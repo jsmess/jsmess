@@ -6,7 +6,6 @@ UINT8 *spdodgeb_videoram;
 
 static int tile_palbank;
 static int sprite_palbank;
-static int scrollx[30];
 
 static tilemap *bg_tilemap;
 
@@ -80,8 +79,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( spdodgeb )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,TILEMAP_TYPE_PEN,8,8,64,32);
-
-	tilemap_set_scroll_rows(bg_tilemap,32);
 }
 
 
@@ -96,14 +93,18 @@ static int lastscroll;
 INTERRUPT_GEN( spdodgeb_interrupt )
 {
 	int iloop = cpu_getiloops();
+	int scanline = (32-iloop) * 8;
 
 	if (iloop > 1 && iloop < 32)
 	{
-		scrollx[31-iloop] = lastscroll;
 		cpunum_set_input_line(0, M6502_IRQ_LINE, HOLD_LINE);
+		video_screen_update_partial(0, scanline+7);
 	}
 	else if (!iloop)
+	{
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		video_screen_update_partial(0, 256);
+	}
 }
 
 WRITE8_HANDLER( spdodgeb_scrollx_lo_w )
@@ -211,19 +212,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( spdodgeb )
 {
-	int i;
 
-
-	if (flip_screen)
-	{
-		for (i = 0;i < 30;i++)
-			tilemap_set_scrollx(bg_tilemap,i+1,scrollx[29 - i]+5);
-	}
-	else
-	{
-		for (i = 0;i < 30;i++)
-			tilemap_set_scrollx(bg_tilemap,i+1,scrollx[i]+5);
-	}
+	tilemap_set_scrollx(bg_tilemap,0,lastscroll+5);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(machine, bitmap,cliprect);

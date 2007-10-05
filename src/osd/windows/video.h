@@ -97,7 +97,4 @@ void winvideo_monitor_refresh(win_monitor_info *monitor);
 float winvideo_monitor_get_aspect(win_monitor_info *monitor);
 win_monitor_info *winvideo_monitor_from_handle(HMONITOR monitor);
 
-void winvideo_set_frameskip(int frameskip);		// <0 = auto
-int winvideo_get_frameskip(void);				// <0 = auto
-
 #endif

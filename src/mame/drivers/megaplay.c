@@ -682,8 +682,8 @@ VIDEO_START(megplay)
 VIDEO_UPDATE(megplay)
 {
 	//printf("megplay vu\n");
-	video_update_megadriv(Machine,0,bitmap,cliprect);
-	megaplay_update_video_normal(Machine, bitmap,cliprect);
+	video_update_megadriv(machine,0,bitmap,cliprect);
+	megaplay_update_video_normal(machine, bitmap,cliprect);
 	return 0;
 }
 

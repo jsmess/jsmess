@@ -18,8 +18,9 @@
 
 **********************************************************************/
 
-#include "8237dma.h"
+#include "driver.h"
 #include "memconv.h"
+#include "8237dma.h"
 
 struct dma8237
 {

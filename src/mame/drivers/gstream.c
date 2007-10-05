@@ -9,8 +9,6 @@
     Simple Sprites (16x16x8bpp tiles)
     3 Simple Tilemaps (32x32x8bpp tiles)
 
-
-
     todo: sprite lag (sprites need buffering?)
           sound banking
 
@@ -94,16 +92,13 @@
     . Board supplied by Tormod
     . Board dumped by Tormod
 
-
-
 *********************************************************************/
 
 #include "driver.h"
 #include "sound/okim6295.h"
 
-static UINT32* gstream_vram;
-static UINT32* gstream_workram;
-static UINT32* gstream_backupram;
+static UINT32 *gstream_vram;
+static UINT32 *gstream_workram;
 
 static tilemap *gstream_tilemap1;
 static tilemap *gstream_tilemap2;
@@ -114,7 +109,6 @@ static UINT32 tilemap1_scrolly, tilemap2_scrolly, tilemap3_scrolly;
 
 static WRITE32_HANDLER( gstream_palette_w )
 {
-
 	COMBINE_DATA(&paletteram32[offset]);
 
 	palette_set_color_rgb(Machine,offset*2,pal5bit(paletteram32[offset] >> (0+16)),
@@ -156,14 +150,10 @@ static WRITE32_HANDLER( gstream_tilemap3_scrollx_w ) { tilemap3_scrollx = data; 
 static WRITE32_HANDLER( gstream_tilemap3_scrolly_w ) { tilemap3_scrolly = data; }
 
 static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00FFFFFF) AM_RAM AM_BASE(&gstream_workram) // work ram, how big?
-
+	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE(&gstream_workram) // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-
 	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM AM_WRITE(gstream_vram_w) AM_BASE(&gstream_vram) // video ram
-
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION(REGION_USER2,0) // main game rom
-
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
 	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM AM_WRITE(gstream_palette_w) AM_BASE(&paletteram32)
@@ -171,305 +161,107 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
 	AM_RANGE(0x4FE00000, 0x4FE00003) AM_WRITE(gstream_tilemap2_scrolly_w)
-
-	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_BASE(&gstream_backupram) // Backup RAM
-
+	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) // Backup RAM
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION(REGION_USER1,0) // boot rom
-
 ADDRESS_MAP_END
 
-
-static READ32_HANDLER(player1_inputs_read) { return readinputport(0); }
-static READ32_HANDLER(player2_inputs_read) { return readinputport(1); }
-static READ32_HANDLER(gstream_unk_r)       { return readinputport(2); }
-
-static READ32_HANDLER( gstream_oki_0_r ) {	return OKIM6295_status_0_r(0); }
-static READ32_HANDLER( gstream_oki_1_r ) {	return OKIM6295_status_1_r(0); }
-static WRITE32_HANDLER( gstream_oki_0_w ) { OKIM6295_data_0_w(0, data & 0x000000ff); } // check other bits
-static WRITE32_HANDLER( gstream_oki_1_w ) { OKIM6295_data_1_w(0, data & 0x000000ff); } // check other bits
+static READ32_HANDLER( gstream_oki_0_r ) { return OKIM6295_status_0_r(0); }
+static READ32_HANDLER( gstream_oki_1_r ) { return OKIM6295_status_1_r(0); }
+static WRITE32_HANDLER( gstream_oki_0_w ) { OKIM6295_data_0_w(0, data & 0xff); }
+static WRITE32_HANDLER( gstream_oki_1_w ) { OKIM6295_data_1_w(0, data & 0xff); }
 
 static WRITE32_HANDLER( gstream_oki_4030_w )
 {
-	//printf("4030: %08x\n", data);
+/*
+    // the only nibbles that are written are: 0x6 0x7 0x9 0xa 0xb 0xe 0xd 0xf which should map to the 8 oki banks
+
+    static const int bank_lookup[16] = { -1, -1, -1, -1, -1, -1, 0, 1, -1, 2, 3, 4, -1, 5, 6, 7 };
+
+    static int old_bank_0 = -1;
+    static int old_bank_1 = -1;
+
+    if(bank_lookup[data & 0xf] != old_bank_0)
+    {
+        old_bank_0 = bank_lookup[data & 0xf];
+
+        if(old_bank_0 != -1)
+            OKIM6295_set_bank_base(0, old_bank_0 * 0x40000);
+        else
+            logerror("oki_0 banking value = %X\n",data & 0xf);
+    }
+
+    if(bank_lookup[(data >> 4) & 0xf] != old_bank_1)
+    {
+        old_bank_1 = bank_lookup[(data >> 4) & 0xf];
+
+        if(old_bank_1 != -1)
+            OKIM6295_set_bank_base(1, old_bank_1 * 0x40000);
+        else
+            logerror("oki_1 banking value = %X\n",(data >> 4) & 0xf);
+    }
+*/
 }
 
 static WRITE32_HANDLER( gstream_oki_4040_w )
 {
-	//printf("4040: %08x\n", data);
+	// data == 0 or data == 0x81
 }
 
-
 static ADDRESS_MAP_START( gstream_io, ADDRESS_SPACE_IO, 32 )
-
-	AM_RANGE(0x0000, 0x0003)                    AM_WRITE(MWA32_NOP) // unknown
-	AM_RANGE(0x001c, 0x001f) AM_READ(MRA32_NOP) AM_WRITE(MWA32_NOP) // unknown
-
-	AM_RANGE(0x4000, 0x4003) AM_READ(player1_inputs_read)
-	AM_RANGE(0x4010, 0x4013) AM_READ(player2_inputs_read)
-	AM_RANGE(0x4020, 0x4023) AM_READ(gstream_unk_r) // extra coin switches etc??
-
-	/* oki banking?? */
+	AM_RANGE(0x4000, 0x4003) AM_READ(input_port_0_dword_r)
+	AM_RANGE(0x4010, 0x4013) AM_READ(input_port_1_dword_r)
+	AM_RANGE(0x4020, 0x4023) AM_READ(input_port_2_dword_r) // extra coin switches etc
 	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_4030_w) // ??
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w) // ??
-
-	AM_RANGE(0x4050, 0x4053) AM_READ(gstream_oki_1_r) AM_WRITE(gstream_oki_1_w) // music
-	AM_RANGE(0x4060, 0x4063) AM_READ(gstream_oki_0_r) AM_WRITE(gstream_oki_0_w) // samples
+	AM_RANGE(0x4050, 0x4053) AM_READWRITE(gstream_oki_1_r, gstream_oki_1_w) // music
+	AM_RANGE(0x4060, 0x4063) AM_READWRITE(gstream_oki_0_r, gstream_oki_0_w) // samples
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( gstream )
 	PORT_START
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_DIPNAME( 0x00001000, 0x00001000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00001000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00002000, 0x00002000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00002000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00004000, 0x00004000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00004000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00008000, 0x00008000, DEF_STR( Unknown ) ) // test1?
-    PORT_DIPSETTING(          0x00008000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_SERVICE2 )
-    PORT_DIPNAME( 0x00001000, 0x00001000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00001000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00002000, 0x00002000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00002000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00004000, 0x00004000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00004000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00008000, 0x00008000, DEF_STR( Unknown ) ) // test 2?
-    PORT_DIPSETTING(          0x00008000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START
-    PORT_DIPNAME( 0x00000001, 0x00000001, "0" )
-    PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000020, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000100, 0x00000100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000100, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000200, 0x00000200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000200, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000400, 0x00000400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000400, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000800, 0x00000800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000800, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00001000, 0x00001000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00001000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00002000, 0x00002000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00002000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00004000, 0x00004000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00004000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00008000, 0x00008000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00008000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "1" )
-    PORT_DIPSETTING(          0x00010000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00020000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00040000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00080000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00200000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00400000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00800000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x01000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-
-	PORT_START
-    PORT_DIPNAME( 0x00000001, 0x00000001, "2" )
-    PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000020, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000100, 0x00000100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000100, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000200, 0x00000200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000200, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000400, 0x00000400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000400, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00000800, 0x00000800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00000800, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00001000, 0x00001000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00001000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00002000, 0x00002000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00002000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00004000, 0x00004000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00004000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00008000, 0x00008000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00008000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "3" )
-    PORT_DIPSETTING(          0x00010000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00020000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00040000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00080000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00200000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00400000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x00800000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x01000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-    PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-
+    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // mirror of some inputs...
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
+    PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
+    PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 
-static const gfx_layout sprites_layout =
+static const gfx_layout layout16x16 =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -480,7 +272,7 @@ static const gfx_layout sprites_layout =
 	16*128,
 };
 
-static const gfx_layout sprites32_layout =
+static const gfx_layout layout32x32 =
 {
 	32,32,
 	RGN_FRAC(1,1),
@@ -499,9 +291,10 @@ static const gfx_layout sprites32_layout =
 };
 
 static GFXDECODE_START( gstream )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, sprites32_layout, 0, 0x80 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, sprites_layout, 0, 0x80 )
+ 	GFXDECODE_ENTRY( REGION_GFX2, 0, layout32x32, 0, 0x80 )
+ 	GFXDECODE_ENTRY( REGION_GFX1, 0, layout16x16, 0, 0x80 )
 GFXDECODE_END
+
 
 
 static TILE_GET_INFO( get_gs1_tile_info )
@@ -549,13 +342,11 @@ VIDEO_UPDATE(gstream)
        Sprites start at the top of memory, tilemaps at
        the bottom, but the areas can overlap
 
-       *potential problem*
+       *What seems an actual game bug*
        when a sprite ends up with a negative co-ordinate
        a value of 0xfffffffe gets set in the sprite list.
        this could corrupt the tile value as both words
-       are being set ?! -- todo, check if this happens
-       and if it does figure out if its a core bug
-
+       are being set ?!
    */
 
 	int i;
@@ -571,9 +362,6 @@ VIDEO_UPDATE(gstream)
 	tilemap_set_scrollx( gstream_tilemap2, 0, tilemap2_scrollx>>16 );
 	tilemap_set_scrolly( gstream_tilemap2, 0, tilemap2_scrolly>>16 );
 
-
-
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
 	tilemap_draw(bitmap,cliprect,gstream_tilemap3,0,0);
 	tilemap_draw(bitmap,cliprect,gstream_tilemap2,0,0);
 	tilemap_draw(bitmap,cliprect,gstream_tilemap1,0,0);
@@ -581,62 +369,20 @@ VIDEO_UPDATE(gstream)
 	for (i=0x0000/4;i<0x4000/4;i+=4)
 	{
 		/* Upper bits are used by the tilemaps */
-		int code = (gstream_vram[i+0]&0x0000ffff);
-		int x =    (gstream_vram[i+1]&0x0000ffff);
-		int y =    (gstream_vram[i+2]&0x0000ffff);
-		int col =  (gstream_vram[i+3]&0x0000ffff)&0x1f;
+		int code = gstream_vram[i+0] & 0xffff;
+		int x    = gstream_vram[i+1] & 0xffff;
+		int y    = gstream_vram[i+2] & 0xffff;
+		int col  = gstream_vram[i+3] & 0x1f;
 
 		/* co-ordinates are signed */
-		if (x&0x8000) x-=0x10000;
-		if (y&0x8000) y-=0x10000;
+		if (x & 0x8000) x-=0x10000;
+		if (y & 0x8000) y-=0x10000;
 
-		drawgfx(bitmap,machine->gfx[1],code,col,0,0,x+1,y+1,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,machine->gfx[1],code,col,0,0,x-2,y,cliprect,TRANSPARENCY_PEN,0);
 	}
-
 
 	return 0;
 }
-
-
-static NVRAM_HANDLER( gstream )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, (UINT8*)gstream_backupram, 0x2000);
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, (UINT8*)gstream_backupram, 0x2000);
-		}
-		else
-		{
-			/* Initialize NVRAM to defaults to avoid ambiguous 'RAM ERROR' message */
-			int i;
-			UINT32 data[32] = {
-				0x00000001, 0x00000000, 0x00000001, 0x00000001,
-				0x00000001, 0x00000000, 0x00000000, 0x00000001,
-				0x00000000, 0x00000002, 0x00000000, 0x00000000,
-				0x000F4240, 0x082E2E2E, 0x000DBBA0, 0x072E2E2E,
-				0x000C3500, 0x062E2E2E, 0x000AAE60, 0x052E2E2E,
-				0x000927C0, 0x042E2E2E, 0x0007A120, 0x032E2E2E,
-				0x00061A80, 0x022E2E2E, 0x000493E0, 0x012E2E2E,
-				0x00030D40, 0x012E2E2E, 0x000186A0, 0x012E2E2E
-
-			};
-
-			memset(gstream_backupram, 0, 0x2000);
-			for(i=0;i<32;i++)
-				gstream_backupram[i] = data[i];
-
-			gstream_backupram[(0x2000-4)/4] = 0x4B42290E;
-
-		}
-	}
-
-}
-
 
 static MACHINE_DRIVER_START( gstream )
 	MDRV_CPU_ADD_TAG("main", E132XT, 16000000)	/* 16 Mhz? */
@@ -656,24 +402,21 @@ static MACHINE_DRIVER_START( gstream )
 	MDRV_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
 	MDRV_GFXDECODE(gstream)
 
-	MDRV_NVRAM_HANDLER(gstream)
+	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	MDRV_VIDEO_START(gstream)
 	MDRV_VIDEO_UPDATE(gstream)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(OKIM6295, 1000000) /* 1 Mhz? */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD(OKIM6295, 1000000) /* 1 Mhz? */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) // pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
-
 
 ROM_START( gstream )
 	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
@@ -682,7 +425,7 @@ ROM_START( gstream )
 	ROM_REGION32_BE( 0x200000, REGION_USER2, 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "gs_prg_02.bin", 0x000000, 0x200000, CRC(2f8a6bea) SHA1(c0a32838f4bd8599f09002139f87562db625c1c5) )
 
-	ROM_REGION( 0x1000000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
+	ROM_REGION( 0x1000000, REGION_GFX1, ROMREGION_DISPOSE )  /* sprite tiles (16x16x8) */
 	ROM_LOAD32_WORD( "gs_gr_07.bin", 0x000000, 0x200000, CRC(84e66fe1) SHA1(73d828714f9ed9baffdc06998f5bf3298396fe9c) )
 	ROM_LOAD32_WORD( "gs_gr_11.bin", 0x000002, 0x200000, CRC(946d71d1) SHA1(516bd3f4d7f5bce59f0593ed6565114dbd5a4ef0) )
 	ROM_LOAD32_WORD( "gs_gr_08.bin", 0x400000, 0x200000, CRC(abd0d6aa) SHA1(dd294bbdda05697df84247257f735ab51bc26ca3) )
@@ -692,7 +435,7 @@ ROM_START( gstream )
 	ROM_LOAD32_WORD( "gs_gr_10.bin", 0xc00000, 0x200000, CRC(d696d15d) SHA1(85aaa5cdb35f3a8d3266bb8debec0558c860cb53) )
 	ROM_LOAD32_WORD( "gs_gr_14.bin", 0xc00002, 0x200000, CRC(6bd2a1e1) SHA1(aedca91643f14ececc101a7708255ce9b1d70f68) )
 
-	ROM_REGION( 0x1000000, REGION_GFX2, ROMREGION_DISPOSE | ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	ROM_REGION( 0xc00000, REGION_GFX2, ROMREGION_DISPOSE )  /* bg tiles (32x32x8) */
 	ROM_LOAD( "gs_gr_01.bin", 0x000000, 0x200000, CRC(b82cfab8) SHA1(08f0eaef5c927fb056c6cc9342e39f445aae9062) )
 	ROM_LOAD( "gs_gr_02.bin", 0x200000, 0x200000, CRC(37e19cbd) SHA1(490ebb037fce09100ec4bba3f73ecdf101526641) )
 	ROM_LOAD( "gs_gr_03.bin", 0x400000, 0x200000, CRC(1a3b2b11) SHA1(a4b1dc1a9709f8f8f2ab2190d7badc246caa540f) )
@@ -700,18 +443,23 @@ ROM_START( gstream )
 	ROM_LOAD( "gs_gr_05.bin", 0x800000, 0x200000, CRC(ef283a73) SHA1(8b598facb344eac33138611abc141a2acb375983) )
 	ROM_LOAD( "gs_gr_06.bin", 0xa00000, 0x200000, CRC(d4e3a2b2) SHA1(4577c007172c718bf7ca55a8ccee5455c281026c) )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 )
-	ROM_LOAD( "gs_snd_01.bin", 0x080000, 0x080000, CRC(79b64d3f) SHA1(b2166210d3a3b85b9ace90749a444c881f69d551) )
-	ROM_LOAD( "gs_snd_03.bin", 0x000000, 0x080000, CRC(2bfff4ac) SHA1(cce1bb3c78b86722c926854c737f9589806012ba) )
+	ROM_REGION( 0x200000, REGION_SOUND1, 0 )
+	ROM_LOAD( "gs_snd_01.bin", 0x000000, 0x080000, CRC(79b64d3f) SHA1(b2166210d3a3b85b9ace90749a444c881f69d551) )
+	ROM_LOAD( "gs_snd_02.bin", 0x080000, 0x080000, CRC(e49ed92c) SHA1(a3d7b3fe93a786a246acf2657d9056398c793078) )
+	ROM_LOAD( "gs_snd_03.bin", 0x100000, 0x080000, CRC(2bfff4ac) SHA1(cce1bb3c78b86722c926854c737f9589806012ba) )
+	ROM_LOAD( "gs_snd_04.bin", 0x180000, 0x080000, CRC(b259de3b) SHA1(1a64f41d4344fefad5832332f1a7655e23f6b017) )
 
-	ROM_REGION( 0x100000, REGION_SOUND2, 0 )
-	ROM_LOAD( "gs_snd_02.bin", 0x000000, 0x080000, CRC(e49ed92c) SHA1(a3d7b3fe93a786a246acf2657d9056398c793078) )
-	ROM_LOAD( "gs_snd_04.bin", 0x080000, 0x080000, CRC(b259de3b) SHA1(1a64f41d4344fefad5832332f1a7655e23f6b017) )
+	ROM_REGION( 0x200000, REGION_SOUND2, 0 )
+	ROM_COPY( REGION_SOUND1, 0, 0, 0x200000 )
 ROM_END
 
 static READ32_HANDLER( gstream_speedup_r )
 {
-	if (activecpu_get_pc()==0xc0001592) {cpu_spinuntil_int();return gstream_workram[0xd1ee0/4];}
+	if (activecpu_get_pc()==0xc0001592)
+	{
+		cpu_spinuntil_int();
+	}
+
 	return gstream_workram[0xd1ee0/4];
 }
 
@@ -720,4 +468,4 @@ static DRIVER_INIT( gstream )
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
 
 }
-GAME( 2002, gstream,  0,      gstream, gstream,   gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", GAME_IMPERFECT_SOUND )
+GAME( 2002, gstream, 0, gstream, gstream, gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", GAME_IMPERFECT_SOUND )

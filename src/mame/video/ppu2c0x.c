@@ -25,9 +25,9 @@ NES-specific:
 ******************************************************************************/
 
 #include <math.h>
-
-#include "video/ppu2c0x.h"
+#include "driver.h"
 #include "profiler.h"
+#include "video/ppu2c0x.h"
 
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH	(32*8)	/* Visible screen width */

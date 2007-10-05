@@ -334,7 +334,7 @@ VIDEO_START( generic )
 	memset(dirtybuffer, 1, videoram_size);
 
 	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* on a restore, we automatically zap the dirty buffer */
 	state_save_register_func_postload(video_generic_postload);
@@ -349,7 +349,7 @@ VIDEO_START( generic )
 VIDEO_START( generic_bitmapped )
 {
 	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* ensure the contents of the bitmap are saved */
 	state_save_register_bitmap("video", 0, "tmpbitmap", tmpbitmap);
@@ -363,7 +363,7 @@ VIDEO_START( generic_bitmapped )
 
 VIDEO_UPDATE( generic_bitmapped )
 {
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	return 0;
 }
 
@@ -666,7 +666,7 @@ PALETTE_INIT( RRRR_GGGG_BBBB )
 {
 	int i;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -678,17 +678,17 @@ PALETTE_INIT( RRRR_GGGG_BBBB )
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* green component */
-		bit0 = (color_prom[i + Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* blue component */
-		bit0 = (color_prom[i + 2*Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + 2*machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[i + 2*machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[i + 2*machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[i + 2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));

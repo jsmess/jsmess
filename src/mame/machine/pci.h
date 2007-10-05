@@ -9,8 +9,6 @@
 #ifndef PCI_H
 #define PCI_H
 
-#include "driver.h"
-
 struct pci_device_info
 {
 	UINT32 (*read_callback)(int function, int reg, UINT32 mem_mask);

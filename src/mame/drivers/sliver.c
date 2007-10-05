@@ -440,8 +440,8 @@ ADDRESS_MAP_END
 
 VIDEO_START(sliver)
 {
-	sliver_bitmap_bg = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	sliver_bitmap_fg = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	sliver_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	sliver_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
 VIDEO_UPDATE(sliver)

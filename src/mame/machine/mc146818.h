@@ -14,8 +14,6 @@
 #ifndef MC146818_H
 #define MC146818_H
 
-#include "driver.h"
-
 typedef enum
 {
 	MC146818_STANDARD,

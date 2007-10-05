@@ -918,6 +918,74 @@ ROM_START( tehkanwc )
 	ROM_LOAD( "twc-5.bin",    0x0000, 0x4000, CRC(444b5544) SHA1(0786d6d9ada7fe49c8ab9751b049095474d2e598) )
 ROM_END
 
+/* from a bootleg board, but clearly a different revision of the game code too,
+   it still displays the Tehkan copyright etc. so might actually be a legitimate alt revision */
+
+/*
+CPUs
+
+    on main board:
+        3x Z8400A-Z80ACPU (main, sound)
+        2x YM-3-8910 (sound)
+        1x OKI M5205 (sound)
+
+    on roms board:
+        1x oscillator 18.000MHz
+        1x oscillator 4.00000MHz
+
+ROMs:
+
+    on main board:
+        5x TMM27128D (1,2,3,5,6)
+        1x HN27256G (4)
+        1x PAL16L8A (on a small piggyback, not dumped)
+
+    on roms board:
+        1x TMM27128D (12)
+        4x HN27256G (7,8,9,11)
+
+Notes:
+
+    on main board:
+        2x 18x2 edge connectors
+        2x 50 pins flat cable connectors to roms board
+        1x trimmer (volume)
+        2x red LEDs
+        2x 8x2 switches dip
+
+    on roms board:
+        2x 50 pins flat cable connectors to roms board
+
+*/
+
+ROM_START( tehkanwb )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "e-1.3-18.ic32",    0x0000, 0x4000, CRC(ac9d851b) SHA1(38a799cec4f29a88ed22c7a1e35fd2287cee869a) )
+	ROM_LOAD( "e-2.3-17.ic31",    0x4000, 0x4000, CRC(65b53d99) SHA1(ea172b2540763d64dc4a238700421cea27138fae) )
+	ROM_LOAD( "e-3.3-15.ic30",    0x8000, 0x4000, CRC(12064bfc) SHA1(954b56a548c697927d58b9cb2ecfe32b4db8d769) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "e-4.9-17.ic100",    0x0000, 0x8000, CRC(70a9f883) SHA1(ace04359265271eb37512a89eb0217eb013aecb7) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "e-6.8-3.ic83",    0x0000, 0x4000, CRC(e3112be2) SHA1(7859e51b4312dc5df01c88e1d97cf608abc7ca72) )
+
+	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "e-12.8c.ic233",   0x00000, 0x4000, CRC(a9e274f8) SHA1(02b46e1b149a856f0be74a23faaeb792935b66c7) )	/* fg tiles */
+
+	ROM_REGION( 0x10000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "e-8.5n.ic191",    0x00000, 0x8000, CRC(055a5264) SHA1(fe294ba57c2c858952e2fab0be1b8859730846cb) )	/* sprites */
+	ROM_LOAD( "e-7.5r.ic193",    0x08000, 0x8000, CRC(59faebe7) SHA1(85dad90928369601e039467d575750539410fcf6) )
+
+	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "e-11.8k.ic238",   0x00000, 0x8000, CRC(669389fc) SHA1(a93e8455060ce5242cb65f78e47b4840aa13ab13) )	/* bg tiles */
+	ROM_LOAD( "e-9.8n.ic240",    0x08000, 0x8000, CRC(347ef108) SHA1(bb9c2f51d65f28655404e10c3be44d7ade98711b) )
+
+	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_LOAD( "e-5.4-3.ic35",    0x0000, 0x4000, CRC(444b5544) SHA1(0786d6d9ada7fe49c8ab9751b049095474d2e598) )
+ROM_END
+
+
 ROM_START( gridiron )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "gfight1.bin",  0x0000, 0x4000, CRC(51612741) SHA1(a0417a35f0ce51ba7fc81f27b356852a97f52a58) )
@@ -977,6 +1045,7 @@ ROM_END
 
 
 
-GAME( 1985, tehkanwc, 0, tehkanwc, tehkanwc, 0,        ROT0,  "Tehkan", "Tehkan World Cup", 0 )
-GAME( 1985, gridiron, 0, gridiron, gridiron, 0,        ROT0,  "Tehkan", "Gridiron Fight", 0 )
-GAME( 1986, teedoff,  0, teedoff,  teedoff,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", 0 )
+GAME( 1985, tehkanwc, 0,        tehkanwc, tehkanwc, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 1)", 0 )
+GAME( 1985, tehkanwb, tehkanwc, tehkanwc, tehkanwc, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 2, bootleg?)", 0 )
+GAME( 1985, gridiron, 0,        gridiron, gridiron, 0,        ROT0,  "Tehkan", "Gridiron Fight", 0 )
+GAME( 1986, teedoff,  0,        teedoff,  teedoff,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", 0 )

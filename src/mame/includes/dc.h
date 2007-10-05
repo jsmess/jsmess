@@ -7,7 +7,8 @@
 #ifndef __DC_H__
 #define __DC_H__
 
-/* machine/dc.c */
+/*----------- defined in machine/dc.c -----------*/
+
 READ64_HANDLER( dc_sysctrl_r );
 WRITE64_HANDLER( dc_sysctrl_w );
 READ64_HANDLER( dc_maple_r );
@@ -27,7 +28,8 @@ WRITE64_HANDLER( dc_aica_reg_w );
 
 MACHINE_RESET( dc );
 
-/* video/dc.c */
+/*----------- defined in video/dc.c -----------*/
+
 READ64_HANDLER( pvr_ctrl_r );
 WRITE64_HANDLER( pvr_ctrl_w );
 READ64_HANDLER( pvr_ta_r );

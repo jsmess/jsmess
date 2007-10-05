@@ -218,7 +218,7 @@ Notes:
 #include "sound/samples.h"
 #include "audio/namco54.h"
 #include "polepos.h"
-
+#include "nam_cust.h"
 
 #define POLEPOS_TOGGLE	PORT_TOGGLE
 
@@ -947,6 +947,12 @@ MACHINE_DRIVER_END
  * ROM definitions
  *********************************************************************/
 
+#define POLEPOS_CUSTOMS \
+	ROM_REGION_NAMCO_54XX( REGION_CPU4 ) \
+	ROM_REGION_NAMCO_51XX( REGION_CPU5 ) \
+	ROM_REGION_NAMCO_52XX( REGION_CPU6 ) \
+	ROM_REGION_NAMCO_53XX( REGION_CPU7 ) \
+
 ROM_START( polepos )
 	/* Z80 memory/ROM data */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -963,9 +969,7 @@ ROM_START( polepos )
 	ROM_LOAD16_BYTE( "pp1_5b.4m",     0x0001, 0x2000, CRC(5cdf5294) SHA1(dbdf327a541fd71aadafda9c925fa4cf7f7c4a24) )
 	ROM_LOAD16_BYTE( "pp1_6b.4l",     0x0000, 0x2000, CRC(81696272) SHA1(27041a7c24297a6f317537c44922b51d2b2278a6) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1045,9 +1049,7 @@ ROM_START( poleposa )
 	ROM_LOAD16_BYTE( "136014.203",   0x0001, 0x2000, CRC(eedea6e7) SHA1(e1459c5e3f824e589e624c3acb18a183fd160df6) )
 	ROM_LOAD16_BYTE( "136014.204",   0x0000, 0x2000, CRC(c52c98ed) SHA1(2e33c487deaf8afb941e07e511a9828d2d8f6b31) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1124,9 +1126,7 @@ ROM_START( polepos1 )
 	ROM_LOAD16_BYTE( "136014.103",   0x0001, 0x2000, CRC(af4fc019) SHA1(1bb6c0f3ffada2e1df72e1767581f8e8bb2b18f9) )
 	ROM_LOAD16_BYTE( "136014.104",   0x0000, 0x2000, CRC(ba0045f3) SHA1(aedb8d8c56407963aa4ffb66243288c8fd6d845a) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1203,9 +1203,8 @@ ROM_START( topracer )
 	ROM_LOAD16_BYTE( "tr5b.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "tr6b.bin",     0x0000, 0x2000, CRC(9d038ada) SHA1(7a9496c3fb93fd1945393656f8510a0c6421a9ab) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	/* this is a bootleg, should we really be loading these? */
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1281,9 +1280,8 @@ ROM_START( topracra )
 	ROM_LOAD16_BYTE( "tr5b.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "pole-d",       0x0000, 0x2000, CRC(932bb5a7) SHA1(8045fe1f9b4b1973ec0d6705adf3ba3891bddaa1) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	/* this is a bootleg, should we really be loading these? */
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1362,9 +1360,8 @@ ROM_START( topracrb )
 	ROM_LOAD16_BYTE( "tr5b.f7",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "tr6b.f5",     0x0000, 0x2000, CRC(b3641d0c) SHA1(38ce172b2e38895749cbd3cc1c0e2c0fe8be744a) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	/* this is a bootleg, should we really be loading these? */
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1443,9 +1440,7 @@ ROM_START( polepos2 )
 	ROM_LOAD16_BYTE( "pp4_7.3m",      0x4001, 0x1000, CRC(ad1c8994) SHA1(2877de9641516767170c0109900955cc7d1ff402) )
 	ROM_LOAD16_BYTE( "pp4_8.3l",      0x4000, 0x1000, CRC(ef25a2ee) SHA1(45959355cad1a48f19ae14193374e03d4f9965c7) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1529,9 +1524,7 @@ ROM_START( poleps2a )
 	ROM_LOAD16_BYTE( "136014.184",   0x4001, 0x2000, CRC(d893c4ed) SHA1(60d39abefbb0c8df68864a30b1f5fcbf4780c86c) )
 	ROM_LOAD16_BYTE( "136014.185",   0x4000, 0x2000, CRC(899de75e) SHA1(4a16535115e37a3d342b2cb53f610a87c0d0abe1) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1613,9 +1606,8 @@ ROM_START( poleps2b )
 	ROM_LOAD16_BYTE( "136014.184",   0x4001, 0x2000, CRC(d893c4ed) SHA1(60d39abefbb0c8df68864a30b1f5fcbf4780c86c) )
 	ROM_LOAD16_BYTE( "136014.185",   0x4000, 0x2000, CRC(899de75e) SHA1(4a16535115e37a3d342b2cb53f610a87c0d0abe1) )
 
-	/* 54XX ROM */
-	ROM_REGION( 0x400, REGION_CPU4, 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	/* this is a bootleg, should we really be loading these? */
+	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */

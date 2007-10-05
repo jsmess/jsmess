@@ -643,9 +643,9 @@ OP( 0x9e, i_sahf      ) { UINT32 tmp = (CompressFlags() & 0xff00) | (I.regs.b[AH
 OP( 0x9f, i_lahf      ) { I.regs.b[AH] = CompressFlags() & 0xff; CLKS(3,3,2); }
 
 OP( 0xa0, i_mov_aldisp ) { UINT32 addr; FETCHWORD(addr); I.regs.b[AL] = GetMemB(DS0, addr); CLKS(10,10,5); }
-OP( 0xa1, i_mov_axdisp ) { UINT32 addr; FETCHWORD(addr); I.regs.b[AL] = GetMemB(DS0, addr); I.regs.b[AH] = GetMemB(DS0, (addr+1)&0xffff); CLKW(14,14,7,14,10,5,addr); }
+OP( 0xa1, i_mov_axdisp ) { UINT32 addr; FETCHWORD(addr); I.regs.w[AW] = GetMemW(DS0, addr); CLKW(14,14,7,14,10,5,addr); }
 OP( 0xa2, i_mov_dispal ) { UINT32 addr; FETCHWORD(addr); PutMemB(DS0, addr, I.regs.b[AL]);  CLKS(9,9,3); }
-OP( 0xa3, i_mov_dispax ) { UINT32 addr; FETCHWORD(addr); PutMemB(DS0, addr, I.regs.b[AL]);  PutMemB(DS0, (addr+1)&0xffff, I.regs.b[AH]); CLKW(13,13,5,13,9,3,addr); }
+OP( 0xa3, i_mov_dispax ) { UINT32 addr; FETCHWORD(addr); PutMemW(DS0, addr, I.regs.w[AW]);  CLKW(13,13,5,13,9,3,addr); }
 OP( 0xa4, i_movsb      ) { UINT32 tmp = GetMemB(DS0,I.regs.w[IX]); PutMemB(DS1,I.regs.w[IY], tmp); I.regs.w[IY] += -2 * I.DF + 1; I.regs.w[IX] += -2 * I.DF + 1; CLKS(8,8,6); }
 OP( 0xa5, i_movsw      ) { UINT32 tmp = GetMemW(DS0,I.regs.w[IX]); PutMemW(DS1,I.regs.w[IY], tmp); I.regs.w[IY] += -4 * I.DF + 2; I.regs.w[IX] += -4 * I.DF + 2; CLKS(16,16,10); }
 OP( 0xa6, i_cmpsb      ) { UINT32 src = GetMemB(DS1, I.regs.w[IY]); UINT32 dst = GetMemB(DS0, I.regs.w[IX]); SUBB; I.regs.w[IY] += -2 * I.DF + 1; I.regs.w[IX] += -2 * I.DF + 1; CLKS(14,14,14); }

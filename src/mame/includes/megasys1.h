@@ -173,7 +173,7 @@ extern tilemap *megasys1_tmap[3];
 extern UINT16 *megasys1_scrollram[3];
 extern UINT16 *megasys1_objectram, *megasys1_vregs, *megasys1_ram;
 
-extern int megasys1_scrollx[3], megasys1_scrolly[3], megasys1_pages_per_tmap_x[3], megasys1_pages_per_tmap_y[3];
+extern int megasys1_scrollx[3], megasys1_scrolly[3];
 extern int megasys1_active_layers;
 //extern int megasys1_screen_flag, megasys1_sprite_flag;
 extern int megasys1_bits_per_color_code;

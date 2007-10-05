@@ -10,8 +10,6 @@
 #include "osdcore.h"
 #include "chd.h"
 #include "chdcd.h"
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
 
 

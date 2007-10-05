@@ -26,6 +26,7 @@
 #include "window.h"
 #include "video.h"
 #include "config.h"
+#include "sound.h"
 
 
 //============================================================

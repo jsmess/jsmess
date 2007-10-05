@@ -15,7 +15,7 @@
     Raphael Nabet, 2003-2004
 */
 
-#include "mame.h"
+#include "driver.h"
 #include "rtc65271.h"
 
 static void field_interrupts(void);

@@ -538,8 +538,7 @@ static void PREFIX(rep)(int flagval)
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
-			PutMemB(ES,I.regs.w[DI],I.regs.b[AL]);
-			PutMemB(ES,I.regs.w[DI]+1,I.regs.b[AH]);
+			PutMemW(ES,I.regs.w[DI],I.regs.w[AX]);
 			I.regs.w[DI] += 2 * I.DirVal;
 			ICOUNT -= cycles.rep_stos16_count;
 		}
@@ -1988,12 +1987,13 @@ static void PREFIX86(_call_far)(void)
 
 static void PREFIX86(_wait)(void)    /* Opcode 0x9b */
 {
-/* PJB 03/05 */
-        if(!I.test_state) ICOUNT -= cycles.wait;
-        else{
-            ICOUNT -= cycles.wait;
-            I.pc --;
-        }
+	if (I.test_state)
+	{
+		ICOUNT = 0;
+		I.pc--;
+	}
+	else
+		ICOUNT -= cycles.wait;
 }
 
 static void PREFIX86(_pushf)(void)    /* Opcode 0x9c */
@@ -2056,8 +2056,7 @@ static void PREFIX86(_mov_axdisp)(void)    /* Opcode 0xa1 */
 	addr += FETCH << 8;
 
 	ICOUNT -= cycles.mov_am16;
-	I.regs.b[AL] = GetMemB(DS, addr);
-	I.regs.b[AH] = GetMemB(DS, addr+1);
+	I.regs.w[AX] = GetMemW(DS, addr);
 }
 
 static void PREFIX86(_mov_dispal)(void)    /* Opcode 0xa2 */
@@ -2079,8 +2078,7 @@ static void PREFIX86(_mov_dispax)(void)    /* Opcode 0xa3 */
 	addr += FETCH << 8;
 
 	ICOUNT -= cycles.mov_ma16;
-	PutMemB(DS, addr, I.regs.b[AL]);
-	PutMemB(DS, addr+1, I.regs.b[AH]);
+	PutMemW(DS, addr, I.regs.w[AX]);
 }
 
 static void PREFIX86(_movsb)(void)    /* Opcode 0xa4 */
@@ -2144,8 +2142,7 @@ static void PREFIX86(_stosb)(void)    /* Opcode 0xaa */
 
 static void PREFIX86(_stosw)(void)    /* Opcode 0xab */
 {
-	PutMemB(ES,I.regs.w[DI],I.regs.b[AL]);
-	PutMemB(ES,I.regs.w[DI]+1,I.regs.b[AH]);
+	PutMemW(ES,I.regs.w[DI],I.regs.w[AX]);
 	I.regs.w[DI] += 2 * I.DirVal;
 	ICOUNT -= cycles.stos16;
 }

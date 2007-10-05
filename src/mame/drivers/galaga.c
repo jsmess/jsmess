@@ -706,7 +706,7 @@ TODO:
 #include "rescap.h"
 #include "sound/samples.h"
 #include "audio/namco54.h"
-
+#include "nam_cust.h"
 
 
 static INTERRUPT_GEN( galaga_cpu3_nmi )
@@ -1893,6 +1893,18 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+/**********************************************************************************************
+  Bosconian & clones
+**********************************************************************************************/
+
+#define BOSCO_CUSTOMS \
+	ROM_REGION_NAMCO_50XX( REGION_CPU4 ) \
+	ROM_REGION_NAMCO_50XX( REGION_CPU5 ) \
+	ROM_REGION_NAMCO_54XX( REGION_CPU6 ) \
+	ROM_REGION_NAMCO_51XX( REGION_CPU7 ) \
+	ROM_REGION_NAMCO_52XX( REGION_CPU8 ) \
+
+
 ROM_START( bosco )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "bos3_1.bin",   0x0000, 0x1000, CRC(96021267) SHA1(bd49b0caabcccf9df45a272d767456a4fc8a7c07) )
@@ -1907,14 +1919,7 @@ ROM_START( bosco )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	BOSCO_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
@@ -1955,14 +1960,7 @@ ROM_START( boscoo )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	BOSCO_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
@@ -2003,14 +2001,7 @@ ROM_START( boscoo2 )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	BOSCO_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
@@ -2051,14 +2042,7 @@ ROM_START( boscomd )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	BOSCO_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
@@ -2099,14 +2083,7 @@ ROM_START( boscomdo )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	BOSCO_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
@@ -2133,6 +2110,13 @@ ROM_START( boscomdo )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
 ROM_END
 
+/**********************************************************************************************
+  Galaga & clones
+**********************************************************************************************/
+
+#define GALAGA_CUSTOMS \
+	ROM_REGION_NAMCO_54XX( REGION_CPU4 ) \
+	ROM_REGION_NAMCO_51XX( REGION_CPU5 ) \
 
 
 ROM_START( galaga )
@@ -2148,8 +2132,7 @@ ROM_START( galaga )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "gg1-7b.2c",    0x0000, 0x1000, CRC(d016686b) SHA1(44c1a04fba3c7c826ff484185cb881b4b22e6657) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	GALAGA_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
@@ -2181,8 +2164,7 @@ ROM_START( galagao )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "gg1-7",        0x0000, 0x1000, CRC(8995088d) SHA1(d6cb439de0718826d1a0363c9d77de8740b18ecf) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	GALAGA_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
@@ -2214,8 +2196,7 @@ ROM_START( galagamw )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "3700g.bin",    0x0000, 0x1000, CRC(b07f0aa4) SHA1(7528644a8480d0be2d0d37069515ed319e94778f) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	GALAGA_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
@@ -2247,8 +2228,7 @@ ROM_START( galagamf )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "3700g.bin",    0x0000, 0x1000, CRC(b07f0aa4) SHA1(7528644a8480d0be2d0d37069515ed319e94778f) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	GALAGA_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
@@ -2280,8 +2260,7 @@ ROM_START( galagamk )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "gg1-7b.2c",    0x0000, 0x1000, CRC(d016686b) SHA1(44c1a04fba3c7c826ff484185cb881b4b22e6657) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	GALAGA_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
@@ -2366,7 +2345,14 @@ ROM_START( gatsbee )
 	ROM_LOAD( "prom-2.5c",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
+/**********************************************************************************************
+  Xevious & clones
+**********************************************************************************************/
 
+#define XEVIOUS_CUSTOMS \
+	ROM_REGION_NAMCO_50XX( REGION_CPU4 ) \
+	ROM_REGION_NAMCO_54XX( REGION_CPU5 ) \
+	ROM_REGION_NAMCO_51XX( REGION_CPU6 ) \
 
 ROM_START( xevious )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for the first CPU */
@@ -2382,11 +2368,7 @@ ROM_START( xevious )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2433,11 +2415,7 @@ ROM_START( xeviousa )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2484,11 +2462,7 @@ ROM_START( xeviousb )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2538,11 +2512,7 @@ ROM_START( xeviousc )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2592,11 +2562,8 @@ ROM_START( xevios )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	/* This is a bootleg, it probably shouldn't be loading these, see 'unknown roms' below */
+	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2631,7 +2598,7 @@ ROM_START( xevios )
 	ROM_LOAD( "xvi_2bpr.7n",  0x0000, 0x0100, CRC(550f06bc) SHA1(816a0fafa0b084ac11ae1af70a5186539376fc2a) )
 	ROM_LOAD( "xvi_1bpr.5n",  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, REGION_USER1, 0 )
+	ROM_REGION( 0x3000, REGION_USER1, 0 ) /* unknown roms */
 	/* extra ROMs (function unknown, could be emulation of the custom I/O */
 	/* chip with a Z80): */
 	ROM_LOAD( "1.16j",        0x0000, 0x1000, CRC(2618f0ce) SHA1(54e8644b5609d6f6ec717a7469c76901eb79f26e) )
@@ -2700,11 +2667,7 @@ ROM_START( sxevious )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
-
-	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2740,7 +2703,13 @@ ROM_START( sxevious )
 	ROM_LOAD( "xvi_1bpr.5n",  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
+/**********************************************************************************************
+  Dig Dug & clones
+**********************************************************************************************/
 
+#define DIGDUG_CUSTOMS \
+	ROM_REGION_NAMCO_51XX( REGION_CPU4 ) \
+	ROM_REGION_NAMCO_53XX( REGION_CPU5 ) \
 
 ROM_START( digdug )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code for the first CPU  */
@@ -2755,6 +2724,8 @@ ROM_START( digdug )
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* 64k for the third CPU  */
 	ROM_LOAD( "136007.107",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
+
+	DIGDUG_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "dd1.9",        0x0000, 0x0800, CRC(f14a6fe1) SHA1(0aa63300c2cb887196de590aceb98f3cf06fead4) )
@@ -2795,6 +2766,8 @@ ROM_START( digdugb )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "136007.107",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
 
+	DIGDUG_CUSTOMS
+
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "dd1.9",        0x0000, 0x0800, CRC(f14a6fe1) SHA1(0aa63300c2cb887196de590aceb98f3cf06fead4) )
 
@@ -2834,6 +2807,8 @@ ROM_START( digdugat )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "136007.107",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
 
+	DIGDUG_CUSTOMS
+
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "136007.108",   0x0000, 0x0800, CRC(3d24a3af) SHA1(857ae93e2a41258a129dcecbaed2df359540b735) )
 
@@ -2872,6 +2847,8 @@ ROM_START( digduga1 )
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "136007.107",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
+
+	DIGDUG_CUSTOMS
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "136007.108",   0x0000, 0x0800, CRC(3d24a3af) SHA1(857ae93e2a41258a129dcecbaed2df359540b735) )
@@ -3009,6 +2986,8 @@ ROM_START( digsid )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "digdug6.6",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
 
+	DIGDUG_CUSTOMS
+
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "digdug8.8",        0x0000, 0x0800, CRC(f14a6fe1) SHA1(0aa63300c2cb887196de590aceb98f3cf06fead4) )
 
@@ -3108,6 +3087,7 @@ static DRIVER_INIT( battles )
 }
 
 
+/* Original Namco hardware, with Namco Customs */
 
 GAME( 1981, bosco,    0,       bosco,   bosco,    0,       ROT0,  "Namco", "Bosconian (new version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, boscoo,   bosco,   bosco,   bosco,    0,       ROT0,  "Namco", "Bosconian (old version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
@@ -3120,20 +3100,25 @@ GAME( 1981, galagao,  galaga,  galaga,  galaga,   galaga,  ROT90, "Namco", "Gala
 GAME( 1981, galagamw, galaga,  galaga,  galagamw, galaga,  ROT90, "[Namco] (Midway license)", "Galaga (Midway set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, galagamk, galaga,  galaga,  galaga,   galaga,  ROT90, "[Namco] (Midway license)", "Galaga (Midway set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, galagamf, galaga,  galaga,  galaga,   galaga,  ROT90, "[Namco] (Midway license)", "Galaga (Midway set 1 with fast shoot hack)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, gallag,   galaga,  galagab, galaga,   galaga,  ROT90, "bootleg", "Gallag", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gatsbee,  galaga,  galagab, gatsbee,  gatsbee, ROT90, "hack", "Gatsbee", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1982, xevious,  0,       xevious, xevious,  xevious, ROT90, "Namco", "Xevious (Namco)", GAME_SUPPORTS_SAVE )
 GAME( 1982, xeviousa, xevious, xevious, xeviousa, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, xeviousb, xevious, xevious, xeviousb, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, xeviousc, xevious, xevious, xeviousa, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1982, xevios,   xevious, xevious, xevious,  xevios,  ROT90, "bootleg", "Xevios", GAME_SUPPORTS_SAVE )
-GAME( 1982, battles,  xevious, battles, xevious,  battles, ROT90, "bootleg", "Battles", GAME_SUPPORTS_SAVE )
 GAME( 1984, sxevious, xevious, xevious, sxevious, xevious, ROT90, "Namco", "Super Xevious", GAME_SUPPORTS_SAVE )
 
 GAME( 1982, digdug,   0,       digdug,  digdug,   0,       ROT90, "Namco", "Dig Dug (rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digdugb,  digdug,  digdug,  digdug,   0,       ROT90, "Namco", "Dig Dug (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digdugat, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digduga1, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digsid,   digdug,  digdug, digdug,    0,       ROT90, "Namco [Sidam license]", "Dig Dug (manufactured by Sidam)", GAME_SUPPORTS_SAVE )
+
+/* Bootlegs with replacement I/O chips */
+
+GAME( 1981, gallag,   galaga,  galagab, galaga,   galaga,  ROT90, "bootleg", "Gallag", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gatsbee,  galaga,  galagab, gatsbee,  gatsbee, ROT90, "hack", "Gatsbee", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+GAME( 1982, xevios,   xevious, xevious, xevious,  xevios,  ROT90, "bootleg", "Xevios", GAME_SUPPORTS_SAVE )
+GAME( 1982, battles,  xevious, battles, xevious,  battles, ROT90, "bootleg", "Battles", GAME_SUPPORTS_SAVE )
+
 GAME( 1982, dzigzag,  digdug,  dzigzag, digdug,   0,       ROT90, "bootleg", "Zig Zag (Dig Dug hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digsid,   digdug,  digdug, digdug,    0,       ROT90, "[Namco] (Sidam license)", "Dig Dug (Sidam)", GAME_SUPPORTS_SAVE ) // still has Namco copyright intact

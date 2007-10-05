@@ -659,7 +659,7 @@ VIDEO_UPDATE( st0016 )
 			{
 				if(srcline[x])
 				{
-					rgb_t color=palette_get_color(Machine, srcline[x]);
+					rgb_t color=palette_get_color(machine, srcline[x]);
 					PLOT_PIXEL_RGB(x,y,RGB_RED(color),RGB_GREEN(color),RGB_BLUE(color));
 				}
 			}

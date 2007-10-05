@@ -68,22 +68,23 @@
 #define OPFLAG_VALIDATE_TLB				0x00000200		/* instruction must validate TLB before execution */
 #define OPFLAG_MODIFIES_TRANSLATION		0x00000400		/* instruction modifies the TLB */
 #define OPFLAG_COMPILER_PAGE_FAULT		0x00000800		/* compiler hit a page fault when parsing */
+#define OPFLAG_COMPILER_UNMAPPED		0x00001000		/* compiler hit unmapped memory when parsing */
 
 /* opcode flags */
-#define OPFLAG_INVALID_OPCODE			0x00001000		/* instruction is invalid */
-#define OPFLAG_VIRTUAL_NOOP				0x00002000		/* instruction is a virtual no-op */
+#define OPFLAG_INVALID_OPCODE			0x00002000		/* instruction is invalid */
+#define OPFLAG_VIRTUAL_NOOP				0x00004000		/* instruction is a virtual no-op */
 
 /* opcode sequence flow flags */
-#define OPFLAG_REDISPATCH				0x00004000		/* instruction must redispatch after completion */
-#define OPFLAG_RETURN_TO_START			0x00008000		/* instruction must jump back to the beginning after completion */
-#define OPFLAG_END_SEQUENCE				0x00010000		/* this is the last instruction in a sequence */
-#define OPFLAG_CAN_CHANGE_MODES			0x00020000		/* instruction can change modes */
+#define OPFLAG_REDISPATCH				0x00008000		/* instruction must redispatch after completion */
+#define OPFLAG_RETURN_TO_START			0x00010000		/* instruction must jump back to the beginning after completion */
+#define OPFLAG_END_SEQUENCE				0x00020000		/* this is the last instruction in a sequence */
+#define OPFLAG_CAN_CHANGE_MODES			0x00040000		/* instruction can change modes */
 
 /* execution semantics */
-#define OPFLAG_READS_MEMORY				0x00040000		/* instruction reads memory */
-#define OPFLAG_WRITES_MEMORY			0x00080000		/* instruction writes memory */
-#define OPFLAG_VARIABLE_SHIFT			0x00100000		/* instruction performs a variable count shift */
-#define OPFLAG_MULTIPLY_DIVIDE			0x00200000		/* instruction performs a multiply/divide */
+#define OPFLAG_READS_MEMORY				0x00080000		/* instruction reads memory */
+#define OPFLAG_WRITES_MEMORY			0x00100000		/* instruction writes memory */
+#define OPFLAG_VARIABLE_SHIFT			0x00200000		/* instruction performs a variable count shift */
+#define OPFLAG_MULTIPLY_DIVIDE			0x00400000		/* instruction performs a multiply/divide */
 
 
 
@@ -124,6 +125,7 @@ struct _opcode_desc
 	/* pointer to the current opcode */
 	union
 	{
+		void *		v;
 		UINT8 *		b;
 		UINT16 *	w;
 		UINT32 *	l;
@@ -133,6 +135,7 @@ struct _opcode_desc
 	/* information about this instruction's execution */
 	UINT8			length;					/* length in bytes of this opcode */
 	UINT8			delayslots;				/* number of delay slots (for branches) */
+	UINT8			skipslots;				/* number of skip slots (for branches) */
 	UINT32			flags;					/* OPFLAG_* opcode flags */
 	UINT32			cycles;					/* number of cycles needed to execute */
 
@@ -153,10 +156,19 @@ struct _drcfe_config
 	UINT32			window_start;			/* code window start offset = startpc - window_start */
 	UINT32			window_end;				/* code window end offset = startpc + window_end */
 	UINT32			max_sequence;			/* maximum instructions to include in a sequence */
-
 	drcfe_describe	describe;				/* callback to describe a single instruction */
 };
 
+/*
+    for each register:
+        callback to load
+        callback to store
+        pointer to memory
+    if (pointer != NULL)
+        - can return reference to memory for operations
+    else
+        - must always load/store from register
+*/
 
 
 /***************************************************************************

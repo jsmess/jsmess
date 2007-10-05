@@ -41,9 +41,6 @@ enum
 };
 
 /* Public functions */
-extern void i80286_set_irq_line(int irqline, int state);
-extern void i80286_set_irq_callback(int (*callback)(int irqline));
-extern const char *i80286_info(void *context, int regnum);
 void i80286_get_info(UINT32 state, cpuinfo *info);
 
 #endif

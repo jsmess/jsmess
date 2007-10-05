@@ -1932,7 +1932,7 @@ INLINE void m68ki_exception_address_error(void)
      */
 	if(CPU_RUN_MODE == RUN_MODE_BERR_AERR_RESET)
 	{
-m68k_read_memory_8(0x00ffff01);
+		m68k_read_memory_8(0x00ffff01);
 		CPU_STOPPED = STOP_LEVEL_HALT;
 		return;
 	}

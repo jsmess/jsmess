@@ -900,6 +900,35 @@ ROM_START( djboy )
 	ROM_LOAD( "bs203.5j", 0x000000, 0x40000, CRC(805341fb) SHA1(fb94e400e2283aaa806814d5a39d6196457dc822) )
 ROM_END
 
+ROM_START( djboya )
+	ROM_REGION( 0x48000, REGION_CPU1, 0 )
+	ROM_LOAD( "bs19s.rom",  0x00000, 0x08000, CRC(17ce9f6c) SHA1(a0c1832b05dc46991e8949067ca0278f5498835f) )
+	ROM_CONTINUE( 0x10000, 0x18000 )
+	ROM_LOAD( "bs100.4d", 0x28000, 0x20000, CRC(081e8af8) SHA1(3589dab1cf31b109a40370b4db1f31785023e2ed) )
+
+	ROM_REGION( 0x38000, REGION_CPU2, 0 )
+	ROM_LOAD( "bs15s.rom",  0x00000, 0x08000, CRC(e6f966b2) SHA1(f9df16035a8b09d87eb70315b216892e25d99b03) )
+	ROM_CONTINUE( 0x10000, 0x08000 )
+	ROM_LOAD( "bs101.6w", 0x18000, 0x20000, CRC(a7c85577) SHA1(8296b96d5f69f6c730b7ed77fa8c93496b33529c) )
+
+	ROM_REGION( 0x24000, REGION_CPU3, 0 ) /* sound */
+	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
+	ROM_CONTINUE( 0x10000, 0x14000 )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* sprites */
+	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
+	ROM_LOAD( "bs001.1f", 0x080000, 0x80000, CRC(fdf36e6b) SHA1(a8762458dfd5201304247c113ceb85e96e33d423) )
+	ROM_LOAD( "bs002.1d", 0x100000, 0x80000, CRC(c52fee7f) SHA1(bd33117f7a57899fd4ec0a77413107edd9c44629) )
+	ROM_LOAD( "bs003.1k", 0x180000, 0x80000, CRC(ed89acb4) SHA1(611af362606b73cd2cf501678b463db52dcf69c4) )
+	ROM_LOAD( "bs07.1b",  0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
+
+	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* background */
+	ROM_LOAD( "bs004.1s", 0x000000, 0x80000, CRC(2f1392c3) SHA1(1bc3030b3612766a02133eef0b4d20013c0495a4) )
+	ROM_LOAD( "bs005.1u", 0x080000, 0x80000, CRC(46b400c4) SHA1(35f4823364bbff1fc935994498d462bbd3bc6044) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* OKI-M6295 samples */
+	ROM_LOAD( "bs203.5j", 0x000000, 0x40000, CRC(805341fb) SHA1(fb94e400e2283aaa806814d5a39d6196457dc822) )
+ROM_END
 
 ROM_START( djboyj )
 	ROM_REGION( 0x48000, REGION_CPU1, 0 )
@@ -1011,6 +1040,7 @@ INPUT_PORTS_START( djboy )
 INPUT_PORTS_END
 
 /*     YEAR, NAME,  PARENT, MACHINE, INPUT, INIT, MNTR,  COMPANY, FULLNAME, FLAGS */
-GAME( 1989, djboy,  0,      djboy,   djboy, djboy,    ROT0, "Sammy / Williams [Kaneko]", "DJ Boy", 0) // Sammy & Williams logos in FG ROM
-GAME( 1989, djboyj, djboy,  djboy,   djboy, djboyj,   ROT0, "Sega [Kaneko]", "DJ Boy (Japan)", 0 ) // Sega logo in FG ROM
+GAME( 1989, djboy,  0,      djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", 0) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboya, djboy,  djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", 0) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboyj, djboy,  djboy,   djboy, djboyj,   ROT0, "Kaneko (Sega license)", "DJ Boy (Japan)", 0 ) // Sega logo in FG ROM
 

@@ -30,13 +30,14 @@ Static Program ROM (48K bytes)            4000-FFFF   R    D0-D7
 
 ****************************************************************************/
 
-#include "machine/atarigen.h"
-#include "audio/atarijsa.h"
+#include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/5220intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
+#include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 
 static UINT8 *bank_base;
 static UINT8 *bank_source_data;

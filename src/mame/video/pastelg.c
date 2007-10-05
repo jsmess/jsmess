@@ -286,7 +286,7 @@ VIDEO_UPDATE( pastelg )
 			for (x = 0; x < machine->screen[0].width; x++)
 			{
 				color = pastelg_videoram[(y * machine->screen[0].width) + x];
-				*BITMAP_ADDR16(pastelg_tmpbitmap, y, x) = Machine->pens[color];
+				*BITMAP_ADDR16(pastelg_tmpbitmap, y, x) = machine->pens[color];
 			}
 		}
 	}

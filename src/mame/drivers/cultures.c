@@ -1,5 +1,5 @@
 /*
-    Jibun wo Migaku cultures School Mahjon Hen
+    Jibun wo Migaku Culture School Mahjong Hen
     (c)1994 Face
 
     driver by Pierpaolo Prazzoli
@@ -321,7 +321,7 @@ GFXDECODE_END
 //WRONG!
 static PALETTE_INIT( cultures )
 {
-	int c;
+	int c,x;
 
 	for (c = 0; c < 256; c++)
 	{
@@ -338,8 +338,11 @@ static PALETTE_INIT( cultures )
         b = ((c & 0xc0) >> 4) | i;
 */
 
+		x = ((c >> 4) & 0x0f);
 
- 		palette_set_color_rgb(machine, c, pal4bit(r), pal4bit(g), pal4bit(b));
+		x = ((x & 4) << 1) | ((x & 8) >> 1) | (x & 1);
+
+ 		palette_set_color_rgb(machine, x | (((c << 4) & 0xf0) ^ 0), pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -385,7 +388,7 @@ MACHINE_DRIVER_END
 
 /*
 
-Jibun wo Migaku cultures School Mahjon Hen
+Jibun wo Migaku Culture School Mahjong Hen
 (c)1994 Face
 
 CPU: Z80
@@ -446,4 +449,4 @@ ROM_START( cultures )
 	ROM_RELOAD(               0x000000, 0x020000 )
 ROM_END
 
-GAME( 1994, cultures, 0, cultures, cultures, 0, ROT0, "Face", "Jibun wo Migaku cultures School Mahjon Hen", GAME_WRONG_COLORS )
+GAME( 1994, cultures, 0, cultures, cultures, 0, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", GAME_WRONG_COLORS )

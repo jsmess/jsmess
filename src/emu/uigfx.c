@@ -13,6 +13,7 @@
 #include "render.h"
 #include "rendfont.h"
 #include "rendutil.h"
+#include "uigfx.h"
 
 
 

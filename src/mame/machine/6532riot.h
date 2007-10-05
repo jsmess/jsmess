@@ -7,8 +7,6 @@
 #ifndef RIOT_6532
 #define RIOT_6532
 
-#include "driver.h"
-
 #define	MAX_R6532	8
 
 struct riot6532_interface

@@ -116,10 +116,6 @@ extern unsigned m6510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UI
 
 extern void m6510t_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef MAME_DEBUG
-extern unsigned m6510t_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
-
 #endif
 
 #if (HAS_M7501)

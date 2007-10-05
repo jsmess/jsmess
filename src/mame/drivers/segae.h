@@ -1,7 +1,5 @@
 /* System E stuff */
 
-#include "driver.h"
-
 extern VIDEO_UPDATE(megatech_bios);
 extern VIDEO_UPDATE(megatech_md_sms);
 extern DRIVER_INIT( megatech_bios );

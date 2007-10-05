@@ -2,8 +2,6 @@
     rtc65271.h: include file for rtc65271.c
 */
 
-#include "driver.h"
-
 extern int rtc65271_file_load(mame_file *file);
 extern int rtc65271_file_save(mame_file *file);
 extern void rtc65271_init(UINT8 *xram, void (*interrupt_callback)(int state));

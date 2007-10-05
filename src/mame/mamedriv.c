@@ -107,6 +107,7 @@ const game_driver * const drivers[] =
 	DRIVER( rocktrv2 )	/* (c) 1986 Triumph Software Inc */
 	DRIVER( bigbucks )	/* (c) 1986 Dynasoft Inc. */
 	DRIVER( mschamp )	/* hack */
+	DRIVER( cannonbp )	/* hack */
 
 	/* S2650 Pacman Kits */
 	DRIVER( drivfrcp )	/* (c) 1984 Shinkai Inc. (Magic Eletronics Inc. licence) */
@@ -1211,6 +1212,7 @@ const game_driver * const drivers[] =
 	DRIVER( goldbug )	/* (c) 1982 Century */
 	DRIVER( heartatk )	/* (c) 1983 Century Electronics */
 	DRIVER( hunchbak )	/* (c) 1983 Century */
+	DRIVER( hunchbka )	/* (c) 1983 Century */
 	DRIVER( superbik )	/* (c) 1983 Century */
 	DRIVER( raiders )	/* (c) 1983 Century Electronics UK */
 	DRIVER( hero )		/* (c) 1983 Seatongrove (c) 1984 CVS */
@@ -1384,6 +1386,9 @@ const game_driver * const drivers[] =
 	DRIVER( nspiritj )	/* (c) 1988 (Japan) */
 	DRIVER( imgfight )	/* (c) 1988 (Japan) */
 	DRIVER( loht )		/* (c) 1989 */
+	DRIVER( lohtj )		/* (c) 1989 (Japan) */
+	DRIVER( lohtb )		/* (c) 1989 (bootleg) */
+	DRIVER( lohtb2 )	/* (c) 1989 (bootleg) */
 	DRIVER( xmultipl )	/* (c) 1989 (Japan) */
 	DRIVER( dbreed )	/* (c) 1989 */
 	DRIVER( dbreed72 )	/* (c) 1989 */
@@ -1657,6 +1662,7 @@ const game_driver * const drivers[] =
 	DRIVER( tetrsark )	/* ??? (c) D.R.Korea */
 	DRIVER( sqix )		/* B03 1987 */
 	DRIVER( sqixa )		/* B03 1987 */
+	DRIVER( sqixu )		/* B03 1987 */
 	DRIVER( sqixbl )	/* bootleg? but (c) 1987 */
 	DRIVER( perestro )	/* (c) 1994 Promat */
 	DRIVER( perestrf )	/* (c) 1993 Promat / Fuuki */
@@ -2965,6 +2971,7 @@ V-V                           TP-027
 				/*  8/1989 Dokaben 2 (baseball) */
 	DRIVER( pang )		/* (c) 1989 Mitchell (World) */
 	DRIVER( pangb )		/* bootleg */
+	DRIVER( pangbold )	/* bootleg */
 	DRIVER( bbros )		/* (c) 1989 Capcom (US) not listed on Capcom's site */
 	DRIVER( pompingw )	/* (c) 1989 Mitchell (Japan) */
 	DRIVER( cbasebal )	/* 10/1989 (c) 1989 Capcom (Japan) (different hardware) */
@@ -2972,6 +2979,7 @@ V-V                           TP-027
 	DRIVER( hatena )	/* 28/02/1990 (QUIZ 2) (c) 1990 Capcom (Japan) */
 	DRIVER( spang )		/* 14/09/1990 (c) 1990 Mitchell (World) */
 	DRIVER( spangj )	/* --/--/1990 (c) 1990 Mitchell (Japan) */
+	DRIVER( spangbl )	/* bootleg */
 	DRIVER( sbbros )	/* 01/10/1990 (c) 1990 Mitchell + Capcom (US) not listed on Capcom's site */
 	DRIVER( marukin )	/* 17/10/1990 (c) 1990 Yuga (Japan) */
 	DRIVER( qtono1 )	/* 25/12/1990 (QUIZ 3) (c) 1991 Capcom (Japan) */
@@ -3344,6 +3352,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( sdi )		/* (c) 1987 (FD1089B, decrypted) */
 	DRIVER( shinobi )	/* (c) 1987 */
 	DRIVER( shinobi1 )	/* (c) 1987 (FD1094, decrypted) */
+	DRIVER( shinobls )	/* (c) 1987 (Star bootleg) */
 	DRIVER( sjryuko1 )	/* (c) 1988 White Board (FD1089B, decrypted) */
 	DRIVER( tetris )	/* (c) 1988 (FD1094, decrypted) S16A */
 	DRIVER( tetris3 )	/* (c) 1988 (FD1094, decrypted) S16A */
@@ -3434,7 +3443,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( goldnab2 )	/* BOOTLEG  */
 	DRIVER( passht4b )	/* bootleg */
 	DRIVER( passshtb )	/* bootleg */
-	DRIVER( shinobl )	/* (c) 1987 (but bootleg) */
+	DRIVER( shinoblb )	/* (c) 1987 (but bootleg) */
+	DRIVER( shinobld )	/* (c) 1987 (but bootleg) */
 	DRIVER( tetrisbl )	/* (c) 1988 (but bootleg) */
 	DRIVER( tturfbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( wb3bbl )	/* BOOTLEG */
@@ -3547,6 +3557,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( gground )	/* (c) 1988 (FD1094, decrypted) */
 	DRIVER( ggroundj )	/* (c) 1988 (FD1094, decrypted) */
 	DRIVER( crkdown )	/* (c) 1989 (FD1094, decrypted) */
+	DRIVER( crkdownu )	/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( crkdownj )	/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( sgmast )	/* (c) 1989 (protected) */
 	DRIVER( sgmastc )	/* (c) 1989 (FD1094, decrypted) */
@@ -3812,6 +3823,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tantrkor )	/* (c) 1992 Sega */
 	DRIVER( tantrbl )	/* bootleg */
 	DRIVER( tantrbl2 )	/* bootleg */
+	DRIVER( tantrbl3 )	/* bootleg */
 	DRIVER( puyo )		/* (c) 1992 Sega / Compile */
 	DRIVER( puyobl )	/* bootleg */
 	DRIVER( puyoj )		/* (c) 1992 Sega / Compile */
@@ -4314,6 +4326,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( lvpoker )	/* ???? - (c) 1985 Tehkan */
 	DRIVER( lvcards )	/* (c) 1985 Tehkan */
 	DRIVER( tehkanwc )	/* (c) 1985 Tehkan */
+	DRIVER( tehkanwb )	/* bootleg */
 	DRIVER( gridiron )	/* (c) 1985 Tehkan */
 	DRIVER( teedoff )	/* 6102 - (c) 1986 Tecmo */
 	DRIVER( solomon )	/* (c) 1986 Tecmo */
@@ -5707,7 +5720,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ddragonw )	/* TA-0021 (c) 1987 Taito */
 	DRIVER( ddragnw1 )	/* TA-0021 (c) 1987 Taito */
 	DRIVER( ddragonb )	/* bootleg */
+	DRIVER( ddragnba )	/* bootleg */
 	DRIVER( spdodgeb )	/* TA-0022 (c) 1987 */
+	DRIVER( nkdodge )	/* TA-0022 (c) 1987 (Japan) */
 	DRIVER( nkdodgeb )	/* TA-0022 (c) 1987 (Japan) */
 	DRIVER( chinagat )	/* TA-0023 (c) 1988 Taito + Romstar license (US) */
 	DRIVER( saiyugou )	/* TA-0023 (c) 1988 (Japan) */
@@ -6161,8 +6176,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Tad games (Tad games run on Seibu hardware) */
 	DRIVER( cabal )		/* (c) 1988 Tad + Fabtek license */
-	DRIVER( cabal2 )	/* (c) 1988 Tad + Fabtek license */
+	DRIVER( cabala )	/* (c) 1988 Tad + Fabtek license */
 	DRIVER( cabalbl )	/* bootleg */
+	DRIVER( cabalus )	/* (c) 1988 Tad + Fabtek license */
+	DRIVER( cabalus2 )	/* (c) 1988 Tad + Fabtek license */
 	DRIVER( toki )		/* (c) 1989 Tad (World) */
 	DRIVER( tokia )		/* (c) 1989 Tad (World) */
 	DRIVER( tokiu )		/* (c) 1989 Tad + Fabtek license (US) */
@@ -6278,6 +6295,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kirarast )	/* (c) 1996 */
 	DRIVER( tp2m32 )	/* (c) 1997 */
 	DRIVER( f1superb )	/* (c) 1994 */
+
+	DRIVER( bnstars1 )	/* (c) 1994 */
 
 	/* Video System Co. games */
 	DRIVER( rabiolep )	/* (c) 1987 V-System Co. (Japan) */
@@ -6468,6 +6487,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Kaneko games */
 	DRIVER( djboy )		/* (c) 1989 Kaneko */
 	DRIVER( djboyj )	/* (c) 1989 Kaneko */
+	DRIVER( djboya )	/* (c) 1989 Kaneko */
 	DRIVER( airbustr )	/* (c) 1990 Kaneko + Namco */
 	DRIVER( airbustj )	/* (c) 1990 Kaneko + Namco (Japan) */
 	DRIVER( airbusb )	/* bootleg */
@@ -6997,7 +7017,10 @@ Other Sun games
 	DRIVER( quiz365 )	/* "78" (c) 1994 Nakanihon */
 	DRIVER( quiz365t )	/* "78" (c) 1994 Nakanihon (Taiwan) */
 	DRIVER( rongrong )	/* "80" (c) 1994 Nakanihon */
+	DRIVER( rongrngj )	/* "80" (c) 1994 Nakanihon */
 	DRIVER( rongrngg )	/* "80" (c) 1994 Nakanihon */
+	DRIVER( hparadis )	/*      (c) 1994 Nakanihon */
+	DRIVER( hgokou )	/*      (c) 1995 Nakanihon */
 	DRIVER( mjdchuka )	/*      (c) 1995 Nakanihon */
 	DRIVER( mjtensin )	/* "100" 1995 Dynax */
 	DRIVER( nettoqc )	/* "103" (c) 1995 Nakanihon */
@@ -7773,5 +7796,6 @@ Other Sun games
 	DRIVER( comebaby )	/* (c) 2000 ExPotato */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
+	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
 
 #endif	/* DRIVER_RECURSIVE */

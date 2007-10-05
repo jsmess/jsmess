@@ -7,9 +7,6 @@
 #ifndef PIC8259_H
 #define PIC8259_H
 
-#include "driver.h"
-
-
 int pic8259_init(int count, void (*set_int_line)(int which, int interrupt));
 int pic8259_acknowledge(int which);
 void pic8259_set_irq_line(int which, int irq, int state);

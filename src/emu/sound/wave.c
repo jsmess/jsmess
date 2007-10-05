@@ -12,6 +12,7 @@
 #include "utils.h"
 #include "devices/cassette.h"
 #include "streams.h"
+#include "wave.h"
 
 #define ALWAYS_PLAY_SOUND	0
 #define WAVE_TOKEN_MASK		0xFFFF0000
@@ -54,8 +55,8 @@ static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 
 static void *wave_start(int sndindex, int clock, const void *config)
 {
-	stream_create(0, 1, Machine->sample_rate, (void *) sndindex, wave_sound_update);
-    return (void *) (sndindex | WAVE_TOKEN_MASK);
+	stream_create(0, 1, Machine->sample_rate, (void *) (FPTR)sndindex, wave_sound_update);
+	return (void *) (FPTR)(sndindex | WAVE_TOKEN_MASK);
 }
 
 

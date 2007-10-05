@@ -607,10 +607,10 @@ VIDEO_UPDATE(mtnew)
 	if (screen ==0)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
-		if (!current_game_is_sms) video_update_megadriv(Machine,0,bitmap,cliprect);
-		else video_update_megatech_md_sms(Machine,0,bitmap,cliprect);
+		if (!current_game_is_sms) video_update_megadriv(machine,0,bitmap,cliprect);
+		else video_update_megatech_md_sms(machine,0,bitmap,cliprect);
 	}
-	else if (screen ==1) video_update_megatech_bios(Machine, 1, bitmap,cliprect);
+	else if (screen ==1) video_update_megatech_bios(machine, 1, bitmap,cliprect);
 	return 0;
 }
 

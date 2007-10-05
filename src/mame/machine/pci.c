@@ -69,8 +69,9 @@
 
 ***************************************************************************/
 
-#include "machine/pci.h"
+#include "driver.h"
 #include "memconv.h"
+#include "machine/pci.h"
 
 #define LOG_PCI	0
 

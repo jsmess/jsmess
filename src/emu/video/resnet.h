@@ -158,9 +158,6 @@ int compute_res_net(int inputs, int channel, const res_net_info *di);
 rgb_t *compute_res_net_all(const UINT8 *prom, const res_net_decode_info *rdi, const res_net_info *di);
 
 
-void normalize_palette(running_machine *machine, int start, int end, int lum_min, int lum_max);
-
-
 /* legacy interface */
 
 double compute_resistor_weights(

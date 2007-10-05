@@ -1007,7 +1007,7 @@ VIDEO_UPDATE( galsnew )
 		{
 			UINT16 dat = (galsnew_fg_pixram[count] & 0xfffe)>>1;
 			dat+=2048;
-			dest[x] = Machine->pens[dat];
+			dest[x] = machine->pens[dat];
 			count++;
 		}
 	}
@@ -1023,7 +1023,7 @@ VIDEO_UPDATE( galsnew )
 			//dat &=0x3ff;
 			if (dat)
 			{
-				dest[x] = Machine->pens[dat];
+				dest[x] = machine->pens[dat];
 			}
 			count++;
 		}

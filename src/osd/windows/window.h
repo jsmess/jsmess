@@ -96,14 +96,6 @@ struct _win_draw_callbacks
 // windows
 extern win_window_info *win_window_list;
 
-// visible bounds
-extern RECT			win_visible_rect;
-extern int			win_visible_width;
-extern int			win_visible_height;
-
-// raw input support
-extern int			win_use_raw_mouse;
-
 
 
 //============================================================

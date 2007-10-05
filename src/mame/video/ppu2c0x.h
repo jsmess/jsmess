@@ -9,8 +9,6 @@
 #ifndef __PPU_2C03B_H__
 #define __PPU_2C03B_H__
 
-#include "driver.h"
-
 /* increment to use more chips */
 #define MAX_PPU 2
 

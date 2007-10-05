@@ -689,12 +689,13 @@ INLINE UINT64 get_cop1_creg(int idx)
 {
 	if (idx == 31)
 	{
+		UINT32 result = mips3.core.ccr[1][31] & ~0xfe800000;
 		int i;
 
-		mips3.core.ccr[1][31] &= ~0xfe800000;
 		for (i = 0; i < 8; i++)
 			if (mips3.core.cf[1][i])
-				mips3.core.ccr[1][31] |= (UINT64)1 << fcc_shift[i];
+				result |= 1 << fcc_shift[i];
+		return result;
 	}
 	return mips3.core.ccr[1][idx];
 }

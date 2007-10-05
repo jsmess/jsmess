@@ -17,7 +17,7 @@
 // Following table gives the decrypted sprite offset given the sprite number.
 // The actual decryption algorithm is unknown.
 
-#include "osdcore.h"
+#include "driver.h"
 
 const UINT32 pgmy2ks[0x3c00] = {
 	0x000000, 0x00007c, 0x0000f8, 0x000174, 0x0001f0, 0x00026c, 0x0002e8, 0x000364,

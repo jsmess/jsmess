@@ -111,7 +111,7 @@
   ???-????      Top Roller             same key as Yamato
   315-5028      Sindbad Mystery
   315-5030      Up'n Down &            unencrypted version available
-           M120 Razzmatazz
+  ???-???? M120 Razzmatazz
   315-5033      Regulus                unencrypted version available
   315-5041 M140 Mister Viking
   315-5048      SWAT                   used Bull Fight for k.p.a.
@@ -123,6 +123,7 @@
   315-5069      Star Force             game by Tehkan; same key as Super Locomotive
   ???-????      Pinball Action         game by Tehkan; also has a simple bitswap on top
   ???-????      Spatter
+  315-5084      Jongkyo                TABLE INCOMPLETE game by Kiwako; also has a simple bitswap on top
   315-5093      Pitfall II
   315-5098      Ninja Princess         unencrypted version available; same key as Up'n Down
   315-5102      Sega Ninja             unencrypted version available
@@ -230,18 +231,6 @@ static void look_for_known_plaintext(void)
 {
 	lfkp(0x57);
 }
-
-static void read_table_from_disk(UINT8 *xortable)
-{
-	FILE *f;
-
-
-	f = fopen("table","rb");
-
-	if (f) fread(xortable,1,128,f);
-
-	fclose(f);
-}
 #endif
 
 static void sega_decode(const UINT8 convtable[32][4])
@@ -280,7 +269,7 @@ static void sega_decode(const UINT8 convtable[32][4])
 		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
 
 		if (convtable[2*row][col] == 0xff)	/* table incomplete! (for development) */
-			decrypted[A] = 0x00;
+			decrypted[A] = 0xee;
 		if (convtable[2*row+1][col] == 0xff)	/* table incomplete! (for development) */
 			rom[A] = 0xee;
 	}
@@ -794,6 +783,74 @@ void spatter_decode(void)
 
 
 	sega_decode(convtable);
+}
+
+
+void jongkyo_decode(void)
+{
+	/* encrypted ROM is banked */
+	UINT8 *decrypted;
+
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x28,0x08,0xa8,0x88 }, { 0xa0,0xa8,0x20,0x28 },	/* ...0...0...0...0 */
+		{ 0x80,0x88,0xa0,0xa8 }, { 0xa0,0xa8,0x20,0x28 },	/* ...0...0...0...1 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x20,0xa0,0x00,0x80 },	/* ...0...0...1...0 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x80,0x88,0xa0,0xa8 },	/* ...0...0...1...1 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x08,0x88,0x00,0x80 },	/* ...0...1...0...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x08,0x88,0x00,0x80 },	/* ...0...1...0...1 */
+		{ 0x20,0xa0,0x00,0x80 }, { 0x20,0xa0,0x00,0x80 },	/* ...0...1...1...0 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x08,0x88,0x00,0x80 },	/* ...0...1...1...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0xa8,0x20,0x28 },	/* ...1...0...0...0 */
+		{ 0x80,0x88,0xa0,0xa8 }, { 0x80,0x88,0xa0,0xa8 },	/* ...1...0...0...1 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x20,0xa0,0x00,0x80 },	/* ...1...0...1...0 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x80,0x88,0xa0,0xa8 },	/* ...1...0...1...1 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x28,0x08,0xa8,0x88 },	/* ...1...1...0...0 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x80,0x88,0xa0,0xa8 },	/* ...1...1...0...1 */
+		{ 0x28,0x08,0xa8,0x88 }, { 0x20,0xa0,0x00,0x80 },	/* ...1...1...1...0 */
+		{ 0x80,0x88,0xa0,0xa8 }, { 0x08,0x88,0x00,0x80 }	/* ...1...1...1...1 */
+	};
+
+	int A;
+
+	UINT8 *rom = memory_region(REGION_CPU1);
+	decrypted = auto_malloc(0x9000);
+
+	for (A = 0x0000;A < 0x9000;A++)
+	{
+		int xor = 0;
+
+		UINT8 src = rom[A];
+
+		/* pick the translation table from bits 0, 4, 8 and 12 of the address */
+		int row = (A & 1) + (((A >> 4) & 1) << 1) + (((A >> 8) & 1) << 2) + (((A >> 12) & 1) << 3);
+
+		/* pick the offset in the table from bits 3 and 5 of the source data */
+		int col = ((src >> 3) & 1) + (((src >> 5) & 1) << 1);
+		/* the bottom half of the translation table is the mirror image of the top */
+		if (src & 0x80)
+		{
+			col = 3 - col;
+			xor = 0xa8;
+		}
+
+		/* special handling for banked area */
+		if (A >= 0x7000)
+			row = (A & 1) + (((A >> 4) & 1) << 1) + (((A >> 8) & 1) << 2);
+
+		/* decode the opcodes */
+		decrypted[A] = (src & ~0xa8) | (convtable[2*row][col] ^ xor);
+
+		/* decode the data */
+		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
+	}
+
+	memory_configure_bank(1,0,8, memory_region(REGION_CPU1)+0x7000,0x0400);
+	memory_configure_bank_decrypted(1,0,8,decrypted+0x7000,0x0400);
+	memory_set_decrypted_region(0, 0x0000, 0x6bff, decrypted);
+	memory_set_bank(1, 0);
 }
 
 

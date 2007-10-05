@@ -21,8 +21,6 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 
 offs_t spc700_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-unsigned int spc700_read_8_disassembler(unsigned int address);
-
 #define spc700_read_8_disassembler(addr)				program_read_byte_8(addr)
 
 

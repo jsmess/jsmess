@@ -62,6 +62,8 @@
 extern VIDEO_START(model2);
 extern VIDEO_UPDATE(model2);
 
+extern void model2_3d_set_zclip( UINT8 clip );
+
 UINT32 *model2_bufferram, *model2_colorxlat, *model2_workram, *model2_backup1, *model2_backup2;
 UINT32 *model2_textureram0, *model2_textureram1, *model2_lumaram;
 static UINT32 model2_intreq;
@@ -526,9 +528,9 @@ static WRITE32_HANDLER( copro_ctl1_w )
 			logerror("Boot copro, %d dwords\n", model2_coprocnt);
 			if (dsp_type != DSP_TYPE_TGPX4)
 			{
-			cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
+				cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
+			}
 		}
-	}
 	}
 
 	model2_coproctl = data;
@@ -1239,6 +1241,11 @@ static WRITE32_HANDLER(model2o_luma_w)
 	}
 }
 
+static WRITE32_HANDLER(model2_3d_zclip_w)
+{
+	model2_3d_set_zclip( data & 0xFF );
+}
+
 /* common map for all Model 2 versions */
 static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
@@ -1273,6 +1280,7 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE(MRA32_RAM, pal32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(&model2_colorxlat)
+	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
 	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_BASE( &model2_backup1 ) // Backup sram
 	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION(REGION_USER1, 0)

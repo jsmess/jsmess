@@ -260,10 +260,10 @@ void vector_clear_list (void)
 VIDEO_UPDATE( vector )
 {
 	UINT32 flags = PRIMFLAG_ANTIALIAS(options_get_bool(mame_options(), OPTION_ANTIALIAS) ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
-	float xscale = 1.0f / (65536 * (Machine->screen[screen].visarea.max_x - Machine->screen[screen].visarea.min_x));
-	float yscale = 1.0f / (65536 * (Machine->screen[screen].visarea.max_y - Machine->screen[screen].visarea.min_y));
-	float xoffs = (float)Machine->screen[screen].visarea.min_x;
-	float yoffs = (float)Machine->screen[screen].visarea.min_y;
+	float xscale = 1.0f / (65536 * (machine->screen[screen].visarea.max_x - machine->screen[screen].visarea.min_x));
+	float yscale = 1.0f / (65536 * (machine->screen[screen].visarea.max_y - machine->screen[screen].visarea.min_y));
+	float xoffs = (float)machine->screen[screen].visarea.min_x;
+	float yoffs = (float)machine->screen[screen].visarea.min_y;
 	point *curpoint;
 	render_bounds clip;
 	int lastx = 0, lasty = 0;

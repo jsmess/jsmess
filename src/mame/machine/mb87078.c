@@ -6,7 +6,7 @@
 
  *****************************************************************************/
 
-#include "osdcore.h"
+#include "driver.h"
 #include "machine/mb87078.h"
 
 struct MB87078 {

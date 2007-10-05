@@ -14,6 +14,7 @@
 #include "uimenu.h"
 #include "uitext.h"
 #include "machine/eeprom.h"
+#include "cheat.h"
 #include <ctype.h>
 #include <math.h>
 

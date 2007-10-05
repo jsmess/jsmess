@@ -131,8 +131,8 @@ static VIDEO_START(srmp6)
 	tileram = auto_malloc(0x100000*16);
 	dirty_tileram = auto_malloc((0x100000*16)/0x40); // every 8x8x8 tile is 0x40 bytes
 
-	memset(tileram,(0x100000*16),0x00);
-	memset(dirty_tileram,(0x100000*16)/0x40,1);
+	memset(tileram,0x00,(0x100000*16));
+	memset(dirty_tileram,1,(0x100000*16)/0x40);
 
 	dmaram = auto_malloc(0x100);
 
@@ -271,7 +271,7 @@ static VIDEO_UPDATE(srmp6)
 
 						if (dirty_tileram[tileno])
 						{
-							decodechar(Machine->gfx[0], tileno, (UINT8*)tileram, &tiles8x8_layout);
+							decodechar(machine->gfx[0], tileno, (UINT8*)tileram, &tiles8x8_layout);
 							dirty_tileram[tileno] = 0;
 						}
 

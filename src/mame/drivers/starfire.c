@@ -72,7 +72,7 @@ static TIMER_CALLBACK( update_callback )
 	/* update the previous chunk of scanlines */
 	starfire_video_update(scanline, SCANLINE_UPDATE_CHUNK);
 	scanline += SCANLINE_UPDATE_CHUNK;
-	if (scanline >= Machine->screen[0].height)
+	if (scanline >= machine->screen[0].height)
 		scanline = 32;
 	mame_timer_set(video_screen_get_time_until_pos(0, scanline + SCANLINE_UPDATE_CHUNK - 1, 0), scanline, update_callback);
 }

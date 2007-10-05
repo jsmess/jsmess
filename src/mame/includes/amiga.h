@@ -371,6 +371,9 @@ extern UINT16 *amiga_autoconfig_mem;
 
 extern const char *amiga_custom_names[0x100];
 
+extern UINT16 (*amiga_chip_ram_r)(offs_t offset);
+extern void (*amiga_chip_ram_w)(offs_t offset, UINT16 data);
+
 void amiga_machine_config(const amiga_machine_interface *intf);
 
 MACHINE_RESET( amiga );
@@ -410,8 +413,5 @@ void amiga_set_genlock_color(UINT16 color);
 void amiga_render_scanline(int scanline);
 void amiga_sprite_dma_reset(int which);
 void amiga_sprite_enable_comparitor(int which, int enable);
-
-extern UINT16 (*amiga_chip_ram_r)(offs_t offset);
-extern void (*amiga_chip_ram_w)(offs_t offset, UINT16 data);
 
 #endif /* __AMIGA_H__ */

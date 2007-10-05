@@ -167,6 +167,17 @@ typedef union
 #endif
 
 
+/* map mame_* helpers to core_* helpers */
+#define mame_stricmp		core_stricmp
+#define mame_strnicmp		core_strnicmp
+#define mame_strdup			core_strdup
+#define mame_strwildcmp		core_strwildcmp
+
+
+/* prevent the use of rand() -- use mame_rand() instead */
+#define rand
+
+
 /* macros to convert radians to degrees and degrees to radians */
 #define RADIAN_TO_DEGREE(x)   ((180.0 / M_PI) * (x))
 #define DEGREE_TO_RADIAN(x)   ((M_PI / 180.0) * (x))
@@ -274,11 +285,6 @@ typedef union
 		 (BIT(val, B0) <<  0))
 
 
-#define mame_stricmp		core_stricmp
-#define mame_strnicmp		core_strnicmp
-#define mame_strdup		core_strdup
-#define mame_strwildcmp	core_strwildcmp
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -380,10 +386,6 @@ INLINE INT32 fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
 	return (INT32)(((INT64)val1 * (INT64)val2) >> shift);
 }
 #endif
-
-
-/* prevent the use of rand() -- use mame_rand() instead */
-#define rand
 
 
 #endif	/* __MAMECORE_H__ */

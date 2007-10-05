@@ -338,10 +338,17 @@ static UINT8 loht_code[CODE_LEN] =
 	0xc6,0x06,0x00,0x09,0x49^0xff,	// mov [0900h], byte 049h
 	0xc6,0x06,0x00,0x0a,0x49^0xff,	// mov [0a00h], byte 049h
 	0xc6,0x06,0x00,0x0b,0x49^0xff,	// mov [0b00h], byte 049h
+
+	0x68,0x00,0xd0,				    // push 0d000h // Japan set only
+	0x1f,					  	    // pop ds // Japan set only
+	0xc6,0x06,0x70,0x16,0x57,		// mov [1670h], byte 057h // Japan set only - checks this (W) of WARNING
+
 	0xea,0x5d,0x01,0x40,0x00	// jmp  0040:$015d
+
 };
 static UINT8 loht_crc[CRC_LEN] =	  {	0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
 												0xfb,0xac,0xd4,0x6d, 0x6d,0x5b,0x77,0xc0, 0x00,0x00 };
+/* service mode crashes at the moment (119u2), so I can't add the CRCs for lohtj */
 
 /* X Multiply */
 static UINT8 xmultipl_code[CODE_LEN] =
@@ -464,6 +471,29 @@ static DRIVER_INIT( loht )
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m72_videoram2,0,0x4000);
 }
+
+READ16_HANDLER( m72_main_mcu_r)
+{
+	return protection_ram[offset];
+}
+
+WRITE16_HANDLER( m72_main_mcu_w)
+{
+	COMBINE_DATA(&protection_ram[offset]);
+}
+
+static DRIVER_INIT( loht_mcu )
+{
+
+	protection_ram = auto_malloc(0x10000);
+
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_r);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+
+}
+
 
 static DRIVER_INIT( xmultipl )
 {
@@ -1868,6 +1898,35 @@ static MACHINE_DRIVER_START( rtype )
 MACHINE_DRIVER_END
 
 
+static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static WRITE8_HANDLER( m72_mcu_data_w )
+{
+	if (offset&1) protection_ram[offset/2] = (protection_ram[offset/2] & 0x00ff) | (data << 8);
+	else protection_ram[offset/2] = (protection_ram[offset/2] & 0xff00) | (data&0xff);
+}
+
+static READ8_HANDLER(m72_mcu_data_r )
+{
+	UINT8 ret;
+
+	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
+	else ret =(protection_ram[offset/2] & 0x00ff);
+
+//  printf("ret %02x\n",ret);
+	return ret;
+}
+
+static ADDRESS_MAP_START( mcu_data_map, ADDRESS_SPACE_DATA, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	/* shared at b0000 - b0fff on the main cpu */
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
+ADDRESS_MAP_END
+
+
 static MACHINE_DRIVER_START( m72 )
 
 	/* basic machine hardware */
@@ -1908,6 +1967,15 @@ static MACHINE_DRIVER_START( m72 )
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( m72_8751 )
+	MDRV_IMPORT_FROM(m72)
+
+	MDRV_CPU_ADD(I8751, 8000000)
+	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_DATA_MAP(mcu_data_map,0)
+	MDRV_CPU_VBLANK_INT(irq0_line_pulse,1)
 MACHINE_DRIVER_END
 
 
@@ -2507,6 +2575,9 @@ ROM_START( bchopper )
 	ROM_LOAD16_BYTE( "c-l3-b.rom",   0x60000, 0x10000, CRC(11562221) SHA1(a2f136a487fb6f30350e8d1e26c0729eb0686c7d) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "bchopper_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "c-00-a.rom",   0x00000, 0x10000, CRC(f6e6e660) SHA1(e066e5ed37719cf2b6fd36e0117f11325bb06f9c) )	/* sprites */
 	ROM_LOAD( "c-01-b.rom",   0x10000, 0x10000, CRC(708cdd37) SHA1(24f3fcd381422f0d75410c2af7a56744e3b4a699) )
@@ -2544,6 +2615,9 @@ ROM_START( mrheli )
 	ROM_LOAD16_BYTE( "mh-c-l3.bin",  0x60000, 0x10000, CRC(c0982536) SHA1(45399f8d0577c6e2a277a69303954ce5d2de7c07) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "mrheli_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "mh-c-00.bin",  0x00000, 0x20000, CRC(dec4e121) SHA1(92169b523f1600e994e016dc1959a52958e1d89d) )	/* sprites */
 	ROM_LOAD( "mh-c-10.bin",  0x20000, 0x20000, CRC(7aaa151e) SHA1(efd980bb2eed7084354b7a4aa2f733cd2f876741) )
@@ -2578,6 +2652,9 @@ ROM_START( nspirit )
 	ROM_RELOAD(                      0xe0001, 0x10000 )
 	ROM_LOAD16_BYTE( "nin-c-l3.rom", 0x60000, 0x10000, CRC(fd7408b8) SHA1(3cbe72835a561c50265a047f0f5cd62db48378fd) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "nspirit_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "nin-r00.rom",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )	/* sprites */
@@ -2614,6 +2691,9 @@ ROM_START( nspiritj )
 	ROM_LOAD16_BYTE( "c-l3",         0x60000, 0x10000, CRC(e754a87a) SHA1(9951d972ed13a0415c827beff122bc7ddb078447) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "nspiritj_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "nin-r00.rom",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )	/* sprites */
 	ROM_LOAD( "nin-r10.rom",  0x20000, 0x20000, CRC(0caad107) SHA1(c4eff00327313e05ac8f7c6dbee3a0de1c83fadd) )
@@ -2644,6 +2724,9 @@ ROM_START( imgfight )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
 	ROM_LOAD16_BYTE( "if-c-l3.bin",  0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "imgfight_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )	/* sprites */
@@ -2677,6 +2760,9 @@ ROM_START( loht )
 	ROM_LOAD16_BYTE( "tom_c-l3.rom", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "loht_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "tom_m53.rom",  0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )	/* sprites */
 	ROM_LOAD( "tom_m51.rom",  0x20000, 0x20000, CRC(8ec5f6f3) SHA1(210f2753f5eeb06396758d21ab1778d459add247) )
@@ -2699,6 +2785,193 @@ ROM_START( loht )
 	ROM_LOAD( "tom_m44.rom",  0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
 ROM_END
 
+/*
+
+Legend of Hero TONMA
+(c)1989 Irem
+
+M72 System
+Horizontal Freq. = 15.625KHz
+H.Period         = 64.0us
+H.Blank          = 16.0us
+H.Sync Pulse     = 5.0us
+Vertical Freq.   = 55.02Hz
+V.Period         = 18.176ms
+V.Blank          = 1.792ms
+V.Sync Pulse     = 384us
+
+ROMs:
+on M72-C mainboard
+set jumper pins
+J1:A
+J2:A
+J3:A
+J4:A
+J5:B
+J6:A
+J7:A
+J9:A
+J10:A
+J11:B
+J12:A
+
+TOM_C-H0- (M5M27C101K, main programs)
+TOM_C-L0-
+TOM_C-H3-
+TOM_C-H0-
+
+R200 (28pin 1Mbit mask, read as 531000)
+R210
+R220
+R230
+
+082 - Samples
+
+TOM_C-PR- (i8751H, read protected, not dumped)
+TOM_C-3F- (PAL, read protected, not dumped)
+
+
+on M72-B-B or M72-B-C or M72-B-D
+set jumper pins (J2, J3, J4, J5) to "B"
+R2A0.A0 (27C512)
+R2A1.A1
+R2A2.A2
+R2A3.A3
+
+078.B0
+079.B1
+080.B2
+081.B3
+
+*/
+
+ROM_START( lohtj )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "tom_c-h0-", 0x00001, 0x20000, CRC(2a752998) SHA1(a88c3c75a1106665c94ddd0945bfaa7696a21b75) )
+	ROM_LOAD16_BYTE( "tom_c-l0-", 0x00000, 0x20000, CRC(a224d928) SHA1(c4744f6ca19ce60b0c03415be979f2a824235a1c) )
+	ROM_LOAD16_BYTE( "tom_c-h3-", 0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
+	ROM_RELOAD(                   0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "tom_c-l3-", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
+	ROM_RELOAD(                   0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "lohtj_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+
+	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "r200",  0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )	/* sprites */
+	ROM_LOAD( "r210",  0x20000, 0x20000, CRC(8ec5f6f3) SHA1(210f2753f5eeb06396758d21ab1778d459add247) )
+	ROM_LOAD( "r220",  0x40000, 0x20000, CRC(a41d3bfd) SHA1(536fb7c0321dbbc1a8b73e9647fba9c53a253fcc) )
+	ROM_LOAD( "r230",  0x60000, 0x20000, CRC(9d81a25b) SHA1(a354537c2fbba85f06485aa8487d7583a7133357) )
+
+	ROM_REGION( 0x040000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "r2a0.a0",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )	/* tiles #1 */
+	ROM_LOAD( "r2a1.a1",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
+	ROM_LOAD( "r2a2.a2",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
+	ROM_LOAD( "r2a3.a3",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
+
+	ROM_REGION( 0x040000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "078.b0",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )	/* tiles #2 */
+	ROM_LOAD( "079.b1",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
+	ROM_LOAD( "080.b2",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
+	ROM_LOAD( "081.b3",  0x30000, 0x10000, CRC(f01fe899) SHA1(c5ab967b7af55a757638bcdc9975f4b15064022d) )
+
+	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	/* samples */
+	ROM_LOAD( "082",  0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+ROM_END
+
+/*
+CPU cpu: nec v30
+cpu: z80 (sharp LH0080B z80b-cpu)
+cpu: 2x YM2203C
+
+quarzi: 16mhz vicino al v30 e 28mhz vicino allo z80 e ym2203c
+*/
+
+ROM_START( lohtb )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "lohtb03.b", 0x00001, 0x20000, CRC(8b845a70) SHA1(902c623310cd77b25592496745f9c6121149b516) )
+	ROM_LOAD16_BYTE( "lohtb05.d", 0x00000, 0x20000, CRC(e90f7623) SHA1(e6e2f66a39286b2d7c03fc267beb2024913fb4ca) )
+	ROM_LOAD16_BYTE( "lohtb02.a", 0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
+	ROM_RELOAD(                   0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "lohtb04.c", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
+	ROM_RELOAD(                   0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Sound CPU program (Z80) + Samples*/
+	ROM_LOAD( "lohtb01.02",  0x00000, 0x10000, CRC(e4bd8f03) SHA1(69fe41a978db92daa912cb345c2c7bafd2a6eb93) )
+
+	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD( "lohtb14.11",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
+	ROM_LOAD( "lohtb15.12",  0x20000, 0x10000, CRC(45220b01) SHA1(83715cf155f91c82067d69f14b3b01ed77777b7d) )
+	ROM_LOAD( "lohtb16.13",  0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
+	ROM_LOAD( "lohtb17.14",  0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
+	ROM_LOAD( "lohtb18.15",  0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
+	ROM_LOAD( "lohtb19.16",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4))
+	ROM_LOAD( "lohtb20.17",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
+	ROM_LOAD( "lohtb21.18",  0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
+
+	ROM_REGION( 0x040000, REGION_GFX2, ROMREGION_INVERT|ROMREGION_DISPOSE ) /* tiles #1 */
+	ROM_LOAD( "lohtb13.10",  0x00000, 0x10000, CRC(359f17d4) SHA1(2875ba48395e7faa1a58404475be936dcca45ed1) )
+	ROM_LOAD( "lohtb11.08",  0x10000, 0x10000, CRC(73391e8a) SHA1(53ca89b8a10895f817ecdb9fa5eef462edb94ae6) )
+	ROM_LOAD( "lohtb09.06",  0x20000, 0x10000, CRC(7096d390) SHA1(f4a16bf8aef7a1a65619ab022cbdb67d2f191888) )
+	ROM_LOAD( "lohtb07.04",  0x30000, 0x10000, CRC(71a27b81) SHA1(d8fe72d15bbcd5b170d1123d8f4c58874cefdca3) )
+
+	ROM_REGION( 0x040000, REGION_GFX3, ROMREGION_INVERT|ROMREGION_DISPOSE ) /* tiles #2 */
+	ROM_LOAD( "lohtb12.09",  0x00000, 0x10000, CRC(4d5e9b53) SHA1(3e3977bab7a66ed0171afcd555d181960e338749) )
+	ROM_LOAD( "lohtb10.07",  0x10000, 0x10000, CRC(4f75a26a) SHA1(79c09a1ad3a6f9cfbd07cb527bbd89d2478ce582) )
+	ROM_LOAD( "lohtb08.05",  0x20000, 0x10000, CRC(34854262) SHA1(37436c12579fb41d22a1596b495f065959c14a26) )
+	ROM_LOAD( "lohtb06.03",  0x30000, 0x10000, CRC(f923183c) SHA1(a6b578191864aefa81e0cad3ba12a2ca491c91cf) )
+
+	ROM_REGION( 0x10000, REGION_SOUND1, ROMREGION_ERASEFF )	/* -- no sample roms on bootleg, included with z80 code */
+ROM_END
+
+
+ROM_START( lohtb2 )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "loht-a2.bin", 0x00001, 0x10000, CRC(ccc90e54) SHA1(860da001d9b0782adc25cfc3b453383225253d9e) )
+	ROM_LOAD16_BYTE( "loht-a3.bin", 0x20001, 0x10000, CRC(ff8a98de) SHA1(ccb8275241bea81abc01dc36e62557712c1b5a8c) )
+	ROM_LOAD16_BYTE( "loht-a10.bin", 0x00000, 0x10000, CRC(3aa06730) SHA1(483b135f8ee0fc54b1953c7c28e909a88aa2fa2e) )
+	ROM_LOAD16_BYTE( "loht-a11.bin", 0x20000, 0x10000, CRC(eab1d7bc) SHA1(ec50fe89f05ae46e91b9f2f3d4e4383aa764e71d) )
+
+	ROM_LOAD16_BYTE( "loht-a5.bin",  0x40001, 0x10000, CRC(79e007ec) SHA1(b2e4cc4a47f5f127ba9a1a00eaaf067464314ea0) )
+	ROM_RELOAD(                      0xc0001, 0x10000 )
+	ROM_LOAD16_BYTE( "loht-a4.bin",  0x60001, 0x10000, CRC(254ea4d5) SHA1(07277bbe2ea6678f0de1f28e40be794880b3faff) )
+	ROM_RELOAD(                      0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "loht-a13.bin", 0x40000, 0x10000, CRC(b951346e) SHA1(82fa3c4a09a86b74b98c31aaea5c0629ddff83a0) )
+	ROM_RELOAD(                      0xc0000, 0x10000 )
+	ROM_LOAD16_BYTE( "loht-a12.bin", 0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
+	ROM_RELOAD(                      0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "loht-a26.bin",  0x00000, 0x2000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) ) // unprotected??
+
+	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "loht-a16.bin",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
+	ROM_LOAD( "loht-a17.bin",  0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
+	ROM_LOAD( "loht-a8.bin",   0x20000, 0x10000, CRC(45220b01) SHA1(83715cf155f91c82067d69f14b3b01ed77777b7d) )
+	ROM_LOAD( "loht-a9.bin",   0x30000, 0x10000, CRC(4af9bb3c) SHA1(04f66caae5b3ae985451002293ad8f609a8d9377) )
+	ROM_LOAD( "loht-a14.bin",  0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
+	ROM_LOAD( "loht-a15.bin",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
+	ROM_LOAD( "loht-a6.bin",   0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
+	ROM_LOAD( "loht-a7.bin",   0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
+
+	ROM_REGION( 0x040000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "loht-a19.bin",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )	/* tiles #1 */
+//  ROM_LOAD( "loht-a20.bin",  0x10000, 0x10000, BAD_DUMP CRC(db2e3d77) SHA1(3f0758f74490b084321d8b2da29525dd1f19da09) )
+	ROM_LOAD( "loht-a20.bin",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
+	ROM_LOAD( "loht-a18.bin",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
+	ROM_LOAD( "loht-a21.bin",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
+
+	ROM_REGION( 0x040000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "loht-a24.bin",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )	/* tiles #2 */
+	ROM_LOAD( "loht-a25.bin",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
+	ROM_LOAD( "loht-a23.bin",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
+	ROM_LOAD( "loht-a22.bin",  0x30000, 0x10000, CRC(f01fe899) SHA1(c5ab967b7af55a757638bcdc9975f4b15064022d) )
+
+	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	/* samples */
+	ROM_LOAD( "loht-a1.bin",  0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+ROM_END
+
+
 ROM_START( xmultipl )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )
 	ROM_LOAD16_BYTE( "ch3.h3",       0x00001, 0x20000, CRC(20685021) SHA1(92f4216320bf525045223b9454fb5bb224c536d8) )
@@ -2707,6 +2980,9 @@ ROM_START( xmultipl )
 	ROM_RELOAD(                      0xe0001, 0x10000 )
 	ROM_LOAD16_BYTE( "cl0.l0",       0x40000, 0x10000, CRC(06a9e213) SHA1(9831c110814642703d6e71d49848d854095b7d3a) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "xmultipl_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "t44.00",       0x00000, 0x20000, CRC(db45186e) SHA1(8c8edeb4b7e6b0516f2597823dc27eba9c5d9528) )	/* sprites */
@@ -2770,6 +3046,9 @@ ROM_START( dbreed72 )
 	ROM_RELOAD(                      0xe0001, 0x10000 )
 	ROM_LOAD16_BYTE( "db_c-l0.rom",  0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "dbreed72_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )	/* sprites */
@@ -2984,6 +3263,9 @@ ROM_START( dkgenm72 )
 	ROM_LOAD16_BYTE( "ge72-l3.bin",  0x60000, 0x10000, CRC(23d303a5) SHA1(b62010f34d71afb590deae458493454f9af38f7c) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "dkgenm72_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "hh_00.rom",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )	/* sprites */
 	ROM_LOAD( "hh_10.rom",    0x20000, 0x20000, CRC(def65294) SHA1(23f5d99fa9f604fde37cb52113bff233d9be1d25) )
@@ -3098,6 +3380,9 @@ ROM_START( airduel )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
 	ROM_LOAD16_BYTE( "ad-c-l3.bin",  0x40000, 0x20000, CRC(9dd343f7) SHA1(9f499936b6d3807aa5b5c18e9811c73c9a2c99f9) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "airduel_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "ad-00.bin",    0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )	/* sprites */
@@ -3223,6 +3508,9 @@ GAME( 1988, nspirit,  0,        m72,      nspirit,  nspirit,  ROT0,   "Irem", "N
 GAME( 1988, nspiritj, nspirit,  m72,      nspirit,  nspiritj, ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL )
 GAME( 1988, imgfight, 0,        m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (Japan)", 0 )
 GAME( 1989, loht,     0,        m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )
+GAME( 1989, lohtj,    loht,     m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
+GAME( 1989, lohtb,    loht,     m72,      loht,     0,        ROT0,   "Irem", "Legend of Hero Tonma (bootleg)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
+GAME( 1989, lohtb2,   loht,     m72_8751, loht,     loht_mcu, ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
 GAME( 1989, xmultipl, 0,        xmultipl, xmultipl, xmultipl, ROT0,   "Irem", "X Multiply (Japan)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreed,   0,        dbreed,   dbreed,   0,        ROT0,   "Irem", "Dragon Breed (M81 pcb version)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreed72, dbreed,   dbreed72, dbreed,   dbreed72, ROT0,   "Irem", "Dragon Breed (M72 pcb version)", GAME_NO_COCKTAIL )

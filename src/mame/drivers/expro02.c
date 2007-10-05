@@ -428,7 +428,7 @@ ROM_START( galsnewa ) /* EXPRO-02 PCB */
 	ROM_LOAD( "pm006e.u83", 0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82", 0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
 	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
-//  ROM_LOAD( "u93",        0x180000, 0x010000  ) // NOT present on this set (empty socket)
+	/* U93 is an empty socket and not used with this set */
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )	/* sprites */
 
@@ -460,14 +460,14 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 	ROM_LOAD16_BYTE( "pm003e.u75", 0x200000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
 
 	ROM_REGION16_BE( 0x80000, REGION_USER2, 0 )	/* contains real (non-cartoon) women, used after each 3rd round */
-	ROM_LOAD16_WORD_SWAP( "pm017e.u84", 0x00000, 0x80000, CRC(bc41b6ca) SHA1(0aeaf024dd7c84550e7df27230a1d4f04cc1d61c) )
+	/* U84 is an empty socket and not used with this set */
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_ERASEFF )	/* sprites */
 	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
 	ROM_LOAD( "pm006e.u83", 0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82", 0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
 	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
-//  ROM_LOAD( "u93",        0x180000, 0x010000  ) // NOT present on this set (empty socket)
+	/* U93 is an empty socket and not used with this set */
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )	/* sprites */
 

@@ -60,11 +60,6 @@
             anything and tracks both, or else shifts ownership to new
             target
 
-        * generic frontend:
-            * flags to indicate variable shifts and multiply/divides
-                to help register allocator avoid ECX/EDX/EAX as
-                appropriate
-
         * generic drc:
             * common code to load registers prior to instruction
                 - each register has a callback that generates the load
@@ -90,7 +85,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define SINGLE_INSTRUCTION_MODE			(0)
 #define DISABLE_FIXED_RAM_LOAD			(0)
 #define DISABLE_FIXED_RAM_STORE			(0)
 #define FLUSH_AFTER_EACH_INSTRUCTION	(0)
@@ -224,11 +218,11 @@ typedef void (*oob_callback)(drc_core *drc, oob_handler *oob, void *param);
 
 struct _oob_handler
 {
-	oob_callback	callback;				/* pointer to callback function */
-	void *			param;					/* callback parameter */
-	const mips3_opcode_desc *desc;			/* pointer to description of relevant instruction */
-	emit_link		link;					/* link to source of the branch */
-	compiler_state	compiler;				/* state of the compiler at this time */
+	oob_callback		callback;			/* pointer to callback function */
+	void *				param;				/* callback parameter */
+	const opcode_desc *	desc;				/* pointer to description of relevant instruction */
+	emit_link			link;				/* link to source of the branch */
+	compiler_state		compiler;			/* state of the compiler at this time */
 };
 
 
@@ -270,10 +264,8 @@ struct _mips3drc_data
 	oob_handler		ooblist[COMPILE_MAX_INSTRUCTIONS*2];
 	int				oobcount;
 
-#if COMPARE_AGAINST_C
 	/* C functions */
 	x86code *		execute_c_version;
-#endif
 };
 
 
@@ -286,13 +278,13 @@ static void drc_reset_callback(drc_core *drc);
 static void drc_recompile_callback(drc_core *drc);
 static void drc_entrygen_callback(drc_core *drc);
 
-static void compile_one(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static void compile_one(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
 
 static void oob_exception_cleanup(drc_core *drc, oob_handler *oob, void *param);
 static void oob_interrupt_cleanup(drc_core *drc, oob_handler *oob, void *param);
 
 static void compiler_register_set_constant(compiler_state *compiler, UINT8 mipsreg, UINT64 constval);
-static mipsreg_state compiler_register_allocate(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 mipsreg, UINT8 flags);
+static mipsreg_state compiler_register_allocate(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 mipsreg, UINT8 flags);
 static void compiler_register_flush(drc_core *drc, compiler_state *compiler, UINT8 mipsreg, int free);
 static void compiler_register_flush_all(drc_core *drc, compiler_state *compiler);
 
@@ -305,43 +297,43 @@ static void append_handle_pc_tlb_mismatch(drc_core *drc);
 static void append_find_exception_handler(drc_core *drc);
 static void append_explode_ccr31(drc_core *drc);
 static void append_recover_ccr31(drc_core *drc);
-static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc);
+static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
 static void append_check_sw_interrupts(drc_core *drc, int inline_generate);
 
-static int compile_instruction(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int compile_special(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int compile_regimm(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int compile_idt(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int compile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int compile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int compile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static int compile_instruction(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
+static int compile_special(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
+static int compile_regimm(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
+static int compile_idt(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
+static int compile_cop0(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
+static int compile_cop1(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
+static int compile_cop1x(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
 
-static int compile_shift(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int shift_type, int shift_variable);
-static int compile_dshift(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int shift_type, int shift_variable, int shift_const_plus32);
-static int compile_movzn(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_movn);
-static int compile_trapcc(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition, int immediate);
-static int compile_branchcc(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition);
-static int compile_branchcz(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition, int link);
-static int compile_add(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions, int immediate);
-static int compile_dadd(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions, int immediate);
-static int compile_sub(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions);
-static int compile_dsub(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions);
-static int compile_mult(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned);
-static int compile_dmult(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned);
-static int compile_div(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned);
-static int compile_ddiv(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned);
-static int compile_logical(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int operation, int immediate);
-static int compile_slt(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned, int immediate);
-static int compile_load(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, int is_unsigned);
-static int compile_load_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *dest);
-static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *dest);
-static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right);
-static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right);
-static int compile_store(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size);
-static int compile_store_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *src);
-static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *src);
-static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right);
-static int compile_store_double_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right);
+static int compile_shift(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int shift_type, int shift_variable);
+static int compile_dshift(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int shift_type, int shift_variable, int shift_const_plus32);
+static int compile_movzn(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_movn);
+static int compile_trapcc(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int condition, int immediate);
+static int compile_branchcc(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int condition);
+static int compile_branchcz(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int condition, int link);
+static int compile_add(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int suppress_exceptions, int immediate);
+static int compile_dadd(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int suppress_exceptions, int immediate);
+static int compile_sub(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int suppress_exceptions);
+static int compile_dsub(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int suppress_exceptions);
+static int compile_mult(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned);
+static int compile_dmult(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned);
+static int compile_div(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned);
+static int compile_ddiv(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned);
+static int compile_logical(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int operation, int immediate);
+static int compile_slt(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned, int immediate);
+static int compile_load(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, int is_unsigned);
+static int compile_load_cop(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, void *dest);
+static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, void *dest);
+static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_right);
+static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_right);
+static int compile_store(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size);
+static int compile_store_cop(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, void *src);
+static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, void *src);
+static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_right);
+static int compile_store_double_partial(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_right);
 
 
 
@@ -370,7 +362,7 @@ static const char *x86regname[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rs
     bounds callback for later
 -------------------------------------------------*/
 
-INLINE void oob_request_callback(drc_core *drc, UINT8 condition, oob_callback callback, const compiler_state *compiler, const mips3_opcode_desc *desc, void *param)
+INLINE void oob_request_callback(drc_core *drc, UINT8 condition, oob_callback callback, const compiler_state *compiler, const opcode_desc *desc, void *param)
 {
 	oob_handler *oob = &mips3.drcdata->ooblist[mips3.drcdata->oobcount++];
 
@@ -423,7 +415,7 @@ static void mips3drc_init(void)
 	memset(&drconfig, 0, sizeof(drconfig));
 	drconfig.cache_base       = mips3.cache;
 	drconfig.cache_size       = CACHE_SIZE;
-	drconfig.max_instructions = MAX_INSTRUCTIONS;
+	drconfig.max_instructions = (512 + 128) / 4;
 	drconfig.address_bits     = 32;
 	drconfig.lsbs_to_ignore   = 2;
 	drconfig.baseptr	      = &mips3.core->r[17];
@@ -467,7 +459,6 @@ static void mips3drc_init(void)
 static void mips3drc_exit(void)
 {
 	printf("Final code size = %d\n", (int)(mips3.drc->cache_top - mips3.drc->cache_base));
-	mips3fe_exit();
 }
 
 
@@ -568,10 +559,9 @@ static void drc_reset_callback(drc_core *drc)
 
 static void drc_recompile_callback(drc_core *drc)
 {
-	int maxseq = (Machine->debug_mode || SINGLE_INSTRUCTION_MODE) ? 1 : MAX_INSTRUCTION_SEQUENCE;
 	int compiled_last_sequence = FALSE;
-	mips3_opcode_desc *seqhead, *seqlast;
-	mips3_opcode_desc *desclist;
+	const opcode_desc *seqhead, *seqlast;
+	const opcode_desc *desclist;
 	void *start = drc->cache_top;
 	int override = FALSE;
 	int oobnum;
@@ -583,19 +573,19 @@ static void drc_recompile_callback(drc_core *drc)
 	mips3.drcdata->oobcount = 0;
 
 	/* get a description of this sequence */
-	desclist = mips3fe_describe_sequence(mips3.core, mips3.core->pc, mips3.core->pc - 128, mips3.core->pc + 512, maxseq);
+	desclist = drcfe_describe_code(mips3.drcfe, mips3.core->pc);
 	if (LOG_CODE)
 		log_opcode_desc(mips3.log, desclist, 0);
 
 	/* loop until we get through all instruction sequences */
 	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next)
 	{
-		mips3_opcode_desc *curdesc;
+		const opcode_desc *curdesc;
 		compiler_state compiler;
 
 		/* determine the last instruction in this sequence */
 		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next)
-			if (seqlast->flags & IDESC_END_SEQUENCE)
+			if (seqlast->flags & OPFLAG_END_SEQUENCE)
 				break;
 		assert(seqlast != NULL);
 
@@ -630,10 +620,10 @@ static void drc_recompile_callback(drc_core *drc)
 		{
 			if (LOG_CODE)
 				x86log_add_comment(mips3.log, drc->cache_top, "[Validation for %08X]", seqhead->pc);
-			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)seqhead->opptr);							// mov  rax,seqhead->opptr
+			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)seqhead->opptr.v);						// mov  rax,seqhead->opptr
 			for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
 			{
-				emit_cmp_m32_imm(DRCTOP, MBD(REG_RAX, (UINT8 *)curdesc->opptr - (UINT8 *)seqhead->opptr), *curdesc->opptr);
+				emit_cmp_m32_imm(DRCTOP, MBD(REG_RAX, curdesc->opptr.b - seqhead->opptr.b), *curdesc->opptr.l);
 																								// cmp  [code],val
 				emit_jcc(DRCTOP, COND_NE, mips3.drc->recompile);								// jne  recompile
 			}
@@ -647,9 +637,9 @@ static void drc_recompile_callback(drc_core *drc)
 			compile_one(drc, &compiler, curdesc);
 
 		/* at the end of the sequence; update the PC in memory and check cycle counts */
-		if (!(seqlast->flags & (IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_WILL_CAUSE_EXCEPTION)))
+		if (!(seqlast->flags & (OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_WILL_CAUSE_EXCEPTION)))
 		{
-			UINT32 nextpc = seqlast->pc + ((seqlast->flags & IDESC_IS_LIKELY_BRANCH) ? 8 : 4);
+			UINT32 nextpc = seqlast->pc + (seqlast->skipslots + 1) * 4;
 			if (compiler.cycles != 0)
 				emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler.cycles);						// sub  [icount],cycles
 			emit_mov_r32_imm(DRCTOP, REG_P1, nextpc);										// mov  p1,nextpc
@@ -659,7 +649,7 @@ static void drc_recompile_callback(drc_core *drc)
 		}
 
 		/* if this is a likely branch, the fall through case needs to skip the next instruction */
-		if ((seqlast->flags & (IDESC_IS_CONDITIONAL_BRANCH | IDESC_IS_LIKELY_BRANCH)) == (IDESC_IS_CONDITIONAL_BRANCH | IDESC_IS_LIKELY_BRANCH))
+		if ((seqlast->flags & OPFLAG_IS_CONDITIONAL_BRANCH) && seqlast->skipslots > 0)
 			if (seqlast->next != NULL && seqlast->next->pc != seqlast->pc + 8)
 			{
 				compiler_register_flush_all(drc, &compiler);
@@ -667,23 +657,20 @@ static void drc_recompile_callback(drc_core *drc)
 			}
 
 		/* if we need a redispatch, do it now */
-		if (seqlast->flags & IDESC_REDISPATCH)
+		if (seqlast->flags & OPFLAG_REDISPATCH)
 		{
-			UINT32 nextpc = seqlast->pc + ((seqlast->flags & IDESC_IS_LIKELY_BRANCH) ? 8 : 4);
+			UINT32 nextpc = seqlast->pc + (seqlast->skipslots + 1) * 4;
 			compiler_register_flush_all(drc, &compiler);
  			drc_append_tentative_fixed_dispatcher(drc, nextpc, TRUE);						// jmp  <nextpc>
  		}
 
  		/* if we need to return to the start, do it */
-		if (seqlast->flags & IDESC_RETURN_TO_START)
+		if (seqlast->flags & OPFLAG_RETURN_TO_START)
 		{
 			compiler_register_flush_all(drc, &compiler);
  			drc_append_tentative_fixed_dispatcher(drc, mips3.core->pc, FALSE);				// jmp  <startpc>
 		}
 	}
-
-	/* free the list */
-	mips3fe_release_descriptions(desclist);
 
 	/* end the sequence */
 	drc_end_sequence(drc);
@@ -724,17 +711,17 @@ static void drc_entrygen_callback(drc_core *drc)
     compile_one
 ------------------------------------------------------------------*/
 
-static void compile_one(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static void compile_one(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
 	int hotnum;
 
 	/* register this instruction */
-	if (!(desc->flags & IDESC_IN_DELAY_SLOT))
+	if (!(desc->flags & OPFLAG_IN_DELAY_SLOT))
 		drc_register_code_at_cache_top(drc, desc->pc);
 
 	/* add an entry for the log */
 	if (LOG_CODE)
-		log_add_disasm_comment(mips3.log, drc->cache_top, desc->pc, *desc->opptr);
+		log_add_disasm_comment(mips3.log, drc->cache_top, desc->pc, *desc->opptr.l);
 
 	/* if we want a probe, add it here */
 	if (desc->pc == PROBE_ADDRESS)
@@ -746,18 +733,17 @@ static void compile_one(drc_core *drc, compiler_state *compiler, mips3_opcode_de
 	}
 
 	/* if we are debugging, call the debugger */
-	if (Machine->debug_mode)
+	if (Machine->debug_mode || COMPARE_AGAINST_C)
 	{
 		emit_mov_m32_imm(DRCTOP, PCADDR, desc->pc);											// mov  [pc],desc->pc
-#if COMPARE_AGAINST_C
-		if (!(desc->flags & IDESC_IN_DELAY_SLOT))
+		if (COMPARE_AGAINST_C && !(desc->flags & OPFLAG_IN_DELAY_SLOT))
 			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->execute_c_version));
-#endif
-		drc_append_call_debugger(drc);														// <call debugger>
+		if (Machine->debug_mode)
+			drc_append_call_debugger(drc);													// <call debugger>
 	}
 
 	/* validate our TLB entry at this PC; if we fail, we need to recompile */
-	if (desc->flags & IDESC_VALIDATE_TLB)
+	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (desc->pc < 0x80000000 || desc->pc >= 0xc0000000))
 	{
 		emit_cmp_m32_imm(DRCTOP, MDRC(&mips3.core->tlb_table[desc->pc >> 12]), mips3.core->tlb_table[desc->pc >> 12]);
 																							// cmp  tlb_table[pc>>12],<original value>
@@ -770,24 +756,22 @@ static void compile_one(drc_core *drc, compiler_state *compiler, mips3_opcode_de
 
 	/* is this a hotspot? */
 	for (hotnum = 0; hotnum < MIPS3_MAX_HOTSPOTS; hotnum++)
-		if (desc->pc == mips3.hotspot[hotnum].pc && *desc->opptr == mips3.hotspot[hotnum].opcode)
+		if (desc->pc == mips3.hotspot[hotnum].pc && *desc->opptr.l == mips3.hotspot[hotnum].opcode)
 		{
 			compiler->cycles += mips3.hotspot[hotnum].cycles;
 			break;
 		}
 
 	/* if this is an invalid opcode, generate the exception now */
-	if (desc->flags & IDESC_INVALID_OPCODE)
+	if (desc->flags & OPFLAG_INVALID_OPCODE)
 		oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_invalidop_exception);
 
 	/* otherwise, it's a regular instruction */
 	else
 	{
-		UINT32 nextpc = desc->pc + ((desc->flags & IDESC_IS_LIKELY_BRANCH) ? 8 : 4);
-
 		/* compile the instruction */
 		if (!compile_instruction(drc, compiler, desc))
-			fatalerror("Unimplemented op %08X (%02X,%02X)", *desc->opptr, *desc->opptr >> 26, *desc->opptr & 0x3f);
+			fatalerror("Unimplemented op %08X (%02X,%02X)", *desc->opptr.l, *desc->opptr.l >> 26, *desc->opptr.l & 0x3f);
 
 		/* flush */
 		if (FLUSH_AFTER_EACH_INSTRUCTION)
@@ -842,7 +826,7 @@ static void oob_exception_cleanup(drc_core *drc, oob_handler *oob, void *param)
 		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, oob->compiler.cycles);							// sub  [icount],cycles
 
 	/* update the PC with the instruction PC */
-	if (!(oob->desc->flags & IDESC_IN_DELAY_SLOT))
+	if (!(oob->desc->flags & OPFLAG_IN_DELAY_SLOT))
 		emit_mov_r32_imm(DRCTOP, REG_P1, oob->desc->pc);									// mov  p1,pc
 	else
 		emit_mov_r32_imm(DRCTOP, REG_P1, oob->desc->pc | 1);								// mov  p1,pc | 1
@@ -876,15 +860,15 @@ static void oob_interrupt_cleanup(drc_core *drc, oob_handler *oob, void *param)
 		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, oob->compiler.cycles);							// sub  [icount],cycles
 
 	/* update the PC with the following instruction PC */
-	if (!(oob->desc->flags & IDESC_IN_DELAY_SLOT))
+	if (!(oob->desc->flags & OPFLAG_IN_DELAY_SLOT))
 	{
-		assert(!(oob->desc->flags & IDESC_IS_BRANCH));
+		assert(!(oob->desc->flags & OPFLAG_IS_BRANCH));
 		emit_mov_r32_imm(DRCTOP, REG_P1, oob->desc->pc + 4);								// mov  p1,pc + 4
 	}
 	else
 	{
 		assert(oob->desc->branch != NULL);
-		if (oob->desc->branch->targetpc != ~0)
+		if (oob->desc->branch->targetpc != BRANCH_TARGET_DYNAMIC)
 			emit_mov_r32_imm(DRCTOP, REG_P1, oob->desc->branch->targetpc);					// mov  p1,<targetpc>
 		else
 			emit_mov_r32_m32(DRCTOP, REG_P1, MBD(REG_RSP, SPOFFS_NEXTPC));					// mov  p1,[rsp + nextpc]
@@ -931,7 +915,7 @@ static void compiler_register_set_constant(compiler_state *compiler, UINT8 mipsr
     register to hold a MIPS register
 -------------------------------------------------*/
 
-static mipsreg_state compiler_register_allocate(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 mipsreg, UINT8 flags)
+static mipsreg_state compiler_register_allocate(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 mipsreg, UINT8 flags)
 {
 	UINT8 regindex, regnum = 0;
 	UINT64 livemask = 0;
@@ -983,7 +967,7 @@ static mipsreg_state compiler_register_allocate(drc_core *drc, compiler_state *c
 		}
 
 		/* advance to the next instruction; stop if we hit end-of-sequence */
-		if (desc->flags & IDESC_END_SEQUENCE)
+		if (desc->flags & OPFLAG_END_SEQUENCE)
 			break;
 		desc = desc->next;
 	}
@@ -1604,7 +1588,7 @@ static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags,
 	for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
 	{
 		const fast_ram_info *raminfo = &mips3.fastram[ramnum];
-		if (!Machine->debug_mode && raminfo->base != NULL && (!(flags & ARW_WRITE) || !raminfo->readonly))
+		if (!COMPARE_AGAINST_C && !Machine->debug_mode && raminfo->base != NULL && (!(flags & ARW_WRITE) || !raminfo->readonly))
 		{
 			emit_link notram1 = { 0 }, notram2 = { 0 };
 
@@ -1826,7 +1810,7 @@ static void append_recover_ccr31(drc_core *drc)
     append_check_interrupts
 ------------------------------------------------------------------*/
 
-static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc)
+static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
 	emit_link link1, link2;
 
@@ -1890,7 +1874,7 @@ static void emit_load_register_value(drc_core *drc, compiler_state *compiler, UI
     register and populate it
 -------------------------------------------------*/
 
-static void emit_set_constant_value(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 mipsreg, UINT64 constval)
+static void emit_set_constant_value(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 mipsreg, UINT64 constval)
 {
 	/* ignore reigster 0 destination */
 	if (mipsreg == 0)
@@ -1913,7 +1897,7 @@ static void emit_set_constant_value(drc_core *drc, compiler_state *compiler, con
     emit_delay_slot_and_branch
 ------------------------------------------------------------------*/
 
-static void emit_delay_slot_and_branch(drc_core *drc, const compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 linkreg)
+static void emit_delay_slot_and_branch(drc_core *drc, const compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg)
 {
 	compiler_state compiler_temp = *compiler;
 
@@ -1930,7 +1914,7 @@ static void emit_delay_slot_and_branch(drc_core *drc, const compiler_state *comp
 		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler_temp.cycles);							// sub  [icount],cycles
 
 	/* load the target PC into P1 */
-	if (desc->targetpc != ~0)
+	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 		emit_mov_r32_imm(DRCTOP, REG_P1, desc->targetpc);									// mov  p1,desc->targetpc
 	else
 		emit_mov_r32_m32(DRCTOP, REG_P1, MBD(REG_RSP, SPOFFS_NEXTPC));						// mov  p1,[esp+nextpc]
@@ -1943,7 +1927,7 @@ static void emit_delay_slot_and_branch(drc_core *drc, const compiler_state *comp
 		emit_jcc(DRCTOP, COND_S, mips3.drc->exit_point);									// js   exit_point
 
 	/* otherwise, append a dispatcher */
-	if (desc->targetpc != ~0)
+	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 		drc_append_tentative_fixed_dispatcher(drc, desc->targetpc, FALSE);					// <redispatch>
 	else
 		drc_append_dispatcher(drc);															// <redispatch>
@@ -1954,7 +1938,7 @@ static void emit_delay_slot_and_branch(drc_core *drc, const compiler_state *comp
     emit_fixed_byte_read
 ------------------------------------------------------------------*/
 
-static int emit_fixed_byte_read(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address)
+static int emit_fixed_byte_read(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address)
 {
 	void *fastram = fastram_ptr(address, 1, FALSE);
 
@@ -2006,7 +1990,7 @@ static int emit_fixed_byte_read(drc_core *drc, compiler_state *compiler, const m
     emit_fixed_half_read
 ------------------------------------------------------------------*/
 
-static int emit_fixed_half_read(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address)
+static int emit_fixed_half_read(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address)
 {
 	void *fastram = fastram_ptr(address & ~1, 2, FALSE);
 
@@ -2058,7 +2042,7 @@ static int emit_fixed_half_read(drc_core *drc, compiler_state *compiler, const m
     emit_fixed_word_read
 ------------------------------------------------------------------*/
 
-static int emit_fixed_word_read(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address, UINT32 mask)
+static int emit_fixed_word_read(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address, UINT32 mask)
 {
 	void *fastram = fastram_ptr(address & ~3, 4, FALSE);
 
@@ -2115,7 +2099,7 @@ static int emit_fixed_word_read(drc_core *drc, compiler_state *compiler, const m
     emit_fixed_double_read
 ------------------------------------------------------------------*/
 
-static int emit_fixed_double_read(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 destreg, offs_t address, UINT64 mask)
+static int emit_fixed_double_read(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 destreg, offs_t address, UINT64 mask)
 {
 	void *fastram = fastram_ptr(address & ~7, 8, FALSE);
 
@@ -2166,7 +2150,7 @@ static int emit_fixed_double_read(drc_core *drc, compiler_state *compiler, const
     emit_fixed_byte_write
 ------------------------------------------------------------------*/
 
-static int emit_fixed_byte_write(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, mipsreg_state srcreg, offs_t address)
+static int emit_fixed_byte_write(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, mipsreg_state srcreg, offs_t address)
 {
 	void *fastram = fastram_ptr(address, 1, TRUE);
 
@@ -2219,7 +2203,7 @@ static int emit_fixed_byte_write(drc_core *drc, compiler_state *compiler, const 
     emit_fixed_half_write
 ------------------------------------------------------------------*/
 
-static int emit_fixed_half_write(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, mipsreg_state srcreg, offs_t address)
+static int emit_fixed_half_write(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, mipsreg_state srcreg, offs_t address)
 {
 	void *fastram = fastram_ptr(address & ~1, 2, TRUE);
 
@@ -2272,7 +2256,7 @@ static int emit_fixed_half_write(drc_core *drc, compiler_state *compiler, const 
     emit_fixed_word_write
 ------------------------------------------------------------------*/
 
-static int emit_fixed_word_write(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, mipsreg_state srcreg, offs_t address, UINT32 mask)
+static int emit_fixed_word_write(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, mipsreg_state srcreg, offs_t address, UINT32 mask)
 {
 	void *fastram = fastram_ptr(address & ~3, 4, TRUE);
 
@@ -2364,7 +2348,7 @@ static int emit_fixed_word_write(drc_core *drc, compiler_state *compiler, const 
     emit_fixed_double_write
 ------------------------------------------------------------------*/
 
-static int emit_fixed_double_write(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, mipsreg_state srcreg, offs_t address, UINT64 mask)
+static int emit_fixed_double_write(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, mipsreg_state srcreg, offs_t address, UINT64 mask)
 {
 	void *fastram = fastram_ptr(address & ~7, 8, TRUE);
 
@@ -2480,9 +2464,9 @@ static int emit_fixed_double_write(drc_core *drc, compiler_state *compiler, cons
     for compiling a given opcode
 -------------------------------------------------*/
 
-static int compile_instruction(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_instruction(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = op >> 26;
 
 	switch (opswitch)
@@ -2647,9 +2631,9 @@ static int compile_instruction(drc_core *drc, compiler_state *compiler, mips3_op
     'SPECIAL' group
 -------------------------------------------------*/
 
-static int compile_special(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_special(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = op & 63;
 	emit_link link1;
 
@@ -2844,9 +2828,9 @@ static int compile_special(drc_core *drc, compiler_state *compiler, mips3_opcode
     'REGIMM' group
 -------------------------------------------------*/
 
-static int compile_regimm(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_regimm(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = RTREG;
 
 	switch (opswitch)
@@ -2878,11 +2862,11 @@ static int compile_regimm(drc_core *drc, compiler_state *compiler, mips3_opcode_
     specific group
 -------------------------------------------------*/
 
-static int compile_idt(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_idt(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
 	fatalerror("Unimplemented IDT instructions");
 #if 0
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = op & 0x1f;
 
 	switch (opswitch)
@@ -2951,7 +2935,7 @@ static int compile_idt(drc_core *drc, compiler_state *compiler, mips3_opcode_des
     handle special COP0 registers
 -------------------------------------------------*/
 
-static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 reg)
+static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 reg)
 {
 	emit_link link1;
 
@@ -3027,52 +3011,35 @@ static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const m
     read special COP0 registers
 -------------------------------------------------*/
 
-static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 reg)
+static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT8 reg)
 {
 	emit_link link1, link2;
 
 	switch (reg)
 	{
 		case COP0_Count:
-#if (!COMPARE_AGAINST_C)
-			emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles + MIPS3_COUNT_READ_CYCLES);
-																							// sub  [icount],<lots>
-			compiler->cycles = 0;
-			emit_jcc_short_link(DRCTOP, COND_NS, &link1);									// jns  notneg
-			emit_mov_m32_imm(DRCTOP, ICOUNTADDR, 0);										// mov  [icount],0
-			resolve_link(DRCTOP, &link1);												// notneg:
-#endif
-			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));
-																							// call activecpu_gettotalcycles64
+			compiler->cycles += MIPS3_COUNT_READ_CYCLES;
+			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));		// call activecpu_gettotalcycles64
 			emit_sub_r64_m64(DRCTOP, REG_RAX, MDRC(&mips3.core->count_zero_time));			// sub  rax,[count_zero_time]
 			emit_shr_r64_imm(DRCTOP, REG_RAX, 1);											// shr  rax,1
 			emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);									// movsxd rax,eax
 			return TRUE;
 
 		case COP0_Cause:
-#if (!COMPARE_AGAINST_C)
-			emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles + MIPS3_CAUSE_READ_CYCLES);
-																							// sub  [icount],<lots>
-			compiler->cycles = 0;
-			emit_jcc_short_link(DRCTOP, COND_NS, &link1);									// jns  notneg
-			emit_mov_m32_imm(DRCTOP, ICOUNTADDR, 0);										// mov  [icount],0
-			resolve_link(DRCTOP, &link1);												// notneg:
-#endif
+			compiler->cycles += MIPS3_COUNT_READ_CYCLES;
 			emit_movsxd_r64_m32(DRCTOP, REG_RAX, CPR0ADDR(COP0_Cause));						// movsxd rax,[Cause]
 			return TRUE;
 
 		case COP0_Random:
-			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));
-																							// call activecpu_gettotalcycles64
-			emit_sub_r64_m64(DRCTOP, REG_RAX, MDRC(&mips3.core->count_zero_time));			// sub  rax,[count_zero_time]
+			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));		// call activecpu_gettotalcycles64
 			emit_mov_r32_m32(DRCTOP, REG_ECX, CPR0ADDR(COP0_Wired));						// mov  ecx,[Wired]
 			emit_mov_r32_imm(DRCTOP, REG_R8D, 48);											// mov  r8d,48
 			emit_and_r32_imm(DRCTOP, REG_ECX, 0x3f);										// and  ecx,0x3f
+			emit_sub_r64_m64(DRCTOP, REG_RAX, MDRC(&mips3.core->count_zero_time));			// sub  rax,[count_zero_time]
 			emit_sub_r32_r32(DRCTOP, REG_R8D, REG_ECX);										// sub  r8d,ecx
-			emit_mov_r64_r64(DRCTOP, REG_RDX, REG_RAX);										// mov  rdx,rax
 			emit_jcc_short_link(DRCTOP, COND_BE, &link1);									// jbe  link1
-			emit_shr_r64_imm(DRCTOP, REG_RDX, 32);											// shr  rdx,32
-			emit_idiv_r32(DRCTOP, REG_R8D);													// idiv r8d
+			emit_xor_r32_r32(DRCTOP, REG_EDX, REG_EDX);										// xor  edx,edx
+			emit_div_r64(DRCTOP, REG_R8);													// div  r8
 			emit_mov_r32_r32(DRCTOP, REG_EAX, REG_EDX);										// mov  eax,edx
 			emit_add_r32_r32(DRCTOP, REG_EAX, REG_ECX);										// add  eax,ecx
 			emit_and_r32_imm(DRCTOP, REG_EAX, 0x3f);										// and  eax,0x3f
@@ -3094,9 +3061,9 @@ static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const m
     compile_cop0 - compile COP0 opcodes
 -------------------------------------------------*/
 
-static int compile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_cop0(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = RSREG;
 
 	/* generate an exception if COP0 is disabled or we are not in kernel mode */
@@ -3127,12 +3094,28 @@ static int compile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_de
 			}
 			return TRUE;
 
+		case 0x02:	/* CFCz */
+			if (RTREG != 0)
+			{
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_DST | ALLOC_DIRTY);
+				emit_movsxd_r64_m32(DRCTOP, X86REG(rt), CCR0ADDR(RDREG));					// movsxd <rt>,ccr1[rd]
+			}
+			return TRUE;
+
 		case 0x04:	/* MTCz */
 		case 0x05:	/* DMTCz */
 			{
 				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
 				emit_load_register_value(drc, compiler, REG_EAX, rt);						// mov  eax,<rt>
 				compile_set_cop0_reg(drc, compiler, desc, RDREG);							// mov  cpr0[rd],rax
+			}
+			return TRUE;
+
+		case 0x06:	/* CTCz */
+			{
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+				emit_load_register_value(drc, compiler, REG_EAX, rt);						// mov  eax,<rt>
+				emit_mov_m32_r32(DRCTOP, CCR0ADDR(RDREG), REG_EAX);							// mov  ccr1[rd],eax
 			}
 			return TRUE;
 
@@ -3200,9 +3183,9 @@ static int compile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_de
     compile_cop1 - compile COP1 opcodes
 -------------------------------------------------*/
 
-static int compile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_cop1(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	emit_link link1;
 
 	/* generate an exception if COP1 is disabled */
@@ -3706,12 +3689,12 @@ static int compile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_de
 
 				case 0x37:
 				case 0x3f:
-					if (IS_SINGLE(op))	/* C.OLE.S */
+					if (IS_SINGLE(op))	/* C.ULE.S */
 					{
 						emit_movss_r128_m32(DRCTOP, REG_XMM0, FPR32ADDR(FSREG));			// movss xmm0,[fsreg]
 						emit_ucomiss_r128_m32(DRCTOP, REG_XMM0, FPR32ADDR(FTREG));			// ucomiss xmm0,[ftreg]
 					}
-					else				/* C.OLE.D */
+					else				/* C.ULE.D */
 					{
 						emit_movsd_r128_m64(DRCTOP, REG_XMM0, FPR64ADDR(FSREG));			// movsd xmm0,[fsreg]
 						emit_ucomisd_r128_m64(DRCTOP, REG_XMM0, FPR64ADDR(FTREG));			// ucomisd xmm0,[ftreg]
@@ -3734,9 +3717,9 @@ static int compile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_de
     compile_cop1x - compile COP1X opcodes
 -------------------------------------------------*/
 
-static int compile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_cop1x(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 
 	if (mips3.drcoptions & MIPS3DRC_STRICT_COP1)
 	{
@@ -3854,9 +3837,9 @@ static int compile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode_d
     3: sra/srav rD,rT,rS
 -------------------------------------------------*/
 
-static int compile_shift(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int shift_type, int shift_variable)
+static int compile_shift(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int shift_type, int shift_variable)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rd, rs, rt;
 
 	assert(shift_type == 0 || shift_type == 2 || shift_type == 3);
@@ -3884,7 +3867,10 @@ static int compile_shift(drc_core *drc, compiler_state *compiler, const mips3_op
 	else
 	{
 		/* allocate the register and load rT into it */
+		/* if rS is non-const, must load it first in case rD == rS */
 		rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DST | ALLOC_DIRTY);
+		if (!ISCONST(rs))
+			emit_load_register_value(drc, compiler, REG_ECX, rs);							// mov  ecx,<rs>
 		emit_load_register_value(drc, compiler, X86REG(rd), rt);							// mov  <rd>,<rt>
 
 		/* if rs is constant, use immediate forms of the shift */
@@ -3901,7 +3887,6 @@ static int compile_shift(drc_core *drc, compiler_state *compiler, const mips3_op
 		/* otherwise, load rs into cl so we can do a variable shift */
 		else
 		{
-			emit_load_register_value(drc, compiler, REG_ECX, rs);							// mov  ecx,<rs>
 			if (shift_type == 0)
 				emit_shl_r32_cl(DRCTOP, X86REG(rd));										// shl  <rd>,cl
 			else if (shift_type == 2)
@@ -3924,9 +3909,9 @@ static int compile_shift(drc_core *drc, compiler_state *compiler, const mips3_op
     3: dsra/dsra32/dsrav rD,rT,rS
 -------------------------------------------------*/
 
-static int compile_dshift(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int shift_type, int shift_variable, int shift_const_plus32)
+static int compile_dshift(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int shift_type, int shift_variable, int shift_const_plus32)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rd, rs, rt;
 
 	assert(shift_type == 0 || shift_type == 2 || shift_type == 3);
@@ -3954,7 +3939,10 @@ static int compile_dshift(drc_core *drc, compiler_state *compiler, const mips3_o
 	else
 	{
 		/* allocate the register and load rT into it */
+		/* if rS is non-const, must load it first in case rD == rS */
 		rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DST | ALLOC_DIRTY);
+		if (!ISCONST(rs))
+			emit_load_register_value(drc, compiler, REG_ECX, rs);							// mov  ecx,<rs>
 		emit_load_register_value(drc, compiler, X86REG(rd), rt);							// mov  <rd>,<rt>
 
 		/* if rs is constant, use immediate forms of the shift */
@@ -3971,7 +3959,6 @@ static int compile_dshift(drc_core *drc, compiler_state *compiler, const mips3_o
 		/* otherwise, load rs into cl so we can do a variable shift */
 		else
 		{
-			emit_load_register_value(drc, compiler, REG_ECX, rs);							// mov  ecx,<rs>
 			if (shift_type == 0)
 				emit_shl_r64_cl(DRCTOP, X86REG(rd));										// shl  <rd>,cl
 			else if (shift_type == 2)
@@ -3991,9 +3978,9 @@ static int compile_dshift(drc_core *drc, compiler_state *compiler, const mips3_o
     movz/movn rD,rS,rT
 -------------------------------------------------*/
 
-static int compile_movzn(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_movn)
+static int compile_movzn(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_movn)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rd, rs, rt;
 	emit_link skip = { 0 };
 
@@ -4040,10 +4027,10 @@ static int compile_movzn(drc_core *drc, compiler_state *compiler, const mips3_op
       6: tne      rS,rT / tnei       rS,SIMM
 -------------------------------------------------*/
 
-static int compile_trapcc(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition, int immediate)
+static int compile_trapcc(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int condition, int immediate)
 {
 	static const UINT8 condtype[] = { COND_GE, COND_AE, COND_L, COND_B, COND_E, COND_NONE, COND_NE, COND_NONE };
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rs, rt;
 
 	assert(condition < ARRAY_LENGTH(condtype) && condtype[condition] != COND_NONE);
@@ -4111,9 +4098,9 @@ static int compile_trapcc(drc_core *drc, compiler_state *compiler, const mips3_o
     bne rS,rT,dest
 -------------------------------------------------*/
 
-static int compile_branchcc(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition)
+static int compile_branchcc(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int condition)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	emit_link skip = { 0 };
 	mipsreg_state rs, rt;
 
@@ -4180,9 +4167,9 @@ static int compile_branchcc(drc_core *drc, compiler_state *compiler, const mips3
     bgezall rS,dest
 -------------------------------------------------*/
 
-static int compile_branchcz(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition, int link)
+static int compile_branchcz(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int condition, int link)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	emit_link skip = { 0 };
 	mipsreg_state rs;
 
@@ -4222,9 +4209,9 @@ static int compile_branchcz(drc_core *drc, compiler_state *compiler, const mips3
     addu rD,rS,rT / addiu rT,rS,SIMM
 -------------------------------------------------*/
 
-static int compile_add(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions, int immediate)
+static int compile_add(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int suppress_exceptions, int immediate)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 destreg = immediate ? RTREG : RDREG;
 	mipsreg_state rd, rs, rt;
 
@@ -4307,9 +4294,9 @@ static int compile_add(drc_core *drc, compiler_state *compiler, const mips3_opco
     daddu rD,rS,rT
 -------------------------------------------------*/
 
-static int compile_dadd(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions, int immediate)
+static int compile_dadd(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int suppress_exceptions, int immediate)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 destreg = immediate ? RTREG : RDREG;
 	mipsreg_state rd, rs, rt;
 
@@ -4379,9 +4366,9 @@ static int compile_dadd(drc_core *drc, compiler_state *compiler, const mips3_opc
     subu rD,rS,rT
 -------------------------------------------------*/
 
-static int compile_sub(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions)
+static int compile_sub(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int suppress_exceptions)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rd, rs, rt;
 
 	/* note that we still must perform this operation even if RDREG == 0
@@ -4472,9 +4459,9 @@ static int compile_sub(drc_core *drc, compiler_state *compiler, const mips3_opco
     dsubu rD,rS,rT
 -------------------------------------------------*/
 
-static int compile_dsub(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions)
+static int compile_dsub(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int suppress_exceptions)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rd, rs, rt;
 
 	/* note that we still must perform this operation even if RDREG == 0
@@ -4564,9 +4551,9 @@ static int compile_dsub(drc_core *drc, compiler_state *compiler, const mips3_opc
     multu rS,rT
 -------------------------------------------------*/
 
-static int compile_mult(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned)
+static int compile_mult(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rs, rt, lo, hi;
 
 	/* allocate source registers */
@@ -4610,9 +4597,9 @@ static int compile_mult(drc_core *drc, compiler_state *compiler, const mips3_opc
     dmultu rS,rT
 -------------------------------------------------*/
 
-static int compile_dmult(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned)
+static int compile_dmult(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rs, rt, lo, hi;
 
 	/* allocate source registers */
@@ -4656,9 +4643,9 @@ static int compile_dmult(drc_core *drc, compiler_state *compiler, const mips3_op
     divu  rS,rT
 -------------------------------------------------*/
 
-static int compile_div(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned)
+static int compile_div(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rs, rt, lo, hi;
 
 	/* allocate source registers */
@@ -4722,9 +4709,9 @@ static int compile_div(drc_core *drc, compiler_state *compiler, const mips3_opco
     ddivu  rS,rT
 -------------------------------------------------*/
 
-static int compile_ddiv(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned)
+static int compile_ddiv(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rs, rt, lo, hi;
 
 	/* allocate source registers */
@@ -4786,9 +4773,9 @@ static int compile_ddiv(drc_core *drc, compiler_state *compiler, const mips3_opc
     3: nor rD,rS,rT
 -------------------------------------------------*/
 
-static int compile_logical(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int operation, int immediate)
+static int compile_logical(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int operation, int immediate)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 destreg = immediate ? RTREG : RDREG;
 	mipsreg_state rd, rs, rt;
 
@@ -4873,9 +4860,9 @@ static int compile_logical(drc_core *drc, compiler_state *compiler, const mips3_
     sltiu rD,rS,rT / sltiu rT,rS,SIMM
 -------------------------------------------------*/
 
-static int compile_slt(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned, int immediate)
+static int compile_slt(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_unsigned, int immediate)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	UINT8 destreg = immediate ? RTREG : RDREG;
 	mipsreg_state rd, rs, rt;
 
@@ -4926,9 +4913,9 @@ static int compile_slt(drc_core *drc, compiler_state *compiler, const mips3_opco
     ld   rT,SIMM(rS)
 -------------------------------------------------*/
 
-static int compile_load(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, int is_unsigned)
+static int compile_load(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, int is_unsigned)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	mipsreg_state rs, rt;
 	int was_fixed = FALSE;
 
@@ -5002,9 +4989,9 @@ static int compile_load(drc_core *drc, compiler_state *compiler, const mips3_opc
     ldc2 rT,SIMM(rs)
 -------------------------------------------------*/
 
-static int compile_load_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *dest)
+static int compile_load_cop(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, void *dest)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs;
 
@@ -5060,9 +5047,9 @@ static int compile_load_cop(drc_core *drc, compiler_state *compiler, const mips3
     ldxc1 fD,rS,rT
 -------------------------------------------------*/
 
-static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *dest)
+static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, void *dest)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs, rt;
 
@@ -5123,9 +5110,9 @@ static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const mips
     lwr   rT,SIMM(rS)
 -------------------------------------------------*/
 
-static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right)
+static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_right)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs, rt;
 
@@ -5168,7 +5155,10 @@ static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, co
 	else
 	{
 		/* compute the address and mask values */
-		emit_lea_r32_m32(DRCTOP, REG_EAX, MBD(X86REG(rs), SIMMVAL));						// lea  eax,[<rs> + SIMMVAL]
+		if (ISCONST(rs))
+			emit_mov_r32_imm(DRCTOP, REG_EAX, CONSTVAL(rs) + SIMMVAL);						// mov  eax,<rs> + SIMMVAL
+		else
+			emit_lea_r32_m32(DRCTOP, REG_EAX, MBD(X86REG(rs), SIMMVAL));					// lea  eax,[<rs> + SIMMVAL]
 		emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));								// lea  ecx,[rax*8]
 		emit_or_r32_imm(DRCTOP, REG_P2, -1);												// or   p2,-1
 		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
@@ -5226,9 +5216,9 @@ static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, co
     ldr   rT,SIMM(rS)
 -------------------------------------------------*/
 
-static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right)
+static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_right)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs, rt;
 
@@ -5276,7 +5266,10 @@ static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, 
 	else
 	{
 		/* compute the address and mask values */
-		emit_lea_r32_m32(DRCTOP, REG_EAX, MBD(X86REG(rs), SIMMVAL));						// lea  eax,[<rs> + SIMMVAL]
+		if (ISCONST(rs))
+			emit_mov_r32_imm(DRCTOP, REG_EAX, CONSTVAL(rs) + SIMMVAL);						// mov  eax,<rs> + SIMMVAL
+		else
+			emit_lea_r32_m32(DRCTOP, REG_EAX, MBD(X86REG(rs), SIMMVAL));					// lea  eax,[<rs> + SIMMVAL]
 		emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));								// lea  ecx,[rax*8]
 		emit_or_r64_imm(DRCTOP, REG_P2, -1);												// or   p2,-1
 		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
@@ -5335,9 +5328,9 @@ static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, 
     sd   rT,SIMM(rS)
 -------------------------------------------------*/
 
-static int compile_store(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size)
+static int compile_store(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs, rt;
 
@@ -5399,9 +5392,9 @@ static int compile_store(drc_core *drc, compiler_state *compiler, const mips3_op
     sdc2 rT,SIMM(rs)
 -------------------------------------------------*/
 
-static int compile_store_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *src)
+static int compile_store_cop(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, void *src)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs;
 
@@ -5457,9 +5450,9 @@ static int compile_store_cop(drc_core *drc, compiler_state *compiler, const mips
     sdxc1 fD,rS,rT
 -------------------------------------------------*/
 
-static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *src)
+static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int size, void *src)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs, rt;
 
@@ -5520,9 +5513,9 @@ static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const mip
     swr   rT,SIMM(rS)
 -------------------------------------------------*/
 
-static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right)
+static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_right)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs, rt;
 
@@ -5615,9 +5608,9 @@ static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, c
     sdr   rT,SIMM(rS)
 -------------------------------------------------*/
 
-static int compile_store_double_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right)
+static int compile_store_double_partial(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, int is_right)
 {
-	UINT32 op = *desc->opptr;
+	UINT32 op = *desc->opptr.l;
 	int was_fixed = FALSE;
 	mipsreg_state rs, rt;
 

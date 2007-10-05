@@ -282,6 +282,17 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc)
 		return desc;
 	}
 
+	/* get a pointer to the physical address */
+	memory_set_opbase(desc->physpc);
+	desc->opptr.v = cpu_opptr(desc->physpc);
+	assert(desc->opptr.v != NULL);
+	if (desc->opptr.v == NULL)
+	{
+		/* address is unmapped; report it as such */
+		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_COMPILER_UNMAPPED | OPFLAG_VIRTUAL_NOOP;
+		return desc;
+	}
+
 	/* call the callback to describe an instruction */
 	if (!(*drcfe->describe)(drcfe->param, desc))
 	{
@@ -340,6 +351,7 @@ static opcode_desc **build_sequence(drcfe_state *drcfe, opcode_desc **tailptr, i
 	UINT64 fprread = 0, fprwrite = 0;
 	int consecutive = 0;
 	int seqstart = -1;
+	int skipsleft = 0;
 	int descnum;
 
 	/* iterate in order from start to end, picking up all non-NULL instructions */
@@ -348,11 +360,17 @@ static opcode_desc **build_sequence(drcfe_state *drcfe, opcode_desc **tailptr, i
 		{
 			opcode_desc *curdesc = drcfe->desc_array[descnum];
 			opcode_desc *nextdesc = NULL;
-			int scandescnum;
+			int nextdescnum;
+			UINT8 skipnum;
 
-			/* determine the next instruction */
-			if (descnum + curdesc->length < end)
-				nextdesc = drcfe->desc_array[descnum + curdesc->length];
+			/* determine the next instruction, taking skips into account */
+			nextdescnum = descnum + curdesc->length;
+			nextdesc = (nextdescnum < end) ? drcfe->desc_array[nextdescnum] : NULL;
+			for (skipnum = 0; skipnum < curdesc->skipslots && nextdesc != NULL; skipnum++)
+			{
+				nextdescnum = nextdescnum + nextdesc->length;
+				nextdesc = (nextdescnum < end) ? drcfe->desc_array[nextdescnum] : NULL;
+			}
 
 			/* start a new sequence if we aren't already in the middle of one */
 			if (seqstart == -1)
@@ -365,11 +383,17 @@ static opcode_desc **build_sequence(drcfe_state *drcfe, opcode_desc **tailptr, i
 			/* otherwise, do some analysis based on the next instruction */
 			else
 			{
+				opcode_desc *scandesc = NULL;
+				int scandescnum;
+
 				/* if there are instructions between us and the next instruction, we must end our sequence here */
-				for (scandescnum = 1; scandescnum < curdesc->length; scandescnum++)
-					if (drcfe->desc_array[descnum + scandescnum] != NULL)
+				for (scandescnum = descnum + 1; scandescnum < end; scandescnum++)
+				{
+					scandesc = drcfe->desc_array[scandescnum];
+					if (scandesc != NULL || scandesc == nextdesc)
 						break;
-				if (scandescnum != curdesc->length)
+				}
+				if (scandesc != nextdesc)
 					curdesc->flags |= OPFLAG_END_SEQUENCE;
 
 				/* if the next instruction is a branch target, mark this instruction as end of sequence */
@@ -404,9 +428,26 @@ static opcode_desc **build_sequence(drcfe_state *drcfe, opcode_desc **tailptr, i
 				fprread = fprwrite = 0;
 			}
 
-			/* add us to the end of the list and clear our array slot */
-			*tailptr = curdesc;
-			tailptr = &curdesc->next;
+			/* if we have instructions remaining to be skipped, and this instruction is a branch target */
+			/* belay the skip order */
+			if (skipsleft > 0 && (curdesc->flags & OPFLAG_IS_BRANCH_TARGET))
+				skipsleft = 0;
+
+			/* if we're not getting skipped, add us to the end of the list and clear our array slot */
+			if (skipsleft == 0)
+			{
+				*tailptr = curdesc;
+				tailptr = &curdesc->next;
+			}
+			else
+				desc_free(drcfe, curdesc);
+
+			/* if the current instruction starts skipping, reset our skip count */
+			/* otherwise, just decrement */
+			if (curdesc->skipslots > 0)
+				skipsleft = curdesc->skipslots;
+			else if (skipsleft > 0)
+				skipsleft--;
 		}
 
 	/* zap the array */

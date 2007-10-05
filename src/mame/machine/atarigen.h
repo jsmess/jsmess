@@ -6,7 +6,6 @@
 
 ##########################################################################*/
 
-#include "driver.h"
 #include "video/atarimo.h"
 #include "video/atarirle.h"
 

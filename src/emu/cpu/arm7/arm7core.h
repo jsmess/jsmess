@@ -40,9 +40,9 @@
  ***************************************************************************************************/
 enum
 {
-ARM7_IRQ_LINE=0, ARM7_FIRQ_LINE,
-ARM7_ABORT_EXCEPTION, ARM7_ABORT_PREFETCH_EXCEPTION, ARM7_UNDEFINE_EXCEPTION,
-ARM7_NUM_LINES
+    ARM7_IRQ_LINE=0, ARM7_FIRQ_LINE,
+    ARM7_ABORT_EXCEPTION, ARM7_ABORT_PREFETCH_EXCEPTION, ARM7_UNDEFINE_EXCEPTION,
+    ARM7_NUM_LINES
 };
 //Really there's only 1 ABORT Line.. and cpu decides whether it's during data fetch or prefetch, but we let the user specify
 

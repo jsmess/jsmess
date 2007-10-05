@@ -4,12 +4,13 @@
 
 ****************************************************************************/
 
-#include "machine/atarigen.h"
+#include "driver.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/dsp32/dsp32.h"
+#include "machine/atarigen.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
 #include "harddriv.h"

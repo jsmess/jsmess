@@ -7,7 +7,7 @@
 static UINT16 PACK(INT32 val)
 {
 	//cut to 16 bits
-	UINT32 f=((UINT32 ) val)>>8;
+	INT32 f=((UINT32 ) val)>>8;
 	return f;
 }
 
@@ -260,19 +260,20 @@ void SCSPDSP_Step(struct _SCSPDSP *DSP)
 			//ADDR+=DSP->RBP<<13;
 			//MEMVAL=DSP->SCSPRAM[ADDR>>1];
 			ADDR+=DSP->RBP<<12;
+			if (ADDR > 0x7ffff) ADDR = 0;
 			if(MRD && (step&1))	//memory only allowed on odd? DoA inserts NOPs on even
 			{
 				if(NOFL)
 					MEMVAL=DSP->SCSPRAM[ADDR]<<8;
 				else
-					MEMVAL=UNPACK(DSP->SCSPRAM[ADDR%DSP->SCSPRAM_LENGTH]);
+					MEMVAL=UNPACK(DSP->SCSPRAM[ADDR]);
 			}
 			if(MWT && (step&1))
 			{
 				if(NOFL)
-					DSP->SCSPRAM[ADDR]=SHIFTED>>8;
+			      		DSP->SCSPRAM[ADDR]=SHIFTED>>8;
 				else
-					DSP->SCSPRAM[ADDR%DSP->SCSPRAM_LENGTH]=PACK(SHIFTED);
+					DSP->SCSPRAM[ADDR]=PACK(SHIFTED);
 			}
 		}
 

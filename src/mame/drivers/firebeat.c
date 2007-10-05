@@ -1801,9 +1801,9 @@ static struct YMZ280Binterface ymz280b_intf =
 
 static NVRAM_HANDLER(firebeat)
 {
-	nvram_handler_intelflash(Machine, 0, file, read_or_write);
-	nvram_handler_intelflash(Machine, 1, file, read_or_write);
-	nvram_handler_intelflash(Machine, 2, file, read_or_write);
+	nvram_handler_intelflash(machine, 0, file, read_or_write);
+	nvram_handler_intelflash(machine, 1, file, read_or_write);
+	nvram_handler_intelflash(machine, 2, file, read_or_write);
 
 	if (read_or_write)
 	{

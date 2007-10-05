@@ -686,21 +686,21 @@ static TIMER_CALLBACK( changela_scanline_callback )
 	{
 		int riv_col, prev_col;
 
-		if((*BITMAP_ADDR16(river_bitmap, sy, sx) == Machine->pens[0x08])
-		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == Machine->pens[0x09])
-		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == Machine->pens[0x0a]))
+		if((*BITMAP_ADDR16(river_bitmap, sy, sx) == machine->pens[0x08])
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == machine->pens[0x09])
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == machine->pens[0x0a]))
 			riv_col = 1;
 		else
 			riv_col = 0;
 
-		if((*BITMAP_ADDR16(river_bitmap, sy, sx-1) == Machine->pens[0x08])
-		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == Machine->pens[0x09])
-		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == Machine->pens[0x0a]))
+		if((*BITMAP_ADDR16(river_bitmap, sy, sx-1) == machine->pens[0x08])
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == machine->pens[0x09])
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == machine->pens[0x0a]))
 			prev_col = 1;
 		else
 			prev_col = 0;
 
-		if(*BITMAP_ADDR16(obj0_bitmap, sy, sx) == Machine->pens[0x14]) /* Car Outline Color */
+		if(*BITMAP_ADDR16(obj0_bitmap, sy, sx) == machine->pens[0x14]) /* Car Outline Color */
 		{
 			/* Tree 0 Collision */
 			if(*BITMAP_ADDR16(tree0_bitmap, sy, sx) != 0)

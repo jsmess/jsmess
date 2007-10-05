@@ -14,9 +14,6 @@ extern UINT8 bios_ctrl[6];
 /*----------- defined in drivers/megatech.c -----------*/
 
 extern UINT32 bios_ctrl_inputs;
-extern READ8_HANDLER (megatech_bios_port_be_bf_r);
-extern WRITE8_HANDLER (megatech_bios_port_be_bf_w);
-extern INTERRUPT_GEN (megatech_irq);
 
 /*----------- defined in drivers/genesis.c -----------*/
 
@@ -46,13 +43,10 @@ extern UINT16		genesis_bg_pal_lookup[];
 extern UINT16		genesis_sp_pal_lookup[];
 
 VIDEO_START( genesis );
-VIDEO_START( megatech );
-VIDEO_START( megaplay );
 VIDEO_START( segac2 );
 
 VIDEO_UPDATE( genesis );
 VIDEO_UPDATE( segac2 );
-VIDEO_UPDATE( megatech );
 VIDEO_UPDATE( megaplay );
 
 void	segac2_enable_display(int enable);

@@ -538,6 +538,7 @@ typedef struct _data_accessors data_accessors;
 typedef struct _handler_data handler_data;
 
 /* ----- a union of all the different read handler types ----- */
+typedef union _read_handlers read_handlers;
 union _read_handlers
 {
 	genf *				handler;
@@ -546,9 +547,9 @@ union _read_handlers
 	read32_handler		handler32;
 	read64_handler		handler64;
 };
-typedef union _read_handlers read_handlers;
 
 /* ----- a union of all the different write handler types ----- */
+typedef union _write_handlers write_handlers;
 union _write_handlers
 {
 	genf *				handler;
@@ -557,9 +558,9 @@ union _write_handlers
 	write32_handler		handler32;
 	write64_handler		handler64;
 };
-typedef union _write_handlers write_handlers;
 
 /* ----- a generic address map type ----- */
+typedef struct _address_map address_map;
 struct _address_map
 {
 	UINT32				flags;				/* flags and additional info about this entry */
@@ -577,9 +578,9 @@ struct _address_map
 	UINT32				region;				/* region containing the memory backing this entry */
 	offs_t				region_offs;		/* offset within the region */
 };
-typedef struct _address_map address_map;
 
 /* ----- structs to contain internal data ----- */
+typedef struct _address_space address_space;
 struct _address_space
 {
 	offs_t				addrmask;			/* address mask */
@@ -589,7 +590,6 @@ struct _address_space
 	handler_data *		writehandlers;		/* write handlers */
 	data_accessors *	accessors;			/* pointers to the data access handlers */
 };
-typedef struct _address_space address_space;
 
 
 

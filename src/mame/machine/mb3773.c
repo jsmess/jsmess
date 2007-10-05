@@ -6,6 +6,7 @@
  *
  */
 
+#include "driver.h"
 #include "machine/mb3773.h"
 
 static mame_timer *watchdog_timer;

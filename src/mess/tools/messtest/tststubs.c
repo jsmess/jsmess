@@ -121,28 +121,6 @@ void osd_image_load_status_changed(mess_image *img, int is_final_unload)
 {
 }
 
-osd_lock *osd_lock_alloc(void)
-{
-	return (osd_lock *) ~0;
-}
-
-void osd_lock_acquire(osd_lock *lock)
-{
-}
-
-int osd_lock_try(osd_lock *lock)
-{
-	return TRUE;
-}
-
-void osd_lock_release(osd_lock *lock)
-{
-}
-
-void osd_lock_free(osd_lock *lock)
-{
-}
-
 #ifdef MAME_DEBUG
 void osd_wait_for_debugger(void)
 {

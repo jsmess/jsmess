@@ -40,6 +40,7 @@
 *****************************************************************************/
 
 #include "driver.h"
+#include "m92.h"
 
 typedef struct _pf_layer_info pf_layer_info;
 struct _pf_layer_info

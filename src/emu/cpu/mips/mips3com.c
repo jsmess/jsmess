@@ -394,7 +394,8 @@ void mips3com_tlbp(mips3_state *mips)
 	vpn = ((mips->cpr[0][COP0_EntryHi] >> 13) & 0x07ffffff) << 1;
 	if (index != ARRAY_LENGTH(mips->tlb))
 	{
-		assert(mips->tlb_table[vpn & 0xfffff] != 0xffffffff);
+		/* we can't assert this because the TLB entry may not be valid */
+		/* assert(mips->tlb_table[vpn & 0xfffff] != 0xffffffff); */
 		mips->cpr[0][COP0_Index] = index;
 	}
 	else

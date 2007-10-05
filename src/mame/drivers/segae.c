@@ -299,6 +299,7 @@ covert megatech / megaplay drivers to use new code etc. etc.
 #include "sound/sn76496.h"
 #include "machine/mc8123.h"
 #include "machine/segacrpt.h"
+#include "segae.h"
 
 
 //static UINT8* sms_rom;

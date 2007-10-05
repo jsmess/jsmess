@@ -13,6 +13,8 @@
     CONSTANTS
 ***************************************************************************/
 
+#define MAX_INSTRUCTIONS				((512 + 128) / 4)
+
 /* recompiler flags */
 #define RECOMPILE_UNIMPLEMENTED			0x0000
 #define RECOMPILE_SUCCESSFUL			0x0001

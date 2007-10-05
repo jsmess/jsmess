@@ -2615,20 +2615,16 @@ static const gfx_layout dealemcharlayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
+	{ 3*4, 2*4, 1*4, 0*4, 7*4, 6*4, 5*4, 4*4  },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8
 };
 
 static GFXDECODE_START( dealem )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dealemcharlayout, 0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dealemcharlayout, 0, 1 )
 GFXDECODE_END
 
 UINT8 *dealem_videoram,*dealem_charram;
-
-
-tilemap *dealem_tilemap;
-
 
 /***************************************************************************
 
@@ -2678,37 +2674,27 @@ PALETTE_INIT( dealem )
 
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
-{
-	int tileno, colour;
-
-	tileno = dealem_videoram[tile_index];
-	colour = dealem_videoram[tile_index];
-
-	SET_TILE_INFO(0,tileno,colour,0);
-}
-
 VIDEO_START(dealem)
 {
-	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+
 }
 
-WRITE8_HANDLER( dealem_videoram_w )
-{
-	dealem_videoram[offset] = data;
-	tilemap_mark_tile_dirty(dealem_tilemap, offset);
-}
-
-// this is wrong, the PAL handles the colour selection
-WRITE8_HANDLER( dealem_colorram_w )
-{
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(dealem_tilemap, offset);
-}
 
 VIDEO_UPDATE(dealem)
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, dealem_tilemap, 0, 0);
+	int x,y;
+	int count = 0;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<40;x++)
+		{
+			int tile = dealem_videoram[count+0x1000] | (dealem_videoram[count] << 8);
+			count++;
+			drawgfx(bitmap,machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+		}
+	}
+
 	return 0;
 }
 
@@ -2735,8 +2721,6 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 //  AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w) // write bank (rom page select)
 
-	AM_RANGE(0x0880, 0x0880) AM_READ(MRA8_RAM) AM_WRITE(dealem_colorram_w) AM_BASE(&colorram) //AM_WRITE(dealem_pal_w)//
-
 //  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
 //  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)
 
@@ -2761,8 +2745,8 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0F00, 0x0F03) AM_WRITE(pia_5_w)		// PIA6821 IC8
 	AM_RANGE(0x0F00, 0x0F03) AM_READ( pia_5_r)
 
-	AM_RANGE(0x1000, 0x3000) AM_WRITE(dealem_videoram_w) AM_BASE(&dealem_videoram)
-	AM_RANGE(0xBE00, 0xFFFF) AM_ROM	AM_WRITENOP// 64k  paged ROM (4 pages)
+	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_BASE(&dealem_videoram)
+	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP// 64k  paged ROM (4 pages)
 
 ADDRESS_MAP_END
 

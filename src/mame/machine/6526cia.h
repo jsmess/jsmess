@@ -10,8 +10,6 @@
 #ifndef _6526CIA_H_
 #define _6526CIA_H_
 
-#include "driver.h"
-
 typedef enum
 {
 	CIA6526,

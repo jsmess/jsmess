@@ -1,5 +1,4 @@
 //fix me -- blitz2k dies when starting a game with heavy fog (in DRC)
-//optimize -- 64-bit multiplies for S/T
 
 /*************************************************************************
 
@@ -206,19 +205,33 @@ static UINT32 banshee_fb_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
 static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
 static UINT32 banshee_io_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
 static UINT32 banshee_rom_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
+
+/* work item management */
+static void work_item_enqueue(voodoo_state *v);
+static void work_item_wait(voodoo_state *v);
+static void *work_item_callback(void *param);
+
+/* command handlers */
 static INT32 fastfill(voodoo_state *v);
 static INT32 swapbuffer(voodoo_state *v, UINT32 data);
+static INT32 triangle(voodoo_state *v);
 static INT32 begin_triangle(voodoo_state *v);
 static INT32 draw_triangle(voodoo_state *v);
-static INT32 triangle(voodoo_state *v);
+
+/* triangle helpers */
 static INT32 setup_and_draw_triangle(voodoo_state *v);
+static INT32 triangle_create_work_item(voodoo_state *v, UINT16 *drawbuf, int texcount);
+
+/* rasterizer management */
 static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo);
 static raster_info *find_rasterizer(voodoo_state *v, int texcount);
 static void dump_rasterizer_stats(voodoo_state *v);
 
-static void raster_generic_0tmu(voodoo_state *v, UINT16 *drawbuf);
-static void raster_generic_1tmu(voodoo_state *v, UINT16 *drawbuf);
-static void raster_generic_2tmu(voodoo_state *v, UINT16 *drawbuf);
+/* generic rasterizers */
+static void raster_fastfill(voodoo_state *v, INT32 scanline);
+static void raster_generic_0tmu(voodoo_state *v, INT32 y);
+static void raster_generic_1tmu(voodoo_state *v, INT32 y);
+static void raster_generic_2tmu(voodoo_state *v, INT32 y);
 
 
 
@@ -244,7 +257,7 @@ static void raster_generic_2tmu(voodoo_state *v, UINT16 *drawbuf);
  *************************************/
 
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	{ NULL, raster_##fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, FALSE, 0, 0, fbzcp, alpha, fog, fbz, tex0, tex1 },
+	{ NULL, raster_##fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, FALSE, 0, 0, 0, fbzcp, alpha, fog, fbz, tex0, tex1 },
 
 static const raster_info predef_raster_table[] =
 {
@@ -272,6 +285,9 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
 	v = auto_malloc(sizeof(*v));
 	memset(v, 0, sizeof(*v));
 	voodoo[which] = v;
+
+	/* create a multiprocessor work queue */
+	v->work.queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI);
 
 	/* create a table of precomputed 1/n and log2(n) values */
 	/* n ranges from 1.0000 to 2.0000 */
@@ -394,6 +410,21 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
 
 	/* do a soft reset to reset everything else */
 	soft_reset(v);
+}
+
+
+
+/*************************************
+ *
+ *  Video exit
+ *
+ *************************************/
+
+void voodoo_exit(int which)
+{
+	/* release the work queue, ensuring all work is finished */
+	if (voodoo[which] != NULL && voodoo[which]->work.queue != NULL)
+		osd_work_queue_free(voodoo[which]->work.queue);
 }
 
 
@@ -2151,6 +2182,9 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 		return 0;
 	}
 
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
+
 	/* switch off the register */
 	switch (regnum)
 	{
@@ -2822,6 +2856,9 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	int x, y, scry, mask;
 	int pixel, destbuf;
 
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
+
 	/* statistics */
 	v->stats.lfb_writes++;
 
@@ -3100,6 +3137,8 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	/* tricky case: run the full pixel pipeline on the pixel */
 	else
 	{
+		DECLARE_STATISTICS;
+
 		if (LOG_LFB) logerror("VOODOO.%d.LFB:write pipelined mode %X (%d,%d) = %08X & %08X\n", v->index, LFBMODE_WRITE_FORMAT(v->reg[lfbMode].u), x, y, data, mem_mask);
 
 		/* determine the screen Y */
@@ -3143,6 +3182,8 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 			x++;
 			mask >>= 4;
 		}
+
+		UPDATE_STATISTICS(v);
 	}
 
 	return 0;
@@ -3160,6 +3201,9 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 {
 	int tmunum = (offset >> 19) & 0x03;
 	tmu_state *t;
+
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
 
 	/* statistics */
 	v->stats.tex_writes++;
@@ -3766,6 +3810,9 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
 	UINT32 bufoffs;
 	UINT32 data;
 	int x, y, scry, destbuf;
+
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
 
 	/* statistics */
 	v->stats.lfb_reads++;
@@ -4403,11 +4450,94 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 
 
 
-/*************************************
- *
- *  Command handlers
- *
- *************************************/
+/***************************************************************************
+    WORK ITEM MANAGEMENT
+***************************************************************************/
+
+/*-------------------------------------------------
+    work_item_enqueue - enqueue a new work item,
+    remembering starting statistics
+-------------------------------------------------*/
+
+static void work_item_enqueue(voodoo_state *v)
+{
+	/* remember the starting statistics values */
+	v->work.start_pixels_in = v->reg[fbiPixelsIn].u;
+	v->work.start_pixels_out = v->reg[fbiPixelsOut].u;
+	v->work.start_chroma_fail = v->reg[fbiChromaFail].u;
+	v->work.start_zfunc_fail = v->reg[fbiZfuncFail].u;
+	v->work.start_afunc_fail = v->reg[fbiAfuncFail].u;
+
+	/* enqueue the work item */
+	osd_work_item_queue(v->work.queue, work_item_callback, &v->work, WORK_ITEM_FLAG_AUTO_RELEASE | WORK_ITEM_FLAG_SHARED);
+}
+
+
+/*-------------------------------------------------
+    work_item_wait - wait for all pending work
+    items to complete, then update statistics
+-------------------------------------------------*/
+
+static void work_item_wait(voodoo_state *v)
+{
+	/* wait for the work item to complete */
+	osd_work_queue_wait(v->work.queue, osd_ticks_per_second());
+
+	/* update our global stats based on the results */
+	v->stats.total_pixels_in += v->reg[fbiPixelsIn].u - v->work.start_pixels_in;
+	v->stats.total_pixels_out += v->reg[fbiPixelsOut].u - v->work.start_pixels_out;
+	v->stats.total_chroma_fail += v->reg[fbiChromaFail].u - v->work.start_chroma_fail;
+	v->stats.total_zfunc_fail += v->reg[fbiZfuncFail].u - v->work.start_zfunc_fail;
+	v->stats.total_afunc_fail += v->reg[fbiAfuncFail].u - v->work.start_afunc_fail;
+	if (v->work.info != NULL)
+		v->work.info->hits += v->reg[fbiPixelsIn].u - v->work.start_pixels_in;
+
+	/* remember the starting statistics values */
+	v->work.start_pixels_in = v->reg[fbiPixelsIn].u;
+	v->work.start_pixels_out = v->reg[fbiPixelsOut].u;
+	v->work.start_chroma_fail = v->reg[fbiChromaFail].u;
+	v->work.start_zfunc_fail = v->reg[fbiZfuncFail].u;
+	v->work.start_afunc_fail = v->reg[fbiAfuncFail].u;
+}
+
+
+/*-------------------------------------------------
+    work_item_callback - work item callback;
+    loop over scanlines and call the rasterizer
+    for each one
+-------------------------------------------------*/
+
+static void *work_item_callback(void *param)
+{
+	/* recover the state pointer and scanline from the param */
+	work_info *work = param;
+	voodoo_state *v = work->state;
+
+	/* render the scanlines and return */
+	while (1)
+	{
+		int scanline = osd_sync_add(&work->curscanline, 1) - 1;
+
+		/* stop when we hit the end scanline */
+		if (scanline >= work->endscanline)
+			break;
+
+		/* handle this scanline then continue */
+		(*work->callback)(v, scanline);
+	}
+	return NULL;
+}
+
+
+
+/***************************************************************************
+    COMMAND HANDLERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    fastfill - execute the 'fastfill'
+    command
+-------------------------------------------------*/
 
 static INT32 fastfill(voodoo_state *v)
 {
@@ -4418,31 +4548,26 @@ static INT32 fastfill(voodoo_state *v)
 	int x, y;
 
 	/* if we're not clearing either, take no time */
-	if (!FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u) &&
-		!FBZMODE_AUX_BUFFER_MASK(v->reg[fbzMode].u))
+	if (!FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u) && !FBZMODE_AUX_BUFFER_MASK(v->reg[fbzMode].u))
 		return 0;
 
 	/* are we clearing the RGB buffer? */
 	if (FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u))
 	{
-		UINT16 dither[16];
-		UINT16 *drawbuf;
-		int destbuf;
-
 		/* determine the draw buffer */
-		destbuf = (v->type >= VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(v->reg[fbzMode].u);
+		int destbuf = (v->type >= VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(v->reg[fbzMode].u);
 		switch (destbuf)
 		{
 			case 0:		/* front buffer */
-				drawbuf = v->fbi.rgb[v->fbi.frontbuf];
+				v->work.drawbuf = v->fbi.rgb[v->fbi.frontbuf];
 				break;
 
 			case 1:		/* back buffer */
-				drawbuf = v->fbi.rgb[v->fbi.backbuf];
+				v->work.drawbuf = v->fbi.rgb[v->fbi.backbuf];
 				break;
 
 			default:	/* reserved */
-				return 0;
+				break;
 		}
 
 		/* determine the dither pattern */
@@ -4454,58 +4579,33 @@ static INT32 fastfill(voodoo_state *v)
 				int b = RGB_BLUE(v->reg[color1].u);
 
 				APPLY_DITHER(v->reg[fbzMode].u, x, y, r, g, b);
-				dither[y*4 + x] = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
+				v->work.dither[y*4 + x] = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
 			}
+	}
 
-		/* now do the fill */
-		for (y = sy; y < ey; y++)
-		{
-			UINT16 *ditherow = &dither[(y & 3) * 4];
-			UINT16 *dest;
-			int scry;
+	/* create a shared work item to actually perform the fill */
+	v->work.state = v;
+	v->work.minx = sx;
+	v->work.maxx = ex;
+	v->work.curscanline = sy;
+	v->work.endscanline = ey;
+	v->work.callback = raster_fastfill;
+	v->work.info = NULL;
+	work_item_enqueue(v);
 
-			/* determine the screen Y */
-			scry = y;
-			if (FBZMODE_Y_ORIGIN(v->reg[fbzMode].u))
-				scry = (v->fbi.yorigin - y) & 0x3ff;
-
-			/* fill this row */
-			dest = drawbuf + scry * v->fbi.rowpixels;
-			for (x = sx; x < ex; x++)
-				dest[x] = ditherow[x & 3];
-		}
-
-		/* track pixel writes to the frame buffer regardless of mask */
+	/* track pixel writes to the frame buffer regardless of mask */
+	if (FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u))
 		v->reg[fbiPixelsOut].u += (ey - sy) * (ex - sx);
-	}
-
-	/* are we clearing the depth buffer? */
-	if (FBZMODE_AUX_BUFFER_MASK(v->reg[fbzMode].u) && v->fbi.aux)
-	{
-		UINT16 color = v->reg[zaColor].u;
-
-		/* now do the fill */
-		for (y = sy; y < ey; y++)
-		{
-			UINT16 *dest;
-			int scry;
-
-			/* determine the screen Y */
-			scry = y;
-			if (FBZMODE_Y_ORIGIN(v->reg[fbzMode].u))
-				scry = (v->fbi.yorigin - y) & 0x3ff;
-
-			/* fill this row */
-			dest = v->fbi.aux + scry * v->fbi.rowpixels;
-			for (x = sx; x < ex; x++)
-				dest[x] = color;
-		}
-	}
 
 	/* 2 pixels per clock */
 	return ((ey - sy) * (ex - sx)) / 2;
 }
 
+
+/*-------------------------------------------------
+    swapbuffer - execute the 'swapbuffer'
+    command
+-------------------------------------------------*/
 
 static INT32 swapbuffer(voodoo_state *v, UINT32 data)
 {
@@ -4527,19 +4627,28 @@ static INT32 swapbuffer(voodoo_state *v, UINT32 data)
 }
 
 
+/*-------------------------------------------------
+    triangle - execute the 'triangle'
+    command
+-------------------------------------------------*/
+
 static INT32 triangle(voodoo_state *v)
 {
-	INT32 start_pixels_in = v->reg[fbiPixelsIn].u;
-	INT32 start_pixels_out = v->reg[fbiPixelsOut].u;
-	INT32 start_chroma_fail = v->reg[fbiChromaFail].u;
-	INT32 start_zfunc_fail = v->reg[fbiZfuncFail].u;
-	INT32 start_afunc_fail = v->reg[fbiAfuncFail].u;
-	raster_info *info;
-	int texcount = 0;
+	int texcount = 0, texnum;
 	UINT16 *drawbuf;
 	int destbuf;
+	int pixels;
 
 	profiler_mark(PROFILER_USER2);
+
+	/* determine the number of TMUs involved */
+	texcount = 0;
+	if (!FBIINIT3_DISABLE_TMUS(v->reg[fbiInit3].u) && FBZCP_TEXTURE_ENABLE(v->reg[fbzColorPath].u))
+	{
+		texcount = 1;
+		if (v->chipmask & 0x04)
+			texcount = 2;
+	}
 
 	/* perform subpixel adjustments */
 	if (FBZCP_CCA_SUBPIXEL_ADJUST(v->reg[fbzColorPath].u))
@@ -4547,6 +4656,7 @@ static INT32 triangle(voodoo_state *v)
 		INT32 dx = 8 - (v->fbi.ax & 15);
 		INT32 dy = 8 - (v->fbi.ay & 15);
 
+		/* adjust iterated R,G,B,A and W/Z */
 		v->fbi.startr += (dy * v->fbi.drdy + dx * v->fbi.drdx) >> 4;
 		v->fbi.startg += (dy * v->fbi.dgdy + dx * v->fbi.dgdx) >> 4;
 		v->fbi.startb += (dy * v->fbi.dbdy + dx * v->fbi.dbdx) >> 4;
@@ -4554,16 +4664,28 @@ static INT32 triangle(voodoo_state *v)
 		v->fbi.startw += (dy * v->fbi.dwdy + dx * v->fbi.dwdx) >> 4;
 		v->fbi.startz += fixed_mul_shift(dy, v->fbi.dzdy, 4) + fixed_mul_shift(dx, v->fbi.dzdx, 4);
 
-		v->tmu[0].startw += (dy * v->tmu[0].dwdy + dx * v->tmu[0].dwdx) >> 4;
-		v->tmu[0].starts += (dy * v->tmu[0].dsdy + dx * v->tmu[0].dsdx) >> 4;
-		v->tmu[0].startt += (dy * v->tmu[0].dtdy + dx * v->tmu[0].dtdx) >> 4;
-
-		if (v->chipmask & 0x04)
+		/* adjust iterated W/S/T for TMU 0 */
+		if (texcount >= 1)
 		{
-			v->tmu[1].startw += (dy * v->tmu[1].dwdy + dx * v->tmu[1].dwdx) >> 4;
-			v->tmu[1].starts += (dy * v->tmu[1].dsdy + dx * v->tmu[1].dsdx) >> 4;
-			v->tmu[1].startt += (dy * v->tmu[1].dtdy + dx * v->tmu[1].dtdx) >> 4;
+			v->tmu[0].startw += (dy * v->tmu[0].dwdy + dx * v->tmu[0].dwdx) >> 4;
+			v->tmu[0].starts += (dy * v->tmu[0].dsdy + dx * v->tmu[0].dsdx) >> 4;
+			v->tmu[0].startt += (dy * v->tmu[0].dtdy + dx * v->tmu[0].dtdx) >> 4;
+
+			/* adjust iterated W/S/T for TMU 1 */
+			if (texcount >= 2)
+			{
+				v->tmu[1].startw += (dy * v->tmu[1].dwdy + dx * v->tmu[1].dwdx) >> 4;
+				v->tmu[1].starts += (dy * v->tmu[1].dsdy + dx * v->tmu[1].dsdx) >> 4;
+				v->tmu[1].startt += (dy * v->tmu[1].dtdy + dx * v->tmu[1].dtdx) >> 4;
+			}
 		}
+	}
+
+	/* set up the textures */
+	for (texnum = 0; texnum < texcount; texnum++)
+	{
+		prepare_tmu(&v->tmu[texnum]);
+		v->stats.texture_mode[TEXMODE_FORMAT(v->tmu[texnum].reg[textureMode].u)]++;
 	}
 
 	/* determine the draw buffer */
@@ -4583,48 +4705,27 @@ static INT32 triangle(voodoo_state *v)
 			return TRIANGLE_SETUP_CLOCKS;
 	}
 
-	/* set up the textures */
-	texcount = 0;
-	if (!FBIINIT3_DISABLE_TMUS(v->reg[fbiInit3].u) && FBZCP_TEXTURE_ENABLE(v->reg[fbzColorPath].u))
-	{
-		texcount = 1;
-		prepare_tmu(&v->tmu[0]);
-		v->stats.texture_mode[TEXMODE_FORMAT(v->tmu[0].reg[textureMode].u)]++;
-
-		/* see if we need to deal with a second TMU */
-		if (v->chipmask & 0x04)
-		{
-			texcount = 2;
-			prepare_tmu(&v->tmu[1]);
-			v->stats.texture_mode[TEXMODE_FORMAT(v->tmu[1].reg[textureMode].u)]++;
-		}
-	}
-
 	/* find a rasterizer that matches our current state */
-	info = find_rasterizer(v, texcount);
-	(*info->callback)(v, drawbuf);
-	info->polys++;
-	info->hits += v->reg[fbiPixelsIn].u - start_pixels_in;
+	pixels = triangle_create_work_item(v, drawbuf, texcount);
 
 	/* update stats */
 	v->reg[fbiTrianglesOut].u++;
 
-	if (LOG_REGISTERS) logerror("cycles = %d\n", TRIANGLE_SETUP_CLOCKS + v->reg[fbiPixelsIn].u - start_pixels_in);
-
 	/* update stats */
 	v->stats.total_triangles++;
-	v->stats.total_pixels_in += v->reg[fbiPixelsIn].u - start_pixels_in;
-	v->stats.total_pixels_out += v->reg[fbiPixelsOut].u - start_pixels_out;
-	v->stats.total_chroma_fail += v->reg[fbiChromaFail].u - start_chroma_fail;
-	v->stats.total_zfunc_fail += v->reg[fbiZfuncFail].u - start_zfunc_fail;
-	v->stats.total_afunc_fail += v->reg[fbiAfuncFail].u - start_afunc_fail;
 
 	profiler_mark(PROFILER_END);
 
 	/* 1 pixel per clock, plus some setup time */
-	return TRIANGLE_SETUP_CLOCKS + v->reg[fbiPixelsIn].u - start_pixels_in;
+	if (LOG_REGISTERS) logerror("cycles = %d\n", TRIANGLE_SETUP_CLOCKS + pixels);
+	return TRIANGLE_SETUP_CLOCKS + pixels;
 }
 
+
+/*-------------------------------------------------
+    begin_triangle - execute the 'beginTri'
+    command
+-------------------------------------------------*/
 
 static INT32 begin_triangle(voodoo_state *v)
 {
@@ -4652,6 +4753,11 @@ static INT32 begin_triangle(voodoo_state *v)
 	return 0;
 }
 
+
+/*-------------------------------------------------
+    draw_triangle - execute the 'DrawTri'
+    command
+-------------------------------------------------*/
 
 static INT32 draw_triangle(voodoo_state *v)
 {
@@ -4689,16 +4795,22 @@ static INT32 draw_triangle(voodoo_state *v)
 
 
 
-/*************************************
- *
- *  Triangle setup
- *
- *************************************/
+/***************************************************************************
+    TRIANGLE HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    setup_and_draw_triangle - process the setup
+    parameters and render the triangle
+-------------------------------------------------*/
 
 static INT32 setup_and_draw_triangle(voodoo_state *v)
 {
 	float dx1, dy1, dx2, dy2;
 	float divisor, tdiv;
+
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
 
 	/* grab the X/Ys at least */
 	v->fbi.ax = (INT16)(v->fbi.svert[0].x * 16.0);
@@ -4817,12 +4929,123 @@ static INT32 setup_and_draw_triangle(voodoo_state *v)
 }
 
 
+/*-------------------------------------------------
+    triangle_create_work_item - finish triangle
+    setup and create the work item
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Rasterizer management
- *
- *************************************/
+static INT32 triangle_create_work_item(voodoo_state *v, UINT16 *drawbuf, int texcount)
+{
+	raster_info *info = find_rasterizer(v, texcount);
+	int curscan, pixels = 0;
+
+	/* sort the vertices */
+	/* note that this is not necessary on the Voodoo 1 as the card assumes the vertices */
+	/* are presorted such that ay <= by <= cy, but we do it anyway because it is cheap enough */
+	if (v->fbi.ay <= v->fbi.by)
+	{
+		if (v->fbi.by <= v->fbi.cy)
+		{
+			v->work.minx = v->fbi.ax;	v->work.miny = v->fbi.ay;
+			v->work.midx = v->fbi.bx;	v->work.midy = v->fbi.by;
+			v->work.maxx = v->fbi.cx;	v->work.maxy = v->fbi.cy;
+		}
+		else if (v->fbi.ay <= v->fbi.cy)
+		{
+			v->work.minx = v->fbi.ax;	v->work.miny = v->fbi.ay;
+			v->work.midx = v->fbi.cx;	v->work.midy = v->fbi.cy;
+			v->work.maxx = v->fbi.bx;	v->work.maxy = v->fbi.by;
+		}
+		else
+		{
+			v->work.minx = v->fbi.cx;	v->work.miny = v->fbi.cy;
+			v->work.midx = v->fbi.ax;	v->work.midy = v->fbi.ay;
+			v->work.maxx = v->fbi.bx;	v->work.maxy = v->fbi.by;
+		}
+	}
+	else
+	{
+		if (v->fbi.ay <= v->fbi.cy)
+		{
+			v->work.minx = v->fbi.bx;	v->work.miny = v->fbi.by;
+			v->work.midx = v->fbi.ax;	v->work.midy = v->fbi.ay;
+			v->work.maxx = v->fbi.cx;	v->work.maxy = v->fbi.cy;
+		}
+		else if (v->fbi.by <= v->fbi.cy)
+		{
+			v->work.minx = v->fbi.bx;	v->work.miny = v->fbi.by;
+			v->work.midx = v->fbi.cx;	v->work.midy = v->fbi.cy;
+			v->work.maxx = v->fbi.ax;	v->work.maxy = v->fbi.ay;
+		}
+		else
+		{
+			v->work.minx = v->fbi.cx;	v->work.miny = v->fbi.cy;
+			v->work.midx = v->fbi.bx;	v->work.midy = v->fbi.by;
+			v->work.maxx = v->fbi.ax;	v->work.maxy = v->fbi.ay;
+		}
+	}
+
+	/* compute the slopes as 16.16 numbers */
+	v->work.dxdy_minmid = (v->work.miny == v->work.midy) ? 0 : ((v->work.midx - v->work.minx) << 16) / (v->work.midy - v->work.miny);
+	v->work.dxdy_minmax = (v->work.miny == v->work.maxy) ? 0 : ((v->work.maxx - v->work.minx) << 16) / (v->work.maxy - v->work.miny);
+	v->work.dxdy_midmax = (v->work.midy == v->work.maxy) ? 0 : ((v->work.maxx - v->work.midx) << 16) / (v->work.maxy - v->work.midy);
+
+	/* clamp to full pixels */
+	v->work.startscanline = v->work.curscanline = (v->work.miny + 7) >> 4;
+	v->work.endscanline = (v->work.maxy + 7) >> 4;
+
+	/* compute the X extents for each scanline */
+	for (curscan = v->work.startscanline; curscan < v->work.endscanline; curscan++)
+	{
+		INT32 fully = (curscan << 4) + 8;
+		INT32 startx = v->work.minx + (((fully - v->work.miny) * v->work.dxdy_minmax) >> 16);
+		INT32 stopx;
+
+		if (fully < v->work.midy)
+			stopx = v->work.minx + (((fully - v->work.miny) * v->work.dxdy_minmid) >> 16);
+		else
+			stopx = v->work.midx + (((fully - v->work.midy) * v->work.dxdy_midmax) >> 16);
+
+		/* clamp to full pixels */
+		startx = (startx + 7) >> 4;
+		stopx = (stopx + 7) >> 4;
+
+		/* force start < stop */
+		if (startx > stopx)
+		{
+			int temp = startx;
+			startx = stopx;
+			stopx = temp;
+		}
+
+		/* set the extent and update the total pixel count */
+		v->work.extent[curscan - v->work.startscanline].startx = startx;
+		v->work.extent[curscan - v->work.startscanline].stopx = stopx;
+		pixels += stopx - startx;
+	}
+
+	/* farm the rasterization out to other threads */
+	v->work.state = v;
+	v->work.callback = info->callback;
+	v->work.drawbuf = drawbuf;
+	v->work.info = info;
+	work_item_enqueue(v);
+
+	/* update statistics */
+	info->polys++;
+	return pixels;
+}
+
+
+
+/***************************************************************************
+    RASTERIZER MANAGEMENT
+***************************************************************************/
+
+/*-------------------------------------------------
+    add_rasterizer - add a rasterizer to our
+    hash table
+-------------------------------------------------*/
 
 static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo)
 {
@@ -4843,7 +5066,7 @@ static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo)
 	v->raster_hash[hash] = info;
 
 	if (LOG_RASTERIZERS)
-		mame_printf_debug("Adding rasterizer @ %p : %08X %08X %08X %08X %08X %08X (hash=%d)\n",
+		printf("Adding rasterizer @ %p : %08X %08X %08X %08X %08X %08X (hash=%d)\n",
 				info->callback,
 				info->eff_color_path, info->eff_alpha_mode, info->eff_fog_mode, info->eff_fbz_mode,
 				info->eff_tex_mode_0, info->eff_tex_mode_1, hash);
@@ -4851,6 +5074,12 @@ static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo)
 	return info;
 }
 
+
+/*-------------------------------------------------
+    find_rasterizer - find a rasterizer that
+    matches  our current parameters and return
+    it, creating a new one if necessary
+-------------------------------------------------*/
 
 static raster_info *find_rasterizer(voodoo_state *v, int texcount)
 {
@@ -4890,17 +5119,10 @@ static raster_info *find_rasterizer(voodoo_state *v, int texcount)
 			return info;
 		}
 
-	/* attempt to generate one */
-#ifdef VOODOO_DRC
-	curinfo.callback = generate_rasterizer(v);
-	curinfo.is_generic = FALSE;
-	if (curinfo.callback == NULL)
-#endif
-	{
-		curinfo.callback = (texcount == 0) ? raster_generic_0tmu : (texcount == 1) ? raster_generic_1tmu : raster_generic_2tmu;
-		curinfo.is_generic = TRUE;
-	}
-
+	/* generate a new one using the generic entry */
+	curinfo.callback = (texcount == 0) ? raster_generic_0tmu : (texcount == 1) ? raster_generic_1tmu : raster_generic_2tmu;
+	curinfo.is_generic = TRUE;
+	curinfo.display = 0;
 	curinfo.polys = 0;
 	curinfo.hits = 0;
 	curinfo.next = 0;
@@ -4909,12 +5131,19 @@ static raster_info *find_rasterizer(voodoo_state *v, int texcount)
 }
 
 
+/*-------------------------------------------------
+    dump_rasterizer_stats - dump statistics on
+    the current rasterizer usage patterns
+-------------------------------------------------*/
+
 static void dump_rasterizer_stats(voodoo_state *v)
 {
+	static UINT8 display_index;
 	raster_info *cur, *best;
 	int hash;
 
-	mame_printf_debug("----\n");
+	printf("----\n");
+	display_index++;
 
 	/* loop until we've displayed everything */
 	while (1)
@@ -4924,107 +5153,553 @@ static void dump_rasterizer_stats(voodoo_state *v)
 		/* find the highest entry */
 		for (hash = 0; hash < RASTER_HASH_SIZE; hash++)
 			for (cur = v->raster_hash[hash]; cur; cur = cur->next)
-				if (!best || cur->hits > best->hits)
+				if (cur->display != display_index && (best == NULL || cur->hits > best->hits))
 					best = cur;
 
 		/* if we're done, we're done */
-		if (!best || best->hits == 0)
+		if (best == NULL || best->hits == 0)
 			break;
 
 		/* print it */
-		mame_printf_debug("%9d  %10d %c  ( 0x%08X,  0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X )\n",
-			best->polys,
-			best->hits,
-			best->is_generic ? '*' : ' ',
+		printf("RASTERIZER_ENTRY( 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) /* %c %8d %10d */\n",
 			best->eff_color_path,
 			best->eff_alpha_mode,
 			best->eff_fog_mode,
 			best->eff_fbz_mode,
 			best->eff_tex_mode_0,
-			best->eff_tex_mode_1);
+			best->eff_tex_mode_1,
+			best->is_generic ? '*' : ' ',
+			best->polys,
+			best->hits);
 
 		/* reset */
-		best->hits = best->polys = 0;
+		best->display = display_index;
 	}
 }
 
 
 
-/*************************************
- *
- *  Generic rasterizers
- *
- *************************************/
+/***************************************************************************
+    GENERIC RASTERIZERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    raster_fastfill - per-scanline
+    implementation of the 'fastfill' command
+-------------------------------------------------*/
+
+static void raster_fastfill(voodoo_state *v, INT32 scanline)
+{
+	int scry, x;
+
+	/* determine the screen Y */
+	scry = scanline;
+	if (FBZMODE_Y_ORIGIN(v->reg[fbzMode].u))
+		scry = (v->fbi.yorigin - scanline) & 0x3ff;
+
+	/* fill this RGB row */
+	if (FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u))
+	{
+		UINT16 *ditherow = &v->work.dither[(scanline & 3) * 4];
+		UINT16 *dest = v->work.drawbuf + scry * v->fbi.rowpixels;
+
+		for (x = v->work.minx; x < v->work.maxx; x++)
+			dest[x] = ditherow[x & 3];
+	}
+
+	/* fill this dest buffer row */
+	if (FBZMODE_AUX_BUFFER_MASK(v->reg[fbzMode].u) && v->fbi.aux)
+	{
+		UINT16 color = v->reg[zaColor].u;
+		UINT16 *dest = v->fbi.aux + scry * v->fbi.rowpixels;
+
+		for (x = v->work.minx; x < v->work.maxx; x++)
+			dest[x] = color;
+	}
+}
+
+
+/*-------------------------------------------------
+    generic_0tmu - generic rasterizer for 0 TMUs
+-------------------------------------------------*/
 
 RASTERIZER(generic_0tmu, 0, v->reg[fbzColorPath].u, v->reg[fbzMode].u, v->reg[alphaMode].u,
 			v->reg[fogMode].u, 0, 0)
 
+
+/*-------------------------------------------------
+    generic_1tmu - generic rasterizer for 1 TMU
+-------------------------------------------------*/
+
 RASTERIZER(generic_1tmu, 1, v->reg[fbzColorPath].u, v->reg[fbzMode].u, v->reg[alphaMode].u,
 			v->reg[fogMode].u, v->tmu[0].reg[textureMode].u, 0)
+
+
+/*-------------------------------------------------
+    generic_2tmu - generic rasterizer for 2 TMUs
+-------------------------------------------------*/
 
 RASTERIZER(generic_2tmu, 2, v->reg[fbzColorPath].u, v->reg[fbzMode].u, v->reg[alphaMode].u,
 			v->reg[fogMode].u, v->tmu[0].reg[textureMode].u, v->tmu[1].reg[textureMode].u)
 
 
-
 #else
 
-/*************************************
- *
- *  Specific rasterizers
- *
- *************************************/
 
-/* blitz -------> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x01420039,  0x00000000, 0x00000000, 0x000B073B, 0x0C261ACF, 0xFFFFFFFF )	/* title */
-RASTERIZER_ENTRY( 0x00582C35,  0x00515110, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF )	/* video */
-RASTERIZER_ENTRY( 0x00000035,  0x00000000, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00002C35,  0x00515110, 0x00000000, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF )	/* select screen */
-RASTERIZER_ENTRY( 0x01420039,  0x00000000, 0x00000000, 0x000B07F9, 0x0C261ACF, 0xFFFFFFFF )	/* select screens */
 
-/* blitz2k -----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x01420039,  0x00000000, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF )	/* select screens */
+/***************************************************************************
+    GAME-SPECIFIC RASTERIZERS
+***************************************************************************/
 
-/* carnevil ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x00002435,  0x04045119, 0x00000000, 0x00030279, 0x0C261A0F, 0xFFFFFFFF )	/* clown */
-RASTERIZER_ENTRY( 0x00002425,  0x00045119, 0x00000000, 0x00030679, 0x0C261A0F, 0xFFFFFFFF )	/* clown */
+/* blitz ------> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00000035, 0x00000000, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /*     284269  914846168 */
+RASTERIZER_ENTRY( 0x00002C35, 0x00515110, 0x00000000, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /*     485421  440309121 */
+RASTERIZER_ENTRY( 0x00582C35, 0x00515110, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /*      31606  230753709 */
+RASTERIZER_ENTRY( 0x00582C35, 0x00515110, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /*      76742  211701679 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000000, 0x000B073B, 0x0C261ACF, 0xFFFFFFFF ) /*       6188  152109056 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000000, 0x000B07F9, 0x0C261ACF, 0xFFFFFFFF ) /*       1100  108134400 */
+RASTERIZER_ENTRY( 0x00002C35, 0x64515119, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /*    6229525  106197740 */
+RASTERIZER_ENTRY( 0x00002C35, 0x40515119, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /*      87756  103438805 */
+RASTERIZER_ENTRY( 0x00002C35, 0x64515119, 0x00000000, 0x000B0799, 0x0C261A0F, 0xFFFFFFFF ) /*     905641   75886220 */
+RASTERIZER_ENTRY( 0x00002C35, 0x40515119, 0x00000000, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /*     205236   53317253 */
+RASTERIZER_ENTRY( 0x01422439, 0x00000000, 0x00000000, 0x000B073B, 0x0C2610C9, 0xFFFFFFFF ) /*     817356   48881349 */
+RASTERIZER_ENTRY( 0x00000035, 0x00000000, 0x00000000, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /*      37979   41687251 */
+RASTERIZER_ENTRY( 0x00002C35, 0x00515110, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /*      26014   41183295 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000000, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /*       2512   37911104 */
+RASTERIZER_ENTRY( 0x00006136, 0x40515119, 0x00000000, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /*      28834   15527654 */
+RASTERIZER_ENTRY( 0x00582435, 0x00515110, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /*       9878    4979429 */
+RASTERIZER_ENTRY( 0x00002C35, 0x64515119, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /*     199952    4622064 */
+RASTERIZER_ENTRY( 0x00582C35, 0x00515110, 0x00000000, 0x000B0739, 0x0C261AC9, 0xFFFFFFFF ) /*       8672    3676949 */
+RASTERIZER_ENTRY( 0x00582C35, 0x00515010, 0x00000000, 0x000B0739, 0x0C2610CF, 0xFFFFFFFF ) /*        616    2743972 */
+RASTERIZER_ENTRY( 0x01422C39, 0x00045110, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /*      81380    2494832 */
+//RASTERIZER_ENTRY( 0x00582435, 0x00515110, 0x00000000, 0x000B0739, 0x0C261AC9, 0xFFFFFFFF ) /*       7670    2235587 */
+//RASTERIZER_ENTRY( 0x00592136, 0x00515110, 0x00000000, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /*        210    1639140 */
+//RASTERIZER_ENTRY( 0x00582C35, 0x00515110, 0x00000000, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /*        108    1154736 */
+//RASTERIZER_ENTRY( 0x00002C35, 0x00515110, 0x00000000, 0x000B07F9, 0x0C26180F, 0xFFFFFFFF ) /*       2152    1150842 */
+//RASTERIZER_ENTRY( 0x00592136, 0x00515110, 0x00000000, 0x000B073B, 0x0C261ACF, 0xFFFFFFFF ) /*        152     880560 */
+//RASTERIZER_ENTRY( 0x00008035, 0x64515119, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /*      90848     805730 */
+//RASTERIZER_ENTRY( 0x00002C35, 0x40515119, 0x00000000, 0x000B07F9, 0x0C261AC9, 0xFFFFFFFF ) /*       2024     571406 */
+//RASTERIZER_ENTRY( 0x00012136, 0x00515110, 0x00000000, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /*       1792     494592 */
+//RASTERIZER_ENTRY( 0x00000002, 0x00000000, 0x00000000, 0x00000300, 0xFFFFFFFF, 0xFFFFFFFF ) /*        256     161280 */
 
-/* calspeed ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x00002815,  0x05045119, 0x00000001, 0x000A0723, 0x0C261ACF, 0xFFFFFFFF )	/* movie */
-RASTERIZER_ENTRY( 0x01022C19,  0x05000009, 0x00000001, 0x000B0739, 0x0C26100F, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00002C15,  0x05045119, 0x00000001, 0x000B0739, 0x0C26180F, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x01022C19,  0x05000009, 0x00000001, 0x000B073B, 0x0C26100F, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00480015,  0x05045119, 0x00000001, 0x000B0339, 0x0C26100F, 0xFFFFFFFF )	/* in-game */
+/* blitz99 ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00000035, 0x64000009, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *  6297478  149465839 */
+RASTERIZER_ENTRY( 0x00000035, 0x64000009, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /* *   210693    6285480 */
+RASTERIZER_ENTRY( 0x01422C39, 0x00045110, 0x00000000, 0x000B073B, 0x0C2610C9, 0xFFFFFFFF ) /* *    20180    2718710 */
+RASTERIZER_ENTRY( 0x00582C35, 0x00515110, 0x00000000, 0x000B073B, 0x0C261ACF, 0xFFFFFFFF ) /* *      360    2425416 */
+RASTERIZER_ENTRY( 0x00002C35, 0x64000009, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *    67059    1480978 */
+RASTERIZER_ENTRY( 0x00008035, 0x64000009, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *    24811     400666 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000000, 0x000B073B, 0x0C2610C9, 0xFFFFFFFF ) /* *    10304     324468 */
+RASTERIZER_ENTRY( 0x00002C35, 0x00515110, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /* *     1024     112665 */
 
-/* mace --------> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x00000035,  0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0xFFFFFFFF )	/* character screen */
-RASTERIZER_ENTRY( 0x00600C09,  0x00045119, 0x00000000, 0x000B0779, 0x0824100F, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00600C09,  0x00045119, 0x00000000, 0x000B0779, 0x0824180F, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00600C09,  0x00045119, 0x00000000, 0x000B0779, 0x082410CF, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00600C09,  0x00045119, 0x00000000, 0x000B0779, 0x082418CF, 0xFFFFFFFF )	/* in-game */
+/* blitz2k ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /* *     3880   95344128 */
+RASTERIZER_ENTRY( 0x00582C35, 0x00514110, 0x00000000, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /* *      148    1785480 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000000, 0x000B073B, 0x0C2610CF, 0xFFFFFFFF ) /* *     9976     314244 */
 
-/* vaportrx ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x00482405,  0x00000009, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF )	/* intro */
-RASTERIZER_ENTRY( 0x00482405,  0x00000000, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00482435,  0x00000000, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00482435,  0x00045119, 0x00000000, 0x000B07F9, 0x0C261ACF, 0xFFFFFFFF )	/* in-game */
+/* carnevil ---> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00002435, 0x04045119, 0x00000000, 0x00030279, 0x0C261A0F, 0xFFFFFFFF ) /* *      492   84128082 */
+RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x00000000, 0x00030679, 0x0C261A0F, 0xFFFFFFFF ) /* *  1988398   36166780 */
+RASTERIZER_ENTRY( 0x00486116, 0x01045119, 0x00000000, 0x00030279, 0x0C26180F, 0xFFFFFFFF ) /* *    34424   28788847 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x00030679, 0x0C261A0F, 0xFFFFFFFF ) /* *      514   26316800 */
+RASTERIZER_ENTRY( 0x00480015, 0x0F045119, 0x00000000, 0x000306F9, 0x0C261AC9, 0xFFFFFFFF ) /* *     7346   18805760 */
+RASTERIZER_ENTRY( 0x00002435, 0x40045119, 0x00000000, 0x000302F9, 0x0C26180F, 0xFFFFFFFF ) /* *   130764   18678972 */
+RASTERIZER_ENTRY( 0x00000035, 0x40045119, 0x00000000, 0x00030679, 0x0C261A0F, 0xFFFFFFFF ) /* *     3380   13844480 */
+RASTERIZER_ENTRY( 0x00482415, 0x0F045119, 0x00000000, 0x000306F9, 0x0C2618C9, 0xFFFFFFFF ) /* *     7244   12179040 */
+RASTERIZER_ENTRY( 0x00482415, 0x0A045119, 0x00000000, 0x000306F9, 0x0C26180F, 0xFFFFFFFF ) /* *    84520   12059721 */
+RASTERIZER_ENTRY( 0x00000035, 0x0A045119, 0x00000000, 0x000306F9, 0x0C261AC9, 0xFFFFFFFF ) /* *    21926   11226112 */
+RASTERIZER_ENTRY( 0x00482415, 0x40045119, 0x00000000, 0x00030679, 0x0C2618C9, 0xFFFFFFFF ) /* *    92115    8926536 */
+RASTERIZER_ENTRY( 0x00480015, 0x04045119, 0x00000000, 0x000306F9, 0x0C261AC9, 0xFFFFFFFF ) /* *     5018    7711968 */
+RASTERIZER_ENTRY( 0x00482415, 0x04045119, 0x00000000, 0x00030279, 0x0C261A0F, 0xFFFFFFFF ) /* *     1730    7629334 */
+RASTERIZER_ENTRY( 0x00002435, 0x40045119, 0x00000000, 0x000B0779, 0x0C26180F, 0xFFFFFFFF ) /* *    37408    5545956 */
+RASTERIZER_ENTRY( 0x00002435, 0x40045119, 0x00000000, 0x00030679, 0x0C26180F, 0xFFFFFFFF ) /* *    26528    4225026 */
+RASTERIZER_ENTRY( 0x00002435, 0x08045119, 0x00000000, 0x000306F9, 0x0C26180F, 0xFFFFFFFF ) /* *    35764    3230884 */
+RASTERIZER_ENTRY( 0x00000035, 0x08045119, 0x00000000, 0x000306F9, 0x0C261AC9, 0xFFFFFFFF ) /* *     3926    2404352 */
+RASTERIZER_ENTRY( 0x01422409, 0x00045119, 0x00000000, 0x00030679, 0x0C261A0F, 0xFFFFFFFF ) /* *    96020    1226438 */
+RASTERIZER_ENTRY( 0x00482415, 0x04045119, 0x00000000, 0x00030279, 0x0C2618C9, 0xFFFFFFFF ) /* *     1020     574649 */
+RASTERIZER_ENTRY( 0x00482415, 0x05045119, 0x00000000, 0x00030679, 0x0C261A0F, 0xFFFFFFFF ) /* *      360     370008 */
+RASTERIZER_ENTRY( 0x00480015, 0x04045119, 0x00000000, 0x000306F9, 0x0C261A0F, 0xFFFFFFFF ) /* *      576     334404 */
 
-/* wg3dh -------> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x00000035,  0x00045119, 0x00000000, 0x000B0779, 0x082410DF, 0xFFFFFFFF )	/* title */
-RASTERIZER_ENTRY( 0x00000035,  0x00045119, 0x00000000, 0x000B0779, 0x0824101F, 0xFFFFFFFF )	/* credits */
-RASTERIZER_ENTRY( 0x00000035,  0x00045119, 0x00000000, 0x000B0779, 0x08241ADF, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00480035,  0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00000035,  0x00045119, 0x00000000, 0x000B0779, 0x0824189F, 0xFFFFFFFF )	/* in-game */
+/* calspeed ---> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000B07F9, 0x0C26100F, 0xFFFFFFFF ) /* *    99120 1731923836 */
+RASTERIZER_ENTRY( 0x01022819, 0x05000009, 0x00000001, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *  9955804 1526119944 */
+RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000B0739, 0x0C26180F, 0xFFFFFFFF ) /* *  1898207 1124776864 */
+RASTERIZER_ENTRY( 0x01022819, 0x05000009, 0x00000001, 0x000B073B, 0x0C26100F, 0xFFFFFFFF ) /* *  3487467 1101663125 */
+RASTERIZER_ENTRY( 0x01022C19, 0x05000009, 0x00000001, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *  1079277  609256033 */
+RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000A0723, 0x0C261ACF, 0xFFFFFFFF ) /* *    11880  583925760 */
+RASTERIZER_ENTRY( 0x00602819, 0x05045119, 0x00000001, 0x000B07F9, 0x0C26180F, 0xFFFFFFFF ) /* *    63644  582469888 */
+RASTERIZER_ENTRY( 0x01022819, 0x05000009, 0x00000001, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /* *    22688  556797972 */
+RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000B07F9, 0x0C26180F, 0xFFFFFFFF ) /* *  1360254  417068457 */
+RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *  3427489  405421272 */
+RASTERIZER_ENTRY( 0x00002C15, 0x05045119, 0x00000001, 0x000B0739, 0x0C26180F, 0xFFFFFFFF ) /* *   286809  238944049 */
+RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000A0321, 0x0C26180F, 0xFFFFFFFF ) /* *    28160  231084818 */
+RASTERIZER_ENTRY( 0x01022819, 0x05000009, 0x00000001, 0x000B07FB, 0x0C26100F, 0xFFFFFFFF ) /* *   183564  201014424 */
+RASTERIZER_ENTRY( 0x00480015, 0x05045119, 0x00000001, 0x000B0339, 0x0C26100F, 0xFFFFFFFF ) /* *    15275  168207109 */
+RASTERIZER_ENTRY( 0x01022819, 0x05000009, 0x00000001, 0x000B07F9, 0x0C26100F, 0xFFFFFFFF ) /* *     2856  134400000 */
+RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000B0339, 0x0C26180F, 0xFFFFFFFF ) /* *    98551  110417974 */
+RASTERIZER_ENTRY( 0x01022819, 0x05000009, 0x00000001, 0x000B07F9, 0x0C2610CF, 0xFFFFFFFF ) /* *    47040  107360728 */
+RASTERIZER_ENTRY( 0x00480015, 0x05045119, 0x00000001, 0x000B0339, 0x0C26180F, 0xFFFFFFFF ) /* *    13128   86876789 */
+RASTERIZER_ENTRY( 0x01022C19, 0x05000009, 0x00000001, 0x000B073B, 0x0C26100F, 0xFFFFFFFF ) /* *   257515   76329054 */
+RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /* *     3934   64958208 */
+//RASTERIZER_ENTRY( 0x00002C15, 0x05045119, 0x00000001, 0x000B07F9, 0x0C26180F, 0xFFFFFFFF ) /* *    77400   63786236 */
+//RASTERIZER_ENTRY( 0x01022C19, 0x05000009, 0x00000001, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /* *    12500   63151200 */
+//RASTERIZER_ENTRY( 0x0102001A, 0x05045119, 0x00000001, 0x000A0321, 0xFFFFFFFF, 0xFFFFFFFF ) /* *     8764   57629312 */
+//RASTERIZER_ENTRY( 0x00002C15, 0x05045119, 0x00000001, 0x000A0321, 0x0C26180F, 0xFFFFFFFF ) /* *     3257   32708448 */
+//RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000A07E3, 0x0C2610CF, 0xFFFFFFFF ) /* *    28364   31195605 */
+//RASTERIZER_ENTRY( 0x00002C15, 0x05045119, 0x00000001, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *   409001   30699647 */
+//RASTERIZER_ENTRY( 0x00482C35, 0x05045119, 0x00000001, 0x000A0321, 0x0C26100F, 0xFFFFFFFF ) /* *    17669   11214172 */
+//RASTERIZER_ENTRY( 0x00002C15, 0x05045119, 0x00000001, 0x000B0339, 0x0C26180F, 0xFFFFFFFF ) /* *     5844    6064373 */
+//RASTERIZER_ENTRY( 0x00002C15, 0x05045119, 0x00000001, 0x000B07FB, 0x0C26100F, 0xFFFFFFFF ) /* *      626    4651080 */
+//RASTERIZER_ENTRY( 0x00482C35, 0x05045119, 0x00000001, 0x000A0321, 0x0C26180F, 0xFFFFFFFF ) /* *     5887    2945500 */
+//RASTERIZER_ENTRY( 0x00480015, 0x05045119, 0x00000001, 0x000B0339, 0x0C261A0F, 0xFFFFFFFF ) /* *     1090    2945093 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x05045119, 0x00000001, 0x000B07F9, 0x0C26180F, 0xFFFFFFFF ) /* *      228    1723908 */
+//RASTERIZER_ENTRY( 0x00002C15, 0x05045119, 0x00000001, 0x000A0321, 0x0C261A0F, 0xFFFFFFFF ) /* *      112    1433600 */
+//RASTERIZER_ENTRY( 0x00002815, 0x05045119, 0x00000001, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *     3091    1165805 */
+//RASTERIZER_ENTRY( 0x01022C19, 0x05000009, 0x00000001, 0x000B07FB, 0x0C26100F, 0xFFFFFFFF ) /* *      620     791202 */
+
+/* hyprdriv ---> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /* *    60860  498565120 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B07F9, 0x0C261A0F, 0xFFFFFFFF ) /* *    28688  235012096 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B07F9, 0x0C261ACF, 0xFFFFFFFF ) /* *    11844  156499968 */
+RASTERIZER_ENTRY( 0x00580035, 0x0A045119, 0x00000001, 0x00030279, 0x0C261A0F, 0xFFFFFFFF ) /* *   175990  146518715 */
+RASTERIZER_ENTRY( 0x00582C35, 0x00515110, 0x00000001, 0x000B0739, 0x0C261ACF, 0xFFFFFFFF ) /* *     2336  114819072 */
+RASTERIZER_ENTRY( 0x00580035, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A1F, 0xFFFFFFFF ) /* *   363325  100404294 */
+RASTERIZER_ENTRY( 0x00582C35, 0x00045110, 0x00000001, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /* *    40918   96318738 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B0739, 0x0C26101F, 0xFFFFFFFF ) /* *    54815   94990269 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B0739, 0x0C261A1F, 0xFFFFFFFF ) /* *   123032   91652828 */
+RASTERIZER_ENTRY( 0x01422429, 0x00000000, 0x00000001, 0x000B0739, 0x0C261A1F, 0xFFFFFFFF ) /* *    82767   86431997 */
+RASTERIZER_ENTRY( 0x01422429, 0x00000000, 0x00000001, 0x000B0739, 0x0C26101F, 0xFFFFFFFF ) /* *     9874   78101834 */
+RASTERIZER_ENTRY( 0x01422429, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A1F, 0xFFFFFFFF ) /* *   102146   72570879 */
+RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B073B, 0x0C26100F, 0xFFFFFFFF ) /* *   657804   67229658 */
+RASTERIZER_ENTRY( 0x00580035, 0x00045110, 0x00000001, 0x000B03F9, 0x0C261A0F, 0xFFFFFFFF ) /* *    10428   63173865 */
+RASTERIZER_ENTRY( 0x01422429, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /* *   230145   57902926 */
+RASTERIZER_ENTRY( 0x01422C19, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /* *   769654   53992486 */
+RASTERIZER_ENTRY( 0x01422C19, 0x00000000, 0x00000001, 0x000B0739, 0x0C26101F, 0xFFFFFFFF ) /* *    85365   51865697 */
+RASTERIZER_ENTRY( 0x00582435, 0x00515110, 0x00000001, 0x000B0739, 0x0C261AC9, 0xFFFFFFFF ) /* *   454674   46165536 */
+RASTERIZER_ENTRY( 0x00580035, 0x00000000, 0x00000001, 0x000B073B, 0x0C26101F, 0xFFFFFFFF ) /* *   101889   33337987 */
+RASTERIZER_ENTRY( 0x00580035, 0x00000000, 0x00000001, 0x000B0739, 0x0C26101F, 0xFFFFFFFF ) /* *   255952   29810993 */
+//RASTERIZER_ENTRY( 0x00582425, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A1F, 0xFFFFFFFF ) /* *   106190   25430383 */
+//RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A1F, 0xFFFFFFFF ) /* *   595001   23268601 */
+//RASTERIZER_ENTRY( 0x0142612A, 0x00000000, 0x00000001, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *   946410   22589110 */
+//RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /* *   330036   21323230 */
+//RASTERIZER_ENTRY( 0x01422C19, 0x00000000, 0x00000001, 0x000B0739, 0x0C261A1F, 0xFFFFFFFF ) /* *    40089   13470498 */
+//RASTERIZER_ENTRY( 0x01422C19, 0x00000000, 0x00000000, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /* *    90906   12850855 */
+//RASTERIZER_ENTRY( 0x00582C35, 0x00515110, 0x00000001, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *     9492   12115280 */
+//RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B073B, 0x0C26101F, 0xFFFFFFFF ) /* *   453515   12013961 */
+//RASTERIZER_ENTRY( 0x01422C19, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A1F, 0xFFFFFFFF ) /* *    33829    8384312 */
+//RASTERIZER_ENTRY( 0x00580035, 0x00000000, 0x00000001, 0x000B073B, 0x0C26100F, 0xFFFFFFFF ) /* *    83986    7841206 */
+//RASTERIZER_ENTRY( 0x00580035, 0x00045110, 0x00000001, 0x000B0339, 0x0C261A0F, 0xFFFFFFFF ) /* *    42515    7242660 */
+//RASTERIZER_ENTRY( 0x00582425, 0x00000000, 0x00000001, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *      706    6158684 */
+//RASTERIZER_ENTRY( 0x00582425, 0x00000000, 0x00000001, 0x000B0739, 0x0C26101F, 0xFFFFFFFF ) /* *    62051    5819485 */
+//RASTERIZER_ENTRY( 0x0142612A, 0x00000000, 0x00000000, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *   135139    5063467 */
+//RASTERIZER_ENTRY( 0x01422429, 0x00000000, 0x00000001, 0x000B073B, 0x0C26100F, 0xFFFFFFFF ) /* *    10359    5135837 */
+//RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *   170159    4449246 */
+//RASTERIZER_ENTRY( 0x00582425, 0x00000000, 0x00000001, 0x000B073B, 0x0C26101F, 0xFFFFFFFF ) /* *    19037    4371219 */
+//RASTERIZER_ENTRY( 0x01422429, 0x00000000, 0x00000001, 0x000B073B, 0x0C26101F, 0xFFFFFFFF ) /* *     8963    4352501 */
+//RASTERIZER_ENTRY( 0x01422C39, 0x00045110, 0x00000001, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /* *    47712    4159994 */
+//RASTERIZER_ENTRY( 0x01422C19, 0x00000000, 0x00000000, 0x000B073B, 0x0C261ACF, 0xFFFFFFFF ) /* *    47525    4151435 */
+//RASTERIZER_ENTRY( 0x01422C19, 0x00000000, 0x00000001, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *    34980    3794066 */
+//RASTERIZER_ENTRY( 0x0142613A, 0x00045110, 0x00000000, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *     6540    2358068 */
+//RASTERIZER_ENTRY( 0x0142611A, 0x00045110, 0x00000000, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *   703308    2096781 */
+//RASTERIZER_ENTRY( 0x00580035, 0x00045110, 0x00000001, 0x000B0339, 0x0C261A1F, 0xFFFFFFFF ) /* *     3963    2079440 */
+//RASTERIZER_ENTRY( 0x01422439, 0x00000000, 0x00000001, 0x000B073B, 0x0C261AC9, 0xFFFFFFFF ) /* *    22866    2008397 */
+//RASTERIZER_ENTRY( 0x01420039, 0x00000000, 0x00000001, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *    69705    1673671 */
+//RASTERIZER_ENTRY( 0x01422C19, 0x00000000, 0x00000001, 0x000B073B, 0x0C26100F, 0xFFFFFFFF ) /* *    13366    1575120 */
+//RASTERIZER_ENTRY( 0x0142613A, 0x00000000, 0x00000000, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *    50625    1408211 */
+//RASTERIZER_ENTRY( 0x0142613A, 0x00045110, 0x00000001, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *  1244348    1244346 */
+//RASTERIZER_ENTRY( 0x00582425, 0x00000000, 0x00000001, 0x000B073B, 0x0C26100F, 0xFFFFFFFF ) /* *    13791    1222735 */
+//RASTERIZER_ENTRY( 0x00580035, 0x00000000, 0x00000001, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /* *    33064     943590 */
+//RASTERIZER_ENTRY( 0x0142610A, 0x00045110, 0x00000001, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *     2041     926507 */
+//RASTERIZER_ENTRY( 0x00480019, 0x00045110, 0x00000001, 0x000B073B, 0x0C261A0F, 0xFFFFFFFF ) /* *     2722     453924 */
+//RASTERIZER_ENTRY( 0x00580035, 0x00000000, 0x00000001, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *    68232     306869 */
+//RASTERIZER_ENTRY( 0x0142611A, 0x00045110, 0x00000001, 0x000B0379, 0xFFFFFFFF, 0xFFFFFFFF ) /* *     7164     269002 */
+
+/* mace -------> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824100F, 0xFFFFFFFF ) /* *  7204150 1340201579 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x08241ADF, 0xFFFFFFFF ) /* *    15332 1181663232 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0xFFFFFFFF ) /* *   104456  652582379 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824180F, 0xFFFFFFFF ) /* *   488613  368880164 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x082418CF, 0xFFFFFFFF ) /* *   352924  312417405 */
+RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0xFFFFFFFF ) /* *    15024  291762384 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x082410CF, 0xFFFFFFFF ) /* *   711824  279246170 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x0824100F, 0xFFFFFFFF ) /* *   735574  171881981 */
+RASTERIZER_ENTRY( 0x00602401, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0xFFFFFFFF ) /* *   943006  154374023 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x082410CF, 0xFFFFFFFF ) /* *   103877  101077498 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824108F, 0xFFFFFFFF ) /* *   710125   87547221 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x08241ACF, 0xFFFFFFFF ) /* *     9834   79774966 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0379, 0x082418DF, 0xFFFFFFFF ) /* *    17644   70187036 */
+RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000000, 0x000B0379, 0x082418DF, 0xFFFFFFFF ) /* *    11324   56633925 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0379, 0x0824180F, 0xFFFFFFFF ) /* *    96743   40820171 */
+RASTERIZER_ENTRY( 0x00482435, 0xA4045119, 0x00000000, 0x000B0739, 0x082418CF, 0xFFFFFFFF ) /* *   166053   29100794 */
+RASTERIZER_ENTRY( 0x00482435, 0xA4045117, 0x00000000, 0x000B0339, 0x082418CF, 0xFFFFFFFF ) /* *   166053   29100697 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0379, 0x0824188F, 0xFFFFFFFF ) /* *     6723   29076516 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824188F, 0xFFFFFFFF ) /* *    53297   23928976 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x0824180F, 0xFFFFFFFF ) /* *    10309   19001776 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0379, 0x0824180F, 0xFFFFFFFF ) /* *    22105   17473157 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0379, 0x0824188F, 0xFFFFFFFF ) /* *    11304   17236698 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x082410DF, 0xFFFFFFFF ) /* *     1664   17180883 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x08241A0F, 0xFFFFFFFF ) /* *   148606   12274278 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x082418CF, 0xFFFFFFFF ) /* *    80692    9248007 */
+//RASTERIZER_ENTRY( 0x00482435, 0xA4045119, 0x00000001, 0x000B0739, 0x082418CF, 0xFFFFFFFF ) /* *    37819    8080994 */
+//RASTERIZER_ENTRY( 0x00482435, 0xA4045117, 0x00000001, 0x000B0339, 0x082418CF, 0xFFFFFFFF ) /* *    37819    8080969 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0379, 0x082418DF, 0xFFFFFFFF ) /* *      536    7930305 */
+//RASTERIZER_ENTRY( 0x00482435, 0x99045117, 0x00000000, 0x000B0339, 0x082418CF, 0xFFFFFFFF ) /* *    27601    7905364 */
+//RASTERIZER_ENTRY( 0x00482435, 0x99045119, 0x00000000, 0x000B0739, 0x082418CF, 0xFFFFFFFF ) /* *    27601    7905364 */
+//RASTERIZER_ENTRY( 0x00482435, 0xAF045119, 0x00000000, 0x000B0739, 0x082418CF, 0xFFFFFFFF ) /* *    36314    7667917 */
+//RASTERIZER_ENTRY( 0x00482435, 0xAF045117, 0x00000000, 0x000B0339, 0x082418CF, 0xFFFFFFFF ) /* *    36314    7667917 */
+//RASTERIZER_ENTRY( 0x00482435, 0xBA045119, 0x00000000, 0x000B0739, 0x082418CF, 0xFFFFFFFF ) /* *    31109    6020110 */
+//RASTERIZER_ENTRY( 0x00482435, 0xBA045117, 0x00000000, 0x000B0339, 0x082418CF, 0xFFFFFFFF ) /* *    31109    6020110 */
+//RASTERIZER_ENTRY( 0x00482435, 0x6D045117, 0x00000000, 0x000B0339, 0x082418CF, 0xFFFFFFFF ) /* *    42689    5959231 */
+//RASTERIZER_ENTRY( 0x00482435, 0x6D045119, 0x00000000, 0x000B0739, 0x082418CF, 0xFFFFFFFF ) /* *    42689    5959231 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x0824188F, 0xFFFFFFFF ) /* *    11965    5118044 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000001, 0x000B0379, 0x0824180F, 0xFFFFFFFF ) /* *    11923    4662909 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0379, 0x082410CF, 0xFFFFFFFF ) /* *     4422    4624260 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0379, 0x0824100F, 0xFFFFFFFF ) /* *     3853    3596375 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000001, 0x000B0379, 0x082418DF, 0xFFFFFFFF ) /* *      400    3555759 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0379, 0x0824180F, 0xFFFFFFFF ) /* *     3755    3453084 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0xFFFFFFFF ) /* *     4170    2425016 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824184F, 0xFFFFFFFF ) /* *      322    2220073 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0379, 0x082418CF, 0xFFFFFFFF ) /* *     4008    1201335 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x0824108F, 0xFFFFFFFF ) /* *    13704     883585 */
+
+/* sfrush -----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0824101F ) /* *   590139  246714190 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x0824101F, 0x0824101F ) /* *   397774  153418144 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x082410DF ) /* *    22732  146975666 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x00000000, 0x0824101F ) /* *   306398  130393278 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824101F, 0x0824101F ) /* *   437743  117403881 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824181F, 0x0824101F ) /* *    66608  109289500 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x00000000, 0x082410DF ) /* *    19101   92573085 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0824181F ) /* *   258287   78618228 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x0824181F, 0x0824101F ) /* *    61814   68788856 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0779, 0x082410DF, 0x0824181F ) /* *   149792   61464124 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824181F, 0x0824181F ) /* *   109988   55083276 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x08241ADF, 0x00000000 ) /* *      478   46989312 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x08241ADF, 0x0824181F ) /* *      468   46006272 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x00000000, 0x0824181F ) /* *   125204   39023396 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x08241ADF, 0x082410DB ) /* *      394   38731776 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x082410DF, 0x082410DB ) /* *    12890   36333568 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0379, 0x0824101F, 0x0824101F ) /* *   147995   31086325 */
+RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000000, 0x000B077B, 0x00000000, 0x082410DB ) /* *     3576   29294592 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x0824181F, 0x0824181F ) /* *    76059   29282981 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0x0824101F ) /* *    12632   29173808 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x00000000, 0x082418DF ) /* *    14040   24318118 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000001, 0x000B0379, 0x0824101F, 0x0824101F ) /* *    56586   17643207 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0x0824181F ) /* *     9130   17277440 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0x0824101F ) /* *    66302   17049921 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0779, 0x082410DF, 0x0824101F ) /* *    64380   16463672 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x082410DF, 0x0824181F ) /* *      152   14942208 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0x0824101F ) /* *     8748   13810176 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x082708DF, 0x0824101F ) /* *   216634   10628656 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000001, 0x000B077B, 0x00000000, 0x082410DB ) /* *     1282   10502144 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0x0824101F ) /* *    74636    9758030 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0x082410DB ) /* *    58652    9353671 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0x082410DB ) /* *     5242    8038747 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B077B, 0x082410DB, 0x082410DB ) /* *    11048    7538060 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0824101F, 0x0824181F ) /* *   121630    6906591 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x082418DF ) /* *    19553    6864245 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0x082418DF ) /* *     1287    6648834 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x082708DF, 0x0824101F ) /* *   197766    6617876 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x082700DF, 0x0824101F ) /* *    75470    6231739 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0779, 0x08241ADF, 0x0824101F ) /* *      180    5898240 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0779, 0x082410DF, 0x082410DB ) /* *     7692    5743360 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0x0824181F ) /* *    20128    4980591 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0x0824181F ) /* *     1144    4685824 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x082700DF, 0x0824101F ) /* *    72299    4466336 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000000, 0x000B0779, 0x082410DF, 0x082410DB ) /* *     3750    4018176 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x082410DF, 0x082410DF ) /* *     7533    3692141 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B077B, 0x082410DB, 0x0824101F ) /* *     9484    3610674 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000001, 0x000B0779, 0x0824101F, 0x0824181F ) /* *   128660    3216280 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0x082410DB ) /* *    22214    3172813 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B077B, 0x082410DB, 0x0824181F ) /* *     5094    3099098 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000001, 0x000B0779, 0x082418DF, 0x0824101F ) /* *     1954    2850924 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0x0824181F ) /* *     1542    2434304 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0x00000000 ) /* *      478    1957888 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0x0824181F ) /* *      468    1916928 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B077B, 0x082410DB, 0x0824101F ) /* *    11664    1729188 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000001, 0x000B077B, 0x082410DB, 0x082410DB ) /* *     1282    1640960 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000001, 0x000B077B, 0x082410DB, 0x0824101F ) /* *      388    1589248 */
+//RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000001, 0x000B0779, 0x082410DF, 0x082410DB ) /* *     1282    1312768 */
+//RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B077B, 0x082410DB, 0x0824181F ) /* *     3928    1046582 */
+
+/* vaportrx ---> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00482405, 0x00000000, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *  2226138  592165102 */
+RASTERIZER_ENTRY( 0x00482435, 0x00000000, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *    53533  281405105 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B07F9, 0x0C261ACF, 0xFFFFFFFF ) /* *   314131  219103141 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x000B0339, 0x0C261A0F, 0xFFFFFFFF ) /* *   216329   95014510 */
+RASTERIZER_ENTRY( 0x00482405, 0x00000009, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *   317128   92010096 */
+RASTERIZER_ENTRY( 0x0142613A, 0x00045119, 0x00000000, 0x000B07F9, 0xFFFFFFFF, 0xFFFFFFFF ) /* *    13728   88595930 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0339, 0x0C261ACF, 0xFFFFFFFF ) /* *   649448   81449105 */
+RASTERIZER_ENTRY( 0x00482435, 0x00000000, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *   444231   60067944 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x000B0339, 0x0C26184F, 0xFFFFFFFF ) /* *    36057   58970468 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0339, 0x0C26100F, 0xFFFFFFFF ) /* *    53147   48856709 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B07F9, 0x0C2610C9, 0xFFFFFFFF ) /* *   447654   47171792 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0339, 0x0C261A0F, 0xFFFFFFFF ) /* *   207392   38933691 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0739, 0x0C2610CF, 0xFFFFFFFF ) /* *  2015632   33364173 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x000B0339, 0x0C26100F, 0xFFFFFFFF ) /* *   196361   30395218 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0339, 0x0C2610CF, 0xFFFFFFFF ) /* *   110898   28973006 */
+RASTERIZER_ENTRY( 0x00482435, 0x00000009, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *   135107   16301589 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0339, 0x0C261A8F, 0xFFFFFFFF ) /* *    22375   15797748 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0339, 0x0C26184F, 0xFFFFFFFF ) /* *   141539    7513140 */
+RASTERIZER_ENTRY( 0x0142613A, 0x00045119, 0x00000000, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *   621403    5369705 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045110, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *    30443    4070277 */
+//RASTERIZER_ENTRY( 0x00482405, 0x00045110, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *    22121    3129894 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *     9187    1864599 */
+//RASTERIZER_ENTRY( 0x00482405, 0x00044110, 0x00000000, 0x000B0739, 0x0C2610CF, 0xFFFFFFFF ) /* *    10390    1694950 */
+//RASTERIZER_ENTRY( 0x0142610A, 0x00000009, 0x00000000, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *    25366    1624563 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0739, 0x0C261A0F, 0xFFFFFFFF ) /* *    69033    1607970 */
+//RASTERIZER_ENTRY( 0x0142610A, 0x00000000, 0x00000000, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *    36316    1084818 */
+//RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x000B0339, 0x0C2610CF, 0xFFFFFFFF ) /* *     1813     816763 */
+//RASTERIZER_ENTRY( 0x0142613A, 0x00045119, 0x00000000, 0x000B0339, 0xFFFFFFFF, 0xFFFFFFFF ) /* *     6602     767221 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045110, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *     2547     646048 */
+//RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x000B0339, 0x0C261A8F, 0xFFFFFFFF ) /* *     2394     501590 */
+//RASTERIZER_ENTRY( 0x0142613A, 0x00000009, 0x00000000, 0x000B0739, 0xFFFFFFFF, 0xFFFFFFFF ) /* *    14078     440086 */
+//RASTERIZER_ENTRY( 0x0142610A, 0x00045119, 0x00000000, 0x000B0339, 0xFFFFFFFF, 0xFFFFFFFF ) /* *     9877     429160 */
+//RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x000B0339, 0x0C261ACF, 0xFFFFFFFF ) /* *     3222     366052 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00000009, 0x00000000, 0x000B0739, 0x0C2610CF, 0xFFFFFFFF ) /* *     5942     285657 */
+//RASTERIZER_ENTRY( 0x00482405, 0x00044119, 0x00000000, 0x000B0339, 0x0C2610CF, 0xFFFFFFFF ) /* *     2328     239688 */
+//RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x000B0739, 0x0C26100F, 0xFFFFFFFF ) /* *     1129     208448 */
+
+/* wg3dh ------> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x0824181F, 0xFFFFFFFF ) /* *   127676  116109477 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x0824189F, 0xFFFFFFFF ) /* *    96310  112016758 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x0824109F, 0xFFFFFFFF ) /* *  1412831  108682642 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x0824101F, 0xFFFFFFFF ) /* *  1612798   45952714 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x08241AD9, 0xFFFFFFFF ) /* *     5960    6103040 */
+RASTERIZER_ENTRY( 0x00002435, 0x00045119, 0x00000000, 0x000B0779, 0x082418DF, 0xFFFFFFFF ) /* *    56512    4856542 */
+RASTERIZER_ENTRY( 0x00480035, 0x00045119, 0x00000000, 0x000B0779, 0x0824109F, 0xFFFFFFFF ) /* *     8480    2045940 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0379, 0x0824181F, 0xFFFFFFFF ) /* *     2779    1994317 */
+RASTERIZER_ENTRY( 0x00000035, 0x00045119, 0x00000000, 0x000B0779, 0x0824105F, 0xFFFFFFFF ) /* *   154691    1922774 */
+RASTERIZER_ENTRY( 0x00002435, 0x00045119, 0x00000000, 0x000B0779, 0x082410DF, 0xFFFFFFFF ) /* *    18114     776139 */
+
+/* gauntleg ---> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C24100F ) /* *   157050  668626339 */
+RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0779, 0x0C22400F, 0x0C241ACF ) /* *  1079126  580272490 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x0C241A4F, 0x0C24100F ) /* *    49686  232178144 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x0C24104F, 0x0C24100F ) /* *  1048560  206304396 */
+RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0779, 0x0C2240CF, 0x0C241ACF ) /* *    59176  182444375 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C241A4F ) /* *    66342  179689728 */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x0C24180F, 0x0C24180F ) /* *    72264  109413344 */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x0C24100F, 0x0C24100F ) /* *   281243   75399210 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C24104F ) /* *   126384   68412120 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0C241A0F, 0x0C24100F ) /* *    26864   43754988 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C241ACF ) /* *    30510   32759936 */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x0C24180F, 0x0C24100F ) /* *    44783   31884168 */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C24180F ) /* *    34946   31359362 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C241ACF ) /* *     8006   28367999 */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0379, 0x0C24180F, 0x0C24180F ) /* *    15430   27908213 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C241A0F ) /* *    29306   25166802 */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x0C24180F, 0x0C241ACF ) /* *    27737   24517949 */
+RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0C241ACF, 0x0C24100F ) /* *     6783   21292092 */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0379, 0x00000000, 0x0C24180F ) /* *     9591   17815763 */
+RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x0C24100F, 0x0C24180F ) /* *   343966   13864759 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x0C241ACF, 0x0C24100F ) /* *    11842   12126208 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0C241A8F, 0x0C24100F ) /* *     6648    9788508 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C2418CF ) /* *     8444    8646656 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0379, 0x0C24180F, 0x0C24100F ) /* *     9677    8365606 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0C24100F, 0x0C24100F ) /* *   844920    8289326 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C24184F ) /* *     3108    8010176 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B03F9, 0x00000000, 0x0C24180F ) /* *     1435    6209238 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0379, 0x0C24180F, 0x0C24100F ) /* *     5754    5617499 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0379, 0x0C24180F, 0x0C24180F ) /* *     1608    5557253 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x0C24100F, 0x0C241ACF ) /* *   105127    5133321 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0379, 0x0C24180F, 0x0C241ACF ) /* *     3460    4689138 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x0C24180F, 0x0C24100F ) /* *     7025    4629550 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C24180F ) /* *     7164    4407683 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C24188F ) /* *     1922    3924179 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C24180F ) /* *     4116    3733777 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0779, 0x00000000, 0x0C241A8F ) /* *     2626    3732809 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B03F9, 0x0C24180F, 0x0C24180F ) /* *      778    3202973 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x00000000, 0x000B0779, 0x0C24184F, 0x0C24100F ) /* *     1525    2997446 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B03F9, 0x0C24180F, 0x0C241A0F ) /* *      645    2975266 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00044119, 0x00000000, 0x000B0379, 0x00000000, 0x0C241A0F ) /* *     5212    2491361 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0379, 0x00000000, 0x0C24180F ) /* *      825    1996513 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0379, 0x0C24180F, 0x0C241A0F ) /* *      466    1967163 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x0580000F, 0x0C24180F ) /* *    77400    1883434 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0379, 0x0C24180F, 0x0C24100F ) /* *      472    1698177 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0779, 0x0C24180F, 0x0C24180F ) /* *     2476    1678760 */
+//RASTERIZER_ENTRY( 0x00600C09, 0x00045119, 0x00000000, 0x000B0379, 0x00000000, 0x0C24180F ) /* *     4054    1541748 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00044119, 0x00000000, 0x000B0379, 0x0C241A0F, 0x0C24180F ) /* *     3132    1509438 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x00000000, 0x000B0779, 0x0580080F, 0x0C24180F ) /* *     8582    1324196 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00044119, 0x00000000, 0x000B0379, 0x00000000, 0x0C24100F ) /* *     1436    1239704 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B03F9, 0x0C24180F, 0x0C24100F ) /* *      253    1220316 */
+//RASTERIZER_ENTRY( 0x00600039, 0x00045119, 0x00000000, 0x000B0779, 0x0C22480F, 0x0C241ACF ) /* *     2433    1014668 */
+
+/* gauntdl ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C241ACF ) /* *    30860 1128173568 */
+RASTERIZER_ENTRY( 0x0060743A, 0x00045119, 0x000000C1, 0x000B0779, 0x0C22400F, 0x0C241ACF ) /* *  2631692 1117011118 */
+RASTERIZER_ENTRY( 0x0060743A, 0x00045110, 0x000000C1, 0x000B0779, 0x0C22400F, 0x0C241ACF ) /* *  2429239  826969012 */
+RASTERIZER_ENTRY( 0x0060743A, 0x00045119, 0x000000C1, 0x000B0779, 0x0C22480F, 0x0C241ACF ) /* *   454056  468285142 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C2418CF ) /* *   257586  355634672 */
+RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0379, 0x00000009, 0x0C24180F ) /* *    10898  134362122 */
+RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C241A0F ) /* *    32195  126327049 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x000000C1, 0x000B0779, 0x0C2410CF, 0x0C24100F ) /* *   855240  123899880 */
+RASTERIZER_ENTRY( 0x00602439, 0x00045110, 0x000000C1, 0x000B0379, 0x00000009, 0x0C24180F ) /* *     1718  120629204 */
+RASTERIZER_ENTRY( 0x0060743A, 0x00045119, 0x000000C1, 0x000B0779, 0x0C22488F, 0x0C241ACF ) /* *   186839  120281357 */
+RASTERIZER_ENTRY( 0x0060743A, 0x00045119, 0x000000C1, 0x000B0379, 0x0C22480F, 0x0C241ACF ) /* *    14102  115428820 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C2410CF ) /* *    88530   98271949 */
+RASTERIZER_ENTRY( 0x0060743A, 0x00045110, 0x000000C1, 0x000B0379, 0x0C22480F, 0x0C241ACF ) /* *    12994   68053222 */
+RASTERIZER_ENTRY( 0x00602439, 0x00044110, 0x00000000, 0x000B0379, 0x00000009, 0x0C24100F ) /* *    68273   67454880 */
+RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24180F ) /* *   100026   62271618 */
+RASTERIZER_ENTRY( 0x0060743A, 0x00045110, 0x000000C1, 0x000B0779, 0x0C22480F, 0x0C241ACF ) /* *   153285   44411342 */
+RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24100F ) /* *   157545   40702131 */
+RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x000000C1, 0x000B0779, 0x0C241ACF, 0x0C24100F ) /* *     7800   31948800 */
+RASTERIZER_ENTRY( 0x0060743A, 0x00045110, 0x000000C1, 0x000B0779, 0x0C22408F, 0x0C241ACF ) /* *    47623   20321183 */
+RASTERIZER_ENTRY( 0x00602439, 0x00044119, 0x00000000, 0x000B0379, 0x00000009, 0x0C24188F ) /* *    21570   19324892 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045110, 0x000000C1, 0x000B0779, 0x0C241ACF, 0x0C24100F ) /* *     3698   15147008 */
+//RASTERIZER_ENTRY( 0x0060743A, 0x00045119, 0x000000C1, 0x000B0779, 0x0C22408F, 0x0C241ACF ) /* *    19765   12383722 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C241ACF ) /* *   662274   10563855 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045110, 0x000000C1, 0x000B0779, 0x0C24180F, 0x0C241ACF ) /* *    27909   10462997 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045110, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24180F ) /* *    78671   10286957 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045110, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24188F ) /* *    52038    9928244 */
+//RASTERIZER_ENTRY( 0x0060743A, 0x00045119, 0x000000C1, 0x000B0779, 0x0C224A0F, 0x0C241ACF ) /* *    27469    9239782 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24100F ) /* *   757116    8072783 */
+//RASTERIZER_ENTRY( 0x0060743A, 0x00045110, 0x000000C1, 0x000B0779, 0x0C22488F, 0x0C241ACF ) /* *    18018    7035833 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00044119, 0x00000000, 0x000B0379, 0x00000009, 0x0C241A0F ) /* *    50339    5976564 */
+//RASTERIZER_ENTRY( 0x00603430, 0x00040219, 0x00000000, 0x000B0379, 0x00000009, 0x0C2410CE ) /* *    29385    5466384 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C24180F ) /* *   423347    5355017 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24180F, 0x0C241ACF ) /* *   162620    4709092 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24100F ) /* *   463705    4642480 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24180F, 0x0C24180F ) /* *   280337    4425529 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0779, 0x0C24180F, 0x0C24180F ) /* *   212646    3432265 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045119, 0x000000C1, 0x000B0779, 0x0C2418CF, 0x0C24100F ) /* *     5788    2963456 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0779, 0x0C24180F, 0x0C24100F ) /* *   460800    2609198 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C24180F ) /* *   251108    2392362 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C24100F ) /* *   297219    2352862 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x0584180F, 0x0C2410CF ) /* *     9913    2097069 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0779, 0x0C24180F, 0x0C241ACF ) /* *   142722    2091569 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0379, 0x0C24180F, 0x0C241ACF ) /* *     8820    2053325 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24188F ) /* *    10346    2033427 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24188F, 0x0C241ACF ) /* *     2136    2017241 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00044119, 0x00000000, 0x000B0379, 0x00000009, 0x0C24100F ) /* *     1505    1928490 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C241ACF ) /* *   176734    1842440 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C24180F ) /* *   262577    1799080 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24180F ) /* *    83179    1534171 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x00000009, 0x0C24188F ) /* *     3863    1527077 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0379, 0x0C24180F, 0x0C24180F ) /* *     8021    1472661 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C241A0F, 0x0C241ACF ) /* *    85416    1342195 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24180F, 0x0C24100F ) /* *   261360    1335048 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x80000009, 0x000000C1, 0x000B0779, 0x0C2418CF, 0x0C24100F ) /* *    74811    1320900 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C24100F ) /* *   239331    1268661 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C241ACF ) /* *   107769    1244175 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0379, 0x0C24180F, 0x0C241ACF ) /* *     3706    1216182 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24100F, 0x0C24188F ) /* *    49608    1206129 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x80000009, 0x000000C1, 0x000B0779, 0x0C2418CF, 0x0C241ACF ) /* *    42440    1204109 */
+//RASTERIZER_ENTRY( 0x00482435, 0x00045110, 0x000000C1, 0x000B0779, 0x0C2410CF, 0x0C24100F ) /* *    29584    1168568 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00045119, 0x000000C1, 0x000B0779, 0x0C24180F, 0x0C241ACF ) /* *    17729    1152869 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045110, 0x000000C1, 0x000B0379, 0x0C24180F, 0x0C24100F ) /* *     4052    1108726 */
+//RASTERIZER_ENTRY( 0x00602C19, 0x00045119, 0x000000C1, 0x000B0779, 0x0C2418CF, 0x0C24100F ) /* *     7082    1079348 */
+//RASTERIZER_ENTRY( 0x00602439, 0x00044119, 0x00000000, 0x000B0379, 0x00000009, 0x0C24180F ) /* *     7761    1023855 */
 
 /* gradius4 ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x02420002,  0x00000009, 0x00000000, 0x00030F7B, 0x08241AC7, 0xFFFFFFFF )	/* intro */
-RASTERIZER_ENTRY( 0x01420021,  0x00005119, 0x00000000, 0x00030F7B, 0x14261AC7, 0xFFFFFFFF )	/* intro */
-RASTERIZER_ENTRY( 0x00000005,  0x00005119, 0x00000000, 0x00030F7B, 0x14261A87, 0xFFFFFFFF )	/* in-game */
+//RASTERIZER_ENTRY( 0x02420002,  0x00000009, 0x00000000, 0x00030F7B, 0x08241AC7, 0xFFFFFFFF )   /* intro */
+//RASTERIZER_ENTRY( 0x01420021,  0x00005119, 0x00000000, 0x00030F7B, 0x14261AC7, 0xFFFFFFFF )   /* intro */
+//RASTERIZER_ENTRY( 0x00000005,  0x00005119, 0x00000000, 0x00030F7B, 0x14261A87, 0xFFFFFFFF )   /* in-game */
 
 /* nbapbp ------> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1  */
-RASTERIZER_ENTRY( 0x00424219,  0x00000000, 0x00000001, 0x00030B7B, 0x08241AC7, 0xFFFFFFFF )	/* intro */
-RASTERIZER_ENTRY( 0x00002809,  0x00004110, 0x00000001, 0x00030FFB, 0x08241AC7, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x00424219,  0x00000000, 0x00000001, 0x00030F7B, 0x08241AC7, 0xFFFFFFFF )	/* in-game */
-RASTERIZER_ENTRY( 0x0200421A,  0x00001510, 0x00000001, 0x00030F7B, 0x08241AC7, 0xFFFFFFFF )	/* in-game */
+//RASTERIZER_ENTRY( 0x00424219,  0x00000000, 0x00000001, 0x00030B7B, 0x08241AC7, 0xFFFFFFFF )   /* intro */
+//RASTERIZER_ENTRY( 0x00002809,  0x00004110, 0x00000001, 0x00030FFB, 0x08241AC7, 0xFFFFFFFF )   /* in-game */
+//RASTERIZER_ENTRY( 0x00424219,  0x00000000, 0x00000001, 0x00030F7B, 0x08241AC7, 0xFFFFFFFF )   /* in-game */
+//RASTERIZER_ENTRY( 0x0200421A,  0x00001510, 0x00000001, 0x00030F7B, 0x08241AC7, 0xFFFFFFFF )   /* in-game */
 
 #endif

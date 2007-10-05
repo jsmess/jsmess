@@ -647,6 +647,49 @@ ROM_START( hunchbak )
 	ROM_LOAD( "82s123.10k", 0x0800, 0x0020, CRC(b5221cec) SHA1(71d9830b33b1a8140b0fe1a2ba8024ba8e6e48e0) )
 ROM_END
 
+ROM_START( hunchbka )
+
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
+	ROM_LOAD( "1b.bin", 0x0000, 0x0400, CRC(c816860b) SHA1(1109639645496d4644564d21c816b8baf8c84cf7) )
+	ROM_CONTINUE( 0x2000, 0x0400 )
+	ROM_CONTINUE( 0x4000, 0x0400 )
+	ROM_CONTINUE( 0x6000, 0x0400 )
+	ROM_LOAD( "2a.bin", 0x0400, 0x0400, CRC(cab1e524) SHA1(c3fd7ac9ce5893fd2602a15ad0f6e3267a4ca122) )
+	ROM_CONTINUE( 0x2400, 0x0400 )
+	ROM_CONTINUE( 0x4400, 0x0400 )
+	ROM_CONTINUE( 0x6400, 0x0400 )
+	ROM_LOAD( "3a.bin", 0x0800, 0x0400, CRC(b2adcfeb) SHA1(3090e2c6b945857c1e48dea395015a05c6165cd9) )
+	ROM_CONTINUE( 0x2800, 0x0400 )
+	ROM_CONTINUE( 0x4800, 0x0400 )
+	ROM_CONTINUE( 0x6800, 0x0400 )
+	ROM_LOAD( "4c.bin", 0x0c00, 0x0400, CRC(229a8b71) SHA1(ea3815eb69d4927da356eada0add8382735feb48) )
+	ROM_CONTINUE( 0x2c00, 0x0400 )
+	ROM_CONTINUE( 0x4c00, 0x0400 )
+	ROM_CONTINUE( 0x6c00, 0x0400 )
+	ROM_LOAD( "5a.bin", 0x1000, 0x0400, CRC(cb4f0313) SHA1(1ef63cbe62e7a54d45e0afbc398c9d9b601e6403) )
+	ROM_CONTINUE( 0x3000, 0x0400 )
+	ROM_CONTINUE( 0x5000, 0x0400 )
+	ROM_CONTINUE( 0x7000, 0x0400 )
+
+	ROM_REGION( 0x2000, REGION_CPU2, 0 )
+	ROM_LOAD( "hb-sdp1.bin", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
+
+	ROM_REGION( 0x0800, REGION_CPU3, 0 )
+	ROM_LOAD( "5b.bin", 0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) )
+
+	ROM_REGION( 0x1000, REGION_SOUND1, 0 )
+	ROM_LOAD( "hb-sp1.bin", 0x0000, 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
+
+	ROM_REGION( 0x1800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "hb-cp1.bin", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
+	ROM_LOAD( "hb-cp2.bin", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
+	ROM_LOAD( "hb-cp3.bin", 0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
+
+	ROM_REGION( 0x0820, REGION_PROMS, 0 )
+	ROM_LOAD( "82s185.10h", 0x0000, 0x0800, CRC(c205bca6) SHA1(ec9bd220e75f7b067ede6139763ef8aca0fb7a29) )
+	ROM_LOAD( "82s123.10k", 0x0800, 0x0020, CRC(b5221cec) SHA1(71d9830b33b1a8140b0fe1a2ba8024ba8e6e48e0) )
+ROM_END
+
 ROM_START( wallst )
 
 	ROM_REGION( 0x8000, REGION_CPU1, 0 )
@@ -1335,6 +1378,19 @@ static DRIVER_INIT( huncholy )
     memory_region(REGION_CPU1)[0x4458] = 0xc0;
 }
 
+static DRIVER_INIT( hunchbka )
+{
+    /* Program roms are bitswapped */
+	UINT8 *ROM = memory_region(REGION_CPU1);
+	int i;
+
+	for (i=0;i<0x8000;i++)
+	{
+		ROM[i] = BITSWAP8(ROM[i],7,6,2,4  ,3,5,1,0);
+	}
+
+}
+
 static DRIVER_INIT( superbik )
 {
     /* Patch out protection */
@@ -1419,7 +1475,8 @@ GAME( 1982, outline,     radarzon, cvs,      cvs,    0,          ROT90, "Century
 GAME( 1982, goldbug,     cvs,      cvs,      cvs,    goldbug,    ROT90, "Century Electronics", "Gold Bug", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1982, diggerc,     cvs,      cvs,      cvs,    0,          ROT90, "Century Electronics", "Digger (CVS)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1983, heartatk,    cvs,      cvs,      cvs,    0,          ROT90, "Century Electronics", "Heart Attack", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1983, hunchbak,    cvs,      cvs,      cvs,    0,          ROT90, "Century Electronics", "Hunchback", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1983, hunchbak,    cvs,      cvs,      cvs,    0,          ROT90, "Century Electronics", "Hunchback (set 1)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1983, hunchbka,    hunchbak, cvs,      cvs,    hunchbka,   ROT90, "Century Electronics", "Hunchback (set 2)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1983, superbik,    cvs,      cvs,      cvs,    superbik,   ROT90, "Century Electronics", "Superbike", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1983, raiders,     cvs,      cvs,      cvs,    raiders,    ROT90, "Century Electronics", "Raiders", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1983, hero,        cvs,      cvs,      cvs,    hero,       ROT90, "Seatongrove Ltd",     "Hero", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )

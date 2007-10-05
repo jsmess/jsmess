@@ -1,8 +1,6 @@
 #ifndef _system1_H_
 #define _system1_H_
 
-#include "driver.h"
-
 #define SPR_Y_TOP		0
 #define SPR_Y_BOTTOM	1
 #define SPR_X_LO		2

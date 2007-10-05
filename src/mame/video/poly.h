@@ -6,9 +6,6 @@
 
 ***************************************************************************/
 
-#include "driver.h"
-
-
 /* up to 6 params (Z,U,V,R,G,B), plus it makes the vertex struct a nice size */
 #define MAX_VERTEX_PARAMS		6
 #define MAX_POLY_SCANLINES		512

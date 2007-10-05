@@ -373,10 +373,14 @@ void K037122_tile_draw(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	if (K037122_reg[chip][0xc] & 0x10000)
 	{
+		tilemap_set_scrolldx(K037122_layer[chip][1], Machine->screen[0].visarea.min_x, Machine->screen[0].visarea.min_x);
+		tilemap_set_scrolldy(K037122_layer[chip][1], Machine->screen[0].visarea.min_y, Machine->screen[0].visarea.min_y);
 		tilemap_draw(bitmap, cliprect, K037122_layer[chip][1], 0,0);
 	}
 	else
 	{
+		tilemap_set_scrolldx(K037122_layer[chip][0], Machine->screen[0].visarea.min_x, Machine->screen[0].visarea.min_x);
+		tilemap_set_scrolldy(K037122_layer[chip][0], Machine->screen[0].visarea.min_y, Machine->screen[0].visarea.min_y);
 		tilemap_draw(bitmap, cliprect, K037122_layer[chip][0], 0,0);
 	}
 }
@@ -492,8 +496,21 @@ static void voodoo_vblank_1(int param)
 	cpunum_set_input_line(0, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
+static void hornet_exit(running_machine *machine)
+{
+	voodoo_exit(0);
+}
+
+static void hornet_2board_exit(running_machine *machine)
+{
+	voodoo_exit(0);
+	voodoo_exit(1);
+}
+
 VIDEO_START( hornet )
 {
+	add_exit_callback(machine, hornet_exit);
+
 	if (voodoo_version == 0)
 		voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
 	else
@@ -506,6 +523,8 @@ VIDEO_START( hornet )
 
 VIDEO_START( hornet_2board )
 {
+	add_exit_callback(machine, hornet_2board_exit);
+
 	if (voodoo_version == 0)
 	{
 		voodoo_start(0, 0, VOODOO_1, 2, 4, 0);

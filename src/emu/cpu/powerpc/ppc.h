@@ -326,7 +326,6 @@ typedef UINT8 (* SPU_RX_HANDLER)(void);
 typedef void  (* SPU_TX_HANDLER)(UINT8);
 typedef void (* PPC_DMA_HANDLER)(int);
 
-void ppc403_get_info(UINT32 state, cpuinfo *info);
 void ppc403_spu_rx(UINT8 data);
 void ppc403_install_spu_rx_handler(SPU_RX_HANDLER rx_handler);
 void ppc403_install_spu_tx_handler(SPU_TX_HANDLER tx_handler);

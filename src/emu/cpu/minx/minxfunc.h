@@ -249,7 +249,7 @@ INLINE void CALL( UINT16 arg ) {
 	JMP( arg );
 }
 
-UINT32 addr1, addr2;
+static UINT32 addr1, addr2;
 
 #define AD1_IHL	addr1 = ( regs.I << 16 ) | regs.HL;
 #define AD1_IN8	addr1 = ( regs.I << 16 ) | ( regs.N << 8 ) | rdop();

@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "driver.h"
 #include "machine/i82439tx.h"
 #include "machine/pci.h"
 

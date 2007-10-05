@@ -71,8 +71,9 @@
 
 *********************************************************************/
 
-#include "machine/mc146818.h"
+#include "driver.h"
 #include "memconv.h"
+#include "machine/mc146818.h"
 
 
 

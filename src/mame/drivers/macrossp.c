@@ -472,9 +472,6 @@ INPUT_PORTS_START( quizmoon )
 	PORT_MODIFY("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" ) /* no Language dipswitch for this game */
 
-	PORT_START
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use, but not dipswitches */
-
 INPUT_PORTS_END
 
 /*** GFX DECODE **************************************************************/

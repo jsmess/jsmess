@@ -8,6 +8,7 @@
 
 #ifndef RECURSIVE_INCLUDE
 
+#include "driver.h"
 #include "poly.h"
 
 /***************************************************************************

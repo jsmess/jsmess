@@ -163,7 +163,7 @@ PALETTE_INIT( looping )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	looping_state *state = Machine->driver_data;
+	looping_state *state = machine->driver_data;
 	int tile_number = state->videoram[tile_index];
 	int color = state->colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
 	SET_TILE_INFO(0, tile_number, color, 0);

@@ -7,6 +7,7 @@
 
 *************************************************************************/
 
+#include "driver.h"
 #include "system1.h"
 
 UINT8 *system1_scroll_y;

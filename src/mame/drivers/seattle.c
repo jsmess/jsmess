@@ -483,8 +483,16 @@ static void update_widget_irq(void);
  *
  *************************************/
 
+static void seattle_exit(running_machine *machine)
+{
+	voodoo_exit(0);
+}
+
+
 static VIDEO_START( seattle )
 {
+	add_exit_callback(machine, seattle_exit);
+
 	voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
@@ -494,6 +502,8 @@ static VIDEO_START( seattle )
 
 static VIDEO_START( flagstaff )
 {
+	add_exit_callback(machine, seattle_exit);
+
 	voodoo_start(0, 0, VOODOO_1, 2, 4, 4);
 
 	voodoo_set_vblank_callback(0, vblank_assert);

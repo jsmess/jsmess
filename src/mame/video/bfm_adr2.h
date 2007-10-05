@@ -10,7 +10,6 @@ extern int adder2_acia_triggered;	// flag <>0, ACIA receive IRQ
 
 GFXDECODE_EXTERN( adder2 );
 extern void adder2_decode_char_roms(void);
-void adder2_update(mame_bitmap *bitmap);
 
 MACHINE_RESET( adder2 );
 INTERRUPT_GEN( adder2_vbl );

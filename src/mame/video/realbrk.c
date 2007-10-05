@@ -603,7 +603,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 		return 0;
 	}
 	else
-		fillbitmap(bitmap,Machine->pens[realbrk_vregs[0xc/2] & 0x7fff],cliprect);
+		fillbitmap(bitmap,machine->pens[realbrk_vregs[0xc/2] & 0x7fff],cliprect);
 
 
 

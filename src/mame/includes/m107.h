@@ -13,7 +13,6 @@ extern UINT16 m107_raster_irq_position;
 
 WRITE16_HANDLER( m107_spritebuffer_w );
 VIDEO_UPDATE( m107 );
-VIDEO_UPDATE( dsoccr );
 VIDEO_START( m107 );
 WRITE16_HANDLER( m107_control_w );
 WRITE16_HANDLER( m107_vram_w );

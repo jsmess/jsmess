@@ -700,7 +700,7 @@ int options_get_bool(core_options *opts, const char *name)
 		sscanf(astring_c(data->data), "%d", &value);
 		if (!data->error_reported)
 		{
-			message(opts, OPTMSG_ERROR, "Illegal boolean value for %s; reverting to %d\n", data->links[0].name, value);
+			message(opts, OPTMSG_ERROR, "Illegal boolean value for %s; reverting to %d\n", astring_c(data->links[0].name), value);
 			data->error_reported = TRUE;
 		}
 	}
@@ -729,7 +729,7 @@ int options_get_int(core_options *opts, const char *name)
 		sscanf(astring_c(data->data), "%d", &value);
 		if (!data->error_reported)
 		{
-			message(opts, OPTMSG_ERROR, "Illegal integer value for %s; reverting to %d\n", data->links[0].name, value);
+			message(opts, OPTMSG_ERROR, "Illegal integer value for %s; reverting to %d\n", astring_c(data->links[0].name), value);
 			data->error_reported = TRUE;
 		}
 	}
@@ -758,7 +758,7 @@ float options_get_float(core_options *opts, const char *name)
 		sscanf(astring_c(data->data), "%f", &value);
 		if (!data->error_reported)
 		{
-			message(opts, OPTMSG_ERROR, "Illegal float value for %s; reverting to %f\n", data->links[0].name, (double)value);
+			message(opts, OPTMSG_ERROR, "Illegal float value for %s; reverting to %f\n", astring_c(data->links[0].name), (double)value);
 			data->error_reported = TRUE;
 		}
 	}
@@ -994,14 +994,14 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 			i = 0;
 			if (sscanf(datastart, "%d", &i) != 1)
 			{
-				message(opts, OPTMSG_ERROR, "Illegal integer value for %s; keeping value of %s\n", data->links[0].name, astring_c(data->data));
+				message(opts, OPTMSG_ERROR, "Illegal integer value for %s; keeping value of %s\n", astring_c(data->links[0].name), astring_c(data->data));
 				data->error_reported = TRUE;
 				return;
 			}
 			if (i < data->range_minimum.i || i > data->range_maximum.i)
 			{
 				message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %i and %i); keeping value of %s\n",
-					data->links[0].name, data->range_minimum.i, data->range_maximum.i, astring_c(data->data));
+					astring_c(data->links[0].name), data->range_minimum.i, data->range_maximum.i, astring_c(data->data));
 				data->error_reported = TRUE;
 				return;
 			}
@@ -1012,14 +1012,14 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 			f = 0;
 			if (sscanf(datastart, "%f", &f) != 1)
 			{
-				message(opts, OPTMSG_ERROR, "Illegal float value for %s; keeping value of %s\n", data->links[0].name, astring_c(data->data));
+				message(opts, OPTMSG_ERROR, "Illegal float value for %s; keeping value of %s\n", astring_c(data->links[0].name), astring_c(data->data));
 				data->error_reported = TRUE;
 				return;
 			}
 			if (f < data->range_minimum.f || f > data->range_maximum.f)
 			{
 				message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %f and %f); keeping value of %s\n",
-					data->links[0].name, data->range_minimum.f, data->range_maximum.f, astring_c(data->data));
+					astring_c(data->links[0].name), data->range_minimum.f, data->range_maximum.f, astring_c(data->data));
 				data->error_reported = TRUE;
 				return;
 			}

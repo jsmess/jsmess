@@ -76,25 +76,25 @@ WRITE8_HANDLER( grchamp_right_w )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	SET_TILE_INFO(0, state->videoram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_left_tile_info )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	SET_TILE_INFO(1, state->leftram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_right_tile_info )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	SET_TILE_INFO(2, state->rightram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_center_tile_info )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	SET_TILE_INFO(3, state->centerram[tile_index], 0, 0);
 }
 

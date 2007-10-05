@@ -7,8 +7,6 @@
 #ifndef DMA8237_H
 #define DMA8237_H
 
-#include "driver.h"
-
 struct dma8237_interface
 {
 	/* CPU to halt when DMA is active */

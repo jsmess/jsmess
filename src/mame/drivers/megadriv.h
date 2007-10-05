@@ -1,7 +1,6 @@
 extern DRIVER_INIT( megadrie );
 extern DRIVER_INIT( megadriv );
 extern DRIVER_INIT( megadrij );
-extern DRIVER_INIT( _32x );
 
 INPUT_PORTS_EXTERN(megadriv);
 INPUT_PORTS_EXTERN(aladbl);

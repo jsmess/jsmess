@@ -6,14 +6,18 @@ briver by Paul Hampson and Nicola Salmoria
 
 TODO:
 - sprite lag (the real game has quite a bit of lag too)
-- rowscroll (not used expect for status display)
-- double-tap tolerance
+- double-tap tolerance (find a way to dump + emulate MCU?)
 
 Notes:
 - there's probably a 63701 on the board, used for protection. It is checked
   on startup and then just used to read the input ports. It doesn't return
   the ports verbatim, it adds further processing, setting flags when the
   player double-taps in one direction to run.(updated to edge-triggering)
+
+- video timing is probably similar to Double Dragon and other Technos games
+  of that era.  The rowscroll of the title bar is done with raster IRQs, I've
+  removed the 'scroll value buffer' hack that the driver was using before and
+  used partial updates instead. (DH, 29 Sept 07)
 
 ***************************************************************************/
 
@@ -500,6 +504,67 @@ ROM_START( spdodgeb )
 	ROM_LOAD( "mb7122e.159",  0x0400, 0x0400, CRC(69706e8d) SHA1(778ee88ff566aa38c80e0e61bb3fe8458f0e9450) )
 ROM_END
 
+/*
+
+Nekketsu Koukou Dodgeball Bu
+(c)1987 Technos Japan
+
+TA-0022-P1-04
+M6100293A (PCB manufactured by Taito)
+
+CPU: 6502 (Labeled TJC-706002)
+Sound: 68A09, YM3812, M5205x2
+OSC: 12.000MHz
+
+ROMs:
+22J4-0.139 - Main program
+22J5-0.33  - Sound program
+22JA-0.162 - HD63701Y0P (no dump)
+
+TJ22J4-0.121 - Text
+TJ22J3-0.107 /
+
+TJ22J1-0.2  - Graphics
+TJ22J2-0.35 /
+
+22J6-0.83 - ADPCM Samples
+22J7-0.82 /
+
+22J8-0.158 (7132)
+22J9-0.159 (7122)
+
+*/
+
+ROM_START( nkdodge )
+	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_LOAD( "22j4-0.139",	  0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
+	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* audio cpu */
+	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* I/O mcu */
+	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
+
+	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE ) /* text */
+	ROM_LOAD( "tj22j4-0.121",    0x00000, 0x20000, CRC(d2922b3f) SHA1(30ad37f8355c732b545017c2fc56879256b650be) )
+	ROM_LOAD( "tj22j3-0.107",    0x20000, 0x20000, CRC(79cd1315) SHA1(2d7a877e59f704b10b5f609e60fa565c68f5fdb0) )
+
+	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "tj22j1-0.2",      0x00000, 0x20000, CRC(9ed27a8d) SHA1(d80d275bbe91f3e1bd0495a2d7a3be0280a7cda1) )
+	ROM_LOAD( "tj22j2-0.35",     0x20000, 0x20000, CRC(768934f9) SHA1(922f3154dcfb29c2e5c1bebc53247136160f1229) )
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* adpcm samples */
+	ROM_LOAD( "22j6-0.83",    0x00000, 0x10000, CRC(744a26e3) SHA1(519f22f1e5cc417cb8f9ced97e959d23c711283b) )
+	ROM_LOAD( "22j7-0.82",    0x10000, 0x10000, CRC(2fa1de21) SHA1(e8c7af6057b64ecadd3473b82abd8e9f873082fd) )
+
+	ROM_REGION( 0x0800, REGION_PROMS, 0 )	/* color PROMs */
+	ROM_LOAD( "22j8-0.158",  0x0000, 0x0400, CRC(c368440f) SHA1(39762d102a42211f24db16bc721b01230df1c4d6) )
+	ROM_LOAD( "22j9-0.159",  0x0400, 0x0400, CRC(6059f401) SHA1(280b1bda3a55f2d8c2fd4552c4dcec7100f0170f) )
+ROM_END
+
+/* the bootleg just seems to have the gfx roms in a different format, program is identical */
+
 ROM_START( nkdodgeb )
 	ROM_REGION( 0x18000, REGION_CPU1, 0 )
 	ROM_LOAD( "12.bin",	      0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
@@ -535,4 +600,5 @@ ROM_END
 
 
 GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, 0, ROT0, "Technos", "Super Dodge Ball (US)", 0 )
-GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, 0, ROT0, "Technos", "Nekketsu Koukou Dodgeball Bu (Japan bootleg)", 0 )
+GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, 0, ROT0, "Technos", "Nekketsu Koukou Dodgeball Bu (Japan)", 0 )
+GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, 0, ROT0, "Technos", "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", 0 )

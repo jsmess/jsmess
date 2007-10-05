@@ -505,6 +505,81 @@ void osd_lock_release(osd_lock *lock);
 void osd_lock_free(osd_lock *lock);
 
 
+/*-----------------------------------------------------------------------------
+    osd_compare_exchange32: compare an INT32 against a value in memory; if they
+        are equal, swap in a new value; return the value from memory
+
+    Parameters:
+
+        ptr - a pointer to the memory to compare and exchange to.
+
+        compare - the value to compare the memory against.
+
+        exchange - the value to swap in if the compare succeeds.
+
+    Return value:
+
+        The original value from memory.
+-----------------------------------------------------------------------------*/
+INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange);
+
+
+/*-----------------------------------------------------------------------------
+    osd_compare_exchange64: compare an INT64 against a value in memory; if they
+        are equal, swap in a new value; return the value from memory
+
+    Parameters:
+
+        ptr - a pointer to the memory to compare and exchange to.
+
+        compare - the value to compare the memory against.
+
+        exchange - the value to swap in if the compare succeeds.
+
+    Return value:
+
+        The original value from memory.
+-----------------------------------------------------------------------------*/
+#ifdef PTR64
+INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange);
+#endif
+
+
+/*-----------------------------------------------------------------------------
+    osd_compare_exchange_ptr: INLINE wrapper to compare and exchange a
+        pointer value of the appropriate size
+-----------------------------------------------------------------------------*/
+INLINE void *osd_compare_exchange_ptr(void * volatile *ptr, void *compare, void *exchange)
+{
+#ifdef PTR64
+	INT64 result = osd_compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
+	return (void *)result;
+#else
+	INT32 result = osd_compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
+	return (void *)result;
+#endif
+}
+
+
+/*-----------------------------------------------------------------------------
+    osd_sync_add: INLINE wrapper to safely add a delta value to a
+        32-bit integer, returning the final result
+-----------------------------------------------------------------------------*/
+INLINE INT32 osd_sync_add(INT32 volatile *ptr, INT32 delta)
+{
+	INT32 origvalue;
+
+	/* loop until we succeed in updating against an unchanged value */
+	do
+	{
+		origvalue = *ptr;
+	} while (osd_compare_exchange32(ptr, origvalue, origvalue + delta) != origvalue);
+
+	/* return the final result */
+	return origvalue + delta;
+}
+
+
 
 /***************************************************************************
     WORK ITEM INTERFACES
@@ -518,6 +593,7 @@ void osd_lock_free(osd_lock *lock);
 /* these flags can be set when queueing a work item to indicate how to handle
    its deconstruction */
 #define WORK_ITEM_FLAG_AUTO_RELEASE	0x0001
+#define WORK_ITEM_FLAG_SHARED		0x0002
 
 /* osd_work_queue is an opaque type which represents a queue of work items */
 typedef struct _osd_work_queue osd_work_queue;
@@ -543,7 +619,7 @@ typedef void *(*osd_work_callback)(void *param);
 
             WORK_QUEUE_FLAG_MULTI - indicates that the work queue should
                 take advantage of as many processors as it can; items queued
-                here are assumed to be independent
+                here are assumed to be fully independent or shared
 
     Return value:
 
@@ -623,6 +699,12 @@ void osd_work_queue_free(osd_work_queue *queue);
 
             WORK_ITEM_FLAG_AUTO_RELEASE - indicates that the work item
                 should be automatically freed when it is complete
+
+            WORK_ITEM_FLAG_SHARED - indicates that the same work item can
+                be simultaneously processed by multiple threads; the item
+                remains at the front of the queue until all threads
+                processing it have returned, which allows other threads to
+                process the same item if they have bandwidth
 
     Return value:
 

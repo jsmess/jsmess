@@ -15,14 +15,9 @@
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "mips3com.h"
-#include "cpu/x86log.h"
-
-#ifdef PTR64
-#include "cpu/x64drc.h"
 #include "mips3fe.h"
-#else
-#include "cpu/x86drc.h"
-#endif
+#include "cpu/x86log.h"
+#include "cpu/drcfe.h"
 
 extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 
@@ -33,6 +28,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 ***************************************************************************/
 
 #define LOG_CODE				(0)
+#define SINGLE_INSTRUCTION_MODE	(0)
 
 #ifdef MAME_DEBUG
 #define COMPARE_AGAINST_C		(0)
@@ -46,7 +42,6 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
     CONFIGURATION
 ***************************************************************************/
 
-#define MAX_INSTRUCTIONS		512
 #define CACHE_SIZE				(32 * 1024 * 1024)
 
 
@@ -106,6 +101,7 @@ struct _mips3_regs
 	/* core state */
 	UINT8 *			cache;						/* base of the cache */
 	mips3_state *	core;						/* pointer to the core MIPS3 state */
+	drcfe_state *	drcfe;						/* pointer to the DRC front-end state */
 	drc_core *		drc;						/* pointer to the DRC core */
 	mips3drc_data *	drcdata;					/* pointer to the DRC-specific data */
 	UINT32			drcoptions;					/* configurable DRC options */
@@ -170,8 +166,16 @@ static mips3_regs mips3;
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int))
+static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int))
 {
+	drcfe_config feconfig =
+	{
+		128,				/* code window start offset = startpc - window_start */
+		512,				/* code window end offset = startpc + window_end */
+		32,					/* maximum instructions to include in a sequence */
+		mips3fe_describe	/* callback to describe a single instruction */
+	};
+
 	/* allocate a cache and memory for the core data in a single block */
 	mips3.core = osd_alloc_executable(CACHE_SIZE + sizeof(*mips3.core));
 	if (mips3.core == NULL)
@@ -186,6 +190,9 @@ static void mips3_init(mips3_state *mips, mips3_flavor flavor, int bigendian, in
 
 	/* initialize the DRC to use the cache */
 	mips3drc_init();
+	if (Machine->debug_mode || SINGLE_INSTRUCTION_MODE)
+		feconfig.max_sequence = 1;
+	mips3.drcfe = drcfe_init(&feconfig, mips3.core);
 
 	/* start up code logging */
 	if (LOG_CODE)
@@ -243,6 +250,7 @@ static void mips3_exit(void)
 
 	/* clean up the DRC */
 	mips3drc_exit();
+	drcfe_exit(mips3.drcfe);
 	drc_exit(mips3.drc);
 
 	/* free the cache */
@@ -354,12 +362,13 @@ static void *fastram_ptr(offs_t addr, int size, int iswrite)
 
 static void log_add_disasm_comment(x86log_context *log, x86code *base, UINT32 pc, UINT32 op)
 {
-	if (LOG_CODE)
+#if (LOG_CODE)
 	{
 		char buffer[100];
 		dasmmips3(buffer, pc, op);
 		x86log_add_comment(log, base, "%08X: %s", pc, buffer);
 	}
+#endif
 }
 
 
@@ -377,46 +386,46 @@ static const char *desc_flags_to_string(UINT32 flags)
 	char *dest = tempbuf;
 
 	/* branches */
-	if (flags & IDESC_IS_UNCONDITIONAL_BRANCH)
+	if (flags & OPFLAG_IS_UNCONDITIONAL_BRANCH)
 		*dest++ = 'U';
-	else if (flags & IDESC_IS_CONDITIONAL_BRANCH)
+	else if (flags & OPFLAG_IS_CONDITIONAL_BRANCH)
 		*dest++ = 'C';
 	else
 		*dest++ = '.';
 
 	/* intrablock branches */
-	*dest++ = (flags & IDESC_INTRABLOCK_BRANCH) ? 'i' : '.';
+	*dest++ = (flags & OPFLAG_INTRABLOCK_BRANCH) ? 'i' : '.';
 
 	/* branch targets */
-	*dest++ = (flags & IDESC_IS_BRANCH_TARGET) ? 'B' : '.';
+	*dest++ = (flags & OPFLAG_IS_BRANCH_TARGET) ? 'B' : '.';
 
 	/* delay slots */
-	*dest++ = (flags & IDESC_IN_DELAY_SLOT) ? 'D' : '.';
+	*dest++ = (flags & OPFLAG_IN_DELAY_SLOT) ? 'D' : '.';
 
 	/* exceptions */
-	if (flags & IDESC_WILL_CAUSE_EXCEPTION)
+	if (flags & OPFLAG_WILL_CAUSE_EXCEPTION)
 		*dest++ = 'E';
-	else if (flags & IDESC_CAN_CAUSE_EXCEPTION)
+	else if (flags & OPFLAG_CAN_CAUSE_EXCEPTION)
 		*dest++ = 'e';
 	else
 		*dest++ = '.';
 
 	/* read/write */
-	if (flags & IDESC_READS_MEMORY)
+	if (flags & OPFLAG_READS_MEMORY)
 		*dest++ = 'R';
-	else if (flags & IDESC_WRITES_MEMORY)
+	else if (flags & OPFLAG_WRITES_MEMORY)
 		*dest++ = 'W';
 	else
 		*dest++ = '.';
 
 	/* TLB validation */
-	*dest++ = (flags & IDESC_VALIDATE_TLB) ? 'V' : '.';
+	*dest++ = (flags & OPFLAG_VALIDATE_TLB) ? 'V' : '.';
 
 	/* TLB modification */
-	*dest++ = (flags & IDESC_MODIFIES_TRANSLATION) ? 'T' : '.';
+	*dest++ = (flags & OPFLAG_MODIFIES_TRANSLATION) ? 'T' : '.';
 
 	/* redispatch */
-	*dest++ = (flags & IDESC_REDISPATCH) ? 'R' : '.';
+	*dest++ = (flags & OPFLAG_REDISPATCH) ? 'R' : '.';
 	return tempbuf;
 }
 
@@ -457,7 +466,7 @@ static void log_register_list(x86log_context *log, const char *string, UINT64 gp
     log_opcode_desc - log a list of descriptions
 -------------------------------------------------*/
 
-static void log_opcode_desc(x86log_context *log, const mips3_opcode_desc *desclist, int indent)
+static void log_opcode_desc(x86log_context *log, const opcode_desc *desclist, int indent)
 {
 	/* open the file, creating it if necessary */
 	if (indent == 0)
@@ -470,7 +479,7 @@ static void log_opcode_desc(x86log_context *log, const mips3_opcode_desc *descli
 
 		/* disassemle the current instruction and output it to the log */
 #if LOG_CODE
-		dasmmips3(buffer, desclist->pc, *desclist->opptr);
+		dasmmips3(buffer, desclist->pc, *desclist->opptr.l);
 #else
 		strcpy(buffer, "???");
 #endif
@@ -488,7 +497,7 @@ static void log_opcode_desc(x86log_context *log, const mips3_opcode_desc *descli
 			log_opcode_desc(log, desclist->delay, indent + 1);
 
 		/* at the end of a sequence add a dividing line */
-		if (desclist->flags & IDESC_END_SEQUENCE)
+		if (desclist->flags & OPFLAG_END_SEQUENCE)
 			x86log_printf(log, "-----\n");
 	}
 }
@@ -576,12 +585,12 @@ void mips3_get_info(UINT32 state, cpuinfo *info)
 #if (HAS_R4600)
 static void r4600be_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_R4600, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4600, TRUE, index, clock, config, irqcallback);
 }
 
 static void r4600le_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_R4600, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4600, FALSE, index, clock, config, irqcallback);
 }
 
 void r4600be_get_info(UINT32 state, cpuinfo *info)
@@ -630,12 +639,12 @@ void r4600le_get_info(UINT32 state, cpuinfo *info)
 #if (HAS_R4650)
 static void r4650be_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_R4650, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4650, TRUE, index, clock, config, irqcallback);
 }
 
 static void r4650le_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_R4650, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4650, FALSE, index, clock, config, irqcallback);
 }
 
 void r4650be_get_info(UINT32 state, cpuinfo *info)
@@ -684,12 +693,12 @@ void r4650le_get_info(UINT32 state, cpuinfo *info)
 #if (HAS_R4700)
 static void r4700be_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_R4700, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4700, TRUE, index, clock, config, irqcallback);
 }
 
 static void r4700le_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_R4700, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4700, FALSE, index, clock, config, irqcallback);
 }
 
 void r4700be_get_info(UINT32 state, cpuinfo *info)
@@ -739,12 +748,12 @@ void r4700le_get_info(UINT32 state, cpuinfo *info)
 #if (HAS_R5000)
 static void r5000be_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_R5000, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R5000, TRUE, index, clock, config, irqcallback);
 }
 
 static void r5000le_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_R5000, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R5000, FALSE, index, clock, config, irqcallback);
 }
 
 void r5000be_get_info(UINT32 state, cpuinfo *info)
@@ -793,12 +802,12 @@ void r5000le_get_info(UINT32 state, cpuinfo *info)
 #if (HAS_QED5271)
 static void qed5271be_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_QED5271, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_QED5271, TRUE, index, clock, config, irqcallback);
 }
 
 static void qed5271le_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_QED5271, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_QED5271, FALSE, index, clock, config, irqcallback);
 }
 
 void qed5271be_get_info(UINT32 state, cpuinfo *info)
@@ -847,12 +856,12 @@ void qed5271le_get_info(UINT32 state, cpuinfo *info)
 #if (HAS_RM7000)
 static void rm7000be_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_RM7000, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_RM7000, TRUE, index, clock, config, irqcallback);
 }
 
 static void rm7000le_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mips3_init(mips3.core, MIPS3_TYPE_RM7000, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_RM7000, FALSE, index, clock, config, irqcallback);
 }
 
 void rm7000be_get_info(UINT32 state, cpuinfo *info)

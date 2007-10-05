@@ -4,8 +4,6 @@
 
 ****************************************************************************/
 
-#include "driver.h"
-#include "machine/atarigen.h"
 
 
 #define ATARI_CLOCK_3MHz		3579000

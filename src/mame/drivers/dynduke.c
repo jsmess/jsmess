@@ -214,9 +214,11 @@ static const gfx_layout spritelayout =
 static const gfx_layout bg_layout =
 {
 	16,16,
-	0x2000,
-	5,	/* actually 4, 5th bit is transparency */
-	{ 0x100000*8+4, 0x80000*8+4,0x80000*8,4,0 },
+	RGN_FRAC(1,3),
+	6,
+	{ RGN_FRAC(2,3)+4, RGN_FRAC(2,3)+0,
+	  RGN_FRAC(1,3)+4, RGN_FRAC(1,3)+0,
+	                4,               0 },
 	{
 		0,1,2,3,8,9,10,11,
 		256+0,256+1,256+2,256+3,256+8,256+9,256+10,256+11
@@ -227,6 +229,7 @@ static const gfx_layout bg_layout =
 	},
 	512
 };
+
 
 static const gfx_layout fg_layout =
 {
@@ -248,10 +251,10 @@ static const gfx_layout fg_layout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( dynduke )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   1280, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, bg_layout,    2048, 32 ) // Really 0
-	GFXDECODE_ENTRY( REGION_GFX3, 0, fg_layout,     512, 16 )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,  768, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,    0x500, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bg_layout,     0x000, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, fg_layout,     0x200, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,  0x300, 32 )
 GFXDECODE_END
 
 /* Parameters: YM3812 frequency, Oki frequency, Oki memory region */
@@ -291,7 +294,7 @@ static MACHINE_DRIVER_START( dynduke )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(dynduke)
-	MDRV_PALETTE_LENGTH(2048+1024)	// 2048 real palette, 1024 for transparency kludge
+	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(dynduke)
 	MDRV_VIDEO_UPDATE(dynduke)
@@ -429,8 +432,10 @@ ROM_START( dbldyn )
 	ROM_REGION( 0x180000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "dd.a2",		0x000000, 0x40000, CRC(598f343f) SHA1(eee794d9d0a92e066f00818bfb63e8ca46bda764) ) /* background */
 	ROM_LOAD( "dd.b2",		0x040000, 0x40000, CRC(41a9088d) SHA1(eb0b7370dc773cb6f5066b044934ffb42bb06587) )
+
 	ROM_LOAD( "dd.c2",		0x080000, 0x40000, CRC(cc341b42) SHA1(8c3cf09a3a0080a1cd7c1049cb8d11f03de50919) )
 	ROM_LOAD( "dd.d2",		0x0c0000, 0x40000, CRC(4752b4d7) SHA1(4625b7885ff9d302e78d7324b3592ac5a3cead86) )
+
 	ROM_LOAD( "dd.de3",		0x100000, 0x40000, CRC(44a4cb62) SHA1(70b2043d0428c90ee22ccd479d9710af24d359f6) )
 	ROM_LOAD( "dd.ef3",		0x140000, 0x40000, CRC(aa8aee1a) SHA1(8b2b8dcb2287318e314b256f84c23424cfe29462) )
 
@@ -479,6 +484,7 @@ ROM_START( dbldynf )
 	ROM_LOAD( "dd.b2",		0x040000, 0x40000, CRC(41a9088d) SHA1(eb0b7370dc773cb6f5066b044934ffb42bb06587) )
 	ROM_LOAD( "dd.c2",		0x080000, 0x40000, CRC(cc341b42) SHA1(8c3cf09a3a0080a1cd7c1049cb8d11f03de50919) )
 	ROM_LOAD( "dd.d2",		0x0c0000, 0x40000, CRC(4752b4d7) SHA1(4625b7885ff9d302e78d7324b3592ac5a3cead86) )
+
 	ROM_LOAD( "dd.de3",		0x100000, 0x40000, CRC(44a4cb62) SHA1(70b2043d0428c90ee22ccd479d9710af24d359f6) )
 	ROM_LOAD( "dd.ef3",		0x140000, 0x40000, CRC(aa8aee1a) SHA1(8b2b8dcb2287318e314b256f84c23424cfe29462) )
 

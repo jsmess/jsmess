@@ -82,6 +82,7 @@ mw-9.rom = ST M27C1001 / GFX
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "sound/2413intf.h"
+#include "sound/msm5205.h"
 
 /* in machine/kabuki.c */
 void mgakuen2_decode(void);
@@ -409,6 +410,54 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
 ADDRESS_MAP_END
 
+
+/* spangbl */
+
+static ADDRESS_MAP_START( spangb_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK1, MWA8_NOP)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE(&pang_colorram)/* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size) /* Banked char / OBJ RAM */
+	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_RAM)	/* Work RAM */
+	AM_RANGE(0xe000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spangb_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x02) AM_READ(input_r)	/* Super Pang needs a kludge to initialize EEPROM. */
+	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
+	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
+	AM_RANGE(0x03, 0x03) AM_WRITE(YM2413_data_port_0_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(YM2413_register_port_0_w)
+	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r)
+	AM_RANGE(0x06, 0x06) AM_WRITE(MWA8_NOP)	/* watchdog? irq ack? */
+	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
+	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
+ADDRESS_MAP_END
+
+
+static int sample_buffer = 0;
+static int sample_select = 0;
+
+/*
+static WRITE8_HANDLER( spangbl_msm5205_data_w )
+{
+    sample_buffer = data;
+}
+*/
+
+static ADDRESS_MAP_START( spangb_sound_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+//  AM_RANGE(0xec00, 0xec00) AM_WRITE( spangbl_msm5205_data_w )
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spangb_sound_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+ADDRESS_MAP_END
 
 /**** Monsters World ****/
 
@@ -913,6 +962,46 @@ INPUT_PORTS_START( pang )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
+INPUT_PORTS_START( spangbl )
+	PORT_START      /* DSW */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT(0x02, 0x02, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
+
+	PORT_START      /* IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START      /* IN1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // must be high for game to boot..
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+
+	PORT_START      /* IN2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+INPUT_PORTS_END
+
 INPUT_PORTS_START( mstworld )
 	/* this port may not have the same role */
 	PORT_START      /* DSW */
@@ -1272,7 +1361,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
+	MDRV_CPU_ADD_TAG("main",Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
@@ -1296,14 +1385,71 @@ static MACHINE_DRIVER_START( pang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 990000)
+	MDRV_SOUND_ADD_TAG("oki", OKIM6295, 990000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM2413, 4000000)
+	MDRV_SOUND_ADD_TAG("ym2413",YM2413, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static const gfx_layout blcharlayout =
+{
+	8,8,	/* 8*8 characters */
+	RGN_FRAC(1,2),	/* 32768 characters */
+	4,		/* 4 bits per pixel */
+	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0,8, 0 },
+	{ 0, 1, 2, 3, 4,5,6,7 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	16*8    /* every char takes 16 consecutive bytes */
+};
+
+
+static GFXDECODE_START( spangbl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, blcharlayout,     0, 128 ) /* colors 0-2047 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,   0,  16 ) /* colors 0- 255 */
+GFXDECODE_END
+
+
+
+static void spangbl_adpcm_int(int data)
+{
+	MSM5205_data_w(0, sample_buffer & 0x0F);
+	sample_buffer >>= 4;
+	sample_select ^= 1;
+	if(sample_select == 0)
+		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+static struct MSM5205interface msm5205_interface =
+{
+	spangbl_adpcm_int,	/* interrupt function */
+	MSM5205_S48_4B		/* 4KHz 4-bit */
+};
+
+
+static MACHINE_DRIVER_START( spangbl )
+	MDRV_IMPORT_FROM(pang)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(spangb_memmap,0)
+	MDRV_CPU_IO_MAP(spangb_portmap,0)
+	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+
+	MDRV_CPU_ADD_TAG("sound",Z80, 8000000)
+	MDRV_CPU_PROGRAM_MAP(spangb_sound_memmap,0 )
+	MDRV_CPU_IO_MAP(spangb_sound_portmap,0)
+	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+
+	MDRV_GFXDECODE(spangbl)
+
+
+	MDRV_SOUND_REPLACE("oki", MSM5205, 384000)
+	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mstworld )
 
@@ -1567,6 +1713,35 @@ ROM_START( pangb )
 	ROM_LOAD( "bb1.bin",      0x00000, 0x20000, CRC(c52e5b8e) SHA1(933b954bfdd2d67e28b032ffabde192531249c1f) )
 ROM_END
 
+/* I suspect the only real difference in this set is that it doesn't have the date hacked to (c)1990 like
+   the above bootleg, and it uses a different PCB layout.  Multiple PCBs with these ROMs have been found,
+   so it's worth supporting anyway. */
+ROM_START( pangbold )
+	ROM_REGION( 2*0x50000, REGION_CPU1, 0 )
+	ROM_LOAD( "4.6l",  0x50000, 0x08000, CRC(f68f88a5) SHA1(6f57891d399a46d8d5a531771129552ed420d10a) )   /* Decrypted opcode + data */
+	ROM_CONTINUE(      0x00000, 0x08000 )
+	ROM_LOAD( "2.3l",  0x60000, 0x20000, CRC(3f15bb61) SHA1(4f74ee25f32a201482840158b4d4c7aca1cda684) )   /* Decrypted op codes */
+	ROM_LOAD( "3.5l",  0x10000, 0x20000, CRC(ce6375e4) SHA1(fdd40d82553fcd4d2762ecfd898d0e3112dfde79) )   /* Decrypted data */
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* chars */
+	ROM_LOAD( "9.10o",  0x000000, 0x20000, CRC(3a5883f5) SHA1(a8a33071e10f5992e80afdb782c334829f9ae27f) )
+	ROM_LOAD( "10.14o", 0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
+	/* 40000-7ffff empty */
+	ROM_LOAD( "11.17j", 0x080000, 0x20000, CRC(166a16ae) SHA1(7f907c78b7ac8c99e3d79761a6ae689c77e3a1f5) )
+	ROM_LOAD( "12.20j", 0x0a0000, 0x20000, CRC(2fb3db6c) SHA1(328814d28569fec763975a8ae4c2767517a680af) )
+	/* c0000-fffff empty */
+
+	ROM_REGION( 0x040000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD( "8.7o",     0x000000, 0x10000, CRC(f3188aa1) SHA1(f59da8986c0c7d74185211eae1d1cc3f59a54f82) )
+	ROM_LOAD( "7.5o",     0x010000, 0x10000, CRC(011da14b) SHA1(3af9c5ca263b3df98b4f4c88d5428a115ddebef8) )
+	ROM_LOAD( "6.3o",     0x020000, 0x10000, CRC(0e25e797) SHA1(88c99e544923142256c93ed2b71f06489f6a90a8) )
+	ROM_LOAD( "5.1o",     0x030000, 0x10000, CRC(6daa4e27) SHA1(23411928de911b6303efa3a229646001459e4c70) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* OKIM */
+	ROM_LOAD( "1.1a",      0x00000, 0x10000, CRC(b6463907) SHA1(b79e0dca10c639b7f0ea9cbc49300b80708d46fa) )
+ROM_END
+
+
 ROM_START( bbros )
 	ROM_REGION( 0x50000, REGION_CPU1, 0 )
 	ROM_LOAD( "bb6.bin",      0x00000, 0x08000, CRC(a3041ca4) SHA1(2accb2151f621e4802211efe986969ebd3acb6d4) )
@@ -1716,6 +1891,69 @@ ROM_START( spang )
 	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* OKIM */
 	ROM_LOAD( "spe_01.rom",   0x00000, 0x20000, CRC(2d19c133) SHA1(b3ec226f35494dfc259e910895cec8a49dd2f846) )
 ROM_END
+
+/*
+1x Z0840006PSC (main)
+1x Z0840006PSC (sound)
+1x OKI M5205
+1x YM2413
+1x LM324N
+1x oscillator 29.700 (close to sound)
+1x oscillator 12.0 MHz (close to main)
+ROMs    16x AM27C512 (1,3-17)
+1x AM27C020 (2)
+2x GAL16V8A (read protected - no dump available)
+Note    1x JAMMA edge connector
+1x trimmer (volume)
+1x 8 switches dip
+*/
+
+ROM_START( spangbl )
+	ROM_REGION( 0x50000*2, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_LOAD( "ic17.1",   0x00000, 0x08000, CRC(f0b2bf86) SHA1(b42a6c0b98c7ccd1e8acd41066a25c7ed4a3aabe) )
+	ROM_CONTINUE(0x50000,0x8000)
+	ROM_LOAD( "ic18.2",   0x60000, 0x04000, CRC(6f377832) SHA1(25755ed77a797f50fdfbb4c42a04f51d3d08f87c) )
+	ROM_CONTINUE(0x10000,0x4000)
+	ROM_CONTINUE(0x64000,0x4000)
+	ROM_CONTINUE(0x14000,0x4000)
+	ROM_CONTINUE(0x68000,0x4000)
+	ROM_CONTINUE(0x18000,0x4000)
+	ROM_CONTINUE(0x6c000,0x4000)
+	ROM_CONTINUE(0x1c000,0x4000)
+	ROM_CONTINUE(0x70000,0x4000)
+	ROM_CONTINUE(0x20000,0x4000)
+	ROM_CONTINUE(0x74000,0x4000)
+	ROM_CONTINUE(0x24000,0x4000)
+	ROM_CONTINUE(0x78000,0x4000)
+	ROM_CONTINUE(0x28000,0x4000)
+	ROM_CONTINUE(0x7c000,0x4000)
+	ROM_CONTINUE(0x2c000,0x4000)
+	ROM_LOAD( "ic19.3",   0x40000, 0x04000, CRC(7c776309) SHA1(8861ed11484ca0727dfbc3003888a9de32ed8ecc) )
+	ROM_CONTINUE(0x48000,0x4000)
+	ROM_CONTINUE(0x44000,0x4000)
+	ROM_CONTINUE(0x4c000,0x4000)
+
+	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* Sound Z80 + M5205 samples */
+	ROM_LOAD( "ic28.4",   0x00000, 0x10000, CRC(02b07d0a) SHA1(77cb9bf1b0d93ebad1bd8cdbedb7fdbad23697be) )
+	ROM_LOAD( "ic45.5",   0x10000, 0x10000, CRC(95c32824) SHA1(02de90a7bfbe89feb7708fda8dfac4ed32bc0773) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_INVERT| ROMREGION_DISPOSE | ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "ic79.11",  0x000001, 0x10000, CRC(10839ddd) SHA1(bfb56aa5d6ee1d3aa19e346264bee90d64545e51) )
+	ROM_LOAD16_BYTE( "ic78.7",   0x000000, 0x10000, CRC(c1d5df89) SHA1(a86e641af1b41c8f642fe3a14ebcbe6c27f80c79) )
+	ROM_LOAD16_BYTE( "ic49.10",  0x020001, 0x10000, CRC(113c2753) SHA1(37b480b5d9c581d3c807c81924b4bbbc21d0698d) )
+	ROM_LOAD16_BYTE( "ic48.6",   0x020000, 0x10000, CRC(4ffae6c9) SHA1(71df3c374a24d6a90e78d33929cb91d05bd10b78) )
+	ROM_LOAD16_BYTE( "ic81.13",  0x080001, 0x10000, CRC(ebe9c63a) SHA1(1aeeea5051086405ceb803ca7a5bfd82a07ade0f) )
+	ROM_LOAD16_BYTE( "ic80.9",   0x080000, 0x10000, CRC(f680051d) SHA1(b6e09e14baf839961f46e0986d2c17f7edfaf13d) )
+	ROM_LOAD16_BYTE( "ic51.12",  0x0a0001, 0x10000, CRC(beb49dc9) SHA1(c93f65b0f4ce0a0f400202f2998b89abad1f6942) )
+	ROM_LOAD16_BYTE( "ic50.8",   0x0a0000, 0x10000, CRC(3f91014c) SHA1(b3947caa0c667d871c19d7dda6536d043ad296f2) )
+
+	ROM_REGION( 0x040000, REGION_GFX2, ROMREGION_INVERT|ROMREGION_DISPOSE )
+	ROM_LOAD( "ic94.17",   0x000000, 0x10000, CRC(a56f3c20) SHA1(cb440e0e612da8b8a50fe25a6336869b62ab4cfd) )
+	ROM_LOAD( "ic95.16",   0x020000, 0x10000, CRC(14df4659) SHA1(d73fab0a8c1e56a26cc15333a294e876f1552bc9) )
+	ROM_LOAD( "ic124.15",  0x010000, 0x10000, CRC(4702c768) SHA1(ff996f1355f32451fa57836c2255027a8108eb40) )
+	ROM_LOAD( "ic125.14",  0x030000, 0x10000, CRC(bd5c2f4b) SHA1(3c71d63637633a98ab513e4336e2954af3f964f4) )
+ROM_END
+
 
 ROM_START( spangj )
 	ROM_REGION( 0x50000, REGION_CPU1, 0 )
@@ -1984,6 +2222,16 @@ static DRIVER_INIT( spang )
 	spang_decode();
 	configure_banks();
 }
+
+static DRIVER_INIT( spangbl )
+{
+	input_type = 3;
+	nvram_size = 0x80;
+	nvram = &memory_region(REGION_CPU1)[0xe000];	/* NVRAM */
+	bootleg_decode();
+	configure_banks();
+}
+
 static DRIVER_INIT( spangj )
 {
 	input_type = 3;
@@ -2121,13 +2369,15 @@ GAME( 1989, pkladiel, pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun
 GAME( 1989, pkladila, pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 401)", 0 )
 GAME( 1989, dokaben,  0,        pang,    pang,     dokaben,  ROT0,   "Capcom", "Dokaben (Japan)", 0 )
 GAME( 1989, pang,     0,        pang,    pang,     pang,     ROT0,   "Mitchell", "Pang (World)", 0 )
-GAME( 1989, pangb,    pang,     pang,    pang,     pangb,    ROT0,   "bootleg", "Pang (bootleg)", 0 )
+GAME( 1989, pangb,    pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 1)", 0 )
+GAME( 1989, pangbold, pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 2)", 0 )
 GAME( 1989, bbros,    pang,     pang,    pang,     pang,     ROT0,   "Capcom", "Buster Bros. (US)", 0 )
 GAME( 1989, pompingw, pang,     pang,    pang,     pang,     ROT0,   "Mitchell", "Pomping World (Japan)", 0 )
 GAME( 1989, cworld,   0,        pang,    qtono1,   cworld,   ROT0,   "Capcom", "Capcom World (Japan)", 0 )
 GAME( 1990, hatena,   0,        pang,    qtono1,   hatena,   ROT0,   "Capcom", "Adventure Quiz 2 Hatena Hatena no Dai-Bouken (Japan 900228)", 0 )
 GAME( 1990, spang,    0,        pang,    pang,     spang,    ROT0,   "Mitchell", "Super Pang (World 900914)", 0 )
 GAME( 1990, spangj,   spang,    pang,    pang,     spangj,   ROT0,   "Mitchell", "Super Pang (Japan 901023)", 0 )
+GAME( 1990, spangbl,  spang,    spangbl, spangbl,  spangbl,  ROT0,   "[Mitchell] (bootleg)", "Super Pang (World 900914, bootleg)", GAME_NO_SOUND ) // different sound hardware
 GAME( 1994, mstworld, 0,        mstworld,mstworld, mstworld, ROT0,   "TCH", "Monsters World",GAME_IMPERFECT_GRAPHICS ) // bootleg of Spang
 GAME( 1990, sbbros,   spang,    pang,    pang,     sbbros,   ROT0,   "Mitchell + Capcom", "Super Buster Bros. (US 901001)", 0 )
 GAME( 1990, marukin,  0,        marukin, marukin,  marukin,  ROT0,   "Yuga", "Super Marukin-Ban (Japan 901017)", 0 )
