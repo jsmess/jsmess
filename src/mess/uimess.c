@@ -128,7 +128,7 @@ int ui_sprintf_image_info(char *buf)
 				char *base_filename_noextension;
 
 				base_filename = image_basename(img);
-				base_filename_noextension = strip_extension((char *) base_filename);
+				base_filename_noextension = strip_extension(base_filename);
 
 				/* display device type and filename */
 				dst += sprintf(dst,"%s: %s\n", image_typename_id(img), base_filename);

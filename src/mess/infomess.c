@@ -12,42 +12,13 @@
 #include "sound/samples.h"
 #include "info.h"
 #include "hash.h"
+#include "xmlfile.h"
 
 /*************************************
  *
  *  Code used by print_mame_xml()
  *
  *************************************/
-
-/* Print a free format string */
-static const char *normalize_string(const char* s)
-{
-	static char buffer[1024];
-	char *d = &buffer[0];
-
-	if (s)
-	{
-		while (*s)
-		{
-			switch (*s)
-			{
-				case '\"' : d += sprintf(d, "&quot;"); break;
-				case '&'  : d += sprintf(d, "&amp;"); break;
-				case '<'  : d += sprintf(d, "&lt;"); break;
-				case '>'  : d += sprintf(d, "&gt;"); break;
-				default:
-					if (*s>=' ' && *s<='~')
-						*d++ = *s;
-					else
-						d += sprintf(d, "&#%d;", (unsigned)(unsigned char)*s);
-			}
-			++s;
-		}
-	}
-	*d++ = 0;
-	return buffer;
-}
-
 
 
 void print_game_device(FILE* out, const game_driver* game)
@@ -63,11 +34,11 @@ void print_game_device(FILE* out, const game_driver* game)
 		for (devindex = 0; devices[devindex].type < IO_COUNT; devindex++)
 		{
 			/* print out device type */
-			fprintf(out, "\t\t<device type=\"%s\"", normalize_string(device_typename(devices[devindex].type)));
+			fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(device_typename(devices[devindex].type)));
 
 			/* does this device have a tag? */
 			if (devices[devindex].tag)
-				fprintf(out, " tag=\"%s\"", normalize_string(devices[devindex].tag));
+				fprintf(out, " tag=\"%s\"", xml_normalize_string(devices[devindex].tag));
 
 			/* is this device mandatory? */
 			if (devices[devindex].must_be_loaded)
@@ -82,8 +53,8 @@ void print_game_device(FILE* out, const game_driver* game)
 				shortname = device_briefinstancename(&devices[devindex].devclass, id);
 
 				fprintf(out, "\t\t\t<instance");
-				fprintf(out, " name=\"%s\"", normalize_string(name));
-				fprintf(out, " briefname=\"%s\"", normalize_string(shortname));
+				fprintf(out, " name=\"%s\"", xml_normalize_string(name));
+				fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
 				fprintf(out, "/>\n");
 			}
 
@@ -93,7 +64,7 @@ void print_game_device(FILE* out, const game_driver* game)
 				while (*ext)
 				{
 					fprintf(out, "\t\t\t<extension");
-					fprintf(out, " name=\"%s\"", normalize_string(ext));
+					fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
 					fprintf(out, "/>\n");
 					ext += strlen(ext) + 1;
 				}

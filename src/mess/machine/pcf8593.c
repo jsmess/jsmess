@@ -41,7 +41,7 @@ typedef struct
 	UINT8 *data;
 	UINT32 size;
 	int pin_scl, pin_sda, inp;
-	bool active;
+	BOOL active;
 	int bits;
 	UINT8 data_recv_index, data_recv[50];
 	UINT8 mode, pos;

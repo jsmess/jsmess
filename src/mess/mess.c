@@ -21,8 +21,6 @@
 #include "messopts.h"
 
 /* Globals */
-const char *mess_path;
-
 UINT32 mess_ram_size;
 UINT8 *mess_ram;
 UINT8 mess_ram_default_value = 0xCD;
@@ -131,13 +129,6 @@ void devices_init(running_machine *machine)
 	int result = INIT_FAIL;
 	const char *image_name;
 	mess_image *image;
-
-	/* convienient place to call this */
-	{
-		char buf[260];
-		osd_getcurdir(buf, ARRAY_LENGTH(buf));
-		mess_path = auto_strdup(buf);
-	}
 
 	/* initialize natural keyboard support */
 	inputx_init();
@@ -263,7 +254,6 @@ UINT32 hash_data_extract_crc32(const char *d)
 
 ***************************************************************************/
 
-READ8_HANDLER( return8_00 )	{ return 0x00; }
 READ8_HANDLER( return8_FE )	{ return 0xFE; }
 READ8_HANDLER( return8_FF )	{ return 0xFF; }
 READ16_HANDLER( return16_FFFF ) { return 0xFFFF; }
