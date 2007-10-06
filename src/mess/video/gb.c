@@ -85,6 +85,7 @@ struct gb_lcd_struct {
 	int	end_x;				/* Pixel to end drawing (exclusive) */
 	int lcd_int_state;		/* Keep track of LCD_INT state */
 	int mode;				/* Keep track of internal STAT mode */
+	int mode_irq;
 	struct layer_struct	layer[2];
 	mame_timer	*lcd_timer;
 	mame_timer	*vblank_delay_timer;
@@ -1149,22 +1150,7 @@ static TIMER_CALLBACK(gb_vblank_delay_proc)
 
 /* Check whether an LCD_INT interrupt should be triggered */
 static void gb_lcd_int_check( void ) {
-	int	lcd_int_state = 0;
-
-	/* Check if stat 0 should trigger an interrupt */
-	if ( LCDSTAT & 0x08 && gb_lcd.mode == 0x00 ) {
-		lcd_int_state = 1;
-	}
-
-	/* Check if stat 2 should trigger an interrupt */
-	if ( LCDSTAT & 0x20 && gb_lcd.mode == 0x02 ) {
-		lcd_int_state = 1;
-	}
-
-	/* Check if stat 1 should trigger an interrupt */
-	if ( LCDSTAT & 0x10 && gb_lcd.mode == 0x01 ) {
-		lcd_int_state = 1;
-	}
+	int	lcd_int_state = gb_lcd.mode_irq;
 
 	/* Check if LY==LYC should trigger an interrupt */
 	if ( LCDSTAT & 0x40 && LCDSTAT & 0x04 ) {
@@ -1176,6 +1162,27 @@ static void gb_lcd_int_check( void ) {
 	}
 
 	gb_lcd.lcd_int_state = lcd_int_state;
+}
+
+static void gb_lcd_check_mode_irq( void ) {
+	gb_lcd.mode_irq = 0;
+
+	/* Check if stat 0 should trigger an interrupt */
+	if ( LCDSTAT & 0x08 && gb_lcd.mode == 0x00 ) {
+		gb_lcd.mode_irq = 1;
+	}
+
+	/* Check if stat 2 should trigger an interrupt */
+	if ( LCDSTAT & 0x20 && gb_lcd.mode == 0x02 ) {
+		gb_lcd.mode_irq = 1;
+	}
+
+	/* Check if stat 1 should trigger an interrupt */
+	if ( LCDSTAT & 0x10 && gb_lcd.mode == 0x01 ) {
+		gb_lcd.mode_irq = 1;
+	}
+
+	gb_lcd_int_check();
 }
 
 enum {
@@ -1208,7 +1215,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.mode = 0;
 			LCDSTAT &= 0xFC;
 			/* Generate lcd interrupt if requested */
-			gb_lcd_int_check();
+			gb_lcd_check_mode_irq();
 			/* Check for HBLANK DMA */
 			if( gbc_hdma_enabled )
 				gbc_hdma(0x10);
@@ -1225,7 +1232,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				/* Internally switch to mode 2 */
 				gb_lcd.mode = 2;
 				/* Generate lcd interrupt if requested */
-				gb_lcd_int_check();
+				gb_lcd_check_mode_irq();
 				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2, time_never );
 			}
 			break;
@@ -1234,7 +1241,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.mode = 2;
 			LCDSTAT = ( LCDSTAT & 0xFC ) | 0x02;
 			/* Generate lcd interrupt if requested */
-			gb_lcd_int_check();
+			gb_lcd_check_mode_irq();
 			/* Mode 2 lasts approximately 80 clock cycles */
 			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, time_never );
 			break;
@@ -1255,7 +1262,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Set Mode 3 lcdstate */
 			gb_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
-			gb_lcd_int_check();
+			gb_lcd_check_mode_irq();
 			/* Mode 3 lasts for approximately 172+#sprites*10 clock cycles */
 			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(172 + 10 * gb_lcd.sprCount,0), GB_LCD_STATE_LYXX_M0, time_never );
 			gb_lcd.start_x = 0;
@@ -1268,13 +1275,14 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				gb_lcd.mode = 1;
 				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
 				/* Trigger LCD interrupt if requested */
-				gb_lcd_int_check();
+				gb_lcd_check_mode_irq();
 			}
 			/* Check if LY==LYC STAT bit should be set */
-			if ( CURLINE == CMPLINE )
+			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
-			/* Trigger LCD interrupt if requested */
-			gb_lcd_int_check();
+				/* Trigger LCD interrupt if requested */
+				gb_lcd_int_check();
+			}
 			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC, time_never );
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
@@ -1309,7 +1317,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Set Mode 0 lcdstat */
 			gb_lcd.mode = 0;
 			LCDSTAT = ( LCDSTAT & 0xFC );
-			gb_lcd_int_check();
+			gb_lcd_check_mode_irq();
 			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M2, time_never );
 			break;
 		}
@@ -1327,6 +1335,7 @@ static void gb_lcd_switch_on( void ) {
 	gb_lcd.previous_line = 153;
 	gb_lcd.window_lines_drawn = 0;
 	gb_lcd.lcd_int_state = 0;
+	gb_lcd.mode_irq = 0;
 	gb_lcd.mode = 0;
 	/* Check for LY=LYC coincidence */
 	if ( CURLINE == CMPLINE ) {
@@ -1387,15 +1396,12 @@ WRITE8_HANDLER ( gb_video_w ) {
 		data = 0x80 | (data & 0x78) | (LCDSTAT & 0x07);
 		/*
 		   Check for the STAT bug:
-		   Writing to STAT when the STAT mode is 1 or 0
-                   causes a STAT interrupt to be triggered.
+		   Writing to STAT when the LCD controller is active causes a STAT
+		   interrupt to be triggered.
 		 */
 		if ( LCDCONT & 0x80 ) {
-			switch ( LCDSTAT & 0x03 ) {
-			case 0x00:
-			case 0x01:
+			if ( ( gb_lcd.mode != 2 ) || ( ! ( data & 0x40 ) && ! ( LCDSTAT & 0x40 ) ) ) {
 				cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
-				break;
 			}
 		}
 		break;
@@ -1404,6 +1410,8 @@ WRITE8_HANDLER ( gb_video_w ) {
 	case 0x05:						/* LYC */
 		if ( CURLINE == data ) {
 			LCDSTAT |= 0x04;
+			/* Generate lcd interrupt if requested */
+			gb_lcd_int_check();
 		} else {
 			LCDSTAT &= 0xFB;
 		}
