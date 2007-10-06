@@ -125,16 +125,3 @@ void print_game_ramoptions(FILE* out, const game_driver* game)
 			fprintf(out, "\t\t<ramoption>%u</ramoption>\n", ram);
 	}
 }
-
-
-
-/*************************************
- *
- *  Implementation of -listtext
- *
- *************************************/
-
-void print_mess_text(void)
-{
-}
-
