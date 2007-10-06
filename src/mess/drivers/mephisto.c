@@ -67,7 +67,7 @@ static UINT8 led7;
 
 static WRITE8_HANDLER ( write_lcd ) 
 { 
-  output_set_digit_value(lcd_shift_counter,data ^ led7);    // 0x109 MM IV // 0x040 MM V
+  if (led7==0)output_set_digit_value(lcd_shift_counter,data);    // 0x109 MM IV // 0x040 MM V
   
   //output_set_digit_value(lcd_shift_counter,data ^ mephisto_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
   lcd_shift_counter--;
@@ -252,12 +252,19 @@ ROM_END
 
 ROM_START(mm5)
   ROM_REGION(0x10000,REGION_CPU1,0)
-  ROM_LOAD("mephisto50.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
+  ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
   ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
   ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" ) 
 	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2)) 
 ROM_END
 
+ROM_START(mm50)
+  ROM_REGION(0x10000,REGION_CPU1,0)
+  ROM_LOAD("mm50.rom", 0x8000, 0x8000, CRC(fcfa7e6e) SHA1(afeac3a8c957ba58cefaa27b11df974f6f2066da))
+  ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
+  ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" ) 
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2)) 
+ROM_END
 /***************************************************************************
 
   Game driver(s)
@@ -275,6 +282,7 @@ static DRIVER_INIT( mephisto )
 /*    YEAR  NAME    PARENT	COMPAT	MACHINE INPUT   INIT    CONFIG    COMPANY   FULLNAME */
 /*CONSB( 1983,	mephisto,	0,		0,		mephisto,	mephisto,	mephisto,	NULL,	  "Hegener & Glaser",  "Mephisto Schach Computer", 0)*/
 CONSB( 1987,    mm4,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto 4 Schach Computer", 0)
-CONSB( 1990,    mm5,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto 5 Schach Computer", 0) 
+CONSB( 1990,    mm5,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto 5.1 Schach Computer", 0) 
+CONSB( 1990,    mm50,   0,     mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto 5.0 Schach Computer", 0)
 CONSB( 1986,    rebel5,   0,      mephisto, 0,        rebel5,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto Rebel 5 Schach Computer", 0)
 // second design sold (same computer/program?)

@@ -46,24 +46,6 @@
 			<bounds left="251" top="105" right="299" bottom="185" />
 		</bezel>
 
-		<bezel name="led5" element="led">
-			<bounds x="51" y="390" width="15" height="15" />
-		</bezel>
-		<bezel name="led4" element="led">
-			<bounds x="102" y="390" width="15" height="15" />
-		</bezel>
-		<bezel name="led3" element="led">
-			<bounds x="155" y="390" width="15" height="15" />
-		</bezel>
-		<bezel name="led2" element="led">
-			<bounds x="205" y="390" width="15" height="15" />
-		</bezel>
-		<bezel name="led0" element="led">
-			<bounds x="256" y="390" width="15" height="15" />
-		</bezel>	
-		<bezel name="led1" element="led">
-			<bounds x="308" y="390" width="15" height="15" />
-		</bezel>	
 
 	</view>
 </mamelayout>

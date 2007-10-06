@@ -807,12 +807,19 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	/* Quelle International */
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
 	/* Hegener & Glaser Munich */
-        DRIVER( mm4 )		/* Mephisto 4								*/
- 	/* NOVAG Industries Ltd. */
-        DRIVER( mm5 )		/* Mephisto 5								*/
- 	/* NOVAG Industries Ltd. */
-	 DRIVER( rebel5 )		/* Mephisto 5								*/
- 	/* H&G München */
-        TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
+  DRIVER( mm4 )		/* Mephisto 4								*/
+ 	/* Hegener & Glaser Munich */
+  DRIVER( mm5 )		/* Mephisto 5.1 ROM								*/
+  DRIVER( mm50 )		/* Mephisto 5.0 ROM								*/
+ 	/* Hegener & Glaser Munich */
+	DRIVER( rebel5 )		/* Mephisto 5								*/
+	DRIVER( glasgow )		/* Glasgow						*/
+	DRIVER( amsterd )		/* Amsterdam							*/
+	DRIVER( dallas )		/* Dallas							*/
+	DRIVER( dallas32 )		/* Dallas							*/
+	DRIVER( polgar )		/* Mephisto Polgar								*/
+	DRIVER( roma )		/* Roma							*/
+ 	/* Novag */
+  TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
 #endif /* DRIVER_RECURSIVE */

@@ -102,7 +102,7 @@ CPUS += M6809E
 CPUS += M68000
 #CPUS += M68010
 CPUS += M68EC020
-#CPUS += M68020
+CPUS += M68020
 #CPUS += M68040
 #CPUS += T11
 CPUS += S2650
@@ -364,6 +364,7 @@ DRVLIBS = \
 	$(MESSOBJ)/mk1.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/mephisto.a \
+	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
@@ -1016,6 +1017,9 @@ $(MESSOBJ)/mk2.a:      \
 $(MESSOBJ)/mephisto.a:      \
 	$(MESS_DRIVERS)/mephisto.o
 
+$(MESSOBJ)/glasgow.a:      \
+	$(MESS_DRIVERS)/glasgow.o
+
 $(MESSOBJ)/ssystem3.a: \
 	$(MESS_VIDEO)/ssystem3.o \
 	$(MESS_DRIVERS)/ssystem3.o
@@ -1177,6 +1181,8 @@ $(MESS_DRIVERS)/mk1.o:	$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk2.o:	$(MESS_LAYOUT)/mk2.lh
 
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
+
+$(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 
