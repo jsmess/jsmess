@@ -103,11 +103,6 @@ void osd_logerror(const char *text)
 {
 }
 
-int osd_select_file(mess_image *img, char *filename)
-{
-	return 0;
-}
-
 int osd_keyboard_disabled(void)
 {
 	return 0;

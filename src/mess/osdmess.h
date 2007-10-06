@@ -207,11 +207,6 @@ char *osd_basename(char *filename);
     UNCATEGORIZED INTERFACES
 ***************************************************************************/
 
-/* called by the filemanager code to allow the OS to override the file		*/
-/* selecting with it's own code. Return 0 if the MESS core should handle	*/
-/* file selection, -1 if the OS code does nothing or 1 if the OS code		*/
-/* changed a file.															*/
-int osd_select_file(mess_image *img, char *filename);
 
 /* returns 1 if input of type IPT_KEYBOARD should be supressed */
 int osd_keyboard_disabled(void);

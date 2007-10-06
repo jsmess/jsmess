@@ -1534,7 +1534,7 @@ ROM_END
 
 ROM_START( ibmpcjr )
     ROM_REGION(0x100000,REGION_CPU1, 0)
-#ifndef MESS_DEBUG
+#ifndef MAME_DEBUG
 	ROM_LOAD("bios.rom", 0xf0000, 0x10000,CRC( 0))
 #else
     ROM_LOAD("basic.rom", 0xf6000, 0x8000, CRC(0c19c1a8))

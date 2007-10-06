@@ -28,7 +28,7 @@
 #undef DRIVER
 #undef TESTDRIVER
 #define DRIVER(NAME) &driver_##NAME,
-#ifdef MESS_DEBUG
+#ifdef MAME_DEBUG
 #define TESTDRIVER(NAME) &driver_##NAME,
 #else
 #define TESTDRIVER(NAME)
@@ -807,18 +807,19 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	/* Quelle International */
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
 	/* Hegener & Glaser Munich */
-  DRIVER( mm4 )		/* Mephisto 4								*/
- 	/* Hegener & Glaser Munich */
-  DRIVER( mm5 )		/* Mephisto 5.1 ROM								*/
-  DRIVER( mm50 )		/* Mephisto 5.0 ROM								*/
- 	/* Hegener & Glaser Munich */
+	DRIVER( mm4 )		/* Mephisto 4								*/
+	/* Hegener & Glaser Munich */
+	DRIVER( mm5 )		/* Mephisto 5.1 ROM								*/
+	DRIVER( mm50 )		/* Mephisto 5.0 ROM								*/
+	/* Hegener & Glaser Munich */
 	DRIVER( rebel5 )		/* Mephisto 5								*/
 	DRIVER( glasgow )		/* Glasgow						*/
 	DRIVER( amsterd )		/* Amsterdam							*/
 	DRIVER( dallas )		/* Dallas							*/
 	DRIVER( dallas32 )		/* Dallas							*/
 	DRIVER( roma )		/* Roma							*/
- 	/* Novag */
-  TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
+	/* Novag */
+TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
+
 
 #endif /* DRIVER_RECURSIVE */
