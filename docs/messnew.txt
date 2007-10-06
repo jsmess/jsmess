@@ -3,7 +3,8 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - SuperGrafx [Wilbert Pol]
-
+- Mephisto 8 Bit MM IV, MM V , Rebel 5. [Dirk Verwiebe]
+- Mephisto 16/32 Bit Glasgow, Dallas. [Dirk Verwiebe]
 
 
 System Driver Changes:
