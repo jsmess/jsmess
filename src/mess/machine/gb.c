@@ -675,7 +675,10 @@ WRITE8_HANDLER ( gb_io_w )
 		}
 		break;
 	case 0x04:						/* DIV - Divider register */
-		gb_divcount = 0xFFF7;				/* The actual value here is closely tied with some implementation details of the z80gb cpu core */
+		/* Force increment of TIMECNT register */
+		if ( gb_divcount >= 16 )
+			gb_timer_callback( 1024 );
+		gb_divcount = 0;
 		return;
 	case 0x05:						/* TIMA - Timer counter */
 		break;
@@ -684,6 +687,10 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x07:						/* TAC - Timer control */
 		data |= 0xF8;
 		gb_timer_shift = timer_shifts[data & 0x03];
+		/* Check if timer is just enabled */
+		if ( ( data & 0x04 ) && ! ( TIMEFRQ & 0x04 ) ) {
+			TIMECNT = TIMEMOD;
+		}
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
@@ -1244,7 +1251,7 @@ READ8_HANDLER ( gb_io_r )
 	switch(offset)
 	{
 		case 0x04:
-			return ( ( gb_divcount + 9 ) >> 8 ) & 0xFF;
+			return ( gb_divcount >> 8 ) & 0xFF;
 		case 0x00:
 		case 0x01:
 		case 0x02:
