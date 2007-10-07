@@ -3,6 +3,7 @@
 #include "machine/pckeybrd.h"
 
 #include "machine/pcshare.h"
+#include "audio/pc.h"
 #include "includes/tandy1t.h"
 
 

@@ -34,6 +34,7 @@
 #include "includes/ps2.h"
 
 #include "machine/pcshare.h"
+#include "audio/pc.h"
 
 #include "devices/mflopimg.h"
 #include "devices/harddriv.h"

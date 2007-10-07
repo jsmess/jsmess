@@ -40,6 +40,7 @@
 #include "includes/europc.h"
 #include "includes/ibmpc.h"
 #include "machine/pcshare.h"
+#include "audio/pc.h"
 
 #include "includes/pc.h"
 #include "mscommon.h"

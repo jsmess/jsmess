@@ -3,6 +3,7 @@
 #include "machine/pcshare.h"
 #include "includes/ibmpc.h"
 #include "memconv.h"
+#include "audio/pc.h"
 
 #define VERBOSE_PIO 0		/* PIO (keyboard controller) */
 

@@ -47,6 +47,7 @@
 
 #include "machine/pc_hdc.h"
 #include "machine/nec765.h"
+#include "audio/pc.h"
 
 #include "mscommon.h"
 #endif /* MESS */

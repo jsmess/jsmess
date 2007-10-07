@@ -181,6 +181,11 @@
 #include "machine/pit8253.h"
 #include "machine/pcshare.h"
 
+#ifdef MESS
+#include "audio/pc.h"
+#endif /* MESS */
+
+
 
 /***************************************************************************
 

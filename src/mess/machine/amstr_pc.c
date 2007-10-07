@@ -6,6 +6,8 @@
 #include "includes/pclpt.h"
 #include "video/pc_vga.h"
 #include "memconv.h"
+#include "audio/pc.h"
+
 
 /* pc20 (v2)
    fc078

@@ -46,6 +46,7 @@
 #include "includes/ibmpc.h"
 
 #include "machine/pcshare.h"
+#include "audio/pc.h"
 #include "includes/pc.h"
 
 #include "machine/pc_hdc.h"

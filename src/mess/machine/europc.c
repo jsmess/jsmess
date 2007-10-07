@@ -4,6 +4,7 @@
 #include "machine/pit8253.h"
 #include "video/pc_aga.h"
 #include "mscommon.h"
+#include "audio/pc.h"
 
 /*
 

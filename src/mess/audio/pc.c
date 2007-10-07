@@ -14,6 +14,7 @@
 #include "streams.h"
 #include "machine/pcshare.h"
 #include "machine/pit8253.h"
+#include "audio/pc.h"
 
 #define SND_LOG(n,m,a)
 #define BASECLOCK	1193180
@@ -21,7 +22,7 @@
 
 static void *pc_sh_custom_start(int clock, const struct CustomSound_interface *config);
 
-struct CustomSound_interface pc_sound_interface =
+const struct CustomSound_interface pc_sound_interface =
 {
 	pc_sh_custom_start
 };
