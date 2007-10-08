@@ -72,6 +72,7 @@ VIDEO_UPDATE( gb );
 void gb_video_init( void );
 void sgb_video_init( void );
 void gbc_video_init( void );
+void gb_video_up_to_date( void );
 
 EXTERN double lcd_time;
 /* Custom Sound Interface */

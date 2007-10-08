@@ -1346,19 +1346,22 @@ static void gb_lcd_switch_on( void ) {
 	mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, time_never );
 }
 
+/* Make sure the video information is up to date */
+void gb_video_up_to_date( void ) {
+	mame_timer_set_global_time(mame_timer_get_time());
+}
+
 READ8_HANDLER( gb_video_r ) {
 //	if ( 0 && activecpu_get_pc() > 0x100 ) {
 //		logerror("LCDSTAT/LY read, cycles left is %d\n", (int)MAME_TIME_TO_CYCLES(0,mame_timer_timeleft( gb_lcd.lcd_timer )) );
 //	}
-	if ( (int)MAME_TIME_TO_CYCLES(0,mame_timer_timeleft( gb_lcd.lcd_timer)) <= 0 )
-		mame_timer_set_global_time(mame_timer_get_time());
+	gb_video_up_to_date();
 	return gb_vid_regs[offset];
 }
 
 /* Ignore write when LCD is on and STAT is 02 or 03 */
 int gb_video_oam_locked( void ) {
-	if ( (int)MAME_TIME_TO_CYCLES(0,mame_timer_timeleft( gb_lcd.lcd_timer)) <= 0 )
-		mame_timer_set_global_time(mame_timer_get_time());
+	gb_video_up_to_date();
 	if ( ( LCDCONT & 0x80 ) && ( LCDSTAT & 0x02 ) ) {
 		return 1;
 	}
@@ -1367,8 +1370,7 @@ int gb_video_oam_locked( void ) {
 
 /* Ignore write when LCD is on and STAT is not 03 */
 int gb_video_vram_locked( void ) {
-	if ( (int)MAME_TIME_TO_CYCLES(0,mame_timer_timeleft( gb_lcd.lcd_timer)) <= 0 )
-		mame_timer_set_global_time(mame_timer_get_time());
+	gb_video_up_to_date();
 	if ( ( LCDCONT & 0x80 ) && ( ( LCDSTAT & 0x03 ) == 0x03 ) ) {
 		return 1;
 	}

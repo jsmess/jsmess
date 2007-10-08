@@ -1264,7 +1264,7 @@ READ8_HANDLER ( gb_io_r )
 			return gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			mame_timer_set_global_time(mame_timer_get_time());
+			gb_video_up_to_date();
 			return 0xE0 | cpunum_get_reg( 0, Z80GB_IF );
 		default:
 			/* It seems unsupported registers return 0xFF */
