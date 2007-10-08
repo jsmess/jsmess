@@ -127,7 +127,7 @@ static TIMER_CALLBACK( mfp68901_tick )
 
 /* USART */
 
-static inline void mfp68901_rx_buffer_full(int which)
+static void mfp68901_rx_buffer_full(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -137,7 +137,7 @@ static inline void mfp68901_rx_buffer_full(int which)
 	}
 }
 
-static inline void mfp68901_rx_error(int which)
+static void mfp68901_rx_error(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -151,7 +151,7 @@ static inline void mfp68901_rx_error(int which)
 	}
 }
 
-static inline void mfp68901_tx_buffer_empty(int which)
+static void mfp68901_tx_buffer_empty(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -161,7 +161,7 @@ static inline void mfp68901_tx_buffer_empty(int which)
 	}
 }
 
-static inline void mfp68901_tx_error(int which)
+static void mfp68901_tx_error(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -175,7 +175,7 @@ static inline void mfp68901_tx_error(int which)
 	}
 }
 
-static inline int mfp68901_parity(UINT8 b)
+static int mfp68901_parity(UINT8 b)
 {
 	b ^= b >> 4;
 	b ^= b >> 2;
@@ -280,7 +280,7 @@ static TIMER_CALLBACK( rx_tick )
 	}
 }
 
-static inline void mfp68901_check_xe(int which)
+static void mfp68901_check_xe(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 

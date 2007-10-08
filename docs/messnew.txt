@@ -42,6 +42,8 @@ Source Changes:
 - Fixed multisession crash with the new menu selector.  (bug #1328) [Nate
   Woods]
 
+- [Messtest] Added selectable bios support.  (bug #1392) [Nate Woods]
+
 
 
 0.119
