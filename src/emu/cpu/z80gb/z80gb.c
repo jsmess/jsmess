@@ -19,11 +19,18 @@
 /** 1.1:                                                    **/
 /**   Removed dependency on the mess gameboy driver         **/
 /**                                                         **/
+/** 1.2:                                                    **/
+/**   Fixed cycle count for taking an interrupt             **/
+/**   Fixed cycle count for BIT X,(HL) instructions         **/
+/**   Fixed flags in RRCA instruction                       **/
+/**   Fixed DAA instruction                                 **/
+/**   Fixed flags in ADD SP,n8 instruction                  **/
+/**   Fixed flags in LD HL,SP+n8 instruction                **/
+/**                                                         **/
 /** TODO: Check cycle counts when leaving HALT state        **/
 /**                                                         **/
 /*************************************************************/
 #include "z80gb.h"
-#include "daa_tab.h"
 #include "debugger.h"
 
 #define FLAG_Z	0x80
@@ -146,10 +153,10 @@ static int CyclesCB[256] =
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
+	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
@@ -247,7 +254,7 @@ INLINE void z80gb_ProcessInterrupts (void)
 						(*Regs.w.irq_callback)(irqline);
 					Regs.w.enable &= ~IME;
 					Regs.w.IF &= ~(1 << irqline);
-					CYCLES_PASSED( 12 ); /* Taking an IRQ seems to take about 12 cycles */
+					CYCLES_PASSED( 20 );
 					Regs.w.SP -= 2;
 					mem_WriteWord (Regs.w.SP, Regs.w.PC);
 					Regs.w.PC = 0x40 + irqline * 8;
@@ -439,7 +446,7 @@ void z80gb_get_info(UINT32 state, cpuinfo *info)
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	case CPUINFO_STR_NAME: 							strcpy(info->s, "Z80GB"); break;
 	case CPUINFO_STR_CORE_FAMILY: 					strcpy(info->s, "Nintendo Z80"); break;
-	case CPUINFO_STR_CORE_VERSION: 					strcpy(info->s, "1.1"); break;
+	case CPUINFO_STR_CORE_VERSION: 					strcpy(info->s, "1.2"); break;
 	case CPUINFO_STR_CORE_FILE: 					strcpy(info->s, __FILE__); break;
 	case CPUINFO_STR_CORE_CREDITS: 					strcpy(info->s, "Copyright (C) 2000 by The MESS Team."); break;
 

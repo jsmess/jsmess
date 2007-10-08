@@ -219,13 +219,10 @@ case 0x0E: /*      LD C,n8 */
 case 0x0F: /*      RRCA */
 
   Regs.b.A = (UINT8) ((Regs.b.A >> 1) | (Regs.b.A << 7));
+  Regs.b.F = 0;
   if (Regs.b.A & 0x80)
   {
     Regs.b.F |= FLAG_C;
-  }
-  else
-  {
-    Regs.b.F = 0;
   }
   break;
 case 0x10: /*      STOP */
@@ -374,8 +371,30 @@ case 0x26: /*      LD H,n8 */
   Regs.b.H = mem_ReadByte (Regs.w.PC++);
   break;
 case 0x27: /*      DAA */
+	{
+		int tmp = Regs.b.A;
 
-  Regs.w.AF = DAATable[(((UINT16) (Regs.b.F & (FLAG_N | FLAG_C | FLAG_H))) << 4) | Regs.b.A];
+		if ( ! ( Regs.b.F & FLAG_N ) ) {
+			if ( ( Regs.b.F & FLAG_H ) || ( tmp & 0x0F ) > 9 ) 
+				tmp += 6;
+			if ( ( Regs.b.F & FLAG_C ) || tmp > 0x9F )
+				tmp += 0x60;
+		} else {
+			if ( Regs.b.F & FLAG_H ) {
+				tmp -= 6;
+				if ( ! ( Regs.b.F & FLAG_C ) )
+					tmp &= 0xFF;
+			}
+			if ( Regs.b.F & FLAG_C )
+					tmp -= 0x60;
+		}
+		Regs.b.F &= ~ ( FLAG_H | FLAG_Z );
+		if ( tmp & 0x100 )
+			Regs.b.F |= FLAG_C;
+		Regs.b.A = tmp & 0xFF;
+		if ( ! Regs.b.A )
+			Regs.b.F |= FLAG_Z;
+	}
   break;
 case 0x28: /*      JR Z,n8 */
 
@@ -502,7 +521,7 @@ case 0x35: /*      DEC (HL) */
     if (r == 0)
       f |= FLAG_Z;
 
-    if ((r & 0xF) != 0xF)
+    if ((r & 0xF) == 0xF)
       f |= FLAG_H;
 
     Regs.b.F = f;
@@ -1387,31 +1406,24 @@ case 0xE8: /*      ADD SP,n8 */
 
   {
 	register INT32 n;
-	register UINT32 r1, r2;
-	register UINT8 f;
-
-    /* printf( "Hmmm.. ADD SP,n8\n" ); */
 
 	n = (INT32) ((INT8) mem_ReadByte (Regs.w.PC++));
-    r1 = Regs.w.SP + n;
-    r2 = (Regs.w.SP & 0xFFF) + (n & 0xFFF);
 
-    if (r1 > 0xFFFF)
+	if ( ( Regs.w.SP & 0xFF ) + (UINT8)(n & 0xFF) > 0xFF )
     {
-      f = FLAG_C;
+      Regs.b.F = FLAG_C;
     }
     else
     {
-      f = 0;
+      Regs.b.F = 0;
     }
 
-    if (r2 > 0xFFF)
+    if ( ( Regs.w.SP & 0x0F ) + ( n & 0x0F ) > 0x0F )
     {
-      f |= FLAG_H;
+      Regs.b.F |= FLAG_H;
     }
 
-	Regs.w.SP = (UINT16) r1;
-    Regs.b.F = f;
+	Regs.w.SP = (UINT16) ( Regs.w.SP + n );
   }
   break;
 case 0xE9: /*      JP (HL) */
@@ -1488,29 +1500,24 @@ case 0xF8: /*      LD HL,SP+n8 */
 
   {
 	register INT32 n;
-	register UINT32 r1, r2;
-	register UINT8 f;
 
 	n = (INT32) ((INT8) mem_ReadByte (Regs.w.PC++));
-    r1 = Regs.w.SP + n;
-    r2 = (Regs.w.SP & 0xFFF) + (n & 0xFFF);
 
-    if (r1 > 0xFFFF)
+	if ( ( Regs.w.SP & 0xFF ) + (UINT8)(n & 0xFF) > 0xFF )
     {
-      f = FLAG_C;
+      Regs.b.F = FLAG_C;
     }
     else
     {
-      f = 0;
+      Regs.b.F = 0;
     }
 
-    if (r2 > 0xFFF)
+	if ( ( Regs.w.SP & 0x0F ) + ( n & 0x0F ) > 0x0F )
     {
-      f |= FLAG_H;
+      Regs.b.F |= FLAG_H;
     }
 
-	Regs.w.HL = (UINT16) r1;
-    Regs.b.F = f;
+	Regs.w.HL = (UINT16) ( Regs.w.SP + n );
   }
   break;
 case 0xF9: /*      LD SP,HL */
