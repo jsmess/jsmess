@@ -136,6 +136,7 @@ WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w );
 WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w );
 WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w );
 WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w );
+static void gb_timer_increment( void );
 
 #ifdef MAME_DEBUG
 /* #define V_GENERAL*/		/* Display general debug information */
@@ -646,7 +647,7 @@ WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w ) {
 
 WRITE8_HANDLER ( gb_io_w )
 {
-	static UINT8 timer_shifts[4] = {10, 4, 6, 8};
+	static const UINT8 timer_shifts[4] = {10, 4, 6, 8};
 
 	switch (offset)
 	{
@@ -677,7 +678,7 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x04:						/* DIV - Divider register */
 		/* Force increment of TIMECNT register */
 		if ( gb_divcount >= 16 )
-			gb_timer_callback( 1024 );
+			gb_timer_increment();
 		gb_divcount = 0;
 		return;
 	case 0x05:						/* TIMA - Timer counter */
@@ -687,6 +688,7 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x07:						/* TAC - Timer control */
 		data |= 0xF8;
 		gb_timer_shift = timer_shifts[data & 0x03];
+		gb_timer_count = 1 << gb_timer_shift;
 		/* Check if timer is just enabled */
 		if ( ( data & 0x04 ) && ! ( TIMEFRQ & 0x04 ) ) {
 			TIMECNT = TIMEMOD;
@@ -1729,19 +1731,27 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	}
 }
 
+static void gb_timer_increment( void ) {
+	TIMECNT += 1;
+	if ( TIMECNT == 0 ) {
+		TIMECNT = TIMEMOD;
+		cpunum_set_input_line( 0, TIM_INT, HOLD_LINE );
+	}
+}
+
 void gb_timer_callback(int cycles) {
 	UINT16 old_gb_divcount = gb_divcount;
 	gb_divcount += cycles;
 	if ( TIMEFRQ & 0x04 ) {
 		UINT16 old_count = old_gb_divcount >> gb_timer_shift;
 		UINT16 new_count = gb_divcount >> gb_timer_shift;
+		if ( cycles > gb_timer_count ) {
+			gb_timer_increment();
+			old_gb_divcount += gb_timer_count;
+			old_count++;
+		}
 		if ( new_count != old_count ) {
-			/* this increment is probably not correct when cycles > 1 timer cycle */
-			TIMECNT += 1;
-			if ( TIMECNT == 0x00 ) {
-				TIMECNT = TIMEMOD;
-				cpunum_set_input_line( 0, TIM_INT, HOLD_LINE );
-			}
+			gb_timer_increment();
 		}
 	}
 }
