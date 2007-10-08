@@ -1372,6 +1372,24 @@ $(CPUOBJ)/ssp1610/ssp1610.o:	$(CPUSRC)/ssp1610/ssp1610.c \
 
 
 #-------------------------------------------------
+# Texas Instruments TMS1000 & TMS1100 series
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_TMS1000=$(if $(filter TMS1000,$(CPUS)),1,0)
+
+ifneq ($(filter TMS1000,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/tms1xxx
+CPUOBJS += $(CPUOBJ)/tms1xxx/tms1xxx.o
+DBGOBJS += $(CPUOBJ)/tms1xxx/tms1xxxd.o
+endif
+
+$(CPUOBJ)/tms1xxx/tms1xxx.o:	$(CPUSRC)/tms1xxx/tms1xxx.h \
+								$(CPUSRC)/tms1xxx/tms1xxx.c
+
+$(CPUOBJ)/tms1xxx/tms1xxxd.o:	$(CPUSRC)/tms1xxx/tms1xxx.h \
+								$(CPUSRC)/tms1xxx/tms1xxxd.c
+
+#-------------------------------------------------
 # Texas Instruments TMS7000 series
 #-------------------------------------------------
 
@@ -1662,7 +1680,6 @@ endif
 
 $(CPUOBJ)/z80gb/z80gb.o:	$(CPUSRC)/z80gb/z80gb.c \
 							$(CPUSRC)/z80gb/z80gb.h \
-							$(CPUSRC)/z80gb/daa_tab.h \
 							$(CPUSRC)/z80gb/opc_cb.h \
 							$(CPUSRC)/z80gb/opc_main.h
 
