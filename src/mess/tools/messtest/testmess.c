@@ -304,7 +304,8 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	/* set up options */
 	opts = mame_options_init(win_mess_opts);
 	options_set_string(opts, OPTION_GAMENAME, driver->name, OPTION_PRIORITY_CMDLINE);
-	options_set_string(opts, OPTION_BIOS, current_testcase.bios, OPTION_PRIORITY_CMDLINE);
+	if( current_testcase.bios )
+		options_set_string(opts, OPTION_BIOS, current_testcase.bios, OPTION_PRIORITY_CMDLINE);
 	options_set_bool(opts, OPTION_SKIP_GAMEINFO, TRUE, OPTION_PRIORITY_CMDLINE);
 	options_set_bool(opts, OPTION_THROTTLE, FALSE, OPTION_PRIORITY_CMDLINE);
 	options_set_bool(opts, OPTION_SKIP_WARNINGS, TRUE, OPTION_PRIORITY_CMDLINE);
