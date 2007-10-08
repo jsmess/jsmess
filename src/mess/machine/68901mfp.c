@@ -280,6 +280,7 @@ static TIMER_CALLBACK( rx_tick )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void mfp68901_check_xe(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
@@ -298,6 +299,7 @@ static void mfp68901_check_xe(int which)
 		}
 	}
 }
+#endif
 
 static void mpf68901_transmit_disabled(int which)
 {
