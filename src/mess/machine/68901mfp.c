@@ -1267,10 +1267,18 @@ void mfp68901_config(int which, const mfp68901_interface *intf)
 	state_save_register_item("mfp68901", which, mfp_p->rsr);
 	state_save_register_item("mfp68901", which, mfp_p->tsr);
 	state_save_register_item("mfp68901", which, mfp_p->udr);
-	state_save_register_item("mfp68901", which, mfp_p->tx_bits);
 	state_save_register_item("mfp68901", which, mfp_p->rx_bits);
-	state_save_register_item("mfp68901", which, mfp_p->tx_parity);
+	state_save_register_item("mfp68901", which, mfp_p->tx_bits);
 	state_save_register_item("mfp68901", which, mfp_p->rx_parity);
+	state_save_register_item("mfp68901", which, mfp_p->tx_parity);
+	state_save_register_item("mfp68901", which, mfp_p->rx_state);
+	state_save_register_item("mfp68901", which, mfp_p->tx_state);
+	state_save_register_item("mfp68901", which, mfp_p->rx_buffer);
+	state_save_register_item("mfp68901", which, mfp_p->tx_buffer);
+	state_save_register_item("mfp68901", which, mfp_p->xmit_state);
+	state_save_register_item("mfp68901", which, mfp_p->rxtx_word);
+	state_save_register_item("mfp68901", which, mfp_p->rxtx_start);
+	state_save_register_item("mfp68901", which, mfp_p->rxtx_stop);
 	state_save_register_item("mfp68901", which, mfp_p->rsr_read);
 	state_save_register_item("mfp68901", which, mfp_p->next_rsr);
 }
