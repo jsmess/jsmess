@@ -729,7 +729,7 @@ BOOL BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult)
 	BOOL		bResult = FALSE;
 	IMalloc*	piMalloc = 0;
 	BROWSEINFO	Info;
-	ITEMIDLIST* pItemIDList = NULL;
+	LPITEMIDLIST pItemIDList = NULL;
 	TCHAR		buf[MAX_PATH];
 	
 	if (!SUCCEEDED(SHGetMalloc(&piMalloc)))

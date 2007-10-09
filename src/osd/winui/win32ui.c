@@ -1221,6 +1221,7 @@ static void ResizeTreeAndListViews(BOOL bResizeHidden)
 	int nLeftWindowWidth = 0;
 	RECT rect;
 	BOOL bVisible;
+	int nLastOverlap = -1;
 
 	/* Size the List Control in the Picker */
 	GetClientRect(hMain, &rect);
@@ -1245,8 +1246,9 @@ static void ResizeTreeAndListViews(BOOL bResizeHidden)
 				nLeftWindowWidth = rect.right - nLastWidth;
 
 			/* woah?  are we overlapping ourselves? */
-			if (nLeftWindowWidth < MIN_VIEW_WIDTH)
+			if ((nLeftWindowWidth < MIN_VIEW_WIDTH) && (i != nLastOverlap))
 			{
+				nLastOverlap = i;
 				nLastWidth = nLastWidth2;
 				nLeftWindowWidth = nSplitterOffset[i] - MIN_VIEW_WIDTH - (SPLITTER_WIDTH*3/2) - nLastWidth;
 				i--;
@@ -5480,11 +5482,11 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 		}
 
 	case WM_HELP:
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAME32CONTEXTHELP, HH_TP_HELP_WM_HELP, (DWORD)dwHelpIDs);
+		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAME32CONTEXTHELP, HH_TP_HELP_WM_HELP, (DWORD_PTR)dwHelpIDs);
 		break;
 
 	case WM_CONTEXTMENU:
-		HelpFunction((HWND)wParam, MAME32CONTEXTHELP, HH_TP_HELP_CONTEXTMENU, (DWORD)dwHelpIDs);
+		HelpFunction((HWND)wParam, MAME32CONTEXTHELP, HH_TP_HELP_CONTEXTMENU, (DWORD_PTR)dwHelpIDs);
 		break;
 
 	case WM_COMMAND:

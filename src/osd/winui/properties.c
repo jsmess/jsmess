@@ -327,9 +327,9 @@ int PropertiesCurrentGame(HWND hDlg)
 	return g_nGame;
 }
 
-DWORD GetHelpIDs(void)
+DWORD_PTR GetHelpIDs(void)
 {
-	return (DWORD) (LPSTR) dwHelpIDs;
+	return (DWORD_PTR)dwHelpIDs;
 }
 
 // This function (and the code that use it) is a gross hack - but at least the vile

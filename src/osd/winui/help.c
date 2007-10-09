@@ -60,7 +60,7 @@ int HelpInit(void)
 	g_hHelpLib  = NULL;
 
 	g_dwCookie = 0;
-	HelpFunction(NULL, NULL, HH_INITIALIZE, (DWORD)&g_dwCookie);
+	HelpFunction(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&g_dwCookie);
 	return 0;
 }
 
