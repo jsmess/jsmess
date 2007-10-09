@@ -915,6 +915,9 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 	// set up MAME options
 	mame_opts = mame_options_init(mame_win_options);
 
+	// Tell mame were to get the INIs
+	options_set_string(mame_opts, OPTION_INIPATH, GetIniDir(), OPTION_PRIORITY_CMDLINE);
+
 #ifdef MESS
 	// add MESS specific device options
 	mess_add_device_options(mame_opts, drivers[nGameIndex]);
