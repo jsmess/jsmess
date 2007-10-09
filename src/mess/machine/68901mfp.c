@@ -11,7 +11,6 @@
 	- interrupt on receiver break end
 	- interrupt on character boundaries during break transmission
 	- loopback mode
-	- transmit parity bit
 
 */
 
@@ -280,28 +279,7 @@ static TIMER_CALLBACK( rx_tick )
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-static void mfp68901_check_xe(int which)
-{
-	mfp_68901 *mfp_p = &mfp[which];
-
-	if (!(mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE))
-	{
-		if (mfp_p->tsr & MFP68901_TSR_AUTO_TURNAROUND)
-		{
-			mfp_p->tsr |= MFP68901_TSR_XMIT_ENABLE;
-		}
-		else
-		{
-			mfp_p->xmit_state = MFP68901_XMIT_OFF;
-			mfp_p->tsr |= MFP68901_TSR_END_OF_XMIT;
-			mfp68901_tx_error(which);
-		}
-	}
-}
-#endif
-
-static void mpf68901_transmit_disabled(int which)
+static void mfp68901_transmit_disabled(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -320,7 +298,7 @@ static void mpf68901_transmit_disabled(int which)
 	}
 }
 
-static void mpf68901_transmit(int which)
+static void mfp68901_transmit(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -335,7 +313,7 @@ static void mpf68901_transmit(int which)
 			}
 			else
 			{
-				mpf68901_transmit_disabled(which);
+				mfp68901_transmit_disabled(which);
 			}
 		}
 		else
@@ -350,7 +328,7 @@ static void mpf68901_transmit(int which)
 				}
 				else
 				{
-					mpf68901_transmit_disabled(which);
+					mfp68901_transmit_disabled(which);
 				}
 			}
 			else
@@ -361,6 +339,7 @@ static void mpf68901_transmit(int which)
 				mfp_p->tx_state = MFP68901_SERIAL_DATA;
 				mfp_p->tsr |= MFP68901_TSR_BUFFER_EMPTY;
 				mfp68901_tx_buffer_empty(which);
+				mfp_p->tx_parity = mfp68901_parity(mfp_p->tx_buffer);
 			}
 		}
 		break;
@@ -384,7 +363,19 @@ static void mpf68901_transmit(int which)
 		break;
 
 	case MFP68901_SERIAL_PARITY:
-		*mfp_p->intf->tx_pin = 0;
+		if (mfp_p->rxtx_word < 8)
+		{
+			// highest bit in buffer is user-specified parity bit
+
+			*mfp_p->intf->tx_pin = mfp_p->tx_buffer & 0x01;
+		}
+		else
+		{
+			// use previously calculated parity
+
+			*mfp_p->intf->tx_pin = mfp_p->tx_parity ^ ((mfp_p->ucr & MFP68901_UCR_PARITY_EVEN) >> 1);
+		}
+
 		mfp_p->tx_state = MFP68901_SERIAL_STOP;
 		break;
 
@@ -420,7 +411,7 @@ static TIMER_CALLBACK( tx_tick )
 	switch (mfp_p->xmit_state)
 	{
 	case MFP68901_XMIT_OFF:
-		mpf68901_transmit_disabled(param);
+		mfp68901_transmit_disabled(param);
 		break;
 
 	case MFP68901_XMIT_STARTING:
@@ -456,7 +447,7 @@ static TIMER_CALLBACK( tx_tick )
 		break;
 
 	case MFP68901_XMIT_ON:
-		mpf68901_transmit(param);
+		mfp68901_transmit(param);
 		break;
 	}
 }
