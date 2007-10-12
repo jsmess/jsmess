@@ -817,7 +817,7 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( amsterd )		/* Amsterdam							*/
 	DRIVER( dallas )		/* Dallas							*/
 	DRIVER( dallas32 )		/* Dallas							*/
-	DRIVER( roma )		/* Roma							*/
+	DRIVER( roma32 )		/* Roma							*/
 	/* Novag */
 TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
