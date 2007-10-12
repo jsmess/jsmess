@@ -1495,7 +1495,6 @@ static void I386OP(std)(void)				// Opcode 0xfd
 static void I386OP(sti)(void)				// Opcode 0xfb
 {
 	I.IF = 1;
-	i386_check_irq_line();
 	CYCLES(CYCLES_STI);
 }
 

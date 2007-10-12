@@ -10,10 +10,10 @@ Sound: (AY-3-8910) + YM2413 + MSM6295
 Other: Real Time Clock (Oki MSM6242B or 72421B)
 
 -----------------------------------------------------------------------------------------------------------------------------
-Year + Game                 Board             CPU     Sound                    Custom                            Notes
+Year + Game                 Board             CPU     Sound                    Custom                                 Other
 -----------------------------------------------------------------------------------------------------------------------------
-92 Monkey Mole Panic                          2xZ80   AY8910 + YM2413 + M6295  NL-001 1108(x2)   1427(x2)         8251
-93 Animalandia Jr.                            2xZ80   AY8910 + YM2413 + M6295  NL-001 NL-003(x2) NL-004(x2)      TMP82C51
+92 Monkey Mole Panic                          2xZ80   AY8910 + YM2413 + M6295  NL-001 1108(x2)   1427(x2)             8251
+93 Animalandia Jr.                            2xZ80   AY8910 + YM2413 + M6295  NL-001 NL-003(x2) NL-004(x2)           8251
 93 Quiz Channel Question  N7311208L1-2        Z80              YM2413 + M6295  NL-002 1108F0405  1427F0071
 93 First Funky Fighter    N7403208L-2         2xZ80   YM2149 + YM2413 + M6295  NL-001 NL-002     NL-005
 94 Mysterious World       D7107058L1-1        Z80     YM2149 + YM2413 + M6295  NL-002 1108F0405  1427F0071 4L02?
@@ -100,7 +100,7 @@ TODO:
 #include "machine/msm6242.h"
 #include "profiler.h"
 
-static UINT8 *pixmap[8];
+UINT8 *ddenlovr_pixmap[8];
 static mame_bitmap *framebuffer;
 static int extra_layers;
 
@@ -127,54 +127,57 @@ The commands are:
 110 Followed by 3 bits: change pen size
 111 Stop.
 
-The drawing operation is verified (quiz365) to modify dynax_blit_y.
+The drawing operation is verified (quiz365) to modify ddenlovr_blit_y.
 
 ***************************************************************************/
 
-static int dynax_dest_layer;
-static int dynax_blit_flip;
-static int dynax_blit_x;
-static int dynax_blit_y;
-static int dynax_blit_address;
-static int dynax_blit_pen,dynax_blit_pen_mode;
-static int dynax_blitter_irq_flag,dynax_blitter_irq_enable;
-static int dynax_rect_width, dynax_rect_height;
-static int dynax_clip_width, dynax_clip_height;
-static int dynax_line_length;
-static int dynax_clip_ctrl = 0xf,dynax_clip_x,dynax_clip_y;
-static int dynax_scroll[8*2];
-static int dynax_priority, dynax_priority2;
-static int dynax_bgcolor, dynax_bgcolor2;
-static int dynax_layer_enable=0x0f, dynax_layer_enable2=0x0f;
-static int dynax_palette_base[8], dynax_palette_mask[8];
-static int dynax_transparency_pen[8], dynax_transparency_mask[8];
-static int dynax_blit_reg;
-static int dynax_blit_pen_mask = 0xff;	// not implemented
-static int dynax_blit_rom_bits;			// usually 8, 16 in hanakanz
-static const int *dynax_blit_commands;
+static int ddenlovr_dest_layer;
+static int ddenlovr_blit_flip;
+static int ddenlovr_blit_x;
+static int ddenlovr_blit_y;
+static int ddenlovr_blit_address;
+static int ddenlovr_blit_pen,ddenlovr_blit_pen_mode;
+static int ddenlovr_blitter_irq_flag,ddenlovr_blitter_irq_enable;
+static int ddenlovr_rect_width, ddenlovr_rect_height;
+static int ddenlovr_clip_width, ddenlovr_clip_height;
+static int ddenlovr_line_length;
+static int ddenlovr_clip_ctrl = 0xf,ddenlovr_clip_x,ddenlovr_clip_y;
+static int ddenlovr_scroll[8*2];
+static int ddenlovr_priority, ddenlovr_priority2;
+static int ddenlovr_bgcolor, ddenlovr_bgcolor2;
+static int ddenlovr_layer_enable=0x0f, ddenlovr_layer_enable2=0x0f;
+static int ddenlovr_palette_base[8], ddenlovr_palette_mask[8];
+static int ddenlovr_transparency_pen[8], ddenlovr_transparency_mask[8];
+static int ddenlovr_blit_reg;
+static int ddenlovr_blit_pen_mask = 0xff;	// not implemented
+static int ddenlovr_blit_rom_bits;			// usually 8, 16 in hanakanz
+static const int *ddenlovr_blit_commands;
 
 enum { BLIT_NEXT = 0, BLIT_LINE, BLIT_COPY, BLIT_SKIP, BLIT_CHANGE_NUM, BLIT_CHANGE_PEN, BLIT_UNKNOWN, BLIT_STOP };
-//                                              0          1                2                   3               4               5                   6                   7
-static const int ddenlovr_blit_commands[8]	= { BLIT_NEXT, BLIT_LINE,		BLIT_COPY,			BLIT_SKIP,		BLIT_UNKNOWN,	BLIT_CHANGE_NUM,	BLIT_CHANGE_PEN,	BLIT_STOP	};
-static const int hanakanz_blit_commands[8]	= { BLIT_NEXT, BLIT_CHANGE_PEN,	BLIT_CHANGE_NUM,	BLIT_UNKNOWN,	BLIT_SKIP,		BLIT_COPY,			BLIT_LINE,			BLIT_STOP	};
-static const int mjflove_blit_commands[8]	= { BLIT_STOP, BLIT_CHANGE_PEN,	BLIT_CHANGE_NUM,	BLIT_UNKNOWN,	BLIT_SKIP,		BLIT_COPY,			BLIT_LINE,			BLIT_NEXT	};
+//                                          0          1                2                   3               4               5                   6                   7
+static const int ddenlovr_commands[8]	= { BLIT_NEXT, BLIT_LINE,		BLIT_COPY,			BLIT_SKIP,		BLIT_UNKNOWN,	BLIT_CHANGE_NUM,	BLIT_CHANGE_PEN,	BLIT_STOP	};
+static const int hanakanz_commands[8]	= { BLIT_NEXT, BLIT_CHANGE_PEN,	BLIT_CHANGE_NUM,	BLIT_UNKNOWN,	BLIT_SKIP,		BLIT_COPY,			BLIT_LINE,			BLIT_STOP	};
+static const int mjflove_commands[8]	= { BLIT_STOP, BLIT_CHANGE_PEN,	BLIT_CHANGE_NUM,	BLIT_UNKNOWN,	BLIT_SKIP,		BLIT_COPY,			BLIT_LINE,			BLIT_NEXT	};
 
 VIDEO_START(ddenlovr)
 {
 	int i;
 	for (i = 0; i < 8; i++)
-		pixmap[i] = auto_malloc(512*512);
+	{
+		ddenlovr_pixmap[i] = auto_malloc(512*512);
+		ddenlovr_scroll[i*2+0] = ddenlovr_scroll[i*2+1] = 0;
+	}
 
 	framebuffer = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	extra_layers = 0;
 
 	// older games do not set these !?
-	dynax_clip_width = 0x400;
-	dynax_clip_height = 0x400;
+	ddenlovr_clip_width = 0x400;
+	ddenlovr_clip_height = 0x400;
 
-	dynax_blit_rom_bits = 8;
-	dynax_blit_commands = ddenlovr_blit_commands;
+	ddenlovr_blit_rom_bits = 8;
+	ddenlovr_blit_commands = ddenlovr_commands;
 }
 
 VIDEO_START(mmpanic)
@@ -188,84 +191,84 @@ VIDEO_START(hanakanz)
 {
 	video_start_ddenlovr(machine);
 
-	dynax_blit_rom_bits = 16;
-	dynax_blit_commands = hanakanz_blit_commands;
+	ddenlovr_blit_rom_bits = 16;
+	ddenlovr_blit_commands = hanakanz_commands;
 }
 
 VIDEO_START(mjflove)
 {
 	video_start_ddenlovr(machine);
 
-	dynax_blit_commands = mjflove_blit_commands;
+	ddenlovr_blit_commands = mjflove_commands;
 }
 
-static void dynax_flipscreen_w( UINT8 data )
+static void ddenlovr_flipscreen_w( UINT8 data )
 {
 	logerror("flipscreen = %02x (%s)\n",data,(data&1)?"off":"on");
 }
 
-static void dynax_blit_flip_w( UINT8 data )
+static void ddenlovr_blit_flip_w( UINT8 data )
 {
-	if ((data ^ dynax_blit_flip) & 0xec)
+	if ((data ^ ddenlovr_blit_flip) & 0xec)
 	{
 #ifdef MAME_DEBUG
-		popmessage("warning dynax_blit_flip = %02x",data);
+		popmessage("warning ddenlovr_blit_flip = %02x",data);
 #endif
-		logerror("warning dynax_blit_flip = %02x\n",data);
+		logerror("warning ddenlovr_blit_flip = %02x\n",data);
 	}
 
-	dynax_blit_flip = data;
+	ddenlovr_blit_flip = data;
 }
 
-static WRITE8_HANDLER( dynax_bgcolor_w )
+WRITE8_HANDLER( ddenlovr_bgcolor_w )
 {
-	dynax_bgcolor = data;
+	ddenlovr_bgcolor = data;
 }
 
-static WRITE8_HANDLER( dynax_bgcolor2_w )
+WRITE8_HANDLER( ddenlovr_bgcolor2_w )
 {
-	dynax_bgcolor2 = data;
+	ddenlovr_bgcolor2 = data;
 }
 
-static WRITE16_HANDLER( ddenlovr_bgcolor_w )
-{
-	if (ACCESSING_LSB)
-		dynax_bgcolor_w(offset,data);
-}
-
-
-static WRITE8_HANDLER( dynax_priority_w )
-{
-	dynax_priority = data;
-}
-
-static WRITE8_HANDLER( dynax_priority2_w )
-{
-	dynax_priority2 = data;
-}
-
-static WRITE16_HANDLER( ddenlovr_priority_w )
+WRITE16_HANDLER( ddenlovr16_bgcolor_w )
 {
 	if (ACCESSING_LSB)
-		dynax_priority_w(offset,data);
+		ddenlovr_bgcolor_w(offset,data);
 }
 
 
-static WRITE8_HANDLER( dynax_layer_enable_w )
+WRITE8_HANDLER( ddenlovr_priority_w )
 {
-	dynax_layer_enable = data;
+	ddenlovr_priority = data;
 }
 
-static WRITE8_HANDLER( dynax_layer_enable2_w )
+WRITE8_HANDLER( ddenlovr_priority2_w )
 {
-	dynax_layer_enable2 = data;
+	ddenlovr_priority2 = data;
 }
 
-
-static WRITE16_HANDLER( ddenlovr_layer_enable_w )
+WRITE16_HANDLER( ddenlovr16_priority_w )
 {
 	if (ACCESSING_LSB)
-		dynax_layer_enable_w(offset,data);
+		ddenlovr_priority_w(offset,data);
+}
+
+
+WRITE8_HANDLER( ddenlovr_layer_enable_w )
+{
+	ddenlovr_layer_enable = data;
+}
+
+WRITE8_HANDLER( ddenlovr_layer_enable2_w )
+{
+	ddenlovr_layer_enable2 = data;
+}
+
+
+WRITE16_HANDLER( ddenlovr16_layer_enable_w )
+{
+	if (ACCESSING_LSB)
+		ddenlovr_layer_enable_w(offset,data);
 }
 
 
@@ -280,35 +283,35 @@ static void do_plot(int x,int y,int pen)
 	x &= 0x1ff;
 
 	// swap x & y (see hanakanz gal check)
-	if (dynax_blit_flip & 0x10)	{	temp = x;	x = y;	y = temp;	}
+	if (ddenlovr_blit_flip & 0x10)	{	temp = x;	x = y;	y = temp;	}
 
 	// clipping rectangle (see hanakanz / hkagerou gal check)
 #if 0
-	xclip	=	(x < dynax_clip_x) || (x > dynax_clip_x+dynax_clip_width);
-	yclip	=	(y < dynax_clip_y) || (y > dynax_clip_y+dynax_clip_height);
+	xclip	=	(x < ddenlovr_clip_x) || (x > ddenlovr_clip_x+ddenlovr_clip_width);
+	yclip	=	(y < ddenlovr_clip_y) || (y > ddenlovr_clip_y+ddenlovr_clip_height);
 #else
-	xclip	=	(x < dynax_clip_x) || (x > dynax_clip_width);
-	yclip	=	(y < dynax_clip_y) || (y > dynax_clip_height);
+	xclip	=	(x < ddenlovr_clip_x) || (x > ddenlovr_clip_width);
+	yclip	=	(y < ddenlovr_clip_y) || (y > ddenlovr_clip_height);
 #endif
 
-	if (!(dynax_clip_ctrl & 1) &&  xclip) return;
-	if (!(dynax_clip_ctrl & 2) && !xclip) return;
-	if (!(dynax_clip_ctrl & 4) &&  yclip) return;
-	if (!(dynax_clip_ctrl & 8) && !yclip) return;
+	if (!(ddenlovr_clip_ctrl & 1) &&  xclip) return;
+	if (!(ddenlovr_clip_ctrl & 2) && !xclip) return;
+	if (!(ddenlovr_clip_ctrl & 4) &&  yclip) return;
+	if (!(ddenlovr_clip_ctrl & 8) && !yclip) return;
 
 	addr = 512 * y + x;
 
-	if (dynax_dest_layer & 0x0001) pixmap[0][addr] = pen;
-	if (dynax_dest_layer & 0x0002) pixmap[1][addr] = pen;
-	if (dynax_dest_layer & 0x0004) pixmap[2][addr] = pen;
-	if (dynax_dest_layer & 0x0008) pixmap[3][addr] = pen;
+	if (ddenlovr_dest_layer & 0x0001) ddenlovr_pixmap[0][addr] = pen;
+	if (ddenlovr_dest_layer & 0x0002) ddenlovr_pixmap[1][addr] = pen;
+	if (ddenlovr_dest_layer & 0x0004) ddenlovr_pixmap[2][addr] = pen;
+	if (ddenlovr_dest_layer & 0x0008) ddenlovr_pixmap[3][addr] = pen;
 
 	if (!extra_layers)	return;
 
-	if (dynax_dest_layer & 0x0100) pixmap[4][addr] = pen;
-	if (dynax_dest_layer & 0x0200) pixmap[5][addr] = pen;
-	if (dynax_dest_layer & 0x0400) pixmap[6][addr] = pen;
-	if (dynax_dest_layer & 0x0800) pixmap[7][addr] = pen;
+	if (ddenlovr_dest_layer & 0x0100) ddenlovr_pixmap[4][addr] = pen;
+	if (ddenlovr_dest_layer & 0x0200) ddenlovr_pixmap[5][addr] = pen;
+	if (ddenlovr_dest_layer & 0x0400) ddenlovr_pixmap[6][addr] = pen;
+	if (ddenlovr_dest_layer & 0x0800) ddenlovr_pixmap[7][addr] = pen;
 }
 
 
@@ -363,11 +366,11 @@ static int blit_draw(int src,int sx)
 {
 	UINT8 *src_data = memory_region(REGION_GFX1);
 	int src_len = memory_region_length(REGION_GFX1);
-	int bit_addr = (src & 0xffffff) * dynax_blit_rom_bits;	/* convert to bit address */
+	int bit_addr = (src & 0xffffff) * ddenlovr_blit_rom_bits;	/* convert to bit address */
 	int pen_size, arg_size, cmd;
 	int x;
-	int xinc = (dynax_blit_flip & 1) ? -1 : 1;
-	int yinc = (dynax_blit_flip & 2) ? -1 : 1;
+	int xinc = (ddenlovr_blit_flip & 1) ? -1 : 1;
+	int yinc = (ddenlovr_blit_flip & 2) ? -1 : 1;
 
 	pen_size = fetch_word(src_data,src_len,&bit_addr,4) + 1;
 	arg_size = fetch_word(src_data,src_len,&bit_addr,4) + 1;
@@ -382,11 +385,11 @@ static int blit_draw(int src,int sx)
 	for (;;)
 	{
 		cmd = fetch_word(src_data,src_len,&bit_addr,3);
-		switch ( dynax_blit_commands[cmd] )
+		switch ( ddenlovr_blit_commands[cmd] )
 		{
 			case BLIT_NEXT:
 				/* next line */
-				dynax_blit_y += yinc;
+				ddenlovr_blit_y += yinc;
 				x = sx;
 				break;
 
@@ -394,11 +397,11 @@ static int blit_draw(int src,int sx)
 				{
 					int length = fetch_word(src_data,src_len,&bit_addr,arg_size);
 					int pen = fetch_word(src_data,src_len,&bit_addr,pen_size);
-					if (dynax_blit_pen_mode) pen = (dynax_blit_pen & 0x0f);
-					pen |= dynax_blit_pen & 0xf0;
+					if (ddenlovr_blit_pen_mode) pen = (ddenlovr_blit_pen & 0x0f);
+					pen |= ddenlovr_blit_pen & 0xf0;
 					while (length-- >= 0)
 					{
-						do_plot(x,dynax_blit_y,pen);
+						do_plot(x,ddenlovr_blit_y,pen);
 						x += xinc;
 					}
 				}
@@ -410,9 +413,9 @@ static int blit_draw(int src,int sx)
 					while (length-- >= 0)
 					{
 						int pen = fetch_word(src_data,src_len,&bit_addr,pen_size);
-						if (dynax_blit_pen_mode) pen = (dynax_blit_pen & 0x0f);
-						pen |= dynax_blit_pen & 0xf0;
-						do_plot(x,dynax_blit_y,pen);
+						if (ddenlovr_blit_pen_mode) pen = (ddenlovr_blit_pen & 0x0f);
+						pen |= ddenlovr_blit_pen & 0xf0;
+						do_plot(x,ddenlovr_blit_y,pen);
 						x += xinc;
 					}
 				}
@@ -434,7 +437,7 @@ static int blit_draw(int src,int sx)
 				log_draw_error(src,cmd);
 			// fall through
 			case BLIT_STOP:
-				return ((bit_addr + dynax_blit_rom_bits - 1) / dynax_blit_rom_bits) & 0xffffff;
+				return ((bit_addr + ddenlovr_blit_rom_bits - 1) / ddenlovr_blit_rom_bits) & 0xffffff;
 		}
 	}
 }
@@ -448,13 +451,13 @@ static void blit_rect_xywh(void)
 	int x,y;
 
 #ifdef MAME_DEBUG
-//  if (dynax_clip_ctrl != 0x0f)
-//      popmessage("RECT clipx=%03x clipy=%03x ctrl=%x",dynax_clip_x,dynax_clip_y,dynax_clip_ctrl);
+//  if (ddenlovr_clip_ctrl != 0x0f)
+//      popmessage("RECT clipx=%03x clipy=%03x ctrl=%x",ddenlovr_clip_x,ddenlovr_clip_y,ddenlovr_clip_ctrl);
 #endif
 
-	for (y = 0; y <= dynax_rect_height; y++)
-		for (x = 0; x <= dynax_rect_width; x++)
-			do_plot( x + dynax_blit_x, y + dynax_blit_y, dynax_blit_pen);
+	for (y = 0; y <= ddenlovr_rect_height; y++)
+		for (x = 0; x <= ddenlovr_rect_width; x++)
+			do_plot( x + ddenlovr_blit_x, y + ddenlovr_blit_y, ddenlovr_blit_pen);
 }
 
 
@@ -471,12 +474,12 @@ static void blit_rect_xywh(void)
 */
 static void blit_rect_yh(void)
 {
-	int start = 512 * dynax_blit_y;
-	int length = 512 * (dynax_rect_height+1);
+	int start = 512 * ddenlovr_blit_y;
+	int length = 512 * (ddenlovr_rect_height+1);
 
 #ifdef MAME_DEBUG
-//  if (dynax_clip_ctrl != 0x0f)
-//      popmessage("UNK8C clipx=%03x clipy=%03x ctrl=%x",dynax_clip_x,dynax_clip_y,dynax_clip_ctrl);
+//  if (ddenlovr_clip_ctrl != 0x0f)
+//      popmessage("UNK8C clipx=%03x clipy=%03x ctrl=%x",ddenlovr_clip_x,ddenlovr_clip_y,ddenlovr_clip_ctrl);
 #endif
 
 	if (start < 512*512)
@@ -484,23 +487,23 @@ static void blit_rect_yh(void)
 		if (start + length > 512*512)
 			length = 512*512 - start;
 
-		if (dynax_dest_layer & 0x0001) memset(pixmap[0] + start,dynax_blit_pen,length);
-		if (dynax_dest_layer & 0x0002) memset(pixmap[1] + start,dynax_blit_pen,length);
-		if (dynax_dest_layer & 0x0004) memset(pixmap[2] + start,dynax_blit_pen,length);
-		if (dynax_dest_layer & 0x0008) memset(pixmap[3] + start,dynax_blit_pen,length);
+		if (ddenlovr_dest_layer & 0x0001) memset(ddenlovr_pixmap[0] + start,ddenlovr_blit_pen,length);
+		if (ddenlovr_dest_layer & 0x0002) memset(ddenlovr_pixmap[1] + start,ddenlovr_blit_pen,length);
+		if (ddenlovr_dest_layer & 0x0004) memset(ddenlovr_pixmap[2] + start,ddenlovr_blit_pen,length);
+		if (ddenlovr_dest_layer & 0x0008) memset(ddenlovr_pixmap[3] + start,ddenlovr_blit_pen,length);
 
 		if (!extra_layers)	return;
 
-		if (dynax_dest_layer & 0x0100) memset(pixmap[4] + start,dynax_blit_pen,length);
-		if (dynax_dest_layer & 0x0200) memset(pixmap[5] + start,dynax_blit_pen,length);
-		if (dynax_dest_layer & 0x0400) memset(pixmap[6] + start,dynax_blit_pen,length);
-		if (dynax_dest_layer & 0x0800) memset(pixmap[7] + start,dynax_blit_pen,length);
+		if (ddenlovr_dest_layer & 0x0100) memset(ddenlovr_pixmap[4] + start,ddenlovr_blit_pen,length);
+		if (ddenlovr_dest_layer & 0x0200) memset(ddenlovr_pixmap[5] + start,ddenlovr_blit_pen,length);
+		if (ddenlovr_dest_layer & 0x0400) memset(ddenlovr_pixmap[6] + start,ddenlovr_blit_pen,length);
+		if (ddenlovr_dest_layer & 0x0800) memset(ddenlovr_pixmap[7] + start,ddenlovr_blit_pen,length);
 	}
 }
 
 
 
-/*  Fill from (X,Y) to end of pixmap
+/*  Fill from (X,Y) to end of ddenlovr_pixmap
     initialized arguments are
     00 dest layer
     05 unknown, related to layer
@@ -517,17 +520,17 @@ static void blit_fill_xy(int x, int y)
 //      popmessage("FILL command X %03x Y %03x",x,y);
 #endif
 
-	if (dynax_dest_layer & 0x0001) memset(pixmap[0] + start,dynax_blit_pen,512*512 - start);
-	if (dynax_dest_layer & 0x0002) memset(pixmap[1] + start,dynax_blit_pen,512*512 - start);
-	if (dynax_dest_layer & 0x0004) memset(pixmap[2] + start,dynax_blit_pen,512*512 - start);
-	if (dynax_dest_layer & 0x0008) memset(pixmap[3] + start,dynax_blit_pen,512*512 - start);
+	if (ddenlovr_dest_layer & 0x0001) memset(ddenlovr_pixmap[0] + start,ddenlovr_blit_pen,512*512 - start);
+	if (ddenlovr_dest_layer & 0x0002) memset(ddenlovr_pixmap[1] + start,ddenlovr_blit_pen,512*512 - start);
+	if (ddenlovr_dest_layer & 0x0004) memset(ddenlovr_pixmap[2] + start,ddenlovr_blit_pen,512*512 - start);
+	if (ddenlovr_dest_layer & 0x0008) memset(ddenlovr_pixmap[3] + start,ddenlovr_blit_pen,512*512 - start);
 
 	if (!extra_layers)	return;
 
-	if (dynax_dest_layer & 0x0100) memset(pixmap[4] + start,dynax_blit_pen,512*512 - start);
-	if (dynax_dest_layer & 0x0200) memset(pixmap[5] + start,dynax_blit_pen,512*512 - start);
-	if (dynax_dest_layer & 0x0400) memset(pixmap[6] + start,dynax_blit_pen,512*512 - start);
-	if (dynax_dest_layer & 0x0800) memset(pixmap[7] + start,dynax_blit_pen,512*512 - start);
+	if (ddenlovr_dest_layer & 0x0100) memset(ddenlovr_pixmap[4] + start,ddenlovr_blit_pen,512*512 - start);
+	if (ddenlovr_dest_layer & 0x0200) memset(ddenlovr_pixmap[5] + start,ddenlovr_blit_pen,512*512 - start);
+	if (ddenlovr_dest_layer & 0x0400) memset(ddenlovr_pixmap[6] + start,ddenlovr_blit_pen,512*512 - start);
+	if (ddenlovr_dest_layer & 0x0800) memset(ddenlovr_pixmap[7] + start,ddenlovr_blit_pen,512*512 - start);
 }
 
 
@@ -540,7 +543,7 @@ static void blit_fill_xy(int x, int y)
     02 Y
     0c line length
     04 blit_pen
-    dynax_blit_x and dynax_blit_y are left pointing to the last pixel at the end of the command
+    ddenlovr_blit_x and ddenlovr_blit_y are left pointing to the last pixel at the end of the command
 */
 static void blit_horiz_line(void)
 {
@@ -549,15 +552,15 @@ static void blit_horiz_line(void)
 #ifdef MAME_DEBUG
 	popmessage("LINE X");
 
-	if (dynax_clip_ctrl != 0x0f)
-		popmessage("LINE X clipx=%03x clipy=%03x ctrl=%x",dynax_clip_x,dynax_clip_y,dynax_clip_ctrl);
+	if (ddenlovr_clip_ctrl != 0x0f)
+		popmessage("LINE X clipx=%03x clipy=%03x ctrl=%x",ddenlovr_clip_x,ddenlovr_clip_y,ddenlovr_clip_ctrl);
 
-	if (dynax_blit_flip)
-		popmessage("LINE X flip=%x",dynax_blit_flip);
+	if (ddenlovr_blit_flip)
+		popmessage("LINE X flip=%x",ddenlovr_blit_flip);
 #endif
 
-	for (i = 0; i <= dynax_line_length; i++)
-		do_plot(dynax_blit_x++,dynax_blit_y,dynax_blit_pen);
+	for (i = 0; i <= ddenlovr_line_length; i++)
+		do_plot(ddenlovr_blit_x++,ddenlovr_blit_y,ddenlovr_blit_pen);
 }
 
 
@@ -570,7 +573,7 @@ static void blit_horiz_line(void)
     02 Y
     0c line length
     04 blit_pen
-    dynax_blit_x and dynax_blit_y are left pointing to the last pixel at the end of the command
+    ddenlovr_blit_x and ddenlovr_blit_y are left pointing to the last pixel at the end of the command
 */
 static void blit_vert_line(void)
 {
@@ -579,12 +582,12 @@ static void blit_vert_line(void)
 #ifdef MAME_DEBUG
 	popmessage("LINE Y");
 
-	if (dynax_clip_ctrl != 0x0f)
-		popmessage("LINE Y clipx=%03x clipy=%03x ctrl=%x",dynax_clip_x,dynax_clip_y,dynax_clip_ctrl);
+	if (ddenlovr_clip_ctrl != 0x0f)
+		popmessage("LINE Y clipx=%03x clipy=%03x ctrl=%x",ddenlovr_clip_x,ddenlovr_clip_y,ddenlovr_clip_ctrl);
 #endif
 
-	for (i = 0; i <= dynax_line_length; i++)
-		do_plot(dynax_blit_x,dynax_blit_y++,dynax_blit_pen);
+	for (i = 0; i <= ddenlovr_line_length; i++)
+		do_plot(ddenlovr_blit_x,ddenlovr_blit_y++,ddenlovr_blit_pen);
 }
 
 
@@ -595,15 +598,15 @@ INLINE void log_blit(int data)
 #if 1
 	logerror("%06x: blit src %06x x %03x y %03x flags %02x layer %02x pen %02x penmode %02x w %03x h %03x linelen %03x clip: ctrl %x xy %03x %03x wh %03x %03x\n",
 			activecpu_get_pc(),
-			dynax_blit_address,dynax_blit_x,dynax_blit_y,data,
-			dynax_dest_layer,dynax_blit_pen,dynax_blit_pen_mode,dynax_rect_width,dynax_rect_height,dynax_line_length,
-			dynax_clip_ctrl,dynax_clip_x,dynax_clip_y, dynax_clip_width,dynax_clip_height		);
+			ddenlovr_blit_address,ddenlovr_blit_x,ddenlovr_blit_y,data,
+			ddenlovr_dest_layer,ddenlovr_blit_pen,ddenlovr_blit_pen_mode,ddenlovr_rect_width,ddenlovr_rect_height,ddenlovr_line_length,
+			ddenlovr_clip_ctrl,ddenlovr_clip_x,ddenlovr_clip_y, ddenlovr_clip_width,ddenlovr_clip_height		);
 #endif
 }
 
 static void blitter_w(int blitter, offs_t offset,UINT8 data,int irq_vector)
 {
-	static int dynax_blit_reg[2];
+	static int ddenlovr_blit_reg[2];
 	int hi_bits;
 
 profiler_mark(PROFILER_VIDEO);
@@ -611,78 +614,78 @@ profiler_mark(PROFILER_VIDEO);
 	switch(offset)
 	{
 	case 0:
-		dynax_blit_reg[blitter] = data;
+		ddenlovr_blit_reg[blitter] = data;
 		break;
 
 	case 1:
-		hi_bits = (dynax_blit_reg[blitter] & 0xc0) << 2;
+		hi_bits = (ddenlovr_blit_reg[blitter] & 0xc0) << 2;
 
-		switch(dynax_blit_reg[blitter] & 0x3f)
+		switch(ddenlovr_blit_reg[blitter] & 0x3f)
 		{
 		case 0x00:
-			if (blitter)	dynax_dest_layer = (dynax_dest_layer & 0x00ff) | (data<<8);
-			else			dynax_dest_layer = (dynax_dest_layer & 0xff00) | (data<<0);
+			if (blitter)	ddenlovr_dest_layer = (ddenlovr_dest_layer & 0x00ff) | (data<<8);
+			else			ddenlovr_dest_layer = (ddenlovr_dest_layer & 0xff00) | (data<<0);
 			break;
 
 		case 0x01:
-			dynax_flipscreen_w(data);
+			ddenlovr_flipscreen_w(data);
 			break;
 
 		case 0x02:
-			dynax_blit_y = data | hi_bits;
+			ddenlovr_blit_y = data | hi_bits;
 			break;
 
 		case 0x03:
-			dynax_blit_flip_w(data);
+			ddenlovr_blit_flip_w(data);
 			break;
 
 		case 0x04:
-			dynax_blit_pen = data;
+			ddenlovr_blit_pen = data;
 			break;
 
 		case 0x05:
-			dynax_blit_pen_mask = data;
+			ddenlovr_blit_pen_mask = data;
 			break;
 
 		case 0x06:
 			// related to pen, can be 0 or 1 for 0x10 blitter command
-			// 0 = only bits 7-4 of dynax_blit_pen contain data
+			// 0 = only bits 7-4 of ddenlovr_blit_pen contain data
 			// 1 = bits 3-0 contain data as well
-			dynax_blit_pen_mode = data;
+			ddenlovr_blit_pen_mode = data;
 			break;
 
 		case 0x0a:
-			dynax_rect_width = data | hi_bits;
+			ddenlovr_rect_width = data | hi_bits;
 			break;
 
 		case 0x0b:
-			dynax_rect_height = data | hi_bits;
+			ddenlovr_rect_height = data | hi_bits;
 			break;
 
 		case 0x0c:
-			dynax_line_length = data | hi_bits;
+			ddenlovr_line_length = data | hi_bits;
 			break;
 
 		case 0x0d:
-			dynax_blit_address = (dynax_blit_address & 0xffff00) | (data <<0);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0xffff00) | (data <<0);
 			break;
 		case 0x0e:
-			dynax_blit_address = (dynax_blit_address & 0xff00ff) | (data <<8);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0xff00ff) | (data <<8);
 			break;
 		case 0x0f:
-			dynax_blit_address = (dynax_blit_address & 0x00ffff) | (data<<16);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0x00ffff) | (data<<16);
 			break;
 
 		case 0x14:
-			dynax_blit_x = data | hi_bits;
+			ddenlovr_blit_x = data | hi_bits;
 			break;
 
 		case 0x16:
-			dynax_clip_x = data | hi_bits;
+			ddenlovr_clip_x = data | hi_bits;
 			break;
 
 		case 0x17:
-			dynax_clip_y = data | hi_bits;
+			ddenlovr_clip_y = data | hi_bits;
 			break;
 
 		case 0x18:
@@ -693,11 +696,11 @@ profiler_mark(PROFILER_VIDEO);
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			dynax_scroll[blitter*8 + (dynax_blit_reg[blitter] & 7)] = data | hi_bits;
+			ddenlovr_scroll[blitter*8 + (ddenlovr_blit_reg[blitter] & 7)] = data | hi_bits;
 			break;
 
 		case 0x20:
-			dynax_clip_ctrl = data;
+			ddenlovr_clip_ctrl = data;
 			break;
 
 		case 0x24:
@@ -708,10 +711,10 @@ profiler_mark(PROFILER_VIDEO);
 			{
 				case 0x04:	blit_fill_xy(0, 0);
 							break;
-				case 0x14:	blit_fill_xy(dynax_blit_x, dynax_blit_y);
+				case 0x14:	blit_fill_xy(ddenlovr_blit_x, ddenlovr_blit_y);
 							break;
 
-				case 0x10:	dynax_blit_address = blit_draw(dynax_blit_address,dynax_blit_x);
+				case 0x10:	ddenlovr_blit_address = blit_draw(ddenlovr_blit_address,ddenlovr_blit_x);
 							break;
 
 				case 0x13:	blit_horiz_line();
@@ -745,16 +748,16 @@ profiler_mark(PROFILER_VIDEO);
 			else
 			{
 				/* ddenlovr */
-				if (dynax_blitter_irq_enable)
+				if (ddenlovr_blitter_irq_enable)
 				{
-					dynax_blitter_irq_flag = 1;
+					ddenlovr_blitter_irq_flag = 1;
 					cpunum_set_input_line(0,1,HOLD_LINE);
 				}
 			}
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", activecpu_get_pc(), blitter, dynax_blit_reg[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", activecpu_get_pc(), blitter, ddenlovr_blit_reg[blitter], data);
 			break;
 		}
 	}
@@ -768,7 +771,7 @@ profiler_mark(PROFILER_END);
 // differences wrt blitter_data_w: slightly different blitter commands
 static void blitter_w_funkyfig(int blitter, offs_t offset,UINT8 data,int irq_vector)
 {
-	static int dynax_blit_reg[2];
+	static int ddenlovr_blit_reg[2];
 	int hi_bits;
 
 profiler_mark(PROFILER_VIDEO);
@@ -776,78 +779,78 @@ profiler_mark(PROFILER_VIDEO);
 	switch(offset)
 	{
 	case 0:
-		dynax_blit_reg[blitter] = data;
+		ddenlovr_blit_reg[blitter] = data;
 		break;
 
 	case 1:
-		hi_bits = (dynax_blit_reg[blitter] & 0xc0) << 2;
+		hi_bits = (ddenlovr_blit_reg[blitter] & 0xc0) << 2;
 
-		switch(dynax_blit_reg[blitter] & 0x3f)
+		switch(ddenlovr_blit_reg[blitter] & 0x3f)
 		{
 		case 0x00:
-			if (blitter)	dynax_dest_layer = (dynax_dest_layer & 0x00ff) | (data<<8);
-			else			dynax_dest_layer = (dynax_dest_layer & 0xff00) | (data<<0);
+			if (blitter)	ddenlovr_dest_layer = (ddenlovr_dest_layer & 0x00ff) | (data<<8);
+			else			ddenlovr_dest_layer = (ddenlovr_dest_layer & 0xff00) | (data<<0);
 			break;
 
 		case 0x01:
-			dynax_flipscreen_w(data);
+			ddenlovr_flipscreen_w(data);
 			break;
 
 		case 0x02:
-			dynax_blit_y = data | hi_bits;
+			ddenlovr_blit_y = data | hi_bits;
 			break;
 
 		case 0x03:
-			dynax_blit_flip_w(data);
+			ddenlovr_blit_flip_w(data);
 			break;
 
 		case 0x04:
-			dynax_blit_pen = data;
+			ddenlovr_blit_pen = data;
 			break;
 
 		case 0x05:
-			dynax_blit_pen_mask = data;
+			ddenlovr_blit_pen_mask = data;
 			break;
 
 		case 0x06:
 			// related to pen, can be 0 or 1 for 0x10 blitter command
-			// 0 = only bits 7-4 of dynax_blit_pen contain data
+			// 0 = only bits 7-4 of ddenlovr_blit_pen contain data
 			// 1 = bits 3-0 contain data as well
-			dynax_blit_pen_mode = data;
+			ddenlovr_blit_pen_mode = data;
 			break;
 
 		case 0x0a:
-			dynax_rect_width = data | hi_bits;
+			ddenlovr_rect_width = data | hi_bits;
 			break;
 
 		case 0x0b:
-			dynax_rect_height = data | hi_bits;
+			ddenlovr_rect_height = data | hi_bits;
 			break;
 
 		case 0x0c:
-			dynax_line_length = data | hi_bits;
+			ddenlovr_line_length = data | hi_bits;
 			break;
 
 		case 0x0d:
-			dynax_blit_address = (dynax_blit_address & 0xffff00) | (data <<0);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0xffff00) | (data <<0);
 			break;
 		case 0x0e:
-			dynax_blit_address = (dynax_blit_address & 0xff00ff) | (data <<8);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0xff00ff) | (data <<8);
 			break;
 		case 0x0f:
-			dynax_blit_address = (dynax_blit_address & 0x00ffff) | (data<<16);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0x00ffff) | (data<<16);
 			break;
 
 		case 0x14:
-			dynax_blit_x = data | hi_bits;
+			ddenlovr_blit_x = data | hi_bits;
 			break;
 
 		case 0x16:
-			dynax_clip_x = data | hi_bits;
+			ddenlovr_clip_x = data | hi_bits;
 			break;
 
 		case 0x17:
-			dynax_clip_y = data | hi_bits;
+			ddenlovr_clip_y = data | hi_bits;
 			break;
 
 		case 0x18:
@@ -858,11 +861,11 @@ profiler_mark(PROFILER_VIDEO);
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			dynax_scroll[blitter*8 + (dynax_blit_reg[blitter] & 7)] = data | hi_bits;
+			ddenlovr_scroll[blitter*8 + (ddenlovr_blit_reg[blitter] & 7)] = data | hi_bits;
 			break;
 
 		case 0x20:
-			dynax_clip_ctrl = data;
+			ddenlovr_clip_ctrl = data;
 			break;
 
 		case 0x24:
@@ -877,10 +880,10 @@ profiler_mark(PROFILER_VIDEO);
 							break;
 
 //              unused?
-//              case 0x14:  blit_fill_xy(dynax_blit_x, dynax_blit_y);
+//              case 0x14:  blit_fill_xy(ddenlovr_blit_x, ddenlovr_blit_y);
 //                          break;
 
-				case 0x00/*0x10*/:	dynax_blit_address = blit_draw(dynax_blit_address,dynax_blit_x);
+				case 0x00/*0x10*/:	ddenlovr_blit_address = blit_draw(ddenlovr_blit_address,ddenlovr_blit_x);
 							break;
 
 				case 0x0b:	// same as 03? see the drawing of the R in "cRoss hatch" (key test)
@@ -912,7 +915,7 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", activecpu_get_pc(), blitter, dynax_blit_reg[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", activecpu_get_pc(), blitter, ddenlovr_blit_reg[blitter], data);
 			break;
 		}
 	}
@@ -925,7 +928,7 @@ profiler_mark(PROFILER_END);
 
 static WRITE8_HANDLER( hanakanz_blitter_reg_w )
 {
-	dynax_blit_reg = data;
+	ddenlovr_blit_reg = data;
 }
 
 // differences wrt blitter_data_w: registers are shuffled around, hi_bits in the low bits, clip_w/h, includes layers registers
@@ -935,73 +938,73 @@ static WRITE8_HANDLER( hanakanz_blitter_data_w )
 
 profiler_mark(PROFILER_VIDEO);
 
-	hi_bits = (dynax_blit_reg & 0x03) << 8;
+	hi_bits = (ddenlovr_blit_reg & 0x03) << 8;
 
-	switch(dynax_blit_reg & 0xfe)
+	switch(ddenlovr_blit_reg & 0xfe)
 	{
 		case 0x00:
-			dynax_dest_layer = data;
+			ddenlovr_dest_layer = data;
 			break;
 
 		case 0x04:
-			dynax_flipscreen_w(data);
+			ddenlovr_flipscreen_w(data);
 			break;
 
 		case 0x08:
-			dynax_blit_y = data | hi_bits;
+			ddenlovr_blit_y = data | hi_bits;
 			break;
 
 		case 0x0c:
-			dynax_blit_flip_w(data);
+			ddenlovr_blit_flip_w(data);
 			break;
 
 		case 0x10:
-			dynax_blit_pen = data;
+			ddenlovr_blit_pen = data;
 			break;
 
 		case 0x14:
-			dynax_blit_pen_mask = data;
+			ddenlovr_blit_pen_mask = data;
 			break;
 
 		case 0x18:
 			// related to pen, can be 0 or 1 for 0x10 blitter command
-			// 0 = only bits 7-4 of dynax_blit_pen contain data
+			// 0 = only bits 7-4 of ddenlovr_blit_pen contain data
 			// 1 = bits 3-0 contain data as well
-			dynax_blit_pen_mode = data;
+			ddenlovr_blit_pen_mode = data;
 			break;
 
 		case 0x28:
-			dynax_rect_width = data | hi_bits;
+			ddenlovr_rect_width = data | hi_bits;
 			break;
 
 		case 0x2c:
-			dynax_rect_height = data | hi_bits;
+			ddenlovr_rect_height = data | hi_bits;
 			break;
 
 		case 0x30:
-			dynax_line_length = data | hi_bits;
+			ddenlovr_line_length = data | hi_bits;
 			break;
 
 		case 0x34:
-			dynax_blit_address = (dynax_blit_address & 0xffff00) | (data <<0);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0xffff00) | (data <<0);
 			break;
 		case 0x38:
-			dynax_blit_address = (dynax_blit_address & 0xff00ff) | (data <<8);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0xff00ff) | (data <<8);
 			break;
 		case 0x3c:
-			dynax_blit_address = (dynax_blit_address & 0x00ffff) | (data<<16);
+			ddenlovr_blit_address = (ddenlovr_blit_address & 0x00ffff) | (data<<16);
 			break;
 
 		case 0x50:
-			dynax_blit_x = data | hi_bits;
+			ddenlovr_blit_x = data | hi_bits;
 			break;
 
 		case 0x58:
-			dynax_clip_x = data | hi_bits;
+			ddenlovr_clip_x = data | hi_bits;
 			break;
 
 		case 0x5c:
-			dynax_clip_y = data | hi_bits;
+			ddenlovr_clip_y = data | hi_bits;
 			break;
 
 		case 0x60:
@@ -1012,61 +1015,61 @@ profiler_mark(PROFILER_VIDEO);
 		case 0x74:
 		case 0x78:
 		case 0x7c:
-			dynax_scroll[(dynax_blit_reg & 0x1c) >> 2] = data | hi_bits;
+			ddenlovr_scroll[(ddenlovr_blit_reg & 0x1c) >> 2] = data | hi_bits;
 			break;
 
 		case 0x80:
-			dynax_clip_ctrl = data;
+			ddenlovr_clip_ctrl = data;
 			break;
 
 		case 0x88:
 		case 0x8a:	// can be 3ff
-			dynax_clip_height = data | hi_bits;
+			ddenlovr_clip_height = data | hi_bits;
 			break;
 
 		case 0x8c:
 		case 0x8e:	// can be 3ff
-			dynax_clip_width = data | hi_bits;
+			ddenlovr_clip_width = data | hi_bits;
 			break;
 
 		case 0xc0:
 		case 0xc2:
 		case 0xc4:
 		case 0xc6:
-			dynax_palette_base[(dynax_blit_reg >> 1) & 3] = data | (hi_bits & 0x100);
+			ddenlovr_palette_base[(ddenlovr_blit_reg >> 1) & 3] = data | (hi_bits & 0x100);
 			break;
 
 		case 0xc8:
 		case 0xca:
 		case 0xcc:
 		case 0xce:
-			dynax_palette_mask[(dynax_blit_reg >> 1) & 3] = data;
+			ddenlovr_palette_mask[(ddenlovr_blit_reg >> 1) & 3] = data;
 			break;
 
 		case 0xd0:
 		case 0xd2:
 		case 0xd4:
 		case 0xd6:
-			dynax_transparency_pen[(dynax_blit_reg >> 1) & 3] = data;
+			ddenlovr_transparency_pen[(ddenlovr_blit_reg >> 1) & 3] = data;
 			break;
 
 		case 0xd8:
 		case 0xda:
 		case 0xdc:
 		case 0xde:
-			dynax_transparency_mask[(dynax_blit_reg >> 1) & 3] = data;
+			ddenlovr_transparency_mask[(ddenlovr_blit_reg >> 1) & 3] = data;
 			break;
 
 		case 0xe4:
-			dynax_priority_w(0,data);
+			ddenlovr_priority_w(0,data);
 			break;
 
 		case 0xe6:
-			dynax_layer_enable_w(0,data);
+			ddenlovr_layer_enable_w(0,data);
 			break;
 
 		case 0xe8:
-			dynax_bgcolor = data | hi_bits;
+			ddenlovr_bgcolor = data | hi_bits;
 			break;
 
 		case 0x90:
@@ -1077,10 +1080,10 @@ profiler_mark(PROFILER_VIDEO);
 			{
 				case 0x04:	blit_fill_xy(0, 0);
 							break;
-				case 0x14:	blit_fill_xy(dynax_blit_x, dynax_blit_y);
+				case 0x14:	blit_fill_xy(ddenlovr_blit_x, ddenlovr_blit_y);
 							break;
 
-				case 0x10:	dynax_blit_address = blit_draw(dynax_blit_address,dynax_blit_x);
+				case 0x10:	ddenlovr_blit_address = blit_draw(ddenlovr_blit_address,ddenlovr_blit_x);
 							break;
 
 				case 0x13:	blit_horiz_line();
@@ -1111,7 +1114,7 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter 0 reg %02x = %02x\n", activecpu_get_pc(), dynax_blit_reg, data);
+			logerror("%06x: Blitter 0 reg %02x = %02x\n", activecpu_get_pc(), ddenlovr_blit_reg, data);
 			break;
 	}
 
@@ -1137,12 +1140,12 @@ static WRITE16_HANDLER( ddenlovr_blitter_irq_ack_w )
 	{
 		if (data & 1)
 		{
-			dynax_blitter_irq_enable = 1;
+			ddenlovr_blitter_irq_enable = 1;
 		}
 		else
 		{
-			dynax_blitter_irq_enable = 0;
-			dynax_blitter_irq_flag = 0;
+			ddenlovr_blitter_irq_enable = 0;
+			ddenlovr_blitter_irq_flag = 0;
 		}
 	}
 }
@@ -1152,7 +1155,7 @@ static READ8_HANDLER( rongrong_gfxrom_r )
 {
 	UINT8 *rom	=	memory_region( REGION_GFX1 );
 	size_t size	=	memory_region_length( REGION_GFX1 );
-	int address	=	dynax_blit_address;
+	int address	=	ddenlovr_blit_address;
 
 	if (address >= size)
 	{
@@ -1160,7 +1163,7 @@ static READ8_HANDLER( rongrong_gfxrom_r )
 		address %= size;
 	}
 
-	dynax_blit_address = (dynax_blit_address + 1) & 0xffffff;
+	ddenlovr_blit_address = (ddenlovr_blit_address + 1) & 0xffffff;
 
 	return rom[address];
 }
@@ -1175,25 +1178,25 @@ static READ16_HANDLER( ddenlovr_gfxrom_r )
 static void copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int layer)
 {
 	int x,y;
-	int scrollx = dynax_scroll[layer/4*8 + (layer%4) + 0];
-	int scrolly = dynax_scroll[layer/4*8 + (layer%4) + 4];
+	int scrollx = ddenlovr_scroll[layer/4*8 + (layer%4) + 0];
+	int scrolly = ddenlovr_scroll[layer/4*8 + (layer%4) + 4];
 
-	int palbase = dynax_palette_base[layer];
-	int penmask = dynax_palette_mask[layer];
+	int palbase = ddenlovr_palette_base[layer];
+	int penmask = ddenlovr_palette_mask[layer];
 
-	int transpen = dynax_transparency_pen[layer];
-	int transmask = dynax_transparency_mask[layer];
+	int transpen = ddenlovr_transparency_pen[layer];
+	int transmask = ddenlovr_transparency_mask[layer];
 
 	palbase		&=	~penmask;
 	transpen	&=	transmask;
 
-	if (((dynax_layer_enable2 << 4) | dynax_layer_enable) & (1 << layer))
+	if (((ddenlovr_layer_enable2 << 4) | ddenlovr_layer_enable) & (1 << layer))
 	{
 		for (y = cliprect->min_y;y <= cliprect->max_y;y++)
 		{
 			for (x = cliprect->min_x;x <= cliprect->max_x;x++)
 			{
-				int pen = pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
+				int pen = ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
 				if ( (pen & transmask) != transpen )
 				{
 					pen &= penmask;
@@ -1227,22 +1230,22 @@ VIDEO_EOF(ddenlovr)
 
 	int pri;
 
-	int enab = dynax_layer_enable;
-	int enab2 = dynax_layer_enable2;
+	int enab = ddenlovr_layer_enable;
+	int enab2 = ddenlovr_layer_enable2;
 
 #if 0
 	static int base = 0x0;
 
 	int next;
-	memset(pixmap[0],0,512*512);
-	memset(pixmap[1],0,512*512);
-	memset(pixmap[2],0,512*512);
-	memset(pixmap[3],0,512*512);
-	dynax_dest_layer = 8;
-	dynax_blit_pen = 0;
-	dynax_blit_pen_mode = 0;
-	dynax_blit_y = 5;
-	dynax_clip_ctrl = 0x0f;
+	memset(ddenlovr_pixmap[0],0,512*512);
+	memset(ddenlovr_pixmap[1],0,512*512);
+	memset(ddenlovr_pixmap[2],0,512*512);
+	memset(ddenlovr_pixmap[3],0,512*512);
+	ddenlovr_dest_layer = 8;
+	ddenlovr_blit_pen = 0;
+	ddenlovr_blit_pen_mode = 0;
+	ddenlovr_blit_y = 5;
+	ddenlovr_clip_ctrl = 0x0f;
 	next = blit_draw(base,0);
 	popmessage("GFX %06x",base);
 	if (input_code_pressed(KEYCODE_S)) base = next;
@@ -1253,7 +1256,7 @@ VIDEO_EOF(ddenlovr)
 	if (input_code_pressed_once(KEYCODE_F)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	fillbitmap(framebuffer,dynax_bgcolor,&machine->screen[0].visarea);
+	fillbitmap(framebuffer,ddenlovr_bgcolor,&machine->screen[0].visarea);
 
 #ifdef MAME_DEBUG
 	if (input_code_pressed(KEYCODE_Z))
@@ -1279,13 +1282,13 @@ VIDEO_EOF(ddenlovr)
 
 		if (mask || mask2)
 		{
-			dynax_layer_enable &= mask;
-			dynax_layer_enable2 &= mask2;
+			ddenlovr_layer_enable &= mask;
+			ddenlovr_layer_enable2 &= mask2;
 		}
 	}
 #endif
 
-	pri = dynax_priority;
+	pri = ddenlovr_priority;
 
 		if (pri >= 24)
 		{
@@ -1300,7 +1303,7 @@ VIDEO_EOF(ddenlovr)
 
 	if (extra_layers)
 	{
-		pri = dynax_priority2;
+		pri = ddenlovr_priority2;
 
 		if (pri >= 24)
 		{
@@ -1314,13 +1317,13 @@ VIDEO_EOF(ddenlovr)
 		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][3]+4);
 	}
 
-	dynax_layer_enable = enab;
-	dynax_layer_enable2 = enab2;
+	ddenlovr_layer_enable = enab;
+	ddenlovr_layer_enable2 = enab2;
 }
 
 READ16_HANDLER( ddenlovr_special_r )
 {
-	int res = readinputport(2) | (dynax_blitter_irq_flag << 6);
+	int res = readinputport(2) | (ddenlovr_blitter_irq_flag << 6);
 
 	return res;
 }
@@ -1364,65 +1367,65 @@ static WRITE16_HANDLER( ddenlovr_palette_w )
 }
 
 
-static WRITE8_HANDLER( dynax_palette_base_w )
+WRITE8_HANDLER( ddenlovr_palette_base_w )
 {
-	dynax_palette_base[offset] = data;
+	ddenlovr_palette_base[offset] = data;
 }
-static WRITE8_HANDLER( dynax_palette_base2_w )
+WRITE8_HANDLER( ddenlovr_palette_base2_w )
 {
-	dynax_palette_base[offset+4] = data;
-}
-
-static WRITE8_HANDLER( dynax_palette_mask_w )
-{
-	dynax_palette_mask[offset] = data;
-}
-static WRITE8_HANDLER( dynax_palette_mask2_w )
-{
-	dynax_palette_mask[offset+4] = data;
+	ddenlovr_palette_base[offset+4] = data;
 }
 
-static WRITE8_HANDLER( dynax_transparency_pen_w )
+WRITE8_HANDLER( ddenlovr_palette_mask_w )
 {
-	dynax_transparency_pen[offset] = data;
+	ddenlovr_palette_mask[offset] = data;
 }
-static WRITE8_HANDLER( dynax_transparency_pen2_w )
+WRITE8_HANDLER( ddenlovr_palette_mask2_w )
 {
-	dynax_transparency_pen[offset+4] = data;
-}
-
-static WRITE8_HANDLER( dynax_transparency_mask_w )
-{
-	dynax_transparency_mask[offset] = data;
-}
-static WRITE8_HANDLER( dynax_transparency_mask2_w )
-{
-	dynax_transparency_mask[offset+4] = data;
+	ddenlovr_palette_mask[offset+4] = data;
 }
 
+WRITE8_HANDLER( ddenlovr_transparency_pen_w )
+{
+	ddenlovr_transparency_pen[offset] = data;
+}
+WRITE8_HANDLER( ddenlovr_transparency_pen2_w )
+{
+	ddenlovr_transparency_pen[offset+4] = data;
+}
 
-static WRITE16_HANDLER( ddenlovr_palette_base_w )
+WRITE8_HANDLER( ddenlovr_transparency_mask_w )
+{
+	ddenlovr_transparency_mask[offset] = data;
+}
+WRITE8_HANDLER( ddenlovr_transparency_mask2_w )
+{
+	ddenlovr_transparency_mask[offset+4] = data;
+}
+
+
+WRITE16_HANDLER( ddenlovr16_palette_base_w )
 {
 	if (ACCESSING_LSB)
-		dynax_palette_base[offset] = data & 0xff;
+		ddenlovr_palette_base[offset] = data & 0xff;
 }
 
-static WRITE16_HANDLER( ddenlovr_palette_mask_w )
+WRITE16_HANDLER( ddenlovr16_palette_mask_w )
 {
 	if (ACCESSING_LSB)
-		dynax_palette_mask[offset] = data & 0xff;
+		ddenlovr_palette_mask[offset] = data & 0xff;
 }
 
-static WRITE16_HANDLER( ddenlovr_transparency_pen_w )
+WRITE16_HANDLER( ddenlovr16_transparency_pen_w )
 {
 	if (ACCESSING_LSB)
-		dynax_transparency_pen[offset] = data & 0xff;
+		ddenlovr_transparency_pen[offset] = data & 0xff;
 }
 
-static WRITE16_HANDLER( ddenlovr_transparency_mask_w )
+WRITE16_HANDLER( ddenlovr16_transparency_mask_w )
 {
 	if (ACCESSING_LSB)
-		dynax_transparency_mask[offset] = data & 0xff;
+		ddenlovr_transparency_mask[offset] = data & 0xff;
 }
 
 
@@ -1471,35 +1474,35 @@ static READ16_HANDLER( unk16_r )
 }
 
 
-static UINT8 dynax_select, dynax_select2;
+static UINT8 ddenlovr_select, ddenlovr_select2;
 
-WRITE8_HANDLER( dynax_select_w )
+WRITE8_HANDLER( ddenlovr_select_w )
 {
-	dynax_select = data;
+	ddenlovr_select = data;
 }
 
-WRITE16_HANDLER( dynax_select_16_w )
+WRITE16_HANDLER( ddenlovr_select_16_w )
 {
 	if (ACCESSING_LSB)
-		dynax_select = data;
+		ddenlovr_select = data;
 }
 
-WRITE8_HANDLER( dynax_select2_w )
+WRITE8_HANDLER( ddenlovr_select2_w )
 {
-	dynax_select2 = data;
+	ddenlovr_select2 = data;
 }
 
-WRITE16_HANDLER( dynax_select2_16_w )
+WRITE16_HANDLER( ddenlovr_select2_16_w )
 {
 	if (ACCESSING_LSB)
-		dynax_select2 = data;
+		ddenlovr_select2 = data;
 }
 
 READ8_HANDLER( rongrong_input2_r )
 {
-//  logerror("%04x: input2_r offset %d select %x\n",activecpu_get_pc(),offset,dynax_select2 );
+//  logerror("%04x: input2_r offset %d select %x\n",activecpu_get_pc(),offset,ddenlovr_select2 );
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
-	switch( dynax_select2 )
+	switch( ddenlovr_select2 )
 	{
 		case 0x00:	return readinputport(0);
 		case 0x01:	return readinputport(1);
@@ -1511,23 +1514,23 @@ READ8_HANDLER( rongrong_input2_r )
 
 READ8_HANDLER( quiz365_input_r )
 {
-	if (!(dynax_select & 0x01))	return readinputport(3);
-	if (!(dynax_select & 0x02))	return readinputport(4);
-	if (!(dynax_select & 0x04))	return readinputport(5);
-	if (!(dynax_select & 0x08))	return 0xff;//mame_rand(Machine);
-	if (!(dynax_select & 0x10))	return 0xff;//mame_rand(Machine);
+	if (!(ddenlovr_select & 0x01))	return readinputport(3);
+	if (!(ddenlovr_select & 0x02))	return readinputport(4);
+	if (!(ddenlovr_select & 0x04))	return readinputport(5);
+	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(Machine);
+	if (!(ddenlovr_select & 0x10))	return 0xff;//mame_rand(Machine);
 	return 0xff;
 }
 
 READ16_HANDLER( quiz365_input2_r )
 {
-//  logerror("%04x: input2_r offset %d select %x\n",activecpu_get_pc(),offset,dynax_select2 );
+//  logerror("%04x: input2_r offset %d select %x\n",activecpu_get_pc(),offset,ddenlovr_select2 );
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
-	switch( dynax_select2 )
+	switch( ddenlovr_select2 )
 	{
 		case 0x10:	return readinputport(0);
 		case 0x11:	return readinputport(1);
-		case 0x12:	return readinputport(2) | (dynax_blitter_irq_flag << 6);
+		case 0x12:	return readinputport(2) | (ddenlovr_blitter_irq_flag << 6);
 	}
 	return 0xff;
 }
@@ -1557,7 +1560,7 @@ static WRITE16_HANDLER( quiz365_coincounter_w )
 {
 	if (ACCESSING_LSB)
 	{
-		if (dynax_select2 == 0x1c)
+		if (ddenlovr_select2 == 0x1c)
 		{
 			coin_counter_w(0, ~data & 1);
 			coin_counter_w(1, ~data & 4);
@@ -1602,15 +1605,15 @@ static ADDRESS_MAP_START( quiz365_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w			)	// Palette
 	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITE(quiz365_protection_w			)	// Protection
 //  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(MWA16_RAM                     )   // ?
-	AM_RANGE(0x300200, 0x300201) AM_WRITE(dynax_select2_16_w		)
+	AM_RANGE(0x300200, 0x300201) AM_WRITE(ddenlovr_select2_16_w		)
 	AM_RANGE(0x300202, 0x300203) AM_WRITE(quiz365_coincounter_w			)	// Coin Counters + more stuff written on startup
-	AM_RANGE(0x300240, 0x300247) AM_WRITE(ddenlovr_palette_base_w		)
-	AM_RANGE(0x300248, 0x30024f) AM_WRITE(ddenlovr_palette_mask_w		)
-	AM_RANGE(0x300250, 0x300257) AM_WRITE(ddenlovr_transparency_pen_w	)
-	AM_RANGE(0x300258, 0x30025f) AM_WRITE(ddenlovr_transparency_mask_w	)
-	AM_RANGE(0x300268, 0x300269) AM_WRITE(ddenlovr_bgcolor_w			)
-	AM_RANGE(0x30026a, 0x30026b) AM_WRITE(ddenlovr_priority_w			)
-	AM_RANGE(0x30026c, 0x30026d) AM_WRITE(ddenlovr_layer_enable_w		)
+	AM_RANGE(0x300240, 0x300247) AM_WRITE(ddenlovr16_palette_base_w		)
+	AM_RANGE(0x300248, 0x30024f) AM_WRITE(ddenlovr16_palette_mask_w		)
+	AM_RANGE(0x300250, 0x300257) AM_WRITE(ddenlovr16_transparency_pen_w	)
+	AM_RANGE(0x300258, 0x30025f) AM_WRITE(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0x300268, 0x300269) AM_WRITE(ddenlovr16_bgcolor_w			)
+	AM_RANGE(0x30026a, 0x30026b) AM_WRITE(ddenlovr16_priority_w			)
+	AM_RANGE(0x30026c, 0x30026d) AM_WRITE(ddenlovr16_layer_enable_w		)
 	AM_RANGE(0x300280, 0x300283) AM_WRITE(ddenlovr_blitter_w			)
 	AM_RANGE(0x300300, 0x300301) AM_WRITE(YM2413_register_port_0_lsb_w	)
 	AM_RANGE(0x300302, 0x300303) AM_WRITE(YM2413_data_port_0_lsb_w		)
@@ -1648,7 +1651,7 @@ static WRITE16_HANDLER( ddenlvrj_coincounter_w )
 
 static READ16_HANDLER( ddenlvrj_blitter_r )
 {
-	return readinputport(2) | (dynax_blitter_irq_flag ? 0x60 : 0x00 );	// bit 4 = 1 -> blitter busy
+	return readinputport(2) | (ddenlovr_blitter_irq_flag ? 0x60 : 0x00 );	// bit 4 = 1 -> blitter busy
 }
 
 static ADDRESS_MAP_START( ddenlvrj_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1668,13 +1671,13 @@ static ADDRESS_MAP_START( ddenlvrj_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM						)	// ROM
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w			)	// Palette
 //  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(MWA16_RAM                     )   // ? B0 on startup, then 00
-	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr_palette_base_w		)
-	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr_palette_mask_w		)
-	AM_RANGE(0x300050, 0x300057) AM_WRITE(ddenlovr_transparency_pen_w	)
-	AM_RANGE(0x300058, 0x30005f) AM_WRITE(ddenlovr_transparency_mask_w	)
-	AM_RANGE(0x300068, 0x300069) AM_WRITE(ddenlovr_bgcolor_w			)
-	AM_RANGE(0x30006a, 0x30006b) AM_WRITE(ddenlovr_priority_w			)
-	AM_RANGE(0x30006c, 0x30006d) AM_WRITE(ddenlovr_layer_enable_w		)
+	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w		)
+	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w		)
+	AM_RANGE(0x300050, 0x300057) AM_WRITE(ddenlovr16_transparency_pen_w	)
+	AM_RANGE(0x300058, 0x30005f) AM_WRITE(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0x300068, 0x300069) AM_WRITE(ddenlovr16_bgcolor_w			)
+	AM_RANGE(0x30006a, 0x30006b) AM_WRITE(ddenlovr16_priority_w			)
+	AM_RANGE(0x30006c, 0x30006d) AM_WRITE(ddenlovr16_layer_enable_w		)
 	AM_RANGE(0x300080, 0x300083) AM_WRITE(ddenlovr_blitter_w			)
 	AM_RANGE(0x3000c0, 0x3000c1) AM_WRITE(YM2413_register_port_0_lsb_w	)
 	AM_RANGE(0x3000c2, 0x3000c3) AM_WRITE(YM2413_data_port_0_lsb_w		)
@@ -1709,13 +1712,13 @@ static ADDRESS_MAP_START( ddenlovr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(ddenlovr_oki_bank_w			)
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w			)	// Palette
 //  AM_RANGE(0xd01000, 0xd017ff) MWA16_RAM                              )   // ? B0 on startup, then 00
-	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr_palette_base_w		)
-	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr_palette_mask_w		)
-	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr_transparency_pen_w	)
-	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr_transparency_mask_w	)
-	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr_bgcolor_w			)
-	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr_priority_w			)
-	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr_layer_enable_w		)
+	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w		)
+	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w		)
+	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w	)
+	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr16_bgcolor_w			)
+	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr16_priority_w			)
+	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr16_layer_enable_w		)
 	AM_RANGE(0xe00080, 0xe00083) AM_WRITE(ddenlovr_blitter_w			)
 	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w	)	// Blitter irq acknowledge
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w		)	// Coin Counters
@@ -1733,14 +1736,14 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( nettoqc_special_r )
 {
-	return readinputport(2) | (dynax_blitter_irq_flag ? 0x60 : 0x00 );
+	return readinputport(2) | (ddenlovr_blitter_irq_flag ? 0x60 : 0x00 );
 }
 
 static READ16_HANDLER( nettoqc_input_r )
 {
-	if (!(dynax_select & 0x01))	return readinputport(3);
-	if (!(dynax_select & 0x02))	return readinputport(4);
-	if (!(dynax_select & 0x04))	return readinputport(5);
+	if (!(ddenlovr_select & 0x01))	return readinputport(3);
+	if (!(ddenlovr_select & 0x02))	return readinputport(4);
+	if (!(ddenlovr_select & 0x04))	return readinputport(5);
 	return 0xffff;
 }
 
@@ -1797,13 +1800,13 @@ static ADDRESS_MAP_START( nettoqc_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w			)	// Palette
 	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITE(MWA16_RAM) AM_BASE(&nettoqc_protection_val	)	//
 	AM_RANGE(0x201000, 0x2017ff) AM_WRITE(MWA16_RAM 					)	// ?
-	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr_palette_base_w		)
-	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr_palette_mask_w		)
-	AM_RANGE(0x300050, 0x300057) AM_WRITE(ddenlovr_transparency_pen_w	)
-	AM_RANGE(0x300058, 0x30005f) AM_WRITE(ddenlovr_transparency_mask_w	)
-	AM_RANGE(0x300068, 0x300069) AM_WRITE(ddenlovr_bgcolor_w			)
-	AM_RANGE(0x30006a, 0x30006b) AM_WRITE(ddenlovr_priority_w			)
-	AM_RANGE(0x30006c, 0x30006d) AM_WRITE(ddenlovr_layer_enable_w		)
+	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w		)
+	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w		)
+	AM_RANGE(0x300050, 0x300057) AM_WRITE(ddenlovr16_transparency_pen_w	)
+	AM_RANGE(0x300058, 0x30005f) AM_WRITE(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0x300068, 0x300069) AM_WRITE(ddenlovr16_bgcolor_w			)
+	AM_RANGE(0x30006a, 0x30006b) AM_WRITE(ddenlovr16_priority_w			)
+	AM_RANGE(0x30006c, 0x30006d) AM_WRITE(ddenlovr16_layer_enable_w		)
 	AM_RANGE(0x300080, 0x300083) AM_WRITE(ddenlovr_blitter_w			)
 	AM_RANGE(0x3000c0, 0x3000c1) AM_WRITE(YM2413_register_port_0_lsb_w	)
 	AM_RANGE(0x3000c2, 0x3000c3) AM_WRITE(YM2413_data_port_0_lsb_w		)
@@ -1811,7 +1814,7 @@ static ADDRESS_MAP_START( nettoqc_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300140, 0x300141) AM_WRITE(AY8910_control_port_0_lsb_w	)
 	AM_RANGE(0x300142, 0x300143) AM_WRITE(AY8910_write_port_0_lsb_w		)
 	AM_RANGE(0x300188, 0x300189) AM_WRITE(nettoqc_coincounter_w			)	// Coin Counters
-	AM_RANGE(0x30018a, 0x30018b) AM_WRITE(dynax_select_16_w				)	//
+	AM_RANGE(0x30018a, 0x30018b) AM_WRITE(ddenlovr_select_16_w				)	//
 	AM_RANGE(0x30018c, 0x30018d) AM_WRITE(nettoqc_oki_bank_w			)
 	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w	)	// Blitter irq acknowledge
 	AM_RANGE(0x300240, 0x300241) AM_WRITE(OKIM6295_data_0_lsb_w 		)
@@ -1825,11 +1828,11 @@ ADDRESS_MAP_END
 
 READ8_HANDLER( rongrong_input_r )
 {
-	if (!(dynax_select & 0x01))	return readinputport(3);
-	if (!(dynax_select & 0x02))	return readinputport(4);
-	if (!(dynax_select & 0x04))	return 0xff;//mame_rand(Machine);
-	if (!(dynax_select & 0x08))	return 0xff;//mame_rand(Machine);
-	if (!(dynax_select & 0x10))	return readinputport(5);
+	if (!(ddenlovr_select & 0x01))	return readinputport(3);
+	if (!(ddenlovr_select & 0x02))	return readinputport(4);
+	if (!(ddenlovr_select & 0x04))	return 0xff;//mame_rand(Machine);
+	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(Machine);
+	if (!(ddenlovr_select & 0x10))	return readinputport(5);
 	return 0xff;
 }
 
@@ -1840,7 +1843,7 @@ WRITE8_HANDLER( rongrong_select_w )
 //logerror("%04x: rongrong_select_w %02x\n",activecpu_get_pc(),data);
 	/* bits 0-4 = **both** ROM bank **AND** input select */
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x1f)]);
-	dynax_select = data;
+	ddenlovr_select = data;
 
 	/* bits 5-7 = RAM bank */
 	memory_set_bankptr(2, &rom[0x110000 + 0x1000 * ((data & 0xe0) >> 5)]);
@@ -1875,17 +1878,17 @@ static ADDRESS_MAP_START( quizchq_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 	AM_RANGE(0x00, 0x01) AM_WRITE(rongrong_blitter_w		)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(rongrong_blitter_busy_w	)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(rongrong_select_w			)
-	AM_RANGE(0x20, 0x20) AM_WRITE(dynax_select2_w			)
+	AM_RANGE(0x20, 0x20) AM_WRITE(ddenlovr_select2_w			)
 	AM_RANGE(0x40, 0x40) AM_WRITE(OKIM6295_data_0_w			)
 	AM_RANGE(0x60, 0x60) AM_WRITE(YM2413_register_port_0_w	)
 	AM_RANGE(0x61, 0x61) AM_WRITE(YM2413_data_port_0_w		)
-	AM_RANGE(0x80, 0x83) AM_WRITE(dynax_palette_base_w		)
-	AM_RANGE(0x84, 0x87) AM_WRITE(dynax_palette_mask_w		)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(dynax_transparency_pen_w	)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE(dynax_transparency_mask_w	)
-	AM_RANGE(0x94, 0x94) AM_WRITE(dynax_bgcolor_w			)
-	AM_RANGE(0x95, 0x95) AM_WRITE(dynax_priority_w			)
-	AM_RANGE(0x96, 0x96) AM_WRITE(dynax_layer_enable_w		)
+	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w		)
+	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w		)
+	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE(ddenlovr_transparency_mask_w	)
+	AM_RANGE(0x94, 0x94) AM_WRITE(ddenlovr_bgcolor_w			)
+	AM_RANGE(0x95, 0x95) AM_WRITE(ddenlovr_priority_w			)
+	AM_RANGE(0x96, 0x96) AM_WRITE(ddenlovr_layer_enable_w		)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(msm6242_w					)	// 6242RTC
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizchq_oki_bank_w		)
 	AM_RANGE(0xc2, 0xc2) AM_WRITE(MWA8_NOP					)	// enables palette RAM at 8000
@@ -1924,14 +1927,14 @@ static ADDRESS_MAP_START( rongrong_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_
 	AM_RANGE(0x40, 0x40) AM_WRITE(OKIM6295_data_0_w			)
 	AM_RANGE(0x60, 0x60) AM_WRITE(YM2413_register_port_0_w	)
 	AM_RANGE(0x61, 0x61) AM_WRITE(YM2413_data_port_0_w		)
-	AM_RANGE(0x80, 0x83) AM_WRITE(dynax_palette_base_w		)
-	AM_RANGE(0x84, 0x87) AM_WRITE(dynax_palette_mask_w		)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(dynax_transparency_pen_w	)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE(dynax_transparency_mask_w	)
-	AM_RANGE(0x94, 0x94) AM_WRITE(dynax_bgcolor_w			)
-	AM_RANGE(0x95, 0x95) AM_WRITE(dynax_priority_w			)
-	AM_RANGE(0x96, 0x96) AM_WRITE(dynax_layer_enable_w		)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(dynax_select2_w			)
+	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w		)
+	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w		)
+	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE(ddenlovr_transparency_mask_w	)
+	AM_RANGE(0x94, 0x94) AM_WRITE(ddenlovr_bgcolor_w			)
+	AM_RANGE(0x95, 0x95) AM_WRITE(ddenlovr_priority_w			)
+	AM_RANGE(0x96, 0x96) AM_WRITE(ddenlovr_layer_enable_w		)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(ddenlovr_select2_w			)
 	AM_RANGE(0xc2, 0xc2) AM_WRITE(MWA8_NOP					)	// enables palette RAM at f000, and protection device at f705/f706/f601
 ADDRESS_MAP_END
 /*
@@ -1998,7 +2001,7 @@ static WRITE8_HANDLER( mmpanic_leds2_w )
 
 static WRITE8_HANDLER( mmpanic_lockout_w )
 {
-	if (dynax_select == 0x0c)
+	if (ddenlovr_select == 0x0c)
 	{
 		coin_counter_w(0,(~data) & 0x01);
 		coin_lockout_w(0,(~data) & 0x02);
@@ -2041,25 +2044,25 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mmpanic_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x0f) AM_WRITE(msm6242_w					)	// 6242RTC
 	// Layers 0-3:
-	AM_RANGE(0x20, 0x23) AM_WRITE(dynax_palette_base_w		)
-	AM_RANGE(0x24, 0x27) AM_WRITE(dynax_palette_mask_w		)
-	AM_RANGE(0x28, 0x2b) AM_WRITE(dynax_transparency_pen_w	)
-	AM_RANGE(0x2c, 0x2f) AM_WRITE(dynax_transparency_mask_w	)
-	AM_RANGE(0x34, 0x34) AM_WRITE(dynax_bgcolor_w			)
-	AM_RANGE(0x35, 0x35) AM_WRITE(dynax_priority_w			)
-	AM_RANGE(0x36, 0x36) AM_WRITE(dynax_layer_enable_w		)
+	AM_RANGE(0x20, 0x23) AM_WRITE(ddenlovr_palette_base_w		)
+	AM_RANGE(0x24, 0x27) AM_WRITE(ddenlovr_palette_mask_w		)
+	AM_RANGE(0x28, 0x2b) AM_WRITE(ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x2c, 0x2f) AM_WRITE(ddenlovr_transparency_mask_w	)
+	AM_RANGE(0x34, 0x34) AM_WRITE(ddenlovr_bgcolor_w			)
+	AM_RANGE(0x35, 0x35) AM_WRITE(ddenlovr_priority_w			)
+	AM_RANGE(0x36, 0x36) AM_WRITE(ddenlovr_layer_enable_w		)
 	// Layers 4-7:
-	AM_RANGE(0x40, 0x43) AM_WRITE(dynax_palette_base2_w		)
-	AM_RANGE(0x44, 0x47) AM_WRITE(dynax_palette_mask2_w		)
-	AM_RANGE(0x48, 0x4b) AM_WRITE(dynax_transparency_pen2_w	)
-	AM_RANGE(0x4c, 0x4f) AM_WRITE(dynax_transparency_mask2_w)
-	AM_RANGE(0x54, 0x54) AM_WRITE(dynax_bgcolor2_w			)
-	AM_RANGE(0x55, 0x55) AM_WRITE(dynax_priority2_w			)
-	AM_RANGE(0x56, 0x56) AM_WRITE(dynax_layer_enable2_w		)
+	AM_RANGE(0x40, 0x43) AM_WRITE(ddenlovr_palette_base2_w		)
+	AM_RANGE(0x44, 0x47) AM_WRITE(ddenlovr_palette_mask2_w		)
+	AM_RANGE(0x48, 0x4b) AM_WRITE(ddenlovr_transparency_pen2_w	)
+	AM_RANGE(0x4c, 0x4f) AM_WRITE(ddenlovr_transparency_mask2_w)
+	AM_RANGE(0x54, 0x54) AM_WRITE(ddenlovr_bgcolor2_w			)
+	AM_RANGE(0x55, 0x55) AM_WRITE(ddenlovr_priority2_w			)
+	AM_RANGE(0x56, 0x56) AM_WRITE(ddenlovr_layer_enable2_w		)
 
 	AM_RANGE(0x60, 0x61) AM_WRITE(mmpanic_blitter_w			)
 	AM_RANGE(0x64, 0x65) AM_WRITE(mmpanic_blitter2_w		)
-	AM_RANGE(0x68, 0x68) AM_WRITE(dynax_select_w			)
+	AM_RANGE(0x68, 0x68) AM_WRITE(ddenlovr_select_w			)
 	AM_RANGE(0x69, 0x69) AM_WRITE(mmpanic_lockout_w			)
 	AM_RANGE(0x74, 0x74) AM_WRITE(mmpanic_rombank_w			)
 
@@ -2137,7 +2140,7 @@ WRITE8_HANDLER( funkyfig_rombank_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 
-	dynax_select = data;
+	ddenlovr_select = data;
 
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
 	// bit 4 selects palette ram at 8000?
@@ -2146,10 +2149,10 @@ WRITE8_HANDLER( funkyfig_rombank_w )
 
 READ8_HANDLER( funkyfig_dsw_r )
 {
-	if (!(dynax_select & 0x01))	return readinputport(3);
-	if (!(dynax_select & 0x02))	return readinputport(4);
-	if (!(dynax_select & 0x04))	return readinputport(5);
-	logerror("%06x: warning, unknown bits read, dynax_select = %02x\n", activecpu_get_pc(), dynax_select);
+	if (!(ddenlovr_select & 0x01))	return readinputport(3);
+	if (!(ddenlovr_select & 0x02))	return readinputport(4);
+	if (!(ddenlovr_select & 0x04))	return readinputport(5);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
 	return 0xff;
 }
 
@@ -2157,29 +2160,29 @@ static UINT8 funkyfig_lockout;
 
 READ8_HANDLER( funkyfig_coin_r )
 {
-	switch( dynax_select2 )
+	switch( ddenlovr_select2 )
 	{
 		case 0x22:	return readinputport(2);
 		case 0x23:	return funkyfig_lockout;
 	}
-	logerror("%06x: warning, unknown bits read, dynax_select2 = %02x\n", activecpu_get_pc(), dynax_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
 	return 0xff;
 }
 
 READ8_HANDLER( funkyfig_key_r )
 {
-	switch( dynax_select2 )
+	switch( ddenlovr_select2 )
 	{
 		case 0x20:	return readinputport(0);
 		case 0x21:	return readinputport(1);
 	}
-	logerror("%06x: warning, unknown bits read, dynax_select2 = %02x\n", activecpu_get_pc(), dynax_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
 	return 0xff;
 }
 
 static WRITE8_HANDLER( funkyfig_lockout_w )
 {
-	switch( dynax_select2 )
+	switch( ddenlovr_select2 )
 	{
 		case 0x2c:
 			funkyfig_lockout = data;
@@ -2192,7 +2195,7 @@ static WRITE8_HANDLER( funkyfig_lockout_w )
 //      case 0xef:  16 bytes on startup
 
 		default:
-			logerror("%06x: warning, unknown bits written, dynax_select2 = %02x, data = %02x\n", activecpu_get_pc(), dynax_select2, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", activecpu_get_pc(), ddenlovr_select2, data);
 	}
 }
 
@@ -2217,15 +2220,15 @@ static ADDRESS_MAP_START( funkyfig_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_
 	AM_RANGE(0x40, 0x4f) AM_WRITE( msm6242_w				)	// 6242RTC
 
 	// Layers 0-3:
-	AM_RANGE(0x60, 0x63) AM_WRITE( dynax_palette_base_w		)
-	AM_RANGE(0x64, 0x67) AM_WRITE( dynax_palette_mask_w		)
-	AM_RANGE(0x68, 0x6b) AM_WRITE( dynax_transparency_pen_w	)
-	AM_RANGE(0x6c, 0x6f) AM_WRITE( dynax_transparency_mask_w)
-	AM_RANGE(0x74, 0x74) AM_WRITE( dynax_bgcolor_w			)
-	AM_RANGE(0x75, 0x75) AM_WRITE( dynax_priority_w			)
-	AM_RANGE(0x76, 0x76) AM_WRITE( dynax_layer_enable_w		)
+	AM_RANGE(0x60, 0x63) AM_WRITE( ddenlovr_palette_base_w		)
+	AM_RANGE(0x64, 0x67) AM_WRITE( ddenlovr_palette_mask_w		)
+	AM_RANGE(0x68, 0x6b) AM_WRITE( ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x6c, 0x6f) AM_WRITE( ddenlovr_transparency_mask_w)
+	AM_RANGE(0x74, 0x74) AM_WRITE( ddenlovr_bgcolor_w			)
+	AM_RANGE(0x75, 0x75) AM_WRITE( ddenlovr_priority_w			)
+	AM_RANGE(0x76, 0x76) AM_WRITE( ddenlovr_layer_enable_w		)
 
-	AM_RANGE(0x80, 0x80) AM_WRITE( dynax_select2_w			)
+	AM_RANGE(0x80, 0x80) AM_WRITE( ddenlovr_select2_w			)
 	AM_RANGE(0x81, 0x81) AM_WRITE( funkyfig_lockout_w		)
 	AM_RANGE(0xa2, 0xa2) AM_WRITE( mmpanic_leds2_w			)
 ADDRESS_MAP_END
@@ -2310,7 +2313,7 @@ static READ8_HANDLER( hanakanz_gfxrom_r )
 {
 	UINT8 *rom	=	memory_region( REGION_GFX1 );
 	size_t size		=	memory_region_length( REGION_GFX1 );
-	int address		=	(dynax_blit_address & 0xffffff) * 2;
+	int address		=	(ddenlovr_blit_address & 0xffffff) * 2;
 
 	static UINT8 romdata[2];
 
@@ -2325,7 +2328,7 @@ static READ8_HANDLER( hanakanz_gfxrom_r )
 		romdata[0] = rom[address + 0];
 		romdata[1] = rom[address + 1];
 
-		dynax_blit_address = (dynax_blit_address + 1) & 0xffffff;
+		ddenlovr_blit_address = (ddenlovr_blit_address + 1) & 0xffffff;
 
 		return romdata[0];
 	}
@@ -2357,18 +2360,18 @@ static WRITE8_HANDLER( hanakanz_palette_w )
 {
 	static int palette_index;
 
-	if (dynax_blit_reg & 0x80)
+	if (ddenlovr_blit_reg & 0x80)
 	{
-		palette_index = data | ((dynax_blit_reg & 1) << 8);
+		palette_index = data | ((ddenlovr_blit_reg & 1) << 8);
 	}
 	else
 	{
 		// 0bbggggg bbbrrrrr
 		// 04343210 21043210
 
-		int g = dynax_blit_reg & 0x1f;
+		int g = ddenlovr_blit_reg & 0x1f;
 		int r = data & 0x1f;
-		int b = ((data & 0xe0) >> 5) | ((dynax_blit_reg & 0x60) >> 2);
+		int b = ((data & 0xe0) >> 5) | ((ddenlovr_blit_reg & 0x60) >> 2);
 		palette_set_color_rgb(Machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
@@ -2509,7 +2512,7 @@ static void mjchuuka_get_romdata(void)
 {
 	UINT8 *rom	=	memory_region( REGION_GFX1 );
 	size_t size		=	memory_region_length( REGION_GFX1 );
-	int address		=	(dynax_blit_address & 0xffffff) * 2;
+	int address		=	(ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
 	{
@@ -2524,7 +2527,7 @@ static void mjchuuka_get_romdata(void)
 static READ8_HANDLER( mjchuuka_gfxrom_0_r )
 {
 	mjchuuka_get_romdata();
-	dynax_blit_address++;
+	ddenlovr_blit_address++;
 	return mjchuuka_romdata[0];
 }
 static READ8_HANDLER( mjchuuka_gfxrom_1_r )
@@ -2639,14 +2642,14 @@ static WRITE8_HANDLER( mjmyster_rambank_w )
 
 static WRITE8_HANDLER( mjmyster_select2_w )
 {
-	dynax_select2 = data;
+	ddenlovr_select2 = data;
 
 	if (data & 0x80)	keyb = 1;
 }
 
 static READ8_HANDLER( mjmyster_coins_r )
 {
-	switch( dynax_select2 )
+	switch( ddenlovr_select2 )
 	{
 		case 0x00:	return readinputport(0);
 		case 0x01:	return 0xff;
@@ -2654,7 +2657,7 @@ static READ8_HANDLER( mjmyster_coins_r )
 		case 0x03:	return 0xff;
 	}
 
-	logerror("%06x: warning, unknown bits read, dynax_select2 = %02x\n", activecpu_get_pc(), dynax_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
 
 	return 0xff;
 }
@@ -2677,18 +2680,18 @@ static READ8_HANDLER( mjmyster_keyb_r )
 
 static READ8_HANDLER( mjmyster_dsw_r )
 {
-	if (!(dynax_select & 0x01))	return readinputport(9);
-	if (!(dynax_select & 0x02))	return readinputport(8);
-	if (!(dynax_select & 0x04))	return readinputport(7);
-	if (!(dynax_select & 0x08))	return readinputport(6);
-	if (!(dynax_select & 0x10))	return readinputport(10);
-	logerror("%06x: warning, unknown bits read, dynax_select = %02x\n", activecpu_get_pc(), dynax_select);
+	if (!(ddenlovr_select & 0x01))	return readinputport(9);
+	if (!(ddenlovr_select & 0x02))	return readinputport(8);
+	if (!(ddenlovr_select & 0x04))	return readinputport(7);
+	if (!(ddenlovr_select & 0x08))	return readinputport(6);
+	if (!(ddenlovr_select & 0x10))	return readinputport(10);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
 	return 0xff;
 }
 
 static WRITE8_HANDLER( mjmyster_coincounter_w )
 {
-	switch( dynax_select2 )
+	switch( ddenlovr_select2 )
 	{
 		case 0x0c:
 			coin_counter_w(0, (~data) & 0x01);	// coin in
@@ -2700,7 +2703,7 @@ static WRITE8_HANDLER( mjmyster_coincounter_w )
 			break;
 
 		default:
-			logerror("%06x: warning, unknown bits written, dynax_select2 = %02x, data = %02x\n", activecpu_get_pc(), dynax_select2, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", activecpu_get_pc(), ddenlovr_select2, data);
 	}
 }
 
@@ -2733,13 +2736,13 @@ static ADDRESS_MAP_START( mjmyster_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_
 	AM_RANGE(0x46, 0x46) AM_WRITE( AY8910_write_port_0_w	)
 	AM_RANGE(0x48, 0x48) AM_WRITE( AY8910_control_port_0_w	)
 	AM_RANGE(0x60, 0x6f) AM_WRITE( msm6242_w				)	// 6242RTC
-	AM_RANGE(0x80, 0x83) AM_WRITE( dynax_palette_base_w		)
-	AM_RANGE(0x84, 0x87) AM_WRITE( dynax_palette_mask_w		)
-	AM_RANGE(0x88, 0x8b) AM_WRITE( dynax_transparency_pen_w	)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE( dynax_transparency_mask_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE( dynax_bgcolor_w			)
-	AM_RANGE(0x95, 0x95) AM_WRITE( dynax_priority_w			)
-	AM_RANGE(0x96, 0x96) AM_WRITE( dynax_layer_enable_w		)
+	AM_RANGE(0x80, 0x83) AM_WRITE( ddenlovr_palette_base_w		)
+	AM_RANGE(0x84, 0x87) AM_WRITE( ddenlovr_palette_mask_w		)
+	AM_RANGE(0x88, 0x8b) AM_WRITE( ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE( ddenlovr_transparency_mask_w)
+	AM_RANGE(0x94, 0x94) AM_WRITE( ddenlovr_bgcolor_w			)
+	AM_RANGE(0x95, 0x95) AM_WRITE( ddenlovr_priority_w			)
+	AM_RANGE(0x96, 0x96) AM_WRITE( ddenlovr_layer_enable_w		)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -2780,12 +2783,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( hginga_dsw_r )
 {
-	if (!(dynax_select & 0x01))	return readinputport(11);
-	if (!(dynax_select & 0x02))	return readinputport(12);
-	if (!(dynax_select & 0x04))	return readinputport(13);
-	if (!(dynax_select & 0x08))	return readinputport(14);
-	if (!(dynax_select & 0x10))	return readinputport(15);
-	logerror("%06x: warning, unknown bits read, dynax_select = %02x\n", activecpu_get_pc(), dynax_select);
+	if (!(ddenlovr_select & 0x01))	return readinputport(11);
+	if (!(ddenlovr_select & 0x02))	return readinputport(12);
+	if (!(ddenlovr_select & 0x04))	return readinputport(13);
+	if (!(ddenlovr_select & 0x08))	return readinputport(14);
+	if (!(ddenlovr_select & 0x10))	return readinputport(15);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
 	return 0xff;
 }
 
@@ -2861,11 +2864,11 @@ static WRITE8_HANDLER( hginga_blitter_w )
 {
 	if (offset == 0)
 	{
-		dynax_blit_reg = data;
+		ddenlovr_blit_reg = data;
 	}
 	else
 	{
-		switch (dynax_blit_reg & 0x3f)
+		switch (ddenlovr_blit_reg & 0x3f)
 		{
 			case 0x00:
 				switch (data & 0xf)
@@ -2909,13 +2912,13 @@ static ADDRESS_MAP_START( hginga_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FL
 	AM_RANGE(0x41, 0x41) AM_WRITE( hginga_coins_w			)
 	AM_RANGE(0x60, 0x6f) AM_WRITE( msm6242_w				)	// 6242RTC
 	AM_RANGE(0x80, 0x80) AM_WRITE( hginga_80_w				)
-	AM_RANGE(0xa0, 0xa3) AM_WRITE( dynax_palette_base_w		)
-	AM_RANGE(0xa4, 0xa7) AM_WRITE( dynax_palette_mask_w		)
-	AM_RANGE(0xa8, 0xab) AM_WRITE( dynax_transparency_pen_w	)
-	AM_RANGE(0xac, 0xaf) AM_WRITE( dynax_transparency_mask_w)
-	AM_RANGE(0xb4, 0xb4) AM_WRITE( dynax_bgcolor_w			)
-	AM_RANGE(0xb5, 0xb5) AM_WRITE( dynax_priority_w			)
-	AM_RANGE(0xb6, 0xb6) AM_WRITE( dynax_layer_enable_w		)
+	AM_RANGE(0xa0, 0xa3) AM_WRITE( ddenlovr_palette_base_w		)
+	AM_RANGE(0xa4, 0xa7) AM_WRITE( ddenlovr_palette_mask_w		)
+	AM_RANGE(0xa8, 0xab) AM_WRITE( ddenlovr_transparency_pen_w	)
+	AM_RANGE(0xac, 0xaf) AM_WRITE( ddenlovr_transparency_mask_w)
+	AM_RANGE(0xb4, 0xb4) AM_WRITE( ddenlovr_bgcolor_w			)
+	AM_RANGE(0xb5, 0xb5) AM_WRITE( ddenlovr_priority_w			)
+	AM_RANGE(0xb6, 0xb6) AM_WRITE( ddenlovr_layer_enable_w		)
 ADDRESS_MAP_END
 
 
@@ -2929,11 +2932,11 @@ static UINT8 hgokou_player_r(int player)
 {
 	UINT8 hopper_bit = ((hgokou_hopper && !(cpu_getcurrentframe()%10)) ? 0 : (1<<6));
 
-	if (!(dynax_select2 & 0x01))	return readinputport(player * 5 + 1) | hopper_bit;
-	if (!(dynax_select2 & 0x02))	return readinputport(player * 5 + 2) | hopper_bit;
-	if (!(dynax_select2 & 0x04))	return readinputport(player * 5 + 3) | hopper_bit;
-	if (!(dynax_select2 & 0x08))	return readinputport(player * 5 + 4) | hopper_bit;
-	if (!(dynax_select2 & 0x10))	return readinputport(player * 5 + 5) | hopper_bit;
+	if (!(ddenlovr_select2 & 0x01))	return readinputport(player * 5 + 1) | hopper_bit;
+	if (!(ddenlovr_select2 & 0x02))	return readinputport(player * 5 + 2) | hopper_bit;
+	if (!(ddenlovr_select2 & 0x04))	return readinputport(player * 5 + 3) | hopper_bit;
+	if (!(ddenlovr_select2 & 0x08))	return readinputport(player * 5 + 4) | hopper_bit;
+	if (!(ddenlovr_select2 & 0x10))	return readinputport(player * 5 + 5) | hopper_bit;
 
 	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 }
@@ -2967,7 +2970,7 @@ static WRITE8_HANDLER( hgokou_input_w )
 			hginga_coins = data;
 			break;
 
-		case 0x2d:	dynax_select2 = data;	break;
+		case 0x2d:	ddenlovr_select2 = data;	break;
 
 		case 0x2f:	break;	// ? written with 2f
 
@@ -3015,13 +3018,13 @@ static ADDRESS_MAP_START( hgokou_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FL
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(mjmyster_rambank_w		)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w			)
 	AM_RANGE(0x20, 0x2f) AM_WRITE(msm6242_w					)	// 6242RTC
-	AM_RANGE(0x40, 0x43) AM_WRITE(dynax_palette_base_w		)
-	AM_RANGE(0x44, 0x47) AM_WRITE(dynax_palette_mask_w		)
-	AM_RANGE(0x48, 0x4b) AM_WRITE(dynax_transparency_pen_w	)
-	AM_RANGE(0x4c, 0x4f) AM_WRITE(dynax_transparency_mask_w	)
-	AM_RANGE(0x54, 0x54) AM_WRITE(dynax_bgcolor_w			)
-	AM_RANGE(0x55, 0x55) AM_WRITE(dynax_priority_w			)
-	AM_RANGE(0x56, 0x56) AM_WRITE(dynax_layer_enable_w		)
+	AM_RANGE(0x40, 0x43) AM_WRITE(ddenlovr_palette_base_w		)
+	AM_RANGE(0x44, 0x47) AM_WRITE(ddenlovr_palette_mask_w		)
+	AM_RANGE(0x48, 0x4b) AM_WRITE(ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x4c, 0x4f) AM_WRITE(ddenlovr_transparency_mask_w	)
+	AM_RANGE(0x54, 0x54) AM_WRITE(ddenlovr_bgcolor_w			)
+	AM_RANGE(0x55, 0x55) AM_WRITE(ddenlovr_priority_w			)
+	AM_RANGE(0x56, 0x56) AM_WRITE(ddenlovr_layer_enable_w		)
 	AM_RANGE(0x60, 0x60) AM_WRITE(hginga_input_w			)
 	AM_RANGE(0x61, 0x61) AM_WRITE(hgokou_input_w			)
 	AM_RANGE(0x80, 0x80) AM_WRITE(OKIM6295_data_0_w			)
@@ -3040,7 +3043,7 @@ static WRITE8_HANDLER( hparadis_select_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 
-	dynax_select = data;
+	ddenlovr_select = data;
 	hginga_ip = 0;
 
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x07)]);
@@ -3065,11 +3068,11 @@ static READ8_HANDLER( hparadis_input_r )
 
 static READ8_HANDLER( hparadis_dsw_r )
 {
-	if (!(dynax_select & 0x01))	return readinputport(13);
-	if (!(dynax_select & 0x02))	return readinputport(14);
-	if (!(dynax_select & 0x04))	return 0xff;
-	if (!(dynax_select & 0x08))	return 0xff;
-	if (!(dynax_select & 0x10))	return readinputport(15);
+	if (!(ddenlovr_select & 0x01))	return readinputport(13);
+	if (!(ddenlovr_select & 0x02))	return readinputport(14);
+	if (!(ddenlovr_select & 0x04))	return 0xff;
+	if (!(ddenlovr_select & 0x08))	return 0xff;
+	if (!(ddenlovr_select & 0x10))	return readinputport(15);
 	return 0xff;
 }
 
@@ -3112,13 +3115,13 @@ static ADDRESS_MAP_START( hparadis_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_
 	AM_RANGE(0x40, 0x40) AM_WRITE(OKIM6295_data_0_w			)
 	AM_RANGE(0x60, 0x60) AM_WRITE(YM2413_register_port_0_w	)
 	AM_RANGE(0x61, 0x61) AM_WRITE(YM2413_data_port_0_w		)
-	AM_RANGE(0x80, 0x83) AM_WRITE(dynax_palette_base_w		)
-	AM_RANGE(0x84, 0x87) AM_WRITE(dynax_palette_mask_w		)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(dynax_transparency_pen_w	)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE(dynax_transparency_mask_w	)
-	AM_RANGE(0x94, 0x94) AM_WRITE(dynax_bgcolor_w			)
-	AM_RANGE(0x95, 0x95) AM_WRITE(dynax_priority_w			)
-	AM_RANGE(0x96, 0x96) AM_WRITE(dynax_layer_enable_w		)
+	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w		)
+	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w		)
+	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE(ddenlovr_transparency_mask_w	)
+	AM_RANGE(0x94, 0x94) AM_WRITE(ddenlovr_bgcolor_w			)
+	AM_RANGE(0x95, 0x95) AM_WRITE(ddenlovr_priority_w			)
+	AM_RANGE(0x96, 0x96) AM_WRITE(ddenlovr_layer_enable_w		)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(hginga_input_w			)
 	AM_RANGE(0xa1, 0xa1) AM_WRITE(hparadis_coin_w			)
 	AM_RANGE(0xc2, 0xc2) AM_WRITE(MWA8_NOP					)	// enables palette RAM at c000
@@ -3131,7 +3134,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjmywrld_coins_r )
 {
-	switch( dynax_select2 )
+	switch( ddenlovr_select2 )
 	{
 		case 0x80:	return readinputport(0);
 		case 0x81:	return 0x00;
@@ -3139,7 +3142,7 @@ static READ8_HANDLER( mjmywrld_coins_r )
 		case 0x83:	return 0x00;
 	}
 
-	logerror("%06x: warning, unknown bits read, dynax_select2 = %02x\n", activecpu_get_pc(), dynax_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
 
 	return 0xff;
 }
@@ -3168,13 +3171,13 @@ static ADDRESS_MAP_START( mjmywrld_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_
 	AM_RANGE(0x46, 0x46) AM_WRITE( AY8910_write_port_0_w	)
 	AM_RANGE(0x48, 0x48) AM_WRITE( AY8910_control_port_0_w	)
 	AM_RANGE(0x60, 0x6f) AM_WRITE( msm6242_w				)	// 6242RTC
-	AM_RANGE(0x80, 0x83) AM_WRITE( dynax_palette_base_w		)
-	AM_RANGE(0x84, 0x87) AM_WRITE( dynax_palette_mask_w		)
-	AM_RANGE(0x88, 0x8b) AM_WRITE( dynax_transparency_pen_w	)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE( dynax_transparency_mask_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE( dynax_bgcolor_w			)
-	AM_RANGE(0x95, 0x95) AM_WRITE( dynax_priority_w			)
-	AM_RANGE(0x96, 0x96) AM_WRITE( dynax_layer_enable_w		)
+	AM_RANGE(0x80, 0x83) AM_WRITE( ddenlovr_palette_base_w		)
+	AM_RANGE(0x84, 0x87) AM_WRITE( ddenlovr_palette_mask_w		)
+	AM_RANGE(0x88, 0x8b) AM_WRITE( ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE( ddenlovr_transparency_mask_w)
+	AM_RANGE(0x94, 0x94) AM_WRITE( ddenlovr_bgcolor_w			)
+	AM_RANGE(0x95, 0x95) AM_WRITE( ddenlovr_priority_w			)
+	AM_RANGE(0x96, 0x96) AM_WRITE( ddenlovr_layer_enable_w		)
 ADDRESS_MAP_END
 
 
@@ -3216,7 +3219,7 @@ static READ16_HANDLER( akamaru_dsw_r )
 
 static READ16_HANDLER( akamaru_blitter_r )
 {
-	return dynax_blitter_irq_flag << 6;	// bit 7 = 1 -> blitter busy
+	return ddenlovr_blitter_irq_flag << 6;	// bit 7 = 1 -> blitter busy
 }
 
 static READ16_HANDLER( akamaru_e0010d_r )
@@ -3247,13 +3250,13 @@ static ADDRESS_MAP_START( akamaru_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x213570, 0x213571) AM_WRITE(akamaru_protection1_w			)	// OKI bank
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w			)	// Palette
 //  AM_RANGE(0xd01000, 0xd017ff) AM_WRITE(MWA16_RAM                     )   // 0
-	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr_palette_base_w		)
-	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr_palette_mask_w		)
-	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr_transparency_pen_w	)
-	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr_transparency_mask_w	)
-	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr_bgcolor_w			)
-	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr_priority_w			)
-	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr_layer_enable_w		)
+	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w		)
+	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w		)
+	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w	)
+	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr16_bgcolor_w			)
+	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr16_priority_w			)
+	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr16_layer_enable_w		)
 	AM_RANGE(0xe00080, 0xe00083) AM_WRITE(ddenlovr_blitter_w			)
 	AM_RANGE(0xe00108, 0xe0010b) AM_WRITE(MWA16_RAM						) AM_BASE( &akamaru_protection2 )
 	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w	)	// Blitter irq acknowledge
@@ -3346,13 +3349,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjflove_writeport, ADDRESS_SPACE_IO, 8 )	// 16 bit I/O
 	AM_RANGE(0x001e, 0x001e) AM_WRITE( hanakanz_keyb_w			)	AM_MIRROR(0xff00)
-	AM_RANGE(0x0020, 0x0023) AM_WRITE( dynax_palette_base_w		)
-	AM_RANGE(0x0024, 0x0027) AM_WRITE( dynax_palette_mask_w		)
-	AM_RANGE(0x0028, 0x002b) AM_WRITE( dynax_transparency_pen_w	)
-	AM_RANGE(0x002c, 0x002f) AM_WRITE( dynax_transparency_mask_w)
-	AM_RANGE(0x0034, 0x0034) AM_WRITE( dynax_bgcolor_w			)
-	AM_RANGE(0x0035, 0x0035) AM_WRITE( dynax_priority_w			)
-	AM_RANGE(0x0036, 0x0036) AM_WRITE( dynax_layer_enable_w		)
+	AM_RANGE(0x0020, 0x0023) AM_WRITE( ddenlovr_palette_base_w		)
+	AM_RANGE(0x0024, 0x0027) AM_WRITE( ddenlovr_palette_mask_w		)
+	AM_RANGE(0x0028, 0x002b) AM_WRITE( ddenlovr_transparency_pen_w	)
+	AM_RANGE(0x002c, 0x002f) AM_WRITE( ddenlovr_transparency_mask_w)
+	AM_RANGE(0x0034, 0x0034) AM_WRITE( ddenlovr_bgcolor_w			)
+	AM_RANGE(0x0035, 0x0035) AM_WRITE( ddenlovr_priority_w			)
+	AM_RANGE(0x0036, 0x0036) AM_WRITE( ddenlovr_layer_enable_w		)
 	AM_RANGE(0x0040, 0x0041) AM_WRITE( mjflove_blitter_w		)	AM_MIRROR(0xff00)
 	AM_RANGE(0x00f2, 0x00f2) AM_WRITE( mjmyster_rambank_w		)	AM_MIRROR(0xff00)
 	AM_RANGE(0x00f8, 0x00f8) AM_WRITE( mjflove_rombank_w		)	AM_MIRROR(0xff00)
@@ -6571,7 +6574,7 @@ static struct AY8910interface quiz365_ay8910_interface =
 	quiz365_input_r,
 	0,
 	0,
-	dynax_select_w
+	ddenlovr_select_w
 };
 
 static MACHINE_DRIVER_START( quiz365 )
@@ -6911,7 +6914,7 @@ static struct AY8910interface mjmyster_ay8910_interface =
 	0,
 	0,
 	0,
-	dynax_select_w
+	ddenlovr_select_w
 };
 
 static MACHINE_DRIVER_START( mjmyster )
@@ -6958,7 +6961,7 @@ static struct AY8910interface hginga_ay8910_interface =
 {
 	// A            B
 	hginga_dsw_r,	0,					// R
-	0,				dynax_select_w		// W
+	0,				ddenlovr_select_w		// W
 };
 
 static MACHINE_DRIVER_START( hginga )

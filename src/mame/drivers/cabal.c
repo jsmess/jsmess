@@ -64,94 +64,6 @@ static MACHINE_RESET( cabalbl )
 
 /******************************************************************************************/
 
-// we should emulate the z80s, not simulate them
-#if 0
-static struct cabalbl_adpcm_state
-{
-	struct adpcm_state adpcm;
-	sound_stream *stream;
-	UINT32 current, end;
-	UINT8 nibble;
-	UINT8 playing;
-	UINT8 allocated;
-	UINT8 *base;
-} cabalbl_adpcm[2];
-
-static void cabalbl_adpcm_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	struct cabalbl_adpcm_state *state = param;
-	stream_sample_t *dest = outputs[0];
-
-	while (state->playing && samples > 0)
-	{
-		int val = (state->base[state->current] >> state->nibble) & 15;
-
-		state->nibble ^= 4;
-		if (state->nibble == 4)
-		{
-			state->current++;
-			if (state->current >= state->end)
-				state->playing = 0;
-		}
-
-		*dest++ = clock_adpcm(&state->adpcm, val);
-		samples--;
-	}
-	while (samples > 0)
-	{
-		*dest++ = 0;
-		samples--;
-	}
-}
-
-void *cabalbl_adpcm_start(int clock, const struct CustomSound_interface *config)
-{
-	int i;
-
-	for (i = 0; i < 2; i++)
-		if (!cabalbl_adpcm[i].allocated)
-		{
-			struct cabalbl_adpcm_state *state = &cabalbl_adpcm[i];
-			state->allocated = 1;
-			state->playing = 0;
-			state->stream = stream_create(0, 1, clock, state, cabalbl_adpcm_callback);
-			state->base = memory_region(REGION_SOUND1);
-			reset_adpcm(&state->adpcm);
-			return state;
-		}
-	return NULL;
-}
-
-void cabalbl_adpcm_stop(void *token)
-{
-	struct cabalbl_adpcm_state *state = token;
-	state->allocated = 0;
-}
-
-static void cabalbl_play_adpcm( int channel, int which ){
-	if( which!=0xff ){
-		UINT8 *RAM = memory_region(REGION_SOUND1);
-		int offset = channel*0x10000;
-		int start,len;
-
-		which = which&0x7f;
-		if( which ){
-			which = which*2+0x100;
-			start = RAM[offset+which] + 256*RAM[offset+which+1];
-			len = (RAM[offset+start]*256 + RAM[offset+start+1])*2;
-			start+=2;
-
-			if (cabalbl_adpcm[channel].stream)
-				stream_update(cabalbl_adpcm[channel].stream);
-			cabalbl_adpcm[channel].current = start + offset;
-			cabalbl_adpcm[channel].end = start + offset + len/2;
-			cabalbl_adpcm[channel].nibble = 4;
-			cabalbl_adpcm[channel].playing = 1;
-			cabalbl_adpcm[channel].base = RAM;
-		}
-	}
-}
-#endif
 static WRITE16_HANDLER( cabalbl_sndcmd_w )
 {
 	switch (offset)
@@ -270,24 +182,22 @@ ADDRESS_MAP_END
 /*********************************************************************/
 
 
-static READ8_HANDLER( cabalbl_snd_r )
+static READ8_HANDLER( cabalbl_snd2_r )
 {
-	switch(offset){
-		case 0x06: return input_port_3_r(0);
-		case 0x08: return cabal_sound_command2;
-		case 0x0a: return cabal_sound_command1;
-		default: return(0xff);
-	}
+	return cabal_sound_command2;
 }
 
-static WRITE8_HANDLER( cabalbl_snd_w )
+static READ8_HANDLER( cabalbl_snd1_r )
 {
-#if 0
-	switch( offset ){
-		case 0x00: cabalbl_play_adpcm( 0, data ); break;
-		case 0x02: cabalbl_play_adpcm( 1, data ); break;
-     }
-#endif
+	return cabal_sound_command1;
+}
+
+static WRITE8_HANDLER( cabalbl_coin_w )
+{
+	coin_counter_w(0, data & 1);
+	coin_counter_w(1, data & 2);
+
+	//data & 0x40? video enable?
 }
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
@@ -320,7 +230,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x400d) AM_READ(cabalbl_snd_r)
+	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
+	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
+	AM_RANGE(0x4006, 0x4006) AM_READ(input_port_3_r)
 	AM_RANGE(0x400f, 0x400f) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
@@ -328,44 +240,54 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4000, 0x4002) AM_WRITE(cabalbl_snd_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch3_w)
+	AM_RANGE(0x4002, 0x4002) AM_WRITE(soundlatch4_w)
+	AM_RANGE(0x4004, 0x4004) AM_WRITE(cabalbl_coin_w)
 	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x400e, 0x400e) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x400f, 0x400f) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(MWA8_NOP)  /*???*/
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(MWA8_NOP)  /* ??? */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
 
 /* the bootleg has 2x z80 sample players */
 
-READ8_HANDLER( cabalbl_talk1_port00_r )
+static WRITE8_HANDLER( cabalbl_adpcm_0_w )
 {
-	return mame_rand(Machine);
+	MSM5205_reset_w(0,(data>>7)&1);
+	/* ?? bit 6?? */
+	MSM5205_data_w(0,data);
+	MSM5205_vclk_w(0,1);
+	MSM5205_vclk_w(0,0);
+}
+
+static WRITE8_HANDLER( cabalbl_adpcm_1_w )
+{
+	MSM5205_reset_w(1,(data>>7)&1);
+	/* ?? bit 6?? */
+	MSM5205_data_w(1,data);
+	MSM5205_vclk_w(1,1);
+	MSM5205_vclk_w(1,0);
 }
 
 static ADDRESS_MAP_START( cabalbl_talk1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(MRA8_ROM, MWA8_NOP)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl_talk1_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(cabalbl_talk1_port00_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(MWA8_NOP) // DAC output?
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r)
+	AM_RANGE(0x01, 0x01) AM_WRITE(cabalbl_adpcm_0_w)
 ADDRESS_MAP_END
 
-READ8_HANDLER( cabalbl_talk2_port00_r )
-{
-	return mame_rand(Machine);
-}
-
 static ADDRESS_MAP_START( cabalbl_talk2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(MRA8_ROM, MWA8_NOP)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl_talk2_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(cabalbl_talk2_port00_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(MWA8_NOP) // DAC output?
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch4_r)
+	AM_RANGE(0x01, 0x01) AM_WRITE(cabalbl_adpcm_1_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/
@@ -582,12 +504,13 @@ static const gfx_layout sprite_layout =
 	64*16
 };
 
-static GFXDECODE_START( cabal )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, text_layout,		0, 1024/4 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout,		32*16, 16 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, sprite_layout,	16*16, 16 )
-GFXDECODE_END
 
+
+static GFXDECODE_START( cabal )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, text_layout,   0, 1024/4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, tile_layout,   32*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x000000, sprite_layout, 16*16, 16 )
+GFXDECODE_END
 
 
 static struct YM2151interface ym2151_interface =
@@ -607,7 +530,17 @@ static struct YM2151interface cabalbl_ym2151_interface =
 
 SEIBU_SOUND_SYSTEM_ADPCM_HARDWARE
 
+static struct MSM5205interface msm5205_interface_1 =
+{
+	0,
+	MSM5205_SEX_4B
+};
 
+static struct MSM5205interface msm5205_interface_2 =
+{
+	0,
+	MSM5205_SEX_4B
+};
 
 static MACHINE_DRIVER_START( cabal )
 
@@ -647,18 +580,12 @@ static MACHINE_DRIVER_START( cabal )
 	MDRV_SOUND_CONFIG(adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
+
 	MDRV_SOUND_ADD(CUSTOM, 8000)
 	MDRV_SOUND_CONFIG(adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_DRIVER_END
 
-#if 0
-static struct CustomSound_interface cabalbl_adpcm_interface =
-{
-	cabalbl_adpcm_start,
-	cabalbl_adpcm_stop
-};
-#endif
 
 /* the bootleg has different sound hardware (2 extra Z80s for ADPCM playback) */
 static MACHINE_DRIVER_START( cabalbl )
@@ -675,13 +602,12 @@ static MACHINE_DRIVER_START( cabalbl )
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cabalbl_talk1_map,0)
 	MDRV_CPU_IO_MAP(cabalbl_talk1_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,10)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cabalbl_talk2_map,0)
 	MDRV_CPU_IO_MAP(cabalbl_talk2_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,10)
-
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -707,13 +633,13 @@ static MACHINE_DRIVER_START( cabalbl )
 	MDRV_SOUND_CONFIG(cabalbl_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-//  MDRV_SOUND_ADD(CUSTOM, 8000)
-//  MDRV_SOUND_CONFIG(cabalbl_adpcm_interface)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_CONFIG(msm5205_interface_1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-//  MDRV_SOUND_ADD(CUSTOM, 8000)
-//  MDRV_SOUND_CONFIG(cabalbl_adpcm_interface)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_CONFIG(msm5205_interface_2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
 ROM_START( cabal )

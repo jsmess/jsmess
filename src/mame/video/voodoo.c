@@ -165,6 +165,7 @@ bits(7:4) and bit(24)), X, and Y:
 
 
 
+
 /*************************************
  *
  *  Statics
@@ -207,7 +208,7 @@ static UINT32 banshee_io_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
 static UINT32 banshee_rom_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
 
 /* work item management */
-static void work_item_enqueue(voodoo_state *v);
+static void work_item_enqueue(voodoo_state *v, work_info *work, int numitems);
 static void work_item_wait(voodoo_state *v);
 static void *work_item_callback(void *param);
 
@@ -228,10 +229,10 @@ static raster_info *find_rasterizer(voodoo_state *v, int texcount);
 static void dump_rasterizer_stats(voodoo_state *v);
 
 /* generic rasterizers */
-static void raster_fastfill(voodoo_state *v, INT32 scanline);
-static void raster_generic_0tmu(voodoo_state *v, INT32 y);
-static void raster_generic_1tmu(voodoo_state *v, INT32 y);
-static void raster_generic_2tmu(voodoo_state *v, INT32 y);
+static void raster_fastfill(work_info *work, INT32 scanline, INT32 startx, INT32 stopx);
+static void raster_generic_0tmu(work_info *work, INT32 y, INT32 startx, INT32 stopx);
+static void raster_generic_1tmu(work_info *work, INT32 y, INT32 startx, INT32 stopx);
+static void raster_generic_2tmu(work_info *work, INT32 y, INT32 startx, INT32 stopx);
 
 
 
@@ -287,7 +288,7 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
 	voodoo[which] = v;
 
 	/* create a multiprocessor work queue */
-	v->work.queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI);
+	v->work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI);
 
 	/* create a table of precomputed 1/n and log2(n) values */
 	/* n ranges from 1.0000 to 2.0000 */
@@ -423,8 +424,8 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
 void voodoo_exit(int which)
 {
 	/* release the work queue, ensuring all work is finished */
-	if (voodoo[which] != NULL && voodoo[which]->work.queue != NULL)
-		osd_work_queue_free(voodoo[which]->work.queue);
+	if (voodoo[which] != NULL && voodoo[which]->work_queue != NULL)
+		osd_work_queue_free(voodoo[which]->work_queue);
 }
 
 
@@ -2183,7 +2184,8 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 	}
 
 	/* wait for any outstanding work to finish */
-	work_item_wait(v);
+	if (regnum < vertexAx || regnum > fdWdY)
+		work_item_wait(v);
 
 	/* switch off the register */
 	switch (regnum)
@@ -2856,9 +2858,6 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	int x, y, scry, mask;
 	int pixel, destbuf;
 
-	/* wait for any outstanding work to finish */
-	work_item_wait(v);
-
 	/* statistics */
 	v->stats.lfb_writes++;
 
@@ -3082,6 +3081,9 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	depth = v->fbi.aux;
 	depthmax = v->fbi.auxmax;
 
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
+
 	/* simple case: no pipeline */
 	if (!LFBMODE_ENABLE_PIXEL_PIPELINE(v->reg[lfbMode].u))
 	{
@@ -3202,9 +3204,6 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 	int tmunum = (offset >> 19) & 0x03;
 	tmu_state *t;
 
-	/* wait for any outstanding work to finish */
-	work_item_wait(v);
-
 	/* statistics */
 	v->stats.tex_writes++;
 
@@ -3215,6 +3214,9 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 	if (TEXLOD_TDIRECT_WRITE(t->reg[tLOD].u))
 		fatalerror("Texture direct write!");
+
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
 
 	/* update texture info if dirty */
 	if (t->regdirty)
@@ -3811,9 +3813,6 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
 	UINT32 data;
 	int x, y, scry, destbuf;
 
-	/* wait for any outstanding work to finish */
-	work_item_wait(v);
-
 	/* statistics */
 	v->stats.lfb_reads++;
 
@@ -3855,6 +3854,9 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
 	bufoffs = scry * v->fbi.rowpixels + x;
 	if (bufoffs >= bufmax)
 		return 0xffffffff;
+
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
 
 	/* compute the data */
 	data = buffer[bufoffs + 0] | (buffer[bufoffs + 1] << 16);
@@ -4459,17 +4461,20 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
     remembering starting statistics
 -------------------------------------------------*/
 
-static void work_item_enqueue(voodoo_state *v)
+static void work_item_enqueue(voodoo_state *v, work_info *work, int numitems)
 {
 	/* remember the starting statistics values */
-	v->work.start_pixels_in = v->reg[fbiPixelsIn].u;
-	v->work.start_pixels_out = v->reg[fbiPixelsOut].u;
-	v->work.start_chroma_fail = v->reg[fbiChromaFail].u;
-	v->work.start_zfunc_fail = v->reg[fbiZfuncFail].u;
-	v->work.start_afunc_fail = v->reg[fbiAfuncFail].u;
+	work->start_pixels_in = v->reg[fbiPixelsIn].u;
+	work->start_pixels_out = v->reg[fbiPixelsOut].u;
+	work->start_chroma_fail = v->reg[fbiChromaFail].u;
+	work->start_zfunc_fail = v->reg[fbiZfuncFail].u;
+	work->start_afunc_fail = v->reg[fbiAfuncFail].u;
+
+	/* set the state */
+	work->state = v;
 
 	/* enqueue the work item */
-	osd_work_item_queue(v->work.queue, work_item_callback, &v->work, WORK_ITEM_FLAG_AUTO_RELEASE | WORK_ITEM_FLAG_SHARED);
+	osd_work_item_queue_multiple(v->work_queue, work_item_callback, numitems, work->unit, sizeof(*work->unit), WORK_ITEM_FLAG_AUTO_RELEASE);
 }
 
 
@@ -4480,24 +4485,26 @@ static void work_item_enqueue(voodoo_state *v)
 
 static void work_item_wait(voodoo_state *v)
 {
+	work_info *work = &v->work;
+
 	/* wait for the work item to complete */
-	osd_work_queue_wait(v->work.queue, osd_ticks_per_second());
+	osd_work_queue_wait(v->work_queue, osd_ticks_per_second());
 
 	/* update our global stats based on the results */
-	v->stats.total_pixels_in += v->reg[fbiPixelsIn].u - v->work.start_pixels_in;
-	v->stats.total_pixels_out += v->reg[fbiPixelsOut].u - v->work.start_pixels_out;
-	v->stats.total_chroma_fail += v->reg[fbiChromaFail].u - v->work.start_chroma_fail;
-	v->stats.total_zfunc_fail += v->reg[fbiZfuncFail].u - v->work.start_zfunc_fail;
-	v->stats.total_afunc_fail += v->reg[fbiAfuncFail].u - v->work.start_afunc_fail;
-	if (v->work.info != NULL)
-		v->work.info->hits += v->reg[fbiPixelsIn].u - v->work.start_pixels_in;
+	v->stats.total_pixels_in += v->reg[fbiPixelsIn].u - work->start_pixels_in;
+	v->stats.total_pixels_out += v->reg[fbiPixelsOut].u - work->start_pixels_out;
+	v->stats.total_chroma_fail += v->reg[fbiChromaFail].u - work->start_chroma_fail;
+	v->stats.total_zfunc_fail += v->reg[fbiZfuncFail].u - work->start_zfunc_fail;
+	v->stats.total_afunc_fail += v->reg[fbiAfuncFail].u - work->start_afunc_fail;
+	if (work->info != NULL)
+		work->info->hits += v->reg[fbiPixelsIn].u - work->start_pixels_in;
 
 	/* remember the starting statistics values */
-	v->work.start_pixels_in = v->reg[fbiPixelsIn].u;
-	v->work.start_pixels_out = v->reg[fbiPixelsOut].u;
-	v->work.start_chroma_fail = v->reg[fbiChromaFail].u;
-	v->work.start_zfunc_fail = v->reg[fbiZfuncFail].u;
-	v->work.start_afunc_fail = v->reg[fbiAfuncFail].u;
+	work->start_pixels_in = v->reg[fbiPixelsIn].u;
+	work->start_pixels_out = v->reg[fbiPixelsOut].u;
+	work->start_chroma_fail = v->reg[fbiChromaFail].u;
+	work->start_zfunc_fail = v->reg[fbiZfuncFail].u;
+	work->start_afunc_fail = v->reg[fbiAfuncFail].u;
 }
 
 
@@ -4509,22 +4516,13 @@ static void work_item_wait(voodoo_state *v)
 
 static void *work_item_callback(void *param)
 {
-	/* recover the state pointer and scanline from the param */
-	work_info *work = param;
-	voodoo_state *v = work->state;
+	work_unit *unit = param;
+	work_info *work = unit->work;
+	int extnum;
 
-	/* render the scanlines and return */
-	while (1)
-	{
-		int scanline = osd_sync_add(&work->curscanline, 1) - 1;
-
-		/* stop when we hit the end scanline */
-		if (scanline >= work->endscanline)
-			break;
-
-		/* handle this scanline then continue */
-		(*work->callback)(v, scanline);
-	}
+	/* iterate over extents */
+	for (extnum = 0; extnum < unit->count; extnum++)
+		(*work->callback)(work, unit->scanline + extnum, unit->extent[extnum].startx, unit->extent[extnum].stopx);
 	return NULL;
 }
 
@@ -4545,6 +4543,8 @@ static INT32 fastfill(voodoo_state *v)
 	int ex = (v->reg[clipLeftRight].u >> 0) & 0x3ff;
 	int sy = (v->reg[clipLowYHighY].u >> 16) & 0x3ff;
 	int ey = (v->reg[clipLowYHighY].u >> 0) & 0x3ff;
+	work_info *work = &v->work;
+	work_unit *unit = work->unit;
 	int x, y;
 
 	/* if we're not clearing either, take no time */
@@ -4559,11 +4559,11 @@ static INT32 fastfill(voodoo_state *v)
 		switch (destbuf)
 		{
 			case 0:		/* front buffer */
-				v->work.drawbuf = v->fbi.rgb[v->fbi.frontbuf];
+				work->drawbuf = v->fbi.rgb[v->fbi.frontbuf];
 				break;
 
 			case 1:		/* back buffer */
-				v->work.drawbuf = v->fbi.rgb[v->fbi.backbuf];
+				work->drawbuf = v->fbi.rgb[v->fbi.backbuf];
 				break;
 
 			default:	/* reserved */
@@ -4579,19 +4579,29 @@ static INT32 fastfill(voodoo_state *v)
 				int b = RGB_BLUE(v->reg[color1].u);
 
 				APPLY_DITHER(v->reg[fbzMode].u, x, y, r, g, b);
-				v->work.dither[y*4 + x] = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
+				work->dither[y*4 + x] = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
 			}
 	}
 
 	/* create a shared work item to actually perform the fill */
-	v->work.state = v;
-	v->work.minx = sx;
-	v->work.maxx = ex;
-	v->work.curscanline = sy;
-	v->work.endscanline = ey;
-	v->work.callback = raster_fastfill;
-	v->work.info = NULL;
-	work_item_enqueue(v);
+	work->startscanline = sy;
+	work->callback = raster_fastfill;
+	work->info = NULL;
+	for (y = sy; y < ey; y += SCANLINES_PER_WORK)
+	{
+		int extnum;
+
+		unit->work = work;
+		unit->scanline = y;
+		unit->count = MIN(ey - y, SCANLINES_PER_WORK);
+		for (extnum = 0; extnum < unit->count; extnum++)
+		{
+			unit->extent[extnum].startx = sx;
+			unit->extent[extnum].stopx = ex;
+		}
+		unit++;
+	}
+	work_item_enqueue(v, work, unit - work->unit);
 
 	/* track pixel writes to the frame buffer regardless of mask */
 	if (FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u))
@@ -4680,6 +4690,9 @@ static INT32 triangle(voodoo_state *v)
 			}
 		}
 	}
+
+	/* wait for any outstanding work to finish */
+	work_item_wait(v);
 
 	/* set up the textures */
 	for (texnum = 0; texnum < texcount; texnum++)
@@ -4809,9 +4822,6 @@ static INT32 setup_and_draw_triangle(voodoo_state *v)
 	float dx1, dy1, dx2, dy2;
 	float divisor, tdiv;
 
-	/* wait for any outstanding work to finish */
-	work_item_wait(v);
-
 	/* grab the X/Ys at least */
 	v->fbi.ax = (INT16)(v->fbi.svert[0].x * 16.0);
 	v->fbi.ay = (INT16)(v->fbi.svert[0].y * 16.0);
@@ -4937,7 +4947,16 @@ static INT32 setup_and_draw_triangle(voodoo_state *v)
 static INT32 triangle_create_work_item(voodoo_state *v, UINT16 *drawbuf, int texcount)
 {
 	raster_info *info = find_rasterizer(v, texcount);
+	work_info *work = &v->work;
+	work_unit *unit = work->unit;
 	int curscan, pixels = 0;
+	INT32 dxdy_minmid;
+	INT32 dxdy_minmax;
+	INT32 dxdy_midmax;
+	INT32 minx, miny;
+	INT32 midx, midy;
+	INT32 maxx, maxy;
+	INT32 endscanline;
 
 	/* sort the vertices */
 	/* note that this is not necessary on the Voodoo 1 as the card assumes the vertices */
@@ -4946,90 +4965,150 @@ static INT32 triangle_create_work_item(voodoo_state *v, UINT16 *drawbuf, int tex
 	{
 		if (v->fbi.by <= v->fbi.cy)
 		{
-			v->work.minx = v->fbi.ax;	v->work.miny = v->fbi.ay;
-			v->work.midx = v->fbi.bx;	v->work.midy = v->fbi.by;
-			v->work.maxx = v->fbi.cx;	v->work.maxy = v->fbi.cy;
+			minx = v->fbi.ax;	miny = v->fbi.ay;
+			midx = v->fbi.bx;	midy = v->fbi.by;
+			maxx = v->fbi.cx;	maxy = v->fbi.cy;
 		}
 		else if (v->fbi.ay <= v->fbi.cy)
 		{
-			v->work.minx = v->fbi.ax;	v->work.miny = v->fbi.ay;
-			v->work.midx = v->fbi.cx;	v->work.midy = v->fbi.cy;
-			v->work.maxx = v->fbi.bx;	v->work.maxy = v->fbi.by;
+			minx = v->fbi.ax;	miny = v->fbi.ay;
+			midx = v->fbi.cx;	midy = v->fbi.cy;
+			maxx = v->fbi.bx;	maxy = v->fbi.by;
 		}
 		else
 		{
-			v->work.minx = v->fbi.cx;	v->work.miny = v->fbi.cy;
-			v->work.midx = v->fbi.ax;	v->work.midy = v->fbi.ay;
-			v->work.maxx = v->fbi.bx;	v->work.maxy = v->fbi.by;
+			minx = v->fbi.cx;	miny = v->fbi.cy;
+			midx = v->fbi.ax;	midy = v->fbi.ay;
+			maxx = v->fbi.bx;	maxy = v->fbi.by;
 		}
 	}
 	else
 	{
 		if (v->fbi.ay <= v->fbi.cy)
 		{
-			v->work.minx = v->fbi.bx;	v->work.miny = v->fbi.by;
-			v->work.midx = v->fbi.ax;	v->work.midy = v->fbi.ay;
-			v->work.maxx = v->fbi.cx;	v->work.maxy = v->fbi.cy;
+			minx = v->fbi.bx;	miny = v->fbi.by;
+			midx = v->fbi.ax;	midy = v->fbi.ay;
+			maxx = v->fbi.cx;	maxy = v->fbi.cy;
 		}
 		else if (v->fbi.by <= v->fbi.cy)
 		{
-			v->work.minx = v->fbi.bx;	v->work.miny = v->fbi.by;
-			v->work.midx = v->fbi.cx;	v->work.midy = v->fbi.cy;
-			v->work.maxx = v->fbi.ax;	v->work.maxy = v->fbi.ay;
+			minx = v->fbi.bx;	miny = v->fbi.by;
+			midx = v->fbi.cx;	midy = v->fbi.cy;
+			maxx = v->fbi.ax;	maxy = v->fbi.ay;
 		}
 		else
 		{
-			v->work.minx = v->fbi.cx;	v->work.miny = v->fbi.cy;
-			v->work.midx = v->fbi.bx;	v->work.midy = v->fbi.by;
-			v->work.maxx = v->fbi.ax;	v->work.maxy = v->fbi.ay;
+			minx = v->fbi.cx;	miny = v->fbi.cy;
+			midx = v->fbi.bx;	midy = v->fbi.by;
+			maxx = v->fbi.ax;	maxy = v->fbi.ay;
 		}
 	}
 
-	/* compute the slopes as 16.16 numbers */
-	v->work.dxdy_minmid = (v->work.miny == v->work.midy) ? 0 : ((v->work.midx - v->work.minx) << 16) / (v->work.midy - v->work.miny);
-	v->work.dxdy_minmax = (v->work.miny == v->work.maxy) ? 0 : ((v->work.maxx - v->work.minx) << 16) / (v->work.maxy - v->work.miny);
-	v->work.dxdy_midmax = (v->work.midy == v->work.maxy) ? 0 : ((v->work.maxx - v->work.midx) << 16) / (v->work.maxy - v->work.midy);
-
 	/* clamp to full pixels */
-	v->work.startscanline = v->work.curscanline = (v->work.miny + 7) >> 4;
-	v->work.endscanline = (v->work.maxy + 7) >> 4;
+	work->startscanline = (miny + 7) >> 4;
+	endscanline = (maxy + 7) >> 4;
+	if (work->startscanline >= endscanline)
+		return 0;
+
+	/* compute the slopes as 16.16 numbers */
+	dxdy_minmid = (miny == midy) ? 0 : ((midx - minx) << 16) / (midy - miny);
+	dxdy_minmax = (miny == maxy) ? 0 : ((maxx - minx) << 16) / (maxy - miny);
+	dxdy_midmax = (midy == maxy) ? 0 : ((maxx - midx) << 16) / (maxy - midy);
 
 	/* compute the X extents for each scanline */
-	for (curscan = v->work.startscanline; curscan < v->work.endscanline; curscan++)
+	for (curscan = work->startscanline; curscan < endscanline; curscan += SCANLINES_PER_WORK)
 	{
-		INT32 fully = (curscan << 4) + 8;
-		INT32 startx = v->work.minx + (((fully - v->work.miny) * v->work.dxdy_minmax) >> 16);
-		INT32 stopx;
+		int extnum;
 
-		if (fully < v->work.midy)
-			stopx = v->work.minx + (((fully - v->work.miny) * v->work.dxdy_minmid) >> 16);
-		else
-			stopx = v->work.midx + (((fully - v->work.midy) * v->work.dxdy_midmax) >> 16);
+		/* fill in the work unit basics */
+		unit->work = work;
+		unit->scanline = curscan;
+		unit->count = MIN(endscanline - curscan, SCANLINES_PER_WORK);
 
-		/* clamp to full pixels */
-		startx = (startx + 7) >> 4;
-		stopx = (stopx + 7) >> 4;
-
-		/* force start < stop */
-		if (startx > stopx)
+		/* iterate over extents */
+		for (extnum = 0; extnum < unit->count; extnum++)
 		{
-			int temp = startx;
-			startx = stopx;
-			stopx = temp;
-		}
+			INT32 fully = ((curscan + extnum) << 4) + 8;
+			INT32 startx = minx + (((fully - miny) * dxdy_minmax) >> 16);
+			INT32 stopx;
 
-		/* set the extent and update the total pixel count */
-		v->work.extent[curscan - v->work.startscanline].startx = startx;
-		v->work.extent[curscan - v->work.startscanline].stopx = stopx;
-		pixels += stopx - startx;
+			/* compute the ending X based on which part of the triangle we're in */
+			if (fully < midy)
+				stopx = minx + (((fully - miny) * dxdy_minmid) >> 16);
+			else
+				stopx = midx + (((fully - midy) * dxdy_midmax) >> 16);
+
+			/* clamp to full pixels */
+			startx = (startx + 7) >> 4;
+			stopx = (stopx + 7) >> 4;
+
+			/* force start < stop */
+			if (startx > stopx)
+			{
+				int temp = startx;
+				startx = stopx;
+				stopx = temp;
+			}
+
+			/* set the extent and update the total pixel count */
+			unit->extent[extnum].startx = startx;
+			unit->extent[extnum].stopx = stopx;
+			pixels += stopx - startx;
+		}
+		unit++;
+	}
+
+	/* copy data */
+	work->ax = v->fbi.ax;
+	work->ay = v->fbi.ay;
+	work->startr = v->fbi.startr;
+	work->startg = v->fbi.startg;
+	work->startb = v->fbi.startb;
+	work->starta = v->fbi.starta;
+	work->startz = v->fbi.startz;
+	work->startw = v->fbi.startw;
+	work->drdx = v->fbi.drdx;
+	work->dgdx = v->fbi.dgdx;
+	work->dbdx = v->fbi.dbdx;
+	work->dadx = v->fbi.dadx;
+	work->dzdx = v->fbi.dzdx;
+	work->dwdx = v->fbi.dwdx;
+	work->drdy = v->fbi.drdy;
+	work->dgdy = v->fbi.dgdy;
+	work->dbdy = v->fbi.dbdy;
+	work->dady = v->fbi.dady;
+	work->dzdy = v->fbi.dzdy;
+	work->dwdy = v->fbi.dwdy;
+	if (texcount > 0)
+	{
+		work->starts0 = v->tmu[0].starts;
+		work->startt0 = v->tmu[0].startt;
+		work->startw0 = v->tmu[0].startw;
+		work->ds0dx = v->tmu[0].dsdx;
+		work->dt0dx = v->tmu[0].dtdx;
+		work->dw0dx = v->tmu[0].dwdx;
+		work->ds0dy = v->tmu[0].dsdy;
+		work->dt0dy = v->tmu[0].dtdy;
+		work->dw0dy = v->tmu[0].dwdy;
+		if (texcount > 1)
+		{
+			work->starts1 = v->tmu[1].starts;
+			work->startt1 = v->tmu[1].startt;
+			work->startw1 = v->tmu[1].startw;
+			work->ds1dx = v->tmu[1].dsdx;
+			work->dt1dx = v->tmu[1].dtdx;
+			work->dw1dx = v->tmu[1].dwdx;
+			work->ds1dy = v->tmu[1].dsdy;
+			work->dt1dy = v->tmu[1].dtdy;
+			work->dw1dy = v->tmu[1].dwdy;
+		}
 	}
 
 	/* farm the rasterization out to other threads */
-	v->work.state = v;
-	v->work.callback = info->callback;
-	v->work.drawbuf = drawbuf;
-	v->work.info = info;
-	work_item_enqueue(v);
+	work->callback = info->callback;
+	work->drawbuf = drawbuf;
+	work->info = info;
+	work_item_enqueue(v, work, unit - work->unit);
 
 	/* update statistics */
 	info->polys++;
@@ -5188,8 +5267,9 @@ static void dump_rasterizer_stats(voodoo_state *v)
     implementation of the 'fastfill' command
 -------------------------------------------------*/
 
-static void raster_fastfill(voodoo_state *v, INT32 scanline)
+static void raster_fastfill(work_info *work, INT32 scanline, INT32 startx, INT32 stopx)
 {
+	voodoo_state *v = work->state;
 	int scry, x;
 
 	/* determine the screen Y */
@@ -5200,10 +5280,10 @@ static void raster_fastfill(voodoo_state *v, INT32 scanline)
 	/* fill this RGB row */
 	if (FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u))
 	{
-		UINT16 *ditherow = &v->work.dither[(scanline & 3) * 4];
-		UINT16 *dest = v->work.drawbuf + scry * v->fbi.rowpixels;
+		UINT16 *ditherow = &work->dither[(scanline & 3) * 4];
+		UINT16 *dest = work->drawbuf + scry * v->fbi.rowpixels;
 
-		for (x = v->work.minx; x < v->work.maxx; x++)
+		for (x = startx; x < stopx; x++)
 			dest[x] = ditherow[x & 3];
 	}
 
@@ -5213,7 +5293,7 @@ static void raster_fastfill(voodoo_state *v, INT32 scanline)
 		UINT16 color = v->reg[zaColor].u;
 		UINT16 *dest = v->fbi.aux + scry * v->fbi.rowpixels;
 
-		for (x = v->work.minx; x < v->work.maxx; x++)
+		for (x = startx; x < stopx; x++)
 			dest[x] = color;
 	}
 }

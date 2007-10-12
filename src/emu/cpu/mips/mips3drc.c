@@ -42,8 +42,14 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
     CONFIGURATION
 ***************************************************************************/
 
-#define CACHE_SIZE				(32 * 1024 * 1024)
+/* size of the execution code cache */
+#define CACHE_SIZE						(32 * 1024 * 1024)
 
+/* compilation boundaries -- how far back/forward does the analysis extend? */
+#define COMPILE_BACKWARDS_BYTES			128
+#define COMPILE_FORWARDS_BYTES			512
+#define COMPILE_MAX_INSTRUCTIONS		((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
+#define COMPILE_MAX_SEQUENCE			64
 
 /* hack when running comparison against the C core */
 #if COMPARE_AGAINST_C
@@ -170,10 +176,10 @@ static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock,
 {
 	drcfe_config feconfig =
 	{
-		128,				/* code window start offset = startpc - window_start */
-		512,				/* code window end offset = startpc + window_end */
-		32,					/* maximum instructions to include in a sequence */
-		mips3fe_describe	/* callback to describe a single instruction */
+		COMPILE_BACKWARDS_BYTES,	/* code window start offset = startpc - window_start */
+		COMPILE_FORWARDS_BYTES,		/* code window end offset = startpc + window_end */
+		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
+		mips3fe_describe			/* callback to describe a single instruction */
 	};
 
 	/* allocate a cache and memory for the core data in a single block */
@@ -227,9 +233,6 @@ static int mips3_execute(int cycles)
 	if (mips3.cache_dirty)
 		drc_cache_reset(mips3.drc);
 	mips3.cache_dirty = FALSE;
-
-	/* update the cycle timing */
-	mips3com_update_cycle_counting(mips3.core);
 
 	/* execute */
 	mips3.core->icount = cycles;

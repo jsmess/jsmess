@@ -244,7 +244,7 @@ typedef struct {
 	int base_cycles;
 	UINT8 opcode;
 
-	INT32 irq_line;
+	UINT8 irq_state;
 	int (*irq_callback)(int);
 	UINT32 a20_mask;
 

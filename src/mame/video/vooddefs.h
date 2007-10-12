@@ -24,8 +24,8 @@ enum
 /* maximum number of TMUs */
 #define MAX_TMU					2
 
-/* number of render groups for parallelism */
-#define RENDER_GROUPS			2
+/* scanlines per work item */
+#define SCANLINES_PER_WORK		4
 
 /* accumulate operations less than this number of clocks */
 #define ACCUMULATE_THRESHOLD	0
@@ -1334,6 +1334,8 @@ static const UINT8 dither_matrix_2x2[4] =
  *************************************/
 
 typedef struct _voodoo_state voodoo_state;
+typedef struct _work_info work_info;
+
 
 typedef union _voodoo_reg voodoo_reg;
 union _voodoo_reg
@@ -1567,7 +1569,7 @@ struct _voodoo_stats
 };
 
 
-typedef void (*raster_callback)(voodoo_state *, INT32);
+typedef void (*raster_callback)(work_info *, INT32, INT32, INT32);
 
 
 typedef struct _raster_info raster_info;
@@ -1588,25 +1590,26 @@ struct _raster_info
 };
 
 
-typedef struct _work_info work_info;
+typedef struct _work_unit work_unit;
+struct _work_unit
+{
+	work_info *work;				/* pointer back to the work info */
+	INT16	scanline, count;		/* starting scanline and count */
+	struct
+	{
+		INT32	startx, stopx;		/* starting/ending X points for each scanline */
+	} extent[SCANLINES_PER_WORK];
+};
+
+
 struct _work_info
 {
-	voodoo_state *state;				/* pointer to the state object */
-	osd_work_queue *queue;				/* work queue for offloading rasterization */
+	voodoo_state *state;				/* pointer back to the voodoo state */
 
 	raster_callback callback;			/* callback to handle a scanline's worth of work */
 	UINT16 *	drawbuf;				/* pointer to render buffer */
 
-	volatile INT32 curscanline;			/* current scanline, shared by all helpers */
 	INT32		startscanline;			/* starting scanline */
-	INT32		endscanline;			/* ending scanline */
-
-	INT32		dxdy_minmid;			/* dx/dy between the top and middle points */
-	INT32		dxdy_minmax;			/* dx/dy between the top and bottom points */
-	INT32		dxdy_midmax;			/* dx/dy between the middle and bottom points */
-	INT32 		minx, miny;				/* x,y of the top point */
-	INT32		midx, midy;				/* x,y of the middle point */
-	INT32		maxx, maxy;				/* x,y of the bottom point */
 
 	UINT16 		dither[16];				/* dither matrix, for fastfill */
 
@@ -1617,10 +1620,32 @@ struct _work_info
 	INT32 		start_afunc_fail;		/* starting fbiAfuncFail value */
 	raster_info *info;					/* pointer to rasterizer information */
 
-	struct
-	{
-		INT32	startx, stopx;			/* starting/ending X points for each scanline */
-	} extent[4097];
+	INT16		ax, ay;					/* vertex A x,y (12.4) */
+	INT32		startr, startg, startb, starta; /* starting R,G,B,A (12.12) */
+	INT32		startz;					/* starting Z (20.12) */
+	INT64		startw;					/* starting W (16.32) */
+	INT32		drdx, dgdx, dbdx, dadx;	/* delta R,G,B,A per X */
+	INT32		dzdx;					/* delta Z per X */
+	INT64		dwdx;					/* delta W per X */
+	INT32		drdy, dgdy, dbdy, dady;	/* delta R,G,B,A per Y */
+	INT32		dzdy;					/* delta Z per Y */
+	INT64		dwdy;					/* delta W per Y */
+
+	INT64		starts0, startt0;		/* starting S,T (14.18) */
+	INT64		startw0;				/* starting W (2.30) */
+	INT64		ds0dx, dt0dx;			/* delta S,T per X */
+	INT64		dw0dx;					/* delta W per X */
+	INT64		ds0dy, dt0dy;			/* delta S,T per Y */
+	INT64		dw0dy;					/* delta W per Y */
+
+	INT64		starts1, startt1;		/* starting S,T (14.18) */
+	INT64		startw1;				/* starting W (2.30) */
+	INT64		ds1dx, dt1dx;			/* delta S,T per X */
+	INT64		dw1dx;					/* delta W per X */
+	INT64		ds1dy, dt1dy;			/* delta S,T per Y */
+	INT64		dw1dy;					/* delta W per Y */
+
+	work_unit	unit[4100/SCANLINES_PER_WORK];	/* individual work units */
 };
 
 
@@ -1664,6 +1689,7 @@ struct _voodoo_state
 	banshee_info banshee;				/* Banshee state */
 
 	work_info 	work;					/* work queue management */
+	osd_work_queue *work_queue;			/* work queue for offloading rasterization */
 
 	voodoo_stats stats;					/* internal statistics */
 
@@ -3498,24 +3524,20 @@ while (0)
 
 #define RASTERIZER(name, TMUS, FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
-static void raster_##name(voodoo_state *v, INT32 y) 							\
+static void raster_##name(work_info *work, INT32 y, INT32 startx, INT32 stopx)	\
 {																				\
+	voodoo_state *v = work->state;												\
 	DECLARE_STATISTICS;															\
 	INT32 iterr, iterg, iterb, itera;											\
 	INT32 iterz;																\
 	INT64 iterw, iterw0 = 0, iterw1 = 0;										\
 	INT64 iters0 = 0, iters1 = 0;												\
 	INT64 itert0 = 0, itert1 = 0;												\
-	INT32 startx, stopx;														\
 	UINT16 *depth;																\
 	UINT16 *dest;																\
 	INT32 dx, dy;																\
 	INT32 scry;																	\
 	INT32 x;																	\
-																				\
-	/* extract X extents */														\
-	startx = v->work.extent[y - v->work.startscanline].startx;					\
-	stopx = v->work.extent[y - v->work.startscanline].stopx;					\
 																				\
 	/* determine the screen Y */												\
 	scry = y;																	\
@@ -3523,35 +3545,29 @@ static void raster_##name(voodoo_state *v, INT32 y) 							\
 		scry = (v->fbi.yorigin - y) & 0x3ff;									\
 																				\
 	/* get pointers to the target buffer and depth buffer */					\
-	dest = v->work.drawbuf + scry * v->fbi.rowpixels;							\
+	dest = work->drawbuf + scry * v->fbi.rowpixels;								\
 	depth = v->fbi.aux ? (v->fbi.aux + scry * v->fbi.rowpixels) : NULL;			\
 																				\
 	/* compute the starting parameters */										\
-	dx = startx - (v->fbi.ax >> 4);												\
-	dy = y - (v->fbi.ay >> 4);													\
-	iterr = v->fbi.startr + dy * v->fbi.drdy + dx * v->fbi.drdx;				\
-	iterg = v->fbi.startg + dy * v->fbi.dgdy + dx * v->fbi.dgdx;				\
-	iterb = v->fbi.startb + dy * v->fbi.dbdy + dx * v->fbi.dbdx;				\
-	itera = v->fbi.starta + dy * v->fbi.dady + dx * v->fbi.dadx;				\
-	iterz = v->fbi.startz + dy * v->fbi.dzdy + dx * v->fbi.dzdx;				\
-	iterw = v->fbi.startw + dy * v->fbi.dwdy + dx * v->fbi.dwdx;				\
+	dx = startx - (work->ax >> 4);												\
+	dy = y - (work->ay >> 4);													\
+	iterr = work->startr + dy * work->drdy + dx * work->drdx;					\
+	iterg = work->startg + dy * work->dgdy + dx * work->dgdx;					\
+	iterb = work->startb + dy * work->dbdy + dx * work->dbdx;					\
+	itera = work->starta + dy * work->dady + dx * work->dadx;					\
+	iterz = work->startz + dy * work->dzdy + dx * work->dzdx;					\
+	iterw = work->startw + dy * work->dwdy + dx * work->dwdx;					\
 	if (TMUS >= 1)																\
 	{																			\
-		iterw0 = v->tmu[0].startw + dy * v->tmu[0].dwdy +						\
-									dx * v->tmu[0].dwdx;						\
-		iters0 = v->tmu[0].starts + dy * v->tmu[0].dsdy + 						\
-									dx * v->tmu[0].dsdx;						\
-		itert0 = v->tmu[0].startt + dy * v->tmu[0].dtdy + 						\
-									dx * v->tmu[0].dtdx;						\
+		iterw0 = work->startw0 + dy * work->dw0dy +	dx * work->dw0dx;			\
+		iters0 = work->starts0 + dy * work->ds0dy + dx * work->ds0dx;			\
+		itert0 = work->startt0 + dy * work->dt0dy + dx * work->dt0dx;			\
 	}																			\
 	if (TMUS >= 2)																\
 	{																			\
-		iterw1 = v->tmu[1].startw + dy * v->tmu[1].dwdy + 						\
-									dx * v->tmu[1].dwdx;						\
-		iters1 = v->tmu[1].starts + dy * v->tmu[1].dsdy + 						\
-									dx * v->tmu[1].dsdx;						\
-		itert1 = v->tmu[1].startt + dy * v->tmu[1].dtdy + 						\
-									dx * v->tmu[1].dtdx;						\
+		iterw1 = work->startw1 + dy * work->dw1dy +	dx * work->dw1dx;			\
+		iters1 = work->starts1 + dy * work->ds1dy + dx * work->ds1dx;			\
+		itert1 = work->startt1 + dy * work->dt1dy + dx * work->dt1dx;			\
 	}																			\
 																				\
 	/* loop in X */																\
@@ -3589,23 +3605,23 @@ static void raster_##name(voodoo_state *v, INT32 y) 							\
 								ALPHAMODE, FOGMODE, iterz, iterw, iterargb);	\
 																				\
 		/* update the iterated parameters */									\
-		iterr += v->fbi.drdx;													\
-		iterg += v->fbi.dgdx;													\
-		iterb += v->fbi.dbdx;													\
-		itera += v->fbi.dadx;													\
-		iterz += v->fbi.dzdx;													\
-		iterw += v->fbi.dwdx;													\
+		iterr += work->drdx;													\
+		iterg += work->dgdx;													\
+		iterb += work->dbdx;													\
+		itera += work->dadx;													\
+		iterz += work->dzdx;													\
+		iterw += work->dwdx;													\
 		if (TMUS >= 1)															\
 		{																		\
-			iterw0 += v->tmu[0].dwdx;											\
-			iters0 += v->tmu[0].dsdx;											\
-			itert0 += v->tmu[0].dtdx;											\
+			iterw0 += work->dw0dx;												\
+			iters0 += work->ds0dx;												\
+			itert0 += work->dt0dx;												\
 		}																		\
 		if (TMUS >= 2)															\
 		{																		\
-			iterw1 += v->tmu[1].dwdx;											\
-			iters1 += v->tmu[1].dsdx;											\
-			itert1 += v->tmu[1].dtdx;											\
+			iterw1 += work->dw1dx;												\
+			iters1 += work->ds1dx;												\
+			itert1 += work->dt1dx;												\
 		}																		\
 	}																			\
 	UPDATE_STATISTICS(v);														\

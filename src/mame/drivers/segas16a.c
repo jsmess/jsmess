@@ -2023,6 +2023,57 @@ ROM_START( alexkid1 )
 	ROM_LOAD( "10436.2", 0x8000, 0x8000, CRC(96c76613) SHA1(fe3e4e649fd2cb2453eec0c92015bd54b3b9a1b5) )
 ROM_END
 
+/**************************************************************************************************************************
+ **************************************************************************************************************************
+ **************************************************************************************************************************
+    Alien Syndrome, System 16A
+    CPU: FD1089B
+ */
+
+ROM_START( aliensy5 )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr10804.43", 0x00000, 0x8000, CRC(23f78b83) SHA1(76538663e8f7ffffeea4928e3ebe091dac954dc7) )
+	ROM_LOAD16_BYTE( "epr10802.26", 0x00001, 0x8000, CRC(996768bd) SHA1(8c972f0f4120600ecd10ceb3456243d9614924b7) )
+	ROM_LOAD16_BYTE( "epr10805.42", 0x10000, 0x8000, CRC(53d7fe50) SHA1(9a4e18f4d11c77ec04a817dca7b618297658113e) )
+	ROM_LOAD16_BYTE( "epr10803.25", 0x10001, 0x8000, CRC(0536dd33) SHA1(f094ed25d81dadf15a47c15711e47c3cb5f33227) )
+	ROM_LOAD16_BYTE( "epr10732.41", 0x20000, 0x8000, CRC(c5712bfc) SHA1(2f11570784c1fc83cb16dbd1d43e21cf104568ac) )
+	ROM_LOAD16_BYTE( "epr10729.24", 0x20001, 0x8000, CRC(3e520e30) SHA1(8eac2640ff8c4944d6cd82421b565f506c480017) )
+
+	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD( "10739", 0x00000, 0x10000, CRC(a29ec207) SHA1(c469d2689a7bdc2a59dfff56ce13d34e9fbac263) )
+	ROM_LOAD( "10740", 0x10000, 0x10000, CRC(47f93015) SHA1(68247a6bffd1d4d1c450148dd46214d01ce1c668) )
+	ROM_LOAD( "10741", 0x20000, 0x10000, CRC(4970739c) SHA1(5bdf4222209ec46e0015bfc0f90578dd9b30bdd1) )
+
+	ROM_REGION16_BE( 0x080000, REGION_GFX2, 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "10709.b1", 0x00001, 0x08000, CRC(addf0a90) SHA1(a92c9531f1817763773471ce63f566b9e88360a0) )
+	ROM_CONTINUE(                0x40001, 0x08000 )
+	ROM_LOAD16_BYTE( "10713.b5", 0x00000, 0x08000, CRC(ececde3a) SHA1(9c12d4665179bf433c42f5ddc8a043ad592aa90e) )
+	ROM_CONTINUE(                0x40000, 0x08000 )
+	ROM_LOAD16_BYTE( "10710.b2", 0x10001, 0x08000, CRC(992369eb) SHA1(c6796acf6807e9ba4c3d241903653f91adf4764e) )
+	ROM_CONTINUE(                0x50001, 0x08000 )
+	ROM_LOAD16_BYTE( "10714.b6", 0x10000, 0x08000, CRC(91bf42fb) SHA1(4b9d3e97768323dee01e92378adafecb26bcc094) )
+	ROM_CONTINUE(                0x50000, 0x08000 )
+	ROM_LOAD16_BYTE( "10711.b3", 0x20001, 0x08000, CRC(29166ef6) SHA1(99a7cfd7d811537c821412a320beadb5a9c09af3) )
+	ROM_CONTINUE(                0x60001, 0x08000 )
+	ROM_LOAD16_BYTE( "10715.b7", 0x20000, 0x08000, CRC(a7c57384) SHA1(46f8efa691d7bbb0a18119c0ff12cff7c0d129e1) )
+	ROM_CONTINUE(                0x60000, 0x08000 )
+	ROM_LOAD16_BYTE( "10712.b4", 0x30001, 0x08000, CRC(876ad019) SHA1(39973ddb5a5746e0e094c759447bff1130c72c84) )
+	ROM_CONTINUE(                0x70001, 0x08000 )
+	ROM_LOAD16_BYTE( "10716.b8", 0x30000, 0x08000, CRC(40ba1d48) SHA1(e2d4d2689bb9b9bdc85e7f72a6665e5fd4c583aa) )
+	ROM_CONTINUE(                0x70000, 0x08000 )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* sound CPU */
+	ROM_LOAD( "10705", 0x00000, 0x8000, CRC(777b749e) SHA1(086b03100064a98228f95db7962b2671121c46ea) )
+
+	ROM_REGION( 0x1000, REGION_CPU3, 0 )  /* 4k for 7751 onboard ROM */
+	ROM_LOAD( "7751.bin",     0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) /* 7751 - U34 */
+
+	ROM_REGION( 0x18000, REGION_SOUND1, 0 ) /* 7751 sound data */
+	ROM_LOAD( "10706", 0x00000, 0x8000, CRC(aa114acc) SHA1(81a2b3586ae90bc7fc55b82478ffe182ac49983e) )
+	ROM_LOAD( "10707", 0x08000, 0x8000, CRC(800c1d82) SHA1(aac4123bd35f87da09264649f4cf8326b2ba3cb8) )
+	ROM_LOAD( "10708", 0x10000, 0x8000, CRC(5921ef52) SHA1(eff9978361692e6e60a9c6caf5740dd6182cfe4a) )
+ROM_END
+
 
 /**************************************************************************************************************************
  **************************************************************************************************************************
@@ -3054,6 +3105,12 @@ static DRIVER_INIT( aliensy1 )
 	fd1089_decrypt_0033();
 }
 
+static DRIVER_INIT( aliensy5 )
+{
+//  void fd1089_decrypt_0037(void);
+	system16a_generic_init(machine);
+//  fd1089_decrypt_0037();
+}
 
 static DRIVER_INIT( bodyslam )
 {
@@ -3116,8 +3173,6 @@ static DRIVER_INIT( timesca1 )
  *************************************/
 
 /* "Pre-System 16" */
-GAME( 1987, aliensy2, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 )
-GAME( 1987, aliensy1, aliensyn, system16a,        aliensy1, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 )
 GAME( 1986, bodyslam, 0,        system16a_8751,   bodyslam, bodyslam,    ROT0,   "Sega",           "Body Slam (8751 317-0015)", 0 )
 GAME( 1986, dumpmtmt, bodyslam, system16a_8751,   bodyslam, bodyslam,    ROT0,   "Sega",           "Dump Matsumoto (Japan, 8751 317-unknown)", 0 )
 GAME( 1985, mjleague, 0,        system16a,        mjleague, mjleague,    ROT270, "Sega",           "Major League", 0 )
@@ -3127,6 +3182,9 @@ GAME( 1986, quart21,  quartet,  system16a_8751,   quart2,   quartet,     ROT0,  
 GAME( 1986, quart2,   quartet,  system16a,        quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (unprotected)", 0 )
 
 /* System 16A */
+GAME( 1987, aliensy5, aliensyn, system16a,        aliensyn, aliensy5,    ROT0,   "Sega",           "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", GAME_NOT_WORKING )
+GAME( 1987, aliensy2, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 )
+GAME( 1987, aliensy1, aliensyn, system16a,        aliensy1, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 )
 GAME( 1988, aceattaa, aceattac, system16a       , aceattaa, aceattaa,    ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", 0 )
 GAME( 1986, afighter, 0,        system16a_no7751, afighter, afighter,    ROT270, "Sega",           "Action Fighter, FD1089A 317-0018", 0 )
 GAME( 1986, alexkidd, 0,        system16a,        alexkidd, generic_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 2, unprotected)", 0 )

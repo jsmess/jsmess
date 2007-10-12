@@ -825,6 +825,7 @@ $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/fcombat.o $(VIDEO)/fcombat.o \
 	$(DRIVERS)/ginganin.o $(VIDEO)/ginganin.o \
 	$(DRIVERS)/homerun.o $(VIDEO)/homerun.o \
+	$(DRIVERS)/hayaosi1.o \
 	$(DRIVERS)/megasys1.o $(VIDEO)/megasys1.o \
 	$(DRIVERS)/momoko.o $(VIDEO)/momoko.o \
 	$(DRIVERS)/ms32.o $(VIDEO)/ms32.o \
@@ -1171,6 +1172,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
 	$(DRIVERS)/dotrikun.o $(VIDEO)/dotrikun.o \
 	$(DRIVERS)/genesis.o $(VIDEO)/genesis.o \
+	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(DRIVERS)/megadriv.o \
@@ -1571,6 +1573,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/gdrawpkr.o $(VIDEO)/gdrawpkr.o \
+	$(DRIVERS)/gtipoker.o \
 	$(DRIVERS)/go2000.o \
 	$(DRIVERS)/good.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
@@ -1616,6 +1619,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/pangofun.o \
 	$(DRIVERS)/pasha2.o \
 	$(DRIVERS)/pass.o $(VIDEO)/pass.o \
+	$(DRIVERS)/peplus.o \
 	$(DRIVERS)/pipeline.o \
 	$(DRIVERS)/pkscram.o \
 	$(DRIVERS)/pmpoker.o \
@@ -1658,6 +1662,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
+	$(DRIVERS)/hayaosi1.o
 
 
 #-------------------------------------------------

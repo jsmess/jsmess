@@ -40,6 +40,7 @@ typedef struct
 	UINT8			pcsp;
 	UINT32			eb;
 	UINT32			shift;
+	UINT32			repcnt;
 	UINT16			sr;
 
 	UINT32			gpr[16];
@@ -83,6 +84,7 @@ static int mb86233_icount;
 #define GETARAM()			mb86233.ARAM
 #define GETBRAM()			mb86233.BRAM
 #define ALU(a)				mb86233_alu(a)
+#define GETREPCNT()			mb86233.repcnt
 
 #define ROPCODE(a)			cpu_readop32(a<<2)
 #define RDMEM(a)			program_read_dword_32le((a<<2))
@@ -623,6 +625,10 @@ static UINT32 GETREGS( UINT32 reg, int source )
 				return GETEB();
 			break;
 
+			case 0x34:
+				return GETREPCNT();
+			break;
+
 			default:
 				logerror( "TGP: Unknown GETREG (%d) at PC=%04x\n", reg, GETPC() );
 			break;
@@ -789,6 +795,10 @@ static void SETREGS( UINT32 reg, UINT32 val )
 
 			case 0x23:
 				GETEB() = val;
+			break;
+
+			case 0x34:
+				GETREPCNT() = val;
 			break;
 
 			default:
@@ -1319,6 +1329,21 @@ static int mb86233_execute(int cycles)
 				else
 				{
 					logerror( "TGP: Unknown LDIMM external reg (sub=%d) at PC:%04x\n", sub, GETPC() );
+				}
+			}
+			break;
+
+			case 0x1d:	//LDIMM to Rep regs
+			{
+				UINT32 sub = (opcode>>24)&0x3;
+				UINT32 imm = opcode&0xffffff;
+				if(sub == 0x00)
+				{
+					GETREPCNT() = imm;
+				}
+				else
+				{
+					logerror( "TGP: Unknown LDIMM REPCnt (sub=%d) at PC:%04x\n", sub, GETPC() );
 				}
 			}
 			break;

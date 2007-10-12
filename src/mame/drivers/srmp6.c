@@ -91,7 +91,7 @@ static const gfx_layout tiles8x8_layout =
 
 void update_palette(void)
 {
-	char r, g ,b;
+	INT8 r, g ,b;
 	int brg = brightness - 0x60;
 	int i;
 
@@ -545,7 +545,7 @@ static WRITE16_HANDLER(tileram_w)
 
 WRITE16_HANDLER(paletteram_w)
 {
-	char r, g, b;
+	INT8 r, g, b;
 	int brg = brightness - 0x60;
 
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset, data, mem_mask);

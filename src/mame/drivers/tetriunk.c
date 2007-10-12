@@ -152,7 +152,7 @@ static PALETTE_INIT(tetrisunk)
 	int i;
 	for(i=0;i<16;i++)
 	{
-		palette_set_color(machine,i,tmpcolors[3*i]);
+		palette_set_color(machine,i,tmpcolors[i]);
 	}
 }
 

@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-/*----------- defined in drivers/dynax.c -----------*/
+//----------- defined in drivers/dynax.c -----------
 
 extern UINT8 dynax_blitter_irq,	dynax_blitter2_irq;
 
@@ -13,13 +13,12 @@ void jantouki_update_irq(void);
 void mjelctrn_update_irq(void);
 void neruton_update_irq(void);
 
-/*----------- defined in video/dynax.c -----------*/
+//----------- defined in video/dynax.c -----------
 
 WRITE8_HANDLER( dynax_blitter_rev2_w );
 WRITE8_HANDLER( jantouki_blitter_rev2_w );
 WRITE8_HANDLER( jantouki_blitter2_rev2_w );
 WRITE8_HANDLER( tenkai_blitter_rev2_w );
-
 
 WRITE8_HANDLER( dynax_blit_pen_w );
 WRITE8_HANDLER( dynax_blit2_pen_w );
@@ -62,11 +61,51 @@ VIDEO_START( mjdialq2 );
 VIDEO_START( jantouki );
 VIDEO_START( mjelctrn );
 VIDEO_START( neruton );
+VIDEO_START( htengoku );
 
 VIDEO_UPDATE( hanamai );
 VIDEO_UPDATE( hnoridur );
 VIDEO_UPDATE( sprtmtch );
 VIDEO_UPDATE( mjdialq2 );
 VIDEO_UPDATE( jantouki );
+VIDEO_EOF( htengoku );
 
 PALETTE_INIT( sprtmtch );
+
+
+//----------- defined in drivers/ddenlovr.c -----------
+
+WRITE8_HANDLER( ddenlovr_bgcolor_w );
+WRITE8_HANDLER( ddenlovr_bgcolor2_w );
+WRITE16_HANDLER( ddenlovr16_bgcolor_w );
+
+WRITE8_HANDLER( ddenlovr_priority_w );
+WRITE8_HANDLER( ddenlovr_priority2_w );
+WRITE16_HANDLER( ddenlovr16_priority_w );
+
+WRITE8_HANDLER( ddenlovr_layer_enable_w );
+WRITE8_HANDLER( ddenlovr_layer_enable2_w );
+WRITE16_HANDLER( ddenlovr16_layer_enable_w );
+
+WRITE8_HANDLER( ddenlovr_palette_base_w );
+WRITE8_HANDLER( ddenlovr_palette_base2_w );
+WRITE16_HANDLER( ddenlovr16_palette_base_w );
+
+WRITE8_HANDLER( ddenlovr_palette_mask_w );
+WRITE8_HANDLER( ddenlovr_palette_mask2_w );
+WRITE16_HANDLER( ddenlovr16_palette_mask_w );
+
+WRITE8_HANDLER( ddenlovr_transparency_pen_w );
+WRITE8_HANDLER( ddenlovr_transparency_pen2_w );
+WRITE16_HANDLER( ddenlovr16_transparency_pen_w );
+
+WRITE8_HANDLER( ddenlovr_transparency_mask_w );
+WRITE8_HANDLER( ddenlovr_transparency_mask2_w );
+WRITE16_HANDLER( ddenlovr16_transparency_mask_w );
+
+extern UINT8 *ddenlovr_pixmap[8];
+
+VIDEO_START(ddenlovr);
+VIDEO_UPDATE(ddenlovr);
+VIDEO_EOF(ddenlovr);
+

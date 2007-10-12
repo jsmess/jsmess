@@ -453,8 +453,6 @@ static UINT8 pending_analog_read;
 static UINT8 status_leds;
 
 static int speedup_index;
-static UINT32 *generic_speedup;
-static UINT32 *generic_speedup2;
 
 static UINT32 cmos_write_enabled;
 
@@ -1585,7 +1583,7 @@ static WRITE32_HANDLER( cmos_w )
 {
 	if (cmos_write_enabled)
 		COMBINE_DATA(generic_nvram32 + offset);
-	cmos_write_enabled = 0;
+	cmos_write_enabled = FALSE;
 }
 
 
@@ -1597,7 +1595,7 @@ static READ32_HANDLER( cmos_r )
 
 static WRITE32_HANDLER( cmos_protect_w )
 {
-	cmos_write_enabled = 1;
+	cmos_write_enabled = TRUE;
 }
 
 
@@ -1644,34 +1642,6 @@ static WRITE32_HANDLER( status_leds_w )
 {
 	if (!(mem_mask & 0x000000ff))
 		status_leds = data;
-}
-
-
-
-/*************************************
- *
- *  Speedups
- *
- *************************************/
-
-static READ32_HANDLER( generic_speedup_r )
-{
-	activecpu_eat_cycles(100);
-	return *generic_speedup;
-}
-
-
-static WRITE32_HANDLER( generic_speedup_w )
-{
-	activecpu_eat_cycles(100);
-	COMBINE_DATA(generic_speedup);
-}
-
-
-static READ32_HANDLER( generic_speedup2_r )
-{
-	activecpu_eat_cycles(100);
-	return *generic_speedup2;
 }
 
 
@@ -2800,7 +2770,7 @@ static void add_speedup(offs_t pc, UINT32 op)
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 1000);
+	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
 }
 
 
@@ -2810,8 +2780,9 @@ static DRIVER_INIT( wg3dh )
 	init_common(MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
-	add_speedup(0x80044178, 0x0230102b);
-	add_speedup(0x8009494c, 0x94820000);
+	add_speedup(0x8004413C, 0x0C0054B4);		/* confirmed */
+	add_speedup(0x80094930, 0x00A2102B);		/* confirmed */
+	add_speedup(0x80092984, 0x3C028011);		/* confirmed */
 }
 
 
@@ -2821,7 +2792,7 @@ static DRIVER_INIT( mace )
 	init_common(MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(0x800108f8, 0x8c420000);
+	add_speedup(0x800108F8, 0x8C420000);		/* confirmed */
 }
 
 
@@ -2831,10 +2802,9 @@ static DRIVER_INIT( sfrush )
 	init_common(MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0012498c, 0x0012498f, 0, 0, generic_speedup_r);
-	generic_speedup = &rambase[0x12498c/4];
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00120000, 0x00120003, 0, 0, generic_speedup2_r);
-	generic_speedup2 = &rambase[0x120000/4];
+	add_speedup(0x80059F34, 0x3C028012);		/* confirmed */
+	add_speedup(0x800A5AF4, 0x8E300010);		/* confirmed */
+	add_speedup(0x8004C260, 0x3C028012);		/* confirmed */
 }
 
 
@@ -2844,10 +2814,10 @@ static DRIVER_INIT( sfrushrk )
 	init_common(MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0012498c, 0x0012498f, 0, 0, generic_speedup_r);
-//  generic_speedup = &rambase[0x12498c/4];
-//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00120000, 0x00120003, 0, 0, generic_speedup2_r);
-//  generic_speedup2 = &rambase[0x120000/4];
+	add_speedup(0x800343E8, 0x3C028012);		/* confirmed */
+	add_speedup(0x8008F4F0, 0x3C028012);		/* confirmed */
+	add_speedup(0x800A365C, 0x8E300014);		/* confirmed */
+	add_speedup(0x80051DAC, 0x3C028012);		/* confirmed */
 }
 
 
@@ -2858,8 +2828,8 @@ static DRIVER_INIT( calspeed )
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x002e6480, 0x002e6483, 0, 0, generic_speedup_r);
-	generic_speedup = &rambase[0x2e6480/4];
+	add_speedup(0x80032534, 0x02221024);		/* confirmed */
+	add_speedup(0x800B1BE4, 0x8E110014);		/* confirmed */
 }
 
 
@@ -2869,6 +2839,9 @@ static DRIVER_INIT( vaportrx )
 	init_common(MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
+	add_speedup(0x80049F14, 0x3C028020);		/* confirmed */
+	add_speedup(0x8004859C, 0x3C028020);		/* confirmed */
+	add_speedup(0x8005922C, 0x8E020014);		/* confirmed */
 }
 
 
@@ -2878,8 +2851,6 @@ static DRIVER_INIT( biofreak )
 	init_common(MIDWAY_IOASIC_STANDARD, 231/* no alternates */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-//  memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x002502bc, 0x002502bf, 0, 0, generic_speedup_w);
-//  generic_speedup = &rambase[0x2502bc/4];
 }
 
 
@@ -2892,11 +2863,8 @@ static DRIVER_INIT( blitz )
 	rombase[0x934/4] += 4;
 
 	/* main CPU speedups */
-	add_speedup(0x8013ddbc, 0x1452fff8);
-	add_speedup(0x80135520, 0x0043102a);
-
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00243d58, 0x00243d5b, 0, 0, generic_speedup_w);
-	generic_speedup = &rambase[0x243d58/4];
+	add_speedup(0x80135510, 0x3C028024);		/* confirmed */
+	add_speedup(0x800087DC, 0x8E820010);		/* confirmed */
 }
 
 
@@ -2906,8 +2874,8 @@ static DRIVER_INIT( blitz99 )
 	init_common(MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x002502bc, 0x002502bf, 0, 0, generic_speedup_w);
-	generic_speedup = &rambase[0x2502bc/4];
+	add_speedup(0x8014E41C, 0x3C038025);		/* confirmed */
+	add_speedup(0x80011F10, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2917,8 +2885,8 @@ static DRIVER_INIT( blitz2k )
 	init_common(MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0024e8d8, 0x0024e8db, 0, 0, generic_speedup_w);
-	generic_speedup = &rambase[0x24e8d8/4];
+	add_speedup(0x8015773C, 0x3C038025);		/* confirmed */
+	add_speedup(0x80012CA8, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2932,7 +2900,8 @@ static DRIVER_INIT( carnevil )
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x16800000, 0x1680001f, 0, 0, carnevil_gun_w);
 
 	/* speedups */
-	add_speedup(0x80151780, 0xac232bac);
+	add_speedup(0x8015176C, 0x3C03801A);		/* confirmed */
+	add_speedup(0x80011FBC, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2942,8 +2911,9 @@ static DRIVER_INIT( hyprdriv )
 	init_common(MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	add_speedup(0x80164424, 0x080590ef);
-	add_speedup(0x801646fc, 0xc7bfff38);
+	add_speedup(0x801643BC, 0x3C03801B);		/* confirmed */
+	add_speedup(0x80011FB8, 0x8E020018);		/* confirmed */
+	//add_speedup(0x80136A80, 0x3C02801D);      /* potential */
 }
 
 

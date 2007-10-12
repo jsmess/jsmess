@@ -3532,7 +3532,7 @@ void segaic16_rotate_draw(int which, mame_bitmap *bitmap, const rectangle *clipr
 			/* fetch the pixel from the source bitmap */
 			int sx = (tx >> 14) & 0x1ff;
 			int sy = (ty >> 14) & 0x1ff;
-			int pix = src[sy * srcbitmap->rowpixels + (sx & 0x1ff)];
+			int pix = src[sy * srcbitmap->rowpixels + sx];
 
 			/* non-zero pixels get written; everything else is the scanline color */
 			if (pix != 0xffff)

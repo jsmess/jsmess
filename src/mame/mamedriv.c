@@ -1613,6 +1613,7 @@ const game_driver * const drivers[] =
 	DRIVER( bublbobr )	/* A78 (c) 1986 Taito America Corporation + Romstar license */
 	DRIVER( bubbobr1 )	/* A78 (c) 1986 Taito America Corporation + Romstar license */
 	DRIVER( boblbobl )	/* bootleg */
+	DRIVER( sboblboa )	/* bootleg */
 	DRIVER( sboblbob )	/* bootleg */
 	DRIVER( bub68705 )	/* bootleg */
 	DRIVER( missb2 )	/* bootleg on enhanced hardware */
@@ -2194,6 +2195,7 @@ V-V                           TP-027
 	DRIVER( fx )		/* bootleg */
 	DRIVER( legend )	/* no copyright notice [1986 Sega/Coreland?] */
 	DRIVER( airwolf )	/* (c) 1987 Kyugo */
+	DRIVER( airwolfa )	/* (c) 1987 Kyugo */
 	DRIVER( skywolf )	/* bootleg */
 	DRIVER( skywolf2 )	/* bootleg */
 
@@ -2972,6 +2974,7 @@ V-V                           TP-027
 	DRIVER( pang )		/* (c) 1989 Mitchell (World) */
 	DRIVER( pangb )		/* bootleg */
 	DRIVER( pangbold )	/* bootleg */
+	DRIVER( pangba )	/* bootleg */
 	DRIVER( bbros )		/* (c) 1989 Capcom (US) not listed on Capcom's site */
 	DRIVER( pompingw )	/* (c) 1989 Mitchell (Japan) */
 	DRIVER( cbasebal )	/* 10/1989 (c) 1989 Capcom (Japan) (different hardware) */
@@ -3069,6 +3072,7 @@ V-V                           TP-027
 	DRIVER( gt97s121 )	/* (c) 1997 Incredible Technologies */
 	DRIVER( gt97v120 )	/* (c) 1997 Incredible Technologies */
 	DRIVER( gt97t240 )	/* (c) 1997 Incredible Technologies */
+	DRIVER( gt97t243 )	/* (c) 1997 Incredible Technologies */
 	DRIVER( gt98 )		/* (c) 1998 Incredible Technologies */
 	DRIVER( gt98v100 )	/* (c) 1998 Incredible Technologies */
 	DRIVER( gt98s100 )	/* (c) 1998 Incredible Technologies */
@@ -3213,6 +3217,7 @@ V-V                           TP-027
 	DRIVER( galaxyrp )  /* (c) 1983 */
 	DRIVER( sblazerp )  /* (c) 1983 */
 	DRIVER( cobraseg )  /* (c) ???? */
+	DRIVER( gpworld )	/* (c) 1984 */
 
 	/* Sega SG1000 based games */
 	DRIVER( chboxing )	/* (c) 1984 */
@@ -3332,8 +3337,9 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( shangupb )	/* (c) 1992 (but bootleg, hangon hw?) */
 
 	/* Pre-16 */
-	DRIVER( aliensy1 )	/* (c) 1987 (FD1094, decrypted) */
-	DRIVER( aliensy2 )	/* (c) 1987 (FD1094, decrypted) */
+	DRIVER( aliensy1 )	/* (c) 1987 (FD1089A, decrypted) */
+	DRIVER( aliensy2 )	/* (c) 1987 (FD1089A, decrypted) */
+	DRIVER( aliensy5 )	/* (c) 1987 (FD1089B) */
 	DRIVER( bodyslam )	/* (c) 1986 (8751) */
 	DRIVER( dumpmtmt )	/* (c) 1986 (Japan) */
 	DRIVER( mjleague )	/* (c) 1985 */
@@ -5872,6 +5878,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kakumei2 )	/* (c) 1992 */
 	DRIVER( suchipi )	/* (c) 1993 */
 
+	DRIVER( hayaosi1 )	/* (c) 1991? */
+
 	/* NMK Double Dealer, Similar Hardware to Jaleco Mahjong games above */
 	DRIVER( ddealer )	/* (c) 1991 NMK */
 
@@ -6280,8 +6288,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( cybattlr )	/* (c) 1993 */
 	DRIVER( peekaboo )	/* (c) 1993 */
 
-	/* Jaleco Mega System 1 games */
-	DRIVER( hayaosi1 )	/* (c) 1994 */
+	/* Jaleco Mega System 32 games */
+	DRIVER( hayaosi2 )	/* (c) 1993 */
+	DRIVER( hayaosi3 )	/* (c) 1994 */
 	DRIVER( bbbxing )	/* (c) 1994 */
 	DRIVER( 47pie2 )	/* (c) 1994 */
 	DRIVER( 47pie2o )	/* (c) 1994 */
@@ -6859,6 +6868,7 @@ Other Sun games
 	DRIVER( lastforg )	/* (c) 1994 */
 	DRIVER( toride2g )	/* (c) 1994 */
 	DRIVER( torid2gg )	/* (c) 1994 */
+	DRIVER( toride2j )	/* (c) 1994 */
 	DRIVER( gunmast )	/* (c) 1994 */
 	DRIVER( daitorid )	/* (c) 1995 */
 	DRIVER( dokyusei )	/* (c) 1995 Make Software / Elf / Media Trading */
@@ -6999,6 +7009,7 @@ Other Sun games
 	DRIVER( tenkaicb )	/* 1991 Dynax */
 	DRIVER( tenkaid )	/* 1991 Dynax */
 	DRIVER( tenkaie )	/* 1991 Dynax */
+	DRIVER( htengoku )	/* 1992 Dynax */
 	DRIVER( mjreach )	/* 1994 Dynax */
 	DRIVER( mjdialq2 )	/* "52" (c) 1991 Dynax */
 	DRIVER( yarunara )	/* "55" Mahjong Yarunara 1991 Dynax */
@@ -7042,6 +7053,8 @@ Other Sun games
 	DRIVER( pkgnsh )	/* "505" Pachinko Gindama Shoubu 1998 (Japan) */
 	DRIVER( pkgnshdx )	/* "522" Pachinko Gindama Shoubu DX 1998 (Japan) */
 
+	DRIVER( hjingi )	/* "???" */
+	DRIVER( hanayara )	/* "???" */
 	DRIVER( mjelctrn )	/* "???" Mahjong Electron Base parts 2 & 4 */
 	DRIVER( mjelct3 )	/* "???" Mahjong Electron Base parts 2 & 3 */
 	DRIVER( mjelct3a )	/* "???" Mahjong Electron Base parts 2 & 3 */
@@ -7066,6 +7079,7 @@ Other Sun games
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
 	DRIVER( cabaret )
+	DRIVER( pokerigs )	/* (c) 1995 */
 	DRIVER( lhb )		/* (c) 1995 */
 	DRIVER( lhba )		/* (c) 1995 */
 	DRIVER( dbc )		/* (c) 199? */
@@ -7794,8 +7808,10 @@ Other Sun games
 	DRIVER( esha )		/* (c) 1984 Funai / Gakken */
 	DRIVER( eshb )		/* (c) 1984 Funai / Gakken */
 	DRIVER( comebaby )	/* (c) 2000 ExPotato */
+	DRIVER( peplus )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
+	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 
 #endif	/* DRIVER_RECURSIVE */

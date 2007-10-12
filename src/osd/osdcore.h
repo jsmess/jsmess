@@ -593,7 +593,6 @@ INLINE INT32 osd_sync_add(INT32 volatile *ptr, INT32 delta)
 /* these flags can be set when queueing a work item to indicate how to handle
    its deconstruction */
 #define WORK_ITEM_FLAG_AUTO_RELEASE	0x0001
-#define WORK_ITEM_FLAG_SHARED		0x0002
 
 /* osd_work_queue is an opaque type which represents a queue of work items */
 typedef struct _osd_work_queue osd_work_queue;
@@ -683,7 +682,7 @@ void osd_work_queue_free(osd_work_queue *queue);
 
 
 /*-----------------------------------------------------------------------------
-    osd_work_item_queue: queue a new work item
+    osd_work_item_queue_multiple: queue a set of work items
 
     Parameters:
 
@@ -692,30 +691,38 @@ void osd_work_queue_free(osd_work_queue *queue);
 
         callback - pointer to a function that will do the work
 
+        numitems - number of work items to queue
+
         param - a void * parameter that can be used to pass data to the
             function
+
+        paramstep - the number of bytes to increment param by for each item
+            queued; for example, if you have an array of work_unit objects,
+            you can point param to the base of the array and set paramstep to
+            sizeof(work_unit)
 
         flags - one or more of the WORK_ITEM_FLAG_* values ORed together:
 
             WORK_ITEM_FLAG_AUTO_RELEASE - indicates that the work item
                 should be automatically freed when it is complete
 
-            WORK_ITEM_FLAG_SHARED - indicates that the same work item can
-                be simultaneously processed by multiple threads; the item
-                remains at the front of the queue until all threads
-                processing it have returned, which allows other threads to
-                process the same item if they have bandwidth
-
     Return value:
 
-        A pointer to an allocated osd_work_item representing the item.
+        A pointer to the final allocated osd_work_item in the list.
 
     Notes:
 
         On single-threaded systems, this function may actually execute the
         work item immediately before returning.
 -----------------------------------------------------------------------------*/
-osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags);
+osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, INT32 numitems, void *parambase, INT32 paramstep, UINT32 flags);
+
+
+/* inline helper to queue a single work item using the same interface */
+INLINE osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
+{
+	return osd_work_item_queue_multiple(queue, callback, 1, param, 0, flags);
+}
 
 
 /*-----------------------------------------------------------------------------

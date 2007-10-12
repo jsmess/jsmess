@@ -31,6 +31,7 @@
 #include "scsp.h"
 #include "scspdsp.h"
 
+
 #define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
 
 #define SHIFT	12
@@ -526,8 +527,9 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 
 	for(i=0;i<0x400;++i)
 	{
-		float fcent=(double) 1200.0*log_base_2((double)(((double) 1024.0+(double)i)/(double)1024.0));
-		fcent=(double) 44100.0*pow(2.0,fcent/1200.0);
+		//float fcent=(double) 1200.0*log_base_2((double)(((double) 1024.0+(double)i)/(double)1024.0));
+		//fcent=(double) 44100.0*pow(2.0,fcent/1200.0);
+		float fcent=44100.0*(1024.0+(double) i)/1024.0;
 		FNS_Table[i]=(float) (1<<SHIFT) *fcent;
 	}
 
@@ -921,17 +923,21 @@ SCSPNAME(_8bit,lfo,alfo,loop)\
 		}\
 		if(_8bit)\
 		{\
-			signed char *p=(signed char *) (slot->base+(slot->cur_addr>>SHIFT));\
+			signed char *p=(signed char *) (slot->base+BYTE_XOR_BE((slot->cur_addr>>SHIFT)));\
 			int s;\
 			signed int fpart=slot->cur_addr&((1<<SHIFT)-1);\
-			s=(int) p[0]*((1<<SHIFT)-fpart)+(int) slot->Prev*fpart;\
-			sample=(s>>SHIFT)<<8;\
-			slot->Prev=p[0];\
+			s=(int) (p[0]<<8)*((1<<SHIFT)-fpart)+(int) slot->Prev*fpart;\
+			sample=(s>>SHIFT);\
+			slot->Prev=p[0]<<8;\
 		}\
 		else\
 		{\
 			signed short *p=(signed short *) (slot->base+((slot->cur_addr>>(SHIFT-1))&(~1)));\
-			sample=(p[0]);\
+			int s;\
+			signed int fpart=slot->cur_addr&((1<<SHIFT)-1);\
+			s=(int) (p[0])*((1<<SHIFT)-fpart)+(int) slot->Prev*fpart;\
+			sample=(s>>SHIFT);\
+			slot->Prev=p[0];\
 		}\
 		if(slot->Backwards)\
 			slot->cur_addr-=step;\
@@ -1123,7 +1129,6 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	INT32 sample;
 	int step=slot->step;
 	UINT32 addr;
-	INT32 smp;
 
 	if(SSCTL(slot)!=0)	//no FM or noise yet
 		return 0;
@@ -1138,28 +1143,39 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		addr=slot->cur_addr>>SHIFT;
 	else
 		addr=(slot->cur_addr>>(SHIFT-1)) & 0x7fffe;
+/*
+    if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
+    {
+        INT32 smp;
+        smp=(SCSP->RINGBUF[(SCSP->BUFPTR+MDXSL(slot))&63]+SCSP->RINGBUF[(SCSP->BUFPTR+MDYSL(slot))&63])/2;
 
-	if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
-	{
-		smp=(SCSP->RINGBUF[(SCSP->BUFPTR+MDXSL(slot))&63]+SCSP->RINGBUF[(SCSP->BUFPTR+MDYSL(slot))&63])/2;
-
-		smp>>=11;
-		addr+=smp;
-		if(!PCM8B(slot))
-			addr&=0x7fffe;
-		else
-			addr&=0x7ffff;
-	}
-
+        smp>>=11;
+        addr+=smp;
+        if(!PCM8B(slot))
+            addr&=0x7fffe;
+        else
+            addr&=0x7ffff;
+    }
+*/
 	if(PCM8B(slot))	//8 bit signed
 	{
-		INT8 *p=(signed char *) (slot->base+(addr));
-		sample=(p[0])<<8;
+		INT8 *p=(INT8 *) (slot->base+BYTE_XOR_BE((slot->cur_addr>>SHIFT)));
+		INT32 s;
+		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
+		s=(int) (p[0]<<8)*((1<<SHIFT)-fpart)+(int) slot->Prev*fpart;
+		sample=(s>>SHIFT);
+		slot->Prev=p[0]<<8;
+
 	}
-	else	//16 bit signed (endianness?)
+	else	//16 bit signed
 	{
-		INT16 *p=(signed short *) (slot->base+addr);
-		sample=(p[0]);
+		INT16 *p=(INT16 *) (slot->base+addr);
+		INT32 s;
+		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
+		s=(int) (p[0])*((1<<SHIFT)-fpart)+(int) slot->Prev*fpart;
+		sample=(s>>SHIFT);
+		slot->Prev=p[0];
+
 	}
 
 	if(slot->Backwards)

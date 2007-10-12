@@ -221,7 +221,7 @@ WRITE8_HANDLER( frogs_audio_w )
 
 static const discrete_mixer_desc headon_mixer =
 	{DISC_MIXER_IS_RESISTOR,
-		{RES_K(130), RES_K(130), RES_K(100), RES_K(100), RES_K(100), RES_K(100)},   // 130 = 390/3, Bonus Res is dummy
+		{RES_K(130), RES_K(130), RES_K(100), RES_K(100), RES_K(100), RES_K(10)},   // 130 = 390/3, Bonus Res is dummy
 		{0,0,0,0,0},	// no variable resistors
 		{0,0,0,0,CAP_N(470),0},
 		0, RES_K(100),
@@ -231,7 +231,7 @@ static const discrete_mixer_desc headon_mixer =
 
 static const discrete_mixer_desc headon_crash_mixer =
 	{DISC_MIXER_IS_OP_AMP,
-		{RES_K(50), RES_K(50)},   // Resistors, in fact variable resistors (100k)
+		{RES_K(50), RES_K(10)},   // Resistors, in fact variable resistors (100k)
 		{0,0,0,0,0},	// no variable resistors
 		{CAP_N(100),CAP_U(1)},
 		0, RES_K(100),
@@ -404,14 +404,24 @@ static DISCRETE_SOUND_START(headon)
 	DISCRETE_LOGIC_INVERT(NODE_80, 1, HEADON_CRASH_EN)
 	DISCRETE_555_MSTABLE(NODE_81, 1, NODE_80, RES_K(470), CAP_U(1), &headon_555_crash)
 	// Mix with noise
-	DISCRETE_MULTIPLY(NODE_85, 1, NODE_81, NODE_51)
+	DISCRETE_MULTIPLY(NODE_84, 1, NODE_81, NODE_51)
+	// Taken from simulation
+	// Center frequency is 500 Hz
+	// roughly 6db per octave
+	DISCRETE_FILTER1(NODE_85, 1, NODE_84, 500, DISC_FILTER_BANDPASS)
+
 
 	DISCRETE_555_MSTABLE(NODE_86, 1, NODE_80, RES_K(470), CAP_U(2.2), &headon_555_crash)
 	// Mix with noise
 	DISCRETE_MULTIPLY(NODE_87, 1, NODE_86, NODE_51)
+	// Sallen Key filter ...
+	// http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
+	// f = w / 2 / pi  = 1 / ( 2 * pi * 15k*sqrt(470n*47n)) = 71 Hz
+	// Q = 1/2 * sqrt(470n/47n)= 1.58
+	DISCRETE_FILTER2(NODE_88, 1, NODE_87, 71, (1.0/1.58), DISC_FILTER_LOWPASS)
 
-	DISCRETE_MIXER2(NODE_89, 1, NODE_85, NODE_87, &headon_crash_mixer)
-	DISCRETE_TRANSFORM2(HEADON_CRASH_OUT, 1, NODE_89, 12, "01/")
+	DISCRETE_MIXER2(NODE_95, 1, NODE_85, NODE_88, &headon_crash_mixer)
+	DISCRETE_TRANSFORM2(HEADON_CRASH_OUT, 1, NODE_95, 12, "01/")
 
 	/************************************************
      * Mixer Stage
@@ -420,7 +430,7 @@ static DISCRETE_SOUND_START(headon)
 	DISCRETE_MIXER6(NODE_210, 1, HEADON_PLAYER_CAR_OUT, HEADON_COMP_CAR_OUT,
 					HEADON_SCREECH1_OUT, HEADON_SCREECH2_OUT,
 					HEADON_BONUS_OUT, HEADON_CRASH_OUT, &headon_mixer)
-	//DISCRETE_OUTPUT(NODE_73, 1000)
+
 	DISCRETE_OUTPUT(NODE_210, 37000.0 / 12.0)
 	//DISCRETE_CSVLOG3(HEADON_CRASH_EN,NODE_81,NODE_80)
 

@@ -496,7 +496,7 @@ void ptm6840_write (int which, int offset, int data)
 		{
 			idx = (offset == 1) ? 1 : (currptr->control_reg[1] & 0x01) ? 0 : 2;
 			diffs = data ^ currptr->control_reg[idx];
-			currptr->t3_divisor = (currptr->control_reg[3] & 0x01) ? 8 : 1;
+			currptr->t3_divisor = (currptr->control_reg[2] & 0x01) ? 8 : 1;
 			currptr->mode[idx] = (data>>3)&0x07;
 			currptr->control_reg[idx] = data;
 

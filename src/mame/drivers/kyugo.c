@@ -1077,6 +1077,48 @@ ROM_START( airwolf )
 	ROM_LOAD( "epl12p6a.9k",   0x0300, 0x0034, CRC(f5acad85) SHA1(ee3caeedf3e91793b12895f109eae5417f5c7631) )
 ROM_END
 
+ROM_START( airwolfa )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "airwolf.2",        0x0000, 0x8000, CRC(bc1a8587) SHA1(5487096621c175759eb4a4a85b76ef32900ca522) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* the rom with this set was bad with FIXED BITS (11xxxxxx), but the remaining bits matched */
+	ROM_LOAD( "airwolf.1",        0x0000, 0x8000, CRC(a3c7af5c) SHA1(0f70ca94f3d168d38e0e93252e9441973f72441a) )
+
+	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "airwolf.6",        0x00000, 0x2000, CRC(5b0a01e9) SHA1(a2873054caf08fcfa51e2f87556e9529b7d4b865) ) /* chars */
+
+	ROM_REGION( 0x06000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "airwolf.9",  0x00000, 0x2000, CRC(25e57e1f) SHA1(bef24bced102cd470e10bd4aa19da3c608211258) ) /* tiles - plane 1 */
+	ROM_LOAD( "airwolf.8",  0x02000, 0x2000, CRC(cf0de5e9) SHA1(32f3eb4c9298d59aca1dc2530b0e92f64311946d) ) /* tiles - plane 0 */
+	ROM_LOAD( "airwolf.7",  0x04000, 0x2000, CRC(4050c048) SHA1(ca21e0750f01342d9791067160339eec436c9458) ) /* tiles - plane 2 */
+
+	ROM_REGION( 0x18000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "airwolf.5",   0x00000, 0x2000, CRC(e8fbc7d2) SHA1(a9a651b4a714f490a051a89fd0327a665353d64b) ) /* sprites - plane 0 */
+	ROM_CONTINUE(            0x04000, 0x2000 )
+	ROM_CONTINUE(            0x02000, 0x2000 )
+	ROM_CONTINUE(            0x06000, 0x2000 )
+	ROM_LOAD( "airwolf.4",   0x08000, 0x2000, CRC(c5d4156b) SHA1(f66ec33b67e39f3df016231b00e48c9757e322f3) ) /* sprites - plane 1 */
+	ROM_CONTINUE(            0x0c000, 0x2000 )
+	ROM_CONTINUE(            0x0a000, 0x2000 )
+	ROM_CONTINUE(            0x0e000, 0x2000 )
+	ROM_LOAD( "airwolf.3",   0x10000, 0x2000, CRC(de91dfb1) SHA1(9f338542f44905d0b895d99510475113eb860f0d) ) /* sprites - plane 2 */
+	ROM_CONTINUE(            0x14000, 0x2000 )
+	ROM_CONTINUE(            0x12000, 0x2000 )
+	ROM_CONTINUE(            0x16000, 0x2000 )
+
+	ROM_REGION( 0x0340, REGION_PROMS, 0 )
+	ROM_LOAD( "01j.bin",     0x0000, 0x0100, CRC(6a94b2a3) SHA1(b1f9bd97aa26c9fb6377ef32d5dd125583361f48) ) /* red */
+	ROM_LOAD( "01h.bin",     0x0100, 0x0100, CRC(ec0923d3) SHA1(26f9eda4260a8b767893b8dea42819f192ef0b20) ) /* green */
+	ROM_LOAD( "01f.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
+	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
+
+	ROM_REGION( 0x0400, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "pal16l8a.2j",   0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "epl12p6a.9j",   0x0200, 0x0034, CRC(19808f14) SHA1(d5043237be8857d2cecaf7dec079461f6b53efa9) )
+	ROM_LOAD( "epl12p6a.9k",   0x0300, 0x0034, CRC(f5acad85) SHA1(ee3caeedf3e91793b12895f109eae5417f5c7631) )
+ROM_END
+
 ROM_START( skywolf )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "02s_03.bin",  0x0000, 0x4000, CRC(a0891798) SHA1(c1b1e1fce529509fb1dd921a0022d5367c3c495c) )
@@ -1230,6 +1272,7 @@ GAME( 1985, flashgla, flashgal, flashgla, flashgal, 0,        ROT0,  "Sega", "Fl
 GAME( 1986, srdmissn, 0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", 0 )
 GAME( 1986, fx,       srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", 0 )
 GAME( 1986?,legend,   0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland ?", "Legend", 0 )
-GAME( 1987, airwolf,  0,        srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo", "Airwolf", 0 )
+GAME( 1987, airwolf,  0,        srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo", "Airwolf (set 1)", 0 )
+GAME( 1987, airwolfa, airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", 0 )
 GAME( 1987, skywolf,  airwolf,  srdmissn, skywolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", 0 )
 GAME( 1987, skywolf2, airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", 0 )

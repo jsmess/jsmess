@@ -290,9 +290,20 @@ static void i386_trap(int irq, int irq_gate)
 
 		I.sreg[CS].selector = READ16( I.idtr.base + entry + 2 );
 		I.eip = READ16( I.idtr.base + entry );
+
+		/* Interrupts that vector through either interrupt gates or trap gates cause TF */
+		/* (the trap flag) to be reset after the current value of TF is saved on the stack as part of EFLAGS. */
+		I.TF = 0;
+
+		if (irq_gate)
+		{
+			I.IF = 0;
+		}
+
 	}
 	else
 	{
+		int type;
 		/* 32-bit */
 		PUSH32( get_flags() & 0x00fcffff );
 		PUSH32( I.sreg[CS].selector );
@@ -302,29 +313,34 @@ static void i386_trap(int irq, int irq_gate)
 		v2 = READ32( I.idtr.base + entry + 4 );
 		offset = (v2 & 0xffff0000) | (v1 & 0xffff);
 		segment = (v1 >> 16) & 0xffff;
+		type = (v2>>8) & 0x1F;
 
 		I.sreg[CS].selector = segment;
 		I.eip = offset;
-	}
 
-	/* Interrupts that vector through either interrupt gates or trap gates cause TF */
-	/* (the trap flag) to be reset after the current value of TF is saved on the stack as part of EFLAGS. */
-	I.TF = 0;
+		/* Interrupts that vector through either interrupt gates or trap gates cause TF */
+		/* (the trap flag) to be reset after the current value of TF is saved on the stack as part of EFLAGS. */
+		if ((type == 14) || (type==15))
+			I.TF = 0;
 
-	if (irq_gate)
-	{
-		I.IF = 0;
+		if (type == 14)
+		{
+			I.IF = 0;
+		}
+
 	}
 
 	i386_load_segment_descriptor(CS);
 	CHANGE_PC(I.eip);
+
 }
 
 static void i386_check_irq_line(void)
 {
 	/* Check if the interrupts are enabled */
-	if ( I.irq_line && I.IF )
+	if ( (I.irq_state) && I.IF )
 	{
+		I.cycles -= 2;
 		i386_trap(I.irq_callback(0), 1);
 	}
 }
@@ -562,7 +578,7 @@ void i386_init(int index, int clock, const void *config, int (*irqcallback)(int)
 	state_save_register_item(state_type, index, I.ldtr.segment);
 	state_save_register_item(state_type, index, I.ldtr.limit);
 	state_save_register_item(state_type, index, I.ldtr.flags);
-	state_save_register_item(state_type, index,  I.irq_line);
+	state_save_register_item(state_type, index,  I.irq_state);
 	state_save_register_item(state_type, index, I.performed_intersegment_jump);
 	state_save_register_func_postload(i386_postload);
 }
@@ -664,8 +680,7 @@ static void i386_set_irq_line(int irqline, int state)
 	}
 	else
 	{
-		I.irq_line = state;
-		i386_check_irq_line();
+		I.irq_state = state;
 	}
 }
 
@@ -697,11 +712,13 @@ int i386_execute(int num_cycles)
 	{
 		I.operand_size = I.sreg[CS].d;
 		I.address_size = I.sreg[CS].d;
+
 		I.segment_prefix = 0;
 		I.prev_eip = I.eip;
 
 		CALL_MAME_DEBUG;
 
+		i386_check_irq_line();
 		I386OP(decode_opcode)();
 	}
 	I.tsc += (num_cycles - I.cycles);
@@ -737,7 +754,7 @@ static void i386_set_info(UINT32 state, cpuinfo *info)
 		i386_set_a20_line(info->i);
 		return;
 	}
-	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 1)
+	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + MAX_INPUT_LINES)
 	{
 		i386_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i);
 		return;

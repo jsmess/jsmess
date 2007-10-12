@@ -101,6 +101,7 @@ extern void i8051_exit	(void); 				/* Shut down CPU core */
 extern int  i8051_execute(int cycles);			/* Execute cycles - returns number of cycles actually run */
 extern void i8051_get_context (void *dst);	/* Get registers, return context size */
 extern void i8051_set_context (void *src);    	/* Set registers */
+extern unsigned i8051_get_intram (int offset);
 extern unsigned i8051_get_reg (int regnum);
 extern void i8051_set_reg (int regnum, unsigned val);
 extern void i8051_set_irq_line(int irqline, int state);

@@ -375,7 +375,7 @@ case 0x27: /*      DAA */
 		int tmp = Regs.b.A;
 
 		if ( ! ( Regs.b.F & FLAG_N ) ) {
-			if ( ( Regs.b.F & FLAG_H ) || ( tmp & 0x0F ) > 9 ) 
+			if ( ( Regs.b.F & FLAG_H ) || ( tmp & 0x0F ) > 9 )
 				tmp += 6;
 			if ( ( Regs.b.F & FLAG_C ) || tmp > 0x9F )
 				tmp += 0x60;

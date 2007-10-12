@@ -224,7 +224,7 @@ WRITE8_HANDLER( dynax_blit2_palbank_w )
 /* Which half of the layers to write two (interleaved games only) */
 WRITE8_HANDLER( hanamai_layer_half_w )
 {
-	hanamai_layer_half = data & 1;
+	hanamai_layer_half = (~data) & 1;
 #if VERBOSE
 	logerror("H=%02X ",data);
 #endif
@@ -352,34 +352,34 @@ INLINE void blitter_plot_pixel(int layer,int mask, int x, int y, int pen, int wr
 	switch (layer_layout)
 	{
 		case LAYOUT_HANAMAI:
-			if (mask & 0x01)	dynax_pixmap[layer+0][hanamai_layer_half][addr] = pen;
-			if (mask & 0x02)	dynax_pixmap[layer+1][hanamai_layer_half][addr] = pen;
-			if (mask & 0x04)	dynax_pixmap[layer+2][hanamai_layer_half][addr] = pen;
-			if (mask & 0x08)	dynax_pixmap[layer+3][hanamai_layer_half][addr] = pen;
+			if (mask & 0x01)	dynax_pixmap[layer+0][hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x02)	dynax_pixmap[layer+1][hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x04)	dynax_pixmap[layer+2][hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x08)	dynax_pixmap[layer+3][hanamai_layer_half^flipscreen][addr] = pen;
 			break;
 
 		case LAYOUT_HNORIDUR:
-			if (mask & 0x01)	dynax_pixmap[layer+0][hanamai_layer_half][addr] = pen;
-			if (mask & 0x02)	dynax_pixmap[layer+1][hanamai_layer_half][addr] = pen;
-			if (mask & 0x04)	dynax_pixmap[layer+2][hanamai_layer_half][addr] = pen;
-			if (mask & 0x08)	dynax_pixmap[layer+3][hanamai_layer_half][addr] = pen;
+			if (mask & 0x01)	dynax_pixmap[layer+0][hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x02)	dynax_pixmap[layer+1][hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x04)	dynax_pixmap[layer+2][hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x08)	dynax_pixmap[layer+3][hanamai_layer_half^flipscreen][addr] = pen;
 			if (!hnoridur_layer_half2) break;
-			if (mask & 0x01)	dynax_pixmap[layer+0][1-hanamai_layer_half][addr] = pen;
-			if (mask & 0x02)	dynax_pixmap[layer+1][1-hanamai_layer_half][addr] = pen;
-			if (mask & 0x04)	dynax_pixmap[layer+2][1-hanamai_layer_half][addr] = pen;
-			if (mask & 0x08)	dynax_pixmap[layer+3][1-hanamai_layer_half][addr] = pen;
+			if (mask & 0x01)	dynax_pixmap[layer+0][1^hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x02)	dynax_pixmap[layer+1][1^hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x04)	dynax_pixmap[layer+2][1^hanamai_layer_half^flipscreen][addr] = pen;
+			if (mask & 0x08)	dynax_pixmap[layer+3][1^hanamai_layer_half^flipscreen][addr] = pen;
 			break;
 
 		case LAYOUT_JANTOUKI:
-			if (mask & 0x80)	dynax_pixmap[layer+3][1][addr] = pen;
-			if (mask & 0x40)	dynax_pixmap[layer+3][0][addr] = pen;
+			if (mask & 0x80)	dynax_pixmap[layer+3][1^flipscreen][addr] = pen;
+			if (mask & 0x40)	dynax_pixmap[layer+3][0^flipscreen][addr] = pen;
 		case LAYOUT_DRGPUNCH:
-			if (mask & 0x20)	dynax_pixmap[layer+2][1][addr] = pen;
-			if (mask & 0x10)	dynax_pixmap[layer+2][0][addr] = pen;
-			if (mask & 0x08)	dynax_pixmap[layer+1][1][addr] = pen;
-			if (mask & 0x04)	dynax_pixmap[layer+1][0][addr] = pen;
-			if (mask & 0x02)	dynax_pixmap[layer+0][1][addr] = pen;
-			if (mask & 0x01)	dynax_pixmap[layer+0][0][addr] = pen;
+			if (mask & 0x20)	dynax_pixmap[layer+2][1^flipscreen][addr] = pen;
+			if (mask & 0x10)	dynax_pixmap[layer+2][0^flipscreen][addr] = pen;
+			if (mask & 0x08)	dynax_pixmap[layer+1][1^flipscreen][addr] = pen;
+			if (mask & 0x04)	dynax_pixmap[layer+1][0^flipscreen][addr] = pen;
+			if (mask & 0x02)	dynax_pixmap[layer+0][1^flipscreen][addr] = pen;
+			if (mask & 0x01)	dynax_pixmap[layer+0][0^flipscreen][addr] = pen;
 			break;
 
 		case LAYOUT_MJDIALQ2:
@@ -946,7 +946,7 @@ void hanamai_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
 		for (dy = 0; dy < 256; dy++)
 		{
 			UINT16 *dst;
-			UINT16 *dstbase = (UINT16 *)bitmap->base + ((dy - scrolly) & 0xff) * bitmap->rowpixels;
+			UINT16 *dstbase = BITMAP_ADDR16(bitmap, (dy - scrolly) & 0xff, 0);
 
 			length = scrollx;
 			dst = dstbase + 2*(256 - length);
@@ -1008,7 +1008,7 @@ void jantouki_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i, int
 		{
 			int sy = ((dy - scrolly) & 0xff) + y;
 			UINT16 *dst;
-			UINT16 *dstbase = (UINT16 *)bitmap->base + sy* bitmap->rowpixels;
+			UINT16 *dstbase = BITMAP_ADDR16(bitmap, sy, 0);
 
 			if ((sy < cliprect->min_y) || (sy > cliprect->max_y))
 			{
@@ -1070,7 +1070,7 @@ void mjdialq2_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
 		for (dy = 0; dy < 256; dy++)
 		{
 			UINT16 *dst;
-			UINT16 *dstbase = (UINT16 *)bitmap->base + ((dy - scrolly) & 0xff) * bitmap->rowpixels;
+			UINT16 *dstbase = BITMAP_ADDR16(bitmap, (dy - scrolly) & 0xff, 0);
 
 			length = scrollx;
 			dst = dstbase + 256 - length;
@@ -1309,4 +1309,33 @@ VIDEO_UPDATE( mjdialq2 )
 	if (layers_ctrl & 1)	mjdialq2_copylayer( bitmap, cliprect, 0 );
 	if (layers_ctrl & 2)	mjdialq2_copylayer( bitmap, cliprect, 1 );
 	return 0;
+}
+
+// htengoku uses the mixer chip from ddenlovr
+
+static mame_bitmap *framebuffer;
+
+VIDEO_START(htengoku)
+{
+	video_start_ddenlovr(machine);
+	video_start_hnoridur(machine);
+	framebuffer = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+}
+
+VIDEO_EOF(htengoku)
+{
+	int layer,x,y;
+
+	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
+	// format and let video_eof_ddenlovr do the final compositing (priorities + palettes)
+	for (layer = 0; layer < 4; layer++)
+	{
+		fillbitmap(framebuffer,0,&machine->screen[0].visarea);
+		hanamai_copylayer( framebuffer, &machine->screen[0].visarea, layer );
+
+		for (y=0; y < 256; y++)
+			for (x=0; x < 512; x++)
+				ddenlovr_pixmap[3-layer][y*512+x] = (UINT8)(*BITMAP_ADDR16(framebuffer, y,x));
+	}
+	video_eof_ddenlovr(machine);
 }

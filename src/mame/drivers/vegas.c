@@ -295,7 +295,7 @@
 #define LOG_TIMEKEEPER		(0)
 #define LOG_SIO				(0)
 #define LOG_DYNAMIC			(0)
-#define PRINTF_SERIAL		(0)
+#define PRINTF_SERIAL		(1)
 
 
 
@@ -447,6 +447,8 @@
 
 static UINT32 *rambase, *rombase;
 static size_t ramsize;
+
+static int speedup_index;
 
 static UINT32 *nile_regs;
 static UINT16 nile_irq_state;
@@ -2225,7 +2227,6 @@ MACHINE_DRIVER_START( vegascore )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MDRV_PALETTE_LENGTH(65536)
 
 	MDRV_VIDEO_START(vegas_voodoo2)
 	MDRV_VIDEO_UPDATE(vegas)
@@ -2453,6 +2454,17 @@ static void init_common(int ioasic, int serialnum)
 	/* allocate RAM for the timekeeper */
 	timekeeper_nvram_size = 0x8000;
 	timekeeper_nvram = auto_malloc(timekeeper_nvram_size);
+
+	/* reset speedups */
+	speedup_index = 0;
+}
+
+static void add_speedup(offs_t pc, UINT32 op)
+{
+	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
+	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
+	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
+	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
 }
 
 
@@ -2462,15 +2474,10 @@ static DRIVER_INIT( gauntleg )
 	init_common(MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_PC, 0x80015438);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, 0x1462fffd);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 1000);
-
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_PC, 0x80015478);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, 0x1440fffa);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 1000);
+	add_speedup(0x80015430, 0x8CC38060);		/* confirmed */
+	add_speedup(0x80015464, 0x3C09801E);		/* confirmed */
+	add_speedup(0x800C8918, 0x8FA2004C);		/* confirmed */
+	add_speedup(0x800C8890, 0x8FA20024);		/* confirmed */
 }
 
 
@@ -2478,6 +2485,12 @@ static DRIVER_INIT( gauntdl )
 {
 	dcs2_init(4, 0x0b5d);
 	init_common(MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
+
+	/* speedups */
+	add_speedup(0x800158B8, 0x8CC3CC40);		/* confirmed */
+	add_speedup(0x800158EC, 0x3C0C8022);		/* confirmed */
+	add_speedup(0x800D40C0, 0x8FA2004C);		/* confirmed */
+	add_speedup(0x800D4038, 0x8FA20024);		/* confirmed */
 }
 
 
@@ -2485,6 +2498,9 @@ static DRIVER_INIT( warfa )
 {
 	dcs2_init(4, 0x0b5d);
 	init_common(MIDWAY_IOASIC_MACE, 337/* others? */);
+
+	/* speedups */
+	add_speedup(0x8009436C, 0x0C031663);		/* confirmed */
 }
 
 
@@ -2492,6 +2508,12 @@ static DRIVER_INIT( tenthdeg )
 {
 	dcs2_init(4, 0x0afb);
 	init_common(MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
+
+	/* speedups */
+	add_speedup(0x80051CD8, 0x0C023C15);		/* confirmed */
+	add_speedup(0x8005E674, 0x3C028017);		/* confirmed */
+	add_speedup(0x8002DBCC, 0x8FA2002C);		/* confirmed */
+	add_speedup(0x80015930, 0x8FC20244);		/* confirmed */
 }
 
 
@@ -2556,7 +2578,7 @@ static DRIVER_INIT( cartfury )
 /* Vegas + Vegas SIO + Voodoo 2 */
 GAME( 1998, gauntleg, 0,        vegas,    gauntleg, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.6)", 0 )
 GAME( 1998, gauntl12, gauntleg, vegas,    gauntleg, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.2)", GAME_NO_SOUND )
-GAME( 1998, tenthdeg, 0,        vegas,    tenthdeg, tenthdeg, ROT0, "Atari Games",  "Tenth Degree", 0 )
+GAME( 1998, tenthdeg, 0,        vegas,    tenthdeg, tenthdeg, ROT0, "Atari Games",  "Tenth Degree (prototype)", 0 )
 
 /* Durango + Vegas SIO + Voodoo 2 */
 GAME( 1999, gauntdl,  0,        vegas,    gauntdl,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", 0 )

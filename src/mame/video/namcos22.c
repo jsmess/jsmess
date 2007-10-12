@@ -237,13 +237,6 @@ INLINE unsigned texel( unsigned x, unsigned y )
 	return mpTextureTileData[(tile<<8)|mXYAttrToPixel[mpTextureTileMapAttr[offs]][x&0xf][y&0xf]];
 } /* texel */
 
-typedef void drawscanline_t(
-	mame_bitmap *bitmap,
-	const rectangle *clip,
-	const edge *e1,
-	const edge *e2,
-	int sy );
-
 static void renderscanline_uvi_full(running_machine *machine, mame_bitmap *bitmap, const rectangle *clip, const edge *e1, const edge *e2, int sy, int color, int bn, UINT16 flags, int cmode )
 {
 	int fadeEnable = (mixer.target&1) && mixer.fadeFactor;

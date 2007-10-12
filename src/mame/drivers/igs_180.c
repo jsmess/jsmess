@@ -351,6 +351,6 @@ static DRIVER_INIT( tjsb )
 	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
 }
 
-GAME( 1996, iqblocka, iqblock, igs_180, igs_180, iqblock, ROT0, "IGS", "IQ-Block (V127M)", 0)//GAME_NOT_WORKING )
-GAME( 1996, iqblockf, iqblock, igs_180, igs_180, iqblock, ROT0, "IGS", "IQ-Block (V113FR)", 0)//GAME_NOT_WORKING )
-GAME( 1997, tjsb,     0,       igs_180, igs_180, tjsb,    ROT0, "IGS", "Mahjong Tian Jiang Shen Bing", 0)//GAME_NOT_WORKING )
+GAME( 1996, iqblocka, iqblock, igs_180, igs_180, iqblock, ROT0, "IGS", "IQ-Block (V127M)", GAME_NOT_WORKING )
+GAME( 1996, iqblockf, iqblock, igs_180, igs_180, iqblock, ROT0, "IGS", "IQ-Block (V113FR)", GAME_NOT_WORKING )
+GAME( 1997, tjsb,     0,       igs_180, igs_180, tjsb,    ROT0, "IGS", "Mahjong Tian Jiang Shen Bing", GAME_NOT_WORKING )

@@ -56,7 +56,7 @@ typedef struct
 
 	UINT16	pending_interrupts; /* MB */
 	int 	(*irq_callback)(int irqline);
-	int 	irq_state[8];		/* KW Additional lines for HD63705 */
+	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
 } m6805_Regs;
 

@@ -86,6 +86,7 @@ VIDEO_START( ms32 )
 	if (!strcmp(machine->gamedrv->name,"tp2m32"))	ms32_reverse_sprite_order = 0;
 	if (!strcmp(machine->gamedrv->name,"47pie2"))	ms32_reverse_sprite_order = 0;
 	if (!strcmp(machine->gamedrv->name,"47pie2o"))	ms32_reverse_sprite_order = 0;
+	if (!strcmp(machine->gamedrv->name,"hayaosi3"))	ms32_reverse_sprite_order = 0;
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	brt[0] = brt[1] = 0xffff;
@@ -486,24 +487,24 @@ VIDEO_UPDATE( ms32 )
        top and bottom of the screen becomes black on black) */
 	fillbitmap(bitmap,machine->pens[0],cliprect);	/* bg color */
 
-#ifdef MAME_DEBUG
-if (!input_code_pressed(KEYCODE_Q))
-#endif
-	tilemap_draw(bitmap,cliprect,ms32_bg_tilemap,0,1);
 
-#ifdef MAME_DEBUG
-if (!input_code_pressed(KEYCODE_W))
-#endif
-	draw_roz(bitmap,cliprect,2);
+	/* priority hack, we really need to figure out what priority ram is I think */
+	if (!strcmp(machine->gamedrv->name,"hayaosi3"))
+	{
+		tilemap_draw(bitmap,cliprect,ms32_bg_tilemap,0,1);
+		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap,0,4);
+		draw_roz(bitmap,cliprect,4); // this question text needs to appear over the sprites
+		draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x40000);
 
-#ifdef MAME_DEBUG
-if (!input_code_pressed(KEYCODE_E))
-#endif
-	tilemap_draw(bitmap,cliprect,ms32_tx_tilemap,0,4);
+	}
+	else
+	{
+		tilemap_draw(bitmap,cliprect,ms32_bg_tilemap,0,1);
+		draw_roz(bitmap,cliprect,2);
+		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap,0,4);
+		draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x40000);
+	}
 
-#ifdef MAME_DEBUG
-if (!input_code_pressed(KEYCODE_R))
-#endif
-	draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x40000);
+
 	return 0;
 }

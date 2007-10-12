@@ -88,20 +88,15 @@
 #define DISABLE_FIXED_RAM_LOAD			(0)
 #define DISABLE_FIXED_RAM_STORE			(0)
 #define FLUSH_AFTER_EACH_INSTRUCTION	(0)
-#define PRINTF_EXCEPTIONS				(1)
+#define PRINTF_EXCEPTIONS				(0)
 #define PROBE_ADDRESS					(0)
+#define LOG_HOTSPOTS					(0)
 
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-/* compilation boundaries -- how far back/forward does the analysis extend? */
-#define COMPILE_BACKWARDS_BYTES			128
-#define COMPILE_FORWARDS_BYTES			512
-#define COMPILE_MAX_INSTRUCTIONS		((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
-#define MAX_INSTRUCTION_SEQUENCE		64
 
 /* extra "conditions" used to augment the basic conditions for OOB handlers */
 #define COND_NONE						16
@@ -229,43 +224,54 @@ struct _oob_handler
 struct _mips3drc_data
 {
 	/* misc data */
-	UINT64			abs64mask[2];
-	UINT32			abs32mask[4];
+	UINT64				abs64mask[2];
+	UINT32				abs32mask[4];
 
 	/* C functions */
-	x86code *		activecpu_gettotalcycles64;
-	x86code *		mips3com_update_cycle_counting;
-	x86code *		mips3com_tlbr;
-	x86code *		mips3com_tlbwi;
-	x86code *		mips3com_tlbwr;
-	x86code *		mips3com_tlbp;
+	x86code *			activecpu_gettotalcycles64;
+	x86code *			mips3com_update_cycle_counting;
+	x86code *			mips3com_tlbr;
+	x86code *			mips3com_tlbwi;
+	x86code *			mips3com_tlbwr;
+	x86code *			mips3com_tlbp;
 
 	/* internal functions */
-	x86code *		generate_interrupt_exception;
-	x86code *		generate_cop_exception;
-	x86code *		generate_overflow_exception;
-	x86code *		generate_invalidop_exception;
-	x86code *		generate_syscall_exception;
-	x86code *		generate_break_exception;
-	x86code *		generate_trap_exception;
-	x86code *		generate_tlbload_exception;
-	x86code *		generate_tlbstore_exception;
-	x86code *		handle_pc_tlb_mismatch;
-	x86code *		find_exception_handler;
-	x86code *		explode_ccr31;
-	x86code *		recover_ccr31;
+	x86code *			generate_interrupt_exception;
+	x86code *			generate_cop_exception;
+	x86code *			generate_overflow_exception;
+	x86code *			generate_invalidop_exception;
+	x86code *			generate_syscall_exception;
+	x86code *			generate_break_exception;
+	x86code *			generate_trap_exception;
+	x86code *			generate_tlbload_exception;
+	x86code *			generate_tlbstore_exception;
+	x86code *			handle_pc_tlb_mismatch;
+	x86code *			find_exception_handler;
+	x86code *			explode_ccr31;
+	x86code *			recover_ccr31;
 
 	/* read/write handlers */
-	readwrite_handlers general;
-	readwrite_handlers cached;
-	readwrite_handlers uncached;
+	readwrite_handlers 	general;
+	readwrite_handlers 	cached;
+	readwrite_handlers 	uncached;
 
 	/* out of bounds handlers */
-	oob_handler		ooblist[COMPILE_MAX_INSTRUCTIONS*2];
-	int				oobcount;
+	oob_handler			ooblist[COMPILE_MAX_INSTRUCTIONS*2];
+	int					oobcount;
 
 	/* C functions */
-	x86code *		execute_c_version;
+	x86code *			execute_c_version;
+
+	/* hotspot tracking */
+#if LOG_HOTSPOTS
+	struct
+	{
+		offs_t			pc;
+		UINT32			opcode;
+		UINT64			count;
+	} hotspot[100000];
+	int					next_hotspot;
+#endif
 };
 
 
@@ -299,6 +305,8 @@ static void append_explode_ccr31(drc_core *drc);
 static void append_recover_ccr31(drc_core *drc);
 static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
 static void append_check_sw_interrupts(drc_core *drc, int inline_generate);
+
+static void emit_update_cycles_pc_and_flush(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, offs_t destpc);
 
 static int compile_instruction(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
 static int compile_special(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
@@ -340,12 +348,6 @@ static int compile_store_double_partial(drc_core *drc, compiler_state *compiler,
 /***************************************************************************
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
-
-static UINT64 dmult_temp1;
-static UINT64 dmult_temp2;
-static UINT32 jr_temp;
-
-static compiler_state compiler_save;
 
 static const UINT8 nvreg[] = { REG_NV0, REG_NV1, REG_NV2, REG_NV3, REG_NV4, REG_NV5, REG_NV6 };
 
@@ -459,6 +461,27 @@ static void mips3drc_init(void)
 static void mips3drc_exit(void)
 {
 	printf("Final code size = %d\n", (int)(mips3.drc->cache_top - mips3.drc->cache_base));
+#if LOG_HOTSPOTS
+	/* print top hotspots */
+	{
+		int maxspot = 0;
+		int hotnum;
+		int count;
+
+		for (count = 0; count < 10; count++)
+		{
+			for (hotnum = 1; hotnum < mips3.drcdata->next_hotspot; hotnum++)
+				if (mips3.drcdata->hotspot[hotnum].count > mips3.drcdata->hotspot[maxspot].count)
+					maxspot = hotnum;
+			printf("%08X%08X hits: add_speedup(0x%08X, 0x%08X);\n",
+					(UINT32)(mips3.drcdata->hotspot[maxspot].count >> 32),
+					(UINT32)mips3.drcdata->hotspot[maxspot].count,
+					mips3.drcdata->hotspot[maxspot].pc,
+					mips3.drcdata->hotspot[maxspot].opcode);
+			mips3.drcdata->hotspot[maxspot].count = 0;
+		}
+	}
+#endif
 }
 
 
@@ -632,6 +655,28 @@ static void drc_recompile_callback(drc_core *drc)
 		/* initialize the compiler state */
 		compiler_state_reset(&compiler);
 
+#if LOG_HOTSPOTS
+		/* add hotspot tracking */
+		{
+			int hotnum;
+
+			drc_register_code_at_cache_top(drc, seqhead->pc);
+
+			for (hotnum = 0; hotnum < mips3.drcdata->next_hotspot; hotnum++)
+				if (mips3.drcdata->hotspot[hotnum].pc == seqhead->pc && mips3.drcdata->hotspot[hotnum].opcode == *seqhead->opptr.l)
+					break;
+			if (hotnum == mips3.drcdata->next_hotspot)
+			{
+				assert(hotnum < ARRAY_LENGTH(mips3.drcdata->hotspot));
+				mips3.drcdata->hotspot[hotnum].pc = seqhead->pc;
+				mips3.drcdata->hotspot[hotnum].opcode = *seqhead->opptr.l;
+				mips3.drcdata->hotspot[hotnum].count = 0;
+				mips3.drcdata->next_hotspot++;
+			}
+			emit_add_m64_imm(DRCTOP, MDRC(&mips3.drcdata->hotspot[hotnum].count), 1);
+		}
+#endif
+
 		/* iterate over instructions in the sequence and compile them */
 		for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
 			compile_one(drc, &compiler, curdesc);
@@ -640,12 +685,7 @@ static void drc_recompile_callback(drc_core *drc)
 		if (!(seqlast->flags & (OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_WILL_CAUSE_EXCEPTION)))
 		{
 			UINT32 nextpc = seqlast->pc + (seqlast->skipslots + 1) * 4;
-			if (compiler.cycles != 0)
-				emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler.cycles);						// sub  [icount],cycles
-			emit_mov_r32_imm(DRCTOP, REG_P1, nextpc);										// mov  p1,nextpc
-			compiler_register_flush_all(drc, &compiler);									// <flush registers>
-			if (compiler.cycles != 0)
-				emit_jcc(DRCTOP, COND_S, mips3.drc->exit_point);							// js   exit_point
+			emit_update_cycles_pc_and_flush(drc, &compiler, NULL, nextpc);
 		}
 
 		/* if this is a likely branch, the fall through case needs to skip the next instruction */
@@ -1894,6 +1934,55 @@ static void emit_set_constant_value(drc_core *drc, compiler_state *compiler, con
 
 
 /*------------------------------------------------------------------
+    emit_flush_cycles_before_instruction
+------------------------------------------------------------------*/
+
+static void emit_flush_cycles_before_instruction(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, UINT32 cycles_to_leave)
+{
+	/* if we have cycles, subtract them now */
+	if (compiler->cycles - cycles_to_leave != 0)
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles - cycles_to_leave);			// sub  [icount],cycles
+
+	/* clear out compiler counts */
+	compiler->cycles = cycles_to_leave;
+}
+
+
+/*------------------------------------------------------------------
+    emit_update_cycles_pc_and_flush
+------------------------------------------------------------------*/
+
+static void emit_update_cycles_pc_and_flush(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, offs_t destpc)
+{
+	/* if we have cycles, subtract them now */
+	emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);									// sub  [icount],cycles
+
+	/* clear out compiler counts */
+	compiler->cycles = 0;
+
+	/* if we have an opcode descriptor, make this an oob */
+	if (desc != NULL)
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+
+	/* otherwise, do it inline */
+	else
+	{
+		/* load the target PC into P1 */
+		if (destpc != BRANCH_TARGET_DYNAMIC)
+			emit_mov_r32_imm(DRCTOP, REG_P1, destpc);										// mov  p1,destpc
+		else
+			emit_mov_r32_m32(DRCTOP, REG_P1, MBD(REG_RSP, SPOFFS_NEXTPC));					// mov  p1,[esp+nextpc]
+
+		/* flush any live registers */
+		compiler_register_flush_all(drc, compiler);
+
+		/* if we subtracted cycles and went negative, time to exit */
+		emit_jcc(DRCTOP, COND_S, mips3.drc->exit_point);									// js   exit_point
+	}
+}
+
+
+/*------------------------------------------------------------------
     emit_delay_slot_and_branch
 ------------------------------------------------------------------*/
 
@@ -1909,22 +1998,8 @@ static void emit_delay_slot_and_branch(drc_core *drc, const compiler_state *comp
 	assert(desc->delay != NULL);
 	compile_one(drc, &compiler_temp, desc->delay);											// <next instruction>
 
-	/* if we have cycles, subtract them now */
-	if (compiler_temp.cycles != 0)
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler_temp.cycles);							// sub  [icount],cycles
-
-	/* load the target PC into P1 */
-	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
-		emit_mov_r32_imm(DRCTOP, REG_P1, desc->targetpc);									// mov  p1,desc->targetpc
-	else
-		emit_mov_r32_m32(DRCTOP, REG_P1, MBD(REG_RSP, SPOFFS_NEXTPC));						// mov  p1,[esp+nextpc]
-
-	/* flush any live registers */
-	compiler_register_flush_all(drc, &compiler_temp);
-
-	/* if we subtracted cycles and went negative, time to exit */
-	if (compiler_temp.cycles != 0)
-		emit_jcc(DRCTOP, COND_S, mips3.drc->exit_point);									// js   exit_point
+	/* update the cycles and load the new PC in case we need to stop here */
+	emit_update_cycles_pc_and_flush(drc, &compiler_temp, NULL, desc->targetpc);
 
 	/* otherwise, append a dispatcher */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
@@ -2954,37 +3029,36 @@ static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 			return TRUE;
 
 		case COP0_Status:
+			emit_flush_cycles_before_instruction(drc, compiler, desc, 1);
 			emit_mov_r32_m32(DRCTOP, REG_EDX, CPR0ADDR(COP0_Status));						// mov  edx,[Status]
 			emit_mov_m32_r32(DRCTOP, CPR0ADDR(COP0_Status), REG_EAX);						// mov  [Status],eax
 			emit_xor_r32_r32(DRCTOP, REG_EDX, REG_EAX);										// xor  edx,eax
 			emit_test_r32_imm(DRCTOP, REG_EDX, 0x8000);										// test edx,0x8000
 			emit_jcc_short_link(DRCTOP, COND_Z, &link1);									// jz   skip
 			emit_lea_r64_m64(DRCTOP, REG_P1, COREADDR);										// lea  p1,[mips3.core]
-			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->mips3com_update_cycle_counting));
-																							// call mips3com_update_cycle_counting
+			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->mips3com_update_cycle_counting));	// call mips3com_update_cycle_counting
 			resolve_link(DRCTOP, &link1);												// skip:
 			append_check_interrupts(drc, compiler, desc);									// <check interrupts>
 			return TRUE;
 
 		case COP0_Count:
+			emit_flush_cycles_before_instruction(drc, compiler, desc, 1);
 			emit_mov_m32_r32(DRCTOP, CPR0ADDR(COP0_Count), REG_EAX);						// mov  [Count],eax
 			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));		// call activecpu_gettotalcycles64
 			emit_mov_r32_m32(DRCTOP, REG_EDX, CPR0ADDR(COP0_Count));						// mov  edx,[Count]
 			emit_sub_r64_r64(DRCTOP, REG_RAX, REG_RDX);										// sub  rax,rdx
 			emit_sub_r64_r64(DRCTOP, REG_RAX, REG_RDX);										// sub  rax,rdx
-			emit_mov_m64_r64(DRCTOP, MDRC(&mips3.core->count_zero_time), REG_RAX);
-																							// mov  [count_zero_time],rax
+			emit_mov_m64_r64(DRCTOP, MDRC(&mips3.core->count_zero_time), REG_RAX);			// mov  [count_zero_time],rax
 			emit_lea_r64_m64(DRCTOP, REG_P1, COREADDR);										// lea  p1,[mips3.core]
-			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->mips3com_update_cycle_counting));
-																							// call mips3com_update_cycle_counting
+			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->mips3com_update_cycle_counting));	// call mips3com_update_cycle_counting
 			return TRUE;
 
 		case COP0_Compare:
+			emit_flush_cycles_before_instruction(drc, compiler, desc, 1);
 			emit_mov_m32_r32(DRCTOP, CPR0ADDR(COP0_Compare), REG_EAX);						// mov  [Compare],eax
 			emit_and_m32_imm(DRCTOP, CPR0ADDR(COP0_Cause), ~0x8000);						// and  [Cause],~0x8000
 			emit_lea_r64_m64(DRCTOP, REG_P1, COREADDR);										// lea  p1,[mips3.core]
-			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->mips3com_update_cycle_counting));
-																							// call mips3com_update_cycle_counting
+			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->mips3com_update_cycle_counting));	// call mips3com_update_cycle_counting
 			return TRUE;
 
 		case COP0_PRId:
@@ -3019,6 +3093,7 @@ static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 	{
 		case COP0_Count:
 			compiler->cycles += MIPS3_COUNT_READ_CYCLES;
+			emit_flush_cycles_before_instruction(drc, compiler, desc, MIPS3_COUNT_READ_CYCLES);
 			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));		// call activecpu_gettotalcycles64
 			emit_sub_r64_m64(DRCTOP, REG_RAX, MDRC(&mips3.core->count_zero_time));			// sub  rax,[count_zero_time]
 			emit_shr_r64_imm(DRCTOP, REG_RAX, 1);											// shr  rax,1
@@ -3026,11 +3101,12 @@ static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 			return TRUE;
 
 		case COP0_Cause:
-			compiler->cycles += MIPS3_COUNT_READ_CYCLES;
+			compiler->cycles += MIPS3_CAUSE_READ_CYCLES;
 			emit_movsxd_r64_m32(DRCTOP, REG_RAX, CPR0ADDR(COP0_Cause));						// movsxd rax,[Cause]
 			return TRUE;
 
 		case COP0_Random:
+			emit_flush_cycles_before_instruction(drc, compiler, desc, 1);
 			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));		// call activecpu_gettotalcycles64
 			emit_mov_r32_m32(DRCTOP, REG_ECX, CPR0ADDR(COP0_Wired));						// mov  ecx,[Wired]
 			emit_mov_r32_imm(DRCTOP, REG_R8D, 48);											// mov  r8d,48
@@ -4970,11 +5046,7 @@ static int compile_load(drc_core *drc, compiler_state *compiler, const opcode_de
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5030,11 +5102,7 @@ static int compile_load_cop(drc_core *drc, compiler_state *compiler, const opcod
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5093,11 +5161,7 @@ static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const opco
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5199,11 +5263,7 @@ static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, co
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5309,11 +5369,7 @@ static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, 
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5373,11 +5429,7 @@ static int compile_store(drc_core *drc, compiler_state *compiler, const opcode_d
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5433,11 +5485,7 @@ static int compile_store_cop(drc_core *drc, compiler_state *compiler, const opco
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5496,11 +5544,7 @@ static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const opc
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5591,11 +5635,7 @@ static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, c
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }
 
@@ -5686,10 +5726,6 @@ static int compile_store_double_partial(drc_core *drc, compiler_state *compiler,
 
 	/* update cycle counts */
 	if (!was_fixed)
-	{
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-		compiler->cycles = 0;
-		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-	}
+		emit_update_cycles_pc_and_flush(drc, compiler, desc, 0);
 	return TRUE;
 }

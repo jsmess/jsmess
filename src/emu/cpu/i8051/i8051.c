@@ -1306,6 +1306,16 @@ void i8051_set_context(void *src)
 		memcpy(&i8051, src, sizeof(I8051));
 }
 
+/* Get Internal RAM value */
+unsigned i8051_get_intram(int offset)
+{
+    UINT8 ram_ret = 0;
+    RWM = 1;
+    ram_ret = IRAM_R(offset);
+    RWM = 0;
+    return ram_ret;
+}
+
 /*NOTE: These are not used by the opcode functions, they are here only for MAME requirements*/
 unsigned i8051_get_reg(int regnum)
 {
@@ -1789,11 +1799,11 @@ static WRITE8_HANDLER(internal_ram_iwrite)
 */
 static READ32_HANDLER(external_ram_iaddr)
 {
-/*  if(i8051.eram_iaddr_callback)
+    if(i8051.eram_iaddr_callback)
         return i8051.eram_iaddr_callback(offset,mem_mask);
     else
         LOG(("i8051 #%d: external ram address requested (8 bit offset=%02x), but no callback available! at PC:%04x\n", cpu_getactivecpu(), offset, PC));
-*/
+
 	return offset;
 }
 

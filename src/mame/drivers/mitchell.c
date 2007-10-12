@@ -1690,6 +1690,8 @@ ROM_START( pang )
 	ROM_LOAD( "bb1.bin",      0x00000, 0x20000, CRC(c52e5b8e) SHA1(933b954bfdd2d67e28b032ffabde192531249c1f) )
 ROM_END
 
+
+
 ROM_START( pangb )
 	ROM_REGION( 2*0x50000, REGION_CPU1, 0 )
 	ROM_LOAD( "pang_04.bin",  0x50000, 0x08000, CRC(f68f88a5) SHA1(6f57891d399a46d8d5a531771129552ed420d10a) )   /* Decrypted opcode + data */
@@ -1739,6 +1741,46 @@ ROM_START( pangbold )
 
 	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* OKIM */
 	ROM_LOAD( "1.1a",      0x00000, 0x10000, CRC(b6463907) SHA1(b79e0dca10c639b7f0ea9cbc49300b80708d46fa) )
+ROM_END
+
+/* this bootleg has different sound hardware, the sound program is the same as 'rebus' by microhard
+   I suspect it was produced by the same company as 'spangbl' */
+ROM_START( pangba )
+	ROM_REGION( 2*0x50000, REGION_CPU1, 0 )
+	ROM_LOAD( "pang.3",  0x50000, 0x08000, CRC(2548534f) SHA1(c67964e1d0b51ea7bb62685055dee1910e9f0fb9) )
+	ROM_CONTINUE(        0x00000, 0x08000 )
+	ROM_LOAD( "pang.2",  0x60000, 0x04000, CRC(8167b646) SHA1(db131cb53e81abd070db83721752a8f5473afbb9) )
+	ROM_CONTINUE(        0x10000, 0x04000 )
+	ROM_CONTINUE(        0x64000, 0x04000 )
+	ROM_CONTINUE(        0x14000, 0x04000 )
+	ROM_CONTINUE(        0x68000, 0x04000 )
+	ROM_CONTINUE(        0x18000, 0x04000 )
+	ROM_CONTINUE(        0x6c000, 0x04000 )
+	ROM_CONTINUE(        0x1c000, 0x04000 )
+	ROM_LOAD( "pang.1",  0x70000, 0x04000, CRC(5c3afca2) SHA1(130c801495d83e2336b8c5b04ca168e76e9e0da8) )
+	ROM_CONTINUE(        0x20000, 0x04000 )
+	ROM_CONTINUE(        0x74000, 0x04000 )
+	ROM_CONTINUE(        0x24000, 0x04000 )
+
+	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* Sound Z80 + M5205(?) samples */
+	ROM_LOAD( "pang.4",   0x00000, 0x10000, CRC(88a7b1f8) SHA1(b34fa26dbc613bf3b525d19df90fa3ba4efb6e5d) ) // this is the same as the microhard game 'rebus' ...
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_INVERT | ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "pang.14",   0x000001, 0x10000, CRC(c90095ee) SHA1(bf380f289eb42030a9f911aa5f697ba76f5723db) )
+	ROM_LOAD16_BYTE( "pang.6",    0x000000, 0x10000, CRC(c0133cf3) SHA1(07916f7ce6bbaea75b68f5d1d2cb4486825fc397) )
+	ROM_LOAD16_BYTE( "pang.13",   0x020001, 0x10000, CRC(a49e98ec) SHA1(8a3d13bd755b58b0bc1d1497363409a1eeade129) )
+	ROM_LOAD16_BYTE( "pang.5",    0x020000, 0x10000, CRC(5804ae3e) SHA1(33de9aea7aa201aa650b0b6c5347713bf10cc13d) )
+
+	ROM_LOAD16_BYTE( "pang.16",   0x080001, 0x10000, CRC(bc508935) SHA1(1a11144b563befc11015d75e3867c07329ee6f32) )
+	ROM_LOAD16_BYTE( "pang.8",    0x080000, 0x10000, CRC(53a99bb6) SHA1(ffb75c5541d7c1478f05717b2cfa4bfe9b4654cd) )
+	ROM_LOAD16_BYTE( "pang.15",   0x0a0001, 0x10000, CRC(bf5c09b9) SHA1(f66a901292b190aa39dc2460363307e94c358d4d) )
+	ROM_LOAD16_BYTE( "pang.7",    0x0a0000, 0x10000, CRC(8b718670) SHA1(c22005a665a9e0bcfc3ddbc22ca4a2a261224ce1) )
+
+	ROM_REGION( 0x040000, REGION_GFX2, ROMREGION_INVERT | ROMREGION_DISPOSE )
+	ROM_LOAD( "pang.11",    0x020000, 0x10000, CRC(07191732) SHA1(7de03ddb07b2afad311b9ed5c84e04bef62d0050) )
+	ROM_LOAD( "pang.9",     0x030000, 0x10000, CRC(6496be82) SHA1(9c7ef4c6c3a0361f3118339a0c63b0923045d6c3) )
+	ROM_LOAD( "pang.12",    0x000000, 0x10000, CRC(fa247a04) SHA1(b5cab5f65eb3af3deeea6afba955056ca51f39af) )
+	ROM_LOAD( "pang.10",    0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
 ROM_END
 
 
@@ -2371,6 +2413,7 @@ GAME( 1989, dokaben,  0,        pang,    pang,     dokaben,  ROT0,   "Capcom", "
 GAME( 1989, pang,     0,        pang,    pang,     pang,     ROT0,   "Mitchell", "Pang (World)", 0 )
 GAME( 1989, pangb,    pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 1)", 0 )
 GAME( 1989, pangbold, pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 2)", 0 )
+GAME( 1989, pangba,   pang,     spangbl, pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 3)", GAME_NO_SOUND )
 GAME( 1989, bbros,    pang,     pang,    pang,     pang,     ROT0,   "Capcom", "Buster Bros. (US)", 0 )
 GAME( 1989, pompingw, pang,     pang,    pang,     pang,     ROT0,   "Mitchell", "Pomping World (Japan)", 0 )
 GAME( 1989, cworld,   0,        pang,    qtono1,   cworld,   ROT0,   "Capcom", "Capcom World (Japan)", 0 )

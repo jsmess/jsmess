@@ -719,6 +719,8 @@ static int fifoout_rpos, fifoout_wpos;
 static UINT8 fifoout_data[FIFO_SIZE];
 static int fifoout_read_request = 0;
 
+static UINT8 sb_coin_latch = 0;
+
 static UINT8 z80_fifoout_pop(void)
 {
 	UINT8 r;
@@ -791,7 +793,21 @@ static void z80_fifoin_push(UINT8 data)
 	fifoin_read_request = 1;
 }
 
+static READ32_HANDLER( sb_coin_r )
+{
+	UINT8 r = sb_coin_latch;
 
+	sb_coin_latch = 0;
+	return r;
+}
+
+static WRITE8_HANDLER( sb_coin_w )
+{
+	if (data)
+		sb_coin_latch = 0xa0 | data;
+	else
+		sb_coin_latch = 0;
+}
 
 static READ32_HANDLER( sound_fifo_r )
 {
@@ -817,7 +833,11 @@ static READ32_HANDLER( sound_fifo_status_r )
 	return r | 1;
 }
 
-
+static READ32_HANDLER( spi_int_r )
+{
+	cpunum_set_input_line( 0, 0,CLEAR_LINE );
+	return 0xffffffff;
+}
 
 static READ32_HANDLER( spi_unknown_r )
 {
@@ -1019,7 +1039,7 @@ static ADDRESS_MAP_START( spi_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
-	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_unknown_r)		/* Unknown */
+	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)				/* Clear Interrupt */
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP				/* Unknown */
 	AM_RANGE(0x00000604, 0x00000607) AM_READ(spi_controls1_r)	/* Player controls */
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)		/* Unknown */
@@ -1041,6 +1061,7 @@ static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(5)
 	AM_RANGE(0x4002, 0x4002) AM_WRITENOP			/* ack RST 10 */
 	AM_RANGE(0x4003, 0x4003) AM_WRITENOP			/* Unknown */
+	AM_RANGE(0x4004, 0x4004) AM_WRITE(sb_coin_w)	/* single board systems */
 	AM_RANGE(0x4008, 0x4008) AM_READWRITE(z80_soundfifo_r, z80_soundfifo_w)
 	AM_RANGE(0x4009, 0x4009) AM_READ(z80_soundfifo_status_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ(z80_jp1_r)
@@ -1111,6 +1132,7 @@ static ADDRESS_MAP_START( seibu386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
+	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)				/* Unknown */
 	AM_RANGE(0x00000604, 0x00000607) AM_READ(spi_controls1_r)	/* Player controls */
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)	/* Player controls (start) */
@@ -1704,7 +1726,7 @@ static NVRAM_HANDLER( sxx2f )
 
 static INTERRUPT_GEN( spi_interrupt )
 {
-	cpunum_set_input_line( 0, 0, PULSE_LINE );
+	cpunum_set_input_line( 0, 0, ASSERT_LINE );
 }
 
 static int spi_irq_callback(int irq)
@@ -1799,7 +1821,10 @@ static MACHINE_RESET( sxx2f )
 	memcpy(z80_rom, rom, 0x40000);
 
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
+	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sb_coin_r);
 	cpunum_set_irq_callback(0, spi_irq_callback);
+
+	sb_coin_latch = 0;
 }
 
 static MACHINE_DRIVER_START( sxx2f ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz(?) */
@@ -1821,6 +1846,9 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 
 	MDRV_SOUND_REPLACE("audio", YMF271, 16384000) /* 16.3840MHz */
 	MDRV_SOUND_CONFIG(ymf271_interface)
+
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_MACHINE_RESET(sxx2f)
 	MDRV_NVRAM_HANDLER(sxx2f)
@@ -1934,7 +1962,14 @@ READ32_HANDLER ( rfjet_speedup_r )
 	if (activecpu_get_pc()==0x0206082) cpu_spinuntil_int(); // idle
 
 	/* rfjetus */
-	if (activecpu_get_pc()==0x0205b39) cpu_spinuntil_int(); // idle
+	if (activecpu_get_pc()==0x0205b39)
+	{
+		UINT32 r;
+		cpu_spinuntil_int(); // idle
+		// Hack to enter test mode
+		r = spimainram[(0x002894c-0x800)/4] & (~0x400);
+		return r | (((readinputport(2) ^ 0xFF)<<8) & 0x400);
+	}
 
 	/* rfjetj */
 	if (activecpu_get_pc()==0x0205f2e) cpu_spinuntil_int(); // idle
@@ -3019,7 +3054,7 @@ GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu 
 /* there is another rf dump rf_spi_asia.zip but it seems strange, 1 program rom, cart pic seems to show others as a different type of rom */
 
 /* SXX2F */
-GAME( 1997, rdft2us,   rdft2,   sxx2f,    spi_2button, rdft2us,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND ) // title screen shows '2.1'
+GAME( 1997, rdft2us,   rdft2,   sxx2f,    spi_2button, rdft2us,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) // title screen shows '2.1'
 
 /* SXX2G */
 GAME( 1999, rfjetus,   rfjet,   sxx2g,    spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND  ) // has 1998-99 copyright + planes unlocked

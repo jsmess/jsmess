@@ -75,7 +75,7 @@ Z80 + Sound Bits
 Re-Add Priorities
 
 Dip switches/inputs in t2m32 and f1superb
-some games (hayaosi1) don't seeem to have service mode even if it's listed among the dips
+some games (hayaosi2) don't seeem to have service mode even if it's listed among the dips
 service mode is still accessible through F1 though
 
 Fix Anything Else (Palette etc.)
@@ -152,7 +152,7 @@ Ryuusei Janshi Kirara Star (kirarast)
 Mahjong Angel Kiss
 *Vs. Janshi Brand New Stars
 
-Hayaoshi Quiz Ouza Ketteisen (hayaosi1)
+Hayaoshi Quiz Ouza Ketteisen (hayaosi2)
 *Hayaoshi Quiz Nettou Namahousou
 *Hayaoshi Quiz Grand Champion Taikai
 
@@ -1031,7 +1031,7 @@ INPUT_PORTS_START( gratia )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hayaosi1 )
+INPUT_PORTS_START( hayaosi2 )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -1497,7 +1497,7 @@ static INTERRUPT_GEN(ms32_interrupt)
 {
 	if( cpu_getiloops() == 0 ) irq_raise(10);
 	if( cpu_getiloops() == 1 ) irq_raise(9);
-	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
+	/* hayaosi2 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
        kirarast needs it too, at least 8 per frame, but waits for a variable amount
        47pi2 needs ?? per frame (otherwise it hangs when you lose)
        in different points. Could this be a raster interrupt?
@@ -1929,7 +1929,7 @@ ROM_START( gametngk )
 	ROM_LOAD( "mr94041.14", 0x200000, 0x200000, CRC(2d6308bd) SHA1(600b6ccdbb976301075e0b287124a9fd5fe7fc1b) )
 ROM_END
 
-ROM_START( hayaosi1 )
+ROM_START( hayaosi2 )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "mb93138a.25", 0x000003, 0x80000, CRC(563c6f2f) SHA1(bc2a61fd2e0adf58256feeef8491b67af6d6eacf) )
 	ROM_LOAD32_BYTE( "mb93138a.27", 0x000002, 0x80000, CRC(fe8e283a) SHA1(fc6c06ae296110b1f5794187d5208b17541614cb) )
@@ -1960,6 +1960,108 @@ ROM_START( hayaosi1 )
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr93038.01",  0x200000, 0x200000, CRC(b8a38bfc) SHA1(1aa7b69beebceb6f09a1ee006de054cb84002e94) )
+ROM_END
+
+/*
+
+Hayaoshi Quiz Nettou Namahousou
+(c)1993 Jaleco
+
+MB-93140A EB91022-20079-1 (Motherboard. Mega System 32?)
+MB-93138A EB91022-20078-1 (ROM board)
+SE-93139 EB91022-30056 (extended board on ROM board)
+
+CPU  : NEC JAPAN D70632GD-20 (V70)
+Sound: Z80 YMF271-F
+OSC  : 48.0000MHz (OSC1) 40.0000MHz (OSC2) 16.9344MHz (X1)
+
+ROMs:
+MR94027.02 (16M mask, location IC 3( 1)) [59976568]
+MR94027.04 (16M mask, location IC 4( 2)) [6a16d13a]
+MR94027.06 (16M mask, location IC 5( 3)) [1618785a]
+MR94027.08 (16M mask, location IC 6( 4)) [753b05e0]
+
+MR94027.09 (16M mask, location IC11( 9)) [32ead437]
+MR94027.11 (16M mask, location IC13(11)) [b65d5096]
+
+MR94027.01 (16M mask, location IC20(13)) [c72e5c6e]
+MR94027.03 (16M mask, location IC21(14)) [3ff68f4f]
+MR94027.05 (16M mask, location IC22(15)) [59545977]
+MR94027.07 (16M mask, location IC23(16)) [c66099c4]
+
+MB93138.21 (M27C2001, location IC30(21)) [008bc217] Ver1.0
+actual label is "MB-93138 21 Ver1.0"
+
+MR92042.01 (16M mask, location IC33(22)) [0fa26f65]
+MR94027.10 (16M mask, locaiton IC34(23)) [e7cabe41]
+
+MB93138.25 (M27C4001, location IC36(25)) [ba8cec03] Ver1.5
+MB93138.27 (M27C4001, location IC38(27)) [571725df] Ver1.5
+MB93138.29 (M27C4001, location IC40(29)) [da891976] Ver1.5
+MB93138.31 (M27C4001, location IC42(31)) [2d17bb06] Ver1.5
+actual label is "???????N?C?Y?M?????????IMB-93138-?? Ver.1.5"
+
+MB93138.32 (M27C4001, location IC43(32)) [df5d00b4] Ver1.0
+actual label is "MB-93138 32 Ver1.0"
+
+
+PALs (not dumped):
+91022-01.2 (18CV8,  IC83(2))
+91022-02.1 (22CV10, IC62(1))
+
+Custom chips:
+SS91022-01 9348 ACBA (IC36, 208pin PQFP)
+SS91022-02 9350 IAHA (IC 9, 100pin PQFP)
+SS91022-03 9343EX006 (IC11, 176pin PQFP)
+SS91022-05 9347EX002 (IC31, 120pin PQFP)
+SS91022-07 9345EV 450881 06440 (IC70, 208pin PQFP)
+
+GS91022-01 9340EK002 (IC46, 120pin PQFP)
+GS91022-02 9334EK709 (IC6,  160pin PQFP)
+GS91022-03 9335PP711 (IC7,  100pin PQFP)
+GS91022-04 9334PP712 (IC24, 100pin PQFP)
+
+SS92046-01 9338EV 436091 06441 (IC1 of EB91022-30056, 144pin PQFP)
+
+Others:
+Lithium battery + LH5168D-10L(SRAM)
+
+*/
+
+
+ROM_START( hayaosi3 )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* V70 code */
+ 	ROM_LOAD32_BYTE( "mb93138.25", 0x000003, 0x80000, CRC(ba8cec03) SHA1(edaa52e0b07307bb21168205ee0d5d6ff8168de9) )
+	ROM_LOAD32_BYTE( "mb93138.27", 0x000002, 0x80000, CRC(571725df) SHA1(66575ec1a29d6fc1b50ae5a5ce8025bb1043deaf))
+	ROM_LOAD32_BYTE( "mb93138.29", 0x000001, 0x80000, CRC(da891976) SHA1(27e8c395e92ca01b47bffdf766bc95a6c2150815) )
+	ROM_LOAD32_BYTE( "mb93138.31", 0x000000, 0x80000, CRC(2d17bb06) SHA1(623b603c4002734427c882424a1e0dc889cf7e02) )
+
+	ROM_REGION( 0x1000000, REGION_GFX1, 0 ) /* sprites, don't dispose since we use GFX_RAW */
+	ROM_LOAD32_WORD( "mr94027.01",  0x000000, 0x200000, CRC(c72e5c6e) SHA1(b98cd656c48c775953d00b5d8bafd4ffde76d8df) )
+	ROM_LOAD32_WORD( "mr94027.02",  0x000002, 0x200000, CRC(59976568) SHA1(a280c352d612913834c76b8e23d86c937fd21281) )
+	ROM_LOAD32_WORD( "mr94027.03",  0x400000, 0x200000, CRC(3ff68f4f) SHA1(1e367b92560c32c87e27fc0e99be3bdb5eb0510b) )
+	ROM_LOAD32_WORD( "mr94027.04",  0x400002, 0x200000, CRC(6a16d13a) SHA1(65a7751c248c966fd01149418ce6bedba7a0d48a) )
+	ROM_LOAD32_WORD( "mr94027.05",  0x800000, 0x200000, CRC(59545977) SHA1(2e0a83efd7ae210c0b4360e9572dd7eec38cd974) )
+	ROM_LOAD32_WORD( "mr94027.06",  0x800002, 0x200000, CRC(1618785a) SHA1(3f2698d07a52947429313a78ebcedfdae478efd7) )
+	ROM_LOAD32_WORD( "mr94027.07",  0xc00000, 0x200000, CRC(c66099c4) SHA1(5a6edffa39a98f38cc3cffbad9191fb2e794a812) )
+	ROM_LOAD32_WORD( "mr94027.08",  0xc00002, 0x200000, CRC(753b05e0) SHA1(0424e92b32a73c27ecb549e6e9449446ea938e40) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mr94027.09",  0x000000, 0x200000, CRC(32ead437) SHA1(b94175cf186b4ebcc180a4c092d2ffcdd9ff3b1d) )
+
+	ROM_REGION( 0x200000, REGION_GFX3, 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
+
+	ROM_REGION( 0x080000, REGION_GFX4, 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mb93138.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
+
+	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* z80 program */
+	ROM_LOAD( "mb93138.21", 0x000000, 0x040000, CRC(008bc217) SHA1(eec66a86f285ccbc47eba17a4bb83cc1f8a5f425) )
+	ROM_RELOAD(              0x010000, 0x40000 )
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* samples - 8-bit signed PCM */
+	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
+	ROM_LOAD( "mr94027.10",  0x200000, 0x200000, CRC(e7cabe41) SHA1(5d903baed690a98856f7581319cf4dbfe1db47bb) )
 ROM_END
 
 ROM_START( kirarast )
@@ -2133,7 +2235,7 @@ ROM_END
 
 /* SS91022-10: desertwr, gratiaa, tp2m32, gametngk */
 
-/* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
+/* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi2 */
 
 /* SS92047-01: gratia, kirarast */
 
@@ -2292,7 +2394,7 @@ static DRIVER_INIT (ss91022_10)
 	decrypt_ms32_bg(0x00000,0xa3, REGION_GFX3);
 }
 
-/* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
+/* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi2 */
 static DRIVER_INIT (ss92046_01)
 {
 	configure_banks();
@@ -2346,7 +2448,10 @@ static DRIVER_INIT (f1superb)
 
 /********** GAME DRIVERS **********/
 
-GAME( 1994, hayaosi1, 0,        ms32, hayaosi1, ss92046_01, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+
+GAME( 1994, hayaosi2, 0,        ms32, hayaosi2, ss92046_01, ROT0,   "Jaleco", "Hayaoshi Quiz Grand Champion Taikai", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, hayaosi3, 0,        ms32, hayaosi2, ss92046_01, ROT0,   "Jaleco", "Hayaoshi Quiz Nettou Namahousou", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1994, bbbxing,  0,        ms32, bbbxing,  ss92046_01, ROT0,   "Jaleco", "Best Bout Boxing", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1994, 47pie2,   0,        ms32, akiss,    47pie2,     ROT0,   "Jaleco", "Idol Janshi Su-Chi-Pie 2 (v1.1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1994, 47pie2o,  47pie2,   ms32, akiss,    47pie2,     ROT0,   "Jaleco", "Idol Janshi Su-Chi-Pie 2 (v1.0)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -162,12 +162,12 @@ drc_core *drc_init(UINT8 cpunum, drc_config *config)
 	memset(drc->lookup_l2_recompile, 0, sizeof(*drc->lookup_l2_recompile) << drc->l2bits);
 
 	/* allocate the sequence and tentative lists */
-	drc->sequence_count_max = config->max_instructions;
+	drc->sequence_count_max = config->max_instructions * 2;
 	drc->sequence_list = malloc(drc->sequence_count_max * sizeof(*drc->sequence_list));
 	if (drc->sequence_list == NULL)
 		goto error;
 
-	drc->tentative_count_max = config->max_instructions;
+	drc->tentative_count_max = config->max_instructions * 2;
 	drc->tentative_list = malloc(drc->tentative_count_max * sizeof(*drc->tentative_list));
 	if (drc->tentative_list == NULL)
 		goto error;

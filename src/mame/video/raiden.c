@@ -4,7 +4,7 @@
 static tilemap *bg_layer,*fg_layer,*tx_layer;
 UINT16 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
-static int flipscreen,ALTERNATE;
+static int flipscreen,alternate;
 
 /******************************************************************************/
 
@@ -72,7 +72,7 @@ VIDEO_START( raiden )
 	bg_layer = tilemap_create(get_back_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,     16,16,32,32);
 	fg_layer = tilemap_create(get_fore_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,32,32);
 	tx_layer = tilemap_create(get_text_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
-	ALTERNATE=0;
+	alternate=0;
 
 	tilemap_set_transparent_pen(fg_layer,15);
 	tilemap_set_transparent_pen(tx_layer,15);
@@ -83,7 +83,7 @@ VIDEO_START( raidena )
 	bg_layer = tilemap_create(get_back_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,     16,16,32,32);
 	fg_layer = tilemap_create(get_fore_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,32,32);
 	tx_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	ALTERNATE=1;
+	alternate=1;
 
 	tilemap_set_transparent_pen(fg_layer,15);
 	tilemap_set_transparent_pen(tx_layer,15);
@@ -136,7 +136,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 VIDEO_UPDATE( raiden )
 {
 	/* Setup the tilemaps, alternate version has different scroll positions */
-	if (!ALTERNATE) {
+	if (!alternate) {
 		tilemap_set_scrollx( bg_layer,0, raiden_scroll_ram[0]);
 		tilemap_set_scrolly( bg_layer,0, raiden_scroll_ram[1]);
 		tilemap_set_scrollx( fg_layer,0, raiden_scroll_ram[2]);

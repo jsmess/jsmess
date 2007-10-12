@@ -513,11 +513,20 @@ WRITE16_HANDLER( prmrsocr_122000_w )
 		prmrsocr_sprite_bank = (data & 0x40) >> 6;
 		K053244_bankselect(0, prmrsocr_sprite_bank << 2);
 
+		/* bit 7 = 53596 region selector for ROM test */
+		glfgreat_roz_char_bank = (data & 0x80) >> 7;
+
 		/* other bits unknown (unused?) */
 	}
 }
 
-
+READ16_HANDLER( prmrsocr_rom_r )
+{
+	if(glfgreat_roz_char_bank)
+		return memory_region(REGION_GFX3)[offset];
+	else
+		return 256 * memory_region(REGION_USER1)[offset] + memory_region(REGION_USER1)[offset + 0x020000];
+}
 
 WRITE16_HANDLER( tmnt_priority_w )
 {
