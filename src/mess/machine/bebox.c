@@ -676,7 +676,7 @@ static void bebox_dma_write_byte(int channel, offs_t offset, UINT8 data)
 static const struct dma8237_interface bebox_dma =
 {
 	0,
-	TIME_IN_USEC(1),
+	1.0e-6, /* 1us */
 
 	bebox_dma_read_byte,
 	bebox_dma_write_byte,
