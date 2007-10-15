@@ -13,6 +13,12 @@
 EMUSRC = $(SRC)/emu
 EMUOBJ = $(OBJ)/emu
 
+EMUAUDIO = $(EMUOBJ)/audio
+EMUDRIVERS = $(EMUOBJ)/drivers
+EMULAYOUT = $(EMUOBJ)/layout
+EMUMACHINE = $(EMUOBJ)/machine
+EMUVIDEO = $(EMUOBJ)/video
+
 OBJDIRS += \
 	$(EMUOBJ)/cpu \
 	$(EMUOBJ)/sound \
@@ -69,17 +75,6 @@ EMUOBJS = \
 	$(EMUOBJ)/uitext.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
-	$(EMUOBJ)/sound/filter.o \
-	$(EMUOBJ)/sound/flt_vol.o \
-	$(EMUOBJ)/sound/flt_rc.o \
-	$(EMUOBJ)/sound/wavwrite.o \
-	$(EMUOBJ)/audio/generic.o \
-	$(EMUOBJ)/drivers/empty.o \
-	$(EMUOBJ)/machine/eeprom.o \
-	$(EMUOBJ)/machine/generic.o \
-	$(EMUOBJ)/video/generic.o \
-	$(EMUOBJ)/video/resnet.o \
-	$(EMUOBJ)/video/vector.o \
 
 ifdef PROFILER
 EMUOBJS += \
@@ -98,7 +93,86 @@ EMUOBJS += \
 	$(EMUOBJ)/debug/textbuf.o
 endif
 
-$(LIBEMU): $(EMUOBJS)
+EMUSOUNDOBJS = \
+	$(EMUOBJ)/sound/filter.o \
+	$(EMUOBJ)/sound/flt_vol.o \
+	$(EMUOBJ)/sound/flt_rc.o \
+	$(EMUOBJ)/sound/wavwrite.o \
+
+EMUAUDIOOBJS = \
+	$(EMUAUDIO)/generic.o \
+
+EMUDRIVEROBJS = \
+	$(EMUDRIVERS)/empty.o \
+
+EMUMACHINEOBJS = \
+	$(EMUMACHINE)/53c810.o \
+	$(EMUMACHINE)/6532riot.o \
+	$(EMUMACHINE)/6522via.o \
+	$(EMUMACHINE)/6526cia.o \
+	$(EMUMACHINE)/6821pia.o \
+	$(EMUMACHINE)/6840ptm.o \
+	$(EMUMACHINE)/6850acia.o \
+	$(EMUMACHINE)/7474.o \
+	$(EMUMACHINE)/74123.o \
+	$(EMUMACHINE)/74148.o \
+	$(EMUMACHINE)/74153.o \
+	$(EMUMACHINE)/74181.o \
+	$(EMUMACHINE)/8042kbdc.o \
+	$(EMUMACHINE)/8237dma.o \
+	$(EMUMACHINE)/8255ppi.o \
+	$(EMUMACHINE)/adc083x.o \
+	$(EMUMACHINE)/adc1213x.o \
+ 	$(EMUMACHINE)/am53cf96.o \
+ 	$(EMUMACHINE)/at28c16.o \
+	$(EMUMACHINE)/ds1302.o \
+	$(EMUMACHINE)/ds2401.o \
+	$(EMUMACHINE)/ds2404.o \
+	$(EMUMACHINE)/eeprom.o \
+	$(EMUMACHINE)/generic.o \
+ 	$(EMUMACHINE)/idectrl.o \
+ 	$(EMUMACHINE)/intelfsh.o \
+	$(EMUMACHINE)/laserdsc.o \
+	$(EMUMACHINE)/mb3773.o \
+	$(EMUMACHINE)/mb87078.o \
+	$(EMUMACHINE)/mc146818.o \
+	$(EMUMACHINE)/msm6242.o \
+	$(EMUMACHINE)/pc16552d.o \
+	$(EMUMACHINE)/pci.o \
+	$(EMUMACHINE)/pic8259.o \
+	$(EMUMACHINE)/pit8253.o \
+	$(EMUMACHINE)/pd4990a.o \
+	$(EMUMACHINE)/roc10937.o \
+	$(EMUMACHINE)/rp5h01.o \
+	$(EMUMACHINE)/rtc65271.o \
+	$(EMUMACHINE)/scsicd.o \
+	$(EMUMACHINE)/scsihd.o \
+ 	$(EMUMACHINE)/smc91c9x.o \
+	$(EMUMACHINE)/timekpr.o \
+	$(EMUMACHINE)/tmp68301.o \
+	$(EMUMACHINE)/upd4701.o \
+	$(EMUMACHINE)/wd33c93.o \
+	$(EMUMACHINE)/x76f041.o \
+	$(EMUMACHINE)/x76f100.o \
+	$(EMUMACHINE)/z80ctc.o \
+	$(EMUMACHINE)/z80pio.o \
+	$(EMUMACHINE)/z80sio.o \
+
+EMUVIDEOOBJS = \
+ 	$(EMUVIDEO)/cdp1869.o \
+ 	$(EMUVIDEO)/crtc6845.o \
+	$(EMUVIDEO)/generic.o \
+	$(EMUVIDEO)/poly.o \
+	$(EMUVIDEO)/resnet.o \
+	$(EMUVIDEO)/s2636.o \
+	$(EMUVIDEO)/tlc34076.o \
+	$(EMUVIDEO)/tms34061.o \
+ 	$(EMUVIDEO)/tms9928a.o \
+	$(EMUVIDEO)/v9938.o \
+ 	$(EMUVIDEO)/vector.o \
+ 	$(EMUVIDEO)/voodoo.o \
+
+$(LIBEMU): $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUAUDIOOBJS) $(EMUDRIVEROBJS) $(EMUMACHINEOBJS) $(EMUVIDEOOBJS)
 
 
 
@@ -140,19 +214,19 @@ $(EMUOBJ)/video.o:		$(EMUSRC)/rendersw.c
 # core layouts
 #-------------------------------------------------
 
-$(EMUOBJ)/rendlay.o:	$(EMUOBJ)/layout/dualhovu.lh \
-						$(EMUOBJ)/layout/dualhsxs.lh \
-						$(EMUOBJ)/layout/dualhuov.lh \
-						$(EMUOBJ)/layout/horizont.lh \
-						$(EMUOBJ)/layout/triphsxs.lh \
-						$(EMUOBJ)/layout/vertical.lh \
-						$(EMUOBJ)/layout/ho20ffff.lh \
-						$(EMUOBJ)/layout/ho2eff2e.lh \
-						$(EMUOBJ)/layout/ho4f893d.lh \
-						$(EMUOBJ)/layout/ho88ffff.lh \
-						$(EMUOBJ)/layout/hoa0a0ff.lh \
-						$(EMUOBJ)/layout/hoffe457.lh \
-						$(EMUOBJ)/layout/hoffff20.lh \
-						$(EMUOBJ)/layout/voffff20.lh \
+$(EMUOBJ)/rendlay.o:	$(EMULAYOUT)/dualhovu.lh \
+						$(EMULAYOUT)/dualhsxs.lh \
+						$(EMULAYOUT)/dualhuov.lh \
+						$(EMULAYOUT)/horizont.lh \
+						$(EMULAYOUT)/triphsxs.lh \
+						$(EMULAYOUT)/vertical.lh \
+						$(EMULAYOUT)/ho20ffff.lh \
+						$(EMULAYOUT)/ho2eff2e.lh \
+						$(EMULAYOUT)/ho4f893d.lh \
+						$(EMULAYOUT)/ho88ffff.lh \
+						$(EMULAYOUT)/hoa0a0ff.lh \
+						$(EMULAYOUT)/hoffe457.lh \
+						$(EMULAYOUT)/hoffff20.lh \
+						$(EMULAYOUT)/voffff20.lh \
 
-$(EMUOBJ)/video.o:		$(EMUOBJ)/layout/snap.lh
+$(EMUOBJ)/video.o:		$(EMULAYOUT)/snap.lh

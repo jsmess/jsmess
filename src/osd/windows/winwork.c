@@ -25,7 +25,7 @@
 //  DEBUGGING
 //============================================================
 
-#define KEEP_STATISTICS			(1)
+#define KEEP_STATISTICS			(0)
 
 
 
@@ -93,6 +93,7 @@ struct _thread_info
 	volatile UINT8		active;			// are we actively processing work?
 
 #if KEEP_STATISTICS
+	osd_ticks_t			actruntime;
 	osd_ticks_t			runtime;
 	osd_ticks_t			spintime;
 	osd_ticks_t			waittime;
@@ -147,6 +148,7 @@ static unsigned __stdcall worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, thread_info *thread);
 
 
+
 //============================================================
 //  INLINE FUNCTIONS
 //============================================================
@@ -181,6 +183,11 @@ INLINE INT32 interlocked_add(INT32 volatile *ptr, INT32 add)
 }
 
 
+
+//============================================================
+//  Scalable Locks
+//============================================================
+
 INLINE void scalable_lock_init(scalable_lock *lock)
 {
 	memset(lock, 0, sizeof(*lock));
@@ -188,7 +195,7 @@ INLINE void scalable_lock_init(scalable_lock *lock)
 }
 
 
-INT32 scalable_lock_acquire(scalable_lock *lock)
+INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 {
 	INT32 myslot = (interlocked_increment(&lock->nextindex) - 1) & (MAX_THREADS - 1);
 	INT32 backoff = 1;
@@ -204,10 +211,12 @@ INT32 scalable_lock_acquire(scalable_lock *lock)
 	return myslot;
 }
 
-void scalable_lock_release(scalable_lock *lock, INT32 myslot)
+
+INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 {
 	lock->slot[(myslot + 1) & (MAX_THREADS - 1)].haslock = TRUE;
 }
+
 
 
 //============================================================
@@ -323,14 +332,21 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 	if (queue->flags & WORK_QUEUE_FLAG_MULTI)
 	{
 		thread_info *thread = &queue->thread[queue->threads];
+		osd_ticks_t stopspin = osd_ticks() + timeout;
 
 		end_timing(thread->waittime);
 
 		// process what we can as a worker thread
 		worker_thread_process(queue, thread);
 
+		// spin until we're done
+		begin_timing(thread->spintime);
+		while (queue->items != 0 && osd_ticks() < stopspin)
+			YieldProcessor();
+		end_timing(thread->spintime);
+
 		begin_timing(thread->waittime);
-		return TRUE;
+		return (queue->items == 0);
 	}
 
 	// reset our done event and double-check the items before waiting
@@ -391,9 +407,10 @@ void osd_work_queue_free(osd_work_queue *queue)
 		{
 			thread_info *thread = &queue->thread[threadnum];
 			osd_ticks_t total = thread->runtime + thread->waittime + thread->spintime;
-			printf("Thread %d:  run=%5.2f%%  spin=%5.2f%%  wait/other=%5.2f%%\n",
+			printf("Thread %d:  run=%5.2f%% (%5.2f%%)  spin=%5.2f%%  wait/other=%5.2f%%\n",
 					threadnum,
 					(double)thread->runtime * 100.0 / (double)total,
+					(double)thread->actruntime * 100.0 / (double)total,
 					(double)thread->spintime * 100.0 / (double)total,
 					(double)thread->waittime * 100.0 / (double)total);
 		}
@@ -608,7 +625,9 @@ static int effective_num_processors(void)
 
 	// otherwise, fetch the info from the system
 	GetSystemInfo(&info);
-	return info.dwNumberOfProcessors;
+
+	// max out at 2 for now since scaling above that seems to do poorly
+	return MIN(info.dwNumberOfProcessors, 2);
 }
 
 
@@ -628,7 +647,7 @@ static unsigned __stdcall worker_thread_entry(void *param)
 		DWORD result = WAIT_OBJECT_0;
 
 		// bail on exit, and only wait if there are no pending items in queue
-		if (!queue->exiting && queue->items == 0)
+		if (!queue->exiting && queue->list == NULL)
 		{
 			begin_timing(thread->waittime);
 			result = WaitForSingleObject(thread->wakeevent, INFINITE);
@@ -652,12 +671,12 @@ static unsigned __stdcall worker_thread_entry(void *param)
 			// spin for a while looking for more work
 			begin_timing(thread->spintime);
 			stopspin = osd_ticks() + SPIN_LOOP_TIME;
-			while (queue->items == 0 && osd_ticks() < stopspin)
+			while (queue->list == NULL && osd_ticks() < stopspin)
 				YieldProcessor();
 			end_timing(thread->spintime);
 
 			// if nothing more, release the processor
-			if (queue->items == 0)
+			if (queue->list == NULL)
 				break;
 			add_to_stat(&queue->spinloops, 1);
 		}
@@ -679,7 +698,7 @@ static void worker_thread_process(osd_work_queue *queue, thread_info *thread)
 	begin_timing(thread->runtime);
 
 	// loop until everything is processed
-	while (queue->items != 0)
+	while (queue->list != NULL)
 	{
 		osd_work_item *item;
 		INT32 lockslot;
@@ -702,7 +721,11 @@ static void worker_thread_process(osd_work_queue *queue, thread_info *thread)
 		if (item != NULL)
 		{
 			// call the callback and stash the result
+			begin_timing(thread->actruntime);
 			item->result = (*item->callback)(item->param);
+			end_timing(thread->actruntime);
+
+			// decrement the item count after we are done
 			interlocked_decrement(&queue->items);
 			item->done = TRUE;
 
@@ -718,7 +741,7 @@ static void worker_thread_process(osd_work_queue *queue, thread_info *thread)
 			}
 
 			// if we removed an item and there's still work to do, bump the stats
-			if (queue->items != 0)
+			if (queue->list != NULL)
 				add_to_stat(&queue->extraitems, 1);
 		}
 	}

@@ -2819,7 +2819,7 @@ static void memory_update(debug_view *view)
 						if (addrbyte + i <= maxaddr)
 						{
 							char c = memory_read_byte(memdata, addrbyte + i, !memdata->no_translation);
-							len += sprintf(&data[len], "%c", isprint(c) ? c : '.');
+							len += sprintf(&data[len], "%c", isprint((UINT8)c) ? c : '.');
 						}
 						else
 							len += sprintf(&data[len], " ");
@@ -2837,7 +2837,7 @@ static void memory_update(debug_view *view)
 						if (addrbyte + i <= maxaddr)
 						{
 							char c = memory_read_byte(memdata, addrbyte + i, !memdata->no_translation);
-							len += sprintf(&data[len], "%c", isprint(c) ? c : '.');
+							len += sprintf(&data[len], "%c", isprint((UINT8)c) ? c : '.');
 						}
 						else
 							len += sprintf(&data[len], " ");

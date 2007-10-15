@@ -67,6 +67,10 @@ struct _pia6821
 	UINT8 out_cb2_needs_pulled;
 	UINT8 logged_port_a_not_connected;
 	UINT8 logged_port_b_not_connected;
+	UINT8 logged_ca1_not_connected;
+	UINT8 logged_ca2_not_connected;
+	UINT8 logged_cb1_not_connected;
+	UINT8 logged_cb2_not_connected;
 };
 
 
@@ -292,7 +296,6 @@ static UINT8 get_in_a_value(int which)
 			if (!p->logged_port_a_not_connected && (p->ddr_a != 0xff))
 			{
 				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, p->ddr_a ^ 0xff);
-
 				p->logged_port_a_not_connected = TRUE;
 			}
 		}
@@ -333,7 +336,6 @@ static UINT8 get_in_b_value(int which)
 				if (!p->logged_port_b_not_connected && (p->ddr_b != 0xff))
 				{
 					logerror("cpu #%d (PC=%08X): PIA #%d: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, p->ddr_b ^ 0xff);
-
 					p->logged_port_b_not_connected = TRUE;
 				}
 
@@ -528,13 +530,19 @@ static UINT8 control_a_r(int which)
 	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
 	if (p->intf->in_ca1_func)
 		pia_set_input_ca1(which, p->intf->in_ca1_func(0));
-	else if (!p->in_ca1_pushed)
+	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
+	{
 		logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No CA1 read handler. Assuming pin not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+		p->logged_ca1_not_connected = TRUE;
+	}
 
 	if (p->intf->in_ca2_func)
 		pia_set_input_ca2(which, p->intf->in_ca2_func(0));
-	else if (C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
+	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
+	{
 		logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No CA2 read handler. Assuming pin not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+		p->logged_ca2_not_connected = TRUE;
+	}
 
 	/* read control register */
 	ret = p->ctl_a;
@@ -560,13 +568,19 @@ static UINT8 control_b_r(int which)
 	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
 	if (p->intf->in_cb1_func)
 		pia_set_input_cb1(which, p->intf->in_cb1_func(0));
-	else if (!p->in_cb1_pushed)
+	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
+	{
 		logerror("cpu #%d (PC=%08X): PIA #%d: Error! no CB1 read handler. Three-state pin is undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+		p->logged_cb1_not_connected = TRUE;
+	}
 
 	if (p->intf->in_cb2_func)
 		pia_set_input_cb2(which, p->intf->in_cb2_func(0));
-	else if (C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
+	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
+	{
 		logerror("cpu #%d (PC=%08X): PIA #%d: Error! No CB2 read handler. Three-state pin is undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+		p->logged_cb2_not_connected = TRUE;
+	}
 
 	/* read control register */
 	ret = p->ctl_b;
@@ -709,7 +723,6 @@ static void ddr_a_w(int which, UINT8 data)
 		/* DDR changed, call the callback again */
 		p->ddr_a = data;
 		p->logged_port_a_not_connected = FALSE;
-
 		send_to_out_a_func(which, "port A write due to DDR change");
 	}
 }
@@ -753,7 +766,6 @@ static void ddr_b_w(int which, UINT8 data)
 		/* DDR changed, call the callback again */
 		p->ddr_b = data;
 		p->logged_port_b_not_connected = FALSE;
-
 		send_to_out_b_func(which, "port B write due to DDR change");
 	}
 }

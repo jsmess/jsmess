@@ -790,6 +790,7 @@ case 0x75: /*      LD (HL),L */
   break;
 case 0x76: /*      HALT */
 	Regs.w.enable |= HALTED;
+	Regs.w.haltIFstatus = Regs.w.IF & Regs.w.IE;
 	Regs.w.PC--;
   break;
 case 0x77: /*      LD (HL),A */

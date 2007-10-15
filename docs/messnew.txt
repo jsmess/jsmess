@@ -1,4 +1,4 @@
-﻿0.119.1
+﻿0.120
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -36,7 +36,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.119u4.  This incorporates all features of the
+- The core is based on MAME 0.120.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Fixed multisession crash with the new menu selector.  (bug #1328) [Nate

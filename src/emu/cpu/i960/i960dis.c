@@ -90,18 +90,22 @@ static const mnemonic_t mnem_reg[100] =
 	{ "ending_code",0 }
 };
 
+static const char *constnames[32] =
+{
+	"0x0", "0x1", "0x2", "0x3", "0x4", "0x5", "0x6", "0x7", "0x8", "0x9", "0xa", "0xb", "0xc", "0xd", "0xe", "0xf",
+	"0x10", "0x11", "0x12", "0x13", "0x14", "0x15", "0x16", "0x17", "0x18", "0x19", "0x1a", "0x1b", "0x1c", "0x1d", "0x1e", "0x1f"
+};
+
 static const char *regnames[32] =
 {
 	"pfp","sp","rip","r3", "r4","r5","r6","r7", "r8","r9","r10","r11", "r12","r13","r14","r15",
 	"g0","g1","g2","g3", "g4","g5","g6","g7", "g8","g9","g10","g11", "g12","g13","g14","fp",
 };
 
-#define DIS_NI 		sprintf(diss->buffer,"%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
-#define DIS	    	sprintf(diss->buffer,
 #define REG_DST		regnames[dst]
 #define REG_ABASE	regnames[abase]
 #define REG_REG2	regnames[reg2]
-#define REG_COBR_SRC1	regnames[COBRSRC1]
+#define REG_COBR_SRC1	((iCode & 0x2000) ? constnames[COBRSRC1] : regnames[COBRSRC1])
 #define REG_COBR_SRC2	regnames[COBRSRC2]
 #define NEM	    	mnemonic[op].mnem
 
@@ -183,57 +187,57 @@ char *i960_disassemble(disassemble_t *diss)
 	switch(mnemonic[op].type)
 	{
 	case 0: // not yet implemented
-		DIS_NI;
+		sprintf(diss->buffer,"%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 		break;
 	case 1: // memory access
 		switch(modeh)
 		{
 		case 0:
-			DIS "%-8s%s, 0x%lx",NEM,REG_DST, iCode&0xfff);
+			sprintf(diss->buffer, "%-8s%s,0x%lx",NEM,REG_DST, iCode&0xfff);
 			break;
 		case 1:
 			switch (model)
 			{
 			case 0:
-				DIS "%-8s%s,(%s)",NEM,REG_DST, REG_ABASE);
+				sprintf(diss->buffer, "%-8s%s,(%s)",NEM,REG_DST, REG_ABASE);
 				break;
 			case 3:
-				DIS "%-8s%s,(%s)[%s*%ld]",NEM,REG_DST, REG_ABASE,REG_REG2,(iCode>>7)&0x7);
+				sprintf(diss->buffer, "%-8s%s,(%s)[%s*%ld]",NEM,REG_DST, REG_ABASE,REG_REG2,(iCode>>7)&0x7);
 				break;
 			default:
-				DIS_NI;
+				sprintf(diss->buffer,"%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 				break;
 			}
 			break;
 		case 2:
-			DIS "%-8s%s, 0x%lx(%s)",NEM,REG_DST, iCode&0xfff,REG_ABASE);
+			sprintf(diss->buffer, "%-8s%s,0x%lx(%s)",NEM,REG_DST, iCode&0xfff,REG_ABASE);
 			break;
 		case 3:
 			switch (model)
 			{
 			case 0:
-				DIS "%-8s%s,0x%x",NEM,REG_DST, READ32(diss,4));
+				sprintf(diss->buffer, "%-8s%s,0x%x",NEM,REG_DST, READ32(diss,4));
 				diss->IPinc = 8;
 				break;
 			case 1:
-				DIS "%-8s%s,0x%x(%s)",NEM,REG_DST, READ32(diss,4),REG_ABASE);
+				sprintf(diss->buffer, "%-8s%s,0x%x(%s)",NEM,REG_DST, READ32(diss,4),REG_ABASE);
 				diss->IPinc = 8;
 				break;
 			case 2:
-				DIS "%-8s%s,0x%x[%s*%ld]",NEM,REG_DST, READ32(diss,4),REG_REG2,(iCode>>7)&0x7);
+				sprintf(diss->buffer, "%-8s%s,0x%x[%s*%ld]",NEM,REG_DST, READ32(diss,4),REG_REG2,(iCode>>7)&0x7);
 				diss->IPinc = 8;
 				break;
 			case 3:
-				DIS "%-8s%s,0x%x(%s)[%s*%ld]",NEM,REG_DST, READ32(diss,4),REG_ABASE,REG_REG2,(iCode>>7)&0x7);
+				sprintf(diss->buffer, "%-8s%s,0x%x(%s)[%s*%ld]",NEM,REG_DST, READ32(diss,4),REG_ABASE,REG_REG2,(iCode>>7)&0x7);
 				diss->IPinc = 8;
 				break;
 			default:
-				DIS_NI;
+				sprintf(diss->buffer,"%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 				break;
 			}
 			break;
 		default:
-			DIS_NI;
+			sprintf(diss->buffer,"%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 			break;
 		}
 		break;
@@ -247,8 +251,8 @@ char *i960_disassemble(disassemble_t *diss)
 			i++;
 		}
 
-		if (mnem_reg[i].type == opc) DIS "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,tmpStr,1));
-		else DIS_NI;
+		if (mnem_reg[i].type == opc) sprintf(diss->buffer, "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,tmpStr,1));
+		else sprintf(diss->buffer,"%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 		break;
 	case 3:
 		i = 0;
@@ -260,24 +264,24 @@ char *i960_disassemble(disassemble_t *diss)
 			i++;
 		}
 
-		if (mnem_reg[i].type == opc) DIS "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,tmpStr,0));
-		else DIS_NI;
+		if (mnem_reg[i].type == opc) sprintf(diss->buffer, "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,tmpStr,0));
+		else sprintf(diss->buffer,"%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 		break;
 
 	case 6: // bitpos and branch type
-		DIS "%-8s%ld,%s,0x%lx",NEM, COBRSRC1, REG_COBR_SRC2,((((long)iCode&0x00fffffc)<<19)>>19) + (diss->IP));
+		sprintf(diss->buffer, "%-8s%ld,%s,0x%lx",NEM, COBRSRC1, REG_COBR_SRC2,((((long)iCode&0x00fffffc)<<19)>>19) + (diss->IP));
 		break;
 	case 7: // compare and branch type
-		DIS "%-8s%s,%s,0x%lx",NEM,REG_COBR_SRC1,REG_COBR_SRC2,((((long)iCode&0x00fffffc)<<19)>>19) + (diss->IP));
+		sprintf(diss->buffer, "%-8s%s,%s,0x%lx",NEM,REG_COBR_SRC1,REG_COBR_SRC2,((((long)iCode&0x00fffffc)<<19)>>19) + (diss->IP));
 		break;
 	case 8: // target type
-		DIS "%-8s%08lx",NEM,((((long)iCode&0x00fffffc)<<8)>>8) + (diss->IP));
+		sprintf(diss->buffer, "%-8s%08lx",NEM,((((long)iCode&0x00fffffc)<<8)>>8) + (diss->IP));
 		break;
 	case 9: // no operands
-		DIS "%s",NEM);
+		sprintf(diss->buffer, "%s",NEM);
 		break;
 	case 10: // TEST type: register only
-		DIS "%s %s", NEM, REG_DST);
+		sprintf(diss->buffer, "%s %s", NEM, REG_DST);
 		break;
 	}
 	return diss->buffer;

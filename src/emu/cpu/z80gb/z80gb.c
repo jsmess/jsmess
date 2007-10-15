@@ -27,7 +27,10 @@
 /**   Fixed flags in ADD SP,n8 instruction                  **/
 /**   Fixed flags in LD HL,SP+n8 instruction                **/
 /**                                                         **/
-/** TODO: Check cycle counts when leaving HALT state        **/
+/** 1.3:                                                    **/
+/**   Improved triggering of the HALT bug                   **/
+/**   Added 4 cycle penalty when leaving HALT state for     **/
+/**   newer versions of the cpu core                        **/
 /**                                                         **/
 /*************************************************************/
 #include "z80gb.h"
@@ -64,6 +67,7 @@ typedef struct {
 	int gb_speed_change_pending;
 	int enable;
 	int doHALTbug;
+	int haltIFstatus;
 	UINT8	features;
 	const Z80GB_CONFIG *config;
 } z80gb_16BitRegs;
@@ -243,9 +247,15 @@ INLINE void z80gb_ProcessInterrupts (void)
 					Regs.w.IF &= ~(1 << irqline);
 					Regs.w.PC++;
 					if ( ! Regs.w.enable & IME ) {
-						/* check if the HALT bug should be performed */
 						if ( Regs.w.features & Z80GB_FEATURE_HALT_BUG ) {
-							Regs.w.doHALTbug = 1;
+							/* Old cpu core (dmg/mgb/sgb) */
+							/* check if the HALT bug should be performed */
+							if ( Regs.w.haltIFstatus ) {
+								Regs.w.doHALTbug = 1;
+							}
+						} else {
+							/* New cpu core (cgb/agb/ags) */
+							CYCLES_PASSED( 4 );
 						}
 					}
 				}
@@ -446,7 +456,7 @@ void z80gb_get_info(UINT32 state, cpuinfo *info)
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	case CPUINFO_STR_NAME: 							strcpy(info->s, "Z80GB"); break;
 	case CPUINFO_STR_CORE_FAMILY: 					strcpy(info->s, "Nintendo Z80"); break;
-	case CPUINFO_STR_CORE_VERSION: 					strcpy(info->s, "1.2"); break;
+	case CPUINFO_STR_CORE_VERSION: 					strcpy(info->s, "1.3"); break;
 	case CPUINFO_STR_CORE_FILE: 					strcpy(info->s, __FILE__); break;
 	case CPUINFO_STR_CORE_CREDITS: 					strcpy(info->s, "Copyright (C) 2000 by The MESS Team."); break;
 

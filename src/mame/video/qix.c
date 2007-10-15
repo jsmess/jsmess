@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "qix.h"
-#include "crtc6845.h"
+#include "video/crtc6845.h"
 
 
 /* Constants */

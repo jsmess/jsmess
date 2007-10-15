@@ -5396,7 +5396,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( alpham2 )	/* 0007 (c) 1991 SNK */
 				/* 0008 Sunshine (prototype) 1990 SNK */
 	DRIVER( ncombat )	/* 0009 (c) 1990 Alpha Denshi Co. */
-	DRIVER( ncombata )	/* 0009 (c) 1990 Alpha Denshi Co. */
+	DRIVER( ncombath )	/* 0009 (c) 1990 Alpha Denshi Co. */
 	DRIVER( cyberlip )	/* 0010 (c) 1990 SNK */
 	DRIVER( superspy )	/* 0011 (c) 1990 SNK */
 				/* 0012 */
@@ -5449,6 +5449,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ssideki )	/* 0052 (c) 1992 SNK */
 	DRIVER( wh1 )		/* 0053 (c) 1992 Alpha Denshi Co. */
 	DRIVER( wh1h )		/* 0053 (c) 1992 Alpha Denshi Co. */
+	DRIVER( wh1ha )		/* 0053 (c) 1992 Alpha Denshi Co. */
 				/* 0054 Crossed Swords 2  (CD only? not confirmed, MVS might exist) */
 	DRIVER( kof94 )		/* 0055 (c) 1994 SNK */
 	DRIVER( aof2 )		/* 0056 (c) 1994 SNK */
@@ -5463,6 +5464,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( spinmast )	/* 0062 (c) 1993 Data East Corporation */
 	DRIVER( samsho2 )	/* 0063 (c) 1994 SNK */
 	DRIVER( wh2j )		/* 0064 (c) 1994 ADK / SNK */
+	DRIVER( wh2jh )		/* 0064 (c) 1994 ADK / SNK */
 	DRIVER( wjammers )	/* 0065 (c) 1994 Data East Corporation */
 	DRIVER( karnovr )	/* 0066 (c) 1994 Data East Corporation */
 	DRIVER( gururin )	/* 0067 (c) 1994 Face */
@@ -5587,14 +5589,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 				/* 0258 SNK vs. Capcom? */
 	DRIVER( bangbead )	/* 0259 (c) 2000 Visco */
 	DRIVER( nitd )		/* 0260 (c) 2000 Eleven / Gavaking */
+	DRIVER( nitdbl )	/* bootleg */
 	DRIVER( sengoku3 )	/* 0261 (c) 2001 SNK */
 	DRIVER( kof2001 )	/* 0262 (c) 2001 Eolith / SNK */
 	DRIVER( kof2001h )	/* 0262 (c) 2001 Eolith / SNK */
-	DRIVER( cthd2003 )	/* bootleg of kof2001*/
+	DRIVER( cthd2003 )	/* bootleg of kof2001 */
 	DRIVER( ct2k3sp )	/* bootleg of kof2001 */
 	DRIVER( ct2k3sa )	/* bootleg of kof2001 */
 	DRIVER( mslug4 )	/* 0263 (c) 2002 Mega Enterprise */
-	DRIVER( ms4plus )	/* 0263 bootleg */
+	DRIVER( ms4plus )	/* bootleg */
 	DRIVER( rotd )		/* 0264 (c) 2002 Evoga */
 	DRIVER( kof2002 )	/* 0265 (c) 2002 Eolith / Playmore */
 	DRIVER( kf2k2pls )	/* bootleg */
@@ -5877,8 +5880,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kakumei )	/* (c) 1990 */
 	DRIVER( kakumei2 )	/* (c) 1992 */
 	DRIVER( suchipi )	/* (c) 1993 */
-
-	DRIVER( hayaosi1 )	/* (c) 1991? */
 
 	/* NMK Double Dealer, Similar Hardware to Jaleco Mahjong games above */
 	DRIVER( ddealer )	/* (c) 1991 NMK */
@@ -6286,6 +6287,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bestleag )	/* bootleg, by Playmark? */
 	DRIVER( chimerab )	/* (c) 1993 */
 	DRIVER( cybattlr )	/* (c) 1993 */
+	DRIVER( hayaosi1 )	/* (c) 1993 */
 	DRIVER( peekaboo )	/* (c) 1993 */
 
 	/* Jaleco Mega System 32 games */

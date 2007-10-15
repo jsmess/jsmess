@@ -459,7 +459,7 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 	ROM_LOAD16_BYTE( "pm002e.u76", 0x200001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
 	ROM_LOAD16_BYTE( "pm003e.u75", 0x200000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
 
-	ROM_REGION16_BE( 0x80000, REGION_USER2, 0 )	/* contains real (non-cartoon) women, used after each 3rd round */
+	ROM_REGION16_BE( 0x80000, REGION_USER2, ROMREGION_ERASEFF )	/* contains real (non-cartoon) women, used after each 3rd round */
 	/* U84 is an empty socket and not used with this set */
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_ERASEFF )	/* sprites */

@@ -1276,11 +1276,11 @@ VIDEO_UPDATE( hng64 )
 	draw3d(machine, bitmap, cliprect);
 
 	/* hack to enable 2nd cpu when key is pressed */
-	if ( input_code_pressed_once(KEYCODE_L) )
-	{
-		cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
-	}
+//  if ( input_code_pressed_once(KEYCODE_L) )
+//  {
+//      cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
+//      cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+//  }
 
 	/* AJG */
 	// if(input_code_pressed(KEYCODE_D))

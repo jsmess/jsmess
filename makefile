@@ -89,6 +89,7 @@ X86_PPC_DRC = 1
 #-------------------------------------------------
 
 # uncomment one of the next lines to build a target-optimized build
+# NATIVE = 1
 # ATHLON = 1
 # I686 = 1
 # P4 = 1
@@ -187,6 +188,11 @@ ARCH =
 ENDIAN = little
 
 # architecture-specific builds get extra options
+ifdef NATIVE
+SUFFIX = nat
+ARCH = -march=native
+endif
+
 ifdef ATHLON
 SUFFIX = at
 ARCH = -march=athlon

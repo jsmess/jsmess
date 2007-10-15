@@ -1,49 +1,65 @@
 /* Hyper NeoGeo 64
 
-Driver by David Haywood, ElSemi, and Andrew Gardner
-Rasterizing code provided in part by Andrew Zaferakis
+Driver by David Haywood, ElSemi, and Andrew Gardner.
+Rasterizing code provided in part by Andrew Zaferakis.
 
-ToDo  12th Oct 2004:
+Notes:
+  * The top board is likely identical for all revisions and all "versions" of the hardware.
+    It contains the main MIPS CPU and a secondary communications KL5C80.
+  * The bottom board is what changes between hardware "versions".  It has a Toshiba MCU with
+    a protected internal ROM.  This MCU controls (at least) the inputs per game and communicates
+    with the main board through dualport RAM.
+  * I believe that this secondary board is used as a protection device.
+    The "board type" code comes from it in dualport RAM, and each game reads its inputs differently through dualport.
+    It's capable of changing the input ports dynamically (maybe explaining Roads Edge's "do not touch" quote below).
+    It probably has a lot to do with the network (Roads Edge network connectors are on this board).
+    And since it can return any value at any time, it may be responsible for fatfurwa's missing palette.
+  * The Toshiba CPU datasheet is here : http://www.semicon.toshiba.co.jp/openb2b/websearch/productDetails.jsp?partKey=TMP87CH40N
+  * The internal ROM needs dumping.  Rumor has it, it's the same MCU as in Naomi hardware...
 
-* find where the remainder of the display list information is 'hiding'
-    - complete display lists are not currently found in the dl_w memory handler.
-      (this manifests itself as 'flickering' 3d in fatfurwa and missing bodies in buriki.
-    - it's been thought the display list may be FIFO - this may tie into the BufferA and BufferB thing -
-      look into it!
-* The effect of numerous (dozens of) 3d flags needs to be figured out by examining real hardware
-* Populate the display buffers (A&B) with the data based on Elsemi's notes below
-    - maybe there are some frame-buffer effects which will then work
-* Determine wether or not the hardware does perspective-correct texture mapping - if not,
-    disable it in the rasterizer.
+  * From the Roads Edge manual : "The Network Check screen will be displayed for about 40 seconds whether
+                                  the cabinet is connected for communication competition or not.  After this,
+                                  the game screen will then appear.  At the same time the Network Check screen
+                                  is displayed, the steering wheel will automatically straighten itself out."
+                                 "During the Network Check, absolutely do not touch or try to use the steering wheel,
+                                  pedal, shift lever, and switches.  This will cause the cabinet to malfunction."
 
+  * The Japanese text on the Roads Edge network screen says : "waiting to connect network... please wait without touching machine"
 
-ToDo  2nd Sept 2004:
+ToDo:
+  * clean up I/O / MCU communication
+  * work out the purpose of the interrupts and how many are needed
+  * correct game speed (seems too fast)
+  * figure out what 'network' Road Edge needs to boot, it should run as a standalone
+  * make ss64 boot (io return 3 then 4 not just 4) then work out where the palette is
 
-* clean up I/O implementation, currently it only 'works' with Fatal Fury WA, it has
-  issues with the coins and causes the startup checks to fail.  This most likely relies on the z80-like cpu
-* work out the purpose of the interrupts and how many are needed
-* correct game speed (seems too fast)
-* figure out what 'network' Road Edge needs to boot, it should run as a standalone
-* make ss64 boot (io return 3 then 4 not just 4) then work out where the palette is (mmu?)
+  2d:
+  * scroll (base registers?)
+  * roz (4th tilemap in fatal fury should be floor [in progress], background should zoom)
+  * find registers to control tilemap mode (4bpp/8bpp, 8x8, 16x16)
+  * fix zooming sprites (zoom registers not understood, center versus edge pivot)
+  * priorities
+  * still some bad sprites/tiles (waterfall level 'splash' - health bar at 50% - intro top and bottom - fatfurwa test mode)
+  * is all the bitmap decoding right?
+  * upgrade to modern video timing.
 
-fix remaining 2d graphic glitches
- -- scroll (base registers?)
- -- roz (4th tilemap in fatal fury should be floor [in progress], background should zoom)
- -- find registers to control tilemap mode (4bpp/8bpp, 8x8, 16x16)
- -- fix zooming sprites (zoom registers not understood, definatley differs between games - center versus edge pivot)
- -- priorities
- -- still some bad sprites (waterfall level 'splash' - health bar at 50% - intro top and bottom)
+  3d:
+  * Find where the remainder of the 3d display list information is 'hiding' (FIFO?)
+  * Remaining 3d bits - glowing, etc.
+  * Populate the display buffers
+  * Does the hng64 do perspective-correct texture mapping?  Doesn't look like it...
 
-* fix communications CPU (z80 based, we have bios rom)
-* hook up CPU2 (v30 based?) no rom? (maybe its the 'sound driver' the game uploads?)
-* add sound
-* backup ram etc. (why does ff have a corrupt 'easy' string in test mode?)
-* correct cpu speed and find idle skips
-* work out what other unknown areas of ram are for and emulate...
-* cleanups!
+  Other:
+  * Translate KL5C80 docs and finish up the implementation
+  * figure out what IO $54 & $72 are on the communications CPU
+  * hook up CPU2 (v30 based?) no rom? (maybe its the 'sound driver' the game uploads?)
+  * add sound
+  * backup ram etc.
+  * correct cpu speed and find idle skips
+  * What is ROM1?  Data for the KL5C80?  There's plenty of physical space to map it to.
+*/
 
------
-
+/*
 Known games on this system
 
 Beast Busters 2nd Nightmare ( http://emustatus.rainemu.com/games/bbustr2nd.htm )
@@ -53,18 +69,9 @@ Roads Edge / Round Trip? ( http://emustatus.rainemu.com/games/redge.htm )
 Samurai Shodown 64 ( http://emustatus.rainemu.com/games/sams64.htm )
 Samurai Shodown: Warrior's Rage ( http://emustatus.rainemu.com/games/samswr.htm )
 Xtreme Rally / Offbeat Racer ( http://emustatus.rainemu.com/games/xrally.htm )
-
-
-pr = program
-sc = scroll characters?
-sd = sound
-tx = textures
-sp = sprites?
-vt = vertex?
 */
 
 /*
-
 NeoGeo Hyper 64 (Main Board)
 SNK, 1997
 
@@ -73,7 +80,7 @@ on both sides, one interface PCB with JAMMA connector and sound circuitry, and
 one game cartridge. Only the Main PCB and interface PCB are detailed here.
 
 PCB Layout (Top)
-----------
+----------------
 
 LVS-MAC SNK 1997.06.02
 |--------------------------------------------------------------|
@@ -232,6 +239,14 @@ Other games not dumped yet     : Samurai Spirits 64 / Samurai Shodown 64
                                * Different regions might use the same roms, not known yet
 
                                There might be Rev.A boards for Buriki and Round Trip
+
+pr = program
+sc = scroll characters?
+sd = sound
+tx = textures
+sp = sprites?
+vt = vertex?
+
 Top
 ---
 LVS-DG1
@@ -420,26 +435,25 @@ LVS-DG2
 info from Daemon
 
 (MACHINE CODE ERROR):
-is given wehn you try to put a "RACING GAME" on a "FIGHTING" board
+Is given when you try to put a "RACING GAME" on a "FIGHTING" board.
 
-there are various types of neogeo64 boards
+There are various types of neogeo64 boards:
 FIGHTING (revision 1 and 2)
 RACING
 SHOOTING
 and
 SAMURAI SHODOWN ONLY (Korean)
 
-fighting boards will ONLY play fighting games
+FIGHTING boards will ONLY play fighting games.
 
-racing boards will ONLY play racing games (and you need the extra gimmicks
+RACING boards will ONLY play racing games (and you need the extra gimmicks
 to connect analog wheel and pedals, otherwise it gives you yet another
-error)
+error).
 
-shooter boards will only work with beast busters 2
+Shooter boards will only work with Beast Busters 2.
 
-and the korean board only plays samurai shodown games (wont play buriki one
-or fatal fury for example)
-
+And the Korean board only plays Samurai Shodown games (wont play Buriki One
+or Fatal Fury for example).
 */
 
 #define MASTER_CLOCK	50000000
@@ -450,9 +464,8 @@ static UINT32 *rombase;
 static UINT32 *hng_mainram;
 static UINT32 *hng_cart;
 static UINT32 *hng64_dualport;
+static UINT32 *hng64_sram;
 static UINT16 *hng64_soundram;
-
-static UINT8  com_cpu_rom[0x8000] ;
 
 // Stuff from over in video...
 extern tilemap *hng64_tilemap0, *hng64_tilemap1, *hng64_tilemap2, *hng64_tilemap3 ;
@@ -472,76 +485,24 @@ static UINT32 no_machine_error_code;
 static int hng64_interrupt_level_request;
 WRITE32_HANDLER( hng64_videoram_w );
 
-/* AJG */
-static UINT32 *hng64_3d_1 ;
-static UINT32 *hng64_3d_2 ;
-static UINT32 *hng64_dl ;
+/* 3D stuff */
+static UINT32 *hng64_3d_1;
+static UINT32 *hng64_3d_2;
+static UINT32 *hng64_dl;
+//static UINT32 *hng64_q2;
 
-static UINT32 *hng64_q2 ;
+/* Communications stuff */
+static UINT32 *hng64_com_ram ;
 
+static UINT8 *hng64_com_virtual_mem;
+static UINT8 *hng64_com_op_base;
 
-//static char writeString[1024] ;
+static UINT8 *hng64_com_mmu_mem;
 
-
+/* Hacky stuff */
+char writeString[1024];
 extern UINT32 hng64_hackTilemap3, hng64_hackTm3Count, hng64_rowScrollOffset;
 
-
-/*
-
-physical
-
-0x00000000  RAM
-0x04000000  Cart
-0x20000000  Sprites-tilemaps-palette
-0x30000000  3D banks
-0x60000000  Sound
-0x68000000  Something related to sound
-0x6E000000  Something related to sound
-0x8     ??  (ffury maps these, access to roms?)
-0x9     ??
-0xa     ??
-0xC0000000  Comm
-
-
-MMU tables:
-
-Virtual     Physical
-
-bios
-0xC0000000  0x20000000
-0xD0000000  0x30000000
-0xE0000000  0x60000000
-0x60000000  0xC0000000
-
-
-fatfury
-0x10000000  0x80000000
-0x20000000  0x88000000
-0x30000000  0x90000000
-0x40000000  0x98000000
-0x50000000  0xA0000000
-0xC0000000  0x20000000
-0xD0000000  0x30000000
-0xE0000000  0x60000000
-0xE8000000  0x68000000
-0xEE000000  0x6E000000
-0x60000000  0xC0000000
-
-
-samsho64
-0xC0000000  0x20000000
-0xC2000000  0x30000000
-0xC4000000  0x60000000
-0xC6000000  0x6e000000
-0xc8000000  0x68000000
-0xD0000000  0x30000000
-0xE0000000  0x60000000
-0x60000000  0xC0000000
-
-<ElSemi> to translate the addresses, first lookup in that table, if it's not there, then output the address (minus the top 3 bits)
-<ElSemi> otherwise output the physical add associated
-
-*/
 
 /*
 WRITE32_HANDLER( trap_write )
@@ -590,6 +551,7 @@ WRITE32_HANDLER( hng64_videoram_w )
 	}
 
 	// Next count the number of lines to be drawn to the screen.
+	// This is probably really done per-scanline or something.
 	if (hng64_rowScrollOffset)
 	{
 		if ((realoff & hng64_rowScrollOffset) == hng64_rowScrollOffset)
@@ -600,21 +562,48 @@ WRITE32_HANDLER( hng64_videoram_w )
 }
 
 
-READ32_HANDLER( hng64_random_reader )
+READ32_HANDLER( hng64_random_read )
 {
-	return 0 ; // return mame_rand(Machine)&0xffffffff;
+	return mame_rand(Machine)&0xffffffff;
 }
 
 
-READ32_HANDLER( hng64_comm_r )
+READ32_HANDLER( hng64_com_r )
 {
-	mame_printf_debug("commr %08x\n",offset);
+	logerror("com read  (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, ~mem_mask, hng64_com_ram[offset]);
+	return hng64_com_ram[offset] ;
+}
 
-	if(offset==0x1)
-		return 0xffffffff;
-	if(offset==0)
-		return 0xAAAA;
-	return 0x00000000;
+
+static WRITE32_HANDLER( hng64_com_w )
+{
+	logerror("com write (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, ~mem_mask, data);
+	COMBINE_DATA(&hng64_com_ram[offset]);
+}
+
+
+static UINT32 hng64_com_shared_a;
+static UINT32 hng64_com_shared_b;
+
+WRITE32_HANDLER( hng64_com_share_w )
+{
+	logerror("commw  (PC=%08x): %08x %08x %08x\n", activecpu_get_pc(), data, (offset*4)+0xc0001000, ~mem_mask);
+
+	if (offset==0x0) COMBINE_DATA(&hng64_com_shared_a);
+	if (offset==0x1) COMBINE_DATA(&hng64_com_shared_b);
+}
+
+READ32_HANDLER( hng64_com_share_r )
+{
+	logerror("commr  (PC=%08x): %08x %08x\n", activecpu_get_pc(), (offset*4)+0xc0001000, ~mem_mask);
+
+//  if(offset==0x0) return hng64_com_shared_a;
+//  if(offset==0x1) return hng64_com_shared_b;
+
+	if(offset==0x0) return 0x0000aaaa;
+	if(offset==0x1)	return 0x00030000;		// fatfurwa : at bfc06624 it wants a 01 : at bfc06650 it wants a 02
+
+	return 0x00;
 }
 
 
@@ -629,27 +618,26 @@ static WRITE32_HANDLER( hng64_pal_w )
 	r = ((paletteram32[offset] & 0x00ff0000) >>16);
 	a = ((paletteram32[offset] & 0xff000000) >>24);
 
-	// a sure ain't alpha ???
+	// a sure ain't alpha.
 	// alpha_set_level(mame_rand(Machine)) ;
 	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r) ;
 
-	// if (a != 0)
+	//if (a != 0)
 	//  popmessage("Alpha is not zero!") ;
 
 	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
-
 static READ32_HANDLER( hng64_port_read )
 {
-	if(offset==0x85b)
-		return 0x00000010;
-	if(offset==0x421)
-		return 0x00000002;
- 	if(offset==0x441)
- 		return hng64_interrupt_level_request;
+	logerror("HNG64 port read (PC=%08x) 0x%08x\n", activecpu_get_pc(),offset*4);
 
-	return 0 ; // return mame_rand(Machine);
+	if(offset==0x421) return 0x00000002;
+ 	if(offset==0x441) return hng64_interrupt_level_request;
+
+	if(offset==0x85b) return 0x00000010;
+
+	return mame_rand(Machine)&0xffffffff;
 }
 
 
@@ -657,7 +645,7 @@ static READ32_HANDLER( hng64_port_read )
 int hng_dma_start,hng_dma_dst,hng_dma_len;
 void hng64_do_dma (void)
 {
-	mame_printf_debug("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
+	logerror("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
 	while (hng_dma_len>0)
 	{
@@ -710,73 +698,79 @@ READ32_HANDLER( hng64_cart_r )
 	return hng_cart[offset];
 }
 
-#ifdef UNUSED_FUNCTION
-static READ32_HANDLER( no_machine_error )
+READ32_HANDLER( hng64_sram_r )
 {
-	return no_machine_error_code;
+	logerror("HNG64 reading from SRAM 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sram[offset], activecpu_get_pc());
+	return hng64_sram[offset];
 }
-#endif
+
+WRITE32_HANDLER( hng64_sram_w )
+{
+	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, ~mem_mask, activecpu_get_pc());
+	COMBINE_DATA (&hng64_sram[offset]);
+}
 
 WRITE32_HANDLER( hng64_dualport_w )
 {
+	logerror("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], activecpu_get_pc());
 	COMBINE_DATA (&hng64_dualport[offset]);
-//  mame_printf_debug("dualport W %08x %08x %08x\n", activecpu_get_pc(), offset, hng64_dualport[offset]);
 }
 
 READ32_HANDLER( hng64_dualport_r )
 {
-//  mame_printf_debug("dualport R %08x %08x %08x\n", activecpu_get_pc(), offset, hng64_dualport[offset]);
+	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], activecpu_get_pc());
 
-	// !! These hacks make the boot-up sequence fail !!
+	// These hacks create some red marks for the boot-up sequence
 	switch (offset*4)
 	{
-		// HACK - This takes care of inputs
-//      case 0x00:  toggi^=1; if (toggi==1) {return 0x00000400;} else {return 0x00000300;};//otherwise it won't read inputs ..
-		case 0x00:  return 0x00000400;
-		case 0x04:  return readinputport(0)|(readinputport(1)<<16);
-		case 0x08:  return readinputport(3)|(readinputport(2)<<16);
+		//SamSho64
+//      case 0x00:  toggi^=1; if (toggi==1) {return 0x00000400;} else {return 0x00000300;};
+		//RoadsEdge
+//      case 0x00:  return readinputportbytag("IPT_TEST");
 
-		// HACK - This takes care of the 'machine' error code
+		//Fatfurwa
+		case 0x00:  return 0x00000400;
+		case 0x04:  return readinputportbytag("IPT_NONE")       | (readinputportbytag("FATFURWA_TST_ETC")<<16);
+		case 0x08:  return readinputportbytag("FATFURWA_PLR_2") | (readinputportbytag("FATFURWA_PLR_1")<<16);
+
+		// This takes care of the 'machine' error code
 		case 0x600: return no_machine_error_code;
 	}
 
-	return hng64_dualport[offset];
+	return mame_rand(Machine)&0xffffffff;
+	//return hng64_dualport[offset];
 }
 
-// These 4 '3d' buffer reads and writes are only used during the startup checks -
-//   the software never addresses them directly anywhere else.  Also, apparently, 3d bank 1 is never written to.
-//   They're probably video and z-buffer memory, and someday maybe I'll write the rasterized 3d to these regions
-//   and then comp it into the final image...
+// Hardware calls these '3d buffers'
+//   They're only read during the startup check of fatfurwa.  Z-buffer memory?  Front buffer, back buffer?
+//   They're definitely mirrored in the startup test.  Elsemi says:
+//   <ElSemi> 30100000-3011ffff is framebuffer A0
+//   <ElSemi> 30120000-3013ffff is framebuffer A1
+//   <ElSemi> 30140000-3015ffff is ZBuffer A
+READ32_HANDLER( hng64_3d_1_r )
+{
+	return hng64_3d_1[offset] ;
+}
+
 WRITE32_HANDLER( hng64_3d_1_w )
 {
-	COMBINE_DATA (&hng64_3d_1[offset]) ;
-	COMBINE_DATA (&hng64_3d_2[offset]) ;
-
 	fatalerror("WRITE32_HANDLER( hng64_3d_1_w )");
+}
+
+READ32_HANDLER( hng64_3d_2_r )
+{
+	return hng64_3d_2[offset] ;
 }
 
 WRITE32_HANDLER( hng64_3d_2_w )
 {
 	COMBINE_DATA (&hng64_3d_1[offset]) ;
 	COMBINE_DATA (&hng64_3d_2[offset]) ;
-//  mame_printf_debug("2w : %08x %08x\n", offset, hng64_3d_2[offset]) ;
-}
-
-READ32_HANDLER( hng64_3d_1_r )
-{
-//  mame_printf_debug("1r : %08x %08x\n", offset, hng64_3d_1[offset]) ;
-	return hng64_3d_1[offset] ;
-}
-
-READ32_HANDLER( hng64_3d_2_r )
-{
-//  mame_printf_debug("2r : %08x %08x\n", offset, hng64_3d_2[offset]) ;
-	return hng64_3d_2[offset] ;
 }
 
 
-// These are for the 3d 'display list'
 
+// The 3d 'display list'
 static WRITE32_HANDLER( dl_w )
 {
 	COMBINE_DATA (&hng64_dl[offset]) ;
@@ -811,8 +805,8 @@ static WRITE32_HANDLER( dl_w )
 
 static READ32_HANDLER( dl_r )
 {
-	// A read of 0x86 ONLY happens if there are more display lists than what are readily available...
-	// See above for more compelling detail...  (PC = 8006fe1c)
+	// A read of 0x86 ONLY happens if there are more display lists than what are readily available.
+	// (PC = 8006fe1c)
 
 //  mame_printf_debug("dl R (%08x) : %x %x\n", activecpu_get_pc(), offset, hng64_dl[offset]) ;
 //  usrintf_showmessage("dl R (%08x) : %x %x", activecpu_get_pc(), offset, hng64_dl[offset]) ;
@@ -827,7 +821,7 @@ WRITE32_HANDLER( activate_3d_buffer )
 }
 */
 
-// Transition Control memory...
+// Transition Control memory.
 static WRITE32_HANDLER( tcram_w )
 {
 	COMBINE_DATA (&hng64_tcram[offset]) ;
@@ -858,54 +852,7 @@ static READ32_HANDLER( tcram_r )
 	return hng64_tcram[offset] ;
 }
 
-
-/* READ32_HANDLER( q1_r )
-{
-//  mame_printf_debug("Q1 (%08x) : %08x %08x\n", activecpu_get_pc(), offset, hng64_q1[offset]) ;
-
-    return hng64_q1[offset] ;
-}
-
-WRITE32_HANDLER( q1_w )
-{
-    COMBINE_DATA (&hng64_q1[offset]) ;
-
-//  if (offset == 0x00)
-//      usrintf_showmessage("Q1 %08x", hng64_q1[offset]) ;
-
-//  mame_printf_debug("Q1 (%08x) : %08x %08x\n", activecpu_get_pc(), offset, hng64_q1[offset]) ;
-}
-*/
-
-// Q2 handler (just after display list in memory)
-// Seems to read and write the same thing for every frame in fatfurwa
 /*
-    Q2 R : 00000000 00311800
-    Q2 W : 00000003 03000000
-    Q2 W : 00000002 e0001c00
-    Q2 W : 00000002 e0001c00
-    Q2 W : 00000001 3fe037e0
-    Q2 W : 00000001 3fe037e0
-    Q2 W : 00000000 00311800
-
-    In the beginning it likes setting 0x04-0x0b to what looks like
-    a bunch of bit-flags...
-*/
-static WRITE32_HANDLER( q2_w )
-{
-	COMBINE_DATA (&hng64_q2[offset]) ;
-	// mame_printf_debug("Q2 W : %.8x %.8x\n", offset, hng64_q2[offset]) ;
-}
-
-static READ32_HANDLER( q2_r )
-{
-	// mame_printf_debug("Q2 R : %.8x %.8x\n", offset, hng64_q2[offset]) ;
-	return hng64_q2[offset] ;
-}
-
-
-/*
-
 <ElSemi> 0xE0000000 sound
 <ElSemi> 0xD0100000 3D bank A
 <ElSemi> 0xD0200000 3D bank B
@@ -915,13 +862,6 @@ static READ32_HANDLER( q2_r )
 <ElSemi> 0xBF808000-0xBF808800 Dualport ram
 <ElSemi> 0xBF800000-0xBF808000 S-RAM
 <ElSemi> 0x60000000-0x60001000 Comm dualport ram
-
-*/
-
-/*
-<ElSemi> d0100000-d011ffff is framebuffer A0
-<ElSemi> d0120000-d013ffff is framebuffer A1
-<ElSemi> d0140000-d015ffff is ZBuffer A
 */
 
 WRITE32_HANDLER( hng64_soundram_w )
@@ -956,45 +896,56 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE(&hng_mainram)
 	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION(REGION_USER3,0) AM_BASE(&hng_cart)
 
+	// Ports
 	AM_RANGE(0x1F700000, 0x1F702fff) AM_READ(hng64_port_read)
 
-	AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITE(MWA32_NOP)		// ?? often
-	AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITE(MWA32_NOP)		// ?? often
-	AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITE(MWA32_NOP)		// fatfur,strange
-	AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITE(MWA32_NOP)		// irq ack
+//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITE(MWA32_NOP)        // ?? often
+//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITE(MWA32_NOP)        // ?? often
+//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITE(MWA32_NOP)        // fatfur,strange
+//  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
+//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITE(MWA32_NOP)        // irq ack
 	AM_RANGE(0x1F701204, 0x1F701207) AM_WRITE(hng_dma_start_w)
 	AM_RANGE(0x1F701214, 0x1F701217) AM_WRITE(hng_dma_dst_w)
 	AM_RANGE(0x1F701224, 0x1F701227) AM_WRITE(hng_dma_len_w)
-	AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITE(MWA32_NOP)		// dma related?
-	AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITE(MWA32_NOP)		// dma related?
+//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITE(MWA32_NOP)        // dma related?
+//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITE(MWA32_NOP)        // dma related?
+//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITE(MWA32_NOP)        // ?? often
 
-	AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITE(MWA32_NOP)		// ?? often
+	// SRAM.  Coin data, Player Statistics, etc.
+	AM_RANGE(0x1F800000, 0x1F803fff) AM_READWRITE(hng64_sram_r, hng64_sram_w) AM_BASE(&hng64_sram)
 
-	// SRAM? -- reads times etc.?  Shared? System Log?
-	// Looks an awful lot like fight statistics - writes upon startup, initial coin insertion, and before every match.
-	//   As matches go on, it writes more data each time (ajg)...
-	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM
-	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_BASE (&hng64_dualport) // Dualport RAM
+	// Dualport RAM
+	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_BASE(&hng64_dualport)
 
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION(REGION_USER1, 0) AM_BASE(&rombase)	// BIOS
+	// BIOS
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION(REGION_USER1, 0) AM_BASE(&rombase)
 
+	// Video
 	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)									// Sprites
-	AM_RANGE(0x20010000, 0x20010013) AM_RAM
+	AM_RANGE(0x20010000, 0x20010013) AM_READ(hng64_random_read)
 	AM_RANGE(0x20100000, 0x2017ffff) AM_READWRITE(MRA32_RAM, hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)									// Video Registers
 	AM_RANGE(0x20200000, 0x20203fff) AM_READWRITE(MRA32_RAM,hng64_pal_w) AM_BASE(&paletteram32)			// Palette
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control
 	AM_RANGE(0x20300000, 0x2030ffff) AM_READWRITE(dl_r, dl_w) AM_BASE(&hng64_dl)						// 3d Display List
 
-	AM_RANGE(0x30000000, 0x3000002f) AM_READWRITE(q2_r, q2_w) AM_BASE(&hng64_q2)						// ? See Above ?
+	// 3d?
+//  AM_RANGE(0x30000000, 0x3000002f) AM_READWRITE(q2_r, q2_w) AM_BASE(&hng64_q2)
 	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r,hng64_3d_2_w) AM_BASE(&hng64_3d_1)		// 3D Display Buffer A
 	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r,hng64_3d_2_w) AM_BASE(&hng64_3d_2)		// 3D Display Buffer B
 
+	// Sound
 	AM_RANGE(0x60000000, 0x601fffff) AM_RAM																// Sound ??
 	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)					// uploads the v53 sound program here, elsewhere on ss64-2 */
 
-	AM_RANGE(0x68000000, 0x68000003) AM_WRITE(MWA32_NOP)												// ??
-	AM_RANGE(0x68000004, 0x68000007) AM_READ(MRA32_NOP)													// ??
+	// ?
+//  AM_RANGE(0x68000000, 0x68000003) AM_WRITE(MWA32_NOP)                                                // ??
+//  AM_RANGE(0x68000004, 0x68000007) AM_READ(MWA32_NOP)                                                 // ??
+//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITE(MWA32_NOP)                                                // ??
+
+	// Communications
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_BASE(&hng64_com_ram)
+	AM_RANGE(0xc0001000, 0xc0001007) AM_READWRITE(hng64_com_share_r, hng64_com_share_w)
 
 	/* 6e000000-6fffffff */
 	/* 80000000-81ffffff */
@@ -1002,23 +953,6 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	/* 90000000-97ffffff */
 	/* 98000000-9bffffff */
 	/* a0000000-a3ffffff */
-
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
-	AM_RANGE(0xc0001000, 0xc000ffff) AM_READ(hng64_comm_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hng_comm_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_BANK3)		// bios rom
-	AM_RANGE(0x8000, 0x8fff) AM_RAM			// BIOS from1.bin does test writes and reads here (see program @ 0x6016)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM			// Probably not really here - 0x246d2 writes from 0x8000-0xbff0 (+ memmanager)
-											//   and it just so happens to overlap this region...
-	AM_RANGE(0xa000, 0xcfff) AM_RAM			// BIOS from1.bin does test writes and reads here (see program @ 0x608b)
-	AM_RANGE(0xd000, 0xefff) AM_RAM			// BIOS from1.bin does test writes and reads here (see program @ 0x6106)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hng_comm_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
 /*
@@ -1126,6 +1060,181 @@ index=00000004  pagesize=01000000  vaddr=00000000C8000000  paddr=000000006800000
 index=00000004  pagesize=01000000  vaddr=00000000C9000000  paddr=0000000069000000  asid=00  r=0  c=2  dvg=dvg
 */
 
+
+/* COMM CPU */
+#define KL5C_MMU_A(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[((xxx-1)*2)+1] << 2) | ((hng64_com_mmu_mem[(xxx-1)*2] & 0xc0) >> 6) )
+#define KL5C_MMU_B(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[(xxx-1)*2] & 0x3f) )
+
+static OPBASE_HANDLER( KL5C80_opbase_handler )
+{
+	opcode_base = opcode_arg_base = hng64_com_op_base;
+	return ~0;
+}
+
+static UINT32 KL5C80_translate_address(UINT16 vAddr)
+{
+	int i ;
+	UINT8 bNum = 4 ;
+
+	/* Determine what B the vAddr is in */
+	for (i = 1; i < 5; i++)
+	{
+		if ( ((KL5C_MMU_B(i)+1)*0x400) > vAddr)
+		{
+			bNum = i-1;
+			break;
+		}
+	}
+
+	/* Calculate the full address and return */
+	if (bNum == 0)
+	{
+		return vAddr;
+	}
+	else
+	{	/* the offset to the base physical address plus the vAddr's offset from the virtual base */
+		return ((KL5C_MMU_A(bNum) + (KL5C_MMU_B(bNum)+1)) * 0x400) + (vAddr - ((KL5C_MMU_B(bNum)+1) * 0x400));
+	}
+}
+
+static void KL5C80_virtual_mem_sync(void)
+{
+	/* The KL5C80 maps each progressive chunk from the beginning of the
+       virtual region until the beginning of the next virtual region.
+       This is implemented here in a lame way to simplify the code.  */
+
+	int i,region;
+
+	for (region = 0; region < 5; region++)
+	{
+		int logical_offset  = (KL5C_MMU_B(region)+1) * 0x400;
+		int physical_offset = (KL5C_MMU_A(region) + (KL5C_MMU_B(region)+1)) * 0x400;
+
+		/* The first MMU region is a special case */
+		if (region == 0)
+		{
+			logical_offset  = 0x0000;
+			physical_offset = 0x00000;
+		}
+
+		logerror("Now copying 0x%x to 0x%x\n", physical_offset, logical_offset);
+		for (i = logical_offset; i <= 0xffff; i++)
+		{
+			if (physical_offset+i <= 0xfffff)
+				hng64_com_op_base[i] = hng64_com_virtual_mem[physical_offset+i];
+		}
+	}
+}
+
+static void KL5C80_init(void)
+{
+	/* init the MMU */
+	hng64_com_mmu_mem[0] =
+	hng64_com_mmu_mem[2] =
+	hng64_com_mmu_mem[4] =
+	hng64_com_mmu_mem[6] = 0x3f;
+
+	hng64_com_mmu_mem[1] =
+	hng64_com_mmu_mem[3] =
+	hng64_com_mmu_mem[5] = 0x00;
+	hng64_com_mmu_mem[7] = 0xf0;
+}
+
+READ8_HANDLER( hng64_comm_memory_r )
+{
+	UINT32 physical_address = KL5C80_translate_address(offset) ;
+	logerror("READING 0x%02x from 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address) ;
+
+	/* Custom "virtual" memory map */
+	if (physical_address >= 0x26000 && physical_address <= 0x28000)
+	{
+		/* May very well be shared memory - it reads 16 bits from it at 0x309 */
+	}
+
+
+	return hng64_com_virtual_mem[physical_address] ;
+}
+
+WRITE8_HANDLER( hng64_comm_memory_w )
+{
+//  UINT32 physical_address = KL5C80_translate_address(offset) ;
+//  logerror("WRITING 0x%02x to 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address) ;
+
+	// Write to both virtual and physical memory
+}
+
+
+/* KL5C80 I/O handlers */
+WRITE8_HANDLER( hng64_comm_io_mmu )
+{
+	hng64_com_mmu_mem[offset] = data;
+
+	/* Debugging - you can't change A4 - the hardware doesn't let you */
+	if (hng64_com_mmu_mem[7] != 0xf0 || ((hng64_com_mmu_mem[6] & 0xc0) != 0x00))
+		logerror("KL5C MMU error !!! Code is trying to change A4!\n");
+
+	logerror("COMM CPU MMU WRITE : ") ;
+	logerror("B : %02x %02x %02x %02x  A : %03x %03x %03x %03x\n", KL5C_MMU_B(1), KL5C_MMU_B(2), KL5C_MMU_B(3), KL5C_MMU_B(4),
+																   KL5C_MMU_A(1), KL5C_MMU_A(2), KL5C_MMU_A(3), KL5C_MMU_A(4)) ;
+	KL5C80_virtual_mem_sync();
+}
+
+/*
+READ8_HANDLER( hng64_comm_shared_r )
+{
+    // I'm thinking 0x54 comes from an interrupt on the MIPS CPU?  Or maybe the Toshiba one?
+    // Nothing from CPU0 seems to ping the COM CPU as often as it reads 0x54.
+    // Sometimes it wants 0x54 to be a 0x01 and sometimes it wants a 0x02.
+
+    // It's not an interrupt on the KL5C80 because they aren't enabled before 0x54 is ping'ed
+    // There is a special onboard interrupt handler for the KL5C80 though...
+
+    if (offset==0x00) logerror("COM CPU reading from 0x50.\n");
+    if (offset==0x01) logerror("COM CPU reading from 0x51.\n");
+    if (offset==0x02) logerror("COM CPU reading from 0x52.\n");
+    if (offset==0x03) logerror("COM CPU reading from 0x53.\n");
+    if (offset==0x04) (hng64_com_shared_b & 0x000000ff) ? return 0xff : return 0x00;
+}
+
+WRITE8_HANDLER( hng64_comm_shared_w )
+{
+    if (offset==0x00) hng64_com_shared_a = (hng64_com_shared_a & 0x00ffffff) | (data << 24);
+    if (offset==0x01) hng64_com_shared_a = (hng64_com_shared_a & 0xff00ffff) | (data << 16);
+    if (offset==0x02) hng64_com_shared_a = (hng64_com_shared_a & 0xffff00ff) | (data <<  8);
+    if (offset==0x03) hng64_com_shared_a = (hng64_com_shared_a & 0xffffff00) | (data <<  0);
+    if (offset==0x04) logerror("COM CPU writing to 0x54.\n");
+
+    logerror("COM CPU wrote to com_shared_a : %08x\n", hng64_com_shared_a);
+}
+*/
+
+static ADDRESS_MAP_START( hng_comm_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000,0xffff) AM_READWRITE( hng64_comm_memory_r, hng64_comm_memory_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hng_comm_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	/* Reserved for the KL5C80 internal hardware */
+	AM_RANGE(0x00,0x07) AM_WRITE( hng64_comm_io_mmu ) AM_BASE(&hng64_com_mmu_mem)
+//  AM_RANGE(0x08,0x1f) AM_NOP              /* Reserved */
+//  AM_RANGE(0x20,0x25) AM_READWRITE        /* Timer/Counter B */           /* hng64 writes here */
+//  AM_RANGE(0x27,0x27) AM_NOP              /* Reserved */
+//  AM_RANGE(0x28,0x2b) AM_READWRITE        /* Timer/Counter A */           /* hng64 writes here */
+//  AM_RANGE(0x2c,0x2f) AM_READWRITE        /* Parallel port A */
+//  AM_RANGE(0x30,0x33) AM_READWRITE        /* Parallel port B */
+//  AM_RANGE(0x34,0x37) AM_READWRITE        /* Interrupt controller */      /* hng64 writes here */
+//  AM_RANGE(0x38,0x39) AM_READWRITE        /* Serial port */               /* hng64 writes here */
+//  AM_RANGE(0x3a,0x3b) AM_READWRITE        /* System control register */   /* hng64 writes here */
+//  AM_RANGE(0x3c,0x3f) AM_NOP              /* Reserved */
+
+	/* General IO */
+	AM_RANGE(0x50,0x54) AM_NOP // AM_WRITE(hng64_comm_shared_r, hng64_comm_shared_w)
+//  AM_RANGE(0x72,0x72) AM_WRITE            /* dunno yet */
+ADDRESS_MAP_END
+
+
+
+
 static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_READ(MRA16_BANK2)
 	AM_RANGE(0xe0000, 0xfffff) AM_READ(MRA16_BANK1)
@@ -1133,10 +1242,27 @@ ADDRESS_MAP_END
 
 
 INPUT_PORTS_START( hng64 )
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IPT_TEST")
+	PORT_BIT(  0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x0400, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE( KEYCODE_Q )
+	PORT_BIT(  0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(  0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
+	PORT_START_TAG("IPT_NONE")
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("FATFURWA_TST_ETC")
 	PORT_BIT(  0x0001, IP_ACTIVE_HIGH, IPT_COIN1)
 	PORT_BIT(  0x0002, IP_ACTIVE_HIGH, IPT_COIN2)
 	PORT_BIT(  0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN)
@@ -1156,7 +1282,7 @@ INPUT_PORTS_START( hng64 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
-	PORT_START	/* Player 1 */
+	PORT_START_TAG("FATFURWA_PLR_1")
 	PORT_BIT(  0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
@@ -1174,7 +1300,7 @@ INPUT_PORTS_START( hng64 )
 	PORT_BIT(  0x4000, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(  0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
-	PORT_START	/* Player 2  */
+	PORT_START_TAG("FATFURWA_PLR_2")
 	PORT_BIT(  0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 	PORT_BIT(  0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
@@ -1265,10 +1391,10 @@ static const gfx_layout hng64_16_layout =
 static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_4_even_layout, 0x0, 0x100 ) /* scrolltiles */
 	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_4_odd_layout,  0x0, 0x100 ) /* scrolltiles */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_layout,        0x0, 0x10 ) /* scrolltiles */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_16_layout,     0x0, 0x10 ) /* scroll tiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_layout,        0x0, 0x10 )  /* scrolltiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_16_layout,     0x0, 0x10 )  /* scroll tiles */
 	GFXDECODE_ENTRY( REGION_GFX2, 0, hng64_4_16_layout,   0x0, 0x100 ) /* sprite tiles */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, hng64_16_layout,     0x0, 0x10 ) /* sprite tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hng64_16_layout,     0x0, 0x10 )  /* sprite tiles */
 GFXDECODE_END
 
 DRIVER_INIT( hng64 )
@@ -1304,9 +1430,9 @@ static TIMER_CALLBACK( irq_stop )
 
 static INTERRUPT_GEN( irq_start )
 {
-	/* the irq 'level' is read in hng64_port_read */
-	/* there are more, the sources are unknown at
-       the moment */
+	logerror("HNG64 interrupt level %x\n", cpu_getiloops());
+
+	/* there are more, the sources are unknown at the moment */
 	switch (cpu_getiloops())
 	{
 		case 0x00: hng64_interrupt_level_request = 0;
@@ -1328,29 +1454,32 @@ MACHINE_RESET(hyperneo)
 {
 	int i ;
 
-	// Sound CPU
+	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)hng64_soundram;
 	memory_set_bankptr(1,&RAM[0x1e0000]);
 	memory_set_bankptr(2,&RAM[0x001000]); // where..
 	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
 
-	// Communications CPU
 
-	// Hack to fake the MMU for the z80'esque CPU - copy all of the higher address memory to empty spaces in
-	//   the lower-address memory - this might actually work?
-	for (i = 0x0000; i < 0x8000; i++) com_cpu_rom[       i] = memory_region(REGION_USER2)[        i] ;
-	// These two pieces of code (0x20000 and 0x40000) are identical save for a single byte in the beginning and a port check
-	//   towards the end.  Odd?
-	for (i = 0x0000; i < 0x1000; i++) com_cpu_rom[0x4000+i] = memory_region(REGION_USER2)[0x20000+i] ;
-//  for (i = 0x0000; i < 0x1000; i++) com_cpu_rom[0x4000+i] = memory_region(REGION_USER2)[0x40000+i] ;
+	/* Comm CPU */
+	KL5C80_init();
 
-	memory_set_bankptr(3,&com_cpu_rom[0x0000]);
-//  cpunum_set_input_line(2, INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
-	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);		// hold on there pardner...
+	/* 1 meg of virtual address space for the com cpu */
+	hng64_com_virtual_mem = auto_malloc(0x100000);
+	hng64_com_op_base     = auto_malloc(0x10000);
 
-	/* HACK .. put ram here on reset .. we end up replacing it with the MMU hack later so the game doesn't clear its own ram with thecode in it!!..... */
-//  memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x0ffffff, 0, 0, hng64_mainram_w);
+	/* Fill up virtual memory with ROM */
+	for (i = 0x0; i < 0x100000; i++)
+		hng64_com_virtual_mem[i] = memory_region(REGION_USER2)[i] ;
+
+	KL5C80_virtual_mem_sync();
+	memory_set_opbase_handler(2, KL5C80_opbase_handler);
+
+	cpunum_set_input_line(2, INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
+
+
 
 	// "Display List" init - ugly
 	activeBuffer = 0 ;
@@ -1381,7 +1510,7 @@ MACHINE_RESET(hyperneo)
 
 MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(R4600BE, MASTER_CLOCK)  	// actually R4300 ?
+	MDRV_CPU_ADD(R4600BE, MASTER_CLOCK)  	// actually R4300
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(hng_map, 0)
 	MDRV_CPU_VBLANK_INT(irq_start,3)
@@ -1389,9 +1518,9 @@ MACHINE_DRIVER_START( hng64 )
 	MDRV_CPU_ADD(V30,8000000)		 		// v53, 16? mhz!
 	MDRV_CPU_PROGRAM_MAP(hng_sound_map,0)
 
-	MDRV_CPU_ADD(Z80,MASTER_CLOCK/4)			// KL5C80A12CFP - binary compatible with Z80, ??? mhz!
-	MDRV_CPU_PROGRAM_MAP(hng_comm_map,0)		//   this chip uses the early I/O memory space for virtual memory mapping
-	MDRV_CPU_IO_MAP(hng_comm_io_map, 0)			//   docs have been found, but they're japanese-only :(!
+	MDRV_CPU_ADD(Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
+	MDRV_CPU_PROGRAM_MAP(hng_comm_map,0)
+	MDRV_CPU_IO_MAP(hng_comm_io_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -1414,24 +1543,16 @@ MACHINE_DRIVER_END
 ROM_START( hng64 )
 	ROM_REGION32_BE( 0x0100000, REGION_USER1, 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* unknown / unused bios roms */
+	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* KL5C80 BIOS and unknown ROM */
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 
+	/* To placate MAME */
 	ROM_REGION32_LE( 0x2000000, REGION_USER3, ROMREGION_ERASEFF ) /* Program Code, mapped at ??? maybe banked?  LE? */
-
-	/* Scroll Characters 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-
-	/* Sprite Characters - 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-
-	/* Textures - 1024x1024x8 pages */
 	ROM_REGION( 0x1000000, REGION_GFX3, ROMREGION_ERASEFF )
-
-	/* X,Y,Z Vertex ROMs */
 	ROM_REGION16_BE( 0x0c00000, REGION_GFX4, ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x1000000, REGION_SOUND1, ROMREGION_ERASEFF ) /* Sound Samples? */
 ROM_END
 
@@ -1441,9 +1562,9 @@ ROM_START( roadedge )
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, REGION_USER1, 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, REGION_USER2, ROMREGION_DISPOSE ) /* unknown / unused bios roms */
+	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* KL5C80 BIOS and unknown ROM */
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
 	ROM_REGION32_LE( 0x2000000, REGION_USER3, 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
@@ -1501,9 +1622,9 @@ ROM_START( sams64_2 )
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, REGION_USER1, 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* unknown / unused bios roms */
+	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* KL5C80 BIOS and unknown ROM */
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
 	ROM_REGION32_LE( 0x2000000, REGION_USER3, 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
@@ -1580,9 +1701,9 @@ ROM_START( fatfurwa )
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, REGION_USER1, 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* unknown / unused bios roms */
+	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* KL5C80 BIOS and unknown ROM */
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
 	ROM_REGION32_LE( 0x2000000, REGION_USER3, 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
@@ -1651,9 +1772,9 @@ ROM_START( buriki )
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, REGION_USER1, 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* unknown / unused bios roms */
+	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* KL5C80 BIOS and unknown ROM */
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
 	ROM_REGION32_LE( 0x2000000, REGION_USER3, 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
@@ -1723,11 +1844,11 @@ ROM_END
 GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 001 */
-/* 002 Samurai Shodown 64 */
-/* 003 Xtreme Rally / Offbeat Racer */
-/* 004 Beast Busters 2nd Nightmare */
-GAME( 1998, sams64_2, hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Samurai Shodown: Warrior's Rage", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Buriki One (rev.B)", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 007 */
+GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
+/* Samurai Shodown 64           002 */
+/* Xtreme Rally / Offbeat Racer 003 */
+/* Beast Busters 2nd Nightmare  004 */
+GAME( 1998, sams64_2, hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Samurai Shodown: Warrior's Rage",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
+GAME( 1998, fatfurwa, hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
+GAME( 1999, buriki,   hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
 

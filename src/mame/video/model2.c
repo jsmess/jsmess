@@ -131,7 +131,7 @@ typedef struct
 	vertex				v[3];
 	UINT16				z;
 	UINT16				texheader[4];
-	UINT16				luma;
+	UINT8				luma;
 	INT16				viewport[4];
 	INT16				center[2];
 } triangle;
@@ -141,7 +141,7 @@ typedef struct
 	vertex	v[4];
 	UINT16	z;
 	UINT16	texheader[4];
-	UINT16	luma;
+	UINT8	luma;
 } quad;
 
 
@@ -432,7 +432,7 @@ static void model2_3d_process_quad( UINT32 attr )
 	raster.command_buffer[1] += tho * 4;
 
 	/* set the luma value of this quad */
-	object.luma = (raster.command_buffer[9] >> 14) & 0xFF;
+	object.luma = (raster.command_buffer[9] >> 15) & 0xFF;
 
 	/* determine wether we can cull this quad */
 	cull = 0;
@@ -678,7 +678,7 @@ static void model2_3d_process_triangle( UINT32 attr )
 	raster.command_buffer[1] += tho * 4;
 
 	/* set the luma value of this quad */
-	object.luma = (raster.command_buffer[9] >> 14) & 0xFF;
+	object.luma = (raster.command_buffer[9] >> 15) & 0xFF;
 
 	/* determine wether we can cull this quad */
 	cull = 0;

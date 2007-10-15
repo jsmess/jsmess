@@ -606,7 +606,7 @@ static void debug_window_draw_contents(debugwin_info *info, HDC dc)
 
 static LRESULT CALLBACK debug_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	debugwin_info *info = (debugwin_info *)(UINT32)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	debugwin_info *info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
 
 	// handle a few messages
 	switch (message)
@@ -1292,7 +1292,7 @@ static void debug_view_next_view(debugwin_info *info, debugview_info *curview)
 
 static LRESULT CALLBACK debug_view_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	debugview_info *info = (debugview_info *)(UINT32)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	debugview_info *info = (debugview_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
 
 	// handle a few messages
 	switch (message)
@@ -1476,7 +1476,7 @@ static LRESULT CALLBACK debug_view_proc(HWND wnd, UINT message, WPARAM wparam, L
 
 static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	debugwin_info *info = (debugwin_info *)(UINT32)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	debugwin_info *info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	TCHAR buffer[MAX_EDIT_STRING];
 
 	// handle a few messages
@@ -1863,7 +1863,7 @@ static void memory_create_window(void)
 	// create an edit box and override its key handling
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
-	info->original_editproc = (void *)(UINT32)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
+	info->original_editproc = (void *)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
 	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debug_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
@@ -2196,7 +2196,7 @@ static void disasm_create_window(void)
 	// create an edit box and override its key handling
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
-	info->original_editproc = (void *)(UINT32)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
+	info->original_editproc = (void *)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
 	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debug_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
@@ -2514,7 +2514,7 @@ static int disasm_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 
 static void disasm_update_caption(HWND wnd)
 {
-	debugwin_info *info = (debugwin_info *)(UINT32)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	debugwin_info *info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	char title[100];
 	UINT32 cpunum;
 
@@ -2582,7 +2582,7 @@ void console_create_window(void)
 	// create an edit box and override its key handling
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
-	info->original_editproc = (void *)(UINT32)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
+	info->original_editproc = (void *)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
 	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debug_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
