@@ -13,17 +13,11 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE 	// for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
 #endif
-#endif
 
 #ifdef SDLMAME_MACOSX
 #include "SDL/SDL.h"
 #else
 #include "SDL.h"
-#endif
-
-#ifdef SDLMAME_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #endif
 
 #ifdef SDLMAME_OS2
@@ -44,7 +38,6 @@
 #include "mame.h"
 #include "sdlsync.h"
 
-#ifndef SDLMAME_WIN32
 #ifndef SDLMAME_OS2
 #include <pthread.h>
 #include <errno.h>
@@ -57,15 +50,15 @@ struct _osd_lock {
 struct _osd_event {
 	pthread_mutex_t 	mutex;
 	pthread_cond_t 		cond;
-	int					autoreset;
-	volatile int		signalled;
+	volatile INT32		autoreset;
+	volatile INT32		signalled;
 };
 
 struct _osd_thread {
 	pthread_t		thread;
 };
 
-static osd_lock		*atomic_lck = NULL;
+static osd_lock			*atomic_lck = NULL;
 
 //============================================================
 //  osd_lock_alloc
@@ -181,7 +174,7 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 	pthread_cond_init(&ev->cond, NULL);
 	ev->signalled = initialstate;
 	ev->autoreset = !manualreset;
-	
+		
 	return ev;
 }
 
@@ -202,9 +195,26 @@ void osd_event_free(osd_event *event)
 
 void osd_event_set(osd_event *event)
 {
+#if 0
+	if (osd_compare_exchange32(&event->signalled, FALSE, TRUE) == FALSE)
+	{
+		pthread_mutex_lock(&event->mutex);
+		if (event->autoreset)
+			pthread_cond_signal(&event->cond);
+		else
+			pthread_cond_broadcast(&event->cond);
+		pthread_mutex_unlock(&event->mutex);
+	}
+#endif
 	pthread_mutex_lock(&event->mutex);
-	event->signalled = TRUE;
-	pthread_cond_broadcast(&event->cond);
+	if (event->signalled == FALSE)
+	{
+		event->signalled = TRUE;
+		if (event->autoreset)
+			pthread_cond_signal(&event->cond);
+		else
+			pthread_cond_broadcast(&event->cond);
+	}
 	pthread_mutex_unlock(&event->mutex);
 }
 
@@ -230,9 +240,10 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 	{
 		if (!event->signalled)
 		{
-			pthread_cond_wait(&event->cond, &event->mutex);
+				pthread_mutex_unlock(&event->mutex);
+				return FALSE;
 		}
-	} 
+	}
 	else
 	{
 		struct timespec   ts;
@@ -249,40 +260,21 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 		ts.tv_sec += t;
 
 		if (!event->signalled)
+		{
 			if ( pthread_cond_timedwait(&event->cond, &event->mutex, &ts) != 0 )
 			{
 				pthread_mutex_unlock(&event->mutex);
 				return FALSE;
 			}
+		}
 	}
+
 	if (event->autoreset)
 		event->signalled = 0;
+
 	pthread_mutex_unlock(&event->mutex);
+
 	return TRUE;
-}
-
-//============================================================
-//  osd_event_wait_multiple
-//============================================================
-
-int osd_event_wait_multiple(int num, osd_event *events[], osd_ticks_t timeout)
-{
-	int i;
-	int ret;
-	
-	//FIXME: ugly and inefficient and ignores timeout
-	do
-	{
-		for (i=0;i<num;i++)
-		{
-			ret = osd_event_wait(events[i], 10);
-			if (ret == TRUE)
-				return (i);
-		}
-		osd_sleep(20);
-	}
-	while (TRUE);
-	return -1;
 }
  
 //============================================================
@@ -312,9 +304,12 @@ void osd_atomic_unlock(void)
 osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 {
 	osd_thread *thread;
+	pthread_attr_t	attr;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
-	if ( pthread_create(&thread->thread, NULL, callback, cbparam) != 0 )
+	pthread_attr_init(&attr);
+	pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
+	if ( pthread_create(&thread->thread, &attr, callback, cbparam) != 0 )
 	{
 		free(thread);
 		return NULL;
@@ -357,44 +352,7 @@ void osd_thread_wait_free(osd_thread *thread)
 //  osd_compare_exchange32
 //============================================================
 
-#if defined(__i386__) || defined(__x86_64__)
-
-INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
-{
-	register INT32 ret;
-	__asm__ __volatile__ (
-		" lock ; cmpxchg %[exchange], %[ptr] ;"
-		: [ptr] "+m" (*ptr)
-		, [ret] "=a" (ret)
-		: [compare] "1" (compare)
-		, [exchange] "q" (exchange)
-		: "%cc"
-	);
-	return ret;
-}
-
-#elif defined(__ppc__) || defined(__PPC__) || defined(__ppc64__) || defined(__PPC64__)
-
-INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
-{
-	register INT32 ret;
-	__asm__ __volatile__ (
-		"1: lwarx %[ret], 0, %[ptr] \n"
-		" cmpw %[compare], %[ret] \n"
-		" bne 2f \n"
-		" sync \n"
-		" stwcx. %[exchange], 0, %[ptr] \n"
-		" bne- 1b \n"
-		"2: "
-		: [ret] "=&r" (ret)
-		: [ptr] "r" (ptr)
-		, [exchange] "r" (exchange)
-		, [compare] "r" (compare)
-		: "cr0"
-	);
-	return ret;
-}
-#else
+#ifndef osd_compare_exchange32
 
 INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
@@ -418,45 +376,8 @@ INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 //  osd_compare_exchange64
 //============================================================
 
-#if defined(__x86_64__)
+#ifndef osd_compare_exchange64
 
-INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
-{
-	register INT64 ret;
-	__asm__ __volatile__ (
-		" lock ; cmpxchg %[exchange], %[ptr] ;"
-		: [ptr] "+m" (*ptr)
-		, [ret] "=a" (ret)
-		: [compare] "1" (compare)
-		, [exchange] "q" (exchange)
-		: "%cc"
-	);
-	return ret;
-}
-
-#elif defined(__ppc64__) || defined(__PPC64__)
-
-INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
-{
-	register INT64 ret;
-	__asm__ __volatile__ (
-		"1: ldarx %[ret], 0, %[ptr] \n"
-		" cmpd %[compare], %[ret] \n"
-		" bne 2f \n"
-		" stdcx. %[exchange], 0, %[ptr] \n"
-		" bne-- 1b \n"
-		"2: "
-		: [ret] "=&r" (ret)
-		: [ptr] "r" (ptr)
-		, [exchange] "r" (exchange)
-		, [compare] "r" (compare)
-		: "cr0"
-	);
-	return ret;
-}
-#else
-
-#ifdef PTR64
 INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	INT64	ret;
@@ -472,7 +393,6 @@ INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 	osd_atomic_unlock();	
 	return ret;
 }
-#endif
 
 #endif
 

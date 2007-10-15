@@ -217,10 +217,6 @@ int sdlwindow_init(running_machine *machine)
 		if (work_queue == NULL)
 			return 1;
 		osd_work_item_queue(work_queue, &sdlwindow_thread_id, NULL, WORK_ITEM_FLAG_AUTO_RELEASE);
-		//FIXME: Without sleep, Queue will not start to run
-		#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
-		usleep(1);
-		#endif
 	}
 	else
 	{
@@ -257,16 +253,7 @@ void _sdlwindow_sync(const char *s, int line)
 {
 	if (multithreading_enabled)
 	{
-		int i;
-		while ( (i=osd_work_queue_items(work_queue)) )
-		{
-//			mame_printf_verbose("Waiting for queue: %s -- %d\n", s, line);
-			#ifndef SDLMAME_WIN32
-			usleep(100);
-			#else
-			Sleep(10);
-			#endif
-		}
+		osd_work_queue_wait(work_queue, osd_ticks_per_second()*10);
 	}
 }
 

@@ -13,6 +13,13 @@
 #include <SDL/SDL.h>
 #include <unistd.h>
 
+#ifdef SDLMAME_UNIX
+#ifndef SDLMAME_DARWIN
+#include <time.h>
+#include <sys/time.h>
+#endif
+#endif
+
 #ifdef SDLMAME_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -315,9 +322,22 @@ static osd_ticks_t mach_cycle_counter(void)
 //  time_cycle_counter
 //============================================================
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
+
+static osd_ticks_t unix_ticks(void)
+{
+		struct timeval    tp;
+		static osd_ticks_t start_sec = 0;
+		
+		gettimeofday(&tp, NULL);
+		if (start_sec==0)
+			start_sec = tp.tv_sec;
+		return (tp.tv_sec - start_sec) * 1000000 + tp.tv_usec;
+}
+
+
 static osd_ticks_t time_cycle_counter(void)
 {
-	return SDL_GetTicks();
+	return unix_ticks();
 }
 #endif
 
