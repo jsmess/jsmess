@@ -427,16 +427,6 @@ DRVLIBS = \
 #-------------------------------------------------
 
 $(MESSOBJ)/shared.a: \
-	$(EMU_VIDEO)/tms9928a.o		\
-	$(EMU_VIDEO)/v9938.o          \
-	$(EMU_MACHINE)/8255ppi.o		\
-	$(EMU_MACHINE)/6522via.o		\
-	$(EMU_MACHINE)/6821pia.o		\
-	$(EMU_MACHINE)/z80ctc.o			\
-	$(EMU_MACHINE)/z80pio.o			\
-	$(EMU_MACHINE)/z80sio.o			\
-	$(EMU_MACHINE)/idectrl.o		\
-	$(EMU_MACHINE)/6532riot.o		\
 	$(MESS_FORMATS)/ioprocs.o	\
 	$(MESS_FORMATS)/flopimg.o	\
 	$(MESS_FORMATS)/cassimg.o	\
@@ -458,16 +448,13 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/6551.o		\
 	$(MESS_MACHINE)/smartmed.o	\
 	$(MESS_VIDEO)/m6847.o		\
-	$(MESS_VIDEO)/m6845.o		\
 	$(MESS_VIDEO)/cdp1864.o		\
 	$(MESS_MACHINE)/msm8251.o  \
 	$(MESS_MACHINE)/tc8521.o   \
-	$(MESS_VIDEO)/crtc6845.o \
+	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_MACHINE)/28f008sa.o \
 	$(MESS_MACHINE)/am29f080.o \
 	$(MESS_MACHINE)/rriot.o    \
-	$(EMU_MACHINE)/pit8253.o  \
-	$(EMU_MACHINE)/mc146818.o \
 	$(MESS_MACHINE)/uart8250.o \
 	$(MESS_MACHINE)/pc_mouse.o \
 	$(MESS_MACHINE)/pclpt.o    \
@@ -478,12 +465,10 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/wd17xx.o   \
 	$(MESS_MACHINE)/serial.o   \
 	$(MESS_FORMATS)/wavfile.o	\
-	$(EMU_MACHINE)/6526cia.o	\
 	$(MESS_FORMATS)/coco_cas.o	\
 	$(MESS_FORMATS)/coco_dsk.o	\
 	$(MESS_MACHINE)/mm58274c.o \
 	$(MESS_MACHINE)/z80dart.o	\
-	$(EMU_MACHINE)/6850acia.o	\
 	$(MESS_MACHINE)/68901mfp.o
 
 
@@ -580,7 +565,6 @@ $(MESSOBJ)/amiga.a: \
 	$(MESS_MACHINE)/amigacd.o	\
 	$(MESS_MACHINE)/matsucd.o	\
 	$(MESS_MACHINE)/amigakbd.o	\
-	$(EMU_MACHINE)/msm6242.o	\
 	$(MESS_DRIVERS)/amiga.o		\
 
 $(MESSOBJ)/cbmshare.a: \
@@ -743,7 +727,6 @@ $(MESSOBJ)/ti99.a:	   \
 	$(MESS_MACHINE)/99_usbsm.o	\
 	$(MESS_MACHINE)/smc92x4.o	\
 	$(MESS_MACHINE)/strata.o	\
-	$(MESS_MACHINE)/rtc65271.o	\
 	$(MESS_MACHINE)/geneve.o	\
 	$(MESS_MACHINE)/990_dk.o	\
 	$(MESS_AUDIO)/spchroms.o	\
@@ -767,8 +750,6 @@ $(MESSOBJ)/bally.a:    \
 	$(MESS_DRIVERS)/astrocde.o
 
 $(MESSOBJ)/pcshare.a:					\
-	$(EMU_MACHINE)/8237dma.o	\
-	$(EMU_MACHINE)/pic8259.o	\
 	$(MAME_MACHINE)/pcshare.o	\
 	$(MESS_MACHINE)/pc_turbo.o	\
 	$(MESS_AUDIO)/pc.o		\
@@ -793,7 +774,6 @@ $(MESSOBJ)/pc.a:	   \
 	$(MESS_VIDEO)/pc_t1t.o	 
 
 $(MESSOBJ)/at.a:	   \
-	$(EMU_MACHINE)/8042kbdc.o    \
 	$(MESS_MACHINE)/pc_ide.o   \
 	$(MESS_MACHINE)/ps2.o	 \
 	$(MESS_MACHINE)/at.o       \
@@ -1099,7 +1079,6 @@ $(MESSOBJ)/telmac.a:					\
 	$(MESS_VIDEO)/osm200.o	\
 	$(MESS_DRIVERS)/tmc600.o	\
 	$(MESS_DRIVERS)/tmc2000e.o	\
-	$(EMU_VIDEO)/cdp1869.o	\
 
 $(MESSOBJ)/exeltel.a:					\
 	$(MESS_DRIVERS)/exelv.o		\
@@ -1121,9 +1100,6 @@ $(MESSOBJ)/sgi.a:						\
 	$(MESS_MACHINE)/sgi.o		\
 	$(MESS_DRIVERS)/ip20.o		\
 	$(MESS_DRIVERS)/ip22.o	\
-	$(MESS_MACHINE)/wd33c93.o \
-	$(EMU_MACHINE)/scsihd.o	\
-	$(EMU_MACHINE)/scsicd.o	\
 	$(MESS_VIDEO)/newport.o
 
 $(MESSOBJ)/primo.a:				\
@@ -1135,11 +1111,8 @@ $(MESSOBJ)/primo.a:				\
 $(MESSOBJ)/be.a:						\
 	$(MESS_DRIVERS)/bebox.o		\
 	$(MESS_MACHINE)/bebox.o		\
-	$(EMU_MACHINE)/pci.o		\
 	$(MESS_MACHINE)/mpc105.o	\
-	$(MESS_VIDEO)/cirrus.o	\
-	$(EMU_MACHINE)/intelfsh.o		\
-	$(EMU_MACHINE)/53c810.o
+	$(MESS_VIDEO)/cirrus.o
 
 $(MESSOBJ)/thomson.a:			\
 	$(MESS_MACHINE)/mc6843.o    \
