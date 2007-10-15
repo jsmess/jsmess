@@ -728,7 +728,7 @@ $(MESSOBJ)/ti99.a:	   \
 	$(MESS_MACHINE)/99_usbsm.o	\
 	$(MESS_MACHINE)/smc92x4.o	\
 	$(MESS_MACHINE)/strata.o	\
-	$(MESS_MACHINE)/rtc65271.o	\
+	$(EMU_MACHINE)/rtc65271.o	\
 	$(MESS_MACHINE)/geneve.o	\
 	$(MESS_MACHINE)/990_dk.o	\
 	$(MESS_AUDIO)/spchroms.o	\
