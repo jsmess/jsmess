@@ -816,6 +816,7 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( glasgow )		/* Glasgow						*/
 	DRIVER( amsterd )		/* Amsterdam							*/
 	DRIVER( dallas )		/* Dallas							*/
+	DRIVER( dallas16 )		/* Dallas							*/
 	DRIVER( dallas32 )		/* Dallas							*/
 	DRIVER( roma32 )		/* Roma							*/
 	/* Novag */

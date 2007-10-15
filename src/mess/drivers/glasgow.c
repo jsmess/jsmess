@@ -474,6 +474,12 @@ ROM_START( dallas )
     ROM_LOAD16_BYTE("dal_g_bl.dat",0x08001, 0x04000,CRC(144a15e2) SHA1(c4fcc23d55fa5262f5e01dbd000644a7feb78f32))
 ROM_END
 
+ROM_START( dallas16 )
+    ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
+    ROM_LOAD16_BYTE("dallas-u.bin",0x00000, 0x06f00,CRC(8c1462b4) SHA1(8b5f5a774a835446d08dceacac42357b9e74cfe8))
+    ROM_LOAD16_BYTE("dallas-l.bin",0x00001, 0x06f00,CRC(f0d5bc03) SHA1(4b1b9a71663d5321820b4cf7da205e5fe5d3d001))
+ROM_END
+
 ROM_START( roma )
     ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
     ROM_LOAD("roma32.bin", 0x000000, 0x10000, CRC(587d03bf) SHA1(504e9ff958084700076d633f9c306fc7baf64ffd))
@@ -482,7 +488,6 @@ ROM_END
 ROM_START( dallas32 )
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD("dallas32.epr", 0x000000, 0x10000, CRC(83b9ff3f) SHA1(97bf4cb3c61f8ec328735b3c98281bba44b30a28) )
-    //ROM_LOAD("roma32.bin", 0x000000, 0x10000, CRC(83b9ff3f) SHA1(97bf4cb3c61f8ec328735b3c98281bba44b30a28) )
 ROM_END
 
 ROM_START( roma32 )
@@ -507,4 +512,5 @@ CONS(  1984, dallas,   0,        0,    glasgow,       old_keyboard,   NULL,     
 CONS(  1984, roma,     0,        0,    glasgow,       new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma",          0)
 CONS(  1984, dallas32, 0,        0,    dallas32,      new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas 32 Bit", 0)
 CONS(  1984, roma32,   0,        0,    dallas32,      new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma 32 Bit",   0)
+CONS(  1984, dallas16, 0,        0,    amsterd,       new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas 16 Bit", 0)
 
