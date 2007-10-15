@@ -448,6 +448,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/6551.o		\
 	$(MESS_MACHINE)/smartmed.o	\
 	$(MESS_VIDEO)/m6847.o		\
+	$(MESS_VIDEO)/m6845.o		\
 	$(MESS_VIDEO)/cdp1864.o		\
 	$(MESS_MACHINE)/msm8251.o  \
 	$(MESS_MACHINE)/tc8521.o   \
@@ -727,6 +728,7 @@ $(MESSOBJ)/ti99.a:	   \
 	$(MESS_MACHINE)/99_usbsm.o	\
 	$(MESS_MACHINE)/smc92x4.o	\
 	$(MESS_MACHINE)/strata.o	\
+	$(MESS_MACHINE)/rtc65271.o	\
 	$(MESS_MACHINE)/geneve.o	\
 	$(MESS_MACHINE)/990_dk.o	\
 	$(MESS_AUDIO)/spchroms.o	\
@@ -1100,6 +1102,7 @@ $(MESSOBJ)/sgi.a:						\
 	$(MESS_MACHINE)/sgi.o		\
 	$(MESS_DRIVERS)/ip20.o		\
 	$(MESS_DRIVERS)/ip22.o	\
+	$(MESS_MACHINE)/wd33c93.o	\
 	$(MESS_VIDEO)/newport.o
 
 $(MESSOBJ)/primo.a:				\
