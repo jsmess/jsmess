@@ -30,7 +30,7 @@ struct TIMERS {
 };
 
 UINT8 pokemini_hwreg[0x100];
-struct VDP vdp;
+static struct VDP vdp;
 static struct TIMERS timers;
 
 static TIMER_CALLBACK(pokemini_seconds_timer_callback)
