@@ -153,7 +153,7 @@ $(MESS_WINUIOBJ)/mess32.res:	$(WINUISRC)/mame32.rc $(MESS_WINUISRC)/mess32.rc $(
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WINUISRC) --include-dir $(MESS_WINUISRC) --include-dir $(WINUIOBJ) -o $@ -i $(MESS_WINUISRC)/mess32.rc
 
-$(WINUIOBJ)/mamevers.rc: $(VERINFO) $(SRC)/version.c
+$(WINUIOBJ)/mamevers.rc: $(WINOBJ)/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
 	@$(VERINFO) $(SRC)/version.c > $@
 
