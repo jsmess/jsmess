@@ -91,6 +91,7 @@ MESS = 1
 # P4 = 1
 # PM = 1
 # AMD64 = 1
+# G3 = 1
 # G4 = 1
 # G5 = 1
 # CELL = 1
@@ -129,7 +130,6 @@ BUILD_ZLIB = 1
 
 # disable DRC cores for 64-bit builds
 ifdef PTR64
-X86_MIPS3_DRC =
 X86_PPC_DRC =
 endif
 
@@ -210,6 +210,12 @@ endif
 ifdef PM
 SUFFIX = pm
 ARCH = -march=pentium3 -msse2
+endif
+
+ifdef G3
+SUFFIX = g3
+ARCH = -mtune=G3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk
+ENDIAN = big
 endif
 
 ifdef G4
@@ -333,7 +339,6 @@ CFLAGS += -g
 endif
 
 # add a basic set of warnings
-
 CFLAGS += \
 	-Wall \
 	-Wpointer-arith \
@@ -344,8 +349,6 @@ CFLAGS += \
 	-Wformat-security \
 	-Wwrite-strings \
 	-Wno-unused-function \
-
-# ^^^^ do not turn off Wno-unused-function, MESS compile will fail due to mame/drivers/cps1.c
 
 # this warning is not supported on the os2 compilers
 ifneq ($(TARGETOS),os2)
