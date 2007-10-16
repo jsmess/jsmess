@@ -427,6 +427,7 @@ DRVLIBS = \
 #-------------------------------------------------
 
 $(MESSOBJ)/shared.a: \
+	$(EMU_MACHINE)/wd33c93.o	\
 	$(MESS_FORMATS)/ioprocs.o	\
 	$(MESS_FORMATS)/flopimg.o	\
 	$(MESS_FORMATS)/cassimg.o	\
@@ -1102,7 +1103,6 @@ $(MESSOBJ)/sgi.a:						\
 	$(MESS_MACHINE)/sgi.o		\
 	$(MESS_DRIVERS)/ip20.o		\
 	$(MESS_DRIVERS)/ip22.o	\
-	$(EMU_MACHINE)/wd33c93.o	\
 	$(MESS_VIDEO)/newport.o
 
 $(MESSOBJ)/primo.a:				\
