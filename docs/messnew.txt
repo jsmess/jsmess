@@ -42,6 +42,9 @@ Source Changes:
 - Fixed multisession crash with the new menu selector.  (bug #1328) [Nate
   Woods]
 
+- Changed the reset done when a cartridge is changed from a soft reset to a
+  hard reset.  [Nate Woods]
+
 - [Messtest] Added selectable bios support.  (bug #1392) [Nate Woods]
 
 
