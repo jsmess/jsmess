@@ -1102,7 +1102,7 @@ $(MESSOBJ)/sgi.a:						\
 	$(MESS_MACHINE)/sgi.o		\
 	$(MESS_DRIVERS)/ip20.o		\
 	$(MESS_DRIVERS)/ip22.o	\
-	$(MESS_MACHINE)/wd33c93.o	\
+	$(EMU_MACHINE)/wd33c93.o	\
 	$(MESS_VIDEO)/newport.o
 
 $(MESSOBJ)/primo.a:				\
