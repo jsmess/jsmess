@@ -427,7 +427,6 @@ DRVLIBS = \
 #-------------------------------------------------
 
 $(MESSOBJ)/shared.a: \
-	$(EMU_MACHINE)/wd33c93.o	\
 	$(MESS_FORMATS)/ioprocs.o	\
 	$(MESS_FORMATS)/flopimg.o	\
 	$(MESS_FORMATS)/cassimg.o	\
@@ -729,7 +728,6 @@ $(MESSOBJ)/ti99.a:	   \
 	$(MESS_MACHINE)/99_usbsm.o	\
 	$(MESS_MACHINE)/smc92x4.o	\
 	$(MESS_MACHINE)/strata.o	\
-	$(EMU_MACHINE)/rtc65271.o	\
 	$(MESS_MACHINE)/geneve.o	\
 	$(MESS_MACHINE)/990_dk.o	\
 	$(MESS_AUDIO)/spchroms.o	\
