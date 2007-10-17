@@ -42,7 +42,6 @@ documentation still exists.
 #include "inputx.h"
 #include "machine/6821pia.h"
 #include "video/generic.h"
-#include "video/m6845.h"
 #include "includes/coco.h"
 #include "includes/dgn_beta.h"
 #include "devices/basicdsk.h"
