@@ -7,7 +7,7 @@
 #include "driver.h"
 
 #include "video/generic.h"
-#include "includes/crtc6845.h"
+#include "video/crtc6845.h"
 #include "mscommon.h"
 #include "includes/cbmb.h"
 
@@ -57,59 +57,24 @@ VIDEO_START( cbm700 )
 	video_start_generic(machine);
 }
 
-void cbmb_vh_cursor(struct mscrtc6845_cursor *cursor)
-{
-	dirtybuffer[cursor->pos]=1;
-}
-
 void cbmb_vh_set_font(int font)
 {
 	cbmb_font=font;
 }
 
-VIDEO_UPDATE( cbmb )
-{
-	int x, y, i;
-	rectangle rect, rect2;
-	int w=mscrtc6845_get_char_columns(mscrtc6845);
-	int h=mscrtc6845_get_char_lines(mscrtc6845);
-	int height=mscrtc6845_get_char_height(mscrtc6845);
-	int start=mscrtc6845_get_start(mscrtc6845)&0x7ff;
-	struct mscrtc6845_cursor cursor;
-	int full_refresh = 1;
+void cbm600_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+	int i;
 
-	rect.min_x=Machine->screen[0].visarea.min_x;
-	rect.max_x=Machine->screen[0].visarea.max_x;
-	if (full_refresh) {
-		memset(dirtybuffer, 1, videoram_size);
+	for( i = 0; i < x_count; i++ ) {
+		drawgfx( bitmap, Machine->gfx[cbmb_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, Machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 	}
+}
 
-	mscrtc6845_time(mscrtc6845);
-	mscrtc6845_get_cursor(mscrtc6845, &cursor);
+void cbm700_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+	int i;
 
-	for (y=0, rect.min_y=0, rect.max_y=height-1, i=start; y<h;
-		 y++, rect.min_y+=height, rect.max_y+=height) {
-		for (x=0; x<w; x++, i=(i+1)&0x7ff) {
-			if (dirtybuffer[i]) {
-				drawgfx(bitmap,Machine->gfx[cbmb_font],
-						videoram[i], 0, 0, 0, Machine->gfx[cbmb_font]->width*x,height*y,
-						&rect,TRANSPARENCY_NONE,0);
-				if ((cursor.on)&&(i==cursor.pos)) {
-					int k=height-cursor.top;
-					rect2=rect;
-					rect2.min_y+=cursor.top; 
-					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
-
-					if (k>0)
-						plot_box(bitmap, Machine->gfx[cbmb_font]->width*x, 
-								 height*y+cursor.top, 
-								 Machine->gfx[cbmb_font]->width, k, Machine->pens[1]);
-				}
-
-				dirtybuffer[i]=0;
-			}
-		}
+	for( i = 0; i < x_count; i++ ) {
+		drawgfx( bitmap, Machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, Machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 	}
-	return 0;
 }
 

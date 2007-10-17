@@ -17,7 +17,7 @@
 #include "includes/vc20tape.h"
 #include "includes/cbmieeeb.h"
 #include "includes/vic6567.h"
-#include "includes/crtc6845.h"
+#include "video/crtc6845.h"
 #include "mscommon.h"
 
 #include "includes/cbmb.h"
@@ -244,35 +244,37 @@ static void cbmb_common_driver_init (void)
 	cbm_ieee_open();
 }
 
-static struct mscrtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };
+//static struct mscrtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };
+const static crtc6845_interface cbm600_crtc = { 0, 1600000 /*?*/, 8 /*?*/, NULL, cbm600_update_row, NULL, NULL };
 
 void cbm600_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm600_vh_init();
-	mscrtc6845_init(&cbm600_crtc);
+	crtc6845_config( 0, &cbm600_crtc);
 }
 
 void cbm600pal_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm600_vh_init();
-	mscrtc6845_init(&cbm600_crtc);
+	crtc6845_config( 0, &cbm600_crtc);
 }
 
 void cbm600hu_driver_init (void)
 {
 	cbmb_common_driver_init ();
-	mscrtc6845_init(&cbm600_crtc);
+	crtc6845_config( 0, &cbm600_crtc);
 }
 
-static struct mscrtc6845_config cbm700_crtc= { 2000000 /*?*/, cbmb_vh_cursor };
+//static struct mscrtc6845_config cbm700_crtc= { 2000000 /*?*/, cbmb_vh_cursor };
+const static crtc6845_interface cbm700_crtc = { 0, 2000000 /*?*/, 9 /*?*/, NULL, cbm700_update_row, NULL, NULL };
 
 void cbm700_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm700_vh_init();
-	mscrtc6845_init(&cbm700_crtc);
+	crtc6845_config( 0, &cbm700_crtc);
 }
 
 void cbm500_driver_init (void)

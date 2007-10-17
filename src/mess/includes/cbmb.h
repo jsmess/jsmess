@@ -228,15 +228,15 @@ void cbm600pal_driver_init (void);
 void cbm600hu_driver_init (void);
 void cbm700_driver_init (void);
 void cbmb_common_init_machine (void);
+void cbm600_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param);
+void cbm700_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param);
 MACHINE_RESET( cbmb );
 
 void cbmb_rom_load(void);
 
 void cbm600_vh_init(void);
 void cbm700_vh_init(void);
-void cbmb_vh_cursor(struct mscrtc6845_cursor *cursor);
 extern VIDEO_START( cbm700 );
-extern VIDEO_UPDATE( cbmb );
 
 void cbmb_vh_set_font(int font);
 
