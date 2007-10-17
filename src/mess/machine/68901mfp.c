@@ -78,6 +78,8 @@ static void mfp68901_poll_gpio(int which)
 		{
 			if (mfp_p->ier & GPIO_MASK[bit]) // AND interrupt enabled bit is set...
 			{
+				logerror("MFP68901 #%u Edge Transition Detected on GPIO%u\n", which, bit);
+
 				mfp_p->ipr |= GPIO_MASK[bit]; // set interrupt pending bit
 			}
 		}
@@ -92,27 +94,29 @@ static void mfp68901_irq_ack(int which)
 
 	int ch;
 
-	if (!mfp_p->isr) // if no interrupts are currently in service...
+	for (ch = 15; ch >= 0; ch--) // loop thru each channel from 15 to 0
 	{
-		for (ch = 15; ch >= 0; ch--) // loop thru each channel from 15 to 0
+		if (BIT(mfp_p->isr, ch)) // if interrupt channel is in service...
 		{
-			if (BIT(mfp_p->imr, ch)) // if interrupt mask bit is set...
+			return; // don't process lower priority channels
+		}
+
+		if (BIT(mfp_p->imr, ch)) // if interrupt mask bit is set...
+		{
+			if (BIT(mfp_p->ipr, ch)) // AND interrupt pending bit is set...
 			{
-				if (BIT(mfp_p->ipr, ch)) // AND interrupt pending bit is set...
+				logerror("MFP68901 #%u Interrupt Fired on Channel %u\n", which, ch);
+
+				mfp_p->ipr &= ~(1 << ch); // clear interrupt pending bit
+
+				if (mfp_p->vr & MFP68901_VR_S) // if software end-of-interrupt mode is enabled...
 				{
-					logerror("MFP68901 #%u Interrupt Fired on Channel %u\n", which, ch);
-
-					mfp_p->ipr &= ~(1 << ch); // clear interrupt pending bit
-
-					if (mfp_p->vr & MFP68901_VR_S) // if software end-of-interrupt mode is enabled...
-					{
-						mfp_p->isr |= (1 << ch); // set interrupt in service bit (bit will be cleared later by the interrupt service routine)
-					}
-
-					mfp_p->intf->irq_callback(which, HOLD_LINE, (mfp_p->vr & 0xf0) | ch); // fire interrupt callback
-
-					return;
+					mfp_p->isr |= (1 << ch); // set interrupt in service bit (bit will be cleared later by the interrupt service routine)
 				}
+
+				mfp_p->intf->irq_callback(which, ASSERT_LINE, (mfp_p->vr & 0xf0) | ch); // fire interrupt callback
+
+				return;
 			}
 		}
 	}
@@ -558,7 +562,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 
 	case MFP68901_REGISTER_IPRA:
 		logerror("MFP68901 #%u Interrupt Pending Register A : %x\n", which, data);
-		mfp_p->ier &= (data << 8) | (mfp_p->ier & 0xff);
+		mfp_p->ipr &= (data << 8) | (mfp_p->ipr & 0xff);
 		break;
 
 	case MFP68901_REGISTER_IPRB:
@@ -568,12 +572,12 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 
 	case MFP68901_REGISTER_ISRA:
 		logerror("MFP68901 #%u Interrupt In-Service Register A : %x\n", which, data);
-		mfp_p->isr = (data << 8) | (mfp_p->isr & 0xff);
+		mfp_p->isr &= (data << 8) | (mfp_p->isr & 0xff);
 		break;
 
 	case MFP68901_REGISTER_ISRB:
 		logerror("MFP68901 #%u Interrupt In-Service Register B : %x\n", which, data);
-		mfp_p->isr = (mfp_p->isr & 0xff00) | data;
+		mfp_p->isr &= (mfp_p->isr & 0xff00) | data;
 		break;
 
 	case MFP68901_REGISTER_IMRA:
