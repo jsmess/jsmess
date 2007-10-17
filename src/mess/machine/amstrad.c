@@ -293,7 +293,7 @@ DEVICE_LOAD(amstrad_plus_cartridge)
 			}
 		}
 	}
-	
+
 
 	return INIT_PASS;
 }
