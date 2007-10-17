@@ -60,9 +60,9 @@
 
 ***************************************************************************/
 
-struct crtc6845
+struct mscrtc6845
 {
-	struct crtc6845_config config;
+	struct mscrtc6845_config config;
 	UINT8 reg[18];
 	UINT8 idx;
 	double cursor_time;
@@ -75,7 +75,7 @@ struct reg_mask
 	UINT8 read_mask;
 };
 
-struct crtc6845 *crtc6845;
+struct mscrtc6845 *mscrtc6845;
 
 /***************************************************************************
 
@@ -84,12 +84,12 @@ struct crtc6845 *crtc6845;
 ***************************************************************************/
 
 /*-------------------------------------------------
-	crtc6845_reg_mask - an array specifying how
+	mscrtc6845_reg_mask - an array specifying how
 	much of any given register "registers", per
 	m6845 personality
 -------------------------------------------------*/
 
-static const struct reg_mask crtc6845_reg_mask[2][18] =
+static const struct reg_mask mscrtc6845_reg_mask[2][18] =
 {
 	{
 		/* M6845_PERSONALITY_GENUINE */
@@ -122,22 +122,22 @@ static UINT8 pc1512_defaults[] =
 
 ***************************************************************************/
 
-static void crtc6845_state_postload(void)
+static void mscrtc6845_state_postload(void)
 {
 	if (dirtybuffer && videoram_size)
 		memset(dirtybuffer, 1, videoram_size);
 }
 
-struct crtc6845 *crtc6845_init(const struct crtc6845_config *config)
+struct mscrtc6845 *mscrtc6845_init(const struct mscrtc6845_config *config)
 {
-	struct crtc6845 *crtc;
+	struct mscrtc6845 *crtc;
 	int idx;
 
-	crtc = auto_malloc(sizeof(struct crtc6845));
+	crtc = auto_malloc(sizeof(struct mscrtc6845));
 	memset(crtc, 0, sizeof(*crtc));
 	crtc->cursor_time = mame_time_to_double(mame_timer_get_time());
 	crtc->config = *config;
-	crtc6845 = crtc;
+	mscrtc6845 = crtc;
 
 	/* Hardwire the values which can't be changed in the PC1512 version */
 	if (config->personality == M6845_PERSONALITY_PC1512)
@@ -148,15 +148,15 @@ struct crtc6845 *crtc6845_init(const struct crtc6845_config *config)
 		}
 	}
 
-	state_save_register_item_array("crtc6845", 0, crtc->reg);
-	state_save_register_item("crtc6845", 0, crtc->idx);
-	state_save_register_func_postload(crtc6845_state_postload);
+	state_save_register_item_array("mscrtc6845", 0, crtc->reg);
+	state_save_register_item("mscrtc6845", 0, crtc->idx);
+	state_save_register_func_postload(mscrtc6845_state_postload);
 	return crtc;
 }
 
 #define REG(x) (crtc->reg[x])
 
-static int crtc6845_clocks_in_frame(struct crtc6845 *crtc)
+static int mscrtc6845_clocks_in_frame(struct mscrtc6845 *crtc)
 {
 	int clocks=CRTC6845_COLUMNS*CRTC6845_LINES;
 	switch (CRTC6845_INTERLACE_MODE) {
@@ -168,23 +168,23 @@ static int crtc6845_clocks_in_frame(struct crtc6845 *crtc)
 	}
 }
 
-void crtc6845_set_clock(struct crtc6845 *crtc, int freq)
+void mscrtc6845_set_clock(struct mscrtc6845 *crtc, int freq)
 {
 	assert(crtc);
 	crtc->config.freq = freq;
 }
 
-void crtc6845_time(struct crtc6845 *crtc)
+void mscrtc6845_time(struct mscrtc6845 *crtc)
 {
 	double neu, ftime;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 
 	neu = mame_time_to_double(mame_timer_get_time());
 
-	if (crtc6845_clocks_in_frame(crtc) == 0.0)
+	if (mscrtc6845_clocks_in_frame(crtc) == 0.0)
 		return;
 
-	ftime = crtc6845_clocks_in_frame(crtc) * 16.0 / crtc->config.freq;
+	ftime = mscrtc6845_clocks_in_frame(crtc) * 16.0 / crtc->config.freq;
 
 	if (CRTC6845_CURSOR_MODE==CRTC6845_CURSOR_32FRAMES)
 		ftime*=2;
@@ -192,7 +192,7 @@ void crtc6845_time(struct crtc6845 *crtc)
 	if (neu-crtc->cursor_time>ftime)
 	{
 		crtc->cursor_time += ftime;
-		crtc6845_get_cursor(crtc, &cursor);
+		mscrtc6845_get_cursor(crtc, &cursor);
 
 		if (crtc->config.cursor_changed)
 			crtc->config.cursor_changed(&cursor);
@@ -201,45 +201,45 @@ void crtc6845_time(struct crtc6845 *crtc)
 	}
 }
 
-int crtc6845_get_char_columns(struct crtc6845 *crtc) 
+int mscrtc6845_get_char_columns(struct mscrtc6845 *crtc) 
 { 
 	return CRTC6845_CHAR_COLUMNS;
 }
 
-int crtc6845_get_char_height(struct crtc6845 *crtc) 
+int mscrtc6845_get_char_height(struct mscrtc6845 *crtc) 
 {
 	return CRTC6845_CHAR_HEIGHT;
 }
 
-int crtc6845_get_char_lines(struct crtc6845 *crtc) 
+int mscrtc6845_get_char_lines(struct mscrtc6845 *crtc) 
 { 
 	return CRTC6845_CHAR_LINES;
 }
 
-int crtc6845_get_start(struct crtc6845 *crtc) 
+int mscrtc6845_get_start(struct mscrtc6845 *crtc) 
 {
 	return CRTC6845_VIDEO_START;
 }
 
 
-void crtc6845_set_char_columns(struct crtc6845 *crtc, UINT8 columns)
+void mscrtc6845_set_char_columns(struct mscrtc6845 *crtc, UINT8 columns)
 { 
 	crtc->reg[1] = columns;
 }
 
 
-void crtc6845_set_char_lines(struct crtc6845 *crtc, UINT8 lines)
+void mscrtc6845_set_char_lines(struct mscrtc6845 *crtc, UINT8 lines)
 { 
 	crtc->reg[6] = lines;
 }
 
 
-int crtc6845_get_personality(struct crtc6845 *crtc)
+int mscrtc6845_get_personality(struct mscrtc6845 *crtc)
 {
 	return crtc->config.personality;
 }
 
-void crtc6845_get_cursor(struct crtc6845 *crtc, struct crtc6845_cursor *cursor)
+void mscrtc6845_get_cursor(struct mscrtc6845 *crtc, struct mscrtc6845_cursor *cursor)
 {
 	switch (CRTC6845_CURSOR_MODE) {
 	case CRTC6845_CURSOR_OFF:
@@ -261,7 +261,7 @@ void crtc6845_get_cursor(struct crtc6845 *crtc, struct crtc6845_cursor *cursor)
 	cursor->bottom = CRTC6845_CURSOR_BOTTOM;
 }
 
-UINT8 crtc6845_port_r(struct crtc6845 *crtc, int offset)
+UINT8 mscrtc6845_port_r(struct mscrtc6845 *crtc, int offset)
 {
 	UINT8 val = 0xff;
 	int idx;
@@ -270,7 +270,7 @@ UINT8 crtc6845_port_r(struct crtc6845 *crtc, int offset)
 	{
 		idx = crtc->idx & 0x1f;
 		if (idx < (sizeof(crtc->reg) / sizeof(crtc->reg[0])))
-			val = crtc->reg[idx] & crtc6845_reg_mask[crtc->config.personality][idx].read_mask;
+			val = crtc->reg[idx] & mscrtc6845_reg_mask[crtc->config.personality][idx].read_mask;
 	}
 	else
 	{
@@ -279,9 +279,9 @@ UINT8 crtc6845_port_r(struct crtc6845 *crtc, int offset)
 	return val;
 }
 
-int crtc6845_port_w(struct crtc6845 *crtc, int offset, UINT8 data)
+int mscrtc6845_port_w(struct mscrtc6845 *crtc, int offset, UINT8 data)
 {
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 	int idx;
 	UINT8 mask;
 
@@ -291,7 +291,7 @@ int crtc6845_port_w(struct crtc6845 *crtc, int offset, UINT8 data)
 		idx = crtc->idx & 0x1f;
 		if (idx < (sizeof(crtc->reg) / sizeof(crtc->reg[0])))
 		{
-			mask = crtc6845_reg_mask[crtc->config.personality][idx].store_mask;
+			mask = mscrtc6845_reg_mask[crtc->config.personality][idx].store_mask;
 			/* Don't zero out bits not covered by the mask. */
 			crtc->reg[crtc->idx] &= ~mask;
 			crtc->reg[crtc->idx] |= (data & mask);
@@ -302,7 +302,7 @@ int crtc6845_port_w(struct crtc6845 *crtc, int offset, UINT8 data)
 			case 0xb:
 			case 0xe:
 			case 0xf:
-				crtc6845_get_cursor(crtc, &cursor);
+				mscrtc6845_get_cursor(crtc, &cursor);
 				if (crtc->config.cursor_changed)
 					crtc->config.cursor_changed(&cursor);
 				break;
@@ -314,8 +314,8 @@ int crtc6845_port_w(struct crtc6845 *crtc, int offset, UINT8 data)
 			if ((crtc->config.personality == M6845_PERSONALITY_PC1512) && (idx == 9))
 			{
 				UINT8 char_height;
-				char_height = crtc6845_get_char_height(crtc);
-				crtc6845_set_char_lines(crtc, 200 ); // / char_height);
+				char_height = mscrtc6845_get_char_height(crtc);
+				mscrtc6845_set_char_lines(crtc, 200 ); // / char_height);
 			}
 			return TRUE;
 		}
@@ -328,13 +328,13 @@ int crtc6845_port_w(struct crtc6845 *crtc, int offset, UINT8 data)
 	return FALSE;
 }
 
- READ8_HANDLER ( crtc6845_0_port_r )
+ READ8_HANDLER ( mscrtc6845_0_port_r )
 {
-	return crtc6845_port_r(crtc6845, offset);
+	return mscrtc6845_port_r(mscrtc6845, offset);
 }
 
-WRITE8_HANDLER ( crtc6845_0_port_w )
+WRITE8_HANDLER ( mscrtc6845_0_port_w )
 {
-	crtc6845_port_w(crtc6845, offset, data);
+	mscrtc6845_port_w(mscrtc6845, offset, data);
 }
 

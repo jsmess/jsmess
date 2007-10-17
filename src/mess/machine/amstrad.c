@@ -125,11 +125,11 @@ void amstrad_handle_snapshot(unsigned char *pSnapshot)
 	/* init CRTC */
 	for (i=0; i<18; i++)
 	{
-                crtc6845_address_w(0,i);
-                crtc6845_register_w(0, pSnapshot[0x043+i] & 0x0ff);
+                m6845_address_w(0,i);
+                m6845_register_w(0, pSnapshot[0x043+i] & 0x0ff);
 	}
 
-    crtc6845_address_w(0,i);
+    m6845_address_w(0,i);
 
 	/* upper rom selection */
 	AmstradCPC_SetUpperRom(pSnapshot[0x055]);

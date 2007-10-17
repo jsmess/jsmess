@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef CRTC6845_H
-#define CRTC6845_H
+#ifndef MSCRTC6845_H
+#define MSCRTC6845_H
 
 #include "mame.h"
 
@@ -38,9 +38,9 @@ extern "C" {
 ***************************************************************************/
 
 /* opaque structure representing a crtc8645 chip */
-struct crtc6845;
+struct mscrtc6845;
 
-struct crtc6845_cursor
+struct mscrtc6845_cursor
 {
 	int on;
 	int pos;
@@ -48,10 +48,10 @@ struct crtc6845_cursor
 	int bottom;
 };
 
-struct crtc6845_config
+struct mscrtc6845_config
 {
 	int freq;
-	void (*cursor_changed)(struct crtc6845_cursor *old);
+	void (*cursor_changed)(struct mscrtc6845_cursor *old);
 	int personality;
 };
 
@@ -61,8 +61,8 @@ struct crtc6845_config
 
 ***************************************************************************/
 
-/* generic crtc6845 instance */
-extern struct crtc6845 *crtc6845;
+/* generic mscrtc6845 instance */
+extern struct mscrtc6845 *mscrtc6845;
 
 /***************************************************************************
 
@@ -70,41 +70,41 @@ extern struct crtc6845 *crtc6845;
 
 ***************************************************************************/
 
-struct crtc6845 *crtc6845_init(const struct crtc6845_config *config);
+struct mscrtc6845 *mscrtc6845_init(const struct mscrtc6845_config *config);
 
-void crtc6845_set_clock(struct crtc6845 *crtc, int freq);
+void mscrtc6845_set_clock(struct mscrtc6845 *crtc, int freq);
 
 /* to be called before drawing screen */
-void crtc6845_time(struct crtc6845 *crtc);
+void mscrtc6845_time(struct mscrtc6845 *crtc);
 
-int crtc6845_get_char_columns(struct crtc6845 *crtc);
-int crtc6845_get_char_height(struct crtc6845 *crtc);
-int crtc6845_get_char_lines(struct crtc6845 *crtc);
-int crtc6845_get_start(struct crtc6845 *crtc);
-void crtc6845_set_char_columns(struct crtc6845 *crtc, UINT8 columns);
-void crtc6845_set_char_lines(struct crtc6845 *crtc, UINT8 lines);
+int mscrtc6845_get_char_columns(struct mscrtc6845 *crtc);
+int mscrtc6845_get_char_height(struct mscrtc6845 *crtc);
+int mscrtc6845_get_char_lines(struct mscrtc6845 *crtc);
+int mscrtc6845_get_start(struct mscrtc6845 *crtc);
+void mscrtc6845_set_char_columns(struct mscrtc6845 *crtc, UINT8 columns);
+void mscrtc6845_set_char_lines(struct mscrtc6845 *crtc, UINT8 lines);
 
-int crtc6845_get_personality(struct crtc6845 *crtc);
+int mscrtc6845_get_personality(struct mscrtc6845 *crtc);
 
 /* cursor off, cursor on, cursor 16 frames on/off, cursor 32 frames on/off 
 	start line, end line */
-void crtc6845_get_cursor(struct crtc6845 *crtc, struct crtc6845_cursor *cursor);
+void mscrtc6845_get_cursor(struct mscrtc6845 *crtc, struct mscrtc6845_cursor *cursor);
 
-UINT8 crtc6845_port_r(struct crtc6845 *crtc, int offset);
-int crtc6845_port_w(struct crtc6845 *crtc, int offset, UINT8 data);
+UINT8 mscrtc6845_port_r(struct mscrtc6845 *crtc, int offset);
+int mscrtc6845_port_w(struct mscrtc6845 *crtc, int offset, UINT8 data);
 
 /* to be called when writting to port */
-WRITE8_HANDLER ( crtc6845_0_port_w );
+WRITE8_HANDLER ( mscrtc6845_0_port_w );
 
 /* to be called when reading from port */
- READ8_HANDLER ( crtc6845_0_port_r );
+ READ8_HANDLER ( mscrtc6845_0_port_r );
 	
 /***************************************************************************
 
 	6845 variant macros
 
 	These are used to support emulations of 6845 variants, but these will
-	be eventually merged into crtc6845.c so these are deprecated
+	be eventually merged into mscrtc6845.c so these are deprecated
 
 ***************************************************************************/
 

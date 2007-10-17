@@ -252,7 +252,7 @@ static PALETTE_INIT( pc_cga )
 
 
 
-void pc_cga_cursor(struct crtc6845_cursor *cursor)
+void pc_cga_cursor(struct mscrtc6845_cursor *cursor)
 {
 	if (dirtybuffer && (videoram_size > cursor->pos*2))
 		dirtybuffer[cursor->pos*2]=1;
@@ -260,7 +260,7 @@ void pc_cga_cursor(struct crtc6845_cursor *cursor)
 
 
 
-static struct crtc6845_config config= { 14318180 /*?*/, pc_cga_cursor };
+static struct mscrtc6845_config config= { 14318180 /*?*/, pc_cga_cursor };
 
 static int internal_pc_cga_video_start(int personality)
 {
@@ -469,10 +469,10 @@ READ8_HANDLER( pc_cga8_r )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			data = crtc6845_port_r(crtc6845, 0);
+			data = mscrtc6845_port_r(mscrtc6845, 0);
 			break;
 		case 1: case 3: case 5: case 7:
-			data = crtc6845_port_r(crtc6845, 1);
+			data = mscrtc6845_port_r(mscrtc6845, 1);
 			break;
 		case 10:
 			data = pc_cga_status_r();
@@ -488,7 +488,7 @@ WRITE8_HANDLER( pc_cga8_w )
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
 	case 1: case 3: case 5: case 7:
-		if (crtc6845_port_w(crtc6845, offset, data))
+		if (mscrtc6845_port_w(mscrtc6845, offset, data))
 		{
 			if (dirtybuffer) memset(dirtybuffer, 1, videoram_size);
 		}
@@ -519,18 +519,18 @@ WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w, offse
   The character cell size is 16x8
 ***************************************************************************/
 
-static void cga_text_inten(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
-	int	offs = crtc6845_get_start(crtc) * 2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc);
+	int	offs = mscrtc6845_get_start(crtc) * 2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 
-	crtc6845_time(crtc);
-	crtc6845_get_cursor(crtc, &cursor);
+	mscrtc6845_time(crtc);
+	mscrtc6845_get_cursor(crtc, &cursor);
 	pc_cga_check_palette();
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
@@ -579,15 +579,15 @@ static void cga_text_inten(mame_bitmap *bitmap, struct crtc6845 *crtc)
   The character cell size is 16x8
 ***************************************************************************/
 
-static void cga_text_inten_alt(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_text_inten_alt(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
-	int	offs = crtc6845_get_start(crtc) * 2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc);
+	int	offs = mscrtc6845_get_start(crtc) * 2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 
 	if (CGA_CHIPSET != CGA_CHIPSET_PC200) 
 	{
@@ -595,8 +595,8 @@ static void cga_text_inten_alt(mame_bitmap *bitmap, struct crtc6845 *crtc)
 		return;
 	}
 
-	crtc6845_time(crtc);
-	crtc6845_get_cursor(crtc, &cursor);
+	mscrtc6845_time(crtc);
+	mscrtc6845_get_cursor(crtc, &cursor);
 	pc_cga_check_palette();
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
@@ -634,18 +634,18 @@ static void cga_text_inten_alt(mame_bitmap *bitmap, struct crtc6845 *crtc)
   Draw text mode with 40x25 characters (default) and blinking colors.
   The character cell size is 16x8
 ***************************************************************************/
-static void cga_text_blink(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc);
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 
-	crtc6845_time(crtc);
-	crtc6845_get_cursor(crtc, &cursor);
+	mscrtc6845_time(crtc);
+	mscrtc6845_get_cursor(crtc, &cursor);
 	pc_cga_check_palette();
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
@@ -706,15 +706,15 @@ static void cga_text_blink(mame_bitmap *bitmap, struct crtc6845 *crtc)
   The character cell size is 16x8
 ***************************************************************************/
 
-static void cga_text_blink_alt(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_text_blink_alt(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc);
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 	
 	if (CGA_CHIPSET != CGA_CHIPSET_PC200) 
 	{
@@ -722,8 +722,8 @@ static void cga_text_blink_alt(mame_bitmap *bitmap, struct crtc6845 *crtc)
 		return;
 	}
 
-	crtc6845_time(crtc);
-	crtc6845_get_cursor(crtc, &cursor);
+	mscrtc6845_time(crtc);
+	mscrtc6845_get_cursor(crtc, &cursor);
 	pc_cga_check_palette();
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
@@ -772,10 +772,10 @@ static void cga_text_blink_alt(mame_bitmap *bitmap, struct crtc6845 *crtc)
 /***************************************************************************
   Draw graphics mode with 320x200 pixels (default) with 2 bits/pixel.
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
-  cga fetches 2 byte per crtc6845 access (not modeled here)!
+  cga fetches 2 byte per mscrtc6845 access (not modeled here)!
 ***************************************************************************/
 
-static void cga_gfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	const UINT16 *palette;
 	int colorset = cga.color_select & 0x3F;
@@ -817,7 +817,7 @@ static void cga_gfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 ***************************************************************************/
 
-static void cga_gfx_1bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	const UINT16 *palette;
 
@@ -846,13 +846,13 @@ INLINE void cga_plot_unit_4bpp(mame_bitmap *bitmap,
 }
 
 
-static void cga_gfx_4bpp(mame_bitmap *bitmap, struct crtc6845 *crtc, int scale)
+static void cga_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc, int scale)
 {
 	int i, sx, sy, sh;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc)*2;
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc)*2;
 
 	pc_cga_check_palette();
 
@@ -895,7 +895,7 @@ static void cga_gfx_4bpp(mame_bitmap *bitmap, struct crtc6845 *crtc, int scale)
  * The different scaling factors mean that the '160x200' versions of screens
  * are the same size as the normal colour ones.
  */ 
-static void cga_gfx_4bpph(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_gfx_4bpph(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	pc_cga_check_palette();
 	cga_gfx_4bpp(bitmap, crtc, 8);
@@ -903,7 +903,7 @@ static void cga_gfx_4bpph(mame_bitmap *bitmap, struct crtc6845 *crtc)
 
 	
 /* The lo-res graphics mode on a colour composite monitor */
-static void cga_gfx_4bppl(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_gfx_4bppl(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	pc_cga_check_palette();
 	cga_gfx_4bpp(bitmap, crtc, 4);
@@ -947,13 +947,13 @@ INLINE void pgfx_plot_unit_4bpp(mame_bitmap *bitmap,
   Second plane at CGA_base + 0x4000 / 0x6000 
 ***************************************************************************/
 
-static void cga_pgfx_4bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_pgfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int i, sx, sy, sh;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc)*2;
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc)*2;
 
 	for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff) 
 	{
@@ -1034,16 +1034,16 @@ INLINE void pgfx_plot_unit_2bpp(mame_bitmap *bitmap,
 /***************************************************************************
   Draw graphics mode with 320x200 pixels (default) with 2 bits/pixel.
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
-  cga fetches 2 byte per crtc6845 access (not modeled here)!
+  cga fetches 2 byte per mscrtc6845 access (not modeled here)!
 ***************************************************************************/
 
-static void cga_pgfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void cga_pgfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int i, sx, sy, sh;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc)*2;
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc)*2;
 	int colorset = cga.color_select & 0x3F;
 	const UINT16 *palette;
 
@@ -1143,13 +1143,13 @@ INLINE void pc1512_plot_unit(mame_bitmap *bitmap,
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 ***************************************************************************/
 
-static void pc1512_gfx_4bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void pc1512_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int i, sx, sy, sh;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc)*2;
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc)*2;
 
 	for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff) 
 	{
@@ -1199,8 +1199,8 @@ static void pc_cga_blink_textcolors(int on)
 	if (cga.pc_blink == on) return;
 
     cga.pc_blink = on;
-	offs = (crtc6845_get_start(crtc6845)*2) & 0x3fff;
-	size = crtc6845_get_char_lines(crtc6845)*crtc6845_get_char_columns(crtc6845);
+	offs = (mscrtc6845_get_start(mscrtc6845)*2) & 0x3fff;
+	size = mscrtc6845_get_char_lines(mscrtc6845)*mscrtc6845_get_char_columns(mscrtc6845);
 
 	if (dirtybuffer)
 	{
@@ -1234,7 +1234,7 @@ static int cga_blinkthisframe(void)
   Choose the appropriate video mode
 ***************************************************************************/
 
-pc_video_update_proc pc_cga_choosevideomode(int *width, int *height, struct crtc6845 *crtc)
+pc_video_update_proc pc_cga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
 	const pc_video_update_proc *procarray;
@@ -1288,7 +1288,7 @@ pc_video_update_proc pc_cga_choosevideomode(int *width, int *height, struct crtc
 	{
 		mode = (cga.mode_control & 0x07) | ((cga.mode_control & 0x30) / 2);
 
-		procarray = videoprocs[crtc6845_get_personality(crtc)];
+		procarray = videoprocs[mscrtc6845_get_personality(crtc)];
 		proc = procarray[mode];
 
 		/* Plantronics high-res */
@@ -1347,23 +1347,23 @@ static WRITE8_HANDLER ( pc1512_w )
 	 * character columns register, program it manually. */
 
 	case 0x8:
-		char_height = crtc6845_get_char_height(crtc6845);
+		char_height = mscrtc6845_get_char_height(mscrtc6845);
 		if (data & 2) /* Graphics */
 		{
-			crtc6845_set_char_columns(crtc6845, 40);
+			mscrtc6845_set_char_columns(mscrtc6845, 40);
 		}
 		else
 		{
 			if (data & 1) /* 80-column */
 			{
-				crtc6845_set_char_columns(crtc6845, 80);
+				mscrtc6845_set_char_columns(mscrtc6845, 80);
 			}
 			else
 			{
-				crtc6845_set_char_columns(crtc6845, 40);
+				mscrtc6845_set_char_columns(mscrtc6845, 40);
 			}
 		}
-		crtc6845_set_char_lines(crtc6845, 200 );
+		mscrtc6845_set_char_lines(mscrtc6845, 200 );
 		pc_cga8_w(offset, data);
 		break;
 

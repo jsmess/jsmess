@@ -54,8 +54,8 @@ static VIDEO_START( vga );
 static VIDEO_RESET( ega );
 static VIDEO_RESET( vga );
 
-static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, struct crtc6845 *crtc);
-static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, struct crtc6845 *crtc);
+static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc);
+static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc);
 
 /***************************************************************************
 
@@ -265,7 +265,7 @@ static struct
 } vga;
 
 
-// to use the crtc6845 macros
+// to use the mscrtc6845 macros
 #define REG(x) vga.crtc.data[x]
 
 #define DOUBLESCAN ((vga.crtc.data[9]&0x80)||((vga.crtc.data[9]&0x1f)!=0) )
@@ -1172,7 +1172,7 @@ static VIDEO_RESET( vga )
 	pc_vga_reset();
 }
 
-static void vga_vh_text(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void vga_vh_text(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	UINT8 ch, attr;
 	UINT8 bits;
@@ -1239,7 +1239,7 @@ static void vga_vh_text(mame_bitmap *bitmap, struct crtc6845 *crtc)
 	}
 }
 
-static void vga_vh_ega(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void vga_vh_ega(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int pos, line, column, c, addr, i;
 	int height = CRTC6845_CHAR_HEIGHT;
@@ -1284,7 +1284,7 @@ static void vga_vh_ega(mame_bitmap *bitmap, struct crtc6845 *crtc)
 	}
 }
 
-static void vga_vh_vga(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void vga_vh_vga(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int pos, line, column, c, addr, curr_addr;
 	UINT16 *bitmapline;
@@ -1342,7 +1342,7 @@ static void vga_vh_vga(mame_bitmap *bitmap, struct crtc6845 *crtc)
 	}
 }
 
-static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, struct crtc6845 *crtc)
+static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
 	int i;
@@ -1368,7 +1368,7 @@ static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, stru
 	return proc;
 }
 
-static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, struct crtc6845 *crtc)
+static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
 	int i;

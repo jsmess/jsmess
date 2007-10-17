@@ -220,7 +220,7 @@ void BBC_draw_teletext(void)
 
 	teletext_data_w(0,(Teletext_Latch&0x3f)|((Teletext_Latch&0x40)|(BBC_DE?0:0x40)));
 
-	meml=crtc6845_memory_address_r(0);
+	meml=m6845_memory_address_r(0);
 
 	if (((meml>>13)&1)==0)
 	{
@@ -393,7 +393,7 @@ void BBC_draw_hi_res(void)
 		// the logic for the memory location address is very complicated so it
 		// is stored in a number of look up arrays (and is calculated once at the start of the emulator).
 		// this is actually does by the latch IC's not the Video ULA
-		meml=video_ram_lookup[crtc6845_memory_address_r(0)]|(BBC_Character_Row&0x7);
+		meml=video_ram_lookup[m6845_memory_address_r(0)]|(BBC_Character_Row&0x7);
 
 		if (vidmem_RAM[meml] || video_refresh )
 		{
@@ -528,7 +528,7 @@ static void BBC_Set_CRE(int offset, int data)
 }
 
 
-static struct crtc6845_interface
+static struct m6845_interface
 BBC6845= {
 	0,// Memory Address register
 	BBC_Set_Character_Row,// Row Address register
@@ -552,10 +552,10 @@ WRITE8_HANDLER ( BBC_6845_w )
 	switch (offset&1)
 	{
 		case 0:
-			crtc6845_address_w(0,data);
+			m6845_address_w(0,data);
 			break;
 		case 1:
-			crtc6845_register_w(0,data);
+			m6845_register_w(0,data);
 			break;
 	}
 
@@ -572,7 +572,7 @@ WRITE8_HANDLER ( BBC_6845_w )
 		case 0:
 			break;
 		case 1:
-			retval=crtc6845_register_r(0);
+			retval=m6845_register_r(0);
 			break;
 	}
 	return retval;
@@ -616,7 +616,7 @@ VIDEO_UPDATE( bbc )
 	while((BBC_VSync)&&(c<60000))
 	{
 		// Clock the 6845
-		crtc6845_clock();
+		m6845_clock();
 		c++;
 	}
 
@@ -631,7 +631,7 @@ VIDEO_UPDATE( bbc )
 		if (VideoULA_CR) BBC_Clock_CR();
 
 		// Clock the 6845
-		crtc6845_clock();
+		m6845_clock();
 		c++;
 	}
 
@@ -643,7 +643,7 @@ VIDEO_UPDATE( bbc )
 
 void bbc_frameclock(void)
 {
-	crtc6845_frameclock();
+	m6845_frameclock();
 }
 
 /**** BBC B+ Shadow Ram change ****/
@@ -669,7 +669,7 @@ VIDEO_START( bbca )
 {
 	set_pixel_lookup();
 	set_video_memory_lookups(16);
-	crtc6845_config(&BBC6845);
+	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
 	BBC_Video_RAM= memory_region(REGION_CPU1);
@@ -681,7 +681,7 @@ VIDEO_START( bbcb )
 {
 	set_pixel_lookup();
 
-	crtc6845_config(&BBC6845);
+	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
 	BBC_Video_RAM= memory_region(REGION_CPU1);
@@ -695,7 +695,7 @@ VIDEO_START( bbcbp )
 	set_pixel_lookup();
 
 	set_video_memory_lookups(32);
-	crtc6845_config(&BBC6845);
+	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
 	BBC_Video_RAM= memory_region(REGION_CPU1);
@@ -708,7 +708,7 @@ VIDEO_START( bbcm )
 	/* need to set up the lookups to work with the BBC B plus memory */
 	set_pixel_lookup();
 	set_video_memory_lookups(32);
-	crtc6845_config(&BBC6845);
+	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
 	BBC_Video_RAM= memory_region(REGION_CPU1);

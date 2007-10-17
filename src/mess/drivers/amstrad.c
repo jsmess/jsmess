@@ -90,7 +90,7 @@ Some bugs left :
 #define SYSTEM_CPC 0
 #define SYSTEM_PLUS 1
 
-//int selected_crtc6845_address = 0;
+//int selected_m6845_address = 0;
 
 // &ff,&77,&b3,&51,&a8,&d4,&62,&39,&9c,&46,&2b,&15,&8a,&cd,&ee
 // This is the sequence for unlocking the ASIC in the CPC+/GX4000
@@ -281,7 +281,7 @@ static READ8_HANDLER (amstrad_ppi_portb_r)
 	data |= (ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
 
 /* 	Set b0 with VSync state from the CRTC */
-	data |= amstrad_CRTC_VS; // crtc6845_vertical_sync_r(0);
+	data |= amstrad_CRTC_VS; // m6845_vertical_sync_r(0);
 
 	return data;
 }
@@ -1051,7 +1051,7 @@ static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 	m6845_personality_t crtc_type;
 
 	crtc_type = readinputportbytag_safe("crtc", 0);
-	crtc6845_set_personality(crtc_type);
+	m6845_set_personality(crtc_type);
 
 	/* if b14 = 0 : CRTC Read selected */
 	if ((offset & (1<<14)) == 0)
@@ -1066,7 +1066,7 @@ static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 				break;
 			case M6845_PERSONALITY_AMS40489:
 			case M6845_PERSONALITY_PREASIC:
-				data = crtc6845_register_r(0);
+				data = m6845_register_r(0);
 				break;
 			default:
 				break;
@@ -1074,7 +1074,7 @@ static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 			break;
 		case 0x03:
 			/* All CRTC type : Read from selected internal 6845 register Read only */
-			data = crtc6845_register_r(0);
+			data = m6845_register_r(0);
 			break;
 		}
 	}
@@ -1147,17 +1147,17 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
   			EventList_AddItemOffset((EVENT_LIST_CODE_CRTC_INDEX_WRITE<<6), data, TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #endif
-        crtc6845_address_w(0,data);
+        m6845_address_w(0,data);
 		if(amstrad_system_type == SYSTEM_PLUS)
 			amstrad_plus_seqcheck(data);
-//          selected_crtc6845_address = (data & 0x1F);
+//          selected_m6845_address = (data & 0x1F);
       } break;
   		case 0x01: {/* Write to selected internal 6845 register Write Only */
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
 				EventList_AddItemOffset((EVENT_LIST_CODE_CRTC_WRITE<<6), data, TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #endif
-//       	  logerror("crtc6845 register (%02d : %04x)\n", selected_crtc6845_address, (data&0x3F));
-        crtc6845_register_w(0,data);
+//       	  logerror("m6845 register (%02d : %04x)\n", selected_m6845_address, (data&0x3F));
+        m6845_register_w(0,data);
   		} break;
   		default: {
   		} break;

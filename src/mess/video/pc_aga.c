@@ -7,7 +7,7 @@
 #include "video/generic.h"
 #include "memconv.h"
 
-static pc_video_update_proc pc_aga_choosevideomode(int *width, int *height, struct crtc6845 *crtc);
+static pc_video_update_proc pc_aga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc);
 
 
 gfx_layout europc_cga_charlayout =
@@ -164,10 +164,10 @@ void pc_aga_set_mode(AGA_MODE mode)
 
 	switch (aga.mode) {
 	case AGA_COLOR:
-		crtc6845_set_clock(crtc6845, 10000000/*?*/);
+		mscrtc6845_set_clock(mscrtc6845, 10000000/*?*/);
 		break;
 	case AGA_MONO:
-		crtc6845_set_clock(crtc6845, 10000000/*?*/);
+		mscrtc6845_set_clock(mscrtc6845, 10000000/*?*/);
 		break;
 	case AGA_OFF:
 		break;
@@ -183,7 +183,7 @@ extern void pc_aga_timer(void)
 	}
 }
 
-static void pc_aga_cursor(struct crtc6845_cursor *cursor)
+static void pc_aga_cursor(struct mscrtc6845_cursor *cursor)
 {
 	switch (aga.mode) {
 	case AGA_COLOR:
@@ -200,7 +200,7 @@ static void pc_aga_cursor(struct crtc6845_cursor *cursor)
 }
 
 
-static struct crtc6845_config config= { 14318180 /*?*/, pc_aga_cursor };
+static struct mscrtc6845_config config= { 14318180 /*?*/, pc_aga_cursor };
 
 VIDEO_START( pc_aga )
 {
@@ -263,7 +263,7 @@ VIDEO_START( pc200 )
 /***************************************************************************
   Choose the appropriate video mode
 ***************************************************************************/
-static pc_video_update_proc pc_aga_choosevideomode(int *width, int *height, struct crtc6845 *crtc)
+static pc_video_update_proc pc_aga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
 

@@ -244,35 +244,35 @@ static void cbmb_common_driver_init (void)
 	cbm_ieee_open();
 }
 
-static struct crtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };
+static struct mscrtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };
 
 void cbm600_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm600_vh_init();
-	crtc6845_init(&cbm600_crtc);
+	mscrtc6845_init(&cbm600_crtc);
 }
 
 void cbm600pal_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm600_vh_init();
-	crtc6845_init(&cbm600_crtc);
+	mscrtc6845_init(&cbm600_crtc);
 }
 
 void cbm600hu_driver_init (void)
 {
 	cbmb_common_driver_init ();
-	crtc6845_init(&cbm600_crtc);
+	mscrtc6845_init(&cbm600_crtc);
 }
 
-static struct crtc6845_config cbm700_crtc= { 2000000 /*?*/, cbmb_vh_cursor };
+static struct mscrtc6845_config cbm700_crtc= { 2000000 /*?*/, cbmb_vh_cursor };
 
 void cbm700_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm700_vh_init();
-	crtc6845_init(&cbm700_crtc);
+	mscrtc6845_init(&cbm700_crtc);
 }
 
 void cbm500_driver_init (void)

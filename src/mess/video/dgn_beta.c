@@ -113,7 +113,7 @@ typedef enum {
 	START_ADDR_L,		// Start address low
 	CURS_H,			// Cursor addr High
 	CURS_L			// CURSOR addr Low
-} crtc6845_regs;
+} m6845_regs;
 
 static int beta_6845_RA = 0;
 static int beta_scr_x   = 0;
@@ -164,8 +164,8 @@ static void beta_Set_HSync(int offset, int data);
 static void beta_Set_VSync(int offset, int data);
 static void beta_Set_DE(int offset, int data);
 
-static struct crtc6845_interface
-beta_crtc6845_interface= {
+static struct m6845_interface
+beta_m6845_interface= {
 	0,		// Memory Address register
 	beta_Set_RA,	// Row Address register
 	beta_Set_HSync,	// Horizontal status
@@ -267,16 +267,16 @@ static void beta_Set_HSync(int offset, int data)
 	
 	if(!beta_HSync)
 	{
-		int HT=crtc6845_get_register(H_TOTAL);			// Get H total
-		int HS=crtc6845_get_register(H_SYNC_POS);		// Get Hsync pos
-		int HW=crtc6845_get_register(H_SYNC_WIDTH)&0xF;	// Hsync width (in chars)
+		int HT=m6845_get_register(H_TOTAL);			// Get H total
+		int HS=m6845_get_register(H_SYNC_POS);		// Get Hsync pos
+		int HW=m6845_get_register(H_SYNC_WIDTH)&0xF;	// Hsync width (in chars)
 		
 		beta_scr_y++;
 //		beta_scr_x=0-(((HT-HS)-HW)*8);	// Number of dots after HS to wait before start of next line
 		beta_scr_x=0-((HT-(HS+HW))*Dots);
 		
 //debug_console_printf("HT=%d, HS=%d, HW=%d, (HS+HW)=%d, HT-(HS+HW)=%d\n",HT,HS,HW,(HS+HW),(HT-(HS+HW)));
-//debug_console_printf("Scanline=%d, row=%d\n",crtc6845_get_scanline_counter(),crtc6845_get_row_counter());		
+//debug_console_printf("Scanline=%d, row=%d\n",m6845_get_scanline_counter(),m6845_get_row_counter());		
 #ifdef MAME_DEBUG
 		HSyncMin=beta_scr_x;
 #endif
@@ -329,8 +329,8 @@ static void beta_Set_DE(int offset, int data)
 void init_video(void)
 {
 	/* initialise 6845 */
-	crtc6845_config(&beta_crtc6845_interface);
-	crtc6845_set_personality(M6845_PERSONALITY_HD6845S);
+	m6845_config(&beta_m6845_interface);
+	m6845_set_personality(M6845_PERSONALITY_HD6845S);
 	
 	GCtrl=0;
 	
@@ -406,7 +406,7 @@ void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, mame_bit
 
 static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 {
-	int CharsPerLine	= crtc6845_get_register(H_DISPLAYED);	// Get chars per line.
+	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
 	unsigned char *data 	= memory_region(REGION_GFX1);		// ptr to char rom
 	int Dot;
 	unsigned char data_byte;
@@ -415,7 +415,7 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 	int Offset;
 	int FgColour;							// Foreground colour
 	int BgColour;							// Background colour
-	int CursorOn		= crtc6845_cursor_enabled_r(0);
+	int CursorOn		= m6845_cursor_enabled_r(0);
 	int Invert;
 	int UnderLine;							// Underline
 	int FlashChar;							// Flashing char
@@ -427,7 +427,7 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 	{	
 		/* The beta text RAM contains alternate character and attribute bytes */
 		/* Top two address lines from PIA, IC28 PB6,7 */
-		crtcAddr=crtc6845_memory_address_r(0)-1;
+		crtcAddr=m6845_memory_address_r(0)-1;
 		Offset=(crtcAddr | ((GCtrl & GCtrlAddrLines)<<8))*2;
 		if (Offset<0) 
 			Offset=0;
@@ -503,7 +503,7 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 void plot_gfx_pixel(int x, int y, int Dot, int Colour, mame_bitmap *bitmap)
 {
 	int	DoubleX		= (~GCtrl & GCtrlHiLo) ? 1 : 0;
-	int	DoubleY		= (~crtc6845_get_register(INTERLACE) & 0x03) ? 1 : 0;
+	int	DoubleY		= (~m6845_get_register(INTERLACE) & 0x03) ? 1 : 0;
 	int	PlotX;
 	int	PlotY;
 	
@@ -577,7 +577,7 @@ static void beta_plot_gfx_line(int x,int y, mame_bitmap *bitmap)
 	if (beta_DE)
 	{	
 		/* Calculate address of graphics pixels */
-		crtcAddr=(crtc6845_memory_address_r(0) & 0x1FFF);
+		crtcAddr=(m6845_memory_address_r(0) & 0x1FFF);
 		Addr=((crtcAddr<<3) | (beta_6845_RA & 0x07))*2;
 	
 		if(Addr<MinAddr) 
@@ -666,7 +666,7 @@ VIDEO_UPDATE( dgnbeta )
 	while((beta_VSync)&&(c<ClkMax))
 	{
 		// Clock the 6845
-		crtc6845_clock();
+		m6845_clock();
 		c++;
 	}
 
@@ -676,7 +676,7 @@ VIDEO_UPDATE( dgnbeta )
 	{
 		while ((beta_HSync)&&(c<ClkMax))
 		{
-			crtc6845_clock();
+			m6845_clock();
 			c++;
 		}
 
@@ -702,7 +702,7 @@ VIDEO_UPDATE( dgnbeta )
 				beta_scr_x+=8;
 
 			// Clock the 6845
-			crtc6845_clock();
+			m6845_clock();
 			c++;
 		}
 	}
@@ -712,14 +712,14 @@ VIDEO_UPDATE( dgnbeta )
 /* Read and write handlers for CPU interface to 6845 */
 READ8_HANDLER(dgnbeta_6845_r)
 {
-	return crtc6845_register_r(offset);
+	return m6845_register_r(offset);
 }
 
 WRITE8_HANDLER(dgnbeta_6845_w)
 {	
 	if(offset&0x1)
 	{
-		crtc6845_register_w(offset,data);
+		m6845_register_w(offset,data);
 	
 		if(VidAddr==INTERLACE)
 		{
@@ -728,7 +728,7 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 	}
 	else
 	{
-		crtc6845_address_w(offset,data);
+		m6845_address_w(offset,data);
 		VidAddr=data;				/* Record reg being written to */
 	}
 #ifdef MAME_DEBUG

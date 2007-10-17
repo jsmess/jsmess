@@ -25,7 +25,7 @@
 
 static PALETTE_INIT( pcjr );
 static VIDEO_START( pc_t1t );
-static pc_video_update_proc pc_t1t_choosevideomode(int *width, int *height, struct crtc6845 *crtc);
+static pc_video_update_proc pc_t1t_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc);
 
 /***************************************************************************
 
@@ -185,8 +185,8 @@ static void pc_t1t_blink_textcolors(int on)
 	if (pcjr.pc_blink == on) return;
 
     pcjr.pc_blink = on;
-	offs = (crtc6845_get_start(crtc6845)* 2) % videoram_size;
-	size = crtc6845_get_char_columns(crtc6845) * crtc6845_get_char_lines(crtc6845);
+	offs = (mscrtc6845_get_start(mscrtc6845)* 2) % videoram_size;
+	size = mscrtc6845_get_char_columns(mscrtc6845) * mscrtc6845_get_char_lines(mscrtc6845);
 
 	if (dirtybuffer)
 	{
@@ -208,13 +208,13 @@ void pc_t1t_timer(void)
 	}
 }
 
-static void pc_t1t_cursor(struct crtc6845_cursor *cursor)
+static void pc_t1t_cursor(struct mscrtc6845_cursor *cursor)
 {
 	if (dirtybuffer)
 		dirtybuffer[cursor->pos*2] = 1;
 }
 
-static struct crtc6845_config config= { 14318180 /*?*/, pc_t1t_cursor };
+static struct mscrtc6845_config config= { 14318180 /*?*/, pc_t1t_cursor };
 
 
 static VIDEO_START( pc_t1t )
@@ -412,10 +412,10 @@ WRITE8_HANDLER ( pc_T1T_w )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			crtc6845_port_w(crtc6845,0,data);
+			mscrtc6845_port_w(mscrtc6845,0,data);
 			break;
 		case 1: case 3: case 5: case 7:
-			crtc6845_port_w(crtc6845,1,data);
+			mscrtc6845_port_w(mscrtc6845,1,data);
 			break;
 		case 8:
 			pc_t1t_mode_control_w(data);
@@ -448,11 +448,11 @@ WRITE8_HANDLER ( pc_T1T_w )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			data = crtc6845_port_r(crtc6845,0);
+			data = mscrtc6845_port_r(mscrtc6845,0);
 			break;
 
 		case 1: case 3: case 5: case 7:
-			data = crtc6845_port_r(crtc6845,1);
+			data = mscrtc6845_port_r(mscrtc6845,1);
 			break;
 
 		case 8:
@@ -517,18 +517,18 @@ static void t1t_plot_char(mame_bitmap *bitmap, const rectangle *r, UINT8 ch, UIN
   Draw text mode with 40x25 characters (default) with high intensity bg.
 ***************************************************************************/
 
-static void t1t_text_inten(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void t1t_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc);
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 
-	crtc6845_time(crtc);
-	crtc6845_get_cursor(crtc, &cursor);
+	mscrtc6845_time(crtc);
+	mscrtc6845_get_cursor(crtc, &cursor);
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height) {
 
@@ -569,18 +569,18 @@ static void t1t_text_inten(mame_bitmap *bitmap, struct crtc6845 *crtc)
   Draw text mode with 40x25 characters (default) and blinking colors.
 ***************************************************************************/
 
-static void t1t_text_blink(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void t1t_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc);
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 
-	crtc6845_time(crtc);
-	crtc6845_get_cursor(crtc, &cursor);
+	mscrtc6845_time(crtc);
+	mscrtc6845_get_cursor(crtc, &cursor);
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
 	{
@@ -633,7 +633,7 @@ static void t1t_text_blink(mame_bitmap *bitmap, struct crtc6845 *crtc)
   Even scanlines are from T1T_base + 0x0000, odd from T1T_base + 0x2000
 ***************************************************************************/
 
-static void t1t_gfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void t1t_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	static const UINT16 palette[] =
 	{
@@ -651,13 +651,13 @@ static void t1t_gfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
   The cell size is 1x1 (1 scanline is the real default)
   Even scanlines are from T1T_base + 0x0000, odd from T1T_base + 0x2000
 ***************************************************************************/
-static void t1t_gfx_1bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void t1t_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int i, sx, sy, sh;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc)*2;
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc)*2;
 
 	for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff) {
 
@@ -693,7 +693,7 @@ static void t1t_gfx_1bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
   CGA_base + 0x2000
 ***************************************************************************/
 
-static void t1t_gfx_4bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void t1t_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	pc_render_gfx_4bpp(bitmap, crtc, pcjr.displayram, NULL, 4);
 }
@@ -704,7 +704,7 @@ static void t1t_gfx_4bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
   Choose the appropriate video mode
 ***************************************************************************/
 
-static pc_video_update_proc pc_t1t_choosevideomode(int *width, int *height, struct crtc6845 *crtc)
+static pc_video_update_proc pc_t1t_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
 {
 	int xfactor = 8;
 	int yfactor = 1;

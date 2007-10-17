@@ -16,7 +16,7 @@ MACHINE_DRIVER_EXTERN( pcvideo_cga );
 /* has a special 640x200 in 16 color mode, 4 banks at 0xb8000 */
 MACHINE_DRIVER_EXTERN( pcvideo_pc1512 );
 
-pc_video_update_proc pc_cga_choosevideomode(int *width, int *height, struct crtc6845 *crtc);
+pc_video_update_proc pc_cga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc);
 
 READ8_HANDLER( pc_cga8_r );
 WRITE8_HANDLER( pc_cga8_w );
@@ -34,7 +34,7 @@ WRITE16_HANDLER( pc1512_videoram16le_w );
 #define CGA_FONT		(input_port_20_r(0)&3)
 
 //internal use
-void pc_cga_cursor(struct crtc6845_cursor *cursor);
+void pc_cga_cursor(struct mscrtc6845_cursor *cursor);
 
 
 

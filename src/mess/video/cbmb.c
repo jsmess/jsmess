@@ -57,7 +57,7 @@ VIDEO_START( cbm700 )
 	video_start_generic(machine);
 }
 
-void cbmb_vh_cursor(struct crtc6845_cursor *cursor)
+void cbmb_vh_cursor(struct mscrtc6845_cursor *cursor)
 {
 	dirtybuffer[cursor->pos]=1;
 }
@@ -71,11 +71,11 @@ VIDEO_UPDATE( cbmb )
 {
 	int x, y, i;
 	rectangle rect, rect2;
-	int w=crtc6845_get_char_columns(crtc6845);
-	int h=crtc6845_get_char_lines(crtc6845);
-	int height=crtc6845_get_char_height(crtc6845);
-	int start=crtc6845_get_start(crtc6845)&0x7ff;
-	struct crtc6845_cursor cursor;
+	int w=mscrtc6845_get_char_columns(mscrtc6845);
+	int h=mscrtc6845_get_char_lines(mscrtc6845);
+	int height=mscrtc6845_get_char_height(mscrtc6845);
+	int start=mscrtc6845_get_start(mscrtc6845)&0x7ff;
+	struct mscrtc6845_cursor cursor;
 	int full_refresh = 1;
 
 	rect.min_x=Machine->screen[0].visarea.min_x;
@@ -84,8 +84,8 @@ VIDEO_UPDATE( cbmb )
 		memset(dirtybuffer, 1, videoram_size);
 	}
 
-	crtc6845_time(crtc6845);
-	crtc6845_get_cursor(crtc6845, &cursor);
+	mscrtc6845_time(mscrtc6845);
+	mscrtc6845_get_cursor(mscrtc6845, &cursor);
 
 	for (y=0, rect.min_y=0, rect.max_y=height-1, i=start; y<h;
 		 y++, rect.min_y+=height, rect.max_y+=height) {

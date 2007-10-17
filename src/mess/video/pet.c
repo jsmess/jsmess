@@ -85,14 +85,14 @@ VIDEO_UPDATE( pet )
 	return 0;
 }
 
-//  commodore pet crtc video circuit for 40 columns display (standard crtc6845)
+//  commodore pet crtc video circuit for 40 columns display (standard mscrtc6845)
 VIDEO_UPDATE( pet40 )
 {
 	int x, y, i;
-	int w=crtc6845_get_char_columns(crtc6845);
-	int h=crtc6845_get_char_lines(crtc6845);
-	int height=crtc6845_get_char_height(crtc6845);
-	int start=crtc6845_get_start(crtc6845)&0x3ff;
+	int w=mscrtc6845_get_char_columns(mscrtc6845);
+	int h=mscrtc6845_get_char_lines(mscrtc6845);
+	int height=mscrtc6845_get_char_height(mscrtc6845);
+	int start=mscrtc6845_get_start(mscrtc6845)&0x3ff;
 
 	for (y=0, i=start; y<h;y++)
 	{
@@ -112,10 +112,10 @@ VIDEO_UPDATE( pet80 )
 {
 	int x, y, i;
 	rectangle rect;
-	int w=crtc6845_get_char_columns(crtc6845);
-	int h=crtc6845_get_char_lines(crtc6845);
-	int height=crtc6845_get_char_height(crtc6845);
-	int start=crtc6845_get_start(crtc6845)&0x3ff;
+	int w=mscrtc6845_get_char_columns(mscrtc6845);
+	int h=mscrtc6845_get_char_lines(mscrtc6845);
+	int height=mscrtc6845_get_char_height(mscrtc6845);
+	int start=mscrtc6845_get_start(mscrtc6845)&0x3ff;
 
 	rect.min_x = Machine->screen[0].visarea.min_x;
 	rect.max_x = Machine->screen[0].visarea.max_x;

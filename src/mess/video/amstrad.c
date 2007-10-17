@@ -16,7 +16,7 @@
 
 #include "sound/ay8910.h"
 
-static crtc6845_state amstrad_vidhrdw_6845_state;
+static m6845_state amstrad_vidhrdw_6845_state;
 int prev_reg;
 
 extern int amstrad_plus_asic_enabled;
@@ -358,8 +358,8 @@ static void amstrad_plus_draw_screen_enabled_mode_0(void)
 {
 	mame_bitmap *bitmap = amstrad_bitmap;
 
-	int ma = amstrad_CRTC_MA; // crtc6845_memory_address_r(0);
-	int ra = amstrad_CRTC_RA; // crtc6845_row_address_r(0);
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
 	/* calc mem addr to fetch data from	based on ma, and ra */
 	unsigned int addr = (((ma>>(4+8)) & 0x03)<<14) |
 			((ra & 0x07)<<11) |
@@ -416,8 +416,8 @@ static void amstrad_plus_draw_screen_enabled_mode_1(void)
 {
 	mame_bitmap *bitmap = amstrad_bitmap;
 
-	int ma = amstrad_CRTC_MA; // crtc6845_memory_address_r(0);
-	int ra = amstrad_CRTC_RA; // crtc6845_row_address_r(0);
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
 /* calc mem addr to fetch data from	based on ma, and ra */
 	unsigned int addr = (((ma>>(4+8)) & 0x03)<<14) |
 			((ra & 0x07)<<11) |
@@ -467,8 +467,8 @@ static void amstrad_plus_draw_screen_enabled_mode_2(void)
 {
 	mame_bitmap *bitmap = amstrad_bitmap;
 
-	int ma = amstrad_CRTC_MA; // crtc6845_memory_address_r(0);
-	int ra = amstrad_CRTC_RA; // crtc6845_row_address_r(0);
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
 /* calc mem addr to fetch data from	based on ma, and ra */
 	unsigned int addr = (((ma>>(4+8)) & 0x03)<<14) |
 			((ra & 0x07)<<11) |
@@ -507,8 +507,8 @@ static void amstrad_plus_draw_screen_enabled_mode_3(void)
 {
 	mame_bitmap *bitmap = amstrad_bitmap;
 
-	int ma = amstrad_CRTC_MA; // crtc6845_memory_address_r(0);
-	int ra = amstrad_CRTC_RA; // crtc6845_row_address_r(0);
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
 /* calc mem addr to fetch data from	based on ma, and ra */
 	unsigned int addr = (((ma>>(4+8)) & 0x03)<<14) |
 			((ra & 0x07)<<11) |
@@ -565,8 +565,8 @@ static void amstrad_draw_screen_enabled_mode_0(void)
 {
 	mame_bitmap *bitmap = amstrad_bitmap;
 
-	int ma = amstrad_CRTC_MA; // crtc6845_memory_address_r(0);
-	int ra = amstrad_CRTC_RA; // crtc6845_row_address_r(0);
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
 	/* calc mem addr to fetch data from	based on ma, and ra */
 	unsigned int addr = (((ma>>(4+8)) & 0x03)<<14) |
 			((ra & 0x07)<<11) |
@@ -612,8 +612,8 @@ static void amstrad_draw_screen_enabled_mode_1(void)
 {
 	mame_bitmap *bitmap = amstrad_bitmap;
 
-	int ma = amstrad_CRTC_MA; // crtc6845_memory_address_r(0);
-	int ra = amstrad_CRTC_RA; // crtc6845_row_address_r(0);
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
 /* calc mem addr to fetch data from	based on ma, and ra */
 	unsigned int addr = (((ma>>(4+8)) & 0x03)<<14) |
 			((ra & 0x07)<<11) |
@@ -652,8 +652,8 @@ static void amstrad_draw_screen_enabled_mode_2(void)
 {
 	mame_bitmap *bitmap = amstrad_bitmap;
 
-	int ma = amstrad_CRTC_MA; // crtc6845_memory_address_r(0);
-	int ra = amstrad_CRTC_RA; // crtc6845_row_address_r(0);
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
 /* calc mem addr to fetch data from	based on ma, and ra */
 	unsigned int addr = (((ma>>(4+8)) & 0x03)<<14) |
 			((ra & 0x07)<<11) |
@@ -686,8 +686,8 @@ static void amstrad_draw_screen_enabled_mode_3(void)
 {
 	mame_bitmap *bitmap = amstrad_bitmap;
 
-	int ma = amstrad_CRTC_MA; // crtc6845_memory_address_r(0);
-	int ra = amstrad_CRTC_RA; // crtc6845_row_address_r(0);
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
 /* calc mem addr to fetch data from	based on ma, and ra */
 	unsigned int addr = (((ma>>(4+8)) & 0x03)<<14) |
 			((ra & 0x07)<<11) |
@@ -730,7 +730,7 @@ static void amstrad_draw_screen_enabled_mode_3(void)
 /* execute crtc_execute_cycles of crtc */
 void amstrad_vh_execute_crtc_cycles(int dummy)
 {
-	crtc6845_clock(); // Clock the 6845
+	m6845_clock(); // Clock the 6845
 	if ((x_screen_pos >= 0) && (x_screen_pos < AMSTRAD_SCREEN_WIDTH) && (y_screen_pos >= 0))
 	{
 		/* render the screen */
@@ -771,9 +771,9 @@ void amstrad_plus_sprite_draw(mame_bitmap* scr_bitmap)
 
 	// get display bounds from CRTC registers (sprites are bound and clipped to inside the border)
 	rect.min_x = display_x;//(((vid.registers[0] - 1) - (vid.registers[2] - 1))*4)+8;
-	rect.max_x = rect.min_x + (crtc6845_get_register(1) * 16);
+	rect.max_x = rect.min_x + (m6845_get_register(1) * 16);
 	rect.min_y = display_y;//(((vid.registers[4] - 1) - (vid.registers[7] - 1))*4)+4;
-	rect.max_y = rect.min_y + (crtc6845_get_register(6) * (crtc6845_get_register(9)+1));
+	rect.max_y = rect.min_y + (m6845_get_register(6) * (m6845_get_register(9)+1));
 
 	for(spr = 15; spr >= 0; spr--)
 	{
@@ -927,7 +927,7 @@ static void amstrad_Set_DE(int offset, int data)
 		if(display_update == 1 && amstrad_plus_asic_enabled != 0)  // first scanline
 		{
 			if(amstrad_plus_scroll_y != 0)
-				amstrad_screen_width = crtc6845_get_register(1) * 2;
+				amstrad_screen_width = m6845_get_register(1) * 2;
 			display_x = x_screen_pos;
 			display_y = y_screen_pos;
 			display_update = 0;
@@ -1000,7 +1000,7 @@ static void amstrad_Set_HS(int offset, int data)
 			// CPC+/GX4000 Programmable Raster Interrupt (disabled if &6800 in ASIC RAM is 0)		
 			if(amstrad_plus_pri != 0)
 			{
-				if(crtc6845_get_row_counter() == ((amstrad_plus_pri >> 3) & 0x1f) && crtc6845_get_scanline_counter() == (amstrad_plus_pri & 0x07))  
+				if(m6845_get_row_counter() == ((amstrad_plus_pri >> 3) & 0x1f) && m6845_get_scanline_counter() == (amstrad_plus_pri & 0x07))  
 				{
 //					logerror("PRI: triggered, scanline %i, VSync width = %i\n",amstrad_scanline,vid.vertical_sync_width);
 					cpunum_set_input_line(0,0,ASSERT_LINE);
@@ -1011,14 +1011,14 @@ static void amstrad_Set_HS(int offset, int data)
 			// CPC+/GX4000 Split screen registers  (disabled if &6801 in ASIC RAM is 0)
 			if(amstrad_plus_split_scanline != 0)
 			{
-				if(crtc6845_get_row_counter() == ((amstrad_plus_split_scanline >> 3) & 0x1f) && crtc6845_get_scanline_counter() == (amstrad_plus_split_scanline & 0x07)) // split occurs here (hopefully)
+				if(m6845_get_row_counter() == ((amstrad_plus_split_scanline >> 3) & 0x1f) && m6845_get_scanline_counter() == (amstrad_plus_split_scanline & 0x07)) // split occurs here (hopefully)
 				{
-					crtc6845_state vid;
-					crtc6845_get_state(0,&vid);
+					m6845_state vid;
+					m6845_get_state(0,&vid);
 //					logerror("SSCR: Split screen occured at scanline %i",amstrad_plus_split_scanline);
 					vid.Memory_Address_of_next_Character_Row = vid.Memory_Address_of_this_Character_Row = amstrad_plus_split_address;
 					vid.Memory_Address = amstrad_plus_split_address;
-					crtc6845_set_state(0,&vid);
+					m6845_set_state(0,&vid);
 				}
 			}
 			// CPC+/GX4000 soft scroll register
@@ -1057,7 +1057,7 @@ static void amstrad_Set_CR(int offset, int data)
 }
 /* The cursor is not used on Amstrad. The CURSOR signal is available on the Expansion port for other hardware to use. */
 
-static struct crtc6845_interface amstrad6845= {
+static struct m6845_interface amstrad6845= {
 	amstrad_Set_MA, // Memory Address register
 	amstrad_Set_RA, // Row Address register
 	amstrad_Set_HS, // Horizontal status
@@ -1109,10 +1109,10 @@ VIDEO_START( amstrad )
 {
 	amstrad_init_lookups();
 
-	crtc6845_start();
-	crtc6845_config(&amstrad6845);
-	crtc6845_reset(0);
-	crtc6845_get_state(0, &amstrad_vidhrdw_6845_state);
+	m6845_start();
+	m6845_config(&amstrad6845);
+	m6845_reset(0);
+	m6845_get_state(0, &amstrad_vidhrdw_6845_state);
 	
 	draw_function = amstrad_draw_screen_disabled;
 	

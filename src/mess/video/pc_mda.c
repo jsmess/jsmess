@@ -120,8 +120,8 @@ static void pc_mda_blink_textcolors(int on)
 	if (mda.pc_blink == on) return;
 
     mda.pc_blink = on;
-	offs = (crtc6845_get_start(crtc6845)*2)% videoram_size;
-	size = crtc6845_get_char_lines(crtc6845)*crtc6845_get_char_columns(crtc6845);
+	offs = (mscrtc6845_get_start(mscrtc6845)*2)% videoram_size;
+	size = mscrtc6845_get_char_lines(mscrtc6845)*mscrtc6845_get_char_columns(mscrtc6845);
 
 	if (dirtybuffer)
 	{
@@ -142,13 +142,13 @@ extern void pc_mda_timer(void)
 	}
 }
 
-void pc_mda_cursor(struct crtc6845_cursor *cursor)
+void pc_mda_cursor(struct mscrtc6845_cursor *cursor)
 {
 	if (dirtybuffer)
 		dirtybuffer[cursor->pos*2]=1;
 }
 
-static struct crtc6845_config config= { 14318180 /*?*/, pc_mda_cursor };
+static struct mscrtc6845_config config= { 14318180 /*?*/, pc_mda_cursor };
 
 
 /* This code seems to go through hoops to accomodate differing GfxElement
@@ -257,10 +257,10 @@ WRITE8_HANDLER ( pc_MDA_w )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			crtc6845_port_w(crtc6845, 0, data);
+			mscrtc6845_port_w(mscrtc6845, 0, data);
 			break;
 		case 1: case 3: case 5: case 7:
-			crtc6845_port_w(crtc6845, 1, data);
+			mscrtc6845_port_w(mscrtc6845, 1, data);
 			break;
 		case 8:
 			hercules_mode_control_w(data);
@@ -277,10 +277,10 @@ WRITE8_HANDLER ( pc_MDA_w )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			data = crtc6845_port_r(crtc6845,0);
+			data = mscrtc6845_port_r(mscrtc6845,0);
 			break;
 		case 1: case 3: case 5: case 7:
-			data = crtc6845_port_r(crtc6845,1);
+			data = mscrtc6845_port_r(mscrtc6845,1);
 			break;
 		case 10:
 			data = pc_mda_status_r();
@@ -295,22 +295,22 @@ WRITE8_HANDLER ( pc_MDA_w )
   The character cell size is 9x15. Column 9 is column 8 repeated for
   character codes 176 to 223.
 ***************************************************************************/
-static void mda_text_inten(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void mda_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc);
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc);
 	int char_width;
 	rectangle r;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 	UINT8 attr;
 
 	char_width = Machine->screen[0].width / 80;
 
-	crtc6845_time(crtc);
-	crtc6845_get_cursor(crtc, &cursor);
+	mscrtc6845_time(crtc);
+	mscrtc6845_get_cursor(crtc, &cursor);
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height) {
 
@@ -351,21 +351,21 @@ static void mda_text_inten(mame_bitmap *bitmap, struct crtc6845 *crtc)
   The character cell size is 9x15. Column 9 is column 8 repeated for
   character codes 176 to 223.
 ***************************************************************************/
-static void mda_text_blink(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void mda_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc);
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc);
 	rectangle r;
-	struct crtc6845_cursor cursor;
+	struct mscrtc6845_cursor cursor;
 	int char_width;
 
 	char_width = Machine->screen[0].width / 80;
 
-	crtc6845_time(crtc);
-	crtc6845_get_cursor(crtc, &cursor);
+	mscrtc6845_time(crtc);
+	mscrtc6845_get_cursor(crtc, &cursor);
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height) {
 
@@ -414,7 +414,7 @@ static void mda_text_blink(mame_bitmap *bitmap, struct crtc6845 *crtc)
   bit 7 being the leftmost.
 ***************************************************************************/
 
-static void hercules_gfx(mame_bitmap *bitmap, struct crtc6845 *crtc)
+static void hercules_gfx(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	const UINT8 *vram = videoram;
 	static const UINT16 palette[2] = {0, 10};
@@ -431,7 +431,7 @@ static void hercules_gfx(mame_bitmap *bitmap, struct crtc6845 *crtc)
   Choose the appropriate video mode
 ***************************************************************************/
 
-pc_video_update_proc pc_mda_choosevideomode(int *width, int *height, struct crtc6845 *crtc)
+pc_video_update_proc pc_mda_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
 

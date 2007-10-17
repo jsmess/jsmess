@@ -411,8 +411,8 @@ static void svi318_Set_DE(int offset, int data)
 	svi318_DE = data;
 }
 
-static struct crtc6845_interface
-svi318_crtc6845_interface= {
+static struct m6845_interface
+svi318_m6845_interface= {
 	0,// Memory Address register
 	svi318_Set_RA,// Row Address register
 	svi318_Set_HSync,// Horizontal status
@@ -428,7 +428,7 @@ static void svi318_80col_init(void)
 	svi318_80col_ram = auto_malloc(0x800);
 memset(svi318_80col_ram, 0x40, 0x400);
 	/* initialise 6845 */
-	crtc6845_config(&svi318_crtc6845_interface);
+	m6845_config(&svi318_m6845_interface);
 
 	svi318_80col_state=(1<<2)|(1<<1);
 }
@@ -455,7 +455,7 @@ static void svi318_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
 		unsigned char data_byte;
 		int char_code;
 
-		char_code = svi318_80col_ram[crtc6845_memory_address_r(0)&0x07ff];
+		char_code = svi318_80col_ram[m6845_memory_address_r(0)&0x07ff];
 		
 		data_byte = data[(char_code<<3) + svi318_6845_RA];
 
@@ -485,7 +485,7 @@ static VIDEO_UPDATE( svi318_80col )
 	while((svi318_VSync)&&(c<33274))
 	{
 		// Clock the 6845
-		crtc6845_clock();
+		m6845_clock();
 		c++;
 	}
 
@@ -495,7 +495,7 @@ static VIDEO_UPDATE( svi318_80col )
 	{
 		while ((svi318_HSync)&&(c<33274))
 		{
-			crtc6845_clock();
+			m6845_clock();
 			c++;
 		}
 		// Do all the clever split mode changes in here before the next while loop
@@ -511,7 +511,7 @@ static VIDEO_UPDATE( svi318_80col )
 			svi318_scr_x+=8;
 
 			// Clock the 6845
-			crtc6845_clock();
+			m6845_clock();
 			c++;
 		}
 	}

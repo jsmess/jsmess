@@ -218,8 +218,8 @@ static void Einstein_Set_DE(int offset, int data)
 }
 
 
-static struct crtc6845_interface
-einstein_crtc6845_interface= {
+static struct m6845_interface
+einstein_m6845_interface= {
 	0,// Memory Address register
 	Einstein_Set_RA,// Row Address register
 	Einstein_Set_HSync,// Horizontal status
@@ -235,7 +235,7 @@ static void	einstein_80col_init(void)
 	einstein_80col_ram = auto_malloc(2048);
 
 	/* initialise 6845 */
-	crtc6845_config(&einstein_crtc6845_interface);
+	m6845_config(&einstein_m6845_interface);
 
 	einstein_80col_state=(1<<2)|(1<<1);
 }
@@ -277,10 +277,10 @@ static WRITE8_HANDLER(einstein_80col_w)
 			einstein_80col_ram_w(offset,data);
 			break;
 		case 8:
-			crtc6845_address_w(offset,data);
+			m6845_address_w(offset,data);
 			break;
 		case 9:
-			crtc6845_register_w(offset,data);
+			m6845_register_w(offset,data);
 			break;
 		default:
 			break;
@@ -1602,7 +1602,7 @@ static void einstein_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
 		unsigned char data_byte;
 		int char_code;
 
-		char_code = einstein_80col_ram[crtc6845_memory_address_r(0)&0x07ff];
+		char_code = einstein_80col_ram[m6845_memory_address_r(0)&0x07ff];
 		
 		data_byte = data[(char_code<<3) + Einstein_6845_RA];
 
@@ -1632,7 +1632,7 @@ static VIDEO_UPDATE( einstein_80col )
 	while((Einstein_VSync)&&(c<33274))
 	{
 		// Clock the 6845
-		crtc6845_clock();
+		m6845_clock();
 		c++;
 	}
 
@@ -1642,7 +1642,7 @@ static VIDEO_UPDATE( einstein_80col )
 	{
 		while ((Einstein_HSync)&&(c<33274))
 		{
-			crtc6845_clock();
+			m6845_clock();
 			c++;
 		}
 		// Do all the clever split mode changes in here before the next while loop
@@ -1658,7 +1658,7 @@ static VIDEO_UPDATE( einstein_80col )
 			Einstein_scr_x+=8;
 
 			// Clock the 6845
-			crtc6845_clock();
+			m6845_clock();
 			c++;
 		}
 	}

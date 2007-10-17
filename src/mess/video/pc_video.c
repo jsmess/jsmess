@@ -19,8 +19,8 @@
 
 ***************************************************************************/
 
-static pc_video_update_proc (*pc_choosevideomode)(int *width, int *height, struct crtc6845 *crtc);
-static struct crtc6845 *pc_crtc;
+static pc_video_update_proc (*pc_choosevideomode)(int *width, int *height, struct mscrtc6845 *crtc);
+static struct mscrtc6845 *pc_crtc;
 static int pc_anythingdirty;
 static int pc_current_height;
 static int pc_current_width;
@@ -39,8 +39,8 @@ static void pc_video_postload(void)
 
 
 
-struct crtc6845 *pc_video_start(const struct crtc6845_config *config,
-	pc_video_update_proc (*choosevideomode)(int *width, int *height, struct crtc6845 *crtc),
+struct mscrtc6845 *pc_video_start(const struct mscrtc6845_config *config,
+	pc_video_update_proc (*choosevideomode)(int *width, int *height, struct mscrtc6845 *crtc),
 	size_t vramsize)
 {
 	pc_choosevideomode = choosevideomode;
@@ -54,7 +54,7 @@ struct crtc6845 *pc_video_start(const struct crtc6845_config *config,
 
 	if (config)
 	{
-		pc_crtc = crtc6845_init(config);
+		pc_crtc = mscrtc6845_init(config);
 		if (!pc_crtc)
 			return NULL;
 	}
@@ -78,8 +78,8 @@ VIDEO_UPDATE( pc_video )
 
 	if (pc_crtc)
 	{
-		w = crtc6845_get_char_columns(pc_crtc);
-		h = crtc6845_get_char_height(pc_crtc) * crtc6845_get_char_lines(pc_crtc);
+		w = mscrtc6845_get_char_columns(pc_crtc);
+		h = mscrtc6845_get_char_height(pc_crtc) * mscrtc6845_get_char_lines(pc_crtc);
 	}
 
 	video_update = pc_choosevideomode(&w, &h, pc_crtc);
@@ -157,14 +157,14 @@ WRITE32_HANDLER( pc_video_videoram32_w )
  *
  *************************************/
 
-void pc_render_gfx_1bpp(mame_bitmap *bitmap, struct crtc6845 *crtc,
+void pc_render_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc,
 	const UINT8 *vram, const UINT16 *palette, int interlace)
 {
 	int sx, sy, sh;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc)*2;
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc)*2;
 
 	if (!vram)
 		vram = videoram;
@@ -197,14 +197,14 @@ void pc_render_gfx_1bpp(mame_bitmap *bitmap, struct crtc6845 *crtc,
 
 
 
-void pc_render_gfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc,
+void pc_render_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc,
 	const UINT8 *vram, const UINT16 *palette, int interlace)
 {
 	int sx, sy, sh;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc)*2;
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc)*2;
 	UINT16 *dest;
 	const UINT8 *src;
 
@@ -238,14 +238,14 @@ void pc_render_gfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc,
 
 
 
-void pc_render_gfx_4bpp(mame_bitmap *bitmap, struct crtc6845 *crtc,
+void pc_render_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc,
 	const UINT8 *vram, const UINT16 *palette, int interlace)
 {
 	int sx, sy, sh;
-	int	offs = crtc6845_get_start(crtc)*2;
-	int lines = crtc6845_get_char_lines(crtc);
-	int height = crtc6845_get_char_height(crtc);
-	int columns = crtc6845_get_char_columns(crtc)*2;
+	int	offs = mscrtc6845_get_start(crtc)*2;
+	int lines = mscrtc6845_get_char_lines(crtc);
+	int height = mscrtc6845_get_char_height(crtc);
+	int columns = mscrtc6845_get_char_columns(crtc)*2;
 
 	if (!vram)
 		vram = videoram;

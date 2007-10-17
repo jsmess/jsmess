@@ -1,4 +1,3 @@
-
 /************************************************************************
 	crct6845
 
@@ -20,7 +19,7 @@ typedef enum
 	M6845_PERSONALITY_PREASIC
 } m6845_personality_t;
 
-struct crtc6845_interface
+struct m6845_interface
 {
 	void (*out_MA_func)(int offset, int data);
 	void (*out_RA_func)(int offset, int data);
@@ -31,7 +30,7 @@ struct crtc6845_interface
 	void (*out_CRE_func)(int offset, int data);
 };
 
-typedef struct crtc6845_state
+typedef struct m6845_state
 {
 	/* Register Select */
 	int address_register;
@@ -85,43 +84,43 @@ typedef struct crtc6845_state
 	int	Vertical_Adjust_Done;
 //	int cycles_to_vsync_start;
 //	int cycles_to_vsync_end;
-} crtc6845_state;
+} m6845_state;
 
 /* set up the local copy of the 6845 external procedure calls */
-void crtc6845_config(const struct crtc6845_interface *intf);
+void m6845_config(const struct m6845_interface *intf);
 
 
 /* functions to set the 6845 registers */
-int crtc6845_register_r(int offset);
-void crtc6845_address_w(int offset, int data);
-void crtc6845_register_w(int offset, int data);
+int m6845_register_r(int offset);
+void m6845_address_w(int offset, int data);
+void m6845_register_w(int offset, int data);
 
 
 /* clock the 6845 */
-void crtc6845_clock(void);
+void m6845_clock(void);
 
 /* called every frame to advance the cursor count */
-void crtc6845_frameclock(void);
+void m6845_frameclock(void);
 
 /* functions to read the 6845 outputs */
-int crtc6845_memory_address_r(int offset);
-int crtc6845_row_address_r(int offset);
-int crtc6845_horizontal_sync_r(int offset);
-int crtc6845_vertical_sync_r(int offset);
-int crtc6845_display_enabled_r(int offset);
-int crtc6845_cursor_enabled_r(int offset);
+int m6845_memory_address_r(int offset);
+int m6845_row_address_r(int offset);
+int m6845_horizontal_sync_r(int offset);
+int m6845_vertical_sync_r(int offset);
+int m6845_display_enabled_r(int offset);
+int m6845_cursor_enabled_r(int offset);
 
-void crtc6845_recalc(int offset, int cycles);
+void m6845_recalc(int offset, int cycles);
 
-void crtc6845_set_state(int offset, crtc6845_state *state);
-void crtc6845_get_state(int offset, crtc6845_state *state);
+void m6845_set_state(int offset, m6845_state *state);
+void m6845_get_state(int offset, m6845_state *state);
 
-void crtc6845_reset(int which);
+void m6845_reset(int which);
 
-void crtc6845_start(void);
+void m6845_start(void);
 
-void crtc6845_set_personality(m6845_personality_t personality);
+void m6845_set_personality(m6845_personality_t personality);
 
-int crtc6845_get_register(int reg);
-int crtc6845_get_scanline_counter(void);
-int crtc6845_get_row_counter(void);
+int m6845_get_register(int reg);
+int m6845_get_scanline_counter(void);
+int m6845_get_row_counter(void);

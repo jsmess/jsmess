@@ -234,7 +234,7 @@ void cbmb_rom_load(void);
 
 void cbm600_vh_init(void);
 void cbm700_vh_init(void);
-void cbmb_vh_cursor(struct crtc6845_cursor *cursor);
+void cbmb_vh_cursor(struct mscrtc6845_cursor *cursor);
 extern VIDEO_START( cbm700 );
 extern VIDEO_UPDATE( cbmb );
 

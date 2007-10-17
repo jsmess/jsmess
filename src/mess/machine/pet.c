@@ -231,7 +231,7 @@ static WRITE8_HANDLER(cbm8096_io_w)
 	else if (offset<0x40) ;
 	else if (offset<0x50) via_0_w(offset&0xf,data);
 	else if (offset<0x80) ;
-	else if (offset<0x82) crtc6845_0_port_w(offset&1,data);
+	else if (offset<0x82) mscrtc6845_0_port_w(offset&1,data);
 }
 
 static  READ8_HANDLER(cbm8096_io_r)
@@ -244,7 +244,7 @@ static  READ8_HANDLER(cbm8096_io_r)
 	else if (offset<0x40) ;
 	else if (offset<0x50) data=via_0_r(offset&0xf);
 	else if (offset<0x80) ;
-	else if (offset<0x82) data=crtc6845_0_port_r(offset&1);
+	else if (offset<0x82) data=mscrtc6845_0_port_r(offset&1);
 	return data;
 }
 
@@ -452,13 +452,13 @@ DRIVER_INIT( pet1 )
 	pet_vh_init();
 }
 
-static struct crtc6845_config crtc_pet = { 800000 /*?*/};
+static struct mscrtc6845_config crtc_pet = { 800000 /*?*/};
 
 DRIVER_INIT( pet40 )
 {
 	pet_common_driver_init ();
 	pet_vh_init();
-	crtc6845_init(&crtc_pet);
+	mscrtc6845_init(&crtc_pet);
 }
 
 DRIVER_INIT( cbm80 )
@@ -470,7 +470,7 @@ DRIVER_INIT( cbm80 )
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
 	pet80_vh_init();
-	crtc6845_init(&crtc_pet);
+	mscrtc6845_init(&crtc_pet);
 }
 
 DRIVER_INIT( superpet )
@@ -484,7 +484,7 @@ DRIVER_INIT( superpet )
 	memory_set_bank(1, 0);
 
 	superpet_vh_init();
-	crtc6845_init(&crtc_pet);
+	mscrtc6845_init(&crtc_pet);
 }
 
 MACHINE_RESET( pet )

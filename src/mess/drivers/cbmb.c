@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf8000, 0xfbfff) AM_READ( MRA8_ROM )
 	/*	{0xfc000, 0xfcfff, MRA8_ROM }, */
 	AM_RANGE(0xfd000, 0xfd7ff) AM_READ( MRA8_ROM )
-	AM_RANGE(0xfd800, 0xfd8ff) AM_READ( crtc6845_0_port_r )
+	AM_RANGE(0xfd800, 0xfd8ff) AM_READ( mscrtc6845_0_port_r )
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_READ( sid6581_0_port_r )
 	/* db00 coprocessor */
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf6000, 0xf7fff) AM_WRITE( MWA8_ROM )
 	AM_RANGE(0xf8000, 0xfbfff) AM_WRITE( MWA8_ROM) AM_BASE( &cbmb_basic )
 	AM_RANGE(0xfd000, 0xfd7ff) AM_WRITE( videoram_w) AM_BASE( &videoram) AM_SIZE(&videoram_size ) /* VIDEORAM */
-	AM_RANGE(0xfd800, 0xfd8ff) AM_WRITE( crtc6845_0_port_w )
+	AM_RANGE(0xfd800, 0xfd8ff) AM_WRITE( mscrtc6845_0_port_w )
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_WRITE( sid6581_0_port_w)
 	/* db00 coprocessor */

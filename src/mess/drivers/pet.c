@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( pet40_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe881) AM_READWRITE(crtc6845_0_port_r, crtc6845_0_port_w)
+	AM_RANGE(0xe880, 0xe881) AM_READWRITE(mscrtc6845_0_port_r, mscrtc6845_0_port_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( pet80_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe881) AM_READWRITE(crtc6845_0_port_r, crtc6845_0_port_w)
+	AM_RANGE(0xe880, 0xe881) AM_READWRITE(mscrtc6845_0_port_r, mscrtc6845_0_port_w)
 #endif
 	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_BANK8)
 	AM_RANGE(0xf000, 0xffef) AM_WRITE(MWA8_BANK8)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( superpet_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe881) AM_READWRITE(crtc6845_0_port_r, crtc6845_0_port_w)
+	AM_RANGE(0xe880, 0xe881) AM_READWRITE(mscrtc6845_0_port_r, mscrtc6845_0_port_w)
 	/* 0xefe0, 0xefe3, mos 6702 */
 	/* 0xeff0, 0xeff3, acia6551 */
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( superpet_m6809_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe881) AM_READWRITE(crtc6845_0_port_r, crtc6845_0_port_w)
+	AM_RANGE(0xe880, 0xe881) AM_READWRITE(mscrtc6845_0_port_r, mscrtc6845_0_port_w)
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
