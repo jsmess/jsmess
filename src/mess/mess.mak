@@ -13,7 +13,7 @@ MESSOBJ = $(OBJ)/mess
 EMUSRC = $(SRC)/emu
 EMUOBJ = $(OBJ)/emu
 
-EMU_AUDIO = $(ENUOBJ)/audio
+EMU_AUDIO = $(EMUOBJ)/audio
 EMU_MACHINE = $(EMUOBJ)/machine
 EMU_VIDEO = $(EMUOBJ)/video
 MAME_AUDIO = $(MAMEOBJ)/audio
