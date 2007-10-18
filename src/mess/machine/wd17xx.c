@@ -875,7 +875,7 @@ static void wd17xx_verify_seek(wd17xx_info *w)
 
 	w->status |= STA_1_SEEK_ERR;
 
-	logerror("failed seek verify!");
+	logerror("failed seek verify!\n");
 }
 
 
