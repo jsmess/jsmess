@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-- ST Book [Curt Coder] (not working)
+- Atari STBook [Curt Coder] (not working)
 
 
 

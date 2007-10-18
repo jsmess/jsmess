@@ -73,7 +73,7 @@ TESTDRIVER( 3do_pal )
 //	DRIVER( stacy )		/* Atari STacy										*/
 	DRIVER( atariste )	/* Atari STe										*/
 	DRIVER( megaste )	/* Atari Mega STe									*/
-	DRIVER( stbook )	/* Atari ST Book									*/
+	DRIVER( stbook )	/* Atari STBook										*/
 //	DRIVER( tt030 )		/* Atari TT030										*/
 //	DRIVER( falcon )	/* Atari Falcon030									*/
 
