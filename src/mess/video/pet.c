@@ -10,7 +10,7 @@
 #include "video/generic.h"
 #include "mscommon.h"
 
-#include "includes/crtc6845.h"
+#include "video/crtc6845.h"
 #include "includes/pet.h"
 
 void pet_vh_init (void)
@@ -85,55 +85,23 @@ VIDEO_UPDATE( pet )
 	return 0;
 }
 
-//  commodore pet crtc video circuit for 40 columns display (standard mscrtc6845)
-VIDEO_UPDATE( pet40 )
-{
-	int x, y, i;
-	int w=mscrtc6845_get_char_columns(mscrtc6845);
-	int h=mscrtc6845_get_char_lines(mscrtc6845);
-	int height=mscrtc6845_get_char_height(mscrtc6845);
-	int start=mscrtc6845_get_start(mscrtc6845)&0x3ff;
 
-	for (y=0, i=start; y<h;y++)
-	{
-		for (x=0;x<w;x++, i=(i+1)&0x3ff)
-		{
-			drawgfx(bitmap,Machine->gfx[pet_font],
-					videoram[i], 0, 0, 0, 8*x,height*y,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		}
+void pet40_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+					  UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+	int i;
+
+	for( i = 0; i < x_count; i++ ) {
+		drawgfx( bitmap, Machine->gfx[pet_font], videoram[(ma+i)&0x3ff], 0, 0, 0, 8 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 	}
-	return 0;
 }
 
-// special hardware to allow crtc programmed for pet 40 column mode! to generate
-// 80 column display!
-VIDEO_UPDATE( pet80 )
-{
-	int x, y, i;
-	rectangle rect;
-	int w=mscrtc6845_get_char_columns(mscrtc6845);
-	int h=mscrtc6845_get_char_lines(mscrtc6845);
-	int height=mscrtc6845_get_char_height(mscrtc6845);
-	int start=mscrtc6845_get_start(mscrtc6845)&0x3ff;
+void pet80_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+					  UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+	int i;
 
-	rect.min_x = Machine->screen[0].visarea.min_x;
-	rect.max_x = Machine->screen[0].visarea.max_x;
-
-	for (y=0, rect.min_y=0, rect.max_y=height-1, i=start; y<h;
-		 y++, rect.min_y+=height, rect.max_y+=height)
-	{
-		for (x=0; x<w; x++, i=(i+1)&0x3ff)
-		{
-			drawgfx(bitmap,Machine->gfx[pet_font],
-					videoram[2*i], 0, 0, 0, 16*x,height*y,
-					&rect,TRANSPARENCY_NONE,0);
-
-			drawgfx(bitmap,Machine->gfx[pet_font],
-					videoram[2*i+1], 0, 0, 0, 16*x+8,height*y,
-					&rect,TRANSPARENCY_NONE,0);
-		}
+	for( i = 0; i < x_count; i++ ) {
+		drawgfx( bitmap, Machine->gfx[pet_font], videoram[((ma+i)<<1)&0x7ff], 0, 0, 0, 16 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+		drawgfx( bitmap, Machine->gfx[pet_font], videoram[(((ma+i)<<1)+1)&0x7ff], 0, 0, 0, 16 * i + 8, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 	}
-	return 0;
 }
 

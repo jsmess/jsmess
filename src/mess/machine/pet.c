@@ -19,7 +19,7 @@
 #include "includes/pet.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-#include "includes/crtc6845.h"
+#include "video/crtc6845.h"
 
 /* keyboard lines */
 static UINT8 pet_keyline[10] = { 0 };
@@ -231,7 +231,8 @@ static WRITE8_HANDLER(cbm8096_io_w)
 	else if (offset<0x40) ;
 	else if (offset<0x50) via_0_w(offset&0xf,data);
 	else if (offset<0x80) ;
-	else if (offset<0x82) mscrtc6845_0_port_w(offset&1,data);
+	else if (offset == 0x80) crtc6845_0_address_w(offset&1, data);
+	else if (offset == 0x81) crtc6845_0_register_w(offset&1,data);
 }
 
 static  READ8_HANDLER(cbm8096_io_r)
@@ -244,7 +245,7 @@ static  READ8_HANDLER(cbm8096_io_r)
 	else if (offset<0x40) ;
 	else if (offset<0x50) data=via_0_r(offset&0xf);
 	else if (offset<0x80) ;
-	else if (offset<0x82) data=mscrtc6845_0_port_r(offset&1);
+	else if (offset == 0x81) data=crtc6845_0_register_r(offset&1);
 	return data;
 }
 
@@ -452,13 +453,35 @@ DRIVER_INIT( pet1 )
 	pet_vh_init();
 }
 
-static struct mscrtc6845_config crtc_pet = { 800000 /*?*/};
+//static struct mscrtc6845_config crtc_pet = { 800000 /*?*/};
+static void pet_display_enable_changed(int display_enabled) {
+}
+
+const static crtc6845_interface crtc_pet40 = {
+	0,
+	800000 /*?*/,
+	8 /*?*/,
+	NULL,
+	pet40_update_row,
+	NULL,
+	pet_display_enable_changed
+};
+
+const static crtc6845_interface crtc_pet80 = {
+	0,
+	800000 /*?*/,
+	16 /*?*/,
+	NULL,
+	pet80_update_row,
+	NULL,
+	pet_display_enable_changed
+};
 
 DRIVER_INIT( pet40 )
 {
 	pet_common_driver_init ();
 	pet_vh_init();
-	mscrtc6845_init(&crtc_pet);
+	crtc6845_config( 0, &crtc_pet40);
 }
 
 DRIVER_INIT( cbm80 )
@@ -470,7 +493,7 @@ DRIVER_INIT( cbm80 )
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
 	pet80_vh_init();
-	mscrtc6845_init(&crtc_pet);
+	crtc6845_config( 0, &crtc_pet80);
 }
 
 DRIVER_INIT( superpet )
@@ -484,7 +507,7 @@ DRIVER_INIT( superpet )
 	memory_set_bank(1, 0);
 
 	superpet_vh_init();
-	mscrtc6845_init(&crtc_pet);
+	crtc6845_config( 0, &crtc_pet80);
 }
 
 MACHINE_RESET( pet )

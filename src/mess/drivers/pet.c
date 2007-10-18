@@ -121,7 +121,7 @@ when problems start with -log and look into error.log file
 #include "machine/6522via.h"
 #include "video/generic.h"
 #include "includes/pet.h"
-#include "includes/crtc6845.h"
+#include "video/crtc6845.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
 /*#include "includes/vc1541.h" */
@@ -142,7 +142,8 @@ static ADDRESS_MAP_START( pet40_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe881) AM_READWRITE(mscrtc6845_0_port_r, mscrtc6845_0_port_w)
+	AM_RANGE(0xe880, 0xe880) AM_WRITE( crtc6845_0_address_w )
+	AM_RANGE(0xe881, 0xe881) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -158,7 +159,8 @@ static ADDRESS_MAP_START( pet80_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe881) AM_READWRITE(mscrtc6845_0_port_r, mscrtc6845_0_port_w)
+	AM_RANGE(0xe880, 0xe880) AM_WRITE( crtc6845_0_address_w )
+	AM_RANGE(0xe881, 0xe881) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
 #endif
 	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_BANK8)
 	AM_RANGE(0xf000, 0xffef) AM_WRITE(MWA8_BANK8)
@@ -188,7 +190,8 @@ static ADDRESS_MAP_START( superpet_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe881) AM_READWRITE(mscrtc6845_0_port_r, mscrtc6845_0_port_w)
+	AM_RANGE(0xe880, 0xe880) AM_WRITE(crtc6845_0_address_w)
+	AM_RANGE(0xe881, 0xe881) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
 	/* 0xefe0, 0xefe3, mos 6702 */
 	/* 0xeff0, 0xeff3, acia6551 */
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
@@ -203,7 +206,8 @@ static ADDRESS_MAP_START( superpet_m6809_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe881) AM_READWRITE(mscrtc6845_0_port_r, mscrtc6845_0_port_w)
+	AM_RANGE(0xe880, 0xe880) AM_WRITE(crtc6845_0_address_w)
+	AM_RANGE(0xe881, 0xe881) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -841,7 +845,7 @@ static MACHINE_DRIVER_START( pet40 )
 	MDRV_IMPORT_FROM( pet )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( pet40_mem, 0 )
-	MDRV_VIDEO_UPDATE( pet40 )
+	MDRV_VIDEO_UPDATE( crtc6845 )
 MACHINE_DRIVER_END
 
 
@@ -862,7 +866,7 @@ static MACHINE_DRIVER_START( pet80 )
 	MDRV_SCREEN_SIZE(640, 250)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MDRV_GFXDECODE( pet80_gfxdecodeinfo )
-	MDRV_VIDEO_UPDATE( pet80 )
+	MDRV_VIDEO_UPDATE( crtc6845 )
 MACHINE_DRIVER_END
 
 

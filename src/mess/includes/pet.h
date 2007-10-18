@@ -13,9 +13,10 @@ extern void pet_vh_init (void);
 extern void pet80_vh_init (void);
 extern void superpet_vh_init (void);
 extern VIDEO_UPDATE( pet );
-extern VIDEO_UPDATE( pet40 );
-extern VIDEO_UPDATE( pet80 );
-extern VIDEO_UPDATE( superpet );
+void pet40_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+					  UINT8 ra, UINT16 y, UINT8 x_count, void *param);
+void pet80_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+					  UINT8 ra, UINT16 y, UINT8 x_count, void *param);
 
 extern int pet_font;
 
