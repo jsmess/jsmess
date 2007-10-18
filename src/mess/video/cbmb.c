@@ -62,19 +62,29 @@ void cbmb_vh_set_font(int font)
 	cbmb_font=font;
 }
 
-void cbm600_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+void cbm600_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+					   UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
-		drawgfx( bitmap, Machine->gfx[cbmb_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, Machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+//		if ( ma + i == cursor_ma ) {
+//			plot_box( bitmap, Machine->gfx[cbmb_font]->width * i, y, Machine->gfx[cbmb_font]->width, 1, Machine->pens[1] );
+//		} else {
+			drawgfx( bitmap, Machine->gfx[cbmb_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, Machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+//		}
 	}
 }
 
-void cbm700_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+void cbm700_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+					   UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
-		drawgfx( bitmap, Machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, Machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+//		if ( ma + i == cursor_ma ) {
+//			plot_box( bitmap, Machine->gfx[cbmb_font]->width * i, y, Machine->gfx[cbmb_font]->width, 1, Machine->pens[1] );
+//		} else {
+			drawgfx( bitmap, Machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, Machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+//		}
 	}
 }
 
