@@ -3,6 +3,15 @@
 
 #define MAX_ACIA 4
 
+#define ACIA6850_STATUS_RDRF	0x01
+#define ACIA6850_STATUS_TDRE	0x02
+#define ACIA6850_STATUS_DCD		0x04
+#define ACIA6850_STATUS_CTS		0x08
+#define ACIA6850_STATUS_FE		0x10
+#define ACIA6850_STATUS_OVRN	0x20
+#define ACIA6850_STATUS_PE		0x40
+#define ACIA6850_STATUS_IRQ		0x80
+
 struct acia6850_interface
 {
 	int	tx_clock;
@@ -10,6 +19,9 @@ struct acia6850_interface
 
 	UINT8 *rx_pin;
 	UINT8 *tx_pin;
+	UINT8 *cts_pin;
+	UINT8 *rts_pin;
+	UINT8 *dcd_pin;
 
 	void (*int_callback)(int state);
 };

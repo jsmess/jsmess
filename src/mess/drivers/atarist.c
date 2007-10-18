@@ -24,7 +24,6 @@
 
 	- MSA disk image support
 	- find missing UK TOS roms
-	- rewrite HD6301 cpu core for serial I/O
 	- UK keyboard layout for the special keys
 	- accurate screen timing
 	- floppy DMA transfer timer
@@ -501,15 +500,15 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 	
 	if (dmasound.ctrl & 0x80)
 	{
-		logerror("DMA sound left  %i\n", dmasound.fifo[7 - dmasound.samples]);
+//		logerror("DMA sound left  %i\n", dmasound.fifo[7 - dmasound.samples]);
 		dmasound.samples--;
 
-		logerror("DMA sound right %i\n", dmasound.fifo[7 - dmasound.samples]);
+//		logerror("DMA sound right %i\n", dmasound.fifo[7 - dmasound.samples]);
 		dmasound.samples--;
 	}
 	else
 	{
-		logerror("DMA sound mono %i\n", dmasound.fifo[7 - dmasound.samples]);
+//		logerror("DMA sound mono %i\n", dmasound.fifo[7 - dmasound.samples]);
 		dmasound.samples--;
 	}
 
@@ -1204,7 +1203,7 @@ static struct AY8910interface ym2149_interface =
 /* Machine Drivers */
 
 static int acia_irq;
-static UINT8 acia_midi_rx, acia_midi_tx;
+static UINT8 acia_midi_rx = 1, acia_midi_tx = 1;
 
 static void acia_interrupt(int state)
 {
@@ -1217,6 +1216,9 @@ static struct acia6850_interface acia_ikbd_intf =
 	Y2/64,
 	&ikbd.rx,
 	&ikbd.tx,
+	NULL,
+	NULL,
+	NULL,
 	acia_interrupt
 };
 
@@ -1226,6 +1228,9 @@ static struct acia6850_interface acia_midi_intf =
 	Y2/64,
 	&acia_midi_rx,
 	&acia_midi_tx,
+	NULL,
+	NULL,
+	NULL,
 	acia_interrupt
 };
 

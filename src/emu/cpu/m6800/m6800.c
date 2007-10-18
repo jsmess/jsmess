@@ -112,11 +112,18 @@ typedef struct
 	PAIR	output_compare;	/* output compare       */
 	UINT16	input_capture;	/* input capture        */
 
+	int		clock;
+	UINT8	trcsr, rmcr, rdr, tdr, rsr, tsr;
+	int		rxbits, txbits, txstate, trcsr_read, tx;
+
 	PAIR	timer_over;
 }   m6800_Regs;
 
 /* 680x registers */
 static m6800_Regs m6800;
+
+static mame_timer *m6800_rx_timer;
+static mame_timer *m6800_tx_timer;
 
 #define m6801   m6800
 #define m6802   m6800
@@ -197,33 +204,44 @@ static UINT32 timer_next;
 	SET_TIMER_EVENT;							\
 }
 
+// serial I/O
+
+#define M6800_RMCR_SS_MASK		0x03 // Speed Select
+#define M6800_RMCR_SS_4096		0x03 // E / 4096
+#define M6800_RMCR_SS_1024		0x02 // E / 1024
+#define M6800_RMCR_SS_128		0x01 // E / 128
+#define M6800_RMCR_SS_16		0x00 // E / 16
+#define M6800_RMCR_CC_MASK		0x0c // Clock Control/Format Select
+
+#define M6800_TRCSR_RDRF		0x80 // Receive Data Register Full
+#define M6800_TRCSR_ORFE		0x40 // Over Run Framing Error
+#define M6800_TRCSR_TDRE		0x20 // Transmit Data Register Empty
+#define M6800_TRCSR_RIE		0x10 // Receive Interrupt Enable
+#define M6800_TRCSR_RE			0x08 // Receive Enable
+#define M6800_TRCSR_TIE		0x04 // Transmit Interrupt Enable
+#define M6800_TRCSR_TE			0x02 // Transmit Enable
+#define M6800_TRCSR_WU			0x01 // Wake Up
+
+#define M6800_PORT2_IO4		0x10
+#define M6800_PORT2_IO3		0x08
+
+static const int M6800_RMCR_SS[] = { 16, 128, 1024, 4096 };
+
+#define M6800_SERIAL_START		0
+#define M6800_SERIAL_STOP		9
+
+enum
+{
+	M6800_TX_STATE_INIT = 0,
+	M6800_TX_STATE_READY
+};
+
 /* take interrupt */
 #define TAKE_ICI ENTER_INTERRUPT("M6800#%d take ICI\n",0xfff6)
 #define TAKE_OCI ENTER_INTERRUPT("M6800#%d take OCI\n",0xfff4)
 #define TAKE_TOI ENTER_INTERRUPT("M6800#%d take TOI\n",0xfff2)
 #define TAKE_SCI ENTER_INTERRUPT("M6800#%d take SCI\n",0xfff0)
 #define TAKE_TRAP ENTER_INTERRUPT("M6800#%d take TRAP\n",0xffee)
-
-/* check IRQ2 (internal irq) */
-#define CHECK_IRQ2 {											\
-	if(m6800.irq2&(TCSR_ICF|TCSR_OCF|TCSR_TOF))					\
-	{															\
-		if(m6800.irq2&TCSR_ICF)									\
-		{														\
-			TAKE_ICI;											\
-			if( m6800.irq_callback )							\
-				(void)(*m6800.irq_callback)(M6800_TIN_LINE);	\
-		}														\
-		else if(m6800.irq2&TCSR_OCF)							\
-		{														\
-			TAKE_OCI;											\
-		}														\
-		else if(m6800.irq2&TCSR_TOF)							\
-		{														\
-			TAKE_TOI;											\
-		}														\
-	}															\
-}
 
 /* operate one instruction for */
 #define ONE_MORE_INSN() {		\
@@ -247,7 +265,7 @@ static UINT32 timer_next;
 				(void)(*m6800.irq_callback)(M6800_IRQ_LINE);	\
 		}														\
 		else													\
-			CHECK_IRQ2;											\
+			m6800_check_irq2();									\
 	}															\
 }
 
@@ -511,6 +529,30 @@ static void ENTER_INTERRUPT(const char *message,UINT16 irq_vector)
 	CHANGE_PC();
 }
 
+void m6800_check_irq2(void)
+{
+	if ((m6800.tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF))
+	{
+		TAKE_ICI;
+		if( m6800.irq_callback )
+			(void)(*m6800.irq_callback)(M6800_TIN_LINE);
+	}
+	else if ((m6800.tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF))
+	{
+		TAKE_OCI;
+	}
+	else if ((m6800.tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF))
+	{
+		TAKE_TOI;
+	}
+	else if (((m6800.trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_RDRF)) == (M6800_TRCSR_RIE|M6800_TRCSR_RDRF)) ||
+			 ((m6800.trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) == (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) ||
+			 ((m6800.trcsr & (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)) == (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)))
+	{
+		TAKE_SCI;
+	}
+}
+
 /* check OCI or TOI */
 static void check_timer_event(void)
 {
@@ -546,6 +588,201 @@ static void check_timer_event(void)
 
 /* include the opcode functions */
 #include "6800ops.c"
+
+static void m6800_tx(int value)
+{
+	m6800.port2_data = (m6800.port2_data & 0xef) | (value << 4);
+
+	if(m6800.port2_ddr == 0xff)
+		io_write_byte_8(M6803_PORT2,m6800.port2_data);
+	else
+		io_write_byte_8(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
+			| (io_read_byte_8(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
+}
+
+static int m6800_rx(void)
+{
+	return (io_read_byte_8(M6803_PORT2) & M6800_PORT2_IO3) >> 3;
+}
+
+static TIMER_CALLBACK(m6800_tx_tick)
+{
+    int cpunum = param;
+
+	if (m6800.trcsr & M6800_TRCSR_TE)
+	{
+		// force Port 2 bit 4 as output
+		m6800.port2_ddr |= M6800_PORT2_IO4;
+
+		switch (m6800.txstate)
+		{
+		case M6800_TX_STATE_INIT:
+			m6800.tx = 1;
+			m6800.txbits++;
+
+			if (m6800.txbits == 10)
+			{
+				m6800.txstate = M6800_TX_STATE_READY;
+				m6800.txbits = M6800_SERIAL_START;
+			}
+			break;
+
+		case M6800_TX_STATE_READY:
+			switch (m6800.txbits)
+			{
+			case M6800_SERIAL_START:
+				if (m6800.trcsr & M6800_TRCSR_TDRE)
+				{
+					// transmit buffer is empty, send consecutive '1's
+					m6800.tx = 1;
+				}
+				else
+				{
+					// transmit buffer is full, send data
+
+					// load TDR to shift register
+					m6800.tsr = m6800.tdr;
+
+					// transmit buffer is empty, set TDRE flag
+					m6800.trcsr |= M6800_TRCSR_TDRE;
+
+					// send start bit '0'
+					m6800.tx = 0;
+
+					m6800.txbits++;
+				}
+				break;
+
+			case M6800_SERIAL_STOP:
+				// send stop bit '1'
+				m6800.tx = 1;
+
+			    cpuintrf_push_context(cpunum);
+				CHECK_IRQ_LINES();
+				cpuintrf_pop_context();
+
+				m6800.txbits = M6800_SERIAL_START;
+				break;
+
+			default:
+				// send data bit '0' or '1'
+				m6800.tx = m6800.tsr & 0x01;
+
+				// shift transmit register
+				m6800.tsr >>= 1;
+
+				m6800.txbits++;
+				break;
+			}
+			break;
+		}
+	}
+
+	m6800_tx(m6800.tx);
+}
+
+static TIMER_CALLBACK(m6800_rx_tick)
+{
+    int cpunum = param;
+
+	if (m6800.trcsr & M6800_TRCSR_RE)
+	{
+		if (m6800.trcsr & M6800_TRCSR_WU)
+		{
+			// wait for 10 bits of '1'
+
+			if (m6800_rx() == 1)
+			{
+				m6800.rxbits++;
+
+				if (m6800.rxbits == 10)
+				{
+					m6800.trcsr &= ~M6800_TRCSR_WU;
+					m6800.rxbits = M6800_SERIAL_START;
+				}
+			}
+			else
+			{
+				m6800.rxbits = M6800_SERIAL_START;
+			}
+		}
+		else
+		{
+			// receive data
+
+			switch (m6800.rxbits)
+			{
+			case M6800_SERIAL_START:
+				if (m6800_rx() == 0)
+				{
+					// start bit found
+					m6800.rxbits++;
+				}
+				break;
+
+			case M6800_SERIAL_STOP:
+				if (m6800_rx() == 1)
+				{
+					if (m6800.trcsr & M6800_TRCSR_RDRF)
+					{
+						// overrun error
+
+						m6800.trcsr |= M6800_TRCSR_ORFE;
+
+					    cpuintrf_push_context(cpunum);
+						CHECK_IRQ_LINES();
+						cpuintrf_pop_context();
+					}
+					else
+					{
+						if (!(m6800.trcsr & M6800_TRCSR_ORFE))
+						{
+							// transfer data into receive register
+							m6800.rdr = m6800.rsr;
+
+							// set RDRF flag
+							m6800.trcsr |= M6800_TRCSR_RDRF;
+
+							cpuintrf_push_context(cpunum);
+							CHECK_IRQ_LINES();
+							cpuintrf_pop_context();
+						}
+					}
+				}
+				else
+				{
+					// framing error
+
+					if (!(m6800.trcsr & M6800_TRCSR_ORFE))
+					{
+						// transfer unframed data into receive register
+						m6800.rdr = m6800.rsr;
+					}
+
+					m6800.trcsr |= M6800_TRCSR_ORFE;
+					m6800.trcsr &= ~M6800_TRCSR_RDRF;
+
+					cpuintrf_push_context(cpunum);
+					CHECK_IRQ_LINES();
+					cpuintrf_pop_context();
+				}
+
+				m6800.rxbits = M6800_SERIAL_START;
+				break;
+
+			default:
+				// shift receive register
+				m6800.rsr >>= 1;
+
+				// receive bit into register
+				m6800.rsr |= (m6800_rx() << 7);
+
+				m6800.rxbits++;
+				break;
+			}
+		}
+	}
+}
 
 /****************************************************************************
  * Reset registers to their initial values
@@ -609,6 +846,16 @@ static void m6800_reset(void)
 	OCD = 0xffff;
 	TOD = 0xffff;
 	m6800.ram_ctrl |= 0x40;
+
+#if (HAS_HD63701)
+	m6800.trcsr = M6800_TRCSR_TDRE;
+	m6800.rmcr = 0;
+	mame_timer_enable(m6800_rx_timer, 0);
+	mame_timer_enable(m6800_tx_timer, 0);
+	m6800.txstate = M6800_TX_STATE_INIT;
+	m6800.txbits = m6800.rxbits = 0;
+	m6800.trcsr_read = 0;
+#endif
 }
 
 /****************************************************************************
@@ -676,7 +923,7 @@ static void set_irq_line(int irqline, int state)
 			m6800.input_capture = CT;
 			MODIFIED_tcsr;
 			if( !(CC & 0x10) )
-				CHECK_IRQ2
+				m6800_check_irq2();
 			break;
 		default:
 			return;
@@ -1348,12 +1595,18 @@ static void m6808_init(int index, int clock, const void *config, int (*irqcallba
  * HD63701 similiar to the M6800
  ****************************************************************************/
 #if (HAS_HD63701)
+
 static void hd63701_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 //  m6800.subtype = SUBTYPE_HD63701;
 	m6800.insn = hd63701_insn;
 	m6800.cycles = cycles_63701;
 	m6800.irq_callback = irqcallback;
+
+	m6800.clock = clock;
+	m6800_rx_timer = mame_timer_alloc(m6800_rx_tick);
+	m6800_tx_timer = mame_timer_alloc(m6800_tx_tick);
+
 	state_register("hd63701", index);
 }
 /****************************************************************************
@@ -2012,7 +2265,6 @@ static READ8_HANDLER( m6803_internal_registers_r )
 					| (m6800.port4_data & m6800.port4_ddr);
 		case 0x08:
 			m6800.pending_tcsr = 0;
-//logerror("CPU #%d PC %04x: warning - read TCSR register\n",cpu_getactivecpu(),activecpu_get_pc());
 			return m6800.tcsr;
 		case 0x09:
 			if(!(m6800.pending_tcsr&TCSR_TOF))
@@ -2047,12 +2299,22 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x0e:
 			return (m6800.input_capture >> 8) & 0xff;
 		case 0x0f:
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x13:
-			logerror("CPU #%d PC %04x: warning - read from unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+			logerror("CPU #%d PC %04x: warning - read from unsupported register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
 			return 0;
+		case 0x10:
+			return m6800.rmcr;
+		case 0x11:
+			m6800.trcsr_read = 1;
+			return m6800.trcsr;
+		case 0x12:
+			if (m6800.trcsr_read)
+			{
+				m6800.trcsr_read = 0;
+				m6800.trcsr = m6800.trcsr & 0x3f;
+			}
+			return m6800.rdr;
+		case 0x13:
+			return m6800.tdr;
 		case 0x14:
 			logerror("CPU #%d PC %04x: read RAM control register\n",cpu_getactivecpu(),activecpu_get_pc());
 			return m6800.ram_ctrl;
@@ -2113,8 +2375,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 					| (io_read_byte_8(M6803_PORT1) & (m6800.port1_ddr ^ 0xff)));
 			break;
 		case 0x03:
-			m6800.port2_data = data;
-			m6800.port2_ddr = data;
+			m6800.port2_data = (m6800.port2_data & 0xef) | (m6800.tx << 4);
 			if(m6800.port2_ddr == 0xff)
 				io_write_byte_8(M6803_PORT2,m6800.port2_data);
 			else
@@ -2164,8 +2425,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			m6800.pending_tcsr &= m6800.tcsr;
 			MODIFIED_tcsr;
 			if( !(CC & 0x10) )
-				CHECK_IRQ2;
-//logerror("CPU #%d PC %04x: TCSR = %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data);
+				m6800_check_irq2();
 			break;
 		case 0x09:
 			latch09 = data & 0xff;	/* 6301 only */
@@ -2194,14 +2454,48 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			break;
 		case 0x0d:
 		case 0x0e:
+		case 0x12:
 			logerror("CPU #%d PC %04x: warning - write %02x to read only internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 			break;
 		case 0x0f:
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x13:
 			logerror("CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			break;
+		case 0x10:
+			m6800.rmcr = data & 0x0f;
+
+			switch ((m6800.rmcr & M6800_RMCR_CC_MASK) >> 2)
+			{
+			case 0:
+			case 3: // not implemented
+				mame_timer_enable(m6800_rx_timer, 0);
+				mame_timer_enable(m6800_tx_timer, 0);
+				break;
+
+			case 1:
+			case 2:
+				{
+					int divisor = M6800_RMCR_SS[m6800.rmcr & M6800_RMCR_SS_MASK];
+
+					mame_timer_adjust(m6800_rx_timer, time_zero, cpu_getactivecpu(), MAME_TIME_IN_HZ(m6800.clock / divisor));
+					mame_timer_adjust(m6800_tx_timer, time_zero, cpu_getactivecpu(), MAME_TIME_IN_HZ(m6800.clock / divisor));
+				}
+				break;
+			}
+			break;
+		case 0x11:
+			if ((data & M6800_TRCSR_TE) && !(m6800.trcsr & M6800_TRCSR_TE))
+			{
+				m6800.txstate = M6800_TX_STATE_INIT;
+			}
+			m6800.trcsr = (m6800.trcsr & 0xe0) | (data & 0x1f);
+			break;
+		case 0x13:
+			if (m6800.trcsr_read)
+			{
+				m6800.trcsr_read = 0;
+				m6800.trcsr &= ~M6800_TRCSR_TDRE;
+			}
+			m6800.tdr = data;
 			break;
 		case 0x14:
 			logerror("CPU #%d PC %04x: write %02x to RAM control register\n",cpu_getactivecpu(),activecpu_get_pc(),data);
@@ -2277,7 +2571,7 @@ void m6800_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 9;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 

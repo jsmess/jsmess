@@ -1,8 +1,7 @@
 /*
     6850 ACIA
-
-    Preliminary and not yet tested outside of bfcobra.c!
 */
+
 #include "driver.h"
 #include "timer.h"
 #include "6850acia.h"
@@ -12,22 +11,13 @@
 #define CR6_5	0x60
 #define CR7		0x80
 
-#define STATUS_RDRF	0x01
-#define STATUS_TDRE	0x02
-#define STATUS_DCD	0x04
-#define STATUS_CTS	0x08
-#define STATUS_FE	0x10
-#define STATUS_OVRN	0x20
-#define STATUS_PE	0x40
-#define STATUS_IRQ	0x80
-
 enum serial_state
 {
 	START,
 	DATA,
 	PARITY,
 	STOP,
-	COMPLETE
+	STOP2,
 };
 
 enum parity_type
@@ -37,18 +27,18 @@ enum parity_type
 	EVEN
 };
 
-static const int div_type[3] = { 1, 16, 64 };
+static const int ACIA6850_DIVIDE[3] = { 1, 16, 64 };
 
-static const int wordtype [8][3] =
+static const int ACIA6850_WORD[8][3] =
 {
-	{7, EVEN, 2},
-	{7, ODD, 2},
-	{7, EVEN, 1},
-	{7, ODD, 1},
-	{8, NONE, 2},
-	{8, NONE, 1},
-	{8, EVEN, 1},
-	{8, ODD, 1}
+	{ 7, EVEN, 2 },
+	{ 7, ODD,  2 },
+	{ 7, EVEN, 1 },
+	{ 7, ODD,  1 },
+	{ 8, NONE, 2 },
+	{ 8, NONE, 1 },
+	{ 8, EVEN, 1 },
+	{ 8, ODD,  1 }
 };
 
 typedef struct _acia_6850_
@@ -58,6 +48,9 @@ typedef struct _acia_6850_
 
 	UINT8	*rx_pin;
 	UINT8	*tx_pin;
+	UINT8	*cts_pin;
+	UINT8	*rts_pin;
+	UINT8	*dcd_pin;
 
 	UINT8	tdr;
 	UINT8	rdr;
@@ -79,10 +72,15 @@ typedef struct _acia_6850_
 	int	bits;
 	enum 	parity_type parity;
 	int	stopbits;
+	int tx_int;
 
 	/* Signals */
 	int	overrun;
 	int	reset;
+	int rts;
+	int brk;
+	int first_reset;
+	int status_read;
 	enum 	serial_state rx_state;
 	enum 	serial_state tx_state;
 
@@ -100,19 +98,55 @@ static TIMER_CALLBACK( transmit_event );
 /*
     Reset the chip
 */
-static void reset(int which)
+static void acia6850_reset(int which)
 {
 	acia_6850 *acia_p = &acia[which];
+	int cts = 0, dcd = 0;
 
-	acia_p->status = STATUS_TDRE;
+	if (acia_p->cts_pin)
+	{
+		cts = *acia_p->cts_pin;
+	}
+
+	if (acia_p->dcd_pin)
+	{
+		dcd = *acia_p->dcd_pin;
+	}
+
+	acia_p->status = (cts << 3) | (dcd << 2) | ACIA6850_STATUS_TDRE;
 	acia_p->tdr = 0;
 	acia_p->rdr = 0;
 	acia_p->tx_shift = 0;
 	acia_p->rx_shift = 0;
 	*acia_p->tx_pin = 1;
+	acia_p->overrun = 0;
+	acia_p->status_read = 0;
+	acia_p->brk = 0;
 
-	acia_p->tx_state = START;
 	acia_p->rx_state = START;
+	acia_p->tx_state = START;
+
+	if (acia_p->int_callback)
+	{
+		acia_p->int_callback(1);
+	}
+
+	if (acia_p->first_reset)
+	{
+		acia_p->first_reset = 0;
+		
+		if (acia_p->rts_pin)
+		{
+			*acia_p->rts_pin = 1;
+		}
+	}
+	else
+	{
+		if (acia_p->rts_pin)
+		{
+			*acia_p->rts_pin = acia_p->rts;
+		}
+	}
 }
 
 /*
@@ -131,15 +165,18 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	acia_p->tx_clock = intf->tx_clock;
 	acia_p->rx_pin = intf->rx_pin;
 	acia_p->tx_pin = intf->tx_pin;
+	acia_p->cts_pin = intf->cts_pin;
+	acia_p->rts_pin = intf->rts_pin;
+	acia_p->dcd_pin = intf->rts_pin;
 	acia_p->rx_timer = mame_timer_alloc(receive_event);
 	acia_p->tx_timer = mame_timer_alloc(transmit_event);
 	acia_p->int_callback = intf->int_callback;
+	acia_p->first_reset = 1;
+	acia_p->status_read = 0;
+	acia_p->brk = 0;
 
 	mame_timer_reset(acia_p->rx_timer, time_never);
 	mame_timer_reset(acia_p->tx_timer, time_never);
-
-	// TODO
-	*acia_p->tx_pin = 1;
 
 	state_save_register_item("acia6850", which, acia_p->ctrl);
 	state_save_register_item("acia6850", which, acia_p->status);
@@ -153,10 +190,15 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	state_save_register_item("acia6850", which, acia_p->tx_bits);
 	state_save_register_item("acia6850", which, acia_p->rx_parity);
 	state_save_register_item("acia6850", which, acia_p->tx_parity);
+	state_save_register_item("acia6850", which, acia_p->tx_int);
 
 	state_save_register_item("acia6850", which, acia_p->divide);
 	state_save_register_item("acia6850", which, acia_p->overrun);
 	state_save_register_item("acia6850", which, acia_p->reset);
+	state_save_register_item("acia6850", which, acia_p->first_reset);
+	state_save_register_item("acia6850", which, acia_p->rts);
+	state_save_register_item("acia6850", which, acia_p->brk);
+	state_save_register_item("acia6850", which, acia_p->status_read);
 }
 
 /*
@@ -164,7 +206,11 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 */
 UINT8 acia6850_stat_r(int which)
 {
-	return acia[which].status;
+	acia_6850 *acia_p = &acia[which];
+
+	acia_p->status_read = 1;
+	
+	return acia_p->status;
 }
 
 /*
@@ -172,68 +218,131 @@ UINT8 acia6850_stat_r(int which)
 */
 void acia6850_ctrl_w(int which, UINT8 data)
 {
+	acia_6850 *acia_p = &acia[which];
+
 	int wordsel;
 	int divide;
-	acia_6850 *acia_p = &acia[which];
 
 	acia_p->ctrl = data;
 
-	/* 1. Counter divide select */
+	// Counter Divide Select Bits
+
 	divide = data & CR1_0;
 
 	if (divide == 3)
 	{
 		acia_p->reset = 1;
-		reset(which);
+		acia6850_reset(which);
 	}
 	else
 	{
 		acia_p->reset = 0;
-		acia_p->divide = div_type[divide];
+		acia_p->divide = ACIA6850_DIVIDE[divide];
 	}
 
-	/* 2. Word type */
+	// Word Select Bits
+
 	wordsel = (data & CR4_2) >> 2;
-	acia_p->bits = wordtype[wordsel][0];
-	acia_p->parity = wordtype[wordsel][1];
-	acia_p->stopbits = wordtype[wordsel][2];
 
-	/* 3. TX Control (TODO) */
+	acia_p->bits = ACIA6850_WORD[wordsel][0];
+	acia_p->parity = ACIA6850_WORD[wordsel][1];
+	acia_p->stopbits = ACIA6850_WORD[wordsel][2];
 
-	/* After writing the word type, start receive clock */
-	if(!acia_p->reset)
+	// Transmitter Control Bits
+
+	switch ((data & CR6_5) >> 5)
 	{
-		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
-		/* TODO! */
-		mame_timer_adjust(acia_p->rx_timer, period, which, period);
+	case 0:
+		if (acia_p->rts_pin)
+		{
+			*acia_p->rts_pin = acia_p->rts = 0;
+		}
+
+		acia_p->tx_int = 0;
+		acia_p->brk = 0;
+		break;
+
+	case 1:
+		if (acia_p->rts_pin)
+		{
+			*acia_p->rts_pin = acia_p->rts = 0;
+		}
+
+		acia_p->tx_int = 1;
+		acia_p->brk = 0;
+		break;
+
+	case 2:
+		if (acia_p->rts_pin)
+		{
+			*acia_p->rts_pin = acia_p->rts = 1;
+		}
+
+		acia_p->tx_int = 0;
+		acia_p->brk = 0;
+		break;
+
+	case 3:
+		if (acia_p->rts_pin)
+		{
+			*acia_p->rts_pin = acia_p->rts = 0;
+		}
+
+		acia_p->tx_int = 0;
+		acia_p->brk = 1;
+		break;
+	}
+
+	// After writing the word type, start receive clock
+
+	if (!acia_p->reset)
+	{
+		mame_time rx_period = scale_up_mame_time(MAME_TIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
+		mame_time tx_period = scale_up_mame_time(MAME_TIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
+		mame_timer_adjust(acia_p->rx_timer, rx_period, which, rx_period);
+		mame_timer_adjust(acia_p->tx_timer, tx_period, which, tx_period);
 	}
 }
 
-static TIMER_CALLBACK( tdr_to_shift )
+void acia6850_check_interrupts(int which)
 {
-		int which = param;
+	acia_6850 *acia_p = &acia[which];
 
-		acia_6850 *acia_p = &acia[which];
-		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
+	int irq = (acia_p->tx_int && (acia_p->status & ACIA6850_STATUS_TDRE)) ||
+		((acia_p->ctrl & 0x80) && ((acia_p->status & (ACIA6850_STATUS_RDRF|ACIA6850_STATUS_DCD)) || acia_p->overrun));
 
-		acia_p->tx_shift = acia[which].tdr;
-		acia_p->status &= ~STATUS_TDRE;
+	if (irq)
+	{
+		acia_p->status |= ACIA6850_STATUS_IRQ;
 
-		/* Start the transmit timer */
-		mame_timer_adjust(acia_p->tx_timer, period, which, period);
+		if (acia_p->int_callback)
+		{
+			acia_p->int_callback(0);
+		}
+	}
+	else
+	{
+		acia_p->status &= ~ACIA6850_STATUS_IRQ;
+
+		if (acia_p->int_callback)
+		{
+			acia_p->int_callback(1);
+		}
+	}
 }
-
 
 /*
     Write transmit register
 */
 void acia6850_data_w(int which, UINT8 data)
 {
-	if (!acia[which].reset)
+	acia_6850 *acia_p = &acia[which];
+
+	if (!acia_p->reset)
 	{
-		acia[which].tdr = data;
-		timer_call_after_resynch(which, tdr_to_shift);
-		//printf("ACIA %d Transmit: %x (%c)\n", which, data, data);
+		acia_p->tdr = data;
+		acia_p->status &= ~ACIA6850_STATUS_TDRE;
+		acia6850_check_interrupts(which);
 	}
 	else
 	{
@@ -246,14 +355,31 @@ void acia6850_data_w(int which, UINT8 data)
 */
 UINT8 acia6850_data_r(int which)
 {
-	acia[which].status &= ~(STATUS_RDRF | STATUS_IRQ | STATUS_PE | STATUS_OVRN);
+	acia_6850 *acia_p = &acia[which];
 
-	if (acia[which].int_callback)
-		acia[which].int_callback(0);
+	acia_p->status &= ~(ACIA6850_STATUS_RDRF | ACIA6850_STATUS_IRQ | ACIA6850_STATUS_PE);
 
-	return acia[which].rdr;
+	if (acia_p->status_read)
+	{
+		acia_p->status_read = 0;
+		acia_p->status &= ~(ACIA6850_STATUS_OVRN | ACIA6850_STATUS_DCD);
+
+		if (acia_p->dcd_pin && *acia_p->dcd_pin)
+		{
+			acia_p->status |= ACIA6850_STATUS_DCD;
+		}
+	}
+
+	if (acia_p->overrun == 1)
+	{
+		acia_p->status |= ACIA6850_STATUS_OVRN;
+		acia_p->overrun = 0;
+	}
+
+	acia6850_check_interrupts(which);
+
+	return acia_p->rdr;
 }
-
 
 /*
     Transmit a bit
@@ -267,15 +393,50 @@ static TIMER_CALLBACK( transmit_event )
 	{
 		case START:
 		{
-			/* Stop bit */
-			*acia_p->tx_pin = 0;
-			acia_p->tx_bits = acia_p->bits;
-			acia_p->tx_state = DATA;
+			if (acia_p->brk)
+			{
+				// transmit break
+
+				*acia_p->tx_pin = 0;
+			}
+			else
+			{
+				if (acia_p->status & ACIA6850_STATUS_TDRE)
+				{
+					// transmitter idle
+
+					*acia_p->tx_pin = 1;
+				}
+				else
+				{
+					// transmit character
+
+					//logerror("ACIA6850 #%u: TX DATA %x\n", which, acia_p->tdr);
+					//logerror("ACIA6850 #%u: TX START BIT\n", which);
+
+					*acia_p->tx_pin = 0;
+
+					acia_p->tx_bits = acia_p->bits;
+					acia_p->tx_shift = acia_p->tdr;
+
+					// inhibit TDRE bit if Clear-to-Send is high
+
+					if (!(acia_p->status & ACIA6850_STATUS_CTS))
+					{
+						acia_p->status |= ACIA6850_STATUS_TDRE;
+					}
+
+					acia6850_check_interrupts(which);
+
+					acia_p->tx_state = DATA;
+				}
+			}
 			break;
 		}
 		case DATA:
 		{
 			int val = acia_p->tx_shift & 1;
+			//logerror("ACIA6850 #%u: TX DATA BIT %x\n", which, val);
 
 			*acia_p->tx_pin = val;
 			acia_p->tx_parity ^= val;
@@ -283,7 +444,7 @@ static TIMER_CALLBACK( transmit_event )
 
 			if (--(acia_p->tx_bits) == 0)
 			{
-				acia_p->tx_state = acia_p->parity == NONE ? STOP : PARITY;
+				acia_p->tx_state = (acia_p->parity == NONE) ? STOP : PARITY;
 			}
 
 			break;
@@ -299,25 +460,30 @@ static TIMER_CALLBACK( transmit_event )
 				*acia_p->tx_pin = (acia_p->tx_parity & 1) ? 0 : 1;
 			}
 
+			//logerror("ACIA6850 #%u: TX PARITY BIT %x\n", which, *acia_p->tx_pin);
 			acia_p->tx_parity = 0;
 			acia_p->tx_state = STOP;
 			break;
 		}
 		case STOP:
 		{
-			/* TODO */
+			//logerror("ACIA6850 #%u: TX STOP BIT\n", which);
 			*acia_p->tx_pin = 1;
-			acia_p->tx_state = COMPLETE;
+
+			if (acia_p->stopbits == 1)
+			{
+				acia_p->tx_state = START;
+			}
+			else
+			{
+				acia_p->tx_state = STOP2;
+			}
 			break;
 		}
-		case COMPLETE:
+		case STOP2:
 		{
-			/* TDR is now empty */
-			acia_p->status |= STATUS_TDRE;
-
-			/* Transmit timer no longer active */
-			mame_timer_enable(acia_p->tx_timer, 0);
-
+			//logerror("ACIA6850 #%u: TX STOP BIT\n", which);
+			*acia_p->tx_pin = 1;
 			acia_p->tx_state = START;
 			break;
 		}
@@ -330,93 +496,136 @@ static TIMER_CALLBACK( receive_event )
 	int which = param;
 	acia_6850 *acia_p = &acia[which];
 
-	switch (acia_p->rx_state)
+	if (acia_p->dcd_pin && *acia_p->dcd_pin)
 	{
-		case START:
-		{
-			/* Wait for low signal */
-			if (*acia_p->rx_pin == 0)
-			{
-				acia_p->rx_shift = 0;
-				acia_p->rx_bits = acia_p->bits;
-				acia_p->rx_state = DATA;
-			}
-			break;
-		}
-		case DATA:
-		{
-			acia_p->rx_shift |= *acia_p->rx_pin ? 0x80 : 0;
-			acia_p->rx_parity ^= *acia_p->rx_pin;
+		acia_p->status |= ACIA6850_STATUS_DCD;
+		acia6850_check_interrupts(which);
+	}
+	else if ((acia_p->status & (ACIA6850_STATUS_DCD|ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
+	{
+		acia_p->status &= ~ACIA6850_STATUS_DCD;
+	}
 
-			if (--acia_p->rx_bits == 0)
-			{
-				acia_p->rx_state = acia_p->parity == NONE ? STOP : PARITY;
-			}
-			else
-			{
-				acia_p->rx_shift >>= 1;
-			}
-			break;
-		}
-		case PARITY:
+	if (acia_p->status & ACIA6850_STATUS_DCD)
+	{
+		acia_p->rx_state = START;
+	}
+	else
+	{
+		switch (acia_p->rx_state)
 		{
-			acia_p->rx_parity ^= *acia_p->rx_pin;
-
-			if (acia_p->parity == EVEN)
+			case START:
 			{
-				if (acia_p->rx_parity)
+				if (*acia_p->rx_pin == 0)
 				{
-					acia_p->status |= STATUS_PE;
+					//logerror("ACIA6850 #%u: RX START BIT\n", which);
+					acia_p->rx_shift = 0;
+					acia_p->rx_parity = 0;
+					acia_p->rx_bits = acia_p->bits;
+					acia_p->rx_state = DATA;
 				}
+				break;
 			}
-			else
+			case DATA:
 			{
-				if (!acia_p->rx_parity)
+				//logerror("ACIA6850 #%u: RX DATA BIT %x\n", which, *acia_p->rx_pin);
+				acia_p->rx_shift |= *acia_p->rx_pin ? 0x80 : 0;
+				acia_p->rx_parity ^= *acia_p->rx_pin;
+
+				if (--acia_p->rx_bits == 0)
 				{
-					acia_p->status |= STATUS_PE;
-				}
-			}
-
-			acia_p->rx_parity = 0;
-			acia_p->rx_state = STOP;
-
-			// As long as data is in RDR
-			break;
-		}
-		case STOP:
-		{
-			/* TODO:
-                Multiple stop bits
-                Overrun
-            */
-			acia_p->rx_state = COMPLETE;
-			break;
-		}
-		case COMPLETE:
-		{
-			/*
-                TODO: Check behaviour.
-            */
-			//if (!(acia_p->status & STATUS_RDRF))
-			{
-				acia_p->rdr = acia_p->rx_shift;
-				acia_p->status |= STATUS_RDRF;
-				acia_p->status |= STATUS_IRQ;
-
-//              printf("ACIA %d Received full: %x\n", which, acia_p->rdr);
-
-				/* TODO */
-				if (acia_p->ctrl & 0x80)
-				{
-					if (acia_p->int_callback)
+					if (acia_p->status & ACIA6850_STATUS_RDRF)
 					{
-						acia_p->int_callback(1);
+						acia_p->overrun = 1;
+						acia6850_check_interrupts(which);
+					}
+
+					acia_p->rx_state = acia_p->parity == NONE ? STOP : PARITY;
+				}
+				else
+				{
+					acia_p->rx_shift >>= 1;
+				}
+				break;
+			}
+			case PARITY:
+			{
+				//logerror("ACIA6850 #%u: RX PARITY BIT %x\n", which, *acia_p->rx_pin);
+				acia_p->rx_parity ^= *acia_p->rx_pin;
+
+				if (acia_p->parity == EVEN)
+				{
+					if (acia_p->rx_parity)
+					{
+						acia_p->status |= ACIA6850_STATUS_PE;
 					}
 				}
-			}
+				else
+				{
+					if (!acia_p->rx_parity)
+					{
+						acia_p->status |= ACIA6850_STATUS_PE;
+					}
+				}
 
-			acia_p->rx_state = START;
-			break;
+				acia_p->rx_state = STOP;
+				break;
+			}
+			case STOP:
+			{
+				if (*acia_p->rx_pin == 1)
+				{
+					//logerror("ACIA6850 #%u: RX STOP BIT\n", which);
+					if (acia_p->stopbits == 1)
+					{
+						acia_p->status &= ~ACIA6850_STATUS_FE;
+
+						if (!(acia_p->status & ACIA6850_STATUS_RDRF))
+						{
+							//logerror("ACIA6850 #%u: RX DATA %x\n", which, acia_p->rx_shift);
+							acia_p->rdr = acia_p->rx_shift;
+							acia_p->status |= ACIA6850_STATUS_RDRF;
+							acia6850_check_interrupts(which);
+						}
+
+						acia_p->rx_state = START;
+					}
+					else
+					{
+						acia_p->rx_state = STOP2;
+					}
+				}
+				else
+				{
+					acia_p->status |= ACIA6850_STATUS_FE;
+					acia_p->rx_state = START;
+				}
+				break;
+			}
+			case STOP2:
+			{
+				if (*acia_p->rx_pin == 1)
+				{
+					//logerror("ACIA6850 #%u: RX STOP BIT\n", which);
+					acia_p->status &= ~ACIA6850_STATUS_FE;
+
+					if (!(acia_p->status & ACIA6850_STATUS_RDRF))
+					{
+						//logerror("ACIA6850 #%u: RX DATA %x\n", which, acia_p->rx_shift);
+						acia_p->rdr = acia_p->rx_shift;
+						acia_p->status |= ACIA6850_STATUS_RDRF;
+						acia6850_check_interrupts(which);
+					}
+
+					acia_p->rx_state = START;
+				}
+				else
+				{
+					acia_p->status |= ACIA6850_STATUS_FE;
+					acia_p->rx_state = START;
+				}
+				break;
+			}
 		}
 	}
 }
