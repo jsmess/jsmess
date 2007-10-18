@@ -1,8 +1,8 @@
-﻿0.120.1
+0.120.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- ST Book [Curt Coder] (not working)
 
 
 

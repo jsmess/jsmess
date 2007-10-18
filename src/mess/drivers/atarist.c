@@ -36,7 +36,15 @@
 
 */
 
+// Atari ST
+
 #define Y1		2457600.0
+
+// STBook
+
+#define U517	16000000.0
+#define Y200	2457600.0
+#define Y700	10000000.0
 
 /* Floppy Disk Controller */
 
@@ -103,12 +111,12 @@ static void atarist_fdc_callback(wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
-	case WD17XX_IRQ_CLR:
-		fdc.irq = CLEAR_LINE;
-		break;
-
 	case WD17XX_IRQ_SET:
 		fdc.irq = ASSERT_LINE;
+		break;
+
+	case WD17XX_IRQ_CLR:
+		fdc.irq = CLEAR_LINE;
 		break;
 
 	case WD17XX_DRQ_SET:
@@ -758,6 +766,54 @@ static WRITE16_HANDLER( megaste_cache_w )
 	cpunum_set_clock(0, (data & 0x01) ? Y2/2 : Y2/4);
 }
 
+/* ST Book */
+
+static READ16_HANDLER( stbook_config_r )
+{
+	/*
+		
+		bit		description
+		
+		0		_POWER_SWITCH
+		1		_TOP_CLOSED
+		2		_RTC_ALARM
+		3		_SOURCE_DEAD
+		4		_SOURCE_LOW
+		5		_MODEM_WAKE
+		6		(reserved)
+		7		_EXPANSION_WAKE
+		8		(reserved)
+		9		(reserved)
+		10		(reserved)
+		11		(reserved)
+		12		(reserved)
+		13		SELF TEST
+		14		LOW SPEED FLOPPY
+		15		DMA AVAILABLE
+
+	*/
+
+	return readinputportbytag("SW400") << 8;
+}
+
+static WRITE16_HANDLER( stbook_lcd_control_w )
+{
+	/*
+		
+		bit		description
+		
+		0		Shadow Chip OFF
+		1		_SHIFTER OFF
+		2		POWEROFF
+		3		_22ON
+		4		RS-232_OFF
+		5		(reserved)
+		6		(reserved)
+		7		MTR_PWR_ON
+
+	*/
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( ikbd_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -939,6 +995,61 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
 	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x000007) AM_ROM
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
+	AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
+	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM
+	AM_RANGE(0xe80000, 0xebffff) AM_ROM
+//	AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
+	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
+/*	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
+	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
+	AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(stbook_shifter_counter_r, stbook_shifter_counter_w)
+	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(stbook_shifter_sync_r, stbook_shifter_sync_w)
+	AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(stbook_shifter_base_low_r, stbook_shifter_base_low_w)
+	AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(stbook_shifter_lineofs_r, stbook_shifter_lineofs_w)
+	AM_RANGE(0xff8240, 0xff8241) AM_READWRITE(stbook_shifter_palette_r, stbook_shifter_palette_w)
+	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(stbook_shifter_mode_r, stbook_shifter_mode_w)
+	AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)*/
+	AM_RANGE(0xff827e, 0xff827f) AM_WRITE(stbook_lcd_control_w)
+	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
+	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
+	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
+	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
+	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
+	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
+	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
+	AM_RANGE(0xff890e, 0xff8913) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
+	AM_RANGE(0xff8920, 0xff8921) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
+	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_microwire_data_r, atariste_microwire_data_w)
+	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_microwire_mask_r, atariste_microwire_mask_w)
+	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(atarist_blitter_halftone_r, atarist_blitter_halftone_w)
+	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(atarist_blitter_src_inc_x_r, atarist_blitter_src_inc_x_w)
+	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(atarist_blitter_src_inc_y_r, atarist_blitter_src_inc_y_w)
+	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(atarist_blitter_src_r, atarist_blitter_src_w)
+	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(atarist_blitter_end_mask_r, atarist_blitter_end_mask_w)
+	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(atarist_blitter_dst_inc_x_r, atarist_blitter_dst_inc_x_w)
+	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(atarist_blitter_dst_inc_y_r, atarist_blitter_dst_inc_y_w)
+	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(atarist_blitter_dst_r, atarist_blitter_dst_w)
+	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(atarist_blitter_count_x_r, atarist_blitter_count_x_w)
+	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(atarist_blitter_count_y_r, atarist_blitter_count_y_w)
+	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
+	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
+	AM_RANGE(0xff9200, 0xff9201) AM_READ(stbook_config_r)
+/*	AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(stbook_lcd_contrast_r, stbook_lcd_contrast_w)
+	AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(stbook_power_r, stbook_power_w)
+	AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(stbook_reference_r, stbook_reference_w)*/
+	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -1160,6 +1271,20 @@ INPUT_PORTS_START( atariste )
 
 	PORT_START_TAG("GUNY") // should be 10-bit
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( stbook )
+	PORT_START_TAG("SW400")
+	PORT_DIPNAME( 0x80, 0x80, "DMA sound hardware")
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, "WD1772 FDC")
+	PORT_DIPSETTING( 0x40, "Low Speed (8 MHz)" )
+	PORT_DIPSETTING( 0x00, "High Speed (16 MHz)" )
+	PORT_DIPNAME( 0x20, 0x00, "Bypass Self Test")
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+	PORT_DIPSETTING( 0x20, DEF_STR( Yes ) )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* Sound Interface */
@@ -1464,6 +1589,132 @@ static MACHINE_START( megaste )
 	rp5c15_init(&rtc_intf);
 }
 
+static void stbook_configure_memory(void)
+{
+	switch (mess_ram_size)
+	{
+	case 1024 * 1024:
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0x080000, MRA16_BANK1, MWA16_BANK1);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
+		break;
+	case 4096 * 1024:
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MRA16_BANK1, MWA16_BANK1);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MRA16_BANK2, MWA16_BANK2);
+		break;
+	}
+
+	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x000008, 0);
+	memory_set_bank(1, 0);
+
+	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x200000, 0);
+	memory_set_bank(2, 0);
+
+	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
+
+	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
+	memory_set_bank(3, 0);
+}
+
+static WRITE8_HANDLER( stbook_ym2149_port_a_w )
+{
+	wd17xx_set_side(data & 0x01);
+
+	if (data & 0x02)
+	{
+		wd17xx_set_drive(0);
+	}
+	
+	if (data & 0x04)
+	{
+		wd17xx_set_drive(1);
+	}
+
+	// 0x08 = RTS
+	// 0x10 = DTR
+
+	centronics_write_handshake(0, (data & 0x20) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+
+	// 0x40 = IDE RESET
+	// 0x80 = FDD_DENSE_SEL
+}
+
+static struct AY8910interface stbook_ym2149_interface =
+{
+	0,
+	0,
+	stbook_ym2149_port_a_w,
+	ym2149_port_b_w
+};
+
+static UINT8 krxd, ktxd;
+
+static struct acia6850_interface stbook_acia_ikbd_intf =
+{
+	U517/32, // 500kHz
+	U517/2/2, // 1MHZ
+	&krxd,
+	&ktxd,
+	NULL,
+	NULL,
+	NULL,
+	acia_interrupt
+};
+
+static READ8_HANDLER( stbook_mfp_gpio_r )
+{
+	/*
+
+		bit		description
+		
+		0		Centronics BUSY
+		1		RS232 DCD
+		2		RS232 CTS
+		3		Blitter done
+		4		Keyboard/MIDI
+		5		FDC
+		6		RS232 RI
+		7		POWER ALARMS
+
+	*/
+
+	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
+
+	data |= (acia_irq << 4);
+	data |= (fdc.irq << 5);
+
+	return data;
+}
+
+static const mfp68901_interface stbook_mfp_intf =
+{
+	Y2/8,
+	Y1,
+	MFP68901_TDO_LOOPBACK,
+	MFP68901_TDO_LOOPBACK,
+	&mfp_rx,
+	&mfp_tx,
+	NULL,
+	mfp_interrupt,
+	stbook_mfp_gpio_r,
+	NULL
+};
+
+static MACHINE_START( stbook )
+{
+	stbook_configure_memory();
+	atariste_state_save();
+
+	state_save_register_global(krxd);
+	state_save_register_global(ktxd);
+
+	centronics_config(0, atarist_centronics_config);
+	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
+	acia6850_config(0, &stbook_acia_ikbd_intf);
+	acia6850_config(1, &acia_midi_intf);
+	mfp68901_config(0, &stbook_mfp_intf);
+	rp5c15_init(&rtc_intf);
+}
+
 static MACHINE_DRIVER_START( atarist )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
@@ -1545,6 +1796,33 @@ static MACHINE_DRIVER_START( megaste )
 	MDRV_MACHINE_START(megaste)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( stbook )
+	// basic machine hardware
+	MDRV_CPU_ADD_TAG("main", M68000, U517/2)
+	MDRV_CPU_PROGRAM_MAP(stbook_map, 0)
+
+	//MDRV_CPU_ADD(COP888, Y700)
+
+	MDRV_MACHINE_START(stbook)
+
+	// video hardware
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_SIZE(640, 400)
+	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
+	MDRV_PALETTE_LENGTH(2)
+
+	MDRV_VIDEO_START( generic_bitmapped )
+	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_PALETTE_INIT( black_and_white )
+
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(YM3439, U517/8)
+	MDRV_SOUND_CONFIG(stbook_ym2149_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
+MACHINE_DRIVER_END
+
 /* ROMs */
 
 ROM_START( atarist )
@@ -1585,16 +1863,6 @@ ROM_START( stacy )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
-ROM_START( stbook )
-	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
-	ROM_SYSTEM_BIOS( 0, "tos208", "TOS 2.08" )
-	ROMX_LOAD( "tos208.img", 0xe00000, 0x030000, NO_DUMP, ROM_BIOS(1) )
-	ROM_COPY( REGION_CPU1, 0xe00000, 0x000000, 0x000008 )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
-ROM_END
-
 ROM_START( atariste )
 	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
@@ -1621,8 +1889,18 @@ ROM_START( megaste )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
+ROM_START( stbook )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
+	ROM_SYSTEM_BIOS( 0, "tos208", "TOS 2.08" )
+	ROMX_LOAD( "tos208.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
+	ROM_COPY( REGION_CPU1, 0xe00000, 0x000000, 0x000008 )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "cop888c0.u703", 0x0000, 0x1000, NO_DUMP )
+ROM_END
+
 ROM_START( tt030 )
-	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_16BIT )
+	ROM_REGION32_BE( 0x4000000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos301", "TOS 3.01 (TT TOS)" )
 	ROMX_LOAD( "tos301.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos305", "TOS 3.05 (TT TOS)" )
@@ -1636,7 +1914,7 @@ ROM_START( tt030 )
 ROM_END
 
 ROM_START( falcon )
-	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_16BIT )
+	ROM_REGION32_BE( 0x4000000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos400", "TOS 4.00" )
 	ROMX_LOAD( "tos400.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos401", "TOS 4.01" )
@@ -1847,6 +2125,17 @@ SYSTEM_CONFIG_START( megaste )
 	// LAN
 SYSTEM_CONFIG_END
 
+SYSTEM_CONFIG_START( stbook )
+	CONFIG_RAM_DEFAULT(4096 * 1024)
+	CONFIG_RAM		  (1024 * 1024)
+	CONFIG_DEVICE(atarist_floppy_getinfo)
+	CONFIG_DEVICE(atarist_printer_getinfo)
+	CONFIG_DEVICE(megaste_serial_getinfo)
+	CONFIG_DEVICE(atarist_cartslot_getinfo)
+	// MIDI
+	// IDE Hard Disk 
+SYSTEM_CONFIG_END
+
 /* System Drivers */
 
 /*     YEAR  NAME    PARENT    COMPAT	MACHINE   INPUT     INIT	CONFIG   COMPANY    FULLNAME */
@@ -1854,10 +2143,10 @@ COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari"
 COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari", "Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
 COMP( 1989, stacy,    atarist,  0,		stacy,    stacy,    0,     stacy,	 "Atari", "STacy", GAME_NOT_WORKING )
-COMP( 1992, stbook,   atarist,  0,		stbook,   stbook,   0,     stbook,	 "Atari", "ST Book", GAME_NOT_WORKING )
 */
 COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1992, stbook,   atariste, 0,		stbook,   stbook,   0,     stbook,	 "Atari", "ST Book", GAME_NOT_WORKING )
 /*
 COMP( 1990, tt030,    0,        0,		tt030,    tt030,    0,     tt030,	 "Atari", "TT030", GAME_NOT_WORKING )
 COMP( 1992, falcon,   0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "Falcon030", GAME_NOT_WORKING )
