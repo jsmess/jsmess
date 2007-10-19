@@ -22,6 +22,7 @@
 
 	TODO:
 
+	- fix floppy interface
 	- MSA disk image support
 	- UK keyboard layout for the special keys
 	- accurate screen timing
@@ -1290,14 +1291,14 @@ INPUT_PORTS_END
 
 static WRITE8_HANDLER( ym2149_port_a_w )
 {
-	wd17xx_set_side(data & 0x01);
+	wd17xx_set_side((data & 0x01) ? 0 : 1);
 
-	if (data & 0x02)
+	if (!(data & 0x02))
 	{
 		wd17xx_set_drive(0);
 	}
 	
-	if (data & 0x04)
+	if (!(data & 0x04))
 	{
 		wd17xx_set_drive(1);
 	}
@@ -1616,14 +1617,14 @@ static void stbook_configure_memory(void)
 
 static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 {
-	wd17xx_set_side(data & 0x01);
+	wd17xx_set_side((data & 0x01) ? 0 : 1);
 
-	if (data & 0x02)
+	if (!(data & 0x02))
 	{
 		wd17xx_set_drive(0);
 	}
 	
-	if (data & 0x04)
+	if (!(data & 0x04))
 	{
 		wd17xx_set_drive(1);
 	}
