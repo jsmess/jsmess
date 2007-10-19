@@ -28,8 +28,6 @@ extern int pet_font;
 #define DATASSETTE_RECORD	(input_port_11_word_r(0,0)&0x800)
 #define DATASSETTE_STOP		(input_port_11_word_r(0,0)&0x400)
 
-#define BUSINESS_KEYBOARD (input_port_11_word_r(0,0)&0x200)
-
 #define CBM8096_MEMORY (input_port_11_r(0)&8)
 #define M6809_SELECT (input_port_11_r(0)&4)
 #define IEEE8ON (input_port_11_r(0)&2)
