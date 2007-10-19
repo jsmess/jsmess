@@ -20,14 +20,6 @@ void pet80_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
 
 extern int pet_font;
 
-#define QUICKLOAD		(input_port_11_word_r(0,0)&0x8000)
-#define DATASSETTE (input_port_11_word_r(0,0)&0x4000)
-#define DATASSETTE_TONE (input_port_11_word_r(0,0)&0x2000)
-
-#define DATASSETTE_PLAY		(input_port_11_word_r(0,0)&0x1000)
-#define DATASSETTE_RECORD	(input_port_11_word_r(0,0)&0x800)
-#define DATASSETTE_STOP		(input_port_11_word_r(0,0)&0x400)
-
 #define CBM8096_MEMORY (input_port_11_r(0)&8)
 #define M6809_SELECT (input_port_11_r(0)&4)
 #define IEEE8ON (input_port_11_r(0)&2)
