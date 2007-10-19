@@ -76,9 +76,11 @@ static void mfp68901_poll_gpio(int which)
 	{
 		if ((BIT(gpold, bit) == 1) && (BIT(gpnew, bit) == 0)) // if transition from 1 to 0 is detected...
 		{
+			logerror("MFP68901 #%u Edge Transition Detected on GPIO%u\n", which, bit);
+
 			if (mfp_p->ier & GPIO_MASK[bit]) // AND interrupt enabled bit is set...
 			{
-				logerror("MFP68901 #%u Edge Transition Detected on GPIO%u\n", which, bit);
+				logerror("MFP68901 #%u Interrupt Pending for GPIO%u\n", which, bit);
 
 				mfp_p->ipr |= GPIO_MASK[bit]; // set interrupt pending bit
 			}
@@ -114,7 +116,7 @@ static void mfp68901_irq_ack(int which)
 					mfp_p->isr |= (1 << ch); // set interrupt in service bit (bit will be cleared later by the interrupt service routine)
 				}
 
-				mfp_p->intf->irq_callback(which, ASSERT_LINE, (mfp_p->vr & 0xf0) | ch); // fire interrupt callback
+				mfp_p->intf->irq_callback(which, HOLD_LINE, (mfp_p->vr & 0xf0) | ch); // fire interrupt callback
 
 				return;
 			}
@@ -583,11 +585,13 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 	case MFP68901_REGISTER_IMRA:
 		logerror("MFP68901 #%u Interrupt Mask Register A : %x\n", which, data);
 		mfp_p->imr = (data << 8) | (mfp_p->imr & 0xff);
+		mfp_p->isr &= mfp_p->imr;
 		break;
 
 	case MFP68901_REGISTER_IMRB:
 		logerror("MFP68901 #%u Interrupt Mask Register B : %x\n", which, data);
 		mfp_p->imr = (mfp_p->imr & 0xff00) | data;
+		mfp_p->isr &= mfp_p->imr;
 		break;
 
 	case MFP68901_REGISTER_VR:
