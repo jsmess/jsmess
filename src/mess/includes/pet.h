@@ -42,6 +42,7 @@ extern READ8_HANDLER(superpet_r);
 extern WRITE8_HANDLER(superpet_w);
 
 DRIVER_INIT( pet );
+DRIVER_INIT( petb );
 DRIVER_INIT( pet1 );
 DRIVER_INIT( pet40 );
 DRIVER_INIT( cbm80 );

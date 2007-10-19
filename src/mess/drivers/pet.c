@@ -304,7 +304,10 @@ ADDRESS_MAP_END
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_EQUALS)\
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RVS OFF") PORT_CODE(KEYCODE_TAB)\
 	PORT_START /* 10 - special keys */ \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(left shift)SHIFT-LOCK (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE\
+	PORT_DIPNAME( 0x80, 0x80, "(left shift)SHIFT-LOCK (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE\
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )\
+	PORT_DIPSETTING(0x80, DEF_STR( On ) )\
+
 
 #define PET_B_KEYBOARD \
 	PORT_START /* 0 */ \
@@ -398,7 +401,10 @@ ADDRESS_MAP_END
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3)\
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Arrow-Left") PORT_CODE(KEYCODE_TILDE)\
 	PORT_START /* 10 - special keys */ \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(left shift)SHIFT-LOCK (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE\
+	PORT_DIPNAME( 0x80, 0x80, "(left shift)SHIFT-LOCK (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE\
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )\
+	PORT_DIPSETTING(0x80, DEF_STR( On ) )\
+
 
 INPUT_PORTS_START (pet)
 	PET_KEYBOARD
@@ -1009,10 +1015,10 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME		COMPAT	PARENT	MACHINE 	INPUT	 INIT	  CONFIG	COMPANY							  FULLNAME */
 COMP (1977,	pet,		0,		0,		pet,		pet,	 pet1,	  pet,		"Commodore Business Machines Co.",  "PET2001/CBM20xx Series (Basic 1)",            GAME_NO_SOUND)
 COMP (1979,	cbm30,		0,		pet,	pet,		pet,	 pet,	  pet2,		"Commodore Business Machines Co.",  "Commodore 30xx (Basic 2)",                    GAME_NO_SOUND)
-COMP (1979,	cbm30b, 	0,		pet,	pet,		petb,	 pet,	  pet2,		"Commodore Business Machines Co.",  "Commodore 30xx (Basic 2) (business keyboard)",GAME_NO_SOUND)
+COMP (1979,	cbm30b, 	0,		pet,	pet,		petb,	 petb,	  pet2,		"Commodore Business Machines Co.",  "Commodore 30xx (Basic 2) (business keyboard)",GAME_NO_SOUND)
 COMP (1982,	cbm40,		0,		pet,	pet40,		pet,	 pet40,   pet4,		"Commodore Business Machines Co.",  "Commodore 40xx FAT (CRTC) 60Hz",              GAME_NO_SOUND)
 COMP (1982,	cbm40pal,	0,		pet,	pet40pal,	pet,	 pet40,   pet4,		"Commodore Business Machines Co.",  "Commodore 40xx FAT (CRTC) 50Hz",              GAME_NO_SOUND)
-COMP (1979,	cbm40b, 	0,		pet,	pet,		petb,	 pet,	  pet4,		"Commodore Business Machines Co.",  "Commodore 40xx THIN (business keyboard)",     GAME_NO_SOUND)
+COMP (1979,	cbm40b, 	0,		pet,	pet,		petb,	 petb,	  pet4,		"Commodore Business Machines Co.",  "Commodore 40xx THIN (business keyboard)",     GAME_NO_SOUND)
 COMP (1981,	cbm80,		0,		pet,	pet80,		cbm8096, cbm80,   pet4_32,	"Commodore Business Machines Co.",  "Commodore 80xx 60Hz",                         GAME_NO_SOUND)
 COMP (1981,	cbm80pal,	0,		pet,	pet80pal,	cbm8096, cbm80,   pet4_32,	"Commodore Business Machines Co.",  "Commodore 80xx 50Hz",                         GAME_NO_SOUND)
 COMP (1981,	cbm80ger,	0,		pet,	pet80pal,	cbm8096, cbm80,   pet4_32,	"Commodore Business Machines Co.",  "Commodore 80xx German (50Hz)",                GAME_NO_SOUND)

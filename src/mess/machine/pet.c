@@ -54,11 +54,30 @@ static WRITE8_HANDLER ( pet_pia0_port_a_write )
 	pet_keyline_select = data & 0x0f;
 }
 
+/* Keyboard reading/handling for regular keyboard */
 static  READ8_HANDLER ( pet_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
 	if ( pet_keyline_select < 10 ) {
 		data = readinputport( pet_keyline_select );
+		/* Check for left-shift lock */
+		if ( pet_keyline_select == 8 && ( readinputport(10) & 0x80 ) ) {
+			data &= 0xFE;
+		}
+	}
+	return data;
+}
+
+/* Keyboard handling for business keyboard */
+static READ8_HANDLER( petb_pia0_port_b_read )
+{
+	UINT8 data = 0xff;
+	if ( pet_keyline_select < 10 ) {
+		data = readinputport( pet_keyline_select );
+		/* Check for left-shift lock */
+		if ( pet_keyline_select == 6 && ( readinputport(10) & 0x80 ) ) {
+			data &= 0xFE;
+		}
 	}
 	return data;
 }
@@ -124,6 +143,22 @@ static const pia6821_interface pet_pia0 =
 {
 	pet_pia0_port_a_read,		/* in_a_func */
 	pet_pia0_port_b_read,		/* in_b_func */
+	NULL,						/* in_ca1_func */
+	NULL,						/* in_cb1_func */
+	NULL,						/* in_ca2_func */
+	NULL,						/* in_cb2_func */
+	pet_pia0_port_a_write,		/* out_a_func */
+	NULL,						/* out_b_func */
+	pet_pia0_ca2_out,			/* out_ca2_func */
+	NULL,						/* out_cb2_func */
+	NULL,						/* irq_a_func */
+	pet_irq						/* irq_b_func */
+};
+
+static const pia6821_interface petb_pia0 =
+{
+	pet_pia0_port_a_read,		/* in_a_func */
+	petb_pia0_port_b_read,		/* in_b_func */
 	NULL,						/* in_ca1_func */
 	NULL,						/* in_cb1_func */
 	NULL,						/* in_ca2_func */
@@ -420,7 +455,6 @@ static void pet_common_driver_init (void)
 	mame_timer_pulse(MAME_TIME_IN_MSEC(10), 0, pet_interrupt);
 
 	via_config(0, &pet_via);
-	pia_config(0, &pet_pia0);
 	pia_config(1, &pet_pia1);
 
 	cbm_ieee_open();
@@ -429,6 +463,14 @@ static void pet_common_driver_init (void)
 DRIVER_INIT( pet )
 {
 	pet_common_driver_init ();
+	pia_config(0, &pet_pia0);
+	pet_vh_init();
+}
+
+DRIVER_INIT( petb )
+{
+	pet_common_driver_init ();
+	pia_config(0, &petb_pia0);
 	pet_vh_init();
 }
 
@@ -436,6 +478,7 @@ DRIVER_INIT( pet1 )
 {
 	pet_basic1 = 1;
 	pet_common_driver_init ();
+	pia_config(0, &pet_pia0);
 	pet_vh_init();
 }
 
@@ -466,6 +509,7 @@ const static crtc6845_interface crtc_pet80 = {
 DRIVER_INIT( pet40 )
 {
 	pet_common_driver_init ();
+	pia_config(0, &pet_pia0);
 	pet_vh_init();
 	crtc6845_config( 0, &crtc_pet40);
 }
@@ -476,6 +520,7 @@ DRIVER_INIT( cbm80 )
 	pet_memory = memory_region(REGION_CPU1);
 
 	pet_common_driver_init ();
+	pia_config(0, &petb_pia0);
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
 	pet80_vh_init();
@@ -486,6 +531,7 @@ DRIVER_INIT( superpet )
 {
 	superpet = 1;
 	pet_common_driver_init ();
+	pia_config(0, &petb_pia0);
 
 	superpet_memory = auto_malloc(0x10000);
 
