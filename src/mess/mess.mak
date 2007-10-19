@@ -605,7 +605,6 @@ $(MESSOBJ)/cbm.a: \
 $(MESSOBJ)/coco.a:   \
 	$(MESS_MACHINE)/6883sam.o	\
 	$(MESS_MACHINE)/ds1315.o	\
-	$(MESS_MACHINE)/m6242b.o	\
 	$(MESS_MACHINE)/coco.o		\
 	$(MESS_VIDEO)/coco.o		\
 	$(MESS_DRIVERS)/coco.o		\

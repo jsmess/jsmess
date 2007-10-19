@@ -8,8 +8,12 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [COCO] Updated to use MAME's 6242 RTC implementation.  [Tim Lindner]
 
+- [PET] Updated to use MAME's CRTC6548 implementation.  [Wilbert Pol]
+
+- [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert
+  Pol]
 
 
 User Interface Changes:

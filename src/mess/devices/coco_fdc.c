@@ -71,7 +71,7 @@
 #include "cococart.h"
 #include "machine/wd17xx.h"
 #include "machine/ds1315.h"
-#include "machine/m6242b.h"
+#include "machine/msm6242.h"
 #include "devices/coco_vhd.h"
 
 #define LOG_FDC		0
@@ -367,6 +367,7 @@ typedef enum
 	RTC_CLOUD9	= 0x01
 } rtc_type_t;
 
+static int msm6242_rtc_address;
 
 /*-------------------------------------------------
     real_time_clock
@@ -391,7 +392,7 @@ static UINT8 fdc_coco3plus_r(coco_cartridge *cartridge, UINT16 addr)
 	{
 		case 0x10:	/* FF50 */
 			if (real_time_clock() == RTC_DISTO)
-				result = m6242_data_r(0);
+				result = msm6242_r(msm6242_rtc_address);
 			break;
 
 		case 0x38:	/* FF78 */
@@ -436,12 +437,12 @@ static void fdc_coco3plus_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 	{
 		case 0x10:	/* FF50 */
 			if (real_time_clock() == RTC_DISTO)
-				m6242_data_w(0, data);
+				msm6242_w(msm6242_rtc_address, data);
 			break;
 
 		case 0x11:	/* FF51 */
 			if (real_time_clock() == RTC_DISTO)
-				m6242_address_w(0, data);
+				msm6242_rtc_address = data & 0x0f;
 			break;
 
 		case 0x40:
