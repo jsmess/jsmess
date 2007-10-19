@@ -44,14 +44,14 @@ UINT8 *pet_videoram;
 */
 static  READ8_HANDLER ( pet_pia0_port_a_read )
 {
-	int data=0xff;
+	int data=0xf0 | pet_keyline_select;
 	if (!cbm_ieee_eoi_r()) data&=~0x40;
 	return data;
 }
 
 static WRITE8_HANDLER ( pet_pia0_port_a_write )
 {
-	pet_keyline_select=data;  /*data is actually line here! */
+	pet_keyline_select = data & 0x0f;
 }
 
 static  READ8_HANDLER ( pet_pia0_port_b_read )
