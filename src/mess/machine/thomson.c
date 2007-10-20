@@ -761,6 +761,7 @@ static struct acia6850_interface to7_acia_modem =
 {
 	1200, 1200, /* 1200 bauds, might be divided by 16 */
 	&to7_modem_rx, &to7_modem_tx,
+	NULL, NULL, NULL,
 	to7_modem_cb
 };
 
