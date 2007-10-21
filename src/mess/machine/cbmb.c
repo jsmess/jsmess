@@ -28,6 +28,8 @@ static TIMER_CALLBACK(cbmb_frame_interrupt);
 static int cbmb_keyline_a, cbmb_keyline_b, cbmb_keyline_c;
 
 static int cbm500=0;
+static int cbm700;
+static int cbm_ntsc;
 UINT8 *cbmb_basic;
 UINT8 *cbmb_kernal;
 static UINT8 *cbmb_chargen;
@@ -149,8 +151,8 @@ static int cbmb_keyboard_line_c(void)
 		 (readinputport(11)&~cbmb_keyline_b)) data|=0x20;
 
 	if (!cbm500) {
-		if (!VIDEO_NTSC) data|=0x40;
-		if (!MODELL_700) data|=0x80;
+		if (!cbm_ntsc) data|=0x40;
+		if (!cbm700) data|=0x80;
 	}
 	return data^0xff;
 }
@@ -240,6 +242,8 @@ static void cbmb_common_driver_init (void)
 	tpi6525[1].c.output=cbmb_keyboard_line_select_c;
 	mame_timer_pulse(MAME_TIME_IN_MSEC(10), 0, cbmb_frame_interrupt);
 
+	cbm500 = 0;
+	cbm700 = 0;
 	cbm_ieee_open();
 }
 
@@ -260,6 +264,7 @@ const static crtc6845_interface cbm600_crtc = {
 void cbm600_driver_init (void)
 {
 	cbmb_common_driver_init ();
+	cbm_ntsc = 1;
 	cbm600_vh_init();
 	crtc6845_config( 0, &cbm600_crtc);
 }
@@ -267,6 +272,7 @@ void cbm600_driver_init (void)
 void cbm600pal_driver_init (void)
 {
 	cbmb_common_driver_init ();
+	cbm_ntsc = 0;
 	cbm600_vh_init();
 	crtc6845_config( 0, &cbm600_crtc);
 }
@@ -274,6 +280,7 @@ void cbm600pal_driver_init (void)
 void cbm600hu_driver_init (void)
 {
 	cbmb_common_driver_init ();
+	cbm_ntsc = 0;
 	crtc6845_config( 0, &cbm600_crtc);
 }
 
@@ -291,6 +298,8 @@ const static crtc6845_interface cbm700_crtc = {
 void cbm700_driver_init (void)
 {
 	cbmb_common_driver_init ();
+	cbm700 = 1;
+	cbm_ntsc = 0;
 	cbm700_vh_init();
 	crtc6845_config( 0, &cbm700_crtc);
 }
@@ -299,6 +308,7 @@ void cbm500_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm500=1;
+	cbm_ntsc = 1;
 	vic6567_init (0, 0, cbmb_dma_read, cbmb_dma_read_color, NULL);
 }
 

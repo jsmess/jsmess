@@ -97,9 +97,6 @@
 #define JOYSTICK_2_BUTTON ((input_port_13_word_r(0,0)&8))
 #define JOYSTICK_2_BUTTON2 ((input_port_13_word_r(0,0)&4))
 
-#define VIDEO_NTSC		(input_port_12_word_r(0,0)&0x200)
-#define MODELL_700		(input_port_12_word_r(0,0)&0x100)
-
 #define IEEE8ON	0
 #define IEEE9ON	0
 
