@@ -11,7 +11,7 @@
 #define OSC_Y1 1000000
 
 /* Pointer to the monitor ROM, which includes the reset vectors for the CPU */
-UINT8 *sym1_monitor;
+extern UINT8 *sym1_monitor;
 
 
 /*----------- defined in machine/sym1.c -----------*/
