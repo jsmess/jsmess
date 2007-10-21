@@ -803,6 +803,8 @@ static  READ8_HANDLER(avigo_04_r)
 
 
 ADDRESS_MAP_START( avigo_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+
 	AM_RANGE(0x000, 0x000) AM_READ( avigo_unmapped_r)
     AM_RANGE(0x001, 0x001) AM_READWRITE( avigo_key_data_read_r, avigo_set_key_line_w )
 	AM_RANGE(0x002, 0x002) AM_READ( avigo_unmapped_r)
