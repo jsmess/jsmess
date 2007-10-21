@@ -1,10 +1,20 @@
-extern DRIVER_INIT( sym1 );
-extern MACHINE_RESET( sym1 );
+/******************************************************************************
+ Synertek Systems Corp. SYM-1
+ 
+ Early driver by PeT mess@utanet.at May 2000
+ Rewritten by Dirk Best October 2007
+ 
+******************************************************************************/
 
-extern INTERRUPT_GEN( sym1_interrupt );
 
-extern UINT8 sym1_led[6];
+/* SYM-1 main (and only) oscillator */
+#define OSC_Y1 1000000
 
-extern PALETTE_INIT( sym1 );
-extern VIDEO_START( sym1 );
-extern VIDEO_UPDATE( sym1 );
+/* Pointer to the monitor ROM, which includes the reset vectors for the CPU */
+UINT8 *sym1_monitor;
+
+
+/*----------- defined in machine/sym1.c -----------*/
+
+DRIVER_INIT( sym1 );
+MACHINE_RESET( sym1 );

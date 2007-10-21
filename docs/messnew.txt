@@ -3,6 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Atari STBook [Curt Coder] (not working)
+- Synertec Systems Corp. SYM-1  [Dirk Best] (not working)
 
 
 
@@ -14,6 +15,9 @@ System Driver Changes:
 
 - [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert
   Pol]
+
+- [SYM1] Rewrote, still many issues and doesn't fully work.  [Dirk Best]
+
 
 
 User Interface Changes:

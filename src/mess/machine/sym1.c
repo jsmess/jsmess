@@ -1,25 +1,38 @@
 /******************************************************************************
-    SYM-1
+ Synertek Systems Corp. SYM-1
 
-    PeT mess@utanet.at May 2000
+ Early driver by PeT mess@utanet.at May 2000
+ Rewritten by Dirk Best October 2007
 
 ******************************************************************************/
-#include "driver.h"
-#include "cpu/m6502/m6502.h"
-#include "video/generic.h"
 
-#define VERBOSE_DBG 0
-#include "includes/cbm.h"
-#include "machine/6522via.h"
-#include "machine/6532riot.h"
+
+#include "driver.h"
 #include "includes/sym1.h"
 
+/* M6502 CPU */
+#include "cpu/m6502/m6502.h"
+
+/* Peripheral chips */
+#include "machine/6522via.h"
+#include "machine/6532riot.h"
+
+
 static UINT8 riot_port_a, riot_port_b;
+static UINT8 sym1_led[6];
+
+
+
+/******************************************************************************
+ 6532 RIOT
+******************************************************************************/
+
 
 /*
   8903 7segment display output, key pressed
   892c keyboard input only ????
 */
+
 
 static READ8_HANDLER( sym1_riot_a_r )
 {
@@ -66,20 +79,13 @@ static READ8_HANDLER( sym1_riot_b_r )
 	return data;
 }
 
-static void sym1_led_w(int chip, int data)
-{
 
-	if ((riot_port_b &0xf)<6) {
-		logerror("write 7seg(%d): %c%c%c%c%c%c%c\n",
-				 data&7,
-				 (riot_port_a & 0x01) ? 'a' : '.',
-				 (riot_port_a & 0x02) ? 'b' : '.',
-				 (riot_port_a & 0x04) ? 'c' : '.',
-				 (riot_port_a & 0x08) ? 'd' : '.',
-				 (riot_port_a & 0x10) ? 'e' : '.',
-				 (riot_port_a & 0x20) ? 'f' : '.',
-				 (riot_port_a & 0x40) ? 'g' : '.');
+static void sym1_led_w(void)
+{
+	if ((riot_port_b & 0x0f) < 6)
+	{
 		sym1_led[riot_port_b] |= riot_port_a;
+		output_set_digit_value(riot_port_b & 0x07, sym1_led[riot_port_b]);
 	}
 }
 
@@ -87,14 +93,16 @@ static void sym1_led_w(int chip, int data)
 static WRITE8_HANDLER( sym1_riot_a_w )
 {
 	riot_port_a = data;
-	sym1_led_w(0, data);
+	logerror("riot_a_w 0x%02x\n", data);
+	sym1_led_w();
 }
 
 
 static WRITE8_HANDLER( sym1_riot_b_w )
 {
 	riot_port_b = data;
-	sym1_led_w(0, data);
+	logerror("riot_b_w 0x%02x\n", data);
+	sym1_led_w();
 }
 
 
@@ -107,73 +115,69 @@ static const struct riot6532_interface r6532_interface =
 };
 
 
+
+/******************************************************************************
+ 6522 VIA
+******************************************************************************/
+
+
 static void sym1_irq(int level)
 {
 	cpunum_set_input_line(0, M6502_IRQ_LINE, level);
 }
 
-static struct via6522_interface via0={
-#if 0
-	int (*in_a_func)(int offset);
-	int (*in_b_func)(int offset);
-	int (*in_ca1_func)(int offset);
-	int (*in_cb1_func)(int offset);
-	int (*in_ca2_func)(int offset);
-	int (*in_cb2_func)(int offset);
-	void (*out_a_func)(int offset, int val);
-	void (*out_b_func)(int offset, int val);
-	void (*out_ca2_func)(int offset, int val);
-	void (*out_cb2_func)(int offset, int val);
-	void (*irq_func)(int state);
 
-    /* kludges for the Vectrex */
-	void (*out_shift_func)(int val);
-	void (*t2_callback)(double time);
-#endif
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
+static struct via6522_interface via0 =
+{
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 	sym1_irq
-},
-via1 = { 0 },
-via2 = { 0 };
+};
+
+
+static struct via6522_interface via1 =
+{
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	sym1_irq
+};
+
+
+static struct via6522_interface via2 =
+{
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	sym1_irq
+};
+
+
+
+/******************************************************************************
+ Driver init and reset
+******************************************************************************/
 
 
 DRIVER_INIT( sym1 )
 {
+	/* install memory */
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x0400, mess_ram_size - 0x0400 - 1, 0, 0, MRA8_RAM, MWA8_RAM);
+
 	via_config(0, &via0);
 	via_config(1, &via1);
 	via_config(2, &via2);
 	r6532_config(0, &r6532_interface);
-	r6532_set_clock(0, 1000000);
+	r6532_set_clock(0, OSC_Y1);
 	r6532_reset(0);
 }
+
 
 MACHINE_RESET( sym1 )
 {
 	via_reset();
 	r6532_reset(0);
+
+	/* Make 0xf800 to 0xffff point to the last half of the monitor ROM */
+	/* so that the CPU can find its reset vectors */
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0xf800, 0xffff, 0, 0, MRA8_BANK1, MWA8_ROM);
+	memory_configure_bank(1, 0, 1, sym1_monitor + 0x800, 0);
+	memory_set_bank(1, 0);
 }
-
-INTERRUPT_GEN( sym1_interrupt )
-{
-	int i;
-
-	/* decrease the brightness of the six 7segment LEDs */
-	for (i = 0; i < 6; i++)
-	{
-		if (videoram[i * 2 + 1] > 0)
-			videoram[i * 2 + 1] -= 1;
-	}
-}
-

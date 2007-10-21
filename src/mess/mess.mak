@@ -401,7 +401,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ssystem3.a \
 	$(MESSOBJ)/svi.a \
 	$(MESSOBJ)/svision.a \
-	$(MESSOBJ)/sym1.a \
+	$(MESSOBJ)/synertec.a \
 	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
@@ -834,8 +834,7 @@ $(MESSOBJ)/kim1.a :    \
 	$(MESS_MACHINE)/kim1.o	 \
 	$(MESS_DRIVERS)/kim1.o
 
-$(MESSOBJ)/sym1.a :    \
-	$(MESS_VIDEO)/sym1.o	 \
+$(MESSOBJ)/synertec.a :    \
 	$(MESS_MACHINE)/sym1.o	 \
 	$(MESS_DRIVERS)/sym1.o
 
@@ -1164,6 +1163,8 @@ $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
+
+$(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 
 $(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
 

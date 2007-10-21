@@ -287,7 +287,7 @@ XL/XE 16kB OS roms
 
 	/* COMMODORE */
 	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
-TESTDRIVER( sym1 )		/* Synertek SYM1									*/
+	DRIVER( sym1 )		/* Synertek SYM-1									*/
 	DRIVER( aim65 )		/* Rockwell AIM65									*/
 
 	DRIVER( pet )		/* PET2001/CBM20xx Series (Basic 1)					*/
