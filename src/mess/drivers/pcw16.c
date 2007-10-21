@@ -106,9 +106,7 @@
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 
-#include "includes/28f008sa.h"
-
-static void pcw16_machine_stop(running_machine *machine);
+#include "machine/intelfsh.h"
 
 // interrupt counter
 unsigned long pcw16_interrupt_counter;
@@ -200,12 +198,18 @@ static const read8_handler pcw16_read_handler_dram[4] =
 /* PCW16 Flash interface */
 /* PCW16 can have two 1mb flash chips */
 
+static NVRAM_HANDLER( pcw16 )
+{
+	nvram_handler_intelflash( machine, 0, file, read_or_write );
+	nvram_handler_intelflash( machine, 1, file, read_or_write );
+}
+
 /* read flash0 */
 static int pcw16_flash0_bank_handler_r(int bank, int offset)
 {
 	int flash_offset = (pcw16_banks[bank]<<14) | offset;
 
-	return flash_bank_handler_r(0, flash_offset);
+	return intelflash_read(0, flash_offset);
 }
 
 /* read flash1 */
@@ -213,7 +217,7 @@ static int pcw16_flash1_bank_handler_r(int bank, int offset)
 {
 	int flash_offset = ((pcw16_banks[bank]&0x03f)<<14) | offset;
 
-	return flash_bank_handler_r(1, flash_offset);
+	return intelflash_read(1, flash_offset);
 }
 
 /* flash 0 */
@@ -279,7 +283,7 @@ static void pcw16_flash0_bank_handler_w(int bank, int offset, int data)
 {
 	int flash_offset = (pcw16_banks[bank]<<14) | offset;
 
-	flash_bank_handler_w(0, flash_offset, data);
+	intelflash_write(0, flash_offset, data);
 }
 
 /* read flash1 */
@@ -287,7 +291,7 @@ static void pcw16_flash1_bank_handler_w(int bank, int offset, int data)
 {
 	int flash_offset = ((pcw16_banks[bank]&0x03f)<<14) | offset;
 
-	flash_bank_handler_w(1, flash_offset,data);
+	intelflash_write(1, flash_offset,data);
 }
 
 /* flash 0 */
@@ -438,11 +442,11 @@ static void pcw16_update_bank(int bank)
 			/* nvram */
 			if ((bank_id & 0x040)==0)
 			{
-				mem_ptr = (unsigned char *)flash_get_base(0);
+				mem_ptr = (unsigned char *)intelflash_getmemptr(0);
 			}
 			else
 			{
-				mem_ptr = (unsigned char *)flash_get_base(1);
+				mem_ptr = (unsigned char *)intelflash_getmemptr(1);
 			}
 		}
 
@@ -1325,8 +1329,6 @@ static void pcw16_reset(void)
 	pcw16_keyboard_init();
 	uart8250_reset(0);
 	uart8250_reset(1);
-	flash_reset(0);
-	flash_reset(1);
 }
 
 
@@ -1345,14 +1347,6 @@ static CENTRONICS_CONFIG cent_config =
 
 static MACHINE_RESET( pcw16 )
 {
-	/* flash 0 */
-	flash_init(0);
-	flash_restore(0, "pcw16f1.nv");
-
-	/* flash 1 */
-	flash_init(1);
-	flash_restore(1, "pcw16f2.nv");
-
 	pcw16_system_status = 0;
 	pcw16_interrupt_counter = 0;
 
@@ -1384,18 +1378,6 @@ static MACHINE_RESET( pcw16 )
 
 	beep_set_state(0,0);
 	beep_set_frequency(0,3750);
-
-	add_exit_callback(machine, pcw16_machine_stop);
-}
-
-static void pcw16_machine_stop(running_machine *machine)
-{
-	/* flash 0 */
-	flash_store(0,"pcw16f1.nv");
-	flash_finish(0);
-
-	flash_store(1,"pcw16f2.nv");
-	flash_finish(1);
 }
 
 INPUT_PORTS_START(pcw16)
@@ -1424,6 +1406,7 @@ static MACHINE_DRIVER_START( pcw16 )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( pcw16 )
+	MDRV_NVRAM_HANDLER( pcw16 )
 
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1443,6 +1426,13 @@ static MACHINE_DRIVER_START( pcw16 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
+
+static DRIVER_INIT( pcw16 )
+{
+	/* init flashes */
+	intelflash_init(0, FLASH_INTEL_E28F008SA, NULL);
+	intelflash_init(1, FLASH_INTEL_E28F008SA, NULL);
+}
 
 /***************************************************************************
 
@@ -1493,4 +1483,4 @@ SYSTEM_CONFIG_START(pcw16)
 SYSTEM_CONFIG_END
 
 /*     YEAR  NAME     PARENT	COMPAT	MACHINE    INPUT     INIT   CONFIG,  COMPANY          FULLNAME */
-COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    0,	    pcw16,   "Amstrad plc",   "PCW16", 0)
+COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	    pcw16,   "Amstrad plc",   "PCW16", 0)

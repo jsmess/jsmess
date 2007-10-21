@@ -39,7 +39,7 @@
  ******************************************************************************/
 #include "driver.h"
 #include "includes/avigo.h"
-#include "includes/am29f080.h"
+#include "machine/intelfsh.h"
 #include "includes/tc8521.h"
 #include "machine/uart8250.h"
 #include "sound/speaker.h"
@@ -81,6 +81,16 @@ static int avigo_flash_at_0x4000;
 static int avigo_flash_at_0x8000;
 static void *avigo_banked_opbase[4];
 
+static NVRAM_HANDLER( avigo )
+{
+	int i;
+
+	for (i = 0; i < 3; i++)
+	{
+		nvram_handler_intelflash( machine, i, file, read_or_write );
+	}
+}
+
 static void avigo_setbank(int bank, void *address, read8_handler rh, write8_handler wh)
 {
 	if (address)
@@ -104,63 +114,38 @@ static void avigo_setbank(int bank, void *address, read8_handler rh, write8_hand
 /* memory 0x0000-0x03fff */
 static  READ8_HANDLER(avigo_flash_0x0000_read_handler)
 {
-	int flash_offset = offset;
-	return amd_flash_bank_handler_r(0, flash_offset);
+	return intelflash_read(0, offset);
 }
 
 /* memory 0x04000-0x07fff */
 static  READ8_HANDLER(avigo_flash_0x4000_read_handler)
 {
-
-        int flash_offset = (avigo_rom_bank_l<<14) | offset;
-
-	//	logerror("flash offset: %04x offset: %04x\n",flash_offset, offset);
-
-
-        return amd_flash_bank_handler_r(avigo_flash_at_0x4000, flash_offset);
+	return intelflash_read(avigo_flash_at_0x4000, (avigo_rom_bank_l<<14) | offset);
 }
 
 /* memory 0x0000-0x03fff */
 static WRITE8_HANDLER(avigo_flash_0x0000_write_handler)
 {
-
-	int flash_offset = offset;
-
-	amd_flash_bank_handler_w(0, flash_offset, data);
+	intelflash_write(0, offset, data);
 }
 
 /* memory 0x04000-0x07fff */
 static WRITE8_HANDLER(avigo_flash_0x4000_write_handler)
 {
-
-        int flash_offset = (avigo_rom_bank_l<<14) | offset;
-
-	//	logerror("flash offset: %04x offset: %04x\n",flash_offset, offset);
-
-        amd_flash_bank_handler_w(avigo_flash_at_0x4000, flash_offset, data);
+	intelflash_write(avigo_flash_at_0x4000, (avigo_rom_bank_l<<14) | offset, data);
 }
 
 /* memory 0x08000-0x0bfff */
 static  READ8_HANDLER(avigo_flash_0x8000_read_handler)
 {
-
-        int flash_offset = (avigo_ram_bank_l<<14) | offset;
-
-	//	logerror("flash offset: %04x offset: %04x\n",flash_offset, offset);
-
-        return amd_flash_bank_handler_r(avigo_flash_at_0x8000, flash_offset);
+	return intelflash_read(avigo_flash_at_0x8000, (avigo_rom_bank_l<<14) | offset);
 }
 
 #ifdef UNUSED_FUNCTION
 /* memory 0x08000-0x0bfff */
 static WRITE8_HANDLER(avigo_flash_0x8000_write_handler)
 {
-
-        int flash_offset = (avigo_ram_bank_l<<14) | offset;
-
-	//	logerror("flash offset: %04x offset: %04x\n",flash_offset, offset);
-
-        amd_flash_bank_handler_w(avigo_flash_at_0x8000, flash_offset, data);
+	intelflash_write(avigo_flash_at_0x8000, (avigo_rom_bank_l<<14) | offset, data);
 }
 #endif
 
@@ -327,7 +312,7 @@ static void avigo_refresh_memory(void)
 			break;
 	}
 
-	addr = (unsigned char *)amd_flash_get_base(avigo_flash_at_0x4000);
+	addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x4000);
 	addr = addr + (avigo_rom_bank_l<<14);
 	avigo_setbank(1, addr, avigo_flash_0x4000_read_handler, avigo_flash_0x4000_write_handler);
 
@@ -351,7 +336,7 @@ static void avigo_refresh_memory(void)
 			avigo_flash_at_0x8000 = 1;
 
 
-			addr = (unsigned char *)amd_flash_get_base(avigo_flash_at_0x8000);
+			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
 			addr = addr + (avigo_ram_bank_l<<14);
 			avigo_setbank(2, addr, avigo_flash_0x8000_read_handler,
 				MWA8_NOP /* avigo_flash_0x8000_write_handler */);
@@ -360,7 +345,7 @@ static void avigo_refresh_memory(void)
 		case 0x07:
 			avigo_flash_at_0x8000 = 0;
 
-			addr = (unsigned char *)amd_flash_get_base(avigo_flash_at_0x8000);
+			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
 			addr = addr + (avigo_ram_bank_l<<14);
 			avigo_setbank(2, addr, avigo_flash_0x8000_read_handler,
 				MWA8_NOP /* avigo_flash_0x8000_write_handler */);
@@ -419,53 +404,15 @@ static void avigo_machine_reset(running_machine *machine)
 	memset(avigo_banked_opbase, 0, sizeof(avigo_banked_opbase));
 
 	/* initialise flash memory */
-	amd_flash_init(0);
-	amd_flash_init(1);
-	amd_flash_init(2);
-
-    /* install os into flash from rom image data */
-	{
-		/* get base of rom data */
-		char *rom = (char *)memory_region(REGION_CPU1)+0x010000;
-		char *flash;
-
-		if (rom!=NULL)
-		{
-			/* copy first 1mb into first flash */
-			flash = (char *)amd_flash_get_base(0);
-			if (flash)
-				memcpy(flash, rom, 0x0100000);
-
-			/* copy second 1mb into second flash */
-			flash = (char *)amd_flash_get_base(1);
-			if (flash)
-				memcpy(flash, rom+0x0100000, 0x0150000-0x0100000);
-		}
-	}
-
+	intelflash_init(0, FLASH_INTEL_E28F008SA, memory_region(REGION_CPU1)+0x10000);
+	intelflash_init(1, FLASH_INTEL_E28F008SA, memory_region(REGION_CPU1)+0x100000);
+	intelflash_init(2, FLASH_INTEL_E28F008SA, NULL);
 
 	stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
 	stylus_marker_y = AVIGO_SCREEN_HEIGHT>>1;
 	stylus_press_x = 0;
 	stylus_press_y = 0;
 	avigo_vh_set_stylus_marker_position(stylus_marker_x, stylus_marker_y);
-
-    /* if these files exist, they will overwrite the os installed
-	from the rom in the code above.
-	
-	This is ok. These files will be created by this driver and they will
-    contain the OS data in them! Since these files are in the flash
-	memory they can be written to. */
-
-	
-	amd_flash_restore(0, "avigof1.nv");
-	amd_flash_reset(0);
-
-    amd_flash_restore(1, "avigof2.nv");
-    amd_flash_reset(1);
-
-    amd_flash_restore(2, "avigof3.nv");
-    amd_flash_reset(2);
 
 	/* initialise settings for port data */
 	for (i=0; i<4; i++)
@@ -493,26 +440,13 @@ static void avigo_machine_reset(running_machine *machine)
 
 	memory_set_opbase_handler(0, avigo_opbase_handler);
 
-	addr = (unsigned char *)amd_flash_get_base(0);
+	addr = (unsigned char *)intelflash_getmemptr(0);
 	avigo_setbank(0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
 
 	avigo_setbank(3, mess_ram, NULL, NULL);
 
 	/* 0x08000 is specially banked! */
 	avigo_refresh_memory();
-}
-
-static void avigo_machine_stop(running_machine *machine)
-{
-	/* store and free flash memory */
-	amd_flash_store(0, "avigof1.nv");
-	amd_flash_finish(0);
-
-	amd_flash_store(1, "avigof2.nv");
-	amd_flash_finish(1);
-
-	amd_flash_store(2, "avigof3.nv");
-	amd_flash_finish(2);
 }
 
 static MACHINE_START( avigo )
@@ -522,7 +456,6 @@ static MACHINE_START( avigo )
 	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, avigo_dummy_timer_callback);
 
 	add_reset_callback(machine, avigo_machine_reset);
-	add_exit_callback(machine, avigo_machine_stop);
 }
 
 
@@ -935,6 +868,7 @@ static MACHINE_DRIVER_START( avigo )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( avigo )
+	MDRV_NVRAM_HANDLER( avigo )
 
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
