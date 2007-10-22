@@ -186,6 +186,7 @@ TESTDRIVER( tvlinkp )
 
 /****************COMPUTERS***************************************************/
     /* ACORN */
+	DRIVER( acrnsys1 )  /* 1979 Acorn System 1 (Microcomputer Kit)          */
 	DRIVER( atom )		/* 1979 Acorn Atom									*/
 	DRIVER( atomeb )	/* 1979 Acorn Atom									*/
 	DRIVER( bbca )		/* 1981 BBC Micro Model A							*/

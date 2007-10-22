@@ -898,6 +898,7 @@ $(MESSOBJ)/mtx.a:	   \
 	$(MESS_DRIVERS)/mtx.o
 
 $(MESSOBJ)/acorn.a:    \
+	$(MESS_DRIVERS)/acrnsys1.o \
 	$(MESS_MACHINE)/i8271.o	 \
 	$(MESS_MACHINE)/upd7002.o  \
 	$(MESS_VIDEO)/saa505x.o	     \
@@ -1165,6 +1166,8 @@ $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
+
+$(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 
 $(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
 
