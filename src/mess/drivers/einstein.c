@@ -93,6 +93,7 @@
 #include "devices/printer.h"
 #include "sound/ay8910.h"
 #include "image.h"
+#include "video/crtc6845.h"
 
 #define EINSTEIN_SYSTEM_CLOCK 4000000
 
@@ -153,7 +154,7 @@ static void einstein_dump_ram(void)
 
 
 */
-#include "video/m6845.h"
+#include "video/crtc6845.h"
 static int einstein_80col_state;
 static char *einstein_80col_ram = NULL;
 
@@ -177,55 +178,91 @@ static  READ8_HANDLER(einstein_80col_state_r)
 	return einstein_80col_state;
 }
 
-static int Einstein_6845_RA = 0;
-static int Einstein_scr_x = 0;
+//static int Einstein_6845_RA = 0;
+//static int Einstein_scr_x = 0;
 static int Einstein_scr_y = 0;
-static int Einstein_HSync = 0;
-static int Einstein_VSync = 0;
-static int Einstein_DE = 0;
+//static int Einstein_HSync = 0;
+//static int Einstein_VSync = 0;
+//static int Einstein_DE = 0;
 
-// called when the 6845 changes the character row
-static void Einstein_Set_RA(int offset, int data)
-{
-	Einstein_6845_RA=data;
-}
+//// called when the 6845 changes the character row
+//static void Einstein_Set_RA(int offset, int data)
+//{
+//	Einstein_6845_RA=data;
+//}
+//
+//
+//// called when the 6845 changes the HSync
+//static void Einstein_Set_HSync(int offset, int data)
+//{
+//	Einstein_HSync=data;
+//	if(!Einstein_HSync)
+//	{
+//		Einstein_scr_y++;
+//		Einstein_scr_x = -40;
+//	}
+//}
+//
+//// called when the 6845 changes the VSync
+//static void Einstein_Set_VSync(int offset, int data)
+//{
+//	Einstein_VSync=data;
+//	if (!Einstein_VSync)
+//	{
+//		Einstein_scr_y = 0;
+//	}
+//}
+//
+//static void Einstein_Set_DE(int offset, int data)
+//{
+//	Einstein_DE = data;
+//}
 
 
-// called when the 6845 changes the HSync
-static void Einstein_Set_HSync(int offset, int data)
-{
-	Einstein_HSync=data;
-	if(!Einstein_HSync)
-	{
-		Einstein_scr_y++;
-		Einstein_scr_x = -40;
+//static struct m6845_interface
+//einstein_m6845_interface= {
+//	0,// Memory Address register
+//	Einstein_Set_RA,// Row Address register
+//	Einstein_Set_HSync,// Horizontal status
+//	Einstein_Set_VSync,// Vertical status
+//	Einstein_Set_DE,// Display Enabled status
+//	0,// Cursor status
+//};
+
+static void einstein_6845_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+									 UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+	/* TODO: Verify implementation */
+	unsigned char *data = memory_region(REGION_CPU1) + 0x012000;
+	unsigned char data_byte;
+	int char_code;
+	int i, x;
+        
+	for ( i = 0, x = 0; i < x_count; i++, x+=8 ) {
+		int w;
+		char_code = einstein_80col_ram[(ma + i)&0x07ff];
+		data_byte = data[(char_code<<3) + ra];
+		for (w=0; w<8;w++) {
+			*BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
+			data_byte = data_byte<<1;
+		}
 	}
 }
 
-// called when the 6845 changes the VSync
-static void Einstein_Set_VSync(int offset, int data)
-{
-	Einstein_VSync=data;
-	if (!Einstein_VSync)
-	{
-		Einstein_scr_y = 0;
+static void einstein_6845_display_enable_changed(int display_enabled) {
+	/* TODO: Implement me properly */
+	if ( display_enabled ) {
+		Einstein_scr_y = ( Einstein_scr_y + 1 ) % 240 /*?*/;
 	}
 }
 
-static void Einstein_Set_DE(int offset, int data)
-{
-	Einstein_DE = data;
-}
-
-
-static struct m6845_interface
-einstein_m6845_interface= {
-	0,// Memory Address register
-	Einstein_Set_RA,// Row Address register
-	Einstein_Set_HSync,// Horizontal status
-	Einstein_Set_VSync,// Vertical status
-	Einstein_Set_DE,// Display Enabled status
-	0,// Cursor status
+static const crtc6845_interface einstein_crtc6845_interface = {
+	0,
+	EINSTEIN_SYSTEM_CLOCK /*?*/,
+	8 /*?*/,
+	NULL,
+	einstein_6845_update_row,
+	NULL,
+	einstein_6845_display_enable_changed
 };
 
 /* 80 column card init */
@@ -235,7 +272,7 @@ static void	einstein_80col_init(void)
 	einstein_80col_ram = auto_malloc(2048);
 
 	/* initialise 6845 */
-	m6845_config(&einstein_m6845_interface);
+	crtc6845_config( 0, &einstein_crtc6845_interface );
 
 	einstein_80col_state=(1<<2)|(1<<1);
 }
@@ -277,10 +314,10 @@ static WRITE8_HANDLER(einstein_80col_w)
 			einstein_80col_ram_w(offset,data);
 			break;
 		case 8:
-			m6845_address_w(offset,data);
+			crtc6845_0_address_w(offset,data);
 			break;
 		case 9:
-			m6845_register_w(offset,data);
+			crtc6845_0_register_w(offset,data);
 			break;
 		default:
 			break;
@@ -1592,83 +1629,84 @@ static struct AY8910interface einstein_ay_interface =
   127*262 = 33274 cycles per frame, vsync len 375 cycles
 */
 
-static void einstein_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
-{
-	int w;
-	if (Einstein_DE)
-	{
-
-		unsigned char *data = memory_region(REGION_CPU1)+0x012000;
-		unsigned char data_byte;
-		int char_code;
-
-		char_code = einstein_80col_ram[m6845_memory_address_r(0)&0x07ff];
-		
-		data_byte = data[(char_code<<3) + Einstein_6845_RA];
-
-		for (w=0; w<8;w++)
-		{
-			*BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
-
-			data_byte = data_byte<<1;
-
-		}
-	}
-	else
-	{
-		for (w=0; w<8;w++)
-			*BITMAP_ADDR16(bitmap, y, x+w) = 0;
-	}
-
-}
-
-static VIDEO_UPDATE( einstein_80col )
-{
-	long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
-
-	c=0;
-
-	// loop until the end of the Vertical Sync pulse
-	while((Einstein_VSync)&&(c<33274))
-	{
-		// Clock the 6845
-		m6845_clock();
-		c++;
-	}
-
-	// loop until the Vertical Sync pulse goes high
-	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
-	while((!Einstein_VSync)&&(c<33274))
-	{
-		while ((Einstein_HSync)&&(c<33274))
-		{
-			m6845_clock();
-			c++;
-		}
-		// Do all the clever split mode changes in here before the next while loop
-
-		while ((!Einstein_HSync)&&(c<33274))
-		{
-			// check that we are on the emulated screen area.
-			if ((Einstein_scr_x>=0) && (Einstein_scr_x<640) && (Einstein_scr_y>=0) && (Einstein_scr_y<400))
-			{
-				einstein_80col_plot_char_line(Einstein_scr_x, Einstein_scr_y, bitmap);
-			}
-
-			Einstein_scr_x+=8;
-
-			// Clock the 6845
-			m6845_clock();
-			c++;
-		}
-	}
-	return 0;
-}
+//static void einstein_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
+//{
+//	int w;
+//	if (Einstein_DE)
+//	{
+//
+//		unsigned char *data = memory_region(REGION_CPU1)+0x012000;
+//		unsigned char data_byte;
+//		int char_code;
+//
+//		char_code = einstein_80col_ram[m6845_memory_address_r(0)&0x07ff];
+//		
+//		data_byte = data[(char_code<<3) + Einstein_6845_RA];
+//
+//		for (w=0; w<8;w++)
+//		{
+//			*BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
+//
+//			data_byte = data_byte<<1;
+//
+//		}
+//	}
+//	else
+//	{
+//		for (w=0; w<8;w++)
+//			*BITMAP_ADDR16(bitmap, y, x+w) = 0;
+//	}
+//
+//}
+//
+//static VIDEO_UPDATE( einstein_80col )
+//{
+//	long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
+//
+//	c=0;
+//
+//	// loop until the end of the Vertical Sync pulse
+//	while((Einstein_VSync)&&(c<33274))
+//	{
+//		// Clock the 6845
+//		m6845_clock();
+//		c++;
+//	}
+//
+//	// loop until the Vertical Sync pulse goes high
+//	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
+//	while((!Einstein_VSync)&&(c<33274))
+//	{
+//		while ((Einstein_HSync)&&(c<33274))
+//		{
+//			m6845_clock();
+//			c++;
+//		}
+//		// Do all the clever split mode changes in here before the next while loop
+//
+//		while ((!Einstein_HSync)&&(c<33274))
+//		{
+//			// check that we are on the emulated screen area.
+//			if ((Einstein_scr_x>=0) && (Einstein_scr_x<640) && (Einstein_scr_y>=0) && (Einstein_scr_y<400))
+//			{
+//				einstein_80col_plot_char_line(Einstein_scr_x, Einstein_scr_y, bitmap);
+//			}
+//
+//			Einstein_scr_x+=8;
+//
+//			// Clock the 6845
+//			m6845_clock();
+//			c++;
+//		}
+//	}
+//	return 0;
+//}
 
 static VIDEO_UPDATE( einstein2 )
 {
 	video_update_tms9928a(machine, screen, bitmap, cliprect);
-	video_update_einstein_80col(machine, screen, bitmap, cliprect);
+	video_update_crtc6845(machine, screen, bitmap, cliprect);
+//	video_update_einstein_80col(machine, screen, bitmap, cliprect);
 	return 0;
 }
 
