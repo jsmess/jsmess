@@ -10,7 +10,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-- [COCO] Updated to use MAME's 6242 RTC implementation.  [Tim Lindner]
+- [COCO] Updated to use MAME's 6242 RTC implementation.  [tim lindner]
 
 - [PET] Updated to use MAME's CRTC6548 implementation.  [Wilbert Pol]
 
@@ -18,6 +18,9 @@ System Driver Changes:
   Pol]
 
 - [SYM1] Rewrote, still many issues and doesn't fully work.  [Dirk Best]
+
+- [COCO] Modified the CoCo's keyboard handler to pass along the tri-state
+   buffer from port B to port A. [tim lindner]
 
 
 

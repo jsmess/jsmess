@@ -1227,7 +1227,7 @@ static mame_time get_relative_time(mame_time absolute_time)
 
 static UINT8 coco_update_keyboard(void)
 {
-	UINT8 porta = 0x7F;
+	UINT8 porta = 0x7F, port_za = 0x7f;
 	int joyval;
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
 	static const int dclg_table[] = {0, 14, 30, 49 };
@@ -1248,6 +1248,14 @@ static UINT8 coco_update_keyboard(void)
 	if ((input_port_5_r(0) | pia0_pb) != 0xff) porta &= ~0x20;
 	if ((input_port_6_r(0) | pia0_pb) != 0xff) porta &= ~0x40;
 
+	if ((input_port_0_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x01;
+	if ((input_port_1_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x02;
+	if ((input_port_2_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x04;
+	if ((input_port_3_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x08;
+	if ((input_port_4_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
+	if ((input_port_5_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
+	if ((input_port_6_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
+	
 	switch(get_input_device(joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
 	{
 		case INPUTDEVICE_RIGHT_JOYSTICK:
@@ -1315,8 +1323,9 @@ static UINT8 coco_update_keyboard(void)
 
 	/* sample joystick buttons */
 	porta &= ~readinputportbytag_safe("joystick_buttons", 0);
+	port_za &= ~readinputportbytag_safe("joystick_buttons", 0);
 	
-	pia_set_input_a(0, porta, 0);
+	pia_set_input_a(0, porta, port_za);
 	return porta;
 }
 
