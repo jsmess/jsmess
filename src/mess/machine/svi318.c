@@ -560,13 +560,13 @@ DRIVER_INIT( svi318 )
 	svi.empty_bank = auto_malloc (0x8000);
 	memset (svi.empty_bank, 0xff, 0x8000);
 	svi.banks[0][0] = memory_region(REGION_CPU1);
-	svi.banks[1][0] = auto_malloc (0x8000);
+	svi.banks[1][0] = malloc (0x8000);
 	memset (svi.banks[1][0], 0, 0x8000);
 
 	/* should also be allocated via dip-switches ... redundant? */
 	if (!svi.svi318)
 	{
-		svi.banks[1][2] = auto_malloc (0x8000);
+		svi.banks[1][2] = malloc (0x8000);
 		memset (svi.banks[1][2], 0, 0x8000);
 	}
 

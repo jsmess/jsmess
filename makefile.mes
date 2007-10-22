@@ -436,7 +436,7 @@ endif
 
 # LDFLAGS are used generally; LDFLAGSEMULATOR are additional
 # flags only used when linking the core emulator
-LDFLAGS = 
+LDFLAGS = -Wl,--warn-common
 LDFLAGSEMULATOR =
 
 # add profiling information for the linker
