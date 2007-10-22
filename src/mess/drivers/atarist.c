@@ -793,7 +793,7 @@ static READ16_HANDLER( stbook_config_r )
 
 	*/
 
-	return readinputportbytag("SW400") << 8;
+	return (readinputportbytag("SW400") << 8) | 0xff;
 }
 
 static WRITE16_HANDLER( stbook_lcd_control_w )
@@ -1899,6 +1899,13 @@ ROM_START( stbook )
 	ROM_LOAD( "cop888c0.u703", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
+ROM_START( stpad )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
+	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05" )
+	ROMX_LOAD( "tos205.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
+	ROM_COPY( REGION_CPU1, 0xe00000, 0x000000, 0x000008 )
+ROM_END
+
 ROM_START( tt030 )
 	ROM_REGION32_BE( 0x4000000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
@@ -1913,22 +1920,36 @@ ROM_START( tt030 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
-ROM_START( falcon )
-	ROM_REGION32_BE( 0x4000000, REGION_CPU1, 0 )
-	ROM_SYSTEM_BIOS( 0, "tos404", "TOS 4.04" )
-	ROMX_LOAD( "tos404.img", 0xe00000, 0x080000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "tos492", "TOS 4.92" )
-	ROMX_LOAD( "tos492.img", 0xe00000, 0x080000, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "tos402", "TOS 4.02" )
-	ROMX_LOAD( "tos402.img", 0xe00000, 0x080000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "tos401", "TOS 4.01" )
-	ROMX_LOAD( "tos401.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 4, "tos400", "TOS 4.00" )
-	ROMX_LOAD( "tos400.img", 0xe00000, 0x080000, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(5) )
+ROM_START( fx1 )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
+	ROM_SYSTEM_BIOS( 0, "tos207", "TOS 2.07" )
+	ROMX_LOAD( "tos207.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
 	ROM_COPY( REGION_CPU1, 0xe00000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+ROM_END
+
+ROM_START( falcon )
+	ROM_REGION32_BE( 0x4000000, REGION_CPU1, 0 )
+	ROM_SYSTEM_BIOS( 0, "tos404", "TOS 4.04" )
+	ROMX_LOAD( "tos404.img", 0xe00000, 0x080000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "tos402", "TOS 4.02" )
+	ROMX_LOAD( "tos402.img", 0xe00000, 0x080000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "tos401", "TOS 4.01" )
+	ROMX_LOAD( "tos401.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "tos400", "TOS 4.00" )
+	ROMX_LOAD( "tos400.img", 0xe00000, 0x080000, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(4) )
+	ROM_COPY( REGION_CPU1, 0xe00000, 0x000000, 0x000008 )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+ROM_END
+
+ROM_START( falcon40 )
+	ROM_REGION32_BE( 0x4000000, REGION_CPU1, 0 )
+	ROM_SYSTEM_BIOS( 0, "tos492", "TOS 4.92" )
+	ROMX_LOAD( "tos492.img", 0xe00000, 0x080000, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(2) )
 ROM_END
 
 /* System Configuration */
@@ -2144,12 +2165,15 @@ SYSTEM_CONFIG_END
 COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari", "ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari", "Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
-COMP( 1989, stacy,    atarist,  0,		stacy,    stacy,    0,     stacy,	 "Atari", "STacy", GAME_NOT_WORKING )
+COMP( 1989, stacy,    atarist,  0,		stacy,    stacy,    0,     stacy,	 "Atari", "Stacy", GAME_NOT_WORKING )
 */
 COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     stbook,	 "Atari", "STBook", GAME_NOT_WORKING )
 COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
-COMP( 1992, stbook,   atariste, 0,		stbook,   stbook,   0,     stbook,	 "Atari", "STBook", GAME_NOT_WORKING )
 /*
+COMP( 1991, stpad,    atariste, 0,		stpad,    stpad,    0,     stpad,	 "Atari", "STPad (prototype)", GAME_NOT_WORKING )
 COMP( 1990, tt030,    0,        0,		tt030,    tt030,    0,     tt030,	 "Atari", "TT030", GAME_NOT_WORKING )
+COMP( 1992, fx1,	  0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "FX-1 (prototype)", GAME_NOT_WORKING )
 COMP( 1992, falcon,   0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "Falcon030", GAME_NOT_WORKING )
+COMP( 1992, falcon40, falcon,	0,		falcon40, falcon,   0,     falcon,	 "Atari", "Falcon040 (prototype)", GAME_NOT_WORKING )
 */
