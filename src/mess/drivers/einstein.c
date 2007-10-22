@@ -154,7 +154,6 @@ static void einstein_dump_ram(void)
 
 
 */
-#include "video/crtc6845.h"
 static int einstein_80col_state;
 static char *einstein_80col_ram = NULL;
 
