@@ -23,6 +23,7 @@
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "image.h"
+#include "video/crtc6845.h"
 
 enum {
 	SVI_INTERNAL	= 0,
@@ -405,58 +406,71 @@ DEVICE_LOAD( svi318_floppy )
 
 /* 80 column card */
 
-#include "video/m6845.h"
 static int svi318_80col_state;
 static char *svi318_80col_ram = NULL;
 
-static int svi318_6845_RA = 0;
-static int svi318_scr_x = 0;
-static int svi318_scr_y = 0;
-static int svi318_HSync = 0;
-static int svi318_VSync = 0;
-static int svi318_DE = 0;
+//static int svi318_6845_RA = 0;
+//static int svi318_scr_x = 0;
+//static int svi318_scr_y = 0;
+//static int svi318_HSync = 0;
+//static int svi318_VSync = 0;
+//static int svi318_DE = 0;
+//
+//// called when the 6845 changes the character row
+//static void svi318_Set_RA(int offset, int data)
+//{
+//	svi318_6845_RA=data;
+//}
+//
+//
+//// called when the 6845 changes the HSync
+//static void svi318_Set_HSync(int offset, int data)
+//{
+//	svi318_HSync=data;
+//	if(!svi318_HSync)
+//	{
+//		svi318_scr_y++;
+//		svi318_scr_x = -40;
+//	}
+//}
+//
+//// called when the 6845 changes the VSync
+//static void svi318_Set_VSync(int offset, int data)
+//{
+//	svi318_VSync=data;
+//	if (!svi318_VSync)
+//	{
+//		svi318_scr_y = 0;
+//	}
+//}
+//
+//static void svi318_Set_DE(int offset, int data)
+//{
+//	svi318_DE = data;
+//}
+//
+//static struct m6845_interface
+//svi318_m6845_interface= {
+//	0,// Memory Address register
+//	svi318_Set_RA,// Row Address register
+//	svi318_Set_HSync,// Horizontal status
+//	svi318_Set_VSync,// Vertical status
+//	svi318_Set_DE,// Display Enabled status
+//	0,// Cursor status
+//};
 
-// called when the 6845 changes the character row
-static void svi318_Set_RA(int offset, int data)
-{
-	svi318_6845_RA=data;
+static void svi318_crtc6845_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+									   UINT8 ra, UINT16 y, UINT8 x_count, void *param ) {
 }
 
-
-// called when the 6845 changes the HSync
-static void svi318_Set_HSync(int offset, int data)
-{
-	svi318_HSync=data;
-	if(!svi318_HSync)
-	{
-		svi318_scr_y++;
-		svi318_scr_x = -40;
-	}
-}
-
-// called when the 6845 changes the VSync
-static void svi318_Set_VSync(int offset, int data)
-{
-	svi318_VSync=data;
-	if (!svi318_VSync)
-	{
-		svi318_scr_y = 0;
-	}
-}
-
-static void svi318_Set_DE(int offset, int data)
-{
-	svi318_DE = data;
-}
-
-static struct m6845_interface
-svi318_m6845_interface= {
-	0,// Memory Address register
-	svi318_Set_RA,// Row Address register
-	svi318_Set_HSync,// Horizontal status
-	svi318_Set_VSync,// Vertical status
-	svi318_Set_DE,// Display Enabled status
-	0,// Cursor status
+static const crtc6845_interface svi318_crtc6845_interface = {
+	0,
+	3579545 /*?*/,
+	8 /*?*/,
+	NULL,
+	svi318_crtc6845_update_row,
+	NULL,
+	NULL
 };
 
 /* 80 column card init */
@@ -464,9 +478,9 @@ static void svi318_80col_init(void)
 {
 	/* 2K RAM */
 	svi318_80col_ram = auto_malloc(0x800);
-memset(svi318_80col_ram, 0x40, 0x400);
+	memset(svi318_80col_ram, 0x40, 0x400);
 	/* initialise 6845 */
-	m6845_config(&svi318_m6845_interface);
+	crtc6845_config( 0, &svi318_crtc6845_interface);
 
 	svi318_80col_state=(1<<2)|(1<<1);
 }
@@ -484,35 +498,35 @@ WRITE8_HANDLER( svi318_crtcbank_w )
 {
 }
 
-static void svi318_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
-{
-	int w;
-	if (svi318_DE)
-	{
-		unsigned char *data = memory_region(REGION_GFX1);
-		unsigned char data_byte;
-		int char_code;
-
-		char_code = svi318_80col_ram[m6845_memory_address_r(0)&0x07ff];
-		
-		data_byte = data[(char_code<<3) + svi318_6845_RA];
-
-		for (w=0; w<8;w++)
-		{
-			*BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
-
-			data_byte = data_byte<<1;
-
-		}
-	}
-	else
-	{
-		for (w=0; w<8;w++)
-			*BITMAP_ADDR16(bitmap, y, x+w) = 0;
-	}
-
-}
-
+//static void svi318_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
+//{
+//	int w;
+//	if (svi318_DE)
+//	{
+//		unsigned char *data = memory_region(REGION_GFX1);
+//		unsigned char data_byte;
+//		int char_code;
+//
+//		char_code = svi318_80col_ram[m6845_memory_address_r(0)&0x07ff];
+//		
+//		data_byte = data[(char_code<<3) + svi318_6845_RA];
+//
+//		for (w=0; w<8;w++)
+//		{
+//			*BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
+//
+//			data_byte = data_byte<<1;
+//
+//		}
+//	}
+//	else
+//	{
+//		for (w=0; w<8;w++)
+//			*BITMAP_ADDR16(bitmap, y, x+w) = 0;
+//	}
+//
+//}
+//
 static VIDEO_UPDATE( svi318_80col )
 {
 	long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
@@ -520,39 +534,39 @@ static VIDEO_UPDATE( svi318_80col )
 	c=0;
 
 	// loop until the end of the Vertical Sync pulse
-	while((svi318_VSync)&&(c<33274))
-	{
-		// Clock the 6845
-		m6845_clock();
-		c++;
-	}
-
-	// loop until the Vertical Sync pulse goes high
-	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
-	while((!svi318_VSync)&&(c<33274))
-	{
-		while ((svi318_HSync)&&(c<33274))
-		{
-			m6845_clock();
-			c++;
-		}
-		// Do all the clever split mode changes in here before the next while loop
-
-		while ((!svi318_HSync)&&(c<33274))
-		{
-			// check that we are on the emulated screen area.
-			if ((svi318_scr_x>=0) && (svi318_scr_x<640) && (svi318_scr_y>=0) && (svi318_scr_y<400))
-			{
-				svi318_80col_plot_char_line(svi318_scr_x, svi318_scr_y, bitmap);
-			}
-
-			svi318_scr_x+=8;
-
-			// Clock the 6845
-			m6845_clock();
-			c++;
-		}
-	}
+//	while((svi318_VSync)&&(c<33274))
+//	{
+//		// Clock the 6845
+//		m6845_clock();
+//		c++;
+//	}
+//
+//	// loop until the Vertical Sync pulse goes high
+//	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
+//	while((!svi318_VSync)&&(c<33274))
+//	{
+//		while ((svi318_HSync)&&(c<33274))
+//		{
+//			m6845_clock();
+//			c++;
+//		}
+//		// Do all the clever split mode changes in here before the next while loop
+//
+//		while ((!svi318_HSync)&&(c<33274))
+//		{
+//			// check that we are on the emulated screen area.
+//			if ((svi318_scr_x>=0) && (svi318_scr_x<640) && (svi318_scr_y>=0) && (svi318_scr_y<400))
+//			{
+//				svi318_80col_plot_char_line(svi318_scr_x, svi318_scr_y, bitmap);
+//			}
+//
+//			svi318_scr_x+=8;
+//
+//			// Clock the 6845
+//			m6845_clock();
+//			c++;
+//		}
+//	}
 	return 0;
 }
 
