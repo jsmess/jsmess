@@ -653,32 +653,6 @@ INTERRUPT_GEN( svi318_interrupt )
 	set = readinputport (13);
 	TMS9928A_set_spriteslimit (set & 0x20);
 	TMS9928A_interrupt();
-
-	/* memory banks */
-	for (i=0;i<4;i++)
-	{
-		bit = set & (1 << i);
-		p = (i & 1);
-		b = i / 2 + 2;
-
-		if (bit && !svi.banks[p][b])
-		{
-			svi.banks[p][b] = malloc (0x8000);
-			if (!svi.banks[p][b])
-				logerror ("Cannot malloc bank%d%d!\n", b, p + 1);
-			else
-			{
-				memset (svi.banks[p][b], 0, 0x8000);
-				logerror ("bank%d%d allocated.\n", b, p + 1);
-			}
-		}
-		else if (!bit && svi.banks[p][b])
-		{
-			free (svi.banks[p][b]);
-			svi.banks[p][b] = NULL;
-			logerror ("bank%d%d freed.\n", b, p + 1);
-		}
-	}
 }
 
 /* Memory */
