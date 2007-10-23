@@ -35,9 +35,19 @@ typedef struct {
 	/* general */
 	int svi318;
 	/* memory */
-	UINT8 *banks[2][4], *empty_bank, bank_switch, bank1, bank2;
+	UINT8	*empty_bank;
+	UINT8	bank_switch;
+	UINT8	bank1;
+	UINT8	bank2;
+	UINT8	*bank1_ptr;
+	UINT8	bank1_read_only;
+	UINT8	*bank2_ptr;
+	UINT8	bank2_read_only;
+	UINT8	*bank3_ptr;
+	UINT8	bank3_read_only;
 	/* printer */
-	UINT8 prn_data, prn_strobe;
+	UINT8	prn_data;
+	UINT8	prn_strobe;
 } SVI_318;
 
 static SVI_318 svi;
@@ -88,14 +98,13 @@ DEVICE_LOAD( svi318_cart )
 	if (svi318_verify_cart(p)==IMAGE_VERIFY_FAIL)
 		return INIT_FAIL;
 	pcart = p;
-	svi.banks[0][1] = p;
 
 	return INIT_PASS;
 }
 
 DEVICE_UNLOAD( svi318_cart )
 {
-	pcart = svi.banks[0][1] = NULL;
+	pcart = NULL;
 	pcart_rom_size = 0;
 }
 
@@ -588,18 +597,6 @@ DRIVER_INIT( svi318 )
 	/* memory */
 	svi.empty_bank = auto_malloc (0x8000);
 	memset (svi.empty_bank, 0xff, 0x8000);
-	svi.banks[0][0] = memory_region(REGION_CPU1);
-	svi.banks[1][0] = malloc (0x8000);
-	memset (svi.banks[1][0], 0, 0x8000);
-
-	/* should also be allocated via dip-switches ... redundant? */
-	if (!svi.svi318)
-	{
-		svi.banks[1][2] = malloc (0x8000);
-		memset (svi.banks[1][2], 0, 0x8000);
-	}
-
-	svi.banks[0][1] = pcart;
 
 	/* adjust z80 cycles for the M1 wait state */
 	for (i = 0; i < sizeof(z80_cycle_table) / sizeof(z80_cycle_table[0]); i++)
@@ -675,42 +672,26 @@ INTERRUPT_GEN( svi318_interrupt )
 
 WRITE8_HANDLER( svi318_writemem1 )
 {
-	if (svi.bank1 < 2) return;
+	if ( svi.bank1_read_only )
+		return;
 
-	if (svi.banks[0][svi.bank1])
-		svi.banks[0][svi.bank1][offset] = data;
+	svi.bank1_ptr[offset] = data;
 }
 
 WRITE8_HANDLER( svi318_writemem2 )
 {
-	switch (svi.bank2)
-	{
-	case 0:
-		if (!svi.svi318)
-			svi.banks[1][0][offset] = data;
+	if ( svi.bank2_read_only)
+		return;
 
-		break;
-	case 2:
-	case 3:
-		if (svi.banks[1][svi.bank2])
-			svi.banks[1][svi.bank2][offset] = data;
-		break;
-	}
+	svi.bank2_ptr[offset] = data;
 }
 
 WRITE8_HANDLER( svi318_writemem3 )
 {
-	switch (svi.bank2)
-	{
-	case 0:
-		svi.banks[1][0][offset + 0x4000] = data;
-		break;
-	case 2:
-	case 3:
-		if (svi.banks[1][svi.bank2])
-			svi.banks[1][svi.bank2][offset + 0x4000] = data;
-		break;
-	}
+	if ( svi.bank3_read_only)
+		return;
+
+	svi.bank3_ptr[offset] = data;
 }
 
 static void svi318_set_banks ()
@@ -720,31 +701,82 @@ static void svi318_set_banks ()
 	svi.bank1 = ( v & 1 ) ? ( ( v & 2 ) ? ( ( v & 8 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2 ) : SVI_CART;
 	svi.bank2 = ( v & 4 ) ? ( ( v & 16 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2;
 
-	if (svi.banks[0][svi.bank1])
-		memory_set_bankptr (1, svi.banks[0][svi.bank1]);
-	else
-		memory_set_bankptr (1, svi.empty_bank);
+	svi.bank1_ptr = svi.empty_bank;
+	svi.bank1_read_only = 1;
 
-	if (svi.banks[1][svi.bank2])
-	{
-		memory_set_bankptr (2, svi.banks[1][svi.bank2]);
-		memory_set_bankptr (3, svi.banks[1][svi.bank2] + 0x4000);
+	switch( svi.bank1 ) {
+	case SVI_INTERNAL:
+		svi.bank1_ptr = memory_region(REGION_CPU1);
+		break;
+	case SVI_CART:
+		if ( pcart ) {
+			svi.bank1_ptr = pcart;
+		}
+		break;
+	case SVI_EXPRAM2:
+		if ( mess_ram_size >= 64 * 1024 ) {
+			svi.bank1_ptr = mess_ram + mess_ram_size - 64 * 1024;
+			svi.bank1_read_only = 0;
+		}
+		break;
+	case SVI_EXPRAM3:
+		if ( mess_ram_size > 128 * 1024 ) {
+			svi.bank1_ptr = mess_ram + mess_ram_size - 128 * 1024;
+			svi.bank1_read_only = 0;
+		}
+		break;
+	}
 
-		/* SVI-318 has only 16kB RAM -- not 32kb! */
-		if (!svi.bank2 && svi.svi318)
-			memory_set_bankptr (2, svi.empty_bank);
+	svi.bank2_ptr = svi.bank3_ptr = svi.empty_bank;
+	svi.bank2_read_only = svi.bank3_read_only = 1;
 
-		if ((svi.bank1 == SVI_CART) && ( (v & 0xc0) != 0xc0))
-		{
-			memory_set_bankptr (2, (v&80)?svi.empty_bank:svi.banks[1][1] + 0x4000);
-			memory_set_bankptr (3, (v&40)?svi.empty_bank:svi.banks[1][1]);
+	switch( svi.bank2 ) {
+	case SVI_INTERNAL:
+		if ( mess_ram_size == 16 * 1024 ) {
+			svi.bank3_ptr = mess_ram;
+			svi.bank3_read_only = 0;
+		} else {
+			svi.bank2_ptr = mess_ram;
+			svi.bank2_read_only = 0;
+			svi.bank3_ptr = mess_ram + 0x4000;
+			svi.bank3_read_only = 0;
+		}
+		break;
+	case SVI_EXPRAM2:
+		if ( mess_ram_size >= 64 * 1024 ) {
+			svi.bank2_ptr = mess_ram + mess_ram_size - 64 * 1024 + 32 * 1024;
+			svi.bank2_read_only = 0;
+			svi.bank3_ptr = mess_ram + mess_ram_size - 64 * 1024 + 48 * 1024;
+			svi.bank3_read_only = 0;
+		}
+		break;
+	case SVI_EXPRAM3:
+		if ( mess_ram_size > 128 * 1024 ) {
+			svi.bank2_ptr = mess_ram + mess_ram_size - 128 * 1024 + 32 * 1024;
+			svi.bank2_read_only = 0;
+			svi.bank3_ptr = mess_ram + mess_ram_size - 128 * 1024 + 48 * 1024;
+			svi.bank3_read_only = 0;
+		}
+		break;
+	}
+
+	/* Check for special CART based banking */
+	if ( svi.bank1 == SVI_CART && ( v & 0xc0 ) != 0xc0 ) {
+		svi.bank2_ptr = svi.empty_bank;
+		svi.bank2_read_only = 1;
+		svi.bank3_ptr = svi.empty_bank;
+		svi.bank3_read_only = 1;
+		if ( pcart && ! ( v & 0x80 ) ) {
+			svi.bank3_ptr = pcart + 0x4000;
+		}
+		if ( pcart && ! ( v & 0x40 ) ) {
+			svi.bank2_ptr = pcart;
 		}
 	}
-	else
-	{
-		memory_set_bankptr (2, svi.empty_bank);
-		memory_set_bankptr (3, svi.empty_bank);
-	}
+
+	memory_set_bankptr( 1, svi.bank1_ptr );
+	memory_set_bankptr( 2, svi.bank2_ptr );
+	memory_set_bankptr( 3, svi.bank3_ptr );
 }
 
 /* Cassette */
