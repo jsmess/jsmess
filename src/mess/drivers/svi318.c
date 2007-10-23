@@ -464,19 +464,20 @@ static void svi318_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-SYSTEM_CONFIG_START(svi318)
+SYSTEM_CONFIG_START(svi318_common)
 	CONFIG_DEVICE(svi318_printer_getinfo)
 	CONFIG_DEVICE(svi318_cassette_getinfo)
 	CONFIG_DEVICE(svi318_cartslot_getinfo)
 	CONFIG_DEVICE(svi318_floppy_getinfo)
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START(svi318)
+	CONFIG_IMPORT_FROM(svi318_common)
 	CONFIG_RAM_DEFAULT(16 * 1024)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(svi328)
-	CONFIG_DEVICE(svi318_printer_getinfo)
-	CONFIG_DEVICE(svi318_cassette_getinfo)
-	CONFIG_DEVICE(svi318_cartslot_getinfo)
-	CONFIG_DEVICE(svi318_floppy_getinfo)
+	CONFIG_IMPORT_FROM(svi318_common)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
