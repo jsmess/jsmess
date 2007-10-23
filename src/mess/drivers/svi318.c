@@ -24,10 +24,9 @@
 #include "sound/ay8910.h"
 
 static ADDRESS_MAP_START( svi318_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x7fff) AM_READWRITE( MRA8_BANK1, svi318_writemem0 )
-	AM_RANGE( 0x8000, 0xbfff) AM_READ( MRA8_BANK2 )
-	AM_RANGE( 0xc000, 0xffff) AM_READ( MRA8_BANK3 )
-	AM_RANGE( 0x8000, 0xffff) AM_WRITE( svi318_writemem1 )
+	AM_RANGE( 0x0000, 0x7fff) AM_READWRITE( MRA8_BANK1, svi318_writemem1 )
+	AM_RANGE( 0x8000, 0xbfff) AM_READWRITE( MRA8_BANK2, svi318_writemem2 )
+	AM_RANGE( 0xc000, 0xffff) AM_READWRITE( MRA8_BANK3, svi318_writemem3 )
 ADDRESS_MAP_END
 
 

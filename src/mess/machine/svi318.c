@@ -24,6 +24,13 @@
 #include "sound/ay8910.h"
 #include "image.h"
 
+enum {
+	SVI_INTERNAL	= 0,
+	SVI_CART		= 1,
+	SVI_EXPRAM2		= 2,
+	SVI_EXPRAM3		= 3
+};
+
 typedef struct {
 	/* general */
 	int svi318;
@@ -666,7 +673,7 @@ INTERRUPT_GEN( svi318_interrupt )
 
 /* Memory */
 
-WRITE8_HANDLER( svi318_writemem0 )
+WRITE8_HANDLER( svi318_writemem1 )
 {
 	if (svi.bank1 < 2) return;
 
@@ -674,12 +681,12 @@ WRITE8_HANDLER( svi318_writemem0 )
 		svi.banks[0][svi.bank1][offset] = data;
 }
 
-WRITE8_HANDLER( svi318_writemem1 )
+WRITE8_HANDLER( svi318_writemem2 )
 {
 	switch (svi.bank2)
 	{
 	case 0:
-		if (!svi.svi318 || offset >= 0x4000)
+		if (!svi.svi318)
 			svi.banks[1][0][offset] = data;
 
 		break;
@@ -691,12 +698,27 @@ WRITE8_HANDLER( svi318_writemem1 )
 	}
 }
 
+WRITE8_HANDLER( svi318_writemem3 )
+{
+	switch (svi.bank2)
+	{
+	case 0:
+		svi.banks[1][0][offset + 0x4000] = data;
+		break;
+	case 2:
+	case 3:
+		if (svi.banks[1][svi.bank2])
+			svi.banks[1][svi.bank2][offset + 0x4000] = data;
+		break;
+	}
+}
+
 static void svi318_set_banks ()
 {
 	const UINT8 v = svi.bank_switch;
 
-	svi.bank1 = (v&1)?(v&2)?(v&8)?0:3:2:1;
-	svi.bank2 = (v&4)?(v&16)?0:3:2;
+	svi.bank1 = ( v & 1 ) ? ( ( v & 2 ) ? ( ( v & 8 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2 ) : SVI_CART;
+	svi.bank2 = ( v & 4 ) ? ( ( v & 16 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2;
 
 	if (svi.banks[0][svi.bank1])
 		memory_set_bankptr (1, svi.banks[0][svi.bank1]);
@@ -712,7 +734,7 @@ static void svi318_set_banks ()
 		if (!svi.bank2 && svi.svi318)
 			memory_set_bankptr (2, svi.empty_bank);
 
-		if ((svi.bank1 == 1) && ( (v & 0xc0) != 0xc0))
+		if ((svi.bank1 == SVI_CART) && ( (v & 0xc0) != 0xc0))
 		{
 			memory_set_bankptr (2, (v&80)?svi.empty_bank:svi.banks[1][1] + 0x4000);
 			memory_set_bankptr (3, (v&40)?svi.empty_bank:svi.banks[1][1]);

@@ -13,8 +13,9 @@ DEVICE_UNLOAD( svi318_cart );
 INTERRUPT_GEN( svi318_interrupt );
 void svi318_vdp_interrupt (int i);
 
-WRITE8_HANDLER( svi318_writemem0 );
 WRITE8_HANDLER( svi318_writemem1 );
+WRITE8_HANDLER( svi318_writemem2 );
+WRITE8_HANDLER( svi318_writemem3 );
 
 READ8_HANDLER( svi318_printer_r );
 WRITE8_HANDLER( svi318_printer_w );
