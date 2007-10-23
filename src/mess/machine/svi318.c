@@ -26,6 +26,7 @@
 
 static SVI_318 svi;
 static UINT8 *pcart;
+static UINT32 pcart_rom_size;
 
 static void svi318_set_banks (void);
 
@@ -40,16 +41,27 @@ static int svi318_verify_cart (UINT8 magic[2])
 		return IMAGE_VERIFY_FAIL;
 }
 
+DEVICE_INIT( svi318_cart ) {
+	pcart = NULL;
+	pcart_rom_size = 0;
+
+	return INIT_PASS;
+}
+
 DEVICE_LOAD( svi318_cart )
 {
 	UINT8 *p;
-	int size;
+	UINT32 size;
 
-	p = image_malloc(image, 0x8000);
+	size = MAX(0x8000,image_length(image));
+
+	p = image_malloc(image, size);
 	if (!p)
 		return INIT_FAIL;
 
-	memset(p, 0xff, 0x8000);
+	pcart_rom_size = size;
+	memset(p, 0xff, size);
+
 	size = image_length(image);
 	if (image_fread(image, p, size) != size)
 	{
@@ -68,6 +80,7 @@ DEVICE_LOAD( svi318_cart )
 DEVICE_UNLOAD( svi318_cart )
 {
 	pcart = svi.banks[0][1] = NULL;
+	pcart_rom_size = 0;
 }
 
 /* PPI */

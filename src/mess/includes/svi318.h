@@ -15,6 +15,7 @@ DRIVER_INIT( svi318 );
 MACHINE_START( svi318 );
 MACHINE_RESET( svi318 );
 
+DEVICE_INIT( svi318_cart );
 DEVICE_LOAD( svi318_cart );
 DEVICE_UNLOAD( svi318_cart );
 

@@ -2,6 +2,11 @@
 ** svi318.c : driver for Spectravideo SVI-318 and SVI-328
 **
 ** Sean Young, Tomas Karlsson
+**
+** Information taken from: http://www.samdal.com/sv318.htm
+**
+** SV-318 : 16KB Video RAM, 16KB RAM
+** SV-328 : 16KB Video RAM, 64KB RAM
 */
 
 #include "driver.h"
@@ -430,6 +435,7 @@ static void svi318_cartslot_getinfo(const device_class *devclass, UINT32 state, 
 		case DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_INIT:							info->init = device_init_svi318_cart; break;
 		case DEVINFO_PTR_LOAD:							info->load = device_load_svi318_cart; break;
 		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_svi318_cart; break;
 
@@ -463,9 +469,18 @@ SYSTEM_CONFIG_START(svi318)
 	CONFIG_DEVICE(svi318_cassette_getinfo)
 	CONFIG_DEVICE(svi318_cartslot_getinfo)
 	CONFIG_DEVICE(svi318_floppy_getinfo)
+	CONFIG_RAM_DEFAULT(16 * 1024)
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START(svi328)
+	CONFIG_DEVICE(svi318_printer_getinfo)
+	CONFIG_DEVICE(svi318_cassette_getinfo)
+	CONFIG_DEVICE(svi318_cartslot_getinfo)
+	CONFIG_DEVICE(svi318_floppy_getinfo)
+	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 /*   YEAR  NAME     PARENT  	BIOS	COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY FULLNAME */
 COMP( 1983, svi318,       0,      	0, 	svi318,  svi318, svi318, svi318, "Spectravideo", "SVI-318 (SV BASIC v1.0)" , 0)
-COMPB(1983, svi328,  svi318,	svi328,	0, 	svi318,  svi328, svi318, svi318, "Spectravideo", "SVI-328" , 0)
-COMPB(1983, svi328b, svi318,	svi328b,0, 	svi328b, svi328, svi318, svi318, "Spectravideo", "SVI-328 + 80 column card", GAME_NOT_WORKING  )
+COMPB(1983, svi328,  svi318,	svi328,	0, 	svi318,  svi328, svi318, svi328, "Spectravideo", "SVI-328" , 0)
+COMPB(1983, svi328b, svi318,	svi328b,0, 	svi328b, svi328, svi318, svi328, "Spectravideo", "SVI-328 + 80 column card", GAME_NOT_WORKING  )
