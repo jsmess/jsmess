@@ -648,7 +648,7 @@ MACHINE_RESET( svi318 )
 
 INTERRUPT_GEN( svi318_interrupt )
 {
-	int set, i, p, b, bit;
+	int set;
 
 	set = readinputport (13);
 	TMS9928A_set_spriteslimit (set & 0x20);
