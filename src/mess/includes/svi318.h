@@ -2,15 +2,6 @@
 ** Spectravideo SVI-318 and SVI-328
 */
 
-typedef struct {
-	/* general */
-	int svi318;
-	/* memory */
-	UINT8 *banks[2][4], *empty_bank, bank_switch, bank1, bank2;
-	/* printer */
-	UINT8 prn_data, prn_strobe;
-} SVI_318;
-
 DRIVER_INIT( svi318 );
 MACHINE_START( svi318 );
 MACHINE_RESET( svi318 );

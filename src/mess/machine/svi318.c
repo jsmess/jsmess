@@ -24,6 +24,15 @@
 #include "sound/ay8910.h"
 #include "image.h"
 
+typedef struct {
+	/* general */
+	int svi318;
+	/* memory */
+	UINT8 *banks[2][4], *empty_bank, bank_switch, bank1, bank2;
+	/* printer */
+	UINT8 prn_data, prn_strobe;
+} SVI_318;
+
 static SVI_318 svi;
 static UINT8 *pcart;
 static UINT32 pcart_rom_size;
