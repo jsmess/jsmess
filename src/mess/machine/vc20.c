@@ -62,7 +62,7 @@ static void vc20_via0_irq (int level)
 
 static  READ8_HANDLER( vc20_via0_read_ca1 )
 {
-	return !KEY_RESTORE;
+	return ! ( readinputportbytag( TAG_KEYBOARD_EXTRA ) & 0x02 );
 }
 
 static  READ8_HANDLER( vc20_via0_read_ca2 )
@@ -722,87 +722,16 @@ DEVICE_LOAD(vc20_rom)
 INTERRUPT_GEN( vc20_frame_interrupt )
 {
 	via_0_ca1_w (0, vc20_via0_read_ca1 (0));
-	keyboard[0] = 0xff;
-	if (KEY_DEL) keyboard[0]&=~0x80;
-	if (KEY_POUND) keyboard[0]&=~0x40;
-	if (KEY_PLUS) keyboard[0]&=~0x20;
-	if (KEY_9) keyboard[0]&=~0x10;
-	if (KEY_7) keyboard[0]&=~0x08;
-	if (KEY_5) keyboard[0]&=~0x04;
-	if (KEY_3) keyboard[0]&=~0x02;
-	if (KEY_1) keyboard[0]&=~0x01;
-
-	keyboard[1] = 0xff;
-	if (KEY_RETURN) keyboard[1]&=~0x80;
-	if (KEY_ASTERIX) keyboard[1]&=~0x40;
-	if (KEY_P) keyboard[1]&=~0x20;
-	if (KEY_I) keyboard[1]&=~0x10;
-	if (KEY_Y) keyboard[1]&=~0x08;
-	if (KEY_R) keyboard[1]&=~0x04;
-	if (KEY_W) keyboard[1]&=~0x02;
-	if (KEY_ARROW_LEFT) keyboard[1]&=~0x01;
-
-	keyboard[2] = 0xff;
-	if (KEY_RIGHT) keyboard[2]&=~0x80;
-	if (KEY_SEMICOLON) keyboard[2]&=~0x40;
-	if (KEY_L) keyboard[2]&=~0x20;
-	if (KEY_J) keyboard[2]&=~0x10;
-	if (KEY_G) keyboard[2]&=~0x08;
-	if (KEY_D) keyboard[2]&=~0x04;
-	if (KEY_A) keyboard[2]&=~0x02;
-	if (KEY_CTRL) keyboard[2]&=~0x01;
-
-	keyboard[3] = 0xff;
-	if (KEY_DOWN) keyboard[3]&=~0x80;
-	if (KEY_SLASH) keyboard[3]&=~0x40;
-	if (KEY_COMMA) keyboard[3]&=~0x20;
-	if (KEY_N) keyboard[3]&=~0x10;
-	if (KEY_V) keyboard[3]&=~0x08;
-	if (KEY_X) keyboard[3]&=~0x04;
-	if (KEY_LEFT_SHIFT) keyboard[3]&=~0x02;
-	if (KEY_STOP) keyboard[3]&=~0x01;
-
-	keyboard[4] = 0xff;
-	if (KEY_F1) keyboard[4]&=~0x80;
-	if (KEY_RIGHT_SHIFT) keyboard[4]&=~0x40;
-	if (KEY_POINT) keyboard[4]&=~0x20;
-	if (KEY_M) keyboard[4]&=~0x10;
-	if (KEY_B) keyboard[4]&=~0x08;
-	if (KEY_C) keyboard[4]&=~0x04;
-	if (KEY_Z) keyboard[4]&=~0x02;
-	if (KEY_SPACE) keyboard[4]&=~0x01;
-
-	keyboard[5] = 0xff;
-	if (KEY_F3) keyboard[5]&=~0x80;
-	if (KEY_EQUALS) keyboard[5]&=~0x40;
-	if (KEY_COLON) keyboard[5]&=~0x20;
-	if (KEY_K) keyboard[5]&=~0x10;
-	if (KEY_H) keyboard[5]&=~0x08;
-	if (KEY_F) keyboard[5]&=~0x04;
-	if (KEY_S) keyboard[5]&=~0x02;
-	if (KEY_CBM) keyboard[5]&=~0x01;
-
-	keyboard[6] = 0xff;
-	if (KEY_F5) keyboard[6]&=~0x80;
-	if (KEY_ARROW_UP) keyboard[6]&=~0x40;
-	if (KEY_AT) keyboard[6]&=~0x20;
-	if (KEY_O) keyboard[6]&=~0x10;
-	if (KEY_U) keyboard[6]&=~0x08;
-	if (KEY_T) keyboard[6]&=~0x04;
-	if (KEY_E) keyboard[6]&=~0x02;
-	if (KEY_Q) keyboard[6]&=~0x01;
-
-	keyboard[7] = 0xff;
-	if (KEY_F7) keyboard[7]&=~0x80;
-	if (KEY_HOME) keyboard[7]&=~0x40;
-	if (KEY_MINUS) keyboard[7]&=~0x20;
-	if (KEY_0) keyboard[7]&=~0x10;
-	if (KEY_8) keyboard[7]&=~0x08;
-	if (KEY_6) keyboard[7]&=~0x04;
-	if (KEY_4) keyboard[7]&=~0x02;
-	if (KEY_2) keyboard[7]&=~0x01;
+	keyboard[0] = readinputportbytag( TAG_KEYBOARD_ROW0 );
+	keyboard[1] = readinputportbytag( TAG_KEYBOARD_ROW1 );
+	keyboard[2] = readinputportbytag( TAG_KEYBOARD_ROW2 );
+	keyboard[3] = readinputportbytag( TAG_KEYBOARD_ROW3 );
+	keyboard[4] = readinputportbytag( TAG_KEYBOARD_ROW4 );
+	keyboard[5] = readinputportbytag( TAG_KEYBOARD_ROW5 );
+	keyboard[6] = readinputportbytag( TAG_KEYBOARD_ROW6 );
+	keyboard[7] = readinputportbytag( TAG_KEYBOARD_ROW7 );
 
 	vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
 	vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);
-	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , KEY_SHIFT_LOCK ? 1 : 0);
+	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , ( readinputportbytag( TAG_KEYBOARD_EXTRA ) & 0x01 ) ? 1 : 0);
 }
