@@ -26,7 +26,8 @@
 #define MAX_SOUND 32
 
 /* Enum listing all the sound chips */
-enum
+typedef enum _sound_type sound_type;
+enum _sound_type
 {
 	SOUND_DUMMY,
 	SOUND_CUSTOM,
@@ -221,15 +222,15 @@ void *sndnum_token(int sndnum);
 ***************************************************************************/
 
 /* get info accessors */
-INT64 sndti_get_info_int(int sndtype, int sndindex, UINT32 state);
-void *sndti_get_info_ptr(int sndtype, int sndindex, UINT32 state);
-genf *sndti_get_info_fct(int sndtype, int sndindex, UINT32 state);
-const char *sndti_get_info_string(int sndtype, int sndindex, UINT32 state);
+INT64 sndti_get_info_int(sound_type sndtype, int sndindex, UINT32 state);
+void *sndti_get_info_ptr(sound_type sndtype, int sndindex, UINT32 state);
+genf *sndti_get_info_fct(sound_type sndtype, int sndindex, UINT32 state);
+const char *sndti_get_info_string(sound_type sndtype, int sndindex, UINT32 state);
 
 /* set info accessors */
-void sndti_set_info_int(int sndtype, int sndindex, UINT32 state, INT64 data);
-void sndti_set_info_ptr(int sndtype, int sndindex, UINT32 state, void *data);
-void sndti_set_info_fct(int sndtype, int sndindex, UINT32 state, genf *data);
+void sndti_set_info_int(sound_type sndtype, int sndindex, UINT32 state, INT64 data);
+void sndti_set_info_ptr(sound_type sndtype, int sndindex, UINT32 state, void *data);
+void sndti_set_info_fct(sound_type sndtype, int sndindex, UINT32 state, genf *data);
 
 #define sndti_name(sndtype, sndindex)			sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_NAME)
 #define sndti_core_family(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_FAMILY)
@@ -238,12 +239,12 @@ void sndti_set_info_fct(int sndtype, int sndindex, UINT32 state, genf *data);
 #define sndti_core_credits(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_CREDITS)
 
 /* misc accessors */
-void sndti_reset(int type, int index);
-int sndti_clock(int sndtype, int sndindex);
-void *sndti_token(int sndtype, int sndindex);
+void sndti_reset(sound_type sndtype, int sndindex);
+int sndti_clock(sound_type sndtype, int sndindex);
+void *sndti_token(sound_type sndtype, int sndindex);
 
 /* driver gain controls on chip outputs */
-void sndti_set_output_gain(int type, int index, int output, float gain);
+void sndti_set_output_gain(sound_type sndtype, int sndindex, int output, float gain);
 
 
 
@@ -252,10 +253,10 @@ void sndti_set_output_gain(int type, int index, int output, float gain);
 ***************************************************************************/
 
 /* get info accessors */
-INT64 sndtype_get_info_int(int sndtype, UINT32 state);
-void *sndtype_get_info_ptr(int sndtype, UINT32 state);
-genf *sndtype_get_info_fct(int sndtype, UINT32 state);
-const char *sndtype_get_info_string(int sndtype, UINT32 state);
+INT64 sndtype_get_info_int(sound_type sndtype, UINT32 state);
+void *sndtype_get_info_ptr(sound_type sndtype, UINT32 state);
+genf *sndtype_get_info_fct(sound_type sndtype, UINT32 state);
+const char *sndtype_get_info_string(sound_type sndtype, UINT32 state);
 
 #define sndtype_name(sndtype)					sndtype_get_info_string(sndtype, SNDINFO_STR_NAME)
 #define sndtype_core_family(sndtype)			sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_FAMILY)
@@ -271,14 +272,14 @@ const char *sndtype_get_info_string(int sndtype, UINT32 state);
 
 /* Initialization/Tear down */
 void sndintrf_init(running_machine *machine);
-int sndintrf_init_sound(int sndnum, int sndtype, int clock, const void *config);
+int sndintrf_init_sound(int sndnum, sound_type sndtype, int clock, const void *config);
 void sndintrf_exit_sound(int sndnum);
 void sndintrf_register_token(void *token);
 
 /* Misc helpers */
-int sndti_exists(int type, int index);
-int sndti_to_sndnum(int type, int index);
-int sndnum_to_sndti(int sndnum, int *index);
+int sndti_exists(sound_type sndtype, int sndindex);
+int sndti_to_sndnum(sound_type type, int index);
+sound_type sndnum_to_sndti(int sndnum, int *index);
 
 
 #endif	/* __SNDINTRF_H__ */

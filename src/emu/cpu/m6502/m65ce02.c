@@ -40,8 +40,7 @@
 #include "debugger.h"
 #include "m65ce02.h"
 
-#include "ops02.h"
-#include "opsc02.h"
+#include "mincce02.h"
 #include "opsce02.h"
 
 #define VERBOSE 0

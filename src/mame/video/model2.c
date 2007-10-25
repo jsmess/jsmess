@@ -99,6 +99,7 @@ extern UINT32 *model2_textureram0;
 extern UINT32 *model2_textureram1;
 extern UINT32 *model2_lumaram;
 
+
 /*******************************************
  *
  *  Basic Data Types
@@ -457,6 +458,24 @@ static void model2_3d_process_quad( UINT32 attr )
 	if ( max_z < 0 )
 		cull = 1;
 
+	/* set the object's z value */
+	zvalue = raster.triangle_z;
+
+	/* see if we need to recompute min/max z */
+	if ( (attr >> 10) & 3 )
+	{
+		if ( (attr >> 10) & 1 ) /* min value */
+		{
+			zvalue = min_z;
+		}
+		else if ( (attr >> 10) & 2 ) /* max value */
+		{
+			zvalue = max_z;
+		}
+
+		raster.triangle_z = zvalue;
+	}
+
 	if ( cull == 0 )
 	{
 		INT32	clipped_verts;
@@ -474,34 +493,6 @@ static void model2_3d_process_quad( UINT32 attr )
 		if ( clipped_verts > 2 )
 		{
 			triangle *ztri;
-
-			/* set the object's z value */
-			zvalue = raster.triangle_z;
-
-			/* see if we need to recompute min/max z */
-			if ( (attr >> 10) & 3 )
-			{
-				/* update min_z and max_z with the new clipped values */
-				min_z = verts[0].z;
-				max_z = verts[0].z;
-
-				for( i = 1; i < clipped_verts; i++ )
-				{
-					if ( verts[i].z < min_z ) min_z = verts[i].z;
-					if ( verts[i].z > max_z ) max_z = verts[i].z;
-				}
-
-				if ( (attr >> 10) & 1 ) /* min value */
-				{
-					zvalue = min_z;
-				}
-				else if ( (attr >> 10) & 2 ) /* max value */
-				{
-					zvalue = max_z;
-				}
-
-				raster.triangle_z = zvalue;
-			}
 
 			/* adjust and set the object z-sort value */
 			object.z = float_to_zval( zvalue + raster.z_adjust );
@@ -703,6 +694,24 @@ static void model2_3d_process_triangle( UINT32 attr )
 	if ( max_z < 0 )
 		cull = 1;
 
+	/* set the object's z value */
+	zvalue = raster.triangle_z;
+
+	/* see if we need to recompute min/max z */
+	if ( (attr >> 10) & 3 )
+	{
+		if ( (attr >> 10) & 1 ) /* min value */
+		{
+			zvalue = min_z;
+		}
+		else if ( (attr >> 10) & 2 ) /* max value */
+		{
+			zvalue = max_z;
+		}
+
+		raster.triangle_z = zvalue;
+	}
+
 	/* if we're not culling, do z-clip and add to out triangle list */
 	if ( cull == 0 )
 	{
@@ -721,34 +730,6 @@ static void model2_3d_process_triangle( UINT32 attr )
 		if ( clipped_verts > 2 )
 		{
 			triangle *ztri;
-
-			/* set the object's z value */
-			zvalue = raster.triangle_z;
-
-			/* see if we need to recompute min/max z */
-			if ( (attr >> 10) & 3 )
-			{
-				/* update min_z and max_z with the new clipped values */
-				min_z = verts[0].z;
-				max_z = verts[0].z;
-
-				for( i = 1; i < clipped_verts; i++ )
-				{
-					if ( verts[i].z < min_z ) min_z = verts[i].z;
-					if ( verts[i].z > max_z ) max_z = verts[i].z;
-				}
-
-				if ( (attr >> 10) & 1 ) /* min value */
-				{
-					zvalue = min_z;
-				}
-				else if ( (attr >> 10) & 2 ) /* max value */
-				{
-					zvalue = max_z;
-				}
-
-				raster.triangle_z = zvalue;
-			}
 
 			/* adjust and set the object z-sort value */
 			object.z = float_to_zval( zvalue + raster.z_adjust );
@@ -2714,6 +2695,8 @@ static void convert_bitmap( running_machine *machine, bitmap_t *dst, bitmap_t *s
 
 VIDEO_UPDATE(model2)
 {
+	logerror("--- frame ---\n");
+
 	sys24_tile_update(machine);
 	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 	fillbitmap(sys24_bitmap, 0, &machine->screen[0].visarea);

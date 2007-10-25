@@ -8937,7 +8937,7 @@ static UINT8 DefaultEnableRegion(SearchRegion * region, SearchInfo * info)
 		case kSearchSpeed_Fast:
 
 #if HAS_SH2
-			if(Machine->drv->cpu[0].cpu_type == CPU_SH2)
+			if(Machine->drv->cpu[0].type == CPU_SH2)
 			{
 				if(	(info->targetType == kRegionType_CPU) && (info->targetIdx == 0) && (region->address == 0x06000000))
 					return 1;
@@ -8963,12 +8963,12 @@ static UINT8 DefaultEnableRegion(SearchRegion * region, SearchInfo * info)
 #if HAS_TMS34010
 
 			/* ----- for exterminator, search bank one ----- */
-			if(	(Machine->drv->cpu[1].cpu_type == CPU_TMS34010) && (info->targetType == kRegionType_CPU) &&
+			if(	(Machine->drv->cpu[1].type == CPU_TMS34010) && (info->targetType == kRegionType_CPU) &&
 				(info->targetIdx == 1) && (handler == MWA8_BANK1))
 				return 1;
 
 			/* ----- for smashtv, search bank two ----- */
-			if(	(Machine->drv->cpu[0].cpu_type == CPU_TMS34010) && (info->targetType == kRegionType_CPU) &&
+			if(	(Machine->drv->cpu[0].type == CPU_TMS34010) && (info->targetType == kRegionType_CPU) &&
 				(info->targetIdx == 0) && (handler == MWA8_BANK2))
 				return 1;
 
@@ -11852,7 +11852,7 @@ static void BuildCPUInfoList(void)
 			CPUInfo	* info = &cpuInfoList[i];
 			CPUInfo	* regionInfo = &regionInfoList[REGION_CPU1 + i - REGION_INVALID];
 
-			int		type = Machine->drv->cpu[i].cpu_type;
+			cpu_type type = Machine->drv->cpu[i].type;
 
 			info->type = type;
 			info->dataBits = cputype_databus_width(type, ADDRESS_SPACE_PROGRAM);

@@ -151,7 +151,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	{										\
 		static const UINT8 table[3]={3,10,10}; 	\
 		I.ip = (WORD)(I.ip+tmp);			\
-		nec_ICount-=table[cpu_type/8];		\
+		nec_ICount-=table[chip_type/8];		\
 		CHANGE_PC;							\
 		return;								\
 	}
@@ -283,7 +283,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",activecpu_get_pc());	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[cpu_type/8];						\
+		nec_ICount-=table[chip_type/8];						\
 		tmp = GetMemB(DS, si);								\
 		tmp2 = GetMemB(ES, di);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
@@ -308,7 +308,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",activecpu_get_pc());	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[cpu_type/8];						\
+		nec_ICount-=table[chip_type/8];						\
 		tmp = GetMemB(ES, di);								\
 		tmp2 = GetMemB(DS, si);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
@@ -338,7 +338,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",activecpu_get_pc());	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[cpu_type/8];						\
+		nec_ICount-=table[chip_type/8];						\
 		tmp = GetMemB(ES, di);								\
 		tmp2 = GetMemB(DS, si);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\

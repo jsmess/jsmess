@@ -819,11 +819,12 @@ static void es5506_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 ***********************************************************************************************/
 
-static void *es5506_start_common(int sndtype, int sndindex, int clock, const void *config)
+static void *es5506_start_common(sound_type sndtype, int sndindex, int clock, const void *config)
 {
 	const struct ES5506interface *intf = config;
 	struct ES5506Chip *chip;
 	int j;
+	UINT32 accum_mask;
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
@@ -851,6 +852,7 @@ static void *es5506_start_common(int sndtype, int sndindex, int clock, const voi
 	chip->irqv = 0x80;
 
 	/* init the voices */
+	accum_mask = (sndtype == SOUND_ES5506) ? 0xffffffff : 0x7fffffff;
 	for (j = 0; j < 32; j++)
 	{
 		chip->voice[j].index = j;
@@ -858,7 +860,7 @@ static void *es5506_start_common(int sndtype, int sndindex, int clock, const voi
 		chip->voice[j].lvol = 0xffff;
 		chip->voice[j].rvol = 0xffff;
 		chip->voice[j].exbank = 0;
-		chip->voice[j].accum_mask = (sndtype == SOUND_ES5506) ? 0xffffffff : 0x7fffffff;
+		chip->voice[j].accum_mask = accum_mask;
 	}
 
 	/* allocate memory */

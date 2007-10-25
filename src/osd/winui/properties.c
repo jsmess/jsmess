@@ -578,18 +578,18 @@ static char *GameInfoCPU(UINT nIndex)
 	cpuintrf_init(NULL);
 
 	i = 0;
-	while (i < MAX_CPU && drv.cpu[i].cpu_type)
+	while (i < MAX_CPU && drv.cpu[i].type)
 	{
-		if (drv.cpu[i].cpu_clock >= 1000000)
+		if (drv.cpu[i].clock >= 1000000)
 			sprintf(&buf[strlen(buf)], "%s %d.%06d MHz",
-					cputype_name(drv.cpu[i].cpu_type),
-					drv.cpu[i].cpu_clock / 1000000,
-					drv.cpu[i].cpu_clock % 1000000);
+					cputype_name(drv.cpu[i].type),
+					drv.cpu[i].clock / 1000000,
+					drv.cpu[i].clock % 1000000);
 		else
 			sprintf(&buf[strlen(buf)], "%s %d.%03d kHz",
-					cputype_name(drv.cpu[i].cpu_type),
-					drv.cpu[i].cpu_clock / 1000,
-					drv.cpu[i].cpu_clock % 1000);
+					cputype_name(drv.cpu[i].type),
+					drv.cpu[i].clock / 1000,
+					drv.cpu[i].clock % 1000);
 
 		strcat(buf, "\n");
 
@@ -610,18 +610,18 @@ static char *GameInfoSound(UINT nIndex)
 	buf[0] = 0;
 
 	i = 0;
-	while (i < MAX_SOUND && drv.sound[i].sound_type)
+	while (i < MAX_SOUND && drv.sound[i].type)
 	{
 		int clock,sound_type,count;
 
-		sound_type = drv.sound[i].sound_type;
+		sound_type = drv.sound[i].type;
 		clock = drv.sound[i].clock;
 
 		count = 1;
 		i++;
 
 		while (i < MAX_SOUND
-				&& drv.sound[i].sound_type == sound_type
+				&& drv.sound[i].type == sound_type
 				&& drv.sound[i].clock == clock)
 		{
 			count++;
@@ -2361,13 +2361,13 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 		{
 			if (nIndex <= -1
 #if HAS_YM3812
-			||  drv.sound[i].sound_type == SOUND_YM3812
+			||  drv.sound[i].type == SOUND_YM3812
 #endif
 #if HAS_YM3526
-			||  drv.sound[i].sound_type == SOUND_YM3526
+			||  drv.sound[i].type == SOUND_YM3526
 #endif
 #if HAS_YM2413
-			||  drv.sound[i].sound_type == SOUND_YM2413
+			||  drv.sound[i].type == SOUND_YM2413
 #endif
 			)
 				enabled = TRUE;
@@ -2395,9 +2395,9 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 		for (i = 0; i < MAX_SOUND; i++)
 		{
 			if (nIndex <= -1
-			||  drv.sound[i].sound_type == SOUND_SAMPLES
+			||  drv.sound[i].type == SOUND_SAMPLES
 #if HAS_VLM5030
-			||  drv.sound[i].sound_type == SOUND_VLM5030
+			||  drv.sound[i].type == SOUND_VLM5030
 #endif
 			)
 				enabled = TRUE;

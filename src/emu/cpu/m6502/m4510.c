@@ -104,6 +104,7 @@ z:      xxxx address bits a19 .. a16 for memory accesses with a15 1 ?
 #include "m6502.h"
 #include "m4510.h"
 
+#include "minc4510.h"
 #include "opsce02.h"
 #include "ops4510.h"
 

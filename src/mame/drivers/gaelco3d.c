@@ -632,7 +632,7 @@ static void adsp_tx_callback(int port, INT32 data)
 			/* calculate how long until we generate an interrupt */
 
 			/* period per each bit sent */
-			sample_period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[2].cpu_clock), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			sample_period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[2].clock), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period = scale_up_mame_time(sample_period, 16 * SOUND_CHANNELS);
@@ -963,8 +963,8 @@ MACHINE_DRIVER_START( gaelco3d )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(576 / GAELCO3D_RESOLUTION_DIVIDE, 432 / GAELCO3D_RESOLUTION_DIVIDE)
-	MDRV_SCREEN_VISIBLE_AREA(0, 576 / GAELCO3D_RESOLUTION_DIVIDE - 1, 0, 432 / GAELCO3D_RESOLUTION_DIVIDE - 1)
+	MDRV_SCREEN_SIZE(576, 432)
+	MDRV_SCREEN_VISIBLE_AREA(0, 575, 0, 431)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(gaelco3d)

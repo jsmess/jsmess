@@ -54,8 +54,8 @@ typedef struct _sndintrf_data sndintrf_data;
 struct _sndintrf_data
 {
 	sound_interface	intf;	 		/* copy of the interface data */
-	int				sndtype; 		/* type index of this sound chip */
-	int				aliastype;		/* aliased type index of this sound chip */
+	sound_type			sndtype; 		/* type index of this sound chip */
+	sound_type			aliastype;		/* aliased type index of this sound chip */
 	int				index; 			/* index of this sound chip */
 	int				clock; 			/* clock for this sound chip */
 	void *			token;			/* dynamically allocated token data */
@@ -178,7 +178,7 @@ static sound_interface sndintrf[SOUND_COUNT];
 
 static const struct
 {
-	int		sndtype;
+	sound_type	sndtype;
 	void	(*get_info)(void *token, UINT32 state, sndinfo *info);
 } sndintrf_map[] =
 {
@@ -498,7 +498,7 @@ void sndintrf_init(running_machine *machine)
 	/* build the sndintrf array */
 	for (mapindex = 0; mapindex < sizeof(sndintrf_map) / sizeof(sndintrf_map[0]); mapindex++)
 	{
-		int sndtype = sndintrf_map[mapindex].sndtype;
+		sound_type sndtype = sndintrf_map[mapindex].sndtype;
 		sound_interface *intf = &sndintrf[sndtype];
 		sndinfo info;
 
@@ -542,7 +542,7 @@ void sndintrf_init(running_machine *machine)
     particular sndnum
 -------------------------------------------------*/
 
-int sndintrf_init_sound(int sndnum, int sndtype, int clock, const void *config)
+int sndintrf_init_sound(int sndnum, sound_type sndtype, int clock, const void *config)
 {
 	sndintrf_data *info = &sound[sndnum];
 	int index;
@@ -614,7 +614,7 @@ void sndintrf_register_token(void *token)
     pair describes an existing chip
 -------------------------------------------------*/
 
-int sndti_exists(int type, int index)
+int sndti_exists(sound_type type, int index)
 {
 	return (sound_matrix[type][index] != 0);
 }
@@ -625,7 +625,7 @@ int sndti_exists(int type, int index)
     a sound number
 -------------------------------------------------*/
 
-int sndti_to_sndnum(int type, int index)
+int sndti_to_sndnum(sound_type type, int index)
 {
 	return sound_matrix[type][index] - 1;
 }
@@ -636,7 +636,7 @@ int sndti_to_sndnum(int type, int index)
     (type,index) pair
 -------------------------------------------------*/
 
-int sndnum_to_sndti(int sndnum, int *index)
+sound_type sndnum_to_sndti(int sndnum, int *index)
 {
 	if (index != NULL)
 		*index = sound[sndnum].index;
@@ -756,7 +756,7 @@ void *sndnum_token(int sndnum)
     Get info accessors
 -------------------------------------------------*/
 
-INT64 sndti_get_info_int(int sndtype, int sndindex, UINT32 state)
+INT64 sndti_get_info_int(sound_type sndtype, int sndindex, UINT32 state)
 {
 	sndinfo info;
 	int sndnum;
@@ -768,7 +768,7 @@ INT64 sndti_get_info_int(int sndtype, int sndindex, UINT32 state)
 	return info.i;
 }
 
-void *sndti_get_info_ptr(int sndtype, int sndindex, UINT32 state)
+void *sndti_get_info_ptr(sound_type sndtype, int sndindex, UINT32 state)
 {
 	sndinfo info;
 	int sndnum;
@@ -780,7 +780,7 @@ void *sndti_get_info_ptr(int sndtype, int sndindex, UINT32 state)
 	return info.p;
 }
 
-genf *sndti_get_info_fct(int sndtype, int sndindex, UINT32 state)
+genf *sndti_get_info_fct(sound_type sndtype, int sndindex, UINT32 state)
 {
 	sndinfo info;
 	int sndnum;
@@ -792,7 +792,7 @@ genf *sndti_get_info_fct(int sndtype, int sndindex, UINT32 state)
 	return info.f;
 }
 
-const char *sndti_get_info_string(int sndtype, int sndindex, UINT32 state)
+const char *sndti_get_info_string(sound_type sndtype, int sndindex, UINT32 state)
 {
 	sndinfo info;
 	int sndnum;
@@ -809,7 +809,7 @@ const char *sndti_get_info_string(int sndtype, int sndindex, UINT32 state)
     Set info accessors
 -------------------------------------------------*/
 
-void sndti_set_info_int(int sndtype, int sndindex, UINT32 state, INT64 data)
+void sndti_set_info_int(sound_type sndtype, int sndindex, UINT32 state, INT64 data)
 {
 	sndinfo info;
 	int sndnum;
@@ -820,7 +820,7 @@ void sndti_set_info_int(int sndtype, int sndindex, UINT32 state, INT64 data)
 	(*sound[sndnum].intf.set_info)(sound[sndnum].token, state, &info);
 }
 
-void sndti_set_info_ptr(int sndtype, int sndindex, UINT32 state, void *data)
+void sndti_set_info_ptr(sound_type sndtype, int sndindex, UINT32 state, void *data)
 {
 	sndinfo info;
 	int sndnum;
@@ -831,7 +831,7 @@ void sndti_set_info_ptr(int sndtype, int sndindex, UINT32 state, void *data)
 	(*sound[sndnum].intf.set_info)(sound[sndnum].token, state, &info);
 }
 
-void sndti_set_info_fct(int sndtype, int sndindex, UINT32 state, genf *data)
+void sndti_set_info_fct(sound_type sndtype, int sndindex, UINT32 state, genf *data)
 {
 	sndinfo info;
 	int sndnum;
@@ -847,7 +847,7 @@ void sndti_set_info_fct(int sndtype, int sndindex, UINT32 state, genf *data)
     Misc accessors
 -------------------------------------------------*/
 
-void sndti_reset(int sndtype, int sndindex)
+void sndti_reset(sound_type sndtype, int sndindex)
 {
 	int sndnum;
 
@@ -857,7 +857,7 @@ void sndti_reset(int sndtype, int sndindex)
 		(*sound[sndnum].intf.reset)(sound[sndnum].token);
 }
 
-int sndti_clock(int sndtype, int sndindex)
+int sndti_clock(sound_type sndtype, int sndindex)
 {
 	int sndnum;
 	VERIFY_SNDTI(sndti_clock);
@@ -865,7 +865,7 @@ int sndti_clock(int sndtype, int sndindex)
 	return sound[sndnum].clock;
 }
 
-void *sndti_token(int sndtype, int sndindex)
+void *sndti_token(sound_type sndtype, int sndindex)
 {
 	int sndnum;
 	VERIFY_SNDTI(sndti_token);
@@ -883,7 +883,7 @@ void *sndti_token(int sndtype, int sndindex)
     Get info accessors
 -------------------------------------------------*/
 
-INT64 sndtype_get_info_int(int sndtype, UINT32 state)
+INT64 sndtype_get_info_int(sound_type sndtype, UINT32 state)
 {
 	sndinfo info;
 
@@ -893,7 +893,7 @@ INT64 sndtype_get_info_int(int sndtype, UINT32 state)
 	return info.i;
 }
 
-void *sndtype_get_info_ptr(int sndtype, UINT32 state)
+void *sndtype_get_info_ptr(sound_type sndtype, UINT32 state)
 {
 	sndinfo info;
 
@@ -903,7 +903,7 @@ void *sndtype_get_info_ptr(int sndtype, UINT32 state)
 	return info.p;
 }
 
-genf *sndtype_get_info_fct(int sndtype, UINT32 state)
+genf *sndtype_get_info_fct(sound_type sndtype, UINT32 state)
 {
 	sndinfo info;
 
@@ -913,7 +913,7 @@ genf *sndtype_get_info_fct(int sndtype, UINT32 state)
 	return info.f;
 }
 
-const char *sndtype_get_info_string(int sndtype, UINT32 state)
+const char *sndtype_get_info_string(sound_type sndtype, UINT32 state)
 {
 	sndinfo info;
 

@@ -15,10 +15,6 @@
 int compare( const void *arg1, const void *arg2 );
 void extract_help_ids(const char *buffer, FILE *fp);
 
-#ifdef main
-#undef main
-#endif
-
 /*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/

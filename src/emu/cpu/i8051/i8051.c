@@ -464,10 +464,10 @@ static UINT8 i8051_cycles[] = {
 	24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
 	24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
 	24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
-	24,24,24,24,12,24,12,12,24,24,24,24,24,24,24,24,
+	24,24,24,24,12,24,12,12,12,12,12,12,12,12,12,12,
 	24,24,24,24,48,24,24,24,24,24,24,24,24,24,24,24,
 	24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,
-	24,24,12,24,48,12,24,24,12,12,12,12,12,12,12,12,
+	24,24,12,24,48,12,24,24,24,24,24,24,24,24,24,24,
 	24,24,12,12,24,24,24,24,24,24,24,24,24,24,24,24,
 	24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
 	24,24,12,12,12,24,12,12,24,24,24,24,24,24,24,24,
@@ -1978,7 +1978,7 @@ INLINE void update_timer(int cyc)
 	//Update Timer 0
 	if(GET_TR0) {
 		//Determine Mode
-		int mode = GET_M0_0 + GET_M0_1;
+		int mode = (GET_M0_1<<1) | GET_M0_0;
 		int overflow;
 		UINT16 count = 0;
 		switch(mode) {
@@ -2031,6 +2031,33 @@ INLINE void update_timer(int cyc)
 				R_TL0 = count & 0xff;
 				break;
 			case 3:			//Split Timer
+                //Split Timer 1
+				overflow = 0xff;
+				count = R_TL0;
+				//Check for overflow
+                if(count+(cyc/12)>overflow) {
+					count = overflow-count;
+                    SET_TF0(1);
+                }
+				else
+					count+=(cyc/12);
+				//Update new values of the counter
+				R_TL0 = count & 0xff;
+
+                //Split Timer 2
+                if(GET_TR1) {
+				    overflow = 0xff;
+				    count = R_TH0;
+				    //Check for overflow
+                    if(count+(cyc/12)>overflow) {
+					    count = overflow-count;
+                        SET_TF1(1);
+                    }
+				    else
+                        count+=(cyc/12);
+				    //Update new values of the counter
+				    R_TH0 = count & 0xff;
+                }
 				break;
 		}
 	}
@@ -2038,7 +2065,7 @@ INLINE void update_timer(int cyc)
 	//Update Timer 1
 	if(GET_TR1) {
 		//Determine Mode
-		int mode = GET_M1_0 + GET_M1_1;
+		int mode = (GET_M1_1<<1) | GET_M1_0;
 		int overflow;
 		UINT16 count = 0;
 		switch(mode) {
@@ -2153,7 +2180,7 @@ INLINE void update_timer(int cyc)
 //NOTE: Enable Serial Port Interrupt bit is NOT required to send/receive data!
 INLINE void serial_transmit(UINT8 data)
 {
-	int mode = GET_SM0+GET_SM1;
+	int mode = (GET_SM0<<1) | GET_SM1;
 
 	//Flag that we're sending data
 	uart.sending = 1;

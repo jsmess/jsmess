@@ -194,8 +194,8 @@ static const UINT8 nullsha1[CHD_SHA1_BYTES] = { 0 };
 ***************************************************************************/
 
 /* internal async operations */
-static void *async_read_callback(void *param);
-static void *async_write_callback(void *param);
+static void *async_read_callback(void *param, int threadid);
+static void *async_write_callback(void *param, int threadid);
 
 /* internal header operations */
 static chd_error header_validate(const chd_header *header);
@@ -1577,7 +1577,7 @@ const char *chd_get_codec_name(UINT32 codec)
     callback
 -------------------------------------------------*/
 
-static void *async_read_callback(void *param)
+static void *async_read_callback(void *param, int threadid)
 {
 	chd_file *chd = param;
 	chd_error err;
@@ -1595,7 +1595,7 @@ static void *async_read_callback(void *param)
     callback
 -------------------------------------------------*/
 
-static void *async_write_callback(void *param)
+static void *async_write_callback(void *param, int threadid)
 {
 	chd_file *chd = param;
 	chd_error err;

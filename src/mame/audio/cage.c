@@ -161,7 +161,7 @@ void cage_init(int boot_region, offs_t speedup)
 	memory_set_bankptr(11, memory_region(boot_region + 1));
 
 	cage_cpu = mame_find_cpu_index(Machine, "cage");
-	cage_cpu_clock_period = MAME_TIME_IN_HZ(Machine->drv->cpu[cage_cpu].cpu_clock);
+	cage_cpu_clock_period = MAME_TIME_IN_HZ(Machine->drv->cpu[cage_cpu].clock);
 	cage_cpu_h1_clock_period = scale_up_mame_time(cage_cpu_clock_period, 2);
 
 	dma_timer = mame_timer_alloc(dma_timer_callback);

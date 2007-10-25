@@ -1,11 +1,12 @@
 #include "driver.h"
 #include "video/konamiic.h"
-#include "f1gp.h"
+//#include "f1gp.h"
 
 
 UINT16 *f1gp_spr1vram,*f1gp_spr2vram,*f1gp_spr1cgram,*f1gp_spr2cgram;
 UINT16 *f1gp_fgvideoram,*f1gp_rozvideoram;
 UINT16 *f1gp2_sprcgram,*f1gp2_spritelist;
+UINT16 *f1gpb_rozregs, *f1gpb_fgregs;
 size_t f1gp_spr1cgram_size,f1gp_spr2cgram_size;
 
 static UINT16 *zoomdata;
@@ -54,11 +55,24 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( f1gp )
 {
-	roz_tilemap = tilemap_create(f1gp_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,64);
+	roz_tilemap = tilemap_create(f1gp_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
 	fg_tilemap =  tilemap_create(get_fg_tile_info,      tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	K053936_wraparound_enable(0, 1);
 	K053936_set_offset(0, -58, -2);
+
+	tilemap_set_transparent_pen(fg_tilemap,0xff);
+
+	dirtychar = auto_malloc(TOTAL_CHARS);
+	memset(dirtychar,1,TOTAL_CHARS);
+
+	zoomdata = (UINT16 *)memory_region(REGION_GFX4);
+}
+
+VIDEO_START( f1gpb )
+{
+	roz_tilemap = tilemap_create(f1gp_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	fg_tilemap =  tilemap_create(get_fg_tile_info,      tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0xff);
 
@@ -247,6 +261,72 @@ static void f1gp_draw_sprites(running_machine *machine,mame_bitmap *bitmap,const
 	}
 }
 
+static void f1gpb_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+{
+	int attr_start, start_offset = spriteram_size/2 - 4;
+
+	// find the "end of list" to draw the sprites in reverse order
+	for (attr_start = 4;attr_start < spriteram_size/2;attr_start += 4)
+	{
+		if (spriteram16[attr_start+3-4] == 0xffff) /* end of list marker */
+		{
+			start_offset = attr_start - 4;
+			break;
+		}
+	}
+
+	for (attr_start = start_offset;attr_start >= 4;attr_start -= 4)
+	{
+		int code,gfx;
+		int x,y,flipx,flipy,color,pri;
+
+		x = (spriteram16[attr_start + 2] & 0x03ff) - 48;
+		y = (256 - (spriteram16[attr_start + 3 - 4] & 0x03ff)) - 15;
+		flipx = spriteram16[attr_start + 1] & 0x0800;
+		flipy = spriteram16[attr_start + 1] & 0x8000;
+		color = spriteram16[attr_start + 1] & 0x000f;
+		code = spriteram16[attr_start + 0] & 0x3fff;
+		pri = 0; //?
+
+		if((spriteram16[attr_start + 1] & 0x00f0) && (spriteram16[attr_start + 1] & 0x00f0) != 0xc0)
+		{
+			printf("attr %X\n",spriteram16[attr_start + 1] & 0x00f0);
+			code = mame_rand(Machine);
+		}
+
+/*
+        if(spriteram16[attr_start + 1] & ~0x88cf)
+            printf("1 = %X\n",spriteram16[attr_start + 1] & ~0x88cf);
+*/
+		if(code >= 0x2000)
+		{
+			gfx = 1;
+			code -= 0x2000;
+		}
+		else
+		{
+			gfx = 0;
+		}
+
+		pdrawgfx(bitmap,machine->gfx[1 + gfx],
+			code,
+			color,
+			flipx,flipy,
+			x,y,
+			cliprect,TRANSPARENCY_PEN,15,
+			pri ? 0 : 0x2);
+
+		// wrap around x
+		pdrawgfx(bitmap,machine->gfx[1 + gfx],
+			code,
+			color,
+			flipx,flipy,
+			x - 512,y,
+			cliprect,TRANSPARENCY_PEN,15,
+			pri ? 0 : 0x2);
+	}
+}
+
 
 VIDEO_UPDATE( f1gp )
 {
@@ -309,6 +389,69 @@ VIDEO_UPDATE( f1gp )
 	return 0;
 }
 
+VIDEO_UPDATE( f1gpb )
+{
+	UINT32 startx,starty;
+	int incxx,incxy,incyx,incyy;
+
+	static const gfx_layout tilelayout =
+	{
+		16,16,
+		TOTAL_CHARS,
+		4,
+		{ 0, 1, 2, 3 },
+#ifdef LSB_FIRST
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
+				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
+#else
+		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
+				8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+#endif
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		64*16,
+	};
+
+
+	if (dirtygfx)
+	{
+		int i;
+
+		dirtygfx = 0;
+
+		for (i = 0;i < TOTAL_CHARS;i++)
+		{
+			if (dirtychar[i])
+			{
+				dirtychar[i] = 0;
+				decodechar(machine->gfx[3],i,(UINT8 *)zoomdata,&tilelayout);
+			}
+		}
+
+		tilemap_mark_all_tiles_dirty(roz_tilemap);
+	}
+
+	incxy = (INT16)f1gpb_rozregs[1];
+	incyx = -incxy;
+	incxx = incyy = (INT16)f1gpb_rozregs[3];
+	startx = f1gpb_rozregs[0] + 328;
+	starty = f1gpb_rozregs[2];
+
+	tilemap_set_scrolly(fg_tilemap,0,f1gpb_fgregs[0] + 8);
+
+	fillbitmap(priority_bitmap, 0, cliprect);
+
+	tilemap_draw_roz(bitmap, cliprect, roz_tilemap,
+		startx << 13, starty << 13,
+		incxx << 5, incxy << 5, incyx << 5, incyy << 5,
+		1, 0, 0);
+
+	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
+
+	f1gpb_draw_sprites(machine,bitmap,cliprect);
+
+	return 0;
+}
 
 
 static void f1gp2_draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect)

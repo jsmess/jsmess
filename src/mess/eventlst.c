@@ -66,7 +66,7 @@ void    EventList_AddItemOffset(int ID, int Data, int Time)
 {
 
         if (!CyclesPerFrame)
-                CyclesPerFrame = (int)(Machine->drv->cpu[0].cpu_clock / Machine->screen[0].refresh);	//totalcycles();	//_(int)(Machine->drv->cpu[0].cpu_clock / Machine->drv->frames_per_second);
+                CyclesPerFrame = (int)(Machine->drv->cpu[0].clock / Machine->screen[0].refresh);	//totalcycles();	//_(int)(Machine->drv->cpu[0].cpu_clock / Machine->drv->frames_per_second);
 
         if (NumEvents < TotalEvents)
         {

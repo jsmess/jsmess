@@ -5927,7 +5927,7 @@ GAME( 1994, lastfero, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",  
 GAME( 1994, lastforg, lastfort, lastforg, ladykill, metro,    ROT0,   "Metro",                      "Last Fortress - Toride (German)"    , 0 )
 GAME( 1994, toride2g, 0,        toride2g, toride2g, metro,    ROT0,   "Metro",                      "Toride II Adauchi Gaiden",        GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, torid2gg, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                      "Toride II Adauchi Gaiden (German)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, toride2j, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                      "Toride II Adauchi Gaiden (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, toride2j, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                      "Toride II (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, gunmast,  0,        pururun,  gunmast,  daitorid, ROT0,   "Metro",                      "Gun Master"                      , 0 )
 GAME( 1995, daitorid, 0,        daitorid, daitorid, daitorid, ROT0,   "Metro",                      "Daitoride",                       GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, dokyusei, 0,        dokyusei, dokyusei, gakusai,  ROT0,   "Make Software / Elf / Media Trading", "Mahjong Doukyuusei"        , 0 )

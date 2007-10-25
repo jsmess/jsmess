@@ -1015,7 +1015,7 @@ VIDEO_UPDATE( buckrog )
 			forebits = pr5198[offs];
 
 			/* fetch the STAR bit */
-			star = state->buckrog_bitmap_ram[y * 64 + xx];
+			star = state->buckrog_bitmap_ram[y * 256 + xx];
 
 			/* now that we have done all the per-5MHz pixel work, mix the sprites at the scale factor */
 			for (ix = 0; ix < TURBO_X_SCALE; ix++)

@@ -400,9 +400,9 @@ static void *common_start(void)
 	has_tms5220 = FALSE;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		if (Machine->drv->sound[i].sound_type == SOUND_TMS5220)
+		if (Machine->drv->sound[i].type == SOUND_TMS5220)
 			has_tms5220 = TRUE;
-		if (Machine->drv->sound[i].sound_type == SOUND_HC55516)
+		if (Machine->drv->sound[i].type == SOUND_HC55516)
 			has_hc55516 = TRUE;
 	}
 

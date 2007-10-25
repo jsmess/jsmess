@@ -290,7 +290,7 @@ static VIDEO_START( pc_cga )
 	 * Plantronics chipset. 
 	 * TODO: Cards which don't support Plantronics should repeat at 
 	 * BC000h */
-	buswidth = cputype_databus_width(Machine->drv->cpu[0].cpu_type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(Machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

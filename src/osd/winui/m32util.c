@@ -363,15 +363,15 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			
 			if (HAS_SAMPLES || HAS_VLM5030)
 			{
-				for (i = 0; drv.sound[i].sound_type && i < MAX_SOUND; i++)
+				for (i = 0; drv.sound[i].type && i < MAX_SOUND; i++)
 				{
 					const char **samplenames = NULL;
 					
 #if (HAS_SAMPLES || HAS_VLM5030)
-					for( i = 0; drv.sound[i].sound_type && i < MAX_SOUND; i++ )
+					for( i = 0; drv.sound[i].type && i < MAX_SOUND; i++ )
 					{
 #if (HAS_SAMPLES)
-						if( drv.sound[i].sound_type == SOUND_SAMPLES )
+						if( drv.sound[i].type == SOUND_SAMPLES )
 							samplenames = ((struct Samplesinterface *)drv.sound[i].config)->samplenames;
 #endif
 					}

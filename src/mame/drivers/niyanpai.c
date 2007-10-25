@@ -202,7 +202,7 @@ static z80ctc_interface ctc_intf =
 static void tmpz84c011_init(running_machine *machine)
 {
 	// initialize the CTC
-	ctc_intf.baseclock = machine->drv->cpu[1].cpu_clock;
+	ctc_intf.baseclock = machine->drv->cpu[1].clock;
 	z80ctc_init(0, &ctc_intf);
 }
 

@@ -1,6 +1,9 @@
 #include "driver.h"
 #include "includes/cclimber.h"
 
+/* set to 1 to fix protection check after bonus round (see notes in pacman.c driver) */
+#define CANNONB_HACK	0
+
 static void cclimber_decode(const UINT8 convtable[8][16])
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
@@ -82,11 +85,33 @@ DRIVER_INIT( mshuttle )
 	cclimber_decode(convtable);
 }
 
-DRIVER_INIT( cannonb )
+DRIVER_INIT( ckongb )
 {
 	int A;
 	UINT8 *rom = memory_region(REGION_CPU1);
 
+	for (A = 0x0000;A < 0x6000;A++) /* all the program ROMs are encrypted */
+	{
+		rom[A] = rom[A] ^ 0xf0;
+	}
+}
+
+#if CANNONB_HACK
+static void cannonb_patch(void)
+{
+	UINT8 *rom = memory_region(REGION_CPU1);
+
+	rom[0x2ba0] = 0x21;
+	rom[0x2ba1] = 0xfb;
+	rom[0x2ba2] = 0x0e;
+	rom[0x2ba3] = 0x00;
+}
+#endif
+
+DRIVER_INIT( cannonb )
+{
+	int A;
+	UINT8 *rom = memory_region(REGION_CPU1);
 
 	for (A = 0x0000;A < 0x1000;A++) /* only first ROM is encrypted */
 	{
@@ -102,16 +127,16 @@ DRIVER_INIT( cannonb )
 
 		rom[A] = src;
 	}
+
+#if CANNONB_HACK
+	cannonb_patch();
+#endif
 }
 
-DRIVER_INIT( ckongb )
+DRIVER_INIT( cannonb2 )
 {
-	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
-
-
-	for (A = 0x0000;A < 0x6000;A++) /* all the program ROMs are encrypted */
-	{
-		rom[A] = rom[A] ^ 0xf0;
-	}
+#if CANNONB_HACK
+	cannonb_patch();
+#endif
 }
+

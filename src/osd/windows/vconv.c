@@ -93,6 +93,7 @@ static const translation_info ld_translate[] =
 	{ 0,		"-o*",				"/out:*" },
 	{ 0,		"-Wl,-Map,*",		"/map:*" },
  	{ 0,		"-Wl,--allow-multiple-definition", "/force:multiple" },
+	{ 0,		"-Wl,--warn-common",	"" },
 	{ 0,		"-mno-cygwin",		"" },
 	{ 0,		"-s",				"" },
 	{ 0,		"-WO",				"" },

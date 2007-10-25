@@ -6492,7 +6492,7 @@ enum
 	FD1089B
 };
 
-static UINT16 fd1089_decrypt(offs_t addr,UINT16 val,const UINT8 *key,int opcode,int cpu_type)
+static UINT16 fd1089_decrypt(offs_t addr,UINT16 val,const UINT8 *key,int opcode,int cputype)
 {
 	int tbl_num,src;
 
@@ -6507,7 +6507,7 @@ static UINT16 fd1089_decrypt(offs_t addr,UINT16 val,const UINT8 *key,int opcode,
 			((val & 0x0040) >> 5) |
 			((val & 0xfc00) >> 8);
 
-	switch (cpu_type)
+	switch (cputype)
 	{
 		case FD1089A: src = decode_fd1089a(src,key[tbl_num + opcode * 0x1000],opcode); break;
 		case FD1089B: src = decode_fd1089b(src,key[tbl_num + opcode * 0x1000],opcode); break;
@@ -6522,7 +6522,7 @@ static UINT16 fd1089_decrypt(offs_t addr,UINT16 val,const UINT8 *key,int opcode,
 
 static UINT16 *decrypted;
 
-static void sys16_decrypt(const UINT8 *key,int cpu_type)
+static void sys16_decrypt(const UINT8 *key,int cputype)
 {
 	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
 	int size = memory_region_length(REGION_CPU1);
@@ -6536,10 +6536,10 @@ static void sys16_decrypt(const UINT8 *key,int cpu_type)
 		UINT16 src = rom[A/2];
 
 		/* decode the opcodes */
-		decrypted[A/2] = fd1089_decrypt(A,src,key,1,cpu_type);
+		decrypted[A/2] = fd1089_decrypt(A,src,key,1,cputype);
 
 		/* decode the data */
-		rom[A/2] = fd1089_decrypt(A,src,key,0,cpu_type);
+		rom[A/2] = fd1089_decrypt(A,src,key,0,cputype);
 	}
 }
 

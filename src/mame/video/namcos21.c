@@ -4,9 +4,6 @@ Namco System 21 Video Hardware
 - sprite hardware is identical to Namco System NB1
 - there are no tilemaps
 - 3d graphics are managed by DSP processors
-
-TODO: use fixed point arithmetic while rendering quads
-TODO: need proper depth cueing tables
 */
 
 #include "driver.h"
@@ -18,11 +15,11 @@ TODO: need proper depth cueing tables
 
 /* work (hidden) framebuffer */
 static UINT16 *mpPolyFrameBufferPens;
-static INT16 *mpPolyFrameBufferZ;
+static UINT16 *mpPolyFrameBufferZ;
 
 /* visible framebuffer */
 static UINT16 *mpPolyFrameBufferPens2;
-static INT16 *mpPolyFrameBufferZ2;
+static UINT16 *mpPolyFrameBufferZ2;
 
 static UINT16 winrun_color;
 static UINT16 winrun_gpu_register[0x10/2];
@@ -83,13 +80,12 @@ void
 namcos21_ClearPolyFrameBuffer( void )
 {
 	int i;
-	INT16 *temp1;
 	UINT16 *temp2;
 
 	/* swap work and visible framebuffers */
-	temp1 = mpPolyFrameBufferZ;
+	temp2 = mpPolyFrameBufferZ;
 	mpPolyFrameBufferZ = mpPolyFrameBufferZ2;
-	mpPolyFrameBufferZ2 = temp1;
+	mpPolyFrameBufferZ2 = temp2;
 
 	temp2 = mpPolyFrameBufferPens;
 	mpPolyFrameBufferPens = mpPolyFrameBufferPens2;
@@ -103,18 +99,20 @@ namcos21_ClearPolyFrameBuffer( void )
 } /* namcos21_ClearPolyFrameBuffer */
 
 static void
-CopyVisiblePolyFrameBuffer( mame_bitmap *bitmap, const rectangle *clip )
+CopyVisiblePolyFrameBuffer( mame_bitmap *bitmap, const rectangle *clip, int zlo, int zhi )
 { /* blit the visible framebuffer */
 	int sy;
 	for( sy=clip->min_y; sy<=clip->max_y; sy++ )
 	{
 		UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
 		const UINT16 *pPen = mpPolyFrameBufferPens2+NAMCOS21_POLY_FRAME_WIDTH*sy;
-		const INT16 *pZ = mpPolyFrameBufferZ2+NAMCOS21_POLY_FRAME_WIDTH*sy;
+		const UINT16 *pZ = mpPolyFrameBufferZ2+NAMCOS21_POLY_FRAME_WIDTH*sy;
 		int sx;
 		for( sx=clip->min_x; sx<=clip->max_x; sx++ )
 		{
-			if( pZ[sx]!=0x7fff )
+			int z = pZ[sx];
+			//if( pZ[sx]!=0x7fff )
+			if( z>=zlo && z<=zhi )
 			{
 				dest[sx] = pPen[sx];
 			}
@@ -177,20 +175,30 @@ update_palette( void )
 	}
 } /* update_palette */
 
+
 VIDEO_UPDATE( namcos21 )
 {
 	int pivot = 3;
 	int pri;
 	update_palette();
 	fillbitmap( bitmap, 0xff, cliprect );
+
 	if( namcos2_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
-		for( pri=0; pri<pivot; pri++ )
-		{
-			namco_obj_draw( machine, bitmap, cliprect, pri );
-		}
+		namco_obj_draw( machine, bitmap, cliprect, 2 );
 	}
-	CopyVisiblePolyFrameBuffer( bitmap, cliprect );
+
+	CopyVisiblePolyFrameBuffer( bitmap, cliprect,0x7fc0,0x7ffe );
+
+	if( namcos2_gametype != NAMCOS21_WINRUN91 )
+	{ /* draw low priority 2d sprites */
+		namco_obj_draw( machine, bitmap, cliprect, 0 );
+		namco_obj_draw( machine, bitmap, cliprect, 1 );
+	}
+
+	CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
+
+
 	if( namcos2_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw high priority 2d sprites */
 		for( pri=pivot; pri<8; pri++ )
@@ -200,34 +208,33 @@ VIDEO_UPDATE( namcos21 )
 	}
 	else
 	{ /* winrun bitmap layer */
-		int dy = (INT16)winrun_gpu_register[0x2/2];
+		int yscroll = -cliprect->min_y+(INT16)winrun_gpu_register[0x2/2];
 		int base = 0x1000+0x100*(winrun_color&0xf);
 		int sx,sy;
 		for( sy=cliprect->min_y; sy<=cliprect->max_y; sy++ )
 		{
-			const UINT8 *pSource = &videoram[((sy+dy)&0x3ff)*0x200];
+			const UINT8 *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
 			UINT16 *pDest = BITMAP_ADDR16(bitmap, sy, 0);
 			for( sx=cliprect->min_x; sx<=cliprect->max_x; sx++ )
 			{
 				int pen = pSource[sx];
-				if( pen!=0xff )
+				switch( pen )
 				{
+				case 0xff:
+					break;
+				case 0x00:
+					pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
+					break;
+				case 0x01:
+					pDest[sx] = (pDest[sx]&0x1fff)+0x6000;
+					break;
+				default:
 					pDest[sx] = base|pen;
+					break;
 				}
 			}
 		}
 	} /* winrun bitmap layer */
-
-
-//  if( input_code_pressed( KEYCODE_Q ) ) namco_obj_draw( machine, bitmap, cliprect, 0 ); // boot, mountains
-//  if( input_code_pressed( KEYCODE_W ) ) namco_obj_draw( machine, bitmap, cliprect, 1 );
-//  if( input_code_pressed( KEYCODE_E ) ) namco_obj_draw( machine, bitmap, cliprect, 2 ); // hs backdrop
-//  if( input_code_pressed( KEYCODE_R ) ) namco_obj_draw( machine, bitmap, cliprect, 3 ); // warn, starship
-//  if( input_code_pressed( KEYCODE_T ) ) namco_obj_draw( machine, bitmap, cliprect, 4 );
-//  if( input_code_pressed( KEYCODE_Y ) ) namco_obj_draw( machine, bitmap, cliprect, 5 );
-//  if( input_code_pressed( KEYCODE_U ) ) namco_obj_draw( machine, bitmap, cliprect, 6 );
-//  if( input_code_pressed( KEYCODE_I ) ) namco_obj_draw( machine, bitmap, cliprect, 7 );
-
 	return 0;
 } /* VIDEO_UPDATE( namcos21 ) */
 
@@ -257,7 +264,7 @@ renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color, int
 
 	{
 		UINT16 *pDest = mpPolyFrameBufferPens + sy*NAMCOS21_POLY_FRAME_WIDTH;
-		INT16 *pZBuf = mpPolyFrameBufferZ     + sy*NAMCOS21_POLY_FRAME_WIDTH;
+		UINT16 *pZBuf = mpPolyFrameBufferZ    + sy*NAMCOS21_POLY_FRAME_WIDTH;
 		int x0 = (int)e1->x;
 		int x1 = (int)e2->x;
 		int w = x1-x0;
@@ -279,7 +286,7 @@ renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color, int
 
 			for( x=x0; x<x1; x++ )
 			{
-				INT16 zz = (INT16)z;
+				UINT16 zz = (UINT16)z;
 				if( zz<pZBuf[x] )
 				{
 					int pen = color;
@@ -288,14 +295,12 @@ renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color, int
 						int depth = 0;
 						if( namcos2_gametype == NAMCOS21_WINRUN91 )
 						{
-							depth = (zz>>1)&0xff00;
-							if( depth>0x1f00 ) depth = 0x1f00;
+							depth = (zz>>10)*0x100;
 							pen += depth;
 						}
 						else
 						{
-							depth = (zz>>0)&0xfe00;
-							if( depth>0x1e00 ) depth = 0x1e00;
+							depth = (zz>>11)*0x200;
 							pen -= depth;
 						}
 					}
@@ -449,7 +454,9 @@ namcos21_DrawQuad( int sx[4], int sy[4], int zcode[4], int color )
 		if( code&0x80 )
 		{
 			color = color&0xff;
-			color = 0x3e00|color;
+//          color = 0x3e00|color;
+			color = 0x2100|color;
+			depthcueenable = 0;
 		}
 		else
 		{

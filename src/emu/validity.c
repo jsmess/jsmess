@@ -264,7 +264,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 
 #ifndef MESS
 	/* make sure sound-less drivers are flagged */
-	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && drv->sound[0].sound_type == SOUND_DUMMY && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
+	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && drv->sound[0].type == SOUND_DUMMY && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -471,11 +471,11 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 		int spacenum;
 
 		/* skip empty entries */
-		if (cpu->cpu_type == CPU_DUMMY)
+		if (cpu->type == CPU_DUMMY)
 			continue;
 
 		/* checks to see if this driver is using a dummy CPU */
-		if (cputype_get_interface(cpu->cpu_type)->get_info == dummy_get_info)
+		if (cputype_get_interface(cpu->type)->get_info == dummy_get_info)
 		{
 			mame_printf_error("%s: %s uses non-present CPU\n", driver->source_file, driver->name);
 			error = TRUE;
@@ -483,10 +483,10 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 		}
 
 		/* check the CPU for incompleteness */
-		if (!cputype_get_info_fct(cpu->cpu_type, CPUINFO_PTR_GET_CONTEXT)
-			|| !cputype_get_info_fct(cpu->cpu_type, CPUINFO_PTR_SET_CONTEXT)
-			|| !cputype_get_info_fct(cpu->cpu_type, CPUINFO_PTR_RESET)
-			|| !cputype_get_info_fct(cpu->cpu_type, CPUINFO_PTR_EXECUTE))
+		if (!cputype_get_info_fct(cpu->type, CPUINFO_PTR_GET_CONTEXT)
+			|| !cputype_get_info_fct(cpu->type, CPUINFO_PTR_SET_CONTEXT)
+			|| !cputype_get_info_fct(cpu->type, CPUINFO_PTR_RESET)
+			|| !cputype_get_info_fct(cpu->type, CPUINFO_PTR_EXECUTE))
 		{
 			mame_printf_error("%s: %s uses an incomplete CPU\n", driver->source_file, driver->name);
 			error = TRUE;
@@ -499,8 +499,8 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 #define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
 #define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
 			static const char *spacename[] = { "program", "data", "I/O" };
-			int databus_width = cputype_databus_width(cpu->cpu_type, spacenum);
-			int addr_shift = cputype_addrbus_shift(cpu->cpu_type, spacenum);
+			int databus_width = cputype_databus_width(cpu->type, spacenum);
+			int addr_shift = cputype_addrbus_shift(cpu->type, spacenum);
 			int alignunit = databus_width/8;
 			address_map addrmap[MAX_ADDRESS_MAP_SIZE*2];
 			address_map *map;
@@ -1110,7 +1110,7 @@ static int validate_sound(int drivnum, const machine_config *drv)
 			}
 
 		/* make sure there are no sound chips with the same tag */
-		for (check = 0; check < MAX_SOUND && drv->sound[check].sound_type != SOUND_DUMMY; check++)
+		for (check = 0; check < MAX_SOUND && drv->sound[check].type != SOUND_DUMMY; check++)
 			if (drv->sound[check].tag && !strcmp(drv->speaker[speaknum].tag, drv->sound[check].tag))
 			{
 				mame_printf_error("%s: %s has both a speaker and a sound chip tagged as '%s'\n", driver->source_file, driver->name, drv->speaker[speaknum].tag);
@@ -1119,7 +1119,7 @@ static int validate_sound(int drivnum, const machine_config *drv)
 	}
 
 	/* make sure the sounds are wired to the speakers correctly */
-	for (sndnum = 0; sndnum < MAX_SOUND && drv->sound[sndnum].sound_type != SOUND_DUMMY; sndnum++)
+	for (sndnum = 0; sndnum < MAX_SOUND && drv->sound[sndnum].type != SOUND_DUMMY; sndnum++)
 	{
 		int routenum;
 
@@ -1136,12 +1136,12 @@ static int validate_sound(int drivnum, const machine_config *drv)
 			{
 				int check;
 
-				for (check = 0; check < MAX_SOUND && drv->sound[check].sound_type != SOUND_DUMMY; check++)
+				for (check = 0; check < MAX_SOUND && drv->sound[check].type != SOUND_DUMMY; check++)
 					if (check != sndnum && drv->sound[check].tag && !strcmp(drv->sound[check].tag, drv->sound[sndnum].route[routenum].target))
 						break;
 
 				/* if we didn't find one, it's an error */
-				if (check >= MAX_SOUND || drv->sound[check].sound_type == SOUND_DUMMY)
+				if (check >= MAX_SOUND || drv->sound[check].type == SOUND_DUMMY)
 				{
 					mame_printf_error("%s: %s attempting to route sound to non-existant speaker '%s'\n", driver->source_file, driver->name, drv->sound[sndnum].route[routenum].target);
 					error = TRUE;

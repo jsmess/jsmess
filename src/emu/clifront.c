@@ -563,8 +563,8 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 			expand_machine_driver(drivers[drvindex]->drv, &drv);
 
 			/* find samples interfaces */
-			for (sndnum = 0; sndnum < MAX_SOUND && drv.sound[sndnum].sound_type != SOUND_DUMMY; sndnum++)
-				if (drv.sound[sndnum].sound_type == SOUND_SAMPLES)
+			for (sndnum = 0; sndnum < MAX_SOUND && drv.sound[sndnum].type != SOUND_DUMMY; sndnum++)
+				if (drv.sound[sndnum].type == SOUND_SAMPLES)
 				{
 					const char **samplenames = ((struct Samplesinterface *)drv.sound[sndnum].config)->samplenames;
 					int sampnum;

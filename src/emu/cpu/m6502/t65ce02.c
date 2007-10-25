@@ -237,8 +237,8 @@ OP(4b) { TAZ; } /* 1 TAZ */
 OP(6b) { TZA; } /* 1 TZA */
 OP(8b) { int tmp; STY; WR_ABX; } /* 4 STY ABX */
 OP(ab) { int tmp; RD_ABS; LDZ; } /* 4 LDZ ABS */
-OP(cb) { PAIR tmp; tmp.d = 0; m65ce02_ICount-=7; RD_ABS_WORD; ASW; WB_EA_WORD;  } /* 7 ASW ABS */
-OP(eb) { PAIR tmp; m65ce02_ICount-=6; RD_ABS_WORD; ROW; WB_EA_WORD;  } /* 6 roW ABS */
+OP(cb) { PAIR tmp; tmp.d = 0; RD_ABS_WORD; ASW; WB_EA_WORD;  } /* 7 ASW ABS */
+OP(eb) { PAIR tmp; RD_ABS_WORD; ROW; WB_EA_WORD;  } /* 6/7? roW ABS */
 
 OP(1b) { INZ; } /* 1 INZ */
 OP(3b) { DEZ; } /* 1 DEZ */
@@ -261,7 +261,7 @@ OP(ec) { int tmp; RD_ABS; CPX; } /* 4 CPX ABS */
 OP(1c) { int tmp; RD_ABS; TRB; WB_EA;  } /* 5 TRB ABS */
 OP(3c) { int tmp; RD_ABX; RD_DUM; BIT;		  } /* 5 BIT ABX */
 #ifdef M4510
-OP(5c) {		  m65ce02_ICount-=4;		 MAP;		  } /* ? MAP */
+OP(5c) {		   MAP;		  } /* 4? MAP */
 #else
 OP(5c) { int t1,t2,t3; AUG; } /* 4 AUGMENT/no operation */
 #endif

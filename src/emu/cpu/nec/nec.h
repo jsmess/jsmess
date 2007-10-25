@@ -116,10 +116,10 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 */
 
 #define CLK(all) nec_ICount-=all
-#define CLKS(v20,v30,v33) { const UINT32 ccount=(v20<<16)|(v30<<8)|v33; nec_ICount-=(ccount>>cpu_type)&0x7f; }
-#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; nec_ICount-=(addr&1)?((ocount>>cpu_type)&0x7f):((ecount>>cpu_type)&0x7f); }
-#define CLKM(v20,v30,v33,v20m,v30m,v33m) { const UINT32 ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; nec_ICount-=( ModRM >=0xc0 )?((ccount>>cpu_type)&0x7f):((mcount>>cpu_type)&0x7f); }
-#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) nec_ICount-=vall; else nec_ICount-=(addr&1)?((ocount>>cpu_type)&0x7f):((ecount>>cpu_type)&0x7f); }
+#define CLKS(v20,v30,v33) { const UINT32 ccount=(v20<<16)|(v30<<8)|v33; nec_ICount-=(ccount>>chip_type)&0x7f; }
+#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; nec_ICount-=(addr&1)?((ocount>>chip_type)&0x7f):((ecount>>chip_type)&0x7f); }
+#define CLKM(v20,v30,v33,v20m,v30m,v33m) { const UINT32 ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; nec_ICount-=( ModRM >=0xc0 )?((ccount>>chip_type)&0x7f):((mcount>>chip_type)&0x7f); }
+#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) nec_ICount-=vall; else nec_ICount-=(addr&1)?((ocount>>chip_type)&0x7f):((ecount>>chip_type)&0x7f); }
 
 /************************************************************************/
 #define CompressFlags() (WORD)(CF | (PF << 2) | (AF << 4) | (ZF << 6) \
@@ -162,7 +162,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	{										\
 		static const UINT8 table[3]={3,10,10}; 	\
 		I.ip = (WORD)(I.ip+tmp);			\
-		nec_ICount-=table[cpu_type/8];		\
+		nec_ICount-=table[chip_type/8];		\
 		CHANGE_PC;							\
 		return;								\
 	}
@@ -294,7 +294,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",activecpu_get_pc());	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[cpu_type/8];						\
+		nec_ICount-=table[chip_type/8];						\
 		tmp = GetMemB(DS0, si);								\
 		tmp2 = GetMemB(DS1, di);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
@@ -319,7 +319,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",activecpu_get_pc());	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[cpu_type/8];						\
+		nec_ICount-=table[chip_type/8];						\
 		tmp = GetMemB(DS1, di);								\
 		tmp2 = GetMemB(DS0, si);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
@@ -349,7 +349,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",activecpu_get_pc());	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[cpu_type/8];						\
+		nec_ICount-=table[chip_type/8];						\
 		tmp = GetMemB(DS1, di);								\
 		tmp2 = GetMemB(DS0, si);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\

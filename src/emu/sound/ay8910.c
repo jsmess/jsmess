@@ -672,7 +672,7 @@ static void AY8910_statesave(struct AY8910 *PSG, int sndindex)
 }
 
 
-void *ay8910_start_ym(int chip_type, int sndindex, int clock, int streams,
+void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, int streams,
 		read8_handler portAread, read8_handler portBread,
 		write8_handler portAwrite, write8_handler portBwrite)
 {

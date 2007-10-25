@@ -104,9 +104,9 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-
 #include "tubep.h"
 
 /* Global variables */
@@ -116,7 +116,12 @@ static UINT8 ls377 = 0;
 
 static mame_timer *interrupt_timer;
 
-/*************************** Main CPU on main PCB **************************/
+
+/*************************************
+ *
+ *  Main CPU on main PCB
+ *
+ *************************************/
 
 
 static WRITE8_HANDLER( tubep_LS259_w )
@@ -186,9 +191,12 @@ static ADDRESS_MAP_START( tubep_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Slave CPU on main PCB
+ *
+ *************************************/
 
-
-/************************** Slave CPU on main PCB ****************************/
 
 static ADDRESS_MAP_START( tubep_g_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -243,6 +251,14 @@ static ADDRESS_MAP_START( tubep_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITE(tubep_sound_unknown)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Save state setup
+ *
+ *************************************/
+
+
 static TIMER_CALLBACK( scanline_callback )
 {
 	int scanline = param;
@@ -281,13 +297,21 @@ static MACHINE_RESET( tubep )
 	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64, time_zero);
 }
 
-
 static MACHINE_START( rjammer )
 {
 	tubep_setup_save_state();
 }
 
-/****************************************************************/
+static MACHINE_RESET( rjammer )
+{}
+
+
+/*************************************
+ *
+ *  Roller Jammer memory handlers
+ *
+ *************************************/
+
 
 static WRITE8_HANDLER( rjammer_LS259_w )
 {
@@ -334,12 +358,12 @@ static ADDRESS_MAP_START( rjammer_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-
 static ADDRESS_MAP_START( rjammer_slave_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(rjammer_background_page_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(rjammer_background_LS377_w)
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( rjammer_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -348,6 +372,13 @@ static ADDRESS_MAP_START( rjammer_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&rjammer_backgroundram)/* M5M5117P @19B (background) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(2)
 ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  NSC8105 memory handlers
+ *
+ *************************************/
 
 
 /* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
@@ -360,12 +391,11 @@ static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-
-
-
-/****************************** Sound CPU *******************************/
-
-
+/*************************************
+ *
+ *  Sound CPU
+ *
+ *************************************/
 
 
 static READ8_HANDLER( rjammer_soundlatch_r )
@@ -480,9 +510,15 @@ static WRITE8_HANDLER( ay8910_portB_2_w )
 }
 
 
+/*************************************
+ *
+ *  Game-specific port definitions
+ *
+ *************************************/
+
 
 INPUT_PORTS_START( tubep )
-	PORT_START	/* Player 1 controls */
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -492,7 +528,7 @@ INPUT_PORTS_START( tubep )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* Player 2 controls */
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -502,7 +538,7 @@ INPUT_PORTS_START( tubep )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* Coin, Start */
+	PORT_START_TAG("Coin_Start")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -512,8 +548,8 @@ INPUT_PORTS_START( tubep )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:6,5,4")
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
@@ -522,7 +558,7 @@ INPUT_PORTS_START( tubep )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,2,1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 6C_1C ) )
@@ -531,67 +567,70 @@ INPUT_PORTS_START( tubep )
 	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* DSW2 */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_START_TAG("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:6,5")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x0c, "40000" )
 	PORT_DIPSETTING(    0x08, "50000" )
 	PORT_DIPSETTING(    0x04, "60000" )
 	PORT_DIPSETTING(    0x00, "80000" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "Serivce mode" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* DSW3 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_START_TAG("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "In Game Sounds" )
+	PORT_DIPNAME( 0x20, 0x20, "In Game Sounds" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( tubepb )
+	PORT_INCLUDE(tubep )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPSETTING(    0x0c, "10000" )
+	PORT_DIPSETTING(    0x08, "20000" )
+	PORT_DIPSETTING(    0x04, "30000" )
+	PORT_DIPSETTING(    0x00, "40000" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
-
-
 INPUT_PORTS_START( rjammer )
-	PORT_START	/* Player 1 controls */
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -601,7 +640,7 @@ INPUT_PORTS_START( rjammer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_START	/* Player 2 controls */
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_COCKTAIL
@@ -611,56 +650,48 @@ INPUT_PORTS_START( rjammer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 
-	PORT_START	/* DSW2 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_START_TAG("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Bonus Time" )
+	PORT_DIPNAME( 0x02, 0x02, "Bonus Time" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x02, "100" )
 	PORT_DIPSETTING(    0x00, "200" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Clear Men" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Clear Men" ) PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x0c, "20" )
 	PORT_DIPSETTING(    0x08, "30" )
 	PORT_DIPSETTING(    0x04, "40" )
 	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x20, "Time" )
+	PORT_DIPNAME( 0x20, 0x20, "Time" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x20, "40" )
 	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("Coins_Service")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -670,6 +701,13 @@ INPUT_PORTS_START( rjammer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 
 static const gfx_layout charlayout =
@@ -689,6 +727,14 @@ GFXDECODE_END
 static GFXDECODE_START( rjammer )
 	GFXDECODE_ENTRY( REGION_GFX1,      0, charlayout,       0, 16 )	/* 16 color codes */
 GFXDECODE_END
+
+
+/*************************************
+ *
+ *  Sound definitions
+ *
+ *************************************/
+
 
 static struct AY8910interface ay8910_interface_1 =
 {
@@ -721,25 +767,31 @@ static struct MSM5205interface msm5205_interface =
 };
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 
 static MACHINE_DRIVER_START( tubep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_ADD_TAG("main",Z80,16000000 / 4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(tubep_map,0)
 	MDRV_CPU_IO_MAP(tubep_portmap,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_ADD_TAG("slave",Z80,16000000 / 4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(tubep_g_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MDRV_CPU_ADD_TAG("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(tubep_sound_map,0)
 	MDRV_CPU_IO_MAP(tubep_sound_portmap,0)
 
-	MDRV_CPU_ADD(NSC8105,6000000/4)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000/4)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
@@ -780,69 +832,56 @@ static MACHINE_DRIVER_START( tubep )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( tubepb )
+	MDRV_IMPORT_FROM( tubep )
+
+	MDRV_CPU_REMOVE("nsc")
+
+	MDRV_CPU_ADD(M6802,6000000/4) /* ? MHz Xtal */
+	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( rjammer )
+	MDRV_IMPORT_FROM( tubep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(rjammer_map,0)
 	MDRV_CPU_IO_MAP(rjammer_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(rjammer_slave_map,0)
 	MDRV_CPU_IO_MAP(rjammer_slave_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,19968000 / 8)	/* Xtal3 divided by LS669 (on Qc output) (signal RH0) */
-	/* audio CPU */
+	MDRV_CPU_MODIFY("sound")	/* Xtal3 divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(rjammer_sound_map,0)
 	MDRV_CPU_IO_MAP(rjammer_sound_portmap,0)
 
-	MDRV_CPU_ADD(NSC8105,6000000/4)	/* 6 MHz Xtal - divided internally ??? */
-	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_INTERLEAVE(100)
-
 	MDRV_MACHINE_START(rjammer)
+	MDRV_MACHINE_RESET(rjammer)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(rjammer)
 	MDRV_PALETTE_LENGTH(64)
 	MDRV_COLORTABLE_LENGTH(2*16 + 16*2)
 
 	MDRV_PALETTE_INIT(rjammer)
-	MDRV_VIDEO_START(tubep)
-	MDRV_VIDEO_EOF(tubep)
 	MDRV_VIDEO_UPDATE(rjammer)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-
-	MDRV_SOUND_ADD(AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-
-	MDRV_SOUND_ADD(AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_3)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-
 	MDRV_SOUND_ADD(MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 
 ROM_START( tubep )
@@ -900,6 +939,77 @@ ROM_START( tubep )
 ROM_END
 
 
+ROM_START( tubepb )
+	ROM_REGION( 0x10000,REGION_CPU1, 0 ) /* Z80 (master) cpu code */
+	ROM_LOAD( "a15.bin", 0x0000, 0x1000, CRC(806370a8) SHA1(c1915fae15bd766ffbd3c47d65ade51d36117eb8) )
+	ROM_LOAD( "a16.bin", 0x1000, 0x1000, CRC(0917fb76) SHA1(1ce2680700d6ce28dfd202f238f1fc6e9c4a2758) )
+	ROM_LOAD( "a13.bin", 0x2000, 0x1000, CRC(6e4bb47e) SHA1(092eba1a90f43eb298ee9e4dc0f13d5411a14b4a) )
+	ROM_LOAD( "a14.bin", 0x3000, 0x1000, CRC(3df78441) SHA1(8e078d4f674da12034e3bb82878e781253f227f2) )
+	ROM_LOAD( "a11.bin", 0x4000, 0x1000, CRC(2b557e49) SHA1(b7b7fdca23b62ebf320d50548d0a09aa904dfe5d) )
+	ROM_LOAD( "a12.bin", 0x5000, 0x1000, CRC(d04a548e) SHA1(bdb4aacb636c9fc9c94af67384b455459c26272e) )
+	ROM_LOAD( "a9.bin",  0x6000, 0x1000, CRC(a20de3d1) SHA1(84f2417597dbaecace0ce72a1684345fb212fc3a) )
+	ROM_LOAD( "a10.bin", 0x7000, 0x1000, CRC(033ba70c) SHA1(de561c5db7cd493aee05e3513e48d52ed95bd510) )
+
+	ROM_REGION( 0x10000,REGION_CPU2, 0 ) /* Z80 (slave) cpu code */
+	ROM_LOAD( "a1.bin",  0x0000, 0x1000, CRC(8a68523d) SHA1(268c659a2312e4d1a29e2064f55dfa07e57f6bca) )
+	ROM_LOAD( "a2.bin",  0x1000, 0x1000, CRC(d15a8645) SHA1(9970377ff49ac525f2ef21c36ded8e7447ed700c) )
+	ROM_LOAD( "a3.bin",  0x2000, 0x1000, CRC(7acf777c) SHA1(042b051de8fcc1295aca459f762619771438625e) )
+	ROM_LOAD( "a4.bin",  0x3000, 0x1000, CRC(8f2bed23) SHA1(fa682172ed7a7a99161a2eaaf2c2e822bbab3f80) )
+	ROM_LOAD( "a5.bin",  0x4000, 0x1000, CRC(8ba045f0) SHA1(91196b96592d98cd49474672ad4cc6b8039a9bcf) )
+	ROM_LOAD( "a6.bin",  0x5000, 0x1000, CRC(8672ab0f) SHA1(784d74b71ab9613fb8177b39295bff083933a002) )
+	ROM_LOAD( "a7.bin",  0x6000, 0x1000, CRC(417dd321) SHA1(aa0faa19eed1397e46a67e8793c5a27991ea9c1b) )
+	ROM_LOAD( "a8.bin",  0x7000, 0x1000, CRC(d26ab4c0) SHA1(8d92386e75114494d65df4cfebdbacd09fddb48e) )
+
+	ROM_REGION( 0x10000,REGION_CPU3, 0 ) /* Z80 (sound) cpu code */
+	ROM_LOAD( "15.bin",  0x0000, 0x2000, CRC(78964fcc) SHA1(a2c6119275d6291d82ac11dcffdaf2e8726e935a) )
+	ROM_LOAD( "16.bin",  0x2000, 0x2000, CRC(61232e29) SHA1(a9ef0fefb7250392ef51173b69a69c903ff91ee8) )
+
+	ROM_REGION( 0x10000,REGION_CPU4, 0 ) /* 64k for the custom CPU */
+	ROM_LOAD( "5.bin",   0xc000, 0x2000, CRC(9f375b27) SHA1(9666d1b20169d899176fbdf5954df41df06b4b82) )
+	ROM_LOAD( "6.bin",   0xe000, 0x2000, CRC(46a273b5) SHA1(ff862c9337b3eeadee5a3d3f0837931a7a71393e) )
+
+	ROM_REGION( 0xc000, REGION_USER1, 0 ) /* background data */
+	ROM_LOAD( "9.bin",   0x0000, 0x2000, CRC(fda355e0) SHA1(3270c65a4ee5d01388727f38691f7fe38f541031) )
+	ROM_LOAD( "10.bin",  0x2000, 0x2000, CRC(0ccb23b0) SHA1(71660a3476ed299684e5662058b8c40153d4a168) )
+	ROM_LOAD( "11.bin",  0x4000, 0x2000, CRC(f5d118e7) SHA1(a899bef3accef8995c457e8142a0001eed033fae) )
+	ROM_LOAD( "12.bin",  0x6000, 0x2000, CRC(01952144) SHA1(d1074c79b51d3e2c152c9f3df6892027fe3a0e00) )
+	ROM_LOAD( "13.bin",  0x8000, 0x2000, CRC(4dabea43) SHA1(72b9df9a3665baf34fb1f7301c5b9dd2619ed206) )
+	ROM_LOAD( "14.bin",  0xa000, 0x2000, CRC(01952144) SHA1(d1074c79b51d3e2c152c9f3df6892027fe3a0e00) )
+
+	ROM_REGION( 0x18000,REGION_USER2, 0 )
+	ROM_LOAD( "d1.bin",  0x0000, 0x1000, CRC(702348d7) SHA1(717e48d8c3529acb9a216b4e99df1599fb2e6b3b) )
+	ROM_LOAD( "d2.bin",  0x1000, 0x1000, CRC(47601e8b) SHA1(4e56fe72644a000648199e92b306365c100cca30) )
+	ROM_LOAD( "d3.bin",  0x2000, 0x1000, CRC(caad3ee2) SHA1(a99b8da36bf26a193d92fa807f168e60ed4bdce5) )
+	ROM_LOAD( "d4.bin",  0x3000, 0x1000, CRC(ba5d8666) SHA1(83bf9a4a6c4cabed7312f1c09dcf317a69fdf26a) )
+	ROM_LOAD( "d5.bin",  0x4000, 0x1000, CRC(cc709b7f) SHA1(6218c4aaac8a1d025d00923e27e026f54eda8987) )
+	ROM_LOAD( "d6.bin",  0x5000, 0x1000, CRC(b9be626a) SHA1(94806056d9f16d455d8993795f220827d5b03183) )
+	ROM_LOAD( "d7.bin",  0x6000, 0x1000, CRC(934e09d4) SHA1(395a0ca3bdf76ef8f715bfddc514b583be9ed499) )
+	ROM_LOAD( "d8.bin",  0x7000, 0x1000, CRC(7e1970a0) SHA1(9e5fb5aa63149348f3da885844eb08d3471ec409) )
+	ROM_LOAD( "d15.bin", 0x8000, 0x1000, CRC(f1f15364) SHA1(e5b783acb3fa3e1b67770db8a8a623ad38dc6a73) )
+	ROM_LOAD( "d16.bin", 0x9000, 0x1000, CRC(05c52829) SHA1(21cc9334cf393bcc808e9b0999e84a15b94cedcb) )
+	ROM_LOAD( "d13.bin", 0xa000, 0x1000, CRC(7c0b9e16) SHA1(2ec6337d06702a542c0dae9eb963d2b8e1736232) )
+	ROM_LOAD( "d14.bin", 0xb000, 0x1000, CRC(81b31170) SHA1(cfaf768dd98116df730fb5ee0468ebc78dc42b2e) )
+	ROM_LOAD( "d11.bin", 0xc000, 0x1000, CRC(9e07ef70) SHA1(e814c7ed72d94011718e45fba640f8dafc49aa31) )
+	ROM_LOAD( "d12.bin", 0xd000, 0x1000, CRC(77e72279) SHA1(594e8018d64fd9862f54de0152723e610163e1b8) )
+	ROM_LOAD( "d9.bin",  0xe000, 0x1000, CRC(7a0edea8) SHA1(ca98c35ef2007363ead3d24a8556e24df031308b) )
+	ROM_LOAD( "d10.bin", 0xf000, 0x1000, CRC(0c1c2cb1) SHA1(addc9cea5247b25c114b88e3e9e1804305aa53c8) )
+	ROM_LOAD( "4.bin",  0x10000, 0x1000, CRC(40a1fe00) SHA1(2e1e12efe8083bf96233016a7712e6e486d968e4) ) /* 2732 eprom is used, but the PCB is prepared for 2764 eproms */
+	ROM_RELOAD(          0x11000, 0x1000 )
+	ROM_LOAD( "1.bin",   0x12000, 0x1000, CRC(4a7407a2) SHA1(7ca4e03c637a6f1c338ca438a7ab9e4ba537fee0) )
+	ROM_LOAD( "2.bin",   0x13000, 0x1000, CRC(f0b26c2e) SHA1(54057c619675bb384035547becd2019974bf23fa) )
+
+	ROM_LOAD( "7.bin",   0x14000, 0x2000, CRC(105cb9e4) SHA1(b9d8ffe35c1f66aa401e5d8e415bf7c016ff53bb) )
+	ROM_LOAD( "8.bin",   0x16000, 0x2000, CRC(27e5e6c1) SHA1(f3896d0006351d165e36bafa4340175077b3d6ba) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_LOAD( "3.bin",   0x0000, 0x1000, CRC(657a465d) SHA1(848217c3b736550586e8e9ba7a6e99e884094066) )	/* text characters */
+
+	ROM_REGION( 0x40,   REGION_PROMS, 0 ) /* color proms */
+	ROM_LOAD( "prom6331.b", 0x0000, 0x0020, CRC(ac7e582f) SHA1(9d8f9eda7130b49b91d9c63bafa119b2a91eeda0) ) /* text and sprites palette */
+	ROM_LOAD( "prom6331.a", 0x0020, 0x0020, CRC(cd0910d6) SHA1(1e6dae16115d5a03bbaf76c695327a06eb6da602) ) /* color control prom */
+ROM_END
+
+
 ROM_START( rjammer )
 	ROM_REGION( 0x10000,REGION_CPU1, 0 ) /* Z80 (master) cpu code */
 	ROM_LOAD( "tp-p.1", 0x0000, 0x2000, CRC(93eeed67) SHA1(9ccfc49f42c6b451ff1c541d6487276f4bf9338e) )
@@ -954,7 +1064,16 @@ ROM_START( rjammer )
 	ROM_LOAD( "16a", 0x0020, 0x0020, CRC(90222a71) SHA1(c3fd49c8075b0af451f6d2a142a4c4a2e397ac08) ) /* background palette */
 ROM_END
 
-/*     year  rom      parent  machine  inp   init */
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+
+/*     year  rom     parent  machine  inp   init */
 GAME( 1984, tubep,   0,      tubep,   tubep,   0, ROT0, "Nichibutsu + Fujitek", "Tube Panic", GAME_SUPPORTS_SAVE )
+GAME( 1984, tubepb,  tubep,  tubepb,  tubepb,  0, ROT0, "bootleg", "Tube Panic (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1984, rjammer, 0,      rjammer, rjammer, 0, ROT0, "Nichibutsu + Alice", "Roller Jammer", GAME_SUPPORTS_SAVE )
 

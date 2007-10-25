@@ -125,7 +125,7 @@ void cpuint_init(running_machine *machine)
 		{
 			input_line_state[cpunum][line] = CLEAR_LINE;
 			interrupt_vector[cpunum][line] =
-			input_line_vector[cpunum][line] = cputype_default_irq_vector(Machine->drv->cpu[cpunum].cpu_type);
+			input_line_vector[cpunum][line] = cputype_default_irq_vector(Machine->drv->cpu[cpunum].type);
 			input_event_index[cpunum][line] = 0;
 		}
 	}
@@ -234,7 +234,7 @@ static TIMER_CALLBACK( cpunum_empty_event_queue )
 			{
 				case PULSE_LINE:
 					/* temporary: PULSE_LINE only makes sense for NMI lines on Z80 */
-					assert(machine->drv->cpu[cpunum].cpu_type != CPU_Z80 || line == INPUT_LINE_NMI);
+					assert(machine->drv->cpu[cpunum].type != CPU_Z80 || line == INPUT_LINE_NMI);
 					activecpu_set_input_line(line, INTERNAL_ASSERT_LINE);
 					activecpu_set_input_line(line, INTERNAL_CLEAR_LINE);
 					break;

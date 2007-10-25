@@ -35,7 +35,7 @@ Year + Game                         System      Protection
     Big Striker                     C           Inputs
 93  Chimera Beast                   C       *   Inputs
     Cybattler                       C           Inputs
-    Hayaoshi Quiz Ouza Ketteisen    B       *   Inputs
+    Hayaoshi Quiz Ouza Ketteisen    B           Inputs
     Peek-a-Boo!                     D           Inputs
 --------------------------------------------^-------------------------------
                                             |
@@ -91,9 +91,9 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
                                 Issues / To Do
                                 --------------
 
-- There's a 512 byte PROM in the video section (different for every game)
-  that controls the priorities. It's been dumped for only a few games, so
-  we have to use fake data for the missing ones.
+- There is a 512 byte PROM in the video section (differs by game) that
+  controls the priorities. This prom is currently missing for two games,
+  so we have to use fake data for those two (64th Street & Chimera Beast).
 
 - Making the M6295 status register return 0 fixes the music tempo in
   avspirit, 64street, astyanax etc. but makes most of the effects in
@@ -1740,7 +1740,7 @@ ROM_START( edf )
 	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
-	ROM_REGION( 0x40000, REGION_CPU3, 0 ) /* MCU Internal Code */
+	ROM_REGION( 0x40000, REGION_CPU3, 0 ) /* MCU Internal Code, 64 pin DIP surface scratched */
 	ROM_LOAD( "edf.mcu", 0x000000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE ) /* Scroll 0 */
@@ -1761,8 +1761,8 @@ ROM_START( edf )
 	ROM_REGION( 0x040000, REGION_SOUND2, 0 )		/* Samples */
 	ROM_LOAD( "edf_m01.rom",  0x000000, 0x040000, CRC(9149286b) SHA1(f6c66c5cd50b72c4d401a263c65a8d4ef8cf9221) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM */
-	ROM_LOAD( "prom.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM  (N82S131N compatible type PROM) */
+	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
 ROM_START( edfu )
@@ -1776,7 +1776,7 @@ ROM_START( edfu )
 	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
-	ROM_REGION( 0x40000, REGION_CPU3, 0 ) /* MCU Internal Code */
+	ROM_REGION( 0x40000, REGION_CPU3, 0 ) /* MCU Internal Code, 64 pin DIP surface scratched */
 	ROM_LOAD( "edf.mcu", 0x000000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE ) /* Scroll 0 */
@@ -1797,8 +1797,8 @@ ROM_START( edfu )
 	ROM_REGION( 0x040000, REGION_SOUND2, 0 )		/* Samples */
 	ROM_LOAD( "edf_m01.rom",  0x000000, 0x040000, CRC(9149286b) SHA1(f6c66c5cd50b72c4d401a263c65a8d4ef8cf9221) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM */
-	ROM_LOAD( "prom.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM  (N82S131N compatible type PROM) */
+	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
 INPUT_PORTS_START( edf )
@@ -1982,7 +1982,7 @@ ROMs:
 9  |              (actual label is ???????N?C?Y[9])
 10 /              (actual label is ???????N?C?Y[10])
 
-PR-91044 (82S131N, not dumped)
+PR-91044 (82S131N)
 
 ***************************************************************************/
 
@@ -2018,8 +2018,8 @@ ROM_START( hayaosi1 )
 	ROM_REGION( 0x40000, REGION_SOUND2, 0 )		/* Samples */
 	ROM_LOAD( "4", 0x000000, 0x40000, CRC(ac3f9bd2) SHA1(7856f40daa30de9077e68a5ea977ec39c044c2f8) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM */
-	ROM_LOAD( "pr-91044",  0x0000, 0x0200, NO_DUMP )
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM  (N82S131N compatible type BPROM) */
+	ROM_LOAD( "pr-91044",  0x0000, 0x0200, CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) )
 ROM_END
 
 INPUT_PORTS_START( hayaosi1 )
@@ -2279,7 +2279,7 @@ ROM_START( jitsupro )
 	ROM_LOAD( "jp_8.bin",  0x000000, 0x040000, CRC(eca67632) SHA1(9f91081a26bd98fd79d5ddc6413b8a32006bb05f) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(          0x000000, 0x040000             )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM */
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM  (N82S131N compatible type BPROM) */
 	ROM_LOAD( "bs.bpr",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
@@ -2665,8 +2665,8 @@ ROM_START( p47 )
 	ROM_LOAD( "p47j_10.bin", 0x000000, 0x020000, CRC(b9d79c1e) SHA1(315dbed9b7cc289b383c95e6c94267682324154c) )
 	ROM_LOAD( "p47j_11.bin", 0x020000, 0x020000, CRC(fa0d1887) SHA1(d24c17806669f5b12527b36bc9c10fd16222e23c) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM */
-	ROM_LOAD( "prom.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM  (N82S131N compatible type BPROM) */
+	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
 
@@ -2706,8 +2706,8 @@ ROM_START( p47j )
 	ROM_LOAD( "p47j_10.bin", 0x000000, 0x020000, CRC(b9d79c1e) SHA1(315dbed9b7cc289b383c95e6c94267682324154c) )
 	ROM_LOAD( "p47j_11.bin", 0x020000, 0x020000, CRC(fa0d1887) SHA1(d24c17806669f5b12527b36bc9c10fd16222e23c) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM */
-	ROM_LOAD( "prom.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM  (N82S131N compatible type BPROM) */
+	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
 INPUT_PORTS_START( p47 )

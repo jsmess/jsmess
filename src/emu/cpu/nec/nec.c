@@ -166,7 +166,7 @@ static int nec_ICount;
 
 static nec_Regs I;
 
-static UINT32 cpu_type;
+static UINT32 chip_type;
 static UINT32 prefix_base;	/* base address of the latest prefix segment */
 static char seg_prefix;		/* prefix segment indicator */
 
@@ -1153,7 +1153,7 @@ void v20_init(int index, int clock, const void *config, int (*irqcallback)(int))
 int v20_execute(int cycles)
 {
 	nec_ICount=cycles;
-	cpu_type=V20;
+	chip_type=V20;
 
 	while(nec_ICount>0) {
 		/* Dispatch IRQ */
@@ -1184,7 +1184,7 @@ void v30_init(int index, int clock, const void *config, int (*irqcallback)(int))
 }
 int v30_execute(int cycles) {
 	nec_ICount=cycles;
-	cpu_type=V30;
+	chip_type=V30;
 
 	while(nec_ICount>0) {
 		/* Dispatch IRQ */
@@ -1216,7 +1216,7 @@ void v33_init(int index, int clock, const void *config, int (*irqcallback)(int))
 int v33_execute(int cycles)
 {
 	nec_ICount=cycles;
-	cpu_type=V33;
+	chip_type=V33;
 
 	while(nec_ICount>0) {
 		/* Dispatch IRQ */

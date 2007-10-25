@@ -24,9 +24,6 @@ enum
 /* maximum number of TMUs */
 #define MAX_TMU					2
 
-/* scanlines per work item */
-#define SCANLINES_PER_WORK		4
-
 /* accumulate operations less than this number of clocks */
 #define ACCUMULATE_THRESHOLD	0
 
@@ -1336,7 +1333,7 @@ static const UINT8 dither_matrix_2x2[16] =
  *************************************/
 
 typedef struct _voodoo_state voodoo_state;
-typedef struct _work_info work_info;
+typedef struct _poly_extra_data poly_extra_data;
 
 
 typedef struct _rgba rgba;
@@ -1361,6 +1358,47 @@ union _voodoo_reg
 
 
 typedef voodoo_reg rgb_union;
+
+
+typedef struct _voodoo_stats voodoo_stats;
+struct _voodoo_stats
+{
+	UINT8		lastkey;				/* last key state */
+	UINT8		display;				/* display stats? */
+	INT32		swaps;					/* total swaps */
+	INT32		stalls;					/* total stalls */
+	INT32		total_triangles;		/* total triangles */
+	INT32		total_pixels_in;		/* total pixels in */
+	INT32		total_pixels_out;		/* total pixels out */
+	INT32		total_chroma_fail;		/* total chroma fail */
+	INT32		total_zfunc_fail;		/* total z func fail */
+	INT32		total_afunc_fail;		/* total a func fail */
+	INT32		total_clipped;			/* total clipped */
+	INT32		total_stippled;			/* total stippled */
+	INT32		lfb_writes;				/* LFB writes */
+	INT32		lfb_reads;				/* LFB reads */
+	INT32		reg_writes;				/* register writes */
+	INT32		reg_reads;				/* register reads */
+	INT32		tex_writes;				/* texture writes */
+	INT32		texture_mode[16];		/* 16 different texture modes */
+	UINT8		render_override;		/* render override */
+	char		buffer[1024];			/* string */
+};
+
+
+/* note that this structure is an even 32 bytes long */
+typedef struct _stats_block stats_block;
+struct _stats_block
+{
+	INT32		pixels_in;				/* pixels in statistic */
+	INT32		pixels_out;				/* pixels out statistic */
+	INT32		chroma_fail;			/* chroma test fail statistic */
+	INT32		zfunc_fail;				/* z function test fail statistic */
+	INT32		afunc_fail;				/* alpha function test fail statistic */
+	INT32		clip_fail;				/* clipping fail statistic */
+	INT32		stipple_count;			/* stipple statistic */
+	INT32		filler[64/4 - 7];		/* pad this structure to 64 bytes */
+};
 
 
 typedef struct _fifo_state fifo_state;
@@ -1392,13 +1430,13 @@ typedef struct _pci_state pci_state;
 struct _pci_state
 {
 	fifo_state	fifo;					/* PCI FIFO */
-	UINT32		fifo_mem[64*2];			/* memory backing the PCI FIFO */
 	UINT32		init_enable;			/* initEnable value */
 	UINT8		stall_state;			/* state of the system if we're stalled */
 	void		(*stall_callback)(int); /* callback for stalling/unstalling */
 	UINT8		op_pending;				/* true if an operation is pending */
 	mame_time	op_end_time;			/* time when the pending operation ends */
 	mame_timer *continue_timer;			/* timer to use to continue processing */
+	UINT32		fifo_mem[64*2];			/* memory backing the PCI FIFO */
 };
 
 
@@ -1410,9 +1448,9 @@ struct _ncc_table
 	INT32 		ir[4], ig[4], ib[4];	/* I values for R,G,B */
 	INT32 		qr[4], qg[4], qb[4];	/* Q values for R,G,B */
 	INT32 		y[16];					/* Y values */
-	rgb_t		texel[256];				/* texel lookup */
 	rgb_t *		palette;				/* pointer to associated RGB palette */
 	rgb_t *		palettea;				/* pointer to associated ARGB palette */
+	rgb_t		texel[256];				/* texel lookup */
 };
 
 
@@ -1438,7 +1476,6 @@ struct _tmu_state
 	INT32		lodbias;				/* LOD bias */
 	UINT32		lodmask;				/* mask of available LODs */
 	UINT32		lodoffset[9];			/* offset of texture base for each LOD */
-	INT32		lodbase;				/* used during rasterization */
 	INT32		detailmax;				/* detail clamp */
 	INT32		detailbias;				/* detail bias */
 	UINT8		detailscale;			/* detail scale */
@@ -1512,10 +1549,6 @@ struct _fbi_state
 	UINT32		tile_height;			/* height of video tiles */
 	UINT32		x_tiles;				/* number of tiles in the X direction */
 
-	rgb_t		pen[65536];				/* mapping from pixels to pens */
-	rgb_t		clut[512];				/* clut gamma data */
-	UINT8		clut_dirty;				/* do we need to recompute? */
-
 	mame_timer *vblank_timer;			/* VBLANK timer */
 	UINT8		vblank;					/* VBLANK state */
 	UINT8		vblank_count;			/* number of VBLANKs since last swap */
@@ -1523,13 +1556,6 @@ struct _fbi_state
 	UINT8		vblank_swap;			/* swap when we hit this count */
 	UINT8		vblank_dont_swap;		/* don't actually swap when we hit this point */
 	void		(*vblank_client)(int);	/* client callback */
-
-	fifo_state	fifo;					/* framebuffer memory fifo */
-	cmdfifo_info cmdfifo[2];			/* command FIFOs */
-
-	UINT8		fogblend[64];			/* 64-entry fog table */
-	UINT8		fogdelta[64];			/* 64-entry fog table */
-	UINT8		fogdelta_mask;			/* mask for for delta (0xff for V1, 0xfc for V2) */
 
 	/* triangle setup info */
 	UINT8		cheating_allowed;		/* allow cheating? */
@@ -1547,8 +1573,21 @@ struct _fbi_state
 	INT32		dzdy;					/* delta Z per Y */
 	INT64		dwdy;					/* delta W per Y */
 
+	stats_block	lfb_stats;				/* LFB-access statistics */
+
 	UINT8		sverts;					/* number of vertices ready */
 	setup_vertex svert[3];				/* 3 setup vertices */
+
+	fifo_state	fifo;					/* framebuffer memory fifo */
+	cmdfifo_info cmdfifo[2];			/* command FIFOs */
+
+	UINT8		fogblend[64];			/* 64-entry fog table */
+	UINT8		fogdelta[64];			/* 64-entry fog table */
+	UINT8		fogdelta_mask;			/* mask for for delta (0xff for V1, 0xfc for V2) */
+
+	rgb_t		pen[65536];				/* mapping from pixels to pens */
+	rgb_t		clut[512];				/* clut gamma data */
+	UINT8		clut_dirty;				/* do we need to recompute? */
 };
 
 
@@ -1560,40 +1599,11 @@ struct _dac_state
 };
 
 
-typedef struct _voodoo_stats voodoo_stats;
-struct _voodoo_stats
-{
-	char		buffer[1024];			/* string */
-	UINT8		lastkey;				/* last key state */
-	UINT8		display;				/* display stats? */
-	INT32		swaps;					/* total swaps */
-	INT32		stalls;					/* total stalls */
-	INT32		total_triangles;		/* total triangles */
-	INT32		total_pixels_in;		/* total pixels in */
-	INT32		total_pixels_out;		/* total pixels out */
-	INT32		total_chroma_fail;		/* total chroma fail */
-	INT32		total_zfunc_fail;		/* total z func fail */
-	INT32		total_afunc_fail;		/* total a func fail */
-	INT32		total_clipped;			/* total clipped */
-	INT32		total_stippled;			/* total stippled */
-	INT32		lfb_writes;				/* LFB writes */
-	INT32		lfb_reads;				/* LFB reads */
-	INT32		reg_writes;				/* register writes */
-	INT32		reg_reads;				/* register reads */
-	INT32		tex_writes;				/* texture writes */
-	INT32		texture_mode[16];		/* 16 different texture modes */
-	UINT8		render_override;		/* render override */
-};
-
-
-typedef void (*raster_callback)(work_info *, INT32, INT32, INT32);
-
-
 typedef struct _raster_info raster_info;
 struct _raster_info
 {
 	struct _raster_info *next;			/* pointer to next entry with the same hash */
-	raster_callback callback; 			/* callback pointer */
+	poly_draw_scanline callback; 		/* callback pointer */
 	UINT8		is_generic;				/* TRUE if this is one of the generic rasterizers */
 	UINT8		display;				/* display index */
 	UINT32		hits;					/* how many hits (pixels) we've used this for */
@@ -1607,34 +1617,9 @@ struct _raster_info
 };
 
 
-typedef struct _work_unit work_unit;
-struct _work_unit
-{
-	work_info *work;				/* pointer back to the work info */
-	INT16	scanline, count;		/* starting scanline and count */
-	struct
-	{
-		INT32	startx, stopx;		/* starting/ending X points for each scanline */
-	} extent[SCANLINES_PER_WORK];
-};
-
-
-struct _work_info
+struct _poly_extra_data
 {
 	voodoo_state *state;				/* pointer back to the voodoo state */
-
-	raster_callback callback;			/* callback to handle a scanline's worth of work */
-	UINT16 *	drawbuf;				/* pointer to render buffer */
-
-	INT32		startscanline;			/* starting scanline */
-
-	UINT16 		dither[16];				/* dither matrix, for fastfill */
-
-	INT32 		start_pixels_in;		/* starting fbiPixelsIn value */
-	INT32 		start_pixels_out;		/* starting fbiPixelsOut value */
-	INT32 		start_chroma_fail;		/* starting fbiChromaFail value */
-	INT32 		start_zfunc_fail;		/* starting fbiZfuncFail value */
-	INT32 		start_afunc_fail;		/* starting fbiAfuncFail value */
 	raster_info *info;					/* pointer to rasterizer information */
 
 	INT16		ax, ay;					/* vertex A x,y (12.4) */
@@ -1654,6 +1639,7 @@ struct _work_info
 	INT64		dw0dx;					/* delta W per X */
 	INT64		ds0dy, dt0dy;			/* delta S,T per Y */
 	INT64		dw0dy;					/* delta W per Y */
+	INT32		lodbase0;				/* used during rasterization */
 
 	INT64		starts1, startt1;		/* starting S,T (14.18) */
 	INT64		startw1;				/* starting W (2.30) */
@@ -1661,8 +1647,9 @@ struct _work_info
 	INT64		dw1dx;					/* delta W per X */
 	INT64		ds1dy, dt1dy;			/* delta S,T per Y */
 	INT64		dw1dy;					/* delta W per Y */
+	INT32		lodbase1;				/* used during rasterization */
 
-	work_unit	unit[4100/SCANLINES_PER_WORK];	/* individual work units */
+	UINT16 		dither[16];				/* dither matrix, for fastfill */
 };
 
 
@@ -1705,8 +1692,8 @@ struct _voodoo_state
 	tmu_shared_state tmushare;			/* TMU shared state */
 	banshee_info banshee;				/* Banshee state */
 
-	work_info 	work;					/* work queue management */
-	osd_work_queue *work_queue;			/* work queue for offloading rasterization */
+	poly_manager *poly;					/* polygon manager */
+	stats_block	*thread_stats;			/* per-thread statistics */
 
 	voodoo_stats stats;					/* internal statistics */
 
@@ -2212,7 +2199,7 @@ while (0)
  *
  *************************************/
 
-#define APPLY_CHROMAKEY(VV, FBZMODE, COLOR)										\
+#define APPLY_CHROMAKEY(VV, STATS, FBZMODE, COLOR)								\
 do 																				\
 {																				\
 	if (FBZMODE_ENABLE_CHROMAKEY(FBZMODE))										\
@@ -2222,7 +2209,7 @@ do 																				\
 		{																		\
 			if (((COLOR.u ^ (VV)->reg[chromaKey].u) & 0xffffff) == 0)			\
 			{																	\
-				chromafail++;													\
+				(STATS)->chroma_fail++;											\
 				goto skipdrawdepth;												\
 			}																	\
 		}																		\
@@ -2261,7 +2248,7 @@ do 																				\
 			{																	\
 				if (results != 0)												\
 				{																\
-					chromafail++;												\
+					(STATS)->chroma_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 			}																	\
@@ -2269,7 +2256,7 @@ do 																				\
 			{																	\
 				if (results == 7)												\
 				{																\
-					chromafail++;												\
+					(STATS)->chroma_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 			}																	\
@@ -2286,14 +2273,14 @@ while (0)
  *
  *************************************/
 
-#define APPLY_ALPHAMASK(VV, FBZMODE, AA)										\
+#define APPLY_ALPHAMASK(VV, STATS, FBZMODE, AA)									\
 do 																				\
 {																				\
 	if (FBZMODE_ENABLE_ALPHA_MASK(FBZMODE))										\
 	{																			\
 		if (((AA) & 1) == 0)													\
 		{																		\
-			afail++;															\
+			(STATS)->afunc_fail++;												\
 			goto skipdrawdepth;													\
 		}																		\
 	}																			\
@@ -2308,61 +2295,62 @@ while (0)
  *
  *************************************/
 
-#define APPLY_ALPHATEST(VV, ALPHAMODE, AA)										\
+#define APPLY_ALPHATEST(VV, STATS, ALPHAMODE, AA)								\
 do 																				\
 {																				\
 	if (ALPHAMODE_ALPHATEST(ALPHAMODE))											\
 	{																			\
+		UINT8 alpharef = (VV)->reg[alphaMode].rgb.a;							\
 		switch (ALPHAMODE_ALPHAFUNCTION(ALPHAMODE))								\
 		{																		\
 			case 0:		/* alphaOP = never */									\
-				afail++;														\
+				(STATS)->afunc_fail++;											\
 				goto skipdrawdepth;												\
 																				\
 			case 1:		/* alphaOP = less than */								\
-				if ((AA) >= v->reg[alphaMode].rgb.a)							\
+				if ((AA) >= alpharef)											\
 				{																\
-					afail++;													\
+					(STATS)->afunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
 																				\
 			case 2:		/* alphaOP = equal */									\
-				if ((AA) != v->reg[alphaMode].rgb.a)							\
+				if ((AA) != alpharef)											\
 				{																\
-					afail++;													\
+					(STATS)->afunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
 																				\
 			case 3:		/* alphaOP = less than or equal */						\
-				if ((AA) > v->reg[alphaMode].rgb.a)								\
+				if ((AA) > alpharef)											\
 				{																\
-					afail++;													\
+					(STATS)->afunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
 																				\
 			case 4:		/* alphaOP = greater than */							\
-				if ((AA) <= v->reg[alphaMode].rgb.a)							\
+				if ((AA) <= alpharef)											\
 				{																\
-					afail++;													\
+					(STATS)->afunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
 																				\
 			case 5:		/* alphaOP = not equal */								\
-				if ((AA) == v->reg[alphaMode].rgb.a)							\
+				if ((AA) == alpharef)											\
 				{																\
-					afail++;													\
+					(STATS)->afunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
 																				\
 			case 6:		/* alphaOP = greater than or equal */					\
-				if ((AA) < v->reg[alphaMode].rgb.a)								\
+				if ((AA) < alpharef)											\
 				{																\
-					afail++;													\
+					(STATS)->afunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
@@ -2552,14 +2540,15 @@ do																				\
 {																				\
 	if (FOGMODE_ENABLE_FOG(FOGMODE))											\
 	{																			\
+		rgb_union fogcolor = (VV)->reg[fogColor];								\
 		INT32 fr, fg, fb;														\
 																				\
 		/* constant fog bypasses everything else */								\
 		if (FOGMODE_FOG_CONSTANT(FOGMODE))										\
 		{																		\
-			fr = (VV)->reg[fogColor].rgb.r;										\
-			fg = (VV)->reg[fogColor].rgb.g;										\
-			fb = (VV)->reg[fogColor].rgb.b;										\
+			fr = fogcolor.rgb.r;												\
+			fg = fogcolor.rgb.g;												\
+			fb = fogcolor.rgb.b;												\
 		}																		\
 																				\
 		/* non-constant fog comes from several sources */						\
@@ -2570,9 +2559,9 @@ do																				\
 			/* if fog_add is zero, we start with the fog color */				\
 			if (FOGMODE_FOG_ADD(FOGMODE) == 0)									\
 			{																	\
-				fr = (VV)->reg[fogColor].rgb.r;									\
-				fg = (VV)->reg[fogColor].rgb.g;									\
-				fb = (VV)->reg[fogColor].rgb.b;									\
+				fr = fogcolor.rgb.r;											\
+				fg = fogcolor.rgb.g;											\
+				fb = fogcolor.rgb.b;											\
 			}																	\
 			else																\
 				fr = fg = fb = 0;												\
@@ -3022,21 +3011,17 @@ while (0)
  *
  *************************************/
 
-#define PIXEL_PIPELINE_BEGIN(VV, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)	\
+#define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)	\
 do 																				\
 {																				\
 	INT32 depthval, wfloat;														\
 	INT32 prefogr, prefogg, prefogb;											\
 	INT32 r, g, b, a;															\
 																				\
-	pixin++;																	\
+	(STATS)->pixels_in++;														\
 																				\
 	/* apply clipping */														\
 	/* note that for perf reasons, we assume the caller has done clipping */	\
-																				\
-	/* rotate stipple pattern */												\
-	if (FBZMODE_STIPPLE_PATTERN(FBZMODE) == 0)									\
-		(VV)->reg[stipple].u = ((VV)->reg[stipple].u << 1) | ((VV)->reg[stipple].u >> 31);\
 																				\
 	/* handle stippling */														\
 	if (FBZMODE_ENABLE_STIPPLE(FBZMODE))										\
@@ -3044,9 +3029,10 @@ do 																				\
 		/* rotate mode */														\
 		if (FBZMODE_STIPPLE_PATTERN(FBZMODE) == 0)								\
 		{																		\
+			(VV)->reg[stipple].u = ((VV)->reg[stipple].u << 1) | ((VV)->reg[stipple].u >> 31);\
 			if (((VV)->reg[stipple].u & 0x80000000) == 0)						\
 			{																	\
-				v->stats.total_stippled++;										\
+				(VV)->stats.total_stippled++;									\
 				goto skipdrawdepth;												\
 			}																	\
 		}																		\
@@ -3057,7 +3043,7 @@ do 																				\
 			int stipple_index = (((YY) & 3) << 3) | (~(XX) & 7);				\
 			if ((((VV)->reg[stipple].u >> stipple_index) & 1) == 0)				\
 			{																	\
-				v->stats.total_stippled++;										\
+				(VV)->stats.total_stippled++;									\
 				goto skipdrawdepth;												\
 			}																	\
 		}																		\
@@ -3103,7 +3089,7 @@ do 																				\
 	/* add the bias */															\
 	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))										\
 	{																			\
-		depthval += (INT16)v->reg[zaColor].u;									\
+		depthval += (INT16)(VV)->reg[zaColor].u;								\
 		CLAMP(depthval, 0, 0xffff);												\
 	}																			\
 																				\
@@ -3117,19 +3103,19 @@ do 																				\
 		if (FBZMODE_DEPTH_SOURCE_COMPARE(FBZMODE) == 0)							\
 			depthsource = depthval;												\
 		else																	\
-			depthsource = v->reg[zaColor].u & 0xffff;							\
+			depthsource = (UINT16)(VV)->reg[zaColor].u;							\
 																				\
 		/* test against the depth buffer */										\
 		switch (FBZMODE_DEPTH_FUNCTION(FBZMODE))								\
 		{																		\
 			case 0:		/* depthOP = never */									\
-				zfail++;														\
+				(STATS)->zfunc_fail++;											\
 				goto skipdrawdepth;												\
 																				\
 			case 1:		/* depthOP = less than */								\
 				if (depthsource >= depth[XX])									\
 				{																\
-					zfail++;													\
+					(STATS)->zfunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
@@ -3137,7 +3123,7 @@ do 																				\
 			case 2:		/* depthOP = equal */									\
 				if (depthsource != depth[XX])									\
 				{																\
-					zfail++;													\
+					(STATS)->zfunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
@@ -3145,7 +3131,7 @@ do 																				\
 			case 3:		/* depthOP = less than or equal */						\
 				if (depthsource > depth[XX])									\
 				{																\
-					zfail++;													\
+					(STATS)->zfunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
@@ -3153,7 +3139,7 @@ do 																				\
 			case 4:		/* depthOP = greater than */							\
 				if (depthsource <= depth[XX])									\
 				{																\
-					zfail++;													\
+					(STATS)->zfunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
@@ -3161,7 +3147,7 @@ do 																				\
 			case 5:		/* depthOP = not equal */								\
 				if (depthsource == depth[XX])									\
 				{																\
-					zfail++;													\
+					(STATS)->zfunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
@@ -3169,7 +3155,7 @@ do 																				\
 			case 6:		/* depthOP = greater than or equal */					\
 				if (depthsource < depth[XX])									\
 				{																\
-					zfail++;													\
+					(STATS)->zfunc_fail++;										\
 					goto skipdrawdepth;											\
 				}																\
 				break;															\
@@ -3180,7 +3166,7 @@ do 																				\
 	}
 
 
-#define PIXEL_PIPELINE_END(VV, DITHER, DITHER4, DITHER_LOOKUP, XX, dest, depth, FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, ITERZ, ITERW, ITERAXXX) \
+#define PIXEL_PIPELINE_END(VV, STATS, DITHER, DITHER4, DITHER_LOOKUP, XX, dest, depth, FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, ITERZ, ITERW, ITERAXXX) \
 																				\
 	/* perform fogging */														\
 	prefogr = r;																\
@@ -3213,7 +3199,7 @@ do 																				\
 	}																			\
 																				\
 	/* track pixel writes to the frame buffer regardless of mask */				\
-	pixout++;																	\
+	(STATS)->pixels_out++;														\
 																				\
 skipdrawdepth:																	\
 	;																			\
@@ -3265,7 +3251,7 @@ while (0)
 
     INT32 r, g, b, a;
 */
-#define COLORPATH_PIPELINE(VV, FBZCOLORPATH, FBZMODE, ALPHAMODE, TEXELARGB, ITERZ, ITERW, ITERARGB) \
+#define COLORPATH_PIPELINE(VV, STATS, FBZCOLORPATH, FBZMODE, ALPHAMODE, TEXELARGB, ITERZ, ITERW, ITERARGB) \
 do 																				\
 {																				\
 	INT32 blendr, blendg, blendb, blenda;										\
@@ -3293,7 +3279,7 @@ do 																				\
 	}																			\
 																				\
 	/* handle chroma key */														\
-	APPLY_CHROMAKEY(VV, FBZMODE, c_other);										\
+	APPLY_CHROMAKEY(VV, STATS, FBZMODE, c_other);								\
 																				\
 	/* compute a_other */														\
 	switch (FBZCP_CC_ASELECT(FBZCOLORPATH))										\
@@ -3316,10 +3302,10 @@ do 																				\
 	}																			\
 																				\
 	/* handle alpha mask */														\
-	APPLY_ALPHAMASK(VV, FBZMODE, c_other.rgb.a);								\
+	APPLY_ALPHAMASK(VV, STATS, FBZMODE, c_other.rgb.a);							\
 																				\
 	/* handle alpha test */														\
-	APPLY_ALPHATEST(VV, ALPHAMODE, c_other.rgb.a);								\
+	APPLY_ALPHATEST(VV, STATS, ALPHAMODE, c_other.rgb.a);						\
 																				\
 	/* compute c_local */														\
 	if (FBZCP_CC_LOCALSELECT_OVERRIDE(FBZCOLORPATH) == 0)						\
@@ -3516,45 +3502,18 @@ while (0)
 
 /*************************************
  *
- *  Statistics manipulation
- *
- *************************************/
-
-#define DECLARE_STATISTICS														\
-	INT32 pixin = 0, pixout = 0, afail = 0, zfail = 0, chromafail = 0			\
-
-#define UPDATE_STATISTICS(VV)													\
-do																				\
-{																				\
-	/* update statistics atomically */											\
-	if (pixin != 0)																\
-		osd_sync_add((INT32 volatile *)&(VV)->reg[fbiPixelsIn].u, pixin);		\
-	if (pixout != 0)															\
-		osd_sync_add((INT32 volatile *)&(VV)->reg[fbiPixelsOut].u, pixout);		\
-	if (afail != 0)																\
-		osd_sync_add((INT32 volatile *)&(VV)->reg[fbiAfuncFail].u, afail);		\
-	if (zfail != 0)																\
-		osd_sync_add((INT32 volatile *)&(VV)->reg[fbiZfuncFail].u, zfail);		\
-	if (chromafail != 0)														\
-		osd_sync_add((INT32 volatile *)&(VV)->reg[fbiChromaFail].u, chromafail);\
-}																				\
-while (0)
-
-
-
-/*************************************
- *
  *  Rasterizer generator macro
  *
  *************************************/
 
 #define RASTERIZER(name, TMUS, FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
-static void raster_##name(work_info *work, INT32 y, INT32 startx, INT32 stopx)	\
+static void raster_##name(void *destbase, INT32 y, INT32 startx, INT32 stopx, const poly_params *poly, int threadid) \
 {																				\
-	voodoo_state *v = work->state;												\
+	poly_extra_data *extra = poly->extra;										\
+	voodoo_state *v = extra->state;												\
+	stats_block *stats = &v->thread_stats[threadid];							\
 	DECLARE_DITHER_POINTERS;													\
-	DECLARE_STATISTICS;															\
 	INT32 iterr, iterg, iterb, itera;											\
 	INT32 iterz;																\
 	INT64 iterw, iterw0 = 0, iterw1 = 0;										\
@@ -3583,8 +3542,8 @@ static void raster_##name(work_info *work, INT32 y, INT32 startx, INT32 stopx)	\
 		if (scry < ((v->reg[clipLowYHighY].u >> 16) & 0x3ff) ||					\
 			scry >= (v->reg[clipLowYHighY].u & 0x3ff))							\
 		{																		\
-			pixin += stopx - startx;											\
-			v->stats.total_clipped += stopx - startx;							\
+			stats->pixels_in += stopx - startx;									\
+			stats->clip_fail += stopx - startx;									\
 			return;																\
 		}																		\
 																				\
@@ -3592,43 +3551,43 @@ static void raster_##name(work_info *work, INT32 y, INT32 startx, INT32 stopx)	\
 		tempclip = (v->reg[clipLeftRight].u >> 16) & 0x3ff;						\
 		if (startx < tempclip)													\
 		{																		\
-			pixin += tempclip - startx;											\
+			stats->pixels_in += tempclip - startx;								\
 			v->stats.total_clipped += tempclip - startx;						\
 			startx = tempclip;													\
 		}																		\
 		tempclip = v->reg[clipLeftRight].u & 0x3ff;								\
 		if (stopx >= tempclip)													\
 		{																		\
-			pixin += stopx - tempclip;											\
+			stats->pixels_in += stopx - tempclip;								\
 			v->stats.total_clipped += stopx - tempclip;							\
 			stopx = tempclip - 1;												\
 		}																		\
 	}																			\
 																				\
 	/* get pointers to the target buffer and depth buffer */					\
-	dest = work->drawbuf + scry * v->fbi.rowpixels;								\
+	dest = (UINT16 *)destbase + scry * v->fbi.rowpixels;							\
 	depth = v->fbi.aux ? (v->fbi.aux + scry * v->fbi.rowpixels) : NULL;			\
 																				\
 	/* compute the starting parameters */										\
-	dx = startx - (work->ax >> 4);												\
-	dy = y - (work->ay >> 4);													\
-	iterr = work->startr + dy * work->drdy + dx * work->drdx;					\
-	iterg = work->startg + dy * work->dgdy + dx * work->dgdx;					\
-	iterb = work->startb + dy * work->dbdy + dx * work->dbdx;					\
-	itera = work->starta + dy * work->dady + dx * work->dadx;					\
-	iterz = work->startz + dy * work->dzdy + dx * work->dzdx;					\
-	iterw = work->startw + dy * work->dwdy + dx * work->dwdx;					\
+	dx = startx - (extra->ax >> 4);												\
+	dy = y - (extra->ay >> 4);													\
+	iterr = extra->startr + dy * extra->drdy + dx * extra->drdx;				\
+	iterg = extra->startg + dy * extra->dgdy + dx * extra->dgdx;				\
+	iterb = extra->startb + dy * extra->dbdy + dx * extra->dbdx;				\
+	itera = extra->starta + dy * extra->dady + dx * extra->dadx;				\
+	iterz = extra->startz + dy * extra->dzdy + dx * extra->dzdx;				\
+	iterw = extra->startw + dy * extra->dwdy + dx * extra->dwdx;				\
 	if (TMUS >= 1)																\
 	{																			\
-		iterw0 = work->startw0 + dy * work->dw0dy +	dx * work->dw0dx;			\
-		iters0 = work->starts0 + dy * work->ds0dy + dx * work->ds0dx;			\
-		itert0 = work->startt0 + dy * work->dt0dy + dx * work->dt0dx;			\
+		iterw0 = extra->startw0 + dy * extra->dw0dy +	dx * extra->dw0dx;		\
+		iters0 = extra->starts0 + dy * extra->ds0dy + dx * extra->ds0dx;		\
+		itert0 = extra->startt0 + dy * extra->dt0dy + dx * extra->dt0dx;		\
 	}																			\
 	if (TMUS >= 2)																\
 	{																			\
-		iterw1 = work->startw1 + dy * work->dw1dy +	dx * work->dw1dx;			\
-		iters1 = work->starts1 + dy * work->ds1dy + dx * work->ds1dx;			\
-		itert1 = work->startt1 + dy * work->dt1dy + dx * work->dt1dx;			\
+		iterw1 = extra->startw1 + dy * extra->dw1dy +	dx * extra->dw1dx;		\
+		iters1 = extra->starts1 + dy * extra->ds1dy + dx * extra->ds1dx;		\
+		itert1 = extra->startt1 + dy * extra->dt1dy + dx * extra->dt1dx;		\
 	}																			\
 																				\
 	/* loop in X */																\
@@ -3638,14 +3597,14 @@ static void raster_##name(work_info *work, INT32 y, INT32 startx, INT32 stopx)	\
 		rgb_union texel = { 0 };												\
 																				\
 		/* pixel pipeline part 1 handles depth testing and stippling */			\
-		PIXEL_PIPELINE_BEGIN(v, x, y, FBZCOLORPATH, FBZMODE, 					\
+		PIXEL_PIPELINE_BEGIN(v, stats, x, y, FBZCOLORPATH, FBZMODE, 			\
 								iterz, iterw);									\
 																				\
 		/* run the texture pipeline on TMU1 to produce a value in texel */		\
 		/* note that they set LOD min to 8 to "disable" a TMU */				\
 		if (TMUS >= 2 && v->tmu[1].lodmin < (8 << 8))							\
 			TEXTURE_PIPELINE(&v->tmu[1], x, dither4, TEXMODE1, texel,			\
-								v->tmu[1].lookup, v->tmu[1].lodbase,			\
+								v->tmu[1].lookup, extra->lodbase1,				\
 								iters1, itert1, iterw1, texel);					\
 																				\
 		/* run the texture pipeline on TMU0 to produce a final */				\
@@ -3653,38 +3612,37 @@ static void raster_##name(work_info *work, INT32 y, INT32 startx, INT32 stopx)	\
 		/* note that they set LOD min to 8 to "disable" a TMU */				\
 		if (TMUS >= 1 && v->tmu[0].lodmin < (8 << 8))							\
 			TEXTURE_PIPELINE(&v->tmu[0], x, dither4, TEXMODE0, texel,			\
-								v->tmu[0].lookup, v->tmu[0].lodbase,			\
+								v->tmu[0].lookup, extra->lodbase0,				\
 								iters0, itert0, iterw0, texel);					\
 																				\
 		/* colorpath pipeline selects source colors and does blending */		\
 		CLAMPED_ARGB(iterr, iterg, iterb, itera, FBZCOLORPATH, iterargb);		\
-		COLORPATH_PIPELINE(v, FBZCOLORPATH, FBZMODE, ALPHAMODE,	texel,			\
+		COLORPATH_PIPELINE(v, stats, FBZCOLORPATH, FBZMODE, ALPHAMODE, texel,	\
 							iterz, iterw, iterargb);							\
 																				\
 		/* pixel pipeline part 2 handles fog, alpha, and final output */		\
-		PIXEL_PIPELINE_END(v, dither, dither4, dither_lookup, x, dest, depth, 	\
+		PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth, \
 							FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, 			\
 							iterz, iterw, iterargb);							\
 																				\
 		/* update the iterated parameters */									\
-		iterr += work->drdx;													\
-		iterg += work->dgdx;													\
-		iterb += work->dbdx;													\
-		itera += work->dadx;													\
-		iterz += work->dzdx;													\
-		iterw += work->dwdx;													\
+		iterr += extra->drdx;													\
+		iterg += extra->dgdx;													\
+		iterb += extra->dbdx;													\
+		itera += extra->dadx;													\
+		iterz += extra->dzdx;													\
+		iterw += extra->dwdx;													\
 		if (TMUS >= 1)															\
 		{																		\
-			iterw0 += work->dw0dx;												\
-			iters0 += work->ds0dx;												\
-			itert0 += work->dt0dx;												\
+			iterw0 += extra->dw0dx;												\
+			iters0 += extra->ds0dx;												\
+			itert0 += extra->dt0dx;												\
 		}																		\
 		if (TMUS >= 2)															\
 		{																		\
-			iterw1 += work->dw1dx;												\
-			iters1 += work->ds1dx;												\
-			itert1 += work->dt1dx;												\
+			iterw1 += extra->dw1dx;												\
+			iters1 += extra->ds1dx;												\
+			itert1 += extra->dt1dx;												\
 		}																		\
 	}																			\
-	UPDATE_STATISTICS(v);														\
 }

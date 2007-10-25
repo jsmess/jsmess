@@ -815,8 +815,8 @@ void slapstic_init(int chip)
 	slapstic_reset();
 
 	/* see if we're 68k or 6502/6809 based */
-	access_68k = (Machine->drv->cpu[0].cpu_type != CPU_M6809 &&
-				  Machine->drv->cpu[0].cpu_type != CPU_M6502);
+	access_68k = (Machine->drv->cpu[0].type != CPU_M6809 &&
+				  Machine->drv->cpu[0].type != CPU_M6502);
 }
 
 

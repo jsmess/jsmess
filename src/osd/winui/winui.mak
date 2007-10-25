@@ -105,7 +105,11 @@ AR = @$(VCONV) ar
 RC = @$(VCONV) windres
 
 # make sure we use the multithreaded runtime
+ifdef DEBUG
+CC += /MTd
+else
 CC += /MT
+endif
 
 # turn on link-time codegen if the MAXOPT flag is also set
 ifdef MAXOPT
@@ -160,7 +164,7 @@ DEFS += -DX64_WINDOWS_ABI
 
 # debug build: enable guard pages on all memory allocations
 ifdef DEBUG
-DEFS += -DMALLOC_DEBUG
+#DEFS += -DMALLOC_DEBUG
 LDFLAGS += -Wl,--allow-multiple-definition
 endif
 
@@ -323,7 +327,7 @@ $(UISRC)/helpids.c : $(UIOBJ)/mkhelp$(EXE) $(UISRC)/resource.h $(UISRC)/resource
 	$(UIOBJ)/mkhelp$(EXE) $(UISRC)/mame32.rc >$@
 
 # rule to build the generator
-$(UIOBJ)/mkhelp$(EXE): $(UIOBJ)/mkhelp.o
+$(UIOBJ)/mkhelp$(EXE): $(UIOBJ)/mkhelp.o $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
 

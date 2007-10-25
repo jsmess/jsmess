@@ -3,6 +3,7 @@
 #include "namcoic.h"
 
 /**************************************************************************************/
+static int mPalXOR;		/* XOR'd with palette select register; needed for System21 */
 
 static struct
 {
@@ -351,27 +352,58 @@ static void zdrawgfxzoom(running_machine *machine,
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 								UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								if( mPalXOR )
 								{
-									int c = source[x_index>>16];
-									if( c != transparent_color )
+									for( x=sx; x<ex; x++ )
 									{
-										if( pri[x]<=zpos )
+										int c = source[x_index>>16];
+										if( c != transparent_color )
 										{
-											if( color == 0xf && c==0xfe && shadow_offset )
+											if( pri[x]<=zpos )
 											{
-												dest[x] |= shadow_offset;
+												switch( c )
+												{
+												case 0:
+													dest[x] = 0x4000|(dest[x]&0x1fff);
+													break;
+												case 1:
+													dest[x] = 0x6000|(dest[x]&0x1fff);
+													break;
+												default:
+													dest[x] = pal[c];
+													break;
+												}
+												pri[x] = zpos;
 											}
-											else
-											{
-												dest[x] = pal[c];
-											}
-											pri[x] = zpos;
 										}
+										x_index += dx;
 									}
-									x_index += dx;
+									y_index += dy;
 								}
-								y_index += dy;
+								else
+								{
+									for( x=sx; x<ex; x++ )
+									{
+										int c = source[x_index>>16];
+										if( c != transparent_color )
+										{
+											if( pri[x]<=zpos )
+											{
+												if( color == 0xf && c==0xfe && shadow_offset )
+												{
+													dest[x] |= shadow_offset;
+												}
+												else
+												{
+													dest[x] = pal[c];
+												}
+												pri[x] = zpos;
+											}
+										}
+										x_index += dx;
+									}
+									y_index += dy;
+								}
 							}
 						}
 					}
@@ -676,7 +708,6 @@ nth_byte32( const UINT32 *pSource, int which )
 
 static int (*mpCodeToTile)( int code ); /* sprite banking callback */
 static int mGfxC355;	/* gfx bank for sprites */
-static int mPalXOR;		/* XOR'd with palette select register; needed for System21 */
 
 /**
  * 0x00000 sprite attr (page0)
@@ -740,11 +771,14 @@ draw_spriteC355(running_machine *machine, mame_bitmap *bitmap, const rectangle *
 	xscroll = (INT16)mSpritePos[1];
 	yscroll = (INT16)mSpritePos[0];
 
-	xscroll &= 0x3ff; if( xscroll & 0x200 ) xscroll |= ~0x3ff;
+//  xscroll &= 0x3ff; if( xscroll & 0x200 ) xscroll |= ~0x3ff;
+	xscroll &= 0x1ff; if( xscroll & 0x100 ) xscroll |= ~0x1ff;
 	yscroll &= 0x1ff; if( yscroll & 0x100 ) yscroll |= ~0x1ff;
 
 	if( bitmap->width > 384 )
 	{ /* Medium Resolution: System21 adjust */
+			xscroll = (INT16)mSpritePos[1];
+			xscroll &= 0x3ff; if( xscroll & 0x200 ) xscroll |= ~0x3ff;
 			if( yscroll<0 )
 			{ /* solvalou */
 				yscroll += 0x20;
@@ -912,12 +946,19 @@ DrawObjectList(running_machine *machine,
 void
 namco_obj_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
 {
+//  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if( pri==0 )
 	{
 		fillbitmap( priority_bitmap, 0, cliprect );
 	}
-	DrawObjectList(machine, bitmap,cliprect,pri,&spriteram16[0x02000/2], &spriteram16[0x00000/2] );
-	DrawObjectList(machine, bitmap,cliprect,pri,&spriteram16[0x14000/2], &spriteram16[0x10000/2] );
+//  if( offs==0 )
+	{ /* boot */
+		DrawObjectList(machine, bitmap,cliprect,pri,&spriteram16[0x02000/2], &spriteram16[0x00000/2] );
+	}
+//  else
+	{
+		DrawObjectList(machine, bitmap,cliprect,pri,&spriteram16[0x14000/2], &spriteram16[0x10000/2] );
+	}
 } /* namco_obj_draw */
 
 WRITE16_HANDLER( namco_obj16_w )

@@ -767,6 +767,21 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 			{
 				SCSP->udata.data[0x20/2]&=~SCSP->udata.data[0x22/2];
 				ResetInterrupts(SCSP);
+
+				// behavior from real hardware: if you SCIRE a timer that's expired,
+				// it'll immediately pop up again in SCIPD.  ask Sakura Taisen on the Saturn...
+				if (SCSP->TimCnt[0] == 0xffff)
+				{
+					SCSP->udata.data[0x20/2] |= 0x40;
+				}
+				if (SCSP->TimCnt[1] == 0xffff)
+				{
+					SCSP->udata.data[0x20/2] |= 0x80;
+				}
+				if (SCSP->TimCnt[2] == 0xffff)
+				{
+					SCSP->udata.data[0x20/2] |= 0x100;
+				}
 			}
 			break;
 		case 0x24:

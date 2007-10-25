@@ -86,7 +86,7 @@ static int nec_ICount;
 
 static nec_Regs I;
 
-static UINT32 cpu_type;
+static UINT32 chip_type;
 static UINT32 prefix_base;	/* base address of the latest prefix segment */
 static char seg_prefix;		/* prefix segment indicator */
 
@@ -953,7 +953,7 @@ void v30mz_init(int index, int clock, const void *config, int (*irqcallback)(int
 int v30mz_execute(int cycles)
 {
 	nec_ICount=cycles;
-	cpu_type=V30MZ;
+	chip_type=V30MZ;
 
 	while(nec_ICount>0) {
 		/* Dispatch IRQ */

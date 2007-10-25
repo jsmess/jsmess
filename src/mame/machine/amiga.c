@@ -33,7 +33,7 @@
  *************************************/
 
 /* 715909 Hz for NTSC, 709379 for PAL */
-#define O2_CLOCK					(Machine->drv->cpu[0].cpu_clock / 10)
+#define O2_CLOCK					(Machine->drv->cpu[0].clock / 10)
 
 /* How many CPU cycles we delay until we fire a pending interrupt */
 #define AMIGA_IRQ_DELAY_CYCLES		24
@@ -1139,7 +1139,7 @@ static void amiga_cia_1_irq(int state)
 
 static void custom_reset(void)
 {
-	int clock = Machine->drv->cpu[0].cpu_clock;
+	int clock = Machine->drv->cpu[0].clock;
 	UINT16	vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
 
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1516,7 +1516,7 @@ void amiga_serial_in_w(UINT16 data)
 mame_time amiga_get_serial_char_period(void)
 {
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	UINT32 baud = Machine->drv->cpu[0].cpu_clock / 2 / divisor;
+	UINT32 baud = Machine->drv->cpu[0].clock / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
 	return scale_up_mame_time(MAME_TIME_IN_HZ(baud), numbits);
 }

@@ -76,7 +76,7 @@ static int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, mess
 		/* if the region is inverted, do that now */
 		if (type >= REGION_CPU1 && type < REGION_CPU1 + MAX_CPU)
 		{
-			int cputype = Machine->drv->cpu[type - REGION_CPU1].cpu_type;
+			int cputype = Machine->drv->cpu[type - REGION_CPU1].type;
 			if (cputype != 0)
 			{
 				datawidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;

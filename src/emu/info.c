@@ -558,10 +558,10 @@ static void print_game_sampleof(FILE* out, const game_driver* game)
 
 	expand_machine_driver(game->drv, &drv);
 
-	for( i = 0; i < MAX_SOUND && drv.sound[i].sound_type != SOUND_DUMMY; i++ )
+	for( i = 0; i < MAX_SOUND && drv.sound[i].type != SOUND_DUMMY; i++ )
 	{
 		const char **samplenames = NULL;
-		if( drv.sound[i].sound_type == SOUND_SAMPLES )
+		if( drv.sound[i].type == SOUND_SAMPLES )
 			samplenames = ((struct Samplesinterface *)drv.sound[i].config)->samplenames;
 		if (samplenames != 0 && samplenames[0] != 0) {
 			int k = 0;
@@ -585,10 +585,10 @@ static void print_game_sample(FILE* out, const game_driver* game)
 
 	expand_machine_driver(game->drv, &drv);
 
-	for( i = 0; i < MAX_SOUND && drv.sound[i].sound_type != SOUND_DUMMY; i++ )
+	for( i = 0; i < MAX_SOUND && drv.sound[i].type != SOUND_DUMMY; i++ )
 	{
 		const char **samplenames = NULL;
-		if( drv.sound[i].sound_type == SOUND_SAMPLES )
+		if( drv.sound[i].type == SOUND_SAMPLES )
 			samplenames = ((struct Samplesinterface *)drv.sound[i].config)->samplenames;
 		if (samplenames != 0 && samplenames[0] != 0) {
 			int k = 0;
@@ -626,25 +626,25 @@ static void print_game_micro(FILE* out, const game_driver* game)
 
 	for(j=0;j<MAX_CPU;++j)
 	{
-		if (cpu[j].cpu_type != CPU_DUMMY)
+		if (cpu[j].type != CPU_DUMMY)
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"cpu\"");
 
-			fprintf(out, " name=\"%s\"", xml_normalize_string(cputype_name(cpu[j].cpu_type)));
+			fprintf(out, " name=\"%s\"", xml_normalize_string(cputype_name(cpu[j].type)));
 
-			fprintf(out, " clock=\"%d\"", cpu[j].cpu_clock);
+			fprintf(out, " clock=\"%d\"", cpu[j].clock);
 			fprintf(out, "/>\n");
 		}
 	}
 
 	for(j=0;j<MAX_SOUND;++j)
 	{
-		if (sound[j].sound_type != SOUND_DUMMY)
+		if (sound[j].type != SOUND_DUMMY)
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"audio\"");
-			fprintf(out, " name=\"%s\"", xml_normalize_string(sndtype_name(sound[j].sound_type)));
+			fprintf(out, " name=\"%s\"", xml_normalize_string(sndtype_name(sound[j].type)));
 			if (sound[j].clock)
 				fprintf(out, " clock=\"%d\"", sound[j].clock);
 			fprintf(out, "/>\n");
@@ -728,7 +728,7 @@ static void print_game_sound(FILE* out, const game_driver* game)
 	i = 0;
 	while (i < MAX_SOUND && !has_sound)
 	{
-		if (sound[i].sound_type != SOUND_DUMMY)
+		if (sound[i].type != SOUND_DUMMY)
 			has_sound = 1;
 		++i;
 	}

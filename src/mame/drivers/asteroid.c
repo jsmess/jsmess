@@ -775,6 +775,22 @@ ROM_START( meteorts )
 	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
 
+ROM_START( meteorho )
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
+	ROM_LOAD( "g.bin",    0x6800, 0x0400, CRC(7420421b) SHA1(e84a340c0cbc8816bbe43120bc8e692d2a3db0ab) )
+	ROM_LOAD( "h.bin",    0x6c00, 0x0400, CRC(a6aa56bc) SHA1(8298e1667c3bd9af9e0be7d53c00d73ef59d742e) )
+	ROM_LOAD( "f.bin",    0x7000, 0x0400, CRC(2711bd52) SHA1(219499b9b8dcc221173f9b9a34c9e6f2fb936231) )
+	ROM_LOAD( "d.bin",    0x7400, 0x0400, CRC(9f169db9) SHA1(b6a4a8ea9d48c6b1faebf104faae7c67b2b060b5) )
+	ROM_LOAD( "c.bin",    0x7800, 0x0400, CRC(bd99556a) SHA1(8c712b205125c0c2a45dbb4fa9e5e5302c5bbd1b) )
+	ROM_LOAD( "e.bin",    0x7c00, 0x0400, CRC(10fdfe9a) SHA1(9db4b3ab904e66d3622ec98e13ef6baf5d4f7099) )
+	/* Vector ROM */
+	ROM_LOAD( "a.bin",    0x5000, 0x0400, CRC(d7822110) SHA1(bf6c5e622fdc16c39a1d8f23fc029abaa1e99b19) )
+	ROM_LOAD( "b.bin",    0x5400, 0x0400, CRC(d62b2887) SHA1(8832953c7166d2f0ed1067c43ebf369db4a4aa70) )
+	/* DVG PROM */
+	ROM_REGION( 0x100, REGION_USER1, 0 )
+	ROM_LOAD( "prom.bin",	0x0000, 0x0100, CRC(9e237193) SHA1(f663e12d5db0fa50ea49d03591475ae0a7168bc0) )
+ROM_END
+
 
 ROM_START( astdelux )
 	ROM_REGION( 0x8000, REGION_CPU1, 0 )
@@ -924,6 +940,7 @@ GAME( 1979, asteroi1, asteroid, asteroid, asteroid, 0,        ROT0, "Atari", "As
 GAME( 1979, asteroib, asteroid, asteroid, asteroib, asteroib, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", 0 )
 GAME( 1979, asterock, asteroid, asterock, asterock, asterock, ROT0, "Sidam", "Asterock", 0 )
 GAME( 1979, meteorts, asteroid, asteroid, asteroid, 0,        ROT0, "VGG",   "Meteorites", 0 )
+GAME( 1980, meteorho, asteroid, asteroid, asteroid, 0,        ROT0, "Hoei",  "Meteor", 0 )
 GAMEL(1980, astdelux, 0,        astdelux, astdelux, 0,        ROT0, "Atari", "Asteroids Deluxe (rev 3)", 0, layout_ho88ffff )
 GAMEL(1980, astdelu2, astdelux, astdelux, astdelux, 0,        ROT0, "Atari", "Asteroids Deluxe (rev 2)", 0, layout_ho88ffff )
 GAMEL(1980, astdelu1, astdelux, astdelux, astdelux, 0,        ROT0, "Atari", "Asteroids Deluxe (rev 1)", 0, layout_ho88ffff )

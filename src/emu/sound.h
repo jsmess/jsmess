@@ -43,7 +43,7 @@ struct _sound_route
 typedef struct _sound_config sound_config;
 struct _sound_config
 {
-	int			sound_type;				/* what type of sound chip? */
+	sound_type		type;			/* what type of sound chip? */
 	int			clock;					/* clock speed */
 	const void *config;					/* configuration for this chip */
 	const char *tag;					/* tag for this chip */

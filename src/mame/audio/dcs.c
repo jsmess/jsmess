@@ -1921,7 +1921,7 @@ static void recompute_sample_rate(void)
 	/* calculate how long until we generate an interrupt */
 
 	/* frequency the time per each bit sent */
-	mame_time sample_period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[dcs.cpunum].cpu_clock), 2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
+	mame_time sample_period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[dcs.cpunum].clock), 2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = scale_up_mame_time(sample_period, 16 * dcs.channels);

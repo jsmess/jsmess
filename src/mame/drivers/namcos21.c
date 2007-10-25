@@ -1,26 +1,9 @@
 /**
 Namco System 21
 
-todo:
-- confirm that halt dsp works
-- fix machine/namcos2 to halt only relevant cpu subsets
-- manual "kickstart" needed (press "N" any time after title screen)
-
 Winning Run
     polygon glitches/flicker
-    missing posirq handling
-
-Air Combat
-    timing innacuracies cause DSP to lock up in-game
-
-Starblade
-    high score colors wrong
-
-Cybersled
-    occasional transparent floor due to z-buffer overloading
-
-Solvaou
-    sprite mixing wrong; needs to use zbuffer
+    posirq effects for bitmap layer not working
 
 Driver's Eyes
     not yet working
@@ -298,7 +281,6 @@ CPU68 PCB:
 
 #define PTRAM_SIZE 0x20000
 #define CPU_DSP_MASTER_REGION	REGION_CPU5
-#define CPU_DSP_SLAVE_REGION	REGION_CPU6
 
 static UINT16 *winrun_dspbios;
 static UINT16 *winrun_dspcomram;
@@ -326,7 +308,7 @@ static UINT16 pointram_control;
 
 
 
-#define DSP_BUF_MAX (4096*8)
+#define DSP_BUF_MAX (4096*12)
 static struct
 {
 	unsigned masterSourceAddr;
@@ -360,7 +342,7 @@ static WRITE16_HANDLER(namcos21_video_enable_w)
 	COMBINE_DATA( &namcos21_video_enable ); /* 0x40 = enable */
 	if( namcos21_video_enable!=0 && namcos21_video_enable!=0x40 )
 	{
-		printf( "unexpected namcos21_video_enable_w=0x%x\n", namcos21_video_enable );
+		logerror( "unexpected namcos21_video_enable_w=0x%x\n", namcos21_video_enable );
 	}
 }
 
@@ -382,7 +364,7 @@ static READ16_HANDLER(dspcuskey_r)
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			printf( "unk cuskey_r; pc=0x%x\n", activecpu_get_pc() );
+			logerror( "unk cuskey_r; pc=0x%x\n", activecpu_get_pc() );
 			break;
 		}
 	}
@@ -417,11 +399,10 @@ TransmitWordToSlave( UINT16 data )
 	unsigned offs = mpDspState->slaveInputStart+mpDspState->slaveBytesAvailable++;
 	mpDspState->slaveInputBuffer[offs%DSP_BUF_MAX] = data;
 	logerror( "+%04x(#%04x)\n", data, mpDspState->slaveBytesAvailable );
-	//printf( "+%04x(#%04x)\n", data, mpDspState->slaveBytesAvailable );
 	mpDspState->slaveActive = 1;
 	if( mpDspState->slaveBytesAvailable >= DSP_BUF_MAX )
 	{
-		printf( "IDC overflow\n" );
+		logerror( "IDC overflow\n" );
 		exit(1);
 	}
 } /* TransmitWordToSlave */
@@ -524,16 +505,30 @@ TransferDspData( void )
 
 static int mbNeedsKickstart;
 
+static UINT16 *master_dsp_code;
+
 void
 namcos21_kickstart( int internal )
 {
+	/* patch dsp watchdog */
+	switch( namcos2_gametype )
+	{
+	case NAMCOS21_AIRCOMBAT:
+		master_dsp_code[0x008e] = 0x808f;
+		break;
+	case NAMCOS21_SOLVALOU:
+		master_dsp_code[0x008b] = 0x808c;
+		break;
+	default:
+		break;
+	}
 	if( internal )
 	{
 		if( mbNeedsKickstart==0 ) return;
 		mbNeedsKickstart--;
 		if( mbNeedsKickstart ) return;
-		printf("KICK\n" );
 	}
+
 	namcos21_ClearPolyFrameBuffer();
 	mpDspState->masterSourceAddr = 0;
 	mpDspState->slaveOutputSize = 0;
@@ -748,12 +743,12 @@ static WRITE16_HANDLER(dsp_portb_w)
 		}
 		else
 		{
-			printf( "indirection used w/ direct draw?\n" );
+			logerror( "indirection used w/ direct draw?\n" );
 		}
 	}
 	else if( mpDspState->masterDirectDrawSize )
 	{
-		printf( "unexpected masterDirectDrawSize=%d!\n",mpDspState->masterDirectDrawSize );
+		logerror( "unexpected masterDirectDrawSize=%d!\n",mpDspState->masterDirectDrawSize );
 	}
 	mpDspState->masterDirectDrawSize = 0;
 } /* dsp_portb_w */
@@ -766,7 +761,7 @@ static WRITE16_HANDLER(dsp_portc_w)
 	}
 	else
 	{
-		printf( "portc overflow\n" );
+		logerror( "portc overflow\n" );
 	}
 } /* dsp_portc_w */
 
@@ -782,7 +777,7 @@ static WRITE16_HANDLER( dsp_xf_w )
 
 static ADDRESS_MAP_START( master_dsp_program, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA16_ROM) /* BIOS */
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) AM_BASE(&master_dsp_code)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_dsp_data, ADDRESS_SPACE_DATA, 16 )
@@ -814,7 +809,7 @@ RenderSlaveOutput( UINT16 data )
 {
 	if( mpDspState->slaveOutputSize >= 4096 )
 	{
-		printf( "FATAL ERROR: SLAVE OVERFLOW (0x%x)\n",mpDspState->slaveOutputBuffer[0]  );
+		logerror( "FATAL ERROR: SLAVE OVERFLOW (0x%x)\n",mpDspState->slaveOutputBuffer[0]  );
 		exit(1);
 		return;
 	}
@@ -832,7 +827,7 @@ RenderSlaveOutput( UINT16 data )
 			int j;
 			if( color&0x8000 )
 			{
-				if( count!=13 ) printf( "?!direct-draw(%d)\n", count );
+				if( count!=13 ) logerror( "?!direct-draw(%d)\n", count );
 				for( j=0; j<4; j++ )
 				{
 					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2 + (INT16)pSource[3*j+0];
@@ -866,7 +861,7 @@ RenderSlaveOutput( UINT16 data )
 		}
 		else if( count==0 )
 		{
-			printf( "RenderSlaveOutput\n" );
+			logerror( "RenderSlaveOutput\n" );
 			exit(1);
 		}
 	}
@@ -1221,7 +1216,7 @@ static WRITE16_HANDLER( winrun_dsp_render_w )
 	}
 	else
 	{
-		printf( "WINRUN_POLY_OVERFLOW\n" );
+		logerror( "WINRUN_POLY_OVERFLOW\n" );
 	}
 } /* winrun_dsp_render_w */
 
@@ -1750,17 +1745,16 @@ ROM_START( aircombu )
 	ROM_LOAD32_BYTE( "ac1-poi-lu.2k", 0x000002, 0x80000, CRC(d99084b9) SHA1(c604d60a2162af7610e5ff7c1aa4195f7df82efe) )
 	ROM_LOAD32_BYTE( "ac1-poi-ll.2n", 0x000003, 0x80000, CRC(abb32307) SHA1(8e936ba99479215dd33a951d81ec2b04020dfd62) )	/* least significant */
 
-
 	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) /* sound samples */
 	ROM_LOAD("ac1-voi0.12b",0x000000,0x80000,CRC(f427b119) SHA1(bd45bbe41c8be26d6c997fcdc226d080b416a2cf) )
 	ROM_LOAD("ac1-voi1.12c",0x080000,0x80000,CRC(c9490667) SHA1(4b6fbe635c32469870a8e6f82742be6a9d4918c9) )
 	ROM_LOAD("ac1-voi2.12d",0x100000,0x80000,CRC(1fcb51ba) SHA1(80fc815e5fad76d20c3795ab1d89b57d9abc3efd) )
 	ROM_LOAD("ac1-voi3.12e",0x180000,0x80000,CRC(cd202e06) SHA1(72a18f5ba402caefef14b8d1304f337eaaa3eb1d) )
 
-	ROM_REGION( 0x0600, REGION_PLDS, ROMREGION_DISPOSE )
-	ROM_LOAD( "gal16v8a-3pdsp5.17d", 0x0000, 0x0117, CRC(799c1f26) SHA1(d28ed1b9fa78180c5a0b01a7198a2870137c7349) )
-	ROM_LOAD( "plhs18p8-3pobj3.17n", 0x0200, 0x0149, CRC(9625f469) SHA1(29158a3d37485fb0714d0a60bcd07abd26a3f56e) )
-	ROM_LOAD( "plhs18p8-3pobj4.17n", 0x0400, 0x0149, CRC(1b7c90c1) SHA1(ae65aab7a191cdf1af488e144af22b9d8669c903) )
+//  ROM_REGION( 0x0600, REGION_PLDS, ROMREGION_DISPOSE )
+//  ROM_LOAD( "gal16v8a-3pdsp5.17d", 0x0000, 0x0117, CRC(799c1f26) SHA1(d28ed1b9fa78180c5a0b01a7198a2870137c7349) )
+//  ROM_LOAD( "plhs18p8-3pobj3.17n", 0x0200, 0x0149, CRC(9625f469) SHA1(29158a3d37485fb0714d0a60bcd07abd26a3f56e) )
+//  ROM_LOAD( "plhs18p8-3pobj4.17n", 0x0400, 0x0149, CRC(1b7c90c1) SHA1(ae65aab7a191cdf1af488e144af22b9d8669c903) )
 ROM_END
 
 ROM_START( aircombj )
@@ -2187,6 +2181,10 @@ static void namcos21_init( int game_type )
 	mpDataROM = (UINT16 *)memory_region( REGION_USER1 );
 	InitDSP();
 	mbNeedsKickstart = 20;
+	if( game_type==NAMCOS21_CYBERSLED )
+	{
+		mbNeedsKickstart = 200;
+	}
 } /* namcos21_init */
 
 static DRIVER_INIT( winrun )

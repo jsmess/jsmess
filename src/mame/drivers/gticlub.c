@@ -42,7 +42,6 @@
 #include "machine/konamiic.h"
 #include "machine/adc083x.h"
 #include "sound/rf5c400.h"
-#include "video/poly.h"
 #include "video/voodoo.h"
 #include "video/gticlub.h"
 #include "rendlay.h"

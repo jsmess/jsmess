@@ -246,7 +246,7 @@ typedef struct _cpuintrf_data cpuintrf_data;
 struct _cpuintrf_data
 {
 	cpu_interface intf;		 		/* copy of the interface data */
-	int cputype; 					/* type index of this CPU */
+	cpu_type cputype; 					/* type index of this CPU */
 	int family; 					/* family index of this CPU */
 	void *context;					/* dynamically allocated context buffer */
 };
@@ -909,7 +909,7 @@ void cpuintrf_init(running_machine *machine)
 	/* build the cpuintrf array */
 	for (mapindex = 0; mapindex < sizeof(cpuintrf_map) / sizeof(cpuintrf_map[0]); mapindex++)
 	{
-		int cputype = cpuintrf_map[mapindex].cputype;
+		cpu_type cputype = cpuintrf_map[mapindex].cputype;
 		cpu_interface *intf = &cpuintrf[cputype];
 		cpuinfo info;
 
@@ -990,7 +990,7 @@ void cpuintrf_init(running_machine *machine)
 		/* loop over all defined CPUs */
 		for (totalcpu = 0; totalcpu < CPU_COUNT; totalcpu++)
 		{
-			int cputype = Machine->drv->cpu[totalcpu].cpu_type;
+			cpu_type cputype = Machine->drv->cpu[totalcpu].type;
 			char familyname[256];
 			int j;
 
@@ -1035,7 +1035,7 @@ void cpuintrf_set_dasm_override(int cpunum, offs_t (*dasm_override)(char *buffer
  *
  *************************************/
 
-int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, int (*irqcallback)(int))
+int cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *config, int (*irqcallback)(int))
 {
 	cpuinfo info;
 
@@ -1521,7 +1521,7 @@ offs_t cpunum_dasm(int cpunum, char *buffer, offs_t pc, const UINT8 *oprom, cons
     Get info accessors
 --------------------------*/
 
-INT64 cputype_get_info_int(int cputype, UINT32 state)
+INT64 cputype_get_info_int(cpu_type cputype, UINT32 state)
 {
 	cpuinfo info;
 
@@ -1531,7 +1531,7 @@ INT64 cputype_get_info_int(int cputype, UINT32 state)
 	return info.i;
 }
 
-void *cputype_get_info_ptr(int cputype, UINT32 state)
+void *cputype_get_info_ptr(cpu_type cputype, UINT32 state)
 {
 	cpuinfo info;
 
@@ -1541,7 +1541,7 @@ void *cputype_get_info_ptr(int cputype, UINT32 state)
 	return info.p;
 }
 
-genf *cputype_get_info_fct(int cputype, UINT32 state)
+genf *cputype_get_info_fct(cpu_type cputype, UINT32 state)
 {
 	cpuinfo info;
 
@@ -1551,7 +1551,7 @@ genf *cputype_get_info_fct(int cputype, UINT32 state)
 	return info.f;
 }
 
-const char *cputype_get_info_string(int cputype, UINT32 state)
+const char *cputype_get_info_string(cpu_type cputype, UINT32 state)
 {
 	cpuinfo info;
 

@@ -50,7 +50,7 @@ Registers per channel:
 UINT16 *gaelco_sndregs;
 
 /* fix me -- asumes that only one type can be active at a time */
-static int chip_type;
+static sound_type chip_type;
 
 /* this structure defines a channel */
 struct gaelcosnd_channel
@@ -252,7 +252,7 @@ WRITE16_HANDLER( gaelcosnd_w )
                         CG-1V/GAE1 Init
   ============================================================================*/
 
-static void *gaelcosnd_start(int sndtype, int sndindex, int clock, const void *config)
+static void *gaelcosnd_start(sound_type sndtype, int sndindex, int clock, const void *config)
 {
 	int j, vol;
 	const struct gaelcosnd_interface *intf = config;

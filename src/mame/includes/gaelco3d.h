@@ -6,9 +6,6 @@
 
 **************************************************************************/
 
-/* should be 1, but can increased to 2 or 3 for speed */
-#define GAELCO3D_RESOLUTION_DIVIDE	1
-
 
 /*----------- defined in video/gaelco3d.c -----------*/
 

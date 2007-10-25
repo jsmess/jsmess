@@ -26,7 +26,7 @@
 static UINT8	cmos_write_enable;
 
 /* sound-related variables */
-static UINT8	sound_type;
+static UINT8	chip_type;
 static UINT8	fake_sound_state;
 
 /* protection */
@@ -412,7 +412,7 @@ static void init_tunit_generic(int sound)
 	}
 
 	/* load sound ROMs and set up sound handlers */
-	sound_type = sound;
+	chip_type = sound;
 	switch (sound)
 	{
 		case SOUND_ADPCM:
@@ -548,7 +548,7 @@ DRIVER_INIT( mk2 )
 MACHINE_RESET( midtunit )
 {
 	/* reset sound */
-	switch (sound_type)
+	switch (chip_type)
 	{
 		case SOUND_ADPCM:
 		case SOUND_ADPCM_LARGE:
@@ -575,7 +575,7 @@ READ16_HANDLER( midtunit_sound_state_r )
 {
 /*  logerror("%08X:Sound status read\n", activecpu_get_pc());*/
 
-	if (sound_type == SOUND_DCS)
+	if (chip_type == SOUND_DCS)
 		return dcs_control_r() >> 4;
 
 	if (fake_sound_state)
@@ -590,7 +590,7 @@ READ16_HANDLER( midtunit_sound_r )
 {
 	logerror("%08X:Sound data read\n", activecpu_get_pc());
 
-	if (sound_type == SOUND_DCS)
+	if (chip_type == SOUND_DCS)
 		return dcs_data_r() & 0xff;
 
 	return ~0;
@@ -607,7 +607,7 @@ WRITE16_HANDLER( midtunit_sound_w )
 
 	/* call through based on the sound type */
 	if (ACCESSING_LSB && ACCESSING_MSB)
-		switch (sound_type)
+		switch (chip_type)
 		{
 			case SOUND_ADPCM:
 			case SOUND_ADPCM_LARGE:

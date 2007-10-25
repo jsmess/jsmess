@@ -194,7 +194,7 @@ void debug_cpu_init(running_machine *machine)
 	/* loop over CPUs and build up their info */
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		int cputype = Machine->drv->cpu[cpunum].cpu_type;
+		cpu_type cputype = Machine->drv->cpu[cpunum].type;
 
 		/* if this is a dummy, stop looking */
 		if (cputype == CPU_DUMMY)

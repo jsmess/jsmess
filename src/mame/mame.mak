@@ -1183,6 +1183,7 @@ $(MAMEOBJ)/seibu.a: \
 	$(DRIVERS)/dcon.o $(VIDEO)/dcon.o \
 	$(DRIVERS)/deadang.o $(VIDEO)/deadang.o \
 	$(DRIVERS)/dynduke.o $(VIDEO)/dynduke.o \
+	$(DRIVERS)/goodejan.o $(VIDEO)/goodejan.o \
 	$(DRIVERS)/kncljoe.o $(VIDEO)/kncljoe.o \
 	$(DRIVERS)/mustache.o $(VIDEO)/mustache.o \
 	$(DRIVERS)/panicr.o \
@@ -1523,6 +1524,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
+	$(DRIVERS)/gamecstl.o \
 	$(DRIVERS)/gdrawpkr.o $(VIDEO)/gdrawpkr.o \
 	$(DRIVERS)/gtipoker.o \
 	$(DRIVERS)/go2000.o \
@@ -1676,6 +1678,10 @@ $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 						$(LAYOUT)/gypsyjug.lh
 
 $(DRIVERS)/nbmj8688.o:	$(LAYOUT)/nbmj8688.lh
+
+$(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
+						$(LAYOUT)/pepp0188.lh \
+						$(LAYOUT)/peset038.lh
 
 $(DRIVERS)/pmpoker.o:	$(LAYOUT)/pmpoker.lh \
 						$(LAYOUT)/goldnpkr.lh \

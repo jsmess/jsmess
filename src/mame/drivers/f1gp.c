@@ -209,7 +209,69 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(YM2610_data_port_0_B_w)
 ADDRESS_MAP_END
 
+static WRITE16_HANDLER( f1gpb_misc_w )
+{
+	/*
+    static int old=-1;
+    static int old_bank = -1;
+    int new_bank = (data & 0xf0) >> 4; //wrong!
 
+    if(old_bank != new_bank && new_bank < 5)
+    {
+        // oki banking
+        UINT8 *src = memory_region(REGION_SOUND1) + 0x40000 + 0x10000 * new_bank;
+        UINT8 *dst = memory_region(REGION_SOUND1) + 0x30000;
+        memcpy(dst, src, 0x10000);
+
+        old_bank = new_bank;
+    }
+
+    //data & 0x80 toggles
+
+    if((data & 0x7f) != old)
+        printf("misc = %X\n",old=data & 0x7f);
+
+    */
+}
+
+static ADDRESS_MAP_START( f1gpb_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
+	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
+	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE(&f1gp_rozvideoram)
+	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
+	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
+	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM //unused
+	AM_RANGE(0xe04000, 0xe07fff) AM_RAM //unused
+	AM_RANGE(0xf00000, 0xf003ff) AM_RAM //unused
+	AM_RANGE(0xf10000, 0xf103ff) AM_RAM //unused
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
+	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_WRITE(f1gp_fgvideoram_w) AM_BASE(&f1gp_fgvideoram)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_1_word_r)
+	AM_RANGE(0xfff006, 0xfff007) AM_READ(input_port_2_word_r)
+	AM_RANGE(0xfff008, 0xfff009) AM_READNOP //?
+	AM_RANGE(0xfff006, 0xfff007) AM_WRITENOP
+	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_BASE(&f1gpb_fgregs)
+	AM_RANGE(0xfff00e, 0xfff00f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
+	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
+	AM_RANGE(0xfff020, 0xfff023) AM_RAM //?
+	AM_RANGE(0xfff050, 0xfff051) AM_READ(input_port_3_word_r)
+	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_BASE(&f1gpb_rozregs)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( f1gpb_cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
+	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w)
+	AM_RANGE(0xfff030, 0xfff031) AM_NOP //?
+ADDRESS_MAP_END
 
 INPUT_PORTS_START( f1gp )
 	PORT_START
@@ -524,15 +586,15 @@ static MACHINE_DRIVER_START( f1gp )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( sf1gp )
+static MACHINE_DRIVER_START( f1gpb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000,10000000)	/* 10 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(f1gp_readmem1,f1gp_writemem1)
+	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
 	MDRV_CPU_ADD(M68000,10000000)	/* 10 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
+	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
 	/* NO sound CPU */
@@ -548,8 +610,8 @@ static MACHINE_DRIVER_START( sf1gp )
 	MDRV_GFXDECODE(f1gp)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(f1gp)
-	MDRV_VIDEO_UPDATE(f1gp)
+	MDRV_VIDEO_START(f1gpb)
+	MDRV_VIDEO_UPDATE(f1gpb)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -630,7 +692,7 @@ ROM_END
    the video hardware is different, it lacks the sound z80, and has less samples
  */
 
-ROM_START( sf1gp )
+ROM_START( f1gpb )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 68000 code */
 	/* these have extra data at 0x30000 which isn't preset in the f1gp set, is it related to the changed sound hardware? */
 	ROM_LOAD16_BYTE( "1.ic38",     0x000001, 0x20000, CRC(046dd83a) SHA1(ea65fa88f9d9a79664de666e63594a7a7de86650) )
@@ -681,8 +743,9 @@ ROM_START( sf1gp )
 	ROM_REGION( 0x40000, REGION_GFX4, ROMREGION_ERASE00 )	/* gfx data for the 053936 */
 	/* RAM, not ROM - handled at run time */
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* sound samples */
-	ROM_LOAD( "6.ic13",   0x000000, 0x080000, CRC(6e83ffd8) SHA1(618fd6cd6c0844a4be96f77ff22cd41364718d16) )
+	ROM_REGION( 0x90000, REGION_SOUND1, 0 ) /* sound samples */
+	ROM_LOAD( "6.ic13",   0x000000, 0x030000, CRC(6e83ffd8) SHA1(618fd6cd6c0844a4be96f77ff22cd41364718d16) )
+	ROM_CONTINUE(         0x040000, 0x050000 )
 ROM_END
 
 
@@ -721,14 +784,8 @@ ROM_START( f1gp2 )
 	ROM_LOAD( "rom3",         0x000000, 0x100000, CRC(7f8f066f) SHA1(5e051d5feb327ac818e9c7f7ac721dada3a102b6) )
 ROM_END
 
-DRIVER_INIT( sf1gp )
-{
-	// no sound z80 to send sound commands to.
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfff008, 0xfff009, 0, 0, MWA16_NOP);
-}
-
 
 GAME( 1991, f1gp,  0,    f1gp,  f1gp,  0, ROT90, "Video System Co.", "F-1 Grand Prix",         GAME_NO_COCKTAIL )
-GAME( 1991, sf1gp, f1gp, sf1gp, f1gp,  sf1gp, ROT90, "[Video System Co.] (Playmark bootleg)", "Super Formula II (bootleg of F-1 Grand Prix)", GAME_NOT_WORKING ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  0, ROT90, "[Video System Co.] (Playmark bootleg)", "F-1 Grand Prix (Playmark bootleg)", GAME_NOT_WORKING ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
 GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, 0, ROT90, "Video System Co.", "F-1 Grand Prix Part II", GAME_NO_COCKTAIL )

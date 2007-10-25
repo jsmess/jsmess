@@ -71,7 +71,6 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
 {
-
 	osd_work_item *item;
 
 	// allocate memory to hold the result
@@ -80,7 +79,7 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 		return NULL;
 
 	// execute the call directly
-	item->result = (*callback)(param);
+	item->result = (*callback)(param, 0);
 	return item;
 }
 

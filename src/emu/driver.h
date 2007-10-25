@@ -281,16 +281,16 @@ struct _game_driver
 	driver_remove_cpu(machine, tag);									\
 	cpu = NULL;															\
 
-#define MDRV_CPU_REPLACE(tag, type, clock)								\
+#define MDRV_CPU_REPLACE(tag, _type, _clock)								\
 	cpu = driver_find_cpu(machine, tag);								\
-	cpu->cpu_type = (CPU_##type);										\
-	cpu->cpu_clock = (clock);											\
+	cpu->type = (CPU_##_type);										\
+	cpu->clock = (_clock);											\
 
 
 /* CPU parameters */
-#define MDRV_CPU_FLAGS(flags)											\
+#define MDRV_CPU_FLAGS(_flags)											\
 	if (cpu)															\
-		cpu->cpu_flags = (flags);										\
+		cpu->flags = (_flags);										\
 
 #define MDRV_CPU_CONFIG(config)											\
 	if (cpu)															\
@@ -482,11 +482,11 @@ struct _game_driver
 	if (sound)															\
 		sound->config = &(_config);										\
 
-#define MDRV_SOUND_REPLACE(tag, type, _clock)							\
+#define MDRV_SOUND_REPLACE(tag, _type, _clock)							\
 	sound = driver_find_sound(machine, tag);							\
 	if (sound)															\
 	{																	\
-		sound->sound_type = SOUND_##type;								\
+		sound->type = SOUND_##_type;								\
 		sound->clock = (_clock);										\
 		sound->config = NULL;											\
 		sound->routes = 0;												\
@@ -578,7 +578,7 @@ extern game_driver driver_empty;
 
 void expand_machine_driver(void (*constructor)(machine_config *), machine_config *output);
 
-cpu_config *driver_add_cpu(machine_config *machine, const char *tag, int type, int cpuclock);
+cpu_config *driver_add_cpu(machine_config *machine, const char *tag, cpu_type type, int cpuclock);
 cpu_config *driver_find_cpu(machine_config *machine, const char *tag);
 void driver_remove_cpu(machine_config *machine, const char *tag);
 
@@ -586,7 +586,7 @@ speaker_config *driver_add_speaker(machine_config *machine, const char *tag, flo
 speaker_config *driver_find_speaker(machine_config *machine, const char *tag);
 void driver_remove_speaker(machine_config *machine, const char *tag);
 
-sound_config *driver_add_sound(machine_config *machine, const char *tag, int type, int clock);
+sound_config *driver_add_sound(machine_config *machine, const char *tag, sound_type type, int clock);
 sound_config *driver_find_sound(machine_config *machine, const char *tag);
 void driver_remove_sound(machine_config *machine, const char *tag);
 

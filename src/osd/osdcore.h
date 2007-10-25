@@ -22,6 +22,8 @@
 
 #include "osdcomm.h"
 
+#include "osinline.h"
+
 
 
 /***************************************************************************
@@ -521,7 +523,9 @@ void osd_lock_free(osd_lock *lock);
 
         The original value from memory.
 -----------------------------------------------------------------------------*/
+#ifndef osd_compare_exchange32
 INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange);
+#endif
 
 
 /*-----------------------------------------------------------------------------
@@ -541,30 +545,17 @@ INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
         The original value from memory.
 -----------------------------------------------------------------------------*/
 #ifdef PTR64
+#ifndef osd_compare_exchange64
 INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange);
 #endif
-
-
-/*-----------------------------------------------------------------------------
-    osd_compare_exchange_ptr: INLINE wrapper to compare and exchange a
-        pointer value of the appropriate size
------------------------------------------------------------------------------*/
-INLINE void *osd_compare_exchange_ptr(void * volatile *ptr, void *compare, void *exchange)
-{
-#ifdef PTR64
-	INT64 result = osd_compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
-	return (void *)result;
-#else
-	INT32 result = osd_compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
-	return (void *)result;
 #endif
-}
 
 
 /*-----------------------------------------------------------------------------
     osd_sync_add: INLINE wrapper to safely add a delta value to a
         32-bit integer, returning the final result
 -----------------------------------------------------------------------------*/
+#ifndef osd_sync_add
 INLINE INT32 osd_sync_add(INT32 volatile *ptr, INT32 delta)
 {
 	INT32 origvalue;
@@ -578,6 +569,25 @@ INLINE INT32 osd_sync_add(INT32 volatile *ptr, INT32 delta)
 	/* return the final result */
 	return origvalue + delta;
 }
+#endif
+
+
+/*-----------------------------------------------------------------------------
+    osd_compare_exchange_ptr: INLINE wrapper to compare and exchange a
+        pointer value of the appropriate size
+-----------------------------------------------------------------------------*/
+#ifndef osd_compare_exchange_ptr
+INLINE void *osd_compare_exchange_ptr(void * volatile *ptr, void *compare, void *exchange)
+{
+#ifdef PTR64
+	INT64 result = osd_compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
+	return (void *)result;
+#else
+	INT32 result = osd_compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
+	return (void *)result;
+#endif
+}
+#endif
 
 
 
@@ -585,10 +595,15 @@ INLINE INT32 osd_sync_add(INT32 volatile *ptr, INT32 delta)
     WORK ITEM INTERFACES
 ***************************************************************************/
 
+/* this is the maximum number of supported threads for a single work queue */
+/* threadid values are expected to range from 0..WORK_MAX_THREADS-1 */
+#define WORK_MAX_THREADS			16
+
 /* these flags can be set when creating a queue to give hints to the code about
    how to configure the queue */
 #define WORK_QUEUE_FLAG_IO			0x0001
 #define WORK_QUEUE_FLAG_MULTI		0x0002
+#define WORK_QUEUE_FLAG_HIGH_FREQ	0x0004
 
 /* these flags can be set when queueing a work item to indicate how to handle
    its deconstruction */
@@ -601,7 +616,7 @@ typedef struct _osd_work_queue osd_work_queue;
 typedef struct _osd_work_item osd_work_item;
 
 /* osd_work_callback is a callback function that does work */
-typedef void *(*osd_work_callback)(void *param);
+typedef void *(*osd_work_callback)(void *param, int threadid);
 
 
 /*-----------------------------------------------------------------------------
@@ -619,6 +634,11 @@ typedef void *(*osd_work_callback)(void *param);
             WORK_QUEUE_FLAG_MULTI - indicates that the work queue should
                 take advantage of as many processors as it can; items queued
                 here are assumed to be fully independent or shared
+
+            WORK_QUEUE_FLAG_HIGH_FREQ - indicates that items are expected
+                to be queued at high frequency and acted upon quickly; in
+                general, this implies doing some spin-waiting internally
+                before falling back to OS-specific synchronization
 
     Return value:
 
@@ -862,7 +882,6 @@ int osd_is_bad_read_ptr(const void *ptr, size_t size);
         break into the debugger and display the given message.
 -----------------------------------------------------------------------------*/
 void osd_break_into_debugger(const char *message);
-
 
 
 #endif	/* __OSDEPEND_H__ */

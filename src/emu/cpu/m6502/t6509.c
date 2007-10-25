@@ -57,8 +57,8 @@ OP(11) { int tmp; RD_IDY_P; ORA;               } /* 5 ORA IDY page penalty */
 OP(31) { int tmp; RD_IDY_P; AND;               } /* 5 AND IDY page penalty */
 OP(51) { int tmp; RD_IDY_P; EOR;               } /* 5 EOR IDY page penalty */
 OP(71) { int tmp; RD_IDY_P; ADC;               } /* 5 ADC IDY page penalty */
-OP(91) { int tmp; STA; WR_IDY_NP;              } /* 6 STA IDY */
-OP(b1) { int tmp; RD_IDY_P; LDA;               } /* 5 LDA IDY page penalty */
+OP(91) { int tmp; STA; WR_IDY_6509;              } /* 6 STA IDY */
+OP(b1) { int tmp; RD_IDY_6509; LDA;               } /* 5 LDA IDY page penalty */
 OP(d1) { int tmp; RD_IDY_P; CMP;               } /* 5 CMP IDY page penalty */
 OP(f1) { int tmp; RD_IDY_P; SBC;               } /* 5 SBC IDY page penalty */
 

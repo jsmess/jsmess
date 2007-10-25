@@ -458,16 +458,15 @@ INPUT_PORTS_START( cannonb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Unknown 1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Player title" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, "Display" )
+	PORT_DIPSETTING(    0x03, "Scores and Progession Bars" )
+	PORT_DIPSETTING(    0x01, "Scores only" )
+	PORT_DIPSETTING(    0x02, "Progession Bars only" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -476,17 +475,16 @@ INPUT_PORTS_START( cannonb )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x18, "6" )
-	PORT_DIPNAME( 0x20, 0x00, "Unknown 2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Unknown 3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Unknown 4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	CKONGIN2
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME( "Select" )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( ckong )
@@ -1286,6 +1284,35 @@ ROM_START( monkeyd )
 	ROM_LOAD( "ck12.bin",     0x1000, 0x1000, CRC(2eb23b60) SHA1(c9e7dc584562aceb374193655fbacb7df6c9c731) )
 ROM_END
 
+ROM_START( ckongb )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "d05-7.rom",    0x0000, 0x1000, CRC(5d96ee9a) SHA1(f531d251fd3469edd3b5b5e7c26ff9cef7006ce8) )
+	ROM_LOAD( "f05-8.rom",    0x1000, 0x1000, CRC(74a8435b) SHA1(465ad96009d3ba939eee13ba0d5fd6d9dec118bc) )
+	ROM_LOAD( "h05-9.rom",    0x2000, 0x1000, CRC(e06ca575) SHA1(cd5a32fac614902e136e522ac188616c72d65571) )
+	ROM_LOAD( "k05-10.rom",   0x3000, 0x1000, CRC(46d83a11) SHA1(de840994104bfc633a3640610966f087fbc3d749) )
+	ROM_LOAD( "l05-11.rom",   0x4000, 0x1000, CRC(07c30f3d) SHA1(9b72f8a76c64ab22f8b8c1bd8e457c10b86d95a1) )
+	ROM_LOAD( "n05-12.rom",   0x5000, 0x1000, CRC(151de90a) SHA1(5d063c4fe6767727d051815120d692818a30ee81) )
+
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "n11-6.bin",    0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
+	ROM_LOAD( "k11-4.bin",    0x1000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
+	ROM_LOAD( "l11-5.bin",    0x2000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "h11-3.bin",    0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
+
+	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "c11-2.bin",    0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
+	ROM_LOAD( "a11-1.bin",    0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
+
+	ROM_REGION( 0x0060, REGION_PROMS, 0 )
+	ROM_LOAD( "prom.v6",      0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
+	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
+
+	ROM_REGION( 0x2000, REGION_SOUND1, 0 )  /* samples */
+	ROM_LOAD( "s05-14.bin",   0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
+	ROM_LOAD( "r05-13.bin",   0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+ROM_END
+
 ROM_START( rpatrolb )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rp1.4l",       0x0000, 0x1000, CRC(bfd7ae7a) SHA1(a06d1cc2674ed40d0bfa67dd6d724964c1e40600) )
@@ -1462,35 +1489,6 @@ ROM_START( cannonb2 )
 	ROM_LOAD( "cb5.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
-ROM_START( ckongb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "d05-7.rom",    0x0000, 0x1000, CRC(5d96ee9a) SHA1(f531d251fd3469edd3b5b5e7c26ff9cef7006ce8) )
-	ROM_LOAD( "f05-8.rom",    0x1000, 0x1000, CRC(74a8435b) SHA1(465ad96009d3ba939eee13ba0d5fd6d9dec118bc) )
-	ROM_LOAD( "h05-9.rom",    0x2000, 0x1000, CRC(e06ca575) SHA1(cd5a32fac614902e136e522ac188616c72d65571) )
-	ROM_LOAD( "k05-10.rom",   0x3000, 0x1000, CRC(46d83a11) SHA1(de840994104bfc633a3640610966f087fbc3d749) )
-	ROM_LOAD( "l05-11.rom",   0x4000, 0x1000, CRC(07c30f3d) SHA1(9b72f8a76c64ab22f8b8c1bd8e457c10b86d95a1) )
-	ROM_LOAD( "n05-12.rom",   0x5000, 0x1000, CRC(151de90a) SHA1(5d063c4fe6767727d051815120d692818a30ee81) )
-
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "n11-6.bin",    0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
-	ROM_LOAD( "k11-4.bin",    0x1000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
-	ROM_LOAD( "l11-5.bin",    0x2000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
-	ROM_LOAD( "h11-3.bin",    0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
-
-	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "c11-2.bin",    0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
-	ROM_LOAD( "a11-1.bin",    0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
-
-	ROM_REGION( 0x0060, REGION_PROMS, 0 )
-	ROM_LOAD( "prom.v6",      0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
-	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
-	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
-
-	ROM_REGION( 0x2000, REGION_SOUND1, 0 )  /* samples */
-	ROM_LOAD( "s05-14.bin",   0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
-	ROM_LOAD( "r05-13.bin",   0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
-ROM_END
-
 ROM_START( swimmer )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sw1",          0x0000, 0x1000, CRC(f12481e7) SHA1(4e8ee509043fd57ec1579594f0b2c543f270bead) )
@@ -1630,14 +1628,14 @@ GAME( 1981, ckongo,   ckong,    cclimber, ckong,    0,        ROT270, "bootleg",
 GAME( 1981, ckongalc, ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong (Alca bootleg)", 0 )
 GAME( 198?, bigkong,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
 GAME( 1981, monkeyd,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
+GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong (Alternative levels)", 0 )
 
 GAME( 1981, rpatrolb, 0,        cclimber, rpatrolb, 0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
 GAME( 1981, rpatrolo, rpatrolb, cclimber, rpatrolb, 0,        ROT0,   "Orca",  "River Patrol (Orca)", 0 )
 GAME( 1981, silvland, rpatrolb, cclimber, rpatrolb, 0,        ROT0,   "Falcon", "Silver Land", 0 )
 
-GAME( 1985, cannonb,  0,        cannonb,  cannonb,  cannonb,  ROT90,  "Soft", "Cannon Ball (Crazy Climber hardware)" , GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, cannonb2, cannonb,  cannonb,  cannonb,  0,        ROT90,  "TV Game Gruenberg", "Cannon Ball (set 2)", 0 )
-GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong (Alternative levels)", 0 )
+GAME( 1985, cannonb,  cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "Soft", "Cannon Ball (bootleg on Crazy Climber hardware, set 1)" , GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, cannonb2, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "TV Game Gruenberg", "Cannon Ball (bootleg on Crazy Climber hardware, set 2)", 0 )
 
 GAME( 1982, swimmer,  0,        swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", 0 )
 GAME( 1982, swimmera, swimmer,  swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", 0 )

@@ -176,7 +176,7 @@ VIDEO_START( odyssey2 )
 INLINE int get_horiz_clock_beam_pos( void )
 {
     int h;
-    h = scale_up_mame_time(sub_mame_times(mame_timer_get_time(), line_time), Machine->drv->cpu[0].cpu_clock * 8).seconds;
+    h = scale_up_mame_time(sub_mame_times(mame_timer_get_time(), line_time), Machine->drv->cpu[0].clock * 8).seconds;
 
     return h;
 }
@@ -184,7 +184,7 @@ INLINE int get_horiz_clock_beam_pos( void )
 INLINE int get_horiz_clock( void )
 {
     int h;
-    h = scale_up_mame_time(sub_mame_times(mame_timer_get_time(), line_time), Machine->drv->cpu[0].cpu_clock).seconds;
+    h = scale_up_mame_time(sub_mame_times(mame_timer_get_time(), line_time), Machine->drv->cpu[0].clock).seconds;
 
     return h;
 }

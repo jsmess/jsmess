@@ -119,7 +119,7 @@ void atarijsa_init(int cpunum, int inputport, int testport, int testmask)
 	has_tms5220 = has_oki6295 = has_pokey = has_ym2151 = 0;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		switch (Machine->drv->sound[i].sound_type)
+		switch (Machine->drv->sound[i].type)
 		{
 			case SOUND_TMS5220:
 				has_tms5220 = 1;
@@ -132,6 +132,8 @@ void atarijsa_init(int cpunum, int inputport, int testport, int testmask)
 				break;
 			case SOUND_YM2151:
 				has_ym2151 = 1;
+				break;
+			default:
 				break;
 		}
 	}

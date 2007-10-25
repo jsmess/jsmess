@@ -1084,15 +1084,15 @@ int sprintf_game_info(char *buffer)
 	bufptr += sprintf(bufptr, "%s\n%s %s\n\n%s:\n", Machine->gamedrv->description, Machine->gamedrv->year, Machine->gamedrv->manufacturer, ui_getstring(UI_cpu));
 
 	/* loop over all CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY; cpunum += count)
+	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum += count)
 	{
-		int type = Machine->drv->cpu[cpunum].cpu_type;
-		int clock = Machine->drv->cpu[cpunum].cpu_clock;
+		cpu_type type = Machine->drv->cpu[cpunum].type;
+		int clock = Machine->drv->cpu[cpunum].clock;
 
 		/* count how many identical CPUs we have */
 		for (count = 1; cpunum + count < MAX_CPU; count++)
-			if (Machine->drv->cpu[cpunum + count].cpu_type != type ||
-		        Machine->drv->cpu[cpunum + count].cpu_clock != clock)
+			if (Machine->drv->cpu[cpunum + count].type != type ||
+		        Machine->drv->cpu[cpunum + count].clock != clock)
 		    	break;
 
 		/* if more than one, prepend a #x in front of the CPU name */
@@ -1111,14 +1111,14 @@ int sprintf_game_info(char *buffer)
 	bufptr += sprintf(bufptr, "\n%s:\n", ui_getstring(UI_sound));
 
 	/* loop over all sound chips */
-	for (sndnum = 0; sndnum < MAX_SOUND && Machine->drv->sound[sndnum].sound_type != SOUND_DUMMY; sndnum += count)
+	for (sndnum = 0; sndnum < MAX_SOUND && Machine->drv->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
 	{
-		int type = Machine->drv->sound[sndnum].sound_type;
+		sound_type type = Machine->drv->sound[sndnum].type;
 		int clock = sndnum_clock(sndnum);
 
 		/* count how many identical sound chips we have */
 		for (count = 1; sndnum + count < MAX_SOUND; count++)
-			if (Machine->drv->sound[sndnum + count].sound_type != type ||
+			if (Machine->drv->sound[sndnum + count].type != type ||
 		        sndnum_clock(sndnum + count) != clock)
 		    	break;
 

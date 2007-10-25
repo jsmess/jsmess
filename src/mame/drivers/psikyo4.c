@@ -10,13 +10,11 @@ This driver is for the dual-screen PS4 boards using an SH-2 processor
  Taisen Hot Gimmick (c)1997
  Taisen Hot Gimmick Kairakuten (c)1998
  Taisen Hot Gimmick 3 Digital Surfing (c)1999
+ Taisen Hot Gimmick 4 Ever (c)2000
+ Taisen Hot Gimmick Integral (c)2001
+
  Lode Runner - The Dig Fight (c)2000
  Quiz de Idol! Hot Debut (c)2000
-
- Incomplete Dumps
- Taisen Hot Gimmick 4 Ever (c)2000 (confirmed by Japump)
- Taisen Hot Gimmick Integral (c)2001 (confirmed by Yahoo! Japan auction)
-
 
  The PS4 board appears to be a cheaper board than PS3/5/5v2, with only simple sprites, no bgs,
  smaller palette etc, only 8bpp sprites too.
@@ -42,7 +40,7 @@ To Do:
 
 Hold Button during booting to test roms (Checksum 16-bit) for:
 
-Lode Runner - The Dig Fight:   PL1 Start (passes gfx, sample result:05A5, expects:0BB0 [both sets])
+Lode Runner - The Dig Fight:   PL1 Start (passes gfx, sample result:05A5, expects:0BB0 [both sets]) (banking?)
 Quiz de Idol! Hot Debut:       PL1 Start (passes)
 
 --- Lode Runner: The Dig Fight ---
@@ -55,6 +53,76 @@ Quiz de Idol! Hot Debut:       PL1 Start (passes)
 
 NOTE: The version number (A/B) on Lode Runner: The Dig Fight is ONLY displayed when the game is set
       to Japanese.  The same is true for Space Bomber in psikyosh.c
+
+
+Psikyo PS4V3 Hardware Overview
+Psikyo, 1997-2001
+
+PCB Layout
+----------
+
+PS4V3 MADE IN JAPAN
+|--------------------------------------------------------------------|
+| SND0.U10 SND1.U19               HA13118            HA13118         |
+|                          JRC4741                                   |
+| 8L.U112  8H.U113            YAC516    VOL             VOL        |-|
+|                  74ACT153 74ACT153                               |
+|                                                                  |-|
+| 7L.U9    7H.U18  74HCT273 74HCT273 74ACT138 74HCT273               |
+|                                             74HC244  74HC244      M|
+|                                      74ACT244              CN8    A|
+| 6L.U8    6H.U17   74ACT138  93LC56                                H|
+|                                 JP4  74ACT244                     J|
+|                       |---------|                                 O|
+| 5L.U7    5H.U16       |         |    74ACT244              CN7    N|
+|                       | PSIKYO  |             74HC14              G|
+|                       | PS6807  |    74ACT244        TD62064       |
+| 4L.U6    4H.U15       |         |                                |-|
+|                       |---------|    74ACT244                    |
+|                                                         TD62003  |-|
+| 3L.U5    3H.U14       57.2727MHz     74ACT244                      |
+|                                               74ACT138  TD62003    |
+|                                               3771                J|
+| 2L.U4    2H.U13   814260        74AC08 74ACT04 74HC245  74HC244   A|
+|                                                                   M|
+|                   814260                 |--------|               M|
+| 1L.U3    1H.U12                          |        |               A|
+|                                          |  SH-2  |                |
+|                                          |        |     74HC244  |-|
+| 0L.U2    0H.U11    1.U23                 |--------|              |
+|                                                         74HC244  |-|
+| PROG.U1            2.U22                     74ACT139              |
+|--------------------------------------------------------------------|
+(All IC's listed)
+Notes:
+SH-2    - Hitachi HD6417604F28 SH-2 CPU, clock input 28.63635 [57.2727/2] (QFP144)
+YMF278  - Yamaha YMF278B OPL4 sound chip, clock input 28.63635MHz [57.2727/2] (QFP80)
+YAC516  - Yamaha YAC516 Delta Sigma Modulation D/A Converter with 8 Times Over-sampling
+          Filter. Clock input 14.318175MHz [57.2727/4]
+814260  - Fujitsu 814260-70 256k x16 (4MBit) DRAM (SOJ40)
+3771    - Fujitsu MB3771 Watchdog Reset IC (SOIC8)
+93LC56  - 256x8(2k) Serial CMOS EEPROM (SOIC8)
+JRC4741 - Japan Radio Co. JRC4741 Quad OP AMP (SOIC14)
+HA13118 - 18W Bridge Tied Load (BTL) Mono Audio Amplifier Module (in 15-pin SP-15TA package)
+JP4     - Hardwired jumper bank (x4) for region selection.
+          All jumpers shorted = Japan region (default)
+CN7/CN8 - Extra connector for 2nd screen output and additional player inputs. JAMMA/MAHJONG
+          connectors not used together. Either one or the other is used depending on the game.
+          Game will operate fine with 1 screen output. CN7/CN8 connection is optional.
+TD62064 - Toshiba TD62064 4 Channel High-Current Darlington Sink Driver (SOP18)
+TD62003 - Toshiba TD62003 7 Channel High-Current Darlington Sink Driver (SOP16)
+VSync   - 60Hz
+HSync   - 15.68kHz
+
+ROMs -
+       1.U23 - Main Program, ST 27C4002 EPROM (DIP40)
+       2.U22 /
+
+       The remaining ROMs are surface mounted TSOP48 Type II MASKROMs,
+       either OKI MSM27C3252 (32MBit) or OKI MSM27C1652 (16MBit).
+       These MASKROMs are non-standard are require a custom adapter
+       to read them. Not all positions are populated for each game. See
+       the source below for specifics.
 
 ----------------------------------------------------------------*/
 
@@ -851,39 +919,52 @@ ROM_START( hotgm4ev )
 ROM_END
 
 ROM_START( hotgmcki )
-	/* main program */
-	ROM_REGION( 0x300000, REGION_CPU1, 0)
+	ROM_REGION( 0x500000, REGION_CPU1, 0)
 	ROM_LOAD32_WORD_SWAP( "2.u22",   0x000000, 0x080000, CRC(abc192dd) SHA1(674c2b8814319605c1b6221bbe18588a98dda093) )
 	ROM_LOAD32_WORD_SWAP( "1.u23",   0x000002, 0x080000, CRC(8be896d0) SHA1(5d677dede4ec18cbfc54acae95fe0f10bfc4d566) )
-	/* not dumped yet */
-    ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x100000, NO_DUMP )
+    ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x200000, CRC(9017ae8e) SHA1(0879198606095a2d209df059538ce1c73460b30e) ) // no test
+	ROM_RELOAD(0x300000,0x200000)
 
-	/* exact number & size of gfx / sound roms may be incorrect */
-	ROM_REGION( 0x4000000, REGION_GFX1, ROMTEST_GFX )	/* Sprites */
-	/* not dumped yet */
-    ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "1h.u12", 0x0800002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "2l.u4",  0x1000000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "2h.u13", 0x1000002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "3l.u5",  0x1800000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "3h.u14", 0x1800002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "4l.u6",  0x2000000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "4h.u15", 0x2000002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "5l.u7",  0x2800000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "5h.u16", 0x2800002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "6l.u8",  0x3000000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "6h.u17", 0x3000002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "7l.u9",  0x3800000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "7h.u18", 0x3800002, 0x400000, NO_DUMP )
+	/* Roms have to be mirrored with ROM_RELOAD for rom tests to pass */
+	ROM_REGION( 0x4000000, REGION_GFX1, ROMREGION_ERASEFF | ROMTEST_GFX )	/* Sprites */
+	ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x200000, CRC(58ae45eb) SHA1(76a23e79f2c772c5e85b8c15cf79f56b6f71fbc6) ) // ok
+	ROM_RELOAD(                0x0400000, 0x200000 )
+	ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x200000, CRC(d7bbb929) SHA1(c505ad04cdafb84800099bbbb67c5f6b52212124) ) // ok
+	ROM_RELOAD(                0x0400002, 0x200000 )
+	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x200000, CRC(27576360) SHA1(ed9d6f5b9934e8ddae3f3ca146e99f42dbd495de) ) // ok
+	ROM_RELOAD(                0x0c00000, 0x200000 )
+    ROM_LOAD32_WORD( "1h.u12", 0x0800002, 0x200000, CRC(7439a63f) SHA1(c9a74e5e81a2c94ce7a9b3b487f54ac5b3635744) ) // ok
+	ROM_RELOAD(                0x0c00002, 0x200000 )
+	ROM_LOAD32_WORD( "2l.u4",  0x1000000, 0x200000, CRC(fda64e24) SHA1(e8788b5f0e8b0f90c9942f9f4cbcee02be8afd09) ) // ok
+	ROM_RELOAD(                0x1400000, 0x200000 )
+	ROM_LOAD32_WORD( "2h.u13", 0x1000002, 0x200000, CRC(8be54ea6) SHA1(311812e9d7815e80db05d9a94c277b2b37e7a589) ) // ok
+	ROM_RELOAD(                0x1400002, 0x200000 )
+	ROM_LOAD32_WORD( "3l.u5",  0x1800000, 0x200000, CRC(92507b3f) SHA1(15f0432a8061e886be6171ee90581ad8fe3d44ba) ) // ok
+	ROM_RELOAD(                0x1c00000, 0x200000 )
+	ROM_LOAD32_WORD( "3h.u14", 0x1800002, 0x200000, CRC(042bef5e) SHA1(b57ffa744a17be21681db3d5246025ea27067ae7) ) // ok
+	ROM_RELOAD(                0x1c00002, 0x200000 )
+	ROM_LOAD32_WORD( "4l.u6",  0x2000000, 0x200000, CRC(023b6d70) SHA1(7932d8648d1c2e90539955a6474d9755f02b4350) ) // ok
+	ROM_RELOAD(                0x2400000, 0x200000 )
+	ROM_LOAD32_WORD( "4h.u15", 0x2000002, 0x200000, CRC(9be7e8b1) SHA1(2200bb86b0a7b05a9387da14d8bdc571d0570d11) ) // ok
+	ROM_RELOAD(                0x2400002, 0x200000 )
+	ROM_LOAD32_WORD( "5l.u7",  0x2800000, 0x200000, CRC(7aa54306) SHA1(ec9ecc8dbe81679e0e7544cf5f331ca3eeee700a) ) // ok
+	ROM_RELOAD(                0x2c00000, 0x200000 )
+	ROM_LOAD32_WORD( "5h.u16", 0x2800002, 0x200000, CRC(e6b48e52) SHA1(1deb84fe96fe31ba33ddf833967ef332570b8fe5) ) // ok
+	ROM_RELOAD(                0x2c00002, 0x200000 )
+	ROM_LOAD32_WORD( "6l.u8",  0x3000000, 0x200000, CRC(dfe675e9) SHA1(a4ff934c4b0501be490a2ba3a0ef1d46bc1d68e7) ) // ok
+	ROM_RELOAD(                0x3400000, 0x200000 )
+	ROM_LOAD32_WORD( "6h.u17", 0x3000002, 0x200000, CRC(45919576) SHA1(63c509f8786ebd43ec24664bb2b829f4bf8acf5d) ) // ok
+	ROM_RELOAD(                0x3400002, 0x200000 )
+	ROM_LOAD32_WORD( "7l.u9",  0x3800000, 0x200000, CRC(cd3af598) SHA1(57c8048802264a4699e0e95b8deb25689afff237) ) // ok
+	ROM_RELOAD(                0x3c00000, 0x200000 )
+	ROM_LOAD32_WORD( "7h.u18", 0x3800002, 0x200000, CRC(a3fd4ae5) SHA1(31056e5f645984b85e9bc3767016a856ac0175f9) ) // ok
+	ROM_RELOAD(                0x3c00002, 0x200000 )
 
 	ROM_REGION( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x800000, REGION_SOUND2, 0 )
-	/* not dumped yet */
-    ROM_LOAD( "snd0.u10", 0x000000, 0x400000, NO_DUMP )
-    ROM_LOAD( "snd1.u19", 0x400000, 0x400000, NO_DUMP )
+	ROM_LOAD( "snd0.u10", 0x000000, 0x400000, CRC(5f275f35) SHA1(c5952a16e9f0cee6fc990c234ccaa7ca577741bd) ) // ok
+	ROM_LOAD( "snd1.u19", 0x400000, 0x400000, CRC(98608779) SHA1(a73c21f0f66c2af903e44a0a6a9f821b00615e7b) ) // ok (but fails rom test due to bad banking in service mode)
 ROM_END
 
 
@@ -1033,7 +1114,7 @@ GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo",
 GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick Kairakuten (Japan)", 0 )
 GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 3 Digital Surfing (Japan)", 0 )
 GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 4 Ever (Japan)", 0 )
-GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick Integral (Japan)", GAME_NOT_WORKING )
+GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Mahjong Hot Gimmick Integral (Japan)", 0 )
 GAME( 2000, loderndf, 0,        ps4small,  loderndf, loderndf, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", 0 )
 GAME( 2000, loderdfa, loderndf, ps4small,  loderndf, loderdfa, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", 0 )
 GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, hotdebut, ROT0,   "Psikyo / Moss", "Quiz de Idol! Hot Debut (Japan)", 0 )

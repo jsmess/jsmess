@@ -26,194 +26,6 @@
 
 #define MAX_CPU 8
 
-/* Enum listing all the CPUs */
-enum
-{
-	CPU_DUMMY,
-	CPU_Z80,
-	CPU_Z180,
-	CPU_8080,
-	CPU_8085A,
-	CPU_M6502,
-	CPU_M65C02,
-	CPU_M65SC02,
-	CPU_M65CE02,
-	CPU_M6509,
-	CPU_M6510,
-	CPU_M6510T,
-	CPU_M7501,
-	CPU_M8502,
-	CPU_N2A03,
-	CPU_DECO16,
-	CPU_M4510,
-	CPU_H6280,
-	CPU_I8086,
-	CPU_I8088,
-	CPU_I80186,
-	CPU_I80188,
-	CPU_I80286,
-	CPU_V20,
-	CPU_V25,
-	CPU_V30,
-	CPU_V33,
-	CPU_V35,
-	CPU_V60,
-	CPU_V70,
-	CPU_I8035,
-	CPU_I8039,
-	CPU_I8048,
-	CPU_N7751,
-	CPU_I8X41,
-	CPU_I8051,
-	CPU_I8052,
-	CPU_I8751,
-	CPU_I8752,
-	CPU_M6800,
-	CPU_M6801,
-	CPU_M6802,
-	CPU_M6803,
-	CPU_M6808,
-	CPU_HD63701,
-	CPU_NSC8105,
-	CPU_M6805,
-	CPU_M68705,
-	CPU_HD63705,
-	CPU_HD6309,
-	CPU_M6809,
-	CPU_M6809E,
-	CPU_KONAMI,
-	CPU_M68000,
-	CPU_M68008,
-	CPU_M68010,
-	CPU_M68EC020,
-	CPU_M68020,
-	CPU_M68040,
-	CPU_T11,
-	CPU_S2650,
-	CPU_TMS34010,
-	CPU_TMS34020,
-	CPU_TI990_10,
-	CPU_TMS9900,
-	CPU_TMS9940,
-	CPU_TMS9980,
-	CPU_TMS9985,
-	CPU_TMS9989,
-	CPU_TMS9995,
-	CPU_TMS99100,
-	CPU_TMS99105A,
-	CPU_TMS99110A,
-	CPU_Z8000,
-	CPU_TMS32010,
-	CPU_TMS32025,
-	CPU_TMS32026,
-	CPU_TMS32031,
-	CPU_TMS32051,
-	CPU_CCPU,
-	CPU_ADSP2100,
- 	CPU_ADSP2101,
-	CPU_ADSP2104,
-	CPU_ADSP2105,
-	CPU_ADSP2115,
-	CPU_ADSP2181,
-	CPU_PSXCPU,
-	CPU_ASAP,
-	CPU_UPD7810,
-	CPU_UPD7807,
-	CPU_JAGUARGPU,
-	CPU_JAGUARDSP,
-	CPU_R3000BE,
-	CPU_R3000LE,
-	CPU_R4600BE,
-	CPU_R4600LE,
-	CPU_R4650BE,
-	CPU_R4650LE,
-	CPU_R4700BE,
-	CPU_R4700LE,
-	CPU_R5000BE,
-	CPU_R5000LE,
-	CPU_QED5271BE,
-	CPU_QED5271LE,
-	CPU_RM7000BE,
-	CPU_RM7000LE,
-	CPU_ARM,
-	CPU_ARM7,
-	CPU_SH2,
-	CPU_SH4,
-	CPU_DSP32C,
-	CPU_PIC16C54,
-	CPU_PIC16C55,
-	CPU_PIC16C56,
-	CPU_PIC16C57,
-	CPU_PIC16C58,
-	CPU_G65816,
-	CPU_SPC700,
-	CPU_E116T,
-	CPU_E116XT,
-	CPU_E116XS,
-	CPU_E116XSR,
-	CPU_E132N,
-	CPU_E132T,
-	CPU_E132XN,
-	CPU_E132XT,
-	CPU_E132XS,
-	CPU_E132XSR,
-	CPU_GMS30C2116,
-	CPU_GMS30C2132,
-	CPU_GMS30C2216,
-	CPU_GMS30C2232,
-	CPU_I386,
-	CPU_I486,
-	CPU_PENTIUM,
-	CPU_MEDIAGX,
-	CPU_I960,
-	CPU_H83002,
-	CPU_V810,
-	CPU_M37702,
-	CPU_M37710,
-	CPU_PPC403,
-	CPU_PPC601,
-	CPU_PPC602,
-	CPU_PPC603,
-	CPU_MPC8240,
-	CPU_SE3208,
-	CPU_MC68HC11,
-	CPU_ADSP21062,
-	CPU_DSP56156,
-	CPU_RSP,
-	CPU_ALPHA8201,
-	CPU_ALPHA8301,
-	CPU_CDP1802,
-	CPU_COP420,
-	CPU_COP410,
-	CPU_COP411,
-	CPU_TMP90840,
-	CPU_TMP90841,
-	CPU_TMP91640,
-	CPU_TMP91641,
-	CPU_APEXC,
-	CPU_CP1610,
-	CPU_F8,
-	CPU_LH5801,
-	CPU_PDP1,
-	CPU_SATURN,
-	CPU_SC61860,
-	CPU_TX0_64KW,
-	CPU_TX0_8KW,
-	CPU_Z80GB,
-	CPU_TMS7000,
-	CPU_TMS7000_EXL,
-	CPU_SM8500,
-	CPU_V30MZ,
-	CPU_MB8841,
-	CPU_MB8842,
-	CPU_MB8843,
-	CPU_MB8844,
-	CPU_MB86233,
-	CPU_SSP1610,
-	CPU_MINX,
-    CPU_COUNT
-};
-
 
 /* Interrupt line constants */
 enum
@@ -460,7 +272,7 @@ struct _cpu_interface
 void cpuintrf_init(running_machine *machine);
 
 /* set up the interface for one CPU of a given type */
-int	cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, int (*irqcallback)(int));
+int	cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *config, int (*irqcallback)(int));
 
 /* clean up the interface for one CPU */
 void cpuintrf_exit_cpu(int cpunum);
@@ -620,10 +432,10 @@ offs_t cpunum_dasm(int cpunum, char *buffer, offs_t pc, const UINT8 *oprom, cons
 ***************************************************************************/
 
 /* get info accessors */
-INT64 cputype_get_info_int(int cputype, UINT32 state);
-void *cputype_get_info_ptr(int cputype, UINT32 state);
-genf *cputype_get_info_fct(int cputype, UINT32 state);
-const char *cputype_get_info_string(int cputype, UINT32 state);
+INT64 cputype_get_info_int(cpu_type cputype, UINT32 state);
+void *cputype_get_info_ptr(cpu_type cputype, UINT32 state);
+genf *cputype_get_info_fct(cpu_type cputype, UINT32 state);
+const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
 
 #define cputype_context_size(cputype)			cputype_get_info_int(cputype, CPUINFO_INT_CONTEXT_SIZE)
 #define cputype_input_lines(cputype)			cputype_get_info_int(cputype, CPUINFO_INT_INPUT_LINES)
@@ -663,7 +475,7 @@ const char *cputype_get_info_string(int cputype, UINT32 state);
 ***************************************************************************/
 
 /* return a pointer to the interface struct for a given CPU type */
-INLINE const cpu_interface *cputype_get_interface(int cputype)
+INLINE const cpu_interface *cputype_get_interface(cpu_type cputype)
 {
 	extern cpu_interface cpuintrf[];
 	return &cpuintrf[cputype];

@@ -163,6 +163,7 @@ EMUVIDEOOBJS = \
  	$(EMUVIDEO)/crtc6845.o \
 	$(EMUVIDEO)/generic.o \
 	$(EMUVIDEO)/poly.o \
+	$(EMUVIDEO)/polynew.o \
 	$(EMUVIDEO)/resnet.o \
 	$(EMUVIDEO)/s2636.o \
 	$(EMUVIDEO)/tlc34076.o \

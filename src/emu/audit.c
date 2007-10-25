@@ -129,7 +129,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 	expand_machine_driver(gamedrv->drv, &config);
 #if HAS_SAMPLES
 	for (sndnum = 0; sndnum < ARRAY_LENGTH(config.sound); sndnum++)
-		if (config.sound[sndnum].sound_type == SOUND_SAMPLES)
+		if (config.sound[sndnum].type == SOUND_SAMPLES)
 		{
 			struct Samplesinterface *intf = (struct Samplesinterface *)config.sound[sndnum].config;
 
@@ -154,7 +154,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 
 	/* now iterate over sample entries */
 	for (sndnum = 0; sndnum < ARRAY_LENGTH(config.sound); sndnum++)
-		if (config.sound[sndnum].sound_type == SOUND_SAMPLES)
+		if (config.sound[sndnum].type == SOUND_SAMPLES)
 		{
 			struct Samplesinterface *intf = (struct Samplesinterface *)config.sound[sndnum].config;
 			const char *sharedname = NULL;

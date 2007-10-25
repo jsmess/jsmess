@@ -152,7 +152,7 @@ DRIVER_INIT( pc1512 )
 static void pc_map_vga_memory(offs_t begin, offs_t end, read8_handler rh, write8_handler wh)
 {
 	int buswidth;
-	buswidth = cputype_databus_width(Machine->drv->cpu[0].cpu_type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(Machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

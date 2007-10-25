@@ -1252,7 +1252,7 @@ void uPD71054_update_timer( int no )
 	UINT16 max = uPD71054.max[no]&0xffff;
 
 	if( max != 0 ) {
-		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[0].cpu_clock), 16 * max);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[0].clock), 16 * max);
 		mame_timer_adjust( uPD71054.timer[no], period, no, time_zero );
 	} else {
 		mame_timer_adjust( uPD71054.timer[no], time_never, no, time_never);

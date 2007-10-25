@@ -22,41 +22,18 @@
  *
  *****************************************************************************/
 
-#define m65ce02 m4510
-#define m65ce02_ICount m4510_ICount
-
-#define M4510_MEM(addr) (m4510.mem[(addr)>>13]+(addr))
-
-#undef CHANGE_PC
-#define CHANGE_PC change_pc(M4510_MEM(PCD))
-
-/***************************************************************
- *  RDOP    read an opcode
+/* 65ce02 ********************************************************
+ * TXS  Transfer index X to stack LSB
+ * no flags changed (sic!)
+ * txs tys not interruptable
  ***************************************************************/
-#undef RDOP
-#define RDOP() m4510_cpu_readop()
-
-/***************************************************************
- *  RDOPARG read an opcode argument
- ***************************************************************/
-#undef RDOPARG
-#define RDOPARG() m4510_cpu_readop_arg()
-
-/***************************************************************
- *  RDMEM   read memory
- ***************************************************************/
-#undef RDMEM
-#undef RDMEM_ID
-#define RDMEM(addr) program_read_byte_8(M4510_MEM(addr))
-#define RDMEM_ID(addr) RDMEM(addr)
-
-/***************************************************************
- *  WRMEM   write memory
- ***************************************************************/
-#undef WRMEM
-#undef WRMEM_ID
-#define WRMEM(addr,data) program_write_byte_8(M4510_MEM(addr),data)
-#define WRMEM_ID(addr,data) WRMEM(addr,data)
+#undef TXS
+#define TXS								\
+	SPL = X;							\
+	if (PEEK_OP() == 0x2b /*TYS*/ ) {	\
+		UINT8 op = RDOP();				\
+		(*m4510.insn[op])();			\
+	}
 
 /* c65 docu says transfer of axyz to the mapper register
    so no readback!? */
@@ -92,8 +69,9 @@
   m4510.mem[7]=(m4510.high&0x8000) ? (m4510.high&0xfff)<<8:0; \
   CHANGE_PC; \
  } \
+	m4510_ICount -= 3; \
  { \
 				UINT8 op = RDOP();								\
-				(*m65ce02.insn[op])();							\
+				(*m4510.insn[op])();							\
  } \
 

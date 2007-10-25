@@ -2619,7 +2619,7 @@ static void mb87078_gain_changed(int channel, int percent)
 {
 	if (channel==1)
 	{
-		int type = Machine->drv->sound[0].sound_type;
+		sound_type type = Machine->drv->sound[0].type;
 		sndti_set_output_gain(type, 0, 0, percent / 100.0);
 		sndti_set_output_gain(type, 1, 0, percent / 100.0);
 		sndti_set_output_gain(type, 2, 0, percent / 100.0);

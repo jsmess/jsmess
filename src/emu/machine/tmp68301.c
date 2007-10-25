@@ -90,7 +90,7 @@ void tmp68301_update_timer( int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;			// P4..1
 			if (scale > 8) scale = 8;
-			duration = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[0].cpu_clock), (1 << scale) * max);
+			duration = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[0].clock), (1 << scale) * max);
 		}
 		break;
 	}

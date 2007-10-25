@@ -281,8 +281,8 @@ static MACHINE_START( dlair )
 static MACHINE_START( dleuro )
 {
 	/* initialize the CTC and SIO peripherals */
-	ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
-	sio_intf.baseclock = machine->drv->cpu[0].cpu_clock;
+	ctc_intf.baseclock = machine->drv->cpu[0].clock;
+	sio_intf.baseclock = machine->drv->cpu[0].clock;
 	z80ctc_init(0, &ctc_intf);
 	z80sio_init(0, &sio_intf);
 

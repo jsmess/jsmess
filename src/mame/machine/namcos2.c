@@ -444,6 +444,23 @@ UINT16  namcos2_68k_master_C148[0x20];
 UINT16  namcos2_68k_slave_C148[0x20];
 UINT16  namcos2_68k_gpu_C148[0x20];
 
+
+static int IsSystem21( void )
+{
+	switch( namcos2_gametype )
+	{
+	case NAMCOS21_AIRCOMBAT:
+	case NAMCOS21_STARBLADE:
+	case NAMCOS21_CYBERSLED:
+	case NAMCOS21_SOLVALOU:
+	case NAMCOS21_WINRUN91:
+	case NAMCOS21_DRIVERS_EYES:
+		return 1;
+	default:
+		return 0;
+	}
+}
+
 static UINT16
 ReadWriteC148( int cpu, offs_t offset, UINT16 data, int bWrite )
 {
@@ -563,9 +580,13 @@ ReadWriteC148( int cpu, offs_t offset, UINT16 data, int bWrite )
 				/* Suspend execution */
 				cpunum_set_input_line(CPU_SOUND, INPUT_LINE_RESET, ASSERT_LINE);
 			}
-			if( data&4 )
+			if( IsSystem21() )
 			{
-				namcos21_kickstart(1);
+				//printf( "dspkick=0x%x\n", data );
+				if( data&4 )
+				{
+					namcos21_kickstart(1);
+				}
 			}
 		}
 		break;
@@ -632,22 +653,6 @@ static TIMER_CALLBACK( namcos2_68k_master_posirq )
 	cpunum_set_input_line(CPU_MASTER , namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 }
 
-static int IsSystem21( void )
-{
-	switch( namcos2_gametype )
-	{
-	case NAMCOS21_AIRCOMBAT:
-	case NAMCOS21_STARBLADE:
-	case NAMCOS21_CYBERSLED:
-	case NAMCOS21_SOLVALOU:
-	case NAMCOS21_WINRUN91:
-	case NAMCOS21_DRIVERS_EYES:
-		return 1;
-	default:
-		return 0;
-	}
-}
-
 static int
 GetPosIRQScanline( void )
 {
@@ -683,15 +688,17 @@ INTERRUPT_GEN( namcos2_68k_slave_vblank )
 
 static TIMER_CALLBACK( namcos2_68k_gpu_posirq )
 {
+	//printf( "namcos2_68k_gpu_posirq(%d)\n", param );
 	video_screen_update_partial(0, param);
 	cpunum_set_input_line(CPU_GPU, namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 }
 
 INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 {
+	//printf( "namcos2_68k_gpu_vblank(%d)\n",namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] );
 	if( namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] )
 	{
-		int scanline = 137;//GetPosIRQScanline();
+		int scanline = 0x50+0x89; /* HACK for Winning Run */
 		mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_gpu_posirq );
 	}
 	cpunum_set_input_line( CPU_GPU, namcos2_68k_gpu_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);

@@ -989,32 +989,16 @@ static int adsp2100_execute(int cycles)
 				{
 					if (CONDITION(op & 15))
 					{
-						switch ((op >> 4) & 3)
-						{
-							case 1:	adsp2100.flagout = !adsp2100.flagout;
-							case 2: adsp2100.flagout = 0;
-							case 3: adsp2100.flagout = 1;
-						}
+						if (op & 0x020) adsp2100.flagout = 0;
+						if (op & 0x010) adsp2100.flagout ^= 1;
 						if (chip_type >= CHIP_TYPE_ADSP2101)
 						{
-							switch ((op >> 6) & 3)
-							{
-								case 1:	adsp2100.fl0 = !adsp2100.fl0;
-								case 2: adsp2100.fl0 = 0;
-								case 3: adsp2100.fl0 = 1;
-							}
-							switch ((op >> 8) & 3)
-							{
-								case 1:	adsp2100.fl1 = !adsp2100.fl1;
-								case 2: adsp2100.fl1 = 0;
-								case 3: adsp2100.fl1 = 1;
-							}
-							switch ((op >> 10) & 3)
-							{
-								case 1:	adsp2100.fl2 = !adsp2100.fl2;
-								case 2: adsp2100.fl2 = 0;
-								case 3: adsp2100.fl2 = 1;
-							}
+							if (op & 0x080) adsp2100.fl0 = 0;
+							if (op & 0x040) adsp2100.fl0 ^= 1;
+							if (op & 0x200) adsp2100.fl1 = 0;
+							if (op & 0x100) adsp2100.fl1 ^= 1;
+							if (op & 0x800) adsp2100.fl2 = 0;
+							if (op & 0x400) adsp2100.fl2 ^= 1;
 						}
 					}
 				}

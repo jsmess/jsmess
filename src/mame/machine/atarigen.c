@@ -109,7 +109,7 @@ static TIMER_CALLBACK( delayed_sound_reset );
 static TIMER_CALLBACK( delayed_sound_w );
 static TIMER_CALLBACK( delayed_6502_sound_w );
 
-static void atarigen_set_vol(running_machine *machine, int volume, int type);
+static void atarigen_set_vol(running_machine *machine, int volume, sound_type type);
 
 static TIMER_CALLBACK( scanline_timer_callback );
 
@@ -775,13 +775,13 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
     changes the volume on all channels associated with it.
 ---------------------------------------------------------------*/
 
-static void atarigen_set_vol(running_machine *machine, int volume, int type)
+void atarigen_set_vol(running_machine *machine, int volume, sound_type type)
 {
 	int sndindex = 0;
 	int ch;
 
 	for (ch = 0; ch < MAX_SOUND; ch++)
-		if (machine->drv->sound[ch].sound_type == type)
+		if (machine->drv->sound[ch].type == type)
 		{
 			int output;
 			for (output = 0; output < 2; output++)

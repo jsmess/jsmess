@@ -5085,7 +5085,7 @@ static void CreateIcons(void)
 
 static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_subitem)
 {
-	int value;
+	int value = 0;  /* Default to 0, for unknown case */
 	const char *name1 = NULL;
 	const char *name2 = NULL;
 	int nTemp1, nTemp2;
@@ -5105,7 +5105,7 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 	switch (sort_subitem)
 	{
 	case COLUMN_GAMES:
-		value = mame_stricmp(ModifyThe(drivers[index1]->description),
+		return mame_stricmp(ModifyThe(drivers[index1]->description),
 						ModifyThe(drivers[index2]->description));
 		break;
 
@@ -5135,7 +5135,6 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 		}
 
 		// ok, both are known
-
 		if (IsAuditResultYes(nTemp1) && IsAuditResultYes(nTemp2))
 			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
 		
@@ -5178,10 +5177,6 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 			else
 				nTemp2 = 2;
 		}
-
-		if (nTemp1 == nTemp2)
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
 		value = nTemp2 - nTemp1;
 		break;
 
@@ -5190,16 +5185,11 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 		break;
 
    	case COLUMN_SRCDRIVERS:
-		if (mame_stricmp(drivers[index1]->source_file+12, drivers[index2]->source_file+12) == 0)
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
-		value = mame_stricmp(drivers[index1]->source_file+12, drivers[index2]->source_file+12);
+		value = mame_stricmp(drivers[index1]->source_file, drivers[index2]->source_file);
 		break;
+
 	case COLUMN_PLAYTIME:
 	   value = GetPlayTime(index1) - GetPlayTime(index2);
-	   if (value == 0)
-		  return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
 	   break;
 
 	case COLUMN_TYPE:
@@ -5208,39 +5198,23 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
         expand_machine_driver(drivers[index1]->drv,&drv1);
         expand_machine_driver(drivers[index2]->drv,&drv2);
 
-		if ((drv1.video_attributes & VIDEO_TYPE_VECTOR) ==
-			(drv2.video_attributes & VIDEO_TYPE_VECTOR))
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
 		value = (drv1.video_attributes & VIDEO_TYPE_VECTOR) -
 				(drv2.video_attributes & VIDEO_TYPE_VECTOR);
 		break;
     }
 	case COLUMN_TRACKBALL:
-		if (DriverUsesTrackball(index1) == DriverUsesTrackball(index2))
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
 		value = DriverUsesTrackball(index1) - DriverUsesTrackball(index2);
 		break;
 
 	case COLUMN_PLAYED:
 	   value = GetPlayCount(index1) - GetPlayCount(index2);
-	   if (value == 0)
-		  return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
 	   break;
 
 	case COLUMN_MANUFACTURER:
-		if (mame_stricmp(drivers[index1]->manufacturer, drivers[index2]->manufacturer) == 0)
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
 		value = mame_stricmp(drivers[index1]->manufacturer, drivers[index2]->manufacturer);
 		break;
 
 	case COLUMN_YEAR:
-		if (mame_stricmp(drivers[index1]->year, drivers[index2]->year) == 0)
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
 		value = mame_stricmp(drivers[index1]->year, drivers[index2]->year);
 		break;
 
@@ -5253,21 +5227,22 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 		if (*name2 == '\0')
 			name2 = NULL;
 
-		if (name1 == name2)
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
-		if (name2 == NULL)
+		if (NULL == name1 && NULL == name2)
+			value = 0;
+		else if (name2 == NULL)
 			value = -1;
 		else if (name1 == NULL)
 			value = 1;
 		else
 			value = mame_stricmp(name1, name2);
 		break;
-
-	default :
-		return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
 	}
 
+	// Handle same comparisons here
+	if (0 == value && COLUMN_GAMES != sort_subitem)
+	{
+		value = GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
+	}
 #ifdef DEBUG
 	if ((strcmp(drivers[index1]->name,"1941") == 0 && strcmp(drivers[index2]->name,"1942") == 0) ||
 		(strcmp(drivers[index1]->name,"1942") == 0 && strcmp(drivers[index2]->name,"1941") == 0))

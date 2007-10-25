@@ -444,7 +444,7 @@ static DRIVER_INIT( svisions )
 	svision.timer1 = mame_timer_alloc(svision_timer);
 	svision_pet.on = TRUE;
 	svision_pet.timer = mame_timer_alloc(svision_pet_timer);
-	mame_timer_pulse(scale_up_mame_time(MAME_TIME_IN_SEC(8), 256/Machine->drv->cpu[0].cpu_clock), 0, svision_pet_timer);  
+	mame_timer_pulse(scale_up_mame_time(MAME_TIME_IN_SEC(8), 256/Machine->drv->cpu[0].clock), 0, svision_pet_timer);  
 }
 
 static MACHINE_RESET( svision )

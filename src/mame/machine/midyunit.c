@@ -41,7 +41,7 @@ static UINT8	term2_analog_select;
 static UINT8	cmos_w_enable;
 
 /* sound-related variables */
-static UINT8	sound_type;
+static UINT8	chip_type;
 
 /* hack-related variables */
 static UINT16 *t2_hack_mem;
@@ -283,7 +283,7 @@ static void init_generic(int bpp, int sound, int prot_start, int prot_end)
 	}
 
 	/* load sound ROMs and set up sound handlers */
-	sound_type = sound;
+	chip_type = sound;
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
@@ -513,7 +513,7 @@ DRIVER_INIT( totcarn )
 MACHINE_RESET( midyunit )
 {
 	/* reset sound */
-	switch (sound_type)
+	switch (chip_type)
 	{
 		case SOUND_NARC:
 			williams_narc_reset_w(1);
@@ -555,7 +555,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 
 	/* call through based on the sound type */
 	if (ACCESSING_LSB && ACCESSING_MSB)
-		switch (sound_type)
+		switch (chip_type)
 		{
 			case SOUND_NARC:
 				williams_narc_data_w(data);

@@ -369,6 +369,7 @@ const game_driver * const drivers[] =
 	DRIVER( clshroad )	/* (c) 1986 Woodplace Inc. */
 	DRIVER( clshrdst )	/* (c) 1986 Status Games */
 	DRIVER( tubep )		/* (c) 1984 + Fujitek */
+	DRIVER( tubepb )	/* (c) 1984 + bootleg */
 	DRIVER( rjammer )	/* (c) 1984 + Alice */
 	DRIVER( magmax )	/* (c) 1985 */
 	DRIVER( cop01 )		/* (c) 1985 */
@@ -4774,6 +4775,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gticlubj )	/* GX688 (c)1996 */
 	DRIVER( hangplt )	/* GX685 (c)1997 */
 	DRIVER( nbapbp )	/* GX778 (c)1998 */
+	DRIVER( terabrst )	/* GX??? (c)1998 */
 	DRIVER( gradius4 )	/* GX837 (c)1999 */
 	DRIVER( sscope )	/* GX830 (c)1999 */
 	DRIVER( sscopea )	/* GX830 (c)1999 */
@@ -4915,6 +4917,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( asteroib )	/* (bootleg) */
 	DRIVER( asterock )	/* Sidam bootleg    (c) 1979 */
 	DRIVER( meteorts )	/* VCC bootleg      (c) 1979 */
+	DRIVER( meteorho )	/* Hoei? bootleg    (c) 1980 */
 	DRIVER( astdelux )	/* 0351xx           (c) 1980 */
 	DRIVER( astdelu2 )	/* 0351xx           (c) 1980 */
 	DRIVER( astdelu1 )	/* 0351xx           (c) 1980 */
@@ -5972,6 +5975,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Midway Zeus games */
 	DRIVER( mk4 )		/* (c) 1997 Midway */
+	DRIVER( mk4a )		/* (c) 1997 Midway */
 	DRIVER( invasn )	/* (c) 1999 Midway */
 	DRIVER( crusnexo )	/* (c) 1999 Midway */
 	DRIVER( thegrid )	/* (c) 2001 Midway */
@@ -6128,6 +6132,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sdgndmps )	/* (c) Banpresto / Bandai (Japan) */
 	DRIVER( dcon )		/* (c) 1992 Success */
 	DRIVER( sengokmj )	/* (c) 1991 Sigma */
+	DRIVER( totmejan )	/* (c) 1991 Seibu/Tecmo */
+	DRIVER( goodejan )	/* (c) 1991 Seibu/Tecmo */
+	DRIVER( goodejaa )	/* (c) 1991 Seibu/Tecmo */
 
 
 	DRIVER( raiden2 )	/* (c) 1993 Seibu Kaihatsu + Fabtek license */
@@ -6356,7 +6363,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( welltrij )	/* (c) 1991 Video System Co. (Japan) */
 	DRIVER( quiz18k )	/* (c) 1992 EIM (Welltris hardware) */
 	DRIVER( f1gp )		/* (c) 1991 Video System Co. */
-	DRIVER( sf1gp )		/* bootleg */
+	DRIVER( f1gpb )		/* bootleg */
 	DRIVER( f1gp2 )		/* (c) 1992 Video System Co. */
 	DRIVER( crshrace )	/* (c) 1993 Video System Co. */
 	DRIVER( crshrac2 )	/* (c) 1993 Video System Co. */
@@ -7811,9 +7818,12 @@ Other Sun games
 	DRIVER( eshb )		/* (c) 1984 Funai / Gakken */
 	DRIVER( comebaby )	/* (c) 2000 ExPotato */
 	DRIVER( peplus )	/* (c) 1987 IGT - International Gaming Technology */
+    DRIVER( pepp0188 )	/* (c) 1987 IGT - International Gaming Technology */
+    DRIVER( peset038 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
+	DRIVER( gamecstl )	/* MAME based bootleg */
 
 #endif	/* DRIVER_RECURSIVE */

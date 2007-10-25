@@ -546,7 +546,7 @@ void itech8_update_interrupts(int periodic, int tms34061, int blitter)
 	if (blitter != -1) blitter_int = blitter;
 
 	/* handle the 6809 case */
-	if (Machine->drv->cpu[0].cpu_type == CPU_M6809)
+	if (Machine->drv->cpu[0].type == CPU_M6809)
 	{
 		/* just modify lines that have changed */
 		if (periodic != -1) cpunum_set_input_line(0, INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
@@ -628,7 +628,7 @@ static MACHINE_START( sstrike )
 static MACHINE_RESET( itech8 )
 {
 	/* make sure bank 0 is selected */
-	if (machine->drv->cpu[0].cpu_type == CPU_M6809)
+	if (machine->drv->cpu[0].type == CPU_M6809)
 		memory_set_bankptr(1, &memory_region(REGION_CPU1)[0x4000]);
 
 	/* reset the PIA (if used) */
