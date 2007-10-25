@@ -64,7 +64,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "video/generic.h"
 #include "includes/vtech2.h"
 #include "devices/cartslot.h"
@@ -420,32 +419,33 @@ static GFXDECODE_START( gfxdecodeinfo )
 GFXDECODE_END
 
 
-static unsigned char vt_palette[] =
+static rgb_t vt_palette[] =
 {
-      0,  0,  0,    /* black */
-      0,  0,127,    /* blue */
-      0,127,  0,    /* green */
-      0,127,127,    /* cyan */
-    127,  0,  0,    /* red */
-    127,  0,127,    /* magenta */
-    127,127,  0,    /* yellow */
-	160,160,160,	/* bright grey */
-    127,127,127,    /* dark grey */
-      0,  0,255,    /* bright blue */
-      0,255,  0,    /* bright green */
-      0,255,255,    /* bright cyan */
-    255,  0,  0,    /* bright red */
-    255,  0,255,    /* bright magenta */
-    255,255,  0,    /* bright yellow */
-    255,255,255,    /* bright white */
+	RGB_BLACK,
+	MAKE_RGB(0x00, 0x00, 0x7f),  /* blue */
+	MAKE_RGB(0x00, 0x7f, 0x00),  /* green */
+	MAKE_RGB(0x00, 0x7f, 0x7f),  /* cyan */
+	MAKE_RGB(0x7f, 0x00, 0x00),  /* red */
+	MAKE_RGB(0x7f, 0x00, 0x7f),  /* magenta */
+	MAKE_RGB(0x7f, 0x7f, 0x00),  /* yellow */
+	MAKE_RGB(0xa0, 0xa0, 0xa0),  /* bright grey */
+	MAKE_RGB(0x7f, 0x7f, 0x7f),  /* dark grey */
+	MAKE_RGB(0x00, 0x00, 0xff),  /* bright blue */
+	MAKE_RGB(0x00, 0xff, 0x00),  /* bright green */
+	MAKE_RGB(0x00, 0xff, 0xff),  /* bright cyan */
+	MAKE_RGB(0xff, 0x00, 0x00),  /* bright red */
+	MAKE_RGB(0xff, 0x00, 0xff),  /* bright magenta */
+	MAKE_RGB(0xff, 0xff, 0x00),  /* bright yellow */
+	RGB_WHITE
 };
+
 
 /* Initialise the palette */
 static PALETTE_INIT( vtech2 )
 {
 	int i;
 
-	palette_set_colors_rgb(machine, 0, vt_palette, sizeof(vt_palette) / 3);
+	palette_set_colors(machine, 0, vt_palette, 16);
 
 	for (i = 0; i < 256; i++)
 	{
@@ -479,7 +479,7 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_SCREEN_SIZE(88*8, 24*8+32)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
 	MDRV_GFXDECODE( gfxdecodeinfo )
-	MDRV_PALETTE_LENGTH(sizeof(vt_palette)/sizeof(vt_palette[0])/3)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(256*2+16)
 	MDRV_PALETTE_INIT(vtech2)
 
