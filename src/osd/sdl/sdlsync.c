@@ -35,6 +35,7 @@
 
 // MAME headers
 #include "osdcore.h"
+#include "osinline.h"
 #include "mame.h"
 #include "sdlsync.h"
 
@@ -44,8 +45,9 @@
 #include <sys/time.h>
 
 struct _osd_lock {
- 	pthread_mutex_t id;
- };
+ 	volatile pthread_t	holder;
+	INT32				count;
+};
  
 struct _osd_event {
 	pthread_mutex_t 	mutex;
@@ -60,22 +62,41 @@ struct _osd_thread {
 
 static osd_lock			*atomic_lck = NULL;
 
+INLINE pthread_t osd_compare_exchange_pthread_t(pthread_t volatile *ptr, pthread_t compare, pthread_t exchange)
+{
+#ifdef PTR64
+	INT64 result = osd_compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
+#else
+	INT32 result = osd_compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
+#endif
+	return (pthread_t)result;
+}
+
+INLINE pthread_t osd_exchange_pthread_t(pthread_t volatile *ptr, pthread_t exchange)
+{
+#ifdef PTR64
+	INT64 result = osd_exchange64((INT64 volatile *)ptr, (INT64)exchange);
+#else
+	INT32 result = osd_exchange32((INT32 volatile *)ptr, (INT32)exchange);
+#endif
+	return (pthread_t)result;
+}
+
+
 //============================================================
 //  osd_lock_alloc
 //============================================================
 
 osd_lock *osd_lock_alloc(void)
 {
-	osd_lock *mutex;
-	pthread_mutexattr_t mtxattr;
+	osd_lock *lock;
 
-	mutex = (osd_lock *)calloc(1, sizeof(osd_lock));
+	lock = (osd_lock *)calloc(1, sizeof(osd_lock));
 
-	pthread_mutexattr_init(&mtxattr);
-	pthread_mutexattr_settype(&mtxattr, PTHREAD_MUTEX_RECURSIVE);
-	pthread_mutex_init(&mutex->id, &mtxattr);
+	lock->holder = NULL;
+	lock->count = 0;
 
-	return mutex;
+	return lock;
 }
 
 //============================================================
@@ -84,12 +105,68 @@ osd_lock *osd_lock_alloc(void)
 
 void osd_lock_acquire(osd_lock *lock)
 {
-	int r;
+	pthread_t current, prev;
 
-	r =	pthread_mutex_lock(&lock->id);
-	if (r==0)
-		return;
-	printf("Error on lock: %d: %s\n", r, strerror(r));
+	current = pthread_self();
+	prev = osd_compare_exchange_pthread_t(&lock->holder, NULL, current);
+	if (prev != NULL && prev != current)
+	{
+		do {
+			register INT32 spin = 10000; // Convenient spin count
+			register pthread_t tmp;
+#if defined(__i386__) || defined(__x86_64__)
+			__asm__ __volatile__ (
+				"1: pause                    ;"
+				"   mov    %[holder], %[tmp] ;"
+				"   test   %[tmp], %[tmp]    ;"
+				"   loopne 1b                ;"
+				: [spin]   "+c" (spin)
+				, [tmp]    "=&r" (tmp)
+				: [holder] "m"  (lock->holder)
+				: "%cc"
+			);
+#elif defined(__ppc__) || defined(__PPC__)
+			__asm__ __volatile__ (
+				"1: nop                        \n"
+				"   nop                        \n"
+				"   lwzx  %[tmp], 0, %[holder] \n"
+				"   cmpwi %[tmp], 0            \n"
+				"   bdnzt eq, 1b               \n"
+				: [spin]   "+c"  (spin)
+				, [tmp]    "=&r" (tmp)
+				: [holder] "r"   (&lock->holder)
+				: "cr0"
+			);
+#elif defined(__ppc64__) || defined(__PPC64__)
+			__asm__ __volatile__ (
+				"1: nop                        \n"
+				"   nop                        \n"
+				"   ldx   %[tmp], 0, %[holder] \n"
+				"   cmpdi %[tmp], 0            \n"
+				"   bdnzt eq, 1b               \n"
+				: [spin]   "+c"  (spin)
+				, [tmp]    "=&r" (tmp)
+				: [holder] "r"   (&lock->holder)
+				: "cr0"
+			);
+#else
+			while (--spin > 0 && lock->holder != NULL)
+				osd_yield_processor();
+#endif
+#if 0
+			/* If you mean to use locks as a blocking mechanism for extended
+			 * periods of time, you should do something like this.  However,
+			 * it kills the performance of gaelco3d.
+			 */
+			if (spin == 0)
+			{
+				struct timespec sleep = { 0, 100000 }, remaining;
+				nanosleep(&sleep, &remaining); // sleep for 100us
+			}
+#endif
+		} while (osd_compare_exchange_pthread_t(&lock->holder, NULL, current) != NULL);
+	}
+	lock->count++;
 }
 
 //============================================================
@@ -98,13 +175,15 @@ void osd_lock_acquire(osd_lock *lock)
 
 int osd_lock_try(osd_lock *lock)
 {
-	int r;
-	
-	r = pthread_mutex_trylock(&lock->id);
-	if (r==0)
+	pthread_t current, prev;
+
+	current = pthread_self();
+	prev = osd_compare_exchange_pthread_t(&lock->holder, NULL, current);
+	if (prev == NULL || prev == current)
+	{
+		lock->count++;
 		return 1;
-	if (r!=EBUSY)
-		printf("Error on trylock: %d: %s\n", r, strerror(r));
+	}
 	return 0;
 }
 
@@ -114,7 +193,23 @@ int osd_lock_try(osd_lock *lock)
 
 void osd_lock_release(osd_lock *lock)
 {
-	pthread_mutex_unlock(&lock->id);
+	pthread_t current;
+
+	current = pthread_self();
+	if (lock->holder == current)
+	{
+		if (--lock->count == 0)
+#if defined(__ppc__) || defined(__PPC__) || defined(__ppc64__) || defined(__PPC64__)
+		lock->holder = NULL;
+		__asm__ __volatile__( " eieio " : : );
+#else
+		osd_exchange_pthread_t(&lock->holder, NULL);
+#endif
+		return;
+	}
+
+	// trying to release a lock you don't hold is bad!
+//	assert(lock->holder == pthread_self());
 }
 
 //============================================================
@@ -123,8 +218,6 @@ void osd_lock_release(osd_lock *lock)
 
 void osd_lock_free(osd_lock *lock)
 {
-	pthread_mutex_unlock(&lock->id);
-	pthread_mutex_destroy(&lock->id);
 	free(lock);
 }
 
@@ -261,11 +354,23 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 
 		if (!event->signalled)
 		{
-			if ( pthread_cond_timedwait(&event->cond, &event->mutex, &ts) != 0 )
-			{
-				pthread_mutex_unlock(&event->mutex);
-				return FALSE;
-			}
+			do {
+				int ret = pthread_cond_timedwait(&event->cond, &event->mutex, &ts);
+				if ( ret == ETIMEDOUT )
+				{
+					if (!event->signalled)
+					{
+						pthread_mutex_unlock(&event->mutex);
+						return FALSE;
+					}
+					else
+						break;
+				}
+				if (ret == 0)
+					break;
+				if ( ret != EINTR)
+					printf("Error %d while waiting for pthread_cond_timedwait\n", ret);
+			} while (TRUE);
 		}
 	}
 

@@ -89,9 +89,11 @@ struct _mame_thread_info
 	osd_work_queue *	queue;			// pointer back to the queue
 	osd_thread *		handle;			// handle to the thread
 	osd_event *			wakeevent;		// wake event for the thread
-	volatile UINT8		active;			// are we actively processing work?
+	volatile INT32		active;			// are we actively processing work?
 
 #if KEEP_STATISTICS
+	INT32				itemsdone;
+	osd_ticks_t			actruntime;
 	osd_ticks_t			runtime;
 	osd_ticks_t			spintime;
 	osd_ticks_t			waittime;
@@ -107,7 +109,7 @@ struct _osd_work_queue
 	osd_work_item * volatile free;		// free list of work items
 	volatile INT32		items;			// items in the queue
 	volatile INT32		livethreads;	// number of live threads
-	volatile UINT8		waiting;		// is someone waiting on the queue to complete?
+	volatile INT32		waiting;		// is someone waiting on the queue to complete?
 	volatile UINT8		exiting;		// should the threads exit on their next opportunity?
 	UINT32				threads;		// number of threads in this queue
 	UINT32				flags;			// creation flags
@@ -132,7 +134,7 @@ struct _osd_work_item
 	void *				result;			// callback result
 	osd_event *			event;			// event signalled when complete
 	UINT32				flags;			// creation flags
-	volatile UINT8		done;			// is the item done?
+	volatile INT32		done;			// is the item done?
 };
 
 
@@ -188,11 +190,51 @@ INLINE void scalable_lock_init(scalable_lock *lock)
 }
 
 
-INT32 scalable_lock_acquire(scalable_lock *lock)
+INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 {
 	INT32 myslot = (osd_interlocked_increment(&lock->nextindex) - 1) & (MAX_THREADS - 1);
-	INT32 backoff = 1;
 
+#if defined(__i386__) || defined(__x86_64__)
+	register INT32 tmp;
+	__asm__ __volatile__ (
+		"1: clr    %[tmp]             ;"
+		"   xchg   %[haslock], %[tmp] ;"
+		"   test   %[tmp], %[tmp]     ;"
+		"   jne    3f                 ;"
+		"2: mov    %[haslock], %[tmp] ;"
+		"   test   %[tmp], %[tmp]     ;"
+		"   jne    1b                 ;"
+		"   pause                     ;"
+		"   jmp    2b                 ;"
+		"3:                            "
+		: [haslock] "+m"  (lock->slot[myslot].haslock)
+		, [tmp]     "=&r" (tmp)
+		:
+		: "%cc"
+	);
+#elif defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
+	register INT32 tmp;
+	__asm__ __volatile__ (
+		"1: lwarx   %[tmp], 0, %[haslock] \n"
+		"   cmpwi   %[tmp], 0             \n"
+		"   bne     3f                    \n"
+		"2: lwzx    %[tmp], 0, %[haslock] \n"
+		"   cmpwi   %[tmp], 0             \n"
+		"   bne     1b                    \n"
+		"   nop                           \n"
+		"   nop                           \n"
+		"   b       2b                    \n"
+		"3: li      %[tmp], 0             \n"
+		"   sync                          \n"
+		"   stwcx.  %[tmp], 0, %[haslock] \n"
+		"   bne-    1b                    \n"
+		"   eieio                         \n"
+		: [tmp]     "=&r" (tmp)
+		: [haslock] "r"   (&lock->slot[myslot].haslock)
+		: "cr0"
+	);
+#else
+	INT32 backoff = 1;
 	while (!osd_compare_exchange32(&lock->slot[myslot].haslock, TRUE, FALSE))
 	{
 		INT32 backcount;
@@ -200,12 +242,26 @@ INT32 scalable_lock_acquire(scalable_lock *lock)
 			osd_yield_processor();
 		backoff <<= 1;
 	}
+#endif
 	return myslot;
 }
 
-void scalable_lock_release(scalable_lock *lock, INT32 myslot)
+INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 {
+#if defined(__i386__) || defined(__x86_64__)
+	register INT32 tmp = TRUE;
+	__asm__ __volatile__ (
+		" xchg   %[haslock], %[tmp] ;"
+		: [haslock] "+m" (lock->slot[(myslot + 1) & (MAX_THREADS - 1)].haslock)
+		, [tmp]     "+r" (tmp)
+		:
+	);
+#elif defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
+	lock->slot[(myslot + 1) & (MAX_THREADS - 1)].haslock = TRUE;
+	__asm__ __volatile__ ( " eieio " : : );
+#else
 	osd_exchange32(&lock->slot[(myslot + 1) & (MAX_THREADS - 1)].haslock, TRUE);
+#endif
 }
 
 
@@ -320,24 +376,29 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 	if (queue->flags & WORK_QUEUE_FLAG_MULTI)
 	{
 		mame_thread_info *thread = &queue->thread[queue->threads];
+		osd_ticks_t stopspin = osd_ticks() + timeout;
 
 		end_timing(thread->waittime);
 
 		// process what we can as a worker thread
 		worker_thread_process(queue, thread);
 
+		// spin until we're done
+		begin_timing(thread->spintime);
+		while (queue->items != 0 && osd_ticks() < stopspin)
+			osd_yield_processor();
+		end_timing(thread->spintime);
+
 		begin_timing(thread->waittime);
-		return TRUE;
+		return (queue->items == 0);
 	}
 
 	// reset our done event and double-check the items before waiting
 	osd_event_reset(queue->doneevent);
-	queue->waiting = TRUE;
+	osd_exchange32(&queue->waiting, TRUE);
 	if (queue->items != 0)
-	{
 		osd_event_wait(queue->doneevent, timeout);
-	}
-	queue->waiting = FALSE;
+	osd_exchange32(&queue->waiting, FALSE);
 
 	// return TRUE if we actually hit 0
 	return (queue->items == 0);
@@ -351,7 +412,7 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 void osd_work_queue_free(osd_work_queue *queue)
 {
 	// if we have threads, clean them up
-	if (queue->threads > 0 && queue->thread != NULL)
+	if (queue->threads >= 0 && queue->thread != NULL)
 	{
 		int threadnum;
 
@@ -359,7 +420,6 @@ void osd_work_queue_free(osd_work_queue *queue)
 		end_timing(queue->thread[queue->threads].waittime);
 
 		// signal all the threads to exit
-		//osd_work_queue_wait(queue, osd_ticks_per_second()*10);
 		queue->exiting = TRUE;
 		for (threadnum = 0; threadnum < queue->threads; threadnum++)
 		{
@@ -390,11 +450,13 @@ void osd_work_queue_free(osd_work_queue *queue)
 		{
 			mame_thread_info *thread = &queue->thread[threadnum];
 			osd_ticks_t total = thread->runtime + thread->waittime + thread->spintime;
-			printf("Thread %d:  run=%5.2f%%  spin=%5.2f%%  wait/other=%5.2f%%\n",
-					threadnum,
+			printf("Thread %d:  items=%9d run=%5.2f%% (%5.2f%%)  spin=%5.2f%%  wait/other=%5.2f%% total=%9d\n",
+					threadnum, thread->itemsdone,
 					(double)thread->runtime * 100.0 / (double)total,
+					(double)thread->actruntime * 100.0 / (double)total,
 					(double)thread->spintime * 100.0 / (double)total,
-					(double)thread->waittime * 100.0 / (double)total);
+					(double)thread->waittime * 100.0 / (double)total,
+					(UINT32) total);
 		}
 #endif
 
@@ -474,7 +536,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		// fill in the basics
 		item->next = NULL;
 		item->callback = callback;
-		item->param = parambase;
+		item->param = (UINT8 *)parambase + itemnum * paramstep;
 		item->result = NULL;
 		item->flags = flags;
 		item->done = FALSE;
@@ -482,7 +544,6 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		// advance to the next
 		*item_tailptr = item;
 		item_tailptr = &item->next;
-		parambase = (UINT8 *)parambase + paramstep;
 	}
 
 	// enqueue the whole thing within the critical section
@@ -520,10 +581,12 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 	// if no threads, run the queue now on this thread
 	if (queue->threads == 0)
+	{
+		end_timing(queue->thread[0].waittime);
 		worker_thread_process(queue, &queue->thread[0]);
-
+		begin_timing(queue->thread[0].waittime);
+	}
 	// only return the item if it won't get released automatically
-	//return (flags & WORK_ITEM_FLAG_AUTO_RELEASE) ? NULL : *item_tailptr;
 	return (flags & WORK_ITEM_FLAG_AUTO_RELEASE) ? NULL : itemlist;
 }
 
@@ -624,7 +687,7 @@ static void *worker_thread_entry(void *param)
 	{
 		// block waiting for work or exit
 		// bail on exit, and only wait if there are no pending items in queue
-		if (!queue->exiting && queue->items == 0)
+		if (!queue->exiting && queue->list == NULL)
 		{
 			begin_timing(thread->waittime);
 			osd_event_wait(thread->wakeevent, INFINITE);
@@ -634,7 +697,7 @@ static void *worker_thread_entry(void *param)
 			break;
 
 		// indicate that we are live
-		thread->active = TRUE;
+		osd_exchange32(&thread->active, TRUE);
 		osd_interlocked_increment(&queue->livethreads);
 
 		// process work items
@@ -646,20 +709,22 @@ static void *worker_thread_entry(void *param)
 			worker_thread_process(queue, thread);
 
 			// spin for a while looking for more work
-			begin_timing(thread->spintime);
-			stopspin = osd_ticks() + SPIN_LOOP_TIME;
-			while (queue->items == 0 && osd_ticks() < stopspin)
-				osd_yield_processor();
-			end_timing(thread->spintime);
-
+			if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ)
+			{
+				begin_timing(thread->spintime);
+				stopspin = osd_ticks() + SPIN_LOOP_TIME;
+				while (queue->list == NULL && osd_ticks() < stopspin)
+					osd_yield_processor();
+				end_timing(thread->spintime);
+			}
 			// if nothing more, release the processor
-			if (queue->items == 0)
+			if (queue->list == NULL)
 				break;
 			add_to_stat(&queue->spinloops, 1);
 		}
 
 		// decrement the live thread count
-		thread->active = FALSE;
+		osd_exchange32(&thread->active, FALSE);
 		osd_interlocked_decrement(&queue->livethreads);
 	}
 	return NULL;
@@ -672,10 +737,12 @@ static void *worker_thread_entry(void *param)
 
 static void worker_thread_process(osd_work_queue *queue, mame_thread_info *thread)
 {
+	int threadid = thread - queue->thread;
+
 	begin_timing(thread->runtime);
 
 	// loop until everything is processed
-	while (queue->items != 0)
+	while (queue->list != NULL)
 	{
 		osd_work_item *item;
 		INT32 lockslot;
@@ -685,7 +752,6 @@ static void worker_thread_process(osd_work_queue *queue, mame_thread_info *threa
 		{
 			// pull the item from the queue
 			item = (osd_work_item *)queue->list;
-
 			if (item != NULL)
 			{
 				queue->list = item->next;
@@ -699,9 +765,15 @@ static void worker_thread_process(osd_work_queue *queue, mame_thread_info *threa
 		if (item != NULL)
 		{
 			// call the callback and stash the result
-			item->result = (*item->callback)(item->param);
+			begin_timing(thread->actruntime);
+			item->result = (*item->callback)(item->param, threadid);
+			end_timing(thread->actruntime);
+
+			// decrement the item count after we are done
 			osd_interlocked_decrement(&queue->items);
 			item->done = TRUE;
+
+			add_to_stat(&thread->itemsdone, 1);
 
 			// if it's an auto-release item, release it
 			if (item->flags & WORK_ITEM_FLAG_AUTO_RELEASE)
@@ -715,7 +787,7 @@ static void worker_thread_process(osd_work_queue *queue, mame_thread_info *threa
 			}
 
 			// if we removed an item and there's still work to do, bump the stats
-			if (queue->items != 0)
+			if (queue->list != NULL)
 				add_to_stat(&queue->extraitems, 1);
 		}
 	}

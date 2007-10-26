@@ -15,7 +15,7 @@
 #include <SDL/SDL_thread.h>
 
 #include <time.h>
-#if defined(SDLMAME_UNIX)
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 #include <sys/time.h>
 #endif
 
@@ -120,16 +120,16 @@ struct _worker_param {
 
 static void sdlwindow_exit(running_machine *machine);
 static void sdlwindow_video_window_destroy(sdl_window_info *window);
-static void *draw_video_contents_wt(void *param);
-static void *sdlwindow_video_window_destroy_wt(void *param);
-static void *sdlwindow_resize_wt(void *param);
-static void *sdlwindow_toggle_full_screen_wt(void *param);
+static void *draw_video_contents_wt(void *param, int threadid);
+static void *sdlwindow_video_window_destroy_wt(void *param, int threadid);
+static void *sdlwindow_resize_wt(void *param, int threadid);
+static void *sdlwindow_toggle_full_screen_wt(void *param, int threadid);
 #if USE_OPENGL
 static void sdlwindow_init_ogl_context(void);
 #endif
 static void get_min_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain);
 
-static void *complete_create_wt(void *param);
+static void *complete_create_wt(void *param, int threadid);
 static void set_starting_view(int index, sdl_window_info *window, const char *view);
 
 //============================================================
@@ -162,7 +162,7 @@ INLINE void execute_async(osd_work_callback callback, worker_param *wp)
 	{
 		osd_work_item_queue(work_queue, callback, (void *) wp_temp, WORK_ITEM_FLAG_AUTO_RELEASE);
 	} else
-		callback((void *) wp_temp);
+		callback((void *) wp_temp, 0);
 }
 
 //============================================================
@@ -180,7 +180,7 @@ INLINE void execute_async_wait(osd_work_callback callback, worker_param *wp)
 //  (window thread)
 //============================================================
 
-static void *sdlwindow_thread_id(void *param)
+static void *sdlwindow_thread_id(void *param, int threadid)
 {
 	window_threadid = SDL_ThreadID();
 
@@ -213,7 +213,7 @@ int sdlwindow_init(running_machine *machine)
 	if (multithreading_enabled)
 	{
 		// create a thread to run the windows from
-		work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_IO);
+		work_queue = osd_work_queue_alloc(0);
 		if (work_queue == NULL)
 			return 1;
 		osd_work_item_queue(work_queue, &sdlwindow_thread_id, NULL, WORK_ITEM_FLAG_AUTO_RELEASE);
@@ -222,7 +222,7 @@ int sdlwindow_init(running_machine *machine)
 	{
 		// otherwise, treat the window thread as the main thread
 		//window_threadid = main_threadid;
-		sdlwindow_thread_id(NULL);
+		sdlwindow_thread_id(NULL, 0);
 	}
 
 	// initialize the drawers
@@ -263,7 +263,7 @@ void _sdlwindow_sync(const char *s, int line)
 //============================================================
 
 #ifdef SDLMAME_WIN32
-static void *sdlwindow_exit_wt(void *param)
+static void *sdlwindow_exit_wt(void *param, int threadid)
 {
 	SDL_Quit();
 	return NULL;
@@ -361,7 +361,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 	}
 }
 
-static void *sdlwindow_resize_wt(void *param)
+static void *sdlwindow_resize_wt(void *param, int threadid)
 {
 	sdl_window_info *window = sdl_window_list;
 	worker_param *wp = (worker_param *) param;
@@ -415,7 +415,7 @@ void sdlwindow_resize(INT32 width, INT32 height)
 //  (window thread)
 //============================================================
 
-static void *sdlwindow_clear_surface_wt(void *param)
+static void *sdlwindow_clear_surface_wt(void *param, int threadid)
 {
 	sdl_window_info *window = sdl_window_list;
 	worker_param *wp = (worker_param *) param;
@@ -451,7 +451,7 @@ void sdlwindow_clear_surface(sdl_window_info *window, int times)
 		free(wp);
 	}
 	else 
-		sdlwindow_clear_surface_wt( (void *) wp);
+		sdlwindow_clear_surface_wt( (void *) wp, 0);
 }
 
 //============================================================
@@ -459,7 +459,7 @@ void sdlwindow_clear_surface(sdl_window_info *window, int times)
 //  (main thread)
 //============================================================
 
-static void *sdlwindow_toggle_full_screen_wt(void *param)
+static void *sdlwindow_toggle_full_screen_wt(void *param, int threadid)
 {
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window;
@@ -486,7 +486,7 @@ static void *sdlwindow_toggle_full_screen_wt(void *param)
 
 	window->fullscreen = !video_config.windowed;
 
-	complete_create_wt(param);
+	complete_create_wt(param, 0);
 
 	return NULL;
 }
@@ -532,7 +532,7 @@ static void sdlwindow_modify_yuv(int dir)
 	}
 }
 
-static void *destroy_all_textures_wt(void *param)
+static void *destroy_all_textures_wt(void *param, int threadid)
 {
 	worker_param *wp = (worker_param *) param;
 #if USE_OPENGL
@@ -708,11 +708,6 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 	window->refresh = config->refresh;
 	window->monitor = monitor;
 	window->fullscreen = !video_config.windowed;
-	if (!window->fullscreen)
-	{
-		window->windowed_width = config->width;
-		window->windowed_height = config->height;
-	}
 	window->totalColors = config->totalColors;
 
 	// add us to the list
@@ -748,7 +743,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 		osd_work_item_release(wi);
 	} 
 	else
-		result = *((int *) complete_create_wt((void *) wp));
+		result = *((int *) complete_create_wt((void *) wp, 0));
 
 	// handle error conditions
 	if (result == 1)
@@ -766,7 +761,7 @@ error:
 //  (main thread)
 //============================================================
 
-static void *sdlwindow_video_window_destroy_wt(void *param)
+static void *sdlwindow_video_window_destroy_wt(void *param, int threadid)
 {
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window;
@@ -1080,7 +1075,7 @@ static void sdlwindow_init_ogl_context(void)
 //  (window thread)
 //============================================================
 
-static void *complete_create_wt(void *param)
+static void *complete_create_wt(void *param, int threadid)
 {
 	
 	worker_param *wp = (worker_param *) param;
@@ -1386,7 +1381,7 @@ static int64_t getusecs(void)
 }
 #endif
 
-static void *draw_video_contents_wt(void * param)
+static void *draw_video_contents_wt(void * param, int threadid)
 {
 	#ifndef SDLMAME_WIN32
 	const unsigned long frames_skip4fps = 100;

@@ -83,6 +83,7 @@ INLINE INT32 _osd_exchange32(INT32 volatile *ptr, INT32 exchange)
 #define osd_exchange32 _osd_exchange32
 #endif
 
+
 //============================================================
 //  osd_sync_add
 //============================================================
@@ -170,6 +171,25 @@ INLINE INT64 _osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 e
 	return ret;
 }
 #define osd_compare_exchange64 _osd_compare_exchange64
+
+
+//============================================================
+//  osd_exchange64
+//============================================================
+
+ATTR_UNUSED
+INLINE INT64 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
+{
+	register INT64 ret;
+	__asm__ __volatile__ (
+		" lock ; xchg %[exchange], %[ptr] ;"
+		: [ptr]      "+m" (*ptr)
+		, [ret]      "=r" (ret)
+		: [exchange] "1"  (exchange)
+	);
+	return ret;
+}
+#define osd_exchange64 _osd_exchange64
 
 #endif /* __x86_64__ */
 
@@ -323,6 +343,28 @@ INLINE INT64 _osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 e
 	return ret;
 }
 #define osd_compare_exchange64 _osd_compare_exchange64
+
+
+//============================================================
+//  osd_exchange64
+//============================================================
+
+ATTR_UNUSED
+INLINE INT64 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
+{
+	register INT32 ret;
+	__asm__ __volatile__ (
+		"1: lwarx  %[ret], 0, %[ptr]      \n"
+		"   stwcx. %[exchange], 0, %[ptr] \n"
+		"   bne-   1b                     \n"
+		: [ret]      "=&r" (ret)
+		: [ptr]      "r"   (ptr)
+		, [exchange] "r"   (exchange)
+		: "cr0"
+	);
+	return ret;
+}
+#define osd_exchange64 _osd_exchange64
 
 #endif /* __ppc64__ || __PPC64__ */
 

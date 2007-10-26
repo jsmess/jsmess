@@ -358,6 +358,10 @@ osd_ticks_t osd_ticks(void)
 
 osd_ticks_t osd_ticks_per_second(void)
 {
+	if (ticks_per_second == 0)
+	{
+		return 1;	// this isn't correct, but it prevents the crash
+	}
 	return ticks_per_second;
 }
 
@@ -369,7 +373,21 @@ osd_ticks_t osd_ticks_per_second(void)
 
 osd_ticks_t osd_profiling_ticks(void)
 {
+#if defined(__i386__) || defined(__x86_64__)
+	UINT64 result;
+	UINT32 r1, r2;
+
+	// use RDTSC
+	__asm__ __volatile__ (
+		"rdtsc"
+		: "=a" (r1), "=d" (r2)
+	);
+
+	result = ((UINT64)r2<<32) | (UINT64)r1;
+	return result;
+#else
 	return (*ticks_counter)();
+#endif
 }
 
 //============================================================

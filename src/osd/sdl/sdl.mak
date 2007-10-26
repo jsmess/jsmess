@@ -58,10 +58,6 @@ CFLAGS += $(OPT_FLAGS)
 #-------------------------------------------------
 
 # disable DRC cores for PowerPC builds
-ifdef G3
-PPC = 1
-endif
-
 ifdef G4
 PPC = 1
 endif
@@ -97,7 +93,7 @@ endif	# PPC
 endif	# SYMBOLS
 
 # add an ARCH define
-DEFS += -DSDLMAME_ARCH="$(ARCH)"
+DEFS += "-DSDLMAME_ARCH=$(ARCH)"
 
 # add SDLMAME TARGETOS definitions
 ifeq ($(TARGETOS),linux)
