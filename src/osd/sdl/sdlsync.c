@@ -47,6 +47,11 @@
 struct _osd_lock {
  	volatile pthread_t	holder;
 	INT32				count;
+#ifdef PTR64
+	INT8				padding[52];	// Fill a 64-byte cache line
+#else
+	INT8				padding[56];	// A bit more padding
+#endif
 };
  
 struct _osd_event {
@@ -54,10 +59,15 @@ struct _osd_event {
 	pthread_cond_t 		cond;
 	volatile INT32		autoreset;
 	volatile INT32		signalled;
+#ifdef PTR64
+	INT8				padding[40];	// Fill a 64-byte cache line
+#else
+	INT8				padding[48];	// A bit more padding
+#endif
 };
 
 struct _osd_thread {
-	pthread_t		thread;
+	pthread_t			thread;
 };
 
 static osd_lock			*atomic_lck = NULL;
@@ -93,7 +103,7 @@ osd_lock *osd_lock_alloc(void)
 
 	lock = (osd_lock *)calloc(1, sizeof(osd_lock));
 
-	lock->holder = NULL;
+	lock->holder = 0;
 	lock->count = 0;
 
 	return lock;
@@ -108,8 +118,8 @@ void osd_lock_acquire(osd_lock *lock)
 	pthread_t current, prev;
 
 	current = pthread_self();
-	prev = osd_compare_exchange_pthread_t(&lock->holder, NULL, current);
-	if (prev != NULL && prev != current)
+	prev = osd_compare_exchange_pthread_t(&lock->holder, 0, current);
+	if (prev != (size_t)NULL && prev != current)
 	{
 		do {
 			register INT32 spin = 10000; // Convenient spin count
@@ -120,9 +130,9 @@ void osd_lock_acquire(osd_lock *lock)
 				"   mov    %[holder], %[tmp] ;"
 				"   test   %[tmp], %[tmp]    ;"
 				"   loopne 1b                ;"
-				: [spin]   "+c" (spin)
+				: [spin]   "+c"  (spin)
 				, [tmp]    "=&r" (tmp)
-				: [holder] "m"  (lock->holder)
+				: [holder] "m"   (lock->holder)
 				: "%cc"
 			);
 #elif defined(__ppc__) || defined(__PPC__)
@@ -164,7 +174,7 @@ void osd_lock_acquire(osd_lock *lock)
 				nanosleep(&sleep, &remaining); // sleep for 100us
 			}
 #endif
-		} while (osd_compare_exchange_pthread_t(&lock->holder, NULL, current) != NULL);
+		} while (osd_compare_exchange_pthread_t(&lock->holder, 0, current) != (size_t)NULL);
 	}
 	lock->count++;
 }
@@ -178,8 +188,8 @@ int osd_lock_try(osd_lock *lock)
 	pthread_t current, prev;
 
 	current = pthread_self();
-	prev = osd_compare_exchange_pthread_t(&lock->holder, NULL, current);
-	if (prev == NULL || prev == current)
+	prev = osd_compare_exchange_pthread_t(&lock->holder, 0, current);
+	if (prev == (size_t)NULL || prev == current)
 	{
 		lock->count++;
 		return 1;
@@ -200,10 +210,10 @@ void osd_lock_release(osd_lock *lock)
 	{
 		if (--lock->count == 0)
 #if defined(__ppc__) || defined(__PPC__) || defined(__ppc64__) || defined(__PPC64__)
-		lock->holder = NULL;
+		lock->holder = 0;
 		__asm__ __volatile__( " eieio " : : );
 #else
-		osd_exchange_pthread_t(&lock->holder, NULL);
+		osd_exchange_pthread_t(&lock->holder, 0);
 #endif
 		return;
 	}

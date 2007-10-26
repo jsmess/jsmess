@@ -352,11 +352,11 @@ INLINE INT64 _osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 e
 ATTR_UNUSED
 INLINE INT64 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 {
-	register INT32 ret;
+	register INT64 ret;
 	__asm__ __volatile__ (
-		"1: lwarx  %[ret], 0, %[ptr]      \n"
-		"   stwcx. %[exchange], 0, %[ptr] \n"
-		"   bne-   1b                     \n"
+		"1: ldarx  %[ret], 0, %[ptr]      \n"
+		"   stdcx. %[exchange], 0, %[ptr] \n"
+		"   bne--  1b                     \n"
 		: [ret]      "=&r" (ret)
 		: [ptr]      "r"   (ptr)
 		, [exchange] "r"   (exchange)
