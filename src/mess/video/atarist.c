@@ -101,7 +101,7 @@ static TIMER_CALLBACK(atarist_glue_tick)
 			shifter.h = CLEAR_LINE;
 			break;
 		case ATARIST_HBSTART_PAL/4:
-			cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
 			shifter.ofs += (shifter.lineofs * 2); // STe
 			break;
 		}
@@ -115,8 +115,11 @@ static TIMER_CALLBACK(atarist_glue_tick)
 			shifter.v = CLEAR_LINE;
 			break;
 		case ATARIST_VBSTART_PAL:
-			cpunum_set_input_line(0, MC68000_IRQ_4, ASSERT_LINE);
-			shifter.ofs = shifter.base;
+			if (hcount == 0)
+			{
+				cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+				shifter.ofs = shifter.base;
+			}
 			break;
 		}
 	}
@@ -133,7 +136,7 @@ static TIMER_CALLBACK(atarist_glue_tick)
 			shifter.h = CLEAR_LINE;
 			break;
 		case ATARIST_HBSTART_NTSC/4:
-			cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
 			shifter.ofs += (shifter.lineofs * 2); // STe
 			break;
 		}
@@ -147,8 +150,11 @@ static TIMER_CALLBACK(atarist_glue_tick)
 			shifter.v = CLEAR_LINE;
 			break;
 		case ATARIST_VBSTART_NTSC:
-			cpunum_set_input_line(0, MC68000_IRQ_4, ASSERT_LINE);
-			shifter.ofs = shifter.base;
+			if (hcount == 0)
+			{
+				cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+				shifter.ofs = shifter.base;
+			}
 			break;
 		}
 	}

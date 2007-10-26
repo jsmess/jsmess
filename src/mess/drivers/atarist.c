@@ -76,7 +76,7 @@ static void atarist_fdc_dma_transfer(void)
 
 	if ((fdc.mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
 	{
-		if (fdc.sectors > 0)
+		while (fdc.sectors > 0)
 		{
 			if (fdc.mode & ATARIST_FLOPPY_MODE_WRITE)
 			{
@@ -112,20 +112,20 @@ static void atarist_fdc_callback(wd17xx_state_t event, void *param)
 	switch (event)
 	{
 	case WD17XX_IRQ_SET:
-		fdc.irq = ASSERT_LINE;
+		fdc.irq = 1;
 		break;
 
 	case WD17XX_IRQ_CLR:
-		fdc.irq = CLEAR_LINE;
+		fdc.irq = 0;
 		break;
 
 	case WD17XX_DRQ_SET:
-		fdc.status &= ~ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
+		fdc.status |= ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
 		atarist_fdc_dma_transfer();
 		break;
 
 	case WD17XX_DRQ_CLR:
-		fdc.status |= ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
+		fdc.status &= ~ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
 		break;
 	}
 }
@@ -191,6 +191,7 @@ static WRITE16_HANDLER( atarist_fdc_dma_mode_w )
 	if ((data & ATARIST_FLOPPY_MODE_WRITE) != (fdc.mode & ATARIST_FLOPPY_MODE_WRITE))
 	{
 		fdc.status = 0;
+		fdc.sectors = 0;
 	}
 
 	fdc.mode = data;
@@ -217,17 +218,16 @@ static WRITE16_HANDLER( atarist_fdc_dma_base_w )
 	{
 	case 0:
 		fdc.dmabase = (fdc.dmabase & 0x00ffff) | ((data & 0xff) << 16);
-		fdc.dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
 		break;
 	case 1:
-		fdc.dmabase = (fdc.dmabase & 0xff00ff) | ((data & 0xff) << 8);
-		fdc.dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
+		fdc.dmabase = (fdc.dmabase & 0x0000ff) | ((data & 0xff) << 8);
 		break;
 	case 2:
-		fdc.dmabase = (fdc.dmabase & 0xffff00) | (data & 0xff);
-		fdc.dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
+		fdc.dmabase = data & 0xff;
 		break;
 	}
+	
+	fdc.dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
 }
 
 /* MMU */
@@ -883,7 +883,7 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(atarist_blitter_count_y_r, atarist_blitter_count_y_w)
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_msb_w)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
 //	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
@@ -988,7 +988,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_msb_w)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
 //	AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE(megaste_scc8530_r, megaste_scc8530_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
@@ -1388,9 +1388,19 @@ static READ8_HANDLER( mfp_gpio_r )
 	return data;
 }
 
-static void mfp_interrupt(int which, int state, int vector)
+static int atarist_int_ack(int line)
 {
-	cpunum_set_input_line_and_vector(0, MC68000_IRQ_6, state, vector);
+	if (line == MC68000_IRQ_6)
+	{
+		return mfp68901_get_vector(0);
+	}
+
+	return MC68000_INT_ACK_AUTOVECTOR;
+}
+
+static void mfp_interrupt(int which, int state)
+{
+	cpunum_set_input_line(0, MC68000_IRQ_6, state);
 }
 
 static UINT8 mfp_rx, mfp_tx;
@@ -1458,6 +1468,9 @@ static void atarist_configure_memory(void)
 static void atarist_state_save(void)
 {
 	memset(&fdc, 0, sizeof(fdc));
+
+	fdc.status |= ATARIST_FLOPPY_STATUS_DMA_ERROR;
+
 	memset(&ikbd, 0, sizeof(ikbd));
 
 	state_save_register_global(mmu);
@@ -1492,6 +1505,8 @@ static MACHINE_START( atarist )
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 	mfp68901_config(0, &mfp_intf);
+
+	cpunum_set_irq_callback(0, atarist_int_ack);
 }
 
 static struct rp5c15_interface rtc_intf = 
@@ -1578,6 +1593,8 @@ static MACHINE_START( atariste )
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 	mfp68901_config(0, &atariste_mfp_intf);
+
+	cpunum_set_irq_callback(0, atarist_int_ack);
 
 	dmasound_timer = mame_timer_alloc(atariste_dmasound_tick);
 	microwire_timer = mame_timer_alloc(atariste_microwire_tick);
@@ -1714,6 +1731,8 @@ static MACHINE_START( stbook )
 	acia6850_config(1, &acia_midi_intf);
 	mfp68901_config(0, &stbook_mfp_intf);
 	rp5c15_init(&rtc_intf);
+
+	cpunum_set_irq_callback(0, atarist_int_ack);
 }
 
 static MACHINE_DRIVER_START( atarist )

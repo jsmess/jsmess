@@ -2,9 +2,10 @@
 
 	TODO:
 
+	- poll TAI/TBI pins
 	- daisy chaining
 	- correct irq_timer period
-	- disable GPIO3/4 interrupts when timer A/B in event count or pulse mode
+	- disable GPIO3/4 interrupts when timer A/B in pulse mode
 	- spurious interrupt
 
 		If you look at the MFP datasheet it is obvious that it can generate the conditions for a spurious interrupt. 
@@ -62,6 +63,7 @@ typedef struct
 	int	rx_parity, tx_parity;
 	int	rx_state, tx_state, xmit_state;
 	int rxtx_word, rxtx_start, rxtx_stop;
+
 	mame_timer *rx_timer, *tx_timer;
 } mfp_68901;
 
@@ -89,6 +91,14 @@ static const int MFP68901_GPIO_TIMER[] =
 };
 
 static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
+
+static void mfp68901_check_interrupts(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	int intr = (mfp_p->ipr & mfp_p->imr) ? HOLD_LINE : CLEAR_LINE;
+	mfp_p->intf->irq_callback(which, intr);
+}
 
 static void mfp68901_poll_gpio(int which)
 {
@@ -123,44 +133,10 @@ static void mfp68901_poll_gpio(int which)
 	mfp_p->gpip = (gpio & ~mfp_p->ddr) | (mfp_p->gpip & mfp_p->ddr);
 }
 
-static void mfp68901_irq_ack(int which)
-{
-	mfp_68901 *mfp_p = &mfp[which];
-
-	int ch;
-
-	for (ch = 15; ch >= 0; ch--) // loop thru each channel from 15 to 0
-	{
-		if (BIT(mfp_p->isr, ch)) // if interrupt channel is in service...
-		{
-			return; // don't process lower priority channels
-		}
-
-		if (BIT(mfp_p->imr, ch)) // if interrupt mask bit is set...
-		{
-			if (BIT(mfp_p->ipr, ch)) // AND interrupt pending bit is set...
-			{
-				logerror("MFP68901 #%u Interrupt Fired on Channel %u\n", which, ch);
-
-				mfp_p->ipr &= ~(1 << ch); // clear interrupt pending bit
-
-				if (mfp_p->vr & MFP68901_VR_S) // if software end-of-interrupt mode is enabled...
-				{
-					mfp_p->isr |= (1 << ch); // set interrupt in service bit (bit will be cleared later by the interrupt service routine)
-				}
-
-				mfp_p->intf->irq_callback(which, HOLD_LINE, (mfp_p->vr & 0xf0) | ch); // fire interrupt callback
-
-				return;
-			}
-		}
-	}
-}
-
 static TIMER_CALLBACK( mfp68901_tick )
 {
 	mfp68901_poll_gpio(param);
-	mfp68901_irq_ack(param);
+	mfp68901_check_interrupts(param);
 }
 
 /* USART */
@@ -586,22 +562,26 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		logerror("MFP68901 #%u Interrupt Enable Register A : %x\n", which, data);
 		mfp_p->ier = (data << 8) | (mfp_p->ier & 0xff);
 		mfp_p->ipr &= mfp_p->ier;
+		mfp68901_check_interrupts(which);
 		break;
 
 	case MFP68901_REGISTER_IERB:
 		logerror("MFP68901 #%u Interrupt Enable Register B : %x\n", which, data);
 		mfp_p->ier = (mfp_p->ier & 0xff00) | data;
 		mfp_p->ipr &= mfp_p->ier;
+		mfp68901_check_interrupts(which);
 		break;
 
 	case MFP68901_REGISTER_IPRA:
 		logerror("MFP68901 #%u Interrupt Pending Register A : %x\n", which, data);
 		mfp_p->ipr &= (data << 8) | (mfp_p->ipr & 0xff);
+		mfp68901_check_interrupts(which);
 		break;
 
 	case MFP68901_REGISTER_IPRB:
 		logerror("MFP68901 #%u Interrupt Pending Register B : %x\n", which, data);
 		mfp_p->ipr &= (mfp_p->ipr & 0xff00) | data;
+		mfp68901_check_interrupts(which);
 		break;
 
 	case MFP68901_REGISTER_ISRA:
@@ -618,12 +598,14 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		logerror("MFP68901 #%u Interrupt Mask Register A : %x\n", which, data);
 		mfp_p->imr = (data << 8) | (mfp_p->imr & 0xff);
 		mfp_p->isr &= mfp_p->imr;
+		mfp68901_check_interrupts(which);
 		break;
 
 	case MFP68901_REGISTER_IMRB:
 		logerror("MFP68901 #%u Interrupt Mask Register B : %x\n", which, data);
 		mfp_p->imr = (mfp_p->imr & 0xff00) | data;
 		mfp_p->isr &= mfp_p->imr;
+		mfp68901_check_interrupts(which);
 		break;
 
 	case MFP68901_REGISTER_VR:
@@ -1073,16 +1055,6 @@ void mfp68901_ti_w(int which, int index, int value)
 	}
 }
 
-void mfp68901_tai_w(int which, int value)
-{
-	mfp68901_ti_w(which, MFP68901_TIMER_A, value);
-}
-
-void mfp68901_tbi_w(int which, int value)
-{
-	mfp68901_ti_w(which, MFP68901_TIMER_B, value);
-}
-
 static TIMER_CALLBACK( timer_a )
 {
 	mfp68901_timer_count(param, MFP68901_TIMER_A);
@@ -1101,6 +1073,66 @@ static TIMER_CALLBACK( timer_c )
 static TIMER_CALLBACK( timer_d )
 {
 	mfp68901_timer_count(param, MFP68901_TIMER_D);
+}
+
+/* External Interface */
+
+void mfp68901_tai_w(int which, int value)
+{
+	mfp68901_ti_w(which, MFP68901_TIMER_A, value);
+}
+
+void mfp68901_tbi_w(int which, int value)
+{
+	mfp68901_ti_w(which, MFP68901_TIMER_B, value);
+}
+
+int mfp68901_get_vector(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	int ch;
+
+	for (ch = 15; ch >= 0; ch--)
+	{
+		if (BIT(mfp_p->ipr, ch))
+		{
+			if (mfp_p->vr & MFP68901_VR_S)
+			{
+				mfp_p->isr |= (1 << ch);
+			}
+
+			mfp_p->ipr &= ~(1 << ch);
+
+			mfp68901_check_interrupts(which);
+
+			return (mfp_p->vr & 0xf0) | ch;
+		}
+	}
+
+	return MC68000_INT_ACK_SPURIOUS;
+}
+
+void mfp68901_reset(int which)
+{
+	mfp68901_register_w(which, MFP68901_REGISTER_GPIP, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_AER, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_DDR, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_IERA, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_IERB, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_IPRA, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_IPRB, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_ISRA, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_ISRB, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_IMRA, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_IMRB, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_VR, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_TACR, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_TBCR, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_TCDCR, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_SCR, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_UCR, 0);
+	mfp68901_register_w(which, MFP68901_REGISTER_RSR, 0);
 }
 
 void mfp68901_config(int which, const mfp68901_interface *intf)
@@ -1175,6 +1207,8 @@ void mfp68901_config(int which, const mfp68901_interface *intf)
 	state_save_register_item("mfp68901", which, mfp_p->rsr_read);
 	state_save_register_item("mfp68901", which, mfp_p->next_rsr);
 }
+
+/* Read/Write Handlers */
 
 READ16_HANDLER( mfp68901_0_register_msb_r ) { return mfp68901_register_r(0, offset) << 8; }
 READ16_HANDLER( mfp68901_1_register_msb_r ) { return mfp68901_register_r(1, offset) << 8; }

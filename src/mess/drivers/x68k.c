@@ -1408,22 +1408,24 @@ TIMER_CALLBACK( x68k_delayed_irq )
 		mame_timer_set(MAME_TIME_IN_CYCLES(32,0),param,x68k_delayed_irq);
 		return;
 	}
-	current_vector[6] = param;
-	cpunum_set_input_line_and_vector(0,6,HOLD_LINE,param);
+//	current_vector[6] = param;
+	cpunum_set_input_line(0,6,HOLD_LINE);
 }
 
-void mfp_irq_callback(int which, int state, int vector)
+void mfp_irq_callback(int which, int state)
 {
-	if(state == HOLD_LINE)
+	if(state == CLEAR_LINE)
+		cpunum_set_input_line(0,6,state);
+	else
 	{
-		if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
-		{
-			mame_timer_set(MAME_TIME_IN_CYCLES(32,0),vector,x68k_delayed_irq);
-			return;
-		}
-		current_vector[6] = vector;
-		cpunum_set_input_line_and_vector(0,6,state,vector);
-//		logerror("MFP IRQ callback: state=%i,vector=0x%02x\n",state,vector);
+//		if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+//		{
+//			mame_timer_set(MAME_TIME_IN_CYCLES(32,0),0,x68k_delayed_irq);
+//			return;
+//		}
+//		current_vector[6] = vector;
+		cpunum_set_input_line(0,6,state);
+//		logerror("MFP IRQ callback: state=%i\n",state);
 	}
 }
 
@@ -1445,15 +1447,6 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 
 static int x68k_int_ack(int line)
 {
-	cpunum_set_input_line_and_vector(0,line,CLEAR_LINE,current_vector[line]);
-	if(line == 1)  // IOSC
-	{
-		sys.ioc.irqstatus &= ~0xf0;
-	}
-	if(line == 5)  // SCC
-	{
-		sys.mouse.irqactive = 0;
-	}
 	if(line == 6)  // MFP
 	{
 //		if(sys.mfp.isra & 0x10)
@@ -1476,6 +1469,19 @@ static int x68k_int_ack(int line)
 //				sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
 //		}
 		sys.mfp.current_irq = -1;
+		current_vector[6] = mfp68901_get_vector(0);
+		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],line);
+		return current_vector[6];
+	}
+
+	cpunum_set_input_line_and_vector(0,line,CLEAR_LINE,current_vector[line]);
+	if(line == 1)  // IOSC
+	{
+		sys.ioc.irqstatus &= ~0xf0;
+	}
+	if(line == 5)  // SCC
+	{
+		sys.mouse.irqactive = 0;
 	}
 
 	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[line],line);
@@ -1517,9 +1523,9 @@ ADDRESS_MAP_END
 
 static mfp68901_interface mfp_interface =
 {
-	4000000, // 4MHz clock
-	4000000,
-	0,
+	2000000, // 4MHz clock
+	2000000,
+	MFP68901_TDO_LOOPBACK,
 	0,
 	&mfp_key,  // Rx
 	NULL,      // Tx
