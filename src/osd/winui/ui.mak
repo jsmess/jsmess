@@ -88,7 +88,7 @@ $(WINUISRC)/helpids.c : $(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/resource.h $(WINUIS
 	$(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/mame32.rc >$@
 
 # rule to build the generator
-$(WINUIOBJ)/mkhelp$(EXE): $(WINUIOBJ)/mkhelp.o
+$(WINUIOBJ)/mkhelp$(EXE): $(WINUIOBJ)/mkhelp.o $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
