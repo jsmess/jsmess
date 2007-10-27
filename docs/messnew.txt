@@ -4,6 +4,7 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Acorn System 1  [Dirk Best] (not working)
 - Atari STBook [Curt Coder] (not working)
+- Osborne-1 [Wilbert Pol] (not working)
 - Synertec Systems Corp. SYM-1  [Dirk Best] (not working)
 
 

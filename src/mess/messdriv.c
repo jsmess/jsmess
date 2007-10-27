@@ -392,6 +392,9 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 	DRIVER( at486 )		/* 19?? IBM AT 486									*/
 	DRIVER( at586 )		/* 19?? AT 586										*/
 
+	/* OSBORNE */
+	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
+
 	/* SINCLAIR RESEARCH */
 	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
 	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/

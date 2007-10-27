@@ -417,6 +417,7 @@ DRVLIBS = \
 	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/3do.a \
+	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/shared.a \
 #	$(MESSOBJ)/exeltel.a \
 
@@ -1140,6 +1141,10 @@ $(MESSOBJ)/cybiko.a:			\
 	$(MESS_VIDEO)/hd66421.o		\
 	$(MESS_MACHINE)/at45dbxx.o	\
 	$(MESS_MACHINE)/sst39vfx.o
+
+$(MESSOBJ)/osborne.a:			\
+	$(MESS_DRIVERS)/osborne1.o	\
+	$(MESS_MACHINE)/osborne1.o	\
 
 #-------------------------------------------------
 # layout dependencies
