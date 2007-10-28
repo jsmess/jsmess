@@ -148,7 +148,7 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_SCREEN_ADD( "main",0 )
 	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
 	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( osborne1 )
+	MDRV_VIDEO_UPDATE( generic_bitmapped )
 	MDRV_PALETTE_LENGTH( 3 )
 	MDRV_PALETTE_INIT( osborne1 )
 

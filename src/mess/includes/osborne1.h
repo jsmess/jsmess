@@ -13,6 +13,4 @@ WRITE8_HANDLER( osborne1_bankswitch_w );
 DRIVER_INIT( osborne1 );
 MACHINE_RESET( osborne1 );
 
-VIDEO_UPDATE( osborne1 );
-
 #endif

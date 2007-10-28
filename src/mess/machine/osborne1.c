@@ -22,10 +22,14 @@ static struct osborne1 {
 	int		pia_0_irq_state;
 	int		pia_1_irq_state;
 	/* video related */
-	UINT8	start_x;
+	UINT8	new_start_x;
+	UINT8	new_start_y;
+	mame_timer	*video_timer;
+	UINT8	*charrom;
+	UINT8	charline;
 	UINT8	start_y;
 	/* other outputs from the video pia */
-	UINT8	d0en;
+	UINT8	dden;
 	UINT8	beep;
 	UINT8	drive1;
 	UINT8	drive2;
@@ -153,8 +157,10 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 }
 
 static void osborne1_update_irq_state(void) {
-	if ( osborne1.pia_0_irq_state || osborne1.pia_1_irq_state ) {
-		cpunum_set_input_line( 0, 0, ASSERT_LINE );
+	logerror("Changing irq state; pia_0_irq_state = %s, pia_1_irq_state = %s\n", osborne1.pia_0_irq_state ? "SET" : "CLEARED", osborne1.pia_1_irq_state ? "SET" : "CLEARED" );
+
+	if ( osborne1.pia_1_irq_state ) {
+		cpunum_set_input_line_and_vector( 0, 0, ASSERT_LINE, 0xF8 );
 	} else {
 		cpunum_set_input_line( 0, 0, CLEAR_LINE );
 	}
@@ -181,14 +187,14 @@ static const pia6821_interface osborne1_ieee_pia_config = {
 };
 
 static WRITE8_HANDLER( video_pia_port_a_w ) {
-	osborne1.start_x = data >> 1;
-	osborne1.d0en = data & 0x01;
+	osborne1.new_start_x = data >> 1;
+	osborne1.dden = data & 0x01;
 
 	logerror("Video pia port a write: %02X\n", data );
 }
 
 static WRITE8_HANDLER( video_pia_port_b_w ) {
-	osborne1.start_y = data & 0x1F;
+	osborne1.new_start_y = data & 0x1F;
 	osborne1.beep = data & 0x20;
 	osborne1.drive1 = data & 0x40;
 	osborne1.drive2 = data & 0x80;
@@ -227,12 +233,66 @@ static const pia6821_interface osborne1_video_pia_config = {
 //	NULL	/* int_callback */
 //};
 
+static TIMER_CALLBACK(osborne1_video_callback) {
+	int y = video_screen_get_vpos(0);
+
+	/* Check for start of frame */
+	if ( y == 0 ) {
+		/* Clear CA1 on video PIA */
+		osborne1.start_y = osborne1.new_start_y;
+		osborne1.charline = 0;
+		logerror("Clear CA1 on video PIA\n");
+		pia_1_ca1_w( 0, 0 );
+	}
+	if ( y == 240 ) {
+		/* Set CA1 on video PIA */
+		logerror("Set CA1 on video PIA\n");
+		pia_1_ca1_w( 0, 0xFF );
+	}
+	if ( y < 240 ) {
+		/* Draw a line of the display */
+		UINT16 address = osborne1.start_y * 128 + osborne1.new_start_x + 10;
+		UINT16 *p = BITMAP_ADDR16( tmpbitmap, y, 0 );
+		int x;
+
+		for ( x = 0; x < 52; x++ ) {
+			UINT8	character = mess_ram[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
+			UINT8	cursor = character & 0x80;
+			UINT8	dim = mess_ram[ 0x10000 + ( ( address + x ) & 0xFFF ) ];
+			UINT8	bits = osborne1.charrom[ osborne1.charline * 128 + character ];
+			int		bit;
+
+			if ( cursor && osborne1.charline == 8 ) {
+				bits = 0xFF;
+			}
+			for ( bit = 0; bit < 8; bit++ ) {
+				p[x * 8 + bit] = ( bits & 0x80 ) ? ( dim ? 2 : 1 ) : 0;
+				bits = bits << 1;
+			}
+		}
+
+		osborne1.charline += 1;
+		if ( osborne1.charline == 10 ) {
+			osborne1.start_y += 1;
+			osborne1.charline = 0;
+		}
+	}
+
+	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, y + 1, 0 ), 0, time_never );
+}
+
 MACHINE_RESET( osborne1 ) {
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( 0x00, 0 );
 
 	osborne1.pia_0_irq_state = FALSE;
 	osborne1.pia_1_irq_state = FALSE;
+
+	osborne1.charrom = memory_region( REGION_GFX1 );
+
+	osborne1.video_timer = mame_timer_alloc( osborne1_video_callback );
+	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, 240, 0 ), 0, time_never );
+	pia_1_ca1_w( 0, 0 );
 }
 
 DRIVER_INIT( osborne1 ) {
@@ -245,37 +305,5 @@ DRIVER_INIT( osborne1 ) {
 
 	/* Configure the 6850 ACIA */
 //	acia6850_config( 0, &osborne1_6850_config );
-}
-
-VIDEO_UPDATE( osborne1 ) {
-	UINT8	*charrom = memory_region(REGION_GFX1);
-	UINT16	address = osborne1.start_y * 128 + osborne1.start_x + 10;
-	int x, y;
-
-	for ( y = 0; y < 24; y++ ) {
-		for ( x = 0; x < 52; x++ ) {
-			UINT8	character = mess_ram[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
-			UINT8	underline = character & 0x80;
-			UINT8	dim = mess_ram[ 0x10000 + ( ( address + x ) & 0xFFF ) ];
-			int line;
-
-			character = character & 0x7F;
-			for ( line = 0; line < 10; line++ ) {
-				UINT16 *p = BITMAP_ADDR16( bitmap, y * 10 + line, x * 8 );
-				int bits = charrom[ line * 128 + character ];
-				int bit;
-
-				if ( underline && line == 8 ) {
-					bits = 0xFF;
-				}
-				for ( bit = 0; bit < 8; bit++ ) {
-					p[bit] = ( bits & 0x80 ) ? ( dim ? 2 : 1 ) : 0;
-					bits = bits << 1;
-				}
-			}
-		}
-		address += 128;
-	}
-	return 0;
 }
 
