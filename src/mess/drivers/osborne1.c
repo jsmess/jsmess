@@ -34,6 +34,7 @@ The actual banking is done through I/O ports 00-03.
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "inputx.h"
+#include "devices/basicdsk.h"
 #include "includes/osborne1.h"
 
 #define MAIN_CLOCK	15974400
@@ -174,7 +175,17 @@ ROM_START( osborne1 )
 	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
+static void osborne1_floppy_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
+	switch( state ) {
+	case DEVINFO_INT_COUNT:				info->i = 2; break;
+	case DEVINFO_PTR_LOAD:				info->load = device_load_osborne1_floppy; break;
+	case DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "img" ); break;
+	default:							legacybasicdsk_device_getinfo( devclass, state, info ); break;
+	}
+}
+
 SYSTEM_CONFIG_START( osborne1 )
+	CONFIG_DEVICE( osborne1_floppy_getinfo )
 	CONFIG_RAM_DEFAULT( 68 * 1024 )		/* 64KB Main RAM and 4Kbit video attribute RAM */
 SYSTEM_CONFIG_END
 
