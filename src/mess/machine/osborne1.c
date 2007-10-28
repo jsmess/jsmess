@@ -1,5 +1,10 @@
 /***************************************************************************
 
+There are three IRQ sources:
+- IRQ0
+- IRQ1 = IRQA from the video PIA
+- IRQ2 = IRQA from the IEEE488 PIA
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -13,6 +18,9 @@ static struct osborne1 {
 	UINT8	bank3_enabled;
 	UINT8	*bank4_ptr;
 	UINT8	*empty_4K;
+	/* IRQ states */
+	int		pia_0_irq_state;
+	int		pia_1_irq_state;
 	/* video related */
 	UINT8	start_x;
 	UINT8	start_y;
@@ -144,6 +152,19 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 	memory_set_bankptr( 4, osborne1.bank4_ptr );
 }
 
+static void osborne1_update_irq_state(void) {
+	if ( osborne1.pia_0_irq_state || osborne1.pia_1_irq_state ) {
+		cpunum_set_input_line( 0, 0, ASSERT_LINE );
+	} else {
+		cpunum_set_input_line( 0, 0, CLEAR_LINE );
+	}
+}
+
+static void ieee_pia_irq_a_func(int state) {
+	osborne1.pia_0_irq_state = state;
+	osborne1_update_irq_state();
+}
+
 static const pia6821_interface osborne1_ieee_pia_config = {
 	NULL,	/* in_a_func */
 	NULL,	/* in_b_func */
@@ -155,7 +176,7 @@ static const pia6821_interface osborne1_ieee_pia_config = {
 	NULL,	/* out_b_func */
 	NULL,	/* out_ca2_func */
 	NULL,	/* out_cb2_func */
-	NULL,	/* irq_a_func */
+	ieee_pia_irq_a_func,	/* irq_a_func */
 	NULL	/* irq_b_func */
 };
 
@@ -176,11 +197,8 @@ static WRITE8_HANDLER( video_pia_port_b_w ) {
 }
 
 static void video_pia_irq_a_func(int state) {
-	if ( state ) {
-		cpunum_set_input_line( 0, 0, ASSERT_LINE );
-	} else {
-		cpunum_set_input_line( 0, 0, CLEAR_LINE );
-	}
+	osborne1.pia_1_irq_state = state;
+	osborne1_update_irq_state();
 }
 
 static const pia6821_interface osborne1_video_pia_config = {
@@ -212,6 +230,9 @@ static const pia6821_interface osborne1_video_pia_config = {
 MACHINE_RESET( osborne1 ) {
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( 0x00, 0 );
+
+	osborne1.pia_0_irq_state = FALSE;
+	osborne1.pia_1_irq_state = FALSE;
 }
 
 DRIVER_INIT( osborne1 ) {
@@ -228,7 +249,7 @@ DRIVER_INIT( osborne1 ) {
 
 VIDEO_UPDATE( osborne1 ) {
 	UINT8	*charrom = memory_region(REGION_GFX1);
-	UINT16	address = osborne1.start_y * 128 + osborne1.start_x;
+	UINT16	address = osborne1.start_y * 128 + osborne1.start_x + 10;
 	int x, y;
 
 	for ( y = 0; y < 24; y++ ) {
@@ -244,7 +265,7 @@ VIDEO_UPDATE( osborne1 ) {
 				int bits = charrom[ line * 128 + character ];
 				int bit;
 
-				if ( underline && line == 9 ) {
+				if ( underline && line == 8 ) {
 					bits = 0xFF;
 				}
 				for ( bit = 0; bit < 8; bit++ ) {
