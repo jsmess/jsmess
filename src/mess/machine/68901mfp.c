@@ -1095,7 +1095,7 @@ int mfp68901_get_vector(int which)
 
 	for (ch = 15; ch >= 0; ch--)
 	{
-		if (BIT(mfp_p->ipr, ch))
+		if (BIT(mfp_p->imr, ch) && BIT(mfp_p->ipr, ch))
 		{
 			if (mfp_p->vr & MFP68901_VR_S)
 			{

@@ -148,7 +148,7 @@ UINT16* sram;   // SRAM
 extern UINT16* x68k_spriteram;  // sprite/background RAM
 extern UINT16* x68k_spritereg;  // sprite/background registers
 UINT8 ppi_port[3];
-UINT8 current_vector[8];
+int current_vector[8];
 UINT8 current_irq_line;
 unsigned int x68k_scanline;
 
@@ -341,6 +341,7 @@ void mfp_set_timer(int timer, unsigned char data)
 
 }
 */
+
 // 4 channel DMA controller (Hitachi HD63450)
 WRITE16_HANDLER( x68k_dmac_w )
 {
@@ -764,7 +765,7 @@ void fdc_irq(int state)
 		sys.ioc.irqstatus |= 0x80;
 		current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cpunum_set_input_line_and_vector(0,1,ASSERT_LINE,current_vector[1]);
+		cpunum_set_input_line_and_vector(0,1,HOLD_LINE,current_vector[1]);
 	}
 }
 
@@ -1401,32 +1402,15 @@ READ8_HANDLER(mfp_gpio_r)
 	return data;
 }
 
-TIMER_CALLBACK( x68k_delayed_irq )
-{
-	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
-	{
-		mame_timer_set(MAME_TIME_IN_CYCLES(32,0),param,x68k_delayed_irq);
-		return;
-	}
-//	current_vector[6] = param;
-	cpunum_set_input_line(0,6,HOLD_LINE);
-}
-
 void mfp_irq_callback(int which, int state)
 {
-	if(state == CLEAR_LINE)
-		cpunum_set_input_line(0,6,state);
-	else
-	{
-//		if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
-//		{
-//			mame_timer_set(MAME_TIME_IN_CYCLES(32,0),0,x68k_delayed_irq);
-//			return;
-//		}
-//		current_vector[6] = vector;
-		cpunum_set_input_line(0,6,state);
-//		logerror("MFP IRQ callback: state=%i\n",state);
-	}
+	static int prev;
+	if(prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
+		return;
+	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+		return;
+	cpunum_set_input_line(0,6,state);
+	prev = state;
 }
 
 static INTERRUPT_GEN( x68k_vsync_irq )
