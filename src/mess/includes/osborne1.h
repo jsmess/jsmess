@@ -1,6 +1,8 @@
 #ifndef __OSBORNE1_H
 #define __OSBORNE1_H
 
+extern const struct z80_irq_daisy_chain osborne1_daisy_chain[];
+
 WRITE8_HANDLER( osborne1_0000_w );
 WRITE8_HANDLER( osborne1_1000_w );
 READ8_HANDLER( osborne1_2000_r );

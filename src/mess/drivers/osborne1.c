@@ -35,6 +35,7 @@ The actual banking is done through I/O ports 00-03.
 #include "cpu/z80/z80.h"
 #include "inputx.h"
 #include "devices/basicdsk.h"
+#include "cpu/z80/z80daisy.h"
 #include "includes/osborne1.h"
 
 #define MAIN_CLOCK	15974400
@@ -141,6 +142,7 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_CPU_ADD_TAG( "main", Z80, MAIN_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP( osborne1_mem, 0 )
 	MDRV_CPU_IO_MAP( osborne1_io, 0 )
+	MDRV_CPU_CONFIG( osborne1_daisy_chain )
 
 	MDRV_MACHINE_RESET( osborne1 )
 

@@ -11,9 +11,10 @@ There are three IRQ sources:
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "includes/osborne1.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
+#include "cpu/z80/z80daisy.h"
+#include "includes/osborne1.h"
 
 static struct osborne1 {
 	UINT8	bank2_enabled;
@@ -33,6 +34,18 @@ static struct osborne1 {
 	/* other outputs from the video pia */
 	UINT8	beep;
 } osborne1;
+
+/* Prototypes */
+static void osborne1_z80_reset(int);
+static int osborne1_z80_irq_state(int);
+static int osborne1_z80_irq_ack(int);
+static void osborne1_z80_irq_reti(int);
+
+const struct z80_irq_daisy_chain osborne1_daisy_chain[] = {
+	{ osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 },
+	{ NULL, NULL, NULL, NULL, -1 }
+};
+
 
 WRITE8_HANDLER( osborne1_0000_w ) {
 	/* Check whether regular RAM is enabled */
@@ -157,13 +170,28 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 	memory_set_bankptr( 4, osborne1.bank4_ptr );
 }
 
+static void osborne1_z80_reset(int param) {
+	osborne1.pia_1_irq_state = 0;
+}
+
+static int osborne1_z80_irq_state(int param) {
+	return ( osborne1.pia_1_irq_state ? Z80_DAISY_INT : 0 );
+}
+
+static int osborne1_z80_irq_ack(int param) {
+	/* Enable ROM and I/O when IRQ is acknowledged */
+	osborne1_bankswitch_w( 0, 0 );
+	return 0xF8;
+}
+
+static void osborne1_z80_irq_reti(int param) {
+}
+
 static void osborne1_update_irq_state(void) {
 	//logerror("Changing irq state; pia_0_irq_state = %s, pia_1_irq_state = %s\n", osborne1.pia_0_irq_state ? "SET" : "CLEARED", osborne1.pia_1_irq_state ? "SET" : "CLEARED" );
 
 	if ( osborne1.pia_1_irq_state ) {
-		/* ROM is enabled when an IRQ is received */
-		osborne1_bankswitch_w( 0, 0 );
-		cpunum_set_input_line_and_vector( 0, 0, ASSERT_LINE, 0xF8 );
+		cpunum_set_input_line( 0, 0, ASSERT_LINE );
 	} else {
 		cpunum_set_input_line( 0, 0, CLEAR_LINE );
 	}
