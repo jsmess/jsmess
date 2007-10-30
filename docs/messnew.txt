@@ -13,6 +13,9 @@ System Driver Changes:
 ----------------------
 - [COCO] Updated to use MAME's 6242 RTC implementation.  [tim lindner]
 
+- [COCO] Modified the CoCo's keyboard handler to pass along the tri-state
+  buffer from port B to port A. [tim lindner]
+
 - [PET] Updated to use MAME's CRTC6548 implementation.  [Wilbert Pol]
 
 - [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert
@@ -20,8 +23,7 @@ System Driver Changes:
 
 - [SYM1] Rewrote, still many issues and doesn't fully work.  [Dirk Best]
 
-- [COCO] Modified the CoCo's keyboard handler to pass along the tri-state
-   buffer from port B to port A. [tim lindner]
+- [X68000] Raster effects improvements.  [Barry Rodewald]
 
 
 

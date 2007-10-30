@@ -214,12 +214,12 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	sys.mfp.gpio &= ~0x40;  // GPIP6
 	if((readinputportbytag("options") & 0x01))
 	{
-		video_screen_update_partial(0,scan+1);
+		video_screen_update_partial(0,scan);
 	}
 
 	irq_time = video_screen_get_time_until_pos(0,scan,2);
 	if(mame_time_to_double(irq_time) > 0)
-		mame_timer_adjust(raster_irq,irq_time,scan,time_never);
+		mame_timer_adjust(raster_irq,irq_time,scan-1,time_never);
 	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(0));
 }
 
@@ -605,7 +605,7 @@ READ16_HANDLER( x68k_spriteram_r )
 {
 	return x68k_spriteram[offset];
 }
-void x68k_draw_gfx(mame_bitmap* bitmap)
+void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 {
 	int priority;
 	rectangle rect;
@@ -624,13 +624,13 @@ void x68k_draw_gfx(mame_bitmap* bitmap)
 			{
 				xscr = sys.crtc.hshift-(sys.crtc.reg[12] & 0x1ff);
 				yscr = sys.crtc.vshift-(sys.crtc.reg[13] & 0x1ff);
-				copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_16, 1, &xscr, 1, &yscr ,&rect, TRANSPARENCY_PEN,0); 
+				copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
 				xscr+=512;
-				copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_16, 1, &xscr, 1, &yscr ,&rect, TRANSPARENCY_PEN,0); 
+				copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
 				yscr+=512;
-				copyscrollbitmap(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&rect, TRANSPARENCY_PEN,0); 
+				copyscrollbitmap(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
 				xscr-=512;
-				copyscrollbitmap(bitmap, x68k_gfx_3_bitmap_16, 1, &xscr, 1, &yscr ,&rect, TRANSPARENCY_PEN,0); 
+				copyscrollbitmap(bitmap, x68k_gfx_3_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
 			}
 		}
 		else  // 512x512 "real" screen size
@@ -647,7 +647,7 @@ void x68k_draw_gfx(mame_bitmap* bitmap)
 					rect.max_y=rect.min_y + sys.crtc.visible_height-1;
 					xscr = sys.crtc.hshift-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vshift-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_65536, 1, &xscr, 1, &yscr,&rect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_65536, 1, &xscr, 1, &yscr,&cliprect, TRANSPARENCY_PEN,0); 
 				}
 				break;
 			case 0x01:
@@ -660,13 +660,13 @@ void x68k_draw_gfx(mame_bitmap* bitmap)
 				{
 					xscr = sys.crtc.hshift-(sys.crtc.reg[16] & 0x1ff);
 					yscr = sys.crtc.vshift-(sys.crtc.reg[17] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_256, 1, &xscr, 1, &yscr, &rect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_256, 1, &xscr, 1, &yscr, &cliprect, TRANSPARENCY_PEN,0); 
 				}
 				if(sys.video.reg[2] & 0x0001 && sys.video.reg[2] & 0x0002 && priority == sys.video.gfxlayer_pri[0])
 				{
 					xscr = sys.crtc.hshift-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vshift-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_256, 1, &xscr, 1, &yscr, &rect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_256, 1, &xscr, 1, &yscr, &cliprect, TRANSPARENCY_PEN,0); 
 				}
 				break;
 			case 0x00:
@@ -679,25 +679,25 @@ void x68k_draw_gfx(mame_bitmap* bitmap)
 				{
 					xscr = sys.crtc.hshift-(sys.crtc.reg[18] & 0x1ff);
 					yscr = sys.crtc.vshift-(sys.crtc.reg[19] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(3,GFX16), 1, &xscr, 1, &yscr ,&rect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_get_gfx_pri(3,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
 				}
 				if(sys.video.reg[2] & 0x0004)  // Pri2
 				{
 					xscr = sys.crtc.hshift-(sys.crtc.reg[16] & 0x1ff);
 					yscr = sys.crtc.vshift-(sys.crtc.reg[17] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(2,GFX16), 1, &xscr, 1, &yscr ,&rect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_get_gfx_pri(2,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
 				}
 				if(sys.video.reg[2] & 0x0002)  // Pri1
 				{
 					xscr = sys.crtc.hshift-(sys.crtc.reg[14] & 0x1ff);
 					yscr = sys.crtc.vshift-(sys.crtc.reg[15] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(1,GFX16), 1, &xscr, 1, &yscr ,&rect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_get_gfx_pri(1,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
 				}
 				if(sys.video.reg[2] & 0x0001)  // Pri0
 				{
 					xscr = sys.crtc.hshift-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vshift-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(0,GFX16), 1, &xscr, 1, &yscr ,&rect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_get_gfx_pri(0,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
 				}
 				break;
 			}
@@ -706,7 +706,7 @@ void x68k_draw_gfx(mame_bitmap* bitmap)
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-void x68k_draw_sprites(mame_bitmap* bitmap, int priority)
+void x68k_draw_sprites(mame_bitmap* bitmap, int priority, rectangle cliprect)
 {
 	/*
 	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
@@ -762,7 +762,7 @@ void x68k_draw_sprites(mame_bitmap* bitmap, int priority)
 
 			sx += sprite_shift;
 
-			drawgfx(bitmap,Machine->gfx[1],code,colour+0x10,xflip,yflip,sys.crtc.hshift+sx,sys.crtc.vshift+sy,&rect,TRANSPARENCY_PEN,0x00);
+			drawgfx(bitmap,Machine->gfx[1],code,colour+0x10,xflip,yflip,sys.crtc.hshift+sx,sys.crtc.vshift+sy,&cliprect,TRANSPARENCY_PEN,0x00);
 		}
 	}
 }
@@ -910,14 +910,18 @@ VIDEO_UPDATE( x68000 )
 		x68k_bg0 = x68k_bg0_16;
 		x68k_bg1 = x68k_bg1_16;
 	}
-	rect.max_x=sys.crtc.width;
-	rect.max_y=sys.crtc.height;
-	fillbitmap(bitmap,0,&rect);
+//	rect.max_x=sys.crtc.width;
+//	rect.max_y=sys.crtc.height;
+	fillbitmap(bitmap,0,cliprect);
 
 	rect.min_x=sys.crtc.hshift;
 	rect.min_y=sys.crtc.vshift;
 	rect.max_x=rect.min_x + sys.crtc.visible_width-1;
 	rect.max_y=rect.min_y + sys.crtc.visible_height-1;
+	if(rect.min_y < cliprect->min_y)
+		rect.min_y = cliprect->min_y;
+	if(rect.max_y > cliprect->max_y)
+		rect.max_y = cliprect->max_y;
 
 	// update tiles
 	for(x=0;x<256;x++)
@@ -938,12 +942,12 @@ VIDEO_UPDATE( x68000 )
 	{
 		// Graphics screen(s)
 		if(priority == sys.video.gfx_pri)
-			x68k_draw_gfx(bitmap);
+			x68k_draw_gfx(bitmap,rect);
 
 		// Sprite / BG Tiles
 		if(priority == sys.video.sprite_pri /*&& (x68k_spritereg[0x404] & 0x0200)*/ && (sys.video.reg[2] & 0x0040))
 		{
-			x68k_draw_sprites(bitmap,1);
+			x68k_draw_sprites(bitmap,1,rect);
 			if((x68k_spritereg[0x404] & 0x0008))
 			{
 				if((x68k_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
@@ -959,7 +963,7 @@ VIDEO_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(bitmap,2);
+			x68k_draw_sprites(bitmap,2,rect);
 			if((x68k_spritereg[0x404] & 0x0001))
 			{
 				if((x68k_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
@@ -975,7 +979,7 @@ VIDEO_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(bitmap,3);
+			x68k_draw_sprites(bitmap,3,rect);
 		}
 
 		// Text screen
