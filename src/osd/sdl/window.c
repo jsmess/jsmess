@@ -708,6 +708,11 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 	window->refresh = config->refresh;
 	window->monitor = monitor;
 	window->fullscreen = !video_config.windowed;
+	if (!window->fullscreen)
+	{
+		window->windowed_width = config->width;
+		window->windowed_height = config->height;
+	}
 	window->totalColors = config->totalColors;
 
 	// add us to the list
