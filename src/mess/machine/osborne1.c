@@ -161,6 +161,8 @@ static void osborne1_update_irq_state(void) {
 	//logerror("Changing irq state; pia_0_irq_state = %s, pia_1_irq_state = %s\n", osborne1.pia_0_irq_state ? "SET" : "CLEARED", osborne1.pia_1_irq_state ? "SET" : "CLEARED" );
 
 	if ( osborne1.pia_1_irq_state ) {
+		/* ROM is enabled when an IRQ is received */
+		osborne1_bankswitch_w( 0, 0 );
 		cpunum_set_input_line_and_vector( 0, 0, ASSERT_LINE, 0xF8 );
 	} else {
 		cpunum_set_input_line( 0, 0, CLEAR_LINE );
@@ -194,7 +196,7 @@ static WRITE8_HANDLER( video_pia_port_a_w ) {
 	osborne1.new_start_x = data >> 1;
 	wd17xx_set_density( ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
 
-	logerror("Video pia port a write: %02X\n", data );
+	logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "DEN_FM_LO" : "DEN_FM_HI" );
 }
 
 static WRITE8_HANDLER( video_pia_port_b_w ) {
@@ -247,12 +249,10 @@ static TIMER_CALLBACK(osborne1_video_callback) {
 		/* Clear CA1 on video PIA */
 		osborne1.start_y = osborne1.new_start_y;
 		osborne1.charline = 0;
-		logerror("Clear CA1 on video PIA\n");
 		pia_1_ca1_w( 0, 0 );
 	}
 	if ( y == 240 ) {
 		/* Set CA1 on video PIA */
-		logerror("Set CA1 on video PIA\n");
 		pia_1_ca1_w( 0, 0xFF );
 	}
 	if ( y < 240 ) {
