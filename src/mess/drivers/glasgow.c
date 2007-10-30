@@ -68,6 +68,8 @@ static WRITE16_HANDLER ( write_lcd_flag )
   lcd_flag=data>>8;
   //beep_set_state(0,lcd_flag&1?1:0);
   if (lcd_flag == 0) key_selector=1;
+ // The key function in the rom expects after writing to 
+ // the  a value from  the second key row;
   if (lcd_flag!=0) led7=255;else led7=0;
   logerror("LCD Flag 16  = %x \n  ",data);
 }
@@ -133,7 +135,8 @@ static READ16_HANDLER(read_newkeys16)  //Amsterdam, Roma
 static READ16_HANDLER(read_board)
 {
  UINT16 data;
-  data=board_value^0xff;
+  //data=board_value^0xff;
+  data=0xff;
   data=data<<8;
   logerror("read board Offset = %x \n  ",offset);
   return data;	// Mephisto need it for working
@@ -144,7 +147,9 @@ static WRITE16_HANDLER(write_board)
  UINT8 board;
  board=data>>8;
  board_value=board;
- if (board==0xff) key_selector=0;
+ if (board==0xff) key_selector=0;   
+ // The key function in the rom expects after writing to 
+ // the chess board a value from  the first key row;
   logerror("Write Board   = %x \n  ",data>>8);
 }
 
@@ -287,6 +292,12 @@ static ADDRESS_MAP_START(glasgow_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 
+
+
+
+
+
+
 static ADDRESS_MAP_START(amsterd_mem, ADDRESS_SPACE_PROGRAM, 16)
    // ADDRESS_MAP_FLAGS( AMEF_ABITS(19) )
     AM_RANGE( 0x0000, 0xffff )         AM_ROM
@@ -394,6 +405,7 @@ static MACHINE_DRIVER_START(glasgow )
 MACHINE_DRIVER_END
 
 
+
 static MACHINE_DRIVER_START(amsterd )
 	MDRV_IMPORT_FROM( glasgow )
 	/* basic machine hardware */
@@ -409,6 +421,7 @@ static MACHINE_DRIVER_START(dallas32 )
 	MDRV_CPU_PROGRAM_MAP(dallas32_mem, 0)
 	MDRV_MACHINE_START( dallas32 )
 MACHINE_DRIVER_END
+
 
 
 /***************************************************************************
@@ -464,7 +477,6 @@ ROM_END
 /***************************************************************************
   System config
 ***************************************************************************/
-
 
 
 /***************************************************************************
