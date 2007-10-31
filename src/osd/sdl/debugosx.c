@@ -533,10 +533,10 @@ int debugwin_is_debugger_visible(void)
 static debugwin_info *debug_window_create(const char *title, void *unused)
 {
 	CGDirectDisplayID	mainID = CGMainDisplayID();
+	HIRect				mainBounds;
 
 	debugwin_info *info = NULL;
 	Rect work_bounds;
-	HIRect				mainBounds;
 	
 	(void)unused;
 	
@@ -578,11 +578,15 @@ static debugwin_info *debug_window_create(const char *title, void *unused)
 	}
 	
 	// fill in some defaults
-	mainBounds = CGDisplayBounds( mainID );
+	HIWindowGetAvailablePositioningBounds( mainID, kHICoordSpaceScreenPixel, &mainBounds );
+	work_bounds.left = mainBounds.origin.x;
+	work_bounds.top = mainBounds.origin.y;
+	work_bounds.right = mainBounds.origin.x + mainBounds.size.width;
+	work_bounds.bottom = mainBounds.origin.y + mainBounds.size.height;
 	info->minwidth = 200;
 	info->minheight = 200;
-	info->maxwidth = mainBounds.size.width;
-	info->maxheight = mainBounds.size.height;
+	info->maxwidth = work_bounds.right - work_bounds.left;
+	info->maxheight = work_bounds.bottom - work_bounds.top;
 
 	// set the default handlers
 	info->handle_command = global_handle_command;
@@ -3015,7 +3019,7 @@ void console_create_window(void)
 {
 	debugwin_info *info;
 	int bestwidth, bestheight;
-	Rect bounds;
+	Rect bounds, work_bounds;
 	MenuRef optionsmenu, popupmenu;
 	UINT32 cpunum;
 	ControlFontStyleRec		style;
@@ -3142,7 +3146,11 @@ void console_create_window(void)
 		}
 
 	// get the work bounds
-	mainBounds = CGDisplayBounds( mainID );
+	HIWindowGetAvailablePositioningBounds( mainID, kHICoordSpaceScreenPixel, &mainBounds );
+	work_bounds.left = mainBounds.origin.x;
+	work_bounds.top = mainBounds.origin.y;
+	work_bounds.right = mainBounds.origin.x + mainBounds.size.width;
+	work_bounds.bottom = mainBounds.origin.y + mainBounds.size.height;
 
 	// adjust the min/max sizes for the window style
 	bounds.top = bounds.left = 0;
@@ -3156,13 +3164,13 @@ void console_create_window(void)
 	info->maxwidth = bounds.right - bounds.left;
 
 	// position the window at the bottom-right
-	bestwidth = (info->maxwidth < (mainBounds.size.width)) ? info->maxwidth : (mainBounds.size.width);
-	bestheight = (500 < (mainBounds.size.height)) ? 500 : (mainBounds.size.height);
+	bestwidth = (info->maxwidth < (work_bounds.right - work_bounds.left)) ? info->maxwidth : (work_bounds.right - work_bounds.left);
+	bestheight = (500 < (work_bounds.bottom - work_bounds.top)) ? 500 : (work_bounds.bottom - work_bounds.top);
 
-	bounds.left = (mainBounds.origin.x+mainBounds.size.width) - bestwidth;
-	bounds.top = (mainBounds.origin.y+mainBounds.size.height) - bestheight;
-	bounds.right = mainBounds.origin.x + bestwidth;
-	bounds.bottom = mainBounds.origin.y + bestheight;
+	bounds.left = work_bounds.right - bestwidth;
+	bounds.top = work_bounds.bottom - bestheight;
+	bounds.right = bounds.left + bestwidth;
+	bounds.bottom = bounds.top + bestheight;
 
 	SetWindowBounds(info->wnd, kWindowStructureRgn, &bounds );
 
