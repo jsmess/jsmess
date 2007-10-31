@@ -533,10 +533,10 @@ int debugwin_is_debugger_visible(void)
 static debugwin_info *debug_window_create(const char *title, void *unused)
 {
 	CGDirectDisplayID	mainID = CGMainDisplayID();
-	GDHandle			mainDevice;
 
 	debugwin_info *info = NULL;
 	Rect work_bounds;
+	HIRect				mainBounds;
 	
 	(void)unused;
 	
@@ -578,12 +578,11 @@ static debugwin_info *debug_window_create(const char *title, void *unused)
 	}
 	
 	// fill in some defaults
-	DMGetGDeviceByDisplayID((DisplayIDType)mainID, &mainDevice, TRUE);
-	GetAvailableWindowPositioningBounds(mainDevice, &work_bounds);
+	mainBounds = CGDisplayBounds( mainID );
 	info->minwidth = 200;
 	info->minheight = 200;
-	info->maxwidth = work_bounds.right - work_bounds.left;
-	info->maxheight = work_bounds.bottom - work_bounds.top;
+	info->maxwidth = mainBounds.size.width;
+	info->maxheight = mainBounds.size.height;
 
 	// set the default handlers
 	info->handle_command = global_handle_command;
@@ -3016,13 +3015,13 @@ void console_create_window(void)
 {
 	debugwin_info *info;
 	int bestwidth, bestheight;
-	Rect bounds, work_bounds;
+	Rect bounds;
 	MenuRef optionsmenu, popupmenu;
 	UINT32 cpunum;
 	ControlFontStyleRec		style;
 	Str255		fontName;
 	CGDirectDisplayID	mainID = CGMainDisplayID();
-	GDHandle			mainDevice;
+	HIRect				mainBounds;
 	MenuItemIndex	menuIndex;
 	ControlButtonContentInfo	content;
 
@@ -3143,8 +3142,7 @@ void console_create_window(void)
 		}
 
 	// get the work bounds
-	DMGetGDeviceByDisplayID((DisplayIDType)mainID, &mainDevice, TRUE);
-	GetAvailableWindowPositioningBounds(mainDevice, &work_bounds);
+	mainBounds = CGDisplayBounds( mainID );
 
 	// adjust the min/max sizes for the window style
 	bounds.top = bounds.left = 0;
@@ -3158,13 +3156,13 @@ void console_create_window(void)
 	info->maxwidth = bounds.right - bounds.left;
 
 	// position the window at the bottom-right
-	bestwidth = (info->maxwidth < (work_bounds.right - work_bounds.left)) ? info->maxwidth : (work_bounds.right - work_bounds.left);
-	bestheight = (500 < (work_bounds.bottom - work_bounds.top)) ? 500 : (work_bounds.bottom - work_bounds.top);
+	bestwidth = (info->maxwidth < (mainBounds.size.width)) ? info->maxwidth : (mainBounds.size.width);
+	bestheight = (500 < (mainBounds.size.height)) ? 500 : (mainBounds.size.height);
 
-	bounds.left = work_bounds.right - bestwidth;
-	bounds.top = work_bounds.bottom - bestheight;
-	bounds.right = bounds.left + bestwidth;
-	bounds.bottom = bounds.top + bestheight;
+	bounds.left = (mainBounds.origin.x+mainBounds.size.width) - bestwidth;
+	bounds.top = (mainBounds.origin.y+mainBounds.size.height) - bestheight;
+	bounds.right = mainBounds.origin.x + bestwidth;
+	bounds.bottom = mainBounds.origin.y + bestheight;
 
 	SetWindowBounds(info->wnd, kWindowStructureRgn, &bounds );
 
