@@ -17,8 +17,18 @@
 		  what happens on the real hardware, this has fixed the NitrOS9 boot
 		  problems.
   
+	2007-Nov-01 Wilbert Pol:
+		Needed these changes to get the MB8877 for Osborne-1 to work:
+		- Added support for multiple record read
+		- Changed the wd17xx_read_id to not return after DATADONEDELAY, but
+		  the host should read the id data through the data register. This
+		  was accomplished by making this change in the wd17xx_read_id
+		  function:
+			-               wd17xx_complete_command(w, DELAY_DATADONE);
+			+               wd17xx_set_data_request();
+
 	TODO:
-		- Multiple record read/write
+		- Multiple record write
 		- What happens if a track is read that doesn't have any id's on it?
 	     (e.g. unformatted disc)
 
@@ -623,7 +633,7 @@ static void wd17xx_read_id(wd17xx_info * w)
 		w->status |= STA_2_BUSY;
 		w->busy_count = 0;
 
-		wd17xx_complete_command(w, DELAY_DATADONE);
+		wd17xx_set_data_request();
 
 		logerror("read id succeeded.\n");
 	}
@@ -657,7 +667,7 @@ static int wd17xx_has_side_select(void)
 
 
 
-static int wd17xx_find_sector(wd17xx_info *w)
+static int wd17xx_locate_sector(wd17xx_info *w)
 {
 	UINT8 revolution_count;
 	chrn_id id;
@@ -698,6 +708,16 @@ static int wd17xx_find_sector(wd17xx_info *w)
 			/* update revolution count */
 			revolution_count++;
 		}
+	}
+	return 0;
+}
+
+
+static int wd17xx_find_sector(wd17xx_info *w)
+{
+	if ( wd17xx_locate_sector(w) )
+	{
+		return 1;
 	}
 
 	/* record not found */
@@ -1137,15 +1157,34 @@ READ8_HANDLER ( wd17xx_sector_r )
 				w->status |= STA_2_REC_TYPE;
 			}
 
-			/* not incremented after each sector - only incremented in multi-sector
-			operation. If this remained as it was oric software would not run! */
-		//	w->sector++;
-			/* Delay the INTRQ 3 byte times becuase we need to read two CRC bytes and
-			   compare them with a calculated CRC */
-			wd17xx_complete_command(w, DELAY_DATADONE);
+			/* Check we should handle the next sector for a multi record read */
+			if ( w->command_type == TYPE_II && w->command == FDC_READ_SEC && ( w->read_cmd & 0x10 ) ) {
+				w->sector++;
+				if (wd17xx_locate_sector(w))
+				{
+					w->data_count = w->sector_length;
 
-			if (VERBOSE)
-				logerror("wd17xx_data_r(): data read completed\n");
+					/* read data */
+					floppy_drive_read_sector_data(wd17xx_current_image(), hd, w->sector_data_id, (char *)w->buffer, w->sector_length);
+
+					wd17xx_timed_data_request();
+
+					w->status |= STA_2_BUSY;
+					w->busy_count = 0;
+				} else {
+					wd17xx_complete_command(w, DELAY_DATADONE);
+
+					if (VERBOSE)
+						logerror("wd17xx_data_r(): multi data read completed\n");
+				}
+			} else {
+				/* Delay the INTRQ 3 byte times becuase we need to read two CRC bytes and
+				   compare them with a calculated CRC */
+				wd17xx_complete_command(w, DELAY_DATADONE);
+
+				if (VERBOSE)
+					logerror("wd17xx_data_r(): data read completed\n");
+			}
 		}
 		else
 		{
