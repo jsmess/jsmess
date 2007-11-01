@@ -5,6 +5,11 @@ There are three IRQ sources:
 - IRQ1 = IRQA from the video PIA
 - IRQ2 = IRQA from the IEEE488 PIA
 
+Interrupt handling on the Osborne-1 is a bit akward. When an interrupt is
+taken by the Z80 the ROMMODE is enabled on each fetch of an instruction
+byte. During execution of an instruction the previous ROMMODE setting
+is used.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -33,6 +38,9 @@ static struct osborne1 {
 	UINT8	start_y;
 	/* other outputs from the video pia */
 	UINT8	beep;
+	/* bankswitch setting */
+	UINT8	bankswitch;
+	UINT8	in_irq_handler;
 } osborne1;
 
 /* Prototypes */
@@ -66,38 +74,39 @@ READ8_HANDLER( osborne1_2000_r ) {
 
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled ) {
-		return mess_ram[ 0x2000 + offset ];
-	}
-	switch( offset & 0x0F00 ) {
-	case 0x100:	/* Floppy */
-		data = wd17xx_r( offset );
-		break;
-	case 0x200:	/* Keyboard */
-		/* Row 0 */
-		if ( offset & 0x01 )	data &= readinputport(0);
-		/* Row 1 */
-		if ( offset & 0x02 )	data &= readinputport(1);
-		/* Row 2 */
-		if ( offset & 0x04 )	data &= readinputport(2);
-		/* Row 3 */
-		if ( offset & 0x08 )	data &= readinputport(3);
-		/* Row 4 */
-		if ( offset & 0x10 )	data &= readinputport(4);
-		/* Row 5 */
-		if ( offset & 0x20 )	data &= readinputport(5);
-		/* Row 6 */
-		if ( offset & 0x40 )	data &= readinputport(6);
-		/* Row 7 */
-		if ( offset & 0x80 )	data &= readinputport(7);
-		break;
-	case 0x900:	/* IEEE488 PIA */
-		data = pia_0_r( offset & 0x03 );
-		break;
-	case 0xA00:	/* Serial */
-		break;
-	case 0xC00:	/* Video PIA */
-		data = pia_1_r( offset & 0x03 );
-		break;
+		data = mess_ram[ 0x2000 + offset ];
+	} else {
+		switch( offset & 0x0F00 ) {
+		case 0x100:	/* Floppy */
+			data = wd17xx_r( offset );
+			break;
+		case 0x200:	/* Keyboard */
+			/* Row 0 */
+			if ( offset & 0x01 )	data &= readinputport(0);
+			/* Row 1 */
+			if ( offset & 0x02 )	data &= readinputport(1);
+			/* Row 2 */
+			if ( offset & 0x04 )	data &= readinputport(2);
+			/* Row 3 */
+			if ( offset & 0x08 )	data &= readinputport(3);
+			/* Row 4 */
+			if ( offset & 0x10 )	data &= readinputport(4);
+			/* Row 5 */
+			if ( offset & 0x20 )	data &= readinputport(5);
+			/* Row 6 */
+			if ( offset & 0x40 )	data &= readinputport(6);
+			/* Row 7 */
+			if ( offset & 0x80 )	data &= readinputport(7);
+			break;
+		case 0x900:	/* IEEE488 PIA */
+			data = pia_0_r( offset & 0x03 );
+			break;
+		case 0xA00:	/* Serial */
+			break;
+		case 0xC00:	/* Video PIA */
+			data = pia_1_r( offset & 0x03 );
+			break;
+		}
 	}
 	return data;
 }
@@ -106,20 +115,21 @@ WRITE8_HANDLER( osborne1_2000_w ) {
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled ) {
 		mess_ram[ 0x2000 + offset ] = data;
-	}
-	/* Handle writes to the I/O area */
-	switch( offset & 0x0F00 ) {
-	case 0x100:	/* Floppy */
-		wd17xx_w( offset, data );
-		break;
-	case 0x900:	/* IEEE488 PIA */
-		pia_0_w( offset & 0x03, data );
-		break;
-	case 0xA00:	/* Serial */
-		break;
-	case 0xC00:	/* Video PIA */
-		pia_1_w( offset & 0x03, data );
-		break;
+	} else {
+		/* Handle writes to the I/O area */
+		switch( offset & 0x0F00 ) {
+		case 0x100:	/* Floppy */
+			wd17xx_w( offset, data );
+			break;
+		case 0x900:	/* IEEE488 PIA */
+			pia_0_w( offset & 0x03, data );
+			break;
+		case 0xA00:	/* Serial */
+			break;
+		case 0xC00:	/* Video PIA */
+			pia_1_w( offset & 0x03, data );
+			break;
+		}
 	}
 }
 
@@ -168,10 +178,20 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 	}
 	osborne1.bank4_ptr = mess_ram + ( ( osborne1.bank3_enabled ) ? 0x10000 : 0xF000 );
 	memory_set_bankptr( 4, osborne1.bank4_ptr );
+	osborne1.bankswitch = offset;
+}
+
+static OPBASE_HANDLER( osborne1_opbase ) {
+	if ( ( address & 0xF000 ) && osborne1.in_irq_handler ) {
+		osborne1.in_irq_handler = 0;
+		osborne1_bankswitch_w( osborne1.bankswitch, 0 );
+	}
+	return address;
 }
 
 static void osborne1_z80_reset(int param) {
 	osborne1.pia_1_irq_state = 0;
+	osborne1.in_irq_handler = 0;
 }
 
 static int osborne1_z80_irq_state(int param) {
@@ -180,7 +200,10 @@ static int osborne1_z80_irq_state(int param) {
 
 static int osborne1_z80_irq_ack(int param) {
 	/* Enable ROM and I/O when IRQ is acknowledged */
+	UINT8	old_bankswitch = osborne1.bankswitch;
+	osborne1.in_irq_handler = 1;
 	osborne1_bankswitch_w( 0, 0 );
+	osborne1.bankswitch = old_bankswitch;
 	return 0xF8;
 }
 
@@ -224,7 +247,7 @@ static WRITE8_HANDLER( video_pia_port_a_w ) {
 	osborne1.new_start_x = data >> 1;
 	wd17xx_set_density( ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
 
-	logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "DEN_FM_LO" : "DEN_FM_HI" );
+	//logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "DEN_FM_LO" : "DEN_FM_HI" );
 }
 
 static WRITE8_HANDLER( video_pia_port_b_w ) {
@@ -235,7 +258,7 @@ static WRITE8_HANDLER( video_pia_port_b_w ) {
 	} else if ( data & 0x80 ) {
 		wd17xx_set_drive( 1 );
 	}
-	logerror("Video pia port b write: %02X\n", data );
+	//logerror("Video pia port b write: %02X\n", data );
 }
 
 static void video_pia_irq_a_func(int state) {
@@ -285,7 +308,7 @@ static TIMER_CALLBACK(osborne1_video_callback) {
 	}
 	if ( y < 240 ) {
 		/* Draw a line of the display */
-		UINT16 address = osborne1.start_y * 128 + osborne1.new_start_x + 10;
+		UINT16 address = osborne1.start_y * 128 + osborne1.new_start_x + 11;
 		UINT16 *p = BITMAP_ADDR16( tmpbitmap, y, 0 );
 		int x;
 
@@ -382,11 +405,13 @@ MACHINE_RESET( osborne1 ) {
 	osborne1.charrom = memory_region( REGION_GFX1 );
 
 	osborne1.video_timer = mame_timer_alloc( osborne1_video_callback );
-	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, 240, 0 ), 0, time_never );
+	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, 1, 0 ), 0, time_never );
 	pia_1_ca1_w( 0, 0 );
 }
 
 DRIVER_INIT( osborne1 ) {
+	memset( &osborne1, 0, sizeof( osborne1 ) );
+
 	osborne1.empty_4K = auto_malloc( 0x1000 );
 	memset( osborne1.empty_4K, 0xFF, 0x1000 );
 
@@ -399,5 +424,8 @@ DRIVER_INIT( osborne1 ) {
 
 	/* Configure the floppy disk interface */
 	wd17xx_init( WD_TYPE_MB8877, NULL, NULL );
+
+	/* Set opbase handler to handle special irq cases */
+	memory_set_opbase_handler( 0, osborne1_opbase );
 }
 
