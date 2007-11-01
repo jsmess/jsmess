@@ -86,13 +86,13 @@ READ8_HANDLER( osborne1_2000_r ) {
 			/* Row 1 */
 			if ( offset & 0x02 )	data &= readinputport(1);
 			/* Row 2 */
-			if ( offset & 0x04 )	data &= readinputport(2);
+			if ( offset & 0x04 )	data &= readinputport(3);
 			/* Row 3 */
-			if ( offset & 0x08 )	data &= readinputport(3);
+			if ( offset & 0x08 )	data &= readinputport(4);
 			/* Row 4 */
-			if ( offset & 0x10 )	data &= readinputport(4);
+			if ( offset & 0x10 )	data &= readinputport(5);
 			/* Row 5 */
-			if ( offset & 0x20 )	data &= readinputport(5);
+			if ( offset & 0x20 )	data &= readinputport(2);
 			/* Row 6 */
 			if ( offset & 0x40 )	data &= readinputport(6);
 			/* Row 7 */
