@@ -29,6 +29,9 @@ The actual banking is done through I/O ports 00-03.
 02 - Have both bank 2 and bank 3 active. (Not 100% sure, also bank 1 from 4000-EFFF?)
 03 - Have both bank 2 and bank 1 active.
 
+TODO:
+  - Verify frequency of the beep/audio alarm.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -155,6 +158,9 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_PALETTE_LENGTH( 3 )
 	MDRV_PALETTE_INIT( osborne1 )
 
+	MDRV_SPEAKER_STANDARD_MONO( "mono" )
+	MDRV_SOUND_ADD( BEEP, 0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_DRIVER_END
 
 ROM_START( osborne1 )

@@ -19,6 +19,7 @@ is used.
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "cpu/z80/z80daisy.h"
+#include "sound/beep.h"
 #include "includes/osborne1.h"
 
 static struct osborne1 {
@@ -36,8 +37,6 @@ static struct osborne1 {
 	UINT8	*charrom;
 	UINT8	charline;
 	UINT8	start_y;
-	/* other outputs from the video pia */
-	UINT8	beep;
 	/* bankswitch setting */
 	UINT8	bankswitch;
 	UINT8	in_irq_handler;
@@ -252,7 +251,7 @@ static WRITE8_HANDLER( video_pia_port_a_w ) {
 
 static WRITE8_HANDLER( video_pia_port_b_w ) {
 	osborne1.new_start_y = data & 0x1F;
-	osborne1.beep = data & 0x20;
+	beep_set_state( 0, ( data & 0x20 ) ? 1 : 0 );
 	if ( data & 0x40 ) {
 		wd17xx_set_drive( 0 );
 	} else if ( data & 0x80 ) {
@@ -395,6 +394,11 @@ DEVICE_LOAD( osborne1_floppy ) {
 	return INIT_PASS;
 }
 
+static TIMER_CALLBACK( setup_beep ) {
+	beep_set_state( 0, 0 );
+	beep_set_frequency( 0, 300 /* 60 * 240 / 2 */ );
+}
+
 MACHINE_RESET( osborne1 ) {
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( 0x00, 0 );
@@ -407,6 +411,8 @@ MACHINE_RESET( osborne1 ) {
 	osborne1.video_timer = mame_timer_alloc( osborne1_video_callback );
 	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, 1, 0 ), 0, time_never );
 	pia_1_ca1_w( 0, 0 );
+
+	mame_timer_set( time_zero, 0, setup_beep );
 }
 
 DRIVER_INIT( osborne1 ) {
