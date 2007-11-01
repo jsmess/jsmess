@@ -298,7 +298,7 @@ static TIMER_CALLBACK(osborne1_video_callback) {
 	/* Check for start of frame */
 	if ( y == 0 ) {
 		/* Clear CA1 on video PIA */
-		osborne1.start_y = osborne1.new_start_y;
+		osborne1.start_y = ( osborne1.new_start_y - 1 ) & 0x1F;
 		osborne1.charline = 0;
 		pia_1_ca1_w( 0, 0 );
 	}
