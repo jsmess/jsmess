@@ -134,8 +134,8 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( osborne1 ) {
 	palette_set_color_rgb( machine, 0, 0, 0, 0 );	/* Black */
-	palette_set_color_rgb( machine, 1, 255, 255, 255 );	/* White */
-	palette_set_color_rgb( machine, 2, 128, 128, 128 );	/* Grey/Dimmed */
+	palette_set_color_rgb( machine, 1, 0, 255, 0 );	/* Full */
+	palette_set_color_rgb( machine, 2, 0, 128, 0 );	/* Dimmed */
 }
 
 static MACHINE_DRIVER_START( osborne1 )
