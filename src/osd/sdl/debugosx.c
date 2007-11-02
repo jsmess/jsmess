@@ -533,7 +533,7 @@ int debugwin_is_debugger_visible(void)
 static debugwin_info *debug_window_create(const char *title, void *unused)
 {
 	CGDirectDisplayID	mainID = CGMainDisplayID();
-	HIRect				mainBounds;
+	GDHandle			mainDevice;
 
 	debugwin_info *info = NULL;
 	Rect work_bounds;
@@ -578,11 +578,8 @@ static debugwin_info *debug_window_create(const char *title, void *unused)
 	}
 	
 	// fill in some defaults
-	HIWindowGetAvailablePositioningBounds( mainID, kHICoordSpaceScreenPixel, &mainBounds );
-	work_bounds.left = mainBounds.origin.x;
-	work_bounds.top = mainBounds.origin.y;
-	work_bounds.right = mainBounds.origin.x + mainBounds.size.width;
-	work_bounds.bottom = mainBounds.origin.y + mainBounds.size.height;
+	DMGetGDeviceByDisplayID((DisplayIDType)mainID, &mainDevice, TRUE);
+	GetAvailableWindowPositioningBounds(mainDevice, &work_bounds);
 	info->minwidth = 200;
 	info->minheight = 200;
 	info->maxwidth = work_bounds.right - work_bounds.left;
@@ -3025,7 +3022,7 @@ void console_create_window(void)
 	ControlFontStyleRec		style;
 	Str255		fontName;
 	CGDirectDisplayID	mainID = CGMainDisplayID();
-	HIRect				mainBounds;
+	GDHandle			mainDevice;
 	MenuItemIndex	menuIndex;
 	ControlButtonContentInfo	content;
 
@@ -3122,7 +3119,7 @@ void console_create_window(void)
 	info->minwidth = 0;
 	info->maxwidth = 0;
 	for (cpunum = MAX_CPU - 1; (INT32)cpunum >= 0; cpunum--)
-		if (Machine->drv->cpu[cpunum].type != CPU_DUMMY)
+		if (Machine->drv->cpu[cpunum].cpu_type != CPU_DUMMY)
 		{
 			UINT32 regchars, dischars, conchars;
 			UINT32 minwidth, maxwidth;
@@ -3146,11 +3143,8 @@ void console_create_window(void)
 		}
 
 	// get the work bounds
-	HIWindowGetAvailablePositioningBounds( mainID, kHICoordSpaceScreenPixel, &mainBounds );
-	work_bounds.left = mainBounds.origin.x;
-	work_bounds.top = mainBounds.origin.y;
-	work_bounds.right = mainBounds.origin.x + mainBounds.size.width;
-	work_bounds.bottom = mainBounds.origin.y + mainBounds.size.height;
+	DMGetGDeviceByDisplayID((DisplayIDType)mainID, &mainDevice, TRUE);
+	GetAvailableWindowPositioningBounds(mainDevice, &work_bounds);
 
 	// adjust the min/max sizes for the window style
 	bounds.top = bounds.left = 0;
