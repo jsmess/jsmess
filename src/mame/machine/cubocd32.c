@@ -3,6 +3,7 @@
 #include "cdrom.h"
 #include "coreutil.h"
 #include "sound/cdda.h"
+#include "machine/i2cmem.h"
 
 
 /*********************************************************************************
@@ -19,24 +20,10 @@ TODO: Add CDDA support
 *********************************************************************************/
 
 #define LOG_AKIKO		0
-#define LOG_AKIKO_I2C	0
 #define LOG_AKIKO_CD	0
 
 #define CD_SECTOR_TIME		(1000/((150*1024)/2048))	/* 1X CDROM sector time in msec (300KBps) */
 
-
-/*************************************
- *
- * Akiko I2C NVRAM implementation
- *
- ************************************/
-
-enum {
-	I2C_WAIT = 0,
-	I2C_DEVICEADDR,
-	I2C_WORDADDR,
-	I2C_DATA
-};
 
 #define	NVRAM_SIZE 1024
 #define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
@@ -50,26 +37,10 @@ struct akiko_def
 	UINT32	c2p_output_index;
 
 	/* i2c bus */
-	int		i2c_state;
-	int		i2c_bitcounter;
-	int		i2c_direction;
-	int		i2c_sda_dir_nvram;
 	int		i2c_scl_out;
-	int		i2c_scl_in;
 	int		i2c_scl_dir;
-	int		i2c_oscl;
 	int		i2c_sda_out;
-	int		i2c_sda_in;
 	int		i2c_sda_dir;
-	int		i2c_osda;
-
-	/* nvram */
-	UINT8	nvram[NVRAM_SIZE];
-	UINT8	nvram_writetmp[NVRAM_PAGE_SIZE];
-	int		nvram_address;
-	int		nvram_writeaddr;
-	int		nvram_rw;
-	UINT8	nvram_byte;
 
 	/* cdrom */
 	UINT32	cdrom_status[2];
@@ -97,27 +68,15 @@ static TIMER_CALLBACK(akiko_frame_proc);
 
 void amiga_akiko_init(void)
 {
+	i2cmem_init( 0, I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE, NULL );
+
 	akiko.c2p_input_index = 0;
 	akiko.c2p_output_index = 0;
 
-	akiko.i2c_state = I2C_WAIT;
-	akiko.i2c_bitcounter = -1;
-	akiko.i2c_direction = -1;
-	akiko.i2c_sda_dir_nvram = 0;
 	akiko.i2c_scl_out = 0;
-	akiko.i2c_scl_in = 0;
 	akiko.i2c_scl_dir = 0;
-	akiko.i2c_oscl = 0;
 	akiko.i2c_sda_out = 0;
-	akiko.i2c_sda_in = 0;
 	akiko.i2c_sda_dir = 0;
-	akiko.i2c_osda = 0;
-
-	akiko.nvram_address = 0;
-	akiko.nvram_writeaddr = 0;
-	akiko.nvram_rw = 0;
-	akiko.nvram_byte = 0;
-	memset( akiko.nvram, 0, NVRAM_SIZE );
 
 	akiko.cdrom_status[0] = akiko.cdrom_status[1] = 0;
 	akiko.cdrom_address[0] = akiko.cdrom_address[1] = 0;
@@ -188,218 +147,48 @@ void amiga_akiko_init(void)
 	}
 }
 
-static void akiko_i2c( void )
-{
-    akiko.i2c_sda_in = 1;
-
-    if ( !akiko.i2c_sda_dir_nvram && akiko.i2c_scl_out && akiko.i2c_oscl )
-    {
-		if ( !akiko.i2c_sda_out && akiko.i2c_osda )	/* START-condition? */
-		{
-	    	akiko.i2c_state = I2C_DEVICEADDR;
-	    	akiko.i2c_bitcounter = 0;
-	    	akiko.i2c_direction = -1;
-#if LOG_AKIKO_I2C
-	    	logerror("START\n");
-#endif
-	    	return;
-		}
-		else if ( akiko.i2c_sda_out && !akiko.i2c_osda ) /* STOP-condition? */
-		{
-	    	akiko.i2c_state = I2C_WAIT;
-	    	akiko.i2c_bitcounter = -1;
-#if LOG_AKIKO_I2C
-	    	logerror("STOP\n");
-#endif
-	    	if ( akiko.i2c_direction > 0 )
-	    	{
-				memcpy( akiko.nvram + ( akiko.nvram_address & ~(NVRAM_PAGE_SIZE - 1) ), akiko.nvram_writetmp, NVRAM_PAGE_SIZE );
-				akiko.i2c_direction = -1;
-#if LOG_AKIKO_I2C
-				{
-					int i;
-
-					logerror("NVRAM write address %04X:", akiko.nvram_address & ~(NVRAM_PAGE_SIZE - 1));
-					for (i = 0; i < NVRAM_PAGE_SIZE; i++)
-		    			logerror("%02X", akiko.nvram_writetmp[i]);
-					logerror("\n");
-				}
-#endif
-	    	}
-	    	return;
-		}
-    }
-
-    if ( akiko.i2c_bitcounter >= 0 )
-    {
-		if ( akiko.i2c_direction )
-		{
-	    	/* Amiga -> NVRAM */
-	    	if ( akiko.i2c_scl_out && !akiko.i2c_oscl )
-	    	{
-				if ( akiko.i2c_bitcounter == 8 )
-				{
-				    akiko.i2c_sda_in = 0; /* ACK */
-
-				    if ( akiko.i2c_direction > 0 )
-				    {
-						akiko.nvram_writetmp[akiko.nvram_writeaddr++] = akiko.nvram_byte;
-						akiko.nvram_writeaddr &= (NVRAM_PAGE_SIZE - 1);
-						akiko.i2c_bitcounter = 0;
-		    		}
-		    		else
-		    		{
-		    			akiko.i2c_bitcounter = -1;
-		    		}
-		    	}
-		    	else
-		    	{
-				    akiko.nvram_byte <<= 1;
-				    akiko.nvram_byte |= akiko.i2c_sda_out;
-				    akiko.i2c_bitcounter++;
-				}
-	    	}
-		}
-		else
-		{
-			/* NVRAM -> Amiga */
-			if ( akiko.i2c_scl_out && !akiko.i2c_oscl && akiko.i2c_bitcounter < 8 )
-			{
-				if ( akiko.i2c_bitcounter == 0 )
-					akiko.nvram_byte = akiko.nvram[akiko.nvram_address];
-
-				akiko.i2c_sda_dir_nvram = 1;
-				akiko.i2c_sda_in = (akiko.nvram_byte & 0x80) ? 1 : 0;
-				akiko.nvram_byte <<= 1;
-				akiko.i2c_bitcounter++;
-
-				if ( akiko.i2c_bitcounter == 8 )
-				{
-#if LOG_AKIKO_I2C
-		    		logerror("NVRAM sent byte %02X address %04X\n", akiko.nvram[akiko.nvram_address], akiko.nvram_address);
-#endif
-		    		akiko.nvram_address++;
-		    		akiko.nvram_address &= NVRAM_SIZE - 1;
-		    		akiko.i2c_sda_dir_nvram = 0;
-				}
-	    	}
-
-	    	if ( !akiko.i2c_sda_out && akiko.i2c_sda_dir && !akiko.i2c_scl_out ) /* ACK from Amiga */
-				akiko.i2c_bitcounter = 0;
-		}
-
-		if ( akiko.i2c_bitcounter >= 0 )
-			return;
-    }
-
-    switch( akiko.i2c_state )
-    {
-		case I2C_DEVICEADDR:
-			if ( ( akiko.nvram_byte & 0xf0 ) != 0xa0 )
-			{
-#if LOG_AKIKO_I2C
-				logerror("WARNING: I2C_DEVICEADDR: device address != 0xA0\n");
-#endif
-				akiko.i2c_state = I2C_WAIT;
-	    		return;
-			}
-
-			akiko.nvram_rw = (akiko.nvram_byte & 1) ? 0 : 1;
-
-			if ( akiko.nvram_rw )
-			{
-				/* 2 high address bits, only fetched if WRITE = 1 */
-				akiko.nvram_address &= 0xff;
-				akiko.nvram_address |= ((akiko.nvram_byte >> 1) & 3) << 8;
-	    		akiko.i2c_state = I2C_WORDADDR;
-	    		akiko.i2c_direction = -1;
-	    	}
-	    	else
-	    	{
-	    		akiko.i2c_state = I2C_DATA;
-	    		akiko.i2c_direction = 0;
-	    		akiko.i2c_sda_dir_nvram = 1;
-			}
-
-			akiko.i2c_bitcounter = 0;
-#if LOG_AKIKO_I2C
-			logerror("I2C_DEVICEADDR: rw %d, address %02Xxx\n", akiko.nvram_rw, akiko.nvram_address >> 8);
-#endif
-		break;
-
-		case I2C_WORDADDR:
-			akiko.nvram_address &= 0x300;
-			akiko.nvram_address |= akiko.nvram_byte;
-
-#if LOG_AKIKO_I2C
-			logerror("I2C_WORDADDR: address %04X\n", akiko.nvram_address);
-#endif
-			if ( akiko.i2c_direction < 0 )
-			{
-				memcpy( akiko.nvram_writetmp, akiko.nvram + (akiko.nvram_address & ~(NVRAM_PAGE_SIZE - 1)), NVRAM_PAGE_SIZE);
-	    		akiko.nvram_writeaddr = akiko.nvram_address & (NVRAM_PAGE_SIZE - 1);
-			}
-
-			akiko.i2c_state = I2C_DATA;
-			akiko.i2c_bitcounter = 0;
-			akiko.i2c_direction = 1;
-		break;
-    }
-}
-
 static void akiko_nvram_write(UINT32 data)
 {
-	int		sda;
-
-	akiko.i2c_oscl = akiko.i2c_scl_out;
 	akiko.i2c_scl_out = BIT(data,31);
-	akiko.i2c_osda = akiko.i2c_sda_out;
 	akiko.i2c_sda_out = BIT(data,30);
 	akiko.i2c_scl_dir = BIT(data,15);
 	akiko.i2c_sda_dir = BIT(data,14);
 
-	sda = akiko.i2c_sda_out;
-    if ( akiko.i2c_oscl != akiko.i2c_scl_out || akiko.i2c_osda != sda )
-    {
-    	akiko_i2c();
-    	akiko.i2c_oscl = akiko.i2c_scl_out;
-    	akiko.i2c_osda = sda;
-    }
+	i2cmem_write( 0, I2CMEM_SCL, akiko.i2c_scl_out );
+	i2cmem_write( 0, I2CMEM_SDA, akiko.i2c_sda_out );
 }
 
 static UINT32 akiko_nvram_read(void)
 {
 	UINT32	v = 0;
 
-	if ( !akiko.i2c_scl_dir )
-	    v |= akiko.i2c_scl_in ? (1<<31) : 0x00;
+	if ( akiko.i2c_scl_dir )
+	{
+		v |= akiko.i2c_scl_out << 31;
+	}
 	else
-	    v |= akiko.i2c_scl_out ? (1<<31) : 0x00;
+	{
+		v |= 0 << 31;
+	}
 
-	if ( !akiko.i2c_sda_dir )
-	    v |= akiko.i2c_sda_in ? (1<<30) : 0x00;
+	if ( akiko.i2c_sda_dir )
+	{
+		v |= akiko.i2c_sda_out << 30;
+	}
 	else
-	    v |= akiko.i2c_sda_out ? (1<<30) : 0x00;
+	{
+		v |= i2cmem_read( 0, I2CMEM_SDA ) << 30;
+	}
 
-	v |= akiko.i2c_scl_dir ? (1<<15) : 0x00;
-	v |= akiko.i2c_sda_dir ? (1<<14) : 0x00;
+	v |= akiko.i2c_scl_dir << 15;
+	v |= akiko.i2c_sda_dir << 14;
 
-    return v;
+	return v;
 }
 
 NVRAM_HANDLER( cd32 )
 {
-	if (read_or_write)
-		/* save the SRAM settings */
-		mame_fwrite(file, akiko.nvram, NVRAM_SIZE);
-	else
-	{
-		/* load the SRAM settings */
-		if (file)
-			mame_fread(file, akiko.nvram, NVRAM_SIZE);
-		else
-			memset(akiko.nvram, 0, NVRAM_SIZE);
-	}
+	nvram_handler_i2cmem_0( machine, file, read_or_write );
 }
 
 /*************************************

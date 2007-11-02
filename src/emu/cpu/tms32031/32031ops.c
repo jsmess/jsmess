@@ -710,6 +710,60 @@ static void mpyf(union genreg *dst, union genreg *src1, union genreg *src2)
 #endif
 
 
+/* normalize a floating point value */
+#if USE_FP
+static void norm(union genreg *dst, union genreg *src)
+{
+	fatalerror("norm not implemented");
+}
+#else
+static void norm(union genreg *dst, union genreg *src)
+{
+	INT32 man = MANTISSA(src);
+	int exp = EXPONENT(src);
+
+	CLR_NZVUF();
+
+	if (exp == -128 || man == 0)
+	{
+		SET_MANTISSA(dst, 0);
+		SET_EXPONENT(dst, -128);
+		if (man != 0)
+			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
+	}
+	else
+	{
+		int cnt;
+		if (man > 0)
+		{
+			cnt = count_leading_zeros((UINT32)man);
+			man <<= cnt;
+			exp -= cnt;
+		}
+		else
+		{
+			cnt = count_leading_ones((UINT32)man);
+			man <<= cnt;
+			exp -= cnt;
+		}
+
+		/* check for underflow */
+		if (exp <= -128)
+		{
+			man = 0x00000000;
+			exp = -128;
+			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
+		}
+	}
+
+	SET_MANTISSA(dst, man);
+	SET_EXPONENT(dst, exp);
+	OR_NZF(dst);
+}
+#endif
+
+
+
 
 /***************************************************************************
     INDIRECT MEMORY REFS
@@ -2192,10 +2246,34 @@ static void nop_ind(void)
 
 /*-----------------------------------------------------*/
 
-static void norm_reg(void) { unimplemented(); }
-static void norm_dir(void) { unimplemented(); }
-static void norm_ind(void) { unimplemented(); }
-static void norm_imm(void) { unimplemented(); }
+static void norm_reg(void)
+{
+	int dreg = (OP >> 16) & 7;
+	norm(&tms32031.r[dreg], &tms32031.r[OP & 7]);
+}
+
+static void norm_dir(void)
+{
+	UINT32 res = RMEM(DIRECT());
+	int dreg = (OP >> 16) & 7;
+	LONG2FP(TMR_TEMP1, res);
+	norm(&tms32031.r[dreg], &tms32031.r[TMR_TEMP1]);
+}
+
+static void norm_ind(void)
+{
+	UINT32 res = RMEM(INDIRECT_D(OP >> 8));
+	int dreg = (OP >> 16) & 7;
+	LONG2FP(TMR_TEMP1, res);
+	norm(&tms32031.r[dreg], &tms32031.r[TMR_TEMP1]);
+}
+
+static void norm_imm(void)
+{
+	int dreg = (OP >> 16) & 7;
+	SHORT2FP(TMR_TEMP1, OP);
+	norm(&tms32031.r[dreg], &tms32031.r[TMR_TEMP1]);
+}
 
 /*-----------------------------------------------------*/
 

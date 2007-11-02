@@ -103,7 +103,7 @@ LD += /LTCG
 endif
 
 ifdef PTR64
-CC += /wd4267 /wd4312 /Wp64
+CC += /wd4267 /Wp64
 endif
 
 # add some VC++-specific defines
@@ -238,11 +238,7 @@ OSDOBJS += \
 endif
 
 # add a stub resource file
-ifdef PTR64
-RESFILE = $(WINOBJ)/mamex64.res
-else
 RESFILE = $(WINOBJ)/mame.res
-endif
 
 
 

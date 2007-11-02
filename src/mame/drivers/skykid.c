@@ -33,7 +33,7 @@ VIDEO_UPDATE( drgnbstr );
 PALETTE_INIT( skykid );
 
 
-static int inputport_selected;
+static UINT8 inputport_selected;
 
 static WRITE8_HANDLER( inputport_select_w )
 {
@@ -84,10 +84,7 @@ static WRITE8_HANDLER( skykid_subreset_w )
 
 static WRITE8_HANDLER( skykid_bankswitch_w )
 {
-	int bit = !BIT(offset,11);
-	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000;
-
-	memory_set_bankptr(1,rom + 0x2000 * bit);
+	memory_set_bank(1, !BIT(offset,11));
 }
 
 static WRITE8_HANDLER( skykid_irq_1_ctrl_w )
@@ -104,6 +101,14 @@ static WRITE8_HANDLER( skykid_irq_2_ctrl_w )
 	cpu_interrupt_enable(1,bit);
 	if (!bit)
 		cpunum_set_input_line(1, 0, CLEAR_LINE);
+}
+
+static MACHINE_START( skykid )
+{
+	/* configure the banks */
+	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x10000, 0x2000);
+
+	state_save_register_global(inputport_selected);
 }
 
 
@@ -380,6 +385,8 @@ static MACHINE_DRIVER_START( skykid )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(100)	/* we need heavy synch */
 
+	MDRV_MACHINE_START(skykid)
+
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -540,7 +547,7 @@ static DRIVER_INIT( skykid )
 	}
 }
 
-GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid,  ROT0,   "Namco", "Dragon Buster", 0 )
-GAME( 1985, skykid,   0,      skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (New Ver.)", 0 ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykido,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (Old Ver.)", 0 ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykidd,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (CUS60 Ver.)", 0 ) /* Uses CUS60 aka 60a1 */
+GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid,  ROT0,   "Namco", "Dragon Buster", GAME_SUPPORTS_SAVE )
+GAME( 1985, skykid,   0,      skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (New Ver.)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykido,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (Old Ver.)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykidd,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (CUS60 Ver.)", GAME_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */

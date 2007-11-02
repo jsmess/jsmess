@@ -1,7 +1,7 @@
 #ifndef LSI53C810_H
 #define LSI53C810_H
 
-#include "machine/scsidev.h"
+#include "machine/scsi.h"
 
 struct LSI53C810interface
 {

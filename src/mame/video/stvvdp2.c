@@ -80,6 +80,7 @@ In other words,the first three types uses the offset and not the color allocated
 */
 
 #include "driver.h"
+#include "eminline.h"
 #include "profiler.h"
 
 UINT32* stv_vdp2_regs;
@@ -2124,7 +2125,7 @@ static struct _stv_rbg_cache_data
 
 } stv_rbg_cache_data;
 
-#define mul_fixed32( a, b ) fixed_mul_shift( a, b, 16 )
+#define mul_fixed32( a, b ) mul_32x32_shift( a, b, 16 )
 
 static void stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
 {

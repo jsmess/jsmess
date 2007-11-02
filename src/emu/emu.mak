@@ -130,6 +130,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ds2404.o \
 	$(EMUMACHINE)/eeprom.o \
 	$(EMUMACHINE)/generic.o \
+	$(EMUMACHINE)/i2cmem.o \
  	$(EMUMACHINE)/idectrl.o \
  	$(EMUMACHINE)/intelfsh.o \
 	$(EMUMACHINE)/laserdsc.o \
@@ -145,8 +146,11 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/roc10937.o \
 	$(EMUMACHINE)/rp5h01.o \
 	$(EMUMACHINE)/rtc65271.o \
+	$(EMUMACHINE)/scsi.o \
 	$(EMUMACHINE)/scsicd.o \
+	$(EMUMACHINE)/scsidev.o \
 	$(EMUMACHINE)/scsihd.o \
+	$(EMUMACHINE)/cr589.o \
  	$(EMUMACHINE)/smc91c9x.o \
 	$(EMUMACHINE)/timekpr.o \
 	$(EMUMACHINE)/tmp68301.o \

@@ -2473,7 +2473,8 @@ V-V                           TP-027
 	DRIVER( ssf2tbr1 )	/* 11/09/1993 (c) 1993 (World) */
 	DRIVER( ssf2tbj )	/* 11/09/1993 (c) 1993 (Japan) */
 	DRIVER( ecofghtr )	/* 03/12/1993 (c) 1993 (World) */
-	DRIVER( ecofghtu )	/* 03/12/1993 (c) 1993 (US) */
+	DRIVER( ecofghtu )	/* 15/02/1994 (c) 1993 (US) */
+	DRIVER( ecofgtu1 )	/* 03/12/1993 (c) 1993 (US) */
 	DRIVER( ecofghta )	/* 03/12/1993 (c) 1993 (Asia) */
 	DRIVER( uecology ) 	/* 03/12/1993 (c) 1993 (Japan) */
 	DRIVER( ddtod )		/* 12/04/1994 (c) 1993 (Euro) */
@@ -2896,6 +2897,8 @@ V-V                           TP-027
 	DRIVER( ddr2mc2 )	/* 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA) */
 	DRIVER( gtrfrk2m )	/* 1999 - Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD) */
 	DRIVER( dsftkd )	/* 1999 - Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA) */
+	DRIVER( cr589fw )	/* 1999 - CR-589 Firmware (700B04) */
+	DRIVER( cr589fwa )	/* 1999 - CR-589 Firmware (700A04) */
 	DRIVER( ddr3mk )	/* 2000 - Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA) */
 	DRIVER( ddr3mka )	/* 2000 - Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA) */
 	DRIVER( ddr3ma )	/* 1999 - Dance Dance Revolution 3rd Mix (GN887 VER. AAA) */
@@ -2927,6 +2930,7 @@ V-V                           TP-027
 	DRIVER( ddr5m )		/* 2001 - Dance Dance Revolution 5th Mix (G*A27 VER. JAA) */
 	DRIVER( dmx2majp )	/* 2001 - Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA ) */
 	DRIVER( gtrfrk6m )	/* 2001 - Guitar Freaks 6th Mix (G*B06 VER. JAA) */
+	DRIVER( gtrfrk7m )	/* 2001 - Guitar Freaks 6th Mix (G*B17 VER. JAA) */
 	DRIVER( ddrmax )	/* 2001 - DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) */
 	DRIVER( ddrmax2 )	/* 2002 - DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA) */
 	DRIVER( dsem2 )		/* 2002 - Dancing Stage Euro Mix 2 (G*C23 VER. EAA) */
@@ -4785,6 +4789,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( thrilld )	/* GX713 (c)1998 */
 	DRIVER( midnrun )	/* GX??? (c)1995 */
 	DRIVER( windheat )	/* GX677 (c)1996 */
+	DRIVER( jetwave )	/* GX??? (c)1996 */
 
 	/* Konami M2 games */
 	DRIVER( polystar )	/* GX623 (c)1997 */
@@ -7369,7 +7374,8 @@ Other Sun games
 
 	/* MPU4+Video Board Games */
 	DRIVER( bctvidbs )
-	DRIVER( dealem )
+	DRIVER( dealem )	/* 1987 */
+	DRIVER( timemchn )	/* 1990 */
 	DRIVER( crmaze )	/* 1994 */
 	DRIVER( crmazea )	/* 1994 */
 	DRIVER( crmazeb )	/* 1994 */

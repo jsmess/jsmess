@@ -1386,7 +1386,7 @@ struct _voodoo_stats
 };
 
 
-/* note that this structure is an even 32 bytes long */
+/* note that this structure is an even 64 bytes long */
 typedef struct _stats_block stats_block;
 struct _stats_block
 {

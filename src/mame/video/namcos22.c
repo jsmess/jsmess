@@ -34,6 +34,8 @@ SPOT TABLE test
 */
 
 #include "driver.h"
+#include "eminline.h"
+#include "video/rgbutil.h"
 #include "namcos22.h"
 #include "video/polynew.h"
 #include <math.h>
@@ -241,6 +243,8 @@ INLINE unsigned texel( unsigned x, unsigned y )
 	return mpTextureTileData[(tile<<8)|mXYAttrToPixel[mpTextureTileMapAttr[offs]][x&0xf][y&0xf]];
 } /* texel */
 
+
+
 typedef struct _poly_extra_data poly_extra_data;
 struct _poly_extra_data
 {
@@ -248,6 +252,10 @@ struct _poly_extra_data
 	int bn;
 	UINT16 flags;
 	int cmode;
+	int fogFactor;
+	rgbint fogColor;
+	int fadeFactor;
+	rgbint fadeColor;
 	const UINT8 *source;		/* sprites */
 	int z;
 	int alpha;
@@ -255,18 +263,14 @@ struct _poly_extra_data
 	int line_modulo;
 };
 
+
 static void renderscanline_uvi_full(void *dest, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
 {
 	mame_bitmap *bitmap = dest;
 	poly_extra_data *extra = poly->extra;
-	UINT16 flags = extra->flags;
-	int cmode = extra->cmode;
 	int bn = extra->bn;
-	int fadeEnable = (mixer.target&1) && mixer.fadeFactor;
-	int fogDisable = extra->color&0x80;
 	const pen_t *pens = &Machine->pens[(extra->color&0x7f)<<8];
-	int fogDensity = 0;
-	int prioverchar = (cmode&7)==1;
+	int prioverchar;
 
 	const UINT8 *pCharPri = BITMAP_ADDR8(priority_bitmap, scanline, 0);
 	UINT32 *pDest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -278,126 +282,67 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, INT32 startx, IN
 	float dv = poly->param[1].dpdx;
 	float di = poly->param[2].dpdx;
 	float dz = poly->param[3].dpdx;
+	int fogFactor = extra->fogFactor;
+	int fadeFactor = extra->fadeFactor;
+	rgbint fogColor = extra->fogColor;
+	rgbint fadeColor = extra->fadeColor;
+	int penmask, penshift;
 	int x;
 	bn *= 0x1000;
 
-	if( mbSuperSystem22 )
+	if (extra->cmode & 4)
 	{
-		if( !fogDisable )
-		{
-			int cz = flags>>8;
-			static const int cztype_remap[4] = { 3,1,2,0 };
-			int cztype = flags&3;
-			if( nthword(namcos22_czattr,4)&(0x4000>>(cztype*4)) )
-			{
-				int fogDelta = (INT16)nthword(namcos22_czattr, cztype);
-				//          if( fogDelta == 0x8000 ) fogDelta = -0x7fff;
-				//cz = Clamp256(cz+fogDelta);
-				fogDensity = fogDelta + namcos22_czram[cztype_remap[cztype]][cz];
-				if( fogDensity<0x0000 )
-				{
-					fogDensity = 0x0000;
-				}
-				else if( fogDensity>0x1fff )
-				{
-					fogDensity = 0x1fff;
-				}
-			}
-		}
+		prioverchar = 0;
+		pens += 0xec + ((extra->cmode & 8) << 1);
+		penmask = 0x03;
+		penshift = 2 * ~(extra->cmode & 3);
+	}
+	else if (extra->cmode & 2)
+	{
+		prioverchar = 0;
+		pens += 0xe0 + ((extra->cmode & 8) << 1);
+		penmask = 0x0f;
+		penshift = 4 * ~(extra->cmode & 1);
+	}
+	else if (extra->cmode & 1)
+	{
+		prioverchar = 1;
+		penmask = 0xff;
+		penshift = 0;
 	}
 	else
 	{
-		fogDisable = 1;
+		prioverchar = 0;
+		penmask = 0xff;
+		penshift = 0;
 	}
 
 	for( x=startx; x<stopx; x++ )
 	{
 		if( pCharPri[x]==0 || prioverchar )
 		{
-			float ooz = 1.0f/z;
+			float ooz = recip_approx(z);
 			int pen = texel((int)(u * ooz),bn+(int)(v*ooz));
-			switch( cmode )
+			int shade = i*ooz;
+			rgbint rgb;
+
+			rgb_to_rgbint(&rgb, pens[(pen >> penshift) & penmask]);
+			rgbint_scale_and_clamp(&rgb, shade << 2);
+
+			if( fogFactor != 0 )
+				rgbint_blend(&rgb, &fogColor, 0xff - fogFactor);
+
+			if( fadeFactor != 0 )
+				rgbint_blend(&rgb, &fadeColor, 0xff - fadeFactor);
+
+			if( prioverchar )
 			{
-				case 0x2:
-					pen = 0xe0|(pen>>4);
-					break;
-				case 0x3:
-					pen = 0xe0|(pen&0xf);
-					break;
-				case 0x4:
-					pen = 0xec|(pen>>6);
-					break;
-				case 0x5:
-					pen = 0xec|((pen>>4)&3);
-					break;
-				case 0x6:
-					pen = 0xec|((pen>>2)&3);
-					break;
-				case 0x7:
-					pen = 0xec|(pen&3);
-					break;
-				case 0xa:
-					pen = 0xf0|(pen>>4);
-					break;
-				case 0xb:
-					pen = 0xf0|(pen&0xf);
-					break;
-				case 0xc:
-					pen = 0xfc|(pen>>6);
-					break;
-				case 0xd:
-					pen = 0xfc|((pen>>4)&3);
-					break;
-				case 0xe:
-					pen = 0xfc|((pen>>2)&3);
-					break;
-				case 0xf:
-					pen = 0xfc|(pen&3);
-					break;
-				default:
-					break;
+				rgbint dest;
+				rgb_to_rgbint(&dest, pDest[x]);
+				rgbint_blend(&rgb, &dest, 0xff - mixer.poly_translucency);
 			}
 
-			{
-				UINT32 rgb = pens[pen];
-				int shade = i*ooz;
-				int r = rgb>>16;
-				int g = (rgb>>8)&0xff;
-				int b = rgb&0xff;
-				r = r*shade/0x40;
-				if( r>0xff ) r = 0xff;
-				g = g*shade/0x40;
-				if( g>0xff ) g = 0xff;
-				b = b*shade/0x40;
-				if( b>0xff ) b = 0xff;
-				if( !fogDisable )
-				{
-					int fogDensity2 = 0x2000 - fogDensity;
-					r = (r*fogDensity2 + fogDensity*mixer.rFogColor)>>13;
-					g = (g*fogDensity2 + fogDensity*mixer.gFogColor)>>13;
-					b = (b*fogDensity2 + fogDensity*mixer.bFogColor)>>13;
-				}
-				if( fadeEnable )
-				{
-					int fade2 = 0x100-mixer.fadeFactor;
-					r = (r*fade2+mixer.fadeFactor*mixer.rFadeColor)>>8;
-					g = (g*fade2+mixer.fadeFactor*mixer.gFadeColor)>>8;
-					b = (b*fade2+mixer.fadeFactor*mixer.bFadeColor)>>8;
-				}
-				if( prioverchar )
-				{
-					UINT32 color = pDest[x];
-					int tr = color>>16;
-					int tg = (color>>8)&0xff;
-					int tb = color&0xff;
-					int trans1 = 0x100 - mixer.poly_translucency;
-					r = (tr*mixer.poly_translucency + r*trans1)>>8;
-					g = (tg*mixer.poly_translucency + g*trans1)>>8;
-					b = (tb*mixer.poly_translucency + b*trans1)>>8;
-				}
-				rgb = (r<<16)|(g<<8)|b;
-				pDest[x] = rgb;
-			}
+			pDest[x] = rgbint_to_rgb(&rgb);
 		}
 
 		u += du;
@@ -444,9 +389,43 @@ static void rendertri(running_machine *machine,
 	extra->bn = bn;
 	extra->flags = flags;
 	extra->cmode = cmode;
+	extra->fogFactor = 0;
+	extra->fadeFactor = 0;
+
+	if (mixer.target&1)
+	{
+		extra->fadeFactor = mixer.fadeFactor;
+		rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
+	}
+
+	if( mbSuperSystem22 )
+	{
+		if( !(color&0x80) )
+		{
+			int cz = flags>>8;
+			static const int cztype_remap[4] = { 3,1,2,0 };
+			int cztype = flags&3;
+			if( nthword(namcos22_czattr,4)&(0x4000>>(cztype*4)) )
+			{
+				int fogDelta = (INT16)nthword(namcos22_czattr, cztype);
+				int fogDensity = fogDelta + namcos22_czram[cztype_remap[cztype]][cz];
+				//          if( fogDelta == 0x8000 ) fogDelta = -0x7fff;
+				//cz = Clamp256(cz+fogDelta);
+				if( fogDensity<0x0000 )
+				{
+					fogDensity = 0x0000;
+				}
+				else if( fogDensity>0x1fff )
+				{
+					fogDensity = 0x1fff;
+				}
+				extra->fogFactor = fogDensity >> 5;
+				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
+			}
+		}
+	}
 
 	poly_render_triangle(poly, bitmap, clip, renderscanline_uvi_full, 4, &vert[0], &vert[1], &vert[2]);
-
 } /* rendertri */
 
 static void

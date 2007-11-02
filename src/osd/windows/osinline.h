@@ -1,6 +1,8 @@
 //============================================================
 //
-//  osinline.h - Win32 inline functions
+//  osinline.h
+//
+//  x86 inline implementations for MSVC compiler.
 //
 //  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -10,105 +12,388 @@
 #ifndef __OSINLINE__
 #define __OSINLINE__
 
-#include "osd_cpu.h"
+#ifdef PTR64
+#include <intrin.h>
+#endif
 
 
-//============================================================
-//  INLINE MATH FUNCTIONS
-//============================================================
+/***************************************************************************
+    INLINE MATH FUNCTIONS
+***************************************************************************/
 
-#if defined(_MSC_VER) && defined(_M_IX86) && !defined(PTR64)
+/*-------------------------------------------------
+    mul_32x32 - perform a signed 32 bit x 32 bit
+    multiply and return the full 64 bit result
+-------------------------------------------------*/
 
-// Microsoft Visual C, x86, 32-bit
-#define vec_mult _vec_mult
-INLINE int _vec_mult(int x, int y)
+#ifndef PTR64
+#define mul_32x32 _mul_32x32
+INLINE INT64 _mul_32x32(INT32 a, INT32 b)
 {
-    int result;
+	// in theory this should work, but it is untested
+    __asm
+    {
+        mov   eax,a
+        imul  b
+        // leave results in edx:eax
+    }
+}
+#endif
 
-    __asm {
-        mov eax, x
-        imul y
-        mov result, edx
+
+/*-------------------------------------------------
+    mulu_32x32 - perform an unsigned 32 bit x
+    32 bit multiply and return the full 64 bit
+    result
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define mulu_32x32 _mulu_32x32
+INLINE UINT64 _mulu_32x32(UINT32 a, UINT32 b)
+{
+	// in theory this should work, but it is untested
+    __asm
+    {
+        mov   eax,a
+        mul   b
+        // leave results in edx:eax
+    }
+}
+#endif
+
+
+/*-------------------------------------------------
+    mul_32x32_hi - perform a signed 32 bit x 32 bit
+    multiply and return the upper 32 bits of the
+    result
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define mul_32x32_hi _mul_32x32_hi
+INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
+{
+	INT32 result;
+
+    __asm
+    {
+        mov   eax,a
+        imul  b
+        mov   result,edx
     }
 
-    return result;
-}
-
-
-
-c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include
-
-#elif defined(__GNUC__) && !defined(PTR64)
-
-// GCC, x86, 32-bit
-#define vec_mult _vec_mult
-INLINE int _vec_mult(int x, int y)
-{
-	int result;
-	__asm__ (
-			"movl  %1    , %0    ; "
-			"imull %2            ; "    /* do the multiply */
-			"movl  %%edx , %%eax ; "
-			:  "=&a" (result)           /* the result has to go in eax */
-			:  "mr" (x),                /* x and y can be regs or mem */
-			   "mr" (y)
-			:  "%edx", "%cc"            /* clobbers edx and flags */
-		);
 	return result;
 }
+#endif
 
-#else
 
-// other
-#define vec_mult _vec_mult
-INLINE int _vec_mult(int x, int y)
+/*-------------------------------------------------
+    mulu_32x32_hi - perform an unsigned 32 bit x
+    32 bit multiply and return the upper 32 bits
+    of the result
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define mulu_32x32_hi _mulu_32x32_hi
+INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
 {
-	return (int)(((INT64)x * (INT64)y) >> 32);
+	INT32 result;
+
+    __asm
+    {
+        mov   eax,a
+        mul   b
+        mov   result,edx
+    }
+
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    mul_32x32_shift - perform a signed 32 bit x
+    32 bit multiply and shift the result by the
+    given number of bits before truncating the
+    result to 32 bits
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define mul_32x32_shift _mul_32x32_shift
+INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+{
+	INT32 result;
+
+    __asm
+    {
+        mov   eax,a
+        imul  b
+        mov   cl,shift
+        shrd  eax,edx,cl
+        mov   result,eax
+    }
+
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    mulu_32x32_shift - perform an unsigned 32 bit x
+    32 bit multiply and shift the result by the
+    given number of bits before truncating the
+    result to 32 bits
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define mulu_32x32_shift _mulu_32x32_shift
+INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+{
+	INT32 result;
+
+    __asm
+    {
+        mov   eax,a
+        mul   b
+        mov   cl,shift
+        shrd  eax,edx,cl
+        mov   result,eax
+    }
+
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    div_64x32 - perform a signed 64 bit x 32 bit
+    divide and return the 32 bit quotient
+-------------------------------------------------*/
+
+/* TBD */
+
+
+/*-------------------------------------------------
+    divu_64x32 - perform an unsigned 64 bit x 32 bit
+    divide and return the 32 bit quotient
+-------------------------------------------------*/
+
+/* TBD */
+
+
+/*-------------------------------------------------
+    div_32x32_shift - perform a signed divide of
+    two 32 bit values, shifting the first before
+    division, and returning the 32 bit quotient
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define div_32x32_shift _div_32x32_shift
+INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+{
+	INT32 result;
+
+    __asm
+    {
+        mov   eax,a
+        cdq
+        mov   cl,shift
+        shld  edx,eax,cl
+        shl   eax,cl
+        idiv  b
+        mov   result,eax
+    }
+
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    divu_32x32_shift - perform an unsigned divide of
+    two 32 bit values, shifting the first before
+    division, and returning the 32 bit quotient
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define divu_32x32_shift _divu_32x32_shift
+INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+{
+	INT32 result;
+
+    __asm
+    {
+        mov   eax,a
+        xor   edx,edx
+        mov   cl,shift
+        shld  edx,eax,cl
+        shl   eax,cl
+        div   b
+        mov   result,eax
+    }
+
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    mod_64x32 - perform a signed 64 bit x 32 bit
+    divide and return the 32 bit remainder
+-------------------------------------------------*/
+
+/* TBD */
+
+
+/*-------------------------------------------------
+    modu_64x32 - perform an unsigned 64 bit x 32 bit
+    divide and return the 32 bit remainder
+-------------------------------------------------*/
+
+/* TBD */
+
+
+/*-------------------------------------------------
+    recip_approx - compute an approximate floating
+    point reciprocal
+-------------------------------------------------*/
+
+#ifdef PTR64
+#define recip_approx _recip_approx
+INLINE float _recip_approx(float z)
+{
+	__m128 mz = _mm_set_ss(z);
+	__m128 mooz = _mm_rcp_ss(mz);
+	float ooz;
+	_mm_store_ss(&ooz, mooz);
+	return ooz;
+}
+#endif
+
+
+
+/***************************************************************************
+    INLINE BIT MANIPULATION FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    count_leading_zeros - return the number of
+    leading zero bits in a 32-bit value
+-------------------------------------------------*/
+
+#define count_leading_zeros _count_leading_zeros
+INLINE UINT8 _count_leading_zeros(UINT32 value)
+{
+#ifdef PTR64
+	UINT32 index;
+	return _BitScanReverse(&index, value) ? (index ^ 31) : 32;
+#else
+	INT32 result;
+
+    __asm
+    {
+    	bsr   eax,value
+    	jnz   skip
+    	mov   eax,63
+    skip:
+    	xor   eax,31
+        mov   result,eax
+    }
+
+	return result;
+#endif
 }
 
-#endif // defined(_MSC_VER) && defined(_M_IX86) && !defined(PTR64)
+
+/*-------------------------------------------------
+    count_leading_ones - return the number of
+    leading one bits in a 32-bit value
+-------------------------------------------------*/
+
+#define count_leading_ones _count_leading_ones
+INLINE UINT8 _count_leading_ones(UINT32 value)
+{
+#ifdef PTR64
+	UINT32 index;
+	return _BitScanReverse(&index, ~value) ? (index ^ 31) : 32;
+#else
+	INT32 result;
+
+    __asm
+    {
+    	mov   eax,value
+    	not   eax
+    	bsr   eax,eax
+    	jnz   skip
+    	mov   eax,63
+    skip:
+    	xor   eax,31
+        mov   result,eax
+    }
+
+	return result;
+#endif
+}
 
 
 
-//============================================================
-//  INLINE SYNCHRONIZATION FUNCTIONS
-//============================================================
+/***************************************************************************
+    INLINE SYNCHRONIZATION FUNCTIONS
+***************************************************************************/
 
-#if defined(_MSC_VER)
+/*-------------------------------------------------
+    compare_exchange32 - compare the 'compare'
+    value against the memory at 'ptr'; if equal,
+    swap in the 'exchange' value. Regardless,
+    return the previous value at 'ptr'.
+-------------------------------------------------*/
 
-// Microsoft Visual C
-#include <intrin.h>
-
-#pragma intrinsic(_InterlockedCompareExchange)
-#pragma intrinsic(_InterlockedCompareExchange64)
-#pragma intrinsic(_InterlockedExchangeAdd)
-
-#define osd_compare_exchange32 _osd_compare_exchange32
-INLINE INT32 _osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
+#define compare_exchange32 _compare_exchange32
+INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
 	return _InterlockedCompareExchange(ptr, exchange, compare);
 }
 
+
+/*-------------------------------------------------
+    compare_exchange64 - compare the 'compare'
+    value against the memory at 'ptr'; if equal,
+    swap in the 'exchange' value. Regardless,
+    return the previous value at 'ptr'.
+-------------------------------------------------*/
+
 #ifdef PTR64
-#define osd_compare_exchange64 _osd_compare_exchange64
-INLINE INT64 _osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
+#define compare_exchange64 _compare_exchange64
+INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	return _InterlockedCompareExchange64(ptr, exchange, compare);
 }
 #endif
 
-#define osd_sync_add _osd_sync_add
-INLINE INT32 osd_sync_add(INT32 volatile *ptr, INT32 delta)
+
+/*-------------------------------------------------
+    atomic_exchange32 - atomically exchange the
+    exchange value with the memory at 'ptr',
+    returning the original value.
+-------------------------------------------------*/
+
+#define atomic_exchange32 _atomic_exchange32
+INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
+{
+	return _InterlockedExchange(ptr, exchange);
+}
+
+
+/*-------------------------------------------------
+    atomic_add32 - atomically add the delta value
+    to the memory at 'ptr', returning the final
+    result.
+-------------------------------------------------*/
+
+#define atomic_add32 _atomic_add32
+INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	return _InterlockedExchangeAdd(ptr, delta) + delta;
 }
-
-#elif defined(__GNUC__) && !defined(PTR64)
-
-// need to copy this from the SDL implementation
-
-#endif
-
 
 
 #endif /* __OSINLINE__ */

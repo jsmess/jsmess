@@ -347,45 +347,4 @@ INLINE UINT64 d2u(double d)
 	return u.vv;
 }
 
-
-
-/***************************************************************************
-    INLINE MATH HELPERS
-***************************************************************************/
-
-/* If the OSD layer wants to override these in osd_cpu.h, they can by #defining */
-/* the function name to itself or to point to something else */
-
-
-/* return the number of leading zero bits in a 32-bt value */
-#ifndef count_leading_zeros
-INLINE UINT32 count_leading_zeros(UINT32 val)
-{
-	UINT32 count;
-	for (count = 0; (INT32)val >= 0; count++) val <<= 1;
-	return count;
-}
-#endif
-
-
-/* return the number of leading one bits in a 32-bt value */
-#ifndef count_leading_ones
-INLINE UINT32 count_leading_ones(UINT32 val)
-{
-	UINT32 count;
-	for (count = 0; (INT32)val < 0; count++) val <<= 1;
-	return count;
-}
-#endif
-
-
-/* perform a 32x32 multiply to 64-bit precision and then shift */
-#ifndef fixed_mul_shift
-INLINE INT32 fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
-{
-	return (INT32)(((INT64)val1 * (INT64)val2) >> shift);
-}
-#endif
-
-
 #endif	/* __MAMECORE_H__ */

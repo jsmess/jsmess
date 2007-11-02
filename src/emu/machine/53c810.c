@@ -6,13 +6,7 @@
 #define DMA_MAX_ICOUNT	512		/* Maximum number of DMA Scripts opcodes to run */
 #define DASM_OPCODES 0
 
-typedef struct
-{
-	void *data;		/* device's "this" pointer */
-	pSCSIDispatch handler;	/* device's handler routine */
-} SCSIDev;
-
-static SCSIDev devices[8];	/* SCSI IDs 0-7 */
+static SCSIInstance *devices[8];	/* SCSI IDs 0-7 */
 static struct LSI53C810interface *intf;
 static UINT8 last_id;
 
@@ -46,13 +40,6 @@ static struct {
 	int dma_icount;
 	int halted;
 	int carry;
-
-	struct
-	{
-		void *data;		// device's "this" pointer
-		pSCSIDispatch handler;	// device's handler routine
-	} devices[8];
-
 	UINT32 (* fetch)(UINT32 dsp);
 	void (* irq_callback)(void);
 	void (* dma_callback)(UINT32, UINT32, int, int);
@@ -707,16 +694,15 @@ extern void lsi53c810_init(struct LSI53C810interface *interface)
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		devices[interface->scsidevs->devices[i].scsiID].handler = interface->scsidevs->devices[i].handler;
-		interface->scsidevs->devices[i].handler(SCSIOP_ALLOC_INSTANCE, &devices[interface->scsidevs->devices[i].scsiID].data, interface->scsidevs->devices[i].diskID, (UINT8 *)NULL);
+		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskID );
 	}
 }
 
 void lsi53c810_read_data(int bytes, UINT8 *pData)
 {
-	if (devices[last_id].handler)
+	if (devices[last_id])
 	{
-		devices[last_id].handler(SCSIOP_READ_DATA, devices[last_id].data, bytes, pData);
+		SCSIReadData( devices[last_id], pData, bytes);
 	}
 	else
 	{
@@ -726,9 +712,9 @@ void lsi53c810_read_data(int bytes, UINT8 *pData)
 
 void lsi53c810_write_data(int bytes, UINT8 *pData)
 {
-	if (devices[last_id].handler)
+	if (devices[last_id])
 	{
-		devices[last_id].handler(SCSIOP_WRITE_DATA, devices[last_id].data, bytes, pData);
+		SCSIWriteData( devices[last_id], pData, bytes );
 	}
 	else
 	{
@@ -740,10 +726,10 @@ void *lsi53c810_get_device(int id)
 {
 	void *ret;
 
-	if (devices[id].handler)
+	if (devices[id])
 	{
 		logerror("lsi53c810: fetching dev pointer for SCSI ID %d\n", id);
-		devices[id].handler(SCSIOP_GET_DEVICE, devices[id].data, 0, (UINT8 *)&ret);
+		SCSIGetDevice( devices[id], &ret );
 
 		return ret;
 	}

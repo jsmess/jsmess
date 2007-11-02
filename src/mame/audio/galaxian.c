@@ -525,7 +525,7 @@ static TIMER_CALLBACK( galaxian_sh_update )
 }
 
 
-struct Samplesinterface galaxian_custom_interface =
+struct Samplesinterface galaxian_samples_interface =
 {
 	5,
 	NULL,

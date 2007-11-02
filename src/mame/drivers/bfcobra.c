@@ -975,12 +975,12 @@ INPUT_PORTS_END
 
 static void z80_acia_irq(int state)
 {
-	cpunum_set_input_line(0, 0, state ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(0, 0, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static void m6809_data_irq(int state)
 {
-	cpunum_set_input_line(1, M6809_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(1, M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static struct acia6850_interface z80_acia_if =
@@ -989,6 +989,9 @@ static struct acia6850_interface z80_acia_if =
 	500000,
 	&m6809_z80_line,
 	&z80_m6809_line,
+	NULL,
+	NULL,
+	NULL,
 	z80_acia_irq
 };
 
@@ -998,6 +1001,9 @@ static struct acia6850_interface m6809_acia_if =
 	500000,
 	&z80_m6809_line,
 	&m6809_z80_line,
+	NULL,
+	NULL,
+	NULL,
 	NULL
 };
 
@@ -1007,6 +1013,9 @@ static struct acia6850_interface data_acia_if =
 	500000,
 	&data_r,
 	&data_t,
+	NULL,
+	NULL,
+	NULL,
 	m6809_data_irq
 };
 

@@ -66,12 +66,7 @@ SOUNDS += HC55516
 
 DRVLIBS = \
 	$(MAMEOBJ)/tiny.o \
-	$(MACHINE)/6821pia.o \
-	$(MACHINE)/7474.o \
-	$(MACHINE)/74148.o \
-	$(MACHINE)/74153.o \
 	$(MACHINE)/ticket.o \
-	$(MACHINE)/z80ctc.o \
 	$(DRIVERS)/carpolo.o $(MACHINE)/carpolo.o $(VIDEO)/carpolo.o \
 	$(DRIVERS)/circus.o $(AUDIO)/circus.o $(VIDEO)/circus.o \
 	$(DRIVERS)/exidy.o $(AUDIO)/exidy.o $(VIDEO)/exidy.o \

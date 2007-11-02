@@ -649,7 +649,7 @@ static struct z80_irq_daisy_chain daisy_chain[] =
 
 
 
-static struct Samplesinterface custom_interface =
+static struct Samplesinterface senjyo_samples_interface =
 {
 	1,
 	NULL,
@@ -700,7 +700,7 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_CONFIG(senjyo_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_DRIVER_END
 

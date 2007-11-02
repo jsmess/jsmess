@@ -135,6 +135,7 @@ bits(7:4) and bit(24)), X, and Y:
 #define EXPAND_RASTERIZERS
 
 #include "driver.h"
+#include "eminline.h"
 #include "profiler.h"
 #include "video/polynew.h"
 #include "voodoo.h"
@@ -4717,7 +4718,7 @@ static INT32 triangle(voodoo_state *v)
 		v->fbi.startb += (dy * v->fbi.dbdy + dx * v->fbi.dbdx) >> 4;
 		v->fbi.starta += (dy * v->fbi.dady + dx * v->fbi.dadx) >> 4;
 		v->fbi.startw += (dy * v->fbi.dwdy + dx * v->fbi.dwdx) >> 4;
-		v->fbi.startz += fixed_mul_shift(dy, v->fbi.dzdy, 4) + fixed_mul_shift(dx, v->fbi.dzdx, 4);
+		v->fbi.startz += mul_32x32_shift(dy, v->fbi.dzdy, 4) + mul_32x32_shift(dx, v->fbi.dzdx, 4);
 
 		/* adjust iterated W/S/T for TMU 0 */
 		if (texcount >= 1)

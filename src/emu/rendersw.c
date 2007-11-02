@@ -52,7 +52,7 @@
 #define FIRST_TIME
 
 #include "mamecore.h"
-#include "osinline.h"
+#include "eminline.h"
 #include "render.h"
 #include <math.h>
 
@@ -146,47 +146,7 @@ INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 	return MAKE_RGB(r, g, b);
 }
 
-
-#ifndef vec_mult
-INLINE int vec_mult(int parm1, int parm2)
-{
-	int temp,result;
-
-	temp     = abs(parm1);
-	result   = (temp&0x0000ffff) * (parm2&0x0000ffff);
-	result >>= 16;
-	result  += (temp&0x0000ffff) * (parm2>>16       );
-	result  += (temp>>16       ) * (parm2&0x0000ffff);
-	result >>= 16;
-	result  += (temp>>16       ) * (parm2>>16       );
-
-	if( parm1 < 0 )
-		return(-result);
-	else
-		return( result);
-}
 #endif
-
-/* can be be replaced by an assembly routine in osinline.h */
-#ifndef vec_div
-INLINE int vec_div(int parm1, int parm2)
-{
-	if( (parm2>>12) )
-	{
-		parm1 = (parm1<<4) / (parm2>>12);
-		if( parm1 > 0x00010000 )
-			return( 0x00010000 );
-		if( parm1 < -0x00010000 )
-			return( -0x00010000 );
-		return( parm1 );
-	}
-	return( 0x00010000 );
-}
-#endif
-
-
-#endif
-
 
 
 /***************************************************************************
@@ -304,12 +264,12 @@ static void FUNC_PREFIX(draw_line)(const render_primitive *prim, void *dstdata, 
 		if (dx >= dy)
 		{
 			sx = ((x1 <= x2) ? 1 : -1);
-			sy = vec_div(y2 - y1, dx);
+			sy = (dy == 0) ? 0 : div_32x32_shift(y2 - y1, dx, 16);
 			if (sy < 0)
 				dy--;
 			x1 >>= 16;
 			xx = x2 >> 16;
-			bwidth = vec_mult(beam << 4, cosine_table[abs(sy) >> 5]);
+			bwidth = mul_32x32_hi(beam << 4, cosine_table[abs(sy) >> 5]);
 			y1 -= bwidth >> 1; /* start back half the diameter */
 			for (;;)
 			{
@@ -340,12 +300,12 @@ static void FUNC_PREFIX(draw_line)(const render_primitive *prim, void *dstdata, 
 		else
 		{
 			sy = ((y1 <= y2) ? 1: -1);
-			sx = vec_div(x2 - x1, dy);
+			sx = (dx == 0) ? 0 : div_32x32_shift(x2 - x1, dy, 16);
 			if (sx < 0)
 				dx--;
 			y1 >>= 16;
 			yy = y2 >> 16;
-			bwidth = vec_mult(beam << 4,cosine_table[abs(sx) >> 5]);
+			bwidth = mul_32x32_hi(beam << 4,cosine_table[abs(sx) >> 5]);
 			x1 -= bwidth >> 1; /* start back half the width */
 			for (;;)
 			{

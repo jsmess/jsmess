@@ -53,23 +53,23 @@ TODO:
 
 /*
 
-	Chip				RAM		NVRAM	ROM		SCI
-	-----------------------------------------------
-	MC6800				-		-		-		no
-	MC6801				128		64		2K		yes
-	MC68701				128		64		-		yes
-	MC6803				128		64		-		yes
-	MC6802				128		32		-		no
-	MC6802NS			128		-		-		no
-	MC6808				-		-		-		no
+    Chip                RAM     NVRAM   ROM     SCI
+    -----------------------------------------------
+    MC6800              -       -       -       no
+    MC6801              128     64      2K      yes
+    MC68701             128     64      -       yes
+    MC6803              128     64      -       yes
+    MC6802              128     32      -       no
+    MC6802NS            128     -       -       no
+    MC6808              -       -       -       no
 
-	HD6301				128		-		4K		yes
-	HD63701				192		-		4K		yes
-	HD6303				128		-		-		yes
-	HD6801				128		64		2K		yes
+    HD6301              128     -       4K      yes
+    HD63701             192     -       4K      yes
+    HD6303              128     -       -       yes
+    HD6801              128     64      2K      yes
 
-	NSC8105				
-	MS2010-A			
+    NSC8105
+    MS2010-A
 
 */
 

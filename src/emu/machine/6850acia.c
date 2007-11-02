@@ -134,7 +134,7 @@ static void acia6850_reset(int which)
 	if (acia_p->first_reset)
 	{
 		acia_p->first_reset = 0;
-		
+
 		if (acia_p->rts_pin)
 		{
 			*acia_p->rts_pin = 1;
@@ -209,7 +209,7 @@ UINT8 acia6850_stat_r(int which)
 	acia_6850 *acia_p = &acia[which];
 
 	acia_p->status_read = 1;
-	
+
 	return acia_p->status;
 }
 

@@ -1615,145 +1615,201 @@ static void f103(void)
 }
 
 struct function {
-	int nb;
 	void (*cb)(void);
 	int count;
 };
 
-static struct function ftab_vf[] = {
-	{   0, fadd,            2 },
-	{   1, fsub,            2 },
-	{   2, fmul,            2 },
-	{   3, fdiv,            2 },
-	{   5, matrix_push,     0 },
-	{   6, matrix_pop,      0 },
-	{   7, matrix_write,   12 },
-	{   8, clear_stack,     0 },
-	{  10, anglev,          2 },
-	{  13, track_select,    1 },
-	{  14, f14,   4 },
-	{  15, anglep,          4 },
-	{  16, matrix_ident,    0 },
-	{  17, matrix_read,     0 },
-	{  18, matrix_trans,    3 },
-	{  19, matrix_scale,    3 },
-	{  20, matrix_rotx,     1 },
-	{  21, matrix_roty,     1 },
-	{  22, matrix_rotz,     1 },
-	{  24, track_read_quad, 1 },
-	{  26, transform_point, 3 },
-	{  27, fsin_m1,         1 },
-	{  28, fcos_m1,         1 },
-	{  29, fsinm_m1,        2 },
-	{  30, fcosm_m1,        2 },
-	{  31, distance3,       6 },
-	{  36, acc_set,         1 },
-	{  37, acc_get,         0 },
-	{  38, acc_add,         1 },
-	{  39, acc_sub,         1 },
-	{  40, acc_mul,         1 },
-	{  41, acc_div,         1 }, // not used ?
-	{  42, f42,   3 },
-	{  43, f43,   6 },
-	{  44, f44,   1 },
-	{  45, f45,   1 },
-	{  46, vlength,         3 },
-	{  48, track_read_info, 1 },
-	{  49, colbox_set,     12 },
-	{  50, colbox_test,     3 },
-	{  54, track_lookup,    4 },
-	{  64, col_setcirc,     3 },
-	{  65, col_testpt,      2 },
-	{  67, distance,        4 },
-	{  71, car_move,        4 },
-	{  72, cpa,            12 },
-	{  74, vmat_store,      1 },
-	{  75, vmat_restore,    1 },
-	{  77, vmat_mul,        2 },
-	{  78, vmat_read,       1 },
-	{  79, matrix_unrot,    0 },
-	{  80, f80,   0 },
-	{  82, matrix_rtrans,   0 },
-	{  84, vmat_save,       1 },
-	{  85, vmat_load,       1 },
-	{  86, ram_setadr,      1 },
-	{  87, groundbox_test,  3 },
-	{  89, f89,   4 },
-	{  92, f92,   4 },
-	{  93, f93,   1 },
-	{  94, f94,   1 },
-	{  95, vmat_flatten,    0 },
-	{  96, vmat_load1,      1 },
-	{  97, ram_trans,       0 },
-	{  98, f98,   1 },
-	{  99, f99,   0 },
-	{ 100, f100,  0 },
-	{ 101, groundbox_set,   7 },
-	{ 102, f102,  8 },
-	{ 103, f103,  1 },
-	{ 0, 0, 0 }
+static const struct function ftab_vf[] = {
+	{ fadd,            2 }, /* 0x00 */
+	{ fsub,            2 },
+	{ fmul,            2 },
+	{ fdiv,            2 },
+	{ NULL,            0 },
+	{ matrix_push,     0 },
+	{ matrix_pop,      0 },
+	{ matrix_write,   12 },
+	{ clear_stack,     0 },
+	{ NULL,            0 },
+	{ anglev,          2 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ track_select,    1 },
+	{ f14,             4 },
+	{ anglep,          4 },
+
+	{ matrix_ident,    0 },  /* 0x10 */
+	{ matrix_read,     0 },
+	{ matrix_trans,    3 },
+	{ matrix_scale,    3 },
+	{ matrix_rotx,     1 },
+	{ matrix_roty,     1 },
+	{ matrix_rotz,     1 },
+	{ NULL,            0 },
+	{ track_read_quad, 1 },
+	{ NULL,            0 },
+	{ transform_point, 3 },
+	{ fsin_m1,         1 },
+	{ fcos_m1,         1 },
+	{ fsinm_m1,        2 },
+	{ fcosm_m1,        2 },
+	{ distance3,       6 },
+
+	{ NULL,            0 },  /* 0x20 */
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ acc_set,         1 },
+	{ acc_get,         0 },
+	{ acc_add,         1 },
+	{ acc_sub,         1 },
+	{ acc_mul,         1 },
+	{ acc_div,         1 }, // not used ?
+	{ f42,             3 },
+	{ f43,             6 },
+	{ f44,             1 },
+	{ f45,             1 },
+	{ vlength,         3 },
+	{ NULL, 0 },
+
+	{ track_read_info, 1 },  /* 0x30 */
+	{ colbox_set,     12 },
+	{ colbox_test,     3 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ track_lookup,    4 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+
+	{ col_setcirc,     3 },  /* 0x40 */
+	{ col_testpt,      2 },
+	{ NULL,            0 },
+	{ distance,        4 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ car_move,        4 },
+	{ cpa,            12 },
+	{ NULL,            0 },
+	{ vmat_store,      1 },
+	{ vmat_restore,    1 },
+	{ NULL,            0 },
+	{ vmat_mul,        2 },
+	{ vmat_read,       1 },
+	{ matrix_unrot,    0 },
+
+	{ f80,             0 },  /* 0x50 */
+	{ NULL,            0 },
+	{ matrix_rtrans,   0 },
+	{ NULL,            0 },
+	{ vmat_save,       1 },
+	{ vmat_load,       1 },
+	{ ram_setadr,      1 },
+	{ groundbox_test,  3 },
+	{ NULL,            0 },
+	{ f89,             4 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ f92,             4 },
+	{ f93,             1 },
+	{ f94,             1 },
+	{ vmat_flatten,    0 },
+
+	{ vmat_load1,      1 },  /* 0x60 */
+	{ ram_trans,       0 },
+	{ f98,             1 },
+	{ f99,             0 },
+	{ f100,            0 },
+	{ groundbox_set,   7 },
+	{ f102,            8 },
+	{ f103,            1 }
 };
+
 // Used in swa scene 1 and unemulated:
 //   f14
 //   f49_swa
 //   f15_swa
 
-static struct function ftab_swa[] = {
-	{   0, fadd,            2 },
-	{   1, fsub,            2 },
-	{   2, fmul,            2 },
-	{   3, fdiv,            2 },
-	{   5, matrix_push,     0 },
-	{   6, matrix_pop,      0 },
-	{   7, matrix_write,   12 },
-	{   8, clear_stack,     0 },
-	{   9, matrix_mul,     12 },
-	{  10, anglev,          2 },
-	{  11, f11,             9 },
-	{  12, normalize,       3 },
-	{  13, acc_seti,        1 },
-	{  14, f14,   4 },
-	{  15, f15_swa, 0 },
-	{  16, matrix_ident,    0 },
-	{  17, matrix_read,     0 },
-	{  18, matrix_trans,    3 },
-	{  19, matrix_scale,    3 },
-	{  20, matrix_rotx,     1 },
-	{  21, matrix_roty,     1 },
-	{  22, matrix_rotz,     1 },
-	{  24, f24_swa,   7 },
-	{  26, transform_point, 3 },
-	{  27, fsin_m1,         1 },
-	{  28, fcos_m1,         1 },
-	{  29, fsinm_m1,        2 },
-	{  30, fcosm_m1,        2 },
-	{  31, distance3,       6 },
-	{  34, ftoi,            1 },
-	{  35, itof,            1 },
-	{  36, acc_set,         1 },
-	{  37, acc_get,         0 },
-	{  38, acc_add,         1 },
-	{  39, acc_sub,         1 },
-	{  40, acc_mul,         1 },
-	{  41, acc_div,         1 }, // not used ?
-	{  42, xyz2rqf,         3 },
-	{  43, f43_swa, 3 },
-	{  44, matrix_sdir,     3 },
-	{  45, f45,   1 },
-	{  46, vlength,         3 },
-	{  47, f47,   3 },
-	{  49, f49_swa, 6 },
-	{  50, f50_swa, 4 },
-	{  52, f52,   0 },
-	{  53, matrix_rdir,     3 },
-	{  56, f56,   7 },
-	{  57, f57,   0 },
-	{  58, matrix_readt,    0 },
-	{  59, acc_geti,        0 },
-	{  60, f60,   0 },
-	{  65, push_and_ident,  0 },
-	{  67, catmull_rom,     13 },
-	{ 0, 0, 0 }
+static const struct function ftab_swa[] = {
+	{ fadd,            2 },  /* 0x00 */
+	{ fsub,            2 },
+	{ fmul,            2 },
+	{ fdiv,            2 },
+	{ NULL,            0 },
+	{ matrix_push,     0 },
+	{ matrix_pop,      0 },
+	{ matrix_write,   12 },
+	{ clear_stack,     0 },
+	{ matrix_mul,     12 },
+	{ anglev,          2 },
+	{ f11,             9 },
+	{ normalize,       3 },
+	{ acc_seti,        1 },
+	{ f14,             4 },
+	{ f15_swa,         0 },
+
+	{ matrix_ident,    0 }, /* 0x10 */
+	{ matrix_read,     0 },
+	{ matrix_trans,    3 },
+	{ matrix_scale,    3 },
+	{ matrix_rotx,     1 },
+	{ matrix_roty,     1 },
+	{ matrix_rotz,     1 },
+	{ NULL,            0 },
+	{ f24_swa,         7 },
+	{ NULL,            0 },
+	{ transform_point, 3 },
+	{ fsin_m1,         1 },
+	{ fcos_m1,         1 },
+	{ fsinm_m1,        2 },
+	{ fcosm_m1,        2 },
+	{ distance3,       6 },
+
+	{ NULL,            0 }, /* 0x20 */
+	{ NULL,            0 },
+	{ ftoi,            1 },
+	{ itof,            1 },
+	{ acc_set,         1 },
+	{ acc_get,         0 },
+	{ acc_add,         1 },
+	{ acc_sub,         1 },
+	{ acc_mul,         1 },
+	{ acc_div,         1 }, // not used ?
+	{ xyz2rqf,         3 },
+	{ f43_swa,         3 },
+	{ matrix_sdir,     3 },
+	{ f45,             1 },
+	{ vlength,         3 },
+	{ f47,             3 },
+
+	{ NULL,            0 }, /* 0x30 */
+	{ f49_swa,         6 },
+	{ f50_swa,         4 },
+	{ NULL,            0 },
+	{ f52,             0 },
+	{ matrix_rdir,     3 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ f56,             7 },
+	{ f57,             0 },
+	{ matrix_readt,    0 },
+	{ acc_geti,        0 },
+	{ f60,             0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+	{ NULL,            0 },
+
+	{ push_and_ident,  0 }, /* 0x40 */
+	{ NULL,            0 },
+	{ catmull_rom,    13 }
 };
 
 
@@ -1767,9 +1823,6 @@ static void dump(void)
 static void function_get_vf(void)
 {
 	UINT32 f = fifoin_pop() >> 23;
-	struct function *fct;
-
-	for(fct = ftab_vf; fct->cb && fct->nb != f; fct++);
 
 	if(fifoout_rpos != fifoout_wpos) {
 		int count = fifoout_wpos - fifoout_rpos;
@@ -1777,9 +1830,9 @@ static void function_get_vf(void)
 			count += FIFO_SIZE;
 		logerror("TGP function called with sizeout = %d\n", count);
 	}
-	if(fct->cb) {
-		fifoin_cbcount = fct->count;
-		fifoin_cb = fct->cb;
+	if(ARRAY_LENGTH(ftab_vf) > f && NULL != ftab_vf[f].cb) {
+		fifoin_cbcount = ftab_vf[f].count;
+		fifoin_cb = ftab_vf[f].cb;
 		//      logerror("TGP function %d request, %d parameters\n", f, fifoin_cbcount);
 		if(!fifoin_cbcount)
 			fifoin_cb();
@@ -1793,9 +1846,6 @@ static void function_get_vf(void)
 static void function_get_swa(void)
 {
 	UINT32 f = fifoin_pop();
-	struct function *fct;
-
-	for(fct = ftab_swa; fct->cb && fct->nb != f; fct++);
 
 	if(fifoout_rpos != fifoout_wpos) {
 		int count = fifoout_wpos - fifoout_rpos;
@@ -1803,9 +1853,9 @@ static void function_get_swa(void)
 			count += FIFO_SIZE;
 		logerror("TGP function called with sizeout = %d\n", count);
 	}
-	if(fct->cb) {
-		fifoin_cbcount = fct->count;
-		fifoin_cb = fct->cb;
+	if(ARRAY_LENGTH(ftab_swa) > f && NULL != ftab_swa[f].cb) {
+		fifoin_cbcount = ftab_swa[f].count;
+		fifoin_cb = ftab_swa[f].cb;
 		//      logerror("TGP function %d request, %d parameters\n", f, fifoin_cbcount);
 		if(!fifoin_cbcount)
 			fifoin_cb();

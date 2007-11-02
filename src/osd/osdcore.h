@@ -22,8 +22,6 @@
 
 #include "osdcomm.h"
 
-#include "osinline.h"
-
 
 
 /***************************************************************************
@@ -505,89 +503,6 @@ void osd_lock_release(osd_lock *lock);
         None.
 -----------------------------------------------------------------------------*/
 void osd_lock_free(osd_lock *lock);
-
-
-/*-----------------------------------------------------------------------------
-    osd_compare_exchange32: compare an INT32 against a value in memory; if they
-        are equal, swap in a new value; return the value from memory
-
-    Parameters:
-
-        ptr - a pointer to the memory to compare and exchange to.
-
-        compare - the value to compare the memory against.
-
-        exchange - the value to swap in if the compare succeeds.
-
-    Return value:
-
-        The original value from memory.
------------------------------------------------------------------------------*/
-#ifndef osd_compare_exchange32
-INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange);
-#endif
-
-
-/*-----------------------------------------------------------------------------
-    osd_compare_exchange64: compare an INT64 against a value in memory; if they
-        are equal, swap in a new value; return the value from memory
-
-    Parameters:
-
-        ptr - a pointer to the memory to compare and exchange to.
-
-        compare - the value to compare the memory against.
-
-        exchange - the value to swap in if the compare succeeds.
-
-    Return value:
-
-        The original value from memory.
------------------------------------------------------------------------------*/
-#ifdef PTR64
-#ifndef osd_compare_exchange64
-INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange);
-#endif
-#endif
-
-
-/*-----------------------------------------------------------------------------
-    osd_sync_add: INLINE wrapper to safely add a delta value to a
-        32-bit integer, returning the final result
------------------------------------------------------------------------------*/
-#ifndef osd_sync_add
-INLINE INT32 osd_sync_add(INT32 volatile *ptr, INT32 delta)
-{
-	INT32 origvalue;
-
-	/* loop until we succeed in updating against an unchanged value */
-	do
-	{
-		origvalue = *ptr;
-	} while (osd_compare_exchange32(ptr, origvalue, origvalue + delta) != origvalue);
-
-	/* return the final result */
-	return origvalue + delta;
-}
-#endif
-
-
-/*-----------------------------------------------------------------------------
-    osd_compare_exchange_ptr: INLINE wrapper to compare and exchange a
-        pointer value of the appropriate size
------------------------------------------------------------------------------*/
-#ifndef osd_compare_exchange_ptr
-INLINE void *osd_compare_exchange_ptr(void * volatile *ptr, void *compare, void *exchange)
-{
-#ifdef PTR64
-	INT64 result = osd_compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
-	return (void *)result;
-#else
-	INT32 result = osd_compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
-	return (void *)result;
-#endif
-}
-#endif
 
 
 

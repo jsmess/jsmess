@@ -18,6 +18,7 @@
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "includes/midzeus.h"
 #include "machine/midwayic.h"
 #include "audio/dcs.h"
 
@@ -28,817 +29,6 @@ static UINT8 cmos_protected;
 static mame_timer *timer[2];
 
 static UINT32 *tms32031_control;
-static UINT32 *graphics_ram;
-
-
-//------------------------------
-
-#define WAVERAM_WIDTH	512
-#define WAVERAM_HEIGHT	4096
-
-static UINT32 *waveram;
-
-
-VIDEO_START( midzeus )
-{
-	int i;
-
-	waveram = auto_malloc(2 * WAVERAM_WIDTH * WAVERAM_HEIGHT * sizeof(*waveram));
-
-	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine, i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
-}
-
-VIDEO_UPDATE( midzeus )
-{
-	static int yoffs = 0;
-	int p = input_code_pressed(KEYCODE_0) ? 0 : 1;
-	int x, y;
-	if (input_code_pressed(KEYCODE_DOWN) && input_code_pressed(KEYCODE_LCONTROL)) yoffs += 8;
-	if (input_code_pressed(KEYCODE_UP) && input_code_pressed(KEYCODE_LCONTROL)) yoffs -= 8;
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
-		UINT32 *src = &waveram[(p * WAVERAM_HEIGHT + ((y + yoffs) % WAVERAM_HEIGHT)) * WAVERAM_WIDTH + 0];
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			dest[x] = src[x] & 0x7fff;
-	}
-	return 0;
-}
-
-/*
-    offset B7 = control....
-
-        8000 = page 1 enable
-        4000 = page 0 enable
-
-        0080 = 2nd pixel enable (maybe Z buff?)
-        0040 = 1st pixel enable (maybe Z buff?)
-        0020 = 2nd pixel enable
-        0010 = 1st pixel enable
-
-
-    writes 80a2 to write an odd pixel at startup
-    writes 80f6 to write the middle pixels
-    writes 8052 to write an odd pixel at the end
-
-    writes 8050 before writing an odd pixel
-    writes 80a0 before writing an even pixel
-
-    writes 44f1 before reading from page 0 of wave ram
-    writes 84f1 before reading from page 1 of wave ram
-
-    writes 42f0 before writing to page 0 of wave ram
-    writes 82f0 before writing to page 1 of wave ram
-
-
-Initialization:
-01BFF4:graphics_w(080) = 0020F023
-01BFF1:graphics_w(081) = 00000020
-01C03E:graphics_w(080) = 00000000
-01C03E:graphics_w(081) = 00008200
-01C03E:graphics_w(08F) = 00000206
-01C03E:graphics_w(08E) = 00000000
-01C03E:graphics_w(08B) = 00000000
-01C03E:graphics_w(08A) = 0000FAFA
-01C03E:graphics_w(08D) = 00000206
-01C03E:graphics_w(08C) = 00000000
-01C03E:graphics_w(089) = 00000000
-01C03E:graphics_w(088) = 0000FAFA
-01C03E:graphics_w(080) = 00000001
-01C03E:graphics_w(0CF) = 000000C8
-01C03E:graphics_w(0CE) = 00007620
-01C03E:graphics_w(0CD) = 00000000
-01C03E:graphics_w(0CC) = 00000000
-01C03E:graphics_w(0CB) = 00000116   = VTOTAL(?)
-01C03E:graphics_w(0CA) = 00000107   = VSYNC END
-01C03E:graphics_w(0C9) = 00000103   = VSYNC START
-01C03E:graphics_w(0C8) = 000000FF   = VBSTART
-01C03E:graphics_w(0C7) = 00000211
-01C03E:graphics_w(0C6) = 0000007F
-01C03E:graphics_w(0C5) = 0000000C
-01C03E:graphics_w(0C4) = 00000042
-01C03E:graphics_w(0C3) = 00000015
-01C03E:graphics_w(0C2) = 0000E591
-01C03E:graphics_w(0C1) = 0000801F
-01C03E:graphics_w(0C0) = 00002500
-01C03E:graphics_w(086) = 00008003
-01C03E:graphics_w(080) = 00000C05
-01C03E:graphics_w(085) = 00000000
-01C03E:graphics_w(084) = 00000000
-01C03E:graphics_w(083) = 00001F1F
-01C03E:graphics_w(082) = 00002011
-01C03E:graphics_w(069) = 00000003
-01C03E:graphics_w(069) = 00000000
-01C03E:graphics_w(08D) = 00000227
-01C03E:graphics_w(08C) = 0000BFFF
-01C03E:graphics_w(08D) = 00000226
-01C03E:graphics_w(08C) = 00000000
-01C03E:graphics_w(08D) = 00000227
-01C03E:graphics_w(08C) = 0000BFFF
-01C03E:graphics_w(08D) = 00000226
-01C03E:graphics_w(08C) = 00000000
-01C03E:graphics_w(08D) = 00000227
-01C03E:graphics_w(08C) = 0000F020
-01C03E:graphics_w(08D) = 00000226
-01C03E:graphics_w(08C) = 00000000
-01C03E:graphics_w(08D) = 00000227
-01C03E:graphics_w(08C) = 0000DFFF
-01C03E:graphics_w(08D) = 00000226
-01C03E:graphics_w(08C) = 00000000
-01C03E:graphics_w(08D) = 00000227
-01C03E:graphics_w(08C) = 0000DFFF
-01C03E:graphics_w(08D) = 00000226
-01C03E:graphics_w(08C) = 00000000
-01C03E:graphics_w(08F) = 00000207
-01C03E:graphics_w(08E) = 0000BFFF
-01C03E:graphics_w(08F) = 00000206
-01C03E:graphics_w(08E) = 00000000
-01C03E:graphics_w(08F) = 00000207
-01C03E:graphics_w(08E) = 0000F020
-01C03E:graphics_w(08F) = 00000206
-01C03E:graphics_w(08E) = 00000000
-01C03E:graphics_w(08F) = 00000207
-01C03E:graphics_w(08E) = 0000DFFF
-01C03E:graphics_w(08F) = 00000206
-01C03E:graphics_w(08E) = 00000000
-01C03E:graphics_w(08F) = 00000207
-01C03E:graphics_w(08E) = 0000DFFF
-01C03E:graphics_w(08F) = 00000206
-01C03E:graphics_w(08E) = 00000000
-01C03E:graphics_w(08F) = 00000206
-01C03E:graphics_w(08E) = 00000000
-01C03E:graphics_w(08D) = 00000226
-01C03E:graphics_w(08C) = 00000000
-01C03E:graphics_w(08B) = 00000000
-01C03E:graphics_w(08A) = 0000D254
-01C03E:graphics_w(089) = 00000000
-01C03E:graphics_w(088) = 0000D794
-
-then:
-01C2CE:graphics_w(0B7) = 00000000
-01C2D0:graphics_w(0B6) = 00000001
-01C2D1:graphics_w(0B0) = 00000000
-01C2D2:graphics_w(0B1) = 00000000
-01C2D3:graphics_w(0B2) = 00007FFF
-01C2D4:graphics_w(0B3) = 00007FFF
-01C2D8:graphics_w(0B5) = 000000FF  y
-01C2DD:graphics_w(0B4) = 00000100  x/yhi
-01C2EA:graphics_w(0B7) = FFFF80F6  page 1
-01C2EB:graphics_w(0B0) = 00000000
-01C2EC:graphics_r(0F6)
-01C2F4:graphics_w(0B0) = 00000000 x 256
-
-01C2F6:graphics_w(0B7) = FFFF8052
-01C2CE:graphics_w(0B7) = 00000000
-01C2D0:graphics_w(0B6) = 00000001
-01C2D1:graphics_w(0B0) = 00000000
-01C2D2:graphics_w(0B1) = 00000000
-01C2D3:graphics_w(0B2) = 00007FFF
-01C2D4:graphics_w(0B3) = 00007FFF
-01C2D8:graphics_w(0B5) = 000000FF  y
-01C2DD:graphics_w(0B4) = 00000000  x/yhi
-01C2EA:graphics_w(0B7) = FFFF80F6
-01C2EB:graphics_w(0B0) = 00000000
-01C2EC:graphics_r(0F6)
-01C2F4:graphics_w(0B0) = 00000000 x 256
-
-etc. to clear all scanlines on page 1
-
-then:
-01C2F6:graphics_w(0B7) = FFFF8052
-01BFF4:graphics_w(080) = 00200001
-01C1B6:graphics_w(0CF) = 000000C9
-01BFF4:graphics_w(080) = 00200C27
-01C1BC:graphics_w(0CF) = 000000C8
-01BFF4:graphics_w(080) = 0020F023
-01BFF1:graphics_w(081) = 00000020
-01BFF1:graphics_w(081) = 00000022
-01BFF4:graphics_w(080) = 0022F023
-
-01C0DB:graphics_w(200) = 00000E00
-01C0DB:graphics_w(202) = 00000025
-01C0DB:graphics_w(204) = 00000E01
-01C0DB:graphics_w(206) = 00000025
-01C0DB:graphics_w(208) = 00000E02
-01C0DB:graphics_w(20A) = 00000025
-01C0DB:graphics_w(20C) = 00000E03
-01C0DB:graphics_w(20E) = 00000025
-01C0DB:graphics_w(210) = 00000E04
-01C0DB:graphics_w(212) = 00000025
-01C0DB:graphics_w(214) = 00000E05
-01C0DB:graphics_w(216) = 00000025
-01C0DB:graphics_w(218) = 00000E06
-01C0DB:graphics_w(21A) = 00000025
-01C0DB:graphics_w(21C) = 00000E07
-01C0DB:graphics_w(21E) = 00000025
-01C0DB:graphics_w(220) = 00000E08
-01C0DB:graphics_w(222) = 00000025
-01C0DB:graphics_w(224) = 00000E09
-01C0DB:graphics_w(226) = 00000025
-01C0DB:graphics_w(228) = 00000E0A
-01C0DB:graphics_w(22A) = 00000025
-01C0DB:graphics_w(22C) = 00000E0B
-01C0DB:graphics_w(22E) = 00000025
-01C0DB:graphics_w(230) = 00000E0C
-01C0DB:graphics_w(232) = 00000025
-01C0DB:graphics_w(234) = 00000E0D
-01C0DB:graphics_w(236) = 00000025
-01C0DB:graphics_w(238) = 00000E0E
-01C0DB:graphics_w(23A) = 00000025
-01C0DB:graphics_w(23C) = 00000E0F
-01C0DB:graphics_w(23E) = 00000025
-01C0DB:graphics_w(240) = 00000E10
-01C0DB:graphics_w(242) = 00000025
-01C0DB:graphics_w(244) = 00000E11
-01C0DB:graphics_w(246) = 00000025
-01C0DB:graphics_w(248) = 00000E12
-01C0DB:graphics_w(24A) = 00000025
-01C0DB:graphics_w(24C) = 00000E13
-01C0DB:graphics_w(24E) = 00000025
-01C0DB:graphics_w(250) = 00000E14
-01C0DB:graphics_w(252) = 00000025
-01C0DB:graphics_w(254) = 00000E15
-01C0DB:graphics_w(256) = 00000025
-01C0DB:graphics_w(258) = 00000E16
-01C0DB:graphics_w(25A) = 00000025
-01C0DB:graphics_w(25C) = 00000E17
-01C0DB:graphics_w(25E) = 00000025
-01C0DB:graphics_w(260) = 00000E18
-01C0DB:graphics_w(262) = 00000025
-01C0DB:graphics_w(264) = 00000E19
-01C0DB:graphics_w(266) = 00000025
-01C0DB:graphics_w(268) = 00000E1A
-01C0DB:graphics_w(26A) = 00000025
-01C0DB:graphics_w(26C) = 00000E1B
-01C0DB:graphics_w(26E) = 00000025
-01C0DB:graphics_w(270) = 00000E1C
-01C0DB:graphics_w(272) = 00000025
-01C0DB:graphics_w(274) = 00000E1D
-01C0DB:graphics_w(276) = 00000025
-01C0DB:graphics_w(278) = 00000E1E
-01C0DB:graphics_w(27A) = 00000025
-01C0DB:graphics_w(27C) = 00000E1F
-01C0DB:graphics_w(27E) = 00000025
-01C0DB:graphics_w(280) = 00000E20
-01C0DB:graphics_w(282) = 00000025
-01C0DB:graphics_w(284) = 00000E21
-01C0DB:graphics_w(286) = 00000025
-01C0DB:graphics_w(288) = 00000E22
-01C0DB:graphics_w(28A) = 00000025
-01C0DB:graphics_w(28C) = 00000E23
-01C0DB:graphics_w(28E) = 00000025
-01C0DB:graphics_w(290) = 00000E24
-01C0DB:graphics_w(292) = 00000025
-01C0DB:graphics_w(294) = 00000E25
-01C0DB:graphics_w(296) = 00000025
-01C0DB:graphics_w(298) = 00000E26
-01C0DB:graphics_w(29A) = 00000025
-01C0DB:graphics_w(29C) = 00000E27
-01C0DB:graphics_w(29E) = 00000025
-01C0DB:graphics_w(2A0) = 00000E28
-01C0DB:graphics_w(2A2) = 00000025
-01C0DB:graphics_w(2A4) = 00000E29
-01C0DB:graphics_w(2A6) = 00000025
-01C0DB:graphics_w(2A8) = 00000E2A
-01C0DB:graphics_w(2AA) = 00000025
-01C0DB:graphics_w(2AC) = 00000E2B
-01C0DB:graphics_w(2AE) = 00000025
-01C0DB:graphics_w(2B0) = 00000E2C
-01C0DB:graphics_w(2B2) = 00000025
-01C0DB:graphics_w(2B4) = 00000E2D
-01C0DB:graphics_w(2B6) = 00000025
-01C0DB:graphics_w(2B8) = 00000E2E
-01C0DB:graphics_w(2BA) = 00000025
-01C0DB:graphics_w(2BC) = 00000E2F
-01C0DB:graphics_w(2BE) = 00000025
-01C0DB:graphics_w(2C0) = 00000E30
-01C0DB:graphics_w(2C2) = 00000025
-01C0DB:graphics_w(2C4) = 00000E31
-01C0DB:graphics_w(2C6) = 00000025
-01C0DB:graphics_w(2C8) = 00000E32
-01C0DB:graphics_w(2CA) = 00000025
-01C0DB:graphics_w(2CC) = 00000E33
-01C0DB:graphics_w(2CE) = 00000025
-01C0DB:graphics_w(2D0) = 00000E34
-01C0DB:graphics_w(2D2) = 00000025
-01C0DB:graphics_w(2D4) = 00000E35
-01C0DB:graphics_w(2D6) = 00000025
-01C0DB:graphics_w(2D8) = 00000E36
-01C0DB:graphics_w(2DA) = 00000025
-01C0DB:graphics_w(2DC) = 00000E37
-01C0DB:graphics_w(2DE) = 00000025
-01C0DB:graphics_w(2E0) = 00000E38
-01C0DB:graphics_w(2E2) = 00000025
-01C0DB:graphics_w(2E4) = 00000E39
-01C0DB:graphics_w(2E6) = 00000025
-01C0DB:graphics_w(2E8) = 00000E3A
-01C0DB:graphics_w(2EA) = 00000025
-01C0DB:graphics_w(2EC) = 00000E3B
-01C0DB:graphics_w(2EE) = 00000025
-01C0DB:graphics_w(2F0) = 00000E3C
-01C0DB:graphics_w(2F2) = 00000025
-01C0DB:graphics_w(2F4) = 00000E3D
-01C0DB:graphics_w(2F6) = 00000025
-01C0DB:graphics_w(2F8) = 00000E3E
-01C0DB:graphics_w(2FA) = 00000025
-01C0DB:graphics_w(2FC) = 00000E3F
-01C0DB:graphics_w(2FE) = 00000025
-01C0DB:graphics_w(300) = 00000E40
-01C0DB:graphics_w(302) = 00000025
-01C0DB:graphics_w(304) = 00000E41
-01C0DB:graphics_w(306) = 00000025
-01C0DB:graphics_w(308) = 00000E42
-01C0DB:graphics_w(30A) = 00000025
-01C0DB:graphics_w(30C) = 00000E43
-01C0DB:graphics_w(30E) = 00000025
-01C0DB:graphics_w(310) = 00000E44
-01C0DB:graphics_w(312) = 00000025
-01C0DB:graphics_w(314) = 00000E45
-01C0DB:graphics_w(316) = 00000025
-01C0DB:graphics_w(318) = 00000E46
-01C0DB:graphics_w(31A) = 00000025
-01C0DB:graphics_w(31C) = 00000E47
-01C0DB:graphics_w(31E) = 00000025
-01C0DB:graphics_w(320) = 00000E48
-01C0DB:graphics_w(322) = 00000025
-01C0DB:graphics_w(324) = 00000E49
-01C0DB:graphics_w(326) = 00000025
-01C0DB:graphics_w(328) = 00000E4A
-01C0DB:graphics_w(32A) = 00000025
-01C0DB:graphics_w(32C) = 00000E4B
-01C0DB:graphics_w(32E) = 00000025
-01C0DB:graphics_w(330) = 00000E4C
-01C0DB:graphics_w(332) = 00000025
-01C0DB:graphics_w(334) = 00000E4D
-01C0DB:graphics_w(336) = 00000025
-01C0DB:graphics_w(338) = 00000E4E
-01C0DB:graphics_w(33A) = 00000025
-01C0DB:graphics_w(33C) = 00000E4F
-01C0DB:graphics_w(33E) = 00000025
-01C0DB:graphics_w(340) = 00000E50
-01C0DB:graphics_w(342) = 00000025
-01C0DB:graphics_w(344) = 00000E51
-01C0DB:graphics_w(346) = 00000025
-01C0DB:graphics_w(348) = 00000E52
-01C0DB:graphics_w(34A) = 00000025
-01C0DB:graphics_w(34C) = 00000E53
-01C0DB:graphics_w(34E) = 00000025
-01C0DB:graphics_w(350) = 00000E54
-01C0DB:graphics_w(352) = 00000025
-01C0DB:graphics_w(354) = 00000E55
-01C0DB:graphics_w(356) = 00000025
-01C0DB:graphics_w(358) = 00000E56
-01C0DB:graphics_w(35A) = 00000025
-01C0DB:graphics_w(35C) = 00000E57
-01C0DB:graphics_w(35E) = 00000025
-01C0DB:graphics_w(360) = 00000E58
-01C0DB:graphics_w(362) = 00000025
-01C0DB:graphics_w(364) = 00000E59
-01C0DB:graphics_w(366) = 00000025
-01C0DB:graphics_w(368) = 00000E5A
-01C0DB:graphics_w(36A) = 00000025
-01C0DB:graphics_w(36C) = 00000E5B
-01C0DB:graphics_w(36E) = 00000025
-01C0DB:graphics_w(370) = 00000E5C
-01C0DB:graphics_w(372) = 00000025
-01C0DB:graphics_w(374) = 00000E5D
-01C0DB:graphics_w(376) = 00000025
-01C0DB:graphics_w(378) = 00000E5E
-01C0DB:graphics_w(37A) = 00000025
-01C0DB:graphics_w(37C) = 00000E5F
-01C0DB:graphics_w(37E) = 00000025
-01C0DB:graphics_w(380) = 00000E60
-01C0DB:graphics_w(382) = 00000025
-01C0DB:graphics_w(384) = 00000E61
-01C0DB:graphics_w(386) = 00000025
-01C0DB:graphics_w(388) = 00000E62
-01C0DB:graphics_w(38A) = 00000025
-01C0DB:graphics_w(38C) = 00000E63
-01C0DB:graphics_w(38E) = 00000025
-01C0DB:graphics_w(390) = 00000E64
-01C0DB:graphics_w(392) = 00000025
-01C0DB:graphics_w(394) = 00000E65
-01C0DB:graphics_w(396) = 00000025
-01C0DB:graphics_w(398) = 00000E66
-01C0DB:graphics_w(39A) = 00000025
-01C0DB:graphics_w(39C) = 00000E67
-01C0DB:graphics_w(39E) = 00000025
-01C0DB:graphics_w(3A0) = 00000E68
-01C0DB:graphics_w(3A2) = 00000025
-01C0DB:graphics_w(3A4) = 00000E69
-01C0DB:graphics_w(3A6) = 00000025
-01C0DB:graphics_w(3A8) = 00000E6A
-01C0DB:graphics_w(3AA) = 00000025
-01C0DB:graphics_w(3AC) = 00000E6B
-01C0DB:graphics_w(3AE) = 00000025
-01C0DB:graphics_w(3B0) = 00000E6C
-01C0DB:graphics_w(3B2) = 00000025
-01C0DB:graphics_w(3B4) = 00000E6D
-01C0DB:graphics_w(3B6) = 00000025
-01C0DB:graphics_w(3B8) = 00000E6E
-01C0DB:graphics_w(3BA) = 00000025
-01C0DB:graphics_w(3BC) = 00000E6F
-01C0DB:graphics_w(3BE) = 00000025
-01C0DB:graphics_w(3C0) = 00000E70
-01C0DB:graphics_w(3C2) = 00000025
-01C0DB:graphics_w(3C4) = 00000E71
-01C0DB:graphics_w(3C6) = 00000025
-01C0DB:graphics_w(3C8) = 00000E72
-01C0DB:graphics_w(3CA) = 00000025
-01C0DB:graphics_w(3CC) = 00000E73
-01C0DB:graphics_w(3CE) = 00000025
-01C0DB:graphics_w(3D0) = 00000E74
-01C0DB:graphics_w(3D2) = 00000025
-01C0DB:graphics_w(3D4) = 00000E75
-01C0DB:graphics_w(3D6) = 00000025
-01C0DB:graphics_w(3D8) = 00000E76
-01C0DB:graphics_w(3DA) = 00000025
-01C0DB:graphics_w(3DC) = 00000E77
-01C0DB:graphics_w(3DE) = 00000025
-01C0DB:graphics_w(3E0) = 00000E78
-01C0DB:graphics_w(3E2) = 00000025
-01C0DB:graphics_w(3E4) = 00000E79
-01C0DB:graphics_w(3E6) = 00000025
-01C0DB:graphics_w(3E8) = 00000E7A
-01C0DB:graphics_w(3EA) = 00000025
-01C0DB:graphics_w(3EC) = 00000E7B
-01C0DB:graphics_w(3EE) = 00000025
-01C0DB:graphics_w(3F0) = 00000E7C
-01C0DB:graphics_w(3F2) = 00000025
-01C0DB:graphics_w(3F4) = 00000E7D
-01C0DB:graphics_w(3F6) = 00000025
-01C0DB:graphics_w(3F8) = 00000E7E
-01C0DB:graphics_w(3FA) = 00000025
-01C0DB:graphics_w(3FC) = 00000E7F
-01C0DB:graphics_w(3FE) = 00000025
-
-01BFB6:graphics_w(05A) = 00000000
-01BFB8:graphics_w(058) = 3F000000
-01BFB9:graphics_r(0F6)
-01BFBE:graphics_w(0E0) = 00000000
-01BFF4:graphics_w(080) = 0022F02B
-01BFC2:graphics_w(068) = 00030000
-01BFC4:graphics_w(068) = 00000000
-01C052:graphics_w(08A) = 8FFFD254
-01C054:graphics_w(088) = 87FFD794
-01BFF4:graphics_w(080) = 0022FC2B
-
-(other stuff)
-
-loop over each scanline:
-    A2DD19:graphics_w(0B7) = 00000000
-    A2DD24:graphics_w(0B6) = 82F00001
-    A2DD30:graphics_r(0F6)
-    A2DD34:graphics_w(0B4) = 01FF0000
-    A2DD37:graphics_w(0B0) = AAAAAAAA
-    A2DD39:graphics_w(0B2) = AAAAAAAA
-    A2DD30:graphics_r(0F6)
-    A2DD34:graphics_w(0B4) = 01FF0001
-    A2DD37:graphics_w(0B0) = AAAAAAAA
-    A2DD39:graphics_w(0B2) = AAAAAAAA
-    A2DD30:graphics_r(0F6)
-    ...
-    A2DD34:graphics_w(0B4) = 01FF01FE
-    A2DD37:graphics_w(0B0) = AAAAAAAA
-    A2DD39:graphics_w(0B2) = AAAAAAAA
-    A2DD30:graphics_r(0F6)
-    A2DD34:graphics_w(0B4) = 01FF01FF
-    A2DD37:graphics_w(0B0) = AAAAAAAA
-    A2DD39:graphics_w(0B2) = AAAAAAAA
-    A2DD45:graphics_w(0B6) = 00000000
-    A2DD58:graphics_w(0B6) = 00000000
-    A2DD6E:graphics_w(0B6) = 84F10001
-    A2DD6F:graphics_w(0B4) = 01FF0000
-    A2DD71:graphics_r(0F6)
-    A2DD76:graphics_w(0B6) = 00000000
-    A2DD77:graphics_r(0B0)
-    A2DD79:graphics_r(0B2)
-    A2DD6E:graphics_w(0B6) = 84F10001
-    A2DD6F:graphics_w(0B4) = 01FF0001
-    A2DD71:graphics_r(0F6)
-    A2DD76:graphics_w(0B6) = 00000000
-    A2DD77:graphics_r(0B0)
-    A2DD79:graphics_r(0B2)
-    ...
-    A2DD6E:graphics_w(0B6) = 84F10001
-    A2DD6F:graphics_w(0B4) = 01FF01FE
-    A2DD71:graphics_r(0F6)
-    A2DD76:graphics_w(0B6) = 00000000
-    A2DD77:graphics_r(0B0)
-    A2DD79:graphics_r(0B2)
-    A2DD6E:graphics_w(0B6) = 84F10001
-    A2DD6F:graphics_w(0B4) = 01FF01FF
-    A2DD71:graphics_r(0F6)
-    A2DD76:graphics_w(0B6) = 00000000
-    A2DD77:graphics_r(0B0)
-    A2DD79:graphics_r(0B2)
-    A2DD82:graphics_w(0B6) = 00000000
-    A2DD19:graphics_w(0B7) = 00000000
-    A2DD24:graphics_w(0B6) = 82F00001
-    A2DD30:graphics_r(0F6)
-
-repeat with 55555555....
-
-repeat with ffffffff....
-
-repeat with 00000000....
-
-A2DD82:graphics_w(0B6) = 00000000
-A2DCAF:graphics_w(0B6) = 00000000
-A2DCB3:graphics_w(0B2) = 7FFF7FFF
-A2DCB7:graphics_w(0B0) = 00000000
-A2DCC2:graphics_w(0B4) = 007F0100
-A2DCCD:graphics_w(0B6) = 80F20001
-A2DD89:graphics_w(0B0) = 00000000
-A2DD8A:graphics_r(0F6)            \  ... x256
-A2DD89:graphics_w(0B0) = 00000000 /
-
-A2DCAF:graphics_w(0B6) = 00000000
-A2DCB3:graphics_w(0B2) = 7FFF7FFF
-A2DCB7:graphics_w(0B0) = 00000000
-A2DCC2:graphics_w(0B4) = 007F0000
-A2DCCD:graphics_w(0B6) = 80F20001
-A2DD89:graphics_w(0B0) = 00000000
-A2DD8A:graphics_r(0F6)            \  ... x256
-A2DD89:graphics_w(0B0) = 00000000 /
-
-drawing:
-A2DCEB:graphics_w(0B6) = 00000000
-A2DCEF:graphics_w(0B2) = 7FFF7FFF
-A2DCF3:graphics_w(0B0) = 001F001F
-A2DCFE:graphics_w(0B4) = 00040104
-A2DD02:graphics_w(0B7) = 80A00000
-A2DD89:graphics_w(0B0) = 001F001F
-A2DD8A:graphics_r(0F6)
-A2DCEB:graphics_w(0B6) = 00000000
-A2DCEF:graphics_w(0B2) = 7FFF7FFF
-A2DCF3:graphics_w(0B0) = 001F001F
-A2DCFE:graphics_w(0B4) = 00040105
-A2DD07:graphics_w(0B7) = 80500000
-A2DD89:graphics_w(0B0) = 001F001F
-A2DD8A:graphics_r(0F6)
-A2DCEB:graphics_w(0B6) = 00000000
-A2DCEF:graphics_w(0B2) = 7FFF7FFF
-A2DCF3:graphics_w(0B0) = 001F001F
-A2DCFE:graphics_w(0B4) = 00040105
-A2DD02:graphics_w(0B7) = 80A00000
-A2DD89:graphics_w(0B0) = 001F001F
-A2DD8A:graphics_r(0F6)
-A2DCEB:graphics_w(0B6) = 00000000
-A2DCEF:graphics_w(0B2) = 7FFF7FFF
-A2DCF3:graphics_w(0B0) = 001F001F
-A2DCFE:graphics_w(0B4) = 00040106
-A2DD07:graphics_w(0B7) = 80500000
-A2DD89:graphics_w(0B0) = 001F001F
-A2DD8A:graphics_r(0F6)
-
-
-Invasion:
-
-011729:graphics_w(0E0) = 1A000000
-011729:graphics_w(0E0) = 187E0000
-011729:graphics_w(0E0) = 0000FFFF
-011729:graphics_w(0E0) = 187C0000
-011729:graphics_w(0E0) = FFFFFFE0
-011729:graphics_w(0E0) = 187A0000
-011729:graphics_w(0E0) = 00800000
-011729:graphics_w(0E0) = 18780000
-011729:graphics_w(0E0) = 000000C7
-011729:graphics_w(0E0) = 18760000
-011729:graphics_w(0E0) = F8800000
-011729:graphics_w(0E0) = 176F0032
-011729:graphics_w(0E0) = 176E0031
-011729:graphics_w(0E0) = 176D003B
-011729:graphics_w(0E0) = 176C002B
-011729:graphics_w(0E0) = 184E0000
-011729:graphics_w(0E0) = 00808080
-011729:graphics_w(0E0) = 184C0000
-011729:graphics_w(0E0) = 00808080
-011729:graphics_w(0E0) = 184A0000
-011729:graphics_w(0E0) = 00FF018E
-011729:graphics_w(0E0) = 18480000
-011729:graphics_w(0E0) = 00FF018E
-011729:graphics_w(0E0) = 176940C4
-011729:graphics_w(0E0) = 17681370
-011729:graphics_w(0E0) = 1707FFFF
-011729:graphics_w(0E0) = 17060030
-011729:graphics_w(0E0) = 17010000
-011729:graphics_w(0E0) = 2D007FFF
-011729:graphics_w(0E0) = 2E000800
-011729:graphics_w(0E0) = 00000000
-011729:graphics_w(0E0) = 1757500A
-011729:graphics_w(0E0) = 175600FF
-011729:graphics_w(0E0) = 17524321
-011729:graphics_w(0E0) = 0100C0B0
-011729:graphics_w(0E0) = 3F001059
-
-011729:graphics_w(0E0) = 0100C0B0
-011729:graphics_w(0E0) = 3F001059
-
-011841:graphics_w(0E0) = 1A000000
-011841:graphics_w(0E0) = 1A000000
-
-00D09A:graphics_w(080) = FB22FC3F
-00D01E:graphics_w(076) = F8800000
-00D020:graphics_w(0CC) = 00800000
-00D034:graphics_w(084) = 00000000
-00D0A7:graphics_r(0F2) = 00000000
-00D0C9:graphics_w(068) = 00000100
-00D0CA:graphics_w(000) = 00000000
-00D0CC:graphics_w(05C) = 00000000
-00D0CE:graphics_w(006) = FFFF0030
-00D0D0:graphics_w(002) = 000C0000
-00D0D2:graphics_w(004) = 00000E01
-00D0D4:graphics_w(04C) = 00808080
-00D0D5:graphics_w(04E) = 00808080
-00D0D6:graphics_w(008) = 00000000
-00D0D7:graphics_w(00C) = 00FF018F
-00D0DD:graphics_w(00A) = 0000018F
-00D0E3:graphics_w(00E) = 00FF0000
-00D0E5:graphics_w(01E) = FFFFFFFF
-00D0E6:graphics_w(01C) = FFFFFFFF
-00D0E7:graphics_w(01A) = FFFFFFFF
-00D0E8:graphics_w(018) = FFFFFFFF
-00D0EA:graphics_w(046) = 00000000
-00D0EB:graphics_w(044) = 00000000
-00D0EC:graphics_w(042) = 00000000
-00D0ED:graphics_w(040) = 00000000
-00D0EE:graphics_w(026) = 00000000
-00D0EF:graphics_w(024) = 00000000
-00D0F0:graphics_w(022) = 00000000
-00D0F1:graphics_w(020) = 00000000
-00D09A:graphics_w(080) = FB22FCFF
-00D0F6:graphics_w(060) = 00000001
-00D09A:graphics_w(080) = FB22FC3F
-011729:graphics_w(0E0) = 1757500A
-011729:graphics_w(0E0) = 175600FF
-00D09A:graphics_w(080) = 0222FC3F
-
-*/
-
-INLINE UINT32 *graphics_pixaddr(void)
-{
-	int p = (graphics_ram[0xb7] >> 15) & 1;
-	int x = (graphics_ram[0xb4] & 0xff) << 1;
-	int y = ((graphics_ram[0xb4] >> 8) & 0x01) | ((graphics_ram[0xb5] << 1) & 0xffe);
-	return &waveram[(p * WAVERAM_HEIGHT + (y % WAVERAM_HEIGHT)) * WAVERAM_WIDTH + x];
-}
-
-
-static READ32_HANDLER( graphics_r )
-{
-	UINT32 result;
-	int logit = 1;
-
-	if (offset >= 0xb0 && offset <= 0xb7)
-		logit = graphics_ram[0xb4] < 8;
-
-	result = graphics_ram[offset & ~1] | (graphics_ram[offset | 1] << 16);
-
-	switch (offset)
-	{
-		case 0x00:
-			// crusnexo wants bit 0x20 to be non-zero
-			result = 0x20;
-			break;
-		case 0x51:
-			// crusnexo expects a reflection of the data at 0x08 here (b425)
-			result = graphics_ram[0x08];
-			break;
-		case 0xf4:
-			result = 6;
-			logit = 0;
-			break;
-		case 0xf6:		// status -- they wait for this & 9 == 0
-			result = 0;
-			logit = 0;
-			break;
-	}
-
-	if (logit || input_code_pressed(KEYCODE_F11))
-		logerror("%06X:graphics_r(%03X) = %08X\n", activecpu_get_pc(), offset, result);
-	return result;
-}
-
-
-/*
-    Writes to even addresses: reg[offs] = data & 0xffff; reg[offs+1] = data >> 16;
-    Writes to odd addresses:  reg[offs] = data & 0xffff;
-
-    Control in $B7.
-    Enable in $B6.
-    Y/2 in $B5.
-    X | ((Y & 1) << 8) in $B4.
-    Depth data in $B2/$B3.
-    Pixel data in $B0/$B1.
-
-    Control = $80F6 when doing initial screen clear.
-       Writes 256 consecutive values to $B0, must mean autoincrement
-       Uses latched value in $B2 (maybe also in $B0)
-
-    Control = $82F0 when doing video RAM test write phase.
-       Writes 512 values across, but updates address before each one.
-
-    Control = $84F1 when doing video RAM test read phase.
-       Reads 512 values across, but updates address before each one.
-
-    Control = $80F2 when doing screen clear.
-       Writes 256 consecutive values to $B0, must mean autoincrement.
-       Uses latched value in $B2 (maybe also in $B0)
-
-    Control = $80A0/$8050 when plotting pixels.
-
-    Control = $42F0 when doing wave RAM test write phase.
-       Writes 512 values across, but updates address before each one.
-
-    Control = $44F1 when doing wave RAM test read phase.
-       Reads 512 values across, but updates address before each one.
-
-
-    Low bits = operation?
-      $0 = write single
-      $1 = read single
-      $2 = write autoinc
-*/
-
-static WRITE32_HANDLER( graphics_w )
-{
-	int logit = 1;
-
-	if (offset >= 0xb0 && offset <= 0xb7)
-		logit = graphics_ram[0xb4] < 8;
-
-	if (!(offset & 1))
-		graphics_ram[offset | 0] = data & 0xffff;
-	graphics_ram[offset | 1] = data >> 16;
-
-	switch (offset)
-	{
-		case 0xb0:
-		case 0xb2:
-		{
-			UINT32 *dest = graphics_pixaddr();
-			if (input_code_pressed(KEYCODE_F11)) logerror("B7=%04X x=%3d y=%3d B0=%04X%04X B2=%04X%04X\n",
-					graphics_ram[0xb7],
-					(graphics_ram[0xb4] & 0xff) << 1,
-					((graphics_ram[0xb4] >> 8) & 0x01) | ((graphics_ram[0xb5] << 1) & 0xffe),
-					graphics_ram[0xb0],graphics_ram[0xb1],
-					graphics_ram[0xb2],graphics_ram[0xb3]);
-
-			if (graphics_ram[0xb7] != 0)
-			{
-				if (graphics_ram[0xb7] & 0x0050)
-					dest[0] = (graphics_ram[0xb2] << 16) | graphics_ram[0xb0];
-				if (graphics_ram[0xb7] & 0x00a0)
-					dest[1] = (graphics_ram[0xb3] << 16) | graphics_ram[0xb1];
-				switch (graphics_ram[0xb7] & 3)
-				{
-					case 0:
-					case 1:
-						break;
-					case 2:
-					case 3:
-						graphics_ram[0xb4]++;
-						break;
-				}
-{
-	static int count = 0;
-	popmessage("WaveRAM writes = %X", ++count);
-}
-			}
-			break;
-		}
-
-		case 0xb4:
-		{
-			if (graphics_ram[0xb7] & 1)
-			{
-				UINT32 *src = graphics_pixaddr();
-				graphics_ram[0xb0] = src[0] & 0xffff;
-				graphics_ram[0xb1] = src[1] & 0xffff;
-				graphics_ram[0xb2] = src[0] >> 16;
-				graphics_ram[0xb3] = src[1] >> 16;
-			}
-			break;
-		}
-	}
-
-	if (logit || input_code_pressed(KEYCODE_F11))
-		logerror("%06X:graphics_w(%03X) = %08X\n", activecpu_get_pc(), offset, data);
-}
-
-
-static READ32_HANDLER( graphics2_r )
-{
-	return graphics_r(offset * 2, 0);
-}
-
-
-static WRITE32_HANDLER( graphics2_w )
-{
-	graphics_w(offset * 2, data, mem_mask);
-}
 
 
 
@@ -960,7 +150,7 @@ static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
 	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
-	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(graphics_r, graphics_w) AM_BASE(&graphics_ram)
+	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 //9d0000 -- page select?
@@ -977,7 +167,7 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
 	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
-	AM_RANGE(0x880000, 0x8801ff) AM_READWRITE(graphics2_r, graphics2_w) AM_BASE(&graphics_ram)
+	AM_RANGE(0x880000, 0x8801ff) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 //9d0000 -- page select?
@@ -997,56 +187,56 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( mk4 )
 	PORT_START	    /* DS1 */
- 	PORT_DIPNAME( 0x0001, 0x0001, "Fatalities" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0002, 0x0002, "Blood" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown )) /* Manual states that switches 3-7 are Unused */
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ))
- 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ))
- 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ))
+	PORT_DIPNAME( 0x0001, 0x0001, "Coinage Source" )
+	PORT_DIPSETTING(      0x0001, "Dipswitch" )
+	PORT_DIPSETTING(      0x0000, "CMOS" )
+	PORT_DIPNAME( 0x003e, 0x003e, DEF_STR( Coinage ))
+	PORT_DIPSETTING(      0x003e, "USA-1" )
+	PORT_DIPSETTING(      0x003c, "USA-2" )
+	PORT_DIPSETTING(      0x003a, "USA-3" )
+	PORT_DIPSETTING(      0x0038, "USA-4" )
+	PORT_DIPSETTING(      0x0034, "USA-9" )
+	PORT_DIPSETTING(      0x0032, "USA-11" )
+	PORT_DIPSETTING(      0x0036, "USA-ECA" )
+	PORT_DIPSETTING(      0x002e, "German-1" )
+	PORT_DIPSETTING(      0x002c, "German-2" )
+	PORT_DIPSETTING(      0x002a, "German-3" )
+	PORT_DIPSETTING(      0x0028, "German-4" )
+	PORT_DIPSETTING(      0x0026, "German-ECA" )
+	PORT_DIPSETTING(      0x001e, "French-1" )
+	PORT_DIPSETTING(      0x001c, "French-2" )
+	PORT_DIPSETTING(      0x001a, "French-3" )
+	PORT_DIPSETTING(      0x0018, "French-4" )
+	PORT_DIPSETTING(      0x0016, "French-ECA" )
+	PORT_DIPSETTING(      0x0030, DEF_STR( Free_Play ))
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ))	/* Manual lists this dip as Unused */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ))
+	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0100, 0x0100, "Coinage Source" )
-	PORT_DIPSETTING(      0x0100, "Dipswitch" )
-	PORT_DIPSETTING(      0x0000, "CMOS" )
-	PORT_DIPNAME( 0x3e00, 0x3e00, DEF_STR( Coinage ))
-	PORT_DIPSETTING(      0x3e00, "USA-1" )
-	PORT_DIPSETTING(      0x3c00, "USA-2" )
-	PORT_DIPSETTING(      0x3a00, "USA-3" )
-	PORT_DIPSETTING(      0x3800, "USA-4" )
-	PORT_DIPSETTING(      0x3400, "USA-9" )
-	PORT_DIPSETTING(      0x3200, "USA-11" )
-	PORT_DIPSETTING(      0x3600, "USA-ECA" )
-	PORT_DIPSETTING(      0x2e00, "German-1" )
-	PORT_DIPSETTING(      0x2c00, "German-2" )
-	PORT_DIPSETTING(      0x2a00, "German-3" )
-	PORT_DIPSETTING(      0x2800, "German-4" )
-	PORT_DIPSETTING(      0x2600, "German-ECA" )
-	PORT_DIPSETTING(      0x1e00, "French-1" )
-	PORT_DIPSETTING(      0x1c00, "French-2" )
-	PORT_DIPSETTING(      0x1a00, "French-3" )
-	PORT_DIPSETTING(      0x1800, "French-4" )
-	PORT_DIPSETTING(      0x1600, "French-ECA" )
-	PORT_DIPSETTING(      0x3000, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ))	/* Manual lists this dip as Unused */
+ 	PORT_DIPNAME( 0x0100, 0x0100, "Fatalities" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0100, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x0200, 0x0200, "Blood" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0200, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown )) /* Manual states that switches 3-7 are Unused */
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ))
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ))
+ 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ))
+ 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ))
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Switch" )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 
@@ -1443,8 +633,8 @@ MACHINE_DRIVER_START( midzeus )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 432)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
+	MDRV_SCREEN_SIZE(512, 278)
+	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 255)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(midzeus)
@@ -1625,8 +815,8 @@ static DRIVER_INIT( thegrid )
  *
  *************************************/
 
-GAME( 1997, mk4,      0,     midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (rev L3)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1997, mk4a,     mk4,   midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (? rev)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, mk4,      0,     midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (3.0)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, mk4a,     mk4,   midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (2.1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, invasn,   0,     midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion (Midway)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, crusnexo, 0,     midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, thegrid,  0,     midzeus2, thegrid,  thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_NO_SOUND )

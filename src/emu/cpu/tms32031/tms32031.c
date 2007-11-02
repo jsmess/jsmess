@@ -8,6 +8,7 @@
 
 #include "debugger.h"
 #include "tms32031.h"
+#include "eminline.h"
 
 
 #define LOG_OPCODE_USAGE	(0)

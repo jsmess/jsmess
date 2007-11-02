@@ -862,7 +862,7 @@ GFXDECODE_END
 
 
 
-static struct Samplesinterface custom_interface =
+static struct Samplesinterface pbillian_samples_interface =
 {
 	1,
 	NULL,
@@ -952,7 +952,7 @@ static MACHINE_DRIVER_START( pbillian )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_CONFIG(pbillian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -986,7 +986,7 @@ static MACHINE_DRIVER_START( hotsmash )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_CONFIG(pbillian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

@@ -1,609 +1,537 @@
 /***************************************************************************
 
-Mad Alien
-(c) 1980 Data East Corporation
+    Mad Alien (c) 1980 Data East Corporation
 
-Driver by Norbert Kehrer (February 2004).
-
-****************************************************************************
-
-Hardware:
----------
-
-Main CPU    6502
-Sound CPU   6502
-Sound chip  AY-3-8910
-
-
-Memory map of main board:
--------------------------
-
-$0000 - $03ff   Program RAM
-$6000 - $63ff   Video RAM
-$6800 - $7fff   Character generator RAM
-$8004       Flip screen in cocktail mode (?)
-$8006       Write: send command to sound board, read: input from sound board
-$8008       Write: set counter for shifter circuitry, read: low byte of shift reg. after shift operation
-$8009       Write: set data to be shifted, read: high byte of shift reg. after shift operation
-$8008       Video register (control of headlight, color, and landscape)
-$800d       Background horiz. scroll register left part
-$800e       Background horiz. scroll register right part
-$800f       Background vertical scroll register
-$9000       Input port 1: player 1 controls
-$9001       DIP switch port
-$9002       Input port 2: player 2 controls
-$c000 - $ffff   Program ROM
-
-Main board interrupts: NMI triggered, when coin is inserted
-
-
-Memory map of sound board:
---------------------------
-
-$0000 - $03ff   Sound board program RAM
-$6500       Sound board register, just to write in someting (?)
-$6800       Sound board register, just to write in and read out (?)
-$8000       Write: AY-3-8910 control port, read: input from master CPU
-$8001       AY-3-8910 data port
-$8006       Output to master CPU
-$f800 - $ffff   Sound board program ROM
-
-Sound board interrupts: NMI triggered by VBlank signal
-
-
-Input ports:
-------------
-
-Input port 1, mapped to memory address $9000:
-7654 3210
-1          Unused
- 1         Start 2 players game
-  1        Start 1 player game
-   1       Player 1 fire button
-     1     Player 1 down (not used in Mad Alien)
-      1    Player 1 up (not used in Mad Alien)
-       1   Player 1 left
-        1  Player 1 right
-
-DIP switch port, mapped to memory address $9001:
-7654 3210
-1          VBlank (0 = off, 1 = on)
- 1         Game screen (0 = prevent turning, 1 = to turn) (?)
-  00       Bonus points (0 = 3000, 1 = 7000, 2 = 5000, 3 = nil)
-     00    Game charge (0 = 1 coin/1 play, 1 = 1 coin/2 plays, 2 and 3 = 2 coins 1 play)
-       00  Number of cars (0 = 3 cars, 1 = 4 cars, 2 = 5 cars, 3 = 6cars)
-
-Input port 2, mapped to memory address $9002:
-7654 3210
-111        Unused
-   1       Player 2 fire button
-     1     Player 2 down (not used in Mad Alien)
-      1    Player 2 up (not used in Mad Alien)
-       1   Player 2 left
-        1  Player 2 right
+    Original driver by Norbert Kehrer (February 2004)
 
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/crtc6845.h"
 #include "sound/ay8910.h"
 
-static tilemap *fg_tilemap, *bg_tilemap_l, *bg_tilemap_r;
+#define MAIN_CLOCK 10595000
 
-static rectangle bg_tilemap_l_clip;
-static rectangle bg_tilemap_r_clip;
+#define SOUND_CLOCK 4000000
 
-static mame_bitmap *headlight_bitmap, *flip_bitmap;
-
-static UINT8 *madalien_videoram;
-static UINT8 *madalien_charram;
-static UINT8 *madalien_bgram;
-static UINT8 *madalien_shift_data;
-
-static UINT8 madalien_scroll_v;
-static UINT8 madalien_scroll_l;
-static UINT8 madalien_scroll_r;
-static UINT8 madalien_scroll_light;
-
-static UINT8 madalien_shift_counter;
-static UINT8 madalien_shift_reg_lo;
-static UINT8 madalien_shift_reg_hi;
-
-static UINT8 madalien_video_register;
-
-static UINT8 madalien_bg_map_selector;
-
-static int madalien_select_color_1;
-static int madalien_select_color_2;
-static int madalien_swap_colors;
-
-static int madalien_headlight_on;
-
-static int madalien_flip_screen;
-
-static int madalien_headlight_source[128][128];
-
-static UINT8 madalien_sound_reg;
+#define PIXEL_CLOCK (MAIN_CLOCK / 2)
 
 
-PALETTE_INIT( madalien )
+static UINT8* madalien_videoram;
+static UINT8* madalien_charram;
+
+static UINT8 madalien_video_flags;
+static UINT8 madalien_screen_control;
+static UINT8 madalien_scroll;
+static UINT8 madalien_edge1_pos;
+static UINT8 madalien_edge2_pos;
+static UINT8 madalien_headlight_pos;
+static UINT8 madalien_shift_count;
+static UINT8 madalien_shift_data;
+
+static tilemap* tilemap_fg;
+
+static tilemap* tilemap_edge1[4];
+static tilemap* tilemap_edge2[4];
+
+static mame_bitmap* tmp_bitmap;
+static mame_bitmap* headlight_bitmap;
+
+
+static PALETTE_INIT( madalien )
 {
-	int i, j, n, bit0, bit1, r, g, b;
+	int i;
 
-	n = machine->drv->total_colors / 2;
-
-	for (i = 0; i < n; i++)
+	for (i = 0; i < 32; i++)
 	{
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		r = 0x40 * bit0 + 0x80 * bit1;
-		/* green component */
-		bit0 = (color_prom[i] >> 2) & 0x01;
-		bit1 = (color_prom[i] >> 3) & 0x01;
-		g = 0x40 * bit0 + 0x80 * bit1;
-		/* blue component */
-		bit0 = (color_prom[i] >> 4) & 0x01;
-		bit1 = (color_prom[i] >> 5) & 0x01;
-		b = 0x40 * bit0 + 0x80 * bit1;
+		int r = 0;
+		int g = 0;
+		int b = 0;
+
+		if (BIT(color_prom[i], 0))
+			r += 0x3f;
+		if (BIT(color_prom[i], 1))
+			r += 0xc0;
+		if (BIT(color_prom[i], 2))
+			g += 0x3f;
+		if (BIT(color_prom[i], 3))
+			g += 0xc0;
+		if (BIT(color_prom[i], 4))
+			b += 0x3f;
+		if (BIT(color_prom[i], 5))
+			b += 0xc0;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
 
-		/* Colors for bits 1 and 2 swapped */
-		j = i;
-		switch (j & 6) {
-			case 2:
-				j &= 0xf9;
-				j |= 0x04;
-				break;
-			case 4:
-				j &= 0xf9;
-				j |= 0x02;
-				break;
-		};
-		palette_set_color(machine, j+n, MAKE_RGB(r, g, b));
+	for (i = 0; i < 16; i++)
+	{
+		colortable[0x00 + i] = i;
+		colortable[0x10 + i] = i;
+		colortable[0x20 + i] = i + 0x10;
+
+		/* PCB can swap address lines 1 and 2 when accessing color PROM */
+
+		if (BIT(i, 1))
+		{
+			colortable[0x10 + i] ^= 6;
+		}
+		if (BIT(i, 2))
+		{
+			colortable[0x10 + i] ^= 6;
+		}
 	}
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+
+static void update_edges(int area)
 {
-	int code, color;
+	UINT8* map = memory_region(REGION_GFX2) + 0x200 * area;
 
-	code = madalien_videoram[tile_index];
-	color = 2 * madalien_select_color_1;
+	// MADALIEN:
+	//
+	//   area 0 section A - casino
+	//          section B - tunnel
+	//   area 1 section A - city
+	//          section B - tunnel
+	//
+	// MADALINA:
+	//
+	//   area 0 section A - desert
+	//          section B - tunnel
+	//   area 1 section A - lake
+	//          section B - tunnel
 
-	SET_TILE_INFO(0, code, color, 0);
-}
+	tilemap_set_user_data(tilemap_edge1[0], map); /* left edge */
+	tilemap_set_user_data(tilemap_edge1[1], map);
+	tilemap_set_user_data(tilemap_edge1[2], map);
+	tilemap_set_user_data(tilemap_edge1[3], map);
 
-static TILE_GET_INFO( get_bg_tile_info_l )
-{
-	int x, y, code, color, bg_base;
+	map += 0x80;
 
-	UINT8 *bgrom = memory_region(REGION_GFX2);
+	tilemap_set_user_data(tilemap_edge2[0], map); /* right edge */
+	tilemap_set_user_data(tilemap_edge2[1], map);
+	tilemap_set_user_data(tilemap_edge2[2], map);
+	tilemap_set_user_data(tilemap_edge2[3], map);
 
-	x = tile_index & 0x0f;
-	y = (tile_index / 16) & 0x0f;
-
-	bg_base = madalien_bg_map_selector * 0x0100;
-
-	if (x < 8)
-		code = bgrom[bg_base + 8*y + x];
-	else
-		code = 16;
-
-	color = madalien_swap_colors * 4;
-
-	SET_TILE_INFO(1, code, color, 0);
-}
-
-static TILE_GET_INFO( get_bg_tile_info_r )
-{
-	int x, y, code, color, bg_base;
-
-	UINT8 *bgrom = memory_region(REGION_GFX2);
-
-	x = tile_index & 0x0f;
-	y = (tile_index / 16) & 0x0f;
-
-	bg_base = madalien_bg_map_selector * 0x0100;
-
-	if (x < 8)
-		code = bgrom[bg_base + 0x80 + 8*y + x];
-	else
-		code = 16;
-
-	color = madalien_swap_colors * 4;
-
-	SET_TILE_INFO(1, code, color, 0);
+	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 }
 
 
-
-
-VIDEO_START( madalien )
+static int scan_helper(int col, int row, int section)
 {
-	int x, y, data1, data2, bit;
-	const UINT8 *headlight_rom;
+	return section * 0x100 + (~col & 15) * 8 + row;
+}
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols_flip_x,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
-	bg_tilemap_l = tilemap_create(get_bg_tile_info_l, tilemap_scan_cols_flip_x,
-		TILEMAP_TYPE_PEN, 16, 16, 16, 16);
+static TILEMAP_MAPPER( scan_mode0 )
+{
+	return scan_helper(col, row, 0);
+}
+static TILEMAP_MAPPER( scan_mode1 )
+{
+	return scan_helper(col, row, 1);
+}
+static TILEMAP_MAPPER( scan_mode2 )
+{
+	return scan_helper(col, row, BIT(col, 4) ? 1 : 0);
+}
+static TILEMAP_MAPPER( scan_mode3 )
+{
+	return scan_helper(col, row, BIT(col, 4) ? 0 : 1);
+}
 
-	bg_tilemap_r = tilemap_create(get_bg_tile_info_r, tilemap_scan_cols_flip_x,
-		TILEMAP_TYPE_PEN, 16, 16, 16, 16);
 
-	tilemap_set_transparent_pen( fg_tilemap, 0 );
+static TILE_GET_INFO( get_tile_info_BG )
+{
+	const UINT8* p = param;
 
-	bg_tilemap_l_clip = machine->screen[0].visarea;
-	bg_tilemap_l_clip.max_y = machine->screen[0].height / 2;
+	SET_TILE_INFO(1, p[tile_index], BIT(madalien_video_flags, 2) ? 2 : 0, 0);
+}
 
-	bg_tilemap_r_clip = machine->screen[0].visarea;
-	bg_tilemap_r_clip.min_y = machine->screen[0].height / 2;
 
-	tilemap_set_flip(bg_tilemap_r, TILEMAP_FLIPY);
+static TILE_GET_INFO( get_tile_info_FG )
+{
+	SET_TILE_INFO(0, madalien_videoram[tile_index], 0, 0);
+}
 
-	headlight_bitmap = auto_bitmap_alloc(128, 128, machine->screen[0].format);
 
-	flip_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+static VIDEO_START( madalien )
+{
+	rectangle rect = { 0, 127, 0, 127 };
 
-	madalien_bgram = auto_malloc(0x1000);	/* ficticiuos background RAM for empty tile */
+	static crtc6845_interface crtc6845_intf =
+	{
+		0,                /* screen we are acting on */
+		PIXEL_CLOCK / 8,  /* the clock of the chip  */
+		8,                /* number of pixels per video memory address */
+		NULL,             /* before pixel update callback */
+		NULL,             /* row update callback */
+		NULL,             /* after pixel update callback */
+		NULL              /* call back for display state changes */
+	};
 
-	memset(madalien_bgram, 0, 0x1000);
+	crtc6845_config(0, &crtc6845_intf);
 
-	madalien_scroll_v = madalien_scroll_l = madalien_scroll_r = 0;
+	tilemap_fg = tilemap_create(get_tile_info_FG,
+		tilemap_scan_cols_flip_x, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
-	madalien_shift_data = memory_region( REGION_GFX4 );
+	tilemap_set_transparent_pen(tilemap_fg, 0);
 
-	/* Generate headlight shape data: */
-	headlight_rom = memory_region( REGION_GFX3 );
-	for( x=0; x<64; x++ )
-		for( y=0; y<64; y+=8 )
+	tilemap_edge1[0] = tilemap_create(get_tile_info_BG,
+		scan_mode0, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+	tilemap_edge1[1] = tilemap_create(get_tile_info_BG,
+		scan_mode1, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+	tilemap_edge1[2] = tilemap_create(get_tile_info_BG,
+		scan_mode2, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+	tilemap_edge1[3] = tilemap_create(get_tile_info_BG,
+		scan_mode3, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+
+	tilemap_edge2[0] = tilemap_create(get_tile_info_BG,
+		scan_mode0, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+	tilemap_edge2[1] = tilemap_create(get_tile_info_BG,
+		scan_mode1, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+	tilemap_edge2[2] = tilemap_create(get_tile_info_BG,
+		scan_mode2, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+	tilemap_edge2[3] = tilemap_create(get_tile_info_BG,
+		scan_mode3, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+
+	update_edges(0);
+
+	tilemap_set_scrolldy(tilemap_edge2[0], 0, machine->screen[0].height - 256);
+	tilemap_set_scrolldy(tilemap_edge2[1], 0, machine->screen[0].height - 256);
+	tilemap_set_scrolldy(tilemap_edge2[2], 0, machine->screen[0].height - 256);
+	tilemap_set_scrolldy(tilemap_edge2[3], 0, machine->screen[0].height - 256);
+
+	tilemap_set_flip(tilemap_edge2[0], TILEMAP_FLIPY);
+	tilemap_set_flip(tilemap_edge2[1], TILEMAP_FLIPY);
+	tilemap_set_flip(tilemap_edge2[2], TILEMAP_FLIPY);
+	tilemap_set_flip(tilemap_edge2[3], TILEMAP_FLIPY);
+
+	headlight_bitmap = auto_bitmap_alloc(128, 128, BITMAP_FORMAT_INDEXED16);
+
+	drawgfx(headlight_bitmap, machine->gfx[2],
+		0, 0, 0, 0, 0x00, 0x00, &rect, TRANSPARENCY_NONE, 0);
+	drawgfx(headlight_bitmap, machine->gfx[2],
+		0, 0, 0, 1, 0x00, 0x40, &rect, TRANSPARENCY_NONE, 0);
+
+	tmp_bitmap = auto_bitmap_alloc(256, 256, BITMAP_FORMAT_INDEXED16);
+}
+
+
+static VIDEO_UPDATE( madalien )
+{
+	int i;
+
+	int flip_screen;
+
+	/* draw background */
+
+	rectangle rect = { 0, 255, 0, 255 };
+
+	rectangle clip_edge1 = rect;
+	rectangle clip_edge2 = rect;
+
+	int mode = madalien_scroll & 3;
+
+	clip_edge1.max_y = madalien_edge1_pos ^ 0x7f;
+	clip_edge2.min_y = madalien_edge2_pos | 0x80;
+
+	fillbitmap(tmp_bitmap, machine->pens[0], &rect);
+
+	tilemap_draw(
+		tmp_bitmap, &clip_edge1, tilemap_edge1[mode], 0, 0);
+	tilemap_draw(
+		tmp_bitmap, &clip_edge2, tilemap_edge2[mode], 0, 0);
+
+	/* draw foreground */
+
+	for (i = 0; i < 256; i++)
+	{
+		decodechar(machine->gfx[0], i, madalien_charram,
+			machine->drv->gfxdecodeinfo[0].gfxlayout);
+	}
+
+	tilemap_mark_all_tiles_dirty(tilemap_fg);
+
+	tilemap_draw(tmp_bitmap, &rect, tilemap_fg, 0, 0);
+
+	/* highlight section A (outside of tunnels) */
+
+	if (mode != 1)
+	{
+		int x;
+		int y;
+
+		int _L = 0;
+		int _T = 0;
+		int _R = 256;
+		int _B = 256;
+
+		if (mode == 2)
 		{
-			data1 = headlight_rom[x*16 + (y/8)];
-			data2 = headlight_rom[x*16 + (y/8) + 8];
-			for( bit=0; bit<8; bit++ )
+			if (_L < (madalien_scroll & 0xfc))
+				_L = (madalien_scroll & 0xfc);
+		}
+		if (mode == 3)
+		{
+			if (_R > (madalien_scroll & 0xfc))
+				_R = (madalien_scroll & 0xfc);
+		}
+
+		for (y = _T; y < _B; y++)
+		{
+			for (x = _L; x < _R; x++)
 			{
-				madalien_headlight_source[127-(y+bit)][x] = (data1 & 0x01);
-				madalien_headlight_source[63-(y+bit)][x] = (data2 & 0x01);
-				data1 >>= 1;
-				data2 >>= 1;
+				*BITMAP_ADDR16(tmp_bitmap, y, x) |= 8;
 			}
 		}
-	for( x=0; x<64; x++ )
-		for( y=0; y<128; y++ )
-			madalien_headlight_source[y][64+x] = madalien_headlight_source[y][63-x];
-}
+	}
 
+	/* draw car headlight */
 
-
-VIDEO_UPDATE( madalien )
-{
-	rectangle clip;
-	int i, yh, x, y, xp, yp;
-
-	for (i=0; i<256; i++)
-		decodechar(machine->gfx[0], i, madalien_charram, machine->drv->gfxdecodeinfo[0].gfxlayout);
-
-	decodechar(machine->gfx[1], 16, madalien_bgram, machine->drv->gfxdecodeinfo[1].gfxlayout); /* empty tile */
-
-	tilemap_set_scrolly( bg_tilemap_l, 0, madalien_scroll_l );
-	tilemap_set_scrollx( bg_tilemap_l, 0, madalien_scroll_v );
-
-	tilemap_set_scrolly( bg_tilemap_r, 0, madalien_scroll_r );
-	tilemap_set_scrollx( bg_tilemap_r, 0, madalien_scroll_v );
-
-	clip = bg_tilemap_l_clip;
-	sect_rect(&clip, cliprect);
-	tilemap_draw(bitmap, &clip, bg_tilemap_l, 0, 0);
-
-	clip = bg_tilemap_r_clip;
-	sect_rect(&clip, cliprect);
-	tilemap_draw(bitmap, &clip, bg_tilemap_r, 0, 0);
-
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
-
-	/* Draw headlight area using lighter colors: */
-	if (madalien_headlight_on && (madalien_bg_map_selector & 1))
+	if (BIT(madalien_video_flags, 0))
 	{
-		yh = (256 - madalien_scroll_light) & 0xff;
-		if (yh >= 192)
-			yh = -(255-yh);
+		int x;
+		int y;
 
-		copybitmap(
-			headlight_bitmap,	/* dest */
-			bitmap,			/* source */
-			0, 0, 			/* flipx, flipy */
-			0, -yh,			/* scroll x, scroll y */
-			cliprect, 		/* clip */
-			TRANSPARENCY_NONE, 0	);
+		for (y = 0; y < 128; y++)
+		{
+			int ypos = (y - madalien_headlight_pos) & 0xff;
 
-		for( x=0; x<128; x++ )
-			for( y=0; y<128; y++ )
-				if (madalien_headlight_source[x][y])
+			for (x = 0; x < 128; x++)
+			{
+				if (*BITMAP_ADDR16(headlight_bitmap, y, x) != 0)
 				{
-					xp = x;
-					yp = yh + y;
-					if( xp >= machine->screen[0].visarea.min_x &&
-					    yp >= machine->screen[0].visarea.min_y &&
-					    xp <= machine->screen[0].visarea.max_x &&
-					    yp <= machine->screen[0].visarea.max_y )
-					{
-						int color = *BITMAP_ADDR16(headlight_bitmap, y, x);
-						*BITMAP_ADDR16(bitmap, yp, xp) = machine->pens[color+8];
-					}
+					*BITMAP_ADDR16(tmp_bitmap, ypos, x) |= 8;
 				}
+			}
+		}
 	};
 
-	/* Flip screen (cocktail mode): */
-	if (madalien_flip_screen) {
-		copybitmap(flip_bitmap, bitmap, 1, 1, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-		copybitmap(bitmap, flip_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-	};
+	/* flip screen if necessary */
+
+	flip_screen = 0;
+
+	if (BIT(readinputportbytag("DIP"), 6)) /* cocktail DIP */
+	{
+		if (BIT(madalien_screen_control, 0))
+		{
+			flip_screen = 1;
+		}
+	}
+
+	copybitmap(bitmap, tmp_bitmap, flip_screen, flip_screen,
+		0, 0, cliprect, TRANSPARENCY_NONE, 0);
+
 	return 0;
 }
 
 
-
-INTERRUPT_GEN( madalien_interrupt )
+static INTERRUPT_GEN( madalien_interrupt )
 {
-	static int coin;
+	cpunum_set_input_line(0, INPUT_LINE_NMI,
+		(readinputportbytag("PLAYER2") & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+}
 
-	int port = readinputport(3) & 0x01;
 
-	if (port != 0x00)    /* Coin insertion triggers an NMI */
+static READ8_HANDLER( madalien_shift_lo_r )
+{
+	const UINT8* table = memory_region(REGION_USER1);
+
+	return table[256 * madalien_shift_count + madalien_shift_data];
+}
+
+
+static READ8_HANDLER( madalien_shift_hi_r )
+{
+	UINT8 result = 0;
+
+	UINT8 flip = 0;
+
+	if (BIT(madalien_shift_data, 0)) flip |= 1 << 7;
+	if (BIT(madalien_shift_data, 1)) flip |= 1 << 6;
+	if (BIT(madalien_shift_data, 2)) flip |= 1 << 5;
+	if (BIT(madalien_shift_data, 3)) flip |= 1 << 4;
+	if (BIT(madalien_shift_data, 4)) flip |= 1 << 3;
+	if (BIT(madalien_shift_data, 5)) flip |= 1 << 2;
+	if (BIT(madalien_shift_data, 6)) flip |= 1 << 1;
+	if (BIT(madalien_shift_data, 7)) flip |= 1 << 0;
+
 	{
-		if (coin == 0)
-		{
-			coin = 1;
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-		}
+		const UINT8* table = memory_region(REGION_USER1);
+
+		UINT8 lookup = table[256 * (madalien_shift_count ^ 7) + flip];
+
+		if (BIT(lookup, 0)) result |= 1 << 6;
+		if (BIT(lookup, 1)) result |= 1 << 5;
+		if (BIT(lookup, 2)) result |= 1 << 4;
+		if (BIT(lookup, 3)) result |= 1 << 3;
+		if (BIT(lookup, 4)) result |= 1 << 2;
+		if (BIT(lookup, 5)) result |= 1 << 1;
+		if (BIT(lookup, 6)) result |= 1 << 0;
 	}
-	else
-		coin = 0;
+
+	return result;
 }
 
 
-READ8_HANDLER( madalien_shift_reg_lo_r )
+static WRITE8_HANDLER(madalien_video_flags_w)
 {
-	return madalien_shift_reg_lo;
-}
+	data &= 15;
 
-READ8_HANDLER( madalien_shift_reg_hi_r )
-{
-	return madalien_shift_reg_hi;
-}
-
-READ8_HANDLER( madalien_videoram_r )
-{
-	return madalien_videoram[offset];
-}
-
-READ8_HANDLER( madalien_charram_r )
-{
-	return madalien_charram[offset];
-}
-
-WRITE8_HANDLER(madalien_video_register_w)
-{
-	int bit0, bit2, bit3;
-
-	if ( madalien_video_register != data )
+	if (madalien_video_flags != data)
 	{
-		madalien_video_register = data;
-
-		bit0 = data & 0x01;
-		bit2 = ((data & 0x04) >> 2);
-		bit3 = ((data & 0x08) >> 3);
-
-		/* Headlight on, if bit 0 is on */
-		madalien_headlight_on = bit0;
-
-		/* Swap color bits 1 and 2 of background */
-		if (bit2 != madalien_swap_colors)
-		{
-			madalien_swap_colors = bit2;
-			tilemap_mark_all_tiles_dirty( fg_tilemap );
-		};
-
-		/* Select map (0=landscape A, 1=tunnel, 2=landscape B, 3=tunnel) */
-		madalien_bg_map_selector &= 0x01;
-		madalien_bg_map_selector |= (bit3 << 1);
-
-		tilemap_mark_all_tiles_dirty( bg_tilemap_l );
-		tilemap_mark_all_tiles_dirty( bg_tilemap_r );
-	};
-}
-
-WRITE8_HANDLER( madalien_charram_w )
-{
-	if (madalien_charram[offset] != data)
-	{
-		madalien_charram[offset] = data;
-		tilemap_mark_all_tiles_dirty(fg_tilemap);
+		update_edges(data >> 3);
 	}
+
+	madalien_video_flags = data;
 }
 
-WRITE8_HANDLER( madalien_scroll_light_w )
+
+static WRITE8_HANDLER( madalien_headlight_pos_w )
 {
-	madalien_scroll_light = data;
+	madalien_headlight_pos = data;
 }
 
-WRITE8_HANDLER( madalien_scroll_v_w )
+
+static WRITE8_HANDLER( madalien_scroll_w )
 {
-	madalien_scroll_v = (255 - (data & 0xfc));
+	int i;
 
-	madalien_bg_map_selector &= 0x02;
-	madalien_bg_map_selector |= (data & 0x01);
+	// bits #0 and #1 define scrolling mode
+	//
+	// mode 0 - cycle over map section A
+	// mode 1 - cycle over map section B
+	//
+	// mode 2 - transition from B to A
+	// mode 3 - transition from A to B
 
-	madalien_select_color_1 = (data & 0x01);
+	for (i = 0; i < 4; i++)
+	{
+		tilemap_set_scrollx(
+			tilemap_edge1[i], 0, -(data & 0xfc));
+		tilemap_set_scrollx(
+			tilemap_edge2[i], 0, -(data & 0xfc));
+	}
 
-	tilemap_mark_all_tiles_dirty( bg_tilemap_l );
-	tilemap_mark_all_tiles_dirty( bg_tilemap_r );
-	tilemap_mark_all_tiles_dirty( fg_tilemap );
+	madalien_scroll = data;
 }
 
-WRITE8_HANDLER( madalien_scroll_l_w )
+
+static WRITE8_HANDLER( madalien_edge1_pos_w )
 {
-	madalien_scroll_l = data;
+	madalien_edge1_pos = data & 0x7f;
+
+	tilemap_set_scrolly(tilemap_edge1[0], 0, madalien_edge1_pos);
+	tilemap_set_scrolly(tilemap_edge1[1], 0, madalien_edge1_pos);
+	tilemap_set_scrolly(tilemap_edge1[2], 0, madalien_edge1_pos);
+	tilemap_set_scrolly(tilemap_edge1[3], 0, madalien_edge1_pos);
 }
 
-WRITE8_HANDLER( madalien_scroll_r_w )
+
+static WRITE8_HANDLER( madalien_edge2_pos_w )
 {
-	madalien_scroll_r = data;
+	madalien_edge2_pos = data & 0x7f;
+
+	tilemap_set_scrolly(tilemap_edge2[0], 0, madalien_edge2_pos);
+	tilemap_set_scrolly(tilemap_edge2[1], 0, madalien_edge2_pos);
+	tilemap_set_scrolly(tilemap_edge2[2], 0, madalien_edge2_pos);
+	tilemap_set_scrolly(tilemap_edge2[3], 0, madalien_edge2_pos);
 }
 
-WRITE8_HANDLER( madalien_shift_counter_w )
+
+static WRITE8_HANDLER( madalien_shift_data_w )
 {
-	madalien_shift_counter = data & 0x07;
+	madalien_shift_data = data;
+}
+static WRITE8_HANDLER( madalien_shift_count_w )
+{
+	madalien_shift_count = data & 7;
 }
 
-static UINT8 reverse_bits( int x )	/* bit reversal by wiring in Mad Alien hardware */
+
+static WRITE8_HANDLER( madalien_screen_control_w )
 {
-	int bit, n;
-	n = 0;
-	for (bit=0; bit<8; bit++)
-		if (x & (1 << bit))
-			n |= (1 << (7-bit));
-	return n;
+	/* bit #0 is set during player 2's turn, bit #3 is set during CRTC initialization */
+
+	madalien_screen_control = data & 15;
 }
 
-static UINT8 swap_bits( int x )	/* special bit swap by wiring in Mad Alien hardware */
+
+static WRITE8_HANDLER( madalien_output_w )
 {
-	int n = 0;
-	if (x & 0x40) n |= 0x01;
-	if (x & 0x20) n |= 0x02;
-	if (x & 0x10) n |= 0x04;
-	if (x & 0x08) n |= 0x08;
-	if (x & 0x04) n |= 0x10;
-	if (x & 0x02) n |= 0x20;
-	if (x & 0x01) n |= 0x40;
-	return n;
+	/* output latch, eight output bits, none connected */
 }
 
-WRITE8_HANDLER( madalien_shift_reg_w )
-{
-	int rom_addr_0, rom_addr_1;
-	rom_addr_0 = madalien_shift_counter * 256 + data;
-	rom_addr_1 = ((madalien_shift_counter^0x07) & 0x07) * 256 + reverse_bits(data);
-	madalien_shift_reg_lo = madalien_shift_data[rom_addr_0];
-	madalien_shift_reg_hi = swap_bits( madalien_shift_data[rom_addr_1] );
-}
 
-WRITE8_HANDLER( madalien_videoram_w )
+static WRITE8_HANDLER( madalien_sound_command_w )
 {
-	madalien_videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
-}
+	cpunum_set_input_line(1, 0, ASSERT_LINE);
 
-WRITE8_HANDLER( madalien_flip_screen_w )
-{
-	if (readinputport(1) & 0x40)	/* hack for screen flipping in cocktail mode - main board schematics needed */
-		madalien_flip_screen = (data & 1);
-	else
-		madalien_flip_screen = 0;
-}
-
-WRITE8_HANDLER( madalien_sound_command_w )
-{
 	soundlatch_w(offset, data);
-	cpunum_set_input_line(1, 0, HOLD_LINE);
-}
-
-WRITE8_HANDLER( madalien_soundreg_w )
-{
-	madalien_sound_reg = data;
-}
-
-READ8_HANDLER( madalien_soundreg_r )
-{
-	return madalien_sound_reg;
 }
 
 
-static const gfx_layout charlayout_memory =
+static READ8_HANDLER(madalien_sound_command_r )
 {
-	8,8,    /* 8*8 characters */
-	256,	/* 256 characters */
-	3,      /* 3 bits per pixel */
-	{ 2*256*8*8, 256*8*8, 0 },  /* the 3 bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every char takes 8 consecutive bytes */
-};
+	cpunum_set_input_line(1, 0, CLEAR_LINE);
 
-static const gfx_layout tilelayout =
+	return soundlatch_r(offset);
+}
+
+
+static WRITE8_HANDLER( madalien_portA_w )
 {
-	16,16,  /* 16*16 tiles */
-	16+1,	/* 16 tiles + 1 empty tile */
-	3,      /* 3 bits per pixel */
-	{ 4*16*16*16+4, 2*16*16*16+4, 4 },
-	{ 3*16*8+0, 3*16*8+1, 3*16*8+2, 3*16*8+3, 2*16*8+0, 2*16*8+1, 2*16*8+2, 2*16*8+3,
-	  16*8+0, 16*8+1, 16*8+2, 16*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	64*8    /* every tile takes 64 consecutive bytes */
-};
+	/* not emulated - amplification? */
+}
+static WRITE8_HANDLER( madalien_portB_w )
+{
+	/* not emulated - motor sound? */
+}
 
 
-static GFXDECODE_START( madalien )
-	GFXDECODE_ENTRY( 0, 0, charlayout_memory,	0, 8 ) /* characters (the game dynamically modifies them) */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,	0, 8 )	/* background tiles */
-GFXDECODE_END
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
 
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_BASE(&madalien_videoram)
+	AM_RANGE(0x6400, 0x67ff) AM_RAM
+	AM_RANGE(0x6800, 0x7fff) AM_RAM AM_BASE(&madalien_charram)
 
-static ADDRESS_MAP_START( madalien_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_RAM)			/* Program RAM */
-	AM_RANGE(0x6000, 0x63ff) AM_READ(madalien_videoram_r)		/* Video RAM   */
-	AM_RANGE(0x6800, 0x7fff) AM_READ(madalien_charram_r)		/* Character generator RAM */
-	AM_RANGE(0x8006, 0x8006) AM_READ(soundlatch2_r)			/* Input from sound board */
-	AM_RANGE(0x8008, 0x8008) AM_READ(madalien_shift_reg_lo_r)	/* Low byte of shift reg. after shift operation */
-	AM_RANGE(0x8009, 0x8009) AM_READ(madalien_shift_reg_hi_r)	/* Low byte of shift reg. after shift operation */
-	AM_RANGE(0x9000, 0x9000) AM_READ(input_port_0_r)    		/* Input ports */
-	AM_RANGE(0x9001, 0x9001) AM_READ(input_port_1_r)
-	AM_RANGE(0x9002, 0x9002) AM_READ(input_port_2_r)
-	AM_RANGE(0xb000, 0xffff) AM_READ(MRA8_ROM)			/* Program ROM */
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(crtc6845_address_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITE(madalien_screen_control_w)
+	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
+	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READWRITE(soundlatch2_r, madalien_sound_command_w)
+	AM_RANGE(0x8008, 0x8008) AM_MIRROR(0x07f0) AM_READWRITE(madalien_shift_lo_r, madalien_shift_count_w)
+	AM_RANGE(0x8009, 0x8009) AM_MIRROR(0x07f0) AM_READWRITE(madalien_shift_hi_r, madalien_shift_data_w)
+	AM_RANGE(0x800b, 0x800b) AM_MIRROR(0x07f0) AM_WRITE(madalien_video_flags_w)
+	AM_RANGE(0x800c, 0x800c) AM_MIRROR(0x07f0) AM_WRITE(madalien_headlight_pos_w)
+	AM_RANGE(0x800d, 0x800d) AM_MIRROR(0x07f0) AM_WRITE(madalien_edge1_pos_w)
+	AM_RANGE(0x800e, 0x800e) AM_MIRROR(0x07f0) AM_WRITE(madalien_edge2_pos_w)
+	AM_RANGE(0x800f, 0x800f) AM_MIRROR(0x07f0) AM_WRITE(madalien_scroll_w)
+
+	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ff0) AM_READ(input_port_0_r)
+	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ff0) AM_READ(input_port_1_r)
+	AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ff0) AM_READ(input_port_2_r)
+
+	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-
-static ADDRESS_MAP_START( madalien_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)						/* Normal RAM */
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(madalien_videoram_w) AM_BASE(&madalien_videoram)	/* Video RAM   */
-	AM_RANGE(0x6800, 0x7fff) AM_WRITE(madalien_charram_w)  AM_BASE(&madalien_charram)	/* Character generator RAM */
-	AM_RANGE(0x8004, 0x8004) AM_WRITE(madalien_flip_screen_w)		/* Flip screen in cocktail mode */
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(madalien_sound_command_w)		/* Command to sound board */
-	AM_RANGE(0x8008, 0x8008) AM_WRITE(madalien_shift_counter_w) 		/* Set counter for shifter circuitry */
-	AM_RANGE(0x8009, 0x8009) AM_WRITE(madalien_shift_reg_w) 		/* Put data to be shifted */
-	AM_RANGE(0x800b, 0x800b) AM_WRITE(madalien_video_register_w)		/* Video register (light/color/landscape) */
-	AM_RANGE(0x800c, 0x800c) AM_WRITE(madalien_scroll_light_w)		/* Car headlight horiz. scroll register */
-	AM_RANGE(0x800d, 0x800d) AM_WRITE(madalien_scroll_l_w)		/* Background horiz. scroll register left part */
-	AM_RANGE(0x800e, 0x800e) AM_WRITE(madalien_scroll_r_w)		/* Background horiz. scroll register right part */
-	AM_RANGE(0x800f, 0x800f) AM_WRITE(madalien_scroll_v_w) 		/* Background vertical scroll register */
-	AM_RANGE(0xb000, 0xffff) AM_WRITE(MWA8_ROM)			/* Program ROM */
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_RAM /* unknown device in an epoxy block, might be tilt detection */
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_READ(madalien_sound_command_r)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x1ffc) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_RAM)		/* Sound board RAM */
-	AM_RANGE(0x6800, 0x6800) AM_READ(madalien_soundreg_r)	/* Sound board register, just to write in and read out */
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)		/* Sound board input from master CPU */
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_ROM)		/* Sound board program ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)			/* Sound board RAM */
-	AM_RANGE(0x6500, 0x6500) AM_WRITE(madalien_soundreg_w)		/* Sound board register */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_0_w)	/* AY-3-8910 control port */
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(AY8910_write_port_0_w)	/* AY-3-8910 data port */
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(soundlatch2_w)		/* Sound board output to master CPU */
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_ROM)			/* Sound board program ROM */
-ADDRESS_MAP_END
-
 
 
 INPUT_PORTS_START( madalien )
-	PORT_START
+	PORT_START_TAG("PLAYER1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -611,67 +539,142 @@ INPUT_PORTS_START( madalien )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_START_TAG("DIP")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives )) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x01, "4" )
 	PORT_DIPSETTING(	0x02, "5" )
 	PORT_DIPSETTING(	0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage )) PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(	0x0c, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x30, 0x30, "Bonus_points" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life )) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x00, "3000" )
-	PORT_DIPSETTING(    0x20, "5000" )
-	PORT_DIPSETTING(    0x10, "7000"  )
-	PORT_DIPSETTING(    0x30, "nil"  )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_DIPSETTING(    0x10, "5000" )
+	PORT_DIPSETTING(    0x20, "7000" )
+	PORT_DIPSETTING(    0x30, "never" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet )) PORT_DIPLOCATION("SW:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START
+	PORT_START_TAG("PLAYER2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START	/* Fake port or coin: coin insertion triggers an NMI */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) /* or service coin */
 INPUT_PORTS_END
 
 
 
+static const UINT32 headlight_xoffset[] =
+{
+	STEP8(0x78, 1),
+	STEP8(0x70, 1),
+	STEP8(0x68, 1),
+	STEP8(0x60, 1),
+	STEP8(0x58, 1),
+	STEP8(0x50, 1),
+	STEP8(0x48, 1),
+	STEP8(0x40, 1),
+	STEP8(0x38, 1),
+	STEP8(0x30, 1),
+	STEP8(0x28, 1),
+	STEP8(0x20, 1),
+	STEP8(0x18, 1),
+	STEP8(0x10, 1),
+	STEP8(0x08, 1),
+	STEP8(0x00, 1),
+};
+
+static const UINT32 headlight_yoffset[] =
+{
+	STEP32(0x0000, 0x80), STEP32(0x1000, 0x80)
+};
+
+static const gfx_layout headlightlayout =
+{
+	128, 64,
+	1,
+	1,
+	{ 0 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	0x2000,
+	headlight_xoffset,
+	headlight_yoffset
+};
+
+static const gfx_layout charlayout =
+{
+	8, 8,
+	256,
+	3,
+	{ 2*0x4000, 1*0x4000, 0*0x4000 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	64
+};
+
+static const gfx_layout tilelayout =
+{
+	16, 16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{
+		0x30*8+4, 0x30*8+5, 0x30*8+6, 0x30*8+7,
+		0x20*8+4, 0x20*8+5, 0x20*8+6, 0x20*8+7,
+		0x10*8+4, 0x10*8+5, 0x10*8+6, 0x10*8+7,
+		0x00*8+4, 0x00*8+5, 0x00*8+6, 0x00*8+7
+	},
+	{ STEP16(0, 8) },
+	0x200
+};
+
+
+static GFXDECODE_START( madalien )
+	GFXDECODE_ENTRY( 0, 0, charlayout, 32, 2 ) /* foreground characters, stored in RAM */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, headlightlayout, 0, 1 )
+GFXDECODE_END
+
+
+static struct AY8910interface ay8910_interface =
+{
+	NULL,
+	NULL,
+	madalien_portA_w,
+	madalien_portB_w
+};
+
+
 static MACHINE_DRIVER_START( madalien )
 
-	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 750000)    /* 750 kHz ? */
-	MDRV_CPU_PROGRAM_MAP(madalien_readmem, madalien_writemem)
+	/* main CPU */
+	MDRV_CPU_ADD_TAG("main", M6502, MAIN_CLOCK / 8)    /* 1324kHz */
+	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT(madalien_interrupt, 1)
 
-	MDRV_CPU_ADD_TAG("sound", M6502, 500000)   /* 500 kHz ? */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 16)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(3072))
+	MDRV_CPU_ADD_TAG("sound", M6502, SOUND_CLOCK / 8)   /* 512kHz */
+	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 800)    /* unknown due to incomplete schematics */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(madalien)
-	MDRV_PALETTE_LENGTH(2*32)
+	MDRV_PALETTE_LENGTH(32)
+	MDRV_COLORTABLE_LENGTH(48)
 	MDRV_PALETTE_INIT(madalien)
 	MDRV_VIDEO_START(madalien)
 	MDRV_VIDEO_UPDATE(madalien)
@@ -679,97 +682,95 @@ static MACHINE_DRIVER_START( madalien )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 500000)
+	MDRV_SOUND_ADD(AY8910, SOUND_CLOCK / 4)
+	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_DRIVER_END
 
 
 ROM_START( madalien )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) 			 /* 64k for 6502 code of main CPU */
-	ROM_LOAD( "m7",	0xc000, 0x0800, CRC(4d12f89d) SHA1(e155f9135bc2bea56e211052f2b74d25e76308c8) )
-	ROM_LOAD( "m6",	0xc800, 0x0800, CRC(1bc4a57b) SHA1(02252b868d0c07c0a18240e9d831c303cdcfa9a6) )
-	ROM_LOAD( "m5",	0xd000, 0x0800, CRC(8db99572) SHA1(f8cf22f8c134b47756b7f02c5ca0217100466744) )
-	ROM_LOAD( "m4",	0xd800, 0x0800, CRC(fba671af) SHA1(dd74bd357c82d525948d836a7f860bbb3182c825) )
-	ROM_LOAD( "m3",	0xe000, 0x0800, CRC(1aad640d) SHA1(9ace7d2c5ef9e789c2b8cc65420b19ce72cd95fa) )
-	ROM_LOAD( "m2",	0xe800, 0x0800, CRC(cbd533a0) SHA1(d3be81fb9ba40e30e5ff0171efd656b11dd20f2b) )
-	ROM_LOAD( "m1",	0xf000, 0x0800, CRC(ad654b1d) SHA1(f8b365dae3801e97e04a10018a790d3bdb5d9439) )
-	ROM_LOAD( "m0",	0xf800, 0x0800, CRC(cf7aa787) SHA1(f852cc806ecc582661582326747974a14f50174a) )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )                   /* main CPU */
+	ROM_LOAD( "m7.3f",	0xc000, 0x0800, CRC(4d12f89d) SHA1(e155f9135bc2bea56e211052f2b74d25e76308c8) )
+	ROM_LOAD( "m6.3h",	0xc800, 0x0800, CRC(1bc4a57b) SHA1(02252b868d0c07c0a18240e9d831c303cdcfa9a6) )
+	ROM_LOAD( "m5.3k",	0xd000, 0x0800, CRC(8db99572) SHA1(f8cf22f8c134b47756b7f02c5ca0217100466744) )
+	ROM_LOAD( "m4.3l",	0xd800, 0x0800, CRC(fba671af) SHA1(dd74bd357c82d525948d836a7f860bbb3182c825) )
+	ROM_LOAD( "m3.4f",	0xe000, 0x0800, CRC(1aad640d) SHA1(9ace7d2c5ef9e789c2b8cc65420b19ce72cd95fa) )
+	ROM_LOAD( "m2.4h",	0xe800, 0x0800, CRC(cbd533a0) SHA1(d3be81fb9ba40e30e5ff0171efd656b11dd20f2b) )
+	ROM_LOAD( "m1.4k",	0xf000, 0x0800, CRC(ad654b1d) SHA1(f8b365dae3801e97e04a10018a790d3bdb5d9439) )
+	ROM_LOAD( "m0.4l",	0xf800, 0x0800, CRC(cf7aa787) SHA1(f852cc806ecc582661582326747974a14f50174a) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     		/* 64k for 6502 code of audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )                   /* audio CPU */
 	ROM_LOAD( "m8", 0xf800, 0x0400, CRC(cfd19dab) SHA1(566dc84ffe9bcaeb112250a9e1882bf62f47b579) )
 	ROM_LOAD( "m9", 0xfc00, 0x0400, CRC(48f30f24) SHA1(9c0bf6e43b143d6af1ebb9dad2bdc2b53eb2e48e) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )   /* Background tiles */
-	ROM_LOAD( "mc", 0x0000, 0x0400, CRC(2daadfb7) SHA1(8be084a39b256e538fd57111e92d47115cb142cd) )
-	ROM_LOAD( "md", 0x0400, 0x0400, CRC(3ee1287a) SHA1(33bc59a8d09d22f3db80f881c2f37aa788718138) )
-	ROM_LOAD( "me", 0x0800, 0x0400, CRC(45a5c201) SHA1(ac600afeabf494634c3189d8e96644bd0deb45f3) )
+	ROM_REGION( 0x0c00, REGION_GFX1, ROMREGION_DISPOSE )    /* background tiles */
+	ROM_LOAD( "mc.3k", 0x0000, 0x0400, CRC(2daadfb7) SHA1(8be084a39b256e538fd57111e92d47115cb142cd) )
+	ROM_LOAD( "md.3l", 0x0400, 0x0400, CRC(3ee1287a) SHA1(33bc59a8d09d22f3db80f881c2f37aa788718138) )
+	ROM_LOAD( "me.3m", 0x0800, 0x0400, CRC(45a5c201) SHA1(ac600afeabf494634c3189d8e96644bd0deb45f3) )
 
-	ROM_REGION( 0x0400, REGION_GFX2, 0 )  			/* Background tile maps */
-	ROM_LOAD( "mf", 0x0000, 0x0400, CRC(e9cba773) SHA1(356c7edb1b412a9e04f0747e780c945af8791c55) )
+	ROM_REGION( 0x0400, REGION_GFX2, 0 )                    /* background tile map */
+	ROM_LOAD( "mf.4h", 0x0000, 0x0400, CRC(e9cba773) SHA1(356c7edb1b412a9e04f0747e780c945af8791c55) )
 
-	ROM_REGION( 0x0400, REGION_GFX3, 0 )			/* Car headlight */
-	ROM_LOAD( "ma", 0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
+	ROM_REGION( 0x0400, REGION_GFX3, ROMREGION_DISPOSE )    /* headlight */
+	ROM_LOAD( "ma.2b", 0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
 
-	ROM_REGION( 0x0800, REGION_GFX4, 0 )			/* Shifting data */
-	ROM_LOAD( "mb", 0x0000, 0x0800, CRC(cb801e49) SHA1(7444c4af7cf07e5fdc54044d62ea4fcb201b2b8b) )
+	ROM_REGION( 0x0800, REGION_USER1, 0 )                   /* shifting table */
+	ROM_LOAD( "mb.5c", 0x0000, 0x0800, CRC(cb801e49) SHA1(7444c4af7cf07e5fdc54044d62ea4fcb201b2b8b) )
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 ) 			/* Color PROM */
-	ROM_LOAD( "mg",	0x0000, 0x0020, CRC(3395b31f) SHA1(26235fb448a4180c58f0887e53a29c17857b3b34) )
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )                   /* color PROM */
+	ROM_LOAD( "mg.7f",	0x0000, 0x0020, CRC(3395b31f) SHA1(26235fb448a4180c58f0887e53a29c17857b3b34) )
 ROM_END
 
 
 ROM_START( madalina )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) 			/* 64k for 6502 code of main CPU */
-	ROM_LOAD( "2716.4c",        0xb000, 0x0800, CRC(90be68af) SHA1(472ccfd2e04d6d49be47d919cba0c55d850b2887) )
-	ROM_LOAD( "2716.4e",        0xb800, 0x0800, CRC(aba10cbb) SHA1(6ca213ded8ed7f4f310ab5ae25220cf867dd1d00) )
-	ROM_LOAD( "2716.3f",        0xc000, 0x0800, CRC(c3af484c) SHA1(c3667526d3b5aeee68823f92826053e657512851) )
-	ROM_LOAD( "2716.3j",        0xc800, 0x0800, CRC(78ca5a87) SHA1(729d69ee63c710241a098471e9769063dfe8ef1e) )
-	ROM_LOAD( "2716.3k",        0xd000, 0x0800, CRC(070e81ea) SHA1(006831f4bf289812e4e87a3ece7885e8b901f2f5) )
-	ROM_LOAD( "2716.3l",        0xd800, 0x0800, CRC(98225cb0) SHA1(ca74f5e33fa9116215b03abadd5d09840c04fb0b) )
-	ROM_LOAD( "2716.4f",        0xe000, 0x0800, CRC(52fea0fc) SHA1(443fd859daf4279d5976256a4b1c970b520661a2) )
-	ROM_LOAD( "2716.4j",        0xe800, 0x0800, CRC(dba6c4f6) SHA1(51f815fc7eb99a05eee6204de2d4cad1734adc52) )
-	ROM_LOAD( "2716.4k",        0xf000, 0x0800, CRC(06991af6) SHA1(19112306529721222b6e1c07920348c263d8b8aa) )
-	ROM_LOAD( "2716.4l",        0xf800, 0x0800, CRC(57752b47) SHA1(a34d3150ea9082889154042dbea3386f71322a78) )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )                   /* main CPU */
+	ROM_LOAD( "2716.4c", 0xb000, 0x0800, CRC(90be68af) SHA1(472ccfd2e04d6d49be47d919cba0c55d850b2887) )
+	ROM_LOAD( "2716.4e", 0xb800, 0x0800, CRC(aba10cbb) SHA1(6ca213ded8ed7f4f310ab5ae25220cf867dd1d00) )
+	ROM_LOAD( "2716.3f", 0xc000, 0x0800, CRC(c3af484c) SHA1(c3667526d3b5aeee68823f92826053e657512851) )
+	ROM_LOAD( "2716.3h", 0xc800, 0x0800, CRC(78ca5a87) SHA1(729d69ee63c710241a098471e9769063dfe8ef1e) )
+	ROM_LOAD( "2716.3k", 0xd000, 0x0800, CRC(070e81ea) SHA1(006831f4bf289812e4e87a3ece7885e8b901f2f5) )
+	ROM_LOAD( "2716.3l", 0xd800, 0x0800, CRC(98225cb0) SHA1(ca74f5e33fa9116215b03abadd5d09840c04fb0b) )
+	ROM_LOAD( "2716.4f", 0xe000, 0x0800, CRC(52fea0fc) SHA1(443fd859daf4279d5976256a4b1c970b520661a2) )
+	ROM_LOAD( "2716.4h", 0xe800, 0x0800, CRC(dba6c4f6) SHA1(51f815fc7eb99a05eee6204de2d4cad1734adc52) )
+	ROM_LOAD( "2716.4k", 0xf000, 0x0800, CRC(06991af6) SHA1(19112306529721222b6e1c07920348c263d8b8aa) )
+	ROM_LOAD( "2716.4l", 0xf800, 0x0800, CRC(57752b47) SHA1(a34d3150ea9082889154042dbea3386f71322a78) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     		/* 64k for 6502 code of audio CPU */
-	ROM_LOAD( "8_2708.4d",      0xf800, 0x0400, CRC(46162e7e) SHA1(7ed85f4a9ac58d6d9bafba0c843a16c269656563) )
-	ROM_LOAD( "9_2708.3d",      0xfc00, 0x0400, CRC(4175f5c4) SHA1(45cae8a1fcfd34b91c63cc7e544a32922da14f16) )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )                   /* audio CPU */
+	ROM_LOAD( "8_2708.4d", 0xf800, 0x0400, CRC(46162e7e) SHA1(7ed85f4a9ac58d6d9bafba0c843a16c269656563) )
+	ROM_LOAD( "9_2708.3d", 0xfc00, 0x0400, CRC(4175f5c4) SHA1(45cae8a1fcfd34b91c63cc7e544a32922da14f16) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )    /* Background tiles */
-	ROM_LOAD( "mc-1_82s137.3k", 0x0000, 0x0400, NO_DUMP )
-	ROM_LOAD( "me-1_82s137.3l", 0x0400, 0x0400, CRC(7328a425) SHA1(327adc8b0e25d93f1ae98a44c26d0aaaac1b1a9c) )
-	ROM_LOAD( "md-1_82s137.3m", 0x0800, 0x0400, CRC(b5329929) SHA1(86890e1b7cc8cb31fc0dcbc2d3cff02e4cf95619) )
+	ROM_REGION( 0x0c00, REGION_GFX1, ROMREGION_DISPOSE )    /* background tiles */
+	ROM_LOAD( "mc-1.3k", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "me-1.3l", 0x0400, 0x0400, CRC(7328a425) SHA1(327adc8b0e25d93f1ae98a44c26d0aaaac1b1a9c) )
+	ROM_LOAD( "md-1.3m", 0x0800, 0x0400, CRC(b5329929) SHA1(86890e1b7cc8cb31fc0dcbc2d3cff02e4cf95619) )
 
-	ROM_REGION( 0x0400, REGION_GFX2, 0 )  			/* Background tile maps */
-	ROM_LOAD( "mf-1_82s137.4h", 0x0000, 0x0400, CRC(9b04c446) SHA1(918013f3c0244ab6a670b9d1b6b642298e2c5ab8) )
+	ROM_REGION( 0x0400, REGION_GFX2, 0 )                    /* background tile map */
+	ROM_LOAD( "mf-1.4h", 0x0000, 0x0400, CRC(9b04c446) SHA1(918013f3c0244ab6a670b9d1b6b642298e2c5ab8) )
 
-	ROM_REGION( 0x0400, REGION_GFX3, 0 )			/* Car headlight */
-	ROM_LOAD( "ma-_2708.2b",    0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
+	ROM_REGION( 0x0400, REGION_GFX3, ROMREGION_DISPOSE )    /* headlight */
+	ROM_LOAD( "ma.2b", 0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
 
-	ROM_REGION( 0x0800, REGION_GFX4, 0 )			/* Shifting data */
-	ROM_LOAD( "mb-_2716.5c",    0x0000, 0x0800, CRC(cb801e49) SHA1(7444c4af7cf07e5fdc54044d62ea4fcb201b2b8b) )
+	ROM_REGION( 0x0800, REGION_USER1, 0 )                   /* shifting table */
+	ROM_LOAD( "mb.5c", 0x0000, 0x0800, CRC(cb801e49) SHA1(7444c4af7cf07e5fdc54044d62ea4fcb201b2b8b) )
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 ) 			/* Color PROM */
-	ROM_LOAD( "mg-1_82s123.7e", 0x0000, 0x0020, CRC(e622396a) SHA1(8972704bd25fed462e25c453771cc5ca4fc74034) )
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )                   /* color PROM */
+	ROM_LOAD( "mg-1.7f", 0x0000, 0x0020, CRC(e622396a) SHA1(8972704bd25fed462e25c453771cc5ca4fc74034) )
 ROM_END
 
 
-DRIVER_INIT( madalien )
+static DRIVER_INIT( madalien )
 {
-	madalien_shift_counter = 0;
-	madalien_shift_reg_lo  = 0;
-	madalien_shift_reg_hi  = 0;
-	madalien_bg_map_selector = 0;
-	madalien_scroll_light = 0;
-	madalien_select_color_1 = 0;
-	madalien_select_color_2 = 0;
-	madalien_headlight_on = 0;
-	madalien_swap_colors = 0;
-	madalien_video_register = 0;
-	madalien_flip_screen = 0;
+	state_save_register_global(madalien_video_flags);
+	state_save_register_global(madalien_screen_control);
+	state_save_register_global(madalien_scroll);
+	state_save_register_global(madalien_edge1_pos);
+	state_save_register_global(madalien_edge2_pos);
+	state_save_register_global(madalien_headlight_pos);
+	state_save_register_global(madalien_shift_count);
+	state_save_register_global(madalien_shift_data);
 }
 
 
 /*          rom       parent     machine   inp       init */
-GAME( 1980, madalien, 0,         madalien, madalien, madalien, ROT270, "Data East Corporation", "Mad Alien", 0 )
-GAME( 1980, madalina, madalien,  madalien, madalien, madalien, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", 0 )
+GAME( 1980, madalien, 0,         madalien, madalien, madalien, ROT270, "Data East Corporation", "Mad Alien", GAME_IMPERFECT_SOUND )
+GAME( 1980, madalina, madalien,  madalien, madalien, madalien, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_SOUND )

@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "osdepend.h"
+#include "eminline.h"
 #include "driver.h"
 #include "hash.h"
 #include <ctype.h>
@@ -202,6 +203,40 @@ static void build_quarks(void)
 		if (string != NULL)
 			add_quark(defstr_table, strnum, quark_string_crc(string));
 	}
+}
+
+
+
+/*************************************
+ *
+ *  Validate inline functions
+ *
+ *************************************/
+
+static int validate_inlines(void)
+{
+#undef rand
+	int test1 = rand() | (rand() << 15);
+	int test2 = rand() | (rand() << 15);
+	int error = FALSE;
+
+	if (mul_32x32(test1, test2) != (INT64)test1 * (INT64)test2) { mame_printf_error("Error testing mul_32x32\n"); error = TRUE; }
+	if (mulu_32x32(test1, test2) != (UINT64)test1 * (UINT64)test2) { mame_printf_error("Error testing mulu_32x32\n"); error = TRUE; }
+	if (mul_32x32_hi(test1, test2) != ((INT64)test1 * (INT64)test2) >> 32) { mame_printf_error("Error testing mul_32x32_hi\n"); error = TRUE; }
+	if (mulu_32x32_hi(test1, test2) != ((UINT64)test1 * (UINT64)test2) >> 32) { mame_printf_error("Error testing mulu_32x32_hi\n"); error = TRUE; }
+	if (mul_32x32_shift(test1, test2, 7) != (INT32)(((INT64)test1 * (INT64)test2) >> 7)) { mame_printf_error("Error testing mul_32x32_shift\n"); error = TRUE; }
+	if (mulu_32x32_shift(test1, test2, 7) != (UINT32)(((UINT64)test1 * (UINT64)test2) >> 7)) { mame_printf_error("Error testing mulu_32x32_shift\n"); error = TRUE; }
+	if (fabs(recip_approx(100.0) - 0.01) > 0.0001) { mame_printf_error("Error testing recip_approx\n"); error = TRUE; }
+	test1 = (test1 & 0x0000ffff) | 0x400000;
+	if (count_leading_zeros(test1) != 9) { mame_printf_error("Error testing count_leading_zeros\n"); error = TRUE; }
+	test1 = (test1 | 0xffff0000) & ~0x400000;
+	if (count_leading_ones(test1) != 9) { mame_printf_error("Error testing count_leading_ones\n"); error = TRUE; }
+	test2 = test1;
+	if (compare_exchange32(&test1, test2, 1000) != test2) { mame_printf_error("Error testing compare_exchange32\n"); error = TRUE; }
+	if (atomic_exchange32(&test1, test2) != 1000) { mame_printf_error("Error testing atomic_exchange32\n"); error = TRUE; }
+	if (atomic_add32(&test1, 45) != test2 + 45) { mame_printf_error("Error testing atomic_add32\n"); error = TRUE; }
+
+	return error;
 }
 
 
@@ -1207,6 +1242,9 @@ int mame_validitychecks(const game_driver *curdriver)
 #else
 	if (lsbtest == 0x00ff)		{ mame_printf_error("LSB_FIRST not specified, but running on a little-endian machine\n"); error = TRUE; }
 #endif
+
+	/* validate inline function behavior */
+	error = validate_inlines() || error;
 
 	/* make sure the CPU and sound interfaces are up and running */
 	cpuintrf_init(NULL);

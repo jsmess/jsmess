@@ -601,7 +601,7 @@ static MACHINE_DRIVER_START( toprollr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(cclimber_custom_interface)
+	MDRV_SOUND_CONFIG(cclimber_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 

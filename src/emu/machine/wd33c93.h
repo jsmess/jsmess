@@ -6,7 +6,7 @@
 #ifndef _WD33C93_H_
 #define _WD33C93_H_
 
-#include "machine/scsidev.h"
+#include "machine/scsi.h"
 
 struct WD33C93interface
 {

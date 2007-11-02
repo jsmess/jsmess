@@ -113,7 +113,7 @@ static WRITE8_HANDLER( polyplay_sound_channel );
 
 
 /* Polyplay Sound Interface */
-static struct Samplesinterface custom_interface =
+static struct Samplesinterface polyplay_samples_interface =
 {
 	2,
 	NULL,
@@ -318,7 +318,7 @@ static MACHINE_DRIVER_START( polyplay )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_CONFIG(polyplay_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

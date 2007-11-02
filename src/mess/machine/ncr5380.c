@@ -347,8 +347,9 @@ extern void ncr5380_init( struct NCR5380interface *interface )
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		devices[interface->scsidevs->devices[i].scsiID].handler = interface->scsidevs->devices[i].handler;
-		interface->scsidevs->devices[i].handler(SCSIOP_ALLOC_INSTANCE, &devices[interface->scsidevs->devices[i].scsiID].data, interface->scsidevs->devices[i].diskID, (UINT8 *)NULL);
+		/* compilation error */
+		/* devices[interface->scsidevs->devices[i].scsiID].handler = interface->scsidevs->devices[i].handler; */
+		/* interface->scsidevs->devices[i].handler(SCSIOP_ALLOC_INSTANCE, &devices[interface->scsidevs->devices[i].scsiID].data, interface->scsidevs->devices[i].diskID, (UINT8 *)NULL); */
 	}	
 
 	state_save_register_item_array("ncr5380", 0, n5380_Registers);

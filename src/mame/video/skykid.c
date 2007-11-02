@@ -3,7 +3,8 @@
 UINT8 *skykid_textram, *skykid_videoram, *skykid_spriteram;
 
 static tilemap *bg_tilemap,*tx_tilemap;
-static int priority,scroll_x,scroll_y;
+static UINT8 priority;
+static UINT16 scroll_x,scroll_y;
 
 
 /***************************************************************************
@@ -135,6 +136,11 @@ VIDEO_START( skykid )
 	spriteram = skykid_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x0800;
 	spriteram_3 = spriteram_2 + 0x0800;
+
+	state_save_register_global(priority);
+	state_save_register_global(scroll_x);
+	state_save_register_global(scroll_y);
+	state_save_register_global(flip_screen);
 }
 
 

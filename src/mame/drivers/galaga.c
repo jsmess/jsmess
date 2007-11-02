@@ -1607,7 +1607,7 @@ static const char *battles_sample_names[] =
 	0	/* end of array */
 };
 
-struct Samplesinterface samples_interface_battles =
+struct Samplesinterface battles_samples_interface =
 {
 	1,	/* one channel */
 	battles_sample_names
@@ -1829,7 +1829,7 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_SOUND_REMOVE("Discrete")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface_battles)
+	MDRV_SOUND_CONFIG(battles_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

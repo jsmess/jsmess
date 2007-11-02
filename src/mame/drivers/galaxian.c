@@ -4280,7 +4280,7 @@ static MACHINE_DRIVER_START( galaxian )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(galaxian_custom_interface)
+	MDRV_SOUND_CONFIG(galaxian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4419,7 +4419,7 @@ static MACHINE_DRIVER_START( mshuttle )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(cclimber_custom_interface)
+	MDRV_SOUND_CONFIG(cclimber_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -4525,7 +4525,7 @@ static MACHINE_DRIVER_START( checkman )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(galaxian_custom_interface)
+	MDRV_SOUND_CONFIG(galaxian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4724,7 +4724,7 @@ static MACHINE_DRIVER_START( drivfrcg )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(galaxian_custom_interface)
+	MDRV_SOUND_CONFIG(galaxian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4767,7 +4767,7 @@ static MACHINE_DRIVER_START( hunchbkg )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(galaxian_custom_interface)
+	MDRV_SOUND_CONFIG(galaxian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

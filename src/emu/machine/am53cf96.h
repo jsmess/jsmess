@@ -6,7 +6,7 @@
 #ifndef _AM53CF96_H_
 #define _AM53CF96_H_
 
-#include "scsidev.h"
+#include "scsi.h"
 
 struct AM53CF96interface
 {

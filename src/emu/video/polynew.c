@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "polynew.h"
+#include "eminline.h"
 #include "mame.h"
 #include <math.h>
 
@@ -614,7 +615,7 @@ static void *poly_item_callback(void *param, int threadid)
 				{
 					orig_count_next = prevunit->count_next;
 					new_count_next = orig_count_next | (unitnum << 16);
-				} while (osd_compare_exchange32((volatile INT32 *)&prevunit->count_next, orig_count_next, new_count_next) != orig_count_next);
+				} while (compare_exchange32((volatile INT32 *)&prevunit->count_next, orig_count_next, new_count_next) != orig_count_next);
 
 #if KEEP_STATISTICS
 				/* track resolved conflicts */
@@ -636,7 +637,7 @@ static void *poly_item_callback(void *param, int threadid)
 		do
 		{
 			orig_count_next = unit->count_next;
-		} while (osd_compare_exchange32((volatile INT32 *)&unit->count_next, orig_count_next, 0) != orig_count_next);
+		} while (compare_exchange32((volatile INT32 *)&unit->count_next, orig_count_next, 0) != orig_count_next);
 
 		/* if we have no more work to do, do nothing */
 		orig_count_next >>= 16;

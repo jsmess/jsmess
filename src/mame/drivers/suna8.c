@@ -1539,7 +1539,7 @@ static struct AY8910interface hardhead_ay8910_interface =
 	suna8_samples_number_w
 };
 
-static struct Samplesinterface custom_interface =
+static struct Samplesinterface suna8_samples_interface =
 {
 	1,
 	NULL,
@@ -1587,7 +1587,7 @@ static MACHINE_DRIVER_START( hardhead )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_CONFIG(suna8_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
@@ -1804,7 +1804,7 @@ static MACHINE_DRIVER_START( starfigh )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_CONFIG(suna8_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
@@ -1863,7 +1863,7 @@ static MACHINE_DRIVER_START( sparkman )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_CONFIG(suna8_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END

@@ -7,7 +7,9 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "eminline.h"
 #include "gaelco3d.h"
+#include "video/rgbutil.h"
 #include "video/polynew.h"
 
 UINT8 *gaelco3d_texture;
@@ -19,8 +21,6 @@ UINT32 gaelco3d_texmask_size;
 #define MAX_POLYGONS		4096
 #define MAX_POLYDATA		(MAX_POLYGONS * 21)
 
-#define BILINEAR_FILTER		1			/* should be 1, but can be set to 0 for speed */
-
 #define DISPLAY_TEXTURE		0
 #define LOG_POLYGONS		0
 #define DISPLAY_STATS		0
@@ -30,7 +30,7 @@ UINT32 gaelco3d_texmask_size;
 
 static mame_bitmap *screenbits;
 static mame_bitmap *zbuffer;
-static UINT16 *palette;
+static rgb_t *palette;
 static UINT32 *polydata_buffer;
 static UINT32 polydata_count;
 
@@ -258,58 +258,32 @@ static void render_noz_noperspective(void *destbase, INT32 scanline, INT32 start
 	mame_bitmap *bitmap = destbase;
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
-	float zbase = 1.0f / extra->ooz_base;
-	float uoz = (extra->uoz_base + scanline * extra->uoz_dy + startx * extra->uoz_dx) * zbase;
-	float voz = (extra->voz_base + scanline * extra->voz_dy + startx * extra->voz_dx) * zbase;
-	float uoz_step = extra->uoz_dx * zbase;
-	float voz_step = extra->voz_dx * zbase;
+	float zbase = recip_approx(extra->ooz_base);
+	float zbase256 = 256.0f * zbase;
+	float uoz = (extra->uoz_base + scanline * extra->uoz_dy + startx * extra->uoz_dx) * zbase256;
+	float voz = (extra->voz_base + scanline * extra->voz_dy + startx * extra->voz_dx) * zbase256;
+	float uoz_step = extra->uoz_dx * zbase256;
+	float voz_step = extra->voz_dx * zbase256;
 	int zbufval = (int)(-extra->z0 * zbase);
 	offs_t endmask = gaelco3d_texture_size - 1;
-	UINT16 color = extra->color;
+	const rgb_t *palsource = palette + extra->color;
 	UINT32 tex = extra->tex;
 	int x;
 
 	for (x = startx; x < stopx; x++)
 	{
-		int pixeloffs, u, v;
-
-		if (!BILINEAR_FILTER)
+		int u = (int)uoz;
+		int v = (int)voz;
+		int pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
+		if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
 		{
-			u = (int)(uoz + 0.5f); v = (int)(voz + 0.5f);
-			pixeloffs = (tex + v * 4096 + u) & endmask;
-			if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
-			{
-				dest[x] = palette[color | gaelco3d_texture[pixeloffs]];
-				zbuf[x] = zbufval;
-			}
-		}
-		else
-		{
-			u = (int)(uoz * 256.0f); v = (int)(voz * 256.0f);
-			pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
-			if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
-			{
-				int paldata, r, g, b, f, tf;
-
-				paldata = palette[color | gaelco3d_texture[pixeloffs]];
-				tf = f = (~u & 0xff) * (~v & 0xff);
-				r = (paldata & 0x7c00) * f; g = (paldata & 0x03e0) * f; b = (paldata & 0x001f) * f;
-
-				paldata = palette[color | gaelco3d_texture[(pixeloffs + 1) & endmask]];
-				tf += f = (u & 0xff) * (~v & 0xff);
-				r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-				paldata = palette[color | gaelco3d_texture[(pixeloffs + 4096) & endmask]];
-				tf += f = (~u & 0xff) * (v & 0xff);
-				r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-				paldata = palette[color | gaelco3d_texture[(pixeloffs + 4097) & endmask]];
-				f = 0x10000 - tf;
-				r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-				dest[x] = ((r >> 16) & 0x7c00) | ((g >> 16) & 0x03e0) | (b >> 16);
-				zbuf[x] = zbufval;
-			}
+			rgb_t rgb00 = palsource[gaelco3d_texture[pixeloffs]];
+			rgb_t rgb01 = palsource[gaelco3d_texture[(pixeloffs + 1) & endmask]];
+			rgb_t rgb10 = palsource[gaelco3d_texture[(pixeloffs + 4096) & endmask]];
+			rgb_t rgb11 = palsource[gaelco3d_texture[(pixeloffs + 4097) & endmask]];
+			rgb_t filtered = rgb_bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
+			dest[x] = (filtered & 0x1f) | ((filtered & 0x1ff800) >> 6);
+			zbuf[x] = zbufval;
 		}
 
 		/* advance texture params to the next pixel */
@@ -326,13 +300,13 @@ static void render_normal(void *destbase, INT32 scanline, INT32 startx, INT32 st
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
 	float ooz_dx = extra->ooz_dx;
-	float uoz_dx = extra->uoz_dx;
-	float voz_dx = extra->voz_dx;
+	float uoz_dx = extra->uoz_dx * 256.0f;
+	float voz_dx = extra->voz_dx * 256.0f;
 	float ooz = extra->ooz_base + scanline * extra->ooz_dy + startx * ooz_dx;
-	float uoz = extra->uoz_base + scanline * extra->uoz_dy + startx * uoz_dx;
-	float voz = extra->voz_base + scanline * extra->voz_dy + startx * voz_dx;
+	float uoz = (extra->uoz_base + scanline * extra->uoz_dy) * 256.0f + startx * uoz_dx;
+	float voz = (extra->voz_base + scanline * extra->voz_dy) * 256.0f + startx * voz_dx;
 	offs_t endmask = gaelco3d_texture_size - 1;
-	UINT16 color = extra->color;
+	const rgb_t *palsource = palette + extra->color;
 	UINT32 tex = extra->tex;
 	float z0 = extra->z0;
 	int x;
@@ -342,49 +316,22 @@ static void render_normal(void *destbase, INT32 scanline, INT32 startx, INT32 st
 		if (ooz > 0)
 		{
 			/* compute Z and check the Z buffer value first */
-			float z = 1.0f / ooz;
+			float z = recip_approx(ooz);
 			int zbufval = (int)(z0 * z);
-			if (zbufval < zbuf[x] || zbufval < 0)
+			if (zbufval < zbuf[x])
 			{
-				int pixeloffs, u, v;
-
-				if (!BILINEAR_FILTER)
+				int u = (int)(uoz * z);
+				int v = (int)(voz * z);
+				int pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
+				if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
 				{
-					u = (int)(uoz * z + 0.5f); v = (int)(voz * z + 0.5f);
-					pixeloffs = (tex + v * 4096 + u) & endmask;
-					if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
-					{
-						dest[x] = palette[color | gaelco3d_texture[pixeloffs]];
-						zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
-					}
-				}
-				else
-				{
-					u = (int)(uoz * z * 256.0f); v = (int)(voz * z * 256.0f);
-					pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
-					if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
-					{
-						int paldata, r, g, b, f, tf;
-
-						paldata = palette[color | gaelco3d_texture[pixeloffs]];
-						tf = f = (~u & 0xff) * (~v & 0xff);
-						r = (paldata & 0x7c00) * f; g = (paldata & 0x03e0) * f; b = (paldata & 0x001f) * f;
-
-						paldata = palette[color | gaelco3d_texture[(pixeloffs + 1) & endmask]];
-						tf += f = (u & 0xff) * (~v & 0xff);
-						r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-						paldata = palette[color | gaelco3d_texture[(pixeloffs + 4096) & endmask]];
-						tf += f = (~u & 0xff) * (v & 0xff);
-						r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-						paldata = palette[color | gaelco3d_texture[(pixeloffs + 4097) & endmask]];
-						f = 0x10000 - tf;
-						r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-						dest[x] = ((r >> 16) & 0x7c00) | ((g >> 16) & 0x03e0) | (b >> 16);
-						zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
-					}
+					rgb_t rgb00 = palsource[gaelco3d_texture[pixeloffs]];
+					rgb_t rgb01 = palsource[gaelco3d_texture[(pixeloffs + 1) & endmask]];
+					rgb_t rgb10 = palsource[gaelco3d_texture[(pixeloffs + 4096) & endmask]];
+					rgb_t rgb11 = palsource[gaelco3d_texture[(pixeloffs + 4097) & endmask]];
+					rgb_t filtered = rgb_bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
+					dest[x] = (filtered & 0x1f) | ((filtered & 0x1ff800) >> 6);
+					zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
 				}
 			}
 		}
@@ -404,13 +351,13 @@ static void render_alphablend(void *destbase, INT32 scanline, INT32 startx, INT3
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
 	float ooz_dx = extra->ooz_dx;
-	float uoz_dx = extra->uoz_dx;
-	float voz_dx = extra->voz_dx;
+	float uoz_dx = extra->uoz_dx * 256.0f;
+	float voz_dx = extra->voz_dx * 256.0f;
 	float ooz = extra->ooz_base + extra->ooz_dy * scanline + startx * ooz_dx;
-	float uoz = extra->uoz_base + extra->uoz_dy * scanline + startx * uoz_dx;
-	float voz = extra->voz_base + extra->voz_dy * scanline + startx * voz_dx;
+	float uoz = (extra->uoz_base + extra->uoz_dy * scanline) * 256.0f + startx * uoz_dx;
+	float voz = (extra->voz_base + extra->voz_dy * scanline) * 256.0f + startx * voz_dx;
 	offs_t endmask = gaelco3d_texture_size - 1;
-	UINT16 color = extra->color;
+	const rgb_t *palsource = palette + extra->color;
 	UINT32 tex = extra->tex;
 	float z0 = extra->z0;
 	int x;
@@ -420,50 +367,22 @@ static void render_alphablend(void *destbase, INT32 scanline, INT32 startx, INT3
 		if (ooz > 0)
 		{
 			/* compute Z and check the Z buffer value first */
-			float z = 1.0f / ooz;
+			float z = recip_approx(ooz);
 			int zbufval = (int)(z0 * z);
-			if (zbufval < zbuf[x] || zbufval < 0)
+			if (zbufval < zbuf[x])
 			{
-				int pixeloffs, u, v;
-
-				if (!BILINEAR_FILTER)
+				int u = (int)(uoz * z);
+				int v = (int)(voz * z);
+				int pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
+				if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
 				{
-					u = (int)(uoz * z + 0.5f); v = (int)(voz * z + 0.5f);
-					pixeloffs = (tex + v * 4096 + u) & endmask;
-					if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
-					{
-						dest[x] = ((dest[x] >> 1) & 0x3def) + ((palette[color | gaelco3d_texture[pixeloffs]] >> 1) & 0x3def);
-						zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
-					}
-				}
-				else
-				{
-					u = (int)(uoz * z * 256.0f); v = (int)(voz * z * 256.0f);
-					pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
-					if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
-					{
-						int paldata, r, g, b, f, tf;
-
-						paldata = palette[color | gaelco3d_texture[pixeloffs]];
-						tf = f = (~u & 0xff) * (~v & 0xff);
-						r = (paldata & 0x7c00) * f; g = (paldata & 0x03e0) * f; b = (paldata & 0x001f) * f;
-
-						paldata = palette[color | gaelco3d_texture[(pixeloffs + 1) & endmask]];
-						tf += f = (u & 0xff) * (~v & 0xff);
-						r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-						paldata = palette[color | gaelco3d_texture[(pixeloffs + 4096) & endmask]];
-						tf += f = (~u & 0xff) * (v & 0xff);
-						r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-						paldata = palette[color | gaelco3d_texture[(pixeloffs + 4097) & endmask]];
-						f = 0x10000 - tf;
-						r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
-
-						paldata = ((r >> 17) & 0x7c00) | ((g >> 17) & 0x03e0) | (b >> 17);
-						dest[x] = ((dest[x] >> 1) & 0x3def) + (paldata & 0x3def);
-						zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
-					}
+					rgb_t rgb00 = palsource[gaelco3d_texture[pixeloffs]];
+					rgb_t rgb01 = palsource[gaelco3d_texture[(pixeloffs + 1) & endmask]];
+					rgb_t rgb10 = palsource[gaelco3d_texture[(pixeloffs + 4096) & endmask]];
+					rgb_t rgb11 = palsource[gaelco3d_texture[(pixeloffs + 4097) & endmask]];
+					rgb_t filtered = rgb_bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v) >> 1;
+					dest[x] = ((filtered & 0x0f) | ((filtered & 0x0f7800) >> 6)) + ((dest[x] >> 1) & 0x3def);
+					zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
 				}
 			}
 		}
@@ -542,7 +461,7 @@ WRITE16_HANDLER( gaelco3d_paletteram_w )
 {
 	poly_wait(poly, "Palette change");
 	COMBINE_DATA(&paletteram16[offset]);
-	palette[offset] = paletteram16[offset];
+	palette[offset] = ((paletteram16[offset] & 0x7fe0) << 6) | (paletteram16[offset] & 0x1f);
 }
 
 
@@ -550,8 +469,8 @@ WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 {
 	poly_wait(poly, "Palette change");
 	COMBINE_DATA(&paletteram32[offset]);
-	palette[offset*2+0] = paletteram32[offset] >> 16;
-	palette[offset*2+1] = paletteram32[offset];
+	palette[offset*2+0] = ((paletteram32[offset] & 0x7fe00000) >> 10) | ((paletteram32[offset] & 0x1f0000) >> 16);
+	palette[offset*2+1] = ((paletteram32[offset] & 0x7fe0) << 6) | (paletteram32[offset] & 0x1f);
 }
 
 

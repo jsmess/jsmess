@@ -15,13 +15,7 @@
 static UINT8 scsi_regs[32], fifo[16], fptr = 0, xfer_state, last_id;
 static struct AM53CF96interface *intf;
 
-typedef struct
-{
-	void *data;		// device's "this" pointer
-	pSCSIDispatch handler;	// device's handler routine
-} SCSIDev;
-
-static SCSIDev devices[8];	// SCSI IDs 0-7
+static SCSIInstance *devices[8];	// SCSI IDs 0-7
 
 // 53CF96 register set
 enum
@@ -147,6 +141,21 @@ WRITE32_HANDLER( am53cf96_w )
 				scsi_regs[REG_IRQSTATE] = 8;	// indicate success
 				xfer_state = 0;
 				break;
+			case 2: // reset device
+				scsi_regs[REG_IRQSTATE] = 8;	// indicate success
+
+				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, activecpu_get_pc());
+				if (devices[last_id])
+				{
+					SCSIReset( devices[last_id] );
+				}
+				else
+				{
+					logerror("53cf96: reset request for unknown device SCSI ID %d\n", last_id);
+				}
+
+				xfer_state = 0;
+				break;
 			case 3:	// reset SCSI bus
 				scsi_regs[REG_INTSTATE] = 4;	// command sent OK
 				xfer_state = 0;
@@ -164,9 +173,12 @@ WRITE32_HANDLER( am53cf96_w )
 				}
 
 				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, activecpu_get_pc());
-				if (devices[last_id].handler)
+				if (devices[last_id])
 				{
-					devices[last_id].handler(SCSIOP_EXEC_COMMAND, devices[last_id].data, 0, &fifo[1]);
+					int length;
+
+					SCSISetCommand( devices[last_id], &fifo[1], 12 );
+					SCSIExecCommand( devices[last_id], &length );
 				}
 				else
 				{
@@ -182,6 +194,9 @@ WRITE32_HANDLER( am53cf96_w )
 			case 0x12:	// message accepted
 				mame_timer_set( MAME_TIME_IN_HZ( 16384 ), 0, am53cf96_irq );
 				scsi_regs[REG_INTSTATE] = 6;	// command sent OK
+				break;
+			default:
+				printf( "unsupported command %02x\n", val );
 				break;
 		}
 	}
@@ -206,8 +221,7 @@ void am53cf96_init( struct AM53CF96interface *interface )
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		devices[interface->scsidevs->devices[i].scsiID].handler = interface->scsidevs->devices[i].handler;
-		interface->scsidevs->devices[i].handler(SCSIOP_ALLOC_INSTANCE, &devices[interface->scsidevs->devices[i].scsiID].data, interface->scsidevs->devices[i].diskID, (UINT8 *)NULL);
+		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskID );
 	}
 
 	state_save_register_global_array(scsi_regs);
@@ -222,9 +236,9 @@ void am53cf96_read_data(int bytes, UINT8 *pData)
 {
 	scsi_regs[REG_STATUS] |= 0x10;	// indicate DMA finished
 
-	if (devices[last_id].handler)
+	if (devices[last_id])
 	{
-		devices[last_id].handler(SCSIOP_READ_DATA, devices[last_id].data, bytes, pData);
+		SCSIReadData( devices[last_id], pData, bytes );
 	}
 	else
 	{
@@ -239,9 +253,9 @@ void am53cf96_write_data(int bytes, UINT8 *pData)
 
 	scsi_regs[REG_STATUS] |= 0x10;	// indicate DMA finished
 
-	if (devices[last_id].handler)
+	if (devices[last_id])
 	{
-		devices[last_id].handler(SCSIOP_WRITE_DATA, devices[last_id].data, bytes, pData);
+		SCSIWriteData( devices[last_id], pData, bytes );
 	}
 	else
 	{
@@ -254,11 +268,10 @@ void *am53cf96_get_device(int id)
 {
 	void *ret;
 
-	if (devices[id].handler)
+	if (devices[id])
 	{
 		logerror("53cf96: fetching dev pointer for SCSI ID %d\n", id);
-		devices[id].handler(SCSIOP_GET_DEVICE, devices[id].data, 0, (UINT8 *)&ret);
-
+		SCSIGetDevice( devices[id], &ret );
 		return ret;
 	}
 

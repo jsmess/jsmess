@@ -929,7 +929,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/midwunit.o $(MACHINE)/midwunit.o \
 	$(DRIVERS)/midxunit.o \
 	$(DRIVERS)/midyunit.o $(MACHINE)/midyunit.o $(VIDEO)/midyunit.o \
-	$(DRIVERS)/midzeus.o \
+	$(DRIVERS)/midzeus.o $(VIDEO)/midzeus.o \
 	$(DRIVERS)/omegrace.o \
 	$(DRIVERS)/seattle.o \
 	$(DRIVERS)/tmaster.o \

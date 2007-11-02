@@ -195,7 +195,8 @@ int K001604_vh_start(running_machine *machine, int chip)
 
 	/* HACK !!! To be removed */
 	if (mame_stricmp(gamename, "racingj") == 0 || mame_stricmp(gamename, "racingj2") == 0
-		|| mame_stricmp(gamename, "hangplt") == 0 || mame_stricmp(gamename, "slrasslt") == 0)
+		|| mame_stricmp(gamename, "hangplt") == 0 || mame_stricmp(gamename, "slrasslt") == 0
+		|| mame_stricmp(gamename, "jetwave") == 0)
 	{
 		K001604_layer_size = 0;		// width = 128 tiles
 	}

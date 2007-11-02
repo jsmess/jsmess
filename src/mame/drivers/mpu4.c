@@ -1,6 +1,7 @@
 /***************************************************************************
   MPU4 highly preliminary driver by J.Wallace, and Anonymous.
 
+     09-2007: Haze: Added Deal 'Em video support.
   03-08-2007: J Wallace: Removed audio filter for now, since sound is more accurate without them.
                          Connect 4 now has the right sound.
   03-07-2007: J Wallace: Several major changes, including input relabelling, and system timer improvements.
@@ -10,7 +11,6 @@
                          Revisionism, if you will.
   17-02-2007: J Wallace: Added Deal 'Em - still needs some work.
   10-02-2007: J Wallace: Improved input timing.
-              It appears Connect 4 uses a different sound mapping to regular Barcrest games.
   30-01-2007: J Wallace: Characteriser rewritten to run the 'extra' data needed by some games.
   24-01-2007: J Wallace: With thanks to Canonman and HIGHWAYMAN/System 80, I was able to confirm a seemingly
               ghastly misuse of a PIA is actually on the real hardware. This fixes the meters.
@@ -262,6 +262,9 @@ IRQ line connected to CPU
        - Confirm that MC6850 emulation is sufficient.
        - MPU4 Master clock value taken from schematic, but 68k value is not.
        - On IRQ, inhibit line goes low.
+
+       - Test mode appears to malfunction in Refill mode in Deal 'Em
+       - Distinguish door switches using manual
 *****************************************************************************************/
 
 #include "driver.h"
@@ -274,7 +277,6 @@ IRQ line connected to CPU
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
-#include "sound/2413intf.h"
 #include "machine/steppers.h"	// stepper motor
 #include "machine/roc10937.h"	// vfd
 #include "machine/mmtr.h"
@@ -288,14 +290,16 @@ IRQ line connected to CPU
 #include "video/crtc6845.h"
 
 #ifdef MAME_DEBUG
-#define LOG(x)
-#define LOG_CHR(x)
-#define LOG_IC3(x)
-#define LOG_IC8(x)
-#define LOGSTUFF(x)
+#define LOG(x)logerror x
+#define LOG_CHR(x)logerror x
+#define LOG_CHR_FULL(x)logerror x
+#define LOG_IC3(x)logerror x
+#define LOG_IC8(x)logerror x
+#define LOGSTUFF(x)logerror x
 #else
 #define LOG(x)
 #define LOG_CHR(x)
+#define LOG_CHR_FULL(x)
 #define LOG_IC3(x)
 #define LOG_IC8(x)
 #define LOGSTUFF(x)
@@ -323,7 +327,7 @@ static int IC23GB;
 static int IC23GA;
 static int prot_col;
 static int lamp_col;
-static int ic24_active;
+static int ic23_active;
 static int led_extend;
 static mame_timer *ic24_timer;
 static mame_timer *freq_timer;
@@ -339,7 +343,6 @@ const UINT8 MPU4_chr_lut[72];
 UINT8 MPU4_chr_data[72];
 static UINT8 led_segs[8];
 static UINT8 Lamps[128];		// 128 multiplexed lamps
-//static UINT8 Lampscopy[128];
 								// 32  multiplexed inputs - but a further 8 possible per AUX.
 								// Two connectors 'orange' (sampled every 8ms) and 'black' (sampled every 16ms)
 								// Each connector carries two banks of eight inputs and two enable signals
@@ -395,6 +398,18 @@ static void mpu4_draw_led(UINT8 id, UINT8 value)
 	output_set_digit_value(id,value);
 }
 
+static void draw_lamps(void)
+{
+	int i;
+
+	for (i=0; i<8; i++)
+	{
+		output_set_lamp_value((8*input_strobe)+i, (Lamps[(8*input_strobe)+i]));
+		output_set_lamp_value((8*input_strobe)+i+64, (Lamps[(8*input_strobe)+i+64]));
+	}
+
+}
+
 static void update_lamps(void)
 {
 	int i;
@@ -422,17 +437,7 @@ static void update_lamps(void)
 		mpu4_draw_led(8, pled_segs[0]);
 		mpu4_draw_led(9, pled_segs[1]);
 	}
-}
 
-static void draw_lamps(void)
-{
-	int i;
-
-	for (i=0; i<8; i++)
-	{
-		output_set_lamp_value((8*input_strobe)+i, (Lamps[(8*input_strobe)+i]));
-		output_set_lamp_value((8*input_strobe)+i+64, (Lamps[(8*input_strobe)+i+64]));
-	}
 }
 
 // palette initialisation /////////////////////////////////////////////////
@@ -585,25 +590,32 @@ static const ptm6840_interface ptm_ic2_intf =
     6821 PIA handlers
 ***************************************************************************/
 
+// IC3
 static WRITE8_HANDLER( pia_ic3_porta_w )
 {
 	LOG_IC3(("%04x IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", activecpu_get_previouspc(),data));
 
-	lamp_strobe = data;
-	update_lamps();
+	if(ic23_active)
+	{
+		lamp_strobe = data;
+		update_lamps();
+	}
 }
 
 static WRITE8_HANDLER( pia_ic3_portb_w )
 {
 	LOG_IC3(("%04x IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", activecpu_get_previouspc(),data));
 
-	lamp_strobe2 = data;
-	update_lamps();
+	if(ic23_active)
+	{
+		lamp_strobe2 = data;
+		update_lamps();
+	}
 }
 
 static WRITE8_HANDLER( pia_ic3_ca2_w )
 {
-	LOG_IC3(("%04x IC3 PIA Write CA2 (alpha data), %02X\n", activecpu_get_previouspc(),data&0xFF));
+	LOG_IC3(("%04x IC3 PIA Write CA2 (alpha data), %02X\n", activecpu_get_previouspc(),data&0xff));
 
 	alpha_data_line = data;
 	ROC10937_draw_16seg(0);
@@ -659,6 +671,7 @@ static void ic23_update(void)
 	{
 		input_strobe = 0x00;
 	}
+	draw_lamps();
 }
 /*---------------------------------------
    IC24 emulation
@@ -679,26 +692,29 @@ static void ic24_setup(void)
 	if (IC23GA)
 	{
 		double duration = TIME_OF_74LS123((220*1000),(0.1*0.000001));
-		if (!ic24_active)
 		{
+			ic23_active=1;
 			ic24_output(0);
 			mame_timer_adjust(ic24_timer, double_to_mame_time(duration), 0, time_zero);
-			ic24_active = 1;
 		}
-		draw_lamps();
 	}
 }
 
 static TIMER_CALLBACK( ic24_timeout )
 {
-	ic24_active = 0;
+	ic23_active=0;
 	ic24_output(1);
 }
 
+// IC4
+
 static WRITE8_HANDLER( pia_ic4_porta_w )
 {
-	led_segs[input_strobe] = data;
-	mpu4_draw_led(input_strobe, led_segs[input_strobe]);
+	if(ic23_active)
+	{
+		led_segs[input_strobe] = data;
+		mpu4_draw_led(input_strobe, led_segs[input_strobe]);
+	}
 }
 
 static READ8_HANDLER( pia_ic4_portb_r )
@@ -753,6 +769,7 @@ static const pia6821_interface pia_ic4_intf =
 	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
 
+//IC5
 static READ8_HANDLER( pia_ic5_porta_r )
 {
 	LOG(("%04x IC5 PIA Read of Port A (AUX1)\n",activecpu_get_previouspc()));
@@ -847,20 +864,23 @@ static const pia6821_interface pia_ic5_intf =
 	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
 
+//IC6
 static WRITE8_HANDLER( pia_ic6_portb_w )
 {
 	LOG(("%04x IC6 PIA Port B Set to %2x (Reel A and B)\n", activecpu_get_previouspc(),data));
+	Stepper_update(0, data & 0x0F );
+	Stepper_update(1, (data>>4) & 0x0F );
 
-	Stepper_update(0, (data >> 4) & 0x0F );
-	Stepper_update(1, data        & 0x0F );
-
-	if ( pia_get_output_cb2(1))
+//  if ( pia_get_output_cb2(1))
 	{
 		if ( Stepper_optic_state(0) ) optic_pattern |=  0x01;
 		else                          optic_pattern &= ~0x01;
+
 		if ( Stepper_optic_state(1) ) optic_pattern |=  0x02;
 		else                          optic_pattern &= ~0x02;
 	}
+//  awp_draw_reel(0);
+//  awp_draw_reel(1);
 }
 
 static WRITE8_HANDLER( pia_ic6_porta_w )
@@ -902,20 +922,22 @@ static const pia6821_interface pia_ic6_intf =
 	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
 
+//IC7
 static WRITE8_HANDLER( pia_ic7_porta_w )
 {
 	LOG(("%04x IC7 PIA Port A Set to %2x (Reel C and D)\n", activecpu_get_previouspc(),data));
+	Stepper_update(2, data & 0x0F );
+	Stepper_update(3, (data >> 4)& 0x0F );
 
-	Stepper_update(2, (data >> 4) & 0x0F );
-	Stepper_update(3, data        & 0x0F );
-
-	if ( pia_get_output_cb2(1))
+//  if ( pia_get_output_cb2(1))
 	{
 		if ( Stepper_optic_state(2) ) optic_pattern |=  0x04;
 		else                          optic_pattern &= ~0x04;
 		if ( Stepper_optic_state(3) ) optic_pattern |=  0x08;
 		else                          optic_pattern &= ~0x08;
 	}
+//  awp_draw_reel(2);
+//  awp_draw_reel(3);
 }
 
 static WRITE8_HANDLER( pia_ic7_portb_w )
@@ -1078,13 +1100,19 @@ static void update_mpu68_interrupts(void)
 // Communications ////////////////////////////////////////////////////////
 /* Clock values are currently unknown, and are derived from the 68k board.
 For now, it's fixed to the frequency set by the PTM on initialisation.*/
-
+static void cpu1a_acia_irq(int state)
+{
+	cpunum_set_input_line(0, M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+//  m6850_irq_state = state;
+//  update_mpu68_interrupts();
+	logerror("6809 acia irq \n");
+}
 static void cpu1_acia_irq(int state)
 {
-	cpunum_set_input_line(0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
-	m6850_irq_state = state;
-	update_mpu68_interrupts();
-	LOG(("acia irq \n"));
+//  cpunum_set_input_line(0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
+  	m6850_irq_state = state;
+  	update_mpu68_interrupts();
+	logerror("68k acia irq \n");
 }
 
 static struct acia6850_interface m6809_acia_if =
@@ -1093,7 +1121,10 @@ static struct acia6850_interface m6809_acia_if =
 	MPU4_MASTER_CLOCK/44,//the ACIA code's hard coding
 	&m68k_m6809_line,
 	&m6809_m68k_line,
-	cpu1_acia_irq
+	NULL,
+	NULL,
+	NULL,
+	cpu1a_acia_irq
 };
 
 static struct acia6850_interface m68k_acia_if =
@@ -1102,7 +1133,10 @@ static struct acia6850_interface m68k_acia_if =
 	MPU4_MASTER_CLOCK/44,
 	&m6809_m68k_line,
 	&m68k_m6809_line,
-	0
+	NULL,
+	NULL,
+	NULL,
+	cpu1_acia_irq
 };
 
 static void cpu1_irq(int state)
@@ -2142,44 +2176,44 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( dealem )
 	PORT_START_TAG("ORANGE1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("05")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("06")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("07")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Gamble")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Pontoon")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Rear Door") PORT_TOGGLE
 
 	PORT_START_TAG("ORANGE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("08")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("09")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("11")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("12")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("13")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("14")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("15")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN5) PORT_NAME("20p Token")PORT_IMPULSE(3)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START_TAG("BLACK1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("16")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("17")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("18")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("19")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("20")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Test Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Collect")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN) //Duplicate for Pontoon button
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Door Switch?") PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START_TAG("BLACK2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("24")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("25")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("26")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("27")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("28")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("29")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("30")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("31")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Twist")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Lo")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Hi")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Stick")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Deal")
 
 	PORT_START_TAG("DIL1")
 	PORT_DIPNAME( 0x0f, 0x00, "Cabinet Set Up Mode" ) PORT_DIPLOCATION("DIL1:01,02,03,04")
@@ -2208,8 +2242,8 @@ INPUT_PORTS_START( dealem )
 
 	PORT_START_TAG("DIL2")
 	PORT_DIPNAME( 0x01, 0x00, "Payout Limit" ) PORT_DIPLOCATION("DIL2:01")
-	PORT_DIPSETTING(    0x00, "GBP 2.00 (All Cash)")
-	PORT_DIPSETTING(    0x01, "GBP 4.00 (Token)")
+	PORT_DIPSETTING(    0x00, "200p (All Cash)")
+	PORT_DIPSETTING(    0x01, "200p (Cash)+400p (Token)")
 	PORT_DIPNAME( 0x02, 0x00, "10p Payout Priority" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
@@ -2219,28 +2253,28 @@ INPUT_PORTS_START( dealem )
 	PORT_DIPNAME( 0x08, 0x00, "50p Payout Solenoid fitted?" ) PORT_DIPLOCATION("DIL2:04")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes  ) )
-	PORT_DIPNAME( 0x10, 0x00, "GBP 1.00 Payout Solenoid fitted?" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPNAME( 0x10, 0x00, "100p Payout Solenoid fitted?" ) PORT_DIPLOCATION("DIL2:05")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes  ) )
-	PORT_DIPNAME( 0x20, 0x00, "Coin alarm active?" ) PORT_DIPLOCATION("DIL2:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes  ) )
-	PORT_DIPNAME( 0x40, 0x00, "Stake" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPNAME( 0x20, 0x00, "Coin alarms active?" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes  ) )
+	PORT_DIPNAME( 0x40, 0x00, "Price of Play" ) PORT_DIPLOCATION("DIL2:07")
 	PORT_DIPSETTING(    0x00, "10p 1 Game" )
 	PORT_DIPSETTING(    0x40, "10p 2 Games" )
-	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "Coin Entry" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, "Multi" )
+	PORT_DIPSETTING(    0x80, DEF_STR(Single))
 
 	PORT_START_TAG("AUX1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("4")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("5")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("6")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START_TAG("AUX2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
@@ -2268,7 +2302,7 @@ INTERRUPT_GEN(mpu4_vid_irq)
 //  if (cpu_getiloops()&1)
 //      cpunum_set_input_line(1, 1, ASSERT_LINE);
 //  else
-//  LOGSTUFF(("scn2674_irq_mask %02x",scn2674_irq_mask));
+  LOGSTUFF(("scn2674_irq_mask %02x",scn2674_irq_mask));
 
 	if (cpu_getiloops()==0) // vbl
 	{
@@ -2328,6 +2362,11 @@ MACHINE_START( mpu4_vid )
 	Stepper_init(2, BARCREST_48STEP_REEL);
 	Stepper_init(3, BARCREST_48STEP_REEL);
 
+/*  Stepper_set_index(0,92,8,0);
+    Stepper_set_index(1,92,8,0);
+    Stepper_set_index(2,92,8,0);
+    Stepper_set_index(3,92,8,0);*/
+
 // setup the standard oki MSC1937 display ///////////////////////////////
 
 	ROC10937_init(0, MSC1937,0);   // ?
@@ -2350,6 +2389,11 @@ static MACHINE_START( mpu4mod2 )
 	Stepper_init(2, BARCREST_48STEP_REEL);
 	Stepper_init(3, BARCREST_48STEP_REEL);
 
+/*  Stepper_set_index(0,92,8,0);
+    Stepper_set_index(1,5,6,0);
+    Stepper_set_index(2,92,8,0);
+    Stepper_set_index(3,1,6,0);*/
+
 // setup the standard oki MSC1937 display ///////////////////////////////
 	ROC10937_init(0, MSC1937,0);
 }
@@ -2358,12 +2402,11 @@ static MACHINE_START( mpu4mod2 )
 Characteriser (CHR)
 
 I haven't been able to work out all the ways of finding the CHR data, but there must be a flag in the ROMs
-somewhere to pick it out. As built, the CHR is a PAL which holds an internal data table that is inaccessible to
-anything other than the CPU. However, the programmers decided to best use this protection device in read/write/compare
+somewhere to pick it out. As built, the CHR is a PAL which can perform basic bit manipulation according to an as yet unknown unique key. However, the programmers decided to best use this protection device in read/write/compare
 cycles, storing almost the entire 'hidden' data table in the ROMs in plain sight. Only later rebuilds by BwB
 avoided this 'feature' of the development kit, and as such, only low level access can defeat their protection.
 
-This information has been used to generate the CHR tables loaded by the programs.
+This information has been used to generate the CHR tables loaded by the programs, until a key can be determined.
 
 For most Barcrest games, the following method was used:
 
@@ -2400,28 +2443,26 @@ static WRITE8_HANDLER( characteriser_w )
 {
 	UINT8 x;
 	int call=data;
-		for ( x = 0; x < 64; x++ )
-		{
-			LOG_CHR(("Characteriser %02X:",MPU4_chr_data[x]));
-		}
-
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", activecpu_get_previouspc(),offset,data));
 	if (offset == 0)
 	{
-		for ( x = prot_col; x < 64; x++ )
+		if (call == 0)
 		{
-			if	(MPU4_chr_lut[(x)] == call)
+			prot_col = 0;
+		}
+		else
+		{
+			for ( x = prot_col; x < 64; x++ )
 			{
-				prot_col = x;
-				LOG_CHR(("Characteriser find column %02X\n",prot_col));
-				LOG_CHR(("Characteriser find data %02X\n",MPU4_chr_data[prot_col]));
-				break;
+				if	(MPU4_chr_lut[(x)] == call)
+				{
+					prot_col = x;
+					LOG_CHR(("Characteriser find column %02X\n",prot_col));
+					LOG_CHR(("Characteriser find data %02X\n",MPU4_chr_data[prot_col]));
+					break;
+				}
 			}
 		}
-			if (prot_col > 63)
-			{
-				prot_col = 0;
-			}
-
 	}
 	else if (offset == 2)
 	{
@@ -2445,6 +2486,7 @@ static WRITE8_HANDLER( characteriser_w )
 static READ8_HANDLER( characteriser_r )
 {
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X", activecpu_get_previouspc(),offset));
 	if (offset == 0)
 	{
 		LOG_CHR(("Characteriser read data %02X \n",MPU4_chr_data[prot_col]));
@@ -2462,22 +2504,28 @@ static WRITE16_HANDLER( characteriser16_w )
 {
 	int x;
 	int call=data;
-	LOG_CHR(("Characteriser write offset %02X data %02X\n",offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", activecpu_get_previouspc(),offset,data));
 	for ( x = prot_col; x < 64; x++ )
 	{
-		if	(MPU4_chr_lut[(x)] == call)
+		if (call == 0)
 		{
-			prot_col = x;
-			LOG_CHR(("Characteriser find column %02X\n",prot_col));
-			break;
-		}
-			if (prot_col > 63)
 			prot_col = 0;
+		}
+		else
+		{
+			if	(MPU4_chr_lut[(x)] == call)
+			{
+				prot_col = x;
+				LOG_CHR(("Characteriser find column %02X\n",prot_col));
+				break;
+			}
+		}
 	}
 }
 
 static READ16_HANDLER( characteriser16_r )
 {
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", activecpu_get_previouspc(),offset,MPU4_chr_data[prot_col]));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",MPU4_chr_data[prot_col]));
 	return MPU4_chr_data[prot_col];
@@ -2676,9 +2724,7 @@ PALETTE_INIT( dealem )
 
 VIDEO_START(dealem)
 {
-
 }
-
 
 VIDEO_UPDATE(dealem)
 {
@@ -2697,20 +2743,6 @@ VIDEO_UPDATE(dealem)
 
 	return 0;
 }
-
-#ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( dealem_pal_w )
-{
-	switch (data)
-	{
-		default:
-		{
-			logerror("Deal 'em PAL write %d",data);
-			break;
-		}
-	}
-}
-#endif
 
 static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
@@ -3015,6 +3047,27 @@ ROM_START( skiltrek )
 	ROM_LOAD16_BYTE( "st.qa",  0x0c0001, 0x010000,  CRC(3fc62a0e) SHA1(0628de4b962d3fcca3757cd4e89b3005c9bfd218) )
 ROM_END
 
+ROM_START( timemchn )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, REGION_CPU2, 0 )
+	ROM_LOAD16_BYTE( "tm20.p1",  0x000000, 0x010000,  CRC(6919697c) SHA1(786d7b9ab218dbf54ff839d1f83580c409c725b3) )
+	ROM_LOAD16_BYTE( "tm20.p2",  0x000001, 0x010000,  CRC(d13b56e4) SHA1(623e73995da93c07b51ce0a5843dba1f853529dd) )
+	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
+	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
+	ROM_LOAD16_BYTE( "q12.p5" ,  0x040000, 0x010000,  CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) )
+	ROM_LOAD16_BYTE( "q11.p6" ,  0x040001, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996D36b4) )
+	ROM_LOAD16_BYTE( "q14.p7" ,  0x060000, 0x010000,  CRC(02abb026) SHA1(42224678e5913090c91c21672661beb8e27127a8) )
+	ROM_LOAD16_BYTE( "q13.p8" ,  0x060001, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) )
+	ROM_LOAD16_BYTE( "q16.p9" ,  0x080000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) )
+	ROM_LOAD16_BYTE( "q15.p10",  0x080001, 0x010000,  CRC(7894ac8b) SHA1(dc46bd108ac4f67a9062bb7ace91aa51f069cbc8) )
+	ROM_LOAD16_BYTE( "q18.p11",  0x0a0000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) )
+	ROM_LOAD16_BYTE( "q17.p12",  0x0a0001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) )
+	ROM_LOAD16_BYTE( "q20.p13",  0x0c0000, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) )
+	ROM_LOAD16_BYTE( "q19.p14",  0x0c0001, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) )
+ROM_END
+
 ROM_START( mating )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	VID_BIOS
@@ -3065,8 +3118,8 @@ ROM_END
 
 ROM_START( connect4 )
 	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00  )
-	ROM_LOAD( "connect4.p2",  0x8000, 0x4000,  CRC(6090633c) )
-	ROM_LOAD( "connect4.p1",  0xC000, 0x4000,  CRC(b1af50c0) )
+	ROM_LOAD( "connect4.p2",  0x8000, 0x4000,  CRC(6090633c) SHA1(0cd2725a235bf93cfe94f2ca648d5fccb87b8e5c) )
+	ROM_LOAD( "connect4.p1",  0xC000, 0x4000,  CRC(b1af50c0) SHA1(7c9645ea378f0857b849ca24a239d9114f62da7f) )
 ROM_END
 
 ROM_START( dealem )
@@ -3077,10 +3130,10 @@ ROM_START( dealem )
 	ROM_LOAD( "zenndlem.u24",	0x0000, 0x10000, CRC(3a1950c4) SHA1(7138346d4e8b3cffbd9751b4d7ebd367b9ad8da9) )    /* text layer */
 
 	ROM_REGION( 0x020, REGION_PROMS, 0 )
-	ROM_LOAD( "zenndlem.u22",		0x000, 0x020, CRC(29988304) SHA1(42f61b8f9e1ee96b65db3b70833eb2f6e7a6ae0a) )
+	ROM_LOAD( "zenndlem.u22",	0x000, 0x020, CRC(29988304) SHA1(42f61b8f9e1ee96b65db3b70833eb2f6e7a6ae0a) )
 
 	ROM_REGION( 0x200, REGION_PLDS, 0 )
-	ROM_LOAD( "zenndlem.u10",		0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
+	ROM_LOAD( "zenndlem.u10",	0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
 ROM_END
 
 GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, 0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS,layout_connect4 )
@@ -3090,12 +3143,13 @@ GAME( 199?, bctvidbs,0,       mpu4mod2, mpu4,     0,	 ROT0,   "Barcrest", 		"MPU
 //and reel assembly with this kit and a supplied monitor.
 //The real Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 //A further different release was made in 2000, running on the Barcrest MPU4 Video, rather than this one.
-GAME( 1987, dealem,	 0,		  dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em (MPU4 Conversion Kit)",									GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_WRONG_COLORS )
+GAME( 1987, dealem,	 0,		  dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em (MPU4 Conversion Kit, v7.0)",								GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The Crystal Maze - Now Featuring Ocean Zone (AMLD Version SWP)",	GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Turnover",															GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
-GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
+GAME( 1990, timemchn,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Time Machine v2.0",												GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Datapak)",										GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, matinga, mating,  mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Standard)",										GAME_NOT_WORKING|GAME_NO_SOUND )

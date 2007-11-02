@@ -209,7 +209,7 @@
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 #include "machine/intelfsh.h"
-#include "machine/scsidev.h"
+#include "machine/cr589.h"
 #include "machine/timekpr.h"
 #include "machine/adc083x.h"
 #include "machine/ds2401.h"
@@ -451,10 +451,9 @@ static WRITE32_HANDLER( control_w )
 
 static UINT8 *atapi_regs;
 static mame_timer *atapi_timer;
-static pSCSIDispatch cdrom_drive;
-static void *inserted_cdrom;
-static void *available_cdroms[ 2 ];
-static UINT16 *atapi_data;
+static SCSIInstance *inserted_cdrom;
+static SCSIInstance *available_cdroms[ 2 ];
+static UINT8 *atapi_data;
 static int atapi_data_ptr, atapi_data_len, atapi_xferlen, atapi_xferbase, atapi_cdata_wait, atapi_xfermod;
 
 #define MAX_TRANSFER_SIZE ( 63488 )
@@ -473,7 +472,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	while (atapi_xferlen > 0 )
 	{
 		// get a sector from the SCSI device
-		cdrom_drive(SCSIOP_READ_DATA, inserted_cdrom, 2048, sector_buffer);
+		SCSIReadData( inserted_cdrom, sector_buffer, 2048 );
 
 		atapi_xferlen -= 2048;
 
@@ -526,8 +525,6 @@ static TIMER_CALLBACK( atapi_xfer_end )
 static READ32_HANDLER( atapi_r )
 {
 	int reg, data;
-	int i;
-	UINT8 sector_buffer[ 4096 ];
 
 	if (mem_mask == 0xffff0000)	// word-wide command read
 	{
@@ -536,24 +533,11 @@ static READ32_HANDLER( atapi_r )
 		// assert IRQ and drop DRQ
 		if (atapi_data_ptr == 0 && atapi_data_len == 0)
 		{
-			while( atapi_xferlen > 0 )
+			// get the data from the device
+			if( atapi_xferlen > 0 )
 			{
-				int transfer = atapi_xferlen;
-				if( transfer > 2048 )
-				{
-					transfer = 2048;
-				}
-
-				// get the data from the device
-				cdrom_drive(SCSIOP_READ_DATA, inserted_cdrom, transfer, sector_buffer);
-
-				// fix it up in an endian-safe way
-				for (i = 0; i < transfer; i += 2)
-				{
-					atapi_data[ atapi_data_len++ ] = sector_buffer[i] | sector_buffer[i+1]<<8;
-				}
-
-				atapi_xferlen -= transfer;
+				SCSIReadData( inserted_cdrom, atapi_data, atapi_xferlen );
+				atapi_data_len = atapi_xferlen;
 			}
 
 			if (atapi_xfermod > MAX_TRANSFER_SIZE)
@@ -589,6 +573,7 @@ static READ32_HANDLER( atapi_r )
 		if( atapi_data_ptr < atapi_data_len )
 		{
 			data = atapi_data[atapi_data_ptr++];
+			data |= ( atapi_data[atapi_data_ptr++] << 8 );
 			if( atapi_data_ptr >= atapi_data_len )
 			{
 //              verboselog( 2, "atapi_r: read all bytes\n" );
@@ -661,8 +646,6 @@ static READ32_HANDLER( atapi_r )
 static WRITE32_HANDLER( atapi_w )
 {
 	int reg;
-	int i;
-	UINT8 atapi_scsi_packet[ 32*1024 ];
 
 	verboselog( 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
@@ -671,22 +654,16 @@ static WRITE32_HANDLER( atapi_w )
 		verboselog( 2, "atapi_w: data=%04x\n", data );
 
 //      mame_printf_debug("ATAPI: packet write %04x\n", data);
-		atapi_data[atapi_data_ptr++] = data;
+		atapi_data[atapi_data_ptr++] = data & 0xff;
+		atapi_data[atapi_data_ptr++] = data >> 8;
 
 		if (atapi_cdata_wait)
 		{
 //          mame_printf_debug("ATAPI: waiting, ptr %d wait %d\n", atapi_data_ptr, atapi_cdata_wait);
 			if (atapi_data_ptr == atapi_cdata_wait)
 			{
-				// decompose SCSI packet into proper byte order
-				for (i = 0; i < atapi_cdata_wait; i += 2)
-				{
-					atapi_scsi_packet[i] = atapi_data[i/2]&0xff;
-					atapi_scsi_packet[i+1] = atapi_data[i/2]>>8;
-				}
-
 				// send it to the device
-				cdrom_drive(SCSIOP_WRITE_DATA, inserted_cdrom, atapi_cdata_wait, atapi_scsi_packet);
+				SCSIWriteData( inserted_cdrom, atapi_data, atapi_cdata_wait );
 
 				// assert IRQ
 				psx_irq_set(0x400);
@@ -696,23 +673,20 @@ static WRITE32_HANDLER( atapi_w )
 			}
 		}
 
-		if ((!atapi_cdata_wait) && (atapi_data_ptr == 6))
+		else if ( atapi_data_ptr == 12 )
 		{
+			int phase;
+
 			verboselog( 2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
 
 			// reset data pointer for reading SCSI results
 			atapi_data_ptr = 0;
 			atapi_data_len = 0;
 
-			// decompose SCSI packet into proper byte order
-			for (i = 0; i < 16; i += 2)
-			{
-				atapi_scsi_packet[i] = atapi_data[i/2]&0xff;
-				atapi_scsi_packet[i+1] = atapi_data[i/2]>>8;
-			}
-
 			// send it to the SCSI device
-			atapi_xferlen = cdrom_drive(SCSIOP_EXEC_COMMAND, inserted_cdrom, 0, atapi_scsi_packet);
+			SCSISetCommand( inserted_cdrom, atapi_data, 12 );
+			SCSIExecCommand( inserted_cdrom, &atapi_xferlen );
+			SCSIGetPhase( inserted_cdrom, &phase );
 
 			if (atapi_xferlen != -1)
 			{
@@ -743,24 +717,24 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 				}
 
+				switch( phase )
+				{
+				case SCSI_PHASE_DATAOUT:
+					atapi_cdata_wait = atapi_xferlen;
+					break;
+				}
+
 				// perform special ATAPI processing of certain commands
 				switch (atapi_data[0]&0xff)
 				{
-					case 0x55:	// MODE SELECT
-						atapi_cdata_wait = atapi_data[4]/2;
-						break;
-
-					case 0x00:	// BUS RESET / TEST UNIT READY
+					case 0x00: // BUS RESET / TEST UNIT READY
+					case 0xbb: // SET CDROM SPEED
 						atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 						break;
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
 						mame_timer_adjust( atapi_timer, MAME_TIME_IN_CYCLES( ATAPI_CYCLES_PER_SECTOR, 0 ), 0, time_zero );
-						break;
-
-					case 0xbb: // SET CDROM SPEED
-						atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 						break;
 				}
 
@@ -850,8 +824,34 @@ static WRITE32_HANDLER( atapi_w )
 
 					memset( atapi_data, 0, atapi_data_len );
 
-					atapi_data[0] = 0x8500;	// ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
-					atapi_data[49] = 0x0400; // IORDY may be disabled
+					atapi_data[ 0 ^ 1 ] = 0x85;	// ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
+					atapi_data[ 1 ^ 1 ] = 0x00;
+
+					memset( &atapi_data[ 46 ], ' ', 8 );
+					atapi_data[ 46 ^ 1 ] = '1';
+					atapi_data[ 47 ^ 1 ] = '.';
+					atapi_data[ 48 ^ 1 ] = '0';
+
+					memset( &atapi_data[ 54 ], ' ', 40 );
+					atapi_data[ 54 ^ 1 ] = 'M';
+					atapi_data[ 55 ^ 1 ] = 'A';
+					atapi_data[ 56 ^ 1 ] = 'T';
+					atapi_data[ 57 ^ 1 ] = 'S';
+					atapi_data[ 58 ^ 1 ] = 'H';
+					atapi_data[ 59 ^ 1 ] = 'I';
+					atapi_data[ 60 ^ 1 ] = 'T';
+					atapi_data[ 61 ^ 1 ] = 'A';
+					atapi_data[ 62 ^ 1 ] = ' ';
+					atapi_data[ 63 ^ 1 ] = 'C';
+					atapi_data[ 64 ^ 1 ] = 'R';
+					atapi_data[ 65 ^ 1 ] = '-';
+					atapi_data[ 66 ^ 1 ] = '5';
+					atapi_data[ 67 ^ 1 ] = '8';
+					atapi_data[ 68 ^ 1 ] = '9';
+					atapi_data[ 69 ^ 1 ] = ' ';
+
+					atapi_data[ 98 ^ 1 ] = 0x04; // IORDY may be disabled
+					atapi_data[ 99 ^ 1 ] = 0x00;
 
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
@@ -895,14 +895,11 @@ static void atapi_init(void)
 	atapi_timer = mame_timer_alloc( atapi_xfer_end );
 	mame_timer_adjust(atapi_timer, time_never, 0, time_never);
 
-	// allocate a SCSI CD-ROM device
-	cdrom_drive = SCSI_DEVICE_CDROM;
-
 	for( i = 0; i < 2; i++ )
 	{
 		if( get_disk_handle( i ) != NULL )
 		{
-			cdrom_drive(SCSIOP_ALLOC_INSTANCE, &available_cdroms[ i ], i, (UINT8 *)NULL);
+			SCSIAllocInstance( &SCSIClassCr589, &available_cdroms[ i ], i );
 		}
 		else
 		{
@@ -1392,7 +1389,7 @@ static double analogue_inputs_callback( int input )
 static void *atapi_get_device(void)
 {
 	void *ret;
-	cdrom_drive(SCSIOP_GET_DEVICE, inserted_cdrom, 0, (UINT8 *)&ret);
+	SCSIGetDevice( inserted_cdrom, &ret );
 	return ret;
 }
 
@@ -1529,7 +1526,7 @@ static struct PSXSPUinterface konami573_psxspu_interface =
 static void update_mode( void )
 {
 	int mode = readinputportbytag( "MODE" );
-	static void *new_cdrom;
+	static SCSIInstance *new_cdrom;
 
 	if( chiptype[ 1 ] != 0 )
 	{
@@ -3018,6 +3015,28 @@ ROM_START( bassangl )
 	DISK_IMAGE_READONLY( "765jaa02", 0, MD5(11693b1234458c238ed613ef37f71245) SHA1(d820f8166b7d5ffcf41e7a70c8c4c4d1c207c1bd) )
 ROM_END
 
+ROM_START( cr589fw )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "700b04", 0, MD5(4847e008189b7c700f2129ecb362b924) SHA1(13ac92eb242de48317924b9c725f9f693a263cf5) )
+ROM_END
+
+ROM_START( cr589fwa )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "700a04", 0, MD5(211850ed73d05ccbf5951f1fe19a6767) SHA1(bf7865629775a34a8f8b628053e97f25b51ade2e) )
+ROM_END
+
 ROM_START( darkhleg )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
 	SYS573_BIOS_A
@@ -4162,6 +4181,28 @@ ROM_START( gtrfrk6m )
 	DISK_IMAGE_READONLY( "b06jaa02", 0, MD5(8191da2660bb645fcfee9fb60baef242) SHA1(e8be8bdc0cbfb95a0a56ab89f39de3089d31f305) )
 ROM_END
 
+ROM_START( gtrfrk7m )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0001014, REGION_USER2, 0 ) /* install security cart eeprom */
+	ROM_LOAD( "gcb17jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(5a338c31) SHA1(0fd9ee306335858dd6bef680a62557a8bf055cc3) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_LOAD( "gcb17jaa.31m", 0x000000, 0x200000, CRC(1e1cbfe3) SHA1(6c942820f915ea0e01f0e736d70780ad8408aa69) )
+	ROM_LOAD( "gcb17jaa.27m", 0x200000, 0x200000, CRC(7e7da9a9) SHA1(1882418779a48b5aefd113895756116379a6a4f7) )
+	ROM_FILL( 0x400000, 0x0c00000, 0xff )
+
+	ROM_REGION( 0x2000000, REGION_USER4, 0 ) /* PCCARD1 */
+	ROM_FILL( 0x0000000, 0x2000000, 0xff )
+
+	ROM_REGION( 0x000008, REGION_USER9, 0 ) /* install security cart id */
+	ROM_LOAD( "gcb17jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "b17jaa02", 0, MD5(65b47fbf7d682e8dc8b2a3137aaab9b7) SHA1(bf8eb8f857c08595bb1c19f470ac689400ee0cab) )
+ROM_END
+
 ROM_START( gtfrk11m )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
 	SYS573_BIOS_A
@@ -4341,6 +4382,8 @@ GAME( 1999, ddr2mc,   ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami"
 GAME( 1999, ddr2mc2,  ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, gtrfrk2m, sys573,   konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, dsftkd,   sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, cr589fw,  sys573,   konami573, konami573, konami573,  ROT0, "Konami", "CD-ROM Drive Updater 2.0 (700B04)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, cr589fwa, sys573,   konami573, konami573, konami573,  ROT0, "Konami", "CD-ROM Drive Updater (700A04)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, ddr3mk,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 2000, ddr3mka,  ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 1999, ddr3ma,   ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.1 */
@@ -4372,6 +4415,7 @@ GAME( 2001, gtrfrk5m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konam
 GAME( 2001, ddr5m,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, dmx2majp, sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, gtrfrk6m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, gtrfrk7m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 7th Mix (G*B17 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, ddrmax,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2002, ddrmax2,  sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2002, dsem2,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix 2 (G*C23 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
