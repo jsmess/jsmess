@@ -7,8 +7,10 @@ There are three IRQ sources:
 
 Interrupt handling on the Osborne-1 is a bit akward. When an interrupt is
 taken by the Z80 the ROMMODE is enabled on each fetch of an instruction
-byte. During execution of an instruction the previous ROMMODE setting
-is used.
+byte. During execution of an instruction the previous ROMMODE setting seems
+to be used. Side effect of this is that when an interrupt is taken and the
+stack pointer is pointing to 0000-3FFF then the return address will still
+be written to RAM if RAM was switched in.
 
 ***************************************************************************/
 
@@ -21,6 +23,8 @@ is used.
 #include "cpu/z80/z80daisy.h"
 #include "sound/beep.h"
 #include "includes/osborne1.h"
+
+#define RAMMODE		(0x01)
 
 static struct osborne1 {
 	UINT8	bank2_enabled;
@@ -56,14 +60,14 @@ const struct z80_irq_daisy_chain osborne1_daisy_chain[] = {
 
 WRITE8_HANDLER( osborne1_0000_w ) {
 	/* Check whether regular RAM is enabled */
-	if ( ! osborne1.bank2_enabled ) {
+	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) ) {
 		mess_ram[ offset ] = data;
 	}
 }
 
 WRITE8_HANDLER( osborne1_1000_w ) {
 	/* Check whether regular RAM is enabled */
-	if ( ! osborne1.bank2_enabled ) {
+	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) ) {
 		mess_ram[ 0x1000 + offset ] = data;
 	}
 }
@@ -115,6 +119,9 @@ WRITE8_HANDLER( osborne1_2000_w ) {
 	if ( ! osborne1.bank2_enabled ) {
 		mess_ram[ 0x2000 + offset ] = data;
 	} else {
+		if ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) {
+			mess_ram[ 0x2000 + offset ] = data;
+		}
 		/* Handle writes to the I/O area */
 		switch( offset & 0x0F00 ) {
 		case 0x100:	/* Floppy */
@@ -134,7 +141,7 @@ WRITE8_HANDLER( osborne1_2000_w ) {
 
 WRITE8_HANDLER( osborne1_3000_w ) {
 	/* Check whether regular RAM is enabled */
-	if ( ! osborne1.bank2_enabled ) {
+	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) ) {
 		mess_ram[ 0x3000 + offset ] = data;
 	}
 }
@@ -178,14 +185,7 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 	osborne1.bank4_ptr = mess_ram + ( ( osborne1.bank3_enabled ) ? 0x10000 : 0xF000 );
 	memory_set_bankptr( 4, osborne1.bank4_ptr );
 	osborne1.bankswitch = offset;
-}
-
-static OPBASE_HANDLER( osborne1_opbase ) {
-	if ( ( address & 0xF000 ) && osborne1.in_irq_handler ) {
-		osborne1.in_irq_handler = 0;
-		osborne1_bankswitch_w( osborne1.bankswitch, 0 );
-	}
-	return address;
+	osborne1.in_irq_handler = 0;
 }
 
 static void osborne1_z80_reset(int param) {
@@ -200,9 +200,9 @@ static int osborne1_z80_irq_state(int param) {
 static int osborne1_z80_irq_ack(int param) {
 	/* Enable ROM and I/O when IRQ is acknowledged */
 	UINT8	old_bankswitch = osborne1.bankswitch;
-	osborne1.in_irq_handler = 1;
 	osborne1_bankswitch_w( 0, 0 );
 	osborne1.bankswitch = old_bankswitch;
+	osborne1.in_irq_handler = 1;
 	return 0xF8;
 }
 
@@ -430,8 +430,5 @@ DRIVER_INIT( osborne1 ) {
 
 	/* Configure the floppy disk interface */
 	wd17xx_init( WD_TYPE_MB8877, NULL, NULL );
-
-	/* Set opbase handler to handle special irq cases */
-	memory_set_opbase_handler( 0, osborne1_opbase );
 }
 
