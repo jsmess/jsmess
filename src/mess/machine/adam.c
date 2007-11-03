@@ -20,9 +20,12 @@ int adam_net_data; /* Data on AdamNet Bus */
 int adam_pcb;
 
 static int joy_mode = 0;
+
+/* TODO: Are these digits correct? */
 static int KeyboardBuffer[20]; /* Buffer to store keys pressed */
 static int KbBufferCapacity = 15; /* Capacity of the Keyboard Buffer */
 static int KbRepeatDelay = 20;
+
 static UINT8 KbRepeatTable[256];
 
 int adam_cart_verify(const UINT8 *cartdata, size_t size)
@@ -113,47 +116,123 @@ void exploreKeyboard(void)
 //logerror("Exploring Keyboard.............\n");
     for(i=0;i<=255;i++) {if (KbRepeatTable[i]>0) KbRepeatTable[i]++;} /* Update repeat table */
 
-    keyboard[0] = input_port_9_r(0);
-    keyboard[1] = input_port_10_r(0);
-    keyboard[2] = input_port_11_r(0);
-    keyboard[3] = input_port_12_r(0);
-    keyboard[4] = input_port_13_r(0);
-    keyboard[5] = input_port_14_r(0);
-    keyboard[6] = input_port_15_r(0);
-    keyboard[7] = input_port_16_r(0);
-    keyboard[8] = input_port_17_r(0);
-    keyboard[9] = input_port_18_r(0);
-    
-    controlKey = (!(keyboard[9]&0x01) || !(keyboard[9]&0x02)); /* Left Control or Right Control */
-    shiftKey = (!(keyboard[8]&0x40) || !(keyboard[8]&0x80) || !(keyboard[9]&0x04)); /* Left shiftKey or Right shiftKey or Caps Lock*/
+    keyboard[0] = readinputportbytag("keyboard_1");
+    keyboard[1] = readinputportbytag("keyboard_2");
+    keyboard[2] = readinputportbytag("keyboard_3");
+    keyboard[3] = readinputportbytag("keyboard_4");
+    keyboard[4] = readinputportbytag("keyboard_5");
+    keyboard[5] = readinputportbytag("keyboard_6");
+    keyboard[6] = readinputportbytag("keyboard_7");
+    keyboard[7] = readinputportbytag("keyboard_8");
+    keyboard[8] = readinputportbytag("keyboard_9");
+    keyboard[9] = readinputportbytag("keyboard_10");
 
-    if (shiftKey && !controlKey && !(keyboard[7] & 0x80)) addToKeyboardBuffer(0xB8); /* shiftKey + BACKSPACE */
-    else {KbRepeatTable[0xB8]=0;}
+/* Reference: Appendix of COLECO ADAM TECHNICAL MANUAL at http://drushel.cwru.edu/atm/atm.html */
+
+    controlKey = !(keyboard[9]&0x01);                                                /* Control */
+    shiftKey = (!(keyboard[8]&0x40) || !(keyboard[8]&0x80) || !(keyboard[9]&0x04));  /* Left shiftKey or Right shiftKey or Lock */
+
+    if (controlKey && !shiftKey && !(keyboard[4] & 0x04)) addToKeyboardBuffer(0x00); /* controlKey + 2 */
+    else {KbRepeatTable[0x00]=0;}
+    if (controlKey && !shiftKey && !(keyboard[0] & 0x02)) addToKeyboardBuffer(0x01); /* controlKey + A */
+    else {KbRepeatTable[0x01]=0;}
+    if (controlKey && !shiftKey && !(keyboard[0] & 0x04)) addToKeyboardBuffer(0x02); /* controlKey + B */
+    else {KbRepeatTable[0x02]=0;}
+    if (controlKey && !shiftKey && !(keyboard[0] & 0x08)) addToKeyboardBuffer(0x03); /* controlKey + C */
+    else {KbRepeatTable[0x03]=0;}
+    if (controlKey && !shiftKey && !(keyboard[0] & 0x10)) addToKeyboardBuffer(0x04); /* controlKey + D */
+    else {KbRepeatTable[0x04]=0;}
+    if (controlKey && !shiftKey && !(keyboard[0] & 0x20)) addToKeyboardBuffer(0x05); /* controlKey + E */
+    else {KbRepeatTable[0x05]=0;}
+    if (controlKey && !shiftKey && !(keyboard[0] & 0x40)) addToKeyboardBuffer(0x06); /* controlKey + F */
+    else {KbRepeatTable[0x06]=0;}
+    if (controlKey && !shiftKey && !(keyboard[0] & 0x80)) addToKeyboardBuffer(0x07); /* controlKey + G */
+    else {KbRepeatTable[0x07]=0;}
+
+    if ((controlKey && !shiftKey && !(keyboard[1] & 0x01)) || !(keyboard[9] & 0x02)) addToKeyboardBuffer(0x08); /* controlKey + H or BACKSPACE */
+    else {KbRepeatTable[0x08]=0;}
+    if ((controlKey && !shiftKey && !(keyboard[1] & 0x02)) || !(keyboard[8] & 0x20)) addToKeyboardBuffer(0x09); /* controlKey + I or TAB */
+    else {KbRepeatTable[0x09]=0;}
+    if (controlKey && !shiftKey && !(keyboard[1] & 0x04)) addToKeyboardBuffer(0x0A); /* controlKey + J */
+    else {KbRepeatTable[0x0A]=0;}
+    if (controlKey && !shiftKey && !(keyboard[1] & 0x08)) addToKeyboardBuffer(0x0B); /* controlKey + K */
+    else {KbRepeatTable[0x0B]=0;}
+    if (controlKey && !shiftKey && !(keyboard[1] & 0x10)) addToKeyboardBuffer(0x0C); /* controlKey + L */
+    else {KbRepeatTable[0x0C]=0;}
+    if ((controlKey && !shiftKey && !(keyboard[1] & 0x20)) || !(keyboard[6] & 0x80)) addToKeyboardBuffer(0x0D); /* controlKey + M or RETURN */
+    else {KbRepeatTable[0x0D]=0;}
+    if (controlKey && !shiftKey && !(keyboard[1] & 0x40)) addToKeyboardBuffer(0x0E); /* controlKey + N */
+    else {KbRepeatTable[0x0E]=0;}
+    if (controlKey && !shiftKey && !(keyboard[1] & 0x80)) addToKeyboardBuffer(0x0F); /* controlKey + O */
+    else {KbRepeatTable[0x0F]=0;}
     
-    if (shiftKey && !controlKey && !(keyboard[8] & 0x20)) addToKeyboardBuffer(0xB9); /* shiftKey + TAB */
-    else {KbRepeatTable[0xB9]=0;}
-    
-    if (shiftKey && !controlKey && !(keyboard[4] & 0x01)) addToKeyboardBuffer(0x29); /* shiftKey + 0 */
-    else {KbRepeatTable[0x29]=0;}
+    if (controlKey && !shiftKey && !(keyboard[2] & 0x01)) addToKeyboardBuffer(0x10); /* controlKey + P */
+    else {KbRepeatTable[0x10]=0;}
+    if (controlKey && !shiftKey && !(keyboard[2] & 0x02)) addToKeyboardBuffer(0x11); /* controlKey + Q */
+    else {KbRepeatTable[0x11]=0;}
+    if (controlKey && !shiftKey && !(keyboard[2] & 0x04)) addToKeyboardBuffer(0x12); /* controlKey + R */
+    else {KbRepeatTable[0x12]=0;}
+    if (controlKey && !shiftKey && !(keyboard[2] & 0x08)) addToKeyboardBuffer(0x13); /* controlKey + S */
+    else {KbRepeatTable[0x13]=0;}
+    if (controlKey && !shiftKey && !(keyboard[2] & 0x10)) addToKeyboardBuffer(0x14); /* controlKey + T */
+    else {KbRepeatTable[0x14]=0;}
+    if (controlKey && !shiftKey && !(keyboard[2] & 0x20)) addToKeyboardBuffer(0x15); /* controlKey + U */
+    else {KbRepeatTable[0x15]=0;}
+    if (controlKey && !shiftKey && !(keyboard[2] & 0x40)) addToKeyboardBuffer(0x16); /* controlKey + V */
+    else {KbRepeatTable[0x16]=0;}
+    if (controlKey && !shiftKey && !(keyboard[2] & 0x80)) addToKeyboardBuffer(0x17); /* controlKey + W */
+    else {KbRepeatTable[0x17]=0;}
+
+    if (controlKey && !shiftKey && !(keyboard[3] & 0x01)) addToKeyboardBuffer(0x18); /* controlKey + X */
+    else {KbRepeatTable[0x18]=0;}
+    if (controlKey && !shiftKey && !(keyboard[3] & 0x02)) addToKeyboardBuffer(0x19); /* controlKey + Y */
+    else {KbRepeatTable[0x19]=0;}
+    if (controlKey && !shiftKey && !(keyboard[3] & 0x04)) addToKeyboardBuffer(0x1A); /* controlKey + Z */
+    else {KbRepeatTable[0x1A]=0;}
+    if ((controlKey && !shiftKey && !(keyboard[5] & 0x80)) || !(keyboard[0] & 0x01)) addToKeyboardBuffer(0x1B); /* controlKey + [ or ESCAPE/WP */
+    else {KbRepeatTable[0x1B]=0;}
+    if (controlKey && !shiftKey && !(keyboard[3] & 0x10)) addToKeyboardBuffer(0x1C); /* controlKey + \ */
+    else {KbRepeatTable[0x1C]=0;}
+    if (controlKey && !shiftKey && !(keyboard[3] & 0x08)) addToKeyboardBuffer(0x1D); /* controlKey + ] */
+    else {KbRepeatTable[0x1D]=0;}
+    if (controlKey && !shiftKey && !(keyboard[3] & 0x20)) addToKeyboardBuffer(0x1E); /* controlKey + ^ */
+    else {KbRepeatTable[0x1E]=0;}
+    if (controlKey && !shiftKey && !(keyboard[4] & 0x40)) addToKeyboardBuffer(0x1F); /* controlKey + 6 */
+    else {KbRepeatTable[0x1F]=0;}
+
+    if (!controlKey && !shiftKey && !(keyboard[6] & 0x40)) addToKeyboardBuffer(0x20); /* SPACEBAR */
+    else {KbRepeatTable[0x20]=0;}
     if (shiftKey && !controlKey && !(keyboard[4] & 0x02)) addToKeyboardBuffer(0x21); /* shiftKey + 1 */
     else {KbRepeatTable[0x21]=0;}
-    if (shiftKey && !controlKey && !(keyboard[4] & 0x04)) addToKeyboardBuffer(0x40); /* shiftKey + 2 */
-    else {KbRepeatTable[0x40]=0;}
+    if (shiftKey && !controlKey && !(keyboard[5] & 0x04)) addToKeyboardBuffer(0x22); /* shiftKey + ' */
+    else {KbRepeatTable[0x22]=0;}
     if (shiftKey && !controlKey && !(keyboard[4] & 0x08)) addToKeyboardBuffer(0x23); /* shiftKey + 3 */
     else {KbRepeatTable[0x23]=0;}
     if (shiftKey && !controlKey && !(keyboard[4] & 0x10)) addToKeyboardBuffer(0x24); /* shiftKey + 4 */
     else {KbRepeatTable[0x24]=0;}
     if (shiftKey && !controlKey && !(keyboard[4] & 0x20)) addToKeyboardBuffer(0x25); /* shiftKey + 5 */
     else {KbRepeatTable[0x25]=0;}
-    if (shiftKey && !controlKey && !(keyboard[4] & 0x40)) addToKeyboardBuffer(0x5F); /* shiftKey + 6 */
-    else {KbRepeatTable[0x5F]=0;}
     if (shiftKey && !controlKey && !(keyboard[4] & 0x80)) addToKeyboardBuffer(0x26); /* shiftKey + 7 */
     else {KbRepeatTable[0x26]=0;}
+    if (!shiftKey && !controlKey && !(keyboard[5] & 0x04)) addToKeyboardBuffer(0x27); /* ' */
+    else {KbRepeatTable[0x27]=0;}
 
-    if (shiftKey && !controlKey && !(keyboard[5] & 0x01)) addToKeyboardBuffer(0x2A); /* shiftKey + 8 */
-    else {KbRepeatTable[0x2A]=0;}
     if (shiftKey && !controlKey && !(keyboard[5] & 0x02)) addToKeyboardBuffer(0x28); /* shiftKey + 9 */
     else {KbRepeatTable[0x28]=0;}
+    if (shiftKey && !controlKey && !(keyboard[4] & 0x01)) addToKeyboardBuffer(0x29); /* shiftKey + 0 */
+    else {KbRepeatTable[0x29]=0;}
+    if (shiftKey && !controlKey && !(keyboard[5] & 0x01)) addToKeyboardBuffer(0x2A); /* shiftKey + 8 */
+    else {KbRepeatTable[0x2A]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[5] & 0x08)) addToKeyboardBuffer(0x2B); /* + */
+    else {KbRepeatTable[0x2B]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[5] & 0x10)) addToKeyboardBuffer(0x2C); /* , */
+    else {KbRepeatTable[0x2C]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[3] & 0x40)) addToKeyboardBuffer(0x2D); /* - */
+    else {KbRepeatTable[0x2D]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[5] & 0x20)) addToKeyboardBuffer(0x2E); /* . */
+    else {KbRepeatTable[0x2E]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[5] & 0x40)) addToKeyboardBuffer(0x2F); /* / */
+    else {KbRepeatTable[0x2F]=0;}
 
     if (!shiftKey && !controlKey && !(keyboard[4] & 0x01)) addToKeyboardBuffer(0x30); /* 0 */
     else {KbRepeatTable[0x30]=0;}
@@ -176,13 +255,21 @@ void exploreKeyboard(void)
     else {KbRepeatTable[0x38]=0;}
     if (!shiftKey && !controlKey && !(keyboard[5] & 0x02)) addToKeyboardBuffer(0x39); /* 9 */
     else {KbRepeatTable[0x39]=0;}
+    if (shiftKey && !controlKey && !(keyboard[3] & 0x80)) addToKeyboardBuffer(0x3A); /* shiftKey + ; */
+    else {KbRepeatTable[0x3A]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[3] & 0x80)) addToKeyboardBuffer(0x3B); /* ; */
+    else {KbRepeatTable[0x3B]=0;}
+    if (shiftKey && !controlKey && !(keyboard[5] & 0x10)) addToKeyboardBuffer(0x3C); /* shiftKey + , */
+    else {KbRepeatTable[0x3C]=0;}
+    if (shiftKey && !controlKey && !(keyboard[5] & 0x08)) addToKeyboardBuffer(0x3D); /* shiftKey + + */
+    else {KbRepeatTable[0x3D]=0;}
+    if (shiftKey && !controlKey && !(keyboard[5] & 0x20)) addToKeyboardBuffer(0x3E); /* shiftKey + . */
+    else {KbRepeatTable[0x3E]=0;}
+    if (shiftKey && !controlKey && !(keyboard[5] & 0x40)) addToKeyboardBuffer(0x3F); /* shiftKey + / */
+    else {KbRepeatTable[0x3F]=0;}
 
-    if (controlKey && !shiftKey && !(keyboard[4] & 0x04)) addToKeyboardBuffer(0x00); /* controlKey + 2 */
-    else {KbRepeatTable[0x00]=0;}
-    if (controlKey && !shiftKey && !(keyboard[4] & 0x40)) addToKeyboardBuffer(0x1F); /* controlKey + 6 */
-    else {KbRepeatTable[0x1F]=0;}
-
-
+    if (shiftKey && !controlKey && !(keyboard[4] & 0x04)) addToKeyboardBuffer(0x40); /* shiftKey + 2 */
+    else {KbRepeatTable[0x40]=0;}
     if (shiftKey && !controlKey && !(keyboard[0] & 0x02)) addToKeyboardBuffer(0x41); /* shiftKey + A */
     else {KbRepeatTable[0x41]=0;}
     if (shiftKey && !controlKey && !(keyboard[0] & 0x04)) addToKeyboardBuffer(0x42); /* shiftKey + B */
@@ -238,66 +325,21 @@ void exploreKeyboard(void)
     else {KbRepeatTable[0x59]=0;}
     if (shiftKey && !controlKey && !(keyboard[3] & 0x04)) addToKeyboardBuffer(0x5A); /* shiftKey + Z */
     else {KbRepeatTable[0x5A]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[5] & 0x80)) addToKeyboardBuffer(0x5B); /* [ */
+    else {KbRepeatTable[0x5B]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[3] & 0x10)) addToKeyboardBuffer(0x5C); /* \ */
+    else {KbRepeatTable[0x5C]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[3] & 0x08)) addToKeyboardBuffer(0x5D); /* ] */
+    else {KbRepeatTable[0x5D]=0;}
+    if (!controlKey && !shiftKey && !(keyboard[3] & 0x20)) addToKeyboardBuffer(0x5E); /* ^ */
+    else {KbRepeatTable[0x5E]=0;}
+    if (shiftKey && !controlKey && !(keyboard[4] & 0x40)) addToKeyboardBuffer(0x5F); /* shiftKey + 6 */
+    else {KbRepeatTable[0x5F]=0;}
 
-    if (controlKey && !shiftKey && !(keyboard[0] & 0x02)) addToKeyboardBuffer(0x01); /* controlKey + A */
-    else {KbRepeatTable[0x01]=0;}
-    if (controlKey && !shiftKey && !(keyboard[0] & 0x04)) addToKeyboardBuffer(0x02); /* controlKey + B */
-    else {KbRepeatTable[0x02]=0;}
-    if (controlKey && !shiftKey && !(keyboard[0] & 0x08)) addToKeyboardBuffer(0x03); /* controlKey + C */
-    else {KbRepeatTable[0x03]=0;}
-    if (controlKey && !shiftKey && !(keyboard[0] & 0x10)) addToKeyboardBuffer(0x04); /* controlKey + D */
-    else {KbRepeatTable[0x04]=0;}
-    if (controlKey && !shiftKey && !(keyboard[0] & 0x20)) addToKeyboardBuffer(0x05); /* controlKey + E */
-    else {KbRepeatTable[0x05]=0;}
-    if (controlKey && !shiftKey && !(keyboard[0] & 0x40)) addToKeyboardBuffer(0x06); /* controlKey + F */
-    else {KbRepeatTable[0x06]=0;}
-    if (controlKey && !shiftKey && !(keyboard[0] & 0x80)) addToKeyboardBuffer(0x07); /* controlKey + G */
-    else {KbRepeatTable[0x07]=0;}
-
-    if ((controlKey && !shiftKey && !(keyboard[1] & 0x01)) || !(keyboard[7] & 0x80)) addToKeyboardBuffer(0x08); /* controlKey + H or BACKSPACE */
-    else {KbRepeatTable[0x08]=0;}
-    if ((controlKey && !shiftKey && !(keyboard[1] & 0x02)) || !(keyboard[8] & 0x20)) addToKeyboardBuffer(0x09); /* controlKey + I or TAB */
-    else {KbRepeatTable[0x09]=0;}
-    if (controlKey && !shiftKey && !(keyboard[1] & 0x04)) addToKeyboardBuffer(0x0A); /* controlKey + J */
-    else {KbRepeatTable[0x0A]=0;}
-    if (controlKey && !shiftKey && !(keyboard[1] & 0x08)) addToKeyboardBuffer(0x0B); /* controlKey + K */
-    else {KbRepeatTable[0x0B]=0;}
-    if (controlKey && !shiftKey && !(keyboard[1] & 0x10)) addToKeyboardBuffer(0x0C); /* controlKey + L */
-    else {KbRepeatTable[0x0C]=0;}
-    if ((controlKey && !shiftKey && !(keyboard[1] & 0x20)) || !(keyboard[6] & 0x80)) addToKeyboardBuffer(0x0D); /* controlKey + M or RETURN */
-    else {KbRepeatTable[0x0D]=0;}
-    if (controlKey && !shiftKey && !(keyboard[1] & 0x40)) addToKeyboardBuffer(0x0E); /* controlKey + N */
-    else {KbRepeatTable[0x0E]=0;}
-    if (controlKey && !shiftKey && !(keyboard[1] & 0x80)) addToKeyboardBuffer(0x0F); /* controlKey + O */
-    else {KbRepeatTable[0x0F]=0;}
-    
-    if (controlKey && !shiftKey && !(keyboard[2] & 0x01)) addToKeyboardBuffer(0x10); /* controlKey + P */
-    else {KbRepeatTable[0x10]=0;}
-    if (controlKey && !shiftKey && !(keyboard[2] & 0x02)) addToKeyboardBuffer(0x11); /* controlKey + Q */
-    else {KbRepeatTable[0x11]=0;}
-    if (controlKey && !shiftKey && !(keyboard[2] & 0x04)) addToKeyboardBuffer(0x12); /* controlKey + R */
-    else {KbRepeatTable[0x12]=0;}
-    if (controlKey && !shiftKey && !(keyboard[2] & 0x08)) addToKeyboardBuffer(0x13); /* controlKey + S */
-    else {KbRepeatTable[0x13]=0;}
-    if (controlKey && !shiftKey && !(keyboard[2] & 0x10)) addToKeyboardBuffer(0x14); /* controlKey + T */
-    else {KbRepeatTable[0x14]=0;}
-    if (controlKey && !shiftKey && !(keyboard[2] & 0x20)) addToKeyboardBuffer(0x15); /* controlKey + U */
-    else {KbRepeatTable[0x15]=0;}
-    if (controlKey && !shiftKey && !(keyboard[2] & 0x40)) addToKeyboardBuffer(0x16); /* controlKey + V */
-    else {KbRepeatTable[0x16]=0;}
-    if (controlKey && !shiftKey && !(keyboard[2] & 0x80)) addToKeyboardBuffer(0x17); /* controlKey + W */
-    else {KbRepeatTable[0x17]=0;}
-
-    if (controlKey && !shiftKey && !(keyboard[3] & 0x01)) addToKeyboardBuffer(0x18); /* controlKey + X */
-    else {KbRepeatTable[0x18]=0;}
-    if (controlKey && !shiftKey && !(keyboard[3] & 0x02)) addToKeyboardBuffer(0x19); /* controlKey + Y */
-    else {KbRepeatTable[0x19]=0;}
-    if (controlKey && !shiftKey && !(keyboard[3] & 0x04)) addToKeyboardBuffer(0x1A); /* controlKey + Z */
-    else {KbRepeatTable[0x1A]=0;}
-
+    if (shiftKey && !controlKey && !(keyboard[3] & 0x40)) addToKeyboardBuffer(0x60); /* shiftKey + - */
+    else {KbRepeatTable[0x60]=0;}
     if (!controlKey && !shiftKey && !(keyboard[0] & 0x02)) addToKeyboardBuffer(0x61); /* A */
     else {KbRepeatTable[0x61]=0;}
-
     if (!controlKey && !shiftKey && !(keyboard[0] & 0x04)) addToKeyboardBuffer(0x62); /* B */
     else {KbRepeatTable[0x62]=0;}
     if (!controlKey && !shiftKey && !(keyboard[0] & 0x08)) addToKeyboardBuffer(0x63); /* C */
@@ -351,32 +393,34 @@ void exploreKeyboard(void)
     else {KbRepeatTable[0x79]=0;}
     if (!controlKey && !shiftKey && !(keyboard[3] & 0x04)) addToKeyboardBuffer(0x7A); /* Z */
     else {KbRepeatTable[0x7A]=0;}
-
-
-
-    if (shiftKey && !controlKey && !(keyboard[5] & 0x04)) addToKeyboardBuffer(0x22); /* shiftKey + ' *//****** Not sure ******/
-    else {KbRepeatTable[0x22]=0;}
-    if (shiftKey && !controlKey && !(keyboard[3] & 0x80)) addToKeyboardBuffer(0x3A); /* shiftKey + ; */    
-    else {KbRepeatTable[0x3A]=0;}
-    if (shiftKey && !controlKey && !(keyboard[5] & 0x10)) addToKeyboardBuffer(0x3C); /* shiftKey + , */
-    else {KbRepeatTable[0x3C]=0;}
-    if (shiftKey && !controlKey && !(keyboard[5] & 0x08)) addToKeyboardBuffer(0x3D); /* shiftKey + + */
-    else {KbRepeatTable[0x3D]=0;}
-    if (shiftKey && !controlKey && !(keyboard[5] & 0x20)) addToKeyboardBuffer(0x3E); /* shiftKey + . */
-    else {KbRepeatTable[0x3E]=0;}
-    if (shiftKey && !controlKey && !(keyboard[5] & 0x40)) addToKeyboardBuffer(0x3F); /* shiftKey + / */
-    else {KbRepeatTable[0x3F]=0;}
-
-    if (shiftKey && !controlKey && !(keyboard[3] & 0x40)) addToKeyboardBuffer(0x60); /* shiftKey + - */
-    else {KbRepeatTable[0x60]=0;}
     if (shiftKey && !controlKey && !(keyboard[5] & 0x80)) addToKeyboardBuffer(0x7B); /* shiftKey + [ */
     else {KbRepeatTable[0x7B]=0;}
-    if (shiftKey && !controlKey && !(keyboard[5] & 0x04)) addToKeyboardBuffer(0x7C); /* shiftKey + \ *//****** Not sure  ******/
+    if (shiftKey && !controlKey && !(keyboard[3] & 0x10)) addToKeyboardBuffer(0x7C); /* shiftKey + \ */
     else {KbRepeatTable[0x7C]=0;}
     if (shiftKey && !controlKey && !(keyboard[3] & 0x08)) addToKeyboardBuffer(0x7D); /* shiftKey + ] */
     else {KbRepeatTable[0x7D]=0;}
     if (shiftKey && !controlKey && !(keyboard[3] & 0x20)) addToKeyboardBuffer(0x7E); /* shiftKey + ^ */
     else {KbRepeatTable[0x7E]=0;}
+    if (controlKey && !shiftKey && !(keyboard[7] & 0x80)) addToKeyboardBuffer(0x7F); /* controlKey + DELETE */
+    else {KbRepeatTable[0x7F]=0;}
+
+    if (!shiftKey && !(keyboard[8] & 0x01)) addToKeyboardBuffer(0x80); /* HOME */
+    else {KbRepeatTable[0x80]=0;}
+    if (!shiftKey && !(keyboard[6] & 0x01)) addToKeyboardBuffer(0x81); /* I */
+    else {KbRepeatTable[0x81]=0;}
+    if (!shiftKey && !(keyboard[6] & 0x02)) addToKeyboardBuffer(0x82); /* II */
+    else {KbRepeatTable[0x82]=0;}
+    if (!shiftKey && !(keyboard[6] & 0x04)) addToKeyboardBuffer(0x83); /* III */
+    else {KbRepeatTable[0x83]=0;}
+    if (!shiftKey && !(keyboard[6] & 0x08)) addToKeyboardBuffer(0x84); /* IV */
+    else {KbRepeatTable[0x84]=0;}
+    if (!shiftKey && !(keyboard[6] & 0x10)) addToKeyboardBuffer(0x85); /* V */
+    else {KbRepeatTable[0x85]=0;}
+    if (!shiftKey && !(keyboard[6] & 0x20)) addToKeyboardBuffer(0x86); /* VI */
+    else {KbRepeatTable[0x86]=0;}
+    /* 0x87 - Unused */
+
+    /* 0x88 - Unused */
     if (shiftKey && !controlKey && !(keyboard[6] & 0x01)) addToKeyboardBuffer(0x89); /* shiftKey + I */
     else {KbRepeatTable[0x89]=0;}
     if (shiftKey && !controlKey && !(keyboard[6] & 0x02)) addToKeyboardBuffer(0x8A); /* shiftKey + II */
@@ -389,6 +433,24 @@ void exploreKeyboard(void)
     else {KbRepeatTable[0x8D]=0;}
     if (shiftKey && !controlKey && !(keyboard[6] & 0x20)) addToKeyboardBuffer(0x8E); /* shiftKey + VI */
     else {KbRepeatTable[0x8E]=0;}
+    /* 0x8F - Unused */
+
+    if (!shiftKey && !(keyboard[7] & 0x01)) addToKeyboardBuffer(0x90); /* WILD CARD */
+    else {KbRepeatTable[0x90]=0;}
+    if (!shiftKey && !(keyboard[7] & 0x02)) addToKeyboardBuffer(0x91); /* UNDO */
+    else {KbRepeatTable[0x91]=0;}
+    if (!shiftKey && !(keyboard[7] & 0x04)) addToKeyboardBuffer(0x92); /* MOVE */
+    else {KbRepeatTable[0x92]=0;}
+    if (!shiftKey && !(keyboard[7] & 0x08)) addToKeyboardBuffer(0x93); /* STORE */
+    else {KbRepeatTable[0x93]=0;}
+    if (!shiftKey && !(keyboard[7] & 0x10)) addToKeyboardBuffer(0x94); /* INSERT */
+    else {KbRepeatTable[0x94]=0;}
+    if (!shiftKey && !(keyboard[7] & 0x20)) addToKeyboardBuffer(0x95); /* PRINT */
+    else {KbRepeatTable[0x95]=0;}
+    if (!shiftKey && !(keyboard[7] & 0x40)) addToKeyboardBuffer(0x96); /* CLEAR */
+    else {KbRepeatTable[0x96]=0;}
+    if (!shiftKey && !(keyboard[7] & 0x80)) addToKeyboardBuffer(0x97); /* DELETE */
+    else {KbRepeatTable[0x97]=0;}
 
     if (shiftKey && !controlKey && !(keyboard[7] & 0x01)) addToKeyboardBuffer(0x98); /* shiftKey + WILD CARD */
     else {KbRepeatTable[0x98]=0;}
@@ -407,97 +469,6 @@ void exploreKeyboard(void)
     if (shiftKey && !controlKey && !(keyboard[7] & 0x80)) addToKeyboardBuffer(0x9F); /* shiftKey + DELETE */
     else {KbRepeatTable[0x9F]=0;}
 
-
-
-    if (controlKey && !shiftKey && !(keyboard[8] & 0x02)) addToKeyboardBuffer(0xA4); /* controlKey + UP ARROW */
-    else {KbRepeatTable[0xA4]=0;}
-    if (controlKey && !shiftKey && !(keyboard[8] & 0x10)) addToKeyboardBuffer(0xA5); /* controlKey + RIGHT ARROW */
-    else {KbRepeatTable[0xA5]=0;}
-    if (controlKey && !shiftKey && !(keyboard[8] & 0x04)) addToKeyboardBuffer(0xA6); /* controlKey + DOWN ARROW */
-    else {KbRepeatTable[0xA6]=0;}
-    if (controlKey && !shiftKey && !(keyboard[8] & 0x08)) addToKeyboardBuffer(0xA7); /* controlKey + LEFT ARROW */
-    else {KbRepeatTable[0xA7]=0;}
-
-    if (controlKey && !shiftKey && !(keyboard[7] & 0x80)) addToKeyboardBuffer(0x7F); /* controlKey + DELETE */
-    else {KbRepeatTable[0x7F]=0;}
-
-
-
-
-    if ((controlKey && !shiftKey && !(keyboard[5] & 0x80)) || !(keyboard[0] & 0x01)) addToKeyboardBuffer(0x1B); /* controlKey + [ or WP/ESCAPE */
-    else {KbRepeatTable[0x1B]=0;}
-    if (controlKey && !shiftKey && !(keyboard[5] & 0x04)) addToKeyboardBuffer(0x1C); /* controlKey + \ *//****** Not sure ******/
-    else {KbRepeatTable[0x1C]=0;}
-    if (controlKey && !shiftKey && !(keyboard[3] & 0x08)) addToKeyboardBuffer(0x1D); /* controlKey + ] */
-    else {KbRepeatTable[0x1D]=0;}
-    if (controlKey && !shiftKey && !(keyboard[3] & 0x20)) addToKeyboardBuffer(0x1E); /* controlKey + ^ */
-    else {KbRepeatTable[0x1E]=0;}
-
-    
-    if (!controlKey && !shiftKey && !(keyboard[6] & 0x40)) addToKeyboardBuffer(0x20); /* SPACEBAR */
-    else {KbRepeatTable[0x20]=0;}
-    if (shiftKey && !controlKey && !(keyboard[5] & 0x04)) addToKeyboardBuffer(0x27); /* ' */
-    else {KbRepeatTable[0x27]=0;}
-
-    if (!controlKey && !shiftKey && !(keyboard[5] & 0x08)) addToKeyboardBuffer(0x2B); /* + */
-    else {KbRepeatTable[0x2B]=0;}
-    if (!controlKey && !shiftKey && !(keyboard[5] & 0x10)) addToKeyboardBuffer(0x2C); /* , */
-    else {KbRepeatTable[0x2C]=0;}
-    if (!controlKey && !shiftKey && !(keyboard[3] & 0x40)) addToKeyboardBuffer(0x2D); /* - */
-    else {KbRepeatTable[0x2D]=0;}
-    if (!controlKey && !shiftKey && !(keyboard[5] & 0x20)) addToKeyboardBuffer(0x2E); /* . */
-    else {KbRepeatTable[0x2E]=0;}
-    if (!controlKey && !shiftKey && !(keyboard[5] & 0x40)) addToKeyboardBuffer(0x2F); /* / */
-    else {KbRepeatTable[0x2F]=0;}
-    
-
-    if (!controlKey && !shiftKey && !(keyboard[3] & 0x80)) addToKeyboardBuffer(0x3B); /* ; */
-    else {KbRepeatTable[0x3B]=0;}
-
-
-    if (!controlKey && !shiftKey && !(keyboard[5] & 0x80)) addToKeyboardBuffer(0x5B); /* [ */
-    else {KbRepeatTable[0x5B]=0;}
-    if (!controlKey && !shiftKey && !(keyboard[5] & 0x04)) addToKeyboardBuffer(0x5C); /* \ *//****** Not sure ******/
-    else {KbRepeatTable[0x5C]=0;}
-    if (!controlKey && !shiftKey && !(keyboard[3] & 0x08)) addToKeyboardBuffer(0x5D); /* ] */
-    else {KbRepeatTable[0x5D]=0;}
-    if (!controlKey && !shiftKey && !(keyboard[3] & 0x20)) addToKeyboardBuffer(0x5E); /* ^ */
-    else {KbRepeatTable[0x5E]=0;}
-
-
-    if (!shiftKey && !(keyboard[8] & 0x01)) addToKeyboardBuffer(0x80); /* HOME */
-    else {KbRepeatTable[0x80]=0;}
-    if (!shiftKey && !(keyboard[6] & 0x01)) addToKeyboardBuffer(0x81); /* I */
-    else {KbRepeatTable[0x81]=0;}
-    if (!shiftKey && !(keyboard[6] & 0x02)) addToKeyboardBuffer(0x82); /* II */
-    else {KbRepeatTable[0x82]=0;}
-    if (!shiftKey && !(keyboard[6] & 0x04)) addToKeyboardBuffer(0x83); /* III */
-    else {KbRepeatTable[0x83]=0;}
-    if (!shiftKey && !(keyboard[6] & 0x08)) addToKeyboardBuffer(0x84); /* IV */
-    else {KbRepeatTable[0x84]=0;}
-    if (!shiftKey && !(keyboard[6] & 0x10)) addToKeyboardBuffer(0x85); /* V */
-    else {KbRepeatTable[0x85]=0;}
-    if (!shiftKey && !(keyboard[6] & 0x20)) addToKeyboardBuffer(0x86); /* VI */
-    else {KbRepeatTable[0x86]=0;}
-
-    if (!shiftKey && !(keyboard[7] & 0x01)) addToKeyboardBuffer(0x90); /* WILD CARD */
-    else {KbRepeatTable[0x90]=0;}
-    if (!shiftKey && !(keyboard[7] & 0x02)) addToKeyboardBuffer(0x91); /* UNDO */
-    else {KbRepeatTable[0x91]=0;}
-    if (!shiftKey && !(keyboard[7] & 0x04)) addToKeyboardBuffer(0x92); /* MOVE */
-    else {KbRepeatTable[0x92]=0;}
-    if (!shiftKey && !(keyboard[7] & 0x08)) addToKeyboardBuffer(0x93); /* STORE */
-    else {KbRepeatTable[0x93]=0;}
-    if (!shiftKey && !(keyboard[7] & 0x10)) addToKeyboardBuffer(0x94); /* INSERT */
-    else {KbRepeatTable[0x94]=0;}
-    if (!shiftKey && !(keyboard[7] & 0x20)) addToKeyboardBuffer(0x95); /* PRINT */
-    else {KbRepeatTable[0x95]=0;}
-    if (!shiftKey && !(keyboard[7] & 0x40)) addToKeyboardBuffer(0x96); /* CLEAR */
-    else {KbRepeatTable[0x96]=0;}
-    if (!shiftKey && !(keyboard[7] & 0x80)) addToKeyboardBuffer(0x97); /* DELETE */
-    else {KbRepeatTable[0x97]=0;}
-    
-
     if (!controlKey && !(keyboard[8] & 0x02)) addToKeyboardBuffer(0xA0); /* UP ARROW */
     else {KbRepeatTable[0xA0]=0;}
     if (!controlKey && !(keyboard[8] & 0x10)) addToKeyboardBuffer(0xA1); /* RIGHT ARROW */
@@ -506,6 +477,14 @@ void exploreKeyboard(void)
     else {KbRepeatTable[0xA2]=0;}
     if (!controlKey && !(keyboard[8] & 0x08)) addToKeyboardBuffer(0xA3); /* LEFT ARROW */
     else {KbRepeatTable[0xA3]=0;}
+    if (controlKey && !shiftKey && !(keyboard[8] & 0x02)) addToKeyboardBuffer(0xA4); /* controlKey + UP ARROW */
+    else {KbRepeatTable[0xA4]=0;}
+    if (controlKey && !shiftKey && !(keyboard[8] & 0x10)) addToKeyboardBuffer(0xA5); /* controlKey + RIGHT ARROW */
+    else {KbRepeatTable[0xA5]=0;}
+    if (controlKey && !shiftKey && !(keyboard[8] & 0x04)) addToKeyboardBuffer(0xA6); /* controlKey + DOWN ARROW */
+    else {KbRepeatTable[0xA6]=0;}
+    if (controlKey && !shiftKey && !(keyboard[8] & 0x08)) addToKeyboardBuffer(0xA7); /* controlKey + LEFT ARROW */
+    else {KbRepeatTable[0xA7]=0;}
 
     if (!controlKey && !(keyboard[8] & 0x02) && !(keyboard[8] & 0x10)) addToKeyboardBuffer(0xA8); /* UP ARROW + RIGHT ARROW */
     else {KbRepeatTable[0xA8]=0;}
@@ -524,6 +503,15 @@ void exploreKeyboard(void)
     if (!controlKey && !(keyboard[8] & 0x01) && !(keyboard[8] & 0x08)) addToKeyboardBuffer(0xAF); /* HOME + LEFT ARROW */
     else {KbRepeatTable[0xAF]=0;}
 
+    /* 0xB0-0xB7 - Unused */
+
+    if (shiftKey && !controlKey && !(keyboard[9] & 0x02)) addToKeyboardBuffer(0xB8); /* shiftKey + BACKSPACE */
+    else {KbRepeatTable[0xB8]=0;}
+    if (shiftKey && !controlKey && !(keyboard[8] & 0x20)) addToKeyboardBuffer(0xB9); /* shiftKey + TAB */
+    else {KbRepeatTable[0xB9]=0;}
+    /* 0xBA-0xEF - Unused */
+
+    /* 0xF0-0xFF - Reserved for internal use by keyboard software */
 }
 
 void master6801_behaviour(int offset, int data)
@@ -813,7 +801,7 @@ WRITE8_HANDLER( master6801_ram_w )
  READ8_HANDLER ( adam_paddle_r )
 {
 
-    if (!(input_port_6_r(0) & 0x0F)) return (0xFF); /* If no controllers enabled */
+    if (!(readinputportbytag("controllers") & 0x0F)) return (0xFF); /* If no controllers enabled */
 	/* Player 1 */
 	if ((offset & 0x02)==0)
 	{
@@ -822,16 +810,16 @@ WRITE8_HANDLER( master6801_ram_w )
 		{
 			int inport0,inport1,inport6,data;
 
-			inport0 = input_port_0_r(0);
-			inport1 = input_port_1_r(0);
-			inport6 = input_port_6_r(0);
+			inport0 = readinputportbytag("controller1_keypad1");
+			inport1 = readinputportbytag("controller1_keypad2");
+			inport6 = readinputportbytag("controllers");
 			
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more 
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
 			the right behaviour */
 			
 			data = 0x0F;	/* No key pressed by default */
-			if (!(inport6&0x01)) /* If Driving Controller enabled -> no keypad 1*/
+			if (!(inport6&0x01)) /* If Driving Controller enabled -> no keypad 1 */
 			{
 			    if (!(inport0 & 0x01)) data &= 0x0A; /* 0 */
 			    if (!(inport0 & 0x02)) data &= 0x0D; /* 1 */
@@ -851,13 +839,13 @@ WRITE8_HANDLER( master6801_ram_w )
 		/* Joystick and fire 2 (SAC Red Button) */
 		else
 		{
-			int data = input_port_2_r(0) & 0xCF;
-			int inport6 = input_port_6_r(0);
+			int data = readinputportbytag("controller1_joystick") & 0xCF;
+			int inport6 = readinputportbytag("controllers");
 			
 			if (inport6&0x07) /* If Extra Contollers enabled */
 			{
 			    if (adam_joy_stat[0]==0)
-					data |= 0x30; /* Spinner Move Left*/
+					data |= 0x30; /* Spinner Move Left */
 			    else if (adam_joy_stat[0]==1)
 					data |= 0x20; /* Spinner Move Right */
 			}  
@@ -872,8 +860,8 @@ WRITE8_HANDLER( master6801_ram_w )
 		{
 			int inport3,inport4,data;
 
-			inport3 = input_port_3_r(0);
-			inport4 = input_port_4_r(0);
+			inport3 = readinputportbytag("controller2_keypad1");
+			inport4 = readinputportbytag("controller2_keypad2");
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more 
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
@@ -898,8 +886,8 @@ WRITE8_HANDLER( master6801_ram_w )
 		/* Joystick and fire 2*/
 		else
 		{
-			int data = input_port_5_r(0) & 0xCF;
-			int inport6 = input_port_6_r(0);
+			int data = readinputportbytag("controller2_joystick") & 0xCF;
+			int inport6 = readinputportbytag("controllers");
 			
 			if (inport6&0x02) /* If Roller Controller enabled */
 			{

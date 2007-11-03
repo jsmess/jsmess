@@ -11,6 +11,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [ADAM] Input ports cleanup, natural keyboard support.  [Stefano Priore]
+
 - [COCO] Updated to use MAME's 6242 RTC implementation.  [tim lindner]
 
 - [COCO] Modified the CoCo's keyboard handler to pass along the tri-state
