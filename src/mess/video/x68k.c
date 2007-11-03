@@ -219,7 +219,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 
 	irq_time = video_screen_get_time_until_pos(0,scan,2);
 	if(mame_time_to_double(irq_time) > 0)
-		mame_timer_adjust(raster_irq,irq_time,scan-1,time_never);
+		mame_timer_adjust(raster_irq,irq_time,scan,time_never);
 	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(0));
 }
 
@@ -228,14 +228,11 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	int val = param;
 	mame_time irq_time;
 	int vblank_line;
-	sys.crtc.vblank = val;
 
 	if(val == 1)  // VBlank on
 	{
-		//mfp_timer_a_callback(machine, 0);
-//		if(!(sys.mfp.aer & 0x10))
-//			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
-		vblank_line = sys.crtc.reg[6];
+		sys.crtc.vblank = 1;
+		vblank_line = sys.crtc.reg[7];
 		if(vblank_line > sys.crtc.reg[4])
 			vblank_line = sys.crtc.reg[4];
 		if(sys.crtc.height == 256)
@@ -247,9 +244,8 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	}
 	if(val == 0)  // VBlank off
 	{
-//		if(sys.mfp.aer & 0x10)
-//			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
-		vblank_line = sys.crtc.reg[7];
+		sys.crtc.vblank = 0;
+		vblank_line = sys.crtc.reg[6];
 		if(sys.crtc.height == 256)
 			irq_time = video_screen_get_time_until_pos(0,vblank_line / 2,2);
 		else
@@ -257,7 +253,6 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		mame_timer_adjust(vblank_irq,irq_time,1,time_never);
 		logerror("CRTC: VBlank off\n");
 	}
-	
 }
 
 // CRTC "VINAS 1+2 / VICON" at 0xe80000
@@ -292,7 +287,6 @@ WRITE16_HANDLER( x68k_crtc_w )
 			if(data > sys.crtc.reg[4])
 				data += sys.crtc.reg[4];
 		}
-
 		if(data <= sys.crtc.video_height)
 		{
 			mame_time irq_time;
@@ -1016,6 +1010,8 @@ VIDEO_UPDATE( x68000 )
 #endif
 
 #ifdef MAME_DEBUG
+//	popmessage("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i",sys.crtc.reg[0],sys.crtc.reg[1],sys.crtc.reg[2],sys.crtc.reg[3],
+//		sys.crtc.reg[4],sys.crtc.reg[5],sys.crtc.reg[6],sys.crtc.reg[7],sys.crtc.reg[8],sys.crtc.reg[9]);
 //	popmessage("Visible resolution = %ix%i (%s) Screen size = %ix%i",sys.crtc.visible_width,sys.crtc.visible_height,sys.crtc.interlace ? "Interlaced" : "Non-interlaced",sys.crtc.video_width,sys.crtc.video_height);
 //	popmessage("VBlank : x68k_scanline = %i",x68k_scanline);
 //	popmessage("CRTC/BG compare H-TOTAL %i/%i H-DISP %i/%i V-DISP %i/%i BG Res %02x",sys.crtc.reg[0],x68k_spritereg[0x405],sys.crtc.reg[2],x68k_spritereg[0x406],
@@ -1024,8 +1020,6 @@ VIDEO_UPDATE( x68000 )
 //		sys.mfp.isra,sys.mfp.isrb,sys.mfp.imra,sys.mfp.imrb);
 //	popmessage("BG Scroll - BG0 X %i Y %i  BG1 X %i Y %i",x68k_spriteram[0x400],x68k_spriteram[0x401],x68k_spriteram[0x402],x68k_spriteram[0x403]);
 //	popmessage("Keyboard buffer position = %i",sys.keyboard.headpos);
-//	popmessage("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i",sys.crtc.reg[0],sys.crtc.reg[1],sys.crtc.reg[2],sys.crtc.reg[3],
-//		sys.crtc.reg[4],sys.crtc.reg[5],sys.crtc.reg[6],sys.crtc.reg[7],sys.crtc.reg[8],sys.crtc.reg[9]);
 //	popmessage("IERA = 0x%02x, IERB = 0x%02x",sys.mfp.iera,sys.mfp.ierb);
 //	popmessage("IPRA = 0x%02x, IPRB = 0x%02x",sys.mfp.ipra,sys.mfp.iprb);
 //	popmessage("uPD72065 status = %02x",nec765_status_r(0));

@@ -334,7 +334,8 @@ void hd63450_single_transfer(int x)
 
 
 			// decrease memory transfer counter
-			dmac.reg[x].mtc--;
+			if(dmac.reg[x].mtc > 0)
+				dmac.reg[x].mtc--;
 
 			// handle change of memory and device addresses
 			if((dmac.reg[x].scr & 0x03) == 0x01)
