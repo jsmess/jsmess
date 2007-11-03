@@ -314,15 +314,15 @@ static TIMER_CALLBACK(osborne1_video_callback) {
 		for ( x = 0; x < 52; x++ ) {
 			UINT8	character = mess_ram[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
 			UINT8	cursor = character & 0x80;
-			UINT8	dim = mess_ram[ 0x10000 + ( ( address + x ) & 0xFFF ) ];
-			UINT8	bits = osborne1.charrom[ osborne1.charline * 128 + character ];
+			UINT8	dim = mess_ram[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
+			UINT8	bits = osborne1.charrom[ osborne1.charline * 128 + ( character & 0x7F ) ];
 			int		bit;
 
-			if ( cursor && osborne1.charline == 8 ) {
+			if ( cursor && osborne1.charline == 9 ) {
 				bits = 0xFF;
 			}
 			for ( bit = 0; bit < 8; bit++ ) {
-				p[x * 8 + bit] = ( bits & 0x80 ) ? ( dim ? 2 : 1 ) : 0;
+				p[x * 8 + bit] = ( bits & 0x80 ) ? ( dim ? 1 : 2 ) : 0;
 				bits = bits << 1;
 			}
 		}
@@ -407,6 +407,8 @@ MACHINE_RESET( osborne1 ) {
 	osborne1.pia_1_irq_state = FALSE;
 
 	osborne1.charrom = memory_region( REGION_GFX1 );
+
+	memset( mess_ram + 0x10000, 0xFF, 0x1000 );
 
 	osborne1.video_timer = mame_timer_alloc( osborne1_video_callback );
 	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, 1, 0 ), 0, time_never );
