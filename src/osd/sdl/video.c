@@ -855,7 +855,9 @@ static void get_resolution(const char *name, sdl_window_config *config, int repo
 
 	config->width = config->height = config->depth = config->refresh = 0;
 	if (strcmp(data, "auto") == 0)
+	{
 		return;
+	}
 	else if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
 		mame_printf_error("Illegal resolution value for %s = %s\n", name, data);
 }

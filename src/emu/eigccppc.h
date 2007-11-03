@@ -42,16 +42,15 @@
 -------------------------------------------------*/
 
 #define mul_32x32_hi _mul_32x32_hi
-INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
+INLINE INT32 _mul_32x32_hi(INT32 val1, INT32 val2)
 {
 	INT32 result;
 
 	__asm__ (
-		" mulhw  %0,%1,%2   \n"
-	  : "=&r" (result),
-		"+r" (val1)
-	  : "r" (val2)
-	  : "xer"
+		" mulhw  %[result], %[val1], %[val2] \n"
+		: [result] "=r" (result)
+		: [val1]   "%r" (val1)
+		, [val2]   "r"  (val2)
 	);
 
 	return result;
@@ -65,16 +64,15 @@ INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
 -------------------------------------------------*/
 
 #define mulu_32x32_hi _mulu_32x32_hi
-INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
+INLINE UINT32 _mulu_32x32_hi(UINT32 val1, UINT32 val2)
 {
 	UINT32 result;
 
 	__asm__ (
-		" mulhwu %0,%1,%2   \n"
-	  : "=&r" (result),
-		"+r" (val1)
-	  : "r" (val2)
-	  : "xer"
+		" mulhwu  %[result], %[val1], %[val2] \n"
+		: [result] "=r" (result)
+		: [val1]   "%r" (val1)
+		, [val2]   "r"  (val2)
 	);
 
 	return result;
@@ -89,32 +87,32 @@ INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
 -------------------------------------------------*/
 
 #define mul_32x32_shift _mul_32x32_shift
-INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+INLINE INT32 _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
 {
 	INT32 result;
 
 #if defined(__ppc64__) || defined(__PPC64__)
 	__asm__ (
-		" mulld  %0,%1,%2 \n"
-		" srd    %0,%0,%3 \n"
-	  : "=&r" (result)			/* result can go in any register */
-	  : "%r" (val1)				/* any register, can swap with val2 */
-		"r" (val2)				/* any register */
-		"r" (shift)				/* any register */
+		" mulld  %[result], %[val1], %[val2]    \n"
+		" srd    %[result], %[result], %[shift] \n"
+		: [result] "=&r" (result)	/* result can go in any register */
+		: [val1]   "%r"  (val1)		/* any register, can swap with val2 */
+		, [val2]   "r"   (val2)		/* any register */
+		, [shift]  "r"   (shift)	/* any register */
 	);
 #else
 	__asm__ (
-		" mullw  %0,%2,%3   \n"
-		" mulhw  %2,%2,%3   \n"
-		" srw    %0,%0,%1   \n"
-		" subfic %1,%1,0x20 \n"
-		" slw    %2,%2,%1   \n"
-		" or     %0,%0,%2   \n"
-	  : "=&r" (result),
-		"+r" (shift),
-		"+r" (val1)
-	  : "r" (val2)
-	  : "xer"
+		" mullw   %[result], %[val1], %[val2]    \n"
+		" mulhw   %[val1], %[val1], %[val2]      \n"
+		" srw     %[result], %[result], %[shift] \n"
+		" subfic  %[shift], %[shift], 0x20       \n"
+		" slw     %[val1], %[val1], %[shift]     \n"
+		" or      %[result], %[result], %[val1]  \n"
+		: [result] "=&r" (result)
+		, [shift]  "+r"  (shift)
+		, [val1]   "+r"  (val1)
+		: [val2]   "r"   (val2)
+		: "xer"
 	);
 #endif
 
@@ -130,32 +128,32 @@ INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #define mulu_32x32_shift _mulu_32x32_shift
-INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+INLINE UINT32 _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
 {
 	UINT32 result;
 
 #if defined(__ppc64__) || defined(__PPC64__)
 	__asm__ (
-		" mulldu %0,%1,%2 \n"
-		" srd    %0,%0,%3 \n"
-	  : "=&r" (result)			/* result can go in any register */
-	  : "%r" (val1)				/* any register, can swap with val2 */
-		"r" (val2)				/* any register */
-		"r" (shift)				/* any register */
+		" mulld  %[result], %[val1], %[val2]    \n"
+		" srd    %[result], %[result], %[shift] \n"
+		: [result] "=&r" (result)	/* result can go in any register */
+		: [val1]   "%r"  (val1)		/* any register, can swap with val2 */
+		, [val2]   "r"   (val2)		/* any register */
+		, [shift]  "r"   (shift)	/* any register */
 	);
 #else
 	__asm__ (
-		" mullw  %0,%2,%3   \n"
-		" mulhwu %2,%2,%3   \n"
-		" srw    %0,%0,%1   \n"
-		" subfic %1,%1,0x20 \n"
-		" slw    %2,%2,%1   \n"
-		" or     %0,%0,%2   \n"
-	  : "=&r" (result),
-		"+r" (shift),
-		"+r" (val1)
-	  : "r" (val2)
-	  : "xer"
+		" mullw   %[result], %[val1], %[val2]    \n"
+		" mulhwu  %[val1], %[val1], %[val2]      \n"
+		" srw     %[result], %[result], %[shift] \n"
+		" subfic  %[shift], %[shift], 0x20       \n"
+		" slw     %[val1], %[val1], %[shift]     \n"
+		" or      %[result], %[result], %[val1]  \n"
+		: [result] "=&r" (result)
+		, [shift]  "+r"  (shift)
+		, [val1]   "+r"  (val1)
+		: [val2]   "r"   (val2)
+		: "xer"
 	);
 #endif
 
@@ -237,9 +235,9 @@ INLINE UINT8 _count_leading_zeros(UINT32 value)
 	UINT32 result;
 
 	__asm__ (
-		" cntlzw %0,%1 \n"
-		: "=r" (result)		/* result can be in any register */
-		: "r" (value)		/* 'value' can be in any register */
+		" cntlzw  %[result], %[value] \n"
+		: [result] "=r" (result)	/* result can be in any register */
+		: [value]  "r"  (value)		/* 'value' can be in any register */
 	);
 
 	return result;
@@ -257,10 +255,10 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 	UINT32 result;
 
 	__asm__ (
-		" not %0,%1 \n"
-		" cntlzw %0,%0 \n"
-		: "=r" (result)		/* result can be in any register */
-		: "r" (value)		/* 'value' can be in any register */
+		" not     %[result], %[value]  \n"
+		" cntlzw  %[result], %[result] \n"
+		: [result] "=r" (result)	/* result can be in any register */
+		: [value]  "r"  (value)		/* 'value' can be in any register */
 	);
 
 	return result;
@@ -290,7 +288,7 @@ INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 excha
 		"   bne    2f                     \n"
 		"   sync                          \n"
 		"   stwcx. %[exchange], 0, %[ptr] \n"
-		"   bne- 1b                       \n"
+		"   bne-   1b                     \n"
 		"2:                                 "
 		: [result]   "=&r" (result)
 		: [ptr]      "r"   (ptr)
@@ -310,7 +308,7 @@ INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 excha
     return the previous value at 'ptr'.
 -------------------------------------------------*/
 
-#ifdef PTR64
+#if defined(__ppc64__) || defined(__PPC64__)
 #define compare_exchange64 _compare_exchange64
 INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
@@ -320,7 +318,6 @@ INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 excha
 		"1: ldarx  %[result], 0, %[ptr]   \n"
 		"   cmpd   %[compare], %[result]  \n"
 		"   bne    2f                     \n"
-		"   sync                          \n"
 		"   stdcx. %[exchange], 0, %[ptr] \n"
 		"   bne--  1b                     \n"
 		"2:                                 "
@@ -352,7 +349,7 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 		"   sync                          \n"
 		"   stwcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
-		: [result]      "=&r" (result)
+		: [result]   "=&r" (result)
 		: [ptr]      "r"   (ptr)
 		, [exchange] "r"   (exchange)
 		: "cr0"
@@ -373,15 +370,15 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	register INT32 result;
 
-	__asm __volatile__ (
-		"1: lwarx  %[result], 0, %[ptr]     \n"
+	__asm__ __volatile__ (
+		"1: lwarx  %[result], 0, %[ptr]           \n"
 		"   add    %[result], %[result], %[delta] \n"
-		"   sync                            \n"
-		"   stwcx. %[result], 0, %[ptr]     \n"
-		"   bne- 1b                         \n"
-		: [result]   "=&b" (result)
-		: [ptr]   "r"   (ptr)
-		, [delta] "r"   (delta)
+		"   sync                                  \n"
+		"   stwcx. %[result], 0, %[ptr]           \n"
+		"   bne-   1b                             \n"
+		: [result] "=&b" (result)
+		: [ptr]    "r"   (ptr)
+		, [delta]  "r"   (delta)
 		: "cr0"
 	);
 

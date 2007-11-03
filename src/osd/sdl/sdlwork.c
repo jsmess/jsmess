@@ -32,6 +32,8 @@
 #endif
 #include "sdlsync.h"
 
+#include "eminline.h"
+
 
 //============================================================
 //  DEBUGGING
@@ -56,7 +58,7 @@
 //============================================================
 
 #if KEEP_STATISTICS
-#define add_to_stat(v,x)		do { osd_interlocked_add((v), (x)); } while (0)
+#define add_to_stat(v,x)		do { atomic_add32((v), (x)); } while (0)
 #define begin_timing(v)			do { (v) -= osd_profiling_ticks(); } while (0)
 #define end_timing(v)			do { (v) += osd_profiling_ticks(); } while (0)
 #else
@@ -151,35 +153,17 @@ static void worker_thread_process(osd_work_queue *queue, mame_thread_info *threa
 //  INLINE FUNCTIONS
 //============================================================
 
-#ifndef osd_exchange32
-INLINE INT32 osd_exchange32(INT32 volatile *ptr, INT32 exchange)
-{
-	INT32 origvalue;
-	do {
-		origvalue = *ptr;
-	} while (osd_compare_exchange32(ptr, origvalue, exchange) != origvalue);
-	return origvalue;
-}
-#endif
-
 #ifndef osd_interlocked_increment
 INLINE INT32 osd_interlocked_increment(INT32 volatile *ptr)
 {
-	return osd_sync_add(ptr, 1);
+	return atomic_add32(ptr, 1);
 }
 #endif
 
 #ifndef osd_interlocked_decrement
 INLINE INT32 osd_interlocked_decrement(INT32 volatile *ptr)
 {
-	return osd_sync_add(ptr, -1);
-}
-#endif
-
-#ifndef osd_interlocked_add
-INLINE INT32 osd_interlocked_add(INT32 volatile *ptr, INT32 add)
-{
-	return osd_sync_add(ptr, add);
+	return atomic_add32(ptr, -1);
 }
 #endif
 
@@ -395,10 +379,10 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 
 	// reset our done event and double-check the items before waiting
 	osd_event_reset(queue->doneevent);
-	osd_exchange32(&queue->waiting, TRUE);
+	atomic_exchange32(&queue->waiting, TRUE);
 	if (queue->items != 0)
 		osd_event_wait(queue->doneevent, timeout);
-	osd_exchange32(&queue->waiting, FALSE);
+	atomic_exchange32(&queue->waiting, FALSE);
 
 	// return TRUE if we actually hit 0
 	return (queue->items == 0);
@@ -520,7 +504,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		do
 		{
 			item = (osd_work_item *)queue->free;
-		} while (item != NULL && osd_compare_exchange_ptr((void * volatile *)&queue->free, item, item->next) != item);
+		} while (item != NULL && compare_exchange_ptr((void * volatile *)&queue->free, item, item->next) != item);
 
 		// if nothing, allocate something new
 		if (item == NULL)
@@ -553,7 +537,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 	scalable_lock_release(&queue->lock, lockslot);
 
 	// increment the number of items in the queue
-	osd_interlocked_add(&queue->items, numitems);
+	atomic_add32(&queue->items, numitems);
 	add_to_stat(&queue->itemsqueued, numitems);
 
 	// look for free threads to do the work
@@ -650,7 +634,7 @@ void osd_work_item_release(osd_work_item *item)
 	{
 		next = (osd_work_item *)item->queue->free;
 		item->next = next;
-	} while (osd_compare_exchange_ptr((void * volatile *)&item->queue->free, next, item) != next);
+	} while (compare_exchange_ptr((void * volatile *)&item->queue->free, next, item) != next);
 }
 
 
@@ -697,7 +681,7 @@ static void *worker_thread_entry(void *param)
 			break;
 
 		// indicate that we are live
-		osd_exchange32(&thread->active, TRUE);
+		atomic_exchange32(&thread->active, TRUE);
 		osd_interlocked_increment(&queue->livethreads);
 
 		// process work items
@@ -724,7 +708,7 @@ static void *worker_thread_entry(void *param)
 		}
 
 		// decrement the live thread count
-		osd_exchange32(&thread->active, FALSE);
+		atomic_exchange32(&thread->active, FALSE);
 		osd_interlocked_decrement(&queue->livethreads);
 	}
 	return NULL;

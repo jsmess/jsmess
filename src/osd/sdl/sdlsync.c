@@ -39,6 +39,8 @@
 #include "mame.h"
 #include "sdlsync.h"
 
+#include "eminline.h"
+
 #ifndef SDLMAME_OS2
 #include <pthread.h>
 #include <errno.h>
@@ -70,14 +72,12 @@ struct _osd_thread {
 	pthread_t			thread;
 };
 
-static osd_lock			*atomic_lck = NULL;
-
 INLINE pthread_t osd_compare_exchange_pthread_t(pthread_t volatile *ptr, pthread_t compare, pthread_t exchange)
 {
 #ifdef PTR64
-	INT64 result = osd_compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
+	INT64 result = compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
 #else
-	INT32 result = osd_compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
+	INT32 result = compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
 #endif
 	return (pthread_t)result;
 }
@@ -87,7 +87,7 @@ INLINE pthread_t osd_exchange_pthread_t(pthread_t volatile *ptr, pthread_t excha
 #ifdef PTR64
 	INT64 result = osd_exchange64((INT64 volatile *)ptr, (INT64)exchange);
 #else
-	INT32 result = osd_exchange32((INT32 volatile *)ptr, (INT32)exchange);
+	INT32 result = atomic_exchange32((INT32 volatile *)ptr, (INT32)exchange);
 #endif
 	return (pthread_t)result;
 }
@@ -393,26 +393,6 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 }
  
 //============================================================
-//  osd_atomic_lock
-//============================================================
-
-void osd_atomic_lock(void)
-{
-	if (!atomic_lck)
-		atomic_lck = osd_lock_alloc();
-	osd_lock_acquire(atomic_lck);
-}
-
-//============================================================
-//  osd_atomic_unlock
-//============================================================
-
-void osd_atomic_unlock(void)
-{
-	osd_lock_release(atomic_lck);
-}
-
-//============================================================
 //  osd_thread_create
 //============================================================
 
@@ -463,55 +443,9 @@ void osd_thread_wait_free(osd_thread *thread)
 	free(thread);
 }
 
-//============================================================
-//  osd_compare_exchange32
-//============================================================
-
-#ifndef osd_compare_exchange32
-
-INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
-{
-	INT32	ret;
-	osd_atomic_lock();
-
-	ret = *ptr;
-
-	if ( *ptr == compare )
-	{
-		*ptr = exchange;
-	}
-
-	osd_atomic_unlock();	
-	return ret;
-}
-
-#endif
-
-//============================================================
-//  osd_compare_exchange64
-//============================================================
-
-#ifndef osd_compare_exchange64
-
-INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
-{
-	INT64	ret;
-	osd_atomic_lock();
-
-	ret = *ptr;
-
-	if ( *ptr == compare )
-	{
-		*ptr = exchange;
-	}
-
-	osd_atomic_unlock();	
-	return ret;
-}
-
-#endif
 
 #else   // SDLMAME_OS2
+
 
 struct _osd_lock
 {

@@ -713,7 +713,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 		window->windowed_width = config->width;
 		window->windowed_height = config->height;
 	}
-	window->totalColors = config->totalColors;
+  	window->totalColors = config->totalColors;
 
 	// add us to the list
 	*last_window_ptr = window;
@@ -727,7 +727,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 	if (window->target == NULL)
 		goto error;
 
-	// set the specific view
+	// set the specific view				    
 	sprintf(option, SDLOPTION_VIEW("%d"), index);
 	set_starting_view(index, window, options_get_string(mame_options(), option));
 

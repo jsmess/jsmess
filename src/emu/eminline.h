@@ -308,17 +308,18 @@ INLINE INT64 compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchan
     return the previous value at 'ptr'.
 -------------------------------------------------*/
 
-#ifdef PTR64
 #ifndef compare_exchange_ptr
 INLINE void *compare_exchange_ptr(void * volatile *ptr, void *compare, void *exchange)
 {
 #ifdef PTR64
-	return (void *)compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
+	INT64 result;
+	result = compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
 #else
-	return (void *)compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
+	INT32 result;
+	result = compare_exchange32((INT32 volatile *)ptr, (INT32)compare, (INT32)exchange);
 #endif
+	return (void *)result;
 }
-#endif
 #endif
 
 

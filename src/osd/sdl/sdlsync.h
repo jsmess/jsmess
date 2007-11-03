@@ -198,41 +198,6 @@ void osd_thread_wait_free(osd_thread *thread);
 int osd_num_processors(void);
 
 
-/*-----------------------------------------------------------------------------
-    osd_atomic_lock: block other processes
-
-    Parameters:
-
-        None.
-
-    Return value:
-
-        None.
-    
-    Notes:
-        This will be used on certain platforms to emulate atomic operations
-        Please see osinclude.h 
------------------------------------------------------------------------------*/
-void osd_atomic_lock(void);
-
-/*-----------------------------------------------------------------------------
-    osd_atomic_unlock: unblock other processes
-
-    Parameters:
-
-        None.
-
-    Return value:
-
-        None.
-    
-    Notes:
-        This will be used on certain platforms to emulate atomic operations
-        Please see osinclude.h 
------------------------------------------------------------------------------*/
-void osd_atomic_unlock(void);
-
-
 #endif	/* SDLMAME_WIN32 */
 
 #endif	/* __SDL_SYNC__ */

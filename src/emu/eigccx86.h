@@ -23,17 +23,18 @@
     multiply and return the full 64 bit result
 -------------------------------------------------*/
 
-#ifndef PTR64
+#ifndef __x86_64__
 #define mul_32x32 _mul_32x32
 INLINE INT64 _mul_32x32(INT32 a, INT32 b)
 {
 	INT64 result;
 
 	__asm__ (
-		"imull %2;"
-      : "=A,A" (result)			/* result in edx:eax */
-      : "0,0" (a),				/* 'a' should also be in eax on entry */
-        "r,m" (b)				/* 'b' can be memory or register */
+		" imull  %[b] ;"
+		: [result] "=A" (result)	/* result in edx:eax */
+		: [a]      "%a"  (a)		/* 'a' should also be in eax on entry */
+		, [b]      "rm"  (b)		/* 'b' can be memory or register */
+		: "%cc"						/* Clobbers condition codes */
 	);
 
 	return result;
@@ -47,17 +48,18 @@ INLINE INT64 _mul_32x32(INT32 a, INT32 b)
     result
 -------------------------------------------------*/
 
-#ifndef PTR64
+#ifndef __x86_64__
 #define mulu_32x32 _mulu_32x32
 INLINE UINT64 _mulu_32x32(UINT32 a, UINT32 b)
 {
 	UINT64 result;
 
 	__asm__ (
-		"mull  %2;"
-      : "=A,A" (result)			/* result in edx:eax */
-      : "0,0" (a),				/* 'a' should also be in eax on entry */
-        "r,m" (b)				/* 'b' can be memory or register */
+		" mull  %[b] ;"
+		: [result] "=A" (result)	/* result in edx:eax */
+		: [a]      "%a"  (a)		/* 'a' should also be in eax on entry */
+		, [b]      "rm"  (b)		/* 'b' can be memory or register */
+		: "%cc"						/* Clobbers condition codes */
 	);
 
 	return result;
@@ -71,24 +73,21 @@ INLINE UINT64 _mulu_32x32(UINT32 a, UINT32 b)
     result
 -------------------------------------------------*/
 
-#ifndef PTR64
 #define mul_32x32_hi _mul_32x32_hi
 INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
 {
 	INT32 result;
 
 	__asm__ (
-		"imull %2;"
-		"movl  %%edx,%0;"
-      : "=a,a" (result)			/* result ends up in eax */
-      : "0,0" (a),				/* 'a' should also be in eax on entry */
-        "r,m" (b)				/* 'b' can be memory or register */
-      : "%edx", "%cc"			/* clobbers EDX and condition codes */
+		" imull  %[b] ;"
+		: [result] "=d"  (result)	/* result in edx */
+		, [a]      "+%a" (a)		/* 'a' should be in eax on entry (clobbered) */
+		: [b]      "rm"  (b)		/* 'b' can be memory or register */
+		: "%cc"						/* Clobbers condition codes */
 	);
 
 	return result;
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -97,24 +96,21 @@ INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
     of the result
 -------------------------------------------------*/
 
-#ifndef PTR64
 #define mulu_32x32_hi _mulu_32x32_hi
 INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
 {
 	UINT32 result;
 
 	__asm__ (
-		"mull  %2;"
-		"movl  %%edx,%0;"
-      : "=a,a" (result)			/* result ends up in eax */
-      : "0,0" (a),				/* 'a' should also be in eax on entry */
-        "r,m" (b)				/* 'b' can be memory or register */
-      : "%edx", "%cc"			/* clobbers EDX and condition codes */
+		" mull  %[b] ;"
+		: [result] "=d"  (result)	/* result in edx */
+		, [a]      "+%a" (a)		/* 'a' should be in eax on entry (clobbered) */
+		: [b]      "rm"  (b)		/* 'b' can be memory or register */
+		: "%cc"						/* Clobbers condition codes */
 	);
 
 	return result;
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -124,20 +120,20 @@ INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
     result to 32 bits
 -------------------------------------------------*/
 
-#ifndef PTR64
+#ifndef __x86_64__
 #define mul_32x32_shift _mul_32x32_shift
 INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	INT32 result;
 
 	__asm__ (
-		"imull %2;"
-		"shrdl %3,%%edx,%0;"
-      : "=a,a,a,a" (result)		/* result ends up in eax */
-      : "0,0,0,0" (a),			/* 'a' should also be in eax on entry */
-        "r,m,r,m" (b),			/* 'b' can be memory or register */
-        "I,I,c,c" (shift)		/* 'shift' must be constant in 0-31 range or in CL */
-      : "%edx", "%cc"			/* clobbers EDX and condition codes */
+		" imull  %[b]                       ;"
+		" shrdl  %[shift], %%edx, %[result] ;"
+		: [result] "=a" (result)	/* result ends up in eax */
+		: [a]      "%0" (a)			/* 'a' should also be in eax on entry */
+		, [b]      "rm" (b)			/* 'b' can be memory or register */
+		, [shift]  "Ic" (shift)		/* 'shift' must be constant in 0-31 range or in cl */
+		: "%edx", "%cc"				/* clobbers edx and condition codes */
 	);
 
 	return result;
@@ -152,20 +148,20 @@ INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
     result to 32 bits
 -------------------------------------------------*/
 
-#ifndef PTR64
+#ifndef __x86_64__
 #define mulu_32x32_shift _mulu_32x32_shift
 INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	UINT32 result;
 
 	__asm__ (
-		"imull %2;"
-		"shrdl %3,%%edx,%0;"
-      : "=a,a,a,a" (result)		/* result ends up in eax */
-      : "0,0,0,0" (a),			/* 'a' should also be in eax on entry */
-        "r,m,r,m" (b),			/* 'b' can be memory or register */
-        "I,I,c,c" (shift)		/* 'shift' must be constant in 0-31 range or in CL */
-      : "%edx", "%cc"			/* clobbers EDX and condition codes */
+		" mull   %[b]                       ;"
+		" shrdl  %[shift], %%edx, %[result] ;"
+		: [result] "=a" (result)	/* result ends up in eax */
+		: [a]      "%0" (a)			/* 'a' should also be in eax on entry */
+		, [b]      "rm" (b)			/* 'b' can be memory or register */
+		, [shift]  "Ic" (shift)		/* 'shift' must be constant in 0-31 range or in cl */
+		: "%edx", "%cc"				/* clobbers edx and condition codes */
 	);
 
 	return result;
@@ -195,29 +191,26 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     division, and returning the 32 bit quotient
 -------------------------------------------------*/
 
-#ifndef PTR64
-/* TBD - I get an error if this is enabled: error: 'asm' operand requires impossible reload */
-#if 0
+#ifndef __x86_64__
 #define div_32x32_shift _div_32x32_shift
 INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	INT32 result;
 
 	__asm__ (
-	    "cdq;"
-	    "shldl %3,%0,%%edx;"
-	    "shll  %3,%0;"
-		"idivl %2;"
-      : "=a,a,a,a" (result)		/* result ends up in eax */
-      : "0,0,0,0" (a),			/* 'a' should also be in eax on entry */
-        "r,m,r,m" (b),			/* 'b' can be memory or register */
-        "I,I,c,c" (shift)		/* 'shift' must be constant in 0-31 range or in CL */
-      : "%edx", "%cc"			/* clobbers EDX and condition codes */
+	    " cdq                          ;"
+	    " shldl  %[shift], %[a], %%edx ;"
+		" shll   %[shift], %[a]        ;"
+		" idivl  %[b]                  ;"
+		: [result] "=&a" (result)	/* result ends up in eax */
+		: [a]      "0"   (a)		/* 'a' should also be in eax on entry */
+        , [b]      "rm"  (b)		/* 'b' can be memory or register */
+        , [shift]  "Ic"  (shift)	/* 'shift' must be constant in 0-31 range or in cl */
+		: "%edx", "%cc"				/* clobbers edx and condition codes */
 	);
 
 	return result;
 }
-#endif
 #endif
 
 
@@ -227,22 +220,22 @@ INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
     division, and returning the 32 bit quotient
 -------------------------------------------------*/
 
-#ifndef PTR64
+#ifndef __x86_64__
 #define divu_32x32_shift _divu_32x32_shift
 INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	INT32 result;
 
 	__asm__ (
-	    "xorl  %%edx,%%edx;"
-	    "shldl %3,%0,%%edx;"
-	    "shll  %3,%0;"
-		"divl  %2;"
-      : "=a,a,a,a" (result)		/* result ends up in eax */
-      : "0,0,0,0" (a),			/* 'a' should also be in eax on entry */
-        "r,m,r,m" (b),			/* 'b' can be memory or register */
-        "I,I,c,c" (shift)		/* 'shift' must be constant in 0-31 range or in CL */
-      : "%edx", "%cc"			/* clobbers EDX and condition codes */
+	    " clr    %%edx                 ;"
+	    " shldl  %[shift], %[a], %%edx ;"
+		" shll   %[shift], %[a]        ;"
+		" divl   %[b]                  ;"
+		: [result] "=&a" (result)	/* result ends up in eax */
+		: [a]      "0"   (a)		/* 'a' should also be in eax on entry */
+        , [b]      "rm"  (b)		/* 'b' can be memory or register */
+        , [shift]  "Ic"  (shift)	/* 'shift' must be constant in 0-31 range or in cl */
+		: "%edx", "%cc"				/* clobbers edx and condition codes */
 	);
 
 	return result;
@@ -290,13 +283,13 @@ INLINE UINT8 _count_leading_zeros(UINT32 value)
 	UINT32 result;
 
 	__asm__ (
-		"bsrl  %1,%0;"
-		"jnz   1f;"
-		"movl  $63,%0;"
-	  "1:xorl  $31,%0;"
-	  : "=r,r" (result)			/* result can be in any register */
-	  : "r,m" (value)			/* 'value' can be register or memory */
-	  : "%cc"					/* clobbers condition codes */
+		"   bsrl  %[value], %[result] ;"
+		"   jnz   1f                  ;"
+		"   movl  $63, %[result]      ;"
+		"1: xorl  $31, %[result]      ;"
+		: [result] "=r" (result)	/* result can be in any register */
+		: [value]  "rm" (value)		/* 'value' can be register or memory */
+		: "%cc"						/* clobbers condition codes */
 	);
 
 	return result;
@@ -314,15 +307,15 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 	UINT32 result;
 
 	__asm__ (
-		"movl  %1,%0;"
-		"notl  %0;"
-		"bsrl  %0,%0;"
-		"jnz   1f;"
-		"movl  $63,%0;"
-	  "1:xorl  $31,%0;"
-	  : "=r,r" (result)			/* result can be in any register */
-	  : "r,m" (value)			/* 'value' can be register or memory */
-	  : "%cc"					/* clobbers condition codes */
+		"   movl  %[value], %[result]  ;"
+		"   notl  %[result]            ;"
+		"   bsrl  %[result], %[result] ;"
+		"   jnz   1f                   ;"
+		"   movl  $63, %[result]       ;"
+		"1: xorl  $31, %[result]       ;"
+		: [result] "=r"  (result)	/* result can be in any register */
+		: [value]  "rmi" (value)	/* 'value' can be register, memory or immediate */
+		: "%cc"						/* clobbers condition codes */
 	);
 
 	return result;
@@ -347,7 +340,7 @@ INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 excha
 	register INT32 result;
 
 	__asm__ __volatile__ (
-		" lock ; cmpxchg %[exchange], %[ptr] ;"
+		" lock ; cmpxchg  %[exchange], %[ptr] ;"
 	  : [ptr]      "+m" (*ptr)
 	  , [result]   "=a" (result)
 	  : [compare]  "1"  (compare)
@@ -366,14 +359,14 @@ INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 excha
     return the previous value at 'ptr'.
 -------------------------------------------------*/
 
-#ifdef PTR64
+#ifdef __x86_64__
 #define compare_exchange64 _compare_exchange64
 INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	register INT64 result;
 
 	__asm__ __volatile__ (
-		" lock ; cmpxchg %[exchange], %[ptr] ;"
+		" lock ; cmpxchg  %[exchange], %[ptr] ;"
 	  : [ptr]      "+m" (*ptr)
 	  , [result]   "=a" (result)
 	  : [compare]  "1"  (compare)
@@ -398,7 +391,7 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 	register INT32 result;
 
 	__asm__ __volatile__ (
-		" lock ; xchg %[exchange], %[ptr] ;"
+		" lock ; xchg  %[exchange], %[ptr] ;"
 		: [ptr]      "+m" (*ptr)
 		, [result]   "=r" (result)
 		: [exchange] "1"  (exchange)
@@ -419,10 +412,10 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	register INT32 result;
 
-	__asm __volatile__ (
-		" mov           %[delta],%[result] ;"
-		" lock ; xadd   %[result],%[ptr]   ;"
-		" add           %[delta],%[result] ;"
+	__asm__ __volatile__ (
+		" mov          %[delta],%[result] ;"
+		" lock ; xadd  %[result],%[ptr]   ;"
+		" add          %[delta],%[result] ;"
 	  : [ptr]    "+m"  (*ptr)
 	  , [result] "=&r" (result)
 	  : [delta]  "rmi" (delta)

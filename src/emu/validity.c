@@ -220,12 +220,12 @@ static int validate_inlines(void)
 	int test2 = rand() | (rand() << 15);
 	int error = FALSE;
 
-	if (mul_32x32(test1, test2) != (INT64)test1 * (INT64)test2) { mame_printf_error("Error testing mul_32x32\n"); error = TRUE; }
-	if (mulu_32x32(test1, test2) != (UINT64)test1 * (UINT64)test2) { mame_printf_error("Error testing mulu_32x32\n"); error = TRUE; }
-	if (mul_32x32_hi(test1, test2) != ((INT64)test1 * (INT64)test2) >> 32) { mame_printf_error("Error testing mul_32x32_hi\n"); error = TRUE; }
-	if (mulu_32x32_hi(test1, test2) != ((UINT64)test1 * (UINT64)test2) >> 32) { mame_printf_error("Error testing mulu_32x32_hi\n"); error = TRUE; }
+	if (mul_32x32(test1, test2) != (INT64)(INT32)test1 * (INT64)(INT32)test2) { mame_printf_error("Error testing mul_32x32\n"); error = TRUE; }
+	if (mulu_32x32(test1, test2) != (UINT64)(UINT32)test1 * (UINT64)(UINT32)test2) { mame_printf_error("Error testing mulu_32x32\n"); error = TRUE; }
+	if (mul_32x32_hi(test1, test2) != ((INT64)(INT32)test1 * (INT64)(INT32)test2) >> 32) { mame_printf_error("Error testing mul_32x32_hi\n"); error = TRUE; }
+	if (mulu_32x32_hi(test1, test2) != ((UINT64)(UINT32)test1 * (UINT64)(UINT32)test2) >> 32) { mame_printf_error("Error testing mulu_32x32_hi\n"); error = TRUE; }
 	if (mul_32x32_shift(test1, test2, 7) != (INT32)(((INT64)test1 * (INT64)test2) >> 7)) { mame_printf_error("Error testing mul_32x32_shift\n"); error = TRUE; }
-	if (mulu_32x32_shift(test1, test2, 7) != (UINT32)(((UINT64)test1 * (UINT64)test2) >> 7)) { mame_printf_error("Error testing mulu_32x32_shift\n"); error = TRUE; }
+	if (mulu_32x32_shift(test1, test2, 7) != (UINT32)(((UINT64)(UINT32)test1 * (UINT64)(UINT32)test2) >> 7)) { mame_printf_error("Error testing mulu_32x32_shift\n"); error = TRUE; }
 	if (fabs(recip_approx(100.0) - 0.01) > 0.0001) { mame_printf_error("Error testing recip_approx\n"); error = TRUE; }
 	test1 = (test1 & 0x0000ffff) | 0x400000;
 	if (count_leading_zeros(test1) != 9) { mame_printf_error("Error testing count_leading_zeros\n"); error = TRUE; }
