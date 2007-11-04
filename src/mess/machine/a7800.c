@@ -52,6 +52,8 @@ static UINT8 *ROM;
 
 /****** RIOT ****************************************/
 
+/* TODO: Convert the definitions into a syntax accepting readinputportbytag */
+
 static const struct riot6532_interface r6532_interface =
 {
 	input_port_0_r,
@@ -128,7 +130,7 @@ MACHINE_RESET( a7800 )
 	a7800_ctrl_lock = 0;
 	a7800_ctrl_reg = 0;
 	maria_flag = 0;
-	
+
 	/* set banks to default states */
 	memory = memory_region(REGION_CPU1);
 	memory_set_bankptr( 1, memory + 0x4000 );
@@ -360,20 +362,20 @@ DEVICE_LOAD( a7800_cart )
 	switch(offset)
 	{
 		case 0x08:
-			  return((input_port_1_r(0) & 0x02) << 6);
+			  return((readinputportbytag("buttons") & 0x02) << 6);
 		case 0x09:
-			  return((input_port_1_r(0) & 0x08) << 4);
+			  return((readinputportbytag("buttons") & 0x08) << 4);
 		case 0x0A:
-			  return((input_port_1_r(0) & 0x01) << 7);
+			  return((readinputportbytag("buttons") & 0x01) << 7);
 		case 0x0B:
-			  return((input_port_1_r(0) & 0x04) << 5);
+			  return((readinputportbytag("buttons") & 0x04) << 5);
 		case 0x0c:
-			if((input_port_1_r(0) & 0x08) ||(input_port_1_r(0) & 0x02))
+			if((readinputportbytag("buttons") & 0x08) ||(readinputportbytag("buttons") & 0x02))
 				return 0x00;
 			else
 				return 0x80;
 		case 0x0d:
-			if((input_port_1_r(0) & 0x01) ||(input_port_1_r(0) & 0x04))
+			if((readinputportbytag("buttons") & 0x01) ||(readinputportbytag("buttons") & 0x04))
 				return 0x00;
 			else
 				return 0x80;
