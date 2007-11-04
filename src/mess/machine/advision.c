@@ -159,7 +159,7 @@ WRITE8_HANDLER ( advision_putp2 )
     int d,in;
 
     // Get joystick switches
-    in = input_port_0_r(0);
+    in = readinputportbytag("joystick");
     d = in | 0x0F;
 
     // Get buttons
