@@ -1,5 +1,7 @@
 /***************************************************************************
 
+Full schematics of anything Adam at http://drushel.cwru.edu/schematics/
+
   adam.c
 
   Driver file to handle emulation of the ColecoAdam.
@@ -99,7 +101,7 @@ interface card was similarly set up at its own I/O port.
     Device 24 = Tape drive 2 (share DCB with Tape1)
     Device 25 = Tape drive 4 (projected, may have share DCB with Tape3)
     Device 26 = Expansion RAM disk drive (third party ID, not used by Coleco)
-    
+
   Terminology:
     EOS = Elementary Operating System
     DCB = Device Control Block Table (21bytes each DCB, DCB+16=dev#, DCB+0=Status Byte) (0xFD7C)
@@ -128,7 +130,7 @@ interface card was similarly set up at its own I/O port.
             adam_pcb+0 = Status, 0=Request Status of Z80 -> must return 0x81..0x82 to sync Master 6801 clk with Z80 clk
             adam_pcb+1,adam_pcb+2 = address of adam_pcb start
             adam_pcb+3 = device #
-            
+
             - Writing to byte0:
                 1   Synchronize the Z80 clock (should return 0x81)
                 2   Synchronize the Master 6801 clock (should return 0x82)
@@ -140,23 +142,23 @@ interface card was similarly set up at its own I/O port.
                 0x82 -> Master 6801 clock in sync
                 0x83 -> adam_pcb relocated
                 0x9B -> Time Out
-            
+
     DEV_ID = Device id
-  
-  
+
+
     The ColecoAdam I/O map is contolled by the MIOC (Memory Input Output Controller):
 
             20-3F (W) = Adamnet Writes
             20-3F (R) = Adamnet Reads
 
             42-42 (W) = Expansion RAM page selection, only useful if expansion greater than 64k
-            
+
             40-40 (W) = Printer Data Out
             40-40 (R) = Printer (Returns 0x41)
-            
+
             5E-5E (RW)= Modem Data I/O
             5F-5F (RW)= Modem Data Control Status
-            
+
             60-7F (W) = Set Memory configuration
             60-7F (R) = Read Memory configuration
 
@@ -166,7 +168,7 @@ interface card was similarly set up at its own I/O port.
             A0-BF (W) = Video Chip (TMS9928A), A0=0 -> Write Register 0 , A0=1 -> Write Register 1
             A0-BF (R) = Video Chip (TMS9928A), A0=0 -> Read Register 0 , A0=1 -> Read Register 1
 
-            C0-DF (W) = Set both controllers to joystick mode 
+            C0-DF (W) = Set both controllers to joystick mode
             C0-DF (R) = Not Connected
 
             E0-FF (W) = Sound Chip (SN76489A)
@@ -239,7 +241,7 @@ INPUT_PORTS_START( adam )
     PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON16) PORT_NAME("P1 Keypad *") PORT_CODE(KEYCODE_EQUALS)    PORT_PLAYER(1)
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2 (SAC Red Button)")             PORT_PLAYER(1)
     PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNUSED )
- 
+
     PORT_START_TAG( "controller1_joystick" )  /* IN2 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                   PORT_PLAYER(1) PORT_8WAY
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                PORT_PLAYER(1) PORT_8WAY
@@ -306,7 +308,7 @@ INPUT_PORTS_START( adam )
               PORT_RESET
 
 /* Keyboard with 75 Keys - TODO: Discover if the keys are actually organized this way on real hardware */
-	
+
 	PORT_START_TAG("keyboard_1") /* IN9 0*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Escape/WP")    PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
@@ -366,7 +368,7 @@ INPUT_PORTS_START( adam )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	
+
 	PORT_START_TAG("keyboard_7") /* IN15 6*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA0") PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA1") PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))
@@ -396,13 +398,13 @@ INPUT_PORTS_START( adam )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")          PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_MAMEKEY(TAB))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
-	
+
 	PORT_START_TAG("keyboard_10") /* IN18 9*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace")    PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Lock")         PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
 	PORT_BIT(0xF8, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -502,7 +504,7 @@ Lineal virtual memory map:
 				memory_set_bankptr(2, BankBase+0x22000);
 				memory_set_bankptr(3, BankBase+0x24000);
 				memory_set_bankptr(4, BankBase+0x26000);
-	            
+
 				/* Write */
 				memory_set_bankptr(6, BankBase+0x3A000); /* Write protecting ROM */
 				memory_set_bankptr(7, BankBase+0x3A000); /* Write protecting ROM */
@@ -516,7 +518,7 @@ Lineal virtual memory map:
 			memory_set_bankptr(2, BankBase+0x02000);
 			memory_set_bankptr(3, BankBase+0x04000);
 			memory_set_bankptr(4, BankBase+0x06000);
-	        
+
 			/* Write */
 			memory_set_bankptr(6, BankBase);
 			memory_set_bankptr(7, BankBase+0x02000);
@@ -542,7 +544,7 @@ Lineal virtual memory map:
 			memory_set_bankptr(2, BankBase+0x02000);
 			memory_set_bankptr(3, BankBase+0x04000);
 			memory_set_bankptr(4, BankBase+0x06000);
-	        
+
 			/* Write */
 			memory_set_bankptr(6, BankBase+0x3A000); /* Write protecting ROM */
 			memory_set_bankptr(7, BankBase+0x02000);
@@ -616,7 +618,7 @@ static MACHINE_RESET( adam )
 
 	memset(&memory_region(REGION_CPU1)[0x0000], 0xFF, 0x20000); /* Initializing RAM */
 	mame_timer_pulse(MAME_TIME_IN_MSEC(20), 0, adam_paddle_callback);
-} 
+}
 
 static MACHINE_DRIVER_START( adam )
 	/* Machine hardware */
