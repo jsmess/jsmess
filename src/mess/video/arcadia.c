@@ -5,13 +5,22 @@
 
 #include "includes/arcadia.h"
 
+/* TODO: implement the RESET key on the front panel
+         uncrapify the color table code
+         find a dump of the charactyer ROM
+         convert the drawing code to tilemap
+
+Schematics, manuals and anything you can desire for at http://amigan.classicgaming.gamespy.com/
+
+*/
+
 /*
   emulation of signetics 2637 video/audio device
 
   seams to me like a special microcontroller
   mask programmed
   1k x 8 ram available; only first 0x300 bytes mapped to cpu
- */
+*/
 
 /*
 0x18fe bit 4 set means sound off?
@@ -534,43 +543,43 @@ READ8_HANDLER(arcadia_video_r)
     UINT8 data=0;
     switch (offset) {
     case 0xff: data=arcadia_video.charline|0xf0;break;
-    case 0x100: data=input_port_1_r(0);break;
-    case 0x101: data=input_port_2_r(0);break;
-    case 0x102: data=input_port_3_r(0);break;
-    case 0x103: data=input_port_4_r(0);break;
-    case 0x104: data=input_port_5_r(0);break;
-    case 0x105: data=input_port_6_r(0);break;
-    case 0x106: data=input_port_7_r(0);break;
-    case 0x107: data=input_port_8_r(0);break;
-    case 0x108: data=input_port_0_r(0);break;
+    case 0x100: data=readinputportbytag("controller1_col1");break;
+    case 0x101: data=readinputportbytag("controller1_col2");break;
+    case 0x102: data=readinputportbytag("controller1_col3");break;
+    case 0x103: data=readinputportbytag("controller1_extra");break;
+    case 0x104: data=readinputportbytag("controller2_col1");break;
+    case 0x105: data=readinputportbytag("controller2_col2");break;
+    case 0x106: data=readinputportbytag("controller2_col3");break;
+    case 0x107: data=readinputportbytag("controller2_extra");break;
+    case 0x108: data=readinputportbytag("panel");break;
 #if 0
     case 0x1fe:
-	if (arcadia_video.ad_select) data=input_port_10_r(0)<<3;
-	else data=input_port_9_r(0)<<3;
+	if (arcadia_video.ad_select) data=readinputportbytag("controller1_joy_y")<<3;
+	else data=readinputportbytag("controller1_joy_x")<<3;
 	break;
     case 0x1ff:
-	if (arcadia_video.ad_select) data=input_port_7_r(0)<<3;
-	else data=input_port_8_r(0)<<3;
+	if (arcadia_video.ad_select) data=readinputportbytag("controller2_joy_y")<<3;
+	else data=readinputportbytag("controller2_joy_x")<<3;
 	break;
 #else
     case 0x1fe:
 	data = 0x80;
 	if (arcadia_video.ad_select) {
-	    if (input_port_9_r(0)&0x10) data=0;
-	    if (input_port_9_r(0)&0x20) data=0xff;
+	    if (readinputportbytag("joysticks")&0x10) data=0;
+	    if (readinputportbytag("joysticks")&0x20) data=0xff;
 	} else {
-	    if (input_port_9_r(0)&0x40) data=0xff;
-	    if (input_port_9_r(0)&0x80) data=0;
+	    if (readinputportbytag("joysticks")&0x40) data=0xff;
+	    if (readinputportbytag("joysticks")&0x80) data=0;
 	}
 	break;
     case 0x1ff:
 	data = 0x6f; // 0x7f too big for alien invaders (movs right)
 	if (arcadia_video.ad_select) {
-	    if (input_port_9_r(0)&0x1) data=0;
-	    if (input_port_9_r(0)&0x2) data=0xff;
+	    if (readinputportbytag("joysticks")&0x1) data=0;
+	    if (readinputportbytag("joysticks")&0x2) data=0xff;
 	} else {
-	    if (input_port_9_r(0)&0x4) data=0xff;
-	    if (input_port_9_r(0)&0x8) data=0;
+	    if (readinputportbytag("joysticks")&0x4) data=0xff;
+	    if (readinputportbytag("joysticks")&0x8) data=0;
 	}
 	break;
 #endif
