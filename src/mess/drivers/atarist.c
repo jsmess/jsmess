@@ -23,6 +23,7 @@
 	TODO:
 
 	- fix floppy interface
+	- fix mouse
 	- MSA disk image support
 	- UK keyboard layout for the special keys
 	- accurate screen timing
@@ -72,7 +73,7 @@ static struct FDC
 
 static void atarist_fdc_dma_transfer(void)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1) + fdc.dmabase;
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	if ((fdc.mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
 	{
@@ -80,11 +81,11 @@ static void atarist_fdc_dma_transfer(void)
 		{
 			if (fdc.mode & ATARIST_FLOPPY_MODE_WRITE)
 			{
-				wd17xx_data_w(0, RAM[0]);
+				wd17xx_data_w(0, RAM[fdc.dmabase]);
 			}
 			else
 			{
-				RAM[0] = wd17xx_data_r(0);
+				RAM[fdc.dmabase] = wd17xx_data_r(0);
 			}
 
 			fdc.dmabase++;
