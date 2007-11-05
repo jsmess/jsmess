@@ -29,6 +29,8 @@ System Driver Changes:
 
 - [X68000] Raster effects, DMA and vblank improvements.  [Barry Rodewald]
 
+- [ATARIST] Implemented iKBD<->68000 communications, so the keyboard is working now. [Curt Coder]
+
 
 
 User Interface Changes:
