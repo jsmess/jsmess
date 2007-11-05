@@ -188,6 +188,20 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 	osborne1.in_irq_handler = 0;
 }
 
+static OPBASE_HANDLER( osborne1_opbase ) {
+	if ( ( address & 0xF000 ) == 0x2000 ) {
+		if ( ! osborne1.bank2_enabled ) {
+			opcode_mask = 0x0fff;
+			opcode_arg_base = mess_ram + 0x2000;
+			opcode_base = mess_ram + 0x2000;
+			opcode_memory_min = 0x2000;
+			opcode_memory_max = 0x2fff;
+			return ~0;
+		}
+	}
+	return address;
+}
+
 static void osborne1_z80_reset(int param) {
 	osborne1.pia_1_irq_state = 0;
 	osborne1.in_irq_handler = 0;
@@ -415,6 +429,8 @@ MACHINE_RESET( osborne1 ) {
 	pia_1_ca1_w( 0, 0 );
 
 	mame_timer_set( time_zero, 0, setup_beep );
+
+	memory_set_opbase_handler( 0, osborne1_opbase );
 }
 
 DRIVER_INIT( osborne1 ) {
