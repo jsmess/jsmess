@@ -18,6 +18,8 @@ System Driver Changes:
 - [COCO] Modified the CoCo's keyboard handler to pass along the tri-state
   buffer from port B to port A. [tim lindner]
 
+- [GAMEGEAR] Fixed graphics issues in Ax Battler.  (bug #1332) [Wilbert Pol]
+
 - [PET] Updated to use MAME's CRTC6548 implementation.  [Wilbert Pol]
 
 - [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert

@@ -447,14 +447,13 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 		pending = 0;
 
 		code = (data >> 6) & 0x03;
+		addr = ( data << 8 ) | latch;
 		switch( code ) {
 		case 0:		/* VRAM reading mode */
-			addr = ( data << 8 ) | latch;
 			buffer = VRAM[ addr & 0x3FFF ];
 			addr += 1;
 			break;
 		case 1:		/* VRAM writing mode */
-			addr = ( data << 8 ) | latch;
 			break;
 		case 2:		/* VDP register write */
 			regNum = data & 0x0F;
@@ -471,7 +470,6 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 			code = 0;
 			break;
 		case 3:		/* CRAM writing mode */
-			addr = ( data << 8 ) | latch;
 			break;
 		}
 	}
