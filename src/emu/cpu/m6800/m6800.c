@@ -887,8 +887,8 @@ static void m6800_reset(void)
 
 	m6800.trcsr = M6800_TRCSR_TDRE;
 	m6800.rmcr = 0;
-	mame_timer_enable(m6800_rx_timer, 0);
-	mame_timer_enable(m6800_tx_timer, 0);
+	if (m6800_rx_timer) mame_timer_enable(m6800_rx_timer, 0);
+	if (m6800_tx_timer) mame_timer_enable(m6800_tx_timer, 0);
 	m6800.txstate = M6800_TX_STATE_INIT;
 	m6800.txbits = m6800.rxbits = 0;
 	m6800.trcsr_read = 0;
@@ -2421,7 +2421,14 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 					| (io_read_byte_8(M6803_PORT1) & (m6800.port1_ddr ^ 0xff)));
 			break;
 		case 0x03:
-			m6800.port2_data = (m6800.port2_data & 0xef) | (m6800.tx << 4);
+			if (m6800.trcsr & M6800_TRCSR_TE)
+			{
+				m6800.port2_data = (data & 0xef) | (m6800.tx << 4);
+			}
+			else
+			{
+				m6800.port2_data = data;
+			}
 			if(m6800.port2_ddr == 0xff)
 				io_write_byte_8(M6803_PORT2,m6800.port2_data);
 			else
