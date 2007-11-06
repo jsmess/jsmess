@@ -332,41 +332,41 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START(oric)
 	INPUT_PORT_ORIC
-	PORT_START
+	PORT_START_TAG("oric_floppy_interface")
 	/* floppy interface  */
-	PORT_DIPNAME( 0x07, 0x00, "Floppy disc interface" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x01, "Microdisc" )
-	PORT_DIPSETTING(    0x02, "Jasmin" )
-/*	PORT_DIPSETTING(    0x03, "Low 8D DOS" ) */
-/*	PORT_DIPSETTING(    0x04, "High 8D DOS" ) */
+	PORT_CONFNAME( 0x03, 0x00, "Floppy disc interface" )
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(    0x01, "Microdisc" )
+	PORT_CONFSETTING(    0x02, "Jasmin" )
+/*	PORT_CONFSETTING(    0x03, "Low 8D DOS" ) */
+/*	PORT_CONFSETTING(    0x04, "High 8D DOS" ) */
 
 	/* vsync cable hardware. This is a simple cable connected to the video output
 	to the monitor/television. The sync signal is connected to the cassette input
 	allowing interrupts to be generated from the vsync signal. */
-	PORT_DIPNAME(0x08, 0x00, "Vsync cable hardware")
-	PORT_DIPSETTING(0x0, DEF_STR( Off) )
-	PORT_DIPSETTING(0x8, DEF_STR( On) )
+	PORT_CONFNAME(0x08, 0x00, "Vsync cable hardware")
+	PORT_CONFSETTING(0x0, DEF_STR( Off) )
+	PORT_CONFSETTING(0x8, DEF_STR( On) )
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_VBLANK)
 INPUT_PORTS_END
 
 INPUT_PORTS_START(orica)
 	INPUT_PORT_ORICA
-	PORT_START
+	PORT_START_TAG("oric_floppy_interface")
 	/* floppy interface  */
-	PORT_DIPNAME( 0x07, 0x00, "Floppy disc interface" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x01, "Microdisc" )
-	PORT_DIPSETTING(    0x02, "Jasmin" )
-/*	PORT_DIPSETTING(    0x03, "Low 8D DOS" ) */
-/*	PORT_DIPSETTING(    0x04, "High 8D DOS" ) */
+	PORT_CONFNAME( 0x03, 0x00, "Floppy disc interface" )
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(    0x01, "Microdisc" )
+	PORT_CONFSETTING(    0x02, "Jasmin" )
+/*	PORT_CONFSETTING(    0x03, "Low 8D DOS" ) */
+/*	PORT_CONFSETTING(    0x04, "High 8D DOS" ) */
 
 	/* vsync cable hardware. This is a simple cable connected to the video output
 	to the monitor/television. The sync signal is connected to the cassette input
 	allowing interrupts to be generated from the vsync signal. */
-    PORT_DIPNAME(0x08, 0x00, "Vsync cable hardware")
-	PORT_DIPSETTING(0x0, DEF_STR( Off) )
-	PORT_DIPSETTING(0x8, DEF_STR( On) )
+    PORT_CONFNAME(0x08, 0x00, "Vsync cable hardware")
+	PORT_CONFSETTING(0x0, DEF_STR( Off) )
+	PORT_CONFSETTING(0x8, DEF_STR( On) )
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_VBLANK)
 INPUT_PORTS_END
 
@@ -452,7 +452,8 @@ static MACHINE_DRIVER_START( oric )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( oric )
-
+	MDRV_MACHINE_RESET( oric )
+	
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

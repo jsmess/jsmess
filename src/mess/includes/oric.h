@@ -1,5 +1,6 @@
 /* from machine/oric.c */
 MACHINE_START( oric );
+MACHINE_RESET( oric );
 INTERRUPT_GEN( oric_interrupt );
 READ8_HANDLER( oric_IO_r );
 WRITE8_HANDLER( oric_IO_w );
