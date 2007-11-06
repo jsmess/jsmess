@@ -247,7 +247,7 @@ static kt_table sdl_key_trans_table[] =
 	KTT_ENTRY0(  STOP,	 		PERIOD, 		0xbe,	'.',	"STOP"  ),
 	KTT_ENTRY0(  SLASH, 		SLASH, 	     	0xbf,	'/',	"SLASH" ),
 	KTT_ENTRY2(  RSHIFT, 		RSHIFT ),
-	KTT_ENTRY0(  ASTERISK, 		KP_MULTIPLY,    '*',	'*',	"ASTERIX" ), 
+	KTT_ENTRY0(  ASTERISK, 		KP_MULTIPLY,    '*',	'*',	"ASTERISK" ), 
 	KTT_ENTRY2(  LALT, 			LALT ),
 	KTT_ENTRY0(  SPACE, 		SPACE, 			' ',	' ',	"SPACE" ),
 	KTT_ENTRY2(  CAPSLOCK, 		CAPSLOCK ),
