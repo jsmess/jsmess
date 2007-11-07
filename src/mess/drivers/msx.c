@@ -2118,6 +2118,18 @@ MSX_LAYOUT_INIT (hx10)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
+ROM_START (vg8020)
+	ROM_REGION (0x8000, REGION_CPU1, 0)
+	ROM_LOAD ("vg8020.rom", 0x0000, 0x8000, CRC(A317E6B4) SHA1(E998F0C441F4F1800EF44E42CD1659150206CF79))
+ROM_END
+
+MSX_LAYOUT_INIT (vg8020)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000) 
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
 static void msx_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -2257,6 +2269,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (phc70fd2)
 	MSX_DRIVER (phc35j)
 	MSX_DRIVER (hx10)
+	MSX_DRIVER (vg8020)
 MSX_DRIVER_END
 
 /*	  YEAR	NAME	  PARENT	COMPAT	MACHINE  INPUT	   INIT   CONFIG  COMPANY			   FULLNAME */
@@ -2280,6 +2293,7 @@ COMP( 1984, dpc200,	  msx,		0,		msx,	 msxkr,    msx,		msx,	"Daewoo", "IQ-1000 DP
 COMP( 1985, hotbit11, msx,		0,		msx,	 hotbit,   msx,		msx,	"Sharp / Epcom",	 "HB-8000 Hotbit 1.1" , 0)
 COMP( 1985, hotbit12, msx,		0,		msx,	 hotbit,   msx,		msx,	"Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
 COMP( 1984, hx10, msx,		0,		msx,	 msx,   msx,		msx,	"Toshiba",	 "HX-10" , 0)
+COMP( 1985, vg8020, msx,		0,		msx,	 msx,   msx,		msx,	"Philips",	 "VG-8020" , 0)
 COMP( 1983, expert10, msx,		0,		msx,	 expert10, msx,		msx,	"Gradiente", "Expert (Brazil)" , 0)
 COMP( 1984, expert11, msx,		0,		msx,	 expert11, msx,		msx,	"Gradiente", "Expert Plus (Brazil)" , 0)
 COMP(1985, expertdp, msx,		0,		msx,	 expert11, msx,		msx,	"Gradiente", "Expert DDPlus (Brazil)", GAME_NOT_WORKING )

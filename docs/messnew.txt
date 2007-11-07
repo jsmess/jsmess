@@ -6,6 +6,7 @@ New System Drivers Supported (in no particular order):
 - Atari STBook [Curt Coder] (not working)
 - Osborne-1 [Wilbert Pol, Cowering]
 - Synertec Systems Corp. SYM-1  [Dirk Best] (not working)
+- VG-8020 [incog]
 
 
 

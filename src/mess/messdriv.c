@@ -625,7 +625,8 @@ TESTDRIVER( trs80m4 )
 	DRIVER( svi738 )	/* 1985 MSX											*/
 	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
 	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
-	DRIVER( hx10 )		/* 1984 MSX	Brazil									*/
+	DRIVER( hx10 )		/* 1984 MSX										*/
+	DRIVER( vg8020 )	/* 1985 MSX										*/
 	DRIVER( expert10 )	/* 1983 MSX Brazil									*/
 	DRIVER( expert11 )	/* 1984 MSX Brazil									*/
 	DRIVER( expertdp )	/* 1985 MSX Brazil									*/
