@@ -87,7 +87,8 @@ static void size_dialog(HWND dialog, const struct anchor_entry *anchor_entries,
 	HWND dlgitem;
 	RECT dialog_rect, adjusted_dialog_rect, dlgitem_rect;
 	LONG dialog_left, dialog_top;
-	LONG left, top, width, height;
+	LONG left, top;
+	FPTR width, height;
 	UINT8 anchor;
 	HANDLE width_prop, height_prop;
 	static const TCHAR winprop_negwidth[] = TEXT("winprop_negwidth");

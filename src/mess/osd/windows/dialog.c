@@ -234,7 +234,7 @@ static void dialog_trigger(HWND dlgwnd, WORD trigger_flags)
 	HWND dialog_item;
 	struct _dialog_box *di;
 	struct dialog_info_trigger *trigger;
-	LONG l;
+	LONG_PTR l;
 
 	l = GetWindowLongPtr(dlgwnd, GWLP_USERDATA);
 	di = (struct _dialog_box *) l;

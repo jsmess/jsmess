@@ -189,7 +189,7 @@ static BOOL check_editbox(HWND control)
 	const char *optspec;
 	optreserr_t err;
 	HANDLE h;
-	int val;
+	FPTR val;
 
 	guide = (const struct OptionGuide *) GetProp(control, guide_prop);
 	optspec = (const char *) GetProp(control, spec_prop);
