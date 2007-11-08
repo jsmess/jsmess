@@ -171,7 +171,7 @@ static GFXDECODE_START( tetriunk )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-INPUT_PORTS_START( tetriunk )
+static INPUT_PORTS_START( tetriunk )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( tetriunk )

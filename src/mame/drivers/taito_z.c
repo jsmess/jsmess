@@ -1958,7 +1958,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
 
-INPUT_PORTS_START( contcirc )
+static INPUT_PORTS_START( contcirc )
 	PORT_START_TAG("DSW1") /* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
@@ -2029,14 +2029,14 @@ INPUT_PORTS_START( contcirc )
 	PORT_DIPSETTING(    0x00, "Analogue" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( contcrcu )
+static INPUT_PORTS_START( contcrcu )
 	PORT_INCLUDE(contcirc)
 
 	PORT_MODIFY("DSW1")
 	TAITO_Z_COINAGE_JAPAN_8		// confirmed
 INPUT_PORTS_END
 
-INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
+static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_START_TAG("DSW1") /* DSW A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )	/* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
 	PORT_DIPSETTING(    0x03, "Upright / Steering Lock" )
@@ -2142,14 +2142,14 @@ INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_DIPSETTING(    0x00, "Analogue" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( chasehqj )
+static INPUT_PORTS_START( chasehqj )
 	PORT_INCLUDE(chasehq)
 
 	PORT_MODIFY("DSW1")
 	TAITO_Z_COINAGE_JAPAN_8
 INPUT_PORTS_END
 
-INPUT_PORTS_START( enforce )
+static INPUT_PORTS_START( enforce )
 	PORT_START /* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -2205,7 +2205,7 @@ INPUT_PORTS_START( enforce )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bshark )
+static INPUT_PORTS_START( bshark )
 	PORT_START_TAG("DSW1") /* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, "Mirror screen" )	// manual says first two must be off
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -2274,14 +2274,14 @@ INPUT_PORTS_START( bshark )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bsharkj )
+static INPUT_PORTS_START( bsharkj )
 	PORT_INCLUDE(bshark)
 
 	PORT_MODIFY("DSW1")
 	TAITO_Z_COINAGE_JAPAN_8
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sci )
+static INPUT_PORTS_START( sci )
 	PORT_START_TAG("DSW1") /* DSW A */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, "Cockpit" )
@@ -2348,21 +2348,21 @@ INPUT_PORTS_START( sci )
 	PORT_DIPSETTING(    0x00, "Analogue" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sciu )
+static INPUT_PORTS_START( sciu )
 	PORT_INCLUDE(sci)
 
 	PORT_MODIFY("DSW1")
 	TAITO_Z_COINAGE_US_8
 INPUT_PORTS_END
 
-INPUT_PORTS_START( scij )
+static INPUT_PORTS_START( scij )
 	PORT_INCLUDE(sci)
 
 	PORT_MODIFY("DSW1")
 	TAITO_Z_COINAGE_JAPAN_8
 INPUT_PORTS_END
 
-INPUT_PORTS_START( nightstr )
+static INPUT_PORTS_START( nightstr )
 	PORT_START /* DSW A */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, "Cockpit" )
@@ -2430,7 +2430,7 @@ INPUT_PORTS_START( nightstr )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( aquajack )
+static INPUT_PORTS_START( aquajack )
 	PORT_START_TAG("DSW1") /* DSW A */
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, "Cockpit" )
@@ -2500,7 +2500,7 @@ INPUT_PORTS_START( aquajack )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( aquajckj )
+static INPUT_PORTS_START( aquajckj )
 	PORT_INCLUDE(aquajack)
 
 	PORT_MODIFY("DSW1")
@@ -2516,7 +2516,7 @@ INPUT_PORTS_START( aquajckj )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( spacegun )
+static INPUT_PORTS_START( spacegun )
 	PORT_START /* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )	// Manual says Always Off
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -2586,7 +2586,7 @@ INPUT_PORTS_START( spacegun )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(22) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dblaxle )
+static INPUT_PORTS_START( dblaxle )
 	PORT_START_TAG("DSW1") /* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -2654,7 +2654,7 @@ INPUT_PORTS_START( dblaxle )
 	PORT_DIPSETTING(    0x00, "Analogue" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pwheelsj )
+static INPUT_PORTS_START( pwheelsj )
 	PORT_INCLUDE(dblaxle)
 
 	PORT_MODIFY("DSW1")

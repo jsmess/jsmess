@@ -580,7 +580,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( grchamp )
+static INPUT_PORTS_START( grchamp )
 
 	PORT_START_TAG("TILT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )

@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( malzak )
+static INPUT_PORTS_START( malzak )
 
 	/* Malzak has an 8-way stick
        and only one button (firing and bomb dropping on the same button) */
@@ -302,7 +302,7 @@ INPUT_PORTS_START( malzak )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( malzak2 )
+static INPUT_PORTS_START( malzak2 )
 
 	/* Same as Malzak, but with additional POT switch, and
        possibly a reset button too. */

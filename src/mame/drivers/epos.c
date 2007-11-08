@@ -141,7 +141,7 @@ static ppi8255_interface ppi8255_intf =
    so that ROMs couldn't be simply swapped.  Each game checks these bits and halts
    the processor if an unexpected value is read. */
 
-INPUT_PORTS_START( megadon )
+static INPUT_PORTS_START( megadon )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -189,7 +189,7 @@ INPUT_PORTS_START( megadon )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( suprglob )
+static INPUT_PORTS_START( suprglob )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -240,7 +240,7 @@ INPUT_PORTS_START( suprglob )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( igmo )
+static INPUT_PORTS_START( igmo )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -289,7 +289,7 @@ INPUT_PORTS_START( igmo )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dealer )
+static INPUT_PORTS_START( dealer )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

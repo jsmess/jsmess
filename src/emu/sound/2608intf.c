@@ -17,8 +17,6 @@
 #include "2608intf.h"
 #include "fm.h"
 
-#if (BUILD_YM2608)
-
 struct ym2608_info
 {
 	sound_stream *	stream;
@@ -314,5 +312,3 @@ void ym2608_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004, The MAME Team"; break;
 	}
 }
-
-#endif

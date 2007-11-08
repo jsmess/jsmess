@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( galspnbl )
+static INPUT_PORTS_START( galspnbl )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* tested at 0x0016c6 - doesn't seem tilt related */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* tested at 0x0016d2 - doesn't seem tilt related */
@@ -176,7 +176,7 @@ INPUT_PORTS_START( galspnbl )
 	PORT_DIPSETTING(    0x40, "5" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hotpinbl )
+static INPUT_PORTS_START( hotpinbl )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* tested at 0x0016c6 - doesn't seem tilt related */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* tested at 0x0016d2 - doesn't seem tilt related */

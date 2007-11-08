@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-INPUT_PORTS_START( toki )
+static INPUT_PORTS_START( toki )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START_TAG("DSW0")
@@ -230,7 +230,7 @@ INPUT_PORTS_START( toki )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tokib )
+static INPUT_PORTS_START( tokib )
 	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x0015, DEF_STR( 6C_1C ) )

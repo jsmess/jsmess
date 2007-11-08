@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( cultures_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( cultures )
+static INPUT_PORTS_START( cultures )
 	PORT_START
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "10 Coins / 1 Credit" )

@@ -468,12 +468,12 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( ppking )
+static INPUT_PORTS_START( ppking )
 
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gladiatr )
+static INPUT_PORTS_START( gladiatr )
 	PORT_START_TAG("DSW1")		/* (8741-0 parallel port)*/
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )

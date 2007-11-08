@@ -458,7 +458,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 
 
-WRITE32_HANDLER( ms32_spramx_w )
+static WRITE32_HANDLER( ms32_spramx_w )
 {
 	COMBINE_DATA(&ms32_spram[offset]);
 }
@@ -532,7 +532,7 @@ VIDEO_UPDATE(bnstars)
 	return 0;
 }
 
-INPUT_PORTS_START( bnstars )
+static INPUT_PORTS_START( bnstars )
 	PORT_START
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_A )

@@ -1123,7 +1123,7 @@ static INPUT_PORTS_START( fpoint )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( fpointbj )
+static INPUT_PORTS_START( fpointbj )
 	SYS16_SERVICE
 
 	PORT_START_TAG("IN0")
@@ -1569,7 +1569,7 @@ static INPUT_PORTS_START( passsht )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( passht4b )
+static INPUT_PORTS_START( passht4b )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -2104,7 +2104,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************************/
 
-INPUT_PORTS_START( wb3b )
+static INPUT_PORTS_START( wb3b )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE

@@ -205,7 +205,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( thedeep )
+static INPUT_PORTS_START( thedeep )
 	PORT_START_TAG("IN0")	//  e008
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )	// Up / down shown in service mode
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )

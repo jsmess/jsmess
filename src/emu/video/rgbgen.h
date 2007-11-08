@@ -400,4 +400,111 @@ INLINE rgb_t rgba_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t r
 }
 
 
+/*-------------------------------------------------
+    rgbint_bilinear_filter - bilinear filter between
+    four pixel values; this code is derived from
+    code provided by Michael Herf
+-------------------------------------------------*/
+
+INLINE void rgbint_bilinear_filter(rgbint *color, rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
+{
+	UINT32 agd1 = (rgb01 & 0xff00ff00) - (rgb00 & 0xff00ff00);
+	UINT32 agd2 = (rgb11 & 0xff00ff00) - (rgb10 & 0xff00ff00);
+	UINT32 rbd1 = (rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff);
+	UINT32 rbd2 = (rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff);
+	agd1 >>= 8;
+	agd2 >>= 8;
+
+	rbd1 *= u;  rgb01 = (rgb00 & 0x00ff00ff);
+	agd1 *= u;  rbd1 >>= 8;
+	rbd2 *= u;  rgb11 = (rgb10 & 0x00ff00ff);
+	agd2 *= u;  rbd2 >>= 8;
+
+	rgb01 += rbd1;
+	rgb00 += agd1;
+
+	rgb11 += rbd2;
+	rgb10 += agd2;
+
+	rgb01 &= 0x00ff00ff;
+	rgb00 &= 0xff00ff00;
+	rgb10 &= 0xff00ff00;
+	rgb11 &= 0x00ff00ff;
+
+	// ---- rgb11 is now rb for the bottom
+	//      rgb10 is     ag for the bottom
+	//      rgb01 is     rb for the top
+	//      rgb00 is     ag for the top
+
+	rgb10 -= rgb00;  // agd
+	rgb11 -= rgb01;  // rbd
+	rgb10 >>= 8;
+
+	rgb11 *= v;
+	rgb10 *= v;
+	rgb11 >>= 8;
+
+	rgb00 += rgb10;
+	rgb01 += rgb11;
+
+	color->r = (rgb01 >> 16) & 0xff;
+	color->g = (rgb00 >> 8) & 0xff;
+	color->b = (rgb01 >> 0) & 0xff;
+}
+
+
+/*-------------------------------------------------
+    rgbaint_bilinear_filter - bilinear filter between
+    four pixel values; this code is derived from
+    code provided by Michael Herf
+-------------------------------------------------*/
+
+INLINE void rgbaint_bilinear_filter(rgbaint *color, rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
+{
+	UINT32 agd1 = (rgb01 & 0xff00ff00) - (rgb00 & 0xff00ff00);
+	UINT32 agd2 = (rgb11 & 0xff00ff00) - (rgb10 & 0xff00ff00);
+	UINT32 rbd1 = (rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff);
+	UINT32 rbd2 = (rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff);
+	agd1 >>= 8;
+	agd2 >>= 8;
+
+	rbd1 *= u;  rgb01 = (rgb00 & 0x00ff00ff);
+	agd1 *= u;  rbd1 >>= 8;
+	rbd2 *= u;  rgb11 = (rgb10 & 0x00ff00ff);
+	agd2 *= u;  rbd2 >>= 8;
+
+	rgb01 += rbd1;
+	rgb00 += agd1;
+
+	rgb11 += rbd2;
+	rgb10 += agd2;
+
+	rgb01 &= 0x00ff00ff;
+	rgb00 &= 0xff00ff00;
+	rgb10 &= 0xff00ff00;
+	rgb11 &= 0x00ff00ff;
+
+	// ---- rgb11 is now rb for the bottom
+	//      rgb10 is     ag for the bottom
+	//      rgb01 is     rb for the top
+	//      rgb00 is     ag for the top
+
+	rgb10 -= rgb00;  // agd
+	rgb11 -= rgb01;  // rbd
+	rgb10 >>= 8;
+
+	rgb11 *= v;
+	rgb10 *= v;
+	rgb11 >>= 8;
+
+	rgb00 += rgb10;
+	rgb01 += rgb11;
+
+	color->a = (rgb00 >> 24) & 0xff;
+	color->r = (rgb01 >> 16) & 0xff;
+	color->g = (rgb00 >> 8) & 0xff;
+	color->b = (rgb01 >> 0) & 0xff;
+}
+
+
 #endif /* __RGBUTIL__ */

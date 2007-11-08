@@ -767,7 +767,7 @@ static ADDRESS_MAP_START( writeport_taiwanmb, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( hanamomo )
+static INPUT_PORTS_START( hanamomo )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -843,7 +843,7 @@ INPUT_PORTS_START( hanamomo )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjcamerb )
+static INPUT_PORTS_START( mjcamerb )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -919,7 +919,7 @@ INPUT_PORTS_START( mjcamerb )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mmcamera )
+static INPUT_PORTS_START( mmcamera )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -995,7 +995,7 @@ INPUT_PORTS_START( mmcamera )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( msjiken )
+static INPUT_PORTS_START( msjiken )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1091,7 +1091,7 @@ INPUT_PORTS_START( msjiken )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( telmahjn )
+static INPUT_PORTS_START( telmahjn )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1187,7 +1187,7 @@ INPUT_PORTS_START( telmahjn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gionbana )
+static INPUT_PORTS_START( gionbana )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1262,7 +1262,7 @@ INPUT_PORTS_START( gionbana )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mgion )
+static INPUT_PORTS_START( mgion )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1338,7 +1338,7 @@ INPUT_PORTS_START( mgion )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( omotesnd )
+static INPUT_PORTS_START( omotesnd )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1414,7 +1414,7 @@ INPUT_PORTS_START( omotesnd )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( abunai )
+static INPUT_PORTS_START( abunai )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1489,7 +1489,7 @@ INPUT_PORTS_START( abunai )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mgmen89 )
+static INPUT_PORTS_START( mgmen89 )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1565,7 +1565,7 @@ INPUT_PORTS_START( mgmen89 )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjfocus )
+static INPUT_PORTS_START( mjfocus )
 
 	// I don't have manual for this game.
 
@@ -1644,7 +1644,7 @@ INPUT_PORTS_START( mjfocus )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjfocusm )
+static INPUT_PORTS_START( mjfocusm )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, "Game Out" )
 	PORT_DIPSETTING(    0x07, "95% (Easy)" )
@@ -1718,7 +1718,7 @@ INPUT_PORTS_START( mjfocusm )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( peepshow )
+static INPUT_PORTS_START( peepshow )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1794,7 +1794,7 @@ INPUT_PORTS_START( peepshow )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( scandal )
+static INPUT_PORTS_START( scandal )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1870,7 +1870,7 @@ INPUT_PORTS_START( scandal )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( scandalm )
+static INPUT_PORTS_START( scandalm )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, "Game Out" )
 	PORT_DIPSETTING(    0x07, "90% (Easy)" )
@@ -1944,7 +1944,7 @@ INPUT_PORTS_START( scandalm )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjnanpas )
+static INPUT_PORTS_START( mjnanpas )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -2020,7 +2020,7 @@ INPUT_PORTS_START( mjnanpas )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjnanpaa )
+static INPUT_PORTS_START( mjnanpaa )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -2096,7 +2096,7 @@ INPUT_PORTS_START( mjnanpaa )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bananadr )
+static INPUT_PORTS_START( bananadr )
 
 	// I don't have manual for this game.
 
@@ -2175,7 +2175,7 @@ INPUT_PORTS_START( bananadr )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( club90s )
+static INPUT_PORTS_START( club90s )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -2250,7 +2250,7 @@ INPUT_PORTS_START( club90s )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( lovehous )
+static INPUT_PORTS_START( lovehous )
 
 	// I don't have manual for this game.
 
@@ -2337,7 +2337,7 @@ INPUT_PORTS_START( lovehous )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mladyhtr )
+static INPUT_PORTS_START( mladyhtr )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -2412,7 +2412,7 @@ INPUT_PORTS_START( mladyhtr )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( chinmoku )
+static INPUT_PORTS_START( chinmoku )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -2487,7 +2487,7 @@ INPUT_PORTS_START( chinmoku )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( maiko )
+static INPUT_PORTS_START( maiko )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -2573,7 +2573,7 @@ INPUT_PORTS_START( maiko )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )			//
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mmaiko )
+static INPUT_PORTS_START( mmaiko )
 
 	// I don't have manual for this game.
 
@@ -2659,7 +2659,7 @@ INPUT_PORTS_START( mmaiko )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hanaoji )
+static INPUT_PORTS_START( hanaoji )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -2745,7 +2745,7 @@ INPUT_PORTS_START( hanaoji )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )			//
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pairsnb )
+static INPUT_PORTS_START( pairsnb )
 	PORT_START /* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )			// Hearts : 10 - Time : 60/60
@@ -2828,7 +2828,7 @@ INPUT_PORTS_START( pairsnb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( taiwanmb )
+static INPUT_PORTS_START( taiwanmb )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, "Game Out" )
 	PORT_DIPSETTING(    0x07, "95% (Easy)" )

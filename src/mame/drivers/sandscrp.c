@@ -217,7 +217,7 @@ ADDRESS_MAP_END
                                 Sand Scorpion
 ***************************************************************************/
 
-INPUT_PORTS_START( sandscrp )
+static INPUT_PORTS_START( sandscrp )
 	PORT_START	// IN0 - $b00000.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	 ) PORT_PLAYER(1)

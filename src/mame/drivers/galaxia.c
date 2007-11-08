@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( galaxia )
+static INPUT_PORTS_START( galaxia )
 	PORT_START	/*  */
 
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )

@@ -120,7 +120,7 @@ ADDRESS_MAP_END
                 INPUT PORTS
 ***********************************************************/
 
-INPUT_PORTS_START( volfied )
+static INPUT_PORTS_START( volfied )
 	/* Z80 CPU -> 0x10002c ($2c,A5) */
 	PORT_START_TAG("DSWA")
 	TAITO_MACHINE_COCKTAIL
@@ -192,7 +192,7 @@ INPUT_PORTS_START( volfied )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( volfiedu )
+static INPUT_PORTS_START( volfiedu )
 	PORT_INCLUDE(volfied)
 
 	PORT_MODIFY("DSWA")
@@ -201,7 +201,7 @@ INPUT_PORTS_START( volfiedu )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                        /* see notes */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( volfiedj )
+static INPUT_PORTS_START( volfiedj )
 	PORT_INCLUDE(volfied)
 
 	PORT_MODIFY("DSWA")

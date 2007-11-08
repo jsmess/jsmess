@@ -174,7 +174,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( mquake )
+static INPUT_PORTS_START( mquake )
 	PORT_START_TAG("CIA0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* JS0SW */

@@ -23,7 +23,7 @@ To do:
 VIDEO_START( tankbust );
 VIDEO_UPDATE( tankbust );
 
-extern UINT8 * txt_ram;
+extern UINT8 *tankbust_txtram;
 
 WRITE8_HANDLER( tankbust_background_videoram_w );
 READ8_HANDLER ( tankbust_background_videoram_r );
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tankbust_background_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(tankbust_background_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(tankbust_txtram_w) AM_BASE(&txt_ram)
+	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(tankbust_txtram_w) AM_BASE(&tankbust_txtram)
 	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
@@ -267,7 +267,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( tankbust )
+static INPUT_PORTS_START( tankbust )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY

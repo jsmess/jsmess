@@ -458,7 +458,7 @@ ADDRESS_MAP_END
              INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( ninjaw )
+static INPUT_PORTS_START( ninjaw )
 	/* 0x200000 (port 0) -> 0x0c2291.b and 0x24122c (shared RAM) */
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:1")
@@ -503,7 +503,7 @@ INPUT_PORTS_START( ninjaw )
 INPUT_PORTS_END
 
 /* Can't use PORT_INCLUDE because of PORT_DIPLOCATION */
-INPUT_PORTS_START( ninjawj )
+static INPUT_PORTS_START( ninjawj )
 	PORT_INCLUDE(ninjaw)
 
 	PORT_MODIFY("DSWA")
@@ -511,7 +511,7 @@ INPUT_PORTS_START( ninjawj )
 INPUT_PORTS_END
 
 /* Can't use PORT_INCLUDE because of PORT_DIPLOCATION */
-INPUT_PORTS_START( darius2 )
+static INPUT_PORTS_START( darius2 )
 	PORT_INCLUDE(ninjaw)
 
 	/* 0x200000 (port 0) -> 0x0c2002 (-$5ffe,A5) and 0x0c2006 (-$5ffa,A5) */

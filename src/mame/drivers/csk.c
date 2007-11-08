@@ -235,7 +235,7 @@ ADDRESS_MAP_END
 
 /* MB: 05 Jun 99  Input ports and Dip switches are all verified! */
 
-INPUT_PORTS_START( csk227 )
+static INPUT_PORTS_START( csk227 )
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Demo Music" )
@@ -395,7 +395,7 @@ INPUT_PORTS_START( csk227 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( csk234 )
+static INPUT_PORTS_START( csk234 )
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Demo Music" )

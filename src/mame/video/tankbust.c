@@ -10,7 +10,7 @@
 
 static tilemap *bg_tilemap;
 static tilemap *txt_tilemap;
-UINT8 * txt_ram;
+UINT8 * tankbust_txtram;
 
 /***************************************************************************
 
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_txt_tile_info )
 {
-	int code = txt_ram[tile_index];
+	int code = tankbust_txtram[tile_index];
 	int color = ((code>>6) & 0x03);
 
 	SET_TILE_INFO(	2,
@@ -121,12 +121,12 @@ READ8_HANDLER( tankbust_background_colorram_r )
 
 WRITE8_HANDLER( tankbust_txtram_w )
 {
-	txt_ram[offset] = data;
+	tankbust_txtram[offset] = data;
 	tilemap_mark_tile_dirty(txt_tilemap, offset);
 }
 READ8_HANDLER( tankbust_txtram_r )
 {
-	return txt_ram[offset];
+	return tankbust_txtram[offset];
 }
 
 

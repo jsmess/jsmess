@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 /*************************************************************/
 
-INPUT_PORTS_START( namcond1 )
+static INPUT_PORTS_START( namcond1 )
 	PORT_START      /* player 1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )

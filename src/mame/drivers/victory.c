@@ -256,7 +256,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( victory )
+static INPUT_PORTS_START( victory )
 	PORT_START	/* $00-$03 = SW2 */
 	PORT_DIPNAME( 0x07, 0x00, "????" )
 	PORT_DIPSETTING(    0x00, "0" )

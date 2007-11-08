@@ -577,7 +577,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( lastday )
+static INPUT_PORTS_START( lastday )
 	PORT_INCLUDE( dooyongz80_generic )
 
 	PORT_MODIFY("DSW2")
@@ -601,7 +601,7 @@ INPUT_PORTS_START( lastday )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gulfstrm )
+static INPUT_PORTS_START( gulfstrm )
 	PORT_INCLUDE( dooyongz80_generic )
 
 	PORT_MODIFY("DSW2")
@@ -625,7 +625,7 @@ INPUT_PORTS_START( gulfstrm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pollux )
+static INPUT_PORTS_START( pollux )
 	PORT_INCLUDE( dooyongz80_generic )
 
 	PORT_START
@@ -639,7 +639,7 @@ INPUT_PORTS_START( pollux )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bluehawk )
+static INPUT_PORTS_START( bluehawk )
 	PORT_INCLUDE( dooyongz80_generic )
 
 	PORT_START
@@ -653,7 +653,7 @@ INPUT_PORTS_START( bluehawk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( flytiger )
+static INPUT_PORTS_START( flytiger )
 	PORT_INCLUDE( dooyongz80_generic )
 
 	PORT_MODIFY("DSW2")
@@ -672,7 +672,7 @@ INPUT_PORTS_START( flytiger )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sadari )
+static INPUT_PORTS_START( sadari )
 	PORT_INCLUDE( dooyongz80_generic )
 
 	PORT_MODIFY("DSW2")
@@ -699,7 +699,7 @@ INPUT_PORTS_START( sadari )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( primella )
+static INPUT_PORTS_START( primella )
 	PORT_INCLUDE( dooyongz80_generic )
 
 	PORT_MODIFY("DSW2")
@@ -723,7 +723,7 @@ INPUT_PORTS_START( primella )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( rshark )
+static INPUT_PORTS_START( rshark )
 	PORT_INCLUDE( dooyongm68_generic )
 
 	PORT_MODIFY("DSW")
@@ -738,11 +738,11 @@ INPUT_PORTS_START( rshark )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW",0x0002,PORTCOND_NOTEQUALS,0x0002)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( superx )
+static INPUT_PORTS_START( superx )
 	PORT_INCLUDE( dooyongm68_generic )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( popbingo )
+static INPUT_PORTS_START( popbingo )
 	PORT_INCLUDE( dooyongm68_generic )
 
 	PORT_MODIFY("DSW")

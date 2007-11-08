@@ -199,7 +199,7 @@ PORT_START_TAG("IN0") \
 	PORT_DIPSETTING(    0x00, "Disable All Coins" )
 
 
-INPUT_PORTS_START( amidar )
+static INPUT_PORTS_START( amidar )
 	AMIDAR_IN0
 
 	AMIDAR_IN1
@@ -232,7 +232,7 @@ INPUT_PORTS_END
 /* absolutely identical to amidar, the only difference is the BONUS dip switch */
 /* Cannot find a port 'replace' macro, which would be all that's needed here */
 /* So instead, I'll use the old definition system */
-INPUT_PORTS_START( amidaru )
+static INPUT_PORTS_START( amidaru )
 AMIDAR_IN0
 
 AMIDAR_IN1
@@ -261,7 +261,7 @@ AMIDAR_DSW
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( amidaro )
+static INPUT_PORTS_START( amidaro )
 AMIDAR_IN0
 
 	PORT_START_TAG("IN1")
@@ -302,7 +302,7 @@ INPUT_PORTS_END
 
 /* similar to Amidar, dip switches are different and port 3, which in Amidar */
 /* selects coins per credit, is not used. */
-INPUT_PORTS_START( turtles )
+static INPUT_PORTS_START( turtles )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably space for button 2 */
@@ -347,7 +347,7 @@ INPUT_PORTS_START( turtles )
 INPUT_PORTS_END
 
 /* same as Turtles, but dip switches are different. */
-INPUT_PORTS_START( turpin )
+static INPUT_PORTS_START( turpin )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably space for button 2 */

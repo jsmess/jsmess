@@ -217,7 +217,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( arcadia )
+static INPUT_PORTS_START( arcadia )
 	PORT_START_TAG("CIA0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -718,19 +718,19 @@ DRIVER_INIT( xeon )  { generic_decode(REGION_USER3, 3, 1, 2, 4, 0, 5, 6, 7); arc
  *************************************/
 
 /* BIOS */
-GAMEB( 1988, ar_bios,	0,		 ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Arcadia System BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1988, ar_bios,	0, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Arcadia System BIOS", GAME_IS_BIOS_ROOT )
 
 /* working */
-GAMEB( 1988, ar_airh,	ar_bios, ar_bios, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, V 2.1)", 0 )
-GAMEB( 1988, ar_bowl,	ar_bios, ar_bios, arcadia, arcadia, bowl,  ROT0, "Arcadia Systems", "SportTime Bowling (Arcadia, V 2.1)", 0 )
-GAMEB( 1987, ar_dart,	ar_bios, ar_bios, arcadia, arcadia, dart,  ROT0, "Arcadia Systems", "World Darts (Arcadia, V 2.1)", 0 )
-GAMEB( 1988, ar_fast,	ar_bios, ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
-GAMEB( 1988, ar_ldrb,	ar_bios, ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, V 2.4?)", 0 )
-GAMEB( 1988, ar_ldrba,	ar_ldrb, ar_bios, arcadia, arcadia, ldrba, ROT0, "Arcadia Systems", "Leader Board (Arcadia, V 2.5)", 0 )
-GAMEB( 1987, ar_ninj,	ar_bios, ar_bios, arcadia, arcadia, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, V 2.5)", 0 )
-GAMEB( 1988, ar_rdwr,	ar_bios, ar_bios, arcadia, arcadia, rdwr,  ROT0, "Arcadia Systems", "RoadWars (Arcadia, V 2.3)", 0  )
-GAMEB( 1988, ar_sdwr,	ar_bios, ar_bios, arcadia, arcadia, sdwr,  ROT0, "Arcadia Systems", "Sidewinder (Arcadia, V 2.1)", 0 )
-GAMEB( 1989, ar_socc,	ar_bios, ar_bios, arcadia, arcadia, socc,  ROT0, "Arcadia Systems", "World Trophy Soccer (Arcadia, V 3.0)", 0 )
-GAMEB( 1990, ar_spot,	ar_bios, ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Spot (Arcadia)", 0 )
-GAMEB( 1987, ar_sprg,	ar_bios, ar_bios, arcadia, arcadia, sprg,  ROT0, "Arcadia Systems", "Space Ranger (Arcadia, V 2.0)", 0 )
-GAMEB( 1988, ar_xeon,	ar_bios, ar_bios, arcadia, arcadia, xeon,  ROT0, "Arcadia Systems", "Xenon (Arcadia, V 2.3)", 0 )
+GAME( 1988, ar_airh,	ar_bios, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, V 2.1)", 0 )
+GAME( 1988, ar_bowl,	ar_bios, arcadia, arcadia, bowl,  ROT0, "Arcadia Systems", "SportTime Bowling (Arcadia, V 2.1)", 0 )
+GAME( 1987, ar_dart,	ar_bios, arcadia, arcadia, dart,  ROT0, "Arcadia Systems", "World Darts (Arcadia, V 2.1)", 0 )
+GAME( 1988, ar_fast,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
+GAME( 1988, ar_ldrb,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, V 2.4?)", 0 )
+GAME( 1988, ar_ldrba,	ar_ldrb, arcadia, arcadia, ldrba, ROT0, "Arcadia Systems", "Leader Board (Arcadia, V 2.5)", 0 )
+GAME( 1987, ar_ninj,	ar_bios, arcadia, arcadia, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, V 2.5)", 0 )
+GAME( 1988, ar_rdwr,	ar_bios, arcadia, arcadia, rdwr,  ROT0, "Arcadia Systems", "RoadWars (Arcadia, V 2.3)", 0  )
+GAME( 1988, ar_sdwr,	ar_bios, arcadia, arcadia, sdwr,  ROT0, "Arcadia Systems", "Sidewinder (Arcadia, V 2.1)", 0 )
+GAME( 1989, ar_socc,	ar_bios, arcadia, arcadia, socc,  ROT0, "Arcadia Systems", "World Trophy Soccer (Arcadia, V 3.0)", 0 )
+GAME( 1990, ar_spot,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Spot (Arcadia)", 0 )
+GAME( 1987, ar_sprg,	ar_bios, arcadia, arcadia, sprg,  ROT0, "Arcadia Systems", "Space Ranger (Arcadia, V 2.0)", 0 )
+GAME( 1988, ar_xeon,	ar_bios, arcadia, arcadia, xeon,  ROT0, "Arcadia Systems", "Xenon (Arcadia, V 2.3)", 0 )

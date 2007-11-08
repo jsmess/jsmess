@@ -38,21 +38,21 @@
 
 VIDEO_START( cvs );
 
-extern UINT8 *bullet_ram;
+extern UINT8 *cvs_bullet_ram;
 
-extern mame_bitmap *collision_bitmap;
-extern mame_bitmap *collision_background;
+extern mame_bitmap *cvs_collision_bitmap;
+extern mame_bitmap *cvs_collision_background;
 
 
-extern int CollisionRegister;
+extern int cvs_collision_register;
 
 
 // Used here
 //static int    scroll[8];
 //static int    scroll_reg = 0;
 
-UINT8 *effectram;
-int           effectcontrol;
+UINT8 *quasar_effectram;
+int quasar_effectcontrol;
 
 static mame_bitmap *effect_bitmap;
 
@@ -135,7 +135,7 @@ PALETTE_INIT( quasar )
 
 VIDEO_START( quasar )
 {
-	effectram   = auto_malloc(0x400);
+	quasar_effectram   = auto_malloc(0x400);
 
 	effect_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
@@ -161,10 +161,10 @@ VIDEO_UPDATE( quasar )
 		// While we have the current character code, draw the effects layer
 		// intensity / on and off controlled by latch
 
-		if (effectcontrol == 0x30)
+		if (quasar_effectcontrol == 0x30)
 			forecolor = 0;
 		else
-			forecolor = effectram[offs] + (256 * (((effectcontrol >> 4) ^ 3) & 3));
+			forecolor = quasar_effectram[offs] + (256 * (((quasar_effectcontrol >> 4) ^ 3) & 3));
 
 		for(ox=0;ox<8;ox++)
 			for(oy=0;oy<8;oy++)
@@ -184,7 +184,7 @@ VIDEO_UPDATE( quasar )
 
 		if((colorram[offs] & 7) == 0)
 		{
-			drawgfx(collision_background,machine->gfx[0],
+			drawgfx(cvs_collision_background,machine->gfx[0],
 					character,
 					64,
 					0,0,
@@ -201,29 +201,29 @@ VIDEO_UPDATE( quasar )
     /* 2636's */
 
 	fillbitmap(s2636_1_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,cvs_collision_bitmap);
 
 	fillbitmap(s2636_2_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,cvs_collision_bitmap);
 
 	fillbitmap(s2636_3_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,cvs_collision_bitmap);
 
     /* Bullet Hardware */
 
     for (offs = 8; offs < 256; offs++ )
     {
-        if(bullet_ram[offs] != 0)
+        if(cvs_bullet_ram[offs] != 0)
         {
         	int ct;
             for(ct=0;ct<1;ct++)
             {
-            	int bx=255-9-bullet_ram[offs]-ct;
+            	int bx=255-9-cvs_bullet_ram[offs]-ct;
 
             	/* Bullet/Object Collision */
 
-				if (*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) CollisionRegister |= 4;
-                if (*BITMAP_ADDR8(s2636_3_bitmap, offs, bx) != 0) CollisionRegister |= 8;
+				if (*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) cvs_collision_register |= 4;
+				if (*BITMAP_ADDR8(s2636_3_bitmap, offs, bx) != 0) cvs_collision_register |= 8;
 
 				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[7];
             }
@@ -241,7 +241,7 @@ VIDEO_UPDATE( quasar )
 	    	UINT32 *sp2 = (UINT32 *)BITMAP_ADDR8(s2636_2_bitmap, sx, 0);
 		    UINT32 *sp3 = (UINT32 *)BITMAP_ADDR8(s2636_3_bitmap, sx, 0);
 	        UINT64 *dst = (UINT64 *)BITMAP_ADDR16(bitmap, sx, 0);
-		    UINT8  *spb = (UINT8  *)BITMAP_ADDR8(collision_background, sx, 0);
+		    UINT8  *spb = (UINT8  *)BITMAP_ADDR8(cvs_collision_background, sx, 0);
 
             for(offs=0;offs<62;offs++)
             {
@@ -269,8 +269,8 @@ VIDEO_UPDATE( quasar )
 
                     if (SB)
                     {
-    			        if (S1 & SB) CollisionRegister |= 1;
-       	                if (S3 & SB) CollisionRegister |= 2;
+    			        if (S1 & SB) cvs_collision_register |= 1;
+       	                if (S3 & SB) cvs_collision_register |= 2;
                     }
                  }
 

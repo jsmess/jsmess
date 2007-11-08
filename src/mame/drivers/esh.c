@@ -168,7 +168,7 @@ ADDRESS_MAP_END									/*   (someday 0xf8-0xff will probably be a single handle
 
 
 /* PORTS */
-INPUT_PORTS_START( esh )
+static INPUT_PORTS_START( esh )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )

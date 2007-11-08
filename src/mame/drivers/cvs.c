@@ -94,7 +94,7 @@ PALETTE_INIT( cvs );
 VIDEO_UPDATE( cvs );
 VIDEO_START( cvs );
 
-extern UINT8 *bullet_ram;
+extern UINT8 *cvs_bullet_ram;
 
 WRITE8_HANDLER( cvs_videoram_w );
 WRITE8_HANDLER( cvs_bullet_w );
@@ -213,7 +213,7 @@ WRITE8_HANDLER( cvs_DAC2_w )
 	DAC_1_data_w(0,DAC_Value);
 }
 
-READ8_HANDLER( CVS_393hz_Clock_r )
+static READ8_HANDLER( cvs_393hz_Clock_r )
 {
   	if(cpu_scalebyfcount(6) & 1) return 0x80;
     else return 0;
@@ -227,7 +227,7 @@ static struct TMS5110interface tms5110_interface =
 
 static ADDRESS_MAP_START( cvs_cpu1_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-    AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_r, cvs_bullet_w) AM_BASE(&bullet_ram)
+    AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_r, cvs_bullet_w) AM_BASE(&cvs_bullet_ram)
     AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_2636_3_r, cvs_2636_3_w) AM_BASE(&s2636_3_ram)
     AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_2636_2_r, cvs_2636_2_w) AM_BASE(&s2636_2_ram)
     AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_2636_1_r, cvs_2636_1_w) AM_BASE(&s2636_1_ram)
@@ -263,10 +263,10 @@ static ADDRESS_MAP_START( cvs_cpu2_program, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cvs_cpu2_io, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(CVS_393hz_Clock_r)
+    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_Clock_r)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( cvs )
+static INPUT_PORTS_START( cvs )
 
 	PORT_START	/* Matrix 0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )				/* Confirmed */

@@ -137,7 +137,7 @@ connector, but of course, I can be wrong.
 #include "genesis.h"
 
 
-INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
+static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 	PORT_START	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

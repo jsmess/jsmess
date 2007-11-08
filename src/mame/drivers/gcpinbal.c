@@ -230,7 +230,7 @@ ADDRESS_MAP_END
                    INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( gcpinbal )
+static INPUT_PORTS_START( gcpinbal )
 	PORT_START	/* DSW */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )

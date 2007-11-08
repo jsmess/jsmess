@@ -490,7 +490,7 @@ static WRITE16_HANDLER( bloodwar_coin_lockout_w )
 static ADDRESS_MAP_START( bloodwar, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&mcu_ram)		// Shared With MCU
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&kaneko16_mcu_ram)		// Shared With MCU
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(toybox_mcu_com0_w)	// To MCU ?
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(toybox_mcu_com1_w)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w)
@@ -550,7 +550,7 @@ static WRITE16_HANDLER( bonkadv_oki_1_bank_w )
 static ADDRESS_MAP_START( bonkadv, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&mcu_ram)		// Shared With MCU
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&kaneko16_mcu_ram)		// Shared With MCU
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(toybox_mcu_com0_w)	// To MCU ?
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(toybox_mcu_com1_w)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w)
@@ -660,7 +660,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gtmr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM					)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(MWA16_RAM					)	// Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(MWA16_RAM) AM_BASE(&mcu_ram		)	// Shared With MCU
+	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(MWA16_RAM) AM_BASE(&kaneko16_mcu_ram	)	// Shared With MCU
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(toybox_mcu_com0_w			)	// To MCU ?
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(toybox_mcu_com1_w			)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w			)
@@ -794,7 +794,7 @@ WRITE16_HANDLER( shogwarr_oki_bank_w )
 static ADDRESS_MAP_START( shogwarr, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(MRA16_RAM,calc3_mcu_ram_w) AM_BASE(&mcu_ram)	// Shared With MCU
+	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(MRA16_RAM,calc3_mcu_ram_w) AM_BASE(&kaneko16_mcu_ram)	// Shared With MCU
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(calc3_mcu_com0_w)
 	AM_RANGE(0x290000, 0x290001) AM_WRITE(calc3_mcu_com1_w)
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(calc3_mcu_com2_w)
@@ -866,7 +866,7 @@ ADDRESS_MAP_END
                             Bakuretsu Breaker
 ***************************************************************************/
 
-INPUT_PORTS_START( bakubrkr )
+static INPUT_PORTS_START( bakubrkr )
 	PORT_START	// IN0 - Player 1 + DSW - e00000.w
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -936,7 +936,7 @@ INPUT_PORTS_END
                             The Berlin Wall (set 1)
 ***************************************************************************/
 
-INPUT_PORTS_START( berlwall )
+static INPUT_PORTS_START( berlwall )
 	PORT_START	// IN0 - Player 1 - 680000.w
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -1032,7 +1032,7 @@ INPUT_PORTS_END
 
 //  Same as berlwall, but for a different lives setting
 
-INPUT_PORTS_START( berlwalt )
+static INPUT_PORTS_START( berlwalt )
 	PORT_START	// IN0 - Player 1 - 680000.w
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -1126,7 +1126,7 @@ INPUT_PORTS_END
                                     Blaze On
 ***************************************************************************/
 
-INPUT_PORTS_START( blazeon )
+static INPUT_PORTS_START( blazeon )
 	PORT_START	// IN0 - Player 1 + DSW - c00000.w
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy )    )
@@ -1222,7 +1222,7 @@ INPUT_PORTS_END
                                 Blood Warrior
 ***************************************************************************/
 
-INPUT_PORTS_START( bloodwar )
+static INPUT_PORTS_START( bloodwar )
 	PORT_START	// IN0 - Player 1 - b00000.w
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		) PORT_PLAYER(1)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN		) PORT_PLAYER(1)
@@ -1292,7 +1292,7 @@ INPUT_PORTS_END
                                 Bonk's Adventure
 ***************************************************************************/
 
-INPUT_PORTS_START( bonkadv )
+static INPUT_PORTS_START( bonkadv )
 	PORT_START	// IN0 - Player 1 - b00000.w
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		) PORT_PLAYER(1)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN		) PORT_PLAYER(1)
@@ -1363,7 +1363,7 @@ INPUT_PORTS_END
                             Great 1000 Miles Rally
 ***************************************************************************/
 
-INPUT_PORTS_START( gtmr )
+static INPUT_PORTS_START( gtmr )
 	PORT_START	// IN0 - Player 1 - b00000.w
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -1435,7 +1435,7 @@ INPUT_PORTS_END
                             Great 1000 Miles Rally 2
 ***************************************************************************/
 
-INPUT_PORTS_START( gtmr2 )
+static INPUT_PORTS_START( gtmr2 )
 	PORT_START	// IN0 - Player 1 - 100004.w <- b00000.w (cpl)
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -1526,7 +1526,7 @@ INPUT_PORTS_END
                                 Magical Crystal
 ***************************************************************************/
 
-INPUT_PORTS_START( mgcrystl )
+static INPUT_PORTS_START( mgcrystl )
 	PORT_START	// IN0 - Player 1 + DSW - c00000.w
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -1613,7 +1613,7 @@ INPUT_PORTS_END
                                 Shogun Warriors
 ***************************************************************************/
 
-INPUT_PORTS_START( shogwarr )
+static INPUT_PORTS_START( shogwarr )
 	PORT_START	// IN0 - - b80000.w
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)

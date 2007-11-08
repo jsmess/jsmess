@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( stactics )
+static INPUT_PORTS_START( stactics )
 
     PORT_START  /*  IN0 */
     /*PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) Motor status. see stactics_port_0_r */

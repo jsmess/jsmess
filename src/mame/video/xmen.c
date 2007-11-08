@@ -56,6 +56,7 @@ VIDEO_START( xmen )
 
 static mame_bitmap * screen_right;
 static mame_bitmap * screen_left;
+static UINT16 *K053247_ram;
 
 VIDEO_START( xmen6p )
 {
@@ -63,6 +64,7 @@ VIDEO_START( xmen6p )
 
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
 	K053247_vh_start(machine,REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
+	K053247_export_config(&K053247_ram, NULL, NULL, NULL, NULL);
 
 	screen_left = auto_bitmap_alloc(64*8, 32*8, BITMAP_FORMAT_INDEXED16);
 	screen_right = auto_bitmap_alloc(64*8, 32*8, BITMAP_FORMAT_INDEXED16);
@@ -127,7 +129,6 @@ VIDEO_UPDATE( xmen )
 }
 
 extern UINT16 xmen_current_frame;
-extern UINT16 *K053247_ram;
 extern UINT16*xmen6p_spriteramleft;
 extern UINT16*xmen6p_spriteramright;
 extern UINT16*xmen6p_tilemapleft;

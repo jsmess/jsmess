@@ -184,7 +184,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( gogomile )
+static INPUT_PORTS_START( gogomile )
 
 	PORT_START	// IN0 - $800000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -268,7 +268,7 @@ INPUT_PORTS_END
 
 /* Same as gogomile, but the default country is different and
    the coinage settings too. */
-INPUT_PORTS_START( gogomilj )
+static INPUT_PORTS_START( gogomilj )
 
 	PORT_START	// IN0 - $800000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -351,7 +351,7 @@ INPUT_PORTS_END
 
 
 
-INPUT_PORTS_START( pbancho )
+static INPUT_PORTS_START( pbancho )
 
 	PORT_START	// IN0 - $800000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )

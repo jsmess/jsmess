@@ -194,7 +194,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( cop01 )
+static INPUT_PORTS_START( cop01 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -275,7 +275,7 @@ INPUT_PORTS_END
 
 /* There is an ingame bug at 0x00e4 to 0x00e6 that performs the 'rrca' instead of 'rlca'
    so you DSW1-8 has no effect and you can NOT start a game at areas 5 to 8. */
-INPUT_PORTS_START( mightguy )
+static INPUT_PORTS_START( mightguy )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY

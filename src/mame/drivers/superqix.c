@@ -580,7 +580,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( pbillian )
+static INPUT_PORTS_START( pbillian )
 	PORT_START
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
@@ -665,7 +665,7 @@ INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_COCKTAIL
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hotsmash )
+static INPUT_PORTS_START( hotsmash )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -733,7 +733,7 @@ INPUT_PORTS_START( hotsmash )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( superqix )
+static INPUT_PORTS_START( superqix )
 	PORT_START	/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -909,14 +909,14 @@ static struct AY8910interface bootleg_ay8910_interface_2 =
 
 
 
-INTERRUPT_GEN( sqix_interrupt )
+static INTERRUPT_GEN( sqix_interrupt )
 {
 	/* highly suspicious... */
 	if (cpu_getiloops() <= 3)
 		nmi_line_assert();
 }
 
-INTERRUPT_GEN( bootleg_interrupt )
+static INTERRUPT_GEN( bootleg_interrupt )
 {
 	/* highly suspicious... */
 	if (cpu_getiloops() <= 3)

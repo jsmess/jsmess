@@ -3476,7 +3476,7 @@ ROM_END
 
 /*******************************************************************/
 
-INPUT_PORTS_START( alpiner )
+static INPUT_PORTS_START( alpiner )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "DIP4-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -3547,7 +3547,7 @@ INPUT_PORTS_START( alpiner )
 INPUT_PORTS_END /* Alpine Racer */
 
 
-INPUT_PORTS_START( airco22 )
+static INPUT_PORTS_START( airco22 )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "DIP1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -3599,7 +3599,7 @@ INPUT_PORTS_START( airco22 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON3 )
 INPUT_PORTS_END /* Air Combat22 */
 
-INPUT_PORTS_START( cybrcycc )
+static INPUT_PORTS_START( cybrcycc )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "DIP4-1 (Test Mode)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -3649,7 +3649,7 @@ INPUT_PORTS_START( cybrcycc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END /* Cyber Cycles */
 
-INPUT_PORTS_START( propcycl )
+static INPUT_PORTS_START( propcycl )
 	PORT_START /* DIP4 */
 	PORT_DIPNAME( 0x01, 0x01, "DIP1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -3711,7 +3711,7 @@ INPUT_PORTS_START( propcycl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END /* Prop Cycle */
 
-INPUT_PORTS_START( cybrcomm )
+static INPUT_PORTS_START( cybrcomm )
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
@@ -3790,7 +3790,7 @@ INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(2)   /* left joystick: horizontal */
 INPUT_PORTS_END /* Cyber Commando */
 
-INPUT_PORTS_START( timecris )
+static INPUT_PORTS_START( timecris )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "DIP4-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -3836,7 +3836,7 @@ INPUT_PORTS_END /* Time Crisis */
 
 /*****************************************************************************************************/
 
-INPUT_PORTS_START( acedrvr )
+static INPUT_PORTS_START( acedrvr )
 	PORT_START /* 0: DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
@@ -3910,7 +3910,7 @@ INPUT_PORTS_START( acedrvr )
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Ace Driver */
 
-INPUT_PORTS_START( victlap )
+static INPUT_PORTS_START( victlap )
 	PORT_START /* 0: DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
@@ -3986,7 +3986,7 @@ INPUT_PORTS_START( victlap )
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Victory Lap */
 
-INPUT_PORTS_START( ridgera )
+static INPUT_PORTS_START( ridgera )
 	PORT_START /* 0: DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1 (test mode?)" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
@@ -4061,7 +4061,7 @@ INPUT_PORTS_START( ridgera )
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Ridge Racer */
 
-INPUT_PORTS_START( raveracw )
+static INPUT_PORTS_START( raveracw )
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1 (test mode)" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
@@ -4389,4 +4389,3 @@ GAME( 1996, propcycl, 0,        namcos22s, propcycl, propcycl, ROT0, "Namco", "P
 //GAME( 1996, tokyowrx, "Tokyo Wars")
 //GAME( 1996, aquajetx, "Aqua Jet")
 //GAME( 1997, armdilox, "Armidillo Racing")
-//GAME( 199?, downhbkx, "Downhill Bikers")

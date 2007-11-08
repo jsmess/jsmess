@@ -245,7 +245,7 @@ ADDRESS_MAP_END
 //****************************************************************************
 // I/O Port Maps
 
-INPUT_PORTS_START( bwing )
+static INPUT_PORTS_START( bwing )
 	PORT_START
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )

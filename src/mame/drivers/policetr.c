@@ -345,7 +345,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( policetr )
+static INPUT_PORTS_START( policetr )
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -423,7 +423,7 @@ INPUT_PORTS_START( policetr )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( polict10 )
+static INPUT_PORTS_START( polict10 )
 	PORT_INCLUDE( policetr )
 
 	PORT_MODIFY("GUNX1")				/* fake analog X */
@@ -440,7 +440,7 @@ INPUT_PORTS_START( polict10 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sshoot11 )
+static INPUT_PORTS_START( sshoot11 )
 	PORT_INCLUDE( policetr )
 
 	PORT_MODIFY("GUNX1")				/* fake analog X */

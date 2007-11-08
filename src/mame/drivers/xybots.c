@@ -109,7 +109,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( xybots )
+static INPUT_PORTS_START( xybots )
 	PORT_START	/* ffe100 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)

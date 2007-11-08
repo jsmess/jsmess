@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( speedbal )
+static INPUT_PORTS_START( speedbal )
 	PORT_START      /* DSW2 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x06, "70000 200000 1M" )

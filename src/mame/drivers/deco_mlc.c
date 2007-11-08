@@ -330,7 +330,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-INPUT_PORTS_START( mlc )
+static INPUT_PORTS_START( mlc )
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)

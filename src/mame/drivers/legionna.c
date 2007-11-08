@@ -2814,7 +2814,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-INPUT_PORTS_START( legionna )
+static INPUT_PORTS_START( legionna )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START
@@ -2902,7 +2902,7 @@ INPUT_PORTS_START( legionna )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( heatbrl )
+static INPUT_PORTS_START( heatbrl )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START
@@ -3006,7 +3006,7 @@ INPUT_PORTS_START( heatbrl )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( godzilla )
+static INPUT_PORTS_START( godzilla )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START
@@ -3104,7 +3104,7 @@ INPUT_PORTS_START( godzilla )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sdgndmrb )
+static INPUT_PORTS_START( sdgndmrb )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START
@@ -3249,7 +3249,7 @@ INPUT_PORTS_START( sdgndmrb )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( cupsoc )
+static INPUT_PORTS_START( cupsoc )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START

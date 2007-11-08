@@ -68,7 +68,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( starcrus )
+static INPUT_PORTS_START( starcrus )
 		PORT_START	/* player 1 */
 		PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY /* ccw */
 		PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* engine */

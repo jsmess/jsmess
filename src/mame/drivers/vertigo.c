@@ -73,7 +73,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( vertigo )
+static INPUT_PORTS_START( vertigo )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 

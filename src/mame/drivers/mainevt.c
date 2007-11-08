@@ -119,7 +119,7 @@ WRITE8_HANDLER( mainevt_sh_bankswitch_w )
 	upd7759_set_bank_base(0, ((data >> 4) & 0x03) * 0x20000);
 }
 
-WRITE8_HANDLER( dv_sh_bankswitch_w )
+static WRITE8_HANDLER( dv_sh_bankswitch_w )
 {
 	int bank_A,bank_B;
 
@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-INPUT_PORTS_START( mainevt )
+static INPUT_PORTS_START( mainevt )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -351,7 +351,7 @@ INPUT_PORTS_START( mainevt )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mainev2p )
+static INPUT_PORTS_START( mainev2p )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -462,7 +462,7 @@ INPUT_PORTS_START( mainev2p )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( devstors )
+static INPUT_PORTS_START( devstors )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -573,7 +573,7 @@ INPUT_PORTS_START( devstors )
 INPUT_PORTS_END
 
 /* Same as 'devstors', but additional "Cocktail" Dip Switch (even if I don't see the use) */
-INPUT_PORTS_START( devstor2 )
+static INPUT_PORTS_START( devstor2 )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )

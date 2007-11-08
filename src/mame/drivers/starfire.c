@@ -203,7 +203,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( starfire )
+static INPUT_PORTS_START( starfire )
 	PORT_START      /* DSW0 */
 	PORT_DIPNAME( 0x03, 0x00, "Time" )
 	PORT_DIPSETTING(    0x00, "90 Sec" )
@@ -247,7 +247,7 @@ INPUT_PORTS_START( starfire )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( fireone )
+static INPUT_PORTS_START( fireone )
 	PORT_START      /* DSW0 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, "2 Coins/1 Player" )

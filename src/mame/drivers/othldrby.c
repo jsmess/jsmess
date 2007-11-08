@@ -125,7 +125,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( othldrby )
+static INPUT_PORTS_START( othldrby )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

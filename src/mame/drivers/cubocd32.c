@@ -185,7 +185,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( cd32 )
+static INPUT_PORTS_START( cd32 )
 	PORT_START_TAG("CIA0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -390,11 +390,11 @@ static DRIVER_INIT( cd32 )
 /***************************************************************************************************/
 
 /* BIOS */
-GAMEB( 1993, cd32, 0, cd32, cd32, cd32, cd32,   ROT0, "Commodore", "Amiga CD32 Bios", GAME_IS_BIOS_ROOT )
+GAME( 1993, cd32, 0, cd32, cd32, cd32,   ROT0, "Commodore", "Amiga CD32 Bios", GAME_IS_BIOS_ROOT )
 
-GAMEB( 1995, cndypuzl, cd32, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Candy Puzzle (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAMEB( 1995, haremchl, cd32, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Harem Challenge", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAMEB( 1995, lsrquiz,  cd32, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Quiz", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAMEB( 1995, lsrquiz2, cd32, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Quiz '2' Italy (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAMEB( 1996, mgprem11, cd32, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Magic Premium (v1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAMEB( 1995, lasstixx, cd32, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Strixx", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, cndypuzl, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Candy Puzzle (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, haremchl, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Harem Challenge", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, lsrquiz,  cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Quiz", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, lsrquiz2, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Quiz '2' Italy (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, mgprem11, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Magic Premium (v1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, lasstixx, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Strixx", GAME_NOT_WORKING|GAME_NO_SOUND )

@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( snd_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( aquarium )
+static INPUT_PORTS_START( aquarium )
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )

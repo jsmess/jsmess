@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( bladestl )
+static INPUT_PORTS_START( bladestl )
 	PORT_START	/* DSW #1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
@@ -271,7 +271,7 @@ INPUT_PORTS_START( bladestl )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bladstle )
+static INPUT_PORTS_START( bladstle )
 	PORT_START	/* DSW #1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )

@@ -124,7 +124,7 @@ AM_WRITE(gms_write2)
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( rbmk )
+static INPUT_PORTS_START( rbmk )
 
 	PORT_START	/* 16bit */
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Controls ) )

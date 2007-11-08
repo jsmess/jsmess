@@ -167,7 +167,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( bsktball )
+static INPUT_PORTS_START( bsktball )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0xFF, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) /* Sensitivity, clip, min, max */
 

@@ -89,7 +89,7 @@ static const gfx_layout tiles8x8_layout =
 	8*64
 };
 
-void update_palette(void)
+static void update_palette(void)
 {
 	INT8 r, g ,b;
 	int brg = brightness - 0x60;
@@ -543,7 +543,7 @@ static WRITE16_HANDLER(tileram_w)
 	}
 }
 
-WRITE16_HANDLER(paletteram_w)
+static WRITE16_HANDLER(paletteram_w)
 {
 	INT8 r, g, b;
 	int brg = brightness - 0x60;
@@ -610,7 +610,7 @@ ADDRESS_MAP_END
     Port definitions
 ***************************************************************************/
 
-INPUT_PORTS_START( srmp6 )
+static INPUT_PORTS_START( srmp6 )
 
 	PORT_START
 	PORT_BIT ( 0xfe01, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitely discarded

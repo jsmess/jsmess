@@ -105,7 +105,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-INPUT_PORTS_START( dcon )
+static INPUT_PORTS_START( dcon )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START
@@ -163,7 +163,7 @@ INPUT_PORTS_START( dcon )
 	DCON_SYSTEM
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sdgndmps )
+static INPUT_PORTS_START( sdgndmps )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START

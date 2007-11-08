@@ -47,13 +47,13 @@ static UINT8 *dirty_character;
 static UINT8 *character_1_ram;
 static UINT8 *character_2_ram;
 static UINT8 *character_3_ram;
-UINT8 *bullet_ram;
+UINT8 *cvs_bullet_ram;
 
-mame_bitmap *collision_bitmap;
-mame_bitmap *collision_background;
+mame_bitmap *cvs_collision_bitmap;
+mame_bitmap *cvs_collision_background;
 static mame_bitmap *scrolled_background;
 
-int CollisionRegister=0;
+int cvs_collision_register=0;
 
 static int ModeOffset[4] = {223,191,255,127};
 
@@ -160,13 +160,13 @@ READ8_HANDLER( cvs_character_mode_r )
 
 READ8_HANDLER( cvs_collision_r )
 {
-	return CollisionRegister;
+	return cvs_collision_register;
 }
 
 READ8_HANDLER( cvs_collision_clear )
 {
-	CollisionRegister=0;
-    return 0;
+	cvs_collision_register=0;
+	return 0;
 }
 
 WRITE8_HANDLER( cvs_scroll_w )
@@ -218,7 +218,7 @@ WRITE8_HANDLER( cvs_bullet_w )
     {
     	// Bullet Ram
 
-        bullet_ram[offset] = data;
+        cvs_bullet_ram[offset] = data;
     }
     else
     {
@@ -237,7 +237,7 @@ READ8_HANDLER( cvs_bullet_r )
     {
     	// Bullet Ram
 
-        return bullet_ram[offset];
+        return cvs_bullet_ram[offset];
     }
     else
     {
@@ -406,8 +406,8 @@ VIDEO_START( cvs )
 
 	/* 3 bitmaps for collision detection */
 
-	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-	collision_background = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	cvs_collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	cvs_collision_background = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 	scrolled_background = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 }
 
@@ -497,7 +497,7 @@ VIDEO_UPDATE( cvs )
 		}
 
 		if(forecolor)
-			drawgfx(collision_background,machine->gfx[character_bank],
+			drawgfx(cvs_collision_background,machine->gfx[character_bank],
 					character,
 					forecolor,
 					0,0,
@@ -509,46 +509,46 @@ VIDEO_UPDATE( cvs )
     /* Update screen - 8 regions, fixed scrolling area */
 
 	copyscrollbitmap(bitmap,tmpbitmap,0,0,8,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	copyscrollbitmap(scrolled_background,collision_background,0,0,8,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(scrolled_background,cvs_collision_background,0,0,8,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
     /* 2636's */
 
 	fillbitmap(s2636_1_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,cvs_collision_bitmap);
 
 	fillbitmap(s2636_2_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,cvs_collision_bitmap);
 
 	fillbitmap(s2636_3_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,cvs_collision_bitmap);
 
     /* Bullet Hardware */
 
     for (offs = 8; offs < 256; offs++ )
     {
-        if(bullet_ram[offs] != 0)
+        if(cvs_bullet_ram[offs] != 0)
         {
         	int ct;
             for(ct=0;ct<4;ct++)
             {
-            	int bx=255-7-bullet_ram[offs]-ct;
+            	int bx=255-7-cvs_bullet_ram[offs]-ct;
 
             	/* Bullet/Object Collision */
 
-                if((CollisionRegister & 8) == 0)
+                if((cvs_collision_register & 8) == 0)
                 {
                     if ((*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) ||
 					    (*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0) ||
 					    (*BITMAP_ADDR8(s2636_3_bitmap, offs, bx) != 0))
-                        CollisionRegister |= 8;
+                        cvs_collision_register |= 8;
                 }
 
             	/* Bullet/Background Collision */
 
-                if((CollisionRegister & 0x80) == 0)
+                if((cvs_collision_register & 0x80) == 0)
                 {
 					if (*BITMAP_ADDR8(scrolled_background, offs, bx) != machine->pens[0])
-                    	CollisionRegister |= 0x80;
+                    	cvs_collision_register |= 0x80;
                 }
 
 				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[7];
@@ -594,15 +594,15 @@ VIDEO_UPDATE( cvs )
 				    if (spb[BL1] != machine->pens[0]) SB |= 0x00000800;
 				    if (spb[BL0] != machine->pens[0]) SB |= 0x00000008;
 
-       	            if (S1 & S2) CollisionRegister |= 1;
-       	            if (S2 & S3) CollisionRegister |= 2;
-    			    if (S1 & S3) CollisionRegister |= 4;
+       	            if (S1 & S2) cvs_collision_register |= 1;
+       	            if (S2 & S3) cvs_collision_register |= 2;
+    			    if (S1 & S3) cvs_collision_register |= 4;
 
                     if (SB)
                     {
-    			        if (S1 & SB) CollisionRegister |= 16;
-   			            if (S2 & SB) CollisionRegister |= 32;
-       	                if (S3 & SB) CollisionRegister |= 64;
+    			        if (S1 & SB) cvs_collision_register |= 16;
+   			            if (S2 & SB) cvs_collision_register |= 32;
+       	                if (S3 & SB) cvs_collision_register |= 64;
                     }
                  }
 

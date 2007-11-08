@@ -28,7 +28,7 @@ TODO: Add CDDA support
 #define	NVRAM_SIZE 1024
 #define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
 
-struct akiko_def
+static struct akiko_def
 {
 	/* chunky to planar converter */
 	UINT32	c2p_input_buffer[8];

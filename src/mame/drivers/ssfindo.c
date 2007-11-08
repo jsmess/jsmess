@@ -208,8 +208,8 @@ enum
 	MAXIO=128
 };
 
-UINT32 PS7500_IO[MAXIO];
-UINT32 PS7500_FIFO[256];
+static UINT32 PS7500_IO[MAXIO];
+static UINT32 PS7500_FIFO[256];
 static UINT32 *vram;
 static UINT32 flashAdr,flashOffset,adrLatch,flashType,flashN;
 
@@ -527,7 +527,7 @@ static MACHINE_RESET( ssfindo )
 	PS7500_reset();
 }
 
-INPUT_PORTS_START( ssfindo )
+static INPUT_PORTS_START( ssfindo )
 	PORT_START_TAG("PS7500")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
@@ -587,7 +587,7 @@ INPUT_PORTS_START( ssfindo )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( ppcar )
+static INPUT_PORTS_START( ppcar )
 	PORT_START_TAG("PS7500")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 

@@ -116,7 +116,7 @@ ADDRESS_MAP_END
 
 /****************************************************************************/
 
-INPUT_PORTS_START( quizdna )
+static INPUT_PORTS_START( quizdna )
 	PORT_START  /* sw2 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )
@@ -210,7 +210,7 @@ INPUT_PORTS_START( quizdna )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gakupara )
+static INPUT_PORTS_START( gakupara )
     PORT_START  /* sw2 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
@@ -306,7 +306,7 @@ INPUT_PORTS_START( gakupara )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gekiretu )
+static INPUT_PORTS_START( gekiretu )
 	PORT_START  /* dsw2 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )

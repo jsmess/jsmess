@@ -720,7 +720,7 @@ ADDRESS_MAP_END
 /**************************************************************************/
 
 
-INPUT_PORTS_START( mjhokite )
+static INPUT_PORTS_START( mjhokite )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -825,7 +825,7 @@ INPUT_PORTS_START( mjhokite )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( reikaids )
+static INPUT_PORTS_START( reikaids )
 	PORT_START	// IN0  - 0x7801
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -906,7 +906,7 @@ INPUT_PORTS_START( reikaids )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( battlcry )
+static INPUT_PORTS_START( battlcry )
 	PORT_START	// IN0  - 0x7801
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -1044,7 +1044,7 @@ INPUT_PORTS_END
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 
-INPUT_PORTS_START( pteacher )
+static INPUT_PORTS_START( pteacher )
 	PORT_START	/* dip switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -1090,7 +1090,7 @@ INPUT_PORTS_START( pteacher )
 	MJ_KEYBOARD
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jogakuen )
+static INPUT_PORTS_START( jogakuen )
 	PORT_START	/* dip switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -1136,7 +1136,7 @@ INPUT_PORTS_START( jogakuen )
 	MJ_KEYBOARD
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjikaga )
+static INPUT_PORTS_START( mjikaga )
 	PORT_START	/* dip switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -1306,7 +1306,7 @@ static struct YM2203interface ym2203_interface =
 };
 
 
-UPD7810_CONFIG upd_config =
+static UPD7810_CONFIG upd_config =
 {
 	TYPE_7810,
 	NULL	/* io_callback */

@@ -404,7 +404,7 @@ ADDRESS_MAP_END
              INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( rainbow_generic )
+static INPUT_PORTS_START( rainbow_generic )
 	PORT_START_TAG("DSWA")
 	TAITO_MACHINE_COCKTAIL
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
@@ -447,7 +447,7 @@ INPUT_PORTS_START( rainbow_generic )
 	PORT_DIPSETTING(    0x00, "Mode B (World)" ) /* Mode B is TAITO_COINAGE_WORLD */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( rainbow )
+static INPUT_PORTS_START( rainbow )
 	PORT_INCLUDE(rainbow_generic)
 
 	/* 0x390000 -> 0x10cfc2 ($fc2,A5) : DSWA */
@@ -494,7 +494,7 @@ INPUT_PORTS_START( rainbow )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jumping )
+static INPUT_PORTS_START( jumping )
 	PORT_INCLUDE(rainbow_generic)
 
 	/* 0x400000 -> 0x10cfc2 ($fc2,A5) */

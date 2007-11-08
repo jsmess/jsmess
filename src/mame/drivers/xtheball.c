@@ -262,7 +262,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( xtheball )
+static INPUT_PORTS_START( xtheball )
 	PORT_START
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0700, 0x0000, "Target Tickets")

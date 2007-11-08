@@ -278,7 +278,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(	0x40, DEF_STR( Hard ) )\
 	PORT_DIPSETTING(	0xc0, DEF_STR( Hardest ) )
 
-INPUT_PORTS_START( pow )
+static INPUT_PORTS_START( pow )
 POW_IN0
 POW_IN1
 POW_IN2
@@ -311,7 +311,7 @@ POW_DSW2
 INPUT_PORTS_END
 
 /* Identical to pow, but the Language dip switch has no effect */
-INPUT_PORTS_START( powj )
+static INPUT_PORTS_START( powj )
 POW_IN0
 POW_IN1
 POW_IN2
@@ -343,7 +343,7 @@ POW_IN2
 POW_DSW2
 INPUT_PORTS_END
 
-INPUT_PORTS_START( searchar )
+static INPUT_PORTS_START( searchar )
 	PORT_START_TAG("IN0")	/* Player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -466,7 +466,7 @@ INPUT_PORTS_END
 	PORT_START_TAG("ROT2")	/* player 2 12-way rotary control - not used in this game */\
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-INPUT_PORTS_START( streetsm )
+static INPUT_PORTS_START( streetsm )
 STREETS_IN0
 STREETS_IN1
 POW_IN2
@@ -499,7 +499,7 @@ STREETS_REST
 INPUT_PORTS_END
 
 /* Same as streetsm, but Coinage is different */
-INPUT_PORTS_START( streetsj )
+static INPUT_PORTS_START( streetsj )
 STREETS_IN0
 STREETS_IN1
 POW_IN2
@@ -531,7 +531,7 @@ POW_IN2
 STREETS_REST
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ikari3 )
+static INPUT_PORTS_START( ikari3 )
 	PORT_START_TAG("IN0")	/* Player 1 controls, maybe all are active_high? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY

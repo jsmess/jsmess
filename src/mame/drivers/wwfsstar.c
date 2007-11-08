@@ -216,7 +216,7 @@ static READ16_HANDLER( input_port_2_word_r_cust )
  2 Sets of Dipswitches
 *******************************************************************************/
 
-INPUT_PORTS_START( wwfsstar )
+static INPUT_PORTS_START( wwfsstar )
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)

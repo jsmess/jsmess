@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 /****************************************************************************/
 
-INPUT_PORTS_START( strnskil )
+static INPUT_PORTS_START( strnskil )
 	PORT_START  /* dsw1 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -229,7 +229,7 @@ INPUT_PORTS_START( strnskil )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( banbam )
+static INPUT_PORTS_START( banbam )
 	PORT_START  /* dsw1 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "3" )

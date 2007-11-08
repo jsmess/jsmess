@@ -495,7 +495,7 @@ READ32_HANDLER( rabbit_tilemap3_r )
 	return rabbit_tilemap_ram[3][offset];
 }
 
-READ32_HANDLER( randomrabbits )
+static READ32_HANDLER( randomrabbits )
 {
 	return mame_rand(Machine);
 }
@@ -824,7 +824,7 @@ static ADDRESS_MAP_START( tmmjprd_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf00000, 0xffffff) AM_WRITE(MWA32_RAM)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( rabbit )
+static INPUT_PORTS_START( rabbit )
 	PORT_START	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) // Eeprom
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
@@ -878,7 +878,7 @@ INPUT_PORTS_START( rabbit )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tmmjprd )
+static INPUT_PORTS_START( tmmjprd )
 	PORT_START	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test

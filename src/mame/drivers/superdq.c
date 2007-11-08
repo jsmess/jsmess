@@ -240,7 +240,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( superdq )
+static INPUT_PORTS_START( superdq )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )

@@ -283,7 +283,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( Off )) \
 	PORT_DIPSETTING(    0x80, DEF_STR( On )) \
 
-INPUT_PORTS_START (vball)
+static INPUT_PORTS_START (vball)
 	COMMON_PORTS_BEFORE
 	/* The dipswitch instructions in naz's dump (vball) don't quite sync here) */
 	/* Looks like the pins from the dips to the board were mixed up a little. */
@@ -334,7 +334,7 @@ INPUT_PORTS_START (vball)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START (vball2pj)
+static INPUT_PORTS_START (vball2pj)
 	COMMON_PORTS_BEFORE
 
 /* The 2-player roms have the game-time in the difficulty spot, and

@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( laserbas_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x9f) AM_WRITE(palette_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( laserbas )
+static INPUT_PORTS_START( laserbas )
 	PORT_START
 		PORT_DIPNAME( 0x01, 0x00, "0-0" )
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

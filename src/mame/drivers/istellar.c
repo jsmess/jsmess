@@ -199,7 +199,7 @@ ADDRESS_MAP_END
 
 
 /* PORTS */
-INPUT_PORTS_START( istellar )
+static INPUT_PORTS_START( istellar )
 	/* TEST MODE might display a 0 for a short and a 1 for an open circuit?  If so, everything below is inverted. */
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")

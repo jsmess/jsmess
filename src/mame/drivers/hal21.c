@@ -340,7 +340,7 @@ VIDEO_UPDATE( aso )
 }
 
 
-INPUT_PORTS_START( hal21 )
+static INPUT_PORTS_START( hal21 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -419,7 +419,7 @@ INPUT_PORTS_END
 
 /**************************************************************************/
 
-INPUT_PORTS_START( aso )
+static INPUT_PORTS_START( aso )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )

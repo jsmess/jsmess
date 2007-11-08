@@ -151,7 +151,7 @@ VIDEO_UPDATE(skattv)
 	return 0;
 }
 
-INPUT_PORTS_START( skattv )
+static INPUT_PORTS_START( skattv )
 
 INPUT_PORTS_END
 

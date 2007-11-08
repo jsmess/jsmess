@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( blockhl )
+static INPUT_PORTS_START( blockhl )
 	PORT_START	/* PLAYER 1 INPUTS */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)

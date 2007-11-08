@@ -96,7 +96,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( crimfght )
+static INPUT_PORTS_START( crimfght )
 	PORT_START	/* DSW #1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
@@ -222,7 +222,7 @@ INPUT_PORTS_START( crimfght )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( crimfgtj )
+static INPUT_PORTS_START( crimfgtj )
 	PORT_START	/* DSW #1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )

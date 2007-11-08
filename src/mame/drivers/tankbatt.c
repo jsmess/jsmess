@@ -180,7 +180,7 @@ INTERRUPT_GEN( tankbatt_interrupt )
 	else if (tankbatt_nmi_enable) cpunum_set_input_line(0,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-INPUT_PORTS_START( tankbatt )
+static INPUT_PORTS_START( tankbatt )
 	PORT_START	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY

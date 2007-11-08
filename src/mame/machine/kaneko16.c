@@ -17,9 +17,9 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 
 #include "kanekotb.h"	// TOYBOX MCU trojaning results
 
-#define MCU_RESPONSE(d) memcpy(&mcu_ram[mcu_offset], d, sizeof(d))
+#define MCU_RESPONSE(d) memcpy(&kaneko16_mcu_ram[mcu_offset], d, sizeof(d))
 
-UINT16 *mcu_ram;
+UINT16 *kaneko16_mcu_ram;
 
 /***************************************************************************
                                 Gals Panic (set 2)
@@ -147,7 +147,7 @@ WRITE16_HANDLER(bloodwar_calc_w)
   rect2       <----->       |     <----------->  |             <--->
   result      <---------->  |     <-------->     |       <---->
 */
-INT16 calc_compute_x(void)
+static INT16 calc_compute_x(void)
 {
 	INT16 x_coll;
 
@@ -161,7 +161,7 @@ INT16 calc_compute_x(void)
 
 	return x_coll;
 }
-INT16 calc_compute_y(void)
+static INT16 calc_compute_y(void)
 {
 	INT16 y_coll;
 
@@ -282,7 +282,7 @@ void calc3_mcu_init(void)
 
 WRITE16_HANDLER( calc3_mcu_ram_w )
 {
-	COMBINE_DATA(&mcu_ram[offset]);
+	COMBINE_DATA(&kaneko16_mcu_ram[offset]);
 	calc3_mcu_run();
 }
 
@@ -317,7 +317,7 @@ void calc3_mcu_run(void)
 
 	if ( calc3_mcu_status != (1|2|4|8) )	return;
 
-	mcu_command = mcu_ram[calc3_mcu_command_offset + 0];
+	mcu_command = kaneko16_mcu_ram[calc3_mcu_command_offset + 0];
 
 	if (mcu_command == 0) return;
 
@@ -329,25 +329,25 @@ void calc3_mcu_run(void)
 
 		case 0x00ff:
 		{
-			int param1 = mcu_ram[calc3_mcu_command_offset + 1];
-			int param2 = mcu_ram[calc3_mcu_command_offset + 2];
-			int param3 = mcu_ram[calc3_mcu_command_offset + 3];
-//          int param4 = mcu_ram[calc3_mcu_command_offset + 4];
-			int param5 = mcu_ram[calc3_mcu_command_offset + 5];
-//          int param6 = mcu_ram[calc3_mcu_command_offset + 6];
-//          int param7 = mcu_ram[calc3_mcu_command_offset + 7];
+			int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
+			int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
+			int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
+			//int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
+			int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
+			//int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
+			//int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
 
 			// clear old command (handshake to main cpu)
-			mcu_ram[calc3_mcu_command_offset] = 0x0000;
+			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
 
 			// execute the command:
 
-			mcu_ram[param1 / 2] = ~readinputport(4);	// DSW
-			mcu_ram[param2 / 2] = 0xffff;				// ? -1 / anything else
+			kaneko16_mcu_ram[param1 / 2] = ~readinputport(4);	// DSW
+			kaneko16_mcu_ram[param2 / 2] = 0xffff;				// ? -1 / anything else
 
 			calc3_mcu_command_offset = param3 / 2;	// where next command will be written?
 			// param 4?
-			mcu_ram[param5 / 2] = 0x8ee4;				// MCU Rom Checksum!
+			kaneko16_mcu_ram[param5 / 2] = 0x8ee4;				// MCU Rom Checksum!
 			// param 6&7 = address.l
 
 /*
@@ -432,20 +432,20 @@ First code snippet provided by the MCU:
 
 		case 0x0001:
 		{
-//          int param1 = mcu_ram[calc3_mcu_command_offset + 1];
-			int param2 = mcu_ram[calc3_mcu_command_offset + 2];
+			//int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
+			int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
 
 			// clear old command (handshake to main cpu)
-			mcu_ram[calc3_mcu_command_offset] = 0x0000;
+			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
 
 			// execute the command:
 
 			// param1 ?
-			mcu_ram[param2/2 + 0] = 0x0000;		// ?
-			mcu_ram[param2/2 + 1] = 0x0000;		// ?
-			mcu_ram[param2/2 + 2] = 0x0000;		// ?
-			mcu_ram[param2/2 + 3] = 0x0000;		// ? addr.l
-			mcu_ram[param2/2 + 4] = 0x00e0;		// 0000e0: 4e73 rte
+			kaneko16_mcu_ram[param2/2 + 0] = 0x0000;		// ?
+			kaneko16_mcu_ram[param2/2 + 1] = 0x0000;		// ?
+			kaneko16_mcu_ram[param2/2 + 2] = 0x0000;		// ?
+			kaneko16_mcu_ram[param2/2 + 3] = 0x0000;		// ? addr.l
+			kaneko16_mcu_ram[param2/2 + 4] = 0x00e0;		// 0000e0: 4e73 rte
 
 		}
 		break;
@@ -453,16 +453,16 @@ First code snippet provided by the MCU:
 
 		case 0x0002:
 		{
-//          int param1 = mcu_ram[calc3_mcu_command_offset + 1];
-//          int param2 = mcu_ram[calc3_mcu_command_offset + 2];
-//          int param3 = mcu_ram[calc3_mcu_command_offset + 3];
-//          int param4 = mcu_ram[calc3_mcu_command_offset + 4];
-//          int param5 = mcu_ram[calc3_mcu_command_offset + 5];
-//          int param6 = mcu_ram[calc3_mcu_command_offset + 6];
-//          int param7 = mcu_ram[calc3_mcu_command_offset + 7];
+			//int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
+			//int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
+			//int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
+			//int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
+			//int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
+			//int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
+			//int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
 
 			// clear old command (handshake to main cpu)
-			mcu_ram[calc3_mcu_command_offset] = 0x0000;
+			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
 
 			// execute the command:
 
@@ -511,9 +511,9 @@ AM_RANGE(0x360000, 0x360001) AM_WRITE(jchan_mcu_com3_w) //  [ for MCU to return 
 MCU parameters:
 ---------------
 
-mcu_command = mcu_ram[0x0010/2];    // command nb
-mcu_offset  = mcu_ram[0x0012/2]/2;  // offset in shared RAM where MCU will write
-mcu_subcmd  = mcu_ram[0x0014/2];    // sub-command parameter, happens only for command #4
+mcu_command = kaneko16_mcu_ram[0x0010/2];    // command nb
+mcu_offset  = kaneko16_mcu_ram[0x0012/2]/2;  // offset in shared RAM where MCU will write
+mcu_subcmd  = kaneko16_mcu_ram[0x0014/2];    // sub-command parameter, happens only for command #4
 
 
     the only MCU commands found in program code are:
@@ -587,9 +587,9 @@ READ16_HANDLER( toybox_mcu_status_r )
 
 void bloodwar_mcu_run(void)
 {
-	UINT16 mcu_command	=	mcu_ram[0x0010/2];
-	UINT16 mcu_offset	=	mcu_ram[0x0012/2] / 2;
-	UINT16 mcu_data		=	mcu_ram[0x0014/2];
+	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
+	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
+	UINT16 mcu_data		=	kaneko16_mcu_ram[0x0014/2];
 
 	switch (mcu_command >> 8)
 	{
@@ -598,7 +598,7 @@ void bloodwar_mcu_run(void)
 			mame_file *f;
 			if ((f = nvram_fopen(Machine, OPEN_FLAG_READ)) != 0)
 			{
-				mame_fread(f,&mcu_ram[mcu_offset], 128);
+				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
 			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
@@ -610,7 +610,7 @@ void bloodwar_mcu_run(void)
 			mame_file *f;
 			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
 			{
-				mame_fwrite(f,&mcu_ram[mcu_offset], 128);
+				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
 			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
@@ -619,7 +619,7 @@ void bloodwar_mcu_run(void)
 
 		case 0x03:	// DSW
 		{
-			mcu_ram[mcu_offset] = readinputport(4);
+			kaneko16_mcu_ram[mcu_offset] = readinputport(4);
 			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -701,9 +701,9 @@ void bloodwar_mcu_run(void)
 
 void bonkadv_mcu_run(void)
 {
-	UINT16 mcu_command	=	mcu_ram[0x0010/2];
-	UINT16 mcu_offset	=	mcu_ram[0x0012/2] / 2;
-	UINT16 mcu_data		=	mcu_ram[0x0014/2];
+	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
+	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
+	UINT16 mcu_data		=	kaneko16_mcu_ram[0x0014/2];
 
 	switch (mcu_command >> 8)
 	{
@@ -713,7 +713,7 @@ void bonkadv_mcu_run(void)
 			mame_file *f;
 			if ((f = nvram_fopen(Machine, OPEN_FLAG_READ)) != 0)
 			{
-				mame_fread(f,&mcu_ram[mcu_offset], 128);
+				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
 			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
@@ -725,7 +725,7 @@ void bonkadv_mcu_run(void)
 			mame_file *f;
 			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
 			{
-				mame_fwrite(f,&mcu_ram[mcu_offset], 128);
+				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
 			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
@@ -746,7 +746,7 @@ void bonkadv_mcu_run(void)
 
 		case 0x03:	// DSW
 		{
-			mcu_ram[mcu_offset] = readinputport(4);
+			kaneko16_mcu_ram[mcu_offset] = readinputport(4);
 			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -821,9 +821,9 @@ void bonkadv_mcu_run(void)
 
 void gtmr_mcu_run(void)
 {
-	UINT16 mcu_command	=	mcu_ram[0x0010/2];
-	UINT16 mcu_offset	=	mcu_ram[0x0012/2] / 2;
-	UINT16 mcu_data		=	mcu_ram[0x0014/2];
+	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
+	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
+	UINT16 mcu_data		=	kaneko16_mcu_ram[0x0014/2];
 
 	logerror("CPU #0 PC %06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
 
@@ -835,7 +835,7 @@ void gtmr_mcu_run(void)
 			mame_file *f;
 			if ((f = nvram_fopen(Machine, OPEN_FLAG_READ)) != 0)
 			{
-				mame_fread(f,&mcu_ram[mcu_offset], 128);
+				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
 		}
@@ -846,7 +846,7 @@ void gtmr_mcu_run(void)
 			mame_file *f;
 			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
 			{
-				mame_fwrite(f,&mcu_ram[mcu_offset], 128);
+				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
 		}
@@ -854,7 +854,7 @@ void gtmr_mcu_run(void)
 
 		case 0x03:	// DSW
 		{
-			mcu_ram[mcu_offset] = readinputport(4);
+			kaneko16_mcu_ram[mcu_offset] = readinputport(4);
 		}
 		break;
 
@@ -864,26 +864,26 @@ void gtmr_mcu_run(void)
 				strcmp(Machine->gamedrv->name, "gtmra") == 0)
 			{
 				/* MCU writes the string "MM0525-TOYBOX199" to shared ram */
-				mcu_ram[mcu_offset+0] = 0x4d4d;
-				mcu_ram[mcu_offset+1] = 0x3035;
-				mcu_ram[mcu_offset+2] = 0x3235;
-				mcu_ram[mcu_offset+3] = 0x2d54;
-				mcu_ram[mcu_offset+4] = 0x4f59;
-				mcu_ram[mcu_offset+5] = 0x424f;
-				mcu_ram[mcu_offset+6] = 0x5831;
-				mcu_ram[mcu_offset+7] = 0x3939;
+				kaneko16_mcu_ram[mcu_offset+0] = 0x4d4d;
+				kaneko16_mcu_ram[mcu_offset+1] = 0x3035;
+				kaneko16_mcu_ram[mcu_offset+2] = 0x3235;
+				kaneko16_mcu_ram[mcu_offset+3] = 0x2d54;
+				kaneko16_mcu_ram[mcu_offset+4] = 0x4f59;
+				kaneko16_mcu_ram[mcu_offset+5] = 0x424f;
+				kaneko16_mcu_ram[mcu_offset+6] = 0x5831;
+				kaneko16_mcu_ram[mcu_offset+7] = 0x3939;
 			}
 			else
 			{
 				/* MCU writes the string "USMM0713-TB1994 " to shared ram */
-				mcu_ram[mcu_offset+0] = 0x5553;
-				mcu_ram[mcu_offset+1] = 0x4d4d;
-				mcu_ram[mcu_offset+2] = 0x3037;
-				mcu_ram[mcu_offset+3] = 0x3133;
-				mcu_ram[mcu_offset+4] = 0x2d54;
-				mcu_ram[mcu_offset+5] = 0x4231;
-				mcu_ram[mcu_offset+6] = 0x3939;
-				mcu_ram[mcu_offset+7] = 0x3420;
+				kaneko16_mcu_ram[mcu_offset+0] = 0x5553;
+				kaneko16_mcu_ram[mcu_offset+1] = 0x4d4d;
+				kaneko16_mcu_ram[mcu_offset+2] = 0x3037;
+				kaneko16_mcu_ram[mcu_offset+3] = 0x3133;
+				kaneko16_mcu_ram[mcu_offset+4] = 0x2d54;
+				kaneko16_mcu_ram[mcu_offset+5] = 0x4231;
+				kaneko16_mcu_ram[mcu_offset+6] = 0x3939;
+				kaneko16_mcu_ram[mcu_offset+7] = 0x3420;
 			}
 		}
 		break;

@@ -138,6 +138,7 @@ bits(7:4) and bit(24)), X, and Y:
 #include "eminline.h"
 #include "profiler.h"
 #include "video/polynew.h"
+#include "video/rgbutil.h"
 #include "voodoo.h"
 #include "vooddefs.h"
 #include "ui.h"
@@ -231,10 +232,10 @@ static raster_info *find_rasterizer(voodoo_state *v, int texcount);
 static void dump_rasterizer_stats(voodoo_state *v);
 
 /* generic rasterizers */
-static void raster_fastfill(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid);
-static void raster_generic_0tmu(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid);
-static void raster_generic_1tmu(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid);
-static void raster_generic_2tmu(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid);
+static void raster_fastfill(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
+static void raster_generic_0tmu(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
+static void raster_generic_1tmu(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
+static void raster_generic_2tmu(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
 
 
 
@@ -4589,7 +4590,7 @@ static INT32 fastfill(voodoo_state *v)
 	int ex = (v->reg[clipLeftRight].u >> 0) & 0x3ff;
 	int sy = (v->reg[clipLowYHighY].u >> 16) & 0x3ff;
 	int ey = (v->reg[clipLowYHighY].u >> 0) & 0x3ff;
-	scanline_extent extents[256];
+	tri_extent extents[256];
 	UINT16 dithermatrix[16];
 	UINT16 *drawbuf = NULL;
 	UINT32 pixels = 0;
@@ -4650,7 +4651,7 @@ static INT32 fastfill(voodoo_state *v)
 		extra->state = v;
 		memcpy(extra->dither, dithermatrix, sizeof(extra->dither));
 
-		pixels += poly_render_custom(v->poly, drawbuf, NULL, raster_fastfill, y, count, extents);
+		pixels += poly_render_triangle_custom(v->poly, drawbuf, NULL, raster_fastfill, y, count, extents);
 	}
 
 	/* 2 pixels per clock */
@@ -5212,22 +5213,24 @@ static void dump_rasterizer_stats(voodoo_state *v)
     implementation of the 'fastfill' command
 -------------------------------------------------*/
 
-static void raster_fastfill(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void raster_fastfill(void *destbase, INT32 y, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
+	const poly_extra_data *extra = extradata;
 	voodoo_state *v = extra->state;
 	stats_block *stats = &v->thread_stats[threadid];
+	INT32 startx = extent->startx;
+	INT32 stopx = extent->stopx;
 	int scry, x;
 
 	/* determine the screen Y */
-	scry = scanline;
+	scry = y;
 	if (FBZMODE_Y_ORIGIN(v->reg[fbzMode].u))
-		scry = (v->fbi.yorigin - scanline) & 0x3ff;
+		scry = (v->fbi.yorigin - y) & 0x3ff;
 
 	/* fill this RGB row */
 	if (FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u))
 	{
-		UINT16 *ditherow = &extra->dither[(scanline & 3) * 4];
+		const UINT16 *ditherow = &extra->dither[(y & 3) * 4];
 		UINT64 expanded = *(UINT64 *)ditherow;
 		UINT16 *dest = (UINT16 *)destbase + scry * v->fbi.rowpixels;
 

@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(	0x20, "Difficult" )\
 	PORT_DIPSETTING(	0x00, "Very Difficult" )
 
-INPUT_PORTS_START( gng )
+static INPUT_PORTS_START( gng )
 GNG_COMMON
 
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
@@ -196,14 +196,14 @@ GNG_COMMON
 INPUT_PORTS_END
 
 /* identical to gng, but the "unknown" dip switch is Invulnerability */
-INPUT_PORTS_START( makaimur )
+static INPUT_PORTS_START( makaimur )
 GNG_COMMON
 	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( diamond )
+static INPUT_PORTS_START( diamond )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )

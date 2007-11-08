@@ -245,7 +245,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( exzisus )
+static INPUT_PORTS_START( exzisus )
 	PORT_START_TAG("IN0")
 	TAITO_JOY_UDRL_2_BUTTONS( 1 )
 

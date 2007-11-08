@@ -156,7 +156,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( bloodbro )
+static INPUT_PORTS_START( bloodbro )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START
@@ -248,7 +248,7 @@ INPUT_PORTS_START( bloodbro )
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( weststry )
+static INPUT_PORTS_START( weststry )
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" )
 	PORT_DIPSETTING(      0x0001, "Mode 1" )
@@ -337,7 +337,7 @@ INPUT_PORTS_START( weststry )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( skysmash )
+static INPUT_PORTS_START( skysmash )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START

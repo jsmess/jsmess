@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( mjkjidai )
+static INPUT_PORTS_START( mjkjidai )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

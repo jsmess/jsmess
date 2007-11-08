@@ -24,7 +24,6 @@ static UINT16 videoram_modulo;
 static UINT16 videoram_offset;
 
 static UINT8 fixed_layer_source;
-static int *blank_fixed_layer_chars[2];	/* no need to state save */
 int neogeo_fixed_layer_bank_type;		/* no need to state save */
 
 static UINT8 auto_animation_speed;
@@ -280,37 +279,6 @@ void neogeo_set_fixed_layer_source(UINT8 data)
 }
 
 
-static void scan_for_blank_fixed_layer_chars_common(int region, int which)
-{
-	offs_t offs;
-
-	UINT8* gfx_base = memory_region(region);
-	int length = memory_region_length(region);
-
-	/* allocate bit array */
-	blank_fixed_layer_chars[which] = auto_malloc((length >> 5) * sizeof(int));
-
-	for (offs = 0; offs < length; offs += 0x20)
-	{
-		int i;
-		int blank = 1;
-
-		for (i = 0; i < 0x20; i++)
-			if (gfx_base[offs + i] != 0)
-				blank = 0;
-
-		blank_fixed_layer_chars[which][offs >> 5] = blank;
-	}
-}
-
-
-static void scan_for_blank_fixed_layer_chars(void)
-{
-	scan_for_blank_fixed_layer_chars_common(NEOGEO_REGION_FIXED_LAYER_CARTRIDGE, 1);
-	scan_for_blank_fixed_layer_chars_common(NEOGEO_REGION_FIXED_LAYER_BIOS, 0);
-}
-
-
 static void draw_fixed_layer(mame_bitmap *bitmap, int scanline)
 {
 	int x;
@@ -363,10 +331,7 @@ if (banked)
 		break;
 	}
 }
-		/* optimization - skip if all blank */
-		if (blank_fixed_layer_chars[fixed_layer_source][code])
-			pixel_addr = pixel_addr + 8;
-		else
+
 		{
 			UINT8 data = 0;
 			int i;
@@ -900,7 +865,6 @@ VIDEO_START( neogeo )
 	neogeo_videoram = auto_malloc(0x20000);
 
 	compute_rgb_weights();
-	scan_for_blank_fixed_layer_chars();
 	create_sprite_line_timer();
 	create_auto_animation_timer();
 	optimize_sprite_data();

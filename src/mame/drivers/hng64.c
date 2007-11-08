@@ -500,7 +500,7 @@ static UINT8 *hng64_com_op_base;
 static UINT8 *hng64_com_mmu_mem;
 
 /* Hacky stuff */
-char writeString[1024];
+//static char writeString[1024];
 extern UINT32 hng64_hackTilemap3, hng64_hackTm3Count, hng64_rowScrollOffset;
 
 
@@ -1241,7 +1241,7 @@ static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( hng64 )
+static INPUT_PORTS_START( hng64 )
 	PORT_START_TAG("IPT_TEST")
 	PORT_BIT(  0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )

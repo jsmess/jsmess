@@ -152,7 +152,7 @@ static const UINT32 sspeedr_controller_table[] =
 };
 
 
-INPUT_PORTS_START( sspeedr )
+static INPUT_PORTS_START( sspeedr )
 
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x3f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(64) PORT_REMAP_TABLE(sspeedr_controller_table) PORT_WRAPS PORT_SENSITIVITY(25) PORT_KEYDELTA(10)

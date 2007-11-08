@@ -100,7 +100,7 @@ static const ptm6840_interface cchasm_6840_intf =
  *
  *************************************/
 
-INPUT_PORTS_START( cchasm )
+static INPUT_PORTS_START( cchasm )
 	PORT_START /* DSW */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x01, "3" )

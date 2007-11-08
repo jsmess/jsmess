@@ -554,28 +554,28 @@ anything to compare,infact
 
 ******************************************************************************************/
 
-UINT16 *mcu_shared_ram;
-UINT16 *mcu_work_ram;
+UINT16 *nmk16_mcu_shared_ram;
+UINT16 *nmk16_mcu_work_ram;
 
 #define PROT_JSR(_offs_,_protvalue_,_pc_) \
-	if(mcu_shared_ram[(_offs_)/2] == _protvalue_) \
+	if(nmk16_mcu_shared_ram[(_offs_)/2] == _protvalue_) \
 	{ \
-		mcu_shared_ram[(_offs_)/2] = 0xffff;  /*(MCU job done)*/ \
-		mcu_shared_ram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
-		mcu_shared_ram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
-		mcu_shared_ram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
+		nmk16_mcu_shared_ram[(_offs_)/2] = 0xffff;  /*(MCU job done)*/ \
+		nmk16_mcu_shared_ram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
+		nmk16_mcu_shared_ram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
+		nmk16_mcu_shared_ram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
 	} \
 
 #define PROT_INPUT(_offs_,_protvalue_,_protinput_,_input_) \
-	if(mcu_shared_ram[_offs_] == _protvalue_) \
+	if(nmk16_mcu_shared_ram[_offs_] == _protvalue_) \
 	{\
-		mcu_shared_ram[_protinput_] = ((_input_ & 0xffff0000)>>16);\
-		mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
+		nmk16_mcu_shared_ram[_protinput_] = ((_input_ & 0xffff0000)>>16);\
+		nmk16_mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
 static READ16_HANDLER( mcu_shared_r )
 {
-	return mcu_shared_ram[offset];
+	return nmk16_mcu_shared_ram[offset];
 }
 
 //td     - hmf
@@ -644,7 +644,7 @@ f0 - player bombs (8c36)
 
 static WRITE16_HANDLER( hachamf_mcu_shared_w )
 {
-	COMBINE_DATA(&mcu_shared_ram[offset]);
+	COMBINE_DATA(&nmk16_mcu_shared_ram[offset]);
 
 	switch(offset)
 	{
@@ -685,13 +685,13 @@ static WRITE16_HANDLER( hachamf_mcu_shared_w )
 		case 0x1fe/2: PROT_JSR(0x1fe,0x8026,0x8c36);//8c36
 					  PROT_JSR(0x1fe,0x8016,0xd620); break;  //unused
 		case 0xf00/2:
-			if(mcu_shared_ram[0xf00/2] == 0x60fe)
+			if(nmk16_mcu_shared_ram[0xf00/2] == 0x60fe)
 			{
-				mcu_shared_ram[0xf00/2] = 0x0000; //this is the coin counter
-				mcu_shared_ram[0xf02/2] = 0x0000;
-				mcu_shared_ram[0xf04/2] = 0x4ef9;
-				mcu_shared_ram[0xf06/2] = 0x0000;
-				mcu_shared_ram[0xf08/2] = 0x7dc2;
+				nmk16_mcu_shared_ram[0xf00/2] = 0x0000; //this is the coin counter
+				nmk16_mcu_shared_ram[0xf02/2] = 0x0000;
+				nmk16_mcu_shared_ram[0xf04/2] = 0x4ef9;
+				nmk16_mcu_shared_ram[0xf06/2] = 0x0000;
+				nmk16_mcu_shared_ram[0xf08/2] = 0x7dc2;
 			}
 			break;
 	}
@@ -726,14 +726,14 @@ static ADDRESS_MAP_START( hachamf_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x09c000, 0x09c7ff) AM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_WRITE(MWA16_RAM)	/* Work RAM */
 	AM_RANGE(0x0f8000, 0x0f8fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0f9000, 0x0fdfff) AM_WRITE(MWA16_RAM) AM_BASE(&mcu_work_ram) /* Work RAM */
-	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM AM_READWRITE(mcu_shared_r,hachamf_mcu_shared_w) AM_BASE(&mcu_shared_ram)	/* Work RAM */
+	AM_RANGE(0x0f9000, 0x0fdfff) AM_WRITE(MWA16_RAM) AM_BASE(&nmk16_mcu_work_ram) /* Work RAM */
+	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM AM_READWRITE(mcu_shared_r,hachamf_mcu_shared_w) AM_BASE(&nmk16_mcu_shared_ram)	/* Work RAM */
 	AM_RANGE(0x0ff000, 0x0fffff) AM_WRITE(MWA16_RAM) /* Work RAM */
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( tdragon_mcu_shared_w )
 {
-	COMBINE_DATA(&mcu_shared_ram[offset]);
+	COMBINE_DATA(&nmk16_mcu_shared_ram[offset]);
 
 	switch(offset)
 	{
@@ -774,13 +774,13 @@ static WRITE16_HANDLER( tdragon_mcu_shared_w )
 		case 0x7fe/2: PROT_JSR(0x7fe,0x8026,0xa57a);
 					  PROT_JSR(0x7fe,0x8016,0xa57a); break;
 		case 0xf00/2:
-			if(mcu_shared_ram[0xf00/2] == 0x60fe)
+			if(nmk16_mcu_shared_ram[0xf00/2] == 0x60fe)
 			{
-				mcu_shared_ram[0xf00/2] = 0x0000; //this is the coin counter
-				mcu_shared_ram[0xf02/2] = 0x0000;
-				mcu_shared_ram[0xf04/2] = 0x4ef9;
-				mcu_shared_ram[0xf06/2] = 0x0000;
-				mcu_shared_ram[0xf08/2] = 0x92f4;
+				nmk16_mcu_shared_ram[0xf00/2] = 0x0000; //this is the coin counter
+				nmk16_mcu_shared_ram[0xf02/2] = 0x0000;
+				nmk16_mcu_shared_ram[0xf04/2] = 0x4ef9;
+				nmk16_mcu_shared_ram[0xf06/2] = 0x0000;
+				nmk16_mcu_shared_ram[0xf08/2] = 0x92f4;
 			}
 			break;
 	}
@@ -808,8 +808,8 @@ static ADDRESS_MAP_START( tdragon_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_WRITE(MWA16_RAM)	/* Work RAM */
 	AM_RANGE(0x0b8000, 0x0b8fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* Sprite RAM */
-	AM_RANGE(0x0b9000, 0x0bdfff) AM_WRITE(MWA16_RAM) AM_BASE(&mcu_work_ram)	/* Work RAM */
-	AM_RANGE(0x0be000, 0x0befff) AM_RAM AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE(&mcu_shared_ram)	/* Work RAM */
+	AM_RANGE(0x0b9000, 0x0bdfff) AM_WRITE(MWA16_RAM) AM_BASE(&nmk16_mcu_work_ram)	/* Work RAM */
+	AM_RANGE(0x0be000, 0x0befff) AM_RAM AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE(&nmk16_mcu_shared_ram)	/* Work RAM */
 	AM_RANGE(0x0bf000, 0x0bffff) AM_WRITE(MWA16_RAM)	/* Work RAM */
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(nmk_flipscreen_w) /* Maybe */
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
@@ -1127,7 +1127,7 @@ static ADDRESS_MAP_START( bjtwin_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( vandyke )
+static INPUT_PORTS_START( vandyke )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1206,7 +1206,7 @@ INPUT_PORTS_START( vandyke )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( blkheart )
+static INPUT_PORTS_START( blkheart )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1284,7 +1284,7 @@ INPUT_PORTS_START( blkheart )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( manybloc )
+static INPUT_PORTS_START( manybloc )
 	PORT_START	/* IN0 - 0x080000 */
 	PORT_BIT( 0x7fff, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )		// VBLANK ? Check code at 0x005640
@@ -1354,7 +1354,7 @@ INPUT_PORTS_START( manybloc )
 	PORT_DIPSETTING(      0x8000, "Best" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tharrier )
+static INPUT_PORTS_START( tharrier )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1439,7 +1439,7 @@ INPUT_PORTS_START( tharrier )
 	PORT_DIPSETTING(      0x0000, "5" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mustang )
+static INPUT_PORTS_START( mustang )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1517,7 +1517,7 @@ INPUT_PORTS_START( mustang )
 	PORT_DIPSETTING(      0x0000, "5" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hachamf )
+static INPUT_PORTS_START( hachamf )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1596,7 +1596,7 @@ INPUT_PORTS_START( hachamf )
 	PORT_DIPSETTING(    0x80, "4" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( strahl )
+static INPUT_PORTS_START( strahl )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1673,7 +1673,7 @@ INPUT_PORTS_START( strahl )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( acrobatm )
+static INPUT_PORTS_START( acrobatm )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1750,7 +1750,7 @@ INPUT_PORTS_START( acrobatm )
 	PORT_DIPSETTING(    0x00, "5" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bioship )
+static INPUT_PORTS_START( bioship )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1828,7 +1828,7 @@ INPUT_PORTS_START( bioship )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tdragon )
+static INPUT_PORTS_START( tdragon )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1908,7 +1908,7 @@ INPUT_PORTS_START( tdragon )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tdragonb )
+static INPUT_PORTS_START( tdragonb )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1988,7 +1988,7 @@ INPUT_PORTS_START( tdragonb )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ssmissin )
+static INPUT_PORTS_START( ssmissin )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2078,7 +2078,7 @@ INPUT_PORTS_START( ssmissin )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( airattck )
+static INPUT_PORTS_START( airattck )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2156,7 +2156,7 @@ INPUT_PORTS_START( airattck )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( macross )
+static INPUT_PORTS_START( macross )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2244,7 +2244,7 @@ INPUT_PORTS_START( macross )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( macross2 )
+static INPUT_PORTS_START( macross2 )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2333,7 +2333,7 @@ INPUT_PORTS_START( macross2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tdragon2 )
+static INPUT_PORTS_START( tdragon2 )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2421,7 +2421,7 @@ INPUT_PORTS_START( tdragon2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gunnail )
+static INPUT_PORTS_START( gunnail )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2502,7 +2502,7 @@ INPUT_PORTS_START( gunnail )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( raphero )
+static INPUT_PORTS_START( raphero )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2580,7 +2580,7 @@ INPUT_PORTS_START( raphero )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sabotenb )
+static INPUT_PORTS_START( sabotenb )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2654,7 +2654,7 @@ INPUT_PORTS_START( sabotenb )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bjtwin )
+static INPUT_PORTS_START( bjtwin )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2734,7 +2734,7 @@ INPUT_PORTS_START( bjtwin )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( nouryoku )
+static INPUT_PORTS_START( nouryoku )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )

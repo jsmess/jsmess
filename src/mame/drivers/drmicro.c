@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 /****************************************************************************/
 
-INPUT_PORTS_START( drmicro )
+static INPUT_PORTS_START( drmicro )
 	PORT_START // 1P (0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )

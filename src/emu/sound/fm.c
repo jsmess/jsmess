@@ -125,7 +125,7 @@
 #endif
 
 /* shared function building option */
-#define BUILD_OPN (BUILD_YM2203||BUILD_YM2608||BUILD_YM2610||BUILD_YM2610B||BUILD_YM2612)
+#define BUILD_OPN (BUILD_YM2203||BUILD_YM2608||BUILD_YM2610||BUILD_YM2610B||BUILD_YM2612||BUILD_YM3438)
 #define BUILD_OPN_PRESCALER (BUILD_YM2203||BUILD_YM2608)
 
 
@@ -4371,7 +4371,7 @@ int YM2610TimerOver(void *chip,int c)
 
 
 
-#if BUILD_YM2612
+#if (BUILD_YM2612||BUILD_YM3438)
 /*******************************************************************************/
 /*      YM2612 local section                                                   */
 /*******************************************************************************/
@@ -4741,4 +4741,4 @@ int YM2612TimerOver(void *chip,int c)
 	return F2612->OPN.ST.irq;
 }
 
-#endif /* BUILD_YM2612 */
+#endif /* (BUILD_YM2612||BUILD_YM3238) */

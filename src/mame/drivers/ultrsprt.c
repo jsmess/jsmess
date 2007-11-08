@@ -198,7 +198,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-INPUT_PORTS_START( ultrsprt )
+static INPUT_PORTS_START( ultrsprt )
 	PORT_START
 	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)

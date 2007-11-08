@@ -217,7 +217,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( skydiver )
+static INPUT_PORTS_START( skydiver )
 	PORT_START /* IN0 */
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )

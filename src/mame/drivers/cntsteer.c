@@ -484,7 +484,7 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************/
-INPUT_PORTS_START( cntsteer )
+static INPUT_PORTS_START( cntsteer )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -563,7 +563,7 @@ INPUT_PORTS_START( cntsteer )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( zerotrgt )
+static INPUT_PORTS_START( zerotrgt )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

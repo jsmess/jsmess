@@ -17,8 +17,6 @@
 #include "sound/2612intf.h"
 
 
-#if (BUILD_YM2612)
-
 struct ym2612_info
 {
 	sound_stream *	stream;
@@ -235,6 +233,7 @@ WRITE8_HANDLER( YM2612_data_port_1_B_w ){
   YM2612Write(info->chip,3,data);
 }
 
+#if BUILD_YM3438
 
 /************************************************/
 /* Status Read for YM3438 - Chip 0              */
@@ -339,6 +338,8 @@ WRITE8_HANDLER( YM3438_data_port_1_B_w ){
   YM2612Write(info->chip,3,data);
 }
 
+#endif
+
 /**************** end of file ****************/
 
 /**************************************************************************
@@ -378,6 +379,8 @@ void ym2612_get_info(void *token, UINT32 state, sndinfo *info)
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
+
+#if BUILD_YM3438
 
 static void ym3438_set_info(void *token, UINT32 state, sndinfo *info)
 {

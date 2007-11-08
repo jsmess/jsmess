@@ -550,7 +550,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( jalmah )
+static INPUT_PORTS_START( jalmah )
 	/*System port*/
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -708,7 +708,7 @@ INPUT_PORTS_START( jalmah )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( jalmah2 )
+static INPUT_PORTS_START( jalmah2 )
 	/*System port*/
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -836,7 +836,7 @@ INPUT_PORTS_START( jalmah2 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( jalmah2a )
+static INPUT_PORTS_START( jalmah2a )
 	/*System port*/
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )

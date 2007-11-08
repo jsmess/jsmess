@@ -681,7 +681,7 @@ MACHINE_DRIVER_END
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(player) \
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(player)
 
-INPUT_PORTS_START( s1945ii )
+static INPUT_PORTS_START( s1945ii )
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN )
 	PORT_START_TAG("IN1")
@@ -696,7 +696,7 @@ INPUT_PORTS_START( s1945ii )
 	PORT_DIPSETTING(    0x01, DEF_STR( World ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( soldivid )
+static INPUT_PORTS_START( soldivid )
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3 )
 	PORT_START_TAG("IN1")
@@ -711,7 +711,7 @@ INPUT_PORTS_START( soldivid )
 	PORT_DIPSETTING(    0x01, DEF_STR( World ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( daraku )
+static INPUT_PORTS_START( daraku )
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN )
 	PORT_START_TAG("IN1")
@@ -735,7 +735,7 @@ INPUT_PORTS_START( daraku )
 	PORT_DIPSETTING(    0x01, DEF_STR( World ) ) /* Title screen is different, English is default now */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sbomberb )
+static INPUT_PORTS_START( sbomberb )
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN )
 	PORT_START_TAG("IN1")
@@ -750,7 +750,7 @@ INPUT_PORTS_START( sbomberb )
 	PORT_DIPSETTING(    0x01, DEF_STR( World ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gunbird2 ) /* Different Region */
+static INPUT_PORTS_START( gunbird2 ) /* Different Region */
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3 )
 	PORT_START_TAG("IN1")
@@ -766,7 +766,7 @@ INPUT_PORTS_START( gunbird2 ) /* Different Region */
 	PORT_DIPSETTING(    0x02, "International Ver B." )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( s1945iii ) /* Different Region again */
+static INPUT_PORTS_START( s1945iii ) /* Different Region again */
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3 )
 	PORT_START_TAG("IN1")
@@ -782,7 +782,7 @@ INPUT_PORTS_START( s1945iii ) /* Different Region again */
 	PORT_DIPSETTING(    0x01, "International Ver B." )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
+static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3 )
 	PORT_START_TAG("IN1")
@@ -799,7 +799,7 @@ INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
 	PORT_DIPSETTING(    0x01, "International Ver B." )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button */
+static INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button */
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3 )
 	PORT_START_TAG("IN1")
@@ -815,7 +815,7 @@ INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button */
 	PORT_DIPSETTING(    0x01, "International Ver B." )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjgtaste ) /* This will need the Mahjong inputs */
+static INPUT_PORTS_START( mjgtaste ) /* This will need the Mahjong inputs */
 	PORT_START_TAG("IN0")
 	PSIKYOSH_PORT_PLAYER( 1, IPT_START1, IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3 )
 	PORT_START_TAG("IN1")

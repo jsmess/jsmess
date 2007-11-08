@@ -297,7 +297,7 @@ static ADDRESS_MAP_START( marinedt_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(marinedt_pf_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( marinedt )
+static INPUT_PORTS_START( marinedt )
 	PORT_START	/* IN0 */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )

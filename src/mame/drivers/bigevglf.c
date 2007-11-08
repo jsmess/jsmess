@@ -82,14 +82,14 @@ WRITE8_HANDLER( bigevglf_mcu_set_w );
 READ8_HANDLER( bigevglf_mcu_r );
 READ8_HANDLER( bigevglf_mcu_status_r );
 
-WRITE8_HANDLER( beg_gfxcontrol_w );
-WRITE8_HANDLER( beg_palette_w );
+WRITE8_HANDLER( bigevglf_gfxcontrol_w );
+WRITE8_HANDLER( bigevglf_palette_w );
 
-extern UINT8 *beg_spriteram1;
-extern UINT8 *beg_spriteram2;
+extern UINT8 *bigevglf_spriteram1;
+extern UINT8 *bigevglf_spriteram2;
 
 static UINT32 beg_bank=0;
-UINT8 *beg_sharedram;
+static UINT8 *beg_sharedram;
 
 static int sound_nmi_enable=0,pending_nmi=0;
 static UINT8 for_sound = 0;
@@ -225,7 +225,7 @@ static WRITE8_HANDLER( beg_sharedram_w )
 	beg_sharedram[offset] = data;
 }
 
-INPUT_PORTS_START( bigevglf )
+static INPUT_PORTS_START( bigevglf )
 
 	PORT_START	/* port 00 on sub cpu */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -289,7 +289,7 @@ INPUT_PORTS_START( bigevglf )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bigevglj )
+static INPUT_PORTS_START( bigevglj )
 	PORT_INCLUDE(bigevglf)
 
 	PORT_MODIFY("DSW2")
@@ -316,16 +316,16 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(beg_sharedram_w) AM_BASE(&beg_sharedram)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(beg_palette_w) AM_BASE(&paletteram)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&beg_spriteram1) /* sprite 'templates' */
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(bigevglf_palette_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe800, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&bigevglf_spriteram1) /* sprite 'templates' */
 	AM_RANGE(0xf000, 0xf0ff) AM_WRITE(bigevglf_vidram_w)
-	AM_RANGE(0xf840, 0xf8ff) AM_WRITE(MWA8_RAM) AM_BASE(&beg_spriteram2)  /* spriteram (x,y,offset in spriteram1,palette) */
+	AM_RANGE(0xf840, 0xf8ff) AM_WRITE(MWA8_RAM) AM_BASE(&bigevglf_spriteram2)  /* spriteram (x,y,offset in spriteram1,palette) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigevglf_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) 	/* video ram enable ???*/
-	AM_RANGE(0x01, 0x01) AM_WRITE(beg_gfxcontrol_w)  /* plane select */
+	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
 	AM_RANGE(0x02, 0x02) AM_WRITE(beg_banking_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(beg13A_set_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(beg13B_clr_w)

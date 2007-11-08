@@ -281,7 +281,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( asteroid )
+static INPUT_PORTS_START( asteroid )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	/* Bit 2 and 3 are handled in the machine dependent part. */
@@ -329,7 +329,7 @@ INPUT_PORTS_START( asteroid )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( asteroib )
+static INPUT_PORTS_START( asteroib )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* resets */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* resets */
@@ -381,7 +381,7 @@ INPUT_PORTS_START( asteroib )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( asterock )
+static INPUT_PORTS_START( asterock )
 	PORT_START_TAG("IN0")
 	/* Bit 0 is VG_HALT, handled in the machine dependent part */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -433,7 +433,7 @@ INPUT_PORTS_START( asterock )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( astdelux )
+static INPUT_PORTS_START( astdelux )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	/* Bit 2 and 3 are handled in the machine dependent part. */
@@ -502,7 +502,7 @@ INPUT_PORTS_START( astdelux )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( llander )
+static INPUT_PORTS_START( llander )
 	PORT_START_TAG("IN0")
 	/* Bit 0 is VG_HALT, handled in the machine dependent part */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -555,7 +555,7 @@ INPUT_PORTS_START( llander )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( llander1 )
+static INPUT_PORTS_START( llander1 )
 	PORT_START_TAG("IN0")
 	/* Bit 0 is VG_HALT, handled in the machine dependent part */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )

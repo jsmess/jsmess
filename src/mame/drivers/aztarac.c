@@ -136,7 +136,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( aztarac )
+static INPUT_PORTS_START( aztarac )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x1f, 0xf, IPT_AD_STICK_Z ) PORT_MINMAX(0,0x1e) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
 

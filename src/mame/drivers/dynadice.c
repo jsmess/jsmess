@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( dynadice_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( dynadice )
+static INPUT_PORTS_START( dynadice )
 
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )

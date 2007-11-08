@@ -167,7 +167,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-INPUT_PORTS_START( fstarfrc )
+static INPUT_PORTS_START( fstarfrc )
 	PORT_START			/* DIP SW 1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -233,7 +233,7 @@ INPUT_PORTS_START( fstarfrc )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ginkun )
+static INPUT_PORTS_START( ginkun )
 	PORT_START			/* DIP SW 1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -304,7 +304,7 @@ INPUT_PORTS_START( ginkun )
 	/* Not used */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( riot )
+static INPUT_PORTS_START( riot )
 	PORT_START			/* DIP SW 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )

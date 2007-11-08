@@ -14,7 +14,7 @@
 #ifndef __RGBSSE__
 #define __RGBSSE__
 
-#include <xmmintrin.h>
+#include <emmintrin.h>
 
 
 /***************************************************************************

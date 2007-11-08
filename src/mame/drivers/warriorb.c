@@ -306,7 +306,7 @@ ADDRESS_MAP_END
                      INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( darius2d )
+static INPUT_PORTS_START( darius2d )
 	/* 0x800000 -> 0x109e16 ($1e16,A5) and 0x109e1a ($1e1a,A5) */
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")    /* code at 0x0170f2 ('darius2d') or 0x01705c ('drius2do') */
@@ -360,7 +360,7 @@ INPUT_PORTS_START( darius2d )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( warriorb )
+static INPUT_PORTS_START( warriorb )
 	PORT_INCLUDE(darius2d)
 
 	/* 0x800000 -> 0x202912.b (-$56ee,A5) */

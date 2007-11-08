@@ -368,7 +368,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( syvalion )
+static INPUT_PORTS_START( syvalion )
 	/* 0x200000 (port 0) -> 0x102842.b (-$57be,A5) */
 	PORT_START_TAG("DSWA")
 	TAITO_MACHINE_COCKTAIL
@@ -425,7 +425,7 @@ INPUT_PORTS_START( syvalion )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( recordbr )
+static INPUT_PORTS_START( recordbr )
 	/* 0x200000 (port 0) -> 0x1022e6.b (-$5d1a,A5) */
 	PORT_START_TAG("DSWA")
 	TAITO_MACHINE_NO_COCKTAIL
@@ -472,7 +472,7 @@ INPUT_PORTS_START( recordbr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* IPT_BUTTON4 (PL2) in service mode */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dleague )
+static INPUT_PORTS_START( dleague )
 	/* 0x200000 -> 0x100526.b ($526,A5) */
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )            /* see notes */

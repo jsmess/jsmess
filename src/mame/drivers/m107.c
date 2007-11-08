@@ -322,7 +322,7 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-INPUT_PORTS_START( firebarr )
+static INPUT_PORTS_START( firebarr )
 	PORT_INCLUDE(m107_2player)
 
 	PORT_MODIFY("COINS_DIPS")
@@ -339,7 +339,7 @@ INPUT_PORTS_START( firebarr )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dsoccr94 )
+static INPUT_PORTS_START( dsoccr94 )
 	PORT_INCLUDE(m107_4player)
 
 	PORT_MODIFY("COINS_DIPS")
@@ -400,7 +400,7 @@ INPUT_PORTS_START( dsoccr94 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( wpksoc )
+static INPUT_PORTS_START( wpksoc )
 	PORT_INCLUDE(m107_2player)
 INPUT_PORTS_END
 

@@ -608,7 +608,7 @@ static ADDRESS_MAP_START( killbld_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 ADDRESS_MAP_END
 
-UINT16*olds_sharedprotram;
+static UINT16 *olds_sharedprotram;
 
 static ADDRESS_MAP_START( olds_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
@@ -924,7 +924,7 @@ static INPUT_PORTS_START( orld105k )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) // "incorrect version" error
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sango )
+static INPUT_PORTS_START( sango )
 	PORT_START	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1014,7 +1014,7 @@ INPUT_PORTS_START( sango )
 	PORT_DIPSETTING(      0x0005, DEF_STR( World ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( olds )
+static INPUT_PORTS_START( olds )
 	PORT_START	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1105,7 +1105,7 @@ INPUT_PORTS_START( olds )
 	PORT_DIPSETTING(      0x0006, DEF_STR( World ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( killbld )
+static INPUT_PORTS_START( killbld )
 	PORT_START	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1202,7 +1202,7 @@ INPUT_PORTS_START( killbld )
 	PORT_DIPSETTING(      0x0021, DEF_STR( World ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( photoy2k )
+static INPUT_PORTS_START( photoy2k )
 	PORT_START	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1292,7 +1292,7 @@ INPUT_PORTS_START( photoy2k )
 	PORT_DIPSETTING(      0x0005, "Hong Kong" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ddp2 )
+static INPUT_PORTS_START( ddp2 )
 	PORT_START	/* P1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -2215,11 +2215,11 @@ static MACHINE_RESET( olds )
 }
 
 
-UINT16 olds_bs,olds_cmd3;
+static UINT16 olds_bs,olds_cmd3;
 
 
 //UINT16 olds_r16(UINT32 addr)
-READ16_HANDLER( olds_r16 )
+static READ16_HANDLER( olds_r16 )
 {
 //  int offset=addr&0xf;
 	UINT16 res ;
@@ -2245,7 +2245,7 @@ READ16_HANDLER( olds_r16 )
 }
 
 //void olds_w16(UINT32 addr,UINT16 data)
-WRITE16_HANDLER( olds_w16 )
+static WRITE16_HANDLER( olds_w16 )
 {
 //  int offset=addr&0xf;
 

@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( mcu_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( a600xl )
+static INPUT_PORTS_START( a600xl )
 
     PORT_START_TAG("console")  /* IN0 console keys & switch settings */
 	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("Option") PORT_CODE(KEYCODE_F2)

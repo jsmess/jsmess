@@ -385,7 +385,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( bwidow )
+static INPUT_PORTS_START( bwidow )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )	// To fit "Coin B" Dip Switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )	// To fit "Coin A" Dip Switch
@@ -464,7 +464,7 @@ INPUT_PORTS_START( bwidow )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gravitar )
+static INPUT_PORTS_START( gravitar )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )	// To fit "Coin B" Dip Switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )	// To fit "Coin A" Dip Switch
@@ -538,7 +538,7 @@ INPUT_PORTS_START( gravitar )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( lunarbat )
+static INPUT_PORTS_START( lunarbat )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )	// To be similar with other games
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )	// To be similar with other games
@@ -572,7 +572,7 @@ INPUT_PORTS_START( lunarbat )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( spacduel )
+static INPUT_PORTS_START( spacduel )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )	// To fit "Coin B" Dip Switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )	// To fit "Coin A" Dip Switch

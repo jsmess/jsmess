@@ -268,7 +268,7 @@ ADDRESS_MAP_END
 
 ******************************************************************************/
 
-INPUT_PORTS_START( inufuku )
+static INPUT_PORTS_START( inufuku )
 	PORT_START	// 0
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)

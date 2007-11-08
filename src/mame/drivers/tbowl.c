@@ -294,7 +294,7 @@ bits 0 and 1 ? I'll try to have another look when the sprites stuff is finished.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START##_n_ )
 
 
-INPUT_PORTS_START( tbowl )
+static INPUT_PORTS_START( tbowl )
 	PORT_START	/* player 1 inputs (0xfc00) */
 	TBOWL_PLAYER_INPUT(1)
 
@@ -400,7 +400,7 @@ INPUT_PORTS_END
 
 /* same as 'tbowl', but different "Quarter Time" Dip Switch
    ("3:00" and "4:00" are inverted) */
-INPUT_PORTS_START( tbowlj )
+static INPUT_PORTS_START( tbowlj )
 	PORT_START	/* player 1 inputs (0xfc00) */
 	TBOWL_PLAYER_INPUT(1)
 

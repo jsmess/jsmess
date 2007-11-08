@@ -218,7 +218,7 @@ ADDRESS_MAP_END
                         Billiard Academy Real Break
 ***************************************************************************/
 
-INPUT_PORTS_START( realbrk )
+static INPUT_PORTS_START( realbrk )
 	PORT_START	// IN0 - $c00000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -314,7 +314,7 @@ INPUT_PORTS_START( realbrk )
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pkgnsh )
+static INPUT_PORTS_START( pkgnsh )
 	PORT_START	// IN0 - $c00002.w
 	PORT_BIT(  0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -422,7 +422,7 @@ INPUT_PORTS_START( pkgnsh )
 	PORT_BIT(     0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pkgnshdx )
+static INPUT_PORTS_START( pkgnshdx )
 	PORT_START	// IN0 - $c00002.w
 	PORT_BIT(  0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )

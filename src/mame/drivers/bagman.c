@@ -267,7 +267,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( bagman )
+static INPUT_PORTS_START( bagman )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -315,7 +315,7 @@ INPUT_PORTS_END
 
 /* EXACTLY the same as bagman, the only difference is that
 Languade dip is replaced by Demo Sounds */
-INPUT_PORTS_START( bagmans )
+static INPUT_PORTS_START( bagmans )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -364,7 +364,7 @@ INPUT_PORTS_END
 
 /* EXACTLY the same as bagman, the only difference is that the START1 button */
 /* also acts as the shoot button. */
-INPUT_PORTS_START( sbagman )
+static INPUT_PORTS_START( sbagman )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -412,7 +412,7 @@ INPUT_PORTS_START( sbagman )
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pickin )
+static INPUT_PORTS_START( pickin )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -459,7 +459,7 @@ INPUT_PORTS_START( pickin )
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( botanic )
+static INPUT_PORTS_START( botanic )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )

@@ -63,7 +63,7 @@ ADDRESS_MAP_END
 
 /****************************************************************************/
 
-INPUT_PORTS_START( ikki )
+static INPUT_PORTS_START( ikki )
 	PORT_START  /* dsw1 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )

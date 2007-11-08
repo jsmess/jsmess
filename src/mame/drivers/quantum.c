@@ -164,7 +164,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( quantum )
+static INPUT_PORTS_START( quantum )
 	PORT_START		/* IN0 */
 	/* YHALT here MUST BE ALWAYS 0  */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL )	/* vg YHALT */

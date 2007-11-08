@@ -1275,7 +1275,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INPUT_PORTS_START( arescue )
+static INPUT_PORTS_START( arescue )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1301,7 +1301,7 @@ INPUT_PORTS_START( arescue )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( alien3 )
+static INPUT_PORTS_START( alien3 )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1330,7 +1330,7 @@ INPUT_PORTS_START( alien3 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( arabfgt )
+static INPUT_PORTS_START( arabfgt )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1363,7 +1363,7 @@ INPUT_PORTS_START( arabfgt )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( arabfgtu )
+static INPUT_PORTS_START( arabfgtu )
 	PORT_INCLUDE( arabfgt )
 
 	PORT_MODIFY("SERVICE12")
@@ -1376,7 +1376,7 @@ INPUT_PORTS_START( arabfgtu )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( brival )
+static INPUT_PORTS_START( brival )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1397,7 +1397,7 @@ INPUT_PORTS_START( brival )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( darkedge )
+static INPUT_PORTS_START( darkedge )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1422,12 +1422,12 @@ INPUT_PORTS_START( darkedge )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dbzvrvs )
+static INPUT_PORTS_START( dbzvrvs )
 	PORT_INCLUDE( system32_generic )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( f1en )
+static INPUT_PORTS_START( f1en )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1468,7 +1468,7 @@ INPUT_PORTS_START( f1en )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( f1lap )
+static INPUT_PORTS_START( f1lap )
 	PORT_INCLUDE( f1en )
 
 	PORT_MODIFY("P1")
@@ -1478,7 +1478,7 @@ INPUT_PORTS_START( f1lap )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( ga2 )
+static INPUT_PORTS_START( ga2 )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_START_TAG("EXTRA1")
@@ -1507,7 +1507,7 @@ INPUT_PORTS_START( ga2 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ga2u )
+static INPUT_PORTS_START( ga2u )
 	PORT_INCLUDE( ga2 )
 
 	PORT_MODIFY("SERVICE12")
@@ -1520,7 +1520,7 @@ INPUT_PORTS_START( ga2u )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( harddunk )
+static INPUT_PORTS_START( harddunk )
 	PORT_INCLUDE( multi32_generic )
 
 	PORT_MODIFY("P1_A")
@@ -1600,7 +1600,7 @@ INPUT_PORTS_START( harddunk )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( holo )
+static INPUT_PORTS_START( holo )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1611,7 +1611,7 @@ INPUT_PORTS_START( holo )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( jpark )
+static INPUT_PORTS_START( jpark )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1634,7 +1634,7 @@ INPUT_PORTS_START( jpark )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( orunners )
+static INPUT_PORTS_START( orunners )
 	PORT_INCLUDE( multi32_generic )
 
 	PORT_MODIFY("P1_A")
@@ -1679,7 +1679,7 @@ INPUT_PORTS_START( orunners )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( radm )
+static INPUT_PORTS_START( radm )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1721,7 +1721,7 @@ INPUT_PORTS_START( radm )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( radr )
+static INPUT_PORTS_START( radr )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1761,7 +1761,7 @@ INPUT_PORTS_START( radr )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( scross )
+static INPUT_PORTS_START( scross )
 	PORT_INCLUDE( multi32_generic )
 
 	PORT_MODIFY("P1_A")
@@ -1790,7 +1790,7 @@ INPUT_PORTS_START( scross )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( slipstrm )
+static INPUT_PORTS_START( slipstrm )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1830,7 +1830,7 @@ INPUT_PORTS_START( slipstrm )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sonic )
+static INPUT_PORTS_START( sonic )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1865,7 +1865,7 @@ INPUT_PORTS_START( sonic )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( spidman )
+static INPUT_PORTS_START( spidman )
 	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1")
@@ -1899,7 +1899,7 @@ INPUT_PORTS_START( spidman )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( spidmanu )
+static INPUT_PORTS_START( spidmanu )
 	PORT_INCLUDE( spidman )
 
 	PORT_MODIFY("SERVICE12")
@@ -1912,12 +1912,12 @@ INPUT_PORTS_START( spidmanu )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( svf )
+static INPUT_PORTS_START( svf )
 	PORT_INCLUDE( system32_generic )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( titlef )
+static INPUT_PORTS_START( titlef )
 	PORT_INCLUDE( multi32_generic )
 
 	PORT_MODIFY("P1_A")

@@ -3080,7 +3080,7 @@ ADDRESS_MAP_END
                                 Arbalester
 ***************************************************************************/
 
-INPUT_PORTS_START( arbalest )
+static INPUT_PORTS_START( arbalest )
 	PORT_START_TAG("IN0")	// Player 1
 	JOY_TYPE2_2BUTTONS(1)
 
@@ -3147,7 +3147,7 @@ INPUT_PORTS_END
                                 Athena no Hatena?
 ***************************************************************************/
 
-INPUT_PORTS_START( atehate )
+static INPUT_PORTS_START( atehate )
 	PORT_START_TAG("IN0")	// Player 1
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -3230,7 +3230,7 @@ INPUT_PORTS_END
                                 Blandia
 ***************************************************************************/
 
-INPUT_PORTS_START( blandia )
+static INPUT_PORTS_START( blandia )
 	PORT_START_TAG("IN0")	//Player 1 - $400000.w
 	JOY_TYPE1_3BUTTONS(1)
 
@@ -3301,7 +3301,7 @@ INPUT_PORTS_END
                                 Block Carnival
 ***************************************************************************/
 
-INPUT_PORTS_START( blockcar )
+static INPUT_PORTS_START( blockcar )
 	PORT_START_TAG("IN0")	//Player 1 - $500001.b
 	JOY_TYPE1_2BUTTONS(1)	// button2 = speed up
 
@@ -3370,7 +3370,7 @@ INPUT_PORTS_END
                                 Caliber 50
 ***************************************************************************/
 
-INPUT_PORTS_START( calibr50 )
+static INPUT_PORTS_START( calibr50 )
 	PORT_START_TAG("IN0")	//Player 1
 	JOY_TYPE2_2BUTTONS(1)
 
@@ -3444,7 +3444,7 @@ INPUT_PORTS_END
                                 Daioh
 ***************************************************************************/
 
-INPUT_PORTS_START( daioh )
+static INPUT_PORTS_START( daioh )
 	PORT_START_TAG("IN0")
 	JOY_TYPE1_3BUTTONS(1)
 
@@ -3531,7 +3531,7 @@ INPUT_PORTS_END
                                 Dragon Unit
 ***************************************************************************/
 
-INPUT_PORTS_START( drgnunit )
+static INPUT_PORTS_START( drgnunit )
 	PORT_START_TAG("IN0")	//Player 1
 	JOY_TYPE1_3BUTTONS(1)
 
@@ -3606,7 +3606,7 @@ INPUT_PORTS_END
                                 DownTown
 ***************************************************************************/
 
-INPUT_PORTS_START( downtown )
+static INPUT_PORTS_START( downtown )
 	PORT_START_TAG("IN0")	//Player 1
 	JOY_TYPE2_2BUTTONS(1)
 
@@ -3693,7 +3693,7 @@ INPUT_PORTS_END
                                 Eight Force
 ***************************************************************************/
 
-INPUT_PORTS_START( eightfrc )
+static INPUT_PORTS_START( eightfrc )
 	PORT_START_TAG("IN0")	//Player 1
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -3764,7 +3764,7 @@ INPUT_PORTS_END
                                 Extreme Downhill
 ***************************************************************************/
 
-INPUT_PORTS_START( extdwnhl )
+static INPUT_PORTS_START( extdwnhl )
 	PORT_START_TAG("IN0") //Player 1
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
@@ -3858,7 +3858,7 @@ INPUT_PORTS_END
                                 Gundhara
 ***************************************************************************/
 
-INPUT_PORTS_START( gundhara )
+static INPUT_PORTS_START( gundhara )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_3BUTTONS(1)
 
@@ -3927,7 +3927,7 @@ INPUT_PORTS_END
                                 Zombie Raid
 ***************************************************************************/
 
-INPUT_PORTS_START( zombraid )
+static INPUT_PORTS_START( zombraid )
 	PORT_START_TAG("IN0") //Player 1
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -4023,7 +4023,7 @@ INPUT_PORTS_END
                                 J.J.Squawkers
 ***************************************************************************/
 
-INPUT_PORTS_START( jjsquawk )
+static INPUT_PORTS_START( jjsquawk )
 	PORT_START_TAG("IN0") //Player 1 - $400000.w
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -4091,7 +4091,7 @@ INPUT_PORTS_END
                 (Kamen) Masked Riders Club Battle Race
 ***************************************************************************/
 
-INPUT_PORTS_START( kamenrid )
+static INPUT_PORTS_START( kamenrid )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)	// BUTTON3 in "test mode" only
 
@@ -4177,7 +4177,7 @@ INPUT_PORTS_END
 #define KRZYBOWL_TRACKBALL(_dir_, _n_ ) \
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_PLAYER(_n_) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_REVERSE
 
-INPUT_PORTS_START( krzybowl )
+static INPUT_PORTS_START( krzybowl )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_3BUTTONS(1)
 
@@ -4260,7 +4260,7 @@ INPUT_PORTS_END
                                 Mad Shark
 ***************************************************************************/
 
-INPUT_PORTS_START( madshark )
+static INPUT_PORTS_START( madshark )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -4338,7 +4338,7 @@ INPUT_PORTS_END
                                 Meta Fox
 ***************************************************************************/
 
-INPUT_PORTS_START( metafox )
+static INPUT_PORTS_START( metafox )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE2_2BUTTONS(1)
 
@@ -4407,7 +4407,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 
-INPUT_PORTS_START( msgundam )
+static INPUT_PORTS_START( msgundam )
 	PORT_START_TAG("IN0") //Player 1 - $400000.w
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -4475,7 +4475,7 @@ INPUT_PORTS_START( msgundam )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( msgunda1 )
+static INPUT_PORTS_START( msgunda1 )
 	PORT_START_TAG("IN0") //Player 1 - $400000.w
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -4549,7 +4549,7 @@ INPUT_PORTS_END
                             Oishii Puzzle
 ***************************************************************************/
 
-INPUT_PORTS_START( oisipuzl )
+static INPUT_PORTS_START( oisipuzl )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -4618,7 +4618,7 @@ INPUT_PORTS_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-INPUT_PORTS_START( kiwame )
+static INPUT_PORTS_START( kiwame )
 	PORT_START_TAG("IN0") //Unused
 	PORT_START_TAG("IN1") //Unused
 
@@ -4733,7 +4733,7 @@ INPUT_PORTS_END
                                 Quiz Kokology
 ***************************************************************************/
 
-INPUT_PORTS_START( qzkklogy )
+static INPUT_PORTS_START( qzkklogy )
 	PORT_START_TAG("IN0") //Player 1 - $b00001.b
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -4813,7 +4813,7 @@ INPUT_PORTS_END
                                 Quiz Kokology 2
 ***************************************************************************/
 
-INPUT_PORTS_START( qzkklgy2 )
+static INPUT_PORTS_START( qzkklgy2 )
 	PORT_START_TAG("IN0") //Player 1 - $b00001.b
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -4892,7 +4892,7 @@ INPUT_PORTS_END
                                     Rezon
 ***************************************************************************/
 
-INPUT_PORTS_START( rezon )
+static INPUT_PORTS_START( rezon )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_3BUTTONS(1)	// 1 used??
 
@@ -4961,7 +4961,7 @@ INPUT_PORTS_START( rezon )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( rezont )
+static INPUT_PORTS_START( rezont )
 
 	PORT_INCLUDE( rezon )
 
@@ -4977,7 +4977,7 @@ INPUT_PORTS_END
     When the "Stage Select" dip switch is on and button1 is pressed during boot,
     pressing P1's button3 freezes the game (pressing P2's button3 resumes it).
 */
-INPUT_PORTS_START( neobattl )
+static INPUT_PORTS_START( neobattl )
 	PORT_START_TAG("IN0") // Player 1 - $400000.w
 	JOY_TYPE1_1BUTTON(1)	// bump to 3 buttons for freezing to work
 
@@ -5053,7 +5053,7 @@ INPUT_PORTS_END
                                 Sokonuke
 ***************************************************************************/
 
-INPUT_PORTS_START( sokonuke )
+static INPUT_PORTS_START( sokonuke )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_1BUTTON(1)
 
@@ -5125,7 +5125,7 @@ INPUT_PORTS_END
                                 Strike Gunner
 ***************************************************************************/
 
-INPUT_PORTS_START( stg )
+static INPUT_PORTS_START( stg )
 	PORT_START_TAG("IN0") //Player 1 - $b00001.b
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -5194,7 +5194,7 @@ INPUT_PORTS_END
                             Thunder & Lightning
 ***************************************************************************/
 
-INPUT_PORTS_START( thunderl )
+static INPUT_PORTS_START( thunderl )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)	// button2 = speed up
 
@@ -5284,7 +5284,7 @@ INPUT_PORTS_END
                                 Thundercade (US)
 ***************************************************************************/
 
-INPUT_PORTS_START( tndrcade )
+static INPUT_PORTS_START( tndrcade )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -5351,7 +5351,7 @@ INPUT_PORTS_END
                                 Thundercade (Japan)
 ***************************************************************************/
 
-INPUT_PORTS_START( tndrcadj )
+static INPUT_PORTS_START( tndrcadj )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -5419,7 +5419,7 @@ INPUT_PORTS_END
                                 Twin Eagle
 ***************************************************************************/
 
-INPUT_PORTS_START( twineagl )
+static INPUT_PORTS_START( twineagl )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -5485,7 +5485,7 @@ INPUT_PORTS_END
                                 Ultraman Club
 ***************************************************************************/
 
-INPUT_PORTS_START( umanclub )
+static INPUT_PORTS_START( umanclub )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -5560,7 +5560,7 @@ INPUT_PORTS_END
                             Ultra Toukon Densetsu
 ***************************************************************************/
 
-INPUT_PORTS_START( utoukond )
+static INPUT_PORTS_START( utoukond )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_3BUTTONS(1)
 
@@ -5651,7 +5651,7 @@ INPUT_PORTS_END
 #define TRACKBALL(_dir_) \
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
 
-INPUT_PORTS_START( usclssic )
+static INPUT_PORTS_START( usclssic )
 	PORT_START_TAG("IN0")
 	TRACKBALL(X)
 	PORT_BIT   ( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5728,7 +5728,7 @@ INPUT_PORTS_END
                                 War of Aero
 ***************************************************************************/
 
-INPUT_PORTS_START( wrofaero )
+static INPUT_PORTS_START( wrofaero )
 	PORT_START_TAG("IN0") //Player 1 - $400000.w
 	JOY_TYPE1_3BUTTONS(1)	// 3rd button selects the weapon
 							// when the dsw for cheating is on
@@ -5805,7 +5805,7 @@ INPUT_PORTS_END
                                     Wit's
 ***************************************************************************/
 
-INPUT_PORTS_START( wits )
+static INPUT_PORTS_START( wits )
 	PORT_START_TAG("IN0") //Player 1
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -5885,7 +5885,7 @@ INPUT_PORTS_END
                                 Zing Zing Zip
 ***************************************************************************/
 
-INPUT_PORTS_START( zingzip )
+static INPUT_PORTS_START( zingzip )
 	PORT_START_TAG("IN0") //Player 1 - $400000.w
 	JOY_TYPE1_2BUTTONS(1)
 
@@ -5959,7 +5959,7 @@ INPUT_PORTS_END
   Pairs Love
 *************************************/
 
-INPUT_PORTS_START( pairlove )
+static INPUT_PORTS_START( pairlove )
 	PORT_START_TAG("IN0") //Player 1 - $500001.b
 	JOY_TYPE1_2BUTTONS(1)	// button2 = speed up
 
@@ -6031,7 +6031,7 @@ INPUT_PORTS_END
                                 Crazy Fight
 ***************************************************************************/
 
-INPUT_PORTS_START( crazyfgt )
+static INPUT_PORTS_START( crazyfgt )
 	PORT_START_TAG("IN0") //Coins - $610000.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )

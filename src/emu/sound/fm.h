@@ -10,7 +10,8 @@
 #define BUILD_YM2608  (HAS_YM2608)		/* build YM2608(OPNA)  emulator */
 #define BUILD_YM2610  (HAS_YM2610)		/* build YM2610(OPNB)  emulator */
 #define BUILD_YM2610B (HAS_YM2610B)		/* build YM2610B(OPNB?)emulator */
-#define BUILD_YM2612  (HAS_YM2612 || HAS_YM3438)		/* build YM2612(OPN2)  emulator */
+#define BUILD_YM2612  (HAS_YM2612)		/* build YM2612(OPN2)  emulator */
+#define BUILD_YM3438  (HAS_YM3438)		/* build YM3438(OPN) emulator */
 
 /* select bit size of output : 8 or 16 */
 #define FM_SAMPLE_BITS 16
@@ -58,7 +59,7 @@ struct ssg_callbacks
   void YM2610UpdateRequest(void *param);
   #define YM2610UpdateReq(chip) YM2610UpdateRequest(chip);
 #endif
-#if BUILD_YM2612
+#if (BUILD_YM2612||BUILD_YM3438)
   /* in 2612intf.c */
   void YM2612UpdateRequest(void *param);
   #define YM2612UpdateReq(chip) YM2612UpdateRequest(chip);
@@ -191,9 +192,9 @@ int YM2610Write(void *chip, int a,unsigned char v);
 unsigned char YM2610Read(void *chip,int a);
 int YM2610TimerOver(void *chip, int c );
 void YM2610Postload(void *chip);
-#endif /* BUILD_YM2610 */
+#endif /* (BUILD_YM2610||BUILD_YM2610B) */
 
-#if BUILD_YM2612
+#if (BUILD_YM2612||BUILD_YM3438)
 void * YM2612Init(void *param, int index, int baseclock, int rate,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler);
 void YM2612Shutdown(void *chip);
@@ -204,7 +205,7 @@ int YM2612Write(void *chip, int a,unsigned char v);
 unsigned char YM2612Read(void *chip,int a);
 int YM2612TimerOver(void *chip, int c );
 void YM2612Postload(void *chip);
-#endif /* BUILD_YM2612 */
+#endif /* (BUILD_YM2612||BUILD_YM3438) */
 
 
 #endif /* _H_FM_FM_ */

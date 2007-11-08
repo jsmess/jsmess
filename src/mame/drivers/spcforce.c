@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( spcforce )
+static INPUT_PORTS_START( spcforce )
 	PORT_START      /* DSW */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
@@ -169,7 +169,7 @@ INPUT_PORTS_START( spcforce )
 INPUT_PORTS_END
 
 /* same as spcforce, but no cocktail mode */
-INPUT_PORTS_START( spcforc2 )
+static INPUT_PORTS_START( spcforc2 )
 	PORT_START      /* DSW */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )

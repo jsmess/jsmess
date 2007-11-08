@@ -132,7 +132,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( canyon )
+static INPUT_PORTS_START( canyon )
 	PORT_START      /* DSW */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )

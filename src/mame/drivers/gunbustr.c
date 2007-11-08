@@ -220,7 +220,7 @@ ADDRESS_MAP_END
              INPUT PORTS (dips in eprom)
 ***********************************************************/
 
-INPUT_PORTS_START( gunbustr )
+static INPUT_PORTS_START( gunbustr )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )

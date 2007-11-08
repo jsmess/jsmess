@@ -526,7 +526,7 @@ ADDRESS_MAP_END
 
 /* INPUT ports ***************************************************************/
 
-INPUT_PORTS_START( kickgoal )
+static INPUT_PORTS_START( kickgoal )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)

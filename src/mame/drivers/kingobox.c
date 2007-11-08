@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( rk_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( kingofb )
+static INPUT_PORTS_START( kingofb )
     PORT_START /* DSW0 - 0xfc01 */
     PORT_DIPNAME( 0x03, 0x01, "Rest Up Points" )
     PORT_DIPSETTING(    0x02, "70000" )
@@ -332,7 +332,7 @@ INPUT_PORTS_START( kingofb )
 INPUT_PORTS_END
 
 /* Ring King */
-INPUT_PORTS_START( ringking )
+static INPUT_PORTS_START( ringking )
     PORT_START /* DSW0 - 0xe000 */
     PORT_DIPNAME( 0x03, 0x03, "Replay" )
     PORT_DIPSETTING(    0x01, "70000" )

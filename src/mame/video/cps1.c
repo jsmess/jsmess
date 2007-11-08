@@ -656,7 +656,7 @@ CPS1 VIDEO RENDERER
 
 */
 /* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
-const int stars_rom_size = 0x2000;
+static const int stars_rom_size = 0x2000;
 
 /* PSL: CPS2 support */
 const int cps2_obj_size    =0x2000;

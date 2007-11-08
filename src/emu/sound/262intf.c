@@ -11,8 +11,6 @@
 #include "ymf262.h"
 
 
-#if (HAS_YMF262)
-
 struct ymf262_info
 {
 	sound_stream *	stream;
@@ -188,6 +186,4 @@ void ymf262_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004, The MAME Team"; break;
 	}
 }
-
-#endif
 

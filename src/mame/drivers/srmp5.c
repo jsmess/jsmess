@@ -220,7 +220,7 @@ static struct r3000_config config =
 	4096	/* data cache size */
 };
 
-INPUT_PORTS_START( srmp5 )
+static INPUT_PORTS_START( srmp5 )
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, "0-0" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

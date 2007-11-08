@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( writeport_pastelg, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( pastelg )
+static INPUT_PORTS_START( pastelg )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1 (Easy)" )

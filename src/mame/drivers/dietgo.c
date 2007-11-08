@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( dietgo )
+static INPUT_PORTS_START( dietgo )
 	PORT_START	/* Verified as 4 bit input port only */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )

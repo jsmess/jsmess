@@ -301,7 +301,7 @@ static void sdwx_gfx_decrypt(void)
 
 ***************************************************************************/
 
-INPUT_PORTS_START( sdwx )
+static INPUT_PORTS_START( sdwx )
 INPUT_PORTS_END
 
 

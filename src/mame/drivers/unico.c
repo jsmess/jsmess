@@ -327,7 +327,7 @@ ADDRESS_MAP_END
                                 Burglar X
 ***************************************************************************/
 
-INPUT_PORTS_START( burglarx )
+static INPUT_PORTS_START( burglarx )
 
 	PORT_START_TAG("IN0")	//$800000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
@@ -416,7 +416,7 @@ INPUT_PORTS_END
                                 Zero Point
 ***************************************************************************/
 
-INPUT_PORTS_START( zeropnt )
+static INPUT_PORTS_START( zeropnt )
 
 	PORT_START_TAG("IN0")	//$800018.w
 	PORT_BIT(  0x0001, IP_ACTIVE_HIGH, IPT_COIN1    )
@@ -509,7 +509,7 @@ INPUT_PORTS_END
                                 Zero Point 2
 ***************************************************************************/
 
-INPUT_PORTS_START( zeropnt2 )
+static INPUT_PORTS_START( zeropnt2 )
 	PORT_START_TAG("IN0")	//$800019.b
 	PORT_BIT(  0x0001, IP_ACTIVE_HIGH, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_HIGH, IPT_COIN2    )

@@ -104,7 +104,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( tmaster )
+static INPUT_PORTS_START( tmaster )
     PORT_START
     PORT_DIPNAME( 0x0001, 0x0001, "DSW" )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

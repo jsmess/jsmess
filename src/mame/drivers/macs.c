@@ -146,7 +146,7 @@ static GFXDECODE_START( macs )
 //  GFXDECODE_ENTRY( 0, 0, charlayout,      0, 16*4  )
 GFXDECODE_END
 
-INPUT_PORTS_START( macs )
+static INPUT_PORTS_START( macs )
 	/*0*/
 	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "DSW0 - BIT 1" )

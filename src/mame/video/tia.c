@@ -23,8 +23,8 @@ struct player_gfx {
 	int skipclip[PLAYER_GFX_SLOTS];
 };
 
-struct player_gfx p0gfx;
-struct player_gfx p1gfx;
+static struct player_gfx p0gfx;
+static struct player_gfx p1gfx;
 
 static UINT32 frame_cycles;
 static UINT32 paddle_cycles;

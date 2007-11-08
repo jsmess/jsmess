@@ -111,7 +111,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( blstroid )
+static INPUT_PORTS_START( blstroid )
 	PORT_START      /* ff9800 */
 	PORT_BIT( 0x00ff, 0, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(10) PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )

@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-INPUT_PORTS_START( shootout )
+static INPUT_PORTS_START( shootout )
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
@@ -208,7 +208,7 @@ INPUT_PORTS_START( shootout )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( shootouj )
+static INPUT_PORTS_START( shootouj )
 	PORT_INCLUDE(shootout)
 
 	PORT_MODIFY("DSW1")

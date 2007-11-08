@@ -271,7 +271,7 @@ static WRITE16_HANDLER( namcona1_nvram_w )
 
 /***************************************************************************/
 
-INPUT_PORTS_START( namcona1_joy )
+static INPUT_PORTS_START( namcona1_joy )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -327,7 +327,7 @@ INPUT_PORTS_START( namcona1_joy )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( namcona1_quiz )
+static INPUT_PORTS_START( namcona1_quiz )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
@@ -383,7 +383,7 @@ INPUT_PORTS_START( namcona1_quiz )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( namcona2_joy )
+static INPUT_PORTS_START( namcona2_joy )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x00, "DIP2 (Freeze)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -447,7 +447,7 @@ INPUT_PORTS_START( namcona2_joy )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN4 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( namcona2_quiz )
+static INPUT_PORTS_START( namcona2_quiz )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x00, "DIP2 (Freeze)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

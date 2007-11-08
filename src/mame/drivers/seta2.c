@@ -714,7 +714,7 @@ ADDRESS_MAP_END
                         Mobile Suit Gundam EX Revue
 ***************************************************************************/
 
-INPUT_PORTS_START( gundamex )
+static INPUT_PORTS_START( gundamex )
 	PORT_START_TAG("IN0")	// $600000.w
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -828,7 +828,7 @@ INPUT_PORTS_END
                                 Guardians
 ***************************************************************************/
 
-INPUT_PORTS_START( grdians )
+static INPUT_PORTS_START( grdians )
 	PORT_START_TAG("IN0")	// $600000.w
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy )    )	// 0
@@ -932,7 +932,7 @@ INPUT_PORTS_END
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
 
-INPUT_PORTS_START( mj4simai )
+static INPUT_PORTS_START( mj4simai )
 	PORT_START_TAG("IN0")	// $600300.w
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
@@ -1049,7 +1049,7 @@ INPUT_PORTS_END
                             Kosodate Quiz My Angel
 ***************************************************************************/
 
-INPUT_PORTS_START( myangel )
+static INPUT_PORTS_START( myangel )
 	PORT_START_TAG("IN0")	// $700300.w
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) ) /* Listed as "Unused" */
@@ -1150,7 +1150,7 @@ INPUT_PORTS_END
                             Kosodate Quiz My Angel 2
 ***************************************************************************/
 
-INPUT_PORTS_START( myangel2 )
+static INPUT_PORTS_START( myangel2 )
 	PORT_START_TAG("IN0") //$600300.w
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) ) /* Listed as "Unused" */
@@ -1251,7 +1251,7 @@ INPUT_PORTS_END
                                 Puzzle De Bowling
 ***************************************************************************/
 
-INPUT_PORTS_START( pzlbowl )
+static INPUT_PORTS_START( pzlbowl )
 	PORT_START_TAG("IN0") //$400300.w
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )
@@ -1352,7 +1352,7 @@ INPUT_PORTS_END
                             Penguin Bros
 ***************************************************************************/
 
-INPUT_PORTS_START( penbros )
+static INPUT_PORTS_START( penbros )
 	PORT_START_TAG("IN0") //$500300.w
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )
@@ -1443,7 +1443,7 @@ INPUT_PORTS_END
                             Sammy Outdoor Shooting
 ***************************************************************************/
 
-INPUT_PORTS_START( deerhunt )
+static INPUT_PORTS_START( deerhunt )
 	PORT_START_TAG("DSW1") // IN0 - $400000.w
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0005, DEF_STR( 4C_1C ) )
@@ -1530,7 +1530,7 @@ INPUT_PORTS_START( deerhunt )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( turkhunt )
+static INPUT_PORTS_START( turkhunt )
 	PORT_INCLUDE(deerhunt)
 
 	PORT_MODIFY("DSW2") // IN1 - fffd0a.w
@@ -1540,7 +1540,7 @@ INPUT_PORTS_START( turkhunt )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( wschamp )
+static INPUT_PORTS_START( wschamp )
 	PORT_INCLUDE(deerhunt)
 
 	PORT_MODIFY("DSW1")	// IN0 - $400000.w
@@ -1606,7 +1606,7 @@ INPUT_PORTS_START( wschamp )
 	PORT_BIT( 0xffcc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( trophyh )
+static INPUT_PORTS_START( trophyh )
 	PORT_INCLUDE(wschamp)
 
 	PORT_MODIFY("DSW2") // IN1 - fffd0a.w

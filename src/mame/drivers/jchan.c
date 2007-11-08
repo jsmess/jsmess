@@ -669,7 +669,7 @@ GFXDECODE_END
 
 /* input ports */
 
-INPUT_PORTS_START( jchan )
+static INPUT_PORTS_START( jchan )
 
 /* TO BE VERIFIED: Player 1 & 2 - see subroutine $21e2a of main68k IT1 */
 /* TO BE VERIFIED: dips assignements according infos by BrianT at http://www.crazykong.com - seems ok */

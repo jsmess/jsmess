@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 /* different harnesses which plugged in here, and */
 /* some pins were unused.                         */
 
-INPUT_PORTS_START( blockade )
+static INPUT_PORTS_START( blockade )
     PORT_START  /* IN0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -187,7 +187,7 @@ INPUT_PORTS_START( blockade )
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( comotion )
+static INPUT_PORTS_START( comotion )
     PORT_START  /* IN0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -229,7 +229,7 @@ INPUT_PORTS_START( comotion )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( blasto )
+static INPUT_PORTS_START( blasto )
     PORT_START  /* IN0 */
     PORT_DIPNAME(    0x03, 0x03, DEF_STR( Coinage ) )
     PORT_DIPSETTING( 0x00, DEF_STR( 4C_1C ) )
@@ -274,7 +274,7 @@ INPUT_PORTS_START( blasto )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hustle )
+static INPUT_PORTS_START( hustle )
     PORT_START  /* IN0 */
     PORT_DIPNAME(    0x03, 0x03, DEF_STR( Coinage ) )
     PORT_DIPSETTING( 0x00, DEF_STR( 4C_1C ) )
@@ -318,7 +318,7 @@ INPUT_PORTS_START( hustle )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mineswpr )
+static INPUT_PORTS_START( mineswpr )
     PORT_START  /* IN0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* This wiring selects upright mode */
@@ -360,7 +360,7 @@ INPUT_PORTS_START( mineswpr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( minesw4p )
+static INPUT_PORTS_START( minesw4p )
     PORT_START  /* IN0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* This wiring selects cocktail mode */

@@ -438,7 +438,7 @@ static ADDRESS_MAP_START( sound_writeport_nbmj8991, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( pstadium )
+static INPUT_PORTS_START( pstadium )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1 (Easy)" )
@@ -513,7 +513,7 @@ INPUT_PORTS_START( pstadium )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( triplew1 )
+static INPUT_PORTS_START( triplew1 )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1 (Easy)" )
@@ -588,7 +588,7 @@ INPUT_PORTS_START( triplew1 )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ntopstar )
+static INPUT_PORTS_START( ntopstar )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1 (Easy)" )
@@ -663,7 +663,7 @@ INPUT_PORTS_START( ntopstar )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjlstory )
+static INPUT_PORTS_START( mjlstory )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1 (Easy)" )
@@ -738,7 +738,7 @@ INPUT_PORTS_START( mjlstory )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vanilla )
+static INPUT_PORTS_START( vanilla )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1 (Easy)" )
@@ -813,7 +813,7 @@ INPUT_PORTS_START( vanilla )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( finalbny )
+static INPUT_PORTS_START( finalbny )
 
 	// I don't have manual for this game.
 
@@ -890,7 +890,7 @@ INPUT_PORTS_START( finalbny )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( qmhayaku )
+static INPUT_PORTS_START( qmhayaku )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1 (Easy)" )
@@ -965,7 +965,7 @@ INPUT_PORTS_START( qmhayaku )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( galkoku )
+static INPUT_PORTS_START( galkoku )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1041,7 +1041,7 @@ INPUT_PORTS_START( galkoku )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hyouban )
+static INPUT_PORTS_START( hyouban )
 
 	// I don't have manual for this game.
 
@@ -1120,7 +1120,7 @@ INPUT_PORTS_START( hyouban )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( galkaika )
+static INPUT_PORTS_START( galkaika )
 
 	// I don't have manual for this game.
 
@@ -1199,7 +1199,7 @@ INPUT_PORTS_START( galkaika )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tokyogal )
+static INPUT_PORTS_START( tokyogal )
 
 	// I don't have manual for this game.
 
@@ -1278,7 +1278,7 @@ INPUT_PORTS_START( tokyogal )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tokimbsj )
+static INPUT_PORTS_START( tokimbsj )
 
 	// I don't have manual for this game.
 
@@ -1357,7 +1357,7 @@ INPUT_PORTS_START( tokimbsj )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mcontest )
+static INPUT_PORTS_START( mcontest )
 
 	// I don't have manual for this game.
 
@@ -1436,7 +1436,7 @@ INPUT_PORTS_START( mcontest )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( uchuuai )
+static INPUT_PORTS_START( uchuuai )
 
 	// I don't have manual for this game.
 
@@ -1515,7 +1515,7 @@ INPUT_PORTS_START( uchuuai )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjgottub )
+static INPUT_PORTS_START( mjgottub )
 
 	// I don't have manual for this game.
 
@@ -1594,7 +1594,7 @@ INPUT_PORTS_START( mjgottub )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( av2mj1bb )
+static INPUT_PORTS_START( av2mj1bb )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -1668,7 +1668,7 @@ INPUT_PORTS_START( av2mj1bb )
 	NBMJCTRL_PORT10	/* (12) PORT 2-5 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( av2mj2rg )
+static INPUT_PORTS_START( av2mj2rg )
 
 	// I don't have manual for this game.
 

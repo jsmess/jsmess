@@ -40,7 +40,7 @@ Unfortunately it's read protected.
 #define MASTER_CLOCK		53693100
 
 
-INPUT_PORTS_START( hshavoc )
+static INPUT_PORTS_START( hshavoc )
 	PORT_START	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

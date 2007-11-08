@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( blmbycar )
+static INPUT_PORTS_START( blmbycar )
 
 	PORT_START	// IN0 - $700000.w
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
@@ -286,7 +286,7 @@ INPUT_PORTS_START( blmbycar )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( watrball )
+static INPUT_PORTS_START( watrball )
 	PORT_START	/* dips */
 	PORT_DIPNAME( 0x0001, 0x0001, "1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

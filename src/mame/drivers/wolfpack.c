@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( wolfpack_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( wolfpack )
+static INPUT_PORTS_START( wolfpack )
 
 	PORT_START
 	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED ) /* dial connects here */

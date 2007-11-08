@@ -198,7 +198,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( crbaloon )
+static INPUT_PORTS_START( crbaloon )
 	PORT_START_TAG("DSW0") // 0
 	PORT_DIPNAME( 0x01, 0x01, "Test?" )
 	PORT_DIPSETTING(    0x01, "I/O Check?" )

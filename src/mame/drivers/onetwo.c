@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( sound_cpu_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( onetwo )
+static INPUT_PORTS_START( onetwo )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

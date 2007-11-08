@@ -2457,8 +2457,6 @@ static int OPL3TimerOver(OPL3 *chip,int c)
 
 
 
-#if (BUILD_YMF262)
-
 void * YMF262Init(int clock, int rate)
 {
 	return OPL3Create(OPL3_TYPE_YMF262,clock,rate);
@@ -2718,4 +2716,4 @@ void YMF262UpdateOne(void *_chip, OPL3SAMPLE **buffers, int length)
 	}
 
 }
-#endif /* BUILD_YMF262 */
+

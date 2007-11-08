@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( whizz_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( sidearms )
+static INPUT_PORTS_START( sidearms )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -327,7 +327,7 @@ INPUT_PORTS_START( sidearms )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )     /* not sure, but likely */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( turtship )
+static INPUT_PORTS_START( turtship )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -408,7 +408,7 @@ INPUT_PORTS_START( turtship )
 	/* 0xc0 1 Coin/1 Credit */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dyger )
+static INPUT_PORTS_START( dyger )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* seems to be 1-player only */
@@ -482,7 +482,7 @@ INPUT_PORTS_START( dyger )
 	/* 0xc0 1 Coin/1 Credit */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( whizz )
+static INPUT_PORTS_START( whizz )
 	PORT_START_TAG("DSW0")	/* 8-bit */
 	PORT_DIPNAME( 0x07, 0x04, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "0 (Easiest)" )

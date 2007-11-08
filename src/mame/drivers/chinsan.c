@@ -82,13 +82,13 @@ static WRITE8_HANDLER(ctrl_w)
 	memory_set_bank(1, data >> 6);
 }
 
-WRITE8_HANDLER( ym_port_w1 )
+static WRITE8_HANDLER( ym_port_w1 )
 {
 	logerror("ym_write port 1 %02x\n",data);
 }
 
 
-WRITE8_HANDLER( ym_port_w2 )
+static WRITE8_HANDLER( ym_port_w2 )
 {
 	logerror("ym_write port 2 %02x\n",data);
 }
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( chinsan_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( chinsan )
+static INPUT_PORTS_START( chinsan )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

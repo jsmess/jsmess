@@ -417,7 +417,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-INPUT_PORTS_START( midnrun )
+static INPUT_PORTS_START( midnrun )
 	PORT_START
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift up
@@ -460,7 +460,7 @@ INPUT_PORTS_START( midnrun )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( windheat )
+static INPUT_PORTS_START( windheat )
 	PORT_START
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift up
@@ -503,7 +503,7 @@ INPUT_PORTS_START( windheat )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jetwave )
+static INPUT_PORTS_START( jetwave )
 	PORT_START
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )

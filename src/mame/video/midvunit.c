@@ -71,7 +71,7 @@ static void midvunit_exit(running_machine *machine)
 VIDEO_START( midvunit )
 {
 	scanline_timer = mame_timer_alloc(scanline_timer_cb);
-	poly = poly_alloc(4000, sizeof(poly_extra_data), 0);
+	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, midvunit_exit);
 }
 
@@ -83,12 +83,13 @@ VIDEO_START( midvunit )
  *
  *************************************/
 
-static void render_flat(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_flat(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
-	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
+	const poly_extra_data *extra = extradata;
 	UINT16 pixdata = extra->pixdata;
 	int xstep = extra->dither + 1;
+	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
+	int startx = extent->startx;
 	int x;
 
 	/* if dithering, ensure that we start on an appropriate pixel */
@@ -96,12 +97,12 @@ static void render_flat(void *destbase, INT32 scanline, INT32 startx, INT32 stop
 
 	/* non-dithered 0 pixels can use a memset */
 	if (pixdata == 0 && xstep == 1)
-		memset(&dest[startx], 0, 2 * (stopx - startx + 1));
+		memset(&dest[startx], 0, 2 * (extent->stopx - startx + 1));
 
 	/* otherwise, we fill manually */
 	else
 	{
-		for (x = startx; x < stopx; x += xstep)
+		for (x = startx; x < extent->stopx; x += xstep)
 			dest[x] = pixdata;
 	}
 }
@@ -114,17 +115,19 @@ static void render_flat(void *destbase, INT32 scanline, INT32 startx, INT32 stop
  *
  *************************************/
 
-static void render_tex(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_tex(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
-	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
+	const poly_extra_data *extra = extradata;
 	UINT16 pixdata = extra->pixdata & 0xff00;
 	const UINT8 *texbase = extra->texbase;
-	INT32 u = poly_param_value(startx, scanline, 0, poly) * 65536.0f;
-	INT32 v = poly_param_value(startx, scanline, 1, poly) * 65536.0f;
-	INT32 dudx = poly->param[0].dpdx * 65536.0f;
-	INT32 dvdx = poly->param[1].dpdx * 65536.0f;
 	int xstep = extra->dither + 1;
+	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
+	int startx = extent->startx;
+	int stopx = extent->stopx;
+	INT32 u = extent->param[0].start;
+	INT32 v = extent->param[1].start;
+	INT32 dudx = extent->param[0].dpdx;
+	INT32 dvdx = extent->param[1].dpdx;
 	int x;
 
 	/* if dithering, we advance by 2x; also ensure that we start on an appropriate pixel */
@@ -150,17 +153,19 @@ static void render_tex(void *destbase, INT32 scanline, INT32 startx, INT32 stopx
 }
 
 
-static void render_textrans(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_textrans(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
-	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
+	const poly_extra_data *extra = extradata;
 	UINT16 pixdata = extra->pixdata & 0xff00;
 	const UINT8 *texbase = extra->texbase;
-	INT32 u = poly_param_value(startx, scanline, 0, poly) * 65536.0f;
-	INT32 v = poly_param_value(startx, scanline, 1, poly) * 65536.0f;
-	INT32 dudx = poly->param[0].dpdx * 65536.0f;
-	INT32 dvdx = poly->param[1].dpdx * 65536.0f;
 	int xstep = extra->dither + 1;
+	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
+	int startx = extent->startx;
+	int stopx = extent->stopx;
+	INT32 u = extent->param[0].start;
+	INT32 v = extent->param[1].start;
+	INT32 dudx = extent->param[0].dpdx;
+	INT32 dvdx = extent->param[1].dpdx;
 	int x;
 
 	/* if dithering, we advance by 2x; also ensure that we start on an appropriate pixel */
@@ -188,17 +193,19 @@ static void render_textrans(void *destbase, INT32 scanline, INT32 startx, INT32 
 }
 
 
-static void render_textransmask(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_textransmask(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
-	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
+	const poly_extra_data *extra = extradata;
 	UINT16 pixdata = extra->pixdata;
 	const UINT8 *texbase = extra->texbase;
-	INT32 u = poly_param_value(startx, scanline, 0, poly) * 65536.0f;
-	INT32 v = poly_param_value(startx, scanline, 1, poly) * 65536.0f;
-	INT32 dudx = poly->param[0].dpdx * 65536.0f;
-	INT32 dvdx = poly->param[1].dpdx * 65536.0f;
 	int xstep = extra->dither + 1;
+	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
+	int startx = extent->startx;
+	int stopx = extent->stopx;
+	INT32 u = extent->param[0].start;
+	INT32 v = extent->param[1].start;
+	INT32 dudx = extent->param[0].dpdx;
+	INT32 dvdx = extent->param[1].dpdx;
 	int x;
 
 	/* if dithering, we advance by 2x; also ensure that we start on an appropriate pixel */
@@ -235,10 +242,11 @@ static void render_textransmask(void *destbase, INT32 scanline, INT32 startx, IN
 
 static void process_dma_queue(running_machine *machine)
 {
+	poly_extra_data *extra = poly_get_extra_data(poly);
+	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	int textured = ((dma_data[0] & 0x300) == 0x100);
-	poly_draw_scanline callback;
+	poly_draw_quad_scanline callback;
 	poly_vertex vert[4];
-	int i;
 
 	/* if we're rendering to the same page we're viewing, it has changed */
 	if ((((page_control >> 2) ^ page_control) & 1) == 0)
@@ -262,14 +270,14 @@ static void process_dma_queue(running_machine *machine)
 	else
 	{
 		/* if textured, add the texture info */
-		vert[0].p[0] = (float)(dma_data[10] & 0xff);
-		vert[0].p[1] = (float)(dma_data[10] >> 8);
-		vert[1].p[0] = (float)(dma_data[11] & 0xff);
-		vert[1].p[1] = (float)(dma_data[11] >> 8);
-		vert[2].p[0] = (float)(dma_data[12] & 0xff);
-		vert[2].p[1] = (float)(dma_data[12] >> 8);
-		vert[3].p[0] = (float)(dma_data[13] & 0xff);
-		vert[3].p[1] = (float)(dma_data[13] >> 8);
+		vert[0].p[0] = (float)(dma_data[10] & 0xff) * 65536.0f;
+		vert[0].p[1] = (float)(dma_data[10] >> 8) * 65536.0f;
+		vert[1].p[0] = (float)(dma_data[11] & 0xff) * 65536.0f;
+		vert[1].p[1] = (float)(dma_data[11] >> 8) * 65536.0f;
+		vert[2].p[0] = (float)(dma_data[12] & 0xff) * 65536.0f;
+		vert[2].p[1] = (float)(dma_data[12] >> 8) * 65536.0f;
+		vert[3].p[0] = (float)(dma_data[13] & 0xff) * 65536.0f;
+		vert[3].p[1] = (float)(dma_data[13] >> 8) * 65536.0f;
 
 		/* handle non-masked, non-transparent quads */
 		if ((dma_data[0] & 0xc00) == 0x000)
@@ -288,23 +296,13 @@ static void process_dma_queue(running_machine *machine)
 			callback = render_flat;
 	}
 
-	/* loop over two tris */
-	for (i = 0; i < 2; i++)
-	{
-		poly_extra_data *extra = poly_get_extra_data(poly);
-		UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
+	/* set up the extra data for this triangle */
+	extra->texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
+	extra->pixdata = dma_data[1] | (dma_data[0] & 0x00ff);
+	extra->dither = ((dma_data[0] & 0x2000) != 0);
 
-		/* set up the extra data for this triangle */
-		extra->texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
-		extra->pixdata = dma_data[1] | (dma_data[0] & 0x00ff);
-		extra->dither = ((dma_data[0] & 0x2000) != 0);
-
-		/* first tri is 0,1,2; second is 0,3,2 */
-		if (i == 0)
-			poly_render_triangle(poly, dest, &machine->screen[0].visarea, callback, textured ? 2 : 0, &vert[0], &vert[1], &vert[2]);
-		else
-			poly_render_triangle(poly, dest, &machine->screen[0].visarea, callback, textured ? 2 : 0, &vert[0], &vert[3], &vert[2]);
-	}
+	/* render as a quad */
+	poly_render_quad(poly, dest, &machine->screen[0].visarea, callback, textured ? 2 : 0, &vert[0], &vert[1], &vert[2], &vert[3]);
 }
 
 

@@ -507,7 +507,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( demoderm )
+static INPUT_PORTS_START( demoderm )
 	PORT_START_TAG("MONO.IP0")	/* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -571,7 +571,7 @@ INPUT_PORTS_END
 
 
 /* not verified, no manual found */
-INPUT_PORTS_START( sarge )
+static INPUT_PORTS_START( sarge )
 	PORT_START_TAG("MONO.IP0")	/* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -614,7 +614,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( maxrpm )
+static INPUT_PORTS_START( maxrpm )
 	PORT_START_TAG("MONO.IP0")	/* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -664,7 +664,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( rampage )
+static INPUT_PORTS_START( rampage )
 	PORT_START_TAG("MONO.IP0")	/* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -730,7 +730,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( powerdrv )
+static INPUT_PORTS_START( powerdrv )
 	PORT_START_TAG("MONO.IP0")	/* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -784,7 +784,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( stargrds )
+static INPUT_PORTS_START( stargrds )
 	PORT_START_TAG("MONO.IP0")	/* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -855,7 +855,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( spyhunt )
+static INPUT_PORTS_START( spyhunt )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -901,7 +901,7 @@ INPUT_PORTS_END
 
 
 /* not verified, no manual found */
-INPUT_PORTS_START( crater )
+static INPUT_PORTS_START( crater )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -936,7 +936,7 @@ INPUT_PORTS_END
 
 
 /* not verified, no manual found */
-INPUT_PORTS_START( turbotag )
+static INPUT_PORTS_START( turbotag )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )

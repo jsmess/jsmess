@@ -225,7 +225,7 @@ ADDRESS_MAP_END
 
 /**********************************************************/
 
-INPUT_PORTS_START( sharkatt )
+static INPUT_PORTS_START( sharkatt )
 	PORT_START      /* IN0 */
 	PORT_DIPNAME( 0x7f, 0x7f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
@@ -278,7 +278,7 @@ INPUT_PORTS_START( sharkatt )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-INPUT_PORTS_START( thief )
+static INPUT_PORTS_START( thief )
 	PORT_START
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -347,7 +347,7 @@ INPUT_PORTS_START( thief )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( natodef )
+static INPUT_PORTS_START( natodef )
 	PORT_START
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )

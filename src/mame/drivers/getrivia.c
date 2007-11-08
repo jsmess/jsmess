@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( gepoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( gselect )
+static INPUT_PORTS_START( gselect )
 	PORT_START      /* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, "Poker: Discard Cards" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -292,7 +292,7 @@ INPUT_PORTS_START( gselect )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gepoker )
+static INPUT_PORTS_START( gepoker )
 	PORT_INCLUDE( gselect )
 
 	PORT_MODIFY("IN0")
@@ -300,7 +300,7 @@ INPUT_PORTS_START( gepoker )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* no button 12 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( getrivia )
+static INPUT_PORTS_START( getrivia )
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x03, 0x01, "Questions" )
 	PORT_DIPSETTING(    0x00, "4" )
@@ -350,7 +350,7 @@ INPUT_PORTS_START( getrivia )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sextriv1 )
+static INPUT_PORTS_START( sextriv1 )
 	PORT_INCLUDE( getrivia )
 
 	PORT_MODIFY("IN0")

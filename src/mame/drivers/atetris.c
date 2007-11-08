@@ -221,7 +221,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( atetris )
+static INPUT_PORTS_START( atetris )
 	// These ports are read via the Pokeys
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -247,7 +247,7 @@ INPUT_PORTS_END
 
 
 // Same as the regular one except they added a Flip Controls switch
-INPUT_PORTS_START( atetcktl )
+static INPUT_PORTS_START( atetcktl )
 	// These ports are read via the Pokeys
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )

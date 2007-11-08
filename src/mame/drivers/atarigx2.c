@@ -1214,7 +1214,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( spclords )
+static INPUT_PORTS_START( spclords )
 	PORT_START		/* 68.SW (A1=0) */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )						/* BLUE button */
@@ -1275,7 +1275,7 @@ INPUT_PORTS_START( spclords )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( motofren )
+static INPUT_PORTS_START( motofren )
 	PORT_START		/* 68.SW (A1=0) */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )						/* Start/fire */
@@ -1321,7 +1321,7 @@ INPUT_PORTS_START( motofren )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( rrreveng )
+static INPUT_PORTS_START( rrreveng )
 	PORT_START		/* 68.SW (A1=0) */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )

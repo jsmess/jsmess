@@ -227,7 +227,7 @@ static PALETTE_INIT( couple )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) \
 
-INPUT_PORTS_START( couple )
+static INPUT_PORTS_START( couple )
 	PORT_INPUTS
 
 	PORT_DSW
@@ -314,7 +314,7 @@ INPUT_PORTS_START( couple )
 INPUT_PORTS_END
 
 /*Different DSWs*/
-INPUT_PORTS_START( couplep )
+static INPUT_PORTS_START( couplep )
 	PORT_INPUTS
 
 	PORT_DSW

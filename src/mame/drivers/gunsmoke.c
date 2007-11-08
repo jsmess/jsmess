@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( gunsmoke )
+static INPUT_PORTS_START( gunsmoke )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -220,7 +220,7 @@ INPUT_PORTS_START( gunsmoke )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gunsmoka )
+static INPUT_PORTS_START( gunsmoka )
 	PORT_INCLUDE(gunsmoke)
 
 	// Same as 'gunsmoke', but "Lives" Dip Switch instead of "Demonstration" Dip Switch

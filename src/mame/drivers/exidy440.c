@@ -582,7 +582,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 
 
-INPUT_PORTS_START( crossbow )
+static INPUT_PORTS_START( crossbow )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -622,7 +622,7 @@ INPUT_PORTS_START( crossbow )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( cheyenne )
+static INPUT_PORTS_START( cheyenne )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -662,7 +662,7 @@ INPUT_PORTS_START( cheyenne )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( combat )
+static INPUT_PORTS_START( combat )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -702,7 +702,7 @@ INPUT_PORTS_START( combat )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( catch22 )
+static INPUT_PORTS_START( catch22 )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -742,7 +742,7 @@ INPUT_PORTS_START( catch22 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( cracksht )
+static INPUT_PORTS_START( cracksht )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -782,7 +782,7 @@ INPUT_PORTS_START( cracksht )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( claypign )
+static INPUT_PORTS_START( claypign )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -818,7 +818,7 @@ INPUT_PORTS_START( claypign )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( chiller )
+static INPUT_PORTS_START( chiller )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -855,7 +855,7 @@ INPUT_PORTS_START( chiller )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( topsecex )
+static INPUT_PORTS_START( topsecex )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -902,7 +902,7 @@ INPUT_PORTS_START( topsecex )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( hitnmiss )
+static INPUT_PORTS_START( hitnmiss )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -942,7 +942,7 @@ INPUT_PORTS_START( hitnmiss )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( whodunit )
+static INPUT_PORTS_START( whodunit )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -979,7 +979,7 @@ INPUT_PORTS_START( whodunit )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( showdown )
+static INPUT_PORTS_START( showdown )
 	PORT_START				/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )

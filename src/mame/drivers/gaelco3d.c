@@ -814,7 +814,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( speedup )
+static INPUT_PORTS_START( speedup )
 	PORT_START	    /* DIPs */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
@@ -853,7 +853,7 @@ INPUT_PORTS_START( speedup )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( surfplnt )
+static INPUT_PORTS_START( surfplnt )
 	PORT_START	    /* DIPs */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VOLUME_UP )	// low two bits read, compared against 3
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )	// low four bits read, compared against f
@@ -887,7 +887,7 @@ INPUT_PORTS_START( surfplnt )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( radikalb )
+static INPUT_PORTS_START( radikalb )
 	PORT_START	    /* DIPs */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )

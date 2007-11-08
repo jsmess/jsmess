@@ -143,7 +143,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************************************/
 
-INPUT_PORTS_START( gunpey )
+static INPUT_PORTS_START( gunpey )
 
 INPUT_PORTS_END
 

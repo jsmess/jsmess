@@ -198,7 +198,7 @@ ADDRESS_MAP_END
                                     Magix
 ***************************************************************************/
 
-INPUT_PORTS_START( magix )
+static INPUT_PORTS_START( magix )
 
 	PORT_START	// IN0 - Coins
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -286,7 +286,7 @@ INPUT_PORTS_END
                                 Cannon Ball
 ***************************************************************************/
 
-INPUT_PORTS_START( cannball )
+static INPUT_PORTS_START( cannball )
 
 	PORT_START	// IN0 - Coins
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -372,7 +372,7 @@ INPUT_PORTS_END
                                     Rock Tris
 ***************************************************************************/
 
-INPUT_PORTS_START( rocktris )
+static INPUT_PORTS_START( rocktris )
 
 	PORT_START	// IN0 - Coins
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )

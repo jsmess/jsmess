@@ -272,7 +272,7 @@ ADDRESS_MAP_END
 
 /***********************************************************/
 
-INPUT_PORTS_START( superchs )
+static INPUT_PORTS_START( superchs )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )

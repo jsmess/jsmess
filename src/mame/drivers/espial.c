@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( espial )
+static INPUT_PORTS_START( espial )
 	PORT_START	/* IN0 */
 	PORT_DIPNAME( 0x01, 0x00, "Number of Buttons" )
 	PORT_DIPSETTING(    0x01, "1" )
@@ -212,7 +212,7 @@ INPUT_PORTS_START( espial )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( netwars )
+static INPUT_PORTS_START( netwars )
 	PORT_START	/* IN0 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )	/* probably unused */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

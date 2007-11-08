@@ -1296,7 +1296,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( chindrag )
+static INPUT_PORTS_START( chindrag )
 	PORT_START	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
@@ -1396,7 +1396,7 @@ INPUT_PORTS_END
 
 
 
-INPUT_PORTS_START( chmplst2 )
+static INPUT_PORTS_START( chmplst2 )
 	PORT_START	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x02, "Pay Out (%)" )
 	PORT_DIPSETTING(    0x07, "50" )
@@ -1534,7 +1534,7 @@ INPUT_PORTS_END
 
 
 
-INPUT_PORTS_START( drgnwrld )
+static INPUT_PORTS_START( drgnwrld )
 	PORT_START	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
@@ -1634,7 +1634,7 @@ INPUT_PORTS_END
 
 
 
-INPUT_PORTS_START( grtwall )
+static INPUT_PORTS_START( grtwall )
 	PORT_START	// IN0 - DSW3
 	PORT_DIPNAME( 0xff, 0xff, "3" )
 	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
@@ -1715,7 +1715,7 @@ INPUT_PORTS_START( grtwall )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( lhb )
+static INPUT_PORTS_START( lhb )
 	PORT_START	// IN0 - DSW1
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out (%)" )
 	PORT_DIPSETTING(    0x0f, "96" )
@@ -1884,7 +1884,7 @@ INPUT_PORTS_START( lhb )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( vbowl )
+static INPUT_PORTS_START( vbowl )
 	PORT_START	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -2022,7 +2022,7 @@ INPUT_PORTS_START( vbowl )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( vbowlj )
+static INPUT_PORTS_START( vbowlj )
 	PORT_START	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -2160,7 +2160,7 @@ INPUT_PORTS_START( vbowlj )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( xymg )
+static INPUT_PORTS_START( xymg )
 	PORT_START	// IN0 - DSW1
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )

@@ -150,7 +150,7 @@ ADDRESS_MAP_END
 
 /****************************************************************************/
 
-INPUT_PORTS_START( xxmissio )
+static INPUT_PORTS_START( xxmissio )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )

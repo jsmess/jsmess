@@ -1685,7 +1685,7 @@ ADDRESS_MAP_END
     Dip sw 2 is not used and all contacts should be set off.
 */
 
-INPUT_PORTS_START( halleys )
+static INPUT_PORTS_START( halleys )
 	PORT_START_TAG("DSW1") // 0xff95
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -1798,7 +1798,7 @@ INPUT_PORTS_START( halleys )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( benberob )
+static INPUT_PORTS_START( benberob )
 	PORT_START_TAG("DSW1") // 0xff95
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x02, "Every 100K" )

@@ -20,6 +20,7 @@ UINT32 gaelco3d_texmask_size;
 
 #define MAX_POLYGONS		4096
 #define MAX_POLYDATA		(MAX_POLYGONS * 21)
+#define MAX_VERTICES		32
 
 #define DISPLAY_TEXTURE		0
 #define LOG_POLYGONS		0
@@ -52,9 +53,9 @@ struct _poly_extra_data
 };
 
 
-static void render_noz_noperspective(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid);
-static void render_normal(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid);
-static void render_alphablend(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid);
+static void render_noz_noperspective(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
+static void render_normal(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
+static void render_alphablend(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
 
 
 
@@ -166,18 +167,20 @@ static void render_poly(UINT32 *polydata)
 	float midx = Machine->screen[0].width / 2;
 	float midy = Machine->screen[0].height / 2;
 	float z0 = dsp_to_float(polydata[0]);
-	float voz_dy = dsp_to_float(polydata[1]);
-	float voz_dx = dsp_to_float(polydata[2]);
+	float voz_dy = dsp_to_float(polydata[1]) * 256.0f;
+	float voz_dx = dsp_to_float(polydata[2]) * 256.0f;
 	float ooz_dy = dsp_to_float(polydata[3]);
 	float ooz_dx = dsp_to_float(polydata[4]);
-	float uoz_dy = dsp_to_float(polydata[5]);
-	float uoz_dx = dsp_to_float(polydata[6]);
-	float voz_base = dsp_to_float(polydata[7]) - midx * voz_dx - midy * voz_dy;
+	float uoz_dy = dsp_to_float(polydata[5]) * 256.0f;
+	float uoz_dx = dsp_to_float(polydata[6]) * 256.0f;
+	float voz_base = dsp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
 	float ooz_base = dsp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
-	float uoz_base = dsp_to_float(polydata[9]) - midx * uoz_dx - midy * uoz_dy;
+	float uoz_base = dsp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
+	poly_extra_data *extra = poly_get_extra_data(poly);
 	int color = (polydata[10] & 0x7f) << 8;
-	poly_vertex vert[3];
-	int i;
+	poly_vertex vert[MAX_VERTICES];
+	UINT32 data;
+	int vertnum;
 
 	if (LOG_POLYGONS)
 	{
@@ -203,74 +206,70 @@ static void render_poly(UINT32 *polydata)
 		logerror("\n");
 	}
 
-	/* extract the first two vertices */
-	vert[0].x = midx + (float)((INT32)polydata[13] >> 16) + 0.5f;
-	vert[0].y = midy + ((float)((INT32)(polydata[13] << 18) >> 18) + 0.5f);
-	vert[1].x = midx + (float)((INT32)polydata[15] >> 16) + 0.5f;
-	vert[1].y = midy + ((float)((INT32)(polydata[15] << 18) >> 18) + 0.5f);
+	/* fill in extra data */
+	extra->tex = polydata[11];
+	extra->color = color;
+	extra->ooz_dx = ooz_dx;
+	extra->ooz_dy = ooz_dy;
+	extra->ooz_base = ooz_base;
+	extra->uoz_dx = uoz_dx;
+	extra->uoz_dy = uoz_dy;
+	extra->uoz_base = uoz_base;
+	extra->voz_dx = voz_dx;
+	extra->voz_dy = voz_dy;
+	extra->voz_base = voz_base;
+	extra->z0 = z0;
 
-	/* loop over the remaining verticies */
-	for (i = 17; !IS_POLYEND(polydata[i - 2]) && i < 1000; i += 2)
+	/* extract vertices */
+	data = 0;
+	for (vertnum = 0; vertnum < ARRAY_LENGTH(vert) && !IS_POLYEND(data); vertnum++)
 	{
-		poly_extra_data *extra = poly_get_extra_data(poly);
+		/* extract vertex data */
+		data = polydata[13 + vertnum * 2];
+		vert[vertnum].x = midx + (float)((INT32)data >> 16) + 0.5f;
+		vert[vertnum].y = midy + (float)((INT32)(data << 18) >> 18) + 0.5f;
+	}
 
-		/* fill in core extra data */
-		extra->tex = polydata[11];
-		extra->color = color;
-		extra->ooz_dx = ooz_dx;
-		extra->ooz_dy = ooz_dy;
-		extra->ooz_base = ooz_base;
-		extra->uoz_dx = uoz_dx;
-		extra->uoz_dy = uoz_dy;
-		extra->uoz_base = uoz_base;
-		extra->voz_dx = voz_dx;
-		extra->voz_dy = voz_dy;
-		extra->voz_base = voz_base;
-		extra->z0 = z0;
-
-		/* extract vertex 2 */
-		vert[2].x = midx + (float)((INT32)polydata[i] >> 16) + 0.5f;
-		vert[2].y = midy + (float)((INT32)(polydata[i] << 18) >> 18) + 0.5f;
-
+	/* if we have a valid number of verts, render them */
+	if (vertnum >= 3)
+	{
 		/* special case: no Z buffering and no perspective correction */
 		if (color != 0x7f00 && z0 < 0 && ooz_dx == 0 && ooz_dy == 0)
-			poly_render_triangle(poly, screenbits, &Machine->screen[0].visarea, render_noz_noperspective, 0, &vert[0], &vert[1], &vert[2]);
+			poly_render_triangle_fan(poly, screenbits, &Machine->screen[0].visarea, render_noz_noperspective, 0, vertnum, &vert[0]);
 
 		/* general case: non-alpha blended */
 		else if (color != 0x7f00)
-			poly_render_triangle(poly, screenbits, &Machine->screen[0].visarea, render_normal, 0, &vert[0], &vert[1], &vert[2]);
+			poly_render_triangle_fan(poly, screenbits, &Machine->screen[0].visarea, render_normal, 0, vertnum, &vert[0]);
 
 		/* color 0x7f seems to be hard-coded as a 50% alpha blend */
 		else
-			poly_render_triangle(poly, screenbits, &Machine->screen[0].visarea, render_alphablend, 0, &vert[0], &vert[1], &vert[2]);
+			poly_render_triangle_fan(poly, screenbits, &Machine->screen[0].visarea, render_alphablend, 0, vertnum, &vert[0]);
 
-		/* copy vertex 2 to vertex 1 -- this hardware draws in fans */
-		vert[1] = vert[2];
-		polygons++;
+		polygons += vertnum - 2;
 	}
 }
 
 
 
-static void render_noz_noperspective(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_noz_noperspective(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
+	const poly_extra_data *extra = extradata;
 	mame_bitmap *bitmap = destbase;
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
 	float zbase = recip_approx(extra->ooz_base);
-	float zbase256 = 256.0f * zbase;
-	float uoz = (extra->uoz_base + scanline * extra->uoz_dy + startx * extra->uoz_dx) * zbase256;
-	float voz = (extra->voz_base + scanline * extra->voz_dy + startx * extra->voz_dx) * zbase256;
-	float uoz_step = extra->uoz_dx * zbase256;
-	float voz_step = extra->voz_dx * zbase256;
+	float uoz_step = extra->uoz_dx * zbase;
+	float voz_step = extra->voz_dx * zbase;
 	int zbufval = (int)(-extra->z0 * zbase);
 	offs_t endmask = gaelco3d_texture_size - 1;
 	const rgb_t *palsource = palette + extra->color;
 	UINT32 tex = extra->tex;
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
+	int startx = extent->startx;
+	float uoz = (extra->uoz_base + scanline * extra->uoz_dy + startx * extra->uoz_dx) * zbase;
+	float voz = (extra->voz_base + scanline * extra->voz_dy + startx * extra->voz_dx) * zbase;
 	int x;
 
-	for (x = startx; x < stopx; x++)
+	for (x = startx; x < extent->stopx; x++)
 	{
 		int u = (int)uoz;
 		int v = (int)voz;
@@ -293,25 +292,26 @@ static void render_noz_noperspective(void *destbase, INT32 scanline, INT32 start
 }
 
 
-static void render_normal(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_normal(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
+	const poly_extra_data *extra = extradata;
 	mame_bitmap *bitmap = destbase;
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
 	float ooz_dx = extra->ooz_dx;
-	float uoz_dx = extra->uoz_dx * 256.0f;
-	float voz_dx = extra->voz_dx * 256.0f;
-	float ooz = extra->ooz_base + scanline * extra->ooz_dy + startx * ooz_dx;
-	float uoz = (extra->uoz_base + scanline * extra->uoz_dy) * 256.0f + startx * uoz_dx;
-	float voz = (extra->voz_base + scanline * extra->voz_dy) * 256.0f + startx * voz_dx;
+	float uoz_dx = extra->uoz_dx;
+	float voz_dx = extra->voz_dx;
 	offs_t endmask = gaelco3d_texture_size - 1;
 	const rgb_t *palsource = palette + extra->color;
 	UINT32 tex = extra->tex;
 	float z0 = extra->z0;
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
+	int startx = extent->startx;
+	float ooz = extra->ooz_base + scanline * extra->ooz_dy + startx * ooz_dx;
+	float uoz = extra->uoz_base + scanline * extra->uoz_dy + startx * uoz_dx;
+	float voz = extra->voz_base + scanline * extra->voz_dy + startx * voz_dx;
 	int x;
 
-	for (x = startx; x < stopx; x++)
+	for (x = startx; x < extent->stopx; x++)
 	{
 		if (ooz > 0)
 		{
@@ -344,25 +344,26 @@ static void render_normal(void *destbase, INT32 scanline, INT32 startx, INT32 st
 }
 
 
-static void render_alphablend(void *destbase, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_alphablend(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
+	const poly_extra_data *extra = extradata;
 	mame_bitmap *bitmap = destbase;
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
 	float ooz_dx = extra->ooz_dx;
-	float uoz_dx = extra->uoz_dx * 256.0f;
-	float voz_dx = extra->voz_dx * 256.0f;
-	float ooz = extra->ooz_base + extra->ooz_dy * scanline + startx * ooz_dx;
-	float uoz = (extra->uoz_base + extra->uoz_dy * scanline) * 256.0f + startx * uoz_dx;
-	float voz = (extra->voz_base + extra->voz_dy * scanline) * 256.0f + startx * voz_dx;
+	float uoz_dx = extra->uoz_dx;
+	float voz_dx = extra->voz_dx;
 	offs_t endmask = gaelco3d_texture_size - 1;
 	const rgb_t *palsource = palette + extra->color;
 	UINT32 tex = extra->tex;
 	float z0 = extra->z0;
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
+	int startx = extent->startx;
+	float ooz = extra->ooz_base + extra->ooz_dy * scanline + startx * ooz_dx;
+	float uoz = extra->uoz_base + extra->uoz_dy * scanline + startx * uoz_dx;
+	float voz = extra->voz_base + extra->voz_dy * scanline + startx * voz_dx;
 	int x;
 
-	for (x = startx; x < stopx; x++)
+	for (x = startx; x < extent->stopx; x++)
 	{
 		if (ooz > 0)
 		{

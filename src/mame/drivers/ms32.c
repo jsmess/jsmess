@@ -478,7 +478,7 @@ ADDRESS_MAP_END
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 
 
-INPUT_PORTS_START( ms32 )
+static INPUT_PORTS_START( ms32 )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -549,7 +549,7 @@ INPUT_PORTS_START( ms32 )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bbbxing )
+static INPUT_PORTS_START( bbbxing )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -618,7 +618,7 @@ INPUT_PORTS_START( bbbxing )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( desertwr )
+static INPUT_PORTS_START( desertwr )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -687,7 +687,7 @@ INPUT_PORTS_START( desertwr )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gametngk )
+static INPUT_PORTS_START( gametngk )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -756,7 +756,7 @@ INPUT_PORTS_START( gametngk )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tetrisp )
+static INPUT_PORTS_START( tetrisp )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -826,7 +826,7 @@ INPUT_PORTS_START( tetrisp )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tp2m32 )
+static INPUT_PORTS_START( tp2m32 )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -894,7 +894,7 @@ INPUT_PORTS_START( tp2m32 )
 INPUT_PORTS_END
 
 /* The Dip Switches for this game are completely wrong in the "test mode" ! */
-INPUT_PORTS_START( p47aces )
+static INPUT_PORTS_START( p47aces )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -962,7 +962,7 @@ INPUT_PORTS_START( p47aces )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gratia )
+static INPUT_PORTS_START( gratia )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -1031,7 +1031,7 @@ INPUT_PORTS_START( gratia )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hayaosi2 )
+static INPUT_PORTS_START( hayaosi2 )
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS
@@ -1147,7 +1147,7 @@ INPUT_PORTS_START( hayaosi2 )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( kirarast )	// player 1 inputs done? others?
+static INPUT_PORTS_START( kirarast )	// player 1 inputs done? others?
 	MS32_UNKNOWN_INPUTS
 
 	PORT_START_TAG("IN1")
@@ -1288,7 +1288,7 @@ INPUT_PORTS_START( kirarast )	// player 1 inputs done? others?
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( akiss )	// player 1 inputs done? others?
+static INPUT_PORTS_START( akiss )	// player 1 inputs done? others?
 	PORT_INCLUDE( kirarast )
 
 	PORT_MODIFY("IN1")
@@ -1296,7 +1296,7 @@ INPUT_PORTS_START( akiss )	// player 1 inputs done? others?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( f1superb )	// Mostly wrong !
+static INPUT_PORTS_START( f1superb )	// Mostly wrong !
 	MS32_UNKNOWN_INPUTS
 
 	MS32_SYSTEM_INPUTS

@@ -200,7 +200,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INPUT_PORTS_START( chwrestl )
+static INPUT_PORTS_START( chwrestl )
 	PORT_INCLUDE( sg1000 )
 
 	PORT_MODIFY("IN0")
@@ -221,7 +221,7 @@ INPUT_PORTS_START( chwrestl )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( chboxing )
+static INPUT_PORTS_START( chboxing )
 	PORT_INCLUDE( sg1000 )
 
 	PORT_MODIFY("DSW")
@@ -231,7 +231,7 @@ INPUT_PORTS_START( chboxing )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dokidoki )
+static INPUT_PORTS_START( dokidoki )
 	PORT_INCLUDE( sg1000 )
 
 	PORT_MODIFY("DSW")

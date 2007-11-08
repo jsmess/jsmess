@@ -245,7 +245,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( thunderj )
+static INPUT_PORTS_START( thunderj )
 	PORT_START		/* 260000 */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 

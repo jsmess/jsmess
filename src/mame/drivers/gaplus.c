@@ -379,7 +379,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( gaplus )
+static INPUT_PORTS_START( gaplus )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */
 	PORT_START	/* 56XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -460,7 +460,7 @@ INPUT_PORTS_START( gaplus )
 INPUT_PORTS_END
 
 /* identical to gaplus, but service mode is a dip switch instead of coming from edge connector */
-INPUT_PORTS_START( gapluso )
+static INPUT_PORTS_START( gapluso )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */
 	PORT_START	/* 56XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -539,7 +539,7 @@ INPUT_PORTS_START( gapluso )
 INPUT_PORTS_END
 
 /* identical to gaplus, but different bonus life settings */
-INPUT_PORTS_START( galaga3a )
+static INPUT_PORTS_START( galaga3a )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */
 	PORT_START	/* 56XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -620,7 +620,7 @@ INPUT_PORTS_START( galaga3a )
 INPUT_PORTS_END
 
 /* identical to gaplus, but different bonus life settings */
-INPUT_PORTS_START( galaga3m )
+static INPUT_PORTS_START( galaga3m )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */
 	PORT_START	/* 56XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY

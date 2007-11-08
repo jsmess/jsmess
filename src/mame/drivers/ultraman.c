@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( ultraman_writeport_sound, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( ultraman )
+static INPUT_PORTS_START( ultraman )
 
 	PORT_START_TAG("IN0")	/* Coins + Service */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )

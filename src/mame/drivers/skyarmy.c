@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( skyarmy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
         AM_RANGE(0xa007, 0xa007) AM_WRITE(MWA8_NOP)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( skyarmy )
+static INPUT_PORTS_START( skyarmy )
         PORT_START
         PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )

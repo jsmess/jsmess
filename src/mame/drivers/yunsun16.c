@@ -225,7 +225,7 @@ ADDRESS_MAP_END
                                 Magic Bubble
 ***************************************************************************/
 
-INPUT_PORTS_START( magicbub )
+static INPUT_PORTS_START( magicbub )
 	PORT_START_TAG("IN0")	// $800000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -295,7 +295,7 @@ INPUT_PORTS_END
                         Magic Bubble (Adult version)
 ***************************************************************************/
 
-INPUT_PORTS_START( magicbua )
+static INPUT_PORTS_START( magicbua )
 	PORT_INCLUDE(magicbub)
 
 	PORT_MODIFY("DSW2")
@@ -310,7 +310,7 @@ INPUT_PORTS_END
                                 Shocking
 ***************************************************************************/
 
-INPUT_PORTS_START( shocking )
+static INPUT_PORTS_START( shocking )
 	PORT_START_TAG("IN0")	// $800000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -383,7 +383,7 @@ INPUT_PORTS_END
                                 Bomb Kick
 ***************************************************************************/
 
-INPUT_PORTS_START( bombkick )
+static INPUT_PORTS_START( bombkick )
 	PORT_START_TAG("IN0")	// $800000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)

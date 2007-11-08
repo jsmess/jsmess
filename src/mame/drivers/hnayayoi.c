@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( hnayayoi )
+static INPUT_PORTS_START( hnayayoi )
 	PORT_START	/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -350,7 +350,7 @@ INPUT_PORTS_START( hnayayoi )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( hnfubuki )
+static INPUT_PORTS_START( hnfubuki )
 	PORT_START	/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -481,7 +481,7 @@ INPUT_PORTS_START( hnfubuki )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( untoucha )
+static INPUT_PORTS_START( untoucha )
 	PORT_START	/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

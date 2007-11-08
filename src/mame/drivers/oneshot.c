@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe010, 0xe010) AM_WRITE(OKIM6295_data_0_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( oneshot )
+static INPUT_PORTS_START( oneshot )
 	PORT_START	/* DSW 1    (0x19c020.l -> 0x08006c.l) */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )		// 0x080084.l : credits (00-09)
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
@@ -247,7 +247,7 @@ INPUT_PORTS_START( oneshot )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( maddonna )
+static INPUT_PORTS_START( maddonna )
 	PORT_START /* DSW A */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )

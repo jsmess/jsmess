@@ -975,7 +975,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( timekill )
+static INPUT_PORTS_START( timekill )
 	PORT_START	/* 40000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -1024,7 +1024,7 @@ INPUT_PORTS_START( timekill )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( itech32_base )
+static INPUT_PORTS_START( itech32_base )
 	PORT_START_TAG("P1")	/* 080000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
@@ -1072,7 +1072,7 @@ INPUT_PORTS_START( itech32_base )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( bloodstm )
+static INPUT_PORTS_START( bloodstm )
 	PORT_INCLUDE(itech32_base)
 
 	PORT_MODIFY("P1")
@@ -1097,7 +1097,7 @@ INPUT_PORTS_START( bloodstm )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( hardyard )
+static INPUT_PORTS_START( hardyard )
 	PORT_INCLUDE(itech32_base)
 
 	PORT_MODIFY("P3")
@@ -1129,7 +1129,7 @@ INPUT_PORTS_START( hardyard )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( pairs )
+static INPUT_PORTS_START( pairs )
 	PORT_INCLUDE(itech32_base)
 
 	PORT_MODIFY("P1")
@@ -1145,7 +1145,7 @@ INPUT_PORTS_START( pairs )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( drivedge )
+static INPUT_PORTS_START( drivedge )
 	PORT_START	/* 8C000 */
 	PORT_BIT ( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1196,7 +1196,7 @@ INPUT_PORTS_START( drivedge )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( wcbowl )
+static INPUT_PORTS_START( wcbowl )
 	PORT_INCLUDE(itech32_base)
 
 	PORT_MODIFY("P1")
@@ -1213,7 +1213,7 @@ INPUT_PORTS_START( wcbowl )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( wcbowln ) /* WCB version 1.66 supports cocktail mode */
+static INPUT_PORTS_START( wcbowln ) /* WCB version 1.66 supports cocktail mode */
 	PORT_INCLUDE(wcbowl)
 
 	PORT_MODIFY("P3")
@@ -1239,7 +1239,7 @@ INPUT_PORTS_START( wcbowln ) /* WCB version 1.66 supports cocktail mode */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( wcbowldx )
+static INPUT_PORTS_START( wcbowldx )
 	PORT_INCLUDE(wcbowln)
 
 	PORT_MODIFY("DIPS")	/* 280000 */
@@ -1252,7 +1252,7 @@ INPUT_PORTS_START( wcbowldx )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sftm )
+static INPUT_PORTS_START( sftm )
 	PORT_INCLUDE(itech32_base)
 
 	PORT_MODIFY("P3")
@@ -1272,7 +1272,7 @@ INPUT_PORTS_START( sftm )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( shufshot ) /* ShuffleShot v1.39 & v1.40 support cocktail mode */
+static INPUT_PORTS_START( shufshot ) /* ShuffleShot v1.39 & v1.40 support cocktail mode */
 	PORT_INCLUDE(itech32_base)
 
 	PORT_MODIFY("P1")
@@ -1304,7 +1304,7 @@ INPUT_PORTS_START( shufshot ) /* ShuffleShot v1.39 & v1.40 support cocktail mode
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( shufbowl )
+static INPUT_PORTS_START( shufbowl )
 	/*
     Earlier versions of Shuffleshot & World Class Bowling share the same input
     port set up. IE: "Freeze Screen" and no support for a cocktail mode
@@ -1340,7 +1340,7 @@ INPUT_PORTS_START( shufbowl )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gt3d )
+static INPUT_PORTS_START( gt3d )
 	PORT_INCLUDE(itech32_base)
 
 	PORT_MODIFY("P1")
@@ -1380,7 +1380,7 @@ INPUT_PORTS_START( gt3d )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gt97 ) /* v1.30 is the first known version of GT97 to support Cocktail mode! */
+static INPUT_PORTS_START( gt97 ) /* v1.30 is the first known version of GT97 to support Cocktail mode! */
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
@@ -1396,7 +1396,7 @@ INPUT_PORTS_START( gt97 ) /* v1.30 is the first known version of GT97 to support
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gt97o ) /* Older versions of GT97 do NOT support a cocktail mode */
+static INPUT_PORTS_START( gt97o ) /* Older versions of GT97 do NOT support a cocktail mode */
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
@@ -1406,7 +1406,7 @@ INPUT_PORTS_START( gt97o ) /* Older versions of GT97 do NOT support a cocktail m
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gt97s )
+static INPUT_PORTS_START( gt97s )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
@@ -1419,7 +1419,7 @@ INPUT_PORTS_START( gt97s )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gt98 )
+static INPUT_PORTS_START( gt98 )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
@@ -1432,7 +1432,7 @@ INPUT_PORTS_START( gt98 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gt98s )
+static INPUT_PORTS_START( gt98s )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
@@ -1445,7 +1445,7 @@ INPUT_PORTS_START( gt98s )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( s_ver )
+static INPUT_PORTS_START( s_ver )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
@@ -1461,7 +1461,7 @@ INPUT_PORTS_START( s_ver )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( aama )
+static INPUT_PORTS_START( aama )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")

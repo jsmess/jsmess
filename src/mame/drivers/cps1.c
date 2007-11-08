@@ -604,7 +604,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
 
 
-INPUT_PORTS_START( forgottn )
+static INPUT_PORTS_START( forgottn )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -691,7 +691,7 @@ INPUT_PORTS_START( forgottn )
 	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ghouls )
+static INPUT_PORTS_START( ghouls )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -773,7 +773,7 @@ INPUT_PORTS_END
 
 /* Same as 'ghouls' but additional "Freeze" Dip Switch, different "Lives" Dip Switch,
    and LOTS of "debug" features (read the notes to know how to activate them) */
-INPUT_PORTS_START( ghoulsu )
+static INPUT_PORTS_START( ghoulsu )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -924,7 +924,7 @@ INPUT_PORTS_START( ghoulsu )
 INPUT_PORTS_END
 
 /* Same as 'ghouls' but additional "Freeze" Dip Switch */
-INPUT_PORTS_START( daimakai )
+static INPUT_PORTS_START( daimakai )
 	PORT_INCLUDE(ghouls)
 
 	PORT_MODIFY("DSWB")
@@ -934,7 +934,7 @@ INPUT_PORTS_START( daimakai )
 INPUT_PORTS_END
 
 /* "Debug" features to be implemented */
-INPUT_PORTS_START( strider )
+static INPUT_PORTS_START( strider )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1018,7 +1018,7 @@ INPUT_PORTS_END
 
 /* Same as 'strider' but additional "2 Coins to Start, 1 to Continue" Dip Switch */
 /* "Debug" features to be implemented */
-INPUT_PORTS_START( stridrua )
+static INPUT_PORTS_START( stridrua )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1100,7 +1100,7 @@ INPUT_PORTS_START( stridrua )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dynwar )
+static INPUT_PORTS_START( dynwar )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1186,7 +1186,7 @@ INPUT_PORTS_START( dynwar )
 INPUT_PORTS_END
 
 /* Read the notes to know how to activate the "debug" features */
-INPUT_PORTS_START( willow )
+static INPUT_PORTS_START( willow )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1351,7 +1351,7 @@ INPUT_PORTS_START( willow )
 INPUT_PORTS_END
 
 /* To enable extra choices in the "test mode", you must press "Coin 1" ('5') AND "Service Mode" ('F2') */
-INPUT_PORTS_START( unsquad )
+static INPUT_PORTS_START( unsquad )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1437,7 +1437,7 @@ INPUT_PORTS_END
 
 /* To enable other choices in the "test mode", you must press ("P1 Button 1" ('Ctrl')
    or "P1 Button 2" ('Alt')) when "Service Mode" is ON */
-INPUT_PORTS_START( ffight )
+static INPUT_PORTS_START( ffight )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1525,7 +1525,7 @@ INPUT_PORTS_START( ffight )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( 1941 )
+static INPUT_PORTS_START( 1941 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1606,7 +1606,7 @@ INPUT_PORTS_START( 1941 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mercs )
+static INPUT_PORTS_START( mercs )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1719,7 +1719,7 @@ INPUT_PORTS_END
      - 0xff14ab.w : energy (player 1)
      - 0xff156b.w : energy (player 2)
 */
-INPUT_PORTS_START( mtwins )
+static INPUT_PORTS_START( mtwins )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1807,7 +1807,7 @@ INPUT_PORTS_END
      - code at 0x019b62 ('msword' and 'mswordr1'), 0x019bde ('mswordu') or 0x019c26 ('mswordj') : unknown effect
      - code at 0x01c322 ('msword' and 'mswordr1'), 0x01c39e ('mswordu') or 0x01c3e0 ('mswordj') : unknown effect
    These features are not available because of the 'bra' instruction after the test of bit 7. */
-INPUT_PORTS_START( msword )
+static INPUT_PORTS_START( msword )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1897,7 +1897,7 @@ INPUT_PORTS_START( msword )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( cawing )
+static INPUT_PORTS_START( cawing )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1988,7 +1988,7 @@ INPUT_PORTS_START( cawing )
 INPUT_PORTS_END
 
 /* "Debug" features to be implemented */
-INPUT_PORTS_START( nemo )
+static INPUT_PORTS_START( nemo )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2069,7 +2069,7 @@ INPUT_PORTS_START( nemo )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sf2 )
+static INPUT_PORTS_START( sf2 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2163,7 +2163,7 @@ INPUT_PORTS_START( sf2 )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( sf2j )
+static INPUT_PORTS_START( sf2j )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2256,7 +2256,7 @@ INPUT_PORTS_START( sf2j )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( 3wonders )
+static INPUT_PORTS_START( 3wonders )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2342,7 +2342,7 @@ INPUT_PORTS_START( 3wonders )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( kod )
+static INPUT_PORTS_START( kod )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2445,7 +2445,7 @@ INPUT_PORTS_END
 
 /* Needs further checking
    Same as kod but different "Bonus_life" values */
-INPUT_PORTS_START( kodj )
+static INPUT_PORTS_START( kodj )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2547,7 +2547,7 @@ INPUT_PORTS_START( kodj )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( captcomm )
+static INPUT_PORTS_START( captcomm )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2664,7 +2664,7 @@ INPUT_PORTS_START( captcomm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( knights )
+static INPUT_PORTS_START( knights )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2773,7 +2773,7 @@ INPUT_PORTS_START( knights )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( varth )
+static INPUT_PORTS_START( varth )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2855,7 +2855,7 @@ INPUT_PORTS_START( varth )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( cworld2j )
+static INPUT_PORTS_START( cworld2j )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2951,7 +2951,7 @@ INPUT_PORTS_START( cworld2j )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( wof )
+static INPUT_PORTS_START( wof )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3004,7 +3004,7 @@ INPUT_PORTS_START( wof )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( dino )
+static INPUT_PORTS_START( dino )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3057,7 +3057,7 @@ INPUT_PORTS_START( dino )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( punisher )
+static INPUT_PORTS_START( punisher )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3100,7 +3100,7 @@ INPUT_PORTS_START( punisher )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( slammast )
+static INPUT_PORTS_START( slammast )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3163,7 +3163,7 @@ INPUT_PORTS_START( slammast )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( pnickj )
+static INPUT_PORTS_START( pnickj )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3255,7 +3255,7 @@ INPUT_PORTS_START( pnickj )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( qad )
+static INPUT_PORTS_START( qad )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3358,7 +3358,7 @@ INPUT_PORTS_START( qad )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( qadj )
+static INPUT_PORTS_START( qadj )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3465,7 +3465,7 @@ INPUT_PORTS_START( qadj )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( qtono2 )
+static INPUT_PORTS_START( qtono2 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3564,7 +3564,7 @@ INPUT_PORTS_START( qtono2 )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( pang3 )
+static INPUT_PORTS_START( pang3 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3606,7 +3606,7 @@ INPUT_PORTS_START( pang3 )
 INPUT_PORTS_END
 
 /* Needs further checking */
-INPUT_PORTS_START( megaman )
+static INPUT_PORTS_START( megaman )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -3719,7 +3719,7 @@ INPUT_PORTS_END
 
 /* Needs further checking */
 /* Same as 'megaman' but no "Voice" Dip Switch */
-INPUT_PORTS_START( rockmanj )
+static INPUT_PORTS_START( rockmanj )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )

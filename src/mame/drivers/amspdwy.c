@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( amspdwy )
+static INPUT_PORTS_START( amspdwy )
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "Character Test" )
@@ -211,7 +211,7 @@ INPUT_PORTS_START( amspdwy )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( amspdwya )
+static INPUT_PORTS_START( amspdwya )
 
 	PORT_INCLUDE(amspdwy)
 

@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( goodejan_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0xd000, 0xd00f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( goodejan )
+static INPUT_PORTS_START( goodejan )
 	/* Must be port 0: coin inputs read through sound cpu */
 	SEIBU_COIN_INPUTS
 

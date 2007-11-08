@@ -174,7 +174,7 @@ static GFXDECODE_START( drtomy )
 GFXDECODE_END
 
 
-INPUT_PORTS_START( drtomy )
+static INPUT_PORTS_START( drtomy )
 	PORT_START	/* DSW #1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )

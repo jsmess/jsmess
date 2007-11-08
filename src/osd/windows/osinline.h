@@ -14,6 +14,11 @@
 
 #ifdef PTR64
 #include <intrin.h>
+#pragma intrinsic(_BitScanReverse)
+#else
+#pragma intrinsic(_InterlockedCompareExchange)
+#pragma intrinsic(_InterlockedExchange)
+#pragma intrinsic(_InterlockedExchangeAdd)
 #endif
 
 
@@ -393,6 +398,32 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	return _InterlockedExchangeAdd(ptr, delta) + delta;
+}
+
+
+/*-------------------------------------------------
+    atomic_increment32 - atomically increment the
+    32-bit value in memory at 'ptr', returning the
+    final result.
+-------------------------------------------------*/
+
+#define atomic_increment32 _atomic_increment32
+INLINE INT32 _atomic_increment32(INT32 volatile *ptr, INT32 delta)
+{
+	return _InterlockedIncrement(ptr);
+}
+
+
+/*-------------------------------------------------
+    atomic_decrement32 - atomically decrement the
+    32-bit value in memory at 'ptr', returning the
+    final result.
+-------------------------------------------------*/
+
+#define atomic_decrement32 _atomic_decrement32
+INLINE INT32 _atomic_decrement32(INT32 volatile *ptr, INT32 delta)
+{
+	return _InterlockedDecrement(ptr);
 }
 
 

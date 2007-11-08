@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 
 /*  Input Ports:    [0] Controls    [1] DSWs */
 
-INPUT_PORTS_START( ginganin )
+static INPUT_PORTS_START( ginganin )
 
 	PORT_START_TAG("IN0")	/* - Controls - Read from 70000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY

@@ -402,7 +402,7 @@ ADDRESS_MAP_END
              INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( opwolf )
+static INPUT_PORTS_START( opwolf )
 	/* 0x380000 -> 0x0ff028 (-$fd8,A5) (C-chip) */
 	PORT_START_TAG("DSWA")
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
@@ -456,14 +456,14 @@ INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( opwolfu )
+static INPUT_PORTS_START( opwolfu )
 	PORT_INCLUDE( opwolf )
 
 	PORT_MODIFY( "DSWA" )
 	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
-INPUT_PORTS_START( opwolfb )
+static INPUT_PORTS_START( opwolfb )
 	PORT_INCLUDE( opwolf )
 
 	PORT_MODIFY( "DSWB" )

@@ -86,21 +86,12 @@ INLINE UINT32 _mulu_32x32_hi(UINT32 val1, UINT32 val2)
     result to 32 bits
 -------------------------------------------------*/
 
+#if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
 #define mul_32x32_shift _mul_32x32_shift
 INLINE INT32 _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
 {
 	INT32 result;
 
-#if defined(__ppc64__) || defined(__PPC64__)
-	__asm__ (
-		" mulld  %[result], %[val1], %[val2]    \n"
-		" srd    %[result], %[result], %[shift] \n"
-		: [result] "=&r" (result)	/* result can go in any register */
-		: [val1]   "%r"  (val1)		/* any register, can swap with val2 */
-		, [val2]   "r"   (val2)		/* any register */
-		, [shift]  "r"   (shift)	/* any register */
-	);
-#else
 	__asm__ (
 		" mullw   %[result], %[val1], %[val2]    \n"
 		" mulhw   %[val1], %[val1], %[val2]      \n"
@@ -114,10 +105,10 @@ INLINE INT32 _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
 		: [val2]   "r"   (val2)
 		: "xer"
 	);
-#endif
 
 	return result;
 }
+#endif
 
 
 /*-------------------------------------------------
@@ -127,21 +118,12 @@ INLINE INT32 _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
     result to 32 bits
 -------------------------------------------------*/
 
+#if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
 #define mulu_32x32_shift _mulu_32x32_shift
 INLINE UINT32 _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
 {
 	UINT32 result;
 
-#if defined(__ppc64__) || defined(__PPC64__)
-	__asm__ (
-		" mulld  %[result], %[val1], %[val2]    \n"
-		" srd    %[result], %[result], %[shift] \n"
-		: [result] "=&r" (result)	/* result can go in any register */
-		: [val1]   "%r"  (val1)		/* any register, can swap with val2 */
-		, [val2]   "r"   (val2)		/* any register */
-		, [shift]  "r"   (shift)	/* any register */
-	);
-#else
 	__asm__ (
 		" mullw   %[result], %[val1], %[val2]    \n"
 		" mulhwu  %[val1], %[val1], %[val2]      \n"
@@ -155,10 +137,10 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
 		: [val2]   "r"   (val2)
 		: "xer"
 	);
-#endif
 
 	return result;
 }
+#endif
 
 
 /*-------------------------------------------------
@@ -216,7 +198,19 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
     point reciprocal
 -------------------------------------------------*/
 
-/* TBD */
+#define recip_approx _recip_approx
+INLINE float _recip_approx(float value)
+{
+	float result;
+
+	__asm__ (
+		" fres  %[result], %[value] \n"
+		: [result] "=f" (result)
+		: [value]  "f"  (value)
+	);
+
+	return result;
+}
 
 
 

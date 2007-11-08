@@ -278,7 +278,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( sidetrac )
+static INPUT_PORTS_START( sidetrac )
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -313,7 +313,7 @@ INPUT_PORTS_START( sidetrac )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( targ )
+static INPUT_PORTS_START( targ )
 	PORT_START_TAG("DSW")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) /* upright/cocktail switch? */
 	PORT_DIPNAME( 0x02, 0x00, "Pence Coinage" )
@@ -358,7 +358,7 @@ INPUT_PORTS_END
 
 
 /* identical to Targ, the only difference is the additional Language dip switch */
-INPUT_PORTS_START( spectar )
+static INPUT_PORTS_START( spectar )
 	PORT_INCLUDE(targ)
 
 	PORT_MODIFY("INTSOURCE")
@@ -370,7 +370,7 @@ INPUT_PORTS_START( spectar )
 	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( rallys )
+static INPUT_PORTS_START( rallys )
 	PORT_INCLUDE(spectar)
 
 	PORT_MODIFY("DSW")
@@ -411,7 +411,7 @@ INPUT_PORTS_START( rallys )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( phantoma )
+static INPUT_PORTS_START( phantoma )
 	PORT_INCLUDE(rallys)
 
 	PORT_MODIFY("DSW")
@@ -427,7 +427,7 @@ INPUT_PORTS_START( phantoma )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( mtrap )
+static INPUT_PORTS_START( mtrap )
 	PORT_START_TAG("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )
@@ -491,7 +491,7 @@ INPUT_PORTS_START( mtrap )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( venture )
+static INPUT_PORTS_START( venture )
 	PORT_START_TAG("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Bonus_Life ) )
@@ -547,7 +547,7 @@ INPUT_PORTS_START( venture )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( teetert )
+static INPUT_PORTS_START( teetert )
 	PORT_START_TAG("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )
@@ -607,7 +607,7 @@ INPUT_PORTS_START( teetert )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( pepper2 )
+static INPUT_PORTS_START( pepper2 )
 	PORT_START_TAG("DSW")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )
@@ -664,7 +664,7 @@ INPUT_PORTS_START( pepper2 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( fax )
+static INPUT_PORTS_START( fax )
 	PORT_START_TAG("DSW")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_DIPNAME( 0x06, 0x06, "Bonus Time" )

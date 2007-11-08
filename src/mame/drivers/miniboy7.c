@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 *      Input Ports       *
 *************************/
 
-INPUT_PORTS_START( miniboy7 )
+static INPUT_PORTS_START( miniboy7 )
 INPUT_PORTS_END
 
 

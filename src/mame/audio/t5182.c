@@ -200,7 +200,7 @@ static void t5182_ym2151_irq_handler(int irq)
 
 
 
-int semaphore_main, semaphore_snd;
+static int semaphore_main, semaphore_snd;
 
 READ8_HANDLER(t5182_sharedram_semaphore_snd_r)
 {

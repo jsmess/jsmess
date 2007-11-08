@@ -292,7 +292,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( capbowl )
+static INPUT_PORTS_START( capbowl )
 	PORT_START	/* IN0 */
 	/* low 4 bits are for the trackball */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL

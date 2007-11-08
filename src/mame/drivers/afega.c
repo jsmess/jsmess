@@ -252,7 +252,7 @@ ADDRESS_MAP_END
                                 Stagger I
 ***************************************************************************/
 
-INPUT_PORTS_START( stagger1 )
+static INPUT_PORTS_START( stagger1 )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2    )
@@ -329,7 +329,7 @@ INPUT_PORTS_START( stagger1 )
 INPUT_PORTS_END
 
 /* everything seems active high.. not low */
-INPUT_PORTS_START( redhawkb )
+static INPUT_PORTS_START( redhawkb )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_HIGH, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_HIGH, IPT_COIN2    )
@@ -409,7 +409,7 @@ INPUT_PORTS_END
                             Sen Jin - Guardian Storm
 ***************************************************************************/
 
-INPUT_PORTS_START( grdnstrm )
+static INPUT_PORTS_START( grdnstrm )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2    )
@@ -487,7 +487,7 @@ INPUT_PORTS_END
 
 /* Pop's Pop's */
 
-INPUT_PORTS_START( popspops )
+static INPUT_PORTS_START( popspops )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2    )
@@ -572,7 +572,7 @@ INPUT_PORTS_END
                                 Bubble 2000
 ***************************************************************************/
 
-INPUT_PORTS_START( bubl2000 )
+static INPUT_PORTS_START( bubl2000 )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2    )
@@ -655,7 +655,7 @@ INPUT_PORTS_END
                                 Mang Chi
 ***************************************************************************/
 
-INPUT_PORTS_START( mangchi )
+static INPUT_PORTS_START( mangchi )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2    )
@@ -739,7 +739,7 @@ INPUT_PORTS_END
                                 Fire Hawk
 ***************************************************************************/
 
-INPUT_PORTS_START( firehawk )
+static INPUT_PORTS_START( firehawk )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -823,7 +823,7 @@ INPUT_PORTS_END
                              Spectrum 2000
 ***************************************************************************/
 
-INPUT_PORTS_START( spec2k )
+static INPUT_PORTS_START( spec2k )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -905,7 +905,7 @@ INPUT_PORTS_END
                                 Twin Action
 ***************************************************************************/
 
-INPUT_PORTS_START( twinactn )
+static INPUT_PORTS_START( twinactn )
 	PORT_START_TAG("IN0")	// $080000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2    )

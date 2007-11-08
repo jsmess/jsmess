@@ -362,4 +362,42 @@ INLINE INT32 atomic_add32(INT32 volatile *ptr, INT32 delta)
 }
 #endif
 
+
+/*-------------------------------------------------
+    atomic_increment32 - atomically increment the
+    32-bit value in memory at 'ptr', returning the
+    final result.
+
+    Note that the default implementation does
+    no synchronization. You MUST override this
+    in osinline.h for it to be useful in a
+    multithreaded environment!
+-------------------------------------------------*/
+
+#ifndef atomic_increment32
+INLINE INT32 atomic_increment32(INT32 volatile *ptr, INT32 delta)
+{
+	return atomic_add32(ptr, 1);
+}
+#endif
+
+
+/*-------------------------------------------------
+    atomic_decrement32 - atomically decrement the
+    32-bit value in memory at 'ptr', returning the
+    final result.
+
+    Note that the default implementation does
+    no synchronization. You MUST override this
+    in osinline.h for it to be useful in a
+    multithreaded environment!
+-------------------------------------------------*/
+
+#ifndef atomic_decrement32
+INLINE INT32 atomic_decrement32(INT32 volatile *ptr, INT32 delta)
+{
+	return atomic_add32(ptr, -1);
+}
+#endif
+
 #endif /* __EMINLINE__ */

@@ -524,23 +524,6 @@ game_driver driver_##NAME =					\
 	NULL									\
 };
 
-#define GAMEB(YEAR,NAME,PARENT,BIOS,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
-game_driver driver_##NAME =					\
-{											\
-	__FILE__,								\
-	#PARENT,								\
-	#NAME,									\
-	FULLNAME,								\
-	#YEAR,									\
-	COMPANY,								\
-	construct_##MACHINE,					\
-	ipt_##INPUT,							\
-	driver_init_##INIT,						\
-	rom_##NAME,								\
-	(MONITOR)|(FLAGS),						\
-	NULL									\
-};
-
 #define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)	\
 game_driver driver_##NAME =					\
 {											\

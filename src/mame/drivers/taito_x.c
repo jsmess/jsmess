@@ -604,7 +604,7 @@ ADDRESS_MAP_END
 
 /**************************************************************************/
 
-INPUT_PORTS_START( taitox_generic )
+static INPUT_PORTS_START( taitox_generic )
 	/* The Dip Switches will be filled for each game */
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -675,7 +675,7 @@ INPUT_PORTS_START( taitox_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( superman )
+static INPUT_PORTS_START( superman )
 	PORT_INCLUDE( taitox_generic )
 
 	/* 0x500000 (low) and 0x500002 (high) -> 0xf01c4a ($1c4a,A5) */
@@ -703,14 +703,14 @@ INPUT_PORTS_START( superman )
 	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( suprmanj )
+static INPUT_PORTS_START( suprmanj )
 	PORT_INCLUDE( superman )
 
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( twinhawk )
+static INPUT_PORTS_START( twinhawk )
 	PORT_INCLUDE( taitox_generic )
 
 	/* 0x500000 (low) and 0x500002 (high) -> 0xf001b8 */
@@ -743,7 +743,7 @@ INPUT_PORTS_START( twinhawk )
 	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( twinhwku )
+static INPUT_PORTS_START( twinhwku )
 	PORT_INCLUDE( twinhawk )
 
 	PORT_MODIFY("DSWA")
@@ -754,7 +754,7 @@ INPUT_PORTS_START( twinhwku )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( daisenpu )
+static INPUT_PORTS_START( daisenpu )
 	PORT_INCLUDE( twinhawk )
 
 	/* 0x500000 (low) and 0x500002 (high) -> 0xf001a4 */
@@ -771,7 +771,7 @@ INPUT_PORTS_START( daisenpu )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gigandes )
+static INPUT_PORTS_START( gigandes )
 	PORT_INCLUDE( taitox_generic )
 
 	/* 0x500000 (low) and 0x500002 (high) -> 0xf00a3c */
@@ -829,7 +829,7 @@ INPUT_PORTS_START( gigandes )
 	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( kyustrkr )
+static INPUT_PORTS_START( kyustrkr )
 	PORT_INCLUDE( taitox_generic )
 
 	/* 0x500000 (low) and 0x500002 (high) -> 0xf028fe */
@@ -874,7 +874,7 @@ INPUT_PORTS_START( kyustrkr )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ballbros )
+static INPUT_PORTS_START( ballbros )
 	PORT_INCLUDE( taitox_generic )
 
 	/* 0x500000 (low) and 0x500002 (high) -> 0xf028fe */

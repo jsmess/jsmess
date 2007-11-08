@@ -1418,7 +1418,7 @@ READ16_HANDLER( SCSP_0_r )
 	return SCSP_r16(SCSP, offset*2);
 }
 
-extern UINT32* stv_scu;
+UINT32* stv_scu;
 
 WRITE16_HANDLER( SCSP_0_w )
 {

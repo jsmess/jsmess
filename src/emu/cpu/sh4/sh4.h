@@ -44,12 +44,14 @@ enum {
 
 enum
 {
-	CPUINFO_INT_SH4_FRT_INPUT = CPUINFO_INT_CPU_SPECIFIC
+	CPUINFO_INT_SH4_IRLn_INPUT = CPUINFO_INT_CPU_SPECIFIC,
+	CPUINFO_INT_SH4_FRT_INPUT
 };
 
 enum
 {
 	CPUINFO_PTR_SH4_FTCSR_READ_CALLBACK = CPUINFO_PTR_CPU_SPECIFIC,
+	CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,
 };
 
 struct sh4_config
@@ -64,6 +66,18 @@ struct sh4_config
   int md7;
   int md8;
   int clock;
+};
+
+struct sh4_ddt_dma
+{
+	UINT32 source;
+	UINT32 length;
+	UINT32 size;
+	UINT32 destination;
+	void *buffer;
+	int direction;
+	int channel;
+	int mode;
 };
 
 extern void sh4_get_info(UINT32 state, cpuinfo *info);

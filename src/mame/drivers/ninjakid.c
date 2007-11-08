@@ -254,7 +254,7 @@ ROM_END
  2 Sets of Dipsiwtches
 *******************************************************************************/
 
-INPUT_PORTS_START( ninjakid )
+static INPUT_PORTS_START( ninjakid )
 	PORT_START_TAG("IN0")	/* 0xa000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,	IPT_JOYSTICK_LEFT ) PORT_2WAY /* "XPOS1" */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,	IPT_JOYSTICK_RIGHT ) PORT_2WAY

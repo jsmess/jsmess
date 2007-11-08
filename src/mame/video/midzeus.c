@@ -603,12 +603,9 @@ Zeus cmd 1C : ( 4000 0000 0000 ) ( 0000 4000 0000 ) ( 0000 0000 4000 )  -101.00 
 */
 
 
-static void render_poly_4bit(void *dest, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_poly_4bit(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
-	float ooz = poly_param_value(startx, scanline, 0, poly);
-	float uoz = poly_param_value(startx, scanline, 1, poly);
-	float voz = poly_param_value(startx, scanline, 2, poly);
+	const poly_extra_data *extra = extradata;
 	float doozdx = poly->param[0].dpdx;
 	float duozdx = poly->param[1].dpdx;
 	float dvozdx = poly->param[2].dpdx;
@@ -616,9 +613,12 @@ static void render_poly_4bit(void *dest, INT32 scanline, INT32 startx, INT32 sto
 	const UINT32 *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
 	int texwidth = extra->texwidth;
+	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
+	float uoz = poly_param_tri_value(extent->startx, scanline, 1, poly);
+	float voz = poly_param_tri_value(extent->startx, scanline, 2, poly);
 	int x;
 
-	for (x = startx; x < stopx; x++)
+	for (x = extent->startx; x < extent->stopx; x++)
 	{
 		float z = recip_approx(ooz);
 		int u = (int)(uoz * z) & ((texwidth * 2) - 1);
@@ -640,12 +640,9 @@ static void render_poly_4bit(void *dest, INT32 scanline, INT32 startx, INT32 sto
 }
 
 
-static void render_poly_8bit(void *dest, INT32 scanline, INT32 startx, INT32 stopx, const poly_params *poly, int threadid)
+static void render_poly_8bit(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
 {
-	poly_extra_data *extra = poly->extra;
-	float ooz = poly_param_value(startx, scanline, 0, poly);
-	float uoz = poly_param_value(startx, scanline, 1, poly);
-	float voz = poly_param_value(startx, scanline, 2, poly);
+	const poly_extra_data *extra = extradata;
 	float doozdx = poly->param[0].dpdx;
 	float duozdx = poly->param[1].dpdx;
 	float dvozdx = poly->param[2].dpdx;
@@ -653,9 +650,12 @@ static void render_poly_8bit(void *dest, INT32 scanline, INT32 startx, INT32 sto
 	const UINT32 *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
 	int texwidth = extra->texwidth;
+	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
+	float uoz = poly_param_tri_value(extent->startx, scanline, 1, poly);
+	float voz = poly_param_tri_value(extent->startx, scanline, 2, poly);
 	int x;
 
-	for (x = startx; x < stopx; x++)
+	for (x = extent->startx; x < extent->stopx; x++)
 	{
 		float z = recip_approx(ooz);
 		int u = (int)(uoz * z) & (texwidth - 1);
@@ -757,7 +757,7 @@ static void zeus_draw_polys(UINT32 addr_and_count, UINT32 texdata, int logcmd)
 
 			if ((data[datanum] >> 24) == 0x25 || (data[datanum] >> 24) == 0x30 /* invasn */)
 			{
-				poly_draw_scanline callback;
+				poly_draw_tri_scanline callback;
 				poly_extra_data *extra;
 				poly_vertex vert[4];
 				int i;

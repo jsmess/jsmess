@@ -57,7 +57,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( revx )
+static INPUT_PORTS_START( revx )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)

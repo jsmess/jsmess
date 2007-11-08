@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( skyraid_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( skyraid )
+static INPUT_PORTS_START( skyraid )
 	PORT_START
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )

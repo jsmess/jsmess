@@ -162,7 +162,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-INPUT_PORTS_START( lkage )
+static INPUT_PORTS_START( lkage )
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x03, "30000 100000" ) /* unverified */

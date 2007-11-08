@@ -233,7 +233,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )\
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
-INPUT_PORTS_START( gyruss )
+static INPUT_PORTS_START( gyruss )
 GYRUSS_COMMON
 
 	PORT_START_TAG("DSW1")
@@ -270,7 +270,7 @@ INPUT_PORTS_END
 
 /* This is identical to gyruss except for the bonus that has different
    values */
-INPUT_PORTS_START( gyrussce )
+static INPUT_PORTS_START( gyrussce )
 GYRUSS_COMMON
 
 	PORT_START_TAG("DSW1")

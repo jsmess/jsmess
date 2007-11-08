@@ -178,7 +178,7 @@ ADDRESS_MAP_END
 
 /* Inputs Ports **************************************************************/
 
-INPUT_PORTS_START( xyonix )
+static INPUT_PORTS_START( xyonix )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)

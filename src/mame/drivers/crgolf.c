@@ -270,7 +270,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( crgolf )
+static INPUT_PORTS_START( crgolf )
 	PORT_START	/* CREDIT */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )

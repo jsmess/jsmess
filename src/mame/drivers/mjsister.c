@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 
 /****************************************************************************/
 
-INPUT_PORTS_START( mjsister )
+static INPUT_PORTS_START( mjsister )
 
 	PORT_START	/* DSW1 (0) */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )

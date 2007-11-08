@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x60000e, 0x60000f) AM_READ(MRA16_NOP) AM_WRITE(MWA16_NOP)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( drill )
+static INPUT_PORTS_START( drill )
 INPUT_PORTS_END
 
 static const gfx_layout drill_layout =

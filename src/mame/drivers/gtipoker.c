@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( gtipoker_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( gtipoker )
+static INPUT_PORTS_START( gtipoker )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =

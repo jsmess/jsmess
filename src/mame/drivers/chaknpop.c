@@ -127,7 +127,7 @@ static struct AY8910interface ay8910_interface_2 =
 
 ***************************************************************************/
 
-INPUT_PORTS_START( chaknpop )
+static INPUT_PORTS_START( chaknpop )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( portrait_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( portrait )
+static INPUT_PORTS_START( portrait )
 	PORT_START /* DSW 1 */
 	PORT_DIPNAME( 0x0f, 0x08, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )

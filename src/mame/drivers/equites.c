@@ -418,7 +418,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 // Equites Port Map
 
-INPUT_PORTS_START( equites )
+static INPUT_PORTS_START( equites )
 	PORT_START
 	EQUITES_PLAYER_INPUT_LSB( IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3, IPT_START1 )
 	EQUITES_PLAYER_INPUT_MSB( IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3, IPT_START2 )
@@ -451,7 +451,7 @@ INPUT_PORTS_END
 /******************************************************************************/
 // Bull Fighter Port Map
 
-INPUT_PORTS_START( bullfgtr )
+static INPUT_PORTS_START( bullfgtr )
 	PORT_START
 	EQUITES_PLAYER_INPUT_LSB( IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3, IPT_START1 )
 	EQUITES_PLAYER_INPUT_MSB( IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3, IPT_START2 )
@@ -483,7 +483,7 @@ INPUT_PORTS_END
 /******************************************************************************/
 // Koukouyakyuh Port Map
 
-INPUT_PORTS_START( kouyakyu )
+static INPUT_PORTS_START( kouyakyu )
 	PORT_START
 	EQUITES_PLAYER_INPUT_LSB( IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3, IPT_START1 )
 	EQUITES_PLAYER_INPUT_MSB( IPT_BUTTON1, IPT_BUTTON2, IPT_BUTTON3, IPT_START2 )
@@ -516,7 +516,7 @@ INPUT_PORTS_END
 /******************************************************************************/
 // Splendor Blast Port Map
 
-INPUT_PORTS_START( splndrbt )
+static INPUT_PORTS_START( splndrbt )
 	PORT_START
 	EQUITES_PLAYER_INPUT_LSB( IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN, IPT_START1 )
 	EQUITES_PLAYER_INPUT_MSB( IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN, IPT_START2 )
@@ -548,7 +548,7 @@ INPUT_PORTS_END
 /******************************************************************************/
 // High Voltage Port Map
 
-INPUT_PORTS_START( hvoltage )
+static INPUT_PORTS_START( hvoltage )
 	PORT_START
 	EQUITES_PLAYER_INPUT_LSB( IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN, IPT_START1 )
 	EQUITES_PLAYER_INPUT_MSB( IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN, IPT_START2 )

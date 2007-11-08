@@ -489,7 +489,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( artmagic )
+static INPUT_PORTS_START( artmagic )
 	PORT_START_TAG("300000")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -580,7 +580,7 @@ INPUT_PORTS_START( artmagic )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( cheesech )
+static INPUT_PORTS_START( cheesech )
 	PORT_INCLUDE(artmagic)
 
 	PORT_MODIFY("300004")
@@ -605,7 +605,7 @@ INPUT_PORTS_START( cheesech )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( ultennis )
+static INPUT_PORTS_START( ultennis )
 	PORT_INCLUDE(artmagic)
 
 	PORT_MODIFY("300004")
@@ -634,7 +634,7 @@ INPUT_PORTS_START( ultennis )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( stonebal )
+static INPUT_PORTS_START( stonebal )
 	PORT_INCLUDE(artmagic)
 
 	PORT_MODIFY("300004")

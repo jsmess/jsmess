@@ -43,7 +43,7 @@ static INTERRUPT_GEN( cheekyms_interrupt )
 }
 
 
-INPUT_PORTS_START( cheekyms )
+static INPUT_PORTS_START( cheekyms )
 	PORT_START      /* IN0 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )

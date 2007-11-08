@@ -195,7 +195,7 @@ ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
 
-INPUT_PORTS_START( suprslam )
+static INPUT_PORTS_START( suprslam )
 
 	PORT_START      /* IN1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)

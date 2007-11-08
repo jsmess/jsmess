@@ -208,7 +208,7 @@ static WRITE16_HANDLER ( wwfwfest_soundwrite )
  There are 4 players, 2 sets of dipswitches and 2 misc
 *******************************************************************************/
 
-INPUT_PORTS_START( wwfwfest )
+static INPUT_PORTS_START( wwfwfest )
 	PORT_START	/* Player 1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )

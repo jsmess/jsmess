@@ -78,7 +78,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-INPUT_PORTS_START( compgolf )
+static INPUT_PORTS_START( compgolf )
 	/* Player 1 Port */
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )

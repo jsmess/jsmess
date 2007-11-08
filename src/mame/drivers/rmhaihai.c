@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( themj_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITE(MWA8_NOP)	// ??
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( rmhaihai )
+static INPUT_PORTS_START( rmhaihai )
 	PORT_START  /* dsw2 */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -341,7 +341,7 @@ INPUT_PORTS_START( rmhaihai )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( rmhaihib )
+static INPUT_PORTS_START( rmhaihib )
 	PORT_START  /* dsw2 */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

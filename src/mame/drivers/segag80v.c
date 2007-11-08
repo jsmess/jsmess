@@ -429,7 +429,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( g80v_generic )
+static INPUT_PORTS_START( g80v_generic )
 	PORT_START_TAG("D7D6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)	/* P1.5 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
@@ -534,7 +534,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INPUT_PORTS_START( elim2 )
+static INPUT_PORTS_START( elim2 )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D7D6")
@@ -574,7 +574,7 @@ INPUT_PORTS_START( elim2 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( elim2c )
+static INPUT_PORTS_START( elim2c )
 	PORT_INCLUDE( elim2 )
 
 	PORT_MODIFY("D7D6")
@@ -593,7 +593,7 @@ INPUT_PORTS_START( elim2c )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( elim4 )
+static INPUT_PORTS_START( elim4 )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D7D6")
@@ -674,7 +674,7 @@ INPUT_PORTS_START( elim4 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( spacfury )
+static INPUT_PORTS_START( spacfury )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D5D4")
@@ -716,7 +716,7 @@ INPUT_PORTS_START( spacfury )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( zektor )
+static INPUT_PORTS_START( zektor )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D3D2")
@@ -753,7 +753,7 @@ INPUT_PORTS_START( zektor )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( tacscan )
+static INPUT_PORTS_START( tacscan )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D3D2")
@@ -790,7 +790,7 @@ INPUT_PORTS_START( tacscan )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( startrek )
+static INPUT_PORTS_START( startrek )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D3D2")

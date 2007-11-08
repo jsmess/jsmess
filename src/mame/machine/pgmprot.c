@@ -8,7 +8,7 @@ extern UINT16 *pgm_mainram;
 
 
 /*** (PSTARS) ***/
-UINT16 PSTARSKEY;
+static UINT16 PSTARSKEY;
 static UINT16 PSTARSINT[2];
 static UINT32 PSTARS_REGS[16];
 static UINT32 PSTARS_VAL;

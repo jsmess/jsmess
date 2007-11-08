@@ -417,7 +417,7 @@ INTERRUPT_GEN( pntnpuzl_irq )
 		cpunum_set_input_line(0, 4, PULSE_LINE);
 }
 
-INPUT_PORTS_START( pntnpuzl )
+static INPUT_PORTS_START( pntnpuzl )
 	PORT_START	/* fake inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)

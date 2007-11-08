@@ -230,7 +230,7 @@ Bonus credit  |50    |                   |    |    |    |on
 */
 
 
-INPUT_PORTS_START( jongkyo )
+static INPUT_PORTS_START( jongkyo )
 	PORT_START_TAG("0")
     PORT_DIPNAME( 0x01, 0x01, "0" )
     PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

@@ -598,7 +598,7 @@ Address in ROM:
  *
  *************************************/
 
-INPUT_PORTS_START( dlair )
+static INPUT_PORTS_START( dlair )
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:1,0")
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -671,7 +671,7 @@ INPUT_PORTS_START( dlair )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dlaire )
+static INPUT_PORTS_START( dlaire )
 	PORT_INCLUDE(dlair)
 
 	PORT_MODIFY("DSW2")
@@ -681,7 +681,7 @@ INPUT_PORTS_START( dlaire )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dleuro )
+static INPUT_PORTS_START( dleuro )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )

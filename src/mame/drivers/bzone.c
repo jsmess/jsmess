@@ -423,7 +423,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING (  0x60, "6 credits/4 coins" )\
   	PORT_DIPSETTING (  0x80, "6 credits/5 coins" )
 
-INPUT_PORTS_START( bzone )
+static INPUT_PORTS_START( bzone )
 BZONEIN0
 BZONEDSW0
 BZONEDSW1
@@ -440,7 +440,7 @@ BZONEDSW1
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( redbaron )
+static INPUT_PORTS_START( redbaron )
 BZONEIN0
 	PORT_START_TAG("DSW0")
 	/* See the table above if you are really interested */
@@ -494,7 +494,7 @@ BZONEIN0
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( bradley )
+static INPUT_PORTS_START( bradley )
 BZONEIN0
 BZONEDSW0
 BZONEDSW1

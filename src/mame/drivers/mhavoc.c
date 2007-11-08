@@ -334,7 +334,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( mhavoc )
+static INPUT_PORTS_START( mhavoc )
 	PORT_START	/* IN0 - alpha (player_1 = 0) */
 	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
@@ -407,7 +407,7 @@ INPUT_PORTS_START( mhavoc )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( mhavocp )
+static INPUT_PORTS_START( mhavocp )
 	PORT_START	/* IN0 - alpha (player_1 = 0) */
 	PORT_BIT ( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -477,7 +477,7 @@ INPUT_PORTS_START( mhavocp )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( alphaone )
+static INPUT_PORTS_START( alphaone )
 	PORT_START	/* IN0 - alpha (player_1 = 0) */
 	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT ( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( littlerb_main, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( littlerb )
+static INPUT_PORTS_START( littlerb )
 	PORT_START	/* 16bit */
 	PORT_DIPNAME( 0x0003, 0x0001, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x0003, "2" )

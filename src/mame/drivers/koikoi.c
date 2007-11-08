@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( koikoi )
+static INPUT_PORTS_START( koikoi )
 	PORT_START	/* DSW */
 	PORT_DIPNAME( 0x03, 0x01, "Timer C" )
 	 PORT_DIPSETTING(    0x00, "50" )

@@ -393,7 +393,7 @@ ADDRESS_MAP_END
                             Back Street Soccer
 ***************************************************************************/
 
-INPUT_PORTS_START( bssoccer )
+static INPUT_PORTS_START( bssoccer )
 
 	PORT_START	// IN0 - $a00001.b - Player 1
 	JOY(1)
@@ -476,7 +476,7 @@ INPUT_PORTS_END
                                 Ultra Balloon
 ***************************************************************************/
 
-INPUT_PORTS_START( uballoon )
+static INPUT_PORTS_START( uballoon )
 
 	PORT_START	// IN0 - $600000.w - Player 1
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -571,7 +571,7 @@ INPUT_PORTS_END
                                 Suna Quiz 6000
 ***************************************************************************/
 
-INPUT_PORTS_START( sunaq )
+static INPUT_PORTS_START( sunaq )
 	PORT_START	// Player 1
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)

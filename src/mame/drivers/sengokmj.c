@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( sengokmj )
+static INPUT_PORTS_START( sengokmj )
 	/* Must be port 0: coin inputs read through sound cpu */
 	SEIBU_COIN_INPUTS
 

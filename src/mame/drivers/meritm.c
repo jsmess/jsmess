@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( meritm )
+static INPUT_PORTS_START( meritm )
 INPUT_PORTS_END
 
 

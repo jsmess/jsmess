@@ -130,7 +130,7 @@ ADDRESS_MAP_END
                                 Paradise
 ***************************************************************************/
 
-INPUT_PORTS_START( paradise )
+static INPUT_PORTS_START( paradise )
 	PORT_START	// IN0 - port $2020 - DSW 1
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
@@ -211,7 +211,7 @@ INPUT_PORTS_START( paradise )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( tgtball )
+static INPUT_PORTS_START( tgtball )
 	PORT_START	// IN0 - port $2020 - DSW 1
 	PORT_DIPNAME( 0x03, 0x02, "Time" )
 	PORT_DIPSETTING(    0x03, "60" )
@@ -290,7 +290,7 @@ INPUT_PORTS_START( tgtball )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( torus )
+static INPUT_PORTS_START( torus )
 
 	PORT_START	// IN0 - port $2020 - DSW 1
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -375,7 +375,7 @@ INPUT_PORTS_START( torus )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( madball )
+static INPUT_PORTS_START( madball )
 	PORT_START	/* 8bit DSW 1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )

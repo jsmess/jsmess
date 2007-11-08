@@ -258,7 +258,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x01, "5" ) \
 	PORT_DIPSETTING(    0x00, "6" )
 
-INPUT_PORTS_START( galivan )
+static INPUT_PORTS_START( galivan )
 	PORT_START_TAG("IN0")
 	NIHON_JOYSTICK(1)
 	PORT_START_TAG("IN1")
@@ -298,7 +298,7 @@ INPUT_PORTS_START( galivan )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dangar )
+static INPUT_PORTS_START( dangar )
 	PORT_START_TAG("IN0")
 	NIHON_JOYSTICK(1)
 	PORT_START_TAG("IN1")
@@ -339,7 +339,7 @@ INPUT_PORTS_START( dangar )
 INPUT_PORTS_END
 
 /* different Lives values and last different the last two dips */
-INPUT_PORTS_START( dangar2 )
+static INPUT_PORTS_START( dangar2 )
 	PORT_START_TAG("IN0")
 	NIHON_JOYSTICK(1)
 	PORT_START_TAG("IN1")
@@ -384,7 +384,7 @@ INPUT_PORTS_START( dangar2 )
 INPUT_PORTS_END
 
 /* the last two dip switches are different */
-INPUT_PORTS_START( dangarb )
+static INPUT_PORTS_START( dangarb )
 	PORT_START_TAG("IN0")
 	NIHON_JOYSTICK(1)
 	PORT_START_TAG("IN1")
@@ -424,7 +424,7 @@ INPUT_PORTS_START( dangarb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ninjemak )
+static INPUT_PORTS_START( ninjemak )
 	PORT_START_TAG("IN0")
 	NIHON_JOYSTICK(1)
 	PORT_START_TAG("IN1")

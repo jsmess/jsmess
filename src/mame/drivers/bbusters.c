@@ -402,7 +402,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-INPUT_PORTS_START( bbusters )
+static INPUT_PORTS_START( bbusters )
 	PORT_START_TAG("IN0")	/* Player controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	PORT_NAME("P1 Fire")	// "Fire"
@@ -497,7 +497,7 @@ INPUT_PORTS_START( bbusters )
 #endif
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mechatt )
+static INPUT_PORTS_START( mechatt )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )

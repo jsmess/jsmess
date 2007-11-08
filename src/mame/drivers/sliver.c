@@ -320,7 +320,7 @@ static void render_jpeg(void)
 	}
 }
 
-int find_data(int offset)
+static int find_data(int offset)
 {
 	int idx=0;
 	while(gfxlookup[idx][0]>=0)
@@ -451,7 +451,7 @@ VIDEO_UPDATE(sliver)
 	return 0;
 }
 
-INPUT_PORTS_START( sliver )
+static INPUT_PORTS_START( sliver )
 
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)

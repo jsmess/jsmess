@@ -24,7 +24,7 @@
 #include "sound/fmopl.h"
 
 
-#if (HAS_YM3812)
+#if BUILD_YM3812
 
 struct ym3812_info
 {
@@ -191,7 +191,7 @@ void ym3812_get_info(void *token, UINT32 state, sndinfo *info)
 #endif
 
 
-#if (HAS_YM3526)
+#if BUILD_YM3526
 
 struct ym3526_info
 {
@@ -359,7 +359,7 @@ void ym3526_get_info(void *token, UINT32 state, sndinfo *info)
 #endif
 
 
-#if (HAS_Y8950)
+#if BUILD_Y8950
 
 struct y8950_info
 {

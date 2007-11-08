@@ -24,12 +24,12 @@ WRITE8_HANDLER( rollrace_flipx_w );
 
 READ8_HANDLER( rollrace_bkgpen_r );
 
-READ8_HANDLER( ra_fake_d800_r )
+static READ8_HANDLER( ra_fake_d800_r )
 {
 	return 0x51;
 }
 
-WRITE8_HANDLER( ra_fake_d800_w )
+static WRITE8_HANDLER( ra_fake_d800_w )
 {
 /*  logerror("d900: %02X\n",data);*/
 }
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( rollrace )
+static INPUT_PORTS_START( rollrace )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY

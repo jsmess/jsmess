@@ -689,7 +689,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )	/* COINL */ \
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-INPUT_PORTS_START( tmek )
+static INPUT_PORTS_START( tmek )
 	COMMON_IN0		/* 68.SW (A1=0) */
 
 	COMMON_IN1		/* 68.SW (A1=1) */
@@ -721,7 +721,7 @@ INPUT_PORTS_START( tmek )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( primrage )
+static INPUT_PORTS_START( primrage )
 	COMMON_IN0		/* 68.SW (A1=0) */
 
 	COMMON_IN1		/* 68.SW (A1=1) bit 0x0008 does something */

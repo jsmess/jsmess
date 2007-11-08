@@ -214,7 +214,7 @@ static INTERRUPT_GEN( panicr_interrupt )
 		cpunum_set_input_line_and_vector(cpu_getactivecpu(), 0, HOLD_LINE, 0xc4/4);
 }
 
-INPUT_PORTS_START( panicr )
+static INPUT_PORTS_START( panicr )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) //left
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) //right

@@ -612,7 +612,7 @@ endif
 SOUNDDEFS += -DHAS_VOTRAX=$(if $(filter VOTRAX,$(SOUNDS)),1,0)
 
 ifneq ($(filter VOTRAX,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/votrax.o
+SOUNDOBJS += $(SOUNDOBJ)/votrax.o $(SOUNDOBJ)/samples.o
 endif
 
 

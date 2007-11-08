@@ -57,7 +57,7 @@ extern UINT8 fcombat_cocktail_flip;
 extern int fcombat_sh;
 extern int fcombat_sv;
 
-INPUT_PORTS_START( fcombat )
+static INPUT_PORTS_START( fcombat )
 	PORT_START_TAG("IN0")      /* player 1 inputs (muxed on 0xe000) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)

@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( thoop2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( thoop2 )
+static INPUT_PORTS_START( thoop2 )
 
 PORT_START	/* DSW #2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )

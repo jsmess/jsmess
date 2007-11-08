@@ -186,9 +186,9 @@ static UINT8 prot_ram[0x80]; /* internal RAM */
 static UINT8 prot_param[8];
 static int coin;
 static int complete;
-int lives[2];
+static int lives[2];
 
-enum
+static enum
 {
 	eDJBOY_ATTRACT_HIGHSCORE,
 	eDJBOY_ATTRACT_TITLE,
@@ -960,7 +960,7 @@ ROM_START( djboyj )
 	ROM_LOAD( "bs-204.5j", 0x000000, 0x40000, CRC(510244f0) SHA1(afb502d46d268ad9cd209ae1da72c50e4e785626) )
 ROM_END
 
-INPUT_PORTS_START( djboy )
+static INPUT_PORTS_START( djboy )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )

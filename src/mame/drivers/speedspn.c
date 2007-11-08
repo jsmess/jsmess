@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 
 /*** INPUT PORT **************************************************************/
 
-INPUT_PORTS_START( speedspn )
+static INPUT_PORTS_START( speedspn )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )

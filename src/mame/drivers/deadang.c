@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( deadang )
+static INPUT_PORTS_START( deadang )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START	/* IN0 */
@@ -136,7 +136,7 @@ INPUT_PORTS_START( deadang )
 	PORT_DIPSETTING(    0x8000, "Overseas" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ghunter )
+static INPUT_PORTS_START( ghunter )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START	/* IN0 */

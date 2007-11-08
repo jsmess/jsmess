@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( bballoon_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( bballoon )
+static INPUT_PORTS_START( bballoon )
 INPUT_PORTS_END
 
 static int irq_en = 0;

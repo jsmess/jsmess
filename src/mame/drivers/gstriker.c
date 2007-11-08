@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
 
-INPUT_PORTS_START( gstriker )
+static INPUT_PORTS_START( gstriker )
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )

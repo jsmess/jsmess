@@ -458,7 +458,7 @@ static UINT8 fn(UINT8 in, const struct optimised_sbox *sboxes, UINT32 key)
 
 // srckey is the 64-bit master key (2x32 bits)
 // dstkey will contain the 96-bit key for the 1st FN (4x24 bits)
-void expand_1st_key(UINT32 *dstkey, const UINT32 *srckey)
+static void expand_1st_key(UINT32 *dstkey, const UINT32 *srckey)
 {
 	static const int bits[96] =
 	{
@@ -493,7 +493,7 @@ void expand_1st_key(UINT32 *dstkey, const UINT32 *srckey)
 
 // srckey is the 64-bit master key (2x32 bits) XORed with the subkey
 // dstkey will contain the 96-bit key for the 2nd FN (4x24 bits)
-void expand_2nd_key(UINT32 *dstkey, const UINT32 *srckey)
+static void expand_2nd_key(UINT32 *dstkey, const UINT32 *srckey)
 {
 	static const int bits[96] =
 	{

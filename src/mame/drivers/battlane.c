@@ -116,7 +116,7 @@ INTERRUPT_GEN( battlane_cpu1_interrupt )
 }
 
 
-INPUT_PORTS_START( battlane )
+static INPUT_PORTS_START( battlane )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )

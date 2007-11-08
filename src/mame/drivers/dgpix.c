@@ -263,7 +263,7 @@ NVRAM_HANDLER( flashroms )
 	}
 }
 
-INPUT_PORTS_START( dgpix )
+static INPUT_PORTS_START( dgpix )
 	PORT_START
 	PORT_BIT( 0x00000003, IP_ACTIVE_LOW, IPT_VBLANK ) //value 2 is used by fmaniac3
 	PORT_BIT( 0xfffffffc, IP_ACTIVE_LOW, IPT_UNUSED )

@@ -355,7 +355,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( badlands )
+static INPUT_PORTS_START( badlands )
 	PORT_START		/* fe4000 */
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)

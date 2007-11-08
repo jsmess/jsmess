@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( pkscramble_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( pkscramble )
+static INPUT_PORTS_START( pkscramble )
 	PORT_START	/* Dips */
 	PORT_DIPNAME( 0x0007, 0x0003, "Level" )
 	PORT_DIPSETTING(      0x0000, "0" )

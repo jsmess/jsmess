@@ -329,7 +329,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( lordgun )
+static INPUT_PORTS_START( lordgun )
 	PORT_START	// IN0
 	PORT_DIPNAME( 0x01, 0x01, "Game Mode" )
 	PORT_DIPSETTING(    0x01, "Arcade" )

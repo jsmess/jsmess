@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-INPUT_PORTS_START( mustache )
+static INPUT_PORTS_START( mustache )
 	PORT_START	/* IN 1 */
 
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  )

@@ -255,7 +255,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( fnkyfish )
+static INPUT_PORTS_START( fnkyfish )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
@@ -314,7 +314,7 @@ INPUT_PORTS_START( fnkyfish )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( kangaroo )
+static INPUT_PORTS_START( kangaroo )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )

@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( missb2 )
+static INPUT_PORTS_START( missb2 )
 	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )

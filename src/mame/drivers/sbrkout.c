@@ -145,7 +145,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( sbrkout )
+static INPUT_PORTS_START( sbrkout )
 	PORT_START		/* DSW - fake port, gets mapped to Super Breakout ports */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( English ) )

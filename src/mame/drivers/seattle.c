@@ -1755,7 +1755,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( seattle_common )
+static INPUT_PORTS_START( seattle_common )
 	PORT_START_TAG("DIPS")
 	PORT_DIPNAME( 0x0001, 0x0001, "Unknown0001" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
@@ -1868,7 +1868,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INPUT_PORTS_START( wg3dh )
+static INPUT_PORTS_START( wg3dh )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
@@ -1879,7 +1879,7 @@ INPUT_PORTS_START( wg3dh )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( mace )
+static INPUT_PORTS_START( mace )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
@@ -1893,7 +1893,7 @@ INPUT_PORTS_START( mace )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sfrush )
+static INPUT_PORTS_START( sfrush )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
@@ -1957,7 +1957,7 @@ INPUT_PORTS_START( sfrush )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sfrushrk )
+static INPUT_PORTS_START( sfrushrk )
 	PORT_INCLUDE(sfrush)
 
 	PORT_MODIFY("DIPS")
@@ -1974,7 +1974,7 @@ INPUT_PORTS_START( sfrushrk )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( calspeed )
+static INPUT_PORTS_START( calspeed )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
@@ -2032,7 +2032,7 @@ INPUT_PORTS_START( calspeed )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( vaportrx )
+static INPUT_PORTS_START( vaportrx )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
@@ -2091,7 +2091,7 @@ INPUT_PORTS_START( vaportrx )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( biofreak )
+static INPUT_PORTS_START( biofreak )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
@@ -2124,7 +2124,7 @@ INPUT_PORTS_START( biofreak )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( blitz )
+static INPUT_PORTS_START( blitz )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
@@ -2185,7 +2185,7 @@ INPUT_PORTS_START( blitz )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( blitz99 )
+static INPUT_PORTS_START( blitz99 )
 	PORT_INCLUDE(blitz)
 
 	PORT_MODIFY("DIPS")
@@ -2231,7 +2231,7 @@ INPUT_PORTS_START( blitz99 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( carnevil )
+static INPUT_PORTS_START( carnevil )
 	PORT_INCLUDE( seattle_common )
 
 	PORT_MODIFY("DIPS")
@@ -2329,7 +2329,7 @@ INPUT_PORTS_START( carnevil )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( hyprdriv )
+static INPUT_PORTS_START( hyprdriv )
 	PORT_INCLUDE( seattle_common )
 
 	PORT_MODIFY("DIPS")

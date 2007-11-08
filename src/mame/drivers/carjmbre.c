@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( carjmbre_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x32, 0x32) AM_WRITE(MWA8_NOP)				//?? written before and after 0x31 with same value
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( carjmbre )
+static INPUT_PORTS_START( carjmbre )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )		//coin error if held high for 1s
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )		//or if many coins inserted quickly

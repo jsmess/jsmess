@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 	PORT_START_TAG("IN3")      /* Spinner Player 2  */\
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_COCKTAIL
 
-INPUT_PORTS_START( arkanoid )
+static INPUT_PORTS_START( arkanoid )
 	ARKNOI_IN0
 	ARKNOI_IN1
 	ARKNOI_SPINNERS
@@ -575,7 +575,7 @@ INPUT_PORTS_START( arkanoid )
 INPUT_PORTS_END
 
 /* Different coinage and additionnal "Cabinet" Dip Switch */
-INPUT_PORTS_START( arknoidj )
+static INPUT_PORTS_START( arknoidj )
 	ARKNOI_IN0
 	ARKNOI_IN1
 	ARKNOI_SPINNERS
@@ -605,7 +605,7 @@ INPUT_PORTS_START( arknoidj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ark1ball )
+static INPUT_PORTS_START( ark1ball )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_START_TAG("DSW")
@@ -617,7 +617,7 @@ INPUT_PORTS_START( ark1ball )
 	PORT_DIPSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( arkangc )
+static INPUT_PORTS_START( arkangc )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
@@ -626,7 +626,7 @@ INPUT_PORTS_START( arkangc )
 	PORT_DIPSETTING(    0x00, "Faster" )                /* 0xc462 = 0x08 - Level 2 same as level 30 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( arkangc2 )
+static INPUT_PORTS_START( arkangc2 )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
@@ -635,7 +635,7 @@ INPUT_PORTS_START( arkangc2 )
 	PORT_DIPSETTING(    0x00, DEF_STR ( Normal ) )      /* 0xc462 = 0x06 - Level 2 same as level 30 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( arkgcbl )
+static INPUT_PORTS_START( arkgcbl )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
@@ -651,7 +651,7 @@ INPUT_PORTS_START( arkgcbl )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )               /* Always 2C_1C - check code at 0x7d5e */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( paddle2 )
+static INPUT_PORTS_START( paddle2 )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
@@ -669,7 +669,7 @@ INPUT_PORTS_START( paddle2 )
 	PORT_DIPSETTING(    0x20, "3" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( arktayt2 )
+static INPUT_PORTS_START( arktayt2 )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_START_TAG("DSW")
@@ -685,7 +685,7 @@ INPUT_PORTS_START( arktayt2 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( tetrsark )
+static INPUT_PORTS_START( tetrsark )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 

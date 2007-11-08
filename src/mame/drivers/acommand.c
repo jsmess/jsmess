@@ -225,13 +225,13 @@ VIDEO_UPDATE( acommand )
 }
 
 
-WRITE16_HANDLER( ac_bgvram_w )
+static WRITE16_HANDLER( ac_bgvram_w )
 {
 	COMBINE_DATA(&ac_bgvram[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-WRITE16_HANDLER( ac_txvram_w )
+static WRITE16_HANDLER( ac_txvram_w )
 {
 	COMBINE_DATA(&ac_txvram[offset]);
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( acommand, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x1000ff) AM_READ(ac_devices_r) AM_WRITE(ac_devices_w) AM_BASE(&ac_devram)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( acommand )
+static INPUT_PORTS_START( acommand )
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

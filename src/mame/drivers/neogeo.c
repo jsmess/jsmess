@@ -768,7 +768,8 @@ static void audio_cpu_banking_init(void)
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
-	memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS), 0);
+ 	if (memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS))
+		memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS), 0);
 	memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE), 0);
 
 	/* audio banking */

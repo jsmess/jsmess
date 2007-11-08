@@ -429,7 +429,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( jedi )
+static INPUT_PORTS_START( jedi )
 	PORT_START	/* 0C00 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 )

@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 
 /****************************************************************************/
 
-INPUT_PORTS_START( mayumi )
+static INPUT_PORTS_START( mayumi )
 
     PORT_START  /* dsw1 */
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )

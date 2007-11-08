@@ -319,7 +319,7 @@ I haven't found how to exit the tests. The only way seems to reset the game.
 										/* move right in hiscores table */
 
 
-INPUT_PORTS_START( angelkds )
+static INPUT_PORTS_START( angelkds )
 	PORT_START_TAG("I40")		/* inport $40 */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x70, DEF_STR( 4C_1C ) )
@@ -425,7 +425,7 @@ INPUT_PORTS_START( angelkds )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( spcpostn )
+static INPUT_PORTS_START( spcpostn )
 	PORT_START_TAG("I40")		/* inport $40 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )

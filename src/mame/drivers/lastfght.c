@@ -382,7 +382,7 @@ ADDRESS_MAP_END
                                 Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( lastfght )
+static INPUT_PORTS_START( lastfght )
 	PORT_START	// IN0 - c00002&3
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1		)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN		)

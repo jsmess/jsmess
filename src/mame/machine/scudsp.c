@@ -83,7 +83,7 @@ typedef union {
 	UINT16 ui;
 } SCUDSPREG16;
 
-struct {
+static struct {
 	   UINT8 pc; 							           /*Program Counter*/
 	   UINT8 delay;									   /* Delay */
 	   UINT8 top;							   		   /*Jump Command memory*/

@@ -119,7 +119,7 @@ ADDRESS_MAP_END
 #define IPT_EEPROM_DATA	IPT_SPECIAL
 
 
-INPUT_PORTS_START( cerberus )		/* complete, verified from code */
+static INPUT_PORTS_START( cerberus )		/* complete, verified from code */
 	PORT_START      /* 0x80 */
     PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -155,7 +155,7 @@ INPUT_PORTS_START( cerberus )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( mayhem )		/* complete, verified from code */
+static INPUT_PORTS_START( mayhem )		/* complete, verified from code */
 	PORT_START      /* 0xC0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -199,7 +199,7 @@ INPUT_PORTS_START( mayhem )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( wseries )		/* complete, verified from code */
+static INPUT_PORTS_START( wseries )		/* complete, verified from code */
 	PORT_START      /* 0x80 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Extra Base") PORT_PLAYER(1)
@@ -236,7 +236,7 @@ INPUT_PORTS_START( wseries )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( alleymas )		/* complete, verified from code */
+static INPUT_PORTS_START( alleymas )		/* complete, verified from code */
 	PORT_START      /* 0xC0 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -272,7 +272,7 @@ INPUT_PORTS_START( alleymas )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( upyoural )		/* complete, verified from code */
+static INPUT_PORTS_START( upyoural )		/* complete, verified from code */
 	PORT_START      /* 0xC0 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 )
@@ -308,7 +308,7 @@ INPUT_PORTS_START( upyoural )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dangerz )		/* complete, verified from code */
+static INPUT_PORTS_START( dangerz )		/* complete, verified from code */
 	PORT_START      /* 0x80 */
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -339,7 +339,7 @@ INPUT_PORTS_START( dangerz )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( basebal2 )		/* complete, verified from code */
+static INPUT_PORTS_START( basebal2 )		/* complete, verified from code */
 	PORT_START      /* 0x40/C0 */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* read by strkzone, but never referenced */
@@ -380,7 +380,7 @@ INPUT_PORTS_START( basebal2 )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( redline )		/* complete, verified in code */
+static INPUT_PORTS_START( redline )		/* complete, verified in code */
 	PORT_START      /* 0xC0 */
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xe0, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(64) PORT_PLAYER(1)
@@ -411,7 +411,7 @@ INPUT_PORTS_START( redline )		/* complete, verified in code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( quarterb )		/* complete, verified in code */
+static INPUT_PORTS_START( quarterb )		/* complete, verified in code */
 	PORT_START      /* 0x80 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -453,7 +453,7 @@ INPUT_PORTS_START( quarterb )		/* complete, verified in code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( teamqb )		/* complete, verified in code */
+static INPUT_PORTS_START( teamqb )		/* complete, verified in code */
 	PORT_START      /* 0x80 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -515,7 +515,7 @@ INPUT_PORTS_START( teamqb )		/* complete, verified in code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( aafb2p )		/* complete, verified in code */
+static INPUT_PORTS_START( aafb2p )		/* complete, verified in code */
 	PORT_START      /* 0x80 */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -569,7 +569,7 @@ INPUT_PORTS_START( aafb2p )		/* complete, verified in code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( offroad )		/* complete, verified from code */
+static INPUT_PORTS_START( offroad )		/* complete, verified from code */
 	PORT_START      /* 0xC0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* read */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* read */
@@ -612,7 +612,7 @@ INPUT_PORTS_START( offroad )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( pigout )		/* complete, verified from code */
+static INPUT_PORTS_START( pigout )		/* complete, verified from code */
 	PORT_START      /* 0x40 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)

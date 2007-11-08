@@ -162,7 +162,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( irobot )
+static INPUT_PORTS_START( irobot )
 	PORT_START	/* IN0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )

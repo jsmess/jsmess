@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( darkhors )
+static INPUT_PORTS_START( darkhors )
 	PORT_START	// IN0 - 580000
 	PORT_BIT( 0xff7fffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("?") PORT_CODE(KEYCODE_RCONTROL)

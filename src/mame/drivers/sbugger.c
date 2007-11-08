@@ -161,7 +161,7 @@ GFXDECODE_END
 
 /* input ports */
 
-INPUT_PORTS_START( sbugger )
+static INPUT_PORTS_START( sbugger )
 	PORT_START	/* 8-bit */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_2WAY
 	PORT_DIPNAME( 0x02, 0x02, "PA 1" )

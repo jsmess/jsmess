@@ -2159,7 +2159,7 @@ ADDRESS_MAP_END
                                     Bal Cube
 ***************************************************************************/
 
-INPUT_PORTS_START( balcube )
+static INPUT_PORTS_START( balcube )
 	PORT_START_TAG("IN0")	// $500000
 	COINS
 
@@ -2202,7 +2202,7 @@ INPUT_PORTS_END
                                 Bang Bang Ball
 ***************************************************************************/
 
-INPUT_PORTS_START( bangball )
+static INPUT_PORTS_START( bangball )
 	PORT_START_TAG("IN0")	// $d00000
 	COINS
 
@@ -2243,7 +2243,7 @@ INPUT_PORTS_END
                                 Battle Bubble
 ***************************************************************************/
 
-INPUT_PORTS_START( batlbubl )
+static INPUT_PORTS_START( batlbubl )
 	PORT_START_TAG("IN0")
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 	JOY_MSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
@@ -2352,7 +2352,7 @@ INPUT_PORTS_END
                             Blazing Tornado
 ***************************************************************************/
 
-INPUT_PORTS_START( blzntrnd )
+static INPUT_PORTS_START( blzntrnd )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x0007, 0x0004, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0007, "Beginner" )
@@ -2469,7 +2469,7 @@ INPUT_PORTS_END
                             Grand Striker 2
 ***************************************************************************/
 
-INPUT_PORTS_START( gstrik2 )
+static INPUT_PORTS_START( gstrik2 )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x0003, 0x0003, "Player Vs Com" )
 	PORT_DIPSETTING(      0x0003, "1:00" )
@@ -2614,7 +2614,7 @@ INPUT_PORTS_END
      On  On    Continue, Retry level
 
 */
-INPUT_PORTS_START( daitorid )
+static INPUT_PORTS_START( daitorid )
 	PORT_START_TAG("IN0") // $c00000
 	COINS
 
@@ -2665,7 +2665,7 @@ INPUT_PORTS_END
 
    Even if there are 4 "tables" the 2 first ones and the 2 last ones
    contains the same values for the timer. */
-INPUT_PORTS_START( dharma )
+static INPUT_PORTS_START( dharma )
 	PORT_START_TAG("IN0") //$c00000
 	COINS
 
@@ -2707,7 +2707,7 @@ INPUT_PORTS_END
                                 Gun Master
 ***************************************************************************/
 
-INPUT_PORTS_START( gunmast )
+static INPUT_PORTS_START( gunmast )
 	PORT_START_TAG("IN0") //$400000
 	COINS
 
@@ -2752,7 +2752,7 @@ INPUT_PORTS_END
                                 Karate Tournament
 ***************************************************************************/
 
-INPUT_PORTS_START( karatour )
+static INPUT_PORTS_START( karatour )
 	PORT_START_TAG("IN0") // $400002
 	JOY_LSB(2, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)
 
@@ -2851,7 +2851,7 @@ INPUT_PORTS_END
 	PORT_START_TAG("IN4") /*$40000c*/\
 	JOY_LSB(1, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)
 
-INPUT_PORTS_START( ladykill )
+static INPUT_PORTS_START( ladykill )
 	LKILL_COMMON1
 	PORT_START_TAG("IN2") // $400006
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
@@ -2879,7 +2879,7 @@ INPUT_PORTS_START( ladykill )
 INPUT_PORTS_END
 
 /* Same as 'ladykill' but NO "Nudity" Dip Switch */
-INPUT_PORTS_START( moegonta )
+static INPUT_PORTS_START( moegonta )
 	LKILL_COMMON1
 
 	PORT_START_TAG("IN2")	// $400006
@@ -2927,7 +2927,7 @@ INPUT_PORTS_START( moegonta )
 	COINAGE_DSW\
 
 
-INPUT_PORTS_START( lastfort )
+static INPUT_PORTS_START( lastfort )
 	LFORT_COMMON
 
 	PORT_START_TAG("IN4")// $c0000c
@@ -2965,7 +2965,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /* Same as 'lastfort' but WORKING "Tiles" Dip Switch */
-INPUT_PORTS_START( lastfero )
+static INPUT_PORTS_START( lastfero )
 	LFORT_COMMON
 
 	PORT_START	// IN4 - $c0000c
@@ -3058,7 +3058,7 @@ INPUT_PORTS_END
 
 
 
-INPUT_PORTS_START( dokyusei )
+static INPUT_PORTS_START( dokyusei )
 	MAHJONG_PANEL
 
 	PORT_START_TAG("IN6")	// $478884.w
@@ -3118,7 +3118,7 @@ INPUT_PORTS_END
 
 /* Same as dokyusei, without the DSWs (these games have an eeprom) */
 
-INPUT_PORTS_START( gakusai )
+static INPUT_PORTS_START( gakusai )
 
 MAHJONG_PANEL
 
@@ -3129,7 +3129,7 @@ INPUT_PORTS_END
                                     Mouja
 ***************************************************************************/
 
-INPUT_PORTS_START( mouja )
+static INPUT_PORTS_START( mouja )
 	PORT_START_TAG("IN0") //$478880
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -3214,7 +3214,7 @@ INPUT_PORTS_END
                                 Pang Poms
 ***************************************************************************/
 
-INPUT_PORTS_START( pangpoms )
+static INPUT_PORTS_START( pangpoms )
 	PORT_START_TAG("IN0") //$800004
 	COINS
 
@@ -3259,7 +3259,7 @@ INPUT_PORTS_END
                                 Poitto!
 ***************************************************************************/
 
-INPUT_PORTS_START( poitto )
+static INPUT_PORTS_START( poitto )
 	PORT_START_TAG("IN0") //$800000
 	COINS
 
@@ -3303,7 +3303,7 @@ INPUT_PORTS_END
                                 Puzzli
 ***************************************************************************/
 
-INPUT_PORTS_START( puzzli )
+static INPUT_PORTS_START( puzzli )
 	PORT_START_TAG("IN0") //$c00000
 	COINS
 
@@ -3347,7 +3347,7 @@ INPUT_PORTS_END
                                 Sankokushi
 ***************************************************************************/
 
-INPUT_PORTS_START( 3kokushi )
+static INPUT_PORTS_START( 3kokushi )
 	PORT_START_TAG("IN0") //$c00000
 	COINS
 
@@ -3409,7 +3409,7 @@ INPUT_PORTS_END
                                 Pururun
 ***************************************************************************/
 
-INPUT_PORTS_START( pururun )
+static INPUT_PORTS_START( pururun )
 	PORT_START_TAG("IN0") //$400000
 	COINS
 
@@ -3468,7 +3468,7 @@ INPUT_PORTS_END
        "none"       "none"
 
 */
-INPUT_PORTS_START( skyalert )
+static INPUT_PORTS_START( skyalert )
 	PORT_START_TAG("IN0") //$400004
 	COINS
 
@@ -3517,7 +3517,7 @@ INPUT_PORTS_END
    All I can tell is that is that it affects the levels which are
    proposed, but there is no evidence that one "table" is harder
    than another. */
-INPUT_PORTS_START( toride2g )
+static INPUT_PORTS_START( toride2g )
 	PORT_START_TAG("IN0") //$800000
 	COINS
 

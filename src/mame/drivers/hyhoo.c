@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( writeport_hyhoo, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( hyhoo )
+static INPUT_PORTS_START( hyhoo )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, "4 (Easy)" )
@@ -179,7 +179,7 @@ INPUT_PORTS_START( hyhoo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hyhoo2 )
+static INPUT_PORTS_START( hyhoo2 )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, "4 (Easy)" )

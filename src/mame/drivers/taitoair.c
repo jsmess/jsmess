@@ -425,7 +425,7 @@ ADDRESS_MAP_END
                INPUT PORTS & DIPS
 ************************************************************/
 
-INPUT_PORTS_START( topland )
+static INPUT_PORTS_START( topland )
 	/* 0xa00200 -> 0x0c0d7c (-$7285,A5) */
 	PORT_START_TAG("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:1" )
@@ -478,7 +478,7 @@ INPUT_PORTS_START( topland )
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ainferno )
+static INPUT_PORTS_START( ainferno )
 	/* 0xa00200 -> 0x0c0003.b (-$7ffd,A5) */
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "Moving Control" )		PORT_DIPLOCATION("SWA:1")

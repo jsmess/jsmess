@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( ddealer, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&shared_ram)// at least fe000-ffff shared with mcu
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( ddealer )
+static INPUT_PORTS_START( ddealer )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

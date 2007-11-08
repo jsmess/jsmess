@@ -290,7 +290,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INPUT_PORTS_START( boomrang )
+static INPUT_PORTS_START( boomrang )
 	PORT_INCLUDE( generic_input )
 
 	PORT_MODIFY("DSW2")
@@ -317,7 +317,7 @@ INPUT_PORTS_START( boomrang )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( kamikcab )
+static INPUT_PORTS_START( kamikcab )
 	PORT_INCLUDE( generic_input )
 
 	PORT_MODIFY("DSW2")
@@ -341,7 +341,7 @@ INPUT_PORTS_START( kamikcab )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( yellowcb )
+static INPUT_PORTS_START( yellowcb )
 	PORT_INCLUDE( kamikcab )
 
 	PORT_MODIFY("IN0")
@@ -349,7 +349,7 @@ INPUT_PORTS_START( yellowcb )
 	PORT_BIT( 0xfb, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( liberate )
+static INPUT_PORTS_START( liberate )
 	PORT_INCLUDE( generic_input )
 
 	PORT_MODIFY("DSW1")
@@ -376,7 +376,7 @@ INPUT_PORTS_START( liberate )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dualaslt )
+static INPUT_PORTS_START( dualaslt )
 	PORT_INCLUDE( liberate )
 
 	PORT_MODIFY("DSW1")
@@ -385,7 +385,7 @@ INPUT_PORTS_START( dualaslt )
 	PORT_DIPSETTING(    0x80, "(INVALID) Data East Corporation (Liberation)" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( liberatb )
+static INPUT_PORTS_START( liberatb )
 	PORT_INCLUDE( liberate )
 
 	PORT_MODIFY("IN0")

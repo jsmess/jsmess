@@ -827,7 +827,7 @@ ADDRESS_MAP_END
                         WEC Le Mans 24 Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( wecleman )
+static INPUT_PORTS_START( wecleman )
 	PORT_START	/* IN0 - Controls and Coins - $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -917,7 +917,7 @@ INPUT_PORTS_END
                             Hot Chase Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( hotchase )
+static INPUT_PORTS_START( hotchase )
 	PORT_START	/* IN0 - Controls and Coins - $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )

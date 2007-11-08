@@ -468,7 +468,7 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
-INPUT_PORTS_START( magicfly )
+static INPUT_PORTS_START( magicfly )
 /*  Multiplexed 4 x 5 bits.
     Code accept only bits 0, 1, 2, 3 and 5 as valid. */
 	PORT_START_TAG("IN0-0")
@@ -530,7 +530,7 @@ INPUT_PORTS_START( magicfly )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( 7mezzo )
+static INPUT_PORTS_START( 7mezzo )
 /*  Multiplexed 4 x 5 bits.
     Code accept only bits 0, 1, 2, 3 and 5 as valid. */
 	PORT_START_TAG("IN0-0")

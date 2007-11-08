@@ -261,7 +261,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( foodf )
+static INPUT_PORTS_START( foodf )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 

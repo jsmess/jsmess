@@ -495,7 +495,7 @@ ADDRESS_MAP_END
 *      Input Ports       *
 *************************/
 
-INPUT_PORTS_START( pmpoker )
+static INPUT_PORTS_START( pmpoker )
 	/* Multiplexed - 4x5bits */
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -564,7 +564,7 @@ INPUT_PORTS_START( pmpoker )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( goldnpkr )
+static INPUT_PORTS_START( goldnpkr )
 	/* Multiplexed - 4x5bits */
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
@@ -626,7 +626,7 @@ INPUT_PORTS_START( goldnpkr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( goldnpkc )
+static INPUT_PORTS_START( goldnpkc )
 	/* Multiplexed - 4x5bits */
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
@@ -696,7 +696,7 @@ INPUT_PORTS_START( goldnpkc )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jokerpkr )
+static INPUT_PORTS_START( jokerpkr )
 	/* Multiplexed - 4x5bits */
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin 1")
@@ -765,7 +765,7 @@ INPUT_PORTS_START( jokerpkr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pottnpkr )
+static INPUT_PORTS_START( pottnpkr )
 	/* Multiplexed - 4x5bits */
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin 1")

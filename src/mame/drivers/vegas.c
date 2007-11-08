@@ -1724,7 +1724,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( vegas_common )
+static INPUT_PORTS_START( vegas_common )
 	PORT_START_TAG("DIPS")
 	PORT_DIPNAME( 0x0001, 0x0001, "Unknown0001" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
@@ -1837,7 +1837,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INPUT_PORTS_START( gauntleg )
+static INPUT_PORTS_START( gauntleg )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -1863,7 +1863,7 @@ INPUT_PORTS_START( gauntleg )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gauntdl )
+static INPUT_PORTS_START( gauntdl )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -1895,7 +1895,7 @@ INPUT_PORTS_START( gauntdl )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( tenthdeg )
+static INPUT_PORTS_START( tenthdeg )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -1919,7 +1919,7 @@ INPUT_PORTS_START( tenthdeg )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( warfa )
+static INPUT_PORTS_START( warfa )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -1963,7 +1963,7 @@ INPUT_PORTS_START( warfa )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( roadburn )
+static INPUT_PORTS_START( roadburn )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -2007,7 +2007,7 @@ INPUT_PORTS_START( roadburn )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( nbashowt )
+static INPUT_PORTS_START( nbashowt )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -2060,7 +2060,7 @@ INPUT_PORTS_START( nbashowt )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sf2049 )
+static INPUT_PORTS_START( sf2049 )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -2103,7 +2103,7 @@ INPUT_PORTS_START( sf2049 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sf2049se )
+static INPUT_PORTS_START( sf2049se )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -2134,7 +2134,7 @@ INPUT_PORTS_START( sf2049se )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sf2049te )
+static INPUT_PORTS_START( sf2049te )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")
@@ -2165,7 +2165,7 @@ INPUT_PORTS_START( sf2049te )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( cartfury )
+static INPUT_PORTS_START( cartfury )
 	PORT_INCLUDE(vegas_common)
 
 	PORT_MODIFY("DIPS")

@@ -136,7 +136,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( copsnrob )
+static INPUT_PORTS_START( copsnrob )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_VBLANK )
 

@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************/
 
-INPUT_PORTS_START( tceptor )
+static INPUT_PORTS_START( tceptor )
 	PORT_START      /* DSW 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -401,7 +401,7 @@ INPUT_PORTS_START( tceptor )
 	PORT_BIT(  0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tceptor2 )
+static INPUT_PORTS_START( tceptor2 )
 	PORT_START      /* DSW 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )

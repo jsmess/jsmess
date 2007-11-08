@@ -206,7 +206,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 
-INPUT_PORTS_START( usg32 )
+static INPUT_PORTS_START( usg32 )
 
 	USGIN0
 
@@ -237,7 +237,7 @@ INPUT_PORTS_START( usg32 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( usg83 ) //From here, the hardware was slightly upgraded, but not too different.
+static INPUT_PORTS_START( usg83 ) //From here, the hardware was slightly upgraded, but not too different.
 
     USGIN0
 

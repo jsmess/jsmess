@@ -178,7 +178,7 @@ static WRITE8_HANDLER( FDT_W )
  		FDT_B[offset] = data;
 }
 
-INPUT_PORTS_START( turbosub )
+static INPUT_PORTS_START( turbosub )
 PORT_START
 INPUT_PORTS_END
 

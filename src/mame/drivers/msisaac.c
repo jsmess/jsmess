@@ -368,7 +368,7 @@ ADDRESS_MAP_END
 
 #endif
 
-INPUT_PORTS_START( msisaac )
+static INPUT_PORTS_START( msisaac )
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "DSW1 Unknown 0" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

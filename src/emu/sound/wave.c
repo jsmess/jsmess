@@ -9,10 +9,12 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "streams.h"
+#ifdef MESS
+#include "messdrv.h"
 #include "utils.h"
 #include "devices/cassette.h"
-#include "streams.h"
-#include "wave.h"
+#endif
 
 #define ALWAYS_PLAY_SOUND	0
 #define WAVE_TOKEN_MASK		0xFFFF0000
@@ -21,6 +23,7 @@
 
 static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
 {
+#ifdef MESS
 	mess_image *image;
 	cassette_image *cassette;
 	cassette_state state;
@@ -49,6 +52,7 @@ static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 	{
 		memset(buffer, 0, sizeof(*buffer) * length);
 	}
+#endif
 }
 
 

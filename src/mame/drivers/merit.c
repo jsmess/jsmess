@@ -279,7 +279,7 @@ ADDRESS_MAP_END
 // keep service test button pressed to clear the coin counter.
 // keep it pressed for 10 seconds to clear all the memory.
 // to enter hidden test mode enable "Enable Test Mode", enable "Reset High Scores"
-INPUT_PORTS_START( phrcraze )
+static INPUT_PORTS_START( phrcraze )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -352,7 +352,7 @@ INPUT_PORTS_END
 // keep service test button pressed to clear the coin counter.
 // keep it pressed for 10 seconds to clear all the memory.
 // to enter hidden test mode enable "Enable Test Mode", enable "Reset High Scores"
-INPUT_PORTS_START( phrcrazs )
+static INPUT_PORTS_START( phrcrazs )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -422,7 +422,7 @@ INPUT_PORTS_END
 // keep service test button pressed to clear the coin counter.
 // To enter hidden test-mode in service mode:
 // enable "Reset High Scores" then press "Service Mode"
-INPUT_PORTS_START( tictac )
+static INPUT_PORTS_START( tictac )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -489,7 +489,7 @@ INPUT_PORTS_START( tictac )
 //  PORT_DIPSETTING(    0x40, "Upright 1 Player" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( trivia )
+static INPUT_PORTS_START( trivia )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -561,7 +561,7 @@ INPUT_PORTS_END
 // keep service test button pressed to clear the coin counter.
 // keep it pressed for 10 seconds to clear all the memory.
 // to enter hidden test mode enable "Enable Test Mode", enable "Reset High Scores"
-INPUT_PORTS_START( trvwhziv )
+static INPUT_PORTS_START( trvwhziv )
 	PORT_INCLUDE( trivia )
 
 	PORT_MODIFY("DSWA")
@@ -570,7 +570,7 @@ INPUT_PORTS_START( trvwhziv )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pitboss )
+static INPUT_PORTS_START( pitboss )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_DIPNAME( 0x02, 0x02, "0-1" )
@@ -610,7 +610,7 @@ INPUT_PORTS_START( pitboss )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bigappg )
+static INPUT_PORTS_START( bigappg )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

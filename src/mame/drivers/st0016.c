@@ -244,7 +244,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INPUT_PORTS_START( renju )
+static INPUT_PORTS_START( renju )
 	PORT_INCLUDE( st0016 )
 
 	PORT_MODIFY("IN2")
@@ -279,7 +279,7 @@ INPUT_PORTS_START( renju )
 	PORT_DIPSETTING(      0x03, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( koikois )
+static INPUT_PORTS_START( koikois )
 	PORT_INCLUDE( st0016 )
 
 
@@ -318,7 +318,7 @@ INPUT_PORTS_START( koikois )
 	PORT_DIPSETTING(      0x03, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( nratechu )
+static INPUT_PORTS_START( nratechu )
 	PORT_INCLUDE( st0016 )
 
 	PORT_MODIFY("DSW1")	/* Dip switch A  */
@@ -353,7 +353,7 @@ INPUT_PORTS_START( nratechu )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mayjisn2 )
+static INPUT_PORTS_START( mayjisn2 )
 	PORT_INCLUDE( st0016 )
 
 	PORT_MODIFY("DSW1")	/* Dip switch A  */

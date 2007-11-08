@@ -287,7 +287,7 @@ VIDEO_UPDATE(mlanding)
 }
 
 
-INPUT_PORTS_START( mlanding )
+static INPUT_PORTS_START( mlanding )
 
 PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_TILT )

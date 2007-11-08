@@ -334,7 +334,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( gridlee )
+static INPUT_PORTS_START( gridlee )
 	PORT_START	/* 9500 (fake) */
     PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8)
 

@@ -1,9 +1,13 @@
 #include "driver.h"
-#include "video/poly.h"
+#include "video/polynew.h"
+#include "video/rgbutil.h"
+#include "eminline.h"
 #include <math.h>
 
 
-#define BILINEAR	1
+#define pz  p[0]
+#define pu 	p[1]
+#define pv	p[2]
 
 
 
@@ -12,37 +16,53 @@ typedef float VECTOR[4];
 typedef float VECTOR3[3];
 
 typedef struct {
-	float x,y,z;
-	UINT32 u,v;
-} VERTEX;
-
-typedef struct {
 	float x,y,z,d;
 } PLANE;
 
 typedef struct
 {
-	VERTEX v[3];
+	poly_vertex v[3];
 	UINT8 texture_x, texture_y;
 	UINT8 texture_width, texture_height;
-	UINT8 transparency, texture_coord_shift;
+	UINT8 transparency;
 	UINT8 texture_format, param;
 	int intensity;
 	UINT32 color;
-	int viewport_priority;
 } TRIANGLE;
+
+typedef struct _cached_texture cached_texture;
+struct _cached_texture
+{
+	cached_texture *next;
+	UINT8		width;
+	UINT8		height;
+	UINT8		format;
+	UINT8		alpha;
+	rgb_t		data[1];
+};
+
+typedef struct _poly_extra_data poly_extra_data;
+struct _poly_extra_data
+{
+	cached_texture *texture;
+	UINT32 color;
+	UINT8 texture_param;
+	int polygon_transparency;
+	int polygon_intensity;
+};
 
 #define TRI_PARAM_TEXTURE_PAGE			0x1
 #define TRI_PARAM_TEXTURE_MIRROR_U		0x2
 #define TRI_PARAM_TEXTURE_MIRROR_V		0x4
 #define TRI_PARAM_TEXTURE_ENABLE		0x8
+#define TRI_PARAM_ALPHA_TEST			0x10
 
 #define MAX_TRIANGLES		131072
 
 
 /* forward declarations */
 static void real3d_traverse_display_list(void);
-static void draw_model(UINT32*);
+static void draw_model(UINT32 addr);
 static void init_matrix_stack(void);
 static void get_top_matrix(MATRIX *out);
 static void push_matrix_stack(void);
@@ -50,8 +70,8 @@ static void pop_matrix_stack(void);
 static void multiply_matrix_stack(MATRIX matrix);
 static void translate_matrix_stack(float x, float y, float z);
 static void traverse_list(UINT32 address);
-static void traverse_node(UINT32 address);
-static void traverse_root_node(UINT32 address);
+static void draw_block(UINT32 address);
+static void draw_viewport(int pri, UINT32 address);
 
 /*****************************************************************************/
 
@@ -92,19 +112,13 @@ static rectangle clip3d;
 static rectangle *screen_clip;
 
 
-static TRIANGLE* triangle_buffer;
-static TRIANGLE* alpha_triangle_buffer;
-static int triangle_buffer_ptr;
-static int alpha_triangle_buffer_ptr;
-
-
-static int* texture_wrap_table[5];
-static int* texture_mirror_table[5];
-
-
 static VECTOR3 parallel_light;
 static float parallel_light_intensity;
 static float ambient_light_intensity;
+
+static poly_manager *poly;
+static cached_texture *texcache[2][1024/32][2048/32];
+
 
 static int list_depth = 0;
 
@@ -116,11 +130,20 @@ static int list_depth = 0;
 
 #define BYTE_REVERSE16(x)		(((x >> 8) & 0xff) | ((x << 8) & 0xff00))
 
+static void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
 
+
+static void model3_exit(running_machine *machine)
+{
+	invalidate_texture(0, 0, 0, 6, 5);
+	invalidate_texture(1, 0, 0, 6, 5);
+	poly_free(poly);
+}
 
 VIDEO_START( model3 )
 {
-	int j,t;
+	poly = poly_alloc(4000, sizeof(poly_extra_data), 0);
+	add_exit_callback(machine, model3_exit);
 
 	bitmap3d = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	zbuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
@@ -153,28 +176,6 @@ VIDEO_START( model3 )
 	memset(texture_fifo, 0, 0x100000);
 
 	init_matrix_stack();
-
-
-	// triangle buffers
-	triangle_buffer = auto_malloc(sizeof(TRIANGLE) * MAX_TRIANGLES);
-	alpha_triangle_buffer = auto_malloc(sizeof(TRIANGLE) * MAX_TRIANGLES);
-
-	// mirror / wrap tables
-	for (j=0; j < 5; j++)
-	{
-		int size = 32 << j;
-		texture_mirror_table[j] = auto_malloc(size * sizeof(int) * 2);
-		texture_wrap_table[j] = auto_malloc(size * sizeof(int) * 2);
-
-		for (t=0; t < size * 2; t++)
-		{
-			// wrapping
-			texture_wrap_table[j][t] = t & (size-1);
-
-			// mirroring
-			texture_mirror_table[j][t] = (t < size) ? t & (size-1) : size - (t & (size-1)) - 1;
-		}
-	}
 }
 
 static void draw_tile_4bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
@@ -373,7 +374,6 @@ VIDEO_UPDATE( model3 )
 	layer_scroll_x[3] = (layer_data[3] & 0x8000) ? (layer_data[3] & 0x1ff) : -(layer_data[3] & 0x1ff);
 	layer_scroll_y[3] = (layer_data[3] & 0x8000) ? (layer_data[3] & 0x1ff) : -(layer_data[3] & 0x1ff);
 
-	bitmap3d = bitmap;
 	screen_clip = (rectangle*)cliprect;
 
 	clip3d.min_x = cliprect->min_x;
@@ -398,29 +398,30 @@ VIDEO_UPDATE( model3 )
 			debug_layer_disable ^= 0x10;
 	}
 
-	fillbitmap(bitmap3d, 0, cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
-	if(!(debug_layer_disable & 0x8)) {
-		draw_layer(bitmap3d, cliprect, 3, (model3_layer_enable >> 3) & 0x1);
-	}
-	if(!(debug_layer_disable & 0x4)) {
-		draw_layer(bitmap3d, cliprect, 2, (model3_layer_enable >> 2) & 0x1);
-	}
+	if (!(debug_layer_disable & 0x8))
+		draw_layer(bitmap, cliprect, 3, (model3_layer_enable >> 3) & 0x1);
+
+	if (!(debug_layer_disable & 0x4))
+		draw_layer(bitmap, cliprect, 2, (model3_layer_enable >> 2) & 0x1);
 
 	if( !(debug_layer_disable & 0x10) )
 	{
-		if(real3d_display_list) {
-			fillbitmap(zbuffer, 0, cliprect);
-			real3d_traverse_display_list();
-		}
+//      if(real3d_display_list) {
+//          fillbitmap(zbuffer, 0, cliprect);
+//          fillbitmap(bitmap3d, 0x8000, cliprect);
+//          real3d_traverse_display_list();
+//      }
+		copybitmap(bitmap, bitmap3d, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0x8000);
 	}
 
-	if(!(debug_layer_disable & 0x2)) {
-		draw_layer(bitmap3d, cliprect, 1, (model3_layer_enable >> 1) & 0x1);
-	}
-	if(!(debug_layer_disable & 0x1)) {
-		draw_layer(bitmap3d, cliprect, 0, (model3_layer_enable >> 0) & 0x1);
-	}
+	if (!(debug_layer_disable & 0x2))
+		draw_layer(bitmap, cliprect, 1, (model3_layer_enable >> 1) & 0x1);
+
+	if (!(debug_layer_disable & 0x1))
+		draw_layer(bitmap, cliprect, 0, (model3_layer_enable >> 0) & 0x1);
+
 	//copy_screen(bitmap, cliprect);
 
 	//draw_texture_sheet(bitmap, cliprect);
@@ -511,6 +512,145 @@ READ64_HANDLER( model3_palette_r )
 
 
 /*****************************************************************************/
+/* texture caching */
+
+/*
+    array of cached textures:
+        4 potential textures for 4-bit grayscale
+        2 pages
+        1024 pixels / 32 pixel resolution vertically
+        2048 pixels / 32 pixel resolution horizontally
+*/
+static void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight)
+{
+	int wtiles = 1 << texwidth;
+	int htiles = 1 << texheight;
+	int x, y;
+
+	for (y = 0; y < htiles; y++)
+		for (x = 0; x < wtiles; x++)
+			while (texcache[page][texy + y][texx + x] != NULL)
+			{
+				cached_texture *freeme = texcache[page][texy + y][texx + x];
+				texcache[page][texy + y][texx + x] = freeme->next;
+				free(freeme);
+			}
+}
+
+static cached_texture *get_texture(int page, int texx, int texy, int texwidth, int texheight, int format)
+{
+	cached_texture *tex = texcache[page][texy][texx];
+	int pixheight = 32 << texheight;
+	int pixwidth = 32 << texwidth;
+	UINT32 alpha = ~0;
+	int x, y;
+
+	/* if we have one already, validate it */
+	for (tex = texcache[page][texy][texx]; tex != NULL; tex = tex->next)
+		if (tex->width == texwidth && tex->height == texheight && tex->format == format)
+			return tex;
+
+	/* create a new texture */
+	tex = malloc_or_die(sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
+	tex->width = texwidth;
+	tex->height = texheight;
+	tex->format = format;
+
+	/* set the new texture */
+	tex->next = texcache[page][texy][texx];
+	texcache[page][texy][texx] = tex;
+
+	/* decode it */
+	for (y = 0; y < pixheight; y++)
+	{
+		const UINT16 *texsrc = &texture_ram[page][(texy * 32 + y) * 2048 + texx * 32];
+		rgb_t *dest = tex->data + 2 * pixwidth * y;
+
+		switch (format)
+		{
+			case 0:		/* 1-5-5-5 ARGB */
+				for (x = 0; x < pixwidth; x++)
+				{
+					UINT16 pixdata = texsrc[x];
+					dest[x] = MAKE_ARGB(pal1bit(pixdata >> 15), pal5bit(pixdata >> 10), pal5bit(pixdata >> 5), pal5bit(pixdata >> 0));
+					alpha = ~0;
+				}
+				break;
+
+			case 1:		/* 4-bit grayscale in low nibble */
+				for (x = 0; x < pixwidth; x++)
+				{
+					UINT8 grayvalue = pal4bit(texsrc[x] >> 0);
+					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+				}
+				break;
+
+			case 2:		/* 4-bit grayscale in 2nd nibble */
+				for (x = 0; x < pixwidth; x++)
+				{
+					UINT8 grayvalue = pal4bit(texsrc[x] >> 4);
+					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+				}
+				break;
+
+			case 3:		/* 4-bit grayscale in 3rd nibble */
+				for (x = 0; x < pixwidth; x++)
+				{
+					UINT8 grayvalue = pal4bit(texsrc[x] >> 8);
+					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+				}
+				break;
+
+			case 4:		/* 8-bit A4L4 */
+				for (x = 0; x < pixwidth; x++)
+				{
+					UINT8 pixdata = texsrc[x / 2] >> ((~x & 1) * 8);
+					alpha &= dest[x] = MAKE_ARGB(pal4bit(pixdata >> 4), pal4bit(~pixdata), pal4bit(~pixdata), pal4bit(~pixdata));
+				}
+				break;
+
+			case 5:		/* 8-bit grayscale */
+				for (x = 0; x < pixwidth; x++)
+				{
+					UINT8 grayvalue = texsrc[x / 2] >> ((~x & 1) * 8);
+					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+				}
+				break;
+
+			case 6:		/* 4-bit grayscale in high nibble */
+				for (x = 0; x < pixwidth; x++)
+				{
+					UINT8 grayvalue = pal4bit(texsrc[x] >> 12);
+					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+				}
+				break;
+
+			case 7:		/* 4-4-4-4 ARGB */
+				for (x = 0; x < pixwidth; x++)
+				{
+					UINT16 pixdata = texsrc[x];
+					alpha &= dest[x] = MAKE_ARGB(pal4bit(pixdata >> 0), pal4bit(pixdata >> 12), pal4bit(pixdata >> 8), pal4bit(pixdata >> 4));
+				}
+				break;
+		}
+
+		/* create the horizontal mirror of this line */
+		for (x = 0; x < pixwidth; x++)
+			dest[pixwidth * 2 - 1 - x] = dest[x];
+	}
+
+	/* create the vertical mirror of the texture */
+	for (y = 0; y < pixheight; y++)
+		memcpy(tex->data + 2 * pixwidth * (pixheight * 2 - 1 - y), tex->data + 2 * pixwidth * y, sizeof(rgb_t) * pixwidth * 2);
+
+	/* remember the overall alpha */
+	tex->alpha = alpha >> 24;
+
+	/* return a pointer to the texture */
+	return tex;
+}
+
+/*****************************************************************************/
 /* Real3D Graphics stuff */
 
 WRITE64_HANDLER( real3d_display_list_w )
@@ -597,27 +737,29 @@ static void real3d_upload_texture(UINT32 header, UINT32 *data)
 	int xpos	= (header & 0x3f) * 32;
 	int ypos	= ((header >> 7) & 0x1f) * 32;
 	int page	= (header >> 20) & 0x1;
-	int bitdepth = (header >> 23) & 0x1;
+//  int bitdepth = (header >> 23) & 0x1;
 
 	switch(header >> 24)
 	{
 		case 0x00:		/* Texture with mipmaps */
-			if(bitdepth) {
+//          if(bitdepth) {
 				write_texture16(xpos, ypos, width, height, page, (UINT16*)data);
-			} else {
+				invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
+//          } else {
 				/* TODO: 8-bit textures are weird. need to figure out some additional bits */
 				//logerror("W: %d, H: %d, X: %d, Y: %d, P: %d, Bit: %d, : %08X, %08X\n", width, height, xpos, ypos, page, bitdepth, header & 0x00681040, header);
 				//write_texture8(xpos, ypos, width, height, page, (UINT16*)data);
-			}
+//          }
 			break;
 		case 0x01:		/* Texture without mipmaps */
-			if(bitdepth) {
+//          if(bitdepth) {
 				write_texture16(xpos, ypos, width, height, page, (UINT16*)data);
-			} else {
+				invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
+//          } else {
 				/* TODO: 8-bit textures are weird. need to figure out some additional bits */
 				//logerror("W: %d, H: %d, X: %d, Y: %d, P: %d, Bit: %d, : %08X, %08X\n", width, height, xpos, ypos, page, bitdepth, header & 0x00681040, header);
 				//write_texture8(xpos, ypos, width, height, page, (UINT16*)data);
-			}
+//          }
 			break;
 		case 0x02:		/* Only mipmaps */
 			break;
@@ -644,7 +786,10 @@ void real3d_display_list_end(void)
 		};
 	}
 	texture_fifo_pos = 0;
-	real3d_display_list = 1;
+	fillbitmap(zbuffer, 0, NULL);
+	fillbitmap(bitmap3d, 0x8000, NULL);
+	real3d_traverse_display_list();
+//  real3d_display_list = 1;
 }
 
 void real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, int byteswap)
@@ -733,6 +878,7 @@ WRITE64_HANDLER( real3d_cmd_w )
 	real3d_display_list_end();
 }
 
+
 /*****************************************************************************/
 /* matrix and vector operations */
 
@@ -747,14 +893,12 @@ INLINE float dot_product3(VECTOR3 a, VECTOR3 b)
 }
 
 /* multiplies a 4-element vector by a 4x4 matrix */
-static void matrix_multiply_vector(MATRIX matrix, VECTOR v, VECTOR *p)
+static void matrix_multiply_vector(MATRIX matrix, const VECTOR v, VECTOR *p)
 {
-	VECTOR out;
-	out[0] = (v[0] * matrix[0][0]) + (v[1] * matrix[1][0]) + (v[2] * matrix[2][0]) + (v[3] * matrix[3][0]);
-	out[1] = (v[0] * matrix[0][1]) + (v[1] * matrix[1][1]) + (v[2] * matrix[2][1]) + (v[3] * matrix[3][1]);
-	out[2] = (v[0] * matrix[0][2]) + (v[1] * matrix[1][2]) + (v[2] * matrix[2][2]) + (v[3] * matrix[3][2]);
-	out[3] = (v[0] * matrix[0][3]) + (v[1] * matrix[1][3]) + (v[2] * matrix[2][3]) + (v[3] * matrix[3][3]);
-	memcpy(p, &out, sizeof(VECTOR));
+	(*p)[0] = (v[0] * matrix[0][0]) + (v[1] * matrix[1][0]) + (v[2] * matrix[2][0]) + (v[3] * matrix[3][0]);
+	(*p)[1] = (v[0] * matrix[0][1]) + (v[1] * matrix[1][1]) + (v[2] * matrix[2][1]) + (v[3] * matrix[3][1]);
+	(*p)[2] = (v[0] * matrix[0][2]) + (v[1] * matrix[1][2]) + (v[2] * matrix[2][2]) + (v[3] * matrix[3][2]);
+	(*p)[3] = (v[0] * matrix[0][3]) + (v[1] * matrix[1][3]) + (v[2] * matrix[2][3]) + (v[3] * matrix[3][3]);
 }
 
 /* multiplies a 4x4 matrix with another 4x4 matrix */
@@ -809,9 +953,7 @@ void push_matrix_stack(void)
 {
 	matrix_stack_ptr++;
 	if (matrix_stack_ptr >= MATRIX_STACK_SIZE)
-	{
 		fatalerror("push_matrix_stack: matrix stack overflow");
-	}
 
 	memcpy( &matrix_stack[matrix_stack_ptr], &matrix_stack[matrix_stack_ptr-1], sizeof(MATRIX));
 }
@@ -820,9 +962,7 @@ void pop_matrix_stack(void)
 {
 	matrix_stack_ptr--;
 	if (matrix_stack_ptr < 0)
-	{
 		fatalerror("pop_matrix_stack: matrix stack underflow");
-	}
 }
 
 void multiply_matrix_stack(MATRIX matrix)
@@ -845,49 +985,6 @@ void translate_matrix_stack(float x, float y, float z)
 /*****************************************************************************/
 /* transformation and rasterizing */
 
-INLINE void push_triangle(int alpha, TRIANGLE *tri)
-{
-	if (alpha)
-	{
-		memcpy(&alpha_triangle_buffer[alpha_triangle_buffer_ptr], tri, sizeof(TRIANGLE));
-		alpha_triangle_buffer_ptr++;
-
-		if (alpha_triangle_buffer_ptr >= MAX_TRIANGLES)
-		{
-			fatalerror("push_triangle: triangle buffer overflow!");
-		}
-	}
-	else
-	{
-		memcpy(&triangle_buffer[triangle_buffer_ptr], tri, sizeof(TRIANGLE));
-		triangle_buffer_ptr++;
-
-		if (triangle_buffer_ptr >= MAX_TRIANGLES)
-		{
-			fatalerror("push_triangle: triangle buffer overflow!");
-		}
-	}
-}
-
-static int texture_x;
-static int texture_y;
-static int texture_width;
-static int texture_height;
-static UINT32 texture_width_mask;
-static UINT32 texture_height_mask;
-static int texture_page;
-static int texture_coord_shift = 16;
-static int polygon_transparency = 0;
-static int polygon_intensity = 0;
-
-static int* texture_u_table;
-static int* texture_v_table;
-
-static UINT32 viewport_priority;
-
-#define ZBUFFER_SCALE		16777216.0
-#define ZDIVIDE_SHIFT		16
-
 #include "m3raster.c"
 
 INLINE int is_point_inside(float x, float y, float z, PLANE cp)
@@ -899,64 +996,64 @@ INLINE int is_point_inside(float x, float y, float z, PLANE cp)
 		return 0;
 }
 
-INLINE float line_plane_intersection(VERTEX *v1, VERTEX *v2, PLANE cp)
+INLINE float line_plane_intersection(const poly_vertex *v1, const poly_vertex *v2, PLANE cp)
 {
 	float x = v1->x - v2->x;
 	float y = v1->y - v2->y;
-	float z = v1->z - v2->z;
-	float t = ((cp.x * v1->x) + (cp.y * v1->y) + (cp.z * v1->z)) / ((cp.x * x) + (cp.y * y) + (cp.z * z));
+	float z = v1->pz - v2->pz;
+	float t = ((cp.x * v1->x) + (cp.y * v1->y) + (cp.z * v1->pz)) / ((cp.x * x) + (cp.y * y) + (cp.z * z));
 	return t;
 }
 
-static int clip_polygon(VERTEX *v, int num_vertices, PLANE cp, VERTEX *vout)
+static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_vertex *vout)
 {
-	VERTEX clipv[10];
+	poly_vertex clipv[10];
 	int clip_verts = 0;
 	float t;
 	int i;
 
-	int pv = num_vertices - 1;
+	int previ = num_vertices - 1;
 
 	for (i=0; i < num_vertices; i++)
 	{
-		int v1_in = is_point_inside(v[i].x, v[i].y, v[i].z, cp);
-		int v2_in = is_point_inside(v[pv].x, v[pv].y, v[pv].z, cp);
+		int v1_in = is_point_inside(v[i].x, v[i].y, v[i].pz, cp);
+		int v2_in = is_point_inside(v[previ].x, v[previ].y, v[previ].pz, cp);
 
 		if (v1_in && v2_in)			/* edge is completely inside the volume */
 		{
-			memcpy(&clipv[clip_verts], &v[i], sizeof(VERTEX));
+			clipv[clip_verts] = v[i];
 			++clip_verts;
 		}
 		else if (!v1_in && v2_in)	/* edge is entering the volume */
 		{
 			/* insert vertex at intersection point */
-			t = line_plane_intersection(&v[i], &v[pv], cp);
-			clipv[clip_verts].x = v[i].x + ((v[pv].x - v[i].x) * t);
-			clipv[clip_verts].y = v[i].y + ((v[pv].y - v[i].y) * t);
-			clipv[clip_verts].z = v[i].z + ((v[pv].z - v[i].z) * t);
-			clipv[clip_verts].u = (UINT32)((float)v[i].u + (((float)v[pv].u - (float)v[i].u) * t));
-			clipv[clip_verts].v = (UINT32)((float)v[i].v + (((float)v[pv].v - (float)v[i].v) * t));
+			t = line_plane_intersection(&v[i], &v[previ], cp);
+			clipv[clip_verts].x = v[i].x + ((v[previ].x - v[i].x) * t);
+			clipv[clip_verts].y = v[i].y + ((v[previ].y - v[i].y) * t);
+			clipv[clip_verts].pz = v[i].pz + ((v[previ].pz - v[i].pz) * t);
+			clipv[clip_verts].pu = v[i].pu + ((v[previ].pu - v[i].pu) * t);
+			clipv[clip_verts].pv = v[i].pv + ((v[previ].pv - v[i].pv) * t);
 			++clip_verts;
 		}
 		else if (v1_in && !v2_in)	/* edge is leaving the volume */
 		{
 			/* insert vertex at intersection point */
-			t = line_plane_intersection(&v[i], &v[pv], cp);
-			clipv[clip_verts].x = v[i].x + ((v[pv].x - v[i].x) * t);
-			clipv[clip_verts].y = v[i].y + ((v[pv].y - v[i].y) * t);
-			clipv[clip_verts].z = v[i].z + ((v[pv].z - v[i].z) * t);
-			clipv[clip_verts].u = (UINT32)((float)v[i].u + (((float)v[pv].u - (float)v[i].u) * t));
-			clipv[clip_verts].v = (UINT32)((float)v[i].v + (((float)v[pv].v - (float)v[i].v) * t));
+			t = line_plane_intersection(&v[i], &v[previ], cp);
+			clipv[clip_verts].x = v[i].x + ((v[previ].x - v[i].x) * t);
+			clipv[clip_verts].y = v[i].y + ((v[previ].y - v[i].y) * t);
+			clipv[clip_verts].pz = v[i].pz + ((v[previ].pz - v[i].pz) * t);
+			clipv[clip_verts].pu = v[i].pu + ((v[previ].pu - v[i].pu) * t);
+			clipv[clip_verts].pv = v[i].pv + ((v[previ].pv - v[i].pv) * t);
 			++clip_verts;
 
 			/* insert the existing vertex */
-			memcpy(&clipv[clip_verts], &v[i], sizeof(VERTEX));
+			clipv[clip_verts] = v[i];
 			++clip_verts;
 		}
 
-		pv = i;
+		previ = i;
 	}
-	memcpy(&vout[0], &clipv[0], sizeof(VERTEX) * clip_verts);
+	memcpy(&vout[0], &clipv[0], sizeof(vout[0]) * clip_verts);
 	return clip_verts;
 }
 
@@ -971,26 +1068,68 @@ static int viewport_region_height = 384;
 
 static PLANE clip_plane[5];
 
-static void draw_model(UINT32 *model)
+static void render_one(TRIANGLE *tri)
 {
+	poly_extra_data *extra = poly_get_extra_data(poly);
+	poly_draw_tri_scanline callback = NULL;
+
+	tri->v[0].pz = 1.0f / tri->v[0].pz;
+	tri->v[1].pz = 1.0f / tri->v[1].pz;
+	tri->v[2].pz = 1.0f / tri->v[2].pz;
+
+	if (tri->param & TRI_PARAM_TEXTURE_ENABLE)
+	{
+		tri->v[0].pu = tri->v[0].pu * tri->v[0].pz * 256.0f;
+		tri->v[0].pv = tri->v[0].pv * tri->v[0].pz * 256.0f;
+		tri->v[1].pu = tri->v[1].pu * tri->v[1].pz * 256.0f;
+		tri->v[1].pv = tri->v[1].pv * tri->v[1].pz * 256.0f;
+		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * 256.0f;
+		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * 256.0f;
+
+		extra->texture = get_texture((tri->param & TRI_PARAM_TEXTURE_PAGE) ? 1 : 0, tri->texture_x, tri->texture_y, tri->texture_width, tri->texture_height, tri->texture_format);
+		extra->texture_param		= tri->param;
+		extra->polygon_transparency = tri->transparency;
+		extra->polygon_intensity	= tri->intensity;
+
+		if (tri->param & TRI_PARAM_ALPHA_TEST)
+			callback = draw_scanline_alpha_test;
+		else if (extra->texture->alpha == 0xff)
+			callback = (tri->transparency >= 32) ? draw_scanline_normal : draw_scanline_trans;
+		else
+			callback = draw_scanline_alpha;
+		poly_render_triangle(poly, bitmap3d, &clip3d, callback, 3, &tri->v[0], &tri->v[1], &tri->v[2]);
+	}
+	else
+	{
+		extra->polygon_transparency = tri->transparency;
+		extra->polygon_intensity	= tri->intensity;
+		extra->color                = tri->color;
+
+		poly_render_triangle(poly, bitmap3d, &clip3d, draw_scanline_color, 1, &tri->v[0], &tri->v[1], &tri->v[2]);
+	}
+}
+
+static void draw_model(UINT32 addr)
+{
+	UINT32 *model = (addr >= 0x100000) ? &model3_vrom[addr] :  &polygon_ram[addr];
 	UINT32 header[7];
 	int index = 0;
-	int last_polygon = 0;
-	int num_vertices, num_reused_vertices;
+	int last_polygon = FALSE;
+	int num_vertices;
 	int i, v, vi;
 	float fixed_point_fraction;
-	VERTEX vertex[4];
-	VERTEX prev_vertex[4];
-	VERTEX clip_vert[10];
+	poly_vertex vertex[4];
+	poly_vertex prev_vertex[4];
+	poly_vertex clip_vert[10];
 
 	int polynum = 0;
 	MATRIX transform_matrix;
 	float center_x, center_y;
 
 	if(model3_step < 0x15) {	/* position coordinates are 17.15 fixed-point in Step 1.0 */
-		fixed_point_fraction = 32768.0f;
+		fixed_point_fraction = 1.0f / 32768.0f;
 	} else {					/* 13.19 fixed-point in other Steps */
-		fixed_point_fraction = 524288.0f;
+		fixed_point_fraction = 1.0f / 524288.0f;
 	}
 
 	get_top_matrix(&transform_matrix);
@@ -999,8 +1138,9 @@ static void draw_model(UINT32 *model)
 	center_x = (float)(viewport_region_x + (viewport_region_width / 2));
 	center_y = (float)(viewport_region_y + (viewport_region_height / 2));
 
-	while(!last_polygon)
+	while (!last_polygon)
 	{
+		float texture_coord_scale;
 		UINT16 color;
 		VECTOR3 normal;
 		VECTOR3 sn;
@@ -1008,70 +1148,48 @@ static void draw_model(UINT32 *model)
 		TRIANGLE tri;
 		float dot;
 		int intensity;
+		int polygon_transparency;
 
-		for(i=0; i < 7; i++) {
+		for (i = 0; i < 7; i++)
 			header[i] = model[index++];
-		}
 
-		if(header[6] == 0) {
-			//logerror("draw_model: header word 6 == 0\n");
+		if (header[6] == 0)
 			return;
-		}
 
-		if(header[1] & 0x4)
-			last_polygon = 1;
+		if (header[1] & 0x4)
+			last_polygon = TRUE;
 
-		if(header[0] & 0x40)
-			num_vertices = 4;
-		else
-			num_vertices = 3;
+		num_vertices = (header[0] & 0x40) ? 4 : 3;
 
-		num_reused_vertices = num_bits[header[0] & 0xf];
-
-		if(header[1] & 0x40) {			/* texture coordinates are 16.0 fixed-point */
-			texture_coord_shift = 16;
-		} else {						/* texture coordinates are 13.3 fixed-point */
-			texture_coord_shift = 19;
-		}
+		/* texture coordinates are 16.0 or 13.3 fixed-point */
+		texture_coord_scale = (header[1] & 0x40) ? 1.0f : (1.0f / 8.0f);
 
 		/* polygon normal (sign + 1.22 fixed-point) */
-		normal[0] = (float)((int)header[1] >> 8) / 4194304.0f;
-		normal[1] = (float)((int)header[2] >> 8) / 4194304.0f;
-		normal[2] = (float)((int)header[3] >> 8) / 4194304.0f;
-
-		vi = 0;
+		normal[0] = (float)((INT32)header[1] >> 8) * (1.0f / 4194304.0f);
+		normal[1] = (float)((INT32)header[2] >> 8) * (1.0f / 4194304.0f);
+		normal[2] = (float)((INT32)header[3] >> 8) * (1.0f / 4194304.0f);
 
 		/* load reused vertices */
-		for(v=0; v < 4; v++)
-		{
-			if(header[0] & (1 << v)) {
-				memcpy(&vertex[vi], &prev_vertex[v], sizeof(VERTEX));
-				++vi;
-			}
-		}
+		vi = 0;
+		for (v = 0; v < 4; v++)
+			if (header[0] & (1 << v))
+				vertex[vi++] = prev_vertex[v];
 
 		/* load new vertices */
-		for(v=0; v < (num_vertices - num_reused_vertices); v++)
+		for ( ; vi < num_vertices; vi++)
 		{
-			vertex[vi].x = (float)((int)model[index++]) / fixed_point_fraction;
-			vertex[vi].y = (float)((int)model[index++]) / fixed_point_fraction;
-			vertex[vi].z = (float)((int)model[index++]) / fixed_point_fraction;
-
-			vertex[vi].u = (UINT16)(model[index] >> 16);
-			vertex[vi].v = (UINT16)(model[index]);
-			++index;
-			++vi;
+			vertex[vi].x = (float)((INT32)model[index++]) * fixed_point_fraction;
+			vertex[vi].y = (float)((INT32)model[index++]) * fixed_point_fraction;
+			vertex[vi].pz = (float)((INT32)model[index++]) * fixed_point_fraction;
+			vertex[vi].pu = (UINT16)(model[index] >> 16);
+			vertex[vi].pv = (UINT16)(model[index++]);
 		}
 
 		/* Copy current vertices as previous vertices */
-		memcpy(prev_vertex, vertex, sizeof(VERTEX) * 4);
+		memcpy(prev_vertex, vertex, sizeof(poly_vertex) * 4);
 
 		color = (((header[4] >> 27) & 0x1f) << 10) | (((header[4] >> 19) & 0x1f) << 5) | ((header[4] >> 11) & 0x1f);
-		if(header[6] & 0x800000) {
-			polygon_transparency = 32;
-		} else {
-			polygon_transparency = (header[6] >> 18) & 0x1f;
-		}
+		polygon_transparency =  (header[6] & 0x800000) ? 32 : ((header[6] >> 18) & 0x1f);
 
 		/* transform polygon normal to view-space */
 		sn[0] = (normal[0] * transform_matrix[0][0]) +
@@ -1090,12 +1208,13 @@ static void draw_model(UINT32 *model)
 
 		/* TODO: backface culling */
 		/* transform vertices */
-		for(i=0; i < num_vertices; i++) {
+		for (i = 0; i < num_vertices; i++)
+		{
 			VECTOR vect;
 
 			vect[0] = vertex[i].x;
 			vect[1] = vertex[i].y;
-			vect[2] = vertex[i].z;
+			vect[2] = vertex[i].pz;
 			vect[3] = 1.0f;
 
 			/* transform to world-space */
@@ -1104,9 +1223,9 @@ static void draw_model(UINT32 *model)
 			/* apply coordinate system */
 			clip_vert[i].x = p[i][0] * coordinate_system[0][1];
 			clip_vert[i].y = p[i][1] * coordinate_system[1][2];
-			clip_vert[i].z = p[i][2] * coordinate_system[2][0];
-			clip_vert[i].u = vertex[i].u;
-			clip_vert[i].v = vertex[i].v;
+			clip_vert[i].pz = p[i][2] * coordinate_system[2][0];
+			clip_vert[i].pu = vertex[i].pu * texture_coord_scale;
+			clip_vert[i].pv = vertex[i].pv * texture_coord_scale;
 		}
 
 		/* clip against view frustum */
@@ -1118,7 +1237,7 @@ static void draw_model(UINT32 *model)
 
 		/* homogeneous Z-divide, screen-space transformation */
 		for(i=0; i < num_vertices; i++) {
-			float ooz = 1.0f / clip_vert[i].z;
+			float ooz = 1.0f / clip_vert[i].pz;
 			clip_vert[i].x = ((clip_vert[i].x * ooz) * viewport_focal_length) + center_x;
 			clip_vert[i].y = ((clip_vert[i].y * ooz) * viewport_focal_length) + center_y;
 		}
@@ -1145,9 +1264,9 @@ static void draw_model(UINT32 *model)
 
 		for (i=2; i < num_vertices; i++)
 		{
-			memcpy(&tri.v[0], &clip_vert[0], sizeof(VERTEX));
-			memcpy(&tri.v[1], &clip_vert[i-1], sizeof(VERTEX));
-			memcpy(&tri.v[2], &clip_vert[i], sizeof(VERTEX));
+			memcpy(&tri.v[0], &clip_vert[0], sizeof(poly_vertex));
+			memcpy(&tri.v[1], &clip_vert[i-1], sizeof(poly_vertex));
+			memcpy(&tri.v[2], &clip_vert[i], sizeof(poly_vertex));
 			tri.texture_x 				= ((header[4] & 0x1f) << 1) | ((header[5] >> 7) & 0x1);
 			tri.texture_y 				= (header[5] & 0x1f);
 			tri.texture_width			= ((header[3] >> 3) & 0x7);
@@ -1155,156 +1274,22 @@ static void draw_model(UINT32 *model)
 			tri.texture_format			= (header[6] >> 7) & 0x7;
 			tri.transparency			= polygon_transparency;
 			tri.intensity 				= intensity;
-			tri.color = color;
-			tri.viewport_priority		= viewport_priority;
-			tri.texture_coord_shift		= texture_coord_shift;
+			tri.color 					= color;
 
 			tri.param	= 0;
 			tri.param 	|= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
 			tri.param	|= (header[6] & 0x4000000) ? TRI_PARAM_TEXTURE_ENABLE : 0;
 			tri.param	|= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
 			tri.param	|= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
+			tri.param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
 
-			if (((header[4] & 0x4000000) && (header[6] & 0x80000000 || header[6] & 0x1))
-				|| (polygon_transparency < 32) || (tri.texture_format == 7))
-			{
-				push_triangle(1, &tri);
-			}
-			else
-			{
-				push_triangle(0, &tri);
-			}
+			render_one(&tri);
 		}
 
 		++polynum;
 	};
 }
 
-static void render_triangles(void)
-{
-	int i;
-
-	for (i=0; i < triangle_buffer_ptr; i++)
-	{
-		TRIANGLE *tri = &triangle_buffer[i];
-
-		if (tri->param & TRI_PARAM_TEXTURE_ENABLE)
-		{
-			texture_x			= tri->texture_x * 32;
-			texture_y 			= tri->texture_y * 32;
-			texture_page		= (tri->param & TRI_PARAM_TEXTURE_PAGE) ? 1 : 0;
-			texture_width		= 32 << tri->texture_width;
-			texture_height		= 32 << tri->texture_height;
-			texture_width_mask	= (texture_width << 1) - 1;
-			texture_height_mask	= (texture_height << 1) - 1;
-			polygon_intensity	= tri->intensity;
-			viewport_priority	= tri->viewport_priority;
-			texture_coord_shift	= tri->texture_coord_shift;
-
-			if (tri->param & TRI_PARAM_TEXTURE_MIRROR_U)
-			{
-				texture_u_table = texture_mirror_table[tri->texture_width];
-			}
-			else
-			{
-				texture_u_table = texture_wrap_table[tri->texture_width];
-			}
-
-			if (tri->param & TRI_PARAM_TEXTURE_MIRROR_V)
-			{
-				texture_v_table = texture_mirror_table[tri->texture_height];
-			}
-			else
-			{
-				texture_v_table = texture_wrap_table[tri->texture_height];
-			}
-
-			switch (tri->texture_format)
-			{
-				case 0:	draw_triangle_tex1555(tri->v[0], tri->v[1], tri->v[2]); break;	/* ARGB1555 */
-				case 7:	draw_triangle_tex4444(tri->v[0], tri->v[1], tri->v[2]); break;	/* ARGB4444 */
-			}
-		}
-		else
-		{
-			polygon_intensity	= tri->intensity;
-			viewport_priority	= tri->viewport_priority;
-			texture_coord_shift	= tri->texture_coord_shift;
-
-			draw_triangle_color(tri->v[0], tri->v[1], tri->v[2], tri->color);
-		}
-	}
-
-	//for (i=0; i < alpha_triangle_buffer_ptr; i++)
-	for (i=alpha_triangle_buffer_ptr-1; i >= 0; i--)
-	{
-		TRIANGLE *tri = &alpha_triangle_buffer[i];
-
-		if (tri->param & TRI_PARAM_TEXTURE_ENABLE)
-		{
-			texture_x			= tri->texture_x * 32;
-			texture_y 			= tri->texture_y * 32;
-			texture_page		= (tri->param & TRI_PARAM_TEXTURE_PAGE) ? 1 : 0;
-			texture_width		= 32 << tri->texture_width;
-			texture_height		= 32 << tri->texture_height;
-			texture_width_mask	= (texture_width << 1) - 1;
-			texture_height_mask	= (texture_height << 1) - 1;
-			polygon_transparency = tri->transparency;
-			polygon_intensity	= tri->intensity;
-			viewport_priority	= tri->viewport_priority;
-			texture_coord_shift	= tri->texture_coord_shift;
-
-			if (tri->param & TRI_PARAM_TEXTURE_MIRROR_U)
-			{
-				texture_u_table = texture_mirror_table[tri->texture_width];
-			}
-			else
-			{
-				texture_u_table = texture_wrap_table[tri->texture_width];
-			}
-
-			if (tri->param & TRI_PARAM_TEXTURE_MIRROR_V)
-			{
-				texture_v_table = texture_mirror_table[tri->texture_height];
-			}
-			else
-			{
-				texture_v_table = texture_wrap_table[tri->texture_height];
-			}
-
-			switch (tri->texture_format)
-			{
-				case 0:		/* ARGB1555 */
-				{
-					if (tri->transparency < 32)
-					{
-						draw_triangle_tex1555_trans(tri->v[0], tri->v[1], tri->v[2]);
-					}
-					else
-					{
-						draw_triangle_tex1555_alpha(tri->v[0], tri->v[1], tri->v[2]);
-					}
-					break;
-				}
-
-				case 7:		/* ARGB4444 */
-				{
-					draw_triangle_tex4444_alpha(tri->v[0], tri->v[1], tri->v[2]);
-					break;
-				}
-			}
-		}
-		else
-		{
-			polygon_transparency = tri->transparency;
-			polygon_intensity	= tri->intensity;
-			viewport_priority	= tri->viewport_priority;
-			texture_coord_shift	= tri->texture_coord_shift;
-
-			draw_triangle_color_trans(tri->v[0], tri->v[1], tri->v[2], tri->color);
-		}
-	}
-}
 
 /*****************************************************************************/
 /* display list parser */
@@ -1327,42 +1312,31 @@ static UINT32 *get_memory_pointer(UINT32 address)
 		}
 		return &culling_ram[address];
 	}
-	return 0;
+	return NULL;
 }
 
 static void load_matrix(int matrix_num, MATRIX *out)
 {
-	MATRIX m;
-	float *matrix = (float*)get_memory_pointer(matrix_base_address + (matrix_num*12));
+	float *matrix = (float *)get_memory_pointer(matrix_base_address + matrix_num * 12);
 
-	m[0][0] = matrix[3];	m[0][1] = matrix[6];	m[0][2] = matrix[9];	m[0][3] = 0.0f;
-	m[1][0] = matrix[4];	m[1][1] = matrix[7];	m[1][2] = matrix[10];	m[1][3] = 0.0f;
-	m[2][0] = matrix[5];	m[2][1] = matrix[8];	m[2][2] = matrix[11];	m[2][3] = 0.0f;
-	m[3][0] = matrix[0];	m[3][1] = matrix[1];	m[3][2] = matrix[2];	m[3][3] = 1.0f;
-
-	memcpy(out, &m, sizeof(MATRIX));
+	(*out)[0][0] = matrix[3];	(*out)[0][1] = matrix[6];	(*out)[0][2] = matrix[9];	(*out)[0][3] = 0.0f;
+	(*out)[1][0] = matrix[4];	(*out)[1][1] = matrix[7];	(*out)[1][2] = matrix[10];	(*out)[1][3] = 0.0f;
+	(*out)[2][0] = matrix[5];	(*out)[2][1] = matrix[8];	(*out)[2][2] = matrix[11];	(*out)[2][3] = 0.0f;
+	(*out)[3][0] = matrix[0];	(*out)[3][1] = matrix[1];	(*out)[3][2] = matrix[2];	(*out)[3][3] = 1.0f;
 }
 
-static void traverse_list4(UINT32 address)
+static void traverse_list4(int lod_num, UINT32 address)
 {
+	/* does something with the LOD selection */
 	UINT32 *list = get_memory_pointer(address);
 	UINT32 link = list[0];
 
-	if ((link & 0xffffff) >= 0x100000)		/* VROM model */
-	{
-		draw_model(&model3_vrom[link & 0xffffff]);
-	}
-	else {		/* model in polygon ram */
-		/* TODO: polygon ram actually overrides the lowest 4MB of VROM.
-                 by moving the polygon ram there we could get rid of this distinction */
-		draw_model(&polygon_ram[link & 0xffffff]);
-	}
+	draw_model(link & 0xffffff);
 }
 
 static void traverse_list(UINT32 address)
 {
 	UINT32 *list = get_memory_pointer(address);
-	int end = 0;
 	int list_ptr = 0;
 
 	if (list_depth > 2)
@@ -1370,166 +1344,138 @@ static void traverse_list(UINT32 address)
 
 	list_depth++;
 
-	/* TODO: traverse from end to beginning may be correct rendering order */
-
-	while(!end)
+	/* find the end of the list */
+	while (1)
 	{
 		address = list[list_ptr++];
-
-		//if (address & 0x02000000 || address == 0) {
-		if(address == 0 || (address >> 24) != 0) {
-			end = 1;
+		if (address & 0x02000000)
+			break;
+		if (address == 0 || (address >> 24) != 0)
+		{
+			list_ptr--;
+			break;
 		}
+	}
 
-		address &= 0xffffff;
-
-		if (address != 0 && address != 0x800800) {
-			traverse_node(address);
-		}
-	};
+	/* walk it backwards */
+	while (list_ptr > 0)
+	{
+		address = list[--list_ptr] & 0xffffff;
+		if (address != 0 && address != 0x800800)
+//      if (address != 0)
+			draw_block(address);
+	}
 
 	list_depth--;
 }
 
-static void traverse_node(UINT32 address)
+INLINE void process_link(UINT32 address, UINT32 link)
 {
-	UINT32 *node;
+	if (link != 0 && link != 0x0fffffff && link != 0x00800800 && link != 0x01000000)
+	{
+		switch (link >> 24)
+		{
+			case 0x00:		/* link to another node */
+				draw_block(link & 0xffffff);
+				break;
+
+			case 0x01:
+			case 0x03:		/* both of these link to models, is there any difference ? */
+				draw_model(link & 0xffffff);
+				break;
+
+			case 0x04:		/* list of links */
+				traverse_list(link & 0xffffff);
+				break;
+
+			default:
+				logerror("process_link %08X: link = %08X\n", address, link);
+				break;
+		}
+	}
+}
+
+static void draw_block(UINT32 address)
+{
+	const UINT32 *node = get_memory_pointer(address);
 	UINT32 link;
 	int node_matrix;
 	float x, y, z;
 	MATRIX matrix;
 	int offset;
 
-	if(model3_step < 0x15) {
-		offset = 2;
-	} else {
-		offset = 0;
-	}
+	offset = (model3_step < 0x15) ? 2 : 0;
+	link = node[7 - offset];
 
-	node = get_memory_pointer(address);
-
-	/* apply node transformation and translation */
-	node_matrix = node[3-offset] & 0xfff;
+	/* apply matrix and translation */
+	node_matrix = node[3 - offset] & 0xfff;
 	load_matrix(node_matrix, &matrix);
 
 	push_matrix_stack();
-	if (node_matrix != 0) {
-		multiply_matrix_stack(matrix);
-	}
-	if (node[0] & 0x10) {
-		x = *(float*)&node[4-offset];
-		y = *(float*)&node[5-offset];
-		z = *(float*)&node[6-offset];
+
+	if (node[0] & 0x10)
+	{
+		x = *(float *)&node[4 - offset];
+		y = *(float *)&node[5 - offset];
+		z = *(float *)&node[6 - offset];
 		translate_matrix_stack(x, y, z);
 	}
+	else if (node_matrix != 0)
+		multiply_matrix_stack(matrix);
 
-	/* handle the link */
-	/* TODO: should we handle the second one first ? */
-	link = node[7-offset];
-
-	if (node[0] & 0x08) {
-		/* TODO: this is a pointer list with 4 links. suspected to do level of detail (LOD) selection. */
-		traverse_list4(link & 0xffffff);
-	}
-	else {
-		if (link != 0x0fffffff && link != 0x00800800 && link != 0)
-		{
-			if (link != 0x01000000) {
-				switch(link >> 24)
-				{
-					case 0x00:		/* link to another node */
-						traverse_node(link & 0xffffff);
-						break;
-
-					case 0x01:
-					case 0x03:		/* both of these link to models, is there any difference ? */
-						if ((link & 0xffffff) >= 0x100000)		/* VROM model */
-						{
-							draw_model(&model3_vrom[link & 0xffffff]);
-						}
-						else {		/* model in polygon ram */
-							/* TODO: polygon ram actually overrides the lowest 4MB of VROM.
-                                     by moving the polygon ram there we could get rid of this distinction */
-							draw_model(&polygon_ram[link & 0xffffff]);
-						}
-						break;
-
-					case 0x04:		/* list of links */
-						traverse_list(link & 0xffffff);
-						break;
-
-					default:
-						logerror("traverse_node %08X: link 1 = %08X\n", address, link);
-						break;
-				}
-			}
-		} else {
-			logerror("traverse_node %08X: link 1 = %08X\n", address, link);
-		}
-	}
+	/* bit 0x08 of word 0 indicates a pointer list */
+	if (node[0] & 0x08)
+		traverse_list4((node[3 - offset] >> 12) & 0x7f, link & 0xffffff);
+	else
+		process_link(address, link);
 
 	pop_matrix_stack();
 
 	/* handle the second link */
-	link = node[8-offset];
-
-	if (link != 0x00800800 && link != 0)
-	{
-		if (link != 0x01000000 && (link >> 24) == 0) {
-			traverse_node(link & 0xffffff);
-		}
-	} else {
-		logerror("traverse_node %08X: link 2 = %08X\n", address, link);
-	}
+	link = node[8 - offset];
+	process_link(address, link);
 }
 
-static void traverse_root_node(UINT32 address)
+static void draw_viewport(int pri, UINT32 address)
 {
-	UINT32 *node;
-	UINT32 link_address, link_node;
+	const UINT32 *node = get_memory_pointer(address);
+	UINT32 link_address;
 	float viewport_left, viewport_right, viewport_top, viewport_bottom;
 	float fov_x, fov_y;
 
-	node = get_memory_pointer(address);
-
 	link_address = node[1];
-	if (link_address == 0) {
+	if (link_address == 0)
 		return;
-	}
 
 	/* traverse to the link node before drawing this viewport */
 	/* check this is correct as this affects the rendering order */
-	if ((link_address >> 24) == 0) {
-		traverse_root_node(link_address & 0xffffff);
-	}
-	else {
-		if ((link_address >> 24) != 0x01) {
-			logerror("traverse_root_node: link address = %08X\n", link_address);
-		}
-	}
+	if (link_address != 0x01000000)
+		draw_viewport(pri, link_address);
 
-	/* draw this viewport */
+	/* skip if this isn't the right priority */
+	if (pri != ((node[0] >> 3) & 3))
+		return;
 
 	/* set viewport parameters */
-	viewport_region_x		= ((node[26] & 0xffff) >> 4);			/* 12.4 fixed point */
-	viewport_region_y		= (((node[26] >> 16) & 0xffff) >> 4);
-	viewport_region_width	= ((node[20] & 0xffff) >> 2);			/* 14.2 fixed point */
-	viewport_region_height	= (((node[20] >> 16) & 0xffff) >> 2);
-
-	viewport_priority = (((node[0] >> 3) & 0x3)) << 29;			/* we use priority as 2 top bits of depth buffer value */
+	viewport_region_x		= (node[26] & 0xffff) >> 4;			/* 12.4 fixed point */
+	viewport_region_y		= ((node[26] >> 16) & 0xffff) >> 4;
+	viewport_region_width	= (node[20] & 0xffff) >> 2;			/* 14.2 fixed point */
+	viewport_region_height	= ((node[20] >> 16) & 0xffff) >> 2;
 
 	/* frustum plane angles */
-	viewport_left		= RADIAN_TO_DEGREE(asin(*(float*)&node[12]));
-	viewport_right		= RADIAN_TO_DEGREE(asin(*(float*)&node[16]));
-	viewport_top		= RADIAN_TO_DEGREE(asin(*(float*)&node[14]));
-	viewport_bottom		= RADIAN_TO_DEGREE(asin(*(float*)&node[18]));
+	viewport_left			= RADIAN_TO_DEGREE(asin(*(float *)&node[12]));
+	viewport_right			= RADIAN_TO_DEGREE(asin(*(float *)&node[16]));
+	viewport_top			= RADIAN_TO_DEGREE(asin(*(float *)&node[14]));
+	viewport_bottom			= RADIAN_TO_DEGREE(asin(*(float *)&node[18]));
 
-	clip_plane[0].x = *(float*)&node[13];	clip_plane[0].y = 0.0f;		clip_plane[0].z = *(float*)&node[12];	clip_plane[0].d = 0.0f;
-	clip_plane[1].x = *(float*)&node[17];	clip_plane[1].y = 0.0f;		clip_plane[1].z = *(float*)&node[16];	clip_plane[1].d = 0.0f;
-	clip_plane[2].x = 0.0f;		clip_plane[2].y = *(float*)&node[15];	clip_plane[2].z = *(float*)&node[14];	clip_plane[2].d = 0.0f;
-	clip_plane[3].x = 0.0f;		clip_plane[3].y = *(float*)&node[19];	clip_plane[3].z = *(float*)&node[18];	clip_plane[3].d = 0.0f;
-	clip_plane[4].x = 0.0f;		clip_plane[4].y = 0.0f;		clip_plane[4].z = 1.0f;	clip_plane[4].d = 1.0f;
+	/* build clipping planes */
+	clip_plane[0].x = *(float *)&node[13];	clip_plane[0].y = 0.0f;		clip_plane[0].z = *(float *)&node[12];	clip_plane[0].d = 0.0f;
+	clip_plane[1].x = *(float *)&node[17];	clip_plane[1].y = 0.0f;		clip_plane[1].z = *(float *)&node[16];	clip_plane[1].d = 0.0f;
+	clip_plane[2].x = 0.0f;		clip_plane[2].y = *(float *)&node[15];	clip_plane[2].z = *(float *)&node[14];	clip_plane[2].d = 0.0f;
+	clip_plane[3].x = 0.0f;		clip_plane[3].y = *(float *)&node[19];	clip_plane[3].z = *(float *)&node[18];	clip_plane[3].d = 0.0f;
+	clip_plane[4].x = 0.0f;		clip_plane[4].y = 0.0f;		clip_plane[4].z = 1.0f;		clip_plane[4].d = 1.0f;
 
+	/* compute field of view */
 	fov_x = viewport_left + viewport_right;
 	fov_y = viewport_top + viewport_bottom;
 	viewport_focal_length = (viewport_region_height / 2) / tan( (fov_y * M_PI / 180.0f) / 2.0f );
@@ -1538,38 +1484,29 @@ static void traverse_root_node(UINT32 address)
 	/* TODO: where does node[23] point to ? LOD table ? */
 
 	/* set lighting parameters */
-	parallel_light[0] = -*(float*)&node[5];
-	parallel_light[1] = *(float*)&node[6];
-	parallel_light[2] = *(float*)&node[4];
-	parallel_light_intensity = *(float*)&node[7];
-
-	ambient_light_intensity = (UINT8)((node[0x24] >> 8) & 0xff) / 256.0f;
+	parallel_light[0] = -*(float *)&node[5];
+	parallel_light[1] = *(float *)&node[6];
+	parallel_light[2] = *(float *)&node[4];
+	parallel_light_intensity = *(float *)&node[7];
+	ambient_light_intensity = (UINT8)(node[36] >> 8) / 256.0f;
 
 	/* set coordinate system matrix */
 	load_matrix(0, &coordinate_system);
 
-	link_node = node[2];
-	switch(link_node >> 24)
-	{
-		case 0x00:		/* basic node */
-			traverse_node(link_node);
-			break;
-
-		default:
-			logerror("traverse_root_node: node link = %08X\n", link_node);
-			break;
-	}
+	/* process a link */
+	process_link(link_address, node[2]);
 }
+
 
 static void real3d_traverse_display_list(void)
 {
+	int pri;
+
 	init_matrix_stack();
 
-	triangle_buffer_ptr = 0;
-	alpha_triangle_buffer_ptr = 0;
+	for (pri = 0; pri < 4; pri++)
+		draw_viewport(pri, 0x800000);
 
-	traverse_root_node(0x800000);
-
-	render_triangles();
+	poly_wait(poly, "real3d_traverse_display_list");
 }
 

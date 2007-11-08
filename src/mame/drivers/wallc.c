@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( wallc_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( wallc )
+static INPUT_PORTS_START( wallc )
 	PORT_START	/* DSW - read from b000 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x03, "5" )

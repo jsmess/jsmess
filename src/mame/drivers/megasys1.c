@@ -980,7 +980,7 @@ ROM_END
 
 
 
-INPUT_PORTS_START( 64street )
+static INPUT_PORTS_START( 64street )
 	COINS
 //  fire    jump
 	PORT_START_TAG("IN1")
@@ -1116,7 +1116,7 @@ ROM_START( lordofk )
 ROM_END
 
 
-INPUT_PORTS_START( astyanax )
+static INPUT_PORTS_START( astyanax )
 	COINS						/* IN0 0x80001.b */
 //  fire    jump    magic
 	PORT_START_TAG("IN1")
@@ -1299,7 +1299,7 @@ ROM_START( phantasm )
 ROM_END
 
 
-INPUT_PORTS_START( avspirit )
+static INPUT_PORTS_START( avspirit )
 	COINS
 	PORT_START_TAG("IN1")
 	JOY_2BUTTONS(1)
@@ -1398,7 +1398,7 @@ ROM_START( bigstrik )
 ROM_END
 
 
-INPUT_PORTS_START( bigstrik )
+static INPUT_PORTS_START( bigstrik )
 	COINS
 //  pass    shoot   feint
 	PORT_START_TAG("IN1")
@@ -1516,7 +1516,7 @@ ROM_START( chimerab )
 	ROM_LOAD( "prom",         0x0000, 0x0200, NO_DUMP )
 ROM_END
 
-INPUT_PORTS_START( chimerab )
+static INPUT_PORTS_START( chimerab )
 
 	COINS
 //  fire    jump    unused?(shown in service mode, but not in instructions)
@@ -1642,7 +1642,7 @@ ROM_START( cybattlr )
 	ROM_LOAD( "pr-91028.12",  0x0000, 0x0200, CRC(cfe90082) SHA1(b59991ec7b3e83ba645b709547e5b4cbe03c0f11) )
 ROM_END
 
-INPUT_PORTS_START( cybattlr )
+static INPUT_PORTS_START( cybattlr )
 
 	COINS
 //  fire    sword
@@ -1801,7 +1801,7 @@ ROM_START( edfu )
 	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
-INPUT_PORTS_START( edf )
+static INPUT_PORTS_START( edf )
 	COINS
 //  fire    unfold_weapons
 	PORT_START_TAG("IN1")
@@ -1901,7 +1901,7 @@ ROM_START( hachoo )
 ROM_END
 
 
-INPUT_PORTS_START( hachoo )
+static INPUT_PORTS_START( hachoo )
 	COINS						/* 0x80001.b */
 //  fire    jump
 	PORT_START_TAG("IN1")
@@ -2022,7 +2022,7 @@ ROM_START( hayaosi1 )
 	ROM_LOAD( "pr-91044",  0x0000, 0x0200, CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) )
 ROM_END
 
-INPUT_PORTS_START( hayaosi1 )
+static INPUT_PORTS_START( hayaosi1 )
 	PORT_START_TAG("IN0")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START1   )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2   )
@@ -2179,7 +2179,7 @@ ROM_START( iganinju )
 ROM_END
 
 
-INPUT_PORTS_START( kazan )
+static INPUT_PORTS_START( kazan )
 
 	COINS						/* IN0 0x80001.b */
 //  fire    jump
@@ -2284,7 +2284,7 @@ ROM_START( jitsupro )
 ROM_END
 
 
-INPUT_PORTS_START( jitsupro )
+static INPUT_PORTS_START( jitsupro )
 
 	COINS						/* 0x80001.b */
 	//  shoot   change view     change bat
@@ -2409,7 +2409,7 @@ ROM_START( kickoff )
 	ROM_LOAD( "kick.bin",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
-INPUT_PORTS_START( kickoff )
+static INPUT_PORTS_START( kickoff )
 	COINS						/* 0x80001.b ->  !f0008/a.w  */
 //  shoot   pass
 	PORT_START_TAG("IN1")
@@ -2528,7 +2528,7 @@ ROM_START( makaiden )
 	ROM_LOAD( "makaiden.10", 0x0100, 0x0100, CRC(e6709c51) SHA1(f5cd4f0454c1a71a5b0006b098f9e76c2d8a27d2) )
 ROM_END
 
-INPUT_PORTS_START( lomakai )
+static INPUT_PORTS_START( lomakai )
 	COINS						/* 0x80001.b */
 //  fire    jump
 	PORT_START_TAG("IN1")
@@ -2710,7 +2710,7 @@ ROM_START( p47j )
 	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
-INPUT_PORTS_START( p47 )
+static INPUT_PORTS_START( p47 )
 
 	COINS						/* 0x80001.b */
 //  fire    bomb
@@ -2871,7 +2871,7 @@ ROM_START( peekaboo )
 	ROM_LOAD( "priority.69",    0x000000, 0x200, CRC(b40bff56) SHA1(39c95eed79328ef2df754988db83e07909e848f8) )
 ROM_END
 
-INPUT_PORTS_START( peekaboo )
+static INPUT_PORTS_START( peekaboo )
 
 	PORT_START_TAG("IN0")		/* COINS + P1&P2 Buttons - .b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN3 )		// called "service"
@@ -3028,7 +3028,7 @@ ROM_START( plusalph )
 	ROM_LOAD( "prom.14m",     0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
-INPUT_PORTS_START( plusalph )
+static INPUT_PORTS_START( plusalph )
 	COINS						/* IN0 0x80001.b */
 //  fire    bomb
 	PORT_START_TAG("IN1")
@@ -3220,7 +3220,7 @@ ROM_START( rodlndjb )
 ROM_END
 
 
-INPUT_PORTS_START( rodland )
+static INPUT_PORTS_START( rodland )
 
 	COINS						/* 0x80001.b */
 //  fire    ladder
@@ -3317,7 +3317,7 @@ ROM_START( stdragon )
 	ROM_LOAD( "prom.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
-INPUT_PORTS_START( stdragon )
+static INPUT_PORTS_START( stdragon )
 	COINS						/* 0x80001.b */
 //  fire    fire
 	PORT_START_TAG("IN1")
@@ -3409,7 +3409,7 @@ ROM_START( soldamj )
 	ROM_LOAD( "soldam.m14",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
-INPUT_PORTS_START( soldamj )
+static INPUT_PORTS_START( soldamj )
 	COINS						/* 0x80001.b */
 	//  turn    turn    (3rd button is shown in service mode, but seems unused)
 	PORT_START_TAG("IN1")
@@ -3547,7 +3547,7 @@ ROM_START( tshingna )
 	ROM_LOAD( "ts.bpr",        0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
-INPUT_PORTS_START( tshingen )
+static INPUT_PORTS_START( tshingen )
 	COINS						/* 0x80001.b */
 	// sword_left   sword_right     jump
 	PORT_START_TAG("IN1")

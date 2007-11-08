@@ -387,7 +387,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( omegrace )
+static INPUT_PORTS_START( omegrace )
 	PORT_START /* SW0 */
 	PORT_DIPNAME( 0x03, 0x03, "1st Bonus Life" )	PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING (   0x00, "40k" )

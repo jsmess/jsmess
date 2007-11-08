@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-INPUT_PORTS_START( lemmings )
+static INPUT_PORTS_START( lemmings )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Select")

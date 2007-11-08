@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( skyfox )
+static INPUT_PORTS_START( skyfox )
 
 	PORT_START_TAG("IN0")	// Player 1
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )

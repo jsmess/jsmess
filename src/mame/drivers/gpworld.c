@@ -220,18 +220,18 @@ VIDEO_UPDATE( gpworld )
 
 /* MEMORY HANDLERS */
 /* READS */
-READ8_HANDLER(ldp_read)
+static READ8_HANDLER( ldp_read )
 {
 	return ldp_read_latch;
 }
 
 /* WRITES */
-WRITE8_HANDLER(ldp_write)
+static WRITE8_HANDLER( ldp_write )
 {
 	ldp_write_latch = data;
 }
 
-WRITE8_HANDLER(misc_io_write)
+static WRITE8_HANDLER( misc_io_write )
 {
 	start_lamp = (data & 0x04) >> 1;
 	nmi_enable = (data & 0x40) >> 6;
@@ -240,7 +240,7 @@ WRITE8_HANDLER(misc_io_write)
 	logerror("NMI : %x (0x%x)\n", nmi_enable, data);
 }
 
-WRITE8_HANDLER(palette_write)
+static WRITE8_HANDLER( palette_write )
 {
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b;
@@ -289,7 +289,7 @@ ADDRESS_MAP_END
 
 
 /* PORTS */
-INPUT_PORTS_START( gpworld )
+static INPUT_PORTS_START( gpworld )
 	PORT_START_TAG("IN0")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )

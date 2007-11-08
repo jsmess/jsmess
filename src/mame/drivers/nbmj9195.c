@@ -1971,7 +1971,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 
-INPUT_PORTS_START( mjuraden )
+static INPUT_PORTS_START( mjuraden )
 
 	// I don't have manual for this game.
 
@@ -2050,7 +2050,7 @@ INPUT_PORTS_START( mjuraden )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( koinomp )
+static INPUT_PORTS_START( koinomp )
 
 	// I don't have manual for this game.
 
@@ -2129,7 +2129,7 @@ INPUT_PORTS_START( koinomp )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( patimono )
+static INPUT_PORTS_START( patimono )
 
 	// I don't have manual for this game.
 
@@ -2208,7 +2208,7 @@ INPUT_PORTS_START( patimono )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( janbari )
+static INPUT_PORTS_START( janbari )
 
 	// I don't have manual for this game.
 
@@ -2287,7 +2287,7 @@ INPUT_PORTS_START( janbari )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjanbari )
+static INPUT_PORTS_START( mjanbari )
 
 	// I don't have manual for this game.
 
@@ -2366,7 +2366,7 @@ INPUT_PORTS_START( mjanbari )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mmehyou )
+static INPUT_PORTS_START( mmehyou )
 
 	// I don't have manual for this game.
 
@@ -2445,7 +2445,7 @@ INPUT_PORTS_START( mmehyou )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ultramhm )
+static INPUT_PORTS_START( ultramhm )
 
 	// I don't have manual for this game.
 
@@ -2524,7 +2524,7 @@ INPUT_PORTS_START( ultramhm )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gal10ren )
+static INPUT_PORTS_START( gal10ren )
 
 	// I don't have manual for this game.
 
@@ -2603,7 +2603,7 @@ INPUT_PORTS_START( gal10ren )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( renaiclb )
+static INPUT_PORTS_START( renaiclb )
 
 	// I don't have manual for this game.
 
@@ -2682,7 +2682,7 @@ INPUT_PORTS_START( renaiclb )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjlaman )
+static INPUT_PORTS_START( mjlaman )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
@@ -2757,7 +2757,7 @@ INPUT_PORTS_START( mjlaman )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mkeibaou )
+static INPUT_PORTS_START( mkeibaou )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -2832,7 +2832,7 @@ INPUT_PORTS_START( mkeibaou )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pachiten )
+static INPUT_PORTS_START( pachiten )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, "Game Out" )
 	PORT_DIPSETTING(    0x07, "90% (Easy)" )
@@ -2906,7 +2906,7 @@ INPUT_PORTS_START( pachiten )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sailorws )
+static INPUT_PORTS_START( sailorws )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -2981,7 +2981,7 @@ INPUT_PORTS_START( sailorws )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sailorwr )
+static INPUT_PORTS_START( sailorwr )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, "Game Out" )
 	PORT_DIPSETTING(    0x07, "90% (Easy)" )
@@ -3055,7 +3055,7 @@ INPUT_PORTS_START( sailorwr )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( psailor1 )
+static INPUT_PORTS_START( psailor1 )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
@@ -3129,7 +3129,7 @@ INPUT_PORTS_START( psailor1 )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( psailor2 )
+static INPUT_PORTS_START( psailor2 )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
@@ -3203,7 +3203,7 @@ INPUT_PORTS_START( psailor2 )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( otatidai )
+static INPUT_PORTS_START( otatidai )
 
 	// I don't have manual for this game.
 
@@ -3280,7 +3280,7 @@ INPUT_PORTS_START( otatidai )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( wcatcher )
+static INPUT_PORTS_START( wcatcher )
 
 	// I don't have manual for this game.
 
@@ -3358,7 +3358,7 @@ INPUT_PORTS_START( wcatcher )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( yosimoto )
+static INPUT_PORTS_START( yosimoto )
 
 	// I don't have manual for this game.
 
@@ -3435,7 +3435,7 @@ INPUT_PORTS_START( yosimoto )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jituroku )
+static INPUT_PORTS_START( jituroku )
 
 	// I don't have manual for this game.
 
@@ -3514,7 +3514,7 @@ INPUT_PORTS_START( jituroku )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ngpgal )
+static INPUT_PORTS_START( ngpgal )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -3590,7 +3590,7 @@ INPUT_PORTS_START( ngpgal )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjgottsu )
+static INPUT_PORTS_START( mjgottsu )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -3665,7 +3665,7 @@ INPUT_PORTS_START( mjgottsu )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bakuhatu )
+static INPUT_PORTS_START( bakuhatu )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -3740,7 +3740,7 @@ INPUT_PORTS_START( bakuhatu )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( cmehyou )
+static INPUT_PORTS_START( cmehyou )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -3816,7 +3816,7 @@ INPUT_PORTS_START( cmehyou )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjkoiura )
+static INPUT_PORTS_START( mjkoiura )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -3892,7 +3892,7 @@ INPUT_PORTS_START( mjkoiura )
 	MJCTRL_NBMJ9195_TYPE1_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mscoutm )
+static INPUT_PORTS_START( mscoutm )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -3967,7 +3967,7 @@ INPUT_PORTS_START( mscoutm )
 	MJCTRL_NBMJ9195_TYPE2_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( imekura )
+static INPUT_PORTS_START( imekura )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -4042,7 +4042,7 @@ INPUT_PORTS_START( imekura )
 	MJCTRL_NBMJ9195_TYPE2_PORT10
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjegolf )
+static INPUT_PORTS_START( mjegolf )
 	PORT_START	/* (0) DIPSW-A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )

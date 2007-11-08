@@ -18,7 +18,7 @@ Framebuffer todo:
 
 #include "driver.h"
 
-int vdp1_sprite_log = 0;
+static int vdp1_sprite_log = 0;
 
 UINT32 *stv_vdp1_vram;
 UINT32 *stv_vdp1_regs;

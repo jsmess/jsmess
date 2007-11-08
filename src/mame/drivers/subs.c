@@ -82,7 +82,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( subs )
+static INPUT_PORTS_START( subs )
 	PORT_START /* OPTIONS */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

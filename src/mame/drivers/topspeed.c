@@ -535,7 +535,7 @@ ADDRESS_MAP_END
                     INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( topspeed )
+static INPUT_PORTS_START( topspeed )
 	/* 0x880000 (port 0) -> 0x400852 (-$77ae,A5) (shared RAM) */
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
@@ -609,7 +609,7 @@ INPUT_PORTS_START( topspeed )
 	PORT_CONFSETTING(    0x00, "Analogue" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( fullthrl )
+static INPUT_PORTS_START( fullthrl )
 	PORT_INCLUDE(topspeed)
 
 	PORT_MODIFY("DSWA")

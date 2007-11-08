@@ -267,7 +267,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************************************/
 
-INPUT_PORTS_START( yumefuda )
+static INPUT_PORTS_START( yumefuda )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "Port 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

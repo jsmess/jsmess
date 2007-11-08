@@ -122,7 +122,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( jackpool )
+static INPUT_PORTS_START( jackpool )
 INPUT_PORTS_END
 
 

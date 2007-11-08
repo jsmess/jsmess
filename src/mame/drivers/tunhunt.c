@@ -182,7 +182,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( tunhunt )
+static INPUT_PORTS_START( tunhunt )
 	PORT_START_TAG("IN0")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )

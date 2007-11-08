@@ -513,7 +513,7 @@ PORT_START	/* IN0 */ \
 	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_IMPULSE(1) \
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* this bit masks irqs - dont change */ \
 
-INPUT_PORTS_START( vsnes )
+static INPUT_PORTS_START( vsnes )
 	VS_CONTROLS( IPT_START1, IPT_BUTTON3, IPT_START2, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_PLAYER(2)
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -543,7 +543,7 @@ INPUT_PORTS_START( vsnes )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( topgun )
+static INPUT_PORTS_START( topgun )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -572,7 +572,7 @@ INPUT_PORTS_START( topgun )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( platoon )
+static INPUT_PORTS_START( platoon )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -618,7 +618,7 @@ Tie 0 0
 Lose Hole -1 -2
 */
 
-INPUT_PORTS_START( golf )
+static INPUT_PORTS_START( golf )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -648,7 +648,7 @@ INPUT_PORTS_START( golf )
 INPUT_PORTS_END
 
 /* Same as 'golf', but 4 start buttons */
-INPUT_PORTS_START( golf4s )
+static INPUT_PORTS_START( golf4s )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_START3, IPT_START2, IPT_START4 )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -677,7 +677,7 @@ INPUT_PORTS_START( golf4s )
 	PORT_DIPSETTING(	0x80, DEF_STR( Hard ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vstennis )
+static INPUT_PORTS_START( vstennis )
 	VS_DUAL_CONTROLS_L /* left side controls */
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -729,7 +729,7 @@ INPUT_PORTS_START( vstennis )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( wrecking )
+static INPUT_PORTS_START( wrecking )
 	VS_DUAL_CONTROLS_L /* left side controls */
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -786,7 +786,7 @@ INPUT_PORTS_START( wrecking )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( balonfgt )
+static INPUT_PORTS_START( balonfgt )
 	VS_DUAL_CONTROLS_L /* left side controls */
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -841,7 +841,7 @@ INPUT_PORTS_START( balonfgt )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsmahjng )
+static INPUT_PORTS_START( vsmahjng )
 	VS_DUAL_CONTROLS_L /* left side controls */
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -894,7 +894,7 @@ INPUT_PORTS_START( vsmahjng )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsbball )
+static INPUT_PORTS_START( vsbball )
 	VS_DUAL_CONTROLS_L /* left side controls */
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -945,7 +945,7 @@ INPUT_PORTS_START( vsbball )
 	PORT_DIPSETTING(	0xc0, "Very Strong" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsbballj )
+static INPUT_PORTS_START( vsbballj )
 	VS_DUAL_CONTROLS_L /* left side controls */
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -996,7 +996,7 @@ INPUT_PORTS_START( vsbballj )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( iceclmrj )
+static INPUT_PORTS_START( iceclmrj )
 	VS_DUAL_CONTROLS_REVERSE_L /* left side controls */
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1052,7 +1052,7 @@ INPUT_PORTS_START( iceclmrj )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( drmario )
+static INPUT_PORTS_START( drmario )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1079,7 +1079,7 @@ INPUT_PORTS_START( drmario )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( rbibb )
+static INPUT_PORTS_START( rbibb )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1105,7 +1105,7 @@ INPUT_PORTS_START( rbibb )
 	/* 0x60,0xa0,0xe0:again "Wrong 3" */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( btlecity )
+static INPUT_PORTS_START( btlecity )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1134,7 +1134,7 @@ INPUT_PORTS_START( btlecity )
 	PORT_DIPSETTING(	0xc0, "Wrong 3" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( cluclu )
+static INPUT_PORTS_START( cluclu )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1163,7 +1163,7 @@ INPUT_PORTS_START( cluclu )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( cstlevna )
+static INPUT_PORTS_START( cstlevna )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1192,7 +1192,7 @@ INPUT_PORTS_START( cstlevna )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( iceclimb )
+static INPUT_PORTS_START( iceclimb )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1222,7 +1222,7 @@ INPUT_PORTS_START( iceclimb )
 INPUT_PORTS_END
 
 /* Same as 'iceclimb', but different buttons mapping and input protection */
-INPUT_PORTS_START( iceclmbj )
+static INPUT_PORTS_START( iceclmbj )
 	PORT_START	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)	/* BUTTON A on a nes */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)	/* BUTTON B on a nes */
@@ -1279,7 +1279,7 @@ INPUT_PORTS_START( iceclmbj )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( excitebk )
+static INPUT_PORTS_START( excitebk )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1308,7 +1308,7 @@ INPUT_PORTS_START( excitebk )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jajamaru )
+static INPUT_PORTS_START( jajamaru )
 	PORT_START	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)	/* BUTTON A on a nes */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)	/* BUTTON B on a nes */
@@ -1364,7 +1364,7 @@ INPUT_PORTS_START( jajamaru )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( machridr )
+static INPUT_PORTS_START( machridr )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1393,7 +1393,7 @@ INPUT_PORTS_START( machridr )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( machridj )
+static INPUT_PORTS_START( machridj )
 	PORT_START	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* BUTTON A on a nes */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* BUTTON B on a nes */
@@ -1448,7 +1448,7 @@ INPUT_PORTS_START( machridj )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( suprmrio )
+static INPUT_PORTS_START( suprmrio )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1477,7 +1477,7 @@ INPUT_PORTS_START( suprmrio )
 	PORT_DIPSETTING(	0x00, "4" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( duckhunt )
+static INPUT_PORTS_START( duckhunt )
 	VS_ZAPPER
 
 	PORT_START /* IN3 */
@@ -1511,7 +1511,7 @@ INPUT_PORTS_START( duckhunt )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( hogalley )
+static INPUT_PORTS_START( hogalley )
 	VS_ZAPPER
 
 	PORT_START /* IN3 */
@@ -1545,7 +1545,7 @@ INPUT_PORTS_START( hogalley )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsgshoe )
+static INPUT_PORTS_START( vsgshoe )
 	VS_ZAPPER
 
 	PORT_START /* IN3 */
@@ -1580,7 +1580,7 @@ INPUT_PORTS_START( vsgshoe )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsfdf )
+static INPUT_PORTS_START( vsfdf )
 	VS_ZAPPER
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1616,7 +1616,7 @@ INPUT_PORTS_START( vsfdf )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vstetris )
+static INPUT_PORTS_START( vstetris )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1643,7 +1643,7 @@ INPUT_PORTS_START( vstetris )
 	/* 0x60,0xa0,0xe0:again "Wrong 3" */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsskykid )
+static INPUT_PORTS_START( vsskykid )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_START2, IPT_UNKNOWN, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1669,7 +1669,7 @@ INPUT_PORTS_START( vsskykid )
 	/* 0x60,0xa0,0xe0:again DEF_STR( Normal ) */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vspinbal )
+static INPUT_PORTS_START( vspinbal )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1699,7 +1699,7 @@ INPUT_PORTS_START( vspinbal )
 INPUT_PORTS_END
 
 /* Same as 'vspinbal', but different buttons mapping */
-INPUT_PORTS_START( vspinblj )
+static INPUT_PORTS_START( vspinblj )
 	PORT_START	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)		/* Right flipper */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)		/* Right flipper */
@@ -1756,7 +1756,7 @@ INPUT_PORTS_START( vspinblj )
 	PORT_DIPSETTING(	0x80, "Fast" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( goonies )
+static INPUT_PORTS_START( goonies )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1785,7 +1785,7 @@ INPUT_PORTS_START( goonies )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vssoccer )
+static INPUT_PORTS_START( vssoccer )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1813,7 +1813,7 @@ INPUT_PORTS_START( vssoccer )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsgradus )
+static INPUT_PORTS_START( vsgradus )
 	VS_CONTROLS_REVERSE( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1842,7 +1842,7 @@ INPUT_PORTS_START( vsgradus )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsslalom )
+static INPUT_PORTS_START( vsslalom )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1871,7 +1871,7 @@ INPUT_PORTS_START( vsslalom )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( starlstr )
+static INPUT_PORTS_START( starlstr )
 	VS_DUAL_CONTROLS_L /* left side controls */
 
 	PORT_START
@@ -1900,7 +1900,7 @@ INPUT_PORTS_START( starlstr )
 	VS_DUAL_CONTROLS_R /* Right Side Controls */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tkoboxng )
+static INPUT_PORTS_START( tkoboxng )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -1929,7 +1929,7 @@ INPUT_PORTS_START( tkoboxng )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bnglngby )
+static INPUT_PORTS_START( bnglngby )
 	PORT_START	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)	/* BUTTON A on a nes */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)	/* BUTTON B on a nes */
@@ -1984,7 +1984,7 @@ INPUT_PORTS_START( bnglngby )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mightybj )
+static INPUT_PORTS_START( mightybj )
 	VS_CONTROLS( IPT_START1, IPT_UNKNOWN, IPT_START2, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -2013,7 +2013,7 @@ INPUT_PORTS_START( mightybj )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( supxevs )
+static INPUT_PORTS_START( supxevs )
 	PORT_START	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* BUTTON A on a nes */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* BUTTON B on a nes */

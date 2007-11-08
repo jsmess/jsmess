@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( nitedrvr )
+static INPUT_PORTS_START( nitedrvr )
 	PORT_START	// fake
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(	0x30, DEF_STR( 2C_1C ) )

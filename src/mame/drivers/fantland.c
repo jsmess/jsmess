@@ -381,7 +381,7 @@ ADDRESS_MAP_END
                                 Fantasy Land
 ***************************************************************************/
 
-INPUT_PORTS_START( fantland )
+static INPUT_PORTS_START( fantland )
 	PORT_START	/* IN0 - a3000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1			)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1			)
@@ -455,7 +455,7 @@ INPUT_PORTS_END
                                 Galaxy Gunners
 ***************************************************************************/
 
-INPUT_PORTS_START( galaxygn )
+static INPUT_PORTS_START( galaxygn )
 	PORT_START	/* IN0 - 53000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1			)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1			)
@@ -530,7 +530,7 @@ INPUT_PORTS_END
                            Born To Fight
 ***************************************************************************/
 
-INPUT_PORTS_START( borntofi )
+static INPUT_PORTS_START( borntofi )
 	PORT_START	/* IN0 - 53000 (Lightgun) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1	)

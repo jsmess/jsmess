@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( wrally_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( wrally )
+static INPUT_PORTS_START( wrally )
 PORT_START	/* DSW #1 & #2 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )

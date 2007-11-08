@@ -273,7 +273,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( liberatr )
+static INPUT_PORTS_START( liberatr )
 	PORT_START			/* IN0 - $5000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )

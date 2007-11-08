@@ -283,7 +283,7 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
-INPUT_PORTS_START( gdrawpkr )
+static INPUT_PORTS_START( gdrawpkr )
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	/* credits */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Manual Collect") PORT_CODE(KEYCODE_7)
@@ -353,7 +353,7 @@ INPUT_PORTS_START( gdrawpkr )
 	PORT_DIPSETTING(    0xC0, "80" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( elgrande )
+static INPUT_PORTS_START( elgrande )
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )

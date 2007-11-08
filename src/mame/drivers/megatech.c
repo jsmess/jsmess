@@ -102,7 +102,7 @@ extern void driver_init_megatech_bios(running_machine *machine);
 
 
 /* not currently used */
-INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
+static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_INCLUDE(megadriv)
 
 	PORT_START_TAG("BIOS_IN0") // port 6

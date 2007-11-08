@@ -390,7 +390,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( monymony )
+static INPUT_PORTS_START( monymony )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -499,7 +499,7 @@ INPUT_PORTS_START( monymony )
 	/* other bits come from a protection device */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jackrabt )
+static INPUT_PORTS_START( jackrabt )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )

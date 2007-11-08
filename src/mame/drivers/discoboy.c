@@ -364,7 +364,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( discoboy )
+static INPUT_PORTS_START( discoboy )
     PORT_START      /* DSWA */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SWA:6,7,8")
     PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )

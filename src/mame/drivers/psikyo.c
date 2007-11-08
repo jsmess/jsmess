@@ -540,7 +540,7 @@ ADDRESS_MAP_END
                         Samurai Aces / Sengoku Ace (Japan)
 ***************************************************************************/
 
-INPUT_PORTS_START( samuraia )
+static INPUT_PORTS_START( samuraia )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
@@ -659,7 +659,7 @@ INPUT_PORTS_START( samuraia )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sngkace )
+static INPUT_PORTS_START( sngkace )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
@@ -784,7 +784,7 @@ INPUT_PORTS_END
                                 Battle K-Road
 ***************************************************************************/
 
-INPUT_PORTS_START( btlkroad )
+static INPUT_PORTS_START( btlkroad )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
@@ -911,7 +911,7 @@ INPUT_PORTS_END
                                 Gun Bird
 ***************************************************************************/
 
-INPUT_PORTS_START( gunbird )
+static INPUT_PORTS_START( gunbird )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
@@ -1021,7 +1021,7 @@ INPUT_PORTS_START( gunbird )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gunbirdj )
+static INPUT_PORTS_START( gunbirdj )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
@@ -1114,7 +1114,7 @@ INPUT_PORTS_END
                                 Strikers 1945
 ***************************************************************************/
 
-INPUT_PORTS_START( s1945 )
+static INPUT_PORTS_START( s1945 )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
@@ -1225,7 +1225,7 @@ INPUT_PORTS_START( s1945 )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( s1945a )
+static INPUT_PORTS_START( s1945a )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
@@ -1320,7 +1320,7 @@ INPUT_PORTS_START( s1945a )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( s1945j )
+static INPUT_PORTS_START( s1945j )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
@@ -1413,7 +1413,7 @@ INPUT_PORTS_END
                                 Tengai
 ***************************************************************************/
 
-INPUT_PORTS_START( tengai )
+static INPUT_PORTS_START( tengai )
 
 	PORT_START	// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2

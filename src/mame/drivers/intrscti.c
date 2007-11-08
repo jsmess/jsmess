@@ -18,7 +18,7 @@ static READ8_HANDLER( unk_r )
 	return mame_rand(Machine);
 }
 
-UINT8 *intrscti_ram;
+static UINT8 *intrscti_ram;
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( intrscti )
+static INPUT_PORTS_START( intrscti )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =

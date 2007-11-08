@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( galpani2 )
+static INPUT_PORTS_START( galpani2 )
 	PORT_START_TAG("IN0")	// IN0 - DSW + Player - 780000.w
 	PORT_DIPNAME( 0x0007, 0x0007, "Unknown 2-0&1&2*" )
 	PORT_DIPSETTING(      0x007, "7" )

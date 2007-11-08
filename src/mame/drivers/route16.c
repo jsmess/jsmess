@@ -486,7 +486,7 @@ static INPUT_PORTS_START( spacecho )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( ttmahjng )
+static INPUT_PORTS_START( ttmahjng )
 	PORT_START      /* IN0 */
 	PORT_DIPNAME( 0x01, 0x00, "Unknown 01" )
 	PORT_DIPSETTING(    0x00, "00" )

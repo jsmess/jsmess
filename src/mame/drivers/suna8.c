@@ -1137,7 +1137,7 @@ ADDRESS_MAP_END
                                 Hard Head
 ***************************************************************************/
 
-INPUT_PORTS_START( hardhead )
+static INPUT_PORTS_START( hardhead )
 
 	PORT_START_TAG("IN0")	// Player 1 - $da00 (ip = 0)
 	JOY(1)
@@ -1201,7 +1201,7 @@ INPUT_PORTS_END
                                 Rough Ranger
 ***************************************************************************/
 
-INPUT_PORTS_START( rranger )
+static INPUT_PORTS_START( rranger )
 
 	PORT_START_TAG("IN0")	// Player 1 - $c002
 	JOY(1)
@@ -1266,7 +1266,7 @@ INPUT_PORTS_END
                                 Brick Zone
 ***************************************************************************/
 
-INPUT_PORTS_START( brickzn )
+static INPUT_PORTS_START( brickzn )
 
 	PORT_START_TAG("IN0") // Player 1 - $c100
 	JOY(1)
@@ -1339,7 +1339,7 @@ INPUT_PORTS_END
                         Hard Head 2 / Star Fighter
 ***************************************************************************/
 
-INPUT_PORTS_START( hardhea2 )
+static INPUT_PORTS_START( hardhea2 )
 
 	PORT_START_TAG("IN0") // Player 1 - $c000
 	JOY(1)
@@ -1413,7 +1413,7 @@ INPUT_PORTS_END
                                 Spark Man
 ***************************************************************************/
 
-INPUT_PORTS_START( sparkman )
+static INPUT_PORTS_START( sparkman )
 
 	PORT_START_TAG("IN0") // Player 1 - $c000
 	JOY(1)

@@ -198,7 +198,7 @@ VIDEO_UPDATE( lockon )
 }
 
 /* Wrong last time I checked */
-INPUT_PORTS_START( lockon )
+static INPUT_PORTS_START( lockon )
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0003, 0x0000, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x0000, "5"    )

@@ -626,7 +626,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-INPUT_PORTS_START( looping )
+static INPUT_PORTS_START( looping )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -671,7 +671,7 @@ INPUT_PORTS_START( looping )
 INPUT_PORTS_END
 
 /* Same as 'looping' but additional "Infinite Lives" Dip Switch */
-INPUT_PORTS_START( skybump )
+static INPUT_PORTS_START( skybump )
 	PORT_INCLUDE(looping)
 
 	PORT_MODIFY("DSW0")

@@ -297,7 +297,7 @@ ADDRESS_MAP_END
              INPUT PORTS (dips in eprom)
 ***********************************************************/
 
-INPUT_PORTS_START( groundfx )
+static INPUT_PORTS_START( groundfx )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW,  IPT_UNUSED )
 

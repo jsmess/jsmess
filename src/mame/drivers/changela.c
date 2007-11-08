@@ -316,7 +316,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( changela )
+static INPUT_PORTS_START( changela )
 	PORT_START /* 0 */ /* DSWA */
 	PORT_DIPNAME( 0x07, 0x01, "Steering Wheel Ratio" )
 	PORT_DIPSETTING(    0x01, "Recommended" )
@@ -459,7 +459,7 @@ static struct AY8910interface ay8910_interface_2 = {
 };
 
 
-INTERRUPT_GEN( chl_interrupt )
+static INTERRUPT_GEN( chl_interrupt )
 {
 	int vector = video_screen_get_vblank(0) ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
 

@@ -159,13 +159,13 @@ logerror("cchip1_r bank: %02x offset: %04x\n",current_bank,offset);
 
 /* Mega Blast */
 
-UINT16 *cchip_ram;
+UINT16 *cchip2_ram;
 
 WRITE16_HANDLER( cchip2_word_w )
 {
     logerror("cchip2_w pc: %06x offset %04x: %02x\n", activecpu_get_pc(), offset, data);
 
-    COMBINE_DATA(&cchip_ram[offset]);
+    COMBINE_DATA(&cchip2_ram[offset]);
 }
 
 READ16_HANDLER( cchip2_word_r )
@@ -179,6 +179,6 @@ READ16_HANDLER( cchip2_word_r )
 
 	logerror("cchip2_r offset: %04x\n", offset);
 
-	return cchip_ram[offset];
+	return cchip2_ram[offset];
 }
 

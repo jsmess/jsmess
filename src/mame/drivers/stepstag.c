@@ -10,17 +10,17 @@
 #include "driver.h"
 //#include "random.h"
 
-READ16_HANDLER( unknown_read_0xc00000 )
+static READ16_HANDLER( unknown_read_0xc00000 )
 {
 	return mame_rand(Machine);
 }
 
-READ16_HANDLER( unknown_read_0xd00000 )
+static READ16_HANDLER( unknown_read_0xd00000 )
 {
 	return mame_rand(Machine);
 }
 
-READ16_HANDLER( unknown_read_0xffff00 )
+static READ16_HANDLER( unknown_read_0xffff00 )
 {
 	return mame_rand(Machine);
 }
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( stepstag_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITE(MWA16_NOP) //??
 ADDRESS_MAP_END
 
-READ16_HANDLER( unknown_sub_read_0xbe0004 )
+static READ16_HANDLER( unknown_sub_read_0xbe0004 )
 {
 	return mame_rand(Machine);
 }
@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( stepstag_sub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( stepstag )
+static INPUT_PORTS_START( stepstag )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =

@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( dominob )
+static INPUT_PORTS_START( dominob )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )             /* works (subs 2 credits), but starts a 1 player game as START1 */

@@ -156,7 +156,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( powerins )
+static INPUT_PORTS_START( powerins )
 	PORT_START	// IN0 - $100000 - Coins
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2    )
@@ -248,7 +248,7 @@ INPUT_PORTS_START( powerins )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( powerinj )
+static INPUT_PORTS_START( powerinj )
 	PORT_INCLUDE(powerins)
 
 	PORT_MODIFY("DSW2")

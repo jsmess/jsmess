@@ -83,8 +83,8 @@ struct _scalable_lock
 };
 
 
-typedef struct _thread_info thread_info;
-struct _thread_info
+typedef struct _work_thread_info work_thread_info;
+struct _work_thread_info
 {
 	osd_work_queue *	queue;			// pointer back to the queue
 	HANDLE				handle;			// handle to the thread
@@ -113,7 +113,7 @@ struct _osd_work_queue
 	volatile UINT8		exiting;		// should the threads exit on their next opportunity?
 	UINT32				threads;		// number of threads in this queue
 	UINT32				flags;			// creation flags
-	thread_info *		thread;			// array of thread information
+	work_thread_info *	thread;			// array of thread information
 	HANDLE				doneevent;		// event signalled when work is complete
 
 #if KEEP_STATISTICS
@@ -145,7 +145,7 @@ struct _osd_work_item
 
 static int effective_num_processors(void);
 static unsigned __stdcall worker_thread_entry(void *param);
-static void worker_thread_process(osd_work_queue *queue, thread_info *thread);
+static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 
 
 
@@ -274,7 +274,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	// iterate over threads
 	for (threadnum = 0; threadnum < queue->threads; threadnum++)
 	{
-		thread_info *thread = &queue->thread[threadnum];
+		work_thread_info *thread = &queue->thread[threadnum];
 		uintptr_t handle;
 
 		// set a pointer back to the queue
@@ -337,7 +337,7 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 	// if this is a multi queue, help out rather than doing nothing
 	if (queue->flags & WORK_QUEUE_FLAG_MULTI)
 	{
-		thread_info *thread = &queue->thread[queue->threads];
+		work_thread_info *thread = &queue->thread[queue->threads];
 		osd_ticks_t stopspin = osd_ticks() + timeout;
 
 		end_timing(thread->waittime);
@@ -390,7 +390,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		queue->exiting = TRUE;
 		for (threadnum = 0; threadnum < queue->threads; threadnum++)
 		{
-			thread_info *thread = &queue->thread[threadnum];
+			work_thread_info *thread = &queue->thread[threadnum];
 			if (thread->wakeevent != NULL)
 				SetEvent(thread->wakeevent);
 		}
@@ -398,7 +398,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		// wait for all the threads to go away
 		for (threadnum = 0; threadnum < queue->threads; threadnum++)
 		{
-			thread_info *thread = &queue->thread[threadnum];
+			work_thread_info *thread = &queue->thread[threadnum];
 
 			// block on the thread going away, then close the handle
 			if (thread->handle != NULL)
@@ -416,7 +416,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		// output per-thread statistics
 		for (threadnum = 0; threadnum <= queue->threads; threadnum++)
 		{
-			thread_info *thread = &queue->thread[threadnum];
+			work_thread_info *thread = &queue->thread[threadnum];
 			osd_ticks_t total = thread->runtime + thread->waittime + thread->spintime;
 			printf("Thread %d:  items=%9d  run=%5.2f%% (%5.2f%%)  spin=%5.2f%%  wait/other=%5.2f%%\n",
 					threadnum, thread->itemsdone,
@@ -532,7 +532,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		// iterate over all the threads
 		for (threadnum = 0; threadnum < queue->threads; threadnum++)
 		{
-			thread_info *thread = &queue->thread[threadnum];
+			work_thread_info *thread = &queue->thread[threadnum];
 
 			// if this thread is not active, wake him up
 			if (!thread->active)
@@ -648,7 +648,7 @@ static int effective_num_processors(void)
 
 static unsigned __stdcall worker_thread_entry(void *param)
 {
-	thread_info *thread = param;
+	work_thread_info *thread = param;
 	osd_work_queue *queue = thread->queue;
 
 	// loop until we exit
@@ -708,7 +708,7 @@ static unsigned __stdcall worker_thread_entry(void *param)
 //  worker_thread_process
 //============================================================
 
-static void worker_thread_process(osd_work_queue *queue, thread_info *thread)
+static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread)
 {
 	int threadid = thread - queue->thread;
 

@@ -129,7 +129,7 @@ extern PALETTE_INIT(berlwall);
 extern UINT16* galsnew_bg_pixram;
 extern UINT16* galsnew_fg_pixram;
 
-INPUT_PORTS_START( galsnew )
+static INPUT_PORTS_START( galsnew )
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

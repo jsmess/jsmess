@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( acefruit_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_NOP /* ? */
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( sidewndr )
+static INPUT_PORTS_START( sidewndr )
 	PORT_START_TAG("IN0")	// 0
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Stop Nudge/Nudge Up or Down" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )
@@ -368,7 +368,7 @@ INPUT_PORTS_START( sidewndr )
 	PORT_DIPSETTING(    0x03, "86%" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( spellbnd )
+static INPUT_PORTS_START( spellbnd )
 	PORT_INCLUDE(sidewndr)
 
 	PORT_MODIFY("IN0")
@@ -412,7 +412,7 @@ INPUT_PORTS_START( spellbnd )
 INPUT_PORTS_END
 
 /* I've only mapped the known inputs after comparaison with 'spellbnd' and the ones known to do something */
-INPUT_PORTS_START( starspnr )
+static INPUT_PORTS_START( starspnr )
 	PORT_START_TAG("IN0")	// 0
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )

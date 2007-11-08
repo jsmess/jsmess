@@ -317,7 +317,7 @@ GFXDECODE_END
                                 Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( bishjan )
+static INPUT_PORTS_START( bishjan )
 	PORT_START	// IN0 - Reset
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 

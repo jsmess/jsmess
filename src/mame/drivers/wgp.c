@@ -741,7 +741,7 @@ ADDRESS_MAP_END
                       INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( wgp_joy_generic )
+static INPUT_PORTS_START( wgp_joy_generic )
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "Gear Shift" )                     /* see notes */
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
@@ -803,7 +803,7 @@ INPUT_PORTS_START( wgp_joy_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( wgp_no_joy_generic )
+static INPUT_PORTS_START( wgp_no_joy_generic )
 	PORT_INCLUDE(wgp_joy_generic)
 
 	PORT_MODIFY("DSWB")
@@ -852,7 +852,7 @@ INPUT_PORTS_START( wgp_no_joy_generic )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( wgp )
+static INPUT_PORTS_START( wgp )
 	PORT_INCLUDE(wgp_no_joy_generic)
 
 	/* 0x180000 -> 0x10bf16 and 0x140010 (shared RAM) */
@@ -866,14 +866,14 @@ INPUT_PORTS_START( wgp )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	                 /* "brake lump" (lamp?) - test mode only */
 INPUT_PORTS_END
 
-INPUT_PORTS_START( wgpj )
+static INPUT_PORTS_START( wgpj )
 	PORT_INCLUDE(wgp)
 
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
-INPUT_PORTS_START( wgpjoy )
+static INPUT_PORTS_START( wgpjoy )
 	PORT_INCLUDE(wgp_joy_generic)
 
 	/* 0x180000 -> 0x10bf1a and 0x140010 (shared RAM) */
@@ -883,7 +883,7 @@ INPUT_PORTS_START( wgpjoy )
 	/* 0x180002 -> 0x10bf1c and 0x140012 (shared RAM) : DSWB*/
 INPUT_PORTS_END
 
-INPUT_PORTS_START( wgp2 )
+static INPUT_PORTS_START( wgp2 )
 	PORT_INCLUDE(wgp_no_joy_generic)
 
 	/* 0x180000 -> 0x107d3a.b (-$2c6,A5) and 0x140018 (shared RAM) */

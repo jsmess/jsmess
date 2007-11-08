@@ -347,15 +347,15 @@ Notes:
 
 int cps3_use_fastboot;
 
-UINT32* decrypted_bios;
-UINT32* decrypted_gamerom;
-UINT32 cram_gfxflash_bank;
+static UINT32* decrypted_bios;
+static UINT32* decrypted_gamerom;
+static UINT32 cram_gfxflash_bank;
 UINT32* cps3_nops;
 
-UINT32*tilemap20_regs_base;
-UINT32*tilemap30_regs_base;
-UINT32*tilemap40_regs_base;
-UINT32*tilemap50_regs_base;
+static UINT32* tilemap20_regs_base;
+static UINT32* tilemap30_regs_base;
+static UINT32* tilemap40_regs_base;
+static UINT32* tilemap50_regs_base;
 
 UINT32* cps3_0xc0000000_ram;
 UINT32* cps3_0xc0000000_ram_decrypted;
@@ -849,7 +849,8 @@ void cps3_set_mame_colours( int colournum, UINT16 data, UINT32 fadeval )
 	if (colournum<0x10000) palette_set_color(Machine,colournum,cps3_mame_colours[colournum]/* MAKE_RGB(r<<3,g<<3,b<<3)*/);//cps3_mame_colours[colournum]);
 }
 
-void decode_ssram(void)
+#ifdef UNUSED_FUNCTION
+static void decode_ssram(void)
 {
 	if (cps3_ss_ram_dirty)
 	{
@@ -869,7 +870,7 @@ void decode_ssram(void)
 	return;
 }
 
-void decode_charram(void)
+static void decode_charram(void)
 {
 	if (cps3_char_ram_is_dirty)
 	{
@@ -888,6 +889,7 @@ void decode_charram(void)
 
 	return;
 }
+#endif
 
 VIDEO_START(cps3)
 {
@@ -1425,9 +1427,9 @@ static offs_t cps3_opbase_handler(offs_t address)
 	return ~0;
 }
 
-UINT32 cram_bank = 0;
+static UINT32 cram_bank = 0;
 
-WRITE32_HANDLER( cram_bank_w )
+static WRITE32_HANDLER( cram_bank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -1456,14 +1458,14 @@ WRITE32_HANDLER( cram_bank_w )
 	}
 }
 
-READ32_HANDLER( cram_data_r )
+static READ32_HANDLER( cram_data_r )
 {
 	UINT32 fulloffset = (((cram_bank&0x7)*0x100000)/4) + offset;
 
 	return LITTLE_ENDIANIZE_INT32(cps3_char_ram[fulloffset]);
 }
 
-WRITE32_HANDLER( cram_data_w )
+static WRITE32_HANDLER( cram_data_w )
 {
 	UINT32 fulloffset = (((cram_bank&0x7)*0x100000)/4) + offset;
 	mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
@@ -1767,7 +1769,7 @@ WRITE32_HANDLER( cps3_flash2_w )
 	cps3_flashmain_w(4, offset,data,mem_mask);
 }
 
-WRITE32_HANDLER( cram_gfxflash_bank_w )
+static WRITE32_HANDLER( cram_gfxflash_bank_w )
 {
 	if (ACCESSING_MSB32)
 	{
@@ -1965,20 +1967,20 @@ WRITE32_HANDLER( cps3_ss_pal_base_w )
 	}
 }
 
-UINT32*tilemap20_regs_base;
-UINT32*tilemap30_regs_base;
-UINT32*tilemap40_regs_base;
-UINT32*tilemap50_regs_base;
+static UINT32* tilemap20_regs_base;
+static UINT32* tilemap30_regs_base;
+static UINT32* tilemap40_regs_base;
+static UINT32* tilemap50_regs_base;
 
 //<ElSemi> +0 X  +2 Y +4 unknown +6 enable (&0x8000) +8 low part tilemap base, high part linescroll base
 //<ElSemi> (a word each)
 
-UINT32 paldma_source;
-UINT32 paldma_realsource;
-UINT32 paldma_dest;
-UINT32 paldma_fade;
-UINT32 paldma_other2;
-UINT32 paldma_length;
+static UINT32 paldma_source;
+static UINT32 paldma_realsource;
+static UINT32 paldma_dest;
+static UINT32 paldma_fade;
+static UINT32 paldma_other2;
+static UINT32 paldma_length;
 
 WRITE32_HANDLER( cps3_palettedma_w )
 {
@@ -2030,18 +2032,18 @@ WRITE32_HANDLER( cps3_palettedma_w )
 
 }
 
-UINT32 chardma_source;
-UINT32 chardma_other;
+static UINT32 chardma_source;
+static UINT32 chardma_other;
 
-UINT8* current_table;
-UINT32 current_table_address = -1;
+//static UINT8* current_table;
+static UINT32 current_table_address = -1;
 
 int cps3_rle_length = 0;
 
-int last_normal_byte = 0;
+static int last_normal_byte = 0;
 
 
-UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length )
+static UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length )
 {
 	UINT8* dest       = (UINT8*)cps3_char_ram;
 
@@ -2138,9 +2140,9 @@ void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_
 	}
 }
 
-unsigned short lastb;
-unsigned short lastb2;
-UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset)
+static unsigned short lastb;
+static unsigned short lastb2;
+static UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset)
 {
 	UINT8* destRAM = (UINT8*)cps3_char_ram;
  	int l=0;
@@ -2420,7 +2422,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( cps3 )
+static INPUT_PORTS_START( cps3 )
 	PORT_START
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -2473,7 +2475,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 }
 
 
-struct sh2_config sh2cp_conf_slave  = { 1 };
+//static struct sh2_config sh2cp_conf_slave  = { 1 };
 
 
 static struct CustomSound_interface custom_interface =
@@ -2523,7 +2525,7 @@ MACHINE_RESET( cps3 )
 
 
 
-void precopy_to_flash(void)
+static void precopy_to_flash(void)
 {
 	int i;
 	/* precopy program roms, ok, sfiii2 tests pass, others fail because of how the decryption affects testing */
@@ -2590,7 +2592,7 @@ void precopy_to_flash(void)
 
 
 // make a copy in the regions we execute code / draw gfx from
-void copy_from_nvram(void)
+static void copy_from_nvram(void)
 {
 
 	int i;

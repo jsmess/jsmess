@@ -431,7 +431,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( tehkanwc )
+static INPUT_PORTS_START( tehkanwc )
 	PORT_START /* DSW1 - Active LOW */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( 2C_1C ) )
@@ -549,7 +549,7 @@ INPUT_PORTS_START( tehkanwc )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( gridiron )
+static INPUT_PORTS_START( gridiron )
 	PORT_START /* DSW1 - Active LOW */
 	PORT_DIPNAME( 0x03, 0x03, "Start Credits (P1&P2)/Extra" )
 	PORT_DIPSETTING (   0x01, "1&1/200%" )
@@ -651,7 +651,7 @@ INPUT_PORTS_START( gridiron )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( teedoff )
+static INPUT_PORTS_START( teedoff )
 	PORT_START /* DSW1 - Active LOW */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING (   0x02, DEF_STR( 2C_1C ) )

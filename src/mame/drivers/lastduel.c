@@ -332,7 +332,7 @@ MACHINE_DRIVER_END
 
 /******************************************************************************/
 
-INPUT_PORTS_START( lastduel )
+static INPUT_PORTS_START( lastduel )
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -435,7 +435,7 @@ INPUT_PORTS_START( lastduel )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( madgear )
+static INPUT_PORTS_START( madgear )
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )

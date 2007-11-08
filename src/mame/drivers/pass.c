@@ -169,7 +169,7 @@ ADDRESS_MAP_END
 
 
 /* todo : work out function of unknown but used dsw */
-INPUT_PORTS_START( pass )
+static INPUT_PORTS_START( pass )
 	PORT_START	/* DSW */
 	PORT_DIPNAME( 0x0001, 0x0001, "Unknown SW 0-0" )	// USED ! Check code at 0x0046ea
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

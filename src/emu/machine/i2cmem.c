@@ -76,7 +76,7 @@ struct i2cmem_chip
 #define DEVSEL_RW ( 1 )
 #define DEVSEL_ADDRESS ( 0xfe )
 
-struct i2cmem_chip i2cmem[ I2CMEM_MAXCHIP ];
+static struct i2cmem_chip i2cmem[ I2CMEM_MAXCHIP ];
 
 void i2cmem_init( int chip, int slave_address, int page_size, int data_size, unsigned char *data )
 {

@@ -993,7 +993,7 @@ ADDRESS_MAP_END
 //                  [1] Coins       [2] Controls    [3] Unknown
 //                  [4] DSW 1 & 2   [5] DSW 3       [6] Driving Wheel
 
-INPUT_PORTS_START( bigrun )
+static INPUT_PORTS_START( bigrun )
 	PORT_START_TAG("FAKE")	// IN0 - Fake input port - Buttons status
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")\
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
@@ -1122,7 +1122,7 @@ INPUT_PORTS_END
 //                  [1] Coins       [2] Controls    [3] Unknown
 //                  [4] DSW 1 & 2   [5] DSW 3       [6] Driving Wheel
 
-INPUT_PORTS_START( cischeat )
+static INPUT_PORTS_START( cischeat )
 	PORT_START_TAG("IN0")	// Fake input port - Buttons status
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\
@@ -1224,7 +1224,7 @@ INPUT_PORTS_END
 //                  [4] DSW 3           [5] Driving Wheel
 //                  [6] Coinage JP&USA  [7] Coinage UK&FR
 
-INPUT_PORTS_START( f1gpstar )
+static INPUT_PORTS_START( f1gpstar )
 	PORT_START_TAG("IN0")	// Fake input port - Buttons status
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")\
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
@@ -1367,7 +1367,7 @@ INPUT_PORTS_END
                                 Wild Pilot
 **************************************************************************/
 
-INPUT_PORTS_START( wildplt )
+static INPUT_PORTS_START( wildplt )
 	PORT_START_TAG("IN0")	// DSW 1 & 2
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
@@ -1447,7 +1447,7 @@ INPUT_PORTS_END
                                 Scud Hammer
 **************************************************************************/
 
-INPUT_PORTS_START( scudhamm )
+static INPUT_PORTS_START( scudhamm )
 	PORT_START_TAG("IN0")	// Buttons
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // GAME OVER if pressed on the selection screen
@@ -1525,7 +1525,7 @@ INPUT_PORTS_END
                             Arm Champs II
 **************************************************************************/
 
-INPUT_PORTS_START( armchmp2 )
+static INPUT_PORTS_START( armchmp2 )
 	PORT_START_TAG("IN0")	// Buttons + Sensors
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL  ) // left   sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL  ) // right  sensor

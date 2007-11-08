@@ -143,7 +143,7 @@ static INTERRUPT_GEN( omegaf_interrupt )
   Inputs
 **************************************************************************/
 
-INPUT_PORTS_START( omegaf )
+static INPUT_PORTS_START( omegaf )
 	PORT_START			/* Player 1 inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -219,7 +219,7 @@ INPUT_PORTS_START( omegaf )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( robokid )
+static INPUT_PORTS_START( robokid )
 	PORT_START			/* Player 1 inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -288,7 +288,7 @@ INPUT_PORTS_START( robokid )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( robokidj )
+static INPUT_PORTS_START( robokidj )
 	PORT_START			/* Player 1 inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY

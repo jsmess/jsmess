@@ -22,8 +22,6 @@ struct ym2151_info
 };
 
 
-#if (HAS_YM2151)
-
 static void ym2151_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
 	struct ym2151_info *info = param;
@@ -236,6 +234,3 @@ void ym2151_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004, The MAME Team"; break;
 	}
 }
-
-#endif
-

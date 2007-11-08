@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( system_h1_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300fff) AM_READWRITE(SCSP_1_r, SCSP_1_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( coolridr )
+static INPUT_PORTS_START( coolridr )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =

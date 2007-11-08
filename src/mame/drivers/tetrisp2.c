@@ -631,7 +631,7 @@ ADDRESS_MAP_END
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 
-INPUT_PORTS_START( tetrisp2 )
+static INPUT_PORTS_START( tetrisp2 )
 TETPLUS2_COMMON
 
 	PORT_START_TAG("IN2") //$be0008.w
@@ -689,7 +689,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 
-INPUT_PORTS_START( teplus2j )
+static INPUT_PORTS_START( teplus2j )
 TETPLUS2_COMMON
 
 /*
@@ -751,7 +751,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 
-INPUT_PORTS_START( rockn )
+static INPUT_PORTS_START( rockn )
 	PORT_START_TAG("IN0")	//$be0002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -841,7 +841,7 @@ INPUT_PORTS_START( rockn )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( rocknms )
+static INPUT_PORTS_START( rocknms )
 	PORT_START	// IN0 - $be0002.w
 
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )		// MAIN -> SUB Communication

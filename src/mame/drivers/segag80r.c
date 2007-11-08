@@ -388,7 +388,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( g80r_generic )
+static INPUT_PORTS_START( g80r_generic )
 	PORT_START_TAG("D7D6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)	/* P1.5 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
@@ -493,7 +493,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INPUT_PORTS_START( astrob )
+static INPUT_PORTS_START( astrob )
 	PORT_INCLUDE(g80r_generic)
 
 	PORT_MODIFY("D5D4")
@@ -523,7 +523,7 @@ INPUT_PORTS_START( astrob )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( astrob2 )
+static INPUT_PORTS_START( astrob2 )
 	PORT_INCLUDE(astrob)
 
 	PORT_MODIFY("D3D2")
@@ -535,7 +535,7 @@ INPUT_PORTS_START( astrob2 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( astrob1 )
+static INPUT_PORTS_START( astrob1 )
 	PORT_INCLUDE(astrob)
 
 	PORT_MODIFY("D3D2")
@@ -545,7 +545,7 @@ INPUT_PORTS_START( astrob1 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( 005 )
+static INPUT_PORTS_START( 005 )
 	PORT_INCLUDE(g80r_generic)
 
 	PORT_MODIFY("D7D6")
@@ -581,7 +581,7 @@ INPUT_PORTS_START( 005 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( spaceod )
+static INPUT_PORTS_START( spaceod )
 	PORT_INCLUDE(g80r_generic)
 
 	PORT_MODIFY("D7D6")
@@ -631,7 +631,7 @@ INPUT_PORTS_START( spaceod )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( monsterb )
+static INPUT_PORTS_START( monsterb )
 	PORT_INCLUDE(g80r_generic)
 
 	PORT_MODIFY("D7D6")
@@ -675,7 +675,7 @@ INPUT_PORTS_START( monsterb )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( pignewt )
+static INPUT_PORTS_START( pignewt )
 	PORT_INCLUDE(g80r_generic)
 
 	PORT_MODIFY("D7D6")
@@ -709,7 +709,7 @@ INPUT_PORTS_START( pignewt )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( pignewta )
+static INPUT_PORTS_START( pignewta )
 	PORT_INCLUDE(pignewt)
 
 	PORT_MODIFY("D7D6")
@@ -731,7 +731,7 @@ INPUT_PORTS_START( pignewta )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sindbadm )
+static INPUT_PORTS_START( sindbadm )
 	PORT_INCLUDE(g80r_generic)
 
 	PORT_MODIFY("D7D6")

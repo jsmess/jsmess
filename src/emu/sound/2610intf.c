@@ -17,8 +17,6 @@
 #include "2610intf.h"
 #include "fm.h"
 
-#if (BUILD_YM2610||BUILD_YM2610B)
-
 static sound_type chip_type = SOUND_YM2610;
 struct ym2610_info
 {
@@ -443,7 +441,6 @@ WRITE16_HANDLER( YM2610_data_port_1_B_lsb_w ){
 		YM2610Write(info->chip,3,data);
 	}
 }
-#endif
 
 /**************** end of file ****************/
 

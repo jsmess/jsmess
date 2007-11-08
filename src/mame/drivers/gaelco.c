@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( bigkarnk_writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0xffff) AM_WRITE(MWA8_ROM)				/* ROM */
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( bigkarnk )
+static INPUT_PORTS_START( bigkarnk )
 	PORT_START	/* DSW #1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
@@ -557,7 +557,7 @@ ROM_END
 
 /*********** Squash Encryption Related Code ******************/
 
-INPUT_PORTS_START( squash )
+static INPUT_PORTS_START( squash )
 	PORT_START	/* DSW2 8bit */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
@@ -1158,7 +1158,7 @@ ROM_END
 
 /*********** Thunder Hoop Encryption Related Code ******************/
 
-INPUT_PORTS_START( thoop )
+static INPUT_PORTS_START( thoop )
 	PORT_START	/* DSW2 8bit */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )

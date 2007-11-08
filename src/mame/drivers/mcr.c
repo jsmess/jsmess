@@ -713,7 +713,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( solarfox )
+static INPUT_PORTS_START( solarfox )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -764,7 +764,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( kick )
+static INPUT_PORTS_START( kick )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -799,7 +799,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( kickc )
+static INPUT_PORTS_START( kickc )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -839,7 +839,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( shollow )
+static INPUT_PORTS_START( shollow )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -881,7 +881,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( tron )
+static INPUT_PORTS_START( tron )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -928,7 +928,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( kroozr )
+static INPUT_PORTS_START( kroozr )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -969,7 +969,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( domino )
+static INPUT_PORTS_START( domino )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1019,7 +1019,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( journey )
+static INPUT_PORTS_START( journey )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1063,7 +1063,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( wacko )
+static INPUT_PORTS_START( wacko )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1111,7 +1111,7 @@ INPUT_PORTS_END
 
 
 /* not verified, no manual found */
-INPUT_PORTS_START( twotiger )
+static INPUT_PORTS_START( twotiger )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1152,7 +1152,7 @@ INPUT_PORTS_END
 
 
 /* not verified, no manual found */
-INPUT_PORTS_START( twotigrc )
+static INPUT_PORTS_START( twotigrc )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1185,7 +1185,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( tapper )
+static INPUT_PORTS_START( tapper )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1234,7 +1234,7 @@ INPUT_PORTS_END
 
 
 /* not verified, no manual found */
-INPUT_PORTS_START( timber )
+static INPUT_PORTS_START( timber )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1285,7 +1285,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( dotron )
+static INPUT_PORTS_START( dotron )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1328,7 +1328,7 @@ INPUT_PORTS_START( dotron )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dotrone )
+static INPUT_PORTS_START( dotrone )
 	PORT_INCLUDE(dotron)
 
 	PORT_MODIFY("SSIO.IP2")
@@ -1339,7 +1339,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( nflfoot )
+static INPUT_PORTS_START( nflfoot )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BILL1 )
@@ -1386,7 +1386,7 @@ INPUT_PORTS_END
 
 /* "wiring diagram was not available at time of publication" according to the manual */
 /* DIPs verified from the manual */
-INPUT_PORTS_START( demoderb )
+static INPUT_PORTS_START( demoderb )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )

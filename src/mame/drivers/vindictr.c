@@ -109,7 +109,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( vindictr )
+static INPUT_PORTS_START( vindictr )
 	PORT_START_TAG("26000")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)

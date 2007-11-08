@@ -353,7 +353,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-INPUT_PORTS_START( hitme )
+static INPUT_PORTS_START( hitme )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )					/* Start button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* Always high */
@@ -430,7 +430,7 @@ INPUT_PORTS_START( hitme )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( barricad )
+static INPUT_PORTS_START( barricad )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )							/* Start button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )							/* Always high */

@@ -118,7 +118,7 @@ static struct YM2203interface ym2203_interface =
 };
 
 
-INPUT_PORTS_START( homerun )
+static INPUT_PORTS_START( homerun )
 	PORT_START
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1  )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
@@ -148,7 +148,7 @@ INPUT_PORTS_START( homerun )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dynashot )
+static INPUT_PORTS_START( dynashot )
 	PORT_START
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1  )
 	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED )

@@ -549,7 +549,7 @@ ADDRESS_MAP_END
              INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( othunder )
+static INPUT_PORTS_START( othunder )
 	/* 0x090000 -> 0x08a000 */
 	PORT_START_TAG("DSWA")
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
@@ -628,14 +628,14 @@ INPUT_PORTS_START( othunder )
 	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( othundrj )
+static INPUT_PORTS_START( othundrj )
 	PORT_INCLUDE( othunder )
 
 	PORT_MODIFY( "DSWA" )
 	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
-INPUT_PORTS_START( othundu )
+static INPUT_PORTS_START( othundu )
 	PORT_INCLUDE( othundrj )
 
 	PORT_MODIFY( "DSWB" )

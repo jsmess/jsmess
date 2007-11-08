@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( tinvader )
+static INPUT_PORTS_START( tinvader )
 
 	PORT_START_TAG("1E80")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -104,7 +104,7 @@ INPUT_PORTS_END
 
 /* Almost identical, no number of bases selection */
 
-INPUT_PORTS_START( sinvader )
+static INPUT_PORTS_START( sinvader )
 
 	PORT_START_TAG("1E80")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -152,7 +152,7 @@ INPUT_PORTS_START( sinvader )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dodgem )
+static INPUT_PORTS_START( dodgem )
 
 	PORT_START_TAG("1E80")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )

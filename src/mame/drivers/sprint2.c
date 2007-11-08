@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( sprint2 )
+static INPUT_PORTS_START( sprint2 )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x00, "Tracks on Demo" )
 	PORT_DIPSETTING(    0x00, "Easy Track Only" )
@@ -384,7 +384,7 @@ INPUT_PORTS_START( sprint2 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( sprint1 )
+static INPUT_PORTS_START( sprint1 )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x00, "Change Track" )
 	PORT_DIPSETTING(    0x01, "Every Lap" )
@@ -441,7 +441,7 @@ INPUT_PORTS_START( sprint1 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dominos )
+static INPUT_PORTS_START( dominos )
 	PORT_START
 	PORT_DIPNAME( 0x03, 0x01, "Points to Win" )
 	PORT_DIPSETTING(	0x03, "6" )

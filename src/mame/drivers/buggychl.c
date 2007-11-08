@@ -252,7 +252,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-INPUT_PORTS_START( buggychl )
+static INPUT_PORTS_START( buggychl )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" )	// Arks/Flags/Fuel
 	PORT_DIPSETTING(    0x03, "2000/1000/50" )

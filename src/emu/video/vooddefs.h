@@ -1603,7 +1603,7 @@ typedef struct _raster_info raster_info;
 struct _raster_info
 {
 	struct _raster_info *next;			/* pointer to next entry with the same hash */
-	poly_draw_scanline callback; 		/* callback pointer */
+	poly_draw_tri_scanline callback;	/* callback pointer */
 	UINT8		is_generic;				/* TRUE if this is one of the generic rasterizers */
 	UINT8		display;				/* display index */
 	UINT32		hits;					/* how many hits (pixels) we've used this for */
@@ -2746,9 +2746,7 @@ do 																				\
 		/* bilinear filtered */													\
 																				\
 		UINT32 texel0, texel1, texel2, texel3;									\
-		UINT32 factor, factorsum;												\
 		UINT32 sfrac, tfrac;													\
-		UINT32 ag, rb;															\
 		INT32 s1, t1;															\
 																				\
 		/* adjust S/T for the LOD and strip off all but the low 8 bits of */	\
@@ -2827,23 +2825,7 @@ do 																				\
 		}																		\
 																				\
 		/* weigh in each texel */												\
-		factorsum = factor = ((0x100 - sfrac) * (0x100 - tfrac)) >> 8;			\
-		ag = ((texel0 >> 8) & 0x00ff00ff) * factor;								\
-		rb = (texel0 & 0x00ff00ff) * factor;									\
-																				\
-		factorsum += factor = (sfrac * (0x100 - tfrac)) >> 8;					\
-		ag += ((texel1 >> 8) & 0x00ff00ff) * factor;							\
-		rb += (texel1 & 0x00ff00ff) * factor;									\
-																				\
-		factorsum += factor = ((0x100 - sfrac) * tfrac) >> 8;					\
-		ag += ((texel2 >> 8) & 0x00ff00ff) * factor;							\
-		rb += (texel2 & 0x00ff00ff) * factor;									\
-																				\
-		factor = 0x100 - factorsum;												\
-		ag += ((texel3 >> 8) & 0x00ff00ff) * factor;							\
-		rb += (texel3 & 0x00ff00ff) * factor;									\
-																				\
-		c_local.u = (ag & 0xff00ff00) | ((rb >> 8) & 0x00ff00ff);				\
+		c_local.u = rgba_bilinear_filter(texel0, texel1, texel2, texel3, sfrac, tfrac);\
 	}																			\
 																				\
 	/* select zero/other for RGB */												\
@@ -3508,12 +3490,14 @@ while (0)
 
 #define RASTERIZER(name, TMUS, FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
-static void raster_##name(void *destbase, INT32 y, INT32 startx, INT32 stopx, const poly_params *poly, int threadid) \
+static void raster_##name(void *destbase, INT32 y, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid) \
 {																				\
-	poly_extra_data *extra = poly->extra;										\
+	const poly_extra_data *extra = extradata;									\
 	voodoo_state *v = extra->state;												\
 	stats_block *stats = &v->thread_stats[threadid];							\
 	DECLARE_DITHER_POINTERS;													\
+	INT32 startx = extent->startx;												\
+	INT32 stopx = extent->stopx;												\
 	INT32 iterr, iterg, iterb, itera;											\
 	INT32 iterz;																\
 	INT64 iterw, iterw0 = 0, iterw1 = 0;										\
@@ -3565,7 +3549,7 @@ static void raster_##name(void *destbase, INT32 y, INT32 startx, INT32 stopx, co
 	}																			\
 																				\
 	/* get pointers to the target buffer and depth buffer */					\
-	dest = (UINT16 *)destbase + scry * v->fbi.rowpixels;							\
+	dest = (UINT16 *)destbase + scry * v->fbi.rowpixels;						\
 	depth = v->fbi.aux ? (v->fbi.aux + scry * v->fbi.rowpixels) : NULL;			\
 																				\
 	/* compute the starting parameters */										\

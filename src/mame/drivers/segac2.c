@@ -672,7 +672,7 @@ ADDRESS_MAP_END
 
 ******************************************************************************/
 
-INPUT_PORTS_START( systemc_generic )
+static INPUT_PORTS_START( systemc_generic )
     PORT_START_TAG("P1")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -778,7 +778,7 @@ INPUT_PORTS_START( systemc_generic )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( columns )
+static INPUT_PORTS_START( columns )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -802,7 +802,7 @@ INPUT_PORTS_START( columns )
     PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )  // 25 jewels
 INPUT_PORTS_END
 
-INPUT_PORTS_START( columnsu )
+static INPUT_PORTS_START( columnsu )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -829,7 +829,7 @@ INPUT_PORTS_START( columnsu )
     PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )  // 25 jewels
 INPUT_PORTS_END
 
-INPUT_PORTS_START( columns2 )
+static INPUT_PORTS_START( columns2 )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -860,7 +860,7 @@ INPUT_PORTS_START( columns2 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( borench )
+static INPUT_PORTS_START( borench )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -894,7 +894,7 @@ INPUT_PORTS_START( borench )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( tfrceac )
+static INPUT_PORTS_START( tfrceac )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("DSW")
@@ -922,7 +922,7 @@ INPUT_PORTS_START( tfrceac )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( twinsqua )
+static INPUT_PORTS_START( twinsqua )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -956,7 +956,7 @@ INPUT_PORTS_START( twinsqua )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( ribbit )
+static INPUT_PORTS_START( ribbit )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -989,7 +989,7 @@ INPUT_PORTS_START( ribbit )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( puyo )
+static INPUT_PORTS_START( puyo )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -1018,7 +1018,7 @@ INPUT_PORTS_START( puyo )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( stkclmns )
+static INPUT_PORTS_START( stkclmns )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -1042,7 +1042,7 @@ INPUT_PORTS_START( stkclmns )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( potopoto )
+static INPUT_PORTS_START( potopoto )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -1080,7 +1080,7 @@ INPUT_PORTS_START( potopoto )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( zunkyou )
+static INPUT_PORTS_START( zunkyou )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -1107,7 +1107,7 @@ INPUT_PORTS_START( zunkyou )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( ichir )
+static INPUT_PORTS_START( ichir )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -1130,7 +1130,7 @@ INPUT_PORTS_START( ichir )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( bloxeedc )
+static INPUT_PORTS_START( bloxeedc )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -1154,7 +1154,7 @@ INPUT_PORTS_START( bloxeedc )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( puyopuy2 )
+static INPUT_PORTS_START( puyopuy2 )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
@@ -1189,7 +1189,7 @@ INPUT_PORTS_START( puyopuy2 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( pclub )
+static INPUT_PORTS_START( pclub )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")

@@ -272,7 +272,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( lsasquad )
+static INPUT_PORTS_START( lsasquad )
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( sound_mem_daikaiju, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( daikaiju )
+static INPUT_PORTS_START( daikaiju )
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )

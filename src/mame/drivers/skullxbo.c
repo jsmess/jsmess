@@ -156,7 +156,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( skullxbo )
+static INPUT_PORTS_START( skullxbo )
 	PORT_START      /* ff5800 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)

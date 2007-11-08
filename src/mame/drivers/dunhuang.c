@@ -439,7 +439,7 @@ ADDRESS_MAP_END
                                 Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( dunhuang )
+static INPUT_PORTS_START( dunhuang )
 	PORT_START	// IN0 - DSW1
 	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Chance (%)" )
 	PORT_DIPSETTING(    0x00, "78" )

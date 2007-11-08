@@ -48,19 +48,19 @@
 static tilemap *bg_tilemap;
 
 /* Pointers to External RAM */
-UINT8 *program_ram;
-UINT8 *cmos_ram;
+static UINT8 *program_ram;
+static UINT8 *cmos_ram;
 
 /* Variables used instead of CRTC6845 system */
-UINT8 vid_register = 0;
-UINT8 vid_low = 0;
-UINT8 vid_high = 0;
+static UINT8 vid_register = 0;
+static UINT8 vid_low = 0;
+static UINT8 vid_high = 0;
 
 /* Holds upper video address and palette number */
-UINT8 *palette_ram;
+static UINT8 *palette_ram;
 
 /* IO Ports */
-UINT8 *io_port;
+static UINT8 *io_port;
 
 
 /*****************
@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
-INPUT_PORTS_START( peplus )
+static INPUT_PORTS_START( peplus )
 	PORT_START_TAG("IN0")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
@@ -598,7 +598,7 @@ INPUT_PORTS_START( peplus )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( pepp0188 )
+static INPUT_PORTS_START( pepp0188 )
 	PORT_START_TAG("IN0")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
@@ -651,7 +651,7 @@ INPUT_PORTS_START( pepp0188 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( peset038 )
+static INPUT_PORTS_START( peset038 )
 	PORT_START_TAG("IN0")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)

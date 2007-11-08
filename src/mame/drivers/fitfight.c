@@ -278,7 +278,7 @@ static UPD7810_CONFIG sound_cpu_config =
 
 /* I've put the inputs the same way they can be read in the "test mode" */
 
-INPUT_PORTS_START( fitfight )
+static INPUT_PORTS_START( fitfight )
 	PORT_START	// 0x200000.w
 	/* players inputs -> 0xe022cc.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -406,7 +406,7 @@ INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( histryma )
+static INPUT_PORTS_START( histryma )
 	PORT_START	// 0x200000.w
 	/* players inputs -> 0xe02cf2.w and 0xe02cf8.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -548,7 +548,7 @@ INPUT_PORTS_END
 /* Surprisingly, the Dip Switches look very similar to the ones from 'histryma'
    (the only difference being that there is no "Needed Points/Maximum Points"
    Dip Switch, the value always being set to "2/3") */
-INPUT_PORTS_START( bbprot )
+static INPUT_PORTS_START( bbprot )
 	PORT_START	// 0x300000.w
 	/* players inputs -> 0xe0545e.w and 0xe05464.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)

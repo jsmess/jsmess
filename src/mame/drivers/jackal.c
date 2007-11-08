@@ -89,7 +89,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( jackal )
+static INPUT_PORTS_START( jackal )
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
@@ -181,7 +181,7 @@ INPUT_PORTS_START( jackal )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( topgunbl )
+static INPUT_PORTS_START( topgunbl )
 	PORT_INCLUDE(jackal)
 
 	PORT_MODIFY("IN0")

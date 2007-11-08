@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( metlclsh )
+static INPUT_PORTS_START( metlclsh )
 	PORT_START_TAG("IN0")	/* c000 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )

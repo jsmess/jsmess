@@ -30,7 +30,7 @@ static READ8_HANDLER( io_read_missing_dips )
 
 
 /* Ports */
-INPUT_PORTS_START( kingpin )
+static INPUT_PORTS_START( kingpin )
 	PORT_START
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )

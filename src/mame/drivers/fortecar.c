@@ -43,7 +43,7 @@ static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( fortecar )
+static INPUT_PORTS_START( fortecar )
 	PORT_START	/* 8bit */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

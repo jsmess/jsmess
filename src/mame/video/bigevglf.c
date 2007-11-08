@@ -8,8 +8,8 @@
 #include "driver.h"
 
 
-UINT8 *beg_spriteram1;
-UINT8 *beg_spriteram2;
+UINT8 *bigevglf_spriteram1;
+UINT8 *bigevglf_spriteram2;
 
 
 static UINT32 vidram_bank = 0;
@@ -20,7 +20,7 @@ static UINT8 *vidram;
 
 static mame_bitmap *tmp_bitmap[4];
 
-WRITE8_HANDLER(beg_palette_w)
+WRITE8_HANDLER(bigevglf_palette_w)
 {
 	int color;
 
@@ -29,7 +29,7 @@ WRITE8_HANDLER(beg_palette_w)
 	palette_set_color_rgb(Machine, offset&0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
 }
 
-WRITE8_HANDLER( beg_gfxcontrol_w )
+WRITE8_HANDLER( bigevglf_gfxcontrol_w )
 {
 /* bits used: 0,1,2,3
  0 and 2 select plane,
@@ -74,13 +74,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	for (i = 0xc0-4; i >= 0; i-=4)
 	{
 		int code,sx,sy;
-		code = beg_spriteram2[i+1];
-		sx = beg_spriteram2[i+3];
-		sy = 200-beg_spriteram2[i];
+		code = bigevglf_spriteram2[i+1];
+		sx = bigevglf_spriteram2[i+3];
+		sy = 200-bigevglf_spriteram2[i];
 		for(j=0;j<16;j++)
 			drawgfx(bitmap,machine->gfx[0],
-				beg_spriteram1[(code<<4)+j]+((beg_spriteram1[0x400+(code<<4)+j]&0xf)<<8),
-				beg_spriteram2[i+2] & 0xf,
+				bigevglf_spriteram1[(code<<4)+j]+((bigevglf_spriteram1[0x400+(code<<4)+j]&0xf)<<8),
+				bigevglf_spriteram2[i+2] & 0xf,
 				0,0,
 				sx+((j&1)<<3),sy+((j>>1)<<3),
 				cliprect,TRANSPARENCY_PEN,0);

@@ -13,6 +13,14 @@
 #ifndef __EIGCCX86__
 #define __EIGCCX86__
 
+/* Include MMX/SSE intrinsics headers */
+
+#ifdef __SSE2__
+#include <mmintrin.h>	/* MMX */
+#include <xmmintrin.h>	/* SSE */
+#include <emmintrin.h>	/* SSE2 */
+#endif
+
 
 /***************************************************************************
     INLINE MATH FUNCTIONS
@@ -174,7 +182,24 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     divide and return the 32 bit quotient
 -------------------------------------------------*/
 
-/* TBD */
+#ifndef __x86_64__
+#define div_64x32 _div_64x32
+INLINE INT32 _div_64x32(INT64 a, INT32 b)
+{
+	INT32 result, temp;
+
+	__asm__ (
+		" idivl  %[b] ;"
+		: [result] "=a" (result)	/* Result ends up in eax */
+		, [temp]   "=d" (temp)		/* This is effectively a clobber */
+		: [a]      "A"  (a)			/* 'a' in edx:eax */
+		, [b]      "rm" (b)			/* 'b' in register or memory */
+		: "%cc"						/* Clobbers condition codes */
+	);
+
+	return result;
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -182,7 +207,24 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     divide and return the 32 bit quotient
 -------------------------------------------------*/
 
-/* TBD */
+#ifndef __x86_64__
+#define divu_64x32 _divu_64x32
+INLINE UINT32 _divu_64x32(UINT64 a, UINT32 b)
+{
+	UINT32 result, temp;
+
+	__asm__ (
+		" divl  %[b] ;"
+		: [result] "=a" (result)	/* Result ends up in eax */
+		, [temp]   "=d" (temp)		/* This is effectively a clobber */
+		: [a]      "A"  (a)			/* 'a' in edx:eax */
+		, [b]      "rm" (b)			/* 'b' in register or memory */
+		: "%cc"						/* Clobbers condition codes */
+	);
+
+	return result;
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -248,7 +290,24 @@ INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     divide and return the 32 bit remainder
 -------------------------------------------------*/
 
-/* TBD */
+#ifndef __x86_64__
+#define mod_64x32 _mod_64x32
+INLINE INT32 _mod_64x32(INT64 a, INT32 b)
+{
+	INT32 result, temp;
+
+	__asm__ (
+		" idivl  %[b] ;"
+		: [result] "=d" (result)	/* Result ends up in edx */
+		, [temp]   "=a" (temp)		/* This is effectively a clobber */
+		: [a]      "A"  (a)			/* 'a' in edx:eax */
+		, [b]      "rm" (b)			/* 'b' in register or memory */
+		: "%cc"						/* Clobbers condition codes */
+	);
+
+	return result;
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -256,7 +315,24 @@ INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     divide and return the 32 bit remainder
 -------------------------------------------------*/
 
-/* TBD */
+#ifndef __x86_64__
+#define modu_64x32 _modu_64x32
+INLINE UINT32 _modu_64x32(UINT64 a, UINT32 b)
+{
+	UINT32 result, temp;
+
+	__asm__ (
+		" divl  %[b] ;"
+		: [result] "=d" (result)	/* Result ends up in edx */
+		, [temp]   "=a" (temp)		/* This is effectively a clobber */
+		: [a]      "A"  (a)			/* 'a' in edx:eax */
+		, [b]      "rm" (b)			/* 'b' in register or memory */
+		: "%cc"						/* Clobbers condition codes */
+	);
+
+	return result;
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -264,7 +340,17 @@ INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     point reciprocal
 -------------------------------------------------*/
 
-/* TBD */
+#ifdef __SSE2__
+#define recip_approx _recip_approx
+INLINE float _recip_approx(float value)
+{
+	__m128 value_xmm = _mm_set_ss(value);
+	__m128 result_xmm = _mm_rcp_ss(value_xmm);
+	float result;
+	_mm_store_ss(&result, result_xmm);
+	return result;
+}
+#endif
 
 
 

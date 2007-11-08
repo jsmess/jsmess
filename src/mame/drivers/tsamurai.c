@@ -75,27 +75,27 @@ static INTERRUPT_GEN( samurai_interrupt ){
 	if (nmi_enabled) cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_HANDLER( unknown_d803_r )
+static READ8_HANDLER( unknown_d803_r )
 {
 	return 0x6b;
 }
 
-READ8_HANDLER( unknown_d803_m660_r )
+static READ8_HANDLER( unknown_d803_m660_r )
 {
 	return 0x53;     // this is what the bootleg patches in.
 }
 
-READ8_HANDLER( unknown_d806_r )
+static READ8_HANDLER( unknown_d806_r )
 {
 	return 0x40;
 }
 
-READ8_HANDLER( unknown_d900_r )
+static READ8_HANDLER( unknown_d900_r )
 {
 	return 0x6a;
 }
 
-READ8_HANDLER( unknown_d938_r )
+static READ8_HANDLER( unknown_d938_r )
 {
 	return 0xfb;
 }
@@ -496,7 +496,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )\
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-INPUT_PORTS_START( tsamurai )
+static INPUT_PORTS_START( tsamurai )
 TS_IN0
 TS_IN1
 TS_IN2
@@ -526,7 +526,7 @@ TS_DSW1
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( nunchaku )
+static INPUT_PORTS_START( nunchaku )
 TS_IN0
 TS_IN1
 TS_IN2
@@ -556,7 +556,7 @@ TS_DSW1
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( vsgongf )
+static INPUT_PORTS_START( vsgongf )
 TS_IN0
 TS_IN1
 TS_IN2
@@ -609,7 +609,7 @@ INPUT_PORTS_END
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )\
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-INPUT_PORTS_START( yamagchi )
+static INPUT_PORTS_START( yamagchi )
 	YAMINS
 	TS_IN2
 	TS_DSW1
@@ -639,7 +639,7 @@ INPUT_PORTS_START( yamagchi )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( m660 )
+static INPUT_PORTS_START( m660 )
 	YAMINS
 	TS_IN2
 

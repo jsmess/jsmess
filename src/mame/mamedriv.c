@@ -1722,6 +1722,7 @@ const game_driver * const drivers[] =
 	/* Taito "tnzs" (Seta) hardware */
 	DRIVER( plumppop )	/* A98 (c) 1987 Taito Corporation (Japan) */
 	DRIVER( extrmatn )	/* B06 (c) 1987 World Games */
+	DRIVER( extrmatj )	/* B06 (c) 1987 Taito Corporation (Japan)*/
 	DRIVER( arknoid2 )	/* B08 (c) 1987 Taito Corporation Japan (World) */
 	DRIVER( arknid2u )	/* B08 (c) 1987 Taito America Corporation + Romstar license (US) */
 	DRIVER( arknid2j )	/* B08 (c) 1987 Taito Corporation (Japan) */
@@ -4501,6 +4502,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( konami88 )	/* GX861 (c) 1988 */
 	DRIVER( hypsptsp )	/* GX861 (c) 1988 (Japan) */
 	DRIVER( gbusters )	/* GX878 (c) 1988 */
+	DRIVER( gbustera )	/* GX878 (c) 1988 */
 	DRIVER( crazycop )	/* GX878 (c) 1988 (Japan) */
 	DRIVER( crimfght )	/* GX821 (c) 1989 (US) */
 	DRIVER( crimfgt2 )	/* GX821 (c) 1989 (World) */
@@ -5910,6 +5912,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( narc )		/* (c) 1988 Williams */
 	DRIVER( narc3 )		/* (c) 1988 Williams */
 	DRIVER( trog )		/* (c) 1990 Midway */
+	DRIVER( trog4 )		/* (c) 1990 Midway */
 	DRIVER( trog3 )		/* (c) 1990 Midway */
 	DRIVER( trogpa6 )	/* (c) 1990 Midway */
 	DRIVER( trogp )		/* (c) 1990 Midway */
@@ -7351,6 +7354,10 @@ Other Sun games
 	DRIVER( evosocc )	/* 2001 Evoga. Evolution Soccer */
 
 	/* Bell Fruit Cobra Hardware */
+	DRIVER( inquiztr )	/* 1989 BFM */
+	DRIVER( escounts )	/* 1990 BFM */
+	DRIVER( trebltop )	/* 1991 BFM */
+	DRIVER( quizvadr )	/* 1991 BFM */
 	DRIVER( qos )		/* 1992 BFM */
 	DRIVER( qosa )		/* 1992 BFM */
 

@@ -270,7 +270,7 @@ static INPUT_PORTS_START( beaminv )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( beaminva )
+static INPUT_PORTS_START( beaminva )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )

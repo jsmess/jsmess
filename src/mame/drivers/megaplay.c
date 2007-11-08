@@ -177,7 +177,7 @@ static UINT32 readpos = 1;  // serial bank selection position (9-bit)
     PORT_DIPSETTING( 0x10, "1 coin/1 credit - 2 coins/3 credits" ) \
     PORT_DIPSETTING( 0x00, " 1 coin/1 credit" )
 
-INPUT_PORTS_START ( megaplay )
+static INPUT_PORTS_START ( megaplay )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -186,7 +186,7 @@ INPUT_PORTS_START ( megaplay )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_sonic )
+static INPUT_PORTS_START ( mp_sonic )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -214,7 +214,7 @@ INPUT_PORTS_START ( mp_sonic )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_gaxe2 )
+static INPUT_PORTS_START ( mp_gaxe2 )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -247,7 +247,7 @@ INPUT_PORTS_START ( mp_gaxe2 )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_col3 )
+static INPUT_PORTS_START ( mp_col3 )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -278,7 +278,7 @@ INPUT_PORTS_START ( mp_col3 )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_twc )
+static INPUT_PORTS_START ( mp_twc )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -303,7 +303,7 @@ INPUT_PORTS_START ( mp_twc )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_sor2 )
+static INPUT_PORTS_START ( mp_sor2 )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -326,7 +326,7 @@ INPUT_PORTS_START ( mp_sor2 )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_bio )
+static INPUT_PORTS_START ( mp_bio )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -349,7 +349,7 @@ INPUT_PORTS_START ( mp_bio )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_gslam )
+static INPUT_PORTS_START ( mp_gslam )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -375,7 +375,7 @@ INPUT_PORTS_START ( mp_gslam )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_mazin )
+static INPUT_PORTS_START ( mp_mazin )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -402,7 +402,7 @@ INPUT_PORTS_START ( mp_mazin )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mp_soni2 )
+static INPUT_PORTS_START ( mp_soni2 )
 	GENESIS_PORTS
 	MEGAPLAY_TEST
 	MEGAPLAY_COIN
@@ -1055,20 +1055,20 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 
 */
 
-/* -- */ GAMEB( 1993, megaplay, 0,        megaplay, mpnew, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", GAME_IS_BIOS_ROOT )
-/* 01 */ GAMEB( 1993, mp_sonic, megaplay, megaplay, mpnew, mp_sonic, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 )
-/* 02 */ GAMEB( 1993, mp_gaxe2, megaplay, megaplay, mpnew, mp_gaxe2, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
-/* 03 */ GAMEB( 1993, mp_gslam, megaplay, megaplay, mpnew, mp_gslam, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",0  )
-/* 04 */ GAMEB( 1993, mp_twc,   megaplay, megaplay, mpnew, mp_twc,	 megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
-/* 05 */ GAMEB( 1993, mp_sor2,  megaplay, megaplay, mpnew, mp_sor2,	 megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )
-/* 06 */ GAMEB( 1993, mp_bio,   megaplay, megaplay, mpnew, mp_bio,   megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
-/* 07 */ GAMEB( 1993, mp_soni2, megaplay, megaplay, mpnew, mp_soni2, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 )
+/* -- */ GAME( 1993, megaplay, 0, mpnew, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", GAME_IS_BIOS_ROOT )
+/* 01 */ GAME( 1993, mp_sonic, megaplay, mpnew, mp_sonic, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 )
+/* 02 */ GAME( 1993, mp_gaxe2, megaplay, mpnew, mp_gaxe2, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
+/* 03 */ GAME( 1993, mp_gslam, megaplay, mpnew, mp_gslam, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",0  )
+/* 04 */ GAME( 1993, mp_twc,   megaplay, mpnew, mp_twc,	 megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
+/* 05 */ GAME( 1993, mp_sor2,  megaplay, mpnew, mp_sor2,	 megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )
+/* 06 */ GAME( 1993, mp_bio,   megaplay, mpnew, mp_bio,   megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
+/* 07 */ GAME( 1993, mp_soni2, megaplay, mpnew, mp_soni2, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 )
 /* 08 */
 /* 09 */
 /* 10 */
-/* 11 */ GAMEB( 1993, mp_mazin, megaplay, megaplay, mpnew, mp_mazin, megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)",0  )
+/* 11 */ GAME( 1993, mp_mazin, megaplay, mpnew, mp_mazin, megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)",0  )
 
-/* ?? */ GAMEB( 1993, mp_col3,  megaplay, megaplay, mpnew, megaplay, megaplay, ROT0, "Sega",                  "Columns III (Mega Play)" , 0 )
+/* ?? */ GAME( 1993, mp_col3,  megaplay, mpnew, megaplay, megaplay, ROT0, "Sega",                  "Columns III (Mega Play)" , 0 )
 
 
 /* Also known to exist:

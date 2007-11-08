@@ -165,7 +165,7 @@ ADDRESS_MAP_END
 
 /* PORTS */
 /*  (DIPLOCATION diplay inverted) */
-INPUT_PORTS_START( lgp )
+static INPUT_PORTS_START( lgp )
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, "1st Round" ) PORT_DIPLOCATION("SWA:2,1")
 	PORT_DIPSETTING(    0x03, "68 Seconds" )
