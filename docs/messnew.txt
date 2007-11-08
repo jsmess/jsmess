@@ -25,8 +25,7 @@ System Driver Changes:
 
 - [PET] Updated to use MAME's CRTC6548 implementation.  [Wilbert Pol]
 
-- [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert
-  Pol]
+- [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert Pol]
 
 - [SYM1] Rewrote, still many issues and doesn't fully work.  [Dirk Best]
 
@@ -34,7 +33,7 @@ System Driver Changes:
 
 - [ATARIST] Implemented iKBD<->68000 communications, so the keyboard is working now. [Curt Coder]
 
-
+- [MEPHISTO] Implemented artwork/code for real chess board usage. [Ralf Schäfer, Cowering]
 
 User Interface Changes:
 -----------------------
