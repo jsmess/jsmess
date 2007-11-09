@@ -191,7 +191,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "devices/mflopimg.h"
 #include "formats/ap2_dsk.h"
 #include "sound/ay8910.h"
-#include "mslegacy.h"
+
 
 static ADDRESS_MAP_START( apple2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
@@ -508,24 +508,24 @@ INPUT_PORTS_END
  * have been more appropriate for an Apple IIgs.  So we've substituted in the
  * Robert Munafo palette instead, which is more accurate on 8-bit Apples
  */
-static const unsigned char apple2_palette[] =
+static const rgb_t apple2_palette[] =
 {
-	0x00, 0x00, 0x00,	/* Black */
-	0xE3, 0x1E, 0x60,	/* Dark Red */
-	0x60, 0x4E, 0xBD,	/* Dark Blue */
-	0xFF, 0x44, 0xFD,	/* Purple */
-	0x00, 0xA3, 0x60,	/* Dark Green */
-	0x9C, 0x9C, 0x9C,	/* Dark Gray */
-	0x14, 0xCF, 0xFD,	/* Medium Blue */
-	0xD0, 0xC3, 0xFF,	/* Light Blue */
-	0x60, 0x72, 0x03,	/* Brown */
-	0xFF, 0x6A, 0x3C,	/* Orange */
-	0x9C, 0x9C, 0x9C,	/* Light Grey */
-	0xFF, 0xA0, 0xD0,	/* Pink */
-	0x14, 0xF5, 0x3C,	/* Light Green */
-	0xD0, 0xDD, 0x8D,	/* Yellow */
-	0x72, 0xFF, 0xD0,	/* Aquamarine */
-	0xFF, 0xFF, 0xFF	/* White */
+	RGB_BLACK,
+	MAKE_RGB(0xE3, 0x1E, 0x60),	/* Dark Red */
+	MAKE_RGB(0x60, 0x4E, 0xBD),	/* Dark Blue */
+	MAKE_RGB(0xFF, 0x44, 0xFD),	/* Purple */
+	MAKE_RGB(0x00, 0xA3, 0x60),	/* Dark Green */
+	MAKE_RGB(0x9C, 0x9C, 0x9C),	/* Dark Gray */
+	MAKE_RGB(0x14, 0xCF, 0xFD),	/* Medium Blue */
+	MAKE_RGB(0xD0, 0xC3, 0xFF),	/* Light Blue */
+	MAKE_RGB(0x60, 0x72, 0x03),	/* Brown */
+	MAKE_RGB(0xFF, 0x6A, 0x3C),	/* Orange */
+	MAKE_RGB(0x9C, 0x9C, 0x9C),	/* Light Grey */
+	MAKE_RGB(0xFF, 0xA0, 0xD0),	/* Pink */
+	MAKE_RGB(0x14, 0xF5, 0x3C),	/* Light Green */
+	MAKE_RGB(0xD0, 0xDD, 0x8D),	/* Yellow */
+	MAKE_RGB(0x72, 0xFF, 0xD0),	/* Aquamarine */
+	RGB_WHITE
 };
 
 static const gfx_layout apple2_text_layout =
@@ -622,7 +622,7 @@ static const unsigned short apple2_colortable[] =
 /* Initialize the palette */
 PALETTE_INIT( apple2 )
 {
-	palette_set_colors_rgb(machine, 0, apple2_palette, sizeof(apple2_palette) / 3);
+	palette_set_colors(machine, 0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 	memcpy(colortable, apple2_colortable, sizeof(apple2_colortable));
 }
 
@@ -646,7 +646,7 @@ static MACHINE_DRIVER_START( apple2_common )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(280*2, 192)
 	MDRV_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
-	MDRV_PALETTE_LENGTH(sizeof(apple2_palette)/3)
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(apple2_palette))
 	MDRV_COLORTABLE_LENGTH(sizeof(apple2_colortable)/sizeof(unsigned short))
 	MDRV_PALETTE_INIT(apple2)
 

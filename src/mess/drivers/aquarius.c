@@ -25,7 +25,6 @@ Aquarius Memory map
 ************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "cpu/z80/z80.h"
 #include "video/generic.h"
 #include "includes/aquarius.h"
@@ -70,24 +69,24 @@ static GFXDECODE_START( aquarius_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, aquarius_charlayout, 0, 256 )
 GFXDECODE_END
 
-static unsigned char aquarius_palette[] =
+static const rgb_t aquarius_palette[] =
 {
-	0x00, 0x00, 0x00,	/* Black */
-	0xff, 0x00, 0x00,	/* Red */
-	0x00, 0xff, 0x00,	/* Green */
-	0xff, 0xff, 0x00,	/* Yellow */
-	0x00, 0x00, 0xff,	/* Blue */
-	0x7f, 0x00, 0x7f,	/* Violet */
-	0x7f, 0xff, 0xff,	/* Light Blue-Green */
-	0xff, 0xff, 0xff,	/* White */
-	0xc0, 0xc0, 0xc0,	/* Light Gray */
-	0x00, 0xff, 0xff,	/* Blue-Green */
-	0xff, 0x00, 0xff,	/* Magenta */
-	0x00, 0x00, 0x7f,	/* Dark Blue */
-	0xff, 0xff, 0x7f,	/* Light Yellow */
-	0x7f, 0xff, 0x7f,	/* Light Green */
-	0xff, 0x7f, 0x00,	/* Orange */
-	0x7f, 0x7f, 0x7f,	/* Dark Gray */
+	RGB_BLACK,					/* Black */
+	MAKE_RGB(0xff, 0x00, 0x00),	/* Red */
+	MAKE_RGB(0x00, 0xff, 0x00),	/* Green */
+	MAKE_RGB(0xff, 0xff, 0x00),	/* Yellow */
+	MAKE_RGB(0x00, 0x00, 0xff),	/* Blue */
+	MAKE_RGB(0x7f, 0x00, 0x7f),	/* Violet */
+	MAKE_RGB(0x7f, 0xff, 0xff),	/* Light Blue-Green */
+	RGB_WHITE,					/* White */
+	MAKE_RGB(0xc0, 0xc0, 0xc0),	/* Light Gray */
+	MAKE_RGB(0x00, 0xff, 0xff),	/* Blue-Green */
+	MAKE_RGB(0xff, 0x00, 0xff),	/* Magenta */
+	MAKE_RGB(0x00, 0x00, 0x7f),	/* Dark Blue */
+	MAKE_RGB(0xff, 0xff, 0x7f),	/* Light Yellow */
+	MAKE_RGB(0x7f, 0xff, 0x7f),	/* Light Green */
+	MAKE_RGB(0xff, 0x7f, 0x00),	/* Orange */
+	MAKE_RGB(0x7f, 0x7f, 0x7f)	/* Dark Gray */
 };
 
 static unsigned short aquarius_colortable[] =
@@ -112,7 +111,7 @@ static unsigned short aquarius_colortable[] =
 
 static PALETTE_INIT( aquarius )
 {
-	palette_set_colors_rgb(machine, 0, aquarius_palette, sizeof(aquarius_palette) / 3);
+	palette_set_colors(machine, 0, aquarius_palette, ARRAY_LENGTH(aquarius_palette));
 	memcpy(colortable, aquarius_colortable, sizeof (aquarius_colortable));
 }
 
@@ -224,7 +223,7 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_SCREEN_SIZE(40 * 8, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE( aquarius_gfxdecodeinfo )
-	MDRV_PALETTE_LENGTH(sizeof (aquarius_palette) / 3)
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(aquarius_palette))
 	MDRV_COLORTABLE_LENGTH(sizeof (aquarius_colortable))
 	MDRV_PALETTE_INIT( aquarius )
 

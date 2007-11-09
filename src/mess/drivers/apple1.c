@@ -75,7 +75,7 @@ $F000-$FFFF:	ROM address space
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "inputx.h"
-#include "mslegacy.h"
+
 
 /* port i/o functions */
 
@@ -134,10 +134,10 @@ GFXDECODE_END
    modulator.  Thus white seems like a more accurate foreground color
    than green. */
 
-static unsigned char apple1_palette[] =
+static const rgb_t apple1_palette[] =
 {
-	0x00, 0x00, 0x00,	/* Black */
-	0xff, 0xff, 0xff	/* White */
+	RGB_BLACK,
+	RGB_WHITE
 };
 
 static unsigned short apple1_colortable[] =
@@ -147,7 +147,7 @@ static unsigned short apple1_colortable[] =
 
 static PALETTE_INIT( apple1 )
 {
-	palette_set_colors_rgb(machine, 0, apple1_palette, sizeof(apple1_palette) / 3);
+	palette_set_colors(machine, 0, apple1_palette, ARRAY_LENGTH(apple1_palette));
 	memcpy(colortable, apple1_colortable, sizeof (apple1_colortable));
 }
 
@@ -245,7 +245,7 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_SCREEN_SIZE(40 * 7, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE(apple1_gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(sizeof (apple1_palette) / 3)
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(apple1_palette))
 	MDRV_COLORTABLE_LENGTH(sizeof(apple1_colortable)/sizeof(unsigned short))
 	MDRV_PALETTE_INIT(apple1)
 

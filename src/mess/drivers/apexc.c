@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "cpu/apexc/apexc.h"
 #include "video/generic.h"
-#include "mslegacy.h"
+
 
 static void apexc_teletyper_init(void);
 static void apexc_teletyper_putchar(int character);
@@ -427,12 +427,12 @@ static void apexc_interrupt(void)
 	Additionnally, We display one page of teletyper output.
 */
 
-static unsigned char apexc_palette[] =
+static const rgb_t apexc_palette[] =
 {
-	255, 255, 255,
-	0, 0, 0,
-	255, 0, 0,
-	50, 0, 0
+	RGB_WHITE,
+	RGB_BLACK,
+	MAKE_RGB(255, 0, 0),
+	MAKE_RGB(50, 0, 0)
 };
 
 static unsigned short apexc_colortable[] =
@@ -440,7 +440,7 @@ static unsigned short apexc_colortable[] =
 	0, 1
 };
 
-#define APEXC_PALETTE_SIZE sizeof(apexc_palette)/3
+#define APEXC_PALETTE_SIZE ARRAY_LENGTH(apexc_palette)
 #define APEXC_COLORTABLE_SIZE sizeof(apexc_colortable)/2
 
 static mame_bitmap *apexc_bitmap;
@@ -482,7 +482,7 @@ static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
 static PALETTE_INIT( apexc )
 {
-	palette_set_colors_rgb(machine, 0, apexc_palette, APEXC_PALETTE_SIZE);
+	palette_set_colors(machine, 0, apexc_palette, APEXC_PALETTE_SIZE);
 
 	memcpy(colortable, & apexc_colortable, sizeof(apexc_colortable));
 }

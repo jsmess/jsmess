@@ -13,7 +13,6 @@ TODO: Define a proper color table - see machine/arcadia.c for details
 #include <assert.h>
 #include "driver.h"
 #include "image.h"
-#include "mslegacy.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/arcadia.h"
 #include "devices/cartslot.h"
@@ -311,16 +310,16 @@ static GFXDECODE_START( arcadia_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, arcadia_charlayout, 0, 128 )
 GFXDECODE_END
 
-static unsigned char arcadia_palette[] =
+static const rgb_t arcadia_palette[] =
 {
-	255, 255, 255,	// white
-	255, 255, 0,	// yellow
-	0, 255, 255,	// cyan
-	0, 255, 0,		// green
-	255, 0, 255,	// magenta
-	255, 0, 0,		// red
-	0, 0, 255,		// blue
-	0, 0, 0			// black
+	RGB_WHITE,					/* white */
+	MAKE_RGB(0xff, 0xff, 0x00),	/* yellow */
+	MAKE_RGB(0x00, 0xff, 0xff),	/* cyan */
+	MAKE_RGB(0x00, 0xff, 0x00),	/* green */
+	MAKE_RGB(0xff, 0x00, 0xff),	/* magenta */
+	MAKE_RGB(0xff, 0x00, 0x00),	/* red */
+	MAKE_RGB(0x00, 0x00, 0xff),	/* blue */
+	RGB_BLACK					/* black */
 };
 
 static unsigned short arcadia_colortable[2][2] = {
@@ -330,7 +329,7 @@ static unsigned short arcadia_colortable[2][2] = {
 
 static PALETTE_INIT( arcadia )
 {
-	palette_set_colors_rgb(machine, 0, arcadia_palette, sizeof (arcadia_palette)/3);
+	palette_set_colors(machine, 0, arcadia_palette, ARRAY_LENGTH(arcadia_palette));
 	memcpy(colortable, arcadia_colortable,sizeof(arcadia_colortable));
 }
 
@@ -350,7 +349,7 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_SCREEN_SIZE(128+2*XPOS, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 2*XPOS+128-1, 0, 262-1)
 	MDRV_GFXDECODE( arcadia_gfxdecodeinfo )
-	MDRV_PALETTE_LENGTH(sizeof (arcadia_palette) / sizeof (arcadia_palette[0]) / 3)
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(arcadia_palette))
 	MDRV_COLORTABLE_LENGTH(sizeof (arcadia_colortable) / sizeof(arcadia_colortable[0][0]))
 	MDRV_PALETTE_INIT( arcadia )
 
