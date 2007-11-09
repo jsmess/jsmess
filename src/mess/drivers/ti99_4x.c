@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 */
 
 /* TI99/4a: 48-key keyboard, plus two optional joysticks (2 shift keys) */
-INPUT_PORTS_START(ti99_4a)
+static INPUT_PORTS_START(ti99_4a)
 
 	/* 1 port for config */
 	PORT_START	/* config */
@@ -244,7 +244,7 @@ INPUT_PORTS_END
 #define JOYSTICK_SENSITIVITY	100
 
 /* TI99/4: 41-key keyboard, plus two optional joysticks  (2 space keys) */
-INPUT_PORTS_START(ti99_4)
+static INPUT_PORTS_START(ti99_4)
 
 	/* 1 port for config */
 	PORT_START	/* config */

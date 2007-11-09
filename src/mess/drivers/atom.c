@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 
 /* not implemented: BREAK */
 
-INPUT_PORTS_START (atom)
+static INPUT_PORTS_START (atom)
 	PORT_START /* 0 VBLANK */
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 

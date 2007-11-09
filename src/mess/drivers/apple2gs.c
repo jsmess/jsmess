@@ -106,7 +106,7 @@ UINT8 apple2gs_docram[64*1024];
 MACHINE_DRIVER_EXTERN( apple2e );
 INPUT_PORTS_EXTERN( apple2ep );
 
-INPUT_PORTS_START( apple2gs )
+static INPUT_PORTS_START( apple2gs )
 	PORT_INCLUDE( apple2ep )
 
 	PORT_START_TAG("adb_mouse_x")

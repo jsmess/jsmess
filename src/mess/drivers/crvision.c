@@ -30,7 +30,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( crvision )
+static INPUT_PORTS_START( crvision )
 	
 	// Player 1 Joystick
 

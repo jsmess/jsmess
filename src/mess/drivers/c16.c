@@ -442,7 +442,7 @@ static INPUT_PORTS_START( ports_both )
 	PORT_DIPSETTING(0x10, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START (c16)
+static INPUT_PORTS_START (c16)
 	PORT_INCLUDE( ports_both )
 	PORT_START
 	PORT_BIT (0xc0, 0x0, IPT_UNUSED)		   /* no real floppy */
@@ -465,7 +465,7 @@ INPUT_PORTS_START (c16)
 	PORT_BIT (0xc, 0x0, IPT_UNUSED) 	   /* c16 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START (c16c)
+static INPUT_PORTS_START (c16c)
 	PORT_INCLUDE( ports_both )
 	PORT_START
 	PORT_BIT (0xc0, 0x40, IPT_UNUSED)		   /* c1551 floppy */
@@ -482,7 +482,7 @@ INPUT_PORTS_START (c16c)
 	PORT_BIT (0xc, 0x0, IPT_UNUSED) 	   /* c16 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START (c16v)
+static INPUT_PORTS_START (c16v)
 	PORT_INCLUDE( ports_both )
 	PORT_START
 	PORT_BIT (0xc0, 0x80, IPT_UNUSED)		   /* vc1541 floppy */
@@ -499,7 +499,7 @@ INPUT_PORTS_START (c16v)
 	PORT_BIT (0xc, 0x0, IPT_UNUSED) 	   /* c16 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START (plus4)
+static INPUT_PORTS_START (plus4)
 	PORT_INCLUDE( ports_both )
 	PORT_START
 	PORT_BIT (0xc0, 0x00, IPT_UNUSED)		   /* no real floppy */
@@ -522,7 +522,7 @@ INPUT_PORTS_START (plus4)
 	PORT_BIT (0xc, 0x4, IPT_UNUSED) 	   /* plus4 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START (plus4c)
+static INPUT_PORTS_START (plus4c)
 	PORT_INCLUDE( ports_both )
 	PORT_START
 	PORT_BIT (0xc0, 0x40, IPT_UNUSED)		   /* c1551 floppy */
@@ -539,7 +539,7 @@ INPUT_PORTS_START (plus4c)
 	PORT_BIT (0xc, 0x4, IPT_UNUSED) 	   /* plus4 */
 INPUT_PORTS_END
 
-INPUT_PORTS_START (plus4v)
+static INPUT_PORTS_START (plus4v)
 	PORT_INCLUDE( ports_both )
 	PORT_START
 	PORT_BIT (0xc0, 0x80, IPT_UNUSED)		   /* vc1541 floppy */
@@ -557,7 +557,7 @@ INPUT_PORTS_START (plus4v)
 INPUT_PORTS_END
 
 #if 0
-INPUT_PORTS_START (c364)
+static INPUT_PORTS_START (c364)
 	PORT_INCLUDE( ports_both )
 	PORT_START
 	PORT_BIT (0xc0, 0x00, IPT_UNUSED)		   /* no real floppy */

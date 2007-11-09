@@ -170,7 +170,7 @@ ADDRESS_MAP_END
  Input Ports
 ******************************************************************************/
 
-INPUT_PORTS_START(vtech1)
+static INPUT_PORTS_START(vtech1)
 	PORT_START_TAG("keyboard_0")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R       RETURN  LEFT$")   PORT_CODE(KEYCODE_R)     PORT_CHAR('R')

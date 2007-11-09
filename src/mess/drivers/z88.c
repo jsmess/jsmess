@@ -623,7 +623,7 @@ A8  (#0) | DEL    ENTER   6       Y       H       N       7       8
 -------------------------------------------------------------------------
 */
 
-INPUT_PORTS_START(z88)
+static INPUT_PORTS_START(z88)
 	/* 0 */
 	PORT_START
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_BACKSPACE)

@@ -1456,7 +1456,7 @@ static DRIVER_INIT( ip225015 )
 	nIOC_ParReadCnt = 0;
 }
 
-INPUT_PORTS_START( ip225015 )
+static INPUT_PORTS_START( ip225015 )
 	PORT_START	// unused IN0
 	PORT_START	// unused IN1
 	PORT_START	// unused IN2

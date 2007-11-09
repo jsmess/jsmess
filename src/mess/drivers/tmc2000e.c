@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( tmc2000e )
+static INPUT_PORTS_START( tmc2000e )
 	PORT_START_TAG("DSW0")	// System Configuration DIPs
 	PORT_DIPNAME( 0x80, 0x00, "Keyboard Type" )
 	PORT_DIPSETTING(    0x00, "ASCII" )

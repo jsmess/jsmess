@@ -794,7 +794,7 @@ b0:   f4     exit   del>   =      0      8      6      4      1             f6
       &3FF0  &3FF1  &3FF2  &3FF3  &3FF4  &3FF5  &3FF6  &3FF7  &3FF8  &3FF9  &3FFA
 */
 
-INPUT_PORTS_START(pcw)
+static INPUT_PORTS_START(pcw)
 	/* keyboard "ports". These are poked automatically into the PCW address space */
 
 	/* 0x03ff0 */

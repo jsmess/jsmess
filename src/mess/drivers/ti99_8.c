@@ -195,7 +195,7 @@ ADDRESS_MAP_END
 
 
 /* ti99/8 : 54-key keyboard */
-INPUT_PORTS_START(ti99_8)
+static INPUT_PORTS_START(ti99_8)
 
 	/* 1 port for config */
 	PORT_START	/* config */

@@ -313,7 +313,7 @@ static PALETTE_INIT( bbc )
 	memcpy(colortable,bbc_colour_table,sizeof(bbc_colour_table));
 }
 
-INPUT_PORTS_START(bbca)
+static INPUT_PORTS_START(bbca)
 
 	/* KEYBOARD COLUMN 0 */
 	PORT_START

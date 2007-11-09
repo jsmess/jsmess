@@ -443,7 +443,7 @@ ADDRESS_MAP_END*/
 
 
 /* tutor keyboard: 56 keys */
-INPUT_PORTS_START(tutor)
+static INPUT_PORTS_START(tutor)
 
 	PORT_START    /* col 0 */
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1)

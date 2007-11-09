@@ -101,7 +101,7 @@ ADDRESS_MAP_END
   Inputs
 ***************************************************************************/
 
-INPUT_PORTS_START( amiga_common )
+static INPUT_PORTS_START( amiga_common )
 	PORT_START_TAG("input")
 	PORT_CONFNAME( 0x20, 0x00, "Input Port 0 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
@@ -159,7 +159,7 @@ INPUT_PORTS_START( amiga_common )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( amiga )
+static INPUT_PORTS_START( amiga )
 	PORT_START_TAG("hardware")
 	PORT_CONFNAME( 0x08, 0x08, "Battery backed-up RTC")
 	PORT_CONFSETTING( 0x00, "Not Installed" )
@@ -170,7 +170,7 @@ INPUT_PORTS_END
 
 
 /* TODO: Support for the CDTV remote control */
-INPUT_PORTS_START( cdtv )
+static INPUT_PORTS_START( cdtv )
 	PORT_INCLUDE( amiga_common )
 INPUT_PORTS_END
 

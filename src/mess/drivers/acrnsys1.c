@@ -36,7 +36,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 
-INPUT_PORTS_START( acrnsys1 )
+static INPUT_PORTS_START( acrnsys1 )
 	PORT_START_TAG("keyboard_0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')

@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 
-INPUT_PORTS_START( aim65 )
+static INPUT_PORTS_START( aim65 )
 	PORT_START_TAG("keyboard_0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")       PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(32)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)

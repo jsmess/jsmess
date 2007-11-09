@@ -53,7 +53,7 @@ static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( microtan )
+static INPUT_PORTS_START( microtan )
     PORT_START // DIP switches
     PORT_DIPNAME( 0x03, 0x00, "Memory size" )
     PORT_DIPSETTING(	0x00, "1K" )

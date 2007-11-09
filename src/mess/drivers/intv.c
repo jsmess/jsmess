@@ -138,7 +138,7 @@ static GFXDECODE_START( intvkbd_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, intvkbd_charlayout, 0, 256 )
 GFXDECODE_END
 
-INPUT_PORTS_START( intv )
+static INPUT_PORTS_START( intv )
 	PORT_START /* IN0 */	/* Right Player Controller Starts Here */
     PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
     PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
@@ -192,7 +192,7 @@ INPUT_PORTS_END
  Row 9  DEL     '       L       J       G       D       NC      A
 */
 
-INPUT_PORTS_START( intvkbd )
+static INPUT_PORTS_START( intvkbd )
 	PORT_START /* IN0 */	/* Keyboard Row 0 */
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NC")
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NC")

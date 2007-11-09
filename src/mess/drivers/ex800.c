@@ -357,7 +357,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 
-INPUT_PORTS_START( ex800 )
+static INPUT_PORTS_START( ex800 )
 	PORT_START_TAG("ONLISW")
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON LINE")   PORT_CODE(KEYCODE_F9)

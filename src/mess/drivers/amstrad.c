@@ -2074,7 +2074,7 @@ INPUT_PORTS_END
 
 /* Steph 2000-10-27	I remapped the 'Machine Name' Dip Switches (easier to understand) */
 
-INPUT_PORTS_START(amstrad)
+static INPUT_PORTS_START(amstrad)
 
 	PORT_INCLUDE( amstrad_keyboard )
 
@@ -2137,11 +2137,11 @@ As far as I know, the KC compact used HD6845S only.
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START(kccomp)
+static INPUT_PORTS_START(kccomp)
 	PORT_INCLUDE( amstrad_keyboard )
 INPUT_PORTS_END
 
-INPUT_PORTS_START(plus)
+static INPUT_PORTS_START(plus)
 	PORT_INCLUDE( amstrad_keyboard )
 
 	PORT_START

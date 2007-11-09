@@ -41,7 +41,7 @@ SM8500_CONFIG gamecom_cpu_config = {
 	gamecom_update_timers
 };
 
-INPUT_PORTS_START( gamecom )
+static INPUT_PORTS_START( gamecom )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME( "Up" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME( "Down" )

@@ -91,7 +91,7 @@ ADDRESS_MAP_END
 	plus two optional joysticks.
 */
 
-INPUT_PORTS_START(ti99_4p)
+static INPUT_PORTS_START(ti99_4p)
 
 	/* 1 port for config */
 	PORT_START	/* config */

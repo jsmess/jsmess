@@ -172,7 +172,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( dgnbeta )
+static INPUT_PORTS_START( dgnbeta )
 	PORT_START /* Key ROw 0 */
 	/* Return shift if either shift key pressed */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L-SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)

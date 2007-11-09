@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( channelf )
+static INPUT_PORTS_START( channelf )
 	PORT_START /* Front panel buttons */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_START )	/* TIME  (1) */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )	/* HOLD  (2) */

@@ -322,7 +322,7 @@ static DRIVER_INIT( ti990_4 )
 #endif
 }
 
-INPUT_PORTS_START(ti990_4)
+static INPUT_PORTS_START(ti990_4)
 #if VIDEO_911
 	VDT911_KEY_PORTS
 #else

@@ -1471,7 +1471,7 @@ static MACHINE_RESET( einstein2 )
 	einstein_80col_init();
 }
 
-INPUT_PORTS_START(einstein)
+static INPUT_PORTS_START(einstein)
 	/* line 0 */
 	PORT_START
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_LALT) 

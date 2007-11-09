@@ -110,7 +110,7 @@ MACHINE_DRIVER_END
 
 
 
-INPUT_PORTS_START( macplus )
+static INPUT_PORTS_START( macplus )
 	PORT_START /* 0: Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
@@ -423,7 +423,7 @@ static struct MachineDriver machine_driver_mac2 =
 
 //#define input_ports_mac2 NULL
 
-INPUT_PORTS_START( mac2 )
+static INPUT_PORTS_START( mac2 )
 
 INPUT_PORTS_END
 

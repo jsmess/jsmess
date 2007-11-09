@@ -80,7 +80,7 @@ static MACHINE_DRIVER_START( concept )
 MACHINE_DRIVER_END
 
 
-INPUT_PORTS_START( concept )
+static INPUT_PORTS_START( concept )
 
 	PORT_START	/* port 0: keys 0x00 through 0x0f */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(right)") PORT_CODE(KEYCODE_RIGHT)

@@ -65,7 +65,7 @@ ADDRESS_MAP_END
  * terminal to alert the user in case of a BEL.
  */
 
-INPUT_PORTS_START( kaypro )
+static INPUT_PORTS_START( kaypro )
     PORT_START /* IN0 */
     PORT_BIT(0xff, 0xff, IPT_UNUSED)
 

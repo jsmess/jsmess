@@ -79,7 +79,7 @@ static ADDRESS_MAP_START (wswan_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x00, 0xff) AM_READWRITE( wswan_port_r, wswan_port_w )	/* I/O ports */
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( wswan )
+static INPUT_PORTS_START( wswan )
 	PORT_START /* IN 0 : cursors (X1-X4) */
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_NAME("X1 - Up") 
 	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_NAME("X3 - Down") 

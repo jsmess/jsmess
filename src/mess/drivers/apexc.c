@@ -266,7 +266,7 @@ enum
 };
 
 /* fake input ports with keyboard keys */
-INPUT_PORTS_START(apexc)
+static INPUT_PORTS_START(apexc)
 
 	PORT_START	/* 0 : panel control */
 	PORT_BIT(panel_run, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Run/Stop") PORT_CODE(KEYCODE_ENTER)

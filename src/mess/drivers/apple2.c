@@ -284,7 +284,7 @@ static INPUT_PORTS_START( apple2_gameport )
 	//PORT_INCLUDE( apple2_paddle )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( apple2 )
+static INPUT_PORTS_START( apple2 )
     PORT_START_TAG("keyb_0")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x90")		PORT_CODE(KEYCODE_LEFT)
@@ -374,7 +374,7 @@ INPUT_PORTS_START( apple2 )
 	PORT_INCLUDE( apple2_gameport )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( apple2p )
+static INPUT_PORTS_START( apple2p )
 	PORT_INCLUDE( apple2 )
 
 	PORT_START_TAG("reset_dip")
@@ -491,7 +491,7 @@ static INPUT_PORTS_START( apple2_special )
     PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")		PORT_CODE(KEYCODE_F12)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( apple2e )
+static INPUT_PORTS_START( apple2e )
 	PORT_INCLUDE( apple2_common )
 	PORT_INCLUDE( apple2_special )
 	PORT_INCLUDE( apple2_gameport )

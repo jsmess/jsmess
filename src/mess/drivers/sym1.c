@@ -46,7 +46,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 
-INPUT_PORTS_START( sym1 )
+static INPUT_PORTS_START( sym1 )
 	PORT_START			/* IN0 */
 	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("0     USR0") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("4     USR4") PORT_CODE(KEYCODE_4)

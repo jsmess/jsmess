@@ -330,7 +330,7 @@ ADDRESS_MAP_END
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L (EHL)") PORT_CODE(KEYCODE_L) \
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 (") PORT_CODE(KEYCODE_8)
 
-INPUT_PORTS_START(oric)
+static INPUT_PORTS_START(oric)
 	INPUT_PORT_ORIC
 	PORT_START_TAG("oric_floppy_interface")
 	/* floppy interface  */
@@ -350,7 +350,7 @@ INPUT_PORTS_START(oric)
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_VBLANK)
 INPUT_PORTS_END
 
-INPUT_PORTS_START(orica)
+static INPUT_PORTS_START(orica)
 	INPUT_PORT_ORICA
 	PORT_START_TAG("oric_floppy_interface")
 	/* floppy interface  */
@@ -370,7 +370,7 @@ INPUT_PORTS_START(orica)
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_VBLANK)
 INPUT_PORTS_END
 
-INPUT_PORTS_START(prav8d)
+static INPUT_PORTS_START(prav8d)
 	INPUT_PORT_PRAV8D
 	/* force apple2 disc interface for pravetz */
 	PORT_START
@@ -384,7 +384,7 @@ INPUT_PORTS_START(prav8d)
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_VBLANK)
 INPUT_PORTS_END
 
-INPUT_PORTS_START(telstrat)
+static INPUT_PORTS_START(telstrat)
 	INPUT_PORT_ORICA
 	PORT_START
 	/* vsync cable hardware. This is a simple cable connected to the video output

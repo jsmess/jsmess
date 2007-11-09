@@ -114,7 +114,7 @@ ADDRESS_MAP_START( sgx_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* todo: alternate forms of input (multitap, mouse, etc.) */
-INPUT_PORTS_START( pce )
+static INPUT_PORTS_START( pce )
 
     PORT_START  /* Player 1 controls */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */

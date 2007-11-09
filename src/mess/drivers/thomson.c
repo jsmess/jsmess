@@ -139,7 +139,7 @@ static const char layout_thomson[] = "thomson";
   available on the TO7(/70), TO9 and MO5.
 */
 
-INPUT_PORTS_START( thom_game_port )
+static INPUT_PORTS_START( thom_game_port )
 
 /* joysticks, common to CM 90-112 & SX 90-018 */
      PORT_START_TAG ( "game_port_directions" )
@@ -187,7 +187,7 @@ INPUT_PORTS_END
 
 /* ------------ lightpen ------------ */
 
-INPUT_PORTS_START( thom_lightpen )
+static INPUT_PORTS_START( thom_lightpen )
 
      PORT_START_TAG ( "lightpen_x" )
      PORT_BIT ( 0xffff, THOM_TOTAL_WIDTH/2, IPT_LIGHTGUN_X )
@@ -542,7 +542,7 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-INPUT_PORTS_START ( to7_config )
+static INPUT_PORTS_START ( to7_config )
      PORT_START_TAG ( "config" )
 
      PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
@@ -551,7 +551,7 @@ INPUT_PORTS_START ( to7_config )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( to7_vconfig )
+static INPUT_PORTS_START ( to7_vconfig )
      PORT_START_TAG ( "vconfig" )
 
      PORT_CONFNAME ( 0x03, 0x00, "Border" )
@@ -566,7 +566,7 @@ INPUT_PORTS_START ( to7_vconfig )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( to7_mconfig )
+static INPUT_PORTS_START ( to7_mconfig )
      PORT_START_TAG ( "mconfig" )
 
      PORT_CONFNAME ( 0x01, 0x01, "E7FE-F port" )
@@ -575,7 +575,7 @@ INPUT_PORTS_START ( to7_mconfig )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( to7_fconfig )
+static INPUT_PORTS_START ( to7_fconfig )
      PORT_START_TAG ( "fconfig" )
 
      PORT_CONFNAME ( 0x07, 0x03, "Floppy (reset)" )
@@ -623,7 +623,7 @@ INPUT_PORTS_START ( to7_fconfig )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START ( to7_keyboard )
+static INPUT_PORTS_START ( to7_keyboard )
      PORT_START_TAG ( "keyboard_0" )
      KEY ( 0, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
      PORT_BIT  ( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -697,7 +697,7 @@ INPUT_PORTS_START ( to7_keyboard )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( to7 )
+static INPUT_PORTS_START ( to7 )
      PORT_INCLUDE ( thom_lightpen )
      PORT_INCLUDE ( thom_game_port )
      PORT_INCLUDE ( to7_keyboard )
@@ -707,7 +707,7 @@ INPUT_PORTS_START ( to7 )
      PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( t9000 )
+static INPUT_PORTS_START ( t9000 )
      PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
@@ -895,7 +895,7 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-INPUT_PORTS_START ( to770 )
+static INPUT_PORTS_START ( to770 )
      PORT_INCLUDE ( to7 )
 
      PORT_MODIFY ( "keyboard_1" )
@@ -913,7 +913,7 @@ INPUT_PORTS_START ( to770 )
 INPUT_PORTS_END
 
 /* arabic version (QWERTY keyboard) */
-INPUT_PORTS_START ( to770a )
+static INPUT_PORTS_START ( to770a )
      PORT_INCLUDE ( to770 )
 
      PORT_MODIFY ( "keyboard_1" )
@@ -1097,7 +1097,7 @@ ROM_END
 
 /* ------------ inputs  ------------ */
 
-INPUT_PORTS_START ( mo5 )
+static INPUT_PORTS_START ( mo5 )
      PORT_INCLUDE ( to770 )
 
      PORT_MODIFY ( "keyboard_0" )
@@ -1107,7 +1107,7 @@ INPUT_PORTS_START ( mo5 )
 INPUT_PORTS_END
 
 /* QWERTY version */
-INPUT_PORTS_START ( mo5e )
+static INPUT_PORTS_START ( mo5e )
      PORT_INCLUDE ( mo5 )
 
      PORT_MODIFY ( "keyboard_1" )
@@ -1341,7 +1341,7 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-INPUT_PORTS_START ( to9_keyboard )
+static INPUT_PORTS_START ( to9_keyboard )
      PORT_START_TAG ( "keyboard_0" )
      KEY ( 0, "F2 F7", F2 )           PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
      KEY ( 1, "_ 6", 6 )              PORT_CHAR('_') PORT_CHAR('6') 
@@ -1434,7 +1434,7 @@ INPUT_PORTS_START ( to9_keyboard )
      KEY ( 7, "> <", BACKSLASH2 )     PORT_CHAR('>') PORT_CHAR('<') 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( to9_fconfig )
+static INPUT_PORTS_START ( to9_fconfig )
      PORT_START_TAG ( "fconfig" )
 
      PORT_CONFNAME ( 0x07, 0x00, "External floppy (reset)" )
@@ -1481,7 +1481,7 @@ INPUT_PORTS_START ( to9_fconfig )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( to9 )
+static INPUT_PORTS_START ( to9 )
      PORT_INCLUDE ( thom_lightpen )
      PORT_INCLUDE ( thom_game_port )
      PORT_INCLUDE ( to9_keyboard )
@@ -1695,7 +1695,7 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-INPUT_PORTS_START ( to8_config )
+static INPUT_PORTS_START ( to8_config )
      PORT_START_TAG ( "config" )
 
      PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
@@ -1709,7 +1709,7 @@ INPUT_PORTS_START ( to8_config )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START ( to8 )
+static INPUT_PORTS_START ( to8 )
      PORT_INCLUDE ( thom_lightpen )
      PORT_INCLUDE ( thom_game_port )
      PORT_INCLUDE ( to9_keyboard )
@@ -1720,7 +1720,7 @@ INPUT_PORTS_START ( to8 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START ( to8d )
+static INPUT_PORTS_START ( to8d )
      PORT_INCLUDE ( to8 )
 INPUT_PORTS_END
 
@@ -1877,7 +1877,7 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-INPUT_PORTS_START ( to9p )
+static INPUT_PORTS_START ( to9p )
      PORT_INCLUDE ( thom_lightpen )
      PORT_INCLUDE ( thom_game_port )
      PORT_INCLUDE ( to9_keyboard )
@@ -2080,7 +2080,7 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-INPUT_PORTS_START ( mo6_keyboard )
+static INPUT_PORTS_START ( mo6_keyboard )
 
      PORT_START_TAG ( "keyboard_0" )
      KEY ( 0, "N", N )                   PORT_CHAR('N')
@@ -2168,7 +2168,7 @@ INPUT_PORTS_START ( mo6_keyboard )
 INPUT_PORTS_END
 
 /* QWERTY version */
-INPUT_PORTS_START ( pro128_keyboard )
+static INPUT_PORTS_START ( pro128_keyboard )
      PORT_INCLUDE ( mo6_keyboard )
 
      PORT_MODIFY ( "keyboard_0" )
@@ -2213,7 +2213,7 @@ INPUT_PORTS_START ( pro128_keyboard )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START ( mo6 )
+static INPUT_PORTS_START ( mo6 )
      PORT_INCLUDE ( thom_lightpen )
      PORT_INCLUDE ( thom_game_port )
      PORT_INCLUDE ( mo6_keyboard )
@@ -2222,7 +2222,7 @@ INPUT_PORTS_START ( mo6 )
      PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( pro128 )
+static INPUT_PORTS_START ( pro128 )
      PORT_INCLUDE ( thom_lightpen )
      PORT_INCLUDE ( thom_game_port )
      PORT_INCLUDE ( pro128_keyboard )
@@ -2374,7 +2374,7 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-INPUT_PORTS_START ( mo5nr_keyboard )
+static INPUT_PORTS_START ( mo5nr_keyboard )
 
      PORT_START_TAG ( "keyboard_0" )
      KEY ( 0, "N", N )                   PORT_CHAR('N')
@@ -2455,7 +2455,7 @@ INPUT_PORTS_START ( mo5nr_keyboard )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START ( mo5nr )
+static INPUT_PORTS_START ( mo5nr )
      PORT_INCLUDE ( thom_lightpen )
      PORT_INCLUDE ( thom_game_port )
      PORT_INCLUDE ( mo5nr_keyboard )

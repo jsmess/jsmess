@@ -39,7 +39,7 @@ ADDRESS_MAP_END
      7  8  9
     Cl  0 En                                                                  */
 
-INPUT_PORTS_START( arcadia )
+static INPUT_PORTS_START( arcadia )
 	PORT_START_TAG("panel")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Start")           PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Option")          PORT_CODE(KEYCODE_O)
@@ -166,7 +166,7 @@ INPUT_PORTS_END
      7  8  9
     10 11 12                                                                           */
 
-INPUT_PORTS_START( vcg )
+static INPUT_PORTS_START( vcg )
 	PORT_START_TAG("panel")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Start")        PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Selector A")   PORT_CODE(KEYCODE_A)

@@ -401,7 +401,7 @@ N/C - Not connected or just dont know!
 */
 
 
-INPUT_PORTS_START( ep128 )
+static INPUT_PORTS_START( ep128 )
 	/* keyboard line 0 */
 	 PORT_START
 	 PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n") PORT_CODE(KEYCODE_N)

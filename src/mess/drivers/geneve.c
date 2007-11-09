@@ -250,7 +250,7 @@ ADDRESS_MAP_END
 */
 
 /* 101-key PC XT keyboard + TI joysticks */
-INPUT_PORTS_START(geneve)
+static INPUT_PORTS_START(geneve)
 
 	PORT_START	/* config */
 		PORT_BIT( config_speech_mask << config_speech_bit, 1 << config_speech_bit, IPT_DIPSWITCH_NAME) PORT_NAME("Speech synthesis")

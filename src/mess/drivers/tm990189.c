@@ -892,7 +892,7 @@ ROM_END
 #define JOYSTICK_DELTA			10
 #define JOYSTICK_SENSITIVITY	100
 
-INPUT_PORTS_START(tm990_189)
+static INPUT_PORTS_START(tm990_189)
 
 	/* 45-key calculator-like alphanumeric keyboard... */
 

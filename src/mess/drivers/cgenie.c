@@ -63,7 +63,7 @@ static ADDRESS_MAP_START (cgenie_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xff, 0xff) AM_READWRITE( cgenie_port_ff_r, cgenie_port_ff_w )
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( cgenie )
+static INPUT_PORTS_START( cgenie )
 	PORT_START /* IN0 */
 	PORT_DIPNAME(	  0x80, 0x80, "Floppy Disc Drives")
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )

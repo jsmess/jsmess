@@ -660,7 +660,7 @@ ADDRESS_MAP_START( exidy_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xff, 0xff) AM_READWRITE( exidy_ff_port_r, exidy_ff_port_w )
 ADDRESS_MAP_END
 
-INPUT_PORTS_START(exidy)
+static INPUT_PORTS_START(exidy)
 	PORT_START
 	/* vblank */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK)
