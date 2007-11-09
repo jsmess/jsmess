@@ -351,15 +351,16 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 	{
 		struct timespec   ts;
 		struct timeval    tp;
-		osd_ticks_t t;
-		osd_ticks_t msec = timeout * 1000 / osd_ticks_per_second();
-
+		UINT64 t;
+		UINT64 msec = timeout * 1000 / osd_ticks_per_second();
+		UINT64 nsec;
+		
 		gettimeofday(&tp, NULL);
 
 		ts.tv_sec  = tp.tv_sec;
-		ts.tv_nsec = tp.tv_usec * 1000 + (msec * 1000000);
-		t = ts.tv_nsec / 1000000000;
-		ts.tv_nsec = t % 1000000000;
+		nsec = (UINT64) tp.tv_usec * (UINT64) 1000 + (msec * (UINT64) 1000000);
+		t = nsec / (UINT64) 1000000000;
+		ts.tv_nsec = t % (UINT64) 1000000000;
 		ts.tv_sec += t;
 
 		if (!event->signalled)
@@ -379,7 +380,10 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 				if (ret == 0)
 					break;
 				if ( ret != EINTR)
-					printf("Error %d while waiting for pthread_cond_timedwait\n", ret);
+				{
+					printf("Error %d while waiting for pthread_cond_timedwait: %d - %s\n", ret, (int) t, strerror(ret));
+				}
+					
 			} while (TRUE);
 		}
 	}

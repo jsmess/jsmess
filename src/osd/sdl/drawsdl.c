@@ -1494,14 +1494,27 @@ static inline int get_valid_pow2_value(int v, int needPow2)
 }
 
 static void texture_compute_size_subroutine(sdl_info *sdl, texture_info *texture, UINT32 flags,
-                                            int width, int height,
+                                            UINT32 width, UINT32 height,
                                             int* p_width, int* p_height, int* p_width_create, int* p_height_create) 
 {
-        int width_create = width;
-        int height_create= height;
+        int width_create;
+        int height_create;
 
-	width_create  = get_valid_pow2_value (width,  texture->texpow2);
-	height_create = get_valid_pow2_value (height, texture->texpow2);
+	if ( texture->texpow2 ) 
+        {
+                width_create  = gl_round_to_pow2 (width);
+                height_create = gl_round_to_pow2 (height);
+        } else if ( texture->type==TEXTURE_TYPE_SHADER ) 
+        {
+                /**
+                 * at least use a multiple of 8 for shader .. just in case
+                 */
+                width_create  = ( width  & ~0x07 ) + ( (width  & 0x07)? 8 : 0 ) ;
+                height_create = ( height & ~0x07 ) + ( (height & 0x07)? 8 : 0 ) ;
+        } else {
+                width_create  = width  ;
+                height_create = height ;
+        }
 
 	// don't prescale above max texture size
 	while (texture->xprescale > 1 && width_create * texture->xprescale > sdl->texture_max_width)
@@ -1739,14 +1752,13 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 	lut_texture_width  = sqrt((double)(texture->lut_table_width));
 	lut_texture_width  = get_valid_pow2_value (lut_texture_width, 1);
 
-	if ( lut_texture_width*lut_texture_width < texture->lut_table_width )
+	texture->lut_table_height = texture->lut_table_width / lut_texture_width;
+
+	if ( lut_texture_width*texture->lut_table_height < texture->lut_table_width )
 	{
-		texture->lut_table_height  = 1;
-	} else {
-		texture->lut_table_height  = 0;
+		texture->lut_table_height  += 1;
 	}
 
-	texture->lut_table_height += texture->lut_table_width / lut_texture_width;
 	texture->lut_table_width   = lut_texture_width;
 
 	/**
@@ -1966,8 +1978,8 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 					   texture->texProperties[SDL_TEXFORMAT_TYPE], 
 					   &_width, &_height, 1) )
 		{
-			mame_printf_error("cannot create lut table texture, req: %dx%d, avail: %dx%d - bail out\n",
-				lut_table_width_pow2, lut_table_height_pow2, (int)_width, (int)_height);
+			mame_printf_error("cannot create bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
+				texture->rawwidth_create, texture->rawheight_create, (int)_width, (int)_height);
 			return -1;
 		}
 
