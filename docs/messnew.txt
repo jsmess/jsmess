@@ -1,4 +1,4 @@
-0.120.1
+﻿0.120.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -33,7 +33,7 @@ System Driver Changes:
 
 - [ATARIST] Implemented iKBD<->68000 communications, so the keyboard is working now. [Curt Coder]
 
-- [MEPHISTO] Implemented artwork/code for real chess board usage. [Ralf Schfer, Cowering]
+- [MEPHISTO] Implemented artwork/code for real chess board usage. [Ralf Schäfer, Cowering]
 
 User Interface Changes:
 -----------------------
@@ -5643,7 +5643,7 @@ Other Changes:
   *"Engine" is separate from the "shell"; which gives the potential for front ends for 
    those who don't like command lines. [Nate Woods]
 
-- Disk write support for AMSTRAD CPC [Oscar Mart�ín González]
+- Disk write support for AMSTRAD CPC [Oscar Martín González]
 
 - Wave timer fix [Oscar Martín González]
 
