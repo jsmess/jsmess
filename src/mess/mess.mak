@@ -6,49 +6,6 @@
 #
 ###########################################################################
 
-MAMESRC = $(SRC)/mame
-MAMEOBJ = $(OBJ)/mame
-MESSSRC = $(SRC)/mess
-MESSOBJ = $(OBJ)/mess
-EMUSRC = $(SRC)/emu
-EMUOBJ = $(OBJ)/emu
-
-EMU_AUDIO = $(EMUOBJ)/audio
-EMU_MACHINE = $(EMUOBJ)/machine
-EMU_VIDEO = $(EMUOBJ)/video
-MAME_AUDIO = $(MAMEOBJ)/audio
-MAME_MACHINE = $(MAMEOBJ)/machine
-MAME_DRIVERS = $(MAMEOBJ)/drivers
-MAME_VIDEO = $(MAMEOBJ)/video
-
-MESS_AUDIO = $(MESSOBJ)/audio
-MESS_DEVICES = $(MESSOBJ)/devices
-MESS_DRIVERS = $(MESSOBJ)/drivers
-MESS_FORMATS = $(MESSOBJ)/formats
-MESS_LAYOUT = $(MESSOBJ)/layout
-MESS_MACHINE = $(MESSOBJ)/machine
-MESS_VIDEO = $(MESSOBJ)/video
-
-OBJDIRS += \
-	$(EMU_AUDIO) \
-	$(EMU_MACHINE) \
-	$(EMU_VIDEO) \
-	$(MAME_AUDIO) \
-	$(MAME_DRIVERS) \
-	$(MAME_LAYOUT) \
-	$(MAME_MACHINE) \
-	$(MAME_VIDEO) \
-	$(MESS_AUDIO) \
-	$(MESS_DEVICES) \
-	$(MESS_DRIVERS) \
-	$(MESS_FORMATS) \
-	$(MESS_LAYOUT) \
-	$(MESS_MACHINE) \
-	$(MESS_VIDEO) \
-	$(MESSOBJ)/tools/dat2html \
-	$(MESSOBJ)/tools/imgtool
-
-
 
 #-------------------------------------------------
 # specify available CPU cores; some of these are
@@ -1176,13 +1133,18 @@ $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 
 $(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
 
-include src/mess/tools/imgtool/imgtool.mak
-include src/mess/tools/messtest/messtest.mak
-include src/mess/tools/messdocs/messdocs.mak
+
+#-------------------------------------------------
+# MESS-specific tools
+#-------------------------------------------------
+
+include $(MESSSRC)/tools/imgtool/imgtool.mak
+include $(MESSSRC)/tools/messtest/messtest.mak
+include $(MESSSRC)/tools/messdocs/messdocs.mak
 
 # include OS-specific MESS stuff
 ifeq ($(OSD),windows)
-include $(SRC)/mess/tools/imgtool/windows/wimgtool.mak
+include $(MESSSRC)/tools/imgtool/windows/wimgtool.mak
 endif
 
 # text files
@@ -1196,12 +1158,7 @@ sysinfo.htm: dat2html$(EXE)
 	@echo Generating $@...
 	@$(CURPATH)dat2html$(EXE) sysinfo.dat
 
-
-
-#-------------------------------------------------
-# MESS tool targets
-#-------------------------------------------------
-
+# tool targets
 TOOLS += dat2html$(EXE) messtest$(EXE) messdocs$(EXE) imgtool$(EXE)
 
 ifeq ($(OSD),windows)
@@ -1209,16 +1166,18 @@ TOOLS += wimgtool$(EXE)
 endif
 
 
-
 #-------------------------------------------------
 # dat2html
 #-------------------------------------------------
 
+OBJDIRS += \
+	$(MESSOBJ)/tools/dat2html \
+
 DAT2HTML_OBJS =								\
-	$(OBJ)/emu/mamecore.o					\
-	$(OBJ)/mess/tools/dat2html/dat2html.o	\
-	$(OBJ)/mess/tools/imgtool/stubs.o		\
-	$(OBJ)/mess/utils.o						\
+	$(EMUOBJ)/mamecore.o					\
+	$(MESSOBJ)/tools/dat2html/dat2html.o	\
+	$(MESSOBJ)/tools/imgtool/stubs.o		\
+	$(MESSOBJ)/utils.o						\
 
 dat2html$(EXE):	$(DAT2HTML_OBJS) $(LIBUTIL) $(ZLIB) $(LIBOCORE)
 	@echo Linking $@...

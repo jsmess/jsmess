@@ -167,8 +167,10 @@ static UINT32 menu_quit_game(UINT32 state);
 static UINT32 menu_select_game(UINT32 state);
 #ifdef MESS
 static UINT32 menu_file_manager(UINT32 state);
+#if HAS_WAVE
 static UINT32 menu_tape_control(UINT32 state);
-#endif
+#endif /* HAS_WAVE */
+#endif /* MESS */
 
 /* menu helpers */
 static void menu_render_triangle(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
@@ -1727,6 +1729,7 @@ static UINT32 menu_file_manager(UINT32 state)
 -------------------------------------------------*/
 
 #ifdef MESS
+#if HAS_WAVE
 static UINT32 menu_tape_control(UINT32 state)
 {
 	int result = tapecontrol(state);
@@ -1734,7 +1737,8 @@ static UINT32 menu_tape_control(UINT32 state)
 	return ui_menu_stack_pop();
 	return result;
 }
-#endif
+#endif /* HAS_WAVE */
+#endif /* MESS */
 
 
 

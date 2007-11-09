@@ -1,3 +1,16 @@
+###########################################################################
+#
+#   imgtool.mak
+#
+#   MESS imgtool makefile
+#
+###########################################################################
+
+
+OBJDIRS += \
+	$(MESSOBJ)/tools/imgtool
+
+
 IMGTOOL_LIB_OBJS =							\
 	$(OBJ)/emu/mamecore.o					\
 	$(OBJ)/version.o						\
