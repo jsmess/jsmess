@@ -503,18 +503,18 @@ SYSTEM_CONFIG_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT    BIOS COMPAT  MACHINE   INPUT   INIT  CONFIG    COMPANY                   FULLNAME                          FLAGS */
-COMP( 1983, laser110,        0,           0, laser110, vtech1, NULL, laser110, "Video Technology",       "Laser 110"                     , 0)
-COMP( 1983, las110de, laser110,           0, laser110, vtech1, NULL, laser110, "Sanyo",                  "Laser 110 (Germany)"           , 0)
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY                     FULLNAME                            FLAGS */
+COMP( 1983, laser110,   0,          0,      laser110,   vtech1, NULL,   laser110,   "Video Technology",         "Laser 110",                        0 )
+COMP( 1983, las110de,   laser110,   0,      laser110,   vtech1, NULL,   laser110,   "Sanyo",                    "Laser 110 (Germany)",              0 )
 
-COMP( 1983, laser200,        0,           0, laser200, vtech1, NULL, laser110, "Video Technology",       "Laser 200"                     , 0)
-COMP( 1983, vz200de,  laser200,           0, laser200, vtech1, NULL, laser110, "Video Technology",       "VZ-200 (Germany & Netherlands)", 0)
-COMP( 1983, fellow,   laser200,           0, laser200, vtech1, NULL, laser110, "Salora",                 "Fellow (Finland)"              , 0)
-COMP( 1983, tx8000,   laser200,           0, laser200, vtech1, NULL, laser110, "Texet",                  "TX-8000 (UK)"                  , 0)
+COMP( 1983, laser200,   0,          0,      laser200,   vtech1, NULL,   laser110,   "Video Technology",         "Laser 200",                        0 )
+COMP( 1983, vz200de,    laser200,   0,      laser200,   vtech1, NULL,   laser110,   "Video Technology",         "VZ-200 (Germany & Netherlands)",   0 )
+COMP( 1983, fellow,     laser200,   0,      laser200,   vtech1, NULL,   laser110,   "Salora",                   "Fellow (Finland)",                 0 )
+COMP( 1983, tx8000,     laser200,   0,      laser200,   vtech1, NULL,   laser110,   "Texet",                    "TX-8000 (UK)",                     0 )
 
-COMP( 1984, laser210,        0,           0, laser210, vtech1, NULL, laser210, "Video Technology",       "Laser 210"                     , 0)
-COMP( 1984, vz200,    laser210,           0, laser210, vtech1, NULL, laser210, "Dick Smith Electronics", "VZ-200 (Oceania)"              , 0)
-COMP( 1984, las210de, laser210,           0, laser210, vtech1, NULL, laser210, "Sanyo",                  "Laser 210 (Germany)"           , 0)
+COMP( 1984, laser210,   0,          0,      laser210,   vtech1, NULL,   laser210,   "Video Technology",         "Laser 210",                        0 )
+COMP( 1984, vz200,      laser210,   0,      laser210,   vtech1, NULL,   laser210,   "Dick Smith Electronics",   "VZ-200 (Oceania)",                 0 )
+COMP( 1984, las210de,   laser210,   0,      laser210,   vtech1, NULL,   laser210,   "Sanyo",                    "Laser 210 (Germany)",              0 )
 
-COMPB(1984, laser310,        0, laser310, 0, laser310, vtech1, NULL, laser310, "Video Technology",       "Laser 310"                     , 0)
-COMPB(1984, vz300,    laser310, laser310, 0, laser310, vtech1, NULL, laser310, "Dick Smith Electronics", "VZ-300 (Oceania)"              , 0)
+COMP( 1984, laser310,   0,          0,      laser310,   vtech1, NULL,   laser310,   "Video Technology",         "Laser 310",                        0 )
+COMP( 1984, vz300,      laser310,   0,      laser310,   vtech1, NULL,   laser310,   "Dick Smith Electronics",   "VZ-300 (Oceania)",                 0 )

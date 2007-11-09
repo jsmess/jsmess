@@ -96,47 +96,7 @@ const game_driver driver_##NAME = 	\
 	NULL									\
 };
 
-#define CONSB(YEAR,NAME,PARENT,BIOS,COMPAT,MACHINE,INPUT,INIT,CONFIG,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver driver_##NAME;   \
-const game_driver driver_##NAME = 	\
-{											\
-	__FILE__,								\
-	#PARENT,								\
-	#NAME,									\
-	FULLNAME,								\
-	#YEAR,									\
-	COMPANY,								\
-	construct_##MACHINE,					\
-	ipt_##INPUT,							\
-	driver_init_##INIT,						\
-	rom_##NAME,								\
-	construct_sysconfig_##CONFIG,			\
-	#COMPAT,								\
-	ROT0|(FLAGS),							\
-	NULL									\
-};
-
 #define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,CONFIG,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver driver_##NAME;   \
-const game_driver driver_##NAME = 	\
-{											\
-	__FILE__,								\
-	#PARENT,								\
-	#NAME,									\
-	FULLNAME,								\
-	#YEAR,									\
-	COMPANY,								\
-	construct_##MACHINE,					\
-	ipt_##INPUT,							\
-	driver_init_##INIT,						\
-	rom_##NAME,								\
-	construct_sysconfig_##CONFIG,			\
-	#COMPAT,								\
-	ROT0|GAME_COMPUTER|(FLAGS),				\
-	NULL									\
-};
-
-#define COMPB(YEAR,NAME,PARENT,BIOS,COMPAT,MACHINE,INPUT,INIT,CONFIG,COMPANY,FULLNAME,FLAGS)	\
 extern const game_driver driver_##NAME;   \
 const game_driver driver_##NAME = 	\
 {											\
@@ -159,5 +119,3 @@ const game_driver driver_##NAME = 	\
 #define construct_sysconfig_NULL	(NULL)
 
 #endif /* MESSDRV_H */
-
-

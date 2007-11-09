@@ -379,5 +379,5 @@ SYSTEM_CONFIG_START(dgnbeta)
 	CONFIG_DEVICE( dgnbeta_floppy_getinfo )
 SYSTEM_CONFIG_END
 
-/*      YEAR	NAME		PARENT	BIOS		COMPAT		MACHINE    	INPUT		INIT    CONFIG		COMPANY			FULLNAME */
-COMPB(  1984,	dgnbeta,	0,	dgnbeta,	0,		dgnbeta,	dgnbeta,	0,	dgnbeta,	"Dragon Data Ltd",    "Dragon Beta Prototype" , 0)
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME                    FLAGS */
+COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta,    0,      dgnbeta,    "Dragon Data Ltd",  "Dragon Beta Prototype",    0 )

@@ -431,6 +431,6 @@ static DRIVER_INIT( tmc2000 )
 
 /* System Drivers */
 
-//	   YEAR  NAME 	  PARENT   BIOS		COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY			FULLNAME
-COMP(  1977, tmc1800, 0,				0,		tmc1800,	tmc1800,	tmc1800,	tmc1800,	"Telercas Oy",	"Telmac 1800", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMPB( 1980, tmc2000, 0,       tmc2000, 0,		tmc2000,	tmc1800,	tmc2000,	tmc2000,	"Telercas Oy",	"Telmac 2000", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY         FULLNAME        FLAGS */
+COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    tmc1800,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc1800,    tmc2000,    tmc2000,    "Telercas Oy",  "Telmac 2000",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

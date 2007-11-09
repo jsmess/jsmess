@@ -372,6 +372,6 @@ SYSTEM_CONFIG_START(c65)
 	CONFIG_RAM((128 + 4096) * 1024)
 SYSTEM_CONFIG_END
 
-/*		YEAR	NAME	PARENT	BIOS	COMPAT	MACHINE INPUT	INIT		CONFIG  COMPANY 							FULLNAME */
-COMPB( 1991,	c65,	0,		c65,    0,		c65,	c65,	c65,		c65,	"Commodore Electronics, Ltd.",  "The Commodore 65 Development System (Prototype, NTSC)",			GAME_NOT_WORKING )
-COMP ( 1991,	c64dx,  c65,			0,		c65pal, c65ger, c65pal, 	c65,	"Commodore Electronics, Ltd.",  "The Commodore 64DX Development System (Prototype, PAL, German)",	GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                         FULLNAME                                                            FLAGS */
+COMP( 1991, c65,    0,      0,      c65,    c65,    c65,    c65,    "Commodore Electronics, Ltd.",  "The Commodore 65 Development System (Prototype, NTSC)",            GAME_NOT_WORKING )
+COMP( 1991, c64dx,  c65,    0,      c65pal, c65ger, c65pal, c65,    "Commodore Electronics, Ltd.",  "The Commodore 64DX Development System (Prototype, PAL, German)",   GAME_NOT_WORKING )

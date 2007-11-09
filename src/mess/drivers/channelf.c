@@ -285,7 +285,5 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT    BIOS      COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY      FULLNAME */
-CONSB( 1976, channelf, 0,        channelf, 0,        channelf, channelf, 0,        channelf, "Fairchild", "Channel F" , 0)
-
-
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY         FULLNAME        FLAGS */
+CONS( 1976, channelf,   0,      0,      channelf,   channelf,   0,      channelf,   "Fairchild",    "Channel F",    0 )

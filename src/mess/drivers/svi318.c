@@ -462,7 +462,7 @@ SYSTEM_CONFIG_START(svi328)
 	CONFIG_RAM( 192 * 1024 )
 SYSTEM_CONFIG_END
 
-/*   YEAR  NAME     PARENT  	BIOS	COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY FULLNAME */
-COMP( 1983, svi318,       0,      	0, 	svi318,  svi318, svi318, svi318, "Spectravideo", "SVI-318 (SV BASIC v1.0)" , 0)
-COMPB(1983, svi328,  svi318,	svi328,	0, 	svi318,  svi328, svi318, svi328, "Spectravideo", "SVI-328" , 0)
-COMPB(1983, svi328b, svi318,	svi328b,0, 	svi328b, svi328, svi318, svi328, "Spectravideo", "SVI-328 + 80 column card", GAME_NOT_WORKING  )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY         FULLNAME                    FLAGS */
+COMP( 1983, svi318,     0,      0,      svi318,     svi318, svi318, svi318, "Spectravideo", "SVI-318 (SV BASIC v1.0)",  0 )
+COMP( 1983, svi328,     svi318, 0,      svi318,     svi328, svi318, svi328, "Spectravideo", "SVI-328",                  0 )
+COMP( 1983, svi328b,    svi318, 0,      svi328b,    svi328, svi318, svi328, "Spectravideo", "SVI-328 + 80 column card", GAME_NOT_WORKING )

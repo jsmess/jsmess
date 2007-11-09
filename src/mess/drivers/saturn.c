@@ -2399,9 +2399,9 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  BIOS      COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY    FULLNAME          FLAGS */
-CONSB(1994, saturn,        0,   saturn,      0, saturn, saturn, saturnus, saturn, "Sega",    "Saturn (USA)",   GAME_NOT_WORKING)
-CONSB(1994, saturnjp, saturn, saturnjp,      0, saturn, saturn, saturnjp, saturn, "Sega",    "Saturn (Japan)", GAME_NOT_WORKING)
-CONSB(1994, saturneu, saturn,   saturn,      0, saturn, saturn, saturneu, saturn, "Sega",    "Saturn (PAL)",   GAME_NOT_WORKING)
-CONS( 1995, vsaturn,  saturn,                0, saturn, saturn, saturnjp, saturn, "JVC",     "V-Saturn",       GAME_NOT_WORKING)
-CONS( 1995, hisaturn, saturn,                0, saturn, saturn, saturnjp, saturn, "Hitachi", "HiSaturn",       GAME_NOT_WORKING)
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT        CONFIG  COMPANY     FULLNAME            FLAGS */
+CONS( 1994, saturn,     0,      0,      saturn, saturn, saturnus,   saturn, "Sega",     "Saturn (USA)",     GAME_NOT_WORKING )
+CONS( 1994, saturnjp,   saturn, 0,      saturn, saturn, saturnjp,   saturn, "Sega",     "Saturn (Japan)",   GAME_NOT_WORKING )
+CONS( 1994, saturneu,   saturn, 0,      saturn, saturn, saturneu,   saturn, "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
+CONS( 1995, vsaturn,    saturn, 0,      saturn, saturn, saturnjp,   saturn, "JVC",      "V-Saturn",         GAME_NOT_WORKING )
+CONS( 1995, hisaturn,   saturn, 0,      saturn, saturn, saturnjp,   saturn, "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )

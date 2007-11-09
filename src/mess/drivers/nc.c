@@ -1851,6 +1851,6 @@ SYSTEM_CONFIG_START(nc200)
 	CONFIG_DEVICE(nc200_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME       PARENT  BIOS 	COMPAT	MACHINE    INPUT     INIT     CONFIG,  COMPANY               FULLNAME */
-COMPB(1992, nc100,     0,      nc100,	0,	nc100,     nc100,    0,       nc100,   "Amstrad plc", "NC100", 0)
-COMP( 1993, nc200,     0,      	0,	nc200,     nc200,    0,       nc200,   "Amstrad plc", "NC200", 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
+COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      nc100,  "Amstrad plc",  "NC100",    0 )
+COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      nc200,  "Amstrad plc",  "NC200",    0 )

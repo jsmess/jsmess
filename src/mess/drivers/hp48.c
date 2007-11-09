@@ -246,6 +246,6 @@ ROM_START(hp48g)
 	ROM_REGION(0x100,REGION_GFX1,0)
 ROM_END
 
-/*   YEAR   NAME	PARENT	BIOS	COMPAT	MACHINE	INPUT	INIT	CONFIG	MONITOR	COMPANY   FULLNAME */
-COMPB(1989, hp48s,	0,	hp48s,	0,	hp48s,	hp48s,	hp48s,	NULL,	"Hewlett Packard",  "HP48S/SX", GAME_NOT_WORKING)
-COMPB(1993, hp48g,	0,	hp48g,	0,	hp48g,	hp48s,	hp48g,	NULL,	"Hewlett Packard",  "HP48G/GX", GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
+COMP( 1989, hp48s,  0,      0,      hp48s,  hp48s,  hp48s,  NULL,   "Hewlett Packard",  "HP48S/SX", GAME_NOT_WORKING )
+COMP( 1993, hp48g,  0,      0,      hp48g,  hp48s,  hp48g,  NULL,   "Hewlett Packard",  "HP48G/GX", GAME_NOT_WORKING )

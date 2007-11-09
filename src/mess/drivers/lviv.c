@@ -503,5 +503,5 @@ SYSTEM_CONFIG_START(lviv)
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME      PARENT    BIOS    COMPAT  MACHINE   INPUT     INIT                CONFIG          COMPANY          FULLNAME */
-COMPB( 1989,	lviv,	0,      lviv,      0,		lviv,      lviv,     0,       lviv,    "V. I. Lenin",	"Lviv" , 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
+COMP( 1989, lviv,   0,      0,      lviv,   lviv,   0,      lviv,   "V. I. Lenin",  "Lviv" ,    0 )

@@ -474,12 +474,12 @@ SYSTEM_CONFIG_END
 
 /* Computer Drivers */
 
-/*     YEAR  NAME    PARENT	BIOS  COMPAT	MACHINE  INPUT	INIT	CONFIG	COMPANY					 FULLNAME */
-COMPB( 1984, ql,     0,		ql,	  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (UK)", GAME_NOT_WORKING )
-COMP ( 1985, ql_jsu, ql,		  0,		ql_ntsc, ql,	0,		ql,		"Sinclair Research Ltd", "QL (USA)", GAME_NOT_WORKING )
-COMP ( 1985, ql_mge, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Spain)", GAME_NOT_WORKING )
-COMP ( 1985, ql_mgf, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (France)", GAME_NOT_WORKING )
-COMP ( 1985, ql_mgg, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Germany)", GAME_NOT_WORKING )
-COMP ( 1985, ql_mgi, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Italy)", GAME_NOT_WORKING )
-COMP ( 1985, ql_mgs, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Sweden)", GAME_NOT_WORKING )
-COMP ( 1985, ql_efp, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Mexico)", GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY                     FULLNAME        FLAGS */
+COMP( 1984, ql,     0,      0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (UK)",      GAME_NOT_WORKING )
+COMP( 1985, ql_jsu, ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_NOT_WORKING )
+COMP( 1985, ql_mge, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_NOT_WORKING )
+COMP( 1985, ql_mgf, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_NOT_WORKING )
+COMP( 1985, ql_mgg, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_NOT_WORKING )
+COMP( 1985, ql_mgi, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_NOT_WORKING )
+COMP( 1985, ql_mgs, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NOT_WORKING )
+COMP( 1985, ql_efp, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Mexico)",  GAME_NOT_WORKING )
