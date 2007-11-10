@@ -18,12 +18,12 @@
 	Kevin Thacker [MESS driver]
 
   May-June 2004 - Yoann Courtois (aka Papagayo/ex GMC/ex PARADOX) - rewritting some code with hardware documentation from http://andercheran.aiind.upv.es/~amstrad
-  
+
   June 2006  - Very preliminary CPC+ support.  CPR cart image handling, secondary ROM register, ASIC unlock detection
-               Supported:  
-			   12-bit palette, 
+               Supported:
+			   12-bit palette,
 			   12-bit hardware sprites (largely works from what I've seen, some games have display issues),
-			   Programmable Raster Interrupt (seems to work), 
+			   Programmable Raster Interrupt (seems to work),
 			   Split screen registers,
 			   Soft scroll registers (only byte-by-byre horizontally for now),
 			   Analogue controls (may well be completely wrong, I have no idea on how these should work),
@@ -115,8 +115,8 @@ int amstrad_plus_scroll_y;  // soft scroll - vertical (0-7), in scanlines
 int amstrad_plus_scroll_border;  // soft scroll - extend border, any program that uses soft scrolling should enable this
 int amstrad_plus_dma_status;
 int amstrad_plus_dma_0_addr;   // DMA channel address
-int amstrad_plus_dma_1_addr; 
-int amstrad_plus_dma_2_addr; 
+int amstrad_plus_dma_1_addr;
+int amstrad_plus_dma_2_addr;
 int amstrad_plus_dma_prescaler[3];  // DMA channel prescaler
 int amstrad_plus_dma_clear;  // set if DMA interrupts are to be cleared automatically
 
@@ -151,7 +151,7 @@ static unsigned char previous_printer_data_byte;
   ------------------*/
 /* current selected upper rom */
 static unsigned char *Amstrad_UpperRom;
-/* There are 8 different ram configurations which work on the currently selected 64k logical block. 
+/* There are 8 different ram configurations which work on the currently selected 64k logical block.
    The following tables show the possible ram configurations :*/
 static int RamConfigurations[8 * 4] =
 {
@@ -185,22 +185,22 @@ static void multiface_stop(void);
 static int multiface_hardware_enabled(void);
 static void multiface_reset(void);
 /* ---------------------------------------
-   - 27.05.2004 - PSG function selection - 
+   - 27.05.2004 - PSG function selection -
    ---------------------------------------
 The databus of the PSG is connected to PPI Port A.
-Data is read from/written to the PSG through this port. 
+Data is read from/written to the PSG through this port.
 
-The PSG function, defined by the BC1,BC2 and BDIR signals, is controlled by bit 7 and bit 6 of PPI Port C. 
+The PSG function, defined by the BC1,BC2 and BDIR signals, is controlled by bit 7 and bit 6 of PPI Port C.
 
 PSG function selection:
 -----------------------
-Function          
+Function
 
 BDIR = PPI Port C Bit 7 and BC1 = PPI Port C Bit 6
 
-PPI Port C Bit | PSG Function 
-BDIR BC1       | 
-0    0         | Inactive 
+PPI Port C Bit | PSG Function
+BDIR BC1       |
+0    0         | Inactive
 0    1         | Read from selected PSG register. When function is set, the PSG will make the register data available to PPI Port A
 1    0         | Write to selected PSG register. When set, the PSG will take the data at PPI Port A and write it into the selected PSG register
 1    1         | Select PSG register. When set, the PSG will take the data at PPI Port A and select a register
@@ -234,36 +234,36 @@ static READ8_HANDLER ( amstrad_ppi_porta_r )
 	update_psg();
   return ppi_port_inputs[amstrad_ppi_PortA];
 }
-	
+
 static WRITE8_HANDLER ( amstrad_ppi_porta_w )
 {
   	ppi_port_outputs[amstrad_ppi_PortA] = data;
     update_psg();
 }
 
-/* - Read PPI Port B - 
+/* - Read PPI Port B -
    -------------------
 Bit Description
 7   Cassette read data
 6   Parallel/Printer port ready signal ("1" = not ready, "0" = Ready)
-5   /EXP signal on expansion port (note 6)  
-4   50/60hz (link on PCB. For this MESS driver I have used the dipswitch feature) (note 5) 
-3   | PCB links to define manufacturer name. For this MESS driver I have used the dipswitch feature. (note 1) (note 4) 
-2   | (note 2) 
-1   | (note 3) 
-0   VSYNC State from 6845. "1" = VSYNC active, "0" = VSYNC inactive 
+5   /EXP signal on expansion port (note 6)
+4   50/60hz (link on PCB. For this MESS driver I have used the dipswitch feature) (note 5)
+3   | PCB links to define manufacturer name. For this MESS driver I have used the dipswitch feature. (note 1) (note 4)
+2   | (note 2)
+1   | (note 3)
+0   VSYNC State from 6845. "1" = VSYNC active, "0" = VSYNC inactive
 
-Note: 
+Note:
 
-1 On CPC464,CPC664,CPC6128 and GX4000 this is LK3 on the PCB. On the CPC464+ and CPC6128+ this is LK103 on the PCB. On the KC compact this is "1". 
-2 On CPC464,CPC664,CPC6128 and GX4000 this is LK2 on the PCB. On the CPC464+ and CPC6128+ this is LK102 on the PCB. On the KC compact this is "0". 
-3 On CPC464,CPC664,CPC6128 and GX4000 this is LK1 on the PCB. On the CPC464+ and CPC6128+ this is LK101 on the PCB. On the KC compact this is /TEST signal from the expansion port. 
-4 On the CPC464,CPC664,CPC6128,CPC464+,CPC6128+ and GX4000 bits 3,2 and 1 define the manufacturer name. See below to see the options available. The manufacturer name is defined on the PCB and cannot be changed through software. 
-5 On the CPC464,CPC664,CPC6128,CPC464+,CPC6128+ and GX4000 bit 4 defines the Screen refresh frequency. "1" = 50Hz, "0" = 60Hz. This is defined on the PCB and cannot be changed with software. On the KC compact bit 4 is "1" 
-6 This bit is connected to /EXP signal on the expansion port. 
-  On the KC Compact this bit is used to define bit 7 of the printer data. 
-  On the CPC, it is possible to use this bit to define bit 7 of the printer data, so a 8-bit printer port is made, with a hardware modification, 
-  On the CPC this can be used by a expansion device to report it's presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices. 
+1 On CPC464,CPC664,CPC6128 and GX4000 this is LK3 on the PCB. On the CPC464+ and CPC6128+ this is LK103 on the PCB. On the KC compact this is "1".
+2 On CPC464,CPC664,CPC6128 and GX4000 this is LK2 on the PCB. On the CPC464+ and CPC6128+ this is LK102 on the PCB. On the KC compact this is "0".
+3 On CPC464,CPC664,CPC6128 and GX4000 this is LK1 on the PCB. On the CPC464+ and CPC6128+ this is LK101 on the PCB. On the KC compact this is /TEST signal from the expansion port.
+4 On the CPC464,CPC664,CPC6128,CPC464+,CPC6128+ and GX4000 bits 3,2 and 1 define the manufacturer name. See below to see the options available. The manufacturer name is defined on the PCB and cannot be changed through software.
+5 On the CPC464,CPC664,CPC6128,CPC464+,CPC6128+ and GX4000 bit 4 defines the Screen refresh frequency. "1" = 50Hz, "0" = 60Hz. This is defined on the PCB and cannot be changed with software. On the KC compact bit 4 is "1"
+6 This bit is connected to /EXP signal on the expansion port.
+  On the KC Compact this bit is used to define bit 7 of the printer data.
+  On the CPC, it is possible to use this bit to define bit 7 of the printer data, so a 8-bit printer port is made, with a hardware modification,
+  On the CPC this can be used by a expansion device to report it's presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
 */
 
 static READ8_HANDLER (amstrad_ppi_portb_r)
@@ -288,12 +288,12 @@ static READ8_HANDLER (amstrad_ppi_portb_r)
 
 /* 26-May-2005 - PPI Port C
    -----------------------
-Bit Description  Usage 
-7   PSG BDIR     | PSG function selection 
+Bit Description  Usage
+7   PSG BDIR     | PSG function selection
 6   PSG BC1      |
-5                Cassette Write data   
-4                Cassette Motor Control set bit to "1" for motor on, or "0" for motor off 
-3                | Keyboard line Select keyboard line to be scanned (0-15) 
+5                Cassette Write data
+4                Cassette Motor Control set bit to "1" for motor on, or "0" for motor off
+3                | Keyboard line Select keyboard line to be scanned (0-15)
 2                |
 1                |
 0                |*/
@@ -308,7 +308,7 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 	previous_ppi_portc_w = ppi_port_outputs[amstrad_ppi_PortC];
 /* Write the data to Port C */
 	changed_data = previous_ppi_portc_w^data;
-	
+
 	ppi_port_outputs[amstrad_ppi_PortC] = data;
 
 /* get b7 and b6 (PSG Function Selected */
@@ -316,13 +316,13 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 
 /* Perform PSG function */
 	update_psg();
-	
+
 /* b5 Cassette Write data */
 	if ((changed_data & 0x20) != 0) {
 		cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),
 			((data & 0x20) ? -1.0 : +1.0));
 	}
-	
+
 /* b4 Cassette Motor Control */
 	if ((changed_data & 0x10) != 0) {
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
@@ -364,15 +364,15 @@ unsigned char *amstrad_plus_asic_ram;
 
 /*--------------------------
   - Ram and Rom management -
-  --------------------------*/ 
+  --------------------------*/
 /*-----------------
   - Set Lower Rom -
-  -----------------*/ 
+  -----------------*/
 void amstrad_setLowerRom(void)
 {
 	unsigned char *BankBase;
 	int banknum;
-/* b2 : "1" Lower rom area disable or "0" Lower rom area enable */ 
+/* b2 : "1" Lower rom area disable or "0" Lower rom area enable */
 	if(amstrad_system_type == SYSTEM_CPC)
 	{
 		if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<2)) == 0) {
@@ -437,10 +437,10 @@ void amstrad_setLowerRom(void)
 			}
 		}
 	}
-}		
+}
 /*-----------------
   - Set Upper Rom -
-  -----------------*/ 
+  -----------------*/
 void amstrad_setUpperRom(void)
 {
 	unsigned char *BankBase;
@@ -456,7 +456,7 @@ void amstrad_setUpperRom(void)
 		memory_set_bankptr(7, BankBase);
 		memory_set_bankptr(8, BankBase+0x2000);
 	}
-}		
+}
 
 void AmstradCPC_SetLowerRom(int Data)
 {
@@ -759,7 +759,7 @@ static READ8_HANDLER( amstrad_plus_asic_6000_r )
 
 /*------------------
   - Rethink Memory -
-  ------------------*/ 
+  ------------------*/
 void amstrad_rethinkMemory(void)
 {
 	/* the following is used for banked memory read/writes and for setting up
@@ -779,7 +779,7 @@ void amstrad_rethinkMemory(void)
 		amstrad_setLowerRom();
 /* bank 3 - 0x0c000..0x0ffff */
     amstrad_setUpperRom();
-/* other banks */    
+/* other banks */
 		memory_set_bankptr(9, AmstradCPC_RamBanks[0]);
 		memory_set_bankptr(10, AmstradCPC_RamBanks[0]+0x2000);
 		memory_set_bankptr(11, AmstradCPC_RamBanks[1]);
@@ -796,19 +796,19 @@ void amstrad_rethinkMemory(void)
 }
 /* simplified ram configuration - e.g. only correct for 128k machines
 
-RAM Expansion Bits 
-                             7 6 5 4  3  2  1  0 
-CPC6128                      1 1 - -  -  s2 s1 s0 
-Dk'tronics 256K Silicon Disk 1 1 1 b1 b0 b2 -  - 
+RAM Expansion Bits
+                             7 6 5 4  3  2  1  0
+CPC6128                      1 1 - -  -  s2 s1 s0
+Dk'tronics 256K Silicon Disk 1 1 1 b1 b0 b2 -  -
 
-"-" - this bit is ignored. The value of this bit is not important. 
-"0" - this bit must be set to "0" 
-"1" - this bit must be set to "1" 
-"b0,b1,b2" - this bit is used to define the logical 64k block that the ram configuration uses 
-"s0,s1,s2" - this bit is used to define the ram configuration 
+"-" - this bit is ignored. The value of this bit is not important.
+"0" - this bit must be set to "0"
+"1" - this bit must be set to "1"
+"b0,b1,b2" - this bit is used to define the logical 64k block that the ram configuration uses
+"s0,s1,s2" - this bit is used to define the ram configuration
 
-The CPC6128 has a 64k ram expansion built-in, giving 128K of RAM in this system. 
-In the CPC464,CPC664 and KC compact if a ram expansion is not present, then writing to this port has no effect and the ram will be in the same arrangement as if configuration 0 had been selected. 
+The CPC6128 has a 64k ram expansion built-in, giving 128K of RAM in this system.
+In the CPC464,CPC664 and KC compact if a ram expansion is not present, then writing to this port has no effect and the ram will be in the same arrangement as if configuration 0 had been selected.
 */
 static void AmstradCPC_GA_SetRamConfiguration(void)
 {
@@ -823,25 +823,25 @@ static void AmstradCPC_GA_SetRamConfiguration(void)
     	AmstradCPC_RamBanks[i] = BankAddr;
     }
   } else {/* Need to add the ram expansion configuration here ! */
-  } 
+  }
   amstrad_rethinkMemory();
 }
 /* -------------------
    -  the Gate Array -
    -------------------
-The gate array is controlled by I/O. The recommended I/O port address is &7Fxx. 
+The gate array is controlled by I/O. The recommended I/O port address is &7Fxx.
 The gate array is selected when bit 15 of the I/O port address is set to "0" and bit 14 of the I/O port address is set to "1".
 The values of the other bits are ignored.
-However, to avoid conflict with other devices in the system, these bits should be set to "1". 
+However, to avoid conflict with other devices in the system, these bits should be set to "1".
 
 The function to be performed is selected by writing data to the Gate-Array, bit 7 and 6 of the data define the function selected (see table below).
-It is not possible to read from the Gate-Array. 
+It is not possible to read from the Gate-Array.
 
-Bit 7 Bit 6 Function 
-0     0     Select pen 
-0     1     Select colour for selected pen 
-1     0     Select screen mode, rom configuration and interrupt control 
-1     1     Ram Memory Management (note 1) 
+Bit 7 Bit 6 Function
+0     0     Select pen
+0     1     Select colour for selected pen
+1     0     Select screen mode, rom configuration and interrupt control
+1     1     Ram Memory Management (note 1)
 
 Note 1 : This function is not available in the Gate-Array, but is performed by a device at the same I/O port address location. In the CPC464,CPC664 and KC compact, this function is performed in a memory-expansion (e.g. Dk'Tronics 64K Ram Expansion), if this expansion is not present then the function is not available. In the CPC6128, this function is performed by a PAL located on the main PCB, or a memory-expansion. In the 464+ and 6128+ this function is performed by the ASIC or a memory expansion. Please read the document on Ram Management for more information.*/
 
@@ -852,9 +852,9 @@ void amstrad_GateArray_write(int dataToGateArray)
 /* Pen selection
    -------------
 Bit Value Function        Bit Value Function
-5   x     not used        5   x     not used 
-4   1     Select border   4   0     Select pen 
-3   x     | ignored       3   x     | Pen Number 
+5   x     not used        5   x     not used
+4   1     Select border   4   0     Select pen
+3   x     | ignored       3   x     | Pen Number
 2   x     |               2   x 	  |
 1   x     |               1   x     |
 0   x     |               0   x     |
@@ -870,11 +870,11 @@ Bit Value Function        Bit Value Function
 /* Colour selection
    ----------------
 Even though there is provision for 32 colours, only 27 are possible.
-The remaining colours are duplicates of those already in the colour palette. 
+The remaining colours are duplicates of those already in the colour palette.
 
-Bit Value Function 
-5   x     not used 
-4   x     | Colour number 
+Bit Value Function
+5   x     not used
+4   x     | Colour number
 3   x     |
 2   x     |
 1   x     |
@@ -888,35 +888,35 @@ Bit Value Function
     } break;
 /* Select screen mode and rom configuration
    ----------------------------------------
-Bit Value Function 
-5   x     not used 
-4   x     Interrupt generation control 
-3   1     Upper rom area disable or 0 Upper rom area enable 
-2   1     Lower rom area disable or 0 Lower rom area enable 
-1   x     | Mode selection 
+Bit Value Function
+5   x     not used
+4   x     Interrupt generation control
+3   1     Upper rom area disable or 0 Upper rom area enable
+2   1     Lower rom area disable or 0 Lower rom area enable
+1   x     | Mode selection
 0   x     |
-   
-Screen mode selection : The settings for bits 1 and 0 and the corresponding screen mode are given in the table below. 
------------------------
-b1 b0 Screen mode 
-0  0  Mode 0, 160x200 resolution, 16 colours 
-0  1  Mode 1, 320x200 resolution, 4 colours 
-1  0  Mode 2, 640x200 resolution, 2 colours 
-1  1  Mode 3, 160x200 resolution, 4 colours (note 1) 
 
-This mode is not official. From the combinations possible, we can see that 4 modes can be defined, although the Amstrad only has 3. Mode 3 is similar to mode 0, because it has the same resolution, but it is limited to only 4 colours. 
-Mode changing is synchronised with HSYNC. If the mode is changed, it will take effect from the next HSYNC. 
+Screen mode selection : The settings for bits 1 and 0 and the corresponding screen mode are given in the table below.
+-----------------------
+b1 b0 Screen mode
+0  0  Mode 0, 160x200 resolution, 16 colours
+0  1  Mode 1, 320x200 resolution, 4 colours
+1  0  Mode 2, 640x200 resolution, 2 colours
+1  1  Mode 3, 160x200 resolution, 4 colours (note 1)
+
+This mode is not official. From the combinations possible, we can see that 4 modes can be defined, although the Amstrad only has 3. Mode 3 is similar to mode 0, because it has the same resolution, but it is limited to only 4 colours.
+Mode changing is synchronised with HSYNC. If the mode is changed, it will take effect from the next HSYNC.
 
 Rom configuration selection :
 -----------------------------
-Bit 2 is used to enable or disable the lower rom area. The lower rom area occupies memory addressess &0000-&3fff and is used to access the operating system rom. When the lower rom area is is enabled, reading from &0000-&3FFF will return data in the rom. When a value is written to &0000-&3FFF, it will be written to the ram underneath the rom. When it is disabled, data read from &0000-&3FFF will return the data in the ram. 
-Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper rom area occupies memory addressess &C000-&FFFF and is BASIC or any expansion roms which may be plugged into a rom board/box. See the document on upper rom selection for more details. When the upper rom area enabled, reading from &c000-&ffff, will return data in the rom. When data is written to &c000-&FFFF, it will be written to the ram at the same address as the rom. When the upper rom area is disabled, and data is read from &c000-&ffff the data returned will be the data in the ram. 
+Bit 2 is used to enable or disable the lower rom area. The lower rom area occupies memory addressess &0000-&3fff and is used to access the operating system rom. When the lower rom area is is enabled, reading from &0000-&3FFF will return data in the rom. When a value is written to &0000-&3FFF, it will be written to the ram underneath the rom. When it is disabled, data read from &0000-&3FFF will return the data in the ram.
+Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper rom area occupies memory addressess &C000-&FFFF and is BASIC or any expansion roms which may be plugged into a rom board/box. See the document on upper rom selection for more details. When the upper rom area enabled, reading from &c000-&ffff, will return data in the rom. When data is written to &c000-&FFFF, it will be written to the ram at the same address as the rom. When the upper rom area is disabled, and data is read from &c000-&ffff the data returned will be the data in the ram.
 
 Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
   	case 0x02: {
       int Previous_GateArray_ModeAndRomConfiguration = amstrad_GateArray_ModeAndRomConfiguration;
 		/* If bit 5 is enabled on a CPC Plus/GX4000 when the ASIC is unlocked, sets the lower ROM position and cart bank
-		   b5 = 1, b4b3 = RAM position for lower ROM area and if the ASIC registers are visible at &4000, 
+		   b5 = 1, b4b3 = RAM position for lower ROM area and if the ASIC registers are visible at &4000,
 		   b2b1b0 = cartridge bank to read from lower ROM area (0-7 only) */
 		if(amstrad_system_type == SYSTEM_PLUS && amstrad_plus_asic_enabled != 0)
 		{
@@ -937,7 +937,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 			amstrad_GateArray_ModeAndRomConfiguration = dataToGateArray;
 		}
 
-/* If bit 4 of the "Select screen mode and rom configuration" register of the Gate-Array is set to "1" 
+/* If bit 4 of the "Select screen mode and rom configuration" register of the Gate-Array is set to "1"
  then the interrupt request is cleared and the 6-bit counter is reset to "0".  */
   			if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<4)) != 0) {
             amstrad_CRTC_HS_Counter = 0;
@@ -956,10 +956,10 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 #else
   				amstrad_vh_update_mode(amstrad_GateArray_ModeAndRomConfiguration & 0x03);
 #endif
-  			} 
+  			}
       }  break;
 /* Ram Memory Management
-	 ---------------------	
+	 ---------------------
 This function is not available in the Gate-Array, but is performed by a device at the same I/O port address location.
 In the CPC464,CPC664 and KC compact, this function is performed in a memory-expansion (e.g. Dk'Tronics 64K Ram Expansion), if this expansion is not present then the function is not available.
 In the CPC6128, this function is performed by a PAL located on the main PCB, or a memory-expansion.
@@ -968,7 +968,7 @@ In the 464+ and 6128+ this function is performed by the ASIC or a memory expansi
   	case 0x03: {
   			amstrad_GateArray_RamConfiguration = dataToGateArray;
      } break;
-  
+
     default: {
     } break;
   }
@@ -985,62 +985,62 @@ void AmstradCPC_PALWrite(int data)
 
 /* CRTC Differences
    ----------------
-The following tables list the functions that can be accessed for each type: 
+The following tables list the functions that can be accessed for each type:
 
 Type 0
-b1 b0 Function Read/Write 
-0  0  Select internal 6845 register Write Only 
-0  1  Write to selected internal 6845 register Write Only 
-1  0  - - 
-1  1  Read from selected internal 6845 register Read only 
+b1 b0 Function Read/Write
+0  0  Select internal 6845 register Write Only
+0  1  Write to selected internal 6845 register Write Only
+1  0  - -
+1  1  Read from selected internal 6845 register Read only
 
 Type 1
-b1 b0 Function Read/Write 
-0  0  Select internal 6845 register Write Only 
-0  1  Write to selected internal 6845 register Write Only 
-1  0  Read Status Register Read Only 
-1  1  Read from selected internal 6845 register Read only 
+b1 b0 Function Read/Write
+0  0  Select internal 6845 register Write Only
+0  1  Write to selected internal 6845 register Write Only
+1  0  Read Status Register Read Only
+1  1  Read from selected internal 6845 register Read only
 
 Type 2
-b1 b0 Function Read/Write 
-0  0  Select internal 6845 register Write Only 
-0  1  Write to selected internal 6845 register Write Only 
-1  0  - - 
-1  1  Read from selected internal 6845 register Read only 
+b1 b0 Function Read/Write
+0  0  Select internal 6845 register Write Only
+0  1  Write to selected internal 6845 register Write Only
+1  0  - -
+1  1  Read from selected internal 6845 register Read only
 
 Type 3 and 4
-b1 b0 Function Read/Write 
-0  0  Select internal 6845 register Write Only 
-0  1  Write to selected internal 6845 register Write Only 
-1  0  Read from selected internal 6845 register Read Only 
-1  1  Read from selected internal 6845 register Read only 
+b1 b0 Function Read/Write
+0  0  Select internal 6845 register Write Only
+0  1  Write to selected internal 6845 register Write Only
+1  0  Read from selected internal 6845 register Read Only
+1  1  Read from selected internal 6845 register Read only
 */
 
 /* I/O port allocation
    -------------------
 
-Many thanks to Mark Rison for providing the original information. Thankyou to Richard Wilson for his discoveries concerning RAM management I/O decoding. 
+Many thanks to Mark Rison for providing the original information. Thankyou to Richard Wilson for his discoveries concerning RAM management I/O decoding.
 
-This document will explain the decoding of the I/O ports. The port address is not decoded fully which means a hardware device can be accessed through more than one address, in addition, using some addressess can access more than one element of the hardware at the same time. The CPC IN/OUT design differs from the norm in that port numbers are defined using 16 bits, as opposed to the traditional 8 bits. 
+This document will explain the decoding of the I/O ports. The port address is not decoded fully which means a hardware device can be accessed through more than one address, in addition, using some addressess can access more than one element of the hardware at the same time. The CPC IN/OUT design differs from the norm in that port numbers are defined using 16 bits, as opposed to the traditional 8 bits.
 
-IN r,(C)/OUT (C),r instructions: Bits b15-b8 come from the B register, bits b7-b0 come from "r" 
-IN A,(n)/OUT (n),A instructions: Bits b15-b8 come from the A register, bits b7-b0 come from "n" 
-Listed below are the internal hardware devices and the bit fields to which they respond. In the table: 
+IN r,(C)/OUT (C),r instructions: Bits b15-b8 come from the B register, bits b7-b0 come from "r"
+IN A,(n)/OUT (n),A instructions: Bits b15-b8 come from the A register, bits b7-b0 come from "n"
+Listed below are the internal hardware devices and the bit fields to which they respond. In the table:
 
-"-" means this bit is ignored, 
-"0" means the bit must be set to "0" for the hardware device to respond, 
-"1" means the bit must be set to "1" for the hardware device to respond. 
-"r1" and "r0" mean a bit used to define a register 
+"-" means this bit is ignored,
+"0" means the bit must be set to "0" for the hardware device to respond,
+"1" means the bit must be set to "1" for the hardware device to respond.
+"r1" and "r0" mean a bit used to define a register
 
-Hardware device       Read/Write Port bits 
-                                 b15 b14 b13 b12 b11 b10 b9  b8  b7  b6  b5  b4  b3  b2  b1  b0 
-Gate-Array            Write Only 0   1   -   -   -   -   -   -   -   -   -   -   -   -   -   - 
-RAM Configuration     Write Only 0   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - 
-CRTC                  Read/Write -   0   -   -   -   -   r1  r0  -   -   -   -   -   -   -   - 
-ROM select            Write only -   -   0   -   -   -   -   -   -   -   -   -   -   -   -   - 
-Printer port          Write only -   -   -   0   -   -   -   -   -   -   -   -   -   -   -   - 
-8255 PPI              Read/Write -   -   -   -   0   -   r1  r0  -   -   -   -   -   -   -   - 
-Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -   -   -   -   - 
+Hardware device       Read/Write Port bits
+                                 b15 b14 b13 b12 b11 b10 b9  b8  b7  b6  b5  b4  b3  b2  b1  b0
+Gate-Array            Write Only 0   1   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+RAM Configuration     Write Only 0   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+CRTC                  Read/Write -   0   -   -   -   -   r1  r0  -   -   -   -   -   -   -   -
+ROM select            Write only -   -   0   -   -   -   -   -   -   -   -   -   -   -   -   -
+Printer port          Write only -   -   -   0   -   -   -   -   -   -   -   -   -   -   -   -
+8255 PPI              Read/Write -   -   -   -   0   -   r1  r0  -   -   -   -   -   -   -   -
+Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -   -   -   -   -
 
 */
 
@@ -1079,14 +1079,14 @@ static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 		}
 	}
 
-/* if b11 = 0 : 8255 PPI Read selected - bits 9 and 8 then define the PPI function access as shown below: 
+/* if b11 = 0 : 8255 PPI Read selected - bits 9 and 8 then define the PPI function access as shown below:
 
-b9 b8 | PPI Function Read/Write status 
-0  0  | Port A data  Read/Write 
-0  1  | Port B data  Read/Write 
-1  0  | Port C data  Read/Write 
+b9 b8 | PPI Function Read/Write status
+0  0  | Port A data  Read/Write
+0  1  | Port B data  Read/Write
+1  0  | Port C data  Read/Write
 1  1  | Control      Write Only
-*/    
+*/
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
@@ -1095,20 +1095,20 @@ b9 b8 | PPI Function Read/Write status
 /* if b10 = 0 : Expansion Peripherals Read selected
 
 bits b7-b5 are used to select an expansion peripheral. Again, this is done by resetting the peripheral's bit:
-Bit | Device 
-b7  | FDC 
-b6  | Reserved (was it ever used?) 
-b5  | Serial port 
+Bit | Device
+b7  | FDC
+b6  | Reserved (was it ever used?)
+b5  | Serial port
 
 In the case of the FDC, bits b8 and b0 are used to select the specific mode of operation; all the other bits (b9,b4-b1) are ignored:
-b8 b0 Function Read/Write state 
-0 0 FDD motor control Write Only 
-0 1 not used N/A 
-1 0 Main Status register of FDC (MSR) Read Only 
+b8 b0 Function Read/Write state
+0 0 FDD motor control Write Only
+0 1 not used N/A
+1 0 Main Status register of FDC (MSR) Read Only
 1 1 Data register of FDC Read/Write
 
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
-The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset. 
+The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
  */
  	if ((offset & (1<<10)) == 0)	{
 		if ((offset & (1<<10)) == 0) {
@@ -1167,7 +1167,7 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 /* b13 = 0 : ROM select Write Selected*/
 	if ((offset & (1<<13)) == 0)
 	{
-		if (previous_amstrad_UpperRom_data != (data & 0xff)) 
+		if (previous_amstrad_UpperRom_data != (data & 0xff))
 		{
 			AmstradCPC_SetUpperRom(data);
 		}
@@ -1189,13 +1189,13 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 		}
 		previous_printer_data_byte = data;
 	}
-/* if b11 = 0 : 8255 PPI Write selected - bits 9 and 8 then define the PPI function access as shown below: 
-b9 b8 | PPI Function Read/Write status 
-0  0  | Port A data  Read/Write 
-0  1  | Port B data  Read/Write 
-1  0  | Port C data  Read/Write 
+/* if b11 = 0 : 8255 PPI Write selected - bits 9 and 8 then define the PPI function access as shown below:
+b9 b8 | PPI Function Read/Write status
+0  0  | Port A data  Read/Write
+0  1  | Port B data  Read/Write
+1  0  | Port C data  Read/Write
 1  1  | Control      Write Only
-*/    
+*/
 	if ((offset & (1<<11)) == 0) {
 		unsigned int Index = ((offset & 0x0300) >> 8);
 		ppi8255_w(0, Index, data);
@@ -1203,29 +1203,29 @@ b9 b8 | PPI Function Read/Write status
 /* if b10 = 0 : Expansion Peripherals Write selected */
 	if ((offset & (1<<10)) == 0) {
 /* bits b7-b5 are used to select an expansion peripheral. This is done by resetting the peripheral's bit:
-Bit | Device 
-b7  | FDC 
-b6  | Reserved (was it ever used?) 
-b5  | Serial port 
+Bit | Device
+b7  | FDC
+b6  | Reserved (was it ever used?)
+b5  | Serial port
 
-In the case of the FDC, bits b8 and b0 are used to select the specific mode of operation; 
+In the case of the FDC, bits b8 and b0 are used to select the specific mode of operation;
 all the other bits (b9,b4-b1) are ignored:
-b8 b0 Function Read/Write state 
-0 0 FDD motor control Write Only 
-0 1 not used N/A 
-1 0 Main Status register of FDC (MSR) Read Only 
-1 1 Data register of FDC Read/Write 
+b8 b0 Function Read/Write state
+0 0 FDD motor control Write Only
+0 1 not used N/A
+1 0 Main Status register of FDC (MSR) Read Only
+1 1 Data register of FDC Read/Write
 
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
-The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset. 
+The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
 */
     if ((offset & (1<<7)) == 0) {
 			unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
 
 			switch (b8b0) {
 			case 0x00:
-        /* FDC Motor Control - Bit 0 defines the state of the FDD motor: 
-         * "1" the FDD motor will be active. 
+        /* FDC Motor Control - Bit 0 defines the state of the FDD motor:
+         * "1" the FDD motor will be active.
          * "0" the FDD motor will be in-active.*/
 				floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x01));
 				floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), (data & 0x01));
@@ -1596,7 +1596,7 @@ void amstrad_reset_machine(void)
 	amstrad_GateArray_write(0x0c0);
 
   // Get manufacturer name and TV refresh rate from PCB link (dipswitch for mess emulation)
-	ppi_port_inputs[amstrad_ppi_PortB] = (((readinputport(10)&MANUFACTURER_NAME)<<1) | (readinputport(10)&TV_REFRESH_RATE));
+	ppi_port_inputs[amstrad_ppi_PortB] = (((readinputportbytag("solder_links")&MANUFACTURER_NAME)<<1) | (readinputportbytag("solder_links")&TV_REFRESH_RATE));
 
 	if(amstrad_system_type == SYSTEM_PLUS)
 		memset(amstrad_plus_asic_ram,0,16384);  // clear ASIC RAM
@@ -1731,7 +1731,7 @@ static UINT8 amstrad_cycle_table_ex[256]=
 static void amstrad_update_video_1(int dummy)
 {
 	amstrad_vh_execute_crtc_cycles(2);
-} 
+}
 #endif
 
 static TIMER_CALLBACK(amstrad_vh_execute_crtc_cycles_callback)
@@ -1793,9 +1793,9 @@ static void amstrad_common_init(void)
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_SS_40);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_SS_40);
 
-/* Every microsecond: 
+/* Every microsecond:
 
-The CRTC generates a memory address using it's MA and RA signal outputs 
+The CRTC generates a memory address using it's MA and RA signal outputs
 The Gate-Array fetches two bytes for each address*/
 
 //	mame_timer_pulse(MAME_TIME_IN_USEC(AMSTRAD_US_PER_SCANLINE), 0, amstrad_vh_execute_crtc_cycles);
@@ -1832,19 +1832,19 @@ static MACHINE_RESET( amstrad )
 	{
 		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x014000];
 	}
-	
+
 	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];
 	amstrad_common_init();
 	amstrad_reset_machine();
 
 	multiface_init();
-	
+
 }
 
 static MACHINE_RESET( plus )
 {
 	int i;
-	
+
 	amstrad_system_type = SYSTEM_PLUS;
 
 	for (i=0; i<128; i++)  // fill ROM table
@@ -1938,13 +1938,13 @@ ADDRESS_MAP_END
 /* Additional notes for the AY-3-8912 in the CPC design
 Port A of the AY-3-8912 is connected to the keyboard.
 The data for a selected keyboard line can be read through Port A, as long as it is defined as input.
-The operating system and I believe all programs assume this port has been defined as input. (NWC has found a bug in the Multiface 2 software. The Multiface does not reprogram the input/output state of the AY-3-8912's registers, therefore if port A is programmed as output, the keyboard will be unresponsive and it will not be possible to use the Multiface functions.) 
-When port B is defined as input (bit 7 of register 7 is set to "0"), a read of this port will return &FF. 
+The operating system and I believe all programs assume this port has been defined as input. (NWC has found a bug in the Multiface 2 software. The Multiface does not reprogram the input/output state of the AY-3-8912's registers, therefore if port A is programmed as output, the keyboard will be unresponsive and it will not be possible to use the Multiface functions.)
+When port B is defined as input (bit 7 of register 7 is set to "0"), a read of this port will return &FF.
 */
 
 /* read PSG port A */
 static READ8_HANDLER ( amstrad_psg_porta_read )
-{	
+{
 /* Read CPC Keyboard
    If keyboard matrix line 11-14 are selected, the byte is always &ff.
    After testing on a real CPC, it is found that these never change, they always return &FF. */
@@ -1960,180 +1960,197 @@ static READ8_HANDLER ( amstrad_psg_porta_read )
 
 static INPUT_PORTS_START( amstrad_keyboard )
 	/* keyboard row 0 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad Enter") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_START_TAG("keyboard_row_0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA7")          PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA8")          PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA9")          PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 9")              PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 6")              PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 3")              PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad Enter")          PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad .")              PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 
 	/* keyboard line 1 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) 
+	PORT_START_TAG("keyboard_row_1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA6")          PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy")                  PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(END))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 7")              PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 8")              PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 5")              PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 1")              PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 2")              PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 0")              PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 
 	/* keyboard row 2 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clr") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('@') PORT_CHAR('|')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_START_TAG("keyboard_row_2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clr")                   PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[")                     PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter")                 PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]")                     PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 4")              PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")            PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift")           PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\")                    PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR('\\') PORT_CHAR('`')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl")                  PORT_CODE(KEYCODE_RALT)       PORT_CHAR(UCHAR_SHIFT_2)
 
 	/* keyboard row 3 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^ \xC2\xA3") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('^') PORT_CHAR('\xa3')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_START_TAG("keyboard_row_3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x91 \xC2\xA3") PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^') PORT_CHAR('\xa3')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@') PORT_CHAR('|')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
 
 	/* keyboard line 4 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('_')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CODE(',') PORT_CHAR('<')
+	PORT_START_TAG("keyboard_row_4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('_')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
 
 	/* keyboard line 5 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_START_TAG("keyboard_row_5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")                 PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(32)
 
 	/* keyboard line 6 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_START_TAG("keyboard_row_6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
 
 	/* keyboard line 7 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_START_TAG("keyboard_row_7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
 
 	/* keyboard line 8 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(26)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_START_TAG("keyboard_row_8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('\"') PORT_CHAR('~')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")                   PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(27)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")                   PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")             PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 
 	/* keyboard line 9 */
-	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_START_TAG("keyboard_row_9")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")                   PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(8)
+
+/* Second joystick port need to be defined: the second joystick is daisy-chained on the back of the first one */
+
 INPUT_PORTS_END
 
 
 /* Steph 2000-10-27	I remapped the 'Machine Name' Dip Switches (easier to understand) */
 
-static INPUT_PORTS_START(amstrad)
-
-	PORT_INCLUDE( amstrad_keyboard )
+static INPUT_PORTS_START( crtc_links )
 
 /* the following are defined as dipswitches, but are in fact solder links on the
  * curcuit board. The links are open or closed when the PCB is made, and are set depending on which country
- * the Amstrad system was to go to
+ * the Amstrad system was to go to (reference: http://amstrad.cpc.free.fr/article.php?sid=26)
 
-b3 b2 b1 Manufacturer Name (CPC and CPC+ only):
-0  0  0  Isp 
-0  0  1  Triumph 
-0  1  0  Saisho 
-0  1  1  Solavox 
-1  0  0  Awa 
-1  0  1  Schneider 
-1  1  0  Orion 
-1  1  1  Amstrad*/
-PORT_START
-	PORT_DIPNAME( 0x07, 0x07, "Manufacturer Name" )
-	PORT_DIPSETTING(    0x00, "Isp" )
-	PORT_DIPSETTING(    0x01, "Triumph" )
-	PORT_DIPSETTING(    0x02, "Saisho" )
-	PORT_DIPSETTING(    0x03, "Solavox" )
-	PORT_DIPSETTING(    0x04, "Awa" )
-	PORT_DIPSETTING(    0x05, "Schneider" )
-	PORT_DIPSETTING(    0x06, "Orion" )
-	PORT_DIPSETTING(    0x07, "Amstrad" )
+lk1 lk2 lk3 Manufacturer Name (CPC and CPC+ only):
 
-	PORT_DIPNAME(    0x10, 0x10, "TV Refresh Rate" )
-	PORT_DIPSETTING(    0x00, "60 Hz" )
-	PORT_DIPSETTING(    0x10, "50 Hz" )
+0   0   0   Isp
+0   0   1   Triumph (UK?)
+0   1   0   Saisho (UK: Saisho is Dixons brand name for their electronic goods)
+0   1   1   Solavox
+1   0   0   Awa (Australia)
+1   0   1   Schneider (Germany)
+1   1   0   Orion (Japan?)
+1   1   1   Amstrad (UK)
+
+lk4     Frequency
+0       60 Hz
+1       50 Hz
+*/
+PORT_START_TAG("solder_links")
+	PORT_DIPNAME(0x07, 0x07, "Manufacturer Name")
+	PORT_DIPLOCATION("LK:3,2,1")
+	PORT_DIPSETTING(0x00, "Isp")
+	PORT_DIPSETTING(0x01, "Triumph")
+	PORT_DIPSETTING(0x02, "Saisho")
+	PORT_DIPSETTING(0x03, "Solavox")
+	PORT_DIPSETTING(0x04, "Awa")
+	PORT_DIPSETTING(0x05, "Schneider")
+	PORT_DIPSETTING(0x06, "Orion")
+	PORT_DIPSETTING(0x07, "Amstrad")
+
+	PORT_DIPNAME(0x10, 0x10, "TV Refresh Rate")
+	PORT_DIPLOCATION("LK:4")
+	PORT_DIPSETTING(0x00, "60 Hz")
+	PORT_DIPSETTING(0x10, "50 Hz")
 
 /* Part number Manufacturer Type number
-   UM6845      UMC          0 
-   HD6845S     Hitachi      0 
-   UM6845R     UMC          1 
-   MC6845      Motorola     2 
+   UM6845      UMC          0
+   HD6845S     Hitachi      0
+   UM6845R     UMC          1
+   MC6845      Motorola     2
    AMS40489    Amstrad      3
    Pre-ASIC??? Amstrad?     4 In the "cost-down" CPC6128, the CRTC functionality is integrated into a single ASIC IC. This ASIC is often refered to as the "Pre-ASIC" because it preceeded the CPC+ ASIC
-As far as I know, the KC compact used HD6845S only. 
+As far as I know, the KC compact used HD6845S only.
 */
 	PORT_START_TAG("crtc")
-	PORT_DIPNAME( 0xFF, M6845_PERSONALITY_UM6845R, "CRTC Type" )
-	PORT_DIPSETTING(M6845_PERSONALITY_UM6845, "Type 0 - UM6845" )
-	PORT_DIPSETTING(M6845_PERSONALITY_HD6845S, "Type 0 - HD6845S" )
-	PORT_DIPSETTING(M6845_PERSONALITY_UM6845R, "Type 1 - UM6845R" )
-	PORT_DIPSETTING(M6845_PERSONALITY_GENUINE, "Type 2 - MC6845" )
-	PORT_DIPSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489" )
-	PORT_DIPSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC???" )
+	PORT_CONFNAME( 0xFF, M6845_PERSONALITY_UM6845R, "CRTC Type")
+	PORT_CONFSETTING(M6845_PERSONALITY_UM6845, "Type 0 - UM6845")
+	PORT_CONFSETTING(M6845_PERSONALITY_HD6845S, "Type 0 - HD6845S")
+	PORT_CONFSETTING(M6845_PERSONALITY_UM6845R, "Type 1 - UM6845R")
+	PORT_CONFSETTING(M6845_PERSONALITY_GENUINE, "Type 2 - MC6845")
+	PORT_CONFSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489")
+	PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
 
 	PORT_START_TAG("multiface")
-	PORT_CONFNAME(0x01, 0x00, "Multiface Hardware" )
+	PORT_CONFNAME(0x01, 0x00, "Multiface Two" )
 	PORT_CONFSETTING(0x00, DEF_STR( Off) )
 	PORT_CONFSETTING(0x01, DEF_STR( On) )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Multiface Stop") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Stop Button") PORT_CODE(KEYCODE_F1)
+//	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Reset Button") PORT_CODE(KEYCODE_F3)  Not implemented
 
 	PORT_START_TAG("green_display")
-	PORT_CONFNAME( 0x01, 0x00, "Color/Green Display" )
-	PORT_CONFSETTING(0x00, "Color Display" )
-	PORT_CONFSETTING(0x01, "Green Display" )
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
+	PORT_CONFSETTING(0x00, "CTM640 Colour Monitor" )
+	PORT_CONFSETTING(0x01, "GT64 Green Monitor" )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(amstrad)
+
+	PORT_INCLUDE( amstrad_keyboard )
+	PORT_INCLUDE( crtc_links )
 
 INPUT_PORTS_END
 
@@ -2143,54 +2160,62 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(plus)
 	PORT_INCLUDE( amstrad_keyboard )
-
-	PORT_START
-	PORT_DIPNAME( 0x07, 0x07, "Manufacturer Name" )
-	PORT_DIPSETTING(    0x00, "Isp" )
-	PORT_DIPSETTING(    0x01, "Triumph" )
-	PORT_DIPSETTING(    0x02, "Saisho" )
-	PORT_DIPSETTING(    0x03, "Solavox" )
-	PORT_DIPSETTING(    0x04, "Awa" )
-	PORT_DIPSETTING(    0x05, "Schneider" )
-	PORT_DIPSETTING(    0x06, "Orion" )
-	PORT_DIPSETTING(    0x07, "Amstrad" )
-
-	PORT_DIPNAME(    0x10, 0x10, "TV Refresh Rate" )
-	PORT_DIPSETTING(    0x00, "60 Hz" )
-	PORT_DIPSETTING(    0x10, "50 Hz" )
-
-	/* The CPC+ and GX4000 use the ASIC CRTC functionality */
-	PORT_START_TAG("crtc")
-	PORT_DIPNAME( 0xFF, M6845_PERSONALITY_AMS40489, "CRTC Type" )
-	PORT_DIPSETTING(M6845_PERSONALITY_UM6845, "Type 0 - UM6845" )
-	PORT_DIPSETTING(M6845_PERSONALITY_HD6845S, "Type 0 - HD6845S" )
-	PORT_DIPSETTING(M6845_PERSONALITY_UM6845R, "Type 1 - UM6845R" )
-	PORT_DIPSETTING(M6845_PERSONALITY_GENUINE, "Type 2 - MC6845" )
-	PORT_DIPSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489" )
-	PORT_DIPSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC???" )
+	PORT_INCLUDE( crtc_links )
 
 	/* The CPC+ and GX4000 adds support for analogue controllers.
-	   Up to two joysticks or four paddles can be used, although the ASIC supports twice that. 
-	   Read at &6808-&680f in ASIC RAM 
+	   Up to two joysticks or four paddles can be used, although the ASIC supports twice that.
+	   Read at &6808-&680f in ASIC RAM
 	   I am unsure if these are even close to correct */
 
-   PORT_START_TAG("analog1")
-   PORT_BIT(0x3f , 0, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_PLAYER(1)
-   PORT_START_TAG("analog2")
-   PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_PLAYER(1)
-   PORT_START_TAG("analog3")
-   PORT_BIT(0x3f , 0, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_PLAYER(2)
-   PORT_START_TAG("analog4")
-   PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_PLAYER(2)
-   // Not used, but are here for completeness
-   PORT_START_TAG("analog5")
-   PORT_BIT(0x3f , 0, IPT_PADDLE) PORT_SENSITIVITY(100)
-   PORT_START_TAG("analog6")
-   PORT_BIT(0x3f , 0, IPT_PADDLE) PORT_SENSITIVITY(100)
-   PORT_START_TAG("analog7")
-   PORT_BIT(0x3f , 0, IPT_PADDLE) PORT_SENSITIVITY(100)
-   PORT_START_TAG("analog8")
-   PORT_BIT(0x3f , 0, IPT_PADDLE) PORT_SENSITIVITY(100)
+	PORT_START_TAG("analog1")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(1)
+
+	PORT_START_TAG("analog2")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(1)
+
+	PORT_START_TAG("analog3")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(2)
+
+	PORT_START_TAG("analog4")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(2)
+
+// Not used, but are here for completeness
+	PORT_START_TAG("analog5")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(3)
+
+	PORT_START_TAG("analog6")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(3)
+
+	PORT_START_TAG("analog7")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(4)
+
+	PORT_START_TAG("analog8")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(4)
+
 INPUT_PORTS_END
 /* --------------------
    - AY8910_interface -
@@ -2254,7 +2279,7 @@ static MACHINE_DRIVER_START( amstrad )
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(800, 312) 
+	MDRV_SCREEN_SIZE(800, 312)
 	/* Amstrad Monitor Visible AREA : 768x272 */
 	MDRV_SCREEN_VISIBLE_AREA(0, ((AMSTRAD_SCREEN_WIDTH-32) - 1), 0, ((AMSTRAD_SCREEN_HEIGHT-40) - 1))
 	MDRV_PALETTE_LENGTH(32)
@@ -2271,7 +2296,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 
@@ -2469,10 +2494,10 @@ ROM_START(gx4000)
 ROM_END
 
 /*      YEAR  NAME    PARENT	COMPAT  MACHINE    INPUT    INIT    CONFIG,  COMPANY               FULLNAME */
-COMP( 1984, cpc464,   0,		0,		amstrad,  amstrad,	0,		cpc6128, "Amstrad plc", "Amstrad/Schneider CPC464", 0)
-COMP( 1985, cpc664,   cpc464,	0,		amstrad,  amstrad,	0,	    cpc6128, "Amstrad plc", "Amstrad/Schneider CPC664", 0)
-COMP( 1985, cpc6128,  cpc464,	0,		amstrad,  amstrad,	0,	    cpc6128, "Amstrad plc", "Amstrad/Schneider CPC6128", 0)
-COMP( 1985, cpc6128f, cpc464,   0,      amstrad,  amstrad, 0, cpc6128, "Amstrad plc", "Amstrad/Schneider CPC6128 Azerty French Keyboard", 0)
+COMP( 1984, cpc464,   0,		0,		amstrad,  amstrad,	0,		cpc6128, "Amstrad plc", "Amstrad CPC464", 0)
+COMP( 1985, cpc664,   cpc464,	0,		amstrad,  amstrad,	0,	    cpc6128, "Amstrad plc", "Amstrad CPC664", 0)
+COMP( 1985, cpc6128,  cpc464,	0,		amstrad,  amstrad,	0,	    cpc6128, "Amstrad plc", "Amstrad CPC6128", 0)
+COMP( 1985, cpc6128f, cpc464,   0,      amstrad,  amstrad, 0, cpc6128, "Amstrad plc", "Amstrad CPC6128 Azerty French Keyboard", 0)
 COMP( 1990, cpc464p,  0,		0,		cpcplus,  plus,	0,	    cpcplus, "Amstrad plc", "Amstrad CPC464+", 0)
 COMP( 1990, cpc6128p, 0,		0,		cpcplus,  plus,	0,	    cpcplus, "Amstrad plc", "Amstrad CPC6128+", 0)
 COMP( 1989, kccomp,   cpc464,	0,		kccomp,   kccomp,	0,	    cpc6128, "VEB Mikroelektronik", "KC Compact", 0)
