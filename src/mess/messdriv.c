@@ -123,6 +123,7 @@ TESTDRIVER( 3do_pal )
 	DRIVER( dcjp )		/* 1998 Sega Dreamcast (Japan) */
 	DRIVER( dc )		/* 1999 Sega Dreamcast (USA) */
 	DRIVER( dceu )		/* 1999 Sega Dreamcast (Europe) */
+	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box 					*/
 
 	/* BALLY */
 	DRIVER( astrocde )	/* Bally Astrocade									*/
