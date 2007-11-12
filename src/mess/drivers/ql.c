@@ -1,6 +1,8 @@
 #include "driver.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/m68000/m68000.h"
+#include "devices/cartslot.h"
+#include "includes/serial.h"
 #include "video/generic.h"
 #include "video/zx8301.h"
 #include "inputx.h"
@@ -35,7 +37,7 @@ static TIMER_CALLBACK( zx8302_baud_tick )
 	zx8302_baudx4 = zx8302_baudx4 ? 0 : 1;
 }
 
-static WRITE8_HANDLER( zx8302_w )
+static WRITE8_HANDLER( zx8302_control_w )
 {
 	int baudx4 = 0;
 
@@ -66,7 +68,7 @@ static WRITE8_HANDLER( zx8302_w )
 	mame_timer_adjust(zx8302_baud_timer, time_zero, 0, MAME_TIME_IN_HZ(baudx4));
 }
 
-static WRITE8_HANDLER( i8049_w )
+static WRITE8_HANDLER( zx8302_ipc_w )
 {
 	/*
 	process 8049 commands (p92)
@@ -138,7 +140,7 @@ static READ8_HANDLER( mdv_status_r )
 	return 0x0;
 }
 
-static WRITE8_HANDLER( clock_w )
+static WRITE8_HANDLER( zx8302_clock_w )
 {
 }
 
@@ -262,20 +264,18 @@ static READ8_HANDLER( ipc_bus_r )
 
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM	// Cartridge ROM
-	AM_RANGE(0x018000, 0x018001) AM_WRITE(clock_w)
-	AM_RANGE(0x018002, 0x018002) AM_WRITE(zx8302_w)
-	AM_RANGE(0x018003, 0x018003) AM_WRITE(i8049_w)
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROMBANK(1) // Cartridge ROM
+	AM_RANGE(0x018000, 0x018001) AM_WRITE(zx8302_clock_w)
+	AM_RANGE(0x018002, 0x018002) AM_WRITE(zx8302_control_w)
+	AM_RANGE(0x018003, 0x018003) AM_WRITE(zx8302_ipc_w)
 	AM_RANGE(0x018020, 0x018020) AM_READWRITE(mdv_status_r, mdv_ctrl_w)
-	AM_RANGE(0x018021, 0x018021) AM_WRITENOP // ???
 	AM_RANGE(0x018022, 0x018022) AM_WRITE(mdv_data_w)
-	AM_RANGE(0x018023, 0x018023) AM_WRITENOP // ???
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM // onboard RAM
 	AM_RANGE(0x040000, 0x0bffff) AM_RAM // 512KB add-on RAM
 	AM_RANGE(0x0c0000, 0x0dffff) AM_NOP // 8x16KB device slots
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM	// add-on ROM
+	AM_RANGE(0x0e0000, 0x0fffff) AM_ROMBANK(2) // add-on ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -398,6 +398,11 @@ INPUT_PORTS_END
 static MACHINE_START( ql )
 {
 	zx8302_baud_timer = mame_timer_alloc(zx8302_baud_tick);
+
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00ffff, 0, 0, MRA8_UNMAP, MWA8_UNMAP);
+
+	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x00c000, 0);
+	memory_set_bank(1, 0);
 }
 
 static MACHINE_DRIVER_START( ql )
@@ -539,9 +544,115 @@ ROM_END
 
 /* System Configuration */
 
+static DEVICE_LOAD( ql_microdrive )
+{
+	int	filesize = image_length(image);
+
+	if (filesize == 174930)
+	{
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+static void ql_microdrive_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
+		case DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_LOAD:							info->load = device_load_ql_microdrive; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "mdv"); break;
+	}
+}
+
+static DEVICE_LOAD( ql_serial )
+{
+	/* filename specified */
+	if (serial_device_load(image)==INIT_PASS)
+	{
+		/* setup transmit parameters */
+		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
+
+		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
+
+		/* and start transmit */
+		serial_device_set_transmit_state(image, 1);
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+static void ql_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* serial */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
+		case DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_INIT:							info->init = serial_device_init; break;
+		case DEVINFO_PTR_LOAD:							info->load = device_load_ql_serial; break;
+		case DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
+	}
+}
+
+static DEVICE_LOAD( ql_cart )
+{
+	UINT8 *ptr = ((UINT8 *)memory_region(REGION_CPU1)) + 0x00c000;
+	int	filesize = image_length(image);
+
+	if (filesize <= 16 * 1024)
+	{
+		if (image_fread(image, ptr, filesize) == filesize)
+		{
+			memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00ffff, 0, 0, MRA8_BANK1, MWA8_BANK1);
+
+			return INIT_PASS;
+		}
+	}
+
+	return INIT_FAIL;
+}
+
+static void ql_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+{
+	switch( state )
+	{
+	case DEVINFO_INT_COUNT:
+		info->i = 1;
+		break;
+	case DEVINFO_PTR_LOAD:
+		info->load = device_load_ql_cart;
+		break;
+	case DEVINFO_STR_FILE_EXTENSIONS:
+		strcpy(info->s = device_temp_str(), "qlc");
+		break;
+	default:
+		cartslot_device_getinfo( devclass, state, info );
+		break;
+	}
+}
+
 SYSTEM_CONFIG_START( ql )
 	CONFIG_RAM_DEFAULT	(128 * 1024)
 	CONFIG_RAM			(640 * 1024)
+	CONFIG_DEVICE(ql_microdrive_getinfo)
+	CONFIG_DEVICE(ql_serial_getinfo)
+	CONFIG_DEVICE(ql_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 /* Computer Drivers */
