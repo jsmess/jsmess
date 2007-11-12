@@ -135,7 +135,7 @@ static WRITE8_HANDLER( mdv_data_w )
 {
 }
 
-static READ8_HANDLER( mdv_status_r )
+static READ8_HANDLER( zx8302_status_r )
 {
 	return 0x0;
 }
@@ -264,11 +264,11 @@ static READ8_HANDLER( ipc_bus_r )
 
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROMBANK(1) // Cartridge ROM
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // Cartridge ROM
 	AM_RANGE(0x018000, 0x018001) AM_WRITE(zx8302_clock_w)
 	AM_RANGE(0x018002, 0x018002) AM_WRITE(zx8302_control_w)
 	AM_RANGE(0x018003, 0x018003) AM_WRITE(zx8302_ipc_w)
-	AM_RANGE(0x018020, 0x018020) AM_READWRITE(mdv_status_r, mdv_ctrl_w)
+	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_status_r, mdv_ctrl_w)
 	AM_RANGE(0x018022, 0x018022) AM_WRITE(mdv_data_w)
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_BASE(&videoram)
@@ -398,11 +398,6 @@ INPUT_PORTS_END
 static MACHINE_START( ql )
 {
 	zx8302_baud_timer = mame_timer_alloc(zx8302_baud_tick);
-
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00ffff, 0, 0, MRA8_UNMAP, MWA8_UNMAP);
-
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x00c000, 0);
-	memory_set_bank(1, 0);
 }
 
 static MACHINE_DRIVER_START( ql )
@@ -612,17 +607,11 @@ static void ql_serial_getinfo(const device_class *devclass, UINT32 state, union 
 
 static DEVICE_LOAD( ql_cart )
 {
-	UINT8 *ptr = ((UINT8 *)memory_region(REGION_CPU1)) + 0x00c000;
 	int	filesize = image_length(image);
 
 	if (filesize <= 16 * 1024)
 	{
-		if (image_fread(image, ptr, filesize) == filesize)
-		{
-			memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00ffff, 0, 0, MRA8_BANK1, MWA8_BANK1);
-
-			return INIT_PASS;
-		}
+		return INIT_PASS;
 	}
 
 	return INIT_FAIL;

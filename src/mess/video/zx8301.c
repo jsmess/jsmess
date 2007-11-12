@@ -21,14 +21,14 @@ static TIMER_CALLBACK(zx8301_flash_tick)
 
 PALETTE_INIT( zx8301 )
 {
-	palette_set_color_rgb(machine, 0x00, 0x00, 0x00, 0x00 );
-	palette_set_color_rgb(machine, 0x01, 0x00, 0x00, 0xff );
-	palette_set_color_rgb(machine, 0x02, 0x00, 0xff, 0x00 );
-	palette_set_color_rgb(machine, 0x03, 0x00, 0xff, 0xff );
-	palette_set_color_rgb(machine, 0x04, 0xff, 0x00, 0x00 );
-	palette_set_color_rgb(machine, 0x05, 0xff, 0x00, 0xff );
-	palette_set_color_rgb(machine, 0x06, 0xff, 0xff, 0x00 );
-	palette_set_color_rgb(machine, 0x07, 0xff, 0xff, 0xff );
+	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00 );
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff );
+	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00 );
+	palette_set_color_rgb(machine, 3, 0x00, 0xff, 0xff );
+	palette_set_color_rgb(machine, 4, 0xff, 0x00, 0x00 );
+	palette_set_color_rgb(machine, 5, 0xff, 0x00, 0xff );
+	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00 );
+	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff );
 }
 
 WRITE8_HANDLER( zx8301_control_w )
@@ -40,7 +40,7 @@ WRITE8_HANDLER( zx8301_control_w )
 
 static void zx8301_draw_screen(mame_bitmap *bitmap)
 {
-	int addr = zx8301.base ? 0x8000 : 0;
+	UINT32 addr = zx8301.base << 15;
 	int y, word, pixel;
 
 	if (zx8301.mode)
@@ -51,7 +51,7 @@ static void zx8301_draw_screen(mame_bitmap *bitmap)
 		{
 			int x = 0;
 
-			for (word = 0; word < 32; word++)
+			for (word = 0; word < 64; word++)
 			{
 				UINT8 byte_high = videoram[addr++];
 				UINT8 byte_low = videoram[addr++];
@@ -62,10 +62,10 @@ static void zx8301_draw_screen(mame_bitmap *bitmap)
 					int green = BIT(byte_high, 7);
 					int color = (green << 1) | red;
 
+					*BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[ZX8301_COLOR_MODE4[color]];
+
 					byte_high <<= 1;
 					byte_low <<= 1;
-
-					*BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[ZX8301_COLOR_MODE4[color]];
 				}
 			}
 		}
@@ -97,11 +97,11 @@ static void zx8301_draw_screen(mame_bitmap *bitmap)
 						color = 0;
 					}
 
+					*BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[color];
+					*BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[color];
+
 					byte_high <<= 2;
 					byte_low <<= 2;
-
-					*BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[color];
-					*BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[color];
 				}
 			}
 		}
