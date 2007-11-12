@@ -176,7 +176,7 @@ static WRITE8_HANDLER( ipc_port2_w )
 		
 		0		Serial data input
 		1		Speaker output
-		2		Interrupt IPL2 output
+		2		Interrupt IPL0-2 output
 		3		Interrupt IPL1 output
 		4		SER2 CTS
 		5		SER1 DTR
@@ -190,10 +190,10 @@ static WRITE8_HANDLER( ipc_port2_w )
 	switch (ipl)
 	{
 	case 0:
-		cpunum_set_input_line(0, MC68000_IRQ_6, HOLD_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_7, HOLD_LINE);
 		break;
 	case 1:
-		cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_5, HOLD_LINE);
 		break;
 	case 2:
 		cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
