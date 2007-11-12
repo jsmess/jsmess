@@ -1,5 +1,7 @@
 #include "driver.h"
+#include "cpu/i8039/i8039.h"
 #include "video/generic.h"
+#include "video/ql.h"
 #include "inputx.h"
 
 /*
@@ -15,105 +17,11 @@
 
 */
 
-/* video */
-
-static int mode4_colors[] = { 0, 2, 4, 7 };
-
-PALETTE_INIT( ql )
-{
-	palette_set_color_rgb(machine,  0x00, 0x00, 0x00, 0x00 );
-	palette_set_color_rgb(machine,  0x01, 0x00, 0x00, 0xff );
-	palette_set_color_rgb(machine,  0x02, 0x00, 0xff, 0x00 );
-	palette_set_color_rgb(machine,  0x03, 0x00, 0xff, 0xff );
-	palette_set_color_rgb(machine,  0x04, 0xff, 0x00, 0x00 );
-	palette_set_color_rgb(machine,  0x05, 0xff, 0x00, 0xff );
-	palette_set_color_rgb(machine,  0x06, 0xff, 0xff, 0x00 );
-	palette_set_color_rgb(machine,  0x07, 0xff, 0xff, 0xff );
-}
-
-WRITE8_HANDLER( ql_videoram_w )
-{
-	int i, x, y, r, g, color, byte0, byte1;
-	int offs;
-
-	videoram[offset] = data;
-
-	offs = offset / 2;
-
-	byte0 = videoram[offs];
-	byte1 = videoram[offs + 1];
-
-	x = (offs % 64) << 3;
-	y = offs / 64;
-
-//	logerror("ofs %u data %u x %u y %u\n", offset, data, x, y);
-
-		/*
-
-		# Note: QL video is encoded as 2-byte chunks
-		# msb->lsb (Green Red)
-		# mode 4: GGGGGGGG RRRRRRRR
-		# R+G=White
-
-		*/
-
-		for (i = 0; i < 8; i++)
-		{
-			r = (byte1 & 0x80) >> 6;
-			g = (byte0 & 0x80) >> 7;
-
-			color = r | g;
-			
-//			logerror("x %u y %u color %u\n", x, y, color);
-
-			*BITMAP_ADDR16(tmpbitmap, y, x++) = Machine->pens[mode4_colors[color]];
-
-			byte0 <<= 1;
-			byte1 <<= 1;
-
-		}
-
-		/*
-
-		# Note: QL video is encoded as 2-byte chunks
-		# msb->lsb (Green Flash Red Blue)
-		# mode 8: GFGFGFGF RBRBRBRB
-
-		*/
-
-/*
-		for (i = 0; i < 8; i++)
-		{
-			r = (data & 0x0080) >> 5;
-			g = (data & 0x8000) >> 14;
-			b = (data & 0x0040) >> 6;
-			f = (data & 0x4000) >> 14;
-
-			color = r | g | b;
-
-			plot_pixel(tmpbitmap, x++, y, Machine->pens[color]);
-			plot_pixel(tmpbitmap, x++, y, Machine->pens[color]);
-
-			data <<= 2;
-		}
-*/
-}
-
 /* Read/Write Handlers */
-
-WRITE8_HANDLER( video_ctrl_w )
-{
-	/*
-	18063 is write only (Quasar p.618)
-	bit 1: 0: screen on, 1: screen off
-	bit 3: 0: mode 512, 1: mode 256
-	bit 7: 0: base=0x20000, 1: base=0x28000
-	*/
-}
 
 static int ZXmode, ZXbps;
 
-WRITE8_HANDLER( zx8302_w )
+static WRITE8_HANDLER( zx8302_w )
 {
 	ZXmode = data & 0x18;
 
@@ -138,7 +46,7 @@ WRITE8_HANDLER( zx8302_w )
 	}
 }
 
-WRITE8_HANDLER( i8049_w )
+static WRITE8_HANDLER( i8049_w )
 {
 	/*
 	process 8049 commands (p92)
@@ -172,7 +80,7 @@ WRITE8_HANDLER( i8049_w )
 	*/
 }
 
-WRITE8_HANDLER( mdv_ctrl_w )
+static WRITE8_HANDLER( mdv_ctrl_w )
 {
 	/*
 	MDV control
@@ -201,17 +109,122 @@ WRITE8_HANDLER( mdv_ctrl_w )
 	*/
 }
 
-WRITE8_HANDLER( mdv_data_w )
+static WRITE8_HANDLER( mdv_data_w )
 {
 }
 
-READ8_HANDLER( mdv_status_r )
+static READ8_HANDLER( mdv_status_r )
 {
 	return 0x0;
 }
 
-WRITE8_HANDLER( clock_w )
+static WRITE8_HANDLER( clock_w )
 {
+}
+
+/* Intelligent Peripheral Controller (IPC) */
+
+static UINT8 ipc_keylatch;
+
+static WRITE8_HANDLER( ipc_port1_w )
+{
+	/*
+		
+		bit		description
+		
+		0		Keyboard column output (KBD0)
+		1		Keyboard column output (KBD1)
+		2		Keyboard column output (KBD2)
+		3		Keyboard column output (KBD3)
+		4		Keyboard column output (KBD4)
+		5		Keyboard column output (KBD5)
+		6		Keyboard column output (KBD6)
+		7		Keyboard column output (KBD7)
+
+	*/
+
+	ipc_keylatch = data;
+}
+
+static WRITE8_HANDLER( ipc_port2_w )
+{
+	/*
+		
+		bit		description
+		
+		0		IPC INT (pin 6)
+		1		Speaker output
+		2		CPU IPL 0-2 (pin 42)
+		3		ULA IPLIL (pin 26), CPU IPL 1 (pin 41)
+		4		J6 CTS (pin 5)
+		5		J5 DTR (pin 4)
+		6		N/C
+		7		ULA COMDATA (pin 35)
+
+	*/
+	
+}
+
+static READ8_HANDLER( ipc_port2_r )
+{
+	/*
+		
+		bit		description
+		
+		0		IPC INT (pin 6)
+		1		Speaker output
+		2		CPU IPL 0-2 (pin 42)
+		3		ULA IPLIL (pin 26), CPU IPL 1 (pin 41)
+		4		J6 CTS (pin 5)
+		5		J5 DTR (pin 4)
+		6		N/C
+		7		ULA COMDATA (pin 35)
+
+	*/
+
+	return 0;
+}
+
+static READ8_HANDLER( ipc_t1_r )
+{
+	/*
+		
+		bit		description
+		
+		0		ULA BAUDK4 (pin 5)
+
+	*/
+
+	return 0;
+}
+
+static READ8_HANDLER( ipc_bus_r )
+{
+	/*
+		
+		bit		description
+		
+		0		Keyboard row input (KBI0)
+		1		Keyboard row input (KBI1)
+		2		Keyboard row input (KBI2)
+		3		Keyboard row input (KBI3)
+		4		Keyboard row input (KBI4)
+		5		Keyboard row input (KBI5)
+		6		Keyboard row input (KBI6)
+		7		Keyboard row input (KBI7)
+
+	*/
+
+	if (ipc_keylatch & 0x01) return readinputportbytag("ROW0");
+	if (ipc_keylatch & 0x02) return readinputportbytag("ROW1");
+	if (ipc_keylatch & 0x04) return readinputportbytag("ROW2");
+	if (ipc_keylatch & 0x08) return readinputportbytag("ROW3");
+	if (ipc_keylatch & 0x10) return readinputportbytag("ROW4");
+	if (ipc_keylatch & 0x20) return readinputportbytag("ROW5");
+	if (ipc_keylatch & 0x40) return readinputportbytag("ROW6");
+	if (ipc_keylatch & 0x80) return readinputportbytag("ROW7");
+
+	return 0xff;
 }
 
 /* Memory Maps */
@@ -226,7 +239,7 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x018021, 0x018021) AM_WRITENOP // ???
 	AM_RANGE(0x018022, 0x018022) AM_WRITE(mdv_data_w)
 	AM_RANGE(0x018023, 0x018023) AM_WRITENOP // ???
-	AM_RANGE(0x018063, 0x018063) AM_WRITE(video_ctrl_w)
+	AM_RANGE(0x018063, 0x018063) AM_WRITE(ql_video_ctrl_w)
 	AM_RANGE(0x020000, 0x027fff) AM_RAM AM_WRITE(ql_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x028000, 0x02ffff) AM_RAM // videoram 2
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM // onboard RAM
@@ -237,6 +250,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(ipc_port1_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
+	AM_RANGE(I8039_t1, I8039_t1) AM_READ(ipc_t1_r)
+	AM_RANGE(I8039_bus, I8039_bus) AM_READ(ipc_bus_r)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -340,8 +360,9 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_CPU_ADD(M68008, 15000000/2)	// 7.5 MHz
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
 
-	MDRV_CPU_ADD(I8039, 11000000)		// 11 MHz (i8049 IPC)
+	MDRV_CPU_ADD(I8048, 11000000)		// 11 MHz (i8049 IPC)
 	MDRV_CPU_PROGRAM_MAP(ipc_map, 0)
+	MDRV_CPU_IO_MAP(ipc_io_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -400,7 +421,7 @@ ROM_START( ql )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
-	ROM_LOAD( "v07.ic24",	  0x0000, 0x0800, CRC(051111f9) SHA1(83ed562464df89b9fdd9740db51d45884a512696) ) // V0.7
+//	ROM_LOAD( "v07.ic24",	  0x0000, 0x0800, CRC(051111f9) SHA1(83ed562464df89b9fdd9740db51d45884a512696) ) // V0.7
 ROM_END
 
 ROM_START( ql_jsu )
