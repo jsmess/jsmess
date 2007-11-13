@@ -110,7 +110,7 @@
 	<hash crc32="776d03dc" sha1="b8fe29112be8108cf087a5a90f347c736ad38a39" name="A-Force (Sachen 4-in-1 Vol. 6) (Unl)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="2e0c6df7" sha1="79790d0406b4d4e96d2ea00a7871821006e459ce" name="Ace Striker (J)[o1]">
+	<hash crc32="2e0c6df7" sha1="79790d0406b4d4e96d2ea00a7871821006e459ce" name="Ace Striker (J) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="cac3ae13" sha1="5a228151bfe921f48767f1ae6e07630f76cae3d6" name="Ace Striker (J)">
@@ -1668,7 +1668,7 @@
 	<hash crc32="a7cdbb96" sha1="e27d941af0a006c4f5ffd03914265146aa140e2c" name="Bonk's Adventure (U)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="59c46139" sha1="d36fbac8228b391bb3ff08e628f86174f6e30102" name="Bonk's Adventure (U)[t1]">
+	<hash crc32="59c46139" sha1="d36fbac8228b391bb3ff08e628f86174f6e30102" name="Bonk's Adventure (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="6557a5ae" sha1="93b45845aab3865a21e85950b26156b26c739da5" name="Bonk's Adventure (U)">
@@ -1838,16 +1838,16 @@
 	<hash crc32="4106d781" sha1="e258d852713f392454d4291032ce50ad325aba86" name="Bubble Bobble Part 2 (UE)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="c7162745" sha1="1c7884a0276462e1bc8a2152314d5c65f994f072" name="Bubble Bobble Part 2 (UE)[o1]">
+	<hash crc32="c7162745" sha1="1c7884a0276462e1bc8a2152314d5c65f994f072" name="Bubble Bobble Part 2 (UE) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="1fef71e0" sha1="651020861862d076e2e121b3706faa316e5eb9ff" name="Bubble Bobble Part 2 (UE)[o2]">
+	<hash crc32="1fef71e0" sha1="651020861862d076e2e121b3706faa316e5eb9ff" name="Bubble Bobble Part 2 (UE) [o2]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="736a488a" sha1="29facbb347460f7645b4c458ab549d33689b7473" name="Bubble Bobble Part 2 (UE)[t1]">
+	<hash crc32="736a488a" sha1="29facbb347460f7645b4c458ab549d33689b7473" name="Bubble Bobble Part 2 (UE) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="8eafe1e1" sha1="88dcbfe26953af3c6643ed1ba368d3631843bb87" name="Bubble Bobble Part 2 (UE)[t2]">
+	<hash crc32="8eafe1e1" sha1="88dcbfe26953af3c6643ed1ba368d3631843bb87" name="Bubble Bobble Part 2 (UE) [t2]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="3a98fe03" sha1="574d56b29709cb413d80242826ca2961fb614b1b" name="Bubble Bobble Part 2 (UE)">
@@ -2298,7 +2298,7 @@
 	<hash crc32="769a2c5a" sha1="5c3c9a4d85a92779c7e8304f2c122296f62f9a9c" name="Catz - Your Virtual Petz Palz (U) [C]">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="fd1f0679" sha1="c0c96803b03b879c3bb948ab6b7edbba2be19078" name="Cave Noire (J)[h1C]">
+	<hash crc32="fd1f0679" sha1="c0c96803b03b879c3bb948ab6b7edbba2be19078" name="Cave Noire (J) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="4621b29b" sha1="3fd2d918357e2157503c9b5e1bd4b8ef65a7ee3c" name="Cave Noire (J)">
@@ -2426,7 +2426,7 @@
 	<hash crc32="3947d66e" sha1="ac76989e6b6e5f1632a621131c382c95264cde6b" name="Chiki Race (J)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="6b9c4cdf" sha1="2c256bdd4f2614d57970e9b754caeec7df4cd692" name="Chiki Race (J)[h1C]">
+	<hash crc32="6b9c4cdf" sha1="2c256bdd4f2614d57970e9b754caeec7df4cd692" name="Chiki Race (J) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="f999d21e" sha1="fa8ed1e3fbd9bdae51f8ce0cdb4cc91d3d7cc554" name="Chiki Race (J)">
@@ -2821,10 +2821,10 @@
 		<status>GoodGBx Verified Image</status>
 	</hash>
 	<hash crc32="f8e0647b" sha1="df62848c2311653050c1bba984723dbc1ae9ef7a" name="Daiku no Gensan - Kachikachi no Tonkachi ga Kachi (J) [C][T+Eng]"> </hash>
-	<hash crc32="f1c6b5ed" sha1="186d6eafa6620b8fa5e0adcba2634904032777a4" name="Daisenryaku (J)[h1C]">
+	<hash crc32="f1c6b5ed" sha1="186d6eafa6620b8fa5e0adcba2634904032777a4" name="Daisenryaku (J) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="a0d3a21b" sha1="b308f52a9af241026b3202764adaee8775a80510" name="Daisenryaku (J)[h2C]">
+	<hash crc32="a0d3a21b" sha1="b308f52a9af241026b3202764adaee8775a80510" name="Daisenryaku (J) [h2C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="69953653" sha1="a9123e32f1a32483bb96769eb43077f0356b7b10" name="Daisenryaku (J)">
@@ -3534,13 +3534,13 @@
 	<hash crc32="10dcbdc3" sha1="ef58063d896533398288a4f07245f23efa3aee4a" name="Dragon Slayer Gaiden (J)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="d392ffc8" sha1="e3e15610c2db2b0513b110f2c36c5d8b2b9abc5d" name="Dragon Slayer Gaiden (J)[h1C]">
+	<hash crc32="d392ffc8" sha1="e3e15610c2db2b0513b110f2c36c5d8b2b9abc5d" name="Dragon Slayer Gaiden (J) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="d8644d8d" sha1="b4becb11b6c4852e7ba2e2304afcf7175d873153" name="Dragon Slayer Gaiden (J)">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="a6353c07" sha1="a3db728ae5701f4d74d1b8107c2d2d8524f4b49e" name="Dragon Slayer Gaiden (J)[h1C]">
+	<hash crc32="a6353c07" sha1="a3db728ae5701f4d74d1b8107c2d2d8524f4b49e" name="Dragon Slayer Gaiden (J) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="ad1f068f" sha1="e828b83d0a63bde9076650b764b3812eb7e1eb08" name="Dragon Slayer Gaiden (J)">
@@ -4091,7 +4091,7 @@
 	<hash crc32="58314182" sha1="6ab6890e8f688bcd87e97886a1748a4d9d341909" name="Final Fantasy Legend II (U)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="9b5b0217" sha1="aeb2313ce8ae3cdb2d67fa5e5880ec670af96275" name="Final Fantasy Legend II (U)[T+Spa100%_Tanero]">
+	<hash crc32="9b5b0217" sha1="aeb2313ce8ae3cdb2d67fa5e5880ec670af96275" name="Final Fantasy Legend II (U) [T+Spa100%_Tanero]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="5cd18d2e" sha1="49472912495576ac10b0e208df9a84ca1e5f5a38" name="Final Fantasy Legend II (U)">
@@ -5534,7 +5534,7 @@
 		<status>GoodGBx Verified Image</status>
 	</hash>
 	<hash crc32="81cd6254" sha1="437047c7f7a2f208cb13a2c153c85eef8037b1c2" name="Game Genie V1.17 BIOS [h1]"> </hash>
-	<hash crc32="d4a7cd0d" sha1="5219255129f3f65550409380e44544dcc1c79735" name="Game Genie V1.17 BIOS[h1]">
+	<hash crc32="d4a7cd0d" sha1="5219255129f3f65550409380e44544dcc1c79735" name="Game Genie V1.17 BIOS [h1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="cacb6d23" sha1="8706e20a51bc5f12c1d3e0645bbf80247893b8f4" name="Game Genie V1.17 BIOS">
@@ -7521,7 +7521,7 @@
 	<hash crc32="2c8ad255" sha1="efbc825bae50c0498e56b53e9d02f00c400ff6d9" name="Jurassic Park (E) (M5)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="286f6727" sha1="8f6ff660fc0f2445173e16d83569e49f54bd70c9" name="Jurassic Park (E) (M5)[t1]">
+	<hash crc32="286f6727" sha1="8f6ff660fc0f2445173e16d83569e49f54bd70c9" name="Jurassic Park (E) (M5) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="d9dc38ee" sha1="5280d612c68db5c5b261936abe16f94aac76635d" name="Jurassic Park (E) (M5)">
@@ -7744,7 +7744,7 @@
 	<hash crc32="0c042862" sha1="465614bb236c507a5709ecab95827a8be4e2e6b8" name="Kid Icarus - Of Myths and Monsters (UE)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="ed213f95" sha1="0234a81a5ba025d58c01396497a2c36ee1a1d1e0" name="Kid Icarus - Of Myths and Monsters (UE)[BF]">
+	<hash crc32="ed213f95" sha1="0234a81a5ba025d58c01396497a2c36ee1a1d1e0" name="Kid Icarus - Of Myths and Monsters (UE) [BF]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="f633f50d" sha1="a393d571da62a01600a371dbb8954f5721ba5760" name="Kid Icarus - Of Myths and Monsters (UE)">
@@ -9828,7 +9828,7 @@
 	<hash crc32="90eb0929" sha1="59752879efaf2f271ce4b8a9d4a455056a2985d0" name="Mortal Kombat (U)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="5175f8e6" sha1="b0526966e123528a004a24b2d9d3efef39a094d5" name="Mortal Kombat (U)[BF]">
+	<hash crc32="5175f8e6" sha1="b0526966e123528a004a24b2d9d3efef39a094d5" name="Mortal Kombat (U) [BF]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="dfb1e455" sha1="1a298bc7f29336e3a7dd0fd217d0fe7aa1e03d5f" name="Mortal Kombat (U)">
@@ -14499,10 +14499,10 @@
 	<hash crc32="6dc1bb2c" sha1="cacb8a79cf66dcb8c3d4f71c94d535cf9e5ad63b" name="Super James Pond (E)">
 		<status>GoodGBx Verified Image</status>
 	</hash>
-	<hash crc32="867f9142" sha1="d259ce1ca1c915f1807a6fa9cbb7f61dfd6ffa25" name="Super James Pond (U)[t1]">
+	<hash crc32="867f9142" sha1="d259ce1ca1c915f1807a6fa9cbb7f61dfd6ffa25" name="Super James Pond (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="19fcde83" sha1="54e56e91754c758f389bbed426d07125ccf3b475" name="Super James Pond (U)[t2]">
+	<hash crc32="19fcde83" sha1="54e56e91754c758f389bbed426d07125ccf3b475" name="Super James Pond (U) [t2]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="798d0742" sha1="79a100bdce94a313694f0dffcc72c4370ea23c6c" name="Super James Pond (U)">

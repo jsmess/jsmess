@@ -803,7 +803,7 @@
 		<status>Good2600 Verified Image</status>
 		<year>1977</year>
 	</hash>
-	<hash crc32="2a765130" sha1="af5b9f33ccb7778b42957da4f20f2bc000992366" name="Air-Sea Battle (Atari)[h1]">
+	<hash crc32="2a765130" sha1="af5b9f33ccb7778b42957da4f20f2bc000992366" name="Air-Sea Battle (Atari) [h1]">
 		<status>Overdumped Image</status>
 		<year>1977</year>
 	</hash>
@@ -2156,7 +2156,7 @@
 		<status>Good2600 Verified Image</status>
 		<year>1978</year>
 	</hash>
-	<hash crc32="1b32c8a0" sha1="73979dc21c170a98a724c80aa99db4da50a8c21d" name="Bowling (Atari)[o1]">
+	<hash crc32="1b32c8a0" sha1="73979dc21c170a98a724c80aa99db4da50a8c21d" name="Bowling (Atari) [o1]">
 		<status>Known Bad Image</status>
 		<year>1978</year>
 	</hash>
@@ -4900,7 +4900,7 @@
 		<status>Good2600 Verified Image</status>
 		<year>1983</year>
 	</hash>
-	<hash crc32="0966e8ed" sha1="684275b22f2bac7d577cf48cf42fa14fa6f69678" name="Fighter Pilot (AKA Tomcat - F-14 FS) (Absolute) (PAL)">
+	<hash crc32="0966e8ed" sha1="684275b22f2bac7d577cf48cf42fa14fa6f69678" name="Fighter Pilot (AKA Tomcat - F-14 FS) (Absolute)  (PAL)">
 		<status>Good2600 Verified Image</status>
 		<year>1988</year>
 	</hash>
@@ -13713,7 +13713,7 @@
 		<status>Good2600 Verified Image</status>
 		<year>1982</year>
 	</hash>
-	<hash crc32="38d97756" sha1="fa37b85d184e0f7c0fcb1d2dbf5a3140b76d85c9" name="Sky Jinks (Activision)[o1]">
+	<hash crc32="38d97756" sha1="fa37b85d184e0f7c0fcb1d2dbf5a3140b76d85c9" name="Sky Jinks (Activision) [o1]">
 		<status>Known Bad Image</status>
 		<year>1982</year>
 	</hash>
@@ -16198,7 +16198,7 @@
 	<hash crc32="8987c473" sha1="5b2742281fea96ab6a3a2f30e676352bcf424390" name="Tomcat - The F-14 Flight Simulator (Absolute)">
 		<year>1988</year>
 	</hash>
-	<hash crc32="cb5d1c42" sha1="d85e90adbb4106b9c14ec95de4798111331e939c" name="Tomcat - The F-14 Flight Simulator (Skyworks) (PAL)">
+	<hash crc32="cb5d1c42" sha1="d85e90adbb4106b9c14ec95de4798111331e939c" name="Tomcat - The F-14 Flight Simulator (Skyworks)  (PAL)">
 		<status>Good2600 Verified Image</status>
 		<year>2002</year>
 	</hash>

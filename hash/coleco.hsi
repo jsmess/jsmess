@@ -570,7 +570,7 @@
 		<status>GoodCol Verified Image</status>
 		<year>1983</year>
 	</hash>
-	<hash crc32="08990b8f" sha1="a2b35d87f13ceb790a99f20bab43d4548d3c6587" name="Frontline (Taito)[o1]">
+	<hash crc32="08990b8f" sha1="a2b35d87f13ceb790a99f20bab43d4548d3c6587" name="Frontline (Taito) [o1]">
 		<status>Known Bad Image</status>
 		<year>1983</year>
 	</hash>
@@ -652,11 +652,11 @@
 		<status>GoodCol Verified Image</status>
 		<year>1983</year>
 	</hash>
-	<hash crc32="bc3b9f78" sha1="aa0069dbb9bc5c4d0ea04941c51f19587a9c6e40" name="Heist, The (Micro Fun)[t1] (50 Men)">
+	<hash crc32="bc3b9f78" sha1="aa0069dbb9bc5c4d0ea04941c51f19587a9c6e40" name="Heist, The (Micro Fun) [t1] (50 Men)">
 		<status>Known Bad Image</status>
 		<year>1983</year>
 	</hash>
-	<hash crc32="b0f5dcb4" sha1="08352200cfae252a69e83b55f1590e5f75739d18" name="Heist, The (Micro Fun)[t2] (8 Men)">
+	<hash crc32="b0f5dcb4" sha1="08352200cfae252a69e83b55f1590e5f75739d18" name="Heist, The (Micro Fun) [t2] (8 Men)">
 		<status>Known Bad Image</status>
 		<year>1983</year>
 	</hash>
@@ -1132,6 +1132,9 @@
 		<year>2004</year>
 	</hash>
 	<hash crc32="5a601d55" sha1="24a209ba6fe8ead416e3991bc361af8b5311187e" name="Search for the Stolen Crown Jewels (Jun 01) (Philipp Klaus Krause)">
+		<year>2006</year>
+	</hash>
+	<hash crc32="e339d9cc" sha1="1e2e883604e3b8559bd36c88313567dabd8444ac" name="Search for the Stolen Crown Jewels Demo V1.0 (Philipp Klaus Krause)">
 		<year>2006</year>
 	</hash>
 	<hash crc32="ad1ba6ed" sha1="09e9347706a9077de4dec06466103ff07884b97c" name="Search for the Stolen Crown Jewels (May 08) (Philipp Klaus Krause)">

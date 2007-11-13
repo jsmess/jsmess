@@ -24,10 +24,10 @@
 	<hash crc32="b0256101" sha1="da7bcb78cf78333d7515b77f676fd45473b5b506" name="1080 Snowboarding (E) (M4)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="933a9d1b" sha1="308e2daded2caacd27c12212fe965b40047e88aa" name="1080 Snowboarding (E) (M4)[f2] (NTSC)">
+	<hash crc32="933a9d1b" sha1="308e2daded2caacd27c12212fe965b40047e88aa" name="1080 Snowboarding (E) (M4) [f2] (NTSC)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="41122c96" sha1="ba7ada020411d8c15366867f7a30649a10261407" name="1080 Snowboarding (E) (M4)[f2] (NTSC)">
+	<hash crc32="41122c96" sha1="ba7ada020411d8c15366867f7a30649a10261407" name="1080 Snowboarding (E) (M4) [f2] (NTSC)">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="9204cc62" sha1="ee89a7d9c4c0ed972d98bdac36dcdcd39e30f32d" name="1080 Snowboarding (E) (M4)">
@@ -454,10 +454,10 @@
 	<hash crc32="79f2df14" sha1="0ce4d812125f7c153795bbe3835cda6c29105724" name="Airboarder 64 (J)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="3ecd5b63" sha1="f743b2b6fa75d31b0a60fc8ea000f066dfc81fbb" name="Airboarder 64 (J)[t1]">
+	<hash crc32="3ecd5b63" sha1="f743b2b6fa75d31b0a60fc8ea000f066dfc81fbb" name="Airboarder 64 (J) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="785ef58d" sha1="1c6a08d3f1cbbe6ca97a57cb727e369ca8a59db3" name="Airboarder 64 (J)[t1]">
+	<hash crc32="785ef58d" sha1="1c6a08d3f1cbbe6ca97a57cb727e369ca8a59db3" name="Airboarder 64 (J) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="74210e87" sha1="11d5f35c8fe528dd3c715d1154e75efbcb340e65" name="Airboarder 64 (J)">
@@ -674,16 +674,16 @@
 	<hash crc32="fb982b44" sha1="6e1c4af8f765dee69b5308ec5a0b20bc7fb8d862" name="Asteroids Hyper 64 (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="fd3d371b" sha1="e8ec0f1a3ed089a27109ace2a35b8ebd829e7ef8" name="Asteroids Hyper 64 (U)[f1] (PAL)">
+	<hash crc32="fd3d371b" sha1="e8ec0f1a3ed089a27109ace2a35b8ebd829e7ef8" name="Asteroids Hyper 64 (U) [f1] (PAL)">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="ff49b184" sha1="3636f5ceb53784273825fb2a7d4a3c8258a21dff" name="Asteroids Hyper 64 (U)[f1] (PAL)">
+	<hash crc32="ff49b184" sha1="3636f5ceb53784273825fb2a7d4a3c8258a21dff" name="Asteroids Hyper 64 (U) [f1] (PAL)">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="d65f7b9a" sha1="8d0c20071fb8cb4a23eed2f6be274f3e04f67ad3" name="Asteroids Hyper 64 (U)[t1]">
+	<hash crc32="d65f7b9a" sha1="8d0c20071fb8cb4a23eed2f6be274f3e04f67ad3" name="Asteroids Hyper 64 (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="1caddfc4" sha1="e06028939e0c91ec251e2a8b921b642d79fdc109" name="Asteroids Hyper 64 (U)[t1]">
+	<hash crc32="1caddfc4" sha1="e06028939e0c91ec251e2a8b921b642d79fdc109" name="Asteroids Hyper 64 (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="91aa6689" sha1="83357d0b5462e02e7121a13f8aec1e37e8852c0b" name="Asteroids Hyper 64 (U)">
@@ -760,10 +760,10 @@
 	<hash crc32="18c2913d" sha1="e24aafd66c020addd99aaf0fd09c6a11deeb6b25" name="Automobili Lamborghini (U) [h1C]"> </hash>
 	<hash crc32="68d2aa64" sha1="cfdbeaa1ad6b87804a3698508624ee76e60d4a1f" name="Automobili Lamborghini (U) [h2C]"> </hash>
 	<hash crc32="df0246fc" sha1="857ae0821a0a187a2c94606abc080f1af15cf144" name="Automobili Lamborghini (U) [h2C]"> </hash>
-	<hash crc32="1f38d9c4" sha1="43c08b6fc69910dd57e6e09d2650b541f097db4b" name="Automobili Lamborghini (U)[T+Ita_cattivik66]">
+	<hash crc32="1f38d9c4" sha1="43c08b6fc69910dd57e6e09d2650b541f097db4b" name="Automobili Lamborghini (U) [T+Ita_cattivik66]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="cba10318" sha1="7e0a382c9e7a8b6010684bea5468403d5b040689" name="Automobili Lamborghini (U)[T+Ita_cattivik66]">
+	<hash crc32="cba10318" sha1="7e0a382c9e7a8b6010684bea5468403d5b040689" name="Automobili Lamborghini (U) [T+Ita_cattivik66]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="190288d7" sha1="4efb5511278f50c460caa62262747fbf32af5adb" name="Automobili Lamborghini (U)">
@@ -802,10 +802,10 @@
 	<hash crc32="0262b512" sha1="ad8453d0c76ee0f90ce1cee2dbd439b807eaa299" name="Automobili Lamborghini (U)">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="405c647d" sha1="0bb84d33fa28691c82c666a94a0bfda80fefb98a" name="Automobili Lamborghini (U)[T+Ita_cattivik66]">
+	<hash crc32="405c647d" sha1="0bb84d33fa28691c82c666a94a0bfda80fefb98a" name="Automobili Lamborghini (U) [T+Ita_cattivik66]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="30e20716" sha1="e1855256144c4dbaa4b18a3209047ad9b5c72606" name="Automobili Lamborghini (U)[T+Ita_cattivik66]">
+	<hash crc32="30e20716" sha1="e1855256144c4dbaa4b18a3209047ad9b5c72606" name="Automobili Lamborghini (U) [T+Ita_cattivik66]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="3a760d0b" sha1="82e2cb9f90e2f192ae460e3aa7127fbc89024b63" name="Automobili Lamborghini (U)">
@@ -1016,10 +1016,10 @@
 	<hash crc32="d64e0a7b" sha1="a67cef8a1f06ce201e0486ad2b9507314398799f" name="Batman Beyond - Return of the Joker (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="0184342f" sha1="0e6772f0e1b173fcfe1dd441118d6ea48dfd6499" name="Batman Beyond - Return of the Joker (U)[t1]">
+	<hash crc32="0184342f" sha1="0e6772f0e1b173fcfe1dd441118d6ea48dfd6499" name="Batman Beyond - Return of the Joker (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="9d34c341" sha1="12fdcdf42cb67096bc0c151c463872660c018cd7" name="Batman Beyond - Return of the Joker (U)[t1]">
+	<hash crc32="9d34c341" sha1="12fdcdf42cb67096bc0c151c463872660c018cd7" name="Batman Beyond - Return of the Joker (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="6c5ab61e" sha1="5e5ffa4c113b8c16ba55c998650a20bbe3ccbedc" name="Batman Beyond - Return of the Joker (U)">
@@ -1052,10 +1052,10 @@
 	<hash crc32="66123c8b" sha1="1daced29439e8f2605349e9f453e90155fea46f4" name="BattleTanx (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="b6697b5c" sha1="d9a9f71b994ab70748c6be80eb861eaec7733303" name="BattleTanx (U)[t1]">
+	<hash crc32="b6697b5c" sha1="d9a9f71b994ab70748c6be80eb861eaec7733303" name="BattleTanx (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="e6e2626a" sha1="a45cfa01c24d51c4631c123d2cf13a54856462ca" name="BattleTanx (U)[t1]">
+	<hash crc32="e6e2626a" sha1="a45cfa01c24d51c4631c123d2cf13a54856462ca" name="BattleTanx (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="716239a4" sha1="391fadf2146560825cd79a7437084c6d03f09f35" name="BattleTanx (U)">
@@ -1314,10 +1314,10 @@
 	<hash crc32="7b878c56" sha1="f61c30bc6feaac9700578a865d552ae42079b0e5" name="Body Harvest (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="822cce53" sha1="c44acb346ee66ad6585f898e98c07c0ea541b5d0" name="Body Harvest (U)[t1]">
+	<hash crc32="822cce53" sha1="c44acb346ee66ad6585f898e98c07c0ea541b5d0" name="Body Harvest (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="af5de7c9" sha1="78479b9e8f57f73a4d538f2f661e293a8a5050cb" name="Body Harvest (U)[t1]">
+	<hash crc32="af5de7c9" sha1="78479b9e8f57f73a4d538f2f661e293a8a5050cb" name="Body Harvest (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="47057360" sha1="0b02592b90e47d6dc132b5c3f6d9eff7056c3718" name="Body Harvest (U)">
@@ -1540,10 +1540,10 @@
 	<hash crc32="c4920705" sha1="1a188b22e88a0f2f95e25445ba1090abb77a9f0e" name="Brunswick Circuit Pro Bowling (U)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="84e3b242" sha1="185fa999c980d85beca760f565a873682f649ddc" name="Brunswick Circuit Pro Bowling (U)[f1] (PAL)">
+	<hash crc32="84e3b242" sha1="185fa999c980d85beca760f565a873682f649ddc" name="Brunswick Circuit Pro Bowling (U) [f1] (PAL)">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="6ca9a742" sha1="4d9abc040af4b11d8f198180fe758fd35a56177f" name="Brunswick Circuit Pro Bowling (U)[f1] (PAL)">
+	<hash crc32="6ca9a742" sha1="4d9abc040af4b11d8f198180fe758fd35a56177f" name="Brunswick Circuit Pro Bowling (U) [f1] (PAL)">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="ca69aa8b" sha1="f854b985152b881360f0e1af23b01048995ada59" name="Brunswick Circuit Pro Bowling (U)">
@@ -1570,10 +1570,10 @@
 	<hash crc32="da2acd5e" sha1="9cf046e320e5437159a41c49694dc66d4d8e79bd" name="Buck Bumble (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="35682724" sha1="0d8ba99a0a18b8e9e81b882ce860e0c07645f666" name="Buck Bumble (U)[t1]">
+	<hash crc32="35682724" sha1="0d8ba99a0a18b8e9e81b882ce860e0c07645f666" name="Buck Bumble (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="90457d57" sha1="7f4e3579d844ae82043c844eb4111b268a65b9e0" name="Buck Bumble (U)[t1]">
+	<hash crc32="90457d57" sha1="7f4e3579d844ae82043c844eb4111b268a65b9e0" name="Buck Bumble (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="462ea83e" sha1="b6a4936b3d8fe7b7e3b90ff705be2dc461ddc3ef" name="Buck Bumble (U)">
@@ -1622,10 +1622,10 @@
 	<hash crc32="7c2f610d" sha1="e30e1b6bdcfd985b000757a8e611a419d1f38233" name="Bug's Life, A (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="478ce66f" sha1="70656ea6c7e45e19f627adc019002e5e7850accf" name="Bug's Life, A (U)[f1] (PAL)">
+	<hash crc32="478ce66f" sha1="70656ea6c7e45e19f627adc019002e5e7850accf" name="Bug's Life, A (U) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="af4ec4be" sha1="d044a137ab5eadd98007bc91e2118574ab71c7ff" name="Bug's Life, A (U)[f1] (PAL)">
+	<hash crc32="af4ec4be" sha1="d044a137ab5eadd98007bc91e2118574ab71c7ff" name="Bug's Life, A (U) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="df844e51" sha1="c3248a10c057e6226ade28bfb31d82c2015d196c" name="Bug's Life, A (U)">
@@ -2270,10 +2270,10 @@
 	<hash crc32="dcccb22f" sha1="1cda578cad71abccecd3643197c76a3284caac3e" name="Clay Fighter 63 1-3 (E)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="5e0dd087" sha1="e7028b268ead7633ee0b3009851424c7e42d2e0d" name="Clay Fighter 63 1-3 (E)[h1C]">
+	<hash crc32="5e0dd087" sha1="e7028b268ead7633ee0b3009851424c7e42d2e0d" name="Clay Fighter 63 1-3 (E) [h1C]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="974185df" sha1="13ae184e6ebbe7f636da057442fb2a0eb88a522d" name="Clay Fighter 63 1-3 (E)[h1C]">
+	<hash crc32="974185df" sha1="13ae184e6ebbe7f636da057442fb2a0eb88a522d" name="Clay Fighter 63 1-3 (E) [h1C]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="41f36719" sha1="d9d954b8f4eeacf2a41a58b791b512dbba13a331" name="Clay Fighter 63 1-3 (E) [h1C]"> </hash>
@@ -2654,10 +2654,10 @@
 	<hash crc32="8ce25c68" sha1="7ca61515b13d927e905b59390dd300945b68d218" name="Dezaemon 3D (J)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="9bbad86e" sha1="2e624609efe173595116ee76fe8446b8a57d0d9a" name="Dezaemon 3D (J)[t1]">
+	<hash crc32="9bbad86e" sha1="2e624609efe173595116ee76fe8446b8a57d0d9a" name="Dezaemon 3D (J) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="646410a3" sha1="cbf9bc2c617af10c94adc0d4b314ede8a5b8141e" name="Dezaemon 3D (J)[t1]">
+	<hash crc32="646410a3" sha1="cbf9bc2c617af10c94adc0d4b314ede8a5b8141e" name="Dezaemon 3D (J) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="9de8a036" sha1="03c85d19528ec48df4c3ad353e7eb86b476f175a" name="Dezaemon 3D (J)">
@@ -2758,10 +2758,10 @@
 	<hash crc32="33d10378" sha1="0729602a2d496714fda9435b9390eb9405b18fc0" name="Diddy Kong Racing (U) (M2) (V1.0) [f3]"> </hash>
 	<hash crc32="f09727f4" sha1="11717be5a8641ef2c0628cb2d51617bb8b05fb04" name="Diddy Kong Racing (U) (M2) (V1.0) [f4]"> </hash>
 	<hash crc32="2b49fc8e" sha1="188796e72539d6fd20a017393b5736bda244aec6" name="Diddy Kong Racing (U) (M2) (V1.0) [f4]"> </hash>
-	<hash crc32="fd3dc0d2" sha1="9c8bac9c8ece2a407a341d62fe6db8c4078a6083" name="Diddy Kong Racing (U) (M2) (V1.0)[f1]">
+	<hash crc32="fd3dc0d2" sha1="9c8bac9c8ece2a407a341d62fe6db8c4078a6083" name="Diddy Kong Racing (U) (M2) (V1.0) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="c209bca1" sha1="49033c36c1ef81f77cce5ed8035e45c9c6f234c1" name="Diddy Kong Racing (U) (M2) (V1.0)[f1]">
+	<hash crc32="c209bca1" sha1="49033c36c1ef81f77cce5ed8035e45c9c6f234c1" name="Diddy Kong Racing (U) (M2) (V1.0) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="36c92d99" sha1="bc9c7082eadba4dde1a304b8be74ad3a965cd9ca" name="Diddy Kong Racing (U) (M2) (V1.0)">
@@ -3608,10 +3608,10 @@
 	<hash crc32="7d8ddefb" sha1="ba7a94d3cece240276c294c2ff29ac93c59bd939" name="F-1 World Grand Prix (G)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="f2a26788" sha1="3c7eafb79e1d7335a0e37fb14b69f7546171c0c7" name="F-1 World Grand Prix (G)[o1]">
+	<hash crc32="f2a26788" sha1="3c7eafb79e1d7335a0e37fb14b69f7546171c0c7" name="F-1 World Grand Prix (G) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="2d5e9675" sha1="7ec60f96f037fbea7627285995efe9f941fda7b4" name="F-1 World Grand Prix (G)[o1]">
+	<hash crc32="2d5e9675" sha1="7ec60f96f037fbea7627285995efe9f941fda7b4" name="F-1 World Grand Prix (G) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="973f566e" sha1="c8f422d64b7b473f11f8204686641e68ad5915ab" name="F-1 World Grand Prix (G)">
@@ -3622,10 +3622,10 @@
 	</hash>
 	<hash crc32="2c894c1c" sha1="00468d7f707625af12ee106f3f4b0d276b116eba" name="F-1 World Grand Prix (G) [h1C]"> </hash>
 	<hash crc32="e1411269" sha1="73da960703807e49f38cdddedef6ba6bd037066e" name="F-1 World Grand Prix (G) [h1C]"> </hash>
-	<hash crc32="1d800e13" sha1="60573fb344742bde00691d3a716eaaa2fbd912ab" name="F-1 World Grand Prix (G)[h1C]">
+	<hash crc32="1d800e13" sha1="60573fb344742bde00691d3a716eaaa2fbd912ab" name="F-1 World Grand Prix (G) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="53612b4c" sha1="74974b549d08f5b766439a7a0fdb021b9ef80b6c" name="F-1 World Grand Prix (G)[h1C]">
+	<hash crc32="53612b4c" sha1="74974b549d08f5b766439a7a0fdb021b9ef80b6c" name="F-1 World Grand Prix (G) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="7e49cfa2" sha1="c50cfa010adc649345e937b0155a0c10c29bbbe0" name="F-1 World Grand Prix (G)">
@@ -4844,16 +4844,16 @@
 	<hash crc32="6b78c2c8" sha1="665e3d9773b0a6802814cd3e7b930cab62fc583d" name="Hydro Thunder (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="2856fbfb" sha1="2576192f63b41ae5036cf12323e903ec9a34eb78" name="Hydro Thunder (U)[f1] (PAL)">
+	<hash crc32="2856fbfb" sha1="2576192f63b41ae5036cf12323e903ec9a34eb78" name="Hydro Thunder (U) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="bb319e07" sha1="ce5442569eef337189ec72c6395345577c6893ad" name="Hydro Thunder (U)[f1] (PAL)">
+	<hash crc32="bb319e07" sha1="ce5442569eef337189ec72c6395345577c6893ad" name="Hydro Thunder (U) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="c0b7026f" sha1="39ad1383a793b52f4aefa57a1ba139431de12a5a" name="Hydro Thunder (U)[t1]">
+	<hash crc32="c0b7026f" sha1="39ad1383a793b52f4aefa57a1ba139431de12a5a" name="Hydro Thunder (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="b773d35e" sha1="77714806a2c5c112e5eec13e3780a5fdaa9fc733" name="Hydro Thunder (U)[t1]">
+	<hash crc32="b773d35e" sha1="77714806a2c5c112e5eec13e3780a5fdaa9fc733" name="Hydro Thunder (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="df1693a6" sha1="925a23a9814d523999e945ba33546fb774f93db6" name="Hydro Thunder (U)">
@@ -5096,16 +5096,16 @@
 	<hash crc32="0e8a88f7" sha1="7deb211dffc0cca5772f010380e356a77cde9683" name="J.League Dynamite Soccer 64 (J) [h2C]"> </hash>
 	<hash crc32="0c7df059" sha1="1112f3cb37daec720187c349ac82c2df5ee912f4" name="J.League Dynamite Soccer 64 (J) [h3C]"> </hash>
 	<hash crc32="9ecaa58e" sha1="4eaa69eeccacc01391d1defb6b1ccf939765ad8a" name="J.League Dynamite Soccer 64 (J) [h3C]"> </hash>
-	<hash crc32="c6279f61" sha1="1c1a285a6f51913dfbbf413ec02e022728961da5" name="J.League Eleven Beat 1997 (J)[h1C]">
+	<hash crc32="c6279f61" sha1="1c1a285a6f51913dfbbf413ec02e022728961da5" name="J.League Eleven Beat 1997 (J) [h1C]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="43762bf4" sha1="a8b318f015ce6bb08e25c37a6a0c27c83a3b3a30" name="J.League Eleven Beat 1997 (J)[h1C]">
+	<hash crc32="43762bf4" sha1="a8b318f015ce6bb08e25c37a6a0c27c83a3b3a30" name="J.League Eleven Beat 1997 (J) [h1C]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="30d40134" sha1="f4b3cebe56b16ea7729ab9939385a831b4c3abc3" name="J.League Eleven Beat 1997 (J)[h1C]">
+	<hash crc32="30d40134" sha1="f4b3cebe56b16ea7729ab9939385a831b4c3abc3" name="J.League Eleven Beat 1997 (J) [h1C]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="7edc8ecf" sha1="8b702e3f1e0a6d72c2bd598e98f90c22aa07bbc2" name="J.League Eleven Beat 1997 (J)[h1C]">
+	<hash crc32="7edc8ecf" sha1="8b702e3f1e0a6d72c2bd598e98f90c22aa07bbc2" name="J.League Eleven Beat 1997 (J) [h1C]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="1347819a" sha1="4a5a607b091e1bddf7c3f926ab62287b40fa8709" name="J.League Eleven Beat 1997 (J) [h1C]"> </hash>
@@ -5176,10 +5176,10 @@
 	</hash>
 	<hash crc32="9f14481b" sha1="6d06efcbdbb760b6ffd3ebf59e69c8daac6407e4" name="Jeopardy! (U) [h1C]"> </hash>
 	<hash crc32="d46d6109" sha1="979552245694d070be170d1821f356edc9c808fe" name="Jeopardy! (U) [h1C]"> </hash>
-	<hash crc32="fd0d1db5" sha1="87de3495948f0f5aaa5829fe4a184c4813d60769" name="Jeopardy! (U)[h1C]">
+	<hash crc32="fd0d1db5" sha1="87de3495948f0f5aaa5829fe4a184c4813d60769" name="Jeopardy! (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="1b184d10" sha1="66c0aac3f38932dfc4d4bf7dcbf2b28ebb4d7d81" name="Jeopardy! (U)[h1C]">
+	<hash crc32="1b184d10" sha1="66c0aac3f38932dfc4d4bf7dcbf2b28ebb4d7d81" name="Jeopardy! (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="8a6a5a0a" sha1="16af910daa4fba4e9c3c57c534a543d965014d5f" name="Jeopardy! (U)">
@@ -5218,16 +5218,16 @@
 	<hash crc32="6e75735b" sha1="4c1eedfac94ea2041a765e60caac00abf77a678d" name="Jet Force Gemini (U) (Kiosk Demo)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="dcf40812" sha1="36f280c9dc4d508717c8bc04ad3ca1138196fdf0" name="Jet Force Gemini (U) (Kiosk Demo)[f1] (Save)">
+	<hash crc32="dcf40812" sha1="36f280c9dc4d508717c8bc04ad3ca1138196fdf0" name="Jet Force Gemini (U) (Kiosk Demo) [f1] (Save)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="a0593b1b" sha1="e7a2d731cd9d5824218e65936913a8d588e2483b" name="Jet Force Gemini (U) (Kiosk Demo)[f1] (Save)">
+	<hash crc32="a0593b1b" sha1="e7a2d731cd9d5824218e65936913a8d588e2483b" name="Jet Force Gemini (U) (Kiosk Demo) [f1] (Save)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="3e65056c" sha1="ed7e545304d1ae1e87732136752b4617f823bd32" name="Jet Force Gemini (U) (Kiosk Demo)[f2]">
+	<hash crc32="3e65056c" sha1="ed7e545304d1ae1e87732136752b4617f823bd32" name="Jet Force Gemini (U) (Kiosk Demo) [f2]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="d4b3d631" sha1="ed9b21cfd9537dc63f60f4d3ea55b07cd5dc724f" name="Jet Force Gemini (U) (Kiosk Demo)[f2]">
+	<hash crc32="d4b3d631" sha1="ed9b21cfd9537dc63f60f4d3ea55b07cd5dc724f" name="Jet Force Gemini (U) (Kiosk Demo) [f2]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="15f91f65" sha1="d438718fc8b3e8e05cf61b2f83d27a135d48d7b5" name="Jet Force Gemini (U) (Kiosk Demo)">
@@ -5522,10 +5522,10 @@
 	<hash crc32="b279e4b2" sha1="75e148b5f290b08f7e0a661ee485fb5a79f4a54a" name="Killer Instinct Gold (U) (V1.0)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="5057dd86" sha1="15e883ab62a0cdd4fda52d24ce1816c87b4d58d7" name="Killer Instinct Gold (U) (V1.0)[t1]">
+	<hash crc32="5057dd86" sha1="15e883ab62a0cdd4fda52d24ce1816c87b4d58d7" name="Killer Instinct Gold (U) (V1.0) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="d0a2a93b" sha1="98c0c2f4570cad20b1dce2c9f1614567b3a04861" name="Killer Instinct Gold (U) (V1.0)[t1]">
+	<hash crc32="d0a2a93b" sha1="98c0c2f4570cad20b1dce2c9f1614567b3a04861" name="Killer Instinct Gold (U) (V1.0) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="3c1d7a7b" sha1="94f53d65a2a8b9e1358f4763f73df21373aa27cf" name="Killer Instinct Gold (U) (V1.0)">
@@ -5682,10 +5682,10 @@
 	<hash crc32="cf204405" sha1="b6b92b53285d22967e2250b6d020350eafb72643" name="Knife Edge - Nose Gunner (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="c7bef4e1" sha1="2a4c33ad552d542e489702889ae5d937fca66a8d" name="Knife Edge - Nose Gunner (U)[t1]">
+	<hash crc32="c7bef4e1" sha1="2a4c33ad552d542e489702889ae5d937fca66a8d" name="Knife Edge - Nose Gunner (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="08ca9819" sha1="115df095e3bfb0aef29156500fe46b8584f5fd2b" name="Knife Edge - Nose Gunner (U)[t1]">
+	<hash crc32="08ca9819" sha1="115df095e3bfb0aef29156500fe46b8584f5fd2b" name="Knife Edge - Nose Gunner (U) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="34e8d3cf" sha1="9e35a4bf84b7a8ccbbdb9a9dc0d5955246f52ce3" name="Knife Edge - Nose Gunner (U) [hI][t1]"> </hash>
@@ -6012,16 +6012,16 @@
 	<hash crc32="3339e557" sha1="9c5b574680a18fc87c74e7c1feea19aae87cc059" name="LEGO Racers (U) (M10)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="194358ef" sha1="916fa01e62d289c1297b69b3501ccb1691a92478" name="LEGO Racers (U) (M10)[f1] (PAL)">
+	<hash crc32="194358ef" sha1="916fa01e62d289c1297b69b3501ccb1691a92478" name="LEGO Racers (U) (M10) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="2cc74338" sha1="a540617bdc91f3af0178df4b82ec6d76d7e26343" name="LEGO Racers (U) (M10)[f1] (PAL)">
+	<hash crc32="2cc74338" sha1="a540617bdc91f3af0178df4b82ec6d76d7e26343" name="LEGO Racers (U) (M10) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="21599de8" sha1="8f3d7b71b21d16508c0bc6a843f37a7389b5f17b" name="LEGO Racers (U) (M10)[t1]">
+	<hash crc32="21599de8" sha1="8f3d7b71b21d16508c0bc6a843f37a7389b5f17b" name="LEGO Racers (U) (M10) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="32ea6a73" sha1="6747233f578aa677b799fd7493095cbbf3bde61c" name="LEGO Racers (U) (M10)[t1]">
+	<hash crc32="32ea6a73" sha1="6747233f578aa677b799fd7493095cbbf3bde61c" name="LEGO Racers (U) (M10) [t1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="39407c9f" sha1="965190474172a15c53eb04f89f25d388ab49db1a" name="LEGO Racers (U) (M10)">
@@ -6084,10 +6084,10 @@
 	<hash crc32="5af38589" sha1="361ca0a284ce8de1b8e54716ed3952a179e0a148" name="Lode Runner 3-D (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="e799d4be" sha1="64a1d21e6fb738e86e7efe936b87a757cbfe152b" name="Lode Runner 3-D (U)[f1] (PAL)">
+	<hash crc32="e799d4be" sha1="64a1d21e6fb738e86e7efe936b87a757cbfe152b" name="Lode Runner 3-D (U) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="e7a5272b" sha1="ecbbe0391c599bc3a677fe40abe43de0d7ed353e" name="Lode Runner 3-D (U)[f1] (PAL)">
+	<hash crc32="e7a5272b" sha1="ecbbe0391c599bc3a677fe40abe43de0d7ed353e" name="Lode Runner 3-D (U) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="0dc54b5b" sha1="d14a2084585ad314a757df56ac49d26ccd104bf6" name="Lode Runner 3-D (U) [f1] (PAL)"> </hash>
@@ -6258,10 +6258,10 @@
 	</hash>
 	<hash crc32="6a46107f" sha1="adf6c24b9d9256a024ffcf60f81806ee37c6c49c" name="Madden Football 64 (U) [h1C]"> </hash>
 	<hash crc32="30308293" sha1="237c0119f770b38c0bd3fb47cdf2075dcad71619" name="Madden Football 64 (U) [h1C]"> </hash>
-	<hash crc32="7cccb7c5" sha1="1071f0728d346b9250e511350534bfcbf14c4b4f" name="Madden Football 64 (U)[h1C]">
+	<hash crc32="7cccb7c5" sha1="1071f0728d346b9250e511350534bfcbf14c4b4f" name="Madden Football 64 (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="453a7bfe" sha1="66043415ffa8257b4109a220dc948a56da63acb2" name="Madden Football 64 (U)[h1C]">
+	<hash crc32="453a7bfe" sha1="66043415ffa8257b4109a220dc948a56da63acb2" name="Madden Football 64 (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="47226e0c" sha1="1b70e74974785def1fd2a71905c9fc0afd340ee6" name="Madden Football 64 (U)">
@@ -6346,10 +6346,10 @@
 	<hash crc32="167c60e6" sha1="d0cbbe4e61af75b6bc41ae76881f81b499f1ae3e" name="Magical Tetris Challenge (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="93acd064" sha1="78998f8f0e9f6fe796f90d234a81ba5ad475932a" name="Magical Tetris Challenge (U)[hI]">
+	<hash crc32="93acd064" sha1="78998f8f0e9f6fe796f90d234a81ba5ad475932a" name="Magical Tetris Challenge (U) [hI]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="598af740" sha1="dc4edd4437746c49315ee9c8c45d7ee3258d11ad" name="Magical Tetris Challenge (U)[hI]">
+	<hash crc32="598af740" sha1="dc4edd4437746c49315ee9c8c45d7ee3258d11ad" name="Magical Tetris Challenge (U) [hI]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="b078e78d" sha1="fc054fde0fb6c653fc244756f18590bd5109661e" name="Magical Tetris Challenge (U) [hI]"> </hash>
@@ -6514,10 +6514,10 @@
 	<hash crc32="88c03853" sha1="d81e6c3ccab8b7ab061c1c77628916a89a2fd539" name="Mario Golf (E) [f2] (Z64-Save)"> </hash>
 	<hash crc32="2e71189b" sha1="95ca38cd9bdab090c3ce120088340919fb98b66a" name="Mario Golf (E) [h1C]"> </hash>
 	<hash crc32="37a4e87e" sha1="a75badca3309e6b5c6fa0d6cdbf8b36a66328eb1" name="Mario Golf (E) [h1C]"> </hash>
-	<hash crc32="1183b2cb" sha1="43eef22f4f67a08e92636d6bfb863532086cb4bd" name="Mario Golf (E)[h1C]">
+	<hash crc32="1183b2cb" sha1="43eef22f4f67a08e92636d6bfb863532086cb4bd" name="Mario Golf (E) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="ed796202" sha1="e453824e69207df2d4c9ee3ef076911ccd0aa970" name="Mario Golf (E)[h1C]">
+	<hash crc32="ed796202" sha1="e453824e69207df2d4c9ee3ef076911ccd0aa970" name="Mario Golf (E) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="a5071a77" sha1="a3f057212e134c411258837271db8a08a6a7921e" name="Mario Golf (E)">
@@ -6532,10 +6532,10 @@
 	<hash crc32="4aa0ae3a" sha1="c1c39bcda0abbae26ac03f9e64e65973524c45d3" name="Mario Golf (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="bf7c03e5" sha1="9f0b07668b39de2708da9d0c2f732b0fe0c96946" name="Mario Golf (U)[f1] (PAL)">
+	<hash crc32="bf7c03e5" sha1="9f0b07668b39de2708da9d0c2f732b0fe0c96946" name="Mario Golf (U) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="00166b9d" sha1="cf74193472d5f6209e97983fad55999dc44fcefd" name="Mario Golf (U)[f1] (PAL)">
+	<hash crc32="00166b9d" sha1="cf74193472d5f6209e97983fad55999dc44fcefd" name="Mario Golf (U) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="619f2d0e" sha1="a20be097d12a99d2b52b026e9a866e422d74ac85" name="Mario Golf (U)">
@@ -6554,10 +6554,10 @@
 	<hash crc32="903d097f" sha1="27b9a6f08f798b148c6767b606dafe9497eee695" name="Mario Golf (U) [f1] (PAL)"> </hash>
 	<hash crc32="c705a039" sha1="254004138d7ad9308e3de7aed10559d43ed84674" name="Mario Golf (U) [f2] (Z64-Save)"> </hash>
 	<hash crc32="2d2c47af" sha1="55fa8efeddee5304db77732ec7554b0045b50761" name="Mario Golf (U) [f2] (Z64-Save)"> </hash>
-	<hash crc32="2fc4c216" sha1="e2c4e7a905b29529b49a1619a401fe699224829b" name="Mario Golf (U)[h1C]">
+	<hash crc32="2fc4c216" sha1="e2c4e7a905b29529b49a1619a401fe699224829b" name="Mario Golf (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="ceb5b977" sha1="03db12b8a018eb10a31d3edcf693d92ab8676f1b" name="Mario Golf (U)[h1C]">
+	<hash crc32="ceb5b977" sha1="03db12b8a018eb10a31d3edcf693d92ab8676f1b" name="Mario Golf (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="941e1852" sha1="1b55d60dd775fc8ff0383066ead368aea5866a27" name="Mario Golf (U) [t1]"> </hash>
@@ -6568,10 +6568,10 @@
 	<hash crc32="af0272e4" sha1="260ff4a729951e0d82b09e2e365d89bd2b963597" name="Mario Golf 64 (J)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="15632a1a" sha1="ec022d16392bdcfd97a8f2a06b16244564ac2b0e" name="Mario Golf 64 (J)[f1] (PAL)">
+	<hash crc32="15632a1a" sha1="ec022d16392bdcfd97a8f2a06b16244564ac2b0e" name="Mario Golf 64 (J) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="ecd5485f" sha1="a115e3e0644f486f01a420087a54d9aca8c1911e" name="Mario Golf 64 (J)[f1] (PAL)">
+	<hash crc32="ecd5485f" sha1="a115e3e0644f486f01a420087a54d9aca8c1911e" name="Mario Golf 64 (J) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="7c33129a" sha1="0a38032efc8414595f7a4f6544379e464bd47db4" name="Mario Golf 64 (J)">
@@ -6670,16 +6670,16 @@
 	<hash crc32="26450aab" sha1="42769bc9467df9a517a88e28f9ce2b6956a7a15f" name="Mario Kart 64 (J) (V1.1)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="23ccd780" sha1="d3bc8d01b83658214cc87d77383dbd1f270548e0" name="Mario Kart 64 (J) (V1.1)[f1] (PAL)">
+	<hash crc32="23ccd780" sha1="d3bc8d01b83658214cc87d77383dbd1f270548e0" name="Mario Kart 64 (J) (V1.1) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="c5900ea1" sha1="27c839643c8574f64c0732b1f2f33de370a3b4a6" name="Mario Kart 64 (J) (V1.1)[f1] (PAL)">
+	<hash crc32="c5900ea1" sha1="27c839643c8574f64c0732b1f2f33de370a3b4a6" name="Mario Kart 64 (J) (V1.1) [f1] (PAL)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="9bdc5ace" sha1="3755c2358a5713bdd5d6204f4e837924338a5cc6" name="Mario Kart 64 (J) (V1.1)[T+Ita_Cattivik66]">
+	<hash crc32="9bdc5ace" sha1="3755c2358a5713bdd5d6204f4e837924338a5cc6" name="Mario Kart 64 (J) (V1.1) [T+Ita_Cattivik66]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="94a8fd89" sha1="f655c7b7073ca066c5aae669b974611c0709ea2b" name="Mario Kart 64 (J) (V1.1)[T+Ita_Cattivik66]">
+	<hash crc32="94a8fd89" sha1="f655c7b7073ca066c5aae669b974611c0709ea2b" name="Mario Kart 64 (J) (V1.1) [T+Ita_Cattivik66]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="b3f6f8cc" sha1="77f041b29943bb027bc7270f69cf23b383e993ad" name="Mario Kart 64 (J) (V1.1)">
@@ -6934,10 +6934,10 @@
 	<hash crc32="14030ff5" sha1="b8961f88210027ee0525623242f7ced6c139dedf" name="Micro Machines 64 Turbo (E) (M5)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="33b1cd80" sha1="c3488c30c012545edebe45f2db0007017252c522" name="Micro Machines 64 Turbo (E) (M5)[f1] (NTSC)">
+	<hash crc32="33b1cd80" sha1="c3488c30c012545edebe45f2db0007017252c522" name="Micro Machines 64 Turbo (E) (M5) [f1] (NTSC)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="4813df3f" sha1="5af4848c1776f9979754e993261637c549b73605" name="Micro Machines 64 Turbo (E) (M5)[f1] (NTSC)">
+	<hash crc32="4813df3f" sha1="5af4848c1776f9979754e993261637c549b73605" name="Micro Machines 64 Turbo (E) (M5) [f1] (NTSC)">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="5dfe09a6" sha1="0b02c77e5d4f278dc48006a65cc9fa564b94de46" name="Micro Machines 64 Turbo (E) (M5)">
@@ -6986,10 +6986,10 @@
 	<hash crc32="8abaaf4a" sha1="21fa4279d15e915f3b8a5310e6dd916ce976d625" name="Midway's Greatest Arcade Hits Volume 1 (U)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="6bbd79f0" sha1="0d7aa022faf288885efa450322174df3ac5ebe34" name="Midway's Greatest Arcade Hits Volume 1 (U)[t1]">
+	<hash crc32="6bbd79f0" sha1="0d7aa022faf288885efa450322174df3ac5ebe34" name="Midway's Greatest Arcade Hits Volume 1 (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="5bff7849" sha1="be53676812e319019821be5037425812af1e60cd" name="Midway's Greatest Arcade Hits Volume 1 (U)[t1]">
+	<hash crc32="5bff7849" sha1="be53676812e319019821be5037425812af1e60cd" name="Midway's Greatest Arcade Hits Volume 1 (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="3adb627e" sha1="8539d5d322dc96ff360b87ebd306da5791be0edc" name="Midway's Greatest Arcade Hits Volume 1 (U)">
@@ -7404,16 +7404,16 @@
 	<hash crc32="b2c6a4d6" sha1="4e9a8cd69bf79ff9ebb47b6a132ce663ee9ec022" name="Mortal Kombat Trilogy (U) (V1.0) [h1C]"> </hash>
 	<hash crc32="241ebd3a" sha1="9f0a3b9040fb81cfb288c94acb43cebd54c21a67" name="Mortal Kombat Trilogy (U) (V1.0) [h2C]"> </hash>
 	<hash crc32="ddd61c1f" sha1="d088c68fd5b0b36888e852445ae9412e90297138" name="Mortal Kombat Trilogy (U) (V1.0) [h2C]"> </hash>
-	<hash crc32="80acf17b" sha1="b58e044fd519c5ca848fc8b7ae443b164ff809cd" name="Mortal Kombat Trilogy (U) (V1.0)[h1C]">
+	<hash crc32="80acf17b" sha1="b58e044fd519c5ca848fc8b7ae443b164ff809cd" name="Mortal Kombat Trilogy (U) (V1.0) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="536da785" sha1="19fd8d32cfba1ede57b785ea2a206f7abc2aaabc" name="Mortal Kombat Trilogy (U) (V1.0)[h1C]">
+	<hash crc32="536da785" sha1="19fd8d32cfba1ede57b785ea2a206f7abc2aaabc" name="Mortal Kombat Trilogy (U) (V1.0) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="5e190b89" sha1="b3493e389bde396a9a64f48ffbf2710cf39a9ecf" name="Mortal Kombat Trilogy (U) (V1.0)[h2C]">
+	<hash crc32="5e190b89" sha1="b3493e389bde396a9a64f48ffbf2710cf39a9ecf" name="Mortal Kombat Trilogy (U) (V1.0) [h2C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="4ca811b3" sha1="51e64f2034dfe4714f2a8c1dc919798e59b413bc" name="Mortal Kombat Trilogy (U) (V1.0)[h2C]">
+	<hash crc32="4ca811b3" sha1="51e64f2034dfe4714f2a8c1dc919798e59b413bc" name="Mortal Kombat Trilogy (U) (V1.0) [h2C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="8848ccd8" sha1="3df0b216d0af29de2b5ea3e2f7863927b3c3216f" name="Mortal Kombat Trilogy (U) (V1.0)">
@@ -7616,6 +7616,8 @@
 	<hash crc32="17ae718f" sha1="e7d8c4d9e07c1b9129768f8b08de3dee19d5b000" name="N64 Stars Demo (PD)"> </hash>
 	<hash crc32="7f933ce2" sha1="bf861922dcb78c316360e3e742f4f70ff63c9bc3" name="N64DD IPLROM (J)"> </hash>
 	<hash crc32="ec200263" sha1="050afc2198003da4411b79e47a139d71315fdac0" name="N64DD IPLROM (J)"> </hash>
+	<hash crc32="858291ec" sha1="4fb40a38412e1fa26652570a34106f41151c97c1" name="N64DD ILPROM (J) [h1]"> </hash>
+	<hash crc32="b53b07ee" sha1="9dbf76df593485b6ffaa09049ccc98eb3a8a08c7" name="N64DD ILPROM (J) [h1]"> </hash>
 	<hash crc32="18d7c629" sha1="f6ff2654b06eb3027f1b8c8dca0e3820258f0e9c" name="N64probe (Button Test) by MooglyGuy (PD)"> </hash>
 	<hash crc32="8774e4d0" sha1="204ec41f28188cfd1dc17c8a2a8c2571604bfcdf" name="N64probe (Button Test) by MooglyGuy (PD)"> </hash>
 	<hash crc32="78c5828c" sha1="6428b3845824c7dbfe3a90fa4e586d4ac015cf8e" name="N64probe by MooglyGuy (PD)"> </hash>
@@ -7676,10 +7678,10 @@
 	</hash>
 	<hash crc32="a4ec448b" sha1="e1c9e5079d756423e5f5a54757fc05782c947615" name="Namco Museum 64 (U) [f1] (PAL)"> </hash>
 	<hash crc32="4a0bcc87" sha1="ec6f9507f88ee87cb9c52ad2f3f8ffe59b77bd79" name="Namco Museum 64 (U) [f1] (PAL)"> </hash>
-	<hash crc32="d76c2fbf" sha1="296a564db699bcbc7fa7bdd23ec93f60fc589352" name="Namco Museum 64 (U)[f1] (PAL)">
+	<hash crc32="d76c2fbf" sha1="296a564db699bcbc7fa7bdd23ec93f60fc589352" name="Namco Museum 64 (U) [f1] (PAL)">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="ef86004f" sha1="436d100d2477f4a0d0134a73d45223295ab9a835" name="Namco Museum 64 (U)[f1] (PAL)">
+	<hash crc32="ef86004f" sha1="436d100d2477f4a0d0134a73d45223295ab9a835" name="Namco Museum 64 (U) [f1] (PAL)">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="843d5802" sha1="2c3d278251b6463354a333090b0979313cca0e75" name="Namco Museum 64 (U)">
@@ -7788,10 +7790,10 @@
 	</hash>
 	<hash crc32="e7e8ef6c" sha1="036218a520b9a1e0227a1f2b3f854f4ccd79b068" name="NBA Hangtime (U) [f1] (PAL)"> </hash>
 	<hash crc32="5a40e5b7" sha1="10c14b98f23e9728332737c3a93e4c4b64ecc270" name="NBA Hangtime (U) [f1] (PAL)"> </hash>
-	<hash crc32="0eb4eba0" sha1="f480c2be0471be70e223252c85e244b89efe734f" name="NBA Hangtime (U)[f1]">
+	<hash crc32="0eb4eba0" sha1="f480c2be0471be70e223252c85e244b89efe734f" name="NBA Hangtime (U) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="2ba58ab4" sha1="fa7d4aecde08d2a42eb291c41d63ba16fc063496" name="NBA Hangtime (U)[f1]">
+	<hash crc32="2ba58ab4" sha1="fa7d4aecde08d2a42eb291c41d63ba16fc063496" name="NBA Hangtime (U) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="2590c84e" sha1="28970e8775ec586c9705bbdacf21668028d60c57" name="NBA Hangtime (U)">
@@ -8066,14 +8068,10 @@
 	<hash crc32="59a5be86" sha1="1968b8fad82f210c94164c1f53e2e36ea57fde99" name="Neon64 V1.2a by Halley's Comet Software (PD)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="baeb6d04" sha1="72671ee3df062d2bc2acd11698134ebf2784d986" name="Neon64 V1.2a by Halley's Comet Software (PD)">
-		<status>Overdumped Image</status>
-	</hash>
-	<hash crc32="14b5e76e" sha1="52069f00f97fa5f5eaa93bb7854bc77eedd4e4f2" name="Neon64 V1.2a by Halley's Comet Software (PD)">
-		<status>Overdumped Image</status>
-	</hash>
-	<hash crc32="93bea654" sha1="8f0a18a2b664197a629fa0fcaf533be195dae569" name="Neon64 V1.2a by Halley's Comet Software (PD)"> </hash>
-	<hash crc32="7381cf30" sha1="285fa2076b9a5acdfe33fc8c3aaac04d9857a97c" name="Neon64 V1.2a by Halley's Comet Software (PD)"> </hash>
+	<hash crc32="baeb6d04" sha1="72671ee3df062d2bc2acd11698134ebf2784d986" name="Neon64 V1.2a by Halley's Comet Software (PD)"> </hash>
+	<hash crc32="14b5e76e" sha1="52069f00f97fa5f5eaa93bb7854bc77eedd4e4f2" name="Neon64 V1.2a by Halley's Comet Software (PD)"> </hash>
+	<hash crc32="93bea654" sha1="8f0a18a2b664197a629fa0fcaf533be195dae569" name="Neon64 V1.2a by Halley's Comet Software (PD) [a1]"> </hash>
+	<hash crc32="7381cf30" sha1="285fa2076b9a5acdfe33fc8c3aaac04d9857a97c" name="Neon64 V1.2a by Halley's Comet Software (PD) [a1]"> </hash>
 	<hash crc32="983263d7" sha1="2392f403b0993f838912cefa83aefd35d34a05a0" name="New Tetris, The (E)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
@@ -8230,10 +8228,10 @@
 	<hash crc32="49013cd4" sha1="fedf2a57651c77fa8c2e955b2ec52bdd1a8b5324" name="NHL Breakaway 98 (E) [f1] (NTSC)"> </hash>
 	<hash crc32="ed786754" sha1="4df83a014cbcebf2edd4eaf8c431b86cca7c4ced" name="NHL Breakaway 98 (E) [h1C]"> </hash>
 	<hash crc32="8c1cee8f" sha1="6ce9241c9373b5ac69b219b3ba9a6331c5247f39" name="NHL Breakaway 98 (E) [h1C]"> </hash>
-	<hash crc32="e9e248fe" sha1="0ff09add41ef96d5941a3c11b16c7613ab0db161" name="NHL Breakaway 98 (E)[h1C]">
+	<hash crc32="e9e248fe" sha1="0ff09add41ef96d5941a3c11b16c7613ab0db161" name="NHL Breakaway 98 (E) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="66bf4ceb" sha1="94d4e4f53209d0b78d2e73ba108c97ad76486562" name="NHL Breakaway 98 (E)[h1C]">
+	<hash crc32="66bf4ceb" sha1="94d4e4f53209d0b78d2e73ba108c97ad76486562" name="NHL Breakaway 98 (E) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="02faddca" sha1="a24928bf6914f1ade1f5d6005ba3e09659f85930" name="NHL Breakaway 98 (E)">
@@ -8250,10 +8248,10 @@
 	</hash>
 	<hash crc32="b3dcbbb8" sha1="77fc7f1fb520148f156718532f0b665a87b56b66" name="NHL Breakaway 98 (U) [h1C]"> </hash>
 	<hash crc32="34a8a18d" sha1="514fd480a76017c4399db1492cbec33d2f6fa7e8" name="NHL Breakaway 98 (U) [h1C]"> </hash>
-	<hash crc32="f21257c9" sha1="e9db378890616b09f5b9fa35da95d917c664bebf" name="NHL Breakaway 98 (U)[h1C]">
+	<hash crc32="f21257c9" sha1="e9db378890616b09f5b9fa35da95d917c664bebf" name="NHL Breakaway 98 (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="4d5359b6" sha1="2f0ee8c40ac19115c24595cdd2647b4ea264c9d4" name="NHL Breakaway 98 (U)[h1C]">
+	<hash crc32="4d5359b6" sha1="2f0ee8c40ac19115c24595cdd2647b4ea264c9d4" name="NHL Breakaway 98 (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="4c866c4d" sha1="0fa55b052f72e305054ba7f1a2afbd58f4a2733a" name="NHL Breakaway 98 (U)">
@@ -8532,10 +8530,10 @@
 	<hash crc32="d52f01fd" sha1="771bb04c814fdb741351b37bc4ca2db00f3d2a43" name="Ogre Battle 64 - Person of Lordly Caliber (J) (V1.1)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="27ea3320" sha1="29143800b2d98f2d3abc668bd071dfd4db6fa35e" name="Ogre Battle 64 - Person of Lordly Caliber (J) (V1.1)[o1]">
+	<hash crc32="27ea3320" sha1="29143800b2d98f2d3abc668bd071dfd4db6fa35e" name="Ogre Battle 64 - Person of Lordly Caliber (J) (V1.1) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="377b0c5a" sha1="20117657416e04b84868e956b2810b094e0e75a5" name="Ogre Battle 64 - Person of Lordly Caliber (J) (V1.1)[o1]">
+	<hash crc32="377b0c5a" sha1="20117657416e04b84868e956b2810b094e0e75a5" name="Ogre Battle 64 - Person of Lordly Caliber (J) (V1.1) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="be2ae208" sha1="6cb501d8f8c8bff5809e47c858f5946744f03629" name="Ogre Battle 64 - Person of Lordly Caliber (J) (V1.1)">
@@ -9138,10 +9136,10 @@
 	<hash crc32="ba3ec852" sha1="2a9585e5819fa7984877848c58fbf9973380d624" name="Polaris SnoCross (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="00ce1ebb" sha1="e8a400613a70e8597fbfb788200edc94ce8b9753" name="Polaris SnoCross (U)[t1]">
+	<hash crc32="00ce1ebb" sha1="e8a400613a70e8597fbfb788200edc94ce8b9753" name="Polaris SnoCross (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="d863245c" sha1="e5a41ae6030cf167826e1738e4188de307e423ab" name="Polaris SnoCross (U)[t1]">
+	<hash crc32="d863245c" sha1="e5a41ae6030cf167826e1738e4188de307e423ab" name="Polaris SnoCross (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="9356fe6c" sha1="7e04caf41c643cedd08e0bd3387e1e621216b85d" name="Polaris SnoCross (U) [t1]"> </hash>
@@ -9306,10 +9304,10 @@
 	</hash>
 	<hash crc32="f7797d6c" sha1="ae972e52c314c4d66e10ae7887ab251e85e6c108" name="Quake 64 (U) [h1C]"> </hash>
 	<hash crc32="94680774" sha1="c3f5a926dd51e330a6ef5af3e934ea35da61be42" name="Quake 64 (U) [h1C]"> </hash>
-	<hash crc32="2235b036" sha1="73874a202e392620c96419ce6478672844822803" name="Quake 64 (U)[t1]">
+	<hash crc32="2235b036" sha1="73874a202e392620c96419ce6478672844822803" name="Quake 64 (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="67ff1b28" sha1="e5112d2046d37d502eb7ebb89049a6345f3b5e13" name="Quake 64 (U)[t1]">
+	<hash crc32="67ff1b28" sha1="e5112d2046d37d502eb7ebb89049a6345f3b5e13" name="Quake 64 (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="92dcb206" sha1="bd44e4eaa3d415e6627966576c4740385dbfebc4" name="Quake 64 (U)">
@@ -9318,10 +9316,10 @@
 	<hash crc32="e958ccf0" sha1="902b484af4b0efdfd157344f416eb818dde756d8" name="Quake 64 (U)">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="87f05c4d" sha1="0b455c84e37d54cfea30c46707f47d41ef0f1b69" name="Quake 64 (U)[t1]">
+	<hash crc32="87f05c4d" sha1="0b455c84e37d54cfea30c46707f47d41ef0f1b69" name="Quake 64 (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="00a55274" sha1="76dd7c4acec0b6f7aaa89e05de36607ecc4200ad" name="Quake 64 (U)[t1]">
+	<hash crc32="00a55274" sha1="76dd7c4acec0b6f7aaa89e05de36607ecc4200ad" name="Quake 64 (U) [t1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="ba81d418" sha1="c8d82ecb248994500bcb65f6c30188728162f2ad" name="Quake 64 (U)">
@@ -10084,10 +10082,10 @@
 	<hash crc32="f7a96b81" sha1="2a5b25809a5470b85db9cc0a1e6c5c44f225747b" name="Sim City 2000 (J)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="c2fd3d62" sha1="f0e823707bf1e213c3aff6c9fbe0fc3afa0f64e0" name="Sim City 2000 (J)[o1]">
+	<hash crc32="c2fd3d62" sha1="f0e823707bf1e213c3aff6c9fbe0fc3afa0f64e0" name="Sim City 2000 (J) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="7bf34344" sha1="aa78e320f92f4a488aedfc0dbe4979cb7398b376" name="Sim City 2000 (J)[o1]">
+	<hash crc32="7bf34344" sha1="aa78e320f92f4a488aedfc0dbe4979cb7398b376" name="Sim City 2000 (J) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="ae23045e" sha1="e19a9e570010ba9debe5365a29bcf56741cb1ba8" name="Sim City 2000 (J)">
@@ -10104,10 +10102,10 @@
 	</hash>
 	<hash crc32="8140d8fc" sha1="2fbbd0a4b9bd365e94d844a21dc7f23832403dee" name="Sim City 2000 (J) [h1C]"> </hash>
 	<hash crc32="c17813e0" sha1="9f6ee02fe57b960ca3fadcaddfdf2e0d19cc318d" name="Sim City 2000 (J) [h1C]"> </hash>
-	<hash crc32="dbef385d" sha1="ae9984a0ce930071e11f99e74181cc2521905a08" name="Sim City 2000 (J)[h1C]">
+	<hash crc32="dbef385d" sha1="ae9984a0ce930071e11f99e74181cc2521905a08" name="Sim City 2000 (J) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="78897633" sha1="4a61e0646b1fdfd9c6a94f1709d4eb47530ecc02" name="Sim City 2000 (J)[h1C]">
+	<hash crc32="78897633" sha1="4a61e0646b1fdfd9c6a94f1709d4eb47530ecc02" name="Sim City 2000 (J) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="73c9ab24" sha1="25b753860525aafb3a4ad7c8d3ab085509ee9ecc" name="Sim City 2000 (J)">
@@ -10412,10 +10410,10 @@
 	</hash>
 	<hash crc32="dac2f94e" sha1="3b3aeff75f3f250b7ee653b53992462c4cfe8504" name="Star Fox 64 (J) [f1]"> </hash>
 	<hash crc32="12732654" sha1="bcbe21d9a0186a513dcf9a14f3ca44f893d874ff" name="Star Fox 64 (J) [f1]"> </hash>
-	<hash crc32="4dc374c0" sha1="0e3e9267cfa5611d1dbd1e752eb61ec0ab0c42a0" name="Star Fox 64 (J)[f1]">
+	<hash crc32="4dc374c0" sha1="0e3e9267cfa5611d1dbd1e752eb61ec0ab0c42a0" name="Star Fox 64 (J) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="e7542506" sha1="5a243a95c66aa4621df83bc8a8d0a6b3966bb0de" name="Star Fox 64 (J)[f1]">
+	<hash crc32="e7542506" sha1="5a243a95c66aa4621df83bc8a8d0a6b3966bb0de" name="Star Fox 64 (J) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="94e2bf8b" sha1="6dcd4753fbf498a72a9e86708b838d1375a547da" name="Star Fox 64 (J)">
@@ -10424,16 +10422,16 @@
 	<hash crc32="33fe28b0" sha1="4af52bf9f8fa0d3ffb4dd2e0ea79b5faeb2493bf" name="Star Fox 64 (J)">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="5d842b4d" sha1="0022386bd3e0959df11108b9205d94bcfc924224" name="Star Fox 64 (J)[f1]">
+	<hash crc32="5d842b4d" sha1="0022386bd3e0959df11108b9205d94bcfc924224" name="Star Fox 64 (J) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="0d4482fa" sha1="ebf25f9b57320130818692cda87894e6b87f23fe" name="Star Fox 64 (J)[f1]">
+	<hash crc32="0d4482fa" sha1="ebf25f9b57320130818692cda87894e6b87f23fe" name="Star Fox 64 (J) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="5439c8ed" sha1="72315e07cc6bdafb7cfb46e50aa707aaeb6d4dd1" name="Star Fox 64 (J)[f1]">
+	<hash crc32="5439c8ed" sha1="72315e07cc6bdafb7cfb46e50aa707aaeb6d4dd1" name="Star Fox 64 (J) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="6f87d245" sha1="3e02fd2e0cb9864f272a5aa0d331c17ae0779c5b" name="Star Fox 64 (J)[f1]">
+	<hash crc32="6f87d245" sha1="3e02fd2e0cb9864f272a5aa0d331c17ae0779c5b" name="Star Fox 64 (J) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="21278e57" sha1="75ec68b6f76ca1898349c36f51bca6a6a6675b55" name="Star Fox 64 (J) [t1] (Boost)"> </hash>
@@ -10460,22 +10458,22 @@
 	<hash crc32="44076cec" sha1="7aaf89171a8917aa1da564f11fa15d42a62a5b3c" name="Star Fox 64 (U) (V1.0) [f2] (PAL)"> </hash>
 	<hash crc32="db9324c2" sha1="805b822687a1d51dce36abaac8e81ae82d24239c" name="Star Fox 64 (U) (V1.0) [h1C]"> </hash>
 	<hash crc32="74c42216" sha1="7aa25200524631a3002ca0000c44e53b97f1fc0a" name="Star Fox 64 (U) (V1.0) [h1C]"> </hash>
-	<hash crc32="b6007a08" sha1="aa73b83854383728cf1668629920cb32dd625df5" name="Star Fox 64 (U) (V1.0)[f1]">
+	<hash crc32="b6007a08" sha1="aa73b83854383728cf1668629920cb32dd625df5" name="Star Fox 64 (U) (V1.0) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="fd7b7373" sha1="352a0154e87f6b7d91f882cb979b625f7bc6f98a" name="Star Fox 64 (U) (V1.0)[f1]">
+	<hash crc32="fd7b7373" sha1="352a0154e87f6b7d91f882cb979b625f7bc6f98a" name="Star Fox 64 (U) (V1.0) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="792ed884" sha1="9a6e04842e832efeed57cc7765633e981a841d7b" name="Star Fox 64 (U) (V1.0)[f1]">
+	<hash crc32="792ed884" sha1="9a6e04842e832efeed57cc7765633e981a841d7b" name="Star Fox 64 (U) (V1.0) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="a1358763" sha1="9d28ffd6c7912b19c7ffa42decea0b5978a2feb1" name="Star Fox 64 (U) (V1.0)[f1]">
+	<hash crc32="a1358763" sha1="9d28ffd6c7912b19c7ffa42decea0b5978a2feb1" name="Star Fox 64 (U) (V1.0) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="e86af5a6" sha1="af36d9d801644cb06b0b5c3542bfb80ae8b38519" name="Star Fox 64 (U) (V1.0)[f1]">
+	<hash crc32="e86af5a6" sha1="af36d9d801644cb06b0b5c3542bfb80ae8b38519" name="Star Fox 64 (U) (V1.0) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="6d12dd29" sha1="e3ed4940c74632de9f2aa186ba5d022bba52370a" name="Star Fox 64 (U) (V1.0)[f1]">
+	<hash crc32="6d12dd29" sha1="e3ed4940c74632de9f2aa186ba5d022bba52370a" name="Star Fox 64 (U) (V1.0) [f1]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="af40cb76" sha1="e200314fbdbe9e00fb0424827a6727aaa5ea4160" name="Star Fox 64 (U) (V1.0) [t1]"> </hash>
@@ -12010,10 +12008,10 @@
 	<hash crc32="b86b9468" sha1="0de66ffd75e7a934be8b4d480c7eb6525aa6c160" name="Virtual Chess 64 (E) (M6)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="ab0ef811" sha1="77bee486d2d94599f3630e216214bf31ed254894" name="Virtual Chess 64 (E) (M6)[h1C]">
+	<hash crc32="ab0ef811" sha1="77bee486d2d94599f3630e216214bf31ed254894" name="Virtual Chess 64 (E) (M6) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="df978952" sha1="d76416fe07e675bd3aed93c98b32918c7a5ec8f1" name="Virtual Chess 64 (E) (M6)[h1C]">
+	<hash crc32="df978952" sha1="d76416fe07e675bd3aed93c98b32918c7a5ec8f1" name="Virtual Chess 64 (E) (M6) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="79167dce" sha1="61fa1a57800dc8e740c3cbe423d72d0ad571824d" name="Virtual Chess 64 (E) (M6)">
@@ -12028,10 +12026,10 @@
 	<hash crc32="3cd894c4" sha1="9f57ec795e3c62d88ea823a5866a7b1012b731db" name="Virtual Chess 64 (U) (M3)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="93774cab" sha1="9b6026713847ddc75a4cb8e8caa66027acaf932e" name="Virtual Chess 64 (U) (M3)[o1]">
+	<hash crc32="93774cab" sha1="9b6026713847ddc75a4cb8e8caa66027acaf932e" name="Virtual Chess 64 (U) (M3) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="a2a9bc0b" sha1="05d2328d494603859cc8c3e6206acb44b8aef07e" name="Virtual Chess 64 (U) (M3)[o1]">
+	<hash crc32="a2a9bc0b" sha1="05d2328d494603859cc8c3e6206acb44b8aef07e" name="Virtual Chess 64 (U) (M3) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="722c9feb" sha1="999fc1367fc3132c1d659a4c538e6c81ce639bee" name="Virtual Chess 64 (U) (M3)">
@@ -12158,10 +12156,10 @@
 	<hash crc32="10635b27" sha1="3ff5c88420221f95eb27a65519c6fe558618bfc7" name="War Gods (U)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="f4daba35" sha1="126d5ee41e7d8c6f4965cd636c059faa51a8e183" name="War Gods (U)[h1C]">
+	<hash crc32="f4daba35" sha1="126d5ee41e7d8c6f4965cd636c059faa51a8e183" name="War Gods (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
-	<hash crc32="084c0ac5" sha1="dc7c4bd00fc48652c69c7407f4a57d5dc7c50ff3" name="War Gods (U)[h1C]">
+	<hash crc32="084c0ac5" sha1="dc7c4bd00fc48652c69c7407f4a57d5dc7c50ff3" name="War Gods (U) [h1C]">
 		<status>Overdumped Image</status>
 	</hash>
 	<hash crc32="5cfc294c" sha1="24f80129b3e09bfb8b8c0581158220d4a030bc03" name="War Gods (U)">
@@ -12834,10 +12832,10 @@
 	<hash crc32="4636066e" sha1="a7667513e7daa0bddc287d89ea7efce207882bf9" name="Yoshi's Story (E) (M3)">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="e5faa601" sha1="e515bce674a9ade5c85d2c0d81b2d320ad0438c5" name="Yoshi's Story (E) (M3)[f1]">
+	<hash crc32="e5faa601" sha1="e515bce674a9ade5c85d2c0d81b2d320ad0438c5" name="Yoshi's Story (E) (M3) [f1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="20f06afa" sha1="23597189c0c84dcb7703d40bdea40749295a740c" name="Yoshi's Story (E) (M3)[f1]">
+	<hash crc32="20f06afa" sha1="23597189c0c84dcb7703d40bdea40749295a740c" name="Yoshi's Story (E) (M3) [f1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="cda63103" sha1="13fd9b7b2cf3745ddaf6df0bfa7df2fe18d37d59" name="Yoshi's Story (E) (M3)">
@@ -12998,10 +12996,10 @@
 	<hash crc32="3361b649" sha1="9afda65b3ae7d3714066dbccf820158c3286f423" name="Zelda no Densetsu - Mujura no Kamen (J) (V1.0)">
 		<status>GoodN64 Verified Image</status>
 	</hash>
-	<hash crc32="749eab8f" sha1="6dcb2f14b874ca0183ab1876cf5e61f02fa719f6" name="Zelda no Densetsu - Mujura no Kamen (J) (V1.0)[o1]">
+	<hash crc32="749eab8f" sha1="6dcb2f14b874ca0183ab1876cf5e61f02fa719f6" name="Zelda no Densetsu - Mujura no Kamen (J) (V1.0) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
-	<hash crc32="1003a3da" sha1="e015bc17014efcf2f5f602197dc8756eb8ab75be" name="Zelda no Densetsu - Mujura no Kamen (J) (V1.0)[o1]">
+	<hash crc32="1003a3da" sha1="e015bc17014efcf2f5f602197dc8756eb8ab75be" name="Zelda no Densetsu - Mujura no Kamen (J) (V1.0) [o1]">
 		<status>Known Bad Image</status>
 	</hash>
 	<hash crc32="a60de571" sha1="d970c55c4ed5384df202a8bc3c5cd408f1370006" name="Zelda no Densetsu - Mujura no Kamen (J) (V1.0)">
