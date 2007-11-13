@@ -519,7 +519,7 @@ INPUT_PORTS_END
 
 /* Machine Drivers */
 
-static INTERRUPT_GEN( ql_int )
+static INTERRUPT_GEN( zx8302_int )
 {
 	cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
 }
@@ -539,6 +539,8 @@ static MACHINE_START( ql )
 	state_save_register_global(ipc_keylatch);
 
 	memset(&zx8302, 0, sizeof(zx8302));
+	zx8302.comctl = 1;
+	zx8302.comdata = 1;
 
 	zx8302_txd_timer = mame_timer_alloc(zx8302_txd_tick);
 	zx8302_ipc_timer = mame_timer_alloc(zx8302_ipc_tick);
@@ -551,7 +553,7 @@ static MACHINE_DRIVER_START( ql )
 	// basic machine hardware
 	MDRV_CPU_ADD(M68008, X1/2)
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
-	MDRV_CPU_VBLANK_INT(ql_int, 1)
+	MDRV_CPU_VBLANK_INT(zx8302_int, 1)
 
 	MDRV_CPU_ADD(I8048, X4) // i8049
 	MDRV_CPU_PROGRAM_MAP(ipc_map, 0)
