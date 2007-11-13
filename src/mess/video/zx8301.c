@@ -3,7 +3,7 @@
 typedef struct
 {
 	int dispoff;
-	int mode;
+	int mode8;
 	int base;
 	int flash;
 } ZX8301_VIDEO_CONFIG;
@@ -34,7 +34,7 @@ PALETTE_INIT( zx8301 )
 WRITE8_HANDLER( zx8301_control_w )
 {
 	zx8301.dispoff = BIT(data, 1);
-	zx8301.mode = BIT(data, 3);
+	zx8301.mode8 = BIT(data, 3);
 	zx8301.base = BIT(data, 7);
 }
 
@@ -43,36 +43,9 @@ static void zx8301_draw_screen(mame_bitmap *bitmap)
 	UINT32 addr = zx8301.base << 15;
 	int y, word, pixel;
 
-	if (zx8301.mode)
+	if (zx8301.mode8)
 	{
-		// mode 512 GGGGGGGG RRRRRRRR
-
-		for (y = 0; y < 256; y++)
-		{
-			int x = 0;
-
-			for (word = 0; word < 64; word++)
-			{
-				UINT8 byte_high = videoram[addr++];
-				UINT8 byte_low = videoram[addr++];
-
-				for (pixel = 0; pixel < 8; pixel++)
-				{
-					int red = BIT(byte_low, 7);
-					int green = BIT(byte_high, 7);
-					int color = (green << 1) | red;
-
-					*BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[ZX8301_COLOR_MODE4[color]];
-
-					byte_high <<= 1;
-					byte_low <<= 1;
-				}
-			}
-		}
-	}
-	else
-	{
-		// mode 256 GFGFGFGF RBRBRBRB
+		// mode 8/256 GFGFGFGF RBRBRBRB
 
 		for (y = 0; y < 256; y++)
 		{
@@ -106,6 +79,33 @@ static void zx8301_draw_screen(mame_bitmap *bitmap)
 			}
 		}
 	}
+	else
+	{
+		// mode 4/512 GGGGGGGG RRRRRRRR
+
+		for (y = 0; y < 256; y++)
+		{
+			int x = 0;
+
+			for (word = 0; word < 64; word++)
+			{
+				UINT8 byte_high = videoram[addr++];
+				UINT8 byte_low = videoram[addr++];
+
+				for (pixel = 0; pixel < 8; pixel++)
+				{
+					int red = BIT(byte_low, 7);
+					int green = BIT(byte_high, 7);
+					int color = (green << 1) | red;
+
+					*BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[ZX8301_COLOR_MODE4[color]];
+
+					byte_high <<= 1;
+					byte_low <<= 1;
+				}
+			}
+		}
+	}
 }
 
 VIDEO_START( zx8301 )
@@ -114,7 +114,7 @@ VIDEO_START( zx8301 )
 	mame_timer_adjust(zx8301_flash_timer, MAME_TIME_IN_HZ(2), 0, MAME_TIME_IN_HZ(2));
 
 	state_save_register_global(zx8301.dispoff);
-	state_save_register_global(zx8301.mode);
+	state_save_register_global(zx8301.mode8);
 	state_save_register_global(zx8301.base);
 	state_save_register_global(zx8301.flash);
 }

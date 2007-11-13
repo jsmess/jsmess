@@ -16,7 +16,14 @@
 
 	TODO:
 
-	- everything
+	- get COMCTL from i8048 WR output
+	- IPC <-> ZX8302 communication
+	- correct frequency for RTC timer
+	- keyboard/joystick connections
+	- speaker sound
+	- accurate screen timings
+	- microdrive
+	- serial I/O
 
 */
 
@@ -27,45 +34,124 @@
 
 /* Peripheral Chip (ZX8302) */
 
-static int ZXmode, ZXbps;
-static int zx8302_comdata, zx8302_baudx4;
+#define ZX8302_IPC_START	0
+#define ZX8302_IPC_STOP		5
 
-static mame_timer *zx8302_baud_timer;
-
-static TIMER_CALLBACK( zx8302_baud_tick )
+static struct ZX8302
 {
-	zx8302_baudx4 = zx8302_baudx4 ? 0 : 1;
+	int comdata;
+	int comctl;
+	int baudx4;
+	UINT8 tcr;
+	UINT8 tdr;
+	UINT8 intr;
+	UINT16 ctr;
+	UINT8 idr;
+	int ipc_bits;
+} zx8302;
+
+static mame_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer;
+
+static TIMER_CALLBACK( zx8302_txd_tick )
+{
+}
+
+static TIMER_CALLBACK( zx8302_ipc_tick )
+{
+	zx8302.baudx4 = zx8302.baudx4 ? 0 : 1;
+
+	if (zx8302.baudx4)
+	{
+		if (zx8302.comctl)
+		{
+			// send 4 bits of data to the IPC
+
+			switch (zx8302.ipc_bits)
+			{
+			case ZX8302_IPC_START:
+				zx8302.comdata = 0;
+				zx8302.ipc_bits++;
+				break;
+
+			default:
+				zx8302.comdata = BIT(zx8302.idr, 0);
+				zx8302.idr >>= 1;
+				zx8302.ipc_bits++;
+				break;
+
+			case ZX8302_IPC_STOP:
+				zx8302.comdata = 1;
+				break;
+			}
+		}
+		else
+		{
+			// receive data from the IPC
+
+			zx8302.idr <<= 1;
+			zx8302.idr |= zx8302.comdata;
+		}
+	}
+}
+
+static TIMER_CALLBACK( zx8302_rtc_tick )
+{
+	zx8302.ctr++;
+}
+
+static READ8_HANDLER( zx8302_rtc_r )
+{
+	if (offset)
+	{
+		return zx8302.ctr & 0xff;
+	}
+	else
+	{
+		return zx8302.ctr >> 8;
+	}
+}
+
+static WRITE8_HANDLER( zx8302_rtc_w )
+{
+	if (offset)
+	{
+		zx8302.ctr = (zx8302.ctr & 0xff00) | data;
+	}
+	else
+	{
+		zx8302.ctr = (data << 8) | (zx8302.ctr & 0xff);
+	}
 }
 
 static WRITE8_HANDLER( zx8302_control_w )
 {
-	int baudx4 = 0;
+	int baud = 19200 >> (data & 0x07);
+	int baudx4 = baud * 4;
 
-	ZXmode = data & 0x18;
-/*
-	switch(ZXmode)
-	{
-	case 0x00: logerror("ZXSER1\n"); break;
-	case 0x08: logerror("ZXSER2\n"); break;
-	case 0x10: logerror("ZXMDV\n"); break;
-	case 0x18: logerror("ZXNET\n"); break;
-	}
-*/
-	switch(data & 0x07)
-	{
-	case 0: ZXbps = 19200; break;
-	case 1: ZXbps = 9600; break;
-	case 2: ZXbps = 4800; break;
-	case 3: ZXbps = 2400; break;
-	case 4: ZXbps = 1200; break;
-	case 5: ZXbps = 600; break;
-	case 6: ZXbps = 300; break;
-	case 7: ZXbps = 75; break;
-	}
+	zx8302.tcr = data;
 
-	baudx4 = ZXbps * 4;
+	mame_timer_adjust(zx8302_txd_timer, time_zero, 0, MAME_TIME_IN_HZ(baud));
+	mame_timer_adjust(zx8302_ipc_timer, time_zero, 0, MAME_TIME_IN_HZ(baudx4));
+}
 
-	mame_timer_adjust(zx8302_baud_timer, time_zero, 0, MAME_TIME_IN_HZ(baudx4));
+static READ8_HANDLER( zx8302_ipc_r )
+{
+	/*
+		
+		bit		description
+		
+		0		Network port
+		1		Microdrive buffer full
+		2		
+		3		
+		4		DTR
+		5		CTS
+		6		COMCTL ???
+		7		COMDATA ???
+
+	*/
+
+	return (zx8302.comdata << 7) | (zx8302.comctl << 6);
 }
 
 static WRITE8_HANDLER( zx8302_ipc_w )
@@ -100,9 +186,12 @@ static WRITE8_HANDLER( zx8302_ipc_w )
 	{ write 00001101 to 18003; wait for '0' in bit6 18020; read bit7 of 18020 }
 
 	*/
+
+	zx8302.idr = data;
+	zx8302.ipc_bits = ZX8302_IPC_START;
 }
 
-static WRITE8_HANDLER( mdv_ctrl_w )
+static WRITE8_HANDLER( zx8302_mdv_control_w )
 {
 	/*
 	MDV control
@@ -131,17 +220,44 @@ static WRITE8_HANDLER( mdv_ctrl_w )
 	*/
 }
 
-static WRITE8_HANDLER( mdv_data_w )
+static READ8_HANDLER( zx8302_irq_r )
 {
+	/*
+		
+		bit		description
+		
+		0		Gap interrupt
+		1		Interface interrupt
+		2		Transmit interrupt
+		3		Frame interrupt
+		4		External interrupt
+		5		
+		6		
+		7		
+
+	*/
+
+	return 0;
 }
 
-static READ8_HANDLER( zx8302_status_r )
+static WRITE8_HANDLER( zx8302_irq_w )
 {
-	return 0x0;
+	zx8302.intr = data;
 }
 
-static WRITE8_HANDLER( zx8302_clock_w )
+static READ8_HANDLER( zx8302_mdv_track1_r )
 {
+	return 0;
+}
+
+static READ8_HANDLER( zx8302_mdv_track2_r )
+{
+	return 0;
+}
+
+static WRITE8_HANDLER( zx8302_txdata_w )
+{
+	zx8302.tdr = data;
 }
 
 /* Intelligent Peripheral Controller (IPC) */
@@ -176,12 +292,12 @@ static WRITE8_HANDLER( ipc_port2_w )
 		
 		0		Serial data input
 		1		Speaker output
-		2		Interrupt IPL0-2 output
-		3		Interrupt IPL1 output
+		2		Interrupt IPL0-2 output (not used)
+		3		Interrupt IPL1 output (not used)
 		4		SER2 CTS
 		5		SER1 DTR
 		6		N/C
-		7		ZX8302 link output
+		7		COMDATA input/output
 
 	*/
 
@@ -203,7 +319,7 @@ static WRITE8_HANDLER( ipc_port2_w )
 		break;
 	}
 
-	zx8302_comdata = BIT(data, 7);
+	zx8302.comdata = BIT(data, 7);
 }
 
 static READ8_HANDLER( ipc_port2_r )
@@ -214,21 +330,21 @@ static READ8_HANDLER( ipc_port2_r )
 		
 		0		Serial data input
 		1		Speaker output
-		2		Interrupt IPL2 output
-		3		Interrupt IPL1 output
+		2		Interrupt IPL0-2 output (not used)
+		3		Interrupt IPL1 output (not used)
 		4		SER2 CTS
 		5		SER1 DTR
 		6		N/C
-		7		ZX8302 link output
+		7		COMDATA input/output
 
 	*/
 
-	return zx8302_comdata << 7;
+	return zx8302.comdata << 7;
 }
 
 static READ8_HANDLER( ipc_t1_r )
 {
-	return zx8302_baudx4;
+	return zx8302.baudx4;
 }
 
 static READ8_HANDLER( ipc_bus_r )
@@ -248,14 +364,14 @@ static READ8_HANDLER( ipc_bus_r )
 
 	*/
 
-	if (ipc_keylatch & 0x01) return readinputportbytag("ROW0");
-	if (ipc_keylatch & 0x02) return readinputportbytag("ROW1");
+	if (ipc_keylatch & 0x01) return readinputportbytag("ROW0") | readinputportbytag("JOY0");
+	if (ipc_keylatch & 0x02) return readinputportbytag("ROW1") | readinputportbytag("JOY1");
 	if (ipc_keylatch & 0x04) return readinputportbytag("ROW2");
 	if (ipc_keylatch & 0x08) return readinputportbytag("ROW3");
 	if (ipc_keylatch & 0x10) return readinputportbytag("ROW4");
 	if (ipc_keylatch & 0x20) return readinputportbytag("ROW5");
 	if (ipc_keylatch & 0x40) return readinputportbytag("ROW6");
-	if (ipc_keylatch & 0x80) return readinputportbytag("ROW7");
+	if (ipc_keylatch & 0x80) return readinputportbytag("ROW7") | readinputportbytag("SPECIAL");
 
 	return 0;
 }
@@ -265,17 +381,19 @@ static READ8_HANDLER( ipc_bus_r )
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// System ROM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // Cartridge ROM
-	AM_RANGE(0x018000, 0x018001) AM_WRITE(zx8302_clock_w)
+	AM_RANGE(0x018000, 0x018001) AM_READWRITE(zx8302_rtc_r, zx8302_rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_WRITE(zx8302_control_w)
 	AM_RANGE(0x018003, 0x018003) AM_WRITE(zx8302_ipc_w)
-	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_status_r, mdv_ctrl_w)
-	AM_RANGE(0x018022, 0x018022) AM_WRITE(mdv_data_w)
+	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_ipc_r, zx8302_mdv_control_w)
+	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_irq_r, zx8302_irq_w)
+	AM_RANGE(0x018022, 0x018022) AM_READWRITE(zx8302_mdv_track1_r, zx8302_txdata_w)
+	AM_RANGE(0x018023, 0x018023) AM_READ(zx8302_mdv_track2_r)
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM // onboard RAM
 	AM_RANGE(0x040000, 0x0bffff) AM_RAM // 512KB add-on RAM
 	AM_RANGE(0x0c0000, 0x0dffff) AM_NOP // 8x16KB device slots
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROMBANK(2) // add-on ROM
+	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM // add-on ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -283,7 +401,7 @@ static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x27, 0x28) AM_NOP // ???
+	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
 	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(ipc_port1_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(ipc_t1_r)
@@ -379,33 +497,63 @@ static INPUT_PORTS_START( ql )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("ALT")
 
 	PORT_START_TAG("JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )		PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )	PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )	PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("JOY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )		PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )	PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )	PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2) PORT_8WAY
 INPUT_PORTS_END
 
 /* Machine Drivers */
 
+static INTERRUPT_GEN( ql_int )
+{
+	cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
+}
+
 static MACHINE_START( ql )
 {
-	zx8302_baud_timer = mame_timer_alloc(zx8302_baud_tick);
+	state_save_register_global(zx8302.comdata);
+	state_save_register_global(zx8302.comctl);
+	state_save_register_global(zx8302.baudx4);
+	state_save_register_global(zx8302.tcr);
+	state_save_register_global(zx8302.tdr);
+	state_save_register_global(zx8302.intr);
+	state_save_register_global(zx8302.ctr);
+	state_save_register_global(zx8302.idr);
+	state_save_register_global(zx8302.ipc_bits);
+
+	state_save_register_global(ipc_keylatch);
+
+	memset(&zx8302, 0, sizeof(zx8302));
+
+	zx8302_txd_timer = mame_timer_alloc(zx8302_txd_tick);
+	zx8302_ipc_timer = mame_timer_alloc(zx8302_ipc_tick);
+	zx8302_rtc_timer = mame_timer_alloc(zx8302_rtc_tick);
+
+	mame_timer_adjust(zx8302_rtc_timer, time_zero, 0, MAME_TIME_IN_HZ(X2));
 }
 
 static MACHINE_DRIVER_START( ql )
 	// basic machine hardware
-	MDRV_CPU_ADD(M68008, X1/2) // 7.5 MHz
+	MDRV_CPU_ADD(M68008, X1/2)
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
+	MDRV_CPU_VBLANK_INT(ql_int, 1)
 
-	MDRV_CPU_ADD(I8048, X4) // 11 MHz (i8049)
+	MDRV_CPU_ADD(I8048, X4) // i8049
 	MDRV_CPU_PROGRAM_MAP(ipc_map, 0)
 	MDRV_CPU_IO_MAP(ipc_io_map, 0)
 
@@ -468,6 +616,9 @@ ROM_START( ql )
 
 	ROM_SYSTEM_BIOS( 6, "tyche", "v2.05 (Tyche)" )
     ROMX_LOAD( "tyche.rom", 0x000000, 0x010000, BAD_DUMP CRC(8724b495) SHA1(5f33a1bc3f23fd09c31844b65bc3aca7616f180a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(7) )
+
+	ROM_SYSTEM_BIOS( 7, "min189", "Minerva v1.89" )
+    ROMX_LOAD( "minerva.rom", 0x000000, 0x00c000, CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(8) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "v07.ic24",	  0x0000, 0x0800, CRC(051111f9) SHA1(83ed562464df89b9fdd9740db51d45884a512696) ) // V0.7
@@ -654,4 +805,4 @@ COMP( 1985, ql_mgf, ql,     0,      ql,         ql,     0,      ql,     "Sinclai
 COMP( 1985, ql_mgg, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_NOT_WORKING )
 COMP( 1985, ql_mgi, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_NOT_WORKING )
 COMP( 1985, ql_mgs, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NOT_WORKING )
-COMP( 1985, ql_efp, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Mexico)",  GAME_NOT_WORKING )
+COMP( 1985, ql_efp, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_NOT_WORKING )
