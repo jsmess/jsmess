@@ -2067,10 +2067,17 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+/* The bit for the third button is officially undocumented: Amstrad joysticks actually
+   use only two buttons. The only device that reads this bit is the AMX mouse, which uses
+   dedicated hardware to connect to the joystick port.
+*/
+//	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")                   PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(8)
 
 /* Second joystick port need to be defined: the second joystick is daisy-chained on the back of the first one */
+
+/* The CPC supports at least two different brands of lightpens, probably connected to the expansion port */
 
 INPUT_PORTS_END
 
@@ -2165,7 +2172,15 @@ static INPUT_PORTS_START(plus)
 	/* The CPC+ and GX4000 adds support for analogue controllers.
 	   Up to two joysticks or four paddles can be used, although the ASIC supports twice that.
 	   Read at &6808-&680f in ASIC RAM
-	   I am unsure if these are even close to correct */
+	   I am unsure if these are even close to correct.
+
+	UPDATE: the analog port supports (probably with an Y-cable) up to two analog joysticks
+	with two buttons each or four paddles with one button each. The CPC+/GX4000 have also an
+	AUX port which supports a lightgun/lightpen with two buttons.
+	Since all these devices have their dedicated connector, two digital joystick, two analog joysticks
+	and one lightgun can be connected at the same moment.
+
+	The connectors' description for both CPCs and CPC+'s can be found at http://www.hardwarebook.info/Category:Computer */
 
 	PORT_START_TAG("analog1")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
