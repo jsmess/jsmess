@@ -48,6 +48,9 @@ static struct ZX8302
 	UINT16 ctr;
 	UINT8 idr;
 	int ipc_bits;
+
+	int ser1_rxd, ser1_cts;
+	int ser2_txd, ser2_dtr;
 } zx8302;
 
 static mame_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer;
@@ -56,9 +59,35 @@ static TIMER_CALLBACK( zx8302_txd_tick )
 {
 }
 
+static void hack_comctl(void)
+{
+	/*
+		This function hacks in the COMCTL line state. The real solution would be 
+		to add a WR output line to the i8039 cpu core and monitor that instead.
+	*/
+
+	offs_t pc = cpunum_get_physical_pc_byte(1);
+
+	switch (pc)
+	{
+	case 0x0758:
+	case 0x075a:
+	case 0x076b:
+	case 0x0774:
+		zx8302.comctl = 0;
+	
+	default:
+		zx8302.comctl = 1;
+	}
+
+	logerror("PC: %x, comctl: %u\n", pc, zx8302.comctl);
+}
+
 static TIMER_CALLBACK( zx8302_ipc_tick )
 {
 	zx8302.baudx4 = zx8302.baudx4 ? 0 : 1;
+
+	hack_comctl(); // HACK
 
 	if (zx8302.baudx4)
 	{
@@ -146,8 +175,8 @@ static READ8_HANDLER( zx8302_ipc_r )
 		3		
 		4		DTR
 		5		CTS
-		6		COMCTL ???
-		7		COMDATA ???
+		6		COMCTL
+		7		COMDATA
 
 	*/
 
@@ -262,7 +291,12 @@ static WRITE8_HANDLER( zx8302_txdata_w )
 
 /* Intelligent Peripheral Controller (IPC) */
 
-static UINT8 ipc_keylatch;
+static struct IPC
+{
+	UINT8 keylatch;
+	int ser1_txd, ser1_dtr;
+	int ser2_rxd, ser2_cts;
+} ipc;
 
 static WRITE8_HANDLER( ipc_port1_w )
 {
@@ -281,7 +315,7 @@ static WRITE8_HANDLER( ipc_port1_w )
 
 	*/
 
-	ipc_keylatch = data;
+	ipc.keylatch = data;
 }
 
 static WRITE8_HANDLER( ipc_port2_w )
@@ -290,14 +324,14 @@ static WRITE8_HANDLER( ipc_port2_w )
 		
 		bit		description
 		
-		0		Serial data input
+		0		Serial data input (SER2 RxD, SER1 TxD)
 		1		Speaker output
-		2		Interrupt IPL0-2 output (not used)
-		3		Interrupt IPL1 output (not used)
-		4		SER2 CTS
-		5		SER1 DTR
-		6		N/C
-		7		COMDATA input/output
+		2		Interrupt output (IPL0-2)
+		3		Interrupt output (IPL1)
+		4		Serial Clear-to-Send output (SER2 CTS)
+		5		Serial Data Terminal Ready output (SER1 DTR)
+		6		not connected
+		7		ZX8302 serial link input/output (COMDATA)
 
 	*/
 
@@ -306,18 +340,27 @@ static WRITE8_HANDLER( ipc_port2_w )
 	switch (ipl)
 	{
 	case 0:
-		cpunum_set_input_line(0, MC68000_IRQ_7, HOLD_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_7, ASSERT_LINE);
 		break;
 	case 1:
-		cpunum_set_input_line(0, MC68000_IRQ_5, HOLD_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_5, ASSERT_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
 		break;
 	case 2:
-		cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
 		break;
 	case 3:
 		// do nothing
 		break;
 	}
+
+	ipc.ser2_cts = BIT(data, 4);
+	ipc.ser1_dtr = BIT(data, 5);
 
 	zx8302.comdata = BIT(data, 7);
 }
@@ -328,18 +371,22 @@ static READ8_HANDLER( ipc_port2_r )
 		
 		bit		description
 		
-		0		Serial data input
+		0		Serial data input (SER2 RxD, SER1 TxD)
 		1		Speaker output
-		2		Interrupt IPL0-2 output (not used)
-		3		Interrupt IPL1 output (not used)
-		4		SER2 CTS
-		5		SER1 DTR
-		6		N/C
-		7		COMDATA input/output
+		2		Interrupt output (IPL0-2)
+		3		Interrupt output (IPL1)
+		4		Serial Clear-to-Send output (SER2 CTS)
+		5		Serial Data Terminal Ready output (SER1 DTR)
+		6		not connected
+		7		ZX8302 serial link input/output (COMDATA)
 
 	*/
 
-	return zx8302.comdata << 7;
+	int irq = (ipc.ser2_rxd | ipc.ser1_txd);
+
+	cpunum_set_input_line(1, INPUT_LINE_IRQ0, irq);
+
+	return (zx8302.comdata << 7) | irq;
 }
 
 static READ8_HANDLER( ipc_t1_r )
@@ -364,14 +411,14 @@ static READ8_HANDLER( ipc_bus_r )
 
 	*/
 
-	if (ipc_keylatch & 0x01) return readinputportbytag("ROW0") | readinputportbytag("JOY0");
-	if (ipc_keylatch & 0x02) return readinputportbytag("ROW1") | readinputportbytag("JOY1");
-	if (ipc_keylatch & 0x04) return readinputportbytag("ROW2");
-	if (ipc_keylatch & 0x08) return readinputportbytag("ROW3");
-	if (ipc_keylatch & 0x10) return readinputportbytag("ROW4");
-	if (ipc_keylatch & 0x20) return readinputportbytag("ROW5");
-	if (ipc_keylatch & 0x40) return readinputportbytag("ROW6");
-	if (ipc_keylatch & 0x80) return readinputportbytag("ROW7") | readinputportbytag("SPECIAL");
+	if (BIT(ipc.keylatch, 0)) return readinputportbytag("ROW0") | readinputportbytag("JOY0");
+	if (BIT(ipc.keylatch, 1)) return readinputportbytag("ROW1") | readinputportbytag("JOY1");
+	if (BIT(ipc.keylatch, 2)) return readinputportbytag("ROW2");
+	if (BIT(ipc.keylatch, 3)) return readinputportbytag("ROW3");
+	if (BIT(ipc.keylatch, 4)) return readinputportbytag("ROW4");
+	if (BIT(ipc.keylatch, 5)) return readinputportbytag("ROW5");
+	if (BIT(ipc.keylatch, 6)) return readinputportbytag("ROW6");
+	if (BIT(ipc.keylatch, 7)) return readinputportbytag("ROW7") | readinputportbytag("SPECIAL");
 
 	return 0;
 }
@@ -526,6 +573,8 @@ static INTERRUPT_GEN( zx8302_int )
 
 static MACHINE_START( ql )
 {
+	// ZX8302
+
 	state_save_register_global(zx8302.comdata);
 	state_save_register_global(zx8302.comctl);
 	state_save_register_global(zx8302.baudx4);
@@ -535,8 +584,10 @@ static MACHINE_START( ql )
 	state_save_register_global(zx8302.ctr);
 	state_save_register_global(zx8302.idr);
 	state_save_register_global(zx8302.ipc_bits);
-
-	state_save_register_global(ipc_keylatch);
+	state_save_register_global(zx8302.ser1_rxd);
+	state_save_register_global(zx8302.ser1_cts);
+	state_save_register_global(zx8302.ser2_txd);
+	state_save_register_global(zx8302.ser2_dtr);
 
 	memset(&zx8302, 0, sizeof(zx8302));
 	zx8302.comctl = 1;
@@ -547,6 +598,16 @@ static MACHINE_START( ql )
 	zx8302_rtc_timer = mame_timer_alloc(zx8302_rtc_tick);
 
 	mame_timer_adjust(zx8302_rtc_timer, time_zero, 0, MAME_TIME_IN_HZ(X2));
+
+	// IPC
+
+	state_save_register_global(ipc.keylatch);
+	state_save_register_global(ipc.ser1_txd);
+	state_save_register_global(ipc.ser1_dtr);
+	state_save_register_global(ipc.ser2_rxd);
+	state_save_register_global(ipc.ser2_cts);
+
+	memset(&ipc, 0, sizeof(ipc));
 }
 
 static MACHINE_DRIVER_START( ql )
@@ -555,7 +616,7 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
 	MDRV_CPU_VBLANK_INT(zx8302_int, 1)
 
-	MDRV_CPU_ADD(I8048, X4) // i8049
+	MDRV_CPU_ADD(I8048, X4) // i8749
 	MDRV_CPU_PROGRAM_MAP(ipc_map, 0)
 	MDRV_CPU_IO_MAP(ipc_io_map, 0)
 
