@@ -48,7 +48,6 @@ static struct ZX8302
 	UINT16 ctr;
 	UINT8 idr;
 	int ipc_bits;
-
 	int ser1_rxd, ser1_cts;
 	int ser2_txd, ser2_dtr;
 } zx8302;
@@ -112,13 +111,6 @@ static TIMER_CALLBACK( zx8302_ipc_tick )
 				zx8302.comdata = 1;
 				break;
 			}
-		}
-		else
-		{
-			// receive data from the IPC
-
-			zx8302.idr <<= 1;
-			zx8302.idr |= zx8302.comdata;
 		}
 	}
 }
@@ -185,37 +177,6 @@ static READ8_HANDLER( zx8302_ipc_r )
 
 static WRITE8_HANDLER( zx8302_ipc_w )
 {
-	/*
-	process 8049 commands (p92)
-	WR 18003: 8049  commands
-	0:
-	1: get interrupt status
-	2: open ser1
-	3: open ser2
-	4: close ser1/ser2
-	5:
-	6: serial1 receive
-	7: serial2 receive
-	8: read keyboard
-	9: keyrow
-	a: set sound
-	b: kill sound
-	c:
-	d: set serial baudrate
-	e: get response
-	f: test
-
-	write nibble to 8049:
-	'dbca' in 4 writes to 18003: 000011d0, 000011c0, 000011b0, 000011a0.
-	each write is acknowledged by 8049 with a '0' in bit 6 of 18020.
-
-	response from 8049:
-	repeat for any number of bits to be received (MSB first)
-	970718
-	{ write 00001101 to 18003; wait for '0' in bit6 18020; read bit7 of 18020 }
-
-	*/
-
 	zx8302.idr = data;
 	zx8302.ipc_bits = ZX8302_IPC_START;
 }
