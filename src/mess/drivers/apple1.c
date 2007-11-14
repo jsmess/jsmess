@@ -152,6 +152,15 @@ static PALETTE_INIT( apple1 )
 }
 
 /* keyboard input */
+/*
+   It's very likely that the keyboard assgnments are totally wrong: the code in machine/apple1.c
+   makes arbitrary assumptions about the mapping of the keys. The schematics that are available
+   on the web can help revealing the real layout.
+   The large picture of Woz's Apple I at http://home.earthlink.net/~judgementcall/apple1.jpg
+   show probably how the real keyboard was meant to be: note how the shifted symbols on the digits
+   and on some letters are different from the ones produced by current emulation and the presence
+   of the gray keys.
+*/
 
 static INPUT_PORTS_START( apple1 )
 	PORT_START	/* 0: first sixteen keys */
