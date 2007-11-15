@@ -18,9 +18,9 @@ static	int	aquarius_ramsize = 0;
 MACHINE_RESET( aquarius )
 {
 	logerror("aquarius_init\r\n");
-	if (readinputport(9) != aquarius_ramsize)
+	if (readinputportbytag("ram") != aquarius_ramsize)
 	{
-		aquarius_ramsize = readinputport(9);
+		aquarius_ramsize = readinputportbytag("ram");
 		switch (aquarius_ramsize)
 		{
 			case 02:
@@ -57,6 +57,7 @@ MACHINE_RESET( aquarius )
 	{
 		if (!(bc & loop))
 		{
+// TODO: replace it with readinputportbytag
 			rpl &= readinputport (loop2);
 		}
 	}
