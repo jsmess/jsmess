@@ -34,8 +34,33 @@
 
 /* Peripheral Chip (ZX8302) */
 
+#define ZX8302_BAUD_19200	0x00
+#define ZX8302_BAUD_9600	0x01
+#define ZX8302_BAUD_4800	0x02
+#define ZX8302_BAUD_2400	0x03
+#define ZX8302_BAUD_1200	0x04
+#define ZX8302_BAUD_600		0x05
+#define ZX8302_BAUD_300		0x06
+#define ZX8302_BAUD_75		0x07
+#define ZX8302_BAUD_MASK	0x07
+#define ZX8302_MODE_SER1	0x00
+#define ZX8302_MODE_SER2	0x08
+#define ZX8302_MODE_MDV		0x10
+#define ZX8302_MODE_NET		0x18
+#define ZX8302_MODE_MASK	0x18
+
+#define ZX8302_INT_GAP			0x01
+#define ZX8302_INT_INTERFACE	0x02
+#define ZX8302_INT_TRANSMIT		0x04
+#define ZX8302_INT_FRAME		0x08
+#define ZX8302_INT_EXTERNAL		0x10
+
 #define ZX8302_IPC_START	0
 #define ZX8302_IPC_STOP		5
+
+#define ZX8302_TXD_START	0
+#define ZX8302_TXD_STOP		9
+#define ZX8302_TXD_STOP2	10
 
 static struct ZX8302
 {
@@ -44,49 +69,80 @@ static struct ZX8302
 	int baudx4;
 	UINT8 tcr;
 	UINT8 tdr;
-	UINT8 irq, ie;
+	UINT8 irq;
 	UINT32 ctr;
 	UINT8 idr;
-	int ipc_bits;
+	int ipc_bits, tx_bits;
 	int ser1_rxd, ser1_cts;
 	int ser2_txd, ser2_dtr;
+	int netout, netin;
+	int mdrdwl, mdselckn, mdseldn, erase, raw1, raw2;
 } zx8302;
 
 static mame_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer;
 
-static TIMER_CALLBACK( zx8302_txd_tick )
+static void zx8302_interrupt(UINT8 line)
 {
+	zx8302.irq |= line;
+	//cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
 }
 
-static void hack_comctl(void)
+static void zx8302_txd(int level)
 {
-	/*
-		This function hacks in the COMCTL line state. The real solution would be 
-		to add a WR output line to the i8039 cpu core and monitor that instead.
-	*/
-
-	offs_t pc = cpunum_get_physical_pc_byte(1);
-
-	switch (pc)
+	switch (zx8302.tcr & ZX8302_MODE_MASK)
 	{
-	case 0x0758:
-	case 0x075a:
-	case 0x076b:
-	case 0x0774:
-		zx8302.comctl = 0;
-	
-	default:
-		zx8302.comctl = 1;
-	}
+	case ZX8302_MODE_SER1:
+		zx8302.ser1_rxd = level;
+		break;
 
-	logerror("PC: %x, comctl: %u\n", pc, zx8302.comctl);
+	case ZX8302_MODE_SER2:
+		zx8302.ser2_txd = level;
+		break;
+
+	case ZX8302_MODE_MDV:
+		// TODO
+		break;
+
+	case ZX8302_MODE_NET:
+		zx8302.netout = level;
+		break;
+	}
+}
+
+static TIMER_CALLBACK( zx8302_txd_tick )
+{
+	switch (zx8302.tx_bits)
+	{
+	case ZX8302_TXD_START:
+		if (!(zx8302.irq & ZX8302_INT_TRANSMIT))
+		{
+			zx8302_txd(0);
+			zx8302.tx_bits++;
+		}
+		break;
+
+	default:
+		zx8302.comdata = BIT(zx8302.tdr, 0);
+		zx8302.tdr >>= 1; // TODO: is the TDR latched internally to a shift register?
+		zx8302.tx_bits++;
+		break;
+
+	case ZX8302_TXD_STOP:
+		zx8302_txd(1);
+		zx8302.tx_bits++;
+		break;
+
+	case ZX8302_TXD_STOP2:
+		zx8302_txd(1);
+		zx8302.tx_bits = ZX8302_TXD_START;
+		zx8302_interrupt(ZX8302_INT_TRANSMIT); // TODO: when is the transmit interrupt triggered?
+		break;
+	}
 }
 
 static TIMER_CALLBACK( zx8302_ipc_tick )
 {
 	zx8302.baudx4 = zx8302.baudx4 ? 0 : 1;
-
-	hack_comctl(); // HACK
 
 	if (zx8302.baudx4)
 	{
@@ -111,6 +167,10 @@ static TIMER_CALLBACK( zx8302_ipc_tick )
 				zx8302.comdata = 1;
 				break;
 			}
+		}
+		else
+		{
+			zx8302.comctl = 1;
 		}
 	}
 }
@@ -139,22 +199,8 @@ static READ8_HANDLER( zx8302_rtc_r )
 
 static WRITE8_HANDLER( zx8302_rtc_w )
 {
+	// TODO
 }
-
-#define ZX8302_BAUD_19200	0x00
-#define ZX8302_BAUD_9600	0x01
-#define ZX8302_BAUD_4800	0x02
-#define ZX8302_BAUD_2400	0x03
-#define ZX8302_BAUD_1200	0x04
-#define ZX8302_BAUD_600		0x05
-#define ZX8302_BAUD_300		0x06
-#define ZX8302_BAUD_75		0x07
-#define ZX8302_BAUD_MASK	0x07
-#define ZX8302_MODE_SER1	0x00
-#define ZX8302_MODE_SER2	0x08
-#define ZX8302_MODE_MDV		0x10
-#define ZX8302_MODE_NET		0x18
-#define ZX8302_MODE_MASK	0x18
 
 static WRITE8_HANDLER( zx8302_control_w )
 {
@@ -185,7 +231,7 @@ static WRITE8_HANDLER( zx8302_control_w )
 	logerror("ZX8302 Baud Rate : %u\n", baud);
 }
 
-static READ8_HANDLER( zx8302_ipc_status_r )
+static READ8_HANDLER( zx8302_status_r )
 {
 	/*
 		
@@ -195,18 +241,20 @@ static READ8_HANDLER( zx8302_ipc_status_r )
 		1		Microdrive buffer full
 		2		
 		3		
-		4		DTR
-		5		CTS
+		4		SER1 DTR
+		5		SER2 CTS
 		6		COMCTL
 		7		COMDATA
 
 	*/
 
-	return (zx8302.comdata << 7) | (zx8302.comctl << 6);
+	return (zx8302.comdata << 7) | (zx8302.comctl << 6) | (zx8302.ser1_cts << 5)| (zx8302.ser2_dtr << 4);
 }
 
 static WRITE8_HANDLER( zx8302_ipc_command_w )
 {
+	logerror("ZX8302 IPC Command : %x\n", data);
+
 	zx8302.idr = data;
 	zx8302.ipc_bits = ZX8302_IPC_START;
 }
@@ -240,39 +288,21 @@ static WRITE8_HANDLER( zx8302_mdv_control_w )
 	*/
 }
 
-#define ZX8302_INT_GAP			0x01
-#define ZX8302_INT_INTERFACE	0x02
-#define ZX8302_INT_TRANSMIT		0x04
-#define ZX8302_INT_FRAME		0x08
-#define ZX8302_INT_EXTERNAL		0x10
-
 static READ8_HANDLER( zx8302_irq_status_r )
 {
-	/*
-		
-		bit		description
-		
-		0		Gap interrupt
-		1		Interface interrupt
-		2		Transmit interrupt
-		3		Frame interrupt
-		4		External interrupt
-		5		
-		6		
-		7		
-
-	*/
-
-	UINT8 irq = zx8302.irq;
-
-	zx8302.irq = 0;
-
-	return irq;
+	return zx8302.irq;
 }
 
-static WRITE8_HANDLER( zx8302_irq_enable_w )
+static WRITE8_HANDLER( zx8302_irq_acknowledge_w )
 {
-	zx8302.ie = data;
+	logerror("ZX8302 Interrupt Acknowledge : %x\n", data);
+
+	zx8302.irq &= ~data;
+
+	if (!zx8302.irq)
+	{
+		cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
+	}
 }
 
 static READ8_HANDLER( zx8302_mdv_track1_r )
@@ -285,19 +315,16 @@ static READ8_HANDLER( zx8302_mdv_track2_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( zx8302_txdata_w )
+static WRITE8_HANDLER( zx8302_data_w )
 {
+	logerror("ZX8302 Data Write : %x\n", data);
+
 	zx8302.tdr = data;
 }
 
 static INTERRUPT_GEN( zx8302_int )
 {
-	if (zx8302.ie & ZX8302_INT_FRAME)
-	{
-		cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
-		zx8302.irq |= ZX8302_INT_FRAME;
-		zx8302.ie ^= ZX8302_INT_FRAME;
-	}
+	zx8302_interrupt(ZX8302_INT_FRAME);
 }
 
 /* Intelligent Peripheral Controller (IPC) */
@@ -308,6 +335,13 @@ static struct IPC
 	int ser1_txd, ser1_dtr;
 	int ser2_rxd, ser2_cts;
 } ipc;
+
+static WRITE8_HANDLER( ipc_comctl_w )
+{
+	logerror("IPC WR low\n");
+
+	zx8302.comctl = 0;
+}
 
 static WRITE8_HANDLER( ipc_port1_w )
 {
@@ -443,10 +477,10 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x018000, 0x018001) AM_WRITE(zx8302_rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_WRITE(zx8302_control_w)
 	AM_RANGE(0x018003, 0x018003) AM_WRITE(zx8302_ipc_command_w)
-	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_ipc_status_r, zx8302_mdv_control_w)
-	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_irq_status_r, zx8302_irq_enable_w)
-	AM_RANGE(0x018022, 0x018022) AM_READWRITE(zx8302_mdv_track1_r, zx8302_txdata_w)
-	AM_RANGE(0x018023, 0x018023) AM_READ(zx8302_mdv_track2_r)
+	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_status_r, zx8302_mdv_control_w)
+	AM_RANGE(0x018021, 0x018021) AM_READWRITE(zx8302_irq_status_r, zx8302_irq_acknowledge_w)
+	AM_RANGE(0x018022, 0x018022) AM_READWRITE(zx8302_mdv_track1_r, zx8302_data_w)
+	AM_RANGE(0x018023, 0x018023) AM_READ(zx8302_mdv_track2_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM // onboard RAM
@@ -460,6 +494,7 @@ static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x22, 0x22) AM_WRITE(ipc_comctl_w) // IPC writes this to assert the WR output line
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
 	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(ipc_port1_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
@@ -588,14 +623,22 @@ static MACHINE_START( ql )
 	state_save_register_global(zx8302.tcr);
 	state_save_register_global(zx8302.tdr);
 	state_save_register_global(zx8302.irq);
-	state_save_register_global(zx8302.ie);
 	state_save_register_global(zx8302.ctr);
 	state_save_register_global(zx8302.idr);
 	state_save_register_global(zx8302.ipc_bits);
+	state_save_register_global(zx8302.tx_bits);
 	state_save_register_global(zx8302.ser1_rxd);
 	state_save_register_global(zx8302.ser1_cts);
 	state_save_register_global(zx8302.ser2_txd);
 	state_save_register_global(zx8302.ser2_dtr);
+	state_save_register_global(zx8302.netout);
+	state_save_register_global(zx8302.netin);
+	state_save_register_global(zx8302.mdrdwl);
+	state_save_register_global(zx8302.mdselckn);
+	state_save_register_global(zx8302.mdseldn);
+	state_save_register_global(zx8302.erase);
+	state_save_register_global(zx8302.raw1);
+	state_save_register_global(zx8302.raw2);
 
 	memset(&zx8302, 0, sizeof(zx8302));
 	zx8302.comctl = 1;
