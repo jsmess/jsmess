@@ -44,8 +44,8 @@ static struct ZX8302
 	int baudx4;
 	UINT8 tcr;
 	UINT8 tdr;
-	UINT8 intr;
-	UINT16 ctr;
+	UINT8 irq, ie;
+	UINT32 ctr;
 	UINT8 idr;
 	int ipc_bits;
 	int ser1_rxd, ser1_cts;
@@ -122,40 +122,70 @@ static TIMER_CALLBACK( zx8302_rtc_tick )
 
 static READ8_HANDLER( zx8302_rtc_r )
 {
-	if (offset)
+	switch (offset)
 	{
-		return zx8302.ctr & 0xff;
+	case 0:
+		return (zx8302.ctr >> 24) & 0xff;
+	case 1:
+		return (zx8302.ctr >> 16) & 0xff;
+	case 2:
+		return (zx8302.ctr >> 8) & 0xff;
+	case 3:
+		return zx8302.ctr;
 	}
-	else
-	{
-		return zx8302.ctr >> 8;
-	}
+
+	return 0;
 }
 
 static WRITE8_HANDLER( zx8302_rtc_w )
 {
-	if (offset)
-	{
-		zx8302.ctr = (zx8302.ctr & 0xff00) | data;
-	}
-	else
-	{
-		zx8302.ctr = (data << 8) | (zx8302.ctr & 0xff);
-	}
 }
+
+#define ZX8302_BAUD_19200	0x00
+#define ZX8302_BAUD_9600	0x01
+#define ZX8302_BAUD_4800	0x02
+#define ZX8302_BAUD_2400	0x03
+#define ZX8302_BAUD_1200	0x04
+#define ZX8302_BAUD_600		0x05
+#define ZX8302_BAUD_300		0x06
+#define ZX8302_BAUD_75		0x07
+#define ZX8302_BAUD_MASK	0x07
+#define ZX8302_MODE_SER1	0x00
+#define ZX8302_MODE_SER2	0x08
+#define ZX8302_MODE_MDV		0x10
+#define ZX8302_MODE_NET		0x18
+#define ZX8302_MODE_MASK	0x18
 
 static WRITE8_HANDLER( zx8302_control_w )
 {
-	int baud = 19200 >> (data & 0x07);
+	int baud = 19200 >> (data & ZX8302_BAUD_MASK);
 	int baudx4 = baud * 4;
 
 	zx8302.tcr = data;
 
+	switch (data & ZX8302_MODE_MASK)
+	{
+	case ZX8302_MODE_SER1:
+		logerror("ZX8302 Mode : SER1\n");
+		break;
+	case ZX8302_MODE_SER2:
+		logerror("ZX8302 Mode : SER2\n");
+		break;
+	case ZX8302_MODE_MDV:
+		logerror("ZX8302 Mode : MDV\n");
+		break;
+	case ZX8302_MODE_NET:
+		logerror("ZX8302 Mode : NET\n");
+		break;
+	}
+
 	mame_timer_adjust(zx8302_txd_timer, time_zero, 0, MAME_TIME_IN_HZ(baud));
 	mame_timer_adjust(zx8302_ipc_timer, time_zero, 0, MAME_TIME_IN_HZ(baudx4));
+
+	logerror("ZX8302 Baud Rate : %u\n", baud);
 }
 
-static READ8_HANDLER( zx8302_ipc_r )
+static READ8_HANDLER( zx8302_ipc_status_r )
 {
 	/*
 		
@@ -175,7 +205,7 @@ static READ8_HANDLER( zx8302_ipc_r )
 	return (zx8302.comdata << 7) | (zx8302.comctl << 6);
 }
 
-static WRITE8_HANDLER( zx8302_ipc_w )
+static WRITE8_HANDLER( zx8302_ipc_command_w )
 {
 	zx8302.idr = data;
 	zx8302.ipc_bits = ZX8302_IPC_START;
@@ -210,7 +240,13 @@ static WRITE8_HANDLER( zx8302_mdv_control_w )
 	*/
 }
 
-static READ8_HANDLER( zx8302_irq_r )
+#define ZX8302_INT_GAP			0x01
+#define ZX8302_INT_INTERFACE	0x02
+#define ZX8302_INT_TRANSMIT		0x04
+#define ZX8302_INT_FRAME		0x08
+#define ZX8302_INT_EXTERNAL		0x10
+
+static READ8_HANDLER( zx8302_irq_status_r )
 {
 	/*
 		
@@ -227,12 +263,16 @@ static READ8_HANDLER( zx8302_irq_r )
 
 	*/
 
-	return 0;
+	UINT8 irq = zx8302.irq;
+
+	zx8302.irq = 0;
+
+	return irq;
 }
 
-static WRITE8_HANDLER( zx8302_irq_w )
+static WRITE8_HANDLER( zx8302_irq_enable_w )
 {
-	zx8302.intr = data;
+	zx8302.ie = data;
 }
 
 static READ8_HANDLER( zx8302_mdv_track1_r )
@@ -248,6 +288,16 @@ static READ8_HANDLER( zx8302_mdv_track2_r )
 static WRITE8_HANDLER( zx8302_txdata_w )
 {
 	zx8302.tdr = data;
+}
+
+static INTERRUPT_GEN( zx8302_int )
+{
+	if (zx8302.ie & ZX8302_INT_FRAME)
+	{
+		cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
+		zx8302.irq |= ZX8302_INT_FRAME;
+		zx8302.ie ^= ZX8302_INT_FRAME;
+	}
 }
 
 /* Intelligent Peripheral Controller (IPC) */
@@ -389,11 +439,12 @@ static READ8_HANDLER( ipc_bus_r )
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// System ROM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // Cartridge ROM
-	AM_RANGE(0x018000, 0x018001) AM_READWRITE(zx8302_rtc_r, zx8302_rtc_w)
+	AM_RANGE(0x018000, 0x018003) AM_READ(zx8302_rtc_r)
+	AM_RANGE(0x018000, 0x018001) AM_WRITE(zx8302_rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_WRITE(zx8302_control_w)
-	AM_RANGE(0x018003, 0x018003) AM_WRITE(zx8302_ipc_w)
-	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_ipc_r, zx8302_mdv_control_w)
-	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_irq_r, zx8302_irq_w)
+	AM_RANGE(0x018003, 0x018003) AM_WRITE(zx8302_ipc_command_w)
+	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_ipc_status_r, zx8302_mdv_control_w)
+	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_irq_status_r, zx8302_irq_enable_w)
 	AM_RANGE(0x018022, 0x018022) AM_READWRITE(zx8302_mdv_track1_r, zx8302_txdata_w)
 	AM_RANGE(0x018023, 0x018023) AM_READ(zx8302_mdv_track2_r)
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
@@ -527,11 +578,6 @@ INPUT_PORTS_END
 
 /* Machine Drivers */
 
-static INTERRUPT_GEN( zx8302_int )
-{
-	cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
-}
-
 static MACHINE_START( ql )
 {
 	// ZX8302
@@ -541,7 +587,8 @@ static MACHINE_START( ql )
 	state_save_register_global(zx8302.baudx4);
 	state_save_register_global(zx8302.tcr);
 	state_save_register_global(zx8302.tdr);
-	state_save_register_global(zx8302.intr);
+	state_save_register_global(zx8302.irq);
+	state_save_register_global(zx8302.ie);
 	state_save_register_global(zx8302.ctr);
 	state_save_register_global(zx8302.idr);
 	state_save_register_global(zx8302.ipc_bits);
