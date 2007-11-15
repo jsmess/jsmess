@@ -44,6 +44,8 @@ static struct osborne1 {
 	/* bankswitch setting */
 	UINT8	bankswitch;
 	UINT8	in_irq_handler;
+	/* beep state */
+	UINT8	beep;
 } osborne1;
 
 /* Prototypes */
@@ -265,7 +267,7 @@ static WRITE8_HANDLER( video_pia_port_a_w ) {
 
 static WRITE8_HANDLER( video_pia_port_b_w ) {
 	osborne1.new_start_y = data & 0x1F;
-	beep_set_state( 0, ( data & 0x20 ) ? 1 : 0 );
+	osborne1.beep = ( data & 0x20 ) ? 1 : 0;
 	if ( data & 0x40 ) {
 		wd17xx_set_drive( 0 );
 	} else if ( data & 0x80 ) {
@@ -346,6 +348,12 @@ static TIMER_CALLBACK(osborne1_video_callback) {
 			osborne1.start_y += 1;
 			osborne1.charline = 0;
 		}
+	}
+
+	if ( ( y % 10 ) == 2 || ( y % 10 ) == 6 ) {
+		beep_set_state( 0, osborne1.beep );
+	} else {
+		beep_set_state( 0, 0 );
 	}
 
 	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, y + 1, 0 ), 0, time_never );
