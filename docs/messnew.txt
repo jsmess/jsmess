@@ -22,6 +22,10 @@ System Driver Changes:
 
 - [GAMEGEAR] Fixed graphics issues in Ax Battler.  (bug #1332) [Wilbert Pol]
 
+- [GAMEGEAR/SMS] Allow the VDP status bits to be read before an
+  interrupt is triggered and handled. Fixes hang in first level of
+  Zool.  (bug #1419) [Wilbert Pol]
+
 - [ORIC] Fixed floppy interface detection.  [Dirk Best]
 
 - [PET] Updated to use MAME's CRTC6548 implementation.  [Wilbert Pol]
