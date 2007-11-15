@@ -41,134 +41,130 @@ PAL frame timing
 #include "includes/sms.h"
 #include "video/generic.h"
 
-#define IS_SMS1_VDP		( features & MODEL_315_5124 )
-#define IS_SMS2_VDP		( features & MODEL_315_5246 )
-#define IS_GAMEGEAR_VDP		( features & MODEL_315_5378 )
+#define IS_SMS1_VDP			( smsvdp.features & MODEL_315_5124 )
+#define IS_SMS2_VDP			( smsvdp.features & MODEL_315_5246 )
+#define IS_GAMEGEAR_VDP		( smsvdp.features & MODEL_315_5378 )
 
-#define STATUS_VINT		(0x80)	/* Pending vertical interrupt flag */
+#define STATUS_VINT			(0x80)	/* Pending vertical interrupt flag */
 #define STATUS_SPROVR		(0x40)	/* Sprite overflow flag */
 #define STATUS_SPRCOL		(0x20)	/* Object collision flag */
-#define STATUS_HINT		(0x02)	/* Pending horizontal interrupt flag */
+#define STATUS_HINT			(0x02)	/* Pending horizontal interrupt flag */
 
 #define GG_CRAM_SIZE		(0x40)	/* 32 colors x 2 bytes per color = 64 bytes */
 #define SMS_CRAM_SIZE		(0x20)	/* 32 colors x 1 bytes per color = 32 bytes */
 #define MAX_CRAM_SIZE		0x40
 
-#define VRAM_SIZE		(0x4000)
+#define VRAM_SIZE			(0x4000)
 
 #define PRIORITY_BIT		0x1000
-#define BACKDROP_COLOR		( ( vdp_mode == 4 ? 0x10 : 0x00 ) + (reg[0x07] & 0x0F))
+#define BACKDROP_COLOR		( ( smsvdp.vdp_mode == 4 ? 0x10 : 0x00 ) + (smsvdp.reg[0x07] & 0x0F))
 
 #define NUM_OF_REGISTER		(0x10)  /* 16 registers */
 
-#define INIT_VCOUNT		0
+#define INIT_VCOUNT			0
 #define VERTICAL_BLANKING	1
 #define TOP_BLANKING		2
-#define TOP_BORDER		3
+#define TOP_BORDER			3
 #define ACTIVE_DISPLAY_V	4
 #define BOTTOM_BORDER		5
 #define BOTTOM_BLANKING		6
 
-static UINT8 sms_ntsc_192[7] = { 0xD5, 3, 13, 27, 192, 24, 3 };
-static UINT8 sms_ntsc_224[7] = { 0xE5, 3, 13, 11, 224,  8, 3 };
-static UINT8 sms_ntsc_240[7] = { 0xEE, 3, 13,  3, 240,  0, 3 };
-static UINT8 sms_pal_192[7]  = { 0xBA, 3, 13, 54, 192, 48, 3 };
-static UINT8 sms_pal_224[7]  = { 0xCA, 3, 13, 38, 224, 32, 3 };
-static UINT8 sms_pal_240[7]  = { 0xD2, 3, 13, 30, 240, 24, 3 };
+static const UINT8 sms_ntsc_192[7] = { 0xD5, 3, 13, 27, 192, 24, 3 };
+static const UINT8 sms_ntsc_224[7] = { 0xE5, 3, 13, 11, 224,  8, 3 };
+static const UINT8 sms_ntsc_240[7] = { 0xEE, 3, 13,  3, 240,  0, 3 };
+static const UINT8 sms_pal_192[7]  = { 0xBA, 3, 13, 54, 192, 48, 3 };
+static const UINT8 sms_pal_224[7]  = { 0xCA, 3, 13, 38, 224, 32, 3 };
+static const UINT8 sms_pal_240[7]  = { 0xD2, 3, 13, 30, 240, 24, 3 };
 
-UINT8 *sms_frame_timing;
+static struct _smsvdp {
+	UINT32		features;
+	UINT8		reg[NUM_OF_REGISTER];		/* All the registers */
+	UINT8		status;						/* Status register */
+	UINT8		reg9copy;					/* Internal copy of register 9 */
+	UINT8		addrmode;					/* Type of VDP action */
+	UINT16		addr;						/* Contents of internal VDP address register */
+	UINT8		cram_mask;					/* Mask to switch between SMS and GG CRAM sizes */
+	int			cram_dirty;					/* Have there been any changes to the CRAM area */
+	int			pending;
+	UINT8		buffer;
+	int			gg_sms_mode;				/* Shrunk SMS screen on GG lcd mode flag */
+	int			irq_state;					/* The status of the IRQ line of the VDP */
+	int			vdp_mode;					/* Current mode of the VDP: 0,1,2,3,4 */
+	int			y_pixels;					/* 192, 224, 240 */
+	int			line_counter;
+	UINT8		*VRAM;						/* Pointer to VRAM */
+	UINT8		*CRAM;						/* Pointer to CRAM */
+	const UINT8	*sms_frame_timing;
+	mame_bitmap	*prev_bitmap;
+	int			prev_bitmap_saved;
+	UINT8		*collision_buffer;
 
-UINT8 reg[NUM_OF_REGISTER];
-UINT8 *VRAM = NULL;
-UINT8 *CRAM = NULL;
-int CRAMMask;
-UINT8 *lineCollisionBuffer;
-UINT8 reg9copy;
-
-int addr;
-int code;
-int pending;
-int latch;
-int buffer;
-int statusReg;
-int ggSmsMode;
-UINT32 features;
-
-int isCRAMDirty;
-
-int lineCountDownCounter;
-int irqState;			/* The status of the IRQ line, as seen by the VDP */
-int y_pixels;			/* 192, 224, 240 */
-int vdp_mode;			/* current mode of the VDP: 0,1,2,3,4 */
-
-mame_bitmap *prevBitMap;
-
-/* lineBuffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
-   Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
-   sms compatibility mode.
- */
-int *lineBuffer = NULL;
-int currentPalette[32];
-int prevBitMapSaved;
-void (*int_callback)(int);
-mame_timer *smsvdp_display_timer = NULL;
+	/* lineBuffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
+	   Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
+	   sms compatibility mode.
+	 */
+	int			*line_buffer;
+	int			current_palette[32];
+	void (*int_callback)(int);
+	mame_timer	*smsvdp_display_timer;
+} smsvdp;
 
 static TIMER_CALLBACK(smsvdp_display_callback);
-void sms_refresh_line(mame_bitmap *bitmap, int offsetx, int offsety, int line);
-void sms_update_palette(void);
+static void sms_refresh_line(mame_bitmap *bitmap, int offsetx, int offsety, int line);
+static void sms_update_palette(void);
 
 static void set_display_settings( void ) {
 	int M1, M2, M3, M4;
-	M1 = reg[0x01] & 0x10;
-	M2 = reg[0x00] & 0x02;
-	M3 = reg[0x01] & 0x08;
-	M4 = reg[0x00] & 0x04;
-	y_pixels = 192;
+	M1 = smsvdp.reg[0x01] & 0x10;
+	M2 = smsvdp.reg[0x00] & 0x02;
+	M3 = smsvdp.reg[0x01] & 0x08;
+	M4 = smsvdp.reg[0x00] & 0x04;
+	smsvdp.y_pixels = 192;
 	if ( M4 ) {
 		/* mode 4 */
-		vdp_mode = 4;
+		smsvdp.vdp_mode = 4;
 		if ( M2 && ( IS_SMS2_VDP || IS_GAMEGEAR_VDP ) ) {
 			/* Is it 224-line display */
 			if ( M1 && ! M3 ) {
-				y_pixels = 224;
+				smsvdp.y_pixels = 224;
 			} else if ( ! M1 && M3 ) {
 				/* 240-line display */
-				y_pixels = 240;
+				smsvdp.y_pixels = 240;
 			}
 		}
 	} else {
 		/* original TMS9918 mode */
 		if ( ! M1 && ! M2 && ! M3 ) {
-			vdp_mode = 0;
+			smsvdp.vdp_mode = 0;
 		} else
 //		if ( M1 && ! M2 && ! M3 ) {
-//			vdp_mode = 1;
+//			smsvdp.vdp_mode = 1;
 //		} else
 		if ( ! M1 && M2 && ! M3 ) {
-			vdp_mode = 2;
+			smsvdp.vdp_mode = 2;
 //		} else
 //		if ( ! M1 && ! M2 && M3 ) {
-//			vdp_mode = 3;
+//			smsvdp.vdp_mode = 3;
 		} else {
 			logerror( "Unknown video mode detected (M1=%c, M2=%c, M3=%c, M4=%c)\n", M1 ? '1' : '0', M2 ? '1' : '0', M3 ? '1' : '0', M4 ? '1' : '0');
 		}
 	}
-	switch( y_pixels ) {
+	switch( smsvdp.y_pixels ) {
 	case 192:
-		sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_192 : sms_ntsc_192;
+		smsvdp.sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_192 : sms_ntsc_192;
 		break;
 	case 224:
-		sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_224 : sms_ntsc_224;
+		smsvdp.sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_224 : sms_ntsc_224;
 		break;
 	case 240:
-		sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_240 : sms_ntsc_240;
+		smsvdp.sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_240 : sms_ntsc_240;
 		break;
 	}
-	isCRAMDirty = 1;
+	smsvdp.cram_dirty = 1;
 }
 
  READ8_HANDLER(sms_vdp_vcount_r) {
-	return ( sms_frame_timing[ INIT_VCOUNT ] + video_screen_get_vpos(0) ) & 0xFF;
+	return ( smsvdp.sms_frame_timing[ INIT_VCOUNT ] + video_screen_get_vpos(0) ) & 0xFF;
 }
 
 READ8_HANDLER(sms_vdp_hcount_r) {
@@ -176,57 +172,53 @@ READ8_HANDLER(sms_vdp_hcount_r) {
 }
 
 void sms_set_ggsmsmode( int mode ) {
-	ggSmsMode = mode;
+	smsvdp.gg_sms_mode = mode;
 }
 
 int smsvdp_video_init( const smsvdp_configuration *config ) {
 
-	features = config->model;
-	int_callback = config->int_callback;
+	memset( &smsvdp, 0, sizeof smsvdp );
+
+	smsvdp.features = config->model;
+	smsvdp.int_callback = config->int_callback;
 
 	/* Allocate video RAM
 	   In theory the driver could have a REGION_GFX1 and/or REGION_GFX2 memory region
 	   of it's own. So this code could potentially cause a clash.
 	*/
-	VRAM = new_memory_region( Machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
-	CRAM = new_memory_region( Machine, REGION_GFX2, MAX_CRAM_SIZE, ROM_REQUIRED );
-	lineBuffer = auto_malloc( 256 * 5 * sizeof(int) );
-	memset( lineBuffer, 0, 256 * 5 * sizeof(int) );
+	smsvdp.VRAM = new_memory_region( Machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
+	smsvdp.CRAM = new_memory_region( Machine, REGION_GFX2, MAX_CRAM_SIZE, ROM_REQUIRED );
+	smsvdp.line_buffer = auto_malloc( 256 * 5 * sizeof(int) );
+	memset( smsvdp.line_buffer, 0, 256 * 5 * sizeof(int) );
 
 	/* Clear RAM */
-	memset(reg, 0, NUM_OF_REGISTER);
-	isCRAMDirty = 1;
-	memset(VRAM, 0, VRAM_SIZE);
-	memset(CRAM, 0, MAX_CRAM_SIZE);
-	reg[0x01] |= 0x20;
-	reg[0x02] = 0x0E;			/* power up default */
-	reg[0x0a] = 0xff;
+	smsvdp.cram_dirty = 1;
+	memset(smsvdp.VRAM, 0, VRAM_SIZE);
+	memset(smsvdp.CRAM, 0, MAX_CRAM_SIZE);
+	smsvdp.reg[0x01] |= 0x20;
+	smsvdp.reg[0x02] = 0x0E;			/* power up default */
+	smsvdp.reg[0x0a] = 0xff;
 
-	CRAMMask = ( IS_GAMEGEAR_VDP && ! ggSmsMode ) ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
+	smsvdp.cram_mask = ( IS_GAMEGEAR_VDP && ! smsvdp.gg_sms_mode ) ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
 
-	/* Initialize VDP state variables */
-	addr = code = pending = latch = buffer = statusReg = \
-	lineCountDownCounter = irqState = 0;
-
-	lineCollisionBuffer = auto_malloc(SMS_X_PIXELS);
+	smsvdp.collision_buffer = auto_malloc(SMS_X_PIXELS);
 
 	/* Make temp bitmap for rendering */
 	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
-	prevBitMapSaved = 0;
-	prevBitMap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
+	smsvdp.prev_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
 	set_display_settings();
 
-	smsvdp_display_timer = mame_timer_alloc( smsvdp_display_callback );
-	mame_timer_adjust( smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ) );
-	return (0);
+	smsvdp.smsvdp_display_timer = mame_timer_alloc( smsvdp_display_callback );
+	mame_timer_adjust( smsvdp.smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ) );
+	return 0;
 }
 
 static TIMER_CALLBACK(smsvdp_set_irq) {
-	irqState = 1;
-	if ( int_callback ) {
-		int_callback( ASSERT_LINE );
+	smsvdp.irq_state = 1;
+	if ( smsvdp.int_callback ) {
+		smsvdp.int_callback( ASSERT_LINE );
 	}
 }
 
@@ -234,9 +226,9 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 {
 	rectangle rec;
 	int vpos = video_screen_get_vpos(0);
-	int vpos_limit = sms_frame_timing[VERTICAL_BLANKING] + sms_frame_timing[TOP_BLANKING]
-	               + sms_frame_timing[TOP_BORDER] + sms_frame_timing[ACTIVE_DISPLAY_V]
-	               + sms_frame_timing[BOTTOM_BORDER] + sms_frame_timing[BOTTOM_BLANKING];
+	int vpos_limit = smsvdp.sms_frame_timing[VERTICAL_BLANKING] + smsvdp.sms_frame_timing[TOP_BLANKING]
+	               + smsvdp.sms_frame_timing[TOP_BORDER] + smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V]
+	               + smsvdp.sms_frame_timing[BOTTOM_BORDER] + smsvdp.sms_frame_timing[BOTTOM_BLANKING];
 
 	rec.min_y = rec.max_y = vpos;
 
@@ -246,22 +238,22 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		return;
 	}
 
-	vpos_limit -= sms_frame_timing[BOTTOM_BLANKING];
+	vpos_limit -= smsvdp.sms_frame_timing[BOTTOM_BLANKING];
 
 	/* Check if we're below the bottom border */
 	if ( vpos >= vpos_limit ) {
 		return;
 	}
 
-	vpos_limit -= sms_frame_timing[BOTTOM_BORDER];
+	vpos_limit -= smsvdp.sms_frame_timing[BOTTOM_BORDER];
 
 	/* Check if we're in the bottom border area */
 	if ( vpos >= vpos_limit ) {
 		if ( vpos == vpos_limit ) {
-			if ( lineCountDownCounter == 0x00 ) {
-				lineCountDownCounter = reg[0x0A];
-				statusReg |= STATUS_HINT;
-				if ( reg[0x00] & 0x10 ) {
+			if ( smsvdp.line_counter == 0x00 ) {
+				smsvdp.line_counter = smsvdp.reg[0x0A];
+				smsvdp.status |= STATUS_HINT;
+				if ( smsvdp.reg[0x00] & 0x10 ) {
 					/* Delay triggering of interrupt to allow software to read the status bit before the irq */
 					mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 				}
@@ -269,8 +261,8 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 
 		}
 		if ( vpos == vpos_limit + 1 ) {
-			statusReg |= STATUS_VINT;
-			if ( reg[0x01] & 0x20 ) {
+			smsvdp.status |= STATUS_VINT;
+			if ( smsvdp.reg[0x01] & 0x20 ) {
 				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
 				mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 			}
@@ -282,35 +274,35 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+		fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+		fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit - sms_frame_timing[ACTIVE_DISPLAY_V], vpos - ( vpos_limit - sms_frame_timing[ACTIVE_DISPLAY_V] ) );
+		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit - smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V], vpos - ( vpos_limit - smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V] ) );
 		return;
 	}
 
-	vpos_limit -= sms_frame_timing[ACTIVE_DISPLAY_V];
+	vpos_limit -= smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V];
 
 	/* Check if we're in the active display area */
 	if ( vpos >= vpos_limit ) {
 		if ( vpos == vpos_limit ) {
-			lineCountDownCounter = reg[0x0A];
-			reg9copy = reg[0x09];
+			smsvdp.line_counter = smsvdp.reg[0x0A];
+			smsvdp.reg9copy = smsvdp.reg[0x09];
 		}
-		if ( lineCountDownCounter == 0x00 ) {
-			lineCountDownCounter = reg[0x0A];
-			statusReg |= STATUS_HINT;
-			if ( reg[0x00] & 0x10 ) {
+		if ( smsvdp.line_counter == 0x00 ) {
+			smsvdp.line_counter = smsvdp.reg[0x0A];
+			smsvdp.status |= STATUS_HINT;
+			if ( smsvdp.reg[0x00] & 0x10 ) {
 				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
 				mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 			}
 		} else {
-			lineCountDownCounter -= 1;
+			smsvdp.line_counter -= 1;
 		}
 		if ( video_skip_this_frame() ) {
 			return;
@@ -318,26 +310,26 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		sms_update_palette();
 
 		/* Check if display is disabled */
-		if ( ! ( reg[0x01] & 0x40 ) ) {
+		if ( ! ( smsvdp.reg[0x01] & 0x40 ) ) {
 			/* set whole line to backdrop color */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
-			fillbitmap( tmpbitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+			fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		} else {
 			/* Draw left border */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-			fillbitmap( tmpbitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+			fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 			/* Draw right border */
 			rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 			rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-			fillbitmap( tmpbitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+			fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 			sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
 		}
 		return;
 	}
 
-	vpos_limit -= sms_frame_timing[TOP_BORDER];
+	vpos_limit -= smsvdp.sms_frame_timing[TOP_BORDER];
 
 	/* Check if we're in the top border area */
 	if ( vpos >= vpos_limit ) {
@@ -348,54 +340,51 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+		fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+		fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit + sms_frame_timing[TOP_BORDER], vpos - ( vpos_limit + sms_frame_timing[TOP_BORDER] ) );
+		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit + smsvdp.sms_frame_timing[TOP_BORDER], vpos - ( vpos_limit + smsvdp.sms_frame_timing[TOP_BORDER] ) );
 		return;
 	}
 }
 
  READ8_HANDLER(sms_vdp_data_r) {
-	int temp;
+	UINT8 temp;
 
 	/* SMS 2 & GG behaviour. Seems like the latched data is passed straight through */
 	/* to the address register when in the middle of doing a command.               */
 	/* Cosmic Spacehead needs this, among others                                    */
-	if ( pending ) {
-		addr = ( addr & 0xff00 ) | latch;
-		/* Clear pending write flag */
-		pending = 0;
-	}
+	/* Clear pending write flag */
+	smsvdp.pending = 0;
 
 	/* Return read buffer contents */
-	temp = buffer;
+	temp = smsvdp.buffer;
 
 	/* Load read buffer */
-	buffer = VRAM[(addr & 0x3FFF)];
+	smsvdp.buffer = smsvdp.VRAM[(smsvdp.addr & 0x3FFF)];
 
 	/* Bump internal address register */
-	addr += 1;
+	smsvdp.addr += 1;
 	return (temp);
 }
 
  READ8_HANDLER(sms_vdp_ctrl_r) {
-	int temp = statusReg;
+	UINT8 temp = smsvdp.status;
 
 	/* Clear pending write flag */
-	pending = 0;
+	smsvdp.pending = 0;
 
-	statusReg &= ~( STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL | STATUS_HINT );
+	smsvdp.status &= ~( STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL | STATUS_HINT );
 
-	if (irqState == 1) {
-		irqState = 0;
-		if ( int_callback ) {
-			int_callback( CLEAR_LINE );
+	if (smsvdp.irq_state == 1) {
+		smsvdp.irq_state = 0;
+		if ( smsvdp.int_callback ) {
+			smsvdp.int_callback( CLEAR_LINE );
 		}
 	}
 
@@ -405,69 +394,66 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 WRITE8_HANDLER(sms_vdp_data_w) {
 	/* SMS 2 & GG behaviour. Seems like the latched data is passed straight through */
 	/* to the address register when in the middle of doing a command.               */
-        /* Cosmic Spacehead needs this, among others                                    */
-	if ( pending ) {
-		addr = ( addr & 0xff00 ) | latch;
-		/* Clear pending write flag */
-		pending = 0;
-	}
+	/* Cosmic Spacehead needs this, among others                                    */
+	/* Clear pending write flag */
+	smsvdp.pending = 0;
 
-	switch(code) {
+	switch(smsvdp.addrmode) {
 		case 0x00:
 		case 0x01:
 		case 0x02: {
-			int address = (addr & 0x3FFF);
+			int address = (smsvdp.addr & 0x3FFF);
 
-			VRAM[address] = data;
+			smsvdp.VRAM[address] = data;
 		}
 		break;
 		case 0x03: {
-			int address = addr & CRAMMask;
+			int address = smsvdp.addr & smsvdp.cram_mask;
 
-			if (data != CRAM[address]) {
-				CRAM[address] = data;
-				isCRAMDirty = 1;
+			if (data != smsvdp.CRAM[address]) {
+				smsvdp.CRAM[address] = data;
+				smsvdp.cram_dirty = 1;
 			}
 		}
 		break;
 	}
 
-	buffer = data;
-	addr += 1;
+	smsvdp.buffer = data;
+	smsvdp.addr += 1;
 }
 
 WRITE8_HANDLER(sms_vdp_ctrl_w) {
 	int regNum;
 
-	if (pending == 0) {
-		latch = data;
-		pending = 1;
+	if (smsvdp.pending == 0) {
+		smsvdp.addr = ( smsvdp.addr & 0xff00 ) | data;
+		smsvdp.pending = 1;
 	} else {
 		/* Clear pending write flag */
-		pending = 0;
+		smsvdp.pending = 0;
 
-		code = (data >> 6) & 0x03;
-		addr = ( data << 8 ) | latch;
-		switch( code ) {
+		smsvdp.addrmode = (data >> 6) & 0x03;
+		smsvdp.addr = ( data << 8 ) | ( smsvdp.addr & 0xff );
+		switch( smsvdp.addrmode ) {
 		case 0:		/* VRAM reading mode */
-			buffer = VRAM[ addr & 0x3FFF ];
-			addr += 1;
+			smsvdp.buffer = smsvdp.VRAM[ smsvdp.addr & 0x3FFF ];
+			smsvdp.addr += 1;
 			break;
 		case 1:		/* VRAM writing mode */
 			break;
 		case 2:		/* VDP register write */
 			regNum = data & 0x0F;
-			reg[regNum] = latch;
-			if (regNum == 0 && latch & 0x02) {
+			smsvdp.reg[regNum] = smsvdp.addr & 0xff;
+			if (regNum == 0 && smsvdp.addr & 0x02) {
 				logerror("overscan enabled.\n");
 			}
 			if ( regNum == 0 || regNum == 1 ) {
 				set_display_settings();
 			}
-			if ( ( regNum == 1 ) && ( reg[0x01] & 0x20 ) && ( statusReg & STATUS_VINT ) ) {
-				int_callback( ASSERT_LINE );
+			if ( ( regNum == 1 ) && ( smsvdp.reg[0x01] & 0x20 ) && ( smsvdp.status & STATUS_VINT ) ) {
+				smsvdp.int_callback( ASSERT_LINE );
 			}
-			code = 0;
+			smsvdp.addrmode = 0;
 			break;
 		case 3:		/* CRAM writing mode */
 			break;
@@ -475,7 +461,7 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 	}
 }
 
-void sms_refresh_line_mode4(int *lineBuffer, int line) {
+static void sms_refresh_line_mode4(int *lineBuffer, int line) {
 	int tileColumn;
 	int xScroll, yScroll, xScrollStartColumn;
 	int spriteIndex;
@@ -485,24 +471,24 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 	int bitPlane0, bitPlane1, bitPlane2, bitPlane3;
 	UINT16 nameTableAddress;
 	UINT8 *nameTable;
-	UINT8 *spriteTable = &VRAM[(reg[0x05] << 7) & 0x3F00];
+	UINT8 *spriteTable = smsvdp.VRAM + ( (smsvdp.reg[0x05] << 7) & 0x3F00 );
 
-	if ( y_pixels != 192 ) {
-		nameTableAddress = (((reg[0x02] & 0x0C) << 10) | 0x0700) + ((((line + reg9copy) % 256) >> 3) << 6);
+	if ( smsvdp.y_pixels != 192 ) {
+		nameTableAddress = (((smsvdp.reg[0x02] & 0x0C) << 10) | 0x0700) + ((((line + smsvdp.reg9copy) % 256) >> 3) << 6);
 	} else {
-		nameTableAddress = ((reg[0x02] << 10) & 0x3800) + ((((line + reg9copy) % 224) >> 3) << 6);
+		nameTableAddress = ((smsvdp.reg[0x02] << 10) & 0x3800) + ((((line + smsvdp.reg9copy) % 224) >> 3) << 6);
 	}
 	if ( IS_SMS1_VDP ) {
-		nameTableAddress = nameTableAddress & (((reg[0x02] & 0x01) << 10) | 0x3BFF);
+		nameTableAddress = nameTableAddress & (((smsvdp.reg[0x02] & 0x01) << 10) | 0x3BFF);
 	}
-	nameTable = VRAM + nameTableAddress;
+	nameTable = smsvdp.VRAM + nameTableAddress;
 
 	/* if top 2 rows of screen not affected by horizontal scrolling, then xScroll = 0 */
 	/* else xScroll = reg[0x08] (SMS Only)                                            */
 	if ( IS_GAMEGEAR_VDP ) {
-		xScroll = 0x0100 - reg[0x08];
+		xScroll = 0x0100 - smsvdp.reg[0x08];
 	} else {
-		xScroll = (((reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - reg[0x08]);
+		xScroll = (((smsvdp.reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - smsvdp.reg[0x08]);
 	}
 
 	xScrollStartColumn = (xScroll >> 3);			 /* x starting column tile */
@@ -516,9 +502,9 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 		/* Rightmost 8 columns for SMS (or 2 columns for GG) not affected by */
 		/* vertical scrolling when bit 7 of reg[0x00] is set */
 		if ( IS_GAMEGEAR_VDP ) {
-			yScroll = (((reg[0x00] & 0x80) && (tileColumn > 29)) ? 0 : (reg9copy) % 224);
+			yScroll = (((smsvdp.reg[0x00] & 0x80) && (tileColumn > 29)) ? 0 : (smsvdp.reg9copy) % 224);
 		} else {
-			yScroll = (((reg[0x00] & 0x80) && (tileColumn > 23)) ? 0 : (reg9copy) % 224);
+			yScroll = (((smsvdp.reg[0x00] & 0x80) && (tileColumn > 23)) ? 0 : (smsvdp.reg9copy) % 224);
 		}
 
 		tileLine = ( ( tileColumn + xScrollStartColumn ) & 0x1F ) * 2;
@@ -534,10 +520,10 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 		if (vertSelected) {
 			tileLine = 0x07 - tileLine;
 		}
-		bitPlane0 = VRAM[((tileSelected << 5) + ((tileLine & 0x07) << 2)) + 0x00];
-		bitPlane1 = VRAM[((tileSelected << 5) + ((tileLine & 0x07) << 2)) + 0x01];
-		bitPlane2 = VRAM[((tileSelected << 5) + ((tileLine & 0x07) << 2)) + 0x02];
-		bitPlane3 = VRAM[((tileSelected << 5) + ((tileLine & 0x07) << 2)) + 0x03];
+		bitPlane0 = smsvdp.VRAM[((tileSelected << 5) + ((tileLine & 0x07) << 2)) + 0x00];
+		bitPlane1 = smsvdp.VRAM[((tileSelected << 5) + ((tileLine & 0x07) << 2)) + 0x01];
+		bitPlane2 = smsvdp.VRAM[((tileSelected << 5) + ((tileLine & 0x07) << 2)) + 0x02];
+		bitPlane3 = smsvdp.VRAM[((tileSelected << 5) + ((tileLine & 0x07) << 2)) + 0x03];
 
 		for (pixelX = 0; pixelX < 8 ; pixelX++) {
 			UINT8 penBit0, penBit1, penBit2, penBit3;
@@ -561,21 +547,21 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 			pixelPlotX = (0 - (xScroll & 0x07) + (tileColumn << 3) + pixelPlotX);
 			if (pixelPlotX >= 0 && pixelPlotX < 256) {
 //				logerror("%x %x\n", pixelPlotX + pixelOffsetX, pixelPlotY);
-				lineBuffer[pixelPlotX] = currentPalette[penSelected];
+				lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
 				prioritySelected[pixelPlotX] = prioritySelect | ( penSelected & 0x0F );
 			}
 		}
 	}
 
 	/* Draw sprite layer */
-	spriteHeight = (reg[0x01] & 0x02 ? 16 : 8);
+	spriteHeight = (smsvdp.reg[0x01] & 0x02 ? 16 : 8);
 	spriteZoom = 1;
-	if (reg[0x01] & 0x01) {
+	if (smsvdp.reg[0x01] & 0x01) {
 		/* sprite doubling */
 		spriteZoom = 2;
 	}
 	spriteBufferCount = 0;
-	for (spriteIndex = 0; (spriteIndex < 64) && (spriteTable[spriteIndex] != 0xD0 || y_pixels != 192) && (spriteBufferCount < 9); spriteIndex++) {
+	for (spriteIndex = 0; (spriteIndex < 64) && (spriteTable[spriteIndex] != 0xD0 || smsvdp.y_pixels != 192) && (spriteBufferCount < 9); spriteIndex++) {
 		spriteY = spriteTable[spriteIndex] + 1; /* sprite y position starts at line 1 */
 		if (spriteY > 240) {
 			spriteY -= 256; /* wrap from top if y position is > 240 */
@@ -585,7 +571,7 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 				spriteBuffer[spriteBufferCount] = spriteIndex;
 			} else {
 				/* Too many sprites per line */
-				statusReg |= STATUS_SPROVR;
+				smsvdp.status |= STATUS_SPROVR;
 			}
 			spriteBufferCount++;
 		}
@@ -593,7 +579,7 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 	if ( spriteBufferCount > 8 ) {
 		spriteBufferCount = 8;
 	}
-	memset(lineCollisionBuffer, 0, SMS_X_PIXELS);
+	memset(smsvdp.collision_buffer, 0, SMS_X_PIXELS);
 	spriteBufferCount--;
 	for (spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex--) {
 		spriteIndex = spriteBuffer[spriteBufferIndex];
@@ -603,14 +589,14 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 		}
 
 		spriteX = spriteTable[0x80 + (spriteIndex << 1)];
-		if (reg[0x00] & 0x08) {
+		if (smsvdp.reg[0x00] & 0x08) {
 			spriteX -= 0x08;	 /* sprite shift */
 		}
 		spriteTileSelected = spriteTable[0x81 + (spriteIndex << 1)];
-		if (reg[0x06] & 0x04) {
+		if (smsvdp.reg[0x06] & 0x04) {
 			spriteTileSelected += 256; /* pattern table select */
 		}
-		if (reg[0x01] & 0x02) {
+		if (smsvdp.reg[0x01] & 0x02) {
 			spriteTileSelected &= 0x01FE; /* force even index */
 		}
 		spriteLine = ( line - spriteY ) / spriteZoom;
@@ -619,10 +605,10 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 			spriteTileSelected += 1;
 		}
 
-		bitPlane0 = VRAM[((spriteTileSelected << 5) + ((spriteLine & 0x07) << 2)) + 0x00];
-		bitPlane1 = VRAM[((spriteTileSelected << 5) + ((spriteLine & 0x07) << 2)) + 0x01];
-		bitPlane2 = VRAM[((spriteTileSelected << 5) + ((spriteLine & 0x07) << 2)) + 0x02];
-		bitPlane3 = VRAM[((spriteTileSelected << 5) + ((spriteLine & 0x07) << 2)) + 0x03];
+		bitPlane0 = smsvdp.VRAM[((spriteTileSelected << 5) + ((spriteLine & 0x07) << 2)) + 0x00];
+		bitPlane1 = smsvdp.VRAM[((spriteTileSelected << 5) + ((spriteLine & 0x07) << 2)) + 0x01];
+		bitPlane2 = smsvdp.VRAM[((spriteTileSelected << 5) + ((spriteLine & 0x07) << 2)) + 0x02];
+		bitPlane3 = smsvdp.VRAM[((spriteTileSelected << 5) + ((spriteLine & 0x07) << 2)) + 0x03];
 
 		for (pixelX = 0; pixelX < 8 ; pixelX++) {
 			UINT8 penBit0, penBit1, penBit2, penBit3;
@@ -639,7 +625,7 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 				continue;
 			}
 
-			if (reg[0x01] & 0x01) {
+			if (smsvdp.reg[0x01] & 0x01) {
 				/* sprite doubling is enabled */
 				pixelPlotX = spriteX + (pixelX << 1);
 
@@ -649,27 +635,27 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 				}
 
 				if ( ! ( prioritySelected[pixelPlotX] & PRIORITY_BIT ) ) {
-					lineBuffer[pixelPlotX] = currentPalette[penSelected];
-					lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
+					lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
+					lineBuffer[pixelPlotX+1] = smsvdp.current_palette[penSelected];
 				} else {
 					if ( prioritySelected[pixelPlotX] == PRIORITY_BIT ) {
-						lineBuffer[pixelPlotX] = currentPalette[penSelected];
+						lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
 					}
 					if ( prioritySelected[pixelPlotX + 1] == PRIORITY_BIT ) {
-						lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
+						lineBuffer[pixelPlotX+1] = smsvdp.current_palette[penSelected];
 					}
 				}
-				if (lineCollisionBuffer[pixelPlotX] != 1) {
-					lineCollisionBuffer[pixelPlotX] = 1;
+				if (smsvdp.collision_buffer[pixelPlotX] != 1) {
+					smsvdp.collision_buffer[pixelPlotX] = 1;
 				} else {
 					/* sprite collision occurred */
-					statusReg |= STATUS_SPRCOL;
+					smsvdp.status |= STATUS_SPRCOL;
 				}
-				if (lineCollisionBuffer[pixelPlotX + 1] != 1) {
-					lineCollisionBuffer[pixelPlotX + 1] = 1;
+				if (smsvdp.collision_buffer[pixelPlotX + 1] != 1) {
+					smsvdp.collision_buffer[pixelPlotX + 1] = 1;
 				} else {
 					/* sprite collision occurred */
-					statusReg |= STATUS_SPRCOL;
+					smsvdp.status |= STATUS_SPRCOL;
 				}
 			} else {
 				pixelPlotX = spriteX + pixelX;
@@ -680,47 +666,47 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 				}
 
 				if ( ! ( prioritySelected[pixelPlotX] & PRIORITY_BIT ) ) {
-					lineBuffer[pixelPlotX] = currentPalette[penSelected];
+					lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
 				} else {
 					if ( prioritySelected[pixelPlotX] == PRIORITY_BIT ) {
-						lineBuffer[pixelPlotX] = currentPalette[penSelected];
+						lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
 					}
 				}
-				if (lineCollisionBuffer[pixelPlotX] != 1) {
-					lineCollisionBuffer[pixelPlotX] = 1;
+				if (smsvdp.collision_buffer[pixelPlotX] != 1) {
+					smsvdp.collision_buffer[pixelPlotX] = 1;
 				} else {
 					/* sprite collision occurred */
-					statusReg |= STATUS_SPRCOL;
+					smsvdp.status |= STATUS_SPRCOL;
 				}
 			}
 		}
 	}
 
 	/* Fill column 0 with overscan color from reg[0x07] */
-	if (reg[0x00] & 0x20) {
-		lineBuffer[0] = currentPalette[BACKDROP_COLOR];
-		lineBuffer[1] = currentPalette[BACKDROP_COLOR];
-		lineBuffer[2] = currentPalette[BACKDROP_COLOR];
-		lineBuffer[3] = currentPalette[BACKDROP_COLOR];
-		lineBuffer[4] = currentPalette[BACKDROP_COLOR];
-		lineBuffer[5] = currentPalette[BACKDROP_COLOR];
-		lineBuffer[6] = currentPalette[BACKDROP_COLOR];
-		lineBuffer[7] = currentPalette[BACKDROP_COLOR];
+	if (smsvdp.reg[0x00] & 0x20) {
+		lineBuffer[0] = smsvdp.current_palette[BACKDROP_COLOR];
+		lineBuffer[1] = smsvdp.current_palette[BACKDROP_COLOR];
+		lineBuffer[2] = smsvdp.current_palette[BACKDROP_COLOR];
+		lineBuffer[3] = smsvdp.current_palette[BACKDROP_COLOR];
+		lineBuffer[4] = smsvdp.current_palette[BACKDROP_COLOR];
+		lineBuffer[5] = smsvdp.current_palette[BACKDROP_COLOR];
+		lineBuffer[6] = smsvdp.current_palette[BACKDROP_COLOR];
+		lineBuffer[7] = smsvdp.current_palette[BACKDROP_COLOR];
 	}
 }
 
-void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
+static void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 	int pixelPlotX;
 	int spriteHeight, spriteBufferCount, spriteIndex, spriteBuffer[4], spriteBufferIndex;
 	UINT8 *spriteTable, *spritePatternTable;
 
 	/* Draw sprite layer */
-	spriteTable = VRAM + ( ( reg[0x05] & 0x7F ) << 7 );
-	spritePatternTable = VRAM + ( ( reg[0x06] & 0x07 ) << 11 );
+	spriteTable = smsvdp.VRAM + ( ( smsvdp.reg[0x05] & 0x7F ) << 7 );
+	spritePatternTable = smsvdp.VRAM + ( ( smsvdp.reg[0x06] & 0x07 ) << 11 );
 	spriteHeight = 8;
-	if ( reg[0x01] & 0x02 )                         /* Check if SI is set */
+	if ( smsvdp.reg[0x01] & 0x02 )                         /* Check if SI is set */
 		spriteHeight = spriteHeight * 2;
-	if ( reg[0x01] & 0x01 )                         /* Check if MAG is set */
+	if ( smsvdp.reg[0x01] & 0x01 )                         /* Check if MAG is set */
 		spriteHeight = spriteHeight * 2;
 	spriteBufferCount = 0;
 	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
@@ -733,7 +719,7 @@ void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 				spriteBuffer[spriteBufferCount] = spriteIndex;
 			} else {
 				/* Too many sprites per line */
-				statusReg |= STATUS_SPROVR;
+				smsvdp.status |= STATUS_SPROVR;
 			}
 			spriteBufferCount++;
 		}
@@ -741,7 +727,7 @@ void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 	if ( spriteBufferCount > 4 ) {
 		spriteBufferCount = 4;
 	}
-	memset( lineCollisionBuffer, 0, SMS_X_PIXELS );
+	memset( smsvdp.collision_buffer, 0, SMS_X_PIXELS );
 	spriteBufferCount--;
 	for ( spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex-- ) {
 		int penSelected;
@@ -763,10 +749,10 @@ void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 		}
 		spriteTileSelected = spriteTable[ spriteIndex + 2 ];
 		spriteLine = line - spriteY;
-		if ( reg[0x01] & 0x01 ) {
+		if ( smsvdp.reg[0x01] & 0x01 ) {
 			spriteLine >>= 1;
 		}
-		if ( reg[0x01] & 0x02 ) {
+		if ( smsvdp.reg[0x01] & 0x02 ) {
 			spriteTileSelected &= 0xFC;
 			if ( spriteLine > 0x07 ) {
 				spriteTileSelected += 1;
@@ -776,23 +762,23 @@ void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 		pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
 
 		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
-			if ( reg[0x01] & 0x01 ) {
+			if ( smsvdp.reg[0x01] & 0x01 ) {
 				pixelPlotX = spriteX + pixelX * 2;
 				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
 					continue;
 				}
 				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-					lineBuffer[pixelPlotX] = currentPalette[penSelected];
-					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-						lineCollisionBuffer[pixelPlotX] = 1;
+					lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
+					if ( smsvdp.collision_buffer[pixelPlotX] != 1 ) {
+						smsvdp.collision_buffer[pixelPlotX] = 1;
 					} else {
-						statusReg |= STATUS_SPRCOL;
+						smsvdp.status |= STATUS_SPRCOL;
 					}
-					lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
-					if ( lineCollisionBuffer[pixelPlotX + 1] != 1 ) {
-						lineCollisionBuffer[pixelPlotX + 1] = 1;
+					lineBuffer[pixelPlotX+1] = smsvdp.current_palette[penSelected];
+					if ( smsvdp.collision_buffer[pixelPlotX + 1] != 1 ) {
+						smsvdp.collision_buffer[pixelPlotX + 1] = 1;
 					} else {
-						statusReg |= STATUS_SPRCOL;
+						smsvdp.status |= STATUS_SPRCOL;
 					}
 				}
 			} else {
@@ -801,38 +787,38 @@ void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 					continue;
 				}
 				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-					lineBuffer[pixelPlotX] = currentPalette[penSelected];
-					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-						lineCollisionBuffer[pixelPlotX] = 1;
+					lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
+					if ( smsvdp.collision_buffer[pixelPlotX] != 1 ) {
+						smsvdp.collision_buffer[pixelPlotX] = 1;
 					} else {
-						statusReg |= STATUS_SPRCOL;
+						smsvdp.status |= STATUS_SPRCOL;
 					}
 				}
 			}
 		}
 	
-		if ( reg[0x01] & 0x02 ) {
+		if ( smsvdp.reg[0x01] & 0x02 ) {
 			spriteTileSelected += 2;
 			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
-			spriteX += ( reg[0x01] & 0x01 ? 16 : 8 );
+			spriteX += ( smsvdp.reg[0x01] & 0x01 ? 16 : 8 );
 			for ( pixelX = 0; pixelX < 8; pixelX++ ) {
-				if ( reg[0x01] & 0x01 ) {
+				if ( smsvdp.reg[0x01] & 0x01 ) {
 					pixelPlotX = spriteX + pixelX * 2;
 					if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
 						continue;
 					}
 					if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-						lineBuffer[pixelPlotX] = currentPalette[penSelected];
-						if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-							lineCollisionBuffer[pixelPlotX] = 1;
+						lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
+						if ( smsvdp.collision_buffer[pixelPlotX] != 1 ) {
+							smsvdp.collision_buffer[pixelPlotX] = 1;
 						} else {
-							statusReg |= STATUS_SPRCOL;
+							smsvdp.status |= STATUS_SPRCOL;
 						}
-						lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
-						if ( lineCollisionBuffer[pixelPlotX + 1] != 1 ) {
-							lineCollisionBuffer[pixelPlotX + 1] = 1;
+						lineBuffer[pixelPlotX+1] = smsvdp.current_palette[penSelected];
+						if ( smsvdp.collision_buffer[pixelPlotX + 1] != 1 ) {
+							smsvdp.collision_buffer[pixelPlotX + 1] = 1;
 						} else {
-							statusReg |= STATUS_SPRCOL;
+							smsvdp.status |= STATUS_SPRCOL;
 						}
 					}
 				} else {
@@ -841,11 +827,11 @@ void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 						continue;
 					}
 					if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-						lineBuffer[pixelPlotX] = currentPalette[penSelected];
-						if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-							lineCollisionBuffer[pixelPlotX] = 1;
+						lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
+						if ( smsvdp.collision_buffer[pixelPlotX] != 1 ) {
+							smsvdp.collision_buffer[pixelPlotX] = 1;
 						} else {
-							statusReg |= STATUS_SPRCOL;
+							smsvdp.status |= STATUS_SPRCOL;
 						}
 					}
 				}
@@ -854,18 +840,18 @@ void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 	}
 }
 
-void sms_refresh_line_mode2(int *lineBuffer, int line) {
+static void sms_refresh_line_mode2(int *lineBuffer, int line) {
 	int tileColumn;
 	int pixelX, pixelPlotX;
 	UINT8 *nameTable, *colorTable, *patternTable;
 	int patternMask, colorMask, patternOffset;
 
 	/* Draw background layer */
-	nameTable = VRAM + ( ( reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
-	colorTable = VRAM + ( ( reg[0x03] & 0x80 ) << 6 );
-	colorMask = ( ( reg[0x03] & 0x7F ) << 3 ) | 0x07;
-	patternTable = VRAM + ( ( reg[0x04] & 0x04 ) << 11 );
-	patternMask = ( ( reg[0x04] & 0x03 ) << 8 ) | 0xFF;
+	nameTable = smsvdp.VRAM + ( ( smsvdp.reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
+	colorTable = smsvdp.VRAM + ( ( smsvdp.reg[0x03] & 0x80 ) << 6 );
+	colorMask = ( ( smsvdp.reg[0x03] & 0x7F ) << 3 ) | 0x07;
+	patternTable = smsvdp.VRAM + ( ( smsvdp.reg[0x04] & 0x04 ) << 11 );
+	patternMask = ( ( smsvdp.reg[0x04] & 0x03 ) << 8 ) | 0xFF;
 	patternOffset = ( line & 0xC0 ) << 2;
 	for ( tileColumn = 0; tileColumn < 32; tileColumn++ ) {
 		UINT8 pattern;
@@ -886,7 +872,7 @@ void sms_refresh_line_mode2(int *lineBuffer, int line) {
 			if ( IS_GAMEGEAR_VDP ) {
 				penSelected |= 0x10;
 			}
-			lineBuffer[pixelPlotX] = currentPalette[penSelected];
+			lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
 		}
 	}
 
@@ -894,15 +880,15 @@ void sms_refresh_line_mode2(int *lineBuffer, int line) {
 	sms_refresh_tms9918_sprites( lineBuffer, line );
 }
 
-void sms_refresh_line_mode0(int *lineBuffer, int line) {
+static void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	int tileColumn;
 	int pixelX, pixelPlotX; 
 	UINT8 *nameTable, *colorTable, *patternTable;
 
 	/* Draw background layer */
-	nameTable = VRAM + ( ( reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
-	colorTable = VRAM + ( ( reg[0x03] << 6 ) & ( VRAM_SIZE - 1 ) );
-	patternTable = VRAM + ( ( reg[0x04] << 11 ) & ( VRAM_SIZE - 1 ) ); 
+	nameTable = smsvdp.VRAM + ( ( smsvdp.reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
+	colorTable = smsvdp.VRAM + ( ( smsvdp.reg[0x03] << 6 ) & ( VRAM_SIZE - 1 ) );
+	patternTable = smsvdp.VRAM + ( ( smsvdp.reg[0x04] << 11 ) & ( VRAM_SIZE - 1 ) ); 
 	for ( tileColumn = 0; tileColumn < 32; tileColumn++ ) {
 		UINT8 pattern;
 		UINT8 colors;
@@ -919,7 +905,7 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 				penSelected |= 0x10;
 			}
 			pixelPlotX = ( tileColumn << 3 ) + pixelX;
-			lineBuffer[pixelPlotX] = currentPalette[penSelected];
+			lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
 		}
 	}
 
@@ -927,12 +913,12 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	sms_refresh_tms9918_sprites( lineBuffer, line );
 }
 
-void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, int line ) {
+static void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, int line ) {
 	int x;
-	int *blitLineBuffer = lineBuffer;
+	int *blitLineBuffer = smsvdp.line_buffer;
 
-	if ( line >= 0 && line < sms_frame_timing[ACTIVE_DISPLAY_V] ) {
-		switch( vdp_mode ) {
+	if ( line >= 0 && line < smsvdp.sms_frame_timing[ACTIVE_DISPLAY_V] ) {
+		switch( smsvdp.vdp_mode ) {
 		case 0:
 			sms_refresh_line_mode0( blitLineBuffer, line );
 			break;
@@ -946,12 +932,12 @@ void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, in
 		}
 	} else {
 		for ( x = 0; x < 256; x++ ) {
-			blitLineBuffer[x] = currentPalette[BACKDROP_COLOR];
+			blitLineBuffer[x] = smsvdp.current_palette[BACKDROP_COLOR];
 		}
 	}
 
-	if ( IS_GAMEGEAR_VDP && ggSmsMode ) {
-		int *combineLineBuffer = lineBuffer + ( ( line & 0x03 ) + 1 ) * 256;
+	if ( IS_GAMEGEAR_VDP && smsvdp.gg_sms_mode ) {
+		int *combineLineBuffer = smsvdp.line_buffer + ( ( line & 0x03 ) + 1 ) * 256;
 		int plotX = 48;
 
 		/* Do horizontal scaling */
@@ -1000,10 +986,10 @@ void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, in
 			pixelPlotY = TBORDER_START + NTSC_192_TBORDER_Y_PIXELS + 24 + ggLine;
 
 			/* Setup our source lines */
-			line1 = lineBuffer + ( ( ( myLine - 3 ) & 0x03 ) + 1 ) * 256;
-			line2 = lineBuffer + ( ( ( myLine - 2 ) & 0x03 ) + 1 ) * 256;
-			line3 = lineBuffer + ( ( ( myLine - 1 ) & 0x03 ) + 1 ) * 256;
-			line4 = lineBuffer + ( ( ( myLine - 0 ) & 0x03 ) + 1 ) * 256;
+			line1 = smsvdp.line_buffer + ( ( ( myLine - 3 ) & 0x03 ) + 1 ) * 256;
+			line2 = smsvdp.line_buffer + ( ( ( myLine - 2 ) & 0x03 ) + 1 ) * 256;
+			line3 = smsvdp.line_buffer + ( ( ( myLine - 1 ) & 0x03 ) + 1 ) * 256;
+			line4 = smsvdp.line_buffer + ( ( ( myLine - 0 ) & 0x03 ) + 1 ) * 256;
 
 			for( x = 0+48; x < 160+48; x++ ) {
 				rgb_t	c1 = Machine->pens[line1[x]];
@@ -1025,35 +1011,35 @@ void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, in
 	}
 }
 
-void sms_update_palette(void) {
+static void sms_update_palette(void) {
 	int i;
 
 	/* Exit if palette is has no changes */
-	if (isCRAMDirty == 0) {
+	if (smsvdp.cram_dirty == 0) {
 		return;
 	}
-	isCRAMDirty = 0;
+	smsvdp.cram_dirty = 0;
 
-	if ( vdp_mode != 4 && ! IS_GAMEGEAR_VDP ) {
+	if ( smsvdp.vdp_mode != 4 && ! IS_GAMEGEAR_VDP ) {
 		for( i = 0; i < 16; i++ ) {
-			currentPalette[i] = 64+i;
+			smsvdp.current_palette[i] = 64+i;
 		}
 		return;
 	}
 
 	if ( IS_GAMEGEAR_VDP ) {
-		if ( ggSmsMode ) {
+		if ( smsvdp.gg_sms_mode ) {
 			for ( i = 0; i < 32; i++ ) {
-				currentPalette[i] = ( ( CRAM[i] & 0x30 ) << 6 ) | ( ( CRAM[i] & 0x0C ) << 4 ) | ( ( CRAM[i] & 0x03 ) << 2 );
+				smsvdp.current_palette[i] = ( ( smsvdp.CRAM[i] & 0x30 ) << 6 ) | ( ( smsvdp.CRAM[i] & 0x0C ) << 4 ) | ( ( smsvdp.CRAM[i] & 0x03 ) << 2 );
 			}
 		} else {
 			for ( i = 0; i < 32; i++ ) {
-				currentPalette[i] = ( ( CRAM[i*2+1] << 8 ) | CRAM[i*2] ) & 0x0FFF;
+				smsvdp.current_palette[i] = ( ( smsvdp.CRAM[i*2+1] << 8 ) | smsvdp.CRAM[i*2] ) & 0x0FFF;
 			}
 		}
 	} else {
 		for ( i = 0; i < 32; i++ ) {
-			currentPalette[i] = CRAM[i] & 0x3F;
+			smsvdp.current_palette[i] = smsvdp.CRAM[i] & 0x3F;
 		}
 	}
 }
@@ -1061,19 +1047,19 @@ void sms_update_palette(void) {
 VIDEO_UPDATE(sms) {
 	int x, y;
 
-	if (prevBitMapSaved) {
+	if (smsvdp.prev_bitmap_saved) {
 	for (y = 0; y < Machine->screen[0].height; y++) {
 		for (x = 0; x < Machine->screen[0].width; x++) {
-			*BITMAP_ADDR32(bitmap, y, x) = (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(prevBitMap, y, x)) >> 2;
-			logerror("%x %x %x\n", *BITMAP_ADDR32(tmpbitmap, y, x), *BITMAP_ADDR32(prevBitMap, y, x), (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(prevBitMap, y, x)) >> 2);
+			*BITMAP_ADDR32(bitmap, y, x) = (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x)) >> 2;
+			logerror("%x %x %x\n", *BITMAP_ADDR32(tmpbitmap, y, x), *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x), (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x)) >> 2);
 		}
 	}
 	} else {
 		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	}
-	if (!prevBitMapSaved) {
-		copybitmap(prevBitMap, tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-	//prevBitMapSaved = 1;
+	if (!smsvdp.prev_bitmap_saved) {
+		copybitmap(smsvdp.prev_bitmap, tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	//smsvdp.prev_bitmap_saved = 1;
 	}
 	return 0;
 }
