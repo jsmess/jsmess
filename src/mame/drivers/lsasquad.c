@@ -185,7 +185,7 @@ READ8_HANDLER( daikaiju_sh_sound_command_r );
 
 MACHINE_RESET(daikaiju);
 
-WRITE8_HANDLER( lsasquad_bankswitch_w )
+static WRITE8_HANDLER( lsasquad_bankswitch_w )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 

@@ -79,7 +79,7 @@ static WRITE32_HANDLER( igs_cg_videoram_w )
 
 
 /* TX Layer */
-WRITE32_HANDLER( igs_tx_videoram_w )
+static WRITE32_HANDLER( igs_tx_videoram_w )
 {
 	COMBINE_DATA(&igs_tx_videoram[offset]);
 	tilemap_mark_tile_dirty(igs_tx_tilemap,offset);
@@ -98,7 +98,7 @@ static TILE_GET_INFO( get_tx_tilemap_tile_info )
 }
 
 /* BG Layer */
-WRITE32_HANDLER( igs_bg_videoram_w )
+static WRITE32_HANDLER( igs_bg_videoram_w )
 {
 	COMBINE_DATA(&igs_bg_videoram[offset]);
 	tilemap_mark_tile_dirty(igs_bg_tilemap,offset);
@@ -118,7 +118,7 @@ static TILE_GET_INFO( get_bg_tilemap_tile_info )
 
 
 /* Pallete Layer */
-WRITE32_HANDLER( igs_pallete32_w )
+static WRITE32_HANDLER( igs_pallete32_w )
 {
 	paletteram16=(UINT16 *)igs_pallete32;
 	COMBINE_DATA(&igs_pallete32[offset]);
@@ -130,7 +130,7 @@ WRITE32_HANDLER( igs_pallete32_w )
 
 
 
-VIDEO_START(igs_majhong)
+static VIDEO_START(igs_majhong)
 {
 	igs_tx_tilemap= tilemap_create(get_tx_tilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 	tilemap_set_transparent_pen(igs_tx_tilemap,15);
@@ -140,7 +140,7 @@ VIDEO_START(igs_majhong)
 	logerror("Video START OK!\n");
 }
 
-VIDEO_UPDATE(igs_majhong)
+static VIDEO_UPDATE(igs_majhong)
 {
 	//??????????
 	fillbitmap(bitmap,get_black_pen(machine),&machine->screen[0].visarea);
@@ -389,7 +389,7 @@ MACHINE_DRIVER_END
 
 
 
-DRIVER_INIT( sdwx )
+static DRIVER_INIT( sdwx )
 {
 	sdwx_decrypt();
 	sdwx_gfx_decrypt();

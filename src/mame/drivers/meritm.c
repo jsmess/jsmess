@@ -31,11 +31,11 @@
 
 #include "driver.h"
 
-VIDEO_START(meritm)
+static VIDEO_START(meritm)
 {
 }
 
-VIDEO_UPDATE(meritm)
+static VIDEO_UPDATE(meritm)
 {
 	return 0;
 }

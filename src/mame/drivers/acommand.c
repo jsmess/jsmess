@@ -145,7 +145,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-VIDEO_START( acommand )
+static VIDEO_START( acommand )
 {
 	tx_tilemap = tilemap_create(ac_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,512,32);
 	bg_tilemap = tilemap_create(ac_get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,16);
@@ -211,7 +211,7 @@ static void draw_led(mame_bitmap *bitmap, int x, int y,UINT8 value)
 #endif
 static UINT16 led0;
 
-VIDEO_UPDATE( acommand )
+static VIDEO_UPDATE( acommand )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(machine,bitmap,cliprect,0,0);

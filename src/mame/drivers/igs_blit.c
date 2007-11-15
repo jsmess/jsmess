@@ -73,7 +73,7 @@ static WRITE16_HANDLER( igs_priority_w )
 }
 
 
-VIDEO_START(igs)
+static VIDEO_START(igs)
 {
 	int i;
 
@@ -85,7 +85,7 @@ VIDEO_START(igs)
 	chmplst2_pen_hi = 0;
 }
 
-VIDEO_UPDATE(igs)
+static VIDEO_UPDATE(igs)
 {
 #ifdef MAME_DEBUG
 	int layer_enable = -1;
@@ -2633,7 +2633,7 @@ static DRIVER_INIT( lhb )
 
 
 
-DRIVER_INIT( vbowl )
+static DRIVER_INIT( vbowl )
 {
 	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
 	UINT8  *gfx = (UINT8 *)  memory_region(REGION_GFX1);
@@ -2651,7 +2651,7 @@ DRIVER_INIT( vbowl )
 	rom[0x3764/2] = 0x4e75;	// 003764: 4E56 0000 link    A6, #$0
 }
 
-DRIVER_INIT( vbowlj )
+static DRIVER_INIT( vbowlj )
 {
 	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
 	UINT8  *gfx = (UINT8 *)  memory_region(REGION_GFX1);

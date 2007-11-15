@@ -147,10 +147,12 @@ INTERRUPT_GEN( getstar_interrupt )
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( getstar_port_04_w )
 {
 //  cpu_halt(0,0);
 }
+#endif
 
 
 /* Tiger Heli MCU */

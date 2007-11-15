@@ -474,7 +474,7 @@ static UINT8 bcd(UINT8 data)
 	return ((data / 10) << 4) | (data % 10);
 }
 
-READ16_HANDLER( pgm_calendar_r )
+static READ16_HANDLER( pgm_calendar_r )
 {
 	UINT8 calr;
 	calr = (CalVal & CalMask) ? 1 : 0;
@@ -482,7 +482,7 @@ READ16_HANDLER( pgm_calendar_r )
 	return calr;
 }
 
-WRITE16_HANDLER( pgm_calendar_w )
+static WRITE16_HANDLER( pgm_calendar_w )
 {
 	static mame_system_time systime;
 
@@ -729,7 +729,7 @@ ADDRESS_MAP_END
 
 UINT16 kovsh_highlatch, kovsh_lowlatch;
 
-READ32_HANDLER( kovsh_arm7_protlatch_r )
+static READ32_HANDLER( kovsh_arm7_protlatch_r )
 {
 //  return 0x00880000;
 //  return 0x0088ff66;
@@ -737,7 +737,7 @@ READ32_HANDLER( kovsh_arm7_protlatch_r )
 	return (kovsh_highlatch << 16) | (kovsh_lowlatch);
 }
 
-WRITE32_HANDLER( kovsh_arm7_protlatch_w )
+static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 {
 	if (!(mem_mask & 0xffff0000))
 	{
@@ -752,7 +752,7 @@ WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 //  cpu_spinuntil_time(MAME_TIME_IN_CYCLES(100, 0));
 }
 
-READ16_HANDLER( kovsh_68k_protlatch_r )
+static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
 	//cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(200));
 	cpu_spinuntil_time(MAME_TIME_IN_CYCLES(600, 0));
@@ -765,7 +765,7 @@ READ16_HANDLER( kovsh_68k_protlatch_r )
 	return -1;
 }
 
-WRITE16_HANDLER( kovsh_68k_protlatch_w )
+static WRITE16_HANDLER( kovsh_68k_protlatch_w )
 {
 	switch (offset)
 	{
@@ -805,7 +805,7 @@ static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(kovsh_68k_protlatch_r, kovsh_68k_protlatch_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
-READ32_HANDLER( kovsh_arm7_unk_r )
+static READ32_HANDLER( kovsh_arm7_unk_r )
 {
 	return 0x00000000;
 }
@@ -1866,7 +1866,7 @@ static int kb_cmd;
 static int reg;
 static int ptr;
 
-WRITE16_HANDLER( killbld_prot_w )
+static WRITE16_HANDLER( killbld_prot_w )
 {
 //  mame_printf_debug("killbrd prot r\n");
 //  return 0;
@@ -2027,7 +2027,7 @@ WRITE16_HANDLER( killbld_prot_w )
 	}
 }
 
-READ16_HANDLER( killbld_prot_r )
+static READ16_HANDLER( killbld_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
 	UINT16 res ;
@@ -2119,7 +2119,7 @@ static READ16_HANDLER ( ddp2_asic27_0xd10000_r )
 }
 
 
-READ16_HANDLER(ddp2_protram_r)
+static READ16_HANDLER(ddp2_protram_r)
 {
 	if (PGMLOGERROR) logerror("prot_r %04x, %04x\n", offset,ddp2_protram[offset]);
 
@@ -2130,7 +2130,7 @@ READ16_HANDLER(ddp2_protram_r)
 	return ddp2_protram[offset];
 }
 
-WRITE16_HANDLER(ddp2_protram_w)
+static WRITE16_HANDLER(ddp2_protram_w)
 {
 	if (PGMLOGERROR) logerror("prot_w %04x, %02x\n", offset,data);
 	COMBINE_DATA(&ddp2_protram[offset]);

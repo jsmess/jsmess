@@ -464,7 +464,7 @@ static WRITE32_HANDLER( ms32_spramx_w )
 }
 
 
-VIDEO_START(bnstars)
+static VIDEO_START(bnstars)
 {
 	ms32_tx_tilemap[0] = tilemap_create(get_ms32_tx0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
 	ms32_tx_tilemap[1] = tilemap_create(get_ms32_tx1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
@@ -488,7 +488,7 @@ VIDEO_START(bnstars)
 
 
 
-VIDEO_UPDATE(bnstars)
+static VIDEO_UPDATE(bnstars)
 {
 
 	fillbitmap(priority_bitmap,0,cliprect);

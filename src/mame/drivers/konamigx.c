@@ -118,8 +118,8 @@ VIDEO_START(opengolf);
 VIDEO_START(racinfrc);
 VIDEO_UPDATE(konamigx);
 
-MACHINE_START(konamigx);
-MACHINE_RESET(konamigx);
+static MACHINE_START(konamigx);
+static MACHINE_RESET(konamigx);
 
 WRITE32_HANDLER( konamigx_palette_w );
 WRITE32_HANDLER( konamigx_palette2_w );
@@ -3415,14 +3415,14 @@ ROM_END
 /**********************************************************************************/
 /* initializers */
 
-MACHINE_START( konamigx )
+static MACHINE_START( konamigx )
 {
 	state_save_register_global(konamigx_wrport1_1);
 	state_save_register_global_array(sndto020);
 	state_save_register_global_array(sndto000);
 }
 
-MACHINE_RESET(konamigx)
+static MACHINE_RESET(konamigx)
 {
 	int i;
 

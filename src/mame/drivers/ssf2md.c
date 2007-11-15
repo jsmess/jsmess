@@ -10,13 +10,13 @@ ROM_START( ssf2ghw )
 	ROM_LOAD16_BYTE( "rom_d", 0x400001, 0x080000,  CRC(b99f6a5b) SHA1(adbe28a7522024bc66328ac86fecf9ded3310e8e) )
 ROM_END
 
-READ16_HANDLER( ssf2ghw_dsw_r )
+static READ16_HANDLER( ssf2ghw_dsw_r )
 {
 	static const char *dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return readinputportbytag(dswname[offset]);
 }
 
-DRIVER_INIT( ssf2ghw )
+static DRIVER_INIT( ssf2ghw )
 {
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, MWA16_NOP); // custom banking is disabled (!)
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x5fffff, 0, 0, MRA16_BANK5);

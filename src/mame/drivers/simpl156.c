@@ -135,7 +135,7 @@ static INPUT_PORTS_START( simpl156 )
 INPUT_PORTS_END
 
 
-READ32_HANDLER( simpl156_inputs_read )
+static READ32_HANDLER( simpl156_inputs_read )
 {
 	int eep = EEPROM_read_bit();
 	UINT32 returndata;
@@ -146,12 +146,12 @@ READ32_HANDLER( simpl156_inputs_read )
 	return returndata;
 }
 
-READ32_HANDLER( simpl156_palette_r )
+static READ32_HANDLER( simpl156_palette_r )
 {
 	return paletteram16[offset]^0xffff0000;
 }
 
-WRITE32_HANDLER( simpl156_palette_w )
+static WRITE32_HANDLER( simpl156_palette_w )
 {
 	UINT16 dat;
 	int color;
@@ -212,12 +212,12 @@ static WRITE32_HANDLER( oki2_w )
 
 /* we need to throw away bits for all ram accesses as the devices are connected as 16-bit */
 
-READ32_HANDLER( simpl156_spriteram_r )
+static READ32_HANDLER( simpl156_spriteram_r )
 {
 	return spriteram32[offset]^0xffff0000;
 }
 
-WRITE32_HANDLER( simpl156_spriteram_w )
+static WRITE32_HANDLER( simpl156_spriteram_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
@@ -228,12 +228,12 @@ WRITE32_HANDLER( simpl156_spriteram_w )
 static UINT32*simpl156_mainram;
 
 
-READ32_HANDLER( simpl156_mainram_r )
+static READ32_HANDLER( simpl156_mainram_r )
 {
 	return simpl156_mainram[offset]^0xffff0000;
 }
 
-WRITE32_HANDLER( simpl156_mainram_w )
+static WRITE32_HANDLER( simpl156_mainram_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
@@ -241,12 +241,12 @@ WRITE32_HANDLER( simpl156_mainram_w )
 	COMBINE_DATA(&simpl156_mainram[offset]);
 }
 
-READ32_HANDLER( simpl156_pf1_rowscroll_r )
+static READ32_HANDLER( simpl156_pf1_rowscroll_r )
 {
 	return deco16_pf1_rowscroll[offset]^0xffff0000;
 }
 
-WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
+static WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
@@ -254,12 +254,12 @@ WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
 	COMBINE_DATA(&deco16_pf1_rowscroll[offset]);
 }
 
-READ32_HANDLER( simpl156_pf2_rowscroll_r )
+static READ32_HANDLER( simpl156_pf2_rowscroll_r )
 {
 	return deco16_pf2_rowscroll[offset]^0xffff0000;
 }
 
-WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
+static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
@@ -267,12 +267,12 @@ WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 	COMBINE_DATA(&deco16_pf2_rowscroll[offset]);
 }
 
-READ32_HANDLER ( simpl156_pf12_control_r )
+static READ32_HANDLER ( simpl156_pf12_control_r )
 {
 	return deco16_pf12_control[offset]^0xffff0000;
 }
 
-WRITE32_HANDLER( simpl156_pf12_control_w )
+static WRITE32_HANDLER( simpl156_pf12_control_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
@@ -281,12 +281,12 @@ WRITE32_HANDLER( simpl156_pf12_control_w )
 }
 
 
-READ32_HANDLER( simpl156_pf1_data_r )
+static READ32_HANDLER( simpl156_pf1_data_r )
 {
 	return deco16_pf1_data[offset]^0xffff0000;
 }
 
-WRITE32_HANDLER( simpl156_pf1_data_w )
+static WRITE32_HANDLER( simpl156_pf1_data_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
@@ -294,13 +294,13 @@ WRITE32_HANDLER( simpl156_pf1_data_w )
 	deco16_pf1_data_w(offset,data,mem_mask);
 }
 
-READ32_HANDLER( simpl156_pf2_data_r )
+static READ32_HANDLER( simpl156_pf2_data_r )
 {
 	return deco16_pf2_data[offset]^0xffff0000;
 }
 
 
-WRITE32_HANDLER( simpl156_pf2_data_w )
+static WRITE32_HANDLER( simpl156_pf2_data_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
@@ -455,7 +455,7 @@ static GFXDECODE_START( simpl156 )
 
 GFXDECODE_END
 
-NVRAM_HANDLER( simpl156 )
+static NVRAM_HANDLER( simpl156 )
 {
 	if (read_or_write)
 		EEPROM_save(file);
@@ -549,7 +549,7 @@ static MACHINE_DRIVER_START( mitchell156 )
 MACHINE_DRIVER_END
 
 
-DRIVER_INIT(simpl156)
+static DRIVER_INIT(simpl156)
 {
 	UINT8 *rom = memory_region(REGION_SOUND2);
 	int length = memory_region_length(REGION_SOUND2);

@@ -78,7 +78,7 @@ void astron_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-VIDEO_UPDATE( astron )
+static VIDEO_UPDATE( astron )
 {
 	fillbitmap(bitmap, 0, cliprect);
 

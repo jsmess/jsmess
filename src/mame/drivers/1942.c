@@ -430,7 +430,7 @@ ROM_START( 1942b )
 ROM_END
 
 
-DRIVER_INIT( 1942 )
+static DRIVER_INIT( 1942 )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	memory_configure_bank(1, 0, 3, &ROM[0x10000], 0x4000);

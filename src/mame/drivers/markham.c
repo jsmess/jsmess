@@ -24,17 +24,17 @@ static UINT8 *markham_sharedram;
 /****************************************************************************/
 
 
-WRITE8_HANDLER( markham_sharedram_w )
+static WRITE8_HANDLER( markham_sharedram_w )
 {
 	markham_sharedram[offset] = data;
 }
 
-READ8_HANDLER( markham_sharedram_r )
+static READ8_HANDLER( markham_sharedram_r )
 {
 	return markham_sharedram[offset];
 }
 
-READ8_HANDLER( markham_e004_r )
+static READ8_HANDLER( markham_e004_r )
 {
 	return 0;
 }

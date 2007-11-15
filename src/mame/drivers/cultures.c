@@ -41,7 +41,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
-VIDEO_START( cultures )
+static VIDEO_START( cultures )
 {
 	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,512,512);
 	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,512,512);
@@ -60,7 +60,7 @@ VIDEO_START( cultures )
 	tilemap_set_scrolldy(bg2_tilemap, 255, 0);
 }
 
-VIDEO_UPDATE( cultures )
+static VIDEO_UPDATE( cultures )
 {
 	int attr;
 

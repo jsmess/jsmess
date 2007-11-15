@@ -29,17 +29,17 @@ extern PALETTE_INIT( strnskil );
 extern VIDEO_START( strnskil );
 extern VIDEO_UPDATE( strnskil );
 
-WRITE8_HANDLER( strnskil_sharedram_w )
+static WRITE8_HANDLER( strnskil_sharedram_w )
 {
 	strnskil_sharedram[offset] = data;
 }
 
-READ8_HANDLER( strnskil_sharedram_r )
+static READ8_HANDLER( strnskil_sharedram_r )
 {
 	return strnskil_sharedram[offset];
 }
 
-READ8_HANDLER( strnskil_d800_r )
+static READ8_HANDLER( strnskil_d800_r )
 {
 /* bit0: interrupt type?, bit1: CPU2 busack? */
 
@@ -516,7 +516,7 @@ ROM_START( banbam )
 	ROM_LOAD( "ban-rom12.ic2", 0x0000,  0x2000, CRC(044bb2f6) SHA1(829b2152740061e0506c7504885d8404fb8fe360) )
 ROM_END
 
-DRIVER_INIT( pettanp )
+static DRIVER_INIT( pettanp )
 {
 //  AM_RANGE(0xd80c, 0xd80c) AM_WRITE(MWA8_NOP)     /* protection reset? */
 //  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
@@ -528,7 +528,7 @@ DRIVER_INIT( pettanp )
 
 }
 
-DRIVER_INIT( banbam )
+static DRIVER_INIT( banbam )
 {
 	/* Fujitsu MB8841 4-Bit MCU */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd806, 0xd806, 0, 0, banbam_protection_r);

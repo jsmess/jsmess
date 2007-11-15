@@ -98,12 +98,12 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-VIDEO_START( eolith16 )
+static VIDEO_START( eolith16 )
 {
 	vram = auto_malloc(0x10000*2);
 }
 
-VIDEO_UPDATE( eolith16 )
+static VIDEO_UPDATE( eolith16 )
 {
 	int x,y,count;
 	int color;
@@ -137,7 +137,7 @@ static NVRAM_HANDLER( eolith16_eeprom )
 }
 
 // setup a custom palette because pixels use 8 bits per color
-PALETTE_INIT( eolith16 )
+static PALETTE_INIT( eolith16 )
 {
 	int c;
 
@@ -250,7 +250,7 @@ ROM_START( klondkp )
 	ROM_LOAD( "kd.u28", 0x000000, 0x080000, CRC(c12112a1) SHA1(729bbaca6db933a730099a4a560a10ed99cae1c3) )
 ROM_END
 
-DRIVER_INIT( eolith16 )
+static DRIVER_INIT( eolith16 )
 {
 	init_eolith_speedup(machine);
 }

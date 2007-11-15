@@ -461,7 +461,7 @@ static GFXDECODE_START( bigevglf )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout,   0x20*16, 16 )
 GFXDECODE_END
 
-MACHINE_RESET( bigevglf )
+static MACHINE_RESET( bigevglf )
 {
 	beg13_ls74[0] = 0;
 	beg13_ls74[1] = 0;

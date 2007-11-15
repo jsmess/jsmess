@@ -31,7 +31,7 @@ VIDEO_UPDATE( vigilant );
 VIDEO_UPDATE( kikcubic );
 
 
-WRITE8_HANDLER( vigilant_bank_select_w )
+static WRITE8_HANDLER( vigilant_bank_select_w )
 {
 	int bankaddress;
 	UINT8 *RAM = memory_region(REGION_CPU1);
@@ -43,7 +43,7 @@ WRITE8_HANDLER( vigilant_bank_select_w )
 /***************************************************************************
  vigilant_out2_w
  **************************************************************************/
-WRITE8_HANDLER( vigilant_out2_w )
+static WRITE8_HANDLER( vigilant_out2_w )
 {
 	/* D0 = FILP = Flip screen? */
 	/* D1 = COA1 = Coin Counter A? */
@@ -56,7 +56,7 @@ WRITE8_HANDLER( vigilant_out2_w )
 //  data & 0x01 cocktail mode
 }
 
-WRITE8_HANDLER( kikcubic_coin_w )
+static WRITE8_HANDLER( kikcubic_coin_w )
 {
 	/* bits 0 is flip screen */
 

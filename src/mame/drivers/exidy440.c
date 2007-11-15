@@ -289,7 +289,7 @@ static INTERRUPT_GEN( main_interrupt )
 }
 
 
-MACHINE_RESET( exidy440 )
+static MACHINE_RESET( exidy440 )
 {
 	exidy440_bank = 0xff;
 	exidy440_bank_select(0);

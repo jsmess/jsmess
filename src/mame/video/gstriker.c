@@ -524,11 +524,13 @@ void CG10103_set_gfx_region(int numchip, int gfx_region)
 /*** VIDEO UPDATE/START **********************************************/
 
 
+#ifdef UNUSED_FUNCTION
 WRITE16_HANDLER( gsx_videoram3_w )
 {
 	// This memory appears to be empty in gstriker
 	gs_videoram3[offset] = data;
 }
+#endif
 
 
 VIDEO_UPDATE(gstriker)

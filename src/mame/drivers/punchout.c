@@ -130,7 +130,7 @@ DRIVER_INIT( armwrest );
 
 
 
-READ8_HANDLER( punchout_input_3_r )
+static READ8_HANDLER( punchout_input_3_r )
 {
 	int data = input_port_3_r(offset);
 	/* bit 4 is busy pin level */
@@ -139,22 +139,22 @@ READ8_HANDLER( punchout_input_3_r )
 	return data;
 }
 
-WRITE8_HANDLER( punchout_speech_reset_w )
+static WRITE8_HANDLER( punchout_speech_reset_w )
 {
 	VLM5030_RST( data&0x01 );
 }
 
-WRITE8_HANDLER( punchout_speech_st_w )
+static WRITE8_HANDLER( punchout_speech_st_w )
 {
 	VLM5030_ST( data&0x01 );
 }
 
-WRITE8_HANDLER( punchout_speech_vcu_w )
+static WRITE8_HANDLER( punchout_speech_vcu_w )
 {
 	VLM5030_VCU( data & 0x01 );
 }
 
-WRITE8_HANDLER( punchout_2a03_reset_w )
+static WRITE8_HANDLER( punchout_2a03_reset_w )
 {
 	if (data & 1)
 		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);

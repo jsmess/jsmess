@@ -29,7 +29,7 @@ extern size_t mnight_foregroundram_size;
 
 static int mnight_bank_latch = 255, main_cpu_num;
 
-MACHINE_RESET( mnight )
+static MACHINE_RESET( mnight )
 {
 	main_cpu_num = 0;
 }
@@ -39,12 +39,12 @@ INTERRUPT_GEN( mnight_interrupt )
 	cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xd7);	/* RST 10h */
 }
 
-READ8_HANDLER( mnight_bankselect_r )
+static READ8_HANDLER( mnight_bankselect_r )
 {
 	return mnight_bank_latch;
 }
 
-WRITE8_HANDLER( mnight_bankselect_w )
+static WRITE8_HANDLER( mnight_bankselect_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1+main_cpu_num);
 	int bankaddress;

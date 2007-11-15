@@ -304,7 +304,7 @@ U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pi
 
 ***************************************************************************/
 
-WRITE16_HANDLER( seta2_sound_bank_w )
+static WRITE16_HANDLER( seta2_sound_bank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -394,12 +394,12 @@ static NVRAM_HANDLER(93C46_gundamex)
 	}
 }
 
-READ16_HANDLER( gundamex_eeprom_r )
+static READ16_HANDLER( gundamex_eeprom_r )
 {
 	return ((EEPROM_read_bit() & 1)) << 3;
 }
 
-WRITE16_HANDLER( gundamex_eeprom_w )
+static WRITE16_HANDLER( gundamex_eeprom_w )
 {
 		EEPROM_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 		EEPROM_write_bit(data & 0x1);
@@ -561,18 +561,18 @@ ADDRESS_MAP_END
 
 /*  The game checks for a specific value read from the ROM region.
     The offset to use is stored in RAM at address 0x20BA16 */
-READ16_HANDLER( pzlbowl_protection_r )
+static READ16_HANDLER( pzlbowl_protection_r )
 {
 	UINT32 address = (program_read_word(0x20ba16) << 16) | program_read_word(0x20ba18);
 	return memory_region(REGION_CPU1)[address - 2];
 }
 
-READ16_HANDLER( pzlbowl_coins_r )
+static READ16_HANDLER( pzlbowl_coins_r )
 {
 	return readinputport(4) | (mame_rand(Machine) & 0x80 );
 }
 
-WRITE16_HANDLER( pzlbowl_coin_counter_w )
+static WRITE16_HANDLER( pzlbowl_coin_counter_w )
 {
 	if (ACCESSING_LSB)
 	{

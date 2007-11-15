@@ -104,7 +104,7 @@ static ppi8255_interface ppi8255_intf =
 	{ p0c_w, p1c_w, p2c_w, p3c_w, p4c_w }	/* Port C write */
 };
 
-MACHINE_RESET( taxidrvr )
+static MACHINE_RESET( taxidrvr )
 {
 	ppi8255_init(&ppi8255_intf);
 }

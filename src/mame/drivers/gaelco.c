@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( bigkarnk_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xffffff) AM_READ(MRA16_RAM)			/* Work RAM */
 ADDRESS_MAP_END
 
-WRITE16_HANDLER( bigkarnk_sound_command_w )
+static WRITE16_HANDLER( bigkarnk_sound_command_w )
 {
 	if (ACCESSING_LSB){
 		soundlatch_w(0,data & 0xff);
@@ -81,7 +81,7 @@ WRITE16_HANDLER( bigkarnk_sound_command_w )
 	}
 }
 
-WRITE16_HANDLER( bigkarnk_coin_w )
+static WRITE16_HANDLER( bigkarnk_coin_w )
 {
 	if (ACCESSING_LSB){
 		switch ((offset >> 3)){
@@ -1038,7 +1038,7 @@ static UINT16 squash_encrypt(int offset, int data, int game)
 	return data;
 }
 
-WRITE16_HANDLER( gaelco_vram_encrypted_w )
+static WRITE16_HANDLER( gaelco_vram_encrypted_w )
 {
 //  mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 
@@ -1049,7 +1049,7 @@ WRITE16_HANDLER( gaelco_vram_encrypted_w )
 }
 
 
-WRITE16_HANDLER(gaelco_encrypted_w)
+static WRITE16_HANDLER(gaelco_encrypted_w)
 {
 //  mame_printf_debug("gaelco_encrypted_w!!\n");
 
@@ -1057,7 +1057,7 @@ WRITE16_HANDLER(gaelco_encrypted_w)
         COMBINE_DATA(&gaelco_screen[offset]);
 }
 
-WRITE16_HANDLER( thoop_vram_encrypted_w )
+static WRITE16_HANDLER( thoop_vram_encrypted_w )
 {
 //  mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 
@@ -1067,7 +1067,7 @@ WRITE16_HANDLER( thoop_vram_encrypted_w )
 	tilemap_mark_tile_dirty(gaelco_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 2);
 }
 
-WRITE16_HANDLER(thoop_encrypted_w)
+static WRITE16_HANDLER(thoop_encrypted_w)
 {
 //  mame_printf_debug("gaelco_encrypted_w!!\n");
 

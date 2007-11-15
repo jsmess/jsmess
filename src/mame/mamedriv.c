@@ -1621,6 +1621,7 @@ const game_driver * const drivers[] =
 	DRIVER( kikikai )	/* A85 (c) 1986 Taito Corporation */
 	DRIVER( knightb )	/* bootleg */
 	DRIVER( kicknrun )	/* A87 (c) 1986 Taito Corporation */
+	DRIVER( kicknruu )	/* A87 (c) 1986 Taito Corporation */
 	DRIVER( mexico86 )	/* bootleg (Micro Research) */
 	DRIVER( darius )	/* A96 (c) 1986 Taito Corporation Japan (World) */
 	DRIVER( dariusj )	/* A96 (c) 1986 Taito Corporation (Japan) */
@@ -3621,6 +3622,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( darkedge )	/* (c) 1992 */
 	DRIVER( darkedgj )	/* (c) 1992 (Japan) */
 	DRIVER( slipstrm )	/* (c) 1995 Capcom */
+	DRIVER( slipstrh )	/* (c) 1995 Capcom */
 
 	/* Sega Multi System 32 games */
 	DRIVER( orunners )	/* (c) 1992 (World) */
@@ -7376,6 +7378,11 @@ Other Sun games
 	DRIVER( sltblgp1 )	/* 1996 */
 	DRIVER( gldncrwn )	/* 1997 */
 
+	/* MPU4 Diagnostic ROMs */
+	DRIVER( mpu4utst )
+	DRIVER( mpu4tst2 )
+	DRIVER( mpu4met0 )
+
 	/* MPU4 Non-Video SWPs */
 	DRIVER( connect4 )	/* Dolbeck Systems */
 
@@ -7390,6 +7397,7 @@ Other Sun games
 	DRIVER( skiltrek )	/* 1992 */
 	DRIVER( mating )	/* 199? */
 	DRIVER( matinga )	/* 199? */
+	DRIVER( vgpoker )	/* 199? */
 
 	/* ADP games */
 	DRIVER( backgamn )	/* (c) 1990 */
@@ -7738,10 +7746,14 @@ Other Sun games
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
 	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
-	DRIVER( ampoker2 )	/* (c) 198? Novomatic */
-	DRIVER( ampokr2a )	/* (c) 198? Novomatic */
-	DRIVER( ampokr2b )	/* (c) 198? Novomatic */
-	DRIVER( ampokr2c )	/* (c) 198? Novomatic */
+	DRIVER( ampoker2 )	/* (c) 1990 Novomatic */
+	DRIVER( ampkr2b1 )	/* 1990 bootleg */
+	DRIVER( ampkr2b2 )	/* 1990 bootleg */
+	DRIVER( ampkr2b3 )	/* 1994 bootleg */
+	DRIVER( pkrdewin )	/* 1990 bootleg */
+	DRIVER( ampkr95 )	/* 1995 bootleg */
+	DRIVER( sigmapkr )	/* (c) 1995 Sigma */
+	DRIVER( sigma2k )	/* (c) 2000 Sigma */
 	DRIVER( lucky8 )	/* (c) 1989 Falcon */
 	DRIVER( sidewndr )	/* (c) 1981? ACE */
 	DRIVER( spellbnd )	/* (c) 1981? ACE */
@@ -7831,8 +7843,15 @@ Other Sun games
 	DRIVER( eshb )		/* (c) 1984 Funai / Gakken */
 	DRIVER( comebaby )	/* (c) 2000 ExPotato */
 	DRIVER( peplus )	/* (c) 1987 IGT - International Gaming Technology */
-    DRIVER( pepp0188 )	/* (c) 1987 IGT - International Gaming Technology */
-    DRIVER( peset038 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0158 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0188 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( peset038 )	/* (c) 1987 IGT - International Gaming Technology */
+    DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
+    DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
+    DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
+	DRIVER( peps0716 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
+    DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */

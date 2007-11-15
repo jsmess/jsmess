@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( mlanding_z80_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-VIDEO_START(mlanding)
+static VIDEO_START(mlanding)
 {
 	int i;
 	for(i=0;i<ML_CHARS;i++)
@@ -209,7 +209,7 @@ VIDEO_START(mlanding)
 		ml_bitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-VIDEO_UPDATE(mlanding)
+static VIDEO_UPDATE(mlanding)
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 

@@ -138,7 +138,7 @@ void littlerb_recalc_address(void)
 	littlerb_write_address = littlerb_vdp_address_low | littlerb_vdp_address_high<<16;
 }
 
-READ16_HANDLER( littlerb_vdp_r )
+static READ16_HANDLER( littlerb_vdp_r )
 {
 	switch (offset)
 	{
@@ -158,7 +158,7 @@ READ16_HANDLER( littlerb_vdp_r )
 	return -1;
 }
 
-WRITE16_HANDLER( littlerb_vdp_w )
+static WRITE16_HANDLER( littlerb_vdp_w )
 {
 	switch (offset)
 	{
@@ -333,7 +333,7 @@ static void draw_sprite(mame_bitmap *bitmap, int xsize,int ysize, int offset, in
 	}
 }
 
-VIDEO_UPDATE(littlerb)
+static VIDEO_UPDATE(littlerb)
 {
 	int x,y,offs, code;
 	int xsize,ysize;

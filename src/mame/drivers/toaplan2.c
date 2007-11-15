@@ -561,7 +561,7 @@ static DRIVER_INIT( bbakradu )
   Toaplan games
 ***************************************************************************/
 
-READ16_HANDLER( toaplan2_inputport_0_word_r )
+static READ16_HANDLER( toaplan2_inputport_0_word_r )
 {
 	return ((video_screen_get_vpos(0) + 15) % 262) >= 245;
 }

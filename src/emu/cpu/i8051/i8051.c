@@ -407,7 +407,7 @@ static READ32_HANDLER((*hold_eram_iaddr_callback));
 #define SERIALPORT_IRQ    ((R_SCON & 0x03) && GET_ES)
 
 #if (HAS_I8052 || HAS_I8752)
-#define NO_PENDING_IRQ  !(R_TCON & 0xaa) && !(SERIALPORT_IRQ) && !GET_TF2 && !GET_EXF2
+#define NO_PENDING_IRQ  !(R_TCON & 0xaa) && !(SERIALPORT_IRQ) && !GET_ET2 //!GET_TF2 && !GET_EXF2
 #else
 #define NO_PENDING_IRQ  !(R_TCON & 0xaa) && !(SERIALPORT_IRQ)
 #endif
@@ -1512,7 +1512,7 @@ INLINE UINT8 check_interrupts(void)
 	}
 #if (HAS_I8052 || HAS_I8752)
 	//Timer 2 overflow (Either Timer Overflow OR External Interrupt)
-	if(!i8051.priority_request && (GET_TF2 || GET_EXF2) && (!i8051.int_vec || (i8051.int_vec && GET_PT2))) {
+	if(!i8051.priority_request && GET_ET2 && (GET_TF2 || GET_EXF2) && (!i8051.int_vec || (i8051.int_vec && GET_PT2))) {
 		//Set vector & priority level request
 		i8051.int_vec = V_TF2;
 		i8051.priority_request = GET_PT2;

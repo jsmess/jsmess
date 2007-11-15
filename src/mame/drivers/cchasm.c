@@ -146,7 +146,7 @@ static INPUT_PORTS_START( cchasm )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* Test 3, not used in cchasm */
 INPUT_PORTS_END
 
-MACHINE_START( cchasm )
+static MACHINE_START( cchasm )
 {
 	ptm6840_config(0, &cchasm_6840_intf );
 }

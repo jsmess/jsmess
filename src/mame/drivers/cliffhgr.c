@@ -104,7 +104,7 @@ static void video_cleanup(running_machine *machine)
 	laserdisc_exit(discinfo);
 }
 
-VIDEO_UPDATE( cliff )
+static VIDEO_UPDATE( cliff )
 {
 	/* update the TMS9928A video */
 	video_update_tms9928a( machine, screen, bitmap, cliprect );

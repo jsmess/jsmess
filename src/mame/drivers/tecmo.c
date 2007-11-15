@@ -66,7 +66,7 @@ VIDEO_UPDATE( tecmo );
 
 
 
-WRITE8_HANDLER( tecmo_bankswitch_w )
+static WRITE8_HANDLER( tecmo_bankswitch_w )
 {
 	int bankaddress;
 	UINT8 *RAM = memory_region(REGION_CPU1);
@@ -836,9 +836,9 @@ ROM_END
    video_type is used to distinguish Rygar, Silkworm and Gemini Wing.
    This is needed because there is a difference in the tile and sprite indexing.
 */
-DRIVER_INIT( rygar )    { tecmo_video_type = 0; }
-DRIVER_INIT( silkworm ) { tecmo_video_type = 1; }
-DRIVER_INIT( gemini )   { tecmo_video_type = 2; }
+static DRIVER_INIT( rygar )    { tecmo_video_type = 0; }
+static DRIVER_INIT( silkworm ) { tecmo_video_type = 1; }
+static DRIVER_INIT( gemini )   { tecmo_video_type = 2; }
 
 
 

@@ -187,7 +187,7 @@ extern WRITE8_HANDLER( gottlieb_cause_dac_nmi_w );
 
 static UINT8 *audiobuffer_region;
 
-MACHINE_RESET( gottlieb )
+static MACHINE_RESET( gottlieb )
 {
 	audiobuffer_region = memory_region(REGION_USER1);
 }
@@ -195,17 +195,17 @@ MACHINE_RESET( gottlieb )
 
 static int track[2];
 
-READ8_HANDLER( gottlieb_track_0_r )
+static READ8_HANDLER( gottlieb_track_0_r )
 {
 	return input_port_2_r(offset) - track[0];
 }
 
-READ8_HANDLER( gottlieb_track_1_r )
+static READ8_HANDLER( gottlieb_track_1_r )
 {
 	return input_port_3_r(offset) - track[1];
 }
 
-WRITE8_HANDLER( gottlieb_track_reset_w )
+static WRITE8_HANDLER( gottlieb_track_reset_w )
 {
 	/* reset the trackball counters */
 	track[0] = input_port_2_r(offset);
@@ -214,7 +214,7 @@ WRITE8_HANDLER( gottlieb_track_reset_w )
 
 static int joympx;
 
-READ8_HANDLER( stooges_IN4_r )
+static READ8_HANDLER( stooges_IN4_r )
 {
 	int joy;
 
@@ -235,7 +235,7 @@ READ8_HANDLER( stooges_IN4_r )
 	return joy | (readinputportbytag("IN4") & 0xf0);
 }
 
-WRITE8_HANDLER( reactor_output_w )
+static WRITE8_HANDLER( reactor_output_w )
 {
 	set_led_status(0,data & 0x20);
 	set_led_status(1,data & 0x40);
@@ -243,7 +243,7 @@ WRITE8_HANDLER( reactor_output_w )
 	gottlieb_video_outputs_w(offset,data);
 }
 
-WRITE8_HANDLER( stooges_output_w )
+static WRITE8_HANDLER( stooges_output_w )
 {
 	joympx = (data >> 5) & 0x03;
 	gottlieb_video_outputs_w(offset,data);
@@ -276,7 +276,7 @@ static int access_time;
  * This gives a total of 1+3+3+19*53=1014 bytes, the 10 last bytes are ignored
  */
 
-READ8_HANDLER( gottlieb_laserdisc_status_r )
+static READ8_HANDLER( gottlieb_laserdisc_status_r )
 {
 	int tmp;
 	switch (offset)
@@ -317,13 +317,13 @@ READ8_HANDLER( gottlieb_laserdisc_status_r )
 	return 0;
 }
 
-WRITE8_HANDLER( gottlieb_laserdisc_mpx_w )
+static WRITE8_HANDLER( gottlieb_laserdisc_mpx_w )
 {
 	lasermpx = data & 1;
 	if (lasermpx==0) skipfirstbyte=1;	/* first byte of the 1K buffer (0x67) is not returned... */
 }
 
-WRITE8_HANDLER( gottlieb_laserdisc_command_w )
+static WRITE8_HANDLER( gottlieb_laserdisc_command_w )
 {
 	static int loop;
 	int cmd;

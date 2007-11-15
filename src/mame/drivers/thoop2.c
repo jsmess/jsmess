@@ -77,7 +77,7 @@ static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 	}
 }
 
-WRITE16_HANDLER( thoop2_coin_w )
+static WRITE16_HANDLER( thoop2_coin_w )
 {
 	if (ACCESSING_LSB){
 		switch ((offset >> 3)){

@@ -68,11 +68,11 @@ static INPUT_PORTS_START( sfkick )
 INPUT_PORTS_END
 
 
-VIDEO_START( sfkick )
+static VIDEO_START( sfkick )
 {
 }
 
-VIDEO_UPDATE( sfkick )
+static VIDEO_UPDATE( sfkick )
 {
 
 	return 0;

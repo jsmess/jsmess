@@ -127,11 +127,11 @@ static const gfx_layout go2000_layout =
 	8*32
 };
 
-VIDEO_START(go2000)
+static VIDEO_START(go2000)
 {
 }
 
-VIDEO_UPDATE(go2000)
+static VIDEO_UPDATE(go2000)
 {
 	int x,y;
 	int count = 0;

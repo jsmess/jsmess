@@ -174,7 +174,7 @@ static UINT8 unkram[65536];
 static int io9400;
 static int io9401;
 
-VIDEO_UPDATE( spaceg )
+static VIDEO_UPDATE( spaceg )
 {
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 

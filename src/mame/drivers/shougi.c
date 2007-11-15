@@ -156,7 +156,7 @@ static PALETTE_INIT( shougi )
 
 
 
-VIDEO_UPDATE( shougi )
+static VIDEO_UPDATE( shougi )
 {
 int offs;
 

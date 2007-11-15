@@ -116,7 +116,7 @@ WRITE8_HANDLER( senjyo_volume_w );
 
 static int int_delay_kludge;
 
-MACHINE_RESET( senjyo )
+static MACHINE_RESET( senjyo )
 {
 	/* we must avoid generating interrupts for the first few frames otherwise */
 	/* Senjyo locks up. There must be an interrupt enable port somewhere, */

@@ -37,9 +37,9 @@ Year + Game         PCB             Notes
 
 ***************************************************************************/
 
-READ16_HANDLER ( YM3812_status_port_0_msb_r )	{	return YM3812_status_port_0_r(0) << 8;	}
-WRITE16_HANDLER( YM3812_register_port_0_msb_w )	{	if (ACCESSING_MSB)	YM3812_control_port_0_w(0,data >> 8);	}
-WRITE16_HANDLER( YM3812_data_port_0_msb_w )		{	if (ACCESSING_MSB)	YM3812_write_port_0_w(0,data >> 8);		}
+static READ16_HANDLER ( YM3812_status_port_0_msb_r )	{	return YM3812_status_port_0_r(0) << 8;	}
+static WRITE16_HANDLER( YM3812_register_port_0_msb_w )	{	if (ACCESSING_MSB)	YM3812_control_port_0_w(0,data >> 8);	}
+static WRITE16_HANDLER( YM3812_data_port_0_msb_w )		{	if (ACCESSING_MSB)	YM3812_write_port_0_w(0,data >> 8);		}
 
 
 /*
@@ -637,7 +637,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_RESET( unico )
+static MACHINE_RESET( unico )
 {
 }
 
@@ -655,7 +655,7 @@ struct EEPROM_interface zeropnt2_eeprom_interface =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-NVRAM_HANDLER( zeropnt2 )
+static NVRAM_HANDLER( zeropnt2 )
 {
 	if (read_or_write)
 		EEPROM_save(file);
@@ -713,7 +713,7 @@ MACHINE_DRIVER_END
                                 Zero Point
 ***************************************************************************/
 
-MACHINE_RESET( zeropt )
+static MACHINE_RESET( zeropt )
 {
 	machine_reset_unico(machine);
 }

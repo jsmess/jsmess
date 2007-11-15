@@ -87,7 +87,7 @@ static TILE_GET_INFO( get_tile_info2 )
 	);
 }
 
-VIDEO_START ( pipeline )
+static VIDEO_START ( pipeline )
 {
 	palram=auto_malloc(0x1000);
 	tilemap1 = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
@@ -95,7 +95,7 @@ VIDEO_START ( pipeline )
 	tilemap_set_transparent_pen(tilemap2,0);
 }
 
-VIDEO_UPDATE ( pipeline)
+static VIDEO_UPDATE ( pipeline)
 {
 	tilemap_draw(bitmap,cliprect,tilemap1, 0,0);
 	tilemap_draw(bitmap,cliprect,tilemap2, 0,0);
@@ -344,7 +344,7 @@ static PALETTE_INIT(pipeline)
 	}
 }
 
-MACHINE_RESET( pipeline )
+static MACHINE_RESET( pipeline )
 {
 	ctc_intf.baseclock = machine->drv->cpu[0].clock;
 	z80ctc_init(0, &ctc_intf);

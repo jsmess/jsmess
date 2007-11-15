@@ -266,7 +266,7 @@ Screenshots available on my site at http://unemulated.emuunlim.com (under PCB Sh
 
 ****************************************************************************/
 
-DRIVER_INIT( puckpkmn )
+static DRIVER_INIT( puckpkmn )
 {
 	UINT8 *rom	=	memory_region(REGION_CPU1);
 	size_t len		=	memory_region_length(REGION_CPU1);

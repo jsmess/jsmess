@@ -72,14 +72,14 @@ out of the sprite list at that point.. (verify on real hw)
 #include "video/kan_panb.h" // for bootlegs / non-original hw
 
 
-WRITE16_HANDLER( snowbros_flipscreen_w )
+static WRITE16_HANDLER( snowbros_flipscreen_w )
 {
 	if (ACCESSING_MSB)
 		flip_screen_set(~data & 0x8000);
 }
 
 
-VIDEO_UPDATE( snowbros )
+static VIDEO_UPDATE( snowbros )
 {
 	/* This clears & redraws the entire screen each pass */
 	fillbitmap(bitmap,0xf0,&machine->screen[0].visarea);
@@ -88,12 +88,12 @@ VIDEO_UPDATE( snowbros )
 }
 
 
-VIDEO_START( snowbros )
+static VIDEO_START( snowbros )
 {
 	pandora_start(0,0,0);
 }
 
-VIDEO_EOF( snowbros )
+static VIDEO_EOF( snowbros )
 {
 	pandora_eof(machine);
 }
@@ -136,7 +136,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 
 /* Sound Routines */
 
-READ16_HANDLER( snowbros_68000_sound_r )
+static READ16_HANDLER( snowbros_68000_sound_r )
 {
 	return soundlatch_r(offset);
 }
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( twinadv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xe010, 0xe010) AM_WRITE(OKIM6295_data_0_w)
 ADDRESS_MAP_END
 
-WRITE8_HANDLER( twinadv_oki_bank_w )
+static WRITE8_HANDLER( twinadv_oki_bank_w )
 {
 	int bank = (data &0x02)>>1;
 
@@ -403,7 +403,7 @@ ADDRESS_MAP_END
 
 /* Same volume used for all samples at the Moment, could be right, we have no
    way of knowing .. */
-READ16_HANDLER( sb3_sound_r )
+static READ16_HANDLER( sb3_sound_r )
 {
 	return 0x0003;
 }
@@ -475,7 +475,7 @@ void sb3_play_sound (int data)
 
 }
 
-WRITE16_HANDLER( sb3_sound_w )
+static WRITE16_HANDLER( sb3_sound_w )
 {
 	if (data == 0x00fe)
 	{
@@ -1534,7 +1534,7 @@ static struct YM2151interface ym2151_interface =
 };
 
 
-MACHINE_RESET (semiprot)
+static MACHINE_RESET (semiprot)
 {
 	UINT16 *PROTDATA = (UINT16*)memory_region(REGION_USER1);
 	int i;
@@ -1543,7 +1543,7 @@ MACHINE_RESET (semiprot)
 	hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
-MACHINE_RESET (finalttr)
+static MACHINE_RESET (finalttr)
 {
 	UINT16 *PROTDATA = (UINT16*)memory_region(REGION_USER1);
 	int i;
@@ -2301,7 +2301,7 @@ ROM_START( finalttr )
 	ROM_LOAD( "9.1h",     0xc0000, 0x40000, CRC(2ebd316d) SHA1(2f1249ebd2a0bb0cc15259f7187201576a365fa6) )
 ROM_END
 
-READ16_HANDLER ( moremorp_0a_read )
+static READ16_HANDLER ( moremorp_0a_read )
 {
 	return 0x000a;
 }
@@ -2676,7 +2676,7 @@ static DRIVER_INIT( hyperpac )
 	hyperpac_ram[0xe086/2] = 0x3210;
 }
 
-READ16_HANDLER ( _4in1_02_read )
+static READ16_HANDLER ( _4in1_02_read )
 {
 	return 0x0202;
 }

@@ -104,11 +104,11 @@ static GFXDECODE_START( rcorsair )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-VIDEO_START( rcorsair )
+static VIDEO_START( rcorsair )
 {
 }
 
-VIDEO_UPDATE( rcorsair )
+static VIDEO_UPDATE( rcorsair )
 {
 
 	return 0;

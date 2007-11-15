@@ -32,7 +32,7 @@ static int cardline_video;
 					cliprect,\
 					transparency?TRANSPARENCY_PEN:TRANSPARENCY_NONE,transparency);
 
-VIDEO_UPDATE( cardline )
+static VIDEO_UPDATE( cardline )
 {
 	int x,y;
 	fillbitmap(bitmap,machine->pens[0],cliprect);
@@ -165,7 +165,7 @@ static GFXDECODE_START( cardline )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT(cardline)
+static PALETTE_INIT(cardline)
 {
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;

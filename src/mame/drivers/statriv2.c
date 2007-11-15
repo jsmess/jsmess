@@ -117,25 +117,25 @@ static TILE_GET_INFO( get_statriv2_tile_info )
 }
 
 
-WRITE8_HANDLER( statriv2_videoram_w )
+static WRITE8_HANDLER( statriv2_videoram_w )
 {
 	statriv2_videoram[offset] = data;
 	tilemap_mark_tile_dirty(statriv2_tilemap,offset & 0x3ff);
 }
 
 
-VIDEO_START (statriv2)
+static VIDEO_START (statriv2)
 {
 	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,16,64, 16);
 }
 
-VIDEO_UPDATE (statriv2)
+static VIDEO_UPDATE (statriv2)
 {
 	tilemap_draw(bitmap,cliprect,statriv2_tilemap,0,0);
 	return 0;
 }
 
-PALETTE_INIT(statriv2)
+static PALETTE_INIT(statriv2)
 {
 	int i;
 

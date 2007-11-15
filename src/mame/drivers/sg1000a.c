@@ -316,12 +316,12 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT( sg1000a )
+static DRIVER_INIT( sg1000a )
 {
 	TMS9928A_configure(&tms9928a_interface);
 }
 
-DRIVER_INIT(chwrestl)
+static DRIVER_INIT(chwrestl)
 {
 	driver_init_sg1000a(machine);
 	regulus_decode();

@@ -662,7 +662,7 @@ static void tumblepb_gfx1_rearrange(void)
 	}
 }
 
-DRIVER_INIT( crospang )
+static DRIVER_INIT( crospang )
 {
 	tumblepb_gfx1_rearrange();
 }

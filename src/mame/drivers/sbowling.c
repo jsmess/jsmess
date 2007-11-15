@@ -91,7 +91,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 	}
 }
 
-VIDEO_UPDATE(sbowling)
+static VIDEO_UPDATE(sbowling)
 {
 	fillbitmap(bitmap,machine->pens[0x18],cliprect);
 	tilemap_draw(bitmap,cliprect,sb_tilemap,0,0);
@@ -99,7 +99,7 @@ VIDEO_UPDATE(sbowling)
 	return 0;
 }
 
-VIDEO_START(sbowling)
+static VIDEO_START(sbowling)
 {
 	tmpbitmap = auto_bitmap_alloc(32*8,32*8,machine->screen[0].format);
 	sb_tilemap = tilemap_create(get_sb_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);

@@ -390,7 +390,7 @@ static struct YM2151interface ym2151_interface =
 	dd3_ymirq_handler
 };
 
-VIDEO_EOF( wwfwfest )
+static VIDEO_EOF( wwfwfest )
 {
 	buffer_spriteram16_w(0,0,0);
 }

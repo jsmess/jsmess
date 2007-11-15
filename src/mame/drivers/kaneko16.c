@@ -229,12 +229,12 @@ static MACHINE_RESET( shogwarr )
 
 ***************************************************************************/
 
-READ16_HANDLER( kaneko16_rnd_r )
+static READ16_HANDLER( kaneko16_rnd_r )
 {
 	return mame_rand(Machine) & 0xffff;
 }
 
-WRITE16_HANDLER( kaneko16_coin_lockout_w )
+static WRITE16_HANDLER( kaneko16_coin_lockout_w )
 {
 	if (ACCESSING_MSB)
 	{
@@ -256,7 +256,7 @@ WRITE16_HANDLER( kaneko16_coin_lockout_w )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( kaneko16_soundlatch_w )
+static WRITE16_HANDLER( kaneko16_soundlatch_w )
 {
 	if (ACCESSING_MSB)
 	{
@@ -267,20 +267,20 @@ WRITE16_HANDLER( kaneko16_soundlatch_w )
 
 /* Two identically mapped YM2149 chips */
 
-READ16_HANDLER( kaneko16_YM2149_0_r )
+static READ16_HANDLER( kaneko16_YM2149_0_r )
 {
 	/* Each 2149 register is mapped to a different address */
 	AY8910_control_port_0_w(0,offset);
 	return AY8910_read_port_0_r(0);
 }
-READ16_HANDLER( kaneko16_YM2149_1_r )
+static READ16_HANDLER( kaneko16_YM2149_1_r )
 {
 	/* Each 2149 register is mapped to a different address */
 	AY8910_control_port_1_w(0,offset);
 	return AY8910_read_port_1_r(0);
 }
 
-WRITE16_HANDLER( kaneko16_YM2149_0_w )
+static WRITE16_HANDLER( kaneko16_YM2149_0_w )
 {
 	/* Each 2149 register is mapped to a different address */
 	AY8910_control_port_0_w(0,offset);
@@ -288,7 +288,7 @@ WRITE16_HANDLER( kaneko16_YM2149_0_w )
 	if (ACCESSING_LSB)	AY8910_write_port_0_w(0, data       & 0xff);
 	else				AY8910_write_port_0_w(0,(data >> 8) & 0xff);
 }
-WRITE16_HANDLER( kaneko16_YM2149_1_w )
+static WRITE16_HANDLER( kaneko16_YM2149_1_w )
 {
 	/* Each 2149 register is mapped to a different address */
 	AY8910_control_port_1_w(0,offset);
@@ -306,18 +306,18 @@ WRITE16_HANDLER( kaneko16_YM2149_1_w )
 
 ***************************************************************************/
 
-READ8_HANDLER( kaneko16_eeprom_r )
+static READ8_HANDLER( kaneko16_eeprom_r )
 {
 	return EEPROM_read_bit() & 1;
 }
 
-WRITE8_HANDLER( kaneko16_eeprom_reset_w )
+static WRITE8_HANDLER( kaneko16_eeprom_reset_w )
 {
 	// reset line asserted: reset.
 	EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
-WRITE16_HANDLER( kaneko16_eeprom_w )
+static WRITE16_HANDLER( kaneko16_eeprom_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -388,7 +388,7 @@ ADDRESS_MAP_END
 /* The two YM2149 chips are only used when entering high score initials, and */
 /* when the game is fully completed. Overkill??? */
 
-WRITE16_HANDLER( bakubrkr_oki_bank_sw )
+static WRITE16_HANDLER( bakubrkr_oki_bank_sw )
 {
 	if (ACCESSING_LSB) {
 		OKIM6295_set_bank_base(0, 0x40000 * (data & 0x7) );
@@ -589,7 +589,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-READ16_HANDLER( gtmr_wheel_r )
+static READ16_HANDLER( gtmr_wheel_r )
 {
 	if ( (readinputport(4) & 0x1800) == 0x10)	// DSW setting
 		return	readinputport(5)<<8;			// 360' Wheel
@@ -597,7 +597,7 @@ READ16_HANDLER( gtmr_wheel_r )
 		return	readinputport(5);				// 270' Wheel
 }
 
-WRITE16_HANDLER( gtmr_oki_0_bank_w )
+static WRITE16_HANDLER( gtmr_oki_0_bank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -606,7 +606,7 @@ WRITE16_HANDLER( gtmr_oki_0_bank_w )
 	}
 }
 
-WRITE16_HANDLER( gtmr_oki_1_bank_w )
+static WRITE16_HANDLER( gtmr_oki_1_bank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -615,7 +615,7 @@ WRITE16_HANDLER( gtmr_oki_1_bank_w )
 	}
 }
 
-WRITE16_HANDLER( gtmr_oki_0_data_w )
+static WRITE16_HANDLER( gtmr_oki_0_data_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -624,7 +624,7 @@ WRITE16_HANDLER( gtmr_oki_0_data_w )
 	}
 }
 
-WRITE16_HANDLER( gtmr_oki_1_data_w )
+static WRITE16_HANDLER( gtmr_oki_1_data_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -694,7 +694,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-READ16_HANDLER( gtmr2_wheel_r )
+static READ16_HANDLER( gtmr2_wheel_r )
 {
 	switch (readinputport(4) & 0x1800)
 	{
@@ -714,7 +714,7 @@ READ16_HANDLER( gtmr2_wheel_r )
 	}
 }
 
-READ16_HANDLER( gtmr2_IN1_r )
+static READ16_HANDLER( gtmr2_IN1_r )
 {
 	return	(readinputport(1) & (readinputport(8) | ~0x7100));
 }
@@ -782,7 +782,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* Untested */
-WRITE16_HANDLER( shogwarr_oki_bank_w )
+static WRITE16_HANDLER( shogwarr_oki_bank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -2183,18 +2183,18 @@ void kaneko16_expand_sample_banks(int region)
 	}
 }
 
-DRIVER_INIT( kaneko16 )
+static DRIVER_INIT( kaneko16 )
 {
 	kaneko16_unscramble_tiles(REGION_GFX2);
 	kaneko16_unscramble_tiles(REGION_GFX3);
 }
 
-DRIVER_INIT( berlwall )
+static DRIVER_INIT( berlwall )
 {
 	kaneko16_unscramble_tiles(REGION_GFX2);
 }
 
-DRIVER_INIT( samplebank )
+static DRIVER_INIT( samplebank )
 {
 	kaneko16_unscramble_tiles(REGION_GFX2);
 	kaneko16_unscramble_tiles(REGION_GFX3);
@@ -3206,7 +3206,7 @@ ROM_START( shogwarr )
 ROM_END
 
 
-DRIVER_INIT( shogwarr )
+static DRIVER_INIT( shogwarr )
 {
 	driver_init_kaneko16(machine);
 

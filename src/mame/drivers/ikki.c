@@ -19,7 +19,7 @@ VIDEO_UPDATE( ikki );
 WRITE8_HANDLER( ikki_scroll_w );
 WRITE8_HANDLER( ikki_scrn_ctrl_w );
 
-READ8_HANDLER( ikki_e000_r )
+static READ8_HANDLER( ikki_e000_r )
 {
 /* bit1: interrupt type?, bit0: CPU2 busack? */
 
@@ -28,7 +28,7 @@ READ8_HANDLER( ikki_e000_r )
 	return 2;
 }
 
-WRITE8_HANDLER( ikki_coin_counters )
+static WRITE8_HANDLER( ikki_coin_counters )
 {
 	coin_counter_w( 0, data & 0x01 );
 	coin_counter_w( 1, data & 0x02 );

@@ -75,7 +75,7 @@
  *
  *************************************/
 
-MACHINE_START( grchamp )
+static MACHINE_START( grchamp )
 {
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
 	if (readinputport(1) & 0x10)
@@ -423,22 +423,22 @@ static READ8_HANDLER( main_to_sub_comm_r )
  *
  *************************************/
 
-WRITE8_HANDLER( grchamp_portA_0_w )
+static WRITE8_HANDLER( grchamp_portA_0_w )
 {
 	discrete_sound_w(GRCHAMP_A_DATA, data);
 }
 
-WRITE8_HANDLER( grchamp_portB_0_w )
+static WRITE8_HANDLER( grchamp_portB_0_w )
 {
 	discrete_sound_w(GRCHAMP_B_DATA, 255-data);
 }
 
-WRITE8_HANDLER( grchamp_portA_2_w )
+static WRITE8_HANDLER( grchamp_portA_2_w )
 {
 	/* A0/A1 modify the output of AY8910 #2 */
 	/* A7 contributes to the discrete logic hanging off of AY8910 #0 */
 }
-WRITE8_HANDLER( grchamp_portB_2_w )
+static WRITE8_HANDLER( grchamp_portB_2_w )
 {
 	/* B0 connects elsewhere */
 }

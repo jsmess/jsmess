@@ -172,7 +172,7 @@ WRITE8_HANDLER( mjsikaku_gfxflag2_w )
 		mjsikaku_gfxflag2 |= 0x20;
 }
 
-WRITE8_HANDLER( mjsikaku_gfxflag3_w )
+static WRITE8_HANDLER( mjsikaku_gfxflag3_w )
 {
 	mjsikaku_gfxflag3 = (data & 0xe0);
 }

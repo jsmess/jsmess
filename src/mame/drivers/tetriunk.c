@@ -18,7 +18,7 @@ static UINT8 * tetriunk_attribram;
 
 static int bitmap_offset=0;
 
-READ8_HANDLER( tetriunk_random_r )
+static READ8_HANDLER( tetriunk_random_r )
 {
 	return mame_rand(Machine);
 }
@@ -78,11 +78,11 @@ static ADDRESS_MAP_START( tetriunk_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-VIDEO_START(tetriunk)
+static VIDEO_START(tetriunk)
 {
 }
 
-VIDEO_UPDATE(tetriunk)
+static VIDEO_UPDATE(tetriunk)
 {
 	int x,y,z;
 	int count = 0;

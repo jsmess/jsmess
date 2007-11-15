@@ -185,7 +185,7 @@ static TILE_GET_INFO( get_tile_info_fg )
 	get_tile_info(machine, tileinfo, tile_index, fg_videoram, 1);
 }
 
-VIDEO_START( ettrivia )
+static VIDEO_START( ettrivia )
 {
 	bg_tilemap = tilemap_create( get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
 	fg_tilemap = tilemap_create( get_tile_info_fg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
@@ -193,7 +193,7 @@ VIDEO_START( ettrivia )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
-VIDEO_UPDATE( ettrivia )
+static VIDEO_UPDATE( ettrivia )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

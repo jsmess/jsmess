@@ -250,7 +250,7 @@ static struct TAITO8741interface gsword_8741interface=
 	{ input_port_7_r,input_port_6_r,gsword_8741_2_r,gsword_8741_3_r }    /* port handler */
 };
 
-MACHINE_RESET( gsword )
+static MACHINE_RESET( gsword )
 {
 	int i;
 
@@ -264,7 +264,7 @@ MACHINE_RESET( gsword )
 	TAITO8741_start(&gsword_8741interface);
 }
 
-MACHINE_RESET( josvolly )
+static MACHINE_RESET( josvolly )
 {
 	josvolly_8741_reset();
 }
@@ -348,14 +348,14 @@ static READ8_HANDLER( gsword_fake_1_r )
 	return fake8910_1+1;
 }
 
-WRITE8_HANDLER( gsword_adpcm_data_w )
+static WRITE8_HANDLER( gsword_adpcm_data_w )
 {
 	MSM5205_data_w (0,data & 0x0f); /* bit 0..3 */
 	MSM5205_reset_w(0,(data>>5)&1); /* bit 5    */
 	MSM5205_vclk_w(0,(data>>4)&1);  /* bit 4    */
 }
 
-WRITE8_HANDLER( adpcm_soundcommand_w )
+static WRITE8_HANDLER( adpcm_soundcommand_w )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);

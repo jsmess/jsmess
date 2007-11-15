@@ -260,12 +260,14 @@ INTERRUPT_GEN( ninjakd2_interrupt )
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( ninjakd2_bankselect_r )
 {
 	return ninjakd2_bank_latch;
 }
+#endif
 
-WRITE8_HANDLER( ninjakd2_bankselect_w )
+static WRITE8_HANDLER( ninjakd2_bankselect_w )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	int bankaddress;
@@ -279,7 +281,7 @@ WRITE8_HANDLER( ninjakd2_bankselect_w )
 	}
 }
 
-WRITE8_HANDLER( ninjakd2_pcm_play_w )
+static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
 	int i;
 	static const int sample_no[9] = { 0x00,0x0A,0x27,0x3E,0x53,0x5E,0x68,0x76,0xF0 };

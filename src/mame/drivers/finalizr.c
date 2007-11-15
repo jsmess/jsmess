@@ -48,7 +48,7 @@ static WRITE8_HANDLER( finalizr_coin_w )
 	coin_counter_w(1,data & 0x02);
 }
 
-WRITE8_HANDLER( finalizr_i8039_irq_w )
+static WRITE8_HANDLER( finalizr_i8039_irq_w )
 {
 	cpunum_set_input_line(1, 0, ASSERT_LINE);
 }

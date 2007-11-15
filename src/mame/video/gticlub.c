@@ -5,6 +5,17 @@
 #include "gticlub.h"
 
 
+typedef struct _poly_extra_data poly_extra_data;
+struct _poly_extra_data
+{
+	UINT32 color;
+	int texture_x, texture_y;
+	int texture_page;
+	int texture_palette;
+	int texture_mirror_x;
+	int texture_mirror_y;
+};
+
 
 // defined in drivers/nwk-tr.c
 int K001604_vh_start(running_machine *machine, int chip);
@@ -14,6 +25,8 @@ void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cli
 
 extern UINT8 gticlub_led_reg0;
 extern UINT8 gticlub_led_reg1;
+
+static poly_manager *poly;
 
 
 
@@ -139,11 +152,6 @@ static const int decode_y_gti[16] = {  0, 8, 32, 40, 1, 9, 33, 41, 64, 72, 96, 1
 
 static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
 static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
-
-typedef struct {
-	float x,y,z;
-	INT16 u,v;
-} VERTEX;
 
 UINT32 K001005_status = 0;
 mame_bitmap *K001005_bitmap[2];
@@ -385,6 +393,7 @@ WRITE32_HANDLER( K001005_w )
 			{
 				K001005_swap_buffers();
 				render_polygons();
+				poly_wait(poly, "render_polygons");
 				K001005_3d_fifo_ptr = 0;
 			}
 			break;
@@ -416,197 +425,94 @@ WRITE32_HANDLER( K001005_w )
 
 }
 
-static void draw_triangle(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
+static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	int x, y;
-	struct poly_vertex vert[3];
-	const struct poly_scanline_data *scans;
+	const poly_extra_data *extra = extradata;
+	mame_bitmap *destmap = dest;
+	float z = extent->param[0].start;
+	float dz = extent->param[0].dpdx;
+	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, scanline, 0);
+	UINT32 color = extra->color;
+	int x;
 
-	rectangle cliprect;
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = Machine->screen[0].width-1;
-	cliprect.max_y = Machine->screen[0].height-1;
-
-	vert[0].x = v1.x;	vert[0].y = v1.y;	vert[0].p[0] = (UINT32)(v1.z);
-	vert[1].x = v2.x;	vert[1].y = v2.y;	vert[1].p[0] = (UINT32)(v2.z);
-	vert[2].x = v3.x;	vert[2].y = v3.y;	vert[2].p[0] = (UINT32)(v3.z);
-
-	scans = setup_triangle_1(&vert[0], &vert[1], &vert[2], &cliprect);
-
-	if (scans)
+	for (x = extent->startx; x < extent->stopx; x++)
 	{
-		INT64 dz;
-		dz = scans->dp[0];
+		UINT32 iz = (UINT32)z >> 16;
 
-		for (y = scans->sy; y <= scans->ey; y++)
+		if (iz <= zb[x])
 		{
-			int x1, x2;
-			INT64 z;
-			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT32 *fb = BITMAP_ADDR32(K001005_bitmap[K001005_bitmap_page], y, 0);
-			UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, y, 0);
-
-			x1 = scan->sx;
-			x2 = scan->ex;
-
-			z = scans->scanline[y - scans->sy].p[0];
-
-			for (x = x1; x <= x2; x++)
+			if (color & 0xff000000)
 			{
-				UINT32 iz = (UINT64)(z) >> 16;
-
-				if (iz <= zb[x])
-				{
-					if (color & 0xff000000)
-					{
-						fb[x] = color;
-						zb[x] = iz;
-					}
-				}
-
-				z += dz;
+				fb[x] = color;
+				zb[x] = iz;
 			}
 		}
+
+		z += dz;
 	}
 }
 
-static int texture_x, texture_y;
-static int texture_page;
-static int texture_palette;
-static int texture_mirror_x;
-static int texture_mirror_y;
-
-#define ZBUFFER_SCALE		16777216.0
-#define ZDIVIDE_SHIFT		24
-
-static void draw_triangle_tex(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
+static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	double z1, z2, z3;
-	double w1, w2, w3;
-	int x, y;
-	struct poly_vertex vert[3];
-	const struct poly_scanline_data *scans;
+	const poly_extra_data *extra = extradata;
+	mame_bitmap *destmap = dest;
+	UINT8 *texrom = memory_region(REGION_GFX1) + (extra->texture_page * 0x40000);
+	int pal_chip = (extra->texture_palette & 0x8) ? 1 : 0;
+	int palette_index = (extra->texture_palette & 0x7) * 256;
+	float z = extent->param[0].start;
+	float u = extent->param[1].start;
+	float v = extent->param[2].start;
+	float w = extent->param[3].start;
+	float dz = extent->param[0].dpdx;
+	float du = extent->param[1].dpdx;
+	float dv = extent->param[2].dpdx;
+	float dw = extent->param[3].dpdx;
+	int texture_mirror_x = extra->texture_mirror_x;
+	int texture_mirror_y = extra->texture_mirror_y;
+	int texture_x = extra->texture_x;
+	int texture_y = extra->texture_y;
+	int x;
 
-	float maxz;
+	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, scanline, 0);
 
-	UINT8 *texrom = memory_region(REGION_GFX1) + (texture_page * 0x40000);
-	int pal_chip = (texture_palette & 0x8) ? 1 : 0;
-	int palette_index = (texture_palette & 0x7) * 256;
-
-	rectangle cliprect;
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = Machine->screen[0].width-1;
-	cliprect.max_y = Machine->screen[0].height-1;
-/*
-    vert[0].x    = v1.x;    vert[0].y    = v1.y;
-    vert[0].p[0] = v1.u;    vert[0].p[1] = v1.v;    vert[0].p[2] = (INT32)(v1.z);
-    vert[1].x    = v2.x;    vert[1].y    = v2.y;
-    vert[1].p[0] = v2.u;    vert[1].p[1] = v2.v;    vert[1].p[2] = (INT32)(v2.z);
-    vert[2].x    = v3.x;    vert[2].y    = v3.y;
-    vert[2].p[0] = v3.u;    vert[2].p[1] = v3.v;    vert[2].p[2] = (INT32)(v3.z);
-*/
-	maxz = 0.0;
-	maxz = MAX(maxz, v1.z);
-	maxz = MAX(maxz, v2.z);
-	maxz = MAX(maxz, v3.z);
-
-	z1 = (double)(v1.z) / maxz;
-	z2 = (double)(v2.z) / maxz;
-	z3 = (double)(v3.z) / maxz;
-
-	w1 = (1.0 / z1) * ZBUFFER_SCALE;
-	w2 = (1.0 / z2) * ZBUFFER_SCALE;
-	w3 = (1.0 / z3) * ZBUFFER_SCALE;
-	v1.u = (INT32)((INT64)(v1.u * w1) >> ZDIVIDE_SHIFT);
-	v1.v = (INT32)((INT64)(v1.v * w1) >> ZDIVIDE_SHIFT);
-	v2.u = (INT32)((INT64)(v2.u * w2) >> ZDIVIDE_SHIFT);
-	v2.v = (INT32)((INT64)(v2.v * w2) >> ZDIVIDE_SHIFT);
-	v3.u = (INT32)((INT64)(v3.u * w3) >> ZDIVIDE_SHIFT);
-	v3.v = (INT32)((INT64)(v3.v * w3) >> ZDIVIDE_SHIFT);
-
-	vert[0].x    = v1.x;	vert[0].y    = v1.y;
-	vert[0].p[0] = v1.u;	vert[0].p[1] = v1.v;	vert[0].p[2] = (UINT32)(w1);	vert[0].p[3] = (UINT32)(v1.z);
-	vert[1].x    = v2.x;	vert[1].y    = v2.y;
-	vert[1].p[0] = v2.u;	vert[1].p[1] = v2.v;	vert[1].p[2] = (UINT32)(w2);	vert[1].p[3] = (UINT32)(v2.z);
-	vert[2].x    = v3.x;	vert[2].y    = v3.y;
-	vert[2].p[0] = v3.u;	vert[2].p[1] = v3.v;	vert[2].p[2] = (UINT32)(w3);	vert[2].p[3] = (UINT32)(v3.z);
-
-
-	scans = setup_triangle_4(&vert[0], &vert[1], &vert[2], &cliprect);
-
-	if (scans)
+	for (x = extent->startx; x < extent->stopx; x++)
 	{
-		INT64 du, dv, dz, dw;
-		du = scans->dp[0];
-		dv = scans->dp[1];
-		dw = scans->dp[2];
-		dz = scans->dp[3];
+		UINT32 iz = (UINT32)z >> 16;
+		//int iu = u >> 16;
+		//int iv = v >> 16;
 
-		for (y = scans->sy; y <= scans->ey; y++)
+		if (iz < zb[x])
 		{
-			int x1, x2;
-			INT64 u, v, z, w;
-			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT32 *fb = BITMAP_ADDR32(K001005_bitmap[K001005_bitmap_page], y, 0);
-			UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, y, 0);
+			float oow = 1.0f / w;
+			UINT32 color;
+			int iu, iv;
+			int iiv, iiu, texel;
 
-			x1 = scan->sx;
-			x2 = scan->ex;
+			iu = u * oow;
+			iv = v * oow;
 
-			u = scans->scanline[y - scans->sy].p[0];
-			v = scans->scanline[y - scans->sy].p[1];
-			w = scans->scanline[y - scans->sy].p[2];
-			z = scans->scanline[y - scans->sy].p[3];
+			iiu = texture_x + tex_mirror_table[texture_mirror_x][(iu >> 4) & 0x7f];
+			iiv = texture_y + tex_mirror_table[texture_mirror_y][(iv >> 4) & 0x7f];
+			texel = texrom[((iiv & 0x1ff) * 512) + (iiu & 0x1ff)];
+			color = K001006_palette[pal_chip][palette_index + texel];
 
-			for (x = x1; x <= x2; x++)
+			if (color & 0xff000000)
 			{
-				UINT32 iz = (UINT64)(z) >> 16;
-				//int iu = u >> 16;
-				//int iv = v >> 16;
-
-				if (iz < zb[x])
-				{
-					UINT32 color;
-					int iu, iv;
-					int iiv, iiu, texel;
-
-					UINT32 iw = (UINT64)(w) >> 16;
-
-					if (iw)
-					{
-						iu = (INT64)(u << 8) / (INT64)iw;
-						iv = (INT64)(v << 8) / (INT64)iw;
-					}
-					else
-					{
-						iu = 0;
-						iv = 0;
-					}
-
-					iiu = texture_x + tex_mirror_table[texture_mirror_x][(iu >> 4) & 0x7f];
-					iiv = texture_y + tex_mirror_table[texture_mirror_y][(iv >> 4) & 0x7f];
-					texel = texrom[((iiv & 0x1ff) * 512) + (iiu & 0x1ff)];
-					color = K001006_palette[pal_chip][palette_index + texel];
-
-					if (color & 0xff000000)
-					{
-						fb[x] = color;
-						zb[x] = iz;
-					}
-				}
-
-				u += du;
-				v += dv;
-				z += dz;
-				w += dw;
+				fb[x] = color;
+				zb[x] = iz;
 			}
 		}
+
+		u += du;
+		v += dv;
+		z += dz;
+		w += dw;
 	}
 }
 
-static VERTEX prev_v[4];
+static poly_vertex prev_v[4];
 static int prev_poly_type;
 
 static void render_polygons(void)
@@ -619,7 +525,8 @@ static void render_polygons(void)
 	{
 		if (K001005_3d_fifo[i] == 0x80000003)
 		{
-			VERTEX v[4];
+			poly_extra_data *extra = poly_get_extra_data(poly);
+			poly_vertex v[4];
 			int r, g, b, a;
 			UINT32 color;
 			int index = i;
@@ -638,6 +545,7 @@ static void render_polygons(void)
 
 				v[j].x = ((float)(x) / 16.0f) + 256.0f;
 				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+				v[j].p[0] = 0;	/* ??? */
 			}
 
 			++index;
@@ -649,8 +557,10 @@ static void render_polygons(void)
 			color = (a << 24) | (r << 16) | (g << 8) | (b);
 			++index;
 
-			draw_triangle(v[0], v[1], v[2], color);
-			draw_triangle(v[0], v[2], v[3], color);
+			extra->color = color;
+			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
+//          poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, 4, v);
 
 			i = index - 1;
 		}
@@ -668,8 +578,8 @@ static void render_polygons(void)
 			// 0x01: -------- -------- ----x-x- x-x-x-x-    Texture X / 8
 			// 0x01: -------- -------- -----x-x -x-x-x-x    Texture Y / 8
 
-
-			VERTEX v[4];
+			poly_extra_data *extra = poly_get_extra_data(poly);
+			poly_vertex v[4];
 			int tx, ty;
 			UINT32 color = 0;
 			UINT32 header;
@@ -717,9 +627,10 @@ static void render_polygons(void)
 
 				v[j].x = ((float)(x) / 16.0f) + 256.0f;
 				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
-				v[j].z = *(float*)(&z);
-				v[j].u = u2;
-				v[j].v = v2;
+				v[j].p[0] = *(float*)(&z);
+				v[j].p[3] = 1.0f / v[j].p[0];
+				v[j].p[1] = u2 * v[j].p[3];
+				v[j].p[2] = v2 * v[j].p[3];
 
 				++num_verts;
 
@@ -741,54 +652,58 @@ static void render_polygons(void)
 				 ((header & 0x008) >> 2) |
 				 ((header & 0x002) >> 1);
 
-			texture_x = tx * 8;
-			texture_y = ty * 8;
+			extra->texture_x = tx * 8;
+			extra->texture_y = ty * 8;
 
-			texture_page = (header >> 12) & 0x1f;
-			texture_palette = (header >> 28) & 0xf;
+			extra->texture_page = (header >> 12) & 0x1f;
+			extra->texture_palette = (header >> 28) & 0xf;
 
-			texture_mirror_x = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
-			texture_mirror_y = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+			extra->texture_mirror_x = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+			extra->texture_mirror_y = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+
+			extra->color = color;
 
 			if (num_verts < 3)
 			{
-				draw_triangle_tex(prev_v[2], v[0], v[1], color);
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, &prev_v[2], &v[0], &v[1]);
 				if (prev_poly_type)
-				{
-					draw_triangle_tex(prev_v[2], prev_v[3], v[0], color);
-				}
+					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, &prev_v[2], &prev_v[3], &v[0]);
+//              if (prev_poly_type)
+//                  poly_render_quad(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, &prev_v[2], &prev_v[3], &v[0], &v[1]);
+//              else
+//                  poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, &prev_v[2], &v[0], &v[1]);
 
-				memcpy(&prev_v[0], &prev_v[2], sizeof(VERTEX));
-				memcpy(&prev_v[1], &prev_v[3], sizeof(VERTEX));
-				memcpy(&prev_v[2], &v[0], sizeof(VERTEX));
-				memcpy(&prev_v[3], &v[1], sizeof(VERTEX));
+				memcpy(&prev_v[0], &prev_v[2], sizeof(poly_vertex));
+				memcpy(&prev_v[1], &prev_v[3], sizeof(poly_vertex));
+				memcpy(&prev_v[2], &v[0], sizeof(poly_vertex));
+				memcpy(&prev_v[3], &v[1], sizeof(poly_vertex));
 			}
 			else
 			{
-				draw_triangle_tex(v[0], v[1], v[2], color);
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
 				if (num_verts > 3)
-				{
-					draw_triangle_tex(v[2], v[3], v[0], color);
-				}
+					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
+//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, num_verts, v);
 
-				memcpy(prev_v, v, sizeof(VERTEX) * 4);
+				memcpy(prev_v, v, sizeof(poly_vertex) * 4);
 			}
 
 			prev_poly_type = poly_type;
 
 			while ((K001005_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < K001005_3d_fifo_ptr)
 			{
+				poly_extra_data *extra = poly_get_extra_data(poly);
 				int new_verts = 0;
 
 				if (poly_type)
 				{
-					memcpy(&v[0], &prev_v[2], sizeof(VERTEX));
-					memcpy(&v[1], &prev_v[3], sizeof(VERTEX));
+					memcpy(&v[0], &prev_v[2], sizeof(poly_vertex));
+					memcpy(&v[1], &prev_v[3], sizeof(poly_vertex));
 				}
 				else
 				{
-					memcpy(&v[0], &prev_v[1], sizeof(VERTEX));
-					memcpy(&v[1], &prev_v[2], sizeof(VERTEX));
+					memcpy(&v[0], &prev_v[1], sizeof(poly_vertex));
+					memcpy(&v[1], &prev_v[2], sizeof(poly_vertex));
 				}
 
 				for (j=2; j < 4; j++)
@@ -827,9 +742,10 @@ static void render_polygons(void)
 
 					v[j].x = ((float)(x) / 16.0f) + 256.0f;
 					v[j].y = ((float)(-y) / 16.0f) + 192.0f;
-					v[j].z = *(float*)(&z);
-					v[j].u = u2;
-					v[j].v = v2;
+					v[j].p[0] = *(float*)(&z);
+					v[j].p[3] = 1.0f / v[j].p[0];
+					v[j].p[1] = u2 * v[j].p[3];
+					v[j].p[2] = v2 * v[j].p[3];
 
 					++new_verts;
 
@@ -837,13 +753,23 @@ static void render_polygons(void)
 						break;
 				}
 
-				draw_triangle_tex(v[0], v[1], v[2], color);
-				if (new_verts > 1)
-				{
-					draw_triangle_tex(v[2], v[3], v[0], color);
-				}
+				extra->texture_x = tx * 8;
+				extra->texture_y = ty * 8;
 
-				memcpy(prev_v, v, sizeof(VERTEX) * 4);
+				extra->texture_page = (header >> 12) & 0x1f;
+				extra->texture_palette = (header >> 28) & 0xf;
+
+				extra->texture_mirror_x = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+				extra->texture_mirror_y = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+
+				extra->color = color;
+
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
+				if (new_verts > 1)
+					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
+//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline_tex, 4, new_verts + 2, v);
+
+				memcpy(prev_v, v, sizeof(poly_vertex) * 4);
 			};
 
 			i = index - 1;
@@ -851,7 +777,8 @@ static void render_polygons(void)
 		else if (K001005_3d_fifo[i] == 0x80000006 || K001005_3d_fifo[i] == 0x80000026 ||
 				 K001005_3d_fifo[i] == 0x80000020 || K001005_3d_fifo[i] == 0x80000022)
 		{
-			VERTEX v[4];
+			poly_extra_data *extra = poly_get_extra_data(poly);
+			poly_vertex v[4];
 			int r, g, b, a;
 			UINT32 color;
 			int num_verts = 0;
@@ -879,7 +806,7 @@ static void render_polygons(void)
 
 				v[j].x = ((float)(x) / 16.0f) + 256.0f;
 				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
-				v[j].z = *(float*)(&z);
+				v[j].p[0] = *(float*)(&z);
 
 				++num_verts;
 
@@ -894,27 +821,29 @@ static void render_polygons(void)
 			color = (a << 24) | (r << 16) | (g << 8) | (b);
 			index++;
 
-			draw_triangle(v[0], v[1], v[2], color);
-			if (num_verts > 3)
-			{
-				draw_triangle(v[2], v[3], v[0], color);
-			}
+			extra->color = color;
 
-			memcpy(prev_v, v, sizeof(VERTEX) * 4);
+			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+			if (num_verts > 3)
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, &v[2], &v[3], &v[0]);
+//          poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, num_verts, v);
+
+			memcpy(prev_v, v, sizeof(poly_vertex) * 4);
 
 			while ((K001005_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < K001005_3d_fifo_ptr)
 			{
+				poly_extra_data *extra = poly_get_extra_data(poly);
 				int new_verts = 0;
 
 				if (poly_type)
 				{
-					memcpy(&v[0], &prev_v[2], sizeof(VERTEX));
-					memcpy(&v[1], &prev_v[3], sizeof(VERTEX));
+					memcpy(&v[0], &prev_v[2], sizeof(poly_vertex));
+					memcpy(&v[1], &prev_v[3], sizeof(poly_vertex));
 				}
 				else
 				{
-					memcpy(&v[0], &prev_v[1], sizeof(VERTEX));
-					memcpy(&v[1], &prev_v[2], sizeof(VERTEX));
+					memcpy(&v[0], &prev_v[1], sizeof(poly_vertex));
+					memcpy(&v[1], &prev_v[2], sizeof(poly_vertex));
 				}
 
 				for (j=2; j < 4; j++)
@@ -936,7 +865,7 @@ static void render_polygons(void)
 
 					v[j].x = ((float)(x) / 16.0f) + 256.0f;
 					v[j].y = ((float)(-y) / 16.0f) + 192.0f;
-					v[j].z = *(float*)(&z);
+					v[j].p[0] = *(float*)(&z);
 
 					++new_verts;
 
@@ -951,13 +880,14 @@ static void render_polygons(void)
 				color = (a << 24) | (r << 16) | (g << 8) | (b);
 				index++;
 
-				draw_triangle(v[0], v[1], v[2], color);
-				if (new_verts > 1)
-				{
-					draw_triangle(v[0], v[2], v[3], color);
-				}
+				extra->color = color;
 
-				memcpy(prev_v, v, sizeof(VERTEX) * 4);
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+				if (new_verts > 1)
+					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
+//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &Machine->screen[0].visarea, draw_scanline, 1, new_verts + 2, v);
+
+				memcpy(prev_v, v, sizeof(poly_vertex) * 4);
 			};
 
 			i = index - 1;
@@ -1014,8 +944,16 @@ void K001005_swap_buffers(void)
 
 
 
+static void gticlub_exit(running_machine *machine)
+{
+	poly_free(poly);
+}
+
 VIDEO_START( gticlub )
 {
+	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	add_exit_callback(machine, gticlub_exit);
+
 	K001005_init();
 	K001604_vh_start(machine, 0);
 }

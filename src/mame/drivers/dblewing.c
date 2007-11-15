@@ -138,7 +138,7 @@ static int dblewing_bank_callback(const int bank)
 	return ((bank>>4) & 0x7) * 0x1000;
 }
 
-VIDEO_START(dblewing)
+static VIDEO_START(dblewing)
 {
 	deco16_1_video_init();
 
@@ -146,7 +146,7 @@ VIDEO_START(dblewing)
 	deco16_set_tilemap_bank_callback(1,dblewing_bank_callback);
 }
 
-VIDEO_UPDATE(dblewing)
+static VIDEO_UPDATE(dblewing)
 {
 
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
@@ -237,7 +237,7 @@ static UINT16 dblwings_200_data;
 static UINT16 dblwings_28c_data;
 
 
-READ16_HANDLER ( dlbewing_prot_r )
+static READ16_HANDLER ( dlbewing_prot_r )
 {
 	if ((offset*2)==0x068) return 0;//dblwings_78a_data;
 	if ((offset*2)==0x094) return dblwings_104_data; // p1 inputs select screen  OK
@@ -274,7 +274,7 @@ READ16_HANDLER ( dlbewing_prot_r )
 	return 0;//mame_rand(Machine);
 }
 
-WRITE16_HANDLER( dblewing_prot_w )
+static WRITE16_HANDLER( dblewing_prot_w )
 {
 	if ((offset*2)==0x008) { dblwings_008_data = data; return; }
 	if ((offset*2)==0x088) { dblwings_088_data = data; return; }

@@ -328,12 +328,12 @@ extern VIDEO_UPDATE( psychic5 );
 static int psychic5_bank_latch = 0x0;
 
 
-READ8_HANDLER( psychic5_bankselect_r )
+static READ8_HANDLER( psychic5_bankselect_r )
 {
 	return psychic5_bank_latch;
 }
 
-WRITE8_HANDLER( psychic5_bankselect_w )
+static WRITE8_HANDLER( psychic5_bankselect_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bankaddress;
@@ -346,7 +346,7 @@ WRITE8_HANDLER( psychic5_bankselect_w )
 	}
 }
 
-WRITE8_HANDLER( psychic5_coin_counter_w )
+static WRITE8_HANDLER( psychic5_coin_counter_w )
 {
 	coin_counter_w(0, data & 0x01);
 	coin_counter_w(1, data & 0x02);

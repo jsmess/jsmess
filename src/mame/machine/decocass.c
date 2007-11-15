@@ -907,7 +907,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
  *
  ***************************************************************************/
 
-READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
+static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 {
 	static UINT8 latch1;
 	UINT8 data;
@@ -988,7 +988,7 @@ READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
  *  - Tornado
  *
  ***************************************************************************/
-READ8_HANDLER( decocass_type2_r )
+static READ8_HANDLER( decocass_type2_r )
 {
 	UINT8 data;
 
@@ -1017,7 +1017,7 @@ READ8_HANDLER( decocass_type2_r )
 	return data;
 }
 
-WRITE8_HANDLER( decocass_type2_w )
+static WRITE8_HANDLER( decocass_type2_w )
 {
 	if (1 == type2_xx_latch)
 	{
@@ -1068,7 +1068,7 @@ WRITE8_HANDLER( decocass_type2_w )
  *  - Peter Pepper's Ice Cream Factory
  *
  ***************************************************************************/
-READ8_HANDLER( decocass_type3_r )
+static READ8_HANDLER( decocass_type3_r )
 {
 	UINT8 data, save;
 
@@ -1255,7 +1255,7 @@ READ8_HANDLER( decocass_type3_r )
 	return data;
 }
 
-WRITE8_HANDLER( decocass_type3_w )
+static WRITE8_HANDLER( decocass_type3_w )
 {
 	if (1 == (offset & 1))
 	{
@@ -1294,7 +1294,7 @@ WRITE8_HANDLER( decocass_type3_w )
  *
  ***************************************************************************/
 
-READ8_HANDLER( decocass_type4_r )
+static READ8_HANDLER( decocass_type4_r )
 {
 	UINT8 data;
 
@@ -1339,7 +1339,7 @@ READ8_HANDLER( decocass_type4_r )
 	return data;
 }
 
-WRITE8_HANDLER( decocass_type4_w )
+static WRITE8_HANDLER( decocass_type4_w )
 {
 	if (1 == (offset & 1))
 	{
@@ -1377,7 +1377,7 @@ WRITE8_HANDLER( decocass_type4_w )
  *
  ***************************************************************************/
 
-READ8_HANDLER( decocass_type5_r )
+static READ8_HANDLER( decocass_type5_r )
 {
 	UINT8 data;
 
@@ -1419,7 +1419,7 @@ READ8_HANDLER( decocass_type5_r )
 	return data;
 }
 
-WRITE8_HANDLER( decocass_type5_w )
+static WRITE8_HANDLER( decocass_type5_w )
 {
 	if (1 == (offset & 1))
 	{
@@ -1453,7 +1453,7 @@ WRITE8_HANDLER( decocass_type5_w )
  *
  ***************************************************************************/
 
-READ8_HANDLER( decocass_nodong_r )
+static READ8_HANDLER( decocass_nodong_r )
 {
 	UINT8 data;
 

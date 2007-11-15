@@ -395,7 +395,7 @@ static MACHINE_RESET( reikaids_upd7807 )
 	reikaids_upd7807_portc_w(0,0xff);
 }
 
-READ8_HANDLER( reikaids_io_r )
+static READ8_HANDLER( reikaids_io_r )
 {
 	int res = readinputport(2);	// bit 4 = coin, bit 5 = service
 

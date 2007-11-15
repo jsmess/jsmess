@@ -2208,18 +2208,18 @@ static DRIVER_INIT( aircombt )
 	namcos21_init( NAMCOS21_AIRCOMBAT );
 }
 
-DRIVER_INIT( starblad )
+static DRIVER_INIT( starblad )
 {
 	namcos21_init( NAMCOS21_STARBLADE );
 }
 
 
-DRIVER_INIT( cybsled )
+static DRIVER_INIT( cybsled )
 {
 	namcos21_init( NAMCOS21_CYBERSLED );
 }
 
-DRIVER_INIT( solvalou )
+static DRIVER_INIT( solvalou )
 {
 	UINT16 *mem = (UINT16 *)memory_region(REGION_CPU1);
 	mem[0x20ce4/2+1] = 0x0000; // $200128
@@ -2230,7 +2230,7 @@ DRIVER_INIT( solvalou )
 	namcos21_init( NAMCOS21_SOLVALOU );
 }
 
-DRIVER_INIT( driveyes )
+static DRIVER_INIT( driveyes )
 {
 	UINT16 *pMem = (UINT16 *)memory_region(REGION_CPU5);
 	int pc = 0;

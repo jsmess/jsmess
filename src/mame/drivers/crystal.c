@@ -704,7 +704,7 @@ static VIDEO_UPDATE(crystal)
 	return 0;
 }
 
-VIDEO_EOF(crystal)
+static VIDEO_EOF(crystal)
 {
 	UINT16 head,tail;
 	int DoFlip=0;
@@ -884,7 +884,7 @@ ROM_START( evosocc )
 ROM_END
 
 
-DRIVER_INIT(crysking)
+static DRIVER_INIT(crysking)
 {
 	UINT16 *Rom=(UINT16*) memory_region(REGION_USER1);
 
@@ -903,7 +903,7 @@ DRIVER_INIT(crysking)
 	Rom[WORD_XOR_LE(0x8a54/2)]=0x403c;	//NOP
 }
 
-DRIVER_INIT(evosocc)
+static DRIVER_INIT(evosocc)
 {
 	UINT16 *Rom=(UINT16*) memory_region(REGION_USER1);
 	Rom+=0x1000000*2/2;

@@ -56,7 +56,7 @@ logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",activec
 }
 
 
-WRITE16_HANDLER( zerozone_sound_w )
+static WRITE16_HANDLER( zerozone_sound_w )
 {
 	if (ACCESSING_MSB)
 	{

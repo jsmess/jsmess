@@ -34,19 +34,19 @@ static TILE_GET_INFO( get_ltcasino_tile_info )
 	SET_TILE_INFO(0,tileno,0,0);
 }
 
-VIDEO_START(ltcasino)
+static VIDEO_START(ltcasino)
 {
 	ltcasino_tilemap = tilemap_create(get_ltcasino_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 }
 
 
-WRITE8_HANDLER( ltcasino_tile_num_w )
+static WRITE8_HANDLER( ltcasino_tile_num_w )
 {
 	ltcasino_tile_num_ram[offset] = data;
 	tilemap_mark_tile_dirty(ltcasino_tilemap,offset);
 }
 
-WRITE8_HANDLER( ltcasino_tile_atr_w )
+static WRITE8_HANDLER( ltcasino_tile_atr_w )
 {
 	ltcasino_tile_atr_ram[offset] = data;
 	tilemap_mark_tile_dirty(ltcasino_tilemap,offset);
@@ -638,7 +638,7 @@ static GFXDECODE_START( ltcasino )
 GFXDECODE_END
 
 
-VIDEO_UPDATE(ltcasino)
+static VIDEO_UPDATE(ltcasino)
 {
 	tilemap_draw(bitmap,cliprect,ltcasino_tilemap,0,0);
 	return 0;

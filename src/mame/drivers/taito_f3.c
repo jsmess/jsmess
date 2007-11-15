@@ -405,7 +405,7 @@ static MACHINE_RESET( f3 )
 }
 
 
-NVRAM_HANDLER( taito_f3 )
+static NVRAM_HANDLER( taito_f3 )
 {
 	if (read_or_write)
 		EEPROM_save(file);

@@ -909,14 +909,14 @@ static void bbusters_patch_code(UINT16 offset)
 }
 #endif
 
-DRIVER_INIT( bbusters )
+static DRIVER_INIT( bbusters )
 {
 	#if BBUSTERS_HACK
 	bbusters_patch_code(0x00234c);
 	#endif
 }
 
-DRIVER_INIT( mechatt )
+static DRIVER_INIT( mechatt )
 {
 	#if MECHATT_HACK
 	bbusters_patch_code(0x003306);

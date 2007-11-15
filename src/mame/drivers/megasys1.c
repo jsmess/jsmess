@@ -149,13 +149,13 @@ WRITE16_HANDLER( megasys1_vregs_D_w );
 
 
 
-MACHINE_RESET( megasys1 )
+static MACHINE_RESET( megasys1 )
 {
 	megasys1_ignore_oki_status = 1;	/* ignore oki status due 'protection' */
 	ip_select = 0;	/* reset protection */
 }
 
-MACHINE_RESET( megasys1_hachoo )
+static MACHINE_RESET( megasys1_hachoo )
 {
 	megasys1_ignore_oki_status = 0;	/* strangely hachoo need real oki status */
 	ip_select = 0;	/* reset protection */
@@ -3452,11 +3452,11 @@ static INPUT_PORTS_START( soldamj )
 
 INPUT_PORTS_END
 
-READ16_HANDLER( soldamj_spriteram16_r )
+static READ16_HANDLER( soldamj_spriteram16_r )
 {
 	return spriteram16[offset];
 }
-WRITE16_HANDLER( soldamj_spriteram16_w )
+static WRITE16_HANDLER( soldamj_spriteram16_w )
 {
 	if (offset < 0x800/2)	COMBINE_DATA(&spriteram16[offset]);
 }

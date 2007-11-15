@@ -535,7 +535,7 @@ static void voodoo_vblank_0(int param)
 	cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-VIDEO_START( nwktr )
+static VIDEO_START( nwktr )
 {
 	voodoo_start(0, 0, VOODOO_1, 2, 2, 2);
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
@@ -544,7 +544,7 @@ VIDEO_START( nwktr )
 }
 
 
-VIDEO_UPDATE( nwktr )
+static VIDEO_UPDATE( nwktr )
 {
 	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
 

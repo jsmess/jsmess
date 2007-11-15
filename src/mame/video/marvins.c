@@ -89,10 +89,12 @@ static void update_palette(running_machine *machine, int type )
 **
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( marvins_spriteram_w )
 {
 	spriteram[offset] = data;
 }
+#endif
 
 WRITE8_HANDLER( marvins_foreground_ram_w )
 {

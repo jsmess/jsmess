@@ -945,6 +945,8 @@ static void add_register(debug_view *view, int regnum, const char *str)
 		valstart++, vallen--;
 	while (isspace(str[valstart + vallen - 1]) && vallen > 0)
 		vallen--;
+	if (str[valstart] == '!')
+		valstart++, vallen--;
 
 	/* note the register number and info */
 	regdata->reg[view->total_rows].lastval  =

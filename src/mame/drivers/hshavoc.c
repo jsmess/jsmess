@@ -208,7 +208,7 @@ static DRIVER_INIT(genesis)
 	memory_set_bankptr(4, genesis_68k_ram );
 }
 
-DRIVER_INIT(hshavoc)
+static DRIVER_INIT(hshavoc)
 {
 
 	int x;

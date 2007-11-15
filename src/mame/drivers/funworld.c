@@ -773,7 +773,7 @@ extern VIDEO_UPDATE( funworld );
 * Read/Write Handlers *
 **********************/
 
-WRITE8_HANDLER(funworld_lamp_a_w)
+static WRITE8_HANDLER(funworld_lamp_a_w)
 {
 	coin_counter_w(0, data & 0x01);		// credit in counter
 
@@ -787,7 +787,7 @@ WRITE8_HANDLER(funworld_lamp_a_w)
 	output_set_lamp_value(3, (data >> 7) & 1);		// button hold4/high
 }
 
-WRITE8_HANDLER(funworld_lamp_b_w)
+static WRITE8_HANDLER(funworld_lamp_b_w)
 {
 	output_set_lamp_value(4, (data >> 0) & 1);		// button hold5/bet
 	output_set_lamp_value(6, (data >> 1) & 1);		// button 7 (start/play)

@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( splash_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(MRA16_RAM)			/* Work RAM */
 ADDRESS_MAP_END
 
-WRITE16_HANDLER( splash_coin_w )
+static WRITE16_HANDLER( splash_coin_w )
 {
 	if (ACCESSING_MSB){
 		switch ((offset >> 3)){
@@ -877,25 +877,25 @@ ROM_END
 
 /* DRIVER INITs */
 
-DRIVER_INIT( splash )
+static DRIVER_INIT( splash )
 {
 	splash_bitmap_type = 0;
 	splash_sprite_attr2_shift = 8;
 }
 
-DRIVER_INIT( splash10 )
+static DRIVER_INIT( splash10 )
 {
 	splash_bitmap_type = 0;
 	splash_sprite_attr2_shift = 0;
 }
 
-DRIVER_INIT( roldfrog )
+static DRIVER_INIT( roldfrog )
 {
 	splash_bitmap_type = 1;
 	splash_sprite_attr2_shift = 8;
 }
 
-DRIVER_INIT( rebus )
+static DRIVER_INIT( rebus )
 {
 	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
 	splash_bitmap_type = 1;
@@ -923,7 +923,7 @@ DRIVER_INIT( rebus )
 
 
 
-DRIVER_INIT( funystrp )
+static DRIVER_INIT( funystrp )
 {
 	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
 

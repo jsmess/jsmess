@@ -83,52 +83,52 @@ static MACHINE_RESET( flyball )
 
 /* two physical buttons (start game and stop runner) share the same port bit */
 
-READ8_HANDLER( flyball_input_r )
+static READ8_HANDLER( flyball_input_r )
 {
 	return readinputport(0) & readinputport(5);
 }
 
-READ8_HANDLER( flyball_scanline_r )
+static READ8_HANDLER( flyball_scanline_r )
 {
 	return video_screen_get_vpos(0) & 0x3f;
 }
 
-READ8_HANDLER( flyball_potsense_r )
+static READ8_HANDLER( flyball_potsense_r )
 {
 	return flyball_potsense & ~flyball_potmask;
 }
 
-WRITE8_HANDLER( flyball_potmask_w )
+static WRITE8_HANDLER( flyball_potmask_w )
 {
 	flyball_potmask |= data & 0xf;
 }
 
-WRITE8_HANDLER( flyball_pitcher_pic_w )
+static WRITE8_HANDLER( flyball_pitcher_pic_w )
 {
 	flyball_pitcher_pic = data & 0xf;
 }
 
-WRITE8_HANDLER( flyball_ball_vert_w )
+static WRITE8_HANDLER( flyball_ball_vert_w )
 {
 	flyball_ball_vert = data;
 }
 
-WRITE8_HANDLER( flyball_ball_horz_w )
+static WRITE8_HANDLER( flyball_ball_horz_w )
 {
 	flyball_ball_horz = data;
 }
 
-WRITE8_HANDLER( flyball_pitcher_vert_w )
+static WRITE8_HANDLER( flyball_pitcher_vert_w )
 {
 	flyball_pitcher_vert = data;
 }
 
-WRITE8_HANDLER( flyball_pitcher_horz_w )
+static WRITE8_HANDLER( flyball_pitcher_horz_w )
 {
 	flyball_pitcher_horz = data;
 }
 
-WRITE8_HANDLER( flyball_misc_w )
+static WRITE8_HANDLER( flyball_misc_w )
 {
 	int bit = ~data & 1;
 
@@ -249,7 +249,7 @@ static GFXDECODE_START( flyball )
 GFXDECODE_END
 
 
-PALETTE_INIT( flyball )
+static PALETTE_INIT( flyball )
 {
 	palette_set_color(machine, 0, MAKE_RGB(0x3F, 0x3F, 0x3F));  /* tiles, ball */
 	palette_set_color(machine, 1, MAKE_RGB(0xFF, 0xFF, 0xFF));

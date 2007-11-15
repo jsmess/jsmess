@@ -362,7 +362,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
-VIDEO_START( powerbal )
+static VIDEO_START( powerbal )
 {
 	bg_tilemap = tilemap_create(powerbal_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
@@ -371,7 +371,7 @@ VIDEO_START( powerbal )
 	tilemap_set_scrolly(bg_tilemap, 0, bg_yoffset);
 }
 
-VIDEO_UPDATE( powerbal )
+static VIDEO_UPDATE( powerbal )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(machine,bitmap,cliprect);
@@ -577,13 +577,13 @@ ROM_START( magicstk )
 	ROM_LOAD( "gal22v10b.bin", 0x0400, 0x02e5, NO_DUMP ) /* GAL is soldered */
 ROM_END
 
-DRIVER_INIT( powerbal )
+static DRIVER_INIT( powerbal )
 {
 	bg_yoffset = 16;
 	yoffset = -8;
 }
 
-DRIVER_INIT( magicstk )
+static DRIVER_INIT( magicstk )
 {
 	bg_yoffset = 0;
 	yoffset = -5;

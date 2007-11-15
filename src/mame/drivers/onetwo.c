@@ -239,12 +239,12 @@ static GFXDECODE_START( onetwo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8x6_layout, 0, 2 )
 GFXDECODE_END
 
-VIDEO_START( onetwo )
+static VIDEO_START( onetwo )
 {
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 }
 
-VIDEO_UPDATE( onetwo )
+static VIDEO_UPDATE( onetwo )
 {
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;

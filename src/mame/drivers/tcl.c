@@ -41,10 +41,10 @@ Notes:
 #include "sound/ay8910.h"
 
 
-VIDEO_START( tcl )
+static VIDEO_START( tcl )
 {
 }
-VIDEO_UPDATE( tcl )
+static VIDEO_UPDATE( tcl )
 {
 	return 0;
 }
@@ -97,7 +97,7 @@ static ppi8255_interface ppi8255_intf =
 	{ NULL, NULL },
 };
 
-MACHINE_RESET( tcl )
+static MACHINE_RESET( tcl )
 {
 	ppi8255_init(&ppi8255_intf);
 }
@@ -166,7 +166,7 @@ ROM_END
 		dest[idx+0x10000]=(n)^0xff;	\
 		idx++;
 
-DRIVER_INIT(tcl)
+static DRIVER_INIT(tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 

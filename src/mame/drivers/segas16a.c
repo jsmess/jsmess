@@ -234,7 +234,7 @@ static TIMER_CALLBACK( suspend_i8751 )
  *
  *************************************/
 
-MACHINE_RESET( system16a )
+static MACHINE_RESET( system16a )
 {
 	fd1094_machine_init();
 

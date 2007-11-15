@@ -59,11 +59,11 @@ static GFXDECODE_START( intrscti )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-VIDEO_START(intrscti)
+static VIDEO_START(intrscti)
 {
 }
 
-VIDEO_UPDATE(intrscti)
+static VIDEO_UPDATE(intrscti)
 {
 	int y,x;
 	int count;
@@ -124,7 +124,7 @@ ROM_START( intrscti )
 	ROM_LOAD( "b.5a", 0x2000, 0x1000, CRC(8951fb7e) SHA1(c423bf0536e3a09453814172e31b47f9c3c3324c) )
 ROM_END
 
-DRIVER_INIT( intrscti )
+static DRIVER_INIT( intrscti )
 {
 	UINT8 *cpu = memory_region( REGION_CPU1 );
 	int i;

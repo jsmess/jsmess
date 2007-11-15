@@ -90,7 +90,7 @@ static UINT8 hv_blank;
 
 static void cga_alphanumeric_tilemap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs);
 
-VIDEO_START( filetto )
+static VIDEO_START( filetto )
 {
 }
 
@@ -235,7 +235,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, mame_bitmap *bitm
 }
 
 
-VIDEO_UPDATE( filetto )
+static VIDEO_UPDATE( filetto )
 {
 /*          xx1x xxxx  Attribute bit 7. 0=blink, 1=Intesity
             xxx1 xxxx  640x200 mode

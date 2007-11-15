@@ -234,14 +234,14 @@ int main(int argc, char *argv[])
 	v.product_name = "MESS";
 	begin_year = 1998;
 #elif defined(WINUI)
-	// MAME32
-	v.author = "Christopher Kirmse and Michael Soderstrom";
-	v.comments = "Multiple Arcade Machine Emulator for Win32";
+	// MAMEUI
+	v.author = "Christopher Kirmse and the MAMEUI team";
+	v.comments = "Multiple Arcade Machine Emulator with GUI";
 	v.company_name = "MAME Team";
-	v.file_description = "Multiple Arcade Machine Emulator for Win32";
-	v.internal_name = "MAME32";
-	v.original_filename = "MAME32";
-	v.product_name = "MAME32";
+	v.file_description = "Multiple Arcade Machine Emulator with GUI";
+	v.internal_name = "MAMEUI";
+	v.original_filename = "MAMEUI";
+	v.product_name = "MAMEUI";
 	begin_year = 1997;
 #else
 	// MAME

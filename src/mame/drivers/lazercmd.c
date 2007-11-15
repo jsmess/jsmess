@@ -768,7 +768,7 @@ ROM_START( bbonk )
 ROM_END
 
 
-DRIVER_INIT( lazercmd )
+static DRIVER_INIT( lazercmd )
 {
 int i, y;
 
@@ -796,7 +796,7 @@ UINT8 *s = &memory_region(REGION_GFX1)[4 * 64 * 10 + i * VERT_FNT];
 	}
 }
 
-DRIVER_INIT( medlanes )
+static DRIVER_INIT( medlanes )
 {
 int i, y;
 
@@ -824,7 +824,7 @@ UINT8 *s = &memory_region(REGION_GFX1)[4 * 64 * 10 + i * VERT_FNT];
 	}
 }
 
-DRIVER_INIT( bbonk )
+static DRIVER_INIT( bbonk )
 {
 int i, y;
 

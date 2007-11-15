@@ -110,10 +110,10 @@ static MACHINE_START( mario )
 #define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
 
 
-WRITE8_HANDLER( mario_sh_getcoin_w )    { t[0] = data; }
-WRITE8_HANDLER( mario_sh_crab_w )       { p[1] = ACTIVEHIGH_PORT_BIT(p[1],0,data); }
-WRITE8_HANDLER( mario_sh_turtle_w )     { p[1] = ACTIVEHIGH_PORT_BIT(p[1],1,data); }
-WRITE8_HANDLER( mario_sh_fly_w )        { p[1] = ACTIVEHIGH_PORT_BIT(p[1],2,data); }
+static WRITE8_HANDLER( mario_sh_getcoin_w )    { t[0] = data; }
+static WRITE8_HANDLER( mario_sh_crab_w )       { p[1] = ACTIVEHIGH_PORT_BIT(p[1],0,data); }
+static WRITE8_HANDLER( mario_sh_turtle_w )     { p[1] = ACTIVEHIGH_PORT_BIT(p[1],1,data); }
+static WRITE8_HANDLER( mario_sh_fly_w )        { p[1] = ACTIVEHIGH_PORT_BIT(p[1],2,data); }
 static WRITE8_HANDLER( mario_sh_tuneselect_w ) { soundlatch_w(offset,data); }
 
 static READ8_HANDLER( mario_sh_p1_r )   { return p[1]; }
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( mario_sh_p2_w )
 {
 	p[2] = data;
 }
-WRITE8_HANDLER( masao_sh_irqtrigger_w )
+static WRITE8_HANDLER( masao_sh_irqtrigger_w )
 {
 	if (last == 1 && data == 0)
 	{

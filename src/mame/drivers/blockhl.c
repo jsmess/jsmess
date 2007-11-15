@@ -58,7 +58,7 @@ static WRITE8_HANDLER( bankedram_w )
 		ram[offset] = data;
 }
 
-WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
+static WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
 {
 	cpunum_set_input_line_and_vector(1, 0, HOLD_LINE, 0xff);
 }

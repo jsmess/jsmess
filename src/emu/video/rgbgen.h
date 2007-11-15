@@ -300,49 +300,17 @@ INLINE void rgbaint_scale_and_clamp(rgbaint *color, INT16 colorscale)
 
 INLINE rgb_t rgb_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
 {
-	UINT32 agd1 = (rgb01 & 0xff00ff00) - (rgb00 & 0xff00ff00);
-	UINT32 agd2 = (rgb11 & 0xff00ff00) - (rgb10 & 0xff00ff00);
-	UINT32 rbd1 = (rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff);
-	UINT32 rbd2 = (rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff);
-	agd1 >>= 8;
-	agd2 >>= 8;
+	UINT32 ag0, ag1, rb0, rb1;
 
-	rbd1 *= u;  rgb01 = (rgb00 & 0x00ff00ff);
-	agd1 *= u;  rbd1 >>= 8;
-	rbd2 *= u;  rgb11 = (rgb10 & 0x00ff00ff);
-	agd2 *= u;  rbd2 >>= 8;
+	rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+	rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
+	ag0 = (rgb00 & 0x0000ff00) + ((((rgb01 & 0x0000ff00) - (rgb00 & 0x0000ff00)) * u) >> 8);
+	ag1 = (rgb10 & 0x0000ff00) + ((((rgb11 & 0x0000ff00) - (rgb10 & 0x0000ff00)) * u) >> 8);
 
-	rgb01 += rbd1;
-	rgb00 += agd1;
+	rb0 = (rb0 & 0x00ff00ff) + ((((rb1 & 0x00ff00ff) - (rb0 & 0x00ff00ff)) * v) >> 8);
+	ag0 = (ag0 & 0x0000ff00) + ((((ag1 & 0x0000ff00) - (ag0 & 0x0000ff00)) * v) >> 8);
 
-	rgb11 += rbd2;
-	rgb10 += agd2;
-
-	rgb01 &= 0x00ff00ff;
-	rgb00 &= 0xff00ff00;
-	rgb10 &= 0xff00ff00;
-	rgb11 &= 0x00ff00ff;
-
-	// ---- rgb11 is now rb for the bottom
-	//      rgb10 is     ag for the bottom
-	//      rgb01 is     rb for the top
-	//      rgb00 is     ag for the top
-
-	rgb10 -= rgb00;  // agd
-	rgb11 -= rgb01;  // rbd
-	rgb10 >>= 8;
-
-	rgb11 *= v;
-	rgb10 *= v;
-	rgb11 >>= 8;
-
-	rgb00 += rgb10;
-	rgb01 += rgb11;
-
-	rgb00 &= 0xff00ff00;
-	rgb01 &= 0x00ff00ff;
-
-	return rgb00 | rgb01;
+	return (ag0 & 0x0000ff00) | (rb0 & 0x00ff00ff);
 }
 
 
@@ -354,49 +322,21 @@ INLINE rgb_t rgb_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rg
 
 INLINE rgb_t rgba_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
 {
-	UINT32 agd1 = (rgb01 & 0xff00ff00) - (rgb00 & 0xff00ff00);
-	UINT32 agd2 = (rgb11 & 0xff00ff00) - (rgb10 & 0xff00ff00);
-	UINT32 rbd1 = (rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff);
-	UINT32 rbd2 = (rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff);
-	agd1 >>= 8;
-	agd2 >>= 8;
+	UINT32 ag0, ag1, rb0, rb1;
 
-	rbd1 *= u;  rgb01 = (rgb00 & 0x00ff00ff);
-	agd1 *= u;  rbd1 >>= 8;
-	rbd2 *= u;  rgb11 = (rgb10 & 0x00ff00ff);
-	agd2 *= u;  rbd2 >>= 8;
-
-	rgb01 += rbd1;
-	rgb00 += agd1;
-
-	rgb11 += rbd2;
-	rgb10 += agd2;
-
-	rgb01 &= 0x00ff00ff;
-	rgb00 &= 0xff00ff00;
-	rgb10 &= 0xff00ff00;
-	rgb11 &= 0x00ff00ff;
-
-	// ---- rgb11 is now rb for the bottom
-	//      rgb10 is     ag for the bottom
-	//      rgb01 is     rb for the top
-	//      rgb00 is     ag for the top
-
-	rgb10 -= rgb00;  // agd
-	rgb11 -= rgb01;  // rbd
+	rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+	rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
+	rgb00 >>= 8;
+	rgb01 >>= 8;
 	rgb10 >>= 8;
-
-	rgb11 *= v;
-	rgb10 *= v;
 	rgb11 >>= 8;
+	ag0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+	ag1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
 
-	rgb00 += rgb10;
-	rgb01 += rgb11;
+	rb0 = (rb0 & 0x00ff00ff) + ((((rb1 & 0x00ff00ff) - (rb0 & 0x00ff00ff)) * v) >> 8);
+	ag0 = (ag0 & 0x00ff00ff) + ((((ag1 & 0x00ff00ff) - (ag0 & 0x00ff00ff)) * v) >> 8);
 
-	rgb00 &= 0xff00ff00;
-	rgb01 &= 0x00ff00ff;
-
-	return rgb00 | rgb01;
+	return ((ag0 << 8) & 0xff00ff00) | (rb0 & 0x00ff00ff);
 }
 
 
@@ -408,48 +348,19 @@ INLINE rgb_t rgba_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t r
 
 INLINE void rgbint_bilinear_filter(rgbint *color, rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
 {
-	UINT32 agd1 = (rgb01 & 0xff00ff00) - (rgb00 & 0xff00ff00);
-	UINT32 agd2 = (rgb11 & 0xff00ff00) - (rgb10 & 0xff00ff00);
-	UINT32 rbd1 = (rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff);
-	UINT32 rbd2 = (rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff);
-	agd1 >>= 8;
-	agd2 >>= 8;
+	UINT32 ag0, ag1, rb0, rb1;
 
-	rbd1 *= u;  rgb01 = (rgb00 & 0x00ff00ff);
-	agd1 *= u;  rbd1 >>= 8;
-	rbd2 *= u;  rgb11 = (rgb10 & 0x00ff00ff);
-	agd2 *= u;  rbd2 >>= 8;
+	rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+	rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
+	ag0 = (rgb00 & 0x0000ff00) + ((((rgb01 & 0x0000ff00) - (rgb00 & 0x0000ff00)) * u) >> 8);
+	ag1 = (rgb10 & 0x0000ff00) + ((((rgb11 & 0x0000ff00) - (rgb10 & 0x0000ff00)) * u) >> 8);
 
-	rgb01 += rbd1;
-	rgb00 += agd1;
+	rb0 = (rb0 & 0x00ff00ff) + ((((rb1 & 0x00ff00ff) - (rb0 & 0x00ff00ff)) * v) >> 8);
+	ag0 = (ag0 & 0x0000ff00) + ((((ag1 & 0x0000ff00) - (ag0 & 0x0000ff00)) * v) >> 8);
 
-	rgb11 += rbd2;
-	rgb10 += agd2;
-
-	rgb01 &= 0x00ff00ff;
-	rgb00 &= 0xff00ff00;
-	rgb10 &= 0xff00ff00;
-	rgb11 &= 0x00ff00ff;
-
-	// ---- rgb11 is now rb for the bottom
-	//      rgb10 is     ag for the bottom
-	//      rgb01 is     rb for the top
-	//      rgb00 is     ag for the top
-
-	rgb10 -= rgb00;  // agd
-	rgb11 -= rgb01;  // rbd
-	rgb10 >>= 8;
-
-	rgb11 *= v;
-	rgb10 *= v;
-	rgb11 >>= 8;
-
-	rgb00 += rgb10;
-	rgb01 += rgb11;
-
-	color->r = (rgb01 >> 16) & 0xff;
-	color->g = (rgb00 >> 8) & 0xff;
-	color->b = (rgb01 >> 0) & 0xff;
+	color->r = rb0 >> 16;
+	color->g = ag0 >> 8;
+	color->b = rb0;
 }
 
 
@@ -461,49 +372,24 @@ INLINE void rgbint_bilinear_filter(rgbint *color, rgb_t rgb00, rgb_t rgb01, rgb_
 
 INLINE void rgbaint_bilinear_filter(rgbaint *color, rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
 {
-	UINT32 agd1 = (rgb01 & 0xff00ff00) - (rgb00 & 0xff00ff00);
-	UINT32 agd2 = (rgb11 & 0xff00ff00) - (rgb10 & 0xff00ff00);
-	UINT32 rbd1 = (rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff);
-	UINT32 rbd2 = (rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff);
-	agd1 >>= 8;
-	agd2 >>= 8;
+	UINT32 ag0, ag1, rb0, rb1;
 
-	rbd1 *= u;  rgb01 = (rgb00 & 0x00ff00ff);
-	agd1 *= u;  rbd1 >>= 8;
-	rbd2 *= u;  rgb11 = (rgb10 & 0x00ff00ff);
-	agd2 *= u;  rbd2 >>= 8;
-
-	rgb01 += rbd1;
-	rgb00 += agd1;
-
-	rgb11 += rbd2;
-	rgb10 += agd2;
-
-	rgb01 &= 0x00ff00ff;
-	rgb00 &= 0xff00ff00;
-	rgb10 &= 0xff00ff00;
-	rgb11 &= 0x00ff00ff;
-
-	// ---- rgb11 is now rb for the bottom
-	//      rgb10 is     ag for the bottom
-	//      rgb01 is     rb for the top
-	//      rgb00 is     ag for the top
-
-	rgb10 -= rgb00;  // agd
-	rgb11 -= rgb01;  // rbd
+	rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+	rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
+	rgb00 >>= 8;
+	rgb01 >>= 8;
 	rgb10 >>= 8;
-
-	rgb11 *= v;
-	rgb10 *= v;
 	rgb11 >>= 8;
+	ag0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+	ag1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
 
-	rgb00 += rgb10;
-	rgb01 += rgb11;
+	rb0 = (rb0 & 0x00ff00ff) + ((((rb1 & 0x00ff00ff) - (rb0 & 0x00ff00ff)) * v) >> 8);
+	ag0 = (ag0 & 0x00ff00ff) + ((((ag1 & 0x00ff00ff) - (ag0 & 0x00ff00ff)) * v) >> 8);
 
-	color->a = (rgb00 >> 24) & 0xff;
-	color->r = (rgb01 >> 16) & 0xff;
-	color->g = (rgb00 >> 8) & 0xff;
-	color->b = (rgb01 >> 0) & 0xff;
+	color->a = ag0 >> 16;
+	color->r = rb0 >> 16;
+	color->g = ag0;
+	color->b = rb0;
 }
 
 

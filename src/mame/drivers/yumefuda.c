@@ -71,12 +71,12 @@ static TILE_GET_INFO( y_get_bg_tile_info )
 }
 
 
-VIDEO_START( yumefuda )
+static VIDEO_START( yumefuda )
 {
 	bg_tilemap = tilemap_create(y_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
-VIDEO_UPDATE( yumefuda )
+static VIDEO_UPDATE( yumefuda )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	return 0;

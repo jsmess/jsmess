@@ -66,8 +66,8 @@ To do:
 
 ***************************************************************************/
 
-VIDEO_START( darkhors );
-VIDEO_UPDATE( darkhors );
+static VIDEO_START( darkhors );
+static VIDEO_UPDATE( darkhors );
 
 static tilemap *darkhors_tmap, *darkhors_tmap2;
 UINT32 *darkhors_tmapram,  *darkhors_tmapscroll;
@@ -87,12 +87,12 @@ static TILE_GET_INFO( get_tile_info_1 )
 	SET_TILE_INFO(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
-WRITE32_HANDLER( darkhors_tmapram_w )
+static WRITE32_HANDLER( darkhors_tmapram_w )
 {
 	COMBINE_DATA(&darkhors_tmapram[offset]);
 	tilemap_mark_tile_dirty(darkhors_tmap, offset);
 }
-WRITE32_HANDLER( darkhors_tmapram2_w )
+static WRITE32_HANDLER( darkhors_tmapram2_w )
 {
 	COMBINE_DATA(&darkhors_tmapram2[offset]);
 	tilemap_mark_tile_dirty(darkhors_tmap2, offset);
@@ -133,7 +133,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_START( darkhors )
+static VIDEO_START( darkhors )
 {
 	darkhors_tmap			=	tilemap_create(	get_tile_info_0, tilemap_scan_rows,
 												TILEMAP_TYPE_PEN, 16,16, 0x40,0x40	);
@@ -147,7 +147,7 @@ VIDEO_START( darkhors )
 	machine->gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
-VIDEO_UPDATE( darkhors )
+static VIDEO_UPDATE( darkhors )
 {
 	int layers_ctrl = -1;
 
@@ -211,7 +211,7 @@ static struct EEPROM_interface eeprom_interface =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-NVRAM_HANDLER( darkhors )
+static NVRAM_HANDLER( darkhors )
 {
 	if (read_or_write)
 		EEPROM_save(file);
@@ -228,13 +228,13 @@ NVRAM_HANDLER( darkhors )
 	}
 }
 
-READ32_HANDLER( darkhors_eeprom_r )
+static READ32_HANDLER( darkhors_eeprom_r )
 {
 	// bit 31?
 	return readinputport(4) | ((EEPROM_read_bit() & 1) << (7+16));
 }
 
-WRITE32_HANDLER( darkhors_eeprom_w )
+static WRITE32_HANDLER( darkhors_eeprom_w )
 {
 	if (data & ~0xff000000)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %08X\n",activecpu_get_pc(),data);

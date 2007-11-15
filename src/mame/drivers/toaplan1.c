@@ -2399,18 +2399,18 @@ ROM_START( vimanan )
 ROM_END
 
 
-DRIVER_INIT( toaplan1 )
+static DRIVER_INIT( toaplan1 )
 {
 	toaplan1_driver_savestate();
 }
 
-DRIVER_INIT( demonwld )
+static DRIVER_INIT( demonwld )
 {
 	toaplan1_driver_savestate();
 	demonwld_driver_savestate();
 }
 
-DRIVER_INIT( vimana )
+static DRIVER_INIT( vimana )
 {
 	toaplan1_driver_savestate();
 	vimana_driver_savestate();

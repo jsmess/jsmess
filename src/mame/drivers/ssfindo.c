@@ -220,7 +220,7 @@ static mame_timer *PS7500timer0;
 static mame_timer *PS7500timer1;
 
 
-VIDEO_UPDATE(ssfindo)
+static VIDEO_UPDATE(ssfindo)
 {
 	int s,x,y;
 

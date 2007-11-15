@@ -58,11 +58,11 @@
 
 #include "driver.h"
 
-VIDEO_START(comebaby)
+static VIDEO_START(comebaby)
 {
 }
 
-VIDEO_UPDATE(comebaby)
+static VIDEO_UPDATE(comebaby)
 {
 	return 0;
 }

@@ -196,7 +196,7 @@ static TIMER_CALLBACK( boost_interleave )
 }
 
 
-MACHINE_RESET( system18 )
+static MACHINE_RESET( system18 )
 {
 	segaic16_memory_mapper_reset();
 	segaic16_tilemap_reset(0);

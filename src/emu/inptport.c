@@ -2402,6 +2402,15 @@ void input_port_parse_diplocation(input_port_entry *in, const char *location)
 		if (curname == NULL)
 			fatalerror("Switch location '%s' missing switch name!", location);
 
+		/* if the number is preceded by a '!' it's active high */
+		if (*number == '!')
+		{
+			in->diploc[index].invert = 1;
+			number++;
+		}
+		else
+			in->diploc[index].invert = 0;
+
 		/* now scan the switch number */
 		if (sscanf(number, "%d", &val) != 1)
 			fatalerror("Switch location '%s' has invalid format!", location);

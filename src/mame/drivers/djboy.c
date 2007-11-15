@@ -645,11 +645,11 @@ static READ8_HANDLER( beast_status_r )
 /******************************************************************************/
 static int bankxor;
 
-DRIVER_INIT( djboy )
+static DRIVER_INIT( djboy )
 {
 	bankxor = 0x00;
 }
-DRIVER_INIT( djboyj )
+static DRIVER_INIT( djboyj )
 {
 	bankxor = 0x1f;
 }

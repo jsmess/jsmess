@@ -36,11 +36,11 @@ ROMs
 
 #include "driver.h"
 
-VIDEO_START(steaser)
+static VIDEO_START(steaser)
 {
 }
 
-VIDEO_UPDATE(steaser)
+static VIDEO_UPDATE(steaser)
 {
 	return 0;
 }

@@ -83,7 +83,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 	logerror("Warning %04x- %02x written to control %02x\n",activecpu_get_pc(),data,offset);
 }
 
-READ16_HANDLER( twocrude_control_r )
+static READ16_HANDLER( twocrude_control_r )
 {
 	switch (offset<<1)
 	{

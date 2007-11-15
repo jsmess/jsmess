@@ -15,12 +15,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
-VIDEO_START(igs_180)
+static VIDEO_START(igs_180)
 {
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 }
 
-VIDEO_UPDATE(igs_180)
+static VIDEO_UPDATE(igs_180)
 {
 	tilemap_mark_all_tiles_dirty(fg_tilemap);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

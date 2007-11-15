@@ -141,7 +141,7 @@ static READ8_HANDLER( dsw0_port_r )
 
 //static int popflame_prot_count = 0;
 
-READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
+static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 {
 	static int values[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
 	static int count;
@@ -740,7 +740,7 @@ ROM_START( trvgns )
 ROM_END
 
 
-DRIVER_INIT( popflame )
+static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9000, 0, 0, popflame_protection_r);
@@ -769,7 +769,7 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 	}
 }
 
-DRIVER_INIT( trvmstr )
+static DRIVER_INIT( trvmstr )
 {
 	/* install questions' handlers  */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, trvmstr_questions_r);

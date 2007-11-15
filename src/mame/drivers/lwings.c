@@ -63,12 +63,12 @@ static int avengers_palette_pen;
 static UINT8 *avengers_soundlatch2, avengers_soundstate=0;
 static UINT8 avengers_adpcm;
 
-WRITE8_HANDLER( avengers_adpcm_w )
+static WRITE8_HANDLER( avengers_adpcm_w )
 {
 	avengers_adpcm = data;
 }
 
-READ8_HANDLER( avengers_adpcm_r )
+static READ8_HANDLER( avengers_adpcm_r )
 {
 	return avengers_adpcm;
 }

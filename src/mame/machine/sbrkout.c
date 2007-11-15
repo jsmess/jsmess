@@ -54,11 +54,13 @@ READ8_HANDLER( sbrkout_select2_r )
     else return 0x00;
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( sbrkout_irq_w )
 {
         /* generate irq */
         cpunum_set_input_line(0,M6502_IRQ_LINE,HOLD_LINE);
 }
+#endif
 
 
 /***************************************************************************

@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "eminline.h"
 #include "includes/midzeus.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 
 
 
@@ -201,7 +201,7 @@ VIDEO_START( midzeus )
 		palette_set_color_rgb(machine, i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 
 	/* initialize polygon engine */
-	poly = poly_alloc(1000, sizeof(poly_extra_data), 0);
+	poly = poly_alloc(1000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
 	add_exit_callback(machine, exit_handler);
@@ -603,19 +603,19 @@ Zeus cmd 1C : ( 4000 0000 0000 ) ( 0000 4000 0000 ) ( 0000 0000 4000 )  -101.00 
 */
 
 
-static void render_poly_4bit(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	float doozdx = poly->param[0].dpdx;
-	float duozdx = poly->param[1].dpdx;
-	float dvozdx = poly->param[2].dpdx;
+	float ooz = extent->param[0].start;
+	float uoz = extent->param[1].start;
+	float voz = extent->param[2].start;
+	float doozdx = extent->param[0].dpdx;
+	float duozdx = extent->param[1].dpdx;
+	float dvozdx = extent->param[2].dpdx;
 	const UINT32 *texbase = extra->texbase;
 	const UINT32 *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
 	int texwidth = extra->texwidth;
-	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
-	float uoz = poly_param_tri_value(extent->startx, scanline, 1, poly);
-	float voz = poly_param_tri_value(extent->startx, scanline, 2, poly);
 	int x;
 
 	for (x = extent->startx; x < extent->stopx; x++)
@@ -640,19 +640,19 @@ static void render_poly_4bit(void *dest, INT32 scanline, const tri_extent *exten
 }
 
 
-static void render_poly_8bit(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	float doozdx = poly->param[0].dpdx;
-	float duozdx = poly->param[1].dpdx;
-	float dvozdx = poly->param[2].dpdx;
+	float ooz = extent->param[0].start;
+	float uoz = extent->param[1].start;
+	float voz = extent->param[2].start;
+	float doozdx = extent->param[0].dpdx;
+	float duozdx = extent->param[1].dpdx;
+	float dvozdx = extent->param[2].dpdx;
 	const UINT32 *texbase = extra->texbase;
 	const UINT32 *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
 	int texwidth = extra->texwidth;
-	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
-	float uoz = poly_param_tri_value(extent->startx, scanline, 1, poly);
-	float voz = poly_param_tri_value(extent->startx, scanline, 2, poly);
 	int x;
 
 	for (x = extent->startx; x < extent->stopx; x++)
@@ -757,7 +757,7 @@ static void zeus_draw_polys(UINT32 addr_and_count, UINT32 texdata, int logcmd)
 
 			if ((data[datanum] >> 24) == 0x25 || (data[datanum] >> 24) == 0x30 /* invasn */)
 			{
-				poly_draw_tri_scanline callback;
+				poly_draw_scanline callback;
 				poly_extra_data *extra;
 				poly_vertex vert[4];
 				int i;
@@ -798,19 +798,7 @@ static void zeus_draw_polys(UINT32 addr_and_count, UINT32 texdata, int logcmd)
 				extra->texwidth = 512 >> texwshift;
 				extra->palbase = zeus_palbase;
 				extra->alpha = zeus_blend;
-				poly_render_triangle(poly, NULL, &Machine->screen[0].visarea, callback, 3, &vert[0], &vert[1], &vert[2]);
-
-				/* skip empty if not a full quad */
-				if (vert[2].x != vert[3].x || vert[2].y != vert[3].y)
-				{
-					extra = poly_get_extra_data(poly);
-					extra->transcolor = 0x100;
-					extra->texbase = &waveram[val1 & 0x3fffff];
-					extra->texwidth = 512 >> texwshift;
-					extra->palbase = zeus_palbase;
-					extra->alpha = zeus_blend;
-					poly_render_triangle(poly, NULL, &Machine->screen[0].visarea, callback, 3, &vert[0], &vert[2], &vert[3]);
-				}
+				poly_render_quad(poly, NULL, &Machine->screen[0].visarea, callback, 3, &vert[0], &vert[1], &vert[2], &vert[3]);
 
 				poly_wait(poly, "Normal");
 			}

@@ -412,7 +412,7 @@ MACHINE_DRIVER_END
   Game driver(s)
 
 ***************************************************************************/
-DRIVER_INIT( silkroad )
+static DRIVER_INIT( silkroad )
 {
 
 	/* why? rom04.bin looks like a bad dump, but it seems not since it was

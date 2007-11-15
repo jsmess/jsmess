@@ -57,7 +57,7 @@ static CDP1802_CONFIG cidelsa_cdp1802_config =
 	NULL
 };
 
-READ8_HANDLER ( cidelsa_input_port_0_r )
+static READ8_HANDLER ( cidelsa_input_port_0_r )
 {
 	return (readinputportbytag("IN0") & 0x7f) + (cdp1869_pcb ? 0x80 : 0x00);
 }
@@ -67,12 +67,12 @@ READ8_HANDLER ( cidelsa_input_port_0_r )
 static int draco_sound;
 static int draco_ay_latch;
 
-WRITE8_HANDLER ( draco_sound_bankswitch_w )
+static WRITE8_HANDLER ( draco_sound_bankswitch_w )
 {
 	memory_set_bank(1, (data & 0x08) >> 3);
 }
 
-WRITE8_HANDLER ( draco_sound_g_w )
+static WRITE8_HANDLER ( draco_sound_g_w )
 {
 	/*
 
@@ -101,22 +101,22 @@ WRITE8_HANDLER ( draco_sound_g_w )
 	}
 }
 
-READ8_HANDLER ( draco_sound_in_r )
+static READ8_HANDLER ( draco_sound_in_r )
 {
 	return draco_sound & 0x07;
 }
 
-READ8_HANDLER ( draco_sound_ay8910_r )
+static READ8_HANDLER ( draco_sound_ay8910_r )
 {
 	return draco_ay_latch;
 }
 
-WRITE8_HANDLER ( draco_sound_ay8910_w )
+static WRITE8_HANDLER ( draco_sound_ay8910_w )
 {
 	draco_ay_latch = data;
 }
 
-WRITE8_HANDLER ( draco_ay8910_port_a_w )
+static WRITE8_HANDLER ( draco_ay8910_port_a_w )
 {
 	/*
       bit   description
@@ -132,7 +132,7 @@ WRITE8_HANDLER ( draco_ay8910_port_a_w )
     */
 }
 
-WRITE8_HANDLER ( draco_ay8910_port_b_w )
+static WRITE8_HANDLER ( draco_ay8910_port_b_w )
 {
 	/*
       bit   description
@@ -158,7 +158,7 @@ static struct AY8910interface ay8910_interface =
 
 /* Read/Write Handlers */
 
-WRITE8_HANDLER ( destryer_out1_w )
+static WRITE8_HANDLER ( destryer_out1_w )
 {
 	/*
       bit   description
@@ -174,7 +174,7 @@ WRITE8_HANDLER ( destryer_out1_w )
     */
 }
 
-WRITE8_HANDLER ( altair_out1_w )
+static WRITE8_HANDLER ( altair_out1_w )
 {
 	/*
       bit   description
@@ -194,7 +194,7 @@ WRITE8_HANDLER ( altair_out1_w )
 	set_led_status(2, data & 0x20); // FIRE
 }
 
-WRITE8_HANDLER ( draco_out1_w )
+static WRITE8_HANDLER ( draco_out1_w )
 {
 	/*
       bit   description
@@ -212,14 +212,14 @@ WRITE8_HANDLER ( draco_out1_w )
     draco_sound = (data & 0xe0) >> 5;
 }
 
-WRITE8_HANDLER ( cidelsa_charram_w )
+static WRITE8_HANDLER ( cidelsa_charram_w )
 {
 	int addr = cdp1869_get_cma(offset);
 	cidelsa_pcb[addr] = activecpu_get_reg(CDP1802_Q);
 	cdp1869_charram_w(offset, data);
 }
 
-READ8_HANDLER ( cidelsa_charram_r )
+static READ8_HANDLER ( cidelsa_charram_r )
 {
 	int addr = cdp1869_get_cma(offset);
 	cdp1869_pcb = cidelsa_pcb[addr];
@@ -676,7 +676,7 @@ static TIMER_CALLBACK( set_cpu_mode )
 	cdp1802_mode = CDP1802_MODE_RUN;
 }
 
-DRIVER_INIT( cidelsa )
+static DRIVER_INIT( cidelsa )
 {
 	cdp1869_configure(&destryer_CDP1869_interface);
 
@@ -692,7 +692,7 @@ static const CDP1869_interface draco_CDP1869_interface =
 	cidelsa_get_color_bits
 };
 
-DRIVER_INIT( draco )
+static DRIVER_INIT( draco )
 {
 	UINT8 *ROM = memory_region(REGION_CPU2);
 	memory_configure_bank(1, 0, 2, &ROM[0x000], 0x400);

@@ -1599,11 +1599,11 @@ ROM_START( extrmatn )
 	ROM_REGION( 0x30000, REGION_CPU1, 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b06-20.11c", 0x00000, 0x08000, CRC(04e3fc1f) SHA1(b1cf2f79f43fa33d6175368c897f84ec6aa6e746) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
-	ROM_LOAD( "b06-21.9c", 0x20000, 0x10000, CRC(1614d6a2) SHA1(f23d465af231ab5653c55748f686d8f25f52394b) )	/* banked at 8000-bfff */
+	ROM_LOAD( "b06-21.9c",  0x20000, 0x10000, CRC(1614d6a2) SHA1(f23d465af231ab5653c55748f686d8f25f52394b) )	/* banked at 8000-bfff */
 
 	ROM_REGION( 0x18000, REGION_CPU2, 0 )				/* Region 2 - sound cpu */
-	ROM_LOAD( "b06-06.4e", 0x00000, 0x08000, CRC(744f2c84) SHA1(7565c1594c2a3bae1ae45afcbf93363fe2b12d58) )
-	ROM_CONTINUE(           0x10000, 0x08000 )	/* banked at 8000-9fff */
+	ROM_LOAD( "b06-06.4e", 0x00000, 0x08000, CRC(744f2c84) SHA1(7565c1594c2a3bae1ae45afcbf93363fe2b12d58) ) /* This is likely the wrong rom ID # */
+	ROM_CONTINUE(          0x10000, 0x08000 )	/* banked at 8000-9fff */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
@@ -1611,8 +1611,8 @@ ROM_START( extrmatn )
 	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b06-01.13a", 0x00000, 0x20000, CRC(d2afbf7e) SHA1(28b4cf94798f049a9f8375464741dbef208d7290) )
 	ROM_LOAD( "b06-02.10a", 0x20000, 0x20000, CRC(e0c2757a) SHA1(3c89044caa28b10b4d1bef1515881810c23d312a) )
-	ROM_LOAD( "b06-03.7a", 0x40000, 0x20000, CRC(ee80ab9d) SHA1(f4e4833cadff7d856b5a8075a61d902427653e16) )
-	ROM_LOAD( "b06-04.4a", 0x60000, 0x20000, CRC(3697ace4) SHA1(6d6e4e64147365bcfcf74a84eb7ae84dffedd304) )
+	ROM_LOAD( "b06-03.7a",  0x40000, 0x20000, CRC(ee80ab9d) SHA1(f4e4833cadff7d856b5a8075a61d902427653e16) )
+	ROM_LOAD( "b06-04.4a",  0x60000, 0x20000, CRC(3697ace4) SHA1(6d6e4e64147365bcfcf74a84eb7ae84dffedd304) )
 
 	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )	/* hi bytes, AM27S29 or compatible like MB7124 */
@@ -1623,11 +1623,11 @@ ROM_START( extrmatj )
 	ROM_REGION( 0x30000, REGION_CPU1, 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b06-05.11c", 0x00000, 0x08000, CRC(918e1fe3) SHA1(1aa69e7ae393f275d440b3d5bf817475e443045d) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
-	ROM_LOAD( "b06-06.9c", 0x20000, 0x10000, CRC(8842e105) SHA1(68675e77801504c5f67f82fae42f55152ffadebe) )	/* banked at 8000-bfff */
+	ROM_LOAD( "b06-06.9c",  0x20000, 0x10000, CRC(8842e105) SHA1(68675e77801504c5f67f82fae42f55152ffadebe) )	/* banked at 8000-bfff */
 
 	ROM_REGION( 0x18000, REGION_CPU2, 0 )				/* Region 2 - sound cpu */
 	ROM_LOAD( "b06-07.4e", 0x00000, 0x08000, CRC(b37fb8b3) SHA1(10696914b9e39d34d56069a69b9d641339ea2309) )
-	ROM_CONTINUE(           0x10000, 0x08000 )	/* banked at 8000-9fff */
+	ROM_CONTINUE(          0x10000, 0x08000 )	/* banked at 8000-9fff */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
@@ -1635,8 +1635,8 @@ ROM_START( extrmatj )
 	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b06-01.13a", 0x00000, 0x20000, CRC(d2afbf7e) SHA1(28b4cf94798f049a9f8375464741dbef208d7290) )
 	ROM_LOAD( "b06-02.10a", 0x20000, 0x20000, CRC(e0c2757a) SHA1(3c89044caa28b10b4d1bef1515881810c23d312a) )
-	ROM_LOAD( "b06-03.7a", 0x40000, 0x20000, CRC(ee80ab9d) SHA1(f4e4833cadff7d856b5a8075a61d902427653e16) )
-	ROM_LOAD( "b06-04.4a", 0x60000, 0x20000, CRC(3697ace4) SHA1(6d6e4e64147365bcfcf74a84eb7ae84dffedd304) )
+	ROM_LOAD( "b06-03.7a",  0x40000, 0x20000, CRC(ee80ab9d) SHA1(f4e4833cadff7d856b5a8075a61d902427653e16) )
+	ROM_LOAD( "b06-04.4a",  0x60000, 0x20000, CRC(3697ace4) SHA1(6d6e4e64147365bcfcf74a84eb7ae84dffedd304) )
 
 	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )	/* hi bytes, AM27S29 or compatible like MB7124 */
@@ -2121,7 +2121,7 @@ ROM_END
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
 GAME( 1987, plumppop, 0,        drtoppel, plumppop, plumpop,  ROT0,   "Taito Corporation", "Plump Pop (Japan)", 0 )
 GAME( 1987, extrmatn, 0,        arknoid2, extrmatn, extrmatn, ROT270, "[Taito] World Games", "Extermination (US)", 0 )
-GAME( 1987, extrmatj, 0,        arknoid2, extrmatn, extrmatn, ROT270, "Taito Corporation", "Extermination (Japan)", 0 )
+GAME( 1987, extrmatj, extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "Taito Corporation", "Extermination (Japan)", 0 )
 GAME( 1987, arknoid2, 0,        arknoid2, arknoid2, arknoid2, ROT270, "Taito Corporation Japan", "Arkanoid - Revenge of DOH (World)", 0 )
 GAME( 1987, arknid2u, arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)", 0 )
 GAME( 1987, arknid2j, arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito Corporation", "Arkanoid - Revenge of DOH (Japan)", 0 )

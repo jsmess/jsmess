@@ -38,7 +38,7 @@ static TILE_GET_INFO( get_hitme_tile_info )
 }
 
 
-WRITE8_HANDLER( hitme_vidram_w )
+static WRITE8_HANDLER( hitme_vidram_w )
 {
 	/* mark this tile dirty */
 	hitme_vidram[offset] = data;

@@ -188,7 +188,7 @@ static INPUT_PORTS_START( koikoi )
 
 INPUT_PORTS_END
 
-PALETTE_INIT( koikoi ) //wrong
+static PALETTE_INIT( koikoi ) //wrong
 {
 	int i;
 
@@ -209,12 +209,12 @@ PALETTE_INIT( koikoi ) //wrong
 	}
 }
 
-VIDEO_START(koikoi)
+static VIDEO_START(koikoi)
 {
 	koikoi_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
-VIDEO_UPDATE(koikoi)
+static VIDEO_UPDATE(koikoi)
 {
 	tilemap_draw(bitmap,cliprect,koikoi_tilemap,0,0);
 	return 0;

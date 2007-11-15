@@ -483,7 +483,7 @@ static UINT32 activeBuffer ;
 
 static UINT32 no_machine_error_code;
 static int hng64_interrupt_level_request;
-WRITE32_HANDLER( hng64_videoram_w );
+static WRITE32_HANDLER( hng64_videoram_w );
 
 /* 3D stuff */
 static UINT32 *hng64_3d_1;
@@ -512,7 +512,7 @@ WRITE32_HANDLER( trap_write )
 */
 
 
-WRITE32_HANDLER( hng64_videoram_w )
+static WRITE32_HANDLER( hng64_videoram_w )
 {
 	int realoff;
 	COMBINE_DATA(&hng64_videoram[offset]);
@@ -562,13 +562,13 @@ WRITE32_HANDLER( hng64_videoram_w )
 }
 
 
-READ32_HANDLER( hng64_random_read )
+static READ32_HANDLER( hng64_random_read )
 {
 	return mame_rand(Machine)&0xffffffff;
 }
 
 
-READ32_HANDLER( hng64_com_r )
+static READ32_HANDLER( hng64_com_r )
 {
 	logerror("com read  (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, ~mem_mask, hng64_com_ram[offset]);
 	return hng64_com_ram[offset] ;
@@ -585,7 +585,7 @@ static WRITE32_HANDLER( hng64_com_w )
 static UINT32 hng64_com_shared_a;
 static UINT32 hng64_com_shared_b;
 
-WRITE32_HANDLER( hng64_com_share_w )
+static WRITE32_HANDLER( hng64_com_share_w )
 {
 	logerror("commw  (PC=%08x): %08x %08x %08x\n", activecpu_get_pc(), data, (offset*4)+0xc0001000, ~mem_mask);
 
@@ -593,7 +593,7 @@ WRITE32_HANDLER( hng64_com_share_w )
 	if (offset==0x1) COMBINE_DATA(&hng64_com_shared_b);
 }
 
-READ32_HANDLER( hng64_com_share_r )
+static READ32_HANDLER( hng64_com_share_r )
 {
 	logerror("commr  (PC=%08x): %08x %08x\n", activecpu_get_pc(), (offset*4)+0xc0001000, ~mem_mask);
 
@@ -663,19 +663,19 @@ void hng64_do_dma (void)
 }
 
 
-WRITE32_HANDLER( hng_dma_start_w )
+static WRITE32_HANDLER( hng_dma_start_w )
 {
 	logerror ("DMA Start Write %08x\n",data);
 	hng_dma_start = data;
 }
 
-WRITE32_HANDLER( hng_dma_dst_w )
+static WRITE32_HANDLER( hng_dma_dst_w )
 {
 	logerror ("DMA Dst Write %08x\n",data);
 	hng_dma_dst = data;
 }
 
-WRITE32_HANDLER( hng_dma_len_w )
+static WRITE32_HANDLER( hng_dma_len_w )
 {
 	logerror ("DMA Len Write %08x\n",data);
 	hng_dma_len = data;
@@ -683,6 +683,7 @@ WRITE32_HANDLER( hng_dma_len_w )
 
 }
 
+#ifdef UNUSED_FUNCTION
 READ32_HANDLER( hng64_videoram_r )
 {
 	return hng64_videoram[offset];
@@ -697,26 +698,27 @@ READ32_HANDLER( hng64_cart_r )
 {
 	return hng_cart[offset];
 }
+#endif
 
-READ32_HANDLER( hng64_sram_r )
+static READ32_HANDLER( hng64_sram_r )
 {
 	logerror("HNG64 reading from SRAM 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sram[offset], activecpu_get_pc());
 	return hng64_sram[offset];
 }
 
-WRITE32_HANDLER( hng64_sram_w )
+static WRITE32_HANDLER( hng64_sram_w )
 {
 	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, ~mem_mask, activecpu_get_pc());
 	COMBINE_DATA (&hng64_sram[offset]);
 }
 
-WRITE32_HANDLER( hng64_dualport_w )
+static WRITE32_HANDLER( hng64_dualport_w )
 {
 	logerror("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], activecpu_get_pc());
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
-READ32_HANDLER( hng64_dualport_r )
+static READ32_HANDLER( hng64_dualport_r )
 {
 	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], activecpu_get_pc());
 
@@ -747,22 +749,24 @@ READ32_HANDLER( hng64_dualport_r )
 //   <ElSemi> 30100000-3011ffff is framebuffer A0
 //   <ElSemi> 30120000-3013ffff is framebuffer A1
 //   <ElSemi> 30140000-3015ffff is ZBuffer A
-READ32_HANDLER( hng64_3d_1_r )
+static READ32_HANDLER( hng64_3d_1_r )
 {
 	return hng64_3d_1[offset] ;
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( hng64_3d_1_w )
 {
 	fatalerror("WRITE32_HANDLER( hng64_3d_1_w )");
 }
+#endif
 
-READ32_HANDLER( hng64_3d_2_r )
+static READ32_HANDLER( hng64_3d_2_r )
 {
 	return hng64_3d_2[offset] ;
 }
 
-WRITE32_HANDLER( hng64_3d_2_w )
+static WRITE32_HANDLER( hng64_3d_2_w )
 {
 	COMBINE_DATA (&hng64_3d_1[offset]) ;
 	COMBINE_DATA (&hng64_3d_2[offset]) ;
@@ -864,7 +868,7 @@ static READ32_HANDLER( tcram_r )
 <ElSemi> 0x60000000-0x60001000 Comm dualport ram
 */
 
-WRITE32_HANDLER( hng64_soundram_w )
+static WRITE32_HANDLER( hng64_soundram_w )
 {
 	UINT32 mem_mask32 = mem_mask;
 	UINT32 data32 = data;
@@ -883,7 +887,7 @@ WRITE32_HANDLER( hng64_soundram_w )
 	COMBINE_DATA(&hng64_soundram[offset * 2 + 1]);
 }
 
-READ32_HANDLER( hng64_soundram_r )
+static READ32_HANDLER( hng64_soundram_r )
 {
 	UINT16 datalo = hng64_soundram[offset * 2 + 0];
 	UINT16 datahi = hng64_soundram[offset * 2 + 1];
@@ -1140,7 +1144,7 @@ static void KL5C80_init(void)
 	hng64_com_mmu_mem[7] = 0xf0;
 }
 
-READ8_HANDLER( hng64_comm_memory_r )
+static READ8_HANDLER( hng64_comm_memory_r )
 {
 	UINT32 physical_address = KL5C80_translate_address(offset) ;
 	logerror("READING 0x%02x from 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address) ;
@@ -1155,7 +1159,7 @@ READ8_HANDLER( hng64_comm_memory_r )
 	return hng64_com_virtual_mem[physical_address] ;
 }
 
-WRITE8_HANDLER( hng64_comm_memory_w )
+static WRITE8_HANDLER( hng64_comm_memory_w )
 {
 //  UINT32 physical_address = KL5C80_translate_address(offset) ;
 //  logerror("WRITING 0x%02x to 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address) ;
@@ -1165,7 +1169,7 @@ WRITE8_HANDLER( hng64_comm_memory_w )
 
 
 /* KL5C80 I/O handlers */
-WRITE8_HANDLER( hng64_comm_io_mmu )
+static WRITE8_HANDLER( hng64_comm_io_mmu )
 {
 	hng64_com_mmu_mem[offset] = data;
 
@@ -1397,18 +1401,18 @@ static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, hng64_16_layout,     0x0, 0x10 )  /* sprite tiles */
 GFXDECODE_END
 
-DRIVER_INIT( hng64 )
+static DRIVER_INIT( hng64 )
 {
 	hng64_soundram=auto_malloc(0x200000);
 }
 
-DRIVER_INIT(hng64_fght)
+static DRIVER_INIT(hng64_fght)
 {
 	no_machine_error_code=0x01010101;
 	driver_init_hng64(machine);
 }
 
-DRIVER_INIT(hng64_race)
+static DRIVER_INIT(hng64_race)
 {
 	no_machine_error_code=0x02020202;
 	driver_init_hng64(machine);
@@ -1450,7 +1454,7 @@ static INTERRUPT_GEN( irq_start )
 
 
 
-MACHINE_RESET(hyperneo)
+static MACHINE_RESET(hyperneo)
 {
 	int i ;
 

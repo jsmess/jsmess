@@ -36,7 +36,7 @@ static int pal_bank, fg_flag, sy_offset;
 static tilemap *bg_tilemap, *fg_tilemap;
 
 
-PALETTE_INIT( wilytowr )
+static PALETTE_INIT( wilytowr )
 {
 	int i;
 
@@ -119,7 +119,7 @@ static WRITE8_HANDLER( wilytwr_palbank_w )
 	}
 }
 
-WRITE8_HANDLER( wilytwr_flipscreen_w )
+static WRITE8_HANDLER( wilytwr_flipscreen_w )
 {
 	if (flip_screen != (~data & 0x01))
 	{
@@ -128,7 +128,7 @@ WRITE8_HANDLER( wilytwr_flipscreen_w )
 	}
 }
 
-WRITE8_HANDLER( fghtbskt_flipscreen_w )
+static WRITE8_HANDLER( fghtbskt_flipscreen_w )
 {
 	flip_screen_set(data);
 	fg_flag = flip_screen ? TILE_FLIPX : 0;
@@ -151,7 +151,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, code, 0, fg_flag);
 }
 
-VIDEO_START( wilytowr )
+static VIDEO_START( wilytowr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
@@ -195,7 +195,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( wilytowr )
+static VIDEO_UPDATE( wilytowr )
 {
 	int col;
 
@@ -716,12 +716,12 @@ ROM_START( fghtbskt )
 	ROM_LOAD( "fb_b.11e",     0x0200, 0x0100, CRC(fca5bf0e) SHA1(5846f43aa2906cac58e300fdab197b99f896e3ef) )
 ROM_END
 
-DRIVER_INIT( wilytowr )
+static DRIVER_INIT( wilytowr )
 {
 	sy_offset = 238;
 }
 
-DRIVER_INIT( fghtbskt )
+static DRIVER_INIT( fghtbskt )
 {
 	sy_offset = 240;
 }

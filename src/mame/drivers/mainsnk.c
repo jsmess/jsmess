@@ -452,7 +452,7 @@ ROM_START( mainsnk)
 	ROM_LOAD( "main1.bin",    0x001000, 0x000800, CRC(deb895c4) SHA1(f1281dcb3471d9627565706ff09ba72f09dc62a4) )
 ROM_END
 
-DRIVER_INIT ( canvas )
+static DRIVER_INIT ( canvas )
 {
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, input_port_0_r );
 }

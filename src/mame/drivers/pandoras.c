@@ -95,7 +95,7 @@ static WRITE8_HANDLER( pandoras_int_control_w ){
 	}
 }
 
-WRITE8_HANDLER( pandoras_cpua_irqtrigger_w ){
+static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w ){
 	if (!firq_old_data_a && data){
 		cpunum_set_input_line(0,M6809_FIRQ_LINE,HOLD_LINE);
 	}
@@ -103,7 +103,7 @@ WRITE8_HANDLER( pandoras_cpua_irqtrigger_w ){
 	firq_old_data_a = data;
 }
 
-WRITE8_HANDLER( pandoras_cpub_irqtrigger_w ){
+static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w ){
 	if (!firq_old_data_b && data){
 		cpunum_set_input_line(1,M6809_FIRQ_LINE,HOLD_LINE);
 	}
@@ -111,7 +111,7 @@ WRITE8_HANDLER( pandoras_cpub_irqtrigger_w ){
 	firq_old_data_b = data;
 }
 
-WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
+static WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
 {
 	cpunum_set_input_line(3, 0, ASSERT_LINE);
 }
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 	i8039_status = (data & 0x20) >> 5;
 }
 
-WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
+static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 {
 	cpunum_set_input_line_and_vector(2,0,HOLD_LINE,0xff);
 }

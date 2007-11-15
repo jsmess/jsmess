@@ -53,7 +53,7 @@ VIDEO_UPDATE( yunsung8 );
 
 
 
-MACHINE_RESET( yunsung8 )
+static MACHINE_RESET( yunsung8 )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1) + 0x24000;
 
@@ -72,7 +72,7 @@ MACHINE_RESET( yunsung8 )
 ***************************************************************************/
 
 
-WRITE8_HANDLER( yunsung8_bankswitch_w )
+static WRITE8_HANDLER( yunsung8_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
@@ -143,7 +143,7 @@ ADDRESS_MAP_END
 
 static int adpcm;
 
-WRITE8_HANDLER( yunsung8_sound_bankswitch_w )
+static WRITE8_HANDLER( yunsung8_sound_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU2);
 	int bank = data & 7;
@@ -158,7 +158,7 @@ WRITE8_HANDLER( yunsung8_sound_bankswitch_w )
 	MSM5205_reset_w(0,data & 0x20);
 }
 
-WRITE8_HANDLER( yunsung8_adpcm_w )
+static WRITE8_HANDLER( yunsung8_adpcm_w )
 {
 	/* Swap the nibbles */
 	adpcm = ((data&0xf)<<4) | ((data >>4)&0xf);

@@ -57,7 +57,7 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 	else if( mnchmobl_nmi_enable ) cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_HANDLER( mnchmobl_soundlatch_w )
+static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
 	soundlatch_w( offset, data );
 	cpunum_set_input_line( 1, 0, HOLD_LINE );

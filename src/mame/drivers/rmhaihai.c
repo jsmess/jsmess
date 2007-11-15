@@ -35,13 +35,13 @@ TODO:
 static int gfxbank;
 static tilemap *bg_tilemap;
 
-WRITE8_HANDLER( rmhaihai_videoram_w )
+static WRITE8_HANDLER( rmhaihai_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( rmhaihai_colorram_w )
+static WRITE8_HANDLER( rmhaihai_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -56,13 +56,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-VIDEO_START( rmhaihai )
+static VIDEO_START( rmhaihai )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 }
 
-VIDEO_UPDATE( rmhaihai )
+static VIDEO_UPDATE( rmhaihai )
 {
 	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	return 0;

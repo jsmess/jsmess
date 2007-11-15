@@ -376,7 +376,7 @@ static void Compute_EG(struct _SCSP *SCSP,struct _SLOT *slot)
 	if(KRS(slot)!=0xf)
 		rate=2*(octave+KRS(slot))+((FNS(slot)>>9)&1);
 	else
-		rate=((FNS(slot)>>9)&1);
+		rate=0; //rate=((FNS(slot)>>9)&1);
 
 	slot->EG.volume=0;
 	slot->EG.AR=Get_AR(SCSP,rate,AR(slot));
@@ -397,9 +397,12 @@ static int EG_Update(struct _SLOT *slot)
 			slot->EG.volume+=slot->EG.AR;
 			if(slot->EG.volume>=(0x3ff<<EG_SHIFT))
 			{
-				slot->EG.state=DECAY1;
-				if(slot->EG.D1R>=(1024<<EG_SHIFT)) //Skip DECAY1, go directly to DECAY2
-					slot->EG.state=DECAY2;
+				if (!LPSLNK(slot))
+				{
+					slot->EG.state=DECAY1;
+					if(slot->EG.D1R>=(1024<<EG_SHIFT)) //Skip DECAY1, go directly to DECAY2
+						slot->EG.state=DECAY2;
+				}
 				slot->EG.volume=0x3ff<<EG_SHIFT;
 			}
 			if(slot->EG.EGHOLD)
@@ -407,7 +410,7 @@ static int EG_Update(struct _SLOT *slot)
 			break;
 		case DECAY1:
 			slot->EG.volume-=slot->EG.D1R;
-			if(slot->EG.volume>>(EG_SHIFT+5)>=slot->EG.DL)
+			if(slot->EG.volume>>(EG_SHIFT+5)<=slot->EG.DL)
 				slot->EG.state=DECAY2;
 			break;
 		case DECAY2:
@@ -561,7 +564,7 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 		if(iPAN&0x4) SegaDB-=12;
 		if(iPAN&0x8) SegaDB-=24;
 
-		if(iPAN==0xf) PAN=0.0;
+		if((iPAN&0xf)==0xf) PAN=0.0;
 		else PAN=pow(10.0,SegaDB/20.0);
 
 		if(iPAN<0x10)
@@ -1172,6 +1175,12 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
             addr&=0x7ffff;
     }
 */
+ 	if(addr==LSA(slot))
+ 	{
+ 		if(LPSLNK(slot) && slot->EG.state==ATTACK)
+ 			slot->EG.state = DECAY1;
+ 	}
+
 	if(PCM8B(slot))	//8 bit signed
 	{
 		INT8 *p=(INT8 *) (slot->base+BYTE_XOR_BE((slot->cur_addr>>SHIFT)));
@@ -1192,6 +1201,11 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		slot->Prev=p[0];
 
 	}
+
+	if(SBCTL(slot)&0x1)
+		sample ^= 0x7FFF;
+	if(SBCTL(slot)&0x2)
+		sample = (INT16)(sample^0x8000);
 
 	if(slot->Backwards)
 		slot->cur_addr-=step;

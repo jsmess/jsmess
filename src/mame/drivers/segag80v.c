@@ -1338,7 +1338,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT( elim2 )
+static DRIVER_INIT( elim2 )
 {
 	/* configure security */
 	sega_security(70);
@@ -1350,7 +1350,7 @@ DRIVER_INIT( elim2 )
 }
 
 
-DRIVER_INIT( elim4 )
+static DRIVER_INIT( elim4 )
 {
 	/* configure security */
 	sega_security(76);
@@ -1366,7 +1366,7 @@ DRIVER_INIT( elim4 )
 }
 
 
-DRIVER_INIT( spacfury )
+static DRIVER_INIT( spacfury )
 {
 	/* configure security */
 	sega_security(64);
@@ -1380,7 +1380,7 @@ DRIVER_INIT( spacfury )
 }
 
 
-DRIVER_INIT( zektor )
+static DRIVER_INIT( zektor )
 {
 	/* configure security */
 	sega_security(82);
@@ -1400,7 +1400,7 @@ DRIVER_INIT( zektor )
 }
 
 
-DRIVER_INIT( tacscan )
+static DRIVER_INIT( tacscan )
 {
 	/* configure security */
 	sega_security(76);
@@ -1418,7 +1418,7 @@ DRIVER_INIT( tacscan )
 }
 
 
-DRIVER_INIT( startrek )
+static DRIVER_INIT( startrek )
 {
 	/* configure security */
 	sega_security(64);

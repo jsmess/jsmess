@@ -173,7 +173,7 @@ static MACHINE_DRIVER_START( kingpin )
 */
 MACHINE_DRIVER_END
 
-DRIVER_INIT( kingpin )
+static DRIVER_INIT( kingpin )
 {
 	static UINT8 *code_base;
 

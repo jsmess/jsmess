@@ -205,7 +205,7 @@ VIDEO_UPDATE( gladiatr );
 
 
 /*Rom bankswitching*/
-WRITE8_HANDLER( gladiatr_bankswitch_w )
+static WRITE8_HANDLER( gladiatr_bankswitch_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000;
 
@@ -326,7 +326,7 @@ static WRITE8_HANDLER( gladiatr_flipscreen_w )
 
 #if 1
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
-WRITE8_HANDLER( gladiatr_irq_patch_w )
+static WRITE8_HANDLER( gladiatr_irq_patch_w )
 {
 	cpunum_set_input_line(1,0,HOLD_LINE);
 }

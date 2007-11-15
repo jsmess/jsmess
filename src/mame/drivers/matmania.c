@@ -59,19 +59,19 @@ READ8_HANDLER( maniach_mcu_status_r );
 
 
 
-WRITE8_HANDLER( matmania_sh_command_w )
+static WRITE8_HANDLER( matmania_sh_command_w )
 {
 	soundlatch_w(offset,data);
 	cpunum_set_input_line(1,M6502_IRQ_LINE,HOLD_LINE);
 }
 
-WRITE8_HANDLER( matmania_dac_w )
+static WRITE8_HANDLER( matmania_dac_w )
 {
 	DAC_signed_data_w(0,data);
 }
 
 
-WRITE8_HANDLER( maniach_sh_command_w )
+static WRITE8_HANDLER( maniach_sh_command_w )
 {
 	soundlatch_w(offset,data);
 	cpunum_set_input_line(1,M6809_IRQ_LINE,HOLD_LINE);

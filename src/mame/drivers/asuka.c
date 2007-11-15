@@ -840,7 +840,7 @@ static struct MSM5205interface msm5205_interface =
                  MACHINE DRIVERS
 ***********************************************************/
 
-VIDEO_EOF( asuka )
+static VIDEO_EOF( asuka )
 {
 	PC090OJ_eof_callback();
 }

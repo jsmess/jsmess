@@ -314,7 +314,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 	thunderx_1f98_data = data;
 }
 
-WRITE8_HANDLER( scontra_bankswitch_w )
+static WRITE8_HANDLER( scontra_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs;

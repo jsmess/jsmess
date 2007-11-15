@@ -122,7 +122,7 @@ void fcrash_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprect, in
 	}
 }
 
-VIDEO_UPDATE( fcrash )
+static VIDEO_UPDATE( fcrash )
 {
    	int layercontrol,l0,l1,l2,l3;
 	int videocontrol=cps1_port(0x22);

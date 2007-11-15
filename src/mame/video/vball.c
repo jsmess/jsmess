@@ -60,10 +60,12 @@ WRITE8_HANDLER( vb_videoram_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( vb_attrib_r )
 {
 	return vb_attribram[offset];
 }
+#endif
 
 WRITE8_HANDLER( vb_attrib_w )
 {

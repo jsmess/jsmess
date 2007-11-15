@@ -65,14 +65,14 @@ VIDEO_UPDATE( brkthru );
 
 static int nmi_enable;
 
-WRITE8_HANDLER( brkthru_1803_w )
+static WRITE8_HANDLER( brkthru_1803_w )
 {
 	/* bit 0 = NMI enable */
 	nmi_enable = ~data & 1;
 
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
-WRITE8_HANDLER( darwin_0803_w )
+static WRITE8_HANDLER( darwin_0803_w )
 {
 	/* bit 0 = NMI enable */
 	/*nmi_enable = ~data & 1;*/
@@ -81,7 +81,7 @@ WRITE8_HANDLER( darwin_0803_w )
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
-WRITE8_HANDLER( brkthru_soundlatch_w )
+static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
 	soundlatch_w(offset,data);
 	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);

@@ -91,11 +91,11 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 
 #include "driver.h"
 
-VIDEO_START(pangofun)
+static VIDEO_START(pangofun)
 {
 }
 
-VIDEO_UPDATE(pangofun)
+static VIDEO_UPDATE(pangofun)
 {
 	return 0;
 }

@@ -246,7 +246,7 @@ static READ16_HANDLER( tetrisp2_ip_1_word_r )
 static UINT16 *tetrisp2_nvram;
 static size_t tetrisp2_nvram_size;
 
-NVRAM_HANDLER( tetrisp2 )
+static NVRAM_HANDLER( tetrisp2 )
 {
 	if (read_or_write)
 		mame_fwrite(file,tetrisp2_nvram,tetrisp2_nvram_size);
@@ -264,18 +264,18 @@ NVRAM_HANDLER( tetrisp2 )
 
 
 /* The game only ever writes even bytes and reads odd bytes */
-READ16_HANDLER( tetrisp2_nvram_r )
+static READ16_HANDLER( tetrisp2_nvram_r )
 {
 	return	( (tetrisp2_nvram[offset] >> 8) & 0x00ff ) |
 			( (tetrisp2_nvram[offset] << 8) & 0xff00 ) ;
 }
 
-WRITE16_HANDLER( tetrisp2_nvram_w )
+static WRITE16_HANDLER( tetrisp2_nvram_w )
 {
 	COMBINE_DATA(&tetrisp2_nvram[offset]);
 }
 
-READ16_HANDLER( rockn_nvram_r )
+static READ16_HANDLER( rockn_nvram_r )
 {
 	return	tetrisp2_nvram[offset];
 }
@@ -292,30 +292,30 @@ READ16_HANDLER( rockn_nvram_r )
 static UINT16 rocknms_main2sub;
 static UINT16 rocknms_sub2main;
 
-READ16_HANDLER( rocknms_main2sub_r )
+static READ16_HANDLER( rocknms_main2sub_r )
 {
 	return rocknms_main2sub;
 }
 
-WRITE16_HANDLER( rocknms_main2sub_w )
+static WRITE16_HANDLER( rocknms_main2sub_w )
 {
 	if (ACCESSING_LSB)
 		rocknms_main2sub = (data ^ 0xffff);
 }
 
-READ16_HANDLER( rocknms_port_0_r )
+static READ16_HANDLER( rocknms_port_0_r )
 {
 	return ((readinputport(0) & 0xfffc ) | (rocknms_sub2main & 0x0003));
 }
 
-WRITE16_HANDLER( rocknms_sub2main_w )
+static WRITE16_HANDLER( rocknms_sub2main_w )
 {
 	if (ACCESSING_LSB)
 		rocknms_sub2main = (data ^ 0xffff);
 }
 
 
-WRITE16_HANDLER( tetrisp2_coincounter_w )
+static WRITE16_HANDLER( tetrisp2_coincounter_w )
 {
 	coin_counter_w( 0, (data & 0x0001));
 }
@@ -1034,25 +1034,25 @@ static void init_rockn_timer(running_machine *machine)
 	state_save_register_global(rockn_soundvolume);
 }
 
-DRIVER_INIT( rockn )
+static DRIVER_INIT( rockn )
 {
 	init_rockn_timer(machine);
 	rockn_protectdata = 1;
 }
 
-DRIVER_INIT( rockn1 )
+static DRIVER_INIT( rockn1 )
 {
 	init_rockn_timer(machine);
 	rockn_protectdata = 1;
 }
 
-DRIVER_INIT( rockn2 )
+static DRIVER_INIT( rockn2 )
 {
 	init_rockn_timer(machine);
 	rockn_protectdata = 2;
 }
 
-DRIVER_INIT( rocknms )
+static DRIVER_INIT( rocknms )
 {
 	init_rockn_timer(machine);
 
@@ -1063,7 +1063,7 @@ DRIVER_INIT( rocknms )
 
 }
 
-DRIVER_INIT( rockn3 )
+static DRIVER_INIT( rockn3 )
 {
 	init_rockn_timer(machine);
 	rockn_protectdata = 4;

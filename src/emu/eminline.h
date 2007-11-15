@@ -375,7 +375,7 @@ INLINE INT32 atomic_add32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #ifndef atomic_increment32
-INLINE INT32 atomic_increment32(INT32 volatile *ptr, INT32 delta)
+INLINE INT32 atomic_increment32(INT32 volatile *ptr)
 {
 	return atomic_add32(ptr, 1);
 }
@@ -394,7 +394,7 @@ INLINE INT32 atomic_increment32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #ifndef atomic_decrement32
-INLINE INT32 atomic_decrement32(INT32 volatile *ptr, INT32 delta)
+INLINE INT32 atomic_decrement32(INT32 volatile *ptr)
 {
 	return atomic_add32(ptr, -1);
 }

@@ -66,7 +66,7 @@ static MACHINE_RESET( orbit )
 }
 
 
-WRITE8_HANDLER( orbit_misc_w )
+static WRITE8_HANDLER( orbit_misc_w )
 {
 	UINT8 bit = offset >> 1;
 

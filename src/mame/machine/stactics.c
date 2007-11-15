@@ -11,6 +11,7 @@ extern int stactics_vblank_count;
 extern int stactics_shot_standby;
 extern int stactics_shot_arrive;
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( stactics_port_0_r )
 {
     if (*stactics_motor_on & 0x01)
@@ -26,6 +27,7 @@ READ8_HANDLER( stactics_port_0_r )
         return (input_port_0_r(0)|0x80);
     }
 }
+#endif
 
 READ8_HANDLER( stactics_port_2_r )
 {

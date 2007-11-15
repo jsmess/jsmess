@@ -115,7 +115,7 @@ struct _looping_state
  *
  *************************************/
 
-PALETTE_INIT( looping )
+static PALETTE_INIT( looping )
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -170,7 +170,7 @@ static TILE_GET_INFO( get_tile_info )
 }
 
 
-VIDEO_START( looping )
+static VIDEO_START( looping )
 {
 	looping_state *state = machine->driver_data;
 
@@ -203,7 +203,7 @@ static WRITE8_HANDLER( flip_screen_y_w )
 }
 
 
-WRITE8_HANDLER( looping_videoram_w )
+static WRITE8_HANDLER( looping_videoram_w )
 {
 	looping_state *state = Machine->driver_data;
 	state->videoram[offset] = data;
@@ -211,7 +211,7 @@ WRITE8_HANDLER( looping_videoram_w )
 }
 
 
-WRITE8_HANDLER( looping_colorram_w )
+static WRITE8_HANDLER( looping_colorram_w )
 {
 	looping_state *state = Machine->driver_data;
 	int i;
@@ -271,7 +271,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-VIDEO_UPDATE( looping )
+static VIDEO_UPDATE( looping )
 {
 	looping_state *state = machine->driver_data;
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -322,7 +322,7 @@ static WRITE8_HANDLER( main_irq_ack_w )
 }
 
 
-WRITE8_HANDLER( looping_souint_clr )
+static WRITE8_HANDLER( looping_souint_clr )
 {
 	if (data == 0)
 		cpunum_set_input_line(1, 0, CLEAR_LINE);
@@ -349,7 +349,7 @@ static WRITE8_HANDLER( looping_soundlatch_w )
  *
  *************************************/
 
-WRITE8_HANDLER( looping_sound_sw )
+static WRITE8_HANDLER( looping_sound_sw )
 {
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
@@ -768,7 +768,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT( looping )
+static DRIVER_INIT( looping )
 {
 	int length = memory_region_length(REGION_CPU1);
 	UINT8 *rom = memory_region(REGION_CPU1);

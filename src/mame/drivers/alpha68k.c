@@ -222,19 +222,19 @@ static MACHINE_RESET( common )
 	credits   = 0;
 }
 
-MACHINE_RESET( tnexspce )
+static MACHINE_RESET( tnexspce )
 {
 	alpha68k_flipscreen_w(0);
 }
 
 /******************************************************************************/
 
-WRITE16_HANDLER( tnexspce_coin_counters_w )
+static WRITE16_HANDLER( tnexspce_coin_counters_w )
 {
 	coin_counter_w(offset, data & 0x01);
 }
 
-WRITE16_HANDLER( tnexspce_unknown_w )
+static WRITE16_HANDLER( tnexspce_unknown_w )
 {
 	logerror("tnexspce_unknown_w : PC = %04x - offset = %04x - data = %04x\n",activecpu_get_pc(),offset,data);
 	if (offset==0)

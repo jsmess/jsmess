@@ -81,14 +81,14 @@ READ32_HANDLER(K001604_reg_r);
 
 
 
-VIDEO_START( jetwave )
+static VIDEO_START( jetwave )
 {
 	K001005_init();
 	K001604_vh_start(machine, 0);
 }
 
 
-VIDEO_UPDATE( jetwave )
+static VIDEO_UPDATE( jetwave )
 {
 	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
 
@@ -124,7 +124,7 @@ static void game_tile_callback(int layer, int *code, int *color, int *flags)
 	*color += layer * 0x40;
 }
 
-VIDEO_START( zr107 )
+static VIDEO_START( zr107 )
 {
 	static int scrolld[NUM_LAYERS][4][2] = {
 	 	{{ 0, 0}, {0, 0}, {0, 0}, {0, 0}},
@@ -135,7 +135,7 @@ VIDEO_START( zr107 )
 	K001005_init();
 }
 
-VIDEO_UPDATE( zr107 )
+static VIDEO_UPDATE( zr107 )
 {
 	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
 

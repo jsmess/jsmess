@@ -729,7 +729,7 @@ void cps3_decrypt_bios(void)
 
 
 
-DRIVER_INIT( cps3crpt )
+static DRIVER_INIT( cps3crpt )
 {
 	const char *gamename = machine->gamedrv->name;
 	const struct game_keys2 *k = &keys_table2[0];
@@ -891,7 +891,7 @@ static void decode_charram(void)
 }
 #endif
 
-VIDEO_START(cps3)
+static VIDEO_START(cps3)
 {
 	cps3_ss_ram       = auto_malloc(0x10000);
 	cps3_ss_ram_dirty = auto_malloc(0x400);
@@ -1028,7 +1028,7 @@ void cps3_draw_tilemapsprite_line(int tmnum, int drawline, mame_bitmap *bitmap, 
 	}
 }
 
-VIDEO_UPDATE(cps3)
+static VIDEO_UPDATE(cps3)
 {
 	int y,x, count;
 //  int offset;
@@ -1360,7 +1360,7 @@ VIDEO_UPDATE(cps3)
 	return 0;
 }
 
-READ32_HANDLER( cps3_ssram_r )
+static READ32_HANDLER( cps3_ssram_r )
 {
 	if (offset>0x8000/4)
 		return LITTLE_ENDIANIZE_INT32(cps3_ss_ram[offset]);
@@ -1368,7 +1368,7 @@ READ32_HANDLER( cps3_ssram_r )
 		return cps3_ss_ram[offset];
 }
 
-WRITE32_HANDLER( cps3_ssram_w )
+static WRITE32_HANDLER( cps3_ssram_w )
 {
 	if (offset>0x8000/4)
 	{
@@ -1383,7 +1383,7 @@ WRITE32_HANDLER( cps3_ssram_w )
 	COMBINE_DATA(&cps3_ss_ram[offset]);
 }
 
-WRITE32_HANDLER( cps3_0xc0000000_ram_w )
+static WRITE32_HANDLER( cps3_0xc0000000_ram_w )
 {
 	COMBINE_DATA( &cps3_0xc0000000_ram[offset] );
 	// store a decrypted copy
@@ -1477,7 +1477,7 @@ static WRITE32_HANDLER( cram_data_w )
 
 /* FLASH ROM ACCESS */
 
-READ32_HANDLER( cps3_gfxflash_r )
+static READ32_HANDLER( cps3_gfxflash_r )
 {
 	UINT32 result = 0;
 	int flash1 = 8;
@@ -1515,7 +1515,7 @@ READ32_HANDLER( cps3_gfxflash_r )
 	return result;
 }
 
-WRITE32_HANDLER( cps3_gfxflash_w )
+static WRITE32_HANDLER( cps3_gfxflash_w )
 {
 	int command;
 	int flash1 = 8;
@@ -1644,7 +1644,7 @@ static const struct cps3_test_hacks testhack_table[] =
 	{ 0 }	// end of table
 };
 
-DRIVER_INIT( cps3_testhacks )
+static DRIVER_INIT( cps3_testhacks )
 {
 	const char *gamename = machine->gamedrv->name;
 	const struct cps3_test_hacks *k = &testhack_table[0];
@@ -1666,7 +1666,7 @@ DRIVER_INIT( cps3_testhacks )
 }
 
 
-READ32_HANDLER( cps3_flash1_r )
+static READ32_HANDLER( cps3_flash1_r )
 {
 	UINT32 retvalue = cps3_flashmain_r(0, offset,mem_mask);
 
@@ -1678,7 +1678,7 @@ READ32_HANDLER( cps3_flash1_r )
 	return retvalue;
 }
 
-READ32_HANDLER( cps3_flash2_r )
+static READ32_HANDLER( cps3_flash2_r )
 {
 	UINT32 retvalue = cps3_flashmain_r(4, offset,mem_mask);
 
@@ -1759,12 +1759,12 @@ void cps3_flashmain_w(int base, UINT32 offset, UINT32 data, UINT32 mem_mask)
 */
 
 }
-WRITE32_HANDLER( cps3_flash1_w )
+static WRITE32_HANDLER( cps3_flash1_w )
 {
 	cps3_flashmain_w(0, offset,data,mem_mask);
 }
 
-WRITE32_HANDLER( cps3_flash2_w )
+static WRITE32_HANDLER( cps3_flash2_w )
 {
 	cps3_flashmain_w(4, offset,data,mem_mask);
 }
@@ -1824,34 +1824,34 @@ static WRITE32_HANDLER( cram_gfxflash_bank_w )
 	}
 }
 
-READ32_HANDLER( cps3_io1_r )
+static READ32_HANDLER( cps3_io1_r )
 {
 	return readinputport(0);
 }
 
-READ32_HANDLER( cps3_io2_r )
+static READ32_HANDLER( cps3_io2_r )
 {
 	return readinputport(1);
 }
 
 // this seems to be dma active flags, and maybe vblank... not if it is anything else
-READ32_HANDLER( cps3_vbl_r )
+static READ32_HANDLER( cps3_vbl_r )
 {
 	return 0x00000000;
 }
 
-READ32_HANDLER( cps3_unk_io_r )
+static READ32_HANDLER( cps3_unk_io_r )
 {
 	//  warzard will crash before booting if you return anything here
 	return 0xffffffff;
 }
 
-READ32_HANDLER( cps3_40C0000_r )
+static READ32_HANDLER( cps3_40C0000_r )
 {
 	return 0x00000000;
 }
 
-READ32_HANDLER( cps3_40C0004_r )
+static READ32_HANDLER( cps3_40C0004_r )
 {
 	return 0x00000000;
 }
@@ -1860,7 +1860,7 @@ READ32_HANDLER( cps3_40C0004_r )
    additional interface, as these writes aren't normal for the type of eeprom we have */
 UINT16 cps3_current_eeprom_read;
 
-READ32_HANDLER( cps3_eeprom_r )
+static READ32_HANDLER( cps3_eeprom_r )
 {
 	int addr = offset*4;
 
@@ -1889,7 +1889,7 @@ READ32_HANDLER( cps3_eeprom_r )
 	return 0x00000000;
 }
 
-WRITE32_HANDLER( cps3_eeprom_w )
+static WRITE32_HANDLER( cps3_eeprom_w )
 {
 	int addr = offset*4;
 
@@ -1911,7 +1911,7 @@ WRITE32_HANDLER( cps3_eeprom_w )
 
 }
 
-READ32_HANDLER( cps3_cdrom_r )
+static READ32_HANDLER( cps3_cdrom_r )
 {
 
 	UINT32 retval = 0;
@@ -1929,7 +1929,7 @@ READ32_HANDLER( cps3_cdrom_r )
 	return retval;
 }
 
-WRITE32_HANDLER( cps3_cdrom_w )
+static WRITE32_HANDLER( cps3_cdrom_w )
 {
 	if (ACCESSING_MSB32)
 	{
@@ -1942,7 +1942,7 @@ WRITE32_HANDLER( cps3_cdrom_w )
 	}
 }
 
-WRITE32_HANDLER( cps3_ss_bank_base_w )
+static WRITE32_HANDLER( cps3_ss_bank_base_w )
 {
 	// might be scroll registers or something else..
 	// used to display bank with 'insert coin' on during sfiii2 attract intro
@@ -1951,7 +1951,7 @@ WRITE32_HANDLER( cps3_ss_bank_base_w )
 //  printf("cps3_ss_bank_base_w %08x %08x\n", data, mem_mask);
 }
 
-WRITE32_HANDLER( cps3_ss_pal_base_w )
+static WRITE32_HANDLER( cps3_ss_pal_base_w )
 {
 	 if(DEBUG_PRINTF) printf ("cps3_ss_pal_base_w %08x %08x\n", data, mem_mask);
 
@@ -1982,7 +1982,7 @@ static UINT32 paldma_fade;
 static UINT32 paldma_other2;
 static UINT32 paldma_length;
 
-WRITE32_HANDLER( cps3_palettedma_w )
+static WRITE32_HANDLER( cps3_palettedma_w )
 {
 	if (offset==0)
 	{
@@ -2269,7 +2269,7 @@ void cps3_process_character_dma(UINT32 address)
 	}
 }
 
-WRITE32_HANDLER( cps3_characterdma_w )
+static WRITE32_HANDLER( cps3_characterdma_w )
 {
 	if(DEBUG_PRINTF) printf("chardma_w %08x %08x %08x\n", offset, data, mem_mask);
 
@@ -2314,29 +2314,29 @@ WRITE32_HANDLER( cps3_characterdma_w )
 	}
 }
 
-WRITE32_HANDLER( cps3_irq10_ack_w )
+static WRITE32_HANDLER( cps3_irq10_ack_w )
 {
 	cpunum_set_input_line(0,10, CLEAR_LINE); return;
 }
 
-WRITE32_HANDLER( cps3_irq12_ack_w )
+static WRITE32_HANDLER( cps3_irq12_ack_w )
 {
 	cpunum_set_input_line(0,12, CLEAR_LINE); return;
 }
 
-WRITE32_HANDLER( cps3_unk_vidregs_w )
+static WRITE32_HANDLER( cps3_unk_vidregs_w )
 {
 	COMBINE_DATA(&cps3_unk_vidregs[offset]);
 }
 
-READ32_HANDLER( cps3_colourram_r )
+static READ32_HANDLER( cps3_colourram_r )
 {
 	UINT16* src = (UINT16*)cps3_colourram;
 
 	return src[offset*2+1] | (src[offset*2+0]<<16);
 }
 
-WRITE32_HANDLER( cps3_colourram_w )
+static WRITE32_HANDLER( cps3_colourram_w )
 {
 //  COMBINE_DATA(&cps3_colourram[offset]);
 
@@ -2509,7 +2509,7 @@ static struct WD33C93interface scsi_intf =
 	NULL			/* command completion IRQ */
 };
 
-MACHINE_RESET( cps3 )
+static MACHINE_RESET( cps3 )
 {
 	wd33c93_init(&scsi_intf);
 
@@ -3057,7 +3057,7 @@ static const struct cps3_speedups speedup_table[] =
 	{ 0 }	// end of table
 };
 
-READ32_HANDLER(cps3_speedup_r)
+static READ32_HANDLER(cps3_speedup_r)
 {
 //  printf("speedup read %08x %d\n",activecpu_get_pc(), cpu_getexecutingcpu());
 	if (cpu_getexecutingcpu()>=0) // prevent cheat search crash..
@@ -3066,7 +3066,7 @@ READ32_HANDLER(cps3_speedup_r)
 	return cps3_mainram[cps3_speedup_ram_address/4];
 }
 
-DRIVER_INIT( cps3_speedups )
+static DRIVER_INIT( cps3_speedups )
 {
 	const char *gamename = machine->gamedrv->name;
 	const struct cps3_speedups *k = &speedup_table[0];
@@ -3094,7 +3094,7 @@ DRIVER_INIT( cps3_speedups )
 /* PLEASE leave the region / NOCD information here even once CD emulation is done, its useful for debugging */
 
 
-DRIVER_INIT( jojo )
+static DRIVER_INIT( jojo )
 {
 	// XXXXXX 0
 	// JAPAN 1
@@ -3122,7 +3122,7 @@ DRIVER_INIT( jojo )
 
 }
 
-DRIVER_INIT (jojoba)
+static DRIVER_INIT (jojoba)
 {
 	// XXXXXX 0
 	// JAPAN 1
@@ -3149,7 +3149,7 @@ DRIVER_INIT (jojoba)
 }
 
 
-DRIVER_INIT( warzard )
+static DRIVER_INIT( warzard )
 {
 	// JAPAN 1
 	// ASIA 2
@@ -3175,7 +3175,7 @@ DRIVER_INIT( warzard )
 }
 
 
-DRIVER_INIT( sfiii )
+static DRIVER_INIT( sfiii )
 {
 	// JAPAN 1
 	// ASIA NCD 2
@@ -3201,7 +3201,7 @@ DRIVER_INIT( sfiii )
 
 }
 
-DRIVER_INIT( sfiii2 )
+static DRIVER_INIT( sfiii2 )
 {
 	// JAPAN 1
 	// ASIA NCD 2
@@ -3225,7 +3225,7 @@ DRIVER_INIT( sfiii2 )
 }
 
 
-DRIVER_INIT( sfiii3 )
+static DRIVER_INIT( sfiii3 )
 {
 	// JAPAN 1
 	// ASIA 2

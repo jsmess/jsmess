@@ -4211,7 +4211,7 @@ static void namcos22s_init( enum namcos22_gametype game_type )
 	mSpotRAM.RAM = auto_malloc(SPOTRAM_SIZE*2);
 }
 
-DRIVER_INIT( alpiner )
+static DRIVER_INIT( alpiner )
 {
 	namcos22s_init(NAMCOS22_ALPINE_RACER);
 
@@ -4220,7 +4220,7 @@ DRIVER_INIT( alpiner )
 	install_130_speedup();
 }
 
-DRIVER_INIT( alpiner2 )
+static DRIVER_INIT( alpiner2 )
 {
 	namcos22s_init(NAMCOS22_ALPINE_RACER_2);
 
@@ -4229,7 +4229,7 @@ DRIVER_INIT( alpiner2 )
 	install_130_speedup();
 }
 
-DRIVER_INIT( alpinesa )
+static DRIVER_INIT( alpinesa )
 {
 	namcos22s_init(NAMCOS22_ALPINE_SURFER);
 
@@ -4238,14 +4238,14 @@ DRIVER_INIT( alpinesa )
 	install_141_speedup();
 }
 
-DRIVER_INIT( airco22 )
+static DRIVER_INIT( airco22 )
 {
 	namcos22s_init(NAMCOS22_AIR_COMBAT22);
 
 	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
 }
 
-DRIVER_INIT( propcycl )
+static DRIVER_INIT( propcycl )
 {
    UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
 
@@ -4271,7 +4271,7 @@ DRIVER_INIT( propcycl )
 	install_141_speedup();
 }
 
-DRIVER_INIT( ridgeraj )
+static DRIVER_INIT( ridgeraj )
 {
 	namcos22_init(NAMCOS22_RIDGE_RACER);
 
@@ -4281,7 +4281,7 @@ DRIVER_INIT( ridgeraj )
 	credits1 = credits2 = 0;
 }
 
-DRIVER_INIT( ridger2j )
+static DRIVER_INIT( ridger2j )
 {
 	namcos22_init(NAMCOS22_RIDGE_RACER2);
 
@@ -4291,7 +4291,7 @@ DRIVER_INIT( ridger2j )
 	credits1 = credits2 = 0;
 }
 
-DRIVER_INIT( acedrvr )
+static DRIVER_INIT( acedrvr )
 {
 	namcos22_init(NAMCOS22_ACE_DRIVER);
 
@@ -4301,7 +4301,7 @@ DRIVER_INIT( acedrvr )
 	credits1 = credits2 = 0;
 }
 
-DRIVER_INIT( victlap )
+static DRIVER_INIT( victlap )
 {
 	namcos22_init(NAMCOS22_VICTORY_LAP);
 
@@ -4311,7 +4311,7 @@ DRIVER_INIT( victlap )
 	credits1 = credits2 = 0;
 }
 
-DRIVER_INIT( raveracw )
+static DRIVER_INIT( raveracw )
 {
 	namcos22_init(NAMCOS22_RAVE_RACER);
 
@@ -4321,7 +4321,7 @@ DRIVER_INIT( raveracw )
 	credits1 = credits2 = 0;
 }
 
-DRIVER_INIT( cybrcomm )
+static DRIVER_INIT( cybrcomm )
 {
 	UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
 	pROM[0x18ade8/4] = 0x4e714e71;
@@ -4338,7 +4338,7 @@ DRIVER_INIT( cybrcomm )
 	credits1 = credits2 = 0;
 }
 
-DRIVER_INIT( cybrcyc )
+static DRIVER_INIT( cybrcyc )
 {
 	/* patch DSP RAM test */
 	UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
@@ -4352,7 +4352,7 @@ DRIVER_INIT( cybrcyc )
 	install_130_speedup();
 }
 
-DRIVER_INIT( timecris )
+static DRIVER_INIT( timecris )
 {
 	namcos22s_init(NAMCOS22_TIME_CRISIS);
 

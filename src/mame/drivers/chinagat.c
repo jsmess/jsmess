@@ -112,7 +112,7 @@ static MACHINE_RESET( chinagat )
 	sound_irq = INPUT_LINE_NMI;
 }
 
-WRITE8_HANDLER( chinagat_video_ctrl_w )
+static WRITE8_HANDLER( chinagat_video_ctrl_w )
 {
 	/***************************
     ---- ---x   X Scroll MSB

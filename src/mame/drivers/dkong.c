@@ -289,12 +289,12 @@ static READ8_HANDLER( epos_decrypt_rom )
 	return 0;
 }
 
-WRITE8_HANDLER( hunchbkd_data_w )
+static WRITE8_HANDLER( hunchbkd_data_w )
 {
 	hunchloopback=data;
 }
 
-READ8_HANDLER( hunchbkd_port0_r )
+static READ8_HANDLER( hunchbkd_port0_r )
 {
 	logerror("port 0 : pc = %4x\n",activecpu_get_pc());
 
@@ -307,12 +307,12 @@ READ8_HANDLER( hunchbkd_port0_r )
     return 0;
 }
 
-READ8_HANDLER( hunchbkd_port1_r )
+static READ8_HANDLER( hunchbkd_port1_r )
 {
 	return hunchloopback;
 }
 
-READ8_HANDLER( herbiedk_port1_r )
+static READ8_HANDLER( herbiedk_port1_r )
 {
 	switch (activecpu_get_pc())
 	{
@@ -323,7 +323,7 @@ READ8_HANDLER( herbiedk_port1_r )
     return 1;
 }
 
-READ8_HANDLER( spclforc_port0_r )
+static READ8_HANDLER( spclforc_port0_r )
 {
 	switch (activecpu_get_pc())
 	{
@@ -335,7 +335,7 @@ READ8_HANDLER( spclforc_port0_r )
     return 0;
 }
 
-READ8_HANDLER( eightact_port1_r )
+static READ8_HANDLER( eightact_port1_r )
 {
 	switch (activecpu_get_pc())
 	{
@@ -346,7 +346,7 @@ READ8_HANDLER( eightact_port1_r )
     return 1;
 }
 
-READ8_HANDLER( shootgal_port0_r )
+static READ8_HANDLER( shootgal_port0_r )
 {
 	switch (activecpu_get_pc())
 	{
@@ -357,7 +357,7 @@ READ8_HANDLER( shootgal_port0_r )
     return 0;
 }
 
-WRITE8_HANDLER( dkong3_2a03_reset_w )
+static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
@@ -687,17 +687,17 @@ static INPUT_PORTS_START( dkong )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START      /* DSW0 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION( "SW1:!1,!2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION( "SW1:!3,!4" )
 	PORT_DIPSETTING(    0x00, "7000" )
 	PORT_DIPSETTING(    0x04, "10000" )
 	PORT_DIPSETTING(    0x08, "15000" )
 	PORT_DIPSETTING(    0x0c, "20000" )
-	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION( "SW1:!5,!6,!7" )
 	PORT_DIPSETTING(    0x70, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
@@ -706,7 +706,7 @@ static INPUT_PORTS_START( dkong )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )		PORT_DIPLOCATION( "SW1:!8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
@@ -805,7 +805,7 @@ static INPUT_PORTS_START( dkong3 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START      /* DSW0 */
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW2:!1,!2,!3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -814,37 +814,31 @@ static INPUT_PORTS_START( dkong3 )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME(DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!6" )
+	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_HIGH, "SW2:!7" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START      /* DSW1 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x00, "30000" )
 	PORT_DIPSETTING(    0x04, "40000" )
 	PORT_DIPSETTING(    0x08, "50000" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x00, "Additional Bonus" )
+	PORT_DIPNAME( 0x30, 0x00, "Additional Bonus" )			PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "30000" )
 	PORT_DIPSETTING(    0x10, "40000" )
 	PORT_DIPSETTING(    0x20, "50000" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )

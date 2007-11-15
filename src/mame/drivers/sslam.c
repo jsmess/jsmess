@@ -317,7 +317,7 @@ static void sslam_play(int track, int data)
 	}
 }
 
-WRITE16_HANDLER( sslam_snd_w )
+static WRITE16_HANDLER( sslam_snd_w )
 {
 	if (ACCESSING_LSB)
 	{

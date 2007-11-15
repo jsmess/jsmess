@@ -15,7 +15,7 @@ TODO:
 
 static tilemap *bg_tilemap;
 
-PALETTE_INIT( olibochu )
+static PALETTE_INIT( olibochu )
 {
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
@@ -58,19 +58,19 @@ PALETTE_INIT( olibochu )
 		COLOR(1,i) = (*(color_prom++) & 0x0f);
 }
 
-WRITE8_HANDLER( olibochu_videoram_w )
+static WRITE8_HANDLER( olibochu_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( olibochu_colorram_w )
+static WRITE8_HANDLER( olibochu_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( olibochu_flipscreen_w )
+static WRITE8_HANDLER( olibochu_flipscreen_w )
 {
 	if (flip_screen != (data & 0x80))
 	{
@@ -91,7 +91,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, color, flags);
 }
 
-VIDEO_START( olibochu )
+static VIDEO_START( olibochu )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
@@ -158,7 +158,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( olibochu )
+static VIDEO_UPDATE( olibochu )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(machine, bitmap, cliprect);

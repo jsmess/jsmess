@@ -69,7 +69,7 @@ static UINT8 coin_counter[2];
  *
  *************************************/
 
-WRITE16_HANDLER( arcadia_multibios_change_game )
+static WRITE16_HANDLER( arcadia_multibios_change_game )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x97ffff, 0, 0, (data == 0) ? MRA16_BANK2 : MRA16_NOP);
 }
@@ -698,16 +698,16 @@ static void arcadia_init(void)
  *************************************/
 
 static DRIVER_INIT( none )  {                                                arcadia_init(); }
-DRIVER_INIT( airh )  { generic_decode(REGION_USER3, 5, 0, 2, 4, 7, 6, 1, 3); arcadia_init(); }
-DRIVER_INIT( bowl )  { generic_decode(REGION_USER3, 7, 6, 0, 1, 2, 3, 4, 5); arcadia_init(); }
-DRIVER_INIT( dart )  { generic_decode(REGION_USER3, 4, 0, 7, 6, 3, 1, 2, 5); arcadia_init(); }
-DRIVER_INIT( ldrba ) { generic_decode(REGION_USER3, 2, 3, 4, 1, 0, 7, 5, 6); arcadia_init(); }
-DRIVER_INIT( ninj )  { generic_decode(REGION_USER3, 1, 6, 5, 7, 4, 2, 0, 3); arcadia_init(); }
-DRIVER_INIT( rdwr )  { generic_decode(REGION_USER3, 3, 1, 6, 4, 0, 5, 2, 7); arcadia_init(); }
-DRIVER_INIT( sdwr )  { generic_decode(REGION_USER3, 6, 3, 4, 5, 2, 1, 0, 7); arcadia_init(); }
-DRIVER_INIT( socc )  { generic_decode(REGION_USER3, 0, 7, 1, 6, 5, 4, 3, 2); arcadia_init(); }
-DRIVER_INIT( sprg )  { generic_decode(REGION_USER3, 4, 7, 3, 0, 6, 5, 2, 1); arcadia_init(); }
-DRIVER_INIT( xeon )  { generic_decode(REGION_USER3, 3, 1, 2, 4, 0, 5, 6, 7); arcadia_init(); }
+static DRIVER_INIT( airh )  { generic_decode(REGION_USER3, 5, 0, 2, 4, 7, 6, 1, 3); arcadia_init(); }
+static DRIVER_INIT( bowl )  { generic_decode(REGION_USER3, 7, 6, 0, 1, 2, 3, 4, 5); arcadia_init(); }
+static DRIVER_INIT( dart )  { generic_decode(REGION_USER3, 4, 0, 7, 6, 3, 1, 2, 5); arcadia_init(); }
+static DRIVER_INIT( ldrba ) { generic_decode(REGION_USER3, 2, 3, 4, 1, 0, 7, 5, 6); arcadia_init(); }
+static DRIVER_INIT( ninj )  { generic_decode(REGION_USER3, 1, 6, 5, 7, 4, 2, 0, 3); arcadia_init(); }
+static DRIVER_INIT( rdwr )  { generic_decode(REGION_USER3, 3, 1, 6, 4, 0, 5, 2, 7); arcadia_init(); }
+static DRIVER_INIT( sdwr )  { generic_decode(REGION_USER3, 6, 3, 4, 5, 2, 1, 0, 7); arcadia_init(); }
+static DRIVER_INIT( socc )  { generic_decode(REGION_USER3, 0, 7, 1, 6, 5, 4, 3, 2); arcadia_init(); }
+static DRIVER_INIT( sprg )  { generic_decode(REGION_USER3, 4, 7, 3, 0, 6, 5, 2, 1); arcadia_init(); }
+static DRIVER_INIT( xeon )  { generic_decode(REGION_USER3, 3, 1, 2, 4, 0, 5, 6, 7); arcadia_init(); }
 
 
 

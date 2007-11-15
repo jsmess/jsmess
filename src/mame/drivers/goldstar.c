@@ -446,7 +446,7 @@ ROM_START( moonlght )
 ROM_END
 
 
-DRIVER_INIT(goldstar)
+static DRIVER_INIT(goldstar)
 {
 	int A;
 	UINT8 *RAM = memory_region(REGION_CPU1);

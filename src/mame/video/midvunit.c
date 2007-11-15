@@ -8,7 +8,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/williams.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "midvunit.h"
 
 
@@ -83,7 +83,7 @@ VIDEO_START( midvunit )
  *
  *************************************/
 
-static void render_flat(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
+static void render_flat(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	UINT16 pixdata = extra->pixdata;
@@ -115,7 +115,7 @@ static void render_flat(void *destbase, INT32 scanline, const quad_extent *exten
  *
  *************************************/
 
-static void render_tex(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
+static void render_tex(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	UINT16 pixdata = extra->pixdata & 0xff00;
@@ -153,7 +153,7 @@ static void render_tex(void *destbase, INT32 scanline, const quad_extent *extent
 }
 
 
-static void render_textrans(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
+static void render_textrans(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	UINT16 pixdata = extra->pixdata & 0xff00;
@@ -193,7 +193,7 @@ static void render_textrans(void *destbase, INT32 scanline, const quad_extent *e
 }
 
 
-static void render_textransmask(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
+static void render_textransmask(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	UINT16 pixdata = extra->pixdata;
@@ -240,12 +240,60 @@ static void render_textransmask(void *destbase, INT32 scanline, const quad_exten
  *
  *************************************/
 
+static void make_vertices_inclusive(poly_vertex *vert)
+{
+	UINT8 rmask = 0, bmask = 0, eqmask = 0;
+	int vnum;
+
+	/* build up a mask of right and bottom points */
+	/* note we assume clockwise orientation here */
+	for (vnum = 0; vnum < 4; vnum++)
+	{
+		poly_vertex *currv = &vert[vnum];
+		poly_vertex *nextv = &vert[(vnum + 1) & 3];
+
+		/* if this vertex equals the next one, tag it */
+		if (nextv->y == currv->y && nextv->x == currv->x)
+			eqmask |= 1 << vnum;
+
+		/* if the next vertex is down from us, we are a right coordinate */
+		if (nextv->y > currv->y || (nextv->y == currv->y && nextv->x < currv->x))
+			rmask |= 1 << vnum;
+
+		/* if the next vertex is left from us, we are a bottom coordinate */
+		if (nextv->x < currv->x || (nextv->x == currv->x && nextv->y < currv->y))
+			bmask |= 1 << vnum;
+	}
+
+	/* bail on the edge case */
+	if (eqmask == 0x0f)
+		return;
+
+	/* adjust the right/bottom points so that they get included */
+	for (vnum = 0; vnum < 4; vnum++)
+	{
+		poly_vertex *currv = &vert[vnum];
+		int effvnum = vnum;
+
+		/* if we're equal to the next vertex, use that instead */
+		while (eqmask & (1 << effvnum))
+			effvnum = (effvnum + 1) & 3;
+
+		/* adjust the points */
+		if (rmask & (1 << effvnum))
+			currv->x += 0.001f;
+		if (bmask & (1 << effvnum))
+			currv->y += 0.001f;
+	}
+}
+
+
 static void process_dma_queue(running_machine *machine)
 {
 	poly_extra_data *extra = poly_get_extra_data(poly);
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	int textured = ((dma_data[0] & 0x300) == 0x100);
-	poly_draw_quad_scanline callback;
+	poly_draw_scanline callback;
 	poly_vertex vert[4];
 
 	/* if we're rendering to the same page we're viewing, it has changed */
@@ -253,14 +301,17 @@ static void process_dma_queue(running_machine *machine)
 		video_changed = TRUE;
 
 	/* fill in the vertex data */
-	vert[0].x = (float)(INT16)dma_data[2];
-	vert[0].y = (float)(INT16)dma_data[3];
-	vert[1].x = (float)(INT16)dma_data[4];
-	vert[1].y = (float)(INT16)dma_data[5];
-	vert[2].x = (float)(INT16)dma_data[6];
-	vert[2].y = (float)(INT16)dma_data[7];
-	vert[3].x = (float)(INT16)dma_data[8];
-	vert[3].y = (float)(INT16)dma_data[9];
+	vert[0].x = (float)(INT16)dma_data[2] + 0.5f;
+	vert[0].y = (float)(INT16)dma_data[3] + 0.5f;
+	vert[1].x = (float)(INT16)dma_data[4] + 0.5f;
+	vert[1].y = (float)(INT16)dma_data[5] + 0.5f;
+	vert[2].x = (float)(INT16)dma_data[6] + 0.5f;
+	vert[2].y = (float)(INT16)dma_data[7] + 0.5f;
+	vert[3].x = (float)(INT16)dma_data[8] + 0.5f;
+	vert[3].y = (float)(INT16)dma_data[9] + 0.5f;
+
+	/* make the vertices inclusive of right/bottom points */
+	make_vertices_inclusive(vert);
 
 	/* handle flat-shaded quads here */
 	if (!textured)
@@ -270,14 +321,14 @@ static void process_dma_queue(running_machine *machine)
 	else
 	{
 		/* if textured, add the texture info */
-		vert[0].p[0] = (float)(dma_data[10] & 0xff) * 65536.0f;
-		vert[0].p[1] = (float)(dma_data[10] >> 8) * 65536.0f;
-		vert[1].p[0] = (float)(dma_data[11] & 0xff) * 65536.0f;
-		vert[1].p[1] = (float)(dma_data[11] >> 8) * 65536.0f;
-		vert[2].p[0] = (float)(dma_data[12] & 0xff) * 65536.0f;
-		vert[2].p[1] = (float)(dma_data[12] >> 8) * 65536.0f;
-		vert[3].p[0] = (float)(dma_data[13] & 0xff) * 65536.0f;
-		vert[3].p[1] = (float)(dma_data[13] >> 8) * 65536.0f;
+		vert[0].p[0] = (float)(dma_data[10] & 0xff) * 65536.0f + 32768.0f;
+		vert[0].p[1] = (float)(dma_data[10] >> 8) * 65536.0f + 32768.0f;
+		vert[1].p[0] = (float)(dma_data[11] & 0xff) * 65536.0f + 32768.0f;
+		vert[1].p[1] = (float)(dma_data[11] >> 8) * 65536.0f + 32768.0f;
+		vert[2].p[0] = (float)(dma_data[12] & 0xff) * 65536.0f + 32768.0f;
+		vert[2].p[1] = (float)(dma_data[12] >> 8) * 65536.0f + 32768.0f;
+		vert[3].p[0] = (float)(dma_data[13] & 0xff) * 65536.0f + 32768.0f;
+		vert[3].p[1] = (float)(dma_data[13] >> 8) * 65536.0f + 32768.0f;
 
 		/* handle non-masked, non-transparent quads */
 		if ((dma_data[0] & 0xc00) == 0x000)

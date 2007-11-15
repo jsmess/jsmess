@@ -173,7 +173,7 @@ number 0 on each voice. That sample is 00000-00000.
 	}
 }
 
-DRIVER_INIT( magicbub )
+static DRIVER_INIT( magicbub )
 {
 //  remove_mem_write16_handler (0, 0x800180, 0x800181 );
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x800188, 0x800189, 0, 0, magicbub_sound_command_w);

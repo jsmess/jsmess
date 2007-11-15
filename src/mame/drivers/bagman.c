@@ -939,7 +939,7 @@ ROM_START( botanic )
 	ROM_LOAD( "bota_3a.3a",    0x0020, 0x0020, CRC(edf88f34) SHA1(b9c342d51303d552f87df2543a34e38c30acd07c) )
 ROM_END
 
-DRIVER_INIT( bagnarda )
+static DRIVER_INIT( bagnarda )
 {
 	/* initialize video enable because it's not done in the code */
 	*bagman_video_enable = 1;

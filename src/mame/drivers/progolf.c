@@ -281,7 +281,7 @@ ROM_START( progolfa )
 ROM_END
 
 
-DRIVER_INIT( progolf )
+static DRIVER_INIT( progolf )
 {
 	int A;
 	UINT8 *rom = memory_region(REGION_CPU1);

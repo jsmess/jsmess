@@ -51,7 +51,7 @@ something is missing, currently needs a hack to boot
 #include "driver.h"
 static int toggle_bit;
 
-READ16_HANDLER( wheelfir_rand1 )
+static READ16_HANDLER( wheelfir_rand1 )
 {
 
 
@@ -60,13 +60,13 @@ READ16_HANDLER( wheelfir_rand1 )
 	return readinputport(0)^toggle_bit;// mame_rand(Machine);
 }
 
-READ16_HANDLER( wheelfir_rand2 )
+static READ16_HANDLER( wheelfir_rand2 )
 {
 	return readinputport(1);// mame_rand(Machine);
 }
 
 
-READ16_HANDLER( wheelfir_rand4 )
+static READ16_HANDLER( wheelfir_rand4 )
 {
 	return mame_rand(Machine);
 }
@@ -270,7 +270,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 }
 
-VIDEO_START(wheelfir)
+static VIDEO_START(wheelfir)
 {
 
 	wheelfir_tmp_bitmap[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
@@ -284,7 +284,7 @@ VIDEO_START(wheelfir)
 static UINT8 wheelfir_palette[8192];
 static int wheelfir_palpos = 0;
 /* Press R to show a page of gfx, Q / E to move between pages, and W to clear the framebuffer */
-VIDEO_UPDATE(wheelfir)
+static VIDEO_UPDATE(wheelfir)
 {
 	/*
     int x,y;

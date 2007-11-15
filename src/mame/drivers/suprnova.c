@@ -284,7 +284,7 @@ static void hit_recalc(void)
 */
 }
 
-WRITE32_HANDLER ( skns_hit_w )
+static WRITE32_HANDLER ( skns_hit_w )
 //void hit_w(UINT32 adr, UINT32 data, int type)
 {
 	int adr = offset * 4;
@@ -348,14 +348,14 @@ WRITE32_HANDLER ( skns_hit_w )
 	hit_recalc();
 }
 
-WRITE32_HANDLER ( skns_hit2_w )
+static WRITE32_HANDLER ( skns_hit2_w )
 {
 //  log_event("HIT", "Set disconnect to %02x", data);
 	hit.disconnect = data;
 }
 
 
-READ32_HANDLER( skns_hit_r )
+static READ32_HANDLER( skns_hit_r )
 //UINT32 hit_r(UINT32 adr, int type)
 {
 	int adr = offset *4;

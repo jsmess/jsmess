@@ -411,6 +411,7 @@ READ32_HANDLER ( stv_vdp1_framebuffer0_r )
 	return result;
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE32_HANDLER ( stv_vdp1_framebuffer1_w )
 {
 	//popmessage ("STV VDP1 Framebuffer 1 WRITE offset %08x data %08x",offset, data);
@@ -421,6 +422,7 @@ READ32_HANDLER ( stv_vdp1_framebuffer1_r )
 	//popmessage ("STV VDP1 Framebuffer 1 READ offset %08x",offset);
 	return 0xffff;
 }
+#endif
 
 
 /*

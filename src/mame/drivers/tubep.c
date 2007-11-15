@@ -12,8 +12,6 @@ Dox lent the Tube Panic PCB to me - I have drawn the schematics using the PCB,
 this allowed me to emulate the background-drawing circuit.
 
 ----
-Tube Panic
-Nichibutsu 1984
 
 CPU
 84P0100B
@@ -97,16 +95,15 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 
 ----
 
+*/
 
-
-
-***************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+
 #include "tubep.h"
 
 /* Global variables */
@@ -115,6 +112,11 @@ static UINT8 ls74 = 0;
 static UINT8 ls377 = 0;
 
 static mame_timer *interrupt_timer;
+
+
+static int curr_scanline=0;
+
+
 
 
 /*************************************
@@ -154,7 +156,7 @@ static WRITE8_HANDLER( tubep_LS259_w )
 }
 
 
-static ADDRESS_MAP_START( tubep_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tubep_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(&tubep_textram)	/* RAM on GFX PCB @B13 */
@@ -165,17 +167,18 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( main_cpu_irq_line_clear_w )
 {
-//  cpunum_set_input_line(0,CLEAR_LINE);
-//not used - handled by MAME anyway (because it is usual Vblank int)
+	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", curr_scanline);
 	return;
 }
+
 
 static WRITE8_HANDLER( tubep_soundlatch_w )
 {
 	sound_latch = (data&0x7f) | 0x80;
 }
 
-static ADDRESS_MAP_START( tubep_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tubep_main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x80, 0x80) AM_READ(input_port_3_r)
 	AM_RANGE(0x90, 0x90) AM_READ(input_port_4_r)
@@ -191,14 +194,22 @@ static ADDRESS_MAP_START( tubep_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+
 /*************************************
  *
  *  Slave CPU on main PCB
  *
  *************************************/
 
+static WRITE8_HANDLER( second_cpu_irq_line_clear_w )
+{
+	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", curr_scanline);
+	return;
+}
 
-static ADDRESS_MAP_START( tubep_g_map, ADDRESS_SPACE_PROGRAM, 8 )
+
+static ADDRESS_MAP_START( tubep_second_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
@@ -208,14 +219,19 @@ static ADDRESS_MAP_START( tubep_g_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(2)									/* program copies here part of shared ram ?? */
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( tubep_second_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x7f, 0x7f) AM_WRITE(second_cpu_irq_line_clear_w)
+ADDRESS_MAP_END
+
+
 static READ8_HANDLER( tubep_soundlatch_r )
 {
  	int res;
 
 	res = sound_latch;
 	sound_latch = 0; /* "=0" ????  or "&= 0x7f" ?????  works either way */
-
-	/*logerror("SOUND COMM READ %2x\n",res);*/
 
 	return res;
 }
@@ -239,6 +255,7 @@ static ADDRESS_MAP_START( tubep_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM		/* 6116 #3 */
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( tubep_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
@@ -252,28 +269,75 @@ static ADDRESS_MAP_START( tubep_sound_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+static TIMER_CALLBACK( tubep_scanline_callback )
+{
+	int scanline = param;
+
+curr_scanline = scanline;//for debugging
+
+
+	/* CPU #0 interrupt */
+	/* activates at the start of VBLANK signal which happens at the beginning of scaline number 240 */
+	if (scanline==240)
+	{
+		logerror("VBLANK CPU#0\n");
+		cpunum_set_input_line(0, 0, ASSERT_LINE);
+	}
+
+
+	/* CPU #1 interrupt */
+	/* activates at the _end_ of VBLANK signal which happens at the beginning of scanline number 16 */
+	if (scanline==16)
+	{
+		logerror("/VBLANK CPU#1\n");
+		cpunum_set_input_line(1, 0, ASSERT_LINE);
+	}
+
+
+	/* CPU #3 MS2010-A NMI */
+	/* activates at the _end_ of VBLANK signal which happens at the beginning of scanline number 16 */
+	if (scanline==16)
+	{
+		logerror("/nmi CPU#3\n");
+		tubep_vblank_end(); /* switch buffered sprite RAM page */
+		cpunum_set_input_line(3, INPUT_LINE_NMI, ASSERT_LINE);
+	}
+	/* CPU #3 MS2010-A NMI */
+	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
+	if (scanline==240)
+	{
+		logerror("CPU#3 nmi clear\n");
+		cpunum_set_input_line(3, INPUT_LINE_NMI, CLEAR_LINE);
+	}
+
+
+	/* sound CPU interrupt */
+	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
+	if ((scanline==64) || (scanline==192))
+	{
+		cpunum_set_input_line(2,0,ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
+	}
+
+
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+
+//debug
+logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(0));
+
+	scanline ++;
+	if (scanline>=264)
+		scanline=0;
+
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+}
+
+
+
 /*************************************
  *
  *  Save state setup
  *
  *************************************/
-
-
-static TIMER_CALLBACK( scanline_callback )
-{
-	int scanline = param;
-
-	/* interrupt is generated whenever line V6 from video part goes lo->hi */
-	/* that is when scanline is 64 and 192 accordingly */
-
-	cpunum_set_input_line(2,0,ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
-
-	scanline += 128;
-	scanline &= 255;
-
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
-}
-
 
 static void tubep_setup_save_state(void)
 {
@@ -284,26 +348,38 @@ static void tubep_setup_save_state(void)
 }
 
 
+
 static MACHINE_START( tubep )
 {
 	/* Create interrupt timer */
-	interrupt_timer = mame_timer_alloc(scanline_callback);
+	interrupt_timer = mame_timer_alloc(tubep_scanline_callback);
 
 	tubep_setup_save_state();
 }
+
 
 static MACHINE_RESET( tubep )
 {
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64, time_zero);
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 }
 
-static MACHINE_START( rjammer )
-{
-	tubep_setup_save_state();
-}
 
-static MACHINE_RESET( rjammer )
-{}
+
+/*************************************
+ *
+ *  NSC8105 memory handlers
+ *
+ *************************************/
+
+/* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
+static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(3) AM_BASE(&tubep_sprite_colorsharedram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
+	AM_RANGE(0x200a, 0x200b) AM_WRITE(MWA8_NOP) /* not used by the games - perhaps designed for debugging */
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -311,7 +387,6 @@ static MACHINE_RESET( rjammer )
  *  Roller Jammer memory handlers
  *
  *************************************/
-
 
 static WRITE8_HANDLER( rjammer_LS259_w )
 {
@@ -329,13 +404,23 @@ static WRITE8_HANDLER( rjammer_LS259_w )
 	}
 }
 
+
 static WRITE8_HANDLER( rjammer_soundlatch_w )
 {
 	sound_latch = data;
 	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( rjammer_portmap, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( rjammer_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM									/* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(&tubep_textram)/* RAM on GFX PCB @B13 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)						/* MB8416 SRAM on daughterboard (the one on the right) */
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( rjammer_main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_2_r)	/* a bug in game code (during attract mode) */
 	AM_RANGE(0x80, 0x80) AM_READ(input_port_2_r)
@@ -350,22 +435,7 @@ static ADDRESS_MAP_START( rjammer_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM									/* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(&tubep_textram)/* RAM on GFX PCB @B13 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)						/* MB8416 SRAM on daughterboard (the one on the right) */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( rjammer_slave_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(rjammer_background_page_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(rjammer_background_LS377_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( rjammer_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( rjammer_second_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM							/* M5M5117P @21G */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)				/* MB8416 on daughterboard (the one on the right) */
@@ -374,21 +444,88 @@ static ADDRESS_MAP_START( rjammer_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-/*************************************
- *
- *  NSC8105 memory handlers
- *
- *************************************/
-
-
-/* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
-static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(3) AM_BASE(&tubep_sprite_colorsharedram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
-	AM_RANGE(0x200a, 0x200b) AM_WRITE(MWA8_NOP) /* not used by the games - perhaps designed for debugging */
-	AM_RANGE(0xc000, 0xffff) AM_ROM
+static ADDRESS_MAP_START( rjammer_second_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(rjammer_background_page_w)
+	AM_RANGE(0xd0, 0xd0) AM_WRITE(rjammer_background_LS377_w)
 ADDRESS_MAP_END
+
+
+static TIMER_CALLBACK( rjammer_scanline_callback )
+{
+	int scanline = param;
+
+curr_scanline = scanline;//for debugging
+
+
+	/* CPU #0 interrupt */
+	/* activates at the start of VBLANK signal which happens at the beginning of scaline number 240 */
+	if (scanline==240)
+	{
+		logerror("VBLANK CPU#0\n");
+		cpunum_set_input_line(0, 0, ASSERT_LINE);
+	}
+
+
+	/* CPU #1 interrupt */
+	/* activates at the _end_ of VBLANK signal which happens at the beginning of scanline number 16 */
+	if (scanline==16)
+	{
+		logerror("/VBLANK CPU#1\n");
+		cpunum_set_input_line(1, 0, HOLD_LINE);
+	}
+
+
+	/* CPU #3 MS2010-A NMI */
+	/* activates at the _end_ of VBLANK signal which happens at the beginning of scanline number 16 */
+	if (scanline==16)
+	{
+		logerror("/nmi CPU#3\n");
+		tubep_vblank_end(); /* switch buffered sprite RAM page */
+		cpunum_set_input_line(3, INPUT_LINE_NMI, ASSERT_LINE);
+	}
+	/* CPU #3 MS2010-A NMI */
+	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
+	if (scanline==240)
+	{
+		logerror("CPU#3 nmi clear\n");
+		cpunum_set_input_line(3, INPUT_LINE_NMI, CLEAR_LINE);
+	}
+
+
+	/* sound CPU interrupt */
+	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
+	if ((scanline==64) || (scanline==192))
+	{
+		cpunum_set_input_line(2,0,ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
+	}
+
+
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+
+logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(0));
+
+	scanline ++;
+	if (scanline>=264)
+		scanline=0;
+
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+}
+
+
+static MACHINE_START( rjammer )
+{
+	/* Create interrupt timer */
+	interrupt_timer = mame_timer_alloc(rjammer_scanline_callback);
+
+	tubep_setup_save_state();
+}
+
+static MACHINE_RESET( rjammer )
+{
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+}
+
 
 
 /*************************************
@@ -397,12 +534,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-
 static READ8_HANDLER( rjammer_soundlatch_r )
 {
  	int res = sound_latch;
 	return res;
 }
+
 
 static WRITE8_HANDLER( rjammer_voice_startstop_w )
 {
@@ -412,6 +549,8 @@ static WRITE8_HANDLER( rjammer_voice_startstop_w )
 
 	return;
 }
+
+
 static WRITE8_HANDLER( rjammer_voice_frequency_select_w )
 {
 	/* bit 0 of data selects voice frequency on MSM5205 */
@@ -423,6 +562,7 @@ static WRITE8_HANDLER( rjammer_voice_frequency_select_w )
 
 	return;
 }
+
 
 static void rjammer_adpcm_vck (int data)
 {
@@ -440,6 +580,7 @@ static void rjammer_adpcm_vck (int data)
 
 }
 
+
 static WRITE8_HANDLER( rjammer_voice_input_w )
 {
 	/* 8 bits of adpcm data for MSM5205 */
@@ -456,17 +597,20 @@ static WRITE8_HANDLER( rjammer_voice_input_w )
 	return;
 }
 
+
 static WRITE8_HANDLER( rjammer_voice_intensity_control_w )
 {
 	/* 4 LSB bits select the intensity (analog circuit that alters the output from MSM5205) */
-	// need to buffer the data
+	/* need to buffer the data */
 	return;
 }
+
 
 static ADDRESS_MAP_START( rjammer_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM		/* M5M5117P (M58125P @2C on schematics) */
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( rjammer_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
@@ -508,6 +652,7 @@ static WRITE8_HANDLER( ay8910_portB_2_w )
 {
 		//analog sound control
 }
+
 
 
 /*************************************
@@ -703,12 +848,12 @@ static INPUT_PORTS_START( rjammer )
 INPUT_PORTS_END
 
 
+
 /*************************************
  *
  *  Graphics definitions
  *
  *************************************/
-
 
 static const gfx_layout charlayout =
 {
@@ -720,6 +865,7 @@ static const gfx_layout charlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8 /* every char takes 8 consecutive bytes */
 };
+
 static GFXDECODE_START( tubep )
 	GFXDECODE_ENTRY( REGION_GFX1,      0, charlayout,       0, 32 )	/* 32 color codes */
 GFXDECODE_END
@@ -729,12 +875,12 @@ static GFXDECODE_START( rjammer )
 GFXDECODE_END
 
 
+
 /*************************************
  *
  *  Sound definitions
  *
  *************************************/
-
 
 static struct AY8910interface ay8910_interface_1 =
 {
@@ -767,33 +913,31 @@ static struct MSM5205interface msm5205_interface =
 };
 
 
+
 /*************************************
  *
  *  Machine driver
  *
  *************************************/
 
-
 static MACHINE_DRIVER_START( tubep )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",Z80,16000000 / 4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(tubep_map,0)
-	MDRV_CPU_IO_MAP(tubep_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_PROGRAM_MAP(tubep_main_map,0)
+	MDRV_CPU_IO_MAP(tubep_main_portmap,0)
 
 	MDRV_CPU_ADD_TAG("slave",Z80,16000000 / 4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(tubep_g_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_PROGRAM_MAP(tubep_second_map,0)
+	MDRV_CPU_IO_MAP(tubep_second_portmap,0)
 
-	MDRV_CPU_ADD_TAG("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	/* audio CPU */
+	MDRV_CPU_ADD_TAG("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(tubep_sound_map,0)
 	MDRV_CPU_IO_MAP(tubep_sound_portmap,0)
 
-	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000/4)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000 / 2)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(100)
@@ -804,7 +948,7 @@ static MACHINE_DRIVER_START( tubep )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_SIZE(256, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(tubep)
 	MDRV_PALETTE_LENGTH(32 + 256*64)
@@ -812,7 +956,6 @@ static MACHINE_DRIVER_START( tubep )
 
 	MDRV_PALETTE_INIT(tubep)
 	MDRV_VIDEO_START(tubep)
-	MDRV_VIDEO_EOF(tubep)
 	MDRV_VIDEO_UPDATE(tubep)
 
 	/* sound hardware */
@@ -844,37 +987,63 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( rjammer )
-	MDRV_IMPORT_FROM( tubep )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(rjammer_map,0)
-	MDRV_CPU_IO_MAP(rjammer_portmap,0)
+	MDRV_CPU_ADD_TAG("main",Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_PROGRAM_MAP(rjammer_main_map,0)
+	MDRV_CPU_IO_MAP(rjammer_main_portmap,0)
 
-	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(rjammer_slave_map,0)
-	MDRV_CPU_IO_MAP(rjammer_slave_portmap,0)
+	MDRV_CPU_ADD_TAG("slave",Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_PROGRAM_MAP(rjammer_second_map,0)
+	MDRV_CPU_IO_MAP(rjammer_second_portmap,0)
 
-	MDRV_CPU_MODIFY("sound")	/* Xtal3 divided by LS669 (on Qc output) (signal RH0) */
+	/* audio CPU */
+	MDRV_CPU_ADD_TAG("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(rjammer_sound_map,0)
 	MDRV_CPU_IO_MAP(rjammer_sound_portmap,0)
+
+	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000/4)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_MACHINE_START(rjammer)
 	MDRV_MACHINE_RESET(rjammer)
 
+
 	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 264)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(rjammer)
 	MDRV_PALETTE_LENGTH(64)
 	MDRV_COLORTABLE_LENGTH(2*16 + 16*2)
 
 	MDRV_PALETTE_INIT(rjammer)
+	MDRV_VIDEO_START(tubep)
 	MDRV_VIDEO_UPDATE(rjammer)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(AY8910, 19968000 / 8 / 2)
+	MDRV_SOUND_CONFIG(ay8910_interface_1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
+	MDRV_SOUND_ADD(AY8910, 19968000 / 8 / 2)
+	MDRV_SOUND_CONFIG(ay8910_interface_2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
+	MDRV_SOUND_ADD(AY8910, 19968000 / 8 / 2)
+	MDRV_SOUND_CONFIG(ay8910_interface_3)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
 	MDRV_SOUND_ADD(MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
 
 
 /*************************************
@@ -882,7 +1051,6 @@ MACHINE_DRIVER_END
  *  ROM definition(s)
  *
  *************************************/
-
 
 ROM_START( tubep )
 	ROM_REGION( 0x10000,REGION_CPU1, 0 ) /* Z80 (master) cpu code */
@@ -1065,14 +1233,14 @@ ROM_START( rjammer )
 ROM_END
 
 
+
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
-
-/*     year  rom     parent  machine  inp   init */
+/*     year  rom      parent  machine  inp   init */
 GAME( 1984, tubep,   0,      tubep,   tubep,   0, ROT0, "Nichibutsu + Fujitek", "Tube Panic", GAME_SUPPORTS_SAVE )
 GAME( 1984, tubepb,  tubep,  tubepb,  tubepb,  0, ROT0, "bootleg", "Tube Panic (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1984, rjammer, 0,      rjammer, rjammer, 0, ROT0, "Nichibutsu + Alice", "Roller Jammer", GAME_SUPPORTS_SAVE )

@@ -140,7 +140,7 @@ static WRITE8_HANDLER( keyboard_select_w )
 static UINT8 *nvram;
 static size_t nvram_size;
 
-NVRAM_HANDLER( mjkjidai )
+static NVRAM_HANDLER( mjkjidai )
 {
 	if (read_or_write)
 		mame_fwrite(file, nvram, nvram_size);

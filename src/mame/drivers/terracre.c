@@ -994,17 +994,17 @@ ROM_START( horekidb )
 	ROM_LOAD( "kid_prom.4e",  0x400, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 ROM_END
 
-DRIVER_INIT( amazon )
+static DRIVER_INIT( amazon )
 {
 	mpProtData = mAmazonProtData;
 }
 
-DRIVER_INIT( amatelas )
+static DRIVER_INIT( amatelas )
 {
 	mpProtData = mAmatelasProtData;
 }
 
-DRIVER_INIT( horekid )
+static DRIVER_INIT( horekid )
 {
 	mpProtData = mHoreKidProtData;
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x44004, 0x44005, 0, 0, horekid_IN2_r);

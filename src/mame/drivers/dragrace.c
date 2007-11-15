@@ -92,7 +92,7 @@ static void dragrace_update_misc_flags(void)
 	discrete_sound_w(DRAGRACE_HITONE_EN, (dragrace_misc_flags & 0x20000000) ? 1: 0);	// HiTone enable
 }
 
-WRITE8_HANDLER( dragrace_misc_w )
+static WRITE8_HANDLER( dragrace_misc_w )
 {
 	/* Set/clear individual bit */
 	UINT32 mask = 1 << offset;
@@ -104,7 +104,7 @@ WRITE8_HANDLER( dragrace_misc_w )
 	dragrace_update_misc_flags();
 	}
 
-WRITE8_HANDLER( dragrace_misc_clear_w )
+static WRITE8_HANDLER( dragrace_misc_clear_w )
 {
 	/* Clear 8 bits */
 	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
@@ -113,7 +113,7 @@ WRITE8_HANDLER( dragrace_misc_clear_w )
 	dragrace_update_misc_flags();
 }
 
-READ8_HANDLER( dragrace_input_r )
+static READ8_HANDLER( dragrace_input_r )
 {
 	int val = readinputport(2);
 
@@ -141,7 +141,7 @@ READ8_HANDLER( dragrace_input_r )
 }
 
 
-READ8_HANDLER( dragrace_steering_r )
+static READ8_HANDLER( dragrace_steering_r )
 {
 	int bitA[2];
 	int bitB[2];
@@ -162,7 +162,7 @@ READ8_HANDLER( dragrace_steering_r )
 }
 
 
-READ8_HANDLER( dragrace_scanline_r )
+static READ8_HANDLER( dragrace_scanline_r )
 {
 	return (video_screen_get_vpos(0) ^ 0xf0) | 0x0f;
 }

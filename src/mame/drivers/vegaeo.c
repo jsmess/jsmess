@@ -73,7 +73,7 @@ static WRITE32_HANDLER( vega_misc_w )
 }
 
 
-READ32_HANDLER( vegaeo_custom_read )
+static READ32_HANDLER( vegaeo_custom_read )
 {
 	eolith_speedup_read();
 	return readinputport(0);
@@ -125,12 +125,12 @@ static INPUT_PORTS_START( crazywar )
 INPUT_PORTS_END
 
 
-VIDEO_START( vega )
+static VIDEO_START( vega )
 {
 	vega_vram = auto_malloc(0x14000*2);
 }
 
-VIDEO_UPDATE( vega )
+static VIDEO_UPDATE( vega )
 {
 	int x,y,count;
 	int color;
@@ -262,7 +262,7 @@ ROM_START( crazywar )
 	ROM_LOAD( "qs1001a.u86",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
-DRIVER_INIT( vegaeo )
+static DRIVER_INIT( vegaeo )
 {
 	init_eolith_speedup(machine);
 }

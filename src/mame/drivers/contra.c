@@ -36,7 +36,7 @@ VIDEO_UPDATE( contra );
 VIDEO_START( contra );
 
 
-WRITE8_HANDLER( contra_bankswitch_w )
+static WRITE8_HANDLER( contra_bankswitch_w )
 {
 	int bankaddress;
 	UINT8 *RAM = memory_region(REGION_CPU1);
@@ -47,12 +47,12 @@ WRITE8_HANDLER( contra_bankswitch_w )
 		memory_set_bankptr(1,&RAM[bankaddress]);
 }
 
-WRITE8_HANDLER( contra_sh_irqtrigger_w )
+static WRITE8_HANDLER( contra_sh_irqtrigger_w )
 {
 	cpunum_set_input_line(1,M6809_IRQ_LINE,HOLD_LINE);
 }
 
-WRITE8_HANDLER( contra_coin_counter_w )
+static WRITE8_HANDLER( contra_coin_counter_w )
 {
 	if (data & 0x01) coin_counter_w(0,data & 0x01);
 	if (data & 0x02) coin_counter_w(1,(data & 0x02) >> 1);

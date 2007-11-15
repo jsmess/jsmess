@@ -557,7 +557,7 @@ static WRITE32_HANDLER( zn_qsound_w )
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-DRIVER_INIT( coh1000c )
+static DRIVER_INIT( coh1000c )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f3fffff, 0, 0, MRA32_BANK1 );     /* fixed game rom */
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f400000, 0x1f7fffff, 0, 0, MRA32_BANK2 );     /* banked game rom */
@@ -579,7 +579,7 @@ DRIVER_INIT( coh1000c )
 	}
 }
 
-MACHINE_RESET( coh1000c )
+static MACHINE_RESET( coh1000c )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	memory_set_bankptr( 2, memory_region( REGION_USER2 ) + 0x400000 ); /* banked game rom */
@@ -844,7 +844,7 @@ static WRITE32_HANDLER( bank_coh3002c_w )
 	memory_set_bankptr( 2, memory_region( REGION_USER2 ) + 0x400000 + ( data * 0x400000 ) );
 }
 
-DRIVER_INIT( coh3002c )
+static DRIVER_INIT( coh3002c )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f3fffff, 0, 0, MRA32_BANK1 );     /* fixed game rom */
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f400000, 0x1f7fffff, 0, 0, MRA32_BANK2 );     /* banked game rom */
@@ -857,7 +857,7 @@ DRIVER_INIT( coh3002c )
 	zn_driver_init();
 }
 
-MACHINE_RESET( coh3002c )
+static MACHINE_RESET( coh3002c )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	memory_set_bankptr( 2, memory_region( REGION_USER2 ) + 0x400000 ); /* banked game rom */
@@ -1216,7 +1216,7 @@ static WRITE32_HANDLER( taitofx1a_ymsound_w )
 	}
 }
 
-DRIVER_INIT( coh1000ta )
+static DRIVER_INIT( coh1000ta )
 {
 	taitofx1_eeprom_size1 = 0x200; taitofx1_eeprom1 = auto_malloc( taitofx1_eeprom_size1 );
 
@@ -1231,7 +1231,7 @@ DRIVER_INIT( coh1000ta )
 	mb3773_init();
 }
 
-MACHINE_RESET( coh1000ta )
+static MACHINE_RESET( coh1000ta )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* banked game rom */
 	memory_set_bankptr( 2, taitofx1_eeprom1 );
@@ -1366,7 +1366,7 @@ static READ32_HANDLER( taitofx1b_sound_r )
 	return data;
 }
 
-DRIVER_INIT( coh1000tb )
+static DRIVER_INIT( coh1000tb )
 {
 	taitofx1_eeprom_size1 = 0x400; taitofx1_eeprom1 = auto_malloc( taitofx1_eeprom_size1 );
 	taitofx1_eeprom_size2 = 0x200; taitofx1_eeprom2 = auto_malloc( taitofx1_eeprom_size2 );
@@ -1385,7 +1385,7 @@ DRIVER_INIT( coh1000tb )
 	mb3773_init();
 }
 
-MACHINE_RESET( coh1000tb )
+static MACHINE_RESET( coh1000tb )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* banked game rom */
 	memory_set_bankptr( 2, taitofx1_eeprom1 );
@@ -1588,7 +1588,7 @@ static READ32_HANDLER( coh3002t_unknown_r )
 	return coh3002t_unknown;
 }
 
-DRIVER_INIT( coh3002t )
+static DRIVER_INIT( coh3002t )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f1fffff, 0, 0, MRA32_BANK1 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb40000, 0x1fb40003, 0, 0, coh3002t_unknown_w );
@@ -1597,7 +1597,7 @@ DRIVER_INIT( coh3002t )
 	zn_driver_init();
 }
 
-MACHINE_RESET( coh3002t )
+static MACHINE_RESET( coh3002t )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* GNET boot rom */
 	zn_machine_init();
@@ -1790,7 +1790,7 @@ static void atpsx_dma_write( UINT32 n_address, INT32 n_size )
 	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }
 
-DRIVER_INIT( coh1000w )
+static DRIVER_INIT( coh1000w )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f1fffff, 0, 0, MRA32_BANK1 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f000003, 0, 0, MWA32_NOP );
@@ -1807,7 +1807,7 @@ DRIVER_INIT( coh1000w )
 	zn_driver_init();
 }
 
-MACHINE_RESET( coh1000w )
+static MACHINE_RESET( coh1000w )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	zn_machine_init();
@@ -2015,7 +2015,7 @@ static WRITE32_HANDLER( coh1002e_latch_w )
 	}
 }
 
-DRIVER_INIT( coh1002e )
+static DRIVER_INIT( coh1002e )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f7fffff, 0, 0, MRA32_BANK1 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fa10300, 0x1fa10303, 0, 0, coh1002e_bank_w );
@@ -2024,7 +2024,7 @@ DRIVER_INIT( coh1002e )
 	zn_driver_init();
 }
 
-MACHINE_RESET( coh1002e )
+static MACHINE_RESET( coh1002e )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* banked game rom */
 	zn_machine_init();
@@ -2360,7 +2360,7 @@ static READ32_HANDLER( nbajamex_80_r )
 	return data;
 }
 
-DRIVER_INIT( coh1000a )
+static DRIVER_INIT( coh1000a )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f1fffff, 0, 0, MRA32_BANK1 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fbfff00, 0x1fbfff03, 0, 0, acpsx_00_w );
@@ -2393,7 +2393,7 @@ DRIVER_INIT( coh1000a )
 	zn_driver_init();
 }
 
-MACHINE_RESET( coh1000a )
+static MACHINE_RESET( coh1000a )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	zn_machine_init();
@@ -2557,7 +2557,7 @@ static WRITE32_HANDLER( coh1001l_bnk_w )
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) + ( ( ( data >> 16 ) & 3 ) * 0x800000 ) );
 }
 
-DRIVER_INIT( coh1001l )
+static DRIVER_INIT( coh1001l )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f7fffff, 0, 0, MRA32_BANK1 ); /* banked rom */
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, coh1001l_bnk_w );
@@ -2565,7 +2565,7 @@ DRIVER_INIT( coh1001l )
 	zn_driver_init();
 }
 
-MACHINE_RESET( coh1001l )
+static MACHINE_RESET( coh1001l )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* banked rom */
 	zn_machine_init();
@@ -2627,7 +2627,7 @@ static WRITE32_HANDLER( coh1002v_bnk_w )
 	memory_set_bankptr( 2, memory_region( REGION_USER3 ) + ( data * 0x100000 ) );
 }
 
-DRIVER_INIT( coh1002v )
+static DRIVER_INIT( coh1002v )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f27ffff, 0, 0, MRA32_BANK1 );
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fbfffff, 0, 0, MRA32_BANK2 );
@@ -2636,7 +2636,7 @@ DRIVER_INIT( coh1002v )
 	zn_driver_init();
 }
 
-MACHINE_RESET( coh1002v )
+static MACHINE_RESET( coh1002v )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	memory_set_bankptr( 2, memory_region( REGION_USER3 ) ); /* banked rom */
@@ -2873,7 +2873,7 @@ static WRITE32_HANDLER( cbaj_z80_w )
 	latch_to_z80 = data;
 }
 
-DRIVER_INIT( coh1002m )
+static DRIVER_INIT( coh1002m )
 {
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f7fffff, 0, 0, MRA32_BANK1 );
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, cbaj_z80_r );
@@ -2883,7 +2883,7 @@ DRIVER_INIT( coh1002m )
 	zn_driver_init();
 }
 
-MACHINE_RESET( coh1002m )
+static MACHINE_RESET( coh1002m )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) );
 	zn_machine_init();

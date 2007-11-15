@@ -1603,7 +1603,7 @@ typedef struct _raster_info raster_info;
 struct _raster_info
 {
 	struct _raster_info *next;			/* pointer to next entry with the same hash */
-	poly_draw_tri_scanline callback;	/* callback pointer */
+	poly_draw_scanline callback;		/* callback pointer */
 	UINT8		is_generic;				/* TRUE if this is one of the generic rasterizers */
 	UINT8		display;				/* display index */
 	UINT32		hits;					/* how many hits (pixels) we've used this for */
@@ -3490,7 +3490,7 @@ while (0)
 
 #define RASTERIZER(name, TMUS, FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
-static void raster_##name(void *destbase, INT32 y, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid) \
+static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid) \
 {																				\
 	const poly_extra_data *extra = extradata;									\
 	voodoo_state *v = extra->state;												\

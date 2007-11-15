@@ -677,7 +677,7 @@ static GFXDECODE_START( witch )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-VIDEO_START(witch)
+static VIDEO_START(witch)
 {
 	gfx0a_tilemap = tilemap_create(get_gfx0a_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 	gfx0b_tilemap = tilemap_create(get_gfx0b_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
@@ -741,7 +741,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 }
 
-VIDEO_UPDATE(witch)
+static VIDEO_UPDATE(witch)
 {
 	tilemap_set_scrollx( gfx1_tilemap, 0, scrollx-7 ); //offset to have it aligned with the sprites
 	tilemap_set_scrolly( gfx1_tilemap, 0, scrolly+8 );
@@ -847,7 +847,7 @@ ROM_START( pbchmp95 )
 	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
 ROM_END
 
-DRIVER_INIT(witch)
+static DRIVER_INIT(witch)
 {
  	UINT8 *ROM = (UINT8 *)memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&ROM[0x10000+UNBANKED_SIZE]);

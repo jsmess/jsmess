@@ -384,7 +384,7 @@ JCHAN_MCU_COM_W(1)
 JCHAN_MCU_COM_W(2)
 JCHAN_MCU_COM_W(3)
 
-READ16_HANDLER( jchan_mcu_status_r )
+static READ16_HANDLER( jchan_mcu_status_r )
 {
 	logerror("cpu #%d (PC=%06X): read mcu status\n", cpu_getactivecpu(), activecpu_get_previouspc());
 	return 0;
@@ -408,7 +408,7 @@ INTERRUPT_GEN( jchan_vblank )
 
 
 
-VIDEO_START(jchan)
+static VIDEO_START(jchan)
 {
 	/* so we can use suprnova.c */
 	buffered_spriteram32 = auto_malloc ( 0x4000 );
@@ -419,7 +419,7 @@ VIDEO_START(jchan)
 extern void skns_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
 
 
-VIDEO_UPDATE(jchan)
+static VIDEO_UPDATE(jchan)
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
@@ -440,7 +440,7 @@ VIDEO_UPDATE(jchan)
 */
 static UINT16 *jchan_ctrl;
 
-WRITE16_HANDLER( jchan_ctrl_w )
+static WRITE16_HANDLER( jchan_ctrl_w )
 {
 // Player 1 buttons C/D for are ON
 // Coin 1 affects Button C and sometimes(!) makes Player 2 buttons C/D both ON definitively
@@ -451,7 +451,7 @@ WRITE16_HANDLER( jchan_ctrl_w )
 	jchan_ctrl[6/2] = -1;
 }
 
-READ16_HANDLER ( jchan_ctrl_r )
+static READ16_HANDLER ( jchan_ctrl_r )
 {
 	switch(offset)
 	{
@@ -476,52 +476,52 @@ static UINT16 *mainsub_shared_ram;
 #define main2sub_param(n) mainsub_shared_ram[(0x03c02 + (n))/2]
 #define sub2main_cmd      mainsub_shared_ram[0x00000/2]
 
-WRITE16_HANDLER( main2sub_cmd_w )
+static WRITE16_HANDLER( main2sub_cmd_w )
 {
 	COMBINE_DATA(&main2sub_cmd);
 	logerror("cpu #%d (PC=%06X): write cmd %04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_cmd);
 	cpunum_set_input_line(1, 4, HOLD_LINE);
 }
-READ16_HANDLER ( main2sub_status_r )
+static READ16_HANDLER ( main2sub_status_r )
 {
 	return main2sub_status;
 }
-WRITE16_HANDLER( main2sub_status_w )
+static WRITE16_HANDLER( main2sub_status_w )
 {
 	COMBINE_DATA(&main2sub_status);
 	logerror("cpu #%d (PC=%06X): write status (%04x)\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_status);
 }
-READ16_HANDLER ( main2sub_result_r )
+static READ16_HANDLER ( main2sub_result_r )
 {
 	logerror("cpu #%d (PC=%06X): read subcpu result (%04x)\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_result);
 	return main2sub_result;
 }
-WRITE16_HANDLER( main2sub_unknown )
+static WRITE16_HANDLER( main2sub_unknown )
 {
 #define mainsub_unknown (0x400100+offset/2)
 	COMBINE_DATA(&mainsub_shared_ram[offset]);
 	logerror("cpu #%d (PC=%06X): write unknown (%06X):%04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), mainsub_unknown, main2sub_param(offset));
 }
 
-WRITE16_HANDLER( main2sub_param_w )
+static WRITE16_HANDLER( main2sub_param_w )
 {
 	COMBINE_DATA(&main2sub_param(offset));
 	logerror("cpu #%d (PC=%06X): write param(%d):%04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), offset, main2sub_param(offset));
 }
 
-WRITE16_HANDLER( sub2main_cmd_w )
+static WRITE16_HANDLER( sub2main_cmd_w )
 {
 	COMBINE_DATA(&sub2main_cmd);
 	logerror("cpu #%d (PC=%06X): write cmd %04x to maincpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), sub2main_cmd);
 	cpunum_set_input_line(0, 3, HOLD_LINE);
 }
-READ16_HANDLER ( sub2main_cmd_r )
+static READ16_HANDLER ( sub2main_cmd_r )
 {
 	logerror("cpu #%d (PC=%06X): read cmd %04x from subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), sub2main_cmd);
 	return sub2main_cmd;
 }
 
-WRITE16_HANDLER( jchan_suprnova_sprite32_w )
+static WRITE16_HANDLER( jchan_suprnova_sprite32_w )
 {
 //  UINT32 dat32;
 
@@ -534,7 +534,7 @@ WRITE16_HANDLER( jchan_suprnova_sprite32_w )
 
 UINT16* jchan_sprregs;
 
-WRITE16_HANDLER( jchan_suprnova_sprite32regs_w )
+static WRITE16_HANDLER( jchan_suprnova_sprite32regs_w )
 {
 //  UINT32 dat32;
 
@@ -860,7 +860,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
-DRIVER_INIT( jchan )
+static DRIVER_INIT( jchan )
 {
 	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16) );
 }

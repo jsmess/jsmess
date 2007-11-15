@@ -69,11 +69,11 @@ static int decrypt_tarzan()
 #endif
 
 
-VIDEO_START(tarzan)
+static VIDEO_START(tarzan)
 {
 }
 
-VIDEO_UPDATE(tarzan)
+static VIDEO_UPDATE(tarzan)
 {
 
 	return 0;

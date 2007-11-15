@@ -1472,7 +1472,7 @@ static READ8_HANDLER( dsw2_r )
  Sprites Buffering
 
 */
-VIDEO_EOF( seta_buffer_sprites )
+static VIDEO_EOF( seta_buffer_sprites )
 {
 	int ctrl2	=	spriteram16[ 0x602/2 ];
 	if (~ctrl2 & 0x20)
@@ -1580,7 +1580,7 @@ ADDRESS_MAP_END
                                 Caliber 50
 ***************************************************************************/
 
-READ16_HANDLER ( calibr50_ip_r )
+static READ16_HANDLER ( calibr50_ip_r )
 {
 	int dir1 = readinputportbytag("IN4") & 0xfff;	// analog port
 	int dir2 = readinputportbytag("IN5") & 0xfff;	// analog port
@@ -1603,7 +1603,7 @@ READ16_HANDLER ( calibr50_ip_r )
 	}
 }
 
-WRITE16_HANDLER( calibr50_soundlatch_w )
+static WRITE16_HANDLER( calibr50_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -1653,7 +1653,7 @@ ADDRESS_MAP_END
                                 U.S. Classic
 ***************************************************************************/
 
-READ16_HANDLER( usclssic_dsw_r )
+static READ16_HANDLER( usclssic_dsw_r )
 {
 	switch (offset)
 	{
@@ -1665,7 +1665,7 @@ READ16_HANDLER( usclssic_dsw_r )
 	return 0;
 }
 
-READ16_HANDLER( usclssic_trackball_x_r )
+static READ16_HANDLER( usclssic_trackball_x_r )
 {
 	switch (offset)
 	{
@@ -1675,7 +1675,7 @@ READ16_HANDLER( usclssic_trackball_x_r )
 	return 0;
 }
 
-READ16_HANDLER( usclssic_trackball_y_r )
+static READ16_HANDLER( usclssic_trackball_y_r )
 {
 	switch (offset)
 	{
@@ -1686,7 +1686,7 @@ READ16_HANDLER( usclssic_trackball_y_r )
 }
 
 
-WRITE16_HANDLER( usclssic_lockout_w )
+static WRITE16_HANDLER( usclssic_lockout_w )
 {
 	static int old_tiles_offset = 0;
 
@@ -1708,7 +1708,7 @@ INLINE void usc_changecolor_xRRRRRGGGGGBBBBB(pen_t color,int data)
 	else palette_set_color_rgb(Machine,color+0x200,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 }
 
-WRITE16_HANDLER( usclssic_paletteram16_xRRRRRGGGGGBBBBB_word_w )
+static WRITE16_HANDLER( usclssic_paletteram16_xRRRRRGGGGGBBBBB_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
 	usc_changecolor_xRRRRRGGGGGBBBBB(offset,paletteram16[offset]);
@@ -2338,7 +2338,7 @@ ADDRESS_MAP_END
                             Mobile Suit Gundam
 ***************************************************************************/
 
-WRITE16_HANDLER( msgundam_vregs_w )
+static WRITE16_HANDLER( msgundam_vregs_w )
 {
 	// swap $500002 with $500004
 	switch( offset )
@@ -2491,17 +2491,17 @@ ADDRESS_MAP_END
 
 UINT16 *kiwame_nvram;
 
-READ16_HANDLER( kiwame_nvram_r )
+static READ16_HANDLER( kiwame_nvram_r )
 {
 	return kiwame_nvram[offset] & 0xff;
 }
 
-WRITE16_HANDLER( kiwame_nvram_w )
+static WRITE16_HANDLER( kiwame_nvram_w )
 {
 	if (ACCESSING_LSB)	COMBINE_DATA( &kiwame_nvram[offset] );
 }
 
-READ16_HANDLER( kiwame_input_r )
+static READ16_HANDLER( kiwame_input_r )
 {
 	int row_select = kiwame_nvram_r( 0x10a/2,0 ) & 0x1f;
 	int i;
@@ -2605,7 +2605,7 @@ ADDRESS_MAP_END
 
 static int wiggie_soundlatch;
 
-READ8_HANDLER( wiggie_soundlatch_r )
+static READ8_HANDLER( wiggie_soundlatch_r )
 {
 	return wiggie_soundlatch;
 }
@@ -2792,7 +2792,7 @@ ADDRESS_MAP_END
                                 DownTown
 ***************************************************************************/
 
-READ8_HANDLER( downtown_ip_r )
+static READ8_HANDLER( downtown_ip_r )
 {
 	int dir1 = readinputport(4);	// analog port
 	int dir2 = readinputport(5);	// analog port
@@ -2837,7 +2837,7 @@ ADDRESS_MAP_END
                         Caliber 50 / U.S. Classic
 ***************************************************************************/
 
-WRITE8_HANDLER( calibr50_soundlatch2_w )
+static WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
 	soundlatch2_w(0,data);
 	cpu_spinuntil_time(MAME_TIME_IN_USEC(50));	// Allow the other cpu to reply
@@ -2919,7 +2919,7 @@ ADDRESS_MAP_END
 static UINT16 pairslove_protram[0x200];
 static UINT16 pairslove_protram_old[0x200];
 
-READ16_HANDLER( pairlove_prot_r )
+static READ16_HANDLER( pairlove_prot_r )
 {
 	int retdata;
 	retdata = pairslove_protram[offset];
@@ -2928,7 +2928,7 @@ READ16_HANDLER( pairlove_prot_r )
 	return retdata;
 }
 
-WRITE16_HANDLER( pairlove_prot_w )
+static WRITE16_HANDLER( pairlove_prot_w )
 {
 //  mame_printf_debug("pairs love protection? write %06x %04x %04x\n",activecpu_get_pc(), offset,data);
 	pairslove_protram_old[offset]=pairslove_protram[offset];
@@ -7016,7 +7016,7 @@ static INTERRUPT_GEN( wrofaero_interrupt )
 	cpunum_set_input_line( 0, 2, HOLD_LINE );
 }
 
-MACHINE_RESET( wrofaero ) { uPD71054_timer_init(); }
+static MACHINE_RESET( wrofaero ) { uPD71054_timer_init(); }
 #endif	// __uPD71054_TIMER
 
 
@@ -8801,7 +8801,7 @@ ROM_START( crazyfgt )
 ROM_END
 
 
-READ16_HANDLER( twineagl_debug_r )
+static READ16_HANDLER( twineagl_debug_r )
 {
 	/*  At several points in the code, the program checks if four
         consecutive bytes in this range are equal to a string, and if they
@@ -8834,19 +8834,19 @@ READ16_HANDLER( twineagl_debug_r )
 /* Extra RAM ? Check code at 0x00ba90 */
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
 static UINT8 xram[8];
-READ16_HANDLER( twineagl_200100_r )
+static READ16_HANDLER( twineagl_200100_r )
 {
 logerror("%04x: twineagl_200100_r %d\n",activecpu_get_pc(),offset);
 	return xram[offset];
 }
-WRITE16_HANDLER( twineagl_200100_w )
+static WRITE16_HANDLER( twineagl_200100_w )
 {
 logerror("%04x: twineagl_200100_w %d = %02x\n",activecpu_get_pc(),offset,data);
 	if (ACCESSING_LSB)
 		xram[offset] = data & 0xff;
 }
 
-DRIVER_INIT( twineagl )
+static DRIVER_INIT( twineagl )
 {
 	/* debug? */
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
@@ -8881,14 +8881,14 @@ static WRITE16_HANDLER( downtown_protection_w )
 	COMBINE_DATA(&downtown_protection[offset]);
 }
 
-DRIVER_INIT( downtown )
+static DRIVER_INIT( downtown )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x2001ff, 0, 0, downtown_protection_r);
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x2001ff, 0, 0, downtown_protection_w);
 }
 
 
-READ16_HANDLER( arbalest_debug_r )
+static READ16_HANDLER( arbalest_debug_r )
 {
 	/*  At some points in the code, the program checks if four
         consecutive bytes in this range are equal to a string, and if they
@@ -8902,13 +8902,13 @@ READ16_HANDLER( arbalest_debug_r )
 	return 0;
 }
 
-DRIVER_INIT( arbalest )
+static DRIVER_INIT( arbalest )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
 }
 
 
-DRIVER_INIT( metafox )
+static DRIVER_INIT( metafox )
 {
 	UINT16 *RAM = (UINT16 *) memory_region(REGION_CPU1);
 
@@ -8922,7 +8922,7 @@ DRIVER_INIT( metafox )
 }
 
 
-DRIVER_INIT ( blandia )
+static DRIVER_INIT ( blandia )
 {
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 
@@ -8956,20 +8956,20 @@ DRIVER_INIT ( blandia )
 }
 
 
-DRIVER_INIT( eightfrc )
+static DRIVER_INIT( eightfrc )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500004, 0x500005, 0, 0, MRA16_NOP);	// watchdog??
 }
 
 
-DRIVER_INIT( zombraid )
+static DRIVER_INIT( zombraid )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
 }
 
 
-DRIVER_INIT( kiwame )
+static DRIVER_INIT( kiwame )
 {
 	UINT16 *RAM = (UINT16 *) memory_region(REGION_CPU1);
 
@@ -8981,7 +8981,7 @@ DRIVER_INIT( kiwame )
 }
 
 
-DRIVER_INIT( rezon )
+static DRIVER_INIT( rezon )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500006, 0x500007, 0, 0, MRA16_NOP);	// irq ack?
 }
@@ -9022,7 +9022,7 @@ static DRIVER_INIT(wiggie)
 
 }
 
-DRIVER_INIT( crazyfgt )
+static DRIVER_INIT( crazyfgt )
 {
 	// protection check at boot
 	UINT16 *RAM = (UINT16 *) memory_region(REGION_CPU1);

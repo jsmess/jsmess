@@ -60,7 +60,7 @@ extern PALETTE_INIT( sonson );
 extern VIDEO_START( sonson );
 extern VIDEO_UPDATE( sonson );
 
-WRITE8_HANDLER( sonson_sh_irqtrigger_w )
+static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 {
 	static int last;
 

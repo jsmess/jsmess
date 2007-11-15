@@ -89,7 +89,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_START( drtomy )
+static VIDEO_START( drtomy )
 {
 	tilemap_bg = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16,16,32,32);
 	tilemap_fg = tilemap_create(get_tile_info_fg,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16,16,32,32);
@@ -97,7 +97,7 @@ VIDEO_START( drtomy )
 	tilemap_set_transparent_pen(tilemap_fg,0);
 }
 
-VIDEO_UPDATE( drtomy )
+static VIDEO_UPDATE( drtomy )
 {
 	tilemap_draw(bitmap,cliprect,tilemap_bg,0,0);
 	tilemap_draw(bitmap,cliprect,tilemap_fg,0,0);
@@ -105,19 +105,19 @@ VIDEO_UPDATE( drtomy )
 	return 0;
 }
 
-WRITE16_HANDLER( drtomy_vram_fg_w )
+static WRITE16_HANDLER( drtomy_vram_fg_w )
 {
 	COMBINE_DATA(&drtomy_videoram_fg[offset]);
 	tilemap_mark_tile_dirty(tilemap_fg,offset);
 }
 
-WRITE16_HANDLER( drtomy_vram_bg_w )
+static WRITE16_HANDLER( drtomy_vram_bg_w )
 {
 	COMBINE_DATA(&drtomy_videoram_bg[offset]);
 	tilemap_mark_tile_dirty(tilemap_bg,offset);
 }
 
-WRITE16_HANDLER( drtomy_okibank_w )
+static WRITE16_HANDLER( drtomy_okibank_w )
 {
 	static int oki_bank;
 

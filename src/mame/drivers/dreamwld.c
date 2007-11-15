@@ -106,7 +106,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-WRITE32_HANDLER( dreamwld_bg_videoram_w )
+static WRITE32_HANDLER( dreamwld_bg_videoram_w )
 {
 	COMBINE_DATA(&dreamwld_bg_videoram[offset]);
 	tilemap_mark_tile_dirty(dreamwld_bg_tilemap,offset*2);
@@ -124,7 +124,7 @@ static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 }
 
 
-WRITE32_HANDLER( dreamwld_bg2_videoram_w )
+static WRITE32_HANDLER( dreamwld_bg2_videoram_w )
 {
 	COMBINE_DATA(&dreamwld_bg2_videoram[offset]);
 	tilemap_mark_tile_dirty(dreamwld_bg2_tilemap,offset*2);
@@ -140,7 +140,7 @@ static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 	SET_TILE_INFO(1,tileno+dreamwld_tilebank[1]*0x2000,0xc0+colour,0);
 }
 
-VIDEO_START(dreamwld)
+static VIDEO_START(dreamwld)
 {
 	dreamwld_bg_tilemap = tilemap_create(get_dreamwld_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16, 16, 64,32);
 	dreamwld_bg2_tilemap = tilemap_create(get_dreamwld_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16, 16, 64,32);
@@ -149,7 +149,7 @@ VIDEO_START(dreamwld)
 	dreamwld_tilebank[0] = dreamwld_tilebank[1] = 0;
 }
 
-VIDEO_UPDATE(dreamwld)
+static VIDEO_UPDATE(dreamwld)
 {
 	tilemap_set_scrolly( dreamwld_bg_tilemap,0, dreamwld_bg_scroll[(0x400/4)]+32 );
 	tilemap_set_scrolly( dreamwld_bg2_tilemap,0, dreamwld_bg_scroll[(0x400/4)+2]+32 );
@@ -202,7 +202,7 @@ static READ32_HANDLER( dreamwld_dips_r )
 	return x|(x<<16);
 }
 
-WRITE32_HANDLER( dreamwld_palette_w )
+static WRITE32_HANDLER( dreamwld_palette_w )
 {
 	UINT16 dat;
 	int color;

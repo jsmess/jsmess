@@ -74,11 +74,11 @@ SEGA CUSTOM IC :
 
 /* video */
 
-VIDEO_START(coolridr)
+static VIDEO_START(coolridr)
 {
 }
 
-VIDEO_UPDATE(coolridr)
+static VIDEO_UPDATE(coolridr)
 {
 	return 0;
 }
@@ -171,7 +171,7 @@ static INTERRUPT_GEN( system_h1_sub )
 	}
 }
 
-MACHINE_RESET ( coolridr )
+static MACHINE_RESET ( coolridr )
 {
 
 //  cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);

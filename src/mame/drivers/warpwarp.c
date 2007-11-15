@@ -141,7 +141,7 @@ TODO:
 
 static int handle_joystick;
 
-READ8_HANDLER( geebee_in_r )
+static READ8_HANDLER( geebee_in_r )
 {
 	int res;
 
@@ -161,7 +161,7 @@ READ8_HANDLER( geebee_in_r )
 	return res;
 }
 
-WRITE8_HANDLER( geebee_out6_w )
+static WRITE8_HANDLER( geebee_out6_w )
 {
 	switch (offset & 3)
 	{
@@ -180,7 +180,7 @@ WRITE8_HANDLER( geebee_out6_w )
 	}
 }
 
-WRITE8_HANDLER( geebee_out7_w )
+static WRITE8_HANDLER( geebee_out7_w )
 {
 	switch (offset & 7)
 	{

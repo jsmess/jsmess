@@ -261,14 +261,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0,tile,color,flag);
 }
 
-VIDEO_START( trvmadns )
+static VIDEO_START( trvmadns )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap,1);
 }
 
-VIDEO_UPDATE( trvmadns )
+static VIDEO_UPDATE( trvmadns )
 {
 	fillbitmap(bitmap,machine->pens[0xd],cliprect);
 

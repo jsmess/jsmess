@@ -193,7 +193,7 @@ static MACHINE_RESET( mustang_sound )
 	machine_reset_seibu_sound_1(machine);
 }
 
-WRITE16_HANDLER ( ssmissin_sound_w )
+static WRITE16_HANDLER ( ssmissin_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -204,7 +204,7 @@ WRITE16_HANDLER ( ssmissin_sound_w )
 
 
 
-WRITE8_HANDLER ( ssmissin_soundbank_w )
+static WRITE8_HANDLER ( ssmissin_soundbank_w )
 {
 	UINT8 *rom = memory_region(REGION_SOUND1);
 	int bank;
@@ -5142,7 +5142,7 @@ static DRIVER_INIT( bjtwin )
 }
 
 /* NO NMK004, it has a PIC instead */
-READ16_HANDLER( vandykeb_r ) { return 0x0000; };
+static READ16_HANDLER( vandykeb_r ) { return 0x0000; };
 static DRIVER_INIT (vandykeb)
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x08000e, 0x08000f, 0, 0, vandykeb_r );

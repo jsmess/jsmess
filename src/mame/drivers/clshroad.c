@@ -43,7 +43,7 @@ WRITE8_HANDLER( wiping_sound_w );
 
 
 
-MACHINE_RESET( clshroad )
+static MACHINE_RESET( clshroad )
 {
 	flip_screen_set(0);
 }
@@ -51,10 +51,10 @@ MACHINE_RESET( clshroad )
 
 /* Shared RAM with the sound CPU */
 
-READ8_HANDLER ( clshroad_sharedram_r )	{	return clshroad_sharedram[offset];	}
-WRITE8_HANDLER( clshroad_sharedram_w )	{	clshroad_sharedram[offset] = data;	}
+static READ8_HANDLER ( clshroad_sharedram_r )	{	return clshroad_sharedram[offset];	}
+static WRITE8_HANDLER( clshroad_sharedram_w )	{	clshroad_sharedram[offset] = data;	}
 
-READ8_HANDLER( clshroad_input_r )
+static READ8_HANDLER( clshroad_input_r )
 {
 	return	((~readinputportbytag("IN0") & (1 << offset)) ? 1 : 0) |
 			((~readinputportbytag("IN1") & (1 << offset)) ? 2 : 0) |

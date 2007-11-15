@@ -825,14 +825,14 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 }
 
 
-READ16_HANDLER( taitof2_sound_r )
+static READ16_HANDLER( taitof2_sound_r )
 {
 	if (offset == 1)
 		return (taitosound_comm16_lsb_r(0,mem_mask));
 	else return 0;
 }
 
-READ16_HANDLER( taitof2_msb_sound_r )
+static READ16_HANDLER( taitof2_msb_sound_r )
 {
 	if (offset == 1)
 		return (taitosound_comm16_msb_r(0,mem_mask));
@@ -3850,13 +3850,13 @@ static struct YM2203interface ym2203_interface =
                       MACHINE DRIVERS
 ***********************************************************/
 
-MACHINE_START( f2 )
+static MACHINE_START( f2 )
 {
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
 }
 
-MACHINE_RESET( qcrayon )
+static MACHINE_RESET( qcrayon )
 {
 	/* point to the extra ROM */
 	memory_set_bankptr(1,memory_region(REGION_USER1));
@@ -5850,7 +5850,7 @@ ROM_START( driveout )
 ROM_END
 
 
-DRIVER_INIT( finalb )
+static DRIVER_INIT( finalb )
 {
 	int i;
 	UINT8 data;
@@ -5877,7 +5877,7 @@ DRIVER_INIT( finalb )
 	}
 }
 
-DRIVER_INIT( mjnquest )
+static DRIVER_INIT( mjnquest )
 {
 	int i;
 	UINT8 *gfx = memory_region(REGION_GFX2);
@@ -5894,13 +5894,13 @@ DRIVER_INIT( mjnquest )
 	}
 }
 
-DRIVER_INIT( yesnoj )
+static DRIVER_INIT( yesnoj )
 {
 	yesnoj_dsw = 0;
 	state_save_register_global(yesnoj_dsw);
 }
 
-DRIVER_INIT( driveout )
+static DRIVER_INIT( driveout )
 {
 	state_save_register_global(driveout_sound_latch);
 	state_save_register_global(oki_bank);

@@ -37,7 +37,7 @@ static UINT8 dirty;
 
 static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
-PALETTE_INIT(quizo)
+static PALETTE_INIT(quizo)
 {
 	int i;
 	for (i = 0;i < 16;i++)
@@ -64,12 +64,12 @@ PALETTE_INIT(quizo)
 	}
 }
 
-VIDEO_START( quizo )
+static VIDEO_START( quizo )
 {
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-VIDEO_UPDATE( quizo )
+static VIDEO_UPDATE( quizo )
 {
 	int x,y;
 	if(dirty)

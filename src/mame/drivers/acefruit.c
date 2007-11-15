@@ -46,7 +46,7 @@ static TIMER_CALLBACK( acefruit_refresh )
 	mame_timer_adjust( acefruit_refresh_timer, video_screen_get_time_until_pos( 0, vpos, 0 ), 0, time_never );
 }
 
-VIDEO_START( acefruit )
+static VIDEO_START( acefruit )
 {
 	acefruit_refresh_timer = mame_timer_alloc( acefruit_refresh );
 }
@@ -57,7 +57,7 @@ INTERRUPT_GEN( acefruit_vblank )
 	mame_timer_adjust( acefruit_refresh_timer, time_zero, 0, time_never );
 }
 
-VIDEO_UPDATE( acefruit )
+static VIDEO_UPDATE( acefruit )
 {
 	int startrow = cliprect->min_y / 8;
 	int endrow = cliprect->max_y / 8;
@@ -193,22 +193,22 @@ static UINT32 starspnr_payout_r(void *param)
 	}
 }
 
-WRITE8_HANDLER( acefruit_colorram_w )
+static WRITE8_HANDLER( acefruit_colorram_w )
 {
 	colorram[ offset ] = data & 0xf;
 }
 
-WRITE8_HANDLER( acefruit_coin_w )
+static WRITE8_HANDLER( acefruit_coin_w )
 {
 	/* TODO: ? */
 }
 
-WRITE8_HANDLER( acefruit_sound_w )
+static WRITE8_HANDLER( acefruit_sound_w )
 {
 	/* TODO: ? */
 }
 
-WRITE8_HANDLER( acefruit_lamp_w )
+static WRITE8_HANDLER( acefruit_lamp_w )
 {
 	int i;
 
@@ -218,7 +218,7 @@ WRITE8_HANDLER( acefruit_lamp_w )
 	}
 }
 
-WRITE8_HANDLER( acefruit_solenoid_w )
+static WRITE8_HANDLER( acefruit_solenoid_w )
 {
 	int i;
 
@@ -228,7 +228,7 @@ WRITE8_HANDLER( acefruit_solenoid_w )
 	}
 }
 
-PALETTE_INIT( acefruit )
+static PALETTE_INIT( acefruit )
 {
 	/* sprites */
 	palette_set_color( machine, 0, MAKE_RGB(0x00, 0x00, 0x00) );

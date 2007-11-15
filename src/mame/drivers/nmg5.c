@@ -796,7 +796,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 static TILE_GET_INFO( fg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_index,fg_videoram, 0); }
 static TILE_GET_INFO( bg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_index,bg_videoram, 1); }
 
-VIDEO_START( nmg5 )
+static VIDEO_START( nmg5 )
 {
 	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,64,64);
 	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
@@ -869,7 +869,7 @@ static void draw_bitmap(mame_bitmap *bitmap)
 }
 
 
-VIDEO_UPDATE( nmg5 )
+static VIDEO_UPDATE( nmg5 )
 {
 	tilemap_set_scrolly(bg_tilemap,0,scroll_ram[3]+9);
 	tilemap_set_scrollx(bg_tilemap,0,scroll_ram[2]+3);
@@ -1472,22 +1472,22 @@ ROM_START( 7ordi )
 	ROM_RELOAD(0x60000,0x20000)
 ROM_END
 
-DRIVER_INIT( prot_val_00 )
+static DRIVER_INIT( prot_val_00 )
 {
 	prot_val = 0x00;
 }
 
-DRIVER_INIT( prot_val_10 )
+static DRIVER_INIT( prot_val_10 )
 {
 	prot_val = 0x10;
 }
 
-DRIVER_INIT( prot_val_20 )
+static DRIVER_INIT( prot_val_20 )
 {
 	prot_val = 0x20;
 }
 
-DRIVER_INIT( prot_val_40 )
+static DRIVER_INIT( prot_val_40 )
 {
 	prot_val = 0x40;
 }

@@ -635,7 +635,7 @@ static void jantouki_blitter2_start(int flags)
 
 
 
-WRITE8_HANDLER( dynax_blit_scroll_w )
+static WRITE8_HANDLER( dynax_blit_scroll_w )
 {
 	switch( blit_src & 0xc00000 )
 	{
@@ -659,7 +659,7 @@ WRITE8_HANDLER( dynax_blit_scroll_w )
 }
 
 // inverted scroll values
-WRITE8_HANDLER( tenkai_blit_scroll_w )
+static WRITE8_HANDLER( tenkai_blit_scroll_w )
 {
 	switch( blit_src & 0xc00000 )
 	{
@@ -682,7 +682,7 @@ WRITE8_HANDLER( tenkai_blit_scroll_w )
 	}
 }
 
-WRITE8_HANDLER( dynax_blit2_scroll_w )
+static WRITE8_HANDLER( dynax_blit2_scroll_w )
 {
 	switch( blit2_src & 0xc00000 )
 	{

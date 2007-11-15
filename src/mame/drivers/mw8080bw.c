@@ -961,7 +961,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-MACHINE_START( boothill )
+static MACHINE_START( boothill )
 {
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);
@@ -1487,7 +1487,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-MACHINE_START( gmissile )
+static MACHINE_START( gmissile )
 {
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);
@@ -1579,7 +1579,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-MACHINE_START( m4 )
+static MACHINE_START( m4 )
 {
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);

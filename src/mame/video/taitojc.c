@@ -10,10 +10,15 @@ extern UINT32 *taitojc_objlist;
 
 //static int debug_tex_pal = 0;
 
-static int tex_base_x;
-static int tex_base_y;
-static int tex_wrap_x;
-static int tex_wrap_y;
+typedef struct _poly_extra_data poly_extra_data;
+struct _poly_extra_data
+{
+	int tex_base_x;
+	int tex_base_y;
+	int tex_wrap_x;
+	int tex_wrap_y;
+};
+
 
 static int taitojc_gfx_index;
 
@@ -22,6 +27,8 @@ static UINT32 *taitojc_char_ram;
 static UINT32 *taitojc_tile_ram;
 static int taitojc_char_dirty = 1;
 static tilemap *taitojc_tilemap;
+
+static poly_manager *poly;
 
 #define TAITOJC_NUM_TILES		0x80
 
@@ -180,8 +187,16 @@ static void draw_object(mame_bitmap *bitmap, const rectangle *cliprect, UINT32 w
 	}
 }
 
+static void taitojc_exit(running_machine *machine)
+{
+	poly_free(poly);
+}
+
 VIDEO_START( taitojc )
 {
+	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	add_exit_callback(machine, taitojc_exit);
+
  	/* find first empty slot to decode gfx */
 	for (taitojc_gfx_index = 0; taitojc_gfx_index < MAX_GFX_ELEMENTS; taitojc_gfx_index++)
 		if (machine->gfx[taitojc_gfx_index] == 0)
@@ -300,243 +315,120 @@ VIDEO_UPDATE( taitojc )
 
 
 
-typedef struct
+static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	int x, y, z;
-	UINT32 color;
-	int u, v;
-} VERTEX;
+	mame_bitmap *destmap = dest;
+	float z = extent->param[0].start;
+	int color = extent->param[1].start;
+	float dz = extent->param[0].dpdx;
+	UINT16 *fb = BITMAP_ADDR16(destmap, scanline, 0);
+	UINT16 *zb = BITMAP_ADDR16(zbuffer, scanline, 0);
+	int x;
 
-static void render_solid_tri(VERTEX *v1, VERTEX *v2, VERTEX *v3)
-{
-	UINT16 color;
-	int x, y;
-	struct poly_vertex vert[3];
-	const struct poly_scanline_data *scans;
-
-	rectangle cliprect;
-
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = Machine->screen[0].width-1;
-	cliprect.max_y = Machine->screen[0].height-1;
-
-	vert[0].x = v1->x;	vert[0].y = v1->y;	vert[0].p[0] = v1->z;
-	vert[1].x = v2->x;	vert[1].y = v2->y;	vert[1].p[0] = v2->z;
-	vert[2].x = v3->x;	vert[2].y = v3->y;	vert[2].p[0] = v3->z;
-
-	color = v1->color;
-
-	scans = setup_triangle_1(&vert[0], &vert[1], &vert[2], &cliprect);
-
-	if (scans)
+	for (x = extent->startx; x < extent->stopx; x++)
 	{
-		INT64 dz = scans->dp[0];
+		int iz = (int)z & 0xffff;
 
-		for (y = scans->sy; y <= scans->ey; y++)
+		if (iz <= zb[x])
 		{
-			int x1, x2;
-			INT64 z;
-			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT16 *fb = BITMAP_ADDR16(framebuffer, y, 0);
-			UINT16 *zb = BITMAP_ADDR16(zbuffer, y, 0);
-
-			x1 = scan->sx;
-			x2 = scan->ex;
-
-			z = scans->scanline[y - scans->sy].p[0];
-
-			for (x = x1; x <= x2; x++)
-			{
-				int iz = (z >> 16) & 0xffff;
-
-				if (iz <= zb[x])
-				{
-					fb[x] = color;
-					zb[x] = iz;
-				}
-
-				z += dz;
-			}
+			fb[x] = color;
+			zb[x] = iz;
 		}
+
+		z += dz;
 	}
 }
 
-static void render_shade_tri(VERTEX *v1, VERTEX *v2, VERTEX *v3)
+static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	int x, y;
-	struct poly_vertex vert[3];
-	const struct poly_scanline_data *scans;
+	mame_bitmap *destmap = dest;
+	float z = extent->param[0].start;
+	float color = extent->param[1].start;
+	float dz = extent->param[0].dpdx;
+	float dcolor = extent->param[1].dpdx;
+	UINT16 *fb = BITMAP_ADDR16(destmap, scanline, 0);
+	UINT16 *zb = BITMAP_ADDR16(zbuffer, scanline, 0);
+	int x;
 
-	rectangle cliprect;
-
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = Machine->screen[0].width-1;
-	cliprect.max_y = Machine->screen[0].height-1;
-
-	vert[0].x = v1->x;	vert[0].y = v1->y;	vert[0].p[0] = v1->color;	vert[0].p[1] = v1->z;
-	vert[1].x = v2->x;	vert[1].y = v2->y;	vert[1].p[0] = v2->color;	vert[1].p[1] = v2->z;
-	vert[2].x = v3->x;	vert[2].y = v3->y;	vert[2].p[0] = v3->color;	vert[2].p[1] = v3->z;
-
-	scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &cliprect);
-
-	if (scans)
+	for (x = extent->startx; x < extent->stopx; x++)
 	{
-		INT64 dcolor = scans->dp[0];
-		INT64 dz = scans->dp[1];
+		int ic = (int)color & 0xffff;
+		int iz = (int)z & 0xffff;
 
-		for (y = scans->sy; y <= scans->ey; y++)
+		if (iz <= zb[x])
 		{
-			int x1, x2;
-			INT64 color, z;
-			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT16 *fb = BITMAP_ADDR16(framebuffer, y, 0);
-			UINT16 *zb = BITMAP_ADDR16(zbuffer, y, 0);
-
-			x1 = scan->sx;
-			x2 = scan->ex;
-
-			color = scans->scanline[y - scans->sy].p[0];
-			z = scans->scanline[y - scans->sy].p[1];
-
-			for (x = x1; x <= x2; x++)
-			{
-				int ic = (color >> 16) & 0xffff;
-				int iz = (z >> 16) & 0xffff;
-
-				if (iz <= zb[x])
-				{
-					fb[x] = ic;
-					zb[x] = iz;
-				}
-
-				color += dcolor;
-				z += dz;
-			}
+			fb[x] = ic;
+			zb[x] = iz;
 		}
+
+		color += dcolor;
+		z += dz;
 	}
 }
 
-static void render_texture_tri(VERTEX *v1, VERTEX *v2, VERTEX *v3)
+static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	int x, y;
-	struct poly_vertex vert[3];
-	const struct poly_scanline_data *scans;
+	const poly_extra_data *extra = extradata;
+	mame_bitmap *destmap = dest;
+	float z = extent->param[0].start;
+	float u = extent->param[1].start;
+	float v = extent->param[2].start;
+	float color = extent->param[3].start;
+	float dz = extent->param[0].dpdx;
+	float du = extent->param[1].dpdx;
+	float dv = extent->param[2].dpdx;
+	float dcolor = extent->param[3].dpdx;
+	UINT16 *fb = BITMAP_ADDR16(destmap, scanline, 0);
+	UINT16 *zb = BITMAP_ADDR16(zbuffer, scanline, 0);
+	int tex_wrap_x = extra->tex_wrap_x;
+	int tex_wrap_y = extra->tex_wrap_y;
+	int tex_base_x = extra->tex_base_x;
+	int tex_base_y = extra->tex_base_y;
+	int x;
 
-	rectangle cliprect;
-
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = Machine->screen[0].width-1;
-	cliprect.max_y = Machine->screen[0].height-1;
-
-	vert[0].x = v1->x;	vert[0].y = v1->y;
-	vert[0].p[0] = v1->u;
-	vert[0].p[1] = v1->v;
-	vert[0].p[2] = v1->color;
-	vert[0].p[3] = v1->z;
-
-	vert[1].x = v2->x;	vert[1].y = v2->y;
-	vert[1].p[0] = v2->u;
-	vert[1].p[1] = v2->v;
-	vert[1].p[2] = v2->color;
-	vert[1].p[3] = v2->z;
-
-	vert[2].x = v3->x;	vert[2].y = v3->y;
-	vert[2].p[0] = v3->u;
-	vert[2].p[1] = v3->v;
-	vert[2].p[2] = v3->color;
-	vert[2].p[3] = v3->z;
-
-	scans = setup_triangle_4(&vert[0], &vert[1], &vert[2], &cliprect);
-
-	if (scans)
+	for (x = extent->startx; x < extent->stopx; x++)
 	{
-		INT64 du = scans->dp[0];
-		INT64 dv = scans->dp[1];
-		INT64 dcolor = scans->dp[2];
-		INT64 dz = scans->dp[3];
+		int iu, iv;
+		UINT8 texel;
+		int palette = ((int)color & 0x7f) << 8;
+		int iz = (int)z & 0xffff;
 
-		for (y = scans->sy; y <= scans->ey; y++)
+		if (!tex_wrap_x)
 		{
-			int x1, x2;
-			INT64 u, v, color, z;
-			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT16 *fb = BITMAP_ADDR16(framebuffer, y, 0);
-			UINT16 *zb = BITMAP_ADDR16(zbuffer, y, 0);
-
-			x1 = scan->sx;
-			x2 = scan->ex;
-
-			u = scans->scanline[y - scans->sy].p[0];
-			v = scans->scanline[y - scans->sy].p[1];
-			color = scans->scanline[y - scans->sy].p[2];
-			z = scans->scanline[y - scans->sy].p[3];
-
-			for (x = x1; x <= x2; x++)
-			{
-				int iu, iv;
-				UINT8 texel;
-				int palette = ((color >> 16) & 0x7f) << 8;
-				int iz = (z >> 16) & 0xffff;
-
-				if (!tex_wrap_x)
-				{
-					iu = (u >> (16+4)) & 0x7ff;
-				}
-				else
-				{
-					iu = (tex_base_x + ((u >> (16+4)) & 0x3f)) & 0x7ff;
-				}
-
-				if (!tex_wrap_y)
-				{
-					iv = (v >> (16+4)) & 0x7ff;
-				}
-				else
-				{
-					iv = (tex_base_y + ((v >> (16+4)) & 0x3f)) & 0x7ff;
-				}
-
-				texel = taitojc_texture[(iv * 2048) + iu];
-
-				if (iz <= zb[x] && texel != 0)
-				{
-					fb[x] = palette | texel;
-					zb[x] = iz;
-				}
-
-				u += du;
-				v += dv;
-				color += dcolor;
-				z += dz;
-			}
+			iu = ((int)u >> 4) & 0x7ff;
 		}
+		else
+		{
+			iu = (tex_base_x + (((int)u >> 4) & 0x3f)) & 0x7ff;
+		}
+
+		if (!tex_wrap_y)
+		{
+			iv = ((int)v >> 4) & 0x7ff;
+		}
+		else
+		{
+			iv = (tex_base_y + (((int)v >> 4) & 0x3f)) & 0x7ff;
+		}
+
+		texel = taitojc_texture[(iv * 2048) + iu];
+
+		if (iz <= zb[x] && texel != 0)
+		{
+			fb[x] = palette | texel;
+			zb[x] = iz;
+		}
+
+		u += du;
+		v += dv;
+		color += dcolor;
+		z += dz;
 	}
-}
-
-INLINE void render_solid_quad(VERTEX *v1, VERTEX *v2, VERTEX *v3, VERTEX *v4)
-{
-	render_solid_tri(v1, v2, v3);
-	render_solid_tri(v1, v3, v4);
-}
-
-INLINE void render_shade_quad(VERTEX *v1, VERTEX *v2, VERTEX *v3, VERTEX *v4)
-{
-	render_shade_tri(v1, v2, v3);
-	render_shade_tri(v1, v3, v4);
-}
-
-INLINE void render_texture_quad(VERTEX *v1, VERTEX *v2, VERTEX *v3, VERTEX *v4)
-{
-	render_texture_tri(v1, v2, v3);
-	render_texture_tri(v1, v3, v4);
 }
 
 void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 {
-	VERTEX vert[4];
+	poly_vertex vert[4];
 	int i;
 	int ptr;
 
@@ -570,6 +462,7 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 				// 0x12: Vertex 3 X
 				// 0x13: Vertex 3 Z
 
+				poly_extra_data *extra = poly_get_extra_data(poly);
 				UINT16 texbase;
 
 				/*
@@ -583,25 +476,25 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 
 				texbase = polygon_fifo[ptr++];
 
-				tex_base_x = ((texbase >> 0) & 0xff) << 4;
-				tex_base_y = ((texbase >> 8) & 0xff) << 4;
+				extra->tex_base_x = ((texbase >> 0) & 0xff) << 4;
+				extra->tex_base_y = ((texbase >> 8) & 0xff) << 4;
 
-				tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-				tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+				extra->tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
+				extra->tex_wrap_y = (cmd & 0x30) ? 1 : 0;
 
 				for (i=0; i < 3; i++)
 				{
-					vert[i].color = polygon_fifo[ptr++];	// palette
-					vert[i].v = (UINT16)(polygon_fifo[ptr++]);
-					vert[i].u = (UINT16)(polygon_fifo[ptr++]);
+					vert[i].p[3] = polygon_fifo[ptr++];	// palette
+					vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
+					vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
 					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
 					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].z = (UINT16)(polygon_fifo[ptr++]);
+					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
 				}
 
-				if (vert[0].z < 0x8000 && vert[1].z < 0x8000 && vert[2].z < 0x8000)
+				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
 				{
-					render_texture_tri(&vert[0], &vert[1], &vert[2]);
+					poly_render_triangle(poly, framebuffer, &Machine->screen[0].visarea, render_texture_scan, 4, &vert[0], &vert[1], &vert[2]);
 				}
 				break;
 			}
@@ -636,24 +529,24 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 
 				for (i=0; i < 4; i++)
 				{
-					vert[i].color = polygon_fifo[ptr++];
+					vert[i].p[1] = polygon_fifo[ptr++];
 					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
 					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].z = (UINT16)(polygon_fifo[ptr++]);
+					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
 				}
 
-				if (vert[0].z < 0x8000 && vert[1].z < 0x8000 && vert[2].z < 0x8000 && vert[3].z < 0x8000)
+				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
 				{
-					if (vert[0].color == vert[1].color &&
-						vert[1].color == vert[2].color &&
-						vert[2].color == vert[3].color)
+					if (vert[0].p[1] == vert[1].p[1] &&
+						vert[1].p[1] == vert[2].p[1] &&
+						vert[2].p[1] == vert[3].p[1])
 					{
 						// optimization: all colours the same -> render solid
-						render_solid_quad(&vert[0], &vert[1], &vert[2], &vert[3]);
+						poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_solid_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 					}
 					else
 					{
-						render_shade_quad(&vert[0], &vert[1], &vert[2], &vert[3]);
+						poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_shade_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 					}
 				}
 				break;
@@ -687,6 +580,7 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 				// 0x18: Vertex 4 X
 				// 0x19: Vertex 4 Z
 
+				poly_extra_data *extra = poly_get_extra_data(poly);
 				UINT16 texbase;
 
 				/*
@@ -700,25 +594,25 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 
 				texbase = polygon_fifo[ptr++];
 
-				tex_base_x = ((texbase >> 0) & 0xff) << 4;
-				tex_base_y = ((texbase >> 8) & 0xff) << 4;
+				extra->tex_base_x = ((texbase >> 0) & 0xff) << 4;
+				extra->tex_base_y = ((texbase >> 8) & 0xff) << 4;
 
-				tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-				tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+				extra->tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
+				extra->tex_wrap_y = (cmd & 0x30) ? 1 : 0;
 
 				for (i=0; i < 4; i++)
 				{
-					vert[i].color = polygon_fifo[ptr++];	// palette
-					vert[i].v = (UINT16)(polygon_fifo[ptr++]);
-					vert[i].u = (UINT16)(polygon_fifo[ptr++]);
+					vert[i].p[3] = polygon_fifo[ptr++];	// palette
+					vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
+					vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
 					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
 					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].z = (UINT16)(polygon_fifo[ptr++]);
+					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
 				}
 
-				if (vert[0].z < 0x8000 && vert[1].z < 0x8000 && vert[2].z < 0x8000 && vert[3].z < 0x8000)
+				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
 				{
-					render_texture_quad(&vert[0], &vert[1], &vert[2], &vert[3]);
+					poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_texture_scan, 4, &vert[0], &vert[1], &vert[2], &vert[3]);
 				}
 				break;
 			}
@@ -733,6 +627,7 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 			}
 		}
 	};
+	poly_wait(poly, "Finished render");
 }
 
 void taitojc_clear_frame(void)

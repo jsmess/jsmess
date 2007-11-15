@@ -375,7 +375,7 @@ static void negf(union genreg *dst, union genreg *src)
 		SET_MANTISSA(dst, -man);
 		SET_EXPONENT(dst, EXPONENT(src));
 	}
-	else if (EXPONENT(src) != -128)
+	else
 	{
 		SET_MANTISSA(dst, man ^ 0x80000000);
 		if (man == 0)
@@ -1263,14 +1263,16 @@ static UINT32 (*indirect_1_def[0x20])(UINT8) =
 
 #define ABSF(dreg, sreg)												\
 {																		\
-	if ((INT32)FREGMAN(sreg) >= 0)										\
+	INT32 man = FREGMAN(sreg);											\
+	CLR_NZVUF();														\
+	tms32031.r[dreg] = tms32031.r[sreg];								\
+	if (man < 0)														\
 	{																	\
-		tms32031.r[dreg] = tms32031.r[sreg];							\
-		CLR_NZVUF();													\
-		OR_NZF(&tms32031.r[dreg]);										\
+		SET_MANTISSA(&tms32031.r[dreg], ~man);							\
+		if (man == (INT32)0x80000000 && FREGEXP(sreg) == 127)			\
+			IREG(TMR_ST) |= VFLAG | LVFLAG;								\
 	}																	\
-	else																\
-		negf(&tms32031.r[dreg], &tms32031.r[sreg]);						\
+	OR_NZF(&tms32031.r[dreg]);											\
 }
 
 static void absf_reg(void)

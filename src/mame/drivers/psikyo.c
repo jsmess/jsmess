@@ -86,7 +86,7 @@ extern void psikyo_switch_banks( int tmap, int bank );
 static UINT8 psikyo_soundlatch;
 static int z80_nmi, mcu_status;
 
-MACHINE_RESET( psikyo )
+static MACHINE_RESET( psikyo )
 {
 	z80_nmi = mcu_status = 0;
 }
@@ -137,7 +137,7 @@ static int psikyo_readcoinport(int has_mcu)
 	return ret;
 }
 
-READ32_HANDLER( sngkace_input_r )
+static READ32_HANDLER( sngkace_input_r )
 {
 	switch(offset)
 	{
@@ -149,7 +149,7 @@ READ32_HANDLER( sngkace_input_r )
 	}
 }
 
-READ32_HANDLER( gunbird_input_r )
+static READ32_HANDLER( gunbird_input_r )
 {
 	switch(offset)
 	{
@@ -168,7 +168,7 @@ static TIMER_CALLBACK( psikyo_soundlatch_callback )
 	z80_nmi = 1;
 }
 
-WRITE32_HANDLER( psikyo_soundlatch_w )
+static WRITE32_HANDLER( psikyo_soundlatch_w )
 {
 	if (ACCESSING_LSB32)
 		timer_call_after_resynch(data & 0xff, psikyo_soundlatch_callback);
@@ -178,7 +178,7 @@ WRITE32_HANDLER( psikyo_soundlatch_w )
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-WRITE32_HANDLER( s1945_soundlatch_w )
+static WRITE32_HANDLER( s1945_soundlatch_w )
 {
 	if (!(mem_mask & 0x00ff0000))
 		timer_call_after_resynch((data >> 16) & 0xff, psikyo_soundlatch_callback);
@@ -220,7 +220,7 @@ static void s1945_mcu_init(const UINT8 *mcu_table)
 	s1945_mcu_bctrl = 0x00;
 }
 
-WRITE32_HANDLER( s1945_mcu_w )
+static WRITE32_HANDLER( s1945_mcu_w )
 {
 	// Accesses are always bytes, so resolve it
 	int suboff;
@@ -284,7 +284,7 @@ WRITE32_HANDLER( s1945_mcu_w )
 	}
 }
 
-READ32_HANDLER( s1945_mcu_r )
+static READ32_HANDLER( s1945_mcu_r )
 {
 	switch(offset) {
 	case 0: {
@@ -305,7 +305,7 @@ READ32_HANDLER( s1945_mcu_r )
 	return 0;
 }
 
-READ32_HANDLER( s1945_input_r )
+static READ32_HANDLER( s1945_input_r )
 {
 	switch(offset)
 	{
@@ -373,12 +373,12 @@ static void sound_irq( int irq )
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_HANDLER( psikyo_soundlatch_r )
+static READ8_HANDLER( psikyo_soundlatch_r )
 {
 	return psikyo_soundlatch;
 }
 
-WRITE8_HANDLER( psikyo_clear_nmi_w )
+static WRITE8_HANDLER( psikyo_clear_nmi_w )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
 	z80_nmi = 0;
@@ -389,7 +389,7 @@ WRITE8_HANDLER( psikyo_clear_nmi_w )
                         Sengoku Ace / Samurai Aces
 ***************************************************************************/
 
-WRITE8_HANDLER( sngkace_sound_bankswitch_w )
+static WRITE8_HANDLER( sngkace_sound_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU2);
 	int bank = data & 3;
@@ -431,7 +431,7 @@ ADDRESS_MAP_END
                                 Gun Bird
 ***************************************************************************/
 
-WRITE8_HANDLER( gunbird_sound_bankswitch_w )
+static WRITE8_HANDLER( gunbird_sound_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU2);
 	int bank = (data >> 4) & 3;
@@ -1795,7 +1795,7 @@ ROM_START( sngkace )
 
 ROM_END
 
-DRIVER_INIT( sngkace )
+static DRIVER_INIT( sngkace )
 {
 	{
 		UINT8 *RAM	=	memory_region(REGION_SOUND1);
@@ -1980,7 +1980,7 @@ ROM_END
 
 
 
-DRIVER_INIT( gunbird )
+static DRIVER_INIT( gunbird )
 {
 	/* input ports */
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
@@ -2038,7 +2038,7 @@ ROM_START( s1945jn )
 
 ROM_END
 
-DRIVER_INIT( s1945jn )
+static DRIVER_INIT( s1945jn )
 {
 	/* input ports */
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
@@ -2193,7 +2193,7 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 
 ROM_END
 
-DRIVER_INIT( s1945 )
+static DRIVER_INIT( s1945 )
 {
 	/* input ports */
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
@@ -2208,7 +2208,7 @@ DRIVER_INIT( s1945 )
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
 }
 
-DRIVER_INIT( s1945a )
+static DRIVER_INIT( s1945a )
 {
 	/* input ports */
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
@@ -2223,7 +2223,7 @@ DRIVER_INIT( s1945a )
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
 }
 
-DRIVER_INIT( s1945j )
+static DRIVER_INIT( s1945j )
 {
 	/* input ports*/
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
@@ -2290,7 +2290,7 @@ ROM_START( tengai )
 
 ROM_END
 
-DRIVER_INIT( tengai )
+static DRIVER_INIT( tengai )
 {
 	/* input ports */
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);

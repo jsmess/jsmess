@@ -406,7 +406,7 @@ static GFXDECODE_START( marinedt )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, marinedt_objlayout,  32, 4 )
 GFXDECODE_END
 
-PALETTE_INIT( marinedt )
+static PALETTE_INIT( marinedt )
 {
 	int i,r,b,g;
 
@@ -448,7 +448,7 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(0, code, color, flags);
 }
 
-VIDEO_START( marinedt )
+static VIDEO_START( marinedt )
 {
 	tx_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
 
@@ -475,7 +475,7 @@ VIDEO_START( marinedt )
 #define OBJ_FLIPX(a)	((marinedt_pf & 0x02) == 0)
 #define OBJ_FLIPY(a)	((a) & 0x80)
 
-VIDEO_UPDATE( marinedt )
+static VIDEO_UPDATE( marinedt )
 {
 	int sx, sy;
 

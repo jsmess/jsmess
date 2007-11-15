@@ -358,7 +358,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT( upscope )
+static DRIVER_INIT( upscope )
 {
 	static const amiga_machine_interface upscope_intf =
 	{

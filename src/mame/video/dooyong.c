@@ -73,7 +73,7 @@ WRITE8_HANDLER( dooyong_bgscroll8_w )
 	dooyong_scroll8_w(offset, data, bgscroll8, bg_tilemap);
 }
 
-WRITE8_HANDLER( dooyong_bg2scroll8_w )
+static WRITE8_HANDLER( dooyong_bg2scroll8_w )
 {
 	dooyong_scroll8_w(offset, data, bg2scroll8, bg2_tilemap);
 }

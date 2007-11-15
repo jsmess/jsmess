@@ -182,7 +182,7 @@ static TIMER_CALLBACK( scanline_callback )
 }
 
 
-MACHINE_RESET( yboard )
+static MACHINE_RESET( yboard )
 {
     interrupt_timer = mame_timer_alloc(scanline_callback);
     mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 223, 0), 223, time_zero);

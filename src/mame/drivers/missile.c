@@ -531,7 +531,7 @@ static UINT8 read_vram(offs_t address)
  *
  *************************************/
 
-VIDEO_UPDATE( missile )
+static VIDEO_UPDATE( missile )
 {
 	int x, y;
 

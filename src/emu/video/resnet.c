@@ -450,6 +450,24 @@ double compute_resistor_net_outputs(
 
 *****************************************************************************/
 
+
+/* Datasheets give a maximum of 0.4V to 0.5V
+ * However in the circuit simulated here this will only
+ * occur if (rBias + rOutn) = 50 Ohm, rBias exists.
+ * This is highly unlikely. With the resistor values used
+ * in such circuits VOL is likely to be around 50mV.
+ */
+
+#define	TTL_VOL			(0.05)
+
+
+/* Likely, datasheets give a typical value of 3.4V to 3.6V
+ * for VOH. Modelling the TTL circuit however backs a value
+ * of 4V for typical currents involved in resistor networks.
+ */
+
+#define TTL_VOH			(4.0)
+
 int compute_res_net(int inputs, int channel, const res_net_info *di)
 {
 	double rTotal=0.0;
@@ -463,6 +481,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 	double cut = di->rgb[channel].cut;
 	double vcc = di->vcc;
 	double ttlHRes = 0;
+	double rGnd = di->rgb[channel].rGnd;
 	UINT8  OpenCol = di->OpenCol;
 
 	/* Global options */
@@ -512,7 +531,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			vBias = 5.0;
 			break;
 		case RES_NET_VBIAS_TTL:
-			vBias = 3.6;
+			vBias = TTL_VOH;
 			break;
 		case RES_NET_VBIAS_CUSTOM:
 			/* Fall through */
@@ -525,7 +544,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 	{
 		case RES_NET_VIN_OPEN_COL:
 			OpenCol = 1;
-			vOL = 0.35;
+			vOL = TTL_VOL;
 			break;
 		case RES_NET_VIN_VCC:
 			vOL = 0.0;
@@ -533,8 +552,8 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			OpenCol = 0;
 			break;
 		case RES_NET_VIN_TTL_OUT:
-			vOL = 0.35;
-			vOH = 3.6;
+			vOL = TTL_VOL;
+			vOH = TTL_VOH;
 			/* rough estimation from 82s129 (7052) datasheet and from various sources
              * 1.4k / 30
              */
@@ -583,13 +602,29 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			vBias = 5.0;
 			break;
 		case RES_NET_VBIAS_TTL:
-			vBias = 3.4;
+			vBias = TTL_VOH;
 			break;
 		case RES_NET_VBIAS_CUSTOM:
 			/* Fall through */
 			break;
 		default:
 			fatalerror("compute_res_net: Unknown vcc type");
+	}
+
+	/* Input impedances */
+
+	switch (di->options & RES_NET_MONITOR_MASK)
+	{
+		case RES_NET_MONITOR_INVERT:
+		case RES_NET_MONITOR_SANYO_EZV20:
+			/* Nothing */
+			break;
+		case RES_NET_MONITOR_ELECTROHOME_G07:
+			if (rGnd != 0.0)
+				rGnd = rGnd * 5600 / (rGnd + 5600);
+			else
+				rGnd = 5600;
+			break;
 	}
 
 	/* compute here - pass a / low inputs */
@@ -618,8 +653,8 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 		rTotal += 1.0 / di->rgb[channel].rBias;
 		v += vBias / di->rgb[channel].rBias;
 	}
-	if (di->rgb[channel].rGnd != 0.0)
-		rTotal += 1.0 / di->rgb[channel].rGnd;
+	if (rGnd != 0.0)
+		rTotal += 1.0 / rGnd;
 
 	/* if the resulting voltage after application of all low inputs is
      * greater than vOH, treat high inputs as open collector/high impedance
@@ -665,6 +700,9 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			v = vcc - v;
 			v = MAX(0, v-0.7);
 			v = MIN(v, vcc - 2 * 0.7);
+			break;
+		case RES_NET_MONITOR_ELECTROHOME_G07:
+			/* Nothing */
 			break;
 	}
 

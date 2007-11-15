@@ -143,12 +143,12 @@ extern WRITE8_HANDLER( tiamc1_timer1_gate_w );
 
 static UINT8 *video_ram;
 
-DRIVER_INIT( tiamc1 )
+static DRIVER_INIT( tiamc1 )
 {
 	video_ram = auto_malloc(0x3040);
 }
 
-MACHINE_RESET( tiamc1 )
+static MACHINE_RESET( tiamc1 )
 {
 	memset(video_ram, 0, 0x3040);
 
@@ -165,7 +165,7 @@ MACHINE_RESET( tiamc1 )
 	state_save_register_global_pointer(video_ram, 0x3040);
 }
 
-WRITE8_HANDLER( tiamc1_control_w )
+static WRITE8_HANDLER( tiamc1_control_w )
 {
 	coin_lockout_w(0, ~data & 0x02);
 	coin_counter_w(0, data & 0x04);

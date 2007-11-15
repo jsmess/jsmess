@@ -883,7 +883,7 @@ static DRIVER_INIT( namcos11 )
 	state_save_register_global( m_n_oldcoin );
 }
 
-MACHINE_RESET( namcos11 )
+static MACHINE_RESET( namcos11 )
 {
 	memset( namcos11_keycus, 0, namcos11_keycus_size );
 	psx_machine_init();

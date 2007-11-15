@@ -30,7 +30,7 @@ static VIDEO_UPDATE(ddz)
 	return 0;
 }
 
-VIDEO_EOF(ddz)
+static VIDEO_EOF(ddz)
 {
 
 }

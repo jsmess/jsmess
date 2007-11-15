@@ -209,7 +209,7 @@ static void xboard_reset(void)
 }
 
 
-MACHINE_RESET( xboard )
+static MACHINE_RESET( xboard )
 {
 	fd1094_machine_init();
 	segaic16_tilemap_reset(0);

@@ -130,7 +130,7 @@ static READ32_HANDLER( port2_r )
  *
  *************************************/
 
-READ32_HANDLER( midvunit_adc_r )
+static READ32_HANDLER( midvunit_adc_r )
 {
 	if (!(control_data & 0x40))
 		return adc_data << adc_shift;
@@ -146,7 +146,7 @@ static TIMER_CALLBACK( adc_ready )
 }
 
 
-WRITE32_HANDLER( midvunit_adc_w )
+static WRITE32_HANDLER( midvunit_adc_w )
 {
 	if (!(control_data & 0x20))
 	{
@@ -194,7 +194,7 @@ static READ32_HANDLER( midvunit_cmos_r )
  *
  *************************************/
 
-WRITE32_HANDLER( midvunit_control_w )
+static WRITE32_HANDLER( midvunit_control_w )
 {
 	UINT16 olddata = control_data;
 	COMBINE_DATA(&control_data);
@@ -214,7 +214,7 @@ WRITE32_HANDLER( midvunit_control_w )
 }
 
 
-WRITE32_HANDLER( crusnwld_control_w )
+static WRITE32_HANDLER( crusnwld_control_w )
 {
 	UINT16 olddata = control_data;
 	COMBINE_DATA(&control_data);

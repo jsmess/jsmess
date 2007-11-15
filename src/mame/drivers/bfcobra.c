@@ -228,7 +228,7 @@ struct
 	UINT8	count_w;
 } ramdac;
 
-VIDEO_UPDATE( bfcobra )
+static VIDEO_UPDATE( bfcobra )
 {
 	int x, y;
 	UINT8  *src;
@@ -856,7 +856,7 @@ void reset_fdc(void)
 	fdc.phase = COMMAND;
 }
 
-READ8_HANDLER( fdctrl_r )
+static READ8_HANDLER( fdctrl_r )
 {
 	UINT8 val = 0;
 
@@ -865,7 +865,7 @@ READ8_HANDLER( fdctrl_r )
 	return val;
 }
 
-READ8_HANDLER( fddata_r )
+static READ8_HANDLER( fddata_r )
 {
 	#define	BPS		1024
 	#define SPT		10
@@ -937,7 +937,7 @@ READ8_HANDLER( fddata_r )
 	return val;
 }
 
-WRITE8_HANDLER( fdctrl_w )
+static WRITE8_HANDLER( fdctrl_w )
 {
 	switch (fdc.phase)
 	{
@@ -1053,6 +1053,7 @@ UINT8 results_phase(void)
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( fd_op_w )
 {
 }
@@ -1060,8 +1061,9 @@ WRITE8_HANDLER( fd_op_w )
 WRITE8_HANDLER( fd_ctrl_w )
 {
 }
+#endif
 
-MACHINE_RESET( bfcobra )
+static MACHINE_RESET( bfcobra )
 {
 	bank[0] = 1;
 	memset(&ramdac, 0, sizeof(ramdac));

@@ -76,7 +76,7 @@ static UINT16 *textram;
 	 				}	\
 			}
 
-VIDEO_UPDATE( drill )
+static VIDEO_UPDATE( drill )
 {
 	int i;
 	fillbitmap(bitmap,0,NULL);
@@ -111,12 +111,12 @@ VIDEO_UPDATE( drill )
 	return 0;
 }
 
-VIDEO_START( drill )
+static VIDEO_START( drill )
 {
 	machine->gfx[0]->color_granularity=16;
 }
 
-READ16_HANDLER( drill_unk_r )
+static READ16_HANDLER( drill_unk_r )
 {
 	return 0xffff;
 }
@@ -234,7 +234,7 @@ ROM_START( 2mindril )
 	ROM_LOAD32_WORD( "d58-10.ic29", 0x000000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
 ROM_END
 
-DRIVER_INIT( drill )
+static DRIVER_INIT( drill )
 {
 	// rearrange gfx roms to something we can decode, two of the roms form 4bpp of the graphics, the third forms another 2bpp but is in a different format
 	UINT32 *src    = (UINT32*)memory_region       ( REGION_GFX2 );

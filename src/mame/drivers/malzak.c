@@ -55,22 +55,22 @@ VIDEO_START( malzak );
 VIDEO_UPDATE( malzak );
 WRITE8_HANDLER( playfield_w );
 
-READ8_HANDLER( malzak_s2636_1_r )
+static READ8_HANDLER( malzak_s2636_1_r )
 {
 	return s2636_1_ram[offset];
 }
 
-READ8_HANDLER( malzak_s2636_2_r )
+static READ8_HANDLER( malzak_s2636_2_r )
 {
 	return s2636_2_ram[offset];
 }
 
-WRITE8_HANDLER( malzak_s2636_1_w )
+static WRITE8_HANDLER( malzak_s2636_1_w )
 {
 	s2636_w(s2636_1_ram,offset,data,s2636_1_dirty);
 }
 
-WRITE8_HANDLER( malzak_s2636_2_w )
+static WRITE8_HANDLER( malzak_s2636_2_w )
 {
 	s2636_w(s2636_2_ram,offset,data,s2636_2_dirty);
 }

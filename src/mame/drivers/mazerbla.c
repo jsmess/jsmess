@@ -101,7 +101,7 @@ static PALETTE_INIT( mazerbla )
 
 static mame_bitmap * tmpbitmaps[4];
 
-VIDEO_START( mazerbla )
+static VIDEO_START( mazerbla )
 {
 	tmpbitmaps[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
@@ -236,7 +236,7 @@ VIDEO_UPDATE( test_vcu )
 
 
 /* these two VIDEO_UPDATE()s will be joined one day */
-VIDEO_UPDATE( greatgun )
+static VIDEO_UPDATE( greatgun )
 {
 
 	UINT32 color_base=0;
@@ -256,7 +256,7 @@ VIDEO_UPDATE( greatgun )
 	return 0;
 }
 
-VIDEO_UPDATE( mazerbla )
+static VIDEO_UPDATE( mazerbla )
 {
 
 	UINT32 color_base=0;

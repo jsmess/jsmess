@@ -296,7 +296,7 @@ static READ16_HANDLER( vdp_fake_r )
 	return mame_rand(Machine);
 }
 
-DRIVER_INIT(topshoot)
+static DRIVER_INIT(topshoot)
 {
 	/* hack -- fix vdp emulation instead */
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xC00004, 0xC00005, 0, 0, vdp_fake_r);

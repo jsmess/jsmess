@@ -161,7 +161,7 @@ static void video_cleanup(running_machine *machine)
 }
 
 
-VIDEO_START( dlair )
+static VIDEO_START( dlair )
 {
 	mame_bitmap *vidbitmap;
 
@@ -175,7 +175,7 @@ VIDEO_START( dlair )
 }
 
 
-PALETTE_INIT( dleuro )
+static PALETTE_INIT( dleuro )
 {
 	int i;
 
@@ -189,7 +189,7 @@ PALETTE_INIT( dleuro )
 }
 
 
-VIDEO_START( dleuro )
+static VIDEO_START( dleuro )
 {
 	video_start_dlair(machine);
 
@@ -206,7 +206,7 @@ VIDEO_START( dleuro )
  *
  *************************************/
 
-VIDEO_UPDATE( dlair )
+static VIDEO_UPDATE( dlair )
 {
 	mame_bitmap *vidbitmap;
 	UINT32 seqid;
@@ -228,7 +228,7 @@ VIDEO_UPDATE( dlair )
 }
 
 
-VIDEO_UPDATE( dleuro )
+static VIDEO_UPDATE( dleuro )
 {
 	mame_bitmap *vidbitmap;
 	UINT32 seqid;

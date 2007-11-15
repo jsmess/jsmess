@@ -31,7 +31,7 @@ VIDEO_UPDATE( mrdo );
 
 /* this looks like some kind of protection. The game doesn't clear the screen */
 /* if a read from this address doesn't return the value it expects. */
-READ8_HANDLER( mrdo_SECRE_r )
+static READ8_HANDLER( mrdo_SECRE_r )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	return RAM[ activecpu_get_reg(Z80_HL) ];

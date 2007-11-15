@@ -32,7 +32,7 @@ static INT32 taito_hide_pixels;
 
 /**********************************************************/
 
-VIDEO_START( slapshot_core )
+static VIDEO_START( slapshot_core )
 {
 	int i;
 

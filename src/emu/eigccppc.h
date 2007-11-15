@@ -380,4 +380,55 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 }
 
 
+/*-------------------------------------------------
+    atomic_increment32 - atomically increment the
+    32-bit value in memory at 'ptr', returning the
+    final result.
+-------------------------------------------------*/
+
+#define atomic_increment32 _atomic_increment32
+INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
+{
+	register INT32 result;
+
+	__asm__ __volatile__ (
+		"1: lwarx   %[result], 0, %[ptr]    \n"
+		"   addi    %[result], %[result], 1 \n"
+		"   sync                            \n"
+		"   stwcx.  %[result], 0, %[ptr]    \n"
+		"   bne-    1b                      \n"
+	  : [result] "=&b" (result)
+	  : [ptr]    "r"   (ptr)
+	  : "cr0"
+	);
+
+	return result;
+}
+
+
+/*-------------------------------------------------
+    atomic_decrement32 - atomically decrement the
+    32-bit value in memory at 'ptr', returning the
+    final result.
+-------------------------------------------------*/
+
+#define atomic_decrement32 _atomic_decrement32
+INLINE INT32 _atomic_decrement32(INT32 volatile *ptr)
+{
+	register INT32 result;
+
+	__asm__ __volatile__ (
+		"1: lwarx   %[result], 0, %[ptr]     \n"
+		"   addi    %[result], %[result], -1 \n"
+		"   sync                             \n"
+		"   stwcx.  %[result], 0, %[ptr]     \n"
+		"   bne-    1b                       \n"
+	  : [result] "=&b" (result)
+	  : [ptr]    "r"   (ptr)
+	  : "cr0"
+	);
+
+	return result;
+}
+
 #endif /* __EIGCCPPC__ */

@@ -526,7 +526,7 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(0, videoram[tile_index], colorram[tile_index], 0);
 }
 
-VIDEO_START( laserbat )
+static VIDEO_START( laserbat )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
@@ -538,7 +538,7 @@ VIDEO_START( laserbat )
 	s2636_x_offset = -19;
 }
 
-VIDEO_UPDATE( laserbat )
+static VIDEO_UPDATE( laserbat )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 

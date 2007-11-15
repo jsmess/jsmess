@@ -329,7 +329,7 @@ ROM_START( sexyboom )
 	/* 15 empty */
 ROM_END
 
-DRIVER_INIT(sangho)
+static DRIVER_INIT(sangho)
 {
 	sangho_ram = auto_malloc(0x20000);
 }

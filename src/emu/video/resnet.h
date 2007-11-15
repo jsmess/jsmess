@@ -73,6 +73,10 @@
 #define RES_NET_MONITOR_INVERT		0x1000
 // SANYO_EZV20 / Nintendo with inverter circuit
 #define RES_NET_MONITOR_SANYO_EZV20	0x2000
+// Electrohome G07 Series
+// 5.6k input impedance
+#define RES_NET_MONITOR_ELECTROHOME_G07	0x3000
+
 #define RES_NET_MONITOR_MASK		0x3000
 
 /* General defines */

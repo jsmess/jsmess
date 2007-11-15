@@ -736,14 +736,14 @@ void crshrace_patch_code(UINT16 offset)
 }
 
 
-DRIVER_INIT( crshrace )
+static DRIVER_INIT( crshrace )
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003778);
 	#endif
 }
 
-DRIVER_INIT( crshrac2 )
+static DRIVER_INIT( crshrac2 )
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003796);

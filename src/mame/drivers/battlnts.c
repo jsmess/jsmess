@@ -27,7 +27,7 @@ static INTERRUPT_GEN( battlnts_interrupt )
 		cpunum_set_input_line(0, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
+static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
 	cpunum_set_input_line_and_vector(1, 0, HOLD_LINE, 0xff);
 }

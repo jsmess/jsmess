@@ -50,7 +50,7 @@ extern WRITE8_HANDLER( exctsccr_mcu_control_w );
 extern WRITE8_HANDLER( exctscc2_mcu_control_w );
 
 
-WRITE8_HANDLER( exctsccr_DAC_data_w )
+static WRITE8_HANDLER( exctsccr_DAC_data_w )
 {
 	DAC_signed_data_w(offset,data << 2);
 }
@@ -590,7 +590,7 @@ ROM_END
 
 /* The games need a different MCU control */
 
-DRIVER_INIT( exctsccr )
+static DRIVER_INIT( exctsccr )
 {
 #if MCU_HACK
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa006, 0xa006, 0, 0, exctsccr_mcu_control_w);
@@ -599,7 +599,7 @@ DRIVER_INIT( exctsccr )
 #endif
 }
 
-DRIVER_INIT( exctscc2 )
+static DRIVER_INIT( exctscc2 )
 {
 #if MCU_HACK
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa006, 0xa006, 0, 0, exctscc2_mcu_control_w);

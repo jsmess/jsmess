@@ -718,7 +718,7 @@ static DRIVER_INIT( toki )
 }
 
 
-DRIVER_INIT( tokib )
+static DRIVER_INIT( tokib )
 {
 	UINT8 *temp = malloc_or_die(65536 * 2);
 	int i, offs;
@@ -756,7 +756,7 @@ DRIVER_INIT( tokib )
 		free (temp);
 }
 
-DRIVER_INIT(jujub)
+static DRIVER_INIT(jujub)
 {
 	/* Program ROMs are bitswapped */
 	{

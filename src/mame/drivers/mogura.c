@@ -7,7 +7,7 @@ UINT8 *mogura_tileram;
 UINT8* mogura_gfxram;
 static tilemap *mogura_tilemap;
 
-PALETTE_INIT( mogura )
+static PALETTE_INIT( mogura )
 {
 	int i,j;
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
@@ -53,12 +53,12 @@ static TILE_GET_INFO( get_mogura_tile_info )
 }
 
 
-VIDEO_START( mogura )
+static VIDEO_START( mogura )
 {
 	mogura_tilemap = tilemap_create(get_mogura_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64, 32);
 }
 
-VIDEO_UPDATE( mogura )
+static VIDEO_UPDATE( mogura )
 {
 	/* tilemap layout is a bit strange ... */
 	rectangle clip;
@@ -79,7 +79,7 @@ VIDEO_UPDATE( mogura )
 	return 0;
 }
 
-WRITE8_HANDLER( mogura_tileram_w )
+static WRITE8_HANDLER( mogura_tileram_w )
 {
 	mogura_tileram[offset] = data;
 	tilemap_mark_tile_dirty(mogura_tilemap,offset&0x7ff);
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-WRITE8_HANDLER ( mogura_gfxram_w )
+static WRITE8_HANDLER ( mogura_gfxram_w )
 {
 	mogura_gfxram[offset] = data ;
 

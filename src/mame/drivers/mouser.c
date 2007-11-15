@@ -29,7 +29,7 @@ VIDEO_UPDATE( mouser );
 /* Mouser has external masking circuitry around
  * the NMI input on the main CPU */
 
-WRITE8_HANDLER( mouser_nmi_enable_w )
+static WRITE8_HANDLER( mouser_nmi_enable_w )
 {
 	mouser_nmi_enable = data;
 }
@@ -42,13 +42,13 @@ INTERRUPT_GEN( mouser_nmi_interrupt )
 
 /* Sound CPU interrupted on write */
 
-WRITE8_HANDLER( mouser_sound_interrupt_w )
+static WRITE8_HANDLER( mouser_sound_interrupt_w )
 {
 	mouser_sound_byte = data;
 	cpunum_set_input_line(1, 0, HOLD_LINE);
 }
 
-READ8_HANDLER( mouser_sound_byte_r )
+static READ8_HANDLER( mouser_sound_byte_r )
 {
 	return mouser_sound_byte;
 }
@@ -283,7 +283,7 @@ ROM_START( mouserc )
 ROM_END
 
 
-DRIVER_INIT( mouser )
+static DRIVER_INIT( mouser )
 {
 	/* Decode the opcodes */
 

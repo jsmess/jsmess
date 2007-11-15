@@ -292,7 +292,7 @@ static TILE_GET_INFO( get_layer2_tile_info )
 }
 
 
-VIDEO_START( magic10 )
+static VIDEO_START( magic10 )
 {
 	layer0_tilemap = tilemap_create(get_layer0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
 	layer1_tilemap = tilemap_create(get_layer1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
@@ -305,7 +305,7 @@ VIDEO_START( magic10 )
 	tilemap_set_scrolly(layer2_tilemap,0,layer2_offset[1]);
 }
 
-VIDEO_UPDATE( magic10 )
+static VIDEO_UPDATE( magic10 )
 {
 	tilemap_draw(bitmap,cliprect,layer0_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,layer1_tilemap,0,0);
@@ -461,13 +461,13 @@ ROM_START( magic102 )
 	ROM_LOAD( "7.u32",        0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
 ROM_END
 
-DRIVER_INIT( magic10 )
+static DRIVER_INIT( magic10 )
 {
 	layer2_offset[0] = 32;
 	layer2_offset[1] = 2;
 }
 
-DRIVER_INIT( magic102 )
+static DRIVER_INIT( magic102 )
 {
 	layer2_offset[0] = 8;
 	layer2_offset[1] = 20;

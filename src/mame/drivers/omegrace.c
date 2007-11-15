@@ -290,7 +290,7 @@ static UINT8 spinnerTable[64] =
 };
 
 
-READ8_HANDLER( omegrace_spinner1_r )
+static READ8_HANDLER( omegrace_spinner1_r )
 {
 	return (spinnerTable[readinputport(4) & 0x3f]);
 }
@@ -303,7 +303,7 @@ READ8_HANDLER( omegrace_spinner1_r )
  *
  *************************************/
 
-WRITE8_HANDLER( omegrace_leds_w )
+static WRITE8_HANDLER( omegrace_leds_w )
 {
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -319,7 +319,7 @@ WRITE8_HANDLER( omegrace_leds_w )
 }
 
 
-WRITE8_HANDLER( omegrace_soundlatch_w )
+static WRITE8_HANDLER( omegrace_soundlatch_w )
 {
 	soundlatch_w (offset, data);
 	cpunum_set_input_line(1, 0, HOLD_LINE);

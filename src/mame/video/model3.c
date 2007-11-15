@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "video/rgbutil.h"
 #include "eminline.h"
 #include <math.h>
@@ -1071,7 +1071,7 @@ static PLANE clip_plane[5];
 static void render_one(TRIANGLE *tri)
 {
 	poly_extra_data *extra = poly_get_extra_data(poly);
-	poly_draw_tri_scanline callback = NULL;
+	poly_draw_scanline callback = NULL;
 
 	tri->v[0].pz = 1.0f / tri->v[0].pz;
 	tri->v[1].pz = 1.0f / tri->v[1].pz;

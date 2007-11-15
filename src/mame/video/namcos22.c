@@ -37,7 +37,7 @@ SPOT TABLE test
 #include "eminline.h"
 #include "video/rgbutil.h"
 #include "namcos22.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include <math.h>
 
 // uncomment this line to render everything as quads
@@ -267,13 +267,8 @@ struct _poly_extra_data
 };
 
 
-#ifdef RENDER_AS_QUADS
-static void renderscanline_uvi_full(void *dest, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
-#else
-static void renderscanline_uvi_full(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
-#endif
+static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-#ifdef RENDER_AS_QUADS
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
 	float v = extent->param[2].start;
@@ -282,16 +277,6 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const tri_extent
 	float du = extent->param[1].dpdx;
 	float dv = extent->param[2].dpdx;
 	float di = extent->param[3].dpdx;
-#else
-	float z = poly_param_tri_value(extent->startx, scanline, 0, poly); /* 1/z */
-	float u = poly_param_tri_value(extent->startx, scanline, 1, poly); /* u/z */
-	float v = poly_param_tri_value(extent->startx, scanline, 2, poly); /* v/z */
-	float i = poly_param_tri_value(extent->startx, scanline, 3, poly); /* i/z */
-	float dz = poly->param[0].dpdx;
-	float du = poly->param[1].dpdx;
-	float dv = poly->param[2].dpdx;
-	float di = poly->param[3].dpdx;
-#endif
 	mame_bitmap *bitmap = dest;
 	const poly_extra_data *extra = extradata;
 	int bn = extra->bn * 0x1000;
@@ -498,21 +483,11 @@ static void poly3d_DrawQuad(running_machine *machine, mame_bitmap *bitmap, int t
 #endif
 }
 
-#ifdef RENDER_AS_QUADS
-static void renderscanline_sprite(void *destbase, INT32 scanline, const quad_extent *extent, const void *extradata, int threadid)
-#else
-static void renderscanline_sprite(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
-#endif
+static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-#ifdef RENDER_AS_QUADS
 	int x_index = extent->param[0].start * 65536.0f;
 	int y_index = extent->param[1].start * 65536.0f;
 	int dx = extent->param[0].dpdx * 65536.0f;
-#else
-	int x_index = poly_param_tri_value(extent->startx, scanline, 0, poly) * 65536.0f;
-	int y_index = poly_param_tri_value(extent->startx, scanline, 1, poly) * 65536.0f;
-	int dx = poly->param[0].dpdx * 65536.0f;
-#endif
 	const poly_extra_data *extra = extradata;
 	mame_bitmap *destmap = destbase;
 	const pen_t *pal = &Machine->remapped_colortable[extra->color];

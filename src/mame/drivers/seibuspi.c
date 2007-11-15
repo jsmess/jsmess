@@ -1855,19 +1855,19 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 
 MACHINE_DRIVER_END
 
-READ32_HANDLER ( senkyu_speedup_r )
+static READ32_HANDLER ( senkyu_speedup_r )
 {
 	if (activecpu_get_pc()==0x00305bb2) cpu_spinuntil_int(); // idle
 	return spimainram[(0x0018cb4-0x800)/4];
 }
 
-READ32_HANDLER( senkyua_speedup_r )
+static READ32_HANDLER( senkyua_speedup_r )
 {
 	if (activecpu_get_pc()== 0x30582e) cpu_spinuntil_int(); // idle
 	return spimainram[(0x0018c9c-0x800)/4];
 }
 
-READ32_HANDLER ( batlball_speedup_r )
+static READ32_HANDLER ( batlball_speedup_r )
 {
 //  printf("activecpu_get_pc() %06x\n", activecpu_get_pc());
 
@@ -1880,7 +1880,7 @@ READ32_HANDLER ( batlball_speedup_r )
 	return spimainram[(0x0018db4-0x800)/4];
 }
 
-READ32_HANDLER ( rdft_speedup_r )
+static READ32_HANDLER ( rdft_speedup_r )
 {
 	/* rdft */
 	if (activecpu_get_pc()==0x0203f0a) cpu_spinuntil_int(); // idle
@@ -1902,7 +1902,7 @@ READ32_HANDLER ( rdft_speedup_r )
 	return spimainram[(0x00298d0-0x800)/4];
 }
 
-READ32_HANDLER ( viprp1_speedup_r )
+static READ32_HANDLER ( viprp1_speedup_r )
 {
 	/* viprp1 */
 	if (activecpu_get_pc()==0x0202769) cpu_spinuntil_int(); // idle
@@ -1918,7 +1918,7 @@ READ32_HANDLER ( viprp1_speedup_r )
 	return spimainram[(0x001e2e0-0x800)/4];
 }
 
-READ32_HANDLER ( viprp1o_speedup_r )
+static READ32_HANDLER ( viprp1o_speedup_r )
 {
 	/* viperp1o */
 	if (activecpu_get_pc()==0x0201f99) cpu_spinuntil_int(); // idle
@@ -1936,7 +1936,7 @@ READ32_HANDLER ( ejanhs_speedup_r )
 }
 */
 
-READ32_HANDLER ( rf2_speedup_r )
+static READ32_HANDLER ( rf2_speedup_r )
 {
 
 	/* rdft22kc */
@@ -1956,7 +1956,7 @@ READ32_HANDLER ( rf2_speedup_r )
 	return spimainram[(0x0282AC-0x800)/4];
 }
 
-READ32_HANDLER ( rfjet_speedup_r )
+static READ32_HANDLER ( rfjet_speedup_r )
 {
 	/* rfjet, rfjetu, rfjeta */
 	if (activecpu_get_pc()==0x0206082) cpu_spinuntil_int(); // idle

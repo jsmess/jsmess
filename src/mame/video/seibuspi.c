@@ -68,10 +68,12 @@ void rf2_set_layer_banks(int banks)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 READ32_HANDLER( spi_layer_enable_r )
 {
 	return layer_enable;
 }
+#endif
 
 WRITE32_HANDLER( spi_layer_enable_w )
 {

@@ -67,7 +67,7 @@ static UINT8 cop_l_latch;
 
 
 /* VIDEO GOODS */
-VIDEO_UPDATE( thayers )
+static VIDEO_UPDATE( thayers )
 {
 	/* display disc information */
 	if (discinfo != NULL)

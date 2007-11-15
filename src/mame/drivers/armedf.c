@@ -1363,28 +1363,28 @@ ROM_START( armedf )
 ROM_END
 
 
-DRIVER_INIT( terraf )
+static DRIVER_INIT( terraf )
 {
 	armedf_setgfxtype(0);
 }
 
-DRIVER_INIT( terrafu )
+static DRIVER_INIT( terrafu )
 {
 	armedf_setgfxtype(5);
 }
 
-DRIVER_INIT( armedf )
+static DRIVER_INIT( armedf )
 {
 	armedf_setgfxtype(1);
 }
 
 
-DRIVER_INIT( kodure )
+static DRIVER_INIT( kodure )
 {
 	armedf_setgfxtype(2);
 }
 
-DRIVER_INIT( legion )
+static DRIVER_INIT( legion )
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -1398,7 +1398,7 @@ DRIVER_INIT( legion )
 	armedf_setgfxtype(3);
 }
 
-DRIVER_INIT( legiono )
+static DRIVER_INIT( legiono )
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -1411,7 +1411,7 @@ DRIVER_INIT( legiono )
 	armedf_setgfxtype(6);
 }
 
-DRIVER_INIT( cclimbr2 )
+static DRIVER_INIT( cclimbr2 )
 {
 	armedf_setgfxtype(4);
 }

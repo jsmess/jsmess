@@ -421,7 +421,7 @@ static INTERRUPT_GEN( n64_vblank )
 	signal_rcp_interrupt(VI_INTERRUPT);
 }
 
-MACHINE_RESET( aleck64 )
+static MACHINE_RESET( aleck64 )
 {
 	n64_machine_reset();
 }
@@ -458,7 +458,7 @@ MACHINE_DRIVER_START( aleck64 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
-DRIVER_INIT( aleck64 )
+static DRIVER_INIT( aleck64 )
 {
 	UINT8 *rom = memory_region(REGION_USER2);
 

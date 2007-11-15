@@ -210,7 +210,7 @@ static INPUT_PORTS_START( esh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-PALETTE_INIT( esh )
+static PALETTE_INIT( esh )
 {
 	int i;
 

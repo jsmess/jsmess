@@ -472,12 +472,12 @@ static DRIVER_INIT( loht )
 	memset(m72_videoram2,0,0x4000);
 }
 
-READ16_HANDLER( m72_main_mcu_r)
+static READ16_HANDLER( m72_main_mcu_r)
 {
 	return protection_ram[offset];
 }
 
-WRITE16_HANDLER( m72_main_mcu_w)
+static WRITE16_HANDLER( m72_main_mcu_w)
 {
 	COMBINE_DATA(&protection_ram[offset]);
 }

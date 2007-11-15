@@ -461,7 +461,7 @@ ROM_END
 
 
 
-DRIVER_INIT( ginganin )
+static DRIVER_INIT( ginganin )
 {
 	UINT16 *rom;
 

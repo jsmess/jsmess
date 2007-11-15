@@ -32,7 +32,7 @@ extern VIDEO_UPDATE( battlane );
 /* CPU interrupt control register */
 int battlane_cpu_control;
 
-WRITE8_HANDLER( battlane_cpu_command_w )
+static WRITE8_HANDLER( battlane_cpu_command_w )
 {
 	battlane_cpu_control = data;
 

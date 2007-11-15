@@ -355,19 +355,19 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 	}
 } /* TextTilemapGetInfo */
 
-READ32_HANDLER( namcos23_textram_r )
+static READ32_HANDLER( namcos23_textram_r )
 {
 	return namcos23_textram[offset];
 }
 
-WRITE32_HANDLER( namcos23_textram_w )
+static WRITE32_HANDLER( namcos23_textram_w )
 {
 	COMBINE_DATA( &namcos23_textram[offset] );
 //  tilemap_mark_tile_dirty( bgtilemap, offset*2 );
 //  tilemap_mark_tile_dirty( bgtilemap, offset*2+1 );
 }
 
-VIDEO_START( ss23 )
+static VIDEO_START( ss23 )
 {
 	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64 );
 	tilemap_set_transparent_pen( bgtilemap, 0xf );
@@ -465,7 +465,7 @@ DrawPoly( mame_bitmap *bitmap, const UINT32 *pSource, int n, int bNew )
 }
 #endif
 
-VIDEO_UPDATE( ss23 )
+static VIDEO_UPDATE( ss23 )
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
@@ -571,14 +571,14 @@ INLINE void UpdatePalette( int entry )
 	}
 }
 
-READ32_HANDLER( namcos23_paletteram_r )
+static READ32_HANDLER( namcos23_paletteram_r )
 {
 	return paletteram32[offset];
 }
 
 /* each LONGWORD is 2 colors.  each OFFSET is 2 colors */
 
-WRITE32_HANDLER( namcos23_paletteram_w )
+static WRITE32_HANDLER( namcos23_paletteram_w )
 {
 	COMBINE_DATA( &paletteram32[offset] );
 
@@ -793,7 +793,7 @@ static INPUT_PORTS_START( ss23 )
 INPUT_PORTS_END
 
 
-DRIVER_INIT(ss23)
+static DRIVER_INIT(ss23)
 {
     }
 

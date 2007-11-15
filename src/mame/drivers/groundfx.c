@@ -488,7 +488,7 @@ static READ32_HANDLER( irq_speedup_r_groundfx )
 }
 
 
-DRIVER_INIT( groundfx )
+static DRIVER_INIT( groundfx )
 {
 	UINT32 offset,i;
 	UINT8 *gfx = memory_region(REGION_GFX3);

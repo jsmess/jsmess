@@ -195,11 +195,11 @@ static ADDRESS_MAP_START( smstrv_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-VIDEO_START( smstrv )
+static VIDEO_START( smstrv )
 {
 }
 
-VIDEO_UPDATE( smstrv )
+static VIDEO_UPDATE( smstrv )
 {
 	return 0;
 }
@@ -216,7 +216,7 @@ static ppi8255_interface ppi8255_intf =
 };
 
 
-MACHINE_RESET( smstrv )
+static MACHINE_RESET( smstrv )
 {
 	ppi8255_init(&ppi8255_intf);
 }

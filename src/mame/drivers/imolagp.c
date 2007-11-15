@@ -158,7 +158,7 @@ InitializeColors( void )
 	}
 }
 
-VIDEO_START( imolagp )
+static VIDEO_START( imolagp )
 {
 	int i;
 	for( i=0; i<3; i++ )
@@ -170,7 +170,7 @@ VIDEO_START( imolagp )
 }
 
 
-VIDEO_UPDATE( imolagp )
+static VIDEO_UPDATE( imolagp )
 {
 	int scroll2 = imola_scroll^0x03;
 	int pass;
@@ -521,7 +521,7 @@ static ppi8255_interface ppi8255_intf =
 	{0}, 		/* Port C write */
 };
 
-DRIVER_INIT( imolagp )
+static DRIVER_INIT( imolagp )
 {
 	ppi8255_init(&ppi8255_intf);
 }

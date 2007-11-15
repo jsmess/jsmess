@@ -105,10 +105,10 @@ Hollywood Action
 
 #define oki_time_base 0x08
 
-static int kickgoal_sound;
-static int kickgoal_melody;
+//static int kickgoal_sound;
+//static int kickgoal_melody;
 static int kickgoal_melody_loop;
-static int kickgoal_snd_bank;
+//static int kickgoal_snd_bank;
 static int snd_new, snd_sam[4];
 
 
@@ -125,6 +125,7 @@ VIDEO_START( actionhw );
 VIDEO_UPDATE( actionhw );
 
 
+#ifdef UNUSED_FUNCTION
 static void kickgoal_play(int melody, int data)
 {
 	int status = OKIM6295_status_0_r(0);
@@ -209,8 +210,9 @@ WRITE16_HANDLER( kickgoal_snd_w )
 		}
 	}
 }
+#endif
 
-WRITE16_HANDLER( actionhw_snd_w )
+static WRITE16_HANDLER( actionhw_snd_w )
 {
 	logerror("PC:%06x Writing %04x to Sound CPU - mask %04x\n",activecpu_get_previouspc(),data,mem_mask);
 
@@ -791,7 +793,7 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-DRIVER_INIT( kickgoal )
+static DRIVER_INIT( kickgoal )
 {
 #if 0 /* we should find a real fix instead  */
 	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);

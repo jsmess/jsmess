@@ -51,8 +51,8 @@
 
 static UINT16 *livequiz_gfxram, *livequiz_gfxregs;
 
-VIDEO_START( livequiz );
-VIDEO_UPDATE( livequiz );
+static VIDEO_START( livequiz );
+static VIDEO_UPDATE( livequiz );
 
 static tilemap *tmap;
 
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(1, code & 0xfff, (code >> 12) & 0xf, TILE_FLIPXY( 0 ));
 }
 
-VIDEO_START( livequiz )
+static VIDEO_START( livequiz )
 {
 	tmap = tilemap_create(	get_tile_info, tilemap_scan_cols,
 							TILEMAP_TYPE_PEN, 8,8, 0x80,0x20	);
@@ -154,7 +154,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( livequiz )
+static VIDEO_UPDATE( livequiz )
 {
 	int layers_ctrl = -1;
 

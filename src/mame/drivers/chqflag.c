@@ -139,7 +139,7 @@ static READ8_HANDLER( analog_read_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
+static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
 	cpunum_set_input_line(1,0,HOLD_LINE);
 }

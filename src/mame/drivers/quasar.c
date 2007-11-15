@@ -169,7 +169,7 @@ static READ8_HANDLER( quasar_IO_r )
 	return ans;
 }
 
-WRITE8_HANDLER( quasar_bullet_w )
+static WRITE8_HANDLER( quasar_bullet_w )
 {
 	cvs_bullet_ram[offset] = (data ^ 0xff);
 }
@@ -178,7 +178,7 @@ static int Quasar_T1=0;
 static int Quasar_Command=0;
 //static int sh_page=0;
 
-WRITE8_HANDLER( quasar_sh_command_w )
+static WRITE8_HANDLER( quasar_sh_command_w )
 {
 	// bit 4 = Sound Invader : Linked to an NE555V circuit
 	// Not handled yet
@@ -190,7 +190,7 @@ WRITE8_HANDLER( quasar_sh_command_w )
 	Quasar_T1      = (Quasar_Command != 15);
 }
 
-READ8_HANDLER( quasar_sh_command_r )
+static READ8_HANDLER( quasar_sh_command_r )
 {
 	// Clear T1 signal
 	Quasar_T1 = 0;
@@ -202,12 +202,12 @@ READ8_HANDLER( quasar_sh_command_r )
 	return (Quasar_Command) + (input_port_5_r(0) & 0x30);
 }
 
-READ8_HANDLER( Quasar_T1_r )
+static READ8_HANDLER( Quasar_T1_r )
 {
 	return Quasar_T1;
 }
 
-WRITE8_HANDLER( Quasar_DAC_w )
+static WRITE8_HANDLER( Quasar_DAC_w )
 {
 	DAC_0_signed_data_w(0,data);
 }

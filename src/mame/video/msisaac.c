@@ -10,7 +10,8 @@
 UINT8 *msisaac_videoram;
 UINT8 *msisaac_videoram2;
 
-static int textbank1, bg2_textbank;
+//static int textbank1;
+static int bg2_textbank;
 
 static tilemap *background, *background2, *foreground;
 
@@ -106,6 +107,7 @@ WRITE8_HANDLER( msisaac_bg_scrollx_w )
 }
 
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( msisaac_textbank1_w )
 {
 	if( textbank1!=data )
@@ -114,6 +116,7 @@ WRITE8_HANDLER( msisaac_textbank1_w )
 		tilemap_mark_all_tiles_dirty( foreground );
 	}
 }
+#endif
 
 WRITE8_HANDLER( msisaac_bg2_textbank_w )
 {

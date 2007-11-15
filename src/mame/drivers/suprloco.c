@@ -255,7 +255,7 @@ ROM_END
 
 
 
-DRIVER_INIT( suprloco )
+static DRIVER_INIT( suprloco )
 {
 	/* convert graphics to 4bpp from 3bpp */
 

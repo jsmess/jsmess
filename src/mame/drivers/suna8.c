@@ -82,7 +82,7 @@ void suna8_sh_start(void);
                                 Hard Head
 ***************************************************************************/
 
-DRIVER_INIT( hardhead )
+static DRIVER_INIT( hardhead )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	int i;
@@ -157,7 +157,7 @@ static UINT8 *brickzn_decrypt(void)
 	return decrypt;
 }
 
-DRIVER_INIT( brickzn )
+static DRIVER_INIT( brickzn )
 {
 	UINT8	*RAM	=	memory_region(REGION_CPU1);
 	UINT8   *decrypt = brickzn_decrypt();
@@ -188,7 +188,7 @@ DRIVER_INIT( brickzn )
 	memory_configure_bank_decrypted(1, 0, 16, decrypt + 0x10000, 0x4000);
 }
 
-DRIVER_INIT( brickzn3 )
+static DRIVER_INIT( brickzn3 )
 {
 	UINT8	*RAM	=	memory_region(REGION_CPU1);
 	UINT8   *decrypt = brickzn_decrypt();
@@ -224,7 +224,7 @@ DRIVER_INIT( brickzn3 )
                                 Hard Head 2
 ***************************************************************************/
 
-DRIVER_INIT( hardhea2 )
+static DRIVER_INIT( hardhea2 )
 {
 	UINT8	*RAM	=	memory_region(REGION_CPU1);
 	size_t	size	=	memory_region_length(REGION_CPU1);
@@ -310,7 +310,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
                                 Star Fighter
 ***************************************************************************/
 
-DRIVER_INIT( starfigh )
+static DRIVER_INIT( starfigh )
 {
 	UINT8	*RAM	=	memory_region(REGION_CPU1);
 	size_t	size	=	memory_region_length(REGION_CPU1);
@@ -751,7 +751,7 @@ static WRITE8_HANDLER( hardhea2_flipscreen_w )
 	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",activecpu_get_pc(),data);
 }
 
-WRITE8_HANDLER( hardhea2_leds_w )
+static WRITE8_HANDLER( hardhea2_leds_w )
 {
 	set_led_status(0, data & 0x01);
 	set_led_status(1, data & 0x02);
@@ -924,7 +924,7 @@ static WRITE8_HANDLER( sparkman_flipscreen_w )
 	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",activecpu_get_pc(),data);
 }
 
-WRITE8_HANDLER( sparkman_leds_w )
+static WRITE8_HANDLER( sparkman_leds_w )
 {
 	set_led_status(0, data & 0x01);
 	set_led_status(1, data & 0x02);

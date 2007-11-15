@@ -90,13 +90,13 @@ static void triplhnt_update_misc(int offset)
 }
 
 
-WRITE8_HANDLER( triplhnt_misc_w )
+static WRITE8_HANDLER( triplhnt_misc_w )
 {
 	triplhnt_update_misc(offset);
 }
 
 
-READ8_HANDLER( triplhnt_cmos_r )
+static READ8_HANDLER( triplhnt_cmos_r )
 {
 	triplhnt_cmos_latch = offset;
 
@@ -104,7 +104,7 @@ READ8_HANDLER( triplhnt_cmos_r )
 }
 
 
-READ8_HANDLER( triplhnt_input_port_4_r )
+static READ8_HANDLER( triplhnt_input_port_4_r )
 {
 	watchdog_reset_w(0, 0);
 
@@ -112,7 +112,7 @@ READ8_HANDLER( triplhnt_input_port_4_r )
 }
 
 
-READ8_HANDLER( triplhnt_misc_r )
+static READ8_HANDLER( triplhnt_misc_r )
 {
 	triplhnt_update_misc(offset);
 
@@ -120,7 +120,7 @@ READ8_HANDLER( triplhnt_misc_r )
 }
 
 
-READ8_HANDLER( triplhnt_da_latch_r )
+static READ8_HANDLER( triplhnt_da_latch_r )
 {
 	int cross_x = readinputport(8);
 	int cross_y = readinputport(9);

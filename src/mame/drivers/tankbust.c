@@ -127,7 +127,7 @@ static READ8_HANDLER( debug_output_area_r )
 
 
 
-PALETTE_INIT( tankbust )
+static PALETTE_INIT( tankbust )
 {
 	int i;
 

@@ -60,12 +60,12 @@ AMSPDWY_WHEEL_R( 0 )
 AMSPDWY_WHEEL_R( 1 )
 
 
-READ8_HANDLER( amspdwy_sound_r )
+static READ8_HANDLER( amspdwy_sound_r )
 {
 	return (YM2151_status_port_0_r(0) & ~ 0x30) | readinputport(4);
 }
 
-WRITE8_HANDLER( amspdwy_sound_w )
+static WRITE8_HANDLER( amspdwy_sound_w )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( amspdwy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-READ8_HANDLER( amspdwy_port_r )
+static READ8_HANDLER( amspdwy_port_r )
 {
 	UINT8 *Tracks = memory_region(REGION_CPU1)+0x10000;
 	return Tracks[offset];

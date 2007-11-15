@@ -4509,71 +4509,71 @@ ROM_START( lckywldj )
 ROM_END
 
 
-DRIVER_INIT( assault ){
+static DRIVER_INIT( assault ){
 	namcos2_gametype=NAMCOS2_ASSAULT;
 }
 
-DRIVER_INIT( assaultj ){
+static DRIVER_INIT( assaultj ){
 	namcos2_gametype=NAMCOS2_ASSAULT_JP;
 }
 
-DRIVER_INIT( assaultp ){
+static DRIVER_INIT( assaultp ){
 	namcos2_gametype=NAMCOS2_ASSAULT_PLUS;
 }
 
-DRIVER_INIT( burnforc ){
+static DRIVER_INIT( burnforc ){
     namcos2_gametype=NAMCOS2_BURNING_FORCE;
 }
 
-DRIVER_INIT( cosmogng ){
+static DRIVER_INIT( cosmogng ){
 	namcos2_gametype=NAMCOS2_COSMO_GANG;
 }
 
-DRIVER_INIT( dsaber ){
+static DRIVER_INIT( dsaber ){
 	namcos2_gametype=NAMCOS2_DRAGON_SABER;
 }
 
-DRIVER_INIT( dsaberj ){
+static DRIVER_INIT( dsaberj ){
 	namcos2_gametype=NAMCOS2_DRAGON_SABER;
 }
 
-DRIVER_INIT( dirtfoxj ){
+static DRIVER_INIT( dirtfoxj ){
 	namcos2_gametype=NAMCOS2_DIRT_FOX_JP;
 }
 
-DRIVER_INIT( finallap ){
+static DRIVER_INIT( finallap ){
 	namcos2_gametype=NAMCOS2_FINAL_LAP;
 }
 
-DRIVER_INIT( finalap2 ){
+static DRIVER_INIT( finalap2 ){
 	namcos2_gametype=NAMCOS2_FINAL_LAP_2;
 }
 
-DRIVER_INIT( finalap3 ){
+static DRIVER_INIT( finalap3 ){
 	namcos2_gametype=NAMCOS2_FINAL_LAP_3;
 }
 
-DRIVER_INIT( finehour ){
+static DRIVER_INIT( finehour ){
 	namcos2_gametype=NAMCOS2_FINEST_HOUR;
 }
 
-DRIVER_INIT( fourtrax ){
+static DRIVER_INIT( fourtrax ){
 	namcos2_gametype=NAMCOS2_FOUR_TRAX;
 }
 
-DRIVER_INIT( kyukaidk ){
+static DRIVER_INIT( kyukaidk ){
 	namcos2_gametype=NAMCOS2_KYUUKAI_DOUCHUUKI;
 }
 
-DRIVER_INIT( marvlanj ){
+static DRIVER_INIT( marvlanj ){
 	namcos2_gametype=NAMCOS2_MARVEL_LAND;
 }
 
-DRIVER_INIT( marvland ){
+static DRIVER_INIT( marvland ){
 	namcos2_gametype=NAMCOS2_MARVEL_LAND;
 }
 
-DRIVER_INIT( metlhawk )
+static DRIVER_INIT( metlhawk )
 {
 	/* unscramble sprites */
 	int i, j, k, l;
@@ -4631,69 +4631,69 @@ DRIVER_INIT( metlhawk )
 	namcos2_gametype=NAMCOS2_METAL_HAWK;
 } /* metlhawk */
 
-DRIVER_INIT( mirninja ){
+static DRIVER_INIT( mirninja ){
 	namcos2_gametype=NAMCOS2_MIRAI_NINJA;
 }
 
-DRIVER_INIT( ordyne ){
+static DRIVER_INIT( ordyne ){
 	namcos2_gametype=NAMCOS2_ORDYNE;
 }
 
-DRIVER_INIT( phelios ){
+static DRIVER_INIT( phelios ){
 	namcos2_gametype=NAMCOS2_PHELIOS;
 }
 
-DRIVER_INIT( rthun2 ){
+static DRIVER_INIT( rthun2 ){
 	namcos2_gametype=NAMCOS2_ROLLING_THUNDER_2;
 }
 
-DRIVER_INIT( rthun2j ){
+static DRIVER_INIT( rthun2j ){
 	namcos2_gametype=NAMCOS2_ROLLING_THUNDER_2;
 }
 
-DRIVER_INIT( sgunner2 ){
+static DRIVER_INIT( sgunner2 ){
 	namcos2_gametype=NAMCOS2_STEEL_GUNNER_2;
 }
 
-DRIVER_INIT( sws ){
+static DRIVER_INIT( sws ){
 	namcos2_gametype=NAMCOS2_SUPER_WSTADIUM;
 }
 
-DRIVER_INIT( sws92 ){
+static DRIVER_INIT( sws92 ){
 	namcos2_gametype=NAMCOS2_SUPER_WSTADIUM_92;
 }
 
-DRIVER_INIT( sws92g ){
+static DRIVER_INIT( sws92g ){
 	namcos2_gametype=NAMCOS2_SUPER_WSTADIUM_92T;
 }
 
-DRIVER_INIT( sws93 ){
+static DRIVER_INIT( sws93 ){
 	namcos2_gametype=NAMCOS2_SUPER_WSTADIUM_93;
 }
 
-DRIVER_INIT( suzuka8h ){
+static DRIVER_INIT( suzuka8h ){
         namcos2_gametype=NAMCOS2_SUZUKA_8_HOURS;
 }
 
-DRIVER_INIT( suzuk8h2 ){
+static DRIVER_INIT( suzuk8h2 ){
 	namcos2_gametype=NAMCOS2_SUZUKA_8_HOURS_2;
 }
 
-DRIVER_INIT( valkyrie ){
+static DRIVER_INIT( valkyrie ){
 	namcos2_gametype=NAMCOS2_VALKYRIE;
 }
 
-DRIVER_INIT( gollygho ){
+static DRIVER_INIT( gollygho ){
 	namcos2_gametype=NAMCOS2_GOLLY_GHOST;
 }
 
-DRIVER_INIT( bubbletr ){
+static DRIVER_INIT( bubbletr ){
 	namcos2_gametype=NAMCOS2_BUBBLE_TROUBLE;
 }
 
 
 
-DRIVER_INIT( luckywld ){
+static DRIVER_INIT( luckywld ){
 	UINT8 *pData = (UINT8 *)memory_region( REGION_GFX5 );
 	int i;
 	for( i=0; i<32*0x4000; i++ )

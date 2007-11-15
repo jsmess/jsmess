@@ -77,13 +77,13 @@ static WRITE8_HANDLER ( funybubl_cpurombank_w )
 
 
 
-WRITE8_HANDLER( funybubl_soundcommand_w )
+static WRITE8_HANDLER( funybubl_soundcommand_w )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(1,0, HOLD_LINE);
 }
 
-WRITE8_HANDLER( funybubl_oki_bank_sw )
+static WRITE8_HANDLER( funybubl_oki_bank_sw )
 {
 	OKIM6295_set_bank_base(0, ((data & 1) * 0x40000));
 }
@@ -233,7 +233,7 @@ GFXDECODE_END
 
 
 
-DRIVER_INIT( funybubl )
+static DRIVER_INIT( funybubl )
 {
 	funybubl_banked_videoram = auto_malloc (0x2000);
 

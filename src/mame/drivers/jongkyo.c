@@ -37,12 +37,12 @@ PR-6266.0B (82S129N)
 static int rom_bank;
 static UINT8* videoram2;
 
-VIDEO_START(jongkyo)
+static VIDEO_START(jongkyo)
 {
 
 }
 
-VIDEO_UPDATE(jongkyo)
+static VIDEO_UPDATE(jongkyo)
 {
 	int y;
 
@@ -563,7 +563,7 @@ static INPUT_PORTS_START( jongkyo )
 INPUT_PORTS_END
 
 
-PALETTE_INIT(jongkyo)
+static PALETTE_INIT(jongkyo)
 {
 	int i;
 	UINT8* proms = memory_region(REGION_PROMS);
@@ -633,7 +633,7 @@ ROM_START( jongkyo )
 ROM_END
 
 
-DRIVER_INIT( jongkyo )
+static DRIVER_INIT( jongkyo )
 {
 	int i;
 	UINT8 *rom = memory_region(REGION_CPU1);

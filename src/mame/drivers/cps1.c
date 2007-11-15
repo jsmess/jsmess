@@ -273,7 +273,7 @@ WRITE16_HANDLER( cps1_coinctrl_w )
 	}
 }
 
-WRITE16_HANDLER( cpsq_coinctrl2_w )
+static WRITE16_HANDLER( cpsq_coinctrl2_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -319,7 +319,7 @@ INTERRUPT_GEN( cps1_qsound_interrupt )
 }
 
 
-READ16_HANDLER( qsound_rom_r )
+static READ16_HANDLER( qsound_rom_r )
 {
 	UINT8 *rom = memory_region(REGION_USER1);
 

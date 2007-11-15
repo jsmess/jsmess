@@ -1101,7 +1101,7 @@ static READ32_HANDLER( tektagt_protection_2_r )
 	return data;
 }
 
-MACHINE_RESET( namcos12 )
+static MACHINE_RESET( namcos12 )
 {
 	psx_machine_init();
 	bankoffset_w(0,0,0);

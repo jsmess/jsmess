@@ -47,7 +47,7 @@ static int backfire_bank_callback(int bank)
 
 
 
-VIDEO_START(backfire)
+static VIDEO_START(backfire)
 {
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
 	deco16_pf1_data = auto_malloc(0x2000);
@@ -169,7 +169,7 @@ static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rect
 
 
 
-VIDEO_UPDATE(backfire)
+static VIDEO_UPDATE(backfire)
 {
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -282,27 +282,28 @@ static WRITE32_HANDLER( deco156_snd_w )
 
 /* map 32-bit writes to 16-bit */
 
-READ32_HANDLER( backfire_pf1_rowscroll_r ) { return deco16_pf1_rowscroll[offset]^0xffff0000; }
-READ32_HANDLER( backfire_pf2_rowscroll_r ) { return deco16_pf2_rowscroll[offset]^0xffff0000; }
-READ32_HANDLER( backfire_pf3_rowscroll_r ) { return deco16_pf3_rowscroll[offset]^0xffff0000; }
-READ32_HANDLER( backfire_pf4_rowscroll_r ) { return deco16_pf4_rowscroll[offset]^0xffff0000; }
-WRITE32_HANDLER( backfire_pf1_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf1_rowscroll[offset]); }
-WRITE32_HANDLER( backfire_pf2_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf2_rowscroll[offset]); }
-WRITE32_HANDLER( backfire_pf3_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf3_rowscroll[offset]); }
-WRITE32_HANDLER( backfire_pf4_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf4_rowscroll[offset]); }
-READ32_HANDLER ( backfire_pf12_control_r ) { return deco16_pf12_control[offset]^0xffff0000; }
-READ32_HANDLER ( backfire_pf34_control_r ) { return deco16_pf34_control[offset]^0xffff0000; }
-WRITE32_HANDLER( backfire_pf12_control_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf12_control[offset]); }
-WRITE32_HANDLER( backfire_pf34_control_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf34_control[offset]); }
-READ32_HANDLER( backfire_pf1_data_r ) {	return deco16_pf1_data[offset]^0xffff0000; }
-READ32_HANDLER( backfire_pf2_data_r ) {	return deco16_pf2_data[offset]^0xffff0000; }
-READ32_HANDLER( backfire_pf3_data_r ) {	return deco16_pf3_data[offset]^0xffff0000; }
-READ32_HANDLER( backfire_pf4_data_r ) {	return deco16_pf4_data[offset]^0xffff0000; }
-WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(offset,data,mem_mask); }
-WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(offset,data,mem_mask); }
-WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(offset,data,mem_mask); }
-WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(offset,data,mem_mask); }
+static READ32_HANDLER( backfire_pf1_rowscroll_r ) { return deco16_pf1_rowscroll[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf2_rowscroll_r ) { return deco16_pf2_rowscroll[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf3_rowscroll_r ) { return deco16_pf3_rowscroll[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf4_rowscroll_r ) { return deco16_pf4_rowscroll[offset]^0xffff0000; }
+static WRITE32_HANDLER( backfire_pf1_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf1_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf2_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf3_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf3_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf4_rowscroll_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf4_rowscroll[offset]); }
+static READ32_HANDLER ( backfire_pf12_control_r ) { return deco16_pf12_control[offset]^0xffff0000; }
+static READ32_HANDLER ( backfire_pf34_control_r ) { return deco16_pf34_control[offset]^0xffff0000; }
+static WRITE32_HANDLER( backfire_pf12_control_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf12_control[offset]); }
+static WRITE32_HANDLER( backfire_pf34_control_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf34_control[offset]); }
+static READ32_HANDLER( backfire_pf1_data_r ) {	return deco16_pf1_data[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf2_data_r ) {	return deco16_pf2_data[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf3_data_r ) {	return deco16_pf3_data[offset]^0xffff0000; }
+static READ32_HANDLER( backfire_pf4_data_r ) {	return deco16_pf4_data[offset]^0xffff0000; }
+static WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(offset,data,mem_mask); }
 
+#ifdef UNUSED_FUNCTION
 READ32_HANDLER( backfire_unknown_wheel_r )
 {
 	return readinputport(4);
@@ -317,6 +318,7 @@ READ32_HANDLER( backfire_wheel2_r )
 {
 	return mame_rand(Machine);
 }
+#endif
 
 
 static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )

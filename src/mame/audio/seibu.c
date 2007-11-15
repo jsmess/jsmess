@@ -407,7 +407,7 @@ WRITE8_HANDLER( seibu_main_data_w )
 	sub2main[offset] = data;
 }
 
-WRITE8_HANDLER( seibu_pending_w )
+static WRITE8_HANDLER( seibu_pending_w )
 {
 	/* just a guess */
 	main2sub_pending = 0;

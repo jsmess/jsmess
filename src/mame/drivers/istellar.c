@@ -42,7 +42,7 @@ static UINT8 ldp_latch2;
 static UINT8 z80_2_nmi_enable;
 
 /* VIDEO GOODS */
-VIDEO_UPDATE( istellar )
+static VIDEO_UPDATE( istellar )
 {
 	int charx, chary;
 
@@ -86,13 +86,13 @@ VIDEO_UPDATE( istellar )
 
 /* MEMORY HANDLERS */
 /* Z80 0 R/W */
-READ8_HANDLER(z80_0_latch1_read)
+static READ8_HANDLER(z80_0_latch1_read)
 {
 	/*logerror("CPU0 : reading LDP status latch (%x)\n", ldp_latch1);*/
 	return ldp_latch1;
 }
 
-WRITE8_HANDLER(z80_0_latch2_write)
+static WRITE8_HANDLER(z80_0_latch2_write)
 {
 	/*logerror("CPU0 : writing cpu_latch2 (%x).  Potentially followed by an IRQ.\n", data);*/
 	ldp_latch2 = data;
@@ -111,39 +111,39 @@ WRITE8_HANDLER(z80_0_latch2_write)
 
 
 /* Z80 2 R/W */
-READ8_HANDLER(z80_2_ldp_read)
+static READ8_HANDLER(z80_2_ldp_read)
 {
 	UINT8 readResult = laserdisc_data_r(discinfo);
 	logerror("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
 
-READ8_HANDLER(z80_2_latch2_read)
+static READ8_HANDLER(z80_2_latch2_read)
 {
 	logerror("CPU2 : reading latch2 (%x)\n", ldp_latch2);
 	return ldp_latch2;
 }
 
-READ8_HANDLER(z80_2_nmienable)
+static READ8_HANDLER(z80_2_nmienable)
 {
 	logerror("CPU2 : ENABLING NMI\n");
 	z80_2_nmi_enable = 1;
 	return 0x00;
 }
 
-READ8_HANDLER(z80_2_unknown_read)
+static READ8_HANDLER(z80_2_unknown_read)
 {
 	logerror("CPU2 : c000!\n");
 	return 0x00;
 }
 
-WRITE8_HANDLER(z80_2_latch1_write)
+static WRITE8_HANDLER(z80_2_latch1_write)
 {
 	logerror("CPU2 : writing latch1 (%x)\n", data);
 	ldp_latch1 = data;
 }
 
-WRITE8_HANDLER(z80_2_ldp_write)
+static WRITE8_HANDLER(z80_2_ldp_write)
 {
 	logerror("CPU2 : writing LDP : 0x%x\n", data);
 	laserdisc_data_w(discinfo,data);
@@ -254,7 +254,7 @@ static INPUT_PORTS_START( istellar )
 	/* SERVICE might be hanging out back here */
 INPUT_PORTS_END
 
-PALETTE_INIT( istellar )
+static PALETTE_INIT( istellar )
 {
 	int i;
 

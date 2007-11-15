@@ -68,7 +68,7 @@
 #include "sound/ay8910.h"
 #include "includes/cclimber.h"
 
-PALETTE_INIT( yamato )
+static PALETTE_INIT( yamato )
 {
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
@@ -156,7 +156,7 @@ PALETTE_INIT( yamato )
 	}
 }
 
-PALETTE_INIT( toprollr )
+static PALETTE_INIT( toprollr )
 {
 	int i;
 

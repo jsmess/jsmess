@@ -216,7 +216,7 @@ static void set_scroll(tilemap *tm, int plane)
 
 /* VIDEO START (move to video file) */
 
-VIDEO_START( raiden2 )
+static VIDEO_START( raiden2 )
 {
 	text_layer       = tilemap_create(get_text_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8, 8, 64,32 );
 	background_layer = tilemap_create(get_back_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,32 );
@@ -241,7 +241,7 @@ VIDEO_START( raiden2 )
 
 /* VIDEO UPDATE (move to video file) */
 
-VIDEO_UPDATE ( raiden2 )
+static VIDEO_UPDATE ( raiden2 )
 {
 	int info_1, info_2, info_3;
 

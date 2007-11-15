@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( vball2pj_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-WRITE8_HANDLER(vb_scrollx_lo_w)
+static WRITE8_HANDLER(vb_scrollx_lo_w)
 {
 	vb_scrollx_lo = data;
 	//logerror("%04x: vb_scrollx_lo =%d\n",activecpu_get_previouspc(), vb_scrollx_lo);

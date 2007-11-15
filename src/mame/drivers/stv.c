@@ -943,7 +943,7 @@ static UINT8 port_sel,mux_data;
 #define HI_WORD_ACCESS (mem_mask & 0x00ff0000) == 0
 #define LO_WORD_ACCESS (mem_mask & 0x000000ff) == 0
 
-READ32_HANDLER ( stv_io_r32 )
+static READ32_HANDLER ( stv_io_r32 )
 {
 	static int i= -1;
 	//if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", activecpu_get_pc(), offset*4, mem_mask);
@@ -1042,7 +1042,7 @@ READ32_HANDLER ( stv_io_r32 )
 	}
 }
 
-WRITE32_HANDLER ( stv_io_w32 )
+static WRITE32_HANDLER ( stv_io_w32 )
 {
 	//if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 
@@ -1207,7 +1207,7 @@ static UINT32 scu_add_tmp;
 #define WORK_RAM_H(_lv_) ((scu_##_lv_ & 0x07ffffff) >= 0x06000000) && ((scu_##_lv_ & 0x07ffffff) <= 0x060fffff)
 #define SOUND_RAM(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05afffff)
 
-READ32_HANDLER( stv_scu_r32 )
+static READ32_HANDLER( stv_scu_r32 )
 {
 	/*TODO: write only registers must return 0...*/
 	//popmessage("%02x",DMA_STATUS);
@@ -1243,7 +1243,7 @@ READ32_HANDLER( stv_scu_r32 )
    	}
 }
 
-WRITE32_HANDLER( stv_scu_w32 )
+static WRITE32_HANDLER( stv_scu_w32 )
 {
 	COMBINE_DATA(&stv_scu[offset]);
 
@@ -2018,7 +2018,7 @@ static void dma_indirect_lv2()
 
 /**************************************************************************************/
 
-WRITE32_HANDLER( stv_sh2_soundram_w )
+static WRITE32_HANDLER( stv_sh2_soundram_w )
 {
 	COMBINE_DATA(sound_ram+offset*2+1);
 	data >>= 16;
@@ -2026,7 +2026,7 @@ WRITE32_HANDLER( stv_sh2_soundram_w )
 	COMBINE_DATA(sound_ram+offset*2);
 }
 
-READ32_HANDLER( stv_sh2_soundram_r )
+static READ32_HANDLER( stv_sh2_soundram_r )
 {
 	return (sound_ram[offset*2]<<16)|sound_ram[offset*2+1];
 }
@@ -2470,7 +2470,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE32_HANDLER ( w60ffc44_write )
+static WRITE32_HANDLER ( w60ffc44_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc44/4]);
 
@@ -2478,7 +2478,7 @@ WRITE32_HANDLER ( w60ffc44_write )
 	//sinit_w(offset,data,mem_mask);
 }
 
-WRITE32_HANDLER ( w60ffc48_write )
+static WRITE32_HANDLER ( w60ffc48_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc48/4]);
 
@@ -2677,7 +2677,7 @@ static struct SCSPinterface scsp_interface =
 	scsp_irq
 };
 
-MACHINE_START( stv )
+static MACHINE_START( stv )
 {
 	SCSP_set_ram_base(0, sound_ram);
 
@@ -2706,7 +2706,7 @@ MACHINE_START( stv )
 	stv_register_protection_savestates(); // machine/stvprot.c
 }
 
-MACHINE_RESET( stv )
+static MACHINE_RESET( stv )
 {
 	// don't let the slave cpu and the 68k go anywhere
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);

@@ -438,13 +438,13 @@ static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_WRITE( oki_setbank )
 ADDRESS_MAP_END
 
-VIDEO_START(sliver)
+static VIDEO_START(sliver)
 {
 	sliver_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	sliver_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-VIDEO_UPDATE(sliver)
+static VIDEO_UPDATE(sliver)
 {
 	copybitmap(bitmap, sliver_bitmap_bg, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 	copybitmap(bitmap, sliver_bitmap_fg, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);

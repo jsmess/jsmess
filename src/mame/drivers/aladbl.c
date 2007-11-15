@@ -129,7 +129,7 @@ ROM_START( aladbl )
 	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0))
 ROM_END
 
-WRITE16_HANDLER( aladbl_w )
+static WRITE16_HANDLER( aladbl_w )
 {
     /*
     Values returned from the log file :
@@ -141,7 +141,7 @@ WRITE16_HANDLER( aladbl_w )
 	logerror("aladbl_w : %06x - data = %04x\n",activecpu_get_pc(),data);
 }
 
-READ16_HANDLER( aladbl_r )
+static READ16_HANDLER( aladbl_r )
 {
 	if (activecpu_get_pc()==0x1b2a56) return (readinputportbytag("MCU") & 0xff0f);             // coins
 	if (activecpu_get_pc()==0x1b2a72) return 0x0000;
@@ -153,7 +153,7 @@ READ16_HANDLER( aladbl_r )
 	return 0x0000;
 }
 
-DRIVER_INIT( aladbl )
+static DRIVER_INIT( aladbl )
 {
 	// 220000 = writes to mcu? 330000 = reads?
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x220000, 0x220001, 0, 0, aladbl_w);

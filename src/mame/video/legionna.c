@@ -29,9 +29,9 @@ void denjinmk_setgfxbank(UINT16 data)
 	mid_gfx_bank  = (data &0x8000) >> 3;//???
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE16_HANDLER( legionna_control_w )
 {
-#if 0
 	if (ACCESSING_LSB)
 	{
 		legionna_enable=data;
@@ -50,8 +50,8 @@ WRITE16_HANDLER( legionna_control_w )
 		else
 			tilemap_set_enable(background_layer,1);
 	}
-#endif
 }
+#endif
 
 WRITE16_HANDLER( legionna_background_w )
 {

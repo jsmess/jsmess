@@ -90,7 +90,7 @@ static WRITE16_HANDLER( sandscrp_irq_cause_w )
                                 Sand Scorpion
 ***************************************************************************/
 
-WRITE16_HANDLER( sandscrp_coin_counter_w )
+static WRITE16_HANDLER( sandscrp_coin_counter_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -164,7 +164,7 @@ ADDRESS_MAP_END
                                 Sand Scorpion
 ***************************************************************************/
 
-WRITE8_HANDLER( sandscrp_bankswitch_w )
+static WRITE8_HANDLER( sandscrp_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bank = data & 0x07;

@@ -130,19 +130,19 @@ static TILE_GET_INFO( get_cstx_tile_info )
 			0);
 }
 
-WRITE8_HANDLER(cshooter_txram_w)
+static WRITE8_HANDLER(cshooter_txram_w)
 {
 	cshooter_txram[offset] = data;
 	tilemap_mark_tile_dirty(cshooter_txtilemap,offset/2);
 }
 
-VIDEO_START(cshooter)
+static VIDEO_START(cshooter)
 {
 	cshooter_txtilemap = tilemap_create(get_cstx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32, 32);
 	tilemap_set_transparent_pen(cshooter_txtilemap, 3);
 }
 
-VIDEO_UPDATE(cshooter)
+static VIDEO_UPDATE(cshooter)
 {
 	fillbitmap(bitmap, 0/*get_black_pen(machine)*/, &machine->screen[0].visarea);
 	tilemap_mark_all_tiles_dirty(cshooter_txtilemap);
@@ -221,7 +221,7 @@ static MACHINE_RESET( cshooter )
 	cshooter_counter = 0;
 }
 
-READ8_HANDLER ( cshooter_coin_r )
+static READ8_HANDLER ( cshooter_coin_r )
 {
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
@@ -230,11 +230,11 @@ READ8_HANDLER ( cshooter_coin_r )
 	return ( (cshooter_counter++ & 1) ? 0xff : input_port_5_r(0) );
 }
 
-WRITE8_HANDLER ( cshooter_c500_w )
+static WRITE8_HANDLER ( cshooter_c500_w )
 {
 }
 
-WRITE8_HANDLER ( cshooter_c700_w )
+static WRITE8_HANDLER ( cshooter_c700_w )
 {
 }
 
@@ -707,7 +707,7 @@ ROM_START( airraid )
 ROM_END
 
 
-DRIVER_INIT( cshooter )
+static DRIVER_INIT( cshooter )
 {
 	/* temp so it boots */
 	UINT8 *rom = memory_region(REGION_CPU1);
@@ -718,7 +718,7 @@ DRIVER_INIT( cshooter )
 	memory_set_bankptr(1,&memory_region(REGION_USER1)[0]);
 }
 
-DRIVER_INIT( cshootre )
+static DRIVER_INIT( cshootre )
 {
 	int A;
 	UINT8 *rom = memory_region(REGION_CPU1);

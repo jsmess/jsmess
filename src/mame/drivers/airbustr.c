@@ -750,7 +750,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT( airbustr )
+static DRIVER_INIT( airbustr )
 {
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, devram_r); // protection device lives here
 }

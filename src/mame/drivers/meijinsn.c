@@ -212,11 +212,11 @@ PORT_START_TAG("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-VIDEO_START(meijinsn)
+static VIDEO_START(meijinsn)
 {
 }
 
-PALETTE_INIT( meijinsn )
+static PALETTE_INIT( meijinsn )
 {
 	int i;
 	static const int resistances_b[2]  = { 470, 220 };
@@ -255,7 +255,7 @@ PALETTE_INIT( meijinsn )
 }
 
 
-VIDEO_UPDATE(meijinsn)
+static VIDEO_UPDATE(meijinsn)
 {
 	int offs;
 
@@ -293,7 +293,7 @@ static struct AY8910interface ay8910_interface =
 	soundlatch_r
 };
 
-MACHINE_RESET( meijinsn )
+static MACHINE_RESET( meijinsn )
 {
 	deposits1 = 0;
 	deposits2 = 0;

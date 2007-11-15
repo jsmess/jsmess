@@ -132,11 +132,11 @@ static GFXDECODE_START( dmndrby )
 
 GFXDECODE_END
 
-VIDEO_START(dderby)
+static VIDEO_START(dderby)
 {
 }
 
-VIDEO_UPDATE(dderby)
+static VIDEO_UPDATE(dderby)
 {
 	int x,y,count;
 	const gfx_element *gfx = machine->gfx[0];

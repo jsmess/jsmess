@@ -704,7 +704,7 @@ static READ32_HANDLER( main_cycle_r )
 	return undrfire_ram[0x4f8/4];
 }
 
-DRIVER_INIT( undrfire )
+static DRIVER_INIT( undrfire )
 {
 	UINT32 offset,i;
 	UINT8 *gfx = memory_region(REGION_GFX3);

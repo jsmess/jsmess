@@ -128,7 +128,7 @@ extern UINT8 *horizon_scrollram;
 /* service mode to test the ROMs. */
 static int ldrun2_bankswap;
 
-READ8_HANDLER( ldrun2_bankswitch_r )
+static READ8_HANDLER( ldrun2_bankswitch_r )
 {
 	if (ldrun2_bankswap)
 	{
@@ -141,7 +141,7 @@ READ8_HANDLER( ldrun2_bankswitch_r )
 	return 0;
 }
 
-WRITE8_HANDLER( ldrun2_bankswitch_w )
+static WRITE8_HANDLER( ldrun2_bankswitch_w )
 {
 	static int bankcontrol[2];
 	static const int banks[30] =
@@ -175,18 +175,18 @@ logerror("unknown bank select %02x\n",data);
 /* Lode Runner 3 has, it seems, a poor man's protection consisting of a PAL */
 /* (I think; it's included in the ROM set) which is read at certain times, */
 /* and the game crashes if it doesn't match the expected values. */
-READ8_HANDLER( ldrun3_prot_5_r )
+static READ8_HANDLER( ldrun3_prot_5_r )
 {
 	return 5;
 }
 
-READ8_HANDLER( ldrun3_prot_7_r )
+static READ8_HANDLER( ldrun3_prot_7_r )
 {
 	return 7;
 }
 
 
-WRITE8_HANDLER( ldrun4_bankswitch_w )
+static WRITE8_HANDLER( ldrun4_bankswitch_w )
 {
 	memory_set_bank(1, data & 0x01);
 }

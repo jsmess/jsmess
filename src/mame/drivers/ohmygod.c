@@ -39,7 +39,7 @@ static MACHINE_RESET( ohmygod )
 	nosound_kludge_step = 0;
 }
 
-WRITE16_HANDLER( ohmygod_ctrl_w )
+static WRITE16_HANDLER( ohmygod_ctrl_w )
 {
 	if (ACCESSING_LSB)
 	{

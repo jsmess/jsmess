@@ -89,7 +89,7 @@ static TILE_GET_INFO( get_tile_info2 )
 	SET_TILE_INFO(1, code, color, 0);
 }
 
-VIDEO_START(dunhuang)
+static VIDEO_START(dunhuang)
 {
 	tmap = tilemap_create(	get_tile_info, tilemap_scan_rows,
 							TILEMAP_TYPE_PEN, 8,8, 0x40,0x20	);
@@ -109,7 +109,7 @@ VIDEO_START(dunhuang)
 	dunhuang_paldata  = (UINT8*)auto_malloc(sizeof(UINT8) * 3 * 256);
 }
 
-VIDEO_UPDATE( dunhuang )
+static VIDEO_UPDATE( dunhuang )
 {
 	int layers_ctrl = -1;
 

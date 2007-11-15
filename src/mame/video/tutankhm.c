@@ -102,6 +102,9 @@ VIDEO_UPDATE( tutankhm )
 
     Depending on bit 0 of the source address either the source pixels will be copied to
     the destination address, or a zero will be written.
+
+    Only source pixels which aren't 0 are copied or cleared.
+
     This allows the game to quickly clear the sprites from the screen
 
     TODO: Does bit 1 of the source address mean something?
@@ -130,22 +133,27 @@ WRITE8_HANDLER( junofrst_blitter_w )
 
 			for (j = 0; j < 16; j++)
 			{
-				UINT8 data = 0;	 /* assume clear */
+				UINT8 data;
 
-				if (copy)
-				{
-					if (src & 1)
-						data = gfx_rom[src >> 1] & 0x0f;
-					else
-						data = gfx_rom[src >> 1] >> 4;
-
-					src = src + 1;
-				}
-
-				if (dest & 1)
-					tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0x0f) | (data << 4);
+				if (src & 1)
+					data = gfx_rom[src >> 1] & 0x0f;
 				else
-					tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0xf0) | data;
+					data = gfx_rom[src >> 1] >> 4;
+
+				src = src + 1;
+
+				/* if there is a source pixel either copy the pixel or clear the pixel depending on the copy flag */
+
+				if (data)
+				{
+					if (copy==0)
+						data = 0;
+
+					if (dest & 1)
+						tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0x0f) | (data << 4);
+					else
+						tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0xf0) | data;
+				}
 
 				dest = dest + 1;
 			}

@@ -692,7 +692,7 @@ ROM_END
 
 
 
-DRIVER_INIT( xsleena )
+static DRIVER_INIT( xsleena )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
@@ -705,7 +705,7 @@ DRIVER_INIT( xsleena )
 	RAM[0xd48d] = 0x12;
 }
 
-DRIVER_INIT( solarwar )
+static DRIVER_INIT( solarwar )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 

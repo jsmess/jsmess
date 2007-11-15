@@ -33,7 +33,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-VIDEO_START( dominob )
+static VIDEO_START( dominob )
 {
 	machine->gfx[0]->color_granularity=8;
 }
@@ -71,7 +71,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-VIDEO_UPDATE( dominob )
+static VIDEO_UPDATE( dominob )
 {
 	/* Convert to tilemaps? */
 	{
@@ -117,12 +117,12 @@ VIDEO_UPDATE( dominob )
 //UINT8 dominob_paddle_select;
 //UINT8 dominob_paddle_value;
 
-WRITE8_HANDLER( dominob_d008_w )
+static WRITE8_HANDLER( dominob_d008_w )
 {
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
 
-READ8_HANDLER( dominob_input_2_r )
+static READ8_HANDLER( dominob_input_2_r )
 {
 	return input_port_2_r(offset);
 }
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* I don't know if this has a purpose - also read in 'arkatayt' but not handled */
-READ8_HANDLER( dominob_unk_port02_r )
+static READ8_HANDLER( dominob_unk_port02_r )
 {
 	return 0xff;//mame_rand(Machine);
 }

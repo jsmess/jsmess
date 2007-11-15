@@ -14,7 +14,7 @@ static size_t nvram_size;*/
 
 static tilemap *bg_tilemap;
 
-PALETTE_INIT( cm )
+static PALETTE_INIT( cm )
 {
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 	int i;
@@ -96,13 +96,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 #endif
 
-VIDEO_START(cm)
+static VIDEO_START(cm)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 }
 
-VIDEO_UPDATE(cm)
+static VIDEO_UPDATE(cm)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 //  draw_sprites(machine, bitmap, cliprect);

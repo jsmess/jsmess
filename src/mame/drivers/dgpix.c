@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 32 )
 ADDRESS_MAP_END
 
 
-NVRAM_HANDLER( flashroms )
+static NVRAM_HANDLER( flashroms )
 {
 	if (read_or_write)
 	{
@@ -297,14 +297,14 @@ static INPUT_PORTS_START( dgpix )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-VIDEO_START( dgpix )
+static VIDEO_START( dgpix )
 {
 	vram = auto_malloc(0x40000*2);
 	bitmaps[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	bitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-VIDEO_UPDATE( dgpix )
+static VIDEO_UPDATE( dgpix )
 {
 	copybitmap(bitmap,bitmaps[vbuffer ^ 1],0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	return 0;

@@ -33,7 +33,7 @@ extern int bublbobl_video_enable;
 
 /* Video Hardware */
 
-VIDEO_UPDATE( missb2 )
+static VIDEO_UPDATE( missb2 )
 {
 	int offs;
 	int sx,sy,xc,yc;

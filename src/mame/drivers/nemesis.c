@@ -65,7 +65,7 @@ WRITE16_HANDLER( nemesis_characterram_word_w );
 VIDEO_UPDATE( nemesis );
 VIDEO_START( nemesis );
 VIDEO_UPDATE( salamand );
-MACHINE_RESET( nemesis );
+static MACHINE_RESET( nemesis );
 
 WRITE16_HANDLER( nemesis_gfx_flipx_w );
 WRITE16_HANDLER( nemesis_gfx_flipy_w );
@@ -81,7 +81,7 @@ static int irq2_on = 0;
 static int irq4_on = 0;
 
 
-MACHINE_RESET( nemesis )
+static MACHINE_RESET( nemesis )
 {
 	irq_on = 0;
 	irq1_on = 0;
@@ -98,7 +98,7 @@ INTERRUPT_GEN( nemesis_interrupt )
 }
 
 
-WRITE16_HANDLER( salamand_soundlatch_word_w )
+static WRITE16_HANDLER( salamand_soundlatch_word_w )
 {
 	if(ACCESSING_LSB) {
 		soundlatch_w(offset,data & 0xff);
@@ -138,7 +138,7 @@ INTERRUPT_GEN( gx400_interrupt )
 	}
 }
 
-WRITE16_HANDLER( gx400_irq1_enable_word_w )
+static WRITE16_HANDLER( gx400_irq1_enable_word_w )
 {
 	if (ACCESSING_LSB)
 		irq1_on = data & 0x0001;
@@ -146,7 +146,7 @@ WRITE16_HANDLER( gx400_irq1_enable_word_w )
 logerror("irq1en = %08x\n",data);*/
 }
 
-WRITE16_HANDLER( gx400_irq2_enable_word_w )
+static WRITE16_HANDLER( gx400_irq2_enable_word_w )
 {
 	if (ACCESSING_LSB)
 		irq2_on = data & 0x0001;
@@ -154,7 +154,7 @@ WRITE16_HANDLER( gx400_irq2_enable_word_w )
 logerror("irq2en = %08x\n",data);*/
 }
 
-WRITE16_HANDLER( gx400_irq4_enable_word_w )
+static WRITE16_HANDLER( gx400_irq4_enable_word_w )
 {
 	if (ACCESSING_MSB)
 		irq4_on = data & 0x0100;
@@ -164,12 +164,12 @@ logerror("irq4en = %08x\n",data);*/
 
 static UINT8 *gx400_shared_ram;
 
-READ16_HANDLER( gx400_sharedram_word_r )
+static READ16_HANDLER( gx400_sharedram_word_r )
 {
 	return gx400_shared_ram[offset];
 }
 
-WRITE16_HANDLER( gx400_sharedram_word_w )
+static WRITE16_HANDLER( gx400_sharedram_word_w )
 {
 	if(ACCESSING_LSB)
 		gx400_shared_ram[offset] = data;
@@ -189,25 +189,25 @@ INTERRUPT_GEN( blkpnthr_interrupt )
 		cpunum_set_input_line(0, 2, HOLD_LINE);
 }
 
-WRITE16_HANDLER( nemesis_irq_enable_word_w )
+static WRITE16_HANDLER( nemesis_irq_enable_word_w )
 {
 	if(ACCESSING_LSB)
 		irq_on = data & 0xff;
 }
 
-WRITE16_HANDLER( konamigt_irq_enable_word_w )
+static WRITE16_HANDLER( konamigt_irq_enable_word_w )
 {
 	if(ACCESSING_LSB)
 		irq_on = data & 0xff;
 }
 
-WRITE16_HANDLER( konamigt_irq2_enable_word_w )
+static WRITE16_HANDLER( konamigt_irq2_enable_word_w )
 {
 	if(ACCESSING_LSB)
 		irq2_on = data & 0xff;
 }
 
-READ16_HANDLER( konamigt_input_word_r )
+static READ16_HANDLER( konamigt_input_word_r )
 {
 /*
     bit 0-7:   steering
@@ -253,7 +253,7 @@ static READ16_HANDLER( selected_ip_r )
 	}
 }
 
-WRITE16_HANDLER( nemesis_soundlatch_word_w )
+static WRITE16_HANDLER( nemesis_soundlatch_word_w )
 {
 	if(ACCESSING_LSB) {
 		soundlatch_w(offset,data & 0xff);
@@ -314,13 +314,13 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x067fff) AM_WRITE(MWA16_RAM) AM_BASE(&ram)	/* WORK RAM */
 ADDRESS_MAP_END
 
-WRITE8_HANDLER( salamand_speech_start_w )
+static WRITE8_HANDLER( salamand_speech_start_w )
 {
         VLM5030_ST ( 1 );
         VLM5030_ST ( 0 );
 }
 
-WRITE8_HANDLER( gx400_speech_start_w )
+static WRITE8_HANDLER( gx400_speech_start_w )
 {
 	/* the voice data is not in a rom but in sound RAM at $8000 */
 	VLM5030_set_rom (gx400_shared_ram + 0x4000);

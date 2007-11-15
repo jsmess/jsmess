@@ -110,7 +110,7 @@ static int prot=0;
 static int respcount;
 
 
-VIDEO_START( ddealer )
+static VIDEO_START( ddealer )
 {
 }
 
@@ -136,7 +136,7 @@ static void ddealer_protection(running_machine *machine)
 
 }
 
-VIDEO_UPDATE( ddealer )
+static VIDEO_UPDATE( ddealer )
 {
 	ddealer_protection(machine);
 	return 0;

@@ -46,7 +46,7 @@ static ppi8255_interface ppi8255_intf =
 };
 
 
-MACHINE_RESET( homerun )
+static MACHINE_RESET( homerun )
 {
 	ppi8255_init(&ppi8255_intf);
 }

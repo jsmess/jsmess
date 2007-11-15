@@ -266,7 +266,7 @@ WRITE16_HANDLER( polepos_road16_vscroll_w );
 /* Pole Position II protection                                                       */
 /*************************************************************************************/
 
-READ16_HANDLER( polepos2_ic25_r )
+static READ16_HANDLER( polepos2_ic25_r )
 {
 	int result;
 	/* protection states */

@@ -224,7 +224,7 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 }
 
-VIDEO_START( pkscramble )
+static VIDEO_START( pkscramble )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8,32,32);
 	md_tilemap = tilemap_create(get_md_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
@@ -234,7 +234,7 @@ VIDEO_START( pkscramble )
 	tilemap_set_transparent_pen(fg_tilemap,15);
 }
 
-VIDEO_UPDATE( pkscramble )
+static VIDEO_UPDATE( pkscramble )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
@@ -270,7 +270,7 @@ static struct YM2203interface ym2203_interface =
 	irqhandler
 };
 
-MACHINE_RESET( pkscramble)
+static MACHINE_RESET( pkscramble)
 {
 	out = 0;
 	interrupt_line_active=0;

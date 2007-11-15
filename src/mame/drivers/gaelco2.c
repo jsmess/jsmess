@@ -660,7 +660,7 @@ static WRITE16_HANDLER( touchgo_coin_w )
 }
 
 /* the game expects this value each frame to know that the DS5002FP is alive */
-READ16_HANDLER ( dallas_kludge_r )
+static READ16_HANDLER ( dallas_kludge_r )
 {
 	return 0x0200;
 }

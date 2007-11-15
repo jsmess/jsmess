@@ -80,7 +80,7 @@ static void handle_coins(int coin)
 }
 
 
-READ8_HANDLER ( xyonix_io_r )
+static READ8_HANDLER ( xyonix_io_r )
 {
 	int regPC = activecpu_get_pc();
 
@@ -140,7 +140,7 @@ READ8_HANDLER ( xyonix_io_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER ( xyonix_io_w )
+static WRITE8_HANDLER ( xyonix_io_w )
 {
 //  logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, activecpu_get_pc());
 	e0_data = data;

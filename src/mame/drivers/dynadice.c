@@ -37,7 +37,7 @@ dy_6.bin (near Z80)
 static tilemap *bg_tilemap,*top_tilemap;
 static int ay_data;
 
-WRITE8_HANDLER( dynadice_videoram_w )
+static WRITE8_HANDLER( dynadice_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -171,7 +171,7 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
-VIDEO_START( dynadice )
+static VIDEO_START( dynadice )
 {
 	/* pacman - style videoram layout */
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
@@ -179,7 +179,7 @@ VIDEO_START( dynadice )
 	tilemap_set_scrollx(bg_tilemap, 0, -16 );
 }
 
-VIDEO_UPDATE( dynadice )
+static VIDEO_UPDATE( dynadice )
 {
 	rectangle myclip=*cliprect;
 	myclip.max_x=15;
@@ -188,7 +188,7 @@ VIDEO_UPDATE( dynadice )
 	return 0;
 }
 
-PALETTE_INIT( dynadice )
+static PALETTE_INIT( dynadice )
 {
 	int i;
 	for(i=0;i<8;i++)

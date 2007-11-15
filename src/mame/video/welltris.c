@@ -16,10 +16,12 @@ static int welltris_scrollx, welltris_scrolly;
 
 
 
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( welltris_spriteram_r )
 {
 	return welltris_spriteram[offset];
 }
+#endif
 
 WRITE16_HANDLER( welltris_spriteram_w )
 {

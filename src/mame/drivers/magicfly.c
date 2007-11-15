@@ -323,13 +323,13 @@
 
 static tilemap *bg_tilemap;
 
-WRITE8_HANDLER( magicfly_videoram_w )
+static WRITE8_HANDLER( magicfly_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( magicfly_colorram_w )
+static WRITE8_HANDLER( magicfly_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -361,7 +361,7 @@ static TILE_GET_INFO( get_magicfly_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
-VIDEO_START(magicfly)
+static VIDEO_START(magicfly)
 {
 	bg_tilemap = tilemap_create(get_magicfly_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 32, 29);
@@ -393,19 +393,19 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
-VIDEO_START( 7mezzo )
+static VIDEO_START( 7mezzo )
 {
 	bg_tilemap = tilemap_create(get_7mezzo_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 32, 29);
 }
 
-VIDEO_UPDATE( magicfly )
+static VIDEO_UPDATE( magicfly )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }
 
-PALETTE_INIT( magicfly )
+static PALETTE_INIT( magicfly )
 {
     /* 1st gfx bank */
 	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));

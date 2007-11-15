@@ -134,13 +134,13 @@
 
 static tilemap *bg_tilemap;
 
-WRITE8_HANDLER( miniboy7_videoram_w )
+static WRITE8_HANDLER( miniboy7_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( miniboy7_colorram_w )
+static WRITE8_HANDLER( miniboy7_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -165,13 +165,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
-VIDEO_START( miniboy7 )
+static VIDEO_START( miniboy7 )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 37, 37);
 }
 
-VIDEO_UPDATE( miniboy7 )
+static VIDEO_UPDATE( miniboy7 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

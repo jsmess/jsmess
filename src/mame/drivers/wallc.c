@@ -125,12 +125,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, videoram[tile_index] + 0x100, 1, 0);
 }
 
-VIDEO_START( wallc )
+static VIDEO_START( wallc )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_y,	TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
-VIDEO_UPDATE( wallc )
+static VIDEO_UPDATE( wallc )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

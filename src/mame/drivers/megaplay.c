@@ -624,7 +624,7 @@ UINT8 segae_vdp_data_r ( UINT8 chip );
 void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data );
 void segae_vdp_data_w ( UINT8 chip, UINT8 data );
 
-READ8_HANDLER (megaplay_bios_port_be_bf_r)
+static READ8_HANDLER (megaplay_bios_port_be_bf_r)
 {
 	UINT8 temp = 0;
 
@@ -638,7 +638,7 @@ READ8_HANDLER (megaplay_bios_port_be_bf_r)
 	return temp;
 }
 
-WRITE8_HANDLER (megaplay_bios_port_be_bf_w)
+static WRITE8_HANDLER (megaplay_bios_port_be_bf_w)
 {
 	switch (offset)
 	{
@@ -672,14 +672,14 @@ void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap,
 extern UINT32 video_update_megadriv(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
 extern void video_start_megadriv(running_machine *machine);
 
-VIDEO_START(megplay)
+static VIDEO_START(megplay)
 {
 	//printf("megplay vs\n");
 	video_start_megadriv(Machine);
 	megaplay_start_video_normal(Machine);
 }
 
-VIDEO_UPDATE(megplay)
+static VIDEO_UPDATE(megplay)
 {
 	//printf("megplay vu\n");
 	video_update_megadriv(machine,0,bitmap,cliprect);
@@ -981,12 +981,12 @@ static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
 }
 
 
-READ16_HANDLER( megadriv_68k_read_z80_extra_ram )
+static READ16_HANDLER( megadriv_68k_read_z80_extra_ram )
 {
 	return ic36_ram[(offset<<1)^1] | (ic36_ram[(offset<<1)]<<8);
 }
 
-WRITE16_HANDLER( megadriv_68k_write_z80_extra_ram )
+static WRITE16_HANDLER( megadriv_68k_write_z80_extra_ram )
 {
 	if (!ACCESSING_LSB) // byte (MSB) access
 	{

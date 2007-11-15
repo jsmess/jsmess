@@ -148,7 +148,7 @@ static void reset_talking (void)
     speech_rom_bit     = 0x0;
 }
 
-WRITE8_HANDLER( control_port_w )
+static WRITE8_HANDLER( control_port_w )
 {
 	/* Controls both Speech and Effects */
 
@@ -201,7 +201,7 @@ int cvs_speech_rom_read_bit(void)
 	return bit;
 }
 
-WRITE8_HANDLER( cvs_DAC2_w )
+static WRITE8_HANDLER( cvs_DAC2_w )
 {
     /* 4 Bit DAC - 4 memory locations used */
 

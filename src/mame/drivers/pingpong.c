@@ -567,7 +567,7 @@ ROM_START( cashquiz )
 	ROM_LOAD( "pingpong.5h",  0x0120, 0x0100, CRC(8456046a) SHA1(8226f1325c14eb8aed5cd3c3d6bad9f9fd88c5fa) ) /* characters */
 ROM_END
 
-DRIVER_INIT( merlinmm )
+static DRIVER_INIT( merlinmm )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	int i;
@@ -577,7 +577,7 @@ DRIVER_INIT( merlinmm )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 }
 
-DRIVER_INIT( cashquiz )
+static DRIVER_INIT( cashquiz )
 {
 	UINT8 *ROM;
 	int i;

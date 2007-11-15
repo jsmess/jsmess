@@ -63,12 +63,12 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(region, code, color, 0);
 }
 
-VIDEO_START( couple )
+static VIDEO_START( couple )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 }
 
-VIDEO_UPDATE( couple )
+static VIDEO_UPDATE( couple )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	return 0;

@@ -146,7 +146,7 @@ static MACHINE_RESET( capbowl )
  *
  *************************************/
 
-WRITE8_HANDLER( capbowl_rom_select_w )
+static WRITE8_HANDLER( capbowl_rom_select_w )
 {
 	int bankaddress = ((data & 0x0c) << 13) + ((data & 0x01) << 14);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000 + bankaddress);

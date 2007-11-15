@@ -52,7 +52,7 @@ VIDEO_UPDATE( blmbycar );
 
 /* The top 64k of samples are banked (16 banks total) */
 
-WRITE16_HANDLER( blmbycar_okibank_w )
+static WRITE16_HANDLER( blmbycar_okibank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( blmbycar_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70007a, 0x70007b) AM_WRITE(blmbycar_pot_wheel_shift_w			)	//
 ADDRESS_MAP_END
 
-READ16_HANDLER( waterball_unk_r )
+static READ16_HANDLER( waterball_unk_r )
 {
 	static int retvalue = 0;
 
@@ -542,7 +542,7 @@ ROM_START( watrball )
 ROM_END
 
 
-DRIVER_INIT( blmbycar )
+static DRIVER_INIT( blmbycar )
 {
 	UINT16 *RAM  = (UINT16 *) memory_region(REGION_CPU1);
 	size_t    size = memory_region_length(REGION_CPU1) / 2;

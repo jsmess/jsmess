@@ -290,7 +290,7 @@ void install_standard_protection(void)
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x04fffff0, 0x04ffffff, 0, 0, a_bus_ctrl_w);
 }
 
-READ32_HANDLER(astrass_prot_r)
+static READ32_HANDLER(astrass_prot_r)
 {
 	if ( offset == 3 && ctrl_index != -1 )
 	{
@@ -309,7 +309,7 @@ READ32_HANDLER(astrass_prot_r)
 	return a_bus[offset];
 }
 
-WRITE32_HANDLER(astrass_prot_w)
+static WRITE32_HANDLER(astrass_prot_w)
 {
 	COMBINE_DATA(&a_bus[0 + offset]);
 	if ( offset == 3 )
@@ -335,7 +335,7 @@ static UINT32 decathlt_prot_uploadoffset=0;
 static UINT16 decathlt_prottable1[24];
 static UINT16 decathlt_prottable2[128];
 
-READ32_HANDLER( decathlt_prot_r )
+static READ32_HANDLER( decathlt_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_USER1);
 
@@ -356,7 +356,7 @@ READ32_HANDLER( decathlt_prot_r )
 	return decathlt_protregs[offset];
 }
 
-WRITE32_HANDLER( decathlt_prot_w )
+static WRITE32_HANDLER( decathlt_prot_w )
 {
 	decathlt_protregs[offset] = (data&~mem_mask)|(decathlt_protregs[offset]&mem_mask);
 //  decathlt_protregs[0] = 0x0c00000/4;

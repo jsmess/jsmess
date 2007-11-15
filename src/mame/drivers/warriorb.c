@@ -152,8 +152,8 @@ Colscroll effects?
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
 
-MACHINE_START( warriorb );
-MACHINE_RESET( taito_dualscreen );
+static MACHINE_START( warriorb );
+static MACHINE_RESET( taito_dualscreen );
 
 VIDEO_START( darius2d );
 VIDEO_START( warriorb );
@@ -195,7 +195,7 @@ static READ16_HANDLER( warriorb_sound_r )
 
 static int ninjaw_pandata[4];		/**** sound pan control ****/
 
-WRITE8_HANDLER( warriorb_pancontrol )
+static WRITE8_HANDLER( warriorb_pancontrol )
 {
 	offset = offset&3;
 	ninjaw_pandata[offset] = (data<<1) + data;   /* original volume*3 */
@@ -737,13 +737,13 @@ ROM_START( warriorb )
 ROM_END
 
 
-MACHINE_START( warriorb )
+static MACHINE_START( warriorb )
 {
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
 }
 
-MACHINE_RESET( taito_dualscreen )
+static MACHINE_RESET( taito_dualscreen )
 {
 	/**** mixer control enable ****/
 	sound_global_enable( 1 );	/* mixer enabled */

@@ -105,7 +105,7 @@ INLINE void pokechmp_set_color(pen_t color, int rshift, int gshift, int bshift, 
 }
 
 
-WRITE8_HANDLER( pokechmp_paletteram_w )
+static WRITE8_HANDLER( pokechmp_paletteram_w )
 {
 	paletteram[offset] = data;
 	pokechmp_set_color(offset &0x3ff, 0, 5, 10, (paletteram[offset&0x3ff]<<8) | ( paletteram[ (offset&0x3ff)+0x400 ] )  );

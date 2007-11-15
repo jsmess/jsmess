@@ -300,7 +300,7 @@ static READ8_HANDLER( spacduel_IN3_r )
  *
  *************************************/
 
-WRITE8_HANDLER( bwidow_misc_w )
+static WRITE8_HANDLER( bwidow_misc_w )
 {
 	/*
         0x10 = p1 led

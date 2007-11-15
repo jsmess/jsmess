@@ -42,7 +42,7 @@ UINT8 changela_boat_shore_col;
 UINT8 changela_collision_reset;
 UINT8 changela_tree_collision_reset;
 
-MACHINE_RESET (changela)
+static MACHINE_RESET (changela)
 {
 	mcu_PC1=0;
 	mcu_PC0=0;
@@ -76,44 +76,44 @@ static WRITE8_HANDLER( mcu_w )
 
 
 
-READ8_HANDLER( changela_68705_portA_r )
+static READ8_HANDLER( changela_68705_portA_r )
 {
 	return (portA_out & ddrA) | (portA_in & ~ddrA);
 }
 
-WRITE8_HANDLER( changela_68705_portA_w )
+static WRITE8_HANDLER( changela_68705_portA_w )
 {
 	portA_out = data;
 }
 
-WRITE8_HANDLER( changela_68705_ddrA_w )
+static WRITE8_HANDLER( changela_68705_ddrA_w )
 {
 	ddrA = data;
 }
 
 
-READ8_HANDLER( changela_68705_portB_r )
+static READ8_HANDLER( changela_68705_portB_r )
 {
 	return (portB_out & ddrB) | (readinputport(4) & ~ddrB);
 }
 
-WRITE8_HANDLER( changela_68705_portB_w )
+static WRITE8_HANDLER( changela_68705_portB_w )
 {
 	portB_out = data;
 }
 
-WRITE8_HANDLER( changela_68705_ddrB_w )
+static WRITE8_HANDLER( changela_68705_ddrB_w )
 {
 	ddrB = data;
 }
 
 
-READ8_HANDLER( changela_68705_portC_r )
+static READ8_HANDLER( changela_68705_portC_r )
 {
 	return (portC_out & ddrC) | (portC_in & ~ddrC);
 }
 
-WRITE8_HANDLER( changela_68705_portC_w )
+static WRITE8_HANDLER( changela_68705_portC_w )
 {
 	/* PC3 is connected to the CLOCK input of the LS374,
         so we latch the data on positive going edge of the clock */
@@ -131,7 +131,7 @@ WRITE8_HANDLER( changela_68705_portC_w )
 	portC_out = data;
 }
 
-WRITE8_HANDLER( changela_68705_ddrC_w )
+static WRITE8_HANDLER( changela_68705_ddrC_w )
 {
 	ddrC = data;
 }

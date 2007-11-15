@@ -9,7 +9,8 @@
 static int tilebank=0;
 
 static tilemap *bg_tilemap;
-static int palette_bank,gfxctrl;
+static int palette_bank;
+//static int gfxctrl;
 
 UINT8 *ladyfrog_scrlram;
 
@@ -78,10 +79,12 @@ WRITE8_HANDLER( ladyfrog_gfxctrl2_w )
 }
 
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( ladyfrog_gfxctrl_r )
 {
 		return 	gfxctrl;
 }
+#endif
 
 READ8_HANDLER( ladyfrog_scrlram_r )
 {

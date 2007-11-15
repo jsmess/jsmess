@@ -632,7 +632,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	reset_sound_region();
 }
 
-WRITE16_HANDLER( wgp_sound_w )
+static WRITE16_HANDLER( wgp_sound_w )
 {
 	if (offset == 0)
 		taitosound_port_w (0, data & 0xff);
@@ -640,7 +640,7 @@ WRITE16_HANDLER( wgp_sound_w )
 		taitosound_comm_w (0, data & 0xff);
 }
 
-READ16_HANDLER( wgp_sound_r )
+static READ16_HANDLER( wgp_sound_r )
 {
 	if (offset == 1)
 		return ((taitosound_comm_r (0) & 0xff));
@@ -1269,7 +1269,7 @@ ROM_START( wgp2 )
 ROM_END
 
 
-DRIVER_INIT( wgp )
+static DRIVER_INIT( wgp )
 {
 #if 0
 	/* Patch for coding error that causes corrupt data in
@@ -1282,7 +1282,7 @@ DRIVER_INIT( wgp )
 	cpua_ctrl = 0xff;
 }
 
-DRIVER_INIT( wgp2 )
+static DRIVER_INIT( wgp2 )
 {
 	/* Code patches to prevent failure in memory checks */
 	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU3);

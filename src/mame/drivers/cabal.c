@@ -103,7 +103,7 @@ static READ16_HANDLER( track_r )
 }
 
 
-WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
+static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 {
 	seibu_main_word_w(4,data,mem_mask);
 
@@ -111,7 +111,7 @@ WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 	cpu_spinuntil_time(MAME_TIME_IN_USEC(50));
 }
 
-WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
+static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 {
 	cpunum_set_input_line( 1, INPUT_LINE_NMI, PULSE_LINE );
 }

@@ -199,7 +199,7 @@ INLINE void rgbaint_subr(rgbaint *color1, const rgbaint *color2)
     TABLES
 ***************************************************************************/
 
-static struct
+static const struct
 {
 	__m128	dummy_for_alignment;
 	INT16	zero[8];
@@ -443,4 +443,43 @@ INLINE rgb_t rgba_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t r
 }
 
 
-#endif /* __RGBUTIL__ */
+/*-------------------------------------------------
+    rgbint_bilinear_filter - bilinear filter between
+    four pixel values
+-------------------------------------------------*/
+
+INLINE void rgbint_bilinear_filter(rgbint *color, rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
+{
+	__m128i color00 = _mm_cvtsi32_si128(rgb00);
+	__m128i color01 = _mm_cvtsi32_si128(rgb01);
+	__m128i color10 = _mm_cvtsi32_si128(rgb10);
+	__m128i color11 = _mm_cvtsi32_si128(rgb11);
+
+	/* interleave color01 and color00 at the byte level */
+	color01 = _mm_unpacklo_epi8(color01, color00);
+	color11 = _mm_unpacklo_epi8(color11, color10);
+	color01 = _mm_unpacklo_epi8(color01, _mm_setzero_si128());
+	color11 = _mm_unpacklo_epi8(color11, _mm_setzero_si128());
+	color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
+	color11 = _mm_madd_epi16(color11, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
+	color01 = _mm_slli_epi32(color01, 15);
+	color11 = _mm_srli_epi32(color11, 1);
+	color01 = _mm_max_epi16(color01, color11);
+	color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[v][0]);
+	color01 = _mm_srli_epi32(color01, 15);
+	*color = _mm_packs_epi32(color01, color01);
+}
+
+
+/*-------------------------------------------------
+    rgbaint_bilinear_filter - bilinear filter between
+    four pixel values
+-------------------------------------------------*/
+
+INLINE void rgbaint_bilinear_filter(rgbaint *color, rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
+{
+	rgbint_bilinear_filter(color, rgb00, rgb01, rgb10, rgb11, u, v);
+}
+
+
+#endif /* __RGBSSE__ */

@@ -143,12 +143,12 @@ static void kof10thBankswitch(UINT16 nBank)
 	neogeo_set_main_cpu_bank_address(bank);
 }
 
-READ16_HANDLER( kof10th_RAMB_r )
+static READ16_HANDLER( kof10th_RAMB_r )
 {
 	return kof10thExtraRAMB[offset];
 }
 
-WRITE16_HANDLER( kof10th_custom_w )
+static WRITE16_HANDLER( kof10th_custom_w )
 {
 	if (!kof10thExtraRAMB[0xFFE]) { // Write to RAM bank A
 		UINT16 *prom = (UINT16*)memory_region( NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
@@ -845,12 +845,12 @@ static WRITE16_HANDLER( mv0_bankswitch_w )
 /* kof2003 bootleg init info */
 static UINT16 kof2003_tbl[4096];
 
-READ16_HANDLER( kof2003_r)
+static READ16_HANDLER( kof2003_r)
 {
 	return kof2003_tbl[offset];
 }
 
-WRITE16_HANDLER( kof2003_w )
+static WRITE16_HANDLER( kof2003_w )
 {
 	data = COMBINE_DATA(&kof2003_tbl[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2) {
@@ -868,7 +868,7 @@ WRITE16_HANDLER( kof2003_w )
 	}
 }
 
-WRITE16_HANDLER( kof2003p_w )
+static WRITE16_HANDLER( kof2003p_w )
 {
 	data = COMBINE_DATA(&kof2003_tbl[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2) {

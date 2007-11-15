@@ -169,26 +169,26 @@ static TILE_GET_INFO( get_rabbit_tilemap3_tile_info )
 	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
 }
 
-WRITE32_HANDLER( rabbit_tilemap0_w )
+static WRITE32_HANDLER( rabbit_tilemap0_w )
 {
 	COMBINE_DATA(&rabbit_tilemap_ram[0][offset]);
 	tilemap_mark_tile_dirty(rabbit_tilemap[0],offset);
 }
 
-WRITE32_HANDLER( rabbit_tilemap1_w )
+static WRITE32_HANDLER( rabbit_tilemap1_w )
 {
 	COMBINE_DATA(&rabbit_tilemap_ram[1][offset]);
 	tilemap_mark_tile_dirty(rabbit_tilemap[1],offset);
 }
 
-WRITE32_HANDLER( rabbit_tilemap2_w )
+static WRITE32_HANDLER( rabbit_tilemap2_w )
 {
 	COMBINE_DATA(&rabbit_tilemap_ram[2][offset]);
 	tilemap_mark_tile_dirty(rabbit_tilemap[2],offset);
 }
 
 
-WRITE32_HANDLER( rabbit_tilemap3_w )
+static WRITE32_HANDLER( rabbit_tilemap3_w )
 {
 	COMBINE_DATA(&rabbit_tilemap_ram[3][offset]);
 	tilemap_mark_tile_dirty(rabbit_tilemap[3],offset);
@@ -332,7 +332,7 @@ static void draw_sprite_bitmap( mame_bitmap *bitmap, const rectangle *cliprect )
 
 
 }
-VIDEO_START(rabbit)
+static VIDEO_START(rabbit)
 {
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
@@ -405,7 +405,7 @@ static void rabbit_drawtilemap( mame_bitmap *bitmap, const rectangle *cliprect, 
 			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 }
 
-VIDEO_UPDATE(rabbit)
+static VIDEO_UPDATE(rabbit)
 {
 	int prilevel;
 
@@ -443,7 +443,7 @@ VIDEO_UPDATE(rabbit)
 }
 
 
-READ32_HANDLER( rabbit_input_r )
+static READ32_HANDLER( rabbit_input_r )
 {
 	int rv;
 
@@ -453,7 +453,7 @@ READ32_HANDLER( rabbit_input_r )
 	return rv;
 }
 
-READ32_HANDLER( tmmjprd_input_r )
+static READ32_HANDLER( tmmjprd_input_r )
 {
 	int rv;
 
@@ -475,22 +475,22 @@ static WRITE32_HANDLER( rabbit_paletteram_dword_w )
 	palette_set_color(Machine,offset^0xff,MAKE_RGB(r,g,b));
 }
 
-READ32_HANDLER( rabbit_tilemap0_r )
+static READ32_HANDLER( rabbit_tilemap0_r )
 {
 	return rabbit_tilemap_ram[0][offset];
 }
 
-READ32_HANDLER( rabbit_tilemap1_r )
+static READ32_HANDLER( rabbit_tilemap1_r )
 {
 	return rabbit_tilemap_ram[1][offset];
 }
 
-READ32_HANDLER( rabbit_tilemap2_r )
+static READ32_HANDLER( rabbit_tilemap2_r )
 {
 	return rabbit_tilemap_ram[2][offset];
 }
 
-READ32_HANDLER( rabbit_tilemap3_r )
+static READ32_HANDLER( rabbit_tilemap3_r )
 {
 	return rabbit_tilemap_ram[3][offset];
 }
@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( rabbit_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 /* rom bank is used when testing roms, not currently hooked up */
-WRITE32_HANDLER ( rabbit_rombank_w )
+static WRITE32_HANDLER ( rabbit_rombank_w )
 {
 	UINT8 *dataroms = memory_region(REGION_USER1);
 	int bank;
@@ -707,7 +707,7 @@ void rabbit_do_blit(void)
 
 
 
-WRITE32_HANDLER( rabbit_blitter_w )
+static WRITE32_HANDLER( rabbit_blitter_w )
 {
 	COMBINE_DATA(&rabbit_blitterregs[offset]);
 
@@ -717,7 +717,7 @@ WRITE32_HANDLER( rabbit_blitter_w )
 	}
 }
 
-WRITE32_HANDLER( rabbit_eeprom_write )
+static WRITE32_HANDLER( rabbit_eeprom_write )
 {
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
@@ -1120,7 +1120,7 @@ static TILE_GET_INFO( get_tmmjprd_tilemap3_tile_info )
 	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
 }
 
-VIDEO_START(tmmjprd)
+static VIDEO_START(tmmjprd)
 {
 	/* NOTE tilemap sizes are different.. game can also select between 16x16 and 8x8.. it NEEDS this to work */
 
@@ -1151,7 +1151,7 @@ VIDEO_START(tmmjprd)
 }
 
 
-VIDEO_UPDATE( tmmjprd )
+static VIDEO_UPDATE( tmmjprd )
 {
 	tilemap_set_scrolly(rabbit_tilemap[3], 0, rabbit_tilemap_regs[3][2] >> 20);
 	tilemap_set_scrolly(rabbit_tilemap[2], 0, rabbit_tilemap_regs[2][2] >> 20);
@@ -1203,7 +1203,7 @@ static MACHINE_DRIVER_START( tmmjprd )
 MACHINE_DRIVER_END
 
 
-DRIVER_INIT(rabbit)
+static DRIVER_INIT(rabbit)
 {
 	rabbit_banking = 1;
 	rabbit_vblirqlevel = 6;
@@ -1211,7 +1211,7 @@ DRIVER_INIT(rabbit)
 	/* 5 and 1 are also valid and might be raster related */
 }
 
-DRIVER_INIT(tmmjprd)
+static DRIVER_INIT(tmmjprd)
 {
 	rabbit_banking = 0;
 	rabbit_vblirqlevel = 5;

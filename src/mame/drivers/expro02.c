@@ -219,7 +219,7 @@ static INPUT_PORTS_START( galsnew )
 INPUT_PORTS_END
 
 
-WRITE16_HANDLER( galsnew_paletteram_w )
+static WRITE16_HANDLER( galsnew_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
 	palette_set_color_rgb(Machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
@@ -348,7 +348,7 @@ static MACHINE_DRIVER_START( galsnew )
 MACHINE_DRIVER_END
 
 /* the tile roms seem lineswapped.. but I don't know how to descramble them yet */
-DRIVER_INIT(galsnew)
+static DRIVER_INIT(galsnew)
 {
 	UINT8 *src    = memory_region       ( REGION_GFX3 );
 	UINT8 *dst    = memory_region       ( REGION_GFX2 );

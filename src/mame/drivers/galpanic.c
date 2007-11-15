@@ -133,7 +133,7 @@ VIDEO_UPDATE( galpanic );
 VIDEO_UPDATE( comad );
 
 
-VIDEO_EOF( galpanic )
+static VIDEO_EOF( galpanic )
 {
 	pandora_eof(machine);
 }
@@ -240,7 +240,7 @@ static READ16_HANDLER( kludge )
 }
 
 /* a kludge! */
-READ16_HANDLER( comad_OKIM6295_status_0_msb_r )
+static READ16_HANDLER( comad_OKIM6295_status_0_msb_r )
 {
 	UINT16 retvalue;
 

@@ -80,13 +80,13 @@ static WRITE8_HANDLER( hotblock_port4_w )
 
 
 
-WRITE8_HANDLER( hotblock_port0_w )
+static WRITE8_HANDLER( hotblock_port0_w )
 {
 //  popmessage("port4_w: pc = %06x : data %04x",activecpu_get_pc(),data);
 	hotblock_port0=data;
 }
 
-WRITE8_HANDLER( hotblock_video_write )
+static WRITE8_HANDLER( hotblock_video_write )
 {
 	/* right?, anything else?? */
 	if(hotblock_port0 &0x20) // port 0 = a8 e8 -- palette
@@ -114,12 +114,12 @@ ADDRESS_MAP_END
 
 
 
-VIDEO_START(hotblock)
+static VIDEO_START(hotblock)
 {
 	hotblock_pal=auto_malloc(0x10000);
 }
 
-VIDEO_UPDATE(hotblock)
+static VIDEO_UPDATE(hotblock)
 {
 
 	int y,x,count;

@@ -129,21 +129,21 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 }
 
 /* Characters */
-WRITE16_HANDLER( lockon_vram_0_w )
+static WRITE16_HANDLER( lockon_vram_0_w )
 {
     COMBINE_DATA(&lockon_vram0[offset]);
    	tilemap_mark_tile_dirty(lockon_tilemap0,offset);
 }
 
 /* Scene */
-WRITE16_HANDLER( lockon_vram_1_w )
+static WRITE16_HANDLER( lockon_vram_1_w )
 {
 	COMBINE_DATA(&lockon_vram1[offset]);
 	tilemap_mark_tile_dirty(lockon_tilemap1,offset);
 }
 
 /* HUD */
-WRITE16_HANDLER( lockon_vram_2_w )
+static WRITE16_HANDLER( lockon_vram_2_w )
 {
 	COMBINE_DATA(&lockon_vram2[offset]);
 	tilemap_mark_tile_dirty(lockon_tilemap2,offset);
@@ -180,7 +180,7 @@ static TILE_GET_INFO( get_lockon_tile_info2 )
 }
 
 
-VIDEO_START( lockon )
+static VIDEO_START( lockon )
 {
 	lockon_tilemap0 = tilemap_create(get_lockon_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8,8,64,32);
 	lockon_tilemap1 = tilemap_create(get_lockon_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8,8,64,32);
@@ -188,7 +188,7 @@ VIDEO_START( lockon )
 	tilemap_set_transparent_pen(lockon_tilemap0,0x00);
 }
 
-VIDEO_UPDATE( lockon )
+static VIDEO_UPDATE( lockon )
 {
 	tilemap_draw(bitmap,cliprect,lockon_tilemap1,0,0);       // Scene
 	tilemap_draw(bitmap,cliprect,lockon_tilemap0,0,0);       // Characters

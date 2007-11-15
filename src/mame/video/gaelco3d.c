@@ -10,7 +10,7 @@
 #include "eminline.h"
 #include "gaelco3d.h"
 #include "video/rgbutil.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 
 UINT8 *gaelco3d_texture;
 UINT8 *gaelco3d_texmask;
@@ -53,9 +53,9 @@ struct _poly_extra_data
 };
 
 
-static void render_noz_noperspective(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
-static void render_normal(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
-static void render_alphablend(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
+static void render_noz_noperspective(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
+static void render_normal(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
+static void render_alphablend(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 
 
 
@@ -251,7 +251,7 @@ static void render_poly(UINT32 *polydata)
 
 
 
-static void render_noz_noperspective(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	mame_bitmap *bitmap = destbase;
@@ -292,7 +292,7 @@ static void render_noz_noperspective(void *destbase, INT32 scanline, const tri_e
 }
 
 
-static void render_normal(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void render_normal(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	mame_bitmap *bitmap = destbase;
@@ -344,7 +344,7 @@ static void render_normal(void *destbase, INT32 scanline, const tri_extent *exte
 }
 
 
-static void render_alphablend(void *destbase, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void render_alphablend(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	mame_bitmap *bitmap = destbase;

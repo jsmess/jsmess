@@ -364,7 +364,7 @@ UINT8 cannonb_bit_to_read;
  *
  *************************************/
 
-MACHINE_RESET( mschamp )
+static MACHINE_RESET( mschamp )
 {
 	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000;
 	int whichbank = readinputportbytag("GAME") & 1;

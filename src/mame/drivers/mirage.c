@@ -107,7 +107,7 @@ static int mirage_bank_callback(const int bank)
 	return ((bank>>4)&0x7) * 0x1000;
 }
 
-VIDEO_START(mirage)
+static VIDEO_START(mirage)
 {
 	deco16_1_video_init();
 
@@ -115,7 +115,7 @@ VIDEO_START(mirage)
 	deco16_set_tilemap_bank_callback(1, mirage_bank_callback);
 }
 
-VIDEO_UPDATE(mirage)
+static VIDEO_UPDATE(mirage)
 {
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
@@ -135,12 +135,12 @@ static READ16_HANDLER( mirage_controls_r )
 	return readinputportbytag("SYSTEM_IN");
 }
 
-READ16_HANDLER( random_readers )
+static READ16_HANDLER( random_readers )
 {
 	return mame_rand(Machine);
 }
 
-READ16_HANDLER( mirage_input_r )
+static READ16_HANDLER( mirage_input_r )
 {
 	UINT16 port = readinputportbytag("MIRAGE0");
 	return port;

@@ -150,7 +150,7 @@ static void ym2151_irq_gen(int state)
 }
 
 
-MACHINE_RESET( rpunch )
+static MACHINE_RESET( rpunch )
 {
 	memcpy(memory_region(REGION_SOUND1), memory_region(REGION_SOUND1) + 0x20000, 0x20000);
 }

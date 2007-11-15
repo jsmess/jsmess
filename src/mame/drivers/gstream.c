@@ -323,7 +323,7 @@ static TILE_GET_INFO( get_gs3_tile_info )
 }
 
 
-VIDEO_START(gstream)
+static VIDEO_START(gstream)
 {
 	gstream_tilemap1 = tilemap_create(get_gs1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 32, 32,16,16);
 	gstream_tilemap2 = tilemap_create(get_gs2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 32, 32,16,16);
@@ -333,7 +333,7 @@ VIDEO_START(gstream)
 	tilemap_set_transparent_pen(gstream_tilemap2,0);
 }
 
-VIDEO_UPDATE(gstream)
+static VIDEO_UPDATE(gstream)
 {
 	/* The tilemaps and sprite sre interleaved together.
        Even Words are tilemap tiles

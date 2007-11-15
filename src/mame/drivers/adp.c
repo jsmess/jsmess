@@ -142,11 +142,11 @@ static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-VIDEO_START(skattv)
+static VIDEO_START(skattv)
 {
 }
 
-VIDEO_UPDATE(skattv)
+static VIDEO_UPDATE(skattv)
 {
 	return 0;
 }

@@ -69,7 +69,7 @@ static TILEMAP_MAPPER( bsb_bg_scan )
 	return offset;
 }
 
-VIDEO_START(bestleag)
+static VIDEO_START(bestleag)
 {
 	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,256, 32);
 	bg_tilemap = tilemap_create(get_bg_tile_info,bsb_bg_scan,TILEMAP_TYPE_PEN,16,16,128, 64);
@@ -142,7 +142,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE(bestleag)
+static VIDEO_UPDATE(bestleag)
 {
 	tilemap_set_scrollx(bg_tilemap,0,(bestleag_vregs[0x00/2] & 0xfff) + (bestleag_vregs[0x08/2] & 0x7) - 3);
 	tilemap_set_scrolly(bg_tilemap,0,bestleag_vregs[0x02/2]);
@@ -158,19 +158,19 @@ VIDEO_UPDATE(bestleag)
 	return 0;
 }
 
-WRITE16_HANDLER( bestleag_txram_w )
+static WRITE16_HANDLER( bestleag_txram_w )
 {
 	bestleag_txram[offset] = data;
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
-WRITE16_HANDLER( bestleag_bgram_w )
+static WRITE16_HANDLER( bestleag_bgram_w )
 {
 	bestleag_bgram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-WRITE16_HANDLER( bestleag_fgram_w )
+static WRITE16_HANDLER( bestleag_fgram_w )
 {
 	bestleag_fgram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap,offset);

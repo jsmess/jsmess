@@ -58,11 +58,11 @@ static UINT8 *FDT_A;
 static UINT8 *FDT_B;
 static UINT8 INTER_CPU_REG;
 
-VIDEO_START( turbosub )
+static VIDEO_START( turbosub )
 {
 }
 
-VIDEO_UPDATE( turbosub )
+static VIDEO_UPDATE( turbosub )
 {
 	return 0;
 }

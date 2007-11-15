@@ -624,7 +624,7 @@ void process_tumbleb2_music_command(int data)
 }
 
 
-WRITE16_HANDLER(tumbleb2_soundmcu_w)
+static WRITE16_HANDLER(tumbleb2_soundmcu_w)
 {
 	int sound;
 
@@ -718,7 +718,7 @@ static ADDRESS_MAP_START( fncywld_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-READ16_HANDLER( semibase_unknown_r )
+static READ16_HANDLER( semibase_unknown_r )
 {
 	return mame_rand(Machine);
 }
@@ -939,7 +939,7 @@ static ADDRESS_MAP_START( jumpkids_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x342400, 0x34247f) AM_WRITE(MWA16_NOP)
 ADDRESS_MAP_END
 
-WRITE8_HANDLER( jumpkids_oki_bank_w )
+static WRITE8_HANDLER( jumpkids_oki_bank_w )
 {
 	UINT8* sound1 = memory_region(REGION_SOUND1);
 	UINT8* sound2 = memory_region(REGION_SOUND2);
@@ -2164,7 +2164,7 @@ static struct YM2151interface semicom_ym2151_interface =
 	semicom_irqhandler
 };
 
-MACHINE_RESET (htchctch)
+static MACHINE_RESET (htchctch)
 {
 	/* copy protection data every reset */
 
@@ -3660,13 +3660,13 @@ static void suprtrio_decrypt_gfx(void)
 		free(buf);
 }
 
-DRIVER_INIT( suprtrio )
+static DRIVER_INIT( suprtrio )
 {
 	suprtrio_decrypt_code();
 	suprtrio_decrypt_gfx();
 }
 
-DRIVER_INIT( chokchok )
+static DRIVER_INIT( chokchok )
 {
 	driver_init_htchctch(machine);
 
@@ -3677,7 +3677,7 @@ DRIVER_INIT( chokchok )
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, chokchok_tilebank_w);
 }
 
-DRIVER_INIT( wlstar )
+static DRIVER_INIT( wlstar )
 {
 	driver_init_htchctch(machine);
 

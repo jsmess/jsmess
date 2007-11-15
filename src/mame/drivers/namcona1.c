@@ -1505,18 +1505,18 @@ init_namcona2( int gametype )
 		NAMCONA_interface.metadata_offset = 0x70000/2;
 }
 
-DRIVER_INIT( bkrtmaq ){		init_namcona1(NAMCO_BKRTMAQ); }
-DRIVER_INIT( cgangpzl ){	init_namcona1(NAMCO_CGANGPZL); }
-DRIVER_INIT( emeralda ){	init_namcona2(NAMCO_EMERALDA); } /* NA-2 Hardware */
-DRIVER_INIT( emeraldj ){	init_namcona1(NAMCO_EMERALDA); } /* NA-1 Hardware */
-DRIVER_INIT( exbania ){		init_namcona1(NAMCO_EXBANIA); }
-DRIVER_INIT( fa ){	        init_namcona1(NAMCO_FA); }
-DRIVER_INIT( knckhead ){	init_namcona2(NAMCO_KNCKHEAD); }
-DRIVER_INIT( numanath ){	init_namcona2(NAMCO_NUMANATH); }
-DRIVER_INIT( quiztou ){		init_namcona2(NAMCO_QUIZTOU); }
-DRIVER_INIT( swcourt ){		init_namcona1(NAMCO_SWCOURT); }
-DRIVER_INIT( tinklpit ){	init_namcona1(NAMCO_TINKLPIT); }
-DRIVER_INIT( xday2 ){		init_namcona2(NAMCO_XDAY2); }
+static DRIVER_INIT( bkrtmaq ){		init_namcona1(NAMCO_BKRTMAQ); }
+static DRIVER_INIT( cgangpzl ){	init_namcona1(NAMCO_CGANGPZL); }
+static DRIVER_INIT( emeralda ){	init_namcona2(NAMCO_EMERALDA); } /* NA-2 Hardware */
+static DRIVER_INIT( emeraldj ){	init_namcona1(NAMCO_EMERALDA); } /* NA-1 Hardware */
+static DRIVER_INIT( exbania ){		init_namcona1(NAMCO_EXBANIA); }
+static DRIVER_INIT( fa ){	        init_namcona1(NAMCO_FA); }
+static DRIVER_INIT( knckhead ){	init_namcona2(NAMCO_KNCKHEAD); }
+static DRIVER_INIT( numanath ){	init_namcona2(NAMCO_NUMANATH); }
+static DRIVER_INIT( quiztou ){		init_namcona2(NAMCO_QUIZTOU); }
+static DRIVER_INIT( swcourt ){		init_namcona1(NAMCO_SWCOURT); }
+static DRIVER_INIT( tinklpit ){	init_namcona1(NAMCO_TINKLPIT); }
+static DRIVER_INIT( xday2 ){		init_namcona2(NAMCO_XDAY2); }
 
 ROM_START( bkrtmaq )
 	ROM_REGION( 0xa80000, REGION_CPU1, 0 )

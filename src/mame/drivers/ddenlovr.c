@@ -180,14 +180,14 @@ VIDEO_START(ddenlovr)
 	ddenlovr_blit_commands = ddenlovr_commands;
 }
 
-VIDEO_START(mmpanic)
+static VIDEO_START(mmpanic)
 {
 	video_start_ddenlovr(machine);
 
 	extra_layers = 1;
 }
 
-VIDEO_START(hanakanz)
+static VIDEO_START(hanakanz)
 {
 	video_start_ddenlovr(machine);
 
@@ -195,7 +195,7 @@ VIDEO_START(hanakanz)
 	ddenlovr_blit_commands = hanakanz_commands;
 }
 
-VIDEO_START(mjflove)
+static VIDEO_START(mjflove)
 {
 	video_start_ddenlovr(machine);
 
@@ -225,12 +225,12 @@ WRITE8_HANDLER( ddenlovr_bgcolor_w )
 	ddenlovr_bgcolor = data;
 }
 
-WRITE8_HANDLER( ddenlovr_bgcolor2_w )
+static WRITE8_HANDLER( ddenlovr_bgcolor2_w )
 {
 	ddenlovr_bgcolor2 = data;
 }
 
-WRITE16_HANDLER( ddenlovr16_bgcolor_w )
+static WRITE16_HANDLER( ddenlovr16_bgcolor_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_bgcolor_w(offset,data);
@@ -242,12 +242,12 @@ WRITE8_HANDLER( ddenlovr_priority_w )
 	ddenlovr_priority = data;
 }
 
-WRITE8_HANDLER( ddenlovr_priority2_w )
+static WRITE8_HANDLER( ddenlovr_priority2_w )
 {
 	ddenlovr_priority2 = data;
 }
 
-WRITE16_HANDLER( ddenlovr16_priority_w )
+static WRITE16_HANDLER( ddenlovr16_priority_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_priority_w(offset,data);
@@ -259,13 +259,13 @@ WRITE8_HANDLER( ddenlovr_layer_enable_w )
 	ddenlovr_layer_enable = data;
 }
 
-WRITE8_HANDLER( ddenlovr_layer_enable2_w )
+static WRITE8_HANDLER( ddenlovr_layer_enable2_w )
 {
 	ddenlovr_layer_enable2 = data;
 }
 
 
-WRITE16_HANDLER( ddenlovr16_layer_enable_w )
+static WRITE16_HANDLER( ddenlovr16_layer_enable_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_layer_enable_w(offset,data);
@@ -1321,7 +1321,7 @@ VIDEO_EOF(ddenlovr)
 	ddenlovr_layer_enable2 = enab2;
 }
 
-READ16_HANDLER( ddenlovr_special_r )
+static READ16_HANDLER( ddenlovr_special_r )
 {
 	int res = readinputport(2) | (ddenlovr_blitter_irq_flag << 6);
 
@@ -1371,7 +1371,7 @@ WRITE8_HANDLER( ddenlovr_palette_base_w )
 {
 	ddenlovr_palette_base[offset] = data;
 }
-WRITE8_HANDLER( ddenlovr_palette_base2_w )
+static WRITE8_HANDLER( ddenlovr_palette_base2_w )
 {
 	ddenlovr_palette_base[offset+4] = data;
 }
@@ -1380,7 +1380,7 @@ WRITE8_HANDLER( ddenlovr_palette_mask_w )
 {
 	ddenlovr_palette_mask[offset] = data;
 }
-WRITE8_HANDLER( ddenlovr_palette_mask2_w )
+static WRITE8_HANDLER( ddenlovr_palette_mask2_w )
 {
 	ddenlovr_palette_mask[offset+4] = data;
 }
@@ -1389,7 +1389,7 @@ WRITE8_HANDLER( ddenlovr_transparency_pen_w )
 {
 	ddenlovr_transparency_pen[offset] = data;
 }
-WRITE8_HANDLER( ddenlovr_transparency_pen2_w )
+static WRITE8_HANDLER( ddenlovr_transparency_pen2_w )
 {
 	ddenlovr_transparency_pen[offset+4] = data;
 }
@@ -1398,31 +1398,31 @@ WRITE8_HANDLER( ddenlovr_transparency_mask_w )
 {
 	ddenlovr_transparency_mask[offset] = data;
 }
-WRITE8_HANDLER( ddenlovr_transparency_mask2_w )
+static WRITE8_HANDLER( ddenlovr_transparency_mask2_w )
 {
 	ddenlovr_transparency_mask[offset+4] = data;
 }
 
 
-WRITE16_HANDLER( ddenlovr16_palette_base_w )
+static WRITE16_HANDLER( ddenlovr16_palette_base_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_palette_base[offset] = data & 0xff;
 }
 
-WRITE16_HANDLER( ddenlovr16_palette_mask_w )
+static WRITE16_HANDLER( ddenlovr16_palette_mask_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_palette_mask[offset] = data & 0xff;
 }
 
-WRITE16_HANDLER( ddenlovr16_transparency_pen_w )
+static WRITE16_HANDLER( ddenlovr16_transparency_pen_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_transparency_pen[offset] = data & 0xff;
 }
 
-WRITE16_HANDLER( ddenlovr16_transparency_mask_w )
+static WRITE16_HANDLER( ddenlovr16_transparency_mask_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_transparency_mask[offset] = data & 0xff;
@@ -1476,29 +1476,29 @@ static READ16_HANDLER( unk16_r )
 
 static UINT8 ddenlovr_select, ddenlovr_select2;
 
-WRITE8_HANDLER( ddenlovr_select_w )
+static WRITE8_HANDLER( ddenlovr_select_w )
 {
 	ddenlovr_select = data;
 }
 
-WRITE16_HANDLER( ddenlovr_select_16_w )
+static WRITE16_HANDLER( ddenlovr_select_16_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_select = data;
 }
 
-WRITE8_HANDLER( ddenlovr_select2_w )
+static WRITE8_HANDLER( ddenlovr_select2_w )
 {
 	ddenlovr_select2 = data;
 }
 
-WRITE16_HANDLER( ddenlovr_select2_16_w )
+static WRITE16_HANDLER( ddenlovr_select2_16_w )
 {
 	if (ACCESSING_LSB)
 		ddenlovr_select2 = data;
 }
 
-READ8_HANDLER( rongrong_input2_r )
+static READ8_HANDLER( rongrong_input2_r )
 {
 //  logerror("%04x: input2_r offset %d select %x\n",activecpu_get_pc(),offset,ddenlovr_select2 );
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
@@ -1512,7 +1512,7 @@ READ8_HANDLER( rongrong_input2_r )
 }
 
 
-READ8_HANDLER( quiz365_input_r )
+static READ8_HANDLER( quiz365_input_r )
 {
 	if (!(ddenlovr_select & 0x01))	return readinputport(3);
 	if (!(ddenlovr_select & 0x02))	return readinputport(4);
@@ -1522,7 +1522,7 @@ READ8_HANDLER( quiz365_input_r )
 	return 0xff;
 }
 
-READ16_HANDLER( quiz365_input2_r )
+static READ16_HANDLER( quiz365_input2_r )
 {
 //  logerror("%04x: input2_r offset %d select %x\n",activecpu_get_pc(),offset,ddenlovr_select2 );
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
@@ -1537,13 +1537,13 @@ READ16_HANDLER( quiz365_input2_r )
 
 static UINT8 rongrong_blitter_busy_select;
 
-WRITE8_HANDLER( rongrong_blitter_busy_w )
+static WRITE8_HANDLER( rongrong_blitter_busy_w )
 {
 	rongrong_blitter_busy_select = data;
 	if (data != 0x18)
 		logerror("%04x: rongrong_blitter_busy_w data = %02x\n",activecpu_get_pc(),data);
 }
-READ8_HANDLER( rongrong_blitter_busy_r )
+static READ8_HANDLER( rongrong_blitter_busy_r )
 {
 	switch( rongrong_blitter_busy_select )
 	{
@@ -1826,7 +1826,7 @@ ADDRESS_MAP_END
                                 Rong Rong
 ***************************************************************************/
 
-READ8_HANDLER( rongrong_input_r )
+static READ8_HANDLER( rongrong_input_r )
 {
 	if (!(ddenlovr_select & 0x01))	return readinputport(3);
 	if (!(ddenlovr_select & 0x02))	return readinputport(4);
@@ -1836,7 +1836,7 @@ READ8_HANDLER( rongrong_input_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER( rongrong_select_w )
+static WRITE8_HANDLER( rongrong_select_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 
@@ -2136,7 +2136,7 @@ static WRITE8_HANDLER( funkyfig_blitter_w )
 	blitter_w_funkyfig(0,offset,data,0xe0);
 }
 
-WRITE8_HANDLER( funkyfig_rombank_w )
+static WRITE8_HANDLER( funkyfig_rombank_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 
@@ -2147,7 +2147,7 @@ WRITE8_HANDLER( funkyfig_rombank_w )
 	memory_set_bankptr(2, &rom[0x90000 + 0x1000 * ((data & 0xe0) >> 5)]);
 }
 
-READ8_HANDLER( funkyfig_dsw_r )
+static READ8_HANDLER( funkyfig_dsw_r )
 {
 	if (!(ddenlovr_select & 0x01))	return readinputport(3);
 	if (!(ddenlovr_select & 0x02))	return readinputport(4);
@@ -2158,7 +2158,7 @@ READ8_HANDLER( funkyfig_dsw_r )
 
 static UINT8 funkyfig_lockout;
 
-READ8_HANDLER( funkyfig_coin_r )
+static READ8_HANDLER( funkyfig_coin_r )
 {
 	switch( ddenlovr_select2 )
 	{
@@ -2169,7 +2169,7 @@ READ8_HANDLER( funkyfig_coin_r )
 	return 0xff;
 }
 
-READ8_HANDLER( funkyfig_key_r )
+static READ8_HANDLER( funkyfig_key_r )
 {
 	switch( ddenlovr_select2 )
 	{
@@ -2249,7 +2249,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_HANDLER( hanakanz_rombank_w )
+static WRITE8_HANDLER( hanakanz_rombank_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 

@@ -60,7 +60,7 @@ static MACHINE_RESET( destroyr )
 }
 
 
-WRITE8_HANDLER( destroyr_misc_w )
+static WRITE8_HANDLER( destroyr_misc_w )
 {
 	/* bits 0 to 2 connect to the sound circuits */
 
@@ -76,7 +76,7 @@ WRITE8_HANDLER( destroyr_misc_w )
 }
 
 
-WRITE8_HANDLER( destroyr_cursor_load_w )
+static WRITE8_HANDLER( destroyr_cursor_load_w )
 {
 	destroyr_cursor = data;
 
@@ -84,13 +84,13 @@ WRITE8_HANDLER( destroyr_cursor_load_w )
 }
 
 
-WRITE8_HANDLER( destroyr_interrupt_ack_w )
+static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }
 
 
-WRITE8_HANDLER( destroyr_output_w )
+static WRITE8_HANDLER( destroyr_output_w )
 {
 	offset &= 15;
 
@@ -130,7 +130,7 @@ WRITE8_HANDLER( destroyr_output_w )
 }
 
 
-READ8_HANDLER( destroyr_input_r )
+static READ8_HANDLER( destroyr_input_r )
 {
 	offset &= 15;
 
@@ -157,7 +157,7 @@ READ8_HANDLER( destroyr_input_r )
 }
 
 
-READ8_HANDLER( destroyr_scanline_r )
+static READ8_HANDLER( destroyr_scanline_r )
 {
 	return video_screen_get_vpos(0);
 }

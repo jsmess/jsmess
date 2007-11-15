@@ -557,10 +557,12 @@ Driver Note:
 Export this function so that the video routine can drive the
 Q-Sound hardware
 */
+#ifdef UNUSED_FUNCTION
 WRITE16_HANDLER( cps2_qsound_sharedram_w )
 {
     qsound_sharedram1_w(offset/2, data, 0xff00);
 }
+#endif
 
 /* Maximum size of Q Sound Z80 region */
 #define QSOUND_SIZE 0x50000
@@ -654,12 +656,12 @@ static NVRAM_HANDLER( cps2 )
 	}
 }
 
-READ16_HANDLER( cps2_eeprom_port_r )
+static READ16_HANDLER( cps2_eeprom_port_r )
 {
     return (input_port_2_word_r(offset,0) & 0xfffe) | EEPROM_read_bit();
 }
 
-WRITE16_HANDLER( cps2_eeprom_port_w )
+static WRITE16_HANDLER( cps2_eeprom_port_w )
 {
     if (ACCESSING_MSB)
     {
@@ -727,7 +729,7 @@ WRITE16_HANDLER( cps2_eeprom_port_w )
     }
 }
 
-READ16_HANDLER( cps2_qsound_volume_r )
+static READ16_HANDLER( cps2_qsound_volume_r )
 {
 	/* Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0 */
 	/* Network adapter (ssf2tb) present when bit 15 = 0 */

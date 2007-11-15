@@ -55,7 +55,7 @@ static UINT8 mux_select;
  *
  *************************************/
 
-MACHINE_START( cinemat )
+static MACHINE_START( cinemat )
 {
 	state_save_register_global(coin_detected);
 	state_save_register_global(coin_last_input);

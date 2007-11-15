@@ -52,14 +52,14 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(0,tile,superdq_color_bank,0);
 }
 
-VIDEO_START( superdq )
+static VIDEO_START( superdq )
 {
 	superdq_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	add_exit_callback(machine, video_cleanup);
 }
 
-VIDEO_UPDATE( superdq )
+static VIDEO_UPDATE( superdq )
 {
 	tilemap_draw(bitmap,cliprect,superdq_tilemap,0,0);
 
@@ -106,7 +106,7 @@ VIDEO_UPDATE( superdq )
  *
  *************************************/
 
-PALETTE_INIT( superdq )
+static PALETTE_INIT( superdq )
 {
 	int i;
 	static const int resistances[3] = { 820, 390, 200 };

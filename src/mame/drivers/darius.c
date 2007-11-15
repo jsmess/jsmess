@@ -139,8 +139,8 @@ sounds.
 #include "darius.lh"
 
 
-MACHINE_START( darius );
-MACHINE_RESET( darius );
+static MACHINE_START( darius );
+static MACHINE_RESET( darius );
 
 VIDEO_START( darius );
 VIDEO_UPDATE( darius );
@@ -1219,7 +1219,7 @@ static DRIVER_INIT( darius )
 }
 
 
-MACHINE_START( darius )
+static MACHINE_START( darius )
 {
 	state_save_register_global(cpua_ctrl);
 	state_save_register_func_postload(parse_control);
@@ -1232,7 +1232,7 @@ MACHINE_START( darius )
 }
 
 
-MACHINE_RESET( darius )
+static MACHINE_RESET( darius )
 {
 	int  i;
 

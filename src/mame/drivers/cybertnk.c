@@ -190,18 +190,18 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0);
 }
 
-VIDEO_START( cybertnk )
+static VIDEO_START( cybertnk )
 {
 	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,32);
 }
 
-VIDEO_UPDATE( cybertnk )
+static VIDEO_UPDATE( cybertnk )
 {
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
 
-DRIVER_INIT( cybertnk )
+static DRIVER_INIT( cybertnk )
 {
 #ifdef IGNORE_MISSING_ROM
 	UINT16 *ROM = (UINT16*)memory_region(REGION_CPU1);

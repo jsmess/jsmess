@@ -49,7 +49,7 @@ UINT8 discoboy_ram_bank;
 static UINT8 port_00;
 UINT8 discoboy_gfxbank;
 
-VIDEO_START( discoboy )
+static VIDEO_START( discoboy )
 {
 }
 
@@ -102,7 +102,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 
 
-VIDEO_UPDATE( discoboy )
+static VIDEO_UPDATE( discoboy )
 {
 	UINT16 x,y;
 	int i;
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
 ADDRESS_MAP_END
 
-READ8_HANDLER( discoboy_port_06_r )
+static READ8_HANDLER( discoboy_port_06_r )
 {
 	return 0x00;
 }
@@ -508,7 +508,7 @@ static MACHINE_DRIVER_START( discoboy )
 
 MACHINE_DRIVER_END
 
-DRIVER_INIT( discoboy )
+static DRIVER_INIT( discoboy )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 

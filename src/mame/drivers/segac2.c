@@ -135,7 +135,7 @@ static MACHINE_START( segac2 )
 }
 
 
-MACHINE_RESET( segac2 )
+static MACHINE_RESET( segac2 )
 {
 	/* set up interrupts and such */
 	machine_reset_genesis(machine);

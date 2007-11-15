@@ -988,7 +988,7 @@ ROM_START( youmab2 )
 ROM_END
 
 
-WRITE8_HANDLER( youmab_extra_bank_w )
+static WRITE8_HANDLER( youmab_extra_bank_w )
 {
 	if (data==0xff)
 	{
@@ -1004,22 +1004,22 @@ WRITE8_HANDLER( youmab_extra_bank_w )
 	}
 }
 
-READ8_HANDLER( youmab_8a_r )
+static READ8_HANDLER( youmab_8a_r )
 {
 	return mame_rand(Machine);
 }
 
-WRITE8_HANDLER( youmab_81_w )
+static WRITE8_HANDLER( youmab_81_w )
 {
 	// ??
 }
 
-WRITE8_HANDLER( youmab_84_w )
+static WRITE8_HANDLER( youmab_84_w )
 {
 	// ??
 }
 
-DRIVER_INIT( youmab )
+static DRIVER_INIT( youmab )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK2);

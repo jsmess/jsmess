@@ -665,6 +665,7 @@ WRITE16_HANDLER(splndrbt_scrollram_w)
 	dirtybuf[offset] = 1;
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE16_HANDLER(splndrbt_bgcolor_w)
 {
 	data >>= 8;
@@ -675,5 +676,6 @@ WRITE16_HANDLER(splndrbt_bgcolor_w)
 		memset(dirtybuf, 1, 0x400);
 	}
 }
+#endif
 
 /******************************************************************************/

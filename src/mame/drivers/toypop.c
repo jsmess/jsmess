@@ -128,12 +128,12 @@ static int interrupt_enable_68k;
 static UINT8 *toypop_m68000_sharedram;
 
 
-READ8_HANDLER( toypop_sound_sharedram_r )
+static READ8_HANDLER( toypop_sound_sharedram_r )
 {
 	return namco_soundregs[offset];
 }
 
-WRITE8_HANDLER( toypop_sound_sharedram_w )
+static WRITE8_HANDLER( toypop_sound_sharedram_w )
 {
 	if (offset < 0x40)
 		namco_15xx_w(offset,data);
@@ -141,41 +141,41 @@ WRITE8_HANDLER( toypop_sound_sharedram_w )
 		namco_soundregs[offset] = data;
 }
 
-READ16_HANDLER( toypop_m68000_sharedram_r )
+static READ16_HANDLER( toypop_m68000_sharedram_r )
 {
 	return toypop_m68000_sharedram[offset];
 }
 
-WRITE16_HANDLER( toypop_m68000_sharedram_w )
+static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 {
 	if (ACCESSING_LSB)
 		toypop_m68000_sharedram[offset] = data & 0xff;
 }
 
-READ8_HANDLER( toypop_main_interrupt_enable_r )
+static READ8_HANDLER( toypop_main_interrupt_enable_r )
 {
 	cpu_interrupt_enable(0,1);
 	return 0;
 }
 
-WRITE8_HANDLER( toypop_main_interrupt_enable_w )
+static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
 {
 	cpu_interrupt_enable(0,1);
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }
 
-WRITE8_HANDLER( toypop_main_interrupt_disable_w )
+static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 {
 	cpu_interrupt_enable(0,0);
 }
 
-WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
+static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
 	cpu_interrupt_enable(1,1);
 	cpunum_set_input_line(1, 0, CLEAR_LINE);
 }
 
-WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
+static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
 {
 	cpu_interrupt_enable(1,0);
 }
@@ -190,22 +190,22 @@ INTERRUPT_GEN( toypop_main_interrupt )
 	namcoio_set_irq_line(2,PULSE_LINE);
 }
 
-WRITE8_HANDLER( toypop_sound_clear_w )
+static WRITE8_HANDLER( toypop_sound_clear_w )
 {
 	cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-WRITE8_HANDLER( toypop_sound_assert_w )
+static WRITE8_HANDLER( toypop_sound_assert_w )
 {
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_HANDLER( toypop_m68000_clear_w )
+static WRITE8_HANDLER( toypop_m68000_clear_w )
 {
 	cpunum_set_input_line(2, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-WRITE8_HANDLER( toypop_m68000_assert_w )
+static WRITE8_HANDLER( toypop_m68000_assert_w )
 {
 	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
 }
@@ -219,7 +219,7 @@ static TIMER_CALLBACK( disable_interrupts )
 	interrupt_enable_68k = 0;
 }
 
-MACHINE_RESET( toypop )
+static MACHINE_RESET( toypop )
 {
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
@@ -232,12 +232,12 @@ INTERRUPT_GEN( toypop_m68000_interrupt )
 		cpunum_set_input_line(2, 6, HOLD_LINE);
 }
 
-WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )
+static WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )
 {
 	interrupt_enable_68k = 1;
 }
 
-WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
+static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
 {
 	interrupt_enable_68k = 0;
 }

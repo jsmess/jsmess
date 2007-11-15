@@ -286,7 +286,7 @@ static MACHINE_START( berzerk )
  *
  *************************************/
 
-MACHINE_RESET( berzerk )
+static MACHINE_RESET( berzerk )
 {
 	irq_enabled = 0;
 	nmi_enabled = 0;

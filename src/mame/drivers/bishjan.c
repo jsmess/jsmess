@@ -62,7 +62,7 @@ static tilemap	*tmap1,				*tmap2;
 static TILE_GET_INFO( get_tile_info1 )	{	SET_TILE_INFO(0, bishjan_videoram1[ tile_index ], 0, 0);	}
 static TILE_GET_INFO( get_tile_info2 )	{	SET_TILE_INFO(0, bishjan_videoram2[ tile_index ], 0, 0);	}
 
-VIDEO_START(bishjan)
+static VIDEO_START(bishjan)
 {
 	tmap1 = tilemap_create(	get_tile_info1, tilemap_scan_rows,
 							TILEMAP_TYPE_PEN, 8,8, 0x80,0x40	);
@@ -79,7 +79,7 @@ VIDEO_START(bishjan)
 	colorram = auto_malloc(256*3);
 }
 
-VIDEO_UPDATE( bishjan )
+static VIDEO_UPDATE( bishjan )
 {
 	int layers_ctrl = ~bishjan_layers[0];
 

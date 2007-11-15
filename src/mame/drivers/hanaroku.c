@@ -20,7 +20,7 @@ UINT8 *hanaroku_spriteram2;
 UINT8 *hanaroku_spriteram3;
 
 
-PALETTE_INIT( hanaroku )
+static PALETTE_INIT( hanaroku )
 {
 	int i;
 	int r,g,b;
@@ -36,7 +36,7 @@ PALETTE_INIT( hanaroku )
 }
 
 
-VIDEO_START(hanaroku)
+static VIDEO_START(hanaroku)
 {
 }
 
@@ -65,7 +65,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE(hanaroku)
+static VIDEO_UPDATE(hanaroku)
 {
 	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);	// ???
 	draw_sprites(machine, bitmap, cliprect);

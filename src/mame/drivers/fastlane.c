@@ -38,7 +38,7 @@ static INTERRUPT_GEN( fastlane_interrupt )
 	}
 }
 
-WRITE8_HANDLER( k007121_registers_w )
+static WRITE8_HANDLER( k007121_registers_w )
 {
 	if (offset < 8)
 		K007121_ctrl_0_w(offset,data);

@@ -325,7 +325,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_RESET( powerins )
+static MACHINE_RESET( powerins )
 {
 	oki_bank = -1;	// samples bank "unitialised"
 }

@@ -81,13 +81,13 @@ static UINT16 *ram;
 
 ***************************************************************************/
 
-READ16_HANDLER( afega_unknown_r )
+static READ16_HANDLER( afega_unknown_r )
 {
 	/* This fixes the text in Service Mode. */
 	return 0x0100;
 }
 
-WRITE16_HANDLER( afega_soundlatch_w )
+static WRITE16_HANDLER( afega_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{

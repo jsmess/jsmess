@@ -1472,13 +1472,15 @@ static void end_of_frame(struct sms_vdp *chip)
 	mame_timer_adjust_ptr(chip->sms_scanline_timer, time_zero, time_zero);
 }
 
+#ifdef UNUSED_FUNCTION
 VIDEO_EOF(sms)
 {
 	end_of_frame(vdp1);
 	//if (SMS_PAUSE_BUTTON) cpunum_set_input_line(0,INPUT_LINE_NMI,PULSE_LINE); // not on systeme!!!
 }
+#endif
 
-VIDEO_START(sms)
+static VIDEO_START(sms)
 {
 
 //  vdp->is_pal = 1;
@@ -1486,11 +1488,12 @@ VIDEO_START(sms)
 //  vdp->sms_framerate = 50;
 }
 
-
+#ifdef UNUSED_FUNCTION
 MACHINE_RESET(sms)
 {
 	mame_timer_adjust_ptr(vdp1->sms_scanline_timer, time_zero, time_zero);
 }
+#endif
 
 /* Sega System E */
 
@@ -1944,7 +1947,7 @@ static UINT8* vdp1_vram_bank0;
 static UINT8* vdp1_vram_bank1;
 static UINT8 f7_bank_value;
 
-MACHINE_RESET(systeme)
+static MACHINE_RESET(systeme)
 {
 	mame_timer_adjust_ptr(vdp1->sms_scanline_timer, time_zero, time_zero);
 	mame_timer_adjust_ptr(vdp2->sms_scanline_timer, time_zero, time_zero);
@@ -1960,7 +1963,7 @@ MACHINE_RESET(megatech_bios)
 	mame_timer_adjust_ptr(vdp1->sms_scanline_timer, time_zero, time_zero);
 }
 
-VIDEO_EOF(systeme)
+static VIDEO_EOF(systeme)
 {
 	end_of_frame(vdp1);
 	end_of_frame(vdp2);
@@ -2014,7 +2017,7 @@ VIDEO_UPDATE(megatech_bios)
 	return 0;
 }
 
-VIDEO_UPDATE(systeme)
+static VIDEO_UPDATE(systeme)
 {
 //  show_tiles();
 	int x,y;
@@ -2083,22 +2086,22 @@ MACHINE_DRIVER_START( systeme )
 MACHINE_DRIVER_END
 
 
-READ8_HANDLER( sms_vdp_2_data_r )
+static READ8_HANDLER( sms_vdp_2_data_r )
 {
 	return vdp_data_r(vdp2);
 }
 
-WRITE8_HANDLER( sms_vdp_2_data_w )
+static WRITE8_HANDLER( sms_vdp_2_data_w )
 {
 	vdp_data_w(data, vdp2);
 }
 
-READ8_HANDLER( sms_vdp_2_ctrl_r )
+static READ8_HANDLER( sms_vdp_2_ctrl_r )
 {
 	return vdp_ctrl_r(vdp2);
 }
 
-WRITE8_HANDLER( sms_vdp_2_ctrl_w )
+static WRITE8_HANDLER( sms_vdp_2_ctrl_w )
 {
 	vdp_ctrl_w(data, vdp2);
 }

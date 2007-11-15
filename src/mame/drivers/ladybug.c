@@ -955,7 +955,7 @@ ROM_START( sraider )
 ROM_END
 
 
-DRIVER_INIT( dorodon )
+static DRIVER_INIT( dorodon )
 {
 	/* Decode the opcodes */
 
@@ -972,7 +972,7 @@ DRIVER_INIT( dorodon )
 	}
 }
 
-DRIVER_INIT( sraider )
+static DRIVER_INIT( sraider )
 {
 }
 

@@ -199,8 +199,8 @@ rumbling on a subwoofer in the cabinet.)
 
 extern const char layout_darius[];
 
-MACHINE_START( ninjaw );
-MACHINE_RESET( ninjaw );
+static MACHINE_START( ninjaw );
+static MACHINE_RESET( ninjaw );
 
 VIDEO_START( ninjaw );
 VIDEO_UPDATE( ninjaw );
@@ -282,7 +282,7 @@ static READ16_HANDLER( ninjaw_sound_r )
 
 /**** sound pan control ****/
 static int ninjaw_pandata[4];
-WRITE8_HANDLER( ninjaw_pancontrol )
+static WRITE8_HANDLER( ninjaw_pancontrol )
 {
   offset = offset&3;
   ninjaw_pandata[offset] = (float)data * (100.f / 255.0f);
@@ -951,7 +951,7 @@ ROM_START( darius2 )
 ROM_END
 
 
-MACHINE_START( ninjaw )
+static MACHINE_START( ninjaw )
 {
 	cpua_ctrl = 0xff;
 	state_save_register_global(cpua_ctrl);
@@ -961,7 +961,7 @@ MACHINE_START( ninjaw )
 	state_save_register_func_postload(reset_sound_region);
 }
 
-MACHINE_RESET( ninjaw )
+static MACHINE_RESET( ninjaw )
 {
   /**** mixer control enable ****/
   sound_global_enable( 1 );	/* mixer enabled */

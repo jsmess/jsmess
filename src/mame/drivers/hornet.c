@@ -391,14 +391,14 @@ static void update_palette_color(running_machine *machine, int chip, UINT32 pale
 	palette_set_color_rgb(machine, color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 }
 
-READ32_HANDLER(K037122_sram_r)
+static READ32_HANDLER(K037122_sram_r)
 {
 	int chip = get_cgboard_id();
 
 	return K037122_tile_ram[chip][offset];
 }
 
-WRITE32_HANDLER(K037122_sram_w)
+static WRITE32_HANDLER(K037122_sram_w)
 {
 	int chip = get_cgboard_id();
 
@@ -437,7 +437,7 @@ WRITE32_HANDLER(K037122_sram_w)
 }
 
 
-READ32_HANDLER(K037122_char_r)
+static READ32_HANDLER(K037122_char_r)
 {
 	int chip = get_cgboard_id();
 
@@ -449,7 +449,7 @@ READ32_HANDLER(K037122_char_r)
 	return K037122_char_ram[chip][addr];
 }
 
-WRITE32_HANDLER(K037122_char_w)
+static WRITE32_HANDLER(K037122_char_w)
 {
 	int chip = get_cgboard_id();
 
@@ -463,7 +463,7 @@ WRITE32_HANDLER(K037122_char_w)
 	K037122_char_dirty[chip] = 1;
 }
 
-READ32_HANDLER(K037122_reg_r)
+static READ32_HANDLER(K037122_reg_r)
 {
 	int chip = get_cgboard_id();
 
@@ -477,7 +477,7 @@ READ32_HANDLER(K037122_reg_r)
 	return K037122_reg[chip][offset];
 }
 
-WRITE32_HANDLER(K037122_reg_w)
+static WRITE32_HANDLER(K037122_reg_w)
 {
 	int chip = get_cgboard_id();
 
@@ -507,7 +507,7 @@ static void hornet_2board_exit(running_machine *machine)
 	voodoo_exit(1);
 }
 
-VIDEO_START( hornet )
+static VIDEO_START( hornet )
 {
 	add_exit_callback(machine, hornet_exit);
 
@@ -521,7 +521,7 @@ VIDEO_START( hornet )
 	K037122_vh_start(machine, 0);
 }
 
-VIDEO_START( hornet_2board )
+static VIDEO_START( hornet_2board )
 {
 	add_exit_callback(machine, hornet_2board_exit);
 
@@ -544,7 +544,7 @@ VIDEO_START( hornet_2board )
 }
 
 
-VIDEO_UPDATE( hornet )
+static VIDEO_UPDATE( hornet )
 {
 	voodoo_update(0, bitmap, cliprect);
 
@@ -556,7 +556,7 @@ VIDEO_UPDATE( hornet )
 	return 0;
 }
 
-VIDEO_UPDATE( hornet_2board )
+static VIDEO_UPDATE( hornet_2board )
 {
 	voodoo_update(screen, bitmap, cliprect);
 

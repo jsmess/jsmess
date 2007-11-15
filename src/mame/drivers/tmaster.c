@@ -16,56 +16,56 @@ GFX might be some kind of blitter device, with memory mapped framebuffer?
 #include "driver.h"
 #include "sound/okim6295.h"
 
-VIDEO_START( tmaster )
+static VIDEO_START( tmaster )
 {
 }
 
-VIDEO_UPDATE( tmaster )
+static VIDEO_UPDATE( tmaster )
 {
 	return 0;
 }
 
-READ16_HANDLER( tmaster_unk_0x300010_r )
+static READ16_HANDLER( tmaster_unk_0x300010_r )
 {
 	return mame_rand(Machine);
 }
 
-WRITE16_HANDLER( tmaster_unk_0x300020_w )
+static WRITE16_HANDLER( tmaster_unk_0x300020_w )
 {
 
 }
 
-WRITE16_HANDLER( tmaster_unk_0x300040_w )
+static WRITE16_HANDLER( tmaster_unk_0x300040_w )
 {
 
 }
 
-WRITE16_HANDLER( tmaster_unk_0x300070_w )
+static WRITE16_HANDLER( tmaster_unk_0x300070_w )
 {
 
 }
 
-WRITE16_HANDLER( tmaster_unk_0x500010_w )
+static WRITE16_HANDLER( tmaster_unk_0x500010_w )
 {
 
 }
 
-WRITE16_HANDLER( tmaster_unk_0x500020_w )
+static WRITE16_HANDLER( tmaster_unk_0x500020_w )
 {
 
 }
 
-WRITE16_HANDLER( tmaster_unk_0x500000_range_w )
+static WRITE16_HANDLER( tmaster_unk_0x500000_range_w )
 {
 
 }
 
-WRITE16_HANDLER( tmaster_unk_0x800010_w )
+static WRITE16_HANDLER( tmaster_unk_0x800010_w )
 {
 
 }
 
-READ16_HANDLER( tmaster_unk_0x500010_r )
+static READ16_HANDLER( tmaster_unk_0x500010_r )
 {
 	return mame_rand(Machine);
 }

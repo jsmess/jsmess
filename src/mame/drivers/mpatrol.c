@@ -66,7 +66,7 @@ static READ8_HANDLER( mpatrol_protection_r )
 }
 
 
-READ8_HANDLER( mpatrol_input_port_3_r )
+static READ8_HANDLER( mpatrol_input_port_3_r )
 {
 	int ret = input_port_3_r(0);
 

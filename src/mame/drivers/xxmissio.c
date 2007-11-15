@@ -27,18 +27,18 @@ WRITE8_HANDLER( xxmissio_videoram_w );
 
 WRITE8_HANDLER( xxmissio_paletteram_w );
 
-WRITE8_HANDLER( xxmissio_bank_sel_w )
+static WRITE8_HANDLER( xxmissio_bank_sel_w )
 {
 	memory_set_bank(1, data & 7);
 }
 
-READ8_HANDLER( xxmissio_status_r )
+static READ8_HANDLER( xxmissio_status_r )
 {
 	xxmissio_status = (xxmissio_status | 2) & ( readinputportbytag("IN2") | 0xfd );
 	return xxmissio_status;
 }
 
-WRITE8_HANDLER ( xxmissio_status_m_w )
+static WRITE8_HANDLER ( xxmissio_status_m_w )
 {
 	switch (data)
 	{
@@ -57,7 +57,7 @@ WRITE8_HANDLER ( xxmissio_status_m_w )
 	}
 }
 
-WRITE8_HANDLER ( xxmissio_status_s_w )
+static WRITE8_HANDLER ( xxmissio_status_s_w )
 {
 	switch (data)
 	{

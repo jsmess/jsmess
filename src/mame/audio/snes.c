@@ -1188,7 +1188,7 @@ void snes_sh_update( void *param, stream_sample_t **inputs, stream_sample_t **ou
  *       I/O for DSP       *
  ***************************/
 
-READ8_HANDLER( snes_dsp_io_r )
+static READ8_HANDLER( snes_dsp_io_r )
 {
 	stream_update(channel);
 
@@ -1202,7 +1202,7 @@ READ8_HANDLER( snes_dsp_io_r )
 	return DSPregs[offset & 0x7f];
 }
 
-WRITE8_HANDLER( snes_dsp_io_w )
+static WRITE8_HANDLER( snes_dsp_io_w )
 {
 	stream_update(channel);
 

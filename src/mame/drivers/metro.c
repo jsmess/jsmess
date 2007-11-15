@@ -136,7 +136,7 @@ static UINT8 requested_int[8];
 
 static UINT16 *metro_irq_levels, *metro_irq_vectors, *metro_irq_enable;
 
-READ16_HANDLER( metro_irq_cause_r )
+static READ16_HANDLER( metro_irq_cause_r )
 {
 	return	requested_int[0] * 0x01 +	// vblank
 			requested_int[1] * 0x02 +
@@ -192,14 +192,14 @@ int metro_irq_callback(int int_level)
 	return metro_irq_vectors[int_level]&0xff;
 }
 
-MACHINE_RESET( metro )
+static MACHINE_RESET( metro )
 {
 	if (irq_line == -1)
 		cpunum_set_irq_callback(0, metro_irq_callback);
 }
 
 
-WRITE16_HANDLER( metro_irq_cause_w )
+static WRITE16_HANDLER( metro_irq_cause_w )
 {
 //if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n",activecpu_get_pc(),data);
 
@@ -572,7 +572,7 @@ static struct YMF278B_interface ymf278b_interface =
 
 /* IT DOESN'T WORK PROPERLY */
 
-WRITE16_HANDLER( metro_coin_lockout_1word_w )
+static WRITE16_HANDLER( metro_coin_lockout_1word_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -583,7 +583,7 @@ WRITE16_HANDLER( metro_coin_lockout_1word_w )
 }
 
 
-WRITE16_HANDLER( metro_coin_lockout_4words_w )
+static WRITE16_HANDLER( metro_coin_lockout_4words_w )
 {
 //  coin_lockout_w( (offset >> 1) & 1, offset & 1 );
 	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",activecpu_get_pc(),data);
@@ -610,7 +610,7 @@ WRITE16_HANDLER( metro_coin_lockout_4words_w )
 
 static UINT16 *metro_rombank;
 
-READ16_HANDLER( metro_bankedrom_r )
+static READ16_HANDLER( metro_bankedrom_r )
 {
 	const int region = REGION_GFX1;
 
@@ -697,7 +697,7 @@ INLINE void blt_write(const int tmap, const offs_t offs, const UINT16 data, cons
 }
 
 
-WRITE16_HANDLER( metro_blitter_w )
+static WRITE16_HANDLER( metro_blitter_w )
 {
 	COMBINE_DATA( &metro_blitter_regs[offset] );
 
@@ -1419,12 +1419,12 @@ static READ16_HANDLER( gakusai_input_r )
 	return 0xffff;
 }
 
-READ16_HANDLER( gakusai_eeprom_r )
+static READ16_HANDLER( gakusai_eeprom_r )
 {
 	return EEPROM_read_bit() & 1;
 }
 
-WRITE16_HANDLER( gakusai_eeprom_w )
+static WRITE16_HANDLER( gakusai_eeprom_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -1547,7 +1547,7 @@ ADDRESS_MAP_END
                         Mahjong Doukyuusei Special
 ***************************************************************************/
 
-READ16_HANDLER( dokyusp_eeprom_r )
+static READ16_HANDLER( dokyusp_eeprom_r )
 {
 	// clock line asserted: write latch or select next bit to read
 	EEPROM_set_clock_line(CLEAR_LINE);
@@ -1556,7 +1556,7 @@ READ16_HANDLER( dokyusp_eeprom_r )
 	return EEPROM_read_bit() & 1;
 }
 
-WRITE16_HANDLER( dokyusp_eeprom_bit_w )
+static WRITE16_HANDLER( dokyusp_eeprom_bit_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -1569,7 +1569,7 @@ WRITE16_HANDLER( dokyusp_eeprom_bit_w )
 	}
 }
 
-WRITE16_HANDLER( dokyusp_eeprom_reset_w )
+static WRITE16_HANDLER( dokyusp_eeprom_reset_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -4076,7 +4076,7 @@ static MACHINE_DRIVER_START( dokyusei )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.90)
 MACHINE_DRIVER_END
 
-NVRAM_HANDLER( dokyusp )
+static NVRAM_HANDLER( dokyusp )
 {
 	static const UINT8 def_data[] = {0x00,0xe0};
 
@@ -4638,7 +4638,7 @@ static DRIVER_INIT( balcube )
 }
 
 
-DRIVER_INIT( dharmak )
+static DRIVER_INIT( dharmak )
 {
 	UINT8 *src = memory_region( REGION_GFX1 );
 	int i;

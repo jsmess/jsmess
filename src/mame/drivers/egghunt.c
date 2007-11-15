@@ -110,7 +110,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, colour, 0);
 }
 
-READ8_HANDLER( egghunt_bgram_r )
+static READ8_HANDLER( egghunt_bgram_r )
 {
 	if (egghunt_vidram_bank)
 	{
@@ -122,7 +122,7 @@ READ8_HANDLER( egghunt_bgram_r )
 	}
 }
 
-WRITE8_HANDLER( egghunt_bgram_w )
+static WRITE8_HANDLER( egghunt_bgram_w )
 {
 	if (egghunt_vidram_bank)
 	{
@@ -135,28 +135,28 @@ WRITE8_HANDLER( egghunt_bgram_w )
 	}
 }
 
-WRITE8_HANDLER( egghunt_atram_w )
+static WRITE8_HANDLER( egghunt_atram_w )
 {
 	egghunt_atram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 
-VIDEO_START(egghunt)
+static VIDEO_START(egghunt)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64, 32);
 	egghunt_bgram = auto_malloc(0x1000);
 	egghunt_spram = auto_malloc(0x1000);
 }
 
-VIDEO_UPDATE(egghunt)
+static VIDEO_UPDATE(egghunt)
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 
-WRITE8_HANDLER( egghunt_gfx_banking_w )
+static WRITE8_HANDLER( egghunt_gfx_banking_w )
 {
 	// data & 0x03 is used for tile banking
 	// data & 0x30 is used for sprites banking
@@ -165,23 +165,23 @@ WRITE8_HANDLER( egghunt_gfx_banking_w )
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 }
 
-WRITE8_HANDLER( egghunt_vidram_bank_w )
+static WRITE8_HANDLER( egghunt_vidram_bank_w )
 {
 	egghunt_vidram_bank = data & 1;
 }
 
-WRITE8_HANDLER( egghunt_soundlatch_w )
+static WRITE8_HANDLER( egghunt_soundlatch_w )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(1,0,HOLD_LINE);
 }
 
-READ8_HANDLER( egghunt_okibanking_r )
+static READ8_HANDLER( egghunt_okibanking_r )
 {
 	return egghunt_okibanking;
 }
 
-WRITE8_HANDLER( egghunt_okibanking_w )
+static WRITE8_HANDLER( egghunt_okibanking_w )
 {
 	egghunt_okibanking = data;
 	OKIM6295_set_bank_base(0, (data & 0x10) ? 0x40000 : 0);

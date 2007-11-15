@@ -995,7 +995,7 @@ static struct YM2151interface ym2151_interface =
 };
 
 
-MACHINE_START( taitox )
+static MACHINE_START( taitox )
 {
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
@@ -1345,7 +1345,7 @@ ROM_START( ballbros )
 ROM_END
 
 
-DRIVER_INIT( kyustrkr )
+static DRIVER_INIT( kyustrkr )
 {
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x900000, 0x90000f, 0, 0, kyustrkr_input_w);
 }

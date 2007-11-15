@@ -18,11 +18,11 @@ All of these have encrypted program roms, which will need decrypting
 #include "driver.h"
 #include "sound/okim6295.h"
 
-VIDEO_START(igs_m68)
+static VIDEO_START(igs_m68)
 {
 }
 
-VIDEO_UPDATE(igs_m68)
+static VIDEO_UPDATE(igs_m68)
 {
 	return 0;
 }

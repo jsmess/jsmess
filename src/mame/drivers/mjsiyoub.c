@@ -35,11 +35,11 @@ COLOR.BPR  color
 #include "sound/msm5205.h"
 
 
-VIDEO_START(mjsiyoub)
+static VIDEO_START(mjsiyoub)
 {
 }
 
-VIDEO_UPDATE(mjsiyoub)
+static VIDEO_UPDATE(mjsiyoub)
 {
 	return 0;
 }

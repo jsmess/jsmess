@@ -585,6 +585,7 @@ struct _input_port_entry
 	{
 		const char *swname;		/* name of the physical DIP switch */
 		UINT8	swnum;			/* physical switch number */
+		UINT8	invert;			/* is this an active-high DIP? */
 	} diploc[8];
 
 	/* valid if type is IPT_KEYBOARD */
@@ -765,7 +766,7 @@ struct _inp_header
 #define PORT_DIPSETTING(default,name) \
 	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_DIPSETTING, default), INPUT_PORT_PTR(name),
 
-/* physical location, of the form: name:sw,[name:]sw,... */
+/* physical location, of the form: name:[!]sw,[name:][!]sw,... */
 /* note that these are specified LSB-first */
 #define PORT_DIPLOCATION(location_) \
 	INPUT_PORT_UINT32(INPUT_TOKEN_DIPLOCATION), INPUT_PORT_PTR(location_),

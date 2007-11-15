@@ -66,12 +66,12 @@ The End
 static int nSndNum=0x10;
 static int nAyCtrl, nAyData;
 
-VIDEO_START(mirax)
+static VIDEO_START(mirax)
 {
 }
 
 
-VIDEO_UPDATE(mirax)
+static VIDEO_UPDATE(mirax)
 {
 #ifdef MAME_DEBUG
 	//audio tester

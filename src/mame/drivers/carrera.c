@@ -242,11 +242,11 @@ static GFXDECODE_START( carrera )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-VIDEO_START(carrera)
+static VIDEO_START(carrera)
 {
 }
 
-VIDEO_UPDATE(carrera)
+static VIDEO_UPDATE(carrera)
 {
 
 	int x,y;
@@ -277,7 +277,7 @@ static struct AY8910interface ay8910_interface =
 	unknown_r,
 };
 
-PALETTE_INIT(carrera)
+static PALETTE_INIT(carrera)
 {
 	int x;
 	UINT8 *src = memory_region ( REGION_PROMS );

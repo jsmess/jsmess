@@ -18,7 +18,7 @@ replaced by a 6th button to start games. This is a feature of the PCB for privat
 #include "sound/dac.h"
 
 
-VIDEO_UPDATE( findout )
+static VIDEO_UPDATE( findout )
 {
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	return 0;
@@ -121,7 +121,7 @@ static ppi8255_interface ppi8255_intf =
 	{ sound_w,	NULL },			/* Port C write */
 };
 
-MACHINE_RESET( findout )
+static MACHINE_RESET( findout )
 {
 	ppi8255_init(&ppi8255_intf);
 

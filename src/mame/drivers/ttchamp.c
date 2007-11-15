@@ -45,11 +45,11 @@ The PCB is Spanish and manufacured by Gamart.
 static UINT16 *peno_vram;
 
 
-VIDEO_START(ttchamp)
+static VIDEO_START(ttchamp)
 {
 }
 
-VIDEO_UPDATE(ttchamp)
+static VIDEO_UPDATE(ttchamp)
 {
 	int y,x,count;
 //  int i;

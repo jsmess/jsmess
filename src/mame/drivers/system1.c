@@ -89,26 +89,26 @@ static WRITE8_HANDLER( outport24_w )
 	inport23_step = data;
 }
 
-WRITE8_HANDLER( hvymetal_videomode_w )
+static WRITE8_HANDLER( hvymetal_videomode_w )
 {
 	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
 	system1_videomode_w(0, data);
 }
 
-WRITE8_HANDLER( brain_videomode_w )
+static WRITE8_HANDLER( brain_videomode_w )
 {
 	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
 	system1_videomode_w(0, data);
 }
 
-WRITE8_HANDLER( chplft_videomode_w )
+static WRITE8_HANDLER( chplft_videomode_w )
 {
 	memory_set_bank(1, (data & 0x0c)>>2);
 	system1_videomode_w(0, data);
 }
 
 
-WRITE8_HANDLER( system1_soundport_w )
+static WRITE8_HANDLER( system1_soundport_w )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
@@ -4585,22 +4585,22 @@ static DRIVER_INIT( ufosensi )  { mc8123_decrypt_rom(0, memory_region(REGION_USE
 
 static UINT8 dakkochn_control;
 
-READ8_HANDLER( dakkochn_port_00_r )
+static READ8_HANDLER( dakkochn_port_00_r )
 {
 	return 0x00;
 }
 
-READ8_HANDLER( dakkochn_port_03_r )
+static READ8_HANDLER( dakkochn_port_03_r )
 {
 	return 0x00;
 }
 
-READ8_HANDLER( dakkochn_port_04_r )
+static READ8_HANDLER( dakkochn_port_04_r )
 {
 	return 0x00;
 }
 
-WRITE8_HANDLER( dakkochn_port_15_w )
+static WRITE8_HANDLER( dakkochn_port_15_w )
 {
 	dakkochn_control = data; // check if any control multiplex bits are in here!
 	chplft_videomode_w(offset,data);

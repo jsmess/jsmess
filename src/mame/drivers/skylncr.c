@@ -67,7 +67,7 @@ static TILEMAP_MAPPER( skylncr_tilemap_scan_pages )
 			(row % TILES_PER_PAGE_Y) * TILES_PER_PAGE_X;
 }
 
-VIDEO_START( skylncr )
+static VIDEO_START( skylncr )
 {
 
 	tmap = tilemap_create(	get_tile_info, tilemap_scan_rows,
@@ -81,7 +81,7 @@ VIDEO_START( skylncr )
 	tilemap_set_transparent_pen(tmap2, 0);
 }
 
-VIDEO_UPDATE( skylncr )
+static VIDEO_UPDATE( skylncr )
 {
 	fillbitmap(bitmap,machine->pens[0],cliprect);
 	tilemap_draw(bitmap,cliprect, tmap2, 0, 0);

@@ -35,12 +35,12 @@ To Do:
 ***************************************************************************/
 
 static UINT16 eeprom_word;
-READ16_HANDLER(galpani2_eeprom_r)
+static READ16_HANDLER(galpani2_eeprom_r)
 {
 	return (eeprom_word & ~1) | (EEPROM_read_bit() & 1);
 }
 
-WRITE16_HANDLER(galpani2_eeprom_w)
+static WRITE16_HANDLER(galpani2_eeprom_w)
 {
 	COMBINE_DATA( &eeprom_word );
 	if ( ACCESSING_LSB )
@@ -183,7 +183,7 @@ static WRITE16_HANDLER( galpani2_mcu_nmi_w )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( galpani2_coin_lockout_w )
+static WRITE16_HANDLER( galpani2_coin_lockout_w )
 {
 	if (ACCESSING_MSB)
 	{
@@ -197,7 +197,7 @@ WRITE16_HANDLER( galpani2_coin_lockout_w )
 	}
 }
 
-WRITE16_HANDLER( galpani2_oki_0_bank_w )
+static WRITE16_HANDLER( galpani2_oki_0_bank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -207,7 +207,7 @@ WRITE16_HANDLER( galpani2_oki_0_bank_w )
 	}
 }
 
-WRITE16_HANDLER( galpani2_oki_1_bank_w )
+static WRITE16_HANDLER( galpani2_oki_1_bank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -282,7 +282,7 @@ ADDRESS_MAP_END
 
 static UINT16 *galpani2_rombank;
 
-READ16_HANDLER( galpani2_bankedrom_r )
+static READ16_HANDLER( galpani2_bankedrom_r )
 {
 	UINT16 *ROM = (UINT16 *) memory_region( REGION_USER1 );
 	size_t    len = memory_region_length( REGION_USER1 ) / 2;

@@ -206,7 +206,7 @@ INTERRUPT_GEN( hyprduel_interrupt )
 	update_irq_state();
 }
 
-MACHINE_RESET( hyprduel )
+static MACHINE_RESET( hyprduel )
 {
 	/* start with cpu2 halted */
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
@@ -228,7 +228,7 @@ MACHINE_RESET( hyprduel )
 
 static UINT16 *hyprduel_rombank;
 
-READ16_HANDLER( hyprduel_bankedrom_r )
+static READ16_HANDLER( hyprduel_bankedrom_r )
 {
 	const int region = REGION_GFX1;
 

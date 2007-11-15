@@ -159,7 +159,7 @@ static READ16_HANDLER( shared_ram_r )
  *
  *************************************/
 
-READ16_HANDLER( thunderj_video_control_r )
+static READ16_HANDLER( thunderj_video_control_r )
 {
 	/* Sigh. CPU #1 reads the video controller register twice per frame, once at
        the beginning of interrupt and once near the end. It stores these values in a

@@ -252,13 +252,13 @@ static WRITE8_HANDLER( z80_irq_w )
 	cpunum_set_input_line_and_vector( 1, 0, HOLD_LINE, 0xff );
 }
 
-READ8_HANDLER( vendetta_sound_interrupt_r )
+static READ8_HANDLER( vendetta_sound_interrupt_r )
 {
 	cpunum_set_input_line_and_vector( 1, 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
-READ8_HANDLER( vendetta_sound_r )
+static READ8_HANDLER( vendetta_sound_r )
 {
 	return K053260_0_r(2 + offset);
 }

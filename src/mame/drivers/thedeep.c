@@ -36,7 +36,7 @@ Notes:
 
 static int nmi_enable;
 
-WRITE8_HANDLER( thedeep_nmi_w )
+static WRITE8_HANDLER( thedeep_nmi_w )
 {
 	nmi_enable = data;
 }

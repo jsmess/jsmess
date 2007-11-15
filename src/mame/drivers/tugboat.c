@@ -34,7 +34,7 @@ static UINT8 hd46505_0_reg[18],hd46505_1_reg[18];
 
 /*  there isn't the usual resistor array anywhere near the color prom,
     just four 1k resistors. */
-PALETTE_INIT( tugboat )
+static PALETTE_INIT( tugboat )
 {
 	int i;
 
@@ -112,7 +112,7 @@ static void draw_tilemap(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
-VIDEO_UPDATE( tugboat )
+static VIDEO_UPDATE( tugboat )
 {
 	int startaddr0 = hd46505_0_reg[0x0c]*256 + hd46505_0_reg[0x0d];
 	int startaddr1 = hd46505_1_reg[0x0c]*256 + hd46505_1_reg[0x0d];
@@ -170,13 +170,13 @@ static TIMER_CALLBACK( interrupt_gen )
 	mame_timer_set(video_screen_get_frame_period(0), 0, interrupt_gen);
 }
 
-MACHINE_START( tugboat )
+static MACHINE_START( tugboat )
 {
 	pia_config(0, &pia0_intf);
 	pia_config(1, &pia1_intf);
 }
 
-MACHINE_RESET( tugboat )
+static MACHINE_RESET( tugboat )
 {
 	pia_reset();
 	mame_timer_set(video_screen_get_time_until_pos(0, 30*8+4, 0), 0, interrupt_gen);

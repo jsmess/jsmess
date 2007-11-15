@@ -109,12 +109,12 @@ static WRITE8_HANDLER( panic_sound_output_w )
 	#endif
 }
 
-WRITE8_HANDLER( panic_sound_output2_w )
+static WRITE8_HANDLER( panic_sound_output2_w )
 {
 	panic_sound_output_w(offset+15, data);
 }
 
-WRITE8_HANDLER( cosmicg_output_w )
+static WRITE8_HANDLER( cosmicg_output_w )
 {
 	static int march_select;
     static int gun_die_select;

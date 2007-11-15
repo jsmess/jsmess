@@ -46,11 +46,11 @@ MM63.10N
 UINT8* chinsan_video;
 UINT8 chinsan_port_select;
 
-VIDEO_START(chinsan)
+static VIDEO_START(chinsan)
 {
 }
 
-VIDEO_UPDATE(chinsan)
+static VIDEO_UPDATE(chinsan)
 {
 	int y,x, count;
 	count = 0;
@@ -102,7 +102,7 @@ static struct YM2203interface ym2203_interface =
 	ym_port_w2
 };
 
-WRITE8_HANDLER( chinsan_port00_w )
+static WRITE8_HANDLER( chinsan_port00_w )
 {
 
 	chinsan_port_select = data;
@@ -119,7 +119,7 @@ WRITE8_HANDLER( chinsan_port00_w )
 
 }
 
-READ8_HANDLER( chinsan_input_port_0_r )
+static READ8_HANDLER( chinsan_input_port_0_r )
 {
 
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
@@ -151,7 +151,7 @@ READ8_HANDLER( chinsan_input_port_0_r )
 	return mame_rand(Machine);
 }
 
-READ8_HANDLER( chinsan_input_port_1_r )
+static READ8_HANDLER( chinsan_input_port_1_r )
 {
 	switch (chinsan_port_select)
 	{

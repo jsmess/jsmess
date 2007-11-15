@@ -87,7 +87,7 @@
  *
  *************************************/
 
-WRITE8_HANDLER( irobot_nvram_w )
+static WRITE8_HANDLER( irobot_nvram_w )
 {
 	generic_nvram[offset] = data & 0x0f;
 }

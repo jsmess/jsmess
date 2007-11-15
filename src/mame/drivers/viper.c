@@ -40,12 +40,12 @@
 static UINT8 backup_ram[0x2000];
 
 
-VIDEO_START(viper)
+static VIDEO_START(viper)
 {
 	voodoo_start(0, 0, VOODOO_3, 16, 16, 16);
 }
 
-VIDEO_UPDATE(viper)
+static VIDEO_UPDATE(viper)
 {
 	return voodoo_update(0, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }

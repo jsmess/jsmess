@@ -382,13 +382,13 @@
 
 static tilemap *bg_tilemap;
 
-WRITE8_HANDLER( pmpoker_videoram_w )
+static WRITE8_HANDLER( pmpoker_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( pmpoker_colorram_w )
+static WRITE8_HANDLER( pmpoker_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -413,19 +413,19 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
-VIDEO_START( pmpoker )
+static VIDEO_START( pmpoker )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 32, 29);
 }
 
-VIDEO_UPDATE( pmpoker )
+static VIDEO_UPDATE( pmpoker )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }
 
-PALETTE_INIT( pottnpkr )
+static PALETTE_INIT( pottnpkr )
 {
 /*  prom bits
     7654 3210

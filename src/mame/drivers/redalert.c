@@ -401,12 +401,12 @@ static const pia6821_interface pia_0_intf =
 	/*irqs   : A/B             */ 0, 0
 };
 
-MACHINE_START( demoneye )
+static MACHINE_START( demoneye )
 {
 	pia_config(0, &pia_0_intf);
 }
 
-MACHINE_RESET( demoneye )
+static MACHINE_RESET( demoneye )
 {
 	pia_reset();
 }

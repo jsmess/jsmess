@@ -378,7 +378,7 @@ GFXDECODE_END
 //****************************************************************************
 // Hardware Definitions
 
-MACHINE_RESET( bwing )
+static MACHINE_RESET( bwing )
 {
 	bwp3_nmimask = 0;
 	fftail = ffhead = ffcount = 0;

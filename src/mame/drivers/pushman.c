@@ -125,7 +125,7 @@ static WRITE8_HANDLER( pushman_68000_w )
 	shared_ram[offset]=data;
 }
 
-MACHINE_RESET( bballs )
+static MACHINE_RESET( bballs )
 {
 	latch=0x400;
 }

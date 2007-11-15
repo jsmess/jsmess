@@ -1,16 +1,16 @@
-static void draw_scanline_normal(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void draw_scanline_normal(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	const cached_texture *texture = extra->texture;
 	mame_bitmap *destmap = dest;
 	UINT16 *p = BITMAP_ADDR16(destmap, scanline, 0);
 	UINT32 *d = BITMAP_ADDR32(zbuffer, scanline, 0);
-	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
-	float uoz = poly_param_tri_value(extent->startx, scanline, 1, poly);
-	float voz = poly_param_tri_value(extent->startx, scanline, 2, poly);
-	float doozdx = poly->param[0].dpdx;
-	float duozdx = poly->param[1].dpdx;
-	float dvozdx = poly->param[2].dpdx;
+	float ooz = extent->param[0].start;
+	float uoz = extent->param[1].start;
+	float voz = extent->param[2].start;
+	float doozdx = extent->param[0].dpdx;
+	float duozdx = extent->param[1].dpdx;
+	float dvozdx = extent->param[2].dpdx;
 	UINT32 polyi = extra->polygon_intensity;
 	UINT32 umask = (((extra->texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
 	UINT32 vmask = (((extra->texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
@@ -47,19 +47,19 @@ static void draw_scanline_normal(void *dest, INT32 scanline, const tri_extent *e
 	}
 }
 
-static void draw_scanline_trans(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void draw_scanline_trans(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	const cached_texture *texture = extra->texture;
 	mame_bitmap *destmap = dest;
 	UINT16 *p = BITMAP_ADDR16(destmap, scanline, 0);
 	UINT32 *d = BITMAP_ADDR32(zbuffer, scanline, 0);
-	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
-	float uoz = poly_param_tri_value(extent->startx, scanline, 1, poly);
-	float voz = poly_param_tri_value(extent->startx, scanline, 2, poly);
-	float doozdx = poly->param[0].dpdx;
-	float duozdx = poly->param[1].dpdx;
-	float dvozdx = poly->param[2].dpdx;
+	float ooz = extent->param[0].start;
+	float uoz = extent->param[1].start;
+	float voz = extent->param[2].start;
+	float doozdx = extent->param[0].dpdx;
+	float duozdx = extent->param[1].dpdx;
+	float dvozdx = extent->param[2].dpdx;
 	UINT32 polyi = (extra->polygon_intensity * extra->polygon_transparency) >> 5;
 	int desttrans = 32 - extra->polygon_transparency;
 	UINT32 umask = (((extra->texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
@@ -102,19 +102,19 @@ static void draw_scanline_trans(void *dest, INT32 scanline, const tri_extent *ex
 }
 
 
-static void draw_scanline_alpha(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void draw_scanline_alpha(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	const cached_texture *texture = extra->texture;
 	mame_bitmap *destmap = dest;
 	UINT16 *p = BITMAP_ADDR16(destmap, scanline, 0);
 	UINT32 *d = BITMAP_ADDR32(zbuffer, scanline, 0);
-	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
-	float uoz = poly_param_tri_value(extent->startx, scanline, 1, poly);
-	float voz = poly_param_tri_value(extent->startx, scanline, 2, poly);
-	float doozdx = poly->param[0].dpdx;
-	float duozdx = poly->param[1].dpdx;
-	float dvozdx = poly->param[2].dpdx;
+	float ooz = extent->param[0].start;
+	float uoz = extent->param[1].start;
+	float voz = extent->param[2].start;
+	float doozdx = extent->param[0].dpdx;
+	float duozdx = extent->param[1].dpdx;
+	float dvozdx = extent->param[2].dpdx;
 	UINT32 polyi = (extra->polygon_intensity * extra->polygon_transparency) >> 5;
 	int desttrans = 32 - extra->polygon_transparency;
 	UINT32 umask = (((extra->texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
@@ -160,19 +160,19 @@ static void draw_scanline_alpha(void *dest, INT32 scanline, const tri_extent *ex
 }
 
 
-static void draw_scanline_alpha_test(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void draw_scanline_alpha_test(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	const cached_texture *texture = extra->texture;
 	mame_bitmap *destmap = dest;
 	UINT16 *p = BITMAP_ADDR16(destmap, scanline, 0);
 	UINT32 *d = BITMAP_ADDR32(zbuffer, scanline, 0);
-	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
-	float uoz = poly_param_tri_value(extent->startx, scanline, 1, poly);
-	float voz = poly_param_tri_value(extent->startx, scanline, 2, poly);
-	float doozdx = poly->param[0].dpdx;
-	float duozdx = poly->param[1].dpdx;
-	float dvozdx = poly->param[2].dpdx;
+	float ooz = extent->param[0].start;
+	float uoz = extent->param[1].start;
+	float voz = extent->param[2].start;
+	float doozdx = extent->param[0].dpdx;
+	float duozdx = extent->param[1].dpdx;
+	float dvozdx = extent->param[2].dpdx;
 	UINT32 polyi = (extra->polygon_intensity * extra->polygon_transparency) >> 5;
 	int desttrans = 32 - extra->polygon_transparency;
 	UINT32 umask = (((extra->texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
@@ -220,15 +220,14 @@ static void draw_scanline_alpha_test(void *dest, INT32 scanline, const tri_exten
 	}
 }
 
-
-static void draw_scanline_color(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void draw_scanline_color(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	mame_bitmap *destmap = dest;
 	UINT16 *p = BITMAP_ADDR16(destmap, scanline, 0);
 	UINT32 *d = BITMAP_ADDR32(zbuffer, scanline, 0);
-	float ooz = poly_param_tri_value(extent->startx, scanline, 0, poly);
-	float doozdx = poly->param[0].dpdx;
+	float ooz = extent->param[0].start;
+	float doozdx = extent->param[0].dpdx;
 	int fr = extra->color & 0x7c00;
 	int fg = extra->color & 0x03e0;
 	int fb = extra->color & 0x001f;

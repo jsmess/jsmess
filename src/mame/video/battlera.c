@@ -96,6 +96,7 @@ WRITE8_HANDLER( HuC6270_register_w )
 
 /******************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( HuC6270_data_r )
 {
 	int result;
@@ -112,6 +113,7 @@ READ8_HANDLER( HuC6270_data_r )
 
 	return 0;
 }
+#endif
 
 WRITE8_HANDLER( HuC6270_data_w )
 {

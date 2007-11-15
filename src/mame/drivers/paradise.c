@@ -906,19 +906,19 @@ ROM_START( madballn ) /* Even numbered stages show topless models.  Is nudity co
 	ROM_LOAD( "s.u28",     0x00000, 0x80000, CRC(78f02584) SHA1(70542e126db73a573db9ef41399d3a07fb7ea94b) )
 ROM_END
 
-DRIVER_INIT (paradise)
+static DRIVER_INIT (paradise)
 {
 	paradise_sprite_inc = 0x20;
 }
 
 // Inverted flipscreen and sprites are packed in less memory (same number though)
-DRIVER_INIT (tgtball)
+static DRIVER_INIT (tgtball)
 {
 	paradise_sprite_inc = 4;
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
 }
 
-DRIVER_INIT (torus)
+static DRIVER_INIT (torus)
 {
 	paradise_sprite_inc = 4;
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x2070, 0x2070, 0, 0, torus_coin_counter_w);

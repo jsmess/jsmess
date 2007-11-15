@@ -657,7 +657,7 @@ logerror("%05x: HD63484 read register %02x\n",activecpu_get_pc(),regno);
 
 
 
-PALETTE_INIT( shanghai )
+static PALETTE_INIT( shanghai )
 {
 	int i;
 
@@ -687,12 +687,12 @@ PALETTE_INIT( shanghai )
 	}
 }
 
-VIDEO_START( shanghai )
+static VIDEO_START( shanghai )
 {
 	HD63484_start();
 }
 
-VIDEO_UPDATE( shanghai )
+static VIDEO_UPDATE( shanghai )
 {
 	int x,y,b;
 

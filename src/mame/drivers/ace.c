@@ -59,7 +59,7 @@ static READ8_HANDLER( ace_objpos_r )
 }
 #endif
 
-VIDEO_UPDATE( ace )
+static VIDEO_UPDATE( ace )
 {
 	int offs;
 

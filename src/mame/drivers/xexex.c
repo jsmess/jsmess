@@ -74,8 +74,8 @@ VIDEO_START( xexex );
 VIDEO_UPDATE( xexex );
 void xexex_set_alpha(int on);
 
-MACHINE_START( xexex );
-MACHINE_RESET( xexex );
+static MACHINE_START( xexex );
+static MACHINE_RESET( xexex );
 
 static UINT16 *xexex_workram;
 static UINT16 cur_control2;
@@ -617,14 +617,14 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_LOAD( "067_b07.rom", 0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 ROM_END
 
-MACHINE_RESET( xexex )
+static MACHINE_RESET( xexex )
 {
 	cur_sound_region = 0;
 	suspension_active = 0;
 	K054539_init_flags(0, K054539_REVERSE_STEREO);
 }
 
-MACHINE_START( xexex )
+static MACHINE_START( xexex )
 {
 	state_save_register_global(cur_control2);
 	state_save_register_func_postload(parse_control2);

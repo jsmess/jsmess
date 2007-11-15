@@ -27,11 +27,11 @@ rom mapping is still wrong, correct this before anything else
 
 UINT8 *galaxia_video;
 
-VIDEO_START( galaxia )
+static VIDEO_START( galaxia )
 {
 }
 
-VIDEO_UPDATE( galaxia )
+static VIDEO_UPDATE( galaxia )
 {
 	int x,y, count;
 

@@ -375,23 +375,23 @@ logerror("68705 sends answer %02x\n",param);
 
 static UINT8 portA_in, portB_out, portC;
 
-READ8_HANDLER( hotsmash_68705_portA_r )
+static READ8_HANDLER( hotsmash_68705_portA_r )
 {
 //logerror("%04x: 68705 reads port A = %02x\n",activecpu_get_pc(),portA_in);
 	return portA_in;
 }
 
-WRITE8_HANDLER( hotsmash_68705_portB_w )
+static WRITE8_HANDLER( hotsmash_68705_portB_w )
 {
 	portB_out = data;
 }
 
-READ8_HANDLER( hotsmash_68705_portC_r )
+static READ8_HANDLER( hotsmash_68705_portC_r )
 {
 	return portC;
 }
 
-WRITE8_HANDLER( hotsmash_68705_portC_w )
+static WRITE8_HANDLER( hotsmash_68705_portC_w )
 {
 	portC = data;
 

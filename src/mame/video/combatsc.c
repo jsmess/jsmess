@@ -301,18 +301,18 @@ WRITE8_HANDLER( combasc_vreg_w )
 	}
 }
 
-WRITE8_HANDLER( combascb_sh_irqtrigger_w )
+static WRITE8_HANDLER( combascb_sh_irqtrigger_w )
 {
 	soundlatch_w(offset,data);
 	cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
 }
 
-READ8_HANDLER( combascb_io_r )
+static READ8_HANDLER( combascb_io_r )
 {
 	return readinputport(offset);
 }
 
-WRITE8_HANDLER( combascb_priority_w )
+static WRITE8_HANDLER( combascb_priority_w )
 {
 	priority = data & 0x20;
 }

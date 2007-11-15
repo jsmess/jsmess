@@ -23,7 +23,7 @@ VIDEO_UPDATE( dambustr );
 static int noise_data = 0;
 
 
-WRITE8_HANDLER( dambustr_noise_enable_w )
+static WRITE8_HANDLER( dambustr_noise_enable_w )
 {
 	if (data != noise_data) {
 		noise_data = data;
@@ -143,7 +143,7 @@ static GFXDECODE_START( dambustr )
 GFXDECODE_END
 
 
-DRIVER_INIT(dambustr)
+static DRIVER_INIT(dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];

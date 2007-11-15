@@ -155,26 +155,26 @@ void megadriv_z80_bank_w(UINT16 data)
 	}
 }
 
-WRITE16_HANDLER( megadriv_68k_z80_bank_write )
+static WRITE16_HANDLER( megadriv_68k_z80_bank_write )
 {
 	//logerror("%06x: 68k writing bit to bank register %01x\n", activecpu_get_pc(),data&0x01);
 	megadriv_z80_bank_w(data&0x01);
 }
 
-WRITE8_HANDLER(megadriv_z80_z80_bank_w)
+static WRITE8_HANDLER(megadriv_z80_z80_bank_w)
 {
 	//logerror("%04x: z80 writing bit to bank register %01x\n", activecpu_get_pc(),data&0x01);
 	megadriv_z80_bank_w(data&0x01);
 }
 
 
-READ16_HANDLER( megadriv_68k_check_z80_bus );
-WRITE16_HANDLER(megadriv_68k_req_z80_bus);
+static READ16_HANDLER( megadriv_68k_check_z80_bus );
+static WRITE16_HANDLER(megadriv_68k_req_z80_bus);
 
-READ16_HANDLER( megadriv_68k_read_z80_ram );
-WRITE16_HANDLER( megadriv_68k_write_z80_ram );
+static READ16_HANDLER( megadriv_68k_read_z80_ram );
+static WRITE16_HANDLER( megadriv_68k_write_z80_ram );
 
-WRITE16_HANDLER( megadriv_68k_req_z80_reset );
+static WRITE16_HANDLER( megadriv_68k_req_z80_reset );
 
 
 
@@ -895,7 +895,7 @@ void megadriv_vdp_ctrl_port_w(int data)
 	}
 }
 
-WRITE16_HANDLER( megadriv_vdp_w )
+static WRITE16_HANDLER( megadriv_vdp_w )
 {
 
 
@@ -1290,7 +1290,7 @@ UINT16 megadriv_read_hv_counters(void)
 
 }
 
-READ16_HANDLER( megadriv_vdp_r )
+static READ16_HANDLER( megadriv_vdp_r )
 {
 	UINT16 retvalue = 0;
 
@@ -1334,7 +1334,7 @@ READ16_HANDLER( megadriv_vdp_r )
 	return retvalue;
 }
 
-READ16_HANDLER( megadriv_68k_YM2612_read)
+static READ16_HANDLER( megadriv_68k_YM2612_read)
 {
 	//mame_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
@@ -1362,7 +1362,7 @@ READ16_HANDLER( megadriv_68k_YM2612_read)
 
 
 
-WRITE16_HANDLER( megadriv_68k_YM2612_write)
+static WRITE16_HANDLER( megadriv_68k_YM2612_write)
 {
 	//mame_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
@@ -1385,7 +1385,7 @@ WRITE16_HANDLER( megadriv_68k_YM2612_write)
 	}
 }
 
-READ8_HANDLER( megadriv_z80_YM2612_read )
+static READ8_HANDLER( megadriv_z80_YM2612_read )
 {
 	switch (offset)
 	{
@@ -1399,7 +1399,7 @@ READ8_HANDLER( megadriv_z80_YM2612_read )
 	return 0x00;
 }
 
-WRITE8_HANDLER( megadriv_z80_YM2612_write )
+static WRITE8_HANDLER( megadriv_z80_YM2612_write )
 {
 	//mame_printf_debug("megadriv_z80_YM2612_write %02x %02x\n",offset,data);
 	switch (offset)
@@ -1951,7 +1951,7 @@ UINT8 megadrive_io_read_sctrl_port(int portnum)
 }
 
 
-READ16_HANDLER( megadriv_68k_io_read )
+static READ16_HANDLER( megadriv_68k_io_read )
 {
 	UINT8 retdata;
 
@@ -2069,7 +2069,7 @@ void megadrive_io_write_sctrl_port(int portnum, UINT16 data)
 
 
 
-WRITE16_HANDLER( megadriv_68k_io_write )
+static WRITE16_HANDLER( megadriv_68k_io_write )
 {
 //  mame_printf_debug("IO Write #%02x data %04x mem_mask %04x\n",offset,data,mem_mask);
 
@@ -2167,7 +2167,7 @@ ADDRESS_MAP_END
 /* z80 sounds/sub CPU */
 
 
-READ16_HANDLER( megadriv_68k_read_z80_ram )
+static READ16_HANDLER( megadriv_68k_read_z80_ram )
 {
 	//mame_printf_debug("read z80 ram %04x\n",mem_mask);
 
@@ -2182,7 +2182,7 @@ READ16_HANDLER( megadriv_68k_read_z80_ram )
 	}
 }
 
-WRITE16_HANDLER( megadriv_68k_write_z80_ram )
+static WRITE16_HANDLER( megadriv_68k_write_z80_ram )
 {
 	//logerror("write z80 ram\n");
 
@@ -2209,7 +2209,7 @@ WRITE16_HANDLER( megadriv_68k_write_z80_ram )
 }
 
 
-READ16_HANDLER( megadriv_68k_check_z80_bus )
+static READ16_HANDLER( megadriv_68k_check_z80_bus )
 {
 	UINT16 retvalue;
 
@@ -2253,7 +2253,7 @@ READ16_HANDLER( megadriv_68k_check_z80_bus )
 }
 
 
-WRITE16_HANDLER( megadriv_68k_req_z80_bus )
+static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 {
 	/* Request the Z80 bus, allows 68k to read/write Z80 address space */
 	if (!ACCESSING_LSB) // byte access
@@ -2304,7 +2304,7 @@ WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	}
 }
 
-WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
+static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 {
 	if (!ACCESSING_LSB) // byte access
 	{
@@ -2379,7 +2379,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 }
 
 
-WRITE8_HANDLER( megadriv_z80_vdp_write )
+static WRITE8_HANDLER( megadriv_z80_vdp_write )
 {
 
 
@@ -2430,13 +2430,13 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 
 }
 
-READ8_HANDLER( megadriv_z80_vdp_read )
+static READ8_HANDLER( megadriv_z80_vdp_read )
 {
 	mame_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
 	return mame_rand(Machine);
 }
 
-READ8_HANDLER( megadriv_z80_unmapped_read )
+static READ8_HANDLER( megadriv_z80_unmapped_read )
 {
 	return 0xff;
 }
@@ -2472,7 +2472,7 @@ ADDRESS_MAP_END
 
 /****************************************** 32X related ******************************************/
 
-READ16_HANDLER( _32x_reg_r )
+static READ16_HANDLER( _32x_reg_r )
 {
 	return mame_rand(Machine);
 }
@@ -2480,22 +2480,22 @@ READ16_HANDLER( _32x_reg_r )
 UINT16 _32x_68k_comms[0x8];
 UINT16 _32x_palette[0x400/2];
 
-READ16_HANDLER( _32x_68k_comms_r )
+static READ16_HANDLER( _32x_68k_comms_r )
 {
 	return _32x_68k_comms[offset];
 }
 
-WRITE16_HANDLER(_32x_68k_comms_w)
+static WRITE16_HANDLER(_32x_68k_comms_w)
 {
 	_32x_68k_comms[offset] = data;
 }
 
-READ16_HANDLER( _32x_68k_palette_r )
+static READ16_HANDLER( _32x_68k_palette_r )
 {
 	return _32x_palette[offset];
 }
 
-WRITE16_HANDLER( _32x_68k_palette_w )
+static WRITE16_HANDLER( _32x_68k_palette_w )
 {
 	_32x_palette[offset] = data;
 }

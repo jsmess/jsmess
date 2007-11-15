@@ -667,7 +667,7 @@ ROM_END
 
 
 
-DRIVER_INIT( skyskipr )
+static DRIVER_INIT( skyskipr )
 {
 	UINT8 *buffer;
 	UINT8 *rom = memory_region(REGION_CPU1);
@@ -684,7 +684,7 @@ DRIVER_INIT( skyskipr )
 	}
 }
 
-DRIVER_INIT( popeye )
+static DRIVER_INIT( popeye )
 {
 	UINT8 *buffer;
 	UINT8 *rom = memory_region(REGION_CPU1);

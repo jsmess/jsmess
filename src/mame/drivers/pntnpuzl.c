@@ -158,13 +158,13 @@ static NVRAM_HANDLER( pntnpuzl )
 
 static UINT16 pntnpuzl_eeprom;
 
-READ16_HANDLER( pntnpuzl_eeprom_r )
+static READ16_HANDLER( pntnpuzl_eeprom_r )
 {
 	/* bit 11 is EEPROM data */
 	return (pntnpuzl_eeprom & 0xf4ff) | (EEPROM_read_bit()<<11) | (readinputport(3) & 0x0300);
 }
 
-WRITE16_HANDLER( pntnpuzl_eeprom_w )
+static WRITE16_HANDLER( pntnpuzl_eeprom_w )
 {
 	pntnpuzl_eeprom = data;
 
@@ -183,12 +183,12 @@ WRITE16_HANDLER( pntnpuzl_eeprom_w )
 UINT16* pntnpuzl_3a0000ram;
 UINT16* pntnpuzl_bank;
 /* vid */
-VIDEO_START( pntnpuzl )
+static VIDEO_START( pntnpuzl )
 {
 	pntnpuzl_3a0000ram=auto_malloc(0x100000);
 }
 
-VIDEO_UPDATE( pntnpuzl )
+static VIDEO_UPDATE( pntnpuzl )
 {
 	int x,y;
 	int count;
@@ -248,7 +248,7 @@ VIDEO_UPDATE( pntnpuzl )
 	return 0;
 }
 
-WRITE16_HANDLER( pntnpuzl_palette_w )
+static WRITE16_HANDLER( pntnpuzl_palette_w )
 {
 	static int indx,sub,rgb[3];
 
@@ -271,24 +271,26 @@ WRITE16_HANDLER( pntnpuzl_palette_w )
 
 
 
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER ( pntnpuzl_random_r )
 {
 	return mame_rand(Machine);
 }
+#endif
 
-READ16_HANDLER( pntnpuzl_vid_r )
+static READ16_HANDLER( pntnpuzl_vid_r )
 {
 //  logerror("read_videoram: pc = %06x : offset %04x reg %04x\n",activecpu_get_pc(),offset*2, pntnpuzl_bank[0]);
 	return pntnpuzl_3a0000ram[offset+ (pntnpuzl_bank[0]&0x0001)*0x8000 ];
 }
 
-WRITE16_HANDLER( pntnpuzl_vid_w )
+static WRITE16_HANDLER( pntnpuzl_vid_w )
 {
 //  logerror("write_to_videoram: pc = %06x : offset %04x data %04x reg %04x\n",activecpu_get_pc(),offset*2, data, pntnpuzl_bank[0]);
 	COMBINE_DATA(&pntnpuzl_3a0000ram[offset+ (pntnpuzl_bank[0]&0x0001)*0x8000 ]);
 }
 
-READ16_HANDLER( pntnpuzl_vblank_r )
+static READ16_HANDLER( pntnpuzl_vblank_r )
 {
 	return (readinputport(0) & 1) << 11;
 }
@@ -318,7 +320,7 @@ write                                     read
 */
 static UINT16 pntpzl_200000, serial, serial_out,read_count;
 
-WRITE16_HANDLER( pntnpuzl_200000_w )
+static WRITE16_HANDLER( pntnpuzl_200000_w )
 {
 // logerror("200000: %04x\n",data);
 	// bit 12: set to 1 when going to serial output to 280018
@@ -332,7 +334,7 @@ WRITE16_HANDLER( pntnpuzl_200000_w )
 	pntpzl_200000 = data;
 }
 
-WRITE16_HANDLER( pntnpuzl_280018_w )
+static WRITE16_HANDLER( pntnpuzl_280018_w )
 {
 // logerror("%04x: 280018: %04x\n",activecpu_get_pc(),data);
 	serial >>= 1;
@@ -340,7 +342,7 @@ WRITE16_HANDLER( pntnpuzl_280018_w )
 		serial |= 0x400;
 }
 
-READ16_HANDLER( pntnpuzl_280014_r )
+static READ16_HANDLER( pntnpuzl_280014_r )
 {
 	static int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
@@ -371,7 +373,7 @@ READ16_HANDLER( pntnpuzl_280014_r )
 	return res << 8;
 }
 
-READ16_HANDLER( pntnpuzl_28001a_r )
+static READ16_HANDLER( pntnpuzl_28001a_r )
 {
 	return 0x4c00;
 }

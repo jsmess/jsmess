@@ -208,12 +208,12 @@ static WRITE8_HANDLER( to_main_w )
 }
 
 
-READ8_HANDLER(nycaptor_sharedram_r)
+static READ8_HANDLER(nycaptor_sharedram_r)
 {
 	return nycaptor_sharedram[offset];
 }
 
-WRITE8_HANDLER(nycaptor_sharedram_w)
+static WRITE8_HANDLER(nycaptor_sharedram_w)
 {
 	nycaptor_sharedram[offset]=data;
 }

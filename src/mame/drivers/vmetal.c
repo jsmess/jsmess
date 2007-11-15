@@ -95,7 +95,7 @@ extern UINT16 *metro_videoregs;
 void metro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
 WRITE16_HANDLER( metro_paletteram_w );
 
-READ16_HANDLER ( varia_crom_read )
+static READ16_HANDLER ( varia_crom_read )
 {
 	/* game reads the cgrom, result is 7772, verified to be correct on the real board */
 
@@ -110,7 +110,7 @@ READ16_HANDLER ( varia_crom_read )
 }
 
 
-READ16_HANDLER ( varia_random )
+static READ16_HANDLER ( varia_random )
 {
 //  return mame_rand(Machine);  // dips etc.. weird
 	return 0xffff;
@@ -127,18 +127,18 @@ static void get_vmetal_tlookup(UINT16 data, UINT16 *tileno, UINT16 *color)
 }
 
 
-WRITE16_HANDLER( vmetal_texttileram_w )
+static WRITE16_HANDLER( vmetal_texttileram_w )
 {
 	COMBINE_DATA(&vmetal_texttileram[offset]);
 	tilemap_mark_tile_dirty(vmetal_texttilemap,offset);
 }
 
-WRITE16_HANDLER( vmetal_mid1tileram_w )
+static WRITE16_HANDLER( vmetal_mid1tileram_w )
 {
 	COMBINE_DATA(&vmetal_mid1tileram[offset]);
 	tilemap_mark_tile_dirty(vmetal_mid1tilemap,offset);
 }
-WRITE16_HANDLER( vmetal_mid2tileram_w )
+static WRITE16_HANDLER( vmetal_mid2tileram_w )
 {
 	COMBINE_DATA(&vmetal_mid2tileram[offset]);
 	tilemap_mark_tile_dirty(vmetal_mid2tilemap,offset);
@@ -395,7 +395,7 @@ static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 	SET_TILE_INFO(0, tile, color^0xf, TILE_FLIPYX(0x0));
 }
 
-VIDEO_START(varia)
+static VIDEO_START(varia)
 {
 	vmetal_texttilemap = tilemap_create(get_vmetal_texttilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      8, 8, 256,256);
 	vmetal_mid1tilemap = tilemap_create(get_vmetal_mid1tilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16,16, 256,256);
@@ -405,7 +405,7 @@ VIDEO_START(varia)
 	tilemap_set_transparent_pen(vmetal_mid2tilemap,0);
 }
 
-VIDEO_UPDATE(varia)
+static VIDEO_UPDATE(varia)
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	fillbitmap(priority_bitmap,0,cliprect);

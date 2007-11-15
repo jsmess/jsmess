@@ -202,7 +202,7 @@ void gpworld_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-VIDEO_UPDATE( gpworld )
+static VIDEO_UPDATE( gpworld )
 {
 	fillbitmap(bitmap, 0, cliprect);
 

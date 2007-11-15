@@ -71,12 +71,12 @@ extern PALETTE_INIT( tankbatt );
 extern VIDEO_START( tankbatt );
 extern VIDEO_UPDATE( tankbatt );
 
-WRITE8_HANDLER( tankbatt_led_w )
+static WRITE8_HANDLER( tankbatt_led_w )
 {
 	set_led_status(offset,data & 1);
 }
 
-READ8_HANDLER( tankbatt_in0_r )
+static READ8_HANDLER( tankbatt_in0_r )
 {
 	int val;
 
@@ -84,7 +84,7 @@ READ8_HANDLER( tankbatt_in0_r )
 	return ((val << (7-offset)) & 0x80);
 }
 
-READ8_HANDLER( tankbatt_in1_r )
+static READ8_HANDLER( tankbatt_in1_r )
 {
 	int val;
 
@@ -92,7 +92,7 @@ READ8_HANDLER( tankbatt_in1_r )
 	return ((val << (7-offset)) & 0x80);
 }
 
-READ8_HANDLER( tankbatt_dsw_r )
+static READ8_HANDLER( tankbatt_dsw_r )
 {
 	int val;
 
@@ -100,7 +100,7 @@ READ8_HANDLER( tankbatt_dsw_r )
 	return ((val << (7-offset)) & 0x80);
 }
 
-WRITE8_HANDLER( tankbatt_interrupt_enable_w )
+static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 {
 	tankbatt_nmi_enable = !data;
 	tankbatt_sound_enable = !data;
@@ -114,7 +114,7 @@ WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 //  interrupt_enable_w (offset, !data);
 }
 
-WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
+static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 {
 	tankbatt_nmi_enable = data;
 	if (data != 0)
@@ -125,13 +125,13 @@ WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 //  interrupt_enable_w (offset, data);
 }
 
-WRITE8_HANDLER( tankbatt_sh_expl_w )
+static WRITE8_HANDLER( tankbatt_sh_expl_w )
 {
 	if (tankbatt_sound_enable)
 		sample_start (1, 3, 0);
 }
 
-WRITE8_HANDLER( tankbatt_sh_engine_w )
+static WRITE8_HANDLER( tankbatt_sh_engine_w )
 {
 	if (tankbatt_sound_enable)
 	{
@@ -143,7 +143,7 @@ WRITE8_HANDLER( tankbatt_sh_engine_w )
 	else sample_stop (2);
 }
 
-WRITE8_HANDLER( tankbatt_sh_fire_w )
+static WRITE8_HANDLER( tankbatt_sh_fire_w )
 {
 	if (tankbatt_sound_enable)
 		sample_start (0, 0, 0);

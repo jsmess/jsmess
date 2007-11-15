@@ -59,7 +59,7 @@ static UINT16 *sprram;
 #define SPRITE_DATA_GRANULARITY 0x80
 
 
-VIDEO_UPDATE( srmp5 )
+static VIDEO_UPDATE( srmp5 )
 {
 	// sprite/tile flipping is not implemented
 	int x,y,address,xs,ys,height,width,xw,yw,sprite,xb,yb,sizex,sizey;

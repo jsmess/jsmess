@@ -141,7 +141,7 @@ int i8275FieldAttributeMode;
 int i8275CursorFormat;
 int i8275HorizontalRetrace;
 
-WRITE8_HANDLER (i8275_preg_w) //param reg
+static WRITE8_HANDLER (i8275_preg_w) //param reg
 {
 	switch(i8275Command)
 	{
@@ -255,14 +255,14 @@ WRITE8_HANDLER (i8275_preg_w) //param reg
 
 }
 
-READ8_HANDLER (i8275_preg_r) //param reg
+static READ8_HANDLER (i8275_preg_r) //param reg
 {
 
 
 	return 0;
 }
 
-WRITE8_HANDLER (i8275_creg_w) //comand reg
+static WRITE8_HANDLER (i8275_creg_w) //comand reg
 {
 	switch(data>>5)
 	{
@@ -300,7 +300,7 @@ WRITE8_HANDLER (i8275_creg_w) //comand reg
 	}
 }
 
-READ8_HANDLER (i8275_sreg_r) //status
+static READ8_HANDLER (i8275_sreg_r) //status
 {
 	return 0;
 }
@@ -457,7 +457,7 @@ INPUT_PORTS_END
 
 
 
-VIDEO_START(dwarfd)
+static VIDEO_START(dwarfd)
 {
 }
 
@@ -527,7 +527,7 @@ static void drawCrt(running_machine *machine, mame_bitmap *bitmap,const rectangl
 }
 
 
-VIDEO_UPDATE( dwarfd )
+static VIDEO_UPDATE( dwarfd )
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	drawCrt(machine,bitmap,cliprect);
@@ -655,7 +655,7 @@ static GFXDECODE_START( dwarfd )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout3, 0, 16 )
 GFXDECODE_END
 
-PALETTE_INIT(dwarfd)
+static PALETTE_INIT(dwarfd)
 {
 	int i;
 

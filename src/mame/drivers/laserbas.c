@@ -21,13 +21,13 @@
 static UINT8 *vram1,*vram2;
 static int vrambank=0;
 
-VIDEO_START(laserbas)
+static VIDEO_START(laserbas)
 {
 	vram1=auto_malloc(0x8000);
 	vram2=auto_malloc(0x8000);
 }
 
-VIDEO_UPDATE(laserbas)
+static VIDEO_UPDATE(laserbas)
 {
 	int x,y;
  	for(y=0;y<256;y++)

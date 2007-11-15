@@ -45,77 +45,6 @@ static UINT32	page = 0;
 
 
 
-
-/***************************************************************************
-
-  Convert the color PROMs into a more useable format.
-
-  Roller Jammer has two 32 bytes palette PROMs, connected to the RGB
-  output this way:
-
-  bit 7 -- 220 ohm resistor  -- \
-        -- 470 ohm resistor  -- | -- 470 ohm pulldown resistor -- BLUE
-
-        -- 220 ohm resistor  -- \
-        -- 470 ohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
-        -- 1  kohm resistor  -- /
-
-        -- 220 ohm resistor  -- \
-        -- 470 ohm resistor  -- | -- 470 ohm pulldown resistor -- RED
-  bit 0 -- 1  kohm resistor  -- /
-
-***************************************************************************/
-PALETTE_INIT( rjammer )
-{
-	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
-	static const int resistors_rg[3] = { 1000, 470, 220 };
-	static const int resistors_b [2] = { 470, 220 };
-	double weights_rg[3];
-	double weights_b[2];
-
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistors_rg,	weights_rg,	470,	0,
-			2,	resistors_b,	weights_b,	470,	0,
-			0,	0,	0,	0,	0	);
-
-	for (i = 0;i < machine->drv->total_colors;i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
-
-		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
-		/* blue component */
-		bit0 = (*color_prom >> 6) & 0x01;
-		bit1 = (*color_prom >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
-
-		palette_set_color(machine,i, MAKE_RGB(r,g,b));
-
-		color_prom++;
-	}
-
-
-	/* text: colors 0, 17-31 from PROM @16B */
-	for (i = 0; i < TOTAL_COLORS(0)/2; i++)
-	{
-		COLOR(0, 2*i + 0) = 0;		/* transparent "black" */
-		COLOR(0, 2*i + 1) = i+16;	/* /SOFF is on the A4 line */
-	}
-}
-
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -437,8 +366,8 @@ PALETTE_INIT( tubep )
 			for (c=0; c<2*6; c++)	out += weights_b[c] * bits_b[c];
 			b = (int)(out + 0.5);
 
-			//logerror("Calculate [%x:%x] (active resistors:r=%i g=%i b=%i) = ", i, shade, active_r, active_g, active_b);
-			//logerror("r:%3i g:%3i b:%3i\n",r,g,b );
+			/*logerror("Calculate [%x:%x] (active resistors:r=%i g=%i b=%i) = ", i, shade, active_r, active_g, active_b);*/
+			/*logerror("r:%3i g:%3i b:%3i\n",r,g,b );*/
 
 			palette_set_color(machine,32+i*0x40+sh, MAKE_RGB(r,g,b));
 		}
@@ -475,11 +404,11 @@ VIDEO_START( tubep )
 	state_save_register_global(page);
 }
 
+
 WRITE8_HANDLER( tubep_textram_w )
 {
 	tubep_textram[offset] = data;
 }
-
 
 
 WRITE8_HANDLER( tubep_background_romselect_w )
@@ -492,7 +421,6 @@ WRITE8_HANDLER( tubep_colorproms_A4_line_w )
 {
 	color_A4 = (data & 1)<<4;
 }
-
 
 
 WRITE8_HANDLER( tubep_background_a000_w )
@@ -650,17 +578,19 @@ WRITE8_HANDLER( tubep_sprite_control_w )
 	}
 }
 
-VIDEO_EOF( tubep )
+void tubep_vblank_end(void)
 {
-	/* clear displayed frame */
-	memset(spritemap+DISP*256*256, 0x0f, 256*256);
 	DISP = DISP ^ 1;
+	/* logerror("EOF: DISP after this is=%i, and clearing it now.\n", DISP); */
+	/* clear the new frame (the one that was (just) displayed)*/
+	memset(spritemap+DISP*256*256, 0x0f, 256*256);
 }
 
 
 VIDEO_UPDATE( tubep )
 {
 	int offs;
+	int DISP_ = DISP^1;
 
 	/* draw background ram */
 	{
@@ -669,7 +599,9 @@ VIDEO_UPDATE( tubep )
 		UINT32 h,v;
 		UINT8 * romBxx = memory_region(REGION_USER1) + 0x2000*background_romsel;
 
-		for (v = 2*8; v < 30*8; v++)	/* only for visible area */
+		/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
+
+		for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
 		{
 			UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
 			for (h = 0*8; h < 32*8; h++)
@@ -707,7 +639,7 @@ VIDEO_UPDATE( tubep )
 
 				sp_data2 = sp_data1;
 				sp_data1 = sp_data0;
-				sp_data0 = spritemap[ h + v*256 +(DISP*256*256) ];
+				sp_data0 = spritemap[ h + v*256 +(DISP_*256*256) ];
 				sel0 = 0;
 				if (sp_data0 != 0x0f)
 					sel0 = 1;
@@ -743,13 +675,17 @@ VIDEO_UPDATE( tubep )
 		sy = (offs/2) / 32;
 		//if (flipscreen[1]) sy = 31 - sy;
 
-		drawgfx(bitmap,machine->gfx[0],
+		if ((cliprect->min_y&(~0x07)) == 8*sy)
+		{
+			drawgfx(bitmap,machine->gfx[0],
 				tubep_textram[offs],
 				((tubep_textram[offs+1]) & 0x0f) | color_A4,
 				0,0, /*flipscreen[0],flipscreen[1],*/
 				8*sx,8*sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[0]);
+				cliprect, TRANSPARENCY_PEN, machine->pens[0]);
+		}
 	}
+
 
 	return 0;
 }
@@ -757,13 +693,80 @@ VIDEO_UPDATE( tubep )
 
 
 
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Roller Jammer has two 32 bytes palette PROMs, connected to the RGB
+  output this way:
+
+  bit 7 -- 220 ohm resistor  -- \
+        -- 470 ohm resistor  -- | -- 470 ohm pulldown resistor -- BLUE
+
+        -- 220 ohm resistor  -- \
+        -- 470 ohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
+        -- 1  kohm resistor  -- /
+
+        -- 220 ohm resistor  -- \
+        -- 470 ohm resistor  -- | -- 470 ohm pulldown resistor -- RED
+  bit 0 -- 1  kohm resistor  -- /
+
+***************************************************************************/
+
+PALETTE_INIT( rjammer )
+{
+	int i;
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+
+	static const int resistors_rg[3] = { 1000, 470, 220 };
+	static const int resistors_b [2] = { 470, 220 };
+	double weights_rg[3];
+	double weights_b[2];
+
+	compute_resistor_weights(0,	255,	-1.0,
+			3,	resistors_rg,	weights_rg,	470,	0,
+			2,	resistors_b,	weights_b,	470,	0,
+			0,	0,	0,	0,	0	);
+
+	for (i = 0;i < machine->drv->total_colors;i++)
+	{
+		int bit0,bit1,bit2,r,g,b;
+
+		/* red component */
+		bit0 = (*color_prom >> 0) & 0x01;
+		bit1 = (*color_prom >> 1) & 0x01;
+		bit2 = (*color_prom >> 2) & 0x01;
+		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		/* green component */
+		bit0 = (*color_prom >> 3) & 0x01;
+		bit1 = (*color_prom >> 4) & 0x01;
+		bit2 = (*color_prom >> 5) & 0x01;
+		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		/* blue component */
+		bit0 = (*color_prom >> 6) & 0x01;
+		bit1 = (*color_prom >> 7) & 0x01;
+		b = combine_2_weights(weights_b, bit0, bit1);
+
+		palette_set_color(machine,i, MAKE_RGB(r,g,b));
+
+		color_prom++;
+	}
+
+
+	/* text: colors 0, 17-31 from PROM @16B */
+	for (i = 0; i < TOTAL_COLORS(0)/2; i++)
+	{
+		COLOR(0, 2*i + 0) = 0;		/* transparent "black" */
+		COLOR(0, 2*i + 1) = i+16;	/* /SOFF is on the A4 line */
+	}
+}
 
 
 WRITE8_HANDLER( rjammer_background_LS377_w )
 {
 	ls377_data = data & 0xff;
 }
-
 
 
 WRITE8_HANDLER( rjammer_background_page_w )
@@ -775,6 +778,7 @@ WRITE8_HANDLER( rjammer_background_page_w )
 VIDEO_UPDATE( rjammer )
 {
 	int offs;
+	int DISP_ = DISP^1;
 
 	/* draw background ram */
 	{
@@ -790,7 +794,7 @@ VIDEO_UPDATE( rjammer )
 	/* especially read from ROM19C can be done once per 8 pixels*/
 	/* and the data could be bitswapped beforehand */
 
-		for (v = 2*8; v < 30*8; v++)	/* only for visible area */
+		for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
 		{
 			UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
 			UINT8 pal14h4_pin19;
@@ -811,7 +815,7 @@ VIDEO_UPDATE( rjammer )
 
 				sp_data2 = sp_data1;
 				sp_data1 = sp_data0;
-				sp_data0 = spritemap[ h + v*256 +(DISP*256*256) ];
+				sp_data0 = spritemap[ h + v*256 +(DISP_*256*256) ];
 				sel0 = 0;
 				if (sp_data0 != 0x0f)
 					sel0 = 1;
@@ -906,12 +910,15 @@ VIDEO_UPDATE( rjammer )
 		sy = (offs/2) / 32;
 		//if (flipscreen[1]) sy = 31 - sy;
 
-		drawgfx(bitmap,machine->gfx[0],
+		if ((cliprect->min_y&(~0x07)) == 8*sy)
+		{
+			drawgfx(bitmap,machine->gfx[0],
 				tubep_textram[offs],
 				(tubep_textram[offs+1]) & 0x0f,
 				0,0, /*flipscreen[0],flipscreen[1],*/
 				8*sx,8*sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[0]);
+				cliprect, TRANSPARENCY_PEN, machine->pens[0]);
+		}
 	}
 
 	return 0;

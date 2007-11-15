@@ -139,13 +139,13 @@ static void set_background_palette_intensity(running_machine *machine)
 }
 
 
-WRITE8_HANDLER( psychic5_bg_videoram_w )
+static WRITE8_HANDLER( psychic5_bg_videoram_w )
 {
 	psychic5_bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
-WRITE8_HANDLER( psychic5_fg_videoram_w )
+static WRITE8_HANDLER( psychic5_fg_videoram_w )
 {
 	psychic5_fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset / 2);

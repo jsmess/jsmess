@@ -65,7 +65,7 @@ static MACHINE_START( crbaloon )
 	state_save_register_global(val0a);
 }
 
-WRITE8_HANDLER( crbaloon_06_w )
+static WRITE8_HANDLER( crbaloon_06_w )
 {
 	val06 = data;
 
@@ -89,19 +89,19 @@ WRITE8_HANDLER( crbaloon_06_w )
 	discrete_sound_w(CRBALOON_LAUGH_EN, data & 0x40);
 }
 
-WRITE8_HANDLER( crbaloon_08_w )
+static WRITE8_HANDLER( crbaloon_08_w )
 {
 	val08 = data;
 
 	crbaloon_flipscreen_w(offset,data & 1);
 }
 
-WRITE8_HANDLER( crbaloon_0a_w )
+static WRITE8_HANDLER( crbaloon_0a_w )
 {
 	val0a = data;
 }
 
-READ8_HANDLER( crbaloon_IN2_r )
+static READ8_HANDLER( crbaloon_IN2_r )
 {
 	if (crbaloon_collision != 0)
 	{
@@ -121,7 +121,7 @@ logerror("PC %04x: %02x low\n",activecpu_get_pc(),offset);
 	}
 }
 
-READ8_HANDLER( crbaloon_IN3_r )
+static READ8_HANDLER( crbaloon_IN3_r )
 {
 	if (val08 & 0x02)
 		/* enable coin & start input? Wild guess!!! */
@@ -141,7 +141,7 @@ logerror("PC %04x: 03 low\n",activecpu_get_pc());
 }
 
 
-READ8_HANDLER( crbaloon_IN_r )
+static READ8_HANDLER( crbaloon_IN_r )
 {
 	switch (offset & 0x03)
 	{
@@ -161,7 +161,7 @@ READ8_HANDLER( crbaloon_IN_r )
 	return 0;
 }
 
-WRITE8_HANDLER( crbaloon_tone_w )
+static WRITE8_HANDLER( crbaloon_tone_w )
 {
 	discrete_sound_w(CRBALOON_MUSIC_DATA, data);
 }

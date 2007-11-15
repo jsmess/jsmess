@@ -223,7 +223,7 @@ static READ16_HANDLER( rom_3_r ) {return rom_3[offset];}
                                 Big Run
 **************************************************************************/
 
-WRITE16_HANDLER( bigrun_paletteram16_w )
+static WRITE16_HANDLER( bigrun_paletteram16_w )
 {
 	UINT16 word = COMBINE_DATA(&paletteram16[offset]);
 	int r = pal5bit(((word >> 11) & 0x1E ) | ((word >> 3) & 0x01));
@@ -295,7 +295,7 @@ ADDRESS_MAP_END
     bd000-bd3ff     bd000-bdfff     sprites
     bec00-befff     <               text        */
 
-WRITE16_HANDLER( cischeat_paletteram16_w )
+static WRITE16_HANDLER( cischeat_paletteram16_w )
 {
 	UINT16 word = COMBINE_DATA(&paletteram16[offset]);
 	int r = pal5bit(((word >> 11) & 0x1E ) | ((word >> 3) & 0x01));
@@ -363,7 +363,7 @@ ADDRESS_MAP_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-WRITE16_HANDLER( f1gpstar_paletteram16_w )
+static WRITE16_HANDLER( f1gpstar_paletteram16_w )
 {
 	UINT16 word = COMBINE_DATA(&paletteram16[offset]);
 	int r = pal5bit(((word >> 11) & 0x1E ) | ((word >> 3) & 0x01));
@@ -475,7 +475,7 @@ ADDRESS_MAP_END
                             Scud Hammer
 **************************************************************************/
 
-WRITE16_HANDLER( scudhamm_paletteram16_w )
+static WRITE16_HANDLER( scudhamm_paletteram16_w )
 {
 	int newword = COMBINE_DATA(&paletteram16[offset]);
 
@@ -523,7 +523,7 @@ READ16_HANDLER( scudhamm_motor_pos_r )
 
     Within $20 vblanks the motor must reach the target. */
 
-WRITE16_HANDLER( scudhamm_motor_command_w )
+static WRITE16_HANDLER( scudhamm_motor_command_w )
 {
 	COMBINE_DATA( &scudhamm_motor_command );
 }
@@ -540,7 +540,7 @@ READ16_HANDLER( scudhamm_analog_r )
     port (coins, tilt, buttons, select etc.) triggers the corresponding bit
     in this word. I mapped the 3 buttons to the first 3 led.
 */
-WRITE16_HANDLER( scudhamm_leds_w )
+static WRITE16_HANDLER( scudhamm_leds_w )
 {
 	if (ACCESSING_MSB)
 	{
@@ -561,12 +561,12 @@ WRITE16_HANDLER( scudhamm_leds_w )
     $FFFC during self test, $FFFF onwards.
     It could be audio(L/R) or layers(0/2) enable.
 */
-WRITE16_HANDLER( scudhamm_enable_w )
+static WRITE16_HANDLER( scudhamm_enable_w )
 {
 }
 
 
-WRITE16_HANDLER( scudhamm_oki_bank_w )
+static WRITE16_HANDLER( scudhamm_oki_bank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -830,7 +830,7 @@ ADDRESS_MAP_END
                                 Big Run
 **************************************************************************/
 
-WRITE16_HANDLER( bigrun_soundbank_w )
+static WRITE16_HANDLER( bigrun_soundbank_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -864,11 +864,11 @@ ADDRESS_MAP_END
                                 Cisco Heat
 **************************************************************************/
 
-WRITE16_HANDLER( cischeat_soundbank_0_w )
+static WRITE16_HANDLER( cischeat_soundbank_0_w )
 {
 	if (ACCESSING_LSB)	OKIM6295_set_bank_base(0, 0x40000 * (data & 1) );
 }
-WRITE16_HANDLER( cischeat_soundbank_1_w )
+static WRITE16_HANDLER( cischeat_soundbank_1_w )
 {
 	if (ACCESSING_LSB)	OKIM6295_set_bank_base(1, 0x40000 * (data & 1) );
 }
@@ -955,8 +955,8 @@ ADDRESS_MAP_END
 
 **************************************************************************/
 
-READ16_HANDLER ( f1gpstr2_io_r )	{ return megasys1_vregs[offset + 0x1000/2]; }
-WRITE16_HANDLER( f1gpstr2_io_w )	{ COMBINE_DATA(&megasys1_vregs[offset + 0x1000/2]); }
+static READ16_HANDLER ( f1gpstr2_io_r )	{ return megasys1_vregs[offset + 0x1000/2]; }
+static WRITE16_HANDLER( f1gpstr2_io_w )	{ COMBINE_DATA(&megasys1_vregs[offset + 0x1000/2]); }
 
 static ADDRESS_MAP_START( f1gpstr2_io_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM						)	// ROM
@@ -2120,7 +2120,7 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) )	// 000xxxxxxxxxxxxx
 ROM_END
 
-DRIVER_INIT( bigrun )
+static DRIVER_INIT( bigrun )
 {
 	/* Split ROMs */
 	rom_1 = (UINT16 *) memory_region(REGION_USER1);
@@ -2242,7 +2242,7 @@ ROM_START( cischeat )
 	ROM_LOAD( "ch9072.03",  0x000000, 0x040000, CRC(7e79151a) SHA1(5a305cff8600446be426641ce112208b379094b9) )
 ROM_END
 
-DRIVER_INIT( cischeat )
+static DRIVER_INIT( cischeat )
 {
 	/* Split ROMs */
 	rom_1 = (UINT16 *) (memory_region(REGION_USER1) + 0x00000);
@@ -2469,7 +2469,7 @@ ROM_START( f1gpstar )
 	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )	// FIXED BITS (000xxxxx000xxxx1)
 ROM_END
 
-DRIVER_INIT( f1gpstar )
+static DRIVER_INIT( f1gpstar )
 {
 	/* Split ROMs */
 	rom_1 = (UINT16 *) memory_region(REGION_USER1);
@@ -2684,7 +2684,7 @@ ROM_START( wildplt )
 	ROM_LOAD( "pr90015b.bin", 0x000000, 0x0100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )
 ROM_END
 
-DRIVER_INIT( wildplt )
+static DRIVER_INIT( wildplt )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
 

@@ -590,7 +590,7 @@ static WRITE16_HANDLER( hotchase_K051316_ctrl_1_w )
 	if (ACCESSING_LSB)      K051316_ctrl_1_w(offset, data & 0xff);
 }
 
-WRITE16_HANDLER( hotchase_soundlatch_w );
+static WRITE16_HANDLER( hotchase_soundlatch_w );
 
 static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -682,7 +682,7 @@ static WRITE8_HANDLER( multiply_w )
 
 ** sample playing ends when a byte with bit 7 set is reached **/
 
-WRITE8_HANDLER( wecleman_K00723216_bank_w )
+static WRITE8_HANDLER( wecleman_K00723216_bank_w )
 {
 	K007232_set_bank( 0, 0, ~data&1 );	//* (wecleman062gre)
 }
@@ -714,7 +714,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* 140001.b */
-WRITE16_HANDLER( hotchase_soundlatch_w )
+static WRITE16_HANDLER( hotchase_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -738,7 +738,7 @@ static struct K007232_interface hotchase_k007232_interface_3 =
 	REGION_SOUND3
 };
 
-WRITE8_HANDLER( hotchase_sound_control_w )
+static WRITE8_HANDLER( hotchase_sound_control_w )
 {
 	int reg[8];
 
@@ -1104,7 +1104,7 @@ static struct K007232_interface wecleman_k007232_interface =
 	REGION_SOUND1	/* but the 2 channels use different ROMs !*/
 };
 
-MACHINE_RESET( wecleman )
+static MACHINE_RESET( wecleman )
 {
 	K007232_set_bank( 0, 0, 1 );
 }
@@ -1305,7 +1305,7 @@ static void bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _1
 }
 
 /* Unpack sprites data and do some patching */
-DRIVER_INIT( wecleman )
+static DRIVER_INIT( wecleman )
 {
 	int i;
 	UINT8 *RAM;
@@ -1447,7 +1447,7 @@ void hotchase_sprite_decode( int num16_banks, int bank_size )
 }
 
 /* Unpack sprites data and do some patching */
-DRIVER_INIT( hotchase )
+static DRIVER_INIT( hotchase )
 {
 //  UINT16 *RAM1 = (UINT16) memory_region(REGION_CPU1); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test

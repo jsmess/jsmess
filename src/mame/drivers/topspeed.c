@@ -866,7 +866,7 @@ ROM_START( fullthrl )
 ROM_END
 
 
-DRIVER_INIT( topspeed )
+static DRIVER_INIT( topspeed )
 {
 //  taitosnd_setz80_soundcpu( 2 );
 

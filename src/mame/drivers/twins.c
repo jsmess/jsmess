@@ -91,12 +91,12 @@ static ADDRESS_MAP_START( twins_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
 ADDRESS_MAP_END
 
-VIDEO_START(twins)
+static VIDEO_START(twins)
 {
 	twins_pal = auto_malloc(0x100*2);
 }
 
-VIDEO_UPDATE(twins)
+static VIDEO_UPDATE(twins)
 {
 	int y,x,count;
 	int i;
@@ -194,12 +194,12 @@ MACHINE_DRIVER_END
 /* The second set has different palette hardware and a different port map */
 
 
-VIDEO_START(twinsa)
+static VIDEO_START(twinsa)
 {
 	twins_pal = auto_malloc(0x1000*2);
 }
 
-VIDEO_UPDATE(twinsa)
+static VIDEO_UPDATE(twinsa)
 {
 	int y,x,count;
 	int i;
@@ -229,14 +229,14 @@ VIDEO_UPDATE(twinsa)
 	return 0;
 }
 
-WRITE16_HANDLER( twinsa_port4_w )
+static WRITE16_HANDLER( twinsa_port4_w )
 {
 	twins_pal[paloff&0xfff] = data;
 	paloff++;
 //  printf("paloff %04x\n",paloff);
 }
 
-READ16_HANDLER( twinsa_unk_r )
+static READ16_HANDLER( twinsa_unk_r )
 {
 	return 0xffff;
 }

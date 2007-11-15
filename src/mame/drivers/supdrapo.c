@@ -29,17 +29,19 @@ A3-1J
 static tilemap *fg_tilemap;
 static UINT8 *char_bank;
 
-WRITE8_HANDLER( supdrapo_videoram_w )
+static WRITE8_HANDLER( supdrapo_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( supdrapo_char_bank_w )
 {
 	char_bank[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
+#endif
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_READ(MRA8_ROM)
@@ -247,12 +249,12 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO( 0, code, 0, 0);
 }
 
-VIDEO_START( supdrapo )
+static VIDEO_START( supdrapo )
 {
 	fg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
-VIDEO_UPDATE( supdrapo )
+static VIDEO_UPDATE( supdrapo )
 {
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 

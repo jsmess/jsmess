@@ -40,7 +40,7 @@ Notes:  Support is complete with the exception of the noise generator.
 static UINT8 coin_latch;  /* Active Low */
 static UINT8 just_been_reset;
 
-DRIVER_INIT( blockade )
+static DRIVER_INIT( blockade )
 {
 	coin_latch = 1;
 	just_been_reset = 0;
@@ -74,7 +74,7 @@ INTERRUPT_GEN( blockade_interrupt )
 	}
 }
 
-READ8_HANDLER( blockade_input_port_0_r )
+static READ8_HANDLER( blockade_input_port_0_r )
 {
     /* coin latch is bit 7 */
 
@@ -82,7 +82,7 @@ READ8_HANDLER( blockade_input_port_0_r )
     return (coin_latch<<7) | (temp);
 }
 
-WRITE8_HANDLER( blockade_coin_latch_w )
+static WRITE8_HANDLER( blockade_coin_latch_w )
 {
     if (data & 0x80)
     {

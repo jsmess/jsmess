@@ -113,13 +113,13 @@ static WRITE8_HANDLER( high_offset_w )
 	question_address = (question_address & 0x00ffff) | (offset << 16);
 }
 
-WRITE8_HANDLER( phrcraze_attr_w )
+static WRITE8_HANDLER( phrcraze_attr_w )
 {
 	phrcraze_attr[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-WRITE8_HANDLER( phrcraze_bg_w )
+static WRITE8_HANDLER( phrcraze_bg_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
@@ -729,12 +729,12 @@ static TILE_GET_INFO( get_tile_info_bg )
 }
 
 
-VIDEO_START( merit )
+static VIDEO_START( merit )
 {
 	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 }
 
-VIDEO_UPDATE( merit )
+static VIDEO_UPDATE( merit )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	return 0;
@@ -1189,27 +1189,27 @@ ROM_START( phrcrazs )
 ROM_END
 
 
-DRIVER_INIT( key_0 )
+static DRIVER_INIT( key_0 )
 {
 	decryption_key = 0;
 }
 
-DRIVER_INIT( key_2 )
+static DRIVER_INIT( key_2 )
 {
 	decryption_key = 2;
 }
 
-DRIVER_INIT( key_4 )
+static DRIVER_INIT( key_4 )
 {
 	decryption_key = 4;
 }
 
-DRIVER_INIT( key_5 )
+static DRIVER_INIT( key_5 )
 {
 	decryption_key = 5;
 }
 
-DRIVER_INIT( key_7 )
+static DRIVER_INIT( key_7 )
 {
 	decryption_key = 7;
 }

@@ -252,7 +252,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0,fgvideoram[tile_index],0,0);
 }
 
-VIDEO_START( dacholer )
+static VIDEO_START( dacholer )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,32,32);
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
@@ -292,7 +292,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE(dacholer)
+static VIDEO_UPDATE(dacholer)
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

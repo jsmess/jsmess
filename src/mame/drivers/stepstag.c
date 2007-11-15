@@ -110,10 +110,10 @@ static GFXDECODE_START( stepstag )
 
 GFXDECODE_END
 
-VIDEO_START(stepstag)
+static VIDEO_START(stepstag)
 {
 }
-VIDEO_UPDATE(stepstag)
+static VIDEO_UPDATE(stepstag)
 {
 
 	return 0;

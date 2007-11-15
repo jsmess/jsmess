@@ -137,7 +137,7 @@ bits(7:4) and bit(24)), X, and Y:
 #include "driver.h"
 #include "eminline.h"
 #include "profiler.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "video/rgbutil.h"
 #include "voodoo.h"
 #include "vooddefs.h"
@@ -232,10 +232,10 @@ static raster_info *find_rasterizer(voodoo_state *v, int texcount);
 static void dump_rasterizer_stats(voodoo_state *v);
 
 /* generic rasterizers */
-static void raster_fastfill(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
-static void raster_generic_0tmu(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
-static void raster_generic_1tmu(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
-static void raster_generic_2tmu(void *dest, INT32 scanline, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid);
+static void raster_fastfill(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
+static void raster_generic_0tmu(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
+static void raster_generic_1tmu(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
+static void raster_generic_2tmu(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 
 
 
@@ -4590,7 +4590,7 @@ static INT32 fastfill(voodoo_state *v)
 	int ex = (v->reg[clipLeftRight].u >> 0) & 0x3ff;
 	int sy = (v->reg[clipLowYHighY].u >> 16) & 0x3ff;
 	int ey = (v->reg[clipLowYHighY].u >> 0) & 0x3ff;
-	tri_extent extents[256];
+	poly_extent extents[64];
 	UINT16 dithermatrix[16];
 	UINT16 *drawbuf = NULL;
 	UINT32 pixels = 0;
@@ -5213,7 +5213,7 @@ static void dump_rasterizer_stats(voodoo_state *v)
     implementation of the 'fastfill' command
 -------------------------------------------------*/
 
-static void raster_fastfill(void *destbase, INT32 y, const tri_extent *extent, const poly_params *poly, const void *extradata, int threadid)
+static void raster_fastfill(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	voodoo_state *v = extra->state;

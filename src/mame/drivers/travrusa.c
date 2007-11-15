@@ -485,7 +485,7 @@ ROM_START( shtridra )
 	ROM_LOAD( "3.bpr",   0x0220, 0x0100, CRC(5db47092) SHA1(8e234ee88143755a4fd5ec86a03b55be5f9c5db8) )
 ROM_END
 
-DRIVER_INIT( motorace )
+static DRIVER_INIT( motorace )
 {
 	int A,j;
 	UINT8 *rom = memory_region(REGION_CPU1);

@@ -1351,7 +1351,7 @@ static void exidy_common_init(UINT8 palette[], UINT16 colortable[], UINT8 cmask,
 }
 
 
-DRIVER_INIT( sidetrac )
+static DRIVER_INIT( sidetrac )
 {
 	exidy_common_init(sidetrac_palette, exidy_1bpp_colortable, 0x00, 0x00);
 
@@ -1360,19 +1360,19 @@ DRIVER_INIT( sidetrac )
 }
 
 
-DRIVER_INIT( targ )
+static DRIVER_INIT( targ )
 {
 	exidy_common_init(targ_palette, exidy_1bpp_colortable, 0x00, 0x00);
 	targ_spec_flag = 1;
 }
 
 
-DRIVER_INIT( spectar )
+static DRIVER_INIT( spectar )
 {
 	exidy_common_init(spectar_palette, exidy_1bpp_colortable, 0x00, 0x00);
 }
 
-DRIVER_INIT( rallys )
+static DRIVER_INIT( rallys )
 {
 	exidy_common_init(spectar_palette, exidy_1bpp_colortable, 0x00, 0x00);
 
@@ -1383,7 +1383,7 @@ DRIVER_INIT( rallys )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5301, 0x5301, 0, 0, exidy_sprite2_ypos_w);
 }
 
-DRIVER_INIT( phantoma )
+static DRIVER_INIT( phantoma )
 {
 	exidy_common_init(spectar_palette, exidy_1bpp_colortable, 0x00, 0x00);
 
@@ -1399,19 +1399,19 @@ DRIVER_INIT( phantoma )
 }
 
 
-DRIVER_INIT( mtrap )
+static DRIVER_INIT( mtrap )
 {
 	exidy_common_init(NULL, exidy_1bpp_colortable, 0x14, 0x00);
 }
 
 
-DRIVER_INIT( venture )
+static DRIVER_INIT( venture )
 {
 	exidy_common_init(NULL, exidy_1bpp_colortable, 0x04, 0x04);
 }
 
 
-DRIVER_INIT( teetert )
+static DRIVER_INIT( teetert )
 {
 	exidy_common_init(NULL, exidy_1bpp_colortable, 0x0c, 0x0c);
 
@@ -1420,7 +1420,7 @@ DRIVER_INIT( teetert )
 }
 
 
-DRIVER_INIT( pepper2 )
+static DRIVER_INIT( pepper2 )
 {
 	exidy_common_init(NULL, exidy_2bpp_colortable, 0x14, 0x04);
 
@@ -1432,7 +1432,7 @@ DRIVER_INIT( pepper2 )
 }
 
 
-DRIVER_INIT( fax )
+static DRIVER_INIT( fax )
 {
 	exidy_common_init(NULL, exidy_2bpp_colortable, 0x04, 0x04);
 

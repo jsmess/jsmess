@@ -49,7 +49,7 @@ static UINT8 current_bank;
  *
  *************************************/
 
-MACHINE_RESET( starwars )
+static MACHINE_RESET( starwars )
 {
 	/* ESB-specific */
 	if (starwars_is_esb)
@@ -88,7 +88,7 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-READ8_HANDLER( esb_slapstic_r )
+static READ8_HANDLER( esb_slapstic_r )
 {
 	int result = slapstic_base[offset];
 	int new_bank = slapstic_tweak(offset);
@@ -103,7 +103,7 @@ READ8_HANDLER( esb_slapstic_r )
 }
 
 
-WRITE8_HANDLER( esb_slapstic_w )
+static WRITE8_HANDLER( esb_slapstic_w )
 {
 	int new_bank = slapstic_tweak(offset);
 

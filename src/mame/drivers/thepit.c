@@ -1035,7 +1035,7 @@ static READ8_HANDLER( rtriv_question_r )
 	return 0; // the value read from the configuration reads is discarded
 }
 
-DRIVER_INIT( rtriv )
+static DRIVER_INIT( rtriv )
 {
 	// Set-up the weirdest questions read ever done
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0, rtriv_question_r);

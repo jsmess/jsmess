@@ -307,7 +307,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 	SET_TILE_INFO(1,tileno,colour,0);
 }
 
-VIDEO_START( mwarr )
+static VIDEO_START( mwarr )
 {
 	bg_tilemap    = tilemap_create(get_bg_tile_info,   tilemap_scan_cols,TILEMAP_TYPE_PEN,      16, 16,64,16);
 	mlow_tilemap  = tilemap_create(get_mlow_tile_info, tilemap_scan_cols,TILEMAP_TYPE_PEN, 16, 16,64,16);
@@ -395,7 +395,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( mwarr )
+static VIDEO_UPDATE( mwarr )
 {
 	int i;
 

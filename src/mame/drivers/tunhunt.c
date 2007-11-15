@@ -70,7 +70,7 @@ extern VIDEO_UPDATE( tunhunt );
 
 UINT8 tunhunt_control;
 
-WRITE8_HANDLER( tunhunt_control_w )
+static WRITE8_HANDLER( tunhunt_control_w )
 {
 	/*
         0x01    coin counter#2  "right counter"

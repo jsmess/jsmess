@@ -106,13 +106,13 @@ void sprtmtch_update_irq(void)
 	cpunum_set_input_line_and_vector(0, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
-WRITE8_HANDLER( dynax_vblank_ack_w )
+static WRITE8_HANDLER( dynax_vblank_ack_w )
 {
 	dynax_vblank_irq = 0;
 	sprtmtch_update_irq();
 }
 
-WRITE8_HANDLER( dynax_blitter_ack_w )
+static WRITE8_HANDLER( dynax_blitter_ack_w )
 {
 	dynax_blitter_irq = 0;
 	sprtmtch_update_irq();
@@ -146,19 +146,19 @@ void jantouki_update_irq(void)
 	cpunum_set_input_line_and_vector(0, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
-WRITE8_HANDLER( jantouki_vblank_ack_w )
+static WRITE8_HANDLER( jantouki_vblank_ack_w )
 {
 	dynax_vblank_irq = 0;
 	jantouki_update_irq();
 }
 
-WRITE8_HANDLER( jantouki_blitter_ack_w )
+static WRITE8_HANDLER( jantouki_blitter_ack_w )
 {
 	dynax_blitter_irq = data;
 	jantouki_update_irq();
 }
 
-WRITE8_HANDLER( jantouki_blitter2_ack_w )
+static WRITE8_HANDLER( jantouki_blitter2_ack_w )
 {
 	dynax_blitter2_irq = data;
 	jantouki_update_irq();
@@ -192,7 +192,7 @@ INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
 	jantouki_sound_update_irq();
 }
 
-WRITE8_HANDLER( jantouki_sound_vblank_ack_w )
+static WRITE8_HANDLER( jantouki_sound_vblank_ack_w )
 {
 	dynax_sound_vblank_irq = 0;
 	jantouki_sound_update_irq();
@@ -654,7 +654,7 @@ static WRITE8_HANDLER( yarunara_rombank_w )
 	hnoridur_bank = data;
 }
 
-WRITE8_HANDLER( yarunara_flipscreen_w )
+static WRITE8_HANDLER( yarunara_flipscreen_w )
 {
 	dynax_flipscreen_w(0,(data&2)?1:0);
 }
@@ -849,12 +849,12 @@ UINT8 dynax_soundlatch_ack;
 UINT8 dynax_soundlatch_full;
 static UINT8 latch;
 
-READ8_HANDLER( jantouki_soundlatch_ack_r )
+static READ8_HANDLER( jantouki_soundlatch_ack_r )
 {
 	return (dynax_soundlatch_ack) ? 0x80 : 0;
 }
 
-WRITE8_HANDLER( jantouki_soundlatch_w )
+static WRITE8_HANDLER( jantouki_soundlatch_w )
 {
 	dynax_soundlatch_ack = 1;
 	dynax_soundlatch_full = 1;
@@ -863,7 +863,7 @@ WRITE8_HANDLER( jantouki_soundlatch_w )
 	jantouki_sound_update_irq();
 }
 
-READ8_HANDLER( jantouki_blitter_busy_r )
+static READ8_HANDLER( jantouki_blitter_busy_r )
 {
 	return 0;	// bit 0 & 1
 }
@@ -912,20 +912,20 @@ ADDRESS_MAP_END
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-WRITE8_HANDLER( jantouki_soundlatch_ack_w )
+static WRITE8_HANDLER( jantouki_soundlatch_ack_w )
 {
 	dynax_soundlatch_ack = data;
 	dynax_soundlatch_irq = 0;
 	jantouki_sound_update_irq();
 }
 
-READ8_HANDLER( jantouki_soundlatch_r )
+static READ8_HANDLER( jantouki_soundlatch_r )
 {
 	dynax_soundlatch_full = 0;
 	return latch;
 }
 
-READ8_HANDLER( jantouki_soundlatch_status_r )
+static READ8_HANDLER( jantouki_soundlatch_status_r )
 {
 	return (dynax_soundlatch_full) ? 0 : 0x80;
 }
@@ -5428,7 +5428,7 @@ ROM_START( mjreach )
 	ROM_RELOAD(          0x80000, 0x80000 )
 ROM_END
 
-DRIVER_INIT( mjreach )
+static DRIVER_INIT( mjreach )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
 }

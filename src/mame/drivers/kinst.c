@@ -206,7 +206,7 @@ static MACHINE_RESET( kinst )
  *
  *************************************/
 
-VIDEO_UPDATE( kinst )
+static VIDEO_UPDATE( kinst )
 {
 	int y;
 

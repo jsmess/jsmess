@@ -34,7 +34,7 @@ extern size_t goindol_bg_videoram_size;
 extern int goindol_char_bank;
 
 
-WRITE8_HANDLER( goindol_bankswitch_w )
+static WRITE8_HANDLER( goindol_bankswitch_w )
 {
 	int bankaddress;
 	UINT8 *RAM = memory_region(REGION_CPU1);
@@ -411,7 +411,7 @@ ROM_END
 
 
 
-DRIVER_INIT( goindol )
+static DRIVER_INIT( goindol )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 

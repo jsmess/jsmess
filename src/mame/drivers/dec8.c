@@ -409,7 +409,7 @@ static WRITE8_HANDLER( ghostb_bank_w )
 	flip_screen_set(data & 0x08);
 }
 
-WRITE8_HANDLER( csilver_control_w )
+static WRITE8_HANDLER( csilver_control_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 

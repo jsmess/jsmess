@@ -49,11 +49,11 @@ static WRITE8_HANDLER(ssingles_vram_w)
 	ssingles_vram[offset]=data;
 }
 
-VIDEO_START(ssingles)
+static VIDEO_START(ssingles)
 {
 }
 
-VIDEO_UPDATE(ssingles)
+static VIDEO_UPDATE(ssingles)
 {
 	int x,y;
 	int addr=0;

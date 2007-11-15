@@ -42,7 +42,8 @@ sprites.
 
 #include "driver.h"
 
-static int scroll1[4],scroll2[4];
+//static int scroll1[4];
+static int scroll2[4];
 static tilemap *dec8_pf0_tilemap,*dec8_pf1_tilemap,*dec8_fix_tilemap;
 static int dec8_pf0_control[0x20],dec8_pf1_control[0x20];
 static int gfx_mask,game_uses_priority;
@@ -147,10 +148,12 @@ WRITE8_HANDLER( srdarwin_videoram_w )
 	tilemap_mark_tile_dirty( dec8_fix_tilemap,offset );
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( dec8_scroll1_w )
 {
 	scroll1[offset]=data;
 }
+#endif
 
 WRITE8_HANDLER( dec8_scroll2_w )
 {

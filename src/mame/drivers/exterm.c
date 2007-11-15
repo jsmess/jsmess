@@ -115,13 +115,13 @@ static MACHINE_RESET( exterm )
  *
  *************************************/
 
-WRITE16_HANDLER( exterm_host_data_w )
+static WRITE16_HANDLER( exterm_host_data_w )
 {
 	tms34010_host_w(1, offset / TOWORD(0x00100000), data);
 }
 
 
-READ16_HANDLER( exterm_host_data_r )
+static READ16_HANDLER( exterm_host_data_r )
 {
 	return tms34010_host_r(1, offset / TOWORD(0x00100000));
 }
@@ -162,13 +162,13 @@ static UINT16 exterm_trackball_port_r(int which, UINT16 mem_mask)
 }
 
 
-READ16_HANDLER( exterm_input_port_0_r )
+static READ16_HANDLER( exterm_input_port_0_r )
 {
 	return exterm_trackball_port_r(0, mem_mask);
 }
 
 
-READ16_HANDLER( exterm_input_port_1_r )
+static READ16_HANDLER( exterm_input_port_1_r )
 {
 	return exterm_trackball_port_r(1, mem_mask);
 }
@@ -181,7 +181,7 @@ READ16_HANDLER( exterm_input_port_1_r )
  *
  *************************************/
 
-WRITE16_HANDLER( exterm_output_port_0_w )
+static WRITE16_HANDLER( exterm_output_port_0_w )
 {
 	/* All the outputs are activated on the rising edge */
 	static UINT16 last = 0;

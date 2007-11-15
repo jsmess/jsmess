@@ -162,14 +162,14 @@ static GFXDECODE_START( murogem )
 GFXDECODE_END
 
 
-PALETTE_INIT(murogem)
+static PALETTE_INIT(murogem)
 {}
 
-VIDEO_START(murogem)
+static VIDEO_START(murogem)
 {
 }
 
-VIDEO_UPDATE(murogem)
+static VIDEO_UPDATE(murogem)
 {
 	int xx,yy,count;
 	count = 0x000;

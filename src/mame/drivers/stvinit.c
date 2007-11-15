@@ -179,14 +179,14 @@ NVRAM_HANDLER( stv )
 */
 
 
-READ32_HANDLER( stv_speedup_r )
+static READ32_HANDLER( stv_speedup_r )
 {
 	if (activecpu_get_pc()==0x60154b4) cpu_spinuntil_int(); // bios menus..
 
 	return stv_workram_h[0x0335d0/4];
 }
 
-READ32_HANDLER( stv_speedup2_r )
+static READ32_HANDLER( stv_speedup2_r )
 {
 	if (activecpu_get_pc()==0x6013af0) cpu_spinuntil_int(); // for use in japan
 

@@ -50,11 +50,11 @@ Notes:
 static UINT16 *unkram;
 static UINT16 *mainram;
 
-VIDEO_START( gunpey )
+static VIDEO_START( gunpey )
 {
 }
 
-VIDEO_UPDATE( gunpey )
+static VIDEO_UPDATE( gunpey )
 {
 
 	return 0;

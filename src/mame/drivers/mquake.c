@@ -431,7 +431,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT(mquake)
+static DRIVER_INIT(mquake)
 {
 	static const amiga_machine_interface mquake_intf =
 	{

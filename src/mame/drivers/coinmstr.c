@@ -531,12 +531,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0,tile,color,0);
 }
 
-VIDEO_START( coinmstr )
+static VIDEO_START( coinmstr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8, 46, 64);
 }
 
-VIDEO_UPDATE( coinmstr )
+static VIDEO_UPDATE( coinmstr )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	return 0;
@@ -799,7 +799,7 @@ ROM_START( supnudg2 )
 	ROM_LOAD( "q20.bin",      0x98000, 0x8000, CRC(0845b450) SHA1(c373839ee1ad983e2df41cb22f625c14972372b0) )
 ROM_END
 
-DRIVER_INIT( coinmstr )
+static DRIVER_INIT( coinmstr )
 {
 	UINT8 *rom = memory_region(REGION_USER1);
 	int length = memory_region_length(REGION_USER1);

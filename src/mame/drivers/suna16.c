@@ -43,7 +43,7 @@ VIDEO_UPDATE( suna16 );
 
 ***************************************************************************/
 
-WRITE16_HANDLER( suna16_soundlatch_w )
+static WRITE16_HANDLER( suna16_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -53,7 +53,7 @@ WRITE16_HANDLER( suna16_soundlatch_w )
 }
 
 
-WRITE16_HANDLER( bssoccer_leds_w )
+static WRITE16_HANDLER( bssoccer_leds_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -67,7 +67,7 @@ WRITE16_HANDLER( bssoccer_leds_w )
 }
 
 
-WRITE16_HANDLER( uballoon_leds_w )
+static WRITE16_HANDLER( uballoon_leds_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -115,7 +115,7 @@ ADDRESS_MAP_END
                                 Ultra Balloon
 ***************************************************************************/
 
-WRITE16_HANDLER( uballoon_spriteram16_w )
+static WRITE16_HANDLER( uballoon_spriteram16_w )
 {
 	COMBINE_DATA( &spriteram16[offset] );
 }
@@ -931,7 +931,7 @@ ROM_START( uballoon )
 ROM_END
 
 
-DRIVER_INIT( uballoon )
+static DRIVER_INIT( uballoon )
 {
 	UINT16 *RAM = (UINT16 *) memory_region(REGION_CPU1);
 

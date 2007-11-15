@@ -1597,7 +1597,7 @@ static DRIVER_INIT( tigerh )
 
 }
 
-READ8_HANDLER( getstar_mcu_r )
+static READ8_HANDLER( getstar_mcu_r )
 {
 	/* pass the first check only */
 	return 0x76;
@@ -1614,7 +1614,7 @@ static DRIVER_INIT( getstarb )
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_e803_r );
 }
 
-READ8_HANDLER( gtstarba_port_0_read )
+static READ8_HANDLER( gtstarba_port_0_read )
 {
 	/* the bootleg has it's own 'protection' on startup? */
 	if (activecpu_get_pc()==0x6d1e) return 0;
@@ -1627,7 +1627,7 @@ READ8_HANDLER( gtstarba_port_0_read )
 	return 0;
 }
 
-READ8_HANDLER( gtstarba_dpram_r )
+static READ8_HANDLER( gtstarba_dpram_r )
 {
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
@@ -1646,7 +1646,7 @@ static DRIVER_INIT( gtstarba )
 
 static int slapfigh_prot_pos;
 
-READ8_HANDLER( slapfigh_mcu_r )
+static READ8_HANDLER( slapfigh_mcu_r )
 {
 	/* pass initial checks */
 	int protvalues[] = { 0xc7, 0x55, -1 };

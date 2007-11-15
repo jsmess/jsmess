@@ -359,7 +359,7 @@ static INTERRUPT_GEN( ertictac_interrupt )
 	}
 }
 
-PALETTE_INIT(ertictac)
+static PALETTE_INIT(ertictac)
 {
 	int c;
 

@@ -130,7 +130,7 @@ static WRITE16_HANDLER( K052109_word_noA12_w )
 	K052109_word_w(offset,data,mem_mask);
 }
 
-WRITE16_HANDLER( punkshot_K052109_word_w )
+static WRITE16_HANDLER( punkshot_K052109_word_w )
 {
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
@@ -290,12 +290,12 @@ static READ16_HANDLER( tmnt2_sound_r )
 	return K053260_0_r(2 + offset);
 }
 
-READ8_HANDLER( tmnt_sres_r )
+static READ8_HANDLER( tmnt_sres_r )
 {
 	return tmnt_soundlatch;
 }
 
-WRITE8_HANDLER( tmnt_sres_w )
+static WRITE8_HANDLER( tmnt_sres_w )
 {
 	/* bit 1 resets the UPD7795C sound chip */
 	upd7759_reset_w(0, data & 2);
@@ -1023,7 +1023,7 @@ static void tmnt2_put_word(UINT32 addr, UINT16 data)
 	else if (addr >= 0x104000/2 && addr <= 0x107fff/2) sunset_104000[addr-0x104000/2] = data;
 }
 
-WRITE16_HANDLER( tmnt2_1c0800_w )
+static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
 	UINT32 src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
@@ -1139,7 +1139,7 @@ WRITE16_HANDLER( tmnt2_1c0800_w )
 	tmnt2_put_word(dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
-WRITE16_HANDLER( tmnt2_1c0800_w )
+static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
     COMBINE_DATA( tmnt2_1c0800 + offset);
     if ( offset == 0x0008 && ( tmnt2_1c0800[0x8] & 0xff00 ) == 0x8200 )

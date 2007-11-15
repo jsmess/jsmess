@@ -496,20 +496,63 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 #define atomic_add32 _atomic_add32
 INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
-	register INT32 result;
+	register INT32 result = delta;
 
 	__asm__ __volatile__ (
-		" mov          %[delta],%[result] ;"
-		" lock ; xadd  %[result],%[ptr]   ;"
-		" add          %[delta],%[result] ;"
-	  : [ptr]    "+m"  (*ptr)
-	  , [result] "=&r" (result)
-	  : [delta]  "rmi" (delta)
+		" lock ; xadd  %[result], %[ptr] ;"
+	  : [ptr]    "+m" (*ptr)
+	  , [result] "+r" (result)
+	  :
 	  : "%cc"
 	);
 
-	return result;
+	return result + delta;
 }
 
+
+/*-------------------------------------------------
+    atomic_increment32 - atomically increment the
+    32-bit value in memory at 'ptr', returning the
+    final result.
+-------------------------------------------------*/
+
+#define atomic_increment32 _atomic_increment32
+INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
+{
+	register INT32 result = 1;
+
+	__asm__ __volatile__ (
+		" lock ; xadd  %[result], %[ptr] ;"
+	  : [ptr]    "+m" (*ptr)
+	  , [result] "+r" (result)
+	  :
+	  : "%cc"
+	);
+
+	return result + 1;
+}
+
+
+/*-------------------------------------------------
+    atomic_decrement32 - atomically decrement the
+    32-bit value in memory at 'ptr', returning the
+    final result.
+-------------------------------------------------*/
+
+#define atomic_decrement32 _atomic_decrement32
+INLINE INT32 _atomic_decrement32(INT32 volatile *ptr)
+{
+	register INT32 result = -1;
+
+	__asm__ __volatile__ (
+		" lock ; xadd  %[result], %[ptr] ;"
+	  : [ptr]    "+m" (*ptr)
+	  , [result] "+r" (result)
+	  :
+	  : "%cc"
+	);
+
+	return result - 1;
+}
 
 #endif /* __EIGCCX86__ */

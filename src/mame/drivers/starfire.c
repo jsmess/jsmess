@@ -78,7 +78,7 @@ static TIMER_CALLBACK( update_callback )
 }
 
 
-MACHINE_RESET( starfire )
+static MACHINE_RESET( starfire )
 {
 	mame_timer_set(video_screen_get_time_until_pos(0, 32 + SCANLINE_UPDATE_CHUNK - 1, 0), 32, update_callback);
 }

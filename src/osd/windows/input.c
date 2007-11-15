@@ -107,6 +107,7 @@ struct _mouse_state
 {
 	DIMOUSESTATE2			state;
 	mouse_state *			partner;
+	LONG					raw_x, raw_y, raw_z;
 };
 
 
@@ -270,7 +271,7 @@ static void rawinput_keyboard_enum(PRAWINPUTDEVICELIST device);
 static void rawinput_keyboard_update(HANDLE device, RAWKEYBOARD *data);
 static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device);
 static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data);
-static INT32 rawinput_mouse_axis_get_state(void *device_internal, void *item_internal);
+static void rawinput_mouse_poll(device_info *devinfo);
 
 // misc utilities
 static TCHAR *reg_query_string(HKEY key, const TCHAR *path);
@@ -1963,6 +1964,7 @@ static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device)
 	devinfo = rawinput_device_create(&mouse_list, device);
 	if (devinfo == NULL)
 		return;
+	devinfo->poll = rawinput_mouse_poll;
 
 	// allocate a second device for the gun (unless we are using the shared axis mode)
 	if (!lightgun_shared_axis_mode)
@@ -1986,7 +1988,7 @@ static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device)
 		const char *name = utf8_from_tstring(default_axis_name[axisnum]);
 
 		// add to the mouse device and optionally to the gun device as well
-		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, rawinput_mouse_axis_get_state);
+		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, generic_axis_get_state);
 		if (guninfo != NULL && axisnum < 2)
 			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, generic_axis_get_state);
 
@@ -2027,19 +2029,19 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 			// if we got relative data, update it as a mouse
 			if (!(data->usFlags & MOUSE_MOVE_ABSOLUTE))
 			{
-				devinfo->mouse.state.lX += data->lLastX * INPUT_RELATIVE_PER_PIXEL;
-				devinfo->mouse.state.lY += data->lLastY * INPUT_RELATIVE_PER_PIXEL;
+				devinfo->mouse.raw_x += data->lLastX * INPUT_RELATIVE_PER_PIXEL;
+				devinfo->mouse.raw_y += data->lLastY * INPUT_RELATIVE_PER_PIXEL;
 
 				// update zaxis
 				if (data->usButtonFlags & RI_MOUSE_WHEEL)
-					devinfo->mouse.state.lZ += (INT16)data->usButtonData * INPUT_RELATIVE_PER_PIXEL;
+					devinfo->mouse.raw_z += (INT16)data->usButtonData * INPUT_RELATIVE_PER_PIXEL;
 			}
 
 			// otherwise, update it as a lightgun
 			else
 			{
-				devinfo->mouse.state.lX = normalize_absolute_axis(data->lLastX, 0, 0xffff);
-				devinfo->mouse.state.lY = normalize_absolute_axis(data->lLastY, 0, 0xffff);
+				devinfo->mouse.raw_x = normalize_absolute_axis(data->lLastX, 0, 0xffff);
+				devinfo->mouse.raw_y = normalize_absolute_axis(data->lLastY, 0, 0xffff);
 
 				// also clear the polling function so win32_lightgun_poll isn't called
 				devinfo->poll = NULL;
@@ -2062,21 +2064,22 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 
 
 //============================================================
-//  rawinput_mouse_axis_get_state
+//  rawinput_mouse_poll
 //============================================================
 
-static INT32 rawinput_mouse_axis_get_state(void *device_internal, void *item_internal)
+static void rawinput_mouse_poll(device_info *devinfo)
 {
-	LONG *axisdata = item_internal;
-	INT32 result;
-
-	// return the current state, clearing the existing data to 0 since we accumulate deltas
 	poll_if_necessary();
+
+	// copy the accumulated raw state to the actual state
 	osd_lock_acquire(input_lock);
-	result = *axisdata;
-	*axisdata = 0;
+	devinfo->mouse.state.lX = devinfo->mouse.raw_x;
+	devinfo->mouse.state.lY = devinfo->mouse.raw_y;
+	devinfo->mouse.state.lZ = devinfo->mouse.raw_z;
+	devinfo->mouse.raw_x = 0;
+	devinfo->mouse.raw_y = 0;
+	devinfo->mouse.raw_z = 0;
 	osd_lock_release(input_lock);
-	return result;
 }
 
 

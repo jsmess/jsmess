@@ -117,7 +117,7 @@ static TILE_GET_INFO( get_pturn_bg_tile_info )
 	SET_TILE_INFO(1,tileno+bgbank*256,palno,0);
 }
 
-VIDEO_START(pturn)
+static VIDEO_START(pturn)
 {
 	pturn_fgmap = tilemap_create(get_pturn_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 	tilemap_set_transparent_pen(pturn_fgmap,0);
@@ -125,7 +125,7 @@ VIDEO_START(pturn)
 	tilemap_set_transparent_pen(pturn_bgmap,0);
 }
 
-VIDEO_UPDATE(pturn)
+static VIDEO_UPDATE(pturn)
 {
 	int offs;
 	int sx, sy;

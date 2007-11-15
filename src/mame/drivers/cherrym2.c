@@ -51,13 +51,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-VIDEO_START(cm2)
+static VIDEO_START(cm2)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
-VIDEO_UPDATE(cm2)
+static VIDEO_UPDATE(cm2)
 {
   tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

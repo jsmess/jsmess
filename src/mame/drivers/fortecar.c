@@ -30,10 +30,12 @@ static ADDRESS_MAP_START( fortecar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE(&fortecar_ram)
 ADDRESS_MAP_END
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( fortecar_read62 )
 {
 	return mame_rand(Machine);
 }
+#endif
 
 static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
@@ -112,11 +114,11 @@ static GFXDECODE_START( fortecar )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-VIDEO_START(fortecar)
+static VIDEO_START(fortecar)
 {
 }
 
-VIDEO_UPDATE(fortecar)
+static VIDEO_UPDATE(fortecar)
 {
 	int x,y,count;
 	count = 0;

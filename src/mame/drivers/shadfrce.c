@@ -96,7 +96,7 @@ WRITE16_HANDLER( shadfrce_bg0videoram_w );
 WRITE16_HANDLER( shadfrce_bg1videoram_w );
 
 
-WRITE16_HANDLER( shadfrce_flip_screen )
+static WRITE16_HANDLER( shadfrce_flip_screen )
 {
 	flip_screen_set(data & 0x01);
 }

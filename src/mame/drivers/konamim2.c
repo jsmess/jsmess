@@ -107,11 +107,11 @@ static UINT32 vdl1_address;
 static UINT32 irq_enable;
 static UINT32 irq_active;
 
-VIDEO_START( m2 )
+static VIDEO_START( m2 )
 {
 }
 
-VIDEO_UPDATE( m2 )
+static VIDEO_UPDATE( m2 )
 {
 	int i, j;
 

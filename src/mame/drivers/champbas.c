@@ -68,7 +68,7 @@ extern PALETTE_INIT( champbas );
 extern VIDEO_START( champbas );
 extern VIDEO_UPDATE( champbas );
 
-WRITE8_HANDLER( champbas_dac_w )
+static WRITE8_HANDLER( champbas_dac_w )
 {
 	DAC_signed_data_w(0,data<<2);
 }
@@ -84,7 +84,7 @@ static WRITE8_HANDLER( champbas_mcu_halt_w )
 }
 
 /* champbja another protection */
-READ8_HANDLER( champbja_alt_protection_r )
+static READ8_HANDLER( champbja_alt_protection_r )
 {
 	UINT8 data = 0;
 /*

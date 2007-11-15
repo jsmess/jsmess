@@ -121,7 +121,7 @@ static ppi8255_interface ppi8255_intf =
 	{ port_C_w },				/* Port C write */
 };
 
-MACHINE_RESET( iqblock )
+static MACHINE_RESET( iqblock )
 {
 	ppi8255_init(&ppi8255_intf);
 }

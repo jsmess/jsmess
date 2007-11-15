@@ -271,7 +271,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, videoram[tile_index], color, 0);
 }
 
-VIDEO_START( jollyjgr )
+static VIDEO_START( jollyjgr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
@@ -315,7 +315,7 @@ static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap)
 	}
 }
 
-VIDEO_UPDATE( jollyjgr )
+static VIDEO_UPDATE( jollyjgr )
 {
 	int offs;
 

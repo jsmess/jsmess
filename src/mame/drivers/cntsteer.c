@@ -37,7 +37,7 @@ static UINT8 *videoram2;
 static int flipscreen=0;
 static int bg_bank = 0;
 
-PALETTE_INIT( zerotrgt )
+static PALETTE_INIT( zerotrgt )
 {
 	int i;
 	for (i = 0;i < machine->drv->total_colors;i++)
@@ -79,7 +79,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, code + ((attr & 0x0f) << 8), ((attr & 0x70) >> 4)+colo, 0);
 }
 
-VIDEO_START( zerotrgt )
+static VIDEO_START( zerotrgt )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,       TILEMAP_TYPE_PEN,     16,16,64,64);
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows_flip_x,TILEMAP_TYPE_PEN, 8, 8,32,32);
@@ -151,7 +151,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 static int scrolly = 0, scrollx = 0, scrolly_hi = 0, rotation_x = 0, rotation_y = 0, rotation_sign = 0;
 
-VIDEO_UPDATE( zerotrgt )
+static VIDEO_UPDATE( zerotrgt )
 {
 static int rot2=0,zoom=0;
 static int scroll=0;
@@ -265,13 +265,13 @@ ui_draw_text(buf,50,8*6);
 }
 
 
-WRITE8_HANDLER( cntsteer_foreground_w )
+static WRITE8_HANDLER( cntsteer_foreground_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
 }
 
-WRITE8_HANDLER( cntsteer_background_w )
+static WRITE8_HANDLER( cntsteer_background_w )
 {
 	videoram2[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -706,7 +706,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-MACHINE_RESET( zerotrgt )
+static MACHINE_RESET( zerotrgt )
 {
 	nmimask = 0;
 }
@@ -957,7 +957,7 @@ static void init_cntsteer(void)
 }
 #endif
 
-DRIVER_INIT( zerotrgt )
+static DRIVER_INIT( zerotrgt )
 {
 	zerotrgt_rearrange_gfx(0x02000, 0x10000);
 }

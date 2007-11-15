@@ -608,7 +608,7 @@ static ppi8255_interface ppi8255_intf =
 	{ NULL,             NULL },				/* Port C write */
 };
 
-MACHINE_RESET( freekckb )
+static MACHINE_RESET( freekckb )
 {
 	ppi8255_init(&ppi8255_intf);
 }
