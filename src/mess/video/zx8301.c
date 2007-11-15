@@ -21,14 +21,14 @@ static TIMER_CALLBACK(zx8301_flash_tick)
 
 PALETTE_INIT( zx8301 )
 {
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00 );
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff );
-	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00 );
-	palette_set_color_rgb(machine, 3, 0x00, 0xff, 0xff );
-	palette_set_color_rgb(machine, 4, 0xff, 0x00, 0x00 );
-	palette_set_color_rgb(machine, 5, 0xff, 0x00, 0xff );
-	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00 );
-	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff );
+	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00 ); // black
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff ); // blue
+	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00 ); // red
+	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff ); // magenta
+	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00 ); // green
+	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff ); // cyan
+	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00 ); // yellow
+	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff ); // whit
 }
 
 WRITE8_HANDLER( zx8301_control_w )
@@ -63,7 +63,7 @@ static void zx8301_draw_screen(mame_bitmap *bitmap)
 					int blue = BIT(byte_low, 6);
 					int flash = BIT(byte_high, 6);
 
-					int color = (blue << 2) | (green << 1) | red;
+					int color = (green << 2) | (red << 1) | blue;
 
 					if (flash && zx8301.flash)
 					{
