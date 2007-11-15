@@ -40,7 +40,6 @@ PAL frame timing
 #include "video/smsvdp.h"
 #include "includes/sms.h"
 #include "video/generic.h"
-#include "cpu/z80/z80.h"
 
 #define IS_SMS1_VDP		( features & MODEL_315_5124 )
 #define IS_SMS2_VDP		( features & MODEL_315_5246 )
@@ -224,6 +223,13 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 	return (0);
 }
 
+static TIMER_CALLBACK(smsvdp_set_irq) {
+	irqState = 1;
+	if ( int_callback ) {
+		int_callback( ASSERT_LINE );
+	}
+}
+
 static TIMER_CALLBACK(smsvdp_display_callback)
 {
 	rectangle rec;
@@ -255,22 +261,18 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			if ( lineCountDownCounter == 0x00 ) {
 				lineCountDownCounter = reg[0x0A];
 				statusReg |= STATUS_HINT;
-				irqState = 1;
 				if ( reg[0x00] & 0x10 ) {
-					if ( int_callback ) {
-						int_callback( ASSERT_LINE );
-					}
+					/* Delay triggering of interrupt to allow software to read the status bit before the irq */
+					mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 				}
 			}
 
 		}
 		if ( vpos == vpos_limit + 1 ) {
 			statusReg |= STATUS_VINT;
-			irqState = 1;
 			if ( reg[0x01] & 0x20 ) {
-				if ( int_callback ) {
-					int_callback( ASSERT_LINE );
-				}
+				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
+				mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 			}
 		}
 		if ( video_skip_this_frame() ) {
@@ -303,11 +305,9 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		if ( lineCountDownCounter == 0x00 ) {
 			lineCountDownCounter = reg[0x0A];
 			statusReg |= STATUS_HINT;
-			irqState = 1;
 			if ( reg[0x00] & 0x10 ) {
-				if ( int_callback ) {
-					int_callback( ASSERT_LINE );
-				}
+				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
+				mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 			}
 		} else {
 			lineCountDownCounter -= 1;
