@@ -432,7 +432,7 @@ WRITE8_HANDLER(sms_vdp_data_w) {
 		break;
 	}
 
-	//buffer = data;
+	buffer = data;
 	addr += 1;
 }
 

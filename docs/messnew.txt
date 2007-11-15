@@ -26,6 +26,9 @@ System Driver Changes:
   interrupt is triggered and handled. Fixes hang in first level of
   Zool.  (bug #1419) [Wilbert Pol]
 
+- [GAMEGEAR/SMS] The internal video data buffer should hold the data written
+  to the data port.  (bug #1378 and bug #1418) [Wilbert Pol]
+
 - [ORIC] Fixed floppy interface detection.  [Dirk Best]
 
 - [PET] Updated to use MAME's CRTC6548 implementation.  [Wilbert Pol]
