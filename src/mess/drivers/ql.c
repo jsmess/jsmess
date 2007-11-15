@@ -16,14 +16,11 @@
 
 	TODO:
 
-	- get COMCTL from i8048 WR output
-	- IPC <-> ZX8302 communication
 	- correct frequency for RTC timer
 	- keyboard/joystick connections
 	- speaker sound
 	- accurate screen timings
 	- microdrive
-	- serial I/O
 
 */
 
@@ -43,6 +40,7 @@
 #define ZX8302_BAUD_300		0x06
 #define ZX8302_BAUD_75		0x07
 #define ZX8302_BAUD_MASK	0x07
+
 #define ZX8302_MODE_SER1	0x00
 #define ZX8302_MODE_SER2	0x08
 #define ZX8302_MODE_MDV		0x10
@@ -54,6 +52,8 @@
 #define ZX8302_INT_TRANSMIT		0x04
 #define ZX8302_INT_FRAME		0x08
 #define ZX8302_INT_EXTERNAL		0x10
+
+#define ZX8302_STATUS_BUFFER_FULL	0x02
 
 #define ZX8302_IPC_START	0
 #define ZX8302_IPC_STOP		5
@@ -72,11 +72,12 @@ static struct ZX8302
 	UINT8 irq;
 	UINT32 ctr;
 	UINT8 idr;
+	UINT8 status;
 	int ipc_bits, tx_bits;
 	int ser1_rxd, ser1_cts;
 	int ser2_txd, ser2_dtr;
 	int netout, netin;
-	int mdrdwl, mdselckn, mdseldn, erase, raw1, raw2;
+	int mdrdw, mdselck, mdseld, erase, raw1, raw2;
 } zx8302;
 
 static mame_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer;
@@ -84,7 +85,7 @@ static mame_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer;
 static void zx8302_interrupt(UINT8 line)
 {
 	zx8302.irq |= line;
-	//cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
+	cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
 }
 
 static void zx8302_txd(int level)
@@ -135,6 +136,7 @@ static TIMER_CALLBACK( zx8302_txd_tick )
 	case ZX8302_TXD_STOP2:
 		zx8302_txd(1);
 		zx8302.tx_bits = ZX8302_TXD_START;
+		zx8302.status &= ~ZX8302_STATUS_BUFFER_FULL;
 		zx8302_interrupt(ZX8302_INT_TRANSMIT); // TODO: when is the transmit interrupt triggered?
 		break;
 	}
@@ -238,7 +240,7 @@ static READ8_HANDLER( zx8302_status_r )
 		bit		description
 		
 		0		Network port
-		1		Microdrive buffer full
+		1		Transmit buffer full
 		2		
 		3		
 		4		SER1 DTR
@@ -248,7 +250,7 @@ static READ8_HANDLER( zx8302_status_r )
 
 	*/
 
-	return (zx8302.comdata << 7) | (zx8302.comctl << 6) | (zx8302.ser1_cts << 5)| (zx8302.ser2_dtr << 4);
+	return (zx8302.comdata << 7) | (zx8302.comctl << 6) | (zx8302.ser1_cts << 5)| (zx8302.ser2_dtr << 4) | (zx8302.status & 0x0f);
 }
 
 static WRITE8_HANDLER( zx8302_ipc_command_w )
@@ -320,6 +322,7 @@ static WRITE8_HANDLER( zx8302_data_w )
 	logerror("ZX8302 Data Write : %x\n", data);
 
 	zx8302.tdr = data;
+	zx8302.status |= ZX8302_STATUS_BUFFER_FULL;
 }
 
 static INTERRUPT_GEN( zx8302_int )
@@ -387,15 +390,15 @@ static WRITE8_HANDLER( ipc_port2_w )
 	case 0:
 		cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
 		cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
-		cpunum_set_input_line(0, MC68000_IRQ_7, ASSERT_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_7, HOLD_LINE);
 		break;
-	case 1:
+	case 1: // CTRL-ALT-7
 		cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
-		cpunum_set_input_line(0, MC68000_IRQ_5, ASSERT_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_5, HOLD_LINE);
 		cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
 		break;
 	case 2:
-		cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
+		cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
 		cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
 		cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
 		break;
@@ -484,9 +487,9 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM // onboard RAM
-	AM_RANGE(0x040000, 0x0bffff) AM_RAM // 512KB add-on RAM
+/*	AM_RANGE(0x040000, 0x0bffff) AM_RAM // 512KB add-on RAM
 	AM_RANGE(0x0c0000, 0x0dffff) AM_NOP // 8x16KB device slots
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM // add-on ROM
+	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM // add-on ROM*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -633,9 +636,9 @@ static MACHINE_START( ql )
 	state_save_register_global(zx8302.ser2_dtr);
 	state_save_register_global(zx8302.netout);
 	state_save_register_global(zx8302.netin);
-	state_save_register_global(zx8302.mdrdwl);
-	state_save_register_global(zx8302.mdselckn);
-	state_save_register_global(zx8302.mdseldn);
+	state_save_register_global(zx8302.mdrdw);
+	state_save_register_global(zx8302.mdselck);
+	state_save_register_global(zx8302.mdseld);
 	state_save_register_global(zx8302.erase);
 	state_save_register_global(zx8302.raw1);
 	state_save_register_global(zx8302.raw2);
@@ -704,35 +707,35 @@ MACHINE_DRIVER_END
 ROM_START( ql )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "js", "v1.10 (JS)" )
-	ROMX_LOAD( "ql.js 0000.ic33", 0x000000, 0x008000, CRC(1bbad3b8) SHA1(59fd4372771a630967ee102760f4652904d7d5fa), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
-    ROMX_LOAD( "ql.js 8000.ic34", 0x008000, 0x004000, CRC(c970800e) SHA1(b8c9203026a7de6a44bd0942ec9343e8b222cb41), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
+	ROMX_LOAD( "ql.js 0000.ic33", 0x000000, 0x008000, CRC(1bbad3b8) SHA1(59fd4372771a630967ee102760f4652904d7d5fa), ROM_BIOS(1) )
+    ROMX_LOAD( "ql.js 8000.ic34", 0x008000, 0x004000, CRC(c970800e) SHA1(b8c9203026a7de6a44bd0942ec9343e8b222cb41), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS( 1, "tb", "v1.0? (TB)" )
-	ROMX_LOAD( "tb.ic33", 0x000000, 0x008000, BAD_DUMP CRC(1c86d688) SHA1(7df8028e6671afc4ebd5f65bf6c2d6019181f239), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
-    ROMX_LOAD( "tb.ic34", 0x008000, 0x004000, BAD_DUMP CRC(de7f9669) SHA1(9d6bc0b794541a4cec2203256ae92c7e68d1011d), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
+	ROMX_LOAD( "tb.ic33", 0x000000, 0x008000, BAD_DUMP CRC(1c86d688) SHA1(7df8028e6671afc4ebd5f65bf6c2d6019181f239), ROM_BIOS(2) )
+    ROMX_LOAD( "tb.ic34", 0x008000, 0x004000, BAD_DUMP CRC(de7f9669) SHA1(9d6bc0b794541a4cec2203256ae92c7e68d1011d), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS( 2, "jm", "v1.03 (JM)" )
-	ROMX_LOAD( "ql.jm 0000.ic33", 0x000000, 0x008000, CRC(1f8e840a) SHA1(7929e716dfe88318bbe99e34f47d039957fe3cc0), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3) )
-    ROMX_LOAD( "ql.jm 8000.ic34", 0x008000, 0x004000, CRC(9168a2e9) SHA1(1e7c47a59fc40bd96dfefc2f4d86827c15f0199e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3) )
+	ROMX_LOAD( "ql.jm 0000.ic33", 0x000000, 0x008000, CRC(1f8e840a) SHA1(7929e716dfe88318bbe99e34f47d039957fe3cc0), ROM_BIOS(3) )
+    ROMX_LOAD( "ql.jm 8000.ic34", 0x008000, 0x004000, CRC(9168a2e9) SHA1(1e7c47a59fc40bd96dfefc2f4d86827c15f0199e), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 3, "ah", "v1.02 (AH)" )
-	ROMX_LOAD( "ah.ic33.1", 0x000000, 0x004000, BAD_DUMP CRC(a9b4d2df) SHA1(142d6f01a9621aff5e0ad678bd3cbf5cde0db801), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(4) )
-    ROMX_LOAD( "ah.ic33.2", 0x004000, 0x004000, BAD_DUMP CRC(36488e4e) SHA1(ff6f597b30ea03ce480a3d6728fd1d858da34d6a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(4) )
-	ROMX_LOAD( "ah.ic34",   0x008000, 0x004000, BAD_DUMP CRC(61259d4c) SHA1(bdd10d111e7ba488551a27c8d3b2743917ff1307), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(4) )
+	ROMX_LOAD( "ah.ic33.1", 0x000000, 0x004000, BAD_DUMP CRC(a9b4d2df) SHA1(142d6f01a9621aff5e0ad678bd3cbf5cde0db801), ROM_BIOS(4) )
+    ROMX_LOAD( "ah.ic33.2", 0x004000, 0x004000, BAD_DUMP CRC(36488e4e) SHA1(ff6f597b30ea03ce480a3d6728fd1d858da34d6a), ROM_BIOS(4) )
+	ROMX_LOAD( "ah.ic34",   0x008000, 0x004000, BAD_DUMP CRC(61259d4c) SHA1(bdd10d111e7ba488551a27c8d3b2743917ff1307), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 4, "pm", "v1.01 (PM)" )
-	ROMX_LOAD( "pm.ic33", 0x000000, 0x008000, NO_DUMP, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(5) )
-    ROMX_LOAD( "pm.ic34", 0x008000, 0x004000, NO_DUMP, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(5) )
+	ROMX_LOAD( "pm.ic33", 0x000000, 0x008000, NO_DUMP, ROM_BIOS(5) )
+    ROMX_LOAD( "pm.ic34", 0x008000, 0x004000, NO_DUMP, ROM_BIOS(5) )
 
 	ROM_SYSTEM_BIOS( 5, "fb", "v1.00 (FB)" )
-    ROMX_LOAD( "fb.ic33", 0x000000, 0x008000, NO_DUMP, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(6) )
-    ROMX_LOAD( "fb.ic34", 0x008000, 0x004000, NO_DUMP, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(6) )
+    ROMX_LOAD( "fb.ic33", 0x000000, 0x008000, NO_DUMP, ROM_BIOS(6) )
+    ROMX_LOAD( "fb.ic34", 0x008000, 0x004000, NO_DUMP, ROM_BIOS(6) )
 
 	ROM_SYSTEM_BIOS( 6, "tyche", "v2.05 (Tyche)" )
-    ROMX_LOAD( "tyche.rom", 0x000000, 0x010000, BAD_DUMP CRC(8724b495) SHA1(5f33a1bc3f23fd09c31844b65bc3aca7616f180a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(7) )
+    ROMX_LOAD( "tyche.rom", 0x000000, 0x010000, BAD_DUMP CRC(8724b495) SHA1(5f33a1bc3f23fd09c31844b65bc3aca7616f180a), ROM_BIOS(7) )
 
 	ROM_SYSTEM_BIOS( 7, "min189", "Minerva v1.89" )
-    ROMX_LOAD( "minerva.rom", 0x000000, 0x00c000, CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(8) )
+    ROMX_LOAD( "minerva.rom", 0x000000, 0x00c000, CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_BIOS(8) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "v07.ic24",	  0x0000, 0x0800, CRC(051111f9) SHA1(83ed562464df89b9fdd9740db51d45884a512696) ) // V0.7
@@ -741,8 +744,8 @@ ROM_END
 
 ROM_START( ql_jsu )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "jsu.ic33", 0x000000, 0x008000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
-    ROM_LOAD16_WORD_SWAP( "jsu.ic34", 0x008000, 0x004000, BAD_DUMP CRC(3debbacc) SHA1(9fbc3e42ec463fa42f9c535d63780ff53a9313ec) )
+    ROM_LOAD( "jsu.ic33", 0x000000, 0x008000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
+    ROM_LOAD( "jsu.ic34", 0x008000, 0x004000, BAD_DUMP CRC(3debbacc) SHA1(9fbc3e42ec463fa42f9c535d63780ff53a9313ec) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -750,8 +753,8 @@ ROM_END
 
 ROM_START( ql_mge )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "mge.ic33", 0x000000, 0x008000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
-    ROM_LOAD16_WORD_SWAP( "mge.ic34", 0x008000, 0x004000, BAD_DUMP CRC(a694f8d7) SHA1(bd2868656008de85d7c191598588017ae8aa3339) )
+    ROM_LOAD( "mge.ic33", 0x000000, 0x008000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
+    ROM_LOAD( "mge.ic34", 0x008000, 0x004000, BAD_DUMP CRC(a694f8d7) SHA1(bd2868656008de85d7c191598588017ae8aa3339) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -759,8 +762,8 @@ ROM_END
 
 ROM_START( ql_mgf )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "mgf.ic33", 0x000000, 0x008000, NO_DUMP )
-    ROM_LOAD16_WORD_SWAP( "mgf.ic34", 0x008000, 0x004000, NO_DUMP )
+    ROM_LOAD( "mgf.ic33", 0x000000, 0x008000, NO_DUMP )
+    ROM_LOAD( "mgf.ic34", 0x008000, 0x004000, NO_DUMP )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -768,8 +771,8 @@ ROM_END
 
 ROM_START( ql_mgg )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "mgg.ic33", 0x000000, 0x008000, BAD_DUMP CRC(b4e468fd) SHA1(cd02a3cd79af90d48b65077d0571efc2f12f146e) )
-    ROM_LOAD16_WORD_SWAP( "mgg.ic34", 0x008000, 0x004000, BAD_DUMP CRC(54959d40) SHA1(ffc0be9649f26019d7be82925c18dc699259877f) )
+    ROM_LOAD( "mgg.ic33", 0x000000, 0x008000, BAD_DUMP CRC(b4e468fd) SHA1(cd02a3cd79af90d48b65077d0571efc2f12f146e) )
+    ROM_LOAD( "mgg.ic34", 0x008000, 0x004000, BAD_DUMP CRC(54959d40) SHA1(ffc0be9649f26019d7be82925c18dc699259877f) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -777,8 +780,8 @@ ROM_END
 
 ROM_START( ql_mgi )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "mgi.ic33", 0x000000, 0x008000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
-    ROM_LOAD16_WORD_SWAP( "mgi.ic34", 0x008000, 0x004000, BAD_DUMP CRC(a2fdfb83) SHA1(162b1052737500f3c13497cdf0f813ba006bdae9) )
+    ROM_LOAD( "mgi.ic33", 0x000000, 0x008000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
+    ROM_LOAD( "mgi.ic34", 0x008000, 0x004000, BAD_DUMP CRC(a2fdfb83) SHA1(162b1052737500f3c13497cdf0f813ba006bdae9) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -786,8 +789,8 @@ ROM_END
 
 ROM_START( ql_mgs )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "mgs.ic33", 0x000000, 0x008000, NO_DUMP )
-    ROM_LOAD16_WORD_SWAP( "mgs.ic34", 0x008000, 0x004000, NO_DUMP )
+    ROM_LOAD( "mgs.ic33", 0x000000, 0x008000, NO_DUMP )
+    ROM_LOAD( "mgs.ic34", 0x008000, 0x004000, NO_DUMP )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -795,8 +798,8 @@ ROM_END
 
 ROM_START( ql_efp )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "efp.ic33", 0x000000, 0x008000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
-    ROM_LOAD16_WORD_SWAP( "efp.ic34", 0x008000, 0x004000, BAD_DUMP CRC(4c3b34b7) SHA1(f9dc571d2d4f68520b306ecc7516acaeea69ec0d) )
+    ROM_LOAD( "efp.ic33", 0x000000, 0x008000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
+    ROM_LOAD( "efp.ic34", 0x008000, 0x004000, BAD_DUMP CRC(4c3b34b7) SHA1(f9dc571d2d4f68520b306ecc7516acaeea69ec0d) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
