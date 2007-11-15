@@ -14,7 +14,7 @@
 #define __RGBUTIL__
 
 /* use SSE on 64-bit implementations, where it can be assumed */
-#if defined(__SSE__) || (defined(PTR64) && defined(_MSC_VER))
+#if defined(__SSE2__) || (defined(PTR64) && defined(_MSC_VER))
 #include "rgbsse.h"
 #elif defined(__ALTIVEC__)
 #include "rgbvmx.h"
