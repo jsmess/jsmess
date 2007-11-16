@@ -15,6 +15,11 @@ System Driver Changes:
 ----------------------
 - [ADAM] Input ports cleanup, natural keyboard support.  [Stefano Priore]
 
+- [ATARIST] Implemented iKBD<->68000 communications, so the keyboard is working
+  now. [Curt Coder]
+
+- [BEBOX] Fixed VGA regression introduced in 0.119.  [Tomas Karlsson]
+
 - [COCO] Updated to use MAME's 6242 RTC implementation.  [tim lindner]
 
 - [COCO] Modified the CoCo's keyboard handler to pass along the tri-state
@@ -29,21 +34,21 @@ System Driver Changes:
 - [GAMEGEAR/SMS] The internal video data buffer should hold the data written
   to the data port.  (bug #1378 and bug #1418) [Wilbert Pol]
 
+- [MEPHISTO] Implemented artwork/code for real chess board usage. [Ralf
+  Schäfer, Cowering]
+
 - [ORIC] Fixed floppy interface detection.  [Dirk Best]
 
 - [PET] Updated to use MAME's CRTC6548 implementation.  [Wilbert Pol]
 
-- [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert Pol]
+- [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert
+  Pol]
+
+- [QL] Added revision 0.7 of the IPC ROM. [MikeB]
 
 - [SYM1] Rewrote, still many issues and doesn't fully work.  [Dirk Best]
 
 - [X68000] Raster effects, DMA and vblank improvements.  [Barry Rodewald]
-
-- [ATARIST] Implemented iKBD<->68000 communications, so the keyboard is working now. [Curt Coder]
-
-- [MEPHISTO] Implemented artwork/code for real chess board usage. [Ralf Schäfer, Cowering]
-
-- [QL] Added revision 0.7 of the IPC ROM. [MikeB]
 
 
 

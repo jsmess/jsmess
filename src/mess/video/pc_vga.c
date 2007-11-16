@@ -64,7 +64,7 @@ static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, stru
 ***************************************************************************/
 
 /* grabbed from dac inited by et4000 bios */
-static unsigned char ega_palette[] =
+static const unsigned char ega_palette[] =
 {
 	0x00, 0x00, 0x00,
 	0x00, 0x00, 0xa8,
@@ -132,7 +132,7 @@ static unsigned char ega_palette[] =
 	0xfc, 0xfc, 0xfc
 };
 
-static unsigned short vga_colortable[] =
+static const unsigned short vga_colortable[] =
 {
      0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0,10, 0,11, 0,12, 0,13, 0,14, 0,15,
      1, 0, 1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1,10, 1,11, 1,12, 1,13, 1,14, 1,15,
@@ -428,7 +428,7 @@ INLINE UINT8 ega_bitplane_to_packed(UINT8 *latch, int number)
 		|color_bitplane_to_packed[3][number][latch[3]];
 }
 
-static  READ8_HANDLER(vga_ega_r)
+static READ8_HANDLER(vga_ega_r)
 {
 	int data;
 	vga.gc.latch[0]=vga.memory[(offset<<2)];
@@ -526,11 +526,18 @@ static WRITE8_HANDLER(vga_vga_w)
 	vga_dirty_font_w(((offset&~3)<<2)|(offset&3),data);
 }
 
+static READ64_HANDLER( vga_text64_r ) { return read64be_with_read8_handler(vga_text_r, offset, mem_mask); }
+static READ64_HANDLER( vga_vga64_r ) { return read64be_with_read8_handler(vga_vga_r, offset, mem_mask); }
+static WRITE64_HANDLER( vga_text64_w ) { write64be_with_write8_handler(vga_text_w, offset, data, mem_mask); }
+static WRITE64_HANDLER( vga_vga64_w ) { write64be_with_write8_handler(vga_vga_w, offset, data, mem_mask); }
+
 static void vga_cpu_interface(void)
 {
 	static int sequencer, gc;
 	read8_handler read_handler;
 	write8_handler write_handler;
+	read64_handler read_handler64;
+	write64_handler write_handler64;
 	UINT8 sel;
 	int buswidth;
 
@@ -543,16 +550,22 @@ static void vga_cpu_interface(void)
 	{
 		read_handler = vga_vga_r;
 		write_handler = vga_vga_w;
+		read_handler64 = vga_vga64_r;
+		write_handler64 = vga_vga64_w;
 	}
 	else if (vga.sequencer.data[4] & 4)
 	{
 		read_handler = vga_ega_r;
 		write_handler = vga_ega_w;
+		read_handler64 = NULL;	/* FIXME */
+		write_handler64 = NULL;	/* FIXME */
 	}
 	else
 	{
 		read_handler = vga_text_r;
 		write_handler = vga_text_w;
+		read_handler64 = vga_text64_r;
+		write_handler64 = vga_text64_w;
 	}
 
 	/* remap the VGA memory */
@@ -612,6 +625,25 @@ static void vga_cpu_interface(void)
 			}
 			break;
 
+		case 64:
+			sel = vga.gc.data[6] & 0x0c;
+			if (sel)
+			{
+				memory_install_read64_handler(0, ADDRESS_SPACE_PROGRAM,  0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? read_handler64  : MRA64_NOP);
+				memory_install_read64_handler(0, ADDRESS_SPACE_PROGRAM,  0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? read_handler64  : MRA64_NOP);
+				memory_install_read64_handler(0, ADDRESS_SPACE_PROGRAM,  0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? read_handler64  : MRA64_NOP);
+				memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? write_handler64 : MWA64_NOP);
+				memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? write_handler64 : MWA64_NOP);
+				memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? write_handler64 : MWA64_NOP);
+			}
+			else
+			{
+				memory_set_bankptr(1, vga.memory);
+				memory_install_read64_handler(0, ADDRESS_SPACE_PROGRAM,  0xa0000, 0xbffff, 0, 0, MRA64_BANK1 );
+				memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, MWA64_BANK1 );
+			}
+			break;
+			
 		default:
 			fatalerror("VGA:  Bus width %d not supported\n", buswidth);
 			break;
