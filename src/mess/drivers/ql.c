@@ -6,6 +6,7 @@
 #include "video/generic.h"
 #include "video/zx8301.h"
 #include "inputx.h"
+#include <time.h>
 
 /*
 
@@ -16,17 +17,20 @@
 
 	TODO:
 
-	- correct frequency for RTC timer
+	- emulate COMCTL properly
+	- serial data latching?
+	- transmit interrupt timing
+	- interface interrupt
 	- keyboard/joystick connections
 	- speaker sound
 	- accurate screen timings
-	- microdrive
+	- microdrive simulation
 
 */
 
 #define X1 15000000.0
-#define X2 32768.0
-#define X3 4436000.0
+#define X2    32768.0
+#define X3  4436000.0
 #define X4 11000000.0
 
 /* Peripheral Chip (ZX8302) */
@@ -54,9 +58,6 @@
 #define ZX8302_INT_EXTERNAL		0x10
 
 #define ZX8302_STATUS_BUFFER_FULL	0x02
-
-#define ZX8302_IPC_START	0
-#define ZX8302_IPC_STOP		5
 
 #define ZX8302_TXD_START	0
 #define ZX8302_TXD_STOP		9
@@ -123,8 +124,8 @@ static TIMER_CALLBACK( zx8302_txd_tick )
 		break;
 
 	default:
-		zx8302.comdata = BIT(zx8302.tdr, 0);
-		zx8302.tdr >>= 1; // TODO: is the TDR latched internally to a shift register?
+		zx8302_txd(BIT(zx8302.tdr, 0));
+		zx8302.tdr >>= 1;
 		zx8302.tx_bits++;
 		break;
 
@@ -137,7 +138,7 @@ static TIMER_CALLBACK( zx8302_txd_tick )
 		zx8302_txd(1);
 		zx8302.tx_bits = ZX8302_TXD_START;
 		zx8302.status &= ~ZX8302_STATUS_BUFFER_FULL;
-		zx8302_interrupt(ZX8302_INT_TRANSMIT); // TODO: when is the transmit interrupt triggered?
+		zx8302_interrupt(ZX8302_INT_TRANSMIT);
 		break;
 	}
 }
@@ -145,36 +146,6 @@ static TIMER_CALLBACK( zx8302_txd_tick )
 static TIMER_CALLBACK( zx8302_ipc_tick )
 {
 	zx8302.baudx4 = zx8302.baudx4 ? 0 : 1;
-
-	if (zx8302.baudx4)
-	{
-		if (zx8302.comctl)
-		{
-			// send 4 bits of data to the IPC
-
-			switch (zx8302.ipc_bits)
-			{
-			case ZX8302_IPC_START:
-				zx8302.comdata = 0;
-				zx8302.ipc_bits++;
-				break;
-
-			default:
-				zx8302.comdata = BIT(zx8302.idr, 0);
-				zx8302.idr >>= 1;
-				zx8302.ipc_bits++;
-				break;
-
-			case ZX8302_IPC_STOP:
-				zx8302.comdata = 1;
-				break;
-			}
-		}
-		else
-		{
-			zx8302.comctl = 1;
-		}
-	}
 }
 
 static TIMER_CALLBACK( zx8302_rtc_tick )
@@ -206,11 +177,12 @@ static WRITE8_HANDLER( zx8302_rtc_w )
 
 static WRITE8_HANDLER( zx8302_control_w )
 {
-	int baud = 19200 >> (data & ZX8302_BAUD_MASK);
+	int baud = (19200 >> (data & ZX8302_BAUD_MASK));
 	int baudx4 = baud * 4;
 
 	zx8302.tcr = data;
 
+	/*
 	switch (data & ZX8302_MODE_MASK)
 	{
 	case ZX8302_MODE_SER1:
@@ -226,11 +198,12 @@ static WRITE8_HANDLER( zx8302_control_w )
 		logerror("ZX8302 Mode : NET\n");
 		break;
 	}
+	*/
 
 	mame_timer_adjust(zx8302_txd_timer, time_zero, 0, MAME_TIME_IN_HZ(baud));
 	mame_timer_adjust(zx8302_ipc_timer, time_zero, 0, MAME_TIME_IN_HZ(baudx4));
 
-	logerror("ZX8302 Baud Rate : %u\n", baud);
+	//logerror("ZX8302 Baud Rate : %u\n", baud);
 }
 
 static READ8_HANDLER( zx8302_status_r )
@@ -249,16 +222,20 @@ static READ8_HANDLER( zx8302_status_r )
 		7		COMDATA
 
 	*/
+	
+	UINT8 data = (zx8302.comdata << 7) | (zx8302.comctl << 6) | (zx8302.ser1_cts << 5)| (zx8302.ser2_dtr << 4) | (zx8302.status & 0x0f); 
 
-	return (zx8302.comdata << 7) | (zx8302.comctl << 6) | (zx8302.ser1_cts << 5)| (zx8302.ser2_dtr << 4) | (zx8302.status & 0x0f);
+	zx8302.comctl = 1;
+
+	return data;
 }
 
 static WRITE8_HANDLER( zx8302_ipc_command_w )
 {
-	logerror("ZX8302 IPC Command : %x\n", data);
+	//logerror("PC: %x ZX8302 IPC Command : %x\n", activecpu_get_pc(), data);
 
 	zx8302.idr = data;
-	zx8302.ipc_bits = ZX8302_IPC_START;
+	zx8302.comdata = BIT(data, 0);
 }
 
 static WRITE8_HANDLER( zx8302_mdv_control_w )
@@ -297,7 +274,7 @@ static READ8_HANDLER( zx8302_irq_status_r )
 
 static WRITE8_HANDLER( zx8302_irq_acknowledge_w )
 {
-	logerror("ZX8302 Interrupt Acknowledge : %x\n", data);
+	//logerror("ZX8302 Interrupt Acknowledge : %x\n", data);
 
 	zx8302.irq &= ~data;
 
@@ -319,7 +296,7 @@ static READ8_HANDLER( zx8302_mdv_track2_r )
 
 static WRITE8_HANDLER( zx8302_data_w )
 {
-	logerror("ZX8302 Data Write : %x\n", data);
+	//logerror("ZX8302 Data Write : %x\n", data);
 
 	zx8302.tdr = data;
 	zx8302.status |= ZX8302_STATUS_BUFFER_FULL;
@@ -339,11 +316,51 @@ static struct IPC
 	int ser2_rxd, ser2_cts;
 } ipc;
 
-static WRITE8_HANDLER( ipc_comctl_w )
+static WRITE8_HANDLER( ipc_link_hack_w )
 {
-	logerror("IPC WR low\n");
+	/*
 
-	zx8302.comctl = 0;
+		IPC <-> ZX8302 serial link protocol
+		***********************************
+
+		Send bit to IPC
+		---------------
+
+		1. ZX initiates transmission (COMDATA = 0)
+		2. IPC acknowledges (COMCTL = 0, COMTL = 1)
+		3. ZX transmits data bit (COMDATA = 0 or 1)
+		4. IPC acknowledges (COMCTL = 0, COMTL = 1)
+		5. ZX ends bit transfer (COMDATA = 1)
+
+		Receive bit from IPC
+		--------------------
+
+		1. ZX initiates transmission (COMDATA = 0)
+		2. IPC acknowledges (COMCTL = 0, COMTL = 1)
+		3. IPC transmits data bit (COMDATA = 0 or 1)
+		4. IPC acknowledges (COMCTL = 0, COMTL = 1)
+		5. IPC ends bit transfer (COMDATA = 1)
+
+	*/
+
+	switch (activecpu_get_pc())
+	{
+	case 0x759:
+		zx8302.comdata = BIT(zx8302.idr, 1);
+		//logerror("ZX8302->IPC %x\n", zx8302.comdata);
+		break;
+
+	case 0x75b:
+		//logerror("COMDATA = 1\n");
+		zx8302.comdata = 1;
+		zx8302.comctl = 0;
+		break;
+
+	case 0x775:
+		zx8302.comctl = 0;
+		//logerror("IPC->ZX8302 %x\n", zx8302.comdata);
+		break;
+	}
 }
 
 static WRITE8_HANDLER( ipc_port1_w )
@@ -487,9 +504,9 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM // onboard RAM
-/*	AM_RANGE(0x040000, 0x0bffff) AM_RAM // 512KB add-on RAM
+	AM_RANGE(0x040000, 0x0bffff) AM_RAM // 512KB add-on RAM
 	AM_RANGE(0x0c0000, 0x0dffff) AM_NOP // 8x16KB device slots
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM // add-on ROM*/
+	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM // add-on ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -497,7 +514,7 @@ static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x22, 0x22) AM_WRITE(ipc_comctl_w) // IPC writes this to assert the WR output line
+	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_link_hack_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
 	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(ipc_port1_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
@@ -651,7 +668,9 @@ static MACHINE_START( ql )
 	zx8302_ipc_timer = mame_timer_alloc(zx8302_ipc_tick);
 	zx8302_rtc_timer = mame_timer_alloc(zx8302_rtc_tick);
 
-	mame_timer_adjust(zx8302_rtc_timer, time_zero, 0, MAME_TIME_IN_HZ(X2));
+	mame_timer_adjust(zx8302_rtc_timer, time_zero, 0, MAME_TIME_IN_HZ(X2/32768));
+
+	zx8302.ctr = time(NULL) + 283996800;
 
 	// IPC
 
