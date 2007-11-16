@@ -741,8 +741,10 @@ TESTDRIVER( hp48s )		/* HP48 S/SX										*/
 TESTDRIVER( hp48g )		/* HP48 G/GX										*/
 
 	/* SpectraVideo */
-	DRIVER( svi318 )	/* SVI-318 (SV BASIC v1.0)							*/
-	DRIVER( svi328 )	/* SVI-328 (SV BASIC v1.1)							*/
+	DRIVER( svi318 )	/* SVI-318 (PAL)									*/
+	DRIVER( svi318n )	/* SVI-318 (NTSC)									*/
+	DRIVER( svi328 )	/* SVI-328 (PAL)									*/
+	DRIVER( svi328n )	/* SVI-328 (NTSC)									*/
 TESTDRIVER( svi328b )	/* SVI-328 + 80 column card							*/
 
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */

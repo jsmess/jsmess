@@ -3,7 +3,8 @@
 */
 
 DRIVER_INIT( svi318 );
-MACHINE_START( svi318 );
+MACHINE_START( svi318_pal );
+MACHINE_START( svi318_ntsc );
 MACHINE_RESET( svi318 );
 
 DEVICE_INIT( svi318_cart );
@@ -11,7 +12,7 @@ DEVICE_LOAD( svi318_cart );
 DEVICE_UNLOAD( svi318_cart );
 
 INTERRUPT_GEN( svi318_interrupt );
-void svi318_vdp_interrupt (int i);
+void svi318_vdp_interrupt(int i);
 
 WRITE8_HANDLER( svi318_writemem1 );
 WRITE8_HANDLER( svi318_writemem2 );
@@ -27,7 +28,7 @@ WRITE8_HANDLER( svi318_psg_port_b_w );
 READ8_HANDLER( svi318_psg_port_a_r );
 
 DEVICE_LOAD( svi318_cassette );
-int svi318_cassette_present (int id);
+int svi318_cassette_present(int id);
 
 READ8_HANDLER( svi318_fdc_irqdrq_r );
 WRITE8_HANDLER( svi318_fdc_drive_motor_w );

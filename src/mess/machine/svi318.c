@@ -4,26 +4,27 @@
 ** Sean Young, Tomas Karlsson
 **
 ** Todo:
-** - serial ports
+** - modem port
 ** - svi_cas format
 ** - 80 column cartridge
 */
 
 #include "driver.h"
-#include "video/generic.h"
-#include "cpu/z80/z80.h"
-#include "machine/wd17xx.h"
 #include "includes/svi318.h"
-#include "formats/svi_cas.h"
-#include "machine/8255ppi.h"
+#include "cpu/z80/z80.h"
+#include "video/generic.h"
+#include "video/crtc6845.h"
 #include "video/tms9928a.h"
+#include "machine/8255ppi.h"
+#include "machine/uart8250.h"
+#include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
 #include "devices/cassette.h"
+#include "formats/svi_cas.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "image.h"
-#include "video/crtc6845.h"
 
 enum {
 	SVI_INTERNAL	= 0,
@@ -56,6 +57,25 @@ static UINT8 *pcart;
 static UINT32 pcart_rom_size;
 
 static void svi318_set_banks (void);
+
+/* Serial ports */
+
+static void svi318_uart8250_interrupt(int nr, int state)
+{
+	cpunum_set_input_line(0, 0, (state ? HOLD_LINE : CLEAR_LINE));
+}
+
+static uart8250_interface svi318_uart8250_interface[1] =
+{
+	{
+		TYPE8250,
+		3072000,
+		svi318_uart8250_interrupt,
+		NULL,
+		NULL,
+		NULL
+	},
+};
 
 /* Cartridge */
 
@@ -130,7 +150,7 @@ static READ8_HANDLER ( svi318_ppi_port_a_r )
 
 	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.0038)
 		data |= 0x80;
-	if (!svi318_cassette_present(0) )
+	if (!svi318_cassette_present(0))
 		data |= 0x40;
 	data |= readinputport(12) & 0x30;
 
@@ -188,7 +208,7 @@ static WRITE8_HANDLER ( svi318_ppi_port_c_w )
 	DAC_signed_data_w (0, val);
 
 	/* cassette motor on/off */
-	if (svi318_cassette_present (0) )
+	if (svi318_cassette_present(0))
 	{
 		cassette_change_state(
 			image_from_devtype_and_index(IO_CASSETTE, 0),
@@ -585,7 +605,7 @@ MACHINE_RESET( svi328b )
 
 /* Init functions */
 
-void svi318_vdp_interrupt (int i)
+void svi318_vdp_interrupt(int i)
 {
 	cpunum_set_input_line(0, 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
@@ -644,19 +664,37 @@ DRIVER_INIT( svi318 )
 
 	/* floppy */
 	wd17xx_init(WD_TYPE_179X, svi_fdc_callback, NULL);
+
+	/* serial */
+	uart8250_init(0, svi318_uart8250_interface);
 }
 
-static const TMS9928a_interface tms9928a_interface =
+static const TMS9928a_interface svi318_tms9928a_interface =
 {
-	TMS9929A,
+	TMS99x8A,
 	0x4000,
-	0, 0,
+	15,
+	15,
 	svi318_vdp_interrupt
 };
 
-MACHINE_START( svi318 )
+static const TMS9928a_interface svi318_tms9929a_interface =
 {
-	TMS9928A_configure(&tms9928a_interface);
+	TMS9929A,
+	0x4000,
+	13,
+	13,
+	svi318_vdp_interrupt
+};
+
+MACHINE_START( svi318_ntsc )
+{
+	TMS9928A_configure(&svi318_tms9928a_interface);
+}
+
+MACHINE_START( svi318_pal )
+{
+	TMS9928A_configure(&svi318_tms9929a_interface);
 }
 
 MACHINE_RESET( svi318 )
@@ -671,6 +709,8 @@ MACHINE_RESET( svi318 )
 	svi318_set_banks();
 
 	wd17xx_reset();
+
+	uart8250_reset(0);
 }
 
 INTERRUPT_GEN( svi318_interrupt )
@@ -795,7 +835,7 @@ static void svi318_set_banks ()
 
 /* Cassette */
 
-int svi318_cassette_present (int id)
+int svi318_cassette_present(int id)
 {
 	return image_exists(image_from_devtype_and_index(IO_CASSETTE, id));
 }

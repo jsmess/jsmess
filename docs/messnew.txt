@@ -6,6 +6,8 @@ New System Drivers Supported (in no particular order):
 - Atari STBook [Curt Coder] (not working)
 - HKT-0120 Sega Dreamcast Development Box [incog] (not working)
 - Osborne-1 [Wilbert Pol, Cowering]
+- Spectravideo SVI-318 (NTSC)  [Tomas Karlsson]
+- Spectravideo SVI-328 (NTSC)  [Tomas Karlsson]
 - Synertec Systems Corp. SYM-1  [Dirk Best] (not working)
 - VG-8020 [incog]
 
@@ -45,6 +47,9 @@ System Driver Changes:
   Pol]
 
 - [QL] Added revision 0.7 of the IPC ROM. [MikeB]
+
+- [SVI318] Fixed borders. Added selectable bioses for all models.
+  Added serial port support. Added support for NTSC models.  [Tomas Karlsson]
 
 - [SYM1] Rewrote, still many issues and doesn't fully work.  [Dirk Best]
 
