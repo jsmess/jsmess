@@ -745,7 +745,8 @@ TESTDRIVER( hp48g )		/* HP48 G/GX										*/
 	DRIVER( svi318n )	/* SVI-318 (NTSC)									*/
 	DRIVER( svi328 )	/* SVI-328 (PAL)									*/
 	DRIVER( svi328n )	/* SVI-328 (NTSC)									*/
-TESTDRIVER( svi328b )	/* SVI-328 + 80 column card							*/
+	DRIVER( sv328p80 )	/* SVI-328 (PAL) + SVI-806 80 column card			*/
+	DRIVER( sv328n80 )	/* SVI-328 (NTSC) + SVI-806 80 column card			*/
 
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */
 	DRIVER( apexc )		/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */

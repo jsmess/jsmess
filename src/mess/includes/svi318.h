@@ -17,6 +17,7 @@ void svi318_vdp_interrupt(int i);
 WRITE8_HANDLER( svi318_writemem1 );
 WRITE8_HANDLER( svi318_writemem2 );
 WRITE8_HANDLER( svi318_writemem3 );
+WRITE8_HANDLER( svi318_writemem4 );
 
 READ8_HANDLER( svi318_printer_r );
 WRITE8_HANDLER( svi318_printer_w );
@@ -35,8 +36,8 @@ WRITE8_HANDLER( svi318_fdc_drive_motor_w );
 WRITE8_HANDLER( svi318_fdc_density_side_w );
 DEVICE_LOAD( svi318_floppy );
 
-READ8_HANDLER( svi318_crtc_r );
-WRITE8_HANDLER( svi318_crtc_w );
-WRITE8_HANDLER( svi318_crtcbank_w );
-VIDEO_UPDATE( svi328b );
-MACHINE_RESET( svi328b );
+READ8_HANDLER( svi806_r );
+WRITE8_HANDLER( svi806_w );
+WRITE8_HANDLER( svi806_ram_enable_w );
+VIDEO_UPDATE( svi328_806 );
+MACHINE_RESET( svi328_806 );

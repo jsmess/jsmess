@@ -1134,6 +1134,7 @@ $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 
 $(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
 
+$(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 
 #-------------------------------------------------
 # MESS-specific tools
