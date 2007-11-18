@@ -1171,7 +1171,8 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.mode = 0;
 			LCDSTAT &= 0xFC;
 			/* Generate lcd interrupt if requested */
-			if ( ( LCDSTAT & 0x08 ) && ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) {
+			if ( ! gb_lcd.mode_irq && ( LCDSTAT & 0x08 ) &&
+			     ( ( ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 			}
 			/* Check for HBLANK DMA */
