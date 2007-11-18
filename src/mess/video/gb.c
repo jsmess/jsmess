@@ -73,7 +73,7 @@ struct layer_struct {
 	INT16  bgline;
 };
 
-struct gb_lcd_struct {
+static struct gb_lcd_struct {
 	int	window_lines_drawn;
 
 	/* Things used to render current line */
@@ -193,7 +193,7 @@ INLINE void gb_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
   Select which sprites should be drawn for the current scanline and return the
   number of sprites selected.
  */
-int gb_select_sprites( void ) {
+static int gb_select_sprites( void ) {
 	int	i, yindex, line, height;
 	UINT8	*oam = gb_oam + 39 * 4;
 
@@ -312,7 +312,7 @@ INLINE void gb_update_sprites (void)
 	}
 }
 
-void gb_update_scanline (void) {
+static void gb_update_scanline (void) {
 	mame_bitmap *bitmap = tmpbitmap;
 
 	profiler_mark(PROFILER_VIDEO);
@@ -534,7 +534,7 @@ INLINE void sgb_update_sprites (void)
 	}
 }
 
-void sgb_refresh_border(void) {
+static void sgb_refresh_border(void) {
 	UINT16 data, data2;
 	UINT16 yidx, xidx, xindex;
 	UINT8 *map, *tiles, *tiles2;
@@ -596,7 +596,7 @@ void sgb_refresh_border(void) {
 	}
 }
 
-void sgb_update_scanline (void) {
+static void sgb_update_scanline (void) {
 	mame_bitmap *bitmap = tmpbitmap;
 
 	profiler_mark(PROFILER_VIDEO);
@@ -859,7 +859,7 @@ INLINE void cgb_update_sprites (void) {
 	}
 }
 
-void cgb_update_scanline (void) {
+static void cgb_update_scanline (void) {
 	mame_bitmap *bitmap = tmpbitmap;
 
 	profiler_mark(PROFILER_VIDEO);
@@ -1067,7 +1067,7 @@ void sgb_video_init( void ) {
    this data from my CGB on a boot once.
 */
 
-const UINT8 cgb_oam_extra[0x60] = {
+static const UINT8 cgb_oam_extra[0x60] = {
 	0x74, 0xFF, 0x09, 0x00, 0x9D, 0x61, 0xA8, 0x28, 0x36, 0x1E, 0x58, 0xAA, 0x75, 0x74, 0xA1, 0x42,
 	0x05, 0x96, 0x40, 0x09, 0x41, 0x02, 0x60, 0x00, 0x1F, 0x11, 0x22, 0xBC, 0x31, 0x52, 0x22, 0x54,
 	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04,
@@ -1107,7 +1107,7 @@ void gbc_video_init( void ) {
 	gbc_hdma_enabled = 0;
 }
 
-void gbc_hdma(UINT16 length) {
+static void gbc_hdma(UINT16 length) {
 	UINT16 src, dst;
 
 	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
@@ -1128,7 +1128,7 @@ void gbc_hdma(UINT16 length) {
 	}
 }
 
-void gb_increment_scanline( void ) {
+static void gb_increment_scanline( void ) {
 	gb_lcd.current_line = ( gb_lcd.current_line + 1 ) % 154;
 	if ( LCDCONT & 0x80 ) {
 		CURLINE = gb_lcd.current_line;
