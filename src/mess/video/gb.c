@@ -1142,6 +1142,7 @@ enum {
 	GB_LCD_STATE_LYXX_M3=1,
 	GB_LCD_STATE_LYXX_M0,
 	GB_LCD_STATE_LYXX_M0_2,
+	GB_LCD_STATE_LYXX_M0_PRE_INC,
 	GB_LCD_STATE_LYXX_M0_INC,
 	GB_LCD_STATE_LY00_M2,
 	GB_LCD_STATE_LYXX_M2,
@@ -1176,13 +1177,25 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check for HBLANK DMA */
 			if( gbc_hdma_enabled )
 				gbc_hdma(0x10);
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(200 - 10 * gb_lcd.sprCount,0), GB_LCD_STATE_LYXX_M0_INC, time_never );
+			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(196 - 10 * gb_lcd.sprCount,0), GB_LCD_STATE_LYXX_M0_PRE_INC, time_never );
+			break;
+		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
+			if ( CURLINE < 143 ) {
+				gb_lcd.mode = 2;
+				if ( ! gb_lcd.mode_irq ) {
+					if ( ( LCDSTAT & 0x20 ) && ( LCDSTAT & 0x40 ) && ( CMPLINE == CURLINE + 1 ) ) {
+						gb_lcd.mode_irq = 1;
+						cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+					}
+				}
+			}
+			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_INC, time_never );
 			break;
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
 			gb_increment_scanline();
 			gb_lcd.delayed_line_irq = gb_lcd.line_irq;
 			gb_lcd.line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
-			if ( ! gb_lcd.delayed_line_irq && gb_lcd.line_irq ) {
+			if ( ! gb_lcd.delayed_line_irq && gb_lcd.line_irq && ! ( LCDSTAT & 0x20 ) ) {
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 			}
 			/* Reset LY==LYC STAT bit */
@@ -1194,8 +1207,12 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				/* Internally switch to mode 2 */
 				gb_lcd.mode = 2;
 				/* Generate lcd interrupt if requested */
-				if ( ( ! gb_lcd.delayed_line_irq || ! ( LCDSTAT & 0x40 ) ) && ( LCDSTAT & 0x20 ) ) {
+				if ( ! gb_lcd.mode_irq && ( LCDSTAT & 0x20 ) && 
+					 ( ( ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
+					gb_lcd.mode_irq = 1;
 					cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+				} else {
+					gb_lcd.mode_irq = 0;
 				}
 				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2, time_never );
 			}
@@ -1215,7 +1232,8 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Update STAT register to the correct state */
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
 			/* Generate lcd interrupt if requested */
-			if ( gb_lcd.delayed_line_irq && gb_lcd.line_irq ) {
+			if ( ( gb_lcd.delayed_line_irq && gb_lcd.line_irq && ! ( LCDSTAT & 0x20 ) ) ||
+				 ( !gb_lcd.mode_irq && ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq && ( LCDSTAT & 0x20 ) ) ) {
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 			}
 			/* Check if LY==LYC STAT bit should be set */
