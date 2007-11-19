@@ -269,7 +269,7 @@ FFFE : probably polled by MCU, needs to be kept alive (cleared by main cpu - IT2
 00207FE0 : may serves for relocating code (written as .l)
 */
 
-void calc3_mcu_run(void);
+static void calc3_mcu_run(void);
 
 static int calc3_mcu_status, calc3_mcu_command_offset;
 

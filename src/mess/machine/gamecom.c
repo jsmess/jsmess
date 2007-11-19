@@ -52,7 +52,7 @@ UINT8 *cartridge2 = NULL;
 UINT8 *cartridge = NULL;
 UINT8 *dummy_bank = NULL;
 
-static mame_timer *gamecom_clock_timer = NULL;
+static emu_timer *gamecom_clock_timer = NULL;
 GAMECOM_DMA gamecom_dma;
 GAMECOM_TIMER gamecom_timer[2];
 
@@ -77,7 +77,7 @@ MACHINE_RESET( gamecom )
 
 	/* should possibly go in a DRIVER_INIT piece? */
 	if ( gamecom_clock_timer == NULL ) {
-		gamecom_clock_timer = mame_timer_alloc( gamecom_clock_timer_callback );
+		gamecom_clock_timer = timer_alloc( gamecom_clock_timer_callback );
 	}
 	/* intialize the empty dummy bank */
 	if ( dummy_bank == NULL ) {
@@ -327,14 +327,14 @@ WRITE8_HANDLER( gamecom_internal_w )
 			/* timer run */
 			if ( data & 0x40 ) {
 				/* timer resolution 1 minute */
-				mame_timer_adjust( gamecom_clock_timer, MAME_TIME_IN_SEC(1), 0, MAME_TIME_IN_SEC(60) );
+				timer_adjust( gamecom_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(60) );
 			} else {
 				/* TImer resolution 1 second */
-				mame_timer_adjust( gamecom_clock_timer, MAME_TIME_IN_SEC(1), 0, MAME_TIME_IN_SEC(1) );
+				timer_adjust( gamecom_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1) );
 			}
 		} else {
 			/* disable timer reset */
-			mame_timer_enable( gamecom_clock_timer, 0 );
+			timer_enable( gamecom_clock_timer, 0 );
 			data &= 0xC0;
 		}
 		break;

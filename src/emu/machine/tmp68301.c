@@ -14,13 +14,13 @@
 UINT16 *tmp68301_regs;
 
 static UINT8 tmp68301_IE[3];		// 3 External Interrupt Lines
-static mame_timer *tmp68301_timer[3];		// 3 Timers
+static emu_timer *tmp68301_timer[3];		// 3 Timers
 
 static int tmp68301_irq_vector[8];
 
-void tmp68301_update_timer( int i );
+static void tmp68301_update_timer( int i );
 
-int tmp68301_irq_callback(int int_level)
+static int tmp68301_irq_callback(int int_level)
 {
 	int vector = tmp68301_irq_vector[int_level];
 //  logerror("CPU #0 PC %06X: irq callback returns %04X for level %x\n",activecpu_get_pc(),vector,int_level);
@@ -68,9 +68,9 @@ void tmp68301_update_timer( int i )
 	UINT16 MAX2	=	tmp68301_regs[(0x206 + i * 0x20)/2];
 
 	int max = 0;
-	mame_time duration = time_zero;
+	attotime duration = attotime_zero;
 
-	mame_timer_adjust(tmp68301_timer[i],time_never,i,time_never);
+	timer_adjust(tmp68301_timer[i],attotime_never,i,attotime_never);
 
 	// timers 1&2 only
 	switch( (TCR & 0x0030)>>4 )						// MR2..1
@@ -90,7 +90,7 @@ void tmp68301_update_timer( int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;			// P4..1
 			if (scale > 8) scale = 8;
-			duration = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[0].clock), (1 << scale) * max);
+			duration = attotime_mul(ATTOTIME_IN_HZ(Machine->drv->cpu[0].clock), (1 << scale) * max);
 		}
 		break;
 	}
@@ -99,8 +99,8 @@ void tmp68301_update_timer( int i )
 
 	if (!(TCR & 0x0002))				// CS
 	{
-		if (compare_mame_times(duration, time_zero))
-			mame_timer_adjust(tmp68301_timer[i],duration,i,time_zero);
+		if (attotime_compare(duration, attotime_zero))
+			timer_adjust(tmp68301_timer[i],duration,i,attotime_zero);
 		else
 			logerror("CPU #0 PC %06X: TMP68301 error, timer %d duration is 0\n",activecpu_get_pc(),i);
 	}
@@ -110,7 +110,7 @@ MACHINE_RESET( tmp68301 )
 {
 	int i;
 	for (i = 0; i < 3; i++)
-		tmp68301_timer[i] = mame_timer_alloc(tmp68301_timer_callback);
+		tmp68301_timer[i] = timer_alloc(tmp68301_timer_callback);
 
 	for (i = 0; i < 3; i++)
 		tmp68301_IE[i] = 0;

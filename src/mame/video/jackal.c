@@ -10,7 +10,8 @@
 
 #include "driver.h"
 
-UINT8 *jackal_scrollram, *jackal_videoctrl;
+static UINT8 *jackal_scrollram;
+UINT8 *jackal_videoctrl;
 
 static tilemap *bg_tilemap;
 

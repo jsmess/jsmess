@@ -104,9 +104,9 @@ static UINT32 display_counter;
 static UINT32 vblank_interrupt_pending;
 static UINT32 display_position_interrupt_pending;
 static UINT32 irq3_pending;
-static mame_timer *display_position_interrupt_timer;
-static mame_timer *display_position_vblank_timer;
-static mame_timer *vblank_interrupt_timer;
+static emu_timer *display_position_interrupt_timer;
+static emu_timer *display_position_vblank_timer;
+static emu_timer *vblank_interrupt_timer;
 
 static UINT8 controller_select;
 
@@ -159,10 +159,10 @@ static void adjust_display_position_interrupt_timer(void)
 {
 	if ((display_counter + 1) != 0)
 	{
-		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(NEOGEO_PIXEL_CLOCK), display_counter + 1);
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(NEOGEO_PIXEL_CLOCK), display_counter + 1);
 		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(0), video_screen_get_hpos(0), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
 
-		mame_timer_adjust(display_position_interrupt_timer, period, 0, time_zero);
+		timer_adjust(display_position_interrupt_timer, period, 0, attotime_zero);
 	}
 }
 
@@ -250,7 +250,7 @@ static TIMER_CALLBACK( display_position_vblank_callback )
 	}
 
 	/* set timer for next screen */
-	mame_timer_adjust(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0, time_zero);
+	timer_adjust(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0, attotime_zero);
 }
 
 
@@ -266,22 +266,22 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 	update_interrupts();
 
 	/* set timer for next screen */
-	mame_timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, time_zero);
+	timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, attotime_zero);
 }
 
 
 static void create_interrupt_timers(void)
 {
-	display_position_interrupt_timer = mame_timer_alloc(display_position_interrupt_callback);
-	display_position_vblank_timer = mame_timer_alloc(display_position_vblank_callback);
-	vblank_interrupt_timer = mame_timer_alloc(vblank_interrupt_callback);
+	display_position_interrupt_timer = timer_alloc(display_position_interrupt_callback);
+	display_position_vblank_timer = timer_alloc(display_position_vblank_callback);
+	vblank_interrupt_timer = timer_alloc(vblank_interrupt_callback);
 }
 
 
 static void start_interrupt_timers(void)
 {
-	mame_timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, time_zero);
-	mame_timer_adjust(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0, time_zero);
+	timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, attotime_zero);
+	timer_adjust(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0, attotime_zero);
 }
 
 
@@ -566,7 +566,7 @@ static WRITE16_HANDLER( audio_command_w )
 		audio_cpu_assert_nmi();
 
 		/* boost the interleave to let the audio CPU read the command */
-		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
 
 		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", activecpu_get_pc(), data, mem_mask);
 	}
@@ -1230,7 +1230,7 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_IO_MAP(auido_io_map,0)
 
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(128762))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(128762))
 
 	MDRV_MACHINE_START(neogeo)
 	MDRV_MACHINE_RESET(neogeo)

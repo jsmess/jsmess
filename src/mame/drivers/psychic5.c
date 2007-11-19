@@ -358,7 +358,7 @@ static WRITE8_HANDLER( psychic5_coin_counter_w )
 	}
 }
 
-INTERRUPT_GEN( psychic5_interrupt )
+static INTERRUPT_GEN( psychic5_interrupt )
 {
 	if (cpu_getiloops() == 0)
 	   cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xd7);		/* RST 10h */

@@ -34,11 +34,11 @@ static struct
 {
 	UINT8 enabled;
 	UINT16 counter;
-	mame_timer *timer;
+	emu_timer *timer;
 } timers[3];
 static sound_stream *channel;
 static UINT8 DSPregs[256];		/* DSP registers */
-UINT8 snes_ipl_region[64];	/* SPC top 64 bytes */
+static UINT8 snes_ipl_region[64];	/* SPC top 64 bytes */
 
 static const int gauss[]=
 {
@@ -1153,15 +1153,15 @@ void *snes_sh_start(int clock, const struct CustomSound_interface *config)
 	channel = stream_create( 0, 2, 32000, NULL, snes_sh_update );
 
 	/* Initialize the timers */
-	timers[0].timer = mame_timer_alloc( snes_spc_timer );
-	mame_timer_adjust( timers[0].timer, MAME_TIME_IN_HZ(8000), 0, MAME_TIME_IN_HZ(8000) );
-	mame_timer_enable( timers[0].timer, 0 );
-	timers[1].timer = mame_timer_alloc( snes_spc_timer );
-	mame_timer_adjust( timers[1].timer, MAME_TIME_IN_HZ(8000), 1, MAME_TIME_IN_HZ(8000) );
-	mame_timer_enable( timers[1].timer, 0 );
-	timers[2].timer = mame_timer_alloc( snes_spc_timer );
-	mame_timer_adjust( timers[2].timer, MAME_TIME_IN_HZ(64000), 2, MAME_TIME_IN_HZ(64000) );
-	mame_timer_enable( timers[2].timer, 0 );
+	timers[0].timer = timer_alloc( snes_spc_timer );
+	timer_adjust( timers[0].timer, ATTOTIME_IN_HZ(8000), 0, ATTOTIME_IN_HZ(8000) );
+	timer_enable( timers[0].timer, 0 );
+	timers[1].timer = timer_alloc( snes_spc_timer );
+	timer_adjust( timers[1].timer, ATTOTIME_IN_HZ(8000), 1, ATTOTIME_IN_HZ(8000) );
+	timer_enable( timers[1].timer, 0 );
+	timers[2].timer = timer_alloc( snes_spc_timer );
+	timer_adjust( timers[2].timer, ATTOTIME_IN_HZ(64000), 2, ATTOTIME_IN_HZ(64000) );
+	timer_enable( timers[2].timer, 0 );
 
 	DSP_Reset();
 
@@ -1270,11 +1270,11 @@ WRITE8_HANDLER( spc_io_w )
 				spc_ram[0xff] = 0;
 			}
 			timers[0].enabled = data & 0x1;
-			mame_timer_enable( timers[0].timer, timers[0].enabled );
+			timer_enable( timers[0].timer, timers[0].enabled );
 			timers[1].enabled = (data & 0x2) >> 1;
-			mame_timer_enable( timers[1].timer, timers[1].enabled );
+			timer_enable( timers[1].timer, timers[1].enabled );
 			timers[2].enabled = (data & 0x4) >> 2;
-			mame_timer_enable( timers[2].timer, timers[2].enabled );
+			timer_enable( timers[2].timer, timers[2].enabled );
 			if( data & 0x10 )
 			{
 				spc_port_in[0] = 0;
@@ -1309,7 +1309,7 @@ WRITE8_HANDLER( spc_io_w )
 		case 0x7:		/* Port 3 */
 //          mame_printf_debug("SPC: %02x to APU @ %d (PC=%x)\n", data, offset&3, activecpu_get_pc());
 			spc_port_out[offset - 4] = data;
-			cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(20));
+			cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(20));
 			break;
 		case 0xA:		/* Timer 0 */
 		case 0xB:		/* Timer 1 */

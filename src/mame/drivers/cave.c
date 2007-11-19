@@ -123,8 +123,8 @@ static TIMER_CALLBACK( cave_vblank_end )
 /* Called once/frame to generate the VBLANK interrupt */
 static INTERRUPT_GEN( cave_interrupt )
 {
-	mame_timer_set(MAME_TIME_IN_USEC(17376-time_vblank_irq), 0, cave_vblank_start);
-	mame_timer_set(MAME_TIME_IN_USEC(17376-time_vblank_irq + 2000), 0, cave_vblank_end);
+	timer_set(ATTOTIME_IN_USEC(17376-time_vblank_irq), 0, cave_vblank_start);
+	timer_set(ATTOTIME_IN_USEC(17376-time_vblank_irq + 2000), 0, cave_vblank_end);
 }
 
 /* Called by the YMZ280B to set the IRQ state */
@@ -222,7 +222,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  sound_flag2 = 1;
 	soundlatch_word_w(offset,data,mem_mask);
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-	cpu_spinuntil_time(MAME_TIME_IN_USEC(50));	// Allow the other cpu to reply
+	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
@@ -4177,7 +4177,7 @@ ROM_END
 
 /* Tiles are 6 bit, 4 bits stored in one rom, 2 bits in the other.
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
-void sailormn_unpack_tiles( const int region )
+static void sailormn_unpack_tiles( const int region )
 {
 	UINT8 *src		=	memory_region(region) + (memory_region_length(region)/4)*3 - 1;
 	UINT8 *dst		=	memory_region(region) + (memory_region_length(region)/4)*4 - 2;

@@ -101,7 +101,7 @@ static TIMER_CALLBACK(c364_speech_timer)
 void c364_speech_init(void)
 {
 	memset(&speech, 0, sizeof(speech));
-	speech.timer = mame_timer_alloc(c364_speech_timer);
+	speech.timer = timer_alloc(c364_speech_timer);
 }
 
 WRITE8_HANDLER(c364_speech_w)
@@ -117,7 +117,7 @@ WRITE8_HANDLER(c364_speech_w)
 					speech.playing=FALSE;
 					break;
 				case 1: /* start */
-					mame_timer_adjust(speech.timer, time_zero, 0, MAME_TIME_IN_HZ(8000));
+					timer_adjust(speech.timer, attotime_zero, 0, ATTOTIME_IN_HZ(8000));
 					speech.playing=TRUE;
 					speech.endOfSample=FALSE;
 					speech.sampleindex=0;
@@ -125,7 +125,7 @@ WRITE8_HANDLER(c364_speech_w)
 				case 2:
 					speech.endOfSample=FALSE;
 					/*speech.busy=FALSE; */
-					mame_timer_reset(speech.timer, time_never);
+					timer_reset(speech.timer, attotime_never);
 					speech.playing=FALSE;
 					break;
 				case 5: /* set rate (in next nibble) */

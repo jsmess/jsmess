@@ -94,7 +94,7 @@ struct _stream_input
 	UINT32				bufalloc;				/* allocated size of output buffer, in samples */
 
 	/* resampling information */
-	subseconds_t		latency_subseconds;		/* latency between this stream and the input stream */
+	attoseconds_t		latency_attoseconds;	/* latency between this stream and the input stream */
 	INT16				gain;					/* gain to apply to this input */
 };
 
@@ -125,7 +125,7 @@ struct _sound_stream
 	UINT32				new_sample_rate;		/* newly-set sample rate for the stream */
 
 	/* timing information */
-	subseconds_t		subseconds_per_sample;	/* number of subseconds per sample */
+	attoseconds_t		attoseconds_per_sample;	/* number of attoseconds per sample */
 	INT32				max_samples_per_update;	/* maximum samples per update */
 
 	/* input information */
@@ -159,8 +159,8 @@ struct _streams_private
 	sound_stream **		stream_tailptr;			/* pointer to pointer to last stream */
 	void *				current_tag;			/* current tag to assign to new streams */
 	int					stream_index;			/* index of the current stream */
-	subseconds_t		update_subseconds;		/* subseconds between global updates */
-	mame_time			last_update;			/* last update time */
+	attoseconds_t		update_attoseconds;		/* attoseconds between global updates */
+	attotime			last_update;			/* last update time */
 };
 
 
@@ -187,10 +187,10 @@ static stream_sample_t *generate_resampled_data(stream_input *input, UINT32 nums
     time to a sample index in a given stream
 -------------------------------------------------*/
 
-INLINE INT32 time_to_sampindex(const streams_private *strdata, const sound_stream *stream, mame_time time)
+INLINE INT32 time_to_sampindex(const streams_private *strdata, const sound_stream *stream, attotime time)
 {
 	/* determine the number of samples since the start of this second */
-	INT32 sample = (INT32)(time.subseconds / stream->subseconds_per_sample);
+	INT32 sample = (INT32)(time.attoseconds / stream->attoseconds_per_sample);
 
 	/* if we're ahead of the last update, then adjust upwards */
 	if (time.seconds > strdata->last_update.seconds)
@@ -218,7 +218,7 @@ INLINE INT32 time_to_sampindex(const streams_private *strdata, const sound_strea
     streams_init - initialize the streams engine
 -------------------------------------------------*/
 
-void streams_init(running_machine *machine, subseconds_t update_subseconds)
+void streams_init(running_machine *machine, attoseconds_t update_attoseconds)
 {
 	streams_private *strdata;
 
@@ -228,14 +228,14 @@ void streams_init(running_machine *machine, subseconds_t update_subseconds)
 
 	/* reset globals */
 	strdata->stream_tailptr = &strdata->stream_head;
-	strdata->update_subseconds = update_subseconds;
+	strdata->update_attoseconds = update_attoseconds;
 
 	/* set the global pointer */
 	machine->streams_data = strdata;
 
 	/* register global states */
 	state_save_register_global(strdata->last_update.seconds);
-	state_save_register_global(strdata->last_update.subseconds);
+	state_save_register_global(strdata->last_update.attoseconds);
 }
 
 
@@ -247,7 +247,7 @@ void streams_init(running_machine *machine, subseconds_t update_subseconds)
 void streams_update(running_machine *machine)
 {
 	streams_private *strdata = machine->streams_data;
-	mame_time curtime = mame_timer_get_time();
+	attotime curtime = timer_get_time();
 	int second_tick = FALSE;
 	sound_stream *stream;
 
@@ -466,7 +466,7 @@ void stream_set_input(sound_stream *stream, int index, sound_stream *input_strea
 void stream_update(sound_stream *stream)
 {
 	streams_private *strdata = Machine->streams_data;
-	INT32 update_sampindex = time_to_sampindex(strdata, stream, mame_timer_get_time());
+	INT32 update_sampindex = time_to_sampindex(strdata, stream, timer_get_time());
 
 	/* generate samples to get us up to the appropriate time */
 	assert(stream->output_sampindex - stream->output_base_sampindex >= 0);
@@ -597,7 +597,7 @@ static void stream_postload(void *param)
 		memset(stream->output[outputnum].buffer, 0, stream->output_bufalloc * sizeof(stream->output[outputnum].buffer[0]));
 
 	/* recompute the sample indexes to make sense */
-	stream->output_sampindex = strdata->last_update.subseconds / stream->subseconds_per_sample;
+	stream->output_sampindex = strdata->last_update.attoseconds / stream->attoseconds_per_sample;
 	stream->output_update_sampindex = stream->output_sampindex;
 	stream->output_base_sampindex = stream->output_sampindex - stream->max_samples_per_update;
 }
@@ -673,8 +673,8 @@ static void recompute_sample_rate_data(streams_private *strdata, sound_stream *s
 	int inputnum;
 
 	/* recompute the timing parameters */
-	stream->subseconds_per_sample = MAX_SUBSECONDS / stream->sample_rate;
-	stream->max_samples_per_update = (strdata->update_subseconds + stream->subseconds_per_sample - 1) / stream->subseconds_per_sample;
+	stream->attoseconds_per_sample = ATTOSECONDS_PER_SECOND / stream->sample_rate;
+	stream->max_samples_per_update = (strdata->update_attoseconds + stream->attoseconds_per_sample - 1) / stream->attoseconds_per_sample;
 
 	/* update resample and output buffer sizes */
 	allocate_resample_buffers(strdata, stream);
@@ -689,17 +689,17 @@ static void recompute_sample_rate_data(streams_private *strdata, sound_stream *s
 		if (input->source != NULL)
 		{
 			sound_stream *input_stream = input->source->owner;
-			subseconds_t new_subsecs_per_sample = MAX_SUBSECONDS / input_stream->sample_rate;
-			subseconds_t latency;
+			attoseconds_t new_attosecs_per_sample = ATTOSECONDS_PER_SECOND / input_stream->sample_rate;
+			attoseconds_t latency;
 
 			/* okay, we have a new sample rate; recompute the latency to be the maximum
                sample period between us and our input */
-			latency = MAX(new_subsecs_per_sample, stream->subseconds_per_sample);
+			latency = MAX(new_attosecs_per_sample, stream->attoseconds_per_sample);
 
 			/* if the input stream's sample rate is lower, we will use linear interpolation */
 			/* this requires an extra sample from the source */
 			if (input_stream->sample_rate < stream->sample_rate)
-				latency += new_subsecs_per_sample;
+				latency += new_attosecs_per_sample;
 
 			/* if our sample rates match exactly, we don't need any latency */
 			else if (input_stream->sample_rate == stream->sample_rate)
@@ -707,8 +707,8 @@ static void recompute_sample_rate_data(streams_private *strdata, sound_stream *s
 
 			/* we generally don't want to tweak the latency, so we just keep the greatest
                one we've computed thus far */
-			input->latency_subseconds = MAX(input->latency_subseconds, latency);
-			assert(input->latency_subseconds < strdata->update_subseconds);
+			input->latency_attoseconds = MAX(input->latency_attoseconds, latency);
+			assert(input->latency_attoseconds < strdata->update_attoseconds);
 		}
 	}
 }
@@ -776,7 +776,7 @@ static stream_sample_t *generate_resampled_data(stream_input *input, UINT32 nums
 	sound_stream *input_stream;
 	stream_sample_t *source;
 	stream_sample_t sample;
-	subseconds_t basetime;
+	attoseconds_t basetime;
 	INT32 basesample;
 	UINT32 basefrac;
 	UINT32 step;
@@ -795,20 +795,20 @@ static stream_sample_t *generate_resampled_data(stream_input *input, UINT32 nums
 
 	/* determine the time at which the current sample begins, accounting for the
        latency we calculated between the input and output streams */
-	basetime = stream->output_sampindex * stream->subseconds_per_sample - input->latency_subseconds;
+	basetime = stream->output_sampindex * stream->attoseconds_per_sample - input->latency_attoseconds;
 
 	/* now convert that time into a sample in the input stream */
 	if (basetime >= 0)
-		basesample = basetime / input_stream->subseconds_per_sample;
+		basesample = basetime / input_stream->attoseconds_per_sample;
 	else
-		basesample = -(-basetime / input_stream->subseconds_per_sample) - 1;
+		basesample = -(-basetime / input_stream->attoseconds_per_sample) - 1;
 
 	/* compute a source pointer to the first sample */
 	assert(basesample >= input_stream->output_base_sampindex);
 	source = output->buffer + (basesample - input_stream->output_base_sampindex);
 
 	/* determine the current fraction of a sample */
-	basefrac = (basetime - basesample * input_stream->subseconds_per_sample) / (MAX_SUBSECONDS >> FRAC_BITS);
+	basefrac = (basetime - basesample * input_stream->attoseconds_per_sample) / (ATTOSECONDS_PER_SECOND >> FRAC_BITS);
 	assert(basefrac >= 0);
 	assert(basefrac < FRAC_ONE);
 

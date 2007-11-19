@@ -173,9 +173,9 @@ static READ32_HANDLER( dipswitch_r )
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
-	AM_RANGE(0x800000, 0x800003) AM_READ( dipswitch_r );
+	AM_RANGE(0x800000, 0x800003) AM_READ( dipswitch_r )
 	AM_RANGE(0xb80000, 0xb8003f) AM_READWRITE(amiga_akiko32_r, amiga_akiko32_w)
-	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w);
+	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia32_r, amiga_cia32_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom32_r, amiga_custom32_w) AM_BASE((UINT32**)&amiga_custom_regs)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION(REGION_USER1, 0x80000)	/* CD32 Extended ROM */
@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 312)
 
 	MDRV_SCREEN_REFRESH_RATE(59.997)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
 	MDRV_MACHINE_RESET(amiga)
 	MDRV_NVRAM_HANDLER(cd32)

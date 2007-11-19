@@ -39,7 +39,7 @@
                 ---- ---- --54 ----     ? (Bit 4 used by uballoon)
                 ---- ---- ---- 3210     Source Row
 
-    $10002.w                                -
+    $10002.w                            -
 
 
                             [ Sprite's Tiles Format ]
@@ -66,9 +66,19 @@ WRITE16_HANDLER( suna16_flipscreen_w )
 	if (ACCESSING_LSB)
 	{
 		flip_screen_set( data & 1 );
-		color_bank = data & 4;
+		color_bank =   ( data & 4 ) >> 2;
 	}
-	if (data & ~5)	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", activecpu_get_pc(), data);
+	if (data & ~(1|4))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", activecpu_get_pc(), data);
+}
+
+WRITE16_HANDLER( bestbest_flipscreen_w )
+{
+	if (ACCESSING_LSB)
+	{
+		flip_screen_set( data & 0x10 );
+//      color_bank =   ( data & 0x07 );
+	}
+	if (data & ~(0x10))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", activecpu_get_pc(), data);
 }
 
 
@@ -82,20 +92,19 @@ WRITE16_HANDLER( suna16_flipscreen_w )
 
 VIDEO_START( suna16 )
 {
-	paletteram16_2 = auto_malloc( 0x100 * sizeof(UINT16) );
+	paletteram16 = auto_malloc( machine->drv->total_colors * sizeof(UINT16) );
 }
 
 READ16_HANDLER( suna16_paletteram16_r )
 {
-	if (color_bank)	return paletteram16_2[offset];
-	else			return paletteram16[offset];
+	return paletteram16[offset + color_bank * 256];
 }
 
 WRITE16_HANDLER( suna16_paletteram16_w )
 {
-	if (color_bank)	data = COMBINE_DATA(&paletteram16_2[offset]);
-	else			data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color_rgb( Machine, offset + (color_bank ? 0x100 : 0),pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	offset += color_bank * 256;
+	data = COMBINE_DATA(&paletteram16[offset]);
+	palette_set_color_rgb( Machine, offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 
@@ -107,11 +116,11 @@ WRITE16_HANDLER( suna16_paletteram16_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *sprites, int gfx)
 {
 	int offs;
 
-	int max_x	=	machine->screen[0].width	- 8;
+	int max_x	=	machine->screen[0].width  - 8;
 	int max_y	=	machine->screen[0].height - 8;
 
 	for ( offs = 0xfc00/2; offs < 0x10000/2 ; offs += 4/2 )
@@ -122,9 +131,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int dx, dy;
 		int flipx, y0;
 
-		int y		=	spriteram16[ offs + 0 + 0x00000 / 2 ];
-		int x		=	spriteram16[ offs + 1 + 0x00000 / 2 ];
-		int dim 	=	spriteram16[ offs + 0 + 0x10000 / 2 ];
+		int y		=	sprites[ offs + 0 + 0x00000 / 2 ];
+		int x		=	sprites[ offs + 1 + 0x00000 / 2 ];
+		int dim 	=	sprites[ offs + 0 + 0x10000 / 2 ];
 
 		int bank	=	(x >> 12) & 0xf;
 
@@ -162,8 +171,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 								((srcx + tile_x) & 0x1f) * 0x20 +
 								((srcy + tile_y) & 0x1f);
 
-				int tile	=	spriteram16[ addr + 0x00000 / 2 ];
-				int attr	=	spriteram16[ addr + 0x10000 / 2 ];
+				int tile	=	sprites[ addr + 0x00000 / 2 ];
+				int attr	=	sprites[ addr + 0x10000 / 2 ];
 
 				int sx		=	x + dx;
 				int sy		=	(y + dy) & 0xff;
@@ -181,9 +190,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx(	bitmap, machine->gfx[0],
+				drawgfx(	bitmap, machine->gfx[gfx],
 							(tile & 0x3fff) + bank*0x4000,
-							attr + (color_bank ? 0x10 : 0),
+							attr + (color_bank << 4),
 							tile_flipx, tile_flipy,
 							sx, sy,
 							cliprect,TRANSPARENCY_PEN,15	);
@@ -211,6 +220,26 @@ VIDEO_UPDATE( suna16 )
 {
 	/* Suna Quiz indicates the background is the last pen */
 	fillbitmap(bitmap,machine->pens[0xff],cliprect);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect, spriteram16, 0);
+	return 0;
+}
+
+VIDEO_UPDATE( bestbest )
+{
+	int layers_ctrl = -1;
+
+#ifdef MAME_DEBUG
+if (input_code_pressed(KEYCODE_Z))
+{	int msk = 0;
+	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(KEYCODE_W))	msk |= 2;
+	if (msk != 0) layers_ctrl &= msk;
+}
+#endif
+
+	/* Suna Quiz indicates the background is the last pen */
+	fillbitmap(bitmap,machine->pens[0xff],cliprect);
+	if (layers_ctrl & 1)	draw_sprites(machine, bitmap, cliprect, spriteram16,   0);
+	if (layers_ctrl & 2)	draw_sprites(machine, bitmap, cliprect, spriteram16_2, 1);
 	return 0;
 }

@@ -243,7 +243,7 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-INTERRUPT_GEN( jackal_interrupt )
+static INTERRUPT_GEN( jackal_interrupt )
 {
 	if (irq_enable)
 		cpunum_set_input_line(0, 0, HOLD_LINE);

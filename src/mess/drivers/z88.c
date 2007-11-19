@@ -278,7 +278,7 @@ static MACHINE_RESET( z88 )
 {
 	memset(mess_ram, 0x0ff, mess_ram_size);
 
-	mame_timer_pulse(MAME_TIME_IN_MSEC(5), 0, z88_rtc_timer_callback);
+	timer_pulse(ATTOTIME_IN_MSEC(5), 0, z88_rtc_timer_callback);
 
 	blink_reset();
 

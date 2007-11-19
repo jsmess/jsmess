@@ -706,7 +706,7 @@ try_again:
 	d3d->presentation.MultiSampleType				= D3DMULTISAMPLE_NONE;
 	d3d->presentation.SwapEffect					= D3DSWAPEFFECT_DISCARD;
 	d3d->presentation.hDeviceWindow					= window->hwnd;
-	d3d->presentation.Windowed						= (!video_config.switchres || !window->fullscreen) || HAS_WINDOW_MENU;
+	d3d->presentation.Windowed						= !window->fullscreen || HAS_WINDOW_MENU;
 	d3d->presentation.EnableAutoDepthStencil		= FALSE;
 	d3d->presentation.AutoDepthStencilFormat		= D3DFMT_D16;
 	d3d->presentation.Flags							= 0;
@@ -1198,7 +1198,7 @@ static int get_adapter_for_monitor(d3d_info *d3d, win_monitor_info *monitor)
 
 static void pick_best_mode(win_window_info *window)
 {
-	double target_refresh = SUBSECONDS_TO_HZ(Machine->screen[0].refresh);
+	double target_refresh = ATTOSECONDS_TO_HZ(Machine->screen[0].refresh);
 	INT32 target_width, target_height;
 	d3d_info *d3d = window->drawdata;
 	INT32 minwidth, minheight;

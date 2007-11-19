@@ -100,7 +100,7 @@ static void amiga_ar1_nmi( void )
 	
 		/* trigger NMI irq */
 		amiga_ar1_spurious = 0;
-		mame_timer_set( MAME_TIME_IN_CYCLES(28,0), 0, amiga_ar1_delayed_nmi );
+		timer_set( ATTOTIME_IN_CYCLES(28,0), 0, amiga_ar1_delayed_nmi );
 	}
 }
 
@@ -117,7 +117,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		{
 			/* trigger an NMI or spurious irq */
 			amiga_ar1_spurious = (offset == 0x60/2) ? 0 : 1;
-			mame_timer_set( MAME_TIME_IN_CYCLES(28,0), 0, amiga_ar1_delayed_nmi );
+			timer_set( ATTOTIME_IN_CYCLES(28,0), 0, amiga_ar1_delayed_nmi );
 		}
 	}
 	

@@ -426,7 +426,7 @@ static MACHINE_RESET( aleck64 )
 	n64_machine_reset();
 }
 
-MACHINE_DRIVER_START( aleck64 )
+static MACHINE_DRIVER_START( aleck64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(R4600BE, 93750000)
 	MDRV_CPU_CONFIG(config)

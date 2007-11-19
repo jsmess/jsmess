@@ -1,7 +1,7 @@
 #include "abc80.h"
 
 static tilemap *tx_tilemap;
-static mame_timer *abc80_blink_timer;
+static emu_timer *abc80_blink_timer;
 static int abc80_blink;
 static int abc80_bank;
 static int abc80_row;
@@ -61,8 +61,8 @@ static TIMER_CALLBACK(abc80_blink_tick)
 
 VIDEO_START( abc80 )
 {
-	abc80_blink_timer = mame_timer_alloc(abc80_blink_tick);
-	mame_timer_adjust(abc80_blink_timer, time_zero, 0, MAME_TIME_IN_HZ(ABC80_XTAL/2/6/64/312/16));
+	abc80_blink_timer = timer_alloc(abc80_blink_tick);
+	timer_adjust(abc80_blink_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC80_XTAL/2/6/64/312/16));
 
 	tx_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan, 
 		TILEMAP_TYPE_PEN, 6, 10, 40, 24);

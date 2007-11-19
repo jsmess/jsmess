@@ -23,7 +23,7 @@ extern VIDEO_START( shaolins );
 extern VIDEO_UPDATE( shaolins );
 
 
-INTERRUPT_GEN( shaolins_interrupt )
+static INTERRUPT_GEN( shaolins_interrupt )
 {
 	if (cpu_getiloops() == 0) cpunum_set_input_line(0, 0, HOLD_LINE);
 	else if (cpu_getiloops() % 2)

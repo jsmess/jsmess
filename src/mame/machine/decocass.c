@@ -12,8 +12,8 @@
 /* tape direction, speed and timing (used also in video/decocass.c) */
 INT32 tape_dir;
 INT32 tape_speed;
-mame_time tape_time0;
-mame_timer *tape_timer;
+attotime tape_time0;
+emu_timer *tape_timer;
 
 static INT32 firsttime = 1;
 static INT32 tape_present;
@@ -94,7 +94,7 @@ static UINT8 decocass_quadrature_decoder[4];
 
 /* sound latches, ACK status bits and NMI timer */
 static UINT8 decocass_sound_ack;
-static mame_timer *decocass_sound_timer;
+static emu_timer *decocass_sound_timer;
 
 WRITE8_HANDLER( decocass_coin_counter_w )
 {
@@ -148,14 +148,14 @@ static TIMER_CALLBACK( decocass_sound_nmi_pulse )
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
 {
 	LOG(2,("CPU #%d sound NMI enb -> $%02x\n", cpu_getactivecpu(), data));
-	mame_timer_adjust(decocass_sound_timer, MAME_TIME_IN_HZ(256 * 57 / 8 / 2), 0, MAME_TIME_IN_HZ(256 * 57 / 8 / 2));
+	timer_adjust(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
 }
 
 READ8_HANDLER( decocass_sound_nmi_enable_r )
 {
 	UINT8 data = 0xff;
 	LOG(2,("CPU #%d sound NMI enb <- $%02x\n", cpu_getactivecpu(), data));
-	mame_timer_adjust(decocass_sound_timer, MAME_TIME_IN_HZ(256 * 57 / 8 / 2), 0, MAME_TIME_IN_HZ(256 * 57 / 8 / 2));
+	timer_adjust(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
 	return data;
 }
 
@@ -277,7 +277,7 @@ READ8_HANDLER( decocass_input_r )
 
 WRITE8_HANDLER( decocass_reset_w )
 {
-	LOG(1,("%9.7f 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+	LOG(1,("%9.7f 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 	decocass_reset = data;
 
 	/* CPU #1 active hight reset */
@@ -285,7 +285,7 @@ WRITE8_HANDLER( decocass_reset_w )
 
 	/* on reset also remove the sound timer */
 	if (data & 1)
-		mame_timer_adjust(decocass_sound_timer, time_never, 0, time_never);
+		timer_adjust(decocass_sound_timer, attotime_never, 0, attotime_never);
 
 	/* 8041 active low reset */
 	cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x08) ^ 0x08 );
@@ -337,28 +337,28 @@ static void tape_crc16(UINT8 data)
 }
 
 
-mame_time decocass_adjust_tape_time(mame_time tape_time)
+attotime decocass_adjust_tape_time(attotime tape_time)
 {
-	mame_time ret = tape_time;
+	attotime ret = tape_time;
 
 	if (tape_timer)
 	{
-		mame_time elapsed = mame_timer_timeelapsed(tape_timer);
+		attotime elapsed = timer_timeelapsed(tape_timer);
 
 		if (tape_dir > 0)
 		{
-			ret = add_mame_times(tape_time, elapsed);
+			ret = attotime_add(tape_time, elapsed);
 
-			if (compare_mame_times(ret, MAME_TIME_IN_MSEC(999900)) > 0)
-				ret = MAME_TIME_IN_MSEC(999900);
+			if (attotime_compare(ret, ATTOTIME_IN_MSEC(999900)) > 0)
+				ret = ATTOTIME_IN_MSEC(999900);
 		}
 
 		if (tape_dir < 0)
 		{
-			if (compare_mame_times(tape_time, elapsed) > 0)
-				ret = sub_mame_times(tape_time, elapsed);
+			if (attotime_compare(tape_time, elapsed) > 0)
+				ret = attotime_sub(tape_time, elapsed);
 			else
-				ret = time_zero;
+				ret = attotime_zero;
 		}
 	}
 
@@ -371,9 +371,9 @@ static void tape_update(void)
 	static int last_byte;
 	int offset, rclk, rdata, tape_bit, tape_byte, tape_block;
 
-	mame_time tape_time = decocass_adjust_tape_time(tape_time0);
+	attotime tape_time = decocass_adjust_tape_time(tape_time0);
 
-	offset = (int)(mame_time_to_double(scale_up_mame_time(tape_time, TAPE_CLOCKRATE)) + 0.499995);
+	offset = (int)(attotime_to_double(attotime_mul(tape_time, TAPE_CLOCKRATE)) + 0.499995);
 
 	/* reset RCLK and RDATA inputs */
 	rclk = 0;
@@ -388,7 +388,7 @@ static void tape_update(void)
 		{
 			tape_bot_eot = 1;
 			set_led_status(1, 1);
-			LOG(5,("tape %5.4fs: %s found LEADER\n", mame_time_to_double(tape_time), dirnm(tape_dir)));
+			LOG(5,("tape %5.4fs: %s found LEADER\n", attotime_to_double(tape_time), dirnm(tape_dir)));
 		}
 	}
 	else
@@ -399,7 +399,7 @@ static void tape_update(void)
 		{
 			tape_bot_eot = 0;
 			set_led_status(1, 0);
-			LOG(5,("tape %5.4fs: %s between BOT + LEADER\n", mame_time_to_double(tape_time), dirnm(tape_dir)));
+			LOG(5,("tape %5.4fs: %s between BOT + LEADER\n", attotime_to_double(tape_time), dirnm(tape_dir)));
 		}
 	}
 	else
@@ -410,7 +410,7 @@ static void tape_update(void)
 		{
 			tape_bot_eot = 1;
 			set_led_status(1, 1);
-			LOG(5,("tape %5.4fs: %s found BOT\n", mame_time_to_double(tape_time), dirnm(tape_dir)));
+			LOG(5,("tape %5.4fs: %s found BOT\n", attotime_to_double(tape_time), dirnm(tape_dir)));
 		}
 	}
 	else
@@ -423,7 +423,7 @@ static void tape_update(void)
 		{
 			tape_bot_eot = 0;
 			set_led_status(1, 0);
-			LOG(5,("tape %5.4fs: %s data area\n", mame_time_to_double(tape_time), dirnm(tape_dir)));
+			LOG(5,("tape %5.4fs: %s data area\n", attotime_to_double(tape_time), dirnm(tape_dir)));
 		}
 		rclk = (offset ^ 1) & 1;
 		tape_bit = (offset / 2) % 8;
@@ -441,7 +441,7 @@ static void tape_update(void)
 			rdata = (0x00 >> tape_bit) & 1;
 			if (tape_byte != last_byte)
 			{
-				LOG(5,("tape %5.4fs: LEADIN $00\n", mame_time_to_double(tape_time)));
+				LOG(5,("tape %5.4fs: LEADIN $00\n", attotime_to_double(tape_time)));
 				set_led_status(2, 1);
 			}
 		}
@@ -450,7 +450,7 @@ static void tape_update(void)
 		{
 			rdata = (0xaa >> tape_bit) & 1;
 			if (tape_byte != last_byte)
-				LOG(5,("tape %5.4fs: HEADER $aa\n", mame_time_to_double(tape_time)));
+				LOG(5,("tape %5.4fs: HEADER $aa\n", attotime_to_double(tape_time)));
 		}
 		else
 		if (tape_byte < TAPE_BLOCK)
@@ -458,42 +458,42 @@ static void tape_update(void)
 			UINT8 *ptr = memory_region(REGION_USER2) + tape_block * 256 + tape_byte - TAPE_HEADER;
 			rdata = (*ptr >> tape_bit) & 1;
 			if (tape_byte != last_byte)
-				LOG(4,("tape %5.4fs: DATA(%02x) $%02x\n", mame_time_to_double(tape_time), tape_byte - TAPE_HEADER, *ptr));
+				LOG(4,("tape %5.4fs: DATA(%02x) $%02x\n", attotime_to_double(tape_time), tape_byte - TAPE_HEADER, *ptr));
 		}
 		else
 		if (tape_byte < TAPE_CRC16_MSB)
 		{
 			rdata = (tape_crc16_msb[tape_block] >> tape_bit) & 1;
 			if (tape_byte != last_byte)
-				LOG(4,("tape %5.4fs: CRC16 MSB $%02x\n", mame_time_to_double(tape_time), tape_crc16_msb[tape_block]));
+				LOG(4,("tape %5.4fs: CRC16 MSB $%02x\n", attotime_to_double(tape_time), tape_crc16_msb[tape_block]));
 		}
 		else
 		if (tape_byte < TAPE_CRC16_LSB)
 		{
 			rdata = (tape_crc16_lsb[tape_block] >> tape_bit) & 1;
 			if (tape_byte != last_byte)
-				LOG(4,("tape %5.4fs: CRC16 LSB $%02x\n", mame_time_to_double(tape_time), tape_crc16_lsb[tape_block]));
+				LOG(4,("tape %5.4fs: CRC16 LSB $%02x\n", attotime_to_double(tape_time), tape_crc16_lsb[tape_block]));
 		}
 		else
 		if (tape_byte < TAPE_TRAILER)
 		{
 			rdata = (0xaa >> tape_bit) & 1;
 			if (tape_byte != last_byte)
-				LOG(4,("tape %5.4fs: TRAILER $aa\n", mame_time_to_double(tape_time)));
+				LOG(4,("tape %5.4fs: TRAILER $aa\n", attotime_to_double(tape_time)));
 		}
 		else
 		if (tape_byte < TAPE_LEADOUT)
 		{
 			rdata = (0x00 >> tape_bit) & 1;
 			if (tape_byte != last_byte)
-				LOG(4,("tape %5.4fs: LEADOUT $00\n", mame_time_to_double(tape_time)));
+				LOG(4,("tape %5.4fs: LEADOUT $00\n", attotime_to_double(tape_time)));
 		}
 		else
 		if (tape_byte < TAPE_LONGCLOCK)
 		{
 			if (tape_byte != last_byte)
 			{
-				LOG(4,("tape %5.4fs: LONG CLOCK\n", mame_time_to_double(tape_time)));
+				LOG(4,("tape %5.4fs: LONG CLOCK\n", attotime_to_double(tape_time)));
 				set_led_status(2, 0);
 			}
 			rclk = 1;
@@ -509,7 +509,7 @@ static void tape_update(void)
 		{
 			tape_bot_eot = 1;
 			set_led_status(1, 1);
-			LOG(5,("tape %5.4fs: %s found EOT\n", mame_time_to_double(tape_time), dirnm(tape_dir)));
+			LOG(5,("tape %5.4fs: %s found EOT\n", attotime_to_double(tape_time), dirnm(tape_dir)));
 		}
 	}
 	else
@@ -520,7 +520,7 @@ static void tape_update(void)
 		{
 			tape_bot_eot = 0;
 			set_led_status(1, 0);
-			LOG(5,("tape %5.4fs: %s EOT and TRAILER\n", mame_time_to_double(tape_time), dirnm(tape_dir)));
+			LOG(5,("tape %5.4fs: %s EOT and TRAILER\n", attotime_to_double(tape_time), dirnm(tape_dir)));
 		}
 	}
 	else
@@ -530,7 +530,7 @@ static void tape_update(void)
 		{
 			tape_bot_eot = 1;
 			set_led_status(1, 1);
-			LOG(5,("tape %5.4fs: %s found TRAILER\n", mame_time_to_double(tape_time), dirnm(tape_dir)));
+			LOG(5,("tape %5.4fs: %s found TRAILER\n", attotime_to_double(tape_time), dirnm(tape_dir)));
 		}
 		offset = tape_length - 1;
 	}
@@ -599,7 +599,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -647,7 +647,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -679,7 +679,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x <- (%s %s)\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -727,7 +727,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -759,7 +759,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -807,7 +807,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 			(((latch1 >> MAP7(type1_inmap)) & 1)	   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -839,7 +839,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -887,7 +887,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -921,7 +921,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x <- (%s %s)\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -969,7 +969,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x\n",
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -998,7 +998,7 @@ static READ8_HANDLER( decocass_type2_r )
 		{
 			UINT8 *prom = memory_region(REGION_USER1);
 			data = prom[256 * type2_d2_latch + type2_promaddr];
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, 256 * type2_d2_latch + type2_promaddr));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, 256 * type2_d2_latch + type2_promaddr));
 		}
 		else
 		{
@@ -1012,7 +1012,7 @@ static READ8_HANDLER( decocass_type2_r )
 		else
 			data = offset & 0xff;
 
-		LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- 8041-%s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "STATUS" : "DATA"));
+		LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- 8041-%s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "STATUS" : "DATA"));
 	}
 	return data;
 }
@@ -1023,18 +1023,18 @@ static WRITE8_HANDLER( decocass_type2_w )
 	{
 		if (1 == (offset & 1))
 		{
-			LOG(4,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM+D2 latch", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM+D2 latch", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 		else
 		{
 			type2_promaddr = data;
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM addr $%02x\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, type2_promaddr));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM addr $%02x\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type2_promaddr));
 			return;
 		}
 	}
 	else
 	{
-		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
+		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
 	}
 	if (1 == (offset & 1))
 	{
@@ -1078,7 +1078,7 @@ static READ8_HANDLER( decocass_type3_r )
 		{
 			UINT8 *prom = memory_region(REGION_USER1);
 			data = prom[type3_ctrs];
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, type3_ctrs));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type3_ctrs));
 			if (++type3_ctrs == 4096)
 				type3_ctrs = 0;
 		}
@@ -1087,12 +1087,12 @@ static READ8_HANDLER( decocass_type3_r )
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = cpunum_get_reg(2, I8X41_STAT);
-				LOG(4,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+				LOG(4,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+				LOG(4,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 			}
 		}
 	}
@@ -1101,7 +1101,7 @@ static READ8_HANDLER( decocass_type3_r )
 		if (1 == type3_pal_19)
 		{
 			save = data = 0xff;    /* open data bus? */
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 		else
 		{
@@ -1232,7 +1232,7 @@ static READ8_HANDLER( decocass_type3_r )
 						(BIT7(save) << 7);
 				}
 				type3_d0_latch = save & 1;
-				LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
@@ -1246,7 +1246,7 @@ static READ8_HANDLER( decocass_type3_r )
 					(BIT5(save) << 5) |
 					(BIT6(save) << 7) |
 					(BIT7(save) << 6);
-				LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
 				type3_d0_latch = save & 1;
 			}
 		}
@@ -1262,7 +1262,7 @@ static WRITE8_HANDLER( decocass_type3_w )
 		if (1 == type3_pal_19)
 		{
 			type3_ctrs = data << 4;
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, "LDCTRS"));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, "LDCTRS"));
 			return;
 		}
 		else
@@ -1274,11 +1274,11 @@ static WRITE8_HANDLER( decocass_type3_w )
 		if (1 == type3_pal_19)
 		{
 			/* write nowhere?? */
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, "nowhere?"));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, "nowhere?"));
 			return;
 		}
 	}
-	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 }
 
@@ -1303,12 +1303,12 @@ static READ8_HANDLER( decocass_type4_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = cpunum_get_reg(2, I8X41_STAT);
-			LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 	}
 	else
@@ -1318,7 +1318,7 @@ static READ8_HANDLER( decocass_type4_r )
 			UINT8 *prom = memory_region(REGION_USER1);
 
 			data = prom[type4_ctrs];
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.', type4_ctrs));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.', type4_ctrs));
 			type4_ctrs = (type4_ctrs+1) & 0x7fff;
 		}
 		else
@@ -1326,12 +1326,12 @@ static READ8_HANDLER( decocass_type4_r )
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = cpunum_get_reg(2, I8X41_DATA);
-				LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+				LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 			}
 		}
 	}
@@ -1346,7 +1346,7 @@ static WRITE8_HANDLER( decocass_type4_w )
 		if (1 == type4_latch)
 		{
 			type4_ctrs = (type4_ctrs & 0x00ff) | ((data & 0x7f) << 8);
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, type4_ctrs));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type4_ctrs));
 			return;
 		}
 		else
@@ -1360,11 +1360,11 @@ static WRITE8_HANDLER( decocass_type4_w )
 		if (type4_latch)
 		{
 			type4_ctrs = (type4_ctrs & 0xff00) | data;
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, type4_ctrs));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type4_ctrs));
 			return;
 		}
 	}
-	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 }
 
@@ -1386,12 +1386,12 @@ static READ8_HANDLER( decocass_type5_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = cpunum_get_reg(2, I8X41_STAT);
-			LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 	}
 	else
@@ -1399,19 +1399,19 @@ static READ8_HANDLER( decocass_type5_r )
 		if (type5_latch)
 		{
 			data = 0x55;	/* Only a fixed value? It looks like this is all we need to do */
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = cpunum_get_reg(2, I8X41_DATA);
-				LOG(3,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+				LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 			}
 		}
 	}
@@ -1425,7 +1425,7 @@ static WRITE8_HANDLER( decocass_type5_w )
 	{
 		if (1 == type5_latch)
 		{
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, "latch #2??"));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, "latch #2??"));
 			return;
 		}
 		else
@@ -1437,11 +1437,11 @@ static WRITE8_HANDLER( decocass_type5_w )
 		if (type5_latch)
 		{
 			/* write nowhere?? */
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, "nowhere?"));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, "nowhere?"));
 			return;
 		}
 	}
-	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 }
 
@@ -1462,12 +1462,12 @@ static READ8_HANDLER( decocass_nodong_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = cpunum_get_reg(2, I8X41_STAT);
-			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 	}
 	else
@@ -1475,12 +1475,12 @@ static READ8_HANDLER( decocass_nodong_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = cpunum_get_reg(2, I8X41_DATA);
-			LOG(3,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 		}
 	}
 
@@ -1511,7 +1511,7 @@ READ8_HANDLER( decocass_e5xx_r )
 			((1 - tape_present)   << 7);	/* D7 = cassette present */
 
 		LOG(4,("%9.7f 6502-PC: %04x decocass_e5xx_r(%02x): $%02x <- STATUS (%s%s%s%s%s%s%s%s)\n",
-			mame_time_to_double(mame_timer_get_time()),
+			attotime_to_double(timer_get_time()),
 			activecpu_get_previouspc(),
 			offset, data,
 			data & 0x01 ? "" : "REQ/",
@@ -1543,7 +1543,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 
 	if (0 == (offset & E5XX_MASK))
 	{
-		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 		cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 #ifdef MAME_DEBUG
 		decocass_fno(offset, data);
@@ -1551,7 +1551,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 	}
 	else
 	{
-		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data));
+		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
 	}
 }
 
@@ -1604,7 +1604,7 @@ static void decocass_state_save_postload(void)
 		decocass_w(A, mem[A]);
 	/* restart the timer if the tape was playing */
 	if (0 != tape_dir)
-		mame_timer_adjust(tape_timer, time_never, 0, time_never);
+		timer_adjust(tape_timer, attotime_never, 0, attotime_never);
 #endif
 }
 
@@ -1615,7 +1615,7 @@ void decocass_machine_state_save_init(void)
 	state_save_register_global(tape_dir);
 	state_save_register_global(tape_speed);
 	state_save_register_global(tape_time0.seconds);
-	state_save_register_global(tape_time0.subseconds);
+	state_save_register_global(tape_time0.attoseconds);
 	state_save_register_global(firsttime);
 	state_save_register_global(tape_present);
 	state_save_register_global(tape_blocks);
@@ -1650,14 +1650,14 @@ void decocass_machine_state_save_init(void)
  *
  ***************************************************************************/
 
-void decocass_init_common(void)
+static void decocass_init_common(void)
 {
 	UINT8 *image = memory_region(REGION_USER2);
 	int i, offs;
 
 	tape_dir = 0;
 	tape_speed = 0;
-	tape_timer = mame_timer_alloc(NULL);
+	tape_timer = timer_alloc(NULL);
 
 	firsttime = 1;
 	tape_present = 1;
@@ -1686,7 +1686,7 @@ void decocass_init_common(void)
 	}
 
 	tape_length = tape_blocks * TAPE_CHUNK * 8 * 2 + 2 * (TAPE_LEADER + TAPE_GAP + TAPE_HOLE);
-	tape_time0 = scale_up_mame_time(MAME_TIME_IN_HZ(TAPE_CLOCKRATE), TAPE_LEADER + TAPE_GAP - TAPE_HOLE);
+	tape_time0 = attotime_mul(ATTOTIME_IN_HZ(TAPE_CLOCKRATE), TAPE_LEADER + TAPE_GAP - TAPE_HOLE);
 	LOG(0,("tape: %d blocks\n", tape_blocks));
 	tape_bot_eot = 0;
 
@@ -1711,7 +1711,7 @@ void decocass_init_common(void)
 
 	memset(decocass_quadrature_decoder, 0, sizeof(decocass_quadrature_decoder));
 	decocass_sound_ack = 0;
-	decocass_sound_timer = mame_timer_alloc(decocass_sound_nmi_pulse);
+	decocass_sound_timer = timer_alloc(decocass_sound_nmi_pulse);
 }
 
 MACHINE_RESET( decocass )
@@ -1986,7 +1986,7 @@ static void tape_stop(void)
 	/* remember time */
 	tape_time0 = decocass_adjust_tape_time(tape_time0);
 
-	mame_timer_adjust(tape_timer, time_never, 0, time_never);
+	timer_adjust(tape_timer, attotime_never, 0, attotime_never);
 }
 
 
@@ -1997,7 +1997,7 @@ WRITE8_HANDLER( i8041_p1_w )
 	if (data != i8041_p1_old)
 	{
 		LOG(4,("%9.7f 8041-PC: %03x i8041_p1_w: $%02x (%s%s%s%s%s%s%s%s)\n",
-			mame_time_to_double(mame_timer_get_time()),
+			attotime_to_double(timer_get_time()),
 			activecpu_get_previouspc(),
 			data,
 			data & 0x01 ? "" : "DATA-WRT",
@@ -2017,18 +2017,18 @@ WRITE8_HANDLER( i8041_p1_w )
 		tape_stop();
 		if (0 == (data & 0x10))
 		{
-			LOG(2,("tape %5.4fs: rewind\n", mame_time_to_double(tape_time0)));
+			LOG(2,("tape %5.4fs: rewind\n", attotime_to_double(tape_time0)));
 			tape_dir = -1;
-			mame_timer_adjust(tape_timer, time_never, 0, time_never);
+			timer_adjust(tape_timer, attotime_never, 0, attotime_never);
 			set_led_status(0, 1);
 		}
 		else
 		{
 			tape_dir = 0;
 			tape_speed = 0;
-			LOG(2,("tape %5.4fs: stopped\n", mame_time_to_double(tape_time0)));
+			LOG(2,("tape %5.4fs: stopped\n", attotime_to_double(tape_time0)));
 #if TAPE_UI_DISPLAY
-			popmessage("   [%05.1fs]   ", mame_time_to_double(tape_time0));
+			popmessage("   [%05.1fs]   ", attotime_to_double(tape_time0));
 #endif
 			set_led_status(0, 0);
 		}
@@ -2040,18 +2040,18 @@ WRITE8_HANDLER( i8041_p1_w )
 		tape_stop();
 		if (0 == (data & 0x20))
 		{
-			LOG(2,("tape %5.4fs: forward\n", mame_time_to_double(tape_time0)));
+			LOG(2,("tape %5.4fs: forward\n", attotime_to_double(tape_time0)));
 			tape_dir = +1;
-			mame_timer_adjust(tape_timer, time_never, 0, time_never);
+			timer_adjust(tape_timer, attotime_never, 0, attotime_never);
 			set_led_status(0, 1);
 		}
 		else
 		{
 			tape_dir = 0;
 			tape_speed = 0;
-			LOG(2,("tape %5.4fs: stopped\n", mame_time_to_double(tape_time0)));
+			LOG(2,("tape %5.4fs: stopped\n", attotime_to_double(tape_time0)));
 #if TAPE_UI_DISPLAY
-			popmessage("   [%05.1fs]   ", mame_time_to_double(tape_time0));
+			popmessage("   [%05.1fs]   ", attotime_to_double(tape_time0));
 #endif
 			set_led_status(0, 0);
 		}
@@ -2067,14 +2067,14 @@ WRITE8_HANDLER( i8041_p1_w )
 		{
 			LOG(2,("tape: fast rewind %s\n", (0 == (data & 0x04)) ? "on" : "off"));
 			tape_dir = (tape_speed) ? -7 : -1;
-			mame_timer_adjust(tape_timer, time_never, 0, time_never);
+			timer_adjust(tape_timer, attotime_never, 0, attotime_never);
 		}
 		else
 		if (tape_dir > 0)
 		{
 			LOG(2,("tape: fast forward %s\n", (0 == (data & 0x04)) ? "on" : "off"));
 			tape_dir = (tape_speed) ? +7 : +1;
-			mame_timer_adjust(tape_timer, time_never, 0, time_never);
+			timer_adjust(tape_timer, attotime_never, 0, attotime_never);
 		}
 	}
 
@@ -2089,7 +2089,7 @@ READ8_HANDLER( i8041_p1_r )
 	if (data != i8041_p1_old)
 	{
 		LOG(4,("%9.7f 8041-PC: %03x i8041_p1_r: $%02x (%s%s%s%s%s%s%s%s)\n",
-			mame_time_to_double(mame_timer_get_time()),
+			attotime_to_double(timer_get_time()),
 			activecpu_get_previouspc(),
 			data,
 			data & 0x01 ? "" : "DATA-WRT",
@@ -2112,7 +2112,7 @@ WRITE8_HANDLER( i8041_p2_w )
 	if (data != i8041_p2_old)
 	{
 		LOG(4,("%9.7f 8041-PC: %03x i8041_p2_w: $%02x (%s%s%s%s%s%s%s%s)\n",
-			mame_time_to_double(mame_timer_get_time()),
+			attotime_to_double(timer_get_time()),
 			activecpu_get_previouspc(),
 			data,
 			data & 0x01 ? "" : "FNO/",
@@ -2140,7 +2140,7 @@ READ8_HANDLER( i8041_p2_r )
 	if (data != i8041_p2_old)
 	{
 		LOG(4,("%9.7f 8041-PC: %03x i8041_p2_r: $%02x (%s%s%s%s%s%s%s%s)\n",
-			mame_time_to_double(mame_timer_get_time()),
+			attotime_to_double(timer_get_time()),
 			activecpu_get_previouspc(),
 			data,
 			data & 0x01 ? "" : "FNO/",

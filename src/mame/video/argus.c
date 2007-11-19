@@ -154,8 +154,8 @@ static int argus_palette_intensity = 0;
 static int lowbitscroll = 0;
 static int prvscrollx = 0;
 
-UINT8 bombsa_ram_page;
-UINT8* bomba_otherram;
+static UINT8 bombsa_ram_page;
+static UINT8* bomba_otherram;
 
 static int valtric_mosaic=0;
 static mame_bitmap *mosaicbitmap;
@@ -1218,7 +1218,7 @@ static void valtric_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 	}
 }
 
-void butasan_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void butasan_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

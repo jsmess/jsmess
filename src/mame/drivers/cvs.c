@@ -182,7 +182,7 @@ static WRITE8_HANDLER( control_port_w )
     }
 }
 
-int cvs_speech_rom_read_bit(void)
+static int cvs_speech_rom_read_bit(void)
 {
 	UINT8 *ROM = memory_region(REGION_SOUND1);
     int bit;
@@ -381,7 +381,7 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_CPU_IO_MAP(cvs_cpu2_io,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1000))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

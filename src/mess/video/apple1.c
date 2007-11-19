@@ -176,11 +176,11 @@ void apple1_vh_dsp_clr (void)
    signal in response to a video display write.  This signal indicates
    the display has completed the write and is ready to accept another
    write. */
-mame_time apple1_vh_dsp_time_to_ready (void)
+attotime apple1_vh_dsp_time_to_ready (void)
 {
 	int cursor_x, cursor_y;
 	int cursor_scanline;
-	double scanline_period = mame_time_to_double(video_screen_get_scan_period(0));
+	double scanline_period = attotime_to_double(video_screen_get_scan_period(0));
 	double cursor_hfrac;
 
 	/* The video hardware refreshes the screen by reading the
@@ -208,11 +208,11 @@ mame_time apple1_vh_dsp_time_to_ready (void)
 		double current_hfrac = video_screen_get_hpos(0) /
 							   Machine->screen[0].width;
 		if (current_hfrac < cursor_hfrac)
-			return double_to_mame_time(scanline_period * (cursor_hfrac - current_hfrac));
+			return double_to_attotime(scanline_period * (cursor_hfrac - current_hfrac));
 	}
 
-	return double_to_mame_time(
-		mame_time_to_double(video_screen_get_time_until_pos(0, cursor_scanline, 0)) + 
+	return double_to_attotime(
+		attotime_to_double(video_screen_get_time_until_pos(0, cursor_scanline, 0)) + 
 		scanline_period * cursor_hfrac);
 }
 
@@ -228,7 +228,7 @@ static void apple1_vh_cursor_blink (void)
 	   number of one-third-cycles elapsed, then checking the result
 	   modulo 3. */
 
-	if (((int) (mame_time_to_double(mame_timer_get_time()) / CURSOR_OFF_LENGTH)) % 3 < 2)
+	if (((int) (attotime_to_double(timer_get_time()) / CURSOR_OFF_LENGTH)) % 3 < 2)
 		new_blink_on = 1;
 	else
 		new_blink_on = 0;

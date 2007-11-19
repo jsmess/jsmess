@@ -273,7 +273,7 @@ static void m107_update_scroll_positions(void)
 
 /*****************************************************************************/
 
-void m107_screenrefresh(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void m107_screenrefresh(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	if ((~m107_control[0x0b] >> 7) & 1)
 	{

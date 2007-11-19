@@ -238,7 +238,7 @@ static int ninjakd2_bank_latch = 255;
 static INT16 *sampledata[8];
 static int samplelen[8];
 
-void ninjakd2_init_samples(void)
+static void ninjakd2_init_samples(void)
 {
 	int i,n;
 	UINT8 *source = memory_region(REGION_SOUND1);
@@ -255,7 +255,7 @@ void ninjakd2_init_samples(void)
 }
 
 
-INTERRUPT_GEN( ninjakd2_interrupt )
+static INTERRUPT_GEN( ninjakd2_interrupt )
 {
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
@@ -481,7 +481,7 @@ static MACHINE_DRIVER_START( ninjakd2 )
 	MDRV_CPU_IO_MAP(ninjakd2_sound_io,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(10000))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(10000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

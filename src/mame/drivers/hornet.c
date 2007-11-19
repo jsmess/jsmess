@@ -369,7 +369,7 @@ static void K037122_tile_update(running_machine *machine, int chip)
 	}
 }
 
-void K037122_tile_draw(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
+static void K037122_tile_draw(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	if (K037122_reg[chip][0xc] & 0x10000)
 	{
@@ -970,7 +970,7 @@ static UINT8 jvs_sdata[1024];
 static int jvs_rdata_ptr = 0;
 static int jvs_sdata_ptr = 0;
 
-UINT8 jamma_jvs_r(void)
+static UINT8 jamma_jvs_r(void)
 {
 	UINT8 r;
 	r = jvs_rdata[jvs_rdata_ptr];
@@ -979,7 +979,7 @@ UINT8 jamma_jvs_r(void)
 	return r;
 }
 
-void jamma_jvs_w(UINT8 data)
+static void jamma_jvs_w(UINT8 data)
 {
 	jvs_sdata[jvs_sdata_ptr] = data;
 	jvs_sdata_ptr++;
@@ -1034,7 +1034,7 @@ static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 	return outptr;
 }
 
-void jamma_jvs_cmd_exec(void)
+static void jamma_jvs_cmd_exec(void)
 {
 	UINT8 sync, node, byte_num;
 	UINT8 data[1024], rdata[1024];

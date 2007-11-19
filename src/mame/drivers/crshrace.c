@@ -726,6 +726,7 @@ ROM_START( crshrac2 )
 ROM_END
 
 
+#ifdef UNUSED_FUNCTION
 void crshrace_patch_code(UINT16 offset)
 {
 	/* A hack which shows 3 player mode in code which is disabled */
@@ -734,6 +735,7 @@ void crshrace_patch_code(UINT16 offset)
 	RAM[(offset + 2)/2] = 0x4e71;
 	RAM[(offset + 4)/2] = 0x4e71;
 }
+#endif
 
 
 static DRIVER_INIT( crshrace )

@@ -15,10 +15,12 @@ static int sprite_colorbase;
 static int layer_colorbase[4], layerpri[3];
 static int alpha_enabled;
 
+#ifdef UNUSED_FUNCTION
 void moo_set_alpha(int on)
 {
 	alpha_enabled = on;
 }
+#endif
 
 static void moo_sprite_callback(int *code, int *color, int *priority_mask)
 {

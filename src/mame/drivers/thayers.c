@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( copio, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_G,  COP400_PORT_G)   AM_READWRITE(cop_g_read,cop_g_write)
 	AM_RANGE(COP400_PORT_D,  COP400_PORT_D)   AM_WRITE(cop_d_write)
 	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK)  AM_WRITE(cop_sk_write)
-	AM_RANGE(COP400_PORT_SIO,COP400_PORT_SIO) AM_READWRITE(port_tag_to_handler8("THAYERS_LETTERS"),cop_sio_write)	/* Unemulated in COP40x core, so nothing happens ATM */
+	AM_RANGE(COP400_PORT_SIO,COP400_PORT_SIO) AM_READ_PORT("THAYERS_LETTERS") AM_WRITE(cop_sio_write)	/* Unemulated in COP40x core, so nothing happens ATM */
 ADDRESS_MAP_END																										/* This is also very wrong.  The keyboard interface needs to
                                                                                                                        be understood much better than what I have here */
 
@@ -463,7 +463,7 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_MACHINE_START(thayers)
 
 /*  io device cpu */
-	MDRV_CPU_ADD(COP420, SCHEMATIC_CLOCK/2/8);		/* Can't read the schematics, but this is what daphne says */
+	MDRV_CPU_ADD(COP420, SCHEMATIC_CLOCK/2/8)		/* Can't read the schematics, but this is what daphne says */
 	MDRV_CPU_PROGRAM_MAP(copmem,0)
 	MDRV_CPU_IO_MAP(copio,0)
 

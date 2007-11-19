@@ -158,7 +158,7 @@ WRITE8_HANDLER( starwars_m6532_w )
 			/* Should be decrementing every data*1024 6532 clock cycles */
 			/* 6532 runs at 1.5 MHz */
 
-			mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(1500000), data * 1024), 0, snd_interrupt);
+			timer_set(attotime_mul(ATTOTIME_IN_HZ(1500000), data * 1024), 0, snd_interrupt);
 			return;
 
 		default:
@@ -181,7 +181,7 @@ static TIMER_CALLBACK( sound_callback )
 {
 	port_A |= 0x40; /* result from sound cpu pending */
 	main_data = param;
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 READ8_HANDLER( starwars_sin_r )
@@ -225,7 +225,7 @@ static TIMER_CALLBACK( main_callback )
 
 	port_A |= 0x80;  /* command from main cpu pending */
 	sound_data = param;
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 
 	if (PA7_irq)
 		cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);

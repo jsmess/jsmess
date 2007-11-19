@@ -213,8 +213,8 @@ static TIMER_CALLBACK_PTR( timekeeper_tick )
 
 void timekeeper_init( int chip, int type, UINT8 *data )
 {
-	mame_timer *timer;
-	mame_time duration;
+	emu_timer *timer;
+	attotime duration;
 	mame_system_time systime;
 	struct timekeeper_chip *c;
 
@@ -300,9 +300,9 @@ void timekeeper_init( int chip, int type, UINT8 *data )
 	state_save_register_item( "timekeeper", chip, c->century );
 	state_save_register_item_pointer( "timekeeper", chip, c->data, c->size );
 
-	timer = mame_timer_alloc_ptr( timekeeper_tick, c );
-	duration = MAME_TIME_IN_SEC(1);
-	mame_timer_adjust_ptr( timer, duration, duration );
+	timer = timer_alloc_ptr( timekeeper_tick, c );
+	duration = ATTOTIME_IN_SEC(1);
+	timer_adjust_ptr( timer, duration, duration );
 }
 
 static void timekeeper_nvram( int chip, mame_file *file, int read_or_write )

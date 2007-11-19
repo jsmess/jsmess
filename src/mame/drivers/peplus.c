@@ -91,7 +91,7 @@ static int sda_dir = 0;
 * NVRAM Handlers *
 ******************/
 
-NVRAM_HANDLER( peplus )
+static NVRAM_HANDLER( peplus )
 {
 	if (read_or_write)
 	{

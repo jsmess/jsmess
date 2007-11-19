@@ -348,7 +348,7 @@ static UINT8 *z80_shared_ram;
 
 /* V60 interrupt controller */
 static UINT8 v60_irq_control[0x10];
-static mame_timer *v60_irq_timer[2];
+static emu_timer *v60_irq_timer[2];
 
 /* sound interrupt controller */
 static UINT8 sound_irq_control[4];
@@ -392,8 +392,8 @@ static MACHINE_RESET( system32 )
 	memset(v60_irq_control, 0xff, sizeof(v60_irq_control));
 
 	/* allocate timers */
-	v60_irq_timer[0] = mame_timer_alloc(signal_v60_irq_callback);
-	v60_irq_timer[1] = mame_timer_alloc(signal_v60_irq_callback);
+	v60_irq_timer[0] = timer_alloc(signal_v60_irq_callback);
+	v60_irq_timer[1] = timer_alloc(signal_v60_irq_callback);
 
 	/* clear IRQ lines */
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
@@ -480,8 +480,8 @@ static void int_control_w(int offset, UINT8 data)
 			duration = v60_irq_control[8] + ((v60_irq_control[9] << 8) & 0xf00);
 			if (duration)
 			{
-				mame_time period = make_mame_time(0, mame_time_to_subseconds(MAME_TIME_IN_HZ(TIMER_0_CLOCK)) * duration);
-				mame_timer_adjust(v60_irq_timer[0], period, MAIN_IRQ_TIMER0, time_never);
+				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_0_CLOCK)) * duration);
+				timer_adjust(v60_irq_timer[0], period, MAIN_IRQ_TIMER0, attotime_never);
 			}
 			break;
 
@@ -491,8 +491,8 @@ static void int_control_w(int offset, UINT8 data)
 			duration = v60_irq_control[10] + ((v60_irq_control[11] << 8) & 0xf00);
 			if (duration)
 			{
-				mame_time period = make_mame_time(0, mame_time_to_subseconds(MAME_TIME_IN_HZ(TIMER_1_CLOCK)) * duration);
-				mame_timer_adjust(v60_irq_timer[1], period, MAIN_IRQ_TIMER1, time_never);
+				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_1_CLOCK)) * duration);
+				timer_adjust(v60_irq_timer[1], period, MAIN_IRQ_TIMER1, attotime_never);
 			}
 			break;
 
@@ -571,7 +571,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
 {
 	signal_v60_irq(MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, end_of_vblank_int);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, end_of_vblank_int);
 	if (system32_prot_vblank)
 		(*system32_prot_vblank)();
 }

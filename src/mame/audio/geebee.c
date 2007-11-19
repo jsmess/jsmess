@@ -13,7 +13,7 @@
 #include "sound/custom.h"
 #include "includes/warpwarp.h"
 
-static mame_timer *volume_timer = NULL;
+static emu_timer *volume_timer = NULL;
 static UINT16 *decay = NULL;
 static sound_stream *channel;
 static int sound_latch = 0;
@@ -45,8 +45,8 @@ WRITE8_HANDLER( geebee_sound_w )
          * Decay:
          * discharge C33 (1uF) through R50 (22k) -> 0.14058s
          */
-        mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 14058), 100000);
-		mame_timer_adjust(volume_timer, period, 0, period);
+        attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 14058), 100000);
+		timer_adjust(volume_timer, period, 0, period);
 	}
 	else
 	{
@@ -57,8 +57,8 @@ WRITE8_HANDLER( geebee_sound_w )
          * I can only guess here that the decay should be slower,
          * maybe half as fast?
          */
-        mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 29060), 100000);
-		mame_timer_adjust(volume_timer, period, 0, period);
+        attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 29060), 100000);
+		timer_adjust(volume_timer, period, 0, period);
     }
 }
 
@@ -125,6 +125,6 @@ void *geebee_sh_start(int clock, const struct CustomSound_interface *config)
 	channel = stream_create(0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
 	vcount = 0;
 
-	volume_timer = mame_timer_alloc(volume_decay);
+	volume_timer = timer_alloc(volume_decay);
     return auto_malloc(1);
 }

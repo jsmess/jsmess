@@ -166,7 +166,7 @@ if ((data & 1) == 0) popmessage("bankswitch RAM bank 0");
 }
 
 //AT
-void spy_collision(void)
+static void spy_collision(void)
 {
 #define MAX_SPRITES 64
 #define DEF_NEAR_PLANE 0x6400

@@ -641,8 +641,12 @@ static void tms32031_set_info(UINT32 state, cpuinfo *info)
  * Internal memory map
  **************************************************************************/
 
-static ADDRESS_MAP_START( internal, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( internal_32031, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( internal_32032, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -745,7 +749,7 @@ void tms32031_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32031_dasm;		break;
 #endif /* MAME_DEBUG */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms32031_icount;		break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_internal; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_internal_32031; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32031");			break;
@@ -807,5 +811,19 @@ void tms32031_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + TMS32031_RS:		sprintf(info->s, " RS:%08X", tms32031.r[TMR_RS].i32[0]); break;
 		case CPUINFO_STR_REGISTER + TMS32031_RE:		sprintf(info->s, " RE:%08X", tms32031.r[TMR_RE].i32[0]); break;
 		case CPUINFO_STR_REGISTER + TMS32031_RC:		sprintf(info->s, " RC:%08X", tms32031.r[TMR_RC].i32[0]); break;
+	}
+}
+
+void tms32032_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_internal_32032; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32032");			break;
+
+		default:										tms32031_get_info(state, info);			break;
 	}
 }

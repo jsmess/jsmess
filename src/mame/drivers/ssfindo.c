@@ -216,8 +216,8 @@ static UINT32 flashAdr,flashOffset,adrLatch,flashType,flashN;
 static void PS7500_startTimer0(void);
 static void PS7500_startTimer1(void);
 
-static mame_timer *PS7500timer0;
-static mame_timer *PS7500timer1;
+static emu_timer *PS7500timer0;
+static emu_timer *PS7500timer1;
 
 
 static VIDEO_UPDATE(ssfindo)
@@ -267,9 +267,9 @@ static void PS7500_startTimer0(void)
 	int val=((PS7500_IO[T0low]&0xff)|((PS7500_IO[T0high]&0xff)<<8))>>1;
 
 	if(val==0)
-		mame_timer_adjust(PS7500timer0, time_never, 0, time_never);
+		timer_adjust(PS7500timer0, attotime_never, 0, attotime_never);
 	else
-		mame_timer_adjust(PS7500timer0, MAME_TIME_IN_USEC(val ), 0, MAME_TIME_IN_USEC(val ));
+		timer_adjust(PS7500timer0, ATTOTIME_IN_USEC(val ), 0, ATTOTIME_IN_USEC(val ));
 }
 
 static TIMER_CALLBACK( PS7500_Timer1_callback )
@@ -285,9 +285,9 @@ static void PS7500_startTimer1(void)
 {
 	int val=((PS7500_IO[T1low]&0xff)|((PS7500_IO[T1high]&0xff)<<8))>>1;
 	if(val==0)
-		mame_timer_adjust(PS7500timer1, time_never, 0, time_never);
+		timer_adjust(PS7500timer1, attotime_never, 0, attotime_never);
 	else
-		mame_timer_adjust(PS7500timer1, MAME_TIME_IN_USEC(val ), 0, MAME_TIME_IN_USEC(val ));
+		timer_adjust(PS7500timer1, ATTOTIME_IN_USEC(val ), 0, ATTOTIME_IN_USEC(val ));
 }
 
 static INTERRUPT_GEN( ssfindo_interrupt )
@@ -304,8 +304,8 @@ static void PS7500_reset(void)
 		PS7500_IO[IOCR]			=	0x3f;
 		PS7500_IO[VIDCR]		=	0;
 
-		mame_timer_adjust( PS7500timer0, time_never, 0, time_never);
-		mame_timer_adjust( PS7500timer1, time_never, 0, time_never);
+		timer_adjust( PS7500timer0, attotime_never, 0, attotime_never);
+		timer_adjust( PS7500timer1, attotime_never, 0, attotime_never);
 }
 
 static READ32_HANDLER(PS7500_IO_r)
@@ -705,15 +705,15 @@ ROM_END
 static DRIVER_INIT(ssfindo)
 {
 	flashType=0;
-	PS7500timer0 = mame_timer_alloc(PS7500_Timer0_callback);
-	PS7500timer1 = mame_timer_alloc(PS7500_Timer1_callback);
+	PS7500timer0 = timer_alloc(PS7500_Timer0_callback);
+	PS7500timer1 = timer_alloc(PS7500_Timer1_callback);
 }
 
 static DRIVER_INIT(ppcar)
 {
 	flashType=1;
-	PS7500timer0 = mame_timer_alloc(PS7500_Timer0_callback);
-	PS7500timer1 = mame_timer_alloc(PS7500_Timer1_callback);
+	PS7500timer0 = timer_alloc(PS7500_Timer0_callback);
+	PS7500timer1 = timer_alloc(PS7500_Timer1_callback);
 }
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo, ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )

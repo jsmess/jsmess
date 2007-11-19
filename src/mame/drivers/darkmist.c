@@ -35,7 +35,7 @@ VIDEO_UPDATE(darkmist);
 PALETTE_INIT(darkmist);
 
 UINT8 * darkmist_scroll;
-UINT8 * darkmist_workram;
+static UINT8 * darkmist_workram;
 
 int darkmist_hw;
 
@@ -236,7 +236,7 @@ static GFXDECODE_START( darkmist )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,  0, 16*4 )
 GFXDECODE_END
 
-INTERRUPT_GEN( darkmist_interrupt )
+static INTERRUPT_GEN( darkmist_interrupt )
 {
 	if(cpu_getiloops())
 	{

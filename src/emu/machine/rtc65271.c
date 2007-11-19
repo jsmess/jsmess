@@ -25,10 +25,10 @@ static TIMER_CALLBACK( rtc_end_update_callback );
 
 /* Delay between the beginning (UIP asserted) and the end (UIP cleared and
 update interrupt asserted) of the update cycle */
-#define UPDATE_CYCLE_TIME MAME_TIME_IN_USEC(1984)
+#define UPDATE_CYCLE_TIME ATTOTIME_IN_USEC(1984)
 /* Delay between the assertion of UIP and the effective start of the update
 cycle */
-/*#define UPDATE_CYCLE_DELAY MAME_TIME_IN_USEC(244)*/
+/*#define UPDATE_CYCLE_DELAY ATTOTIME_IN_USEC(244)*/
 
 static struct
 {
@@ -42,10 +42,10 @@ static struct
 	int cur_xram_page;
 
 	/* update timer: called every second */
-	mame_timer *update_timer;
+	emu_timer *update_timer;
 
 	/* SQW timer: called every periodic clock half-period */
-	mame_timer *SQW_timer;
+	emu_timer *SQW_timer;
 	int SQW_internal_state;
 
 	/* callback called when interrupt pin state changes (may be NULL) */
@@ -316,9 +316,9 @@ void rtc65271_init(UINT8 *xram, void (*interrupt_callback)(int state))
 
 	rtc.xram = xram;
 
-	rtc.update_timer = mame_timer_alloc(rtc_begin_update_callback);
-	mame_timer_adjust(rtc.update_timer, MAME_TIME_IN_SEC(1), 0, MAME_TIME_IN_SEC(1));
-	rtc.SQW_timer = mame_timer_alloc(rtc_SQW_callback);
+	rtc.update_timer = timer_alloc(rtc_begin_update_callback);
+	timer_adjust(rtc.update_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+	rtc.SQW_timer = timer_alloc(rtc_SQW_callback);
 	rtc.interrupt_callback = interrupt_callback;
 }
 
@@ -404,21 +404,21 @@ void rtc65271_w(int xramsel, offs_t offset, UINT8 data)
 				{
 					if (data & reg_A_RS)
 					{
-						mame_time period = MAME_TIME_IN_HZ(SQW_freq_table[data & reg_A_RS]);
-						mame_time half_period = scale_down_mame_time(period, 2);
-						mame_time elapsed = mame_timer_timeelapsed(rtc.update_timer);
+						attotime period = ATTOTIME_IN_HZ(SQW_freq_table[data & reg_A_RS]);
+						attotime half_period = attotime_div(period, 2);
+						attotime elapsed = timer_timeelapsed(rtc.update_timer);
 
-						if (compare_mame_times(half_period, elapsed) > 0)
-							mame_timer_adjust(rtc.SQW_timer, sub_mame_times(half_period, elapsed), 0, time_never);
+						if (attotime_compare(half_period, elapsed) > 0)
+							timer_adjust(rtc.SQW_timer, attotime_sub(half_period, elapsed), 0, attotime_never);
 						else
-							mame_timer_adjust(rtc.SQW_timer, half_period, 0, time_never);
+							timer_adjust(rtc.SQW_timer, half_period, 0, attotime_never);
 					}
 					else
 					{
 						rtc.SQW_internal_state = 0;	/* right??? */
 
 						/* Stop the divider used for SQW and periodic interrupts. */
-						mame_timer_adjust(rtc.SQW_timer, time_never, 0, time_never);
+						timer_adjust(rtc.SQW_timer, attotime_never, 0, attotime_never);
 					}
 				}
 				/* The UIP bit is read-only */
@@ -477,7 +477,7 @@ static void field_interrupts(void)
 */
 static TIMER_CALLBACK( rtc_SQW_callback )
 {
-	mame_time half_period;
+	attotime half_period;
 
 	rtc.SQW_internal_state = ! rtc.SQW_internal_state;
 	if (! rtc.SQW_internal_state)
@@ -487,8 +487,8 @@ static TIMER_CALLBACK( rtc_SQW_callback )
 		field_interrupts();
 	}
 
-	half_period = scale_down_mame_time(MAME_TIME_IN_HZ(SQW_freq_table[rtc.regs[reg_A] & reg_A_RS]), 2);
-	mame_timer_adjust(rtc.SQW_timer, half_period, 0, time_never);
+	half_period = attotime_div(ATTOTIME_IN_HZ(SQW_freq_table[rtc.regs[reg_A] & reg_A_RS]), 2);
+	timer_adjust(rtc.SQW_timer, half_period, 0, attotime_never);
 }
 
 /*
@@ -501,7 +501,7 @@ static TIMER_CALLBACK( rtc_begin_update_callback )
 		rtc.regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		mame_timer_set(UPDATE_CYCLE_TIME, 0, rtc_end_update_callback);
+		timer_set(UPDATE_CYCLE_TIME, 0, rtc_end_update_callback);
 	}
 }
 

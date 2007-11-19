@@ -26,7 +26,7 @@ static int fd1094_current_cacheposition; // current position in cache array
    if it is then it copies the cached data to the user region where code is
    executed from, if its not cached then it gets decrypted to the current
    cache position using the functions in s24_fd1094.c */
-void s24_fd1094_setstate_and_decrypt(int state)
+static void s24_fd1094_setstate_and_decrypt(int state)
 {
 	int i;
 	UINT32 addr;
@@ -77,7 +77,7 @@ void s24_fd1094_setstate_and_decrypt(int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-void s24_fd1094_cmp_callback(UINT32 val, int reg)
+static void s24_fd1094_cmp_callback(UINT32 val, int reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -86,20 +86,20 @@ void s24_fd1094_cmp_callback(UINT32 val, int reg)
 }
 
 /* Callback when the s24_fd1094 enters interrupt code */
-int s24_fd1094_int_callback (int irq)
+static int s24_fd1094_int_callback (int irq)
 {
 	s24_fd1094_setstate_and_decrypt(FD1094_STATE_IRQ);
 	return (0x60+irq*4)/4; // vector address
 }
 
-void s24_fd1094_rte_callback (void)
+static void s24_fd1094_rte_callback (void)
 {
 	s24_fd1094_setstate_and_decrypt(FD1094_STATE_RTE);
 }
 
 
 /* KLUDGE, set the initial PC / SP based on table as we can't decrypt them yet */
-void s24_fd1094_kludge_reset_values(void)
+static void s24_fd1094_kludge_reset_values(void)
 {
 	int i;
 

@@ -1366,7 +1366,7 @@ static MACHINE_DRIVER_START( ldrun )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(55)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1790) /* frames per second and vblank duration from the Lode Runner manual */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

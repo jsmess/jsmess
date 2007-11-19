@@ -85,7 +85,7 @@ WRITE16_HANDLER( niyanpai_palette_w )
 
 
 ******************************************************************************/
-int niyanpai_blitter_r(int vram, int offset)
+static int niyanpai_blitter_r(int vram, int offset)
 {
 	int ret;
 	UINT8 *GFXROM = memory_region(REGION_GFX1);
@@ -100,7 +100,7 @@ int niyanpai_blitter_r(int vram, int offset)
 	return ret;
 }
 
-void niyanpai_blitter_w(int vram, int offset, int data)
+static void niyanpai_blitter_w(int vram, int offset, int data)
 {
 	switch (offset)
 	{
@@ -133,12 +133,12 @@ void niyanpai_blitter_w(int vram, int offset, int data)
 	}
 }
 
-void niyanpai_clutsel_w(int vram, int data)
+static void niyanpai_clutsel_w(int vram, int data)
 {
 	niyanpai_clutsel[vram] = data;
 }
 
-void niyanpai_clut_w(int vram, int offset, int data)
+static void niyanpai_clut_w(int vram, int offset, int data)
 {
 	niyanpai_clut[vram][((niyanpai_clutsel[vram] & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
@@ -342,7 +342,7 @@ static void niyanpai_gfxdraw(int vram)
 	}
 
 	nb19010_busyflag = 0;
-	mame_timer_set(scale_up_mame_time(MAME_TIME_IN_NSEC(1650), nb19010_busyctr), 0, blitter_timer_callback);
+	timer_set(attotime_mul(ATTOTIME_IN_NSEC(1650), nb19010_busyctr), 0, blitter_timer_callback);
 }
 
 /******************************************************************************

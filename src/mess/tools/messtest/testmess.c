@@ -56,11 +56,11 @@ struct messtest_command
 	messtest_command_type_t command_type;
 	union
 	{
-		mame_time wait_time;
+		attotime wait_time;
 		struct
 		{
 			const char *input_chars;
-			mame_time rate;
+			attotime rate;
 		} input_args;
 		struct
 		{
@@ -93,7 +93,7 @@ struct messtest_testcase
 	const char *name;
 	const char *bios;
 	const char *driver;
-	mame_time time_limit;	/* 0.0 = default */
+	attotime time_limit;	/* 0.0 = default */
 	struct messtest_command *commands;
 
 	/* options */
@@ -129,8 +129,8 @@ struct messtest_results
 
 static messtest_running_state_t state;
 static int had_failure;
-static mame_time wait_target;
-static mame_time final_time;
+static attotime wait_target;
+static attotime final_time;
 static const struct messtest_command *current_command;
 static int test_flags;
 static int screenshot_num;
@@ -362,13 +362,13 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 			if (had_failure)
 			{
 				report_message(MSG_FAILURE, "Test failed (real time %.2f; emu time %.2f [%i%%])",
-					real_run_time, mame_time_to_double(final_time), (int) ((mame_time_to_double(final_time) / real_run_time) * 100));
+					real_run_time, attotime_to_double(final_time), (int) ((attotime_to_double(final_time) / real_run_time) * 100));
 				rc = MESSTEST_RESULT_RUNTIMEFAILURE;
 			}
 			else
 			{
 				report_message(MSG_INFO, "Test succeeded (real time %.2f; emu time %.2f [%i%%])",
-					real_run_time, mame_time_to_double(final_time), (int) ((mame_time_to_double(final_time) / real_run_time) * 100));
+					real_run_time, attotime_to_double(final_time), (int) ((attotime_to_double(final_time) / real_run_time) * 100));
 				rc = MESSTEST_RESULT_SUCCESS;
 			}
 			break;
@@ -492,18 +492,18 @@ static void find_switch(const char *switch_name, const char *switch_setting,
 
 static void command_wait(void)
 {
-	mame_time current_time = mame_timer_get_time();
+	attotime current_time = timer_get_time();
 
 	if (state == STATE_READY)
 	{
 		/* beginning a wait command */
-		wait_target = add_mame_times(current_time, current_command->u.wait_time);
+		wait_target = attotime_add(current_time, current_command->u.wait_time);
 		state = STATE_INCOMMAND;
 	}
 	else
 	{
 		/* during a wait command */
-		state = (compare_mame_times(current_time, wait_target) >= 0) ? STATE_READY : STATE_INCOMMAND;
+		state = (attotime_compare(current_time, wait_target) >= 0) ? STATE_READY : STATE_INCOMMAND;
 	}
 }
 
@@ -536,11 +536,11 @@ static void command_input(void)
 static void command_rawinput(void)
 {
 	int parts;
-	mame_time current_time = mame_timer_get_time();
+	attotime current_time = timer_get_time();
 	static const char *position;
 #if 0
 	int i;
-	double rate = MAME_TIME_IN_SEC(1);
+	double rate = ATTOTIME_IN_SEC(1);
 	const char *s;
 	char buf[256];
 #endif
@@ -553,7 +553,7 @@ static void command_rawinput(void)
 		wait_target = current_time;
 		state = STATE_INCOMMAND;
 	}
-	else if (compare_mame_times(current_time, wait_target) > 0)
+	else if (attotime_compare(current_time, wait_target) > 0)
 	{
 #if 0
 		do
@@ -944,7 +944,7 @@ static void command_end(void)
 {
 	/* at the end of our test */
 	state = STATE_DONE;
-	final_time = mame_timer_get_time();
+	final_time = timer_get_time();
 	mame_schedule_exit(Machine);
 }
 
@@ -980,8 +980,8 @@ static const struct command_procmap_entry commands[] =
 void osd_update(int skip_redraw)
 {
 	int i;
-	mame_time time_limit;
-	mame_time current_time;
+	attotime time_limit;
+	attotime current_time;
 	int cpunum;
 
 	render_target_get_primitives(target);
@@ -1001,10 +1001,10 @@ void osd_update(int skip_redraw)
 	}
 
 	/* have we hit the time limit? */
-	current_time = mame_timer_get_time();
-	time_limit = (compare_mame_times(current_testcase.time_limit, time_zero) != 0) ? current_testcase.time_limit
-		: MAME_TIME_IN_SEC(600);
-	if (compare_mame_times(current_time, time_limit) > 0)
+	current_time = timer_get_time();
+	time_limit = (attotime_compare(current_testcase.time_limit, attotime_zero) != 0) ? current_testcase.time_limit
+		: ATTOTIME_IN_SEC(600);
+	if (attotime_compare(current_time, time_limit) > 0)
 	{
 		state = STATE_ABORTED;
 		report_message(MSG_FAILURE, "Time limit of %.2f seconds exceeded", time_limit);
@@ -1158,12 +1158,12 @@ static void node_input(xml_data_node *node)
 {
 	/* <input> - inputs natural keyboard data into a system */
 	xml_attribute_node *attr_node;
-	mame_time rate;
+	attotime rate;
 
 	memset(&new_command, 0, sizeof(new_command));
 	new_command.command_type = MESSTEST_COMMAND_INPUT;
 	attr_node = xml_get_attribute(node, "rate");
-	rate = attr_node ? parse_time(attr_node->value) : make_mame_time(0, 0);
+	rate = attr_node ? parse_time(attr_node->value) : attotime_make(0, 0);
 	new_command.u.input_args.rate = rate;
 	new_command.u.input_args.input_chars = node->value;
 

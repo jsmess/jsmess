@@ -68,7 +68,7 @@ VIDEO_START( oric )
 	/* initialise flash timer */
 	vh_state.flash_count = 0;
 	vh_state.flash_state = 0;
-	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, oric_vh_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(50), 0, oric_vh_timer_callback);
 	/* mode */
 	oric_vh_update_attribute((1<<3)|(1<<4));
 }

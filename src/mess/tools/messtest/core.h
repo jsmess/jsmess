@@ -66,7 +66,7 @@ int messtest(const struct messtest_options *opts, int *test_count, int *failure_
 int memory_region_from_string(const char *region_name);
 const char *memory_region_to_string(int region);
 const char *find_attribute(const char **attributes, const char *seek_attribute);
-mame_time parse_time(const char *s);
+attotime parse_time(const char *s);
 offs_t parse_offset(const char *s);
 
 /* reporting */

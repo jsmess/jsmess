@@ -180,7 +180,7 @@ UINT16 *toaplan2_txvideoram16;		/* Video ram for extra text layer */
 UINT16 *toaplan2_txvideoram16_offs;	/* Text layer tile flip and positon ? */
 UINT16 *toaplan2_txscrollram16;		/* Text layer scroll ? */
 UINT16 *toaplan2_tx_gfxram16;			/* Text Layer RAM based tiles */
-UINT16 *raizing_tx_gfxram16;			/* Text Layer RAM based tiles (Batrider) */
+static UINT16 *raizing_tx_gfxram16;			/* Text Layer RAM based tiles (Batrider) */
 static int toaplan2_overflow_vram;		/* Teki Paki VRAM test is bugged. It goes out of range */
 
 static int toaplan2_scroll_reg[2];
@@ -559,7 +559,7 @@ VIDEO_START( batrider_0 )
 
 ***************************************************************************/
 
-void toaplan2_voffs_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_voffs_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
 {
 	if (data >= 0x1c00)
 		logerror("Hmmm, unknown video controller %01x layer being selected (%08x)\n",controller,data);
@@ -718,7 +718,7 @@ WRITE16_HANDLER( batrider_objectbank_w )
 
 
 
-int toaplan2_videoram16_r(offs_t offset, int controller)
+static int toaplan2_videoram16_r(offs_t offset, int controller)
 {
 	static UINT16 video_data = 0;
 	static offs_t vram_offset;
@@ -764,7 +764,7 @@ READ16_HANDLER( toaplan2_1_videoram16_r )
 	return toaplan2_videoram16_r(offset, 1);
 }
 
-void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
 {
 	offs_t vram_offset;
 
@@ -811,7 +811,7 @@ WRITE16_HANDLER( toaplan2_1_videoram16_w )
 }
 
 
-void toaplan2_scroll_reg_select_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_scroll_reg_select_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
 {
 	if (ACCESSING_LSB)
 	{
@@ -836,7 +836,7 @@ WRITE16_HANDLER( toaplan2_1_scroll_reg_select_w )
 }
 
 
-void toaplan2_scroll_reg_data_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_scroll_reg_data_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
 {
 	/************************************************************************/
 	/***** layer X and Y flips can be set independantly, so emulate it ******/

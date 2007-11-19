@@ -343,7 +343,7 @@ static void fghthist_draw_sprites(running_machine* machine, mame_bitmap *bitmap,
     Bottom 8 bits per pixel is palettised sprite data, top 8 is
     colour/alpha/priority.
 */
-void deco32_draw_sprite(mame_bitmap *dest,const gfx_element *gfx,
+static void deco32_draw_sprite(mame_bitmap *dest,const gfx_element *gfx,
 		UINT32 code,UINT32 priority,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip)
 {

@@ -1386,7 +1386,7 @@ static int len1=0;
 static int len2=0;
 static int len3=0;
 
-mame_timer *bbc_tape_timer;
+emu_timer *bbc_tape_timer;
 
 static TIMER_CALLBACK(bbc_tape_timer_cb)
 {
@@ -1453,10 +1453,10 @@ void BBC_Cassette_motor(unsigned char status)
 	if (status)
 	{
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED ,CASSETTE_MASK_MOTOR);
-		mame_timer_adjust(bbc_tape_timer, time_zero, 0, MAME_TIME_IN_HZ(44100));
+		timer_adjust(bbc_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 	} else {
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		mame_timer_reset(bbc_tape_timer, time_never);
+		timer_reset(bbc_tape_timer, attotime_never);
 		MC6850_Reset(wav_len);
 		len0=0;
 		len1=0;
@@ -2091,12 +2091,12 @@ DEVICE_LOAD( bbcb_cart )
 DRIVER_INIT( bbc )
 {
 	bbc_Master=0;
-	bbc_tape_timer = mame_timer_alloc(bbc_tape_timer_cb);
+	bbc_tape_timer = timer_alloc(bbc_tape_timer_cb);
 }
 DRIVER_INIT( bbcm )
 {
 	bbc_Master=1;
-	bbc_tape_timer = mame_timer_alloc(bbc_tape_timer_cb);
+	bbc_tape_timer = timer_alloc(bbc_tape_timer_cb);
     mc146818_init(MC146818_STANDARD);
 }
 

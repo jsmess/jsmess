@@ -509,7 +509,7 @@ static MACHINE_START( glasgow )
   key_selector=0;
   irq_flag=0;
   lcd_shift_counter=3;
-	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, update_nmi);
+	timer_pulse(ATTOTIME_IN_HZ(50), 0, update_nmi);
   beep_set_frequency(0, 44);
 }
 
@@ -518,7 +518,7 @@ static MACHINE_START( dallas32 )
 {
   lcd_shift_counter=3;
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, update_nmi32);
+	timer_pulse(ATTOTIME_IN_HZ(50), 0, update_nmi32);
   beep_set_frequency(0, 44);
 }
 

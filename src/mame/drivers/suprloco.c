@@ -34,7 +34,7 @@ static WRITE8_HANDLER( suprloco_soundport_w )
 	soundlatch_w(0,data);
 	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
-	cpu_spinuntil_time(MAME_TIME_IN_USEC(50));
+	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 }
 
 
@@ -193,7 +193,7 @@ static MACHINE_DRIVER_START( suprloco )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)			/* NMIs are caused by the main CPU */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(5000))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

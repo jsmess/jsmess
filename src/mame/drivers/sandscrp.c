@@ -130,7 +130,7 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 		latch1_full = 1;
 		soundlatch_w(0, data & 0xff);
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(MAME_TIME_IN_USEC(100));	// Allow the other cpu to reply
+		cpu_spinuntil_time(ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
 	}
 }
 

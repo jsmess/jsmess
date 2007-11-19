@@ -420,12 +420,12 @@ static TIMER_CALLBACK(setup_beep)
 
 static DRIVER_INIT( tmc1800 )
 {
-	mame_timer_set(time_zero, 0, setup_beep);
+	timer_set(attotime_zero, 0, setup_beep);
 }
 
 static DRIVER_INIT( tmc2000 )
 {
-	mame_timer_set(time_zero, 0, setup_beep);
+	timer_set(attotime_zero, 0, setup_beep);
 	cdp1864_configure(&tmc2000_CDP1864_interface);
 }
 

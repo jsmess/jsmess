@@ -32,8 +32,8 @@ static struct SHIFTER
 	int h, v;
 } shifter;
 
-static mame_timer *atarist_glue_timer;
-static mame_timer *atarist_shifter_timer;
+static emu_timer *atarist_glue_timer;
+static emu_timer *atarist_shifter_timer;
 static mame_bitmap *atarist_bitmap;
 
 static TIMER_CALLBACK(atarist_shifter_tick)
@@ -375,7 +375,7 @@ static struct BLITTER
 	UINT32 srcbuf;
 } blitter;
 
-static mame_timer *blitter_timer;
+static emu_timer *blitter_timer;
 
 static void atarist_blitter_source(void)
 {
@@ -681,7 +681,7 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 			if ((data >> 8) & ATARIST_BLITTER_CTRL_BUSY)
 			{
 				int nops = BLITTER_NOPS[blitter.op][blitter.hop]; // each NOP takes 4 cycles
-				mame_timer_pulse(MAME_TIME_IN_HZ((Y2/4)/(4*nops)), 0, atarist_blitter_tick);
+				timer_pulse(ATTOTIME_IN_HZ((Y2/4)/(4*nops)), 0, atarist_blitter_tick);
 			}
 		}
 	}
@@ -695,12 +695,12 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 
 VIDEO_START( atarist )
 {
-	atarist_shifter_timer = mame_timer_alloc(atarist_shifter_tick);
-	atarist_glue_timer = mame_timer_alloc(atarist_glue_tick);
-	blitter_timer = mame_timer_alloc(atarist_blitter_tick);
+	atarist_shifter_timer = timer_alloc(atarist_shifter_tick);
+	atarist_glue_timer = timer_alloc(atarist_glue_tick);
+	blitter_timer = timer_alloc(atarist_blitter_tick);
 
-	mame_timer_adjust(atarist_glue_timer, video_screen_get_time_until_pos(0,0,4), 0, MAME_TIME_IN_HZ(Y2/16)); // 500 ns
-	mame_timer_adjust(atarist_shifter_timer, video_screen_get_time_until_pos(0,0,0), 0, MAME_TIME_IN_HZ(Y2/4)); // 125 ns
+	timer_adjust(atarist_glue_timer, video_screen_get_time_until_pos(0,0,4), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
+	timer_adjust(atarist_shifter_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
 
 	atarist_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 

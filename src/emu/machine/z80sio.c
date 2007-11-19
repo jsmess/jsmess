@@ -170,7 +170,7 @@ struct _sio_channel
 	int			inbuf;				/* input buffer */
 	int			outbuf;				/* output buffer */
 	UINT8		int_on_next_rx;		/* interrupt on next rx? */
-	mame_timer *receive_timer;		/* timer to clock data in */
+	emu_timer *receive_timer;		/* timer to clock data in */
 	UINT8		receive_buffer[16];	/* buffer for incoming data */
 	UINT8		receive_inptr;		/* index of data coming in */
 	UINT8		receive_outptr;		/* index of data going out */
@@ -272,10 +272,10 @@ INLINE void interrupt_check(z80sio *sio)
 }
 
 
-INLINE mame_time compute_time_per_character(z80sio *sio, int which)
+INLINE attotime compute_time_per_character(z80sio *sio, int which)
 {
 	/* fix me -- should compute properly and include data, stop, parity bits */
-	return scale_up_mame_time(MAME_TIME_IN_HZ(9600), 10);
+	return attotime_mul(ATTOTIME_IN_HZ(9600), 10);
 }
 
 
@@ -296,8 +296,8 @@ void z80sio_init(int which, z80sio_interface *intf)
 
 	memset(sio, 0, sizeof(*sio));
 
-	sio->chan[0].receive_timer = mame_timer_alloc(serial_callback);
-	sio->chan[1].receive_timer = mame_timer_alloc(serial_callback);
+	sio->chan[0].receive_timer = timer_alloc(serial_callback);
+	sio->chan[1].receive_timer = timer_alloc(serial_callback);
 
 	sio->irq_cb = intf->irq_cb;
 	sio->dtr_changed_cb = intf->dtr_changed_cb;
@@ -316,7 +316,7 @@ void z80sio_init(int which, z80sio_interface *intf)
 
 static void reset_channel(z80sio *sio, int ch)
 {
-	mame_time tpc = compute_time_per_character(sio, ch);
+	attotime tpc = compute_time_per_character(sio, ch);
 	sio_channel *chan = &sio->chan[ch];
 
 	chan->status[0] = SIO_RR0_TX_BUFFER_EMPTY;
@@ -333,7 +333,7 @@ static void reset_channel(z80sio *sio, int ch)
 	interrupt_check(sio);
 
 	/* start the receive timer running */
-	mame_timer_adjust(chan->receive_timer, tpc, ((sio - sios) << 1) | ch, tpc);
+	timer_adjust(chan->receive_timer, tpc, ((sio - sios) << 1) | ch, tpc);
 }
 
 

@@ -827,5 +827,5 @@ void rainbow_cchip_init(int version)
 
 	state_save_register_item("cchip", 0, current_bank);
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, cchip_timer);
+	timer_pulse(ATTOTIME_IN_HZ(60), 0, cchip_timer);
 }

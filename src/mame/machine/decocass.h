@@ -24,9 +24,9 @@ extern WRITE8_HANDLER( decocass_adc_w );
 extern READ8_HANDLER( decocass_input_r );
 extern int tape_dir;
 extern int tape_speed;
-extern mame_time tape_time0;
-extern mame_timer *tape_timer;
-mame_time decocass_adjust_tape_time(mame_time tape_time);
+extern attotime tape_time0;
+extern emu_timer *tape_timer;
+attotime decocass_adjust_tape_time(attotime tape_time);
 
 extern WRITE8_HANDLER( decocass_reset_w );
 

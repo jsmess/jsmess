@@ -702,7 +702,7 @@ INPUT_PORTS_END
     Machine driver
 ***************************************************************************/
 
-INTERRUPT_GEN(srmp6_interrupt)
+static INTERRUPT_GEN(srmp6_interrupt)
 {
 	if(!cpu_getiloops())
 	{

@@ -294,7 +294,7 @@ static struct {
 
 	UINT16 status;
 
-	mame_time time;
+	attotime time;
 	int head,track,sector;
 } c65_fdc= { 0 };
 
@@ -311,7 +311,7 @@ static void c65_fdc_state(void)
 {
 	switch (c65_fdc.state) {
 	case FDC_CMD_MOTOR_SPIN_UP:
-		if (mame_timer_get_time()-c65_fdc.time) {
+		if (timer_get_time()-c65_fdc.time) {
 			c65_fdc.state=0;
 			c65_fdc.status&=~FDC_BUSY;
 		}
@@ -333,7 +333,7 @@ static void c65_fdc_w(int offset, int data)
 		case 0x20: // wait for motor spin up
 			c65_fdc.status&=~(FDC_IRQ|FDC_LOST|FDC_CRC|FDC_RNF);
 			c65_fdc.status|=FDC_BUSY;
-			c65_fdc.time=mame_timer_get_time();
+			c65_fdc.time=timer_get_time();
 			c65_fdc.state=FDC_CMD_MOTOR_SPIN_UP;
 			break;
 		case 0: // cancel

@@ -64,7 +64,7 @@ static void dirty_tilemaps(void)	// will be used for save states
 }
 #endif
 
-void gcpinbal_core_vh_start (void)
+static void gcpinbal_core_vh_start (void)
 {
 	int xoffs = 0;
 	int yoffs = 0;

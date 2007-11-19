@@ -523,7 +523,7 @@ READ16_HANDLER( scudhamm_motor_pos_r )
 
     Within $20 vblanks the motor must reach the target. */
 
-static WRITE16_HANDLER( scudhamm_motor_command_w )
+WRITE16_HANDLER( scudhamm_motor_command_w )
 {
 	COMBINE_DATA( &scudhamm_motor_command );
 }
@@ -533,7 +533,6 @@ READ16_HANDLER( scudhamm_analog_r )
 {
 	return readinputport(1);
 }
-
 
 /*
     I don't know how many leds are there, but each bit in the buttons input
@@ -1723,7 +1722,7 @@ GFXDECODE_END
 
 /* CPU # 1 */
 #define CISCHEAT_INTERRUPT_NUM	3
-INTERRUPT_GEN( cischeat_interrupt )
+static INTERRUPT_GEN( cischeat_interrupt )
 {
 	if (cpu_getiloops()==0)
 		cpunum_set_input_line(0, 4, HOLD_LINE); /* Once */
@@ -1877,7 +1876,7 @@ MACHINE_DRIVER_END
     4]          == 3
 */
 #define INTERRUPT_NUM_SCUDHAMM		30
-INTERRUPT_GEN( interrupt_scudhamm )
+static INTERRUPT_GEN( interrupt_scudhamm )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -1928,7 +1927,7 @@ MACHINE_DRIVER_END
                             Arm Champs II
 **************************************************************************/
 
-INTERRUPT_GEN( interrupt_armchmp2)
+static INTERRUPT_GEN( interrupt_armchmp2)
 {
 	switch ( cpu_getiloops() )
 	{
@@ -1967,7 +1966,7 @@ MACHINE_DRIVER_END
 
     We need to untangle it
 */
-void cischeat_untangle_sprites(int region)
+static void cischeat_untangle_sprites(int region)
 {
 	UINT8		*src = memory_region(region);
 	const UINT8	*end = memory_region(region) + memory_region_length(region);

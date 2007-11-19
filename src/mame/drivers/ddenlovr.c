@@ -2749,7 +2749,7 @@ ADDRESS_MAP_END
                             Hanafuda Hana Ginga
 ***************************************************************************/
 
-UINT8 hginga_rombank;
+static UINT8 hginga_rombank;
 static WRITE8_HANDLER( hginga_rombank_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
@@ -2926,7 +2926,7 @@ ADDRESS_MAP_END
                              Hanafuda Hana Gokou
 ***************************************************************************/
 
-UINT8 hgokou_hopper;
+static UINT8 hgokou_hopper;
 
 static UINT8 hgokou_player_r(int player)
 {
@@ -3307,7 +3307,7 @@ static READ8_HANDLER( mjflove_keyb_r )
 	return val;
 }
 
-UINT8 mjflove_irq_cause;
+static UINT8 mjflove_irq_cause;
 
 static READ8_HANDLER( mjflove_blitter_r )
 {
@@ -7058,7 +7058,7 @@ MACHINE_DRIVER_END
 
 /*  It runs in IM 2, thus needs a vector on the data bus:
     0xee is vblank  */
-INTERRUPT_GEN( hparadis_irq )
+static INTERRUPT_GEN( hparadis_irq )
 {
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xee);
 }

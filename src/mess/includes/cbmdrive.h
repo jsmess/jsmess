@@ -46,7 +46,7 @@ typedef struct
 			int forme;				   /* i am selected */
 			int last;				   /* last byte to be sent */
 			int broadcast;			   /* sent to all */
-			mame_time time;
+			attotime time;
 		}
 		serial;
 		struct 

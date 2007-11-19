@@ -92,7 +92,7 @@ static int csb[MAX_BOARD];				/* command status byte */
 static int status[MAX_BOARD];			/* drive status */
 static int error[MAX_BOARD]; 			/* error code */
 static int dip[MAX_BOARD];				/* dip switches */
-static mame_timer *timer[MAX_BOARD];
+static emu_timer *timer[MAX_BOARD];
 
 
 static int data_cnt = 0;                /* data count */
@@ -178,7 +178,7 @@ int pc_hdc_setup(void)
 		status[i] = 0;
 		error[i] = 0;
 		dip[i] = 0xff;
-		timer[i] = mame_timer_alloc(pc_hdc_command);
+		timer[i] = timer_alloc(pc_hdc_command);
 		if (!timer[i])
 			return -1;
 	}
@@ -633,7 +633,7 @@ static void pc_hdc_data_w(int n, int data)
 			status[n] |= STA_INPUT;
 			
 			assert(timer[n]);
-			mame_timer_adjust(timer[n], MAME_TIME_IN_MSEC(1), n, time_zero);
+			timer_adjust(timer[n], ATTOTIME_IN_MSEC(1), n, attotime_zero);
         }
 	}
 }

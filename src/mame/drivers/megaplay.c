@@ -73,7 +73,7 @@ extern UINT8 segae_hintpending;
 extern UINT8 *segae_vdp_regs[];		/* pointer to vdp's registers */
 
 // Interrupt handler - from drivers/segasyse.c
-INTERRUPT_GEN (megaplay_bios_irq)
+static INTERRUPT_GEN (megaplay_bios_irq)
 {
 	int sline;
 	sline = 261 - cpu_getiloops();
@@ -852,7 +852,7 @@ ROM_START( mp_mazin ) /* Mazin Wars */
 ROM_END
 
 
-void megplay_stat(void)
+static void megplay_stat(void)
 {
 	UINT8 *src = memory_region(REGION_CPU3);
 	UINT8 *instruction_rom = memory_region(REGION_USER1);

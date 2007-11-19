@@ -72,7 +72,7 @@ static MACHINE_RESET( super8 )
 	keyboard_scan();
 	/* enable ROM in base >0000, and re-enable RAM shortly thereafter */
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0xC000);
-	mame_timer_set(MAME_TIME_IN_USEC(10), 0, reset_timer_callback);
+	timer_set(ATTOTIME_IN_USEC(10), 0, reset_timer_callback);
 }
 
 static VIDEO_START( super80 )

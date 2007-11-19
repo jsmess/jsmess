@@ -1080,7 +1080,7 @@ static TIMER_CALLBACK( atomicp_sound_irq )
 static MACHINE_RESET( atomicp )
 {
 	machine_reset_system16b(machine);
-	mame_timer_pulse(MAME_TIME_IN_HZ(atomicp_sound_rate), 0, atomicp_sound_irq);
+	timer_pulse(ATTOTIME_IN_HZ(atomicp_sound_rate), 0, atomicp_sound_irq);
 }
 
 

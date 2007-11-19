@@ -1076,7 +1076,7 @@ static struct YM2151interface afega_ym2151_intf =
 	irq_handler
 };
 
-INTERRUPT_GEN( interrupt_afega )
+static INTERRUPT_GEN( interrupt_afega )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -1212,7 +1212,7 @@ static MACHINE_DRIVER_START( firehawk )
 MACHINE_DRIVER_END
 
 
-INTERRUPT_GEN( interrupt_twinactn )
+static INTERRUPT_GEN( interrupt_twinactn )
 {
 	switch ( cpu_getiloops() )
 	{

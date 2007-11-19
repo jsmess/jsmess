@@ -139,7 +139,7 @@ static int bytedecode(int src,int swap_key1,int swap_key2,int xor_key,int select
 	return src;
 }
 
-void kabuki_decode(UINT8 *src,UINT8 *dest_op,UINT8 *dest_data,
+static void kabuki_decode(UINT8 *src,UINT8 *dest_op,UINT8 *dest_data,
 		int base_addr,int length,int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
 	int A;

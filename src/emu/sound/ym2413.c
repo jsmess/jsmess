@@ -1858,7 +1858,7 @@ static int OPLL_LockTable(void)
 #ifdef LOG_CYM_FILE
 	cymfile = fopen("2413_.cym","wb");
 	if (cymfile)
-		mame_timer_pulse ( MAME_TIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
+		timer_pulse ( ATTOTIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
 	else
 		logerror("Could not create file 2413_.cym\n");
 #endif

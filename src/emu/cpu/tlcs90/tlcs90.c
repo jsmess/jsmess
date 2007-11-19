@@ -21,10 +21,10 @@ typedef struct
 	UINT32		ixbase,iybase;
 
 	// Timers: 4 x 8-bit + 1 x 16-bit
-	mame_timer	*timer[4+1];
+	emu_timer	*timer[4+1];
 	UINT8		timer_value[4];
 	UINT16		timer4_value;
-	mame_time	timer_period;
+	attotime	timer_period;
 
 }	t90_Regs;
 
@@ -2305,7 +2305,7 @@ static READ8_HANDLER( t90_internal_registers_r )
 void t90_start_timer(int i)
 {
 	int prescaler;
-	mame_time period;
+	attotime period;
 
 	T90.timer_value[i] = 0;
 
@@ -2342,17 +2342,17 @@ void t90_start_timer(int i)
 	}
 
 
-	period = scale_up_mame_time(T90.timer_period, prescaler);
+	period = attotime_mul(T90.timer_period, prescaler);
 
-	mame_timer_adjust(T90.timer[i], period, i, period);
+	timer_adjust(T90.timer[i], period, i, period);
 
-	logerror("%04X: CPU Timer %d started at %lf Hz\n", activecpu_get_pc(), i, 1.0 / mame_time_to_double(period));
+	logerror("%04X: CPU Timer %d started at %lf Hz\n", activecpu_get_pc(), i, 1.0 / attotime_to_double(period));
 }
 
 void t90_start_timer4(void)
 {
 	int prescaler;
-	mame_time period;
+	attotime period;
 
 	T90.timer4_value = 0;
 
@@ -2364,17 +2364,17 @@ void t90_start_timer4(void)
 					return;
 	}
 
-	period = scale_up_mame_time(T90.timer_period, prescaler);
+	period = attotime_mul(T90.timer_period, prescaler);
 
-	mame_timer_adjust(T90.timer[4], period, 4, period);
+	timer_adjust(T90.timer[4], period, 4, period);
 
-	logerror("%04X: CPU Timer 4 started at %lf Hz\n", activecpu_get_pc(), 1.0 / mame_time_to_double(period));
+	logerror("%04X: CPU Timer 4 started at %lf Hz\n", activecpu_get_pc(), 1.0 / attotime_to_double(period));
 }
 
 
 void t90_stop_timer(int i)
 {
-	mame_timer_adjust(T90.timer[i], time_never, i, time_zero);
+	timer_adjust(T90.timer[i], attotime_never, i, attotime_zero);
 	logerror("%04X: CPU Timer %d stopped\n", activecpu_get_pc(), i);
 }
 
@@ -2652,7 +2652,7 @@ static void t90_init(int index, int clock, const void *config, int (*irqcallback
 	memset(&T90, 0, sizeof(T90));
 	T90.irq_callback = irqcallback;
 
-	T90.timer_period = scale_up_mame_time(MAME_TIME_IN_HZ(cpunum_get_clock(cpu_getactivecpu())), 8);
+	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpu_getactivecpu())), 8);
 
 	// Reset registers to their initial values
 
@@ -2662,9 +2662,9 @@ static void t90_init(int index, int clock, const void *config, int (*irqcallback
 	// Timers
 
 	for (i = 0; i < 4; i++)
-		T90.timer[i] = mame_timer_alloc(t90_timer_callback);
+		T90.timer[i] = timer_alloc(t90_timer_callback);
 
-	T90.timer[4] = mame_timer_alloc(t90_timer4_callback);
+	T90.timer[4] = timer_alloc(t90_timer4_callback);
 }
 
 static ADDRESS_MAP_START(tmp90840_mem, ADDRESS_SPACE_PROGRAM, 8)

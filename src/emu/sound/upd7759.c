@@ -153,8 +153,8 @@ struct upd7759_chip
 	/* internal clock to output sample rate mapping */
 	UINT32		pos;						/* current output sample position */
 	UINT32		step;						/* step value per output sample */
-	mame_time	clock_period;				/* clock period */
-	mame_timer *timer;						/* timer */
+	attotime	clock_period;				/* clock period */
+	emu_timer *timer;						/* timer */
 
 	/* I/O lines */
 	UINT8		fifo_in;					/* last data written to the sound chip */
@@ -540,7 +540,7 @@ static TIMER_CALLBACK_PTR( upd7759_slave_update )
 
 	/* set a timer to go off when that is done */
 	if (chip->state != STATE_IDLE)
-		mame_timer_adjust_ptr(chip->timer, scale_up_mame_time(chip->clock_period, chip->clocks_left), time_zero);
+		timer_adjust_ptr(chip->timer, attotime_mul(chip->clock_period, chip->clocks_left), attotime_zero);
 }
 
 
@@ -575,7 +575,7 @@ static void upd7759_reset(struct upd7759_chip *chip)
 
 	/* turn off any timer */
 	if (chip->timer)
-		mame_timer_adjust_ptr(chip->timer, time_never, time_zero);
+		timer_adjust_ptr(chip->timer, attotime_never, attotime_zero);
 }
 
 
@@ -634,7 +634,7 @@ static void *upd7759_start(int sndindex, int clock, const void *config)
 	chip->step = 4 * FRAC_ONE;
 
 	/* compute the clock period */
-	chip->clock_period = MAME_TIME_IN_HZ(clock);
+	chip->clock_period = ATTOTIME_IN_HZ(clock);
 
 	/* set the intial state */
 	chip->state = STATE_IDLE;
@@ -643,7 +643,7 @@ static void *upd7759_start(int sndindex, int clock, const void *config)
 	if (intf->region != 0)
 		chip->rom = chip->rombase = memory_region(intf->region);
 	else
-		chip->timer = mame_timer_alloc_ptr(upd7759_slave_update, chip);
+		chip->timer = timer_alloc_ptr(upd7759_slave_update, chip);
 
 	/* set the DRQ callback */
 	chip->drqcallback = intf->drqcallback;
@@ -702,7 +702,7 @@ void upd7759_start_w(int which, UINT8 data)
 
 		/* for slave mode, start the timer going */
 		if (chip->timer)
-			mame_timer_adjust_ptr(chip->timer, time_zero, time_zero);
+			timer_adjust_ptr(chip->timer, attotime_zero, attotime_zero);
 	}
 }
 

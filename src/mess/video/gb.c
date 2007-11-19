@@ -89,7 +89,7 @@ static struct gb_lcd_struct {
 	int mode_irq;
 	int delayed_line_irq;
 	struct layer_struct	layer[2];
-	mame_timer	*lcd_timer;
+	emu_timer	*lcd_timer;
 } gb_lcd;
 
 void (*update_scanline)(void);
@@ -320,7 +320,7 @@ static void gb_update_scanline (void) {
 	/* Make sure we're in mode 3 */
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) {
 		/* Calculate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = MAME_TIME_TO_CYCLES( 0, mame_timer_timeleft( gb_lcd.lcd_timer ) );
+		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
 		if ( gb_lcd.start_x == 0 ) {
@@ -603,7 +603,7 @@ static void sgb_update_scanline (void) {
 
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) {
 		/* Calcuate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = MAME_TIME_TO_CYCLES( 0, mame_timer_timeleft( gb_lcd.lcd_timer ) );
+		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
 		if ( gb_lcd.start_x == 0 ) {
@@ -866,7 +866,7 @@ static void cgb_update_scanline (void) {
 
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) {
 		/* Calcuate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = MAME_TIME_TO_CYCLES( 0, mame_timer_timeleft( gb_lcd.lcd_timer ) );
+		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
 		if ( gb_lcd.start_x == 0 ) {
@@ -1049,8 +1049,8 @@ void gb_video_init( void ) {
 	/* set the scanline update function */
 	update_scanline = gb_update_scanline;
 
-	gb_lcd.lcd_timer = mame_timer_alloc( gb_lcd_timer_proc );
-	mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(456,0), 0, time_never );
+	gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc );
+	timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0, attotime_never );
 }
 
 void sgb_video_init( void ) {
@@ -1178,7 +1178,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check for HBLANK DMA */
 			if( gbc_hdma_enabled )
 				gbc_hdma(0x10);
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(196 - 10 * gb_lcd.sprCount,0), GB_LCD_STATE_LYXX_M0_PRE_INC, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(196 - 10 * gb_lcd.sprCount,0), GB_LCD_STATE_LYXX_M0_PRE_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			if ( CURLINE < 143 ) {
@@ -1190,7 +1190,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 					}
 				}
 			}
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_INC, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
 			gb_increment_scanline();
@@ -1203,7 +1203,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			LCDSTAT &= 0xFB;
 			/* Check if we're going into VBlank next */
 			if ( CURLINE == 144 ) {
-				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1, time_never );
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1, attotime_never );
 			} else {
 				/* Internally switch to mode 2 */
 				gb_lcd.mode = 2;
@@ -1215,7 +1215,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				} else {
 					gb_lcd.mode_irq = 0;
 				}
-				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2, time_never );
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2, attotime_never );
 			}
 			break;
 		case GB_LCD_STATE_LY00_M2:		/* Switch to mode 2 on line #0 */
@@ -1227,7 +1227,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 			}
 			/* Mode 2 lasts approximately 80 clock cycles */
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
@@ -1242,7 +1242,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				LCDSTAT |= 0x04;
 			}
 			/* Mode 2 last for approximately 80 clock cycles */
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
 			gb_select_sprites();
@@ -1250,7 +1250,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
 			/* Mode 3 lasts for approximately 172+#sprites*10 clock cycles */
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(172 + 10 * gb_lcd.sprCount,0), GB_LCD_STATE_LYXX_M0, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(172 + 10 * gb_lcd.sprCount,0), GB_LCD_STATE_LYXX_M0, attotime_never );
 			gb_lcd.start_x = 0;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
@@ -1269,7 +1269,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
 			}
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
 			gb_increment_scanline();
@@ -1281,9 +1281,9 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Reset LY==LYC STAT bit */
 			LCDSTAT &= 0xFB;
 			if ( gb_lcd.current_line == 153 ) {
-				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1, time_never );
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1, attotime_never );
 			} else {
-				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1, time_never );
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1, attotime_never );
 			}
 			break;
 		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
@@ -1304,13 +1304,13 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 //				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 //			}
 			LCDSTAT &= 0xFB;
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4/*8*/,0), GB_LCD_STATE_LY00_M1_1, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4/*8*/,0), GB_LCD_STATE_LY00_M1_1, attotime_never );
 			break;
 		case GB_LCD_STATE_LY00_M1_1:
 			if ( ! gb_lcd.delayed_line_irq && gb_lcd.line_irq ) {
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 			}
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_2, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_2, attotime_never );
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
 			if ( gb_lcd.delayed_line_irq && gb_lcd.line_irq ) {
@@ -1319,13 +1319,13 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
 			}
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(444,0), GB_LCD_STATE_LY00_M0, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(444,0), GB_LCD_STATE_LY00_M0, attotime_never );
 			break;
 		case GB_LCD_STATE_LY00_M0:		/* The STAT register seems to go to 0 for about 4 cycles */
 			/* Set Mode 0 lcdstat */
 			gb_lcd.mode = 0;
 			LCDSTAT = ( LCDSTAT & 0xFC );
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M2, time_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M2, attotime_never );
 			break;
 		}
 	} else {
@@ -1333,7 +1333,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 		if ( gb_lcd.current_line < 144 ) {
 			update_scanline();
 		}
-		mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(456,0), 0, time_never );
+		timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0, attotime_never );
 	}
 }
 
@@ -1352,17 +1352,17 @@ static void gb_lcd_switch_on( void ) {
 			cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 		}
 	}
-	mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, time_never );
+	timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
 }
 
 /* Make sure the video information is up to date */
 void gb_video_up_to_date( void ) {
-	mame_timer_set_global_time(mame_timer_get_time());
+	timer_set_global_time(timer_get_time());
 }
 
 READ8_HANDLER( gb_video_r ) {
 //	if ( 0 && activecpu_get_pc() > 0x100 ) {
-//		logerror("LCDSTAT/LY read, cycles left is %d\n", (int)MAME_TIME_TO_CYCLES(0,mame_timer_timeleft( gb_lcd.lcd_timer )) );
+//		logerror("LCDSTAT/LY read, cycles left is %d\n", (int)ATTOTIME_TO_CYCLES(0,timer_timeleft( gb_lcd.lcd_timer )) );
 //	}
 	gb_video_up_to_date();
 	return gb_vid_regs[offset];

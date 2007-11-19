@@ -30,7 +30,7 @@
 static UINT8 microtan_keypad_column;
 static UINT8 microtan_keyboard_ascii;
 
-static mame_timer *microtan_timer = NULL;
+static emu_timer *microtan_timer = NULL;
 
 static int via_0_irq_line = CLEAR_LINE;
 static int via_1_irq_line = CLEAR_LINE;
@@ -434,7 +434,7 @@ WRITE8_HANDLER ( microtan_bffx_w )
         break;
     case 1: /* BFF1: write delayed NMI */
         LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
-        mame_timer_set(MAME_TIME_IN_CYCLES(8,0), 0, microtan_pulse_nmi);
+        timer_set(ATTOTIME_IN_CYCLES(8,0), 0, microtan_pulse_nmi);
         break;
     case 2: /* BFF2: write keypad column write (what is this meant for?) */
         LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));
@@ -965,5 +965,5 @@ MACHINE_RESET( microtan )
 
 	acia_6551_init();
 
-	microtan_timer = mame_timer_alloc(microtan_read_cassette);
+	microtan_timer = timer_alloc(microtan_read_cassette);
 }

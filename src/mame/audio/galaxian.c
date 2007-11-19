@@ -37,7 +37,7 @@
 #define LOG(x)
 #endif
 
-static mame_timer *lfotimer = NULL;
+static emu_timer *lfotimer = NULL;
 static INT32 freq = MAXFREQ;
 
 #define STEP 1
@@ -69,7 +69,7 @@ static INT16 backgroundwave[32] =
 #define CHANNEL_SHOOT	1
 #define CHANNEL_LFO		2
 static sound_stream * tone_stream;
-static mame_timer *noisetimer;
+static emu_timer *noisetimer;
 
 static TIMER_CALLBACK( lfo_timer_cb );
 static TIMER_CALLBACK( galaxian_sh_update );
@@ -363,12 +363,12 @@ static void galaxian_sh_start(void)
 	sample_set_volume(CHANNEL_LFO+2,0);
 	sample_start_raw(CHANNEL_LFO+2,backgroundwave,sizeof(backgroundwave)/2,1000,1);
 
-	noisetimer = mame_timer_alloc(noise_timer_cb);
-	mame_timer_adjust(noisetimer, MAME_TIME_IN_NSEC((155000+22000)/100*693*22), 0, MAME_TIME_IN_NSEC((155000+22000)/100*693*22));
+	noisetimer = timer_alloc(noise_timer_cb);
+	timer_adjust(noisetimer, ATTOTIME_IN_NSEC((155000+22000)/100*693*22), 0, ATTOTIME_IN_NSEC((155000+22000)/100*693*22));
 
-	lfotimer = mame_timer_alloc(lfo_timer_cb);
+	lfotimer = timer_alloc(lfo_timer_cb);
 
-	mame_timer_pulse(make_mame_time(0, Machine->screen[0].refresh), 0, galaxian_sh_update);
+	timer_pulse(attotime_make(0, Machine->screen[0].refresh), 0, galaxian_sh_update);
 
 	state_save_register_global(freq);
 	state_save_register_global(noise_enable);
@@ -446,7 +446,7 @@ WRITE8_HANDLER( galaxian_lfo_freq_w )
 #undef Vbe
 #undef Vcc
 	logerror("lfo timer bits:%d%d%d%d r1:%d, r2:%d, re: %d, td: %9.2fsec\n", lfobit[0], lfobit[1], lfobit[2], lfobit[3], (int)r1, (int)r2, (int)Re, td);
-	mame_timer_adjust(lfotimer, make_mame_time(0, MAX_SUBSECONDS / (MAXFREQ-MINFREQ) * td), 0, make_mame_time(0, MAX_SUBSECONDS / (MAXFREQ-MINFREQ) * td));
+	timer_adjust(lfotimer, attotime_make(0, ATTOSECONDS_PER_SECOND / (MAXFREQ-MINFREQ) * td), 0, attotime_make(0, ATTOSECONDS_PER_SECOND / (MAXFREQ-MINFREQ) * td));
 #else
 	double r0, r1, rx = 100000.0;
 
@@ -503,7 +503,7 @@ WRITE8_HANDLER( galaxian_lfo_freq_w )
 	rx = rx + 2000000.0 * r0 / (r0+r1);
 
 	LOG(("lfotimer bits:%d%d%d%d r0:%d, r1:%d, rx: %d, time: %9.2fus\n", lfobit[3], lfobit[2], lfobit[1], lfobit[0], (int)r0, (int)r1, (int)rx, 0.639 * rx));
-	mame_timer_adjust(lfotimer, make_mame_time(0, MAX_SUBSECONDS / 1000000000 / (MAXFREQ-MINFREQ) * 639 * rx), 0, make_mame_time(0, MAX_SUBSECONDS / 1000000000 / (MAXFREQ-MINFREQ) * 639 * rx));
+	timer_adjust(lfotimer, attotime_make(0, ATTOSECONDS_PER_SECOND / 1000000000 / (MAXFREQ-MINFREQ) * 639 * rx), 0, attotime_make(0, ATTOSECONDS_PER_SECOND / 1000000000 / (MAXFREQ-MINFREQ) * 639 * rx));
 #endif
 }
 

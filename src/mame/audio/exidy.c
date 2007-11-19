@@ -48,7 +48,7 @@ static UINT8 pia_irq_state;
 static UINT8 riot_irq_state;
 
 /* 6532 variables */
-static mame_timer *riot_timer;
+static emu_timer *riot_timer;
 static UINT8 riot_irq_flag;
 static UINT8 riot_timer_irq_enable;
 static UINT8 riot_PA7_irq_enable;
@@ -420,7 +420,7 @@ static void *common_start(void)
 	sh6840_LFSR_3 = 0xffffffff;
 
 	/* Init 6532 */
-    riot_timer = mame_timer_alloc(riot_interrupt);
+    riot_timer = timer_alloc(riot_interrupt);
     riot_irq_flag = 0;
     riot_timer_irq_enable = 0;
 	riot_porta_data = 0xff;
@@ -491,14 +491,14 @@ static TIMER_CALLBACK( riot_interrupt )
 
 		/* now start counting clock cycles down */
 		riot_state = RIOT_POST_COUNT;
-		mame_timer_adjust(riot_timer, scale_up_mame_time(MAME_TIME_IN_HZ(SH6532_CLOCK), 0xff), 0, time_zero);
+		timer_adjust(riot_timer, attotime_mul(ATTOTIME_IN_HZ(SH6532_CLOCK), 0xff), 0, attotime_zero);
 	}
 
 	/* if not, we are done counting down */
 	else
 	{
 		riot_state = RIOT_IDLE;
-		mame_timer_adjust(riot_timer, time_never, 0, time_never);
+		timer_adjust(riot_timer, attotime_never, 0, attotime_never);
 	}
 }
 
@@ -536,11 +536,11 @@ WRITE8_HANDLER( exidy_shriot_w )
 					if (!(data & 0x01) && (riot_portb_data & 0x01))
 					{
 						riot_porta_data = tms5220_status_r(0);
-						logerror("(%f)%04X:TMS5220 status read = %02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), riot_porta_data);
+						logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot_porta_data);
 					}
 					if (!(data & 0x02) && (riot_portb_data & 0x02))
 					{
-						logerror("(%f)%04X:TMS5220 data write = %02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), riot_porta_data);
+						logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot_porta_data);
 						tms5220_data_w(0, riot_porta_data);
 					}
 				}
@@ -575,7 +575,7 @@ WRITE8_HANDLER( exidy_shriot_w )
 
 		/* set a new timer */
 		riot_clock_divisor = divisors[offset & 0x03];
-		mame_timer_adjust(riot_timer, scale_up_mame_time(MAME_TIME_IN_HZ(SH6532_CLOCK), data * riot_clock_divisor), 0, time_zero);
+		timer_adjust(riot_timer, attotime_mul(ATTOTIME_IN_HZ(SH6532_CLOCK), data * riot_clock_divisor), 0, attotime_zero);
 		riot_state = RIOT_COUNT;
 	}
 }
@@ -641,10 +641,10 @@ READ8_HANDLER( exidy_shriot_r )
 				return 0x00;
 
 			case RIOT_COUNT:
-				return mame_time_to_double(mame_timer_timeleft(riot_timer)) * SH6532_CLOCK / riot_clock_divisor;
+				return attotime_to_double(timer_timeleft(riot_timer)) * SH6532_CLOCK / riot_clock_divisor;
 
 			case RIOT_POST_COUNT:
-				return mame_time_to_double(mame_timer_timeleft(riot_timer)) * SH6532_CLOCK;
+				return attotime_to_double(timer_timeleft(riot_timer)) * SH6532_CLOCK;
 		}
 	}
 
@@ -843,8 +843,8 @@ READ8_HANDLER( mtrap_voiceio_r )
 	}
     if (!(offset & 0x40))
     {
-    	mame_time curtime = mame_timer_get_time();
-    	int clock_pulse = curtime.subseconds / HZ_TO_SUBSECONDS(2 * CVSD_CLOCK_FREQ);
+    	attotime curtime = timer_get_time();
+    	int clock_pulse = curtime.attoseconds / HZ_TO_ATTOSECONDS(2 * CVSD_CLOCK_FREQ);
     	return (clock_pulse & 1) << 7;
 	}
 	return 0;

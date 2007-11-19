@@ -352,7 +352,7 @@ WRITE32_HANDLER( cgboard_1_shared_sharc_w )
 
 /*****************************************************************************/
 
-UINT32 nwk_fifo_r(int board)
+static UINT32 nwk_fifo_r(int board)
 {
 	int cpu = (board == 0) ? 2 : 3;
 	UINT32 data;
@@ -390,7 +390,7 @@ UINT32 nwk_fifo_r(int board)
 	return data;
 }
 
-void nwk_fifo_w(int board, UINT32 data)
+static void nwk_fifo_w(int board, UINT32 data)
 {
 	int cpu = (board == 0) ? 2 : 3;
 

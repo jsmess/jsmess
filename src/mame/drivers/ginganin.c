@@ -311,7 +311,7 @@ GFXDECODE_END
 
 
 /* Modified by Takahiro Nogi. 1999/09/27 */
-INTERRUPT_GEN( ginganin_sound_interrupt )
+static INTERRUPT_GEN( ginganin_sound_interrupt )
 {
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */

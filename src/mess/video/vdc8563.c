@@ -25,7 +25,7 @@
 
 #if VERBOSE
 #define DBG_LOG(N,M,A)      \
-    if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",mame_timer_get_time(),(char*)M );
+    if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M );
  logerror A; }
 #else
 #define DBG_LOG(N,M,A)
@@ -386,7 +386,7 @@ static int vdc8563_clocks_in_frame(void)
 static void vdc8563_time(void)
 {
 	double neu, ftime;
-	neu=mame_time_to_double(mame_timer_get_time());
+	neu=attotime_to_double(timer_get_time());
 
 	if (vdc8563_clocks_in_frame()==0.0) return;
 	ftime=16*vdc8563_clocks_in_frame()/2000000.0;

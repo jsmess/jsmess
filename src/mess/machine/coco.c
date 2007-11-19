@@ -104,9 +104,9 @@ easier to manage.
 static UINT8 *coco_rom;
 static int dclg_state, dclg_output_h, dclg_output_v, dclg_timer;
 static UINT8 (*update_keyboard)(void);
-static mame_timer *update_keyboard_timer;
-static mame_timer *mux_sel1_timer;
-static mame_timer *mux_sel2_timer;
+static emu_timer *update_keyboard_timer;
+static emu_timer *mux_sel1_timer;
+static emu_timer *mux_sel2_timer;
 static UINT8 mux_sel1, mux_sel2;
 
 static WRITE8_HANDLER ( d_pia1_pb_w );
@@ -380,9 +380,9 @@ static const sam6883_interface coco3_sam_intf =
 };
 
 static coco_cartridge *coco_cart;
-static mame_timer *cart_timer;
-static mame_timer *nmi_timer;
-static mame_timer *halt_timer;
+static emu_timer *cart_timer;
+static emu_timer *nmi_timer;
+static emu_timer *halt_timer;
 
 
 
@@ -875,7 +875,7 @@ void coco_set_halt_line(int halt_line)
 {
 	cpunum_set_input_line(0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
-		mame_timer_set(MAME_TIME_IN_CYCLES(1,0), 0, recalc_interrupts);
+		timer_set(ATTOTIME_IN_CYCLES(1,0), 0, recalc_interrupts);
 }
 
 
@@ -982,10 +982,10 @@ static coco_input_device get_input_device(coco_input_port port)
 ***************************************************************************/
 
 static int coco_hiresjoy_ca = 1;
-static mame_time coco_hiresjoy_xtransitiontime;
-static mame_time coco_hiresjoy_ytransitiontime;
+static attotime coco_hiresjoy_xtransitiontime;
+static attotime coco_hiresjoy_ytransitiontime;
 
-static mame_time coco_hiresjoy_computetransitiontime(const char *inputport)
+static attotime coco_hiresjoy_computetransitiontime(const char *inputport)
 {
 	double val;
 
@@ -1002,7 +1002,7 @@ static mame_time coco_hiresjoy_computetransitiontime(const char *inputport)
 		val = val * 4160.0 + 592.0;
 	}
 
-	return add_mame_times(mame_timer_get_time(), scale_up_mame_time(COCO_CPU_SPEED, val));
+	return attotime_add(timer_get_time(), attotime_mul(COCO_CPU_SPEED, val));
 }
 
 static void coco_hiresjoy_w(int data)
@@ -1016,16 +1016,16 @@ static void coco_hiresjoy_w(int data)
 	else if (data && !coco_hiresjoy_ca)
 	{
 		/* Lo to hi */
-		coco_hiresjoy_ytransitiontime = time_zero;
-		coco_hiresjoy_ytransitiontime = time_zero;
+		coco_hiresjoy_ytransitiontime = attotime_zero;
+		coco_hiresjoy_ytransitiontime = attotime_zero;
 	}
 	coco_hiresjoy_ca = data;
 	(*update_keyboard)();
 }
 
-static int coco_hiresjoy_readone(mame_time transitiontime)
+static int coco_hiresjoy_readone(attotime transitiontime)
 {
-	return compare_mame_times(mame_timer_get_time(), transitiontime) >= 0;
+	return attotime_compare(timer_get_time(), transitiontime) >= 0;
 }
 
 static int coco_hiresjoy_rx(void)
@@ -1188,7 +1188,7 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 
 static WRITE8_HANDLER ( d_pia0_ca2_w )
 {
-	mame_timer_adjust(mux_sel1_timer, MAME_TIME_IN_USEC(16), data, time_never);
+	timer_adjust(mux_sel1_timer, ATTOTIME_IN_USEC(16), data, attotime_never);
 }
 
 static TIMER_CALLBACK(coco_update_sel1_timerproc)
@@ -1200,7 +1200,7 @@ static TIMER_CALLBACK(coco_update_sel1_timerproc)
 
 static WRITE8_HANDLER ( d_pia0_cb2_w )
 {
-	mame_timer_adjust(mux_sel2_timer, MAME_TIME_IN_USEC(16), data, time_never);
+	timer_adjust(mux_sel2_timer, ATTOTIME_IN_USEC(16), data, attotime_never);
 }
 
 static TIMER_CALLBACK(coco_update_sel2_timerproc)
@@ -1211,15 +1211,15 @@ static TIMER_CALLBACK(coco_update_sel2_timerproc)
 }
 
 
-static mame_time get_relative_time(mame_time absolute_time)
+static attotime get_relative_time(attotime absolute_time)
 {
-	mame_time result;
-	mame_time now = mame_timer_get_time();
+	attotime result;
+	attotime now = timer_get_time();
 
-	if (compare_mame_times(absolute_time, now) > 0)
-		result = sub_mame_times(absolute_time, now);
+	if (attotime_compare(absolute_time, now) > 0)
+		result = attotime_sub(absolute_time, now);
 	else
-		result = time_never;
+		result = attotime_never;
 	return result;
 }
 
@@ -1231,7 +1231,7 @@ static UINT8 coco_update_keyboard(void)
 	int joyval;
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
 	static const int dclg_table[] = {0, 14, 30, 49 };
-	mame_time dclg_time = time_zero;
+	attotime dclg_time = attotime_zero;
 	UINT8 pia0_pb;
 	UINT8 dac = pia_get_output_a(1) & 0xFC;
 	int joystick_axis, joystick;
@@ -1306,19 +1306,19 @@ static UINT8 coco_update_keyboard(void)
 			break;
 	}
 	
-	if( compare_mame_times(dclg_time, time_zero) )
+	if( attotime_compare(dclg_time, attotime_zero) )
 	{
 		/* schedule lightgun events */
-		mame_timer_reset(update_keyboard_timer, dclg_time );
+		timer_reset(update_keyboard_timer, dclg_time );
 	}
 	else
 	{
 		/* schedule hires joystick events */
-		mame_time xtrans = get_relative_time(coco_hiresjoy_xtransitiontime);
-		mame_time ytrans = get_relative_time(coco_hiresjoy_ytransitiontime);
+		attotime xtrans = get_relative_time(coco_hiresjoy_xtransitiontime);
+		attotime ytrans = get_relative_time(coco_hiresjoy_ytransitiontime);
 
-		mame_timer_reset(update_keyboard_timer,
-			(compare_mame_times(xtrans, ytrans) > 0) ? ytrans : xtrans);
+		timer_reset(update_keyboard_timer,
+			(attotime_compare(xtrans, ytrans) > 0) ? ytrans : xtrans);
 	}
 
 	/* sample joystick buttons */
@@ -2002,7 +2002,7 @@ static void d_sam_set_memorysize(int val)
   FAQ agrees with this
 ***************************************************************************/
 
-static mame_timer *coco3_gime_timer;
+static emu_timer *coco3_gime_timer;
 
 static void coco3_timer_reset(void)
 {
@@ -2010,7 +2010,7 @@ static void coco3_timer_reset(void)
 	UINT64 current_time;
 	UINT16 timer_value;
 	m6847_timing_type timing;
-	mame_time target_time;
+	attotime target_time;
 
 	/* value is from 0-4095 */
 	timer_value = ((coco3_gimereg[4] & 0x0F) * 0x100) | coco3_gimereg[5];
@@ -2032,15 +2032,15 @@ static void coco3_timer_reset(void)
 		/* calculate the time */
 		target_time = m6847_time_until(timing, current_time + timer_value);
 		if (LOG_TIMER)
-			logerror("coco3_reset_timer(): target_time=%g\n", mame_time_to_double(target_time));
+			logerror("coco3_reset_timer(): target_time=%g\n", attotime_to_double(target_time));
 
 		/* and adjust the timer */
-		mame_timer_adjust(coco3_gime_timer, target_time, 0, time_zero);
+		timer_adjust(coco3_gime_timer, target_time, 0, attotime_zero);
 	}
 	else
 	{
 		/* timer is shut off */
-		mame_timer_reset(coco3_gime_timer, time_never);
+		timer_reset(coco3_gime_timer, attotime_never);
 		if (LOG_TIMER)
 			logerror("coco3_reset_timer(): timer is off\n");
 	}
@@ -2060,7 +2060,7 @@ static TIMER_CALLBACK(coco3_timer_proc)
 
 static void coco3_timer_init(void)
 {
-	coco3_gime_timer = mame_timer_alloc(coco3_timer_proc);
+	coco3_gime_timer = timer_alloc(coco3_timer_proc);
 }
 
 
@@ -2573,7 +2573,7 @@ static TIMER_CALLBACK(coco_cart_timer_proc)
 
 	/* special code for Q state */
 	if ((data == 0x02) || (data == 0x03) || (data == 0x04))
-		mame_timer_adjust(cart_timer, MAME_TIME_IN_USEC(0), data + 1, time_zero);
+		timer_adjust(cart_timer, ATTOTIME_IN_USEC(0), data + 1, attotime_zero);
 }
 
 
@@ -2627,15 +2627,15 @@ static void coco_setcartline(coco_cartridge *cartridge, cococart_line line, coco
 	switch(line)
 	{
 		case COCOCART_LINE_CART:
-			mame_timer_adjust(cart_timer, MAME_TIME_IN_USEC(0), (int) value, time_zero);
+			timer_adjust(cart_timer, ATTOTIME_IN_USEC(0), (int) value, attotime_zero);
 			break;
 
 		case COCOCART_LINE_NMI:
-			mame_timer_adjust(nmi_timer, MAME_TIME_IN_USEC(0), (int) value, time_zero);
+			timer_adjust(nmi_timer, ATTOTIME_IN_USEC(0), (int) value, attotime_zero);
 			break;
 
 		case COCOCART_LINE_HALT:
-			mame_timer_adjust(halt_timer, MAME_TIME_IN_CYCLES(7,0), (int) value, time_zero);
+			timer_adjust(halt_timer, ATTOTIME_IN_CYCLES(7,0), (int) value, attotime_zero);
 			break;
 	}
 }
@@ -2696,7 +2696,7 @@ static void twiddle_cart_line_if_q(void)
 {
 	/* if the cartridge CART line is set to Q, trigger another round of pulses */
 	if ((coco_cart != NULL) && (cococart_get_line(coco_cart, COCOCART_LINE_CART) == COCOCART_LINE_VALUE_Q))
-		mame_timer_adjust(cart_timer, MAME_TIME_IN_USEC(0), 0x02, time_zero);
+		timer_adjust(cart_timer, ATTOTIME_IN_USEC(0), 0x02, attotime_zero);
 }
 
 
@@ -2745,19 +2745,19 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 
 	/* clear static variables */
 	coco_hiresjoy_ca = 1;
-	coco_hiresjoy_xtransitiontime = time_zero;
-	coco_hiresjoy_ytransitiontime = time_zero;
+	coco_hiresjoy_xtransitiontime = attotime_zero;
+	coco_hiresjoy_ytransitiontime = attotime_zero;
 
 	/* set up function pointers */
 	update_keyboard = coco_update_keyboard;
 	recalc_interrupts = init->recalc_interrupts_;
 
 	/* this timer is used to schedule keyboard updating */
-	update_keyboard_timer = mame_timer_alloc(coco_update_keyboard_timerproc);
+	update_keyboard_timer = timer_alloc(coco_update_keyboard_timerproc);
 	
 	/* these are the timers to delay the MUX switching */
-	mux_sel1_timer = mame_timer_alloc(coco_update_sel1_timerproc);
-	mux_sel2_timer = mame_timer_alloc(coco_update_sel2_timerproc);
+	mux_sel1_timer = timer_alloc(coco_update_sel1_timerproc);
+	mux_sel2_timer = timer_alloc(coco_update_sel2_timerproc);
 
 	/* setup ROM */
 	coco_rom = memory_region(REGION_CPU1);
@@ -2777,9 +2777,9 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	pia_reset();
 
 	/* cartridge line timers */
-	cart_timer = mame_timer_alloc(init->cart_timer_proc);
-	nmi_timer = mame_timer_alloc(nmi_timer_proc);
-	halt_timer = mame_timer_alloc(halt_timer_proc);
+	cart_timer = timer_alloc(init->cart_timer_proc);
+	nmi_timer = timer_alloc(nmi_timer_proc);
+	halt_timer = timer_alloc(halt_timer_proc);
 
 	/* determine which cartridge hardware we should be using */
 	cart_image = cartslot_image();

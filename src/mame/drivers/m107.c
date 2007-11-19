@@ -27,7 +27,7 @@
 
 
 
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 static UINT8 m107_irq_vectorbase;
 
 static TIMER_CALLBACK( m107_scanline_interrupt );
@@ -45,12 +45,12 @@ static WRITE16_HANDLER( bankswitch_w )
 
 static MACHINE_START( m107 )
 {
-	scanline_timer = mame_timer_alloc(m107_scanline_interrupt);
+	scanline_timer = timer_alloc(m107_scanline_interrupt);
 }
 
 static MACHINE_RESET( m107 )
 {
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_never);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 /*****************************************************************************/
@@ -76,7 +76,7 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine->screen[0].height)
 		scanline = 0;
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_never);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_never);
 }
 
 

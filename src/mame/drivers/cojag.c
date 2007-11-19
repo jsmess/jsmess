@@ -474,7 +474,7 @@ static TIMER_CALLBACK( gpu_sync_timer )
 {
 	/* if a command is still pending, and we haven't maxed out our timer, set a new one */
 	if (gpu_command_pending && param < 1000)
-		mame_timer_set(MAME_TIME_IN_USEC(50), ++param, gpu_sync_timer);
+		timer_set(ATTOTIME_IN_USEC(50), ++param, gpu_sync_timer);
 }
 
 
@@ -984,7 +984,7 @@ static struct jaguar_config dsp_config =
 };
 
 
-MACHINE_DRIVER_START( cojagr3k )
+static MACHINE_DRIVER_START( cojagr3k )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(R3000BE, 66000000/2)
@@ -1025,7 +1025,7 @@ MACHINE_DRIVER_START( cojagr3k )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( r3knarrow )
+static MACHINE_DRIVER_START( r3knarrow )
 	MDRV_IMPORT_FROM(cojagr3k)
 
 	/* video hardware */
@@ -1033,7 +1033,7 @@ MACHINE_DRIVER_START( r3knarrow )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( cojag68k )
+static MACHINE_DRIVER_START( cojag68k )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 50000000/2)

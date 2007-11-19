@@ -7,7 +7,7 @@
 #include "driver.h"
 
 
-UINT8 *brkthru_scroll;
+//UINT8 *brkthru_scroll;
 UINT8 *brkthru_videoram;
 size_t brkthru_videoram_size;
 static int bgscroll;

@@ -281,7 +281,7 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 		sndpending = 1;
 		cpunum_set_input_line(1,2,HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		cpu_spinuntil_time(MAME_TIME_IN_USEC(50));
+		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 	}
 }
 

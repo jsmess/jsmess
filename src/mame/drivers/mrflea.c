@@ -153,7 +153,7 @@ static READ8_HANDLER( mrflea_io_status_r ){
 	return mrflea_status^0x01;
 }
 
-INTERRUPT_GEN( mrflea_io_interrupt ){
+static INTERRUPT_GEN( mrflea_io_interrupt ){
 	if( cpu_getiloops()==0 || (mrflea_status&0x08) )
 		cpunum_set_input_line(1, 0, HOLD_LINE);
 }

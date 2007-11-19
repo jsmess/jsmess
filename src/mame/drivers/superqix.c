@@ -132,7 +132,7 @@ VIDEO_UPDATE( superqix );
 /* pbillian sample playback */
 static INT16 *samplebuf;
 
-void pbillian_sh_start(void)
+static void pbillian_sh_start(void)
 {
 	UINT8 *src = memory_region(REGION_SOUND1);
 	int i;
@@ -345,7 +345,7 @@ logerror("Z80 sends command %02x\n",param);
 	from_z80 = param;
 	from_mcu_pending = 0;
 	cpunum_set_input_line(1, 0, HOLD_LINE);
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(200));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(200));
 }
 
 static TIMER_CALLBACK( delayed_mcu_z80_w )

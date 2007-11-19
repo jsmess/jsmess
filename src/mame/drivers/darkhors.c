@@ -70,8 +70,8 @@ static VIDEO_START( darkhors );
 static VIDEO_UPDATE( darkhors );
 
 static tilemap *darkhors_tmap, *darkhors_tmap2;
-UINT32 *darkhors_tmapram,  *darkhors_tmapscroll;
-UINT32 *darkhors_tmapram2, *darkhors_tmapscroll2;
+static UINT32 *darkhors_tmapram,  *darkhors_tmapscroll;
+static UINT32 *darkhors_tmapram2, *darkhors_tmapscroll2;
 
 static TILE_GET_INFO( get_tile_info_0 )
 {

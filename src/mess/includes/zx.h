@@ -19,7 +19,7 @@ VIDEO_EOF( zx );
 void zx_ula_bkgnd(int color);
 int zx_ula_r(int offs, int region);
 
-extern mame_timer *ula_nmi;
+extern emu_timer *ula_nmi;
 extern int ula_irq_active;
 extern int ula_nmi_active;
 extern int ula_frame_vsync;

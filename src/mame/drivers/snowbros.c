@@ -100,8 +100,8 @@ static VIDEO_EOF( snowbros )
 
 
 static UINT16 *hyperpac_ram;
-int sb3_music_is_playing;
-int sb3_music;
+static int sb3_music_is_playing;
+static int sb3_music;
 
 static INTERRUPT_GEN( snowbros_interrupt )
 {
@@ -408,7 +408,7 @@ static READ16_HANDLER( sb3_sound_r )
 	return 0x0003;
 }
 
-void sb3_play_music(int data)
+static void sb3_play_music(int data)
 {
 	/* sample is actually played in interrupt function so it loops */
 	sb3_music = data;
@@ -452,7 +452,7 @@ void sb3_play_music(int data)
 	}
 }
 
-void sb3_play_sound (int data)
+static void sb3_play_sound (int data)
 {
 	int status = OKIM6295_status_0_r(0);
 

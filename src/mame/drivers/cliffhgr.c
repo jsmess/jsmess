@@ -91,7 +91,7 @@ static render_texture *video_texture;
 static render_texture *overlay_texture;
 static mame_bitmap *last_video_bitmap;
 
-static mame_timer *irq_timer;
+static emu_timer *irq_timer;
 
 /********************************************************/
 
@@ -251,7 +251,7 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	if ( phillips_code & 0x800000 )
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
 
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, param, 0), param, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, param, 0), param, attotime_zero);
 }
 
 static void vdp_interrupt (int state)
@@ -264,14 +264,14 @@ static void vdp_interrupt (int state)
 static MACHINE_START( cliffhgr )
 {
 	discinfo = laserdisc_init(LASERDISC_TYPE_PR8210, get_disk_handle(0), 0);
-	irq_timer = mame_timer_alloc(cliff_irq_callback);
+	irq_timer = timer_alloc(cliff_irq_callback);
 }
 
 static MACHINE_RESET( cliffhgr )
 {
 	port_bank = 0;
 	phillips_code = 0;
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, 17, 0), 17, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, 17, 0), 17, attotime_zero);
 }
 
 /********************************************************/

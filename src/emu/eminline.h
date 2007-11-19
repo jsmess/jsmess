@@ -147,6 +147,36 @@ INLINE UINT32 divu_64x32(UINT64 a, UINT32 b)
 
 
 /*-------------------------------------------------
+    div_64x32_rem - perform a signed 64 bit x 32
+    bit divide and return the 32 bit quotient and
+    32 bit remainder
+-------------------------------------------------*/
+
+#ifndef div_64x32_rem
+INLINE INT32 div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
+{
+	*remainder = a % (INT64)b;
+	return a / (INT64)b;
+}
+#endif
+
+
+/*-------------------------------------------------
+    divu_64x32_rem - perform an unsigned 64 bit x
+    32 bit divide and return the 32 bit quotient
+    and 32 bit remainder
+-------------------------------------------------*/
+
+#ifndef divu_64x32_rem
+INLINE UINT32 divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
+{
+	*remainder = a % (UINT64)b;
+	return a / (UINT64)b;
+}
+#endif
+
+
+/*-------------------------------------------------
     div_32x32_shift - perform a signed divide of
     two 32 bit values, shifting the first before
     division, and returning the 32 bit quotient

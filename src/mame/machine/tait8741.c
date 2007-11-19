@@ -78,7 +78,7 @@ static int taito8741_hostcmd_r(I8741 *st)
 
 /* TAITO8741 I8741 emulation */
 
-void taito8741_serial_rx(I8741 *st,UINT8 *data)
+static void taito8741_serial_rx(I8741 *st,UINT8 *data)
 {
 	memcpy(st->rxd,data,8);
 }
@@ -445,7 +445,7 @@ static void josvolly_8741_do(int num)
 	if( (i8741[num].sts & 0x02) )
 	{
 		/* transmit data */
-		mame_timer_set (MAME_TIME_IN_USEC(1),num,josvolly_8741_tx);
+		timer_set (ATTOTIME_IN_USEC(1),num,josvolly_8741_tx);
 	}
 }
 

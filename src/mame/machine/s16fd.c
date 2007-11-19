@@ -46,7 +46,7 @@ static void set_decrypted_region(void)
    if it is then it copies the cached data to the user region where code is
    executed from, if its not cached then it gets decrypted to the current
    cache position using the functions in fd1094.c */
-void fd1094_setstate_and_decrypt(int state)
+static void fd1094_setstate_and_decrypt(int state)
 {
 	int i;
 	UINT32 addr;
@@ -95,7 +95,7 @@ void fd1094_setstate_and_decrypt(int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-void fd1094_cmp_callback(UINT32 val, int reg)
+static void fd1094_cmp_callback(UINT32 val, int reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -104,20 +104,20 @@ void fd1094_cmp_callback(UINT32 val, int reg)
 }
 
 /* Callback when the FD1094 enters interrupt code */
-int fd1094_int_callback (int irq)
+static int fd1094_int_callback (int irq)
 {
 	fd1094_setstate_and_decrypt(FD1094_STATE_IRQ);
 	return (0x60+irq*4)/4; // vector address
 }
 
-void fd1094_rte_callback (void)
+static void fd1094_rte_callback (void)
 {
 	fd1094_setstate_and_decrypt(FD1094_STATE_RTE);
 }
 
 
 /* KLUDGE, set the initial PC / SP based on table as we can't decrypt them yet */
-void fd1094_kludge_reset_values(void)
+static void fd1094_kludge_reset_values(void)
 {
 	int i;
 

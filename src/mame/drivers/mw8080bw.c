@@ -872,7 +872,7 @@ static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 static MACHINE_START( maze )
 {
 	/* create astable timer for IC B1 */
-	mame_timer_pulse(MAZE_555_B1_PERIOD, 0, maze_tone_timing_timer_callback);
+	timer_pulse(MAZE_555_B1_PERIOD, 0, maze_tone_timing_timer_callback);
 
 	/* initialize state of Tone Timing FF, IC C1 */
 	maze_tone_timing_state = 0;
@@ -1275,7 +1275,7 @@ static MACHINE_DRIVER_START( desertgu )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(desertgu_io_map,0)
 	MDRV_MACHINE_START(desertgu)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(desertgu_audio)
@@ -1472,7 +1472,7 @@ static MACHINE_DRIVER_START( dplay )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(dplay_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(dplay_audio)
@@ -1654,7 +1654,7 @@ static MACHINE_DRIVER_START( m4 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(m4_io_map,0)
 	MDRV_MACHINE_START(m4)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(m4_audio)
@@ -1828,7 +1828,7 @@ static MACHINE_DRIVER_START( clowns )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(clowns_io_map,0)
 	MDRV_MACHINE_START(clowns)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(clowns_audio)
@@ -1906,7 +1906,7 @@ static MACHINE_DRIVER_START( shuffle )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(shuffle_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	/* MDRV_IMPORT_FROM(shuffle_audio) */
@@ -1991,7 +1991,7 @@ static MACHINE_DRIVER_START( dogpatch )
 	MDRV_CPU_IO_MAP(dogpatch_io_map,0)
 	/* the watch dog time is unknown, but all other */
 	/* Midway boards of the era used the same circuit */
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(dogpatch_audio)
@@ -2007,12 +2007,12 @@ MACHINE_DRIVER_END
  *************************************/
 
 #define SPCENCTR_STROBE_FREQ		(9.00)  /* Hz - calculated from the 555 timer */
-#define SPCENCTR_STROBE_PERIOD		MAME_TIME_IN_HZ(SPCENCTR_STROBE_FREQ)
+#define SPCENCTR_STROBE_PERIOD		ATTOTIME_IN_HZ(SPCENCTR_STROBE_FREQ)
 #define SPCENCTR_DUTY_CYCLE			(95) /* % */
 
 
-static mame_timer *spcenctr_strobe_on_timer;
-static mame_timer *spcenctr_strobe_off_timer;
+static emu_timer *spcenctr_strobe_on_timer;
+static emu_timer *spcenctr_strobe_off_timer;
 static UINT8 spcenctr_strobe_state;
 static UINT8 spcenctr_trench_width;
 static UINT8 spcenctr_trench_center;
@@ -2026,15 +2026,15 @@ static void adjust_strobe_timers(void)
 	if (spcenctr_strobe_state)
 	{
 		/* multiply by the precentage and divide by 100 to get the ON period */
-		mame_time on_period = scale_down_mame_time(scale_up_mame_time(SPCENCTR_STROBE_PERIOD, SPCENCTR_DUTY_CYCLE), 100);
+		attotime on_period = attotime_div(attotime_mul(SPCENCTR_STROBE_PERIOD, SPCENCTR_DUTY_CYCLE), 100);
 
-		mame_timer_adjust(spcenctr_strobe_on_timer, time_zero, 1, SPCENCTR_STROBE_PERIOD);
-		mame_timer_adjust(spcenctr_strobe_off_timer, on_period, 0, SPCENCTR_STROBE_PERIOD);
+		timer_adjust(spcenctr_strobe_on_timer, attotime_zero, 1, SPCENCTR_STROBE_PERIOD);
+		timer_adjust(spcenctr_strobe_off_timer, on_period, 0, SPCENCTR_STROBE_PERIOD);
 	}
 	else
 	{
-		mame_timer_adjust(spcenctr_strobe_on_timer, time_never, 0, time_zero);
-		mame_timer_adjust(spcenctr_strobe_off_timer, time_zero, 0, time_zero);
+		timer_adjust(spcenctr_strobe_on_timer, attotime_never, 0, attotime_zero);
+		timer_adjust(spcenctr_strobe_off_timer, attotime_zero, 0, attotime_zero);
 	}
 }
 
@@ -2048,8 +2048,8 @@ static TIMER_CALLBACK( spcenctr_strobe_timer_callback )
 static MACHINE_START( spcenctr )
 {
 	/* create timers */
-	spcenctr_strobe_on_timer = mame_timer_alloc(spcenctr_strobe_timer_callback);
-	spcenctr_strobe_off_timer = mame_timer_alloc(spcenctr_strobe_timer_callback);
+	spcenctr_strobe_on_timer = timer_alloc(spcenctr_strobe_timer_callback);
+	spcenctr_strobe_off_timer = timer_alloc(spcenctr_strobe_timer_callback);
 
 	/* setup for save states */
 	state_save_register_global(spcenctr_strobe_state);
@@ -2199,7 +2199,7 @@ static MACHINE_DRIVER_START( spcenctr )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(spcenctr_io_map,0)
 	MDRV_MACHINE_START(spcenctr)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(spcenctr)
@@ -2299,7 +2299,7 @@ static MACHINE_DRIVER_START( phantom2 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(phantom2_io_map,0)
 	MDRV_MACHINE_START(phantom2)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(phantom2)
@@ -2435,7 +2435,7 @@ static MACHINE_DRIVER_START( bowler )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(bowler_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(bowler_audio)
@@ -2657,7 +2657,7 @@ MACHINE_DRIVER_START( invaders )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(invaders_io_map,0)
 	MDRV_MACHINE_START(invaders)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(invaders)
@@ -2736,7 +2736,7 @@ static MACHINE_DRIVER_START( blueshrk )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(blueshrk_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(blueshrk_audio)
@@ -2834,7 +2834,7 @@ static MACHINE_DRIVER_START( invad2ct )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(invad2ct_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(invad2ct_audio)

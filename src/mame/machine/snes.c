@@ -37,10 +37,10 @@ static UINT8 ppu_last_scroll;	/* as per Theme Park, this is shared by all scroll
 static UINT8 snes_hdma_chnl;	/* channels enabled for HDMA */
 static UINT8 joy1l, joy1h, joy2l, joy2h, joy3l, joy3h, joy4l, joy4h;
 static UINT8 read_ophct = 0, read_opvct = 0;
-static mame_timer *snes_scanline_timer;
-static mame_timer *snes_hblank_timer;
-static mame_timer *snes_nmi_timer;
-static mame_timer *snes_hirq_timer;
+static emu_timer *snes_scanline_timer;
+static emu_timer *snes_hblank_timer;
+static emu_timer *snes_nmi_timer;
+static emu_timer *snes_hirq_timer;
 static UINT16 hblank_offset;
 static UINT16 snes_htmult;	/* in 512 wide, we run HTOTAL double and halve it on latching */
 
@@ -61,7 +61,7 @@ static struct
 } joypad[4];
 
 // quick extern to fix missing header
-extern mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
+extern attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
 
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
 static void snes_latch_counters(void)
@@ -81,7 +81,7 @@ static TIMER_CALLBACK( snes_nmi_tick )
 	cpunum_set_input_line( 0, G65816_LINE_NMI, HOLD_LINE );
 
 	// don't happen again
-	mame_timer_adjust(snes_nmi_timer, time_never, 0, time_never);
+	timer_adjust(snes_nmi_timer, attotime_never, 0, attotime_never);
 }
 
 static void snes_hirq_tick(void)
@@ -93,7 +93,7 @@ static void snes_hirq_tick(void)
 	cpunum_set_input_line( 0, G65816_LINE_IRQ, HOLD_LINE );
 
 	// don't happen again
-	mame_timer_adjust(snes_hirq_timer, time_never, 0, time_never);
+	timer_adjust(snes_hirq_timer, attotime_never, 0, attotime_never);
 }
 
 static TIMER_CALLBACK( snes_hirq_tick_callback )
@@ -147,7 +147,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			}
 			else
 			{
-				mame_timer_adjust(snes_hirq_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, pixel*snes_htmult), 0, time_never);
+				timer_adjust(snes_hirq_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, pixel*snes_htmult), 0, attotime_never);
 			}
 		}
     	}
@@ -163,7 +163,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		if( snes_ram[NMITIMEN] & 0x80 )	/* NMI only signaled if this bit set */
 		{
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
-			mame_timer_adjust(snes_nmi_timer, MAME_TIME_IN_CYCLES(12, 0), 0, time_zero);
+			timer_adjust(snes_nmi_timer, ATTOTIME_IN_CYCLES(12, 0), 0, attotime_zero);
 		}
 	}
 
@@ -228,8 +228,8 @@ static TIMER_CALLBACK( snes_scanline_tick )
 
 	cpuintrf_pop_context();
 
-	mame_timer_adjust(snes_scanline_timer, time_never, 0, time_never);
-	mame_timer_adjust(snes_hblank_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0, time_never);
+	timer_adjust(snes_scanline_timer, attotime_never, 0, attotime_never);
+	timer_adjust(snes_hblank_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0, attotime_never);
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
@@ -240,7 +240,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	snes_ppu.beam.current_vert = video_screen_get_vpos(0);
 
 	/* make sure we halt */
-	mame_timer_adjust(snes_hblank_timer, time_never, 0, time_never);
+	timer_adjust(snes_hblank_timer, attotime_never, 0, attotime_never);
 
 	// we must guarantee the 65816's context for HDMA to work
   	cpuintrf_push_context(0);
@@ -272,7 +272,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		nextscan = 0;
 	}
 
-	mame_timer_adjust(snes_scanline_timer, video_screen_get_time_until_pos(0, nextscan, 0), 0, time_never);
+	timer_adjust(snes_scanline_timer, video_screen_get_time_until_pos(0, nextscan, 0), 0, attotime_never);
 }
 
 static void snes_init_ram(void)
@@ -318,25 +318,25 @@ static void snes_init_ram(void)
 	snes_ram[VMAIN] = 0x80;
 
 	/* init timers and stop them */
-	snes_scanline_timer = mame_timer_alloc(snes_scanline_tick);
-	mame_timer_adjust(snes_scanline_timer, time_never, 0, time_never);
-	snes_hblank_timer = mame_timer_alloc(snes_hblank_tick);
-	mame_timer_adjust(snes_hblank_timer, time_never, 0, time_never);
-	snes_nmi_timer = mame_timer_alloc(snes_nmi_tick);
-	mame_timer_adjust(snes_nmi_timer, time_never, 0, time_never);
-	snes_hirq_timer = mame_timer_alloc(snes_hirq_tick_callback);
-	mame_timer_adjust(snes_hirq_timer, time_never, 0, time_never);
+	snes_scanline_timer = timer_alloc(snes_scanline_tick);
+	timer_adjust(snes_scanline_timer, attotime_never, 0, attotime_never);
+	snes_hblank_timer = timer_alloc(snes_hblank_tick);
+	timer_adjust(snes_hblank_timer, attotime_never, 0, attotime_never);
+	snes_nmi_timer = timer_alloc(snes_nmi_tick);
+	timer_adjust(snes_nmi_timer, attotime_never, 0, attotime_never);
+	snes_hirq_timer = timer_alloc(snes_hirq_tick_callback);
+	timer_adjust(snes_hirq_timer, attotime_never, 0, attotime_never);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
 	hblank_offset = 268;
-	mame_timer_adjust(snes_hblank_timer, video_screen_get_time_until_pos(0, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0, time_never);
+	timer_adjust(snes_hblank_timer, video_screen_get_time_until_pos(0, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0, attotime_never);
 
 	// check if DSP1 is present (maybe not 100%?)
 	has_dsp1 = ((snes_r_bank1(0xffd6) >= 3) && (snes_r_bank1(0xffd6) <= 5)) ? 1 : 0;
 
 	// init frame counter so first line is 0
-	if( SUBSECONDS_TO_HZ(Machine->screen[0].refresh) >= 59 )
+	if( ATTOSECONDS_TO_HZ(Machine->screen[0].refresh) >= 59 )
 	{
 		snes_ppu.beam.current_vert = SNES_VTOTAL_NTSC;
 	}
@@ -379,7 +379,7 @@ MACHINE_RESET( snes )
 	snes_init_ram();
 
 	/* Set STAT78 to NTSC or PAL */
-	if( SUBSECONDS_TO_HZ(machine->screen[0].refresh) >= 59.0f )
+	if( ATTOSECONDS_TO_HZ(machine->screen[0].refresh) >= 59.0f )
 		snes_ram[STAT78] = SNES_NTSC;
 	else /* if( machine->screen[0].refresh == 50 ) */
 		snes_ram[STAT78] = SNES_PAL;
@@ -962,7 +962,7 @@ WRITE8_HANDLER( snes_w_io )
 	{
 //          printf("816: %02x to APU @ %d\n", data, offset&3);
 	     	spc_port_in[offset & 0x3] = data;
-		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(20));
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(20));
 		return;
 	}
 

@@ -35,7 +35,7 @@ struct _crtc6845_state
 	UINT16	cursor;
 	UINT16	light_pen;
 
-	mame_timer *display_enable_changed_timer;
+	emu_timer *display_enable_changed_timer;
 
 	/* saved screen parameters so we don't call
        video_screen_configure() unneccessarily.
@@ -98,7 +98,7 @@ void crtc6845_config(int which, const crtc6845_interface *intf)
 	/* create the timer if the user is interested in getting display enable
        notifications */
 	if (intf->display_enable_changed)
-		chip->display_enable_changed_timer = mame_timer_alloc_ptr(display_enable_changed_timer_cb, chip);
+		chip->display_enable_changed_timer = timer_alloc_ptr(display_enable_changed_timer_cb, chip);
 }
 
 
@@ -250,7 +250,7 @@ static void configure_screen(crtc6845_state *chip, int postload)
 			{
 				rectangle visarea;
 
-				subseconds_t refresh = HZ_TO_SUBSECONDS(chip->intf->clock) * (chip->horiz_total + 1) * vert_total;
+				attoseconds_t refresh = HZ_TO_ATTOSECONDS(chip->intf->clock) * (chip->horiz_total + 1) * vert_total;
 
 				visarea.min_x = 0;
 				visarea.min_y = 0;
@@ -258,7 +258,7 @@ static void configure_screen(crtc6845_state *chip, int postload)
 				visarea.max_y = max_y;
 
 				if (LOG) logerror("CRTC6845 config screen: HTOTAL: %x  VTOTAL: %x  MAX_X: %x  MAX_Y: %x  FPS: %f\n",
-								  horiz_total, vert_total, max_x, max_y, 1 / SUBSECONDS_TO_DOUBLE(refresh));
+								  horiz_total, vert_total, max_x, max_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 				video_screen_configure(chip->intf->scrnum, horiz_total, vert_total, &visarea, refresh);
 
@@ -291,7 +291,7 @@ static void update_timer(crtc6845_state *chip)
 {
 	INT16 next_y;
 	UINT16 next_x;
-	mame_time duration;
+	attotime duration;
 
 	if (chip->has_valid_parameters && (chip->display_enable_changed_timer != 0))
 	{
@@ -332,9 +332,9 @@ static void update_timer(crtc6845_state *chip)
 		if (next_y != -1)
 			duration = video_screen_get_time_until_pos(chip->intf->scrnum, next_y, next_x);
 		else
-			duration = time_never;
+			duration = attotime_never;
 
-		mame_timer_adjust_ptr(chip->display_enable_changed_timer, duration, time_never);
+		timer_adjust_ptr(chip->display_enable_changed_timer, duration, attotime_never);
 	}
 }
 

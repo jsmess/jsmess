@@ -42,7 +42,7 @@ extern int wecleman_selected_ip, wecleman_irqctrl;
 UINT16 *wecleman_videostatus;
 UINT16 *wecleman_pageram, *wecleman_txtram, *wecleman_roadram;
 size_t wecleman_roadram_size;
-int wecleman_bgpage[4], wecleman_fgpage[4], *wecleman_gfx_bank;
+static int wecleman_bgpage[4], wecleman_fgpage[4], *wecleman_gfx_bank;
 
 /* Variables only used here: */
 static tilemap *bg_tilemap, *fg_tilemap, *txt_tilemap;
@@ -416,7 +416,7 @@ static void sprite_draw(mame_bitmap *bitmap, const rectangle *cliprect)
                 [ Frontmost (text) layer + video registers ]
 ------------------------------------------------------------------------*/
 
-TILE_GET_INFO( wecleman_get_txt_tile_info )
+static TILE_GET_INFO( wecleman_get_txt_tile_info )
 {
 	int code = wecleman_txtram[tile_index];
 	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
@@ -462,7 +462,7 @@ WRITE16_HANDLER( wecleman_txtram_w )
                             [ Background ]
 ------------------------------------------------------------------------*/
 
-TILE_GET_INFO( wecleman_get_bg_tile_info )
+static TILE_GET_INFO( wecleman_get_bg_tile_info )
 {
 	int page = wecleman_bgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = wecleman_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
@@ -474,7 +474,7 @@ TILE_GET_INFO( wecleman_get_bg_tile_info )
                             [ Foreground ]
 ------------------------------------------------------------------------*/
 
-TILE_GET_INFO( wecleman_get_fg_tile_info )
+static TILE_GET_INFO( wecleman_get_fg_tile_info )
 {
 	int page = wecleman_fgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = wecleman_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];

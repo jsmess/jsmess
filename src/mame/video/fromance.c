@@ -25,7 +25,7 @@ static UINT32 scrollx_ofs;
 
 static UINT8 crtc_register;
 static UINT8 crtc_data[0x10];
-static mame_timer *crtc_timer;
+static emu_timer *crtc_timer;
 
 static UINT8 flipscreen_old = -1;
 
@@ -90,7 +90,7 @@ VIDEO_START( fromance )
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
 	/* reset the timer */
-	crtc_timer = mame_timer_alloc(crtc_interrupt_gen);
+	crtc_timer = timer_alloc(crtc_interrupt_gen);
 
 	scrollx_ofs = 0x159;
 	scrolly_ofs = 0x10;
@@ -129,7 +129,7 @@ VIDEO_START( nekkyoku )
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
 	/* reset the timer */
-	crtc_timer = mame_timer_alloc(crtc_interrupt_gen);
+	crtc_timer = timer_alloc(crtc_interrupt_gen);
 
 	scrollx_ofs = 0x159;
 	scrolly_ofs = 0x10;
@@ -294,7 +294,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	cpunum_set_input_line(1, 0, HOLD_LINE);
 	if (param != 0)
-		mame_timer_adjust(crtc_timer, make_mame_time(0, machine->screen[0].refresh / param), 0, make_mame_time(0, machine->screen[0].refresh / param));
+		timer_adjust(crtc_timer, attotime_make(0, machine->screen[0].refresh / param), 0, attotime_make(0, machine->screen[0].refresh / param));
 }
 
 
@@ -306,7 +306,7 @@ WRITE8_HANDLER( fromance_crtc_data_w )
 	{
 		/* only register we know about.... */
 		case 0x0b:
-			mame_timer_adjust(crtc_timer, video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), (data > 0x80) ? 2 : 1, time_zero);
+			timer_adjust(crtc_timer, video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), (data > 0x80) ? 2 : 1, attotime_zero);
 			break;
 
 		default:

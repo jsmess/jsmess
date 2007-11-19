@@ -105,7 +105,7 @@ typedef enum
 } trans32T;
 
 // local variables
-static mame_timer *sector_timer;
+static emu_timer *sector_timer;
 static partitionT partitions[MAX_FILTERS];
 static partitionT *transpart;
 
@@ -198,7 +198,7 @@ static TIMER_CALLBACK( sector_cb )
 	cr3 = (cd_curfad>>16)&0xff;
 	cr4 = cd_curfad;
 
-	mame_timer_adjust(sector_timer, MAME_TIME_IN_HZ(150), 0, time_zero);
+	timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);
 }
 
 // global functions
@@ -273,8 +273,8 @@ void stvcd_reset(void)
 		cd_stat = CD_STAT_OPEN;
 	}
 
-	sector_timer = mame_timer_alloc(sector_cb);
-	mame_timer_adjust(sector_timer, MAME_TIME_IN_HZ(150), 0, time_zero);	// 150 sectors / second = 300kBytes/second
+	sector_timer = timer_alloc(sector_cb);
+	timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);	// 150 sectors / second = 300kBytes/second
 }
 
 static blockT *cd_alloc_block(UINT8 *blknum)
@@ -776,8 +776,8 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 
 			// and do the disc I/O
 			// make sure it doesn't come in too early
-			mame_timer_adjust(sector_timer, time_never, 0, time_never);
-			mame_timer_adjust(sector_timer, MAME_TIME_IN_HZ(150), 0, time_zero);	// 150 sectors / second = 300kBytes/second
+			timer_adjust(sector_timer, attotime_never, 0, attotime_never);
+			timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);	// 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x1100: // disk seek
@@ -1285,7 +1285,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			playtype = 1;
 
 			// and do the disc I/O
-//          mame_timer_adjust(sector_timer, MAME_TIME_IN_HZ(150), 0, time_zero);  // 150 sectors / second = 300kBytes/second
+//          timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x7500:

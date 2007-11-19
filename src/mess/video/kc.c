@@ -110,7 +110,7 @@ enum
 /* set new blink state - record blink state in event list */
 void	kc85_video_set_blink_state(int data)
 {
-	EventList_AddItemOffset(KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), MAME_TIME_TO_CYCLES(0, scale_up_mame_time(video_screen_get_scan_period(0), video_screen_get_vpos(0))));
+	EventList_AddItemOffset(KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))));
 }
 
 
@@ -551,7 +551,7 @@ static void kc85_common_process_frame(mame_bitmap *bitmap, void (*pixel_grab_cal
 	/* process remainder */
 	kc85_common_vh_process_lines(&video_update, cycles_remaining_in_frame);
 	EventList_Reset();
-	EventList_SetOffsetStartTime ( MAME_TIME_TO_CYCLES(0, scale_up_mame_time(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
+	EventList_SetOffsetStartTime ( ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
 }
 
 
@@ -574,7 +574,7 @@ static void kc85_common_vh_eof_callback(void)
 		{
 			pItem = EventList_GetFirstItem();
 			EventList_Reset();
-			EventList_SetOffsetStartTime ( MAME_TIME_TO_CYCLES(0, scale_up_mame_time(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
+			EventList_SetOffsetStartTime ( ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
 			logerror ("Event log reset in callback fn.\n");
 		}
 }

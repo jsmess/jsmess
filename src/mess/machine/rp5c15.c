@@ -71,7 +71,7 @@
 
 struct rp5c15 rtc;
 
-mame_timer* rtc_timer;
+emu_timer* rtc_timer;
 
 TIMER_CALLBACK(rtc_alarm_pulse)
 {
@@ -135,8 +135,8 @@ void rp5c15_init(struct rp5c15_interface* intf)
 	rtc.test = 0x00;
 	rtc.pulse_count = 0;
 	
-	rtc_timer = mame_timer_alloc(rtc_alarm_pulse);
-	mame_timer_adjust(rtc_timer, time_zero, 0, MAME_TIME_IN_HZ(32));
+	rtc_timer = timer_alloc(rtc_alarm_pulse);
+	timer_adjust(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
 }
 
 int rp5c15_read(int offset, UINT16 mem_mask)

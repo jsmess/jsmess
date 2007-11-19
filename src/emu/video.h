@@ -45,8 +45,8 @@ struct _screen_state
 	int				width, height;				/* total width/height (HTOTAL, VTOTAL) */
 	rectangle		visarea;					/* visible area (HBLANK end/start, VBLANK end/start) */
 	UINT8			oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
-	subseconds_t	refresh;					/* refresh period */
-	subseconds_t	vblank;						/* duration of a VBLANK */
+	attoseconds_t	refresh;					/* refresh period */
+	attoseconds_t	vblank;						/* duration of a VBLANK */
 	bitmap_format	format;						/* bitmap format */
 };
 
@@ -84,7 +84,7 @@ void video_vblank_start(running_machine *machine);
 /* ----- screen management ----- */
 
 /* set the resolution of a screen */
-void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, subseconds_t refresh);
+void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t refresh);
 
 /* set the visible area of a screen; this is a subset of video_screen_configure */
 void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int max_y);
@@ -101,13 +101,13 @@ int video_screen_get_vblank(int scrnum);
 int video_screen_get_hblank(int scrnum);
 
 /* return the time when the beam will reach a particular H,V position */
-mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
+attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
 
 /* return the amount of time the beam takes to draw one scan line */
-mame_time video_screen_get_scan_period(int scrnum);
+attotime video_screen_get_scan_period(int scrnum);
 
 /* return the amount of time the beam takes to draw one complete frame */
-mame_time video_screen_get_frame_period(int scrnum);
+attotime video_screen_get_frame_period(int scrnum);
 
 /* returns whether a given screen exists */
 int video_screen_exists(int scrnum);

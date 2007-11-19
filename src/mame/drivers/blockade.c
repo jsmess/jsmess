@@ -63,7 +63,7 @@ static DRIVER_INIT( blockade )
 /* Need to check for a coin on the interrupt, */
 /* This will reset the cpu                    */
 
-INTERRUPT_GEN( blockade_interrupt )
+static INTERRUPT_GEN( blockade_interrupt )
 {
 	cpunum_resume(0, SUSPEND_ANY_REASON);
 

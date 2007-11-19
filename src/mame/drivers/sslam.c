@@ -87,7 +87,7 @@ Notes:
 
 #define oki_time_base 0x08
 
-static mame_timer *music_timer;
+static emu_timer *music_timer;
 
 static int sslam_sound;
 static int sslam_melody;
@@ -259,7 +259,7 @@ static TIMER_CALLBACK( music_playback )
 			sslam_track = 0;
 			sslam_melody = 0;
 			sslam_bar = 0;
-			mame_timer_enable(music_timer,0);
+			timer_enable(music_timer,0);
 		}
 		if (pattern) {
 			logerror("Changing bar in music track to pattern %02x\n",pattern);
@@ -287,7 +287,7 @@ static void sslam_play(int track, int data)
 					OKIM6295_data_0_w(0,0x40);
 				OKIM6295_data_0_w(0,(0x80 | data));
 				OKIM6295_data_0_w(0,0x81);
-				mame_timer_adjust(music_timer, MAME_TIME_IN_MSEC(4), 0, MAME_TIME_IN_HZ(250));	/* 250Hz for smooth sequencing */
+				timer_adjust(music_timer, ATTOTIME_IN_MSEC(4), 0, ATTOTIME_IN_HZ(250));	/* 250Hz for smooth sequencing */
 			}
 		}
 		else {
@@ -307,7 +307,7 @@ static void sslam_play(int track, int data)
 	}
 	else {		/* use above 0x80 to turn off channels */
 		if (track) {
-			mame_timer_enable(music_timer,0);
+			timer_enable(music_timer,0);
 			sslam_track = 0;
 			sslam_melody = 0;
 			sslam_bar = 0;
@@ -958,7 +958,7 @@ static DRIVER_INIT( sslam )
 	state_save_register_global(sslam_bar);
 	state_save_register_global(sslam_snd_bank);
 
-	music_timer = mame_timer_alloc(music_playback);
+	music_timer = timer_alloc(music_playback);
 }
 
 static DRIVER_INIT( powerbls )

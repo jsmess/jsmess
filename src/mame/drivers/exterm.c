@@ -78,7 +78,7 @@
 static UINT8 aimpos[2];
 static UINT8 trackball_old[2];
 
-static mame_timer *sound_nmi_timer;
+static emu_timer *sound_nmi_timer;
 static UINT8 master_sound_latch;
 static UINT8 slave_sound_latch;
 static UINT8 sound_control;
@@ -104,7 +104,7 @@ static TIMER_CALLBACK( master_sound_nmi_callback );
 
 static MACHINE_RESET( exterm )
 {
-	sound_nmi_timer = mame_timer_alloc(master_sound_nmi_callback);
+	sound_nmi_timer = timer_alloc(master_sound_nmi_callback);
 }
 
 
@@ -256,8 +256,8 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 	/* rate is controlled by the value written here */
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
-	mame_time nmi_rate = scale_up_mame_time(MAME_TIME_IN_HZ(4000000), 4096 * (256 - data));
-	mame_timer_adjust(sound_nmi_timer, nmi_rate, 0, nmi_rate);
+	attotime nmi_rate = attotime_mul(ATTOTIME_IN_HZ(4000000), 4096 * (256 - data));
+	timer_adjust(sound_nmi_timer, nmi_rate, 0, nmi_rate);
 }
 
 

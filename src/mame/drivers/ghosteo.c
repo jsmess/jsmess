@@ -470,7 +470,7 @@ static VIDEO_UPDATE( bballoon )
 	return 0;
 }
 
-INTERRUPT_GEN( bballoon_interrupt )
+static INTERRUPT_GEN( bballoon_interrupt )
 {
 	if(irq_en)
 		cpunum_set_input_line(0, ARM7_IRQ_LINE, PULSE_LINE);

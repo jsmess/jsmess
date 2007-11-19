@@ -36,7 +36,7 @@ static TIMER_CALLBACK( dragrace_frame_callback )
 
 static MACHINE_RESET( dragrace )
 {
-	mame_timer_pulse(video_screen_get_frame_period(0), 0, dragrace_frame_callback);
+	timer_pulse(video_screen_get_frame_period(0), 0, dragrace_frame_callback);
 }
 
 static void dragrace_update_misc_flags(void)

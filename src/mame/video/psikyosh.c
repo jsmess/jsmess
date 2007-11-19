@@ -392,7 +392,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 /* sx and sy is top-left of entire sprite regardless of flip */
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
-void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 		const rectangle *clip,int transparency,int transparent_color,
 		int zoomx, int zoomy, int wide, int high, UINT32 z)

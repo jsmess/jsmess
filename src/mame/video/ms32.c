@@ -14,7 +14,7 @@ priority should be given to
 
 #include "driver.h"
 
-UINT32 *ms32_fce00000;
+//UINT32 *ms32_fce00000;
 UINT32 *ms32_roz_ctrl;
 UINT32 *ms32_tx_scroll;
 UINT32 *ms32_bg_scroll;
@@ -28,7 +28,7 @@ UINT32 *ms32_txram;
 UINT32 *ms32_mainram;
 
 // kirarast, tp2m32, and 47pie2 require the sprites in a different order
-int ms32_reverse_sprite_order;
+static int ms32_reverse_sprite_order;
 
 /********** Tilemaps **********/
 

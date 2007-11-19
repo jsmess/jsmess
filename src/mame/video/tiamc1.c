@@ -16,9 +16,9 @@ UINT8 *tiamc1_spriteram_x;
 UINT8 *tiamc1_spriteram_y;
 UINT8 *tiamc1_spriteram_a;
 UINT8 *tiamc1_spriteram_n;
-UINT8 tiamc1_layers_ctrl;
-UINT8 tiamc1_bg_vshift;
-UINT8 tiamc1_bg_hshift;
+static UINT8 tiamc1_layers_ctrl;
+static UINT8 tiamc1_bg_vshift;
+static UINT8 tiamc1_bg_hshift;
 
 static tilemap *bg_tilemap1, *bg_tilemap2;
 static rgb_t *palette;

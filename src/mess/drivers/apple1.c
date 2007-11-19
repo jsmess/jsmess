@@ -242,7 +242,7 @@ static MACHINE_DRIVER_START( apple1 )
 	   are visible, and each character time is 7 dot times; a dot time
 	   is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
 	   total blanking time is about 4450 microseconds. */
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS((int) (70 * 65 * 7 * 2 / 14.31818)))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( apple1 )

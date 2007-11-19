@@ -81,7 +81,7 @@ static struct ZX8302
 	int mdrdw, mdselck, mdseld, erase, raw1, raw2;
 } zx8302;
 
-static mame_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer;
+static emu_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer;
 
 static void zx8302_interrupt(UINT8 line)
 {
@@ -200,8 +200,8 @@ static WRITE8_HANDLER( zx8302_control_w )
 	}
 	*/
 
-	mame_timer_adjust(zx8302_txd_timer, time_zero, 0, MAME_TIME_IN_HZ(baud));
-	mame_timer_adjust(zx8302_ipc_timer, time_zero, 0, MAME_TIME_IN_HZ(baudx4));
+	timer_adjust(zx8302_txd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud));
+	timer_adjust(zx8302_ipc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baudx4));
 
 	//logerror("ZX8302 Baud Rate : %u\n", baud);
 }
@@ -664,11 +664,11 @@ static MACHINE_START( ql )
 	zx8302.comctl = 1;
 	zx8302.comdata = 1;
 
-	zx8302_txd_timer = mame_timer_alloc(zx8302_txd_tick);
-	zx8302_ipc_timer = mame_timer_alloc(zx8302_ipc_tick);
-	zx8302_rtc_timer = mame_timer_alloc(zx8302_rtc_tick);
+	zx8302_txd_timer = timer_alloc(zx8302_txd_tick);
+	zx8302_ipc_timer = timer_alloc(zx8302_ipc_tick);
+	zx8302_rtc_timer = timer_alloc(zx8302_rtc_tick);
 
-	mame_timer_adjust(zx8302_rtc_timer, time_zero, 0, MAME_TIME_IN_HZ(X2/32768));
+	timer_adjust(zx8302_rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(X2/32768));
 
 	zx8302.ctr = time(NULL) + 283996800;
 

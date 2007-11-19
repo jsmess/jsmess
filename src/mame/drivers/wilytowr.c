@@ -29,7 +29,7 @@ TODO:
 extern void fghtbskt_sh_start(void);
 extern WRITE8_HANDLER( fghtbskt_samples_w );
 
-UINT8 *wilytowr_videoram2, *wilytowr_scrollram;
+static UINT8 *wilytowr_videoram2, *wilytowr_scrollram;
 
 static int pal_bank, fg_flag, sy_offset;
 

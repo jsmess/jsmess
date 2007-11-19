@@ -909,7 +909,7 @@ VIDEO_START( neruton )
 
 ***************************************************************************/
 
-void hanamai_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
+static void hanamai_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
 {
 	int color;
 	int scrollx,scrolly;
@@ -974,7 +974,7 @@ void hanamai_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
 }
 
 
-void jantouki_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i, int y)
+static void jantouki_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i, int y)
 {
 	int color,scrollx,scrolly,palettes,palbank;
 
@@ -1043,7 +1043,7 @@ void jantouki_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i, int
 }
 
 
-void mjdialq2_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
+static void mjdialq2_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
 {
 	int color;
 	int scrollx,scrolly;

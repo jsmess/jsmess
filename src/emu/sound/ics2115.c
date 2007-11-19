@@ -55,7 +55,7 @@ struct ics2115{
 
 	struct {
 		UINT8 scale, preset;
-		mame_timer *timer;
+		emu_timer *timer;
 		UINT64 period;	/* in nsec */
 	} timer[2];
 
@@ -195,9 +195,9 @@ static void recalc_timer(struct ics2115 *chip, int timer)
 	if(chip->timer[timer].period != period) {
 		chip->timer[timer].period = period;
 		if(period)
-			mame_timer_adjust_ptr(chip->timer[timer].timer, MAME_TIME_IN_NSEC(period), MAME_TIME_IN_NSEC(period));
+			timer_adjust_ptr(chip->timer[timer].timer, ATTOTIME_IN_NSEC(period), ATTOTIME_IN_NSEC(period));
 		else
-			mame_timer_adjust_ptr(chip->timer[timer].timer, time_never, time_zero);
+			timer_adjust_ptr(chip->timer[timer].timer, attotime_never, attotime_zero);
 	}
 }
 
@@ -458,8 +458,8 @@ static void *ics2115_start(int sndindex, int clock, const void *config)
 	chip->intf = config;
 	chip->index = sndindex;
 	chip->rom = memory_region(chip->intf->region);
-	chip->timer[0].timer = mame_timer_alloc_ptr(timer_cb_0, chip);
-	chip->timer[1].timer = mame_timer_alloc_ptr(timer_cb_1, chip);
+	chip->timer[0].timer = timer_alloc_ptr(timer_cb_0, chip);
+	chip->timer[1].timer = timer_alloc_ptr(timer_cb_1, chip);
 	chip->ulaw = auto_malloc(256*sizeof(INT16));
 	chip->stream = stream_create(0, 2, 33075, chip, update);
 
@@ -532,8 +532,8 @@ void ics2115_reset(void *_chip)
 	chip->irq_en = 0;
 	chip->irq_pend = 0;
 	memset(chip->voice, 0, sizeof(chip->voice));
-	mame_timer_adjust_ptr(chip->timer[0].timer, time_never, time_zero);
-	mame_timer_adjust_ptr(chip->timer[1].timer, time_never, time_zero);
+	timer_adjust_ptr(chip->timer[0].timer, attotime_never, attotime_zero);
+	timer_adjust_ptr(chip->timer[1].timer, attotime_never, attotime_zero);
 	chip->timer[0].period = 0;
 	chip->timer[1].period = 0;
 	recalc_irq(chip);

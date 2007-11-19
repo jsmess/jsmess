@@ -255,7 +255,7 @@ static GFXDECODE_START( pbaction )
 GFXDECODE_END
 
 
-INTERRUPT_GEN( pbaction_interrupt )
+static INTERRUPT_GEN( pbaction_interrupt )
 {
 	cpunum_set_input_line_and_vector(1, 0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
 }

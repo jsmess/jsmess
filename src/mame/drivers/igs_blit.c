@@ -367,7 +367,7 @@ static WRITE16_HANDLER( igs_palette_w )
 
 ***************************************************************************/
 
-void grtwall_decrypt(void)
+static void grtwall_decrypt(void)
 {
 	int i;
 	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
@@ -391,7 +391,7 @@ void grtwall_decrypt(void)
 }
 
 
-void lhb_decrypt(void)
+static void lhb_decrypt(void)
 {
 	int i;
 	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
@@ -416,7 +416,7 @@ void lhb_decrypt(void)
 }
 
 
-void chindrag_decrypt(void)
+static void chindrag_decrypt(void)
 {
 	int i;
 	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
@@ -445,7 +445,7 @@ void chindrag_decrypt(void)
 }
 
 
-void drgnwrld_decrypt(void)
+static void drgnwrld_decrypt(void)
 {
 	int i;
 	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
@@ -474,7 +474,7 @@ void drgnwrld_decrypt(void)
 }
 
 
-void chmplst2_decrypt(void)
+static void chmplst2_decrypt(void)
 {
 	int i,j;
 	int rom_size = 0x80000;
@@ -506,7 +506,7 @@ void chmplst2_decrypt(void)
 
 
 
-void vbowlj_decrypt(void)
+static void vbowlj_decrypt(void)
 {
 	int i;
 	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
@@ -540,6 +540,7 @@ void vbowlj_decrypt(void)
 }
 
 // To do:
+#ifdef UNUSED_FUNCTION
 void vbowl_decrypt(void)
 {
 	int i;
@@ -563,6 +564,7 @@ void vbowl_decrypt(void)
 
 //  vbowlj_decrypt();
 }
+#endif
 
 
 /***************************************************************************
@@ -572,7 +574,7 @@ void vbowl_decrypt(void)
 ***************************************************************************/
 
 
-void chmplst2_decrypt_gfx(void)
+static void chmplst2_decrypt_gfx(void)
 {
 	int i;
 	unsigned rom_size = 0x200000;
@@ -587,7 +589,7 @@ void chmplst2_decrypt_gfx(void)
 	free(result_data);
 }
 
-void chindrag_gfx_decrypt(void)
+static void chindrag_gfx_decrypt(void)
 {
 	int i;
 	unsigned rom_size = 0x400000;

@@ -417,7 +417,7 @@ static struct AY8910interface ay8910_interface =
 
 
 // It runs in IM 0, thus needs an opcode on the data bus
-INTERRUPT_GEN( skylncr_vblank_interrupt )
+static INTERRUPT_GEN( skylncr_vblank_interrupt )
 {
 	if (skylncr_nmi_enable) cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 }

@@ -1029,19 +1029,19 @@ READ8_HANDLER ( apple2_c06x_r )
 			break;
 		case 0x04:
 			/* X Joystick 1 axis */
-			result = mame_time_to_double(mame_timer_get_time()) < joystick_x1_time;
+			result = attotime_to_double(timer_get_time()) < joystick_x1_time;
 			break;
 		case 0x05:
 			/* Y Joystick 1 axis */
-			result = mame_time_to_double(mame_timer_get_time()) < joystick_y1_time;
+			result = attotime_to_double(timer_get_time()) < joystick_y1_time;
 			break;
 		case 0x06:
 			/* X Joystick 2 axis */
-			result = mame_time_to_double(mame_timer_get_time()) < joystick_x2_time;
+			result = attotime_to_double(timer_get_time()) < joystick_x2_time;
 			break;
 		case 0x07:
 			/* Y Joystick 2 axis */
-			result = mame_time_to_double(mame_timer_get_time()) < joystick_y2_time;
+			result = attotime_to_double(timer_get_time()) < joystick_y2_time;
 			break;
 		default:
 			/* c060 Empty Cassette head read 
@@ -1061,15 +1061,15 @@ READ8_HANDLER ( apple2_c06x_r )
 
 READ8_HANDLER ( apple2_c07x_r )
 {
-	double x_calibration = mame_time_to_double(MAME_TIME_IN_USEC(12));
-	double y_calibration = mame_time_to_double(MAME_TIME_IN_USEC(13));
+	double x_calibration = attotime_to_double(ATTOTIME_IN_USEC(12));
+	double y_calibration = attotime_to_double(ATTOTIME_IN_USEC(13));
 
 	if (offset == 0)
 	{
-		joystick_x1_time = mame_time_to_double(mame_timer_get_time()) + x_calibration * readinputportbytag("joystick_1_x");
-		joystick_y1_time = mame_time_to_double(mame_timer_get_time()) + y_calibration * readinputportbytag("joystick_1_y");
-		joystick_x2_time = mame_time_to_double(mame_timer_get_time()) + x_calibration * readinputportbytag("joystick_2_x");
-		joystick_y2_time = mame_time_to_double(mame_timer_get_time()) + y_calibration * readinputportbytag("joystick_2_y");
+		joystick_x1_time = attotime_to_double(timer_get_time()) + x_calibration * readinputportbytag("joystick_1_x");
+		joystick_y1_time = attotime_to_double(timer_get_time()) + y_calibration * readinputportbytag("joystick_1_y");
+		joystick_x2_time = attotime_to_double(timer_get_time()) + x_calibration * readinputportbytag("joystick_2_x");
+		joystick_y2_time = attotime_to_double(timer_get_time()) + y_calibration * readinputportbytag("joystick_2_y");
 	}
 	return 0;
 }

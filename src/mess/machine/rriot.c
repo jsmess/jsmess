@@ -66,9 +66,9 @@ typedef struct {
 
 	UINT8	irqen;		/* IRQ enabled ? */
 	enum { Delay1, Delay8, Delay64, Delay1024, TimerShot } state;
-	mame_time shottime;
+	attotime shottime;
 	int	irq;
-	mame_timer *timer; 	/* timer callback */
+	emu_timer *timer; 	/* timer callback */
 } RRIOT;
 
 static RRIOT rriot[MAX_RRIOTS]= { {0} };
@@ -79,7 +79,7 @@ void rriot_init(int nr, RRIOT_CONFIG *config)
 {
 	memset(&rriot[nr], 0, sizeof(rriot[nr]));
 	rriot[nr].config = config;
-	rriot[nr].timer = mame_timer_alloc(rriot_timer_cb);
+	rriot[nr].timer = timer_alloc(rriot_timer_cb);
 
     LOG("RRIOT - successfully initialised\n");
 }
@@ -134,19 +134,19 @@ int rriot_r(int chip, int offset)
 		case 0: /* Timer count read */
 			switch (rriot[chip].state) {
 			case Delay1:
-				data = scale_up_mame_time(mame_timer_timeleft(rriot[chip].timer), rriot[chip].config->baseclock).seconds;
+				data = attotime_mul(timer_timeleft(rriot[chip].timer), rriot[chip].config->baseclock).seconds;
 				break;
 			case Delay8:
-				data = scale_up_mame_time(mame_timer_timeleft(rriot[chip].timer), rriot[chip].config->baseclock).seconds>>3;
+				data = attotime_mul(timer_timeleft(rriot[chip].timer), rriot[chip].config->baseclock).seconds>>3;
 				break;
 			case Delay64:
-				data = scale_up_mame_time(mame_timer_timeleft(rriot[chip].timer), rriot[chip].config->baseclock).seconds>>6;
+				data = attotime_mul(timer_timeleft(rriot[chip].timer), rriot[chip].config->baseclock).seconds>>6;
 				break;
 			case Delay1024:
-				data = scale_up_mame_time(mame_timer_timeleft(rriot[chip].timer), rriot[chip].config->baseclock).seconds>>10;
+				data = attotime_mul(timer_timeleft(rriot[chip].timer), rriot[chip].config->baseclock).seconds>>10;
 				break;
 			case TimerShot:
-				data=255- scale_up_mame_time(sub_mame_times(mame_timer_get_time(), rriot[chip].shottime), rriot[chip].config->baseclock).seconds;
+				data=255- attotime_mul(attotime_sub(timer_get_time(), rriot[chip].shottime), rriot[chip].config->baseclock).seconds;
 				if (data <0 ) data=0;
 				break;
 			}
@@ -174,7 +174,7 @@ static TIMER_CALLBACK(rriot_timer_cb)
 	LOG(("rriot(%d) timer expired\n", chip));
 	rriot[chip].irq=1;
 	rriot[chip].state=TimerShot;
-	rriot[chip].shottime=mame_timer_get_time();
+	rriot[chip].shottime=timer_get_time();
 	if( rriot[chip].irqen ) /* with IRQ? */
 	{
 		if( rriot[chip].config->irq_callback )
@@ -221,23 +221,23 @@ void rriot_w(int chip, int offset, int data)
 		switch (offset&3) {
 		case 0: /* Timer 1 start */
 			LOG(("rriot(%d) TMR1  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			mame_timer_adjust(rriot[chip].timer, scale_up_mame_time(MAME_TIME_IN_HZ(rriot[chip].config->baseclock), (data+1) ), chip, time_zero);
+			timer_adjust(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) ), chip, attotime_zero);
 			rriot[chip].state=Delay1;
 			break;
 		case 1: /* Timer 8 start */
 			LOG(("rriot(%d) TMR8  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			mame_timer_adjust(rriot[chip].timer, scale_up_mame_time(MAME_TIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 8 ), chip, time_zero);
+			timer_adjust(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 8 ), chip, attotime_zero);
 			rriot[chip].state=Delay8;
 			break;
 		case 2: /* Timer 64 start */
 			LOG(("rriot(%d) TMR64 write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
 //			LOG(("rriot(%d) TMR64 write: time is $%f\n", chip, (double)(64.0 * (data + 1) / rriot[chip].clock)));
-			mame_timer_adjust(rriot[chip].timer, scale_up_mame_time(MAME_TIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 64 ), chip, time_zero);
+			timer_adjust(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 64 ), chip, attotime_zero);
 			rriot[chip].state=Delay64;
 			break;
 		case 3: /* Timer 1024 start */
 			LOG(("rriot(%d) TMR1K write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			mame_timer_adjust(rriot[chip].timer, scale_up_mame_time(MAME_TIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 1024 ), chip, time_zero);
+			timer_adjust(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 1024 ), chip, attotime_zero);
 			rriot[chip].state=Delay1024;
 			break;
 		}

@@ -86,6 +86,7 @@ WRITE8_HANDLER( gottlieb_sh_w )
 }
 
 
+#ifdef UNUSED_FUNCTION
 void gottlieb_knocker(void)
 {
 	if (!strcmp(Machine->gamedrv->name,"reactor"))	/* reactor */
@@ -94,6 +95,7 @@ void gottlieb_knocker(void)
 	else if (sndti_exists(SOUND_SAMPLES, 0))	/* qbert */
 		sample_start(0,44,0);
 }
+#endif
 
 /* callback for the timer */
 static TIMER_CALLBACK( gottlieb_nmi_generate )
@@ -148,7 +150,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	}
 
 	/* generate a NMI after a while to make the CPU continue to send data */
-	mame_timer_set(MAME_TIME_IN_USEC(50),0,gottlieb_nmi_generate);
+	timer_set(ATTOTIME_IN_USEC(50),0,gottlieb_nmi_generate);
 }
 
 WRITE8_HANDLER( gottlieb_speech_clock_DAC_w )
@@ -199,7 +201,7 @@ WRITE8_HANDLER( gottlieb_riot_w )
 
 
 static UINT8 psg_latch;
-static mame_timer *nmi_timer;
+static emu_timer *nmi_timer;
 static int nmi_rate;
 static int sp0250_drq;
 static UINT8 sp0250_latch;
@@ -207,7 +209,7 @@ static UINT8 sp0250_latch;
 static TIMER_CALLBACK( nmi_callback );
 void gottlieb_sound_init(void)
 {
-	nmi_timer = mame_timer_alloc(nmi_callback);
+	nmi_timer = timer_alloc(nmi_callback);
 }
 
 void stooges_sp0250_drq(int level)
@@ -245,11 +247,11 @@ static WRITE8_HANDLER( common_sound_control_w )
 	if (data & 0x01)
 	{
 		/* base clock is 250kHz divided by 256 */
-		mame_time interval = scale_up_mame_time(MAME_TIME_IN_HZ(250000), 256 * (256-nmi_rate));
-		mame_timer_adjust(nmi_timer, interval, 0, interval);
+		attotime interval = attotime_mul(ATTOTIME_IN_HZ(250000), 256 * (256-nmi_rate));
+		timer_adjust(nmi_timer, interval, 0, interval);
 	}
 	else
-		mame_timer_adjust(nmi_timer, time_never, 0, time_never);
+		timer_adjust(nmi_timer, attotime_never, 0, attotime_never);
 
 	/* Bit 1 controls a LED on the sound board. I'm not emulating it */
 }

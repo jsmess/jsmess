@@ -68,7 +68,7 @@ static void reset_talking (void)
     speech_rom_bit        = 0;
 }
 
-int ad2083_speech_rom_read_bit(void)
+static int ad2083_speech_rom_read_bit(void)
 {
 	UINT8 *ROM = memory_region(REGION_SOUND1);
 	int bit;
@@ -552,7 +552,7 @@ static ADDRESS_MAP_START( monsterz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xd800) AM_READ(monsterz_prot_r)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( monsterz_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( monsterz_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ(monsterz_sound_status_r)
 	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
@@ -2467,7 +2467,7 @@ static MACHINE_DRIVER_START( hunchbks )
 	MDRV_CPU_IO_MAP(hunchbks_readport,0)
 	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
 
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2500))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */

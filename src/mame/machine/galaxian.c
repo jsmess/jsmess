@@ -12,7 +12,7 @@
 #include "includes/galaxian.h"
 
 static int irq_line;
-static mame_timer *int_timer;
+static emu_timer *int_timer;
 
 static UINT8 kingball_speech_dip;
 static UINT8 kingball_sound;
@@ -63,7 +63,7 @@ static TIMER_CALLBACK( interrupt_timer )
 
 	param = (param + 0x10) & 0xff;
 
-	mame_timer_adjust(int_timer, video_screen_get_time_until_pos(0, param, 0), param, time_zero);
+	timer_adjust(int_timer, video_screen_get_time_until_pos(0, param, 0), param, attotime_zero);
 
 	TTL7474_update(0);
 }
@@ -84,8 +84,8 @@ static void machine_reset_common( int line )
 	TTL7474_preset_w(1, 0);
 
 	/* start a timer to generate interrupts */
-	int_timer = mame_timer_alloc(interrupt_timer);
-	mame_timer_adjust(int_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+	int_timer = timer_alloc(interrupt_timer);
+	timer_adjust(int_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 }
 
 MACHINE_RESET( galaxian )

@@ -278,7 +278,7 @@ static DRIVER_INIT( vip )
 	// turn on power led
 	set_led_status(0, 1);
 
-	mame_timer_set(time_zero, 0, setup_beep);
+	timer_set(attotime_zero, 0, setup_beep);
 }
 
 /* System Drivers */

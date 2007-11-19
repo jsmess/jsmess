@@ -66,18 +66,18 @@ Buggy Boy Error Codes             TX-1 Error Codes
 static int TS, z80_int = 0;
 
 UINT16 *tx1_vram;
-UINT16 *tx1_object_ram;
+static UINT16 *tx1_object_ram;
 
 UINT16 *buggyboy_vram;	/* Tile RAM (three monitor)   */
 UINT16 *buggyb1_vram;	/* Tile RAM (single monitor)  */
 static UINT8 *z80_ram;	/* Main 8086/Z80 shared RAM   */
 UINT16 *bb_objram;
 UINT16 *bb_sky;		/* Sky register */
-UINT16 *bb_rcram;
+static UINT16 *bb_rcram;
 
-size_t tx1_objectram_size;
+static size_t tx1_objectram_size;
 size_t bb_objectram_size;
-size_t bb_rcram_size;
+static size_t bb_rcram_size;
 
 tilemap *tx1_tilemap;
 tilemap *buggyboy_tilemap;
@@ -904,7 +904,7 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(tx1_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )        /* To do: measure HD46505 CUDISP output rate */
-	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
+	//MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
 	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(tx1_slave,0)
@@ -957,7 +957,7 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )    /* To do: measure HD46505 CUDISP output rate */
-	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
+	//MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
 	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_slave,0)
@@ -1020,7 +1020,7 @@ static MACHINE_DRIVER_START( buggyb1 )
 	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyb1_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )    /* To do: measure HD46505 CUDISP output rate */
-	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
+	//MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
 	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_slave,0)

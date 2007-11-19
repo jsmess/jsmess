@@ -543,7 +543,7 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
-INPUT_PORTS_START( ampoker2 )
+static INPUT_PORTS_START( ampoker2 )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -628,7 +628,7 @@ INPUT_PORTS_START( ampoker2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_4)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ampkr95 )
+static INPUT_PORTS_START( ampkr95 )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -713,7 +713,7 @@ INPUT_PORTS_START( ampkr95 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_4)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sigmapkr )
+static INPUT_PORTS_START( sigmapkr )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -860,7 +860,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 	MDRV_CPU_PROGRAM_MAP(ampoker2_map, 0)
 	MDRV_CPU_IO_MAP(ampoker2_io_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_HZ( 5 ))	/* 200 ms, measured */
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_HZ( 5 ))	/* 200 ms, measured */
 	//MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	/*  if VBLANK is used, the watchdog timer stop to work.

@@ -237,13 +237,13 @@ int vdt911_init_term(int unit, const vdt911_init_params_t *params)
 	else
 		vdt[unit].cursor_address_mask = 0x7ff;	/* 2 kb of RAM */
 
-	mame_timer_set(time_zero, unit, setup_beep);
+	timer_set(attotime_zero, unit, setup_beep);
 
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
-	/*vdt[unit].blink_clock =*/ mame_timer_pulse(MAME_TIME_IN_MSEC(250), unit, blink_callback);
+	/*vdt[unit].blink_clock =*/ timer_pulse(ATTOTIME_IN_MSEC(250), unit, blink_callback);
 
 	/* alloc beep timer */
-	vdt[unit].beep_timer = mame_timer_alloc(beep_callback);
+	vdt[unit].beep_timer = timer_alloc(beep_callback);
 
 	return 0;
 }
@@ -444,7 +444,7 @@ void vdt911_cru_w(int offset, int data, int unit)
 			/* beep enable strobe - not tested */
 			beep_set_state(unit, 1);
 
-			mame_timer_adjust(vdt[unit].beep_timer, MAME_TIME_IN_USEC(300), unit, time_zero);
+			timer_adjust(vdt[unit].beep_timer, ATTOTIME_IN_USEC(300), unit, attotime_zero);
 			break;
 
 		case 0xf:

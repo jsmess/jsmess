@@ -69,7 +69,7 @@ static size_t astrof_videoram_size;
 static UINT8 *astrof_colorram;
 static UINT8 *tomahawk_protection;
 
-static mame_timer *irq_timer;
+static emu_timer *irq_timer;
 
 static UINT8 *astrof_color;
 static UINT8 astrof_palette_bank;
@@ -99,19 +99,19 @@ static TIMER_CALLBACK( irq_callback )
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
 
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
 }
 
 
 static void create_irq_timer(void)
 {
-	irq_timer = mame_timer_alloc(irq_callback);
+	irq_timer = timer_alloc(irq_callback);
 }
 
 
 static void start_irq_timer(void)
 {
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
 }
 
 

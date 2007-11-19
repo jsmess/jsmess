@@ -85,10 +85,10 @@ const char *find_attribute(const char **attributes, const char *seek_attribute)
 
 
 
-mame_time parse_time(const char *s)
+attotime parse_time(const char *s)
 {
 	double d = atof(s);
-	return double_to_mame_time(d);
+	return double_to_attotime(d);
 }
 
 

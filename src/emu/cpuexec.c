@@ -92,7 +92,7 @@ struct _cpuexec_data
 	INT32 	iloops; 				/* number of interrupts remaining this frame */
 
 	UINT64 	totalcycles;			/* total CPU cycles executed */
-	mame_time localtime;			/* local time, relative to the timer system's global time */
+	attotime localtime;			/* local time, relative to the timer system's global time */
 	INT32	clock;					/* current active clock */
 	double	clockscale;				/* current active clock scale factor */
 
@@ -101,7 +101,7 @@ struct _cpuexec_data
 	void *	vblankint_timer;		/* reference to elapsed time counter */
 
 	void *	timedint_timer;			/* reference to this CPU's timer */
-	mame_time timedint_period; 		/* timing period of the timed interrupt */
+	attotime timedint_period; 		/* timing period of the timed interrupt */
 };
 
 
@@ -129,24 +129,24 @@ static int cycles_stolen;
  *
  *************************************/
 
-static mame_timer *vblank_timer;
+static emu_timer *vblank_timer;
 static INT32 vblank_countdown;
 static INT32 vblank_multiplier;
-static mame_time vblank_period;
+static attotime vblank_period;
 
-static mame_timer *update_timer;
+static emu_timer *update_timer;
 
-mame_timer *refresh_timer;	/* temporarily made non-static (for ccpu) */
-static mame_time refresh_period;
+emu_timer *refresh_timer;	/* temporarily made non-static (for ccpu) */
+static attotime refresh_period;
 
-static mame_timer *timeslice_timer;
-static mame_time timeslice_period;
+static emu_timer *timeslice_timer;
+static attotime timeslice_period;
 
-static mame_timer *interleave_boost_timer;
-static mame_timer *interleave_boost_timer_end;
-static mame_time perfect_interleave;
+static emu_timer *interleave_boost_timer;
+static emu_timer *interleave_boost_timer_end;
+static attotime perfect_interleave;
 
-static mame_timer *watchdog_timer;
+static emu_timer *watchdog_timer;
 
 
 
@@ -202,8 +202,8 @@ void cpuexec_init(running_machine *machine)
 		machine->screen[0].vblank = (machine->screen[0].refresh / machine->screen[0].height) * (machine->screen[0].height - (machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y));
 
 	/* allocate vblank and refresh timers, and compute the initial timing */
-	vblank_timer = mame_timer_alloc(cpu_vblankcallback);
-	refresh_timer = mame_timer_alloc(NULL);
+	vblank_timer = timer_alloc(cpu_vblankcallback);
+	refresh_timer = timer_alloc(NULL);
 	cpu_compute_vblank_timing();
 
 	/* loop over all our CPUs */
@@ -221,11 +221,11 @@ void cpuexec_init(running_machine *machine)
 		cpu[cpunum].suspend = SUSPEND_REASON_RESET;
 		cpu[cpunum].clock = machine->drv->cpu[cpunum].clock;
 		cpu[cpunum].clockscale = 1.0;
-		cpu[cpunum].localtime = time_zero;
+		cpu[cpunum].localtime = attotime_zero;
 
 		/* compute the cycle times */
 		cycles_per_second[cpunum] = cpu[cpunum].clockscale * cpu[cpunum].clock;
-		subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / (cpu[cpunum].clockscale * cpu[cpunum].clock);
+		attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / (cpu[cpunum].clockscale * cpu[cpunum].clock);
 
 		/* register some of our variables for later */
 		state_save_register_item("cpu", cpunum, cpu[cpunum].suspend);
@@ -238,7 +238,7 @@ void cpuexec_init(running_machine *machine)
 
 		state_save_register_item("cpu", cpunum, cpu[cpunum].totalcycles);
 		state_save_register_item("cpu", cpunum, cpu[cpunum].localtime.seconds);
-		state_save_register_item("cpu", cpunum, cpu[cpunum].localtime.subseconds);
+		state_save_register_item("cpu", cpunum, cpu[cpunum].localtime.attoseconds);
 		state_save_register_item("cpu", cpunum, cpu[cpunum].clock);
 		state_save_register_item("cpu", cpunum, cpu[cpunum].clockscale);
 
@@ -368,12 +368,12 @@ static void watchdog_setup(int alloc_new)
 			/* Start a vblank based watchdog. */
 			watchdog_counter = Machine->drv->watchdog_vblank_count;
 		}
-		else if (compare_mame_times(Machine->drv->watchdog_time, time_zero) != 0)
+		else if (attotime_compare(Machine->drv->watchdog_time, attotime_zero) != 0)
 		{
 			/* Start a time based watchdog. */
 			if (alloc_new)
-				watchdog_timer = mame_timer_alloc(watchdog_callback);
-			mame_timer_adjust(watchdog_timer, Machine->drv->watchdog_time, 0, time_zero);
+				watchdog_timer = timer_alloc(watchdog_callback);
+			timer_adjust(watchdog_timer, Machine->drv->watchdog_time, 0, attotime_zero);
 			watchdog_counter = WATCHDOG_IS_TIMER_BASED;
 		}
 		else if (watchdog_counter == WATCHDOG_IS_INVALID)
@@ -394,7 +394,7 @@ static void watchdog_setup(int alloc_new)
              * The 3 seconds delay is targeted at qzshowby, which otherwise
              * would reset at the start of a game.
              */
-			watchdog_counter = 3 * SUBSECONDS_TO_HZ(Machine->screen[0].refresh);
+			watchdog_counter = 3 * ATTOSECONDS_TO_HZ(Machine->screen[0].refresh);
 		}
 	}
 }
@@ -411,7 +411,7 @@ void watchdog_reset(void)
 {
 	if (watchdog_counter == WATCHDOG_IS_TIMER_BASED)
 	{
-		mame_timer_reset(watchdog_timer, Machine->drv->watchdog_time);
+		timer_reset(watchdog_timer, Machine->drv->watchdog_time);
 	}
 	else
 	{
@@ -466,12 +466,12 @@ void watchdog_enable(int enable)
 
 void cpuexec_timeslice(void)
 {
-	mame_time target = mame_timer_next_fire_time();
-	mame_time base = mame_timer_get_time();
+	attotime target = timer_next_fire_time();
+	attotime base = timer_get_time();
 	int cpunum, ran;
 
 	LOG(("------------------\n"));
-	LOG(("cpu_timeslice: target = %.9f\n", mame_time_to_double(target)));
+	LOG(("cpu_timeslice: target = %s\n", attotime_string(target, 9)));
 
 	/* process any pending suspends */
 	for (cpunum = 0; Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
@@ -489,7 +489,7 @@ void cpuexec_timeslice(void)
 		if (!cpu[cpunum].suspend)
 		{
 			/* compute how long to run */
-			cycles_running = MAME_TIME_TO_CYCLES(cpunum, sub_mame_times(target, cpu[cpunum].localtime));
+			cycles_running = ATTOTIME_TO_CYCLES(cpunum, attotime_sub(target, cpu[cpunum].localtime));
 			LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
 
 			/* run for the requested number of cycles */
@@ -512,13 +512,13 @@ void cpuexec_timeslice(void)
 
 				/* account for these cycles */
 				cpu[cpunum].totalcycles += ran;
-				cpu[cpunum].localtime = add_mame_times(cpu[cpunum].localtime, MAME_TIME_IN_CYCLES(ran, cpunum));
-				LOG(("         %d ran, %d total, time = %.9f\n", ran, (INT32)cpu[cpunum].totalcycles, mame_time_to_double(cpu[cpunum].localtime)));
+				cpu[cpunum].localtime = attotime_add(cpu[cpunum].localtime, ATTOTIME_IN_CYCLES(ran, cpunum));
+				LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)cpu[cpunum].totalcycles, attotime_string(cpu[cpunum].localtime, 9)));
 
 				/* if the new local CPU time is less than our target, move the target up */
-				if (compare_mame_times(cpu[cpunum].localtime, target) < 0)
+				if (attotime_compare(cpu[cpunum].localtime, target) < 0)
 				{
-					if (compare_mame_times(cpu[cpunum].localtime, base) > 0)
+					if (attotime_compare(cpu[cpunum].localtime, base) > 0)
 						target = cpu[cpunum].localtime;
 					else
 						target = base;
@@ -532,15 +532,15 @@ void cpuexec_timeslice(void)
 	for (cpunum = 0; Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 	{
 		/* if we're suspended and counting, process */
-		if (cpu[cpunum].suspend && cpu[cpunum].eatcycles && compare_mame_times(cpu[cpunum].localtime, target) < 0)
+		if (cpu[cpunum].suspend && cpu[cpunum].eatcycles && attotime_compare(cpu[cpunum].localtime, target) < 0)
 		{
 			/* compute how long to run */
-			cycles_running = MAME_TIME_TO_CYCLES(cpunum, sub_mame_times(target, cpu[cpunum].localtime));
+			cycles_running = ATTOTIME_TO_CYCLES(cpunum, attotime_sub(target, cpu[cpunum].localtime));
 			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, cycles_running));
 
 			cpu[cpunum].totalcycles += cycles_running;
-			cpu[cpunum].localtime = add_mame_times(cpu[cpunum].localtime, MAME_TIME_IN_CYCLES(cycles_running, cpunum));
-			LOG(("         %d skipped, %d total, time = %.9f\n", cycles_running, (INT32)cpu[cpunum].totalcycles, mame_time_to_double(cpu[cpunum].localtime)));
+			cpu[cpunum].localtime = attotime_add(cpu[cpunum].localtime, ATTOTIME_IN_CYCLES(cycles_running, cpunum));
+			LOG(("         %d skipped, %d total, time = %s\n", cycles_running, (INT32)cpu[cpunum].totalcycles, attotime_string(cpu[cpunum].localtime, 9)));
 		}
 
 		/* update the suspend state */
@@ -551,7 +551,7 @@ void cpuexec_timeslice(void)
 	}
 
 	/* update the global time */
-	mame_timer_set_global_time(target);
+	timer_set_global_time(target);
 }
 
 
@@ -587,9 +587,9 @@ void activecpu_abort_timeslice(void)
  *
  *************************************/
 
-mame_time cpunum_get_localtime(int cpunum)
+attotime cpunum_get_localtime(int cpunum)
 {
-	mame_time result;
+	attotime result;
 
 	VERIFY_CPUNUM(cpunum_get_localtime);
 
@@ -598,7 +598,7 @@ mame_time cpunum_get_localtime(int cpunum)
 	if (cpunum == cpu_getexecutingcpu())
 	{
 		int cycles = cycles_currently_ran();
-		result = add_mame_times(result, MAME_TIME_IN_CYCLES(cycles, cpunum));
+		result = attotime_add(result, ATTOTIME_IN_CYCLES(cycles, cpunum));
 	}
 	return result;
 }
@@ -687,7 +687,7 @@ void cpunum_set_clock(int cpunum, int clock)
 
 	cpu[cpunum].clock = clock;
 	cycles_per_second[cpunum] = (double)clock * cpu[cpunum].clockscale;
-	subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / ((double)clock * cpu[cpunum].clockscale);
+	attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / ((double)clock * cpu[cpunum].clockscale);
 
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
@@ -695,13 +695,13 @@ void cpunum_set_clock(int cpunum, int clock)
 
 
 
-void cpunum_set_clock_period(int cpunum, subseconds_t clock_period)
+void cpunum_set_clock_period(int cpunum, attoseconds_t clock_period)
 {
 	VERIFY_CPUNUM(cpunum_set_clock);
 
-	cpu[cpunum].clock = MAX_SUBSECONDS / clock_period;
-	cycles_per_second[cpunum] = (double) (MAX_SUBSECONDS / clock_period) * cpu[cpunum].clockscale;
-	subseconds_per_cycle[cpunum] = clock_period;
+	cpu[cpunum].clock = ATTOSECONDS_PER_SECOND / clock_period;
+	cycles_per_second[cpunum] = (double) (ATTOSECONDS_PER_SECOND / clock_period) * cpu[cpunum].clockscale;
+	attoseconds_per_cycle[cpunum] = clock_period;
 
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
@@ -737,7 +737,7 @@ void cpunum_set_clockscale(int cpunum, double clockscale)
 
 	cpu[cpunum].clockscale = clockscale;
 	cycles_per_second[cpunum] = (double)cpu[cpunum].clock * clockscale;
-	subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / ((double)cpu[cpunum].clock * clockscale);
+	attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / ((double)cpu[cpunum].clock * clockscale);
 
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
@@ -752,20 +752,20 @@ void cpunum_set_clockscale(int cpunum, double clockscale)
  *
  *************************************/
 
-void cpu_boost_interleave(mame_time timeslice_time, mame_time boost_duration)
+void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration)
 {
 	/* if you pass 0 for the timeslice_time, it means pick something reasonable */
-	if (compare_mame_times(timeslice_time, perfect_interleave) < 0)
+	if (attotime_compare(timeslice_time, perfect_interleave) < 0)
 		timeslice_time = perfect_interleave;
 
-	LOG(("cpu_boost_interleave(%.9f, %.9f)\n", mame_time_to_double(timeslice_time), mame_time_to_double(boost_duration)));
+	LOG(("cpu_boost_interleave(%s, %s)\n", attotime_string(timeslice_time, 9), attotime_string(boost_duration, 9)));
 
 	/* adjust the interleave timer */
-	mame_timer_adjust(interleave_boost_timer, timeslice_time, 0, timeslice_time);
+	timer_adjust(interleave_boost_timer, timeslice_time, 0, timeslice_time);
 
 	/* adjust the end timer, but only if we are going to extend it */
-	if (!mame_timer_enabled(interleave_boost_timer_end) || compare_mame_times(mame_timer_timeleft(interleave_boost_timer_end), boost_duration) < 0)
-		mame_timer_adjust(interleave_boost_timer_end, boost_duration, 0, time_never);
+	if (!timer_enabled(interleave_boost_timer_end) || attotime_compare(timer_timeleft(interleave_boost_timer_end), boost_duration) < 0)
+		timer_adjust(interleave_boost_timer_end, boost_duration, 0, attotime_never);
 }
 
 
@@ -875,14 +875,14 @@ void activecpu_eat_cycles(int cycles)
 
 int cpu_scalebyfcount(int value)
 {
-	mame_time refresh_elapsed = mame_timer_timeelapsed(refresh_timer);
+	attotime refresh_elapsed = timer_timeelapsed(refresh_timer);
 	int result;
 
 	/* shift off some bits to ensure no overflow */
 	if (value < 65536)
-		result = value * (refresh_elapsed.subseconds >> 16) / (refresh_period.subseconds >> 16);
+		result = value * (refresh_elapsed.attoseconds >> 16) / (refresh_period.attoseconds >> 16);
 	else
-		result = value * (refresh_elapsed.subseconds >> 32) / (refresh_period.subseconds >> 32);
+		result = value * (refresh_elapsed.attoseconds >> 32) / (refresh_period.attoseconds >> 32);
 	if (value >= 0)
 		return (result < value) ? result : value;
 	else
@@ -904,19 +904,19 @@ int cpu_scalebyfcount(int value)
 
 void cpu_compute_vblank_timing(void)
 {
-	refresh_period = make_mame_time(0, Machine->screen[0].refresh);
+	refresh_period = attotime_make(0, Machine->screen[0].refresh);
 
 	/* recompute the vblank period */
-	vblank_period = make_mame_time(0, Machine->screen[0].refresh / (vblank_multiplier ? vblank_multiplier : 1));
-	if (vblank_timer != NULL && mame_timer_enable(vblank_timer, FALSE))
+	vblank_period = attotime_make(0, Machine->screen[0].refresh / (vblank_multiplier ? vblank_multiplier : 1));
+	if (vblank_timer != NULL && timer_enable(vblank_timer, FALSE))
 	{
-		mame_time remaining = mame_timer_timeleft(vblank_timer);
-		if (remaining.seconds == 0 && remaining.subseconds == 0)
+		attotime remaining = timer_timeleft(vblank_timer);
+		if (remaining.seconds == 0 && remaining.attoseconds == 0)
 			remaining = vblank_period;
-		mame_timer_adjust(vblank_timer, remaining, 0, vblank_period);
+		timer_adjust(vblank_timer, remaining, 0, vblank_period);
 	}
 
-	LOG(("cpu_compute_vblank_timing: refresh=%.9f vblank=%.9f\n", mame_time_to_double(refresh_period), mame_time_to_double(vblank_period)));
+	LOG(("cpu_compute_vblank_timing: refresh=%s vblank=%s\n", attotime_string(refresh_period, 9), attotime_string(vblank_period, 9)));
 }
 
 
@@ -996,9 +996,9 @@ static TIMER_CALLBACK( cpu_triggertime_callback )
 }
 
 
-void cpu_triggertime(mame_time duration, int trigger)
+void cpu_triggertime(attotime duration, int trigger)
 {
-	mame_timer_set(duration, trigger, cpu_triggertime_callback);
+	timer_set(duration, trigger, cpu_triggertime_callback);
 }
 
 
@@ -1110,7 +1110,7 @@ void cpu_yield(void)
  *
  *************************************/
 
-void cpu_spinuntil_time(mame_time duration)
+void cpu_spinuntil_time(attotime duration)
 {
 	static int timetrig = 0;
 
@@ -1120,7 +1120,7 @@ void cpu_spinuntil_time(mame_time duration)
 }
 
 
-void cpu_yielduntil_time(mame_time duration)
+void cpu_yielduntil_time(attotime duration)
 {
 	static int timetrig = 0;
 
@@ -1210,7 +1210,7 @@ static void cpu_vblankreset(void)
 static TIMER_CALLBACK( cpu_firstvblankcallback )
 {
 	/* now that we're synced up, pulse from here on out */
-	mame_timer_adjust(vblank_timer, vblank_period, param, vblank_period);
+	timer_adjust(vblank_timer, vblank_period, param, vblank_period);
 
 	/* but we need to call the standard routine as well */
 	cpu_vblankcallback(machine, param);
@@ -1257,13 +1257,13 @@ static TIMER_CALLBACK( cpu_vblankcallback )
 
 				/* reset the countdown and timer */
 				cpu[cpunum].vblankint_countdown = cpu[cpunum].vblankint_multiplier;
-				mame_timer_adjust(cpu[cpunum].vblankint_timer, time_never, 0, time_never);
+				timer_adjust(cpu[cpunum].vblankint_timer, attotime_never, 0, attotime_never);
 			}
 		}
 
 		/* else reset the VBLANK timer if this is going to be a real VBLANK */
 		else if (vblank_countdown == 1)
-			mame_timer_adjust(cpu[cpunum].vblankint_timer, time_never, 0, time_never);
+			timer_adjust(cpu[cpunum].vblankint_timer, attotime_never, 0, attotime_never);
 	}
 
 	/* is it a real VBLANK? */
@@ -1274,7 +1274,7 @@ static TIMER_CALLBACK( cpu_vblankcallback )
 			video_frame_update();
 
 		/* Set the timer to update the screen */
-		mame_timer_adjust(update_timer, make_mame_time(0, machine->screen[0].vblank), 0, time_zero);
+		timer_adjust(update_timer, attotime_make(0, machine->screen[0].vblank), 0, attotime_zero);
 
 		/* reset the globals */
 		cpu_vblankreset();
@@ -1311,7 +1311,7 @@ static TIMER_CALLBACK( cpu_updatecallback )
 	current_frame++;
 
 	/* reset the refresh timer */
-	mame_timer_adjust(refresh_timer, time_never, 0, time_never);
+	timer_adjust(refresh_timer, attotime_never, 0, attotime_never);
 }
 
 
@@ -1358,7 +1358,7 @@ static TIMER_CALLBACK( cpu_timeslicecallback )
 
 static TIMER_CALLBACK( end_interleave_boost )
 {
-	mame_timer_adjust(interleave_boost_timer, time_never, 0, time_never);
+	timer_adjust(interleave_boost_timer, attotime_never, 0, attotime_never);
 	LOG(("end_interleave_boost\n"));
 }
 
@@ -1373,29 +1373,29 @@ static TIMER_CALLBACK( end_interleave_boost )
 
 static void compute_perfect_interleave(void)
 {
-	subseconds_t smallest = subseconds_per_cycle[0];
+	attoseconds_t smallest = attoseconds_per_cycle[0];
 	int cpunum;
 
 	/* start with a huge time factor and find the 2nd smallest cycle time */
-	perfect_interleave = time_zero;
-	perfect_interleave.subseconds = MAX_SUBSECONDS - 1;
+	perfect_interleave = attotime_zero;
+	perfect_interleave.attoseconds = ATTOSECONDS_PER_SECOND - 1;
 	for (cpunum = 1; Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 	{
 		/* find the 2nd smallest cycle interval */
-		if (subseconds_per_cycle[cpunum] < smallest)
+		if (attoseconds_per_cycle[cpunum] < smallest)
 		{
-			perfect_interleave.subseconds = smallest;
-			smallest = subseconds_per_cycle[cpunum];
+			perfect_interleave.attoseconds = smallest;
+			smallest = attoseconds_per_cycle[cpunum];
 		}
-		else if (subseconds_per_cycle[cpunum] < perfect_interleave.subseconds)
-			perfect_interleave.subseconds = subseconds_per_cycle[cpunum];
+		else if (attoseconds_per_cycle[cpunum] < perfect_interleave.attoseconds)
+			perfect_interleave.attoseconds = attoseconds_per_cycle[cpunum];
 	}
 
 	/* adjust the final value */
-	if (perfect_interleave.subseconds == MAX_SUBSECONDS - 1)
-		perfect_interleave.subseconds = subseconds_per_cycle[0];
+	if (perfect_interleave.attoseconds == ATTOSECONDS_PER_SECOND - 1)
+		perfect_interleave.attoseconds = attoseconds_per_cycle[0];
 
-	LOG(("Perfect interleave = %.9f, smallest = %.9f\n", mame_time_to_double(perfect_interleave), SUBSECONDS_TO_DOUBLE(smallest)));
+	LOG(("Perfect interleave = %s, smallest = %.9f\n", attotime_string(perfect_interleave), ATTOSECONDS_TO_DOUBLE(smallest)));
 }
 
 
@@ -1408,20 +1408,20 @@ static void compute_perfect_interleave(void)
 
 static void cpu_inittimers(running_machine *machine)
 {
-	mame_time first_time;
+	attotime first_time;
 	int cpunum, max, ipf;
 
 	/* allocate a dummy timer at the minimum frequency to break things up */
 	ipf = machine->drv->cpu_slices_per_frame;
 	if (ipf <= 0)
 		ipf = 1;
-	timeslice_period = make_mame_time(0, machine->screen[0].refresh / ipf);
-	timeslice_timer = mame_timer_alloc(cpu_timeslicecallback);
-	mame_timer_adjust(timeslice_timer, timeslice_period, 0, timeslice_period);
+	timeslice_period = attotime_make(0, machine->screen[0].refresh / ipf);
+	timeslice_timer = timer_alloc(cpu_timeslicecallback);
+	timer_adjust(timeslice_timer, timeslice_period, 0, timeslice_period);
 
 	/* allocate timers to handle interleave boosts */
-	interleave_boost_timer = mame_timer_alloc(NULL);
-	interleave_boost_timer_end = mame_timer_alloc(end_interleave_boost);
+	interleave_boost_timer = timer_alloc(NULL);
+	interleave_boost_timer_end = timer_alloc(end_interleave_boost);
 
 	/*
      *  The following code finds all the CPUs that are interrupting in sync with the VBLANK
@@ -1464,11 +1464,11 @@ static void cpu_inittimers(running_machine *machine)
 	}
 
 	/* allocate a vblank timer at the frame rate * the LCD number of interrupts per frame */
-	vblank_period = make_mame_time(0, machine->screen[0].refresh / vblank_multiplier);
+	vblank_period = attotime_make(0, machine->screen[0].refresh / vblank_multiplier);
 	vblank_countdown = vblank_multiplier;
 
 	/* allocate an update timer that will be used to time the actual screen updates */
-	update_timer = mame_timer_alloc(cpu_updatecallback);
+	update_timer = timer_alloc(cpu_updatecallback);
 
 	/*
      *      The following code creates individual timers for each CPU whose interrupts are not
@@ -1483,29 +1483,29 @@ static void cpu_inittimers(running_machine *machine)
 		/* compute the average number of cycles per interrupt */
 		if (ipf <= 0)
 			ipf = 1;
-		cpu[cpunum].vblankint_timer = mame_timer_alloc(NULL);
+		cpu[cpunum].vblankint_timer = timer_alloc(NULL);
 
 		/* see if we need to allocate a CPU timer */
 		if (machine->drv->cpu[cpunum].timed_interrupt_period != 0)
 		{
-			cpu[cpunum].timedint_period = make_mame_time(0, machine->drv->cpu[cpunum].timed_interrupt_period);
-			cpu[cpunum].timedint_timer = mame_timer_alloc(cpu_timedintcallback);
-			mame_timer_adjust(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
+			cpu[cpunum].timedint_period = attotime_make(0, machine->drv->cpu[cpunum].timed_interrupt_period);
+			cpu[cpunum].timedint_timer = timer_alloc(cpu_timedintcallback);
+			timer_adjust(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
 		}
 	}
 
 	/* note that since we start the first frame on the refresh, we can't pulse starting
        immediately; instead, we back up one VBLANK period, and inch forward until we hit
        positive time. That time will be the time of the first VBLANK timer callback */
-	first_time = sub_subseconds_from_mame_time(vblank_period, machine->screen[0].vblank);
-	while (compare_mame_times(first_time, time_zero) < 0)
+	first_time = attotime_sub_attoseconds(vblank_period, machine->screen[0].vblank);
+	while (attotime_compare(first_time, attotime_zero) < 0)
 	{
 		cpu_vblankcallback(machine, -1);
-		first_time = add_mame_times(first_time, vblank_period);
+		first_time = attotime_add(first_time, vblank_period);
 	}
-	mame_timer_set(first_time, 0, cpu_firstvblankcallback);
+	timer_set(first_time, 0, cpu_firstvblankcallback);
 
 	/* reset the refresh timer to get ourself back in sync */
-	mame_timer_adjust(refresh_timer, time_never, 0, time_never);
+	timer_adjust(refresh_timer, attotime_never, 0, attotime_never);
 }
 

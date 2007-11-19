@@ -460,7 +460,7 @@ GFXDECODE_END
 
 /* CPU#1 Interrups */
 #define GALPANI2_INTERRUPTS_NUM	4
-INTERRUPT_GEN( galpani2_interrupt )
+static INTERRUPT_GEN( galpani2_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -474,7 +474,7 @@ INTERRUPT_GEN( galpani2_interrupt )
 /* CPU#2 Interrups */
 /* lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
 #define GALPANI2_INTERRUPTS_NUM2	3
-INTERRUPT_GEN( galpani2_interrupt2 )
+static INTERRUPT_GEN( galpani2_interrupt2 )
 {
 	switch ( cpu_getiloops() )
 	{

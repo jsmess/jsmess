@@ -341,5 +341,5 @@ void draw_border(mame_bitmap *bitmap,
 
 	/* Assume all other routines have processed their data from the list */
 	EventList_Reset();
-	EventList_SetOffsetStartTime ( MAME_TIME_TO_CYCLES(0, scale_up_mame_time(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
+	EventList_SetOffsetStartTime ( ATTOTIME_TO_CYCLES(0, attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
 }

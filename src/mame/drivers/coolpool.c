@@ -54,7 +54,7 @@ static const UINT16 nvram_unlock_seq[] =
 #define NVRAM_UNLOCK_SEQ_LEN (ARRAY_LENGTH(nvram_unlock_seq))
 static UINT16 nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
 static UINT8 nvram_write_enable;
-static mame_timer *nvram_write_timer;
+static emu_timer *nvram_write_timer;
 
 
 
@@ -146,7 +146,7 @@ static void coolpool_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 static MACHINE_RESET( amerdart )
 {
 	nvram_write_enable = 0;
-	nvram_write_timer = mame_timer_alloc(nvram_write_timeout);
+	nvram_write_timer = timer_alloc(nvram_write_timeout);
 }
 
 
@@ -154,7 +154,7 @@ static MACHINE_RESET( coolpool )
 {
 	tlc34076_reset(6);
 	nvram_write_enable = 0;
-	nvram_write_timer = mame_timer_alloc(nvram_write_timeout);
+	nvram_write_timer = timer_alloc(nvram_write_timeout);
 }
 
 
@@ -181,7 +181,7 @@ static WRITE16_HANDLER( nvram_thrash_w )
 	if (!memcmp(nvram_unlock_seq, nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
 		nvram_write_enable = 1;
-		mame_timer_adjust(nvram_write_timer, MAME_TIME_IN_MSEC(1000), 0, time_zero);
+		timer_adjust(nvram_write_timer, ATTOTIME_IN_MSEC(1000), 0, attotime_zero);
 	}
 }
 
@@ -277,7 +277,7 @@ static WRITE16_HANDLER( amerdart_iop_w )
 {
 	logerror("%08x:IOP write %04x\n", activecpu_get_pc(), data);
 	COMBINE_DATA(&iop_cmd);
-	mame_timer_set(MAME_TIME_IN_USEC(100), 0, amerdart_iop_response);
+	timer_set(ATTOTIME_IN_USEC(100), 0, amerdart_iop_response);
 }
 
 
@@ -314,7 +314,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 	cpunum_set_input_line(1, 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 										/* the DSP polls the status bit so it isn't strictly */
 										/* necessary to also have an IRQ */
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
 }
 
 
@@ -679,7 +679,7 @@ static tms34010_config tms_config_coolpool =
  *
  *************************************/
 
-MACHINE_DRIVER_START( amerdart )
+static MACHINE_DRIVER_START( amerdart )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)

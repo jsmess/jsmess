@@ -22,8 +22,8 @@
 #include "includes/zx.h"
 #include "sound/dac.h"
 
-mame_timer *ula_nmi = NULL;
-mame_timer *ula_irq = NULL;
+emu_timer *ula_nmi = NULL;
+emu_timer *ula_irq = NULL;
 int ula_nmi_active, ula_irq_active;
 int ula_frame_vsync = 0;
 int ula_scancode_count = 0;
@@ -145,7 +145,7 @@ int zx_ula_r(int offs, int region)
 		y = video_screen_get_vpos(0);
 
 		cycles = 4 * (64 - (rreg & 63));
-		mame_timer_set(MAME_TIME_IN_CYCLES(cycles, 0), 0, zx_ula_irq);
+		timer_set(ATTOTIME_IN_CYCLES(cycles, 0), 0, zx_ula_irq);
 		ula_irq_active = 1;
 		scanline = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -185,7 +185,7 @@ int zx_ula_r(int offs, int region)
 
 VIDEO_START( zx )
 {
-	ula_nmi = mame_timer_alloc(zx_ula_nmi);
+	ula_nmi = timer_alloc(zx_ula_nmi);
 	ula_irq_active = 0;
 	video_start_generic_bitmapped(machine);
 }

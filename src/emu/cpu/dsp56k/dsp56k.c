@@ -1033,7 +1033,7 @@ UINT8 dsp56k_host_interface_read(UINT8 addr)
 				/* Maybe this isn't needed? */
 				if (!memtest3_hack)
 				{
-					cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+					cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 					memtest3_hack++;
 				}
 			}

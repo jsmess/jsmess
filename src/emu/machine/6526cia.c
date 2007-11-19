@@ -54,7 +54,7 @@ struct _cia_timer
 	UINT16		count;
 	UINT8		mode;
 	UINT8		irq;
-	mame_timer *timer;
+	emu_timer *timer;
 	cia_state *	cia;
 };
 
@@ -171,14 +171,14 @@ void cia_config(int which, const cia6526_interface *intf)
 	for (t = 0; t < (sizeof(cia->timer) / sizeof(cia->timer[0])); t++)
 	{
 		cia_timer *timer = &cia->timer[t];
-		timer->timer = mame_timer_alloc_ptr(cia_timer_proc, timer);
+		timer->timer = timer_alloc_ptr(cia_timer_proc, timer);
 		timer->cia = cia;
 		timer->irq = 0x01 << t;
 	}
 
 	/* setup TOD timer, if appropriate */
 	if (intf->tod_clock)
-		mame_timer_pulse(MAME_TIME_IN_HZ(intf->tod_clock), which, cia_clock_tod_callback);
+		timer_pulse(ATTOTIME_IN_HZ(intf->tod_clock), which, cia_clock_tod_callback);
 
 	/* special case; for the first CIA, set up an exit handler to clear things out */
 	if (which == 0)
@@ -292,14 +292,14 @@ static void cia_update_interrupts(cia_state *cia)
 }
 
 
-static int is_timer_active(mame_timer *timer)
+static int is_timer_active(emu_timer *timer)
 {
-	mame_time t = mame_timer_firetime(timer);
-	return compare_mame_times(t, time_never) != 0;
+	attotime t = timer_firetime(timer);
+	return attotime_compare(t, attotime_never) != 0;
 }
 
 
-/* updates the count and mame_timer for a given CIA timer */
+/* updates the count and emu_timer for a given CIA timer */
 static void cia_timer_update(cia_timer *timer, INT32 new_count)
 {
 	int which = timer - timer->cia->timer;
@@ -310,7 +310,7 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	/* update the timer count, if necessary */
 	if ((new_count == -1) && is_timer_active(timer->timer))
 	{
-		UINT16 current_count = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer->timer), timer->cia->clock));
+		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), timer->cia->clock));
 		timer->count = timer->count - MIN(timer->count, current_count);
 	}
 
@@ -322,13 +322,13 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	if ((timer->mode & 0x01) && ((timer->mode & (which ? 0x60 : 0x20)) == 0x00))
 	{
 		/* timer is on and is connected to clock */
-		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(timer->cia->clock), (timer->count ? timer->count : 0x10000));
-		mame_timer_adjust_ptr(timer->timer, period, time_zero);
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(timer->cia->clock), (timer->count ? timer->count : 0x10000));
+		timer_adjust_ptr(timer->timer, period, attotime_zero);
 	}
 	else
 	{
 		/* timer is off or not connected to clock */
-		mame_timer_adjust_ptr(timer->timer, time_never, time_zero);
+		timer_adjust_ptr(timer->timer, attotime_never, attotime_zero);
 	}
 }
 

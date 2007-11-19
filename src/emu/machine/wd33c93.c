@@ -185,7 +185,7 @@ typedef struct
 	UINT8		busphase;
 	UINT8		identify;
 	int			read_pending;
-	mame_timer *cmd_timer;
+	emu_timer *cmd_timer;
 } _wd33c93_data;
 
 /* local instance of controller data */
@@ -237,7 +237,7 @@ static void wd33c93_read_data(int bytes, UINT8 *pData)
 static void wd33c93_complete_immediate( int status )
 {
 	/* reset our timer */
-	mame_timer_reset( scsi_data.cmd_timer, time_never );
+	timer_reset( scsi_data.cmd_timer, attotime_never );
 
 	/* set the new status */
 	scsi_data.regs[WD_SCSI_STATUS] = status & 0xff;
@@ -286,7 +286,7 @@ static TIMER_CALLBACK(wd33c93_deassert_cip)
 static void wd33c93_complete_cmd( UINT8 status )
 {
 	/* fire off a timer to complete the command */
-	mame_timer_adjust( scsi_data.cmd_timer, MAME_TIME_IN_USEC(1), status, time_zero );
+	timer_adjust( scsi_data.cmd_timer, ATTOTIME_IN_USEC(1), status, attotime_zero );
 }
 
 /* command handlers */
@@ -351,7 +351,7 @@ static void wd33c93_select_cmd( void )
 		}
 
 		/* queue up a service request out in the future */
-		mame_timer_set( MAME_TIME_IN_USEC(50), 0, wd33c93_service_request );
+		timer_set( ATTOTIME_IN_USEC(50), 0, wd33c93_service_request );
 	}
 	else
 	{
@@ -423,7 +423,7 @@ static void wd33c93_selectxfer_cmd( void )
 			scsi_data.busphase = PHS_MESS_IN;
 
 			/* queue up a service request out in the future */
-			mame_timer_set( MAME_TIME_IN_MSEC(50), 0, wd33c93_service_request );
+			timer_set( ATTOTIME_IN_MSEC(50), 0, wd33c93_service_request );
 		}
 	}
 	else
@@ -453,7 +453,7 @@ static void wd33c93_xferinfo_cmd( void )
 	scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
 
 	/* the command will be completed once the data is transferred */
-	mame_timer_set( MAME_TIME_IN_MSEC(1), 0, wd33c93_deassert_cip );
+	timer_set( ATTOTIME_IN_MSEC(1), 0, wd33c93_deassert_cip );
 }
 
 /* Command handlers */
@@ -802,7 +802,7 @@ extern void wd33c93_init( struct WD33C93interface *interface )
 	}
 
 	/* allocate a timer for commands */
-	scsi_data.cmd_timer = mame_timer_alloc(wd33c93_complete_cb);
+	scsi_data.cmd_timer = timer_alloc(wd33c93_complete_cb);
 
 	scsi_data.temp_input = auto_malloc( TEMP_INPUT_LEN );
 

@@ -381,7 +381,7 @@ logerror("laserdisc command %02x -> %02x\n",data,cmd);
 	}
 }
 
-INTERRUPT_GEN( gottlieb_interrupt )
+static INTERRUPT_GEN( gottlieb_interrupt )
 {
 	if (access_time > 0) {
 		access_time--;
@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( gottlieb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gottlieb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_READ(riot_ram_r)
 	AM_RANGE(0x0200, 0x03ff) AM_READ(gottlieb_riot_r)
 	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_ROM)
@@ -454,7 +454,7 @@ ADDRESS_MAP_START( gottlieb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( gottlieb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gottlieb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_WRITE(riot_ram_w) AM_BASE(&riot_ram)
 	AM_RANGE(0x0200, 0x03ff) AM_WRITE(gottlieb_riot_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(DAC_0_data_w)
@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( stooges_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( stooges_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( stooges_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x4000, 0x4001) AM_WRITE(DAC_0_data_w)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( stooges_sound2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( stooges_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( stooges_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(stooges_sp0250_latch_w)	/* speech chip. The game sends strings */
 									/* of 15 bytes (clocked by 4000). The chip also */
@@ -1555,7 +1555,7 @@ static MACHINE_DRIVER_START( gottlieb )
 	MDRV_CPU_PROGRAM_MAP(gottlieb_sound_readmem,gottlieb_sound_writemem)
 								/* NMIs are triggered by the Votrax SC-01 */
 	MDRV_SCREEN_REFRESH_RATE(61)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1018)	/* frames per second, vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1018)	/* frames per second, vblank duration */)
 
 	MDRV_MACHINE_RESET(gottlieb)
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -1636,7 +1636,7 @@ static MACHINE_DRIVER_START( gottlieb2 )
 	MDRV_CPU_PROGRAM_MAP(stooges_sound2_readmem,stooges_sound2_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(61)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1018)	/* frames per second, vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1018)	/* frames per second, vblank duration */)
 
 	MDRV_MACHINE_RESET(gottlieb)
 	MDRV_NVRAM_HANDLER(generic_1fill)

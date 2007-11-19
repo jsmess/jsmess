@@ -252,7 +252,7 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #include "sound/ay8910.h"
 #include "machine/steppers.h"	// stepper motor
 #include "machine/roc10937.h"	// vfd
-#include "machine/mmtr.h"
+#include "machine/meters.h"
 
 #ifdef MAME_DEBUG
 #define LOG(x)logerror x
@@ -296,7 +296,7 @@ static int lamp_col;
 static int ic23_active;
 static int led_extend;
 static int serial_card_connected;
-static mame_timer *ic24_timer;
+static emu_timer *ic24_timer;
 static TIMER_CALLBACK( ic24_timeout );
 
 static int	input_strobe;	  // IC23 74LS138 A = CA2 IC7, B = CA2 IC4, C = CA2 IC8
@@ -304,8 +304,8 @@ static UINT8  lamp_strobe,lamp_strobe2;
 static UINT8  lamp_data;
 static UINT8  aydata;
 
-const UINT8 MPU4_chr_lut[72];
-UINT8 MPU4_chr_data[72];
+extern const UINT8 MPU4_chr_lut[72];
+static UINT8 MPU4_chr_data[72];
 static UINT8 led_segs[8];
 static UINT8 Lamps[128];		// 128 multiplexed lamps
 								// 32  multiplexed inputs - but a further 8 possible per AUX.
@@ -603,7 +603,7 @@ static void ic24_setup(void)
 		{
 			ic23_active=1;
 			ic24_output(0);
-			mame_timer_adjust(ic24_timer, double_to_mame_time(duration), 0, time_zero);
+			timer_adjust(ic24_timer, double_to_attotime(duration), 0, attotime_zero);
 		}
 	}
 }
@@ -852,7 +852,7 @@ static WRITE8_HANDLER( pia_ic7_porta_w )
 static WRITE8_HANDLER( pia_ic7_portb_w )
 {
 	int i;
-	long cycles  = MAME_TIME_TO_CYCLES(0, mame_timer_get_time() );
+	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
 
 // The meters are connected to a voltage drop sensor, where current
 // flowing through them also passes through pin B7, meaning that when
@@ -891,7 +891,7 @@ static WRITE8_HANDLER( pia_ic7_cb2_w )
 {
 // The eighth meter is connected here, because the voltage sensor
 // is on PB7.
-	long cycles  = MAME_TIME_TO_CYCLES(0, mame_timer_get_time() );
+	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
 	if (data)
 	{
 		pia_set_input_b(4,mmtr_data|0x80);
@@ -1197,7 +1197,7 @@ static void mpu4_config_common(void)
 	pia_config(4,&pia_ic7_intf);
 	pia_config(5,&pia_ic8_intf);
 
-	ic24_timer = mame_timer_alloc(ic24_timeout);
+	ic24_timer = timer_alloc(ic24_timeout);
 	// setup ptm ////////////////////////////////////////////////////////////
 	ptm6840_config(0, &ptm_ic2_intf );
 }

@@ -73,7 +73,7 @@ static void mjkjidai_adpcm_callback (void *param, stream_sample_t **inputs, stre
 	}
 }
 
-void *mjkjidai_adpcm_start (int clock, const struct CustomSound_interface *config)
+static void *mjkjidai_adpcm_start (int clock, const struct CustomSound_interface *config)
 {
 	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
 	state->playing = 0;

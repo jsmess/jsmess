@@ -118,7 +118,7 @@ static INPUT_PORTS_START( laserbas )
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-INTERRUPT_GEN( laserbas_interrupt )
+static INTERRUPT_GEN( laserbas_interrupt )
 {
 	if(video_screen_get_vblank(0))
 		 cpunum_set_input_line(0, 0, HOLD_LINE);

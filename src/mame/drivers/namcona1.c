@@ -1169,7 +1169,7 @@ static WRITE16_HANDLER(snd_w)
 	}
 }
 
-ADDRESS_MAP_START( namcona1_mcu_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( namcona1_mcu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
 	AM_RANGE(0x001000, 0x001fff) AM_READWRITE(snd_r, snd_w)				// C140-alike sound chip
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
@@ -1295,7 +1295,7 @@ static READ8_HANDLER( portana_r )
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }
 
-ADDRESS_MAP_START( namcona1_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( namcona1_mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READWRITE( port4_r, port4_w )
 	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READWRITE( port5_r, port5_w )
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE( port6_r, port6_w )
@@ -1304,7 +1304,7 @@ ADDRESS_MAP_START( namcona1_mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x1f) AM_READ( portana_r )
 ADDRESS_MAP_END
 
-INTERRUPT_GEN( namcona1_interrupt )
+static INTERRUPT_GEN( namcona1_interrupt )
 {
 	int level = cpu_getiloops(); /* 0,1,2,3,4 */
 	if( level==0 )
@@ -1350,7 +1350,7 @@ static MACHINE_DRIVER_START( namcona1 )
 	MDRV_CPU_ADD(M37710, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_mcu_map, 0)
 	MDRV_CPU_IO_MAP( namcona1_mcu_io_map, 0 )
-	MDRV_CPU_VBLANK_INT(mcu_interrupt, 2);
+	MDRV_CPU_VBLANK_INT(mcu_interrupt, 2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

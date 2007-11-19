@@ -112,7 +112,7 @@ static INT16 *dacr;
 static int dacl_ptr = 0;
 static int dacr_ptr = 0;
 
-static mame_timer *sound_timer;
+static emu_timer *sound_timer;
 static UINT8 ad1847_regs[16];
 static UINT32 ad1847_sample_counter = 0;
 static UINT32 ad1847_sample_rate;
@@ -642,7 +642,7 @@ static void cx5510_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 static TIMER_CALLBACK( sound_timer_callback )
 {
 	ad1847_sample_counter = 0;
-	mame_timer_adjust(sound_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);
+	timer_adjust(sound_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
 
 	dmadac_transfer(0, 1, 0, 1, dacl_ptr, dacl);
 	dmadac_transfer(1, 1, 0, 1, dacr_ptr, dacr);
@@ -860,8 +860,8 @@ static MACHINE_RESET(mediagx)
 	dacl = auto_malloc(65536 * sizeof(INT16));
 	dacr = auto_malloc(65536 * sizeof(INT16));
 
-	sound_timer = mame_timer_alloc(sound_timer_callback);
-	mame_timer_adjust(sound_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);
+	sound_timer = timer_alloc(sound_timer_callback);
+	timer_adjust(sound_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
 
 	dmadac_enable(0, 2, 1);
 	ide_controller_reset(0);

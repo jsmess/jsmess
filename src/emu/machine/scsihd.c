@@ -22,7 +22,7 @@ typedef struct
 
 // scsihd_exec_command
 
-int scsihd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
+static int scsihd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 {
 	UINT8 *command;
 	int commandLength;

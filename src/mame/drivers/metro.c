@@ -186,7 +186,7 @@ static void update_irq_state(void)
 
 
 /* For games that supply an *IRQ Vector* on the data bus */
-int metro_irq_callback(int int_level)
+static int metro_irq_callback(int int_level)
 {
 //  logerror("CPU #0 PC %06X: irq callback returns %04X\n",activecpu_get_pc(),metro_irq_vectors[int_level]);
 	return metro_irq_vectors[int_level]&0xff;
@@ -220,7 +220,7 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 }
 
 
-INTERRUPT_GEN( metro_interrupt )
+static INTERRUPT_GEN( metro_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -237,7 +237,7 @@ INTERRUPT_GEN( metro_interrupt )
 }
 
 /* Lev 1. Lev 2 seems sound related */
-INTERRUPT_GEN( bangball_interrupt )
+static INTERRUPT_GEN( bangball_interrupt )
 {
 	requested_int[0] = 1;	// set scroll regs if a flag is set
 	requested_int[4] = 1;	// clear that flag
@@ -251,7 +251,7 @@ static TIMER_CALLBACK( vblank_end_callback )
 }
 
 /* lev 2-7 (lev 1 seems sound related) */
-INTERRUPT_GEN( karatour_interrupt )
+static INTERRUPT_GEN( karatour_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -259,7 +259,7 @@ INTERRUPT_GEN( karatour_interrupt )
 			requested_int[0] = 1;
 			requested_int[5] = 1;	// write the scroll registers
 			/* the duration is a guess */
-			mame_timer_set(MAME_TIME_IN_USEC(2500), 0, vblank_end_callback);
+			timer_set(ATTOTIME_IN_USEC(2500), 0, vblank_end_callback);
 			update_irq_state();
 			break;
 
@@ -270,7 +270,7 @@ INTERRUPT_GEN( karatour_interrupt )
 	}
 }
 
-static mame_timer *mouja_irq_timer;
+static emu_timer *mouja_irq_timer;
 
 static TIMER_CALLBACK( mouja_irq_callback )
 {
@@ -281,17 +281,17 @@ static TIMER_CALLBACK( mouja_irq_callback )
 static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 {
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2;					/* 0xff=58Hz, 0x80=116Hz? */
-	mame_timer_adjust(mouja_irq_timer, time_zero, 0, MAME_TIME_IN_HZ(freq));
+	timer_adjust(mouja_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(freq));
 }
 
-INTERRUPT_GEN( mouja_interrupt )
+static INTERRUPT_GEN( mouja_interrupt )
 {
 	requested_int[1] = 1;
 	update_irq_state();
 }
 
 
-INTERRUPT_GEN( gakusai_interrupt )
+static INTERRUPT_GEN( gakusai_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -302,7 +302,7 @@ INTERRUPT_GEN( gakusai_interrupt )
 	}
 }
 
-INTERRUPT_GEN( dokyusei_interrupt )
+static INTERRUPT_GEN( dokyusei_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -672,7 +672,7 @@ static READ16_HANDLER( metro_bankedrom_r )
 
 ***************************************************************************/
 
-UINT16 *metro_blitter_regs;
+static UINT16 *metro_blitter_regs;
 
 static TIMER_CALLBACK( metro_blit_done )
 {
@@ -754,7 +754,7 @@ static WRITE16_HANDLER( metro_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						mame_timer_set(MAME_TIME_IN_USEC(500),0,metro_blit_done);
+						timer_set(ATTOTIME_IN_USEC(500),0,metro_blit_done);
 						return;
 					}
 
@@ -1381,7 +1381,7 @@ ADDRESS_MAP_END
 
 static int gakusai_oki_bank_lo, gakusai_oki_bank_hi;
 
-void gakusai_oki_bank_set(void)
+static void gakusai_oki_bank_set(void)
 {
 	int bank = (gakusai_oki_bank_lo & 7) + (gakusai_oki_bank_hi & 1) * 8;
 	OKIM6295_set_bank_base(0, bank * 0x40000);
@@ -4667,7 +4667,7 @@ static DRIVER_INIT( mouja )
 {
 	metro_common();
 	irq_line = -1;	/* split interrupt handlers */
-	mouja_irq_timer = mame_timer_alloc(mouja_irq_callback);
+	mouja_irq_timer = timer_alloc(mouja_irq_callback);
 }
 
 static DRIVER_INIT( gakusai )

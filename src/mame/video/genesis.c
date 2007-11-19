@@ -14,7 +14,7 @@
 void megaplay_start_video_normal(running_machine *machine);
 void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
 
-int genesis_screen_number;
+static int genesis_screen_number;
 
 
 /******************************************************************************
@@ -125,7 +125,7 @@ static UINT8		window_width;				/* window width */
 ******************************************************************************/
 
 
-void start_genesis_vdp(int screen_number)
+static void start_genesis_vdp(int screen_number)
 {
 	static const UINT8 vdp_init[24] =
 	{

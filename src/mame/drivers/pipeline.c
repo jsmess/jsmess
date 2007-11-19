@@ -210,7 +210,7 @@ static TIMER_CALLBACK( protection_deferred_w )
 static WRITE8_HANDLER(protection_w)
 {
 	timer_call_after_resynch(data, protection_deferred_w);
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 static ADDRESS_MAP_START( cpu0_mem, ADDRESS_SPACE_PROGRAM, 8 )

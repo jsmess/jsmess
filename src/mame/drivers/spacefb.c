@@ -117,7 +117,7 @@
  *
  *************************************/
 
-static mame_timer *interrupt_timer;
+static emu_timer *interrupt_timer;
 
 
 static TIMER_CALLBACK( interrupt_callback )
@@ -135,19 +135,19 @@ static TIMER_CALLBACK( interrupt_callback )
 	else
 		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
 
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, attotime_zero);
 }
 
 
 static void create_interrupt_timer(void)
 {
-	interrupt_timer = mame_timer_alloc(interrupt_callback);
+	interrupt_timer = timer_alloc(interrupt_callback);
 }
 
 
 static void start_interrupt_timer(void)
 {
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, SPACEFB_INT_TRIGGER_COUNT_1, 0), 0, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, SPACEFB_INT_TRIGGER_COUNT_1, 0), 0, attotime_zero);
 }
 
 

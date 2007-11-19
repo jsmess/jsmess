@@ -72,13 +72,13 @@ WRITE8_HANDLER ( zx_io_w )
 {
 	if ((offset & 2) == 0)
 	{
-		mame_timer_reset(ula_nmi, time_never);
+		timer_reset(ula_nmi, attotime_never);
 
 		LOG_ZX81_IOW("ULA NMIs off");
 	}
 	else if ((offset & 1) == 0)
 	{
-		mame_timer_adjust(ula_nmi, time_zero, 0, MAME_TIME_IN_CYCLES(207, 0));
+		timer_adjust(ula_nmi, attotime_zero, 0, ATTOTIME_IN_CYCLES(207, 0));
 
 		LOG_ZX81_IOW("ULA NMIs on");
 
@@ -145,7 +145,7 @@ READ8_HANDLER ( zx_io_r )
 			if ((cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
-				mame_timer_set(MAME_TIME_IN_USEC(362), 0, zx_tape_pulse);
+				timer_set(ATTOTIME_IN_USEC(362), 0, zx_tape_pulse);
 			}
 
 			data &= ~zx_tape_bit;
@@ -209,7 +209,7 @@ READ8_HANDLER ( pow3000_io_r )
 			if ((cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
-				mame_timer_set(MAME_TIME_IN_USEC(362), 0, zx_tape_pulse);
+				timer_set(ATTOTIME_IN_USEC(362), 0, zx_tape_pulse);
 			}
 
 			data &= ~zx_tape_bit;

@@ -297,7 +297,7 @@ WRITE16_HANDLER( hyprduel_window_w )
  the tile's sizes to be known at startup - which we don't!
 */
 
-int hyprduel_sprite_xoffs, hyprduel_sprite_yoffs;
+static int hyprduel_sprite_xoffs, hyprduel_sprite_yoffs;
 
 
 static void alloc_empty_tiles(void)

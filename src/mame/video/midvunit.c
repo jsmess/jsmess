@@ -34,7 +34,7 @@ static UINT8 dma_data_index;
 static UINT16 page_control;
 static UINT8 video_changed;
 
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 static poly_manager *poly;
 
 typedef struct _poly_extra_data poly_extra_data;
@@ -58,7 +58,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 	int scanline = param;
 
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline + 1, 0), scanline, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline + 1, 0), scanline, attotime_zero);
 }
 
 
@@ -70,7 +70,7 @@ static void midvunit_exit(running_machine *machine)
 
 VIDEO_START( midvunit )
 {
-	scanline_timer = mame_timer_alloc(scanline_timer_cb);
+	scanline_timer = timer_alloc(scanline_timer_cb);
 	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, midvunit_exit);
 }
@@ -436,7 +436,7 @@ WRITE32_HANDLER( midvunit_video_control_w )
 
 	/* update the scanline timer */
 	if (offset == 0)
-		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, (data & 0x1ff) + 1, 0), data & 0x1ff, time_zero);
+		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, (data & 0x1ff) + 1, 0), data & 0x1ff, attotime_zero);
 
 	/* if something changed, update our parameters */
 	if (old != video_regs[offset] && video_regs[6] != 0 && video_regs[11] != 0)
@@ -448,7 +448,7 @@ WRITE32_HANDLER( midvunit_video_control_w )
 		visarea.max_x = (video_regs[6] + video_regs[2] - video_regs[5]) % video_regs[6];
 		visarea.min_y = 0;
 		visarea.max_y = (video_regs[11] + video_regs[7] - video_regs[10]) % video_regs[11];
-		video_screen_configure(0, video_regs[6], video_regs[11], &visarea, HZ_TO_SUBSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * video_regs[6] * video_regs[11]);
+		video_screen_configure(0, video_regs[6], video_regs[11], &visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * video_regs[6] * video_regs[11]);
 	}
 }
 

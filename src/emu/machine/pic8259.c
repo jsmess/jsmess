@@ -32,7 +32,7 @@ typedef enum
 
 struct pic8259
 {
-	mame_timer *timer;
+	emu_timer *timer;
 	void (*set_int_line)(int which, int interrupt);
 
 	pic8259_state_t state;
@@ -81,7 +81,7 @@ int pic8259_init(int count, void (*set_int_line)(int which, int interrupt))
 
 	for (i = 0; i < count; i++)
 	{
-		pic[i].timer = mame_timer_alloc(pic8259_timerproc);
+		pic[i].timer = timer_alloc(pic8259_timerproc);
 		pic[i].set_int_line = set_int_line;
 	}
 
@@ -128,7 +128,7 @@ static TIMER_CALLBACK( pic8259_timerproc )
 
 static void pic8259_set_timer(int which)
 {
-	mame_timer_adjust(pic[which].timer, time_zero, which, time_zero);
+	timer_adjust(pic[which].timer, attotime_zero, which, attotime_zero);
 }
 
 

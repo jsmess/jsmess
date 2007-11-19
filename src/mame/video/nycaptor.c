@@ -16,7 +16,7 @@ static int char_bank,palette_bank,gfxctrl;
 
 UINT8 *nycaptor_scrlram;
 
-UINT8 *nycaptor_spriteram;
+static UINT8 *nycaptor_spriteram;
 extern UINT8 *nycaptor_sharedram;
 extern int nyc_gametype;
 

@@ -44,10 +44,12 @@ extern VIDEO_START( exctsccr );
 extern VIDEO_UPDATE( exctsccr );
 
 /* from machine */
+#if MCU_HACK
 extern UINT8 *exctsccr_mcu_ram;
 extern WRITE8_HANDLER( exctsccr_mcu_w );
 extern WRITE8_HANDLER( exctsccr_mcu_control_w );
 extern WRITE8_HANDLER( exctscc2_mcu_control_w );
+#endif
 
 
 static WRITE8_HANDLER( exctsccr_DAC_data_w )
@@ -108,13 +110,12 @@ static const int *mcu_patch_data = NULL;
 static UINT8 *mcu_shared_ram;
 static WRITE8_HANDLER( cexctsccr_mcu_halt_w )
 {
+#if MCU_HACK
+	exctsccr_mcu_control_w(offset,data&1);
+#else
 	const int *p;
 
 	data &= 1;
-#if MCU_HACK
-	exctsccr_mcu_control_w(offset,data);
-extern UINT8 *exctsccr_mcu_ram;
-#else
 	cpunum_set_input_line(2, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 	if( (p=mcu_patch_data) != NULL)
 	{
@@ -129,8 +130,8 @@ extern UINT8 *exctsccr_mcu_ram;
 			p++;
 		}
 	}
-}
 #endif
+}
 
 /***************************************************************************
 

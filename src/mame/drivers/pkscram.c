@@ -25,7 +25,7 @@ static UINT16* pkscramble_mdtilemap_ram;
 static UINT16* pkscramble_bgtilemap_ram;
 
 static tilemap *fg_tilemap, *md_tilemap, *bg_tilemap;
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 
 static WRITE16_HANDLER( pkscramble_fgtilemap_w )
 {
@@ -212,14 +212,14 @@ static TIMER_CALLBACK( scanline_callback )
 	{
     	if (out&0x2000)
     		cpunum_set_input_line(0, 1, ASSERT_LINE);
-		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, param+1, 0), param+1, time_zero);
+		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, param+1, 0), param+1, attotime_zero);
 		interrupt_line_active = 1;
 	}
 	else
 	{
 		if (interrupt_line_active)
 	    	cpunum_set_input_line(0, 1, CLEAR_LINE);
-		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, time_zero);
+		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, attotime_zero);
 		interrupt_line_active = 0;
 	}
 }
@@ -274,8 +274,8 @@ static MACHINE_RESET( pkscramble)
 {
 	out = 0;
 	interrupt_line_active=0;
-	scanline_timer = mame_timer_alloc(scanline_callback);
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, time_zero);
+	scanline_timer = timer_alloc(scanline_callback);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, attotime_zero);
 
 	state_save_register_global(out);
 	state_save_register_global(interrupt_line_active);

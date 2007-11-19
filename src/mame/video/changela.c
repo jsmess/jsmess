@@ -33,7 +33,7 @@ static UINT32  mem_dev_selected; /* an offset within memory_devices area */
 
 static mame_bitmap *obj0_bitmap, *river_bitmap, *tree0_bitmap, *tree1_bitmap;
 
-static mame_timer* changela_scanline_timer;
+static emu_timer* changela_scanline_timer;
 static TIMER_CALLBACK( changela_scanline_callback );
 
 VIDEO_START( changela )
@@ -46,8 +46,8 @@ VIDEO_START( changela )
 	tree0_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	tree1_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	changela_scanline_timer = mame_timer_alloc(changela_scanline_callback);
-	mame_timer_adjust(changela_scanline_timer, video_screen_get_time_until_pos(0, 30, 0), 30, time_zero);
+	changela_scanline_timer = timer_alloc(changela_scanline_callback);
+	timer_adjust(changela_scanline_timer, video_screen_get_time_until_pos(0, 30, 0), 30, attotime_zero);
 
 	state_save_register_global(slopeROM_bank);
 	state_save_register_global(tree_en);
@@ -737,7 +737,7 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 	sy++;
 	if(sy > 256) sy = 30;
-	mame_timer_adjust(changela_scanline_timer, video_screen_get_time_until_pos(0, sy, 0), sy, time_zero);
+	timer_adjust(changela_scanline_timer, video_screen_get_time_until_pos(0, sy, 0), sy, attotime_zero);
 }
 
 VIDEO_UPDATE( changela )

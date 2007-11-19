@@ -42,7 +42,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 /* Variables that driver has access to: */
 UINT16 *powerins_vram_0, *powerins_vctrl_0;
 UINT16 *powerins_vram_1, *powerins_vctrl_1;
-UINT16 *powerins_vregs;
+//UINT16 *powerins_vregs;
 
 /* Variables only used here: */
 static tilemap *tilemap_0, *tilemap_1;

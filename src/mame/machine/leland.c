@@ -41,7 +41,7 @@ UINT8 leland_dac_control;
 
 static UINT8 leland_gfx_control;
 static UINT8 wcol_enable;
-static mame_timer *master_int_timer;
+static emu_timer *master_int_timer;
 
 static UINT8 *master_base;
 static UINT8 *slave_base;
@@ -361,13 +361,13 @@ MACHINE_START( leland )
 	battery_ram = auto_malloc(LELAND_BATTERY_RAM_SIZE);
 
 	/* start scanline interrupts going */
-	master_int_timer = mame_timer_alloc(leland_interrupt_callback);
+	master_int_timer = timer_alloc(leland_interrupt_callback);
 }
 
 
 MACHINE_RESET( leland )
 {
-	mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8, time_zero);
+	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8, attotime_zero);
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
@@ -414,14 +414,14 @@ MACHINE_START( ataxx )
 	extra_tram = auto_malloc(ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
-	master_int_timer = mame_timer_alloc(ataxx_interrupt_callback);
+	master_int_timer = timer_alloc(ataxx_interrupt_callback);
 }
 
 
 MACHINE_RESET( ataxx )
 {
 	memset(extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
-	mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8, time_zero);
+	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8, attotime_zero);
 
 	/* initialize the XROM */
 	xrom_length = memory_region_length(REGION_USER1);
@@ -475,7 +475,7 @@ static TIMER_CALLBACK( leland_interrupt_callback )
 	scanline += 16;
 	if (scanline > 248)
 		scanline = 8;
-	mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
@@ -489,7 +489,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 	cpunum_set_input_line(0, 0, HOLD_LINE);
 
 	/* set a timer for the next one */
-	mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
@@ -1274,7 +1274,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 			break;
 
 		case 0x08:	/*  */
-			mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, data + 1, 0), data + 1, time_zero);
+			timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, data + 1, 0), data + 1, attotime_zero);
 			break;
 
 		default:

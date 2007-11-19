@@ -285,7 +285,7 @@ void sailormn_tilebank_w( int bank )
 	}
 }
 
-TILE_GET_INFO( sailormn_get_tile_info_2 )
+static TILE_GET_INFO( sailormn_get_tile_info_2 )
 {
 	UINT32 code, color, pri;
 
@@ -1391,13 +1391,13 @@ INLINE void cave_tilemap_draw(
 	}
 }
 
-void cave_tilemap_0_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
+static void cave_tilemap_0_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {	 cave_tilemap_draw( bitmap, cliprect, tilemap_0, cave_vram_0, cave_vctrl_0, flags, priority, priority2 );	}
-void cave_tilemap_1_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
+static void cave_tilemap_1_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {	 cave_tilemap_draw( bitmap, cliprect, tilemap_1, cave_vram_1, cave_vctrl_1, flags, priority, priority2 );	}
-void cave_tilemap_2_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
+static void cave_tilemap_2_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {	 cave_tilemap_draw( bitmap, cliprect, tilemap_2, cave_vram_2, cave_vctrl_2, flags, priority, priority2 );	}
-void cave_tilemap_3_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
+static void cave_tilemap_3_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {	 cave_tilemap_draw( bitmap, cliprect, tilemap_3, cave_vram_3, cave_vctrl_3, flags, priority, priority2 );	}
 
 

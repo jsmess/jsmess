@@ -150,8 +150,8 @@ typedef struct
 	int 	internal_irq_level;
 	int 	internal_irq_vector;
 
-	mame_timer *timer;
-	mame_timer *dma_timer[2];
+	emu_timer *timer;
+	emu_timer *dma_timer[2];
 	int     dma_timer_active[2];
 
 	int     is_slave, cpu_number;
@@ -2411,7 +2411,7 @@ static void sh2_timer_activate(void)
 	int max_delta = 0xfffff;
 	UINT16 frc;
 
-	mame_timer_adjust(sh2.timer, time_never, 0, time_zero);
+	timer_adjust(sh2.timer, attotime_never, 0, attotime_zero);
 
 	frc = sh2.frc;
 	if(!(sh2.m[4] & OCFA)) {
@@ -2437,7 +2437,7 @@ static void sh2_timer_activate(void)
 		if(divider) {
 			max_delta <<= divider;
 			sh2.frc_base = cpunum_gettotalcycles(sh2.cpu_number);
-			mame_timer_adjust(sh2.timer, MAME_TIME_IN_CYCLES(max_delta, sh2.cpu_number), sh2.cpu_number, time_zero);
+			timer_adjust(sh2.timer, ATTOTIME_IN_CYCLES(max_delta, sh2.cpu_number), sh2.cpu_number, attotime_zero);
 		} else {
 			logerror("SH2.%d: Timer event in %d cycles of external clock", sh2.cpu_number, max_delta);
 		}
@@ -2557,7 +2557,7 @@ static void sh2_dmac_check(int dma)
 			LOG(("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, src, dst, count, sh2.m[0x63+4*dma], incs, incd, size));
 
 			sh2.dma_timer_active[dma] = 1;
-			mame_timer_adjust(sh2.dma_timer[dma], MAME_TIME_IN_CYCLES(2*count+1, sh2.cpu_number), (sh2.cpu_number<<1)|dma, time_zero);
+			timer_adjust(sh2.dma_timer[dma], ATTOTIME_IN_CYCLES(2*count+1, sh2.cpu_number), (sh2.cpu_number<<1)|dma, attotime_zero);
 
 			src &= AM;
 			dst &= AM;
@@ -2636,7 +2636,7 @@ static void sh2_dmac_check(int dma)
 		if(sh2.dma_timer_active[dma])
 		{
 			logerror("SH2: DMA %d cancelled in-flight", dma);
-			mame_timer_adjust(sh2.dma_timer[dma], time_never, 0, time_zero);
+			timer_adjust(sh2.dma_timer[dma], attotime_never, 0, attotime_zero);
 			sh2.dma_timer_active[dma] = 0;
 		}
 	}
@@ -2933,14 +2933,14 @@ static void sh2_init(int index, int clock, const void *config, int (*irqcallback
 {
 	const struct sh2_config *conf = config;
 
-	sh2.timer = mame_timer_alloc(sh2_timer_callback);
-	mame_timer_adjust(sh2.timer, time_never, 0, time_zero);
+	sh2.timer = timer_alloc(sh2_timer_callback);
+	timer_adjust(sh2.timer, attotime_never, 0, attotime_zero);
 
-	sh2.dma_timer[0] = mame_timer_alloc(sh2_dmac_callback);
-	mame_timer_adjust(sh2.dma_timer[0], time_never, 0, time_zero);
+	sh2.dma_timer[0] = timer_alloc(sh2_dmac_callback);
+	timer_adjust(sh2.dma_timer[0], attotime_never, 0, attotime_zero);
 
-	sh2.dma_timer[1] = mame_timer_alloc(sh2_dmac_callback);
-	mame_timer_adjust(sh2.dma_timer[1], time_never, 0, time_zero);
+	sh2.dma_timer[1] = timer_alloc(sh2_dmac_callback);
+	timer_adjust(sh2.dma_timer[1], attotime_never, 0, attotime_zero);
 
 	sh2.m = auto_malloc(0x200);
 

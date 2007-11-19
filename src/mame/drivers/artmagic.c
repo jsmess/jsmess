@@ -717,7 +717,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( artmagic )
+static MACHINE_DRIVER_START( artmagic )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK_25MHz/2)
@@ -751,7 +751,7 @@ MACHINE_DRIVER_START( artmagic )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( stonebal )
+static MACHINE_DRIVER_START( stonebal )
 	MDRV_IMPORT_FROM(artmagic)
 
 	MDRV_CPU_MODIFY("main")

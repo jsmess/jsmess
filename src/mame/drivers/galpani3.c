@@ -76,7 +76,7 @@ extern UINT32* skns_spc_regs;
 
 static UINT16 *galpani3_sprregs, *galpani3_spriteram;
 
-INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
+static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 {
 	switch ( cpu_getiloops() )
 	{
@@ -197,7 +197,7 @@ static WRITE16_HANDLER( galpani3_suprnova_sprite32regs_w )
 ***************************************************************************/
 static UINT16 *mcu_ram, galpani3_mcu_com[4];
 
-void galpani3_mcu_run(void)
+static void galpani3_mcu_run(void)
 {
 	UINT16 mcu_command = mcu_ram[0x0010/2];		/* command nb */
 	UINT16 mcu_offset  = mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */

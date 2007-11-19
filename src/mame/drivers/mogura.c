@@ -3,8 +3,8 @@
 #include "driver.h"
 #include "sound/dac.h"
 
-UINT8 *mogura_tileram;
-UINT8* mogura_gfxram;
+static UINT8 *mogura_tileram;
+static UINT8* mogura_gfxram;
 static tilemap *mogura_tilemap;
 
 static PALETTE_INIT( mogura )

@@ -293,7 +293,7 @@ switch (OPM)										\
 
 
 
-void HD63484_command_w(UINT16 cmd)
+static void HD63484_command_w(UINT16 cmd)
 {
 	int len;
 

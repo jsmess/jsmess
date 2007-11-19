@@ -364,7 +364,7 @@ ALL VROM ROMs are 16M MASK
 #include "machine/53c810.h"
 #include "sound/scsp.h"
 
-int model3_irq_enable;
+static int model3_irq_enable;
 int model3_irq_state;
 int model3_step;
 UINT32 *model3_vrom;
@@ -1312,7 +1312,7 @@ static WRITE64_HANDLER(model3_sound_w)
 		SCSP_MidiIn(0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
+		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
 	}
 }
 

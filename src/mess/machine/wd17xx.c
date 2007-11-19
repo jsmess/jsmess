@@ -174,7 +174,7 @@ struct _wd17xx_info
 
 	UINT8	ddam;					/* ddam of sector found - used when reading */
 	UINT8	sector_data_id;
-	mame_timer	*timer, *timer_rs, *timer_ws, *timer_rid;
+	emu_timer	*timer, *timer_rs, *timer_ws, *timer_rid;
 	int		data_direction;
 
 	UINT8   ipl;					/* index pulse */
@@ -245,7 +245,7 @@ static void wd17xx_clear_data_request(void);
 static void wd17xx_set_data_request(void);
 static void wd17xx_timed_data_request(void);
 static void wd17xx_set_irq(wd17xx_info *);
-static mame_timer *busy_timer = NULL;
+static emu_timer *busy_timer = NULL;
 
 /* one wd controlling multiple drives */
 static wd17xx_info wd;
@@ -304,15 +304,15 @@ static TIMER_CALLBACK_PTR(wd17xx_busy_callback)
 {
 	wd17xx_info *info = (wd17xx_info *) param;
 	wd17xx_set_irq(info);			
-	mame_timer_reset(busy_timer, time_never);
+	timer_reset(busy_timer, attotime_never);
 }
 
 
 
-static void wd17xx_set_busy(wd17xx_info *w, mame_time duration)
+static void wd17xx_set_busy(wd17xx_info *w, attotime duration)
 {
 	w->status |= STA_1_BUSY;
-	mame_timer_adjust_ptr(busy_timer, duration, time_zero);
+	timer_adjust_ptr(busy_timer, duration, attotime_zero);
 }
 
 
@@ -361,7 +361,7 @@ static void wd17xx_restore(wd17xx_info *w)
 	/* when command completes set irq */
 	wd17xx_set_irq(w);
 #endif
-	wd17xx_set_busy(w, MAME_TIME_IN_USEC(100));
+	wd17xx_set_busy(w, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -397,10 +397,10 @@ void wd17xx_init(wd17xx_type_t type, void (*callback)(wd17xx_state_t, void *), v
 	wd.callback_param = param;
 //	wd.status_ipl = STA_1_IPL;
 	wd.density = DEN_MFM_LO;
-	busy_timer = mame_timer_alloc_ptr(wd17xx_busy_callback, &wd);
-	wd.timer = mame_timer_alloc(wd17xx_misc_timer_callback);
-	wd.timer_rs = mame_timer_alloc(wd17xx_read_sector_callback);
-	wd.timer_ws = mame_timer_alloc(wd17xx_write_sector_callback);
+	busy_timer = timer_alloc_ptr(wd17xx_busy_callback, &wd);
+	wd.timer = timer_alloc(wd17xx_misc_timer_callback);
+	wd.timer_rs = timer_alloc(wd17xx_read_sector_callback);
+	wd.timer_ws = timer_alloc(wd17xx_write_sector_callback);
 
 	wd17xx_reset();
 }
@@ -805,7 +805,7 @@ static TIMER_CALLBACK(wd17xx_misc_timer_callback)
 	}
 
 	/* stop it, but don't allow it to be free'd */
-	mame_timer_reset(w->timer, time_never); 
+	timer_reset(w->timer, attotime_never); 
 }
 
 
@@ -830,7 +830,7 @@ static void wd17xx_complete_command(wd17xx_info *w, int delay)
 	usecs *= delay;
 
 	/* set new timer */
-	mame_timer_adjust(w->timer, MAME_TIME_IN_USEC(usecs), MISCCALLBACK_COMMAND, time_zero);
+	timer_adjust(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_COMMAND, attotime_zero);
 }
 
 
@@ -947,7 +947,7 @@ static TIMER_CALLBACK(wd17xx_read_sector_callback)
 		wd17xx_read_sector(w);
 
 	/* stop it, but don't allow it to be free'd */
-	mame_timer_reset(w->timer_rs, time_never); 
+	timer_reset(w->timer_rs, attotime_never); 
 }
 
 
@@ -998,7 +998,7 @@ static TIMER_CALLBACK(wd17xx_write_sector_callback)
 	}
 
 	/* stop it, but don't allow it to be free'd */
-	mame_timer_reset(w->timer_ws, time_never); 
+	timer_reset(w->timer_ws, attotime_never); 
 }
 
 
@@ -1012,7 +1012,7 @@ static void wd17xx_timed_data_request(void)
 	usecs = floppy_drive_get_datarate_in_us(w->density);
 
 	/* set new timer */
-	mame_timer_adjust(w->timer, MAME_TIME_IN_USEC(usecs), MISCCALLBACK_DATA, time_zero);
+	timer_adjust(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_DATA, attotime_zero);
 }
 
 
@@ -1026,7 +1026,7 @@ static void wd17xx_timed_read_sector_request(void)
 	usecs = 40; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
-	mame_timer_reset(w->timer_rs, MAME_TIME_IN_USEC(usecs));
+	timer_reset(w->timer_rs, ATTOTIME_IN_USEC(usecs));
 }
 
 
@@ -1040,7 +1040,7 @@ static void wd17xx_timed_write_sector_request(void)
 	usecs = 40; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
-	mame_timer_reset(w->timer_ws, MAME_TIME_IN_USEC(usecs));
+	timer_reset(w->timer_ws, ATTOTIME_IN_USEC(usecs));
 }
 
 
@@ -1419,7 +1419,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 #if 0
 		wd17xx_set_irq(w);
 #endif
-		wd17xx_set_busy(w, MAME_TIME_IN_USEC(100));
+		wd17xx_set_busy(w, ATTOTIME_IN_USEC(100));
 
 	}
 
@@ -1441,7 +1441,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 #if 0
 		wd17xx_set_irq(w);
 #endif
-		wd17xx_set_busy(w, MAME_TIME_IN_USEC(100));
+		wd17xx_set_busy(w, ATTOTIME_IN_USEC(100));
 
 
 	}
@@ -1463,7 +1463,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 #if 0
 		wd17xx_set_irq(w);
 #endif
-		wd17xx_set_busy(w, MAME_TIME_IN_USEC(100));
+		wd17xx_set_busy(w, ATTOTIME_IN_USEC(100));
 
 	}
 
@@ -1486,7 +1486,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 #if 0
 		wd17xx_set_irq(w);
 #endif
-		wd17xx_set_busy(w, MAME_TIME_IN_USEC(100));
+		wd17xx_set_busy(w, ATTOTIME_IN_USEC(100));
 	}
 
 //	if (w->busy_count==0)

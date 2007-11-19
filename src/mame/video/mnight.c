@@ -16,7 +16,7 @@ static UINT8     *bg_dirtybuffer;
 static int       bg_enable = 1;
 static int       sp_overdraw = 0;
 
-void mnight_mark_background_dirty(void)
+static void mnight_mark_background_dirty(void)
 {
 	/* set 1024 bytes allocated in VIDEO_START( mnight ) to 'true' */
 	memset(bg_dirtybuffer,1,1024);

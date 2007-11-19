@@ -6,7 +6,7 @@
 static UINT8 K056800_host_reg[8];
 static UINT8 K056800_sound_reg[8];
 
-static mame_timer *K056800_sound_cpu_timer;
+static emu_timer *K056800_sound_cpu_timer;
 static int K056800_sound_cpu_irq1_enable;
 static void (*K056800_sound_irq_callback)(int);
 
@@ -55,16 +55,16 @@ static TIMER_CALLBACK( K056800_sound_cpu_timer_tick )
 
 void K056800_init(void (* irq_callback)(int))
 {
-	mame_time timer_period;
+	attotime timer_period;
 	K056800_sound_irq_callback = irq_callback;
 
 	memset(K056800_host_reg, 0, sizeof(K056800_host_reg));
 	memset(K056800_sound_reg, 0, sizeof(K056800_sound_reg));
 
-	timer_period = scale_up_mame_time(MAME_TIME_IN_HZ(44100), 128);	// roughly 2.9us
+	timer_period = attotime_mul(ATTOTIME_IN_HZ(44100), 128);	// roughly 2.9us
 
-	K056800_sound_cpu_timer = mame_timer_alloc(K056800_sound_cpu_timer_tick);
-	mame_timer_adjust(K056800_sound_cpu_timer, timer_period, 0, timer_period);
+	K056800_sound_cpu_timer = timer_alloc(K056800_sound_cpu_timer_tick);
+	timer_adjust(K056800_sound_cpu_timer, timer_period, 0, timer_period);
 }
 
 READ32_HANDLER(K056800_host_r)

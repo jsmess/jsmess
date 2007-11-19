@@ -132,7 +132,7 @@ one for shoot and one for select.
 
 
 static tilemap *ppmast93_fg_tilemap, *ppmast93_bg_tilemap;
-UINT8 *ppmast93_fgram, *ppmast93_bgram;
+static UINT8 *ppmast93_fgram, *ppmast93_bgram;
 
 static WRITE8_HANDLER( ppmast93_fgram_w )
 {

@@ -474,7 +474,7 @@ VIDEO_EOF( leland )
 	update_for_scanline(VIDEO_HEIGHT * 8);
 
 	/* set a timer to go off at the top of the frame */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, scanline_reset);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, scanline_reset);
 }
 
 

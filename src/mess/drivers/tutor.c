@@ -87,7 +87,7 @@ static char cartridge_enable;
 static TIMER_CALLBACK(tape_interrupt_handler);
 
 static char tape_interrupt_enable;
-static mame_timer *tape_interrupt_timer;
+static emu_timer *tape_interrupt_timer;
 
 /* parallel interface state */
 static UINT8 printer_data;
@@ -102,7 +102,7 @@ enum
 
 static DRIVER_INIT(tutor)
 {
-	tape_interrupt_timer = mame_timer_alloc(tape_interrupt_handler);
+	tape_interrupt_timer = timer_alloc(tape_interrupt_handler);
 
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + basic_base, 0);
 	memory_configure_bank(1, 1, 1, memory_region(REGION_CPU1) + cartridge_base, 0);
@@ -289,10 +289,10 @@ static WRITE8_HANDLER(tutor_cassette_w)
 			{
 				tape_interrupt_enable = ! data;
 				if (tape_interrupt_enable)
-					mame_timer_adjust(tape_interrupt_timer, /*MAME_TIME_IN_HZ(44100)*/time_zero, 0, MAME_TIME_IN_HZ(44100));
+					timer_adjust(tape_interrupt_timer, /*ATTOTIME_IN_HZ(44100)*/attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 				else
 				{
-					mame_timer_adjust(tape_interrupt_timer, time_never, 0, time_zero);
+					timer_adjust(tape_interrupt_timer, attotime_never, 0, attotime_zero);
 					cpunum_set_input_line(0, 1, CLEAR_LINE);
 				}
 			}

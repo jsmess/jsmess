@@ -7,7 +7,7 @@
 UINT16 *namcos2_sprite_ram;
 UINT16 *namcos2_68k_palette_ram;
 size_t namcos2_68k_palette_size;
-size_t namcos2_68k_roz_ram_size;
+//size_t namcos2_68k_roz_ram_size;
 UINT16 *namcos2_68k_roz_ram;
 
 static UINT16 namcos2_68k_roz_ctrl[0x8];

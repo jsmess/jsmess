@@ -705,7 +705,7 @@ static struct POKEYinterface pokey_interface =
 static MACHINE_DRIVER_START( atari_common_nodac )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6510, FREQ_17_EXACT)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )

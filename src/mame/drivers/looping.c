@@ -302,7 +302,7 @@ static MACHINE_START( looping )
  *
  *************************************/
 
-INTERRUPT_GEN( looping_interrupt )
+static INTERRUPT_GEN( looping_interrupt )
 {
 	cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, 4);
 }
@@ -329,7 +329,7 @@ static WRITE8_HANDLER( looping_souint_clr )
 }
 
 
-void looping_spcint(int state)
+static void looping_spcint(int state)
 {
 	cpunum_set_input_line_and_vector(1, 0, state, 6);
 }

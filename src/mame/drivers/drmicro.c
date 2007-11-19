@@ -30,7 +30,7 @@ extern void drmicro_flip_w( int flip );
 
 static int drmicro_nmi_enable;
 
-INTERRUPT_GEN( drmicro_interrupt )
+static INTERRUPT_GEN( drmicro_interrupt )
 {
 	if (drmicro_nmi_enable)
 		 cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);

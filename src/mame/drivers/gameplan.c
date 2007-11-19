@@ -182,7 +182,7 @@ static VIDEO_UPDATE( leprechn )
  *
  *************************************/
 
-static mame_timer *via_0_ca1_timer;
+static emu_timer *via_0_ca1_timer;
 
 
 
@@ -281,7 +281,7 @@ static void via_irq(int state)
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
        leave time for the program to see the flag change. */
-	mame_timer_set(MAME_TIME_IN_USEC(50), state, via_irq_delayed);
+	timer_set(ATTOTIME_IN_USEC(50), state, via_irq_delayed);
 }
 
 
@@ -311,21 +311,21 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 	via_0_ca1_w(0, (UINT8)param);
 
 	if (param)
-		mame_timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, time_zero);
+		timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
 	else
-		mame_timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBEND, 0), 1, time_zero);
+		timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBEND, 0), 1, attotime_zero);
 }
 
 
 static void create_via_0_timer(void)
 {
-	via_0_ca1_timer = mame_timer_alloc(via_0_ca1_timer_callback);
+	via_0_ca1_timer = timer_alloc(via_0_ca1_timer_callback);
 }
 
 
 static void start_via_0_timer(void)
 {
-	mame_timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, time_zero);
+	timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
 }
 
 

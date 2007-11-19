@@ -450,7 +450,7 @@ static WRITE32_HANDLER( control_w )
 #define ATAPI_DATA_SIZE ( 64 * 1024 )
 
 static UINT8 *atapi_regs;
-static mame_timer *atapi_timer;
+static emu_timer *atapi_timer;
 static SCSIInstance *inserted_cdrom;
 static SCSIInstance *available_cdroms[ 2 ];
 static UINT8 *atapi_data;
@@ -463,7 +463,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	int i, n_this;
 	UINT8 sector_buffer[ 4096 ];
 
-	mame_timer_adjust(atapi_timer, time_never, 0, time_never);
+	timer_adjust(atapi_timer, attotime_never, 0, attotime_never);
 
 //  verboselog( 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
 
@@ -508,7 +508,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		mame_timer_adjust(atapi_timer, MAME_TIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0, time_zero);
+		timer_adjust(atapi_timer, ATTOTIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0, attotime_zero);
 	}
 	else
 	{
@@ -734,7 +734,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						mame_timer_adjust( atapi_timer, MAME_TIME_IN_CYCLES( ATAPI_CYCLES_PER_SECTOR, 0 ), 0, time_zero );
+						timer_adjust( atapi_timer, ATTOTIME_IN_CYCLES( ATAPI_CYCLES_PER_SECTOR, 0 ), 0, attotime_zero );
 						break;
 				}
 
@@ -892,8 +892,8 @@ static void atapi_init(void)
 	atapi_data_len = 0;
 	atapi_cdata_wait = 0;
 
-	atapi_timer = mame_timer_alloc( atapi_xfer_end );
-	mame_timer_adjust(atapi_timer, time_never, 0, time_never);
+	atapi_timer = timer_alloc( atapi_xfer_end );
+	timer_adjust(atapi_timer, attotime_never, 0, attotime_never);
 
 	for( i = 0; i < 2; i++ )
 	{
@@ -959,7 +959,7 @@ static void cdrom_dma_write( UINT32 n_address, INT32 n_size )
 	verboselog( 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	mame_timer_adjust(atapi_timer, MAME_TIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0, time_zero);
+	timer_adjust(atapi_timer, ATTOTIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0, attotime_zero);
 }
 
 static UINT32 m_n_security_control;
@@ -1096,7 +1096,7 @@ static WRITE32_HANDLER( flash_w )
 
 /* Root Counters */
 
-static mame_timer *m_p_timer_root[ 3 ];
+static emu_timer *m_p_timer_root[ 3 ];
 static UINT16 m_p_n_root_count[ 3 ];
 static UINT16 m_p_n_root_mode[ 3 ];
 static UINT16 m_p_n_root_target[ 3 ];
@@ -1171,7 +1171,7 @@ static void root_timer_adjust( int n_counter )
 {
 	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
 	{
-		mame_timer_adjust( m_p_timer_root[ n_counter ], time_never, n_counter, time_zero);
+		timer_adjust( m_p_timer_root[ n_counter ], attotime_never, n_counter, attotime_zero);
 	}
 	else
 	{
@@ -1185,7 +1185,7 @@ static void root_timer_adjust( int n_counter )
 
 		n_duration *= root_divider( n_counter );
 
-		mame_timer_adjust( m_p_timer_root[ n_counter ], scale_up_mame_time(MAME_TIME_IN_HZ(33868800), n_duration), n_counter, time_zero);
+		timer_adjust( m_p_timer_root[ n_counter ], attotime_mul(ATTOTIME_IN_HZ(33868800), n_duration), n_counter, attotime_zero);
 	}
 }
 
@@ -1483,7 +1483,7 @@ static DRIVER_INIT( konami573 )
 
 	for (i = 0; i < 3; i++)
 	{
-		m_p_timer_root[i] = mame_timer_alloc(root_finished);
+		m_p_timer_root[i] = timer_alloc(root_finished);
 	}
 
 	timekeeper_init( 0, TIMEKEEPER_M48T58, memory_region( REGION_USER11 ) );
@@ -2716,7 +2716,7 @@ static MACHINE_DRIVER_START( konami573 )
 	MDRV_CPU_VBLANK_INT( sys573_vblank, 1 )
 
 	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS( 0 ))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
 
 	MDRV_MACHINE_RESET( konami573 )
 	MDRV_NVRAM_HANDLER( konami573 )

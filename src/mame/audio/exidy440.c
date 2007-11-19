@@ -404,7 +404,7 @@ WRITE8_HANDLER( exidy440_sound_interrupt_clear_w )
  *
  *************************************/
 
-void exidy440_m6844_update(void)
+static void exidy440_m6844_update(void)
 {
 	/* update the stream */
 	stream_update(stream);

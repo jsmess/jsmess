@@ -135,7 +135,7 @@ static READ16_HANDLER( hacked_soundcommand_r )
 
 ********************************************************************/
 
-INTERRUPT_GEN( bionicc_interrupt )
+static INTERRUPT_GEN( bionicc_interrupt )
 {
 	if (cpu_getiloops() == 0)
 		cpunum_set_input_line(0, 2, HOLD_LINE);

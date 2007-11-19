@@ -8,7 +8,7 @@ int pc10_dispmask;		/* Display Mask */
 int pc10_nmi_enable;	/* nmi enable */
 int pc10_dog_di;		/* watchdog disable */
 int pc10_int_detect;	/* interrupt detect */
-int pc10_gun_controller;
+static int pc10_gun_controller;
 int pc10_game_mode;		/* Used in Single monitor version to display Game or PPU */
 int pc10_dispmask_old;
 

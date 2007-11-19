@@ -4,8 +4,8 @@
 
 #include "driver.h"
 
-mame_bitmap *thief_page0;
-mame_bitmap *thief_page1;
+static mame_bitmap *thief_page0;
+static mame_bitmap *thief_page1;
 
 static UINT8 thief_read_mask, thief_write_mask;
 static UINT8 thief_video_control;

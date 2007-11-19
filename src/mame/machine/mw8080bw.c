@@ -15,7 +15,7 @@
  *
  *************************************/
 
-static mame_timer *interrupt_timer;
+static emu_timer *interrupt_timer;
 
 
 static UINT8 vpos_to_vysnc_chain_counter(int vpos)
@@ -81,20 +81,20 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 	}
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, attotime_zero);
 }
 
 
 static void mw8080bw_create_interrupt_timer(void)
 {
-	interrupt_timer = mame_timer_alloc(mw8080bw_interrupt_callback);
+	interrupt_timer = timer_alloc(mw8080bw_interrupt_callback);
 }
 
 
 static void mw8080bw_start_interrupt_timer(void)
 {
 	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, attotime_zero);
 }
 
 

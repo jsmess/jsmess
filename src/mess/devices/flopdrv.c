@@ -44,7 +44,7 @@ int floppy_drive_init(mess_image *img, const floppy_interface *iface)
 	pDrive->flags = 0;
 	pDrive->index_pulse_callback = NULL;
 	pDrive->ready_state_change_callback = NULL;
-	pDrive->index_timer = mame_timer_alloc_ptr(floppy_drive_index_callback, img);
+	pDrive->index_timer = timer_alloc_ptr(floppy_drive_index_callback, img);
 	pDrive->index = 0;
 
 	/* all drives are double-sided 80 track - can be overriden in driver! */
@@ -75,12 +75,12 @@ static TIMER_CALLBACK_PTR(floppy_drive_index_callback)
 	if (pDrive->index)
 	{
 		pDrive->index = 0;
-		mame_timer_adjust_ptr(pDrive->index_timer, double_to_mame_time(ms*19/20/1000.0), time_zero);
+		timer_adjust_ptr(pDrive->index_timer, double_to_attotime(ms*19/20/1000.0), attotime_zero);
 	}
 	else
 	{
 		pDrive->index = 1;
-		mame_timer_adjust_ptr(pDrive->index_timer, double_to_mame_time(ms/20/1000.0), time_zero);
+		timer_adjust_ptr(pDrive->index_timer, double_to_attotime(ms/20/1000.0), attotime_zero);
 	}
 
 	if (pDrive->index_pulse_callback)
@@ -214,7 +214,7 @@ void floppy_drive_set_motor_state(mess_image *img, int state)
 			else
 			{
 				/* on->off */
-				mame_timer_adjust_ptr(pDrive->index_timer, time_zero, time_zero);
+				timer_adjust_ptr(pDrive->index_timer, attotime_zero, attotime_zero);
 			}
 		}
 	}

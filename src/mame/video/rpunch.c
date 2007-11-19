@@ -29,7 +29,7 @@ static tilemap *background[2];
 
 static UINT16 videoflags;
 static UINT8 crtc_register;
-static mame_timer *crtc_timer;
+static emu_timer *crtc_timer;
 static UINT8 bins, gins;
 
 
@@ -78,7 +78,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	cpunum_set_input_line(0, 1, HOLD_LINE);
 	if (param != 0)
-		mame_timer_adjust(crtc_timer, make_mame_time(0, machine->screen[0].refresh / param), 0, make_mame_time(0, machine->screen[0].refresh / param));
+		timer_adjust(crtc_timer, attotime_make(0, machine->screen[0].refresh / param), 0, attotime_make(0, machine->screen[0].refresh / param));
 }
 
 
@@ -95,7 +95,7 @@ VIDEO_START( rpunch )
 		memset(rpunch_bitmapram, 0xff, rpunch_bitmapram_size);
 
 	/* reset the timer */
-	crtc_timer = mame_timer_alloc(crtc_interrupt_gen);
+	crtc_timer = timer_alloc(crtc_interrupt_gen);
 }
 
 
@@ -164,7 +164,7 @@ WRITE16_HANDLER( rpunch_crtc_data_w )
 		{
 			/* only register we know about.... */
 			case 0x0b:
-				mame_timer_adjust(crtc_timer, video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), (data == 0xc0) ? 2 : 1, time_zero);
+				timer_adjust(crtc_timer, video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), (data == 0xc0) ? 2 : 1, attotime_zero);
 				break;
 
 			default:

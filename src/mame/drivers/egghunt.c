@@ -44,10 +44,10 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 #include "driver.h"
 #include "sound/okim6295.h"
 
-UINT8 *egghunt_bgram;
-UINT8 *egghunt_atram;
-UINT8 *egghunt_spram;
-UINT8 egghunt_vidram_bank;
+static UINT8 *egghunt_bgram;
+static UINT8 *egghunt_atram;
+static UINT8 *egghunt_spram;
+static UINT8 egghunt_vidram_bank;
 
 static tilemap *bg_tilemap;
 static UINT8 egghunt_okibanking;

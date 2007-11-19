@@ -1238,7 +1238,7 @@ static UINT8 *sharedram;
     timer(uPD71054) struct
 ------------------------------*/
 static struct st_chip {
-	mame_timer *timer[3];			// Timer
+	emu_timer *timer[3];			// Timer
 	UINT16	max[3];				// Max counter
 	UINT16	write_select;		// Max counter write select
 	UINT8	reg[4];				//
@@ -1247,15 +1247,15 @@ static struct st_chip {
 /*------------------------------
     uppdate timer
 ------------------------------*/
-void uPD71054_update_timer( int no )
+static void uPD71054_update_timer( int no )
 {
 	UINT16 max = uPD71054.max[no]&0xffff;
 
 	if( max != 0 ) {
-		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[0].clock), 16 * max);
-		mame_timer_adjust( uPD71054.timer[no], period, no, time_zero );
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(Machine->drv->cpu[0].clock), 16 * max);
+		timer_adjust( uPD71054.timer[no], period, no, attotime_zero );
 	} else {
-		mame_timer_adjust( uPD71054.timer[no], time_never, no, time_never);
+		timer_adjust( uPD71054.timer[no], attotime_never, no, attotime_never);
 		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				activecpu_get_pc(), no );
 	}
@@ -1277,7 +1277,7 @@ static TIMER_CALLBACK( uPD71054_timer_callback )
 /*------------------------------
     initialize
 ------------------------------*/
-void uPD71054_timer_init( void )
+static void uPD71054_timer_init( void )
 {
 	int no;
 
@@ -1287,7 +1287,7 @@ void uPD71054_timer_init( void )
 		uPD71054.max[no] = 0xffff;
 	}
 	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054.timer[no] = mame_timer_alloc( uPD71054_timer_callback );
+		uPD71054.timer[no] = timer_alloc( uPD71054_timer_callback );
 	}
 }
 
@@ -1609,7 +1609,7 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 	{
 		soundlatch_word_w(0,data,mem_mask);
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(MAME_TIME_IN_USEC(50));	// Allow the other cpu to reply
+		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 	}
 }
 
@@ -2489,7 +2489,7 @@ ADDRESS_MAP_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-UINT16 *kiwame_nvram;
+static UINT16 *kiwame_nvram;
 
 static READ16_HANDLER( kiwame_nvram_r )
 {
@@ -2840,7 +2840,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
 	soundlatch2_w(0,data);
-	cpu_spinuntil_time(MAME_TIME_IN_USEC(50));	// Allow the other cpu to reply
+	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -6533,7 +6533,7 @@ MACHINE_DRIVER_END
 */
 
 #define calibr50_INTERRUPTS_NUM (4+1)
-INTERRUPT_GEN( calibr50_interrupt )
+static INTERRUPT_GEN( calibr50_interrupt )
 {
 	switch (cpu_getiloops())
 	{
@@ -8858,7 +8858,7 @@ static DRIVER_INIT( twineagl )
 
 
 /* Protection? NVRAM is handled writing commands here */
-UINT16 downtown_protection[0x200/2];
+static UINT16 downtown_protection[0x200/2];
 static READ16_HANDLER( downtown_protection_r )
 {
 	int job = downtown_protection[0xf8/2] & 0xff;

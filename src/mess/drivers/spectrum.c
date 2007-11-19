@@ -193,7 +193,7 @@ static WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		EventList_AddItemOffset(0x0fe, data & 0x07, MAME_TIME_TO_CYCLES(0,scale_up_mame_time(video_screen_get_scan_period(0), video_screen_get_vpos(0))));
+		EventList_AddItemOffset(0x0fe, data & 0x07, ATTOTIME_TO_CYCLES(0,attotime_mul(video_screen_get_scan_period(0), video_screen_get_vpos(0))));
 	}
 
 	if ((Changed & (1<<4))!=0)

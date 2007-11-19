@@ -113,7 +113,7 @@ typedef struct
 	INT32 pcm_l, pcm_r;
 
 	UINT8 timer_a_count, timer_b_count, enable, current_irq;
-	mame_timer *timer_a, *timer_b;
+	emu_timer *timer_a, *timer_b;
 	int irq_line;
 
 	UINT8 port_A, port_B, port_C;
@@ -376,30 +376,30 @@ static void ymf278b_timer_a_reset(YMF278BChip *chip)
 {
 	if(chip->enable & 1)
 	{
-		mame_time period = MAME_TIME_IN_NSEC((256-chip->timer_a_count) * 80800);
+		attotime period = ATTOTIME_IN_NSEC((256-chip->timer_a_count) * 80800);
 
 		if (chip->clock != YMF278B_STD_CLOCK)
-			period = scale_down_mame_time(scale_up_mame_time(period, chip->clock), YMF278B_STD_CLOCK);
+			period = attotime_div(attotime_mul(period, chip->clock), YMF278B_STD_CLOCK);
 
-		mame_timer_adjust_ptr(chip->timer_a, period, period);
+		timer_adjust_ptr(chip->timer_a, period, period);
 	}
 	else
-		mame_timer_adjust_ptr(chip->timer_a, time_never, time_zero);
+		timer_adjust_ptr(chip->timer_a, attotime_never, attotime_zero);
 }
 
 static void ymf278b_timer_b_reset(YMF278BChip *chip)
 {
 	if(chip->enable & 2)
 	{
-		mame_time period = MAME_TIME_IN_NSEC((256-chip->timer_b_count) * 323100);
+		attotime period = ATTOTIME_IN_NSEC((256-chip->timer_b_count) * 323100);
 
 		if (chip->clock != YMF278B_STD_CLOCK)
-			period = scale_down_mame_time(scale_up_mame_time(period, chip->clock), YMF278B_STD_CLOCK);
+			period = attotime_div(attotime_mul(period, chip->clock), YMF278B_STD_CLOCK);
 
-		mame_timer_adjust_ptr(chip->timer_a, period, period);
+		timer_adjust_ptr(chip->timer_a, period, period);
 	}
 	else
-		mame_timer_adjust_ptr(chip->timer_b, time_never, time_zero);
+		timer_adjust_ptr(chip->timer_b, attotime_never, attotime_zero);
 }
 
 static void ymf278b_A_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
@@ -670,8 +670,8 @@ static void ymf278b_init(YMF278BChip *chip, UINT8 *rom, void (*cb)(int), int clo
 {
 	chip->rom = rom;
 	chip->irq_callback = cb;
-	chip->timer_a = mame_timer_alloc_ptr(ymf278b_timer_a_tick, chip);
-	chip->timer_b = mame_timer_alloc_ptr(ymf278b_timer_b_tick, chip);
+	chip->timer_a = timer_alloc_ptr(ymf278b_timer_a_tick, chip);
+	chip->timer_b = timer_alloc_ptr(ymf278b_timer_b_tick, chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = clock;
 

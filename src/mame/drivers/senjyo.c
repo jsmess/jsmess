@@ -125,7 +125,7 @@ static MACHINE_RESET( senjyo )
 	int_delay_kludge = 10;
 }
 
-INTERRUPT_GEN( senjyo_interrupt )
+static INTERRUPT_GEN( senjyo_interrupt )
 {
 	if (int_delay_kludge == 0) cpunum_set_input_line(0, 0, HOLD_LINE);
 	else int_delay_kludge--;

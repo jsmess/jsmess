@@ -39,7 +39,7 @@ static UINT8 timer_irq_state;
 
 static UINT16 *backupram;
 
-static mame_timer *interrupt_timer;
+static emu_timer *interrupt_timer;
 
 
 
@@ -80,7 +80,7 @@ static void update_main_irqs(void)
 		cpunum_set_input_line(0, irq, ASSERT_LINE);
 		cpunum_set_input_line(1, irq, ASSERT_LINE);
 		cpunum_set_input_line(2, irq, ASSERT_LINE);
-		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
 	}
 	else
 	{
@@ -163,7 +163,7 @@ static TIMER_CALLBACK( scanline_callback )
 	update_main_irqs();
 
 	/* come back at the next appropriate scanline */
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -184,8 +184,8 @@ static TIMER_CALLBACK( scanline_callback )
 
 static MACHINE_RESET( yboard )
 {
-    interrupt_timer = mame_timer_alloc(scanline_callback);
-    mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 223, 0), 223, time_zero);
+    interrupt_timer = timer_alloc(scanline_callback);
+    timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 223, 0), 223, attotime_zero);
 
 	state_save_register_global_array(misc_io_data);
 	state_save_register_global_array(analog_data);

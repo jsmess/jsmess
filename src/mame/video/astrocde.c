@@ -47,7 +47,7 @@ static UINT8 vertical_feedback;
 static UINT8 horizontal_feedback;
 
 /* Astrocade video parameters */
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 static UINT8 colors[8];
 static UINT8 colorsplit;
 static UINT8 bgdata;
@@ -224,8 +224,8 @@ PALETTE_INIT( profpac )
 VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = mame_timer_alloc(scanline_callback);
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, time_zero);
+	scanline_timer = timer_alloc(scanline_callback);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, attotime_zero);
 
 	/* register for save states */
 	init_savestate();
@@ -239,8 +239,8 @@ VIDEO_START( astrocde )
 VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = mame_timer_alloc(scanline_callback);
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, time_zero);
+	scanline_timer = timer_alloc(scanline_callback);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, attotime_zero);
 
 	/* allocate videoram */
 	profpac_videoram = auto_malloc(0x4000 * 4 * sizeof(*profpac_videoram));
@@ -444,7 +444,7 @@ void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback)
 		else
 		{
 			cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			mame_timer_set(MAME_TIME_IN_CYCLES(1, 0), 0, interrupt_off);
+			timer_set(ATTOTIME_IN_CYCLES(1, 0), 0, interrupt_off);
 		}
 
 		/* latch the feedback registers */
@@ -480,7 +480,7 @@ static TIMER_CALLBACK( scanline_callback )
 		else
 		{
 			cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, interrupt_vector);
-			mame_timer_set(MAME_TIME_IN_CYCLES(1, 0), 0, interrupt_off);
+			timer_set(ATTOTIME_IN_CYCLES(1, 0), 0, interrupt_off);
 		}
 	}
 
@@ -492,7 +492,7 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline++;
 	if (scanline >= machine->screen[0].height)
 		scanline = 0;
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 

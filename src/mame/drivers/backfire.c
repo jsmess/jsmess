@@ -23,14 +23,14 @@ extern void decrypt156(void);
 #include "deco16ic.h"
 #include "rendlay.h"
 
-UINT32 *backfire_spriteram32_1;
-UINT32 *backfire_spriteram32_2;
-UINT32 *backfire_mainram;
-mame_bitmap * backfire_left;
-mame_bitmap * backfire_right;
+static UINT32 *backfire_spriteram32_1;
+static UINT32 *backfire_spriteram32_2;
+static UINT32 *backfire_mainram;
+static mame_bitmap * backfire_left;
+static mame_bitmap * backfire_right;
 
 //UINT32 *backfire_180010, *backfire_188010;
-UINT32 *backfire_left_priority, *backfire_right_priority;
+static UINT32 *backfire_left_priority, *backfire_right_priority;
 
 /* I'm using the functions in deco16ic.c ... same chips, why duplicate code? */
 
@@ -491,7 +491,7 @@ static MACHINE_DRIVER_START( backfire )
 	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
@@ -678,8 +678,8 @@ static READ32_HANDLER( backfire_speedup_r )
 {
 //  mame_printf_debug( "%08x\n",activecpu_get_pc());
 
-	if (activecpu_get_pc()==0xce44)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400)); // backfire
-	if (activecpu_get_pc()==0xcee4)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400)); // backfira
+	if (activecpu_get_pc()==0xce44)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // backfire
+	if (activecpu_get_pc()==0xcee4)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // backfira
 
 	return backfire_mainram[0x18/4];
 }

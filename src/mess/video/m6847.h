@@ -77,10 +77,10 @@ int m6847_get_field_sync(void);
 
 /* timing functions */
 UINT64 m6847_time(m6847_timing_type timing);
-mame_time m6847_time_until(m6847_timing_type timing, UINT64 target_time);
+attotime m6847_time_until(m6847_timing_type timing, UINT64 target_time);
 
 /* CoCo 3 hooks */
-mame_time m6847_scanline_time(int scanline);
+attotime m6847_scanline_time(int scanline);
 
 INPUT_PORTS_EXTERN( m6847_artifacting );
 

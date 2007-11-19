@@ -1653,7 +1653,7 @@ static struct YM3812interface brickzn_ym3812_interface =
 	soundirq	/* IRQ Line */
 };
 
-INTERRUPT_GEN( brickzn_interrupt )
+static INTERRUPT_GEN( brickzn_interrupt )
 {
 	if (cpu_getiloops()) cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 	else				 cpunum_set_input_line(0, 0, HOLD_LINE);
@@ -1724,7 +1724,7 @@ MACHINE_DRIVER_END
 
 /* 1 x 24 MHz crystal */
 
-INTERRUPT_GEN( hardhea2_interrupt )
+static INTERRUPT_GEN( hardhea2_interrupt )
 {
 	if (cpu_getiloops())
 	{

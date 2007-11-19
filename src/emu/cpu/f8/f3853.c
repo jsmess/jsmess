@@ -34,7 +34,7 @@ static struct {
     int priority_line; /* inverted level*/
     int external_interrupt_line;/* inverted level */
 
-    mame_timer *timer;
+    emu_timer *timer;
 } f3853= { { 0 } };
 #define INTERRUPT_VECTOR(external) (external?f3853.low|(f3853.high<<8)|0x80 \
 					:(f3853.low|(f3853.high<<8))&~0x80)
@@ -56,9 +56,9 @@ static TIMER_CALLBACK( f3853_timer_callback );
 
 static void f3853_timer_start(UINT8 value)
 {
-	mame_time period = (value != 0xff) ? scale_up_mame_time(MAME_TIME_IN_HZ(f3853.config.frequency), f3853_value_to_cycle[value]*31) : time_never;
+	attotime period = (value != 0xff) ? attotime_mul(ATTOTIME_IN_HZ(f3853.config.frequency), f3853_value_to_cycle[value]*31) : attotime_never;
 
-	mame_timer_adjust(f3853.timer, period, 0, time_never);
+	timer_adjust(f3853.timer, period, 0, attotime_never);
 }
 
 static TIMER_CALLBACK( f3853_timer_callback )
@@ -90,7 +90,7 @@ void f3853_init(F3853_CONFIG *config)
 
 	f3853.priority_line=FALSE;
 	f3853.external_interrupt_line=TRUE;
-	f3853.timer = mame_timer_alloc(f3853_timer_callback);
+	f3853.timer = timer_alloc(f3853_timer_callback);
 }
 
 void f3853_reset(void)

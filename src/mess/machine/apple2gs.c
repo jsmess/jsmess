@@ -146,7 +146,7 @@ static UINT8 apple2gs_mouse_y;
 static INT8 apple2gs_mouse_dx;
 static INT8 apple2gs_mouse_dy;
 static mess_image *apple2gs_cur_slot6_image;
-static mame_timer *apple2gs_scanline_timer;
+static emu_timer *apple2gs_scanline_timer;
 
 
 /* -----------------------------------------------------------------------
@@ -178,7 +178,7 @@ static void process_clock(void)
 	seconds_t current_interval;
 
 	/* update clock_curtime */
-	current_interval = mame_timer_get_time().seconds;
+	current_interval = timer_get_time().seconds;
 	clock_curtime += current_interval - clock_curtime_interval;
 	clock_curtime_interval = current_interval;
 
@@ -830,7 +830,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 			apple2_interrupt();
 	}
 
-	mame_timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1)%262, 0), 0, time_never);
+	timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1)%262, 0), 0, attotime_never);
 
 	cpuintrf_pop_context();
 }
@@ -1717,11 +1717,11 @@ static READ8_HANDLER( apple2gs_read_vector )
 
 MACHINE_RESET( apple2gs )
 {
-	apple2gs_scanline_timer = mame_timer_alloc(apple2gs_scanline_tick);
-	mame_timer_adjust(apple2gs_scanline_timer, time_never, 0, time_never);
+	apple2gs_scanline_timer = timer_alloc(apple2gs_scanline_tick);
+	timer_adjust(apple2gs_scanline_timer, attotime_never, 0, attotime_never);
 
 	// fire on scanline zero
-	mame_timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_never);
+	timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 MACHINE_START( apple2gs )

@@ -450,7 +450,7 @@ DRIVER_INIT( hp48s )
 	hp48_card1=memory_region(REGION_CPU1)+0x140000;
 	hp48_card2=memory_region(REGION_CPU1)+0x180000;
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(8192), 0, hp48_timer);
+	timer_pulse(ATTOTIME_IN_HZ(8192), 0, hp48_timer);
 }
 
 DRIVER_INIT( hp48g )
@@ -470,7 +470,7 @@ DRIVER_INIT( hp48g )
 	hp48_card1=memory_region(REGION_CPU1)+0x140000;
 	hp48_card2=memory_region(REGION_CPU1)+0x180000;
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(8192), 0, hp48_timer);
+	timer_pulse(ATTOTIME_IN_HZ(8192), 0, hp48_timer);
 }
 
 MACHINE_RESET( hp48 )

@@ -35,7 +35,7 @@ void pc1401_outb(int data)
 
 void pc1401_outc(int data)
 {
-	logerror("%g outc %.2x\n", mame_time_to_double(mame_timer_get_time()), data);
+	logerror("%g outc %.2x\n", attotime_to_double(timer_get_time()), data);
 	pc1401_portc=data;
 }
 
@@ -292,7 +292,7 @@ DRIVER_INIT( pc1401 )
 #endif
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	mame_timer_set(MAME_TIME_IN_SEC(1), 0, pc1401_power_up);
+	timer_set(ATTOTIME_IN_SEC(1), 0, pc1401_power_up);
 
 	if (RAM10K)
 	{

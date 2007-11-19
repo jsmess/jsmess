@@ -15,7 +15,7 @@
  * Oct 2004, Derrick Renaud
  ************************************************************************/
 
-static mame_timer *frogs_croak_timer;
+static emu_timer *frogs_croak_timer;
 
 
 /* Discrete Sound Input Nodes */
@@ -139,7 +139,7 @@ static TIMER_CALLBACK( frogs_croak_callback )
 
 MACHINE_START( frogs_audio )
 {
-	frogs_croak_timer = mame_timer_alloc(frogs_croak_callback);
+	frogs_croak_timer = timer_alloc(frogs_croak_callback);
 }
 
 
@@ -168,7 +168,7 @@ WRITE8_HANDLER( frogs_audio_w )
 		if (last_croak)
 		{
 			/* The croak will keep playing until .429s after being disabled */
-			mame_timer_adjust(frogs_croak_timer, double_to_mame_time(1.1 * RES_K(390) * CAP_U(1)), 0, time_zero);
+			timer_adjust(frogs_croak_timer, double_to_attotime(1.1 * RES_K(390) * CAP_U(1)), 0, attotime_zero);
 		}
 	}
 	if (new_buzzz)

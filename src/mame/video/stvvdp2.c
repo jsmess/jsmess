@@ -86,8 +86,8 @@ In other words,the first three types uses the offset and not the color allocated
 UINT32* stv_vdp2_regs;
 UINT32* stv_vdp2_vram;
 /* this won't be used in the end .. */
-UINT8*  stv_vdp2_vram_dirty_8x8x4;
-UINT8*  stv_vdp2_vram_dirty_8x8x8;
+static UINT8*  stv_vdp2_vram_dirty_8x8x4;
+static UINT8*  stv_vdp2_vram_dirty_8x8x8;
 
 static UINT8* stv_vdp2_gfx_decode;
 extern UINT8* stv_vdp1_gfx_decode;

@@ -58,8 +58,8 @@ static struct
 	UINT8  timer_started;
 
 	/* timers */
-	mame_timer *interval; /* interval programmable timer */
-	mame_timer *one_shot; /* 1-us x factor one-shot timer */
+	emu_timer *interval; /* interval programmable timer */
+	emu_timer *one_shot; /* 1-us x factor one-shot timer */
 
 } mc6846;
 
@@ -92,8 +92,8 @@ INLINE UINT16 mc6846_counter ( void )
 {
 	if ( mc6846.timer_started ) 
 	{
-		mame_time delay = mame_timer_timeleft( mc6846.interval );
-		return MAME_TIME_TO_CYCLES( mc6846.iface->cpunum, delay ) / FACTOR;
+		attotime delay = timer_timeleft( mc6846.interval );
+		return ATTOTIME_TO_CYCLES( mc6846.iface->cpunum, delay ) / FACTOR;
 	}
 	else 
 		return mc6846.preset;
@@ -113,7 +113,7 @@ INLINE void mc6846_update_irq( void )
 	if ( old_cif != cif ) 
 	{ 
 		LOG (( "%f: mc6846 interrupt %i (time=%i cp1=%i cp2=%i)\n", 
-		       mame_time_to_double(mame_timer_get_time()), cif, 
+		       attotime_to_double(timer_get_time()), cif, 
 		       mc6846.csr & 1, (mc6846.csr >> 1 ) & 1, (mc6846.csr >> 2 ) & 1 ));
 		old_cif = cif;
 	}
@@ -139,7 +139,7 @@ INLINE void mc6846_update_cto ( void )
 	static int old_cto;
 	if ( cto != old_cto ) 
 	{
-		LOG (( "%f: mc6846 CTO set to %i\n", mame_time_to_double(mame_timer_get_time()), cto ));
+		LOG (( "%f: mc6846 CTO set to %i\n", attotime_to_double(timer_get_time()), cto ));
 		old_cto = cto;
 	}
 	if ( mc6846.iface->out_cto_func ) 
@@ -151,7 +151,7 @@ INLINE void mc6846_update_cto ( void )
 INLINE void mc6846_timer_launch ( void )
 {
 	int delay = FACTOR * (mc6846.preset+1);
-	LOG (( "%f: mc6846 timer launch called, mode=%i, preset=%i (x%i)\n", mame_time_to_double(mame_timer_get_time()), MODE, mc6846.preset, FACTOR ));
+	LOG (( "%f: mc6846 timer launch called, mode=%i, preset=%i (x%i)\n", attotime_to_double(timer_get_time()), MODE, mc6846.preset, FACTOR ));
 
 	if ( ! (mc6846.tcr & 2) ) 
 	{
@@ -168,7 +168,7 @@ INLINE void mc6846_timer_launch ( void )
     
 	case 0x20: /* single-shot */
 		mc6846.cto = 0;
-		mame_timer_reset( mc6846.one_shot, MAME_TIME_IN_CYCLES( FACTOR, mc6846.iface->cpunum ) );
+		timer_reset( mc6846.one_shot, ATTOTIME_IN_CYCLES( FACTOR, mc6846.iface->cpunum ) );
 		break;
     
 	case 0x30:  /* cascaded single-shot */
@@ -176,12 +176,12 @@ INLINE void mc6846_timer_launch ( void )
     
 	default:
 		logerror( "mc6846 timer mode %i not implemented\n", MODE );
-		mame_timer_reset( mc6846.interval, time_never );
+		timer_reset( mc6846.interval, attotime_never );
 		mc6846.timer_started = 0;
 		return;
 	}
   
-	mame_timer_reset( mc6846.interval, MAME_TIME_IN_CYCLES( delay, mc6846.iface->cpunum ) );
+	timer_reset( mc6846.interval, ATTOTIME_IN_CYCLES( delay, mc6846.iface->cpunum ) );
 	mc6846.timer_started = 1;
   
 	mc6846.csr &= ~1;
@@ -197,7 +197,7 @@ static TIMER_CALLBACK(mc6846_timer_expire)
 {
 	int delay = FACTOR * (mc6846.latch+1);
 
-	LOG (( "%f: mc6846 timer expire called, mode=%i, latch=%i (x%i)\n", mame_time_to_double(mame_timer_get_time()), MODE, mc6846.latch, FACTOR ));
+	LOG (( "%f: mc6846 timer expire called, mode=%i, latch=%i (x%i)\n", attotime_to_double(timer_get_time()), MODE, mc6846.latch, FACTOR ));
 
 	/* latch => counter */
 	mc6846.preset = mc6846.latch;
@@ -222,12 +222,12 @@ static TIMER_CALLBACK(mc6846_timer_expire)
 
 	default:
 		logerror( "mc6846 timer mode %i not implemented\n", MODE );
-		mame_timer_reset( mc6846.interval, time_never );
+		timer_reset( mc6846.interval, attotime_never );
 		mc6846.timer_started = 0;
 		return;
 	}
 
-	mame_timer_reset( mc6846.interval, MAME_TIME_IN_CYCLES( delay, mc6846.iface->cpunum ) );
+	timer_reset( mc6846.interval, ATTOTIME_IN_CYCLES( delay, mc6846.iface->cpunum ) );
 
 	mc6846.csr |= 1;
 	mc6846_update_cto();
@@ -238,7 +238,7 @@ static TIMER_CALLBACK(mc6846_timer_expire)
 
 static TIMER_CALLBACK(mc6846_timer_one_shot)
 {
-	LOG (( "%f: mc6846 timer one shot called\n", mame_time_to_double(mame_timer_get_time()) ));
+	LOG (( "%f: mc6846 timer one shot called\n", attotime_to_double(timer_get_time()) ));
 
 	/* 1 micro second after one-shot launch, we put cto to high */
 	mc6846.cto = 1;
@@ -258,7 +258,7 @@ READ8_HANDLER ( mc6846_r )
 	case 0:
 	case 4:
 		LOG (( "$%04x %f: mc6846 CSR read $%02X intr=%i (timer=%i, cp1=%i, cp2=%i)\n",
-		       activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), 
+		       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), 
 		       mc6846.csr, (mc6846.csr >> 7) & 1, 
 		       mc6846.csr & 1, (mc6846.csr >> 1) & 1, (mc6846.csr >> 2) & 1 ));
 		mc6846.csr0_to_be_cleared = mc6846.csr & 1;
@@ -267,15 +267,15 @@ READ8_HANDLER ( mc6846_r )
 		return mc6846.csr;
     
 	case 1: 
-		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), mc6846.pcr ));
+		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846.pcr ));
 		return mc6846.pcr;
 
 	case 2: 
-		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), mc6846.ddr ));
+		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846.ddr ));
 		return mc6846.ddr;
 
 	case 3:
-		LOG (( "$%04x %f: mc6846 PORT read $%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), PORT ));
+		LOG (( "$%04x %f: mc6846 PORT read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), PORT ));
 		if ( ! (mc6846.pcr & 0x80) ) 
 		{
 			if ( mc6846.csr1_to_be_cleared ) 
@@ -289,11 +289,11 @@ READ8_HANDLER ( mc6846_r )
 		return PORT;
 
 	case 5:
-		LOG (( "$%04x %f: mc6846 TCR read $%02X\n",activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), mc6846.tcr ));
+		LOG (( "$%04x %f: mc6846 TCR read $%02X\n",activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846.tcr ));
 		return mc6846.tcr;
 
 	case 6:
-		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), mc6846_counter() >> 8 ));
+		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846_counter() >> 8 ));
 		if ( mc6846.csr0_to_be_cleared ) 
 		{
 			mc6846.csr &= ~1;
@@ -303,7 +303,7 @@ READ8_HANDLER ( mc6846_r )
 		return mc6846_counter() >> 8;
 
 	case 7:
-		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), mc6846_counter() & 0xff ));
+		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846_counter() & 0xff ));
 		if ( mc6846.csr0_to_be_cleared ) 
 		{
 			mc6846.csr &= ~1;
@@ -343,7 +343,7 @@ WRITE8_HANDLER ( mc6846_w )
 			"latcged,pos-edge", "latcged,pos-edge,intr" 
 		};
 		LOG (( "$%04x %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n", 
-		       activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data,
+		       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
 		       (data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] ));
 #endif
 	}
@@ -371,7 +371,7 @@ WRITE8_HANDLER ( mc6846_w )
 	break;
 
 	case 2:
-		LOG (( "$%04x %f: mc6846 DDR write $%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data ));
+		LOG (( "$%04x %f: mc6846 DDR write $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 		if ( ! (mc6846.pcr & 0x80) ) 
 		{
 			mc6846.ddr = data;
@@ -381,7 +381,7 @@ WRITE8_HANDLER ( mc6846_w )
 		break;
 		
 	case 3:
-		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data,mc6846.ddr ));
+		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,mc6846.ddr ));
 		if ( ! (mc6846.pcr & 0x80) ) 
 		{
 			mc6846.pdr = data;
@@ -390,12 +390,12 @@ WRITE8_HANDLER ( mc6846_w )
 			if ( mc6846.csr1_to_be_cleared && (mc6846.csr & 2) ) 
 			{
 				mc6846.csr &= ~2;
-				LOG (( "$%04x %f: mc6846 CP1 intr reset\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()) ));
+				LOG (( "$%04x %f: mc6846 CP1 intr reset\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()) ));
 			}
 			if ( mc6846.csr2_to_be_cleared && (mc6846.csr & 4) )
 			{
 				mc6846.csr &= ~4;
-				LOG (( "$%04x %f: mc6846 CP2 intr reset\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()) ));
+				LOG (( "$%04x %f: mc6846 CP2 intr reset\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()) ));
 			}
 			mc6846.csr1_to_be_cleared = 0;
 			mc6846.csr2_to_be_cleared = 0;
@@ -412,7 +412,7 @@ WRITE8_HANDLER ( mc6846_w )
 				"freq-cmp", "freq-cmp", "pulse-cmp", "pulse-cmp"
 			};
 		LOG (( "$%04x %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n", 
-		       activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data,
+		       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
 		       (data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
 		       (data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
 		       (data & 1) ? "enabled" : "0" ));
@@ -426,8 +426,8 @@ WRITE8_HANDLER ( mc6846_w )
 			if ( MODE != 0x30 ) 
 				mc6846.cto = 0;
 			mc6846_update_cto();
-			mame_timer_reset( mc6846.interval, time_never );
-			mame_timer_reset( mc6846.one_shot, time_never );
+			timer_reset( mc6846.interval, attotime_never );
+			timer_reset( mc6846.one_shot, attotime_never );
 			mc6846.timer_started = 0;
 		}
 		else 
@@ -446,7 +446,7 @@ WRITE8_HANDLER ( mc6846_w )
 
 	case 7:
 		mc6846.latch = ( ((UINT16) mc6846.time_MSB) << 8 ) + data;
-		LOG (( "$%04x %f: mc6846 COUNT write %i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), mc6846.latch  ));
+		LOG (( "$%04x %f: mc6846 COUNT write %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846.latch  ));
 		if (!(mc6846.tcr & 0x38)) 
 		{
 			/* timer initialization */
@@ -478,7 +478,7 @@ void mc6846_set_input_cp1 ( int data )
 	if ( data == mc6846.cp1 ) 
 		return;
 	mc6846.cp1 = data;
-	LOG (( "%f: mc6846 input CP1 set to %i\n",  mame_time_to_double(mame_timer_get_time()), data ));
+	LOG (( "%f: mc6846 input CP1 set to %i\n",  attotime_to_double(timer_get_time()), data ));
 	if (( data &&  (mc6846.pcr & 2)) || (!data && !(mc6846.pcr & 2))) 
 	{
 		mc6846.csr |= 2;
@@ -492,7 +492,7 @@ void mc6846_set_input_cp2 ( int data )
 	if ( data == mc6846.cp2 ) 
 		return;
 	mc6846.cp2 = data;
-	LOG (( "%f: mc6846 input CP2 set to %i\n", mame_time_to_double(mame_timer_get_time()), data ));
+	LOG (( "%f: mc6846 input CP2 set to %i\n", attotime_to_double(timer_get_time()), data ));
 	if (mc6846.pcr & 0x20) 
 	{
 		if (( data &&  (mc6846.pcr & 0x10)) || (!data && !(mc6846.pcr & 0x10))) 
@@ -560,8 +560,8 @@ void mc6846_reset ( void )
 	mc6846.csr1_to_be_cleared = 0;
 	mc6846.csr2_to_be_cleared = 0;
 	mc6846.timer_started = 0;
-	mame_timer_reset( mc6846.interval, time_never );
-	mame_timer_reset( mc6846.one_shot, time_never );
+	timer_reset( mc6846.interval, attotime_never );
+	timer_reset( mc6846.one_shot, attotime_never );
 }
 
 
@@ -571,8 +571,8 @@ void mc6846_reset ( void )
 void mc6846_config ( const mc6846_interface* iface )
 {
 	mc6846.iface = iface;
-	mc6846.interval = mame_timer_alloc( mc6846_timer_expire );
-	mc6846.one_shot = mame_timer_alloc( mc6846_timer_one_shot );
+	mc6846.interval = timer_alloc( mc6846_timer_expire );
+	mc6846.one_shot = timer_alloc( mc6846_timer_one_shot );
   
 	state_save_register_item( "mc6846", 0, mc6846.csr );
 	state_save_register_item( "mc6846", 0, mc6846.pcr );

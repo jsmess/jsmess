@@ -26,7 +26,7 @@ static UINT8 LS74_clr = 0;
 static UINT8 LS74_q   = 0;
 static UINT8 gain_control = 0;
 
-static mame_timer *interrupt_timer;
+static emu_timer *interrupt_timer;
 
 static WRITE16_HANDLER( magmax_sound_w )
 {
@@ -68,13 +68,13 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline += 128;
 	scanline &= 255;
 
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 static MACHINE_START( magmax )
 {
 	/* Create interrupt timer */
-	interrupt_timer = mame_timer_alloc(scanline_callback);
+	interrupt_timer = timer_alloc(scanline_callback);
 
 	/* Set up save state */
 	state_save_register_global(sound_latch);
@@ -85,7 +85,7 @@ static MACHINE_START( magmax )
 
 static MACHINE_RESET( magmax )
 {
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64, attotime_zero);
 
 #if 0
 	{

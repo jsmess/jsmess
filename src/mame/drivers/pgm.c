@@ -335,19 +335,19 @@ static TIMER_CALLBACK( arm_irq )
 }
 #endif
 
-//static mame_timer *   arm_comms_timer;
+//static emu_timer *   arm_comms_timer;
 static WRITE32_HANDLER( arm7_latch_arm_w )
 {
 	if (PGMARM7LOGERROR) logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, activecpu_get_pc() );
 	COMBINE_DATA(&arm7_latch);
 
 #ifdef PGMARM7SPEEDHACK
-//  cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+//  cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	if (data!=0xaa) cpu_spinuntil_trigger(1000);
 	cpu_trigger(1002);
 #else
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
-	cpu_spinuntil_time(MAME_TIME_IN_CYCLES(100, 0));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(100, 0));
 #endif
 }
 
@@ -376,12 +376,12 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 
 #ifdef PGMARM7SPEEDHACK
 	cpu_trigger(1000);
-	mame_timer_set(MAME_TIME_IN_USEC(50), 0, arm_irq); // i don't know how long..
+	timer_set(ATTOTIME_IN_USEC(50), 0, arm_irq); // i don't know how long..
 	cpu_spinuntil_trigger(1002);
 #else
 	cpunum_set_input_line(2, ARM7_FIRQ_LINE, PULSE_LINE);
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(200));
-	cpu_spinuntil_time(MAME_TIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
 #endif
 }
 
@@ -727,7 +727,7 @@ ADDRESS_MAP_END
 
 /* Kov Superheroes */
 
-UINT16 kovsh_highlatch, kovsh_lowlatch;
+static UINT16 kovsh_highlatch, kovsh_lowlatch;
 
 static READ32_HANDLER( kovsh_arm7_protlatch_r )
 {
@@ -748,14 +748,14 @@ static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 		kovsh_lowlatch = data;
 	}
 
-//  cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
-//  cpu_spinuntil_time(MAME_TIME_IN_CYCLES(100, 0));
+//  cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+//  cpu_spinuntil_time(ATTOTIME_IN_CYCLES(100, 0));
 }
 
 static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
-	//cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(200));
-	cpu_spinuntil_time(MAME_TIME_IN_CYCLES(600, 0));
+	//cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(600, 0));
 
 	switch (offset)
 	{
@@ -2102,7 +2102,7 @@ static DRIVER_INIT( killbld )
 
 /* ddp2 rubbish */
 
-UINT16 *ddp2_protram;
+static UINT16 *ddp2_protram;
 static int ddp2_asic27_0xd10000 = 0;
 
 static WRITE16_HANDLER ( ddp2_asic27_0xd10000_w )

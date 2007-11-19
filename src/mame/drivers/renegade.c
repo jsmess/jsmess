@@ -164,7 +164,7 @@ static void renegade_adpcm_callback(void *param, stream_sample_t **inputs, strea
 	}
 }
 
-void *renegade_adpcm_start(int clock, const struct CustomSound_interface *config)
+static void *renegade_adpcm_start(int clock, const struct CustomSound_interface *config)
 {
 	struct renegade_adpcm_state *state = &renegade_adpcm;
 	state->playing = 0;

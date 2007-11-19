@@ -7,7 +7,7 @@
 #include "driver.h"
 
 UINT8 *renegade_videoram2;
-INT32 renegade_scrollx;
+static INT32 renegade_scrollx;
 static tilemap *bg_tilemap;
 static tilemap *fg_tilemap;
 

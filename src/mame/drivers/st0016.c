@@ -392,7 +392,7 @@ static GFXDECODE_START( st0016 )
 //  GFXDECODE_ENTRY( 0, 0, charlayout,      0, 16*4  )
 GFXDECODE_END
 
-INTERRUPT_GEN(st0016_int)
+static INTERRUPT_GEN(st0016_int)
 {
 	if(!cpu_getiloops())
 		cpunum_set_input_line(0,0,HOLD_LINE);

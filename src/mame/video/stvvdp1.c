@@ -21,27 +21,28 @@ Framebuffer todo:
 static int vdp1_sprite_log = 0;
 
 UINT32 *stv_vdp1_vram;
-UINT32 *stv_vdp1_regs;
+static UINT32 *stv_vdp1_regs;
 UINT8* stv_vdp1_gfx_decode;
 
 extern UINT32 *stv_scu;
 extern int stv_vblank;
 
-UINT16	 *stv_framebuffer[2];
-UINT16	 **stv_framebuffer_draw_lines, **stv_framebuffer_display_lines;
-int		 stv_framebuffer_width;
-int		 stv_framebuffer_height;
+static UINT16	 *stv_framebuffer[2];
+static UINT16	 **stv_framebuffer_draw_lines;
+UINT16	 **stv_framebuffer_display_lines;
+static int		 stv_framebuffer_width;
+static int		 stv_framebuffer_height;
 int		 stv_framebuffer_mode;
 int		 stv_framebuffer_double_interlace;
-int		 stv_vdp1_fbcr_accessed;
-int		 stv_vdp1_current_display_framebuffer;
-int		 stv_vdp1_current_draw_framebuffer;
-int		 stv_vdp1_clear_framebuffer_on_next_frame;
-rectangle stv_vdp1_system_cliprect;
-rectangle stv_vdp1_user_cliprect;
+static int		 stv_vdp1_fbcr_accessed;
+static int		 stv_vdp1_current_display_framebuffer;
+static int		 stv_vdp1_current_draw_framebuffer;
+static int		 stv_vdp1_clear_framebuffer_on_next_frame;
+static rectangle stv_vdp1_system_cliprect;
+static rectangle stv_vdp1_user_cliprect;
 
-int stvvdp1_local_x;
-int stvvdp1_local_y;
+static int stvvdp1_local_x;
+static int stvvdp1_local_y;
 
 struct stv_vdp1_poly_scanline
 {
@@ -184,7 +185,7 @@ struct shaded_point
 
 
 
-void stv_vdp1_process_list(void);
+static void stv_vdp1_process_list(void);
 
 READ32_HANDLER( stv_vdp1_regs_r )
 {
@@ -1390,7 +1391,7 @@ static int y2s(int v)
 	return (INT32)(INT16)v + stvvdp1_local_y;
 }
 
-void stv_vdp1_draw_line( const rectangle *cliprect)
+static void stv_vdp1_draw_line( const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1409,7 +1410,7 @@ void stv_vdp1_draw_line( const rectangle *cliprect)
 	vdp1_fill_quad(cliprect, 0, 1, q);
 }
 
-void stv_vdp1_draw_poly_line( const rectangle *cliprect)
+static void stv_vdp1_draw_poly_line( const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1472,7 +1473,7 @@ void stv_vdp1_draw_poly_line( const rectangle *cliprect)
 
 }
 
-void stv_vpd1_draw_distorted_sprite(const rectangle *cliprect)
+static void stv_vpd1_draw_distorted_sprite(const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1530,7 +1531,7 @@ void stv_vpd1_draw_distorted_sprite(const rectangle *cliprect)
 	vdp1_fill_quad(cliprect, patterndata, xsize, q);
 }
 
-void stv_vpd1_draw_scaled_sprite(const rectangle *cliprect)
+static void stv_vpd1_draw_scaled_sprite(const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1678,7 +1679,7 @@ void stv_vpd1_draw_scaled_sprite(const rectangle *cliprect)
 }
 
 
-void stv_vpd1_draw_normal_sprite(const rectangle *cliprect, int sprite_type)
+static void stv_vpd1_draw_normal_sprite(const rectangle *cliprect, int sprite_type)
 {
 	UINT16 *destline;
 

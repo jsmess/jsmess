@@ -465,7 +465,7 @@ VIDEO_UPDATE( apple2 )
 	int new_flash;
 	UINT32 new_a2;
 
-	new_flash = (scale_up_mame_time(mame_timer_get_time(), 4).seconds & 1) ? 1 : 0;
+	new_flash = (attotime_mul(timer_get_time(), 4).seconds & 1) ? 1 : 0;
 	if (flash != new_flash)
 	{
 		flash = new_flash;

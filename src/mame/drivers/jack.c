@@ -911,7 +911,7 @@ static MACHINE_DRIVER_START( tripool )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2) /* tripool needs 2 or the palette is broken */
 MACHINE_DRIVER_END
 
-INTERRUPT_GEN( joinem_interrupts )
+static INTERRUPT_GEN( joinem_interrupts )
 {
 	if(cpu_getiloops() > 0)
 	{

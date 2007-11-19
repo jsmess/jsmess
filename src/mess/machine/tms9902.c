@@ -136,7 +136,7 @@ void tms9902_init(int which, const tms9902reset_param *param)
 	tms9902[which].brk_callback = param->brk_callback;
 	tms9902[which].xmit_callback = param->xmit_callback;
 
-	tms9902[which].timer = mame_timer_alloc(decrementer_callback);
+	tms9902[which].timer = timer_alloc(decrementer_callback);
 
 	reset(which);
 }
@@ -146,7 +146,7 @@ void tms9902_cleanup(int which)
 {
 	if (tms9902[which].timer)
 	{
-		mame_timer_reset(tms9902[which].timer, time_never);	/* FIXME - timers should only be allocated once */
+		timer_reset(tms9902[which].timer, attotime_never);	/* FIXME - timers should only be allocated once */
 		tms9902[which].timer = NULL;
 	}
 }
@@ -281,14 +281,14 @@ static void reload_interval_timer(int which)
 {
 	if (tms9902[which].TMR)
 	{	/* reset clock interval */
-		mame_timer_adjust(tms9902[which].timer,
-						double_to_mame_time((double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.)),
+		timer_adjust(tms9902[which].timer,
+						double_to_attotime((double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.)),
 						which,
-						double_to_mame_time((double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.)));
+						double_to_attotime((double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */
-		mame_timer_enable(tms9902[which].timer, 0);
+		timer_enable(tms9902[which].timer, 0);
 	}
 }
 

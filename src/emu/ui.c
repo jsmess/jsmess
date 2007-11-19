@@ -1147,7 +1147,7 @@ int sprintf_game_info(char *buffer)
 				Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1,
 				Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1,
 				(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-				SUBSECONDS_TO_HZ(Machine->screen[0].refresh));
+				ATTOSECONDS_TO_HZ(Machine->screen[0].refresh));
 	return bufptr - buffer;
 }
 
@@ -1748,16 +1748,16 @@ static INT32 slider_overclock(INT32 newval, char *buffer, int arg)
 
 static INT32 slider_refresh(INT32 newval, char *buffer, int arg)
 {
-	double defrefresh = SUBSECONDS_TO_HZ(Machine->drv->screen[arg].defstate.refresh);
+	double defrefresh = ATTOSECONDS_TO_HZ(Machine->drv->screen[arg].defstate.refresh);
 	double refresh;
 
 	if (buffer != NULL)
 	{
 		screen_state *state = &Machine->screen[arg];
-		video_screen_configure(arg, state->width, state->height, &state->visarea, HZ_TO_SUBSECONDS(defrefresh + (double)newval * 0.001));
-		sprintf(buffer, "Screen %d %s %.3f", arg, ui_getstring(UI_refresh_rate), SUBSECONDS_TO_HZ(Machine->screen[arg].refresh));
+		video_screen_configure(arg, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
+		sprintf(buffer, "Screen %d %s %.3f", arg, ui_getstring(UI_refresh_rate), ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh));
 	}
-	refresh = SUBSECONDS_TO_HZ(Machine->screen[arg].refresh);
+	refresh = ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
 }
 

@@ -617,7 +617,7 @@ static MACHINE_RESET( adam )
 	clear_keyboard_buffer();
 
 	memset(&memory_region(REGION_CPU1)[0x0000], 0xFF, 0x20000); /* Initializing RAM */
-	mame_timer_pulse(MAME_TIME_IN_MSEC(20), 0, adam_paddle_callback);
+	timer_pulse(ATTOTIME_IN_MSEC(20), 0, adam_paddle_callback);
 }
 
 static MACHINE_DRIVER_START( adam )

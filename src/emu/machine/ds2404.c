@@ -287,7 +287,7 @@ void DS2404_init(int ref_year, int ref_month, int ref_day)
 	struct tm ref_tm;
 	time_t ref_time;
 	time_t current_time;
-	mame_timer *timer;
+	emu_timer *timer;
 
 	memset( &ref_tm, 0, sizeof( ref_tm ) );
 	ref_tm.tm_year = ref_year - 1900;
@@ -305,8 +305,8 @@ void DS2404_init(int ref_year, int ref_month, int ref_day)
 	ds2404.rtc[ 3 ] = ( current_time >> 16 ) & 0xff;
 	ds2404.rtc[ 4 ] = ( current_time >> 24 ) & 0xff;
 
-	timer = mame_timer_alloc( DS2404_tick );
-	mame_timer_adjust( timer, MAME_TIME_IN_HZ( 256 ), 0, MAME_TIME_IN_HZ( 256 ) );
+	timer = timer_alloc( DS2404_tick );
+	timer_adjust( timer, ATTOTIME_IN_HZ( 256 ), 0, ATTOTIME_IN_HZ( 256 ) );
 }
 
 void DS2404_load(mame_file *file)

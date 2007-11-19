@@ -198,7 +198,7 @@ Notes:
 static UINT8 irqvector;
 static UINT16 sound_status;
 static UINT32 bankaddress;
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 
 static UINT8 m92_irq_vectorbase;
 
@@ -225,12 +225,12 @@ static MACHINE_START( m92 )
 	state_save_register_global(bankaddress);
 	state_save_register_func_postload(set_m92_bank);
 
-	scanline_timer = mame_timer_alloc(m92_scanline_interrupt);
+	scanline_timer = timer_alloc(m92_scanline_interrupt);
 }
 
 static MACHINE_RESET( m92 )
 {
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_never);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 /*****************************************************************************/
@@ -256,7 +256,7 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine->screen[0].height)
 		scanline = 0;
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_never);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_never);
 }
 
 /*****************************************************************************/

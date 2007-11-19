@@ -91,8 +91,8 @@ typedef enum _laserdisc_state laserdisc_state;
 #define STOP_SPEED					INT_TO_FRAC(0)		/* no movement */
 #define PLAY_SPEED					INT_TO_FRAC(1)		/* regular playback speed */
 
-#define GENERIC_SPINUP_TIME			(make_mame_time(3, 0))
-#define GENERIC_LOAD_TIME			(make_mame_time(10, 0))
+#define GENERIC_SPINUP_TIME			(attotime_make(3, 0))
+#define GENERIC_LOAD_TIME			(attotime_make(10, 0))
 #define GENERIC_RESET_SPEED			INT_TO_FRAC(5000)
 
 /* Pioneer PR-7820 specific states */
@@ -161,7 +161,7 @@ struct _pr8210_info
 {
 	UINT8			mode;					/* current mode */
 	UINT16			commandtriplet[3];		/* current command triplet */
-	mame_time		commandtime;			/* command time */
+	attotime		commandtime;			/* command time */
 	UINT8			commandbits;			/* command bit count */
 	UINT8			seekstate;				/* state of the seek command */
 };
@@ -251,10 +251,10 @@ struct _laserdisc_info
 	UINT8			video;					/* video state: bit 0 = on/off */
 	UINT8			audio;					/* audio state: bit 0 = audio 1, bit 1 = audio 2 */
 	UINT8			display;				/* display state: bit 0 = on/off */
-	mame_time		lastvsynctime;			/* time of the last vsync */
+	attotime		lastvsynctime;			/* time of the last vsync */
 
 	/* deferred states */
-	mame_time		holdfinished;			/* time when current state will advance */
+	attotime		holdfinished;			/* time when current state will advance */
 	UINT8			postholdstate;			/* state to switch into after holding */
 	INT32			postholdfracspeed;		/* speed after the hold */
 
@@ -533,7 +533,7 @@ INLINE int laserdisc_active(laserdisc_info *info)
 INLINE void set_state(laserdisc_info *info, laserdisc_state state, INT32 fracspeed, INT32 targetframe)
 {
 	info->holdfinished.seconds = 0;
-	info->holdfinished.subseconds = 0;
+	info->holdfinished.attoseconds = 0;
 	info->state = state;
 	info->curfracspeed = fracspeed;
 	info->targetframe = targetframe;
@@ -545,9 +545,9 @@ INLINE void set_state(laserdisc_info *info, laserdisc_state state, INT32 fracspe
     a playback state to follow
 -------------------------------------------------*/
 
-INLINE void set_hold_state(laserdisc_info *info, mame_time holdtime, laserdisc_state state, INT32 fracspeed)
+INLINE void set_hold_state(laserdisc_info *info, attotime holdtime, laserdisc_state state, INT32 fracspeed)
 {
-	info->holdfinished = add_mame_times(mame_timer_get_time(), holdtime);
+	info->holdfinished = attotime_add(timer_get_time(), holdtime);
 	info->postholdstate = state;
 	info->postholdfracspeed = fracspeed;
 }
@@ -832,17 +832,17 @@ void laserdisc_vsync(laserdisc_info *info)
 	UINT8 hittarget;
 
 	/* remember the time */
-	info->lastvsynctime = mame_timer_get_time();
+	info->lastvsynctime = timer_get_time();
 
 	/* if we're holding, stay in this state until finished */
-	if (info->holdfinished.seconds != 0 || info->holdfinished.subseconds != 0)
+	if (info->holdfinished.seconds != 0 || info->holdfinished.attoseconds != 0)
 	{
-		if (compare_mame_times(info->lastvsynctime, info->holdfinished) < 0)
+		if (attotime_compare(info->lastvsynctime, info->holdfinished) < 0)
 			return;
 		info->state = info->postholdstate;
 		info->curfracspeed = info->postholdfracspeed;
 		info->holdfinished.seconds = 0;
-		info->holdfinished.subseconds = 0;
+		info->holdfinished.attoseconds = 0;
 	}
 
 	/* wait for previous read and decode to finish */
@@ -1798,7 +1798,7 @@ static void pr7820_enter_w(laserdisc_info *info, UINT8 newstate)
 				INT32 prevspeed = info->curfracspeed;
 				set_state(info, LASERDISC_STOPPED, STOP_SPEED, NULL_TARGET_FRAME);
 				if (info->parameter != -1)
-					set_hold_state(info, double_to_mame_time(info->parameter * 0.1), prevstate, prevspeed);
+					set_hold_state(info, double_to_attotime(info->parameter * 0.1), prevstate, prevspeed);
 			}
 			break;
 
@@ -1960,7 +1960,7 @@ static void pr8210_soft_reset(laserdisc_info *info)
 	info->audio = AUDIO_CH1_ENABLE  | AUDIO_CH2_ENABLE;
 	info->display = 0;
 	pr8210->mode = PR8210_MODE_GET_1ST;
-	pr8210->commandtime = mame_timer_get_time();
+	pr8210->commandtime = timer_get_time();
 	pr8210->commandbits = 0;
 	memset( pr8210->commandtriplet, 0, 3*sizeof(UINT16) );
 	pr8210->seekstate = 0;
@@ -2165,24 +2165,24 @@ static void pr8210_control_w(laserdisc_info *info, UINT8 data)
 	if ( data == ASSERT_LINE )
 	{
 		/* get the time difference from the last assert */
-		mame_time delta = sub_mame_times(mame_timer_get_time(), pr8210->commandtime);
+		attotime delta = attotime_sub(timer_get_time(), pr8210->commandtime);
 
 		/* and update our internal command time */
-		pr8210->commandtime = mame_timer_get_time();
+		pr8210->commandtime = timer_get_time();
 
 #if 0
 		{
-			int usecdiff = (int)(delta.subseconds / USEC_TO_SUBSECONDS(1));
+			int usecdiff = (int)(delta.attoseconds / ATTOSECONDS_IN_USEC(1));
 
 			printf( "bitdelta = %d\n", usecdiff );
 		}
 #endif
 
 		/* if the delay is less than 3 msec, we're receiving data */
-		if ( delta.subseconds < MAME_TIME_IN_MSEC(3).subseconds )
+		if ( delta.attoseconds < ATTOTIME_IN_MSEC(3).attoseconds )
 		{
 			/* 0 bit delta is 1.05 msec, 1 bit delta is 2.11 msec */
-			int longpulse = ( delta.subseconds < MAME_TIME_IN_USEC(1500).subseconds ) ? 0 : 1;
+			int longpulse = ( delta.attoseconds < ATTOTIME_IN_USEC(1500).attoseconds ) ? 0 : 1;
 			pr8210->commandtriplet[pr8210->mode] <<= 1;
 			pr8210->commandtriplet[pr8210->mode] |= longpulse;
 
@@ -2508,7 +2508,7 @@ static void ldv1000_data_w(laserdisc_info *info, UINT8 prev, UINT8 data)
 				INT32 prevspeed = info->curfracspeed;
 				set_state(info, LASERDISC_STOPPED, STOP_SPEED, NULL_TARGET_FRAME);
 				if (info->parameter != -1)
-					set_hold_state(info, double_to_mame_time(info->parameter * 0.1), prevstate, prevspeed);
+					set_hold_state(info, double_to_attotime(info->parameter * 0.1), prevstate, prevspeed);
 			}
 			break;
 
@@ -2569,9 +2569,9 @@ static UINT8 ldv1000_status_strobe_r(laserdisc_info *info)
 {
 	/* the status strobe is asserted (active low) 500-650usec after VSYNC */
 	/* for a duration of 26usec; we pick 600-626usec */
-	mame_time delta = sub_mame_times(mame_timer_get_time(), info->lastvsynctime);
-	if (delta.subseconds >= MAME_TIME_IN_USEC(600).subseconds &&
-		delta.subseconds < MAME_TIME_IN_USEC(626).subseconds)
+	attotime delta = attotime_sub(timer_get_time(), info->lastvsynctime);
+	if (delta.attoseconds >= ATTOTIME_IN_USEC(600).attoseconds &&
+		delta.attoseconds < ATTOTIME_IN_USEC(626).attoseconds)
 		return ASSERT_LINE;
 
 	return CLEAR_LINE;
@@ -2588,9 +2588,9 @@ static UINT8 ldv1000_command_strobe_r(laserdisc_info *info)
 	/* the command strobe is asserted (active low) 54 or 84usec after the status */
 	/* strobe for a duration of 25usec; we pick 600+84 = 684-709usec */
 	/* for a duration of 26usec; we pick 600-626usec */
-	mame_time delta = sub_mame_times(mame_timer_get_time(), info->lastvsynctime);
-	if (delta.subseconds >= MAME_TIME_IN_USEC(684).subseconds &&
-		delta.subseconds < MAME_TIME_IN_USEC(709).subseconds)
+	attotime delta = attotime_sub(timer_get_time(), info->lastvsynctime);
+	if (delta.attoseconds >= ATTOTIME_IN_USEC(684).attoseconds &&
+		delta.attoseconds < ATTOTIME_IN_USEC(709).attoseconds)
 		return ASSERT_LINE;
 
 	return CLEAR_LINE;

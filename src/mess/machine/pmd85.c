@@ -32,7 +32,7 @@ enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO};
 
 static UINT8 pmd85_model;
 
-static mame_timer * pmd85_cassette_timer;
+static emu_timer * pmd85_cassette_timer;
 
 static void pmd851_update_memory (void)
 {
@@ -784,8 +784,8 @@ void pmd85_common_driver_init (void)
 
 	msm8251_init(&pmd85_msm8251_interface);
 
-	pmd85_cassette_timer = mame_timer_alloc(pmd85_cassette_timer_callback);
-	mame_timer_adjust(pmd85_cassette_timer, time_zero, 0, MAME_TIME_IN_HZ(2400));
+	pmd85_cassette_timer = timer_alloc(pmd85_cassette_timer_callback);
+	timer_adjust(pmd85_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
 
 	serial_connection_init(&pmd85_cassette_serial_connection);
 	serial_connection_set_in_callback(&pmd85_cassette_serial_connection, pmd85_cassette_write);

@@ -390,10 +390,10 @@ static READ32_HANDLER( trackball32_4bit_r )
 {
 	static int effx, effy;
 	static int lastresult;
-	static mame_time lasttime;
-	mame_time curtime = mame_timer_get_time();
+	static attotime lasttime;
+	attotime curtime = timer_get_time();
 
-	if (compare_mame_times(sub_mame_times(curtime, lasttime), video_screen_get_scan_period(0)) > 0)
+	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(0)) > 0)
 	{
 		int upper, lower;
 		int dx, dy;
@@ -429,10 +429,10 @@ static READ32_HANDLER( trackball32_4bit_p2_r )
 {
 	static int effx, effy;
 	static int lastresult;
-	static mame_time lasttime;
-	mame_time curtime = mame_timer_get_time();
+	static attotime lasttime;
+	attotime curtime = timer_get_time();
 
-	if (compare_mame_times(sub_mame_times(curtime, lasttime), video_screen_get_scan_period(0)) > 0)
+	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(0)) > 0)
 	{
 		int upper, lower;
 		int dx, dy;
@@ -709,7 +709,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 	if (offset == 0) COMBINE_DATA(tms1_boot);
 	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(0);
 	if (!tms_spinning[0])
-		cpu_boost_interleave(MAME_TIME_IN_HZ(CLOCK_25MHz/256), MAME_TIME_IN_USEC(20));
+		cpu_boost_interleave(ATTOTIME_IN_HZ(CLOCK_25MHz/256), ATTOTIME_IN_USEC(20));
 }
 
 
@@ -718,21 +718,21 @@ static WRITE32_HANDLER( tms2_68k_ram_w )
 	COMBINE_DATA(&tms2_ram[offset]);
 	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(1);
 	if (!tms_spinning[1])
-		cpu_boost_interleave(MAME_TIME_IN_HZ(CLOCK_25MHz/256), MAME_TIME_IN_USEC(20));
+		cpu_boost_interleave(ATTOTIME_IN_HZ(CLOCK_25MHz/256), ATTOTIME_IN_USEC(20));
 }
 
 
 static WRITE32_HANDLER( tms1_trigger_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
-	cpu_boost_interleave(MAME_TIME_IN_HZ(CLOCK_25MHz/256), MAME_TIME_IN_USEC(20));
+	cpu_boost_interleave(ATTOTIME_IN_HZ(CLOCK_25MHz/256), ATTOTIME_IN_USEC(20));
 }
 
 
 static WRITE32_HANDLER( tms2_trigger_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	cpu_boost_interleave(MAME_TIME_IN_HZ(CLOCK_25MHz/256), MAME_TIME_IN_USEC(20));
+	cpu_boost_interleave(ATTOTIME_IN_HZ(CLOCK_25MHz/256), ATTOTIME_IN_USEC(20));
 }
 
 

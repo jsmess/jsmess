@@ -228,6 +228,58 @@ INLINE UINT32 _divu_64x32(UINT64 a, UINT32 b)
 
 
 /*-------------------------------------------------
+    div_64x32_rem - perform a signed 64 bit x 32
+    bit divide and return the 32 bit quotient and
+    32 bit remainder
+-------------------------------------------------*/
+
+#ifndef __x86_64__
+#define div_64x32_rem _div_64x32_rem
+INLINE INT32 _div_64x32_rem(INT64 dividend, INT32 divisor, INT32 *remainder)
+{
+	INT32 quotient;
+
+	__asm__ (
+		" idivl  %[divisor] ;"
+		: [result]    "=a" (quotient)	/* Quotient ends up in eax */
+		, [remainder] "=d" (*remainder)	/* Remainder ends up in edx */
+		: [dividend]  "A"  (dividend)	/* 'dividend' in edx:eax */
+		, [divisor]   "rm" (divisor)	/* 'divisor' in register or memory */
+		: "%cc"							/* Clobbers condition codes */
+	);
+
+	return quotient;
+}
+#endif
+
+
+/*-------------------------------------------------
+    divu_64x32_rem - perform an unsigned 64 bit x
+    32 bit divide and return the 32 bit quotient
+    and 32 bit remainder
+-------------------------------------------------*/
+
+#ifndef __x86_64__
+#define divu_64x32_rem _divu_64x32_rem
+INLINE UINT32 _divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
+{
+	UINT32 quotient;
+
+	__asm__ (
+		" divl  %[divisor] ;"
+		: [result]    "=a" (quotient)	/* Quotient ends up in eax */
+		, [remainder] "=d" (*remainder)	/* Remainder ends up in edx */
+		: [dividend]  "A"  (dividend)	/* 'dividend' in edx:eax */
+		, [divisor]   "rm" (divisor)	/* 'divisor' in register or memory */
+		: "%cc"							/* Clobbers condition codes */
+	);
+
+	return quotient;
+}
+#endif
+
+
+/*-------------------------------------------------
     div_32x32_shift - perform a signed divide of
     two 32 bit values, shifting the first before
     division, and returning the 32 bit quotient

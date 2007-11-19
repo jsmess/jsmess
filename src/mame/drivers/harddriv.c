@@ -3665,8 +3665,8 @@ static DRIVER_INIT( stunrun )
 }
 
 
-UINT32 *rddsp32_speedup;
-offs_t rddsp32_speedup_pc;
+static UINT32 *rddsp32_speedup;
+static offs_t rddsp32_speedup_pc;
 static READ32_HANDLER( rddsp32_speedup_r )
 {
 	if (activecpu_get_pc() == rddsp32_speedup_pc && (*rddsp32_speedup >> 16) == 0)

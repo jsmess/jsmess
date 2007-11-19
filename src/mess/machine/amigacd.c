@@ -69,7 +69,7 @@ typedef struct
 	UINT32		wtc;		/* Word Transfer Count Register (RW) */
 	UINT32		acr;		/* Address Count Register (RW) */
 	UINT16		dawr;		/* DACK Width Register (W) */
-	mame_timer *dma_timer;
+	emu_timer *dma_timer;
 } _dmac_data;
 
 static _dmac_data dmac_data;
@@ -115,7 +115,7 @@ static TIMER_CALLBACK(dmac_dma_proc)
 	if ( dmac_data.wtc > 0 )
 	{
 		matsucd_read_next_block();
-		mame_timer_adjust( dmac_data.dma_timer, MAME_TIME_IN_MSEC( CD_SECTOR_TIME ), 0, time_zero );
+		timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
 	}
 	else
 	{
@@ -224,14 +224,14 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x70:	/* DMA start strobe */
 		{
 			LOG( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() );
-			mame_timer_adjust( dmac_data.dma_timer, MAME_TIME_IN_MSEC( CD_SECTOR_TIME ), 0, time_zero );
+			timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
 		}
 		break;
 		
 		case 0x71:	/* DMA stop strobe */
 		{
 			LOG( "DMAC: PC=%08x - DMA Stop Strobe\n", activecpu_get_pc() );
-			mame_timer_reset( dmac_data.dma_timer, time_never );
+			timer_reset( dmac_data.dma_timer, attotime_never );
 		}
 		break;
 		
@@ -350,14 +350,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x70:	/* DMA start strobe */
 		{
 			LOG( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() );
-			mame_timer_adjust( dmac_data.dma_timer, MAME_TIME_IN_MSEC( CD_SECTOR_TIME ), 0, time_zero );
+			timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
 		}
 		break;
 		
 		case 0x71:	/* DMA stop strobe */
 		{
 			LOG( "DMAC: PC=%08x - DMA Stop Strobe\n", activecpu_get_pc() );
-			mame_timer_reset( dmac_data.dma_timer, time_never );
+			timer_reset( dmac_data.dma_timer, attotime_never );
 		}
 		break;
 		
@@ -447,7 +447,7 @@ static void tp6525_portb_w( int data )
 		matsucd_enable_w( data & 2 ); /* write to the /ENABLE signal */
 }
 
-static mame_timer *tp6525_delayed_timer;
+static emu_timer *tp6525_delayed_timer;
 
 static TIMER_CALLBACK(tp6525_delayed_irq)
 {
@@ -459,7 +459,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 	}
 	else
 	{
-		mame_timer_adjust( tp6525_delayed_timer, MAME_TIME_IN_MSEC(1), 0, time_zero );
+		timer_adjust( tp6525_delayed_timer, ATTOTIME_IN_MSEC(1), 0, attotime_zero );
 	}
 }
 
@@ -476,7 +476,7 @@ static void tp6525_irq( int level )
 		else
 		{
 			/* we *have to* deliver the irq, so if we can't, delay it and try again later */
-			mame_timer_adjust( tp6525_delayed_timer, MAME_TIME_IN_MSEC(1), 0, time_zero );
+			timer_adjust( tp6525_delayed_timer, ATTOTIME_IN_MSEC(1), 0, attotime_zero );
 		}
 	}
 }
@@ -507,8 +507,8 @@ void amigacd_init( void )
 	/* initialize the dmac */
 	memset( &dmac_data, 0, sizeof( dmac_data ) );
 	
-	dmac_data.dma_timer = mame_timer_alloc(dmac_dma_proc);
-	tp6525_delayed_timer = mame_timer_alloc(tp6525_delayed_irq);
+	dmac_data.dma_timer = timer_alloc(dmac_dma_proc);
+	tp6525_delayed_timer = timer_alloc(tp6525_delayed_irq);
 	
 	/* initialize the 6525 TPI */
 	tpi6525_0_reset();

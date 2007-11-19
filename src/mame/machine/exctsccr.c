@@ -21,13 +21,12 @@ Ernesto Corvi - 10/30/98
 #include "driver.h"
 
 #define MCU_HACK 0
+#if MCU_HACK
 
 #define MCU_KEY_TABLE_SIZE 16
 
 /* These are global */
 UINT8 *exctsccr_mcu_ram;
-
-#if MCU_HACK
 
 WRITE8_HANDLER( exctsccr_mcu_w );
 WRITE8_HANDLER( exctsccr_mcu_control_w );

@@ -32,7 +32,7 @@ static UINT16 blitter_yparam[16];
 static UINT16 blitter_vidparam[32];
 
 static mame_bitmap *dstbitmap;
-static mame_timer *blitter_timer;
+static emu_timer *blitter_timer;
 
 
 
@@ -70,7 +70,7 @@ static void update_scanline_irq(void)
 	if (blitter_vidparam[0x22/2] <= blitter_vidparam[0x1e/2])
 	{
 		int effscan;
-		mame_time time;
+		attotime time;
 
 		/* compute the effective scanline of the interrupt */
 		effscan = blitter_vidparam[0x22/2] - blitter_vidparam[0x1a/2];
@@ -79,9 +79,9 @@ static void update_scanline_irq(void)
 
 		/* determine the time; if it's in this scanline, bump to the next frame */
 		time = video_screen_get_time_until_pos(0, effscan, 0);
-		if (compare_mame_times(time, video_screen_get_scan_period(0)) < 0)
-			time = add_mame_times(time, video_screen_get_frame_period(0));
-		mame_timer_adjust(blitter_timer, time, 0, time_zero);
+		if (attotime_compare(time, video_screen_get_scan_period(0)) < 0)
+			time = attotime_add(time, video_screen_get_frame_period(0));
+		timer_adjust(blitter_timer, time, 0, attotime_zero);
 	}
 }
 
@@ -111,7 +111,7 @@ VIDEO_START( dcheese )
 	dstbitmap = auto_bitmap_alloc(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine->screen[0].format);
 
 	/* create a timer */
-	blitter_timer = mame_timer_alloc(blitter_scanline_callback);
+	blitter_timer = timer_alloc(blitter_scanline_callback);
 
 	/* register for saving */
 	state_save_register_global_array(blitter_color);
@@ -162,7 +162,7 @@ static void do_clear(void)
 		memset(BITMAP_ADDR16(dstbitmap, y % DSTBITMAP_HEIGHT, 0), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	mame_timer_set(video_screen_get_scan_period(0), 1, dcheese_signal_irq_callback);
+	timer_set(video_screen_get_scan_period(0), 1, dcheese_signal_irq_callback);
 }
 
 
@@ -216,7 +216,7 @@ static void do_blit(void)
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	mame_timer_set(make_mame_time(0, mame_time_to_subseconds(video_screen_get_scan_period(0)) / 2), 2, dcheese_signal_irq_callback);
+	timer_set(attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) / 2), 2, dcheese_signal_irq_callback);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (blitter_xparam[8] != 0 || blitter_xparam[9] != 0 || blitter_xparam[10] != 0 || blitter_xparam[11] != 0 ||

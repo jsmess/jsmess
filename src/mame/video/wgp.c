@@ -13,7 +13,7 @@ UINT16 *wgp_piv_ctrlram;
 static UINT16 wgp_piv_ctrl_reg;
 static UINT16 wgp_piv_zoom[3],wgp_piv_scrollx[3],wgp_piv_scrolly[3];
 UINT16 wgp_rotate_ctrl[8];
-int wgp_piv_xoffs,wgp_piv_yoffs;
+static int wgp_piv_xoffs,wgp_piv_yoffs;
 
 
 

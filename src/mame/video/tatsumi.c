@@ -8,7 +8,7 @@ static mame_bitmap *temp_bitmap;
 UINT16 *roundup_r_ram, *roundup_p_ram, *roundup_l_ram;
 UINT16 *cyclwarr_videoram, *cyclwarr_videoram2;
 UINT16* tatsumi_sprite_control_ram;
-UINT16* roundup5_vram;
+static UINT16* roundup5_vram;
 
 /******************************************************************************/
 

@@ -4,7 +4,7 @@
 
 
 UINT8 *buggychl_scrollv,*buggychl_scrollh;
-UINT8 buggychl_sprite_lookup[0x2000];
+static UINT8 buggychl_sprite_lookup[0x2000];
 UINT8 *buggychl_character_ram;
 
 static int *dirtychar;

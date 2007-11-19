@@ -34,7 +34,7 @@ static MACHINE_RESET( mnight )
 	main_cpu_num = 0;
 }
 
-INTERRUPT_GEN( mnight_interrupt )
+static INTERRUPT_GEN( mnight_interrupt )
 {
 	cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xd7);	/* RST 10h */
 }
@@ -351,7 +351,7 @@ static MACHINE_DRIVER_START( mnight )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(10000))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(10000))
 	MDRV_INTERLEAVE(10)
 
 	MDRV_MACHINE_RESET(mnight)

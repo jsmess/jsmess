@@ -219,7 +219,7 @@ This will benefit galpani3 and other kaneko16 games with TOYBOX MCU.
 ***************************************************************************/
 static UINT16 *mcu_ram, jchan_mcu_com[4];
 
-void jchan_mcu_run(void)
+static void jchan_mcu_run(void)
 {
 	UINT16 mcu_command = mcu_ram[0x0010/2];		/* command nb */
 	UINT16 mcu_offset  = mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
@@ -398,7 +398,7 @@ static READ16_HANDLER( jchan_mcu_status_r )
 
 static UINT16 *jchan_spriteram;
 
-INTERRUPT_GEN( jchan_vblank )
+static INTERRUPT_GEN( jchan_vblank )
 {
 	if (!cpu_getiloops())
 		cpunum_set_input_line(0, 1, HOLD_LINE);
@@ -532,7 +532,7 @@ static WRITE16_HANDLER( jchan_suprnova_sprite32_w )
 	buffered_spriteram32[offset]=(jchan_spriteram[offset*2+1]<<16) | (jchan_spriteram[offset*2]);
 }
 
-UINT16* jchan_sprregs;
+static UINT16* jchan_sprregs;
 
 static WRITE16_HANDLER( jchan_suprnova_sprite32regs_w )
 {

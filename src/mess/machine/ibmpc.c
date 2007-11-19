@@ -11,14 +11,14 @@
 
 #if VERBOSE_DBG
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",mame_timer_get_time(),(char*)M ); logerror A; }
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
 #else
 #define DBG_LOG(n,m,a)
 #endif
 
 #if VERBOSE_PIO
 #define PIO_LOG(N,M,A) \
-	if(VERBOSE_PIO>=N){ if( M )logerror("%11.6f: %-24s",mame_timer_get_time(),(char*)M ); logerror A; }
+	if(VERBOSE_PIO>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
 #else
 #define PIO_LOG(n,m,a)
 #endif
@@ -198,7 +198,7 @@ WRITE8_HANDLER ( pc_ppi_portc_w )
 // will do more when I have a program supporting it
 static struct {
 	int data[0x18];
-	mame_timer *timer;
+	emu_timer *timer;
 } pc_rtc;
 
 static TIMER_CALLBACK(pc_rtc_timer)
@@ -227,8 +227,8 @@ static TIMER_CALLBACK(pc_rtc_timer)
 void pc_rtc_init(void)
 {
 	memset(&pc_rtc,0,sizeof(pc_rtc));
-	pc_rtc.timer = mame_timer_alloc(pc_rtc_timer);
-	mame_timer_adjust(pc_rtc.timer, time_zero, 0, make_mame_time(1, 0));
+	pc_rtc.timer = timer_alloc(pc_rtc_timer);
+	timer_adjust(pc_rtc.timer, attotime_zero, 0, attotime_make(1, 0));
 }
 
 READ8_HANDLER( pc_rtc_r )

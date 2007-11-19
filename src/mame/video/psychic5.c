@@ -52,7 +52,7 @@ WRITE8_HANDLER( psychic5_title_screen_w )
 	title_screen = data & 0x01;
 }
 
-void psychic5_paletteram_w(int color_offs, int offset, int data)
+static void psychic5_paletteram_w(int color_offs, int offset, int data)
 {
 	int r,g,b,a,val;
 

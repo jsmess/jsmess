@@ -55,7 +55,7 @@
 #define VERBOSE_DBG 0       /* general debug messages */
 #if VERBOSE_DBG
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",mame_time_to_double(mame_timer_get_time()),(char*)M ); logerror A; }
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 #else
 #define DBG_LOG(n,m,a)
 #endif
@@ -65,7 +65,7 @@
 #if VERBOSE_JOY
 #define LOG(LEVEL,N,M,A)  \
 #define JOY_LOG(N,M,A) \
-	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",mame_time_to_double(mame_timer_get_time()),(char*)M ); logerror A; }
+	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 #else
 #define JOY_LOG(n,m,a)
 #endif
@@ -73,7 +73,7 @@
 #define FDC_DMA 2
 
 
-static mame_timer *pc_keyboard_timer;
+static emu_timer *pc_keyboard_timer;
 
 static TIMER_CALLBACK( pc_keyb_timer );
 
@@ -503,7 +503,7 @@ void init_pc_common(UINT32 flags)
 		pc_page_offset_mask = 0x0F0000;
 	}
 
-	pc_keyboard_timer = mame_timer_alloc(pc_keyb_timer);
+	pc_keyboard_timer = timer_alloc(pc_keyb_timer);
 }
 
 /*
@@ -534,16 +534,16 @@ static TIMER_CALLBACK( pc_keyb_timer )
 
 void pc_keyb_set_clock(int on)
 {
-	mame_time keyb_delay = { 0, MAX_SUBSECONDS/200 };	// 5ms
+	attotime keyb_delay = STATIC_ATTOTIME_IN_MSEC(5);
 
 	on = on ? 1 : 0;
 
 	if (pc_keyb.on != on)
 	{
 		if (on)
-			mame_timer_adjust(pc_keyboard_timer, keyb_delay, 0, time_zero);
+			timer_adjust(pc_keyboard_timer, keyb_delay, 0, attotime_zero);
 		else
-			mame_timer_reset(pc_keyboard_timer, time_never);
+			timer_reset(pc_keyboard_timer, attotime_never);
 
 		pc_keyb.on = on;
 	}

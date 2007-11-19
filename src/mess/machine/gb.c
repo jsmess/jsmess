@@ -111,7 +111,7 @@ UINT8 gb_timer_count;
 UINT8 gb_timer_shift;
 /* Serial I/O related */
 static UINT32 SIOCount;			/* Serial I/O counter                          */
-mame_timer	*gb_serial_timer = NULL;
+emu_timer	*gb_serial_timer = NULL;
 
 /*
   Prototypes
@@ -233,8 +233,8 @@ static void gb_init(void) {
 	gb_sound_w( 0x16, 0x00 );       /* Initialize sound hardware */
 
 	/* Allocate the serial timer, and disable it */
-	gb_serial_timer = mame_timer_alloc( gb_serial_timer_proc );
-	mame_timer_enable( gb_serial_timer, 0 );
+	gb_serial_timer = timer_alloc( gb_serial_timer_proc );
+	timer_enable( gb_serial_timer, 0 );
 
 }
 
@@ -670,8 +670,8 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
 			SIOCount = 8;
-			mame_timer_adjust( gb_serial_timer, MAME_TIME_IN_CYCLES( 512, 0 ), 0, MAME_TIME_IN_CYCLES( 512, 0 ) );
-			mame_timer_enable( gb_serial_timer, 1 );
+			timer_adjust( gb_serial_timer, ATTOTIME_IN_CYCLES( 512, 0 ), 0, ATTOTIME_IN_CYCLES( 512, 0 ) );
+			timer_enable( gb_serial_timer, 1 );
 			break;
 		}
 		break;
@@ -1726,7 +1726,7 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	/* If all bits done, stop timer and trigger interrupt */
 	if ( ! SIOCount ) {
 		SIOCONT &= 0x7F;
-		mame_timer_enable( gb_serial_timer, 0 );
+		timer_enable( gb_serial_timer, 0 );
 		cpunum_set_input_line(0, SIO_INT, HOLD_LINE);
 	}
 }

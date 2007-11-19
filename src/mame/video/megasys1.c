@@ -679,7 +679,7 @@ struct priority
 	int priorities[16];
 };
 
-int megasys1_layers_order[16];
+static int megasys1_layers_order[16];
 
 /*
     Layers order encoded as an int like: 0x01234, where

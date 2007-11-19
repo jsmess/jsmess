@@ -87,32 +87,32 @@
 /*
     Globals
 */
-UINT8 bank[4];
-UINT8 *work_ram;
-UINT8 *video_ram;
-UINT8 h_scroll;
-UINT8 v_scroll;
-UINT8 flip_8;
-UINT8 flip_22;
+static UINT8 bank[4];
+static UINT8 *work_ram;
+static UINT8 *video_ram;
+static UINT8 h_scroll;
+static UINT8 v_scroll;
+static UINT8 flip_8;
+static UINT8 flip_22;
 
 /* UART source/sinks */
-UINT8 z80_m6809_line;
-UINT8 m6809_z80_line;
-UINT8 data_r;
-UINT8 data_t;
+static UINT8 z80_m6809_line;
+static UINT8 m6809_z80_line;
+static UINT8 data_r;
+static UINT8 data_t;
 
-int	irq_state;
-int acia_irq;
-int vblank_irq;
-int blitter_irq;
+static int	irq_state;
+static int acia_irq;
+static int vblank_irq;
+static int blitter_irq;
 
-UINT8 z80_int;
-UINT8 z80_inten;
+static UINT8 z80_int;
+static UINT8 z80_inten;
 
 /* EM and lamps stuff */
-UINT32 meter_latch;
-UINT32 mux_input;
-UINT32 mux_outputlatch;
+static UINT32 meter_latch;
+static UINT32 mux_input;
+static UINT32 mux_outputlatch;
 
 /*
     Function prototypes
@@ -190,7 +190,7 @@ typedef union
 /*
     Blitter state
 */
-struct
+static struct
 {
 	ADDR_REG	program;
 
@@ -212,7 +212,7 @@ struct
 /*
     MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 */
-struct
+static struct
 {
 	UINT8	addr_w;
 	UINT8	addr_r;
@@ -290,7 +290,7 @@ INLINE UINT8* blitter_get_addr(UINT32 addr)
     The Flare One blitter is a simpler design with slightly different parameters
     and will require hardware tests to figure everything out correctly.
 */
-void RunBlit(void)
+static void RunBlit(void)
 {
 #define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(blitter.program.addr++))
 
@@ -788,9 +788,9 @@ static WRITE8_HANDLER( rombank_w )
 
 ***************************************************************************/
 
-void command_phase(UINT8 data);
-void exec_w_phase(UINT8 data);
-UINT8 exec_r_phase(void);
+static void command_phase(UINT8 data);
+static void exec_w_phase(UINT8 data);
+//UINT8 exec_r_phase(void);
 
 /*
     WD37C656C-PL (or equivalent) Floppy Disk Controller
@@ -823,7 +823,7 @@ enum command
 	SCAN_HIGH_OR_EQUAL = 29
 };
 
-struct
+static struct
 {
 	UINT8	MSR;
 
@@ -848,7 +848,7 @@ struct
 } fdc;
 
 
-void reset_fdc(void)
+static void reset_fdc(void)
 {
 	memset(&fdc, 0, sizeof(fdc));
 
@@ -958,7 +958,7 @@ static WRITE8_HANDLER( fdctrl_w )
 	}
 }
 
-void command_phase(UINT8 data)
+static void command_phase(UINT8 data)
 {
 	if (fdc.cmd_cnt == 0)
 	{
@@ -1039,21 +1039,23 @@ void command_phase(UINT8 data)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 UINT8 exec_r_phase(void)
 {
 	return 0;
 }
+#endif
 
-void exec_w_phase(UINT8 data)
+static void exec_w_phase(UINT8 data)
 {
 }
 
+#ifdef UNUSED_FUNCTION
 UINT8 results_phase(void)
 {
 	return 0;
 }
 
-#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( fd_op_w )
 {
 }
@@ -1224,7 +1226,7 @@ static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(MWA8_NOP)	/* Watchdog */
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( bfcobra )
+static INPUT_PORTS_START( bfcobra )
 PORT_START_TAG("STROBE0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin: 10p")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin: 20p")
@@ -1331,27 +1333,16 @@ INPUT_PORTS_END
 /*
     Allocate work RAM and video RAM shared by the Z80 and chipset.
 */
-static int init_ram(void)
+static void init_ram(void)
 {
 	/* 768kB work RAM */
 	work_ram = auto_malloc(0xC0000);
 
-	if (!work_ram)
-		goto startfailed;
-
 	/* 128kB video RAM */
 	video_ram = auto_malloc(0x20000);
 
-	if (!video_ram)
-		goto startfailed;
-
 	memset(work_ram, 0, 0xc0000);
 	memset(video_ram, 0, 0x20000);
-
-	return 0;
-
-startfailed:
-	return 1;
 }
 
 static void z80_acia_irq(int state)
@@ -1419,7 +1410,7 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *rom;
 	UINT8 *tmp;
 
-	tmp = malloc(0x8000);
+	tmp = malloc_or_die(0x8000);
 	rom = memory_region(REGION_CPU2) + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 

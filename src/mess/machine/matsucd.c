@@ -50,7 +50,7 @@ typedef struct
 	void (*stch_cb)( int level );	/* Status changed callback */
 	void (*scor_cb)( int level );	/* Subcode ready callback */
 	cdrom_file *cdrom;
-	mame_timer *frame_timer;
+	emu_timer *frame_timer;
 } matsucd;
 
 static matsucd cd;
@@ -66,7 +66,7 @@ void matsucd_init( void )
 	
 	cd.cdrom = mess_cd_get_cdrom_file_by_number(0);
 	
-	cd.frame_timer = mame_timer_alloc(matsu_subcode_proc);
+	cd.frame_timer = timer_alloc(matsu_subcode_proc);
 	
 	cd.stch_signal = 1;
 }
@@ -139,7 +139,7 @@ static void matsucd_cdda_stop( void )
 	if (cddanum != -1)
 	{
 		cdda_stop_audio(cddanum);
-		mame_timer_reset( cd.frame_timer, time_never );
+		timer_reset( cd.frame_timer, attotime_never );
 	}
 }
 
@@ -149,7 +149,7 @@ static void matsucd_cdda_play( UINT32 lba, UINT32 num_blocks )
 	if (cddanum != -1)
 	{
 		cdda_start_audio(cddanum, lba, num_blocks);
-		mame_timer_adjust( cd.frame_timer, MAME_TIME_IN_HZ( 75 ), 0, time_zero );
+		timer_adjust( cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
 	}
 }
 
@@ -162,11 +162,11 @@ static void matsucd_cdda_pause( int pause )
 		
 		if ( pause )
 		{
-			mame_timer_reset( cd.frame_timer, time_never );
+			timer_reset( cd.frame_timer, attotime_never );
 		}
 		else
 		{
-			mame_timer_adjust( cd.frame_timer, MAME_TIME_IN_HZ( 75 ), 0, time_zero );
+			timer_adjust( cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
 		}
 	}
 }
@@ -270,7 +270,7 @@ static void matsucd_set_status( UINT8 status )
 		if ( cd.stch_signal != 0 )
 		{
 			update_status_changed( 0 );
-			mame_timer_set( MAME_TIME_IN_MSEC(1), 0, matsucd_set_status_end );
+			timer_set( ATTOTIME_IN_MSEC(1), 0, matsucd_set_status_end );
 		}
 	}
 }
@@ -296,7 +296,7 @@ static TIMER_CALLBACK(matsu_subcode_proc)
 			
 			newstatus |= MATSU_STATUS_PLAYING;
 			
-			mame_timer_adjust( cd.frame_timer, MAME_TIME_IN_HZ( 75 ), 0, time_zero );
+			timer_adjust( cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
 		}
 		else
 		{

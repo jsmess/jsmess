@@ -28,7 +28,7 @@ static UINT8		irq2_int;			/* INT2 */
 static UINT8		scanline_int;		/* INT4 - programmable */
 static UINT8		vblank_int;			/* INT6 - on every VBLANK */
 
-static mame_timer *	scan_timer;
+static emu_timer *	scan_timer;
 
 
 static int z80running;
@@ -103,7 +103,7 @@ static TIMER_CALLBACK( vdp_reload_counter )
 		{
 			scanline_int = 1;
 			update_interrupts();
-			mame_timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), 0, vdp_int4_off);
+			timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), 0, vdp_int4_off);
 		}
 
 	/* advance to the next scanline */
@@ -114,7 +114,7 @@ static TIMER_CALLBACK( vdp_reload_counter )
 		scanline = 0;
 
 	/* set a timer */
-	mame_timer_adjust(scan_timer, video_screen_get_time_until_pos(0, scanline, 320), scanline, time_zero);
+	timer_adjust(scan_timer, video_screen_get_time_until_pos(0, scanline, 320), scanline, attotime_zero);
 }
 
 
@@ -134,7 +134,7 @@ INTERRUPT_GEN( genesis_vblank_interrupt )
 	update_interrupts();
 
 	/* set a timer to turn it off */
-	mame_timer_set(video_screen_get_time_until_pos(0, video_screen_get_vpos(0), 22), 0, vdp_int6_off);
+	timer_set(video_screen_get_time_until_pos(0, video_screen_get_vpos(0), 22), 0, vdp_int6_off);
 }
 
 
@@ -172,8 +172,8 @@ MACHINE_RESET( genesis )
 	logerror("Machine init\n");
 
 	/* set the first scanline 0 timer to go off */
-	scan_timer = mame_timer_alloc(vdp_reload_counter);
-	mame_timer_adjust(scan_timer, video_screen_get_time_until_pos(0, 0, 320), 0, time_zero);
+	scan_timer = timer_alloc(vdp_reload_counter);
+	timer_adjust(scan_timer, video_screen_get_time_until_pos(0, 0, 320), 0, attotime_zero);
 }
 
 

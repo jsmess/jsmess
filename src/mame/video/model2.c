@@ -1100,7 +1100,7 @@ static void model2_3d_frame_end( bitmap_t *bitmap, const rectangle *cliprect )
 }
 
 /* 3D Rasterizer main data input port */
-void model2_3d_push( UINT32 input )
+static void model2_3d_push( UINT32 input )
 {
 	/* see if we have a command in progress */
 	if ( raster.cur_command != 0 )

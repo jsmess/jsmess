@@ -36,7 +36,7 @@ static struct Regs
 /* Main portion of the arithmetic unit emulation. Accessed by AU_R and AU_W */
 /* Only a few instructions implemented currently */
 
-void MMI_74S516(int ins, UINT16 *data)
+static void MMI_74S516(int ins, UINT16 *data)
 {
 
    if ((ins!=7) && ((AU_Regs.ins_seq & 0xf)==7))   /* If last instruction was a reading operation, clear sequence. */

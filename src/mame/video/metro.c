@@ -367,7 +367,7 @@ WRITE16_HANDLER( metro_window_w )
  the tile's sizes to be known at startup - which we don't!
 */
 
-int metro_sprite_xoffs, metro_sprite_yoffs;
+static int metro_sprite_xoffs, metro_sprite_yoffs;
 
 
 static void alloc_empty_tiles(void)

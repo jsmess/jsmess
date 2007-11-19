@@ -15,9 +15,9 @@ TODO:
 
 /* video */
 
-UINT8 *hanaroku_spriteram1;
-UINT8 *hanaroku_spriteram2;
-UINT8 *hanaroku_spriteram3;
+static UINT8 *hanaroku_spriteram1;
+static UINT8 *hanaroku_spriteram2;
+static UINT8 *hanaroku_spriteram3;
 
 
 static PALETTE_INIT( hanaroku )

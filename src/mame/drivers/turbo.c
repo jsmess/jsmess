@@ -1416,7 +1416,7 @@ ROM_END
  *
  *************************************/
 
-void turbo_rom_decode(void)
+static void turbo_rom_decode(void)
 {
 	/*
      * The table is arranged this way (second half is mirror image of first)

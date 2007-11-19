@@ -180,7 +180,7 @@ static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
 	cpu_interrupt_enable(1,0);
 }
 
-INTERRUPT_GEN( toypop_main_interrupt )
+static INTERRUPT_GEN( toypop_main_interrupt )
 {
 	irq0_line_assert();	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cpunum_set_input_line(0, 0, ASSERT_LINE);
@@ -226,7 +226,7 @@ static MACHINE_RESET( toypop )
 	timer_call_after_resynch(0, disable_interrupts);
 }
 
-INTERRUPT_GEN( toypop_m68000_interrupt )
+static INTERRUPT_GEN( toypop_m68000_interrupt )
 {
 	if (interrupt_enable_68k)
 		cpunum_set_input_line(2, 6, HOLD_LINE);

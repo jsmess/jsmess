@@ -257,7 +257,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 	case 6:						   /*lightpen horicontal */
 	case 7:						   /*lightpen vertical */
 		if (LIGHTPEN_BUTTON
-			&& ((mame_time_to_double(mame_timer_get_time ()) - lightpenreadtime) * VIC6560_VRETRACERATE >= 1))
+			&& ((attotime_to_double(timer_get_time ()) - lightpenreadtime) * VIC6560_VRETRACERATE >= 1))
 		{
 			/* only 1 update each frame */
 			/* and diode must recognize light */
@@ -266,7 +266,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 				vic6560[6] = VIC6560_X_VALUE;
 				vic6560[7] = VIC6560_Y_VALUE;
 			}
-			lightpenreadtime = mame_time_to_double(mame_timer_get_time ());
+			lightpenreadtime = attotime_to_double(timer_get_time ());
 		}
 		val = vic6560[offset];
 		break;

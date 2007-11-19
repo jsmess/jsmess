@@ -527,7 +527,7 @@ static MACHINE_DRIVER_START( liberate )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 529ms Vblank duration?? */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
 	MDRV_INTERLEAVE(200)
 
 	/* video hardware */
@@ -597,7 +597,7 @@ static MACHINE_DRIVER_START( prosport )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 529ms Vblank duration?? */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
 	MDRV_INTERLEAVE(200)
 
 	/* video hardware */

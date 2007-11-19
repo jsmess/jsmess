@@ -69,7 +69,7 @@ static void cassette_update(mess_image *cassette)
 	double cur_time;
 	double new_position;
 
-	cur_time = mame_time_to_double(mame_timer_get_time());
+	cur_time = attotime_to_double(timer_get_time());
 	tag = get_cassimg(cassette);
 
 	if (cassette_is_motor_on(cassette) && tag->cassette)
@@ -180,7 +180,7 @@ double cassette_get_position(mess_image *cassette)
 	position = tag->position;
 
 	if (cassette_is_motor_on(cassette))
-		position += mame_time_to_double(mame_timer_get_time()) - tag->position_time;
+		position += attotime_to_double(timer_get_time()) - tag->position_time;
 	return position;
 }
 
@@ -294,7 +294,7 @@ static int device_load_cassette(mess_image *image)
 
 	/* reset the position */
 	tag->position = 0.0;
-	tag->position_time = mame_time_to_double(mame_timer_get_time());
+	tag->position_time = attotime_to_double(timer_get_time());
 
 	return INIT_PASS;
 

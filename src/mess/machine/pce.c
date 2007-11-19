@@ -71,8 +71,8 @@ static struct {
 	UINT8	*subcode_buffer;
 	cdrom_file	*cd;
 	const cdrom_toc*	toc;
-	mame_timer	*data_timer;
-	mame_timer	*adpcm_dma_timer;
+	emu_timer	*data_timer;
+	emu_timer	*adpcm_dma_timer;
 } pce_cd;
 
 /* MSM5205 ADPCM decoder definition */
@@ -358,7 +358,7 @@ static void pce_cd_read_6( void ) {
 	if ( frame_count == 0 ) {
 		pce_cd_reply_status_byte( SCSI_STATUS_OK );
 	} else {
-		mame_timer_adjust( pce_cd.data_timer, MAME_TIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND ), 0, MAME_TIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND ) );
+		timer_adjust( pce_cd.data_timer, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND ), 0, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND ) );
 	}
 }
 
@@ -790,7 +790,7 @@ static TIMER_CALLBACK( pce_cd_data_timer_callback ) {
 			/* We are done, disable the timer */
 			logerror("Last frame read from CD\n");
 			pce_cd.data_transferred = 1;
-			mame_timer_adjust( pce_cd.data_timer, time_never, 0, time_never );
+			timer_adjust( pce_cd.data_timer, attotime_never, 0, attotime_never );
 		} else {
 			pce_cd.data_transferred = 0;
 		}
@@ -834,10 +834,10 @@ static void pce_cd_init( void ) {
 		pce_cd.end_frame = pce_cd.last_frame;
 	}
 
-	pce_cd.data_timer = mame_timer_alloc( pce_cd_data_timer_callback );
-	mame_timer_adjust( pce_cd.data_timer, time_never, 0, time_never );
-	pce_cd.adpcm_dma_timer = mame_timer_alloc( pce_cd_adpcm_dma_timer_callback );
-	mame_timer_adjust( pce_cd.adpcm_dma_timer, time_never, 0, time_never );
+	pce_cd.data_timer = timer_alloc( pce_cd_data_timer_callback );
+	timer_adjust( pce_cd.data_timer, attotime_never, 0, attotime_never );
+	pce_cd.adpcm_dma_timer = timer_alloc( pce_cd_adpcm_dma_timer_callback );
+	timer_adjust( pce_cd.adpcm_dma_timer, attotime_never, 0, attotime_never );
 }
 
 WRITE8_HANDLER( pce_cd_bram_w ) {
@@ -891,11 +891,11 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 	case 0x0B:	/* ADPCM DMA control */
 		if ( ! ( pce_cd.regs[0x0B] & 0x02 ) && ( data & 0x02 ) ) {
 			/* Start CD to ADPCM transfer */
-			mame_timer_adjust( pce_cd.adpcm_dma_timer, MAME_TIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ), 0, MAME_TIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ) );
+			timer_adjust( pce_cd.adpcm_dma_timer, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ), 0, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ) );
 		}
 		if ( ( pce_cd.regs[0x0B] & 0x02 ) && ! ( data & 0x02 ) ) {
 			/* Stop CD to ADPCM transfer (?) */
-			mame_timer_adjust( pce_cd.adpcm_dma_timer, time_never, 0, time_never );
+			timer_adjust( pce_cd.adpcm_dma_timer, attotime_never, 0, attotime_never );
 		}
 		break;
 	case 0x0C:	/* ADPCM status */
@@ -944,7 +944,7 @@ static UINT8 pce_cd_get_cd_data_byte( void ) {
 	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD ) {
 		if ( pce_cd.scsi_IO ) {
 			pce_cd.scsi_ACK = 1;
-			mame_timer_set( MAME_TIME_IN_CYCLES( 15, 0 ), 0, pce_cd_clear_ack );
+			timer_set( ATTOTIME_IN_CYCLES( 15, 0 ), 0, pce_cd_clear_ack );
 		}
 	}
 	return data;

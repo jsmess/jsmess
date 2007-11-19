@@ -27,7 +27,7 @@ UINT16 *atarisy2_slapstic;
  *
  *************************************/
 
-static mame_timer *yscroll_reset_timer;
+static emu_timer *yscroll_reset_timer;
 static UINT32 playfield_tile_bank[2];
 static UINT32 videobank;
 static UINT16 *vram;
@@ -133,7 +133,7 @@ VIDEO_START( atarisy2 )
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 
 	/* reset the statics */
-	yscroll_reset_timer = mame_timer_alloc(reset_yscroll_callback);
+	yscroll_reset_timer = timer_alloc(reset_yscroll_callback);
 	videobank = 0;
 }
 
@@ -190,7 +190,7 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 	if (!(newscroll & 0x10))
 		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(0));
 	else
-		mame_timer_adjust(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll >> 6, time_zero);
+		timer_adjust(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll >> 6, attotime_zero);
 
 	/* update the playfield banking */
 	if (playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)

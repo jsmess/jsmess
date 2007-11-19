@@ -249,7 +249,7 @@ static TIMER_CALLBACK( irq0_stop )
 static INTERRUPT_GEN( irq0_start )
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	mame_timer_set(MAME_TIME_IN_USEC(50), 0, irq0_stop);
+	timer_set(ATTOTIME_IN_USEC(50), 0, irq0_stop);
 }
 
 
@@ -392,7 +392,7 @@ static READ32_HANDLER( kinst_speedup_r )
 		UINT32 r26 = activecpu_get_reg(MIPS3_R26) - *kinst_speedup;
 		if (r26 < r3)
 		{
-			mame_timer_set(MAME_TIME_IN_CYCLES((r3 - r26) * 2, 0), 0, end_spin);
+			timer_set(ATTOTIME_IN_CYCLES((r3 - r26) * 2, 0), 0, end_spin);
 			cpu_spinuntil_int();
 		}
 	}
@@ -650,7 +650,7 @@ static struct mips3_config config =
 };
 
 
-MACHINE_DRIVER_START( kinst )
+static MACHINE_DRIVER_START( kinst )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(R4600LE, MASTER_CLOCK*2)

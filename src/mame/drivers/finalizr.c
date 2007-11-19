@@ -19,7 +19,7 @@ extern UINT8 *finalizr_scroll;
 extern UINT8 *finalizr_videoram2,*finalizr_colorram2;
 static UINT8 *finalizr_interrupt_enable;
 
-int finalizr_T1_line;
+static int finalizr_T1_line;
 
 PALETTE_INIT( finalizr );
 VIDEO_START( finalizr );

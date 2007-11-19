@@ -1442,10 +1442,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	// set absolute mode
 	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_ABS);
  	if (result != DI_OK)
- 	{
- 		mame_printf_error("DirectInput: Unable to set absolute mode for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
-		goto error;
-	}
+ 		mame_printf_warning("DirectInput: Unable to set absolute mode for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
 
 	// turn off deadzone; we do our own calculations
 	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_DEADZONE, 0, DIPH_DEVICE, 0);
@@ -1527,11 +1524,6 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 
 exit:
 	return DIENUM_CONTINUE;
-
-error:
-	if (devinfo != NULL)
-		dinput_device_release(devinfo);
-	goto exit;
 }
 
 

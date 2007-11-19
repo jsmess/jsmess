@@ -75,10 +75,10 @@ Atomic Robokid  256x192(H)  512x512
 **************************************************************************/
 
 UINT8 *omegaf_fg_videoram;
-UINT8 *omegaf_bg0_videoram;
-UINT8 *omegaf_bg1_videoram;
-UINT8 *omegaf_bg2_videoram;
-size_t omegaf_fgvideoram_size;
+static UINT8 *omegaf_bg0_videoram;
+static UINT8 *omegaf_bg1_videoram;
+static UINT8 *omegaf_bg2_videoram;
+//size_t omegaf_fgvideoram_size;
 
 static int omegaf_bg0_bank = 0;
 static int omegaf_bg1_bank = 0;

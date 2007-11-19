@@ -33,9 +33,9 @@
 
 extern struct x68k_system sys;
 
-extern mame_timer* scanline_timer;
-extern mame_timer* raster_irq;
-extern mame_timer* vblank_irq;
+extern emu_timer* scanline_timer;
+extern emu_timer* raster_irq;
+extern emu_timer* vblank_irq;
 
 UINT16* gvram;  // Graphic VRAM
 UINT16* tvram;  // Text VRAM
@@ -174,32 +174,32 @@ void x68k_crtc_refresh_mode()
 	sys.crtc.hshift = (sys.crtc.width - sys.crtc.visible_width) / 2;
 	sys.crtc.vshift = (sys.crtc.height - sys.crtc.visible_height) / 2;
 
-	video_screen_configure(0,sys.crtc.video_width,sys.crtc.video_height,&rect,HZ_TO_SUBSECONDS(55.45));
+	video_screen_configure(0,sys.crtc.video_width,sys.crtc.video_height,&rect,HZ_TO_ATTOSECONDS(55.45));
 	logerror("video_screen_configure(0,%i,%i,[%i,%i,%i,%i],55.45)\n",sys.crtc.video_width,sys.crtc.video_height,rect.min_x,rect.min_y,rect.max_x,rect.max_y);
 //	x68k_scanline = video_screen_get_vpos(0);
 	if(sys.crtc.reg[4] != 0)
 	{
-//		scantime = MAME_TIME_IN_HZ(55.45) / sys.crtc.reg[4];
-//		mame_timer_adjust(scanline_timer,time_zero,0,scantime);
+//		scantime = ATTOTIME_IN_HZ(55.45) / sys.crtc.reg[4];
+//		timer_adjust(scanline_timer,attotime_zero,0,scantime);
 	}
 }
 
 TIMER_CALLBACK(x68k_hsync)
 {
 	int state = param;
-	mame_time irq_time = video_screen_get_scan_period(0);
-	mame_time hsync_time = MAME_TIME_IN_CYCLES(0,32);
+	attotime irq_time = video_screen_get_scan_period(0);
+	attotime hsync_time = ATTOTIME_IN_CYCLES(0,32);
 
 	sys.crtc.hblank = state;	
 	if(state == 1)
 	{
 //		mfp_trigger_irq(MFP_IRQ_GPIP7);  // HSync
-		mame_timer_adjust(scanline_timer,hsync_time,0,time_never);
+		timer_adjust(scanline_timer,hsync_time,0,attotime_never);
 	}
 	if(state == 0)
 	{
-		double time_to_irq = mame_time_to_double(irq_time) - mame_time_to_double(hsync_time);
-		mame_timer_adjust(scanline_timer,double_to_mame_time(time_to_irq),1,time_never);
+		double time_to_irq = attotime_to_double(irq_time) - attotime_to_double(hsync_time);
+		timer_adjust(scanline_timer,double_to_attotime(time_to_irq),1,attotime_never);
 		if(!(sys.mfp.gpio & 0x40))  // if GPIP6 is active, clear it
 			sys.mfp.gpio |= 0x40;
 	}
@@ -209,7 +209,7 @@ TIMER_CALLBACK(x68k_hsync)
 TIMER_CALLBACK(x68k_crtc_raster_irq)
 {
 	int scan = param;
-	mame_time irq_time;
+	attotime irq_time;
 //	mfp_trigger_irq(MFP_IRQ_GPIP6);
 	sys.mfp.gpio &= ~0x40;  // GPIP6
 	if((readinputportbytag("options") & 0x01))
@@ -218,15 +218,15 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	}
 
 	irq_time = video_screen_get_time_until_pos(0,scan,2);
-	if(mame_time_to_double(irq_time) > 0)
-		mame_timer_adjust(raster_irq,irq_time,scan,time_never);
+	if(attotime_to_double(irq_time) > 0)
+		timer_adjust(raster_irq,irq_time,scan,attotime_never);
 	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(0));
 }
 
 TIMER_CALLBACK(x68k_crtc_vblank_irq)
 {
 	int val = param;
-	mame_time irq_time;
+	attotime irq_time;
 	int vblank_line;
 
 	if(val == 1)  // VBlank on
@@ -239,7 +239,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 			irq_time = video_screen_get_time_until_pos(0,vblank_line / 2,2);
 		else
 			irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
-		mame_timer_adjust(vblank_irq,irq_time,0,time_never);
+		timer_adjust(vblank_irq,irq_time,0,attotime_never);
 		logerror("CRTC: VBlank on\n");
 	}
 	if(val == 0)  // VBlank off
@@ -250,7 +250,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 			irq_time = video_screen_get_time_until_pos(0,vblank_line / 2,2);
 		else
 			irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
-		mame_timer_adjust(vblank_irq,irq_time,1,time_never);
+		timer_adjust(vblank_irq,irq_time,1,attotime_never);
 		logerror("CRTC: VBlank off\n");
 	}
 }
@@ -273,7 +273,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		x68k_crtc_refresh_mode();
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
-		mame_timer_adjust(raster_irq,time_never,0,time_never);  // disable timer
+		timer_adjust(raster_irq,attotime_never,0,attotime_never);  // disable timer
 		if(sys.crtc.height == 256)  // adjust to visible area
 		{
 			data = data / 2;
@@ -289,12 +289,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 		}
 		if(data <= sys.crtc.video_height)
 		{
-			mame_time irq_time;
+			attotime irq_time;
 			irq_time = video_screen_get_time_until_pos(0,data - 1,2);
 
-			if(mame_time_to_double(irq_time) > 0)
-				mame_timer_adjust(raster_irq,irq_time,data - 1,time_never);
-			logerror("CRTC: Time until next raster IRQ = %f\n",mame_time_to_double(irq_time));
+			if(attotime_to_double(irq_time) > 0)
+				timer_adjust(raster_irq,irq_time,data - 1,attotime_never);
+			logerror("CRTC: Time until next raster IRQ = %f\n",attotime_to_double(irq_time));
 		}
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
@@ -341,7 +341,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		if(data & 0x08)  // text screen raster copy
 		{
 			x68k_crtc_text_copy((sys.crtc.reg[22] & 0xff00) >> 8,(sys.crtc.reg[22] & 0x00ff));
-			mame_timer_set(MAME_TIME_IN_MSEC(1),0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
+			timer_set(ATTOTIME_IN_MSEC(1),0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
@@ -367,7 +367,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 			{
 				fillbitmap(x68k_gfx_3_bitmap_16,0,&rect);
 			}
-			mame_timer_set(MAME_TIME_IN_MSEC(10),0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
+			timer_set(ATTOTIME_IN_MSEC(10),0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 //			popmessage("CRTC: High-speed gfx screen clear [0x%02x]",sys.crtc.reg[21] & 0x0f);
 		}
 		break;
@@ -882,7 +882,7 @@ VIDEO_START( x68000 )
 	tilemap_set_transparent_pen(x68k_bg0_16,0);
 	tilemap_set_transparent_pen(x68k_bg1_16,0);
 
-//	mame_timer_adjust(scanline_timer,time_zero,0,MAME_TIME_IN_HZ(55.45)/568);
+//	timer_adjust(scanline_timer,attotime_zero,0,ATTOTIME_IN_HZ(55.45)/568);
 }
 
 VIDEO_UPDATE( x68000 )

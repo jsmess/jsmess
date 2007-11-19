@@ -804,7 +804,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 	/* signal we're done */
 skipdma:
-	mame_timer_set(MAME_TIME_IN_NSEC(41 * pixels), 0, dma_callback);
+	timer_set(ATTOTIME_IN_NSEC(41 * pixels), 0, dma_callback);
 
 	profiler_mark(PROFILER_END);
 }

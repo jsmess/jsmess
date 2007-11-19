@@ -67,7 +67,7 @@ struct _coco3_video
 	UINT32 composite_palette[64];
 	UINT32 rgb_palette[64];
 	UINT8 fontdata[128][8];
-	mame_timer *gime_fs_timer;
+	emu_timer *gime_fs_timer;
 
 	/* CoCo 3 palette status */
 	UINT8 palette_ram[16];
@@ -511,10 +511,10 @@ static int coco3_new_frame(void)
 	}
 
 	/* set up GIME field sync */
-	mame_timer_adjust(video->gime_fs_timer,
+	timer_adjust(video->gime_fs_timer,
 		m6847_scanline_time(gime_field_sync),
 		0,
-		time_never);
+		attotime_never);
 
 	return video->legacy_video;
 }
@@ -811,7 +811,7 @@ static void internal_video_start_coco3(m6847_type type)
 	}
 
 	/* GIME field sync timer */
-	video->gime_fs_timer = mame_timer_alloc(gime_fs);
+	video->gime_fs_timer = timer_alloc(gime_fs);
 
 	/* initialize the CoCo video code */
 	memset(&cfg, 0, sizeof(cfg));

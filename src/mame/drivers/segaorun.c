@@ -186,7 +186,7 @@ static void update_main_irqs(void)
 	if (irq != 0)
 	{
 		cpunum_set_input_line(0, irq, ASSERT_LINE);
-		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 	else
 		cpunum_set_input_line(0, 7, CLEAR_LINE);
@@ -213,7 +213,7 @@ static TIMER_CALLBACK( scanline_callback )
 		case 65:
 		case 129:
 		case 193:
-			mame_timer_set(video_screen_get_time_until_pos(0, scanline, machine->screen[0].visarea.max_x + 1), 0, irq2_gen);
+			timer_set(video_screen_get_time_until_pos(0, scanline, machine->screen[0].visarea.max_x + 1), 0, irq2_gen);
 			next_scanline = scanline + 1;
 			break;
 
@@ -244,7 +244,7 @@ static TIMER_CALLBACK( scanline_callback )
 	update_main_irqs();
 
 	/* come back at the next targeted scanline */
-	mame_timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), next_scanline, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), next_scanline, scanline_callback);
 }
 
 
@@ -275,7 +275,7 @@ static MACHINE_RESET( outrun )
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
 
 	/* start timers to track interrupts */
-	mame_timer_set(video_screen_get_time_until_pos(0, 223, 0), 223, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(0, 223, 0), 223, scanline_callback);
 }
 
 
@@ -854,13 +854,13 @@ static MACHINE_DRIVER_START( outrundx )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( outrun )
+static MACHINE_DRIVER_START( outrun )
 	MDRV_IMPORT_FROM(outrundx)
 	MDRV_NVRAM_HANDLER(outrun)
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( shangon )
+static MACHINE_DRIVER_START( shangon )
 	MDRV_IMPORT_FROM(outrun)
 
 	MDRV_SCREEN_MODIFY("main")

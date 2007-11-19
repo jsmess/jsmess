@@ -51,7 +51,7 @@ void expand_machine_driver(void (*constructor)(machine_config *), machine_config
 {
 	/* initialize the tag on the first screen */
 	memset(output, 0, sizeof(*output));
-	output->watchdog_time = time_zero;
+	output->watchdog_time = attotime_zero;
 
 	/* keeping this function allows us to pre-init the driver before constructing it */
 	(*constructor)(output);
@@ -62,7 +62,7 @@ void expand_machine_driver(void (*constructor)(machine_config *), machine_config
 
 	/* if no screens, set a dummy refresh for the main screen */
 	if (output->screen[0].tag == NULL)
-		output->screen[0].defstate.refresh = HZ_TO_SUBSECONDS(60);
+		output->screen[0].defstate.refresh = HZ_TO_ATTOSECONDS(60);
 }
 
 

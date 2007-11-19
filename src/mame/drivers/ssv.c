@@ -204,7 +204,7 @@ static void update_irq_state(void)
 	cpunum_set_input_line(0, 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
-int ssv_irq_callback(int level)
+static int ssv_irq_callback(int level)
 {
 	int i;
 	for ( i = 0; i <= 7; i++ )
@@ -251,7 +251,7 @@ static WRITE16_HANDLER( ssv_irq_enable_w )
 
 static int interrupt_ultrax;
 
-INTERRUPT_GEN( ssv_interrupt )
+static INTERRUPT_GEN( ssv_interrupt )
 {
 	if (cpu_getiloops())
 	{
@@ -268,7 +268,7 @@ INTERRUPT_GEN( ssv_interrupt )
 	}
 }
 
-INTERRUPT_GEN( gdfs_interrupt )
+static INTERRUPT_GEN( gdfs_interrupt )
 {
 	if (cpu_getiloops())
 	{
@@ -2694,7 +2694,7 @@ static struct ES5506interface es5506_interface =
 
 ***************************************************************************/
 
-void init_ssv(void)
+static void init_ssv(void)
 {
 	int i;
 	for (i = 0; i < 16; i++)
@@ -2708,7 +2708,7 @@ void init_ssv(void)
 	eaglshot_dirty = 0;
 }
 
-void init_ssv_hypreac2(void)
+static void init_ssv_hypreac2(void)
 {
 	int i;
 

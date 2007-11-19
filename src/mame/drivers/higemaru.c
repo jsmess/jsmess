@@ -19,7 +19,7 @@ extern VIDEO_START( higemaru );
 extern VIDEO_UPDATE( higemaru );
 
 
-INTERRUPT_GEN( higemaru_interrupt )
+static INTERRUPT_GEN( higemaru_interrupt )
 {
 	if (cpu_getiloops() == 0)
 		cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xcf);	/* RST 08h */

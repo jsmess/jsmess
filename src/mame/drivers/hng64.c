@@ -642,8 +642,8 @@ static READ32_HANDLER( hng64_port_read )
 
 
 /* preliminary dma code, dma is used to copy program code -> ram */
-int hng_dma_start,hng_dma_dst,hng_dma_len;
-void hng64_do_dma (void)
+static int hng_dma_start,hng_dma_dst,hng_dma_len;
+static void hng64_do_dma (void)
 {
 	logerror("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
@@ -1448,7 +1448,7 @@ static INTERRUPT_GEN( irq_start )
 	}
 
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	mame_timer_set(MAME_TIME_IN_USEC(50), 0, irq_stop);
+	timer_set(ATTOTIME_IN_USEC(50), 0, irq_stop);
 }
 
 
@@ -1512,7 +1512,7 @@ static MACHINE_RESET(hyperneo)
 }
 
 
-MACHINE_DRIVER_START( hng64 )
+static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(R4600BE, MASTER_CLOCK)  	// actually R4300
 	MDRV_CPU_CONFIG(config)

@@ -140,7 +140,7 @@ static WRITE16_HANDLER( hypr_subcpu_control_w )
 			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
 			subcpu_resetline = 0;
 			if (pc == 0xbb0 || pc == 0x9d30 || pc == 0xb19c)
-				cpu_spinuntil_time(MAME_TIME_IN_USEC(15000));		/* sync semaphore */
+				cpu_spinuntil_time(ATTOTIME_IN_USEC(15000));		/* sync semaphore */
 		}
 		else if (subcpu_resetline == -1)
 		{
@@ -185,7 +185,7 @@ static TIMER_CALLBACK( vblank_end_callback )
 	cpunum_set_input_line(1, 2, HOLD_LINE);
 }
 
-INTERRUPT_GEN( hyprduel_interrupt )
+static INTERRUPT_GEN( hyprduel_interrupt )
 {
 	int line = RASTER_LINES - cpu_getiloops();
 
@@ -196,7 +196,7 @@ INTERRUPT_GEN( hyprduel_interrupt )
 		cpunum_set_input_line(0, 2, HOLD_LINE);
 		cpunum_set_input_line(1, 1, HOLD_LINE);
 		/* the duration is a guess */
-		mame_timer_set(MAME_TIME_IN_USEC(2500), 0x20, vblank_end_callback);
+		timer_set(ATTOTIME_IN_USEC(2500), 0x20, vblank_end_callback);
 		rastersplit = 0;
 	} else {
 		requested_int |= 0x12;		/* hsync */
@@ -285,7 +285,7 @@ static READ16_HANDLER( hyprduel_bankedrom_r )
 
 ***************************************************************************/
 
-UINT16 *hyprduel_blitter_regs;
+static UINT16 *hyprduel_blitter_regs;
 
 static TIMER_CALLBACK( hyprduel_blit_done )
 {
@@ -367,7 +367,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						mame_timer_set(MAME_TIME_IN_USEC(500),0,hyprduel_blit_done);
+						timer_set(ATTOTIME_IN_USEC(500),0,hyprduel_blit_done);
 						return;
 					}
 

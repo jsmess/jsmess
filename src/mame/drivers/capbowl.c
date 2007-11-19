@@ -129,13 +129,13 @@ static TIMER_CALLBACK( capbowl_update )
 	video_screen_update_partial(0, scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, capbowl_update);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, capbowl_update);
 }
 
 
 static MACHINE_RESET( capbowl )
 {
-	mame_timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, capbowl_update);
+	timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, capbowl_update);
 }
 
 

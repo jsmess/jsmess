@@ -302,7 +302,7 @@ static void pd4990a_process_command(void)
 }
 
 
-void pd4990a_serial_control(UINT8 data)
+static void pd4990a_serial_control(UINT8 data)
 {
 	//Check for command end
 	if(command_line && !(data&END_BIT)) //end of command

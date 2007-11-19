@@ -5,9 +5,9 @@
 
 static mame_bitmap *cdptmpbitmap;
 
-static mame_timer *cdp1861_int_timer;
-static mame_timer *cdp1861_efx_timer;
-static mame_timer *cdp1861_dma_timer;
+static emu_timer *cdp1861_int_timer;
+static emu_timer *cdp1861_efx_timer;
+static emu_timer *cdp1861_dma_timer;
 
 typedef struct
 {
@@ -30,7 +30,7 @@ static TIMER_CALLBACK(cdp1861_int_tick)
 			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, HOLD_LINE);
 		}
 
-		mame_timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_END, 0), 0, time_zero);
+		timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_END, 0), 0, attotime_zero);
 	}
 	else
 	{
@@ -39,7 +39,7 @@ static TIMER_CALLBACK(cdp1861_int_tick)
 			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 		}
 
-		mame_timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_START, 0), 0, time_zero);
+		timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_START, 0), 0, attotime_zero);
 	}
 }
 
@@ -51,22 +51,22 @@ static TIMER_CALLBACK(cdp1861_efx_tick)
 	{
 	case CDP1861_SCANLINE_EFX_TOP_START:
 		cdp1861_efx = ASSERT_LINE;
-		mame_timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_TOP_END, 0), 0, time_zero);
+		timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_TOP_END, 0), 0, attotime_zero);
 		break;
 
 	case CDP1861_SCANLINE_EFX_TOP_END:
 		cdp1861_efx = CLEAR_LINE;
-		mame_timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_BOTTOM_START, 0), 0, time_zero);
+		timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_BOTTOM_START, 0), 0, attotime_zero);
 		break;
 
 	case CDP1861_SCANLINE_EFX_BOTTOM_START:
 		cdp1861_efx = ASSERT_LINE;
-		mame_timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_BOTTOM_END, 0), 0, time_zero);
+		timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_BOTTOM_END, 0), 0, attotime_zero);
 		break;
 
 	case CDP1861_SCANLINE_EFX_BOTTOM_END:
 		cdp1861_efx = CLEAR_LINE;
-		mame_timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
+		timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_TOP_START, 0), 0, attotime_zero);
 		break;
 	}
 }
@@ -85,7 +85,7 @@ static TIMER_CALLBACK(cdp1861_dma_tick)
 			}
 		}
 
-		mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_DMA_WAIT, 0), 0, time_zero);
+		timer_adjust(cdp1861_dma_timer, ATTOTIME_IN_CYCLES(CDP1861_CYCLES_DMA_WAIT, 0), 0, attotime_zero);
 		
 		cdp1861.dmaout = 0;
 	}
@@ -99,7 +99,7 @@ static TIMER_CALLBACK(cdp1861_dma_tick)
 			}
 		}
 
-		mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_DMA_ACTIVE, 0), 0, time_zero);
+		timer_adjust(cdp1861_dma_timer, ATTOTIME_IN_CYCLES(CDP1861_CYCLES_DMA_ACTIVE, 0), 0, attotime_zero);
 		
 		cdp1861.dmaout = 1;
 	}
@@ -121,9 +121,9 @@ void cdp1861_dma_w(UINT8 data)
 
 MACHINE_RESET( cdp1861 )
 {
-	mame_timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_START, 0), 0, time_zero);
-	mame_timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
-	mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_DMA_START, 0), 0, time_zero);
+	timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_START, 0), 0, attotime_zero);
+	timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_TOP_START, 0), 0, attotime_zero);
+	timer_adjust(cdp1861_dma_timer, ATTOTIME_IN_CYCLES(CDP1861_CYCLES_DMA_START, 0), 0, attotime_zero);
 
 	cdp1861.disp = 0;
 	cdp1861.dmaout = 0;
@@ -149,9 +149,9 @@ WRITE8_HANDLER( cdp1861_dispoff_w )
 
 VIDEO_START( cdp1861 )
 {
-	cdp1861_int_timer = mame_timer_alloc(cdp1861_int_tick);
-	cdp1861_efx_timer = mame_timer_alloc(cdp1861_efx_tick);
-	cdp1861_dma_timer = mame_timer_alloc(cdp1861_dma_tick);
+	cdp1861_int_timer = timer_alloc(cdp1861_int_tick);
+	cdp1861_efx_timer = timer_alloc(cdp1861_efx_tick);
+	cdp1861_dma_timer = timer_alloc(cdp1861_dma_tick);
 
 	/* allocate the temporary bitmap */
 	cdptmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);

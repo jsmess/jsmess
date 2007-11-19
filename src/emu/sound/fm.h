@@ -36,12 +36,12 @@ struct ssg_callbacks
 /* --- external callback funstions for realtime update --- */
 
 #if FM_BUSY_FLAG_SUPPORT
-#define TIME_TYPE 					mame_time
-#define UNDEFINED_TIME				time_zero
-#define FM_GET_TIME_NOW() 			mame_timer_get_time()
-#define ADD_TIMES(t1, t2)    		add_mame_times((t1), (t2))
-#define COMPARE_TIMES(t1, t2)		compare_mame_times((t1), (t2))
-#define MULTIPLY_TIME_BY_INT(t,i)	scale_up_mame_time(t, i)
+#define TIME_TYPE 					attotime
+#define UNDEFINED_TIME				attotime_zero
+#define FM_GET_TIME_NOW() 			timer_get_time()
+#define ADD_TIMES(t1, t2)    		attotime_add((t1), (t2))
+#define COMPARE_TIMES(t1, t2)		attotime_compare((t1), (t2))
+#define MULTIPLY_TIME_BY_INT(t,i)	attotime_mul(t, i)
 #endif
 
 #if BUILD_YM2203

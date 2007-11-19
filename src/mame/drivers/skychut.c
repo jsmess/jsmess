@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( greenberet_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-INTERRUPT_GEN( skychut_interrupt )
+static INTERRUPT_GEN( skychut_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);

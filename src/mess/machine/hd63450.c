@@ -21,7 +21,7 @@ void hd63450_init(struct hd63450_interface* intf)
 	dmac.intf = intf;
 	for(x=0;x<4;x++)
 	{
-		dmac.timer[x] = mame_timer_alloc(dma_transfer_timer);
+		dmac.timer[x] = timer_alloc(dma_transfer_timer);
 		dmac.reg[x].niv = 0x0f;  // defaults?
 		dmac.reg[x].eiv = 0x0f;
 	}
@@ -205,10 +205,10 @@ void dma_transfer_start(int channel, int dir)
 	if((dmac.reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
 		cpunum_set_input_line(dmac.intf->cpu,INPUT_LINE_HALT,ASSERT_LINE);
-		mame_timer_adjust(dmac.timer[channel],time_zero,channel, double_to_mame_time(dmac.intf->burst_clock[channel]));
+		timer_adjust(dmac.timer[channel],attotime_zero,channel, double_to_attotime(dmac.intf->burst_clock[channel]));
 	}
 	else
-		mame_timer_adjust(dmac.timer[channel],MAME_TIME_IN_USEC(500),channel, double_to_mame_time(dmac.intf->clock[channel]));
+		timer_adjust(dmac.timer[channel],ATTOTIME_IN_USEC(500),channel, double_to_attotime(dmac.intf->clock[channel]));
 
 
 	dmac.transfer_size[channel] = dmac.reg[channel].mtc;
@@ -224,7 +224,7 @@ TIMER_CALLBACK(dma_transfer_timer)
 void dma_transfer_abort(int channel)
 {
 	logerror("DMA#%i: Transfer aborted\n",channel);
-	mame_timer_adjust(dmac.timer[channel],time_zero,0,time_zero);
+	timer_adjust(dmac.timer[channel],attotime_zero,0,attotime_zero);
 	dmac.in_progress[channel] = 0;
 	dmac.reg[channel].mtc = dmac.transfer_size[channel];
 	dmac.reg[channel].csr |= 0xe0;  // channel operation complete, block transfer complete
@@ -234,7 +234,7 @@ void dma_transfer_abort(int channel)
 void dma_transfer_halt(int channel)
 {
 	dmac.halted[channel] = 1;
-	mame_timer_adjust(dmac.timer[channel],time_zero,0,time_zero);
+	timer_adjust(dmac.timer[channel],attotime_zero,0,attotime_zero);
 }
 
 void dma_transfer_continue(int channel)
@@ -242,7 +242,7 @@ void dma_transfer_continue(int channel)
 	if(dmac.halted[channel] != 0)
 	{
 		dmac.halted[channel] = 0;
-		mame_timer_adjust(dmac.timer[channel],time_zero,channel, double_to_mame_time(dmac.intf->clock[channel]));
+		timer_adjust(dmac.timer[channel],attotime_zero,channel, double_to_attotime(dmac.intf->clock[channel]));
 	}
 }
 
@@ -361,7 +361,7 @@ void hd63450_single_transfer(int x)
 					dmac.reg[x].mtc = program_read_word(dmac.reg[x].bar+4);
 					return;
 				}
-				mame_timer_adjust(dmac.timer[x],time_zero,0,time_zero);
+				timer_adjust(dmac.timer[x],attotime_zero,0,attotime_zero);
 				dmac.in_progress[x] = 0;
 				dmac.reg[x].mtc = dmac.transfer_size[x];
 				dmac.reg[x].csr |= 0xe0;  // channel operation complete, block transfer complete

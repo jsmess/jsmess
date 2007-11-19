@@ -105,7 +105,7 @@ void	mfm_drive_exit(int drive_id)
 	{
 		if (drive->index_timer!=NULL)
 		{
-			mame_timer_reset(drive->index_timer, time_never);	/* FIXME - timers should only be allocated once */
+			timer_reset(drive->index_timer, attotime_never);	/* FIXME - timers should only be allocated once */
 			drive->index_timer = NULL;
 		}
 	}
@@ -137,7 +137,7 @@ void	mfm_drive_motor(int drive_id, int motor)
 		/* shut off timer */
 		if (drive->index_timer!=NULL)
 		{
-			mame_timer_reset(drive->index_timer, time_never);	/* FIXME - timers should only be allocated once */
+			timer_reset(drive->index_timer, attotime_never);	/* FIXME - timers should only be allocated once */
 			drive->index_timer = NULL;
 		}
 
@@ -147,7 +147,7 @@ void	mfm_drive_motor(int drive_id, int motor)
 			/* this is not quite correct. if the motor is stopped in the middle
 			of the track, the next index pulse will occur in half a track time, from
 			there after it will occur every 300hz */
-			drive->index_timer = mame_timer_pulse(MAME_TIME_IN_HZ(300), drive_id, index_timer_callback);
+			drive->index_timer = timer_pulse(ATTOTIME_IN_HZ(300), drive_id, index_timer_callback);
 		}
 
 		drive->motor_state = motor;

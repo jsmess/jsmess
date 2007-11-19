@@ -197,10 +197,10 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem);
 static void init_tmu_shared(tmu_shared_state *s);
 static void init_tmu(voodoo_state *v, tmu_state *t, int type, voodoo_reg *reg, void *memory, int tmem);
 static void soft_reset(voodoo_state *v);
-static void check_stalled_cpu(voodoo_state *v, mame_time current_time);
-static void flush_fifos(voodoo_state *v, mame_time current_time);
+static void check_stalled_cpu(voodoo_state *v, attotime current_time);
+static void flush_fifos(voodoo_state *v, attotime current_time);
 static TIMER_CALLBACK_PTR( stall_cpu_callback );
-static void stall_cpu(voodoo_state *v, int state, mame_time current_time);
+static void stall_cpu(voodoo_state *v, int state, attotime current_time);
 static TIMER_CALLBACK_PTR( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront);
@@ -368,7 +368,7 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
 	v->index = which;
 	v->type = type;
 	v->chipmask = 0x01;
-	v->subseconds_per_cycle = MAX_SUBSECONDS / v->freq;
+	v->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / v->freq;
 	v->trigger = 51324 + which;
 
 	/* build the rasterizer table */
@@ -380,7 +380,7 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
 	v->pci.fifo.size = 64*2;
 	v->pci.fifo.in = v->pci.fifo.out = 0;
 	v->pci.stall_state = NOT_STALLED;
-	v->pci.continue_timer = mame_timer_alloc_ptr(stall_cpu_callback, v);
+	v->pci.continue_timer = timer_alloc_ptr(stall_cpu_callback, v);
 
 	/* allocate memory */
 	if (type <= VOODOO_2)
@@ -803,7 +803,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	}
 
 	/* allocate a VBLANK timer */
-	f->vblank_timer = mame_timer_alloc_ptr(vblank_callback, v);
+	f->vblank_timer = timer_alloc_ptr(vblank_callback, v);
 	f->vblank = FALSE;
 
 	/* initialize the memory FIFO */
@@ -944,7 +944,7 @@ static void update_statistics(voodoo_state *v, int accumulate)
 	int threadnum;
 
 	/* accumulate/reset statistics from all units */
-	for (threadnum = 0; threadnum < ARRAY_LENGTH(v->thread_stats); threadnum++)
+	for (threadnum = 0; threadnum < WORK_MAX_THREADS; threadnum++)
 	{
 		if (accumulate)
 			accumulate_statistics(v, &v->thread_stats[threadnum]);
@@ -1013,13 +1013,13 @@ static void swap_buffers(voodoo_state *v)
 	/* reset the last_op_time to now and start processing the next command */
 	if (v->pci.op_pending)
 	{
-		v->pci.op_end_time = mame_timer_get_time();
+		v->pci.op_end_time = timer_get_time();
 		flush_fifos(v, v->pci.op_end_time);
 	}
 
 	/* we may be able to unstall now */
 	if (v->pci.stall_state != NOT_STALLED)
-		check_stalled_cpu(v, mame_timer_get_time());
+		check_stalled_cpu(v, timer_get_time());
 
 	/* periodically log rasterizer info */
 	v->stats.swaps++;
@@ -1082,12 +1082,12 @@ static void swap_buffers(voodoo_state *v)
 
 static void adjust_vblank_timer(voodoo_state *v)
 {
-	mame_time vblank_period = video_screen_get_time_until_pos(v->scrnum, v->fbi.vsyncscan, 0);
+	attotime vblank_period = video_screen_get_time_until_pos(v->scrnum, v->fbi.vsyncscan, 0);
 
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
-	if (compare_mame_times(vblank_period, time_zero) == 0)
+	if (attotime_compare(vblank_period, attotime_zero) == 0)
 		vblank_period = video_screen_get_frame_period(v->scrnum);
-	mame_timer_adjust_ptr(v->fbi.vblank_timer, vblank_period, time_never);
+	timer_adjust_ptr(v->fbi.vblank_timer, vblank_period, attotime_never);
 }
 
 
@@ -1117,7 +1117,7 @@ static TIMER_CALLBACK_PTR( vblank_callback )
 	if (v->pci.op_pending)
 	{
 		if (LOG_VBLANK_SWAP) logerror("---- vblank flush begin\n");
-		flush_fifos(v, mame_timer_get_time());
+		flush_fifos(v, timer_get_time());
 		if (LOG_VBLANK_SWAP) logerror("---- vblank flush end\n");
 	}
 
@@ -1135,7 +1135,7 @@ static TIMER_CALLBACK_PTR( vblank_callback )
 		swap_buffers(v);
 
 	/* set a timer for the next off state */
-	mame_timer_set_ptr(video_screen_get_time_until_pos(v->scrnum, 0, 0), v, vblank_off_callback);
+	timer_set_ptr(video_screen_get_time_until_pos(v->scrnum, 0, 0), v, vblank_off_callback);
 
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
@@ -2121,11 +2121,11 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 		if (cycles > 0)
 		{
 			v->pci.op_pending = TRUE;
-			v->pci.op_end_time = add_subseconds_to_mame_time(mame_timer_get_time(), (subseconds_t)cycles * v->subseconds_per_cycle);
+			v->pci.op_end_time = attotime_add_attoseconds(timer_get_time(), (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
-				mame_timer_get_time().seconds, (UINT32)(mame_timer_get_time().subseconds >> 32), (UINT32)mame_timer_get_time().subseconds,
-				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.subseconds >> 32), (UINT32)v->pci.op_end_time.subseconds);
+				timer_get_time().seconds, (UINT32)(timer_get_time().attoseconds >> 32), (UINT32)timer_get_time().attoseconds,
+				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
 		}
 	}
 }
@@ -2141,11 +2141,11 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 
 static TIMER_CALLBACK_PTR( stall_cpu_callback )
 {
-	check_stalled_cpu(param, mame_timer_get_time());
+	check_stalled_cpu(param, timer_get_time());
 }
 
 
-static void check_stalled_cpu(voodoo_state *v, mame_time current_time)
+static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 {
 	int resume = FALSE;
 
@@ -2194,12 +2194,12 @@ static void check_stalled_cpu(voodoo_state *v, mame_time current_time)
 	/* if not, set a timer for the next one */
 	else
 	{
-		mame_timer_adjust_ptr(v->pci.continue_timer, sub_mame_times(v->pci.op_end_time, current_time), time_never);
+		timer_adjust_ptr(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), attotime_never);
 	}
 }
 
 
-static void stall_cpu(voodoo_state *v, int state, mame_time current_time)
+static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 {
 	/* sanity check */
 	if (!v->pci.op_pending) fatalerror("FIFOs not empty, no op pending!");
@@ -2215,7 +2215,7 @@ static void stall_cpu(voodoo_state *v, int state, mame_time current_time)
 		cpu_spinuntil_trigger(v->trigger);
 
 	/* set a timer to clear the stall */
-	mame_timer_adjust_ptr(v->pci.continue_timer, sub_mame_times(v->pci.op_end_time, current_time), time_never);
+	timer_adjust_ptr(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), attotime_never);
 }
 
 
@@ -2612,8 +2612,8 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					int hbp = (v->reg[backPorch].u & 0xff) + 2;
 					int vbp = (v->reg[backPorch].u >> 16) & 0xff;
 					screen_state *state = &Machine->screen[v->scrnum];
-					subseconds_t stdperiod, medperiod, vgaperiod;
-					subseconds_t stddiff, meddiff, vgadiff;
+					attoseconds_t stdperiod, medperiod, vgaperiod;
+					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
 
 					/* create a new visarea */
@@ -2627,9 +2627,9 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					visarea.max_y = MIN(visarea.max_y, vtotal - 1);
 
 					/* compute the new period for standard res, medium res, and VGA res */
-					stdperiod = HZ_TO_SUBSECONDS(15750) * vtotal;
-					medperiod = HZ_TO_SUBSECONDS(25000) * vtotal;
-					vgaperiod = HZ_TO_SUBSECONDS(31500) * vtotal;
+					stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
+					medperiod = HZ_TO_ATTOSECONDS(25000) * vtotal;
+					vgaperiod = HZ_TO_ATTOSECONDS(31500) * vtotal;
 
 					/* compute a diff against the current refresh period */
 					stddiff = stdperiod - state->refresh;
@@ -2647,17 +2647,17 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					if (stddiff < meddiff && stddiff < vgadiff)
 					{
 						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, stdperiod);
-						mame_printf_debug("Standard resolution, %f Hz\n", SUBSECONDS_TO_HZ(stdperiod));
+						mame_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
 					}
 					else if (meddiff < vgadiff)
 					{
 						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, medperiod);
-						mame_printf_debug("Medium resolution, %f Hz\n", SUBSECONDS_TO_HZ(medperiod));
+						mame_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
 					}
 					else
 					{
 						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, vgaperiod);
-						mame_printf_debug("VGA resolution, %f Hz\n", SUBSECONDS_TO_HZ(vgaperiod));
+						mame_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
 					}
 
 					/* configure the new framebuffer info */
@@ -2957,7 +2957,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	UINT32 destmax, depthmax;
 	int sr[2], sg[2], sb[2], sa[2], sw[2];
 	int x, y, scry, mask;
-	int pixel, destbuf;
+	int pix, destbuf;
 
 	/* statistics */
 	v->stats.lfb_writes++;
@@ -3205,7 +3205,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 		COMPUTE_DITHER_POINTERS(v->reg[fbzMode].u, y);
 
 		/* loop over up to two pixels */
-		for (pixel = 0; mask; pixel++)
+		for (pix = 0; mask; pix++)
 		{
 			/* make sure we care about this pixel */
 			if (mask & 0x0f)
@@ -3214,8 +3214,8 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				if ((mask & LFB_RGB_PRESENT) && bufoffs < destmax)
 				{
 					/* apply dithering and write to the screen */
-					APPLY_DITHER(v->reg[fbzMode].u, x, dither_lookup, sr[pixel], sg[pixel], sb[pixel]);
-					dest[bufoffs] = (sr[pixel] << 11) | (sg[pixel] << 5) | sb[pixel];
+					APPLY_DITHER(v->reg[fbzMode].u, x, dither_lookup, sr[pix], sg[pix], sb[pix]);
+					dest[bufoffs] = (sr[pix] << 11) | (sg[pix] << 5) | sb[pix];
 				}
 
 				/* make sure we have an aux buffer to write to */
@@ -3223,11 +3223,11 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				{
 					/* write to the alpha buffer */
 					if ((mask & LFB_ALPHA_PRESENT) && FBZMODE_ENABLE_ALPHA_PLANES(v->reg[fbzMode].u))
-						depth[bufoffs] = sa[pixel];
+						depth[bufoffs] = sa[pix];
 
 					/* write to the depth buffer */
 					if ((mask & (LFB_DEPTH_PRESENT | LFB_DEPTH_PRESENT_MSW)) && !FBZMODE_ENABLE_ALPHA_PLANES(v->reg[fbzMode].u))
-						depth[bufoffs] = sw[pixel];
+						depth[bufoffs] = sw[pix];
 				}
 
 				/* track pixel writes to the frame buffer regardless of mask */
@@ -3262,14 +3262,14 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 		COMPUTE_DITHER_POINTERS(v->reg[fbzMode].u, y);
 
 		/* loop over up to two pixels */
-		for (pixel = 0; mask; pixel++)
+		for (pix = 0; mask; pix++)
 		{
 			/* make sure we care about this pixel */
 			if (mask & 0x0f)
 			{
 				stats_block *stats = &v->fbi.lfb_stats;
-				INT64 iterw = sw[pixel] << (30-16);
-				INT32 iterz = sw[pixel] << 12;
+				INT64 iterw = sw[pix] << (30-16);
+				INT32 iterz = sw[pix] << 12;
 				rgb_union color;
 
 				/* apply clipping */
@@ -3290,10 +3290,10 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				PIXEL_PIPELINE_BEGIN(v, stats, x, y, v->reg[fbzColorPath].u, v->reg[fbzMode].u, iterz, iterw);
 
 				/* use the RGBA we stashed above */
-				color.rgb.r = r = sr[pixel];
-				color.rgb.g = g = sg[pixel];
-				color.rgb.b = b = sb[pixel];
-				color.rgb.a = a = sa[pixel];
+				color.rgb.r = r = sr[pix];
+				color.rgb.g = g = sg[pix];
+				color.rgb.b = b = sb[pix];
+				color.rgb.a = a = sa[pix];
 
 				/* apply chroma key, alpha mask, and alpha testing */
 				APPLY_CHROMAKEY(v, stats, v->reg[fbzMode].u, color);
@@ -3446,7 +3446,7 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
  *
  *************************************/
 
-static void flush_fifos(voodoo_state *v, mame_time current_time)
+static void flush_fifos(voodoo_state *v, attotime current_time)
 {
 	static UINT8 in_flush;
 
@@ -3458,11 +3458,11 @@ static void flush_fifos(voodoo_state *v, mame_time current_time)
 	if (!v->pci.op_pending) fatalerror("flush_fifos called with no pending operation");
 
 	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos start -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
-		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.subseconds >> 32), (UINT32)v->pci.op_end_time.subseconds,
-		current_time.seconds, (UINT32)(current_time.subseconds >> 32), (UINT32)current_time.subseconds);
+		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds,
+		current_time.seconds, (UINT32)(current_time.attoseconds >> 32), (UINT32)current_time.attoseconds);
 
 	/* loop while we still have cycles to burn */
-	while (compare_mame_times(v->pci.op_end_time, current_time) <= 0)
+	while (attotime_compare(v->pci.op_end_time, current_time) <= 0)
 	{
 		INT32 extra_cycles = 0;
 		INT32 cycles;
@@ -3553,15 +3553,15 @@ static void flush_fifos(voodoo_state *v, mame_time current_time)
 		cycles += extra_cycles;
 
 		/* account for those cycles */
-		v->pci.op_end_time = add_subseconds_to_mame_time(v->pci.op_end_time, (subseconds_t)cycles * v->subseconds_per_cycle);
+		v->pci.op_end_time = attotime_add_attoseconds(v->pci.op_end_time, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:update -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
-			v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.subseconds >> 32), (UINT32)v->pci.op_end_time.subseconds,
-			current_time.seconds, (UINT32)(current_time.subseconds >> 32), (UINT32)current_time.subseconds);
+			v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds,
+			current_time.seconds, (UINT32)(current_time.attoseconds >> 32), (UINT32)current_time.attoseconds);
 	}
 
 	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos end -- pending command complete at %d.%08X%08X\n", v->index,
-		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.subseconds >> 32), (UINT32)v->pci.op_end_time.subseconds);
+		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
 
 	in_flush = FALSE;
 }
@@ -3587,7 +3587,7 @@ static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mas
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, mame_timer_get_time());
+		flush_fifos(v, timer_get_time());
 
 	/* special handling for registers */
 	if ((offset & 0xc00000/4) == 0)
@@ -3667,11 +3667,11 @@ static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mas
 		if (cycles)
 		{
 			v->pci.op_pending = TRUE;
-			v->pci.op_end_time = add_subseconds_to_mame_time(mame_timer_get_time(), (subseconds_t)cycles * v->subseconds_per_cycle);
+			v->pci.op_end_time = attotime_add_attoseconds(timer_get_time(), (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
-				mame_timer_get_time().seconds, (UINT32)(mame_timer_get_time().subseconds >> 32), (UINT32)mame_timer_get_time().subseconds,
-				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.subseconds >> 32), (UINT32)v->pci.op_end_time.subseconds);
+				timer_get_time().seconds, (UINT32)(timer_get_time().attoseconds >> 32), (UINT32)timer_get_time().attoseconds,
+				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
 		}
 		profiler_mark(PROFILER_END);
 		return;
@@ -3720,7 +3720,7 @@ static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mas
 			fifo_items(&v->fbi.fifo) >= 2 * 32 * FBIINIT0_MEMORY_FIFO_HWM(v->reg[fbiInit0].u))
 		{
 			if (LOG_FIFO) logerror("VOODOO.%d.FIFO:voodoo_w hit memory FIFO HWM -- stalling\n", v->index);
-			stall_cpu(v, STALLED_UNTIL_FIFO_LWM, mame_timer_get_time());
+			stall_cpu(v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
 		}
 	}
 
@@ -3729,14 +3729,14 @@ static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mas
 		fifo_space(&v->pci.fifo) <= 2 * FBIINIT0_PCI_FIFO_LWM(v->reg[fbiInit0].u))
 	{
 		if (LOG_FIFO) logerror("VOODOO.%d.FIFO:voodoo_w hit PCI FIFO free LWM -- stalling\n", v->index);
-		stall_cpu(v, STALLED_UNTIL_FIFO_LWM, mame_timer_get_time());
+		stall_cpu(v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
 	}
 
 	/* if we weren't ready, and this is a non-FIFO access, stall until the FIFOs are clear */
 	if (stall)
 	{
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:voodoo_w wrote non-FIFO register -- stalling until clear\n", v->index);
-		stall_cpu(v, STALLED_UNTIL_FIFO_EMPTY, mame_timer_get_time());
+		stall_cpu(v, STALLED_UNTIL_FIFO_EMPTY, timer_get_time());
 	}
 
 	profiler_mark(PROFILER_END);
@@ -4009,7 +4009,7 @@ static UINT32 voodoo_r(voodoo_state *v, offs_t offset)
 {
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, mame_timer_get_time());
+		flush_fifos(v, timer_get_time());
 
 	/* target the appropriate location */
 	if (!(offset & (0xc00000/4)))
@@ -4095,7 +4095,7 @@ static UINT32 banshee_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, mame_timer_get_time());
+		flush_fifos(v, timer_get_time());
 
 	if (offset < 0x80000/4)
 		result = banshee_io_r(v, offset, mem_mask);
@@ -4128,7 +4128,7 @@ static UINT32 banshee_fb_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, mame_timer_get_time());
+		flush_fifos(v, timer_get_time());
 
 	if (offset < v->fbi.lfb_base)
 	{
@@ -4384,7 +4384,7 @@ static void banshee_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_ma
 {
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, mame_timer_get_time());
+		flush_fifos(v, timer_get_time());
 
 	if (offset < 0x80000/4)
 		banshee_io_w(v, offset, data, mem_mask);
@@ -4416,7 +4416,7 @@ static void banshee_fb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, mame_timer_get_time());
+		flush_fifos(v, timer_get_time());
 
 	if (offset < v->fbi.lfb_base)
 	{

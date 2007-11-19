@@ -38,8 +38,8 @@
 UINT16 kaneko16_disp_enable = 1; // default enabled for games not using it
 
 
-tilemap *kaneko16_tmap_0, *kaneko16_tmap_1;
-tilemap *kaneko16_tmap_2, *kaneko16_tmap_3;
+static tilemap *kaneko16_tmap_0, *kaneko16_tmap_1;
+static tilemap *kaneko16_tmap_2, *kaneko16_tmap_3;
 UINT16 *kaneko16_vram_0,    *kaneko16_vram_1,    *kaneko16_layers_0_regs;
 UINT16 *kaneko16_vscroll_0, *kaneko16_vscroll_1;
 UINT16 *kaneko16_vram_2,    *kaneko16_vram_3,    *kaneko16_layers_1_regs;
@@ -801,7 +801,7 @@ WRITE16_HANDLER( kaneko16_bg15_reg_w )
 
 ***************************************************************************/
 
-void kaneko16_prepare_first_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_prepare_first_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* Set Up FIRST Tilemap chip */
 	int layers_flip_0;
@@ -841,7 +841,7 @@ void kaneko16_prepare_first_tilemap_chip(running_machine *machine, mame_bitmap *
 
 }
 
-void kaneko16_prepare_second_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_prepare_second_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* Set Up SECOND Tilemap chip */
 	int layers_flip_1 = 0;
@@ -880,13 +880,13 @@ void kaneko16_prepare_second_tilemap_chip(running_machine *machine, mame_bitmap 
 	}
 }
 
-void kaneko16_render_first_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void kaneko16_render_first_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_0, pri, pri, 0);
 	tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_1, pri, pri, 0);
 }
 
-void kaneko16_render_second_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void kaneko16_render_second_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	if (kaneko16_tmap_2)
 	{
@@ -895,7 +895,7 @@ void kaneko16_render_second_tilemap_chip(running_machine *machine, mame_bitmap *
 	}
 }
 
-void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* Sprites last (rendered with pdrawgfx, so they can slip
        in between the layers) */
@@ -913,7 +913,7 @@ void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitmap, cons
 	}
 }
 
-void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	if (kaneko16_bg15_bitmap)
 	{
@@ -937,7 +937,7 @@ void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-void kaneko16_fill_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_fill_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	if(kaneko16_sprite_type == 1)
 		fillbitmap(bitmap,machine->pens[0x7f00],cliprect);
@@ -948,7 +948,7 @@ void kaneko16_fill_bitmap(running_machine *machine, mame_bitmap *bitmap, const r
 		fillbitmap(bitmap,machine->pens[0],cliprect);
 }
 
-void kaneko16_video_update_common(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_video_update_common(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
 

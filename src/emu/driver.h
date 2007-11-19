@@ -109,12 +109,12 @@
 */
 
 /* The default is to have no VBLANK timing -- this is historical, and a bad idea */
-#define DEFAULT_60HZ_VBLANK_DURATION		USEC_TO_SUBSECONDS(0)
-#define DEFAULT_30HZ_VBLANK_DURATION		USEC_TO_SUBSECONDS(0)
+#define DEFAULT_60HZ_VBLANK_DURATION		ATTOSECONDS_IN_USEC(0)
+#define DEFAULT_30HZ_VBLANK_DURATION		ATTOSECONDS_IN_USEC(0)
 
 /* If you use IPT_VBLANK, you need a duration different from 0 */
-#define DEFAULT_REAL_60HZ_VBLANK_DURATION	USEC_TO_SUBSECONDS(2500)
-#define DEFAULT_REAL_30HZ_VBLANK_DURATION	USEC_TO_SUBSECONDS(2500)
+#define DEFAULT_REAL_60HZ_VBLANK_DURATION	ATTOSECONDS_IN_USEC(2500)
+#define DEFAULT_REAL_30HZ_VBLANK_DURATION	ATTOSECONDS_IN_USEC(2500)
 
 
 
@@ -184,7 +184,7 @@ struct _machine_config
 	cpu_config			cpu[MAX_CPU];				/* array of CPUs in the system */
 	UINT32				cpu_slices_per_frame;		/* number of times to interleave execution per frame */
 	INT32				watchdog_vblank_count;		/* number of VBLANKs until the watchdog kills us */
-	mame_time			watchdog_time;				/* length of time until the watchdog kills us */
+	attotime			watchdog_time;				/* length of time until the watchdog kills us */
 
 	void 				(*machine_start)(running_machine *machine);		/* one-time machine start callback */
 	void 				(*machine_reset)(running_machine *machine);		/* machine reset callback */
@@ -328,7 +328,7 @@ struct _game_driver
 	if (cpu)															\
 	{																	\
 		cpu->timed_interrupt = func;									\
-		cpu->timed_interrupt_period = HZ_TO_SUBSECONDS(rate);			\
+		cpu->timed_interrupt_period = HZ_TO_ATTOSECONDS(rate);			\
 	}																	\
 
 
@@ -408,7 +408,7 @@ struct _game_driver
 	screen->defstate.format = (_format);								\
 
 #define MDRV_SCREEN_RAW_PARAMS(pixclock, htotal, hbend, hbstart, vtotal, vbend, vbstart) \
-	screen->defstate.refresh = HZ_TO_SUBSECONDS(pixclock) * (htotal) * (vtotal); \
+	screen->defstate.refresh = HZ_TO_ATTOSECONDS(pixclock) * (htotal) * (vtotal); \
 	screen->defstate.vblank = (screen->defstate.refresh / (vtotal)) * ((vtotal) - ((vbstart) - (vbend))); \
 	screen->defstate.width = (htotal);									\
 	screen->defstate.height = (vtotal);									\
@@ -418,10 +418,10 @@ struct _game_driver
 	screen->defstate.visarea.max_y = (vbstart) - 1;						\
 
 #define MDRV_SCREEN_REFRESH_RATE(rate)									\
-	screen->defstate.refresh = HZ_TO_SUBSECONDS(rate);					\
+	screen->defstate.refresh = HZ_TO_ATTOSECONDS(rate);					\
 
 #define MDRV_SCREEN_VBLANK_TIME(time)									\
-	screen->defstate.vblank = time;				\
+	screen->defstate.vblank = time;										\
 	screen->defstate.oldstyle_vblank_supplied = 1;						\
 
 #define MDRV_SCREEN_SIZE(_width, _height)								\

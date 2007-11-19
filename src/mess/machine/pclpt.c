@@ -10,7 +10,7 @@
 #include "memconv.h"
 
 #define LOG(LEVEL,N,M,A)  \
-if( M )logerror("%11.6f: %-24s",mame_time_to_double(mame_timer_get_time()),(char*)M ); logerror A;
+if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A;
 
 
 #define VERBOSE_LPT 1

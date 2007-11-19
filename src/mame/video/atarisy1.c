@@ -53,12 +53,12 @@ UINT16 *atarisy1_bankselect;
 static UINT16 playfield_lookup[256];
 static UINT8 playfield_tile_bank;
 static UINT16 playfield_priority_pens;
-static mame_timer *yscroll_reset_timer;
+static emu_timer *yscroll_reset_timer;
 
 /* INT3 tracking */
 static int next_timer_scanline;
-static mame_timer *scanline_timer;
-static mame_timer *int3off_timer;
+static emu_timer *scanline_timer;
+static emu_timer *int3off_timer;
 
 /* graphics bank tracking */
 static UINT8 bank_gfx[3][8];
@@ -201,9 +201,9 @@ VIDEO_START( atarisy1 )
 	/* reset the statics */
 	atarimo_set_yscroll(0, 256);
 	next_timer_scanline = -1;
-	scanline_timer = mame_timer_alloc(int3_callback);
-	int3off_timer = mame_timer_alloc(int3off_callback);
-	yscroll_reset_timer = mame_timer_alloc(reset_yscroll_callback);
+	scanline_timer = timer_alloc(int3_callback);
+	int3off_timer = timer_alloc(int3off_callback);
+	yscroll_reset_timer = timer_alloc(reset_yscroll_callback);
 }
 
 
@@ -329,7 +329,7 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 
 	/* but since we've adjusted it, we must reset it to the normal value
        once we hit scanline 0 again */
-	mame_timer_adjust(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll, time_zero);
+	timer_adjust(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll, attotime_zero);
 
 	/* update the data */
 	*atarigen_yscroll = newscroll;
@@ -397,7 +397,7 @@ static TIMER_CALLBACK( int3_callback )
 	atarigen_scanline_int_gen();
 
 	/* set a timer to turn it off */
-	mame_timer_adjust(int3off_timer, video_screen_get_scan_period(0), 0, time_zero);
+	timer_adjust(int3off_timer, video_screen_get_scan_period(0), 0, attotime_zero);
 
 	/* determine the time of the next one */
 	next_timer_scanline = -1;
@@ -476,9 +476,9 @@ static void update_timers(int scanline)
 
 		/* set a new one */
 		if (best != -1)
-			mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, best, 0), best, time_zero);
+			timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, best, 0), best, attotime_zero);
 		else
-			mame_timer_adjust(scanline_timer, time_never, 0, time_zero);
+			timer_adjust(scanline_timer, attotime_never, 0, attotime_zero);
 	}
 }
 

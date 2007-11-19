@@ -42,13 +42,13 @@ struct ds2401_chip
 	int rx;
 	int tx;
 	UINT8 *data;
-	mame_timer *timer;
-	mame_timer *reset_timer;
-	mame_time t_samp;
-	mame_time t_rdv;
-	mame_time t_rstl;
-	mame_time t_pdh;
-	mame_time t_pdl;
+	emu_timer *timer;
+	emu_timer *reset_timer;
+	attotime t_samp;
+	attotime t_rdv;
+	attotime t_rstl;
+	attotime t_pdh;
+	attotime t_pdl;
 };
 
 #define SIZE_DATA ( 8 )
@@ -72,7 +72,7 @@ static TIMER_CALLBACK( ds2401_reset )
 	verboselog( 1, "ds2401_reset(%d)\n", which );
 
 	c->state = STATE_RESET;
-	mame_timer_adjust( c->timer, time_never, which, time_never );
+	timer_adjust( c->timer, attotime_never, which, attotime_never );
 }
 
 static TIMER_CALLBACK( ds2401_tick )
@@ -86,7 +86,7 @@ static TIMER_CALLBACK( ds2401_tick )
 		verboselog( 2, "ds2401_tick(%d) state_reset1 %d\n", which, c->rx );
 		c->tx = 0;
 		c->state = STATE_RESET2;
-		mame_timer_adjust( c->timer, c->t_pdl, which, time_never );
+		timer_adjust( c->timer, c->t_pdl, which, attotime_never );
 		break;
 	case STATE_RESET2:
 		verboselog( 2, "ds2401_tick(%d) state_reset2 %d\n", which, c->rx );
@@ -154,11 +154,11 @@ void ds2401_init( int which, UINT8 *data )
 	c->rx = 1;
 	c->tx = 1;
 	c->data = data;
-	c->t_samp = MAME_TIME_IN_USEC( 15 );
-	c->t_rdv = MAME_TIME_IN_USEC( 15 );
-	c->t_rstl = MAME_TIME_IN_USEC( 480 );
-	c->t_pdh = MAME_TIME_IN_USEC( 15 );
-	c->t_pdl = MAME_TIME_IN_USEC( 60 );
+	c->t_samp = ATTOTIME_IN_USEC( 15 );
+	c->t_rdv = ATTOTIME_IN_USEC( 15 );
+	c->t_rstl = ATTOTIME_IN_USEC( 480 );
+	c->t_pdh = ATTOTIME_IN_USEC( 15 );
+	c->t_pdl = ATTOTIME_IN_USEC( 60 );
 
 	state_save_register_item( "ds2401", which, c->state );
 	state_save_register_item( "ds2401", which, c->bit );
@@ -168,8 +168,8 @@ void ds2401_init( int which, UINT8 *data )
 	state_save_register_item( "ds2401", which, c->tx );
 	state_save_register_item_pointer( "ds2401", which, data, SIZE_DATA );
 
-	c->timer = mame_timer_alloc( ds2401_tick );
-	c->reset_timer = mame_timer_alloc( ds2401_reset );
+	c->timer = timer_alloc( ds2401_tick );
+	c->reset_timer = timer_alloc( ds2401_reset );
 }
 
 void ds2401_write( int which, int data )
@@ -186,7 +186,7 @@ void ds2401_write( int which, int data )
 			break;
 		case STATE_COMMAND:
 			verboselog( 2, "ds2401_write(%d) state_command\n", which );
-			mame_timer_adjust( c->timer, c->t_samp, which, time_never );
+			timer_adjust( c->timer, c->t_samp, which, attotime_never );
 			break;
 		case STATE_READROM:
 			if( c->bit == 0 )
@@ -203,13 +203,13 @@ void ds2401_write( int which, int data )
 				c->byte++;
 			}
 			verboselog( 2, "ds2401_write(%d) state_readrom %d\n", which, c->tx );
-			mame_timer_adjust( c->timer, c->t_rdv, which, time_never );
+			timer_adjust( c->timer, c->t_rdv, which, attotime_never );
 			break;
 		default:
 			verboselog( 0, "ds2401_write(%d) state not handled: %d\n", which, c->state );
 			break;
 		}
-		mame_timer_adjust( c->reset_timer, c->t_rstl, which, time_never );
+		timer_adjust( c->reset_timer, c->t_rstl, which, attotime_never );
 	}
 	else if( data == 1 && c->rx == 0 )
 	{
@@ -217,10 +217,10 @@ void ds2401_write( int which, int data )
 		{
 		case STATE_RESET:
 			c->state = STATE_RESET1;
-			mame_timer_adjust( c->timer, c->t_pdh, which, time_never );
+			timer_adjust( c->timer, c->t_pdh, which, attotime_never );
 			break;
 		}
-		mame_timer_adjust( c->reset_timer, time_never, which, time_never );
+		timer_adjust( c->reset_timer, attotime_never, which, attotime_never );
 	}
 	c->rx = data;
 }

@@ -180,8 +180,8 @@ static WRITE16_HANDLER( pntnpuzl_eeprom_w )
 
 
 
-UINT16* pntnpuzl_3a0000ram;
-UINT16* pntnpuzl_bank;
+static UINT16* pntnpuzl_3a0000ram;
+static UINT16* pntnpuzl_bank;
 /* vid */
 static VIDEO_START( pntnpuzl )
 {
@@ -409,7 +409,7 @@ static ADDRESS_MAP_START( pntnpuzl_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INTERRUPT_GEN( pntnpuzl_irq )
+static INTERRUPT_GEN( pntnpuzl_irq )
 {
 	if (readinputport(0) & 0x02)	/* coin */
 		cpunum_set_input_line(0, 1, PULSE_LINE);

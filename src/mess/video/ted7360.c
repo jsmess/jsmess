@@ -378,15 +378,15 @@ Video part
 #define TIMER2 (TIMER2HELPER?TIMER2HELPER:0x10000)
 #define TIMER3 (TIMER3HELPER?TIMER3HELPER:0x10000)
 
-static mame_time TEDTIME_IN_CYCLES(int cycles)
+static attotime TEDTIME_IN_CYCLES(int cycles)
 {
 	double d = (double)(cycles)/TED7360_CLOCK;
-	return double_to_mame_time(d);
+	return double_to_attotime(d);
 }
 
-static int TEDTIME_TO_CYCLES(mame_time t)
+static int TEDTIME_TO_CYCLES(attotime t)
 {
-	double d = mame_time_to_double(t);
+	double d = attotime_to_double(t);
 	return (int)((d)*TED7360_CLOCK);
 }
 
@@ -493,7 +493,7 @@ int ted7360_rom;
 
 static int lines;
 static int timer1_active, timer2_active, timer3_active;
-static mame_timer *timer1, *timer2, *timer3;
+static emu_timer *timer1, *timer2, *timer3;
 static int cursor1 = FALSE;
 static read8_handler vic_dma_read;
 static read8_handler vic_dma_read_rom;
@@ -534,9 +534,9 @@ void ted7360_init (int pal)
 	lines = TED7360_LINES;
 	chargenaddr = bitmapaddr = videoaddr = 0;
 	timer1_active = timer2_active = timer3_active = 0;
-	timer1 = mame_timer_alloc(ted7360_timer_timeout);
-	timer2 = mame_timer_alloc(ted7360_timer_timeout);
-	timer3 = mame_timer_alloc(ted7360_timer_timeout);
+	timer1 = timer_alloc(ted7360_timer_timeout);
+	timer2 = timer_alloc(ted7360_timer_timeout);
+	timer3 = timer_alloc(ted7360_timer_timeout);
 }
 
 void ted7360_set_dma (read8_handler dma_read,
@@ -576,7 +576,7 @@ static void ted7360_clear_interrupt (int mask)
 
 static int ted7360_rastercolumn (void)
 {
-	return (int) ((mame_time_to_double(mame_timer_get_time ()) - rastertime)
+	return (int) ((attotime_to_double(timer_get_time ()) - rastertime)
 				  * TED7360_VRETRACERATE * lines * 57 * 8 + 0.5);
 }
 
@@ -588,17 +588,17 @@ static TIMER_CALLBACK(ted7360_timer_timeout)
 	{
 	case 1:
 	    // prooved by digisound of several intros like eoroidpro
-		mame_timer_adjust(timer1, TEDTIME_IN_CYCLES (TIMER1), 1, time_zero);
+		timer_adjust(timer1, TEDTIME_IN_CYCLES (TIMER1), 1, attotime_zero);
 		timer1_active = 1;
 		ted7360_set_interrupt (8);
 		break;
 	case 2:
-		mame_timer_adjust(timer2, TEDTIME_IN_CYCLES (0x10000), 2, time_zero);
+		timer_adjust(timer2, TEDTIME_IN_CYCLES (0x10000), 2, attotime_zero);
 		timer2_active = 1;
 		ted7360_set_interrupt (0x10);
 		break;
 	case 3:
-		mame_timer_adjust(timer3, TEDTIME_IN_CYCLES (0x10000), 3, time_zero);
+		timer_adjust(timer3, TEDTIME_IN_CYCLES (0x10000), 3, attotime_zero);
 		timer3_active = 1;
 		ted7360_set_interrupt (0x40);
 		break;
@@ -644,42 +644,42 @@ WRITE8_HANDLER ( ted7360_port_w )
 		ted7360[offset] = data;
 		if (timer1_active)
 		{
-			ted7360[1] = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer1)) >> 8;
-			mame_timer_reset(timer1, time_never);
+			ted7360[1] = TEDTIME_TO_CYCLES (timer_timeleft (timer1)) >> 8;
+			timer_reset(timer1, attotime_never);
 			timer1_active = 0;
 		}
 		break;
 	case 1:						   /* start timer 1 */
 		ted7360[offset] = data;
-		mame_timer_adjust(timer1, TEDTIME_IN_CYCLES (TIMER1), 1, time_zero);
+		timer_adjust(timer1, TEDTIME_IN_CYCLES (TIMER1), 1, attotime_zero);
 		timer1_active = 1;
 		break;
 	case 2:						   /* stop timer 2 */
 		ted7360[offset] = data;
 		if (timer2_active)
 		{
-			ted7360[3] = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer2)) >> 8;
-			mame_timer_reset(timer2, time_never);
+			ted7360[3] = TEDTIME_TO_CYCLES (timer_timeleft (timer2)) >> 8;
+			timer_reset(timer2, attotime_never);
 			timer2_active = 0;
 		}
 		break;
 	case 3:						   /* start timer 2 */
 		ted7360[offset] = data;
-		mame_timer_adjust(timer2, TEDTIME_IN_CYCLES (TIMER2), 2, time_zero);
+		timer_adjust(timer2, TEDTIME_IN_CYCLES (TIMER2), 2, attotime_zero);
 		timer2_active = 1;
 		break;
 	case 4:						   /* stop timer 3 */
 		ted7360[offset] = data;
 		if (timer3_active)
 		{
-			ted7360[5] = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer3)) >> 8;
-			mame_timer_reset(timer3, time_never);
+			ted7360[5] = TEDTIME_TO_CYCLES (timer_timeleft (timer3)) >> 8;
+			timer_reset(timer3, attotime_never);
 			timer3_active = 0;
 		}
 		break;
 	case 5:						   /* start timer 3 */
 		ted7360[offset] = data;
-		mame_timer_adjust(timer3, TEDTIME_IN_CYCLES (TIMER3), 3, time_zero);
+		timer_adjust(timer3, TEDTIME_IN_CYCLES (TIMER3), 3, attotime_zero);
 		timer3_active = 1;
 		break;
 	case 6:
@@ -858,37 +858,37 @@ WRITE8_HANDLER ( ted7360_port_w )
 	{
 	case 0:
 		if (timer1)
-			val = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer1)) & 0xff;
+			val = TEDTIME_TO_CYCLES (timer_timeleft (timer1)) & 0xff;
 		else
 			val = ted7360[offset];
 		break;
 	case 1:
 		if (timer1)
-			val = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer1)) >> 8;
+			val = TEDTIME_TO_CYCLES (timer_timeleft (timer1)) >> 8;
 		else
 			val = ted7360[offset];
 		break;
 	case 2:
 		if (timer2)
-			val = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer2)) & 0xff;
+			val = TEDTIME_TO_CYCLES (timer_timeleft (timer2)) & 0xff;
 		else
 			val = ted7360[offset];
 		break;
 	case 3:
 		if (timer2)
-			val = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer2)) >> 8;
+			val = TEDTIME_TO_CYCLES (timer_timeleft (timer2)) >> 8;
 		else
 			val = ted7360[offset];
 		break;
 	case 4:
 		if (timer3)
-			val = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer3)) & 0xff;
+			val = TEDTIME_TO_CYCLES (timer_timeleft (timer3)) & 0xff;
 		else
 			val = ted7360[offset];
 		break;
 	case 5:
 		if (timer3)
-			val = TEDTIME_TO_CYCLES (mame_timer_timeleft (timer3)) >> 8;
+			val = TEDTIME_TO_CYCLES (timer_timeleft (timer3)) >> 8;
 		else
 			val = ted7360[offset];
 		break;
@@ -1210,7 +1210,7 @@ static void ted7360_drawlines (int first, int last)
 INTERRUPT_GEN( ted7360_raster_interrupt )
 {
 	rasterline++;
-	rastertime = mame_time_to_double(mame_timer_get_time ());
+	rastertime = attotime_to_double(timer_get_time ());
 	if (rasterline >= lines)
 	{
 		rasterline = 0;

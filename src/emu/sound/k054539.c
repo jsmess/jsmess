@@ -473,7 +473,7 @@ static void K054539_init_chip(struct k054539_info *info, int clock, int sndindex
 		// One or more of the registers must be the timer period
 		// And anyway, this particular frequency is probably wrong
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
-		mame_timer_pulse_ptr(MAME_TIME_IN_HZ(480), info, K054539_irq);
+		timer_pulse_ptr(ATTOTIME_IN_HZ(480), info, K054539_irq);
 
 	info->stream = stream_create(0, 2, clock, info, K054539_update);
 

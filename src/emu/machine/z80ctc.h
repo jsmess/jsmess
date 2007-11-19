@@ -42,7 +42,7 @@ typedef struct
 
 void z80ctc_init(int which, z80ctc_interface *intf);
 void z80ctc_reset(int which);
-mame_time z80ctc_getperiod (int which, int ch);
+attotime z80ctc_getperiod (int which, int ch);
 
 
 

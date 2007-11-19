@@ -3,7 +3,7 @@
 #include "driver.h"
 
 extern UINT16 *kickgoal_fgram, *kickgoal_bgram, *kickgoal_bg2ram, *kickgoal_scrram;
-tilemap *kickgoal_fgtm, *kickgoal_bgtm, *kickgoal_bg2tm;
+static tilemap *kickgoal_fgtm, *kickgoal_bgtm, *kickgoal_bg2tm;
 
 /* FG */
 static TILE_GET_INFO( get_kickgoal_fg_tile_info )

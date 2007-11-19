@@ -152,7 +152,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 #include "sound/262intf.h"
 #include "sound/ymf278b.h"
 
-static mame_timer *raster_interrupt_timer;
+static emu_timer *raster_interrupt_timer;
 static UINT8 fuuki32_shared_ram[16];
 
 // Described in src/video/fuuki32.c
@@ -249,7 +249,7 @@ static WRITE32_HANDLER( fuuki32_vregs_w )
 		COMBINE_DATA(&fuuki32_vregs[offset]);
 		if (offset == 0x1c/4)
 		{
-			mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, fuuki32_vregs[0x1c/4]>>16, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(0));
+			timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, fuuki32_vregs[0x1c/4]>>16, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(0));
 		}
 	}
 }
@@ -539,14 +539,14 @@ GFXDECODE_END
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	cpunum_set_input_line(0, 1, PULSE_LINE);
-	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpunum_set_input_line(0, 3, PULSE_LINE);	// VBlank IRQ
-	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
 }
 
 
@@ -554,21 +554,21 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	cpunum_set_input_line(0, 5, PULSE_LINE);	// Raster Line IRQ
 	video_screen_update_partial(0, video_screen_get_vpos(0));
-	mame_timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, time_zero);
+	timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, attotime_zero);
 }
 
 
 static MACHINE_START( fuuki32 )
 {
-	raster_interrupt_timer = mame_timer_alloc(raster_interrupt_callback);
+	raster_interrupt_timer = timer_alloc(raster_interrupt_callback);
 }
 
 
 static MACHINE_RESET( fuuki32 )
 {
-	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
-	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
-	mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, machine->screen[0].visarea.max_x + 1), 0, time_zero);
+	timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, machine->screen[0].visarea.max_x + 1), 0, attotime_zero);
 }
 
 

@@ -237,7 +237,7 @@ Notes:
 
 static UINT32 *deco32_ram;
 static int raster_enable;
-static mame_timer *raster_irq_timer;
+static emu_timer *raster_irq_timer;
 static UINT8 nslasher_sound_irq;
 
 extern void decrypt156(void);
@@ -304,9 +304,9 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		scanline=(data&0xff);
 		if (raster_enable && scanline>0 && scanline<240)
-			mame_timer_adjust(raster_irq_timer,video_screen_get_time_until_pos(0, scanline-1, 320),0,time_never);
+			timer_adjust(raster_irq_timer,video_screen_get_time_until_pos(0, scanline-1, 320),0,attotime_never);
 		else
-			mame_timer_adjust(raster_irq_timer,time_never,0,time_zero);
+			timer_adjust(raster_irq_timer,attotime_never,0,attotime_zero);
 		break;
 	case 2: /* VBL irq ack */
 		break;
@@ -1859,7 +1859,7 @@ static NVRAM_HANDLER(tattass)
 
 static MACHINE_RESET( deco32 )
 {
-	raster_irq_timer = mame_timer_alloc(interrupt_gen);
+	raster_irq_timer = timer_alloc(interrupt_gen);
 }
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )

@@ -318,7 +318,7 @@ static void vblank_callback(void)
 	if (sndti_exists(SOUND_BEEP, 0))
 	{
 		beep_set_state(0, 1);
-		beep_set_frequency(0, SUBSECONDS_TO_HZ(z80ctc_getperiod(0, 0).subseconds));
+		beep_set_frequency(0, ATTOSECONDS_TO_HZ(z80ctc_getperiod(0, 0).attoseconds));
 	}
 }
 
@@ -844,7 +844,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_CPU_IO_MAP(dleuro_io_map,0)
 	MDRV_CPU_VBLANK_INT(vblank_callback, 1)
 
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 
 	MDRV_MACHINE_START(dleuro)
 	MDRV_MACHINE_RESET(dlair)

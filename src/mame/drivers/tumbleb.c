@@ -307,7 +307,7 @@ extern WRITE16_HANDLER( chokchok_tilebank_w );
 extern WRITE16_HANDLER( wlstar_tilebank_w );
 
 extern UINT16 *tumblepb_pf1_data,*tumblepb_pf2_data;
-UINT16* tumblepb_mainram;
+static UINT16* tumblepb_mainram;
 UINT16* jumppop_control;
 UINT16* suprtrio_control;
 
@@ -439,11 +439,11 @@ command 1 - stop?
 
 
 
-int tumblep_music_command;
-int tumblep_music_bank;
-int tumbleb2_music_is_playing;
+static int tumblep_music_command;
+static int tumblep_music_bank;
+static int tumbleb2_music_is_playing;
 
-void tumbleb2_playmusic(void)
+static void tumbleb2_playmusic(void)
 {
 	int status = OKIM6295_status_0_r(0);
 
@@ -458,7 +458,7 @@ void tumbleb2_playmusic(void)
 }
 
 
-INTERRUPT_GEN( tumbleb2_interrupt )
+static INTERRUPT_GEN( tumbleb2_interrupt )
 {
 	cpunum_set_input_line(0, 6, HOLD_LINE);
 	tumbleb2_playmusic();
@@ -485,13 +485,13 @@ static int tumbleb_sound_lookup[256] = {
 };
 
 /* we use channels 1,2,3 for sound effects, and channel 4 for music */
-void tumbleb2_set_music_bank(int bank)
+static void tumbleb2_set_music_bank(int bank)
 {
 	UINT8 *oki = memory_region(REGION_SOUND1);
 	memcpy(&oki[0x38000], &oki[0x80000+0x38000+0x8000*bank],0x8000);
 }
 
-void tumbleb2_play_sound (int data)
+static void tumbleb2_play_sound (int data)
 {
 	int status = OKIM6295_status_0_r(0);
 
@@ -524,7 +524,7 @@ void tumbleb2_play_sound (int data)
 // bank 7 = how to play?
 // bank 8 = boss???
 
-void process_tumbleb2_music_command(int data)
+static void process_tumbleb2_music_command(int data)
 {
 	int status = OKIM6295_status_0_r(0);
 
@@ -852,8 +852,8 @@ static WRITE16_HANDLER( semicom_soundcmd_w )
 	{
 		soundlatch_w(0,data & 0xff);
 		// needed for Super Trio which reads the sound with polling
-//      cpu_spinuntil_time(MAME_TIME_IN_USEC(100));
-		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(20));
+//      cpu_spinuntil_time(ATTOTIME_IN_USEC(100));
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(20));
 
 	}
 }
@@ -2034,7 +2034,7 @@ static MACHINE_DRIVER_START( tumblepb )
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -2064,7 +2064,7 @@ static MACHINE_DRIVER_START( tumbleb2 )
 	MDRV_CPU_VBLANK_INT(tumbleb2_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -2097,7 +2097,7 @@ static MACHINE_DRIVER_START( jumpkids )
 	MDRV_CPU_PROGRAM_MAP(jumpkids_sound_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -2125,7 +2125,7 @@ static MACHINE_DRIVER_START( fncywld )
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -2188,7 +2188,7 @@ static MACHINE_DRIVER_START( htchctch )
 	MDRV_CPU_PROGRAM_MAP(semicom_sound_readmem,semicom_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2400)) // ?? cookbib needs it above ~2400 or the Joystick on the How to Play screen is the wrong colour?!
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) // ?? cookbib needs it above ~2400 or the Joystick on the How to Play screen is the wrong colour?!
 
 	MDRV_MACHINE_RESET ( htchctch )
 
@@ -2217,12 +2217,12 @@ static MACHINE_DRIVER_START( htchctch )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( cookbib )
+static MACHINE_DRIVER_START( cookbib )
 	MDRV_IMPORT_FROM(htchctch)
 	MDRV_VIDEO_UPDATE( semicom_altoffsets )
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( bcstory )
+static MACHINE_DRIVER_START( bcstory )
 	MDRV_IMPORT_FROM(htchctch)
 	MDRV_VIDEO_UPDATE( bcstory )
 
@@ -2232,19 +2232,19 @@ MACHINE_DRIVER_START( bcstory )
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( semibase )
+static MACHINE_DRIVER_START( semibase )
 	MDRV_IMPORT_FROM(bcstory)
 	MDRV_VIDEO_UPDATE(semibase )
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( sdfight )
+static MACHINE_DRIVER_START( sdfight )
 	MDRV_IMPORT_FROM(bcstory)
 	MDRV_VIDEO_START(sdfight)
 	MDRV_VIDEO_UPDATE(sdfight)
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( metlsavr )
+static MACHINE_DRIVER_START( metlsavr )
 	MDRV_IMPORT_FROM(cookbib)
 
 	MDRV_SOUND_REPLACE("ym2151", YM2151, 3427190)
@@ -2266,7 +2266,7 @@ static MACHINE_DRIVER_START( jumppop )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1953)	/* measured */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -2303,7 +2303,7 @@ static MACHINE_DRIVER_START( suprtrio )
 	MDRV_CPU_PROGRAM_MAP(semicom_sound_readmem,semicom_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -2333,7 +2333,7 @@ static MACHINE_DRIVER_START( pangpang )
 	MDRV_CPU_VBLANK_INT(tumbleb2_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -3279,6 +3279,7 @@ ROM_END
 
 /******************************************************************************/
 
+#if TUMBLEP_HACK
 void tumblepb_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
@@ -3286,6 +3287,7 @@ void tumblepb_patch_code(UINT16 offset)
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }
+#endif
 
 
 static void tumblepb_gfx1_rearrange(void)

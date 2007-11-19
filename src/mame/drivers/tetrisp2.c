@@ -38,14 +38,14 @@ Notes:
 #include "rocknms.lh"
 
 UINT16 tetrisp2_systemregs[0x10];
-UINT16 rocknms_sub_systemregs[0x10];
+static UINT16 rocknms_sub_systemregs[0x10];
 
-UINT16 rockn_protectdata;
-UINT16 rockn_adpcmbank;
-UINT16 rockn_soundvolume;
+static UINT16 rockn_protectdata;
+static UINT16 rockn_adpcmbank;
+static UINT16 rockn_soundvolume;
 
-static mame_timer *rockn_timer_l4;
-static mame_timer *rockn_timer_sub_l4;
+static emu_timer *rockn_timer_l4;
+static emu_timer *rockn_timer_sub_l4;
 
 /* Variables defined in video: */
 
@@ -102,7 +102,7 @@ static WRITE16_HANDLER( tetrisp2_systemregs_w )
 	}
 }
 
-#define ROCKN_TIMER_BASE MAME_TIME_IN_NSEC(500000)
+#define ROCKN_TIMER_BASE ATTOTIME_IN_NSEC(500000)
 
 static WRITE16_HANDLER( rockn_systemregs_w )
 {
@@ -111,8 +111,8 @@ static WRITE16_HANDLER( rockn_systemregs_w )
 		tetrisp2_systemregs[offset] = data;
 		if (offset == 0x0c)
 		{
-			mame_time timer = scale_up_mame_time(ROCKN_TIMER_BASE, 4096 - data);
-			mame_timer_adjust(rockn_timer_l4, timer, 0, timer);
+			attotime timer = attotime_mul(ROCKN_TIMER_BASE, 4096 - data);
+			timer_adjust(rockn_timer_l4, timer, 0, timer);
 		}
 	}
 }
@@ -125,8 +125,8 @@ static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 		rocknms_sub_systemregs[offset] = data;
 		if (offset == 0x0c)
 		{
-			mame_time timer = scale_up_mame_time(ROCKN_TIMER_BASE, 4096 - data);
-			mame_timer_adjust(rockn_timer_sub_l4, timer, 0, timer);
+			attotime timer = attotime_mul(ROCKN_TIMER_BASE, 4096 - data);
+			timer_adjust(rockn_timer_sub_l4, timer, 0, timer);
 		}
 	}
 }
@@ -1024,8 +1024,8 @@ static TIMER_CALLBACK( rockn_timer_sub_level1_callback )
 
 static void init_rockn_timer(running_machine *machine)
 {
-	mame_timer_pulse(MAME_TIME_IN_MSEC(32), 0, rockn_timer_level1_callback);
-	rockn_timer_l4 = mame_timer_alloc(rockn_timer_level4_callback);
+	timer_pulse(ATTOTIME_IN_MSEC(32), 0, rockn_timer_level1_callback);
+	rockn_timer_l4 = timer_alloc(rockn_timer_level4_callback);
 
 	state_save_register_global_array(tetrisp2_systemregs);
 	state_save_register_global_array(rocknms_sub_systemregs);
@@ -1056,8 +1056,8 @@ static DRIVER_INIT( rocknms )
 {
 	init_rockn_timer(machine);
 
-	mame_timer_pulse(MAME_TIME_IN_MSEC(32), 0, rockn_timer_sub_level1_callback);
-	rockn_timer_sub_l4 = mame_timer_alloc(rockn_timer_sub_level4_callback);
+	timer_pulse(ATTOTIME_IN_MSEC(32), 0, rockn_timer_sub_level1_callback);
+	rockn_timer_sub_l4 = timer_alloc(rockn_timer_sub_level4_callback);
 
 	rockn_protectdata = 3;
 

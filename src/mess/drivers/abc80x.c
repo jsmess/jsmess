@@ -84,7 +84,7 @@
 #include "machine/abcbus.h"
 #include "video/abc80x.h"
 
-static mame_timer *abc800_ctc_timer;
+static emu_timer *abc800_ctc_timer;
 
 /* Read/Write Handlers */
 
@@ -651,8 +651,8 @@ static MACHINE_START( abc800 )
 	state_save_register_global(abc77_keylatch);
 	state_save_register_global(abc77_clock);
 
-	abc800_ctc_timer = mame_timer_alloc(abc800_ctc_tick);
-	mame_timer_adjust(abc800_ctc_timer, time_zero, 0, MAME_TIME_IN_HZ(ABC800_X01/2/2/2));
+	abc800_ctc_timer = timer_alloc(abc800_ctc_tick);
+	timer_adjust(abc800_ctc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC800_X01/2/2/2));
 
 	z80ctc_init(0, &abc800_ctc_intf);
 	z80sio_init(0, &abc800_sio_intf);

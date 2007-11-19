@@ -5,7 +5,7 @@
     driver by Phil Bennett
 
     Games supported:
-        * Cluedo (2 sets)
+        * Cluedo (3 sets)
         * Hangman
         * Scrabble
         * Trivial Pursuit
@@ -15,8 +15,8 @@
         * Snakes and Ladders
 
     Known issues:
-        * I/O documentation for lamps, reels, meters etc is incomplete.
-        * DUART emulation is very simplistic.
+        * I/O documentation for lamps, reels, meters etc is possibly incorrect.
+        * DUART emulation is very simplistic, in progress.
         * Digital volume control is not emulated.
 
 ****************************************************************************
@@ -33,7 +33,8 @@
     400000-403FFF   R/W   xxxxxxxx xxxxxxxx   Program RAM (battery-backed)
     480000-48001F   R/W   -------- xxxxxxxx   MC68681 DUART 1
     480020-480033   R     -------- xxxxxxxx   Inputs
-    480060-480067   R/W   -------- xxxxxxxx   D71055C?
+    480041          R     -xxxxxxx xxxxxxxx   Reel optos
+    480060-480067   R/W   -------- xxxxxxxx   D71055C? PPI?
     480080-480081     W   -------- xxxxxxxx   uPD7559 communications
     480082-480083     W   -------- xxxxxxxx   Sound control
                           -------- -------x      (uPD7759 reset)
@@ -76,7 +77,7 @@
 #include "cpu/tms34010/34010ops.h"
 #include "sound/upd7759.h"
 #include "jpmimpct.h"
-
+#include "machine/meters.h"
 
 /*************************************
  *
@@ -88,8 +89,10 @@ static UINT8 tms_irq;
 static UINT8 duart_1_irq;
 static UINT8 touch_cnt;
 static UINT8 touch_data[3];
-static mame_timer *duart_1_timer;
+static emu_timer *duart_1_timer;
 
+static int lamp_strobe;
+static UINT8 Lamps[256];
 static TIMER_CALLBACK( duart_1_timer_event );
 
 
@@ -133,6 +136,8 @@ static struct
 
 	UINT8 IVR;
 	UINT8 IP;
+	UINT8 OP;
+	UINT8 OPR;
 	UINT8 OPCR;
 } duart_1;//, duart_2;
 
@@ -169,12 +174,13 @@ static MACHINE_RESET( jpmimpct )
 {
 	memset(&duart_1, 0, sizeof(duart_1));
 
-	duart_1_timer = mame_timer_alloc(duart_1_timer_event);
+	duart_1_timer = timer_alloc(duart_1_timer_event);
 
 	/* Reset states */
 	duart_1_irq = tms_irq = 0;
 	touch_cnt = 0;
 
+//  duart_1.IVR=0x0f;
 	state_save_register_global(tms_irq);
 	state_save_register_global(duart_1_irq);
 	state_save_register_global(touch_cnt);
@@ -236,6 +242,7 @@ static TIMER_CALLBACK( duart_1_timer_event )
 {
 	duart_1.tc = 0;
 	duart_1.ISR |= 0x08;
+
 	duart_1_irq = 1;
 	update_irqs();
 }
@@ -243,13 +250,30 @@ static TIMER_CALLBACK( duart_1_timer_event )
 static READ16_HANDLER( duart_1_r )
 {
 	UINT16 val = 0xffff;
-
 	switch (offset)
 	{
 		case 0x1:
 		{
 			/* RxDA ready */
 			val = 0x04;
+			break;
+		}
+		case 0x2:
+		{
+			val = 0x00;
+			break;
+		}
+		case 0x3:
+		{
+			val = duart_1.RBA;
+			duart_1.ISR &= ~0x02;
+			duart_1.SRA &= ~0x03;
+			break;
+		}
+		case 0x4:
+		{
+			val = duart_1.IPCR;
+			duart_1.ISR &= ~0x80;
 			break;
 		}
 		case 0x5:
@@ -270,8 +294,8 @@ static READ16_HANDLER( duart_1_r )
 		}
 		case 0xe:
 		{
-			mame_time rate = scale_up_mame_time(MAME_TIME_IN_HZ(MC68681_1_CLOCK), 16 * duart_1.CT);
-			mame_timer_adjust(duart_1_timer, rate, 0, rate);
+			attotime rate = attotime_mul(ATTOTIME_IN_HZ(MC68681_1_CLOCK), 16 * duart_1.CT);
+			timer_adjust(duart_1_timer, rate, 0, rate);
 			break;
 		}
 		case 0xf:
@@ -288,8 +312,14 @@ static READ16_HANDLER( duart_1_r )
 
 static WRITE16_HANDLER( duart_1_w )
 {
+	int old_val;
 	switch (offset)
 	{
+		case 0x1:
+		{
+			duart_1.CSRA = data;
+			break;
+		}
 		case 0x3:
 		{
 			//mame_printf_debug("%c", data);
@@ -326,13 +356,29 @@ static WRITE16_HANDLER( duart_1_w )
 			//mame_printf_debug("%c",data);
 			break;
 		}
+		case 0xc:
+		{
+			duart_1.IVR = data;
+			break;
+		}
+		case 0xd:
+		{
+			duart_1.OPCR = data;
+			break;
+		}
 		case 0xe:
 		{
+		    old_val = duart_1.OPR;
+		    duart_1.OPR = duart_1.OPR | data;
+		    duart_1.OP = ~duart_1.OPR;
 			/* Output port bit set */
 			break;
 		}
 		case 0xf:
 		{
+		    old_val = duart_1.OPR;
+		    duart_1.OPR = duart_1.OPR &~data;
+		    duart_1.OP = ~duart_1.OPR;
 			/* Output port bit reset */
 			break;
 		}
@@ -483,7 +529,6 @@ static READ16_HANDLER( upd7759_r )
 	return 0xffff;
 }
 
-
 /*************************************
  *
  *  Mysterious stuff
@@ -499,6 +544,78 @@ static WRITE16_HANDLER( unk_w )
 {
 }
 
+static void jpm_draw_lamps(int data, int lamp_strobe)
+{
+	int i;
+	for (i=0; i<16; i++)
+	{
+		Lamps[16*(lamp_strobe+i)] = data & 1;
+		output_set_lamp_value((16*lamp_strobe)+i, (Lamps[(16*lamp_strobe)+i]));
+	    data = data >> 1;
+    }
+}
+
+static READ16_HANDLER( jpmio_r )
+{
+	return 0xffff;
+}
+
+static WRITE16_HANDLER( jpmio_w )
+{
+	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	switch (offset)
+	{
+		case 0x02:
+		{
+			//reel 1
+			break;
+		}
+		case 0x04:
+		{
+			//reel 2
+			break;
+		}
+		case 0x06:
+		{
+			if ( data & 0x10 )
+			{   // PAYEN ?
+				if ( data & 0xf )
+				{
+			//      slide = 1;
+				}
+				else
+				{
+				//  slide = 0;
+				}
+			}
+			else
+//          slide = 0;
+			Mechmtr_update(0, cycles, data >> 10);
+			duart_1.IP &= ~0x10;
+			break;
+		}
+
+		case 0x08:
+		{
+			jpm_draw_lamps(data, lamp_strobe);
+			break;
+		}
+
+		case 0x0b:
+		{
+			output_set_digit_value(lamp_strobe,data);
+			break;
+		}
+		case 0x0f:
+		{
+			if (data & 0x10)
+			{
+				lamp_strobe = (data +1) & 0x0f;
+			}
+			break;
+		}
+	}
+}
 
 /*************************************
  *
@@ -512,8 +629,8 @@ static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
 	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1_r)
 	AM_RANGE(0x00480034, 0x00480035) AM_READ(unk_r)
-	AM_RANGE(0x00480060, 0x00480067) AM_READWRITE(unk_r, unk_w)
-	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(unk_r, unk_w)
+	AM_RANGE(0x00480060, 0x00480067) AM_READWRITE(unk_r, unk_w)//PPI
+	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmio_w)
 	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
 	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
 	AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
@@ -689,7 +806,7 @@ static struct upd7759_interface upd7759_interface =
  *
  *************************************/
 
-void jpmimpct_tms_irq(int state)
+static void jpmimpct_tms_irq(int state)
 {
 	tms_irq = state;
 	update_irqs();
@@ -795,6 +912,30 @@ ROM_START( cluedo2c )
 	ROM_LOAD( "1214.bin", 0x000000, 0x80000, CRC(fe43aeae) SHA1(017a471af5766ef41fa46982c02941fb4fc35174) )
 ROM_END
 
+ROM_START( cluedo2 )
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "clu21.bin", 0x000000, 0x080000, CRC(b1aa0103)SHA1(52d10a428710cd04313a2638fc3c23fb9d0ab6db))
+	ROM_LOAD16_BYTE( "clu22.bin", 0x000001, 0x080000, CRC(90d8dd28)SHA1(3124a8313c6b362176283e145c4af27f5deac683))
+	ROM_LOAD16_BYTE( "clu23.bin", 0x100000, 0x080000, CRC(196bd993)SHA1(50920441707fc6cae9d36961d92ce213e53c4238))
+	ROM_LOAD16_BYTE( "clu24.bin", 0x100001, 0x080000, CRC(3f5c1259)SHA1(dfdbb66a81716a0ced7510e277f6f321516f57af))
+
+	ROM_LOAD16_BYTE( "6977.bin", 0xc00000, 0x080000, CRC(6030dfc1) SHA1(8746909b0b7f7eb99cf5388ac85db6addb6deee3) )
+	ROM_LOAD16_BYTE( "6978.bin", 0xc00001, 0x080000, CRC(21e30e06) SHA1(4e97baa9e39663b662dd202bbaf34be0e29930de) )
+	ROM_LOAD16_BYTE( "6979.bin", 0xd00000, 0x080000, CRC(5575162a) SHA1(27f7b5f4ee7d95319b03e2414a25d5b1a6c54fc7) )
+	ROM_LOAD16_BYTE( "6980.bin", 0xd00001, 0x080000, CRC(968224df) SHA1(726c278622681206a7f34bafe1b5bb4421232cc4) )
+	ROM_LOAD16_BYTE( "6981.bin", 0xe00000, 0x080000, CRC(2ad3ee20) SHA1(9370dab84a255864f40254772199211884d8557b) )
+	ROM_LOAD16_BYTE( "6982.bin", 0xe00001, 0x080000, CRC(7478e91b) SHA1(158b473b46aeccf011669cb58dc3a1596370d8f1) )
+	ROM_FILL(                    0xf00000, 0x100000, 0xff )
+
+	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "clugrb1", 0x000000, 0x80000, CRC(176ae2df) SHA1(135fd2640c255e5321b1a6ba35f72fa2ba8f04b8) )
+	ROM_LOAD16_BYTE( "clugrb2", 0x000001, 0x80000, CRC(06ab2f78) SHA1(4325fd9096e73956310e97e244c7fe1ee8d27f5c) )
+	ROM_COPY( REGION_USER1, 0x000000, 0x100000, 0x100000 )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "clue2as1.bin", 0x000000, 0x80000, CRC(16b2bc45) SHA1(56963f5d63b5a091b89b96f4ca9327010006c024) )
+ROM_END
+
 ROM_START( trivialp )
 	ROM_REGION( 0x1000000, REGION_CPU1, 0 )
 	ROM_LOAD16_BYTE( "1422.bin", 0x000000, 0x080000, CRC(5e39c946) SHA1(bae7f572a32e90d716813271f03e7868be603086) )
@@ -882,7 +1023,7 @@ ROM_END
 
 GAME( 1995, cluedo,   0,      jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2D)",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995, cluedo2c, cluedo, jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2C)",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,  cluedo, jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2)",         	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1996, trivialp, 0,      jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursuit (prod. 1D)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1997, scrabble, 0,      jpmimpct, scrabble, 0, ROT0, "JPM", "Scrabble (rev. F)",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1998, hngmnjpm, 0,      jpmimpct, hngmnjpm, 0, ROT0, "JPM", "Hangman (JPM)",              GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-

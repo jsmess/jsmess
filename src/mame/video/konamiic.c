@@ -2991,7 +2991,7 @@ READ8_HANDLER( K053245_r )
 }
 
 
-void K053245_chip_w(int chip,int offset,int data)
+static void K053245_chip_w(int chip,int offset,int data)
 {
 	if(offset & 1)
 		K053245_ram[chip][offset>>1] = (K053245_ram[chip][offset>>1] & 0xff00) | data;
@@ -3021,7 +3021,7 @@ INLINE void K053245_update_buffer( int chip )
 	memcpy(K053245_buffer[chip], K053245_ram[chip], K053245_ramsize[chip]);
 }
 
-UINT8 K053244_chip_r (int chip, int offset)
+static UINT8 K053244_chip_r (int chip, int offset)
 {
 	if ((K053244_regs[chip][5] & 0x10) && offset >= 0x0c && offset < 0x10)
 	{
@@ -3053,7 +3053,7 @@ READ8_HANDLER( K053244_r )
 	return K053244_chip_r(0,offset);
 }
 
-void K053244_chip_w(int chip, int offset, int data)
+static void K053244_chip_w(int chip, int offset, int data)
 {
 	K053244_regs[chip][offset] = data;
 
@@ -4520,7 +4520,7 @@ static TILE_GET_INFO( K051316_get_tile_info1 ) { K051316_get_tile_info(machine,t
 static TILE_GET_INFO( K051316_get_tile_info2 ) { K051316_get_tile_info(machine,tileinfo,tile_index,2); }
 
 
-void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_region,int bpp,
+static void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_region,int bpp,
 		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
@@ -4637,7 +4637,7 @@ void K051316_vh_start_2(running_machine *machine,int gfx_memory_region,int bpp,
 }
 
 
-int K051316_r(int chip, int offset)
+static int K051316_r(int chip, int offset)
 {
 	return K051316_ram[chip][offset];
 }
@@ -4658,7 +4658,7 @@ READ8_HANDLER( K051316_2_r )
 }
 
 
-void K051316_w(int chip,int offset,int data)
+static void K051316_w(int chip,int offset,int data)
 {
 	K051316_ram[chip][offset] = data;
 	tilemap_mark_tile_dirty(K051316_tilemap[chip],offset & 0x3ff);
@@ -4680,7 +4680,7 @@ WRITE8_HANDLER( K051316_2_w )
 }
 
 
-int K051316_rom_r(int chip, int offset)
+static int K051316_rom_r(int chip, int offset)
 {
 	if ((K051316_ctrlram[chip][0x0e] & 0x01) == 0)
 	{
@@ -4718,7 +4718,7 @@ READ8_HANDLER( K051316_rom_2_r )
 
 
 
-void K051316_ctrl_w(int chip,int offset,int data)
+static void K051316_ctrl_w(int chip,int offset,int data)
 {
 	K051316_ctrlram[chip][offset] = data;
 //if (offset >= 0x0c) logerror("%04x: write %02x to 051316 reg %x\n",activecpu_get_pc(),data,offset);
@@ -4751,7 +4751,7 @@ void K051316_set_offset(int chip, int xoffs, int yoffs)
 }
 
 
-void K051316_zoom_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+static void K051316_zoom_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
@@ -5246,7 +5246,7 @@ static UINT16 K056832_regs[0x20];	// 157/832 regs group 1
 static UINT16 K056832_regsb[4];	// 157/832 regs group 2, board dependent
 
 static UINT8 *K056832_rombase;	// pointer to tile gfx data
-UINT16 *K056832_videoram;
+static UINT16 *K056832_videoram;
 static int K056832_NumGfxBanks;		// depends on size of graphics ROMs
 static int K056832_CurGfxBank;		// cached info for K056832_regs[0x1a]
 static int K056832_gfxnum;			// graphics element index for unpacked tiles

@@ -1434,8 +1434,8 @@ struct _pci_state
 	UINT8		stall_state;			/* state of the system if we're stalled */
 	void		(*stall_callback)(int); /* callback for stalling/unstalling */
 	UINT8		op_pending;				/* true if an operation is pending */
-	mame_time	op_end_time;			/* time when the pending operation ends */
-	mame_timer *continue_timer;			/* timer to use to continue processing */
+	attotime	op_end_time;			/* time when the pending operation ends */
+	emu_timer *continue_timer;			/* timer to use to continue processing */
 	UINT32		fifo_mem[64*2];			/* memory backing the PCI FIFO */
 };
 
@@ -1549,7 +1549,7 @@ struct _fbi_state
 	UINT32		tile_height;			/* height of video tiles */
 	UINT32		x_tiles;				/* number of tiles in the X direction */
 
-	mame_timer *vblank_timer;			/* VBLANK timer */
+	emu_timer *	vblank_timer;			/* VBLANK timer */
 	UINT8		vblank;					/* VBLANK state */
 	UINT8		vblank_count;			/* number of VBLANKs since last swap */
 	UINT8		vblank_swap_pending;	/* a swap is pending, waiting for a vblank */
@@ -1675,7 +1675,7 @@ struct _voodoo_state
 	UINT8		type;					/* type of system */
 	UINT8		chipmask;				/* mask for which chips are available */
 	UINT32		freq;					/* operating frequency */
-	subseconds_t subseconds_per_cycle;	/* subseconds per cycle */
+	attoseconds_t attoseconds_per_cycle;/* attoseconds per cycle */
 	UINT32		extra_cycles;			/* extra cycles not yet accounted for */
 	int			trigger;				/* trigger used for stalling */
 

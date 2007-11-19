@@ -44,7 +44,7 @@ static UINT8 sound_data;
 static UINT8 square_state;
 static UINT8 square_count;
 
-static mame_timer *sega005_sound_timer;
+static emu_timer *sega005_sound_timer;
 static sound_stream *sega005_stream;
 
 static UINT8 n7751_command;
@@ -519,14 +519,14 @@ INLINE void sega005_update_sound_data(void)
 	if ((diff & 0x20) && !(newval & 0x20))
 	{
 		//mame_printf_debug("Stopping timer\n");
-		mame_timer_adjust(sega005_sound_timer, time_never, 0, time_never);
+		timer_adjust(sega005_sound_timer, attotime_never, 0, attotime_never);
 	}
 
 	/* if bit 5 goes low, we start the timer again */
 	if ((diff & 0x20) && (newval & 0x20))
 	{
 		//mame_printf_debug("Starting timer\n");
-		mame_timer_adjust(sega005_sound_timer, MAME_TIME_IN_HZ(SEGA005_555_TIMER_FREQ), 0, MAME_TIME_IN_HZ(SEGA005_555_TIMER_FREQ));
+		timer_adjust(sega005_sound_timer, ATTOTIME_IN_HZ(SEGA005_555_TIMER_FREQ), 0, ATTOTIME_IN_HZ(SEGA005_555_TIMER_FREQ));
 	}
 }
 
@@ -579,7 +579,7 @@ static void *sega005_custom_start(int clock, const struct CustomSound_interface 
 	sega005_stream = stream_create(0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
 
 	/* create a timer for the 555 */
-	sega005_sound_timer = mame_timer_alloc(sega005_auto_timer);
+	sega005_sound_timer = timer_alloc(sega005_auto_timer);
 
 	/* set the initial sound data */
 	sound_data = 0x00;
@@ -632,7 +632,7 @@ static TIMER_CALLBACK( sega005_auto_timer )
 
 static SOUND_START( spaceod );
 
-const char *spaceod_sample_names[] =
+static const char *spaceod_sample_names[] =
 {
 	"*spaceod",
 	"fire.wav",			/* 0 */
@@ -796,11 +796,11 @@ static struct TMS36XXinterface monsterb_tms3617_interface =
  *
  *************************************/
 
-ADDRESS_MAP_START( monsterb_7751_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( monsterb_7751_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( monsterb_7751_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( monsterb_7751_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(n7751_t1_r)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READ(n7751_command_r)
 	AM_RANGE(I8039_bus, I8039_bus) AM_READ(n7751_rom_r)
@@ -934,7 +934,7 @@ static WRITE8_HANDLER( n7751_command_w )
     */
 	n7751_command = data & 0x07;
 	cpunum_set_input_line(1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 

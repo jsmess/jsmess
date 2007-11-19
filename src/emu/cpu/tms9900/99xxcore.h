@@ -469,7 +469,7 @@ typedef struct
 	UINT8 decrementer_enabled;
 	UINT16 decrementer_interval;
 	UINT16 decrementer_count;	/* used in event counter mode*/
-	mame_timer *timer;  /* used in timer mode */
+	emu_timer *timer;  /* used in timer mode */
 #endif
 
 #if (TMS99XX_MODEL == TMS9995_ID)
@@ -929,7 +929,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			/* read decrementer */
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				return ceil(MAME_TIME_TO_CYCLES(cpu_getactivecpu(), scale_down_mame_time(mame_timer_timeleft(I.timer), 16)));
+				return ceil(ATTOTIME_TO_CYCLES(cpu_getactivecpu(), attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				return I.decrementer_count;
@@ -993,7 +993,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				value = ceil(MAME_TIME_TO_CYCLES(cpu_getactivecpu(), scale_down_mame_time(mame_timer_timeleft(I.timer), 16)));
+				value = ceil(ATTOTIME_TO_CYCLES(cpu_getactivecpu(), attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				value = I.decrementer_count;
@@ -1284,7 +1284,7 @@ static void tms99xx_init(int index, int clock, const void *config, int (*irqcall
 	I.irq_callback = irqcallback;
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	I.timer = mame_timer_alloc(decrementer_callback);
+	I.timer = timer_alloc(decrementer_callback);
 #endif
 
 	I.idle_callback = param ? param->idle_callback : NULL;
@@ -1816,7 +1816,7 @@ static TIMER_CALLBACK( decrementer_callback )
 */
 static void reset_decrementer(void)
 {
-	mame_timer_adjust(I.timer, time_never, 0, time_zero);
+	timer_adjust(I.timer, attotime_never, 0, attotime_zero);
 
 	/* reload count */
 	I.decrementer_count = I.decrementer_interval;
@@ -1826,8 +1826,8 @@ static void reset_decrementer(void)
 
 	if (I.decrementer_enabled && ! (I.flag & 1))
 		{	/* timer */
-		mame_time period = MAME_TIME_IN_CYCLES(I.decrementer_interval * 16L, cpu_getactivecpu());
-		mame_timer_adjust(I.timer, period, 0, period);
+		attotime period = ATTOTIME_IN_CYCLES(I.decrementer_interval * 16L, cpu_getactivecpu());
+		timer_adjust(I.timer, period, 0, period);
 	}
 }
 

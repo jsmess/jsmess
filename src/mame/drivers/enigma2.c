@@ -67,8 +67,8 @@ static UINT8 engima2_flip_screen;
  *
  *************************************/
 
-static mame_timer *interrupt_clear_timer;
-static mame_timer *interrupt_assert_timer;
+static emu_timer *interrupt_clear_timer;
+static emu_timer *interrupt_assert_timer;
 
 
 INLINE UINT16 vpos_to_vysnc_chain_counter(int vpos)
@@ -107,22 +107,22 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 		next_counter = INT_TRIGGER_COUNT_1;
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
-	mame_timer_adjust(interrupt_assert_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, time_zero);
-	mame_timer_adjust(interrupt_clear_timer, video_screen_get_time_until_pos(0, vpos + 1, 0), 0, time_zero);
+	timer_adjust(interrupt_assert_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, attotime_zero);
+	timer_adjust(interrupt_clear_timer, video_screen_get_time_until_pos(0, vpos + 1, 0), 0, attotime_zero);
 }
 
 
 static void create_interrupt_timers(void)
 {
-	interrupt_clear_timer = mame_timer_alloc(interrupt_clear_callback);
-	interrupt_assert_timer = mame_timer_alloc(interrupt_assert_callback);
+	interrupt_clear_timer = timer_alloc(interrupt_clear_callback);
+	interrupt_assert_timer = timer_alloc(interrupt_assert_callback);
 }
 
 
 static void start_interrupt_timers(void)
 {
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
-	mame_timer_adjust(interrupt_assert_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
+	timer_adjust(interrupt_assert_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, attotime_zero);
 }
 
 

@@ -21,7 +21,7 @@ static struct {
 	UINT8 queue[256];
 	UINT8 head, tail, mb;
 
-	mame_timer *timer;
+	emu_timer *timer;
 
 } pc_mouse;
 
@@ -30,7 +30,7 @@ static TIMER_CALLBACK(pc_mouse_scan);
 void pc_mouse_initialise(void)
 {
 	pc_mouse.head = pc_mouse.tail = 0;
-	pc_mouse.timer = mame_timer_alloc(pc_mouse_scan);
+	pc_mouse.timer = timer_alloc(pc_mouse_scan);
 	pc_mouse.inputs=UART8250_HANDSHAKE_IN_DSR|UART8250_HANDSHAKE_IN_CTS;
 	if (pc_mouse.serial_port!=-1)
 		uart8250_handshake_in(pc_mouse.serial_port, pc_mouse.inputs);
@@ -229,12 +229,12 @@ void pc_mouse_handshake_in(int n, int outputs)
 			}
 
 			/* start a timer to scan the mouse input */
-			mame_timer_adjust(pc_mouse.timer, time_zero, pc_mouse.serial_port, MAME_TIME_IN_HZ(240));
+			timer_adjust(pc_mouse.timer, attotime_zero, pc_mouse.serial_port, ATTOTIME_IN_HZ(240));
 		}
 		else
 		{
 			/* CTS just went to 0 */
-			mame_timer_adjust(pc_mouse.timer, time_zero, pc_mouse.serial_port, time_zero);
+			timer_adjust(pc_mouse.timer, attotime_zero, pc_mouse.serial_port, attotime_zero);
 			pc_mouse.head = pc_mouse.tail = 0; 
 		}
 	}

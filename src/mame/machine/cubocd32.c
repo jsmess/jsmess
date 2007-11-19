@@ -59,8 +59,8 @@ static struct akiko_def
 	UINT8	cdrom_cmd_resp;
 	cdrom_file *cdrom;
 	UINT8 *	cdrom_toc;
-	mame_timer *dma_timer;
-	mame_timer *frame_timer;
+	emu_timer *dma_timer;
+	emu_timer *frame_timer;
 } akiko;
 
 static TIMER_CALLBACK(akiko_dma_proc);
@@ -94,8 +94,8 @@ void amiga_akiko_init(void)
 	akiko.cdrom_cmd_resp = 0;
 	akiko.cdrom = cdrom_open(get_disk_handle(0));
 	akiko.cdrom_toc = NULL;
-	akiko.dma_timer = mame_timer_alloc(akiko_dma_proc);
-	akiko.frame_timer = mame_timer_alloc(akiko_frame_proc);
+	akiko.dma_timer = timer_alloc(akiko_dma_proc);
+	akiko.frame_timer = timer_alloc(akiko_frame_proc);
 
 	/* create the TOC table */
 	if ( akiko.cdrom != NULL && cdrom_get_last_track(akiko.cdrom) )
@@ -274,7 +274,7 @@ static void akiko_cdda_stop( void )
 	if (cddanum != -1)
 	{
 		cdda_stop_audio(cddanum);
-		mame_timer_reset( akiko.frame_timer, time_never );
+		timer_reset( akiko.frame_timer, attotime_never );
 	}
 }
 
@@ -284,7 +284,7 @@ static void akiko_cdda_play( UINT32 lba, UINT32 num_blocks )
 	if (cddanum != -1)
 	{
 		cdda_start_audio(cddanum, lba, num_blocks);
-		mame_timer_adjust( akiko.frame_timer, MAME_TIME_IN_HZ( 75 ), 0, time_zero );
+		timer_adjust( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
 	}
 }
 
@@ -299,11 +299,11 @@ static void akiko_cdda_pause( int pause )
 
 			if ( pause )
 			{
-				mame_timer_reset( akiko.frame_timer, time_never );
+				timer_reset( akiko.frame_timer, attotime_never );
 			}
 			else
 			{
-				mame_timer_adjust( akiko.frame_timer, MAME_TIME_IN_HZ( 75 ), 0, time_zero );
+				timer_adjust( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
 			}
 		}
 	}
@@ -367,7 +367,7 @@ static TIMER_CALLBACK(akiko_frame_proc)
 			akiko_set_cd_status( 0x80000000 );	/* subcode ready */
 		}
 
-		mame_timer_adjust( akiko.frame_timer, MAME_TIME_IN_HZ( 75 ), 0, time_zero );
+		timer_adjust( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
 	}
 }
 
@@ -472,7 +472,7 @@ static TIMER_CALLBACK(akiko_dma_proc)
 	if ( akiko.cdrom_readreqmask == 0 )
 		akiko_set_cd_status(0x04000000);
 	else
-		mame_timer_adjust( akiko.dma_timer, MAME_TIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0, time_zero );
+		timer_adjust( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0, attotime_zero );
 }
 
 static void akiko_start_dma( void )
@@ -488,7 +488,7 @@ static void akiko_start_dma( void )
 
 	akiko.cdrom_lba_cur = akiko.cdrom_lba_start;
 
-	mame_timer_adjust( akiko.dma_timer, MAME_TIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0, time_zero );
+	timer_adjust( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0, attotime_zero );
 }
 
 static void akiko_setup_response( int len, UINT8 *r1 )
@@ -679,7 +679,7 @@ static void akiko_update_cdrom( void )
 		{
 			akiko.cdrom_cmd_start = (akiko.cdrom_cmd_start+3) & 0xff;
 
-			mame_timer_set( MAME_TIME_IN_MSEC(1), resp[0], akiko_cd_delayed_cmd );
+			timer_set( ATTOTIME_IN_MSEC(1), resp[0], akiko_cd_delayed_cmd );
 
 			break;
 		}

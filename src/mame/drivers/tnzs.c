@@ -234,7 +234,7 @@ UINT8 *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
 static INT16 *sampledata[MAX_SAMPLES];
 static int samplesize[MAX_SAMPLES];
 
-void kageki_init_samples(void)
+static void kageki_init_samples(void)
 {
 	UINT8 *scan, *src;
 	INT16 *dest;

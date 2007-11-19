@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( orbit )
 	MDRV_CPU_PERIODIC_INT(orbit_interrupt, 240)
 
 	MDRV_SCREEN_REFRESH_RATE(60) /* interlaced */
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS((int) ((22. * 1000000) / (262. * 60) + 0.5)))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) ((22. * 1000000) / (262. * 60) + 0.5)))
 	MDRV_MACHINE_RESET(orbit)
 
 	/* video hardware */

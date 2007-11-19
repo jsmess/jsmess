@@ -370,7 +370,7 @@ void ti99_fdc_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = mame_timer_alloc(motor_on_timer_callback);
+	motor_on_timer = timer_alloc(motor_on_timer_callback);
 
 	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
 
@@ -484,7 +484,7 @@ static void fdc_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			mame_timer_adjust(motor_on_timer, MAME_TIME_IN_MSEC(4230), 0, time_zero);
+			timer_adjust(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0, attotime_zero);
 		}
 		motor_on = data;
 		break;
@@ -635,7 +635,7 @@ void ti99_ccfdc_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = mame_timer_alloc(motor_on_timer_callback);
+	motor_on_timer = timer_alloc(motor_on_timer_callback);
 
 	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
 
@@ -696,7 +696,7 @@ static void ccfdc_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			mame_timer_adjust(motor_on_timer, MAME_TIME_IN_MSEC(4230), 0, time_zero);
+			timer_adjust(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0, attotime_zero);
 		}
 		motor_on = data;
 		break;
@@ -854,7 +854,7 @@ void ti99_bwg_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = mame_timer_alloc(motor_on_timer_callback);
+	motor_on_timer = timer_alloc(motor_on_timer_callback);
 
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 
@@ -917,7 +917,7 @@ static void bwg_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			mame_timer_adjust(motor_on_timer, MAME_TIME_IN_MSEC(4230), 0, time_zero);
+			timer_adjust(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0, attotime_zero);
 		}
 		motor_on = data;
 		break;
@@ -1248,7 +1248,7 @@ void ti99_hfdc_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = mame_timer_alloc(motor_on_timer_callback);
+	motor_on_timer = timer_alloc(motor_on_timer_callback);
 
 	ti99_peb_set_card_handlers(0x1100, & hfdc_handlers);
 
@@ -1331,7 +1331,7 @@ static void hfdc_cru_w(int offset, int data)
 		{
 			DVENA = 1;
 			fdc_handle_hold();
-			mame_timer_adjust(motor_on_timer, MAME_TIME_IN_MSEC(4230), 0, time_zero);
+			timer_adjust(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0, attotime_zero);
 		}
 		motor_on = data;
 		break;

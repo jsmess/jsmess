@@ -175,7 +175,7 @@ static WRITE8_HANDLER( sound_answer_w )
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (activecpu_get_pc() == 0x08bc) mame_timer_set(MAME_TIME_IN_SEC(1),0,reset_callback);
+	if (activecpu_get_pc() == 0x08bc) timer_set(ATTOTIME_IN_SEC(1),0,reset_callback);
 }
 
 
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( msm_reset_w )
 	MSM5205_reset_w(0,data ? 0 : 1);
 }
 
-void tehkanwc_adpcm_int (int data)
+static void tehkanwc_adpcm_int (int data)
 {
 	static int toggle;
 

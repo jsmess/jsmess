@@ -297,8 +297,8 @@ static UINT16 namcos21_video_enable;
 static UINT8 *pointram;
 static int pointram_idx;
 
-UINT16 *namcos21_dspram16;
-UINT16 *namcos21_spritepos;
+static UINT16 *namcos21_dspram16;
+//UINT16 *namcos21_spritepos;
 
 /* private data */
 static UINT16 *mpDataROM;
@@ -683,7 +683,7 @@ static READ16_HANDLER( dsp_port8_r )
 	return 1;
 } /* dsp_port8_r */
 
-int namcos21_irq_enable;
+static int namcos21_irq_enable;
 
 static WRITE16_HANDLER( dsp_port8_w )
 { /* IRQ-enable? */

@@ -124,7 +124,7 @@ WRITE8_HANDLER( angelkds_bgbotscroll_write )
 	tilemap_set_scrollx(bgbot_tilemap, 0, data );
 }
 
-UINT8 angelkds_layer_ctrl;
+static UINT8 angelkds_layer_ctrl;
 
 WRITE8_HANDLER( angelkds_layer_ctrl_write )
 {

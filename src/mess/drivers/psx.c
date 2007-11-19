@@ -186,7 +186,7 @@ static TIMER_CALLBACK(psx_pad_ack)
 		if( !m_pad[ n_port ].b_ack )
 		{
 			m_pad[ n_port ].b_ack = 1;
-			mame_timer_set( MAME_TIME_IN_USEC( 2 ), n_port, psx_pad_ack );
+			timer_set( ATTOTIME_IN_USEC( 2 ), n_port, psx_pad_ack );
 		}
 	}
 }
@@ -299,7 +299,7 @@ static void psx_pad( int n_port, int n_data )
 	if( b_ack )
 	{
 		m_pad[ n_port ].b_ack = 0;
-		mame_timer_set( MAME_TIME_IN_USEC( 10 ), n_port, psx_pad_ack );
+		timer_set( ATTOTIME_IN_USEC( 10 ), n_port, psx_pad_ack );
 	}
 }
 

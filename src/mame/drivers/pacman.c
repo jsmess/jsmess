@@ -355,7 +355,7 @@ Boards:
 #define VBSTART				(224)	/*(224+16)*/
 
 
-UINT8 cannonb_bit_to_read;
+static UINT8 cannonb_bit_to_read;
 
 
 /*************************************

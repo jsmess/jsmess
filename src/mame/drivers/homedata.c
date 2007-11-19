@@ -564,7 +564,7 @@ static WRITE8_HANDLER( bankswitch_w )
 /********************************************************************************/
 
 
-ADDRESS_MAP_START( mrokumei_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrokumei_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_RAM) /* videoram */
 	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_RAM) /* work ram */
@@ -578,7 +578,7 @@ ADDRESS_MAP_START( mrokumei_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(mrokumei_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_RAM)
@@ -594,11 +594,11 @@ ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( mrokumei_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrokumei_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( mrokumei_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrokumei_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITE(MWA8_NOP)	/* stack writes happen here, but there's no RAM */
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
@@ -614,7 +614,7 @@ ADDRESS_MAP_END
 
 /********************************************************************************/
 
-ADDRESS_MAP_START( reikaids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( reikaids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_RAM) /* videoram */
 	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_RAM) /* work ram */
@@ -626,7 +626,7 @@ ADDRESS_MAP_START( reikaids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( reikaids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( reikaids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(reikaids_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_RAM)
@@ -666,7 +666,7 @@ ADDRESS_MAP_END
 /**************************************************************************/
 
 
-ADDRESS_MAP_START( pteacher_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pteacher_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_RAM) /* work ram */
@@ -677,7 +677,7 @@ ADDRESS_MAP_START( pteacher_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( pteacher_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pteacher_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(pteacher_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0x5eff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x5f00, 0x5fff) AM_WRITE(MWA8_RAM)

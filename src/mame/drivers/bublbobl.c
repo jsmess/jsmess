@@ -462,50 +462,50 @@ static INPUT_PORTS_START( bublbobl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	// output: select read or write shared RAM
 
 	PORT_START_TAG("DSW0")
-	PORT_DIPNAME( 0x05, 0x04, "Mode" )
+	PORT_DIPNAME( 0x05, 0x04, "Mode" )						PORT_DIPLOCATION("DSW-A:1,3")
 	PORT_DIPSETTING(    0x04, "Game, English" )
 	PORT_DIPSETTING(    0x05, "Game, Japanese" )
 	PORT_DIPSETTING(    0x01, "Test (Grid and Inputs)" )
-	PORT_DIPSETTING(    0x00, "Test (RAM and Sound)" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, "Test (RAM and Sound)/Pause" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("DSW-A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("DSW-A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("DSW-A:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("DSW-A:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("DSW-B:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("DSW-B:3,4")
 	PORT_DIPSETTING(    0x08, "20K 80K 300K" )
 	PORT_DIPSETTING(    0x0c, "30K 100K 400K" )
 	PORT_DIPSETTING(    0x04, "40K 200K 500K" )
 	PORT_DIPSETTING(    0x00, "50K 250K 500K" )
 	// then more bonus lives at 1M 2M 3M 4M 5M - for all dip switch settings
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("DSW-B:5,6")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	// must be off (see notes)
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW-B:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )				// must be off (see notes)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "ROM Type" )	// will hang on startup if set to wrong type
-	PORT_DIPSETTING(    0x80, "IC52=512kb, IC53=none" )
+	PORT_DIPNAME( 0x80, 0x80, "ROM Type" )					PORT_DIPLOCATION("DSW-B:8")
+	PORT_DIPSETTING(    0x80, "IC52=512kb, IC53=none" )		// will hang on startup if set to wrong type
 	PORT_DIPSETTING(    0x00, "IC52=256kb, IC53=256kb" )
 
 	PORT_START_TAG("IN1")
@@ -616,46 +616,46 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tokio )
 	PORT_START_TAG("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW A:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW A:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Enemies" )
+	PORT_DIPNAME( 0x01, 0x00, "Enemies" )				PORT_DIPLOCATION("SW B:1")
 	PORT_DIPSETTING(    0x01, "Few (Easy)" )
 	PORT_DIPSETTING(    0x00, "Many (Hard)" )
-	PORT_DIPNAME( 0x02, 0x02, "Enemy Shots" )
+	PORT_DIPNAME( 0x02, 0x02, "Enemy Shots" )			PORT_DIPLOCATION("SW B:2")
 	PORT_DIPSETTING(    0x02, "Few (Easy)" )
 	PORT_DIPSETTING(    0x00, "Many (Hard)" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x0c, "100K 400K" )
 	PORT_DIPSETTING(    0x08, "200K 400K" )
 	PORT_DIPSETTING(    0x04, "300K 400K" )
 	PORT_DIPSETTING(    0x00, "400K 400K" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW B:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "99 (Cheat)")	// 6 in original version
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW B:7" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 
@@ -746,7 +746,7 @@ static MACHINE_DRIVER_START( tokio )
 	MDRV_CPU_PROGRAM_MAP(tokio_sound_map, 0) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
 	MDRV_SCREEN_REFRESH_RATE(VSYNC)	// 59.185606 Hz
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(VBLANK)) 	// 2560 us
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(VBLANK)) 	// 2560 us
 	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
@@ -789,7 +789,7 @@ static MACHINE_DRIVER_START( bublbobl )
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse, 1) // comes from the same clock that latches the INT pin on the second Z80
 
 	MDRV_SCREEN_REFRESH_RATE(VSYNC)	// 59.185606 Hz
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(VBLANK)) 	// 2560 us
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(VBLANK)) 	// 2560 us
 	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware

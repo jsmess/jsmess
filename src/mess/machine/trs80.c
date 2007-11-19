@@ -282,7 +282,7 @@ static void trs80_machine_reset(running_machine *machine)
 	if (cas_size)
 	{
 		LOG(("trs80_init_machine: schedule cas_copy_callback (%d)\n", cas_size));
-		mame_timer_set(MAME_TIME_IN_MSEC(500), 0, cas_copy_callback);
+		timer_set(ATTOTIME_IN_MSEC(500), 0, cas_copy_callback);
 	}
 }
 

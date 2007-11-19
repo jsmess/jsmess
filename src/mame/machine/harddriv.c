@@ -104,7 +104,7 @@ static UINT8 duart_irq_state;
 static UINT8 duart_read_data[16];
 static UINT8 duart_write_data[16];
 static UINT8 duart_output_port;
-static mame_timer *duart_timer;
+static emu_timer *duart_timer;
 
 static UINT8 last_gsp_shiftreg;
 
@@ -200,7 +200,7 @@ MACHINE_RESET( harddriv )
 	memset(duart_read_data, 0, sizeof(duart_read_data));
 	memset(duart_write_data, 0, sizeof(duart_write_data));
 	duart_output_port = 0;
-	duart_timer = mame_timer_alloc(duart_callback);
+	duart_timer = timer_alloc(duart_callback);
 
 	/* reset the ADSP/DSIII/DSIV boards */
 	adsp_halt = 1;
@@ -612,9 +612,9 @@ INLINE int duart_clock(void)
 }
 
 
-INLINE mame_time duart_clock_period(void)
+INLINE attotime duart_clock_period(void)
 {
-	return MAME_TIME_IN_HZ(duart_clock());
+	return ATTOTIME_IN_HZ(duart_clock());
 }
 
 
@@ -628,7 +628,7 @@ static TIMER_CALLBACK( duart_callback )
 		duart_irq_state = (duart_read_data[0x05] & duart_write_data[0x05]) != 0;
 		atarigen_update_interrupts();
 	}
-	mame_timer_adjust(duart_timer, scale_up_mame_time(duart_clock_period(), 65536), 0, time_zero);
+	timer_adjust(duart_timer, attotime_mul(duart_clock_period(), 65536), 0, attotime_zero);
 }
 
 
@@ -655,14 +655,14 @@ READ16_HANDLER( hd68k_duart_r )
 		case 0x0e:		/* Start-Counter Command 3 */
 		{
 			int reps = (duart_write_data[0x06] << 8) | duart_write_data[0x07];
-			mame_timer_adjust(duart_timer, scale_up_mame_time(duart_clock_period(), reps), 0, time_zero);
-			logerror("DUART timer started (period=%f)\n", mame_time_to_double(scale_up_mame_time(duart_clock_period(), reps)));
+			timer_adjust(duart_timer, attotime_mul(duart_clock_period(), reps), 0, attotime_zero);
+			logerror("DUART timer started (period=%f)\n", attotime_to_double(attotime_mul(duart_clock_period(), reps)));
 			return 0x00ff;
 		}
 		case 0x0f:		/* Stop-Counter Command 3 */
 			{
-				int reps = mame_time_to_double(scale_up_mame_time(mame_timer_timeleft(duart_timer), duart_clock()));
-				mame_timer_adjust(duart_timer, time_never, 0, time_zero);
+				int reps = attotime_to_double(attotime_mul(timer_timeleft(duart_timer), duart_clock()));
+				timer_adjust(duart_timer, attotime_never, 0, attotime_zero);
 				duart_read_data[0x06] = reps >> 8;
 				duart_read_data[0x07] = reps & 0xff;
 				logerror("DUART timer stopped (final count=%04X)\n", reps);
@@ -1251,7 +1251,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	/* it is important that all the CPUs be in sync before we continue, so spin a little */
 	/* while to let everyone else catch up */
 	cpu_spinuntil_trigger(DS3_TRIGGER);
-	cpu_triggertime(MAME_TIME_IN_USEC(5), DS3_TRIGGER);
+	cpu_triggertime(ATTOTIME_IN_USEC(5), DS3_TRIGGER);
 
 	return ds3_gdata;
 }

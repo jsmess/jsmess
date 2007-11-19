@@ -1191,10 +1191,10 @@ static UINT32 menu_bookkeeping(UINT32 state)
 	char *bufptr = buf;
 	UINT32 selected = 0;
 	int ctrnum;
-	mame_time total_time;
+	attotime total_time;
 
 	/* show total time first */
-	total_time = mame_timer_get_time();
+	total_time = timer_get_time();
 	if (total_time.seconds >= 60 * 60)
 		bufptr += sprintf(bufptr, "%s: %d:%02d:%02d\n\n", ui_getstring(UI_totaltime), total_time.seconds / (60*60), (total_time.seconds / 60) % 60, total_time.seconds % 60);
 	else

@@ -25,8 +25,8 @@ static UINT8 *pastelg_videoram;
 static UINT8 *pastelg_clut;
 
 
-void pastelg_vramflip(void);
-void pastelg_gfxdraw(void);
+static void pastelg_vramflip(void);
+static void pastelg_gfxdraw(void);
 
 
 /******************************************************************************
@@ -253,7 +253,7 @@ void pastelg_gfxdraw(void)
 	}
 
 	nb1413m3_busyflag = 0;
-	mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(400000), nb1413m3_busyctr), 0, blitter_timer_callback);
+	timer_set(attotime_mul(ATTOTIME_IN_HZ(400000), nb1413m3_busyctr), 0, blitter_timer_callback);
 }
 
 /******************************************************************************

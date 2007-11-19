@@ -16,7 +16,7 @@
 struct ym2151_info
 {
 	sound_stream *	stream;
-	mame_timer *	timer[2];
+	emu_timer *	timer[2];
 	void *			chip;
 	const struct YM2151interface *intf;
 };

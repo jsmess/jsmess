@@ -216,25 +216,131 @@ static void build_quarks(void)
 static int validate_inlines(void)
 {
 #undef rand
-	int test1 = rand() | (rand() << 15);
-	int test2 = rand() | (rand() << 15);
+	UINT64 testu64a = rand() + (rand() << 15) + ((UINT64)rand() << 30) + ((UINT64)rand() << 45) + 1;
+	INT64 testi64a = rand() + (rand() << 15) + ((INT64)rand() << 30) + ((INT64)rand() << 45) + 1;
+#ifdef PTR64
+	INT64 testi64b = rand() + (rand() << 15) + ((INT64)rand() << 30) + ((INT64)rand() << 45) + 1;
+#endif
+	UINT32 testu32a = rand() + (rand() << 15) + 1;
+	UINT32 testu32b = rand() + (rand() << 15) + 1;
+	INT32 testi32a = rand() + (rand() << 15) + 1;
+	INT32 testi32b = rand() + (rand() << 15) + 1;
+	INT32 resulti32, expectedi32;
+	UINT32 resultu32, expectedu32;
+	INT64 resulti64, expectedi64;
+	UINT64 resultu64, expectedu64;
+	INT32 remainder, expremainder;
+	UINT32 uremainder, expuremainder;
 	int error = FALSE;
 
-	if (mul_32x32(test1, test2) != (INT64)(INT32)test1 * (INT64)(INT32)test2) { mame_printf_error("Error testing mul_32x32\n"); error = TRUE; }
-	if (mulu_32x32(test1, test2) != (UINT64)(UINT32)test1 * (UINT64)(UINT32)test2) { mame_printf_error("Error testing mulu_32x32\n"); error = TRUE; }
-	if (mul_32x32_hi(test1, test2) != ((INT64)(INT32)test1 * (INT64)(INT32)test2) >> 32) { mame_printf_error("Error testing mul_32x32_hi\n"); error = TRUE; }
-	if (mulu_32x32_hi(test1, test2) != ((UINT64)(UINT32)test1 * (UINT64)(UINT32)test2) >> 32) { mame_printf_error("Error testing mulu_32x32_hi\n"); error = TRUE; }
-	if (mul_32x32_shift(test1, test2, 7) != (INT32)(((INT64)test1 * (INT64)test2) >> 7)) { mame_printf_error("Error testing mul_32x32_shift\n"); error = TRUE; }
-	if (mulu_32x32_shift(test1, test2, 7) != (UINT32)(((UINT64)(UINT32)test1 * (UINT64)(UINT32)test2) >> 7)) { mame_printf_error("Error testing mulu_32x32_shift\n"); error = TRUE; }
-	if (fabs(recip_approx(100.0) - 0.01) > 0.0001) { mame_printf_error("Error testing recip_approx\n"); error = TRUE; }
-	test1 = (test1 & 0x0000ffff) | 0x400000;
-	if (count_leading_zeros(test1) != 9) { mame_printf_error("Error testing count_leading_zeros\n"); error = TRUE; }
-	test1 = (test1 | 0xffff0000) & ~0x400000;
-	if (count_leading_ones(test1) != 9) { mame_printf_error("Error testing count_leading_ones\n"); error = TRUE; }
-	test2 = test1;
-	if (compare_exchange32(&test1, test2, 1000) != test2) { mame_printf_error("Error testing compare_exchange32\n"); error = TRUE; }
-	if (atomic_exchange32(&test1, test2) != 1000) { mame_printf_error("Error testing atomic_exchange32\n"); error = TRUE; }
-	if (atomic_add32(&test1, 45) != test2 + 45) { mame_printf_error("Error testing atomic_add32\n"); error = TRUE; }
+	resulti64 = mul_32x32(testi32a, testi32b);
+	expectedi64 = (INT64)testi32a * (INT64)testi32b;
+	if (resulti64 != expectedi64)
+		{ mame_printf_error("Error testing mul_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testi32a, testi32b, (UINT32)(resulti64 >> 32), (UINT32)resulti64, (UINT32)(expectedi64 >> 32), (UINT32)expectedi64); error = TRUE; }
+
+	resultu64 = mulu_32x32(testu32a, testu32b);
+	expectedu64 = (UINT64)testu32a * (UINT64)testu32b;
+	if (resultu64 != expectedu64)
+		{ mame_printf_error("Error testing mulu_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testu32a, testu32b, (UINT32)(resultu64 >> 32), (UINT32)resultu64, (UINT32)(expectedu64 >> 32), (UINT32)expectedu64); error = TRUE; }
+
+	resulti32 = mul_32x32_hi(testi32a, testi32b);
+	expectedi32 = ((INT64)testi32a * (INT64)testi32b) >> 32;
+	if (resulti32 != expectedi32)
+		{ mame_printf_error("Error testing mul_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32); error = TRUE; }
+
+	resultu32 = mulu_32x32_hi(testu32a, testu32b);
+	expectedu32 = ((INT64)testu32a * (INT64)testu32b) >> 32;
+	if (resultu32 != expectedu32)
+		{ mame_printf_error("Error testing mulu_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32); error = TRUE; }
+
+	resulti32 = mul_32x32_shift(testi32a, testi32b, 7);
+	expectedi32 = ((INT64)testi32a * (INT64)testi32b) >> 7;
+	if (resulti32 != expectedi32)
+		{ mame_printf_error("Error testing mul_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32); error = TRUE; }
+
+	resultu32 = mulu_32x32_shift(testu32a, testu32b, 7);
+	expectedu32 = ((INT64)testu32a * (INT64)testu32b) >> 7;
+	if (resultu32 != expectedu32)
+		{ mame_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32); error = TRUE; }
+
+	while ((INT64)testi32a * (INT64)0x7fffffff < testi64a)
+		testi64a /= 2;
+	while ((UINT64)testu32a * (UINT64)0xffffffff < testu64a)
+		testu64a /= 2;
+
+	resulti32 = div_64x32(testi64a, testi32a);
+	expectedi32 = testi64a / (INT64)testi32a;
+	if (resulti32 != expectedi32)
+		{ mame_printf_error("Error testing div_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, expectedi32); error = TRUE; }
+
+	resultu32 = divu_64x32(testu64a, testu32a);
+	expectedu32 = testu64a / (UINT64)testu32a;
+	if (resultu32 != expectedu32)
+		{ mame_printf_error("Error testing divu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, expectedu32); error = TRUE; }
+
+	resulti32 = div_64x32_rem(testi64a, testi32a, &remainder);
+	expectedi32 = testi64a / (INT64)testi32a;
+	expremainder = testi64a % (INT64)testi32a;
+	if (resulti32 != expectedi32 || remainder != expremainder)
+		{ mame_printf_error("Error testing div_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, remainder, expectedi32, expremainder); error = TRUE; }
+
+	resultu32 = divu_64x32_rem(testu64a, testu32a, &uremainder);
+	expectedu32 = testu64a / (UINT64)testu32a;
+	expuremainder = testu64a % (UINT64)testu32a;
+	if (resultu32 != expectedu32 || uremainder != expuremainder)
+		{ mame_printf_error("Error testing divu_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, uremainder, expectedu32, expuremainder); error = TRUE; }
+
+	resulti32 = mod_64x32(testi64a, testi32a);
+	expectedi32 = testi64a % (INT64)testi32a;
+	if (resulti32 != expectedi32)
+		{ mame_printf_error("Error testing mod_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, expectedi32); error = TRUE; }
+
+	resultu32 = modu_64x32(testu64a, testu32a);
+	expectedu32 = testu64a % (UINT64)testu32a;
+	if (resultu32 != expectedu32)
+		{ mame_printf_error("Error testing modu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, expectedu32); error = TRUE; }
+
+	while ((INT64)testi32a * (INT64)0x7fffffff < ((INT32)testi64a << 3))
+		testi64a /= 2;
+	while ((UINT64)testu32a * (UINT64)0xffffffff < ((UINT32)testu64a << 3))
+		testu64a /= 2;
+
+	resulti32 = div_32x32_shift((INT32)testi64a, testi32a, 3);
+	expectedi32 = ((INT64)(INT32)testi64a << 3) / (INT64)testi32a;
+	if (resulti32 != expectedi32)
+		{ mame_printf_error("Error testing div_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", (INT32)testi64a, testi32a, resulti32, expectedi32); error = TRUE; }
+
+	resultu32 = divu_32x32_shift((UINT32)testu64a, testu32a, 3);
+	expectedu32 = ((UINT64)(UINT32)testu64a << 3) / (UINT64)testu32a;
+	if (resultu32 != expectedu32)
+		{ mame_printf_error("Error testing divu_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", (UINT32)testu64a, testu32a, resultu32, expectedu32); error = TRUE; }
+
+	if (fabs(recip_approx(100.0) - 0.01) > 0.0001)
+		{ mame_printf_error("Error testing recip_approx\n"); error = TRUE; }
+
+	testi32a = (testi32a & 0x0000ffff) | 0x400000;
+	if (count_leading_zeros(testi32a) != 9)
+		{ mame_printf_error("Error testing count_leading_zeros\n"); error = TRUE; }
+	testi32a = (testi32a | 0xffff0000) & ~0x400000;
+	if (count_leading_ones(testi32a) != 9)
+		{ mame_printf_error("Error testing count_leading_ones\n"); error = TRUE; }
+
+	testi32b = testi32a;
+	if (compare_exchange32(&testi32a, testi32b, 1000) != testi32b || testi32a != 1000)
+		{ mame_printf_error("Error testing compare_exchange32\n"); error = TRUE; }
+#ifdef PTR64
+	testi64b = testi64a;
+	if (compare_exchange64(&testi64a, testi64b, 1000) != testi64b || testi64a != 1000)
+		{ mame_printf_error("Error testing compare_exchange64\n"); error = TRUE; }
+#endif
+	if (atomic_exchange32(&testi32a, testi32b) != 1000)
+		{ mame_printf_error("Error testing atomic_exchange32\n"); error = TRUE; }
+	if (atomic_add32(&testi32a, 45) != testi32b + 45)
+		{ mame_printf_error("Error testing atomic_add32\n"); error = TRUE; }
+	if (atomic_increment32(&testi32a) != testi32b + 46)
+		{ mame_printf_error("Error testing atomic_increment32\n"); error = TRUE; }
+	if (atomic_decrement32(&testi32a) != testi32b + 45)
+		{ mame_printf_error("Error testing atomic_decrement32\n"); error = TRUE; }
 
 	return error;
 }

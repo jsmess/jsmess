@@ -745,10 +745,10 @@ WRITE8_HANDLER( fantasy_sound_w )
 #define HD38880_CMV	0x20
 #define HD68880_SYBS	0x0f
 
-int	hd38880_cmd;
-UINT32	hd38880_addr;
-int	hd38880_data_bytes;
-double	hd38880_speed;
+static int	hd38880_cmd;
+static UINT32	hd38880_addr;
+static int	hd38880_data_bytes;
+static double	hd38880_speed;
 
 
 static void rockola_speech_w(UINT8 data, UINT16 *table, int start)

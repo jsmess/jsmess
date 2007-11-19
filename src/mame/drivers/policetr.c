@@ -128,7 +128,7 @@ static TIMER_CALLBACK( irq5_gen )
 static INTERRUPT_GEN( irq4_gen )
 {
 	cpunum_set_input_line(0, R3000_IRQ4, ASSERT_LINE);
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, irq5_gen);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, irq5_gen);
 }
 
 
@@ -472,7 +472,7 @@ static struct r3000_config config =
 };
 
 
-MACHINE_DRIVER_START( policetr )
+static MACHINE_DRIVER_START( policetr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", R3000BE, MASTER_CLOCK/2)
@@ -504,7 +504,7 @@ MACHINE_DRIVER_START( policetr )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( sshooter )
+static MACHINE_DRIVER_START( sshooter )
 	MDRV_IMPORT_FROM(policetr)
 
 	/* basic machine hardware */

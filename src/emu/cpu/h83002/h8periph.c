@@ -34,7 +34,7 @@
 
 static TIMER_CALLBACK( h8itu_timer_0_cb )
 {
-	mame_timer_adjust(h8.timer[0], time_never, 0, time_zero);
+	timer_adjust(h8.timer[0], attotime_never, 0, attotime_zero);
 	h8.h8TCNT0 = 0;
 	h8.per_regs[TSR0] |= 4;
 	// interrupt on overflow ?
@@ -46,7 +46,7 @@ static TIMER_CALLBACK( h8itu_timer_0_cb )
 
 static TIMER_CALLBACK( h8itu_timer_1_cb )
 {
-	mame_timer_adjust(h8.timer[1], time_never, 0, time_zero);
+	timer_adjust(h8.timer[1], attotime_never, 0, attotime_zero);
 	h8.h8TCNT1 = 0;
 	h8.per_regs[TSR1] |= 4;
 	// interrupt on overflow ?
@@ -58,7 +58,7 @@ static TIMER_CALLBACK( h8itu_timer_1_cb )
 
 static TIMER_CALLBACK( h8itu_timer_2_cb )
 {
-	mame_timer_adjust(h8.timer[2], time_never, 0, time_zero);
+	timer_adjust(h8.timer[2], attotime_never, 0, attotime_zero);
 	h8.h8TCNT2 = 0;
 	h8.per_regs[TSR2] |= 4;
 	// interrupt on overflow ?
@@ -70,7 +70,7 @@ static TIMER_CALLBACK( h8itu_timer_2_cb )
 
 static TIMER_CALLBACK( h8itu_timer_3_cb )
 {
-	mame_timer_adjust(h8.timer[3], time_never, 0, time_zero);
+	timer_adjust(h8.timer[3], attotime_never, 0, attotime_zero);
 	h8.h8TCNT3 = 0;
 	h8.per_regs[TSR3] |= 4;
 	// interrupt on overflow ?
@@ -82,7 +82,7 @@ static TIMER_CALLBACK( h8itu_timer_3_cb )
 
 static TIMER_CALLBACK( h8itu_timer_4_cb )
 {
-	mame_timer_adjust(h8.timer[4], time_never, 0, time_zero);
+	timer_adjust(h8.timer[4], attotime_never, 0, attotime_zero);
 	h8.h8TCNT4 = 0;
 	h8.per_regs[TSR4] |= 4;
 	// interrupt on overflow ?
@@ -96,7 +96,7 @@ static void h8_itu_refresh_timer(int tnum)
 {
 	int ourTCR = 0;
 	int ourTVAL = 0;
-	mame_time period;
+	attotime period;
 	static const int tscales[4] = { 1, 2, 4, 8 };
 
 	switch (tnum)
@@ -123,20 +123,20 @@ static void h8_itu_refresh_timer(int tnum)
 			break;
 	}
 
-	period = scale_up_mame_time(MAME_TIME_IN_HZ(cpunum_get_clock(h8.cpu_number)), tscales[ourTCR & 3] * (65536 - ourTVAL));
+	period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(h8.cpu_number)), tscales[ourTCR & 3] * (65536 - ourTVAL));
 
 	if (ourTCR & 4)
 	{
 		logerror("H8/3002: Timer %d is using an external clock.  Unsupported!\n", tnum);
 	}
 
-	mame_timer_adjust(h8.timer[tnum], period, 0, time_zero);
+	timer_adjust(h8.timer[tnum], period, 0, attotime_zero);
 }
 
 static void h8_itu_sync_timers(int tnum)
 {
 	int ourTCR = 0;
-	mame_time cycle_time, cur;
+	attotime cycle_time, cur;
 	UINT16 ratio;
 	static const int tscales[4] = { 1, 2, 4, 8 };
 
@@ -160,10 +160,10 @@ static void h8_itu_sync_timers(int tnum)
 	}
 
 	// get the time per unit
-	cycle_time = scale_up_mame_time(MAME_TIME_IN_HZ(cpunum_get_clock(h8.cpu_number)), tscales[ourTCR & 3]);
-	cur = mame_timer_timeelapsed(h8.timer[tnum]);
+	cycle_time = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(h8.cpu_number)), tscales[ourTCR & 3]);
+	cur = timer_timeelapsed(h8.timer[tnum]);
 
-	ratio = mame_time_to_double(cur) / mame_time_to_double(cycle_time);
+	ratio = attotime_to_double(cur) / attotime_to_double(cycle_time);
 
 	switch (tnum)
 	{
@@ -484,11 +484,11 @@ void h8_register_write8(UINT32 address, UINT8 val)
 
 void h8_itu_init(void)
 {
-	h8.timer[0] = mame_timer_alloc(h8itu_timer_0_cb);
-	h8.timer[1] = mame_timer_alloc(h8itu_timer_1_cb);
-	h8.timer[2] = mame_timer_alloc(h8itu_timer_2_cb);
-	h8.timer[3] = mame_timer_alloc(h8itu_timer_3_cb);
-	h8.timer[4] = mame_timer_alloc(h8itu_timer_4_cb);
+	h8.timer[0] = timer_alloc(h8itu_timer_0_cb);
+	h8.timer[1] = timer_alloc(h8itu_timer_1_cb);
+	h8.timer[2] = timer_alloc(h8itu_timer_2_cb);
+	h8.timer[3] = timer_alloc(h8itu_timer_3_cb);
+	h8.timer[4] = timer_alloc(h8itu_timer_4_cb);
 
 	h8_itu_reset();
 
@@ -498,9 +498,9 @@ void h8_itu_init(void)
 void h8_itu_reset(void)
 {
 	// stop all the timers
-	mame_timer_adjust(h8.timer[0], time_never, 0, time_zero);
-	mame_timer_adjust(h8.timer[1], time_never, 0, time_zero);
-	mame_timer_adjust(h8.timer[2], time_never, 0, time_zero);
-	mame_timer_adjust(h8.timer[3], time_never, 0, time_zero);
-	mame_timer_adjust(h8.timer[4], time_never, 0, time_zero);
+	timer_adjust(h8.timer[0], attotime_never, 0, attotime_zero);
+	timer_adjust(h8.timer[1], attotime_never, 0, attotime_zero);
+	timer_adjust(h8.timer[2], attotime_never, 0, attotime_zero);
+	timer_adjust(h8.timer[3], attotime_never, 0, attotime_zero);
+	timer_adjust(h8.timer[4], attotime_never, 0, attotime_zero);
 }

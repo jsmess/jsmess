@@ -852,7 +852,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 }
 INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
 {
-	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(MAME_TIME_IN_HZ(ST->clock), busyclock * ST->timer_prescaler);
+	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(ATTOTIME_IN_HZ(ST->clock), busyclock * ST->timer_prescaler);
 	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(), expiry_period);
 }
 #else
@@ -1627,7 +1627,7 @@ static void FMsave_state_st(const char *state_name,int num,FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
 	state_save_register_item(state_name, num, ST->busy_expiry_time.seconds );
-	state_save_register_item(state_name, num, ST->busy_expiry_time.subseconds );
+	state_save_register_item(state_name, num, ST->busy_expiry_time.attoseconds );
 #endif
 	state_save_register_item(state_name, num, ST->address );
 	state_save_register_item(state_name, num, ST->irq     );

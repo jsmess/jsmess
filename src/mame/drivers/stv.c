@@ -251,7 +251,7 @@ static UINT8 *smpc_ram;
 
 UINT32* stv_workram_l;
 UINT32* stv_workram_h;
-UINT32* stv_backupram;
+static UINT32* stv_backupram;
 extern UINT32* stv_scu;
 static UINT32* ioga;
 static UINT16* scsp_regs;
@@ -292,7 +292,7 @@ static void dma_indirect_lv2(void); /*DMA level 2 indirect transfer function*/
 
 
 int minit_boost,sinit_boost;
-mame_time minit_boost_timeslice, sinit_boost_timeslice;
+attotime minit_boost_timeslice, sinit_boost_timeslice;
 
 static int scanline;
 
@@ -2049,7 +2049,7 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
 static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
-	cpu_boost_interleave(minit_boost_timeslice, MAME_TIME_IN_USEC(minit_boost));
+	cpu_boost_interleave(minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpu_trigger(1000);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
@@ -2057,7 +2057,7 @@ static WRITE32_HANDLER( minit_w )
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
-	cpu_boost_interleave(sinit_boost_timeslice, MAME_TIME_IN_USEC(sinit_boost));
+	cpu_boost_interleave(sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
@@ -2499,8 +2499,8 @@ DRIVER_INIT ( stv )
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	minit_boost = 400;
 	sinit_boost = 400;
-	minit_boost_timeslice = time_zero;
-	sinit_boost_timeslice = time_zero;
+	minit_boost_timeslice = attotime_zero;
+	sinit_boost_timeslice = attotime_zero;
 
 	smpc_ram = auto_malloc (0x80);
 	stv_scu = auto_malloc (0x100);
@@ -2743,7 +2743,7 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_CPU_PROGRAM_MAP(sound_mem, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(192))	// guess, needed to force video update after V-Blank OUT interrupt
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
 
 	MDRV_MACHINE_START(stv)
 	MDRV_MACHINE_RESET(stv)

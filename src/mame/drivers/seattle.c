@@ -215,7 +215,7 @@
  *************************************/
 
 #define SYSTEM_CLOCK			50000000
-#define TIMER_PERIOD			MAME_TIME_IN_HZ(SYSTEM_CLOCK)
+#define TIMER_PERIOD			ATTOTIME_IN_HZ(SYSTEM_CLOCK)
 
 /* various board configurations */
 #define PHOENIX_CONFIG			(0)
@@ -381,7 +381,7 @@
 
 struct galileo_timer
 {
-	mame_timer *		timer;
+	emu_timer *		timer;
 	UINT32			count;
 	UINT8			active;
 };
@@ -541,10 +541,10 @@ static MACHINE_RESET( seattle )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* allocate timers for the galileo */
-	galileo.timer[0].timer = mame_timer_alloc(galileo_timer_callback);
-	galileo.timer[1].timer = mame_timer_alloc(galileo_timer_callback);
-	galileo.timer[2].timer = mame_timer_alloc(galileo_timer_callback);
-	galileo.timer[3].timer = mame_timer_alloc(galileo_timer_callback);
+	galileo.timer[0].timer = timer_alloc(galileo_timer_callback);
+	galileo.timer[1].timer = timer_alloc(galileo_timer_callback);
+	galileo.timer[2].timer = timer_alloc(galileo_timer_callback);
+	galileo.timer[3].timer = timer_alloc(galileo_timer_callback);
 	galileo.dma_active = -1;
 
 	vblank_irq_num = 0;
@@ -915,7 +915,7 @@ static TIMER_CALLBACK( galileo_timer_callback )
 
 	/* if we're a timer, adjust the timer to fire again */
 	if (galileo.reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
-		mame_timer_adjust(timer->timer, scale_up_mame_time(TIMER_PERIOD, timer->count), which, time_zero);
+		timer_adjust(timer->timer, attotime_mul(TIMER_PERIOD, timer->count), which, attotime_zero);
 	else
 		timer->active = timer->count = 0;
 
@@ -1095,7 +1095,7 @@ static READ32_HANDLER( galileo_r )
 			result = timer->count;
 			if (timer->active)
 			{
-				UINT32 elapsed = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
+				UINT32 elapsed = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
@@ -1226,16 +1226,16 @@ static WRITE32_HANDLER( galileo_w )
 						if (which != 0)
 							timer->count &= 0xffffff;
 					}
-					mame_timer_adjust(timer->timer, scale_up_mame_time(TIMER_PERIOD, timer->count), which, time_zero);
+					timer_adjust(timer->timer, attotime_mul(TIMER_PERIOD, timer->count), which, attotime_zero);
 					if (LOG_TIMERS)
-						logerror("Adjusted timer to fire in %f secs\n", mame_time_to_double(scale_up_mame_time(TIMER_PERIOD, timer->count)));
+						logerror("Adjusted timer to fire in %f secs\n", attotime_to_double(attotime_mul(TIMER_PERIOD, timer->count)));
 				}
 				else if (timer->active && !(data & mask))
 				{
-					UINT32 elapsed = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
+					UINT32 elapsed = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
-					mame_timer_adjust(timer->timer, time_never, which, time_zero);
+					timer_adjust(timer->timer, attotime_never, which, attotime_zero);
 					if (LOG_TIMERS)
 						logerror("Disabled timer\n");
 				}
@@ -2454,7 +2454,7 @@ static struct mips3_config config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-MACHINE_DRIVER_START( seattle_common )
+static MACHINE_DRIVER_START( seattle_common )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", R5000LE, SYSTEM_CLOCK*3)
@@ -2479,28 +2479,28 @@ MACHINE_DRIVER_START( seattle_common )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( phoenixsa )
+static MACHINE_DRIVER_START( phoenixsa )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_CPU_REPLACE("main", R4700LE, SYSTEM_CLOCK*2)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( seattle150 )
+static MACHINE_DRIVER_START( seattle150 )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*3)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( seattle200 )
+static MACHINE_DRIVER_START( seattle200 )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*4)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( flagstaff )
+static MACHINE_DRIVER_START( flagstaff )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*4)
 	MDRV_VIDEO_START(flagstaff)

@@ -45,7 +45,7 @@ typedef struct
 	int bits;
 	UINT8 data_recv_index, data_recv[50];
 	UINT8 mode, pos;
-	mame_timer *timer;
+	emu_timer *timer;
 } PCF8593;
 
 static PCF8593 rtc;
@@ -56,8 +56,8 @@ void pcf8593_init( void)
 	memset( &rtc, 0, sizeof( rtc));
 	rtc.size = 16;
 	rtc.data = malloc( rtc.size);
-	rtc.timer = mame_timer_alloc( pcf8593_timer_callback );
-	mame_timer_adjust( rtc.timer, MAME_TIME_IN_SEC(1), 0, MAME_TIME_IN_SEC(1));
+	rtc.timer = timer_alloc( pcf8593_timer_callback );
+	timer_adjust( rtc.timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
 	pcf8593_reset();
 }
 

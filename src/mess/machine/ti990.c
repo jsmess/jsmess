@@ -84,7 +84,7 @@ static TIMER_CALLBACK(clear_load)
 void ti990_hold_load(void)
 {
 	cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
-	mame_timer_set(MAME_TIME_IN_MSEC(100), 0, clear_load);
+	timer_set(ATTOTIME_IN_MSEC(100), 0, clear_load);
 }
 
 /*

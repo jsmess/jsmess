@@ -78,12 +78,12 @@ static int mapper41_chr, mapper41_reg2;
 
 static int mapper_warning;
 
-static mame_timer	*nes_irq_timer;
+static emu_timer	*nes_irq_timer;
 
 static TIMER_CALLBACK(nes_irq_callback)
 {
 	cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
-	mame_timer_adjust(nes_irq_timer, time_never, 0, time_never);
+	timer_adjust(nes_irq_timer, attotime_never, 0, attotime_never);
 }
 
 WRITE8_HANDLER( nes_low_mapper_w )
@@ -640,7 +640,7 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 		{
 			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
 			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
-//			mame_timer_adjust(nes_irq_timer, MAME_TIME_IN_CYCLES(4, 0), 0, time_never);
+//			timer_adjust(nes_irq_timer, ATTOTIME_IN_CYCLES(4, 0), 0, attotime_never);
 		}
 	}
 }
@@ -4213,7 +4213,7 @@ int mapper_reset (int mapperNum)
 	ppu2c0x_set_hblank_callback (0, mapper ? mapper->mmc_hblank :  NULL);
 
 	if (!nes_irq_timer)
-		nes_irq_timer = mame_timer_alloc(nes_irq_callback);
+		nes_irq_timer = timer_alloc(nes_irq_callback);
 		
 	mapper_warning = 0;
 	/* 8k mask */

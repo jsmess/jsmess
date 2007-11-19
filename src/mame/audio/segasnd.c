@@ -317,7 +317,7 @@ void sega_usb_reset(UINT8 t1_clock_mask)
 	cpunum_set_input_line(usb.cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
-	mame_timer_pulse(scale_up_mame_time(MAME_TIME_IN_HZ(USB_2MHZ_CLOCK), 256), 0, increment_t1_clock);
+	timer_pulse(attotime_mul(ATTOTIME_IN_HZ(USB_2MHZ_CLOCK), 256), 0, increment_t1_clock);
 	usb.t1_clock_mask = t1_clock_mask;
 }
 
@@ -363,7 +363,7 @@ WRITE8_HANDLER( sega_usb_data_w )
 	timer_call_after_resynch(data, delayed_usb_data_w);
 
 	/* boost the interleave so that sequences can be sent */
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(250));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(250));
 }
 
 

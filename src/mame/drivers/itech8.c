@@ -622,7 +622,7 @@ static MACHINE_START( sstrike )
 	machine_start_itech8(machine);
 
 	/* we need to update behind the beam as well */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 32, behind_the_beam_update);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), 32, behind_the_beam_update);
 }
 
 static MACHINE_RESET( itech8 )
@@ -674,7 +674,7 @@ static TIMER_CALLBACK( behind_the_beam_update )
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), (scanline << 8) + interval, behind_the_beam_update);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), (scanline << 8) + interval, behind_the_beam_update);
 }
 
 

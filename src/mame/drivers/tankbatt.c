@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
 
-INTERRUPT_GEN( tankbatt_interrupt )
+static INTERRUPT_GEN( tankbatt_interrupt )
 {
 	if ((readinputport (0) & 0x60) == 0) cpunum_set_input_line(0,0,HOLD_LINE);
 	else if (tankbatt_nmi_enable) cpunum_set_input_line(0,INPUT_LINE_NMI,PULSE_LINE);

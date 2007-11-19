@@ -5,7 +5,7 @@
 #include "namcoic.h"
 #include "namcos2.h"
 
-UINT32 *namcofl_spritebank32;
+//UINT32 *namcofl_spritebank32;
 //UINT32 *namcofl_tilebank32;
 UINT32 *namcofl_mcuram;
 

@@ -1,7 +1,7 @@
 #include "driver.h"
 
-tilemap *ksayakyu_tilemap;
-tilemap *ksayakyu_textmap;
+static tilemap *ksayakyu_tilemap;
+static tilemap *ksayakyu_textmap;
 
 static int video_ctrl;
 static int flipscreen;

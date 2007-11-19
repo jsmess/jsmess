@@ -27,7 +27,7 @@
 
 
 static laserdisc_info *discinfo;
-static mame_timer *serial_timer;
+static emu_timer *serial_timer;
 static UINT8 serial_timer_active;
 static UINT16 input_select;
 
@@ -145,7 +145,7 @@ static VIDEO_UPDATE( alg )
 static MACHINE_START( alg )
 {
 	discinfo = laserdisc_init(LASERDISC_TYPE_LDP1450, get_disk_handle(0), 1);
-	serial_timer = mame_timer_alloc(response_timer);
+	serial_timer = timer_alloc(response_timer);
 	serial_timer_active = FALSE;
 }
 
@@ -177,7 +177,7 @@ static TIMER_CALLBACK( response_timer )
 
 	/* if there's more to come, set another timer */
 	if (laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		mame_timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, time_zero);
+		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, attotime_zero);
 	else
 		serial_timer_active = FALSE;
 }
@@ -191,7 +191,7 @@ static void vsync_callback(void)
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		mame_timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, time_zero);
+		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, attotime_zero);
 		serial_timer_active = TRUE;
 	}
 }
@@ -205,7 +205,7 @@ static void serial_w(UINT16 data)
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		mame_timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, time_zero);
+		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, attotime_zero);
 		serial_timer_active = TRUE;
 	}
 }
@@ -457,7 +457,7 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 262)
 
 	MDRV_SCREEN_REFRESH_RATE(59.97)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
 	MDRV_MACHINE_START(alg)
 	MDRV_MACHINE_RESET(alg)

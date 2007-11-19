@@ -4,7 +4,7 @@ static int homerun_gfx_ctrl;
 static int homerun_gc_up,homerun_gc_down;
 int homerun_xpa,homerun_xpb,homerun_xpc;
 
-tilemap *homerun_tilemap;
+static tilemap *homerun_tilemap;
 UINT8 *homerun_videoram;
 
 #define half_screen 116

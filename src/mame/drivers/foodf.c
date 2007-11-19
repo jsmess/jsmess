@@ -88,7 +88,7 @@
  *
  *************************************/
 
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 static UINT8 whichport = 0;
 
 
@@ -146,21 +146,21 @@ static TIMER_CALLBACK( scanline_update )
 		scanline = 0;
 
 	/* set a timer for it */
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
 static MACHINE_START( foodf )
 {
 	state_save_register_global(whichport);
-	scanline_timer = mame_timer_alloc(scanline_update);
+	scanline_timer = timer_alloc(scanline_update);
 }
 
 
 static MACHINE_RESET( foodf )
 {
 	atarigen_interrupt_reset(update_interrupts);
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 }
 
 

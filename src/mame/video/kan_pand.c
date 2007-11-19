@@ -70,7 +70,7 @@ void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectang
 }
 
 
-void pandora_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void pandora_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 
 	int sx=0, sy=0, x=0, y=0, offs;

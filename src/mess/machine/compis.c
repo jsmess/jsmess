@@ -53,10 +53,10 @@ struct timer_state
 	UINT16	maxA;
 	UINT16	maxB;
 	UINT16	count;
-	mame_timer *	int_timer;
-	mame_timer *	time_timer;
+	emu_timer *	int_timer;
+	emu_timer *	time_timer;
 	UINT8	time_timer_active;
-	mame_time	last_time;
+	attotime	last_time;
 };
 
 struct dma_state
@@ -66,7 +66,7 @@ struct dma_state
 	UINT16	count;
 	UINT16	control;
 	UINT8	finished;
-	mame_timer *	finish_timer;
+	emu_timer *	finish_timer;
 };
 
 struct intr_state
@@ -567,7 +567,7 @@ WRITE16_HANDLER ( compis_usart_w )
 static int int_callback(int line)
 {
 	if (LOG_INTERRUPTS)
-		logerror("(%f) **** Acknowledged interrupt vector %02X\n", mame_time_to_double(mame_timer_get_time()), i186.intr.poll_status & 0x1f);
+		logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time()), i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	activecpu_set_input_line(0, CLEAR_LINE);
@@ -682,7 +682,7 @@ generate_int:
 	i186.intr.pending = 1;
 	cpu_trigger(CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", mame_time_to_double(mame_timer_get_time()), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time()), new_vector);
 }
 
 
@@ -707,7 +707,7 @@ static void handle_eoi(int data)
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", activecpu_get_pc(), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", mame_time_to_double(mame_timer_get_time()), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time()), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -720,7 +720,7 @@ static void handle_eoi(int data)
 			if ((i186.intr.timer & 7) == i && (i186.intr.in_service & 0x01))
 			{
 				i186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", mame_time_to_double(mame_timer_get_time()));
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", attotime_to_double(timer_get_time()));
 				return;
 			}
 
@@ -729,7 +729,7 @@ static void handle_eoi(int data)
 				if ((i186.intr.dma[j] & 7) == i && (i186.intr.in_service & (0x04 << j)))
 				{
 					i186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", mame_time_to_double(mame_timer_get_time()), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", attotime_to_double(timer_get_time()), j);
 					return;
 				}
 
@@ -738,7 +738,7 @@ static void handle_eoi(int data)
 				if ((i186.intr.ext[j] & 7) == i && (i186.intr.in_service & (0x10 << j)))
 				{
 					i186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", mame_time_to_double(mame_timer_get_time()), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", attotime_to_double(timer_get_time()), j);
 					return;
 				}
 		}
@@ -774,11 +774,11 @@ static TIMER_CALLBACK(internal_timer_int)
 	if (t->control & 0x0001)
 	{
 		int count = t->maxA ? t->maxA : 0x10000;
-		mame_timer_adjust(t->int_timer, scale_up_mame_time(MAME_TIME_IN_HZ(2000000), count), which, time_zero);
+		timer_adjust(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), count), which, attotime_zero);
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		mame_timer_adjust(t->int_timer, time_never, which, time_zero);
+		timer_adjust(t->int_timer, attotime_never, which, attotime_zero);
 }
 
 
@@ -789,8 +789,8 @@ static void internal_timer_sync(int which)
 	/* if we have a timing timer running, adjust the count */
 	if (t->time_timer_active)
 	{
-		mame_time current_time = mame_timer_timeelapsed(t->time_timer);
-		int net_clocks = scale_up_mame_time(sub_mame_times(current_time, t->last_time),  2000000).seconds;
+		attotime current_time = timer_timeelapsed(t->time_timer);
+		int net_clocks = attotime_mul(attotime_sub(current_time, t->last_time),  2000000).seconds;
 		t->last_time = current_time;
 
 		/* set the max count bit if we passed the max */
@@ -889,7 +889,7 @@ static void internal_timer_update(int which,
 				internal_timer_sync(which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				mame_timer_adjust(t->time_timer, time_never, which, time_zero);
+				timer_adjust(t->time_timer, attotime_never, which, attotime_zero);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -898,7 +898,7 @@ static void internal_timer_update(int which,
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				mame_timer_adjust(t->time_timer, time_never, which, time_zero);
+				timer_adjust(t->time_timer, attotime_never, which, attotime_zero);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -923,12 +923,12 @@ static void internal_timer_update(int which,
 	        	int diff = t->maxA - t->count;
 	         	if (diff <= 0)
 	         		diff += 0x10000;
-	         	mame_timer_adjust(t->int_timer, scale_up_mame_time(MAME_TIME_IN_HZ(2000000), diff), which, time_zero);
+	         	timer_adjust(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which, attotime_zero);
 	         	if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 	      	}
 	      	else
 	      	{
-	        	mame_timer_adjust(t->int_timer, time_never, which, time_zero);
+	        	timer_adjust(t->int_timer, attotime_never, which, attotime_zero);
 		}
 	}
 }
@@ -1010,8 +1010,8 @@ static void update_dma_control(int which, int new_control)
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 			d->finished = 0;
-/*			mame_timer_adjust(d->finish_timer,
-         MAME_TIME_IN_HZ(dac[dacnum].frequency) * (double)count, which, 0);*/
+/*			timer_adjust(d->finish_timer,
+         ATTOTIME_IN_HZ(dac[dacnum].frequency) * (double)count, which, 0);*/
 		}
 	}
 
@@ -1519,14 +1519,14 @@ WRITE16_HANDLER( i186_internal_port_w )
 void compis_cpu_init(void)
 {
 	/* create timers here so they stick around */
-	i186.timer[0].int_timer = mame_timer_alloc(internal_timer_int);
-	i186.timer[1].int_timer = mame_timer_alloc(internal_timer_int);
-	i186.timer[2].int_timer = mame_timer_alloc(internal_timer_int);
-	i186.timer[0].time_timer = mame_timer_alloc(NULL);
-	i186.timer[1].time_timer = mame_timer_alloc(NULL);
-	i186.timer[2].time_timer = mame_timer_alloc(NULL);
-	i186.dma[0].finish_timer = mame_timer_alloc(dma_timer_callback);
-	i186.dma[1].finish_timer = mame_timer_alloc(dma_timer_callback);
+	i186.timer[0].int_timer = timer_alloc(internal_timer_int);
+	i186.timer[1].int_timer = timer_alloc(internal_timer_int);
+	i186.timer[2].int_timer = timer_alloc(internal_timer_int);
+	i186.timer[0].time_timer = timer_alloc(NULL);
+	i186.timer[1].time_timer = timer_alloc(NULL);
+	i186.timer[2].time_timer = timer_alloc(NULL);
+	i186.dma[0].finish_timer = timer_alloc(dma_timer_callback);
+	i186.dma[1].finish_timer = timer_alloc(dma_timer_callback);
 }
 
 /*-------------------------------------------------------------------------*/

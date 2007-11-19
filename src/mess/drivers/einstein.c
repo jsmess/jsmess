@@ -1453,11 +1453,11 @@ static MACHINE_RESET( einstein )
 	/* the einstein keyboard can generate a interrupt */
 	/* the int is actually clocked at the system clock 4Mhz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */
-	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, einstein_keyboard_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(50), 0, einstein_keyboard_timer_callback);
 
 	/* the input to channel 0 and 1 of the ctc is a 2mhz clock */
 	einstein_ctc_trigger = 0;
-	mame_timer_pulse(MAME_TIME_IN_HZ(2000000), 0, einstein_ctc_trigger_callback);
+	timer_pulse(ATTOTIME_IN_HZ(2000000), 0, einstein_ctc_trigger_callback);
 
 	centronics_config(0, einstein_cent_config);
 	/* assumption: select is tied low */

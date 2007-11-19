@@ -235,7 +235,7 @@ static MACHINE_DRIVER_START( dommy )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,16)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(3072)        /* frames per second, vblank duration taken from Burger Time */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)        /* frames per second, vblank duration taken from Burger Time */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( scregg )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,16)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(3072)        /* frames per second, vblank duration taken from Burger Time */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)        /* frames per second, vblank duration taken from Burger Time */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

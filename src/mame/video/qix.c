@@ -24,7 +24,7 @@ UINT8 qix_cocktail_flip;
 static UINT8 vram_mask;
 static UINT8 qix_palettebank;
 static UINT8 leds;
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 static UINT8 scanline_latch;
 
 
@@ -84,8 +84,8 @@ VIDEO_START( qix )
 	vram_mask = 0xff;
 
 	/* allocate a timer */
-	scanline_timer = mame_timer_alloc(scanline_callback);
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, time_zero);
+	scanline_timer = timer_alloc(scanline_callback);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, attotime_zero);
 
 	/* set up save states */
 	state_save_register_global_pointer(videoram, 256 * 256);
@@ -114,7 +114,7 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline += SCANLINE_INCREMENT;
 	if (scanline > machine->screen[0].visarea.max_y)
 		scanline = SCANLINE_INCREMENT;
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 

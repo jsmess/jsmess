@@ -729,7 +729,7 @@ static void update_all_volumes(running_machine *machine )
  *
  *************************************/
 
-ADDRESS_MAP_START( atarijsa1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2000, 0x2001) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0x2800, 0x2bff) AM_READ(jsa1_io_r)
@@ -737,7 +737,7 @@ ADDRESS_MAP_START( atarijsa1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( atarijsa1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2151_data_port_0_w)
@@ -746,7 +746,7 @@ ADDRESS_MAP_START( atarijsa1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( atarijsa2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2000, 0x2001) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0x2800, 0x2bff) AM_READ(jsa2_io_r)
@@ -754,7 +754,7 @@ ADDRESS_MAP_START( atarijsa2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( atarijsa2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2151_data_port_0_w)
@@ -764,7 +764,7 @@ ADDRESS_MAP_END
 
 
 /* full map verified from schematics and Batman GALs */
-ADDRESS_MAP_START( atarijsa3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07fe) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x07fe) AM_WRITE(YM2151_data_port_0_w)
@@ -774,7 +774,7 @@ ADDRESS_MAP_START( atarijsa3_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( atarijsa3s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa3s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07fe) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x07fe) AM_WRITE(YM2151_data_port_0_w)

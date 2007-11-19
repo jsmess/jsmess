@@ -76,13 +76,13 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 	}
 }
 
-INTERRUPT_GEN( xxmissio_interrupt_m )
+static INTERRUPT_GEN( xxmissio_interrupt_m )
 {
 	xxmissio_status &= ~0x20;
 	cpunum_set_input_line(0, 0, HOLD_LINE);
 }
 
-INTERRUPT_GEN( xxmissio_interrupt_s )
+static INTERRUPT_GEN( xxmissio_interrupt_s )
 {
 	xxmissio_status &= ~0x10;
 	cpunum_set_input_line(1, 0, HOLD_LINE);

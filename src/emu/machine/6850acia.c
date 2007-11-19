@@ -84,8 +84,8 @@ typedef struct _acia_6850_
 	enum 	serial_state rx_state;
 	enum 	serial_state tx_state;
 
-	mame_timer *rx_timer;
-	mame_timer *tx_timer;
+	emu_timer *rx_timer;
+	emu_timer *tx_timer;
 
 	void (*int_callback)(int param);
 } acia_6850;
@@ -168,15 +168,15 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	acia_p->cts_pin = intf->cts_pin;
 	acia_p->rts_pin = intf->rts_pin;
 	acia_p->dcd_pin = intf->dcd_pin;
-	acia_p->rx_timer = mame_timer_alloc(receive_event);
-	acia_p->tx_timer = mame_timer_alloc(transmit_event);
+	acia_p->rx_timer = timer_alloc(receive_event);
+	acia_p->tx_timer = timer_alloc(transmit_event);
 	acia_p->int_callback = intf->int_callback;
 	acia_p->first_reset = 1;
 	acia_p->status_read = 0;
 	acia_p->brk = 0;
 
-	mame_timer_reset(acia_p->rx_timer, time_never);
-	mame_timer_reset(acia_p->tx_timer, time_never);
+	timer_reset(acia_p->rx_timer, attotime_never);
+	timer_reset(acia_p->tx_timer, attotime_never);
 
 	state_save_register_item("acia6850", which, acia_p->ctrl);
 	state_save_register_item("acia6850", which, acia_p->status);
@@ -204,7 +204,7 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 /*
     Read Status Register
 */
-UINT8 acia6850_stat_r(int which)
+static UINT8 acia6850_stat_r(int which)
 {
 	acia_6850 *acia_p = &acia[which];
 
@@ -216,7 +216,7 @@ UINT8 acia6850_stat_r(int which)
 /*
     Write Control Register
 */
-void acia6850_ctrl_w(int which, UINT8 data)
+static void acia6850_ctrl_w(int which, UINT8 data)
 {
 	acia_6850 *acia_p = &acia[which];
 
@@ -297,14 +297,14 @@ void acia6850_ctrl_w(int which, UINT8 data)
 
 	if (!acia_p->reset)
 	{
-		mame_time rx_period = scale_up_mame_time(MAME_TIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
-		mame_time tx_period = scale_up_mame_time(MAME_TIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
-		mame_timer_adjust(acia_p->rx_timer, rx_period, which, rx_period);
-		mame_timer_adjust(acia_p->tx_timer, tx_period, which, tx_period);
+		attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
+		attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
+		timer_adjust(acia_p->rx_timer, rx_period, which, rx_period);
+		timer_adjust(acia_p->tx_timer, tx_period, which, tx_period);
 	}
 }
 
-void acia6850_check_interrupts(int which)
+static void acia6850_check_interrupts(int which)
 {
 	acia_6850 *acia_p = &acia[which];
 
@@ -334,7 +334,7 @@ void acia6850_check_interrupts(int which)
 /*
     Write transmit register
 */
-void acia6850_data_w(int which, UINT8 data)
+static void acia6850_data_w(int which, UINT8 data)
 {
 	acia_6850 *acia_p = &acia[which];
 
@@ -353,7 +353,7 @@ void acia6850_data_w(int which, UINT8 data)
 /*
     Read character
 */
-UINT8 acia6850_data_r(int which)
+static UINT8 acia6850_data_r(int which)
 {
 	acia_6850 *acia_p = &acia[which];
 

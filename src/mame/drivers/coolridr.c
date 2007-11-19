@@ -85,8 +85,8 @@ static VIDEO_UPDATE(coolridr)
 
 /* end video */
 
-UINT32* sysh1_workram_h;
-UINT16* sysh1_soundram;
+static UINT32* sysh1_workram_h;
+//UINT16* sysh1_soundram;
 
 // what's wrong:
 //

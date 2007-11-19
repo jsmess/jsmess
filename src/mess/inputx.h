@@ -101,23 +101,23 @@ const char *inputx_key_name(unicode_char ch);
 
 /* various posting functions; can be called from FEs */
 void inputx_post(const unicode_char *text);
-void inputx_post_rate(const unicode_char *text, mame_time rate);
+void inputx_post_rate(const unicode_char *text, attotime rate);
 void inputx_postc(unicode_char ch);
-void inputx_postc_rate(unicode_char ch, mame_time rate);
+void inputx_postc_rate(unicode_char ch, attotime rate);
 void inputx_postn(const unicode_char *text, size_t text_len);
-void inputx_postn_rate(const unicode_char *text, size_t text_len, mame_time rate);
+void inputx_postn_rate(const unicode_char *text, size_t text_len, attotime rate);
 void inputx_post_utf16(const utf16_char *text);
-void inputx_post_utf16_rate(const utf16_char *text, mame_time rate);
+void inputx_post_utf16_rate(const utf16_char *text, attotime rate);
 void inputx_postn_utf16(const utf16_char *text, size_t text_len);
-void inputx_postn_utf16_rate(const utf16_char *text, size_t text_len, mame_time rate);
+void inputx_postn_utf16_rate(const utf16_char *text, size_t text_len, attotime rate);
 void inputx_post_utf8(const char *text);
-void inputx_post_utf8_rate(const char *text, mame_time rate);
+void inputx_post_utf8_rate(const char *text, attotime rate);
 void inputx_postn_utf8(const char *text, size_t text_len);
-void inputx_postn_utf8_rate(const char *text, size_t text_len, mame_time rate);
+void inputx_postn_utf8_rate(const char *text, size_t text_len, attotime rate);
 void inputx_post_coded(const char *text);
-void inputx_post_coded_rate(const char *text, mame_time rate);
+void inputx_post_coded_rate(const char *text, attotime rate);
 void inputx_postn_coded(const char *text, size_t text_len);
-void inputx_postn_coded_rate(const char *text, size_t text_len, mame_time rate);
+void inputx_postn_coded_rate(const char *text, size_t text_len, attotime rate);
 
 /* miscellaneous functions */
 int input_classify_port(const input_port_entry *in);

@@ -9,8 +9,8 @@
 #include "sound/speaker.h"
 
 
-static mame_timer *schaser_effect_555_timer;
-static mame_time schaser_effect_555_time_remain;
+static emu_timer *schaser_effect_555_timer;
+static attotime schaser_effect_555_time_remain;
 static int schaser_effect_555_is_low;
 static int schaser_explosion;
 static UINT8 port_1_last = 0;
@@ -797,16 +797,16 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 	{
 		if (effect)
 		{
-			if (compare_mame_times(schaser_effect_555_time_remain, time_zero) != 0)
+			if (attotime_compare(schaser_effect_555_time_remain, attotime_zero) != 0)
 			{
 				/* timer re-enabled, use up remaining 555 high time */
-				mame_timer_adjust(schaser_effect_555_timer, schaser_effect_555_time_remain, effect, time_zero);
+				timer_adjust(schaser_effect_555_timer, schaser_effect_555_time_remain, effect, attotime_zero);
 			}
 			else if (!schaser_effect_555_is_low)
 			{
 				/* set 555 high time */
-				mame_time new_time = make_mame_time(0, MAX_SUBSECONDS * .8873 * schaser_effect_rc[effect]);
-				mame_timer_adjust(schaser_effect_555_timer, new_time, effect, time_zero);
+				attotime new_time = attotime_make(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
+				timer_adjust(schaser_effect_555_timer, new_time, effect, attotime_zero);
 			}
 		}
 		else
@@ -814,8 +814,8 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			/* disable effect - stops at end of low cycle */
 			if (!schaser_effect_555_is_low)
 			{
-				schaser_effect_555_time_remain = mame_timer_timeleft(schaser_effect_555_timer);
-				mame_timer_adjust(schaser_effect_555_timer, time_never, 0, time_never);
+				schaser_effect_555_time_remain = timer_timeleft(schaser_effect_555_timer);
+				timer_adjust(schaser_effect_555_timer, attotime_never, 0, attotime_never);
 			}
 		}
 		last_effect = effect;
@@ -860,21 +860,21 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 static TIMER_CALLBACK( schaser_effect_555_cb )
 {
 	int effect = param;
-	mame_time new_time;
+	attotime new_time;
 	/* Toggle 555 output */
 	schaser_effect_555_is_low = !schaser_effect_555_is_low;
-	schaser_effect_555_time_remain = time_zero;
+	schaser_effect_555_time_remain = attotime_zero;
 
 	if (schaser_effect_555_is_low)
-		new_time = scale_down_mame_time(PERIOD_OF_555_ASTABLE(0, RES_K(20), CAP_U(1)), 2);
+		new_time = attotime_div(PERIOD_OF_555_ASTABLE(0, RES_K(20), CAP_U(1)), 2);
 	else
 	{
 		if (effect)
-			new_time = make_mame_time(0, MAX_SUBSECONDS * .8873 * schaser_effect_rc[effect]);
+			new_time = attotime_make(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
 		else
-			new_time = time_never;
+			new_time = attotime_never;
 	}
-	mame_timer_adjust(schaser_effect_555_timer, new_time, effect, time_zero);
+	timer_adjust(schaser_effect_555_timer, new_time, effect, attotime_zero);
 	SN76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
 	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
 }
@@ -882,7 +882,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 
 MACHINE_START( schaser )
 {
-	schaser_effect_555_timer = mame_timer_alloc(schaser_effect_555_cb);
+	schaser_effect_555_timer = timer_alloc(schaser_effect_555_cb);
 
 	machine_start_mw8080bw(machine);
 }
@@ -891,10 +891,10 @@ MACHINE_START( schaser )
 MACHINE_RESET( schaser )
 {
 	schaser_effect_555_is_low = 0;
-	mame_timer_adjust(schaser_effect_555_timer, time_never, 0, time_never);
+	timer_adjust(schaser_effect_555_timer, attotime_never, 0, attotime_never);
 	schaser_sh_port_1_w(0, 0);
 	schaser_sh_port_2_w(0, 0);
-	schaser_effect_555_time_remain = time_zero;
+	schaser_effect_555_time_remain = attotime_zero;
 
 	machine_reset_mw8080bw(machine);
 }

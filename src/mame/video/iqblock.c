@@ -3,7 +3,7 @@
 
 
 UINT8 *iqblock_bgvideoram;
-UINT8 *iqblock_fgscroll;
+//UINT8 *iqblock_fgscroll;
 UINT8 *iqblock_fgvideoram;
 int iqblock_videoenable;
 int iqblock_video_type;

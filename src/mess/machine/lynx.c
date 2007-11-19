@@ -72,7 +72,7 @@ static struct
 
     int everon;
     int memory_accesses;
-    mame_time time;
+    attotime time;
 } blitter;
 
 UINT8 *lynx_mem_0000;
@@ -610,7 +610,7 @@ static void lynx_blitter(void)
     }
 
 	if (0)
-		mame_timer_set(MAME_TIME_IN_CYCLES(blitter.memory_accesses*20,0), 0, lynx_blitter_timer);
+		timer_set(ATTOTIME_IN_CYCLES(blitter.memory_accesses*20,0), 0, lynx_blitter_timer);
 }
 
 static void lynx_divide(void)
@@ -672,12 +672,12 @@ static void lynx_multiply(void)
 		data=1; // must not be 0 for correct power up
 		break;
 	case 0x92:
-		if (!compare_mame_times(blitter.time, time_zero))
+		if (!attotime_compare(blitter.time, attotime_zero))
 		{
-			if ( MAME_TIME_TO_CYCLES(0,sub_mame_times(mame_timer_get_time(), blitter.time)) > blitter.memory_accesses*20)
+			if ( ATTOTIME_TO_CYCLES(0,attotime_sub(timer_get_time(), blitter.time)) > blitter.memory_accesses*20)
 			{
 				suzy.u.data[offset]&=~1; //blitter finished
-				blitter.time = time_zero;
+				blitter.time = attotime_zero;
 			}
 		}
 		data=suzy.u.data[offset];
@@ -744,7 +744,7 @@ WRITE8_HANDLER(suzy_write)
 	case 0x63: lynx_divide();break;
 	case 0x91:
 	    if (data&1) {
-		blitter.time=mame_timer_get_time();
+		blitter.time=timer_get_time();
 		lynx_blitter();
 	    }
 //	    logerror("suzy write %.2x %.2x\n",offset,data);
@@ -820,7 +820,7 @@ static TIMER_CALLBACK(lynx_timer_shot);
 static void lynx_timer_init(int which)
 {
 	memset( &lynx_timer[which], 0, sizeof(LYNX_TIMER) );
-	lynx_timer[which].timer = mame_timer_alloc( lynx_timer_shot );
+	lynx_timer[which].timer = timer_alloc( lynx_timer_shot );
 	lynx_timer[which].settime = 0.0;
 }
 
@@ -916,7 +916,7 @@ static UINT8 lynx_timer_read(int which, int offset)
 		else
 		{
 			if ( lynx_timer[which].timer_active )
-				data = (UINT8) ( lynx_timer[which].bakup - scale_up_mame_time(mame_timer_timeleft(lynx_timer[which].timer), lynx_time_factor( lynx_timer[which].cntrl1 & 7 )).seconds);
+				data = (UINT8) ( lynx_timer[which].bakup - attotime_mul(timer_timeleft(lynx_timer[which].timer), lynx_time_factor( lynx_timer[which].cntrl1 & 7 )).seconds);
 		}
 		break;
 
@@ -938,17 +938,17 @@ static void lynx_timer_write(int which, int offset, UINT8 data)
 		break;
 	case 1:
 		lynx_timer[which].cntrl1 = data;
-		mame_timer_reset( lynx_timer[which].timer, time_never);
+		timer_reset( lynx_timer[which].timer, attotime_never);
 		lynx_timer[which].timer_active = 0;
 		if ( ( lynx_timer[which].cntrl1 & 0x08 ) )
 		{
 			if ( ( lynx_timer[which].cntrl1 & 7 ) != 7 )
 			{
-				mame_time t = scale_up_mame_time(MAME_TIME_IN_HZ( lynx_time_factor( lynx_timer[which].cntrl1 & 7 ) ), lynx_timer[which].bakup + 1 );
+				attotime t = attotime_mul(ATTOTIME_IN_HZ( lynx_time_factor( lynx_timer[which].cntrl1 & 7 ) ), lynx_timer[which].bakup + 1 );
 				if ( lynx_timer[which].cntrl1 & 0x10 )
-					mame_timer_adjust( lynx_timer[which].timer, time_zero, which, t);
+					timer_adjust( lynx_timer[which].timer, attotime_zero, which, t);
 				else
-					mame_timer_adjust( lynx_timer[which].timer, t, which, time_zero);
+					timer_adjust( lynx_timer[which].timer, t, which, attotime_zero);
 				lynx_timer[which].timer_active = 1;
 			}
 		}
@@ -983,7 +983,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
     if (uart.buffer_loaded) {
 	uart.data_to_send=uart.buffer;
 	uart.buffer_loaded=FALSE;
-	mame_timer_set(MAME_TIME_IN_USEC(11), 0, lynx_uart_timer);	
+	timer_set(ATTOTIME_IN_USEC(11), 0, lynx_uart_timer);	
     } else {
 	uart.sending=FALSE;
     }
@@ -1025,7 +1025,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 	} else {
 	    uart.sending=TRUE;
 	    uart.data_to_send=data;
-	    mame_timer_set(MAME_TIME_IN_USEC(11), 0, lynx_uart_timer);
+	    timer_set(ATTOTIME_IN_USEC(11), 0, lynx_uart_timer);
 	}
 	break;
     }

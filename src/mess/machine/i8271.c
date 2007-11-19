@@ -61,8 +61,8 @@ void i8271_init(i8271_interface *iface)
 	{
 		memcpy(&i8271.fdc_interface, iface, sizeof(i8271_interface));
 	}
-	i8271.data_timer = mame_timer_alloc(i8271_data_timer_callback);
-	i8271.command_complete_timer = mame_timer_alloc(i8271_timed_command_complete_callback);
+	i8271.data_timer = timer_alloc(i8271_data_timer_callback);
+	i8271.command_complete_timer = timer_alloc(i8271_timed_command_complete_callback);
 	i8271.drive = 0;
 	i8271.pExecutionPhaseData = temp_buffer;
 
@@ -138,7 +138,7 @@ static TIMER_CALLBACK(i8271_data_timer_callback)
 	i8271_data_request();
 
 	/* stop it */
-	mame_timer_reset(i8271.data_timer, time_never); 
+	timer_reset(i8271.data_timer, attotime_never); 
 }
 
 /* setup a timed data request - data request will be triggered in a few usecs time */
@@ -150,8 +150,8 @@ static void i8271_timed_data_request(void)
 	usecs = 64;
 
 	/* set timers */
-	mame_timer_reset(i8271.command_complete_timer, time_never);
-	mame_timer_adjust(i8271.data_timer, MAME_TIME_IN_USEC(usecs), 0, time_zero);
+	timer_reset(i8271.command_complete_timer, attotime_never);
+	timer_adjust(i8271.data_timer, ATTOTIME_IN_USEC(usecs), 0, attotime_zero);
 }
 
 
@@ -160,7 +160,7 @@ static TIMER_CALLBACK(i8271_timed_command_complete_callback)
 	i8271_command_complete(1,1);
 
 	/* stop it, but don't allow it to be free'd */
-	mame_timer_reset(i8271.command_complete_timer, time_never); 
+	timer_reset(i8271.command_complete_timer, attotime_never); 
 }
 
 /* setup a irq to occur 128us later - in reality this would be much later, because the int would
@@ -174,8 +174,8 @@ static void i8271_timed_command_complete(void)
 	usecs = 64*2;
 
 	/* set timers */
-	mame_timer_reset(i8271.data_timer, time_never);
-	mame_timer_adjust(i8271.command_complete_timer, MAME_TIME_IN_USEC(usecs), 0, time_zero);
+	timer_reset(i8271.data_timer, attotime_never);
+	timer_adjust(i8271.command_complete_timer, ATTOTIME_IN_USEC(usecs), 0, attotime_zero);
 }
 
 void i8271_reset()
@@ -186,8 +186,8 @@ void i8271_reset()
 	i8271.ParameterCount = 0;
 
 	/* if timer is active remove */
-	mame_timer_reset(i8271.command_complete_timer, time_never);
-	mame_timer_reset(i8271.data_timer, time_never);
+	timer_reset(i8271.command_complete_timer, attotime_never);
+	timer_reset(i8271.data_timer, attotime_never);
 
 	/* clear irq */
 	i8271_set_irq_state(0);

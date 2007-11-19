@@ -73,9 +73,9 @@ typedef struct {
 	pen_t					*colortable_mono;		/* monochromatic color table modified at run time */
 	UINT8					*dirtychar;				/* an array flagging dirty characters */
 	int						chars_are_dirty;		/* master flag to check if theres any dirty character */
-	mame_timer				*scanline_timer;		/* scanline timer */
-	mame_timer				*hblank_timer;			/* hblank period at end of each scanline */
-	mame_timer				*nmi_timer;				/* NMI timer */
+	emu_timer				*scanline_timer;		/* scanline timer */
+	emu_timer				*hblank_timer;			/* hblank period at end of each scanline */
+	emu_timer				*nmi_timer;				/* NMI timer */
 	int						scanline;				/* scanline count */
 	ppu2c0x_scanline_cb		scanline_callback_proc;	/* optional scanline callback */
 	ppu2c0x_hblank_cb		hblank_callback_proc;	/* optional hblank callback */
@@ -295,9 +295,9 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		}
 
 		/* initialize the scanline handling portion */
-		chips[i].scanline_timer = mame_timer_alloc(scanline_callback);
-		chips[i].hblank_timer = mame_timer_alloc(hblank_callback);
-		chips[i].nmi_timer = mame_timer_alloc(nmi_callback);
+		chips[i].scanline_timer = timer_alloc(scanline_callback);
+		chips[i].hblank_timer = timer_alloc(hblank_callback);
+		chips[i].nmi_timer = timer_alloc(nmi_callback);
 		chips[i].scanline = 0;
 		chips[i].scan_scale = 1;
 
@@ -363,7 +363,7 @@ static TIMER_CALLBACK( hblank_callback )
 	if (this_ppu->hblank_callback_proc)
 		(*this_ppu->hblank_callback_proc) (num, this_ppu->scanline, vblank, blanked);
 
-	mame_timer_adjust(chips[num].hblank_timer, time_never, num, time_never);
+	timer_adjust(chips[num].hblank_timer, attotime_never, num, attotime_never);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -375,7 +375,7 @@ static TIMER_CALLBACK( nmi_callback )
 	if (intf->nmi_handler[num])
 		(*intf->nmi_handler[num]) (num, ppu_regs);
 
-	mame_timer_adjust(chips[num].nmi_timer, time_never, num, time_never);
+	timer_adjust(chips[num].nmi_timer, attotime_never, num, attotime_never);
 }
 
 static void draw_background(const int num, UINT8 *line_priority )
@@ -871,7 +871,7 @@ logerror("vlbank starting\n");
 			// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
 			// via a read from $2002 in the NMI handler).
 			// B-Wings is an example game that needs this.
-			mame_timer_adjust(this_ppu->nmi_timer, MAME_TIME_IN_CYCLES(4, 0), num, time_never);
+			timer_adjust(this_ppu->nmi_timer, ATTOTIME_IN_CYCLES(4, 0), num, attotime_never);
 		}
 	}
 
@@ -922,10 +922,10 @@ logerror("vlbank ending\n");
 		next_scanline = 0;
 
 	// Call us back when the hblank starts for this scanline
-	mame_timer_adjust(this_ppu->hblank_timer, MAME_TIME_IN_CYCLES(86.67, 0), num, time_never); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust(this_ppu->hblank_timer, ATTOTIME_IN_CYCLES(86.67, 0), num, attotime_never); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// trigger again at the start of the next scanline
-	mame_timer_adjust(this_ppu->scanline_timer, video_screen_get_time_until_pos(0, next_scanline * this_ppu->scan_scale, 0), num, time_zero);
+	timer_adjust(this_ppu->scanline_timer, video_screen_get_time_until_pos(0, next_scanline * this_ppu->scan_scale, 0), num, attotime_zero);
 }
 
 /*************************************
@@ -950,13 +950,13 @@ void ppu2c0x_reset(int num, int scan_scale )
 	/* set the scan scale (this is for dual monitor vertical setups) */
 	chips[num].scan_scale = scan_scale;
 
-	mame_timer_adjust(chips[num].nmi_timer, time_never, num, time_never);
+	timer_adjust(chips[num].nmi_timer, attotime_never, num, attotime_never);
 
 	// Call us back when the hblank starts for this scanline
-	mame_timer_adjust(chips[num].hblank_timer, MAME_TIME_IN_CYCLES(86.67, 0), num, time_never); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust(chips[num].hblank_timer, ATTOTIME_IN_CYCLES(86.67, 0), num, attotime_never); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// Call us back at the start of the next scanline
-	mame_timer_adjust(chips[num].scanline_timer, video_screen_get_time_until_pos(0, 1, 0), num, time_zero);
+	timer_adjust(chips[num].scanline_timer, video_screen_get_time_until_pos(0, 1, 0), num, attotime_zero);
 
 	/* reset the callbacks */
 	chips[num].scanline_callback_proc = 0;
@@ -1489,6 +1489,7 @@ void ppu2c0x_set_mirroring( int num, int mirroring )
 	this_ppu->mirror_state = mirroring;
 }
 
+#ifdef UNUSED_FUNCTION
 void ppu2c0x_set_nmi_callback( int num, ppu2c0x_nmi_cb cb )
 {
 	/* check bounds */
@@ -1500,6 +1501,7 @@ void ppu2c0x_set_nmi_callback( int num, ppu2c0x_nmi_cb cb )
 
 	intf->nmi_handler[num] = cb;
 }
+#endif
 
 void ppu2c0x_set_scanline_callback( int num, ppu2c0x_scanline_cb cb )
 {

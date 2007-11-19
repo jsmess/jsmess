@@ -20,11 +20,11 @@ static UINT8 vdp_accessmode[CHIPS];		/* VDP Access Mode (VRAM, CRAM) */
 static UINT16 vdp_accessaddr[CHIPS];	/* VDP Access Address */
 static UINT8 vdp_readbuffer[CHIPS];		/* VDP Read Buffer */
 
-UINT8 *segae_vdp_vram[CHIPS];			/* Pointer to VRAM */
+static UINT8 *segae_vdp_vram[CHIPS];			/* Pointer to VRAM */
 static UINT8 *vdp_cram[CHIPS];			/* Pointer to the VDP's CRAM */
 UINT8 *segae_vdp_regs[CHIPS];			/* Pointer to the VDP's Registers */
 
-UINT8 segae_vdp_vrambank[CHIPS];		/* Current VRAM Bank number (from writes to Port 0xf7) */
+static UINT8 segae_vdp_vrambank[CHIPS];		/* Current VRAM Bank number (from writes to Port 0xf7) */
 
 static UINT8 *cache_bitmap;					/* 8bpp bitmap with raw pen values */
 
@@ -42,7 +42,7 @@ static void vdp_setregister(UINT8 chip, UINT16 cmd);
 
 static void draw_tiles_line(UINT8 *dest, int line, UINT8 chip, UINT8 pri);
 static void draw_sprite_line(UINT8 *dest, UINT8 chip, UINT8 line);
-void segae_drawscanline(int line, int chips, int blank);
+static void segae_drawscanline(int line, int chips, int blank);
 
 static void draw_8pix_solid16(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col);
 static void draw_8pix(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col);

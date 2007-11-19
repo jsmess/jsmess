@@ -40,7 +40,7 @@ from 2.bin to 9.bin program eproms
 /* not verified */
 #define CPS1_ROWSCROLL_OFFS     0x20    /* base of row scroll offsets in other RAM */
 
-void fcrash_update_transmasks(void)
+static void fcrash_update_transmasks(void)
 {
 	int i;
 	int priority[4];
@@ -65,7 +65,7 @@ void fcrash_update_transmasks(void)
 	}
 }
 
-void fcrash_render_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void fcrash_render_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int pos;
 	int base=0x50c8/2; // and 10c8/2 for the buffer?
@@ -92,7 +92,7 @@ void fcrash_render_sprites(running_machine *machine, mame_bitmap *bitmap,const r
 
 }
 
-void fcrash_render_layer(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int layer,int primask)
+static void fcrash_render_layer(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int layer,int primask)
 {
 	switch (layer)
 	{
@@ -107,7 +107,7 @@ void fcrash_render_layer(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
-void fcrash_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer)
+static void fcrash_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer)
 {
 	switch (layer)
 	{

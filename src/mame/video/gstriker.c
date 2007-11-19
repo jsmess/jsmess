@@ -216,7 +216,7 @@ static TILEMAP_MAPPER( twc94_scan )
 	return (row*64) + (col&63) + ((col&64)<<6);
 }
 
-void MB60553_init(int numchips)
+static void MB60553_init(int numchips)
 {
 	int i;
 
@@ -231,18 +231,18 @@ void MB60553_init(int numchips)
 	}
 }
 
-void MB60553_set_pal_base(int numchip, int pal_base)
+static void MB60553_set_pal_base(int numchip, int pal_base)
 {
 	MB60553[numchip].pal_base = pal_base;
 }
 
-void MB60553_set_gfx_region(int numchip, int gfx_region)
+static void MB60553_set_gfx_region(int numchip, int gfx_region)
 {
 	MB60553[numchip].gfx_region = gfx_region;
 }
 
 /* THIS IS STILL WRONG! */
-void MB60553_draw(running_machine *machine, int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
+static void MB60553_draw(running_machine *machine, int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
 {
 	int line;
 	rectangle clip;
@@ -288,7 +288,7 @@ void MB60553_draw(running_machine *machine, int numchip, mame_bitmap* screen, co
 
 }
 
-tilemap* MB60553_get_tilemap(int numchip)
+static tilemap* MB60553_get_tilemap(int numchip)
 {
 	return MB60553[numchip].tmap;
 }
@@ -495,7 +495,7 @@ static void CG10103_draw(running_machine *machine, int numchip, mame_bitmap* scr
 	}
 }
 
-void CG10103_init(int numchips)
+static void CG10103_init(int numchips)
 {
 	int i;
 
@@ -509,12 +509,12 @@ void CG10103_init(int numchips)
 	}
 }
 
-void CG10103_set_pal_base(int numchip, int pal_base)
+static void CG10103_set_pal_base(int numchip, int pal_base)
 {
 	CG10103[numchip].pal_base = pal_base;
 }
 
-void CG10103_set_gfx_region(int numchip, int gfx_region)
+static void CG10103_set_gfx_region(int numchip, int gfx_region)
 {
 	CG10103[numchip].gfx_region = gfx_region;
 }

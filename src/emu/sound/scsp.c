@@ -205,7 +205,7 @@ struct _SCSP
 	int TimCnt[3];
 
 	// timers
-	mame_timer *timerA, *timerB, *timerC;
+	emu_timer *timerA, *timerB, *timerC;
 
 	// DMA stuff
 	UINT32 scsp_dmea;
@@ -524,9 +524,9 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 		}
 	}
 
-	SCSP->timerA = mame_timer_alloc_ptr(timerA_cb, SCSP);
-	SCSP->timerB = mame_timer_alloc_ptr(timerB_cb, SCSP);
-	SCSP->timerC = mame_timer_alloc_ptr(timerC_cb, SCSP);
+	SCSP->timerA = timer_alloc_ptr(timerA_cb, SCSP);
+	SCSP->timerB = timer_alloc_ptr(timerB_cb, SCSP);
+	SCSP->timerC = timer_alloc_ptr(timerC_cb, SCSP);
 
 	for(i=0;i<0x400;++i)
 	{
@@ -720,7 +720,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 					time = (44100 / SCSP->TimPris[0]) / (255-(SCSP->udata.data[0x18/2]&0xff));
 					if (time)
 					{
-						mame_timer_adjust_ptr(SCSP->timerA, MAME_TIME_IN_HZ(time), time_never);
+						timer_adjust_ptr(SCSP->timerA, ATTOTIME_IN_HZ(time), attotime_never);
 					}
 				}
 			}
@@ -739,7 +739,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 					time = (44100 / SCSP->TimPris[1]) / (255-(SCSP->udata.data[0x1A/2]&0xff));
 					if (time)
 					{
-						mame_timer_adjust_ptr(SCSP->timerB, MAME_TIME_IN_HZ(time), time_never);
+						timer_adjust_ptr(SCSP->timerB, ATTOTIME_IN_HZ(time), attotime_never);
 					}
 				}
 			}
@@ -758,7 +758,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 					time = (44100 / SCSP->TimPris[2]) / (255-(SCSP->udata.data[0x1C/2]&0xff));
 					if (time)
 					{
-						mame_timer_adjust_ptr(SCSP->timerC, MAME_TIME_IN_HZ(time), time_never);
+						timer_adjust_ptr(SCSP->timerC, ATTOTIME_IN_HZ(time), attotime_never);
 					}
 				}
 			}

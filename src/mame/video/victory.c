@@ -34,9 +34,9 @@ static struct
 	UINT8		r,g,b;
 	UINT8		x,xp,y,yp;
 	UINT8		cmd,cmdlo;
-	mame_timer *	timer;
+	emu_timer *	timer;
 	UINT8		timer_active;
-	mame_time	endtime;
+	attotime	endtime;
 } micro;
 
 
@@ -44,7 +44,7 @@ static struct
 /* from what I can tell, this should be divided by 32, not 8  */
 /* but the interrupt test does some precise timing, and fails */
 /* if it's not 8 */
-#define MICRO_STATE_CLOCK_PERIOD	MAME_TIME_IN_HZ(11827000/8)
+#define MICRO_STATE_CLOCK_PERIOD	ATTOTIME_IN_HZ(11827000/8)
 
 
 /* debugging constants */
@@ -97,7 +97,7 @@ VIDEO_START( victory )
 	update_complete = 0;
 	video_control = 0;
 	memset(&micro, 0, sizeof(micro));
-	micro.timer = mame_timer_alloc(NULL);
+	micro.timer = timer_alloc(NULL);
 }
 
 
@@ -108,7 +108,7 @@ VIDEO_START( victory )
  *
  *************************************/
 
-void victory_update_irq(void)
+static void victory_update_irq(void)
 {
 	if (vblank_irq || fgcoll || (bgcoll && (video_control & 0x20)))
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
@@ -221,7 +221,7 @@ READ8_HANDLER( victory_video_control_r )
 			// D5 = 5VIRQ
 			// D4 = 5BCIRQ (3B1)
 			// D3 = SL256
-			if (micro.timer_active && compare_mame_times(mame_timer_timeelapsed(micro.timer), micro.endtime) < 0)
+			if (micro.timer_active && attotime_compare(timer_timeelapsed(micro.timer), micro.endtime) < 0)
 				result |= 0x80;
 			result |= (~fgcoll & 1) << 6;
 			result |= (~vblank_irq & 1) << 5;
@@ -555,22 +555,22 @@ Registers:
 
 INLINE void count_states(int states)
 {
-	mame_time state_time = make_mame_time(0, mame_time_to_subseconds(MICRO_STATE_CLOCK_PERIOD) * states);
+	attotime state_time = attotime_make(0, attotime_to_attoseconds(MICRO_STATE_CLOCK_PERIOD) * states);
 
 	if (!micro.timer)
 	{
-		mame_timer_adjust(micro.timer, time_never, 0, time_zero);
+		timer_adjust(micro.timer, attotime_never, 0, attotime_zero);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}
-	else if (compare_mame_times(mame_timer_timeelapsed(micro.timer), micro.endtime) > 0)
+	else if (attotime_compare(timer_timeelapsed(micro.timer), micro.endtime) > 0)
 	{
-		mame_timer_adjust(micro.timer, time_never, 0, time_zero);
+		timer_adjust(micro.timer, attotime_never, 0, attotime_zero);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}
 	else
-		micro.endtime = add_mame_times(micro.endtime, state_time);
+		micro.endtime = attotime_add(micro.endtime, state_time);
 }
 
 
@@ -1180,7 +1180,7 @@ VIDEO_EOF( victory )
 			int fpix = *fg++;
 			int bpix = bg[(x + scrollx) & 255];
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				mame_timer_set(video_screen_get_time_until_pos(0, y, x), x | (y << 8), bgcoll_irq_callback);
+				timer_set(video_screen_get_time_until_pos(0, y, x), x | (y << 8), bgcoll_irq_callback);
 		}
 	}
 }
@@ -1218,7 +1218,7 @@ VIDEO_UPDATE( victory )
 			int bpix = bg[(x + scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				mame_timer_set(video_screen_get_time_until_pos(0, y, x), x | (y << 8), bgcoll_irq_callback);
+				timer_set(video_screen_get_time_until_pos(0, y, x), x | (y << 8), bgcoll_irq_callback);
 		}
 
 		/* draw the scanline */

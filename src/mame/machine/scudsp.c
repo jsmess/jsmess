@@ -118,7 +118,7 @@ static char dasm_buffer[100];
 #if DEBUG_DSP
 static FILE *log_file = NULL;
 #endif
-void dsp_dasm_opcode( UINT32 op, char *buffer );
+static void dsp_dasm_opcode( UINT32 op, char *buffer );
 
 
 
@@ -1008,7 +1008,7 @@ static const char* DMA_Command[] =
 };
 
 
-void	dsp_dasm_prefix( const char* format, char* buffer, UINT32 *data )
+static void	dsp_dasm_prefix( const char* format, char* buffer, UINT32 *data )
 {
 
 	for ( ; *format; format++ )
@@ -1109,7 +1109,7 @@ void	dsp_dasm_prefix( const char* format, char* buffer, UINT32 *data )
 	}
 	*buffer = 0;
 }
-void	dsp_dasm_operation( UINT32 op, char *buffer )
+static void	dsp_dasm_operation( UINT32 op, char *buffer )
 {
 	char *my_buffer = buffer;
 	char temp_buffer[64];
@@ -1175,7 +1175,7 @@ void	dsp_dasm_operation( UINT32 op, char *buffer )
 	sprintf( my_buffer, "%-10s", temp_buffer );
 }
 
-void dsp_dasm_move_immediate( UINT32 op, char *buffer )
+static void dsp_dasm_move_immediate( UINT32 op, char *buffer )
 {
 	UINT32 data[3];
 	if ( (op & 0x2000000) )
@@ -1193,7 +1193,7 @@ void dsp_dasm_move_immediate( UINT32 op, char *buffer )
 	}
 }
 
-void dsp_dasm_jump( UINT32 op, char *buffer )
+static void dsp_dasm_jump( UINT32 op, char *buffer )
 {
 	UINT32 data[2];
 	if ( op & 0x3F80000 )
@@ -1209,7 +1209,7 @@ void dsp_dasm_jump( UINT32 op, char *buffer )
 	}
 }
 
-void dsp_dasm_loop( UINT32 op, char* buffer )
+static void dsp_dasm_loop( UINT32 op, char* buffer )
 {
 	if ( op & 0x8000000 )
 	{
@@ -1221,7 +1221,7 @@ void dsp_dasm_loop( UINT32 op, char* buffer )
 	}
 }
 
-void dsp_dasm_end( UINT32 op, char* buffer )
+static void dsp_dasm_end( UINT32 op, char* buffer )
 {
 	if ( op & 0x8000000 )
 	{
@@ -1233,7 +1233,7 @@ void dsp_dasm_end( UINT32 op, char* buffer )
 	}
 }
 
-void dsp_dasm_dma( UINT32 op, char* buffer )
+static void dsp_dasm_dma( UINT32 op, char* buffer )
 {
 	UINT32 data[4];
 	data[0] = (op &  0x4000) >> 14; /* H */

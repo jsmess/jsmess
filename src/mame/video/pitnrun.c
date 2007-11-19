@@ -111,7 +111,7 @@ WRITE8_HANDLER(pitnrun_color_select_w)
 	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 }
 
-void pitnrun_spotlights(void)
+static void pitnrun_spotlights(void)
 {
 	int x,y,i,b,datapix;
 	UINT8 *ROM = memory_region(REGION_USER1);

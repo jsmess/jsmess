@@ -187,7 +187,7 @@ static TIMER_CALLBACK( slapshot_interrupt6 )
 
 static INTERRUPT_GEN( slapshot_interrupt )
 {
-	mame_timer_set(MAME_TIME_IN_CYCLES(200000-500,0),0, slapshot_interrupt6);
+	timer_set(ATTOTIME_IN_CYCLES(200000-500,0),0, slapshot_interrupt6);
 	cpunum_set_input_line(0,5,HOLD_LINE);
 }
 

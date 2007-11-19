@@ -5,7 +5,7 @@ static tilemap *bg_tilemap, *fg_tilemap;
 static UINT8 flipscreen;
 static UINT8 ninjakun_xscroll,ninjakun_yscroll;
 
-UINT8 ninjakun_io_8000_ctrl[4];
+static UINT8 ninjakun_io_8000_ctrl[4];
 // static UINT8 old_scroll;
 
 /*******************************************************************************

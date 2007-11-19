@@ -24,7 +24,7 @@ unsigned char vectrex_via_out[2];
 UINT32 vectrex_beam_color = VC_WHITE;	   /* the color of the vectrex beam */
 int vectrex_imager_status = 0;	   /* 0 = off, 1 = right eye, 2 = left eye */
 double imager_freq;
-mame_timer *imager_timer;
+emu_timer *imager_timer;
 int vectrex_lightpen_port=0;
 UINT8 *vectrex_ram_base;
 size_t vectrex_ram_size;
@@ -238,13 +238,13 @@ TIMER_CALLBACK(vectrex_imager_right_eye)
 	{
 		vectrex_imager_status = param;
 		coffset = param>1?3:0;
-		mame_timer_set (double_to_mame_time(rtime * vectrex_imager_angles[0]), imager_colors[coffset+2], vectrex_imager_change_color);
-		mame_timer_set (double_to_mame_time(rtime * vectrex_imager_angles[1]), imager_colors[coffset+1], vectrex_imager_change_color);
-		mame_timer_set (double_to_mame_time(rtime * vectrex_imager_angles[2]), imager_colors[coffset], vectrex_imager_change_color);
+		timer_set (double_to_attotime(rtime * vectrex_imager_angles[0]), imager_colors[coffset+2], vectrex_imager_change_color);
+		timer_set (double_to_attotime(rtime * vectrex_imager_angles[1]), imager_colors[coffset+1], vectrex_imager_change_color);
+		timer_set (double_to_attotime(rtime * vectrex_imager_angles[2]), imager_colors[coffset], vectrex_imager_change_color);
 
 		if (param == 2)
 		{
-			mame_timer_set (double_to_mame_time(rtime * 0.50), 1, vectrex_imager_right_eye);
+			timer_set (double_to_attotime(rtime * 0.50), 1, vectrex_imager_right_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
 			via_0_ca1_w (0, 1);
@@ -269,7 +269,7 @@ WRITE8_HANDLER ( vectrex_psg_port_w )
 	if (!mcontrol && mcontrol ^ state)
 	{
 		state = mcontrol;
-		tmp = mame_time_to_double(mame_timer_get_time());
+		tmp = attotime_to_double(timer_get_time());
 		wavel = tmp - sl;
 		sl = tmp;
 
@@ -286,17 +286,17 @@ WRITE8_HANDLER ( vectrex_psg_port_w )
 
 			if (imager_freq > 1)
 			{
-				mame_timer_adjust (imager_timer,
-					double_to_mame_time(MIN(1.0/imager_freq, mame_time_to_double(mame_timer_timeleft(imager_timer)))),
+				timer_adjust (imager_timer,
+					double_to_attotime(MIN(1.0/imager_freq, attotime_to_double(timer_timeleft(imager_timer)))),
 					2,
-					MAME_TIME_IN_HZ(imager_freq));
+					ATTOTIME_IN_HZ(imager_freq));
 			}
 		}
 	}
 	if (mcontrol && mcontrol ^ state)
 	{
 		state = mcontrol;
-		pwl = mame_time_to_double(mame_timer_get_time()) - sl;
+		pwl = attotime_to_double(timer_get_time()) - sl;
 	}
 }
 

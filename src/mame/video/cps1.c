@@ -419,10 +419,12 @@ int cps1_scanline1;
 int cps1_scanline2;
 int cps1_scancalls;
 
+#ifdef UNUSED_FUNCTION
 void cps_setversion(int v)
 {
     cps_version=v;
 }
+#endif
 
 
 static MACHINE_RESET( cps )

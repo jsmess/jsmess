@@ -107,7 +107,7 @@ WRITE8_HANDLER( system1_paletteram_w )
 	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
-void system1_postload(void)
+static void system1_postload(void)
 {
 	memset(sprite_onscreen_map, 255, 256*256);
 	memset(bg_dirtybuffer, 1, 1024);

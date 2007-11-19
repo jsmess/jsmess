@@ -30,9 +30,9 @@ static UINT8 auto_animation_speed;
 static UINT8 auto_animation_disabled;
 static UINT8 auto_animation_counter;
 static UINT8 auto_animation_frame_counter;
-static mame_timer *auto_animation_timer;
+static emu_timer *auto_animation_timer;
 
-static mame_timer *sprite_line_timer;
+static emu_timer *sprite_line_timer;
 
 
 
@@ -250,19 +250,19 @@ static TIMER_CALLBACK( auto_animation_timer_callback )
 	else
 		auto_animation_frame_counter = auto_animation_frame_counter - 1;
 
-	mame_timer_adjust(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0, time_zero);
+	timer_adjust(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0, attotime_zero);
 }
 
 
 static void create_auto_animation_timer(void)
 {
-	auto_animation_timer = mame_timer_alloc(auto_animation_timer_callback);
+	auto_animation_timer = timer_alloc(auto_animation_timer_callback);
 }
 
 
 static void start_auto_animation_timer(void)
 {
-	mame_timer_adjust(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0, time_zero);
+	timer_adjust(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0, attotime_zero);
 }
 
 
@@ -672,19 +672,19 @@ static TIMER_CALLBACK( sprite_line_timer_callback )
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	mame_timer_adjust(sprite_line_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(sprite_line_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
 static void create_sprite_line_timer(void)
 {
-	sprite_line_timer = mame_timer_alloc(sprite_line_timer_callback);
+	sprite_line_timer = timer_alloc(sprite_line_timer_callback);
 }
 
 
 static void start_sprite_line_timer(void)
 {
-	mame_timer_adjust(sprite_line_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+	timer_adjust(sprite_line_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 }
 
 

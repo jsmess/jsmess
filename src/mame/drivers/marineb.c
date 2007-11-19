@@ -514,7 +514,7 @@ static MACHINE_DRIVER_START( marineb )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(5000)	/* frames per second, vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000)	/* frames per second, vblank duration */)
 
 	MDRV_MACHINE_RESET(marineb)
 

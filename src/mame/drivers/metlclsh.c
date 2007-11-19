@@ -296,7 +296,7 @@ static struct YM3526interface ym3526_interface =
 	metlclsh_irqhandler
 };
 
-INTERRUPT_GEN( metlclsh_interrupt2 )
+static INTERRUPT_GEN( metlclsh_interrupt2 )
 {
 	if (cpu_getiloops() == 0)
 		return;

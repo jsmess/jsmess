@@ -231,7 +231,7 @@ static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 
 static void kc_disc_interface_init(void)
 {
-	mame_timer_set(time_zero, 0, kc85_disk_reset_timer_callback);
+	timer_set(attotime_zero, 0, kc85_disk_reset_timer_callback);
 
 	nec765_init(&kc_fdc_interface,NEC765A);
 
@@ -382,10 +382,10 @@ static void kc85_module_system_init(void)
 */
 
 
-#define KC_CASSETTE_TIMER_FREQUENCY MAME_TIME_IN_HZ(4800)
+#define KC_CASSETTE_TIMER_FREQUENCY ATTOTIME_IN_HZ(4800)
 
 /* this timer is used to update the cassette */
-static mame_timer *kc_cassette_timer;
+static emu_timer *kc_cassette_timer;
 /* this is the current state of the cassette motor */
 static int kc_cassette_motor_state;
 /* ardy output from pio */
@@ -410,7 +410,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 
 static void	kc_cassette_init(void)
 {
-	kc_cassette_timer = mame_timer_alloc(kc_cassette_timer_callback);
+	kc_cassette_timer = timer_alloc(kc_cassette_timer_callback);
 }
 
 static void	kc_cassette_set_motor(int motor_state)
@@ -426,12 +426,12 @@ static void	kc_cassette_set_motor(int motor_state)
 		if (motor_state)
 		{
 			/* start timer */
-			mame_timer_adjust(kc_cassette_timer, time_zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
+			timer_adjust(kc_cassette_timer, attotime_zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
 		}
 		else
 		{
 			/* stop timer */
-			mame_timer_reset(kc_cassette_timer, time_never);
+			timer_reset(kc_cassette_timer, attotime_never);
 		}
 	}
 
@@ -902,10 +902,10 @@ static void kc_keyboard_init(void)
 	keyboard_data.head = (keyboard_data.tail = 0);
 
 	/* 50hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
-	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, kc_keyboard_update);
+	timer_pulse(ATTOTIME_IN_HZ(50), 0, kc_keyboard_update);
 
 	/* timer to transmit pulses to kc base unit */
-	mame_timer_pulse(MAME_TIME_IN_USEC(1024), 0, kc_keyboard_transmit_timer_callback);
+	timer_pulse(ATTOTIME_IN_USEC(1024), 0, kc_keyboard_transmit_timer_callback);
 
 	/* kc keyboard is not transmitting */
 	keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_IDLE;
@@ -1891,8 +1891,8 @@ static void	kc85_common_init(void)
 	kc85_50hz_state = 0;
 	kc85_15khz_state = 0;
 	kc85_15khz_count = 0;
-	mame_timer_pulse(MAME_TIME_IN_HZ(15625), 0, kc85_15khz_timer_callback);
-	mame_timer_set(time_zero, 0, kc85_reset_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(15625), 0, kc85_15khz_timer_callback);
+	timer_set(attotime_zero, 0, kc85_reset_timer_callback);
 	kc85_module_system_init();
 }
 

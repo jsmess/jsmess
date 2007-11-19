@@ -12,16 +12,16 @@ Video hardware driver by Uki
 
 UINT8 *momoko_bg_scrollx;
 UINT8 *momoko_bg_scrolly;
-UINT8 momoko_fg_scrollx;
-UINT8 momoko_fg_scrolly;
-UINT8 momoko_fg_select;
-UINT8 momoko_text_scrolly;
-UINT8 momoko_text_mode;
-UINT8 momoko_bg_select;
-UINT8 momoko_bg_priority;
-UINT8 momoko_bg_mask;
-UINT8 momoko_fg_mask;
-UINT8 momoko_flipscreen;
+static UINT8 momoko_fg_scrollx;
+static UINT8 momoko_fg_scrolly;
+static UINT8 momoko_fg_select;
+static UINT8 momoko_text_scrolly;
+static UINT8 momoko_text_mode;
+static UINT8 momoko_bg_select;
+static UINT8 momoko_bg_priority;
+static UINT8 momoko_bg_mask;
+static UINT8 momoko_fg_mask;
+static UINT8 momoko_flipscreen;
 
 /****************************************************************************/
 

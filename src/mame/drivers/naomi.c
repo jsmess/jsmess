@@ -480,7 +480,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( naomi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", SH4, CPU_CLOCK) // SH4!!!
-	MDRV_CPU_CONFIG(sh4cpu_config);
+	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
 
 	MDRV_CPU_ADD_TAG("sound", ARM7, 45000000)

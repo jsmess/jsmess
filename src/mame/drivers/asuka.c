@@ -239,9 +239,9 @@ static TIMER_CALLBACK( cadash_interrupt5 )
 	cpunum_set_input_line(0, 5, HOLD_LINE);
 }
 
-INTERRUPT_GEN( cadash_interrupt )
+static INTERRUPT_GEN( cadash_interrupt )
 {
-	mame_timer_set(MAME_TIME_IN_CYCLES(500,0),0, cadash_interrupt5);
+	timer_set(ATTOTIME_IN_CYCLES(500,0),0, cadash_interrupt5);
 	cpunum_set_input_line(0, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 

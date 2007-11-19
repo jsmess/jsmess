@@ -14,7 +14,7 @@ static int palette_bank;
 
 UINT8 *ladyfrog_scrlram;
 
-UINT8 *ladyfrog_spriteram;
+static UINT8 *ladyfrog_spriteram;
 extern UINT8 *ladyfrog_sharedram;
 
 WRITE8_HANDLER(ladyfrog_spriteram_w)

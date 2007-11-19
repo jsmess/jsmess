@@ -292,9 +292,9 @@ struct _dcs_state
 	UINT8		channels;
 	UINT16		size;
 	UINT16		incs;
-	mame_timer *reg_timer;
-	mame_timer *sport_timer;
-	mame_timer *internal_timer;
+	emu_timer *reg_timer;
+	emu_timer *sport_timer;
+	emu_timer *internal_timer;
 	INT32		ireg;
 	UINT16		ireg_base;
 	UINT16		control_regs[32];
@@ -343,7 +343,7 @@ struct _hle_transfer_state
 	INT32		writes_left;
 	UINT16		sum;
 	INT32		fifo_entries;
-	mame_timer *watchdog;
+	emu_timer *watchdog;
 };
 
 
@@ -423,14 +423,14 @@ static int preprocess_write(UINT16 data);
  *************************************/
 
 /* DCS 2k memory map */
-ADDRESS_MAP_START( dcs_2k_program_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( dcs_2k_program_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&dcs_internal_program_ram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(1) AM_BASE(&dcs_external_program_ram)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( dcs_2k_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( dcs_2k_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK(20)
 	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
@@ -441,7 +441,7 @@ ADDRESS_MAP_END
 
 
 /* DCS 2k with UART memory map */
-ADDRESS_MAP_START( dcs_2k_uart_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( dcs_2k_uart_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK(20)
 	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
@@ -454,12 +454,12 @@ ADDRESS_MAP_END
 
 
 /* DCS 8k memory map */
-ADDRESS_MAP_START( dcs_8k_program_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( dcs_8k_program_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&dcs_internal_program_ram)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_BASE(&dcs_external_program_ram)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( dcs_8k_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( dcs_8k_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK(20)
@@ -477,13 +477,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START( dcs2_program_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( dcs2_program_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( dcs2_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( dcs2_data_map, ADDRESS_SPACE_DATA, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
@@ -503,13 +503,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START( dsio_program_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( dsio_program_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( dsio_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( dsio_data_map, ADDRESS_SPACE_DATA, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK(20)
 	AM_RANGE(0x0400, 0x3fdf) AM_RAM
@@ -517,7 +517,7 @@ ADDRESS_MAP_START( dsio_data_map, ADDRESS_SPACE_DATA, 16 )
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( dsio_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( dsio_io_map, ADDRESS_SPACE_IO, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
@@ -535,13 +535,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START( denver_program_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( denver_program_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( denver_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( denver_data_map, ADDRESS_SPACE_DATA, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(20)
 	AM_RANGE(0x0800, 0x3fdf) AM_RAM
@@ -549,7 +549,7 @@ ADDRESS_MAP_START( denver_data_map, ADDRESS_SPACE_DATA, 16 )
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( denver_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( denver_io_map, ADDRESS_SPACE_IO, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
@@ -810,11 +810,11 @@ static TIMER_CALLBACK( dcs_reset )
 	/* reset timers */
 	dcs.timer_enable = 0;
 	dcs.timer_scale = 1;
-	mame_timer_adjust(dcs.internal_timer, time_never, 0, time_never);
+	timer_adjust(dcs.internal_timer, attotime_never, 0, attotime_never);
 
 	/* start the SPORT0 timer */
 	if (dcs.sport_timer)
-		mame_timer_adjust(dcs.sport_timer, MAME_TIME_IN_HZ(1000), 0, MAME_TIME_IN_HZ(1000));
+		timer_adjust(dcs.sport_timer, ATTOTIME_IN_HZ(1000), 0, ATTOTIME_IN_HZ(1000));
 
 	/* reset the HLE transfer states */
 	transfer.dcs_state = transfer.state = 0;
@@ -891,8 +891,8 @@ void dcs_init(void)
 	dcs.sounddata_words = dcs.bootrom_words;
 
 	/* create the timers */
-	dcs.internal_timer = mame_timer_alloc(internal_timer_callback);
-	dcs.reg_timer = mame_timer_alloc(dcs_irq);
+	dcs.internal_timer = timer_alloc(internal_timer_callback);
+	dcs.reg_timer = timer_alloc(dcs_irq);
 
 	/* non-RAM based automatically acks */
 	dcs.auto_ack = TRUE;
@@ -942,9 +942,9 @@ void dcs2_init(int dram_in_mb, offs_t polling_offset)
 	dcs_sram = auto_malloc(0x8000*4);
 
 	/* create the timers */
-	dcs.internal_timer = mame_timer_alloc(internal_timer_callback);
-	dcs.reg_timer = mame_timer_alloc(dcs_irq);
-	dcs.sport_timer = mame_timer_alloc(sport0_irq);
+	dcs.internal_timer = timer_alloc(internal_timer_callback);
+	dcs.reg_timer = timer_alloc(dcs_irq);
+	dcs.sport_timer = timer_alloc(sport0_irq);
 
 	/* we don't do auto-ack by default */
 	dcs.auto_ack = FALSE;
@@ -955,17 +955,19 @@ void dcs2_init(int dram_in_mb, offs_t polling_offset)
 
 	/* allocate a watchdog timer for HLE transfers */
 	if (HLE_TRANSFERS)
-		transfer.watchdog = mame_timer_alloc(transfer_watchdog_callback);
+		transfer.watchdog = timer_alloc(transfer_watchdog_callback);
 
 	/* reset the system */
 	dcs_reset(Machine, 0);
 }
 
 
+#ifdef UNUSED_FUNCTION
 void dsio_init(int dram_in_mb, offs_t polling_offset)
 {
 	dcs2_init(dram_in_mb, polling_offset);
 }
+#endif
 
 
 void dcs_set_auto_ack(int state)
@@ -1434,7 +1436,7 @@ int dcs_control_r(void)
 {
 	/* only boost for DCS2 boards */
 	if (!dcs.auto_ack && !HLE_TRANSFERS)
-		cpu_boost_interleave(MAME_TIME_IN_NSEC(500), MAME_TIME_IN_USEC(5));
+		cpu_boost_interleave(ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
 	return dcs.latch_control;
 }
 
@@ -1492,7 +1494,7 @@ static void dcs_delayed_data_w(int data)
 		logerror("%08X:dcs_data_w(%04X)\n", activecpu_get_pc(), data);
 
 	/* boost the interleave temporarily */
-	cpu_boost_interleave(MAME_TIME_IN_NSEC(500), MAME_TIME_IN_USEC(5));
+	cpu_boost_interleave(ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
 
 	/* set the IRQ line on the ADSP */
 	cpunum_set_input_line(dcs.cpunum, ADSP2105_IRQ2, ASSERT_LINE);
@@ -1683,7 +1685,7 @@ static TIMER_CALLBACK( internal_timer_callback )
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		mame_timer_adjust(dcs.internal_timer, MAME_TIME_IN_CYCLES(target_cycles, dcs.cpunum), 0, time_zero);
+		timer_adjust(dcs.internal_timer, ATTOTIME_IN_CYCLES(target_cycles, dcs.cpunum), 0, attotime_zero);
 	cpunum_set_input_line(dcs.cpunum, ADSP2105_TIMER, PULSE_LINE);
 }
 
@@ -1718,7 +1720,7 @@ static void reset_timer(void)
 
 	/* adjust the timer if not optimized */
 	if (!dcs.timer_ignore)
-		mame_timer_adjust(dcs.internal_timer, MAME_TIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_start_count + 1), dcs.cpunum), 0, time_zero);
+		timer_adjust(dcs.internal_timer, ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_start_count + 1), dcs.cpunum), 0, attotime_zero);
 }
 
 
@@ -1728,13 +1730,13 @@ static void timer_enable_callback(int enable)
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
-//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / MAME_TIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_period + 1), dcs.cpunum));
+//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_period + 1), dcs.cpunum));
 		reset_timer();
 	}
 	else
 	{
 //      mame_printf_debug("Timer disabled\n");
-		mame_timer_adjust(dcs.internal_timer, time_never, 0, time_never);
+		timer_adjust(dcs.internal_timer, attotime_never, 0, attotime_never);
 	}
 }
 
@@ -1812,7 +1814,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(0, dcs.channels, 0);
-				mame_timer_adjust(dcs.reg_timer, time_never, 0, time_never);
+				timer_adjust(dcs.reg_timer, attotime_never, 0, attotime_never);
 			}
 			break;
 
@@ -1821,7 +1823,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(0, dcs.channels, 0);
-				mame_timer_adjust(dcs.reg_timer, time_never, 0, time_never);
+				timer_adjust(dcs.reg_timer, attotime_never, 0, attotime_never);
 			}
 			break;
 
@@ -1921,18 +1923,18 @@ static void recompute_sample_rate(void)
 	/* calculate how long until we generate an interrupt */
 
 	/* frequency the time per each bit sent */
-	mame_time sample_period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[dcs.cpunum].clock), 2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
+	attotime sample_period = attotime_mul(ATTOTIME_IN_HZ(Machine->drv->cpu[dcs.cpunum].clock), 2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
-	sample_period = scale_up_mame_time(sample_period, 16 * dcs.channels);
-	dmadac_set_frequency(0, dcs.channels, SUBSECONDS_TO_HZ(sample_period.subseconds));
+	sample_period = attotime_mul(sample_period, 16 * dcs.channels);
+	dmadac_set_frequency(0, dcs.channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
 	dmadac_enable(0, dcs.channels, 1);
 
 	/* fire off a timer wich will hit every half-buffer */
 	if (dcs.incs)
 	{
-		mame_time period = scale_down_mame_time(scale_up_mame_time(sample_period, dcs.size), (2 * dcs.channels * dcs.incs));
-		mame_timer_adjust(dcs.reg_timer, period, 0, period);
+		attotime period = attotime_div(attotime_mul(sample_period, dcs.size), (2 * dcs.channels * dcs.incs));
+		timer_adjust(dcs.reg_timer, period, 0, period);
 	}
 }
 
@@ -1985,7 +1987,7 @@ static void sound_tx_callback(int port, INT32 data)
 	dmadac_enable(0, dcs.channels, 0);
 
 	/* remove timer */
-	mame_timer_adjust(dcs.reg_timer, time_never, 0, time_never);
+	timer_adjust(dcs.reg_timer, attotime_never, 0, attotime_never);
 }
 
 
@@ -2034,7 +2036,7 @@ static TIMER_CALLBACK( transfer_watchdog_callback )
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
 			preprocess_write((*dcs.fifo_data_r)());
 	}
-	mame_timer_adjust(transfer.watchdog, MAME_TIME_IN_MSEC(1), transfer.writes_left, time_zero);
+	timer_adjust(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left, attotime_zero);
 }
 
 
@@ -2043,7 +2045,7 @@ static TIMER_CALLBACK( s1_ack_callback2 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		mame_timer_set(MAME_TIME_IN_USEC(1), param, s1_ack_callback2);
+		timer_set(ATTOTIME_IN_USEC(1), param, s1_ack_callback2);
 		return;
 	}
 	output_latch_w(0, 0x000a, 0);
@@ -2055,13 +2057,13 @@ static TIMER_CALLBACK( s1_ack_callback1 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		mame_timer_set(MAME_TIME_IN_USEC(1), param, s1_ack_callback1);
+		timer_set(ATTOTIME_IN_USEC(1), param, s1_ack_callback1);
 		return;
 	}
 	output_latch_w(0, param, 0);
 
 	/* chain to the next word we need to write back */
-	mame_timer_set(MAME_TIME_IN_USEC(1), 0, s1_ack_callback2);
+	timer_set(ATTOTIME_IN_USEC(1), 0, s1_ack_callback2);
 }
 
 
@@ -2171,7 +2173,7 @@ static int preprocess_stage_1(UINT16 data)
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
-					mame_timer_set(MAME_TIME_IN_USEC(1), transfer.sum, s1_ack_callback1);
+					timer_set(ATTOTIME_IN_USEC(1), transfer.sum, s1_ack_callback1);
 				return 1;
 			}
 			break;
@@ -2185,7 +2187,7 @@ static TIMER_CALLBACK( s2_ack_callback )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		mame_timer_set(MAME_TIME_IN_USEC(1), param, s2_ack_callback);
+		timer_set(ATTOTIME_IN_USEC(1), param, s2_ack_callback);
 		return;
 	}
 	output_latch_w(0, param, 0);
@@ -2248,7 +2250,7 @@ static int preprocess_stage_2(UINT16 data)
 			transfer.sum = 0;
 			if (HLE_TRANSFERS)
 			{
-				mame_timer_adjust(transfer.watchdog, MAME_TIME_IN_MSEC(1), transfer.writes_left, time_zero);
+				timer_adjust(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left, attotime_zero);
 				return 1;
 			}
 			break;
@@ -2273,8 +2275,8 @@ static int preprocess_stage_2(UINT16 data)
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
 				{
-					mame_timer_set(MAME_TIME_IN_USEC(1), transfer.sum, s2_ack_callback);
-					mame_timer_adjust(transfer.watchdog, time_never, 0, time_never);
+					timer_set(ATTOTIME_IN_USEC(1), transfer.sum, s2_ack_callback);
+					timer_adjust(transfer.watchdog, attotime_never, 0, attotime_never);
 				}
 				return 1;
 			}

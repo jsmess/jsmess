@@ -469,7 +469,7 @@ static struct DMASOUND
 
 static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
 
-static mame_timer *dmasound_timer;
+static emu_timer *dmasound_timer;
 
 static void atariste_dmasound_set_state(int state)
 {
@@ -529,7 +529,7 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 		}
 		else
 		{
-			mame_timer_enable(dmasound_timer, 0);
+			timer_enable(dmasound_timer, 0);
 		}
 	}
 }
@@ -598,13 +598,13 @@ static WRITE16_HANDLER( atariste_sound_dma_control_w )
 		if (!dmasound.active)
 		{
 			atariste_dmasound_set_state(1);
-			mame_timer_adjust(dmasound_timer, time_zero, 0, MAME_TIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]));
+			timer_adjust(dmasound_timer, attotime_zero, 0, ATTOTIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]));
 		}
 	}
 	else
 	{
 		atariste_dmasound_set_state(0);
-		mame_timer_enable(dmasound_timer, 0);
+		timer_enable(dmasound_timer, 0);
 	}
 }
 
@@ -663,7 +663,7 @@ static struct MICROWIRE
 	int shift;
 } mwire;
 
-static mame_timer *microwire_timer;
+static emu_timer *microwire_timer;
 
 static void atariste_microwire_shift(void)
 {
@@ -698,7 +698,7 @@ static TIMER_CALLBACK( atariste_microwire_tick )
 		atariste_microwire_shift();
 		lmc1992_enable_w(1);
 		mwire.shift = 0;
-		mame_timer_enable(microwire_timer, 0);
+		timer_enable(microwire_timer, 0);
 		break;
 	}
 }
@@ -710,10 +710,10 @@ static READ16_HANDLER( atariste_microwire_data_r )
 
 static WRITE16_HANDLER( atariste_microwire_data_w )
 {
-	if (!mame_timer_enabled(microwire_timer))
+	if (!timer_enabled(microwire_timer))
 	{
 		mwire.data = data;
-		mame_timer_adjust(microwire_timer, time_zero, 0, MAME_TIME_IN_USEC(2));
+		timer_adjust(microwire_timer, attotime_zero, 0, ATTOTIME_IN_USEC(2));
 	}
 }
 
@@ -724,7 +724,7 @@ static READ16_HANDLER( atariste_microwire_mask_r )
 
 static WRITE16_HANDLER( atariste_microwire_mask_w )
 {
-	if (!mame_timer_enabled(microwire_timer))
+	if (!timer_enabled(microwire_timer))
 	{
 		mwire.mask = data;
 	}
@@ -1597,8 +1597,8 @@ static MACHINE_START( atariste )
 
 	cpunum_set_irq_callback(0, atarist_int_ack);
 
-	dmasound_timer = mame_timer_alloc(atariste_dmasound_tick);
-	microwire_timer = mame_timer_alloc(atariste_microwire_tick);
+	dmasound_timer = timer_alloc(atariste_dmasound_tick);
+	microwire_timer = timer_alloc(atariste_microwire_tick);
 }
 
 static MACHINE_START( megaste )

@@ -297,7 +297,7 @@ void tc8521_init(struct tc8521_interface *intf)
 	memset(&rtc.interface, 0, sizeof(struct tc8521_interface));
 	if (intf)
 		memcpy(&rtc.interface, intf, sizeof(struct tc8521_interface));
-	mame_timer_pulse(MAME_TIME_IN_HZ(32), 0, tc8521_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(32), 0, tc8521_timer_callback);
 }
 
  READ8_HANDLER(tc8521_r)

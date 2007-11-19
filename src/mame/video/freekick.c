@@ -2,7 +2,7 @@
 
 #include "driver.h"
 
-tilemap *freek_tilemap;
+static tilemap *freek_tilemap;
 UINT8 *freek_videoram;
 
 

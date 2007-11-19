@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-void gaelco2_ROM16_split(int src_reg, int dst_reg, int start, int length, int dest1, int dest2)
+static void gaelco2_ROM16_split(int src_reg, int dst_reg, int start, int length, int dest1, int dest2)
 {
 	int i;
 

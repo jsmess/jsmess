@@ -283,7 +283,7 @@ static DRIVER_INIT( tmc2000e )
 	// enable power led
 	set_led_status(2, 1);
 
-	mame_timer_set(time_zero, 0, setup_beep);
+	timer_set(attotime_zero, 0, setup_beep);
 
 	cdp1864_configure(&tmc2000e_CDP1864_interface);
 }

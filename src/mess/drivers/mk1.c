@@ -158,7 +158,7 @@ static TIMER_CALLBACK( mk1_update_leds ) {
 
 
 static MACHINE_START( mk1 ) {
-	mame_timer_pulse( MAME_TIME_IN_HZ(30), 0, mk1_update_leds );
+	timer_pulse( ATTOTIME_IN_HZ(30), 0, mk1_update_leds );
 }
 
 static MACHINE_DRIVER_START( mk1 )

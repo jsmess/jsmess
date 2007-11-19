@@ -55,7 +55,7 @@ typedef struct
 
 	UINT32 accumulator;
 	UINT8  irqpend;
-	mame_timer *timer;
+	emu_timer *timer;
 } ES5503Osc;
 
 typedef struct
@@ -262,7 +262,7 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 		chip->oscillators[osc].irqpend = 0;
 		chip->oscillators[osc].accumulator = 0;
 
-		chip->oscillators[osc].timer = mame_timer_alloc_ptr(es5503_timer_cb, &chip->oscillators[osc]);
+		chip->oscillators[osc].timer = timer_alloc_ptr(es5503_timer_cb, &chip->oscillators[osc]);
 		chip->oscillators[osc].chip = (void *)chip;
 	}
 
@@ -436,7 +436,7 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 						int resshift = resshifts[chip->oscillators[osc].resolution] - chip->oscillators[osc].wavetblsize;
 						UINT32 sizemask = accmasks[chip->oscillators[osc].wavetblsize];
 						UINT32 ramptr, altram;
-						mame_time period;
+						attotime period;
 
 						run = 1;
 						length = 0;
@@ -458,15 +458,15 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 						}
 
 						// ok, we run for this long
-						period = scale_up_mame_time(MAME_TIME_IN_HZ(chip->output_rate), length);
+						period = attotime_mul(ATTOTIME_IN_HZ(chip->output_rate), length);
 
-						mame_timer_adjust_ptr(chip->oscillators[osc].timer, period, period);
+						timer_adjust_ptr(chip->oscillators[osc].timer, period, period);
 					}
 				}
 				else if (!(chip->oscillators[osc].control & 1) && (data&1))
 				{
 					// key off
-					mame_timer_adjust_ptr(chip->oscillators[osc].timer, time_never, time_never);
+					timer_adjust_ptr(chip->oscillators[osc].timer, attotime_never, attotime_never);
 				}
 
 				chip->oscillators[osc].control = data;

@@ -371,7 +371,7 @@ static void speech_kludge_callback(int dummy)
 	{
 		/* Weirdly enough, we are always seeing some problems even though
 		everything is working fine. */
-		/*mame_time time_to_ready = double_to_mame_time(tms5220_time_to_ready());
+		/*attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
 		logerror("ti99/4a speech says aaargh!\n");
 		logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));*/
 	}
@@ -393,13 +393,13 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	complex. */
 	if (! tms5220_ready_r())
 	{
-		mame_time time_to_ready = double_to_mame_time(tms5220_time_to_ready());
-		int cycles_to_ready = ceil(MAME_TIME_TO_CYCLES(0, time_to_ready));
+		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
+		int cycles_to_ready = ceil(ATTOTIME_TO_CYCLES(0, time_to_ready));
 
-		logerror("time to ready: %f -> %d\n", mame_time_to_double(time_to_ready), (int) cycles_to_ready);
+		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
 		activecpu_adjust_icount(-cycles_to_ready);
-		mame_timer_set(time_zero, 0, /*speech_kludge_callback*/NULL);
+		timer_set(attotime_zero, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
 

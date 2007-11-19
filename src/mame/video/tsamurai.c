@@ -229,7 +229,7 @@ VS Gong Fight runs on older hardware
 
 ***************************************************************************/
 
-int vsgongf_color;
+static int vsgongf_color;
 
 WRITE8_HANDLER( vsgongf_color_w )
 {

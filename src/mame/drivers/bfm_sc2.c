@@ -150,7 +150,7 @@ Adder hardware:
 #include "machine/steppers.h" // stepper motor
 
 #include "machine/bfm_bd1.h"  // vfd
-#include "machine/mmtr.h"
+#include "machine/meters.h"
 
 #include "bfm_sc2.lh"
 #include "gldncrwn.lh"
@@ -202,7 +202,7 @@ static int uart2_data;
 static int data_to_uart1;
 static int data_to_uart2;
 static int locked;			// hardware lock/unlock status (0=unlocked)
-static int timer_enabled;
+static int is_timer_enabled;
 static int reel_changed;
 static int coin_inhibits;
 static int irq_timer_stat;
@@ -304,7 +304,7 @@ static void on_scorpion2_reset(void)
 	mmtr_latch        = 0;
 	triac_latch       = 0;
 	irq_status        = 0;
-	timer_enabled     = 1;
+	is_timer_enabled  = 1;
 	coin_inhibits     = 0;
 	irq_timer_stat    = 0;
 	expansion_latch   = 0;
@@ -510,7 +510,7 @@ static INTERRUPT_GEN( timer_irq )
 		}
 	}
 
-	if ( timer_enabled )
+	if ( is_timer_enabled )
 	{
 		irq_timer_stat = 0x01;
 		irq_status     = 0x02;
@@ -608,7 +608,7 @@ static WRITE8_HANDLER( reel56_w )
 static WRITE8_HANDLER( mmtr_w )
 {
 	int  changed = mmtr_latch ^ data;
-	long cycles  = MAME_TIME_TO_CYCLES(0, mame_timer_get_time() );
+	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
 
 	mmtr_latch = data;
 
@@ -899,7 +899,7 @@ static WRITE8_HANDLER( muxena_w )
 
 static WRITE8_HANDLER( timerirq_w )
 {
-	timer_enabled = data & 1;
+	is_timer_enabled = data & 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -3069,7 +3069,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 
 	MDRV_CPU_ADD_TAG("adder2", M6809, 2000000 )			// adder2 board 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(adder2_memmap,0)				// setup adder2 board memorymap
-	MDRV_CPU_VBLANK_INT(adder2_vbl, 1);					// board has a VBL IRQ
+	MDRV_CPU_VBLANK_INT(adder2_vbl, 1)					// board has a VBL IRQ
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)

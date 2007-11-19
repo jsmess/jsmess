@@ -9,7 +9,7 @@
 
 size_t gsword_spritexy_size;
 
-UINT8 *gsword_scrolly_ram;
+//UINT8 *gsword_scrolly_ram;
 UINT8 *gsword_spritexy_ram;
 UINT8 *gsword_spritetile_ram;
 UINT8 *gsword_spriteattrib_ram;

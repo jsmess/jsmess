@@ -21,7 +21,7 @@ INT16 spyhunt_scrollx, spyhunt_scrolly;
 INT16 spyhunt_scroll_offset;
 
 UINT8 *spyhunt_alpharam;
-size_t spyhunt_alpharam_size;
+//size_t spyhunt_alpharam_size;
 
 
 

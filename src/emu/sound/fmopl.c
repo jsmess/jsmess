@@ -317,7 +317,7 @@ typedef struct fm_opl_f {
 	UINT32 clock;					/* master clock  (Hz)           */
 	UINT32 rate;					/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
-	mame_time TimerBase;			/* Timer base time (==sampling time)*/
+	attotime TimerBase;			/* Timer base time (==sampling time)*/
 } FM_OPL;
 
 
@@ -1272,7 +1272,7 @@ static void OPL_initalize(FM_OPL *OPL)
 	/*logerror("freqbase=%f\n", OPL->freqbase);*/
 
 	/* Timer base time */
-	OPL->TimerBase = scale_up_mame_time(MAME_TIME_IN_HZ(OPL->clock), 72);
+	OPL->TimerBase = attotime_mul(ATTOTIME_IN_HZ(OPL->clock), 72);
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -1501,14 +1501,14 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 				/* timer 2 */
 				if(OPL->st[1] != st2)
 				{
-					mame_time period = st2 ? scale_up_mame_time(OPL->TimerBase, OPL->T[1]) : time_zero;
+					attotime period = st2 ? attotime_mul(OPL->TimerBase, OPL->T[1]) : attotime_zero;
 					OPL->st[1] = st2;
 					if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,1,period);
 				}
 				/* timer 1 */
 				if(OPL->st[0] != st1)
 				{
-					mame_time period = st1 ? scale_up_mame_time(OPL->TimerBase, OPL->T[0]) : time_zero;
+					attotime period = st1 ? attotime_mul(OPL->TimerBase, OPL->T[0]) : attotime_zero;
 					OPL->st[0] = st1;
 					if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,0,period);
 				}
@@ -1749,7 +1749,7 @@ static int OPL_LockTable(void)
 #ifdef LOG_CYM_FILE
 	cymfile = fopen("3812_.cym","wb");
 	if (cymfile)
-		mame_timer_pulse ( MAME_TIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
+		timer_pulse ( ATTOTIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
 	else
 		logerror("Could not create file 3812_.cym\n");
 #endif
@@ -2160,7 +2160,7 @@ static int OPLTimerOver(FM_OPL *OPL,int c)
 		}
 	}
 	/* reload timer */
-	if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,c,scale_up_mame_time(OPL->TimerBase, OPL->T[c]));
+	if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,c,attotime_mul(OPL->TimerBase, OPL->T[c]));
 	return OPL->status>>7;
 }
 

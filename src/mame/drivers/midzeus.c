@@ -23,10 +23,13 @@
 #include "audio/dcs.h"
 
 
+#define CPU_CLOCK		60000000
+
+
 static UINT32 *ram_base;
 static UINT8 cmos_protected;
 
-static mame_timer *timer[2];
+static emu_timer *timer[2];
 
 static UINT32 *tms32031_control;
 
@@ -44,8 +47,8 @@ static MACHINE_RESET( midzeus )
 
 	*(UINT32 *)ram_base *= 2;
 
-	timer[0] = mame_timer_alloc(NULL);
-	timer[1] = mame_timer_alloc(NULL);
+	timer[0] = timer_alloc(NULL);
+	timer[1] = timer_alloc(NULL);
 }
 
 
@@ -89,7 +92,7 @@ static READ32_HANDLER( tms32031_control_r )
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer[which]), 10000000));
+		INT32 result = attotime_to_double(attotime_mul(timer_timeelapsed(timer[which]), 10000000));
 		return result;
 	}
 
@@ -114,7 +117,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 	{
 		int which = (offset >> 4) & 1;
 		if (data & 0x40)
-			mame_timer_adjust(timer[which], time_never, 0, time_never);
+			timer_adjust(timer[which], attotime_never, 0, attotime_never);
 	}
 	else
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
@@ -149,7 +152,6 @@ static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
-	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
 	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
@@ -166,7 +168,6 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
-	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
 	AM_RANGE(0x880000, 0x8801ff) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
@@ -617,10 +618,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( midzeus )
+static MACHINE_DRIVER_START( midzeus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS32031, 50000000)		// actually, TMS32032
+	MDRV_CPU_ADD_TAG("main", TMS32032, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zeus_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
@@ -645,7 +646,7 @@ MACHINE_DRIVER_START( midzeus )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( midzeus2 )
+static MACHINE_DRIVER_START( midzeus2 )
 	MDRV_IMPORT_FROM(midzeus)
 
 	/* basic machine hardware */

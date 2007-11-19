@@ -47,7 +47,7 @@ static int bitbanger_init(mess_image *img)
 	bi->last_pulse_time = 0.0;
 	bi->recorded_pulses = 0;
 	bi->value = config->initial_value;
-	bi->timeout_timer = mame_timer_alloc(bitbanger_overthreshhold);
+	bi->timeout_timer = timer_alloc(bitbanger_overthreshhold);
 	bi->over_threshhold = 1;
 
 	bitbangers[id] = bi;
@@ -118,7 +118,7 @@ static TIMER_CALLBACK(bitbanger_overthreshhold)
 {
 	int id = param;
 	struct bitbanger_info *bi = bitbangers[id];
-	bitbanger_addpulse(id, bi, mame_time_to_double(mame_timer_get_time()) - bi->last_pulse_time);
+	bitbanger_addpulse(id, bi, attotime_to_double(timer_get_time()) - bi->last_pulse_time);
 	bi->over_threshhold = 1;
 	bi->recorded_pulses = 0;
 }
@@ -138,7 +138,7 @@ void bitbanger_output(mess_image *img, int value)
 	/* only meaningful if we change */
 	if (bi->value != value)
 	{
-		current_time = mame_time_to_double(mame_timer_get_time());
+		current_time = attotime_to_double(timer_get_time());
 		pulse_width = current_time - bi->last_pulse_time;
 
 		assert(pulse_width >= 0);
@@ -152,7 +152,7 @@ void bitbanger_output(mess_image *img, int value)
 		bi->over_threshhold = 0;
 
 		/* update timeout timer */
-		mame_timer_reset(bi->timeout_timer, double_to_mame_time(bi->config->pulse_threshhold));
+		timer_reset(bi->timeout_timer, double_to_attotime(bi->config->pulse_threshhold));
 	}
 }
 

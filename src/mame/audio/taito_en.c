@@ -7,7 +7,7 @@ static int counter,vector_reg,imr_status;
 static UINT16 es5510_dsp_ram[0x200];
 static UINT32	es5510_gpr[0xc0];
 static UINT32	es5510_gpr_latch;
-static mame_timer *timer_68681=NULL;
+static emu_timer *timer_68681=NULL;
 static int timer_mode,m68681_imr;
 
 static int es_tmp=1;
@@ -80,7 +80,7 @@ static TIMER_CALLBACK( timer_callback )
 
 void f3_68681_reset(void)
 {
-	timer_68681 = mame_timer_alloc(timer_callback);
+	timer_68681 = timer_alloc(timer_callback);
 }
 
 READ16_HANDLER(f3_68681_r)
@@ -120,7 +120,7 @@ WRITE16_HANDLER(f3_68681_w)
 				case 3:
 					logerror("Counter:  X1/Clk - divided by 16, counter is %04x, so interrupt every %d cycles\n",counter,(M68000_CLOCK/M68681_CLOCK)*counter*16);
 					timer_mode=TIMER_SINGLESHOT;
-					mame_timer_adjust(timer_68681, MAME_TIME_IN_CYCLES((M68000_CLOCK/M68681_CLOCK)*counter*16,1), 0, time_zero);
+					timer_adjust(timer_68681, ATTOTIME_IN_CYCLES((M68000_CLOCK/M68681_CLOCK)*counter*16,1), 0, attotime_zero);
 					break;
 				case 4:
 					logerror("Timer:  Unimplemented external IP2\n");
@@ -131,7 +131,7 @@ WRITE16_HANDLER(f3_68681_w)
 				case 6:
 					logerror("Timer:  X1/Clk, counter is %04x, so interrupt every %d cycles\n",counter,(M68000_CLOCK/M68681_CLOCK)*counter);
 					timer_mode=TIMER_PULSE;
-					mame_timer_adjust(timer_68681, MAME_TIME_IN_CYCLES((M68000_CLOCK/M68681_CLOCK)*counter,1), 0, MAME_TIME_IN_CYCLES((M68000_CLOCK/M68681_CLOCK)*counter,1));
+					timer_adjust(timer_68681, ATTOTIME_IN_CYCLES((M68000_CLOCK/M68681_CLOCK)*counter,1), 0, ATTOTIME_IN_CYCLES((M68000_CLOCK/M68681_CLOCK)*counter,1));
 					break;
 				case 7:
 					logerror("Timer:  Unimplemented X1/Clk - divided by 16\n");

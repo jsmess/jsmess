@@ -22,8 +22,8 @@ static size_t clayshoo_videoram_size;
 
 static UINT8 input_port_select;
 static UINT8 analog_port_val;
-static mame_timer *analog_timer_1;
-static mame_timer *analog_timer_2;
+static emu_timer *analog_timer_1;
+static emu_timer *analog_timer_2;
 
 
 
@@ -91,11 +91,11 @@ static TIMER_CALLBACK( reset_analog_bit )
 }
 
 
-static mame_time compute_duration(int analog_pos)
+static attotime compute_duration(int analog_pos)
 {
 	/* the 58 comes from the length of the loop used to
        read the analog position */
-	return MAME_TIME_IN_CYCLES(58 * analog_pos, 0);
+	return ATTOTIME_IN_CYCLES(58 * analog_pos, 0);
 }
 
 
@@ -107,8 +107,8 @@ static WRITE8_HANDLER( analog_reset_w )
 
 	analog_port_val = 0xff;
 
-	mame_timer_adjust(analog_timer_1, compute_duration(readinputportbytag("AN1")), 0x02, time_zero);
-	mame_timer_adjust(analog_timer_2, compute_duration(readinputportbytag("AN2")), 0x01, time_zero);
+	timer_adjust(analog_timer_1, compute_duration(readinputportbytag("AN1")), 0x02, attotime_zero);
+	timer_adjust(analog_timer_2, compute_duration(readinputportbytag("AN2")), 0x01, attotime_zero);
 }
 
 
@@ -120,8 +120,8 @@ static READ8_HANDLER( analog_r )
 
 static void create_analog_timers(void)
 {
-	analog_timer_1 = mame_timer_alloc(reset_analog_bit);
-	analog_timer_2 = mame_timer_alloc(reset_analog_bit);
+	analog_timer_1 = timer_alloc(reset_analog_bit);
+	analog_timer_2 = timer_alloc(reset_analog_bit);
 }
 
 

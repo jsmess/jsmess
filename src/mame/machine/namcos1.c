@@ -700,7 +700,7 @@ static void set_bank(int banknum, bankhandler *handler)
 	namcos1_active_bank[banknum] = *handler;
 }
 
-void namcos1_bankswitch(int cpu, offs_t offset, UINT8 data)
+static void namcos1_bankswitch(int cpu, offs_t offset, UINT8 data)
 {
 	static int chip[16];
 	int bank = (cpu*8) + (( offset >> 9) & 0x07);

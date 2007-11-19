@@ -13,7 +13,7 @@
 UINT8 *route16_videoram1;
 UINT8 *route16_videoram2;
 size_t route16_videoram_size;
-int route16_hardware;
+//int route16_hardware;
 
 static UINT8 flipscreen;
 static UINT8 palette_1;

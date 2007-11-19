@@ -132,7 +132,7 @@ void psx_irq_set( UINT32 data )
 static UINT32 m_p_n_dmabase[ 7 ];
 static UINT32 m_p_n_dmablockcontrol[ 7 ];
 static UINT32 m_p_n_dmachannelcontrol[ 7 ];
-static mame_timer *m_p_timer_dma[ 7 ];
+static emu_timer *m_p_timer_dma[ 7 ];
 static psx_dma_read_handler m_p_fn_dma_read[ 7 ];
 static psx_dma_write_handler m_p_fn_dma_write[ 7 ];
 static UINT32 m_p_n_dma_ticks[ 7 ];
@@ -142,14 +142,14 @@ static UINT32 m_n_dicr;
 
 static void dma_start_timer( int n_channel, UINT32 n_ticks )
 {
-	mame_timer_adjust( m_p_timer_dma[ n_channel ], scale_up_mame_time(MAME_TIME_IN_HZ(33868800), n_ticks), n_channel, time_zero);
+	timer_adjust( m_p_timer_dma[ n_channel ], attotime_mul(ATTOTIME_IN_HZ(33868800), n_ticks), n_channel, attotime_zero);
 	m_p_n_dma_ticks[ n_channel ] = n_ticks;
 	m_p_b_dma_running[ n_channel ] = 1;
 }
 
 static void dma_stop_timer( int n_channel )
 {
-	mame_timer_adjust( m_p_timer_dma[ n_channel ], time_never, 0, time_never);
+	timer_adjust( m_p_timer_dma[ n_channel ], attotime_never, 0, attotime_never);
 	m_p_b_dma_running[ n_channel ] = 0;
 }
 
@@ -467,7 +467,7 @@ READ32_HANDLER( psx_dma_r )
 
 /* Root Counters */
 
-static mame_timer *m_p_timer_root[ 3 ];
+static emu_timer *m_p_timer_root[ 3 ];
 static UINT16 m_p_n_root_count[ 3 ];
 static UINT16 m_p_n_root_mode[ 3 ];
 static UINT16 m_p_n_root_target[ 3 ];
@@ -542,7 +542,7 @@ static void root_timer_adjust( int n_counter )
 {
 	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
 	{
-		mame_timer_adjust( m_p_timer_root[ n_counter ], time_never, n_counter, time_never);
+		timer_adjust( m_p_timer_root[ n_counter ], attotime_never, n_counter, attotime_never);
 	}
 	else
 	{
@@ -556,7 +556,7 @@ static void root_timer_adjust( int n_counter )
 
 		n_duration *= root_divider( n_counter );
 
-		mame_timer_adjust( m_p_timer_root[ n_counter ], scale_up_mame_time(MAME_TIME_IN_HZ(33868800), n_duration), n_counter, time_zero);
+		timer_adjust( m_p_timer_root[ n_counter ], attotime_mul(ATTOTIME_IN_HZ(33868800), n_duration), n_counter, attotime_zero);
 	}
 }
 
@@ -668,7 +668,7 @@ static UINT32 m_p_n_sio_rx_shift[ 2 ];
 static UINT32 m_p_n_sio_tx_bits[ 2 ];
 static UINT32 m_p_n_sio_rx_bits[ 2 ];
 
-static mame_timer *m_p_timer_sio[ 2 ];
+static emu_timer *m_p_timer_sio[ 2 ];
 static psx_sio_handler m_p_f_sio_handler[ 2 ];
 
 #define SIO_STATUS_TX_RDY ( 1 << 0 )
@@ -702,7 +702,7 @@ static void sio_interrupt( int n_port )
 
 static void sio_timer_adjust( int n_port )
 {
-	mame_time n_time;
+	attotime n_time;
 	if( ( m_p_n_sio_status[ n_port ] & SIO_STATUS_TX_EMPTY ) == 0 || m_p_n_sio_tx_bits[ n_port ] != 0 )
 	{
 		int n_prescaler;
@@ -725,21 +725,21 @@ static void sio_timer_adjust( int n_port )
 
 		if( m_p_n_sio_baud[ n_port ] != 0 && n_prescaler != 0 )
 		{
-			n_time = scale_up_mame_time(MAME_TIME_IN_HZ(33868800), n_prescaler * m_p_n_sio_baud[n_port]);
+			n_time = attotime_mul(ATTOTIME_IN_HZ(33868800), n_prescaler * m_p_n_sio_baud[n_port]);
 			verboselog( 2, "sio_timer_adjust( %d ) = %f ( %d x %d )\n", n_port, n_time, n_prescaler, m_p_n_sio_baud[ n_port ] );
 		}
 		else
 		{
-			n_time = time_never;
+			n_time = attotime_never;
 			verboselog( 0, "sio_timer_adjust( %d ) invalid baud rate ( %d x %d )\n", n_port, n_prescaler, m_p_n_sio_baud[ n_port ] );
 		}
 	}
 	else
 	{
-		n_time = time_never;
+		n_time = attotime_never;
 		verboselog( 2, "sio_timer_adjust( %d ) finished\n", n_port );
 	}
-	mame_timer_adjust( m_p_timer_sio[ n_port ], n_time, n_port, time_zero);
+	timer_adjust( m_p_timer_sio[ n_port ], n_time, n_port, attotime_zero);
 }
 
 static TIMER_CALLBACK( sio_clock )
@@ -1563,19 +1563,19 @@ void psx_driver_init( void )
 
 	for( n = 0; n < 7; n++ )
 	{
-		m_p_timer_dma[ n ] = mame_timer_alloc( dma_finished_callback );
+		m_p_timer_dma[ n ] = timer_alloc( dma_finished_callback );
 		m_p_fn_dma_read[ n ] = NULL;
 		m_p_fn_dma_write[ n ] = NULL;
 	}
 
 	for( n = 0; n < 3; n++ )
 	{
-		m_p_timer_root[ n ] = mame_timer_alloc( root_finished );
+		m_p_timer_root[ n ] = timer_alloc( root_finished );
 	}
 
 	for( n = 0; n < 2; n++ )
 	{
-		m_p_timer_sio[ n ] = mame_timer_alloc( sio_clock );
+		m_p_timer_sio[ n ] = timer_alloc( sio_clock );
 	}
 
 	for( n = 0; n < 256; n++ )

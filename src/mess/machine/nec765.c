@@ -109,11 +109,11 @@ typedef struct nec765
 
 	int command;
 
-	mame_timer *seek_timer;
-	mame_timer *timer;
+	emu_timer *seek_timer;
+	emu_timer *timer;
 	int timer_type;
 
-	mame_timer *command_timer;
+	emu_timer *command_timer;
 } NEC765;
 
 //static void nec765_setup_data_request(unsigned char Data);
@@ -313,7 +313,7 @@ static TIMER_CALLBACK(nec765_seek_timer_callback)
 	/* seek complete */
 	nec765_seek_complete();
 
-	mame_timer_reset(fdc.seek_timer, time_never);
+	timer_reset(fdc.seek_timer, attotime_never);
 }
 
 static TIMER_CALLBACK(nec765_timer_callback)
@@ -329,7 +329,7 @@ static TIMER_CALLBACK(nec765_timer_callback)
 		if (!(fdc.nec765_flags & NEC765_DMA_MODE))
 		{
 			/* for pcw */
-			mame_timer_reset(fdc.timer, MAME_TIME_IN_USEC(27));
+			timer_reset(fdc.timer, ATTOTIME_IN_USEC(27));
 		}
 		else
 		{
@@ -361,7 +361,7 @@ static TIMER_CALLBACK(nec765_timer_callback)
 
 		nec765_set_data_request();
 
-		mame_timer_reset(fdc.timer, time_never);
+		timer_reset(fdc.timer, attotime_never);
 	}
 	else if (fdc.timer_type == 4)
 	{
@@ -380,7 +380,7 @@ static TIMER_CALLBACK(nec765_timer_callback)
 			}
 		}
 
-		mame_timer_reset(fdc.timer, time_never);
+		timer_reset(fdc.timer, attotime_never);
 	}
 }
 
@@ -390,18 +390,18 @@ In this driver, the first NMI calls the handler function, furthur NMI's are
 effectively disabled by reading the data before the NMI int can be set.
 */
 
-static void nec765_setup_timed_generic(int timer_type, mame_time duration)
+static void nec765_setup_timed_generic(int timer_type, attotime duration)
 {
 	fdc.timer_type = timer_type;
 
 	if (!(fdc.nec765_flags & NEC765_DMA_MODE))
 	{
-		mame_timer_adjust(fdc.timer, duration, 0, time_zero);		
+		timer_adjust(fdc.timer, duration, 0, attotime_zero);		
 	}
 	else
 	{
 		nec765_timer_callback(Machine, fdc.timer_type);
-		mame_timer_reset(fdc.timer, time_never);
+		timer_reset(fdc.timer, attotime_never);
 	}
 }
 
@@ -409,13 +409,13 @@ static void nec765_setup_timed_generic(int timer_type, mame_time duration)
 static void nec765_setup_timed_data_request(int bytes)
 {
 	/* setup timer to trigger in NEC765_DATA_RATE us */
-	nec765_setup_timed_generic(0, MAME_TIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);		
+	nec765_setup_timed_generic(0, ATTOTIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);		
 }
 
 /* setup result data request */
 static void nec765_setup_timed_result_data_request(void)
 {
-	nec765_setup_timed_generic(2, MAME_TIME_IN_USEC(NEC765_DATA_RATE*2));
+	nec765_setup_timed_generic(2, ATTOTIME_IN_USEC(NEC765_DATA_RATE*2));
 }
 
 
@@ -423,7 +423,7 @@ static void nec765_setup_timed_result_data_request(void)
 static void nec765_setup_timed_int(int signed_tracks)
 {
 	/* setup timer to signal after seek time is complete */
-	mame_timer_adjust(fdc.seek_timer, time_zero, 0, double_to_mame_time(fdc.srt_in_ms*abs(signed_tracks)*0.001));
+	timer_adjust(fdc.seek_timer, attotime_zero, 0, double_to_attotime(fdc.srt_in_ms*abs(signed_tracks)*0.001));
 }
 
 static void nec765_seek_setup(int is_recalibrate)
@@ -673,9 +673,9 @@ void nec765_init(const nec765_interface *iface, NEC765_VERSION version)
 	int i;
 
 	fdc.version = version;
-	fdc.timer = mame_timer_alloc(nec765_timer_callback);
-	fdc.seek_timer = mame_timer_alloc(nec765_seek_timer_callback);
-	fdc.command_timer = mame_timer_alloc(nec765_continue_command);
+	fdc.timer = timer_alloc(nec765_timer_callback);
+	fdc.seek_timer = timer_alloc(nec765_seek_timer_callback);
+	fdc.command_timer = timer_alloc(nec765_continue_command);
 	memset(&nec765_iface, 0, sizeof(nec765_interface));
 
 	if (iface)
@@ -719,14 +719,14 @@ void nec765_set_tc_state(int state)
 			{
 				if (fdc.timer_type==0)
 				{
-					mame_timer_reset(fdc.timer, time_never);
+					timer_reset(fdc.timer, attotime_never);
 
 
 				}
 			}
 
 #ifdef NO_END_OF_CYLINDER
-			mame_timer_adjust(fdc.command_timer, time_zero, 0, time_zero);
+			timer_adjust(fdc.command_timer, attotime_zero, 0, attotime_zero);
 #else
 			nec765_update_state();
 #endif
@@ -1599,7 +1599,7 @@ void nec765_update_state(void)
 
 		if ((fdc.nec765_transfer_bytes_remaining==0) || (fdc.nec765_flags & NEC765_TC))
 		{
-			mame_timer_adjust(fdc.command_timer, time_zero, 0, time_zero);
+			timer_adjust(fdc.command_timer, attotime_zero, 0, attotime_zero);
 		}
 		else
 		{
@@ -1667,7 +1667,7 @@ void nec765_update_state(void)
 
 		if ((fdc.nec765_transfer_bytes_remaining == 0) || (fdc.nec765_flags & NEC765_TC))
 		{
-			mame_timer_adjust(fdc.command_timer, time_zero, 0, time_zero);
+			timer_adjust(fdc.command_timer, attotime_zero, 0, attotime_zero);
 		}
 		else
 		{

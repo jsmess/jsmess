@@ -95,13 +95,13 @@ static UINT32 *rabbit_tilemap_regs[4];
 static UINT32 *rabbit_spriteregs;
 static UINT32 *rabbit_blitterregs;
 static mame_bitmap *rabbit_sprite_bitmap;
-rectangle rabbit_sprite_clip;
+static rectangle rabbit_sprite_clip;
 
 static int rabbit_vblirqlevel, rabbit_bltirqlevel, rabbit_banking;
 
-UINT32 *rabbit_tilemap_ram[4];
+static UINT32 *rabbit_tilemap_ram[4];
 
-UINT32 *rabbit_spriteram;
+static UINT32 *rabbit_spriteram;
 static tilemap *rabbit_tilemap[4];
 
 /* call with tilesize = 0 for 8x8 or 1 for 16x16 */
@@ -612,7 +612,7 @@ static TIMER_CALLBACK( rabbit_blit_done )
 	cpunum_set_input_line(0, rabbit_bltirqlevel, HOLD_LINE);
 }
 
-void rabbit_do_blit(void)
+static void rabbit_do_blit(void)
 {
 	UINT8 *blt_data = memory_region(REGION_USER1);
 	int blt_source = (rabbit_blitterregs[0]&0x000fffff)>>0;
@@ -656,7 +656,7 @@ void rabbit_do_blit(void)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					mame_timer_set(MAME_TIME_IN_USEC(500),0,rabbit_blit_done);
+					timer_set(ATTOTIME_IN_USEC(500),0,rabbit_blit_done);
 					return;
 				}
 

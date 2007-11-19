@@ -56,10 +56,10 @@ struct pit8253_timer
 	void (*output_callback)(int);	/* callback function for when output changes */
 	void (*freq_callback)(double);	/* callback function for when output frequency changes */
 
-	mame_time last_updated;			/* time when last updated */
+	attotime last_updated;			/* time when last updated */
 
-	mame_timer *outputtimer;		/* MAME timer for output change callback */
-	mame_timer *freqtimer;			/* MAME timer for output frequency change callback */
+	emu_timer *outputtimer;		/* MAME timer for output change callback */
+	emu_timer *freqtimer;			/* MAME timer for output frequency change callback */
 
 	UINT16 value;					/* current counter value ("CE" in Intel docs) */
 	UINT16 latch;					/* latched counter value ("OL" in Intel docs) */
@@ -223,11 +223,11 @@ static void	freq_callback_in(struct	pit8253_timer *timer,UINT32	cycles)
 
 	if (timer->clockin == 0	|| cycles == CYCLES_NEVER)
 	{
-		mame_timer_reset(timer->freqtimer,time_never);
+		timer_reset(timer->freqtimer,attotime_never);
 	}
 	else
 	{
-		mame_timer_reset(timer->freqtimer,double_to_mame_time(cycles / timer->clockin));
+		timer_reset(timer->freqtimer,double_to_attotime(cycles / timer->clockin));
 	}
 	timer->cycles_to_freq =	cycles;
 }
@@ -615,12 +615,12 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 		timer->cycles_to_output	= cycles_to_output;
 		if (cycles_to_output ==	CYCLES_NEVER ||	timer->clockin == 0)
 		{
-			mame_timer_reset(timer->outputtimer,time_never);
+			timer_reset(timer->outputtimer,attotime_never);
 		}
 		else
 		{
-			mame_timer_reset(timer->outputtimer,
-				double_to_mame_time(cycles_to_output / timer->clockin));
+			timer_reset(timer->outputtimer,
+				double_to_attotime(cycles_to_output / timer->clockin));
 		}
 	}
 
@@ -677,11 +677,11 @@ static void	update(struct pit8253_timer	*timer)
 {
 	/* With the 82C54's maximum clockin of 10MHz, 64 bits is nearly 60,000
        years of time. Should be enough for now. */
-	mame_time now =	mame_timer_get_time();
-	mame_time elapsed_time = sub_mame_times(now,timer->last_updated);
-	INT64 elapsed_cycles =	mame_time_to_double(elapsed_time) *	timer->clockin;
+	attotime now =	timer_get_time();
+	attotime elapsed_time = attotime_sub(now,timer->last_updated);
+	INT64 elapsed_cycles =	attotime_to_double(elapsed_time) *	timer->clockin;
 
-	timer->last_updated	= add_mame_times(timer->last_updated,double_to_mame_time(elapsed_cycles/timer->clockin));
+	timer->last_updated	= attotime_add(timer->last_updated,double_to_attotime(elapsed_cycles/timer->clockin));
 
 	simulate(timer,elapsed_cycles);
 }
@@ -712,7 +712,7 @@ void pit8253_reset(int which)
 		timer->null_count =	1;
 		timer->cycles_to_output	= timer->cycles_to_freq	= CYCLES_NEVER;
 
-		timer->last_updated	= mame_timer_get_time();
+		timer->last_updated	= timer_get_time();
 
 		update(timer);
 	}
@@ -731,7 +731,7 @@ static TIMER_CALLBACK( freqcallback )
 
 	t = cycles / timer->clockin;
 
-	timer->last_updated	= add_mame_times(timer->last_updated, double_to_mame_time(t));
+	timer->last_updated	= attotime_add(timer->last_updated, double_to_attotime(t));
 }
 
 
@@ -747,7 +747,7 @@ static TIMER_CALLBACK( outputcallback )
 
 	t = cycles / timer->clockin;
 
-	timer->last_updated	= add_mame_times(timer->last_updated, double_to_mame_time(t));
+	timer->last_updated	= attotime_add(timer->last_updated, double_to_attotime(t));
 }
 
 
@@ -781,15 +781,15 @@ int	pit8253_init(int count,	const struct pit8253_config *config)
 				timer->outputtimer = NULL;
 			else
 			{
-				timer->outputtimer = mame_timer_alloc(outputcallback);
-				mame_timer_adjust(timer->outputtimer, time_never, i	| (timerno<<4),	time_zero);
+				timer->outputtimer = timer_alloc(outputcallback);
+				timer_adjust(timer->outputtimer, attotime_never, i	| (timerno<<4),	attotime_zero);
 			}
 			if (timer->freq_callback ==	NULL)
 				timer->freqtimer = NULL;
 			else
 			{
-				timer->freqtimer = mame_timer_alloc(freqcallback);
-				mame_timer_adjust(timer->freqtimer,	time_never,	i |	(timerno<<4), time_zero);
+				timer->freqtimer = timer_alloc(freqcallback);
+				timer_adjust(timer->freqtimer,	attotime_never,	i |	(timerno<<4), attotime_zero);
 			}
 
 			/* set up state save values */
@@ -812,7 +812,7 @@ int	pit8253_init(int count,	const struct pit8253_config *config)
 			state_save_register_item("pit8253", n, timer->cycles_to_freq);
 			state_save_register_item("pit8253", n, timer->freq_count);
 			state_save_register_item("pit8253", n, timer->last_updated.seconds);
-			state_save_register_item("pit8253", n, timer->last_updated.subseconds);
+			state_save_register_item("pit8253", n, timer->last_updated.attoseconds);
 			++n;
 		}
 		pit8253_reset(i);

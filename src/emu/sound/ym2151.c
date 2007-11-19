@@ -121,10 +121,10 @@ typedef struct
 
 #ifdef USE_MAME_TIMERS
 /* ASG 980324 -- added for tracking timers */
-	mame_timer	*timer_A;
-	mame_timer	*timer_B;
-	mame_time	timer_A_time[1024];		/* timer A times for MAME */
-	mame_time	timer_B_time[256];		/* timer B times for MAME */
+	emu_timer	*timer_A;
+	emu_timer	*timer_B;
+	attotime	timer_A_time[1024];		/* timer A times for MAME */
+	attotime	timer_B_time[256];		/* timer B times for MAME */
 	int			irqlinestate;
 #else
 	UINT8		tim_A;					/* timer A enable (0-disabled) */
@@ -592,7 +592,7 @@ static void init_chip_tables(YM2151 *chip)
 	int i,j;
 	double mult,phaseinc,Hz;
 	double scaler;
-	mame_time pom;
+	attotime pom;
 
 	scaler = ( (double)chip->clock / 64.0 ) / ( (double)chip->sampfreq );
 	/*logerror("scaler    = %20.15f\n", scaler);*/
@@ -697,21 +697,21 @@ static void init_chip_tables(YM2151 *chip)
 	for (i=0; i<1024; i++)
 	{
 		/* ASG 980324: changed to compute both tim_A_tab and timer_A_time */
-		pom= scale_up_mame_time(MAME_TIME_IN_HZ(chip->clock), 64 * (1024 - i));
+		pom= attotime_mul(ATTOTIME_IN_HZ(chip->clock), 64 * (1024 - i));
 		#ifdef USE_MAME_TIMERS
 			chip->timer_A_time[i] = pom;
 		#else
-			chip->tim_A_tab[i] = mame_time_to_double(pom) * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
+			chip->tim_A_tab[i] = attotime_to_double(pom) * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
 		#endif
 	}
 	for (i=0; i<256; i++)
 	{
 		/* ASG 980324: changed to compute both tim_B_tab and timer_B_time */
-		pom= scale_up_mame_time(MAME_TIME_IN_HZ(chip->clock), 1024 * (256 - i));
+		pom= attotime_mul(ATTOTIME_IN_HZ(chip->clock), 1024 * (256 - i));
 		#ifdef USE_MAME_TIMERS
 			chip->timer_B_time[i] = pom;
 		#else
-			chip->tim_B_tab[i] = mame_time_to_double(pom) * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
+			chip->tim_B_tab[i] = attotime_to_double(pom) * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
 		#endif
 	}
 
@@ -826,12 +826,12 @@ static TIMER_CALLBACK_PTR( irqBoff_callback )
 static TIMER_CALLBACK_PTR( timer_callback_a )
 {
 	YM2151 *chip = param;
-	mame_timer_adjust_ptr(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], time_zero);
+	timer_adjust_ptr(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], attotime_zero);
 	chip->timer_A_index_old = chip->timer_A_index;
 	if (chip->irq_enable & 0x04)
 	{
 		chip->status |= 1;
-		mame_timer_set_ptr(time_zero,chip,irqAon_callback);
+		timer_set_ptr(attotime_zero,chip,irqAon_callback);
 	}
 	if (chip->irq_enable & 0x80)
 		chip->csm_req = 2;		/* request KEY ON / KEY OFF sequence */
@@ -839,12 +839,12 @@ static TIMER_CALLBACK_PTR( timer_callback_a )
 static TIMER_CALLBACK_PTR( timer_callback_b )
 {
 	YM2151 *chip = param;
-	mame_timer_adjust_ptr(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], time_zero);
+	timer_adjust_ptr(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], attotime_zero);
 	chip->timer_B_index_old = chip->timer_B_index;
 	if (chip->irq_enable & 0x08)
 	{
 		chip->status |= 2;
-		mame_timer_set_ptr(time_zero,chip,irqBon_callback);
+		timer_set_ptr(attotime_zero,chip,irqBon_callback);
 	}
 }
 #if 0
@@ -1056,7 +1056,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 #if 0
 	/* There is no info on what YM2151 really does when busy flag is set */
 	if ( chip->status & 0x80 ) return;
-	mame_timer_set_ptr ( scale_up_mame_time(MAME_TIME_IN_HZ(chip->clock), 64), chip, timer_callback_chip_busy);
+	timer_set_ptr ( attotime_mul(ATTOTIME_IN_HZ(chip->clock), 64), chip, timer_callback_chip_busy);
 	chip->status |= 0x80;	/* set busy flag for 64 chip clock cycles */
 #endif
 
@@ -1107,7 +1107,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~1;
-				mame_timer_set_ptr(time_zero,chip,irqAoff_callback);
+				timer_set_ptr(attotime_zero,chip,irqAoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
@@ -1119,7 +1119,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~2;
-				mame_timer_set_ptr(time_zero,chip,irqBoff_callback);
+				timer_set_ptr(attotime_zero,chip,irqBoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
@@ -1131,9 +1131,9 @@ void YM2151WriteReg(void *_chip, int r, int v)
 				#ifdef USE_MAME_TIMERS
 				/* ASG 980324: added a real timer */
 				/* start timer _only_ if it wasn't already started (it will reload time value next round) */
-					if (!mame_timer_enable(chip->timer_B, 1))
+					if (!timer_enable(chip->timer_B, 1))
 					{
-						mame_timer_adjust_ptr(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], time_zero);
+						timer_adjust_ptr(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], attotime_zero);
 						chip->timer_B_index_old = chip->timer_B_index;
 					}
 				#else
@@ -1146,7 +1146,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 			}else{		/* stop timer B */
 				#ifdef USE_MAME_TIMERS
 				/* ASG 980324: added a real timer */
-					mame_timer_enable(chip->timer_B, 0);
+					timer_enable(chip->timer_B, 0);
 				#else
 					chip->tim_B = 0;
 				#endif
@@ -1156,9 +1156,9 @@ void YM2151WriteReg(void *_chip, int r, int v)
 				#ifdef USE_MAME_TIMERS
 				/* ASG 980324: added a real timer */
 				/* start timer _only_ if it wasn't already started (it will reload time value next round) */
-					if (!mame_timer_enable(chip->timer_A, 1))
+					if (!timer_enable(chip->timer_A, 1))
 					{
-						mame_timer_adjust_ptr(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], time_zero);
+						timer_adjust_ptr(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], attotime_zero);
 						chip->timer_A_index_old = chip->timer_A_index;
 					}
 				#else
@@ -1171,7 +1171,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 			}else{		/* stop timer A */
 				#ifdef USE_MAME_TIMERS
 				/* ASG 980324: added a real timer */
-					mame_timer_enable(chip->timer_A, 0);
+					timer_enable(chip->timer_A, 0);
 				#else
 					chip->tim_A = 0;
 				#endif
@@ -1542,8 +1542,8 @@ void * YM2151Init(int index, int clock, int rate)
 
 #ifdef USE_MAME_TIMERS
 /* this must be done _before_ a call to YM2151ResetChip() */
-	PSG->timer_A = mame_timer_alloc_ptr(timer_callback_a, PSG);
-	PSG->timer_B = mame_timer_alloc_ptr(timer_callback_b, PSG);
+	PSG->timer_A = timer_alloc_ptr(timer_callback_a, PSG);
+	PSG->timer_B = timer_alloc_ptr(timer_callback_b, PSG);
 #else
 	PSG->tim_A      = 0;
 	PSG->tim_B      = 0;
@@ -1554,7 +1554,7 @@ void * YM2151Init(int index, int clock, int rate)
 #ifdef LOG_CYM_FILE
 	cymfile = fopen("2151_.cym","wb");
 	if (cymfile)
-		mame_timer_pulse ( MAME_TIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
+		timer_pulse ( ATTOTIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
 	else
 		logerror("Could not create file 2151_.cym\n");
 #endif
@@ -1626,8 +1626,8 @@ void YM2151ResetChip(void *_chip)
 	chip->irq_enable = 0;
 #ifdef USE_MAME_TIMERS
 	/* ASG 980324 -- reset the timers before writing to the registers */
-	mame_timer_enable(chip->timer_A, 0);
-	mame_timer_enable(chip->timer_B, 0);
+	timer_enable(chip->timer_A, 0);
+	timer_enable(chip->timer_B, 0);
 #else
 	chip->tim_A      = 0;
 	chip->tim_B      = 0;

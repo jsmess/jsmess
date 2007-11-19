@@ -43,8 +43,8 @@ MM63.10N
 #include "machine/mc8123.h"
 #include "sound/2203intf.h"
 
-UINT8* chinsan_video;
-UINT8 chinsan_port_select;
+static UINT8* chinsan_video;
+static UINT8 chinsan_port_select;
 
 static VIDEO_START(chinsan)
 {
@@ -462,7 +462,7 @@ static MACHINE_DRIVER_START( chinsan )
 	MDRV_CPU_IO_MAP(chinsan_io,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_MACHINE_RESET( chinsan );
+	MDRV_MACHINE_RESET( chinsan )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )

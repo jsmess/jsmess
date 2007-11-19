@@ -393,7 +393,7 @@ static TIMER_CALLBACK( f3_interrupt3 )
 static INTERRUPT_GEN( f3_interrupt2 )
 {
 	cpunum_set_input_line(0, 2, HOLD_LINE);	// vblank
-	mame_timer_set( MAME_TIME_IN_CYCLES(10000,0), 0, f3_interrupt3);
+	timer_set( ATTOTIME_IN_CYCLES(10000,0), 0, f3_interrupt3);
 }
 
 static MACHINE_RESET( f3 )
@@ -446,7 +446,7 @@ static MACHINE_DRIVER_START( f3 )
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_SCREEN_REFRESH_RATE(58.97)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(624) /* 58.97 Hz, 624us vblank time */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
 
 	MDRV_MACHINE_START(f3)
 	MDRV_MACHINE_RESET(f3)

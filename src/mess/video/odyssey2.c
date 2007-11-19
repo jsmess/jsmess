@@ -152,7 +152,7 @@ union {
 
 static UINT8 collision[8];    /* only 7 used but easier to index */
 static int line;
-static mame_time line_time;
+static attotime line_time;
 static UINT32 o2_snd_shift[2];
 static UINT8 x_beam_pos;
 static UINT8 y_beam_pos;
@@ -176,7 +176,7 @@ VIDEO_START( odyssey2 )
 INLINE int get_horiz_clock_beam_pos( void )
 {
     int h;
-    h = scale_up_mame_time(sub_mame_times(mame_timer_get_time(), line_time), Machine->drv->cpu[0].clock * 8).seconds;
+    h = attotime_mul(attotime_sub(timer_get_time(), line_time), Machine->drv->cpu[0].clock * 8).seconds;
 
     return h;
 }
@@ -184,7 +184,7 @@ INLINE int get_horiz_clock_beam_pos( void )
 INLINE int get_horiz_clock( void )
 {
     int h;
-    h = scale_up_mame_time(sub_mame_times(mame_timer_get_time(), line_time), Machine->drv->cpu[0].clock).seconds;
+    h = attotime_mul(attotime_sub(timer_get_time(), line_time), Machine->drv->cpu[0].clock).seconds;
 
     return h;
 }
@@ -317,7 +317,7 @@ extern READ8_HANDLER( odyssey2_t1_r )
 
 INTERRUPT_GEN( odyssey2_line )
 {
-    line_time = mame_timer_get_time();
+    line_time = timer_get_time();
     line = (line + 1) % 262;
 
     switch (line) 

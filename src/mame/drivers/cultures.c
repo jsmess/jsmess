@@ -312,7 +312,7 @@ static const gfx_layout gfxlayout =
 	8*64,
 };
 
-GFXDECODE_START( culture )
+static GFXDECODE_START( culture )
 	GFXDECODE_ENTRY(REGION_GFX1, 0, gfxlayout, 0, 1 )
 	GFXDECODE_ENTRY(REGION_GFX2, 0, gfxlayout, 0, 1 )
 	GFXDECODE_ENTRY(REGION_GFX3, 0, gfxlayout, 0, 1 )

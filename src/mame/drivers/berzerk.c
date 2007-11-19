@@ -44,8 +44,8 @@ static UINT8 magicram_control;		/* 8-bit latch @ 6C */
 static UINT8 last_shift_data;		/* 7-bit latch @ 7C */
 static UINT8 intercept;				/* J-K flip-flop @ 6B */
 
-static mame_timer *irq_timer;
-static mame_timer *nmi_timer;
+static emu_timer *irq_timer;
+static emu_timer *nmi_timer;
 static UINT8 irq_enabled;			/* J-K flip-flop @ 3D */
 static UINT8 nmi_enabled;			/* flip-flop made out of 2 NAND gates @ 1D */
 
@@ -164,20 +164,20 @@ static TIMER_CALLBACK( irq_callback )
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_irq_number, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_irq_number, attotime_zero);
 }
 
 
 static void create_irq_timer(void)
 {
-	irq_timer = mame_timer_alloc(irq_callback);
+	irq_timer = timer_alloc(irq_callback);
 }
 
 
 static void start_irq_timer(void)
 {
 	int vpos = vysnc_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, attotime_zero);
 }
 
 
@@ -241,20 +241,20 @@ static TIMER_CALLBACK( nmi_callback )
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
-	mame_timer_adjust(nmi_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_nmi_number, time_zero);
+	timer_adjust(nmi_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_nmi_number, attotime_zero);
 }
 
 
 static void create_nmi_timer(void)
 {
-	nmi_timer = mame_timer_alloc(nmi_callback);
+	nmi_timer = timer_alloc(nmi_callback);
 }
 
 
 static void start_nmi_timer(void)
 {
 	int vpos = vysnc_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
-	mame_timer_adjust(nmi_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
+	timer_adjust(nmi_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, attotime_zero);
 }
 
 

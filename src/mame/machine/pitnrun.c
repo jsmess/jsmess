@@ -47,7 +47,7 @@ WRITE8_HANDLER( pitnrun_mcu_data_w )
 READ8_HANDLER( pitnrun_mcu_status_r )
 {
 	/* mcu synchronization */
-	cpu_yielduntil_time (MAME_TIME_IN_USEC(5));
+	cpu_yielduntil_time (ATTOTIME_IN_USEC(5));
 	/* bit 0 = the 68705 has read data from the Z80 */
 	/* bit 1 = the 68705 has written data for the Z80 */
 	return ~((zready << 1) | (zaccept << 0));

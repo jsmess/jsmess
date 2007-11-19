@@ -65,7 +65,7 @@ typedef struct tms34010_regs
 	UINT8 reset_deferred;
 	int (*irq_callback)(int irqline);
 	const tms34010_config *config;
-	mame_timer *scantimer;
+	emu_timer *scantimer;
 
 	/* A registers 0-15 map to regs[0]-regs[15] */
 	/* B registers 0-15 map to regs[30]-regs[15] */
@@ -616,8 +616,8 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 		screen_to_cpu[config->scrnum] = index;
 
 	/* allocate a scanline timer and set it to go off at the start */
-	state.scantimer = mame_timer_alloc(scanline_callback);
-	mame_timer_adjust(state.scantimer, time_zero, index, time_zero);
+	state.scantimer = timer_alloc(scanline_callback);
+	timer_adjust(state.scantimer, attotime_zero, index, attotime_zero);
 
 	/* allocate the shiftreg */
 	state.shiftreg = auto_malloc(SHIFTREG_SIZE);
@@ -640,7 +640,7 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 static void tms34010_reset(void)
 {
 	const tms34010_config *config;
-	mame_timer *save_scantimer;
+	emu_timer *save_scantimer;
 	int (*save_irqcallback)(int);
 	UINT16 *shiftreg;
 
@@ -963,7 +963,7 @@ static TIMER_CALLBACK( scanline_callback )
 			int htotal = SMART_IOREG(HTOTAL);
 			if (htotal > 0 && vtotal > 0)
 			{
-				subseconds_t refresh = HZ_TO_SUBSECONDS(state.config->pixclock) * (htotal + 1) * (vtotal + 1);
+				attoseconds_t refresh = HZ_TO_ATTOSECONDS(state.config->pixclock) * (htotal + 1) * (vtotal + 1);
 				int width = (htotal + 1) * state.config->pixperclock;
 				int height = vtotal + 1;
 				rectangle visarea;
@@ -984,7 +984,7 @@ static TIMER_CALLBACK( scanline_callback )
 				}
 
 				LOG(("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
-						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, SUBSECONDS_TO_HZ(refresh)));
+						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, ATTOSECONDS_TO_HZ(refresh)));
 
 				/* interlaced timing not supported */
 				if ((SMART_IOREG(DPYCTL) & 0x4000) == 0)
@@ -1029,9 +1029,9 @@ static TIMER_CALLBACK( scanline_callback )
 	if (vcount > vtotal)
 		vcount = 0;
 
-	/* note that we add !master (0 or 1) as a subseconds value; this makes no practical difference */
+	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	mame_timer_adjust(state.scantimer, add_subseconds_to_mame_time(video_screen_get_time_until_pos(state.config->scrnum, vcount, 0), !master), cpunum | (vcount << 8), time_zero);
+	timer_adjust(state.scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(state.config->scrnum, vcount, 0), !master), cpunum | (vcount << 8), attotime_zero);
 
 	/* restore the context */
 	cpuintrf_pop_context();
@@ -1460,7 +1460,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			/* have an IRQ handler. For this reason, we return it signalled a bit early in order */
 			/* to make it past these loops. */
 			if (SMART_IOREG(VCOUNT) + 1 == SMART_IOREG(DPYINT) &&
-				compare_mame_times(mame_timer_timeleft(state.scantimer), MAME_TIME_IN_HZ(40000000/TMS34010_CLOCK_DIVIDER/3)) < 0)
+				attotime_compare(timer_timeleft(state.scantimer), ATTOTIME_IN_HZ(40000000/TMS34010_CLOCK_DIVIDER/3)) < 0)
 				result |= TMS34010_DI;
 			return result;
 	}

@@ -561,11 +561,11 @@ int inputx_validitycheck(const game_driver *gamedrv, input_port_entry **memory)
 
 static mess_input_code *codes;
 static key_buffer *keybuffer;
-static mame_timer *inputx_timer;
+static emu_timer *inputx_timer;
 static int (*queue_chars)(const unicode_char *text, size_t text_len);
 static int (*accept_char)(unicode_char ch);
 static int (*charqueue_empty)(void);
-static mame_time current_rate;
+static attotime current_rate;
 
 static TIMER_CALLBACK(inputx_timerproc);
 
@@ -582,7 +582,7 @@ static void execute_input(int ref, int params, const char *param[])
 
 static void setup_keybuffer(void)
 {
-	inputx_timer = mame_timer_alloc(inputx_timerproc);
+	inputx_timer = timer_alloc(inputx_timerproc);
 	keybuffer = auto_malloc(sizeof(key_buffer));
 	memset(keybuffer, 0, sizeof(*keybuffer));
 }
@@ -733,31 +733,31 @@ int inputx_can_post_key(unicode_char ch)
 
 
 
-static mame_time choose_delay(unicode_char ch)
+static attotime choose_delay(unicode_char ch)
 {
-	subseconds_t delay = 0;
+	attoseconds_t delay = 0;
 
-	if (current_rate.seconds || current_rate.subseconds)
+	if (attotime_compare(current_rate, attotime_zero) != 0)
 		return current_rate;
 
 	if (queue_chars)
 	{
 		/* systems with queue_chars can afford a much smaller delay */
-		delay = DOUBLE_TO_SUBSECONDS(0.01);
+		delay = DOUBLE_TO_ATTOSECONDS(0.01);
 	}
 	else
 	{
 		switch(ch) {
 		case '\r':
-			delay = DOUBLE_TO_SUBSECONDS(0.2);
+			delay = DOUBLE_TO_ATTOSECONDS(0.2);
 			break;
 
 		default:
-			delay = DOUBLE_TO_SUBSECONDS(0.05);
+			delay = DOUBLE_TO_ATTOSECONDS(0.05);
 			break;
 		}
 	}
-	return make_mame_time(0, delay);
+	return attotime_make(0, delay);
 }
 
 
@@ -771,7 +771,7 @@ static void internal_post_key(unicode_char ch)
 	/* need to start up the timer? */
 	if (keybuf->begin_pos == keybuf->end_pos)
 	{
-		mame_timer_adjust(inputx_timer, choose_delay(ch), 0, time_zero);
+		timer_adjust(inputx_timer, choose_delay(ch), 0, attotime_zero);
 		keybuf->status_keydown = 0;
 	}
 
@@ -790,7 +790,7 @@ static int buffer_full(void)
 
 
 
-void inputx_postn_rate(const unicode_char *text, size_t text_len, mame_time rate)
+void inputx_postn_rate(const unicode_char *text, size_t text_len, attotime rate)
 {
 	int last_cr = 0;
 	unicode_char ch;
@@ -852,7 +852,7 @@ void inputx_postn_rate(const unicode_char *text, size_t text_len, mame_time rate
 static TIMER_CALLBACK(inputx_timerproc)
 {
 	key_buffer *keybuf;
-	mame_time delay;
+	attotime delay;
 
 	keybuf = get_buffer();
 
@@ -864,7 +864,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 			keybuf->begin_pos++;
 			keybuf->begin_pos %= sizeof(keybuf->buffer) / sizeof(keybuf->buffer[0]);
 
-			if (current_rate.seconds || current_rate.subseconds)
+			if (attotime_compare(current_rate, attotime_zero) != 0)
 				break;
 		}
 	}
@@ -887,7 +887,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 	if (keybuf->begin_pos != keybuf->end_pos)
 	{
 		delay = choose_delay(keybuf->buffer[keybuf->begin_pos]);
-		mame_timer_adjust(inputx_timer, delay, 0, time_zero);
+		timer_adjust(inputx_timer, delay, 0, attotime_zero);
 	}
 }
 
@@ -1008,7 +1008,7 @@ int inputx_is_posting(void)
 
 ***************************************************************************/
 
-void inputx_postn_coded_rate(const char *text, size_t text_len, mame_time rate)
+void inputx_postn_coded_rate(const char *text, size_t text_len, attotime rate)
 {
 	size_t i, j, key_len, increment;
 	unicode_char ch;
@@ -1087,12 +1087,12 @@ void inputx_postn_coded_rate(const char *text, size_t text_len, mame_time rate)
 
 void inputx_postn(const unicode_char *text, size_t text_len)
 {
-	inputx_postn_rate(text, text_len, make_mame_time(0, 0));
+	inputx_postn_rate(text, text_len, attotime_make(0, 0));
 }
 
 
 
-void inputx_post_rate(const unicode_char *text, mame_time rate)
+void inputx_post_rate(const unicode_char *text, attotime rate)
 {
 	size_t len = 0;
 	while(text[len])
@@ -1104,12 +1104,12 @@ void inputx_post_rate(const unicode_char *text, mame_time rate)
 
 void inputx_post(const unicode_char *text)
 {
-	inputx_post_rate(text, make_mame_time(0, 0));
+	inputx_post_rate(text, attotime_make(0, 0));
 }
 
 
 
-void inputx_postc_rate(unicode_char ch, mame_time rate)
+void inputx_postc_rate(unicode_char ch, attotime rate)
 {
 	inputx_postn_rate(&ch, 1, rate);
 }
@@ -1118,12 +1118,12 @@ void inputx_postc_rate(unicode_char ch, mame_time rate)
 
 void inputx_postc(unicode_char ch)
 {
-	inputx_postc_rate(ch, make_mame_time(0, 0));
+	inputx_postc_rate(ch, attotime_make(0, 0));
 }
 
 
 
-void inputx_postn_utf16_rate(const utf16_char *text, size_t text_len, mame_time rate)
+void inputx_postn_utf16_rate(const utf16_char *text, size_t text_len, attotime rate)
 {
 	size_t len = 0;
 	unicode_char c;
@@ -1180,12 +1180,12 @@ void inputx_postn_utf16_rate(const utf16_char *text, size_t text_len, mame_time 
 
 void inputx_postn_utf16(const utf16_char *text, size_t text_len)
 {
-	inputx_postn_utf16_rate(text, text_len, make_mame_time(0, 0));
+	inputx_postn_utf16_rate(text, text_len, attotime_make(0, 0));
 }
 
 
 
-void inputx_post_utf16_rate(const utf16_char *text, mame_time rate)
+void inputx_post_utf16_rate(const utf16_char *text, attotime rate)
 {
 	size_t len = 0;
 	while(text[len])
@@ -1197,12 +1197,12 @@ void inputx_post_utf16_rate(const utf16_char *text, mame_time rate)
 
 void inputx_post_utf16(const utf16_char *text)
 {
-	inputx_post_utf16_rate(text, make_mame_time(0, 0));
+	inputx_post_utf16_rate(text, attotime_make(0, 0));
 }
 
 
 
-void inputx_postn_utf8_rate(const char *text, size_t text_len, mame_time rate)
+void inputx_postn_utf8_rate(const char *text, size_t text_len, attotime rate)
 {
 	size_t len = 0;
 	unicode_char buf[256];
@@ -1234,12 +1234,12 @@ void inputx_postn_utf8_rate(const char *text, size_t text_len, mame_time rate)
 
 void inputx_postn_utf8(const char *text, size_t text_len)
 {
-	inputx_postn_utf8_rate(text, text_len, make_mame_time(0, 0));
+	inputx_postn_utf8_rate(text, text_len, attotime_make(0, 0));
 }
 
 
 
-void inputx_post_utf8_rate(const char *text, mame_time rate)
+void inputx_post_utf8_rate(const char *text, attotime rate)
 {
 	inputx_postn_utf8_rate(text, strlen(text), rate);
 }
@@ -1248,7 +1248,7 @@ void inputx_post_utf8_rate(const char *text, mame_time rate)
 
 void inputx_post_utf8(const char *text)
 {
-	inputx_post_utf8_rate(text, make_mame_time(0, 0));
+	inputx_post_utf8_rate(text, attotime_make(0, 0));
 }
 
 
@@ -1260,7 +1260,7 @@ void inputx_post_coded(const char *text)
 
 
 
-void inputx_post_coded_rate(const char *text, mame_time rate)
+void inputx_post_coded_rate(const char *text, attotime rate)
 {
 	inputx_postn_coded_rate(text, strlen(text), rate);
 }
@@ -1269,7 +1269,7 @@ void inputx_post_coded_rate(const char *text, mame_time rate)
 
 void inputx_postn_coded(const char *text, size_t text_len)
 {
-	inputx_postn_coded_rate(text, text_len, make_mame_time(0, 0));
+	inputx_postn_coded_rate(text, text_len, attotime_make(0, 0));
 }
 
 

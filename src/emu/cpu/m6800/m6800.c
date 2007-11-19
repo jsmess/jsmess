@@ -143,8 +143,8 @@ typedef struct
 /* 680x registers */
 static m6800_Regs m6800;
 
-static mame_timer *m6800_rx_timer;
-static mame_timer *m6800_tx_timer;
+static emu_timer *m6800_rx_timer;
+static emu_timer *m6800_tx_timer;
 
 #define m6801   m6800
 #define m6802   m6800
@@ -887,8 +887,8 @@ static void m6800_reset(void)
 
 	m6800.trcsr = M6800_TRCSR_TDRE;
 	m6800.rmcr = 0;
-	if (m6800_rx_timer) mame_timer_enable(m6800_rx_timer, 0);
-	if (m6800_tx_timer) mame_timer_enable(m6800_tx_timer, 0);
+	if (m6800_rx_timer) timer_enable(m6800_rx_timer, 0);
+	if (m6800_tx_timer) timer_enable(m6800_tx_timer, 0);
 	m6800.txstate = M6800_TX_STATE_INIT;
 	m6800.txbits = m6800.rxbits = 0;
 	m6800.trcsr_read = 0;
@@ -1274,8 +1274,8 @@ static void m6801_init(int index, int clock, const void *config, int (*irqcallba
 	m6800.irq_callback = irqcallback;
 
 	m6800.clock = clock;
-	m6800_rx_timer = mame_timer_alloc(m6800_rx_tick);
-	m6800_tx_timer = mame_timer_alloc(m6800_tx_tick);
+	m6800_rx_timer = timer_alloc(m6800_rx_tick);
+	m6800_tx_timer = timer_alloc(m6800_tx_tick);
 
 	state_register("m6801", index);
 }
@@ -1307,8 +1307,8 @@ void m6803_init(int index, int clock, const void *config, int (*irqcallback)(int
 	m6800.irq_callback = irqcallback;
 
 	m6800.clock = clock;
-	m6800_rx_timer = mame_timer_alloc(m6800_rx_tick);
-	m6800_tx_timer = mame_timer_alloc(m6800_tx_tick);
+	m6800_rx_timer = timer_alloc(m6800_rx_tick);
+	m6800_tx_timer = timer_alloc(m6800_tx_tick);
 
 	state_register("m6803", index);
 }
@@ -1650,8 +1650,8 @@ static void hd63701_init(int index, int clock, const void *config, int (*irqcall
 	m6800.irq_callback = irqcallback;
 
 	m6800.clock = clock;
-	m6800_rx_timer = mame_timer_alloc(m6800_rx_tick);
-	m6800_tx_timer = mame_timer_alloc(m6800_tx_tick);
+	m6800_rx_timer = timer_alloc(m6800_rx_tick);
+	m6800_tx_timer = timer_alloc(m6800_tx_tick);
 
 	state_register("hd63701", index);
 }
@@ -2520,8 +2520,8 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 			case 0:
 			case 3: // not implemented
-				mame_timer_enable(m6800_rx_timer, 0);
-				mame_timer_enable(m6800_tx_timer, 0);
+				timer_enable(m6800_rx_timer, 0);
+				timer_enable(m6800_tx_timer, 0);
 				break;
 
 			case 1:
@@ -2529,8 +2529,8 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				{
 					int divisor = M6800_RMCR_SS[m6800.rmcr & M6800_RMCR_SS_MASK];
 
-					mame_timer_adjust(m6800_rx_timer, time_zero, cpu_getactivecpu(), MAME_TIME_IN_HZ(m6800.clock / divisor));
-					mame_timer_adjust(m6800_tx_timer, time_zero, cpu_getactivecpu(), MAME_TIME_IN_HZ(m6800.clock / divisor));
+					timer_adjust(m6800_rx_timer, attotime_zero, cpu_getactivecpu(), ATTOTIME_IN_HZ(m6800.clock / divisor));
+					timer_adjust(m6800_tx_timer, attotime_zero, cpu_getactivecpu(), ATTOTIME_IN_HZ(m6800.clock / divisor));
 				}
 				break;
 			}

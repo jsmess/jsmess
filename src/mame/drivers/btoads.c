@@ -55,7 +55,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	cpu_triggerint(1);
 
 	/* use a timer to make long transfers faster */
-	mame_timer_set(MAME_TIME_IN_USEC(50), 0, 0);
+	timer_set(ATTOTIME_IN_USEC(50), 0, 0);
 }
 
 

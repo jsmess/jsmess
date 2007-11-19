@@ -16,7 +16,7 @@
 
 
 UINT8 arkanoid_paddle_select;
-UINT8 arkanoid_paddle_value;
+static UINT8 arkanoid_paddle_value;
 
 static UINT8 z80write,fromz80,m68705write,toz80;
 
@@ -62,7 +62,7 @@ WRITE8_HANDLER( arkanoid_Z80_mcu_w )
 {
 	timer_call_after_resynch(data, test);
 	/* boost the interleave for a few usecs to make sure it is read successfully */
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(10));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 READ8_HANDLER( arkanoid_68705_portA_r )

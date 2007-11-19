@@ -1746,7 +1746,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 #define KANEKO16_INTERRUPTS_NUM	3
-INTERRUPT_GEN( kaneko16_interrupt )
+static INTERRUPT_GEN( kaneko16_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -2082,7 +2082,7 @@ MACHINE_DRIVER_END
     other: busy loop
 */
 #define SHOGWARR_INTERRUPTS_NUM	3
-INTERRUPT_GEN( shogwarr_interrupt )
+static INTERRUPT_GEN( shogwarr_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
@@ -2141,7 +2141,7 @@ MACHINE_DRIVER_END
  have the even and odd pixels swapped. So we use this function to untangle
  them and have one single gfxlayout for both tiles and sprites.
 */
-void kaneko16_unscramble_tiles(int region)
+static void kaneko16_unscramble_tiles(int region)
 {
 	UINT8 *RAM	=	memory_region(region);
 	int size			=	memory_region_length(region);
@@ -2155,7 +2155,7 @@ void kaneko16_unscramble_tiles(int region)
 	}
 }
 
-void kaneko16_expand_sample_banks(int region)
+static void kaneko16_expand_sample_banks(int region)
 {
 	/* The sample data for the first OKI has an address translator/
        banking register in it that munges the addresses as follows:

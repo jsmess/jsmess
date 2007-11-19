@@ -32,7 +32,7 @@ static void acefruit_update_irq( int vpos )
 	}
 }
 
-static mame_timer *acefruit_refresh_timer;
+static emu_timer *acefruit_refresh_timer;
 
 static TIMER_CALLBACK( acefruit_refresh )
 {
@@ -43,18 +43,18 @@ static TIMER_CALLBACK( acefruit_refresh )
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	mame_timer_adjust( acefruit_refresh_timer, video_screen_get_time_until_pos( 0, vpos, 0 ), 0, time_never );
+	timer_adjust( acefruit_refresh_timer, video_screen_get_time_until_pos( 0, vpos, 0 ), 0, attotime_never );
 }
 
 static VIDEO_START( acefruit )
 {
-	acefruit_refresh_timer = mame_timer_alloc( acefruit_refresh );
+	acefruit_refresh_timer = timer_alloc( acefruit_refresh );
 }
 
-INTERRUPT_GEN( acefruit_vblank )
+static INTERRUPT_GEN( acefruit_vblank )
 {
 	cpunum_set_input_line( 0, 0, HOLD_LINE );
-	mame_timer_adjust( acefruit_refresh_timer, time_zero, 0, time_never );
+	timer_adjust( acefruit_refresh_timer, attotime_zero, 0, attotime_never );
 }
 
 static VIDEO_UPDATE( acefruit )

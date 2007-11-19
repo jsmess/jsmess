@@ -6781,6 +6781,7 @@ Other Sun games
 	DRIVER( hardhea2 )	/* (c) 1991 SunA */
 	DRIVER( brickzn )	/* (c) 1992 SunA */
 	DRIVER( brickzn3 )	/* (c) 1992 SunA */
+	DRIVER( bestbest )	/* (c) 1994 SunA */
 	DRIVER( sunaq )		/* (c) 1994 SunA */
 	DRIVER( bssoccer )	/* (c) 1996 SunA */
 	DRIVER( uballoon )	/* (c) 1996 SunA */
@@ -7409,6 +7410,7 @@ Other Sun games
 	/* JMP Impact Games */
 	DRIVER( cluedo )	/* (c) 1995 */
 	DRIVER( cluedo2c )	/* (c) 1995 */
+	DRIVER( cluedo2 )	/* (c) 1995 */
 	DRIVER( trivialp )	/* (c) 1996 */
 	DRIVER( scrabble )	/* (c) 1997 */
 	DRIVER( hngmnjpm )	/* (c) 1998 */

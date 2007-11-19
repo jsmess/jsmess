@@ -16,17 +16,17 @@ struct VDP {
 struct TIMERS {
 	UINT8		seconds_running;	/* Seconds timer running */
 	UINT32		seconds_counter;	/* Seconds timer counter */
-	mame_timer	*seconds_timer;
+	emu_timer	*seconds_timer;
 	UINT8		hz256_running;		/* 256Hz timer running */
 	UINT8		hz256_counter;		/* 256Hz timer counter */
-	mame_timer	*hz256_timer;
+	emu_timer	*hz256_timer;
 	UINT8		timers_enabled;		/* Timers 1 to 3 enabled */
 	UINT16		timer1_counter;
-	mame_timer	*timer1_timer;		/* Timer 1 */
+	emu_timer	*timer1_timer;		/* Timer 1 */
 	UINT16		timer2_counter;
-	mame_timer	*timer2_timer;		/* Timer 2 */
+	emu_timer	*timer2_timer;		/* Timer 2 */
 	UINT16		timer3_counter;
-	mame_timer	*timer3_timer;		/* Timer 3 */
+	emu_timer	*timer3_timer;		/* Timer 3 */
 };
 
 UINT8 pokemini_hwreg[0x100];
@@ -93,11 +93,11 @@ MACHINE_RESET( pokemini ) {
 	memset( &vdp, 0, sizeof(vdp) );
 	memset( &timers, 0, sizeof(timers) );
 	memset( pokemini_hwreg, 0, sizeof(pokemini_hwreg) );
-	timers.seconds_timer = mame_timer_alloc( pokemini_seconds_timer_callback );
-	timers.hz256_timer = mame_timer_alloc( pokemini_256hz_timer_callback );
-	timers.timer1_timer = mame_timer_alloc( pokemini_timer1_callback );
-	timers.timer2_timer = mame_timer_alloc( pokemini_timer2_callback );
-	timers.timer3_timer = mame_timer_alloc( pokemini_timer3_callback );
+	timers.seconds_timer = timer_alloc( pokemini_seconds_timer_callback );
+	timers.hz256_timer = timer_alloc( pokemini_256hz_timer_callback );
+	timers.timer1_timer = timer_alloc( pokemini_timer1_callback );
+	timers.timer2_timer = timer_alloc( pokemini_timer2_callback );
+	timers.timer3_timer = timer_alloc( pokemini_timer3_callback );
 }
 
 WRITE8_HANDLER( pokemini_hwreg_w ) {
@@ -123,12 +123,12 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			*/
 		if ( data & 0x01 ) {	/* enable timer */
 			if ( ! timers.seconds_running ) {
-				mame_timer_adjust( timers.seconds_timer, MAME_TIME_IN_SEC(1), 0, time_zero );
+				timer_adjust( timers.seconds_timer, ATTOTIME_IN_SEC(1), 0, attotime_zero );
 				timers.seconds_running = 1;
 			}
 		} else {		/* pause timer */
 			if ( timers.seconds_running ) {
-				mame_timer_reset( timers.seconds_timer, time_never );
+				timer_reset( timers.seconds_timer, attotime_never );
 				timers.seconds_running = 0;
 			}
 		}
@@ -169,12 +169,12 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 4-7 R/W Unused
 			*/
 		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x18] & 0x07 ) ) {
-			mame_timer_adjust( timers.timer1_timer, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+			timer_adjust( timers.timer1_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
 		}
 		if ( ( data & 0x08 ) && timers.timers_enabled ) {
-			mame_timer_enable( timers.timer1_timer, 1 );
+			timer_enable( timers.timer1_timer, 1 );
 		} else {
-			mame_timer_enable( timers.timer1_timer, 0 );
+			timer_enable( timers.timer1_timer, 0 );
 		}
 		break;
 	case 0x19:	/* Timers 1 to 3 enabler
@@ -187,18 +187,18 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 		timers.timers_enabled = ( data & 0x20 ) ? 1 : 0;
 		if ( timers.timers_enabled ) {
 			if ( pokemini_hwreg[0x18] & 0x08 ) {
-				mame_timer_enable( timers.timer1_timer, 1 );
+				timer_enable( timers.timer1_timer, 1 );
 			}
 			if ( pokemini_hwreg[0x1A] & 0x08 ) {
-				mame_timer_enable( timers.timer2_timer, 1 );
+				timer_enable( timers.timer2_timer, 1 );
 			}
 			if ( pokemini_hwreg[0x1C] & 0x08 ) {
-				mame_timer_enable( timers.timer3_timer, 1 );
+				timer_enable( timers.timer3_timer, 1 );
 			}
 		} else {
-			mame_timer_enable( timers.timer1_timer, 0 );
-			mame_timer_enable( timers.timer2_timer, 0 );
-			mame_timer_enable( timers.timer3_timer, 0 );
+			timer_enable( timers.timer1_timer, 0 );
+			timer_enable( timers.timer2_timer, 0 );
+			timer_enable( timers.timer3_timer, 0 );
 		}
 		break;
 	case 0x1A:	/* Timer 2 pre-scale + enable
@@ -214,12 +214,12 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 4-7     Unused
 			*/
 		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x1A] & 0x07 ) ) {
-			mame_timer_adjust( timers.timer2_timer, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+			timer_adjust( timers.timer2_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
 		}
 		if ( ( data & 0x08 ) && timers.timers_enabled ) {
-			mame_timer_enable( timers.timer2_timer, 1 );
+			timer_enable( timers.timer2_timer, 1 );
 		} else {
-			mame_timer_enable( timers.timer2_timer, 0 );
+			timer_enable( timers.timer2_timer, 0 );
 		}
 		break;
 	case 0x1C:	/* Timer 3 pre-scale + enable
@@ -235,12 +235,12 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 4-7     Unused
 			*/
 		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x1C] & 0x07 ) ) {
-			mame_timer_adjust( timers.timer3_timer, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+			timer_adjust( timers.timer3_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
 		}
 		if ( ( data & 0x08 ) && timers.timers_enabled ) {
-			mame_timer_enable( timers.timer3_timer, 1 );
+			timer_enable( timers.timer3_timer, 1 );
 		} else {
-			mame_timer_enable( timers.timer3_timer, 0 );
+			timer_enable( timers.timer3_timer, 0 );
 		}
 		break;
 	case 0x20:	/* Event #1-#8 primary enable
@@ -412,12 +412,12 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			*/
 		if ( data & 0x01 ) {	/* enable timer */
 			if ( ! timers.hz256_running ) {
-				mame_timer_adjust( timers.hz256_timer, MAME_TIME_IN_HZ(256), 0, time_zero );
+				timer_adjust( timers.hz256_timer, ATTOTIME_IN_HZ(256), 0, attotime_zero );
 				timers.hz256_running = 1;
 			}
 		} else {		/* pause timer */
 			if ( timers.hz256_running ) {
-				mame_timer_reset( timers.hz256_timer, time_never );
+				timer_reset( timers.hz256_timer, attotime_never );
 				timers.hz256_running = 0;
 			}
 		}

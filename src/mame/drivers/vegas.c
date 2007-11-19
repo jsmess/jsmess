@@ -306,7 +306,7 @@
  *************************************/
 
 #define SYSTEM_CLOCK		100000000
-#define TIMER_PERIOD		MAME_TIME_IN_HZ(SYSTEM_CLOCK)
+#define TIMER_PERIOD		ATTOTIME_IN_HZ(SYSTEM_CLOCK)
 
 #define MAX_DYNAMIC_ADDRESSES	32
 
@@ -458,7 +458,7 @@ static UINT32 pci_bridge_regs[0x40];
 static UINT32 pci_ide_regs[0x40];
 static UINT32 pci_3dfx_regs[0x40];
 
-static mame_timer *timer[4];
+static emu_timer *timer[4];
 
 static UINT8 vblank_state;
 
@@ -576,10 +576,10 @@ static MACHINE_RESET( vegas )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* allocate timers for the NILE */
-	timer[0] = mame_timer_alloc(NULL);
-	timer[1] = mame_timer_alloc(NULL);
-	timer[2] = mame_timer_alloc(timer_callback);
-	timer[3] = mame_timer_alloc(timer_callback);
+	timer[0] = timer_alloc(NULL);
+	timer[1] = timer_alloc(NULL);
+	timer[2] = timer_alloc(timer_callback);
+	timer[3] = timer_alloc(timer_callback);
 
 	/* reset dynamic addressing */
 	memset(nile_regs, 0, 0x1000);
@@ -964,7 +964,7 @@ static TIMER_CALLBACK( timer_callback )
 		if (regs[1] & 2)
 			logerror("Unexpected value: timer %d is prescaled\n", which);
 		if (scale != 0)
-			mame_timer_adjust(timer[which], scale_up_mame_time(TIMER_PERIOD, scale), which, time_never);
+			timer_adjust(timer[which], attotime_mul(TIMER_PERIOD, scale), which, attotime_never);
 	}
 
 	/* trigger the interrupt */
@@ -1047,7 +1047,7 @@ static READ32_HANDLER( nile_r )
 			{
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				result = nile_regs[offset + 1] = mame_time_to_double(mame_timer_timeleft(timer[which])) * (double)SYSTEM_CLOCK;
+				result = nile_regs[offset + 1] = attotime_to_double(timer_timeleft(timer[which])) * (double)SYSTEM_CLOCK;
 			}
 
 			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", activecpu_get_pc(), which, offset*4, result);
@@ -1177,8 +1177,8 @@ static WRITE32_HANDLER( nile_w )
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (scale != 0)
-					mame_timer_adjust(timer[which], scale_up_mame_time(TIMER_PERIOD, scale), which, time_never);
-				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)SUBSECONDS_TO_HZ(scale_up_mame_time(TIMER_PERIOD, nile_regs[offset + 1] + 1).subseconds));
+					timer_adjust(timer[which], attotime_mul(TIMER_PERIOD, scale), which, attotime_never);
+				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ(attotime_mul(TIMER_PERIOD, nile_regs[offset + 1] + 1).attoseconds));
 			}
 
 			/* timer disabled? */
@@ -1186,8 +1186,8 @@ static WRITE32_HANDLER( nile_w )
 			{
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				nile_regs[offset + 1] = mame_time_to_double(mame_timer_timeleft(timer[which])) * SYSTEM_CLOCK;
-				mame_timer_adjust(timer[which], time_never, which, time_never);
+				nile_regs[offset + 1] = attotime_to_double(timer_timeleft(timer[which])) * SYSTEM_CLOCK;
+				timer_adjust(timer[which], attotime_never, which, attotime_never);
 			}
 			break;
 
@@ -1203,7 +1203,7 @@ static WRITE32_HANDLER( nile_w )
 			{
 				if (nile_regs[offset - 1] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				mame_timer_adjust(timer[which], scale_up_mame_time(TIMER_PERIOD, nile_regs[offset]), which, time_never);
+				timer_adjust(timer[which], attotime_mul(TIMER_PERIOD, nile_regs[offset]), which, attotime_never);
 			}
 			break;
 
@@ -2210,7 +2210,7 @@ static struct mips3_config config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-MACHINE_DRIVER_START( vegascore )
+static MACHINE_DRIVER_START( vegascore )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", R5000LE, SYSTEM_CLOCK*2)
@@ -2233,20 +2233,20 @@ MACHINE_DRIVER_START( vegascore )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( vegas )
+static MACHINE_DRIVER_START( vegas )
 	MDRV_IMPORT_FROM(vegascore)
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( vegas250 )
+static MACHINE_DRIVER_START( vegas250 )
 	MDRV_IMPORT_FROM(vegascore)
 	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*2.5)
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( vegas32m )
+static MACHINE_DRIVER_START( vegas32m )
 	MDRV_IMPORT_FROM(vegascore)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)
@@ -2254,7 +2254,7 @@ MACHINE_DRIVER_START( vegas32m )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( vegasban )
+static MACHINE_DRIVER_START( vegasban )
 	MDRV_IMPORT_FROM(vegascore)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)
@@ -2263,14 +2263,14 @@ MACHINE_DRIVER_START( vegasban )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( vegasv3 )
+static MACHINE_DRIVER_START( vegasv3 )
 	MDRV_IMPORT_FROM(vegas32m)
 	MDRV_CPU_REPLACE("main", RM7000LE, SYSTEM_CLOCK*2.5)
 	MDRV_VIDEO_START(vegas_voodoo3)
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( denver )
+static MACHINE_DRIVER_START( denver )
 	MDRV_IMPORT_FROM(vegascore)
 	MDRV_CPU_REPLACE("main", RM7000LE, SYSTEM_CLOCK*2.5)
 	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)

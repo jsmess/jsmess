@@ -293,7 +293,7 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 #define TEMPEST_BUTTONS_P2_TAG	("BUTTONSP2")
 
 
-UINT8 tempest_player_select;
+static UINT8 tempest_player_select;
 
 /*************************************
  *
@@ -584,7 +584,7 @@ static MACHINE_DRIVER_START( tempest )
 	MDRV_CPU_ADD(M6502, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
-	MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_HZ(CLOCK_3KHZ / 256))
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_HZ(CLOCK_3KHZ / 256))
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_NVRAM_HANDLER(atari_vg)

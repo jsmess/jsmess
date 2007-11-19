@@ -36,6 +36,7 @@ OBJDIRS += \
 #-------------------------------------------------
 
 EMUOBJS = \
+	$(EMUOBJ)/attotime.o \
 	$(EMUOBJ)/audit.o \
 	$(EMUOBJ)/cheat.o \
 	$(EMUOBJ)/clifront.o \

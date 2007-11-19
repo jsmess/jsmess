@@ -63,7 +63,7 @@ static int break_on_interrupt;
 static int break_on_interrupt_cpunum;
 static int break_on_interrupt_irqline;
 static int break_on_time;
-static mame_time break_on_time_target;
+static attotime break_on_time_target;
 static int memory_modified;
 static int memory_hook_cpunum;
 
@@ -430,9 +430,9 @@ void debug_cpu_go_milliseconds(UINT64 milliseconds)
 	execution_state = EXECUTION_STATE_RUNNING;
 	debug_cpuinfo[cpu_getactivecpu()].temp_breakpoint_pc = ~0;
 	break_on_time = 1;
-	break_on_time_target = add_mame_times(
-		mame_timer_get_time(),
-		make_mame_time(milliseconds / 1000, (milliseconds % 1000) * (MAX_SUBSECONDS / 1000)));
+	break_on_time_target = attotime_add(
+		timer_get_time(),
+		attotime_make(milliseconds / 1000, (milliseconds % 1000) * (ATTOSECONDS_PER_SECOND / 1000)));
 }
 
 
@@ -746,9 +746,9 @@ void mame_debug_hook(void)
 		}
 
 		/* see if we hit a target time */
-		if (break_on_time && compare_mame_times(mame_timer_get_time(), break_on_time_target) > 0)
+		if (break_on_time && attotime_compare(timer_get_time(), break_on_time_target) > 0)
 		{
-			debug_console_printf("Stopped at time interval %.1g\n", mame_time_to_double(mame_timer_get_time()));
+			debug_console_printf("Stopped at time interval %.1g\n", attotime_to_double(timer_get_time()));
 			break_on_time = 0;
 			execution_state = EXECUTION_STATE_STOPPED;
 		}

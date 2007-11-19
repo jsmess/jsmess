@@ -117,7 +117,7 @@ int to7_get_cassette ( void )
 			if ( bitpos >= to7_k7_bitsize ) 
 				bitpos = to7_k7_bitsize -1;
 			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n", 
-				activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), state, pos, bitpos, 
+				activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, bitpos, 
 				to7_k7_bits[ bitpos ] ));
 			return to7_k7_bits[ bitpos ];
 		}
@@ -138,7 +138,7 @@ int to7_get_cassette ( void )
 			}
 			k = ( chg >= 13 ) ? 1 : 0;
 			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n", 
-				activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), state, pos, bitpos, 
+				activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, bitpos, 
 				k, chg ));
 			return k;
 		}
@@ -166,7 +166,7 @@ WRITE8_HANDLER ( to7_set_cassette_motor )
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-	       activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data ? "off" : "on",
+	       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ? "off" : "on",
 	       (int) (pos / TO7_BIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 ) 
@@ -216,7 +216,7 @@ int mo5_get_cassette ( void )
 		hbit = hbit >= 0;
     
 		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n", 
-			activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), state, pos, 
+			activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, 
 			(int) (pos / MO5_HBIT_LENGTH), hbit ));
 		return hbit;
 	}
@@ -241,7 +241,7 @@ WRITE8_HANDLER ( mo5_set_cassette_motor )
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-	       activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data ? "off" : "on",
+	       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ? "off" : "on",
 	       (int) (pos / MO5_HBIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 ) 

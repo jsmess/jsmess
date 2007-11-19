@@ -16,9 +16,9 @@
 
 
 /* timers */
-static mame_timer *scanline_timer;
-static mame_timer *scan240_timer;
-static mame_timer *scan254_timer;
+static emu_timer *scanline_timer;
+static emu_timer *scan240_timer;
+static emu_timer *scan254_timer;
 
 /* banking addresses set by the drivers */
 UINT8 *mayday_protection;
@@ -257,7 +257,7 @@ static TIMER_CALLBACK( williams_va11_callback )
 	/* set a timer for the next update */
 	scanline++;
 	if (scanline >= 256) scanline = 0;
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
@@ -274,10 +274,10 @@ static TIMER_CALLBACK( williams_count240_callback )
 	pia_1_ca1_w(0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, williams_count240_off_callback);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, williams_count240_off_callback);
 
 	/* set a timer for next frame */
-	mame_timer_adjust(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0, time_zero);
+	timer_adjust(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0, attotime_zero);
 }
 
 
@@ -318,12 +318,12 @@ static void williams_common_init(void)
 	ticket_dispenser_init(70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = mame_timer_alloc(williams_va11_callback);
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+	scanline_timer = timer_alloc(williams_va11_callback);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 
 	/* also set a timer to go off on scanline 240 */
-	scan240_timer = mame_timer_alloc(williams_count240_callback);
-	mame_timer_adjust(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0, time_zero);
+	scan240_timer = timer_alloc(williams_count240_callback);
+	timer_adjust(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0, attotime_zero);
 
 	state_save_register_global(vram_bank);
 }
@@ -360,7 +360,7 @@ static TIMER_CALLBACK( williams2_va11_callback )
 	/* set a timer for the next update */
 	scanline++;
 	if (scanline >= 256) scanline = 0;
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
@@ -377,10 +377,10 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
 	pia_0_ca1_w(0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	mame_timer_set(video_screen_get_time_until_pos(0, 8, 0), 0, williams2_endscreen_off_callback);
+	timer_set(video_screen_get_time_until_pos(0, 8, 0), 0, williams2_endscreen_off_callback);
 
 	/* set a timer for next frame */
-	mame_timer_adjust(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0, time_zero);
+	timer_adjust(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0, attotime_zero);
 }
 
 
@@ -410,12 +410,12 @@ MACHINE_RESET( williams2 )
 	williams2_bank_select_w(0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = mame_timer_alloc(williams2_va11_callback);
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+	scanline_timer = timer_alloc(williams2_va11_callback);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 
 	/* also set a timer to go off on scanline 254 */
-	scan254_timer = mame_timer_alloc(williams2_endscreen_callback);
-	mame_timer_adjust(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0, time_zero);
+	scan254_timer = timer_alloc(williams2_endscreen_callback);
+	timer_adjust(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0, attotime_zero);
 
 	state_save_register_global(vram_bank);
 	state_save_register_func_postload(williams2_postload);

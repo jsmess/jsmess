@@ -160,7 +160,7 @@ static TIMER_CALLBACK(pc1350_power_up)
 
 MACHINE_START( pc1350 )
 {
-	mame_timer_set(MAME_TIME_IN_SEC(1), 0, pc1350_power_up);
+	timer_set(ATTOTIME_IN_SEC(1), 0, pc1350_power_up);
 
 	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_BANK1);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MWA8_BANK1);

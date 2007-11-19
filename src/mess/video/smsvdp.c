@@ -106,7 +106,7 @@ static struct _smsvdp {
 	int			*line_buffer;
 	int			current_palette[32];
 	void (*int_callback)(int);
-	mame_timer	*smsvdp_display_timer;
+	emu_timer	*smsvdp_display_timer;
 } smsvdp;
 
 static TIMER_CALLBACK(smsvdp_display_callback);
@@ -210,8 +210,8 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 
 	set_display_settings();
 
-	smsvdp.smsvdp_display_timer = mame_timer_alloc( smsvdp_display_callback );
-	mame_timer_adjust( smsvdp.smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ) );
+	smsvdp.smsvdp_display_timer = timer_alloc( smsvdp_display_callback );
+	timer_adjust( smsvdp.smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ) );
 	return 0;
 }
 
@@ -255,7 +255,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 				smsvdp.status |= STATUS_HINT;
 				if ( smsvdp.reg[0x00] & 0x10 ) {
 					/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-					mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
+					timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 				}
 			}
 
@@ -264,7 +264,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			smsvdp.status |= STATUS_VINT;
 			if ( smsvdp.reg[0x01] & 0x20 ) {
 				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-				mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
+				timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 			}
 		}
 		if ( video_skip_this_frame() ) {
@@ -299,7 +299,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			smsvdp.status |= STATUS_HINT;
 			if ( smsvdp.reg[0x00] & 0x10 ) {
 				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-				mame_timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
+				timer_set( video_screen_get_time_until_pos( 0, video_screen_get_vpos(0), video_screen_get_hpos(0) + 1 ), 0, smsvdp_set_irq );
 			}
 		} else {
 			smsvdp.line_counter -= 1;

@@ -111,7 +111,7 @@ static void update_main_irqs(void)
 	if (irq != 0)
 	{
 		cpunum_set_input_line(0, irq, ASSERT_LINE);
-		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 	else
 		cpunum_set_input_line(0, 7, CLEAR_LINE);
@@ -150,7 +150,7 @@ static TIMER_CALLBACK( scanline_callback )
 		update_main_irqs();
 
 	/* come back in 2 scanlines */
-	mame_timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), next_scanline, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), next_scanline, scanline_callback);
 }
 
 
@@ -205,7 +205,7 @@ static READ8_HANDLER( sound_data_r )
 static void xboard_reset(void)
 {
 	cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -222,7 +222,7 @@ static MACHINE_RESET( xboard )
 	segaic16_compare_timer_init(1, NULL, NULL);
 
 	/* start timers to track interrupts */
-	mame_timer_set(video_screen_get_time_until_pos(0, 1, 0), 1, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(0, 1, 0), 1, scanline_callback);
 }
 
 
@@ -461,7 +461,7 @@ static UINT16 *loffire_sync;
 static WRITE16_HANDLER( loffire_sync0_w )
 {
 	COMBINE_DATA(&loffire_sync[offset]);
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(10));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 
@@ -731,6 +731,9 @@ static INPUT_PORTS_START( aburner )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// According to the manual, SWB:4 sets 3 or 4 lives, but it doesn't actually do that.
+	// However, it does on Afterburner II.  Maybe there's another version of Afterburner
+	// that behaves as the manual suggests.
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "3x Credits" )
@@ -772,12 +775,11 @@ static INPUT_PORTS_START( aburner2 )
 	PORT_DIPNAME( 0x04, 0x04, "Throttle Lever" ) PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:4")
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x10, 0x00, "Ship Increase" ) PORT_DIPLOCATION("SWB:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:4,5")
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x08, "3x Credits" )
+	PORT_DIPSETTING(    0x00, "4x Credits" )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -1170,7 +1172,7 @@ static MACHINE_DRIVER_START( xboard )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( smgp )
+static MACHINE_DRIVER_START( smgp )
 	MDRV_IMPORT_FROM(xboard)
 
 	MDRV_CPU_ADD_TAG("comm", Z80, 4000000)

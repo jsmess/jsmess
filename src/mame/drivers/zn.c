@@ -1138,7 +1138,7 @@ static WRITE32_HANDLER( bank_coh1000t_w )
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) + ( ( data & 3 ) * 0x800000 ) );
 }
 
-INTERRUPT_GEN( coh1000t_vblank )
+static INTERRUPT_GEN( coh1000t_vblank )
 {
 	/* kludge: stop dropping into test mode on bootup */
 	if( strcmp( Machine->gamedrv->name, "raystorm" ) == 0 )
@@ -2643,7 +2643,7 @@ static MACHINE_RESET( coh1002v )
 	zn_machine_init();
 }
 
-INTERRUPT_GEN( coh1002v_vblank )
+static INTERRUPT_GEN( coh1002v_vblank )
 {
 	/* kludge: to stop dropping into test mode on bootup */
 	if(strcmp( Machine->gamedrv->name, "sncwgltd" ) == 0 )
@@ -2910,12 +2910,12 @@ static READ8_HANDLER( cbaj_z80_ready_r )
 	return ret;
 }
 
-ADDRESS_MAP_START( cbaj_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cbaj_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( cbaj_z80_port_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( cbaj_z80_port_map, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE( 0x84, 0x84 ) AM_READWRITE( YMZ280B_status_0_r, YMZ280B_register_0_w )
 	AM_RANGE( 0x85, 0x85 ) AM_READWRITE( YMZ280B_status_0_r, YMZ280B_data_0_w )

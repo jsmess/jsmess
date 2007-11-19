@@ -1516,8 +1516,9 @@ $(CPUOBJ)/tms32025/tms32025.o:	$(CPUSRC)/tms32025/tms32025.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_TMS32031=$(if $(filter TMS32031,$(CPUS)),1,0)
+CPUDEFS += -DHAS_TMS32032=$(if $(filter TMS32032,$(CPUS)),1,0)
 
-ifneq ($(filter TMS32031,$(CPUS)),)
+ifneq ($(filter TMS32031 TMS32032,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms32031
 CPUOBJS += $(CPUOBJ)/tms32031/tms32031.o
 DBGOBJS += $(CPUOBJ)/tms32031/dis32031.o

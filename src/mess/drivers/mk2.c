@@ -94,7 +94,7 @@ static TIMER_CALLBACK( update_leds )
 
 static MACHINE_START( mk2 )
 {
-	mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, update_leds);
+	timer_pulse(ATTOTIME_IN_HZ(60), 0, update_leds);
 }
 
 static MACHINE_RESET( mk2 )

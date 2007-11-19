@@ -236,13 +236,13 @@ static TIMER_CALLBACK( irq_trigger_callback ) { cpunum_set_input_line(param, 0, 
 INTERRUPT_GEN( snk_irq_AB )
 {
 	cpunum_set_input_line(0, 0, HOLD_LINE);
-	mame_timer_set(MAME_TIME_IN_USEC(snk_irq_delay), 1, irq_trigger_callback);
+	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), 1, irq_trigger_callback);
 }
 
 INTERRUPT_GEN( snk_irq_BA )
 {
 	cpunum_set_input_line(1, 0, HOLD_LINE);
-	mame_timer_set(MAME_TIME_IN_USEC(snk_irq_delay), 0, irq_trigger_callback);
+	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), 0, irq_trigger_callback);
 }
 
 // NMI handshakes between CPUs are determined to be much simpler
@@ -356,11 +356,11 @@ static READ8_HANDLER( snk_sound_register_r ){
 	return snk_sound_register;// | 0x2; /* hack; lets chopper1 play music */
 }
 
-void snk_sound_callback0_w( int state ){ /* ? */
+static void snk_sound_callback0_w( int state ){ /* ? */
 	if( state ) snk_sound_register |= 0x01;
 }
 
-void snk_sound_callback1_w( int state ){ /* ? */
+static void snk_sound_callback1_w( int state ){ /* ? */
 	if( state ) snk_sound_register |= 0x02;
 }
 
@@ -1185,7 +1185,7 @@ static MACHINE_DRIVER_START( tdfever )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1000))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
 	MDRV_INTERLEAVE(300)
 
 	/* video hardware */
@@ -1230,7 +1230,7 @@ static MACHINE_DRIVER_START( tdfever2 )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1000))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
 	MDRV_INTERLEAVE(300)
 
 	/* video hardware */

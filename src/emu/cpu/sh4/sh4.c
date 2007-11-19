@@ -73,12 +73,12 @@ typedef struct
 	int 	internal_irq_level;
 	int 	internal_irq_vector;
 
-	mame_timer *dma_timer[4];
-	mame_timer *refresh_timer;
-	mame_timer *rtc_timer;
-	mame_timer *timer0;
-	mame_timer *timer1;
-	mame_timer *timer2;
+	emu_timer *dma_timer[4];
+	emu_timer *refresh_timer;
+	emu_timer *rtc_timer;
+	emu_timer *timer0;
+	emu_timer *timer1;
+	emu_timer *timer2;
 	UINT32	refresh_timer_base;
 	int     dma_timer_active[2];
 
@@ -3050,7 +3050,7 @@ INLINE void op1111(UINT16 opcode)
 static void sh4_reset(void)
 {
 	void *tsaved[4];
-	mame_timer *tsave[5];
+	emu_timer *tsave[5];
 	UINT32 *m;
 	int cpunum;
 	int save_is_slave;
@@ -3100,7 +3100,7 @@ static void sh4_reset(void)
 	sh4_default_exception_priorities();
 	memset(sh4.exception_requesting, 0, sizeof(sh4.exception_requesting));
 
-	mame_timer_adjust(sh4.rtc_timer, MAME_TIME_IN_HZ(128), cpunum, time_zero);
+	timer_adjust(sh4.rtc_timer, ATTOTIME_IN_HZ(128), cpunum, attotime_zero);
 	sh4.m[RCR2] = 0x09;
 	sh4.m[TCOR0] = 0xffffffff;
 	sh4.m[TCNT0] = 0xffffffff;
@@ -3192,12 +3192,12 @@ static void sh4_set_context(void *src)
 		memcpy(&sh4, src, sizeof(SH4));
 }
 
-static UINT32 compute_ticks_refresh_timer(mame_timer *timer, int hertz, int base, int divisor)
+static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)
 {
 	// elapsed:total = x : ticks
 	// x=elapsed*tics/total -> x=elapsed*(double)100000000/rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]
 	// ticks/total=ticks / ((rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] * ticks) / 100000000)=1/((rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / 100000000)=100000000/rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]
-	return base + (UINT32)((mame_time_to_double(mame_timer_timeelapsed(timer)) * (double)hertz) / (double)divisor);
+	return base + (UINT32)((attotime_to_double(timer_timeelapsed(timer)) * (double)hertz) / (double)divisor);
 }
 
 static void sh4_refresh_timer_recompute(void)
@@ -3210,62 +3210,27 @@ UINT32 ticks;
 	if (ticks < 0)
 		ticks = 256 + ticks;
 	//((double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / (double)100000000)*ticks
-	mame_timer_adjust(sh4.refresh_timer, scale_up_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(sh4.bus_clock), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), ticks), sh4.cpu_number, time_zero);
+	timer_adjust(sh4.refresh_timer, attotime_mul(attotime_mul(ATTOTIME_IN_HZ(sh4.bus_clock), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), ticks), sh4.cpu_number, attotime_zero);
 	sh4.refresh_timer_base = sh4.m[RTCNT];
 }
 
 /*-------------------------------------------------
-    sh4_scale_up_mame_time - multiply a mame_time by
+    sh4_scale_up_mame_time - multiply a attotime by
     a (constant+1) where 0 <= constant < 2^32
 -------------------------------------------------*/
 
-INLINE mame_time sh4_scale_up_mame_time(mame_time _time1, UINT32 factor1)
+INLINE attotime sh4_scale_up_mame_time(attotime _time1, UINT32 factor1)
 {
-	UINT32 subseclo, subsechi;
-	UINT64 templo, temphi;
-	UINT64 factor;
-	mame_time result;
-
-	/* if one of the items is time_never, return time_never */
-	if (_time1.seconds >= MAX_SECONDS)
-		return time_never;
-
-	/* 0 times anything is zero */
 	if (factor1 == 0)
-		return time_zero;
-
-	factor=factor1;
-	factor++;
-
-	/* break subseconds into lower and upper halves */
-	subseclo = (UINT32)(_time1.subseconds % MAX_SUBSECONDS_SQRT);
-	subsechi = (UINT32)(_time1.subseconds / MAX_SUBSECONDS_SQRT);
-
-	/* get a 64-bit product for each one */
-	templo = (UINT64)subseclo * (UINT64)factor;
-	temphi = (UINT64)subsechi * (UINT64)factor;
-
-	/* separate out the low and carry into the high */
-	subseclo = templo % MAX_SUBSECONDS_SQRT;
-	temphi += templo / MAX_SUBSECONDS_SQRT;
-	subsechi = temphi % MAX_SUBSECONDS_SQRT;
-
-	/* assemble the two parts into final subseconds and carry into seconds */
-	result.subseconds = (subseconds_t)subseclo + MAX_SUBSECONDS_SQRT * (subseconds_t)subsechi;
-	result.seconds = _time1.seconds * factor + temphi / MAX_SUBSECONDS_SQRT;
-
-	/* max out at never time */
-	if (result.seconds >= MAX_SECONDS)
-		return time_never;
-
-	return result;
+		return attotime_zero;
+	return attotime_mul(_time1, factor1 + 1);
 }
 
-static UINT32 compute_ticks_timer(mame_timer *timer, int hertz, int divisor)
+static UINT32 compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
 {
 	double ret;
 
-	ret=((mame_time_to_double(mame_timer_timeleft(timer)) * (double)hertz) / (double)divisor) - 1;
+	ret=((attotime_to_double(timer_timeleft(timer)) * (double)hertz) / (double)divisor) - 1;
 	return (UINT32)ret;
 }
 
@@ -3274,7 +3239,7 @@ static void sh4_timer0_recompute(void)
 	double ticks;
 
 	ticks = sh4.m[TCNT0];
-	mame_timer_adjust(sh4.timer0, sh4_scale_up_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR0] & 7]), ticks), sh4.cpu_number, time_zero);
+	timer_adjust(sh4.timer0, sh4_scale_up_mame_time(attotime_mul(ATTOTIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR0] & 7]), ticks), sh4.cpu_number, attotime_zero);
 }
 
 static void sh4_timer1_recompute(void)
@@ -3282,7 +3247,7 @@ static void sh4_timer1_recompute(void)
 	double ticks;
 
 	ticks = sh4.m[TCNT1];
-	mame_timer_adjust(sh4.timer1, sh4_scale_up_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR1] & 7]), ticks), sh4.cpu_number, time_zero);
+	timer_adjust(sh4.timer1, sh4_scale_up_mame_time(attotime_mul(ATTOTIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR1] & 7]), ticks), sh4.cpu_number, attotime_zero);
 }
 
 static void sh4_timer2_recompute(void)
@@ -3290,7 +3255,7 @@ static void sh4_timer2_recompute(void)
 	double ticks;
 
 	ticks = sh4.m[TCNT2];
-	mame_timer_adjust(sh4.timer2, sh4_scale_up_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR2] & 7]), ticks), sh4.cpu_number, time_zero);
+	timer_adjust(sh4.timer2, sh4_scale_up_mame_time(attotime_mul(ATTOTIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR2] & 7]), ticks), sh4.cpu_number, attotime_zero);
 }
 
 static TIMER_CALLBACK( sh4_refresh_timer_callback )
@@ -3409,7 +3374,7 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 	int cpunum = param;
 
 	cpuintrf_push_context(cpunum);
-	mame_timer_adjust(sh4.rtc_timer, MAME_TIME_IN_HZ(128), cpunum, time_zero);
+	timer_adjust(sh4.rtc_timer, ATTOTIME_IN_HZ(128), cpunum, attotime_zero);
 	sh4.m[R64CNT] = (sh4.m[R64CNT]+1) & 0x7f;
 	if (sh4.m[R64CNT] == 64)
 	{
@@ -3521,12 +3486,12 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 	if (timermode == 1)
 	{
 		sh4.dma_timer_active[channel] = 1;
-		mame_timer_adjust(sh4.dma_timer[channel], MAME_TIME_IN_CYCLES(2*count+1, sh4.cpu_number), (sh4.cpu_number << 8) | channel, time_zero);
+		timer_adjust(sh4.dma_timer[channel], ATTOTIME_IN_CYCLES(2*count+1, sh4.cpu_number), (sh4.cpu_number << 8) | channel, attotime_zero);
 	}
 	else if (timermode == 2)
 	{
 		sh4.dma_timer_active[channel] = 1;
-		mame_timer_adjust(sh4.dma_timer[channel], time_zero, (sh4.cpu_number << 8) | channel, time_zero);
+		timer_adjust(sh4.dma_timer[channel], attotime_zero, (sh4.cpu_number << 8) | channel, attotime_zero);
 	}
 
 	src &= AM;
@@ -3669,7 +3634,7 @@ UINT32 dmatcr,chcr,sar,dar;
 		if (sh4.dma_timer_active[channel])
 		{
 			logerror("SH4: DMA %d cancelled in-flight but all data transferred", channel);
-			mame_timer_adjust(sh4.dma_timer[channel], time_never, 0, time_zero);
+			timer_adjust(sh4.dma_timer[channel], attotime_never, 0, attotime_zero);
 			sh4.dma_timer_active[channel] = 0;
 		}
 	}
@@ -3685,7 +3650,7 @@ int s;
 		if (sh4.dma_timer_active[s])
 		{
 			logerror("SH4: DMA %d cancelled due to NMI but all data transferred", s);
-			mame_timer_adjust(sh4.dma_timer[s], time_never, 0, time_zero);
+			timer_adjust(sh4.dma_timer[s], attotime_never, 0, attotime_zero);
 			sh4.dma_timer_active[s] = 0;
 		}
 	}
@@ -3711,7 +3676,7 @@ WRITE32_HANDLER( sh4_internal_w )
 		}
 		else
 		{
-			mame_timer_adjust(sh4.refresh_timer, time_never, 0, time_zero);
+			timer_adjust(sh4.refresh_timer, attotime_never, 0, attotime_zero);
 		}
 		break;
 
@@ -3757,11 +3722,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		}
 		if ((sh4.m[RCR2] & 8) && (~old & 8))
 		{ // 0 -> 1
-			mame_timer_adjust(sh4.rtc_timer, MAME_TIME_IN_HZ(128), sh4.cpu_number, time_zero);
+			timer_adjust(sh4.rtc_timer, ATTOTIME_IN_HZ(128), sh4.cpu_number, attotime_zero);
 		}
 		else if (~(sh4.m[RCR2]) & 8)
 		{ // 0
-			mame_timer_adjust(sh4.rtc_timer, time_never, 0, time_zero);
+			timer_adjust(sh4.rtc_timer, attotime_never, 0, attotime_zero);
 		}
 		break;
 
@@ -3770,21 +3735,21 @@ WRITE32_HANDLER( sh4_internal_w )
 		if (old & 1)
 			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
 		if ((sh4.m[TSTR] & 1) == 0) {
-			mame_timer_adjust(sh4.timer0, time_never, 0, time_zero);
+			timer_adjust(sh4.timer0, attotime_never, 0, attotime_zero);
 		} else
 			sh4_timer0_recompute();
 
 		if (old & 2)
 			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
 		if ((sh4.m[TSTR] & 2) == 0) {
-			mame_timer_adjust(sh4.timer1, time_never, 0, time_zero);
+			timer_adjust(sh4.timer1, attotime_never, 0, attotime_zero);
 		} else
 			sh4_timer1_recompute();
 
 		if (old & 4)
 			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
 		if ((sh4.m[TSTR] & 4) == 0) {
-			mame_timer_adjust(sh4.timer2, time_never, 0, time_zero);
+			timer_adjust(sh4.timer2, attotime_never, 0, attotime_zero);
 		} else
 			sh4_timer2_recompute();
 		break;
@@ -4156,28 +4121,28 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 {
 	const struct sh4_config *conf = config;
 
-	sh4.timer0 = mame_timer_alloc(sh4_timer0_callback);
-	mame_timer_adjust(sh4.timer0, time_never, 0, time_zero);
-	sh4.timer1 = mame_timer_alloc(sh4_timer1_callback);
-	mame_timer_adjust(sh4.timer1, time_never, 0, time_zero);
-	sh4.timer2 = mame_timer_alloc(sh4_timer2_callback);
-	mame_timer_adjust(sh4.timer2, time_never, 0, time_zero);
+	sh4.timer0 = timer_alloc(sh4_timer0_callback);
+	timer_adjust(sh4.timer0, attotime_never, 0, attotime_zero);
+	sh4.timer1 = timer_alloc(sh4_timer1_callback);
+	timer_adjust(sh4.timer1, attotime_never, 0, attotime_zero);
+	sh4.timer2 = timer_alloc(sh4_timer2_callback);
+	timer_adjust(sh4.timer2, attotime_never, 0, attotime_zero);
 
-	sh4.dma_timer[0] = mame_timer_alloc(sh4_dmac_callback);
-	mame_timer_adjust(sh4.dma_timer[0], time_never, 0, time_zero);
-	sh4.dma_timer[1] = mame_timer_alloc(sh4_dmac_callback);
-	mame_timer_adjust(sh4.dma_timer[1], time_never, 0, time_zero);
-	sh4.dma_timer[2] = mame_timer_alloc(sh4_dmac_callback);
-	mame_timer_adjust(sh4.dma_timer[2], time_never, 0, time_zero);
-	sh4.dma_timer[3] = mame_timer_alloc(sh4_dmac_callback);
-	mame_timer_adjust(sh4.dma_timer[3], time_never, 0, time_zero);
+	sh4.dma_timer[0] = timer_alloc(sh4_dmac_callback);
+	timer_adjust(sh4.dma_timer[0], attotime_never, 0, attotime_zero);
+	sh4.dma_timer[1] = timer_alloc(sh4_dmac_callback);
+	timer_adjust(sh4.dma_timer[1], attotime_never, 0, attotime_zero);
+	sh4.dma_timer[2] = timer_alloc(sh4_dmac_callback);
+	timer_adjust(sh4.dma_timer[2], attotime_never, 0, attotime_zero);
+	sh4.dma_timer[3] = timer_alloc(sh4_dmac_callback);
+	timer_adjust(sh4.dma_timer[3], attotime_never, 0, attotime_zero);
 
-	sh4.refresh_timer = mame_timer_alloc(sh4_refresh_timer_callback);
-	mame_timer_adjust(sh4.refresh_timer, time_never, 0, time_zero);
+	sh4.refresh_timer = timer_alloc(sh4_refresh_timer_callback);
+	timer_adjust(sh4.refresh_timer, attotime_never, 0, attotime_zero);
 	sh4.refresh_timer_base = 0;
 
-	sh4.rtc_timer = mame_timer_alloc(sh4_rtc_timer_callback);
-	mame_timer_adjust(sh4.rtc_timer, time_never, 0, time_zero);
+	sh4.rtc_timer = timer_alloc(sh4_rtc_timer_callback);
+	timer_adjust(sh4.rtc_timer, attotime_never, 0, attotime_zero);
 
 	sh4.m = auto_malloc(16384*4);
 

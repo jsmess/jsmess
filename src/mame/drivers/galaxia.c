@@ -25,7 +25,7 @@ rom mapping is still wrong, correct this before anything else
 
 #include "driver.h"
 
-UINT8 *galaxia_video;
+static UINT8 *galaxia_video;
 
 static VIDEO_START( galaxia )
 {

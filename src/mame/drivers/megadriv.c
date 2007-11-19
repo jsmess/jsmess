@@ -73,26 +73,26 @@ INLINE UINT16 get_hposition(void);
 static UINT8* sprite_renderline;
 static UINT8* highpri_renderline;
 static UINT16* video_renderline;
-UINT16* megadrive_vdp_palette_lookup;
-UINT16* megadrive_vdp_palette_lookup_shadow;
-UINT16* megadrive_vdp_palette_lookup_highlight;
+static UINT16* megadrive_vdp_palette_lookup;
+static UINT16* megadrive_vdp_palette_lookup_shadow;
+static UINT16* megadrive_vdp_palette_lookup_highlight;
 static UINT8 oldscreenwidth = 3;
 UINT16* megadrive_ram;
 UINT8 megadrive_vram_fill_pending = 0;
 UINT16 megadrive_vram_fill_length = 0;
 int genesis_scanline_counter = 0;
 int megadrive_sprite_collision = 0;
-int megadrive_region_export;
-int megadrive_region_pal;
-int megadrive_max_hposition;
+static int megadrive_region_export;
+static int megadrive_region_pal;
+static int megadrive_max_hposition;
 
 
-static mame_timer* frame_timer;
-static mame_timer* scanline_timer;
-static mame_timer* irq6_on_timer;
-static mame_timer* irq4_on_timer;
+static emu_timer* frame_timer;
+static emu_timer* scanline_timer;
+static emu_timer* irq6_on_timer;
+static emu_timer* irq4_on_timer;
 static mame_bitmap* render_bitmap;
-//mame_timer* vblankirq_off_timer;
+//emu_timer* vblankirq_off_timer;
 
 
 #ifdef UNUSED_FUNCTION
@@ -136,7 +136,7 @@ static struct genesis_z80_vars
 	UINT8* z80_prgram;
 } genz80;
 
-void megadriv_z80_bank_w(UINT16 data)
+static void megadriv_z80_bank_w(UINT16 data)
 {
 	genz80.z80_bank_partial |= (data & 0x01)<<23; // add new bit to partial address
 	genz80.z80_bank_pos++;
@@ -199,18 +199,18 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_reset );
 
 
 
-int megadrive_vdp_command_pending; // 2nd half of command pending..
-UINT16 megadrive_vdp_command_part1;
-UINT16 megadrive_vdp_command_part2;
-UINT8  megadrive_vdp_code;
-UINT16 megadrive_vdp_address;
-UINT16 megadrive_vdp_register[0x20];
-UINT16* megadrive_vdp_vram;
-UINT16* megadrive_vdp_cram;
-UINT16* megadrive_vdp_vsram;
+static int megadrive_vdp_command_pending; // 2nd half of command pending..
+static UINT16 megadrive_vdp_command_part1;
+static UINT16 megadrive_vdp_command_part2;
+static UINT8  megadrive_vdp_code;
+static UINT16 megadrive_vdp_address;
+static UINT16 megadrive_vdp_register[0x20];
+static UINT16* megadrive_vdp_vram;
+static UINT16* megadrive_vdp_cram;
+static UINT16* megadrive_vdp_vsram;
 /* The VDP keeps a 0x400 byte on-chip cache of the Sprite Attribute Table
    to speed up processing */
-UINT16* megadrive_vdp_internal_sprite_attribute_table;
+static UINT16* megadrive_vdp_internal_sprite_attribute_table;
 
 /*
 
@@ -401,7 +401,7 @@ static void vdp_cram_write(UINT16 data)
 }
 
 
-void megadriv_vdp_data_port_w(int data)
+static void megadriv_vdp_data_port_w(int data)
 {
 	megadrive_vdp_command_pending = 0;
 
@@ -497,7 +497,7 @@ void megadriv_vdp_data_port_w(int data)
 
 
 
-void megadrive_vdp_set_register(int regnum, UINT8 value)
+static void megadrive_vdp_set_register(int regnum, UINT8 value)
 {
 	megadrive_vdp_register[regnum] = value;
 
@@ -555,7 +555,7 @@ void megadrive_vdp_set_register(int regnum, UINT8 value)
 //  mame_printf_debug("%06x Setting VDP Register #%02x to %02x\n",activecpu_get_pc(), regnum,value);
 }
 
-void update_megadrive_vdp_code_and_address(void)
+static void update_megadrive_vdp_code_and_address(void)
 {
 	megadrive_vdp_code = ((megadrive_vdp_command_part1 & 0xc000) >> 14) |
 	                     ((megadrive_vdp_command_part2 & 0x00f0) >> 2);
@@ -608,7 +608,7 @@ static UINT16 get_word_from_68k_mem(UINT32 source)
 
 /* Note, In reality this transfer is NOT instant, the 68k isn't paused
    as the 68k address bus isn't accessed */
-void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length);
+static void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length);
 
 /* Wani Wani World, James Pond 3, Pirates Gold! */
 void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length)
@@ -639,14 +639,14 @@ void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length)
 }
 
 /* Instant, but we pause the 68k a bit */
-void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
+static void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
 {
 	int count;
 
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(MAME_TIME_IN_NSEC(length*1000/3500));
+	cpu_spinuntil_time(ATTOTIME_IN_NSEC(length*1000/3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -666,7 +666,7 @@ void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
 }
 
 
-void megadrive_do_insta_68k_to_cram_dma(UINT32 source,UINT16 length)
+static void megadrive_do_insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -694,7 +694,7 @@ void megadrive_do_insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 
 }
 
-void megadrive_do_insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
+static void megadrive_do_insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -854,7 +854,7 @@ static void handle_dma_bits(void)
 	}
 }
 
-void megadriv_vdp_ctrl_port_w(int data)
+static void megadriv_vdp_ctrl_port_w(int data)
 {
 //  logerror("write to vdp control port %04x\n",data);
 	megadrive_vram_fill_pending = 0; // ??
@@ -958,7 +958,7 @@ static UINT16 vdp_cram_r(void)
 	return megadrive_vdp_cram[(megadrive_vdp_address&0x7e)>>1];
 }
 
-UINT16 megadriv_vdp_data_port_r(void)
+static UINT16 megadriv_vdp_data_port_r(void)
 {
 	UINT16 retdata=0;
 
@@ -1075,7 +1075,7 @@ PAL, 256x224
 
 
 
-UINT16 megadriv_vdp_ctrl_port_r(void)
+static UINT16 megadriv_vdp_ctrl_port_r(void)
 {
 	/* Battletoads is very fussy about the vblank flag
        it wants it to be 1. in scanline 224 */
@@ -1241,7 +1241,7 @@ static UINT8 vc_pal_240[] =
 
 
 
-UINT16 megadriv_read_hv_counters(void)
+static UINT16 megadriv_read_hv_counters(void)
 {
 	/* Bubble and Squeek wants vcount=0xe0 */
 	/* Dracula is very sensitive to this */
@@ -1411,7 +1411,7 @@ static WRITE8_HANDLER( megadriv_z80_YM2612_write )
 	}
 }
 
-static mame_timer *io_timeout[2];
+static emu_timer *io_timeout[2];
 static int io_stage[2];
 
 static TIMER_CALLBACK( io_timeout0_timer_callback )
@@ -1425,12 +1425,12 @@ static TIMER_CALLBACK( io_timeout1_timer_callback )
 }
 
 
-void init_megadri6_io(void)
+static void init_megadri6_io(void)
 {
-	io_timeout[0] = mame_timer_alloc(io_timeout0_timer_callback);
+	io_timeout[0] = timer_alloc(io_timeout0_timer_callback);
 	io_stage[0] = -1;
 
-	io_timeout[1] = mame_timer_alloc(io_timeout1_timer_callback);
+	io_timeout[1] = timer_alloc(io_timeout1_timer_callback);
 	io_stage[1] = -1;
 
 }
@@ -1724,11 +1724,11 @@ INPUT_PORTS_END
 #define UP_BUTTON(player)    ( (readinputport(player) & 0x01) >> 0 )
 #define MD_RESET_BUTTON      ( (readinputportbytag_safe("RESET",0x00)      & 0x01) >> 0 )
 
-UINT8 megadrive_io_data_regs[3];
-UINT8 megadrive_io_ctrl_regs[3];
-UINT8 megadrive_io_tx_regs[3];
+static UINT8 megadrive_io_data_regs[3];
+static UINT8 megadrive_io_ctrl_regs[3];
+static UINT8 megadrive_io_tx_regs[3];
 
-void megadrive_init_io(running_machine *machine)
+static void megadrive_init_io(running_machine *machine)
 {
 	megadrive_io_data_regs[0] = 0x7f;
 	megadrive_io_data_regs[1] = 0x7f;
@@ -1748,7 +1748,7 @@ void megadrive_init_io(running_machine *machine)
 }
 
 /************* 6 button version **************************/
-UINT8 megadrive_io_read_data_port_6button(int portnum)
+static UINT8 megadrive_io_read_data_port_6button(int portnum)
 {
 	UINT8 retdata;
 
@@ -1822,7 +1822,7 @@ UINT8 megadrive_io_read_data_port_6button(int portnum)
 }
 /************* end 6 button version ********************************************/
 
-UINT8 megadrive_io_read_data_port_3button(int portnum)
+static UINT8 megadrive_io_read_data_port_3button(int portnum)
 {
 	UINT8 retdata;
 
@@ -1924,7 +1924,7 @@ READ8_HANDLER (megatech_sms_ioport_dd_r)
 		   (LEFT_BUTTON(1)  << 0);
 }
 
-UINT8 megadrive_io_read_ctrl_port(int portnum)
+static UINT8 megadrive_io_read_ctrl_port(int portnum)
 {
 	UINT8 retdata;
 	retdata = megadrive_io_ctrl_regs[portnum];
@@ -1933,19 +1933,19 @@ UINT8 megadrive_io_read_ctrl_port(int portnum)
 	return retdata|(retdata<<8);
 }
 
-UINT8 megadrive_io_read_tx_port(int portnum)
+static UINT8 megadrive_io_read_tx_port(int portnum)
 {
 	UINT8 retdata;
 	retdata = megadrive_io_tx_regs[portnum];
 	return retdata|(retdata<<8);
 }
 
-UINT8 megadrive_io_read_rx_port(int portnum)
+static UINT8 megadrive_io_read_rx_port(int portnum)
 {
 	return 0x00;
 }
 
-UINT8 megadrive_io_read_sctrl_port(int portnum)
+static UINT8 megadrive_io_read_sctrl_port(int portnum)
 {
 	return 0x00;
 }
@@ -2017,7 +2017,7 @@ static READ16_HANDLER( megadriv_68k_io_read )
 }
 
 
-void megadrive_io_write_data_port_3button(int portnum, UINT16 data)
+static void megadrive_io_write_data_port_3button(int portnum, UINT16 data)
 {
 	megadrive_io_data_regs[portnum] = data;
 	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
@@ -2027,14 +2027,14 @@ void megadrive_io_write_data_port_3button(int portnum, UINT16 data)
 
 /******************************6 button version*****************************/
 
-void megadrive_io_write_data_port_6button(int portnum, UINT16 data)
+static void megadrive_io_write_data_port_6button(int portnum, UINT16 data)
 {
 	if (megadrive_io_ctrl_regs[portnum]&0x40)
 	{
 		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			io_stage[portnum]++;
-			mame_timer_adjust(io_timeout[portnum], MAME_TIME_IN_CYCLES(8192,0), 0, time_zero);
+			timer_adjust(io_timeout[portnum], ATTOTIME_IN_CYCLES(8192,0), 0, attotime_zero);
 		}
 
 	}
@@ -2046,23 +2046,23 @@ void megadrive_io_write_data_port_6button(int portnum, UINT16 data)
 
 /***************************end 6 button version ****************************/
 
-void megadrive_io_write_ctrl_port(int portnum, UINT16 data)
+static void megadrive_io_write_ctrl_port(int portnum, UINT16 data)
 {
 	megadrive_io_ctrl_regs[portnum] = data;
 //  mame_printf_debug("Setting IO Control Register #%d data %04x\n",portnum,data);
 }
 
-void megadrive_io_write_tx_port(int portnum, UINT16 data)
+static void megadrive_io_write_tx_port(int portnum, UINT16 data)
 {
 	megadrive_io_tx_regs[portnum] = data;
 }
 
-void megadrive_io_write_rx_port(int portnum, UINT16 data)
+static void megadrive_io_write_rx_port(int portnum, UINT16 data)
 {
 
 }
 
-void megadrive_io_write_sctrl_port(int portnum, UINT16 data)
+static void megadrive_io_write_sctrl_port(int portnum, UINT16 data)
 {
 
 }
@@ -2477,8 +2477,8 @@ static READ16_HANDLER( _32x_reg_r )
 	return mame_rand(Machine);
 }
 
-UINT16 _32x_68k_comms[0x8];
-UINT16 _32x_palette[0x400/2];
+static UINT16 _32x_68k_comms[0x8];
+static UINT16 _32x_palette[0x400/2];
 
 static READ16_HANDLER( _32x_68k_comms_r )
 {
@@ -2572,7 +2572,7 @@ ADDRESS_MAP_END
 /****************************************** END 32X related *************************************/
 
 
-static mame_time time_elapsed_since_crap;
+static attotime time_elapsed_since_crap;
 
 
 VIDEO_START(megadriv)
@@ -2622,9 +2622,9 @@ VIDEO_UPDATE(megadriv)
 //  int xxx;
 	/* reference */
 
-//  time_elapsed_since_crap = mame_timer_timeelapsed(frame_timer);
-//  xxx = MAME_TIME_TO_CYCLES(0,time_elapsed_since_crap);
-//  mame_printf_debug("update cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.subseconds>>32),(UINT32)(time_elapsed_since_crap.subseconds&0xffffffff));
+//  time_elapsed_since_crap = timer_timeelapsed(frame_timer);
+//  xxx = ATTOTIME_TO_CYCLES(0,time_elapsed_since_crap);
+//  mame_printf_debug("update cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 
 	return 0;
 }
@@ -2675,7 +2675,7 @@ static TIMER_CALLBACK( frame_timer_callback )
 
 */
 
-void genesis_render_spriteline_to_spritebuffer(int scanline)
+static void genesis_render_spriteline_to_spritebuffer(int scanline)
 {
 	int screenwidth;
 	int maxsprites=0;
@@ -2866,7 +2866,7 @@ void genesis_render_spriteline_to_spritebuffer(int scanline)
 }
 
 /* Clean up this function (!) */
-void genesis_render_videoline_to_videobuffer(int scanline)
+static void genesis_render_videoline_to_videobuffer(int scanline)
 {
 	UINT16 base_a;
 	UINT16 base_w=0;
@@ -3879,7 +3879,7 @@ void genesis_render_videoline_to_videobuffer(int scanline)
 }
 
 /* This converts our render buffer to real screen colours */
-void genesis_render_videobuffer_to_screenbuffer(running_machine *machine, int scanline)
+static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine, int scanline)
 {
 	UINT16*lineptr;
 	int x;
@@ -3934,7 +3934,7 @@ void genesis_render_videobuffer_to_screenbuffer(running_machine *machine, int sc
 
 }
 
-void genesis_render_scanline(running_machine *machine, int scanline)
+static void genesis_render_scanline(running_machine *machine, int scanline)
 {
 	//if (MEGADRIVE_REG01_DMA_ENABLE==0) mame_printf_debug("off\n");
 	genesis_render_spriteline_to_spritebuffer(genesis_scanline_counter);
@@ -3947,14 +3947,14 @@ INLINE UINT16 get_hposition(void)
 //  static int lowest = 99999;
 //  static int highest = -99999;
 
-	mame_time time_elapsed_since_scanline_timer;
+	attotime time_elapsed_since_scanline_timer;
 	UINT16 value4;
 
-	time_elapsed_since_scanline_timer = mame_timer_timeelapsed(scanline_timer);
+	time_elapsed_since_scanline_timer = timer_timeelapsed(scanline_timer);
 
-	if (time_elapsed_since_scanline_timer.subseconds<(MAX_SUBSECONDS/megadriv_framerate /megadrive_total_scanlines))
+	if (time_elapsed_since_scanline_timer.attoseconds<(ATTOSECONDS_PER_SECOND/megadriv_framerate /megadrive_total_scanlines))
 	{
-		value4 = (UINT16)(megadrive_max_hposition*((double)(time_elapsed_since_scanline_timer.subseconds) / (double)(MAX_SUBSECONDS/megadriv_framerate /megadrive_total_scanlines)));
+		value4 = (UINT16)(megadrive_max_hposition*((double)(time_elapsed_since_scanline_timer.attoseconds) / (double)(ATTOSECONDS_PER_SECOND/megadriv_framerate /megadrive_total_scanlines)));
 	}
 	else /* in some cases (probably due to rounding errors) we get some stupid results (the odd huge value where the time elapsed is much higher than the scanline time??!).. hopefully by clamping the result to the maximum we limit errors */
 	{
@@ -4238,7 +4238,7 @@ INLINE UINT16 get_hposition(void)
 
 static int irq4counter = -1;
 
-static mame_timer* render_timer;
+static emu_timer* render_timer;
 
 static TIMER_CALLBACK( render_timer_callback )
 {
@@ -4267,13 +4267,13 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	{
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
-		mame_timer_adjust(scanline_timer, scale_down_mame_time(MAME_TIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0, time_zero);
-		mame_timer_adjust(render_timer, MAME_TIME_IN_USEC(1), 0, time_zero);
+		timer_adjust(scanline_timer, attotime_div(ATTOTIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0, attotime_zero);
+		timer_adjust(render_timer, ATTOTIME_IN_USEC(1), 0, attotime_zero);
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )
 		{
 		//  mame_printf_debug("x %d",genesis_scanline_counter);
-			mame_timer_adjust(irq6_on_timer,  MAME_TIME_IN_USEC(6), 0, time_zero);
+			timer_adjust(irq6_on_timer,  ATTOTIME_IN_USEC(6), 0, attotime_zero);
 			megadrive_irq6_pending = 1;
 			megadrive_vblank_flag = 1;
 		}
@@ -4300,7 +4300,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					mame_timer_adjust(irq4_on_timer,  MAME_TIME_IN_USEC(1), 0, time_zero);
+					timer_adjust(irq4_on_timer,  ATTOTIME_IN_USEC(1), 0, attotime_zero);
 					//mame_printf_debug("irq4 on scanline %d reload %d\n",genesis_scanline_counter,MEGADRIVE_REG0A_HINT_VALUE);
 				}
 			}
@@ -4311,7 +4311,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 			else irq4counter=MEGADRIVE_REG0A_HINT_VALUE;
 		}
 
-		//if (genesis_scanline_counter==0) mame_timer_adjust(irq4_on_timer,  MAME_TIME_IN_USEC(2), 0, time_zero);
+		//if (genesis_scanline_counter==0) timer_adjust(irq4_on_timer,  ATTOTIME_IN_USEC(2), 0, attotime_zero);
 
 
 
@@ -4353,9 +4353,9 @@ static TIMER_CALLBACK( irq4_on_callback )
 
 /*****************************************************************************************/
 
-int hazemdchoice_megadrive_region_export;
-int hazemdchoice_megadrive_region_pal;
-int hazemdchoice_megadriv_framerate;
+static int hazemdchoice_megadrive_region_export;
+static int hazemdchoice_megadrive_region_pal;
+static int hazemdchoice_megadriv_framerate;
 
 MACHINE_RESET( megadriv )
 {
@@ -4407,15 +4407,15 @@ MACHINE_RESET( megadriv )
 
 	megadrive_init_io(machine);
 
-	frame_timer = mame_timer_alloc(frame_timer_callback);
-	scanline_timer = mame_timer_alloc(scanline_timer_callback);
-	render_timer = mame_timer_alloc(render_timer_callback);
+	frame_timer = timer_alloc(frame_timer_callback);
+	scanline_timer = timer_alloc(scanline_timer_callback);
+	render_timer = timer_alloc(render_timer_callback);
 
-	irq6_on_timer = mame_timer_alloc(irq6_on_callback);
-	irq4_on_timer = mame_timer_alloc(irq4_on_callback);
+	irq6_on_timer = timer_alloc(irq6_on_callback);
+	irq4_on_timer = timer_alloc(irq4_on_callback);
 
-	mame_timer_adjust(frame_timer, time_zero, 0, time_zero);
-	mame_timer_adjust(scanline_timer,  time_zero, 0, time_zero);
+	timer_adjust(frame_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
 
 //  set_refresh_rate(megadriv_framerate);
 	cpunum_set_clockscale(0, 0.9950f); /* Fatal Rewind is very fussy... */
@@ -4428,7 +4428,7 @@ MACHINE_RESET( megadriv )
 
 void megadriv_stop_scanline_timer(void)
 {
-	mame_timer_adjust(scanline_timer,  time_never, 0, time_never);
+	timer_adjust(scanline_timer,  attotime_never, 0, attotime_never);
 }
 
 /*
@@ -4529,7 +4529,7 @@ int megadrive_z80irq_hpos = 320;
 	visarea.min_y = 0;
 	visarea.max_y = megadrive_visible_scanlines-1;
 
-	video_screen_configure(0, scr_width, megadrive_visible_scanlines, &visarea, HZ_TO_SUBSECONDS(megadriv_framerate));
+	video_screen_configure(0, scr_width, megadrive_visible_scanlines, &visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
 
 #if 0
 {
@@ -4578,16 +4578,16 @@ int megadrive_z80irq_hpos = 320;
 		UINT64 frametime;
 
 	//  /* reference */
-		frametime = MAX_SUBSECONDS/megadriv_framerate;
+		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
-		time_elapsed_since_crap = mame_timer_timeelapsed(frame_timer);
-		xxx = MAME_TIME_TO_CYCLES(0,time_elapsed_since_crap);
-		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.subseconds>>32),(UINT32)(time_elapsed_since_crap.subseconds&0xffffffff));
+		time_elapsed_since_crap = timer_timeelapsed(frame_timer);
+		xxx = ATTOTIME_TO_CYCLES(0,time_elapsed_since_crap);
+		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
 	}
 
-	mame_timer_adjust(frame_timer,  time_zero, 0, time_zero);
-	mame_timer_adjust(scanline_timer,  time_zero, 0, time_zero);
+	timer_adjust(frame_timer,  attotime_zero, 0, attotime_zero);
+	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
 
 }
 
@@ -4694,7 +4694,7 @@ MACHINE_DRIVER_END
 
 
 /* Callback when the genesis enters interrupt code */
-int genesis_int_callback (int irq)
+static int genesis_int_callback (int irq)
 {
 	if (irq==4)
 	{
@@ -4715,7 +4715,7 @@ static int megadriv_tas_callback(void)
 	return 0; // writeback not allowed
 }
 
-void megadriv_init_common(running_machine *machine)
+static void megadriv_init_common(running_machine *machine)
 {
 	genz80.z80_cpunum = 1;
 	genz80.z80_prgram = auto_malloc(0x2000);

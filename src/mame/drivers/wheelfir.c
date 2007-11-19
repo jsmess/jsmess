@@ -537,8 +537,8 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static mame_timer* frame_timer;
-static mame_timer* scanline_timer;
+static emu_timer* frame_timer;
+static emu_timer* scanline_timer;
 
 static TIMER_CALLBACK( frame_timer_callback )
 {
@@ -548,7 +548,7 @@ static TIMER_CALLBACK( frame_timer_callback )
 static int scanline_counter = 0;
 static int total_scanlines = 262;
 
-void render_background_to_render_buffer(int scanline)
+static void render_background_to_render_buffer(int scanline)
 {
 	int x;
 	UINT16 yscroll = (wheelfir_blitdata[0xb]&0x00ff) | (wheelfir_blitdata[0x8]&0x0080) << 1;
@@ -575,7 +575,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	{
 		scanline_counter++;
 		cpunum_set_input_line(0, 5, HOLD_LINE); // raster IRQ, changes scroll values for road
-		mame_timer_adjust(scanline_timer, scale_down_mame_time(MAME_TIME_IN_HZ(60), total_scanlines), 0, time_zero);
+		timer_adjust(scanline_timer, attotime_div(ATTOTIME_IN_HZ(60), total_scanlines), 0, attotime_zero);
 
 		if (scanline_counter<256)
 		{
@@ -606,16 +606,16 @@ static VIDEO_EOF( wheelfir )
 	scanline_counter = -1;
 	fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
 
-	mame_timer_adjust(frame_timer,  time_zero, 0, time_zero);
-	mame_timer_adjust(scanline_timer,  time_zero, 0, time_zero);
+	timer_adjust(frame_timer,  attotime_zero, 0, attotime_zero);
+	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
 }
 
 static MACHINE_RESET(wheelfir)
 {
-	frame_timer = mame_timer_alloc(frame_timer_callback);
-	scanline_timer = mame_timer_alloc(scanline_timer_callback);
-	mame_timer_adjust(frame_timer, time_zero, 0, time_zero);
-	mame_timer_adjust(scanline_timer,  time_zero, 0, time_zero);
+	frame_timer = timer_alloc(frame_timer_callback);
+	scanline_timer = timer_alloc(scanline_timer_callback);
+	timer_adjust(frame_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
 	scanline_counter = -1;
 }
 

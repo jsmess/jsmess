@@ -18,7 +18,7 @@ static int flag_b;
 
 UINT16 *printerRAM;
 
-static mame_timer *print_timer;
+static emu_timer *print_timer;
 static int printer_level;
 
 
@@ -95,12 +95,12 @@ WRITE8_HANDLER( aim65_printer_on )
 	if (!data)
 	{
 		aim65_printer_cr();
-		mame_timer_adjust(print_timer, time_zero, 0, MAME_TIME_IN_USEC(10));
+		timer_adjust(print_timer, attotime_zero, 0, ATTOTIME_IN_USEC(10));
 		via_0_cb1_w(0, 0);
 		printer_level = 1;
 	}
 	else
-		mame_timer_reset(print_timer, time_never);
+		timer_reset(print_timer, attotime_never);
 }
 
 
@@ -122,7 +122,7 @@ void aim65_printer_data_b(UINT8 data) {
 
 VIDEO_START( aim65 )
 {
-	print_timer = mame_timer_alloc(aim65_printer_timer);
+	print_timer = timer_alloc(aim65_printer_timer);
 
 	/*
     videoram_size = 600 * 10 * 2;

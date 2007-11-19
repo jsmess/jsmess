@@ -13,7 +13,7 @@ extern VIDEO_START( kopunch );
 extern VIDEO_UPDATE( kopunch );
 
 
-INTERRUPT_GEN( kopunch_interrupt )
+static INTERRUPT_GEN( kopunch_interrupt )
 {
 	if (cpu_getiloops() == 0)
 	{

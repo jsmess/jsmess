@@ -16,7 +16,7 @@ extern UINT16 *gaelco_vregs;
 extern UINT16 *gaelco_videoram;
 extern UINT16 *gaelco_spriteram;
 extern tilemap *gaelco_tilemap[2];
-UINT16 *gaelco_screen;
+static UINT16 *gaelco_screen;
 
 /* from video/gaelco.c */
 WRITE16_HANDLER( gaelco_vram_w );

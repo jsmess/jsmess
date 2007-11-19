@@ -391,7 +391,7 @@ static MACHINE_DRIVER_START( decocass )
 	MDRV_CPU_IO_MAP(decocass_mcu_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(3072)		/* frames per second, vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)		/* frames per second, vblank duration */)
 	MDRV_INTERLEAVE(7)				/* interleave CPUs */
 
 	MDRV_MACHINE_RESET(decocass)

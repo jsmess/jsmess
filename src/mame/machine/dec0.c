@@ -458,7 +458,7 @@ static void birdtry_i8751_write(int data)
 }
 
 #if 0
-static mame_timer *i8751_timer;
+static emu_timer *i8751_timer;
 
 static TIMER_CALLBACK( i8751_callback )
 {

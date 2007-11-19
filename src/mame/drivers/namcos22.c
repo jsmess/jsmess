@@ -1183,7 +1183,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 		{ /* SUBCPU enable on System 22 (guessed, but too early crashes Rave Racer so it's a good test) */
 			if (data == 0xff00)
 			{
-				mame_timer_set(MAME_TIME_IN_MSEC(50), 0, start_subcpu);
+				timer_set(ATTOTIME_IN_MSEC(50), 0, start_subcpu);
 			}
 		}
 	}
@@ -1822,7 +1822,7 @@ static MACHINE_DRIVER_START( namcos22s )
 	MDRV_CPU_ADD(M37710, SS22_MASTER_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(mcu_program, 0)
 	MDRV_CPU_IO_MAP( mcu_io, 0 )
-	MDRV_CPU_VBLANK_INT(mcu_interrupt, 3);
+	MDRV_CPU_VBLANK_INT(mcu_interrupt, 3)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

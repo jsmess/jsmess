@@ -13,7 +13,7 @@ int spacefev_red_cannon;
 
 int helifire_flash;
 
-static mame_timer* cannon_timer;
+static emu_timer* cannon_timer;
 
 static int sheriff_color_mode;
 static int sheriff_color_data;
@@ -65,7 +65,7 @@ void spacefev_start_red_cannon(void)
 {
 	spacefev_red_cannon = 1;
 
-	mame_timer_adjust(cannon_timer, MAME_TIME_IN_USEC(550 * 68 * 10), 0, time_zero);
+	timer_adjust(cannon_timer, ATTOTIME_IN_USEC(550 * 68 * 10), 0, attotime_zero);
 }
 
 
@@ -73,11 +73,11 @@ static TIMER_CALLBACK( spacefev_stop_red_cannon )
 {
 	spacefev_red_cannon = 0;
 
-	mame_timer_adjust(cannon_timer, time_never, 0, time_never);
+	timer_adjust(cannon_timer, attotime_never, 0, attotime_never);
 }
 
 
-void helifire_next_line(void)
+static void helifire_next_line(void)
 {
 	helifire_mv++;
 
@@ -106,7 +106,7 @@ void helifire_next_line(void)
 
 VIDEO_START( spacefev )
 {
-	cannon_timer = mame_timer_alloc(spacefev_stop_red_cannon);
+	cannon_timer = timer_alloc(spacefev_stop_red_cannon);
 
 	flip_screen = 0;
 

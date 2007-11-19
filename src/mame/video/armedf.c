@@ -9,7 +9,7 @@ UINT16 *armedf_fg_videoram;
 UINT16 *legion_cmd;
 static UINT16 armedf_fg_scrollx,armedf_fg_scrolly;
 
-UINT16 terraf_scroll_msb;
+static UINT16 terraf_scroll_msb;
 
 static tilemap *bg_tilemap, *fg_tilemap;
 tilemap *armedf_tx_tilemap;

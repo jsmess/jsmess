@@ -109,9 +109,9 @@ VIDEO_EOF( mlc );
 
 extern UINT32 *mlc_vram, *mlc_clip_ram;
 static UINT32 *mlc_ram, *irq_ram;
-static mame_timer *raster_irq_timer;
+static emu_timer *raster_irq_timer;
 static int mainCpuIsArm=1;
-int mlc_raster_table[9][256];
+static int mlc_raster_table[9][256];
 
 /***************************************************************************/
 
@@ -221,7 +221,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */
-		mame_timer_adjust(raster_irq_timer,video_screen_get_time_until_pos(0, irq_ram[0x14/4], 0),0,time_never);
+		timer_adjust(raster_irq_timer,video_screen_get_time_until_pos(0, irq_ram[0x14/4], 0),0,attotime_never);
 		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(0));
 		return;
 		break;
@@ -422,7 +422,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( mlc )
 {
-	raster_irq_timer = mame_timer_alloc(interrupt_gen);
+	raster_irq_timer = timer_alloc(interrupt_gen);
 }
 
 static struct YMZ280Binterface ymz280b_intf =

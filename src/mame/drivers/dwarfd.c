@@ -128,18 +128,18 @@ enum
 	I8275_COMMAND_LOAD_CURSOR_LENGTH=2,
 	I8275_COMMAND_PRESET_LENGTH=0
 };
-int i8275Command;
-int i8275HorizontalCharactersRow;
-int i8275CommandSeqCnt;
-int i8275SpacedRows;
-int i8275VerticalRows;
-int i8275VerticalRetraceRows;
-int i8275Underline;
-int i8275Lines;
-int i8275LineCounterMode;
-int i8275FieldAttributeMode;
-int i8275CursorFormat;
-int i8275HorizontalRetrace;
+static int i8275Command;
+static int i8275HorizontalCharactersRow;
+static int i8275CommandSeqCnt;
+static int i8275SpacedRows;
+static int i8275VerticalRows;
+static int i8275VerticalRetraceRows;
+static int i8275Underline;
+static int i8275Lines;
+static int i8275LineCounterMode;
+static int i8275FieldAttributeMode;
+static int i8275CursorFormat;
+static int i8275HorizontalRetrace;
 
 static WRITE8_HANDLER (i8275_preg_w) //param reg
 {
@@ -540,7 +540,7 @@ static void dwarfd_sod_callback(int nSO)
 }
 
 #define NUM_LINES 25
-INTERRUPT_GEN( dwarfd_interrupt )
+static INTERRUPT_GEN( dwarfd_interrupt )
 {
 	if(cpu_getiloops() < NUM_LINES)
 	{

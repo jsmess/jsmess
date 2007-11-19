@@ -47,7 +47,7 @@ static INT16 waveform1[32] =
 #define FALLING_EDGE(bit) (!(data & bit) && (targ_sh_ctrl0 & bit))
 
 
-void targ_tone_generator(int data)
+static void targ_tone_generator(int data)
 {
 	int maxfreq;
 

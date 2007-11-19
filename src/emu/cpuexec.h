@@ -100,6 +100,7 @@ enum _cpu_type
 	CPU_TMS32025,
 	CPU_TMS32026,
 	CPU_TMS32031,
+	CPU_TMS32032,
 	CPU_TMS32051,
 	CPU_CCPU,
 	CPU_ADSP2100,
@@ -224,7 +225,7 @@ struct _cpu_config
 	void 		(*vblank_interrupt)(void);	/* for interrupts tied to VBLANK */
 	int 		vblank_interrupts_per_frame;/* usually 1 */
 	void 		(*timed_interrupt)(void);	/* for interrupts not tied to VBLANK */
-	subseconds_t timed_interrupt_period;	/* period for periodic interrupts */
+	attoseconds_t timed_interrupt_period;	/* period for periodic interrupts */
 	void *		reset_param;				/* parameter for cpu_reset */
 	const char *tag;
 };
@@ -306,7 +307,7 @@ int cpunum_is_suspended(int cpunum, int reason);
 void activecpu_abort_timeslice(void);
 
 /* Returns the current local time for a CPU */
-mame_time cpunum_get_localtime(int cpunum);
+attotime cpunum_get_localtime(int cpunum);
 
 /* Returns the current CPU's unscaled running clock speed */
 /* If you want to know the current effective running clock
@@ -315,7 +316,7 @@ int cpunum_get_clock(int cpunum);
 
 /* Sets the current CPU's clock speed and then adjusts for scaling */
 void cpunum_set_clock(int cpunum, int clock);
-void cpunum_set_clock_period(int cpunum, subseconds_t clock_period);
+void cpunum_set_clock_period(int cpunum, attoseconds_t clock_period);
 
 /* Returns the current scaling factor for a CPU's clock speed */
 double cpunum_get_clockscale(int cpunum);
@@ -324,7 +325,7 @@ double cpunum_get_clockscale(int cpunum);
 void cpunum_set_clockscale(int cpunum, double clockscale);
 
 /* Temporarily boosts the interleave factor */
-void cpu_boost_interleave(mame_time timeslice_time, mame_time boost_duration);
+void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration);
 
 
 
@@ -382,7 +383,7 @@ int cpu_getcurrentframe(void);
 void cpu_trigger(int trigger);
 
 /* generate a trigger after a specific period of time */
-void cpu_triggertime(mame_time duration, int trigger);
+void cpu_triggertime(attotime duration, int trigger);
 
 /* generate a trigger corresponding to an interrupt on the given CPU */
 void cpu_triggerint(int cpunum);
@@ -409,10 +410,10 @@ void cpu_spin(void);
 void cpu_yield(void);
 
 /* burn CPU cycles for a specific period of time */
-void cpu_spinuntil_time(mame_time duration);
+void cpu_spinuntil_time(attotime duration);
 
 /* yield our timeslice for a specific period of time */
-void cpu_yielduntil_time(mame_time duration);
+void cpu_yielduntil_time(attotime duration);
 
 
 

@@ -137,7 +137,7 @@ static UINT16 xfer_xcur, xfer_ycur;
 static rectangle clip_rect, scaled_clip_rect;
 static rectangle clip_save;
 
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 
 static UINT8 *grom_base;
 static UINT32 grom_size;
@@ -231,7 +231,7 @@ VIDEO_START( itech32 )
 	/* reset statics */
 	memset(itech32_video, 0, 0x80);
 
-	scanline_timer = mame_timer_alloc(scanline_interrupt);
+	scanline_timer = timer_alloc(scanline_interrupt);
 	enable_latch[0] = 1;
 	enable_latch[1] = (itech32_planes > 1) ? 1 : 0;
 
@@ -478,7 +478,7 @@ static void update_interrupts(int fast)
 static TIMER_CALLBACK( scanline_interrupt )
 {
 	/* set timer for next frame */
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, attotime_zero);
 
 	/* set the interrupt bit in the status reg */
 	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", video_screen_get_vpos(0));
@@ -1346,7 +1346,7 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x2c/2:	/* VIDEO_INTSCANLINE */
-			mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, time_zero);
+			timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, attotime_zero);
 			break;
 
 		case 0x32/2:	/* VIDEO_VTOTAL */

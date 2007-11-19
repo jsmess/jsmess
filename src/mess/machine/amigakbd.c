@@ -16,7 +16,7 @@ static int	kbd_index[4] = { 0, 1, 2, 3 };
 static UINT8 *key_buf = NULL;
 static int key_buf_pos = 0;
 static int key_cur_pos = 0;
-static mame_timer *kbd_timer;
+static emu_timer *kbd_timer;
 
 static void kbd_sendscancode( UINT8 scancode )
 {
@@ -49,7 +49,7 @@ static TIMER_CALLBACK( kbd_update_callback )
 	/* if we still have more data, schedule another update */
 	if ( key_buf_pos != key_cur_pos )
 	{
-		mame_timer_adjust( kbd_timer, scale_down_mame_time(video_screen_get_frame_period(0),4), 0, time_zero);
+		timer_adjust( kbd_timer, attotime_div(video_screen_get_frame_period(0),4), 0, attotime_zero);
 	}
 }
 
@@ -89,7 +89,7 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
 		if ( key_buf_was_empty && ( key_buf_pos != key_cur_pos ) )
 		{
-			mame_timer_adjust( kbd_timer, scale_down_mame_time(video_screen_get_frame_period(0),4), 0, time_zero);
+			timer_adjust( kbd_timer, attotime_div(video_screen_get_frame_period(0),4), 0, attotime_zero);
 		}
 	}
 }
@@ -112,8 +112,8 @@ void amigakbd_init( void )
 	key_buf = auto_malloc( KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;
 	key_cur_pos = 0;
-	kbd_timer = mame_timer_alloc(kbd_update_callback);
-	mame_timer_reset( kbd_timer, time_never );
+	kbd_timer = timer_alloc(kbd_update_callback);
+	timer_reset( kbd_timer, attotime_never );
 }
 
 /*********************************************************************************************/

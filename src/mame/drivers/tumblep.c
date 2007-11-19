@@ -327,7 +327,7 @@ static MACHINE_DRIVER_START( tumblep )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -396,6 +396,7 @@ ROM_END
 
 /******************************************************************************/
 
+#if TUMBLEP_HACK
 void tumblep_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
@@ -403,6 +404,7 @@ void tumblep_patch_code(UINT16 offset)
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }
+#endif
 
 static DRIVER_INIT( tumblep )
 {

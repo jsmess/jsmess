@@ -116,17 +116,17 @@ struct _m6847_vdg
 	void (*custom_prepare_scanline)(int scanline);
 
 	/* timers */
-	mame_timer *fs_rise_timer;
-	mame_timer *fs_fall_timer;
-	mame_timer *hs_rise_timer;
-	mame_timer *hs_fall_timer;
+	emu_timer *fs_rise_timer;
+	emu_timer *fs_fall_timer;
+	emu_timer *hs_rise_timer;
+	emu_timer *hs_fall_timer;
 
 	/* things that vary according to chip version */
-	subseconds_t clock_period;
-	subseconds_t scanline_period;
-	subseconds_t field_sync_period;
-	subseconds_t horizontal_sync_period;
-	subseconds_t vblank_period;
+	attoseconds_t clock_period;
+	attoseconds_t scanline_period;
+	attoseconds_t field_sync_period;
+	attoseconds_t horizontal_sync_period;
+	attoseconds_t vblank_period;
 	int top_border_scanlines;
 	int display_scanlines;
 	int bottom_border_scanlines;
@@ -1043,39 +1043,6 @@ static UINT32 color(int c)
 
 
 
-static const char *mame_time_string(mame_time t)
-{
-	static char return_buffer[32];
-	char subseconds_buffer[24];
-	char *s;
-	char c;
-	subseconds_t subseconds;
-	subseconds_t max_subseconds;
-
-	s = subseconds_buffer + sizeof(subseconds_buffer);
-	*(--s) = '\0';
-
-	subseconds = t.subseconds;
-	max_subseconds = MAX_SUBSECONDS;
-
-	while(max_subseconds > 1)
-	{
-		c = (subseconds % 10) + '0';
-		if ((c != '0') || s[1])
-			*(--s) = c;
-		subseconds /= 10;
-		max_subseconds /= 10;
-	}
-
-	if (*s == '\0')
-		*(--s) = '0';
-
-	snprintf(return_buffer, sizeof(return_buffer), "%u.%s", t.seconds, s);
-	return return_buffer;
-}
-
-
-
 static int attr_index_from_attribute(UINT8 attr)
 {
 	int result;
@@ -1466,21 +1433,21 @@ INPUT_PORTS_END
 static int get_scanline(void)
 {
 	int result;
-	mame_time duration;
+	attotime duration;
 
 	/* get the time since last field sync */
-	duration = sub_mame_times(
-		mame_timer_starttime(m6847->hs_rise_timer),
-		mame_timer_starttime(m6847->fs_rise_timer));
+	duration = attotime_sub(
+		timer_starttime(m6847->hs_rise_timer),
+		timer_starttime(m6847->fs_rise_timer));
 	assert_always(duration.seconds == 0, "get_scanline(): duration exceeds one second");
 
-	if (duration.subseconds < m6847->vblank_period)
+	if (duration.attoseconds < m6847->vblank_period)
 	{
 		result = -1;	/* vblank */
 	}
 	else
 	{
-		result = (duration.subseconds - m6847->vblank_period)
+		result = (duration.attoseconds - m6847->vblank_period)
 			/ m6847->scanline_period;
 	}
 	return result;
@@ -1490,10 +1457,10 @@ static int get_scanline(void)
 #ifdef MAME_DEBUG
 static int get_beamx(void)
 {
-	mame_time scanline_time;
+	attotime scanline_time;
 	int result;
 
-	scanline_time = mame_timer_timeelapsed(m6847->hs_rise_timer);
+	scanline_time = timer_timeelapsed(m6847->hs_rise_timer);
 	if (scanline_time.seconds != 0)
 		return 0;
 	assert(scanline_time.subseconds < m6847->scanline_period);
@@ -1610,16 +1577,16 @@ void m6847_video_changed(void)
 
 int m6847_get_horizontal_sync(void)
 {
-	mame_time fire_time = mame_timer_firetime(m6847->hs_fall_timer);
-	return compare_mame_times(fire_time, mame_timer_get_time()) > 0;
+	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
+	return attotime_compare(fire_time, timer_get_time()) > 0;
 }
 
 
 
 static void set_horizontal_sync(void)
 {
-	mame_time fire_time = mame_timer_firetime(m6847->hs_fall_timer);
-	int horizontal_sync = compare_mame_times(fire_time, mame_timer_get_time()) > 0;
+	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
+	int horizontal_sync = attotime_compare(fire_time, timer_get_time()) > 0;
 	if (m6847->horizontal_sync_callback)
 		m6847->horizontal_sync_callback(!horizontal_sync);
 }
@@ -1628,16 +1595,16 @@ static void set_horizontal_sync(void)
 
 int m6847_get_field_sync(void)
 {
-	mame_time fire_time = mame_timer_firetime(m6847->fs_fall_timer);
-	return compare_mame_times(fire_time, mame_timer_get_time()) > 0;
+	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
+	return attotime_compare(fire_time, timer_get_time()) > 0;
 }
 
 
 
 static void set_field_sync(void)
 {
-	mame_time fire_time = mame_timer_firetime(m6847->fs_fall_timer);
-	int field_sync = compare_mame_times(fire_time, mame_timer_get_time()) > 0;
+	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
+	int field_sync = attotime_compare(fire_time, timer_get_time()) > 0;
 	if (m6847->field_sync_callback)
 		m6847->field_sync_callback(field_sync);
 }
@@ -1653,7 +1620,7 @@ static void set_field_sync(void)
 static TIMER_CALLBACK(hs_fall)
 {
 	if (LOG_HS)
-		logerror("hs_fall(): time=%g\n", mame_time_to_double(mame_timer_get_time()));
+		logerror("hs_fall(): time=%g\n", attotime_to_double(timer_get_time()));
 
 	set_horizontal_sync();
 }
@@ -1661,14 +1628,14 @@ static TIMER_CALLBACK(hs_fall)
 static TIMER_CALLBACK(hs_rise)
 {
 	if (LOG_HS)
-		logerror("hs_rise(): time=%g\n", mame_time_to_double(mame_timer_get_time()));
+		logerror("hs_rise(): time=%g\n", attotime_to_double(timer_get_time()));
 
-	mame_timer_adjust(m6847->hs_rise_timer,
-		make_mame_time(0, m6847->scanline_period),
-		0, time_never);
-	mame_timer_adjust(m6847->hs_fall_timer,
-		make_mame_time(0, m6847->horizontal_sync_period),
-		0, time_never);
+	timer_adjust(m6847->hs_rise_timer,
+		attotime_make(0, m6847->scanline_period),
+		0, attotime_never);
+	timer_adjust(m6847->hs_fall_timer,
+		attotime_make(0, m6847->horizontal_sync_period),
+		0, attotime_never);
 
 	set_horizontal_sync();
 	prepare_scanline(0);
@@ -1677,7 +1644,7 @@ static TIMER_CALLBACK(hs_rise)
 static TIMER_CALLBACK(fs_fall)
 {
 	if (LOG_FS)
-		logerror("fs_fall(): time=%g scanline=%d\n", mame_time_to_double(mame_timer_get_time()), get_scanline());
+		logerror("fs_fall(): time=%g scanline=%d\n", attotime_to_double(timer_get_time()), get_scanline());
 
 	set_field_sync();
 }
@@ -1685,15 +1652,15 @@ static TIMER_CALLBACK(fs_fall)
 static TIMER_CALLBACK(fs_rise)
 {
 	if (LOG_FS)
-		logerror("fs_rise(): time=%g scanline=%d\n", mame_time_to_double(mame_timer_get_time()), get_scanline());
+		logerror("fs_rise(): time=%g scanline=%d\n", attotime_to_double(timer_get_time()), get_scanline());
 
 	/* adjust field sync falling edge timer */
-	mame_timer_adjust(m6847->fs_fall_timer,
-		make_mame_time(0, m6847->field_sync_period),
-		0, time_never);
+	timer_adjust(m6847->fs_fall_timer,
+		attotime_make(0, m6847->field_sync_period),
+		0, attotime_never);
 
 	/* adjust horizontal sync rising timer */
-	mame_timer_adjust(m6847->hs_rise_timer, time_zero, 0, time_never);
+	timer_adjust(m6847->hs_rise_timer, attotime_zero, 0, attotime_never);
 
 	/* this is a hook for the CoCo 3 code to extend this stuff */
 	if (m6847->new_frame_callback)
@@ -1842,7 +1809,7 @@ void m6847_init(const m6847_config *cfg)
 {
 	const m6847_variant *v;
 	UINT32 frequency;
-	subseconds_t period, frame_period, cpu0_clock_period = 0;
+	attoseconds_t period, frame_period, cpu0_clock_period = 0;
 	double total_scanlines;
 	int portnum;
 
@@ -1884,10 +1851,10 @@ void m6847_init(const m6847_config *cfg)
 	}
 
 	/* allocate timers */
-	m6847->fs_rise_timer = mame_timer_alloc(fs_rise);
-	m6847->fs_fall_timer = mame_timer_alloc(fs_fall);
-	m6847->hs_rise_timer = mame_timer_alloc(hs_rise);
-	m6847->hs_fall_timer = mame_timer_alloc(hs_fall);
+	m6847->fs_rise_timer = timer_alloc(fs_rise);
+	m6847->fs_fall_timer = timer_alloc(fs_fall);
+	m6847->hs_rise_timer = timer_alloc(hs_rise);
+	m6847->hs_fall_timer = timer_alloc(hs_fall);
 
 	/* setup dimensions */
 	m6847->top_border_scanlines = v->top_border_scanlines;
@@ -1898,7 +1865,7 @@ void m6847_init(const m6847_config *cfg)
 	frequency = v->frames_per_second
 		* ((UINT32) (v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME))
 		* ((UINT32) (v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE));
-	period = MAX_SUBSECONDS / frequency;
+	period = ATTOTIME_MAX_SECONDS / frequency;
 
 	/* choose CPU clock, if specified */
 	if (cfg->cpu0_timing_factor > 0)
@@ -1922,7 +1889,7 @@ void m6847_init(const m6847_config *cfg)
 	/* setup timing */
 	frame_period = period *
 		(UINT32) (v->clocks_per_scanline * total_scanlines * GROSS_FACTOR);
-	mame_timer_adjust(m6847->fs_rise_timer, time_zero, 0, make_mame_time(0, frame_period));
+	timer_adjust(m6847->fs_rise_timer, attotime_zero, 0, attotime_make(0, frame_period));
 
 	/* setup save states */
 	state_save_register_func_postload(set_field_sync);
@@ -1941,14 +1908,14 @@ void m6847_init(const m6847_config *cfg)
 	if (LOG_STATS)
 	{
 		logerror("m6847_init():\n");
-		logerror("\tclock:      %30s sec\n", mame_time_string(make_mame_time(0, period * GROSS_FACTOR)));
+		logerror("\tclock:      %30s sec\n", attotime_string(attotime_make(0, period * GROSS_FACTOR), 6));
 		if (cpu0_clock_period > 0)
-			logerror("\tCPU0 clock: %30s sec\n", mame_time_string(make_mame_time(0, cpu0_clock_period)));
-		logerror("\tscanline:   %30s sec\n", mame_time_string(make_mame_time(0, m6847->scanline_period)));
-		logerror("\tfield sync: %30s sec\n", mame_time_string(make_mame_time(0, m6847->field_sync_period)));
-		logerror("\thorz sync:  %30s sec\n", mame_time_string(make_mame_time(0, m6847->horizontal_sync_period)));
-		logerror("\tvblank:     %30s sec\n", mame_time_string(make_mame_time(0, m6847->vblank_period)));
-		logerror("\tframe:      %30s sec\n", mame_time_string(make_mame_time(0, frame_period)));
+			logerror("\tCPU0 clock: %30s sec\n", attotime_string(attotime_make(0, cpu0_clock_period), 6));
+		logerror("\tscanline:   %30s sec\n", attotime_string(attotime_make(0, m6847->scanline_period), 6));
+		logerror("\tfield sync: %30s sec\n", attotime_string(attotime_make(0, m6847->field_sync_period), 6));
+		logerror("\thorz sync:  %30s sec\n", attotime_string(attotime_make(0, m6847->horizontal_sync_period), 6));
+		logerror("\tvblank:     %30s sec\n", attotime_string(attotime_make(0, m6847->vblank_period), 6));
+		logerror("\tframe:      %30s sec\n", attotime_string(attotime_make(0, frame_period), 6));
 		logerror("\n");
 	}
 
@@ -2011,44 +1978,27 @@ VIDEO_UPDATE(m6847)
  *
  *************************************/
 
-static UINT64 divide_mame_time(mame_time dividend, mame_time divisor)
+static UINT64 divide_mame_time(attotime dividend, attotime divisor)
 {
 	/* TODO: it should not be necessary to use floating point here */
-	double dividend_dbl = mame_time_to_double(dividend);
-	double divisor_dbl = mame_time_to_double(divisor);
+	double dividend_dbl = attotime_to_double(dividend);
+	double divisor_dbl = attotime_to_double(divisor);
 	return (UINT64) (dividend_dbl / divisor_dbl);
 }
 
 
 
-static mame_time multiply_mame_time(mame_time time, UINT64 factor)
+static attotime interval(m6847_timing_type timing)
 {
-	/* TODO: it should not be necessary to use floating point here */
-	double d = mame_time_to_double(time);
-
-#if defined(_MSC_VER) && (_MSC_VER <= 1200)
-	/* casting unsigned __int64 to double is not supported on VC6 or before */
-	d *= (INT64) factor;
-#else
-	d *= factor;
-#endif
-
-	return double_to_mame_time(d);
-}
-
-
-
-static mame_time interval(m6847_timing_type timing)
-{
-	mame_time result;
+	attotime result;
 
 	switch(timing)
 	{
 		case M6847_CLOCK:
-			result = make_mame_time(0, m6847->clock_period);
+			result = attotime_make(0, m6847->clock_period);
 			break;
 		case M6847_HSYNC:
-			result = make_mame_time(0, m6847->scanline_period);
+			result = attotime_make(0, m6847->scanline_period);
 			break;
 		default:
 			fatalerror("invalid timing type");
@@ -2061,30 +2011,30 @@ static mame_time interval(m6847_timing_type timing)
 
 UINT64 m6847_time(m6847_timing_type timing)
 {
-	mame_time current_time = mame_timer_get_time();
-	mame_time divisor = interval(timing);
+	attotime current_time = timer_get_time();
+	attotime divisor = interval(timing);
 	return divide_mame_time(current_time, divisor);
 }
 
 
 
-mame_time m6847_time_until(m6847_timing_type timing, UINT64 target_time)
+attotime m6847_time_until(m6847_timing_type timing, UINT64 target_time)
 {
-	mame_time target_mame_time, current_time;
-	target_mame_time = multiply_mame_time(interval(timing), target_time);
-	current_time = mame_timer_get_time();
+	attotime target_mame_time, current_time;
+	target_mame_time = attotime_mul(interval(timing), target_time);
+	current_time = timer_get_time();
 
-	if (compare_mame_times(target_mame_time, current_time) < 0)
+	if (attotime_compare(target_mame_time, current_time) < 0)
 		fatalerror("m6847_time_until(): cannot target past times");
 
-	return sub_mame_times(target_mame_time, current_time);
+	return attotime_sub(target_mame_time, current_time);
 }
 
 
 
-mame_time m6847_scanline_time(int scanline)
+attotime m6847_scanline_time(int scanline)
 {
-	return make_mame_time(0, m6847->scanline_period *
+	return attotime_make(0, m6847->scanline_period *
 			(13 /* FIXME */ + scanline));
 }
 

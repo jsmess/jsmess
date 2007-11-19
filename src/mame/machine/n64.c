@@ -584,11 +584,11 @@ WRITE32_HANDLER( n64_dp_reg_w )
 
 
 // Video Interface
-UINT32 vi_width;
+static UINT32 vi_width;
 UINT32 vi_origin;
 UINT32 vi_control;
-UINT32 vi_burst, vi_vsync, vi_hsync, vi_leap, vi_hstart, vi_vstart;
-UINT32 vi_intr, vi_vburst, vi_xscale, vi_yscale;
+static UINT32 vi_burst, vi_vsync, vi_hsync, vi_leap, vi_hstart, vi_vstart;
+static UINT32 vi_intr, vi_vburst, vi_xscale, vi_yscale;
 
 READ32_HANDLER( n64_vi_reg_r )
 {
@@ -737,7 +737,7 @@ static int ai_dacrate;
 static int ai_bitrate;
 static UINT32 ai_status = 0;
 
-static mame_timer *audio_timer;
+static emu_timer *audio_timer;
 
 #define SOUNDBUFFER_LENGTH	0x20000
 #define AUDIO_DMA_DEPTH		2
@@ -756,7 +756,7 @@ static int audio_fifo_num = 0;
 static void audio_fifo_push(UINT32 address, UINT32 length)
 {
 	AUDIO_DMA *current;
-	mame_time period;
+	attotime period;
 
 	if (audio_fifo_num == AUDIO_DMA_DEPTH)
 	{
@@ -783,8 +783,8 @@ static void audio_fifo_push(UINT32 address, UINT32 length)
 	}
 
 	// adjust the timer
-	period = scale_up_mame_time(MAME_TIME_IN_HZ(DACRATE_NTSC), (ai_dacrate + 1) * (current->length / 4));
-	mame_timer_adjust(audio_timer, period, 0, time_zero);
+	period = attotime_mul(ATTOTIME_IN_HZ(DACRATE_NTSC), (ai_dacrate + 1) * (current->length / 4));
+	timer_adjust(audio_timer, period, 0, attotime_zero);
 }
 
 static void audio_fifo_pop(void)
@@ -1057,8 +1057,8 @@ WRITE32_HANDLER( n64_ri_reg_w )
 }
 
 // Serial Interface
-UINT8 pif_ram[0x40];
-UINT8 pif_cmd[0x40];
+static UINT8 pif_ram[0x40];
+static UINT8 pif_cmd[0x40];
 UINT32 si_dram_addr = 0;
 UINT32 si_pif_addr = 0;
 UINT32 si_status = 0;
@@ -1576,8 +1576,8 @@ void n64_machine_reset(void)
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rdram);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	audio_timer = mame_timer_alloc(audio_timer_callback);
-	mame_timer_adjust(audio_timer, time_never, 0, time_never);
+	audio_timer = timer_alloc(audio_timer_callback);
+	timer_adjust(audio_timer, attotime_never, 0, attotime_never);
 
 	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
 

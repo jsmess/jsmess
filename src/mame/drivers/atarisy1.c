@@ -135,7 +135,7 @@
 static UINT8 joystick_type;
 static UINT8 trackball_type;
 
-static mame_timer *joystick_timer;
+static emu_timer *joystick_timer;
 static UINT8 joystick_int;
 static UINT8 joystick_int_enable;
 static UINT8 joystick_value;
@@ -186,7 +186,7 @@ static MACHINE_RESET( atarisy1 )
 
 	/* reset the joystick parameters */
 	joystick_value = 0;
-	joystick_timer = mame_timer_alloc(delayed_joystick_int);
+	joystick_timer = timer_alloc(delayed_joystick_int);
 	joystick_int = 0;
 	joystick_int_enable = 0;
 }
@@ -228,7 +228,7 @@ static READ16_HANDLER( joystick_r )
 
 	/* clear any existing interrupt and set a timer for a new one */
 	joystick_int = 0;
-	mame_timer_adjust(joystick_timer, MAME_TIME_IN_USEC(50), newval, time_zero);
+	timer_adjust(joystick_timer, ATTOTIME_IN_USEC(50), newval, attotime_zero);
 	atarigen_update_interrupts();
 
 	return joystick_value;

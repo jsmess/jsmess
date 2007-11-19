@@ -156,7 +156,7 @@ static TIMER_CALLBACK( scanline_callback )
 	update_interrupts();
 
 	/* set the timer for the next one */
-	mame_timer_set(double_to_mame_time(mame_time_to_double(video_screen_get_time_until_pos(0, scanline, 0)) - hblank_offset), scanline, scanline_callback);
+	timer_set(double_to_attotime(attotime_to_double(video_screen_get_time_until_pos(0, scanline, 0)) - hblank_offset), scanline, scanline_callback);
 }
 
 
@@ -172,8 +172,8 @@ static MACHINE_RESET( beathead )
 	memcpy(ram_base, rom_base, 0x40);
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
-	hblank_offset = mame_time_to_double(video_screen_get_scan_period(0)) * ((455. - 336. - 25.) / 455.);
-	mame_timer_set(double_to_mame_time(mame_time_to_double(video_screen_get_time_until_pos(0, 0, 0)) - hblank_offset), 0, scanline_callback);
+	hblank_offset = attotime_to_double(video_screen_get_scan_period(0)) * ((455. - 336. - 25.) / 455.);
+	timer_set(double_to_attotime(attotime_to_double(video_screen_get_time_until_pos(0, 0, 0)) - hblank_offset), 0, scanline_callback);
 
 	/* reset IRQs */
 	irq_line_state = CLEAR_LINE;

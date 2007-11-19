@@ -18,8 +18,8 @@
     CONSTANTS
 ##########################################################################*/
 
-#define SOUND_TIMER_RATE			MAME_TIME_IN_USEC(5)
-#define SOUND_TIMER_BOOST			MAME_TIME_IN_USEC(100)
+#define SOUND_TIMER_RATE			ATTOTIME_IN_USEC(5)
+#define SOUND_TIMER_BOOST			ATTOTIME_IN_USEC(100)
 
 
 
@@ -65,7 +65,7 @@ struct atarivc_state_desc atarivc_state;
 ##########################################################################*/
 
 static atarigen_int_callback update_int_callback;
-static mame_timer * scanline_interrupt_timer;
+static emu_timer * scanline_interrupt_timer;
 
 static UINT8 			eeprom_unlocked;
 
@@ -90,8 +90,8 @@ static UINT8			atarivc_playfields;
 static UINT32			playfield_latch;
 static UINT32			playfield2_latch;
 
-static mame_timer *		scanline_timer[ATARIMO_MAX];
-static mame_timer *		atarivc_eof_update_timer[ATARIMO_MAX];
+static emu_timer *		scanline_timer[ATARIMO_MAX];
+static emu_timer *		atarivc_eof_update_timer[ATARIMO_MAX];
 
 
 
@@ -143,10 +143,10 @@ void atarigen_interrupt_reset(atarigen_int_callback update_int)
 
 	/* create timers */
 	for (i = 0; i < ATARIMO_MAX; i++)
-		scanline_timer[i] = mame_timer_alloc(scanline_timer_callback);
+		scanline_timer[i] = timer_alloc(scanline_timer_callback);
 
 	/* create a timer for scanlines */
-	scanline_interrupt_timer = mame_timer_alloc(scanline_interrupt_callback);
+	scanline_interrupt_timer = timer_alloc(scanline_interrupt_callback);
 }
 
 
@@ -170,7 +170,7 @@ void atarigen_update_interrupts(void)
 
 void atarigen_scanline_int_set(int scrnum, int scanline)
 {
-	mame_timer_adjust(scanline_interrupt_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), scrnum, time_zero);
+	timer_adjust(scanline_interrupt_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), scrnum, attotime_zero);
 }
 
 
@@ -274,7 +274,7 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 	atarigen_scanline_int_gen();
 
 	/* set a new timer to go off at the same scan line next frame */
-	mame_timer_adjust(scanline_interrupt_timer, video_screen_get_frame_period(param), param, time_zero);
+	timer_adjust(scanline_interrupt_timer, video_screen_get_frame_period(param), param, attotime_zero);
 }
 
 
@@ -839,7 +839,7 @@ void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_callback update
 
 	/* set a timer to go off at scanline 0 */
 	if (scanline_callback != NULL)
-		mame_timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), (scrnum << 16) | 0, time_zero);
+		timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), (scrnum << 16) | 0, attotime_zero);
 }
 
 
@@ -862,7 +862,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 		scanline += scanlines_per_callback;
 		if (scanline >= machine->screen[scrnum].height)
 			scanline = 0;
-		mame_timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, scanline, 0), (scrnum << 16) | scanline, time_zero);
+		timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, scanline, 0), (scrnum << 16) | scanline, attotime_zero);
 	}
 }
 
@@ -899,7 +899,7 @@ static TIMER_CALLBACK( atarivc_eof_update )
 		tilemap_set_scrollx(atarigen_playfield2_tilemap, 0, atarivc_state.pf1_xscroll);
 		tilemap_set_scrolly(atarigen_playfield2_tilemap, 0, atarivc_state.pf1_yscroll);
 	}
-	mame_timer_adjust(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, time_zero);
+	timer_adjust(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
 
 	/* use this for debugging the video controller values */
 #if 0
@@ -936,11 +936,11 @@ void atarivc_reset(int scrnum, UINT16 *eof_data, int playfields)
 	atarivc_state.latch1 = atarivc_state.latch2 = -1;
 	actual_vc_latch0 = actual_vc_latch1 = -1;
 
-	atarivc_eof_update_timer[scrnum] = mame_timer_alloc(atarivc_eof_update);
+	atarivc_eof_update_timer[scrnum] = timer_alloc(atarivc_eof_update);
 
 	/* start a timer to go off a little before scanline 0 */
 	if (atarivc_eof_data)
-		mame_timer_adjust(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, time_zero);
+		timer_adjust(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
 }
 
 
@@ -1297,7 +1297,7 @@ WRITE16_HANDLER( atarigen_halt_until_hblank_0_w )
 
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)Machine->screen[0].width;
-	mame_timer_set(double_to_mame_time(mame_time_to_double(video_screen_get_scan_period(0)) * fraction), 0, unhalt_cpu);
+	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(0)) * fraction), 0, unhalt_cpu);
 	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
 }
 

@@ -215,7 +215,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN( naughtyb_interrupt )
+static INTERRUPT_GEN( naughtyb_interrupt )
 {
 	if (readinputport(3) & 1)
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);

@@ -38,7 +38,7 @@ struct hd63450
 		unsigned char bfc;  // [39]  Base Function Code (R/W)
 		unsigned char gcr;  // [3f]  General Control Register (R/W)
 	} reg[4];
-	mame_timer* timer[4];  // for timing data reading/writing each channel
+	emu_timer* timer[4];  // for timing data reading/writing each channel
 	int in_progress[4];  // if a channel is in use
 	int transfer_size[4];
 	int halted[4];  // non-zero if a channel has been halted, and can be continued later.

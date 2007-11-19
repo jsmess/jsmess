@@ -65,7 +65,7 @@
 #endif
 
 static TIMER_CALLBACK(mac_scanline_tick);
-static mame_timer *mac_scanline_timer;
+static emu_timer *mac_scanline_timer;
 static int scan_keyboard(void);
 static TIMER_CALLBACK(inquiry_timeout_func);
 static void keyboard_receive(int val);
@@ -267,7 +267,7 @@ static int keyboard_reply;
 static int kbd_comm;
 static int kbd_receive;
 /* timer which is used to time out inquiry */
-static mame_timer *inquiry_timeout;
+static emu_timer *inquiry_timeout;
 
 static int kbd_shift_reg;
 static int kbd_shift_count;
@@ -445,7 +445,7 @@ static void kbd_shift_out(int data)
 	if (kbd_comm == TRUE)
 	{
 		kbd_shift_reg = data;
-		mame_timer_set(MAME_TIME_IN_MSEC(1), 0, kbd_clock);
+		timer_set(ATTOTIME_IN_MSEC(1), 0, kbd_clock);
 	}
 }
 
@@ -456,7 +456,7 @@ static WRITE8_HANDLER(mac_via_out_cb2)
 		/* Mac pulls CB2 down to initiate communication */
 		kbd_comm = TRUE;
 		kbd_receive = TRUE;
-		mame_timer_set(MAME_TIME_IN_USEC(100), 0, kbd_clock);
+		timer_set(ATTOTIME_IN_USEC(100), 0, kbd_clock);
 	}
 	if (kbd_comm == TRUE && kbd_receive == TRUE)
 	{
@@ -491,9 +491,9 @@ static void keyboard_receive(int val)
 		if (keyboard_reply == 0x7B)
 		{	
 			/* if NULL, wait until key pressed or timeout */
-			mame_timer_adjust(inquiry_timeout,
-				make_mame_time(0, DOUBLE_TO_SUBSECONDS(0.25)),
-				0, time_zero);
+			timer_adjust(inquiry_timeout,
+				attotime_make(0, DOUBLE_TO_ATTOSECONDS(0.25)),
+				0, attotime_zero);
 		}
 		break;
 
@@ -1327,10 +1327,10 @@ MACHINE_RESET(mac)
 	mac_set_sound_buffer(0);
 
 	if (mac_model == MODEL_MAC_SE)
-		mame_timer_set(time_zero, 0, set_memory_overlay_callback);
+		timer_set(attotime_zero, 0, set_memory_overlay_callback);
 
-	mac_scanline_timer = mame_timer_alloc(mac_scanline_tick);
-	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_never);
+	mac_scanline_timer = timer_alloc(mac_scanline_tick);
+	timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 
@@ -1365,7 +1365,7 @@ static void mac_driver_init(mac_model_t model)
 	/* setup keyboard */
 	keyboard_init();
 
-	inquiry_timeout = mame_timer_alloc(inquiry_timeout_func);
+	inquiry_timeout = timer_alloc(inquiry_timeout_func);
 
 	cpuintrf_set_dasm_override(0, mac_dasm_override);
 
@@ -1435,7 +1435,7 @@ static void mac_vblank_irq(void)
 
 			logerror("keyboard enquiry successful, keycode %X\n", keycode);
 
-			mame_timer_reset(inquiry_timeout, time_never);
+			timer_reset(inquiry_timeout, attotime_never);
 			kbd_shift_out(keycode);
 		}
 	}
@@ -1474,7 +1474,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 	if (!(scanline % 10))
 		mouse_callback();
 
-	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0, time_never);
+	timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0, attotime_never);
 
 	cpuintrf_pop_context();
 }

@@ -256,7 +256,7 @@ typedef struct {
 	int clock;						/* master clock  (Hz)           */
 	int rate;						/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
-	mame_time TimerBase;			/* Timer base time (==sampling time)*/
+	attotime TimerBase;			/* Timer base time (==sampling time)*/
 } OPL3;
 
 
@@ -1299,7 +1299,7 @@ static void OPL3_initalize(OPL3 *chip)
 	/* logerror("YMF262: freqbase=%f\n", chip->freqbase); */
 
 	/* Timer base time */
-	chip->TimerBase = scale_up_mame_time(MAME_TIME_IN_HZ(chip->clock), 8*36);
+	chip->TimerBase = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 8*36);
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -1726,14 +1726,14 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 				/* timer 2 */
 				if(chip->st[1] != st2)
 				{
-					mame_time period = st2 ? scale_up_mame_time(chip->TimerBase, chip->T[1]) : time_zero;
+					attotime period = st2 ? attotime_mul(chip->TimerBase, chip->T[1]) : attotime_zero;
 					chip->st[1] = st2;
 					if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,1,period);
 				}
 				/* timer 1 */
 				if(chip->st[0] != st1)
 				{
-					mame_time period = st1 ? scale_up_mame_time(chip->TimerBase, chip->T[0]) : time_zero;
+					attotime period = st1 ? attotime_mul(chip->TimerBase, chip->T[0]) : attotime_zero;
 					chip->st[0] = st1;
 					if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,0,period);
 				}
@@ -2255,7 +2255,7 @@ static int OPL3_LockTable(void)
 #ifdef LOG_CYM_FILE
 	cymfile = fopen("ymf262_.cym","wb");
 	if (cymfile)
-		mame_timer_pulse ( MAME_TIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
+		timer_pulse ( ATTOTIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
 	else
 		logerror("Could not create ymf262_.cym file\n");
 #endif
@@ -2450,7 +2450,7 @@ static int OPL3TimerOver(OPL3 *chip,int c)
 		OPL3_STATUS_SET(chip,0x40);
 	}
 	/* reload timer */
-	if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,c,scale_up_mame_time(chip->TimerBase, chip->T[c]));
+	if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,c,attotime_mul(chip->TimerBase, chip->T[c]));
 	return chip->status>>7;
 }
 

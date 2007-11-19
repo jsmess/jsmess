@@ -34,7 +34,7 @@ struct riot6532
 
 	int timer_irq_enable;
 	int timer_irq;
-	mame_timer	*counter_timer;
+	emu_timer	*counter_timer;
 
 	int clock;
 };
@@ -45,7 +45,7 @@ static struct riot6532 r6532[MAX_R6532];
 
 INLINE void r6532_set_timer(int which, UINT8 count)
 {
-	mame_timer_adjust( r6532[which].counter_timer, scale_up_mame_time(MAME_TIME_IN_HZ(r6532[which].clock), (count << r6532[which].shift) + 1), which, time_zero );
+	timer_adjust( r6532[which].counter_timer, attotime_mul(ATTOTIME_IN_HZ(r6532[which].clock), (count << r6532[which].shift) + 1), which, attotime_zero );
 }
 
 
@@ -155,7 +155,7 @@ void r6532_write(int which, offs_t offset, UINT8 data)
 
 INLINE UINT8 r6532_read_timer(int which)
 {
-	int timer_cycles_left = ( mame_time_to_double(mame_timer_timeleft( r6532[which].counter_timer )) * r6532[which].clock ) - 1;
+	int timer_cycles_left = ( attotime_to_double(timer_timeleft( r6532[which].counter_timer )) * r6532[which].clock ) - 1;
 	if ( timer_cycles_left >= 0)
 	{
 		timer_cycles_left = timer_cycles_left >> r6532[which].shift;
@@ -194,7 +194,7 @@ void r6532_set_input_b(int which, UINT8 data)
 
 INLINE UINT8 r6532_read_irq_flags(int which)
 {
-	int timer_cycles_left = ( mame_time_to_double(mame_timer_timeleft( r6532[which].counter_timer )) * r6532[which].clock ) - 1;
+	int timer_cycles_left = ( attotime_to_double(timer_timeleft( r6532[which].counter_timer )) * r6532[which].clock ) - 1;
 	int res = 0;
 
 	if ( timer_cycles_left < 0 )
@@ -286,7 +286,7 @@ void r6532_reset(int which)
 
 	r6532[which].shift = 10;
 
-	r6532[which].counter_timer = mame_timer_alloc(r6532_irq_timer_callback);
+	r6532[which].counter_timer = timer_alloc(r6532_irq_timer_callback);
 
 	r6532_set_timer( which, 0xFF );
 

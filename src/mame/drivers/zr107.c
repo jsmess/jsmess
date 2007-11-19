@@ -250,7 +250,7 @@ static WRITE32_HANDLER( sysreg_w )
 	mame_printf_debug("sysreg_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 }
 
-double adc0838_callback(int input)
+static double adc0838_callback(int input)
 {
 	switch (input)
 	{

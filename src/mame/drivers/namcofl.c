@@ -130,7 +130,7 @@ OSC3: 48.384MHz
 #include "audio/namcoc7x.h"
 
 
-static mame_timer *raster_interrupt_timer;
+static emu_timer *raster_interrupt_timer;
 
 VIDEO_START( namcofl );
 VIDEO_UPDATE( namcofl );
@@ -182,7 +182,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0, time_zero);
+		timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0, attotime_zero);
 	}
 }
 
@@ -314,14 +314,14 @@ GFXDECODE_END
 static TIMER_CALLBACK( network_interrupt_callback )
 {
 	cpunum_set_input_line(0, I960_IRQ0, ASSERT_LINE);
-	mame_timer_set(video_screen_get_frame_period(0), 0, network_interrupt_callback);
+	timer_set(video_screen_get_frame_period(0), 0, network_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpunum_set_input_line(0, I960_IRQ2, ASSERT_LINE);
-	mame_timer_set(video_screen_get_frame_period(0), 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_frame_period(0), 0, vblank_interrupt_callback);
 }
 
 
@@ -329,20 +329,20 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	video_screen_update_partial(0, video_screen_get_vpos(0));
 	cpunum_set_input_line(0, I960_IRQ1, ASSERT_LINE);
-	mame_timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, time_zero);
+	timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, attotime_zero);
 }
 
 
 static MACHINE_START( namcofl )
 {
-	raster_interrupt_timer = mame_timer_alloc(raster_interrupt_callback);
+	raster_interrupt_timer = timer_alloc(raster_interrupt_callback);
 }
 
 
 static MACHINE_RESET( namcofl )
 {
-	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 3, 0), 0, network_interrupt_callback);
-	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 3, 0), 0, network_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
 }
 
 

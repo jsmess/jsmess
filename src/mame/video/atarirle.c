@@ -112,11 +112,11 @@ struct atarirle_data
 UINT16 *atarirle_0_spriteram;
 UINT32 *atarirle_0_spriteram32;
 
-UINT16 *atarirle_0_command;
-UINT32 *atarirle_0_command32;
+//UINT16 *atarirle_0_command;
+//UINT32 *atarirle_0_command32;
 
-UINT16 *atarirle_0_table;
-UINT32 *atarirle_0_table32;
+//UINT16 *atarirle_0_table;
+//UINT32 *atarirle_0_table32;
 
 int atarirle_hilite_index = -1;
 

@@ -11,7 +11,7 @@ typedef struct {
 	UINT8 data;
 	UINT8 control;
 	double time_;
-	mame_timer *timer;
+	emu_timer *timer;
 
 	/* These bytes are used in the timer callback. When the timer callback
 	is executed, the control value is updated with the new data. The mask
@@ -37,7 +37,7 @@ void centronics_config(int nr, CENTRONICS_CONFIG *config)
 {
 	CENTRONICS *This=cent+nr;
 	This->config=config;
-	This->timer = mame_timer_alloc(centronics_timer_callback);
+	This->timer = timer_alloc(centronics_timer_callback);
 }
 
 void centronics_write_data(int nr, UINT8 data)
@@ -72,19 +72,19 @@ static TIMER_CALLBACK(centronics_timer_callback)
 	{
 		This->new_control_mask = CENTRONICS_ACKNOWLEDGE;
 		This->new_control_data = 0;
-		mame_timer_adjust(This->timer, MAME_TIME_IN_USEC(2), nr, time_zero);
+		timer_adjust(This->timer, ATTOTIME_IN_USEC(2), nr, attotime_zero);
 	}
 	/* phase 3: end */
 	else if ( This->control & CENTRONICS_NOT_BUSY )
 	{
-		mame_timer_adjust(This->timer, time_never, nr, time_zero);
+		timer_adjust(This->timer, attotime_never, nr, attotime_zero);
 	}
 	/* phase 1: schedule not busy & ack */
 	else
 	{
 		This->new_control_mask = CENTRONICS_NOT_BUSY | CENTRONICS_ACKNOWLEDGE;
 		This->new_control_data = CENTRONICS_NOT_BUSY | CENTRONICS_ACKNOWLEDGE;
-		mame_timer_adjust(This->timer, MAME_TIME_IN_USEC(15), nr, time_zero);
+		timer_adjust(This->timer, ATTOTIME_IN_USEC(15), nr, attotime_zero);
 	}
 }
 
@@ -102,7 +102,7 @@ void centronics_write_handshake(int nr, int data, int mask)
 			/* schedule busy */
 			This->new_control_mask = CENTRONICS_NOT_BUSY;
 			This->new_control_data = 0;
-			mame_timer_adjust(This->timer, MAME_TIME_IN_USEC(5), nr, time_zero);
+			timer_adjust(This->timer, ATTOTIME_IN_USEC(5), nr, attotime_zero);
 
 			/* output */
 			printer_output(image_from_devtype_and_index(IO_PRINTER, nr), This->data);

@@ -73,7 +73,7 @@ static UINT16 *model2_soundram = NULL;
 
 static UINT32 model2_timervals[4], model2_timerorig[4];
 static int      model2_timerrun[4];
-static mame_timer *model2_timers[4];
+static emu_timer *model2_timers[4];
 static int model2_ctrlmode;
 
 static UINT32 *tgp_program;
@@ -176,7 +176,7 @@ static UINT32 copro_fifoout_pop(void)
 		i960_stall();
 
 		/* spin the main cpu and let the TGP catch up */
-		cpu_spinuntil_time(MAME_TIME_IN_USEC(100));
+		cpu_spinuntil_time(ATTOTIME_IN_USEC(100));
 
 		return 0;
 	}
@@ -283,7 +283,7 @@ static READ32_HANDLER( timers_r )
 	if (model2_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		UINT32 cur = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(model2_timers[offset]), 25000000));
+		UINT32 cur = attotime_to_double(attotime_mul(timer_timeelapsed(model2_timers[offset]), 25000000));
 
 		// subtract units from starting value
 		model2_timervals[offset] = model2_timerorig[offset] - cur;
@@ -294,20 +294,20 @@ static READ32_HANDLER( timers_r )
 
 static WRITE32_HANDLER( timers_w )
 {
-	mame_time period;
+	attotime period;
 
 	i960_noburst();
 	COMBINE_DATA(&model2_timervals[offset]);
 
 	model2_timerorig[offset] = model2_timervals[offset];
-	period = scale_up_mame_time(MAME_TIME_IN_HZ(25000000), model2_timerorig[offset]);
-	mame_timer_adjust(model2_timers[offset], period, 0, time_zero);
+	period = attotime_mul(ATTOTIME_IN_HZ(25000000), model2_timerorig[offset]);
+	timer_adjust(model2_timers[offset], period, 0, attotime_zero);
 	model2_timerrun[offset] = 1;
 }
 
 static void model2_timer_exp(int tnum, int bit)
 {
-	mame_timer_adjust(model2_timers[tnum], time_never, 0, time_never);
+	timer_adjust(model2_timers[tnum], attotime_never, 0, attotime_never);
 
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
@@ -341,15 +341,15 @@ static MACHINE_RESET(model2_common)
 
 	model2_timerrun[0] = model2_timerrun[1] = model2_timerrun[2] = model2_timerrun[3] = 0;
 
-	model2_timers[0] = mame_timer_alloc(model2_timer_0_cb);
-	model2_timers[1] = mame_timer_alloc(model2_timer_1_cb);
-	model2_timers[2] = mame_timer_alloc(model2_timer_2_cb);
-	model2_timers[3] = mame_timer_alloc(model2_timer_3_cb);
+	model2_timers[0] = timer_alloc(model2_timer_0_cb);
+	model2_timers[1] = timer_alloc(model2_timer_1_cb);
+	model2_timers[2] = timer_alloc(model2_timer_2_cb);
+	model2_timers[3] = timer_alloc(model2_timer_3_cb);
 
-	mame_timer_adjust(model2_timers[0], time_never, 0, time_never);
-	mame_timer_adjust(model2_timers[1], time_never, 0, time_never);
-	mame_timer_adjust(model2_timers[2], time_never, 0, time_never);
-	mame_timer_adjust(model2_timers[3], time_never, 0, time_never);
+	timer_adjust(model2_timers[0], attotime_never, 0, attotime_never);
+	timer_adjust(model2_timers[1], attotime_never, 0, attotime_never);
+	timer_adjust(model2_timers[2], attotime_never, 0, attotime_never);
+	timer_adjust(model2_timers[3], attotime_never, 0, attotime_never);
 }
 
 static MACHINE_RESET(model2o)
@@ -658,7 +658,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         {
             logerror("Boot geo, %d dwords\n", model2_geocnt);
             cpunum_set_input_line(3, INPUT_LINE_HALT, CLEAR_LINE);
-            //cpu_spinuntil_time(MAME_TIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
+            //cpu_spinuntil_time(ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
@@ -898,7 +898,7 @@ static int snd_68k_ready_r(void)
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
+		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -909,7 +909,7 @@ static void snd_latch_to_68k_w(int data)
 {
 	while (!snd_68k_ready_r())
 	{
-		cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
+		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
 	}
 
 	to_68k = data;
@@ -917,7 +917,7 @@ static void snd_latch_to_68k_w(int data)
 	cpunum_set_input_line(1, 2, HOLD_LINE);
 
 	// give the 68k time to notice
-	cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
+	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
 }
 
 static READ32_HANDLER( model2_serial_r )
@@ -945,7 +945,7 @@ static WRITE32_HANDLER( model2_serial_w )
 		SCSP_MidiIn(0, data&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
+		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
 	}
 }
 

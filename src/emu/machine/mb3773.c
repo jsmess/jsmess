@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "machine/mb3773.h"
 
-static mame_timer *watchdog_timer;
+static emu_timer *watchdog_timer;
 static UINT8 ck = 0;
 
 static TIMER_CALLBACK( watchdog_timeout )
@@ -19,7 +19,7 @@ static TIMER_CALLBACK( watchdog_timeout )
 
 static void reset_timer( void )
 {
-	mame_timer_adjust( watchdog_timer, MAME_TIME_IN_SEC( 5 ), 0, time_zero );
+	timer_adjust( watchdog_timer, ATTOTIME_IN_SEC( 5 ), 0, attotime_zero );
 }
 
 void mb3773_set_ck( UINT8 new_ck )
@@ -33,7 +33,7 @@ void mb3773_set_ck( UINT8 new_ck )
 
 void mb3773_init( void )
 {
-	watchdog_timer = mame_timer_alloc( watchdog_timeout );
+	watchdog_timer = timer_alloc( watchdog_timeout );
 	reset_timer();
 	state_save_register_global( ck );
 }

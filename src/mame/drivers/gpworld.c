@@ -59,7 +59,7 @@ static laserdisc_info *discinfo;
 
 
 /* VIDEO GOODS */
-void gpworld_draw_tiles(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void gpworld_draw_tiles(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	UINT8 characterX, characterY;
 
@@ -93,7 +93,7 @@ INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y
 	*BITMAP_ADDR32(bitmap, y, x) = color;
 }
 
-void gpworld_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void gpworld_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const int SPR_Y_TOP     = 0;
 	const int SPR_Y_BOTTOM  = 1;
@@ -408,7 +408,7 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	mame_timer_set(MAME_TIME_IN_USEC(100), 0, irq_stop);
+	timer_set(ATTOTIME_IN_USEC(100), 0, irq_stop);
 
 	laserdisc_vsync(discinfo);
 }

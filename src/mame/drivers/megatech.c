@@ -230,7 +230,7 @@ INPUT_PORTS_END
 
 /* MEGATECH specific */
 
-UINT8 mt_cart_select_reg;
+static UINT8 mt_cart_select_reg;
 
 static READ8_HANDLER( megatech_instr_r )
 {
@@ -268,8 +268,8 @@ static WRITE8_HANDLER( z80_unmapped_w )
 	printf("unmapped z80 write %04x\n",offset);
 }
 
-UINT8* sms_mainram;
-UINT8* sms_rom;
+static UINT8* sms_mainram;
+static UINT8* sms_rom;
 
 
 static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
@@ -314,7 +314,7 @@ READ8_HANDLER( md_sms_ioport_dd_r )
 
 
 
-void megatech_set_genz80_as_sms_standard_ports(void)
+static void megatech_set_genz80_as_sms_standard_ports(void)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r);
@@ -339,7 +339,7 @@ void megatech_set_genz80_as_sms_standard_ports(void)
 	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
 }
 
-void megatech_set_genz80_as_sms_standard_map(void)
+static void megatech_set_genz80_as_sms_standard_map(void)
 {
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
@@ -372,7 +372,7 @@ void megatech_set_genz80_as_sms_standard_map(void)
 
 }
 
-void megatech_select_game(int gameno)
+static void megatech_select_game(int gameno)
 {
 	UINT8* game_region;
 	UINT8* bios_region;
@@ -603,7 +603,7 @@ static VIDEO_START(mtnew)
 	init_for_megadrive(); // create an sms vdp too, for comptibility mode
 	video_start_megadriv(Machine);
 }
-//time_never
+//attotime_never
 static VIDEO_UPDATE(mtnew)
 {
 	if (screen ==0)

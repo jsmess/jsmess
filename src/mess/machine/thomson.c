@@ -73,9 +73,9 @@ static void thom_set_irq ( int line, int state )
 
 #if VERBOSE_IRQ
 	if ( !old && thom_irq )
-		logerror( "%f thom_set_irq: irq line up %i\n", mame_time_to_double(mame_timer_get_time()), line );
+		logerror( "%f thom_set_irq: irq line up %i\n", attotime_to_double(timer_get_time()), line );
 	if ( old && !thom_irq )
-		logerror( "%f thom_set_irq: irq line down %i\n", mame_time_to_double(mame_timer_get_time()), line );
+		logerror( "%f thom_set_irq: irq line down %i\n", attotime_to_double(timer_get_time()), line );
 #endif
 
 	cpunum_set_input_line( 0, M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE );
@@ -97,9 +97,9 @@ static void thom_set_firq ( int line, int state )
 	
 #if VERBOSE_IRQ
 	if ( !old && thom_firq )
-		logerror( "%f thom_set_firq: firq line up %i\n", mame_time_to_double(mame_timer_get_time()), line );
+		logerror( "%f thom_set_firq: firq line up %i\n", attotime_to_double(timer_get_time()), line );
 	if ( old && !thom_firq )
-		logerror( "%f thom_set_firq: firq line down %i\n", mame_time_to_double(mame_timer_get_time()), line );
+		logerror( "%f thom_set_firq: firq line down %i\n", attotime_to_double(timer_get_time()), line );
 #endif
 	
 	cpunum_set_input_line( 0, M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE );
@@ -427,7 +427,7 @@ static void to7_lightpen_cb ( int step )
 		return;
 
 #if VERBOSE_VIDEO
-	logerror( "%f to7_lightpen_cb: step=%i\n", mame_time_to_double(mame_timer_get_time()), step );
+	logerror( "%f to7_lightpen_cb: step=%i\n", attotime_to_double(timer_get_time()), step );
 #endif
 	
 	pia_set_input_cb1( THOM_PIA_SYS, 1 );
@@ -446,7 +446,7 @@ static void to7_set_init ( int init )
 	/* INIT signal wired to system PIA 6821 */
 
 #if VERBOSE_VIDEO
-	logerror( "%f to7_set_init: init=%i\n", mame_time_to_double(mame_timer_get_time()), init );
+	logerror( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time()), init );
 #endif
 
 	pia_set_input_ca1( THOM_PIA_SYS, init );
@@ -559,7 +559,7 @@ static void to7_io_ack ( int n, int data, int mask )
 {
 	/* acknowledge from centronics printer to PIA */
 	int ack = (data & CENTRONICS_ACKNOWLEDGE) ? 1 : 0;
-	LOG (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", mame_time_to_double(mame_timer_get_time()), data, ack ));
+	LOG (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", attotime_to_double(timer_get_time()), data, ack ));
 	pia_set_input_cb1( THOM_PIA_IO, ack );
 }
 
@@ -571,7 +571,7 @@ static WRITE8_HANDLER ( to7_io_porta_out )
 	int dtr = ( data & 2 ) ? 1 : 0;
 	
 #if VERBOSE_IO
-	logerror( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), tx, dtr );
+	logerror( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), tx, dtr );
 #endif
 
 	if ( dtr ) 
@@ -597,7 +597,7 @@ static READ8_HANDLER ( to7_io_porta_in )
 		cts = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 1 : 0;
   
 #if VERBOSE_IO
-	logerror( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), to7_io_mode(), cts, dsr, rd );
+	logerror( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_io_mode(), cts, dsr, rd );
 #endif
 	
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
@@ -610,7 +610,7 @@ static WRITE8_HANDLER ( to7_io_portb_out )
 	/* set 8-bit data */
 
 #if VERBOSE_IO      
-	logerror( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data );
+	logerror( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
 #endif
 
 	centronics_write_data( 0, data );
@@ -623,7 +623,7 @@ static WRITE8_HANDLER ( to7_io_cb2_out )
   /* send STROBE to printer */
 
 #if VERBOSE_IO      
-	logerror( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data );
+	logerror( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
 #endif
 
 	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
@@ -637,7 +637,7 @@ static void to7_io_in_callback ( int id, unsigned long state )
 	to7_io_line.input_state = state;
 
 #if VERBOSE_IO
-	logerror( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", mame_time_to_double(mame_timer_get_time()), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) );
+	logerror( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", attotime_to_double(timer_get_time()), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) );
 #endif
 
 }
@@ -838,12 +838,12 @@ WRITE8_HANDLER ( to7_modem_mea8000_w )
 
 
 
-#define TO7_GAME_POLL_PERIOD  MAME_TIME_IN_USEC( 500 )
+#define TO7_GAME_POLL_PERIOD  ATTOTIME_IN_USEC( 500 )
 
 
 
 /* calls to7_game_update_cb periodically */
-static mame_timer* to7_game_timer;
+static emu_timer* to7_game_timer;
 
 static UINT8 to7_game_sound;
 static UINT8 to7_game_mute;
@@ -1008,8 +1008,8 @@ static void to7_game_init ( void )
 {
 	LOG (( "to7_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &to7_game );
-	to7_game_timer = mame_timer_alloc( to7_game_update_cb );
-	mame_timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
+	to7_game_timer = timer_alloc( to7_game_update_cb );
+	timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	state_save_register_global( to7_game_sound );
 	state_save_register_global( to7_game_mute );
 }
@@ -1116,7 +1116,7 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 7:     interrupt */
 #if VERBOSE_MIDI
 		logerror( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n", 
-			  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), to7_midi_status,
+			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_midi_status,
 			  (to7_midi_status & ACIA_6850_RDRF) ? 1 : 0, 
 			  (to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_OVRN) ? 1 : 0, 
@@ -1136,7 +1136,7 @@ READ8_HANDLER ( to7_midi_r )
 		to7_midi_overrun = 0;
 #if VERBOSE_MIDI
 		logerror( "$%04x %f to7_midi_r: read data $%02X\n", 
-			  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data );
+			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
 #endif
 		to7_midi_update_irq();
 		return data;
@@ -1165,7 +1165,7 @@ WRITE8_HANDLER ( to7_midi_w )
 		{
 			/* reset */
 #if VERBOSE_MIDI
-			logerror( "$%04x %f to7_midi_w: reset (data=$%02X)\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data );
+			logerror( "$%04x %f to7_midi_w: reset (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
 #endif
 			to7_midi_overrun = 0;
 			to7_midi_status = 2;
@@ -1184,7 +1184,7 @@ WRITE8_HANDLER ( to7_midi_w )
 				static int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static char parity[8] = { 'e','o','e','o','-','-','e','o' };
 				logerror( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n", 
-					  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()),
+					  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 					  data, 
 					  bits[ (data >> 2) & 7 ],
 					  stop[ (data >> 2) & 7 ],
@@ -1200,7 +1200,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 	case 1: /* output data */
 #if VERBOSE_MIDI
-		logerror( "$%04x %f to7_midi_w: write data $%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data );
+		logerror( "$%04x %f to7_midi_w: write data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
 #endif
 		if ( data == 0x55 ) 
 			/* cable-detect: shortcut */
@@ -1628,7 +1628,7 @@ static void mo5_lightpen_cb ( int step )
 
 
 
-static mame_timer* mo5_periodic_timer;
+static emu_timer* mo5_periodic_timer;
 
 
 
@@ -1644,7 +1644,7 @@ static TIMER_CALLBACK(mo5_periodic_cb)
 static void mo5_init_timer(void)
 {
 	/* time is a faster than 50 Hz to match video framerate */
-	mame_timer_adjust( mo5_periodic_timer, time_zero, 0, MAME_TIME_IN_USEC( 19968 ) );
+	timer_adjust( mo5_periodic_timer, attotime_zero, 0, ATTOTIME_IN_USEC( 19968 ) );
 }
 
 
@@ -1930,7 +1930,7 @@ MACHINE_START ( mo5 )
 	to7_modem_init();
 	to7_midi_init();
 	to7_rf57932_init();
-	mo5_periodic_timer = mame_timer_alloc( mo5_periodic_cb );
+	mo5_periodic_timer = timer_alloc( mo5_periodic_cb );
 	mea8000_config( THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -1969,14 +1969,14 @@ MACHINE_START ( mo5 )
 
 WRITE8_HANDLER ( to9_ieee_w )
 {
-	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data, offset );
+	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data, offset );
 }
 
 
 
 READ8_HANDLER  ( to9_ieee_r )
 {
-	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), offset );
+	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset );
 	return 0;
 }
 
@@ -2103,7 +2103,7 @@ READ8_HANDLER  ( to9_vreg_r )
 WRITE8_HANDLER ( to9_vreg_w )
 {
 #if VERBOSE_VIDEO
-	logerror( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), offset, 0xe7da + offset, data );
+	logerror( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset, 0xe7da + offset, data );
 #endif
 
 	switch ( offset ) 
@@ -2297,11 +2297,11 @@ static void to9_update_ram_bank ( void )
 
 
 /* normal mode: polling interval */
-#define TO9_KBD_POLL_PERIOD  MAME_TIME_IN_MSEC( 10 )
+#define TO9_KBD_POLL_PERIOD  ATTOTIME_IN_MSEC( 10 )
 
 /* peripherial mode: time between two bytes, and after last byte */
-#define TO9_KBD_BYTE_SPACE   MAME_TIME_IN_USEC( 300 )
-#define TO9_KBD_END_SPACE    MAME_TIME_IN_USEC( 9100 )
+#define TO9_KBD_BYTE_SPACE   ATTOTIME_IN_USEC( 300 )
+#define TO9_KBD_END_SPACE    ATTOTIME_IN_USEC( 9100 )
 
 /* first and subsequent repeat periods, in TO9_KBD_POLL_PERIOD units */
 #define TO9_KBD_REPEAT_DELAY  80 /* 800 ms */
@@ -2325,7 +2325,7 @@ static UINT16 to9_kbd_key_count;
 static UINT8  to9_kbd_caps;  /* caps-lock */
 static UINT8  to9_kbd_pad;   /* keypad outputs special codes */
 
-static mame_timer* to9_kbd_timer; 
+static emu_timer* to9_kbd_timer; 
 
 
 
@@ -2386,7 +2386,7 @@ READ8_HANDLER ( to9_kbd_r )
 		/* bit 7:     interrupt */
 #if VERBOSE_KBD
 		logerror( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n", 
-			  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), to9_kbd_status,
+			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to9_kbd_status,
 			  (to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0, 
 			  (to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0, 
@@ -2403,7 +2403,7 @@ READ8_HANDLER ( to9_kbd_r )
 			to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 		to9_kbd_overrun = 0;
 #if VERBOSE_KBD
-		logerror( "$%04x %f to9_kbd_r: read data $%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), to9_kbd_in );
+		logerror( "$%04x %f to9_kbd_r: read data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to9_kbd_in );
 #endif
 		to9_kbd_update_irq();
 		return to9_kbd_in;
@@ -2432,7 +2432,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_status = ACIA_6850_TDRE;
 			to9_kbd_intr = 0;
 #if VERBOSE_KBD
-			logerror( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data );
+			logerror( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
 #endif
 		}
 		else 
@@ -2447,7 +2447,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_intr = data >> 5;
 #if VERBOSE_KBD
 			logerror( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n", 
-				  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), 
+				  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), 
 				  data, to9_kbd_parity, to9_kbd_intr >> 2, 
 				  (to9_kbd_intr & 3) ? 1 : 0 );
 #endif
@@ -2479,13 +2479,13 @@ WRITE8_HANDLER ( to9_kbd_w )
 		case 0xFE: to9_kbd_periph = 0; break;
 
 		default:
-			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data );
+			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
 		}
 
 		thom_set_caps_led( ! to9_kbd_caps );
 
 		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n", 
-		      activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data,
+		      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
 		      to9_kbd_caps, to9_kbd_pad, to9_kbd_periph ));
 
 		break;
@@ -2508,7 +2508,7 @@ static void to9_kbd_send ( UINT8 data, int parity )
 		/* overrun will be set when the current valid byte is read */
 		to9_kbd_overrun = 1;
 #if VERBOSE_KBD
-		logerror( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", mame_time_to_double(mame_timer_get_time()), data, parity );
+		logerror( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", attotime_to_double(timer_get_time()), data, parity );
 #endif
 	}
 	else 
@@ -2521,7 +2521,7 @@ static void to9_kbd_send ( UINT8 data, int parity )
 		else
 			to9_kbd_status |= ACIA_6850_PE;  /* parity error */
 #if VERBOSE_KBD
-		logerror( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", mame_time_to_double(mame_timer_get_time()), data, parity, to9_kbd_status );
+		logerror( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", attotime_to_double(timer_get_time()), data, parity, to9_kbd_status );
 #endif
 	}
 	to9_kbd_update_irq();
@@ -2701,7 +2701,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 		}
 
 		to9_kbd_byte_count = ( to9_kbd_byte_count + 1 ) & 3;
-		mame_timer_adjust( to9_kbd_timer, to9_kbd_byte_count ? TO9_KBD_BYTE_SPACE : TO9_KBD_END_SPACE, 0, time_never );
+		timer_adjust( to9_kbd_timer, to9_kbd_byte_count ? TO9_KBD_BYTE_SPACE : TO9_KBD_END_SPACE, 0, attotime_never );
 	}
 	else 
 	{
@@ -2709,7 +2709,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 		/* keyboard mode: send a byte only if a key is down */
 		if ( key ) 
 			to9_kbd_send( key, 0 );
-		mame_timer_adjust( to9_kbd_timer, TO9_KBD_POLL_PERIOD, 0, time_never );
+		timer_adjust( to9_kbd_timer, TO9_KBD_POLL_PERIOD, 0, attotime_never );
 	}
 }
 
@@ -2729,7 +2729,7 @@ static void to9_kbd_reset ( void )
 	to9_kbd_key_count = 0;
 	to9_kbd_last_key = 0xff;
 	to9_kbd_update_irq();
-	mame_timer_adjust( to9_kbd_timer, TO9_KBD_POLL_PERIOD, 0, time_never );
+	timer_adjust( to9_kbd_timer, TO9_KBD_POLL_PERIOD, 0, attotime_never );
 }
 
 
@@ -2737,7 +2737,7 @@ static void to9_kbd_reset ( void )
 static void to9_kbd_init ( void )
 {
 	LOG(( "to9_kbd_init called\n" ));
-	to9_kbd_timer = mame_timer_alloc( to9_kbd_timer_cb );
+	to9_kbd_timer = timer_alloc( to9_kbd_timer_cb );
 	state_save_register_global( to9_kbd_parity );
 	state_save_register_global( to9_kbd_intr );
 	state_save_register_global( to9_kbd_in );
@@ -2770,7 +2770,7 @@ static void to9_update_centronics ( void )
 
 #if VERBOSE_IO  
 	logerror( "$%04x %f to9_update_centronics: data=$%02X strobe=%i\n",
-		  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data,
+		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
 		  (b & 2) ? 1 : 0 );
 #endif
 }
@@ -2959,14 +2959,14 @@ UINT8 to8_cart_vpage;
 
 
 /* polling interval */
-#define TO8_KBD_POLL_PERIOD  MAME_TIME_IN_MSEC( 1 )
+#define TO8_KBD_POLL_PERIOD  ATTOTIME_IN_MSEC( 1 )
 
 /* first and subsequent repeat periods, in TO8_KBD_POLL_PERIOD units */
 #define TO8_KBD_REPEAT_DELAY  800 /* 800 ms */
 #define TO8_KBD_REPEAT_PERIOD  70 /*  70 ms */
 
 /* timeout waiting for CPU */
-#define TO8_KBD_TIMEOUT  MAME_TIME_IN_MSEC( 100 )
+#define TO8_KBD_TIMEOUT  ATTOTIME_IN_MSEC( 100 )
 
 
 
@@ -2978,8 +2978,8 @@ static UINT8  to8_kbd_last_key;  /* last key (for repetition) */
 static UINT32 to8_kbd_key_count; /* keypress time (for repetition)  */
 static UINT8  to8_kbd_caps;      /* caps lock */
 
-static mame_timer* to8_kbd_timer;   /* bit-send */
-static mame_timer* to8_kbd_signal;  /* signal from CPU */
+static emu_timer* to8_kbd_timer;   /* bit-send */
+static emu_timer* to8_kbd_signal;  /* signal from CPU */
 
 
 
@@ -3083,10 +3083,10 @@ static int to8_kbd_get_key( void )
 /* keyboard automaton */
 static TIMER_CALLBACK(to8_kbd_timer_cb)
 {
-	mame_time d;
+	attotime d;
 
 #if VERBOSE_KBD
-	logerror( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", mame_time_to_double(mame_timer_get_time()), to8_kbd_step, to8_kbd_ack, to8_kbd_data );
+	logerror( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", attotime_to_double(timer_get_time()), to8_kbd_step, to8_kbd_ack, to8_kbd_data );
 #endif
 
 	if( ! to8_kbd_step ) 
@@ -3110,7 +3110,7 @@ static TIMER_CALLBACK(to8_kbd_timer_cb)
 #endif
 			to8_kbd_data = k;
 			to8_kbd_step = 1;
-			d = MAME_TIME_IN_USEC( 100 );
+			d = ATTOTIME_IN_USEC( 100 );
 		}
 	}
 	else if ( to8_kbd_step == 255 ) 
@@ -3140,7 +3140,7 @@ static TIMER_CALLBACK(to8_kbd_timer_cb)
 	{
 		/* send silence between bits */
 		mc6846_set_input_cp1( 0 );
-		d = MAME_TIME_IN_USEC( 100 );
+		d = ATTOTIME_IN_USEC( 100 );
 		to8_kbd_step++;
 	}
 	else 
@@ -3149,10 +3149,10 @@ static TIMER_CALLBACK(to8_kbd_timer_cb)
 		int bpos = 8 - ( (to8_kbd_step - 100) / 2);
 		int bit = (to8_kbd_data >> bpos) & 1;
 		mc6846_set_input_cp1( 1 );
-		d = MAME_TIME_IN_USEC( bit ? 56 : 38 );
+		d = ATTOTIME_IN_USEC( bit ? 56 : 38 );
 		to8_kbd_step++;
 	}
-	mame_timer_adjust( to8_kbd_timer, d, 0, time_never );
+	timer_adjust( to8_kbd_timer, d, 0, attotime_never );
 }
 
 
@@ -3166,36 +3166,36 @@ static void to8_kbd_set_ack ( int data )
  
 	if ( data ) 
 	{
-		double len = mame_time_to_double(mame_timer_timeelapsed( to8_kbd_signal )) * 1000. - 2.;
+		double len = attotime_to_double(timer_timeelapsed( to8_kbd_signal )) * 1000. - 2.;
 #if VERBOSE_KBD
-		logerror( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", mame_time_to_double(mame_timer_get_time()), len );
+		logerror( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", attotime_to_double(timer_get_time()), len );
 #endif
 		if ( to8_kbd_data == 0xfff ) 
 		{
 			/* end signal from CPU */
 			if ( len >= 0.6 && len <= 0.8 ) 
 			{
-				LOG (( "%f to8_kbd_set_ack: INIT signal\n", mame_time_to_double(mame_timer_get_time()) ));
+				LOG (( "%f to8_kbd_set_ack: INIT signal\n", attotime_to_double(timer_get_time()) ));
 				to8_kbd_last_key = 0xff;
 				to8_kbd_key_count = 0;
 				to8_kbd_caps = 1;
 				/* send back signal: TODO returned codes ? */
 				to8_kbd_data = 0;
 				to8_kbd_step = 0;
-				mame_timer_adjust( to8_kbd_timer, MAME_TIME_IN_MSEC( 1 ), 0, time_never );
+				timer_adjust( to8_kbd_timer, ATTOTIME_IN_MSEC( 1 ), 0, attotime_never );
 			}
 			else 
 			{
 				to8_kbd_step = 0;
-				mame_timer_adjust( to8_kbd_timer, TO8_KBD_POLL_PERIOD, 0, time_never );
+				timer_adjust( to8_kbd_timer, TO8_KBD_POLL_PERIOD, 0, attotime_never );
 				if ( len >= 1.2 && len <= 1.4 ) 
 				{
-					LOG (( "%f to8_kbd_set_ack: CAPS on signal\n", mame_time_to_double(mame_timer_get_time()) ));
+					LOG (( "%f to8_kbd_set_ack: CAPS on signal\n", attotime_to_double(timer_get_time()) ));
 					to8_kbd_caps = 1;
 				}
 				else if ( len >= 1.8 && len <= 2.0 ) 
 				{
-					LOG (( "%f to8_kbd_set_ack: CAPS off signal\n", mame_time_to_double(mame_timer_get_time()) ));
+					LOG (( "%f to8_kbd_set_ack: CAPS off signal\n", attotime_to_double(timer_get_time()) ));
 					to8_kbd_caps = 0;
 				}
 			}
@@ -3205,7 +3205,7 @@ static void to8_kbd_set_ack ( int data )
 		{
 			/* end key transmission */
 			to8_kbd_step = 0;
-			mame_timer_adjust( to8_kbd_timer, TO8_KBD_POLL_PERIOD, 0, time_never );
+			timer_adjust( to8_kbd_timer, TO8_KBD_POLL_PERIOD, 0, attotime_never );
 		}
 	}
 
@@ -3215,18 +3215,18 @@ static void to8_kbd_set_ack ( int data )
 		{
 			/* CPU accepts key */
 			to8_kbd_step = 99;
-			mame_timer_adjust( to8_kbd_timer, MAME_TIME_IN_USEC( 400 ), 0, time_never );
+			timer_adjust( to8_kbd_timer, ATTOTIME_IN_USEC( 400 ), 0, attotime_never );
 		}
 		else 
 		{
 			/* start signal from CPU */
 			to8_kbd_data = 0xfff;
 			to8_kbd_step = 91;
-			mame_timer_adjust( to8_kbd_timer, MAME_TIME_IN_USEC( 400 ), 0, time_never );
-			mame_timer_adjust( to8_kbd_signal, time_never, 0, time_never );
+			timer_adjust( to8_kbd_timer, ATTOTIME_IN_USEC( 400 ), 0, attotime_never );
+			timer_adjust( to8_kbd_signal, attotime_never, 0, attotime_never );
 		}
 #if VERBOSE_KBD
-		logerror( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", mame_time_to_double(mame_timer_get_time()), to8_kbd_data );
+		logerror( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", attotime_to_double(timer_get_time()), to8_kbd_data );
 #endif
 	}
 }
@@ -3249,8 +3249,8 @@ static void to8_kbd_reset ( void )
 
 static void to8_kbd_init ( void )
 {
-	to8_kbd_timer = mame_timer_alloc( to8_kbd_timer_cb );
-	to8_kbd_signal = mame_timer_alloc( NULL );
+	to8_kbd_timer = timer_alloc( to8_kbd_timer_cb );
+	to8_kbd_signal = timer_alloc( NULL );
 	state_save_register_global( to8_kbd_ack );
 	state_save_register_global( to8_kbd_data );
 	state_save_register_global( to8_kbd_step );
@@ -3543,7 +3543,7 @@ READ8_HANDLER  ( to8_gatearray_r )
 
 #if VERBOSE_VIDEO
 	logerror( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()),
+		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 		  offset, 0xe7e4 + offset, res, to7_lightpen );
 #endif
 
@@ -3556,7 +3556,7 @@ WRITE8_HANDLER ( to8_gatearray_w )
 {
 #if VERBOSE_VIDEO
 	logerror( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",  
-		  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()),
+		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 		  offset, 0xe7e4 + offset, data );
 #endif
 
@@ -3639,7 +3639,7 @@ WRITE8_HANDLER ( to8_vreg_w )
 {
 #if VERBOSE_VIDEO
 	logerror( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",  
-		  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()),
+		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 		  offset, 0xe7da + offset, data );
 #endif
 
@@ -3697,7 +3697,7 @@ static READ8_HANDLER ( to8_sys_porta_in )
 	int ktest = to8_kbd_ktest ();
 
 #if VERBOSE_KBD
-	logerror( "$%04x %f: to8_sys_porta_in ktest=%i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), ktest );
+	logerror( "$%04x %f: to8_sys_porta_in ktest=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), ktest );
 #endif
 
 	return ktest;
@@ -4218,7 +4218,7 @@ WRITE8_HANDLER ( mo6_ext_w )
 static WRITE8_HANDLER ( mo6_game_porta_out )
 {
 	/* centronics data */
-	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data ));
+	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 	centronics_write_data( 0, data );
 }
 
@@ -4228,7 +4228,7 @@ static READ8_HANDLER ( mo6_game_cb1_in )
 {
 	int dtr = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 0 : 1;
 	/* note: printer busy signal replaces button */
-	LOG (( "$%04x %f mo6_game_cb1_in: CENTRONICS get dtr=%i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), dtr ));
+	LOG (( "$%04x %f mo6_game_cb1_in: CENTRONICS get dtr=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), dtr ));
 	return dtr;
 }
 
@@ -4237,7 +4237,7 @@ static READ8_HANDLER ( mo6_game_cb1_in )
 static WRITE8_HANDLER ( mo6_game_cb2_out )
 {
 	/* centronics strobe */
-	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data ));
+	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0, 
 				    CENTRONICS_STROBE );
 }
@@ -4278,8 +4278,8 @@ static void mo6_game_init ( void )
 {
 	LOG (( "mo6_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &mo6_game );
-	to7_game_timer = mame_timer_alloc( mo6_game_update_cb );
-	mame_timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
+	to7_game_timer = timer_alloc( mo6_game_update_cb );
+	timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	state_save_register_global( to7_game_sound );
 	state_save_register_global( to7_game_mute );
 }
@@ -4423,7 +4423,7 @@ READ8_HANDLER  ( mo6_gatearray_r )
 
 #if VERBOSE_VIDEO
 	logerror( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()),
+		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 		  offset, 0xa7e4 + offset, res, to7_lightpen );
 #endif
 
@@ -4436,7 +4436,7 @@ WRITE8_HANDLER ( mo6_gatearray_w )
 {
 #if VERBOSE_VIDEO
 	logerror( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",  
-		  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()),
+		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 		  offset, 0xa7e4 + offset, data );
 #endif
 
@@ -4505,7 +4505,7 @@ WRITE8_HANDLER ( mo6_vreg_w )
 {
 #if VERBOSE_VIDEO
 	logerror( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",  
-		  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()),
+		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 		  offset, 0xa7da + offset, data );
 #endif
 
@@ -4607,7 +4607,7 @@ MACHINE_START ( mo6 )
 	to7_modem_init();
 	to7_midi_init();
 	to7_rf57932_init();
-	mo5_periodic_timer = mame_timer_alloc( mo5_periodic_cb );
+	mo5_periodic_timer = timer_alloc( mo5_periodic_cb );
 	mea8000_config( THOM_SOUND_SPEECH, NULL );
   
 	/* memory */
@@ -4660,7 +4660,7 @@ READ8_HANDLER ( mo5nr_net_r )
 	if ( to7_controller_type ) 
 		return to7_floppy_r ( offset );
 
-	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), offset );
+	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset );
 
 	if ( to7_controller_type ) 
 		return to7_floppy_r ( offset );
@@ -4676,7 +4676,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 		to7_floppy_w ( offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
-			  activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), data, offset );
+			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data, offset );
 }
 
 
@@ -4704,7 +4704,7 @@ READ8_HANDLER ( mo5nr_prn_r )
 			return 0x80;
 
 	default:
-		logerror( "$%04x %f mo5nr_prn_r: unhandled read from reg %i\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), offset );  
+		logerror( "$%04x %f mo5nr_prn_r: unhandled read from reg %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset );  
 		return 0;
 	}
 }
@@ -4726,7 +4726,7 @@ WRITE8_HANDLER ( mo5nr_prn_w )
 		break;
 
 	default:
-		logerror( "$%04x %f mo5nr_prn_w: unhandled to reg %i (data=$%02X)\n", activecpu_get_previouspc(), mame_time_to_double(mame_timer_get_time()), offset, data );
+		logerror( "$%04x %f mo5nr_prn_w: unhandled to reg %i (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset, data );
 	}
 }
 
@@ -4792,8 +4792,8 @@ static void mo5nr_game_init ( void )
 {
 	LOG (( "mo5nr_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &mo5nr_game );
-	to7_game_timer = mame_timer_alloc( mo6_game_update_cb );
-	mame_timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
+	to7_game_timer = timer_alloc( mo6_game_update_cb );
+	timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	state_save_register_global( to7_game_sound );
 	state_save_register_global( to7_game_mute );
 }
@@ -4874,7 +4874,7 @@ MACHINE_START ( mo5nr )
 	to7_modem_init();
 	to7_midi_init();
 	to7_rf57932_init();
-	mo5_periodic_timer = mame_timer_alloc( mo5_periodic_cb );
+	mo5_periodic_timer = timer_alloc( mo5_periodic_cb );
 	mea8000_config( THOM_SOUND_SPEECH, NULL );
   
 	/* memory */

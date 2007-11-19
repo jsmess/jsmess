@@ -818,7 +818,7 @@ static UINT16 irq_timera;
 static UINT8  irq_timerb;
 static UINT8  irq_allow0, irq_allow1;
 static int    irq_timer_pend0, irq_timer_pend1, irq_yms;
-static mame_timer *irq_timer;
+static emu_timer *irq_timer;
 
 static TIMER_CALLBACK( irq_timer_cb )
 {
@@ -837,7 +837,7 @@ static void irq_init(void)
 	irq_allow1 = 0;
 	irq_timer_pend0 = 0;
 	irq_timer_pend1 = 0;
-	irq_timer = mame_timer_alloc(irq_timer_cb);
+	irq_timer = timer_alloc(irq_timer_cb);
 }
 
 static void irq_timer_reset(void)
@@ -845,7 +845,7 @@ static void irq_timer_reset(void)
 	int freq = (irq_timerb << 12) | irq_timera;
 	freq &= 0x1fff;
 
-	mame_timer_adjust(irq_timer, MAME_TIME_IN_HZ(freq), 0, MAME_TIME_IN_HZ(freq));
+	timer_adjust(irq_timer, ATTOTIME_IN_HZ(freq), 0, ATTOTIME_IN_HZ(freq));
 	logerror("New timer frequency: %0d [%02x %04x]\n", freq, irq_timerb, irq_timera);
 }
 
@@ -912,7 +912,7 @@ static READ16_HANDLER(irq_r)
 			/* set a timer to generate an irq at the needed point */
 			if (ggground_kludge == 1)
 			{
-				mame_timer_set(MAME_TIME_IN_USEC(180000), 0, gground_generate_kludge_irq);
+				timer_set(ATTOTIME_IN_USEC(180000), 0, gground_generate_kludge_irq);
 				ggground_kludge = 0;
 			}
 			return 1;
@@ -936,7 +936,7 @@ static READ16_HANDLER(irq_r)
 			/* set a timer to generate an irq at the needed point */
 			if (ggground_kludge == 1)
 			{
-				mame_timer_set(MAME_TIME_IN_USEC(180000), 0, gground_generate_kludge_irq);
+				timer_set(ATTOTIME_IN_USEC(180000), 0, gground_generate_kludge_irq);
 				ggground_kludge = 0;
 			}
 			return 1;
@@ -2375,7 +2375,7 @@ static MACHINE_DRIVER_START( system24 )
 	MDRV_CPU_PROGRAM_MAP(system24_cpu2_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(100))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
 	MDRV_INTERLEAVE(4)
 
 	MDRV_MACHINE_RESET(system24)

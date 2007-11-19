@@ -262,7 +262,7 @@ UINT16 cdp1869_get_cma(UINT16 offset)
 	return addr;
 }
 
-UINT8 cdp1869_read_pageram(UINT16 addr)
+static UINT8 cdp1869_read_pageram(UINT16 addr)
 {
 	if (addr >= cdp1869.pramsize)
 	{
@@ -274,6 +274,7 @@ UINT8 cdp1869_read_pageram(UINT16 addr)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 UINT8 cdp1869_read_charram(UINT16 addr)
 {
 	if (addr >= cdp1869.cramsize)
@@ -285,6 +286,7 @@ UINT8 cdp1869_read_charram(UINT16 addr)
 		return cdp1869.cram[addr];
 	}
 }
+#endif
 
 WRITE8_HANDLER ( cdp1869_charram_w )
 {

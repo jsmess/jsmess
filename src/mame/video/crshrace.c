@@ -4,7 +4,7 @@
 
 
 UINT16 *crshrace_videoram1,*crshrace_videoram2;
-UINT16 *crshrace_roz_ctrl1,*crshrace_roz_ctrl2;
+//UINT16 *crshrace_roz_ctrl1,*crshrace_roz_ctrl2;
 
 static int roz_bank,gfxctrl,flipscreen;
 

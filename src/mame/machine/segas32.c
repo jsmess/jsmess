@@ -12,7 +12,7 @@
 
 #define xxxx 0x00
 
-const UINT8 ga2_v25_opcode_table[256] = {
+static const UINT8 ga2_v25_opcode_table[256] = {
      xxxx,xxxx,0xEA,xxxx,xxxx,0x8B,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,
      xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xFA,
      xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x49,xxxx,xxxx,xxxx,
@@ -33,7 +33,7 @@ const UINT8 ga2_v25_opcode_table[256] = {
 
 #undef xxxx
 
-void nec_v25_cpu_decrypt(void)
+static void nec_v25_cpu_decrypt(void)
 {
 	int i;
 	UINT8 *rom = memory_region(REGION_CPU3);

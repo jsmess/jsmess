@@ -304,7 +304,7 @@ static void toaplan1_spritevram_alloc(void)
 	spriteram_size = TOAPLAN1_SPRITERAM_SIZE;
 }
 
-void toaplan1_set_scrolls(void)
+static void toaplan1_set_scrolls(void)
 {
 	tilemap_set_scrollx(pf1_tilemap,0,(pf1_scrollx >> 7) - (tiles_offsetx - scrollx_offs1));
 	tilemap_set_scrollx(pf2_tilemap,0,(pf2_scrollx >> 7) - (tiles_offsetx - scrollx_offs2));
@@ -316,12 +316,12 @@ void toaplan1_set_scrolls(void)
 	tilemap_set_scrolly(pf4_tilemap,0,(pf4_scrolly >> 7) - (tiles_offsety - scrolly_offs));
 }
 
-void rallybik_flipscreen(void)
+static void rallybik_flipscreen(void)
 {
 	rallybik_bcu_flipscreen_w(0, bcu_flipscreen, 0);
 }
 
-void toaplan1_flipscreen(void)
+static void toaplan1_flipscreen(void)
 {
 	toaplan1_bcu_flipscreen_w(0, bcu_flipscreen, 0);
 }

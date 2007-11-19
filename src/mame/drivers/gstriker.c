@@ -176,8 +176,8 @@ VSIS-20V3
 ******************************************************************************/
 
 
-UINT16 *gs_videoram3;
-UINT16 *gs_mixer_regs;
+//UINT16 *gs_videoram3;
+static UINT16 *gs_mixer_regs;
 
 /* in video */
 VIDEO_UPDATE( gstriker );
@@ -446,7 +446,7 @@ static MACHINE_DRIVER_START( gstriker )
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(5000) /* hand-tuned, it needs a bit */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000) /* hand-tuned, it needs a bit */)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_AFTER_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

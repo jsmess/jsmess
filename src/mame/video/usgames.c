@@ -3,7 +3,7 @@
 UINT8 *usg_videoram,*usg_charram;
 
 
-tilemap *usg_tilemap;
+static tilemap *usg_tilemap;
 
 
 

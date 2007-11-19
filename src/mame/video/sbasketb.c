@@ -8,7 +8,7 @@
 
 #include "driver.h"
 
-UINT8 *sbasketb_scroll;
+//UINT8 *sbasketb_scroll;
 UINT8 *sbasketb_palettebank;
 UINT8 *sbasketb_spriteram_select;
 

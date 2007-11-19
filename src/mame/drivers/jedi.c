@@ -129,7 +129,7 @@ static UINT8 speech_write_buffer;
 static UINT8 speech_strobe_state;
 static UINT8 nvram_enabled;
 
-static mame_timer *jedi_timer;
+static emu_timer *jedi_timer;
 
 
 /*************************************
@@ -150,7 +150,7 @@ static TIMER_CALLBACK( generate_interrupt )
 	scanline += 32;
 	if (scanline > 256)
 		scanline = 32;
-	mame_timer_adjust(jedi_timer,video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(jedi_timer,video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
@@ -169,8 +169,8 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 static MACHINE_START( jedi )
 {
 	/* set a timer to run the interrupts */
-	jedi_timer = mame_timer_alloc(generate_interrupt);
-	mame_timer_adjust(jedi_timer,video_screen_get_time_until_pos(0, 32, 0), 32, time_zero);
+	jedi_timer = timer_alloc(generate_interrupt);
+	timer_adjust(jedi_timer,video_screen_get_time_until_pos(0, 32, 0), 32, attotime_zero);
 
 	/* configure the banks */
 	memory_configure_bank(1, 0, 3, memory_region(REGION_CPU1) + 0x10000, 0x4000);

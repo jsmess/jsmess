@@ -177,7 +177,7 @@ int rockola_music0_playing(void);
 
 /* binary counter (1.4MHz update) */
 static UINT8 sasuke_counter;
-static mame_timer *sasuke_timer;
+static emu_timer *sasuke_timer;
 
 static TIMER_CALLBACK( sasuke_update_counter )
 {
@@ -188,8 +188,8 @@ static void sasuke_start_counter(void)
 {
 	sasuke_counter = 0;
 
-	sasuke_timer = mame_timer_alloc(sasuke_update_counter);
-	mame_timer_adjust(sasuke_timer, time_zero, 0, MAME_TIME_IN_HZ(11289000/8));	// 1.4 MHz
+	sasuke_timer = timer_alloc(sasuke_update_counter);
+	timer_adjust(sasuke_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11289000/8));	// 1.4 MHz
 }
 
 

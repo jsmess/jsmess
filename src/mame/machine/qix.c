@@ -271,7 +271,7 @@ static TIMER_CALLBACK( vblank_stop )
 INTERRUPT_GEN( qix_vblank_start )
 {
 	pia_3_cb1_w(0, 1);
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, vblank_stop);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, vblank_stop);
 }
 
 
@@ -427,7 +427,7 @@ static WRITE8_HANDLER( qixmcu_coinctrl_w )
 		cpunum_set_input_line(3, M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
-		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
 	}
 	else
 		cpunum_set_input_line(3, M68705_IRQ_LINE, CLEAR_LINE);

@@ -112,7 +112,7 @@
 static UINT8 *nvram_stage;
 static const UINT8 *syncprom;
 static UINT8 irq_state;
-static mame_timer *irq_timer;
+static emu_timer *irq_timer;
 
 int cloud9_vblank_start;
 int cloud9_vblank_end;
@@ -131,7 +131,7 @@ INLINE void schedule_next_irq(int curscanline)
 	curscanline = (curscanline + 64) & 255;
 
 	/* next one at the start of this scanline */
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, curscanline, 0), curscanline, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, curscanline, 0), curscanline, attotime_zero);
 }
 
 
@@ -193,10 +193,10 @@ static MACHINE_START( cloud9 )
 	visarea.max_x = 255;
 	visarea.min_y = cloud9_vblank_end + 1;
 	visarea.max_y = cloud9_vblank_start;
-	video_screen_configure(0, 320, 256, &visarea, HZ_TO_SUBSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	video_screen_configure(0, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = mame_timer_alloc(clock_irq);
+	irq_timer = timer_alloc(clock_irq);
 	irq_state = 0;
 	schedule_next_irq(0-64);
 

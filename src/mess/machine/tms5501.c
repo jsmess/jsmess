@@ -89,7 +89,7 @@ typedef struct tms5501_t
 
 	/* internal timers */
 	UINT8 timer_counter[5];
-	mame_timer * timer[5];
+	emu_timer * timer[5];
 	double clock_rate;
 } tms5501_t;
 
@@ -195,7 +195,7 @@ static void tms5501_timer_reload(int which, int timer)
 {
 	if (tms5501[which].timer_counter[timer])
 	{	/* reset clock interval */
-		mame_timer_adjust(tms5501[which].timer[timer], double_to_mame_time((double) tms5501[which].timer_counter[0] / (tms5501[which].clock_rate / 128.)), which, double_to_mame_time((double) tms5501[which].timer_counter[timer] / (tms5501[which].clock_rate / 128.)));
+		timer_adjust(tms5501[which].timer[timer], double_to_attotime((double) tms5501[which].timer_counter[0] / (tms5501[which].clock_rate / 128.)), which, double_to_attotime((double) tms5501[which].timer_counter[timer] / (tms5501[which].clock_rate / 128.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */
@@ -207,7 +207,7 @@ static void tms5501_timer_reload(int which, int timer)
 			case 3: tms5501_timer_3_decrementer_callback(Machine, which); break;
 			case 4: tms5501_timer_4_decrementer_callback(Machine, which); break;
 		}
-		mame_timer_enable(tms5501[which].timer[timer], 0);
+		timer_enable(tms5501[which].timer[timer], 0);
 	}
 }
 
@@ -223,7 +223,7 @@ static void tms5501_reset (int which)
 	for (i=0; i<5; i++)
 	{
 		tms5501[which].timer_counter[i] = 0;
-		mame_timer_enable(tms5501[which].timer[i], 0);
+		timer_enable(tms5501[which].timer[i], 0);
 	}
 
 	LOG_TMS5501(which, "Reset", 0);
@@ -232,11 +232,11 @@ static void tms5501_reset (int which)
 void tms5501_init (int which, const tms5501_init_param *param)
 {
 	tms5501[which].clock_rate = param->clock_rate;
-	tms5501[which].timer[0] = mame_timer_alloc(tms5501_timer_0_decrementer_callback);
-	tms5501[which].timer[1] = mame_timer_alloc(tms5501_timer_1_decrementer_callback);
-	tms5501[which].timer[2] = mame_timer_alloc(tms5501_timer_2_decrementer_callback);
-	tms5501[which].timer[3] = mame_timer_alloc(tms5501_timer_3_decrementer_callback);
-	tms5501[which].timer[4] = mame_timer_alloc(tms5501_timer_4_decrementer_callback);
+	tms5501[which].timer[0] = timer_alloc(tms5501_timer_0_decrementer_callback);
+	tms5501[which].timer[1] = timer_alloc(tms5501_timer_1_decrementer_callback);
+	tms5501[which].timer[2] = timer_alloc(tms5501_timer_2_decrementer_callback);
+	tms5501[which].timer[3] = timer_alloc(tms5501_timer_3_decrementer_callback);
+	tms5501[which].timer[4] = timer_alloc(tms5501_timer_4_decrementer_callback);
 
 	tms5501[which].pio_read_callback = param->pio_read_callback;
 	tms5501[which].pio_write_callback = param->pio_write_callback;
@@ -267,7 +267,7 @@ void tms5501_cleanup (int which)
 	{
 		if (tms5501[which].timer[i])
 		{
-			mame_timer_reset(tms5501[which].timer[i], time_never);	/* FIXME - timers should only be allocated once */
+			timer_reset(tms5501[which].timer[i], attotime_never);	/* FIXME - timers should only be allocated once */
 			tms5501[which].timer[i] = NULL;
 		}
 	}

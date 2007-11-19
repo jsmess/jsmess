@@ -113,7 +113,7 @@ MACHINE_RESET( mhavoc )
 	gamma_irq_clock = 0;
 
 	/* set a timer going for the CPU interrupt generators */
-	mame_timer_pulse(MAME_TIME_IN_HZ(MHAVOC_CLOCK_5K), 0, cpu_irq_clock);
+	timer_pulse(ATTOTIME_IN_HZ(MHAVOC_CLOCK_5K), 0, cpu_irq_clock);
 
 	state_save_register_item("misc", 0, alpha_data);
 	state_save_register_item("misc", 0, alpha_rcvd);
@@ -146,7 +146,7 @@ static TIMER_CALLBACK( delayed_gamma_w )
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
-	mame_timer_set(MAME_TIME_IN_USEC(250), 0, 0);
+	timer_set(ATTOTIME_IN_USEC(250), 0, 0);
 }
 
 

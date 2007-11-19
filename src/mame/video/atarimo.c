@@ -136,7 +136,7 @@ UINT16 *atarimo_1_slipram;
 ##########################################################################*/
 
 static struct atarimo_data atarimo[ATARIMO_MAX];
-static mame_timer *force_update_timer;
+static emu_timer *force_update_timer;
 
 
 /*##########################################################################
@@ -244,7 +244,7 @@ INLINE void init_gfxelement(running_machine *machine, struct atarimo_data *mo, i
 }
 
 static struct atarimo_data atarimo[ATARIMO_MAX];
-static mame_timer *force_update_timer;
+static emu_timer *force_update_timer;
 
 /*---------------------------------------------------------------
     init_savestate: Initialize save states
@@ -323,7 +323,7 @@ static TIMER_CALLBACK( force_update )
 	scanline += 64;
 	if (scanline >= machine->screen[0].visarea.max_y)
 		scanline = 0;
-	mame_timer_adjust(force_update_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(force_update_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 /*---------------------------------------------------------------
@@ -444,8 +444,8 @@ void atarimo_init(running_machine *machine, int map, const struct atarimo_desc *
 	init_gfxelement(machine, mo, desc->gfxindex);
 
 	/* start a timer to update a few times during refresh */
-	force_update_timer = mame_timer_alloc(force_update);
-	mame_timer_adjust(force_update_timer,video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+	force_update_timer = timer_alloc(force_update);
+	timer_adjust(force_update_timer,video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 
 	init_savestate(map, mo);
 

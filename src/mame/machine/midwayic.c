@@ -49,7 +49,7 @@ struct serial_state
 struct pic_state
 {
 	UINT16	latch;
-	mame_time latch_expire_time;
+	attotime latch_expire_time;
 	UINT8	state;
 	UINT8	index;
 	UINT8	total;
@@ -61,7 +61,7 @@ struct pic_state
 	UINT8	time_index;
 	UINT8	time_just_written;
 	UINT16	yearoffs;
-	mame_timer *time_write_timer;
+	emu_timer *time_write_timer;
 };
 
 struct ioasic_state
@@ -265,7 +265,7 @@ static void pic_register_state(void)
 {
 	state_save_register_global(pic.latch);
 	state_save_register_global(pic.latch_expire_time.seconds);
-	state_save_register_global(pic.latch_expire_time.subseconds);
+	state_save_register_global(pic.latch_expire_time.attoseconds);
 	state_save_register_global(pic.state);
 	state_save_register_global(pic.index);
 	state_save_register_global(pic.total);
@@ -287,7 +287,7 @@ void midway_serial_pic2_init(int upper, int yearoffs)
 
 	pic.yearoffs = yearoffs;
 	pic.time_just_written = 0;
-	pic.time_write_timer = mame_timer_alloc(reset_timer);
+	pic.time_write_timer = timer_alloc(reset_timer);
 	memset(pic.default_nvram, 0xff, sizeof(pic.default_nvram));
 	generate_serial_data(upper);
 }
@@ -306,7 +306,7 @@ UINT8 midway_serial_pic2_status_r(void)
 	/* if we're still holding the data ready bit high, do it */
 	if (pic.latch & 0xf00)
 	{
-		if (compare_mame_times(mame_timer_get_time(), pic.latch_expire_time) > 0)
+		if (attotime_compare(timer_get_time(), pic.latch_expire_time) > 0)
 			pic.latch &= 0xff;
 		else
 			pic.latch -= 0x100;
@@ -352,7 +352,7 @@ void midway_serial_pic2_w(UINT8 data)
 
 	/* store in the latch, along with a bit to indicate we have data */
 	pic.latch = (data & 0x00f) | 0x480;
-	pic.latch_expire_time = add_mame_times(mame_timer_get_time(), MAME_TIME_IN_MSEC(1));
+	pic.latch_expire_time = attotime_add(timer_get_time(), ATTOTIME_IN_MSEC(1));
 	if (data & 0x10)
 	{
 		int cmd = pic.state ? (pic.state & 0x0f) : (pic.latch & 0x0f);
@@ -441,7 +441,7 @@ void midway_serial_pic2_w(UINT8 data)
 					/* otherwise, flag the time as having just been written for 1/2 second */
 					else
 					{
-						mame_timer_adjust(pic.time_write_timer, MAME_TIME_IN_MSEC(500), 0, time_zero);
+						timer_adjust(pic.time_write_timer, ATTOTIME_IN_MSEC(500), 0, attotime_zero);
 						pic.time_just_written = 1;
 						pic.state = 0;
 					}

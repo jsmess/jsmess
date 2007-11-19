@@ -12,8 +12,6 @@
 //                                                                       //
 // TODO:  add different types of stepper motors if needed                //
 //                                                                       //
-// Any fixes for this driver should be forwarded to AGEMAME HQ           //
-// (http://www.mameworld.net/agemame/)                                   //
 ///////////////////////////////////////////////////////////////////////////
 
 #include "driver.h"
@@ -607,7 +605,7 @@ void Stepper_init(int id, int type)
 		steppers[id].pattern     = 0;
 		steppers[id].old_pattern = 0;
 		steppers[id].step_pos    = 0;
-		steppers[id].max_steps   = 48*2;
+		steppers[id].max_steps   = (48*2)-1;
 		steppers[id].type		 = type;
 
 		switch ( steppers[id].type )
@@ -620,7 +618,7 @@ void Stepper_init(int id, int type)
 			steppers[id].index_patt  = 0x09;
 			break;
 			case STEPPER_144STEPS_DICE :  // STARPOINT 1DCU DICE mechanism
-			steppers[id].max_steps = 144*2;
+			steppers[id].max_steps = (144*2)-1;
 			break;
 		}
 		state_save_register_item("Stepper", id, steppers[id].index_pos);

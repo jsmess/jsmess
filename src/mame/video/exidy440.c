@@ -29,7 +29,7 @@ static UINT8 palettebank_io;
 static UINT8 palettebank_vis;
 
 /* function prototypes */
-void exidy440_update_firq(void);
+static void exidy440_update_firq(void);
 
 
 
@@ -354,7 +354,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
-							mame_timer_set(video_screen_get_time_until_pos(0, yoffs, currx), currx, collide_firq_callback);
+							timer_set(video_screen_get_time_until_pos(0, yoffs, currx), currx, collide_firq_callback);
 					}
 					currx++;
 
@@ -367,7 +367,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
-							mame_timer_set(video_screen_get_time_until_pos(0, yoffs, currx), currx, collide_firq_callback);
+							timer_set(video_screen_get_time_until_pos(0, yoffs, currx), currx, collide_firq_callback);
 					}
 					currx++;
 				}
@@ -438,8 +438,8 @@ VIDEO_EOF( exidy440 )
 	/* generate an interrupt once/frame for the beam */
 	if (!exidy440_topsecret)
 	{
-		mame_time time;
-		subseconds_t increment;
+		attotime time;
+		attoseconds_t increment;
 		int beamx, beamy;
 		int i;
 
@@ -452,12 +452,12 @@ VIDEO_EOF( exidy440 )
             From this, it appears that they are expecting to get beams over
             a 12 scanline period, and trying to pick roughly the middle one.
             This is how it is implemented. */
-		increment =  mame_time_to_subseconds(video_screen_get_scan_period(0));
-		time = sub_mame_times(video_screen_get_time_until_pos(0, beamy, beamx), make_mame_time(0, increment * 6));
+		increment = attotime_to_attoseconds(video_screen_get_scan_period(0));
+		time = attotime_sub(video_screen_get_time_until_pos(0, beamy, beamx), attotime_make(0, increment * 6));
 		for (i = 0; i <= 12; i++)
 		{
-			mame_timer_set(time, beamx, beam_firq_callback);
-			time = add_mame_times(time, make_mame_time(0, increment));
+			timer_set(time, beamx, beam_firq_callback);
+			time = attotime_add(time, attotime_make(0, increment));
 		}
 	}
 }

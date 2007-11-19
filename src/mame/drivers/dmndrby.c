@@ -165,7 +165,7 @@ static VIDEO_UPDATE(dderby)
 	return 0;
 }
 
-INTERRUPT_GEN( dderby_interrupt )
+static INTERRUPT_GEN( dderby_interrupt )
 {
 //  cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x8);  // almost certainly wrong?
 //  cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x10); // almost certainly wrong?

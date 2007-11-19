@@ -60,24 +60,24 @@ Dip sw.2
 
 #include "driver.h"
 
-UINT16 littlerb_vdp_address_low;
-UINT16 littlerb_vdp_address_high;
-UINT16 littlerb_vdp_writemode;
-UINT32 littlerb_write_address;
+static UINT16 littlerb_vdp_address_low;
+static UINT16 littlerb_vdp_address_high;
+static UINT16 littlerb_vdp_writemode;
+static UINT32 littlerb_write_address;
 
-void littlerb_recalc_regs(void)
+static void littlerb_recalc_regs(void)
 {
 	littlerb_vdp_address_low = littlerb_write_address&0xffff;
 	littlerb_vdp_address_high = (littlerb_write_address>>16)&0xffff;
 }
 
-UINT16* littlerb_region1;
-UINT16* littlerb_region2;
-UINT16* littlerb_region3;
-UINT16* littlerb_region4;
+static UINT16* littlerb_region1;
+static UINT16* littlerb_region2;
+static UINT16* littlerb_region3;
+static UINT16* littlerb_region4;
 
 
-void littlerb_data_write(UINT16 data)
+static void littlerb_data_write(UINT16 data)
 {
 	UINT32 addr = littlerb_write_address>>4; // is this right? should we shift?
 
@@ -133,7 +133,7 @@ void littlerb_data_write(UINT16 data)
 
 
 
-void littlerb_recalc_address(void)
+static void littlerb_recalc_address(void)
 {
 	littlerb_write_address = littlerb_vdp_address_low | littlerb_vdp_address_high<<16;
 }

@@ -79,11 +79,11 @@ cleanup
 #include "sound/okim6295.h"
 #include "sound/es8712.h"
 
-UINT16 *vmetal_texttileram;
-UINT16 *vmetal_mid1tileram;
-UINT16 *vmetal_mid2tileram;
-UINT16 *vmetal_tlookup;
-UINT16 *vmetal_videoregs;
+static UINT16 *vmetal_texttileram;
+static UINT16 *vmetal_mid1tileram;
+static UINT16 *vmetal_mid2tileram;
+static UINT16 *vmetal_tlookup;
+static UINT16 *vmetal_videoregs;
 
 
 static tilemap *vmetal_texttilemap;

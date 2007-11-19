@@ -45,7 +45,7 @@ Emulation Notes:
 #include "sound/ay8910.h"
 #include "video/crtc6845.h"
 
-UINT8* carrera_tileram;
+static UINT8* carrera_tileram;
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_READ(MRA8_ROM)

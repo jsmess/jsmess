@@ -23,10 +23,10 @@ static int music1_latch = 0;
 static int music2_latch = 0;
 static int sound_signal = 0;
 static int sound_volume = 0;
-static mame_timer *sound_volume_timer = NULL;
+static emu_timer *sound_volume_timer = NULL;
 static int music_signal = 0;
 static int music_volume = 0;
-static mame_timer *music_volume_timer = NULL;
+static emu_timer *music_volume_timer = NULL;
 static int noise = 0;
 
 static TIMER_CALLBACK( sound_volume_decay )
@@ -54,8 +54,8 @@ WRITE8_HANDLER( warpwarp_sound_w )
          * discharge C90(?) (1uF) through R13||R14 (22k||47k)
          * 0.639 * 15k * 1uF -> 0.9585s
          */
-        mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 95850), 100000);
-		mame_timer_adjust(sound_volume_timer, period, 0, period);
+        attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 95850), 100000);
+		timer_adjust(sound_volume_timer, period, 0, period);
 	}
 	else
 	{
@@ -66,9 +66,9 @@ WRITE8_HANDLER( warpwarp_sound_w )
          * ...but this is not very realistic for the game sound :(
          * maybe there _is_ a discharge through the diode D17?
          */
-//      mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 702900), 100000);
-        mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 191700), 100000);
-		mame_timer_adjust(sound_volume_timer, period, 0, period);
+//      attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 702900), 100000);
+        attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 191700), 100000);
+		timer_adjust(sound_volume_timer, period, 0, period);
     }
 }
 
@@ -102,8 +102,8 @@ WRITE8_HANDLER( warpwarp_music2_w )
          * 0.639 * 15k * 10uF -> 9.585s
          * ...I'm sure this is off by one number of magnitude :/
          */
-        mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 95850), 100000);
-		mame_timer_adjust(music_volume_timer, period, 0, period);
+        attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 95850), 100000);
+		timer_adjust(music_volume_timer, period, 0, period);
 	}
 	else
 	{
@@ -112,9 +112,9 @@ WRITE8_HANDLER( warpwarp_music2_w )
          * discharge C95(?) (10uF) through R14 (47k)
          * 0.639 * 47k * 10uF -> 30.033s
          */
-//      mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 3003300), 100000);
-        mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768),  300330), 100000);
-		mame_timer_adjust(music_volume_timer, period, 0, period);
+//      attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 3003300), 100000);
+        attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768),  300330), 100000);
+		timer_adjust(music_volume_timer, period, 0, period);
 	}
 
 }
@@ -215,7 +215,7 @@ void *warpwarp_sh_start(int clock, const struct CustomSound_interface *config)
 
 	channel = stream_create(0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
-	sound_volume_timer = mame_timer_alloc(sound_volume_decay);
-	music_volume_timer = mame_timer_alloc(music_volume_decay);
+	sound_volume_timer = timer_alloc(sound_volume_decay);
+	music_volume_timer = timer_alloc(music_volume_decay);
     return auto_malloc(1);
 }

@@ -23,7 +23,7 @@ static tilemap *bg_tilemap;
 
 static mame_bitmap *bg_bits;
 static const UINT8 *color_codes;
-static mame_timer *scanline_timer;
+static emu_timer *scanline_timer;
 
 static const double cd4049_vl = 1.5/5.0;
 static const double cd4049_vh = 3.5/5.0;
@@ -773,7 +773,7 @@ static TIMER_CALLBACK( scanline_callback )
 		counter++;
 	scanline = (scanline+1) % VTOTAL;
 	/* come back at the next appropriate scanline */
-	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 static VIDEO_START( dkong_base )
@@ -820,8 +820,8 @@ VIDEO_START( radarscp )
 
 	bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-    scanline_timer = mame_timer_alloc(scanline_callback);
-    mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+    scanline_timer = timer_alloc(scanline_callback);
+    timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 
 }
 
@@ -837,8 +837,8 @@ VIDEO_START( radarsc1 )
 
 	bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-    scanline_timer = mame_timer_alloc(scanline_callback);
-    mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+    scanline_timer = timer_alloc(scanline_callback);
+    timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 
 }
 

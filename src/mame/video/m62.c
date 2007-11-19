@@ -27,8 +27,8 @@ static const UINT8 *sprite_height_prom;
 static INT32 m62_background_hscroll;
 static INT32 m62_background_vscroll;
 
-UINT8 *irem_textram;
-size_t irem_textram_size;
+static UINT8 *irem_textram;
+static size_t irem_textram_size;
 
 static UINT8 kidniki_background_bank;
 static INT32 kidniki_text_vscroll;
@@ -364,7 +364,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-void m62_start( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_start( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
 	m62_background = tilemap_create( tile_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, x1, y1, x2, y2 );
 
@@ -383,7 +383,7 @@ void m62_start( tile_get_info_callback tile_get_info, int rows, int cols, int x1
 	}
 }
 
-void m62_textlayer( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_textlayer( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
 	m62_foreground = tilemap_create( tile_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, x1, y1, x2, y2 );
 

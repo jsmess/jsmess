@@ -73,7 +73,7 @@
 
 #define TILEMAPS 0
 
-int suna8_text_dim; /* specifies format of text layer */
+static int suna8_text_dim; /* specifies format of text layer */
 
 UINT8 suna8_rombank, suna8_spritebank, suna8_palettebank;
 UINT8 suna8_unknown;

@@ -10,11 +10,11 @@
 
 #define CPK_VIDEO_SIZE	0x800
 
-UINT8 * cpk_colorram;
-UINT8 * cpk_videoram;
-UINT8 * cpk_palette;
-UINT8 * cpk_palette2;
-UINT8 * cpk_expram;
+static UINT8 * cpk_colorram;
+static UINT8 * cpk_videoram;
+static UINT8 * cpk_palette;
+static UINT8 * cpk_palette2;
+static UINT8 * cpk_expram;
 
 static UINT8 * dirtybuffer1;
 static mame_bitmap *tmpbitmap2;

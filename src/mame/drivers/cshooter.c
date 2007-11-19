@@ -86,7 +86,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "driver.h"
 #include "audio/seibu.h"
 
-UINT8* cshooter_txram;
+static UINT8* cshooter_txram;
 static tilemap *cshooter_txtilemap;
 static int coin_stat=0;
 
@@ -195,7 +195,7 @@ static VIDEO_UPDATE(cshooter)
 
 /* main cpu */
 
-INTERRUPT_GEN( cshooter_interrupt )
+static INTERRUPT_GEN( cshooter_interrupt )
 {
 	if(cpu_getiloops())
 	{

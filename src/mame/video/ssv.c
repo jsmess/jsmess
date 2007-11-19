@@ -141,9 +141,9 @@ Note: press Z to show some info on each sprite (debug builds only)
 #include "ui.h"
 #endif
 
-int shadow_pen_mask, shadow_pen_shift;
+static int shadow_pen_mask, shadow_pen_shift;
 
-void ssv_drawgfx(	mame_bitmap *bitmap, const gfx_element *gfx,
+static void ssv_drawgfx(	mame_bitmap *bitmap, const gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					const rectangle *cliprect, int shadow	)
 {

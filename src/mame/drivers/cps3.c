@@ -345,36 +345,36 @@ Notes:
 	#define DMA_XOR(a)	((a) ^ 2)
 #endif
 
-int cps3_use_fastboot;
+static int cps3_use_fastboot;
 
 static UINT32* decrypted_bios;
 static UINT32* decrypted_gamerom;
 static UINT32 cram_gfxflash_bank;
-UINT32* cps3_nops;
+static UINT32* cps3_nops;
 
 static UINT32* tilemap20_regs_base;
 static UINT32* tilemap30_regs_base;
 static UINT32* tilemap40_regs_base;
 static UINT32* tilemap50_regs_base;
 
-UINT32* cps3_0xc0000000_ram;
-UINT32* cps3_0xc0000000_ram_decrypted;
+static UINT32* cps3_0xc0000000_ram;
+static UINT32* cps3_0xc0000000_ram_decrypted;
 
-UINT32* cps3_char_ram;
+static UINT32* cps3_char_ram;
 
-UINT32* cps3_spriteram;
-UINT32* cps3_eeprom;
-UINT32* cps3_fullscreenzoom;
+static UINT32* cps3_spriteram;
+static UINT32* cps3_eeprom;
+static UINT32* cps3_fullscreenzoom;
 
 UINT32 cps3_ss_pal_base = 0;
-UINT32* cps3_colourram;
-UINT32 cps3_unk_vidregs[0x20/4];
+static UINT32* cps3_colourram;
+static UINT32 cps3_unk_vidregs[0x20/4];
 UINT32 cps3_ss_bank_base = 0;
 
-UINT32 cps3_screenwidth;
-cdrom_file* cps3_cd;
+static UINT32 cps3_screenwidth;
+//cdrom_file* cps3_cd;
 
-UINT32* cps3_mame_colours;//[0x20000]; // actual values to write to 32-bit bitmap
+static UINT32* cps3_mame_colours;//[0x20000]; // actual values to write to 32-bit bitmap
 
 static mame_bitmap *renderbuffer_bitmap;
 static rectangle renderbuffer_clip;
@@ -686,7 +686,7 @@ static const struct game_keys2 keys_table2[] =
 	{ 0 }	// end of table
 };
 
-void cps3_decrypt_bios(void)
+static void cps3_decrypt_bios(void)
 {
 	int i;
 	UINT32 *coderegion = (UINT32*)memory_region(REGION_USER1);
@@ -804,14 +804,14 @@ static const gfx_layout cps3_tiles8x8_layout =
 	64*8
 };
 
-UINT32* cps3_ss_ram;
-UINT8* cps3_ss_ram_dirty;
-int cps3_ss_ram_is_dirty;
+static UINT32* cps3_ss_ram;
+static UINT8* cps3_ss_ram_dirty;
+static int cps3_ss_ram_is_dirty;
 
-UINT8* cps3_char_ram_dirty;
-int cps3_char_ram_is_dirty;
+static UINT8* cps3_char_ram_dirty;
+static int cps3_char_ram_is_dirty;
 
-void cps3_set_mame_colours( int colournum, UINT16 data, UINT32 fadeval )
+static void cps3_set_mame_colours( int colournum, UINT16 data, UINT32 fadeval )
 {
 	int r,g,b;
 	UINT16* dst = (UINT16*)cps3_colourram;
@@ -940,7 +940,7 @@ static VIDEO_START(cps3)
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-void cps3_draw_tilemapsprite_line(int tmnum, int drawline, mame_bitmap *bitmap, const rectangle *cliprect )
+static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	UINT32* tmapregs[4] = { tilemap20_regs_base, tilemap30_regs_base, tilemap40_regs_base, tilemap50_regs_base };
 	UINT32* regs;
@@ -1576,7 +1576,7 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 
 
 
-UINT32 cps3_flashmain_r(int base, UINT32 offset, UINT32 mem_mask)
+static UINT32 cps3_flashmain_r(int base, UINT32 offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 
@@ -1609,8 +1609,8 @@ UINT32 cps3_flashmain_r(int base, UINT32 offset, UINT32 mem_mask)
 /* In certain situations (SH2 DMA?) the reads must bypass the encryption device,
    this is used when checking the flash roms, and performing rom tests.  Without
    modification to the SH2 core this requires PC based hacks to work correctly */
-UINT32 cps3_bios_test_hack;
-UINT32 cps3_game_test_hack;
+static UINT32 cps3_bios_test_hack;
+static UINT32 cps3_game_test_hack;
 
 struct cps3_test_hacks
 {
@@ -1690,7 +1690,7 @@ static READ32_HANDLER( cps3_flash2_r )
 	return retvalue;
 }
 
-void cps3_flashmain_w(int base, UINT32 offset, UINT32 data, UINT32 mem_mask)
+static void cps3_flashmain_w(int base, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
 	int command;
 	if (!(mem_mask & 0xff000000))	// Flash 1
@@ -1858,7 +1858,7 @@ static READ32_HANDLER( cps3_40C0004_r )
 
 /* EEPROM access is a little odd, I think it accesses eeprom through some kind of
    additional interface, as these writes aren't normal for the type of eeprom we have */
-UINT16 cps3_current_eeprom_read;
+static UINT16 cps3_current_eeprom_read;
 
 static READ32_HANDLER( cps3_eeprom_r )
 {
@@ -2089,7 +2089,7 @@ static UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length 
 	}
 }
 
-void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_length )
+static void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_length )
 {
 	UINT8* sourcedata = (UINT8*)memory_region(REGION_USER5);
 	int length_remaining;
@@ -2176,7 +2176,7 @@ static UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset)
  	}
  }
 
-void cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length )
+static void cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length )
 {
 	UINT8* px = (UINT8*)memory_region(REGION_USER5);
 	UINT32 start = real_dest;
@@ -2217,7 +2217,7 @@ void cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length )
 	}
 }
 
-void cps3_process_character_dma(UINT32 address)
+static void cps3_process_character_dma(UINT32 address)
 {
 	int i;
 
@@ -2351,7 +2351,7 @@ static WRITE32_HANDLER( cps3_colourram_w )
 	}
 }
 
-UINT32* cps3_mainram;
+static UINT32* cps3_mainram;
 
 /* there are more unknown writes, but you get the idea */
 static ADDRESS_MAP_START( cps3_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -2484,7 +2484,7 @@ static struct CustomSound_interface custom_interface =
 };
 
 
-static mame_timer* fastboot_timer;
+static emu_timer* fastboot_timer;
 
 static TIMER_CALLBACK( fastboot_timer_callback )
 {
@@ -2515,9 +2515,9 @@ static MACHINE_RESET( cps3 )
 
 	if (cps3_use_fastboot)
 	{
-		fastboot_timer = mame_timer_alloc(fastboot_timer_callback);
+		fastboot_timer = timer_alloc(fastboot_timer_callback);
 	//  printf("reset\n");
-		mame_timer_adjust(fastboot_timer, time_zero, 0, time_zero);
+		timer_adjust(fastboot_timer, attotime_zero, 0, attotime_zero);
 	}
 }
 
@@ -3022,8 +3022,8 @@ ROM_START( redeartn )
 ROM_END
 
 /* Idle loop skipping speedups */
-UINT32 cps3_speedup_ram_address;
-UINT32 cps3_speedup_code_address;
+static UINT32 cps3_speedup_ram_address;
+static UINT32 cps3_speedup_code_address;
 
 struct cps3_speedups
 {

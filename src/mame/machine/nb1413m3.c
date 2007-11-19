@@ -44,7 +44,7 @@ static int nb1413m3_outcoin_flag;
 #define NB1413M3_TIMER_BASE 20000000
 static TIMER_CALLBACK( nb1413m3_timer_callback )
 {
-	mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(NB1413M3_TIMER_BASE), 256), 0, nb1413m3_timer_callback);
+	timer_set(attotime_mul(ATTOTIME_IN_HZ(NB1413M3_TIMER_BASE), 256), 0, nb1413m3_timer_callback);
 
 	nb1413m3_74ls193_counter++;
 	nb1413m3_74ls193_counter &= 0x0f;

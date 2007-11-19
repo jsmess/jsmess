@@ -26,7 +26,8 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "sound/ay8910.h"
 
 
-UINT8 *tugboat_ram,*tugboat_score;
+static UINT8 *tugboat_ram;
+//UINT8 *tugboat_score;
 
 
 static UINT8 hd46505_0_reg[18],hd46505_1_reg[18];
@@ -167,7 +168,7 @@ static const pia6821_interface pia1_intf =
 static TIMER_CALLBACK( interrupt_gen )
 {
 	cpunum_set_input_line(0, 0, HOLD_LINE);
-	mame_timer_set(video_screen_get_frame_period(0), 0, interrupt_gen);
+	timer_set(video_screen_get_frame_period(0), 0, interrupt_gen);
 }
 
 static MACHINE_START( tugboat )
@@ -179,7 +180,7 @@ static MACHINE_START( tugboat )
 static MACHINE_RESET( tugboat )
 {
 	pia_reset();
-	mame_timer_set(video_screen_get_time_until_pos(0, 30*8+4, 0), 0, interrupt_gen);
+	timer_set(video_screen_get_time_until_pos(0, 30*8+4, 0), 0, interrupt_gen);
 }
 
 

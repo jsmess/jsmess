@@ -36,7 +36,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SUBSECONDS_PER_SPEED_UPDATE	(MAX_SUBSECONDS / 4)
+#define SUBSECONDS_PER_SPEED_UPDATE	(ATTOSECONDS_PER_SECOND / 4)
 #define PAUSED_REFRESH_RATE			30
 
 
@@ -62,10 +62,10 @@ struct _internal_screen_info
 	INT32					last_partial_scan;	/* scanline of last partial update */
 
 	/* screen timing */
-	subseconds_t			scantime;			/* subseconds per scanline */
-	subseconds_t			pixeltime;			/* subseconds per pixel */
-	mame_time 				vblank_time;		/* time of last VBLANK start */
-	mame_timer *			scanline0_timer;	/* scanline 0 timer */
+	attoseconds_t			scantime;			/* attoseconds per scanline */
+	attoseconds_t			pixeltime;			/* attoseconds per pixel */
+	attotime 				vblank_time;		/* time of last VBLANK start */
+	emu_timer *				scanline0_timer;	/* scanline 0 timer */
 
 	/* movie recording */
 	mame_file *				movie_file;			/* handle to the open movie file */
@@ -97,20 +97,20 @@ struct _video_global
 {
 	/* throttling calculations */
 	osd_ticks_t				throttle_last_ticks;/* osd_ticks the last call to throttle */
-	mame_time 				throttle_realtime;	/* real time the last call to throttle */
-	mame_time 				throttle_emutime;	/* emulated time the last call to throttle */
+	attotime 				throttle_realtime;	/* real time the last call to throttle */
+	attotime 				throttle_emutime;	/* emulated time the last call to throttle */
 	UINT32 					throttle_history;	/* history of frames where we were fast enough */
 
 	/* dynamic speed computation */
 	osd_ticks_t 			speed_last_realtime;/* real time at the last speed calculation */
-	mame_time 				speed_last_emutime;	/* emulated time at the last speed calculation */
+	attotime 				speed_last_emutime;	/* emulated time at the last speed calculation */
 	double 					speed_percent;		/* most recent speed percentage */
 	UINT32 					partial_updates_this_frame;/* partial update counter this frame */
 
 	/* overall speed computation */
 	UINT32					overall_real_seconds;/* accumulated real seconds at normal speed */
 	osd_ticks_t				overall_real_ticks;	/* accumulated real ticks at normal speed */
-	mame_time				overall_emutime;	/* accumulated emulated time at normal speed */
+	attotime				overall_emutime;	/* accumulated emulated time at normal speed */
 	UINT32					overall_valid_counter;/* number of consecutive valid time periods */
 
 	/* configuration */
@@ -177,10 +177,10 @@ static TIMER_CALLBACK( scanline0_callback );
 static int finish_screen_updates(running_machine *machine);
 
 /* throttling/frameskipping/performance */
-static void update_throttle(mame_time emutime);
+static void update_throttle(attotime emutime);
 static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks);
 static void update_frameskip(void);
-static void recompute_speed(mame_time emutime);
+static void recompute_speed(attotime emutime);
 
 /* screen snapshots */
 static mame_bitmap *get_snapshot_bitmap(running_machine *machine, int scrnum);
@@ -301,7 +301,7 @@ void video_init(running_machine *machine)
 			internal_screen_info *info = &viddata->scrinfo[scrnum];
 
 			/* allocate a timer to reset partial updates */
-			info->scanline0_timer = mame_timer_alloc(scanline0_callback);
+			info->scanline0_timer = timer_alloc(scanline0_callback);
 
 			/* make pointers back to the config and state */
 			info->config = &machine->drv->screen[scrnum];
@@ -321,11 +321,11 @@ void video_init(running_machine *machine)
 				render_container_set_yscale(container, info->config->yscale);
 
 			/* reset VBLANK timing */
-			info->vblank_time = sub_subseconds_from_mame_time(time_zero, machine->screen[0].vblank);
+			info->vblank_time = attotime_sub_attoseconds(attotime_zero, machine->screen[0].vblank);
 
 			/* register for save states */
 			state_save_register_item("video", scrnum, info->vblank_time.seconds);
-			state_save_register_item("video", scrnum, info->vblank_time.subseconds);
+			state_save_register_item("video", scrnum, info->vblank_time.attoseconds);
 		}
 
 	/* create spriteram buffers if necessary */
@@ -415,8 +415,8 @@ static void video_exit(running_machine *machine)
 	{
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)global.overall_real_seconds + (double)global.overall_real_ticks / (double)tps;
-		double final_emu_time = mame_time_to_double(global.overall_emutime);
-		mame_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, add_subseconds_to_mame_time(global.overall_emutime, MAX_SUBSECONDS / 2).seconds);
+		double final_emu_time = attotime_to_double(global.overall_emutime);
+		mame_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, attotime_add_attoseconds(global.overall_emutime, ATTOSECONDS_PER_SECOND / 2).seconds);
 	}
 }
 
@@ -429,13 +429,13 @@ static void video_exit(running_machine *machine)
 void video_vblank_start(running_machine *machine)
 {
 	video_private *viddata = machine->video_data;
-	mame_time curtime = mame_timer_get_time();
+	attotime curtime = timer_get_time();
 	int scrnum;
 
 	/* kludge: we get called at time 0 to reset, but at that point,
        the time of last VBLANK is actually -vblank_duration */
-	if (curtime.seconds == 0 && curtime.subseconds == 0)
-		curtime = sub_subseconds_from_mame_time(time_zero, machine->screen[0].vblank);
+	if (curtime.seconds == 0 && curtime.attoseconds == 0)
+		curtime = attotime_sub_attoseconds(attotime_zero, machine->screen[0].vblank);
 
 	/* reset VBLANK timers for each screen -- fix me */
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
@@ -647,7 +647,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
     of a screen
 -------------------------------------------------*/
 
-void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, subseconds_t refresh)
+void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t refresh)
 {
 	video_private *viddata = Machine->video_data;
 	internal_screen_info *info = &viddata->scrinfo[scrnum];
@@ -727,7 +727,7 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 		float minrefresh = render_get_max_update_rate();
 		if (minrefresh != 0)
 		{
-			UINT32 target_speed = floor(minrefresh * 100.0 / SUBSECONDS_TO_HZ(refresh));
+			UINT32 target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(refresh));
 			target_speed = MIN(target_speed, global.original_speed);
 			if (target_speed != global.speed)
 			{
@@ -743,9 +743,9 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	/* if we are on scanline 0 already, reset the update timer immediately */
 	/* otherwise, defer until the next scanline 0 */
 	if (video_screen_get_vpos(scrnum) == 0)
-		mame_timer_adjust(info->scanline0_timer, time_zero, scrnum, time_zero);
+		timer_adjust(info->scanline0_timer, attotime_zero, scrnum, attotime_zero);
 	else
-		mame_timer_adjust(info->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, time_zero);
+		timer_adjust(info->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
 }
 
 
@@ -867,7 +867,7 @@ void video_screen_update_partial(int scrnum, int scanline)
 int video_screen_get_vpos(int scrnum)
 {
 	internal_screen_info *info = get_screen_info(Machine, scrnum);
-	subseconds_t delta = mame_time_to_subseconds(sub_mame_times(mame_timer_get_time(), info->vblank_time));
+	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), info->vblank_time));
 	int vpos;
 
 	/* round to the nearest pixel */
@@ -890,7 +890,7 @@ int video_screen_get_vpos(int scrnum)
 int video_screen_get_hpos(int scrnum)
 {
 	internal_screen_info *info = get_screen_info(Machine, scrnum);
-	subseconds_t delta = mame_time_to_subseconds(sub_mame_times(mame_timer_get_time(), info->vblank_time));
+	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), info->vblank_time));
 	int vpos;
 
 	/* round to the nearest pixel */
@@ -939,18 +939,18 @@ int video_screen_get_hblank(int scrnum)
     at the given hpos,vpos
 -------------------------------------------------*/
 
-mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
+attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 {
 	internal_screen_info *info = get_screen_info(Machine, scrnum);
-	subseconds_t curdelta = mame_time_to_subseconds(sub_mame_times(mame_timer_get_time(), info->vblank_time));
-	subseconds_t targetdelta;
+	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(), info->vblank_time));
+	attoseconds_t targetdelta;
 
 	/* since we measure time relative to VBLANK, compute the scanline offset from VBLANK */
 	vpos += info->state->height - (info->state->visarea.max_y + 1);
 	vpos %= info->state->height;
 
 	/* compute the delta for the given X,Y position */
-	targetdelta = (subseconds_t)vpos * info->scantime + (subseconds_t)hpos * info->pixeltime;
+	targetdelta = (attoseconds_t)vpos * info->scantime + (attoseconds_t)hpos * info->pixeltime;
 
 	/* if we're past that time (within 1/2 of a pixel), head to the next frame */
 	if (targetdelta <= curdelta + info->pixeltime / 2)
@@ -959,7 +959,7 @@ mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 		targetdelta += info->state->refresh;
 
 	/* return the difference */
-	return make_mame_time(0, targetdelta - curdelta);
+	return attotime_make(0, targetdelta - curdelta);
 }
 
 
@@ -969,10 +969,10 @@ mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
     scanline
 -------------------------------------------------*/
 
-mame_time video_screen_get_scan_period(int scrnum)
+attotime video_screen_get_scan_period(int scrnum)
 {
 	internal_screen_info *info = get_screen_info(Machine, scrnum);
-	return make_mame_time(0, info->scantime);
+	return attotime_make(0, info->scantime);
 }
 
 
@@ -982,9 +982,9 @@ mame_time video_screen_get_scan_period(int scrnum)
     complete frame
 -------------------------------------------------*/
 
-mame_time video_screen_get_frame_period(int scrnum)
+attotime video_screen_get_frame_period(int scrnum)
 {
-	return make_mame_time(0, Machine->screen[scrnum].refresh);
+	return attotime_make(0, Machine->screen[scrnum].refresh);
 }
 
 
@@ -1007,7 +1007,7 @@ static TIMER_CALLBACK( scanline0_callback )
 	viddata->scrinfo[scrnum].last_partial_scan = 0;
 	global.partial_updates_this_frame = 0;
 
-	mame_timer_adjust(viddata->scrinfo[scrnum].scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, time_zero);
+	timer_adjust(viddata->scrinfo[scrnum].scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
 }
 
 
@@ -1019,7 +1019,7 @@ static TIMER_CALLBACK( scanline0_callback )
 
 void video_frame_update(void)
 {
-	mame_time current_time = mame_timer_get_time();
+	attotime current_time = timer_get_time();
 	int skipped_it = global.skipping_this_frame;
 	int phase = mame_get_phase(Machine);
 
@@ -1311,7 +1311,7 @@ void video_set_fastforward(int _fastforward)
     natural speed
 -------------------------------------------------*/
 
-static void update_throttle(mame_time emutime)
+static void update_throttle(attotime emutime)
 {
 /*
 
@@ -1357,10 +1357,10 @@ static void update_throttle(mame_time emutime)
 		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
 		3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7, 4,5,5,6,5,6,6,7, 5,6,6,7,6,7,7,8
 	};
-	subseconds_t real_delta_subseconds;
-	subseconds_t emu_delta_subseconds;
-	subseconds_t real_is_ahead_subseconds;
-	subseconds_t subseconds_per_tick;
+	attoseconds_t real_delta_attoseconds;
+	attoseconds_t emu_delta_attoseconds;
+	attoseconds_t real_is_ahead_attoseconds;
+	attoseconds_t attoseconds_per_tick;
 	osd_ticks_t ticks_per_second;
 	osd_ticks_t target_ticks;
 	osd_ticks_t diff_ticks;
@@ -1369,17 +1369,17 @@ static void update_throttle(mame_time emutime)
 	if (global.speed != 0 && global.speed != 100)
 	{
 		/* multiply emutime by 100 */
-		emutime = scale_up_mame_time(emutime, 100);
+		emutime = attotime_mul(emutime, 100);
 
 		/* divide emutime by the global speed factor */
-		emutime.subseconds /= global.speed;
-		emutime.subseconds += (emutime.seconds % global.speed) * (MAX_SUBSECONDS / global.speed);
+		emutime.attoseconds /= global.speed;
+		emutime.attoseconds += (emutime.seconds % global.speed) * (ATTOSECONDS_PER_SECOND / global.speed);
 		emutime.seconds /= global.speed;
 	}
 
 	/* compute conversion factors up front */
 	ticks_per_second = osd_ticks_per_second();
-	subseconds_per_tick = MAX_SUBSECONDS / ticks_per_second;
+	attoseconds_per_tick = ATTOSECONDS_PER_SECOND / ticks_per_second;
 
 	/* if we're paused, emutime will not advance; instead, we subtract a fixed
        amount of time (1/60th of a second) from the emulated time that was passed in,
@@ -1388,7 +1388,7 @@ static void update_throttle(mame_time emutime)
        ago, and was in sync in both real and emulated time */
 	if (mame_is_paused(Machine))
 	{
-		global.throttle_emutime = sub_subseconds_from_mame_time(emutime, MAX_SUBSECONDS / PAUSED_REFRESH_RATE);
+		global.throttle_emutime = attotime_sub_attoseconds(emutime, ATTOSECONDS_PER_SECOND / PAUSED_REFRESH_RATE);
 		global.throttle_realtime = global.throttle_emutime;
 	}
 
@@ -1396,11 +1396,11 @@ static void update_throttle(mame_time emutime)
        reported value from our current value; this should be a small value somewhere
        between 0 and 1/10th of a second ... anything outside of this range is obviously
        wrong and requires a resync */
-	emu_delta_subseconds = mame_time_to_subseconds(sub_mame_times(emutime, global.throttle_emutime));
-	if (emu_delta_subseconds < 0 || emu_delta_subseconds > MAX_SUBSECONDS / 10)
+	emu_delta_attoseconds = attotime_to_attoseconds(attotime_sub(emutime, global.throttle_emutime));
+	if (emu_delta_attoseconds < 0 || emu_delta_attoseconds > ATTOSECONDS_PER_SECOND / 10)
 	{
 		if (LOG_THROTTLE)
-			logerror("Resync due to weird emutime delta: 0.%09d%09d\n", (int)(emu_delta_subseconds / MAX_SUBSECONDS_SQRT), (int)(emu_delta_subseconds % MAX_SUBSECONDS_SQRT));
+			logerror("Resync due to weird emutime delta: %s\n", attotime_string(attotime_make(0, emu_delta_attoseconds), 18));
 		goto resync;
 	}
 
@@ -1419,43 +1419,43 @@ static void update_throttle(mame_time emutime)
 		goto resync;
 	}
 
-	/* convert this value into subseconds for easier comparison */
-	real_delta_subseconds = diff_ticks * subseconds_per_tick;
+	/* convert this value into attoseconds for easier comparison */
+	real_delta_attoseconds = diff_ticks * attoseconds_per_tick;
 
 	/* now update our real and emulated timers with the current values */
 	global.throttle_emutime = emutime;
-	global.throttle_realtime = add_subseconds_to_mame_time(global.throttle_realtime, real_delta_subseconds);
+	global.throttle_realtime = attotime_add_attoseconds(global.throttle_realtime, real_delta_attoseconds);
 
 	/* keep a history of whether or not emulated time beat real time over the last few
        updates; this can be used for future heuristics */
-	global.throttle_history = (global.throttle_history << 1) | (emu_delta_subseconds > real_delta_subseconds);
+	global.throttle_history = (global.throttle_history << 1) | (emu_delta_attoseconds > real_delta_attoseconds);
 
 	/* determine how far ahead real time is versus emulated time; note that we use the
        accumulated times for this instead of the deltas for the current update because
        we want to track time over a longer duration than a single update */
-	real_is_ahead_subseconds = mame_time_to_subseconds(sub_mame_times(global.throttle_emutime, global.throttle_realtime));
+	real_is_ahead_attoseconds = attotime_to_attoseconds(attotime_sub(global.throttle_emutime, global.throttle_realtime));
 
 	/* if we're more than 1/10th of a second out, or if we are behind at all and emulation
        is taking longer than the real frame, we just need to resync */
-	if (real_is_ahead_subseconds < -MAX_SUBSECONDS / 10 ||
-		(real_is_ahead_subseconds < 0 && popcount[global.throttle_history & 0xff] < 6))
+	if (real_is_ahead_attoseconds < -ATTOSECONDS_PER_SECOND / 10 ||
+		(real_is_ahead_attoseconds < 0 && popcount[global.throttle_history & 0xff] < 6))
 	{
 		if (LOG_THROTTLE)
-			logerror("Resync due to being behind: 0.%09d%09d (history=%08X)\n", (int)(-real_is_ahead_subseconds / MAX_SUBSECONDS_SQRT), (int)((-real_is_ahead_subseconds) % MAX_SUBSECONDS_SQRT), global.throttle_history);
+			logerror("Resync due to being behind: %s (history=%08X)\n", attotime_string(attotime_make(0, -real_is_ahead_attoseconds), 18), global.throttle_history);
 		goto resync;
 	}
 
 	/* if we're behind, it's time to just get out */
-	if (real_is_ahead_subseconds < 0)
+	if (real_is_ahead_attoseconds < 0)
 		return;
 
 	/* compute the target real time, in ticks, where we want to be */
-	target_ticks = global.throttle_last_ticks + real_is_ahead_subseconds / subseconds_per_tick;
+	target_ticks = global.throttle_last_ticks + real_is_ahead_attoseconds / attoseconds_per_tick;
 
 	/* throttle until we read the target, and update real time to match the final time */
 	diff_ticks = throttle_until_ticks(target_ticks) - global.throttle_last_ticks;
 	global.throttle_last_ticks += diff_ticks;
-	global.throttle_realtime = add_subseconds_to_mame_time(global.throttle_realtime, diff_ticks * subseconds_per_tick);
+	global.throttle_realtime = attotime_add_attoseconds(global.throttle_realtime, diff_ticks * attoseconds_per_tick);
 	return;
 
 resync:
@@ -1583,9 +1583,9 @@ static void update_frameskip(void)
     if we did not skip a frame
 -------------------------------------------------*/
 
-static void recompute_speed(mame_time emutime)
+static void recompute_speed(attotime emutime)
 {
-	subseconds_t delta_emutime;
+	attoseconds_t delta_emutime;
 
 	/* if we don't have a starting time yet, or if we're paused, reset our starting point */
 	if (global.speed_last_realtime == 0 || mame_is_paused(Machine))
@@ -1595,15 +1595,15 @@ static void recompute_speed(mame_time emutime)
 	}
 
 	/* if it has been more than the update interval, update the time */
-	delta_emutime = mame_time_to_subseconds(sub_mame_times(emutime, global.speed_last_emutime));
+	delta_emutime = attotime_to_attoseconds(attotime_sub(emutime, global.speed_last_emutime));
 	if (delta_emutime > SUBSECONDS_PER_SPEED_UPDATE)
 	{
 		osd_ticks_t realtime = osd_ticks();
 		osd_ticks_t delta_realtime = realtime - global.speed_last_realtime;
 		osd_ticks_t tps = osd_ticks_per_second();
 
-		/* convert from ticks to subseconds */
-		global.speed_percent = (double)delta_emutime * (double)tps / ((double)delta_realtime * (double)MAX_SUBSECONDS);
+		/* convert from ticks to attoseconds */
+		global.speed_percent = (double)delta_emutime * (double)tps / ((double)delta_realtime * (double)ATTOSECONDS_PER_SECOND);
 
 		/* remember the last times */
 		global.speed_last_realtime = realtime;
@@ -1624,7 +1624,7 @@ static void recompute_speed(mame_time emutime)
 				global.overall_real_ticks -= tps;
 				global.overall_real_seconds++;
 			}
-			global.overall_emutime = add_subseconds_to_mame_time(global.overall_emutime, delta_emutime);
+			global.overall_emutime = attotime_add_attoseconds(global.overall_emutime, delta_emutime);
 		}
 	}
 
@@ -1890,7 +1890,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 			png_add_text(&pnginfo, "System", text);
 
 			/* start the capture */
-			error = mng_capture_start(mame_core_file(info->movie_file), bitmap, SUBSECONDS_TO_HZ(viddata->scrinfo[scrnum].state->refresh));
+			error = mng_capture_start(mame_core_file(info->movie_file), bitmap, ATTOSECONDS_TO_HZ(viddata->scrinfo[scrnum].state->refresh));
 			if (error != PNGERR_NONE)
 			{
 				png_free(&pnginfo);

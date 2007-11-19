@@ -800,7 +800,7 @@ static TIMER_CALLBACK( taitof2_interrupt6 )
 
 static INTERRUPT_GEN( taitof2_interrupt )
 {
-	mame_timer_set(MAME_TIME_IN_CYCLES(500,0),0, taitof2_interrupt6);
+	timer_set(ATTOTIME_IN_CYCLES(500,0),0, taitof2_interrupt6);
 	cpunum_set_input_line(0, 5, HOLD_LINE);
 }
 

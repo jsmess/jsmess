@@ -644,9 +644,9 @@ static TIMER_CALLBACK(read_COPS_command)
 
 		case 0x7:	/* send mouse command */
 			if (immediate & 0x8)
-				mame_timer_adjust(mouse_timer, time_zero, 0, MAME_TIME_IN_MSEC((immediate & 0x7)*4)); /* enable mouse */
+				timer_adjust(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC((immediate & 0x7)*4)); /* enable mouse */
 			else
-				mame_timer_reset(mouse_timer, time_never);
+				timer_reset(mouse_timer, attotime_never);
 			break;
 		}
 	}
@@ -689,7 +689,7 @@ static TIMER_CALLBACK(set_COPS_ready)
 	COPS_Ready = TRUE;
 
 	/* impulsion width : +/- 20us */
-	mame_timer_set(MAME_TIME_IN_USEC(20), 0, read_COPS_command);
+	timer_set(ATTOTIME_IN_USEC(20), 0, read_COPS_command);
 }
 
 static void reset_COPS(void)
@@ -704,7 +704,7 @@ static void reset_COPS(void)
 	for (i=0; i<8; i++)
 		key_matrix[i] = 0;
 
-	mame_timer_reset(mouse_timer, time_never);
+	timer_reset(mouse_timer, attotime_never);
 }
 
 static void unplug_keyboard(void)
@@ -753,7 +753,7 @@ static void init_COPS(void)
 	COPS_Ready = FALSE;
 
 	/* read command every ms (don't know the real value) */
-	mame_timer_pulse(MAME_TIME_IN_MSEC(1), 0, set_COPS_ready);
+	timer_pulse(ATTOTIME_IN_MSEC(1), 0, set_COPS_ready);
 
 	reset_COPS();
 }
@@ -1122,7 +1122,7 @@ static void lisa210_set_iwm_enable_lines(int enable_mask)
 
 MACHINE_RESET( lisa )
 {
-	mouse_timer = mame_timer_alloc(handle_mouse);
+	mouse_timer = timer_alloc(handle_mouse);
 
 	lisa_ram_ptr = memory_region(REGION_CPU1) + RAM_OFFSET;
 	lisa_rom_ptr = memory_region(REGION_CPU1) + ROM_OFFSET;

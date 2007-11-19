@@ -36,7 +36,7 @@
     STATIC GLOBALS
 ****************************************************************************/
 
-UINT8 williams_sound_int_state;
+static UINT8 williams_sound_int_state;
 
 static UINT8 audio_talkback;
 
@@ -84,7 +84,7 @@ static WRITE8_HANDLER( narc_slave_sync_w );
 ****************************************************************************/
 
 /* CVSD readmem/writemem structures */
-ADDRESS_MAP_START( williams_cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1ffe) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x1ffe) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 
 
 /* NARC master readmem/writemem structures */
-ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03fe) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x03fe) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
@@ -112,7 +112,7 @@ ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* NARC slave readmem/writemem structures */
-ADDRESS_MAP_START( williams_narc_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_narc_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(hc55516_0_clock_set_w)
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_WRITE(hc55516_0_digit_clock_clear_w)
@@ -127,7 +127,7 @@ ADDRESS_MAP_END
 
 
 /* ADPCM readmem/writemem structures */
-ADDRESS_MAP_START( williams_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(adpcm_bank_select_w)
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03fe) AM_WRITE(YM2151_register_port_0_w)

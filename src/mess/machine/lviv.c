@@ -226,7 +226,7 @@ MACHINE_RESET( lviv )
 	memory_set_bankptr(3, memory_region(REGION_CPU1) + 0x010000);
 	memory_set_bankptr(4, memory_region(REGION_CPU1) + 0x010000);
 
-	/*mame_timer_pulse(TIME_IN_NSEC(200), 0, lviv_draw_pixel);*/
+	/*timer_pulse(TIME_IN_NSEC(200), 0, lviv_draw_pixel);*/
 
 	/*memset(mess_ram, 0, sizeof(unsigned char)*0xffff);*/
 }

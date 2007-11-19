@@ -156,7 +156,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 }
 
-void mcatadv_draw_tilemap_part(UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap* current_tilemap, mame_bitmap *bitmap, const rectangle *cliprect)
+static void mcatadv_draw_tilemap_part(UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap* current_tilemap, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int flip;
 	UINT32 drawline;

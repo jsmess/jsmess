@@ -225,7 +225,7 @@ static struct {
 	UINT8 data[0x10];
 	int reg;
 	int state;
-	mame_timer *timer;
+	emu_timer *timer;
 } europc_rtc;
 
 void europc_rtc_set_time(void)
@@ -277,8 +277,8 @@ void europc_rtc_init(void)
 	memset(&europc_rtc,0,sizeof(europc_rtc));
 	europc_rtc.data[0xf]=1;
 
-	europc_rtc.timer = mame_timer_alloc(europc_rtc_timer);
-	mame_timer_adjust(europc_rtc.timer, time_zero, 0, make_mame_time(1, 0));
+	europc_rtc.timer = timer_alloc(europc_rtc_timer);
+	timer_adjust(europc_rtc.timer, attotime_zero, 0, attotime_make(1, 0));
 }
 
  READ8_HANDLER( europc_rtc_r )

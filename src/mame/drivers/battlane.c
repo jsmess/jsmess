@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( battlane_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-INTERRUPT_GEN( battlane_cpu1_interrupt )
+static INTERRUPT_GEN( battlane_cpu1_interrupt )
 {
 	/* See note in battlane_cpu_command_w */
 

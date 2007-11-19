@@ -103,7 +103,7 @@ static int thom_update_screen_size( void )
 
 
 
-static mame_timer* thom_video_timer; /* time elapsed from begining of frame */
+static emu_timer* thom_video_timer; /* time elapsed from begining of frame */
 
 
 
@@ -111,8 +111,8 @@ static mame_timer* thom_video_timer; /* time elapsed from begining of frame */
 INLINE unsigned thom_video_elapsed ( void )
 {
 	unsigned u;
-	mame_time elapsed = mame_timer_timeelapsed( thom_video_timer );
-	u = scale_up_mame_time( elapsed, 1000000 ).seconds;
+	attotime elapsed = timer_timeelapsed( thom_video_timer );
+	u = attotime_mul( elapsed, 1000000 ).seconds;
 	if ( u >= 19968 ) 
 		u = 19968;
 	return u;
@@ -206,7 +206,7 @@ static int thom_lightpen_nb;
 
 
 /* called thom_lightpen_nb times */
-static mame_timer *thom_lightpen_timer;
+static emu_timer *thom_lightpen_timer;
 
 
 /* lightpen callback function to call from timer */
@@ -216,7 +216,7 @@ static void (*thom_lightpen_cb) ( int );
 
 void thom_set_lightpen_callback ( int nb, void (*cb) ( int step ) )
 {
-	LOG (( "%f thom_set_lightpen_callback called\n", mame_time_to_double(mame_timer_get_time()) ));
+	LOG (( "%f thom_set_lightpen_callback called\n", attotime_to_double(timer_get_time()) ));
 	thom_lightpen_nb = nb;
 	thom_lightpen_cb = cb;
 }
@@ -229,7 +229,7 @@ static TIMER_CALLBACK( thom_lightpen_step )
 		thom_lightpen_cb( step );
 
 	if ( step < thom_lightpen_nb )
-		mame_timer_adjust( thom_lightpen_timer, MAME_TIME_IN_USEC( 64 ), step + 1, time_zero );
+		timer_adjust( thom_lightpen_timer, ATTOTIME_IN_USEC( 64 ), step + 1, attotime_zero );
 }
 
 
@@ -258,7 +258,7 @@ static TIMER_CALLBACK( thom_lightpen_step )
 
 UINT8* thom_vram; /* pointer to video memory */
 
-static mame_timer* thom_scanline_timer; /* scan-line udpate */
+static emu_timer* thom_scanline_timer; /* scan-line udpate */
 
 static UINT16 thom_last_pal[16];   /* palette at last scanline start */
 static UINT16 thom_pal[16];        /* current palette */
@@ -829,7 +829,7 @@ TIMER_CALLBACK( thom_scanline_start )
 
 	/* prepare for next scanline */
 	if ( y == 199 ) 
-		mame_timer_adjust( thom_scanline_timer, time_never, 0, time_zero);
+		timer_adjust( thom_scanline_timer, attotime_never, 0, attotime_zero);
 	else 
 	{ 
 
@@ -854,7 +854,7 @@ TIMER_CALLBACK( thom_scanline_start )
 			thom_pal_changed = 0;
 		}
 
-		mame_timer_adjust( thom_scanline_timer, MAME_TIME_IN_USEC(64), y + 1, time_zero);
+		timer_adjust( thom_scanline_timer, ATTOTIME_IN_USEC(64), y + 1, attotime_zero);
 	}
 }
 
@@ -920,7 +920,7 @@ VIDEO_UPDATE ( thom )
 	rectangle lrect = { 0, xbleft - 1, 0, 0 };
 	rectangle rrect = { xbright, xright - 1, 0, 0 };
 
-	LOG (( "%f thom: video update called\n", mame_time_to_double(mame_timer_get_time()) ));
+	LOG (( "%f thom: video update called\n", attotime_to_double(timer_get_time()) ));
 
 	/* upper border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
@@ -1016,7 +1016,7 @@ VIDEO_UPDATE ( thom )
 
 
 
-static mame_timer *thom_init_timer;
+static emu_timer *thom_init_timer;
 
 static void (*thom_init_cb) ( int );
 
@@ -1032,12 +1032,12 @@ void thom_set_init_callback ( void (*cb) ( int init ) )
 static TIMER_CALLBACK( thom_set_init )
 {
 	int init = param;
-	LOG (( "%f thom_set_init: %i, at line %i col %i\n", mame_time_to_double(mame_timer_get_time()), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
+	LOG (( "%f thom_set_init: %i, at line %i col %i\n", attotime_to_double(timer_get_time()), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
 
 	if ( thom_init_cb ) 
 		thom_init_cb( init );
 	if ( ! init )
-		mame_timer_adjust( thom_init_timer, MAME_TIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init, time_zero );
+		timer_adjust( thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init, attotime_zero );
 }
 
 /* call this at the very begining of each new frame */
@@ -1048,7 +1048,7 @@ VIDEO_EOF ( thom )
 	UINT16 b = 0;
 	struct thom_vsignal l = thom_get_lightpen_vsignal( 0, -1, 0 );
   
-	LOG (( "%f thom: video eof called\n", mame_time_to_double(mame_timer_get_time()) ));
+	LOG (( "%f thom: video eof called\n", attotime_to_double(timer_get_time()) ));
 
 	/* floppy indicator count */
 	if ( thom_floppy_wcount ) 
@@ -1075,20 +1075,20 @@ VIDEO_EOF ( thom )
 	thom_vstate_dirty = 0;
   
 	/* schedule first init signal */
-	mame_timer_adjust( thom_init_timer, MAME_TIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7 ), 0, time_zero );
+	timer_adjust( thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7 ), 0, attotime_zero );
 
 	/* schedule first lightpen signal */
 	l.line &= ~1; /* hack (avoid lock in MO6 palette selection) */
-	mame_timer_adjust( thom_lightpen_timer,
-			   MAME_TIME_IN_USEC( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ),
-			   0, time_zero );
+	timer_adjust( thom_lightpen_timer,
+			   ATTOTIME_IN_USEC( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ),
+			   0, attotime_zero );
 
 	/* schedule first active-area scanline call-back */
-	mame_timer_adjust( thom_scanline_timer, MAME_TIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7),
-			   -1, time_zero );
+	timer_adjust( thom_scanline_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7),
+			   -1, attotime_zero );
 
 	/* reset video frame time */
-	mame_timer_adjust( thom_video_timer, time_zero, 0, time_never );
+	timer_adjust( thom_video_timer, attotime_zero, 0, attotime_never );
 
 	/* update screen size according to user options */
 	if ( thom_update_screen_size() )
@@ -1162,17 +1162,17 @@ VIDEO_START ( thom )
 	state_save_register_global( thom_floppy_rcount );
 	output_set_value( "floppy", 0 );
 
-	thom_video_timer = mame_timer_alloc( NULL );
+	thom_video_timer = timer_alloc( NULL );
 
-	thom_scanline_timer = mame_timer_alloc( thom_scanline_start );
+	thom_scanline_timer = timer_alloc( thom_scanline_start );
 
 	thom_lightpen_nb = 0;
 	thom_lightpen_cb = NULL;
-	thom_lightpen_timer = mame_timer_alloc( thom_lightpen_step );
+	thom_lightpen_timer = timer_alloc( thom_lightpen_step );
 	state_save_register_global( thom_lightpen_nb );
 
 	thom_init_cb = NULL;
-	thom_init_timer = mame_timer_alloc( thom_set_init );
+	thom_init_timer = timer_alloc( thom_set_init );
   
 	video_eof_thom(machine);
 

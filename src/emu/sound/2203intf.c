@@ -8,7 +8,7 @@
 struct ym2203_info
 {
 	sound_stream *	stream;
-	mame_timer *	timer[2];
+	emu_timer *	timer[2];
 	void *			chip;
 	void *			psg;
 	const struct YM2203interface *intf;
@@ -80,13 +80,13 @@ static void timer_handler(void *param,int c,int count,int clock)
 	struct ym2203_info *info = param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
-		mame_timer_enable(info->timer[c], 0);
+		timer_enable(info->timer[c], 0);
 	}
 	else
 	{	/* Start FM Timer */
-		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(clock), count);
-		if (!mame_timer_enable(info->timer[c], 1))
-			mame_timer_adjust_ptr(info->timer[c], period, time_zero);
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(clock), count);
+		if (!timer_enable(info->timer[c], 1))
+			timer_adjust_ptr(info->timer[c], period, attotime_zero);
 	}
 }
 
@@ -119,8 +119,8 @@ static void *ym2203_start(int sndindex, int clock, const void *config)
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = mame_timer_alloc_ptr(timer_callback_2203_0, info);
-	info->timer[1] = mame_timer_alloc_ptr(timer_callback_2203_1, info);
+	info->timer[0] = timer_alloc_ptr(timer_callback_2203_0, info);
+	info->timer[1] = timer_alloc_ptr(timer_callback_2203_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,1,rate,info,ym2203_stream_update);

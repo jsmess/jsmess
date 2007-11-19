@@ -15,8 +15,8 @@
 #include "videopin.lh"
 #include "sound/discrete.h"
 
-static mame_time time_pushed;
-static mame_time time_released;
+static attotime time_pushed;
+static attotime time_released;
 
 static UINT8 prev = 0;
 static UINT8 mask = 0;
@@ -33,7 +33,7 @@ static void update_plunger(void)
 	{
 		if (val == 0)
 		{
-			time_released = mame_timer_get_time();
+			time_released = timer_get_time();
 
 			if (!mask)
 			{
@@ -42,7 +42,7 @@ static void update_plunger(void)
 		}
 		else
 		{
-			time_pushed = mame_timer_get_time();
+			time_pushed = timer_get_time();
 		}
 
 		prev = val;
@@ -65,13 +65,13 @@ static TIMER_CALLBACK( interrupt_callback )
 		scanline = 32;
 	}
 
-	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_callback);
 }
 
 
 static MACHINE_RESET( videopin )
 {
-	mame_timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, interrupt_callback);
 
 	/* both output latches are cleared on reset */
 
@@ -82,7 +82,7 @@ static MACHINE_RESET( videopin )
 
 static double calc_plunger_pos(void)
 {
-	return (mame_time_to_double(mame_timer_get_time()) - mame_time_to_double(time_released)) * (mame_time_to_double(time_released) - mame_time_to_double(time_pushed) + 0.2);
+	return (attotime_to_double(timer_get_time()) - attotime_to_double(time_released)) * (attotime_to_double(time_released) - attotime_to_double(time_pushed) + 0.2);
 }
 
 

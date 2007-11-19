@@ -438,22 +438,22 @@
 #include "sound/msm5205.h"
 
 /* RAM areas */
-UINT8* mastboy_tileram;
-UINT8* mastboy_vram;
-UINT8* mastboy_colram;
-UINT8* mastboy_workram;
+static UINT8* mastboy_tileram;
+static UINT8* mastboy_vram;
+static UINT8* mastboy_colram;
+static UINT8* mastboy_workram;
 
 /* Bank Control */
-UINT8 mastboy_bank;
+static UINT8 mastboy_bank;
 
 /* General */
-int mastboy_irq0_ack;
-int mastboy_backupram_enabled;
+static int mastboy_irq0_ack;
+static int mastboy_backupram_enabled;
 
 /* MSM5205 */
-int mastboy_m5205_next;
-int mastboy_m5205_part;
-int mastboy_m5205_sambit0, mastboy_m5205_sambit1;
+static int mastboy_m5205_next;
+static int mastboy_m5205_part;
+static int mastboy_m5205_sambit0, mastboy_m5205_sambit1;
 
 /* VIDEO EMULATION */
 
@@ -658,7 +658,7 @@ static WRITE8_HANDLER( mastboy_irq0_ack_w )
 	if ((data&1)==1) cpunum_set_input_line(0,0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN( mastboy_interrupt )
+static INTERRUPT_GEN( mastboy_interrupt )
 {
 	if ((mastboy_irq0_ack&1)==1)
 	{

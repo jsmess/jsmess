@@ -13,7 +13,7 @@
 #include "devices/cassette.h"
 
 ULA ula;
-mame_timer *electron_tape_timer;
+emu_timer *electron_tape_timer;
 
 static mess_image *cassette_device_image( void ) {
 	return image_from_devtype_and_index( IO_CASSETTE, 0 );
@@ -28,12 +28,12 @@ static void electron_tape_start( void ) {
 	ula.high_tone_set = 0;
 	ula.bit_count = 0;
 	ula.tape_running = 1;
-	mame_timer_adjust( electron_tape_timer, time_zero, 0, MAME_TIME_IN_HZ(4800) );
+	timer_adjust( electron_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(4800) );
 }
 
 static void electron_tape_stop( void ) {
 	ula.tape_running = 0;
-	mame_timer_reset( electron_tape_timer, time_never );
+	timer_reset( electron_tape_timer, attotime_never );
 }
 
 #define TAPE_LOW	0x00;
@@ -292,8 +292,8 @@ MACHINE_START( electron )
 	
 	ula.interrupt_status = 0x82;
 	ula.interrupt_control = 0x00;
-	mame_timer_set( time_zero, 0, setup_beep );
-	electron_tape_timer = mame_timer_alloc( electron_tape_timer_handler );
+	timer_set( attotime_zero, 0, setup_beep );
+	electron_tape_timer = timer_alloc( electron_tape_timer_handler );
 	add_reset_callback(machine, electron_reset);
 }
 

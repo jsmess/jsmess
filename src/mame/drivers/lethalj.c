@@ -501,7 +501,7 @@ static tms34010_config tms_config_lethalj =
  *
  *************************************/
 
-MACHINE_DRIVER_START( gameroom )
+static MACHINE_DRIVER_START( gameroom )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
@@ -536,7 +536,7 @@ MACHINE_DRIVER_START( gameroom )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( lethalj )
+static MACHINE_DRIVER_START( lethalj )
 	MDRV_IMPORT_FROM( gameroom )
 
 	MDRV_CPU_MODIFY("main")

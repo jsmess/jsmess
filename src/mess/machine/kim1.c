@@ -24,7 +24,7 @@ typedef struct
 	UINT8 irqen;	/* IRQ enabled ? */
 	UINT8 state;	/* current timer state (bit 7) */
 	double clock;	/* 100000/1(,8,64,1024) */
-	mame_timer *timer;	/* timer callback */
+	emu_timer *timer;	/* timer callback */
 }
 M6530;
 
@@ -598,7 +598,7 @@ DRIVER_INIT( kim1 )
 
 static void set_chip_clock(int chip, int data)
 {
-	mame_timer_adjust(m6530[chip].timer, time_zero, chip, MAME_TIME_IN_HZ((data + 1) * m6530[chip].clock / 256 / 256));
+	timer_adjust(m6530[chip].timer, attotime_zero, chip, ATTOTIME_IN_HZ((data + 1) * m6530[chip].clock / 256 / 256));
 }
 
 MACHINE_RESET( kim1 )
@@ -624,13 +624,13 @@ MACHINE_RESET( kim1 )
 	m6530[0].dria = 0xff;
 	m6530[0].drib = 0xff;
 	m6530[0].clock = (double) 1000000 / 1;
-	m6530[0].timer = mame_timer_alloc(m6530_timer_cb);
+	m6530[0].timer = timer_alloc(m6530_timer_cb);
 	set_chip_clock(0, 255);
 
 	m6530[1].dria = 0xff;
 	m6530[1].drib = 0xff;
 	m6530[1].clock = (double) 1000000 / 1;
-	m6530[1].timer = mame_timer_alloc(m6530_timer_cb);
+	m6530[1].timer = timer_alloc(m6530_timer_cb);
 	set_chip_clock(1, 255);
 }
 
@@ -757,19 +757,19 @@ INLINE int m6530_r(int chip, int offset)
 		break;
 	case 0x04:
 	case 0x0c:						   /* Timer count read (not supported?) */
-		data = scale_up_mame_time(mame_timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
+		data = attotime_mul(timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
 		m6530[chip].irqen = (offset & 8) ? 1 : 0;
 		logerror("m6530(%d) TIMR  read : $%02x%s\n", chip, data, (offset & 8) ? " (IRQ)" : "");
 		break;
 	case 0x05:
 	case 0x0d:						   /* Timer count read (not supported?) */
-		data = scale_up_mame_time(mame_timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
+		data = attotime_mul(timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
 		m6530[chip].irqen = (offset & 8) ? 1 : 0;
 		logerror("m6530(%d) TIMR  read : $%02x%s\n", chip, data, (offset & 8) ? " (IRQ)" : "");
 		break;
 	case 0x06:
 	case 0x0e:						   /* Timer count read */
-		data = scale_up_mame_time(mame_timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
+		data = attotime_mul(timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
 		m6530[chip].irqen = (offset & 8) ? 1 : 0;
 		logerror("m6530(%d) TIMR  read : $%02x%s\n", chip, data, (offset & 8) ? " (IRQ)" : "");
 		break;

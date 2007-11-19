@@ -77,7 +77,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 #include "driver.h"
 #include "sound/ay8910.h"
 
-tilemap *pturn_fgmap,*pturn_bgmap;
+static tilemap *pturn_fgmap,*pturn_bgmap;
 static int bgbank=0;
 static int fgbank=0;
 static int bgpalette=0;

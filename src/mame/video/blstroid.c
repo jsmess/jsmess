@@ -119,8 +119,8 @@ void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline
 	if (offset < 0x1000)
 		if (atarigen_playfield[offset] & 0x8000)
 		{
-			mame_time period_on;
-			mame_time period_off;
+			attotime period_on;
+			attotime period_off;
 
 			/* fix me - the only thing this IRQ does it tweak the starting MO link */
 			/* unfortunately, it does it too early for the given MOs! */
@@ -132,8 +132,8 @@ void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline
 			period_on  = video_screen_get_time_until_pos(scrnum, video_screen_get_vpos(scrnum) + 7, machine->screen[scrnum].width * 0.9);
 			period_off = video_screen_get_time_until_pos(scrnum, video_screen_get_vpos(scrnum) + 8, machine->screen[scrnum].width * 0.9);
 
-			mame_timer_set(period_on,  0, irq_on);
-			mame_timer_set(period_off, 0, irq_off);
+			timer_set(period_on,  0, irq_on);
+			timer_set(period_off, 0, irq_off);
 		}
 }
 

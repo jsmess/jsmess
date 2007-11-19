@@ -15,8 +15,8 @@
 #include "driver.h"
 #include "sound/ay8910.h"
 
-UINT8 mouser_sound_byte;
-UINT8 mouser_nmi_enable;
+static UINT8 mouser_sound_byte;
+static UINT8 mouser_nmi_enable;
 
 /* From "video/mouser.c" */
 PALETTE_INIT( mouser );
@@ -34,7 +34,7 @@ static WRITE8_HANDLER( mouser_nmi_enable_w )
 	mouser_nmi_enable = data;
 }
 
-INTERRUPT_GEN( mouser_nmi_interrupt )
+static INTERRUPT_GEN( mouser_nmi_interrupt )
 {
 	if ((mouser_nmi_enable & 1) == 1)
 		nmi_line_pulse();

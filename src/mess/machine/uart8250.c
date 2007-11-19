@@ -18,7 +18,7 @@
 
 
 #define LOG(LEVEL,N,M,A)  \
-if( M )logerror("%11.6f: %-24s",mame_timer_get_time(),(char*)M ); logerror A;
+if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A;
 
 
 //#define VERBOSE_COM 0
@@ -316,7 +316,7 @@ UINT8 uart8250_r(int n, offs_t idx)
 		case 5:
 
 #if 0
-			if (uart[n].send.active && (mame_timer_get_time()-uart[n].send.time>uart_byte_time(n)))
+			if (uart[n].send.active && (timer_get_time()-uart[n].send.time>uart_byte_time(n)))
 			{
 				// currently polling is enough for pc1512
 				uart[n].lsr |= 0x40; /* set TSRE */

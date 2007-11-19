@@ -105,8 +105,8 @@ typedef struct
 
 	// on-board peripheral stuff
 	UINT8 m37710_regs[128];
-	mame_time reload[8];
-	mame_timer *timers[8];
+	attotime reload[8];
+	emu_timer *timers[8];
 } m37710i_cpu_struct;
 
 extern m37710i_cpu_struct m37710i_cpu;

@@ -25,7 +25,7 @@
  *
  *************************************/
 
-mame_time mcr68_timing_factor;
+attotime mcr68_timing_factor;
 
 UINT8 mcr_cocktail_flip;
 
@@ -50,9 +50,9 @@ static struct counter_state
 	UINT8			control;
 	UINT16			latch;
 	UINT16			count;
-	mame_timer *	timer;
+	emu_timer *	timer;
 	UINT8			timer_active;
-	mame_time		period;
+	attotime		period;
 } m6840_state[3];
 
 /* MCR/68k interrupt states */
@@ -65,10 +65,10 @@ static void (*v493_callback)(running_machine *machine, int param);
 
 static UINT8 zwackery_sound_data;
 
-static mame_time m6840_counter_periods[3];
-static mame_time m6840_internal_counter_period;	/* 68000 CLK / 10 */
+static attotime m6840_counter_periods[3];
+static attotime m6840_internal_counter_period;	/* 68000 CLK / 10 */
 
-static mame_timer *ipu_watchdog_timer;
+static emu_timer *ipu_watchdog_timer;
 
 
 
@@ -290,7 +290,7 @@ MACHINE_START( nflfoot )
 	z80sio_init(0, &nflfoot_sio_intf);
 
 	/* allocate a timer for the IPU watchdog */
-	ipu_watchdog_timer = mame_timer_alloc(ipu_watchdog_reset);
+	ipu_watchdog_timer = timer_alloc(ipu_watchdog_reset);
 }
 
 
@@ -319,7 +319,7 @@ MACHINE_START( mcr68 )
 	{
 		struct counter_state *m6840 = &m6840_state[i];
 
-		m6840->timer = mame_timer_alloc(counter_fired_callback);
+		m6840->timer = timer_alloc(counter_fired_callback);
 
 		state_save_register_item("m6840", i, m6840->control);
 		state_save_register_item("m6840", i, m6840->latch);
@@ -344,9 +344,9 @@ static void mcr68_common_init(void)
 	int i;
 
 	/* reset the 6840's */
-	m6840_counter_periods[0] = MAME_TIME_IN_HZ(30);			/* clocked by /VBLANK */
-	m6840_counter_periods[1] = time_never;					/* grounded */
-	m6840_counter_periods[2] = MAME_TIME_IN_HZ(512 * 30);	/* clocked by /HSYNC */
+	m6840_counter_periods[0] = ATTOTIME_IN_HZ(30);			/* clocked by /VBLANK */
+	m6840_counter_periods[1] = attotime_never;					/* grounded */
+	m6840_counter_periods[2] = ATTOTIME_IN_HZ(512 * 30);	/* clocked by /HSYNC */
 
 	m6840_status = 0x00;
 	m6840_status_read_since_int = 0x00;
@@ -358,13 +358,13 @@ static void mcr68_common_init(void)
 		m6840->control = 0x00;
 		m6840->latch = 0xffff;
 		m6840->count = 0xffff;
-		mame_timer_enable(m6840->timer, FALSE);
+		timer_enable(m6840->timer, FALSE);
 		m6840->timer_active = 0;
 		m6840->period = m6840_counter_periods[i];
 	}
 
 	/* initialize the clock */
-	m6840_internal_counter_period = MAME_TIME_IN_HZ(Machine->drv->cpu[0].clock / 10);
+	m6840_internal_counter_period = ATTOTIME_IN_HZ(Machine->drv->cpu[0].clock / 10);
 
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;
@@ -459,7 +459,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	mame_timer_set(sub_mame_times(MAME_TIME_IN_HZ(30), mcr68_timing_factor), 0, v493_callback);
+	timer_set(attotime_sub(ATTOTIME_IN_HZ(30), mcr68_timing_factor), 0, v493_callback);
 }
 
 
@@ -499,7 +499,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 {
 	v493_irq_state = 1;
 	update_mcr68_interrupts();
-	mame_timer_set(video_screen_get_scan_period(0), 0, mcr68_493_off_callback);
+	timer_set(video_screen_get_scan_period(0), 0, mcr68_493_off_callback);
 	logerror("--- (INT1) ---\n");
 }
 
@@ -620,7 +620,7 @@ static TIMER_CALLBACK( zwackery_493_off_callback )
 static TIMER_CALLBACK( zwackery_493_callback )
 {
 	pia_2_ca1_w(0, 1);
-	mame_timer_set(video_screen_get_scan_period(0), 0, zwackery_493_off_callback);
+	timer_set(video_screen_get_scan_period(0), 0, zwackery_493_off_callback);
 }
 
 
@@ -719,8 +719,8 @@ static TIMER_CALLBACK( counter_fired_callback )
 
 static void reload_count(int counter)
 {
-	mame_time period;
-	mame_time total_period;
+	attotime period;
+	attotime total_period;
 	int count;
 
 	/* copy the latched value in */
@@ -729,7 +729,7 @@ static void reload_count(int counter)
 	/* counter 0 is self-updating if clocked externally */
 	if (counter == 0 && !(m6840_state[counter].control & 0x02))
 	{
-		mame_timer_adjust(m6840_state[counter].timer, time_never, 0, time_zero);
+		timer_adjust(m6840_state[counter].timer, attotime_never, 0, attotime_zero);
 		m6840_state[counter].timer_active = 0;
 		return;
 	}
@@ -748,16 +748,16 @@ static void reload_count(int counter)
 		count = count + 1;
 
 	/* set the timer */
-	total_period = make_mame_time(0, mame_time_to_subseconds(period) * count);
-LOG(("reload_count(%d): period = %f  count = %d\n", counter, mame_time_to_double(period), count));
-	mame_timer_adjust(m6840_state[counter].timer, total_period, (count << 2) + counter, time_zero);
+	total_period = attotime_make(0, attotime_to_attoseconds(period) * count);
+LOG(("reload_count(%d): period = %f  count = %d\n", counter, attotime_to_double(period), count));
+	timer_adjust(m6840_state[counter].timer, total_period, (count << 2) + counter, attotime_zero);
 	m6840_state[counter].timer_active = 1;
 }
 
 
 static UINT16 compute_counter(int counter)
 {
-	mame_time period;
+	attotime period;
 	int remaining;
 
 	/* if there's no timer, return the count */
@@ -771,7 +771,7 @@ static UINT16 compute_counter(int counter)
 		period = m6840_counter_periods[counter];
 
 	/* see how many are left */
-	remaining = mame_time_to_subseconds(mame_timer_timeleft(m6840_state[counter].timer)) / mame_time_to_subseconds(period);
+	remaining = attotime_to_attoseconds(timer_timeleft(m6840_state[counter].timer)) / attotime_to_attoseconds(period);
 
 	/* adjust the count for dual byte mode */
 	if (m6840_state[counter].control & 0x04)
@@ -813,7 +813,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 			{
 				for (i = 0; i < 3; i++)
 				{
-					mame_timer_adjust(m6840_state[i].timer, time_never, 0, time_zero);
+					timer_adjust(m6840_state[i].timer, attotime_never, 0, attotime_zero);
 					m6840_state[i].timer_active = 0;
 				}
 			}
@@ -1015,7 +1015,7 @@ READ8_HANDLER( mcr_ipu_watchdog_r )
 {
 	/* watchdog counter is clocked by 7.3728MHz crystal / 16 */
 	/* watchdog is tripped when 14-bit counter overflows => / 32768 = 14.0625Hz*/
-	mame_timer_adjust(ipu_watchdog_timer, MAME_TIME_IN_HZ(7372800 / 16 / 32768), 0, time_zero);
+	timer_adjust(ipu_watchdog_timer, ATTOTIME_IN_HZ(7372800 / 16 / 32768), 0, attotime_zero);
 	return 0xff;
 }
 

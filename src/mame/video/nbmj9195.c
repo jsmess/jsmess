@@ -98,7 +98,7 @@ WRITE8_HANDLER( nbmj9195_nb22090_palette_w )
 
 
 ******************************************************************************/
-int nbmj9195_blitter_r(int vram, int offset)
+static int nbmj9195_blitter_r(int vram, int offset)
 {
 	int ret;
 	UINT8 *GFXROM = memory_region(REGION_GFX1);
@@ -113,7 +113,7 @@ int nbmj9195_blitter_r(int vram, int offset)
 	return ret;
 }
 
-void nbmj9195_blitter_w(int vram, int offset, int data)
+static void nbmj9195_blitter_w(int vram, int offset, int data)
 {
 	int new_line;
 
@@ -165,7 +165,7 @@ void nbmj9195_clutsel_w(int data)
 	nbmj9195_clutsel = data;
 }
 
-void nbmj9195_clut_w(int vram, int offset, int data)
+static void nbmj9195_clut_w(int vram, int offset, int data)
 {
 	nbmj9195_clut[vram][((nbmj9195_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
@@ -382,7 +382,7 @@ static void nbmj9195_gfxdraw(int vram)
 	nb19010_busyflag = 0;
 
 	/* 1650ns per count */
-	mame_timer_set(make_mame_time(0, nb19010_busyctr * 1650 * (MAX_SUBSECONDS / 1000000000)), 0, blitter_timer_callback);
+	timer_set(attotime_make(0, nb19010_busyctr * 1650 * ATTOSECONDS_PER_NANOSECOND), 0, blitter_timer_callback);
 }
 
 /******************************************************************************

@@ -190,7 +190,7 @@ enum
 static UINT32 blitter_regs[BLITTER_REGS];
 static UINT16 gpu_regs[GPU_REGS];
 
-static mame_timer *vi_timer;
+static emu_timer *vi_timer;
 static UINT8 cpu_irq_state;
 
 static pen_t *pen_table;
@@ -277,7 +277,7 @@ static TIMER_CALLBACK( vi_callback )
 
 	cpu_irq_state |= 1;
 	update_cpu_irq();
-	mame_timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
@@ -302,7 +302,7 @@ void jaguar_dsp_cpu_int(void)
  *
  *************************************/
 
-void jaguar_set_palette(UINT16 vmode)
+static void jaguar_set_palette(UINT16 vmode)
 {
 	static const UINT8 red_lookup[256] =
 	{
@@ -648,7 +648,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 		{
 			case VI:
 				scanline = (gpu_regs[VI] - gpu_regs[VBE]) / 2;
-				mame_timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+				timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 				break;
 
 			case INT1:
@@ -734,7 +734,7 @@ VIDEO_START( cojag )
 
 	pen_table = auto_malloc(65536 * sizeof(pen_t));
 
-	vi_timer = mame_timer_alloc(vi_callback);
+	vi_timer = timer_alloc(vi_callback);
 
 	state_save_register_global_pointer(pen_table, 65536);
 	state_save_register_global_array(blitter_regs);

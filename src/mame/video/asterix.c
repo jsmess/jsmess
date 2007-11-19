@@ -8,7 +8,7 @@ static UINT16 spritebank;
 static int tilebanks[4];
 static int spritebanks[4];
 
-void reset_spritebank(void)
+static void reset_spritebank(void)
 {
 	K053244_bankselect(0, spritebank & 7);
 	spritebanks[0] = (spritebank << 12) & 0x7000;

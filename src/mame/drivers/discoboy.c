@@ -39,15 +39,15 @@ Notes:
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 
-UINT8* discoboy_ram_part1;
-UINT8* discoboy_ram_part2;
-UINT8* discoboy_ram_part3;
-UINT8* discoboy_ram_part4;
-UINT8* discoboy_ram_att;
+static UINT8* discoboy_ram_part1;
+static UINT8* discoboy_ram_part2;
+static UINT8* discoboy_ram_part3;
+static UINT8* discoboy_ram_part4;
+static UINT8* discoboy_ram_att;
 
-UINT8 discoboy_ram_bank;
+static UINT8 discoboy_ram_bank;
 static UINT8 port_00;
-UINT8 discoboy_gfxbank;
+static UINT8 discoboy_gfxbank;
 
 static VIDEO_START( discoboy )
 {
@@ -163,12 +163,14 @@ static VIDEO_UPDATE( discoboy )
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 void discoboy_setrombank(UINT8 data)
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	data &=0x2f;
 	memory_set_bankptr(1, &ROM[0x6000+(data*0x1000)] );
 }
+#endif
 
 static WRITE8_HANDLER( rambank_select_w )
 {

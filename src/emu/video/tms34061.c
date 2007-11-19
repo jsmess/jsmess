@@ -33,7 +33,7 @@ struct tms34061_data
 	UINT8 *			latchram;
 	UINT8			latchdata;
 	UINT8 *			shiftreg;
-	mame_timer *		timer;
+	emu_timer *		timer;
 	struct tms34061_interface intf;
 };
 
@@ -117,7 +117,7 @@ void tms34061_start(struct tms34061_interface *interface)
 	tms34061.regs[TMS34061_VERCOUNTER]   = 0x0000;
 
 	/* start vertical interrupt timer */
-	tms34061.timer = mame_timer_alloc(tms34061_interrupt);
+	tms34061.timer = timer_alloc(tms34061_interrupt);
 }
 
 
@@ -145,7 +145,7 @@ INLINE void update_interrupts(void)
 static TIMER_CALLBACK( tms34061_interrupt )
 {
 	/* set timer for next frame */
-	mame_timer_adjust(tms34061.timer, video_screen_get_frame_period(tms34061.intf.scrnum), 0, time_zero);
+	timer_adjust(tms34061.timer, video_screen_get_frame_period(tms34061.intf.scrnum), 0, attotime_zero);
 
 	/* set the interrupt bit in the status reg */
 	tms34061.regs[TMS34061_STATUS] |= 1;
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( register_w )
 			if (scanline < 0)
 				scanline += tms34061.regs[TMS34061_VERTOTAL];
 
-			mame_timer_adjust(tms34061.timer, video_screen_get_time_until_pos(tms34061.intf.scrnum, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0, time_zero);
+			timer_adjust(tms34061.timer, video_screen_get_time_until_pos(tms34061.intf.scrnum, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0, attotime_zero);
 			break;
 
 		/* XY offset: set the X and Y masks */

@@ -23,9 +23,9 @@
 #include "driver.h"
 #include "sound/ay8910.h"
 
-UINT8 *skyarmy_videoram;
-UINT8 *skyarmy_colorram;
-UINT8 *skyarmy_scrollram;
+static UINT8 *skyarmy_videoram;
+static UINT8 *skyarmy_colorram;
+static UINT8 *skyarmy_scrollram;
 static tilemap* skyarmy_tilemap;
 
 static TILE_GET_INFO( get_skyarmy_tile_info )

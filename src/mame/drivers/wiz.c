@@ -650,7 +650,7 @@ static const discrete_lfsr_desc stinger_lfsr =
 	16			/* Output bit is feedback bit */
 };
 
-DISCRETE_SOUND_START(stinger)
+static DISCRETE_SOUND_START(stinger)
 
 #define STINGER_SHOT_OUT	NODE_90
 #define STINGER_BOOM_OUT	NODE_91

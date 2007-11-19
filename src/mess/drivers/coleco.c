@@ -228,7 +228,7 @@ static MACHINE_RESET(coleco)
 {
     cpunum_set_input_line_vector(0, 0, 0xff);
 	memset(&memory_region(REGION_CPU1)[0x6000], 0xff, 0x400);	// initialize RAM
-    mame_timer_pulse(MAME_TIME_IN_MSEC(20), 0, paddle_callback);
+    timer_pulse(ATTOTIME_IN_MSEC(20), 0, paddle_callback);
 }
 
 static MACHINE_DRIVER_START( coleco )

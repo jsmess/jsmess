@@ -97,7 +97,7 @@ extern void update_system18_vdp( mame_bitmap *bitmap, const rectangle *cliprect 
 extern void start_system18_vdp(void);
 extern READ16_HANDLER( segac2_vdp_r );
 extern WRITE16_HANDLER( segac2_vdp_w );
-UINT16 sys18_ddcrew_bankregs[0x20];
+static UINT16 sys18_ddcrew_bankregs[0x20];
 
 
 
@@ -132,7 +132,7 @@ int sys16_bg_priority_mode;
 int sys16_fg_priority_mode;
 int sys16_bg_priority_value;
 int sys16_fg_priority_value;
-int sys16_18_mode;
+static int sys16_18_mode;
 int sys16_tilebank_switch;
 int sys16_rowscroll_scroll;
 int shinobl_kludge;

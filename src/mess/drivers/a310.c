@@ -83,7 +83,7 @@ static UINT8 a310_iocregs[0x80/4];
 static UINT32 a310_timercnt[4], a310_timerout[4];
 static UINT32 a310_sndstart, a310_sndend, a310_sndcur;
 
-static mame_timer *vbl_timer, *timer[4], *snd_timer;
+static emu_timer *vbl_timer, *timer[4], *snd_timer;
 
 VIDEO_START( a310 )
 {
@@ -139,7 +139,7 @@ static TIMER_CALLBACK( a310_vblank )
 	a310_request_irq_a(A310_IRQA_VBL);
 
 	// set up for next vbl
-	mame_timer_adjust(vbl_timer, video_screen_get_time_until_pos(0, a310_vidregs[0xb4], 0), 0, time_never);
+	timer_adjust(vbl_timer, video_screen_get_time_until_pos(0, a310_vidregs[0xb4], 0), 0, attotime_never);
 }
 
 static void a310_set_timer(int tmr)
@@ -148,7 +148,7 @@ static void a310_set_timer(int tmr)
 
 //	logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, a310_timercnt[tmr], freq);
 
-	mame_timer_adjust(timer[tmr], MAME_TIME_IN_HZ(freq), tmr, time_never);
+	timer_adjust(timer[tmr], ATTOTIME_IN_HZ(freq), tmr, attotime_never);
 }
 
 // param
@@ -216,20 +216,20 @@ static MACHINE_START( a310 )
 	a310_pagesize = 0;
 	wd17xx_init(WD_TYPE_1772, a310_wd177x_callback, NULL);
 
-	vbl_timer = mame_timer_alloc(a310_vblank);
-	mame_timer_adjust(vbl_timer, time_never, 0, time_never);
+	vbl_timer = timer_alloc(a310_vblank);
+	timer_adjust(vbl_timer, attotime_never, 0, attotime_never);
 
-	timer[0] = mame_timer_alloc(a310_timer);
-	timer[1] = mame_timer_alloc(a310_timer);
-	timer[2] = mame_timer_alloc(a310_timer);
-	timer[3] = mame_timer_alloc(a310_timer);
-	mame_timer_adjust(timer[0], time_never, 0, time_never);
-	mame_timer_adjust(timer[1], time_never, 0, time_never);
-	mame_timer_adjust(timer[2], time_never, 0, time_never);
-	mame_timer_adjust(timer[3], time_never, 0, time_never);
+	timer[0] = timer_alloc(a310_timer);
+	timer[1] = timer_alloc(a310_timer);
+	timer[2] = timer_alloc(a310_timer);
+	timer[3] = timer_alloc(a310_timer);
+	timer_adjust(timer[0], attotime_never, 0, attotime_never);
+	timer_adjust(timer[1], attotime_never, 0, attotime_never);
+	timer_adjust(timer[2], attotime_never, 0, attotime_never);
+	timer_adjust(timer[3], attotime_never, 0, attotime_never);
 
-	snd_timer = mame_timer_alloc(a310_audio_tick);
-	mame_timer_adjust(snd_timer, time_never, 0, time_never);
+	snd_timer = timer_alloc(a310_audio_tick);
+	timer_adjust(snd_timer, attotime_never, 0, attotime_never);
 
 	// reset the DAC to centerline
 	DAC_signed_data_w(0, 0x80);
@@ -371,7 +371,7 @@ static void latch_timer_cnt(int tmr)
 {
 	double time;
 
-	time = mame_time_to_double(mame_timer_timeelapsed(timer[tmr]));
+	time = attotime_to_double(timer_timeelapsed(timer[tmr]));
 	time *= 2000000.0;	// find out how many 2 MHz ticks have gone by
 	a310_timerout[tmr] = a310_timercnt[tmr] - (UINT32)time; 
 }
@@ -600,7 +600,7 @@ static WRITE32_HANDLER(vidc_w)
 			video_screen_configure(0, a310_vidregs[0x80], a310_vidregs[0xa0], &visarea, Machine->screen[0].refresh);
 
 			// slightly hacky: fire off a VBL right now.  the BIOS doesn't wait long enough otherwise.
-			mame_timer_adjust(vbl_timer, time_zero, 0, time_never);
+			timer_adjust(vbl_timer, attotime_zero, 0, attotime_never);
 		}
 	
 		a310_vidregs[reg] = val>>12;
@@ -647,11 +647,11 @@ static WRITE32_HANDLER(memc_w)
 
 					a310_sndcur = a310_sndstart;
 
-					mame_timer_adjust(snd_timer, MAME_TIME_IN_HZ(sndhz), 0, MAME_TIME_IN_HZ(sndhz));
+					timer_adjust(snd_timer, ATTOTIME_IN_HZ(sndhz), 0, ATTOTIME_IN_HZ(sndhz));
 				}
 				else
 				{
-					mame_timer_adjust(snd_timer, time_never, 0, time_never);
+					timer_adjust(snd_timer, attotime_never, 0, attotime_never);
 					DAC_signed_data_w(0, 0x80);
 				}
 				break;

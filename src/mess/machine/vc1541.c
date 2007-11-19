@@ -579,14 +579,14 @@ static WRITE8_HANDLER( vc1541_via1_write_portb )
 			tme=vc1541_times[vc1541->frequency>>5]*8*2;
 			if (vc1541->motor)
 			{
-				if (mame_time_to_double(mame_timer_timeelapsed(vc1541->timer)) > 1.0e29)
-					mame_timer_reset(vc1541->timer, time_never);
+				if (attotime_to_double(timer_timeelapsed(vc1541->timer)) > 1.0e29)
+					timer_reset(vc1541->timer, attotime_never);
 				else
-					mame_timer_adjust(vc1541->timer, time_zero, 0, double_to_mame_time(tme));
+					timer_adjust(vc1541->timer, attotime_zero, 0, double_to_attotime(tme));
 			}
 			else
 			{
-				mame_timer_reset(vc1541->timer, time_never);
+				timer_reset(vc1541->timer, attotime_never);
 			}
 		}
 		old=data;
@@ -634,7 +634,7 @@ DEVICE_LOAD(vc1541)
 
 	logerror("floppy image %s loaded\n", image_filename(image));
 
-	vc1541->timer = mame_timer_alloc(vc1541_timer);
+	vc1541->timer = timer_alloc(vc1541_timer);
 	return INIT_PASS;
 }
 
@@ -642,7 +642,7 @@ DEVICE_UNLOAD(vc1541)
 {
 	/* writeback of image data */
 	vc1541->d64.data = NULL;
-	mame_timer_reset(vc1541->timer, time_never);	/* FIXME - timers should only be allocated once */
+	timer_reset(vc1541->timer, attotime_never);	/* FIXME - timers should only be allocated once */
 }
 
 int vc1541_config (int id, int mode, VC1541_CONFIG *config)
@@ -873,14 +873,14 @@ static WRITE8_HANDLER ( c1551_port_w )
 				tme=vc1541_times[vc1541->frequency>>5]*8*2;
 				if (vc1541->motor)
 				{
-					if (mame_time_to_double(mame_timer_timeelapsed(vc1541->timer)) > 1.0e29)
-						mame_timer_reset(vc1541->timer, time_never);
+					if (attotime_to_double(timer_timeelapsed(vc1541->timer)) > 1.0e29)
+						timer_reset(vc1541->timer, attotime_never);
 					else
-						mame_timer_adjust(vc1541->timer, time_zero, 0, double_to_mame_time(tme));
+						timer_adjust(vc1541->timer, attotime_zero, 0, double_to_attotime(tme));
 				}
 				else
 				{
-					mame_timer_reset(vc1541->timer, time_never);
+					timer_reset(vc1541->timer, attotime_never);
 				}
 			}
 			old=data;
@@ -956,8 +956,8 @@ int c1551_config (int id, int mode, C1551_CONFIG *config)
 
 	/* time should be small enough to allow quitting of the irq
 	   line before the next interrupt is triggered */
-	vc1541->drive.c1551.timer = mame_timer_alloc(c1551_timer);
-	mame_timer_adjust(vc1541->drive.c1551.timer, time_zero, 0, MAME_TIME_IN_HZ(60));
+	vc1541->drive.c1551.timer = timer_alloc(c1551_timer);
+	timer_adjust(vc1541->drive.c1551.timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
 	return 0;
 }
 

@@ -754,7 +754,7 @@ static TILE_GET_INFO( PC080SN_get_fg_tile_info_1 )
 	common_get_PC080SN_fg_tile_info(machine,tileinfo,tile_index,PC080SN_bg_ram[1][1],PC080SN_bg_gfx[1]);
 }
 
-tile_get_info_callback PC080SN_get_tile_info[PC080SN_MAX_CHIPS][2] =
+static tile_get_info_callback PC080SN_get_tile_info[PC080SN_MAX_CHIPS][2] =
 {
 	{ PC080SN_get_bg_tile_info_0, PC080SN_get_fg_tile_info_0 },
 	{ PC080SN_get_bg_tile_info_1, PC080SN_get_fg_tile_info_1 }
@@ -1015,7 +1015,7 @@ void PC080SN_tilemap_update(void)
 }
 
 
-UINT16 topspeed_get_road_pixel_color(UINT16 pixel,UINT16 color)
+static UINT16 topspeed_get_road_pixel_color(UINT16 pixel,UINT16 color)
 {
 	UINT16 road_body_color,off_road_color,pixel_type;
 
@@ -1476,7 +1476,7 @@ static const gfx_layout TC0080VCO_charlayout =
 };
 
 
-void TC0080VCO_set_layer_ptrs(void)
+static void TC0080VCO_set_layer_ptrs(void)
 {
 	TC0080VCO_char_ram      = TC0080VCO_ram + 0x00000/2;	/* continues at +0x10000 */
 	TC0080VCO_tx_ram_0      = TC0080VCO_ram + 0x01000/2;
@@ -1495,20 +1495,20 @@ void TC0080VCO_set_layer_ptrs(void)
 	TC0080VCO_scroll_ram    = TC0080VCO_ram + 0x20800/2;
 }
 
-void TC0080VCO_dirty_chars(void)
+static void TC0080VCO_dirty_chars(void)
 {
 	memset(TC0080VCO_char_dirty,1,TC0080VCO_TOTAL_CHARS);
 	TC0080VCO_chars_dirty = 1;
 }
 
-void TC0080VCO_dirty_tilemaps(void)
+static void TC0080VCO_dirty_tilemaps(void)
 {
 	tilemap_mark_all_tiles_dirty(TC0080VCO_tilemap[0]);
 	tilemap_mark_all_tiles_dirty(TC0080VCO_tilemap[1]);
 	tilemap_mark_all_tiles_dirty(TC0080VCO_tilemap[2]);
 }
 
-void TC0080VCO_restore_scroll(void)
+static void TC0080VCO_restore_scroll(void)
 {
 	TC0080VCO_flipscreen = TC0080VCO_scroll_ram[0] & 0x0c00;
 
@@ -2163,7 +2163,7 @@ static TILE_GET_INFO( TC0100SCN_get_tx_tile_info_2 )
 
 /* This array changes with TC0100SCN_MAX_CHIPS */
 
-tile_get_info_callback TC0100SCN_get_tile_info[TC0100SCN_MAX_CHIPS][3] =
+static tile_get_info_callback TC0100SCN_get_tile_info[TC0100SCN_MAX_CHIPS][3] =
 {
 	{ TC0100SCN_get_bg_tile_info_0, TC0100SCN_get_fg_tile_info_0, TC0100SCN_get_tx_tile_info_0 },
 	{ TC0100SCN_get_bg_tile_info_1, TC0100SCN_get_fg_tile_info_1, TC0100SCN_get_tx_tile_info_1 },
@@ -2211,7 +2211,7 @@ WRITE16_HANDLER( TC0100SCN_gfxbank_w )   /* Mjnquest banks its 2 sets of scr til
     TC0100SCN_gfxbank = (data & 0x1);
 }
 
-void TC0100SCN_set_layer_ptrs(int i)
+static void TC0100SCN_set_layer_ptrs(int i)
 {
 	if (!TC0100SCN_dblwidth[i])
 	{
@@ -2238,14 +2238,14 @@ void TC0100SCN_set_layer_ptrs(int i)
 /* As we can't pass function calls with params in set...func_postload() calls
    in the vh_start, this slightly obnoxious method is used */
 
-void TC0100SCN_dirty_tilemaps(int chip)
+static void TC0100SCN_dirty_tilemaps(int chip)
 {
 	tilemap_mark_all_tiles_dirty(TC0100SCN_tilemap[chip][0][TC0100SCN_dblwidth[chip]]);
 	tilemap_mark_all_tiles_dirty(TC0100SCN_tilemap[chip][1][TC0100SCN_dblwidth[chip]]);
 	tilemap_mark_all_tiles_dirty(TC0100SCN_tilemap[chip][2][TC0100SCN_dblwidth[chip]]);
 }
 
-void TC0100SCN_dirty_chars(int chip)
+static void TC0100SCN_dirty_chars(int chip)
 {
 	memset(TC0100SCN_char_dirty[chip],1,TC0100SCN_TOTAL_CHARS);
 	TC0100SCN_chars_dirty[chip] = 1;
@@ -3011,7 +3011,7 @@ static TILE_GET_INFO( TC0480SCP_get_tx_tile_info )
 	common_get_tc0480tx_tile_info(machine,tileinfo,tile_index,TC0480SCP_tx_ram,TC0480SCP_tx_gfx);
 }
 
-tile_get_info_callback tc480_get_tile_info[5] =
+static tile_get_info_callback tc480_get_tile_info[5] =
 {
 	TC0480SCP_get_bg0_tile_info, TC0480SCP_get_bg1_tile_info,
 	TC0480SCP_get_bg2_tile_info, TC0480SCP_get_bg3_tile_info,
@@ -3034,7 +3034,7 @@ static const gfx_layout TC0480SCP_charlayout =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
-void TC0480SCP_set_layer_ptrs(void)
+static void TC0480SCP_set_layer_ptrs(void)
 {
 	if (!TC0480SCP_dblwidth)
 	{
@@ -3072,7 +3072,7 @@ void TC0480SCP_set_layer_ptrs(void)
 	}
 }
 
-void TC0480SCP_dirty_tilemaps(void)
+static void TC0480SCP_dirty_tilemaps(void)
 {
 	tilemap_mark_all_tiles_dirty(TC0480SCP_tilemap[0][TC0480SCP_dblwidth]);
 	tilemap_mark_all_tiles_dirty(TC0480SCP_tilemap[1][TC0480SCP_dblwidth]);
@@ -3081,7 +3081,7 @@ void TC0480SCP_dirty_tilemaps(void)
 	tilemap_mark_all_tiles_dirty(TC0480SCP_tilemap[4][TC0480SCP_dblwidth]);
 }
 
-void TC0480SCP_dirty_chars(void)
+static void TC0480SCP_dirty_chars(void)
 {
 	memset(TC0480SCP_char_dirty,1,TC0480SCP_TOTAL_CHARS);
 	TC0480SCP_chars_dirty = 1;
@@ -4682,7 +4682,7 @@ static UINT16 *TC0110PCR_ram[3];
 #define TC0110PCR_RAM_SIZE 0x2000
 
 
-void TC0110PCR_restore_colors(int chip)
+static void TC0110PCR_restore_colors(int chip)
 {
 	int i,color,r=0,g=0,b=0;
 

@@ -39,7 +39,7 @@
  *
  *************************************/
 
-UINT8 mcr_sound_config;
+static UINT8 mcr_sound_config;
 
 
 
@@ -463,7 +463,7 @@ struct AY8910interface ssio_ay8910_interface_2 =
 /********* memory interfaces ***********/
 
 /* address map verified from schematics */
-ADDRESS_MAP_START( ssio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
@@ -537,7 +537,7 @@ static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 static READ16_HANDLER( csdeluxe_pia_r )
@@ -581,7 +581,7 @@ void csdeluxe_reset_w(int state)
 /********* memory interfaces ***********/
 
 /* address map determined by PAL; not verified */
-ADDRESS_MAP_START( csdeluxe_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( csdeluxe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(17) )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
 	AM_RANGE(0x018000, 0x018007) AM_READWRITE(csdeluxe_pia_r, csdeluxe_pia_w)
@@ -657,7 +657,7 @@ static TIMER_CALLBACK( soundsgood_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(250));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(250));
 }
 
 
@@ -682,7 +682,7 @@ void soundsgood_reset_w(int state)
 /********* memory interfaces ***********/
 
 /* address map determined by PAL; not verified */
-ADDRESS_MAP_START( soundsgood_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( soundsgood_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(19) )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060007) AM_READWRITE(pia_1_msb_alt_r, pia_1_msb_alt_w)
@@ -748,7 +748,7 @@ static TIMER_CALLBACK( turbocs_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -772,7 +772,7 @@ void turbocs_reset_w(int state)
 /********* memory interfaces ***********/
 
 /* address map verified from schematics */
-ADDRESS_MAP_START( turbocs_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( turbocs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
@@ -896,7 +896,7 @@ void squawkntalk_reset_w(int state)
 /* address map verified from schematics */
 /* note that jumpers control the ROM sizes; if these are changed, use the alternate */
 /* address map below */
-ADDRESS_MAP_START( squawkntalk_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( squawkntalk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_READWRITE(pia_0_r, pia_0_w)
@@ -907,6 +907,7 @@ ADDRESS_MAP_END
 
 /* alternate address map if the ROM jumpers are changed to support a smaller */
 /* ROM size of 2k */
+#ifdef UNUSED_FUNCTION
 ADDRESS_MAP_START( squawkntalk_alt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
@@ -915,6 +916,7 @@ ADDRESS_MAP_START( squawkntalk_alt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x6000) AM_ROM
 ADDRESS_MAP_END
+#endif
 
 
 /********* PIA interfaces ***********/

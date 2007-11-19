@@ -20,7 +20,7 @@ UINT8 *taitosj_colscrolly;
 UINT8 *taitosj_gfxpointer;
 UINT8 *taitosj_colorbank,*taitosj_video_priority;
 UINT8 *kikstart_scrollram;
-UINT8 *taitosj_spritebank;
+static UINT8 *taitosj_spritebank;
 static UINT8 taitosj_collision_reg[4];
 static UINT8 *dirtybuffer2,*dirtybuffer3;
 static mame_bitmap *taitosj_tmpbitmap[3];

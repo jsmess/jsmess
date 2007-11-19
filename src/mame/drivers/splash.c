@@ -54,7 +54,7 @@ extern UINT16 *splash_videoram;
 extern UINT16 *splash_spriteram;
 extern UINT16 *splash_pixelram;
 extern UINT16 *roldfrog_bitmap_mode;
-UINT16 *roldfrog_protdata;
+static UINT16 *roldfrog_protdata;
 
 extern int splash_bitmap_type;
 extern int splash_sprite_attr2_shift;
@@ -81,7 +81,7 @@ static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 	}
 
 	// give the z80 time to see it
-	cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
+	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
 }
 
 static ADDRESS_MAP_START( splash_readmem, ADDRESS_SPACE_PROGRAM, 16 )

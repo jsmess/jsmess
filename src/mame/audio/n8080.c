@@ -13,7 +13,7 @@
 
 static int n8080_hardware;
 
-static mame_timer* sound_timer[3];
+static emu_timer* sound_timer[3];
 
 static int helifire_dac_phase;
 
@@ -149,13 +149,13 @@ static void update_SN76477_status(void)
 }
 
 
-static void start_mono_flop(int n, mame_time expire)
+static void start_mono_flop(int n, attotime expire)
 {
 	mono_flop[n] = 1;
 
 	update_SN76477_status();
 
-	mame_timer_adjust(sound_timer[n], expire, n, time_zero);
+	timer_adjust(sound_timer[n], expire, n, attotime_zero);
 }
 
 
@@ -165,7 +165,7 @@ static void stop_mono_flop(int n)
 
 	update_SN76477_status();
 
-	mame_timer_adjust(sound_timer[n], time_never, n, time_never);
+	timer_adjust(sound_timer[n], attotime_never, n, attotime_never);
 }
 
 
@@ -189,15 +189,15 @@ static void spacefev_sound_pins_changed(void)
 	}
 	if (changes & (1 << 0x3))
 	{
-		start_mono_flop(0, MAME_TIME_IN_USEC(550 * 36 * 100));
+		start_mono_flop(0, ATTOTIME_IN_USEC(550 * 36 * 100));
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(1, MAME_TIME_IN_USEC(550 * 22 * 33));
+		start_mono_flop(1, ATTOTIME_IN_USEC(550 * 22 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(2, MAME_TIME_IN_USEC(550 * 22 * 33));
+		start_mono_flop(2, ATTOTIME_IN_USEC(550 * 22 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
@@ -216,11 +216,11 @@ static void sheriff_sound_pins_changed(void)
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(0, MAME_TIME_IN_USEC(550 * 33 * 33));
+		start_mono_flop(0, ATTOTIME_IN_USEC(550 * 33 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(1, MAME_TIME_IN_USEC(550 * 33 * 33));
+		start_mono_flop(1, ATTOTIME_IN_USEC(550 * 33 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
@@ -434,7 +434,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 		helifire_dac_timing = DECAY_RATE * log(helifire_dac_volume);
 	}
 
-	helifire_dac_timing += mame_time_to_double(mame_timer_get_time());
+	helifire_dac_timing += attotime_to_double(timer_get_time());
 }
 
 
@@ -444,7 +444,7 @@ static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 
 	if (mono_flop[2])
 	{
-		voltage = 5 * (1 - exp(- mame_time_to_double(mame_timer_timeelapsed(sound_timer[2])) / 0.22));
+		voltage = 5 * (1 - exp(- attotime_to_double(timer_timeelapsed(sound_timer[2])) / 0.22));
 	}
 
 	SN76477_vco_voltage_w(0, voltage);
@@ -453,7 +453,7 @@ static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 
 static TIMER_CALLBACK( helifire_dac_volume_timer )
 {
-	double t = helifire_dac_timing - mame_time_to_double(mame_timer_get_time());
+	double t = helifire_dac_timing - attotime_to_double(timer_get_time());
 
 	if (helifire_dac_phase)
 	{
@@ -470,11 +470,11 @@ static MACHINE_RESET( spacefev_sound )
 {
 	n8080_hardware = 1;
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(1000), 0, spacefev_vco_voltage_timer);
+	timer_pulse(ATTOTIME_IN_HZ(1000), 0, spacefev_vco_voltage_timer);
 
-	sound_timer[0] = mame_timer_alloc(stop_mono_flop_callback);
-	sound_timer[1] = mame_timer_alloc(stop_mono_flop_callback);
-	sound_timer[2] = mame_timer_alloc(stop_mono_flop_callback);
+	sound_timer[0] = timer_alloc(stop_mono_flop_callback);
+	sound_timer[1] = timer_alloc(stop_mono_flop_callback);
+	sound_timer[2] = timer_alloc(stop_mono_flop_callback);
 
 	mono_flop[0] = 0;
 	mono_flop[1] = 0;
@@ -489,8 +489,8 @@ static MACHINE_RESET( sheriff_sound )
 {
 	n8080_hardware = 2;
 
-	sound_timer[0] = mame_timer_alloc(stop_mono_flop_callback);
-	sound_timer[1] = mame_timer_alloc(stop_mono_flop_callback);
+	sound_timer[0] = timer_alloc(stop_mono_flop_callback);
+	sound_timer[1] = timer_alloc(stop_mono_flop_callback);
 
 	mono_flop[0] = 0;
 	mono_flop[1] = 0;
@@ -504,7 +504,7 @@ static MACHINE_RESET( helifire_sound )
 {
 	n8080_hardware = 3;
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(1000), 0, helifire_dac_volume_timer);
+	timer_pulse(ATTOTIME_IN_HZ(1000), 0, helifire_dac_volume_timer);
 
 	helifire_dac_volume = 1;
 	helifire_dac_timing = 0;

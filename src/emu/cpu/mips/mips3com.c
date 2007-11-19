@@ -118,7 +118,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int in
 	mips->tlb_table = auto_malloc(sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)));
 
 	/* allocate a timer for the compare interrupt */
-	mips->compare_int_timer = mame_timer_alloc(compare_int_callback);
+	mips->compare_int_timer = timer_alloc(compare_int_callback);
 
 	/* reset the state */
 	mips3com_reset(mips);
@@ -179,14 +179,14 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 		UINT32 count = (activecpu_gettotalcycles64() - mips->count_zero_time) / 2;
 		UINT32 compare = mips->cpr[0][COP0_Compare];
 		UINT32 cyclesleft = compare - count;
-		mame_time newtime = MAME_TIME_IN_CYCLES(((INT64)cyclesleft * 2), cpu_getactivecpu());
+		attotime newtime = ATTOTIME_IN_CYCLES(((INT64)cyclesleft * 2), cpu_getactivecpu());
 
 		/* due to accuracy issues, don't bother setting timers unless they're for less than 100msec */
-		if (compare_mame_times(newtime, MAME_TIME_IN_MSEC(100)) < 0)
-			mame_timer_adjust(mips->compare_int_timer, newtime, cpu_getactivecpu(), time_zero);
+		if (attotime_compare(newtime, ATTOTIME_IN_MSEC(100)) < 0)
+			timer_adjust(mips->compare_int_timer, newtime, cpu_getactivecpu(), attotime_zero);
 	}
 	else
-		mame_timer_adjust(mips->compare_int_timer, time_never, cpu_getactivecpu(), time_zero);
+		timer_adjust(mips->compare_int_timer, attotime_never, cpu_getactivecpu(), attotime_zero);
 }
 
 

@@ -20,7 +20,7 @@ XTAL        :   18.432 MHz
 #include "driver.h"
 #include "sound/custom.h"
 
-UINT8 *clshroad_sharedram;
+static UINT8 *clshroad_sharedram;
 
 /* Variables & functions defined in video: */
 

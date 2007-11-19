@@ -25,8 +25,8 @@
 struct dma8237
 {
 	const struct dma8237_interface *intf;
-	mame_timer *timer;
-	mame_timer *msbflip_timer;
+	emu_timer *timer;
+	emu_timer *msbflip_timer;
 
 	struct
 	{
@@ -75,8 +75,8 @@ int dma8237_init(int count)
 	for (which = 0; which < dma_count; which++)
 	{
 		dma[which].status = 0x0F;
-		dma[which].timer = mame_timer_alloc(dma8237_timerproc);
-		dma[which].msbflip_timer = mame_timer_alloc(dma8237_msbflip_timerproc);
+		dma[which].timer = timer_alloc(dma8237_timerproc);
+		dma[which].msbflip_timer = timer_alloc(dma8237_msbflip_timerproc);
 		dma[which].eop = 1;
 	}
 	return 0;
@@ -195,15 +195,15 @@ static void dma8237_update_status(int which)
 			dma[which].status |= 0x10 << channel;
 			dma[which].status &= ~(0x01 << channel);
 
-			mame_timer_adjust(dma[which].timer,
-				time_zero,
+			timer_adjust(dma[which].timer,
+				attotime_zero,
 				which * 4 + channel,
-				double_to_mame_time(dma[which].intf->bus_speed));
+				double_to_attotime(dma[which].intf->bus_speed));
 		}
 		else
 		{
 			/* no transfers active right now */
-			mame_timer_reset(dma[which].timer, time_never);
+			timer_reset(dma[which].timer, attotime_never);
 		}
 
 		/* set the halt line */
@@ -236,7 +236,7 @@ static void dma8237_verify(int which)
 
 static void prepare_msb_flip(int which)
 {
-	mame_timer_adjust(dma[which].msbflip_timer, time_zero, which, time_zero);
+	timer_adjust(dma[which].msbflip_timer, attotime_zero, which, attotime_zero);
 }
 
 

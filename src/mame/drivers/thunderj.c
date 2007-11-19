@@ -120,7 +120,7 @@ static WRITE16_HANDLER( latch_w )
 static TIMER_CALLBACK( shared_sync_callback )
 {
 	if (--param)
-		mame_timer_set(MAME_TIME_IN_USEC(50), param, shared_sync_callback);
+		timer_set(ATTOTIME_IN_USEC(50), param, shared_sync_callback);
 }
 
 

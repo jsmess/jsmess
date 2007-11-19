@@ -42,10 +42,10 @@ Notes:
 #define MASTER_CLOCK 32000000
 
 
-UINT32*dreamwld_bg_videoram;
-UINT32*dreamwld_bg2_videoram;
-UINT32*dreamwld_bg_scroll;
-int dreamwld_tilebank[2], dreamwld_tilebankold[2];
+static UINT32*dreamwld_bg_videoram;
+static UINT32*dreamwld_bg2_videoram;
+static UINT32*dreamwld_bg_scroll;
+static int dreamwld_tilebank[2], dreamwld_tilebankold[2];
 
 static tilemap *dreamwld_bg_tilemap;
 static tilemap *dreamwld_bg2_tilemap;

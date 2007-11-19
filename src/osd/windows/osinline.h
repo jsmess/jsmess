@@ -174,7 +174,25 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     divide and return the 32 bit quotient
 -------------------------------------------------*/
 
-/* TBD */
+#ifndef PTR64
+#define div_64x32 _div_64x32
+INLINE INT32 _div_64x32(INT64 a, INT32 b)
+{
+	INT32 result;
+	INT32 alow = a;
+	INT32 ahigh = a >> 32;
+
+    __asm
+    {
+        mov   eax,alow
+        mov   edx,ahigh
+        idiv  b
+        mov   result,eax
+    }
+
+	return result;
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -182,7 +200,85 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     divide and return the 32 bit quotient
 -------------------------------------------------*/
 
-/* TBD */
+#ifndef PTR64
+#define divu_64x32 _divu_64x32
+INLINE UINT32 _divu_64x32(UINT64 a, UINT32 b)
+{
+	UINT32 result;
+	UINT32 alow = a;
+	UINT32 ahigh = a >> 32;
+
+    __asm
+    {
+        mov   eax,alow
+        mov   edx,ahigh
+        div   b
+        mov   result,eax
+    }
+
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    div_64x32_rem - perform a signed 64 bit x 32
+    bit divide and return the 32 bit quotient and
+    32 bit remainder
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define div_64x32_rem _div_64x32_rem
+INLINE INT32 _div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
+{
+	INT32 result;
+	INT32 alow = a;
+	INT32 ahigh = a >> 32;
+	INT32 rem;
+
+    __asm
+    {
+        mov   eax,alow
+        mov   edx,ahigh
+        idiv  b
+        mov   result,eax
+        mov   rem,edx
+    }
+
+	*remainder = rem;
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    divu_64x32_rem - perform an unsigned 64 bit x
+    32 bit divide and return the 32 bit quotient
+    and 32 bit remainder
+-------------------------------------------------*/
+
+#ifndef PTR64
+#define divu_64x32_rem _divu_64x32_rem
+INLINE UINT32 _divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
+{
+	UINT32 result;
+	UINT32 alow = a;
+	UINT32 ahigh = a >> 32;
+	UINT32 rem;
+
+    __asm
+    {
+        mov   eax,alow
+        mov   edx,ahigh
+        div   b
+        mov   result,eax
+        mov   rem,edx
+    }
+
+	*remainder = rem;
+	return result;
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -223,7 +319,7 @@ INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 #define divu_32x32_shift _divu_32x32_shift
 INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
-	INT32 result;
+	UINT32 result;
 
     __asm
     {
@@ -246,7 +342,25 @@ INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     divide and return the 32 bit remainder
 -------------------------------------------------*/
 
-/* TBD */
+#ifndef PTR64
+#define mod_64x32 _mod_64x32
+INLINE INT32 _mod_64x32(INT64 a, INT32 b)
+{
+	INT32 result;
+	INT32 alow = a;
+	INT32 ahigh = a >> 32;
+
+    __asm
+    {
+        mov   eax,alow
+        mov   edx,ahigh
+        idiv  b
+        mov   result,edx
+    }
+
+	return result;
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -254,7 +368,25 @@ INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
     divide and return the 32 bit remainder
 -------------------------------------------------*/
 
-/* TBD */
+#ifndef PTR64
+#define modu_64x32 _modu_64x32
+INLINE UINT32 _modu_64x32(UINT64 a, UINT32 b)
+{
+	UINT32 result;
+	UINT32 alow = a;
+	UINT32 ahigh = a >> 32;
+
+    __asm
+    {
+        mov   eax,alow
+        mov   edx,ahigh
+        div   b
+        mov   result,edx
+    }
+
+	return result;
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -408,7 +540,7 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #define atomic_increment32 _atomic_increment32
-INLINE INT32 _atomic_increment32(INT32 volatile *ptr, INT32 delta)
+INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
 {
 	return _InterlockedIncrement(ptr);
 }
@@ -421,7 +553,7 @@ INLINE INT32 _atomic_increment32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #define atomic_decrement32 _atomic_decrement32
-INLINE INT32 _atomic_decrement32(INT32 volatile *ptr, INT32 delta)
+INLINE INT32 _atomic_decrement32(INT32 volatile *ptr)
 {
 	return _InterlockedDecrement(ptr);
 }

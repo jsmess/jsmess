@@ -111,7 +111,7 @@ static UINT8 sound_latch;
 static UINT8 ls74 = 0;
 static UINT8 ls377 = 0;
 
-static mame_timer *interrupt_timer;
+static emu_timer *interrupt_timer;
 
 
 static int curr_scanline=0;
@@ -328,7 +328,7 @@ logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(0));
 	if (scanline>=264)
 		scanline=0;
 
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
@@ -352,7 +352,7 @@ static void tubep_setup_save_state(void)
 static MACHINE_START( tubep )
 {
 	/* Create interrupt timer */
-	interrupt_timer = mame_timer_alloc(tubep_scanline_callback);
+	interrupt_timer = timer_alloc(tubep_scanline_callback);
 
 	tubep_setup_save_state();
 }
@@ -360,7 +360,7 @@ static MACHINE_START( tubep )
 
 static MACHINE_RESET( tubep )
 {
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 }
 
 
@@ -509,21 +509,21 @@ logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(0));
 	if (scanline>=264)
 		scanline=0;
 
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
 static MACHINE_START( rjammer )
 {
 	/* Create interrupt timer */
-	interrupt_timer = mame_timer_alloc(rjammer_scanline_callback);
+	interrupt_timer = timer_alloc(rjammer_scanline_callback);
 
 	tubep_setup_save_state();
 }
 
 static MACHINE_RESET( rjammer )
 {
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 }
 
 

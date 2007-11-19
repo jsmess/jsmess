@@ -11,8 +11,8 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 #include "video/ppu2c0x.h"
 
 /* Globals */
-int vsnes_gun_controller;
-int vsnes_do_vrom_bank;
+static int vsnes_gun_controller;
+static int vsnes_do_vrom_bank;
 
 /* Locals */
 static int input_latch[4];

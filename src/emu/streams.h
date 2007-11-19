@@ -29,7 +29,7 @@ typedef void (*stream_callback)(void *param, stream_sample_t **inputs, stream_sa
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void streams_init(running_machine *machine, subseconds_t update_subseconds);
+void streams_init(running_machine *machine, attoseconds_t update_subseconds);
 void streams_set_tag(running_machine *machine, void *streamtag);
 void streams_update(running_machine *machine);
 

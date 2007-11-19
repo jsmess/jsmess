@@ -67,7 +67,7 @@ READ8_HANDLER( odyssey2_getp1 )
 {
     UINT8 data = p1;
 
-    logerror("%.9f p1 read %.2x\n", mame_time_to_double(mame_timer_get_time()), data);
+    logerror("%.9f p1 read %.2x\n", attotime_to_double(timer_get_time()), data);
     return data;
 }
 
@@ -78,7 +78,7 @@ WRITE8_HANDLER( odyssey2_putp1 )
     /* ROM is mirrored so this will be OK for all sizes 2k/4k/8k */
     memory_set_bankptr(1, memory_region(REGION_USER1) + (0x800 * (p1 & 0x03)));
 
-    logerror("%.6f p1 written %.2x\n", mame_time_to_double(mame_timer_get_time()), data);
+    logerror("%.6f p1 written %.2x\n", attotime_to_double(timer_get_time()), data);
 }
 
 READ8_HANDLER( odyssey2_getp2 )
@@ -109,7 +109,7 @@ READ8_HANDLER( odyssey2_getp2 )
     else
         p2 = p2 | 0xF0;
     
-    logerror("%.6f p2 read %.2x\n", mame_time_to_double(mame_timer_get_time()), p2);
+    logerror("%.6f p2 read %.2x\n", attotime_to_double(timer_get_time()), p2);
     return p2;
 }
 
@@ -117,7 +117,7 @@ WRITE8_HANDLER( odyssey2_putp2 )
 {
     p2 = data;
 
-    logerror("%.6f p2 written %.2x\n", mame_time_to_double(mame_timer_get_time()), data);
+    logerror("%.6f p2 written %.2x\n", attotime_to_double(timer_get_time()), data);
 }
 
 READ8_HANDLER( odyssey2_getbus )
@@ -130,13 +130,13 @@ READ8_HANDLER( odyssey2_getbus )
     if ((p2 & P2_KEYBOARD_SELECT_MASK) == 0)
 		data &= readinputport(7);       /* read joystick 2 */
 
-    logerror("%.6f bus read %.2x\n", mame_time_to_double(mame_timer_get_time()), data);
+    logerror("%.6f bus read %.2x\n", attotime_to_double(timer_get_time()), data);
     return data;
 }
 
 WRITE8_HANDLER( odyssey2_putbus )
 {
-    logerror("%.6f bus written %.2x\n", mame_time_to_double(mame_timer_get_time()), data);
+    logerror("%.6f bus written %.2x\n", attotime_to_double(timer_get_time()), data);
 }
 
 ///////////////////////////////////

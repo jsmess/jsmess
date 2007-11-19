@@ -107,7 +107,7 @@ void polyplay_sh_start(void);
 
 /* timer handling */
 static TIMER_CALLBACK( timer_callback );
-static mame_timer* polyplay_timer;
+static emu_timer* polyplay_timer;
 static WRITE8_HANDLER( polyplay_start_timer2 );
 static WRITE8_HANDLER( polyplay_sound_channel );
 
@@ -133,7 +133,7 @@ static MACHINE_RESET( polyplay )
 	polyplay_set_channel2(0);
 	polyplay_play_channel2(0);
 
-	polyplay_timer = mame_timer_alloc(timer_callback);
+	polyplay_timer = timer_alloc(timer_callback);
 }
 
 
@@ -248,10 +248,10 @@ static WRITE8_HANDLER( polyplay_sound_channel )
 static WRITE8_HANDLER( polyplay_start_timer2 )
 {
 	if (data == 0x03)
-		mame_timer_adjust(polyplay_timer, time_never, 0, time_never);
+		timer_adjust(polyplay_timer, attotime_never, 0, attotime_never);
 
 	if (data == 0xb5)
-		mame_timer_adjust(polyplay_timer, MAME_TIME_IN_HZ(40), 0, MAME_TIME_IN_HZ(40));
+		timer_adjust(polyplay_timer, ATTOTIME_IN_HZ(40), 0, ATTOTIME_IN_HZ(40));
 }
 
 static READ8_HANDLER( polyplay_random_read )

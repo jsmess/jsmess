@@ -133,7 +133,7 @@ static UINT8 xram[4096];
 static UINT8 extend_board_irq_enable;
 static UINT8 extend_board_irq_active;
 
-static mame_timer *keyboard_timer;
+static emu_timer *keyboard_timer;
 
 static GCU_REGS gcu[2];
 
@@ -2283,8 +2283,8 @@ static DRIVER_INIT(ppd)
 static void init_keyboard(void)
 {
 	// set keyboard timer
-	keyboard_timer = mame_timer_alloc(keyboard_timer_callback);
-	mame_timer_adjust(keyboard_timer, MAME_TIME_IN_MSEC(10), 0, MAME_TIME_IN_MSEC(10));
+	keyboard_timer = timer_alloc(keyboard_timer_callback);
+	timer_adjust(keyboard_timer, ATTOTIME_IN_MSEC(10), 0, ATTOTIME_IN_MSEC(10));
 }
 
 static DRIVER_INIT(kbm)

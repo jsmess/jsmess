@@ -35,8 +35,8 @@ static UINT8 irvg_running;
 static UINT8 irmb_running;
 
 #if IR_TIMING
-static mame_timer *irvg_timer;
-static mame_timer *irmb_timer;
+static emu_timer *irvg_timer;
+static emu_timer *irmb_timer;
 #endif
 
 static UINT8 *comRAM[2], *mbRAM, *mbROM;
@@ -112,7 +112,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 		else
 			logerror("vg start [busy!] ");
 		IR_CPU_STATE;
-		mame_timer_adjust(irvg_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);
+		timer_adjust(irvg_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
 #endif
 		irvg_running=1;
 	}
@@ -185,7 +185,7 @@ static TIMER_CALLBACK( scanline_callback )
     /* set a callback for the next 32-scanline increment */
     scanline += 32;
     if (scanline >= 256) scanline = 0;
-    mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, scanline_callback);
+    timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, scanline_callback);
 }
 
 static TIMER_CALLBACK( irmb_done_callback );
@@ -201,12 +201,12 @@ MACHINE_RESET( irobot )
 
 	irvg_vblank=0;
 	irvg_running = 0;
-	irvg_timer = mame_timer_alloc(irvg_done_callback);
+	irvg_timer = timer_alloc(irvg_done_callback);
 	irmb_running = 0;
-	irmb_timer = mame_timer_alloc(irmb_done_callback);
+	irmb_timer = timer_alloc(irmb_done_callback);
 
 	/* set an initial timer to go off on scanline 0 */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, scanline_callback);
 
 	irobot_rom_banksel_w(0,0);
 	irobot_out0_w(0,0);
@@ -850,7 +850,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 #if IR_TIMING
 	if (irmb_running == 0)
 	{
-		mame_timer_adjust(irmb_timer, scale_up_mame_time(MAME_TIME_IN_HZ(12000000), icount), 0, time_zero);
+		timer_adjust(irmb_timer, attotime_mul(ATTOTIME_IN_HZ(12000000), icount), 0, attotime_zero);
 		logerror("mb start ");
 		IR_CPU_STATE;
 	}
@@ -858,7 +858,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 	{
 		logerror("mb start [busy!] ");
 		IR_CPU_STATE;
-		mame_timer_adjust(irmb_timer, scale_up_mame_time(MAME_TIME_IN_NSEC(200), icount), 0, time_zero);
+		timer_adjust(irmb_timer, attotime_mul(ATTOTIME_IN_NSEC(200), icount), 0, attotime_zero);
 	}
 #else
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);

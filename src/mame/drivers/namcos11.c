@@ -822,10 +822,10 @@ static struct
 static DRIVER_INIT( namcos11 )
 {
 	int n_game;
-	mame_timer *timer;
+	emu_timer *timer;
 
-	timer = mame_timer_alloc( mcu_timer );
-	mame_timer_adjust( timer, MAME_TIME_IN_HZ( 600 ), 0, MAME_TIME_IN_HZ( 600 ) );
+	timer = timer_alloc( mcu_timer );
+	timer_adjust( timer, ATTOTIME_IN_HZ( 600 ), 0, ATTOTIME_IN_HZ( 600 ) );
 
 	psx_driver_init();
 	namcoc7x_on_driver_init();

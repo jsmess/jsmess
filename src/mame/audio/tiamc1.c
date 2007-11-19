@@ -67,12 +67,12 @@ static struct timer8253struct timer1;
 #define T8253_CWORD		3
 
 
-void timer8253_reset(struct timer8253struct *t) {
+static void timer8253_reset(struct timer8253struct *t) {
 	memset(t,0,sizeof(struct timer8253struct));
 }
 
 
-void timer8253_tick(struct timer8253struct *t,int chn) {
+static void timer8253_tick(struct timer8253struct *t,int chn) {
 	if (t->channel[chn].enable && t->channel[chn].gate) {
 		switch (t->channel[chn].cntMode) {
 		case 0:
@@ -109,7 +109,7 @@ void timer8253_tick(struct timer8253struct *t,int chn) {
 
 
 
-void timer8253_wr(struct timer8253struct *t, int reg, UINT8 val)
+static void timer8253_wr(struct timer8253struct *t, int reg, UINT8 val)
 {
 	int chn;
 
@@ -213,14 +213,14 @@ void timer8253_wr(struct timer8253struct *t, int reg, UINT8 val)
 	}
 }
 
-void timer8253_set_gate(struct timer8253struct *t, int chn, UINT8 gate)
+static void timer8253_set_gate(struct timer8253struct *t, int chn, UINT8 gate)
 {
 	t->channel[chn].gate = gate;
 }
 
 
 
-char timer8253_get_output(struct timer8253struct *t, int chn)
+static char timer8253_get_output(struct timer8253struct *t, int chn)
 {
 	return t->channel[chn].output;
 }

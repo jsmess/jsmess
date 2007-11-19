@@ -261,8 +261,8 @@
 
 static const UINT8 *writeprom;
 
-static mame_timer *irq_timer;
-static mame_timer *cpu_timer;
+static emu_timer *irq_timer;
+static emu_timer *cpu_timer;
 
 static UINT8 irq_state;
 static UINT8 ctrld;
@@ -305,7 +305,7 @@ INLINE void schedule_next_irq(int curv)
 		curv = ((curv + 32) & 0xff) & ~0x10;
 
 	/* next one at the start of this scanline */
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv, attotime_zero);
 }
 
 
@@ -351,7 +351,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* scanline for the next run */
 	curv ^= 224;
-	mame_timer_adjust(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv, time_zero);
+	timer_adjust(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv, attotime_zero);
 }
 
 
@@ -391,11 +391,11 @@ static MACHINE_START( missile )
 	opcode_base = opcode_arg_base = videoram;
 
 	/* create a timer to speed/slow the CPU */
-	cpu_timer = mame_timer_alloc(adjust_cpu_speed);
-	mame_timer_adjust(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(0), 0), 0, time_zero);
+	cpu_timer = timer_alloc(adjust_cpu_speed);
+	timer_adjust(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(0), 0), 0, attotime_zero);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = mame_timer_alloc(clock_irq);
+	irq_timer = timer_alloc(clock_irq);
 	irq_state = 0;
 	schedule_next_irq(-32);
 

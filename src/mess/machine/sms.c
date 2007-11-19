@@ -34,7 +34,7 @@ UINT8 sms_input_port0;
 UINT8 sms_input_port1;
 
 /* Data needed for Rapid Fire Unit support */
-mame_timer	*rapid_fire_timer;
+emu_timer	*rapid_fire_timer;
 UINT8 rapid_fire_state_1;
 UINT8 rapid_fire_state_2;
 
@@ -955,8 +955,8 @@ MACHINE_RESET(sms)
 
 	rapid_fire_state_1 = 0;
 	rapid_fire_state_2 = 0;
-	rapid_fire_timer = mame_timer_alloc( rapid_fire_callback );
-	mame_timer_adjust( rapid_fire_timer, MAME_TIME_IN_HZ(10), 0, MAME_TIME_IN_HZ(10) );
+	rapid_fire_timer = timer_alloc( rapid_fire_callback );
+	timer_adjust( rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10) );
 
 	last_paddle_read_time = 0;
 	paddle_read_state = 0;

@@ -94,8 +94,8 @@ TODO:
 ***************************************************************************/
 
 UINT8 dynax_blitter_irq;
-UINT8 dynax_sound_irq;
-UINT8 dynax_vblank_irq;
+static UINT8 dynax_sound_irq;
+static UINT8 dynax_vblank_irq;
 
 /* It runs in IM 0, thus needs an opcode on the data bus */
 void sprtmtch_update_irq(void)
@@ -118,13 +118,13 @@ static WRITE8_HANDLER( dynax_blitter_ack_w )
 	sprtmtch_update_irq();
 }
 
-INTERRUPT_GEN( sprtmtch_vblank_interrupt )
+static INTERRUPT_GEN( sprtmtch_vblank_interrupt )
 {
 	dynax_vblank_irq = 1;
 	sprtmtch_update_irq();
 }
 
-void sprtmtch_sound_callback(int state)
+static void sprtmtch_sound_callback(int state)
 {
 	dynax_sound_irq = state;
 	sprtmtch_update_irq();
@@ -164,7 +164,7 @@ static WRITE8_HANDLER( jantouki_blitter2_ack_w )
 	jantouki_update_irq();
 }
 
-INTERRUPT_GEN( jantouki_vblank_interrupt )
+static INTERRUPT_GEN( jantouki_vblank_interrupt )
 {
 	dynax_vblank_irq = 1;
 	jantouki_update_irq();
@@ -175,10 +175,10 @@ INTERRUPT_GEN( jantouki_vblank_interrupt )
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-UINT8 dynax_soundlatch_irq;
-UINT8 dynax_sound_vblank_irq;
+static UINT8 dynax_soundlatch_irq;
+static UINT8 dynax_sound_vblank_irq;
 
-void jantouki_sound_update_irq(void)
+static void jantouki_sound_update_irq(void)
 {
 	int irq	=	((dynax_sound_irq)			? 0x08 : 0) |
 				((dynax_soundlatch_irq)		? 0x10 : 0) |
@@ -186,7 +186,7 @@ void jantouki_sound_update_irq(void)
 	cpunum_set_input_line_and_vector(1, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
-INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
+static INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
 {
 	dynax_sound_vblank_irq = 1;
 	jantouki_sound_update_irq();
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( jantouki_sound_vblank_ack_w )
 	jantouki_sound_update_irq();
 }
 
-void jantouki_sound_callback(int state)
+static void jantouki_sound_callback(int state)
 {
 	dynax_sound_irq = state;
 	jantouki_sound_update_irq();
@@ -845,8 +845,8 @@ ADDRESS_MAP_END
                             Jantouki - Main CPU
 ***************************************************************************/
 
-UINT8 dynax_soundlatch_ack;
-UINT8 dynax_soundlatch_full;
+static UINT8 dynax_soundlatch_ack;
+static UINT8 dynax_soundlatch_full;
 static UINT8 latch;
 
 static READ8_HANDLER( jantouki_soundlatch_ack_r )
@@ -1151,7 +1151,7 @@ ADDRESS_MAP_END
 
 static int rombank;
 static UINT8 *romptr;
-int tenkai_dswsel, tenkai_ipsel, tenkai_ip;
+static int tenkai_dswsel, tenkai_ipsel, tenkai_ip;
 static UINT8 tenkai_p5_val;
 
 static WRITE8_HANDLER( tenkai_ipsel_w )
@@ -3793,7 +3793,7 @@ MACHINE_DRIVER_END
   what was it trying to do?
   set an irq and clear it before its even taken? */
 
-INTERRUPT_GEN( yarunara_clock_interrupt )
+static INTERRUPT_GEN( yarunara_clock_interrupt )
 {
 	static int i=0;
 	i^=1;
@@ -3948,7 +3948,7 @@ void mjelctrn_update_irq(void)
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xfa);
 }
 
-INTERRUPT_GEN( mjelctrn_vblank_interrupt )
+static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 {
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
@@ -3982,7 +3982,7 @@ void neruton_update_irq(void)
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x42);
 }
 
-INTERRUPT_GEN( neruton_vblank_interrupt )
+static INTERRUPT_GEN( neruton_vblank_interrupt )
 {
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
@@ -4011,7 +4011,7 @@ MACHINE_DRIVER_END
 /*  It runs in IM 2, thus needs a vector on the data bus:
     0x42 and 0x44 are very similar, they should be triggered by the blitter
     0x40 is vblank  */
-INTERRUPT_GEN( majxtal7_vblank_interrupt )
+static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 {
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
@@ -4081,7 +4081,7 @@ MACHINE_DRIVER_END
                                Mahjong Tenkaigen
 ***************************************************************************/
 
-INTERRUPT_GEN( tenkai_interrupt )
+static INTERRUPT_GEN( tenkai_interrupt )
 {
 	switch(cpu_getiloops())
 	{

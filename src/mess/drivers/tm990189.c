@@ -53,7 +53,7 @@ static int digitsel;
 static int segment;
 
 static void *displayena_timer;
-#define displayena_duration MAME_TIME_IN_USEC(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
+#define displayena_duration ATTOTIME_IN_USEC(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 static UINT8 segment_state[10];
 static UINT8 old_segment_state[10];
 static UINT8 LED_state;
@@ -185,11 +185,11 @@ static const tms9902reset_param tms9902_params =
 
 static mess_image *rs232_fp;
 static UINT8 rs232_rts;
-static mame_timer *rs232_input_timer;
+static emu_timer *rs232_input_timer;
 
 static MACHINE_RESET( tm990_189 )
 {
-	displayena_timer = mame_timer_alloc(NULL);
+	displayena_timer = timer_alloc(NULL);
 
 	hold_load();
 
@@ -216,12 +216,12 @@ static MACHINE_START( tm990_189_v )
 
 static MACHINE_RESET( tm990_189_v )
 {
-	displayena_timer = mame_timer_alloc(NULL);
+	displayena_timer = timer_alloc(NULL);
 
-	joy1x_timer = mame_timer_alloc(NULL);
-	joy1y_timer = mame_timer_alloc(NULL);
-	joy2x_timer = mame_timer_alloc(NULL);
-	joy2y_timer = mame_timer_alloc(NULL);
+	joy1x_timer = timer_alloc(NULL);
+	joy1y_timer = timer_alloc(NULL);
+	joy2x_timer = timer_alloc(NULL);
+	joy2y_timer = timer_alloc(NULL);
 
 	hold_load();
 
@@ -357,7 +357,7 @@ static void hold_load(void)
 {
 	load_state = TRUE;
 	field_interrupts();
-	mame_timer_set(MAME_TIME_IN_MSEC(100), 0, clear_load);
+	timer_set(ATTOTIME_IN_MSEC(100), 0, clear_load);
 }
 
 /*
@@ -417,7 +417,7 @@ static void sys9901_segment_w(int offset, int data)
 	else
 	{
 		segment &= ~ (1 << (offset-4));
-		if ((compare_mame_times(mame_timer_timeleft(displayena_timer), time_zero) > 0) && (digitsel < 10))
+		if ((attotime_compare(timer_timeleft(displayena_timer), attotime_zero) > 0) && (digitsel < 10))
 			draw_digit();
 	}
 }
@@ -426,7 +426,7 @@ static void sys9901_dsplytrgr_w(int offset, int data)
 {
 	if ((!data) && (digitsel < 10))
 	{
-		mame_timer_reset(displayena_timer, displayena_duration);
+		timer_reset(displayena_timer, displayena_duration);
 		draw_digit();
 	}
 }
@@ -477,8 +477,8 @@ static int device_load_tm990_189_rs232(mess_image *image)
 	rs232_fp = image;
 
 	tms9902_set_dsr(id, 1);
-	rs232_input_timer = mame_timer_alloc(rs232_input_callback);
-	mame_timer_adjust(rs232_input_timer, time_zero, 0, MAME_TIME_IN_MSEC(10));
+	rs232_input_timer = timer_alloc(rs232_input_callback);
+	timer_adjust(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
 	return INIT_PASS;
 }
@@ -497,7 +497,7 @@ static void device_unload_tm990_189_rs232(mess_image *image)
 
 	tms9902_set_dsr(id, 0);
 
-	mame_timer_reset(rs232_input_timer, time_never);	/* FIXME - timers should only be allocated once */
+	timer_reset(rs232_input_timer, attotime_never);	/* FIXME - timers should only be allocated once */
 }
 
 static void rts_callback(int which, int RTS)
@@ -615,16 +615,16 @@ static  READ8_HANDLER(video_joy_r)
 	int reply = readinputport(9);
 
 
-	if (compare_mame_times(mame_timer_timeleft(joy1x_timer), time_zero) < 0)
+	if (attotime_compare(timer_timeleft(joy1x_timer), attotime_zero) < 0)
 		reply |= 0x01;
 
-	if (compare_mame_times(mame_timer_timeleft(joy1y_timer), time_zero) < 0)
+	if (attotime_compare(timer_timeleft(joy1y_timer), attotime_zero) < 0)
 		reply |= 0x02;
 
-	if (compare_mame_times(mame_timer_timeleft(joy2x_timer), time_zero) < 0)
+	if (attotime_compare(timer_timeleft(joy2x_timer), attotime_zero) < 0)
 		reply |= 0x08;
 
-	if (compare_mame_times(mame_timer_timeleft(joy2y_timer), time_zero) < 0)
+	if (attotime_compare(timer_timeleft(joy2y_timer), attotime_zero) < 0)
 		reply |= 0x10;
 
 	return reply;
@@ -632,10 +632,10 @@ static  READ8_HANDLER(video_joy_r)
 
 static WRITE8_HANDLER(video_joy_w)
 {
-	mame_timer_reset(joy1x_timer, MAME_TIME_IN_USEC(readinputport(10)*28+28));
-	mame_timer_reset(joy1y_timer, MAME_TIME_IN_USEC(readinputport(11)*28+28));
-	mame_timer_reset(joy2x_timer, MAME_TIME_IN_USEC(readinputport(12)*28+28));
-	mame_timer_reset(joy2y_timer, MAME_TIME_IN_USEC(readinputport(13)*28+28));
+	timer_reset(joy1x_timer, ATTOTIME_IN_USEC(readinputport(10)*28+28));
+	timer_reset(joy1y_timer, ATTOTIME_IN_USEC(readinputport(11)*28+28));
+	timer_reset(joy2x_timer, ATTOTIME_IN_USEC(readinputport(12)*28+28));
+	timer_reset(joy2y_timer, ATTOTIME_IN_USEC(readinputport(13)*28+28));
 }
 
 

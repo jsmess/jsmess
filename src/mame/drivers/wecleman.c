@@ -1271,7 +1271,7 @@ ROM_START( wecleman )
 
 ROM_END
 
-void wecleman_unpack_sprites(void)
+static void wecleman_unpack_sprites(void)
 {
 	const int region       = REGION_GFX1;	// sprites
 
@@ -1399,7 +1399,7 @@ ROM_END
     in a ROM module definition.  This routine unpacks each sprite nibble
     into a byte, doubling the memory consumption. */
 
-void hotchase_sprite_decode( int num16_banks, int bank_size )
+static void hotchase_sprite_decode( int num16_banks, int bank_size )
 {
 	UINT8 *base, *temp;
 	int i;

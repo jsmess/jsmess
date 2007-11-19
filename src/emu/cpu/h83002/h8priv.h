@@ -28,7 +28,7 @@ typedef struct
 	UINT16 h8TCNT0, h8TCNT1, h8TCNT2, h8TCNT3, h8TCNT4;
 	UINT8 h8TSTR;
 
-	mame_timer *timer[5];
+	emu_timer *timer[5];
 
 	int cpu_number;
 

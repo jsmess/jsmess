@@ -102,7 +102,7 @@ static struct DPC {
 	UINT8	latch_64;
 	UINT8	dlc;
 	UINT8	shift_reg;
-	mame_timer	*oscillator;
+	emu_timer	*oscillator;
 } dpc;
 
 static UINT8* extra_RAM;
@@ -1372,7 +1372,7 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback ) {
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 ) {
 			if ( supported_screen_heights[i] != current_screen_height ) {
 				current_screen_height = supported_screen_heights[i];
-//				video_screen_configure( 0, 228, current_screen_height, &visarea[i], HZ_TO_SUBSECONDS( MASTER_CLOCK_NTSC ) * 228 * current_screen_height );
+//				video_screen_configure( 0, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * current_screen_height );
 			}
 		}
 	}
@@ -1385,7 +1385,7 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback_pal ) {
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 ) {
 			if ( supported_screen_heights[i] != current_screen_height ) {
 				current_screen_height = supported_screen_heights[i];
-//				video_screen_configure( 0, 228, current_screen_height, &visarea[i], HZ_TO_SUBSECONDS( MASTER_CLOCK_PAL ) * 228 * current_screen_height );
+//				video_screen_configure( 0, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * current_screen_height );
 			}
 		}
 	}
@@ -1741,8 +1741,8 @@ static MACHINE_RESET( a2600 )
 				dpc.df[data_fetcher].music_mode = 0;
 			}
 		}
-		dpc.oscillator = mame_timer_alloc( modeDPC_timer_callback );
-		mame_timer_adjust( dpc.oscillator, MAME_TIME_IN_HZ(42000), 0, MAME_TIME_IN_HZ(42000) );
+		dpc.oscillator = timer_alloc( modeDPC_timer_callback );
+		timer_adjust( dpc.oscillator, ATTOTIME_IN_HZ(42000), 0, ATTOTIME_IN_HZ(42000) );
 		break;
 
 	case mode32in1:

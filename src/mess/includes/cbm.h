@@ -32,7 +32,7 @@ void cbmcartslot_device_getinfo(const device_class *devclass, UINT32 state, unio
         { \
 	  if(LEVEL>=N) { \
 	    if( M ) \
-              logerror("%11.6f: %-24s",mame_timer_get_time(), (char*)M );\
+              logerror("%11.6f: %-24s",timer_get_time(), (char*)M );\
 	    logerror A; \
 	  } \
         }

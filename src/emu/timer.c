@@ -42,11 +42,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* in timer.h: typedef struct _mame_timer mame_timer; */
-struct _mame_timer
+/* in timer.h: typedef struct _emu_timer emu_timer; */
+struct _emu_timer
 {
-	mame_timer *	next;
-	mame_timer *	prev;
+	emu_timer *	next;
+	emu_timer *	prev;
 	void 			(*callback)(running_machine *, int);
 	void			(*callback_ptr)(running_machine *, void *);
 	int 			callback_param;
@@ -57,9 +57,9 @@ struct _mame_timer
 	UINT8 			enabled;
 	UINT8 			temporary;
 	UINT8			ptr;
-	mame_time 		period;
-	mame_time 		start;
-	mame_time 		expire;
+	attotime 		period;
+	attotime 		start;
+	attotime 		expire;
 };
 
 
@@ -69,24 +69,20 @@ struct _mame_timer
 ***************************************************************************/
 
 /* conversion constants */
-subseconds_t subseconds_per_cycle[MAX_CPU];
+attoseconds_t attoseconds_per_cycle[MAX_CPU];
 UINT32 cycles_per_second[MAX_CPU];
 
 /* list of active timers */
-static mame_timer timers[MAX_TIMERS];
-static mame_timer *timer_head;
-static mame_timer *timer_free_head;
-static mame_timer *timer_free_tail;
+static emu_timer timers[MAX_TIMERS];
+static emu_timer *timer_head;
+static emu_timer *timer_free_head;
+static emu_timer *timer_free_tail;
 
 /* other internal states */
-static mame_time global_basetime;
-static mame_timer *callback_timer;
+static attotime global_basetime;
+static emu_timer *callback_timer;
 static int callback_timer_modified;
-static mame_time callback_timer_expire_time;
-
-/* other constant times */
-mame_time time_zero;
-mame_time time_never;
+static attotime callback_timer_expire_time;
 
 
 
@@ -96,7 +92,7 @@ mame_time time_never;
 
 static void timer_postload(void);
 static void timer_logtimers(void);
-static void timer_remove(mame_timer *which);
+static void timer_remove(emu_timer *which);
 
 
 
@@ -108,7 +104,7 @@ static void timer_remove(mame_timer *which);
     get_current_time - return the current time
 -------------------------------------------------*/
 
-INLINE mame_time get_current_time(void)
+INLINE attotime get_current_time(void)
 {
 	int activecpu;
 
@@ -130,9 +126,9 @@ INLINE mame_time get_current_time(void)
     timer_new - allocate a new timer
 -------------------------------------------------*/
 
-INLINE mame_timer *timer_new(void)
+INLINE emu_timer *timer_new(void)
 {
-	mame_timer *timer;
+	emu_timer *timer;
 
 	/* remove an empty entry */
 	if (!timer_free_head)
@@ -154,10 +150,10 @@ INLINE mame_timer *timer_new(void)
     the list at the appropriate location
 -------------------------------------------------*/
 
-INLINE void timer_list_insert(mame_timer *timer)
+INLINE void timer_list_insert(emu_timer *timer)
 {
-	mame_time expire = timer->enabled ? timer->expire : time_never;
-	mame_timer *t, *lt = NULL;
+	attotime expire = timer->enabled ? timer->expire : attotime_never;
+	emu_timer *t, *lt = NULL;
 
 	/* sanity checks for the debug build */
 	#ifdef MAME_DEBUG
@@ -179,7 +175,7 @@ INLINE void timer_list_insert(mame_timer *timer)
 	for (t = timer_head; t; lt = t, t = t->next)
 	{
 		/* if the current list entry expires after us, we should be inserted before it */
-		if (compare_mame_times(t->expire, expire) > 0)
+		if (attotime_compare(t->expire, expire) > 0)
 		{
 			/* link the new guy in before the current list entry */
 			timer->prev = t->prev;
@@ -209,12 +205,12 @@ INLINE void timer_list_insert(mame_timer *timer)
     linked list
 -------------------------------------------------*/
 
-INLINE void timer_list_remove(mame_timer *timer)
+INLINE void timer_list_remove(emu_timer *timer)
 {
 	/* sanity checks for the debug build */
 	#ifdef MAME_DEBUG
 	{
-		mame_timer *t;
+		emu_timer *t;
 
 		/* loop over the timer list */
 		for (t = timer_head; t && t != timer; t = t->next) ;
@@ -246,20 +242,15 @@ void timer_init(running_machine *machine)
 {
 	int i;
 
-	/* init the constant times */
-	time_zero.seconds = time_zero.subseconds = 0;
-	time_never.seconds = MAX_SECONDS;
-	time_never.subseconds = MAX_SUBSECONDS - 1;
-
 	/* we need to wait until the first call to timer_cyclestorun before using real CPU times */
-	global_basetime = time_zero;
+	global_basetime = attotime_zero;
 	callback_timer = NULL;
 	callback_timer_modified = FALSE;
 
 	/* register with the save state system */
 	state_save_push_tag(0);
 	state_save_register_item("timer", 0, global_basetime.seconds);
-	state_save_register_item("timer", 0, global_basetime.subseconds);
+	state_save_register_item("timer", 0, global_basetime.attoseconds);
 	state_save_register_func_postload(timer_postload);
 	state_save_pop_tag();
 
@@ -293,11 +284,11 @@ void timer_destructor(void *ptr, size_t size)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    mame_timer_next_fire_time - return the
+    timer_next_fire_time - return the
     time when the next timer will fire
 -------------------------------------------------*/
 
-mame_time mame_timer_next_fire_time(void)
+attotime timer_next_fire_time(void)
 {
 	return timer_head->expire;
 }
@@ -308,23 +299,23 @@ mame_time mame_timer_next_fire_time(void)
     time; this is also where we fire the timers
 -------------------------------------------------*/
 
-void mame_timer_set_global_time(mame_time newbase)
+void timer_set_global_time(attotime newbase)
 {
-	mame_timer *timer;
+	emu_timer *timer;
 
 	/* set the new global offset */
 	global_basetime = newbase;
 
-	LOG(("mame_timer_set_global_time: new=%.9f head->expire=%.9f\n", mame_time_to_double(newbase), mame_time_to_double(timer_head->expire)));
+	LOG(("timer_set_global_time: new=%s head->expire=%s\n", attotime_string(newbase), attotime_string(timer_head->expire)));
 
 	/* now process any timers that are overdue */
-	while (compare_mame_times(timer_head->expire, global_basetime) <= 0)
+	while (attotime_compare(timer_head->expire, global_basetime) <= 0)
 	{
 		int was_enabled = timer_head->enabled;
 
 		/* if this is a one-shot timer, disable it now */
 		timer = timer_head;
-		if (compare_mame_times(timer->period, time_zero) == 0 || compare_mame_times(timer->period, time_never) == 0)
+		if (attotime_compare(timer->period, attotime_zero) == 0 || attotime_compare(timer->period, attotime_never) == 0)
 			timer->enabled = FALSE;
 
 		/* set the global state of which callback we're in */
@@ -337,14 +328,14 @@ void mame_timer_set_global_time(mame_time newbase)
 		{
 			if (!timer->ptr && timer->callback)
 			{
-				LOG(("Timer %s:%d[%s] fired (expire=%.9f)\n", timer->file, timer->line, timer->func, mame_time_to_double(timer->expire)));
+				LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
 				profiler_mark(PROFILER_TIMER_CALLBACK);
 				(*timer->callback)(Machine, timer->callback_param);
 				profiler_mark(PROFILER_END);
 			}
 			else if (timer->ptr && timer->callback_ptr)
 			{
-				LOG(("Timer %s:%d[%s] fired (expire=%.9f)\n", timer->file, timer->line, timer->func, mame_time_to_double(timer->expire)));
+				LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
 				profiler_mark(PROFILER_TIMER_CALLBACK);
 				(*timer->callback_ptr)(Machine, timer->callback_ptr_param);
 				profiler_mark(PROFILER_END);
@@ -365,7 +356,7 @@ void mame_timer_set_global_time(mame_time newbase)
 			else
 			{
 				timer->start = timer->expire;
-				timer->expire = add_mame_times(timer->expire, timer->period);
+				timer->expire = attotime_add(timer->expire, timer->period);
 
 				timer_list_remove(timer);
 				timer_list_insert(timer);
@@ -385,11 +376,11 @@ void mame_timer_set_global_time(mame_time newbase)
     the save state system
 -------------------------------------------------*/
 
-static void timer_register_save(mame_timer *timer)
+static void timer_register_save(emu_timer *timer)
 {
 	char buf[256];
 	int count = 0;
-	mame_timer *t;
+	emu_timer *t;
 
 	/* find other timers that match our func name */
 	for (t = timer_head; t; t = t->next)
@@ -404,11 +395,11 @@ static void timer_register_save(mame_timer *timer)
 	state_save_register_item(buf, count, timer->callback_param);
 	state_save_register_item(buf, count, timer->enabled);
 	state_save_register_item(buf, count, timer->period.seconds);
-	state_save_register_item(buf, count, timer->period.subseconds);
+	state_save_register_item(buf, count, timer->period.attoseconds);
 	state_save_register_item(buf, count, timer->start.seconds);
-	state_save_register_item(buf, count, timer->start.subseconds);
+	state_save_register_item(buf, count, timer->start.attoseconds);
 	state_save_register_item(buf, count, timer->expire.seconds);
-	state_save_register_item(buf, count, timer->expire.subseconds);
+	state_save_register_item(buf, count, timer->expire.attoseconds);
 	state_save_pop_tag();
 }
 
@@ -419,8 +410,8 @@ static void timer_register_save(mame_timer *timer)
 
 static void timer_postload(void)
 {
-	mame_timer *privlist = NULL;
-	mame_timer *t;
+	emu_timer *privlist = NULL;
+	emu_timer *t;
 
 	/* remove all timers and make a private list */
 	while (timer_head)
@@ -457,7 +448,7 @@ static void timer_postload(void)
 
 int timer_count_anonymous(void)
 {
-	mame_timer *t;
+	emu_timer *t;
 	int count = 0;
 
 	logerror("timer_count_anonymous:\n");
@@ -483,10 +474,10 @@ int timer_count_anonymous(void)
     isn't primed yet
 -------------------------------------------------*/
 
-INLINE mame_timer *_mame_timer_alloc_common(void (*callback)(running_machine *, int), void (*callback_ptr)(running_machine *, void *), void *param, const char *file, int line, const char *func, int temp)
+INLINE emu_timer *_timer_alloc_common(void (*callback)(running_machine *, int), void (*callback_ptr)(running_machine *, void *), void *param, const char *file, int line, const char *func, int temp)
 {
-	mame_time time = get_current_time();
-	mame_timer *timer = timer_new();
+	attotime time = get_current_time();
+	emu_timer *timer = timer_new();
 
 	/* fill in the record */
 	timer->callback = callback;
@@ -496,14 +487,14 @@ INLINE mame_timer *_mame_timer_alloc_common(void (*callback)(running_machine *, 
 	timer->enabled = FALSE;
 	timer->temporary = temp;
 	timer->ptr = (callback_ptr != NULL);
-	timer->period = time_zero;
+	timer->period = attotime_zero;
 	timer->file = file;
 	timer->line = line;
 	timer->func = func;
 
 	/* compute the time of the next firing and insert into the list */
 	timer->start = time;
-	timer->expire = time_never;
+	timer->expire = attotime_never;
 	timer_list_insert(timer);
 
 	/* if we're not temporary, register ourselve with the save state system */
@@ -517,14 +508,14 @@ INLINE mame_timer *_mame_timer_alloc_common(void (*callback)(running_machine *, 
 	return timer;
 }
 
-mame_timer *_mame_timer_alloc(void (*callback)(running_machine *, int), const char *file, int line, const char *func)
+emu_timer *_timer_alloc(void (*callback)(running_machine *, int), const char *file, int line, const char *func)
 {
-	return _mame_timer_alloc_common(callback, NULL, NULL, file, line, func, FALSE);
+	return _timer_alloc_common(callback, NULL, NULL, file, line, func, FALSE);
 }
 
-mame_timer *_mame_timer_alloc_ptr(void (*callback_ptr)(running_machine *, void *), void *param, const char *file, int line, const char *func)
+emu_timer *_timer_alloc_ptr(void (*callback_ptr)(running_machine *, void *), void *param, const char *file, int line, const char *func)
 {
-	return _mame_timer_alloc_common(NULL, callback_ptr, param, file, line, func, FALSE);
+	return _timer_alloc_common(NULL, callback_ptr, param, file, line, func, FALSE);
 }
 
 
@@ -533,7 +524,7 @@ mame_timer *_mame_timer_alloc_ptr(void (*callback_ptr)(running_machine *, void *
     system
 -------------------------------------------------*/
 
-static void timer_remove(mame_timer *which)
+static void timer_remove(emu_timer *which)
 {
 	/* if this is a callback timer, note that */
 	if (which == callback_timer)
@@ -563,9 +554,9 @@ static void timer_remove(mame_timer *which)
     fire periodically
 -------------------------------------------------*/
 
-INLINE void mame_timer_adjust_common(mame_timer *which, mame_time duration, INT32 param, mame_time period)
+INLINE void timer_adjust_common(emu_timer *which, attotime duration, INT32 param, attotime period)
 {
-	mame_time time = get_current_time();
+	attotime time = get_current_time();
 
 	/* if this is the callback timer, mark it modified */
 	if (which == callback_timer)
@@ -577,11 +568,11 @@ INLINE void mame_timer_adjust_common(mame_timer *which, mame_time duration, INT3
 
 	/* clamp negative times to 0 */
 	if (duration.seconds < 0)
-		duration = time_zero;
+		duration = attotime_zero;
 
 	/* set the start and expire times */
 	which->start = time;
-	which->expire = add_mame_times(time, duration);
+	which->expire = attotime_add(time, duration);
 	which->period = period;
 
 	/* remove and re-insert the timer in its new order */
@@ -589,23 +580,23 @@ INLINE void mame_timer_adjust_common(mame_timer *which, mame_time duration, INT3
 	timer_list_insert(which);
 
 	/* if this was inserted as the head, abort the current timeslice and resync */
-	LOG(("timer_adjust %s.%s:%d to expire @ %.9f\n", which->file, which->func, which->line, mame_time_to_double(which->expire)));
+	LOG(("timer_adjust %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
 	if (which == timer_head && cpu_getexecutingcpu() >= 0)
 		activecpu_abort_timeslice();
 }
 
-void mame_timer_adjust(mame_timer *which, mame_time duration, INT32 param, mame_time period)
+void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime period)
 {
 	if (which->ptr)
-		fatalerror("mame_timer_adjust called on a ptr timer!");
-	mame_timer_adjust_common(which, duration, param, period);
+		fatalerror("timer_adjust called on a ptr timer!");
+	timer_adjust_common(which, duration, param, period);
 }
 
-void mame_timer_adjust_ptr(mame_timer *which, mame_time duration, mame_time period)
+void timer_adjust_ptr(emu_timer *which, attotime duration, attotime period)
 {
 	if (!which->ptr)
-		fatalerror("mame_timer_adjust_ptr called on a non-ptr timer!");
-	mame_timer_adjust_common(which, duration, 0, period);
+		fatalerror("timer_adjust_ptr called on a non-ptr timer!");
+	timer_adjust_common(which, duration, 0, period);
 }
 
 
@@ -620,20 +611,20 @@ void mame_timer_adjust_ptr(mame_timer *which, mame_time duration, mame_time peri
     period
 -------------------------------------------------*/
 
-void _mame_timer_pulse(mame_time period, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func)
+void _timer_pulse(attotime period, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func)
 {
-	mame_timer *timer = _mame_timer_alloc_common(callback, NULL, NULL, file, line, func, FALSE);
+	emu_timer *timer = _timer_alloc_common(callback, NULL, NULL, file, line, func, FALSE);
 
 	/* adjust to our liking */
-	mame_timer_adjust(timer, period, param, period);
+	timer_adjust(timer, period, param, period);
 }
 
-void _mame_timer_pulse_ptr(mame_time period, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func)
+void _timer_pulse_ptr(attotime period, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func)
 {
-	mame_timer *timer = _mame_timer_alloc_common(NULL, callback, param, file, line, func, FALSE);
+	emu_timer *timer = _timer_alloc_common(NULL, callback, param, file, line, func, FALSE);
 
 	/* adjust to our liking */
-	mame_timer_adjust_ptr(timer, period, period);
+	timer_adjust_ptr(timer, period, period);
 }
 
 
@@ -642,20 +633,20 @@ void _mame_timer_pulse_ptr(mame_time period, void *param, void (*callback)(runni
     calls the callback after the given duration
 -------------------------------------------------*/
 
-void _mame_timer_set(mame_time duration, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func)
+void _timer_set(attotime duration, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func)
 {
-	mame_timer *timer = _mame_timer_alloc_common(callback, NULL, NULL, file, line, func, TRUE);
+	emu_timer *timer = _timer_alloc_common(callback, NULL, NULL, file, line, func, TRUE);
 
 	/* adjust to our liking */
-	mame_timer_adjust(timer, duration, param, time_zero);
+	timer_adjust(timer, duration, param, attotime_zero);
 }
 
-void _mame_timer_set_ptr(mame_time duration, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func)
+void _timer_set_ptr(attotime duration, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func)
 {
-	mame_timer *timer = _mame_timer_alloc_common(NULL, callback, param, file, line, func, TRUE);
+	emu_timer *timer = _timer_alloc_common(NULL, callback, param, file, line, func, TRUE);
 
 	/* adjust to our liking */
-	mame_timer_adjust_ptr(timer, duration, time_zero);
+	timer_adjust_ptr(timer, duration, attotime_zero);
 }
 
 
@@ -668,13 +659,13 @@ void _mame_timer_set_ptr(mame_time duration, void *param, void (*callback)(runni
     timer_reset - reset the timing on a timer
 -------------------------------------------------*/
 
-void mame_timer_reset(mame_timer *which, mame_time duration)
+void timer_reset(emu_timer *which, attotime duration)
 {
 	/* adjust the timer */
 	if (!which->ptr)
-		mame_timer_adjust(which, duration, which->callback_param, which->period);
+		timer_adjust(which, duration, which->callback_param, which->period);
 	else
-		mame_timer_adjust_ptr(which, duration, which->period);
+		timer_adjust_ptr(which, duration, which->period);
 }
 
 
@@ -682,7 +673,7 @@ void mame_timer_reset(mame_timer *which, mame_time duration)
     timer_enable - enable/disable a timer
 -------------------------------------------------*/
 
-int mame_timer_enable(mame_timer *which, int enable)
+int timer_enable(emu_timer *which, int enable)
 {
 	int old;
 
@@ -703,7 +694,7 @@ int mame_timer_enable(mame_timer *which, int enable)
     enabled
 -------------------------------------------------*/
 
-int mame_timer_enabled(mame_timer *which)
+int timer_enabled(emu_timer *which)
 {
 	return which->enabled;
 }
@@ -715,16 +706,17 @@ int mame_timer_enabled(mame_timer *which)
     parameter of a timer
 -------------------------------------------------*/
 
-int mame_timer_get_param(mame_timer *which)
+int timer_get_param(emu_timer *which)
 {
 	return which->callback_param;
 }
 
 
-void *mame_timer_get_param_ptr(mame_timer *which)
+void *timer_get_param_ptr(emu_timer *which)
 {
 	return which->callback_ptr_param;
 }
+
 
 
 /***************************************************************************
@@ -736,9 +728,9 @@ void *mame_timer_get_param_ptr(mame_timer *which)
     last trigger
 -------------------------------------------------*/
 
-mame_time mame_timer_timeelapsed(mame_timer *which)
+attotime timer_timeelapsed(emu_timer *which)
 {
-	return sub_mame_times(get_current_time(), which->start);
+	return attotime_sub(get_current_time(), which->start);
 }
 
 
@@ -747,9 +739,9 @@ mame_time mame_timer_timeelapsed(mame_timer *which)
     next trigger
 -------------------------------------------------*/
 
-mame_time mame_timer_timeleft(mame_timer *which)
+attotime timer_timeleft(emu_timer *which)
 {
-	return sub_mame_times(which->expire, get_current_time());
+	return attotime_sub(which->expire, get_current_time());
 }
 
 
@@ -757,7 +749,7 @@ mame_time mame_timer_timeleft(mame_timer *which)
     timer_get_time - return the current time
 -------------------------------------------------*/
 
-mame_time mame_timer_get_time(void)
+attotime timer_get_time(void)
 {
 	return get_current_time();
 }
@@ -768,7 +760,7 @@ mame_time mame_timer_get_time(void)
     timer started counting
 -------------------------------------------------*/
 
-mame_time mame_timer_starttime(mame_timer *which)
+attotime timer_starttime(emu_timer *which)
 {
 	return which->start;
 }
@@ -779,7 +771,7 @@ mame_time mame_timer_starttime(mame_timer *which)
     timer will fire next
 -------------------------------------------------*/
 
-mame_time mame_timer_firetime(mame_timer *which)
+attotime timer_firetime(emu_timer *which)
 {
 	return which->expire;
 }
@@ -796,7 +788,7 @@ mame_time mame_timer_firetime(mame_timer *which)
 
 static void timer_logtimers(void)
 {
-	mame_timer *t;
+	emu_timer *t;
 
 	logerror("===============\n");
 	logerror("TIMER LOG START\n");
@@ -805,12 +797,12 @@ static void timer_logtimers(void)
 	logerror("Enqueued timers:\n");
 	for (t = timer_head; t; t = t->next)
 		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
-			mame_time_to_double(t->start), mame_time_to_double(t->expire), mame_time_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
+			attotime_to_double(t->start), attotime_to_double(t->expire), attotime_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
 
 	logerror("Free timers:\n");
 	for (t = timer_free_head; t; t = t->next)
 		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
-			mame_time_to_double(t->start), mame_time_to_double(t->expire), mame_time_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
+			attotime_to_double(t->start), attotime_to_double(t->expire), attotime_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
 
 	logerror("==============\n");
 	logerror("TIMER LOG STOP\n");

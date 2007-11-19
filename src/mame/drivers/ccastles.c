@@ -139,7 +139,7 @@
  *************************************/
 
 static const UINT8 *syncprom;
-static mame_timer *irq_timer;
+static emu_timer *irq_timer;
 
 static UINT8 irq_state;
 static UINT8 *nvram_stage;
@@ -164,7 +164,7 @@ INLINE void schedule_next_irq(int curscanline)
 			break;
 
 	/* next one at the start of this scanline */
-	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, curscanline, 0), curscanline, time_zero);
+	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, curscanline, 0), curscanline, attotime_zero);
 }
 
 
@@ -226,13 +226,13 @@ static MACHINE_START( ccastles )
 	visarea.max_x = 255;
 	visarea.min_y = ccastles_vblank_end;
 	visarea.max_y = ccastles_vblank_start - 1;
-	video_screen_configure(0, 320, 256, &visarea, HZ_TO_SUBSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	video_screen_configure(0, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = mame_timer_alloc(clock_irq);
+	irq_timer = timer_alloc(clock_irq);
 	irq_state = 0;
 	schedule_next_irq(0);
 

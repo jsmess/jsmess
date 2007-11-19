@@ -17,7 +17,7 @@ extern int vectrex_imager_status;
 extern UINT32 vectrex_beam_color;
 extern unsigned char vectrex_via_out[2];
 extern double imager_freq;
-extern mame_timer *imager_timer;
+extern emu_timer *imager_timer;
 extern int vectrex_lightpen_port;
 extern UINT8 *vectrex_ram_base;
 extern size_t vectrex_ram_size;

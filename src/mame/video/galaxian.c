@@ -102,14 +102,14 @@ static int stars_colors_start;
        UINT8 galaxian_stars_on;
 static INT32 stars_scrollpos;
 static UINT8 stars_blink_state;
-static mame_timer *stars_blink_timer;
-static mame_timer *stars_scroll_timer;
+static emu_timer *stars_blink_timer;
+static emu_timer *stars_scroll_timer;
 static UINT8 timer_adjusted;
        void galaxian_init_stars(running_machine *machine, int colors_offset);
 static void (*draw_stars)(running_machine *, mame_bitmap *);		/* function to call to draw the star layer */
 static void     noop_draw_stars(running_machine *machine, mame_bitmap *bitmap);
        void galaxian_draw_stars(running_machine *machine, mame_bitmap *bitmap);
-	   void scramble_draw_stars(running_machine *machine, mame_bitmap *bitmap);
+static 	   void scramble_draw_stars(running_machine *machine, mame_bitmap *bitmap);
 static void   rescue_draw_stars(running_machine *machine, mame_bitmap *bitmap);
 static void  mariner_draw_stars(running_machine *machine, mame_bitmap *bitmap);
 static void  jumpbug_draw_stars(running_machine *machine, mame_bitmap *bitmap);
@@ -1731,8 +1731,8 @@ void galaxian_init_stars(running_machine *machine, int colors_offset)
 
 	galaxian_stars_on = 0;
 	stars_blink_state = 0;
-	stars_blink_timer = mame_timer_alloc(stars_blink_callback);
-	stars_scroll_timer = mame_timer_alloc(stars_scroll_callback);
+	stars_blink_timer = timer_alloc(stars_blink_callback);
+	stars_scroll_timer = timer_alloc(stars_scroll_callback);
 	timer_adjusted = 0;
 	stars_colors_start = colors_offset;
 
@@ -2032,7 +2032,7 @@ static void start_stars_blink_timer(double ra, double rb, double c)
 
 	int period_in_ms = 693 * (ra + 2.0 * rb) * c;
 
-	mame_timer_adjust(stars_blink_timer, MAME_TIME_IN_MSEC(period_in_ms), 0, MAME_TIME_IN_MSEC(period_in_ms));
+	timer_adjust(stars_blink_timer, ATTOTIME_IN_MSEC(period_in_ms), 0, ATTOTIME_IN_MSEC(period_in_ms));
 }
 
 
@@ -2046,7 +2046,7 @@ static TIMER_CALLBACK( stars_scroll_callback )
 
 static void start_stars_scroll_timer()
 {
-	mame_timer_adjust(stars_scroll_timer, video_screen_get_frame_period(0), 0, video_screen_get_frame_period(0));
+	timer_adjust(stars_scroll_timer, video_screen_get_frame_period(0), 0, video_screen_get_frame_period(0));
 }
 
 

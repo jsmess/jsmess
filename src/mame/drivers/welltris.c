@@ -316,7 +316,7 @@ TODO:
 #include "sound/2610intf.h"
 
 UINT16 *welltris_spriteram;
-size_t welltris_spriteram_size;
+//size_t welltris_spriteram_size;
 UINT16 *welltris_pixelram;
 UINT16 *welltris_charvideoram;
 

@@ -293,7 +293,7 @@ static READ8_HANDLER ( to7_5p14_r )
 	else if ( offset == 8 ) 
 		return to7_5p14_select;
 	else
-		logerror ( "%f $%04x to7_5p14_r: invalid read offset %i\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset );
+		logerror ( "%f $%04x to7_5p14_r: invalid read offset %i\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset );
 	return 0;
 }
 
@@ -317,7 +317,7 @@ static WRITE8_HANDLER( to7_5p14_w )
 		case 4: drive = 2; side = 0; break;
 		case 5: drive = 3; side = 1; break;
 		default:
-			logerror( "%f $%04x to7_5p14_w: invalid drive select pattern $%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data );
+			logerror( "%f $%04x to7_5p14_w: invalid drive select pattern $%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data );
 		}
     
 		dens = (data & 0x80) ? DEN_FM_LO : DEN_MFM_LO;
@@ -332,13 +332,13 @@ static WRITE8_HANDLER( to7_5p14_w )
 			wd17xx_set_drive( drive );
 			wd17xx_set_side( side );
 			LOG(( "%f $%04x to7_5p14_w: $%02X set drive=%i side=%i density=%s\n", 
-			      mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(),
+			      attotime_to_double(timer_get_time()), activecpu_get_previouspc(),
 			      data, drive, side, (dens == DEN_FM_LO) ? "FM" : "MFM" ));
 		}
 	}
 	else
 		logerror ( "%f $%04x to7_5p14_w: invalid write offset %i (data=$%02X)\n", 
-			   mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data );
+			   attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data );
 }
 
 
@@ -390,7 +390,7 @@ static READ8_HANDLER ( to7_5p14sd_r )
 	else if ( offset >= 8 && offset <= 9 ) 
 		return to7_5p14sd_select;
 	else
-		logerror ( "%f $%04x to7_5p14sd_r: invalid read offset %i\n",  mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset );
+		logerror ( "%f $%04x to7_5p14sd_r: invalid read offset %i\n",  attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset );
 	return 0;
 }
 
@@ -434,12 +434,12 @@ static WRITE8_HANDLER( to7_5p14sd_w )
 			mc6843_set_drive( drive );
 			mc6843_set_side( side );
 			LOG(( "%f $%04x to7_5p14sd_w: $%02X set drive=%i side=%i\n", 
-			      mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data, drive, side ));
+			      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data, drive, side ));
 		}
 	}
 	else
 		logerror ( "%f $%04x to7_5p14sd_w: invalid write offset %i (data=$%02X)\n", 
-			   mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data );
+			   attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data );
 }
 
 
@@ -552,7 +552,7 @@ static void to7_qdd_index_pulse_cb ( mess_image* img, int state )
 		to7qdd->data_size = 0;
 	}
 
-	VLOG(( "%f to7_qdd_pulse_cb: state=%i\n", mame_time_to_double(mame_timer_get_time()), state ));
+	VLOG(( "%f to7_qdd_pulse_cb: state=%i\n", attotime_to_double(timer_get_time()), state ));
 }
 
 
@@ -616,7 +616,7 @@ static UINT8 to7_qdd_read_byte( void )
 		data = to7qdd->data[ to7qdd->data_idx ];
   
 	VLOG(( "%f $%04x to7_qdd_read_byte: RDATA off=%i/%i data=$%02X\n", 
-	       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), 
+	       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), 
 	       to7qdd->data_idx, to7qdd->data_size, data ));
   
 	to7qdd->data_idx++;
@@ -657,7 +657,7 @@ static void to7_qdd_write_byte( UINT8 data )
 		to7qdd->data_idx++;
     
 		VLOG (( "%f $%04x to7_qdd_write_byte: got $%02X offs=%i-%i\n", 
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,
 			to7qdd->start_idx, to7qdd->data_idx ));
     
 		/* end of tentative id field */
@@ -671,7 +671,7 @@ static void to7_qdd_write_byte( UINT8 data )
 			UINT8 filler = 0xff;
       
 			LOG(( "%f $%04x to7_qdd_write_byte: got id field for sector=%i\n", 
-			      mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), sector ));
+			      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), sector ));
 	  
 			floppy_drive_format_sector( to7_qdd_image(),
 						    0, sector, 0, 0, sector, 128, filler );
@@ -700,7 +700,7 @@ static void to7_qdd_write_byte( UINT8 data )
 				int sector = (int) to7qdd->data[ i + 1 ] * 256 + (int) to7qdd->data[ i + 2 ];
 	
 				LOG(( "%f $%04x to7_qdd_write_byte: goto data field for sector=%i\n", 
-				      mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), sector ));
+				      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), sector ));
 				
 				floppy_drive_write_sector_data( to7_qdd_image(), 0, sector, to7qdd->data + to7qdd->start_idx + 1, 128, 0 );
 			}
@@ -722,7 +722,7 @@ static READ8_HANDLER ( to7_qdd_r )
 	case 0: /* MC6852 status */
 		to7_qdd_stat_update();
 		VLOG(( "%f $%04x to7_qdd_r: STAT=$%02X irq=%i pe=%i ovr=%i und=%i tr=%i rd=%i ncts=%i\n",
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), to7qdd->status,
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), to7qdd->status,
 		       to7qdd->status & QDD_S_IRQ  ? 1 : 0,
 		       to7qdd->status & QDD_S_PE   ? 1 : 0,
 		       to7qdd->status & QDD_S_OVR  ? 1 : 0,
@@ -745,12 +745,12 @@ static READ8_HANDLER ( to7_qdd_r )
 			data |= 0x40; /* disk present */
 		if ( to7qdd->index_pulse ) 
 			data |= 0x80; /* disk start */
-		VLOG(( "%f $%04x to7_qdd_r: STATUS8 $%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+		VLOG(( "%f $%04x to7_qdd_r: STATUS8 $%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		return data;
 	}
  
 	default:
-		logerror ( "%f $%04x to7_qdd_r: invalid read offset %i\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset );
+		logerror ( "%f $%04x to7_qdd_r: invalid read offset %i\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset );
 		return 0;
 	}
 }
@@ -772,7 +772,7 @@ static WRITE8_HANDLER( to7_qdd_w )
 		to7qdd->ctrl1 = ( data & ~(QDD_C1_RRESET | QDD_C1_TRESET) ) |( data &  (QDD_C1_RRESET | QDD_C1_TRESET) & to7qdd->ctrl1 );
 		to7_qdd_stat_update();
 		VLOG(( "%f $%04x to7_qdd_w: CTRL1=$%02X reset=%c%c %s%sirq=%c%c\n",
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,
 		       data & QDD_C1_RRESET ? 'r' : '-', data & QDD_C1_TRESET ? 't' : '-',
 		       data & QDD_C1_STRIPSYNC ? "strip-sync " : "",
 		       data & QDD_C1_CLRSYNC ? "clear-sync " : "",
@@ -796,7 +796,7 @@ static WRITE8_HANDLER( to7_qdd_w )
 			parity = par[ (data >> 3) & 7 ];
 			to7_qdd_stat_update();
 			VLOG(( "%f $%04x to7_qdd_w: CTRL2=$%02X bits=%i par=%s blen=%i under=%s%s\n",
-			       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,
+			       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,
 			       bits, parname[ parity ], data & QDD_C2_BLEN ? 1 : 2,
 			       data & QDD_C2_TSYNC ? "sync" : "ff",
 			       data & QDD_C2_EIE ? "irq-err" : "" ));
@@ -814,7 +814,7 @@ static WRITE8_HANDLER( to7_qdd_w )
 				to7qdd->status &= ~QDD_S_NCTS;
 			to7_qdd_stat_update();
 			VLOG(( "%f $%04x to7_qdd_w: CTRL3=$%02X %s%ssync-len=%i sync-mode=%s\n",
-			       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,
+			       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,
 			       data & QDD_C3_CLRTUF ? "clr-tuf " : "",
 			       data & QDD_C3_CLRCTS ? "clr-cts " : "",
 			       data & QDD_C3_SYNCLEN ? 1 : 2,
@@ -826,7 +826,7 @@ static WRITE8_HANDLER( to7_qdd_w )
 			break;
 
 		case 3: /* MC6852 data out => does not seem to be used */
-			VLOG(( "%f $%04x to7_qdd_w: ignored WDATA=$%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+			VLOG(( "%f $%04x to7_qdd_w: ignored WDATA=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 			break;
 
 		}
@@ -834,16 +834,16 @@ static WRITE8_HANDLER( to7_qdd_w )
 
 	case 8: /* set drive */
 		to7qdd->drive = data;
-		VLOG(( "%f $%04x to7_qdd_w: DRIVE=$%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+		VLOG(( "%f $%04x to7_qdd_w: DRIVE=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		break;
 
 	case 12: /* motor pulse ? */
 		thom_floppy_active( 0 );
-		VLOG(( "%f $%04x to7_qdd_w: MOTOR=$%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+		VLOG(( "%f $%04x to7_qdd_w: MOTOR=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		break;
 
 	default:
-		logerror ( "%f $%04x to7_qdd_w: invalid write offset %i (data=$%02X)\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data );
+		logerror ( "%f $%04x to7_qdd_w: invalid write offset %i (data=$%02X)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data );
 	}
 }
 
@@ -951,7 +951,7 @@ static struct
 } * thmfc1;
 
 
-static mame_timer* thmfc_floppy_cmd;
+static emu_timer* thmfc_floppy_cmd;
 
 
 
@@ -994,7 +994,7 @@ static void thmfc_floppy_index_pulse_cb ( mess_image *img, int state )
 			thmfc1->data_raw_idx = 0;
 	}
 
-	VLOG(( "%f thmfc_floppy_index_pulse_cb: state=%i\n", mame_time_to_double(mame_timer_get_time()), state ));
+	VLOG(( "%f thmfc_floppy_index_pulse_cb: state=%i\n", attotime_to_double(timer_get_time()), state ));
 }
 
 
@@ -1039,7 +1039,7 @@ static int thmfc_floppy_find_sector ( chrn_id* dst )
 static TIMER_CALLBACK( thmfc_floppy_cmd_complete_cb )
 {
 	LOG (( "%f thmfc_floppy_cmd_complete_cb: cmd=%i off=%i/%i/%i\n", 
-	       mame_time_to_double(mame_timer_get_time()), thmfc1->op, thmfc1->data_idx, 
+	       attotime_to_double(timer_get_time()), thmfc1->op, thmfc1->data_idx, 
 	       thmfc1->data_finish - 1, thmfc1->data_size - 1 ));
 
 	if ( thmfc1->op == THMFC1_OP_WRITE_SECT ) 
@@ -1052,7 +1052,7 @@ static TIMER_CALLBACK( thmfc_floppy_cmd_complete_cb )
 	thmfc1->stat0 |= THMFC1_STAT0_FINISHED;
 	thmfc1->data_idx = 0;
 	thmfc1->data_size = 0;
-	mame_timer_adjust( thmfc_floppy_cmd, time_never, 0, time_never );
+	timer_adjust( thmfc_floppy_cmd, attotime_never, 0, attotime_never );
 }
 
 
@@ -1063,7 +1063,7 @@ static UINT8 thmfc_floppy_read_byte ( void )
 	UINT8 data = thmfc1->data[ thmfc1->data_idx ];
   
 	VLOG(( "%f $%04x thmfc_floppy_read_byte: off=%i/%i/%i data=$%02X\n", 
-	       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), 
+	       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), 
 	       thmfc1->data_idx, thmfc1->data_finish - 1, thmfc1->data_size - 1, 
 	       data ));
   
@@ -1106,7 +1106,7 @@ static UINT8 thmfc_floppy_raw_read_byte ( void )
 		data = thmfc1->data[ thmfc1->data_raw_idx ];
 
 	VLOG(( "%f $%04x thmfc_floppy_raw_read_byte: off=%i/%i data=$%02X\n", 
-	       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), 
+	       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), 
 	       thmfc1->data_raw_idx, thmfc1->data_raw_size, data ));
   
 	thmfc1->data_raw_idx++;
@@ -1144,7 +1144,7 @@ static void thmfc_floppy_qdd_write_byte ( UINT8 data )
 		}
     
 		VLOG (( "%f $%04x thmfc_floppy_qdd_write_byte: $%02X offs=%i-%i\n", 
-			mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,
+			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,
 			thmfc1->data_idx,thmfc1->data_raw_idx ));
     
 		if ( thmfc1->data_raw_idx == thmfc1->data_idx + 3 &&
@@ -1156,7 +1156,7 @@ static void thmfc_floppy_qdd_write_byte ( UINT8 data )
 			int sector = (int) thmfc1->data[ thmfc1->data_idx ] * 256 + (int) thmfc1->data[ thmfc1->data_idx + 1 ];
 			UINT8 filler = 0xff;
       
-			LOG(( "%f $%04x thmfc_floppy_qdd_write_byte: id field, sector=%i\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), sector ));
+			LOG(( "%f $%04x thmfc_floppy_qdd_write_byte: id field, sector=%i\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), sector ));
       
 			floppy_drive_format_sector( thmfc_floppy_image(), 0, sector, 0, 0, sector, 128, filler );
 			thmfc1->data_idx = 0;
@@ -1185,7 +1185,7 @@ static void thmfc_floppy_qdd_write_byte ( UINT8 data )
 					(int) thmfc1->data[ i + 2 ];
 	
 				LOG(( "%f $%04x thmfc_floppy_qdd_write_byte: data field, sector=%i\n", 
-				      mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), sector ));
+				      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), sector ));
 				
 				floppy_drive_write_sector_data( img, 0, sector, thmfc1->data + thmfc1->data_idx, 128, 0 );
 			}
@@ -1199,7 +1199,7 @@ static void thmfc_floppy_qdd_write_byte ( UINT8 data )
 	else
 	{
 		thmfc1->data_raw_idx++;
-		VLOG (( "%f $%04x thmfc_floppy_qdd_write_byte: ignored $%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+		VLOG (( "%f $%04x thmfc_floppy_qdd_write_byte: ignored $%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 	}
   
 }
@@ -1210,7 +1210,7 @@ static void thmfc_floppy_qdd_write_byte ( UINT8 data )
 static void thmfc_floppy_write_byte ( UINT8 data )
 {
 	VLOG (( "%f $%04x thmfc_floppy_write_byte: off=%i/%i data=$%02X\n", 
-		mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), 
+		attotime_to_double(timer_get_time()), activecpu_get_previouspc(), 
 		thmfc1->data_idx, thmfc1->data_size - 1, data ));
   
 	thmfc1->data_raw_size = 0;
@@ -1224,7 +1224,7 @@ static void thmfc_floppy_write_byte ( UINT8 data )
 /* intelligent formatting */
 static void thmfc_floppy_format_byte ( UINT8 data )
 {
-	VLOG (( "%f $%04x thmfc_floppy_format_byte: $%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+	VLOG (( "%f $%04x thmfc_floppy_format_byte: $%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
   
 	thmfc1->data_raw_size = 0;
   
@@ -1264,7 +1264,7 @@ READ8_HANDLER ( thmfc_floppy_r )
 		
 	case 0: /* STAT0 */
 		thmfc1->stat0 ^= THMFC1_STAT0_SYNCHRO | THMFC1_STAT0_BYTE_READY_POL;
-		VLOG(( "%f $%04x thmfc_floppy_r: STAT0=$%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), thmfc1->stat0 ));
+		VLOG(( "%f $%04x thmfc_floppy_r: STAT0=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), thmfc1->stat0 ));
 		return thmfc1->stat0;
     
 	case 1: /* STAT1 */
@@ -1295,7 +1295,7 @@ READ8_HANDLER ( thmfc_floppy_r )
 			data |= 0x10;
 		if ( flags & FLOPPY_DRIVE_DISK_WRITE_PROTECTED ) 
 			data |= 0x04;
-		VLOG(( "%f $%04x thmfc_floppy_r: STAT1=$%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+		VLOG(( "%f $%04x thmfc_floppy_r: STAT1=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		return data;
 	}
 	
@@ -1313,12 +1313,12 @@ READ8_HANDLER ( thmfc_floppy_r )
 	{ 
 		/* undocumented => emulate TO7 QDD controller ? */
 		UINT8 data = thmfc1->ipl << 7;
-		VLOG(( "%f $%04x thmfc_floppy_r: STAT8=$%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+		VLOG(( "%f $%04x thmfc_floppy_r: STAT8=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		return data;
 	}
 
 	default:
-		logerror ( "%f $%04x thmfc_floppy_r: invalid read offset %i\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset );
+		logerror ( "%f $%04x thmfc_floppy_r: invalid read offset %i\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset );
 		return 0;
 	}
 }
@@ -1338,14 +1338,14 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		thom_floppy_set_density( dens );
 		thmfc1->formatting = (data >> 2) & 1;
 		LOG (( "%f $%04x thmfc_floppy_w: CMD0=$%02X dens=%s wsync=%i dsync=%i fmt=%i op=%i\n",
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,  
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,  
 		       (dens == DEN_FM_LO) ? "MF" : "MFM",
 		       wsync, (data >> 3) & 1,
 		       thmfc1->formatting, data & 3 ));
       
 		/* abort previous command, if any */
 		thmfc1->op = THMFC1_OP_RESET;
-		mame_timer_adjust( thmfc_floppy_cmd, time_never, 0, time_never );
+		timer_adjust( thmfc_floppy_cmd, attotime_never, 0, attotime_never );
       
 		switch ( data & 3 ) 
 		{
@@ -1364,7 +1364,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_finish = thmfc1->sector_size + 3;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_WRITE_SECT;
-				mame_timer_adjust( thmfc_floppy_cmd, MAME_TIME_IN_MSEC( 10 ), 0, time_never );
+				timer_adjust( thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 10 ), 0, attotime_never );
 			}
 			break;
 	
@@ -1380,7 +1380,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_idx = 1;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_READ_ADDR;
-				mame_timer_adjust( thmfc_floppy_cmd, MAME_TIME_IN_MSEC( 1 ), 0, time_never );
+				timer_adjust( thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 1 ), 0, attotime_never );
 			}
 			break;
 	
@@ -1396,7 +1396,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_idx = 1;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_READ_SECT;
-				mame_timer_adjust( thmfc_floppy_cmd, MAME_TIME_IN_MSEC( 10 ), 0, time_never );
+				timer_adjust( thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 10 ), 0, attotime_never );
 			}
 			break;
 		}
@@ -1428,7 +1428,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		}
     
 		LOG (( "%f $%04x thmfc_floppy_w: CMD1=$%02X sect-size=%i comp=%i head=%i\n",
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,
 		       thmfc1->sector_size, (data >> 1) & 7, thmfc1->side ));
 		break;
 
@@ -1456,7 +1456,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		thom_floppy_active( 0 );
       
 		LOG (( "%f $%04x thmfc_floppy_w: CMD2=$%02X drv=%i step=%i motor=%i\n",
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data, 
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data, 
 		       thmfc1->drive, seek, motor ));
  
 		if ( seek ) 
@@ -1486,7 +1486,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		{
 			/* TODO: implement other forms of raw track writing */
 			LOG (( "%f $%04x thmfc_floppy_w: ignored raw WDATA $%02X\n", 
-			       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+			       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		}
 		break;
     
@@ -1494,32 +1494,32 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 	case 4: /* WCLK (unemulated) */
 		/* clock configuration: FF for data, 0A for synchro */
 		LOG (( "%f $%04x thmfc_floppy_w: WCLK=$%02X (%s)\n", 
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,
 		       (data == 0xff) ? "data" : (data == 0x0A) ? "synchro" : "?" ));
 		break;
 
 	case 5: /* WSECT */
 		thmfc1->sector = data;
 		LOG (( "%f $%04x thmfc_floppy_w: WSECT=%i\n", 
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		break;
 
 	case 6: /* WTRCK */
 		thmfc1->track = data;
 		LOG (( "%f $%04x thmfc_floppy_w: WTRCK=%i (real=%i)\n", 
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data,
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data,
 		       floppy_drive_get_current_track( thmfc_floppy_image() ) ));
 		break;
 
 	case 7: /* WCELL */
 		/* precompensation (unemulated) */
 		LOG (( "%f $%04x thmfc_floppy_w: WCELL=$%02X\n", 
-		       mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), data ));
+		       attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		break;
       
 	default:
 		logerror ( "%f $%04x thmfc_floppy_w: invalid write offset %i (data=$%02X)\n", 
-			   mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data );
+			   attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data );
 	}
 }
 
@@ -1553,7 +1553,7 @@ void thmfc_floppy_reset( void )
 	thmfc1->data_raw_size = 0;
 	thmfc1->data_crc = 0;
 	thmfc1->wsync = 0;
-	mame_timer_adjust( thmfc_floppy_cmd, time_never, 0, time_never );
+	timer_adjust( thmfc_floppy_cmd, attotime_never, 0, attotime_never );
 }
 
 
@@ -1565,7 +1565,7 @@ void thmfc_floppy_init( void )
 	thmfc1 = auto_malloc( sizeof( *thmfc1 ) );
 	assert( thmfc1 );
 
-	thmfc_floppy_cmd = mame_timer_alloc( thmfc_floppy_cmd_complete_cb );
+	thmfc_floppy_cmd = timer_alloc( thmfc_floppy_cmd_complete_cb );
 
 	state_save_register_global( thmfc1->op );
 	state_save_register_global( thmfc1->sector );
@@ -1603,29 +1603,29 @@ void thmfc_floppy_init( void )
 
 static TIMER_CALLBACK( ans4 )
 {
-	LOG(( "%f ans4\n", mame_time_to_double(mame_timer_get_time()) ));
+	LOG(( "%f ans4\n", attotime_to_double(timer_get_time()) ));
 	mc6854_set_cts( 0 );
 }
 
 static TIMER_CALLBACK( ans3 )
 {
-	LOG(( "%f ans3\n", mame_time_to_double(mame_timer_get_time()) ));
+	LOG(( "%f ans3\n", attotime_to_double(timer_get_time()) ));
 	mc6854_set_cts( 1 );
-	mame_timer_set(  MAME_TIME_IN_USEC( 100 ), 0, ans4 );
+	timer_set(  ATTOTIME_IN_USEC( 100 ), 0, ans4 );
 }
 
 static TIMER_CALLBACK( ans2 )
 {
-	LOG(( "%f ans2\n", mame_time_to_double(mame_timer_get_time()) ));
+	LOG(( "%f ans2\n", attotime_to_double(timer_get_time()) ));
 	mc6854_set_cts( 0 );
-	mame_timer_set(  MAME_TIME_IN_USEC( 100 ), 0, ans3 );
+	timer_set(  ATTOTIME_IN_USEC( 100 ), 0, ans3 );
 }
 
 static TIMER_CALLBACK( ans )
 {
-	LOG(( "%f ans\n", mame_time_to_double(mame_timer_get_time()) ));
+	LOG(( "%f ans\n", attotime_to_double(timer_get_time()) ));
 	mc6854_set_cts( 1 );
-	mame_timer_set(  MAME_TIME_IN_USEC( 100 ), 0, ans2 );
+	timer_set(  ATTOTIME_IN_USEC( 100 ), 0, ans2 );
 }
 /* consigne DKBOOT
 
@@ -1659,7 +1659,7 @@ static TIMER_CALLBACK( ans )
 static void to7_network_got_frame( UINT8* data, int length )
 {
 	int i;
-	LOG(( "%f to7_network_got_frame:", mame_time_to_double(mame_timer_get_time()) ));
+	LOG(( "%f to7_network_got_frame:", attotime_to_double(timer_get_time()) ));
 	for ( i = 0; i < length; i++ )
 		LOG(( " $%02X", data[i] ));
 	LOG(( "\n" ));
@@ -1667,7 +1667,7 @@ static void to7_network_got_frame( UINT8* data, int length )
 	if ( data[1] == 0xff ) 
 	{
 		LOG(( "to7_network_got_frame: %i phones %i\n", data[2], data[0] ));
-		mame_timer_set(  MAME_TIME_IN_USEC( 100 ), 0, ans  );
+		timer_set(  ATTOTIME_IN_USEC( 100 ), 0, ans  );
 		mc6854_set_cts( 0 );
 	}
 	else if ( ! data[1] ) 
@@ -1721,11 +1721,11 @@ static READ8_HANDLER ( to7_network_r )
 	{
 		/* network ID of the computer */
 		UINT8 id = readinputport( THOM_INPUT_FCONFIG ) >> 3;
-		VLOG(( "%f $%04x to7_network_r: read id $%02X\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), id ));
+		VLOG(( "%f $%04x to7_network_r: read id $%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), id ));
 		return id;
 	}
 
-	logerror( "%f $%04x to7_network_r: invalid read offset %i\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset );
+	logerror( "%f $%04x to7_network_r: invalid read offset %i\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset );
 	return 0;
 }
 
@@ -1738,7 +1738,7 @@ static WRITE8_HANDLER ( to7_network_w )
 	else
 	{
 		logerror( "%f $%04x to7_network_w: invalid write offset %i (data=$%02X)\n",
-			  mame_time_to_double(mame_timer_get_time()), activecpu_get_previouspc(), offset, data );
+			  attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data );
 	}
 }
 

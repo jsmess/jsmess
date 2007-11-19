@@ -79,7 +79,7 @@ struct _ptm6840
 	int external_clock[3];
 
 	// each PTM has 3 timers
-	mame_timer *timer[3];
+	emu_timer *timer[3];
 
 	UINT16 latch[3];
 	UINT16 counter[3];
@@ -164,13 +164,13 @@ static void subtract_from_counter(int counter, int count, int which)
 
 		/* store the result */
 		currptr->counter[counter] = (msb << 8) | lsb;
-		mame_timer_adjust(currptr->timer[counter], scale_up_mame_time(MAME_TIME_IN_HZ(clock), currptr->counter[counter]), which, time_zero);
+		timer_adjust(currptr->timer[counter], attotime_mul(ATTOTIME_IN_HZ(clock), currptr->counter[counter]), which, attotime_zero);
 	}
 
 	/* word mode */
 	else
 	{
-		mame_time duration;
+		attotime duration;
 		int word = currptr->counter[counter];
 
 		/* count the clocks */
@@ -188,9 +188,9 @@ static void subtract_from_counter(int counter, int count, int which)
 
 		/* store the result */
 		currptr->counter[counter] = word;
-		duration = scale_up_mame_time(MAME_TIME_IN_HZ(clock), currptr->counter[counter]);
-		if (counter == 2) duration = scale_up_mame_time(duration, currptr->t3_divisor);
-		mame_timer_adjust(currptr->timer[counter], duration, which, time_zero);
+		duration = attotime_mul(ATTOTIME_IN_HZ(clock), currptr->counter[counter]);
+		if (counter == 2) duration = attotime_mul(duration, currptr->t3_divisor);
+		timer_adjust(currptr->timer[counter], duration, which, attotime_zero);
 	}
 }
 
@@ -246,7 +246,7 @@ static UINT16 compute_counter(int counter, int which)
 		PLOG(("MC6840 #%d: %d external clock freq %d \n", which,counter,clock));
 	}
 	/* see how many are left */
-	remaining = mame_time_to_double(scale_up_mame_time(mame_timer_timeleft(currptr->timer[counter]), clock));
+	remaining = attotime_to_double(attotime_mul(timer_timeleft(currptr->timer[counter]), clock));
 
 	/* adjust the count for dual byte mode */
 	if (currptr->control_reg[counter] & 0x04)
@@ -270,7 +270,7 @@ static void reload_count(int idx, int which)
 {
 	int clock;
 	int count;
-	mame_time duration;
+	attotime duration;
 	ptm6840 *currptr = ptm + which;
 
 	/* copy the latched value in */
@@ -306,23 +306,23 @@ static void reload_count(int idx, int which)
 	/* set the timer */
 	PLOG(("MC6840 #%d: reload_count(%d): clock = %d  count = %d\n", which, idx, clock, count));
 
-	duration = scale_up_mame_time(MAME_TIME_IN_HZ(clock), count);
-	if (idx == 2) duration = scale_up_mame_time(duration, currptr->t3_divisor);
-	mame_timer_adjust(currptr->timer[idx], duration, which, time_zero);
-	PLOG(("MC6840 #%d: reload_count(%d): output = %lf\n", which, idx, mame_time_to_double(duration)));
+	duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
+	if (idx == 2) duration = attotime_mul(duration, currptr->t3_divisor);
+	timer_adjust(currptr->timer[idx], duration, which, attotime_zero);
+	PLOG(("MC6840 #%d: reload_count(%d): output = %lf\n", which, idx, attotime_to_double(duration)));
 
 	if (!currptr->control_reg[idx] & 0x02)
 	{
 		if (!currptr->intf->external_clock[idx])
 		{
 			currptr->enabled[idx] = 0;
-			mame_timer_enable(currptr->timer[idx],FALSE);
+			timer_enable(currptr->timer[idx],FALSE);
 		}
 	}
 	else
 	{
 		currptr->enabled[idx] = 1;
-		mame_timer_enable(currptr->timer[idx],TRUE);
+		timer_enable(currptr->timer[idx],TRUE);
 	}
 }
 
@@ -355,12 +355,12 @@ void ptm6840_config(int which, const ptm6840_interface *intf)
 		}
 	}
 
-	ptm[which].timer[0] = mame_timer_alloc(ptm6840_t1_timeout);
-	ptm[which].timer[1] = mame_timer_alloc(ptm6840_t2_timeout);
-	ptm[which].timer[2] = mame_timer_alloc(ptm6840_t3_timeout);
+	ptm[which].timer[0] = timer_alloc(ptm6840_t1_timeout);
+	ptm[which].timer[1] = timer_alloc(ptm6840_t2_timeout);
+	ptm[which].timer[2] = timer_alloc(ptm6840_t3_timeout);
 
 	for (i = 0; i < 3; i++)
-		mame_timer_enable(ptm[which].timer[i], FALSE);
+		timer_enable(ptm[which].timer[i], FALSE);
 
 	state_save_register_item("6840ptm", which, currptr->lsb_buffer);
 	state_save_register_item("6840ptm", which, currptr->msb_buffer);
@@ -521,7 +521,7 @@ void ptm6840_write (int which, int offset, int data)
 					PLOG(("MC6840 #%d : Timer reset\n",which));
 					for (i = 0; i < 3; i++)
 					{
-						mame_timer_enable(currptr->timer[i],FALSE);
+						timer_enable(currptr->timer[i],FALSE);
 						currptr->enabled[i]=0;
 					}
 				}

@@ -44,7 +44,7 @@
 typedef struct _audio_channel audio_channel;
 struct _audio_channel
 {
-	mame_timer *	irq_timer;
+	emu_timer *	irq_timer;
 	UINT32			curlocation;
 	UINT16			curlength;
 	UINT16			curticks;
@@ -90,7 +90,7 @@ static void dma_reload(audio_channel *chan)
 {
 	chan->curlocation = CUSTOM_REG_LONG(REG_AUD0LCH + chan->index * 8);
 	chan->curlength = CUSTOM_REG(REG_AUD0LEN + chan->index * 8);
-	mame_timer_adjust(chan->irq_timer, MAME_TIME_IN_HZ(15750), chan->index, time_zero);
+	timer_adjust(chan->irq_timer, ATTOTIME_IN_HZ(15750), chan->index, attotime_zero);
 	LOG(("dma_reload(%d): offs=%05X len=%04X\n", chan->index, chan->curlocation, chan->curlength));
 }
 
@@ -271,7 +271,7 @@ void *amiga_sh_start(int clock, const struct CustomSound_interface *config)
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
-		audio_state->channel[i].irq_timer = mame_timer_alloc(signal_irq);
+		audio_state->channel[i].irq_timer = timer_alloc(signal_irq);
 	}
 
 	/* create the stream */

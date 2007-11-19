@@ -12,7 +12,7 @@ static ZX8301_VIDEO_CONFIG zx8301;
 
 static const int ZX8301_COLOR_MODE4[] = { 0, 2, 4, 7 };
 
-static mame_timer *zx8301_flash_timer;
+static emu_timer *zx8301_flash_timer;
 
 static TIMER_CALLBACK(zx8301_flash_tick)
 {
@@ -110,8 +110,8 @@ static void zx8301_draw_screen(mame_bitmap *bitmap)
 
 VIDEO_START( zx8301 )
 {
-	zx8301_flash_timer = mame_timer_alloc(zx8301_flash_tick);
-	mame_timer_adjust(zx8301_flash_timer, MAME_TIME_IN_HZ(2), 0, MAME_TIME_IN_HZ(2));
+	zx8301_flash_timer = timer_alloc(zx8301_flash_tick);
+	timer_adjust(zx8301_flash_timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
 
 	state_save_register_global(zx8301.dispoff);
 	state_save_register_global(zx8301.mode8);

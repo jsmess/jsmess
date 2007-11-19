@@ -186,7 +186,7 @@ static int lordgun_gun_x_table[] =
 	0x1B3,0x1B4,0x1B5,0x1B6,0x1B7,0x1B8,0x1B9,0x1BA,0x1BB,0x1BC,0x1BD,0x1BE,0x1BF,0x1BF
 };
 
-void lorddgun_calc_gun_scr(int i)
+static void lorddgun_calc_gun_scr(int i)
 {
 	int x = readinputport(5+i) - 0x3c;
 	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )

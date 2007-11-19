@@ -40,7 +40,7 @@ static UINT16 K001006_unknown_ram[MAX_K001006_CHIPS][0x1000];
 static UINT32 K001006_addr[MAX_K001006_CHIPS] = { 0, 0 };
 static int K001006_device_sel[MAX_K001006_CHIPS] = { 0, 0 };
 
-UINT32 K001006_palette[MAX_K001006_CHIPS][0x800];
+static UINT32 K001006_palette[MAX_K001006_CHIPS][0x800];
 
 static UINT32 K001006_r(int chip, int offset, UINT32 mem_mask)
 {
@@ -154,9 +154,9 @@ static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
 static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
 
 UINT32 K001005_status = 0;
-mame_bitmap *K001005_bitmap[2];
-mame_bitmap *K001005_zbuffer;
-rectangle K001005_cliprect;
+static mame_bitmap *K001005_bitmap[2];
+static mame_bitmap *K001005_zbuffer;
+static rectangle K001005_cliprect;
 
 static void render_polygons(void);
 

@@ -76,8 +76,8 @@ const amiga_machine_interface *amiga_intf;
 
 static autoconfig_device *autoconfig_list;
 static autoconfig_device *cur_autoconfig;
-static mame_timer * amiga_irq_timer;
-static mame_timer * amiga_blitter_timer;
+static emu_timer * amiga_irq_timer;
+static emu_timer * amiga_blitter_timer;
 
 const char *amiga_custom_names[0x100] =
 {
@@ -293,8 +293,8 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	cia_config(1, &cia_intf[1]);
 
 	/* setup the timers */
-	amiga_irq_timer = mame_timer_alloc(amiga_irq_proc);
-	amiga_blitter_timer = mame_timer_alloc(amiga_blitter_proc);
+	amiga_irq_timer = timer_alloc(amiga_irq_proc);
+	amiga_blitter_timer = timer_alloc(amiga_blitter_proc);
 }
 
 
@@ -434,7 +434,7 @@ static void update_irqs(void)
 static TIMER_CALLBACK( amiga_irq_proc )
 {
 	update_irqs();
-	mame_timer_reset( amiga_irq_timer, time_never);
+	timer_reset( amiga_irq_timer, attotime_never);
 }
 
 /*************************************
@@ -968,7 +968,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_BLIT, 0);
 
 	/* reset the blitter timer */
-	mame_timer_reset( amiga_blitter_timer, time_never);
+	timer_reset( amiga_blitter_timer, attotime_never);
 }
 
 
@@ -1032,7 +1032,7 @@ static void blitter_setup(void)
  	CUSTOM_REG(REG_DMACON) |= 0x4000;
 
 	/* set a timer */
-	mame_timer_adjust( amiga_blitter_timer, MAME_TIME_IN_CYCLES( blittime, 0 ), 0, time_zero);
+	timer_adjust( amiga_blitter_timer, ATTOTIME_IN_CYCLES( blittime, 0 ), 0, attotime_zero);
 }
 
 
@@ -1308,7 +1308,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if (amiga_intf->serdat_w != NULL)
 				(*amiga_intf->serdat_w)(data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			mame_timer_set(amiga_get_serial_char_period(), 0, finish_serial_write);
+			timer_set(amiga_get_serial_char_period(), 0, finish_serial_write);
 			break;
 
 		case REG_BLTSIZE:
@@ -1402,7 +1402,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
-				mame_timer_adjust( amiga_blitter_timer, MAME_TIME_IN_CYCLES( BLITTER_NASTY_DELAY, 0 ), 0, time_zero);
+				timer_adjust( amiga_blitter_timer, ATTOTIME_IN_CYCLES( BLITTER_NASTY_DELAY, 0 ), 0, attotime_zero);
 
 			break;
 
@@ -1413,7 +1413,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
-				mame_timer_adjust( amiga_irq_timer, MAME_TIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0, time_zero);
+				timer_adjust( amiga_irq_timer, ATTOTIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0, attotime_zero);
 			else /* if we're disabling irq's, process right away */
 				update_irqs();
 			break;
@@ -1430,7 +1430,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
-				mame_timer_adjust( amiga_irq_timer, MAME_TIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0, time_zero);
+				timer_adjust( amiga_irq_timer, ATTOTIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0, attotime_zero);
 			else /* if we're clearing irq's, process right away */
 				update_irqs();
 			break;
@@ -1513,12 +1513,12 @@ void amiga_serial_in_w(UINT16 data)
 }
 
 
-mame_time amiga_get_serial_char_period(void)
+attotime amiga_get_serial_char_period(void)
 {
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
 	UINT32 baud = Machine->drv->cpu[0].clock / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
-	return scale_up_mame_time(MAME_TIME_IN_HZ(baud), numbits);
+	return attotime_mul(ATTOTIME_IN_HZ(baud), numbits);
 }
 
 

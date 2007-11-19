@@ -41,7 +41,7 @@ static UINT8 adc_shift;
 static UINT16 last_port0;
 static UINT8 shifter_state;
 
-static mame_timer *timer[2];
+static emu_timer *timer[2];
 static double timer_rate;
 
 static UINT32 *tms32031_control;
@@ -63,8 +63,8 @@ static MACHINE_RESET( midvunit )
 
 	memcpy(ram_base, memory_region(REGION_USER1), 0x20000*4);
 
-	timer[0] = mame_timer_alloc(NULL);
-	timer[1] = mame_timer_alloc(NULL);
+	timer[0] = timer_alloc(NULL);
+	timer[1] = timer_alloc(NULL);
 }
 
 
@@ -75,8 +75,8 @@ static MACHINE_RESET( midvplus )
 
 	memcpy(ram_base, memory_region(REGION_USER1), 0x20000*4);
 
-	timer[0] = mame_timer_alloc(NULL);
-	timer[1] = mame_timer_alloc(NULL);
+	timer[0] = timer_alloc(NULL);
+	timer[1] = timer_alloc(NULL);
 
 	ide_controller_reset(0);
 }
@@ -154,7 +154,7 @@ static WRITE32_HANDLER( midvunit_adc_w )
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
 		adc_data = readinputport(3 + which);
-		mame_timer_set(MAME_TIME_IN_MSEC(1), 0, adc_ready);
+		timer_set(ATTOTIME_IN_MSEC(1), 0, adc_ready);
 	}
 	else
 		logerror("adc_w without enabling writes!\n");
@@ -255,7 +255,7 @@ static READ32_HANDLER( tms32031_control_r )
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer[which]), timer_rate));
+		INT32 result = attotime_to_double(attotime_mul(timer_timeelapsed(timer[which]), timer_rate));
 //      logerror("%06X:tms32031_control_r(%02X) = %08X\n", activecpu_get_pc(), offset, result);
 		return result;
 	}
@@ -282,7 +282,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 		int which = (offset >> 4) & 1;
 //  logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
 		if (data & 0x40)
-			mame_timer_adjust(timer[which], time_never, 0, time_never);
+			timer_adjust(timer[which], attotime_never, 0, attotime_never);
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)
@@ -988,7 +988,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( midvcommon )
+static MACHINE_DRIVER_START( midvcommon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", TMS32031, CPU_CLOCK)
@@ -1010,7 +1010,7 @@ MACHINE_DRIVER_START( midvcommon )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( midvunit )
+static MACHINE_DRIVER_START( midvunit )
 	MDRV_IMPORT_FROM(midvcommon)
 
 	/* sound hardware */
@@ -1018,7 +1018,7 @@ MACHINE_DRIVER_START( midvunit )
 MACHINE_DRIVER_END
 
 
-MACHINE_DRIVER_START( midvplus )
+static MACHINE_DRIVER_START( midvplus )
 	MDRV_IMPORT_FROM(midvcommon)
 
 	/* basic machine hardware */

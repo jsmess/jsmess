@@ -23,8 +23,8 @@ static rectangle bottomvisiblearea =
 	6*8, 32*8-1
 };
 
-UINT8 *vigilant_paletteram;
-UINT8 *vigilant_sprite_paletteram;
+//UINT8 *vigilant_paletteram;
+//UINT8 *vigilant_sprite_paletteram;
 
 static int horiz_scroll_low=0;
 static int horiz_scroll_high=0;

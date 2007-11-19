@@ -37,7 +37,7 @@
 ***************************************************************************/
 
 #define MAX_MIXER_CHANNELS		100
-#define SOUND_UPDATE_FREQUENCY	MAME_TIME_IN_HZ(50)
+#define SOUND_UPDATE_FREQUENCY	ATTOTIME_IN_HZ(50)
 
 
 
@@ -91,7 +91,7 @@ struct _speaker_info
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static mame_timer *sound_update_timer;
+static emu_timer *sound_update_timer;
 
 static int totalsnd;
 static sound_info sound[MAX_SOUND];
@@ -176,7 +176,7 @@ INLINE sound_info *find_sound_by_tag(const char *tag)
 
 void sound_init(running_machine *machine)
 {
-	mame_time update_frequency = SOUND_UPDATE_FREQUENCY;
+	attotime update_frequency = SOUND_UPDATE_FREQUENCY;
 	const char *filename;
 
 	/* handle -nosound */
@@ -194,12 +194,12 @@ void sound_init(running_machine *machine)
 	finalmix = auto_malloc(Machine->sample_rate * sizeof(*finalmix));
 
 	/* allocate a global timer for sound timing */
-	sound_update_timer = mame_timer_alloc(sound_update);
-	mame_timer_adjust(sound_update_timer, update_frequency, 0, update_frequency);
+	sound_update_timer = timer_alloc(sound_update);
+	timer_adjust(sound_update_timer, update_frequency, 0, update_frequency);
 
 	/* initialize the streams engine */
 	VPRINTF(("streams_init\n"));
-	streams_init(machine, update_frequency.subseconds);
+	streams_init(machine, update_frequency.attoseconds);
 
 	/* now start up the sound chips and tag their streams */
 	VPRINTF(("start_sound_chips\n"));

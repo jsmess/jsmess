@@ -37,7 +37,7 @@ To Do:
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 
-static mame_timer *raster_interrupt_timer;
+static emu_timer *raster_interrupt_timer;
 
 /* Variables defined in video: */
 
@@ -69,7 +69,7 @@ static WRITE16_HANDLER( fuuki16_vregs_w )
 	UINT16 new_data	=	COMBINE_DATA(&fuuki16_vregs[offset]);
 	if ((offset == 0x1c/2) && old_data != new_data)
 	{
-		mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, new_data, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(0));
+		timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, new_data, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(0));
 	}
 }
 
@@ -79,8 +79,8 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 	{
 		soundlatch_w(0,data & 0xff);
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-//      cpu_spinuntil_time(MAME_TIME_IN_USEC(50));   // Allow the other CPU to reply
-		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50)); // Fixes glitching in rasters
+//      cpu_spinuntil_time(ATTOTIME_IN_USEC(50));   // Allow the other CPU to reply
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50)); // Fixes glitching in rasters
 	}
 }
 
@@ -524,14 +524,14 @@ static struct YM3812interface fuuki16_ym3812_intf =
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	cpunum_set_input_line(0, 1, PULSE_LINE);
-	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpunum_set_input_line(0, 3, PULSE_LINE);	// VBlank IRQ
-	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
 }
 
 
@@ -539,21 +539,21 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	cpunum_set_input_line(0, 5, PULSE_LINE);	// Raster Line IRQ
 	video_screen_update_partial(0, video_screen_get_vpos(0));
-	mame_timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, time_zero);
+	timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, attotime_zero);
 }
 
 
 static MACHINE_START( fuuki16 )
 {
-	raster_interrupt_timer = mame_timer_alloc(raster_interrupt_callback);
+	raster_interrupt_timer = timer_alloc(raster_interrupt_callback);
 }
 
 
 static MACHINE_RESET( fuuki16 )
 {
-	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
-	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
-	mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, machine->screen[0].visarea.max_x + 1), 0, time_zero);
+	timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, machine->screen[0].visarea.max_x + 1), 0, attotime_zero);
 }
 
 

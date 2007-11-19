@@ -178,7 +178,7 @@ static INPUT_PORTS_START( sangho )
 INPUT_PORTS_END
 
 
-void sangho_common_machine_reset(void)
+static void sangho_common_machine_reset(void)
 {
 	memory_set_bankptr(1,&sangho_ram[0]);
 	memory_set_bankptr(2,&sangho_ram[0x4000]);
@@ -211,7 +211,7 @@ static MACHINE_RESET(sexyboom)
 	sangho_common_machine_reset();
 }
 
-void msx_vdp_interrupt(int i)
+static void msx_vdp_interrupt(int i)
 {
 	cpunum_set_input_line (0, 0, (i ? HOLD_LINE : CLEAR_LINE));
 }

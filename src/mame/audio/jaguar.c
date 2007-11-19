@@ -166,7 +166,7 @@ enum
 static UINT16 dsp_regs[DSP_REGS];
 
 static UINT16 serial_frequency;
-static mame_timer *serial_timer;
+static emu_timer *serial_timer;
 
 static UINT8 gpu_irq_state;
 
@@ -285,9 +285,9 @@ void cojag_sound_init(void)
 void cojag_sound_reset(void)
 {
 #if ENABLE_SPEEDUP_HACKS
-	serial_timer = mame_timer_alloc(serial_chunky_callback);
+	serial_timer = timer_alloc(serial_chunky_callback);
 #else
-	serial_timer = mame_timer_alloc(serial_callback);
+	serial_timer = timer_alloc(serial_callback);
 #endif
 }
 
@@ -461,8 +461,8 @@ WRITE32_HANDLER( jaguar_serial_w )
 				logerror("Unexpected write to SMODE = %X\n", data);
 			if ((data & 0x3f) == 0x15)
 			{
-				mame_time rate = scale_up_mame_time(MAME_TIME_IN_HZ(26000000), 32 * 2 * (serial_frequency + 1));
-				mame_timer_adjust(serial_timer, rate, 0, rate);
+				attotime rate = attotime_mul(ATTOTIME_IN_HZ(26000000), 32 * 2 * (serial_frequency + 1));
+				timer_adjust(serial_timer, rate, 0, rate);
 			}
 			break;
 

@@ -37,7 +37,7 @@ static struct osborne1 {
 	/* video related */
 	UINT8	new_start_x;
 	UINT8	new_start_y;
-	mame_timer	*video_timer;
+	emu_timer	*video_timer;
 	UINT8	*charrom;
 	UINT8	charline;
 	UINT8	start_y;
@@ -356,7 +356,7 @@ static TIMER_CALLBACK(osborne1_video_callback) {
 		beep_set_state( 0, 0 );
 	}
 
-	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, y + 1, 0 ), 0, time_never );
+	timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, y + 1, 0 ), 0, attotime_never );
 }
 
 /*
@@ -432,11 +432,11 @@ MACHINE_RESET( osborne1 ) {
 
 	memset( mess_ram + 0x10000, 0xFF, 0x1000 );
 
-	osborne1.video_timer = mame_timer_alloc( osborne1_video_callback );
-	mame_timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, 1, 0 ), 0, time_never );
+	osborne1.video_timer = timer_alloc( osborne1_video_callback );
+	timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, 1, 0 ), 0, attotime_never );
 	pia_1_ca1_w( 0, 0 );
 
-	mame_timer_set( time_zero, 0, setup_beep );
+	timer_set( attotime_zero, 0, setup_beep );
 
 	memory_set_opbase_handler( 0, osborne1_opbase );
 }

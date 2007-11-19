@@ -790,7 +790,7 @@ static void m6845_remove_vsync_clear_timer(void)
 {
 	if (m6845_vsync_clear_timer!=NULL)
 	{
-		mame_timer_reset(m6845_vsync_clear_timer, time_never);	/* FIXME - timers should only be allocated once */
+		timer_reset(m6845_vsync_clear_timer, attotime_never);	/* FIXME - timers should only be allocated once */
 		m6845_vsync_clear_timer = NULL;
 	}
 }
@@ -808,7 +808,7 @@ static void m6845_set_new_vsync_set_time(int cycles)
 
         if (crtc_cycles_to_vsync_start!=-1)
 	{
-                m6845_vsync_set_timer = mame_timer_set(MAME_TIME_IN_USEC(crtc_cycles_to_vsync_start), 0, m6845_vsync_set_timer_callback);
+                m6845_vsync_set_timer = timer_set(ATTOTIME_IN_USEC(crtc_cycles_to_vsync_start), 0, m6845_vsync_set_timer_callback);
 	}
 }
 
@@ -824,7 +824,7 @@ static void m6845_set_new_vsync_clear_time(int cycles)
 
 	if (crtc_cycles_to_vsync_end!=-1)
 	{
-                m6845_vsync_clear_timer = mame_timer_set(MAME_TIME_IN_USEC(crtc_cycles_to_vsync_end), 0, m6845_vsync_clear_timer_callback);
+                m6845_vsync_clear_timer = timer_set(ATTOTIME_IN_USEC(crtc_cycles_to_vsync_end), 0, m6845_vsync_clear_timer_callback);
 	}
 }
 
@@ -847,7 +847,7 @@ static void m6845_vsync_clear_timer_callback(int dummy)
 	m6845_set_new_vsync_set_time(m6845_cycles_per_frame()-m6845_vsync_length_in_cycles());
 
 	/* prevent timer from being free'd and don't let it trigger again */
-	mame_timer_reset(m6845_vsync_clear_timer, time_never);
+	timer_reset(m6845_vsync_clear_timer, attotime_never);
 }
 
 /* called when vsync is set */
@@ -868,7 +868,7 @@ static void m6845_vsync_set_timer_callback(int dummy)
     m6845_set_new_vsync_clear_time(m6845_vsync_length_in_cycles());
 
 	/* prevent timer from being free'd and don't let it trigger again */
-	mame_timer_reset(m6845_vsync_set_timer, time_never);
+	timer_reset(m6845_vsync_set_timer, attotime_never);
 }
 static void m6845_recalc_cycles_to_vsync_end(void)
 {
