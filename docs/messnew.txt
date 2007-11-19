@@ -54,6 +54,8 @@ System Driver Changes:
 - [SVI318] Fixed a bug in banking for SVI-328 with 64KB RAM. Added SVI806
   80 column card support.  [Wilbert Pol]
 
+- [SVI328] Fixed numeric pad input ports.  [Tomas Karlsson]
+
 - [SYM1] Rewrote, still many issues and doesn't fully work.  [Dirk Best]
 
 - [X68000] Raster effects, DMA and vblank improvements.  [Barry Rodewald]
