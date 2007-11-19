@@ -1463,22 +1463,22 @@ static int get_beamx(void)
 	scanline_time = timer_timeelapsed(m6847->hs_rise_timer);
 	if (scanline_time.seconds != 0)
 		return 0;
-	assert(scanline_time.subseconds < m6847->scanline_period);
+	assert(attotime_to_attoseconds(scanline_time) < m6847->scanline_period);
 
-	if (scanline_time.subseconds < (m6847->clock_period * 42))
+	if (attotime_to_attoseconds(scanline_time) < (m6847->clock_period * 42))
 	{
 		/* hsync */
 		result = 0;
 	}
-	else if (scanline_time.subseconds < (m6847->clock_period * 95 / 2))
+	else if (attotime_to_attoseconds(scanline_time) < (m6847->clock_period * 95 / 2))
 	{
 		/* left border */
 		result = 0;
 	}
-	else if (scanline_time.subseconds < (m6847->clock_period * 351 / 2))
+	else if (attotime_to_attoseconds(scanline_time) < (m6847->clock_period * 351 / 2))
 	{
 		/* body */
-		result = (scanline_time.subseconds - (m6847->clock_period * 95 / 2))
+		result = (attotime_to_attoseconds(scanline_time) - (m6847->clock_period * 95 / 2))
 			/ m6847->clock_period * 2;
 	}
 	else
