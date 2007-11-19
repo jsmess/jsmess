@@ -65,7 +65,7 @@
 
 static struct ZX8302
 {
-	int comdata;
+	int comdata, comdata_l;
 	int comctl;
 	int baudx4;
 	UINT8 tcr;
@@ -223,19 +223,22 @@ static READ8_HANDLER( zx8302_status_r )
 
 	*/
 	
-	UINT8 data = (zx8302.comdata << 7) | (zx8302.comctl << 6) | (zx8302.ser1_cts << 5)| (zx8302.ser2_dtr << 4) | (zx8302.status & 0x0f); 
+	UINT8 data = (zx8302.comdata_l << 7) | (zx8302.comctl << 6) | (zx8302.ser1_cts << 5)| (zx8302.ser2_dtr << 4) | (zx8302.status & 0x0f); 
 
 	zx8302.comctl = 1;
 
 	return data;
 }
 
+static TIMER_CALLBACK( zx8302_delayed_ipc_command )
+{
+	zx8302.idr = param;
+	zx8302.comdata = BIT(param, 0);
+}
+
 static WRITE8_HANDLER( zx8302_ipc_command_w )
 {
-	//logerror("PC: %x ZX8302 IPC Command : %x\n", activecpu_get_pc(), data);
-
-	zx8302.idr = data;
-	zx8302.comdata = BIT(data, 0);
+	timer_set(ATTOTIME_IN_NSEC(480), data, zx8302_delayed_ipc_command);
 }
 
 static WRITE8_HANDLER( zx8302_mdv_control_w )
@@ -346,19 +349,20 @@ static WRITE8_HANDLER( ipc_link_hack_w )
 	switch (activecpu_get_pc())
 	{
 	case 0x759:
+		// transmit data bit from ZX8302
 		zx8302.comdata = BIT(zx8302.idr, 1);
-		//logerror("ZX8302->IPC %x\n", zx8302.comdata);
 		break;
 
 	case 0x75b:
-		//logerror("COMDATA = 1\n");
+		// end bit transfer from ZX8302
 		zx8302.comdata = 1;
 		zx8302.comctl = 0;
 		break;
 
 	case 0x775:
+		// latch data bit from IPC
+		zx8302.comdata_l = zx8302.comdata;
 		zx8302.comctl = 0;
-		//logerror("IPC->ZX8302 %x\n", zx8302.comdata);
 		break;
 	}
 }
@@ -638,6 +642,7 @@ static MACHINE_START( ql )
 	// ZX8302
 
 	state_save_register_global(zx8302.comdata);
+	state_save_register_global(zx8302.comdata_l);
 	state_save_register_global(zx8302.comctl);
 	state_save_register_global(zx8302.baudx4);
 	state_save_register_global(zx8302.tcr);
