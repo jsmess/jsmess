@@ -23,50 +23,6 @@ INLINE void osd_yield_processor(void)
 }
 
 
-//============================================================
-//  osd_interlocked_increment
-//============================================================
-
-ATTR_UNUSED
-INLINE INT32 _osd_interlocked_increment(INT32 volatile *ptr)
-{
-	register INT32 ret;
-	__asm__ __volatile__(
-		" mov           $1,%[ret]     ;"
-		" lock ; xadd   %[ret],%[ptr] ;"
-		" inc           %[ret]        ;"
-		: [ptr] "+m"  (*ptr)
-		, [ret] "=&r" (ret)
-		: 
-		: "%cc"
-	);
-	return ret;
-}
-#define osd_interlocked_increment _osd_interlocked_increment
-
-
-//============================================================
-//  osd_interlocked_decrement
-//============================================================
-
-ATTR_UNUSED
-INLINE INT32 _osd_interlocked_decrement(INT32 volatile *ptr)
-{
-	register INT32 ret;
-	__asm__ __volatile__(
-		" mov           $-1,%[ret]    ;"
-		" lock ; xadd   %[ret],%[ptr] ;"
-		" dec           %[ret]        ;"
-		: [ptr] "+m"  (*ptr)
-		, [ret] "=&r" (ret)
-		: 
-		: "%cc"
-	);
-	return ret;
-}
-#define osd_interlocked_decrement _osd_interlocked_decrement
-
-
 #if defined(__x86_64__)
 
 //============================================================
@@ -98,51 +54,6 @@ INLINE void osd_yield_processor(void)
 	__asm__ __volatile__ ( " nop \n nop \n" );
 }
 
-
-//============================================================
-//  osd_interlocked_increment
-//============================================================
-
-ATTR_UNUSED
-INLINE INT32 _osd_interlocked_increment(INT32 volatile *ptr)
-{
-	register INT32 ret;
-	__asm__ __volatile__(
-		"1: lwarx  %[ret], 0, %[ptr] \n"
-		"   addi   %[ret], %[ret], 1 \n"
-		"   sync                     \n"
-		"   stwcx. %[ret], 0, %[ptr] \n"
-		"   bne-   1b                \n"
-		: [ret] "=&b" (ret)
-		: [ptr] "r"   (ptr)
-		: "cr0"
-	);
-	return ret;
-}
-#define osd_interlocked_increment _osd_interlocked_increment
-
-
-//============================================================
-//  osd_interlocked_decrement
-//============================================================
-
-ATTR_UNUSED
-INLINE INT32 _osd_interlocked_decrement(INT32 volatile *ptr)
-{
-	register INT32 ret;
-	__asm__ __volatile__(
-		"1: lwarx  %[ret], 0, %[ptr]  \n"
-		"   addi   %[ret], %[ret], -1 \n"
-		"   sync                      \n"
-		"   stwcx. %[ret], 0, %[ptr]  \n"
-		"   bne-   1b                 \n"
-		: [ret] "=&b" (ret)
-		: [ptr] "r"   (ptr)
-		: "cr0"
-	);
-	return ret;
-}
-#define osd_interlocked_decrement _osd_interlocked_decrement
 
 
 #if defined(__ppc64__) || defined(__PPC64__)

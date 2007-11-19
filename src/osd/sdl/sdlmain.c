@@ -195,6 +195,7 @@ static const options_entry mame_sdl_options[] =
 	{ NULL, 		                         NULL,        OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
 	{ SDLOPTION_JOYMAP,                      "0",         OPTION_BOOLEAN,    "enable physical to logical joystick mapping" },
 	{ SDLOPTION_JOYMAP_FILE,                "joymap.dat", 0,               "joymap filename" },
+	{ SDLOPTION_SIXAXIS,			"0",	OPTION_BOOLEAN, "Use special handling for PS3 Sixaxis controllers" },
 	{ NULL }
 };
 

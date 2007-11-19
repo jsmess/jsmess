@@ -300,11 +300,12 @@ static int validate_inlines(void)
 	if (resultu32 != expectedu32)
 		{ mame_printf_error("Error testing modu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, expectedu32); error = TRUE; }
 
+#if 0
 	while ((INT64)testi32a * (INT64)0x7fffffff < ((INT32)testi64a << 3))
 		testi64a /= 2;
 	while ((UINT64)testu32a * (UINT64)0xffffffff < ((UINT32)testu64a << 3))
 		testu64a /= 2;
-
+#endif
 	resulti32 = div_32x32_shift((INT32)testi64a, testi32a, 3);
 	expectedi32 = ((INT64)(INT32)testi64a << 3) / (INT64)testi32a;
 	if (resulti32 != expectedi32)

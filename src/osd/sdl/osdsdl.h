@@ -77,6 +77,7 @@
 #define SDLOPTION_JOYMAP				"remapjoys"
 #define SDLOPTION_JOYMAP_FILE			"remapjoyfile"
 #define SDLOPTION_UIMODEKEY				"uimodekey"
+#define SDLOPTION_SIXAXIS			"sixaxis"
 
 #define SDLOPTION_SHADER_MAME(x)		"glsl_shader_mame" x
 #define SDLOPTION_SHADER_SCREEN(x)		"glsl_shader_screen" x

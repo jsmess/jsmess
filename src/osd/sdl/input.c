@@ -7,6 +7,9 @@
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
+//  SixAxis info: left analog is axes 0 & 1, right analog is axes 2 & 3, 
+//                analog L2 is axis 12 and analog L3 is axis 13
+//
 //============================================================
 
 // standard sdl header
@@ -148,6 +151,8 @@ static struct
 	int		ismapped;
 	char		*name;
 } joy_map[MAX_JOYMAP];
+
+static int sixaxis_mode;
 
 static int joy_logical[MAX_JOYSTICKS];
 
@@ -618,6 +623,8 @@ static void sdlinput_register_joysticks(running_machine *machine)
 		// loop over all buttons
 		for (button = 0; button < SDL_JoystickNumButtons(joy); button++)
 		{
+			devinfo->joystick.buttons[button] = 0;
+
 			if (button < 16)
 			{
 				sprintf(tempname, "J%d button %d", stick + 1, button);
@@ -713,6 +720,9 @@ void sdlinput_init(running_machine *machine)
 	joystick_list = NULL;
 	mouse_list = NULL;
 	lightgun_list = NULL;
+
+	// get Sixaxis special mode info
+	sixaxis_mode = options_get_bool(mame_options(), SDLOPTION_SIXAXIS);
 
 	// we need pause and exit callbacks
 	add_pause_callback(machine, sdlinput_pause);
@@ -957,7 +967,23 @@ void sdlinput_poll(void)
 			devinfo = generic_device_find_index(joystick_list, event.jaxis.which);
 			if (devinfo)
 			{
-				devinfo->joystick.axes[event.jaxis.axis] = (event.jaxis.value * 2); 
+				if (sixaxis_mode)
+				{
+					int axis = event.jaxis.axis;
+
+					if (axis <= 3)
+					{
+						devinfo->joystick.axes[event.jaxis.axis] = (event.jaxis.value * 2); 
+					}
+					if ((axis == 12) || (axis == 13))
+					{
+						devinfo->joystick.axes[event.jaxis.axis] = (event.jaxis.value / 2) + 16383; 
+					}
+				}
+				else
+				{
+					devinfo->joystick.axes[event.jaxis.axis] = (event.jaxis.value * 2); 
+				}
 			}
 			break;
 		case SDL_JOYHATMOTION:
