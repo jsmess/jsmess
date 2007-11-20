@@ -1,4 +1,4 @@
-﻿0.121
+0.121
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -46,7 +46,7 @@ System Driver Changes:
 - [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert
   Pol]
 
-- [QL] Added revision 0.7 of the IPC ROM. [MikeB]
+- [QL] The system is now usable, except that microdrives don't work yet. [Curt Coder]
 
 - [SVI318] Fixed borders. Added selectable bioses for all models.
   Added serial port support. Added support for NTSC models.  [Tomas Karlsson]

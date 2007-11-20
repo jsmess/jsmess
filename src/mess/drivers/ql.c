@@ -18,6 +18,7 @@
 	TODO:
 
 	- RTC register write
+	- international keyboard layouts
 	- proper pound key code (£)
 	- speaker sound
 	- microdrive simulation
@@ -695,11 +696,6 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_PALETTE_INIT(zx8301)
 	MDRV_VIDEO_START(zx8301)
 	MDRV_VIDEO_UPDATE(zx8301)
-
-	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ql_ntsc )
@@ -743,7 +739,6 @@ ROM_START( ql )
     ROMX_LOAD( "minerva.rom", 0x000000, 0x00c000, CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_BIOS(8) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
-	ROM_LOAD( "v07.ic24",	  0x0000, 0x0800, CRC(051111f9) SHA1(83ed562464df89b9fdd9740db51d45884a512696) ) // V0.7
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 ROM_END
 
@@ -920,11 +915,11 @@ SYSTEM_CONFIG_END
 /* Computer Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY                     FULLNAME        FLAGS */
-COMP( 1984, ql,     0,      0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (UK)",      GAME_NOT_WORKING )
-COMP( 1985, ql_jsu, ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_NOT_WORKING )
-COMP( 1985, ql_mge, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_NOT_WORKING )
-COMP( 1985, ql_mgf, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_NOT_WORKING )
-COMP( 1985, ql_mgg, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_NOT_WORKING )
-COMP( 1985, ql_mgi, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_NOT_WORKING )
-COMP( 1985, ql_mgs, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NOT_WORKING )
-COMP( 1985, ql_efp, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_NOT_WORKING )
+COMP( 1984, ql,     0,      0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (UK)",      GAME_NO_SOUND )
+COMP( 1985, ql_jsu, ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_NO_SOUND )
+COMP( 1985, ql_mge, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_NO_SOUND )
+COMP( 1985, ql_mgf, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_NO_SOUND )
+COMP( 1985, ql_mgg, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_NO_SOUND )
+COMP( 1985, ql_mgi, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_NO_SOUND )
+COMP( 1985, ql_mgs, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NO_SOUND )
+COMP( 1985, ql_efp, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_NO_SOUND )
