@@ -436,13 +436,14 @@ TESTDRIVER( scorpion )
 TESTDRIVER( pentagon )
 
 	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
-	DRIVER( ql_jsu )	/* 1984 Sinclair QL	(USA)							*/
-	DRIVER( ql_mge )	/* 1984 Sinclair QL	(Spain)							*/
-	DRIVER( ql_mgf )	/* 1984 Sinclair QL	(France)						*/
-	DRIVER( ql_mgg )	/* 1984 Sinclair QL	(Germany)						*/
-	DRIVER( ql_mgi )	/* 1984 Sinclair QL	(Italy)							*/
-	DRIVER( ql_mgs )	/* 1984 Sinclair QL	(Sweden)						*/
-	DRIVER( ql_efp )	/* 1984 Sinclair QL	(Mexico)						*/
+	DRIVER( ql_us )		/* 1984 Sinclair QL	(USA)							*/
+	DRIVER( ql_es )		/* 1984 Sinclair QL	(Spain)							*/
+	DRIVER( ql_fr )		/* 1984 Sinclair QL	(France)						*/
+	DRIVER( ql_de )		/* 1984 Sinclair QL	(Germany)						*/
+	DRIVER( ql_it )		/* 1984 Sinclair QL	(Italy)							*/
+	DRIVER( ql_se )		/* 1984 Sinclair QL	(Sweden)						*/
+	DRIVER( ql_dk )		/* 1984 Sinclair QL	(Denmark)						*/
+	DRIVER( ql_gr )		/* 1984 Sinclair QL	(Greece)						*/
 
 	/* SHARP */
 	DRIVER( pc1251 )	/* Pocket Computer 1251								*/

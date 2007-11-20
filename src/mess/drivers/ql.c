@@ -614,7 +614,7 @@ static INPUT_PORTS_START( ql )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_DOWN)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ql_mge )
+static INPUT_PORTS_START( ql_es )
 	PORT_INCLUDE(ql)
 
 	PORT_MODIFY("ROW1")
@@ -642,7 +642,7 @@ static INPUT_PORTS_START( ql_mge )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('?')
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ql_mgg )
+static INPUT_PORTS_START( ql_de )
 	PORT_INCLUDE(ql)
 
 	PORT_MODIFY("ROW0")
@@ -682,7 +682,7 @@ static INPUT_PORTS_START( ql_mgg )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ql_mgi )
+static INPUT_PORTS_START( ql_it )
 	PORT_INCLUDE(ql)
 
 	PORT_MODIFY("ROW0")
@@ -853,7 +853,7 @@ ROM_START( ql )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 ROM_END
 
-ROM_START( ql_jsu )
+ROM_START( ql_us )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
     ROM_LOAD( "jsu.ic33", 0x000000, 0x008000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
     ROM_LOAD( "jsu.ic34", 0x008000, 0x004000, BAD_DUMP CRC(3debbacc) SHA1(9fbc3e42ec463fa42f9c535d63780ff53a9313ec) )
@@ -862,7 +862,7 @@ ROM_START( ql_jsu )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 ROM_END
 
-ROM_START( ql_mge )
+ROM_START( ql_es )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
     ROM_LOAD( "mge.ic33", 0x000000, 0x008000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
     ROM_LOAD( "mge.ic34", 0x008000, 0x004000, BAD_DUMP CRC(a694f8d7) SHA1(bd2868656008de85d7c191598588017ae8aa3339) )
@@ -871,7 +871,7 @@ ROM_START( ql_mge )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 ROM_END
 
-ROM_START( ql_mgf )
+ROM_START( ql_fr )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
     ROM_LOAD( "mgf.ic33", 0x000000, 0x008000, NO_DUMP )
     ROM_LOAD( "mgf.ic34", 0x008000, 0x004000, NO_DUMP )
@@ -880,20 +880,24 @@ ROM_START( ql_mgf )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 ROM_END
 
-ROM_START( ql_mgg )
+ROM_START( ql_de )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "mg", "v1.10 (MG)" )
     ROMX_LOAD( "mgg.ic33", 0x000000, 0x008000, BAD_DUMP CRC(b4e468fd) SHA1(cd02a3cd79af90d48b65077d0571efc2f12f146e), ROM_BIOS(1) )
     ROMX_LOAD( "mgg.ic34", 0x008000, 0x004000, BAD_DUMP CRC(54959d40) SHA1(ffc0be9649f26019d7be82925c18dc699259877f), ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS( 1, "ultramg", "Ultrasoft" )
-	ROMX_LOAD( "ultramg.rom", 0x000000, 0x00c000, BAD_DUMP CRC(ad12463b) SHA1(0561b3bc7ce090f3101b2142ee957c18c250eefa), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 1, "mf", "v1.14 (MF)" )
+    ROMX_LOAD( "mf.ic33", 0x000000, 0x008000, BAD_DUMP CRC(49c40563) SHA1(d3bcd0614cf9b52e9d7fc2832e11463e5030476b), ROM_BIOS(2) )
+    ROMX_LOAD( "mf.ic34", 0x008000, 0x004000, BAD_DUMP CRC(5974616b) SHA1(c3603768c08535c25f077eed02fb80128aff13d9), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS( 2, "ultramg", "Ultrasoft" )
+	ROMX_LOAD( "ultramg.rom", 0x000000, 0x00c000, BAD_DUMP CRC(ad12463b) SHA1(0561b3bc7ce090f3101b2142ee957c18c250eefa), ROM_BIOS(3) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 ROM_END
 
-ROM_START( ql_mgi )
+ROM_START( ql_it )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
     ROM_LOAD( "mgi.ic33", 0x000000, 0x008000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
     ROM_LOAD( "mgi.ic34", 0x008000, 0x004000, BAD_DUMP CRC(a2fdfb83) SHA1(162b1052737500f3c13497cdf0f813ba006bdae9) )
@@ -902,7 +906,7 @@ ROM_START( ql_mgi )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 ROM_END
 
-ROM_START( ql_mgs )
+ROM_START( ql_se )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
     ROM_LOAD( "mgs.ic33", 0x000000, 0x008000, NO_DUMP )
     ROM_LOAD( "mgs.ic34", 0x008000, 0x004000, NO_DUMP )
@@ -911,10 +915,19 @@ ROM_START( ql_mgs )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 ROM_END
 
-ROM_START( ql_efp )
+ROM_START( ql_gr )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
     ROM_LOAD( "efp.ic33", 0x000000, 0x008000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
     ROM_LOAD( "efp.ic34", 0x008000, 0x004000, BAD_DUMP CRC(4c3b34b7) SHA1(f9dc571d2d4f68520b306ecc7516acaeea69ec0d) )
+
+	ROM_REGION( 0x800, REGION_CPU2, 0 )
+	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
+ROM_END
+
+ROM_START( ql_dk )
+    ROM_REGION( 0x400000, REGION_CPU1, 0 )
+    ROM_LOAD( "mgd.ic33", 0x000000, 0x008000, BAD_DUMP CRC(f57755eb) SHA1(dc57939ffb8741e17967a1d2479c339750ec7ff6) )
+    ROM_LOAD( "mgd.ic34", 0x008000, 0x004000, BAD_DUMP CRC(1892465a) SHA1(0ff3046b5276da6639d3fe79b22ae25cc265d540) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1031,10 +1044,11 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY                     FULLNAME        FLAGS */
 COMP( 1984, ql,     0,      0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (UK)",      GAME_NO_SOUND )
-COMP( 1985, ql_jsu, ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_NO_SOUND )
-COMP( 1985, ql_mge, ql,     0,      ql,         ql_mge, 0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_NO_SOUND )
-COMP( 1985, ql_mgf, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_NO_SOUND )
-COMP( 1985, ql_mgg, ql,     0,      ql,         ql_mgg, 0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_NO_SOUND )
-COMP( 1985, ql_mgi, ql,     0,      ql,         ql_mgi, 0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_NO_SOUND )
-COMP( 1985, ql_mgs, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NO_SOUND )
-COMP( 1985, ql_efp, ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_NO_SOUND )
+COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_NO_SOUND )
+COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_NO_SOUND )
+COMP( 1985, ql_fr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_NO_SOUND )
+COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_NO_SOUND )
+COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_NO_SOUND )
+COMP( 1985, ql_se,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NO_SOUND )
+COMP( 1985, ql_dk,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
+COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_NO_SOUND )
