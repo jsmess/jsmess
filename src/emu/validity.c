@@ -229,8 +229,8 @@ static int validate_inlines(void)
 	UINT32 resultu32, expectedu32;
 	INT64 resulti64, expectedi64;
 	UINT64 resultu64, expectedu64;
-	INT32 remainder, expremainder;
-	UINT32 uremainder, expuremainder;
+//	INT32 remainder, expremainder;
+//	UINT32 uremainder, expuremainder;
 	int error = FALSE;
 
 	resulti64 = mul_32x32(testi32a, testi32b);
@@ -263,6 +263,7 @@ static int validate_inlines(void)
 	if (resultu32 != expectedu32)
 		{ mame_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32); error = TRUE; }
 
+#if 0
 	while ((INT64)testi32a * (INT64)0x7fffffff < testi64a)
 		testi64a /= 2;
 	while ((UINT64)testu32a * (UINT64)0xffffffff < testu64a)
@@ -300,7 +301,6 @@ static int validate_inlines(void)
 	if (resultu32 != expectedu32)
 		{ mame_printf_error("Error testing modu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, expectedu32); error = TRUE; }
 
-#if 0
 	while ((INT64)testi32a * (INT64)0x7fffffff < ((INT32)testi64a << 3))
 		testi64a /= 2;
 	while ((UINT64)testu32a * (UINT64)0xffffffff < ((UINT32)testu64a << 3))
