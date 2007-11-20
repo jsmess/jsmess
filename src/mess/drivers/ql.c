@@ -17,7 +17,8 @@
 
 	TODO:
 
-	- joystick connections
+	- RTC register write
+	- proper pound key code (£)
 	- speaker sound
 	- microdrive simulation
 	- M68008 opcode reading interface
@@ -189,28 +190,8 @@ static WRITE8_HANDLER( zx8302_control_w )
 
 	zx8302.tcr = data;
 
-	/*
-	switch (data & ZX8302_MODE_MASK)
-	{
-	case ZX8302_MODE_SER1:
-		logerror("ZX8302 Mode : SER1\n");
-		break;
-	case ZX8302_MODE_SER2:
-		logerror("ZX8302 Mode : SER2\n");
-		break;
-	case ZX8302_MODE_MDV:
-		logerror("ZX8302 Mode : MDV\n");
-		break;
-	case ZX8302_MODE_NET:
-		logerror("ZX8302 Mode : NET\n");
-		break;
-	}
-	*/
-
 	timer_adjust(zx8302_txd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud));
 	timer_adjust(zx8302_ipc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baudx4));
-
-	//logerror("ZX8302 Baud Rate : %u\n", baud);
 }
 
 static READ8_HANDLER( zx8302_status_r )
@@ -284,8 +265,6 @@ static READ8_HANDLER( zx8302_irq_status_r )
 
 static WRITE8_HANDLER( zx8302_irq_acknowledge_w )
 {
-	//logerror("ZX8302 Interrupt Acknowledge : %x\n", data);
-
 	zx8302.irq &= ~data;
 
 	if (!zx8302.irq)
@@ -306,8 +285,6 @@ static READ8_HANDLER( zx8302_mdv_track2_r )
 
 static WRITE8_HANDLER( zx8302_data_w )
 {
-	//logerror("ZX8302 Data Write : %x\n", data);
-
 	zx8302.tdr = data;
 	zx8302.status |= ZX8302_STATUS_BUFFER_FULL;
 }
@@ -356,12 +333,12 @@ static WRITE8_HANDLER( ipc_link_hack_w )
 	switch (activecpu_get_pc())
 	{
 	case 0x759:
-		// transmit data bit from ZX8302
+		// transmit data bit to IPC
 		zx8302.comdata = BIT(zx8302.idr, 1);
 		break;
 
 	case 0x75b:
-		// end bit transfer from ZX8302
+		// end transmit
 		zx8302.comdata = 1;
 		zx8302.comctl = 0;
 		break;
@@ -487,8 +464,8 @@ static READ8_HANDLER( ipc_bus_r )
 
 	*/
 
-	if (BIT(ipc.keylatch, 0)) return readinputportbytag("ROW0");// | readinputportbytag("JOY0");
-	if (BIT(ipc.keylatch, 1)) return readinputportbytag("ROW1");// | readinputportbytag("JOY1");
+	if (BIT(ipc.keylatch, 0)) return readinputportbytag("ROW0") | readinputportbytag("JOY0");
+	if (BIT(ipc.keylatch, 1)) return readinputportbytag("ROW1") | readinputportbytag("JOY1");
 	if (BIT(ipc.keylatch, 2)) return readinputportbytag("ROW2");
 	if (BIT(ipc.keylatch, 3)) return readinputportbytag("ROW3");
 	if (BIT(ipc.keylatch, 4)) return readinputportbytag("ROW4");
@@ -617,24 +594,24 @@ static INPUT_PORTS_START( ql )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
 	PORT_START_TAG("JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )	PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )	PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )	PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )	PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(1) PORT_CODE(KEYCODE_F5)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("JOY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )	PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )	PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_UP)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(2) PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_DOWN)
 INPUT_PORTS_END
 
 /* Machine Drivers */
