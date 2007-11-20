@@ -72,7 +72,7 @@ UINT16 *amiga_custom_regs;
 UINT16 *amiga_expansion_ram;
 UINT16 *amiga_autoconfig_mem;
 
-const amiga_machine_interface *amiga_intf;
+static const amiga_machine_interface *amiga_intf;
 
 static autoconfig_device *autoconfig_list;
 static autoconfig_device *cur_autoconfig;
@@ -1758,4 +1758,17 @@ WRITE16_HANDLER( amiga_autoconfig_w )
 			(*cur_autoconfig->device.install)(cur_autoconfig->base);
 		cur_autoconfig = cur_autoconfig->next;
 	}
+}
+
+
+
+/*************************************
+ *
+ *  Get interface
+ *
+ *************************************/
+
+const amiga_machine_interface *amiga_get_interface(void)
+{
+	return amiga_intf;
 }
