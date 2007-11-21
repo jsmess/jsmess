@@ -998,12 +998,12 @@
 	</hash>
 	<hash crc32="e14e9d36" sha1="6a4f4a03c367ccf00aa7462191c929a2736eb44b" name="With You Mitsumete Itai (J)">
 		<year>2001-01-25</year>
-		<manufacturer>Cocktail Soft / F&C Co. Ltd.</manufacturer>
+		<manufacturer>Cocktail Soft / F&amp;C Co. Ltd.</manufacturer>
 		<status>GoodWSx Verified Image</status>
 	</hash>
 	<hash crc32="a44b167e" sha1="92bf65f9f9a11cfd078e245a7469e3df0e832cc7" name="With You Mitsumete Itai (J) [f1]">
 		<year>2001-01-25</year>
-		<manufacturer>Cocktail Soft / F&C Co. Ltd.</manufacturer>
+		<manufacturer>Cocktail Soft / F&amp;C Co. Ltd.</manufacturer>
 	</hash>
 	<hash crc32="15e55706" sha1="c1ad383d337dba8a63295cfb8c7ca8470c893c67" name="Wizardry - Scenario 1 - Kyounou no Shiren Jou (J)">
 		<year>2001-03-01</year>
@@ -1102,10 +1102,18 @@
 		<status>GoodWSx Verified Image</status>
 	</hash>
 	<hash crc32="85c4c9a1" sha1="58c691cb31f96eea5689693fd23768d02e8b133f" name="Judgement Silversword (J) (REV.SC21)">
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="4fce380d" sha1="a1d910123b6be0b941f699ef70c745d16350d029" name="Judgement Silversword (J) (REV.SC21)">
 		<status>GoodWSx Verified Image</status>
 	</hash>
-	<hash crc32="aa13e9de" sha1="1dc66ac8ac21eb651723428657c9b18cb80d9ee0" name="Judgement Silversword - Rebirth Edition (J)">
+
+	<hash crc32="60191872" sha1="657aea8377e207b9b5a182b13966a27f46633640" name="Judgement Silversword - Rebirth Edition (J)">
 		<status>GoodWSx Verified Image</status>
+	</hash>
+
+	<hash crc32="aa13e9de" sha1="1dc66ac8ac21eb651723428657c9b18cb80d9ee0" name="Judgement Silversword - Rebirth Edition (J)">
+		<status>Overdumped Image</status>		
 	</hash>
 	<hash crc32="945fc213" sha1="461f87e6e301b0dbb6324d908d4ca7efd7518e20" name="Keiba Yosou Shien Shinkaron (J) [M]">
 		<status>GoodWSx Verified Image</status>
