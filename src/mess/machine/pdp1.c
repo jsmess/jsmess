@@ -1157,7 +1157,7 @@ void iot_dra(int op2, int nac, int mb, int *io, int ac)
 {
 	(*io) = attotime_mul(
 		timer_timeelapsed(parallel_drum.rotation_timer),
-		ATTOTIME_MAX_SECONDS / (attotime_to_attoseconds(PARALLEL_DRUM_WORD_TIME))).seconds & 0007777;
+		ATTOSECONDS_PER_SECOND / (attotime_to_attoseconds(PARALLEL_DRUM_WORD_TIME))).seconds & 0007777;
 
 	/* set parity error and timing error... */
 }

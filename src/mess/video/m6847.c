@@ -928,6 +928,8 @@ enum
 
 
 
+#define ATTOTIME_STRING_PRECISION	9
+
 #define M6847_RGB(r,g,b)	((r << 16) | (g << 8) | (b << 0))
 
 
@@ -1620,7 +1622,7 @@ static void set_field_sync(void)
 static TIMER_CALLBACK(hs_fall)
 {
 	if (LOG_HS)
-		logerror("hs_fall(): time=%g\n", attotime_to_double(timer_get_time()));
+		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION));
 
 	set_horizontal_sync();
 }
@@ -1628,7 +1630,7 @@ static TIMER_CALLBACK(hs_fall)
 static TIMER_CALLBACK(hs_rise)
 {
 	if (LOG_HS)
-		logerror("hs_rise(): time=%g\n", attotime_to_double(timer_get_time()));
+		logerror("hs_rise(): time=%s\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION));
 
 	timer_adjust(m6847->hs_rise_timer,
 		attotime_make(0, m6847->scanline_period),
@@ -1644,7 +1646,7 @@ static TIMER_CALLBACK(hs_rise)
 static TIMER_CALLBACK(fs_fall)
 {
 	if (LOG_FS)
-		logerror("fs_fall(): time=%g scanline=%d\n", attotime_to_double(timer_get_time()), get_scanline());
+		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION), get_scanline());
 
 	set_field_sync();
 }
@@ -1652,7 +1654,7 @@ static TIMER_CALLBACK(fs_fall)
 static TIMER_CALLBACK(fs_rise)
 {
 	if (LOG_FS)
-		logerror("fs_rise(): time=%g scanline=%d\n", attotime_to_double(timer_get_time()), get_scanline());
+		logerror("fs_rise(): time=%s scanline=%d\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION), get_scanline());
 
 	/* adjust field sync falling edge timer */
 	timer_adjust(m6847->fs_fall_timer,
@@ -1865,7 +1867,7 @@ void m6847_init(const m6847_config *cfg)
 	frequency = v->frames_per_second
 		* ((UINT32) (v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME))
 		* ((UINT32) (v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE));
-	period = ATTOTIME_MAX_SECONDS / frequency;
+	period = ATTOSECONDS_PER_SECOND / frequency;
 
 	/* choose CPU clock, if specified */
 	if (cfg->cpu0_timing_factor > 0)
@@ -1908,14 +1910,14 @@ void m6847_init(const m6847_config *cfg)
 	if (LOG_STATS)
 	{
 		logerror("m6847_init():\n");
-		logerror("\tclock:      %30s sec\n", attotime_string(attotime_make(0, period * GROSS_FACTOR), 6));
+		logerror("\tclock:      %30s sec\n", attotime_string(attotime_make(0, period * GROSS_FACTOR), ATTOTIME_STRING_PRECISION));
 		if (cpu0_clock_period > 0)
-			logerror("\tCPU0 clock: %30s sec\n", attotime_string(attotime_make(0, cpu0_clock_period), 6));
-		logerror("\tscanline:   %30s sec\n", attotime_string(attotime_make(0, m6847->scanline_period), 6));
-		logerror("\tfield sync: %30s sec\n", attotime_string(attotime_make(0, m6847->field_sync_period), 6));
-		logerror("\thorz sync:  %30s sec\n", attotime_string(attotime_make(0, m6847->horizontal_sync_period), 6));
-		logerror("\tvblank:     %30s sec\n", attotime_string(attotime_make(0, m6847->vblank_period), 6));
-		logerror("\tframe:      %30s sec\n", attotime_string(attotime_make(0, frame_period), 6));
+			logerror("\tCPU0 clock: %30s sec\n", attotime_string(attotime_make(0, cpu0_clock_period), ATTOTIME_STRING_PRECISION));
+		logerror("\tscanline:   %30s sec\n", attotime_string(attotime_make(0, m6847->scanline_period), ATTOTIME_STRING_PRECISION));
+		logerror("\tfield sync: %30s sec\n", attotime_string(attotime_make(0, m6847->field_sync_period), ATTOTIME_STRING_PRECISION));
+		logerror("\thorz sync:  %30s sec\n", attotime_string(attotime_make(0, m6847->horizontal_sync_period), ATTOTIME_STRING_PRECISION));
+		logerror("\tvblank:     %30s sec\n", attotime_string(attotime_make(0, m6847->vblank_period), ATTOTIME_STRING_PRECISION));
+		logerror("\tframe:      %30s sec\n", attotime_string(attotime_make(0, frame_period), ATTOTIME_STRING_PRECISION));
 		logerror("\n");
 	}
 
