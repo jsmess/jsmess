@@ -17,7 +17,7 @@
 
 	Kevin Thacker [MESS driver]
 
-  May-June 2004 - Yoann Courtois (aka Papagayo/ex GMC/ex PARADOX) - rewritting some code with hardware documentation from http://andercheran.aiind.upv.es/~amstrad
+  May-June 2004 - Yoann Courtois (aka Papagayo/ex GMC/ex PARADOX) - rewritting some code with hardware documentation from http://www.cepece.info/amstrad/
 
   June 2006  - Very preliminary CPC+ support.  CPR cart image handling, secondary ROM register, ASIC unlock detection
                Supported:
@@ -1604,6 +1604,15 @@ void amstrad_reset_machine(void)
 	multiface_reset();
 }
 
+void kccomp_reset_machine(void)
+{
+	/* enable lower rom (OS rom) */
+	amstrad_GateArray_write(0x089);
+
+	/* set ram config 0 */
+	amstrad_GateArray_write(0x0c0);
+}
+
 /* the following timings have been measured! */
 static UINT8 amstrad_cycle_table_op[256] = {
 	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
@@ -1902,7 +1911,7 @@ static MACHINE_RESET( kccomp )
 	}
 
 	amstrad_common_init();
-	amstrad_reset_machine();
+	kccomp_reset_machine();
 
 	/* bit 1 = /TEST. When 0, KC compact will enter data transfer
 	sequence, where another system using the expansion port signals
