@@ -1337,7 +1337,7 @@ static void CALLBACK MessTestsTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 		KillTimer(NULL, s_nTestingTimer);
 		s_nTestingTimer = 0;
 
-		MessageBox(GetMainWindow(), TEXT("Tests successfully completed!"), TEXT(MAME32NAME), MB_OK);
+		win_message_box_utf8(GetMainWindow(), "Tests successfully completed!", MAME32NAME, MB_OK);
 	}
 	else
 	{
