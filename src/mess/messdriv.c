@@ -195,6 +195,7 @@ TESTDRIVER( tvlinkp )
 	DRIVER( bbcbp )		/* 198? BBC Micro Model B+ 64K						*/
 	DRIVER( bbcbp128 )	/* 198? BBC Micro Model B+ 128K						*/
 	DRIVER( bbcm)		/* 198? BBC Master									*/
+	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
 	DRIVER( electron )	/* 1983 Acorn Electron								*/
 TESTDRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 

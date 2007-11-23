@@ -865,6 +865,7 @@ $(MESSOBJ)/acorn.a:    \
 	$(MESS_VIDEO)/bbc.o	     \
 	$(MESS_MACHINE)/bbc.o	     \
 	$(MESS_DRIVERS)/bbc.o	     \
+	$(MESS_DRIVERS)/bbcbc.o	     \
 	$(MESS_DRIVERS)/a310.o	 \
 	$(MESS_DRIVERS)/z88.o	     \
 	$(MESS_VIDEO)/z88.o      \

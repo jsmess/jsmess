@@ -4,6 +4,7 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Acorn System 1  [Dirk Best] (not working)
 - Atari STBook [Curt Coder] (not working)
+- BBC Bridge Companion [incog] (not working)
 - HKT-0120 Sega Dreamcast Development Box [incog] (not working)
 - Osborne-1 [Wilbert Pol, Cowering]
 - Spectravideo SVI-318 (NTSC)  [Tomas Karlsson]
