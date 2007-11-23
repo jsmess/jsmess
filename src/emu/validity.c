@@ -216,15 +216,15 @@ static void build_quarks(void)
 static int validate_inlines(void)
 {
 #undef rand
-	UINT64 testu64a = rand() ^ (rand() << 15) ^ ((UINT64)rand() << 30) ^ ((UINT64)rand() << 45);
-	INT64 testi64a = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
+	volatile UINT64 testu64a = rand() ^ (rand() << 15) ^ ((UINT64)rand() << 30) ^ ((UINT64)rand() << 45);
+	volatile INT64 testi64a = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
 #ifdef PTR64
-	INT64 testi64b = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
+	volatile INT64 testi64b = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
 #endif
-	UINT32 testu32a = rand() ^ (rand() << 15);
-	UINT32 testu32b = rand() ^ (rand() << 15);
-	INT32 testi32a = rand() ^ (rand() << 15);
-	INT32 testi32b = rand() ^ (rand() << 15);
+	volatile UINT32 testu32a = rand() ^ (rand() << 15);
+	volatile UINT32 testu32b = rand() ^ (rand() << 15);
+	volatile INT32 testi32a = rand() ^ (rand() << 15);
+	volatile INT32 testi32b = rand() ^ (rand() << 15);
 	INT32 resulti32, expectedi32;
 	UINT32 resultu32, expectedu32;
 	INT64 resulti64, expectedi64;
@@ -232,7 +232,7 @@ static int validate_inlines(void)
 	INT32 remainder, expremainder;
 	UINT32 uremainder, expuremainder;
 	int error = FALSE;
-	
+
 	/* use only non-zero, positive numbers */
 	if (testu64a == 0) testu64a++;
 	if (testi64a == 0) testi64a++;
