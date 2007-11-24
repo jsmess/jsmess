@@ -328,7 +328,10 @@ void *realloc_file_line(void *memory, size_t size, const char *file, int line)
 	}
 	else
 	{
-		newmemory = (void *) GlobalReAlloc(memory, size, GMEM_MOVEABLE);
+		if (memory != NULL)
+			newmemory = (void *) GlobalReAlloc(memory, size, GMEM_MOVEABLE);
+		else
+			newmemory = (void *) GlobalAlloc(GMEM_FIXED, size);
 	}
 
 	return newmemory;
