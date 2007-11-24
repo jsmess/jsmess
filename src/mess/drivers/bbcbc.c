@@ -98,5 +98,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*   YEAR  NAME  PARENT  COMPAT  MACHINE INPUT  INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
-CONS(1985, bbcbc,     0, bbcbc,  bbcbc,  bbcbc, 0,    bbcbc,  "BBC",   "Bridge Companion", GAME_NOT_WORKING )
+CONS(1985, bbcbc,     0, 0,      bbcbc,  bbcbc, 0,    bbcbc,  "BBC",   "Bridge Companion", GAME_NOT_WORKING )
 

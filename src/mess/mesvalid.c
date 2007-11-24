@@ -14,6 +14,12 @@
 #include "inputx.h"
 
 
+/*************************************
+ *
+ *  Validate devices
+ *
+ *************************************/
+
 static int validate_device(const device_class *devclass)
 {
 	int error = 0;
@@ -178,20 +184,111 @@ static int validate_device(const device_class *devclass)
 
 
 
+static int validate_driver_devices(const game_driver *drv)
+{
+	int error = 0;
+	int i;
+	struct SystemConfigurationParamBlock cfg;
+	device_getinfo_handler handlers[64];
+	device_class devclass;
+	int count_overrides[sizeof(handlers) / sizeof(handlers[0])];
+
+	if (drv->sysconfig_ctor)
+	{
+		memset(&cfg, 0, sizeof(cfg));
+		memset(handlers, 0, sizeof(handlers));
+		cfg.device_slotcount = sizeof(handlers) / sizeof(handlers[0]);
+		cfg.device_handlers = handlers;
+		cfg.device_countoverrides = count_overrides;
+		drv->sysconfig_ctor(&cfg);
+
+		for (i = 0; handlers[i]; i++)
+		{
+			devclass.gamedrv = drv;
+			devclass.get_info = handlers[i];
+
+			error = validate_device(&devclass) || error;
+		}
+	}
+	return error;
+}
+
+
+
+/*************************************
+ *
+ *  Validate compatibility chain
+ *
+ *************************************/
+
+static int validate_compatibility_chain(const game_driver *drv)
+{
+	int error = 0;
+	const game_driver *next_drv;
+	const game_driver *other_drv;
+	const char *compatible_with;
+
+	/* normalize drv->compatible_with */
+	compatible_with = drv->compatible_with;
+	if ((compatible_with != NULL) && !strcmp(compatible_with, "0"))
+		compatible_with = NULL;
+
+	/* check for this driver being compatible with a non-existant driver */
+	if ((compatible_with != NULL) && (driver_get_name(drv->compatible_with) == NULL))
+	{
+		mame_printf_error("%s: is compatible with %s, which is not in drivers[]\n", drv->name, drv->compatible_with);
+		error = 1;
+	}
+
+	/* check for clone_of and compatible_with being specified at the same time */
+	if ((driver_get_clone(drv) != NULL) && (compatible_with != NULL))
+	{
+		mame_printf_error("%s: both compatible_with and clone_of are specified\n", drv->name);
+		error = 1;
+	}
+
+	/* look for recursive compatibility */
+	while(!error && (drv != NULL))
+	{
+		/* identify the next driver */
+		next_drv = mess_next_compatible_driver(drv);
+
+		/* find any recursive dependencies on the current driver */
+		for (other_drv = next_drv; other_drv != NULL; other_drv = mess_next_compatible_driver(other_drv))
+		{
+			if (drv == other_drv)
+			{
+				mame_printf_error("%s: recursive compatibility\n", drv->name);
+				error = 1;
+				break;
+			}
+		}
+
+		/* advance to next driver */
+		drv = next_drv;
+	}
+
+	return error;
+}
+
+
+
+
+/*************************************
+ *
+ *  MESS validity checks
+ *
+ *************************************/
+
 int mess_validitychecks(void)
 {
-	int i, j;
+	int i;
 	int error = 0;
 	iodevice_t devtype;
-	const struct IODevice *devices;
 	const char *name;
 	input_port_entry *inputports = NULL;
 	extern int device_valididtychecks(void);
 	extern const char *mess_default_text[];
-	struct SystemConfigurationParamBlock cfg;
-	device_getinfo_handler handlers[64];
-	int count_overrides[sizeof(handlers) / sizeof(handlers[0])];
-	device_class devclass;
 
 	/* make sure that all of the UI_* strings are set for all devices */
 	for (devtype = 0; devtype < IO_COUNT; devtype++)
@@ -207,88 +304,22 @@ int mess_validitychecks(void)
 	/* MESS specific driver validity checks */
 	for (i = 0; drivers[i]; i++)
 	{
-		devices = devices_allocate(drivers[i]);
-
-		/* make sure that there are no clones that reference nonexistant drivers */
-		if (driver_get_clone(drivers[i]))
-		{
-			if (driver_get_name(drivers[i]->compatible_with) != NULL)
-			{
-				mame_printf_error("%s: both compatible_with and clone_of are specified\n", drivers[i]->name);
-				error = 1;
-			}
-
-			for (j = 0; drivers[j]; j++)
-			{
-				if (driver_get_clone(drivers[i]) == drivers[j])
-					break;
-			}
-			if (!drivers[j])
-			{
-				mame_printf_error("%s: is a clone of %s, which is not in drivers[]\n", drivers[i]->name, driver_get_clone(drivers[i])->name);
-				error = 1;
-			}
-		}
-
-		/* make sure that there are no clones that reference nonexistant drivers */
-		if (driver_get_name(drivers[i]->compatible_with) != NULL)
-		{
-			for (j = 0; drivers[j]; j++)
-			{
-				if (driver_get_name(drivers[i]->compatible_with) == drivers[j])
-					break;
-			}
-			if (!drivers[j])
-			{
-				mame_printf_error("%s: is compatible with %s, which is not in drivers[]\n", drivers[i]->name, drivers[i]->compatible_with);
-				error = 1;
-			}
-		}
-
 		/* check devices */
-		if (drivers[i]->sysconfig_ctor)
-		{
-			memset(&cfg, 0, sizeof(cfg));
-			memset(handlers, 0, sizeof(handlers));
-			cfg.device_slotcount = sizeof(handlers) / sizeof(handlers[0]);
-			cfg.device_handlers = handlers;
-			cfg.device_countoverrides = count_overrides;
-			drivers[i]->sysconfig_ctor(&cfg);
+		error = validate_driver_devices(drivers[i]) || error;
 
-			for (j = 0; handlers[j]; j++)
-			{
-				devclass.gamedrv = drivers[i];
-				devclass.get_info = handlers[j];
-
-				if (validate_device(&devclass))
-					error = 1;
-			}
-		}
+		/* check compatibility chain */
+		error = validate_compatibility_chain(drivers[i]) || error;
 
 		/* check system config */
 		ram_option_count(drivers[i]);
 
 		/* make sure that our input system likes this driver */
-		if (inputx_validitycheck(drivers[i], &inputports))
-			error = 1;
-
-		devices_free(devices);
-		devices = NULL;
+		error = inputx_validitycheck(drivers[i], &inputports) || error;
 	}
 
 	/* call other validity checks */
-	if (inputx_validitycheck(NULL, &inputports))
-		error = 1;
-	if (device_valididtychecks())
-		error = 1;
-
-	/* now that we are completed, re-expand the actual driver to compensate
-	 * for the tms9928a hack */
-	if (Machine && Machine->gamedrv)
-	{
-		machine_config drv;
-		expand_machine_driver(Machine->gamedrv->drv, &drv);
-	}
+	error = inputx_validitycheck(NULL, &inputports) || error;
+	error = device_valididtychecks() || error;
 
 	return error;
 }
