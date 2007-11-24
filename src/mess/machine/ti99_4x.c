@@ -661,7 +661,7 @@ static const TMS9928a_interface tms9918_interface =
 {
 	TMS99x8,
 	0x4000,
-	0, 0,
+	15, 15,
 	tms9901_set_int2
 };
 
@@ -674,7 +674,7 @@ static const TMS9928a_interface tms9929_interface =
 {
 	TMS9929,
 	0x4000,
-	0, 0,
+	13, 13,
 	tms9901_set_int2
 };
 
@@ -687,7 +687,7 @@ static const TMS9928a_interface tms9918a_interface =
 {
 	TMS99x8A,
 	0x4000,
-	0, 0,
+	15, 15,
 	tms9901_set_int2
 };
 
@@ -700,7 +700,7 @@ static const TMS9928a_interface tms9929a_interface =
 {
 	TMS9929A,
 	0x4000,
-	0, 0,
+	13, 13,
 	tms9901_set_int2
 };
 

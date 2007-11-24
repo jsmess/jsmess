@@ -47,7 +47,8 @@ System Driver Changes:
 - [PET] Fixed keyboard regression introduced in 0.116.  (bug #1405) [Wilbert
   Pol]
 
-- [QL] The system is now usable, except that microdrives don't work yet. [Curt Coder]
+- [QL] The system is now usable, except that microdrives don't work yet. [Curt
+  Coder]
 
 - [SVI318] Fixed borders. Added selectable bioses for all models.
   Added serial port support. Added support for NTSC models.  [Tomas Karlsson]
@@ -58,6 +59,8 @@ System Driver Changes:
 - [SVI328] Fixed numeric pad input ports.  [Tomas Karlsson]
 
 - [SYM1] Rewrote, still many issues and doesn't fully work.  [Dirk Best]
+
+- [TI99] Fixed TI99 border regression.  [Michael Zapf]
 
 - [X68000] Raster effects, DMA and vblank improvements.  [Barry Rodewald]
 
