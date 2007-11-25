@@ -11,11 +11,11 @@
 	<!-- 1 msx-dos 2 -->
 	<!-- 2 konami5 with SCC -->
 	<!-- 3 konami4 without SCC -->
-	<!-- 4 ascii/8kb -->
-	<!-- 5 ascii/16kb -->
+	<!-- 4 Ascii/8kb -->
+	<!-- 5 Ascii/16kb -->
 	<!-- 6 Game Master 2 with SRAM -->
-	<!-- 7 ascii/8kb with 8kb SRAM -->
-	<!-- 8 ascii/16kb with 2kb SRAM -->
+	<!-- 7 Ascii/8kb with 8kb SRAM -->
+	<!-- 8 Ascii/16kb with 2kb SRAM -->
 	<!-- 9 R-type -->
 	<!-- 10 Konami mah-jong 2 -->
 	<!-- 11 Panasonic fm-pac -->
@@ -126,8 +126,8 @@
 		<manufacturer>Pony Cannon</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
-	<hash crc32="62b1f1df" name="Aleste">
-		<manufacturer>Compile (hacked)</manufacturer>
+	<hash crc32="62b1f1df" name="Aleste (hacked)">
+		<manufacturer>Compile</manufacturer>
 		<year>1988</year>
 		<status>needs msx2</status>
 		<extrainfo>3</extrainfo>
@@ -158,8 +158,8 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="716dc9af" name="Alpha Roid (hacked)">
-		<manufacturer>?</manufacturer>
-		<year>????</year>
+		<manufacturer>Pony Canyon</manufacturer>
+		<year>1986</year>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="055254e0" name="Alpha Squadron">
@@ -353,12 +353,12 @@
 	</hash>
 	<hash crc32="336fdcd9" name="Balance (1)">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="cdabd75b" name="Balance (2)">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="6aa7cbe0" name="Banana">
@@ -473,17 +473,17 @@
 	</hash>
 	<hash crc32="8cf0e6c0" name="Bomber King">
 		<year>1988</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>4</extrainfo>
 	</hash>
 	<hash crc32="9a5aef05" name="Bomber Man">
 		<year>1983</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="3df1f56f" name="Bomberman (hacked)">
-		<manufacturer>?</manufacturer>
-		<year>????</year>
+		<manufacturer>Hudson Soft</manufacturer>
+		<year>1986</year>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="042ad44d" name="Bomberman Special">
@@ -571,12 +571,12 @@
 	</hash>
 	<hash crc32="9cf39bd6" name="Buru To Marty Kikiippatsu">
 		<year>1986</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="4b2aa972" name="Butamaru Pants">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="e8938db6" name="C So! (hacked)">
@@ -606,7 +606,7 @@
 	</hash>
 	<hash crc32="a667ad8a" name="Cannon Ball">
 		<year>1983</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="8e985857" name="Captain Chef">
@@ -655,7 +655,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="90f38029" name="Castle Excellent">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1986</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -791,7 +791,7 @@
 	</hash>
 	<hash crc32="12552a1f" name="Color Ball">
 		<year>1983</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="40e2f32a" name="Color Midway">
@@ -1051,7 +1051,7 @@
 	</hash>
 	<hash crc32="a0ff8771" name="Dragon Attack">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="981facd3" name="Dragon Attack (hacked)">
@@ -1119,7 +1119,7 @@
 		<extrainfo>5</extrainfo>
 	</hash>
 	<hash crc32="33700744" name="Dungeon Master">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1986</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -1135,12 +1135,12 @@
 	</hash>
 	<hash crc32="6c366b32" name="Dunk Shot (1)">
 		<year>1986</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="99b7eab1" name="Dunk Shot (2)">
 		<year>1986</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="47ec57da" name="Dynamite Bowl">
@@ -1165,7 +1165,7 @@
 	</hash>
 	<hash crc32="2de03477" name="Eddy 2">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="232b1050" name="Eggerland Mystery">
@@ -1245,7 +1245,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="70a0cb2c" name="F16 Fighting Falcon">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1984</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -1425,7 +1425,7 @@
 	</hash>
 	<hash crc32="eba95a38" name="Fruit Search">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="b1160421" name="Fruit Search (hacked)">
@@ -1516,7 +1516,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="11bac0e6" name="Ghost Flight - Athletic Ball">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1984</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -1575,12 +1575,12 @@
 	</hash>
 	<hash crc32="d83a6a3f" name="Golf-Kyou">
 		<year>1984</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="40d3889f" name="Golgo 13 Okami No Su">
 		<year>1986</year>
-		<manufacturer>Pont Cannon</manufacturer>
+		<manufacturer>Pony Cannon</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="5eac55df" name="Golvellius">
@@ -1619,7 +1619,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="4d44255f" name="Gradius">
-		<manufacturer>Korami</manufacturer>
+		<manufacturer>Konami</manufacturer>
 		<year>1986</year>
 		<extrainfo>3</extrainfo>
 	</hash>
@@ -1738,9 +1738,9 @@
 		<manufacturer>Micro Cabin</manufacturer>
 		<extrainfo>8</extrainfo>
 	</hash>
-	<hash crc32="a0d363d3" name="Harryfox Yki No Maoh (hacked)">
-		<manufacturer>1985</manufacturer>
-		<year>Micro Cabin</year>
+	<hash crc32="a0d363d3" name="Harryfox Yki No Maou (hacked)">
+		<manufacturer>Micro Cabin</manufacturer>
+		<year>1985</year>
 		<extrainfo>5</extrainfo>
 	</hash>
 	<hash crc32="c7fe3ee1" name="Harryfox Yuki No Maou">
@@ -1762,7 +1762,7 @@
 	</hash>
 	<hash crc32="11e46700" name="Heavy Boxing">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="911185e1" name="Heavy Boxing (hacked)">
@@ -1776,7 +1776,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="cd63cd50" name="Helitank">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -1787,11 +1787,11 @@
 	</hash>
 	<hash crc32="24851440" name="High Way Star">
 		<year>1983</year>
-		<manufacturer>Way Limit</manufacturer>
+		<manufacturer>Way Limited</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
-	<hash crc32="24851440" name="High way star">
-		<manufacturer>Way limit</manufacturer>
+	<hash crc32="24851440" name="High Way Star">
+		<manufacturer>Way Limited</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -1813,27 +1813,27 @@
 	</hash>
 	<hash crc32="11502a96" name="Hitsuji Yai">
 		<year>1984</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="86731751" name="Hole In One (1)">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="5bd60572" name="Hole In One (2)">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="98e7b01b" name="Hole In One (3)">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="acfcbba6" name="Hole In One Professional">
 		<year>1985</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="ff063cdb" name="Hole in one (hacked)">
@@ -1944,11 +1944,11 @@
 	</hash>
 	<hash crc32="3a550788" name="Indian No Bouken">
 		<year>1983</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="98a3451c" name="Indian no Bouken (hacked)">
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -1979,7 +1979,7 @@
 	</hash>
 	<hash crc32="d6465702" name="Jagur 5">
 		<year>1987</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>5</extrainfo>
 	</hash>
 	<hash crc32="61ea6742" name="Janka">
@@ -1995,7 +1995,7 @@
 	</hash>
 	<hash crc32="9191c890" name="Jet Set Willy">
 		<year>1985</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="f278c6f3" name="Jigsaw Set">
@@ -2054,7 +2054,7 @@
 	</hash>
 	<hash crc32="7382f3ac" name="Jyan-Kyou">
 		<year>1984</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="c8ff3829" name="Jyanyuu">
@@ -2074,11 +2074,12 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="3b8fdf44" name="Kanji Rom - JIS 1st Class (For Japanese MSX-Write)">
-		<manufacturer>0</manufacturer>
+		<extrainfo>0</extrainfo>
+		<manufacturer>Ascii</manufacturer>
 	</hash>
 	<hash crc32="12be29fc" name="Karamaru Chindoutyuu">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="6a30c707" name="Karuizaw">
@@ -2103,7 +2104,7 @@
 	</hash>
 	<hash crc32="e4f63cb7" name="Kick It">
 		<year>1987</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="5c859406" name="Kikikaikai">
@@ -2338,7 +2339,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="adc58732" name="Lode Runner">
-		<manufacturer>Broderbound</manufacturer>
+		<manufacturer>Broderbund</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -2417,7 +2418,7 @@
 	<hash crc32="381b3431" name="MSX Bunsetsu Henkan Jisyo (FS-SR022)">
 		<year>1985</year>
 		<manufacturer>National</manufacturer>
-		<status>( Not Playable / Needs FS-4000)</status>
+		<status>(Not Playable / Needs FS-4000)</status>
 	</hash>
 	<hash crc32="268cc301" name="MSX Derby">
 		<year>1983</year>
@@ -2596,7 +2597,7 @@
 	</hash>
 	<hash crc32="2f8065eb" name="Meikyuushinwa">
 		<year>1986</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>5</extrainfo>
 	</hash>
 	<hash crc32="e85c5731" name="Metal Gear">
@@ -2658,7 +2659,7 @@
 	</hash>
 	<hash crc32="eba19259" name="Mobile Planet Suthirus">
 		<year>1986</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="1d27d31f" name="Mobile Suit Gundam">
@@ -2780,7 +2781,7 @@
 	</hash>
 	<hash crc32="414d29bc" name="Mr.Chin">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="4098d71d" name="Mr.Do">
@@ -2896,7 +2897,7 @@
 	</hash>
 	<hash crc32="b202f481" name="Ninja Kage">
 		<year>1984</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="f56a00e6" name="Ninja Kun">
@@ -2968,7 +2969,7 @@
 	</hash>
 	<hash crc32="01a24ca7" name="Oyoide Tango">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="77c3424c" name="PSG Music Writer">
@@ -3018,7 +3019,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="195f5366" name="Pairs (hacked)">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -3127,7 +3128,7 @@
 	</hash>
 	<hash crc32="9e51ae0a" name="Picture Puzzle">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="7411c6f2" name="Pine Applin">
@@ -3218,7 +3219,7 @@
 	</hash>
 	<hash crc32="558a09f6" name="Pooyan">
 		<year>1985</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="bd387377" name="Poppaq The Fish">
@@ -3227,7 +3228,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="22aa8966" name="Pretty Sheep (hacked)">
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -3382,7 +3383,7 @@
 		<extrainfo>3</extrainfo>
 	</hash>
 	<hash crc32="01043328" name="Rise Out (hacked)">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -3423,7 +3424,7 @@
 	</hash>
 	<hash crc32="56200fef" name="Roller Ball">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="23777f81" name="Roller Ball (hacked)">
@@ -3594,7 +3595,7 @@
 	</hash>
 	<hash crc32="4a44bf23" name="Snake-It">
 		<year>1986</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="74bc8295" name="Soccer">
@@ -3608,7 +3609,7 @@
 		<extrainfo>4</extrainfo>
 	</hash>
 	<hash crc32="e683af8a" name="Sokoban (hacked)">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1984</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -3668,7 +3669,7 @@
 	</hash>
 	<hash crc32="4a45cbc0" name="Space Maze Attack">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="d8776861" name="Space Maze Attack (hacked)">
@@ -3678,7 +3679,7 @@
 	</hash>
 	<hash crc32="26119f0a" name="Space Trouble">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="2f791048" name="Space Trouble (hacked)">
@@ -3738,12 +3739,12 @@
 	</hash>
 	<hash crc32="c14e53a1" name="Star Force">
 		<year>1985</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="0b3d975d" name="Star Soldier">
 		<year>1986</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="c6250410" name="Star Soldier (hacked)">
@@ -3757,7 +3758,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="236d2ab1" name="Starship Simulator">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1984</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -3768,12 +3769,12 @@
 	</hash>
 	<hash crc32="60a8927b" name="Step Up (1)">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="cabcddf1" name="Step Up (2)">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="0fb7df8f" name="Stepper">
@@ -3799,7 +3800,7 @@
 	</hash>
 	<hash crc32="79bc12b2" name="Super Billiards">
 		<year>1984</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="7de493ab" name="Super Boy II">
@@ -3883,7 +3884,7 @@
 	</hash>
 	<hash crc32="491c6af0" name="Super Snake">
 		<year>1983</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="e31a0336" name="Super Snake (hacked)">
@@ -3937,7 +3938,7 @@
 		<extrainfo>7</extrainfo>
 	</hash>
 	<hash crc32="d792c827" name="TZR Grand Prix Rider">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1986</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -3948,7 +3949,7 @@
 	</hash>
 	<hash crc32="892266ca" name="Takahashi Meijin No Boukenjima">
 		<year>1986</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="c57272c3" name="Takeru Densetsu">
@@ -3972,7 +3973,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="895cb183" name="Tawara (hacked)">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1984</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -3992,7 +3993,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="29314400" name="Telebunnie">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -4012,18 +4013,18 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="e2d3377c" name="Tetra Horror (hacked)">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1984</year>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="b6c02ae7" name="Tetsuman (1)">
 		<year>1985</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="929d6786" name="Tetsuman (2)">
 		<year>1985</year>
-		<manufacturer>Hal</manufacturer>
+		<manufacturer>HAL</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="e258c032" name="The Black Onyx">
@@ -4047,7 +4048,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="2149c32d" name="The Castle">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1986</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -4148,7 +4149,7 @@
 		<extrainfo>5</extrainfo>
 	</hash>
 	<hash crc32="a156ac02" name="The Spider (hacked)">
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<year>1983</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -4228,12 +4229,12 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="190f4ce5" name="Topple Zip">
-		<manufacturer>Bothec</manufacturer>
+		<manufacturer>Bothtec</manufacturer>
 		<year>1986</year>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="5da0f013" name="Topple Zip (hacked)">
-		<manufacturer>?</manufacturer>
+		<manufacturer>Bothtec</manufacturer>
 		<year>????</year>
 		<status>needs msx2</status>
 		<extrainfo>3</extrainfo>
@@ -4383,7 +4384,7 @@
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="e621ebc9" name="Warroid (hacked)">
-		<manufacturer>ASCII</manufacturer>
+		<manufacturer>Ascii</manufacturer>
 		<year>1985</year>
 		<extrainfo>0</extrainfo>
 	</hash>
@@ -4393,7 +4394,7 @@
 		<extrainfo>4</extrainfo>
 	</hash>
 	<hash crc32="08a5ca60" name="Wizardry">
-		<manufacturer>Fortune co., ltd</manufacturer>
+		<manufacturer>Fortune Co., Ltd</manufacturer>
 		<year>1988</year>
 		<status>needs msx2</status>
 		<extrainfo>7</extrainfo>
@@ -4437,7 +4438,7 @@
 	</hash>
 	<hash crc32="24b94274" name="Yakyuu-Kyou">
 		<year>1984</year>
-		<manufacturer>Hudson</manufacturer>
+		<manufacturer>Hudson Soft</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="71e6605f" name="Yellow Submarine">

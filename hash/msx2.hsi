@@ -934,10 +934,12 @@
 		<extrainfo>7</extrainfo>
 	</hash>
 	<hash crc32="3b8fdf44" name="Kanji Rom - JIS 1st Class (For Japanese MSX-Write)">
-		<manufacturer>0</manufacturer>
+		<manufacturer>Ascii</manufacturer>
+		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="17e58926" name="Kanji Rom - JIS 1st+2nd Class (For Japanese MSX-Write II)">
-		<manufacturer>0</manufacturer>
+		<manufacturer>Ascii</manufacturer>
+		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="084c5803" name="Konami's Game Master 2">
 		<year>1987</year>
@@ -2325,15 +2327,15 @@
 	</hash>
 	<hash crc32="f52d77ab" name="Digger (De)">
 		<year>1987</year>
-		<manufacturer>Data Beutner Kg</manufacturer>
+		<manufacturer>Data Beutner KG</manufacturer>
 	</hash>
 	<hash crc32="26d3dfc7" name="Digger (De)[a]">
 		<year>1987</year>
-		<manufacturer>Data Beutner Kg</manufacturer>
+		<manufacturer>Data Beutner KG</manufacturer>
 	</hash>
 	<hash crc32="2474d258" name="Digger (Nl)[a]">
 		<year>1987</year>
-		<manufacturer>Data Beutner Kg</manufacturer>
+		<manufacturer>Data Beutner KG</manufacturer>
 	</hash>
 	<hash crc32="46376623" name="Dimies">
 		<year>1991</year>
@@ -3283,7 +3285,7 @@
 	</hash>
 	<hash crc32="093828c0" name="Graph Saurus 2 (Jp)">
 		<year>1991</year>
-		<manufacturer>Bit 2</manufacturer>
+		<manufacturer>Bit2</manufacturer>
 	</hash>
 	<hash crc32="5c1a7086" name="Graph Saurus 2 v2.0 [a]">
 		<year>1991</year>
@@ -3687,23 +3689,23 @@
 	</hash>
 	<hash crc32="08ce0296" name="Kubikiri Yakata - Sachan Ghyan (Jp)(Disk 1 of 5)">
 		<year>1989</year>
-		<manufacturer>Bit 2</manufacturer>
+		<manufacturer>Bit2</manufacturer>
 	</hash>
 	<hash crc32="691bd893" name="Kubikiri Yakata - Sachan Ghyan (Jp)(Disk 2 of 5)">
 		<year>1989</year>
-		<manufacturer>Bit 2</manufacturer>
+		<manufacturer>Bit2</manufacturer>
 	</hash>
 	<hash crc32="f91441f2" name="Kubikiri Yakata - Sachan Ghyan (Jp)(Disk 3 of 5)">
 		<year>1989</year>
-		<manufacturer>Bit 2</manufacturer>
+		<manufacturer>Bit2</manufacturer>
 	</hash>
 	<hash crc32="32300da3" name="Kubikiri Yakata - Sachan Ghyan (Jp)(Disk 4 of 5)">
 		<year>1989</year>
-		<manufacturer>Bit 2</manufacturer>
+		<manufacturer>Bit2</manufacturer>
 	</hash>
 	<hash crc32="7b6fbdae" name="Kubikiri Yakata - Sachan Ghyan (Jp)(Disk 5 of 5)">
 		<year>1989</year>
-		<manufacturer>Bit 2</manufacturer>
+		<manufacturer>Bit2</manufacturer>
 	</hash>
 	<hash crc32="d541f24a" name="Kujaku (Jp)">
 		<year>19??</year>
@@ -4572,7 +4574,7 @@
 	</hash>
 	<hash crc32="2009827c" name="Nyancle Racing (Jp)">
 		<year>1988</year>
-		<manufacturer>Matsushita-Bit 2</manufacturer>
+		<manufacturer>Matsushita-Bit2</manufacturer>
 	</hash>
 	<hash crc32="6623b664" name="Ogre">
 		<year>19??</year>
@@ -5569,7 +5571,7 @@
 		<year>19??</year>
 		<manufacturer>Data Beutner KG</manufacturer>
 	</hash>
-	<hash crc32="d076661d" name="Stone Of Agni, The (Jp)">
+	<hash crc32="d076661d" name="Stone of Agni, The (Jp)">
 		<year>19??</year>
 		<manufacturer>Humming Bird Soft</manufacturer>
 	</hash>
@@ -6684,7 +6686,7 @@
 	</hash>
 	<hash crc32="5a477665" name="ZZZ-UNK-DRAGON SLAYER 5, SORCERIAN (USERDISK)">
 		<year>1987</year>
-		<manufacturer>FALCOM</manufacturer>
+		<manufacturer>Falcom</manufacturer>
 	</hash>
 	<hash crc32="d8770b01" name="ZZZ-UNK-DRAGON WORLD[DISK 1]">
 	</hash>
@@ -6906,7 +6908,7 @@
 	</hash>
 	<hash crc32="1d900b27" name="ZZZ-UNK-HALNOTE V0.4">
 		<year>1986</year>
-		<manufacturer>HAL LABORATORY</manufacturer>
+		<manufacturer>HAL</manufacturer>
 	</hash>
 	<hash crc32="02e0ad93" name="ZZZ-UNK-HARADIUS">
 	</hash>
@@ -8058,18 +8060,18 @@
 	</hash>
 	<hash crc32="1d1ec602" md5="886b6a075cc986b6ce8c9c315b0384af" name="Eggerland Mistery 2 (Jp-En)">
 		<year>1986</year>
-		<manufacturer>Hal Lab</manufacturer>
+		<manufacturer>HAL</manufacturer>
 	</hash>
 	<hash crc32="2f8065eb" md5="acdf6caf45f51f7ade125c34bee747db" name="Eggerland Mistery 2 (Jp-En)[a]">
 		<year>1986</year>
-		<manufacturer>Hal Lab</manufacturer>
+		<manufacturer>HAL</manufacturer>
 	</hash>
 	<hash crc32="5fd839d2" md5="bf2cc0e26d55f0143609000c8ebcf242" name="Eggerland Mistery 2 (Jp-En)">
 		<status>KNOWN BAD DUMP</status>
 	</hash>
 	<hash crc32="872b7752" md5="eb5a3b333dfdccfd726e98c8d4f032d1" name="Eggerland Mistery 2 (Jp-En)[h TEVMA]">
 		<year>1986</year>
-		<manufacturer>Hal Lab</manufacturer>
+		<manufacturer>HAL</manufacturer>
 	</hash>
 	<hash crc32="14913432" md5="ff25f8ccde5cf7d49a758d19f46e41d0" name="Eidolon">
 		<year>1985</year>
@@ -8875,10 +8877,10 @@
 	</hash>
 	<hash crc32="d0ececc6" md5="532c46b3f3b28ea4e1ddb215ba7ab5b0" name="Zukkoke Yajikita (Jp)">
 		<year>1987</year>
-		<manufacturer>Hal Lab</manufacturer>
+		<manufacturer>HAL</manufacturer>
 	</hash>
 	<hash crc32="4968e84e" md5="ba2e644a68677cf42c116781579896d7" name="Zukkoke Yajikita (Jp)[a]">
 		<year>1987</year>
-		<manufacturer>Hal Lab</manufacturer>
+		<manufacturer>HAL</manufacturer>
 	</hash>
 </hashfile>
