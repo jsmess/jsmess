@@ -1158,10 +1158,8 @@
 	<hash crc32="6e8a792d" sha1="8542649963efe0976015759382c180b7c056be9a" name="Saint Seiya - Ougon Densetsu Hen Perfect Edition (J)"/>
 	<hash crc32="f0acda5c" sha1="152c4d63b1b17f2c717a43efc75d718b614f9ddc" name="SD Gundam - Operation U.C. (J)"/>
 	<hash crc32="6aca1f04" sha1="91e087056207fce21e782e25e383c203bc046897" name="SD Gundam G Generation - Mono-Eye Gundams (J)"/>
-	<hash crc32="6c029674" sha1="1e735d1e83a7bfa06c5c717c7e8a386d55a8e3f0" name="Shaman King Mirai E no Ishi (J)">
-		<status>Known Bad Image</status>
-	</hash>
-	<hash crc32="34908cb4" sha1="473195666a633573c777d3be98d7e8f46569c84b" name="Shaman King Mirai E no Ishi (J)"/>
+	<hash crc32="6c029674" sha1="1e735d1e83a7bfa06c5c717c7e8a386d55a8e3f0" name="Shaman King Mirai E no Ishi (J) (V1.0)"/>
+	<hash crc32="34908cb4" sha1="473195666a633573c777d3be98d7e8f46569c84b" name="Shaman King Mirai E no Ishi (J) (V1.1)"/>
 	<hash crc32="6918c824" sha1="b579f204be604ebef4e8238e5883152b70399c4d" name="Super Robot Taisen Compact 3 (J) (V1.5)"/>
 	<hash crc32="188ca644" sha1="dd6fe0f278cdec2670d3be8552dbb0cf6a3a2841" name="Super Robot Taisen Compact 3 (J) (V1.6)"/>
 	<hash crc32="50b7a742" sha1="be4559d6f48d7cb9550c8776f877c5c9cda0efa1" name="Taikyoku Igo Heisei Kiin (J)">
