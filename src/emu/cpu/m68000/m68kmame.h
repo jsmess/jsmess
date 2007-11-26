@@ -71,7 +71,7 @@ extern offs_t m68k_encrypted_opcode_end[MAX_CPU];
 #define m68k_read_pcrelative_16(address)     m68kx_read_pcrelative_16(address)
 #define m68k_read_pcrelative_32(address)     m68kx_read_pcrelative_32(address)
 
-#define m68k_read_disassembler_16(address)   m68kx_read_immediate_16(address)
+#define m68k_read_disassembler_16(address)   m68k_read_immediate_16(address)
 #define m68k_read_disassembler_32(address)   m68kx_read_immediate_32(address)
 
 #define m68k_write_memory_8(address, value)  (*m68k_memory_intf.write8)(address, value)
