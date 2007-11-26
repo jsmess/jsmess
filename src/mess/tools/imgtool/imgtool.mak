@@ -66,11 +66,10 @@ IMGTOOL_LIB_OBJS =						\
 	$(IMGTOOL_MODULES)/macutil.o		\
 	$(IMGTOOL_MODULES)/cybiko.o
 #	$(IMGTOOLOBJ)/tstsuite.o			\
-#	$(IMGTOOLOBJ)/imgfile.o				\
-#	$(IMGTOOLOBJ)/imgwave.o				\
 #	$(MESS_FORMATS)/fmsx_cas.o			\
 #	$(MESS_FORMATS)/svi_cas.o			\
 #	$(MESS_FORMATS)/ti85_ser.o			\
+#	$(IMGTOOL_MODULES)/imgwave.o		\
 #	$(IMGTOOL_MODULES)/cococas.o		\
 #	$(IMGTOOL_MODULES)/vmsx_tap.o		\
 #	$(IMGTOOL_MODULES)/vmsx_gm2.o		\
