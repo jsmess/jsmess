@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [FAMICOM] Fixed reads to $4031-2 when a disk is not mounted.  [MAMEPlus Team]
 
 
 

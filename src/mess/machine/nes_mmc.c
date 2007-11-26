@@ -2086,15 +2086,21 @@ READ8_HANDLER ( fds_r )
 			nes_fds.status0 &= ~0x01;
 			break;
 		case 0x01: /* $4031 - data latch */
-			if (nes_fds.current_side)
+			/* don't read data if disk is unloaded */
+			if (nes_fds.data == NULL)
+				ret = 0;
+			else if (nes_fds.current_side)
 				ret = nes_fds.data[(nes_fds.current_side-1) * 65500 + nes_fds.head_position++];
 			else
 				ret = 0;
 			break;
 		case 0x02: /* $4032 - disk status 1 */
-			/* If we've switched disks, report "no disk" for a few reads */
-			if (last_side != nes_fds.current_side)
+			/* return "no disk" status if disk is unloaded */
+			if (nes_fds.data == NULL)
+				ret = 1;
+			else if (last_side != nes_fds.current_side)
 			{
+				/* If we've switched disks, report "no disk" for a few reads */			
 				ret = 1;
 				count ++;
 				if (count == 50)
