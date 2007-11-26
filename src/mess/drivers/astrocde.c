@@ -46,8 +46,7 @@
 
 static WRITE8_HANDLER( astrocade_soundblock1_w )
 {
-	extern void astrocade_sound_w(UINT8 num, offs_t offset, UINT8 data);
-	astrocade_sound_w(0, (offset>>8)&7, data);
+	astrocade_sound1_w(offset + 0x18, data);
 }
 
 ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )

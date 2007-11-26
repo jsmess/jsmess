@@ -90,19 +90,7 @@ INLINE void m68k_write_memory_32_pd(unsigned int address, unsigned int value);
 
 INLINE unsigned int m68kx_read_immediate_16(unsigned int address)
 {
-	unsigned int addr = (address) ^ m68k_memory_intf.opcode_xor;
-	unsigned int data;
-
-	if (activecpu_databus_width(ADDRESS_SPACE_PROGRAM) == 8)
-	{
-		data = (cpu_readop(addr) << 8) | (cpu_readop(addr + 1));
-	}
-	else
-	{
-		data = cpu_readop16(addr);
-	}
-
-	return data;
+	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
 }
 
 INLINE unsigned int m68kx_read_immediate_32(unsigned int address)
