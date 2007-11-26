@@ -16,6 +16,7 @@
 #include "secview.h"
 #include "wimgres.h"
 #include "hexview.h"
+#include "winutf8.h"
 
 #define ANCHOR_LEFT		0x01
 #define ANCHOR_TOP		0x02
@@ -210,27 +211,27 @@ done:
 static void set_sector_text(HWND dialog)
 {
 	struct sectorview_info *info;
-	TCHAR buf[32];
+	CHAR buf[32];
 
 	info = get_sectorview_info(dialog);
 
 	if (info->track != ~0)
-		_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%u"), (unsigned int) info->track);
+		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%u", (unsigned int) info->track);
 	else
 		buf[0] = '\0';
-	SetWindowText(GetDlgItem(dialog, IDC_TRACKEDIT), buf);
+	win_set_window_text_utf8(GetDlgItem(dialog, IDC_TRACKEDIT), buf);
 
 	if (info->head != ~0)
-		_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%u"), (unsigned int) info->head);
+		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%u", (unsigned int) info->head);
 	else
 		buf[0] = '\0';
-	SetWindowText(GetDlgItem(dialog, IDC_HEADEDIT), buf);
+	win_set_window_text_utf8(GetDlgItem(dialog, IDC_HEADEDIT), buf);
 
 	if (info->sector != ~0)
-		_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%u"), (unsigned int) info->sector);
+		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%u", (unsigned int) info->sector);
 	else
 		buf[0] = '\0';
-	SetWindowText(GetDlgItem(dialog, IDC_SECTOREDIT), buf);
+	win_set_window_text_utf8(GetDlgItem(dialog, IDC_SECTOREDIT), buf);
 }
 
 

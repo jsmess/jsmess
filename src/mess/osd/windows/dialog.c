@@ -268,8 +268,7 @@ static void dialog_trigger(HWND dlgwnd, WORD trigger_flags)
 static INT_PTR CALLBACK dialog_proc(HWND dlgwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	INT_PTR handled = TRUE;
-	TCHAR buf[32];
-	char *str;
+	CHAR buf[32];
 	WORD command;
 
 	if (LOG_WINMSGS)
@@ -288,15 +287,13 @@ static INT_PTR CALLBACK dialog_proc(HWND dlgwnd, UINT msg, WPARAM wparam, LPARAM
 		case WM_COMMAND:
 			command = LOWORD(wparam);
 
-			GetWindowText((HWND) lparam, buf, sizeof(buf) / sizeof(buf[0]));
-			str = utf8_from_tstring(buf);
-			if (!strcmp(str, DLGTEXT_OK))
+			win_get_window_text_utf8((HWND) lparam, buf, sizeof(buf) / sizeof(buf[0]));
+			if (!strcmp(buf, DLGTEXT_OK))
 				command = IDOK;
-			else if (!strcmp(str, DLGTEXT_CANCEL))
+			else if (!strcmp(buf, DLGTEXT_CANCEL))
 				command = IDCANCEL;
 			else
 				command = 0;
-			free(str);
 
 			switch(command)
 			{
