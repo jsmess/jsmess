@@ -303,8 +303,7 @@ static void bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 	if (LOG_INTERRUPTS)
 	{
 		/* make sure that we don't shoot ourself in the foot */
-		if ((interrupt_bit > sizeof(interrupt_names) / sizeof(interrupt_names[0])) && !interrupt_names[interrupt_bit])
-			fatalerror("Raising invalid interrupt %u", interrupt_bit);
+		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != NULL), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
 			(unsigned) cpunum_get_reg(0, REG_PC),
