@@ -138,7 +138,7 @@ static WRITE8_HANDLER(avigo_flash_0x4000_write_handler)
 /* memory 0x08000-0x0bfff */
 static  READ8_HANDLER(avigo_flash_0x8000_read_handler)
 {
-	return intelflash_read(avigo_flash_at_0x8000, (avigo_rom_bank_l<<14) | offset);
+	return intelflash_read(avigo_flash_at_0x8000, (avigo_ram_bank_l<<14) | offset);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -405,7 +405,7 @@ static void avigo_machine_reset(running_machine *machine)
 
 	/* initialise flash memory */
 	intelflash_init(0, FLASH_INTEL_E28F008SA, memory_region(REGION_CPU1)+0x10000);
-	intelflash_init(1, FLASH_INTEL_E28F008SA, memory_region(REGION_CPU1)+0x100000);
+	intelflash_init(1, FLASH_INTEL_E28F008SA, memory_region(REGION_CPU1)+0x110000);
 	intelflash_init(2, FLASH_INTEL_E28F008SA, NULL);
 
 	stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
@@ -899,7 +899,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(avigo)
-	ROM_REGION((64*1024)+0x0150000, REGION_CPU1,0)
+	ROM_REGION(0x210000, REGION_CPU1,0)
 	ROM_LOAD("avigo.rom", 0x010000, 0x0150000, CRC(160ee4a6) SHA1(4d09201a3876de16808bd92989f3d8d7182d72b3))
 ROM_END
 
