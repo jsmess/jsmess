@@ -918,7 +918,7 @@ static void kc_keyboard_init(void)
 	z80pio_bstb_w(0,0);
 
 
-	for (i=0; i<KC_KEYBOARD_NUM_LINES; i++)
+	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)
 	{
 		/* read input port */
 		kc_previous_keyboard[i] = readinputport(i);

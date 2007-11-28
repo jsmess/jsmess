@@ -11,26 +11,59 @@
 
 
 
-/* Uncomment this to dump info about the inputs to the errorlog */
-//#define LOG_JOY
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
-/* Uncomment this to generate prg chunk files when the cart is loaded */
-//#define SPLIT_PRG
+/* Set to dump info about the inputs to the errorlog */
+#define LOG_JOY		0
+
+/* Set to generate prg chunk files when the cart is loaded */
+#define SPLIT_PRG	0
 
 #define BATTERY_SIZE 0x2000
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _nes_input nes_input;
+struct _nes_input
+{
+	UINT32 shift;
+	UINT32 i0, i1, i2;
+};
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
 UINT8 battery_data[BATTERY_SIZE];
 
 struct nes_struct nes;
 struct fds_struct nes_fds;
 
-static UINT32 in_0[3];
-static UINT32 in_1[3];
-static UINT32 in_0_shift;
-static UINT32 in_1_shift;
+static nes_input in_0;
+static nes_input in_1;
 
-/* local prototypes */
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
 static void init_nes_core(void);
 static void nes_machine_stop(running_machine *machine);
+
+
+
+/***************************************************************************
+    FUNCTIONS
+***************************************************************************/
 
 static mess_image *cartslot_image(void)
 {
@@ -144,8 +177,8 @@ static void nes_machine_reset(running_machine *machine)
 	mapper_reset (nes.mapper);
 
 	/* Reset the serial input ports */
-	in_0_shift = 0;
-	in_1_shift = 0;
+	in_0.shift = 0;
+	in_1.shift = 0;
 }
 
 MACHINE_START( nes )
@@ -173,7 +206,7 @@ static void nes_machine_stop(running_machine *machine)
 
 
 
-static int zapper_hit_pixel(const UINT32 *input)
+static int zapper_hit_pixel(const nes_input *input)
 {
 	UINT16 pix = 0;
 	rgb_t col;
@@ -181,7 +214,7 @@ static int zapper_hit_pixel(const UINT32 *input)
 	extern mame_bitmap *nes_zapper_hack;
 
 	if (nes_zapper_hack)
-		pix = *BITMAP_ADDR16(nes_zapper_hack, input[2], input[1]);
+		pix = *BITMAP_ADDR16(nes_zapper_hack, input->i2, input->i1);
 
 	col = palette_get_color(Machine, pix);
 	r = (UINT8) (col >> 16);
@@ -202,7 +235,7 @@ static int zapper_hit_pixel(const UINT32 *input)
 	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
 	retVal = 0x40;
 
-	retVal |= ((in_0[0] >> in_0_shift) & 0x01);
+	retVal |= ((in_0.i0 >> in_0.shift) & 0x01);
 
 	/* Check the configuration to see what's connected */
 	cfg = readinputport(PORT_CONFIG1);
@@ -210,20 +243,19 @@ static int zapper_hit_pixel(const UINT32 *input)
 	if (((cfg & 0x000f) == 0x0002) || ((cfg & 0x000f) == 0x0003))
 	{
 		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		retVal |= ((in_0[0] & 0x01) << 4);
+		retVal |= ((in_0.i0 & 0x01) << 4);
 
 		/* Look at the screen and see if the cursor is over a bright pixel */
-		if (zapper_hit_pixel(in_0))
+		if (zapper_hit_pixel(&in_0))
 			retVal &= ~0x08; /* sprite hit */
 		else
 			retVal |= 0x08;  /* no sprite hit */
 	}
 
-#ifdef LOG_JOY
-	logerror ("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", retVal, activecpu_get_pc(), in_0_shift, in_0[0]);
-#endif
+	if (LOG_JOY)
+		logerror ("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", retVal, activecpu_get_pc(), in_0.shift, in_0.i0);
 
-	in_0_shift ++;
+	in_0.shift ++;
 	return retVal;
 }
 
@@ -237,7 +269,7 @@ static int zapper_hit_pixel(const UINT32 *input)
 	retVal = 0x40;
 
 	/* Handle data line 0's serial output */
-	retVal |= ((in_1[0] >> in_1_shift) & 0x01);
+	retVal |= ((in_1.i0 >> in_1.shift) & 0x01);
 
 	/* Check the fake dip to see what's connected */
 	cfg = readinputport(PORT_CONFIG1);
@@ -246,10 +278,10 @@ static int zapper_hit_pixel(const UINT32 *input)
 	{
 		/* zapper */
 		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		retVal |= ((in_1[0] & 0x01) << 4);
+		retVal |= ((in_1.i0 & 0x01) << 4);
 
 		/* Look at the screen and see if the cursor is over a bright pixel */
-		if (zapper_hit_pixel(in_1))
+		if (zapper_hit_pixel(&in_1))
 			retVal &= ~0x08; /* sprite hit */
 		else
 			retVal |= 0x08;  /* no sprite hit */
@@ -258,58 +290,58 @@ static int zapper_hit_pixel(const UINT32 *input)
 	{
 		/* arkanoid dial */
 		/* Handle data line 2's serial output */
-		retVal |= ((in_1[2] >> in_1_shift) & 0x01) << 3;
+		retVal |= ((in_1.i2 >> in_1.shift) & 0x01) << 3;
 
 		/* Handle data line 3's serial output - bits are reversed */
-//		retVal |= ((in_1[3] >> in_1_shift) & 0x01) << 4;
-		retVal |= ((in_1[3] << in_1_shift) & 0x80) >> 3;
+		/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
+		/* retVal |= ((in_1[3] >> in_1.shift) & 0x01) << 4; */
+		/* retVal |= ((in_1[3] << in_1.shift) & 0x80) >> 3; */
 	}
 
-#ifdef LOG_JOY
-	logerror ("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", retVal, activecpu_get_pc(), in_1_shift, in_1[0]);
-#endif
+	if (LOG_JOY)
+		logerror ("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", retVal, activecpu_get_pc(), in_1.shift, in_1.i0);
 
-	in_1_shift ++;
+	in_1.shift ++;
 	return retVal;
 }
 
 
 
-static void nes_read_input_device(int cfg, UINT32 *vals, int pad_port,
+static void nes_read_input_device(int cfg, nes_input *vals, int pad_port,
 	int supports_zapper, int paddle_port)
 {
-	vals[0] = 0;
-	vals[1] = 0;
-	vals[2] = 0;
+	vals->i0 = 0;
+	vals->i1 = 0;
+	vals->i2 = 0;
 	
 	switch(cfg & 0x0f)
 	{
 		case 0x01:	/* gamepad */
 			if (pad_port >= 0)
-				vals[0] = readinputport(pad_port);
+				vals->i0 = readinputport(pad_port);
 			break;
 
 		case 0x02:	/* zapper 1 */
 			if (supports_zapper)
 			{
-				vals[0] = readinputport(PORT_ZAPPER0_T);
-				vals[1] = readinputport(PORT_ZAPPER0_X);
-				vals[2] = readinputport(PORT_ZAPPER0_Y);
+				vals->i0 = readinputport(PORT_ZAPPER0_T);
+				vals->i1 = readinputport(PORT_ZAPPER0_X);
+				vals->i2 = readinputport(PORT_ZAPPER0_Y);
 			}
 			break;
 
 		case 0x03:	/* zapper 2 */
 			if (supports_zapper)
 			{
-				vals[0] = readinputport(PORT_ZAPPER1_T);
-				vals[1] = readinputport(PORT_ZAPPER1_X);
-				vals[2] = readinputport(PORT_ZAPPER1_Y);
+				vals->i0 = readinputport(PORT_ZAPPER1_T);
+				vals->i1 = readinputport(PORT_ZAPPER1_X);
+				vals->i2 = readinputport(PORT_ZAPPER1_Y);
 			}
 			break;
 
 		case 0x04:	/* arkanoid paddle */
 			if (paddle_port >= 0)
-				vals[0] = (UINT8) ((UINT8) readinputport (paddle_port) + (UINT8)0x52) ^ 0xff;
+				vals->i0 = (UINT8) ((UINT8) readinputport (paddle_port) + (UINT8)0x52) ^ 0xff;
 			break;
 	}
 }
@@ -319,31 +351,31 @@ static void nes_read_input_device(int cfg, UINT32 *vals, int pad_port,
 WRITE8_HANDLER ( nes_IN0_w )
 {
 	int cfg;
-	UINT32 in_2[3];
-	UINT32 in_3[3];
+	nes_input in_2;
+	nes_input in_3;
 
 	if (data & 0x01) return;
-#ifdef LOG_JOY
-	logerror ("joy 0 bits read: %d\n", in_0_shift);
-#endif
+
+	if (LOG_JOY)
+		logerror ("joy 0 bits read: %d\n", in_0.shift);
 
 	/* Toggling bit 0 high then low resets both controllers */
-	in_0_shift = 0;
-	in_1_shift = 0;
+	in_0.shift = 0;
+	in_1.shift = 0;
 
 	/* Check the configuration to see what's connected */
 	cfg = readinputport(PORT_CONFIG1);
 
 	/* Read the input devices */
-	nes_read_input_device(cfg >>  0, in_0, PORT_PAD0,  TRUE, -1);
-	nes_read_input_device(cfg >>  4, in_1, PORT_PAD1,  TRUE, PORT_PADDLE1);
-	nes_read_input_device(cfg >>  8, in_2, PORT_PAD2, FALSE, -1);
-	nes_read_input_device(cfg >> 12, in_3, PORT_PAD3, FALSE, -1);
+	nes_read_input_device(cfg >>  0, &in_0, PORT_PAD0,  TRUE, -1);
+	nes_read_input_device(cfg >>  4, &in_1, PORT_PAD1,  TRUE, PORT_PADDLE1);
+	nes_read_input_device(cfg >>  8, &in_2, PORT_PAD2, FALSE, -1);
+	nes_read_input_device(cfg >> 12, &in_3, PORT_PAD3, FALSE, -1);
 
 	if (cfg & 0x0f00)
-		in_0[0] |= (in_2[0] << 8) | (0x08 << 16);
+		in_0.i0 |= (in_2.i0 << 8) | (0x08 << 16);
 	if (cfg & 0xf000)
-		in_1[0] |= (in_3[0] << 8) | (0x04 << 16);
+		in_1.i0 |= (in_3.i0 << 8) | (0x04 << 16);
 }
 
 
@@ -472,23 +504,23 @@ DEVICE_LOAD(nes_cart)
 	else
 		image_fread (image, &nes.rom[0x10000], 0x4000 * nes.prg_chunks);
 
-#ifdef SPLIT_PRG
-{
-	FILE *prgout;
-	char outname[255];
-
-	for (i = 0; i < nes.prg_chunks; i ++)
+#if SPLIT_PRG
 	{
-		sprintf (outname, "%s.p%d", battery_name, i);
-		prgout = fopen (outname, "wb");
-		if (prgout)
+		FILE *prgout;
+		char outname[255];
+
+		for (i = 0; i < nes.prg_chunks; i ++)
 		{
-			fwrite (&nes.rom[0x10000 + 0x4000 * i], 1, 0x4000, prgout);
-			fclose (prgout);
+			sprintf (outname, "%s.p%d", battery_name, i);
+			prgout = fopen (outname, "wb");
+			if (prgout)
+			{
+				fwrite (&nes.rom[0x10000 + 0x4000 * i], 1, 0x4000, prgout);
+				fclose (prgout);
+			}
 		}
 	}
-}
-#endif
+#endif /* SPLIT_PRG */
 
 	logerror("**\n");
 	logerror("Mapper: %d\n", nes.mapper);

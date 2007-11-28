@@ -1024,7 +1024,7 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 		/* check information */
 		if ((totphysrecs != (l1_img->geometry.secspertrack * l1_img->geometry.cylinders * l1_img->geometry.heads))
 				|| (totphysrecs < 2)
-				|| memcmp(vib->id, "DSK", 3) || (! strchr(" P", vib->id[3]))
+				|| memcmp(vib->id, "DSK", 3) || (! strchr(" P", vib->protection))
 				|| (((img_format == if_mess) || (img_format == if_v9t9))
 					&& (stream_size(file_handle) != totphysrecs*256)))
 			return IMGTOOLERR_CORRUPTIMAGE;
@@ -5022,7 +5022,7 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 		/* delete parent catalog entry */
 		for (i=catalog_index; i<113; i++)
 			catalog.subdirs[i] = catalog.subdirs[i+1];
-		catalog.subdirs[114].dir_ptr = 0;
+		catalog.subdirs[113].dir_ptr = 0;
 		catalog.num_subdirs--;
 
 		/* update parent VIB/DDR */
