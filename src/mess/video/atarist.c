@@ -37,7 +37,7 @@ static struct SHIFTER
 static emu_timer *atarist_glue_timer;
 static emu_timer *atarist_shifter_timer;
 
-pen_t INLINE atarist_shift_mode_0(void)
+INLINE pen_t atarist_shift_mode_0(void)
 {
 	int color = (BIT(shifter.rr[3], 15) << 3) | (BIT(shifter.rr[2], 15) << 2) | (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
 
@@ -49,7 +49,7 @@ pen_t INLINE atarist_shift_mode_0(void)
 	return Machine->pens[color];
 }
 
-pen_t INLINE atarist_shift_mode_1(void)
+INLINE pen_t atarist_shift_mode_1(void)
 {
 	int color = (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
 
@@ -68,7 +68,7 @@ pen_t INLINE atarist_shift_mode_1(void)
 	return Machine->pens[color];
 }
 
-pen_t INLINE atarist_shift_mode_2(void)
+INLINE pen_t atarist_shift_mode_2(void)
 {
 	int color = BIT(shifter.rr[0], 15);
 
@@ -125,7 +125,7 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 	*BITMAP_ADDR32(tmpbitmap, y, x) = pen;
 }
 
-void INLINE atarist_shifter_load(void)
+INLINE void atarist_shifter_load(void)
 {
 	UINT8 *RAM = memory_region(REGION_CPU1) + shifter.ofs;
 

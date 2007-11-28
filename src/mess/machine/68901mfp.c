@@ -4,7 +4,7 @@
 
 	- poll TAI/TBI pins
 	- daisy chaining
-	- correct irq_timer period
+	- correct gpio_timer period
 	- disable GPIO3/4 interrupts when timer A/B in pulse mode
 	- spurious interrupt
 
@@ -45,7 +45,7 @@ typedef struct
 
 	UINT16 ier, ipr, isr, imr;
 	UINT8 vr;
-	emu_timer *irq_timer;
+	int irqlevel;
 
 	UINT8 tacr, tbcr, tcdcr;
 	UINT8 tdr[MFP68901_MAX_TIMERS];
@@ -63,8 +63,6 @@ typedef struct
 	int	rx_parity, tx_parity;
 	int	rx_state, tx_state, xmit_state;
 	int rxtx_word, rxtx_start, rxtx_stop;
-
-	emu_timer *rx_timer, *tx_timer;
 } mfp_68901;
 
 static mfp_68901 mfp[MAX_MFP];
@@ -92,40 +90,49 @@ static const int MFP68901_GPIO_TIMER[] =
 
 static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
-static void mfp68901_check_interrupts(int which)
+INLINE void mfp68901_check_interrupts(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
-	int intr = (mfp_p->ipr & mfp_p->imr) ? HOLD_LINE : CLEAR_LINE;
-	mfp_p->intf->irq_callback(which, intr);
+	int irqlevel = (mfp_p->ipr & mfp_p->imr) ? HOLD_LINE : CLEAR_LINE;
+
+	if (irqlevel != mfp_p->irqlevel)
+	{
+		mfp_p->intf->irq_callback(which, irqlevel);
+	}
 }
 
-static void mfp68901_poll_gpio(int which)
+INLINE void mfp68901_interrupt(int which, UINT16 mask)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
-	UINT8 gpio = 0, gpold, gpnew;
+	mfp_p->ipr |= mask;
+
+	mfp68901_check_interrupts(which);
+}
+
+static TIMER_CALLBACK( mfp68901_gpio_poll_tick )
+{
+	mfp_68901 *mfp_p = &mfp[param];
+
+	UINT8 gpio = mfp_p->intf->gpio_r(0);
+
+	UINT8 gpold = (mfp_p->gpip & ~mfp_p->ddr) ^ mfp_p->aer;
+	UINT8 gpnew = (gpio & ~mfp_p->ddr) ^ mfp_p->aer;
+
 	int bit;
-
-	if (mfp_p->intf->gpio_r)
-	{
-		gpio = mfp_p->intf->gpio_r(0); // read the state of GPIO the pins from the driver
-	}
-
-	gpold = (mfp_p->gpip & ~mfp_p->ddr) ^ mfp_p->aer;
-	gpnew = (gpio & ~mfp_p->ddr) ^ mfp_p->aer;
 
 	for (bit = 0; bit < 8; bit++) // loop thru each bit from 0 to 7
 	{
 		if ((BIT(gpold, bit) == 1) && (BIT(gpnew, bit) == 0)) // if transition from 1 to 0 is detected...
 		{
-			logerror("MFP68901 #%u Edge Transition Detected on GPIO%u\n", which, bit);
+			logerror("MFP68901 #%u Edge Transition Detected on GPIO%u\n", param, bit);
 
 			if (mfp_p->ier & MFP68901_INT_MASK_GPIO[bit]) // AND interrupt enabled bit is set...
 			{
-				logerror("MFP68901 #%u Interrupt Pending for GPIO%u\n", which, bit);
+				logerror("MFP68901 #%u Interrupt Pending for GPIO%u\n", param, bit);
 
-				mfp_p->ipr |= MFP68901_INT_MASK_GPIO[bit]; // set interrupt pending bit
+				mfp68901_interrupt(param, MFP68901_INT_MASK_GPIO[bit]); // set interrupt pending bit
 			}
 		}
 	}
@@ -133,31 +140,25 @@ static void mfp68901_poll_gpio(int which)
 	mfp_p->gpip = (gpio & ~mfp_p->ddr) | (mfp_p->gpip & mfp_p->ddr);
 }
 
-static TIMER_CALLBACK( mfp68901_tick )
-{
-	mfp68901_poll_gpio(param);
-	mfp68901_check_interrupts(param);
-}
-
 /* USART */
 
-static void mfp68901_rx_buffer_full(int which)
+INLINE void mfp68901_rx_buffer_full(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
 	if (mfp_p->ier & MFP68901_IR_RCV_BUFFER_FULL)
 	{
-		mfp_p->ipr |= MFP68901_IR_RCV_BUFFER_FULL;
+		mfp68901_interrupt(which, MFP68901_IR_RCV_BUFFER_FULL);
 	}
 }
 
-static void mfp68901_rx_error(int which)
+INLINE void mfp68901_rx_error(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
 	if (mfp_p->ier & MFP68901_IR_RCV_ERROR)
 	{
-		mfp_p->ipr |= MFP68901_IR_RCV_ERROR;
+		mfp68901_interrupt(which, MFP68901_IR_RCV_ERROR);
 	}
 	else
 	{
@@ -165,23 +166,23 @@ static void mfp68901_rx_error(int which)
 	}
 }
 
-static void mfp68901_tx_buffer_empty(int which)
+INLINE void mfp68901_tx_buffer_empty(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
 	if (mfp_p->ier & MFP68901_IR_XMIT_BUFFER_EMPTY)
 	{
-		mfp_p->ipr |= MFP68901_IR_XMIT_BUFFER_EMPTY;
+		mfp68901_interrupt(which, MFP68901_IR_XMIT_BUFFER_EMPTY);
 	}
 }
 
-static void mfp68901_tx_error(int which)
+INLINE void mfp68901_tx_error(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
 	if (mfp_p->ier & MFP68901_IR_XMIT_ERROR)
 	{
-		mfp_p->ipr |= MFP68901_IR_XMIT_ERROR;
+		mfp68901_interrupt(which, MFP68901_IR_XMIT_ERROR);
 	}
 	else
 	{
@@ -189,7 +190,7 @@ static void mfp68901_tx_error(int which)
 	}
 }
 
-static int mfp68901_parity(UINT8 b)
+INLINE int mfp68901_parity(UINT8 b)
 {
 	b ^= b >> 4;
 	b ^= b >> 2;
@@ -197,9 +198,9 @@ static int mfp68901_parity(UINT8 b)
 	return b & 1;
 }
 
-static TIMER_CALLBACK( rx_tick )
+INLINE void mfp68901_serial_rx(int which)
 {
-	mfp_68901 *mfp_p = &mfp[param];
+	mfp_68901 *mfp_p = &mfp[which];
 
 	if (mfp_p->rsr & MFP68901_RSR_RCV_ENABLE)
 	{
@@ -274,7 +275,7 @@ static TIMER_CALLBACK( rx_tick )
 							// incoming word received and receive buffer is empty
 							mfp_p->rsr |= MFP68901_RSR_BUFFER_FULL;
 							mfp_p->udr = mfp_p->rx_buffer;
-							mfp68901_rx_buffer_full(param);
+							mfp68901_rx_buffer_full(which);
 						}
 					}
 				}
@@ -294,7 +295,12 @@ static TIMER_CALLBACK( rx_tick )
 	}
 }
 
-static void mfp68901_transmit_disabled(int which)
+static TIMER_CALLBACK( rx_tick )
+{
+	mfp68901_serial_rx(param);
+}
+
+INLINE void mfp68901_transmit_disabled(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -313,7 +319,7 @@ static void mfp68901_transmit_disabled(int which)
 	}
 }
 
-static void mfp68901_transmit(int which)
+INLINE void mfp68901_transmit(int which)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -419,14 +425,14 @@ static void mfp68901_transmit(int which)
 	}
 }
 
-static TIMER_CALLBACK( tx_tick )
+INLINE void mfp68901_serial_tx(int which)
 {
-	mfp_68901 *mfp_p = &mfp[param];
+	mfp_68901 *mfp_p = &mfp[which];
 
 	switch (mfp_p->xmit_state)
 	{
 	case MFP68901_XMIT_OFF:
-		mfp68901_transmit_disabled(param);
+		mfp68901_transmit_disabled(which);
 		break;
 
 	case MFP68901_XMIT_STARTING:
@@ -462,9 +468,14 @@ static TIMER_CALLBACK( tx_tick )
 		break;
 
 	case MFP68901_XMIT_ON:
-		mfp68901_transmit(param);
+		mfp68901_transmit(which);
 		break;
 	}
+}
+
+static TIMER_CALLBACK( tx_tick )
+{
+	mfp68901_serial_tx(param);
 }
 
 static UINT8 mfp68901_register_r(int which, int reg)
@@ -976,7 +987,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 	}
 }
 
-void mfp68901_timer_count(int which, int index)
+INLINE void mfp68901_timer_count(int which, int index)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
@@ -988,12 +999,12 @@ void mfp68901_timer_count(int which, int index)
 		{
 			if (mfp_p->intf->rx_clock == MFP68901_LOOPBACK_TIMER[index])
 			{
-				timer_adjust(mfp_p->rx_timer, attotime_zero, which, attotime_never);
+				mfp68901_serial_rx(which);
 			}
 
 			if (mfp_p->intf->tx_clock == MFP68901_LOOPBACK_TIMER[index])
 			{
-				timer_adjust(mfp_p->tx_timer, attotime_zero, which, attotime_never);
+				mfp68901_serial_tx(which);
 			}
 		}
 
@@ -1004,7 +1015,7 @@ void mfp68901_timer_count(int which, int index)
 
 		if (mfp_p->ier & MFP68901_INT_MASK_TIMER[index])
 		{
-			mfp_p->ipr |= MFP68901_INT_MASK_TIMER[index];
+			mfp68901_interrupt(which, MFP68901_INT_MASK_TIMER[index]);
 		}
 
 		mfp_p->tmc[index] = mfp_p->tdr[index];
@@ -1015,9 +1026,10 @@ void mfp68901_timer_count(int which, int index)
 	}
 }
 
-void mfp68901_ti_w(int which, int index, int value)
+INLINE void mfp68901_ti_w(int which, int index, int value)
 {
 	mfp_68901 *mfp_p = &mfp[which];
+
 	int bit = MFP68901_GPIO_TIMER[index];
 	int aer = BIT(mfp_p->aer, bit);
 	int cr = index ? mfp_p->tbcr : mfp_p->tacr;
@@ -1040,13 +1052,13 @@ void mfp68901_ti_w(int which, int index, int value)
 	case MFP68901_TCR_TIMER_PULSE_64:
 	case MFP68901_TCR_TIMER_PULSE_100:
 	case MFP68901_TCR_TIMER_PULSE_200:
-		timer_enable(mfp_p->timer[index], (value == aer) ? 1 : 0);
+		timer_enable(mfp_p->timer[index], (value == aer));
 
 		if (((mfp_p->ti[index] ^ aer) == 0) && ((value ^ aer) == 1))
 		{
 			if (mfp_p->ier & MFP68901_INT_MASK_GPIO[bit])
 			{
-				mfp_p->ipr |= MFP68901_INT_MASK_GPIO[bit];
+				mfp68901_interrupt(which, MFP68901_INT_MASK_GPIO[bit]);
 			}
 		}
 
@@ -1103,7 +1115,6 @@ int mfp68901_get_vector(int which)
 			}
 
 			mfp_p->ipr &= ~(1 << ch);
-
 			mfp68901_check_interrupts(which);
 
 			return (mfp_p->vr & 0xf0) | ch;
@@ -1139,10 +1150,9 @@ void mfp68901_config(int which, const mfp68901_interface *intf)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
-	if (which >= MAX_MFP)
-	{
-		return;
-	}
+	assert(which < MAX_MFP);
+
+	// initial settings
 
 	memset(mfp_p, 0, sizeof(mfp));
 
@@ -1150,27 +1160,35 @@ void mfp68901_config(int which, const mfp68901_interface *intf)
 
 	mfp_p->intf = intf;
 
+	// counter timers
+
 	mfp_p->timer[MFP68901_TIMER_A] = timer_alloc(timer_a);
 	mfp_p->timer[MFP68901_TIMER_B] = timer_alloc(timer_b);
 	mfp_p->timer[MFP68901_TIMER_C] = timer_alloc(timer_c);
 	mfp_p->timer[MFP68901_TIMER_D] = timer_alloc(timer_d);
 
-	mfp_p->rx_timer = timer_alloc(rx_tick);
-	
+	// serial receive timer
+
 	if (mfp_p->intf->rx_clock > 0)
 	{
-		timer_adjust(mfp_p->rx_timer, attotime_zero, which, ATTOTIME_IN_HZ(mfp_p->intf->rx_clock));
+		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->rx_clock), which, rx_tick);
 	}
 	
-	mfp_p->tx_timer = timer_alloc(tx_tick);
+	// serial transmit timer
 
 	if (mfp_p->intf->tx_clock > 0)
 	{
-		timer_adjust(mfp_p->tx_timer, attotime_zero, which, ATTOTIME_IN_HZ(mfp_p->intf->tx_clock));
+		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->tx_clock), which, tx_tick);
 	}
 
-	mfp_p->irq_timer = timer_alloc(mfp68901_tick);
-	timer_adjust(mfp_p->irq_timer, attotime_zero, which, ATTOTIME_IN_HZ(mfp_p->intf->chip_clock / 4));
+	// general purpose I/O poll timer
+
+	if (mfp_p->intf->gpio_r)
+	{
+		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->chip_clock / 4), which, mfp68901_gpio_poll_tick);
+	}
+
+	// save state support
 
 	state_save_register_item("mfp68901", which, mfp_p->gpip);
 	state_save_register_item("mfp68901", which, mfp_p->aer);
@@ -1206,6 +1224,7 @@ void mfp68901_config(int which, const mfp68901_interface *intf)
 	state_save_register_item("mfp68901", which, mfp_p->rxtx_stop);
 	state_save_register_item("mfp68901", which, mfp_p->rsr_read);
 	state_save_register_item("mfp68901", which, mfp_p->next_rsr);
+	state_save_register_item("mfp68901", which, mfp_p->irqlevel);
 }
 
 /* Read/Write Handlers */
