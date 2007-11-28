@@ -56,7 +56,7 @@ pen_t INLINE atarist_shift_mode_1(void)
 	shifter.rr[1] <<= 1;
 	shifter.shift++;
 
-	if (shifter.shift == 15)
+	if (shifter.shift == 16)
 	{
 		shifter.rr[0] = shifter.rr[2];
 		shifter.rr[1] = shifter.rr[3];
@@ -69,8 +69,34 @@ pen_t INLINE atarist_shift_mode_1(void)
 
 pen_t INLINE atarist_shift_mode_2(void)
 {
-	// not implemented
-	return Machine->pens[0];
+	int color = BIT(shifter.rr[0], 15);
+
+	shifter.rr[0] <<= 1;
+	shifter.shift++;
+
+	switch (shifter.shift)
+	{
+	case 16:
+		shifter.rr[0] = shifter.rr[1];
+		shifter.rr[1] = shifter.rr[2];
+		shifter.rr[2] = shifter.rr[3];
+		shifter.rr[3] = 0;
+		break;
+
+	case 32:
+		shifter.rr[0] = shifter.rr[1];
+		shifter.rr[1] = shifter.rr[2];
+		shifter.rr[2] = 0;
+		break;
+
+	case 48:
+		shifter.rr[0] = shifter.rr[1];
+		shifter.rr[1] = 0;
+		shifter.shift = 0;
+		break;
+	}
+
+	return Machine->pens[color];
 }
 
 static TIMER_CALLBACK(atarist_shifter_tick)
