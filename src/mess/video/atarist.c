@@ -120,6 +120,10 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 	case 2:
 		pen = atarist_shift_mode_2();
 		break;
+
+	default:
+		pen = get_black_pen(machine);
+		break;
 	}
 
 	*BITMAP_ADDR32(tmpbitmap, y, x) = pen;
