@@ -301,6 +301,16 @@ MACHINE_RESET( gbpocket )
 	gb_sound_w(0x15,0xF3);
 	gb_sound_w(0x14,0x77);
 
+	/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
+	{
+		int i;
+		for( i = 1; i < 0x0D; i++ ) {
+			gb_vram[ 0x1903 + i ] = i;
+			gb_vram[ 0x1923 + i ] = i + 0x0C;
+		}
+		gb_vram[ 0x1910 ] = 0x19;
+	}
+
 	/* Enable BIOS rom if we have one */
 	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
