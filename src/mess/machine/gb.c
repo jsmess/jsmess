@@ -309,6 +309,8 @@ MACHINE_RESET( gbpocket )
 			gb_vram[ 0x1923 + i ] = i + 0x0C;
 		}
 		gb_vram[ 0x1910 ] = 0x19;
+
+		cpunum_set_input_line( 0, VBL_INT, ASSERT_LINE );
 	}
 
 	/* Enable BIOS rom if we have one */
@@ -362,6 +364,11 @@ MACHINE_RESET( gbc )
 		gbc_mode = GBC_MODE_GBC;
 	else
 		gbc_mode = GBC_MODE_MONO;
+
+	/* Extra initialization to get the state after running the bios */
+	{
+		cpunum_set_input_line( 0, VBL_INT, ASSERT_LINE );
+	}
 }
 
 static void gb_machine_stop(running_machine *machine)
