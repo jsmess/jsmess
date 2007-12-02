@@ -462,7 +462,7 @@ endif
 # include files which define additional targets
 #-------------------------------------------------
 
-all: maketree buildtools emulator tools help
+all: maketree buildtools emulator tools
 
 
 
