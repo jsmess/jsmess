@@ -136,7 +136,7 @@ void tms9902_init(int which, const tms9902reset_param *param)
 	tms9902[which].brk_callback = param->brk_callback;
 	tms9902[which].xmit_callback = param->xmit_callback;
 
-	tms9902[which].timer = timer_alloc(decrementer_callback);
+	tms9902[which].timer = timer_alloc(decrementer_callback, NULL);
 
 	reset(which);
 }

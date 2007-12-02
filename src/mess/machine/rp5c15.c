@@ -135,7 +135,7 @@ void rp5c15_init(struct rp5c15_interface* intf)
 	rtc.test = 0x00;
 	rtc.pulse_count = 0;
 	
-	rtc_timer = timer_alloc(rtc_alarm_pulse);
+	rtc_timer = timer_alloc(rtc_alarm_pulse, NULL);
 	timer_adjust(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
 }
 

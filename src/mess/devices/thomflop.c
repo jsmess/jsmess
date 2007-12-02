@@ -1036,7 +1036,7 @@ static int thmfc_floppy_find_sector ( chrn_id* dst )
 
 
 /* complete command (by read, write, or timeout) */
-static TIMER_CALLBACK( thmfc_floppy_cmd_complete_cb )
+static void thmfc_floppy_cmd_complete(void)
 {
 	LOG (( "%f thmfc_floppy_cmd_complete_cb: cmd=%i off=%i/%i/%i\n", 
 	       attotime_to_double(timer_get_time()), thmfc1->op, thmfc1->data_idx, 
@@ -1057,6 +1057,13 @@ static TIMER_CALLBACK( thmfc_floppy_cmd_complete_cb )
 
 
 
+static TIMER_CALLBACK( thmfc_floppy_cmd_complete_cb )
+{
+	thmfc_floppy_cmd_complete();
+}
+
+
+
 /* intelligent read: show just one field, skip header */
 static UINT8 thmfc_floppy_read_byte ( void )
 {
@@ -1068,7 +1075,7 @@ static UINT8 thmfc_floppy_read_byte ( void )
 	       data ));
   
 	if ( thmfc1->data_idx >= thmfc1->data_size - 1 )
-		thmfc_floppy_cmd_complete_cb( Machine, 0 );
+		thmfc_floppy_cmd_complete();
 	else 
 		thmfc1->data_idx++;
 
@@ -1216,7 +1223,7 @@ static void thmfc_floppy_write_byte ( UINT8 data )
 	thmfc1->data_raw_size = 0;
 	thmfc1->data[ thmfc1->data_idx ] = data;
 	if ( thmfc1->data_idx >= thmfc1->data_size - 1 )
-		thmfc_floppy_cmd_complete_cb( Machine, 0 );
+		thmfc_floppy_cmd_complete();
 	else 
 		thmfc1->data_idx++;
 }
@@ -1565,7 +1572,7 @@ void thmfc_floppy_init( void )
 	thmfc1 = auto_malloc( sizeof( *thmfc1 ) );
 	assert( thmfc1 );
 
-	thmfc_floppy_cmd = timer_alloc( thmfc_floppy_cmd_complete_cb );
+	thmfc_floppy_cmd = timer_alloc( thmfc_floppy_cmd_complete_cb, NULL );
 
 	state_save_register_global( thmfc1->op );
 	state_save_register_global( thmfc1->sector );
@@ -1611,21 +1618,21 @@ static TIMER_CALLBACK( ans3 )
 {
 	LOG(( "%f ans3\n", attotime_to_double(timer_get_time()) ));
 	mc6854_set_cts( 1 );
-	timer_set(  ATTOTIME_IN_USEC( 100 ), 0, ans4 );
+	timer_set(  ATTOTIME_IN_USEC( 100 ), NULL, 0, ans4 );
 }
 
 static TIMER_CALLBACK( ans2 )
 {
 	LOG(( "%f ans2\n", attotime_to_double(timer_get_time()) ));
 	mc6854_set_cts( 0 );
-	timer_set(  ATTOTIME_IN_USEC( 100 ), 0, ans3 );
+	timer_set(  ATTOTIME_IN_USEC( 100 ), NULL, 0, ans3 );
 }
 
 static TIMER_CALLBACK( ans )
 {
 	LOG(( "%f ans\n", attotime_to_double(timer_get_time()) ));
 	mc6854_set_cts( 1 );
-	timer_set(  ATTOTIME_IN_USEC( 100 ), 0, ans2 );
+	timer_set(  ATTOTIME_IN_USEC( 100 ), NULL, 0, ans2 );
 }
 /* consigne DKBOOT
 
@@ -1667,7 +1674,7 @@ static void to7_network_got_frame( UINT8* data, int length )
 	if ( data[1] == 0xff ) 
 	{
 		LOG(( "to7_network_got_frame: %i phones %i\n", data[2], data[0] ));
-		timer_set(  ATTOTIME_IN_USEC( 100 ), 0, ans  );
+		timer_set(  ATTOTIME_IN_USEC( 100 ), NULL, 0, ans  );
 		mc6854_set_cts( 0 );
 	}
 	else if ( ! data[1] ) 

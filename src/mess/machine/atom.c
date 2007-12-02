@@ -251,7 +251,7 @@ MACHINE_RESET( atom )
 	via_reset();
 
 	timer_state = 0;
-	timer_pulse(ATTOTIME_IN_HZ(2400*2), 0, atom_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(2400*2), NULL, 0, atom_timer_callback);
 
 	memory_set_opbase_handler(0,atom_opbase_handler);
 }

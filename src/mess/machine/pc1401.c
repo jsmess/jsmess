@@ -292,7 +292,7 @@ DRIVER_INIT( pc1401 )
 #endif
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	timer_set(ATTOTIME_IN_SEC(1), 0, pc1401_power_up);
+	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1401_power_up);
 
 	if (RAM10K)
 	{

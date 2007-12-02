@@ -506,20 +506,20 @@ static TIMER_CALLBACK( update_nmi32 )
 
 static MACHINE_START( glasgow )
 {
-  key_selector=0;
-  irq_flag=0;
-  lcd_shift_counter=3;
-	timer_pulse(ATTOTIME_IN_HZ(50), 0, update_nmi);
-  beep_set_frequency(0, 44);
+	key_selector=0;
+	irq_flag=0;
+	lcd_shift_counter=3;
+	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, update_nmi);
+	beep_set_frequency(0, 44);
 }
 
 
 static MACHINE_START( dallas32 )
 {
-  lcd_shift_counter=3;
+	lcd_shift_counter=3;
 
-	timer_pulse(ATTOTIME_IN_HZ(50), 0, update_nmi32);
-  beep_set_frequency(0, 44);
+	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, update_nmi32);
+	beep_set_frequency(0, 44);
 }
 
 
@@ -907,13 +907,13 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR, NAME,     PARENT,   BIOS, COMPAT MACHINE,INPUT,          INIT,     CONFIG, COMPANY,                      FULLNAME,                 FLAGS */
-CONS(  1984, glasgow,  0,        0,    glasgow,       old_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", 0)
-CONS(  1984, amsterd,  0,        0,    amsterd,       new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Amsterdam",     0)
-CONS(  1984, dallas,   0,        0,    glasgow,       old_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas",        0)
-CONS(  1984, roma,     0,        0,    glasgow,       new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma",          0)
-CONS(  1984, dallas32, 0,        0,    dallas32,      new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas 32 Bit", 0)
-CONS(  1984, roma32,   0,        0,    dallas32,      new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma 32 Bit",   0)
-CONS(  1984, dallas16, 0,        0,    amsterd,       new_keyboard,   NULL,     NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas 16 Bit", 0)
+CONS(  1984, glasgow,  0,        0,    glasgow,       old_keyboard,   0,		NULL,   "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", 0)
+CONS(  1984, amsterd,  0,        0,    amsterd,       new_keyboard,   0,		NULL,   "Hegener & Glaser Muenchen",  "Mephisto Amsterdam",     0)
+CONS(  1984, dallas,   0,        0,    glasgow,       old_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas",        0)
+CONS(  1984, roma,     0,        0,    glasgow,       new_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma",          0)
+CONS(  1984, dallas32, 0,        0,    dallas32,      new_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas 32 Bit", 0)
+CONS(  1984, roma32,   0,        0,    dallas32,      new_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma 32 Bit",   0)
+CONS(  1984, dallas16, 0,        0,    amsterd,       new_keyboard,   0,		NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas 16 Bit", 0)
 
 
 

@@ -205,11 +205,11 @@ void mfp_init()
 	sys.mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
 	sys.mfp.current_irq = -1;  // No current interrupt
 
-/*	mfp_timer[0] = timer_alloc(mfp_timer_a_callback);
-	mfp_timer[1] = timer_alloc(mfp_timer_b_callback);
-	mfp_timer[2] = timer_alloc(mfp_timer_c_callback);
-	mfp_timer[3] = timer_alloc(mfp_timer_d_callback);
-	mfp_irq = timer_alloc(mfp_update_irq);
+/*	mfp_timer[0] = timer_alloc(mfp_timer_a_callback, NULL);
+	mfp_timer[1] = timer_alloc(mfp_timer_b_callback, NULL);
+	mfp_timer[2] = timer_alloc(mfp_timer_c_callback, NULL);
+	mfp_timer[3] = timer_alloc(mfp_timer_d_callback, NULL);
+	mfp_irq = timer_alloc(mfp_update_irq, NULL);
 	timer_adjust(mfp_irq, attotime_zero, 0, ATTOTIME_IN_USEC(32));
 */
 }
@@ -1329,7 +1329,7 @@ READ16_HANDLER( x68k_exp_r )
 		offset *= 2;
 		if(ACCESSING_LSB)
 			offset++;
-		timer_set(ATTOTIME_IN_CYCLES(16,0),0xeafa00+offset,x68k_fake_bus_error);
+		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
 //		cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
 	}
 	return 0xffff;
@@ -1345,7 +1345,7 @@ WRITE16_HANDLER( x68k_exp_w )
 		offset *= 2;
 		if(ACCESSING_LSB)
 			offset++;
-		timer_set(ATTOTIME_IN_CYCLES(16,0),0xeafa00+offset,x68k_fake_bus_error);
+		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
 //		cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
 	}
 }
@@ -1963,11 +1963,11 @@ DRIVER_INIT( x68000 )
 	// init keyboard
 	sys.keyboard.delay = 500;  // 3*100+200 
 	sys.keyboard.repeat = 110;  // 4^2*5+30
-	kb_timer = timer_alloc(x68k_keyboard_poll);
-	scanline_timer = timer_alloc(x68k_hsync);
-	raster_irq = timer_alloc(x68k_crtc_raster_irq);
-	vblank_irq = timer_alloc(x68k_crtc_vblank_irq);
-	mouse_timer = timer_alloc(x68k_scc_ack);
+	kb_timer = timer_alloc(x68k_keyboard_poll, NULL);
+	scanline_timer = timer_alloc(x68k_hsync, NULL);
+	raster_irq = timer_alloc(x68k_crtc_raster_irq, NULL);
+	vblank_irq = timer_alloc(x68k_crtc_vblank_irq, NULL);
+	mouse_timer = timer_alloc(x68k_scc_ack, NULL);
 }
 
 

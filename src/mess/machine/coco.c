@@ -869,13 +869,13 @@ static TIMER_CALLBACK(coco3_recalc_interrupts)
 	coco3_recalc_irq();
 }
 
-static void (*recalc_interrupts)(running_machine *machine, int dummy);
+static timer_callback recalc_interrupts;
 
 void coco_set_halt_line(int halt_line)
 {
 	cpunum_set_input_line(0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
-		timer_set(ATTOTIME_IN_CYCLES(1,0), 0, recalc_interrupts);
+		timer_set(ATTOTIME_IN_CYCLES(1,0), NULL, 0, recalc_interrupts);
 }
 
 
@@ -2060,7 +2060,7 @@ static TIMER_CALLBACK(coco3_timer_proc)
 
 static void coco3_timer_init(void)
 {
-	coco3_gime_timer = timer_alloc(coco3_timer_proc);
+	coco3_gime_timer = timer_alloc(coco3_timer_proc, NULL);
 }
 
 
@@ -2563,17 +2563,27 @@ WRITE8_HANDLER(coco3_cartridge_w)
 
 
 /*-------------------------------------------------
-    coco_cart_timer_proc - call for CART line
+    coco_cart_timer_w - call for CART line
 -------------------------------------------------*/
 
-static TIMER_CALLBACK(coco_cart_timer_proc)
+static void coco_cart_timer_w(running_machine *machine, int data)
 {
-	int data = param;
 	pia_1_cb1_w(0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* special code for Q state */
 	if ((data == 0x02) || (data == 0x03) || (data == 0x04))
 		timer_adjust(cart_timer, ATTOTIME_IN_USEC(0), data + 1, attotime_zero);
+}
+
+
+
+/*-------------------------------------------------
+    coco_cart_timer_proc - call for CART line
+-------------------------------------------------*/
+
+static TIMER_CALLBACK(coco_cart_timer_proc)
+{
+	coco_cart_timer_w(machine, param);
 }
 
 
@@ -2587,7 +2597,7 @@ static TIMER_CALLBACK(coco3_cart_timer_proc)
 {
 	int data = param;
 	coco3_raise_interrupt(COCO3_INT_EI0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-	coco_cart_timer_proc(machine, data);
+	coco_cart_timer_w(machine, data);
 }
 
 
@@ -2721,9 +2731,9 @@ typedef struct _machine_init_interface machine_init_interface;
 struct _machine_init_interface
 {
 	const pia6821_interface *piaintf;			/* PIA initializer */
-	void (*recalc_interrupts_)(running_machine *machine, int dummy);		/* recalculate inturrupts callback */
+	timer_callback recalc_interrupts_;			/* recalculate inturrupts callback */
 	void (*printer_out_)(int data);				/* printer output callback */
-	void (*cart_timer_proc)(running_machine *machine, int data);			/* cartridge timer proc */
+	timer_callback cart_timer_proc;				/* cartridge timer proc */
 	const char *fdc_cart_hardware;				/* normal cartridge hardware */
 	void (*map_memory)(coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
 };
@@ -2753,11 +2763,11 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	recalc_interrupts = init->recalc_interrupts_;
 
 	/* this timer is used to schedule keyboard updating */
-	update_keyboard_timer = timer_alloc(coco_update_keyboard_timerproc);
+	update_keyboard_timer = timer_alloc(coco_update_keyboard_timerproc, NULL);
 	
 	/* these are the timers to delay the MUX switching */
-	mux_sel1_timer = timer_alloc(coco_update_sel1_timerproc);
-	mux_sel2_timer = timer_alloc(coco_update_sel2_timerproc);
+	mux_sel1_timer = timer_alloc(coco_update_sel1_timerproc, NULL);
+	mux_sel2_timer = timer_alloc(coco_update_sel2_timerproc, NULL);
 
 	/* setup ROM */
 	coco_rom = memory_region(REGION_CPU1);
@@ -2777,9 +2787,9 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	pia_reset();
 
 	/* cartridge line timers */
-	cart_timer = timer_alloc(init->cart_timer_proc);
-	nmi_timer = timer_alloc(nmi_timer_proc);
-	halt_timer = timer_alloc(halt_timer_proc);
+	cart_timer = timer_alloc(init->cart_timer_proc, NULL);
+	nmi_timer = timer_alloc(nmi_timer_proc, NULL);
+	halt_timer = timer_alloc(halt_timer_proc, NULL);
 
 	/* determine which cartridge hardware we should be using */
 	cart_image = cartslot_image();

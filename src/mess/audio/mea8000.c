@@ -663,7 +663,7 @@ void mea8000_config ( int channel, write8_handler req_out_func )
 	mea8000_init_tables();
 	mea8000.channel = channel;
 	mea8000.req_out_func = req_out_func;
-	mea8000.timer = timer_alloc( mea8000_timer_expire );
+	mea8000.timer = timer_alloc( mea8000_timer_expire , NULL);
 
 	state_save_register_item( "mea8000", 0, mea8000.state );
 	state_save_register_item_array( "mea8000", 0, mea8000.buf );

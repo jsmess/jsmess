@@ -1162,30 +1162,30 @@ void mfp68901_config(int which, const mfp68901_interface *intf)
 
 	// counter timers
 
-	mfp_p->timer[MFP68901_TIMER_A] = timer_alloc(timer_a);
-	mfp_p->timer[MFP68901_TIMER_B] = timer_alloc(timer_b);
-	mfp_p->timer[MFP68901_TIMER_C] = timer_alloc(timer_c);
-	mfp_p->timer[MFP68901_TIMER_D] = timer_alloc(timer_d);
+	mfp_p->timer[MFP68901_TIMER_A] = timer_alloc(timer_a, NULL);
+	mfp_p->timer[MFP68901_TIMER_B] = timer_alloc(timer_b, NULL);
+	mfp_p->timer[MFP68901_TIMER_C] = timer_alloc(timer_c, NULL);
+	mfp_p->timer[MFP68901_TIMER_D] = timer_alloc(timer_d, NULL);
 
 	// serial receive timer
 
 	if (mfp_p->intf->rx_clock > 0)
 	{
-		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->rx_clock), which, rx_tick);
+		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->rx_clock), NULL, which, rx_tick);
 	}
 	
 	// serial transmit timer
 
 	if (mfp_p->intf->tx_clock > 0)
 	{
-		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->tx_clock), which, tx_tick);
+		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->tx_clock), NULL, which, tx_tick);
 	}
 
 	// general purpose I/O poll timer
 
 	if (mfp_p->intf->gpio_r)
 	{
-		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->chip_clock / 4), which, mfp68901_gpio_poll_tick);
+		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->chip_clock / 4), NULL, which, mfp68901_gpio_poll_tick);
 	}
 
 	// save state support

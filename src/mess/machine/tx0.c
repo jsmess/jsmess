@@ -166,10 +166,10 @@ MACHINE_START( tx0 )
 {
 	memory_set_opbase_handler(0, setOPbasefunc);;
 
-	tape_reader.timer = timer_alloc(reader_callback);
-	tape_puncher.timer = timer_alloc(puncher_callback);
-	typewriter.prt_timer = timer_alloc(prt_callback);
-	dis_timer = timer_alloc(dis_callback);
+	tape_reader.timer = timer_alloc(reader_callback, NULL);
+	tape_puncher.timer = timer_alloc(puncher_callback, NULL);
+	typewriter.prt_timer = timer_alloc(prt_callback, NULL);
+	dis_timer = timer_alloc(dis_callback, NULL);
 
 	add_reset_callback(machine, tx0_machine_reset);
 	add_exit_callback(machine, tx0_machine_stop);

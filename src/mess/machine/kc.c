@@ -231,7 +231,7 @@ static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 
 static void kc_disc_interface_init(void)
 {
-	timer_set(attotime_zero, 0, kc85_disk_reset_timer_callback);
+	timer_set(attotime_zero, NULL, 0, kc85_disk_reset_timer_callback);
 
 	nec765_init(&kc_fdc_interface,NEC765A);
 
@@ -410,7 +410,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 
 static void	kc_cassette_init(void)
 {
-	kc_cassette_timer = timer_alloc(kc_cassette_timer_callback);
+	kc_cassette_timer = timer_alloc(kc_cassette_timer_callback, NULL);
 }
 
 static void	kc_cassette_set_motor(int motor_state)
@@ -902,10 +902,10 @@ static void kc_keyboard_init(void)
 	keyboard_data.head = (keyboard_data.tail = 0);
 
 	/* 50hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
-	timer_pulse(ATTOTIME_IN_HZ(50), 0, kc_keyboard_update);
+	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, kc_keyboard_update);
 
 	/* timer to transmit pulses to kc base unit */
-	timer_pulse(ATTOTIME_IN_USEC(1024), 0, kc_keyboard_transmit_timer_callback);
+	timer_pulse(ATTOTIME_IN_USEC(1024), NULL, 0, kc_keyboard_transmit_timer_callback);
 
 	/* kc keyboard is not transmitting */
 	keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_IDLE;
@@ -1891,8 +1891,8 @@ static void	kc85_common_init(void)
 	kc85_50hz_state = 0;
 	kc85_15khz_state = 0;
 	kc85_15khz_count = 0;
-	timer_pulse(ATTOTIME_IN_HZ(15625), 0, kc85_15khz_timer_callback);
-	timer_set(attotime_zero, 0, kc85_reset_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(15625), NULL, 0, kc85_15khz_timer_callback);
+	timer_set(attotime_zero, NULL, 0, kc85_reset_timer_callback);
 	kc85_module_system_init();
 }
 

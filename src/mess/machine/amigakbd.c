@@ -112,7 +112,7 @@ void amigakbd_init( void )
 	key_buf = auto_malloc( KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;
 	key_cur_pos = 0;
-	kbd_timer = timer_alloc(kbd_update_callback);
+	kbd_timer = timer_alloc(kbd_update_callback, NULL);
 	timer_reset( kbd_timer, attotime_never );
 }
 

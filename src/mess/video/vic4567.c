@@ -786,7 +786,7 @@ INTERRUPT_GEN( vic3_raster_irq )
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer starten */
-			timer_set (attotime_make(0, 0), 1, vic2_timer_timeout);
+			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 		//state_display(vic2.bitmap);
 	}

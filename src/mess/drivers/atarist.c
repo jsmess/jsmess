@@ -1597,8 +1597,8 @@ static MACHINE_START( atariste )
 
 	cpunum_set_irq_callback(0, atarist_int_ack);
 
-	dmasound_timer = timer_alloc(atariste_dmasound_tick);
-	microwire_timer = timer_alloc(atariste_microwire_tick);
+	dmasound_timer = timer_alloc(atariste_dmasound_tick, NULL);
+	microwire_timer = timer_alloc(atariste_microwire_tick, NULL);
 }
 
 static MACHINE_START( megaste )

@@ -370,7 +370,7 @@ void ti99_fdc_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = timer_alloc(motor_on_timer_callback);
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
 
 	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
 
@@ -635,7 +635,7 @@ void ti99_ccfdc_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = timer_alloc(motor_on_timer_callback);
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
 
 	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
 
@@ -854,7 +854,7 @@ void ti99_bwg_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = timer_alloc(motor_on_timer_callback);
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
 
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 
@@ -1248,7 +1248,7 @@ void ti99_hfdc_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = timer_alloc(motor_on_timer_callback);
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
 
 	ti99_peb_set_card_handlers(0x1100, & hfdc_handlers);
 

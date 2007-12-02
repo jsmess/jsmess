@@ -277,7 +277,7 @@ void europc_rtc_init(void)
 	memset(&europc_rtc,0,sizeof(europc_rtc));
 	europc_rtc.data[0xf]=1;
 
-	europc_rtc.timer = timer_alloc(europc_rtc_timer);
+	europc_rtc.timer = timer_alloc(europc_rtc_timer, NULL);
 	timer_adjust(europc_rtc.timer, attotime_zero, 0, attotime_make(1, 0));
 }
 

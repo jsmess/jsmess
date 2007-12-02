@@ -400,8 +400,8 @@ static TIMER_CALLBACK(setup_beep)
 
 static DRIVER_INIT( studio2 )
 {
-	timer_set(attotime_zero, 0, setup_beep);
-	timer_set(ATTOTIME_IN_MSEC(200), 0, set_cpu_mode);
+	timer_set(attotime_zero, NULL, 0, setup_beep);
+	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 }
 
 static int mpt02_colorram_r(UINT16 addr)
@@ -426,7 +426,7 @@ static TIMER_CALLBACK(mpt02_setup_beep)
 
 static DRIVER_INIT( mpt02 )
 {
-	timer_set(attotime_zero, 0, mpt02_setup_beep);
+	timer_set(attotime_zero, NULL, 0, mpt02_setup_beep);
 	cdp1864_configure(&mpt02_CDP1864_interface);
 }
 

@@ -155,40 +155,60 @@ static void tms5501_field_interrupts(int which)
 	}
 }
 
+static void tms5501_timer_0_decrementer(int which)
+{
+	tms5501[which].pending_interrupts |= TMS5501_TIMER_0_INT;
+	tms5501_field_interrupts(which);
+}
+
 static TIMER_CALLBACK(tms5501_timer_0_decrementer_callback)
 {
-	int which = param;
-	tms5501[which].pending_interrupts |= TMS5501_TIMER_0_INT;
+	tms5501_timer_0_decrementer(param);
+}
+
+static void tms5501_timer_1_decrementer(int which)
+{
+	tms5501[which].pending_interrupts |= TMS5501_TIMER_1_INT;
 	tms5501_field_interrupts(which);
 }
 
 static TIMER_CALLBACK(tms5501_timer_1_decrementer_callback)
 {
-	int which = param;
-	tms5501[which].pending_interrupts |= TMS5501_TIMER_1_INT;
+	tms5501_timer_1_decrementer(param);
+}
+
+static void tms5501_timer_2_decrementer(int which)
+{
+	tms5501[which].pending_interrupts |= TMS5501_TIMER_2_INT;
 	tms5501_field_interrupts(which);
 }
 
 static TIMER_CALLBACK(tms5501_timer_2_decrementer_callback)
 {
-	int which = param;
-	tms5501[which].pending_interrupts |= TMS5501_TIMER_2_INT;
+	tms5501_timer_2_decrementer(param);
+}
+
+static void tms5501_timer_3_decrementer(int which)
+{
+	tms5501[which].pending_interrupts |= TMS5501_TIMER_3_INT;
 	tms5501_field_interrupts(which);
 }
 
 static TIMER_CALLBACK(tms5501_timer_3_decrementer_callback)
 {
-	int which = param;
-	tms5501[which].pending_interrupts |= TMS5501_TIMER_3_INT;
+	tms5501_timer_3_decrementer(param);
+}
+
+static void tms5501_timer_4_decrementer(int which)
+{
+	if (!(tms5501[which].command & TMS5501_INT_7_SELECT))
+		tms5501[which].pending_interrupts |= TMS5501_TIMER_4_INT;
 	tms5501_field_interrupts(which);
 }
 
 static TIMER_CALLBACK(tms5501_timer_4_decrementer_callback)
 {
-	int which = param;
-	if (!(tms5501[which].command & TMS5501_INT_7_SELECT))
-		tms5501[which].pending_interrupts |= TMS5501_TIMER_4_INT;
-	tms5501_field_interrupts(which);
+	tms5501_timer_4_decrementer(param);
 }
 
 static void tms5501_timer_reload(int which, int timer)
@@ -201,11 +221,11 @@ static void tms5501_timer_reload(int which, int timer)
 	{	/* clock interval == 0 -> no timer */
 		switch (timer)
 		{
-			case 0: tms5501_timer_0_decrementer_callback(Machine, which); break;
-			case 1: tms5501_timer_1_decrementer_callback(Machine, which); break;
-			case 2: tms5501_timer_2_decrementer_callback(Machine, which); break;
-			case 3: tms5501_timer_3_decrementer_callback(Machine, which); break;
-			case 4: tms5501_timer_4_decrementer_callback(Machine, which); break;
+			case 0: tms5501_timer_0_decrementer(which); break;
+			case 1: tms5501_timer_1_decrementer(which); break;
+			case 2: tms5501_timer_2_decrementer(which); break;
+			case 3: tms5501_timer_3_decrementer(which); break;
+			case 4: tms5501_timer_4_decrementer(which); break;
 		}
 		timer_enable(tms5501[which].timer[timer], 0);
 	}
@@ -232,11 +252,11 @@ static void tms5501_reset (int which)
 void tms5501_init (int which, const tms5501_init_param *param)
 {
 	tms5501[which].clock_rate = param->clock_rate;
-	tms5501[which].timer[0] = timer_alloc(tms5501_timer_0_decrementer_callback);
-	tms5501[which].timer[1] = timer_alloc(tms5501_timer_1_decrementer_callback);
-	tms5501[which].timer[2] = timer_alloc(tms5501_timer_2_decrementer_callback);
-	tms5501[which].timer[3] = timer_alloc(tms5501_timer_3_decrementer_callback);
-	tms5501[which].timer[4] = timer_alloc(tms5501_timer_4_decrementer_callback);
+	tms5501[which].timer[0] = timer_alloc(tms5501_timer_0_decrementer_callback, NULL);
+	tms5501[which].timer[1] = timer_alloc(tms5501_timer_1_decrementer_callback, NULL);
+	tms5501[which].timer[2] = timer_alloc(tms5501_timer_2_decrementer_callback, NULL);
+	tms5501[which].timer[3] = timer_alloc(tms5501_timer_3_decrementer_callback, NULL);
+	tms5501[which].timer[4] = timer_alloc(tms5501_timer_4_decrementer_callback, NULL);
 
 	tms5501[which].pio_read_callback = param->pio_read_callback;
 	tms5501[which].pio_write_callback = param->pio_write_callback;

@@ -74,9 +74,9 @@ static DEVICE_INIT(amiga_fdc)
 	fdc_status[id].dir = 0;
 	fdc_status[id].wprot = 1;
 	fdc_status[id].cyl = 0;
-	fdc_status[id].rev_timer = timer_alloc(fdc_rev_proc);
-	fdc_status[id].dma_timer = timer_alloc(fdc_dma_proc);
-	fdc_status[id].sync_timer = timer_alloc(fdc_sync_proc);
+	fdc_status[id].rev_timer = timer_alloc(fdc_rev_proc, NULL);
+	fdc_status[id].dma_timer = timer_alloc(fdc_dma_proc, NULL);
+	fdc_status[id].sync_timer = timer_alloc(fdc_sync_proc, NULL);
 	fdc_status[id].rev_timer_started = 0;
 	fdc_status[id].cached = -1;
 	fdc_status[id].pos = 0;

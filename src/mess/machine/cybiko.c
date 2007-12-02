@@ -296,7 +296,7 @@ void cybiko_rs232_init( void)
 {
 	_logerror( 0, "cybiko_rs232_init\n");
 	memset( &rs232, 0, sizeof( rs232));
-//	timer_pulse( TIME_IN_HZ( 10), 0, rs232_timer_callback);
+//	timer_pulse( TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
 }
 
 void cybiko_rs232_exit( void)

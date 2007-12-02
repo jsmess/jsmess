@@ -27,7 +27,7 @@ static struct floppy_drive *get_drive(mess_image *img)
 	return image_lookuptag(img, FLOPDRVTAG);
 }
 
-static TIMER_CALLBACK_PTR(floppy_drive_index_callback);
+static TIMER_CALLBACK(floppy_drive_index_callback);
 
 /* this is called on device init */
 int floppy_drive_init(mess_image *img, const floppy_interface *iface)
@@ -44,7 +44,7 @@ int floppy_drive_init(mess_image *img, const floppy_interface *iface)
 	pDrive->flags = 0;
 	pDrive->index_pulse_callback = NULL;
 	pDrive->ready_state_change_callback = NULL;
-	pDrive->index_timer = timer_alloc_ptr(floppy_drive_index_callback, img);
+	pDrive->index_timer = timer_alloc(floppy_drive_index_callback, img);
 	pDrive->index = 0;
 
 	/* all drives are double-sided 80 track - can be overriden in driver! */
@@ -65,9 +65,8 @@ int floppy_drive_init(mess_image *img, const floppy_interface *iface)
 
 
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
-static TIMER_CALLBACK_PTR(floppy_drive_index_callback)
+static void floppy_drive_index_func(mess_image *img)
 {
-	mess_image *img = (mess_image *) param;
 	struct floppy_drive *pDrive = get_drive(img);
 
 	double ms = 1000. / (pDrive->rpm / 60.);
@@ -75,17 +74,26 @@ static TIMER_CALLBACK_PTR(floppy_drive_index_callback)
 	if (pDrive->index)
 	{
 		pDrive->index = 0;
-		timer_adjust_ptr(pDrive->index_timer, double_to_attotime(ms*19/20/1000.0), attotime_zero);
+		timer_adjust(pDrive->index_timer, double_to_attotime(ms*19/20/1000.0), 0, attotime_zero);
 	}
 	else
 	{
 		pDrive->index = 1;
-		timer_adjust_ptr(pDrive->index_timer, double_to_attotime(ms/20/1000.0), attotime_zero);
+		timer_adjust(pDrive->index_timer, double_to_attotime(ms/20/1000.0), 0, attotime_zero);
 	}
 
 	if (pDrive->index_pulse_callback)
 		pDrive->index_pulse_callback(img, pDrive->index);
 }
+
+
+
+static TIMER_CALLBACK(floppy_drive_index_callback)
+{
+	mess_image *image = (mess_image *) ptr;
+	floppy_drive_index_func(image);
+}
+
 
 
 /* set the callback for the index pulse */
@@ -209,12 +217,12 @@ void floppy_drive_set_motor_state(mess_image *img, int state)
 				/* check it's in range */
 
 				/* setup timer to trigger at rpm */
-				floppy_drive_index_callback(Machine, (void*)img);
+				floppy_drive_index_func(img);
 			}
 			else
 			{
 				/* on->off */
-				timer_adjust_ptr(pDrive->index_timer, attotime_zero, attotime_zero);
+				timer_adjust(pDrive->index_timer, attotime_zero, 0, attotime_zero);
 			}
 		}
 	}

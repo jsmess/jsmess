@@ -610,7 +610,7 @@ static void lynx_blitter(void)
     }
 
 	if (0)
-		timer_set(ATTOTIME_IN_CYCLES(blitter.memory_accesses*20,0), 0, lynx_blitter_timer);
+		timer_set(ATTOTIME_IN_CYCLES(blitter.memory_accesses*20,0), NULL, 0, lynx_blitter_timer);
 }
 
 static void lynx_divide(void)
@@ -820,7 +820,7 @@ static TIMER_CALLBACK(lynx_timer_shot);
 static void lynx_timer_init(int which)
 {
 	memset( &lynx_timer[which], 0, sizeof(LYNX_TIMER) );
-	lynx_timer[which].timer = timer_alloc( lynx_timer_shot );
+	lynx_timer[which].timer = timer_alloc( lynx_timer_shot , NULL);
 	lynx_timer[which].settime = 0.0;
 }
 
@@ -983,7 +983,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
     if (uart.buffer_loaded) {
 	uart.data_to_send=uart.buffer;
 	uart.buffer_loaded=FALSE;
-	timer_set(ATTOTIME_IN_USEC(11), 0, lynx_uart_timer);	
+	timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);	
     } else {
 	uart.sending=FALSE;
     }
@@ -1025,7 +1025,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 	} else {
 	    uart.sending=TRUE;
 	    uart.data_to_send=data;
-	    timer_set(ATTOTIME_IN_USEC(11), 0, lynx_uart_timer);
+	    timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
 	}
 	break;
     }

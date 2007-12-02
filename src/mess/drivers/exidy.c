@@ -257,8 +257,8 @@ static void cassette_serial_in(int id, unsigned long state)
 
 static MACHINE_START( exidy )
 {
-	serial_timer = timer_alloc(exidy_serial_timer_callback);
-	cassette_timer = timer_alloc(exidy_cassette_timer_callback);
+	serial_timer = timer_alloc(exidy_serial_timer_callback, NULL);
+	cassette_timer = timer_alloc(exidy_cassette_timer_callback, NULL);
 
 	wd17xx_init(WD_TYPE_179X, NULL, NULL);
 }
@@ -278,7 +278,7 @@ static MACHINE_RESET( exidy )
 	
 	exidy_fe_port_w(0,0);
 
-	timer_set(attotime_zero, 0, exidy_reset_timer_callback);
+	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
 	
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 
@@ -307,7 +307,7 @@ static MACHINE_RESET( exidyd )
 	
 	exidy_fe_port_w(0,0);
 
-	timer_set(attotime_zero, 0, exidy_reset_timer_callback);
+	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
 	
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }

@@ -1231,7 +1231,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
 		activecpu_adjust_icount(-cycles_to_ready);
-		timer_set(attotime_zero, 0, /*speech_kludge_callback*/NULL);
+		timer_set(attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
 
@@ -1594,7 +1594,7 @@ WRITE8_HANDLER ( ti99_8_w )
 							, (int) cycles_to_ready);
 
 						activecpu_adjust_icount(-cycles_to_ready);
-						timer_set(attotime_zero, 0, /*speech_kludge_callback*/NULL);
+						timer_set(attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
 
 					tms5220_data_w(offset, data);
@@ -1742,7 +1742,7 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 		of next message is not requested for either, so we need to decide on
 		our own when we can post a new event.  Currently, we wait for 1000us
 		after the DSR acknowledges the second nybble. */
-		timer_set(ATTOTIME_IN_USEC(1000), 0, ti99_handset_ack_callback);
+		timer_set(ATTOTIME_IN_USEC(1000), NULL, 0, ti99_handset_ack_callback);
 	}
 
 	if (handset_buflen == 0)
@@ -1762,7 +1762,7 @@ static void ti99_handset_set_ack(int offset, int data)
 		handset_ack = data;
 		if (data == handset_clock)
 			/* I don't know what the real delay is, but 30us apears to be enough */
-			timer_set(ATTOTIME_IN_USEC(30), 0, ti99_handset_ack_callback);
+			timer_set(ATTOTIME_IN_USEC(30), NULL, 0, ti99_handset_ack_callback);
 	}
 }
 

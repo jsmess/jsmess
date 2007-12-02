@@ -689,7 +689,7 @@ static TIMER_CALLBACK(set_COPS_ready)
 	COPS_Ready = TRUE;
 
 	/* impulsion width : +/- 20us */
-	timer_set(ATTOTIME_IN_USEC(20), 0, read_COPS_command);
+	timer_set(ATTOTIME_IN_USEC(20), NULL, 0, read_COPS_command);
 }
 
 static void reset_COPS(void)
@@ -753,7 +753,7 @@ static void init_COPS(void)
 	COPS_Ready = FALSE;
 
 	/* read command every ms (don't know the real value) */
-	timer_pulse(ATTOTIME_IN_MSEC(1), 0, set_COPS_ready);
+	timer_pulse(ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);
 
 	reset_COPS();
 }
@@ -1122,7 +1122,7 @@ static void lisa210_set_iwm_enable_lines(int enable_mask)
 
 MACHINE_RESET( lisa )
 {
-	mouse_timer = timer_alloc(handle_mouse);
+	mouse_timer = timer_alloc(handle_mouse, NULL);
 
 	lisa_ram_ptr = memory_region(REGION_CPU1) + RAM_OFFSET;
 	lisa_rom_ptr = memory_region(REGION_CPU1) + ROM_OFFSET;

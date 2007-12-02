@@ -89,12 +89,12 @@ DRIVER_INIT(mz700)
 
 MACHINE_RESET(mz700)
 {
-	ne556_timer[0] = timer_alloc(ne556_callback);
+	ne556_timer[0] = timer_alloc(ne556_callback, NULL);
 	timer_adjust(ne556_timer[0], ATTOTIME_IN_HZ(1.5), 0, ATTOTIME_IN_HZ(1.5));
-	/*timer_pulse(ATTOTIME_IN_HZ(1.5), 0, ne556_callback)*/
-	ne556_timer[1] = timer_alloc(ne556_callback);
+	/*timer_pulse(ATTOTIME_IN_HZ(1.5), NULL, 0, ne556_callback)*/
+	ne556_timer[1] = timer_alloc(ne556_callback, NULL);
 	timer_adjust(ne556_timer[1], ATTOTIME_IN_HZ(34.5), 1, ATTOTIME_IN_HZ(34.5));
-	/*timer_pulse(ATTOTIME_IN_HZ(34.5), 1, ne556_callback)*/
+	/*timer_pulse(ATTOTIME_IN_HZ(34.5), NULL, 1, ne556_callback)*/
 }
 
 

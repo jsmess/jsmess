@@ -1162,17 +1162,17 @@ VIDEO_START ( thom )
 	state_save_register_global( thom_floppy_rcount );
 	output_set_value( "floppy", 0 );
 
-	thom_video_timer = timer_alloc( NULL );
+	thom_video_timer = timer_alloc( NULL , NULL);
 
-	thom_scanline_timer = timer_alloc( thom_scanline_start );
+	thom_scanline_timer = timer_alloc( thom_scanline_start , NULL);
 
 	thom_lightpen_nb = 0;
 	thom_lightpen_cb = NULL;
-	thom_lightpen_timer = timer_alloc( thom_lightpen_step );
+	thom_lightpen_timer = timer_alloc( thom_lightpen_step , NULL);
 	state_save_register_global( thom_lightpen_nb );
 
 	thom_init_cb = NULL;
-	thom_init_timer = timer_alloc( thom_set_init );
+	thom_init_timer = timer_alloc( thom_set_init , NULL);
   
 	video_eof_thom(machine);
 

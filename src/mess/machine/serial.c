@@ -118,7 +118,7 @@ void serial_device_setup(mess_image *image, int baud_rate, int num_data_bits, in
 	serial_devices[id].data_form.word_length = num_data_bits;
 	serial_devices[id].data_form.stop_bit_count = stop_bit_count;
 	serial_devices[id].data_form.parity = parity_code;
-	serial_devices[id].timer = timer_alloc(serial_device_baud_rate_callback);
+	serial_devices[id].timer = timer_alloc(serial_device_baud_rate_callback, NULL);
 
 	serial_connection_init(&serial_devices[id].connection);
 	serial_connection_set_in_callback(&serial_devices[id].connection, serial_device_in_callback);

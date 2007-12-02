@@ -227,7 +227,7 @@ static TIMER_CALLBACK(pc_rtc_timer)
 void pc_rtc_init(void)
 {
 	memset(&pc_rtc,0,sizeof(pc_rtc));
-	pc_rtc.timer = timer_alloc(pc_rtc_timer);
+	pc_rtc.timer = timer_alloc(pc_rtc_timer, NULL);
 	timer_adjust(pc_rtc.timer, attotime_zero, 0, attotime_make(1, 0));
 }
 

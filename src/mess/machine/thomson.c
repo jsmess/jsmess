@@ -1008,7 +1008,7 @@ static void to7_game_init ( void )
 {
 	LOG (( "to7_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &to7_game );
-	to7_game_timer = timer_alloc( to7_game_update_cb );
+	to7_game_timer = timer_alloc( to7_game_update_cb , NULL);
 	timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	state_save_register_global( to7_game_sound );
 	state_save_register_global( to7_game_mute );
@@ -1930,7 +1930,7 @@ MACHINE_START ( mo5 )
 	to7_modem_init();
 	to7_midi_init();
 	to7_rf57932_init();
-	mo5_periodic_timer = timer_alloc( mo5_periodic_cb );
+	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
 	mea8000_config( THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -2737,7 +2737,7 @@ static void to9_kbd_reset ( void )
 static void to9_kbd_init ( void )
 {
 	LOG(( "to9_kbd_init called\n" ));
-	to9_kbd_timer = timer_alloc( to9_kbd_timer_cb );
+	to9_kbd_timer = timer_alloc( to9_kbd_timer_cb , NULL);
 	state_save_register_global( to9_kbd_parity );
 	state_save_register_global( to9_kbd_intr );
 	state_save_register_global( to9_kbd_in );
@@ -3081,7 +3081,7 @@ static int to8_kbd_get_key( void )
 */
 
 /* keyboard automaton */
-static TIMER_CALLBACK(to8_kbd_timer_cb)
+static void to8_kbd_timer_func(void)
 {
 	attotime d;
 
@@ -3153,6 +3153,13 @@ static TIMER_CALLBACK(to8_kbd_timer_cb)
 		to8_kbd_step++;
 	}
 	timer_adjust( to8_kbd_timer, d, 0, attotime_never );
+}
+
+
+
+static TIMER_CALLBACK(to8_kbd_timer_cb)
+{
+	to8_kbd_timer_func();
 }
 
 
@@ -3242,15 +3249,15 @@ static void to8_kbd_reset ( void )
 	to8_kbd_ack = 1; 
 	to8_kbd_caps = 1;
 	thom_set_caps_led( ! to8_kbd_caps );
-	to8_kbd_timer_cb( Machine, 0 );
+	to8_kbd_timer_func();
 }
 
 
 
 static void to8_kbd_init ( void )
 {
-	to8_kbd_timer = timer_alloc( to8_kbd_timer_cb );
-	to8_kbd_signal = timer_alloc( NULL );
+	to8_kbd_timer = timer_alloc( to8_kbd_timer_cb , NULL);
+	to8_kbd_signal = timer_alloc( NULL , NULL);
 	state_save_register_global( to8_kbd_ack );
 	state_save_register_global( to8_kbd_data );
 	state_save_register_global( to8_kbd_step );
@@ -4278,7 +4285,7 @@ static void mo6_game_init ( void )
 {
 	LOG (( "mo6_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &mo6_game );
-	to7_game_timer = timer_alloc( mo6_game_update_cb );
+	to7_game_timer = timer_alloc( mo6_game_update_cb , NULL);
 	timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	state_save_register_global( to7_game_sound );
 	state_save_register_global( to7_game_mute );
@@ -4607,7 +4614,7 @@ MACHINE_START ( mo6 )
 	to7_modem_init();
 	to7_midi_init();
 	to7_rf57932_init();
-	mo5_periodic_timer = timer_alloc( mo5_periodic_cb );
+	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
 	mea8000_config( THOM_SOUND_SPEECH, NULL );
   
 	/* memory */
@@ -4792,7 +4799,7 @@ static void mo5nr_game_init ( void )
 {
 	LOG (( "mo5nr_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &mo5nr_game );
-	to7_game_timer = timer_alloc( mo6_game_update_cb );
+	to7_game_timer = timer_alloc( mo6_game_update_cb , NULL);
 	timer_adjust( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	state_save_register_global( to7_game_sound );
 	state_save_register_global( to7_game_mute );
@@ -4874,7 +4881,7 @@ MACHINE_START ( mo5nr )
 	to7_modem_init();
 	to7_midi_init();
 	to7_rf57932_init();
-	mo5_periodic_timer = timer_alloc( mo5_periodic_cb );
+	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
 	mea8000_config( THOM_SOUND_SPEECH, NULL );
   
 	/* memory */

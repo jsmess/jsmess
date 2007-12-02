@@ -571,8 +571,8 @@ void mc6846_reset ( void )
 void mc6846_config ( const mc6846_interface* iface )
 {
 	mc6846.iface = iface;
-	mc6846.interval = timer_alloc( mc6846_timer_expire );
-	mc6846.one_shot = timer_alloc( mc6846_timer_one_shot );
+	mc6846.interval = timer_alloc( mc6846_timer_expire , NULL);
+	mc6846.one_shot = timer_alloc( mc6846_timer_one_shot , NULL);
   
 	state_save_register_item( "mc6846", 0, mc6846.csr );
 	state_save_register_item( "mc6846", 0, mc6846.pcr );

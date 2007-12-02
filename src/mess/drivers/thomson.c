@@ -780,9 +780,9 @@ static MACHINE_DRIVER_START ( t9000 )
 MACHINE_DRIVER_END
 
 
-COMP ( 1982, to7, 0, 0, to7, to7, NULL, to7, "Thomson", "TO7", 0 )
+COMP ( 1982, to7, 0, 0, to7, to7, 0, to7, "Thomson", "TO7", 0 )
 
-COMP ( 1980, t9000, to7, 0, t9000, t9000, NULL, t9000, "Thomson", "T9000", 0 )
+COMP ( 1980, t9000, to7, 0, t9000, t9000, 0, t9000, "Thomson", "T9000", 0 )
 
 
 /***************************** TO7/70 *********************************
@@ -969,9 +969,9 @@ static MACHINE_DRIVER_START ( to770a )
      MDRV_IMPORT_FROM ( to770 )
 MACHINE_DRIVER_END
 
-COMP ( 1984, to770, 0, 0, to770, to770, NULL, to770, "Thomson", "TO7/70", 0 )
+COMP ( 1984, to770, 0, 0, to770, to770, 0, to770, "Thomson", "TO7/70", 0 )
 
-COMP ( 1984, to770a, to770, 0, to770a, to770a, NULL, to770a, "Thomson", "TO7/70 arabic", 0 )
+COMP ( 1984, to770a, to770, 0, to770a, to770a, 0, to770a, "Thomson", "TO7/70 arabic", 0 )
 
 
 /************************* MO5 / MO5E *********************************
@@ -1169,9 +1169,9 @@ static MACHINE_DRIVER_START ( mo5e )
 MACHINE_DRIVER_END
 
 
-COMP ( 1984, mo5, 0, 0, mo5, mo5, NULL, mo5, "Thomson", "MO5", 0 )
+COMP ( 1984, mo5, 0, 0, mo5, mo5, 0, mo5, "Thomson", "MO5", 0 )
 
-COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, NULL, mo5e, "Thomson", "MO5E", 0 )
+COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, 0, mo5e, "Thomson", "MO5E", 0 )
 
 
 /********************************* TO9 *******************************
@@ -1512,7 +1512,7 @@ static MACHINE_DRIVER_START ( to9 )
 MACHINE_DRIVER_END
 
 
-COMP ( 1985, to9, 0, 0, to9, to9, NULL, to9, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
+COMP ( 1985, to9, 0, 0, to9, to9, 0, to9, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
 
 
 /******************************** TO8 ********************************
@@ -1753,9 +1753,9 @@ static MACHINE_DRIVER_START ( to8d )
 MACHINE_DRIVER_END
 
 
-COMP ( 1986, to8, 0, 0, to8, to8, NULL, to8, "Thomson", "TO8", 0 )
+COMP ( 1986, to8, 0, 0, to8, to8, 0, to8, "Thomson", "TO8", 0 )
 
-COMP ( 1987, to8d, to8, 0, to8d, to8d, NULL, to8d, "Thomson", "TO8D", 0 )
+COMP ( 1987, to8d, to8, 0, to8d, to8d, 0, to8d, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1906,7 +1906,7 @@ static MACHINE_DRIVER_START ( to9p )
      MDRV_CPU_PROGRAM_MAP ( to9p, 0 )
 MACHINE_DRIVER_END
 
-COMP ( 1986, to9p, 0, 0, to9p, to9p, NULL, to9p, "Thomson", "TO9+", 0 )
+COMP ( 1986, to9p, 0, 0, to9p, to9p, 0, to9p, "Thomson", "TO9+", 0 )
 
 
 
@@ -2258,9 +2258,9 @@ static MACHINE_DRIVER_START ( pro128 )
      MDRV_IMPORT_FROM ( mo6 )
 MACHINE_DRIVER_END
 
-COMP ( 1986, mo6, 0, 0, mo6, mo6, NULL, mo6, "Thomson", "MO6", 0 )
+COMP ( 1986, mo6, 0, 0, mo6, mo6, 0, mo6, "Thomson", "MO6", 0 )
 
-COMP ( 1986, pro128, mo6, 0, pro128, pro128, NULL, pro128, "Olivetti / Thomson", "Prodest PC 128", 0 )
+COMP ( 1986, pro128, mo6, 0, pro128, pro128, 0, pro128, "Olivetti / Thomson", "Prodest PC 128", 0 )
 
 
 
@@ -2483,4 +2483,4 @@ static MACHINE_DRIVER_START ( mo5nr )
      MDRV_CPU_PROGRAM_MAP ( mo5nr, 0 )
 MACHINE_DRIVER_END
 
-COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, NULL, mo5nr, "Thomson", "MO5 NR", 0 )
+COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, mo5nr, "Thomson", "MO5 NR", 0 )

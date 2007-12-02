@@ -791,14 +791,17 @@ static void command_verify_memory(void)
 	if (offset_end == 0)
 		offset_end = offset_start + verify_data_size - 1;
 
+	/* what type of memory are we validating? */
 	region = current_command->u.verify_args.mem_region;
 	if (region)
 	{
+		/* we're validating a conventional memory region */
 		target_data = memory_region(region);
 		target_data_size = memory_region_length(region);
 	}
 	else
 	{
+		/* we're validating mess_ram */
 		target_data = mess_ram;
 		target_data_size = mess_ram_size;
 	}
@@ -823,6 +826,7 @@ static void command_verify_memory(void)
 		return;
 	}
 
+	/* loop through the memory, verifying it byte by byte */
 	for (offset = offset_start; offset <= offset_end; offset++)
 	{
 		if (verify_data[i] != target_data[offset])

@@ -197,7 +197,7 @@ void tms9901_init(int which, const tms9901reset_param *param)
 {
 	int i;
 
-	tms9901[which].timer = timer_alloc(decrementer_callback);
+	tms9901[which].timer = timer_alloc(decrementer_callback, NULL);
 
 	tms9901[which].supported_int_mask = param->supported_int_mask;
 

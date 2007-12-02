@@ -56,7 +56,7 @@ void pcf8593_init( void)
 	memset( &rtc, 0, sizeof( rtc));
 	rtc.size = 16;
 	rtc.data = malloc( rtc.size);
-	rtc.timer = timer_alloc( pcf8593_timer_callback );
+	rtc.timer = timer_alloc( pcf8593_timer_callback , NULL);
 	timer_adjust( rtc.timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
 	pcf8593_reset();
 }

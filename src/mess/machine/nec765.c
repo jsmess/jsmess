@@ -316,7 +316,7 @@ static TIMER_CALLBACK(nec765_seek_timer_callback)
 	timer_reset(fdc.seek_timer, attotime_never);
 }
 
-static TIMER_CALLBACK(nec765_timer_callback)
+static void nec765_timer_func(int timer_type)
 {
 	/* type 0 = data transfer mode in execution phase */
 	if (fdc.timer_type == 0)
@@ -333,7 +333,7 @@ static TIMER_CALLBACK(nec765_timer_callback)
 		}
 		else
 		{
-			nec765_timer_callback(machine, fdc.timer_type);
+			nec765_timer_func(fdc.timer_type);
 		}
 	}
 	else if (fdc.timer_type==2)
@@ -384,6 +384,11 @@ static TIMER_CALLBACK(nec765_timer_callback)
 	}
 }
 
+static TIMER_CALLBACK(nec765_timer_callback)
+{
+	nec765_timer_func(param);
+}
+
 /* after (32-27) the DRQ is set, then 27 us later, the int is set.
 I don't know if this is correct, but it is required for the PCW driver.
 In this driver, the first NMI calls the handler function, furthur NMI's are
@@ -400,7 +405,7 @@ static void nec765_setup_timed_generic(int timer_type, attotime duration)
 	}
 	else
 	{
-		nec765_timer_callback(Machine, fdc.timer_type);
+		nec765_timer_func(fdc.timer_type);
 		timer_reset(fdc.timer, attotime_never);
 	}
 }
@@ -673,9 +678,9 @@ void nec765_init(const nec765_interface *iface, NEC765_VERSION version)
 	int i;
 
 	fdc.version = version;
-	fdc.timer = timer_alloc(nec765_timer_callback);
-	fdc.seek_timer = timer_alloc(nec765_seek_timer_callback);
-	fdc.command_timer = timer_alloc(nec765_continue_command);
+	fdc.timer = timer_alloc(nec765_timer_callback, NULL);
+	fdc.seek_timer = timer_alloc(nec765_seek_timer_callback, NULL);
+	fdc.command_timer = timer_alloc(nec765_continue_command, NULL);
 	memset(&nec765_iface, 0, sizeof(nec765_interface));
 
 	if (iface)

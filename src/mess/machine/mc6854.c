@@ -980,7 +980,7 @@ void mc6854_config ( const mc6854_interface* iface )
 	mc6854 = auto_malloc( sizeof( * mc6854 ) );
 	assert( mc6854 );
 	mc6854->iface = iface;
-	mc6854->ttimer = timer_alloc( mc6854_tfifo_cb );
+	mc6854->ttimer = timer_alloc( mc6854_tfifo_cb , NULL);
 	state_save_register_item( "mc6854", 0, mc6854->cr1 );
 	state_save_register_item( "mc6854", 0, mc6854->cr2 );
 	state_save_register_item( "mc6854", 0, mc6854->cr3 );

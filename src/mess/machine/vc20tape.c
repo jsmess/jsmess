@@ -902,8 +902,8 @@ void vc20_tape_open (void (*read_callback) (UINT32, UINT8))
 	tape.data = 0;
 #endif
 	prg.c16 = 0;
-	wav.timer = timer_alloc(vc20_wav_timer);
-	prg.prg_timer = timer_alloc(vc20_prg_timer);
+	wav.timer = timer_alloc(vc20_wav_timer, NULL);
+	prg.prg_timer = timer_alloc(vc20_prg_timer, NULL);
 }
 
 void c16_tape_open (void)

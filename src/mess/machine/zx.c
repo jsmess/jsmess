@@ -145,7 +145,7 @@ READ8_HANDLER ( zx_io_r )
 			if ((cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
-				timer_set(ATTOTIME_IN_USEC(362), 0, zx_tape_pulse);
+				timer_set(ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
 			}
 
 			data &= ~zx_tape_bit;
@@ -209,7 +209,7 @@ READ8_HANDLER ( pow3000_io_r )
 			if ((cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
-				timer_set(ATTOTIME_IN_USEC(362), 0, zx_tape_pulse);
+				timer_set(ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
 			}
 
 			data &= ~zx_tape_bit;

@@ -77,7 +77,7 @@ MACHINE_RESET( gamecom )
 
 	/* should possibly go in a DRIVER_INIT piece? */
 	if ( gamecom_clock_timer == NULL ) {
-		gamecom_clock_timer = timer_alloc( gamecom_clock_timer_callback );
+		gamecom_clock_timer = timer_alloc( gamecom_clock_timer_callback , NULL);
 	}
 	/* intialize the empty dummy bank */
 	if ( dummy_bank == NULL ) {

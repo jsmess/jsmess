@@ -30,7 +30,7 @@ static TIMER_CALLBACK(pc_mouse_scan);
 void pc_mouse_initialise(void)
 {
 	pc_mouse.head = pc_mouse.tail = 0;
-	pc_mouse.timer = timer_alloc(pc_mouse_scan);
+	pc_mouse.timer = timer_alloc(pc_mouse_scan, NULL);
 	pc_mouse.inputs=UART8250_HANDSHAKE_IN_DSR|UART8250_HANDSHAKE_IN_CTS;
 	if (pc_mouse.serial_port!=-1)
 		uart8250_handshake_in(pc_mouse.serial_port, pc_mouse.inputs);

@@ -93,11 +93,11 @@ MACHINE_RESET( pokemini ) {
 	memset( &vdp, 0, sizeof(vdp) );
 	memset( &timers, 0, sizeof(timers) );
 	memset( pokemini_hwreg, 0, sizeof(pokemini_hwreg) );
-	timers.seconds_timer = timer_alloc( pokemini_seconds_timer_callback );
-	timers.hz256_timer = timer_alloc( pokemini_256hz_timer_callback );
-	timers.timer1_timer = timer_alloc( pokemini_timer1_callback );
-	timers.timer2_timer = timer_alloc( pokemini_timer2_callback );
-	timers.timer3_timer = timer_alloc( pokemini_timer3_callback );
+	timers.seconds_timer = timer_alloc( pokemini_seconds_timer_callback , NULL);
+	timers.hz256_timer = timer_alloc( pokemini_256hz_timer_callback , NULL);
+	timers.timer1_timer = timer_alloc( pokemini_timer1_callback , NULL);
+	timers.timer2_timer = timer_alloc( pokemini_timer2_callback , NULL);
+	timers.timer3_timer = timer_alloc( pokemini_timer3_callback , NULL);
 }
 
 WRITE8_HANDLER( pokemini_hwreg_w ) {

@@ -432,19 +432,19 @@ static INTERRUPT_GEN( svision_frame_int )
 
 static DRIVER_INIT( svision )
 {
-	svision.timer1 = timer_alloc(svision_timer);
+	svision.timer1 = timer_alloc(svision_timer, NULL);
 	svision_pet.on = FALSE;
 	memory_set_bankptr(2, memory_region(REGION_USER1) + 0x1c000);
 }
 
 static DRIVER_INIT( svisions )
 {
-	svision.timer1 = timer_alloc(svision_timer);
+	svision.timer1 = timer_alloc(svision_timer, NULL);
 	memory_set_bankptr(2, memory_region(REGION_USER1) + 0x1c000);
-	svision.timer1 = timer_alloc(svision_timer);
+	svision.timer1 = timer_alloc(svision_timer, NULL);
 	svision_pet.on = TRUE;
-	svision_pet.timer = timer_alloc(svision_pet_timer);
-	timer_pulse(attotime_mul(ATTOTIME_IN_SEC(8), 256/Machine->drv->cpu[0].clock), 0, svision_pet_timer);  
+	svision_pet.timer = timer_alloc(svision_pet_timer, NULL);
+	timer_pulse(attotime_mul(ATTOTIME_IN_SEC(8), 256/Machine->drv->cpu[0].clock), NULL, 0, svision_pet_timer);  
 }
 
 static MACHINE_RESET( svision )

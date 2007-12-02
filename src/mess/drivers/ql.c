@@ -226,7 +226,7 @@ static TIMER_CALLBACK( zx8302_delayed_ipc_command )
 
 static WRITE8_HANDLER( zx8302_ipc_command_w )
 {
-	timer_set(ATTOTIME_IN_NSEC(480), data, zx8302_delayed_ipc_command);
+	timer_set(ATTOTIME_IN_NSEC(480), NULL, data, zx8302_delayed_ipc_command);
 }
 
 static WRITE8_HANDLER( zx8302_mdv_control_w )
@@ -760,10 +760,10 @@ static MACHINE_START( ql )
 	zx8302.comctl = 1;
 	zx8302.comdata = 1;
 
-	zx8302_txd_timer = timer_alloc(zx8302_txd_tick);
-	zx8302_ipc_timer = timer_alloc(zx8302_ipc_tick);
-	zx8302_rtc_timer = timer_alloc(zx8302_rtc_tick);
-	zx8302_gap_timer = timer_alloc(zx8302_gap_tick);
+	zx8302_txd_timer = timer_alloc(zx8302_txd_tick, NULL);
+	zx8302_ipc_timer = timer_alloc(zx8302_ipc_tick, NULL);
+	zx8302_rtc_timer = timer_alloc(zx8302_rtc_tick, NULL);
+	zx8302_gap_timer = timer_alloc(zx8302_gap_tick, NULL);
 
 	timer_adjust(zx8302_rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(X2/32768));
 	timer_adjust(zx8302_gap_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(31));

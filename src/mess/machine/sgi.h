@@ -11,8 +11,8 @@
 
 #include "mame.h"
 
-TIMER_CALLBACK(mc_update);
 void mc_init(void);
+void mc_update(void);
 
 READ32_HANDLER(mc_r);
 WRITE32_HANDLER(mc_w);

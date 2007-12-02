@@ -252,11 +252,6 @@ endif
 # form the name of the executable
 #-------------------------------------------------
 
-# MSVC builds append the 'vc' suffix
-ifdef MSVC_BUILD
-SUFFIX:=$(SUFFIX)vc
-endif
-
 # unicode builds append the 'u' suffix
 ifdef UNICODE
 SUFFIX:=$(SUFFIX)u
@@ -388,6 +383,7 @@ CFLAGS += -O$(OPTIMIZE)
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
 CFLAGS += -Werror $(ARCH) -fno-strict-aliasing
+#CFLAGS += $(ARCH) -fno-strict-aliasing
 endif
 
 # if symbols are on, make sure we have frame pointers

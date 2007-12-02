@@ -101,7 +101,7 @@ void applefdc_init(const struct applefdc_interface *intf)
 {
 	applefdc_lines = 0;
 	iwm_mode = 0x1f;	/* default value needed by Lisa 2 - no, I don't know if it is true */
-	motor_timer = timer_alloc(iwm_turnmotor_onoff);
+	motor_timer = timer_alloc(iwm_turnmotor_onoff, NULL);
 	if (intf)
 		iwm_intf = *intf;
 	else

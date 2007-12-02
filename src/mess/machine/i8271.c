@@ -61,8 +61,8 @@ void i8271_init(i8271_interface *iface)
 	{
 		memcpy(&i8271.fdc_interface, iface, sizeof(i8271_interface));
 	}
-	i8271.data_timer = timer_alloc(i8271_data_timer_callback);
-	i8271.command_complete_timer = timer_alloc(i8271_timed_command_complete_callback);
+	i8271.data_timer = timer_alloc(i8271_data_timer_callback, NULL);
+	i8271.command_complete_timer = timer_alloc(i8271_timed_command_complete_callback, NULL);
 	i8271.drive = 0;
 	i8271.pExecutionPhaseData = temp_buffer;
 

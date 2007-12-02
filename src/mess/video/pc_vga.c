@@ -1180,7 +1180,7 @@ static VIDEO_START( ega )
 	vga.monitor.get_columns = ega_get_crtc_columns;
 	vga.monitor.get_sync_lines = vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns = vga_get_crtc_sync_columns;
-	timer_pulse(ATTOTIME_IN_HZ(60), 0, vga_timer);
+	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, vga_timer);
 	pc_video_start(NULL, pc_ega_choosevideomode, 0);
 }
 
@@ -1195,7 +1195,7 @@ static VIDEO_START( vga )
 	vga.monitor.get_columns=vga_get_crtc_columns;
 	vga.monitor.get_sync_lines=vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns=vga_get_crtc_sync_columns;
-	timer_pulse(ATTOTIME_IN_HZ(60), 0, vga_timer);
+	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, vga_timer);
 	pc_video_start(NULL, pc_vga_choosevideomode, 0);
 }
 

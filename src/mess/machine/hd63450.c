@@ -21,7 +21,7 @@ void hd63450_init(struct hd63450_interface* intf)
 	dmac.intf = intf;
 	for(x=0;x<4;x++)
 	{
-		dmac.timer[x] = timer_alloc(dma_transfer_timer);
+		dmac.timer[x] = timer_alloc(dma_transfer_timer, NULL);
 		dmac.reg[x].niv = 0x0f;  // defaults?
 		dmac.reg[x].eiv = 0x0f;
 	}

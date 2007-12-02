@@ -651,7 +651,7 @@ static MACHINE_START( abc800 )
 	state_save_register_global(abc77_keylatch);
 	state_save_register_global(abc77_clock);
 
-	abc800_ctc_timer = timer_alloc(abc800_ctc_tick);
+	abc800_ctc_timer = timer_alloc(abc800_ctc_tick, NULL);
 	timer_adjust(abc800_ctc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC800_X01/2/2/2));
 
 	z80ctc_init(0, &abc800_ctc_intf);

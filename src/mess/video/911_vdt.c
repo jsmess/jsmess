@@ -237,13 +237,13 @@ int vdt911_init_term(int unit, const vdt911_init_params_t *params)
 	else
 		vdt[unit].cursor_address_mask = 0x7ff;	/* 2 kb of RAM */
 
-	timer_set(attotime_zero, unit, setup_beep);
+	timer_set(attotime_zero, NULL, unit, setup_beep);
 
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
-	/*vdt[unit].blink_clock =*/ timer_pulse(ATTOTIME_IN_MSEC(250), unit, blink_callback);
+	/*vdt[unit].blink_clock =*/ timer_pulse(ATTOTIME_IN_MSEC(250), NULL, unit, blink_callback);
 
 	/* alloc beep timer */
-	vdt[unit].beep_timer = timer_alloc(beep_callback);
+	vdt[unit].beep_timer = timer_alloc(beep_callback, NULL);
 
 	return 0;
 }

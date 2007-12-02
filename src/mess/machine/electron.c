@@ -292,8 +292,8 @@ MACHINE_START( electron )
 	
 	ula.interrupt_status = 0x82;
 	ula.interrupt_control = 0x00;
-	timer_set( attotime_zero, 0, setup_beep );
-	electron_tape_timer = timer_alloc( electron_tape_timer_handler );
+	timer_set( attotime_zero, NULL, 0, setup_beep );
+	electron_tape_timer = timer_alloc( electron_tape_timer_handler, NULL );
 	add_reset_callback(machine, electron_reset);
 }
 

@@ -238,13 +238,13 @@ TIMER_CALLBACK(vectrex_imager_right_eye)
 	{
 		vectrex_imager_status = param;
 		coffset = param>1?3:0;
-		timer_set (double_to_attotime(rtime * vectrex_imager_angles[0]), imager_colors[coffset+2], vectrex_imager_change_color);
-		timer_set (double_to_attotime(rtime * vectrex_imager_angles[1]), imager_colors[coffset+1], vectrex_imager_change_color);
-		timer_set (double_to_attotime(rtime * vectrex_imager_angles[2]), imager_colors[coffset], vectrex_imager_change_color);
+		timer_set (double_to_attotime(rtime * vectrex_imager_angles[0]), NULL, imager_colors[coffset+2], vectrex_imager_change_color);
+		timer_set (double_to_attotime(rtime * vectrex_imager_angles[1]), NULL, imager_colors[coffset+1], vectrex_imager_change_color);
+		timer_set (double_to_attotime(rtime * vectrex_imager_angles[2]), NULL, imager_colors[coffset], vectrex_imager_change_color);
 
 		if (param == 2)
 		{
-			timer_set (double_to_attotime(rtime * 0.50), 1, vectrex_imager_right_eye);
+			timer_set (double_to_attotime(rtime * 0.50), NULL, 1, vectrex_imager_right_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
 			via_0_ca1_w (0, 1);

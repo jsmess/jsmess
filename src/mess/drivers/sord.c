@@ -491,7 +491,7 @@ static MACHINE_RESET( sord_m5 )
 	/* PI-5 interface connected to Sord M5 */
 	ppi8255_init(&sord_ppi8255_interface);
 
-//	cassette_timer = timer_pulse(TIME_IN_HZ(11025), 0, cassette_timer_callback);
+//	cassette_timer = timer_pulse(TIME_IN_HZ(11025), NULL, 0, cassette_timer_callback);
 	TMS9928A_reset ();
 	z80ctc_reset(0);
 

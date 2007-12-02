@@ -216,19 +216,19 @@ static MACHINE_START( a310 )
 	a310_pagesize = 0;
 	wd17xx_init(WD_TYPE_1772, a310_wd177x_callback, NULL);
 
-	vbl_timer = timer_alloc(a310_vblank);
+	vbl_timer = timer_alloc(a310_vblank, NULL);
 	timer_adjust(vbl_timer, attotime_never, 0, attotime_never);
 
-	timer[0] = timer_alloc(a310_timer);
-	timer[1] = timer_alloc(a310_timer);
-	timer[2] = timer_alloc(a310_timer);
-	timer[3] = timer_alloc(a310_timer);
+	timer[0] = timer_alloc(a310_timer, NULL);
+	timer[1] = timer_alloc(a310_timer, NULL);
+	timer[2] = timer_alloc(a310_timer, NULL);
+	timer[3] = timer_alloc(a310_timer, NULL);
 	timer_adjust(timer[0], attotime_never, 0, attotime_never);
 	timer_adjust(timer[1], attotime_never, 0, attotime_never);
 	timer_adjust(timer[2], attotime_never, 0, attotime_never);
 	timer_adjust(timer[3], attotime_never, 0, attotime_never);
 
-	snd_timer = timer_alloc(a310_audio_tick);
+	snd_timer = timer_alloc(a310_audio_tick, NULL);
 	timer_adjust(snd_timer, attotime_never, 0, attotime_never);
 
 	// reset the DAC to centerline

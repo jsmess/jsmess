@@ -801,7 +801,7 @@ void mc6843_config ( const mc6843_interface* iface )
 	assert( mc6843 );
 	memset( mc6843, 0, sizeof( * mc6843 ) );
 	mc6843->iface = iface;
-	mc6843->timer_cont = timer_alloc( mc6843_cont );
+	mc6843->timer_cont = timer_alloc( mc6843_cont , NULL);
 
 	state_save_register_item( "mc6843", 0, mc6843->CTAR );
 	state_save_register_item( "mc6843", 0, mc6843->CMR );

@@ -66,7 +66,7 @@ void matsucd_init( void )
 	
 	cd.cdrom = mess_cd_get_cdrom_file_by_number(0);
 	
-	cd.frame_timer = timer_alloc(matsu_subcode_proc);
+	cd.frame_timer = timer_alloc(matsu_subcode_proc, NULL);
 	
 	cd.stch_signal = 1;
 }
@@ -270,7 +270,7 @@ static void matsucd_set_status( UINT8 status )
 		if ( cd.stch_signal != 0 )
 		{
 			update_status_changed( 0 );
-			timer_set( ATTOTIME_IN_MSEC(1), 0, matsucd_set_status_end );
+			timer_set( ATTOTIME_IN_MSEC(1), NULL, 0, matsucd_set_status_end );
 		}
 	}
 }

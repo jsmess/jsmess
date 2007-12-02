@@ -178,7 +178,7 @@ int pc_hdc_setup(void)
 		status[i] = 0;
 		error[i] = 0;
 		dip[i] = 0xff;
-		timer[i] = timer_alloc(pc_hdc_command);
+		timer[i] = timer_alloc(pc_hdc_command, NULL);
 		if (!timer[i])
 			return -1;
 	}

@@ -1049,7 +1049,7 @@ void gb_video_init( void ) {
 	/* set the scanline update function */
 	update_scanline = gb_update_scanline;
 
-	gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc );
+	gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
 	timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0, attotime_never );
 }
 

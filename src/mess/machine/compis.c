@@ -1519,14 +1519,14 @@ WRITE16_HANDLER( i186_internal_port_w )
 void compis_cpu_init(void)
 {
 	/* create timers here so they stick around */
-	i186.timer[0].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[1].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[2].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[0].time_timer = timer_alloc(NULL);
-	i186.timer[1].time_timer = timer_alloc(NULL);
-	i186.timer[2].time_timer = timer_alloc(NULL);
-	i186.dma[0].finish_timer = timer_alloc(dma_timer_callback);
-	i186.dma[1].finish_timer = timer_alloc(dma_timer_callback);
+	i186.timer[0].int_timer = timer_alloc(internal_timer_int, NULL);
+	i186.timer[1].int_timer = timer_alloc(internal_timer_int, NULL);
+	i186.timer[2].int_timer = timer_alloc(internal_timer_int, NULL);
+	i186.timer[0].time_timer = timer_alloc(NULL, NULL);
+	i186.timer[1].time_timer = timer_alloc(NULL, NULL);
+	i186.timer[2].time_timer = timer_alloc(NULL, NULL);
+	i186.dma[0].finish_timer = timer_alloc(dma_timer_callback, NULL);
+	i186.dma[1].finish_timer = timer_alloc(dma_timer_callback, NULL);
 }
 
 /*-------------------------------------------------------------------------*/

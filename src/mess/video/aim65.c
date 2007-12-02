@@ -122,7 +122,7 @@ void aim65_printer_data_b(UINT8 data) {
 
 VIDEO_START( aim65 )
 {
-	print_timer = timer_alloc(aim65_printer_timer);
+	print_timer = timer_alloc(aim65_printer_timer, NULL);
 
 	/*
     videoram_size = 600 * 10 * 2;

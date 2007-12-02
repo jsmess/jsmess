@@ -305,7 +305,7 @@ static offs_t m68008_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
  ****************************************************************************/
 #if HAS_M68010
 
-void m68010_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void m68010_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68010);

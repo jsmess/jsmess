@@ -1351,11 +1351,11 @@ static MACHINE_RESET( pcw16 )
 	pcw16_interrupt_counter = 0;
 
 	/* video ints */
-	timer_pulse(ATTOTIME_IN_USEC(5830), 0,pcw16_timer_callback);
+	timer_pulse(ATTOTIME_IN_USEC(5830), NULL, 0,pcw16_timer_callback);
 	/* rtc timer */
-	timer_pulse(ATTOTIME_IN_HZ(256), 0, rtc_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(256), NULL, 0, rtc_timer_callback);
 	/* keyboard timer */
-	timer_pulse(ATTOTIME_IN_HZ(50), 0, pcw16_keyboard_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, pcw16_keyboard_timer_callback);
 
 
 	pc_fdc_init(&pcw16_fdc_interface);

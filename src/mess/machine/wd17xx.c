@@ -300,9 +300,9 @@ void wd17xx_set_density(DENSITY density)
 
 
 
-static TIMER_CALLBACK_PTR(wd17xx_busy_callback)
+static TIMER_CALLBACK(wd17xx_busy_callback)
 {
-	wd17xx_info *info = (wd17xx_info *) param;
+	wd17xx_info *info = (wd17xx_info *) ptr;
 	wd17xx_set_irq(info);			
 	timer_reset(busy_timer, attotime_never);
 }
@@ -312,7 +312,7 @@ static TIMER_CALLBACK_PTR(wd17xx_busy_callback)
 static void wd17xx_set_busy(wd17xx_info *w, attotime duration)
 {
 	w->status |= STA_1_BUSY;
-	timer_adjust_ptr(busy_timer, duration, attotime_zero);
+	timer_adjust(busy_timer, duration, 0, attotime_zero);
 }
 
 
@@ -397,10 +397,10 @@ void wd17xx_init(wd17xx_type_t type, void (*callback)(wd17xx_state_t, void *), v
 	wd.callback_param = param;
 //	wd.status_ipl = STA_1_IPL;
 	wd.density = DEN_MFM_LO;
-	busy_timer = timer_alloc_ptr(wd17xx_busy_callback, &wd);
-	wd.timer = timer_alloc(wd17xx_misc_timer_callback);
-	wd.timer_rs = timer_alloc(wd17xx_read_sector_callback);
-	wd.timer_ws = timer_alloc(wd17xx_write_sector_callback);
+	busy_timer = timer_alloc(wd17xx_busy_callback, &wd);
+	wd.timer = timer_alloc(wd17xx_misc_timer_callback, NULL);
+	wd.timer_rs = timer_alloc(wd17xx_read_sector_callback, NULL);
+	wd.timer_ws = timer_alloc(wd17xx_write_sector_callback, NULL);
 
 	wd17xx_reset();
 }

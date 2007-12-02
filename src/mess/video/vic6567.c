@@ -1319,7 +1319,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer starten */
-			timer_set (attotime_make(0, 0), 1, vic2_timer_timeout);
+			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 	}
 	if (vic2.rasterline == C64_2_RASTERLINE (RASTERLINE))

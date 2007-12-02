@@ -703,7 +703,7 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 			if ((data >> 8) & ATARIST_BLITTER_CTRL_BUSY)
 			{
 				int nops = BLITTER_NOPS[blitter.op][blitter.hop]; // each NOP takes 4 cycles
-				timer_set(ATTOTIME_IN_HZ((Y2/4)/(4*nops)), 0, atarist_blitter_tick);
+				timer_set(ATTOTIME_IN_HZ((Y2/4)/(4*nops)), NULL, 0, atarist_blitter_tick);
 			}
 		}
 	}
@@ -717,8 +717,8 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 
 VIDEO_START( atarist )
 {
-	atarist_shifter_timer = timer_alloc(atarist_shifter_tick);
-	atarist_glue_timer = timer_alloc(atarist_glue_tick);
+	atarist_shifter_timer = timer_alloc(atarist_shifter_tick, NULL);
+	atarist_glue_timer = timer_alloc(atarist_glue_tick, NULL);
 
 	timer_adjust(atarist_shifter_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
 	timer_adjust(atarist_glue_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns

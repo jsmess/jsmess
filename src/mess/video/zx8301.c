@@ -110,7 +110,7 @@ static void zx8301_draw_screen(mame_bitmap *bitmap)
 
 VIDEO_START( zx8301 )
 {
-	zx8301_flash_timer = timer_alloc(zx8301_flash_tick);
+	zx8301_flash_timer = timer_alloc(zx8301_flash_tick, NULL);
 	timer_adjust(zx8301_flash_timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
 
 	state_save_register_global(zx8301.dispoff);

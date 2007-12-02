@@ -434,7 +434,7 @@ INTERRUPT_GEN( intv_interrupt )
 {
 	cpunum_set_input_line(0, CP1610_INT_INTRM, ASSERT_LINE);
 	sr1_int_pending = 1;
-	timer_set(ATTOTIME_IN_CYCLES(3791, 0), 0, intv_interrupt_complete);
+	timer_set(ATTOTIME_IN_CYCLES(3791, 0), NULL, 0, intv_interrupt_complete);
 	stic_screenrefresh();
 }
 

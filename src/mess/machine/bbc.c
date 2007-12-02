@@ -2091,13 +2091,13 @@ DEVICE_LOAD( bbcb_cart )
 DRIVER_INIT( bbc )
 {
 	bbc_Master=0;
-	bbc_tape_timer = timer_alloc(bbc_tape_timer_cb);
+	bbc_tape_timer = timer_alloc(bbc_tape_timer_cb, NULL);
 }
 DRIVER_INIT( bbcm )
 {
 	bbc_Master=1;
-	bbc_tape_timer = timer_alloc(bbc_tape_timer_cb);
-    mc146818_init(MC146818_STANDARD);
+	bbc_tape_timer = timer_alloc(bbc_tape_timer_cb, NULL);
+	mc146818_init(MC146818_STANDARD);
 }
 
 MACHINE_START( bbca )

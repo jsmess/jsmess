@@ -806,9 +806,9 @@ static void m6845_set_new_vsync_set_time(int cycles)
 
 	m6845_remove_vsync_set_timer();
 
-        if (crtc_cycles_to_vsync_start!=-1)
+	if (crtc_cycles_to_vsync_start!=-1)
 	{
-                m6845_vsync_set_timer = timer_set(ATTOTIME_IN_USEC(crtc_cycles_to_vsync_start), 0, m6845_vsync_set_timer_callback);
+		m6845_vsync_set_timer = timer_set(ATTOTIME_IN_USEC(crtc_cycles_to_vsync_start), NULL, 0, m6845_vsync_set_timer_callback);
 	}
 }
 
@@ -824,7 +824,7 @@ static void m6845_set_new_vsync_clear_time(int cycles)
 
 	if (crtc_cycles_to_vsync_end!=-1)
 	{
-                m6845_vsync_clear_timer = timer_set(ATTOTIME_IN_USEC(crtc_cycles_to_vsync_end), 0, m6845_vsync_clear_timer_callback);
+		m6845_vsync_clear_timer = timer_set(ATTOTIME_IN_USEC(crtc_cycles_to_vsync_end), NULL, 0, m6845_vsync_clear_timer_callback);
 	}
 }
 

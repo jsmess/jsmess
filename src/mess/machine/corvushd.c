@@ -1391,7 +1391,7 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 	//
 	// Set up timers for command completion and timeout from host
 	//
-	timer_set(ATTOTIME_IN_USEC(c->delay), CALLBACK_CTH_MODE, corvus_hdc_callback);
+	timer_set(ATTOTIME_IN_USEC(c->delay), NULL, CALLBACK_CTH_MODE, corvus_hdc_callback);
 	timer_enable(c->timeout_timer, 0);			// We've received enough data, disable the timeout timer
 
 	c->delay = 0;									// Reset delay for next function
@@ -1496,7 +1496,7 @@ UINT8 corvus_hdc_init() {
 	c->xmit_bytes = 0;							// We don't have anything to say to the host
 	c->recv_bytes = 0;							// We aren't waiting on additional data from the host
 
-	c->timeout_timer = timer_alloc(corvus_hdc_callback);	// Set up a timer to handle the four-second host-to-controller timeout
+	c->timeout_timer = timer_alloc(corvus_hdc_callback, NULL);	// Set up a timer to handle the four-second host-to-controller timeout
 	timer_adjust(c->timeout_timer, ATTOTIME_IN_SEC(4), CALLBACK_TIMEOUT, attotime_zero);
 	timer_enable(c->timeout_timer, 0);		// Start this timer out disabled
 
@@ -1670,14 +1670,14 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 		c->xmit_bytes = 0;		// We don't have anything more to say
 		c->recv_bytes = 0;		// No active commands
 		
-		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_HTC_MODE, corvus_hdc_callback);
+		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_HTC_MODE, corvus_hdc_callback);
 
 //		c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY);	// Put us in Idle, Host-to-Controller mode
 	} else {
 		//
 		// Not finished with this packet.  Insert an interbyte delay and then let the host continue
 		//
-		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_SAME_MODE, corvus_hdc_callback);		
+		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);		
 	}
 
 	return result;
@@ -1756,6 +1756,6 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 		// Make the controller busy for a few microseconds while the command is processed
 		//
 		c->status |= CONTROLLER_BUSY;
-		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_SAME_MODE, corvus_hdc_callback);
+		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);
 	}
 }

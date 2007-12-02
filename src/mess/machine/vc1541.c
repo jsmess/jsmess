@@ -634,7 +634,7 @@ DEVICE_LOAD(vc1541)
 
 	logerror("floppy image %s loaded\n", image_filename(image));
 
-	vc1541->timer = timer_alloc(vc1541_timer);
+	vc1541->timer = timer_alloc(vc1541_timer, NULL);
 	return INIT_PASS;
 }
 
@@ -956,7 +956,7 @@ int c1551_config (int id, int mode, C1551_CONFIG *config)
 
 	/* time should be small enough to allow quitting of the irq
 	   line before the next interrupt is triggered */
-	vc1541->drive.c1551.timer = timer_alloc(c1551_timer);
+	vc1541->drive.c1551.timer = timer_alloc(c1551_timer, NULL);
 	timer_adjust(vc1541->drive.c1551.timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
 	return 0;
 }

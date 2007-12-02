@@ -468,7 +468,7 @@ static WRITE32_HANDLER( int_w )
 
 static INTERRUPT_GEN( ip20_update_chips )
 {
-	mc_update(Machine, 0);
+	mc_update();
 	nRTC_Temp++;
 	if( nRTC_Temp == 100 )
 	{

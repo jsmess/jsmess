@@ -100,7 +100,7 @@ void vectrex_add_point (int x, int y, rgb_t color, int intensity)
 /*********************************************************************
   Lightpen
  *********************************************************************/
-static TIMER_CALLBACK(lightpen_trigger)
+static void lightpen_trigger(void)
 {
 	if (vectrex_lightpen_port & 1)
 	{
@@ -111,6 +111,11 @@ static TIMER_CALLBACK(lightpen_trigger)
 	{
 		cpunum_set_input_line(0, M6809_FIRQ_LINE, PULSE_LINE);
 	}
+}
+
+static TIMER_CALLBACK(lightpen_trigger_callback)
+{
+	lightpen_trigger();
 }
 
 static int lightpen_check (void)
@@ -269,10 +274,10 @@ VIDEO_START( vectrex )
 
 	imager_freq = 1;
 
-	imager_timer = timer_alloc(vectrex_imager_right_eye);
+	imager_timer = timer_alloc(vectrex_imager_right_eye, NULL);
 	timer_adjust(imager_timer, ATTOTIME_IN_HZ(imager_freq), 2, ATTOTIME_IN_HZ(imager_freq));
 
-	lp_t = timer_alloc(lightpen_trigger);
+	lp_t = timer_alloc(lightpen_trigger_callback, NULL);
 
 	video_start_vector(machine);
 }
@@ -427,7 +432,7 @@ static WRITE8_HANDLER ( v_via_cb2_w )
 			start_time = time_now;
 		}
 		if (data & lightpen_check())
-			lightpen_trigger(Machine, 0);
+			lightpen_trigger();
 
 		blank = data;
 	}

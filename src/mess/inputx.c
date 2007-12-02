@@ -582,7 +582,7 @@ static void execute_input(int ref, int params, const char *param[])
 
 static void setup_keybuffer(void)
 {
-	inputx_timer = timer_alloc(inputx_timerproc);
+	inputx_timer = timer_alloc(inputx_timerproc, NULL);
 	keybuffer = auto_malloc(sizeof(key_buffer));
 	memset(keybuffer, 0, sizeof(*keybuffer));
 }

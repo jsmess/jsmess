@@ -137,7 +137,7 @@ MACHINE_START( dai )
 	ppi8255_init(&dai_ppi82555_intf);
 	pit8253_init(1, &dai_pit8253_intf);
 
-	timer_set(attotime_zero, 0, dai_bootstrap_callback);
+	timer_set(attotime_zero, NULL, 0, dai_bootstrap_callback);
 }
 
 /***************************************************************************

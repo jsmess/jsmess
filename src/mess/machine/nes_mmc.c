@@ -4219,7 +4219,7 @@ int mapper_reset (int mapperNum)
 	ppu2c0x_set_hblank_callback (0, mapper ? mapper->mmc_hblank :  NULL);
 
 	if (!nes_irq_timer)
-		nes_irq_timer = timer_alloc(nes_irq_callback);
+		nes_irq_timer = timer_alloc(nes_irq_callback, NULL);
 		
 	mapper_warning = 0;
 	/* 8k mask */

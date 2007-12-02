@@ -520,9 +520,14 @@ WRITE32_HANDLER( mc_w )
 	}
 }
 
-TIMER_CALLBACK(mc_update)
+void mc_update(void)
 {
 	nMC_RPSSCounter += 1000;
+}
+
+static TIMER_CALLBACK(mc_update_callback)
+{
+	mc_update();
 }
 
 void mc_init()
@@ -568,7 +573,7 @@ void mc_init()
 	nMC_DMAGIO64Addr = 0;
 	nMC_DMAMode = 0;
 	nMC_DMAZoomByteCnt = 0;
-	tMC_UpdateTimer = timer_alloc( mc_update );
+	tMC_UpdateTimer = timer_alloc( mc_update_callback , NULL);
 	timer_adjust( tMC_UpdateTimer, ATTOTIME_IN_HZ(10000), 0, ATTOTIME_IN_HZ(10000) );
 
 	// if Indigo2, ID appropriately

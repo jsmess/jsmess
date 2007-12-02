@@ -196,9 +196,9 @@ MACHINE_RESET( cdp1864 )
 
 VIDEO_START( cdp1864 )
 {
-	cdp1864_int_timer = timer_alloc(cdp1864_int_tick);
-	cdp1864_efx_timer = timer_alloc(cdp1864_efx_tick);
-	cdp1864_dma_timer = timer_alloc(cdp1864_dma_tick);
+	cdp1864_int_timer = timer_alloc(cdp1864_int_tick, NULL);
+	cdp1864_efx_timer = timer_alloc(cdp1864_efx_tick, NULL);
+	cdp1864_dma_timer = timer_alloc(cdp1864_dma_tick, NULL);
 
 	/* allocate the temporary bitmap */
 	cdptmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
