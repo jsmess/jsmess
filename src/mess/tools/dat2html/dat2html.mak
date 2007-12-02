@@ -42,6 +42,6 @@ $(DAT2HTML): $(DAT2HTML_OBJS) $(LIBUTIL) $(ZLIB) $(LIBOCORE)
 # rule for building sysinfo.htm
 #-------------------------------------------------
 
-sysinfo.htm: dat2html$(EXE)
+sysinfo.htm: $(DAT2HTML)
 	@echo Generating $@...
-	@$(CURPATH)dat2html$(EXE) sysinfo.dat
+	@$(CURPATH)$(DAT2HTML) sysinfo.dat

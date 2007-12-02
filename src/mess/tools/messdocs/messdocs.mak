@@ -10,9 +10,12 @@
 # messdocs executable name
 MESSDOCS = messdocs$(EXE)
 
+MESSHELP = mess.chm
+
 # messdocs directories
 OBJDIRS += $(MESSOBJ)/tools/messdocs
 
+HELPOBJ = $(OBJ)/help
 
 
 #-------------------------------------------------
@@ -30,7 +33,7 @@ MESSDOCS_OBJS = \
 # rules to build the messdocs executable
 #-------------------------------------------------
 
-messdocs$(EXE):	$(MESSDOCS_OBJS) $(LIBUTIL) $(LIBOCORE) $(EXPAT)
+$(OBJ)/build/$(MESSDOCS): $(MESSDOCS_OBJS) $(LIBUTIL) $(LIBOCORE) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) $(EXPAT) -o $@
 
@@ -40,7 +43,7 @@ messdocs$(EXE):	$(MESSDOCS_OBJS) $(LIBUTIL) $(LIBOCORE) $(EXPAT)
 # rule for building the mess help file
 #-------------------------------------------------
 
-mess.chm: $(MESSDOCS)
-	$(MESSDOCS) docs/wintoc.xml $(OBJ)/help
-	$(HHC) $(subst /,\\,$(OBJ)/help)\\mess.hhp
-	@cp $(OBJ)/help/mess.chm $@
+$(MESSHELP): $(OBJ)/build/$(MESSDOCS)
+	$(subst /,\,$(OBJ)/build/$(MESSDOCS)) docs/wintoc.xml $(HELPOBJ)
+	$(HHC) $(subst /,\\,$(HELPOBJ))\\mess.hhp
+	@cp $(HELPOBJ)/$(MESSHELP) $@

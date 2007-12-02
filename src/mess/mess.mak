@@ -1150,7 +1150,7 @@ TOOLS += $(DAT2HTML) $(MESSTEST) $(IMGTOOL)
 
 # build additional tools if we are on building for Windows
 ifeq ($(OSD),windows)
-TOOLS += $(WIMGTOOL) $(MESSDOCS)
+TOOLS += $(WIMGTOOL)
 endif
 
 
