@@ -7,21 +7,29 @@
 ###########################################################################
 
 
-# Add path to imgtool headers
-CFLAGS += \
-	-I$(SRC)/$(TARGET)/tools/imgtool \
+# imgtool executable name
+IMGTOOL = imgtool$(EXE)
 
+# add path to imgtool headers
+CFLAGS += -I$(SRC)/$(TARGET)/tools/imgtool
 
-# Imgtool directories
+# imgtool directories
 IMGTOOLOBJ = $(MESSOBJ)/tools/imgtool
 IMGTOOL_MODULES = $(IMGTOOLOBJ)/modules
+
+
+
+#-------------------------------------------------
+# imgtool objects
+#-------------------------------------------------
 
 OBJDIRS += \
 	$(IMGTOOLOBJ) \
 	$(IMGTOOL_MODULES)
 
+LIBIMGTOOL = $(OBJ)/libimgtool.a
 
-# Imgtool shared objects
+# imgtool lib objects
 IMGTOOL_LIB_OBJS =						\
 	$(OBJ)/version.o					\
 	$(EMUOBJ)/mamecore.o				\
@@ -85,20 +93,19 @@ IMGTOOL_LIB_OBJS =						\
 #	$(IMGTOOL_MODULES)/nccard.o			\
 #	$(IMGTOOL_MODULES)/ti85.o			\
 
-
-
-#-------------------------------------------------
-# imgtool
-#-------------------------------------------------
+$(LIBIMGTOOL): $(IMGTOOL_LIB_OBJS)
 
 IMGTOOL_OBJS = \
-	$(IMGTOOL_LIB_OBJS) \
 	$(IMGTOOLOBJ)/main.o \
 	$(IMGTOOLOBJ)/stubs.o \
 	$(MESSOBJ)/toolerr.o
-	
-imgtool-bin: maketree imgtool$(EXE)
 
-imgtool$(EXE): $(IMGTOOL_OBJS) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+
+
+#-------------------------------------------------
+# rules to build the imgtool executable
+#-------------------------------------------------
+
+$(IMGTOOL): $(IMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

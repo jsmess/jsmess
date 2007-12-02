@@ -59,6 +59,33 @@ endif
 
 
 #-------------------------------------------------
+# configure name of final executable
+#-------------------------------------------------
+
+# uncomment and specify prefix to be added to the name
+# PREFIX =
+
+# uncomment and specify suffix to be added to the name
+# SUFFIX =
+
+
+
+#-------------------------------------------------
+# specify architecture-specific optimizations
+#-------------------------------------------------
+
+# uncomment and specify architecture-specific optimizations here
+# some examples:
+#   optimize for I686:   ARCHOPTS = -march=pentiumpro
+#   optimize for Core 2: ARCHOPTS = -march=pentium-m -msse3
+#   optimize for G4:     ARCHOPTS = -mcpu=G4
+# note that we leave this commented by default so that you can
+# configure this in your environment and never have to think about it
+# ARCHOPTS =
+
+
+
+#-------------------------------------------------
 # specify program options; see each option below 
 # for details
 #-------------------------------------------------
@@ -79,29 +106,17 @@ X86_PPC_DRC = 1
 # X86_VOODOO_DRC = 1
 
 
-WINUI = 1
-MESS = 1
-
 
 #-------------------------------------------------
 # specify build options; see each option below 
 # for details
 #-------------------------------------------------
 
-# uncomment one of the next lines to build a target-optimized build
-# NATIVE = 1
-# ATHLON = 1
-# AMD64 = 1
-# I686 = 1
-# P4 = 1
-# PM = 1
-# CORE2 = 1
-# G4 = 1
-# G5 = 1
-# CELL = 1
-
 # uncomment next line if you are building for a 64-bit target
 # PTR64 = 1
+
+# uncomment next line if you are building for a big-endian target
+# BIGENDIAN = 1
 
 # uncomment next line to build expat as part of MAME build
 BUILD_EXPAT = 1
@@ -117,9 +132,6 @@ BUILD_ZLIB = 1
 
 # uncomment next line to generate a link map for exception handling in windows
 # MAP = 1
-
-# uncomment next line to generate a unicode build
-# UNICODE = 1
 
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
@@ -183,88 +195,12 @@ RM = @rm -f
 
 
 #-------------------------------------------------
-# based on the architecture, determine suffixes
-# and endianness
-#-------------------------------------------------
-
-# by default, don't compile for a specific target CPU
-# and assume little-endian (x86)
-ARCH = 
-ENDIAN = little
-
-# architecture-specific builds get extra options
-ifdef NATIVE
-SUFFIX = nat
-ARCH = -march=native
-endif
-
-ifdef ATHLON
-SUFFIX = at
-ARCH = -march=athlon
-endif
-
-ifdef AMD64
-SUFFIX = 64
-ARCH = -march=athlon64
-endif
-
-ifdef I686
-SUFFIX = pp
-ARCH = -march=pentiumpro
-endif
-
-ifdef P4
-SUFFIX = p4
-ARCH = -march=pentium4
-endif
-
-ifdef PM
-SUFFIX = pm
-ARCH = -march=pentium-m
-endif
-
-ifdef CORE2
-SUFFIX = c2
-ARCH = -march=pentium-m -msse3
-endif
-
-ifdef G4
-SUFFIX = g4
-ARCH = -mcpu=G4
-ENDIAN = big
-endif
-
-ifdef G5
-SUFFIX = g5
-ARCH = -mcpu=G5
-ENDIAN = big
-endif
-
-ifdef CELL
-SUFFIX = cbe
-ARCH = 
-ENDIAN = big
-endif
-
-
-
-#-------------------------------------------------
 # form the name of the executable
 #-------------------------------------------------
 
-# unicode builds append the 'u' suffix
-ifdef UNICODE
-SUFFIX:=$(SUFFIX)u
-endif
-
-# x64 builds append the 'x64' suffix
-ifdef PTR64
-SUFFIX:=$(SUFFIX)x64
-endif
-
-# debug builds append the 'd' suffix
+# debug builds just get the 'd' suffix and nothing more
 ifdef DEBUG
-SUFFIX:=$(SUFFIX)d
+DEBUGSUFFIX = d
 endif
 
 # the name is just 'target' if no subtarget; otherwise it is
@@ -275,13 +211,21 @@ else
 NAME = $(TARGET)$(SUBTARGET)
 endif
 
-# fullname is prefix+name+suffix
-FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)
-FULLGUINAME = $(PREFIX)$(NAME)gui$(SUFFIX)
+# fullname is prefix+name+suffix+debugsuffix
+FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)$(DEBUGSUFFIX)
+FULLGUINAME = $(PREFIX)$(NAME)gui$(SUFFIX)$(DEBUGSUFFIX)
 
 # add an EXE suffix to get the final emulator name
 EMULATORCLI = $(FULLNAME)$(EXE)
 EMULATORGUI = $(FULLGUINAME)$(EXE)
+
+# MESS on Windows builds a DLL by default
+ifeq ($(OSD),windows)
+EMULATORDLL = $(FULLNAME)lib.dll
+EMULATORALL = $(EMULATORDLL) $(EMULATORCLI) $(EMULATORGUI)
+else
+EMULATORALL = $(EMULATORCLI)
+endif
 
 
 
@@ -301,11 +245,17 @@ OBJ = obj/$(OSD)/$(FULLNAME)
 # compile-time definitions
 #-------------------------------------------------
 
+# add an additional define for MESS
+ifeq ($(TARGET),mess)
+MESS = 1
+endif
+
 # CR/LF setup: use both on win32/os2, CR only on everything else
 DEFS = -DCRLF=2
 
 ifeq ($(TARGETOS),win32)
-DEFS = -DCRLF=3
+DEFS = -DCRLF=3 -DWIN32 -DWINNT
+WINUI = 1
 endif
 ifeq ($(TARGETOS),os2)
 DEFS = -DCRLF=3
@@ -315,7 +265,7 @@ endif
 DEFS += -DINLINE="static __inline__"
 
 # define LSB_FIRST if we are a little-endian target
-ifeq ($(ENDIAN),little)
+ifndef BIGENDIAN
 DEFS += -DLSB_FIRST
 endif
 
@@ -350,6 +300,9 @@ endif
 # we compile to C89 standard with GNU extensions
 CFLAGS = -std=gnu89
 
+# this speeds it up a bit by piping between the preprocessor/compiler/assembler
+CFLAGS += -pipe
+
 # add -g if we need symbols
 ifdef SYMBOLS
 CFLAGS += -g
@@ -382,8 +335,8 @@ CFLAGS += -O$(OPTIMIZE)
 # if we are optimizing, include optimization options
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
-CFLAGS += -Werror $(ARCH) -fno-strict-aliasing
-#CFLAGS += $(ARCH) -fno-strict-aliasing
+CFLAGS += -Werror $(ARCHOPTS) -fno-strict-aliasing
+#CFLAGS += $(ARCHOPTS) -fno-strict-aliasing
 endif
 
 # if symbols are on, make sure we have frame pointers
@@ -392,21 +345,6 @@ CFLAGS += -fno-omit-frame-pointer
 endif
 
 
-ifeq ($(OSD),windows)
-
-DEFS += -DWIN32 -DWINNT
-EMULATORDLL = $(FULLNAME)lib.dll
-EMULATORALL = $(EMULATORDLL) $(EMULATORCLI) $(EMULATORGUI)
-MESSDOCS = messdocs$(EXE)
-
-else
-
-EMULATORALL = $(EMULATORCLI)
-
-endif
-
-# extra options needed *only* for the osd files
-CFLAGSOSDEPEND = $(CFLAGS)
 
 #-------------------------------------------------
 # include paths
@@ -555,6 +493,8 @@ CDEFS = $(DEFS) $(COREDEFS) $(CPUDEFS) $(SOUNDDEFS)
 
 emulator: maketree $(BUILD) $(EMULATORALL)
 
+buildtools: maketree $(BUILD)
+
 tools: maketree $(TOOLS)
 
 maketree: $(sort $(OBJDIRS))
@@ -613,10 +553,11 @@ $(EMULATORCLI):	$(EMULATORDLL) $(OBJ)/mess/osd/windows/climain.o
 
 else
 
-$(EMULATORCLI):	$(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU)  $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+$(EMULATORCLI): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
+# always recompile the version string
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) -mconsole $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
 
 endif
 
@@ -657,8 +598,3 @@ $(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
 	@echo Objective-C compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 endif
-
-mess.chm: $(MESSDOCS)
-	$(MESSDOCS) docs/wintoc.xml obj/help
-	$(HHC) obj\\help\\mess.hhp
-	@cp obj/help/mess.chm $@

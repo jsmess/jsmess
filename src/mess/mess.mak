@@ -380,6 +380,7 @@ DRVLIBS = \
 #	$(MESSOBJ)/exeltel.a \
 
 
+
 #-------------------------------------------------
 # the following files are general components and
 # shared across a number of drivers
@@ -1106,37 +1107,29 @@ $(MESSOBJ)/osborne.a:			\
 	$(MESS_DRIVERS)/osborne1.o	\
 	$(MESS_MACHINE)/osborne1.o	\
 
+
+
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
 
-
 $(OBJ)/render.o:	$(MESS_LAYOUT)/horizont.lh \
 					$(MESS_LAYOUT)/vertical.lh \
 
-$(MESS_DRIVERS)/coco.o:	$(MESS_LAYOUT)/coco3.lh
-
-$(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
-
-$(MESS_DRIVERS)/gb.o:	$(MESS_LAYOUT)/gb.lh
-
-$(MESS_DRIVERS)/mk1.o:	$(MESS_LAYOUT)/mk1.lh
-
-$(MESS_DRIVERS)/mk2.o:	$(MESS_LAYOUT)/mk2.lh
-
-$(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
-
-$(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
-
+$(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
-
+$(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
+$(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
+$(MESS_DRIVERS)/gb.o:		$(MESS_LAYOUT)/gb.lh
+$(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
+$(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
+$(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
+$(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
+$(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
+$(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 
-$(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 
-$(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
-
-$(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 
 #-------------------------------------------------
 # MESS-specific tools
@@ -1144,45 +1137,29 @@ $(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 
 include $(MESSSRC)/tools/imgtool/imgtool.mak
 include $(MESSSRC)/tools/messtest/messtest.mak
-include $(MESSSRC)/tools/messdocs/messdocs.mak
+include $(MESSSRC)/tools/dat2html/dat2html.mak
 
 # include OS-specific MESS stuff
 ifeq ($(OSD),windows)
+include $(MESSSRC)/tools/messdocs/messdocs.mak
 include $(MESSSRC)/tools/imgtool/windows/wimgtool.mak
 endif
 
-# text files
-TEXTS = sysinfo.htm
-
-mess.txt: $(EMULATORCLI)
-	@echo Generating $@...
-	@$(CURPATH)$(EMULATORCLI) -listtext -noclones -sortname > docs/mess.txt
-
-sysinfo.htm: dat2html$(EXE)
-	@echo Generating $@...
-	@$(CURPATH)dat2html$(EXE) sysinfo.dat
-
 # tool targets
-TOOLS += dat2html$(EXE) messtest$(EXE) messdocs$(EXE) imgtool$(EXE)
+TOOLS += $(DAT2HTML) $(MESSTEST) $(IMGTOOL)
 
+# build additional tools if we are on building for Windows
 ifeq ($(OSD),windows)
-TOOLS += wimgtool$(EXE)
+TOOLS += $(WIMGTOOL) $(MESSDOCS)
 endif
 
 
+
 #-------------------------------------------------
-# dat2html
+# MESS text files
 #-------------------------------------------------
 
-OBJDIRS += \
-	$(MESSOBJ)/tools/dat2html \
-
-DAT2HTML_OBJS =								\
-	$(EMUOBJ)/mamecore.o					\
-	$(MESSOBJ)/tools/dat2html/dat2html.o	\
-	$(MESSOBJ)/tools/imgtool/stubs.o		\
-	$(MESSOBJ)/utils.o						\
-
-dat2html$(EXE):	$(DAT2HTML_OBJS) $(LIBUTIL) $(ZLIB) $(LIBOCORE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+# rule to build the list of supported systems
+mess.txt: $(EMULATORCLI)
+	@echo Generating $@...
+	@$(CURPATH)$(EMULATORCLI) -listtext -noclones -sortname > docs/mess.txt

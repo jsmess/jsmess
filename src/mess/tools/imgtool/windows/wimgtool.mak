@@ -7,41 +7,46 @@
 ###########################################################################
 
 
-WIMGTOOLSRC = $(SRC)/mess/tools/imgtool/windows
-WIMGTOOLOBJ = $(OBJ)/mess/tools/imgtool/windows
+# wimgtool executable name
+WIMGTOOL = wimgtool$(EXE)
 
-OBJDIRS += $(WIMGTOOLOBJ)
-
-WIMGTOOL_OBJS=\
-	$(IMGTOOL_LIB_OBJS)								\
-	$(OBJ)/mess/pile.o								\
-	$(OBJ)/mess/toolerr.o							\
-	$(OBJ)/mess/osd/windows/opcntrl.o				\
-	$(OBJ)/mess/osd/windows/winutils.o				\
-	$(OBJ)/mess/tools/imgtool/stubs.o				\
-	$(OBJ)/mess/tools/imgtool/windows/wmain.o		\
-	$(OBJ)/mess/tools/imgtool/windows/wimgtool.o	\
-	$(OBJ)/mess/tools/imgtool/windows/attrdlg.o		\
-	$(OBJ)/mess/tools/imgtool/windows/assoc.o		\
-	$(OBJ)/mess/tools/imgtool/windows/assocdlg.o	\
-	$(OBJ)/mess/tools/imgtool/windows/hexview.o		\
-	$(OBJ)/mess/tools/imgtool/windows/secview.o		\
-	$(OBJ)/mess/tools/imgtool/windows/wimgtool.res	\
-
-$(OBJ)/mess/tools/imgtool/$(OSD)/%.res: mess/tools/imgtool/$(OSD)/%.rc
-	@echo Compiling resources $<...
-	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir mess/tools/imgtool/$(OSD) -o $@ -i $<
-	
-wimgtool$(EXE):	 $(WIMGTOOL_OBJS) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) -mwindows $^ $(LIBS) -o $@
+# wimgtool directories
+WIMGTOOLSRC = $(MESSSRC)/tools/imgtool/windows
+WIMGTOOLOBJ = $(MESSOBJ)/tools/imgtool/windows
 
 
 
 #-------------------------------------------------
-# generic rule for the resource compiler
+# wimgtool objects
+#-------------------------------------------------
+
+OBJDIRS += $(WIMGTOOLOBJ)
+
+WIMGTOOL_OBJS = \
+	$(MESSOBJ)/pile.o								\
+	$(MESSOBJ)/toolerr.o							\
+	$(MESSOBJ)/osd/windows/opcntrl.o				\
+	$(MESSOBJ)/osd/windows/winutils.o				\
+	$(MESSOBJ)/tools/imgtool/stubs.o				\
+	$(MESSOBJ)/tools/imgtool/windows/wmain.o		\
+	$(MESSOBJ)/tools/imgtool/windows/wimgtool.o		\
+	$(MESSOBJ)/tools/imgtool/windows/attrdlg.o		\
+	$(MESSOBJ)/tools/imgtool/windows/assoc.o		\
+	$(MESSOBJ)/tools/imgtool/windows/assocdlg.o		\
+	$(MESSOBJ)/tools/imgtool/windows/hexview.o		\
+	$(MESSOBJ)/tools/imgtool/windows/secview.o		\
+	$(MESSOBJ)/tools/imgtool/windows/wimgtool.res	\
+
+
+
+#-------------------------------------------------
+# rules to build the wimgtool executable
 #-------------------------------------------------
 
 $(WIMGTOOLOBJ)/%.res: $(WIMGTOOLSRC)/%.rc | $(OSPREBUILD)
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WIMGTOOLSRC) -o $@ -i $<
+
+$(WIMGTOOL): $(WIMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) -mwindows $^ $(LIBS) -o $@
