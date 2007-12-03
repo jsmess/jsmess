@@ -2,7 +2,10 @@
 #
 #   makefile.mes
 #
-#   Core makefile for building MESS and derivatives
+#   Core makefile for building MAME and derivatives
+#
+#   Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+#   Visit http://mamedev.org for licensing and usage restrictions.
 #
 ###########################################################################
 
@@ -213,19 +216,9 @@ endif
 
 # fullname is prefix+name+suffix+debugsuffix
 FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)$(DEBUGSUFFIX)
-FULLGUINAME = $(PREFIX)$(NAME)gui$(SUFFIX)$(DEBUGSUFFIX)
 
 # add an EXE suffix to get the final emulator name
-EMULATORCLI = $(FULLNAME)$(EXE)
-EMULATORGUI = $(FULLGUINAME)$(EXE)
-
-# MESS on Windows builds a DLL by default
-ifeq ($(OSD),windows)
-EMULATORDLL = $(FULLNAME)lib.dll
-EMULATOR = $(EMULATORDLL) $(EMULATORCLI) $(EMULATORGUI)
-else
-EMULATOR = $(EMULATORCLI)
-endif
+EMULATOR = $(FULLNAME)$(EXE)
 
 
 
@@ -245,17 +238,11 @@ OBJ = obj/$(OSD)/$(FULLNAME)
 # compile-time definitions
 #-------------------------------------------------
 
-# add an additional define for MESS
-ifeq ($(TARGET),mess)
-MESS = 1
-endif
-
 # CR/LF setup: use both on win32/os2, CR only on everything else
 DEFS = -DCRLF=2
 
 ifeq ($(TARGETOS),win32)
-DEFS = -DCRLF=3 -DWIN32 -DWINNT
-WINUI = 1
+DEFS = -DCRLF=3
 endif
 ifeq ($(TARGETOS),os2)
 DEFS = -DCRLF=3
@@ -362,12 +349,6 @@ CFLAGS += \
 	-I$(SRC)/osd \
 	-I$(SRC)/osd/$(OSD) \
 
-ifdef MESS
-CFLAGS += \
-	-I$(SRC)/mame \
-	-I$(SRC)/mame/includes \
-	-I$(SRC)/$(TARGET)/osd/$(OSD)
-endif
 
 
 #-------------------------------------------------
@@ -474,9 +455,7 @@ all: maketree buildtools emulator tools
 include $(SRC)/osd/$(OSD)/$(OSD).mak
 
 # then the various core pieces
-include $(SRC)/mess/messcore.mak
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak
-include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 include $(SRC)/emu/emu.mak
 include $(SRC)/lib/lib.mak
 include $(SRC)/build/build.mak
@@ -497,7 +476,7 @@ buildtools: maketree $(BUILD)
 
 tools: maketree $(TOOLS)
 
-help: maketree $(MESSHELP)
+help: maketree $(HELP)
 
 maketree: $(sort $(OBJDIRS))
 
@@ -528,31 +507,7 @@ $(sort $(OBJDIRS)):
 # executable targets and dependencies
 #-------------------------------------------------
 
-ifeq ($(OSD),windows)
-
-ifdef MSVC_BUILD
-DLLLINK=lib
-else
-DLLLINK=dll
-endif
-
-$(EMULATORDLL): $(VERSIONOBJ) $(OBJ)/mess/osd/windows/messlib.o $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(MESS_WINOBJ)/mess.res
-# always recompile the version string
-	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
-	@echo Linking $@...
-	$(LD) -shared $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
-
-# gui target
-$(EMULATORGUI):	$(EMULATORDLL) $(OBJ)/mess/osd/winui/guimain.o $(GUIRESFILE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) -mwindows $(FULLNAME)lib.$(DLLLINK) $(OBJ)/mess/osd/winui/guimain.o $(GUIRESFILE) $(LIBS) -o $@
-
-# cli target
-$(EMULATORCLI):	$(EMULATORDLL) $(OBJ)/mess/osd/windows/climain.o
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) -mconsole $(FULLNAME)lib.$(DLLLINK) $(OBJ)/mess/osd/windows/climain.o $(LIBS) -o $@
-
-else
+ifndef EXECUTABLE_DEFINED
 
 $(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
 # always recompile the version string

@@ -11,12 +11,10 @@ WINUIOBJ = $(OBJ)/osd/winui
 
 OBJDIRS += $(WINUIOBJ)
 	
-ifdef MESS
 MESS_WINUISRC = $(SRC)/mess/osd/winui
 MESS_WINUIOBJ = $(OBJ)/mess/osd/winui
 OBJDIRS += $(MESS_WINUIOBJ)
 CFLAGS += -I$(WINUISRC) -I$(MESS_WINUISRC)
-endif
 
 
 
@@ -49,9 +47,6 @@ WINUIOBJS += \
 	$(WINUIOBJ)/m32opts.o \
 	$(WINUIOBJ)/win32ui.o \
 	$(WINUIOBJ)/helpids.o \
-
-ifdef MESS
-WINUIOBJS += \
 	$(MESS_WINUIOBJ)/mess32ui.o \
 	$(MESS_WINUIOBJ)/optionsms.o \
  	$(MESS_WINUIOBJ)/layoutms.o \
@@ -59,23 +54,10 @@ WINUIOBJS += \
 	$(MESS_WINUIOBJ)/propertiesms.o \
 	$(MESS_WINUIOBJ)/softwarepicker.o \
 	$(MESS_WINUIOBJ)/devview.o
-else
-WINUIOBJS += \
- 	$(WINUIOBJ)/layout.o \
-	$(WINUIOBJ)/m32main.o \
-	$(WINUIOBJ)/mame32.res
-endif
 
-ifdef MESS
-# extra dependencies
-# $(MESS_WINUIOBJ)/mess32ui.o:	$(WINUISRC)/win32ui.c $(MESS_WINUISRC)/mess32ui.c
-# $(MESS_WINUIOBJ)/optionsms.o:	$(WINUISRC)/options.c $(MESS_WINUISRC)/optionsms.c
-endif
-	
+
 # add resource file
-ifdef MESS
 GUIRESFILE = $(MESS_WINUIOBJ)/mess32.res
-endif
 
 $(LIBOSD): $(WINUIOBJS)
 
@@ -117,17 +99,6 @@ DEFS += \
 #####################################################################
 # Resources
 
-ifndef MESS
-UI_RC = @windres --use-temp-file
-
-UI_RCDEFS = -DNDEBUG -D_WIN32_IE=0x0400
-
-UI_RCFLAGS = -O coff --include-dir $(WINUISRC)
-
-$(WINUIOBJ)/%.res: $(WINUISRC)/%.rc
-	@echo Compiling mame32 resources $<...
-	$(UI_RC) $(UI_RCDEFS) $(UI_RCFLAGS) -o $@ -i $<
-endif
 
 #####################################################################
 # Linker
@@ -141,13 +112,10 @@ LIBS += -lkernel32 \
 
 endif
 
-ifndef MESS
-LDFLAGS += -mwindows
-endif
+
 
 #####################################################################
 
-ifdef MESS
 
 $(MESS_WINUIOBJ)/mess32.res:	$(WINUISRC)/mame32.rc $(MESS_WINUISRC)/mess32.rc $(WINUISRC)/resource.h $(MESS_WINUISRC)/resourcems.h $(WINUIOBJ)/mamevers.rc
 	@echo Compiling resources $<...
@@ -156,5 +124,3 @@ $(MESS_WINUIOBJ)/mess32.res:	$(WINUISRC)/mame32.rc $(MESS_WINUISRC)/mess32.rc $(
 $(WINUIOBJ)/mamevers.rc: $(WINOBJ)/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
 	@$(VERINFO) $(SRC)/version.c > $@
-
-endif

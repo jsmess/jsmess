@@ -3,7 +3,7 @@
 #   tiny.mak
 #
 #   Small driver-specific example makefile
-#	Use make SUBTARGET=tiny to build
+#	Use make TARGET=mess SUBTARGET=tiny to build
 #
 #   As an example this makefile builds MESS with the three Colecovision
 #   drivers enabled only.
@@ -12,6 +12,11 @@
 #   Visit  http://mamedev.org for licensing and usage restrictions.
 #
 ###########################################################################
+
+
+# include MESS core defines
+include $(SRC)/mess/messcore.mak
+include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 
 
 #-------------------------------------------------
@@ -53,3 +58,8 @@ DRVLIBS = \
 
 
 
+#-------------------------------------------------
+# MESS special OSD rules
+#-------------------------------------------------
+
+include $(SRC)/mess/osd/$(OSD)/$(OSD).mak

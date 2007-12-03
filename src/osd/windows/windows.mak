@@ -246,16 +246,6 @@ RESFILE = $(WINOBJ)/mame.res
 
 
 #-------------------------------------------------
-# if building with a UI, include the ui.mak
-#-------------------------------------------------
-
-ifdef WINUI
-include $(SRC)/osd/winui/ui.mak
-endif
-
-
-
-#-------------------------------------------------
 # rules for building the libaries
 #-------------------------------------------------
 

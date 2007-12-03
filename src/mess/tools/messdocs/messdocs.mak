@@ -10,12 +10,14 @@
 # messdocs executable name
 MESSDOCS = messdocs$(EXE)
 
-MESSHELP = mess.chm
-
-# messdocs directories
-OBJDIRS += $(MESSOBJ)/tools/messdocs
-
+# messdocs will create this file
 HELPOBJ = $(OBJ)/help
+MESSHELP = mess.chm 
+
+# add our stuff to the global variables
+OBJDIRS += $(MESSOBJ)/tools/messdocs
+HELP += $(MESSHELP)
+
 
 
 #-------------------------------------------------

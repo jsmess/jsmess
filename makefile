@@ -191,6 +191,7 @@ endif
 AR = @ar
 CC = @gcc
 LD = @gcc
+HHC = @-hhc
 MD = -mkdir$(EXE)
 RM = @rm -f
 
@@ -402,6 +403,7 @@ LIBCPU = $(OBJ)/libcpu.a
 LIBSOUND = $(OBJ)/libsound.a
 LIBUTIL = $(OBJ)/libutil.a
 LIBOCORE = $(OBJ)/libocore.a
+LIBOCORE_NOMAIN = $(OBJ)/libocore_nomain.a
 LIBOSD = $(OBJ)/libosd.a
 
 VERSIONOBJ = $(OBJ)/version.o
@@ -474,6 +476,8 @@ buildtools: maketree $(BUILD)
 
 tools: maketree $(TOOLS)
 
+help: maketree $(HELP)
+
 maketree: $(sort $(OBJDIRS))
 
 clean:
@@ -503,11 +507,15 @@ $(sort $(OBJDIRS)):
 # executable targets and dependencies
 #-------------------------------------------------
 
+ifndef EXECUTABLE_DEFINED
+
 $(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
 # always recompile the version string
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
+
+endif
 
 
 

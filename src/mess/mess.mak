@@ -7,6 +7,10 @@
 ###########################################################################
 
 
+# include MESS core defines
+include $(SRC)/mess/messcore.mak
+
+
 #-------------------------------------------------
 # specify available CPU cores; some of these are
 # only for MAME and so aren't included
@@ -1152,6 +1156,14 @@ TOOLS += $(DAT2HTML) $(MESSTEST) $(IMGTOOL)
 ifeq ($(OSD),windows)
 TOOLS += $(WIMGTOOL)
 endif
+
+
+
+#-------------------------------------------------
+# MESS special OSD rules
+#-------------------------------------------------
+	
+include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 
 
 
