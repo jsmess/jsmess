@@ -3,6 +3,7 @@
 #include "cpu/m68000/m68000.h"
 #include "devices/cartslot.h"
 #include "includes/serial.h"
+#include "sound/speaker.h"
 #include "video/generic.h"
 #include "video/zx8301.h"
 #include "inputx.h"
@@ -17,17 +18,16 @@
 
 	TODO:
 
-	- RTC register write
-	- proper pound key code (£)
-	- speaker sound
+	- unicode for port char macros
+	- get rid of keyboard not 100% prompt
 	- microdrive simulation
-	- M68008 opcode reading interface
+	- RTC register write
 	- serial data latching?
 	- transmit interrupt timing
 	- interface interrupt
 	- accurate screen timings
-	- emulate COMCTL properly
 	- ZX8301 cycle stealing
+	- emulate COMCTL properly
 
 */
 
@@ -82,6 +82,7 @@ static struct ZX8302
 	int ser2_txd, ser2_dtr;
 	int netout, netin;
 	int mdrdw, mdselck, mdseld, erase, raw1, raw2;
+	int mdv_motor;
 } zx8302;
 
 static emu_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer, *zx8302_gap_timer;
@@ -158,7 +159,10 @@ static TIMER_CALLBACK( zx8302_rtc_tick )
 
 static TIMER_CALLBACK( zx8302_gap_tick )
 {
-	zx8302_interrupt(ZX8302_INT_GAP);
+	if (zx8302.mdv_motor)
+	{
+		zx8302_interrupt(ZX8302_INT_GAP);
+	}
 }
 
 static READ8_HANDLER( zx8302_rtc_r )
@@ -229,8 +233,37 @@ static WRITE8_HANDLER( zx8302_ipc_command_w )
 	timer_set(ATTOTIME_IN_NSEC(480), NULL, data, zx8302_delayed_ipc_command);
 }
 
+/*
+static int zx8302_get_selected_microdrive(void)
+{
+	int i;
+
+	for (i = 0; i < 8; i++)
+	{
+		if (BIT(zx8302.mdv_motor, i)) return 8 - i;
+	}
+
+	return 0;
+}
+*/
+
 static WRITE8_HANDLER( zx8302_mdv_control_w )
 {
+	/*
+		
+		bit		description
+		
+		0		MDSELDH
+		1		MDSELCKH
+		2		MDRDWL
+		3		ERASE
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
 	/*
 	MDV control
 	at reset; and after data transfer of any mdv
@@ -256,6 +289,23 @@ static WRITE8_HANDLER( zx8302_mdv_control_w )
 		get 4 bytes
 		(02 02) indication to skip PLL sequence: 6*00,2*ff
 	*/
+
+	zx8302.mdseld = BIT(data, 0);
+	zx8302.mdselck = BIT(data, 1);
+	zx8302.mdrdw = BIT(data, 2) ? 0 : 1;
+	zx8302.erase = BIT(data, 3);
+
+	// Microdrive selection shift register
+
+	if (zx8302.mdselck)
+	{
+		zx8302.mdv_motor >>= 1;
+		zx8302.mdv_motor |= (zx8302.mdseld << 7);
+
+//		logerror("MDV selected %u\n", zx8302_get_selected_microdrive());
+	}
+
+//	logerror("MDV control %x\n", data);
 }
 
 static READ8_HANDLER( zx8302_irq_status_r )
@@ -411,6 +461,8 @@ static WRITE8_HANDLER( ipc_port2_w )
 		// do nothing
 		break;
 	}
+
+	speaker_level_w(0, BIT(data, 1));
 
 	ipc.ser2_cts = BIT(data, 4);
 	ipc.ser1_dtr = BIT(data, 5);
@@ -807,6 +859,11 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_PALETTE_INIT(zx8301)
 	MDRV_VIDEO_START(zx8301)
 	MDRV_VIDEO_UPDATE(zx8301)
+
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ql_ntsc )
@@ -1043,12 +1100,12 @@ SYSTEM_CONFIG_END
 /* Computer Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY                     FULLNAME        FLAGS */
-COMP( 1984, ql,     0,      0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (UK)",      GAME_NO_SOUND )
-COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_NO_SOUND )
-COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_NO_SOUND )
-COMP( 1985, ql_fr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_NO_SOUND )
-COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_NO_SOUND )
-COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_NO_SOUND )
-COMP( 1985, ql_se,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NO_SOUND )
+COMP( 1984, ql,     0,      0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (UK)",      GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_fr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_se,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_SUPPORTS_SAVE )
 COMP( 1985, ql_dk,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
-COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_NO_SOUND )
+COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_SUPPORTS_SAVE )
