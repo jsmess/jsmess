@@ -204,6 +204,18 @@ static WRITE16_HANDLER ( write_lcd_gg )
 //  logerror("LCD Offset = %d Data low  = %x \n  ",offset,lcd_data);
 }
 
+
+
+static WRITE16_HANDLER ( write_beeper )
+{
+UINT8 beep_flag;
+lcd_invert=1;
+beep_flag=data>>8;
+//if ((beep_flag &02)== 0) key_selector=0;else key_selector=1;
+ logerror("Write Beeper   = %x \n  ",data);
+ beeper=data;
+}
+
 static WRITE16_HANDLER ( write_lcd )
 {
   UINT8 lcd_data;
@@ -211,8 +223,9 @@ static WRITE16_HANDLER ( write_lcd )
   output_set_digit_value(lcd_shift_counter,lcd_invert&1?lcd_data^0xff:lcd_data);
   lcd_shift_counter--;
   lcd_shift_counter&=3;
-//  logerror("LCD Offset = %d Data low  = %x \n  ",offset,lcd_data);
+  logerror("LCD Offset = %d Data low  = %x \n  ",offset,lcd_data);
 }
+
 static WRITE16_HANDLER ( write_lcd_flag )
 {
   UINT8 lcd_flag;
@@ -220,9 +233,12 @@ static WRITE16_HANDLER ( write_lcd_flag )
   lcd_flag=data>>8;
   //beep_set_state(0,lcd_flag&1?1:0);
   if (lcd_flag == 0) key_selector=1;
+ // The key function in the rom expects after writing to 
+ // the  a value from  the second key row;
   if (lcd_flag!=0) led7=255;else led7=0;
-//  logerror("LCD Flag 16  = %x \n  ",data);
+  logerror("LCD Flag 16  = %x \n  ",data);
 }
+
 
 
 static WRITE16_HANDLER ( write_lcd_flag_gg )
@@ -242,7 +258,27 @@ static WRITE16_HANDLER ( write_keys )
 // logerror("Write Key   = %x \n  ",data);
 }
 
-static WRITE16_HANDLER ( write_board )
+
+static READ16_HANDLER(read_board)
+{
+  return 0xff00;	// Mephisto need it for working
+}
+
+
+static WRITE16_HANDLER(write_board)
+{
+ UINT8 board;
+ board=data>>8;
+ board_value=board;
+ if (board==0xff) key_selector=0;   
+ // The key function in the rom expects after writing to 
+ // the chess board a value from  the first key row;
+  logerror("Write Board   = %x \n  ",data>>8);
+}
+
+
+
+static WRITE16_HANDLER ( write_board_gg )
 {
 UINT8 beep_flag;
 
@@ -272,7 +308,6 @@ beep_flag=data>>8;
 
 static WRITE16_HANDLER ( write_irq_flag )
 {
-
  beep_set_state(0,data&0x100);
  logerror("Write 0x800004   = %x \n  ",data);
  irq_flag=1;
@@ -301,7 +336,7 @@ static READ16_HANDLER(read_newkeys16)  //Amsterdam, Roma
  return data ;
 }
 
-static READ16_HANDLER(read_board)
+static READ16_HANDLER(read_board_gg)
 {
 	  UINT8 i_18, i_AH;
 	  UINT16 data;
@@ -342,7 +377,7 @@ static READ16_HANDLER(read_board)
 
 }
 
-static WRITE16_HANDLER(write_beeper)
+static WRITE16_HANDLER(write_beeper_gg)
 {
 //  logerror("Write Board   = %x \n  ",data>>8);
 
@@ -472,9 +507,14 @@ static READ32_HANDLER(read_board32)
   logerror("read board 32 Offset = %x \n  ",offset);
   return 0x00000000;
 }
+/*
+static READ16_HANDLER(read_board_amsterd)
+{
+  logerror("read board amsterdam Offset = %x \n  ",offset);
+  return 0xffff;
+}
 
-
-
+*/
 static WRITE32_HANDLER(write_board32)
 {
  UINT8 board;
@@ -537,6 +577,9 @@ static MACHINE_RESET( glasgow )
 static VIDEO_START( glasgow )
 {
 }
+
+
+
 
 static VIDEO_UPDATE( glasgow )
 {
@@ -690,13 +733,21 @@ static VIDEO_UPDATE( glasgow )
 }
 
 
+
+
+
+static VIDEO_UPDATE( dallas32 )
+{
+ return 0;
+}
+
 static ADDRESS_MAP_START(glasgow_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE( 0x0000, 0xffff ) AM_ROM
 	AM_RANGE( 0x00ff0000, 0x00ff0001)  AM_MIRROR ( 0xfe0000 ) AM_WRITE     ( write_lcd_gg )
   AM_RANGE( 0x00ff0002, 0x00ff0003)  AM_MIRROR ( 0xfe0002 ) AM_READWRITE ( read_keys,write_keys )
   AM_RANGE( 0x00ff0004, 0x00ff0005)  AM_MIRROR ( 0xfe0004 ) AM_WRITE     ( write_lcd_flag_gg )
-  AM_RANGE( 0x00ff0006, 0x00ff0007)  AM_MIRROR ( 0xfe0006 ) AM_READWRITE ( read_board, write_beeper )
-  AM_RANGE( 0x00ff0008, 0x00ff0009)  AM_MIRROR ( 0xfe0008 ) AM_WRITE     ( write_board )
+  AM_RANGE( 0x00ff0006, 0x00ff0007)  AM_MIRROR ( 0xfe0006 ) AM_READWRITE ( read_board_gg, write_beeper_gg )
+  AM_RANGE( 0x00ff0008, 0x00ff0009)  AM_MIRROR ( 0xfe0008 ) AM_WRITE     ( write_board_gg )
   AM_RANGE( 0x00ffC000, 0x00ffFFFF)  AM_MIRROR ( 0xfeC000 ) AM_RAM      // 16KB
 ADDRESS_MAP_END
 
@@ -755,6 +806,18 @@ static INPUT_PORTS_START( new_keyboard ) //Amsterdam, Dallas 32, Roma, Roma 32
   PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H8")  PORT_CODE(KEYCODE_H )
   PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G7")  PORT_CODE(KEYCODE_7 )
   PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H8")  PORT_CODE(KEYCODE_8 )
+  
+  PORT_START
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X)  PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
+
+    PORT_START
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
+
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("left button")
+
+   	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("right button")
 INPUT_PORTS_END
 
 
@@ -834,6 +897,7 @@ static MACHINE_DRIVER_START(amsterd )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(amsterd_mem, 0)
+	MDRV_VIDEO_UPDATE(dallas32)
 MACHINE_DRIVER_END
 
 
@@ -843,6 +907,7 @@ static MACHINE_DRIVER_START(dallas32 )
 	MDRV_CPU_REPLACE("main", M68020, 14000000)
 	MDRV_CPU_PROGRAM_MAP(dallas32_mem, 0)
 	MDRV_MACHINE_START( dallas32 )
+  MDRV_VIDEO_UPDATE(dallas32)
 MACHINE_DRIVER_END
 
 
