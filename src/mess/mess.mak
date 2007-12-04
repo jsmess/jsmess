@@ -7,6 +7,30 @@
 ###########################################################################
 
 
+
+###########################################################################
+#################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
+###########################################################################
+
+# uncomment next line to build imgtool
+BUILD_IMGTOOL = 1
+
+# uncomment next line to build wimgtool
+BUILD_WIMGTOOL = 1
+
+# uncomment next line to build messtest
+BUILD_MESSTEST = 1
+
+# uncomment next line to build dat2html
+BUILD_DAT2HTML = 1
+
+
+###########################################################################
+##################   END USER-CONFIGURABLE OPTIONS   ######################
+###########################################################################
+
+
+
 # include MESS core defines
 include $(SRC)/mess/messcore.mak
 
@@ -1139,22 +1163,29 @@ $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 # MESS-specific tools
 #-------------------------------------------------
 
+ifdef BUILD_IMGTOOL
 include $(MESSSRC)/tools/imgtool/imgtool.mak
+TOOLS += $(IMGTOOL)
+endif
+
+ifdef BUILD_MESSTEST
 include $(MESSSRC)/tools/messtest/messtest.mak
+TOOLS += $(MESSTEST)
+endif
+
+ifdef BUILD_DAT2HTML
 include $(MESSSRC)/tools/dat2html/dat2html.mak
+TOOLS += $(DAT2HTML)
+endif
 
 # include OS-specific MESS stuff
 ifeq ($(OSD),windows)
 include $(MESSSRC)/tools/messdocs/messdocs.mak
+
+ifdef BUILD_WIMGTOOL
 include $(MESSSRC)/tools/imgtool/windows/wimgtool.mak
-endif
-
-# tool targets
-TOOLS += $(DAT2HTML) $(MESSTEST) $(IMGTOOL)
-
-# build additional tools if we are on building for Windows
-ifeq ($(OSD),windows)
 TOOLS += $(WIMGTOOL)
+endif
 endif
 
 
@@ -1164,14 +1195,3 @@ endif
 #-------------------------------------------------
 	
 include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
-
-
-
-#-------------------------------------------------
-# MESS text files
-#-------------------------------------------------
-
-# rule to build the list of supported systems
-mess.txt: $(EMULATORCLI)
-	@echo Generating $@...
-	@$(CURPATH)$(EMULATORCLI) -listtext -noclones -sortname > docs/mess.txt
