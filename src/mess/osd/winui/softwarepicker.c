@@ -23,11 +23,11 @@
 #include "picker.h"
 #include "screenshot.h"
 #include "bitmask.h"
-#include "mame32.h"
+#include "winui.h"
 #include "resourcems.h"
-#include "m32opts.h"
+#include "mui_opts.h"
 #include "softwarepicker.h"
-#include "m32util.h"
+#include "mui_util.h"
 
 
 
@@ -212,7 +212,7 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 		{
 			while(pDriver && !pPickerInfo->pHashFile)
 			{
-				pPickerInfo->pHashFile = hashfile_open_options(Mame32Global(), pDriver->name, TRUE, pPickerInfo->pfnErrorProc);
+				pPickerInfo->pHashFile = hashfile_open_options(MameUIGlobal(), pDriver->name, TRUE, pPickerInfo->pfnErrorProc);
 				pDriver = mess_next_compatible_driver(pDriver);
 			}
 		}

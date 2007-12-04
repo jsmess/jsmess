@@ -23,12 +23,12 @@ CFLAGS += -I$(WINUISRC) -I$(MESS_WINUISRC)
 #-------------------------------------------------
 
 WINUIOBJS += \
-	$(WINUIOBJ)/m32util.o \
+	$(WINUIOBJ)/mui_util.o \
 	$(WINUIOBJ)/directinput.o \
 	$(WINUIOBJ)/dijoystick.o \
 	$(WINUIOBJ)/directdraw.o \
 	$(WINUIOBJ)/directories.o \
-	$(WINUIOBJ)/audit32.o \
+	$(WINUIOBJ)/mui_audit.o \
 	$(WINUIOBJ)/columnedit.o \
 	$(WINUIOBJ)/screenshot.o \
 	$(WINUIOBJ)/treeview.o \
@@ -44,20 +44,20 @@ WINUIOBJS += \
 	$(WINUIOBJ)/dialogs.o \
 	$(WINUIOBJ)/dirwatch.o	\
 	$(WINUIOBJ)/datafile.o	\
-	$(WINUIOBJ)/m32opts.o \
-	$(WINUIOBJ)/win32ui.o \
+	$(WINUIOBJ)/mui_opts.o \
+	$(WINUIOBJ)/winui.o \
 	$(WINUIOBJ)/helpids.o \
-	$(MESS_WINUIOBJ)/mess32ui.o \
+	$(MESS_WINUIOBJ)/messui.o \
 	$(MESS_WINUIOBJ)/optionsms.o \
  	$(MESS_WINUIOBJ)/layoutms.o \
-	$(MESS_WINUIOBJ)/ms32util.o \
+	$(MESS_WINUIOBJ)/msuiutil.o \
 	$(MESS_WINUIOBJ)/propertiesms.o \
 	$(MESS_WINUIOBJ)/softwarepicker.o \
 	$(MESS_WINUIOBJ)/devview.o
 
 
 # add resource file
-GUIRESFILE = $(MESS_WINUIOBJ)/mess32.res
+GUIRESFILE = $(MESS_WINUIOBJ)/messui.res
 
 $(LIBOSD): $(WINUIOBJS)
 
@@ -66,8 +66,8 @@ $(LIBOSD): $(WINUIOBJS)
 # rules for creating helpids.c 
 #-------------------------------------------------
 
-$(WINUISRC)/helpids.c : $(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/resource.h $(WINUISRC)/resource.hm $(WINUISRC)/mame32.rc
-	$(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/mame32.rc >$@
+$(WINUISRC)/helpids.c : $(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/resource.h $(WINUISRC)/resource.hm $(WINUISRC)/mameui.rc
+	$(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/mameui.rc >$@
 
 # rule to build the generator
 $(WINUIOBJ)/mkhelp$(EXE): $(WINUIOBJ)/mkhelp.o $(LIBOCORE)
@@ -117,9 +117,9 @@ endif
 #####################################################################
 
 
-$(MESS_WINUIOBJ)/mess32.res:	$(WINUISRC)/mame32.rc $(MESS_WINUISRC)/mess32.rc $(WINUISRC)/resource.h $(MESS_WINUISRC)/resourcems.h $(WINUIOBJ)/mamevers.rc
+$(MESS_WINUIOBJ)/messui.res:	$(WINUISRC)/mameui.rc $(MESS_WINUISRC)/messui.rc $(WINUISRC)/resource.h $(MESS_WINUISRC)/resourcems.h $(WINUIOBJ)/mamevers.rc
 	@echo Compiling resources $<...
-	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WINUISRC) --include-dir $(MESS_WINUISRC) --include-dir $(WINUIOBJ) -o $@ -i $(MESS_WINUISRC)/mess32.rc
+	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WINUISRC) --include-dir $(MESS_WINUISRC) --include-dir $(WINUIOBJ) -o $@ -i $(MESS_WINUISRC)/messui.rc
 
 $(WINUIOBJ)/mamevers.rc: $(WINOBJ)/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...

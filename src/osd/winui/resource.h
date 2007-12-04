@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by mame32.rc
+// Used by mameui.rc
 //
 #define IDPAUSE                         3
 #define IDAPPLY                         4
@@ -33,7 +33,7 @@
 #define ID_TOOLBAR_EDIT                 92
 #define IDD_MAIN                        101
 #define IDA_TAB_KEYS                    106
-#define IDI_MAME32_ICON                 107
+#define IDI_MAMEUI_ICON                 107
 #define IDD_ABOUT                       108
 #define IDR_MAIN_MENU                   109
 #define IDR_UI_MENU                     110
@@ -357,7 +357,7 @@
 #define ID_FILE_PLAY_RECORD_MNG         40022
 #define ID_VIEW_PICTURE_AREA            40023
 #define ID_HELP_CONTENTS                40025
-#define ID_HELP_WHATS_NEW32             40026
+#define ID_HELP_WHATS_NEWUI             40026
 #define ID_HELP_TROUBLE                 40027
 #define ID_HELP_RELEASE                 40028
 #define ID_HELP_WHATS_NEW               40029

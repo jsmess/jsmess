@@ -1,5 +1,5 @@
 // Microsoft Visual C++ generated Help ID include file.
-// Used by mame32.rc
+// Used by mameui.rc
 //
 #define HIDC_ADSTICK                    0x80b904b9    // IDD_PROP_CONTROLLER
 #define HIDC_ANTIALIAS                  0x809f0405    // IDD_PROP_VECTOR

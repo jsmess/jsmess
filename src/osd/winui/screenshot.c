@@ -1,14 +1,15 @@
 /***************************************************************************
 
-  M.A.M.E.32  -  Multiple Arcade Machine Emulator for Win32
-  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse
+  M.A.M.E.UI  -  Multiple Arcade Machine Emulator with User Interface
+  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse,
+  Copyright (C) 2003-2007 Chris Kirmse and the MAME32/MAMEUI team.
 
-  This file is part of MAME32, and may only be used, modified and
+  This file is part of MAMEUI, and may only be used, modified and
   distributed under the terms of the MAME license, in "readme.txt".
   By continuing to use, modify or distribute this file you indicate
   that you have read the license and understand and accept it fully.
-    
-***************************************************************************/
+
+ ***************************************************************************/
 
 /***************************************************************************
 
@@ -20,24 +21,20 @@
       
 ***************************************************************************/
 
+// standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <stdlib.h>
-#include <io.h>
-#include <fcntl.h>
-#include <driver.h>
-#include <png.h>
-#include <osdepend.h>
-#include <tchar.h>
 
-#include "screenshot.h"
-#include "file.h"
-#include "bitmask.h"
-#include "m32opts.h"
-#include "m32util.h"
-#include "win32ui.h"
+// MAME/MAMEUI headers
+#include "driver.h"
+#include "png.h"
+#include "osdepend.h"
 #include "unzip.h"
-#include "strconv.h"
+
+#include "mui_opts.h"
+#include "mui_util.h"
+#include "winui.h"
+
 
 /***************************************************************************
     function prototypes
@@ -133,6 +130,14 @@ BOOL LoadScreenShot(int nGame, int nType)
 				loaded = LoadDIB(drivers[nParentIndex]->name, &m_hDIB, &m_hPal, nType);
 		}
 	}
+
+#ifndef MESS
+	/* MSH 20071029 - If driver is broken and no images exists, look for nonworking.png */
+	if (!loaded && DriverIsBroken(nGame))
+	{
+		loaded = LoadDIB("nonworking", &m_hDIB, &m_hPal, nType);
+	}
+#endif
 
 	if (loaded)
 	{

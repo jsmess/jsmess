@@ -1,3 +1,16 @@
+/***************************************************************************
+
+  M.A.M.E.UI  -  Multiple Arcade Machine Emulator with User Interface
+  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse,
+  Copyright (C) 2003-2007 Chris Kirmse and the MAME32/MAMEUI team.
+
+  This file is part of MAMEUI, and may only be used, modified and
+  distributed under the terms of the MAME license, in "readme.txt".
+  By continuing to use, modify or distribute this file you indicate
+  that you have read the license and understand and accept it fully.
+
+ ***************************************************************************/
+
 /****************************************************************************
  *      datafile.c
  *      History database engine
@@ -6,14 +19,19 @@
  *      Modifications and higher-level functions by John Butler
  ****************************************************************************/
 
+// standard windows headers
+#include <windows.h>
+
+// standard C headers
 #include <assert.h>
 #include <ctype.h>
-#include <windows.h>
+
+// MAME/MAMEUI headers
 #include "osdcomm.h"
 #include "osd_cpu.h"
 #include "driver.h"
 #include "datafile.h"
-#include "m32opts.h"
+#include "mui_opts.h" // For MameUIGlobal()
 
 /****************************************************************************
  *      token parsing constants
@@ -324,7 +342,7 @@ static UINT8 ParseOpen(const char *pszFilename)
 {
         /* Open file up in binary mode */
 
-        mame_fopen_options(Mame32Global(), NULL, pszFilename, OPEN_FLAG_READ, &fp);
+        mame_fopen_options(MameUIGlobal(), NULL, pszFilename, OPEN_FLAG_READ, &fp);
 
         /* If this is NULL, return FALSE. We can't open it */
 

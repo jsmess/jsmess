@@ -1,9 +1,10 @@
 /***************************************************************************
 
-  M.A.M.E.32  -  Multiple Arcade Machine Emulator for Win32
-  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse
+  M.A.M.E.UI  -  Multiple Arcade Machine Emulator with User Interface
+  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse,
+  Copyright (C) 2003-2007 Chris Kirmse and the MAME32/MAMEUI team.
 
-  This file is part of MAME32, and may only be used, modified and
+  This file is part of MAMEUI, and may only be used, modified and
   distributed under the terms of the MAME license, in "readme.txt".
   By continuing to use, modify or distribute this file you indicate
   that you have read the license and understand and accept it fully.
@@ -12,22 +13,26 @@
 
 /***************************************************************************
 
-  DIJoystick.c
+  dijoystick.c
 
  ***************************************************************************/
 
+// standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
+// standard C headers
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
 #include <tchar.h>
-#include "screenshot.h"
-#include "mame32.h"
+
+// MAMEUI headers
+#include "winui.h"
 #include "directinput.h"
 #include "dijoystick.h"
-#include "m32util.h"
-#include "dxdecode.h"
+#include "mui_util.h" // For ErrorMsg
+#include "dxdecode.h" // for DirectXDecodeError
 
 /***************************************************************************
     function prototypes

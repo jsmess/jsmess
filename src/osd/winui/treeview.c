@@ -1,51 +1,54 @@
 /***************************************************************************
 
-  M.A.M.E.32  -  Multiple Arcade Machine Emulator for Win32
-  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse
+  M.A.M.E.UI  -  Multiple Arcade Machine Emulator with User Interface
+  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse,
+  Copyright (C) 2003-2007 Chris Kirmse and the MAME32/MAMEUI team.
 
-  This file is part of MAME32, and may only be used, modified and
+  This file is part of MAMEUI, and may only be used, modified and
   distributed under the terms of the MAME license, in "readme.txt".
   By continuing to use, modify or distribute this file you indicate
   that you have read the license and understand and accept it fully.
 
-***************************************************************************/
+ ***************************************************************************/
 
 /***************************************************************************
 
-  TreeView.c
+  treeview.c
 
   TreeView support routines - MSH 11/19/1998
 
 ***************************************************************************/
 
+// standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <shellapi.h>
 #include <commctrl.h>
-#include <stdio.h>  /* for sprintf */
-#include <stdlib.h> /* For malloc and free */
-#include <ctype.h> /* For tolower */
+
+// standard C headers
+#include <stdio.h>  // for sprintf
+#include <stdlib.h> // For malloc and free
+#include <ctype.h> // For tolower
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
 #ifdef _MSC_VER
 #include <direct.h>
 #endif
 #include <tchar.h>
-
 #include <io.h>
-#include <driver.h>
+
+// MAME/MAMEUI headers
+#include "driver.h"
 #include "hash.h"
-#include "m32util.h"
+#include "mui_util.h"
 #include "bitmask.h"
-#include "screenshot.h"
-#include "mame32.h"
+#include "winui.h"
 #include "treeview.h"
 #include "resource.h"
-#include "m32opts.h"
-#include "properties.h"
-#include "help.h"
+#include "mui_opts.h"
 #include "dialogs.h"
 #include "winutf8.h"
 #include "strconv.h"
@@ -2234,7 +2237,7 @@ BOOL TryRenameCustomFolder(LPTREEFOLDER lpFolder, const char *new_name)
 		char buf[500];
 		snprintf(buf,ARRAY_LENGTH(buf),"Error while renaming custom file %s to %s",
 				 filename,new_filename);
-		win_message_box_utf8(GetMainWindow(), buf, MAME32NAME, MB_OK | MB_ICONERROR);
+		win_message_box_utf8(GetMainWindow(), buf, MAMEUINAME, MB_OK | MB_ICONERROR);
 	}
 	return retval;
 }
@@ -2244,7 +2247,7 @@ void AddToCustomFolder(LPTREEFOLDER lpFolder,int driver_index)
     if ((lpFolder->m_dwFlags & F_CUSTOM) == 0)
 	{
 	    win_message_box_utf8(GetMainWindow(),"Unable to add game to non-custom folder",
-				   MAME32NAME,MB_OK | MB_ICONERROR);
+				   MAMEUINAME,MB_OK | MB_ICONERROR);
 		return;
 	}
 
@@ -2261,7 +2264,7 @@ void RemoveFromCustomFolder(LPTREEFOLDER lpFolder,int driver_index)
     if ((lpFolder->m_dwFlags & F_CUSTOM) == 0)
 	{
 	    win_message_box_utf8(GetMainWindow(),"Unable to remove game from non-custom folder",
-				   MAME32NAME,MB_OK | MB_ICONERROR);
+				   MAMEUINAME,MB_OK | MB_ICONERROR);
 		return;
 	}
 
@@ -2303,7 +2306,7 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 
 	if (extra_folder == NULL || root_folder == NULL)
 	{
-	   MessageBox(GetMainWindow(), TEXT("Error finding custom file name to save"), TEXT(MAME32NAME), MB_OK | MB_ICONERROR);
+	   MessageBox(GetMainWindow(), TEXT("Error finding custom file name to save"), TEXT(MAMEUINAME), MB_OK | MB_ICONERROR);
 	   return FALSE;
 	}
     /* "folder\title.ini" */
@@ -2375,7 +2378,7 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 	{
 		char buf[500];
 		snprintf(buf,ARRAY_LENGTH(buf),"Error while saving custom file %s",fname);
-		win_message_box_utf8(GetMainWindow(), buf, MAME32NAME, MB_OK | MB_ICONERROR);
+		win_message_box_utf8(GetMainWindow(), buf, MAMEUINAME, MB_OK | MB_ICONERROR);
 	}
 	return !error;
 }

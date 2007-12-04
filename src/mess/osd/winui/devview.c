@@ -19,7 +19,7 @@
 #include "uitext.h"
 #include "strconv.h"
 #include "winutf8.h"
-#include "m32util.h"
+#include "mui_util.h"
 
 #define DEVVIEW_PADDING	10
 

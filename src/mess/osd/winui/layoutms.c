@@ -17,18 +17,18 @@
 
 #include "bitmask.h"
 #include "TreeView.h"
-#include "M32Util.h"
+#include "mui_util.h"
 #include "resource.h"
 #include "directories.h"
-#include "m32opts.h"
+#include "mui_opts.h"
 #include "splitters.h"
 #include "help.h"
-#include "audit32.h"
+#include "mui_audit.h"
 #include "screenshot.h"
-#include "win32ui.h"
+#include "winui.h"
 #include "properties.h"
 
-#include "ms32util.h"
+#include "msuiutil.h"
 #include "resourcems.h"
 #include "propertiesms.h"
 

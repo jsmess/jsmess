@@ -1,14 +1,15 @@
 /***************************************************************************
 
-  M.A.M.E.32  -  Multiple Arcade Machine Emulator for Win32
-  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse
+  M.A.M.E.UI  -  Multiple Arcade Machine Emulator with User Interface
+  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse,
+  Copyright (C) 2003-2007 Chris Kirmse and the MAME32/MAMEUI team.
 
-  This file is part of MAME32, and may only be used, modified and
+  This file is part of MAMEUI, and may only be used, modified and
   distributed under the terms of the MAME license, in "readme.txt".
   By continuing to use, modify or distribute this file you indicate
   that you have read the license and understand and accept it fully.
 
-***************************************************************************/
+ ***************************************************************************/
 
 /***************************************************************************
 
@@ -26,27 +27,27 @@
 #endif
 #endif
 
+// standard windows headers
 #include <windows.h>
 #include <windowsx.h>
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+
+// standard C headers
 #include <string.h>
 #include <tchar.h>
 
+// MAMEUI headers
 #include "bitmask.h"
 #include "treeview.h"
-#include "m32util.h"
 #include "resource.h"
-#include "directories.h"
-#include "m32opts.h"
-#include "splitters.h"
+#include "mui_opts.h"
 #include "help.h"
-#include "audit32.h"
-#include "screenshot.h"
-#include "mame32.h"
-#include "properties.h"
-#include "dialogs.h"
+#include "winui.h"
+#include "properties.h"  // For GetHelpIDs
+
+// MAME headers
 #include "strconv.h"
 #include "winutf8.h"
 
@@ -97,11 +98,11 @@ INT_PTR CALLBACK ResetDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 	case WM_HELP:
 		/* User clicked the ? from the upper right on a control */
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAME32CONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
+		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
 		break;
 
 	case WM_CONTEXTMENU:
-		HelpFunction((HWND)wParam, MAME32CONTEXTHELP, HH_TP_HELP_CONTEXTMENU, GetHelpIDs());
+		HelpFunction((HWND)wParam, MAMEUICONTEXTHELP, HH_TP_HELP_CONTEXTMENU, GetHelpIDs());
 
 		break;
 
@@ -117,7 +118,7 @@ INT_PTR CALLBACK ResetDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			{
 
 				TCHAR temp[400];
-				_tcscpy(temp, TEXT(MAME32NAME));
+				_tcscpy(temp, TEXT(MAMEUINAME));
 				_tcscat(temp, TEXT(" will now reset the following\n"));
 				_tcscat(temp, TEXT("to the default settings:\n\n"));
 
@@ -132,7 +133,7 @@ INT_PTR CALLBACK ResetDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 					_tcscat(temp, TEXT("User interface settings\n\n"));
 					_tcscat(temp, TEXT("Resetting the User Interface options\n"));
 					_tcscat(temp, TEXT("requires exiting "));
-					_tcscat(temp, TEXT(MAME32NAME));
+					_tcscat(temp, TEXT(MAMEUINAME));
 					_tcscat(temp, TEXT(".\n"));
 				}
 				_tcscat(temp, TEXT("\nDo you wish to continue?"));
@@ -247,11 +248,11 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 
 	case WM_HELP:
 		/* User clicked the ? from the upper right on a control */
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAME32CONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
+		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
 		break;
 
 	case WM_CONTEXTMENU:
-		HelpFunction((HWND)wParam, MAME32CONTEXTHELP, HH_TP_HELP_CONTEXTMENU, GetHelpIDs());
+		HelpFunction((HWND)wParam, MAMEUICONTEXTHELP, HH_TP_HELP_CONTEXTMENU, GetHelpIDs());
 		break;
 	case WM_HSCROLL:
 		HANDLE_WM_HSCROLL(hDlg, wParam, lParam, OnHScroll);
@@ -505,12 +506,12 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 	}
 	case WM_HELP:
 		// User clicked the ? from the upper right on a control
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAME32CONTEXTHELP,
+		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP,
 					 HH_TP_HELP_WM_HELP, GetHelpIDs());
 		break;
 
 	case WM_CONTEXTMENU:
-		HelpFunction((HWND)wParam, MAME32CONTEXTHELP, HH_TP_HELP_CONTEXTMENU, GetHelpIDs());
+		HelpFunction((HWND)wParam, MAMEUICONTEXTHELP, HH_TP_HELP_CONTEXTMENU, GetHelpIDs());
 		break;
 
 	case WM_COMMAND:
@@ -714,10 +715,10 @@ INT_PTR CALLBACK DirectXDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 	HWND hEdit;
 
 	const char *directx_help =
-		MAME32NAME " requires DirectX version 3 or later, which is a set of operating\r\n"
+		MAMEUINAME " requires DirectX version 3 or later, which is a set of operating\r\n"
 		"system extensions by Microsoft for Windows 9x, NT and 2000.\r\n\r\n"
 		"Visit Microsoft's DirectX web page at http://www.microsoft.com/directx\r\n"
-		"download DirectX, install it, and then run " MAME32NAME " again.\r\n";
+		"download DirectX, install it, and then run " MAMEUINAME " again.\r\n";
 
 	switch (Msg)
 	{

@@ -1,0 +1,115 @@
+0.121u2
+-------
+
+
+MAMETesters Bugs Fixed
+----------------------
+
+
+Source Changes
+--------------
+Added speedup hack to the mosaicf2 driver. [David Haywood]
+
+Fixed BCD math error in i8051 core. [stephh]
+
+Fixed the m6800 cpu core so that the cpu variants can be compiled
+independently once again. [Atari Ace]
+
+More formally separated the RSP core from the N64 driver. [Atari Ace]
+
+Fixed invalid dips in panicr and added dip locations. [Sonikos]
+
+Switched some #defines in the core over to enums. Also adjusted the 
+GAME macro so that it results in const data, and that it is defined 
+in terms of the more generic GAMEL macro. [Atari Ace]
+
+Converted some more unnecessary globals into statics. [Atari Ace]
+
+Fixes the M68008 data bus to properly use 8-bit accesses. [Curt Coder]
+
+Cleaned up the peplus.c driver. Added MACHINE_RESET to fix autohold
+option. Added layouts for several types of games. [stephh]
+
+Fix array overrun in get_num_dips. [Nathan Woods, Michael Zapf]
+
+Moved redundant check for bank switching out of inline code, which
+nets a small speedup in the midwunit driver. [Christophe Jaillet]
+
+Added save state support to a number of Konami custom chips. [Lei Wu]
+
+Add -pipe flag for GCC in makefile (GCC will pipe between cpp, cc and
+as rather than using temporary files, which speeds up compiling).
+[Vas Crabb]
+
+Cleanups to the inline functions: [Vas Crabb]
+ * Add attributes to functions in eigccppc.h and eigccx86.h to cause 
+    GCC to always inline them, and to treat them as arithmetic 
+    operators when appropriate (so GCC can identify loop invariants 
+    or common subexpressions involving these functions)
+ * Mark locals in functions in eigccppc.h and eigccx86.h as register, 
+    so GCC won't always allocate stack space even at O0 optimisation 
+    level
+ * Add dummy +m operands to atomic access functions in eigccppc.h so 
+    that GCC will not cache values across calls even if values are 
+    not volatile - this will cause GCC to allocate an additional 
+    register at O0 optimisation, but not if optimisation is on
+ * Don't include <altivec.h> in rgbvmx.h if __APPLE_ALTIVEC__ is 
+    defined, as this will cause a compiler warning.
+
+Cleaned up inputs in the System 24 driver: [Sonikos]
+ - Fixed dips in qrouka, sgmastc, sgmastcj, roughrac, qsww
+ - Fixed input in dcclub, sgmastc, sgmastj, qrouka (the last is still 
+    missing input for the 3rd & 4th player)
+ - Added more description for each game: region, system (rom or floppy
+    based), version
+    
+Removed useless pen_array in the midtunit driver, saving some memory
+and getting a small speed boost. [Christophe Jaillet]
+
+Added 3D glasses support to the tceptor driver. [BUT]
+
+Unified timer callbacks. All timer callbacks are now passed both a
+pointer and a parameter. The pointer can only be set at timer 
+allocation time; the parameter can be changed whenever the timer
+is adjusted. Removed most explicit uses of timer_*_ptr functions in
+favor of the more generic routines. [Aaron Giles]
+
+Deprecated cpu_yield* functions except for cpu_yield() itself, which
+yields for the current timeslice only. Drivers that relied on the
+other yielding functions should be updated to use 
+cpu_boost_interleave() instead, as it does not have the same negative
+side effects on time management. [Aaron Giles]
+
+Changed video_frame_update() internally to accept a debug parameter
+which forces updates and does not meddle with synchronization/time
+accountiing. [Aaron Giles]
+
+Some more internal improvements to the midzeus driver. [Aaron Giles]
+
+Removed the burgeoning list of architecture optimization options.
+Instead, if you want to make a build optimized for a specific 
+architecture, you explicitly specify the options in a new ARCHOPTS
+variable. You can control the name of the final executable via the
+existing PREFIX and SUFFIX variables, which are now documented.
+[Aaron Giles]
+
+MSVC-based builds now automatically get a 'v' prefix unless otherwise
+specified. [Aaron Giles]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+Maze Invaders (prototype) [Aaron Giles]
+Guts 'n Glory (prototype) [Aaron Giles]
+Jumbo Ozaki Super Masters Golf [Sonikos]
+
+
+
+New clones added
+----------------
+Sky Kid (Manufactured by Sipem) [Corrado Tomaselli]
+Next Fase (bootleg of Phoenix) [David Haywood]
+Hang-On (Rev A) [Tony Beason]
+Shooting Master (set 2, 8751 315-5159a) [Kevin Eshbach]
+Super Burger Time (World, set 2) [Patrik Styrnell]

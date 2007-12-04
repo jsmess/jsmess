@@ -1,35 +1,28 @@
 /***************************************************************************
 
-  M.A.M.E.32  -  Multiple Arcade Machine Emulator for Win32
-  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse
+  M.A.M.E.UI  -  Multiple Arcade Machine Emulator with User Interface
+  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse,
+  Copyright (C) 2003-2007 Chris Kirmse and the MAME32/MAMEUI team.
 
-  This file is part of MAME32, and may only be used, modified and
+  This file is part of MAMEUI, and may only be used, modified and
   distributed under the terms of the MAME license, in "readme.txt".
   By continuing to use, modify or distribute this file you indicate
   that you have read the license and understand and accept it fully.
 
  ***************************************************************************/
 
+// standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <shellapi.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <io.h>
-#include <fcntl.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include <string.h>
-#include <sys/stat.h>
 #include <wingdi.h>
-#include <time.h>
-#include <assert.h>
-#include <tchar.h>
-#include <stdlib.h>
 
+// MAME/MAMEUI headers
 #include "tabview.h"
-#include "m32util.h"
+#include "mui_util.h"
 #include "strconv.h"
 
 

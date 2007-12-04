@@ -15,8 +15,8 @@
 
 #include "screenshot.h"
 #include "bitmask.h"
-#include "mame32.h"
-#include "m32util.h"
+#include "mameui.h"
+#include "mui_util.h"
 #include "resource.h"
 #include "treeview.h"
 #include "file.h"
@@ -44,7 +44,7 @@ static BOOL SettingsFileName(DWORD nSettingsFile, char *buffer, size_t bufsize)
 	switch(nSettingsFile & 0xF0000000)
 	{
 		case SETTINGS_FILE_UI:
-			_snprintf(buffer, bufsize, "%s", MAME32NAME "ui.ini");
+			_snprintf(buffer, bufsize, "%s", MAMEUINAME "ui.ini");
 			break;
 
 		case SETTINGS_FILE_GLOBAL:

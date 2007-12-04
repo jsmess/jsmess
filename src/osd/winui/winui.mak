@@ -2,7 +2,7 @@
 #
 #   winui.mak
 #
-#   winui (Mame32) makefile
+#   winui (MameUI) makefile
 #
 #   Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
@@ -42,11 +42,14 @@
 
 
 #-------------------------------------------------
-# append "32" to the emulator name 
+# append "ui" to the emulator name 
 #-------------------------------------------------
 
-EMULATOR = $(FULLNAME)32$(EXE)
-
+ifdef PTR64
+EMULATOR = $(FULLNAME)UI64$(EXE)
+else
+EMULATOR = $(FULLNAME)UI32$(EXE)
+endif
 
 
 #-------------------------------------------------
@@ -141,6 +144,14 @@ endif
 $(WINOBJ)/vconv.o: $(WINSRC)/vconv.c
 	@echo Compiling $<...
 	@cl.exe /nologo /O1 -D_CRT_SECURE_NO_DEPRECATE -c $< /Fo$@
+
+PDBFILES = $(EMULATOR:.exe=.pdb) $(TOOLS:.exe=.pdb)
+
+clean-pdb:
+	@echo Deleting $(PDBFILES)...
+	$(RM) $(PDBFILES)
+
+clean: clean-pdb
 
 endif
 
@@ -259,12 +270,12 @@ OSDOBJS = \
 
 # add UI objs
 OSDOBJS += \
-	$(UIOBJ)/m32util.o \
+	$(UIOBJ)/mui_util.o \
 	$(UIOBJ)/directinput.o \
 	$(UIOBJ)/dijoystick.o \
 	$(UIOBJ)/directdraw.o \
 	$(UIOBJ)/directories.o \
-	$(UIOBJ)/audit32.o \
+	$(UIOBJ)/mui_audit.o \
 	$(UIOBJ)/columnedit.o \
 	$(UIOBJ)/screenshot.o \
 	$(UIOBJ)/treeview.o \
@@ -278,11 +289,11 @@ OSDOBJS += \
 	$(UIOBJ)/help.o \
 	$(UIOBJ)/history.o \
 	$(UIOBJ)/dialogs.o \
-	$(UIOBJ)/m32opts.o \
+	$(UIOBJ)/mui_opts.o \
 	$(UIOBJ)/layout.o \
 	$(UIOBJ)/datafile.o \
 	$(UIOBJ)/dirwatch.o \
-	$(UIOBJ)/win32ui.o \
+	$(UIOBJ)/winui.o \
 	$(UIOBJ)/helpids.o \
 
 
@@ -297,11 +308,12 @@ OSDOBJS += \
 endif
 
 # add our UI resources
-RESFILE += $(UIOBJ)/mame32.res
+RESFILE += $(UIOBJ)/mameui.res
 
 $(LIBOSD): $(OSDOBJS)
 
-EMUMAIN = $(UIOBJ)/m32main.o
+# The : is important! It prevents the dependency above from including mui_main.o in its target!
+LIBOSD := $(UIOBJ)/mui_main.o $(LIBOSD)
 
 
 
@@ -323,8 +335,8 @@ TOOLS += ledutil$(EXE)
 # rules for creating helpids.c 
 #-------------------------------------------------
 
-$(UISRC)/helpids.c : $(UIOBJ)/mkhelp$(EXE) $(UISRC)/resource.h $(UISRC)/resource.hm $(UISRC)/mame32.rc
-	$(UIOBJ)/mkhelp$(EXE) $(UISRC)/mame32.rc >$@
+$(UISRC)/helpids.c : $(UIOBJ)/mkhelp$(EXE) $(UISRC)/resource.h $(UISRC)/resource.hm $(UISRC)/mameui.rc
+	$(UIOBJ)/mkhelp$(EXE) $(UISRC)/mameui.rc >$@
 
 # rule to build the generator
 $(UIOBJ)/mkhelp$(EXE): $(UIOBJ)/mkhelp.o $(LIBOCORE)
@@ -361,8 +373,8 @@ $(UIOBJ)/verinfo.o : $(WINSRC)/verinfo.c
 # generic rule for the resource compiler for UI
 #-------------------------------------------------
 
-$(UIOBJ)/mame32.res: $(UISRC)/mame32.rc $(UIOBJ)/mamevers.rc
-	@echo Compiling mame32 resources $<...
+$(UIOBJ)/mameui.res: $(UISRC)/mameui.rc $(UIOBJ)/mamevers.rc
+	@echo Compiling mameui resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) -o $@ -i $<
 
 
@@ -371,7 +383,7 @@ $(UIOBJ)/mame32.res: $(UISRC)/mame32.rc $(UIOBJ)/mamevers.rc
 # rules for resource file
 #-------------------------------------------------
 
-$(UIOBJ)/mame32.res: $(UISRC)/mame32.rc $(UIOBJ)/mamevers.rc
+#$(UIOBJ)/mameui.res: $(UISRC)/mameui.rc $(UIOBJ)/mamevers.rc
 
 $(UIOBJ)/mamevers.rc: $(VERINFO) $(SRC)/version.c
 	@echo Emitting $@...

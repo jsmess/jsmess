@@ -1,14 +1,15 @@
 /***************************************************************************
 
-  M.A.M.E.32  -  Multiple Arcade Machine Emulator for Win32
-  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse
+  M.A.M.E.UI  -  Multiple Arcade Machine Emulator with User Interface
+  Win32 Portions Copyright (C) 1997-2003 Michael Soderstrom and Chris Kirmse,
+  Copyright (C) 2003-2007 Chris Kirmse and the MAME32/MAMEUI team.
 
-  This file is part of MAME32, and may only be used, modified and
+  This file is part of MAMEUI, and may only be used, modified and
   distributed under the terms of the MAME license, in "readme.txt".
   By continuing to use, modify or distribute this file you indicate
   that you have read the license and understand and accept it fully.
 
-***************************************************************************/
+ ***************************************************************************/
  
 /***************************************************************************
 
@@ -105,40 +106,37 @@ b) Exit the dialog.
 
 ***************************************************************************/
 
+// standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
 #include <commdlg.h>
 #include <ddraw.h>
+
+// standard C headers
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <tchar.h>
 
-#include <driver.h>
-#include <info.h>
+// MAME/MAMEUI headers
+#include "driver.h"
+#include "info.h"
 #include "audit.h"
-#include "audit32.h"
-#include "bitmask.h"
-#include "m32opts.h"
-#include "file.h"
+#include "mui_audit.h"
+#include "mui_opts.h"
 #include "resource.h"
 #include "dijoystick.h"     /* For DIJoystick avalibility. */
-#include "m32util.h"
+#include "mui_util.h"
 #include "directdraw.h"
 #include "properties.h"
-#include "treeview.h"
-#include "win32ui.h"
-#include "screenshot.h"
-#include "mame32.h"
+#include "winui.h"
 #include "datamap.h"
 #include "help.h"
-#include "resource.hm"
 #include "winmain.h"
 #include "strconv.h"
 #include "winutf8.h"
-#include "m32util.h"
 
 typedef HANDLE HTHEME;
 
@@ -434,7 +432,7 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 	pshead.hInstance    = hInst;
 	pshead.pszCaption   = TEXT("Default Game");
 	pshead.nStartPage   = 0;
-	pshead.pszIcon      = MAKEINTRESOURCE(IDI_MAME32_ICON);
+	pshead.pszIcon      = MAKEINTRESOURCE(IDI_MAMEUI_ICON);
 	pshead.ppsp         = pspage;
 
 	/* Create the Property sheet and display it */
@@ -544,7 +542,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	pshead.dwFlags    = PSH_PROPSHEETPAGE | PSH_USEICONID | PSH_PROPTITLE;
 	pshead.hInstance  = hInst;
 	pshead.nStartPage = start_page;
-	pshead.pszIcon    = MAKEINTRESOURCE(IDI_MAME32_ICON);
+	pshead.pszIcon    = MAKEINTRESOURCE(IDI_MAMEUI_ICON);
 	pshead.ppsp       = pspage;
 
 	/* Create the Property sheet and display it */
@@ -1335,11 +1333,11 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 	case WM_HELP:
 		/* User clicked the ? from the upper right on a control */
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAME32CONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
+		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
 		break;
 
 	case WM_CONTEXTMENU: 
-		HelpFunction((HWND)wParam, MAME32CONTEXTHELP, HH_TP_HELP_CONTEXTMENU, GetHelpIDs());
+		HelpFunction((HWND)wParam, MAMEUICONTEXTHELP, HH_TP_HELP_CONTEXTMENU, GetHelpIDs());
 		break; 
 
 	}
@@ -2240,6 +2238,7 @@ static void BuildDataMap(void)
 	datamap_set_trackbar_range(properties_datamap, IDC_JDZ,         0.00,  1.00, 0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_JSAT,        0.00,  1.00, 0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_SPEED,       0.00,  3.00, 0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_BEAM,        0.10, 10.00, 0.10);       
 
 #ifdef MESS
 	// MESS specific stuff

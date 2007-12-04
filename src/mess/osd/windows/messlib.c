@@ -34,6 +34,6 @@ int __declspec(dllexport) mess_gui_main(
 	LPTSTR       lpCmdLine,
 	int          nCmdShow)
 {
-	extern int Mame32Main(HINSTANCE, LPTSTR, int);
-	return Mame32Main(hInstance, lpCmdLine, nCmdShow);
+	extern int MameUIMain(HINSTANCE, LPTSTR, int);
+	return MameUIMain(hInstance, lpCmdLine, nCmdShow);
 }
