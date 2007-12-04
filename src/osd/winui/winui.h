@@ -30,7 +30,7 @@
 #endif
 #define MAMENAME	"MAME"
 #else
-#define MAMEUINAME	"MESS"
+#define MAMEUINAME	"MESSUI"
 #define MAMENAME	"MESS"
 #endif
 
