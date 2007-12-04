@@ -1,20 +1,19 @@
 /******************************************************************************
- PeT mess@utanet.at November 2000
-******************************************************************************/
 
+  ssystem3.c
 
-/* 
-chess champion super system III
--------------------------------
-(germany chess champion mk III)
+Driver file to handle emulation of the Chess Champion Super System III / Chess
+Champion MK III
+by PeT mess@utanet.at November 2000
 
-6502
-6522 ($6000?)
-2x2114 (1kx4 sram) ($0000)
-signetics 7947e c19081e ss-3-lrom
-signetics 7945e c19082 ss-3-hrom ($d000??)
-(both connected to the same pins!,
-look into mess source mess/messroms/rddil24.c for notes)
+Hardware descriptions:
+- A 6502 CPU
+- A 6522 VIA ($6000?) (PB6 and PB7 are tied)
+- 2 x 2114  1kx4 SRAM to provide 1KB of RAM ($0000)
+- 2xXXKB ROM (both connected to the same pins!,
+  look into mess source mess/messroms/rddil24.c for notes)
+  - signetics 7947e c19081e ss-3-lrom
+  - signetics 7945e c19082 ss-3-hrom ($d000??)
 
 optional printer (special serial connection)
 optional board display (special serial connection)
@@ -62,16 +61,16 @@ static DRIVER_INIT( ssystem3 )
 	via_config(0,&config);
 }
 
-static INTERRUPT_GEN( ssystem3_frame_int )
-{
-	static int toggle=0;
-	via_set_input_b(0,toggle?0x40:0);
-	toggle^=0;
+static TIMER_CALLBACK( ssystem3_pb6_toggle ) {
+	static int toggle = 0;
+	via_set_input_b( 0, toggle ? 0x40 : 0 );
+	toggle ^= 1;
 }
 
 static MACHINE_RESET( ssystem3 )
 {
 	via_reset();
+	timer_pulse( ATTOTIME_IN_HZ(4000000), NULL, 0, ssystem3_pb6_toggle );
 }
 
 static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
@@ -123,7 +122,6 @@ static MACHINE_DRIVER_START( ssystem3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(ssystem3_map, 0)
-	MDRV_CPU_VBLANK_INT(ssystem3_frame_int, 1)
 	MDRV_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
