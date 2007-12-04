@@ -747,7 +747,7 @@ static INPUT_PORTS_START( ql_it )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('$') PORT_CHAR('&')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR(':') PORT_CHAR('/')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("* \xc2\xa7") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('*') PORT_CHAR(0xa7) //  §
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("* \xc2\xa7") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('*') PORT_CHAR(0xa7) // * §
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('?')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb9 %") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0xf9) PORT_CHAR('%') // ù %
 
@@ -774,6 +774,18 @@ static INPUT_PORTS_START( ql_it )
 	PORT_MODIFY("ROW7")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb2 !") PORT_CODE(KEYCODE_SLASH) PORT_CHAR(0xf2) PORT_CHAR('!') // ò !
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('.')
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ql_fr )
+	PORT_INCLUDE(ql)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ql_se )
+	PORT_INCLUDE(ql)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ql_dk )
+	PORT_INCLUDE(ql)
 INPUT_PORTS_END
 
 /* Machine Drivers */
@@ -1101,9 +1113,9 @@ SYSTEM_CONFIG_END
 COMP( 1984, ql,     0,      0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (UK)",      GAME_SUPPORTS_SAVE )
 COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_SUPPORTS_SAVE )
 COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_SUPPORTS_SAVE )
-COMP( 1985, ql_fr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_fr,  ql,     0,      ql,         ql_fr,  0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_SUPPORTS_SAVE )
 COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_SUPPORTS_SAVE )
 COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_SUPPORTS_SAVE )
-COMP( 1985, ql_se,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_SUPPORTS_SAVE )
-COMP( 1985, ql_dk,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
+COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  0,      ql,     "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
 COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_SUPPORTS_SAVE )
