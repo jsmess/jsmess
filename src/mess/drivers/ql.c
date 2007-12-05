@@ -19,6 +19,7 @@
 	TODO:
 
 	- microdrive simulation
+	- get Danish version to boot, it has been modified, e.g. MD_DESEL is patched to jump to 0x1cd5e
 	- RTC register write
 	- serial data latching?
 	- transmit interrupt timing
@@ -349,6 +350,7 @@ static struct IPC
 	UINT8 keylatch;
 	int ser1_txd, ser1_dtr;
 	int ser2_rxd, ser2_cts;
+	int ipl;
 } ipc;
 
 static WRITE8_HANDLER( ipc_link_hack_w )
@@ -438,26 +440,33 @@ static WRITE8_HANDLER( ipc_port2_w )
 
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);
 
-	switch (ipl)
+	if (ipl != ipc.ipl)
 	{
-	case 0:
-		cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
-		cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
-		cpunum_set_input_line(0, MC68000_IRQ_7, HOLD_LINE);
-		break;
-	case 1: // CTRL-ALT-7
-		cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
-		cpunum_set_input_line(0, MC68000_IRQ_5, HOLD_LINE);
-		cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
-		break;
-	case 2:
-		cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
-		cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
-		cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
-		break;
-	case 3:
-		// do nothing
-		break;
+		switch (ipl)
+		{
+		case 0:
+			cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_7, HOLD_LINE);
+			break;
+		case 1: // CTRL-ALT-7
+			cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_5, HOLD_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
+			break;
+		case 2:
+			cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
+			break;
+		case 3:
+			cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
+			cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
+			break;
+		}
+
+		ipc.ipl = ipl;
 	}
 
 	speaker_level_w(0, BIT(data, 1));
@@ -531,6 +540,7 @@ static READ8_HANDLER( ipc_bus_r )
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// System ROM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // Cartridge ROM
+	AM_RANGE(0x010000, 0x017fff) AM_NOP // expansion I/O
 	AM_RANGE(0x018000, 0x018003) AM_READ(zx8302_rtc_r)
 	AM_RANGE(0x018000, 0x018001) AM_WRITE(zx8302_rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_WRITE(zx8302_control_w)
@@ -540,11 +550,12 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x018022, 0x018022) AM_READWRITE(zx8302_mdv_track1_r, zx8302_data_w)
 	AM_RANGE(0x018023, 0x018023) AM_READ(zx8302_mdv_track2_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
+	AM_RANGE(0x01c000, 0x01ffff) AM_ROM // expansion I/O
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM // onboard RAM
-	AM_RANGE(0x040000, 0x0bffff) AM_RAM // 512KB add-on RAM
+	AM_RANGE(0x040000, 0x0bffff) AM_RAM // 512KB expansion RAM
 	AM_RANGE(0x0c0000, 0x0dffff) AM_NOP // 8x16KB device slots
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM // add-on ROM
+	AM_RANGE(0x0e0000, 0x0fffff) AM_NOP // expansion I/O
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -839,6 +850,7 @@ static MACHINE_START( ql )
 	state_save_register_global(ipc.ser1_dtr);
 	state_save_register_global(ipc.ser2_rxd);
 	state_save_register_global(ipc.ser2_cts);
+	state_save_register_global(ipc.ipl);
 
 	memset(&ipc, 0, sizeof(ipc));
 }
@@ -995,6 +1007,7 @@ ROM_START( ql_dk )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
     ROM_LOAD( "mgd.ic33", 0x000000, 0x008000, BAD_DUMP CRC(f57755eb) SHA1(dc57939ffb8741e17967a1d2479c339750ec7ff6) )
     ROM_LOAD( "mgd.ic34", 0x008000, 0x004000, BAD_DUMP CRC(1892465a) SHA1(0ff3046b5276da6639d3fe79b22ae25cc265d540) )
+	ROM_LOAD( "extra.rom", 0x01c000, 0x004000, NO_DUMP )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
