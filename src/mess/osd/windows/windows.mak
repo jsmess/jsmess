@@ -59,7 +59,7 @@ endif
 # if building with a UI, include the ui.mak
 #-------------------------------------------------
 
-include $(SRC)/osd/winui/ui.mak
+include $(SRC)/mess/osd/winui/winui.mak
 
 
 
@@ -70,14 +70,6 @@ include $(SRC)/osd/winui/ui.mak
 $(MESS_WINOBJ)/%.res: $(MESS_WINSRC)/%.rc
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir mess/$(OSD) -o $@ -i $<
-
-$(OBJ)/ui/%.res: src/ui/%.rc
-	@echo Compiling resources $<...
-	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir src/ui -o $@ -i $<
-
-$(OBJ)/mess/ui/%.res: mess/ui/%.rc
-	@echo Compiling resources $<...
-	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir mess/ui --include-dir src/ui --include-dir src -o $@ -i $<
 
 
 
