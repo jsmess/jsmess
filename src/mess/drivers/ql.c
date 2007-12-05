@@ -19,7 +19,6 @@
 	TODO:
 
 	- microdrive simulation
-	- get Danish version to boot, it has been modified, e.g. MD_DESEL is patched to jump to 0x1cd5e
 	- RTC register write
 	- serial data latching?
 	- transmit interrupt timing
@@ -27,6 +26,8 @@
 	- accurate screen timings
 	- ZX8301 cycle stealing
 	- emulate COMCTL properly
+	- emulate microdrive properly
+	- get modified Danish version to boot (e.g. MD_DESEL was patched to jump to 0x1cd5e)
 
 */
 
@@ -59,11 +60,27 @@
 #define ZX8302_INT_FRAME		0x08
 #define ZX8302_INT_EXTERNAL		0x10
 
-#define ZX8302_STATUS_BUFFER_FULL	0x02
+#define ZX8302_STATUS_NETWORK_PORT		0x01
+#define ZX8302_STATUS_TX_BUFFER_FULL	0x02
+#define ZX8302_STATUS_RX_BUFFER_FULL	0x04
+#define ZX8302_STATUS_MICRODRIVE_GAP	0x08
 
 #define ZX8302_TXD_START	0
 #define ZX8302_TXD_STOP		9
 #define ZX8302_TXD_STOP2	10
+
+#define MDV_SECTOR_COUNT	255
+#define MDV_SECTOR_LENGTH	686
+#define MDV_IMAGE_LENGTH	(MDV_SECTOR_COUNT * MDV_SECTOR_LENGTH)
+
+#define MDV_PREAMBLE_LENGTH			12
+#define MDV_GAP_LENGTH				120
+
+#define MDV_OFFSET_HEADER_PREAMBLE	0
+#define MDV_OFFSET_HEADER			MDV_OFFSET_HEADER_PREAMBLE + MDV_PREAMBLE_LENGTH
+#define MDV_OFFSET_DATA_PREAMBLE	28
+#define MDV_OFFSET_DATA				MDV_OFFSET_DATA_PREAMBLE + MDV_PREAMBLE_LENGTH
+#define MDV_OFFSET_GAP				566
 
 static struct ZX8302
 {
@@ -80,11 +97,13 @@ static struct ZX8302
 	int ser1_rxd, ser1_cts;
 	int ser2_txd, ser2_dtr;
 	int netout, netin;
-	int mdrdw, mdselck, mdseld, erase, raw1, raw2;
-	int mdv_motor;
+	int mdrdw, mdselck, mdseld, erase;
+	int mdv_motor, mdv_offset;
 } zx8302;
 
 static emu_timer *zx8302_txd_timer, *zx8302_ipc_timer, *zx8302_rtc_timer, *zx8302_gap_timer;
+
+static UINT8 *mdv_image;
 
 static void zx8302_interrupt(UINT8 line)
 {
@@ -140,7 +159,7 @@ static TIMER_CALLBACK( zx8302_txd_tick )
 	case ZX8302_TXD_STOP2:
 		zx8302_txd(1);
 		zx8302.tx_bits = ZX8302_TXD_START;
-		zx8302.status &= ~ZX8302_STATUS_BUFFER_FULL;
+		zx8302.status &= ~ZX8302_STATUS_TX_BUFFER_FULL;
 		zx8302_interrupt(ZX8302_INT_TRANSMIT);
 		break;
 	}
@@ -197,6 +216,57 @@ static WRITE8_HANDLER( zx8302_control_w )
 	timer_adjust(zx8302_ipc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baudx4));
 }
 
+static UINT8 zx8302_get_microdrive_status(void)
+{
+	UINT8 status = 0;
+
+	if (zx8302.mdv_motor)
+	{
+		switch (zx8302.mdv_offset % MDV_SECTOR_LENGTH)
+		{
+		case MDV_OFFSET_HEADER_PREAMBLE:
+			zx8302.status &= ~ZX8302_STATUS_MICRODRIVE_GAP;
+			zx8302.mdv_offset += MDV_PREAMBLE_LENGTH;
+			break;
+
+		case MDV_OFFSET_HEADER:
+			zx8302.status |= ZX8302_STATUS_RX_BUFFER_FULL;
+			break;
+
+		case MDV_OFFSET_DATA_PREAMBLE:
+			zx8302.status &= ~ZX8302_STATUS_RX_BUFFER_FULL;
+			zx8302.mdv_offset += MDV_PREAMBLE_LENGTH;
+			break;
+
+		case MDV_OFFSET_DATA:
+			zx8302.status |= ZX8302_STATUS_RX_BUFFER_FULL;
+			break;
+
+		case MDV_OFFSET_GAP:
+			zx8302.status &= ~ZX8302_STATUS_RX_BUFFER_FULL;
+			zx8302.status |= ZX8302_STATUS_MICRODRIVE_GAP;
+			zx8302.mdv_offset += MDV_GAP_LENGTH;
+			break;
+		}
+	}
+
+	return status;
+}
+
+static READ8_HANDLER( zx8302_mdv_track_r )
+{
+	UINT8 data = mdv_image[zx8302.mdv_offset];
+
+	zx8302.mdv_offset++;
+
+	if (zx8302.mdv_offset == MDV_IMAGE_LENGTH)
+	{
+		zx8302.mdv_offset = 0;
+	}
+
+	return data;
+}
+
 static READ8_HANDLER( zx8302_status_r )
 {
 	/*
@@ -205,8 +275,8 @@ static READ8_HANDLER( zx8302_status_r )
 		
 		0		Network port
 		1		Transmit buffer full
-		2		
-		3		
+		2		Receive buffer full
+		3		Microdrive GAP
 		4		SER1 DTR
 		5		SER2 CTS
 		6		Latched COMCTL
@@ -214,7 +284,14 @@ static READ8_HANDLER( zx8302_status_r )
 
 	*/
 	
-	UINT8 data = (zx8302.comdata_l << 7) | (zx8302.comctl << 6) | (zx8302.ser1_cts << 5)| (zx8302.ser2_dtr << 4) | (zx8302.status & 0x0f); 
+	UINT8 data = 0; 
+
+	data |= zx8302.comdata_l << 7;
+	data |= zx8302.comctl << 6;
+	data |= zx8302.ser1_cts << 5;
+	data |= zx8302.ser2_dtr << 4;
+	data |= zx8302_get_microdrive_status();
+	data |= zx8302.status;
 
 	zx8302.comctl = 1;
 
@@ -263,32 +340,6 @@ static WRITE8_HANDLER( zx8302_mdv_control_w )
 
 	*/
 
-	/*
-	MDV control
-	at reset; and after data transfer of any mdv
-		(02 00) 8 times			stop all motors
-	start an mdvN:
-		(03 01) (02 00) N-1 times	start motorN
-	format (erase):
-		0a
-		(0e 0e) 0a per header and per sector
-	format (verify):
-		02
-		(02 02) after finding pulses per header/sector
-	format (write directory):
-		0a (0e 0e) 02 write sector
-	format (find sector 0):
-		(02 02) after pulses
-	format (write directory):
-		0a (0e 0e) 02 write sector
-		(02 00) 8 times 		stop motor
-
-	read sector:
-		(02 02) after pulses
-		get 4 bytes
-		(02 02) indication to skip PLL sequence: 6*00,2*ff
-	*/
-
 	zx8302.mdseld = BIT(data, 0);
 	zx8302.mdselck = BIT(data, 1);
 	zx8302.mdrdw = BIT(data, 2) ? 0 : 1;
@@ -301,10 +352,9 @@ static WRITE8_HANDLER( zx8302_mdv_control_w )
 		zx8302.mdv_motor >>= 1;
 		zx8302.mdv_motor |= (zx8302.mdseld << 7);
 
-//		logerror("MDV selected %u\n", zx8302_get_selected_microdrive());
+		zx8302.mdv_offset = 0;
+		zx8302.status &= ~ZX8302_STATUS_RX_BUFFER_FULL;
 	}
-
-//	logerror("MDV control %x\n", data);
 }
 
 static READ8_HANDLER( zx8302_irq_status_r )
@@ -322,20 +372,10 @@ static WRITE8_HANDLER( zx8302_irq_acknowledge_w )
 	}
 }
 
-static READ8_HANDLER( zx8302_mdv_track1_r )
-{
-	return 0;
-}
-
-static READ8_HANDLER( zx8302_mdv_track2_r )
-{
-	return 0;
-}
-
 static WRITE8_HANDLER( zx8302_data_w )
 {
 	zx8302.tdr = data;
-	zx8302.status |= ZX8302_STATUS_BUFFER_FULL;
+	zx8302.status |= ZX8302_STATUS_TX_BUFFER_FULL;
 }
 
 static INTERRUPT_GEN( zx8302_int )
@@ -547,8 +587,8 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x018003, 0x018003) AM_WRITE(zx8302_ipc_command_w)
 	AM_RANGE(0x018020, 0x018020) AM_READWRITE(zx8302_status_r, zx8302_mdv_control_w)
 	AM_RANGE(0x018021, 0x018021) AM_READWRITE(zx8302_irq_status_r, zx8302_irq_acknowledge_w)
-	AM_RANGE(0x018022, 0x018022) AM_READWRITE(zx8302_mdv_track1_r, zx8302_data_w)
-	AM_RANGE(0x018023, 0x018023) AM_READ(zx8302_mdv_track2_r) AM_WRITENOP
+	AM_RANGE(0x018022, 0x018022) AM_READWRITE(zx8302_mdv_track_r, zx8302_data_w)
+	AM_RANGE(0x018023, 0x018023) AM_READ(zx8302_mdv_track_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_WRITE(zx8301_control_w)
 	AM_RANGE(0x01c000, 0x01ffff) AM_ROM // expansion I/O
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_BASE(&videoram)
@@ -826,8 +866,8 @@ static MACHINE_START( ql )
 	state_save_register_global(zx8302.mdselck);
 	state_save_register_global(zx8302.mdseld);
 	state_save_register_global(zx8302.erase);
-	state_save_register_global(zx8302.raw1);
-	state_save_register_global(zx8302.raw2);
+	state_save_register_global(zx8302.mdv_motor);
+	state_save_register_global(zx8302.mdv_offset);
 
 	memset(&zx8302, 0, sizeof(zx8302));
 	zx8302.comctl = 1;
@@ -842,6 +882,8 @@ static MACHINE_START( ql )
 	timer_adjust(zx8302_gap_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(31));
 
 	zx8302.ctr = time(NULL) + 283996800;
+
+	mdv_image = auto_malloc(MDV_IMAGE_LENGTH);
 
 	// IPC
 
@@ -1019,9 +1061,12 @@ static DEVICE_LOAD( ql_microdrive )
 {
 	int	filesize = image_length(image);
 
-	if (filesize == 174930)
+	if (filesize == MDV_IMAGE_LENGTH)
 	{
-		return INIT_PASS;
+		if (image_fread(image, mdv_image, filesize) == filesize)
+		{
+			return INIT_PASS;
+		}
 	}
 
 	return INIT_FAIL;
@@ -1033,7 +1078,11 @@ static void ql_microdrive_getinfo(const device_class *devclass, UINT32 state, un
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+
+		case DEVINFO_INT_READABLE:						info->i = 1; break;
+		case DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_PTR_LOAD:							info->load = device_load_ql_microdrive; break;
@@ -1083,11 +1132,15 @@ static void ql_serial_getinfo(const device_class *devclass, UINT32 state, union 
 
 static DEVICE_LOAD( ql_cart )
 {
+	UINT8 *ptr = memory_region(REGION_CPU1) + 0x00c000;
 	int	filesize = image_length(image);
 
 	if (filesize <= 16 * 1024)
 	{
-		return INIT_PASS;
+		if (image_fread(image, ptr, filesize) == filesize)
+		{
+			return INIT_PASS;
+		}
 	}
 
 	return INIT_FAIL;
@@ -1104,7 +1157,7 @@ static void ql_cartslot_getinfo( const device_class *devclass, UINT32 state, uni
 		info->load = device_load_ql_cart;
 		break;
 	case DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy(info->s = device_temp_str(), "qlc");
+		strcpy(info->s = device_temp_str(), "bin");
 		break;
 	default:
 		cartslot_device_getinfo( devclass, state, info );
