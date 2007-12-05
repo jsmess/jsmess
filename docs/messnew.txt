@@ -30,6 +30,8 @@ Source Changes:
 - The core is based on MAME 0.121u2.  This incorporates all features of the
   update to this core.  [MAME team]
 
+- Changed spacing between natural keyboard key names.  [Nate Woods]
+
 
 
 0.121

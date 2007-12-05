@@ -20,6 +20,7 @@
 #define NUM_SIMUL_KEYS	(UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)
 #define LOG_INPUTX		0
 #define DUMP_CODES		0
+#define SPACE_COUNT		3
 
 typedef struct _mess_input_code mess_input_code;
 struct _mess_input_code
@@ -946,12 +947,14 @@ void inputx_handle_mess_extensions(input_port_entry *ipt)
 				/ sizeof(ipt->keyboard.chars[0])); i++)
 			{
 				ch = ipt->keyboard.chars[i];
-				pos += sprintf(&buf[pos], "%s ", inputx_key_name(ch));
+				pos += snprintf(&buf[pos], ARRAY_LENGTH(buf) - pos, "%-*s ", MAX(SPACE_COUNT - 1, 0), inputx_key_name(ch));
 			}
 
+			/* trim extra spaces */
 			rtrim(buf);
 
-			if (buf[0])
+			/* specify the key name */
+			if (buf[0] != '\0')
 				ipt->name = auto_strdup(buf);
 			else
 				ipt->name = "Unnamed Key";
