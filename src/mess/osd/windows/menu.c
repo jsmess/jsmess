@@ -118,7 +118,7 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 //	customize_input
 //============================================================
 
-static void customize_input(HWND wnd, const char *title, int cust_type, int player, int inputclass, const char *section)
+static void customize_input(HWND wnd, const char *title, artwork_cust_type cust_type, int player, int inputclass, const char *section)
 {
 	dialog_box *dlg;
 	input_port_entry *in;

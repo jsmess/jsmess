@@ -9,6 +9,7 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 - [FAMICOM] Fixed reads to $4031-2 when a disk is not mounted.  [MAMEPlus Team]
+
 - [QL] Added sound. [Curt Coder]
 
 
@@ -27,7 +28,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.121u2.  This incorporates all features of the
+- The core is based on MAME 0.121u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Changed spacing between natural keyboard key names.  [Nate Woods]

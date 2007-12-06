@@ -105,9 +105,6 @@ X86_MIPS3_DRC = 1
 # uncomment next line to use DRC PowerPC engine
 X86_PPC_DRC = 1
 
-# uncomment next line to use DRC Voodoo rasterizers
-# X86_VOODOO_DRC = 1
-
 
 
 #-------------------------------------------------
@@ -191,7 +188,6 @@ endif
 AR = @ar
 CC = @gcc
 LD = @gcc
-HHC = @-hhc
 MD = -mkdir$(EXE)
 RM = @rm -f
 
@@ -271,11 +267,6 @@ endif
 # define MAME_PROFILER if we are a profiling build
 ifdef PROFILER
 DEFS += -DMAME_PROFILER
-endif
-
-# define VOODOO_DRC if we are building the DRC Voodoo engine
-ifdef X86_VOODOO_DRC
-DEFS += -DVOODOO_DRC
 endif
 
 
@@ -403,7 +394,6 @@ LIBCPU = $(OBJ)/libcpu.a
 LIBSOUND = $(OBJ)/libsound.a
 LIBUTIL = $(OBJ)/libutil.a
 LIBOCORE = $(OBJ)/libocore.a
-LIBOCORE_NOMAIN = $(OBJ)/libocore_nomain.a
 LIBOSD = $(OBJ)/libosd.a
 
 VERSIONOBJ = $(OBJ)/version.o
@@ -476,8 +466,6 @@ buildtools: maketree $(BUILD)
 
 tools: maketree $(TOOLS)
 
-help: maketree $(HELP)
-
 maketree: $(sort $(OBJDIRS))
 
 clean:
@@ -507,15 +495,11 @@ $(sort $(OBJDIRS)):
 # executable targets and dependencies
 #-------------------------------------------------
 
-ifndef EXECUTABLE_DEFINED
-
 $(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
 # always recompile the version string
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
-
-endif
 
 
 
