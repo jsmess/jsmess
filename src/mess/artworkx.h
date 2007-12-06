@@ -21,10 +21,13 @@
 
 ***************************************************************************/
 
-#define ARTWORK_CUSTTYPE_JOYSTICK	0
-#define ARTWORK_CUSTTYPE_KEYBOARD	1
-#define ARTWORK_CUSTTYPE_MISC		2
-#define ARTWORK_CUSTTYPE_INVALID	3
+enum
+{
+	ARTWORK_CUSTTYPE_JOYSTICK = 0,
+	ARTWORK_CUSTTYPE_KEYBOARD,
+	ARTWORK_CUSTTYPE_MISC,
+	ARTWORK_CUSTTYPE_INVALID
+}
 
 
 
