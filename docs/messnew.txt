@@ -14,6 +14,8 @@ System Driver Changes:
 
 - [QL] Added sound. [Curt Coder]
 
+- [SYM1] Fixed bug #1442.  [Dirk Best]
+
 
 
 User Interface Changes:

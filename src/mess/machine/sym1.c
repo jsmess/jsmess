@@ -156,9 +156,12 @@ static struct via6522_interface via2 =
 
 DRIVER_INIT( sym1 )
 {
-	/* install memory */
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
-			0x0400, mess_ram_size - 0x0400 - 1, 0, 0, MRA8_RAM, MWA8_RAM);
+	/* install expansion memory */
+	if (mess_ram_size > 1024)
+	{
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x0400, mess_ram_size - 1, 0, 0, MRA8_RAM, MWA8_RAM);
+	}
 
 	via_config(0, &via0);
 	via_config(1, &via1);
