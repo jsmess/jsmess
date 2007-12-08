@@ -341,7 +341,6 @@ DRVLIBS = \
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/dai.a \
-	$(MESSOBJ)/dec.a \
 	$(MESSOBJ)/dgn_beta.a \
 	$(MESSOBJ)/ep128.a \
 	$(MESSOBJ)/exidy.a \
@@ -1090,9 +1089,6 @@ $(MESSOBJ)/sgi.a:						\
 	$(MESS_DRIVERS)/ip20.o		\
 	$(MESS_DRIVERS)/ip22.o	\
 	$(MESS_VIDEO)/newport.o
-
-$(MESSOBJ)/dec.a:			\
-	$(MESS_DRIVERS)/ds3100.o	\
 
 $(MESSOBJ)/primo.a:				\
 	$(MESS_DRIVERS)/primo.o	\
