@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <shlwapi.h>
 
-#include "strconv.h"
 #include "assoc.h"
 
 

@@ -11,7 +11,6 @@
 #include "wimgres.h"
 #include "hexview.h"
 #include "../modules.h"
-#include "strconv.h"
 #include "winutf8.h"
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
