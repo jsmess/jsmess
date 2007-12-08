@@ -130,7 +130,7 @@ CPUS += PSXCPU
 CPUS += ARM
 CPUS += ARM7
 CPUS += JAGUAR
-#CPUS += R3000
+CPUS += R3000
 CPUS += R4600
 #CPUS += R4650
 #CPUS += R4700
@@ -172,7 +172,7 @@ CPUS += PENTIUM
 #CPUS += M37710
 #CPUS += PPC403
 #CPUS += PPC601
-#CPUS += PPC602
+CPUS += PPC602
 CPUS += PPC603
 #CPUS += MPC8240
 #CPUS += SE3208
@@ -341,6 +341,7 @@ DRVLIBS = \
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/dai.a \
+	$(MESSOBJ)/dec.a \
 	$(MESSOBJ)/dgn_beta.a \
 	$(MESSOBJ)/ep128.a \
 	$(MESSOBJ)/exidy.a \
@@ -1089,6 +1090,9 @@ $(MESSOBJ)/sgi.a:						\
 	$(MESS_DRIVERS)/ip20.o		\
 	$(MESS_DRIVERS)/ip22.o	\
 	$(MESS_VIDEO)/newport.o
+
+$(MESSOBJ)/dec.a:			\
+	$(MESS_DRIVERS)/ds3100.o	\
 
 $(MESSOBJ)/primo.a:				\
 	$(MESS_DRIVERS)/primo.o	\
