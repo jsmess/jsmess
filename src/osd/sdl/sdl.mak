@@ -57,20 +57,7 @@ CFLAGS += $(OPT_FLAGS)
 # sanity check the configuration
 #-------------------------------------------------
 
-# disable DRC cores for PowerPC builds
-ifdef G4
-PPC = 1
-endif
-
-ifdef G5
-PPC = 1
-endif
-
-ifdef CELL
-PPC = 1
-endif
-
-ifdef PPC
+ifdef BIGENDIAN
 X86_MIPS3_DRC =
 X86_PPC_DRC =
 endif
@@ -85,7 +72,7 @@ endif
 #-------------------------------------------------
 
 ifdef SYMBOLS
-ifdef PPC
+ifdef BIGENDIAN
 ifeq ($(TARGETOS),macosx)
 CFLAGS += -mlong-branch
 endif	# macosx
@@ -116,6 +103,9 @@ endif
 ifeq ($(TARGETOS),macosx)
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
 MAINLDFLAGS = -Xlinker -all_load
+ifdef BIGENDIAN
+PPC=1
+endif
 ifdef PPC
 ifdef PTR64
 CFLAGS += -arch ppc64
