@@ -20,7 +20,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- [Windows] Fixed occasional crash in menu bar when multithreading is on.
+  [MAMEPlus Team]
 
 
 

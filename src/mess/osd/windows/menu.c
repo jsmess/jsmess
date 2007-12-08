@@ -1648,6 +1648,9 @@ static int invoke_command(HWND wnd, UINT command)
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	win_window_info *window = (win_window_info *)ptr;
 
+	// pause while invoking command
+	winwindow_ui_pause_from_window_thread(TRUE);
+
 	switch(command)
 	{
 		case ID_FILE_LOADSTATE:
@@ -1871,6 +1874,10 @@ static int invoke_command(HWND wnd, UINT command)
 			}
 			break;
 	}
+
+	// resume emulation
+	winwindow_ui_pause_from_window_thread(FALSE);
+
 	return handled;
 }
 
