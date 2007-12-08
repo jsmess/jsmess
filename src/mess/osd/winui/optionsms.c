@@ -7,7 +7,6 @@
 #include <commdlg.h>
 #include <wingdi.h>
 #include <winuser.h>
-#include <tchar.h>
 
 #include "mui_util.h"
 #include "mui_opts.h"

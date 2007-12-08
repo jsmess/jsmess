@@ -12,8 +12,6 @@
 
 #ifdef WIN32
 #include <windows.h>
-#include <tchar.h>
-#include "strconv.h"
 #endif /* WIN32 */
 
 #include "core.h"

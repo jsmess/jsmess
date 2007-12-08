@@ -6,7 +6,6 @@
 
 #include <windows.h>
 #include <commctrl.h>
-#include <tchar.h>
 
 #include "wimgtool.h"
 #include "wimgres.h"
