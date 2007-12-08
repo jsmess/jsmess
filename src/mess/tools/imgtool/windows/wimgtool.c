@@ -63,20 +63,6 @@ static void tstring_rtrim(TCHAR *buf)
 	}
 }
 
-static BOOL win_create_directory_utf8(const char* pathname, LPSECURITY_ATTRIBUTES securityattributes)
-{
-	BOOL result = FALSE;
-	TCHAR* t_pathname = tstring_from_utf8(pathname);
-	if( !t_pathname )
-		return result;
-		
-	result = CreateDirectory(t_pathname, securityattributes);
-	
-	free(t_pathname);
-	
-	return result;
-}
-
 static wimgtool_info *get_wimgtool_info(HWND window)
 {
 	wimgtool_info *info;
@@ -892,7 +878,7 @@ static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const 
 	const char *subpath;
 	char local_subpath[MAX_PATH];
 
-	if (!win_create_directory_utf8(local_path, NULL))
+	if (osd_mkdir(local_path) != FILERR_NONE)
 	{
 		err = IMGTOOLERR_UNEXPECTED;
 		goto done;
