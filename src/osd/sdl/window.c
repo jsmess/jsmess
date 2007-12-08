@@ -18,6 +18,9 @@
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 #include <sys/time.h>
 #endif
+#if defined(SDLMAME_MACOSX)
+#include <sys/time.h>
+#endif
 
 #include "osd_opengl.h"
 
