@@ -564,6 +564,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	fclose(chm_hhp);
 
 	/* finish up */
+	XML_ParserFree(state.parser);
 	pool_free(state.pool);
 	return state.error ? -1 : 0;
 
