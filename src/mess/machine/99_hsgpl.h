@@ -4,6 +4,7 @@ int ti99_hsgpl_load_memcard(void);
 int ti99_hsgpl_save_memcard(void);
 
 void ti99_hsgpl_init(void);
+void ti99_hsgpl_reset(void);
 
 READ16_HANDLER ( ti99_hsgpl_gpl_r );
 WRITE16_HANDLER ( ti99_hsgpl_gpl_w );

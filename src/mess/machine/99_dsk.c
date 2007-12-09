@@ -267,6 +267,14 @@ static FLOPPY_CONSTRUCT(ti99_floppy_construct)
 	int success;
 	floperr_t err;
 
+        /* Prevents internal_floppy_device_load (mflopimg) to set the drive
+           geometry to the medium geometry. TI disk controllers determine the
+           number of tracks from a field in sector 0, and if the medium has
+           40 tracks but the drive has 80, the DSR ROM automatically 
+           double-steps the tracks. 
+        */
+        floppy_keep_drive_geometry();
+
 	geometry1 = floppy_create_tag(floppy, TI99DSK_TAG, sizeof(*geometry1));
 
 	ti99_guess_geometry(floppy, geometry1, NULL, &success);
@@ -362,24 +370,27 @@ static const ti99_peb_card_handlers_t fdc_handlers =
 */
 void ti99_fdc_init(void)
 {
-	ti99_disk_DSR = memory_region(region_dsr) + offset_fdc_dsr;
+	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	ti99_install_tracktranslate_procs();
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
+	use_80_track_drives = FALSE;
+}
 
+/*
+	Reset fdc card, set up handlers
+*/
+void ti99_fdc_reset(void)
+{
+	ti99_disk_DSR = memory_region(region_dsr) + offset_fdc_dsr;
 	DSEL = 0;
 	DSKnum = -1;
 	DSKside = 0;
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
-
 	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
-
-	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	wd17xx_reset();		/* resets the fdc */
 	wd17xx_set_density(DEN_FM_LO);
-
-	use_80_track_drives = FALSE;
-
-	ti99_install_tracktranslate_procs();
 }
 
 
@@ -627,26 +638,28 @@ static const ti99_peb_card_handlers_t ccfdc_handlers =
 */
 void ti99_ccfdc_init(void)
 {
-	ti99_disk_DSR = memory_region(region_dsr) + offset_ccfdc_dsr;
+	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
+	ti99_install_tracktranslate_procs();
+	use_80_track_drives = FALSE;
+}
 
+void ti99_ccfdc_reset(void)
+{
+	ti99_disk_DSR = memory_region(region_dsr) + offset_ccfdc_dsr;
 	DSEL = 0;
 	DSKnum = -1;
 	DSKside = 0;
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
 
 	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
 
-	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	wd17xx_reset();		/* initialize the floppy disk controller */
 	wd17xx_set_density(DEN_MFM_LO);
-
-
-	use_80_track_drives = FALSE;
-
-	ti99_install_tracktranslate_procs();
 }
+
 
 
 /*
@@ -842,8 +855,17 @@ static UINT8 *bwg_ram;
 */
 void ti99_bwg_init(void)
 {
+	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	mm58274c_init(1, 1);	/* initialize the RTC */
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
+	ti99_install_tracktranslate_procs();
+	use_80_track_drives = FALSE;
+}
+
+void ti99_bwg_reset(void)
+{
 	ti99_disk_DSR = memory_region(region_dsr) + offset_bwg_dsr;
-	bwg_ram = memory_region(region_dsr) + offset_bwg_ram;
+        bwg_ram = memory_region(region_dsr) + offset_bwg_ram;
 	bwg_ram_offset = 0;
 	bwg_rom_offset = 0;
 	bwg_rtc_enable = 0;
@@ -854,21 +876,11 @@ void ti99_bwg_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
-
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 
-	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	wd17xx_reset();		/* initialize the floppy disk controller */
 	wd17xx_set_density(DEN_MFM_LO);
-
-
-	mm58274c_init(1, 1);	/* initialize the RTC */
-
-	use_80_track_drives = FALSE;
-
-	ti99_install_tracktranslate_procs();
 }
-
 
 /*
 	Read disk CRU interface
@@ -1236,6 +1248,17 @@ static void hfdc_int_callback(int which, int state)
 */
 void ti99_hfdc_init(void)
 {
+	/* initialize the floppy disk controller */
+	smc92x4_init(0, & hfdc_intf);
+	mm58274c_init(1, 1);	/* initialize the RTC */
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
+	ti99_install_tracktranslate_procs();
+	use_80_track_drives = TRUE;
+}
+
+
+void ti99_hfdc_reset(void)
+{
 	ti99_disk_DSR = memory_region(region_dsr) + offset_hfdc_dsr;
 	hfdc_ram = memory_region(region_dsr) + offset_hfdc_ram;
 	hfdc_ram_offset[0] = hfdc_ram_offset[1] = hfdc_ram_offset[2] = 0;
@@ -1248,18 +1271,10 @@ void ti99_hfdc_init(void)
 
 	DVENA = 0;
 	motor_on = 0;
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
 
 	ti99_peb_set_card_handlers(0x1100, & hfdc_handlers);
 
-	/* initialize the floppy disk controller */
-	smc92x4_init(0, & hfdc_intf);
-
-	mm58274c_init(1, 1);	/* initialize the RTC */
-
-	use_80_track_drives = TRUE;
-
-	ti99_install_tracktranslate_procs();
+	smc92x4_reset(0);
 }
 
 
@@ -1269,7 +1284,6 @@ void ti99_hfdc_init(void)
 static int hfdc_cru_r(int offset)
 {
 	int reply;
-
 	switch (offset)
 	{
 	case 0:

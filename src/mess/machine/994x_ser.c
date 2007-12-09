@@ -158,9 +158,19 @@ DEVICE_UNLOAD( ti99_4_rs232 )
 }
 
 /*
-	Reset rs232 card, set up handlers
+	Initializes rs232 card, set up handlers
 */
 void ti99_rs232_init(void)
+{
+	rs232_DSR = memory_region(region_dsr) + offset_rs232_dsr;
+	tms9902_init(0, &tms9902_params);
+	tms9902_init(1, &tms9902_params);
+}
+
+/*
+	Reset rs232 card, set up handlers
+*/
+void ti99_rs232_reset(void)
 {
 	rs232_DSR = memory_region(region_dsr) + offset_rs232_dsr;
 
@@ -173,9 +183,8 @@ void ti99_rs232_init(void)
 	cts1 = 0;
 	cts2 = 0;
 	led = 0;
-
-	tms9902_init(0, &tms9902_params);
-	tms9902_init(1, &tms9902_params);
+	tms9902_reset(0);
+	tms9902_reset(1);
 }
 
 /*

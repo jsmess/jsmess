@@ -72,7 +72,6 @@ TODO:
 #include "devices/harddriv.h"	/* for device_init_mess_hd() */
 #include "smc92x4.h"	/* for smc92x4_hd_load()/smc92x4_hd_unload() */
 
-
 /* prototypes */
 static READ16_HANDLER ( ti99_rspeech_r );
 static WRITE16_HANDLER ( ti99_wspeech_w );
@@ -100,14 +99,17 @@ static void ti99_CS_motor(int offset, int data);
 static void ti99_audio_gate(int offset, int data);
 static void ti99_CS_output(int offset, int data);
 
-static void ti99_8_internal_dsr_init(void);
+static void ti99_8_internal_dsr_reset(void);
 
-static void ti99_4p_internal_dsr_init(void);
+static void ti99_4p_internal_dsr_reset(void);
 static void ti99_TIxram_init(void);
 static void ti99_sAMSxram_init(void);
 static void ti99_4p_mapper_init(void);
 static void ti99_myarcxram_init(void);
-static void ti99_evpc_init(void);
+static void ti99_evpc_reset(void);
+
+static void ti99_common_init(const TMS9928a_interface *intf);
+
 
 /*
 	pointer to extended RAM area
@@ -667,7 +669,7 @@ static const TMS9928a_interface tms9918_interface =
 
 MACHINE_START( ti99_4_60hz )
 {
-	TMS9928A_configure(&tms9918_interface);
+    ti99_common_init(&tms9918_interface);
 }
 
 static const TMS9928a_interface tms9929_interface =
@@ -680,7 +682,7 @@ static const TMS9928a_interface tms9929_interface =
 
 MACHINE_START( ti99_4_50hz )
 {
-	TMS9928A_configure(&tms9929_interface);
+    ti99_common_init(&tms9929_interface);
 }
 
 static const TMS9928a_interface tms9918a_interface =
@@ -693,7 +695,7 @@ static const TMS9928a_interface tms9918a_interface =
 
 MACHINE_START( ti99_4a_60hz )
 {
-	TMS9928A_configure(&tms9918a_interface);
+    ti99_common_init(&tms9918a_interface);
 }
 
 static const TMS9928a_interface tms9929a_interface =
@@ -706,8 +708,47 @@ static const TMS9928a_interface tms9929a_interface =
 
 MACHINE_START( ti99_4a_50hz )
 {
-	TMS9928A_configure(&tms9929a_interface);
+    ti99_common_init(&tms9929a_interface);
 }
+
+MACHINE_START( ti99_4ev_60hz)
+{
+	tms9901_init(0, & tms9901reset_param_ti99_4x);
+    	ti99_peb_init();
+        ti99_fdc_init();
+#if HAS_99CCFDC
+	ti99_ccfdc_init();
+#endif
+	ti99_bwg_init();
+	ti99_hfdc_init();
+        ti99_ide_init();
+        ti99_rs232_init();
+	ti99_hsgpl_init();
+	ti99_usbsm_init();
+}
+
+static void ti99_common_init(const TMS9928a_interface *gfxparm) {
+
+	tms9901_init(0, & tms9901reset_param_ti99_4x);
+
+	TMS9928A_configure(gfxparm);
+            
+        /* Initialize all. Actually, at this point, we don't know
+           how the switches are set. Later we use the configuration switches to 
+           determine which one to use. */
+	ti99_peb_init();
+        ti99_fdc_init();
+#if HAS_99CCFDC
+	ti99_ccfdc_init();
+#endif
+	ti99_bwg_init();
+	ti99_hfdc_init();
+        ti99_ide_init();
+        ti99_rs232_init();
+	ti99_hsgpl_init();
+	ti99_usbsm_init();
+}
+
 
 /*
 	ti99_init_machine(); called before ti99_load_rom...
@@ -744,15 +785,10 @@ MACHINE_RESET( ti99 )
 	}
 
 	/* init tms9901 */
-	if (ti99_model == model_99_8)
-		tms9901_init(0, & tms9901reset_param_ti99_8);
-	else
-		tms9901_init(0, & tms9901reset_param_ti99_4x);
-
-	if (! has_evpc)
-		TMS9928A_reset();
-	if (has_evpc)
-		v9938_reset();
+        tms9901_reset(0);
+	
+	if (!has_evpc) TMS9928A_reset();
+        else v9938_reset();
 
 	/* clear keyboard interface state (probably overkill, but can't harm) */
 	KeyCol = 0;
@@ -784,15 +820,15 @@ MACHINE_RESET( ti99 )
 	has_usb_sm = (readinputport(input_port_config) >> config_usbsm_bit) & config_usbsm_mask;
 
 	/* set up optional expansion hardware */
-	ti99_peb_init(ti99_model == model_99_4p, tms9901_set_int1, NULL);
+	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
 
 	if (ti99_model == model_99_8)
-		ti99_8_internal_dsr_init();
+		ti99_8_internal_dsr_reset();
 
 	if (ti99_model == model_99_4p)
-		ti99_4p_internal_dsr_init();
+		ti99_4p_internal_dsr_reset();
 
-	if (has_speech)
+        if (has_speech)
 	{
 		spchroms_interface speech_intf = { region_speech_rom };
 
@@ -819,7 +855,6 @@ MACHINE_RESET( ti99 )
 	{
 	case xRAM_kind_none:
 	default:
-		/* reset mem handler to none */
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_nop_8_r);
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, ti99_nop_8_w);
 		memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, ti99_nop_8_r);
@@ -841,52 +876,49 @@ MACHINE_RESET( ti99 )
 		ti99_myarcxram_init();
 		break;
 	case xRAM_kind_99_8:
-		/* nothing needs to be done */
 		break;
 	}
 
 	switch (fdc_kind)
 	{
 	case fdc_kind_TI:
-		ti99_fdc_init();
+		ti99_fdc_reset();
 		break;
 #if HAS_99CCFDC
 	case fdc_kind_CC:
-		ti99_ccfdc_init();
+		ti99_ccfdc_reset();
 		break;
 #endif
 	case fdc_kind_BwG:
-		ti99_bwg_init();
+		ti99_bwg_reset();
 		break;
 	case fdc_kind_hfdc:
-		ti99_hfdc_init();
+		ti99_hfdc_reset();
 		break;
 	case fdc_kind_none:
 		break;
 	}
 
-	if (has_ide)
-	{
-		ti99_ide_init(ti99_model == model_99_8);
+	if (has_ide) {
+		ti99_ide_reset(ti99_model == model_99_8);
 		ti99_ide_load_memcard();
 	}
 
 	if (has_rs232)
-		ti99_rs232_init();
+		ti99_rs232_reset();
 
-	if (has_hsgpl)
-	{
-		ti99_hsgpl_init();
-		ti99_hsgpl_load_memcard();
+	if (has_hsgpl)	{
+            ti99_hsgpl_reset();
+            ti99_hsgpl_load_memcard();
 	}
 	else
 		hsgpl_crdena = 0;
 
 	if (has_usb_sm)
-		ti99_usbsm_init(ti99_model == model_99_8);
+		ti99_usbsm_reset(ti99_model == model_99_8);
 
 	if (has_evpc)
-		ti99_evpc_init();
+		ti99_evpc_reset();
 
 	/* initialize mechatronics mouse */
 	mecmouse_sel = 0;
@@ -2406,7 +2438,7 @@ static UINT8 *ti99_8_internal_DSR;
 
 
 /* set up handlers, and set initial state */
-static void ti99_8_internal_dsr_init(void)
+static void ti99_8_internal_dsr_reset(void)
 {
 	ti99_8_internal_DSR = memory_region(REGION_CPU1) + offset_rom0_8 + 0x4000;
 
@@ -2463,7 +2495,7 @@ static UINT16 *ti99_4p_internal_DSR;
 
 
 /* set up handlers, and set initial state */
-static void ti99_4p_internal_dsr_init(void)
+static void ti99_4p_internal_dsr_reset(void)
 {
 	ti99_4p_internal_DSR = (UINT16 *) (memory_region(REGION_CPU1) + offset_rom4_4p);
 	ti99_4p_internal_ROM6 = (UINT16 *) (memory_region(REGION_CPU1) + offset_rom6_4p);
@@ -3000,7 +3032,7 @@ static const ti99_peb_card_handlers_t evpc_handlers =
 /*
 	Reset evpc card, set up handlers
 */
-static void ti99_evpc_init(void)
+static void ti99_evpc_reset(void)
 {
 	ti99_evpc_DSR = memory_region(region_dsr) + offset_evpc_dsr;
 

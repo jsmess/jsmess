@@ -111,7 +111,6 @@ static tms9902_t tms9902[MAX_9902];
 	prototypes
 */
 
-static void reset(int which);
 static void field_interrupts(int which);
 static TIMER_CALLBACK(decrementer_callback);
 static void set_rts(int which, int state);
@@ -138,7 +137,7 @@ void tms9902_init(int which, const tms9902reset_param *param)
 
 	tms9902[which].timer = timer_alloc(decrementer_callback, NULL);
 
-	reset(which);
+	tms9902_reset(which);
 }
 
 
@@ -151,7 +150,7 @@ void tms9902_cleanup(int which)
 	}
 }
 
-static void reset(int which)
+void tms9902_reset(int which)
 {
 	/*  disable all interrupts */
 	tms9902[which].DSCENB = 0;
@@ -611,7 +610,7 @@ void tms9902_cru_w(int which, int offset, int data)
 		break;
 
 	case 0x1F:	/* RESET */
-		reset(which);
+		tms9902_reset(which);
 		break;
 	}
 }

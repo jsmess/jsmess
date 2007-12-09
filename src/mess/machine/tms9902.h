@@ -9,6 +9,7 @@ typedef struct tms9902reset_param
 
 
 void tms9902_init(int which, const tms9902reset_param *param);
+void tms9902_reset(int which);
 void tms9902_cleanup(int which);
 
 void tms9902_set_cts(int which, int state);

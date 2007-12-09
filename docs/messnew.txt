@@ -16,6 +16,8 @@ System Driver Changes:
 
 - [SYM1] Fixed bug #1442.  [Dirk Best]
 
+- [TI99] Fixed fatal regressions introduced a few releases ago.  [Michael Zapf]
+
 - [X68000] Improved video timing.  [Barry Rodewald]
 
 

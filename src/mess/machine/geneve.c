@@ -200,8 +200,28 @@ DRIVER_INIT( genmod )
 	/*has_genmod = TRUE;*/
 }
 
-
 MACHINE_START( geneve )
+{
+    	tms9901_init(0, & tms9901reset_param_ti99);
+
+        /* Initialize all. Actually, at this point, we don't know
+           how the switches are set. Later we use the configuration switches to 
+           determine which one to use. */
+	ti99_peb_init();
+        ti99_fdc_init();
+#if HAS_99CCFDC
+	ti99_ccfdc_init();
+#endif
+	ti99_bwg_init();
+	ti99_hfdc_init();
+        ti99_ide_init();
+        ti99_rs232_init();
+	ti99_usbsm_init();
+	mm58274c_init(0, 1);
+	add_exit_callback(machine, machine_stop_geneve);
+}
+
+MACHINE_RESET( geneve )
 {
 	mode_flags = /*0*/mf_mapmode;
 	/* initialize page lookup */
@@ -219,11 +239,9 @@ MACHINE_START( geneve )
 	cartridge_page = 0;
 
 	/* init tms9901 */
-	tms9901_init(0, & tms9901reset_param_ti99);
+        tms9901_reset(0);
 
 	v9938_reset();
-
-	mm58274c_init(0, 1);
 
 	/* clear keyboard interface state (probably overkill, but can't harm) */
 	JoySel = 0;
@@ -247,7 +265,7 @@ MACHINE_START( geneve )
 	has_usb_sm = (readinputport(input_port_config) >> config_usbsm_bit) & config_usbsm_mask;
 
 	/* set up optional expansion hardware */
-	ti99_peb_init(0, inta_callback, intb_callback);
+	ti99_peb_reset(0, inta_callback, intb_callback);
 
 	if (has_speech)
 	{
@@ -259,18 +277,18 @@ MACHINE_START( geneve )
 	switch (fdc_kind)
 	{
 	case fdc_kind_TI:
-		ti99_fdc_init();
+		ti99_fdc_reset();
 		break;
 #if HAS_99CCFDC
 	case fdc_kind_CC:
-		ti99_ccfdc_init();
+		ti99_ccfdc_reset();
 		break;
 #endif
 	case fdc_kind_BwG:
-		ti99_bwg_init();
+		ti99_bwg_reset();
 		break;
 	case fdc_kind_hfdc:
-		ti99_hfdc_init();
+		ti99_hfdc_reset();
 		break;
 	case fdc_kind_none:
 		break;
@@ -278,17 +296,15 @@ MACHINE_START( geneve )
 
 	if (has_ide)
 	{
-		ti99_ide_init(TRUE);
+		ti99_ide_reset(TRUE);
 		ti99_ide_load_memcard();
 	}
 
 	if (has_rs232)
-		ti99_rs232_init();
+		ti99_rs232_reset();
 
 	if (has_usb_sm)
-		ti99_usbsm_init(TRUE);
-
-	add_exit_callback(machine, machine_stop_geneve);
+		ti99_usbsm_reset(TRUE);
 }
 
 static void machine_stop_geneve(running_machine *machine)

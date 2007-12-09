@@ -70,11 +70,17 @@ tms9995 CPU used by Geneve and ti-99/8. */
 static int tms9995_mode;
 
 /*
+	Initilaizes USB-SmartMedia card, set up handlers
+*/
+void ti99_usbsm_init() {
+	ti99_usbsm_RAM = auto_malloc(0x100000);
+}
+
+/*
 	Reset USB-SmartMedia card, set up handlers
 */
-int ti99_usbsm_init(int in_tms9995_mode)
+int ti99_usbsm_reset(int in_tms9995_mode)
 {
-	ti99_usbsm_RAM = auto_malloc(0x100000);
 	if (strataflash_init(0))
 		return 1;
 	if (smartmedia_machine_init(0))

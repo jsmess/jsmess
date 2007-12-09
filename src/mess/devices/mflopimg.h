@@ -27,4 +27,7 @@ void floppy_install_unload_proc(mess_image *image, void (*proc)(mess_image *imag
 /* hack for TI99; replace this when we think of something better */
 void floppy_install_tracktranslate_proc(mess_image *image, int (*proc)(mess_image *image, floppy_image *floppy, int physical_track));
 
+/* another hack for TI99: Drive track count may differ from medium track count. */
+void floppy_keep_drive_geometry(void);
+
 #endif /* MFLOPIMG_H */

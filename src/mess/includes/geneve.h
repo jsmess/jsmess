@@ -32,6 +32,7 @@ DRIVER_INIT( geneve );
 DRIVER_INIT( genmod );
 
 MACHINE_START( geneve );
+MACHINE_RESET( geneve );
 
 VIDEO_START( geneve );
 void geneve_hblank_interrupt(void);

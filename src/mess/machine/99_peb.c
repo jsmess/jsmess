@@ -167,6 +167,17 @@ void (*intb_callback)(int state);
 
 
 /*
+	Initializes the expansion card handlers
+
+*/
+void ti99_peb_init()
+{
+	memset(expansion_ports, 0, sizeof(expansion_ports));
+	memset(ti99_4p_expansion_ports, 0, sizeof(ti99_4p_expansion_ports));
+}
+
+
+/*
 	Resets the expansion card handlers
 
 	in_has_16bit_peb: TRUE if we are using the snug sgcpu 99/4p 16-bit
@@ -176,11 +187,8 @@ void (*intb_callback)(int state);
 	in_intb_callback: callback called when the state of INTB changes (may be
 		NULL)
 */
-void ti99_peb_init(int in_has_16bit_peb, void (*in_inta_callback)(int state), void (*in_intb_callback)(int state))
+void ti99_peb_reset(int in_has_16bit_peb, void (*in_inta_callback)(int state), void (*in_intb_callback)(int state))
 {
-	memset(expansion_ports, 0, sizeof(expansion_ports));
-	memset(ti99_4p_expansion_ports, 0, sizeof(ti99_4p_expansion_ports));
-
 	has_16bit_peb = in_has_16bit_peb;
 	inta_callback = in_inta_callback;
 	intb_callback = in_intb_callback;
@@ -471,7 +479,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
 
 	if (active_card != -1)
 	{
-		handler = expansion_ports[active_card].mem_read;
+            handler = expansion_ports[active_card].mem_read;
 		if (handler)
 			reply = (*handler)(offset);
 	}

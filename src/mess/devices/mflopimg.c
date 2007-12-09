@@ -11,10 +11,23 @@
 #include "image.h"
 #include "devices/flopdrv.h"
 
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 #define FLOPPY_TAG		"floptag"
 #define LOG_FLOPPY		0
 
-struct mess_flopimg
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _mess_flopimg mess_flopimg;
+struct _mess_flopimg
 {
 	floppy_image *floppy;
 	int track;
@@ -22,14 +35,23 @@ struct mess_flopimg
 	int (*tracktranslate_proc)(mess_image *image, floppy_image *floppy, int physical_track);
 };
 
-struct floppy_error_map
+
+
+typedef struct _floppy_error_map floppy_error_map;
+struct _floppy_error_map
 {
 	floperr_t ferr;
 	image_error_t ierr;
 	const char *message;
 };
 
-static const struct floppy_error_map errmap[] =
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+static const floppy_error_map errmap[] =
 {
 	{ FLOPPY_ERROR_SUCCESS,			IMAGE_ERROR_SUCCESS },
 	{ FLOPPY_ERROR_INTERNAL,		IMAGE_ERROR_INTERNAL },
@@ -38,10 +60,17 @@ static const struct floppy_error_map errmap[] =
 	{ FLOPPY_ERROR_INVALIDIMAGE,	IMAGE_ERROR_INVALIDIMAGE }
 };
 
+static int flopimg_keep_geometry;	/* hack for TI-99 - please fix when possible */
 
-static struct mess_flopimg *get_flopimg(mess_image *image)
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+static mess_flopimg *get_flopimg(mess_image *image)
 {
-	return (struct mess_flopimg *) image_lookuptag(image, FLOPPY_TAG);
+	return (mess_flopimg *) image_lookuptag(image, FLOPPY_TAG);
 }
 
 
@@ -55,7 +84,7 @@ floppy_image *flopimg_get_image(mess_image *image)
 
 static void flopimg_seek_callback(mess_image *image, int physical_track)
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 
 	flopimg = get_flopimg(image);
 	if (!flopimg || !flopimg->floppy)
@@ -72,7 +101,7 @@ static void flopimg_seek_callback(mess_image *image, int physical_track)
 
 static int flopimg_get_sectors_per_track(mess_image *image, int side)
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 	floperr_t err;
 	int sector_count;
 
@@ -90,7 +119,7 @@ static int flopimg_get_sectors_per_track(mess_image *image, int side)
 
 static void flopimg_get_id_callback(mess_image *image, chrn_id *id, int id_index, int side)
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 	int cylinder, sector, N;
 	UINT32 sector_length;
 	
@@ -125,7 +154,7 @@ static void log_readwrite(const char *name, int head, int track, int sector, con
 
 static void flopimg_read_sector_data_into_buffer(mess_image *image, int side, int index1, char *ptr, int length)
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 
 	flopimg = get_flopimg(image);
 	if (!flopimg || !flopimg->floppy)
@@ -141,7 +170,7 @@ static void flopimg_read_sector_data_into_buffer(mess_image *image, int side, in
 
 static void flopimg_write_sector_data_from_buffer(mess_image *image, int side, int index1, const char *ptr, int length,int ddam)
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 
 	flopimg = get_flopimg(image);
 	if (!flopimg || !flopimg->floppy)
@@ -157,7 +186,7 @@ static void flopimg_write_sector_data_from_buffer(mess_image *image, int side, i
 
 static void flopimg_read_track_data_info_buffer(mess_image *image, int side, void *ptr, int *length)
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 
 	flopimg = get_flopimg(image);
 	if (!flopimg || !flopimg->floppy)
@@ -170,7 +199,7 @@ static void flopimg_read_track_data_info_buffer(mess_image *image, int side, voi
 
 static void flopimg_write_track_data_info_buffer(mess_image *image, int side, const void *ptr, int *length)
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 
 	flopimg = get_flopimg(image);
 	if (!flopimg || !flopimg->floppy)
@@ -234,7 +263,8 @@ struct io_procs mess_ioprocs =
 
 static int device_init_floppy(mess_image *image)
 {
-	if (!image_alloctag(image, FLOPPY_TAG, sizeof(struct mess_flopimg)))
+    flopimg_keep_geometry = FALSE;
+    if (!image_alloctag(image, FLOPPY_TAG, sizeof(mess_flopimg)))
 		return INIT_FAIL;
 	return floppy_drive_init(image, &mess_floppy_interface);
 }
@@ -244,7 +274,7 @@ static int device_init_floppy(mess_image *image)
 static int internal_floppy_device_load(mess_image *image, int create_format, option_resolution *create_args)
 {
 	floperr_t err;
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 	const struct IODevice *dev;
 	const struct FloppyFormat *floppy_options;
 	int floppy_flags, i;
@@ -276,7 +306,8 @@ static int internal_floppy_device_load(mess_image *image, int create_format, opt
 	}
 
 	/* if we can get head and track counts, then set the geometry accordingly */
-	if (floppy_callbacks(flopimg->floppy)->get_heads_per_disk
+	if (!flopimg_keep_geometry 
+            && floppy_callbacks(flopimg->floppy)->get_heads_per_disk
 		&& floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
 	{
 		floppy_drive_set_geometry_absolute(image,
@@ -312,7 +343,7 @@ static int device_create_floppy(mess_image *image, int create_format, option_res
 
 static void device_unload_floppy(mess_image *image)
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 	flopimg = image_lookuptag(image, FLOPPY_TAG);
 
 	/* if we have one of our hacky unload procs, call it */
@@ -333,7 +364,7 @@ static void device_unload_floppy(mess_image *image)
 
 void floppy_install_unload_proc(mess_image *image, void (*proc)(mess_image *image))
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 	flopimg = image_lookuptag(image, FLOPPY_TAG);
 	flopimg->unload_proc = proc;
 }
@@ -342,9 +373,26 @@ void floppy_install_unload_proc(mess_image *image, void (*proc)(mess_image *imag
 
 void floppy_install_tracktranslate_proc(mess_image *image, int (*proc)(mess_image *image, floppy_image *floppy, int physical_track))
 {
-	struct mess_flopimg *flopimg;
+	mess_flopimg *flopimg;
 	flopimg = image_lookuptag(image, FLOPPY_TAG);
 	flopimg->tracktranslate_proc = proc;
+}
+
+
+/************
+ *  Another hack for ti99: Drive track count may differ from medium track count.
+ *  It is possible to insert a 40 track medium in an 80 track drive; the TI
+ *  controllers read the track count from sector 0 and automatically 
+ *  apply double steps. Setting the track count of the drive to the medium
+ *  track count will lead to unreachable tracks.
+ *  This function is called from 99_dsk.c to switch off the lines in 
+ *  internal_floppy_device_load which set the drive geometry to the medium
+ *  geometry.
+ *************/
+void floppy_keep_drive_geometry(void)
+{
+	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call floppy_keep_drive_geometry at init time!");
+	flopimg_keep_geometry = TRUE;
 }
 
 

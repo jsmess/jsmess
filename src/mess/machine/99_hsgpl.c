@@ -248,19 +248,12 @@ int ti99_hsgpl_save_memcard(void)
 }
 
 /*
-	Reset hsgpl card, set up handlers
+	Initialize hsgpl card, set up handlers
 */
 void ti99_hsgpl_init(void)
 {
 	hsgpl.GRAM_ptr = memory_region(region_hsgpl) + offset_hsgpl_gram;
 	hsgpl.RAM6_ptr = memory_region(region_hsgpl) + offset_hsgpl_ram6;
-	hsgpl.addr = 0;
-	hsgpl.raddr_LSB = 0;
-	hsgpl.waddr_LSB = 0;
-	hsgpl.cur_port = 0;
-	hsgpl.cur_bank = 0;
-	hsgpl.cru_reg = 0;
-	set_hsgpl_crdena(/*0*/1);
 
 	at29c040a_init_data_ptr(feeprom_grom0, memory_region(region_hsgpl) + offset_hsgpl_grom);
 	at29c040a_init(feeprom_grom0);
@@ -270,6 +263,20 @@ void ti99_hsgpl_init(void)
 	at29c040a_init(feeprom_rom6);
 	at29c040a_init_data_ptr(feeprom_dsr, memory_region(region_hsgpl) + offset_hsgpl_dsr);
 	at29c040a_init(feeprom_dsr);
+}
+
+/*
+	Reset hsgpl card
+*/
+void ti99_hsgpl_reset(void)
+{
+	hsgpl.addr = 0;
+	hsgpl.raddr_LSB = 0;
+	hsgpl.waddr_LSB = 0;
+	hsgpl.cur_port = 0;
+	hsgpl.cur_bank = 0;
+	hsgpl.cru_reg = 0;
+	set_hsgpl_crdena(/*0*/1);
 
 	ti99_peb_set_card_handlers(0x1b00, & hsgpl_handlers);
 }
@@ -308,7 +315,6 @@ READ16_HANDLER ( ti99_hsgpl_gpl_r )
 {
 	int port;
 	int reply;
-
 
 	//activecpu_adjust_icount(-4);
 

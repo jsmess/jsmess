@@ -463,7 +463,8 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	/*MDRV_INTERLEAVE(interleave)*/
 
 	MDRV_MACHINE_START( geneve )
-
+        MDRV_MACHINE_RESET( geneve )
+        
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

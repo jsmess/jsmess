@@ -2,4 +2,5 @@
 DEVICE_LOAD( ti99_sm );
 DEVICE_UNLOAD( ti99_sm );*/
 
-int ti99_usbsm_init(int in_tms9995_mode);
+void ti99_usbsm_init(void);
+int ti99_usbsm_reset(int in_tms9995_mode);

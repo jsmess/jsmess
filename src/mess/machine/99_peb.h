@@ -53,7 +53,8 @@ enum
 	intb_ieee488_bit = 7-1
 };
 
-void ti99_peb_init(int in_has_16bit_peb, void (*in_inta_callback)(int state), void (*in_intb_callback)(int state));
+void ti99_peb_init(void);
+void ti99_peb_reset(int in_has_16bit_peb, void (*in_inta_callback)(int state), void (*in_intb_callback)(int state));
 
 void ti99_peb_set_card_handlers(int cru_base, const ti99_peb_card_handlers_t *handler);
 void ti99_peb_set_16bit_card_handlers(int cru_base, const ti99_peb_16bit_card_handlers_t *handler);
