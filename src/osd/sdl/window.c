@@ -535,20 +535,19 @@ static void sdlwindow_modify_yuv(int dir)
 	}
 }
 
+#if USE_OPENGL
 static void *destroy_all_textures_wt(void *param, int threadid)
 {
 	worker_param *wp = (worker_param *) param;
-#if USE_OPENGL
-	sdl_window_info *window = wp->window;
-#endif
 
-#if USE_OPENGL
+	sdl_window_info *window = wp->window;
+
 	drawsdl_destroy_all_textures(window);
-#endif
-	
+
 	free(wp);
 	return NULL;
 }
+#endif
 
 void sdlwindow_modify_prescale(int dir)
 {
