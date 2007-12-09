@@ -110,6 +110,17 @@ struct x68k_system
 		int operation;  // operation port (0xe80481)
 		int vblank;  // 1 if in VBlank
 		int hblank;  // 1 if in HBlank
+		int htotal;  // Horizontal Total (in characters)
+		int vtotal;  // Vertical Total
+		int hbegin;  // Horizontal Begin
+		int vbegin;  // Vertical Begin
+		int hend;    // Horizontal End
+		int vend;    // Vertical End
+		int hsync_end;  // Horizontal Sync End
+		int vsync_end;  // Vertical Sync End
+		int hsyncadjust;  // Horizontal Sync Adjustment
+		int hmultiple;  // Horizontal pixel multiplier
+		int vmultiple;  // Vertical scanline multiplier (x2 for doublescan modes)
 		int height;
 		int width;
 		int visible_height;

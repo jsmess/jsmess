@@ -990,9 +990,9 @@ READ16_HANDLER( x68k_mfp_r )
 		return 0xff;
 	}
 }
-
+*/
 WRITE16_HANDLER( x68k_mfp_w )
-{*/
+{
 	/* For the Interrupt registers, the bits are set out as such:
 	   Reg A - bit 7: GPIP7 (HSync)
 	           bit 6: GPIP6 (CRTC CIRQ)
@@ -1011,9 +1011,9 @@ WRITE16_HANDLER( x68k_mfp_w )
 			   bit 1: GPIP1 (EXPON)
 			   bit 0: GPIP0 (Alarm)
 	*/
-/*	switch(offset)
+	switch(offset)
 	{
-	case 0:  // GPDR
+/*	case 0:  // GPDR
 		// All bits are inputs generally, so no action taken.
 		break;
 	case 1:  // AER
@@ -1096,7 +1096,7 @@ WRITE16_HANDLER( x68k_mfp_w )
 			sys.mfp.usart.recv_enable = 1;
 		else
 			sys.mfp.usart.recv_enable = 0;
-		break;
+		break;*/
 	case 22:
 		if(data & 0x01)
 			sys.mfp.usart.send_enable = 1;
@@ -1113,11 +1113,11 @@ WRITE16_HANDLER( x68k_mfp_w )
 		}
 		break;
 	default:
-		logerror("MFP: Writing 0x%04x to offset %i\n",data,offset);
+		mfp68901_0_register_lsb_w(offset,data,mem_mask);
 		return;
 	}
 }
-*/
+
 
 WRITE16_HANDLER( x68k_ppi_w )
 {
@@ -1193,8 +1193,8 @@ WRITE16_HANDLER( x68k_vid_w )
 
 	if(offset >= 0x100 && offset < 0x200)
 	{
-		COMBINE_DATA(sys.video.text_pal+offset);
-		val = sys.video.text_pal[offset];
+		COMBINE_DATA(sys.video.text_pal+(offset-0x100));
+		val = sys.video.text_pal[offset-0x100];
 		palette_set_color_rgb(Machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
@@ -1228,7 +1228,7 @@ READ16_HANDLER( x68k_vid_r )
 		return sys.video.gfx_pal[offset];
 
 	if(offset >= 0x100 && offset < 0x200)
-		return sys.video.text_pal[offset];
+		return sys.video.text_pal[offset-0x100];
 
 	switch(offset)
 	{
@@ -1385,7 +1385,6 @@ void x68k_fm_irq(int irq)
 	else
 	{
 		sys.mfp.gpio &= ~0x08;
-		current_vector[6] = 0x43;
 	}
 	
 }
@@ -1394,7 +1393,7 @@ READ8_HANDLER(mfp_gpio_r)
 {
 	UINT8 data = sys.mfp.gpio;
 	
-	data &= ~(video_screen_get_hblank(0) << 7);
+	data &= ~(sys.crtc.hblank << 7);
 	data &= ~(sys.crtc.vblank << 4);
 	data |= 0x23;  // GPIP5 is unused, always 1
 	mfp68901_tai_w(0,sys.crtc.vblank);
@@ -1483,7 +1482,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(mfp68901_0_register_lsb_r, x68k_mfp_w)
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE(x68k_rtc_r, x68k_rtc_w)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
@@ -1508,7 +1507,7 @@ ADDRESS_MAP_END
 static mfp68901_interface mfp_interface =
 {
 	2000000, // 4MHz clock
-	2000000,
+	4000000,
 	MFP68901_TDO_LOOPBACK,
 	0,
 	&mfp_key,  // Rx
@@ -1963,11 +1962,11 @@ DRIVER_INIT( x68000 )
 	// init keyboard
 	sys.keyboard.delay = 500;  // 3*100+200 
 	sys.keyboard.repeat = 110;  // 4^2*5+30
-	kb_timer = timer_alloc(x68k_keyboard_poll, NULL);
-	scanline_timer = timer_alloc(x68k_hsync, NULL);
-	raster_irq = timer_alloc(x68k_crtc_raster_irq, NULL);
-	vblank_irq = timer_alloc(x68k_crtc_vblank_irq, NULL);
-	mouse_timer = timer_alloc(x68k_scc_ack, NULL);
+	kb_timer = timer_alloc(x68k_keyboard_poll,NULL);
+	scanline_timer = timer_alloc(x68k_hsync,NULL);
+	raster_irq = timer_alloc(x68k_crtc_raster_irq,NULL);
+	vblank_irq = timer_alloc(x68k_crtc_vblank_irq,NULL);
+	mouse_timer = timer_alloc(x68k_scc_ack,NULL);
 }
 
 
