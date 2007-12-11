@@ -69,6 +69,11 @@ static READ8_HANDLER( tvdraw_data_r )
 	return tvdraw_data;
 }
 
+static READ8_HANDLER( sg1000_joysel_r )
+{
+	return 0x80;
+}
+
 /* Memory Maps */
 
 // SG-1000
@@ -86,7 +91,8 @@ static ADDRESS_MAP_START( sg1000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0xdc, 0xdc) AM_READ(input_port_0_r)
 	AM_RANGE(0xdd, 0xdd) AM_READ(input_port_1_r)
-	AM_RANGE(0xde, 0xdf) AM_NOP
+	AM_RANGE(0xde, 0xde) AM_READ(sg1000_joysel_r) AM_WRITENOP
+	AM_RANGE(0xdf, 0xdf) AM_NOP
 ADDRESS_MAP_END
 
 // SC-3000

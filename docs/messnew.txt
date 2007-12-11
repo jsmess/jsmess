@@ -20,6 +20,8 @@ System Driver Changes:
 
 - [X68000] Improved video timing.  [Barry Rodewald]
 
+- [SG1000] Fixed keyboard/joystick detection. (bug #1444) [Curt Coder]
+
 
 
 User Interface Changes:
