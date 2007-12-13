@@ -44,7 +44,7 @@ typedef struct {
 	void (*handshake_out)(int n, int data, int mask);
 } CENTRONICS_CONFIG;
 
-void centronics_config(int nr, CENTRONICS_CONFIG *config);
+void centronics_config(int nr, const CENTRONICS_CONFIG *config);
 
 void centronics_write_data(int nr, UINT8 data);
 void centronics_write_handshake(int nr, int data, int mask);

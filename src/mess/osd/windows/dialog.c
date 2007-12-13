@@ -1208,6 +1208,27 @@ static LRESULT seqselect_apply(dialog_box *dialog, HWND editwnd, UINT message, W
 }
 
 //============================================================
+//	input_port_mutable_seq
+//============================================================
+
+static input_seq *input_port_mutable_seq(input_port_entry *in, int seqtype)
+{
+	const input_seq *const_seq = input_port_seq(in, seqtype);
+	input_seq *seq;
+
+	if (const_seq == &in->seq)
+		seq = &in->seq;
+	else if (const_seq == &in->analog.incseq)
+		seq = &in->analog.incseq;
+	else if (const_seq == &in->analog.decseq)
+		seq = &in->analog.decseq;
+	else
+		seq = NULL;
+
+	return seq;
+}
+
+//============================================================
 //	dialog_add_single_seqselect
 //============================================================
 
@@ -1217,7 +1238,7 @@ static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 	seqselect_info *stuff;
 	input_seq *code;
 
-	code = input_port_seq(port, seq);
+	code = input_port_mutable_seq(port, seq);
 
 	if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_ENDELLIPSIS | ES_CENTER | SS_SUNKEN,
 			x, y, cx, cy, NULL, DLGITEM_EDIT, NULL))

@@ -14,13 +14,13 @@ System Driver Changes:
 
 - [QL] Added sound. [Curt Coder]
 
+- [SG1000] Fixed keyboard/joystick detection. (bug #1444) [Curt Coder]
+
 - [SYM1] Fixed bug #1442.  [Dirk Best]
 
 - [TI99] Fixed fatal regressions introduced a few releases ago.  [Michael Zapf]
 
 - [X68000] Improved video timing.  [Barry Rodewald]
-
-- [SG1000] Fixed keyboard/joystick detection. (bug #1444) [Curt Coder]
 
 
 
@@ -39,7 +39,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.121u3.  This incorporates all features of the
+- The core is based on MAME 0.121u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Changed spacing between natural keyboard key names.  [Nate Woods]

@@ -21,7 +21,7 @@ typedef struct {
 	// dma for ecp
 } PC_LPT_CONFIG;
 
-void pc_lpt_config(int nr, PC_LPT_CONFIG *config);
+void pc_lpt_config(int nr, const PC_LPT_CONFIG *config);
 
 void pc_lpt_set_device(int nr, CENTRONICS_DEVICE *device);
 

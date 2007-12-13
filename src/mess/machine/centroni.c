@@ -7,7 +7,7 @@
 #include "devices/printer.h"
 
 typedef struct {
-	CENTRONICS_CONFIG *config;
+	const CENTRONICS_CONFIG *config;
 	UINT8 data;
 	UINT8 control;
 	double time_;
@@ -33,7 +33,7 @@ static CENTRONICS cent[3]={
 
 static TIMER_CALLBACK(centronics_timer_callback);
 
-void centronics_config(int nr, CENTRONICS_CONFIG *config)
+void centronics_config(int nr, const CENTRONICS_CONFIG *config)
 {
 	CENTRONICS *This=cent+nr;
 	This->config=config;

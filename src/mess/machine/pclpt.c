@@ -35,7 +35,7 @@ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M );
 
 typedef struct {
 	CENTRONICS_DEVICE *device;
-	PC_LPT_CONFIG *config;
+	const PC_LPT_CONFIG *config;
 	int on;
 	UINT8 data;
 	UINT8 status;
@@ -45,7 +45,7 @@ static PC_LPT LPT[3]= {
 	{ 0 }
 };
 
-void pc_lpt_config(int nr, PC_LPT_CONFIG *config)
+void pc_lpt_config(int nr, const PC_LPT_CONFIG *config)
 {
 	PC_LPT *This=LPT+nr;
 	This->config=config;
