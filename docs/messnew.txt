@@ -18,6 +18,9 @@ System Driver Changes:
 
 - [SYM1] Fixed bug #1442.  [Dirk Best]
 
+- [SYM1] Better LED support, memory write protect support and added speaker
+  emulation. System is now marked as working.  [Dirk Best]
+
 - [TI99] Fixed fatal regressions introduced a few releases ago.  [Michael Zapf]
 
 - [X68000] Improved video timing.  [Barry Rodewald]
@@ -43,6 +46,9 @@ Source Changes:
   update to this core.  [MAME team]
 
 - Changed spacing between natural keyboard key names.  [Nate Woods]
+
+- Added a general 74145 BCD-to-decimal decoder emulation, currently used
+  by the SYM-1 driver.  [Dirk Best]
 
 
 

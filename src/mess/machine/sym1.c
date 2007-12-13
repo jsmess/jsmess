@@ -16,11 +16,12 @@
 /* Peripheral chips */
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
+#include "machine/74145.h"
+#include "sound/speaker.h"
 
 
 static UINT8 riot_port_a, riot_port_b;
-static UINT8 sym1_led[6];
-
+emu_timer *led_update;
 
 
 /******************************************************************************
@@ -28,10 +29,22 @@ static UINT8 sym1_led[6];
 ******************************************************************************/
 
 
-/*
-  8903 7segment display output, key pressed
-  892c keyboard input only ????
-*/
+static TIMER_CALLBACK( led_refresh )
+{
+	/* update digits depending on the status of the output lines */
+	if (ttl74145_output_0(0)) output_set_digit_value(0, riot_port_a);
+	if (ttl74145_output_1(0)) output_set_digit_value(1, riot_port_a);
+	if (ttl74145_output_2(0)) output_set_digit_value(2, riot_port_a);
+	if (ttl74145_output_3(0)) output_set_digit_value(3, riot_port_a);
+	if (ttl74145_output_4(0)) output_set_digit_value(4, riot_port_a);
+	if (ttl74145_output_5(0)) output_set_digit_value(5, riot_port_a);	
+}
+
+
+static void sym1_led_w(void)
+{
+	timer_adjust(led_update, ATTOTIME_IN_USEC(70), 0, attotime_never);
+}
 
 
 static READ8_HANDLER( sym1_riot_a_r )
@@ -80,28 +93,32 @@ static READ8_HANDLER( sym1_riot_b_r )
 }
 
 
-static void sym1_led_w(void)
-{
-	if ((riot_port_b & 0x0f) < 6)
-	{
-		sym1_led[riot_port_b] |= riot_port_a;
-		output_set_digit_value(riot_port_b & 0x07, sym1_led[riot_port_b]);
-	}
-}
-
-
 static WRITE8_HANDLER( sym1_riot_a_w )
 {
+	logerror("%x: riot_a_w 0x%02x\n", activecpu_get_pc(), data);
+
+	/* save for later use */
 	riot_port_a = data;
-	logerror("riot_a_w 0x%02x\n", data);
+
+	/* refresh the leds */
 	sym1_led_w();
 }
 
 
 static WRITE8_HANDLER( sym1_riot_b_w )
 {
+	logerror("%x: riot_b_w 0x%02x\n", activecpu_get_pc(), data);
+
+	/* save for later use */
 	riot_port_b = data;
-	logerror("riot_b_w 0x%02x\n", data);
+
+	/* first 4 output pins are connected to the 74145 */
+	ttl74145_0_w(0, data & 0x0f);
+	
+	/* speaker is connected to output 6 of the 74145 */
+	speaker_level_w(0, ttl74145_output_6(0));
+
+	/* refresh the leds */
 	sym1_led_w();
 }
 
@@ -127,24 +144,92 @@ static void sym1_irq(int level)
 }
 
 
-static struct via6522_interface via0 =
+static READ8_HANDLER( sym1_via0_b_r )
 {
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	sym1_irq
+	return 0xff;
+}
+
+
+static WRITE8_HANDLER( sym1_via0_b_w )
+{
+	logerror("%x: via0_b_w 0x%02x\n", activecpu_get_pc(), data);
+}
+
+
+/* PA0: Write protect R6532 RAM
+ * PA1: Write protect RAM 0x400-0x7ff
+ * PA2: Write protect RAM 0x800-0xbff
+ * PA3: Write protect RAM 0xc00-0xfff
+ */
+static WRITE8_HANDLER( sym1_via2_a_w )
+{
+	logerror("SYM1 VIA2 W 0x%02x\n", data);
+
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa600, 0xa67f, 0, 0,  
+		((readinputportbytag("WP") & 0x01) && !(data & 0x01)) ? MWA8_NOP : MWA8_BANK5);
+
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0400, 0x07ff, 0, 0, 
+		((readinputportbytag("WP") & 0x02) && !(data & 0x02)) ? MWA8_NOP : MWA8_BANK2);
+
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0800, 0x0bff, 0, 0, 
+		((readinputportbytag("WP") & 0x04) && !(data & 0x04)) ? MWA8_NOP : MWA8_BANK3);
+
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0c00, 0x0fff, 0, 0, 
+		((readinputportbytag("WP") & 0x08) && !(data & 0x08)) ? MWA8_NOP : MWA8_BANK4);
+}
+
+
+static const struct via6522_interface via0 =
+{
+	NULL,           /* VIA Port A Input */
+	sym1_via0_b_r,  /* VIA Port B Input */
+	NULL,           /* VIA Port CA1 Input */
+	NULL,           /* VIA Port CB1 Input */
+	NULL,           /* VIA Port CA2 Input */
+	NULL,           /* VIA Port CB2 Input */
+	NULL,           /* VIA Port A Output */
+	sym1_via0_b_w,  /* VIA Port B Output */
+	NULL,           /* VIA Port CA1 Output */
+	NULL,           /* VIA Port CB1 Output */
+	NULL,           /* VIA Port CA2 Output */
+	NULL,           /* VIA Port CB2 Output */
+	sym1_irq        /* VIA IRQ Callback */
 };
 
 
-static struct via6522_interface via1 =
+static const struct via6522_interface via1 =
 {
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	sym1_irq
+	NULL,           /* VIA Port A Input */
+	NULL,           /* VIA Port B Input */
+	NULL,           /* VIA Port CA1 Input */
+	NULL,           /* VIA Port CB1 Input */
+	NULL,           /* VIA Port CA2 Input */
+	NULL,           /* VIA Port CB2 Input */
+	NULL,           /* VIA Port A Output */
+	NULL,           /* VIA Port B Output */
+	NULL,           /* VIA Port CA1 Output */
+	NULL,           /* VIA Port CB1 Output */
+	NULL,           /* VIA Port CA2 Output */
+	NULL,           /* VIA Port CB2 Output */
+	sym1_irq        /* VIA IRQ Callback */
 };
 
 
-static struct via6522_interface via2 =
+static const struct via6522_interface via2 =
 {
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	sym1_irq
+	NULL,           /* VIA Port A Input */
+	NULL,           /* VIA Port B Input */
+	NULL,           /* VIA Port CA1 Input */
+	NULL,           /* VIA Port CB1 Input */
+	NULL,           /* VIA Port CA2 Input */
+	NULL,           /* VIA Port CB2 Input */
+	sym1_via2_a_w,  /* VIA Port A Output */
+	NULL,           /* VIA Port B Output */
+	NULL,           /* VIA Port CA1 Output */
+	NULL,           /* VIA Port CB1 Output */
+	NULL,           /* VIA Port CA2 Output */
+	NULL,           /* VIA Port CB2 Output */
+	sym1_irq        /* VIA IRQ Callback */
 };
 
 
@@ -156,19 +241,23 @@ static struct via6522_interface via2 =
 
 DRIVER_INIT( sym1 )
 {
-	/* install expansion memory */
-	if (mess_ram_size > 1024)
+	/* wipe expansion memory banks that are not installed */
+	if (mess_ram_size < 4*1024)
 	{
 		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
-			0x0400, mess_ram_size - 1, 0, 0, MRA8_RAM, MWA8_RAM);
+			mess_ram_size, 0x0fff, 0, 0, MRA8_NOP, MWA8_NOP);
 	}
 
+	/* configure vias and riot */
 	via_config(0, &via0);
 	via_config(1, &via1);
 	via_config(2, &via2);
 	r6532_config(0, &r6532_interface);
 	r6532_set_clock(0, OSC_Y1);
 	r6532_reset(0);
+	
+	/* allocate a timer to refresh the led display */
+	led_update = timer_alloc(led_refresh, NULL);
 }
 
 
@@ -176,11 +265,11 @@ MACHINE_RESET( sym1 )
 {
 	via_reset();
 	r6532_reset(0);
+	ttl74145_reset(0);
 
-	/* Make 0xf800 to 0xffff point to the last half of the monitor ROM */
-	/* so that the CPU can find its reset vectors */
+	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
+	   so that the CPU can find its reset vectors */
 	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
 			0xf800, 0xffff, 0, 0, MRA8_BANK1, MWA8_ROM);
-	memory_configure_bank(1, 0, 1, sym1_monitor + 0x800, 0);
-	memory_set_bank(1, 0);
+	memory_set_bankptr(1, sym1_monitor + 0x800);
 }

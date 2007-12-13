@@ -14,13 +14,18 @@
 /* Peripheral chips */
 #include "machine/6532riot.h"
 #include "machine/6522via.h"
-#include "sound/beep.h"
 
 /* Layout */
 #include "sym1.lh"
 
 
+
+/* pointers to memory locations */
 UINT8 *sym1_monitor;
+UINT8 *sym1_ram_1k;
+UINT8 *sym1_ram_2k;
+UINT8 *sym1_ram_3k;
+UINT8 *sym1_riot_ram;
 
 
 
@@ -31,10 +36,13 @@ UINT8 *sym1_monitor;
 
 static ADDRESS_MAP_START( sym1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM                              /* U12/U13 RAM */
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_RAMBANK(2) AM_BASE(&sym1_ram_1k)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_RAMBANK(3) AM_BASE(&sym1_ram_2k)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_RAMBANK(4) AM_BASE(&sym1_ram_3k)
 	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_BASE(&sym1_monitor)       /* U20 Monitor ROM */
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(via_0_r, via_0_w)      /* U25 VIA #1 */
 	AM_RANGE(0xa400, 0xa40f) AM_READWRITE(r6532_0_r, r6532_0_w)  /* U27 RIOT */
-	AM_RANGE(0xa600, 0xa67f) AM_RAM                              /* U27 RIOT RAM */
+	AM_RANGE(0xa600, 0xa67f) AM_RAM AM_RAMBANK(5) AM_BASE(&sym1_riot_ram)  /* U27 RIOT RAM */
 	AM_RANGE(0xa800, 0xa80f) AM_READWRITE(via_1_r, via_1_w)      /* U28 VIA #2 */
 	AM_RANGE(0xac00, 0xac0f) AM_READWRITE(via_2_r, via_2_w)      /* U29 VIA #3 */
 ADDRESS_MAP_END
@@ -87,6 +95,20 @@ static INPUT_PORTS_START( sym1 )
 	PORT_START			/* IN4 */
 	PORT_BIT(0x80, 0x80, IPT_KEYBOARD) PORT_NAME("DEBUG OFF") PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x40, 0x40, IPT_KEYBOARD) PORT_NAME("DEBUG ON") PORT_CODE(KEYCODE_F7)
+	
+	PORT_START_TAG("WP")
+	PORT_DIPNAME(0x01, 0x01, "6532 RAM WP")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, "1K RAM WP")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x04, "2K RAM WP")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x04, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x08, "3K RAM WP")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x08, DEF_STR(On))
 INPUT_PORTS_END
 
 
@@ -109,7 +131,7 @@ static MACHINE_DRIVER_START( sym1 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(BEEP, 0)
+	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -160,4 +182,4 @@ SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT INIT  CONFIG COMPANY                   FULLNAME          FLAGS */
-COMP( 1978, sym1, 0,     0,     sym1,   sym1, sym1, sym1,  "Synertek Systems Corp.", "SYM-1/SY-VIM-1", GAME_NOT_WORKING )
+COMP( 1978, sym1, 0,     0,     sym1,   sym1, sym1, sym1,  "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )
