@@ -12,6 +12,8 @@ System Driver Changes:
 
 - [FAMICOM] Fixed reads to $4031-2 when a disk is not mounted.  [MAMEPlus Team]
 
+- [GAMEBOY] Several fixes to the video timing.  [Wilbert Pol]
+
 - [QL] Added sound. [Curt Coder]
 
 - [SG1000] Fixed keyboard/joystick detection. (bug #1444) [Curt Coder]
