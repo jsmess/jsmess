@@ -63,6 +63,10 @@
 typedef struct _ttl74145_state ttl74145_state;
 struct _ttl74145_state
 {
+	/* Pointer to our interface */
+	const ttl74145_interface *intf;
+	
+	/* Decoded number */
 	UINT16 number;
 };
 
@@ -82,6 +86,22 @@ static ttl74145_state ttl74145[MAX_74145];
 *****************************************************************************/
 
 
+/* Config */
+void ttl74145_config(int which, const ttl74145_interface *intf)
+{
+	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT,
+		"Can only call ttl74145_config at init time!");
+	assert_always(which < MAX_74145,
+		"'which' exceeds maximum number of configured 74145s!");
+
+	/* Assign interface */
+	ttl74145[which].intf = intf;
+	
+	/* Initialize */
+	ttl74145_reset(which);
+}
+
+
 /* Reset */
 void ttl74145_reset(int which)
 {
@@ -92,20 +112,30 @@ void ttl74145_reset(int which)
 /* Data Write */
 void ttl74145_write(int which, offs_t offset, UINT8 data)
 {
-	ttl74145[which].number = bcd_2_dec(data & 0x0f);
+	/* Decode number */
+	UINT16 new_number = bcd_2_dec(data & 0x0f);
+	
+	/* Call output callbacks if the number changed */
+	if (new_number != ttl74145[which].number)
+	{
+		const ttl74145_interface *i = ttl74145[which].intf;
+		
+		if (i->output_line_0) i->output_line_0(new_number == 0);
+		if (i->output_line_1) i->output_line_1(new_number == 1);
+		if (i->output_line_2) i->output_line_2(new_number == 2);
+		if (i->output_line_3) i->output_line_3(new_number == 3);
+		if (i->output_line_4) i->output_line_4(new_number == 4);
+		if (i->output_line_5) i->output_line_5(new_number == 5);
+		if (i->output_line_6) i->output_line_6(new_number == 6);
+		if (i->output_line_7) i->output_line_7(new_number == 7);
+		if (i->output_line_8) i->output_line_8(new_number == 8);
+		if (i->output_line_9) i->output_line_9(new_number == 9);				
+	}
+	
+	/* Update state */
+	ttl74145[which].number = new_number;
 }
 
 
-int ttl74145_output_0(int which) { return ttl74145[which].number == 0; }
-int ttl74145_output_1(int which) { return ttl74145[which].number == 1; }
-int ttl74145_output_2(int which) { return ttl74145[which].number == 2; }
-int ttl74145_output_3(int which) { return ttl74145[which].number == 3; }
-int ttl74145_output_4(int which) { return ttl74145[which].number == 4; }
-int ttl74145_output_5(int which) { return ttl74145[which].number == 5; }
-int ttl74145_output_6(int which) { return ttl74145[which].number == 6; }
-int ttl74145_output_7(int which) { return ttl74145[which].number == 7; }
-int ttl74145_output_8(int which) { return ttl74145[which].number == 8; }
-int ttl74145_output_9(int which) { return ttl74145[which].number == 9; }
-
-
 WRITE8_HANDLER( ttl74145_0_w ) { ttl74145_write(0, offset, data); }
+READ16_HANDLER( ttl74145_0_r ) { return ttl74145[0].number; }

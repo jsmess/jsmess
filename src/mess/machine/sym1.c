@@ -20,8 +20,12 @@
 #include "sound/speaker.h"
 
 
+#define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
+
+
 static UINT8 riot_port_a, riot_port_b;
-emu_timer *led_update;
+static emu_timer *led_update;
+
 
 
 /******************************************************************************
@@ -29,45 +33,67 @@ emu_timer *led_update;
 ******************************************************************************/
 
 
-static TIMER_CALLBACK( led_refresh )
+void sym1_74145_output_0_w(int state)
 {
-	/* update digits depending on the status of the output lines */
-	if (ttl74145_output_0(0)) output_set_digit_value(0, riot_port_a);
-	if (ttl74145_output_1(0)) output_set_digit_value(1, riot_port_a);
-	if (ttl74145_output_2(0)) output_set_digit_value(2, riot_port_a);
-	if (ttl74145_output_3(0)) output_set_digit_value(3, riot_port_a);
-	if (ttl74145_output_4(0)) output_set_digit_value(4, riot_port_a);
-	if (ttl74145_output_5(0)) output_set_digit_value(5, riot_port_a);	
+	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 0, attotime_never);
 }
 
 
-static void sym1_led_w(void)
+void sym1_74145_output_1_w(int state)
 {
-	timer_adjust(led_update, ATTOTIME_IN_USEC(70), 0, attotime_never);
+	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 1, attotime_never);
+}
+
+
+void sym1_74145_output_2_w(int state)
+{
+	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 2, attotime_never);
+}
+
+
+void sym1_74145_output_3_w(int state)
+{
+	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 3, attotime_never);
+}
+
+
+void sym1_74145_output_4_w(int state)
+{
+	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 4, attotime_never);
+}
+
+
+void sym1_74145_output_5_w(int state)
+{
+	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 5, attotime_never);
+}
+
+
+static TIMER_CALLBACK( led_refresh )
+{
+	output_set_digit_value(param, riot_port_a);
+}
+
+
+/* The speaker is connected to output 6 of the 74145 */
+void sym1_74145_output_6_w(int state)
+{
+	speaker_level_w(0, state);	
 }
 
 
 static READ8_HANDLER( sym1_riot_a_r )
 {
-	int data = 0xff;
+	int data = 0x7f;
 
-	if (!(riot_port_a & 0x80)) {
-		data &= input_port_0_r(0);
-	}
+	/* scan keypad rows */
+	if (!(riot_port_a & 0x80)) data &= readinputportbytag("ROW-0");
+	if (!(riot_port_b & 0x01)) data &= readinputportbytag("ROW-1");
+	if (!(riot_port_b & 0x02)) data &= readinputportbytag("ROW-2");
+	if (!(riot_port_b & 0x04)) data &= readinputportbytag("ROW-3");
 
-	if (!(riot_port_b & 0x01)) {
-		data &= input_port_1_r(1);
-	}
-
-	if (!(riot_port_b & 0x02)) {
-		data &= input_port_2_r(1);
-	}
-
-	if (!(riot_port_b & 0x04)) {
-		data &= input_port_3_r(1);
-	}
-
-	if ( ((riot_port_a ^ 0xff) & (input_port_0_r(0) ^ 0xff)) & 0x3f )
+	/* determine column */
+	if ( ((riot_port_a ^ 0xff) & (readinputportbytag("ROW-0") ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
@@ -78,13 +104,14 @@ static READ8_HANDLER( sym1_riot_b_r )
 {
 	int data = 0xff;
 
-	if ( ((riot_port_a ^ 0xff) & (input_port_1_r(0) ^ 0xff)) & 0x3f )
+	/* determine column */
+	if ( ((riot_port_a ^ 0xff) & (readinputportbytag("ROW-1") ^ 0xff)) & 0x7f )
 		data &= ~1;
 
-	if ( ((riot_port_a ^ 0xff) & (input_port_2_r(0) ^ 0xff)) & 0x3f )
+	if ( ((riot_port_a ^ 0xff) & (readinputportbytag("ROW-2") ^ 0xff)) & 0x3f )
 		data &= ~2;
 
-	if ( ((riot_port_a ^ 0xff) & (input_port_3_r(0) ^ 0xff)) & 0x3f )
+	if ( ((riot_port_a ^ 0xff) & (readinputportbytag("ROW-3") ^ 0xff)) & 0x1f )
 		data &= ~4;
 
 	data &= ~0x80; // else hangs 8b02
@@ -99,9 +126,6 @@ static WRITE8_HANDLER( sym1_riot_a_w )
 
 	/* save for later use */
 	riot_port_a = data;
-
-	/* refresh the leds */
-	sym1_led_w();
 }
 
 
@@ -112,14 +136,8 @@ static WRITE8_HANDLER( sym1_riot_b_w )
 	/* save for later use */
 	riot_port_b = data;
 
-	/* first 4 output pins are connected to the 74145 */
+	/* first 4 pins are connected to the 74145 */
 	ttl74145_0_w(0, data & 0x0f);
-	
-	/* speaker is connected to output 6 of the 74145 */
-	speaker_level_w(0, ttl74145_output_6(0));
-
-	/* refresh the leds */
-	sym1_led_w();
 }
 
 
@@ -131,6 +149,20 @@ static const struct riot6532_interface r6532_interface =
 	sym1_riot_b_w
 };
 
+
+static const ttl74145_interface ttl74145_intf =
+{
+	sym1_74145_output_0_w,  /* connected to DS0 */
+	sym1_74145_output_1_w,  /* connected to DS1 */
+	sym1_74145_output_2_w,  /* connected to DS2 */
+	sym1_74145_output_3_w,  /* connected to DS3 */
+	sym1_74145_output_4_w,  /* connected to DS4 */
+	sym1_74145_output_5_w,  /* connected to DS5 */
+	sym1_74145_output_6_w,  /* connected to the speaker */
+	NULL,                   /* not connected */
+	NULL,                   /* not connected */
+	NULL                    /* not connected */
+};
 
 
 /******************************************************************************
@@ -255,6 +287,9 @@ DRIVER_INIT( sym1 )
 	r6532_config(0, &r6532_interface);
 	r6532_set_clock(0, OSC_Y1);
 	r6532_reset(0);
+	
+	/* configure 74145 */
+	ttl74145_config(0, &ttl74145_intf);
 	
 	/* allocate a timer to refresh the led display */
 	led_update = timer_alloc(led_refresh, NULL);
