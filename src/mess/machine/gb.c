@@ -107,7 +107,6 @@ UINT8 gbTama5Address;
 UINT8 gbLastTama5Command;
 /* Timer related globals */
 UINT16	gb_divcount;
-UINT8 gb_timer_count;
 UINT8 gb_timer_shift;
 /* Serial I/O related */
 static UINT32 SIOCount;			/* Serial I/O counter                          */
@@ -236,6 +235,7 @@ static void gb_init(void) {
 	gb_serial_timer = timer_alloc( gb_serial_timer_proc , NULL);
 	timer_enable( gb_serial_timer, 0 );
 
+	gb_divcount = 0;
 }
 
 MACHINE_START( gb )
@@ -705,7 +705,6 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x07:						/* TAC - Timer control */
 		data |= 0xF8;
 		gb_timer_shift = timer_shifts[data & 0x03];
-		gb_timer_count = 1 << gb_timer_shift;
 		/* Check if timer is just enabled */
 		if ( ( data & 0x04 ) && ! ( TIMEFRQ & 0x04 ) ) {
 			TIMECNT = TIMEMOD;
@@ -1762,9 +1761,9 @@ void gb_timer_callback(int cycles) {
 	if ( TIMEFRQ & 0x04 ) {
 		UINT16 old_count = old_gb_divcount >> gb_timer_shift;
 		UINT16 new_count = gb_divcount >> gb_timer_shift;
-		if ( cycles > gb_timer_count ) {
+		if ( cycles > ( 1 << gb_timer_shift ) ) {
 			gb_timer_increment();
-			old_gb_divcount += gb_timer_count;
+			old_gb_divcount += ( 1 << gb_timer_shift );
 			old_count++;
 		}
 		if ( new_count != old_count ) {

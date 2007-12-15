@@ -14,6 +14,8 @@ System Driver Changes:
 
 - [GAMEBOY] Several fixes to the video timing.  [Wilbert Pol]
 
+- [GAMEBOY] Fixed a bug in the handling of 256 and 1024 cycle timers.  [Wilbert Pol]
+
 - [QL] Added sound. [Curt Coder]
 
 - [SG1000] Fixed keyboard/joystick detection. (bug #1444) [Curt Coder]
