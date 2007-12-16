@@ -216,80 +216,95 @@ DEVICE_LOAD(amstrad_plus_cartridge)
 	unsigned int bytes_to_read;  // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
 	unsigned char* mem = memory_region(REGION_CPU1);
 
-	logerror("CPR: loading RIFF format CPC cartridge file\n");
+	logerror("IMG: loading CPC+ cartridge file\n");
 	// load RIFF chunk
 	result = image_fread(image,header,12);
 	if(result != 12)
 	{
-		logerror("CPR: failed to read from cart image\n");
+		logerror("IMG: failed to read from cart image\n");
 		return INIT_FAIL;
 	}
 	if(strncmp((char *)header,"RIFF",4) != 0)
 	{
-		logerror("CPR: not an RIFF format file - header is '%s'\n",header);
-		return INIT_FAIL;
-	}
-	if(strncmp((char*)(header+8),"AMS!",4) != 0)
-	{
-		logerror("CPR: not an Amstrad CPC cartridge image\n");
-		return INIT_FAIL;
-	}
-
-	bytes_to_read = header[4] + (header[5] << 8) + (header[6] << 16)+ (header[7] << 24);
-	bytes_to_read -= 4;  // account for AMS! header
-	logerror("CPR: Data to read: %i bytes\n",bytes_to_read);
-	// read some chunks
-	while(bytes_to_read > 0)
-	{
-		result = image_fread(image,chunkid,4);
-		if(result != 4)
+		// not an RIFF format file, assume raw binary (*.bin)
+		image_fseek(image,0,SEEK_SET);
+		ramblock = 0;
+		while(!image_feof(image))
 		{
-			logerror("CPR: failed to read from cart image\n");
-			return INIT_FAIL;
-		}
-		bytes_to_read -= result;
-		result = image_fread(image,chunklen,4);
-		if(result != 4)
-		{
-			logerror("CPR: failed to read from cart image\n");
-			return INIT_FAIL;
-		}
-		bytes_to_read -= result;
-		// calculate little-endian value, just to be sure
-		chunksize = chunklen[0] + (chunklen[1] << 8) + (chunklen[2] << 16) + (chunklen[3] << 24);
-
-		if(strncmp(chunkid,"cb",2) == 0)
-		{
-			// load chunk into RAM
-			// find out what block this is
-			ramblock = (chunkid[2] - 0x30) * 10;
-			ramblock += chunkid[3] - 0x30;
-			logerror("CPR: Loading chunk into RAM block %i ['%4s']\n",ramblock,chunkid);
-			if(ramblock >= 0 && ramblock < 32)
+			result = image_fread(image,mem+(0x4000*ramblock),0x4000);
+			if(result < 0x4000)
 			{
-				// clear RAM block
-				memset(mem+(0x4000*ramblock),0,0x4000);
-
-				// load block into ROM area
-				if(chunksize > 16384)
-					chunksize = 16384;
-				result = image_fread(image,mem+(0x4000*ramblock),chunksize);
-				if(result != chunksize)
-				{
-					logerror("CPR: Read %i-byte chunk, expected %i bytes\n",result,chunksize);
-					return INIT_FAIL;
-				}
-				bytes_to_read -= chunksize;
-				logerror("CPR: Loaded %i-byte chunk into RAM block %i\n",result,ramblock);
+				logerror("BIN: block %i loaded is smaller than 16kB in size\n",ramblock);
+				return INIT_FAIL;
 			}
+			ramblock++;
 		}
-		else
+	}
+	else
+	{
+		// Is RIFF format (*.cpr)
+		if(strncmp((char*)(header+8),"AMS!",4) != 0)
 		{
-			logerror("CPR: Unknown chunk '%4s', skipping %i bytes\n",chunkid,chunksize);
-			if(chunksize != 0)
+			logerror("CPR: not an Amstrad CPC cartridge image\n");
+			return INIT_FAIL;
+		}
+
+		bytes_to_read = header[4] + (header[5] << 8) + (header[6] << 16)+ (header[7] << 24);
+		bytes_to_read -= 4;  // account for AMS! header
+		logerror("CPR: Data to read: %i bytes\n",bytes_to_read);
+		// read some chunks
+		while(bytes_to_read > 0)
+		{
+			result = image_fread(image,chunkid,4);
+			if(result != 4)
 			{
-				image_fseek(image,chunksize,SEEK_CUR);
-				bytes_to_read -= chunksize;
+				logerror("CPR: failed to read from cart image\n");
+				return INIT_FAIL;
+			}
+			bytes_to_read -= result;
+			result = image_fread(image,chunklen,4);
+			if(result != 4)
+			{
+				logerror("CPR: failed to read from cart image\n");
+				return INIT_FAIL;
+			}
+			bytes_to_read -= result;
+			// calculate little-endian value, just to be sure
+			chunksize = chunklen[0] + (chunklen[1] << 8) + (chunklen[2] << 16) + (chunklen[3] << 24);
+
+			if(strncmp(chunkid,"cb",2) == 0)
+			{
+				// load chunk into RAM
+				// find out what block this is
+				ramblock = (chunkid[2] - 0x30) * 10;
+				ramblock += chunkid[3] - 0x30;
+				logerror("CPR: Loading chunk into RAM block %i ['%4s']\n",ramblock,chunkid);
+				if(ramblock >= 0 && ramblock < 32)
+				{
+					// clear RAM block
+					memset(mem+(0x4000*ramblock),0,0x4000);
+
+					// load block into ROM area
+					if(chunksize > 16384)
+						chunksize = 16384;
+					result = image_fread(image,mem+(0x4000*ramblock),chunksize);
+					if(result != chunksize)
+					{
+						logerror("CPR: Read %i-byte chunk, expected %i bytes\n",result,chunksize);
+						return INIT_FAIL;
+					}
+					bytes_to_read -= chunksize;
+					logerror("CPR: Loaded %i-byte chunk into RAM block %i\n",result,ramblock);
+				}
+			}
+			else
+			{
+				logerror("CPR: Unknown chunk '%4s', skipping %i bytes\n",chunkid,chunksize);
+				if(chunksize != 0)
+				{
+					image_fseek(image,chunksize,SEEK_CUR);
+					bytes_to_read -= chunksize;
+				}
 			}
 		}
 	}
