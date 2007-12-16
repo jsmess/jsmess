@@ -106,8 +106,13 @@ UINT8 gbTama5Byte;
 UINT8 gbTama5Address;
 UINT8 gbLastTama5Command;
 /* Timer related globals */
-UINT16	gb_divcount;
-UINT8 gb_timer_shift;
+static struct gb_timer_struct {
+	UINT16	divcount;
+	UINT8	shift;
+	UINT16	shift_cycles;
+	UINT8	triggering_irq;
+	UINT8	reloading;
+} gb_timer;
 /* Serial I/O related */
 static UINT32 SIOCount;			/* Serial I/O counter                          */
 emu_timer	*gb_serial_timer = NULL;
@@ -149,7 +154,6 @@ static void gb_init_regs(void) {
 
 	gb_io_w( 0x05, 0x00 );		/* TIMECNT */
 	gb_io_w( 0x06, 0x00 );		/* TIMEMOD */
-	gb_io_w( 0x07, 0x00 );		/* TIMEFRQ */
 	gb_video_w( 0x0, 0x91 );	/* LCDCONT */
 	gb_video_w( 0x7, 0xFC );	/* BGRDPAL */
 	gb_video_w( 0x8, 0xFC );	/* SPR0PAL */
@@ -235,7 +239,9 @@ static void gb_init(void) {
 	gb_serial_timer = timer_alloc( gb_serial_timer_proc , NULL);
 	timer_enable( gb_serial_timer, 0 );
 
-	gb_divcount = 0;
+	gb_timer.divcount = 0;
+	gb_timer.triggering_irq = 0;
+	gb_io[0x07] = 0xF8;		/* Upper bits of TIMEFRQ register are set to 1 */
 }
 
 MACHINE_START( gb )
@@ -694,21 +700,33 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	case 0x04:						/* DIV - Divider register */
 		/* Force increment of TIMECNT register */
-		if ( gb_divcount >= 16 )
+		if ( gb_timer.divcount >= 16 )
 			gb_timer_increment();
-		gb_divcount = 0;
+		gb_timer.divcount = 0;
 		return;
 	case 0x05:						/* TIMA - Timer counter */
+		/* Check if the counter is being reloaded in this cycle */
+		if ( gb_timer.reloading && ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) == 4 ) {
+			data = TIMECNT;
+		}
 		break;
 	case 0x06:						/* TMA - Timer module */
+		/* Check if the counter is being reloaded in this cycle */
+		if ( gb_timer.reloading && ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) == 4 ) {
+			TIMECNT = data;
+		}
 		break;
 	case 0x07:						/* TAC - Timer control */
 		data |= 0xF8;
-		gb_timer_shift = timer_shifts[data & 0x03];
-		/* Check if timer is just enabled */
-		if ( ( data & 0x04 ) && ! ( TIMEFRQ & 0x04 ) ) {
-			TIMECNT = TIMEMOD;
+		/* Check if timer is just disabled or the timer frequency is changing */
+		if ( ( ! ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) ) || ( ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) && ( data & 0x03 ) != ( TIMEFRQ & 0x03 ) ) ) {
+			/* Check if TIMECNT should be incremented */
+			if ( ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) >= ( gb_timer.shift_cycles >> 1 ) ) {
+				gb_timer_increment();
+			}
 		}
+		gb_timer.shift = timer_shifts[data & 0x03];
+		gb_timer.shift_cycles = 1 << gb_timer.shift;
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
@@ -716,7 +734,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	}
 
-	gb_io [offset] = data;
+	gb_io[offset] = data;
 }
 
 WRITE8_HANDLER ( gb_io2_w )
@@ -1269,7 +1287,7 @@ READ8_HANDLER ( gb_io_r )
 	switch(offset)
 	{
 		case 0x04:
-			return ( gb_divcount >> 8 ) & 0xFF;
+			return ( gb_timer.divcount >> 8 ) & 0xFF;
 		case 0x00:
 		case 0x01:
 		case 0x02:
@@ -1747,27 +1765,45 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	}
 }
 
+INLINE void gb_timer_check_irq( void ) {
+	gb_timer.reloading = 0;
+	if ( gb_timer.triggering_irq ) {
+		gb_timer.triggering_irq = 0;
+		if ( TIMECNT == 0 ) {
+			TIMECNT = TIMEMOD;
+			cpunum_set_input_line( 0, TIM_INT, HOLD_LINE );
+			gb_timer.reloading = 1;
+		}
+	}
+}
+
 static void gb_timer_increment( void ) {
+	gb_timer_check_irq();
+
 	TIMECNT += 1;
 	if ( TIMECNT == 0 ) {
-		TIMECNT = TIMEMOD;
-		cpunum_set_input_line( 0, TIM_INT, HOLD_LINE );
+		gb_timer.triggering_irq = 1;
 	}
 }
 
 void gb_timer_callback(int cycles) {
-	UINT16 old_gb_divcount = gb_divcount;
-	gb_divcount += cycles;
+	UINT16 old_gb_divcount = gb_timer.divcount;
+	gb_timer.divcount += cycles;
+
+	gb_timer_check_irq();
+
 	if ( TIMEFRQ & 0x04 ) {
-		UINT16 old_count = old_gb_divcount >> gb_timer_shift;
-		UINT16 new_count = gb_divcount >> gb_timer_shift;
-		if ( cycles > ( 1 << gb_timer_shift ) ) {
+		UINT16 old_count = old_gb_divcount >> gb_timer.shift;
+		UINT16 new_count = gb_timer.divcount >> gb_timer.shift;
+		if ( cycles > gb_timer.shift_cycles ) {
 			gb_timer_increment();
-			old_gb_divcount += ( 1 << gb_timer_shift );
 			old_count++;
 		}
 		if ( new_count != old_count ) {
 			gb_timer_increment();
+		}
+		if ( new_count << gb_timer.shift < gb_timer.divcount ) {
+			gb_timer_check_irq();
 		}
 	}
 }
