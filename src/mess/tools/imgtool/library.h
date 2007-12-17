@@ -20,6 +20,7 @@
 #include "opresolv.h"
 #include "stream.h"
 #include "unicode.h"
+#include "charconv.h"
 
 
 typedef struct _imgtool_image imgtool_image;
@@ -159,6 +160,7 @@ enum
 	IMGTOOLINFO_INT_CREATION_UNTESTED,
 	IMGTOOLINFO_INT_SUPPORTS_BOOTBLOCK,
 	IMGTOOLINFO_INT_BLOCK_SIZE,
+	IMGTOOLINFO_INT_CHARSET,
 
 	IMGTOOLINFO_INT_CLASS_SPECIFIC = 0x08000,
 

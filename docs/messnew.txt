@@ -46,7 +46,8 @@ User Interface Changes:
 
 Imgtool Changes:
 ----------------
-(none)
+- Modules can now specify IMGTOOLINFO_INT_CHARSET which alters the native
+  character set for a particular Imgtool module.  [Dirk Best]
 
 
 
