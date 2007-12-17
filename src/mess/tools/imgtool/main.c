@@ -890,25 +890,6 @@ static struct command cmds[] =
 };
 
 #ifdef WIN32
-#include "glob.h"
-void win_expand_wildcards(int *argc, char **argv[])
-{
-	int i;
-	glob_t g;
-
-	memset(&g, 0, sizeof(g));
-
-	for (i = 0; i < *argc; i++)
-		glob((*argv)[i], (g.gl_pathc > 0) ? GLOB_APPEND|GLOB_NOCHECK : GLOB_NOCHECK, NULL, &g);
-
-	*argc = g.gl_pathc;
-	*argv = g.gl_pathv;
-}
-#endif
-
-
-
-#ifdef WIN32
 int CLIB_DECL utf8_main(int argc, char *argv[])
 #else
 int CLIB_DECL main(int argc, char *argv[])
@@ -924,9 +905,7 @@ int CLIB_DECL main(int argc, char *argv[])
 		return -1;
 #endif /* MAME_DEBUG */
 
-#ifdef WIN32
-	win_expand_wildcards(&argc, &argv);
-#endif
+	expand_wildcards(&argc, &argv);
 
 	putchar('\n');
 

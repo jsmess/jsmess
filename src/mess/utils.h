@@ -201,4 +201,7 @@ void specify_extension(char *buffer, size_t buffer_len, const char *extension);
 /* validity checks */
 int utils_validitychecks(void);
 
+/* expand wildcards so '*' can be used */
+void expand_wildcards(int *argc, char **argv[]);
+
 #endif /* UTILS_H */

@@ -13,11 +13,6 @@
 #include "emuopts.h"
 #include "../imgtool/imgtool.h"
 
-#ifdef WIN32
-#include <windows.h>
-#include "glob.h"
-#endif /* WIN32 */
-
 extern int mame_validitychecks(int game);
 
 static int test_count, failure_count;
@@ -72,24 +67,6 @@ static void messtest_fail(const char *message)
 
 
 #ifdef WIN32
-static void win_expand_wildcards(int *argc, char **argv[])
-{
-	int i;
-	glob_t g;
-
-	memset(&g, 0, sizeof(g));
-
-	for (i = 0; i < *argc; i++)
-		glob((*argv)[i], (g.gl_pathc > 0) ? GLOB_APPEND|GLOB_NOCHECK : GLOB_NOCHECK, NULL, &g);
-
-	*argc = g.gl_pathc;
-	*argv = g.gl_pathv;
-}
-#endif /* WIN32 */
-
-
-
-#ifdef WIN32
 int CLIB_DECL utf8_main(int argc, char *argv[])
 #else
 int CLIB_DECL main(int argc, char *argv[])
@@ -103,10 +80,8 @@ int CLIB_DECL main(int argc, char *argv[])
 	/* test case for memory allocation system */
 	test_memory_pools();
 	
-#ifdef WIN32
-	/* expand wildcards so '*' can be used; this is not UNIX */
-	win_expand_wildcards(&argc, &argv);
-#endif /* WIN32 */
+	/* expand wildcards so '*' can be used */
+	expand_wildcards(&argc, &argv);
 
 	test_count = 0;
 	failure_count = 0;

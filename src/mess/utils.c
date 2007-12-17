@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdlib.h>
+#include "glob.h"
 #include "utils.h"
 
 char *strncpyz(char *dest, const char *source, size_t len)
@@ -363,3 +364,16 @@ int utils_validitychecks(void)
 	return error;
 }
 
+void expand_wildcards(int *argc, char **argv[])
+{
+	int i;
+	glob_t g;
+
+	memset(&g, 0, sizeof(g));
+
+	for (i = 0; i < *argc; i++)
+		glob((*argv)[i], (g.gl_pathc > 0) ? GLOB_APPEND|GLOB_NOCHECK : GLOB_NOCHECK, NULL, &g);
+
+	*argc = g.gl_pathc;
+	*argv = g.gl_pathv;
+}
