@@ -195,7 +195,6 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 	smsvdp.cram_dirty = 1;
 	memset(smsvdp.VRAM, 0, VRAM_SIZE);
 	memset(smsvdp.CRAM, 0, MAX_CRAM_SIZE);
-	smsvdp.reg[0x01] |= 0x20;
 	smsvdp.reg[0x02] = 0x0E;			/* power up default */
 	smsvdp.reg[0x0a] = 0xff;
 

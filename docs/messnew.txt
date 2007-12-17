@@ -26,6 +26,8 @@ System Driver Changes:
 
 - [SG1000] Fixed keyboard/joystick detection. (bug #1444) [Curt Coder]
 
+- [SMS/GG] Disabled interrupt generation on bootup. (bug #1451) [Wilbert Pol]
+
 - [SYM1] Fixed bug #1442.  [Dirk Best]
 
 - [SYM1] Better LED support, memory write protect support and added speaker
