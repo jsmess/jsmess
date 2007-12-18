@@ -2139,6 +2139,8 @@ MACHINE_START( saturn )
 	state_save_register_global(pmode);
 	state_save_register_global(smpcSR);
 	state_save_register_global_array(SMEM);
+
+	add_exit_callback(machine, stvcd_exit);
 }
 
 MACHINE_RESET( saturn )
