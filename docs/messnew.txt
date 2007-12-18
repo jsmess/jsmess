@@ -1,4 +1,4 @@
-0.121.1
+0.122
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -55,7 +55,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.121u4.  This incorporates all features of the
+- The core is based on MAME 0.122.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Changed spacing between natural keyboard key names.  [Nate Woods]
