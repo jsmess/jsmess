@@ -16,7 +16,9 @@ MESSHELP = mess.chm
 
 # add our stuff to the global variables
 OBJDIRS += $(MESSOBJ)/tools/messdocs
-HELP += $(MESSHELP)
+
+# html help compiler
+HHC = @-hhc
 
 
 
@@ -44,6 +46,8 @@ $(OBJ)/build/$(MESSDOCS): $(MESSDOCS_OBJS) $(LIBUTIL) $(LIBOCORE) $(EXPAT)
 #-------------------------------------------------
 # rule for building the mess help file
 #-------------------------------------------------
+
+help: maketree $(MESSHELP)
 
 $(MESSHELP): $(OBJ)/build/$(MESSDOCS)
 	$(subst /,\,$(OBJ)/build/$(MESSDOCS)) docs/wintoc.xml $(HELPOBJ)
