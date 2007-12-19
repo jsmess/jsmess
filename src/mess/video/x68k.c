@@ -186,6 +186,15 @@ void x68k_crtc_refresh_mode()
 		visiblescr.min_y = sys.crtc.vbegin - ((sys.crtc.height - length)/2);
 		visiblescr.max_y = sys.crtc.vend + ((sys.crtc.height - length)/2);
 	}
+	// bounds check
+	if(visiblescr.min_x < 0)
+		visiblescr.min_x = 0;
+	if(visiblescr.min_y < 0)
+		visiblescr.min_y = 0;
+	if(visiblescr.max_x >= scr.max_x)
+		visiblescr.max_x = scr.max_x - 1;
+	if(visiblescr.max_y >= scr.max_y)
+		visiblescr.max_y = scr.max_y - 1;
 	
 	logerror("video_screen_configure(0,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
 	video_screen_configure(0,scr.max_x,scr.max_y,&visiblescr,HZ_TO_ATTOSECONDS(55.45));
@@ -300,7 +309,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	if(val == 0)  // VBlank off
 	{
 		sys.crtc.vblank = 0;
-		vblank_line = sys.crtc.vsync_end;
+		vblank_line = sys.crtc.vbegin;
 		irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
 		timer_adjust(vblank_irq,irq_time,1,attotime_never);
 		logerror("CRTC: VBlank off\n");
