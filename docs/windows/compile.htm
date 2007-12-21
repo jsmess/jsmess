@@ -15,7 +15,7 @@ identical)</p>
 written in C, with some assembler hacks in speed-critical places. The Win32 version of <a href="http://www.mess.org/">MESS</a> is compiled with
 <a href="http://www.mingw.org/">MinGW</a>, which is the minimalist Win32 port of a C compiler called <a href="http://gcc.gnu.org/">GCC</a> and its
 libraries.</p>
-<p>This particular how-to is written for <a href="http://www.mess.org/">MESS</a> 0.111, but with a bit of luck you can compile other versions with the
+<p>This particular how-to is written for <a href="http://www.mess.org/">MESS</a> 0.122, but with a bit of luck you can compile other versions with the
 help of this page. This how-to tells how to compile the Win32 version of <a href="http://www.mess.org/">MESS</a>, which includes both the command
 line and GUI versions.</p>
 <p>The MinGW development environment will be installed to <span class="filename">C:\MINGW</span> and <a href="http://www.mess.org/">MESS</a> sources
@@ -78,7 +78,7 @@ other versions of the following files.</p>
 <tr>
 <td><span><a href="http://alleg.sourceforge.net/files/dx80_mgw.zip">dx80_mgw.zip</a></span></td>
 <td><span>451 kB</span></td>
-<td><span>DirectX 8.0 headers, required for <a href="http://www.mess.org/">MESS</a> 0.111. Uncompress this over the MinGW directory.</span></td>
+<td><span>DirectX 8.0 headers, required for <a href="http://www.mess.org/">MESS</a> 0.122. Uncompress this over the MinGW directory.</span></td>
 </tr>
 </table>
 <hr />
@@ -115,27 +115,25 @@ override on the <a href="http://www.mame.net/">MAME</a> source.&nbsp; Therefore 
 <td><span><b>Description</b></span></td>
 </tr>
 <tr>
-<td><a href="http://www.mamedev.org/releases/mame0111s.zip"><b>mame0111s.zip</b></a></td>
+<td><a href="http://www.mamedev.org/releases/mame0122s.zip"><b>mame0122s.zip</b></a></td>
 <td>12136 kB</td>
-<td>This is the source archive of <a href="http://www.mame.net/">MAME</a> 0.111.</td>
+<td>This is the source archive of <a href="http://www.mame.net/">MAME</a> 0.122.</td>
 </tr>
 <tr>
-<td><a href="http://www.mess.org/files/mess0111s.zip"><b>mess0111s.zip</b></a></td>
+<td><a href="http://www.mess.org/files/mess0122s.zip"><b>mess0122s.zip</b></a></td>
 <td>10819 kB</td>
-<td>This is the source archive of <a href="http://www.mess.org/">MESS</a> 0.111.</td>
+<td>This is the source archive of <a href="http://www.mess.org/">MESS</a> 0.122.</td>
 </tr>
 </table>
 <p>Go to the download directory by typing <span class="command">cd \download</span> and uncompress the <a href="http://www.mame.net/">MAME</a> and
 <a href="http://www.mess.org/">MESS</a> sources by typing the following commands</p>
 <ul>
-<li><span class="command">unzip mame0111s.zip</span></li>
+<li><span class="command">unzip mame0122s.zip</span></li>
 <li><span class="command">unzip mame.zip -d c:\mingw\mess\</span></li>
-<li><span class="command">unzip</span> <span class="command">mess0111s.zip -d c:\mingw\mess\</span> .</li>
+<li><span class="command">unzip</span> <span class="command">mess0122s.zip -d c:\mingw\mess\</span> .</li>
 </ul>
-<p>Then you can compile <a href="http://www.mess.org/">MESS</a>. Type <span class="command">make -f makefile.mes</span> and hit enter. This will
-finally compile <a href="http://www.mess.org/">MESS</a> itself. If you want to compile the CPU optimized versions, type <span class="command">make -f
-makefile.mes I686=1</span> or <span class="command">make -f makefile.mes K6=1</span> instead of just <span class="command">make -f
-makefile.mes</span> . It will take a lot of time, ranging from 15 minutes to an hour depending on your CPU speed, so go get yourself something to
+<p>Then you can compile <a href="http://www.mess.org/">MESS</a>. Type <span class="command">make TARGET=mess</span> and hit enter. This will
+finally compile <a href="http://www.mess.org/">MESS</a> itself. If you want to compile the CPU optimized versions, type <span class="command">make TARGET=mess ARCHOPTS=-march=pentiumpro</span> instead of just <span class="command">make TARGET=mess</span> . It will take a lot of time, ranging from 15 minutes to an hour depending on your CPU speed, so go get yourself something to
 drink.</p>
 <p>When the compilation is done, you can type <span class="command">dir</span>. You should see a brand new <span class="filename">MESS.EXE</span> in
 there.</p>
@@ -151,7 +149,7 @@ delete it totally (if you are sure that nothing important is there), and then un
 <p>Of course, the biggest advantage of building your own binary is the possibility to tinker around with the source files. For example, to try out
 drivers which are not fully working yet, take a look at the file <span class="filename">mess/system.c</span> with a normal text editor (like EDIT).
 The disabled drivers are marked with the text TESTDRIVER. Simply remove the TEST part from a driver you want to test, save the file and type
-<span class="command">make -f makefile.mes</span> again. Remember, the license forbids you from redistributing binaries that contain systems which
+<span class="command">make TARGET=mess</span> again. Remember, the license forbids you from redistributing binaries that contain systems which
 are disabled in the official versions. Naturally, there should not be any reasons to redistribute such binaries since this page makes it easy for
 everybody to build their own binaries.</p>
 <p>You might notice that the executables created by the build are much larger than the ones released by the <a href="http://www.mess.org/">MESS</a>
@@ -159,10 +157,10 @@ team.&nbsp; This is because the <a href="http://www.mess.org/">MESS</a> releases
 make them smaller.</p>
 <hr />
 <h2>9. Debug modes</h2>
-<p>To include the debugger functionality in your <a href="http://www.mess.org/">MESS</a> executable, edit <span class="filename">makefile.mes</span>.
+<p>To include the debugger functionality in your <a href="http://www.mess.org/">MESS</a> executable, edit <span class="filename">makefile</span>.
 Near the top you will see a text like "uncomment next line to include the debugger". Remove the <span class="command">#</span> character from the
 next line, so that it only has <span class="filename">DEBUG = 1</span> in that particular line. Save the file, type <span class="command">make -f
-makefile.mes clean</span> and then <span class="command">make -f makefile.mes</span>. To actually use the debugger, edit <span class="filename">MESS.INI</span> and find the line that says <span class="filename">debug = no</span>. Change it to <span class="filename">debug =
+makefile TARGET=mess clean</span> and then <span class="command">make TARGET=mess</span>. To actually use the debugger, edit <span class="filename">MESS.INI</span> and find the line that says <span class="filename">debug = no</span>. Change it to <span class="filename">debug =
 yes</span> and save the file. In <a href="http://www.mess.org/">MESS</a>, hit tilde (&nbsp;<span>~</span>&nbsp;) or key to the left of the key
 &nbsp;<span>1</span> &nbsp; to enter the debugger.</p>
 </body>
