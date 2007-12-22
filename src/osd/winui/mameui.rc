@@ -363,7 +363,7 @@ BEGIN
     CTEXT           "Multi Emulator Super System",IDC_STATIC,147,7,142,
                     11,NOT WS_GROUP
     CTEXT           "Version 0",IDC_VERSION,147,18,142,11,NOT WS_GROUP
-    CTEXT           "Copyright (C) 1998-2005 The MESS Team",IDC_STATIC,147,
+    CTEXT           "Copyright (C) 1998-2007 The MESS Team",IDC_STATIC,147,
                     29,142,10,NOT WS_GROUP
     CTEXT           "MESS UI based on MAMEUI version by",IDC_STATIC,147,51,142,10,NOT
                     WS_GROUP
@@ -1403,7 +1403,7 @@ IDC_CURSOR_HSPLIT       CURSOR                  "res\\splith.cur"
 STRINGTABLE 
 BEGIN
     IDS_UI_FILE             "Contains commands for working with the selected items"
-    IDS_UI_VIEW             "Contains commands for manupulating the view"
+    IDS_UI_VIEW             "Contains commands for manipulating the view"
     IDS_UI_OPTIONS          "Contains commands for user interface options"
 END
 
@@ -1502,7 +1502,7 @@ BEGIN
     ID_CONTEXT_RESET_PLAYTIME "Reset time played for selected item"
     ID_CONTEXT_RESET_PLAYCOUNT "Reset number of plays for selected item"
     ID_FOLDER_PROPERTIES    "Display folder properties"
-    ID_FOLDER_AUDIT         "Audit itmes in this folder"
+    ID_FOLDER_AUDIT         "Audit items in this folder"
 #ifdef MESS
     ID_FILE_LOADSTATE       "Run a system starting with the given savestate"
 #else
@@ -1517,7 +1517,7 @@ BEGIN
     ID_VIEW_TAB_TITLE       "Select Title tab"
     ID_VIEW_TAB_CONTROL_PANEL "Select Control panel tab"
     ID_VIEW_TAB_HISTORY     "Select History tab"
-    ID_OPTIONS_BG           "Set the bacground image"
+    ID_OPTIONS_BG           "Set the background image"
     ID_TOGGLE_TAB_SCREENSHOT "Enable the screenshot tab"
     ID_TOGGLE_TAB_FLYER     "Enable the flyer tab"
     ID_TOGGLE_TAB_CABINET   "Enable the cabinet tab"
