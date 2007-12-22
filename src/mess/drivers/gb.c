@@ -75,7 +75,7 @@ In other words, each sprite on a line makes stat 3 last 10 cycles longer.
 
 
 For lines 1 - 143 when stat changes to 2 the line counter is incremented.
-
+ 
 Line 153 is little odd timing wise. The line counter stays 153 for ~4 clock cycles
 and is then rolls over to 0.
 
@@ -119,6 +119,8 @@ STAT:
 
 The full STAT/LY value state machine.
 =====================================
+
+The timing information below is with sprites disabled.
 
 For STAT we only show the lower 3 bits and for LY only the lower 5 bits of the full
 register. Each digit stands for 4 clock cycles (the smallest measurable unit on a
@@ -457,7 +459,7 @@ static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* BIOS or ROM */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)					/* 16k switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_WRITE( gb_vram_w ) AM_BASE(&gb_vram)	/* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_WRITE( gb_oam_w ) AM_BASE(&gb_oam)	/* OAM RAM */
@@ -475,7 +477,7 @@ static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)					/* 16k switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_WRITE( gb_vram_w ) AM_BASE(&gb_vram)	/* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_WRITE( gb_oam_w ) AM_BASE(&gb_oam)	/* OAM RAM */
@@ -493,7 +495,7 @@ static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)					/* 16k switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(4) AM_WRITE( gbc_vram_w )		/* 8k switched VRAM bank */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w )		/* 8k switched VRAM bank */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (on cartridge) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM						/* 4k fixed RAM bank */
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK(3)					/* 4k switched RAM bank */
@@ -512,7 +514,7 @@ static ADDRESS_MAP_START(megaduck_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(10)						/* 16k switched ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* 16k switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_WRITE( gb_vram_w ) AM_BASE(&gb_vram)		/* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w )		/* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_NOP							/* unused? */
 	AM_RANGE(0xc000, 0xfe9f) AM_RAM							/* 8k low RAM, echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_WRITE( gb_oam_w ) AM_BASE(&gb_oam)		/* OAM RAM */

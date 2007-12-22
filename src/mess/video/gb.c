@@ -50,15 +50,16 @@ static UINT8 gb_bpal[4];	/* Background palette		*/
 static UINT8 gb_spal0[4];	/* Sprite 0 palette		*/
 static UINT8 gb_spal1[4];	/* Sprite 1 palette		*/
 UINT8 *gb_oam = NULL;
-UINT8 *gb_vram = NULL;
+UINT8 *gb_vram;
+static UINT8 *gb_vram_ptr;
 int gbc_hdma_enabled;
-UINT8	*gb_chrgen;	/* Character generator           */
-UINT8	*gb_bgdtab;	/* Background character table    */
-UINT8	*gb_wndtab;	/* Window character table        */
-UINT8	gb_tile_no_mod;
-UINT8	*gbc_chrgen;	/* Character generator           */
-UINT8	*gbc_bgdtab;	/* Background character table    */
-UINT8	*gbc_wndtab;	/* Window character table        */
+static UINT8	*gb_chrgen;	/* Character generator           */
+static UINT8	*gb_bgdtab;	/* Background character table    */
+static UINT8	*gb_wndtab;	/* Window character table        */
+static UINT8	gb_tile_no_mod;
+static UINT8	*gbc_chrgen;	/* Character generator           */
+static UINT8	*gbc_bgdtab;	/* Background character table    */
+static UINT8	*gbc_wndtab;	/* Window character table        */
 
 struct layer_struct {
 	UINT8  enabled;
@@ -803,11 +804,11 @@ INLINE void cgb_update_sprites (void) {
 			xindex = oam[1] - 8;
 			if (oam[3] & 0x40)		   /* flip y ? */
 			{
-				data = *((UINT16 *) &GBC_VRAMMap[(oam[3] & 0x8)>>3][(oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2]);
+				data = *((UINT16 *) &gb_vram[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2]);
 			}
 			else
 			{
-				data = *((UINT16 *) &GBC_VRAMMap[(oam[3] & 0x8)>>3][(oam[2] & tilemask) * 16 + (line - oam[0]) * 2]);
+				data = *((UINT16 *) &gb_vram[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (line - oam[0]) * 2]);
 			}
 #ifndef LSB_FIRST
 			data = (data << 8) | (data >> 8);
@@ -1019,9 +1020,47 @@ static void cgb_update_scanline (void) {
 	profiler_mark(PROFILER_END);
 }
 
-void gb_video_init( void ) {
-	int	i;
+/* The CGB seems to have some data in the FEA0-FEFF area upon booting.
+   The contents of this area are almost the same on each boot, but always
+   a couple of bits are different.
+   The data could be some kind of fingerprint for each CGB, I've just taken
+   this data from my CGB on a boot once.
+*/
 
+static const UINT8 cgb_oam_extra[0x60] = {
+	0x74, 0xFF, 0x09, 0x00, 0x9D, 0x61, 0xA8, 0x28, 0x36, 0x1E, 0x58, 0xAA, 0x75, 0x74, 0xA1, 0x42,
+	0x05, 0x96, 0x40, 0x09, 0x41, 0x02, 0x60, 0x00, 0x1F, 0x11, 0x22, 0xBC, 0x31, 0x52, 0x22, 0x54,
+	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04,
+	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04,
+	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04,
+	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04
+};
+
+/*
+  For an AGS in CGB mode this data is:
+	0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
+	0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB,
+	0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC,
+	0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD,
+	0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+*/
+
+static TIMER_CALLBACK( gb_video_init_vbl ) {
+	cpunum_set_input_line( 0, VBL_INT, ASSERT_LINE );
+}
+
+void gb_video_init( int mode ) {
+	int	i;
+	int vram_size = 0x2000;
+
+	switch( mode ) {
+	case GB_VIDEO_CGB:	vram_size = 0x4000; break;
+	}
+	gb_vram = new_memory_region( Machine, REGION_GFX1, vram_size, 0 );
+	memset( gb_vram, 0, vram_size );
+ 
+	gb_vram_ptr = gb_vram;
 	gb_chrgen = gb_vram;
 	gb_bgdtab = gb_vram + 0x1C00;
 	gb_wndtab = gb_vram + 0x1C00;
@@ -1048,65 +1087,82 @@ void gb_video_init( void ) {
 		gb_oam[i] = 0x00;
 	}
 
-	/* set the scanline update function */
-	update_scanline = gb_update_scanline;
-
 	gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
 	timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0, attotime_never );
-}
 
-void sgb_video_init( void ) {
-	gb_video_init();
+	switch( mode ) {
+	case GB_VIDEO_DMG:
+		/* set the scanline update function */
+		update_scanline = gb_update_scanline;
+		break;
+	case GB_VIDEO_MGB:
+		/* set the scanline update function */
+		update_scanline = gb_update_scanline;
+		/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
+		for( i = 1; i < 0x0D; i++ ) {
+			gb_vram[ 0x1903 + i ] = i;
+			gb_vram[ 0x1923 + i ] = i + 0x0C;
+		}
+		gb_vram[ 0x1910 ] = 0x19;
 
-	/* Override the scanline refresh function */
-	update_scanline = sgb_update_scanline;
-}
+		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
+		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
 
-/* The CGB seems to have some data in the FEA0-FEFF area upon booting.
-   The contents of this area are almost the same on each boot, but always
-   a couple of bits are different.
-   The data could be some kind of fingerprint for each CGB, I've just taken
-   this data from my CGB on a boot once.
-*/
+		/* Initialize some video registers */
+		gb_video_w( 0x0, 0x91 );    /* LCDCONT */
+		gb_video_w( 0x7, 0xFC );    /* BGRDPAL */
+		gb_video_w( 0x8, 0xFC );    /* SPR0PAL */
+		gb_video_w( 0x9, 0xFC );    /* SPR1PAL */
 
-static const UINT8 cgb_oam_extra[0x60] = {
-	0x74, 0xFF, 0x09, 0x00, 0x9D, 0x61, 0xA8, 0x28, 0x36, 0x1E, 0x58, 0xAA, 0x75, 0x74, 0xA1, 0x42,
-	0x05, 0x96, 0x40, 0x09, 0x41, 0x02, 0x60, 0x00, 0x1F, 0x11, 0x22, 0xBC, 0x31, 0x52, 0x22, 0x54,
-	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04,
-	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04,
-	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04,
-	0x22, 0xA9, 0xC4, 0x00, 0x1D, 0xAD, 0x80, 0x0C, 0x5D, 0xFA, 0x51, 0x92, 0x93, 0x98, 0xA4, 0x04
-};
+		break;
+	case GB_VIDEO_SGB:
+		/* set the scanline update function */
+		update_scanline = sgb_update_scanline;
 
-/*
-  For an AGB in CGB mode this data is:
-	0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
-	0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB,
-	0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC,
-	0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD,
-	0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-*/
+		/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
+		for( i = 1; i < 0x0D; i++ ) {
+			gb_vram[ 0x1903 + i ] = i;
+			gb_vram[ 0x1923 + i ] = i + 0x0C;
+		}
+		gb_vram[ 0x1910 ] = 0x19;
 
-void gbc_video_init( void ) {
-	int i;
+		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
+		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
 
-	gb_video_init();
+		/* Initialize some video registers */
+		gb_video_w( 0x0, 0x91 );    /* LCDCONT */
+		gb_video_w( 0x7, 0xFC );    /* BGRDPAL */
+		gb_video_w( 0x8, 0xFC );    /* SPR0PAL */
+		gb_video_w( 0x9, 0xFC );    /* SPR1PAL */
 
-	for( i = 0; i < sizeof(cgb_oam_extra); i++ ) {
-		gb_oam[ 0xa0 + i] = cgb_oam_extra[i];
+		break;
+	case GB_VIDEO_CGB:
+		/* set the scanline update function */
+		update_scanline = cgb_update_scanline;
+
+		for( i = 0; i < sizeof(cgb_oam_extra); i++ ) {
+			gb_oam[ 0xa0 + i] = cgb_oam_extra[i];
+		}
+
+		gb_chrgen = gb_vram;
+		gbc_chrgen = gb_vram + 0x2000;
+		gb_bgdtab = gb_wndtab = gb_vram + 0x1C00;
+		gbc_bgdtab = gbc_wndtab = gb_vram + 0x3C00;
+
+		/* HDMA disabled */
+		gbc_hdma_enabled = 0;
+
+		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
+		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
+
+		/* Initialize some video registers */
+		gbc_video_w( 0x0, 0x91 );    /* LCDCONT */
+		gbc_video_w( 0x7, 0xFC );    /* BGRDPAL */
+		gbc_video_w( 0x8, 0xFC );    /* SPR0PAL */
+		gbc_video_w( 0x9, 0xFC );    /* SPR1PAL */
+		gbc_video_w( 0x0F, 0x00 );
+		break;
 	}
-
-	gb_chrgen = GBC_VRAMMap[0];
-	gbc_chrgen = GBC_VRAMMap[1];
-	gb_bgdtab = gb_wndtab = GBC_VRAMMap[0] + 0x1C00;
-	gbc_bgdtab = gbc_wndtab = GBC_VRAMMap[1] + 0x1C00;
-
-	/* Override the scanline update function */
-	update_scanline = cgb_update_scanline;
-
-	/* HDMA disabled */
-	gbc_hdma_enabled = 0;
 }
 
 static void gbc_hdma(UINT16 length) {
@@ -1404,12 +1460,34 @@ int gb_video_oam_locked( void ) {
 }
 
 /* Ignore write when LCD is on and STAT is not 03 */
-int gb_video_vram_locked( void ) {
+static int gb_video_vram_locked( void ) {
 	gb_video_up_to_date();
 	if ( ( LCDCONT & 0x80 ) && ( ( LCDSTAT & 0x03 ) == 0x03 ) ) {
 		return 1;
 	}
 	return 0;
+}
+
+READ8_HANDLER( gb_vram_r ) {
+	return gb_video_vram_locked() ? 0xFF : gb_vram_ptr[offset];
+}
+
+WRITE8_HANDLER( gb_vram_w ) {
+	if ( gb_video_vram_locked() ) {
+		return;
+	}
+	gb_vram_ptr[offset] = data;
+}
+
+READ8_HANDLER( gb_oam_r ) {
+	return gb_video_oam_locked() ? 0xFF : gb_oam[offset];
+}
+
+WRITE8_HANDLER( gb_oam_w ) {
+	if ( gb_video_oam_locked() || offset >= 0xa0 ) {
+		return;
+	}
+	gb_oam[offset] = data;
 }
 
 WRITE8_HANDLER ( gb_video_w ) {
@@ -1524,13 +1602,13 @@ WRITE8_HANDLER ( gbc_video_w ) {
 	gb_video_up_to_date();
 	switch( offset ) {
 	case 0x00:      /* LCDC - LCD Control */
-		gb_chrgen = GBC_VRAMMap[0] + ((data & 0x10) ? 0x0000 : 0x0800);
-		gbc_chrgen = GBC_VRAMMap[1] + ((data & 0x10) ? 0x0000 : 0x0800);
+		gb_chrgen = gb_vram + ((data & 0x10) ? 0x0000 : 0x0800);
+		gbc_chrgen = gb_vram + ((data & 0x10) ? 0x2000 : 0x2800);
 		gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
-		gb_bgdtab = GBC_VRAMMap[0] + ((data & 0x08) ? 0x1C00 : 0x1800);
-		gbc_bgdtab = GBC_VRAMMap[1] + ((data & 0x08) ? 0x1C00 : 0x1800);
-		gb_wndtab = GBC_VRAMMap[0] + ((data & 0x40) ? 0x1C00 : 0x1800);
-		gbc_wndtab = GBC_VRAMMap[1] + ((data & 0x40) ? 0x1C00 : 0x1800);
+		gb_bgdtab = gb_vram + ((data & 0x08) ? 0x1C00 : 0x1800);
+		gbc_bgdtab = gb_vram + ((data & 0x08) ? 0x3C00 : 0x3800);
+		gb_wndtab = gb_vram + ((data & 0x40) ? 0x1C00 : 0x1800);
+		gbc_wndtab = gb_vram + ((data & 0x40) ? 0x3C00 : 0x3800);
 		/* if LCD controller is switched off, set STAT to 00 */
 		if ( ! ( data & 0x80 ) ) {
 			LCDSTAT &= ~0x03;
@@ -1571,6 +1649,10 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			cgb_spal[6] = gbc_to_gb_pal[(data & 0x30) >> 4];
 			cgb_spal[7] = gbc_to_gb_pal[(data & 0xC0) >> 6];
 		}
+		break;
+	case 0x0F:		/* VBK - VRAM bank select */
+		gb_vram_ptr = gb_vram + ( data & 0x01 ) * 0x2000;
+		data |= 0xFE;
 		break;
 	case 0x11:      /* HDMA1 - HBL General DMA - Source High */
 		break;

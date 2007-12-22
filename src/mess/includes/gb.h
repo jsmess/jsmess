@@ -50,10 +50,17 @@ MACHINE_START( gb );
 MACHINE_RESET( gb );
 MACHINE_RESET( gbpocket );
 WRITE8_HANDLER( gb_oam_w );
+READ8_HANDLER( gb_vram_r );
 WRITE8_HANDLER( gb_vram_w );
-WRITE8_HANDLER( gbc_vram_w );
 
 /* from video/gb.c */
+enum {
+	GB_VIDEO_DMG=1,
+	GB_VIDEO_MGB,
+	GB_VIDEO_SGB,
+	GB_VIDEO_CGB
+};
+
 extern UINT8 *gb_oam;
 extern UINT8 *gb_vram;
 
@@ -65,13 +72,9 @@ PALETTE_INIT( megaduck );
 
 READ8_HANDLER( gb_video_r );
 WRITE8_HANDLER( gb_video_w );
-int gb_video_oam_locked( void );
-int gb_video_vram_locked( void );
 VIDEO_START( gb );
 VIDEO_UPDATE( gb );
-void gb_video_init( void );
-void sgb_video_init( void );
-void gbc_video_init( void );
+void gb_video_init( int mode );
 void gb_video_up_to_date( void );
 
 EXTERN double lcd_time;
@@ -102,7 +105,6 @@ extern WRITE8_HANDLER ( sgb_io_w );
 #define GBC_MODE_GBC		1		/* GBC is in colour mode				*/
 #define GBC_MODE_MONO		2		/* GBC is in mono mode					*/
 
-extern UINT8 *GBC_VRAMMap[2];		/* Addressses of GBC video RAM banks	*/
 EXTERN UINT8 gbc_mode;				/* is the GBC in mono/colour mode?		*/
 
 MACHINE_RESET( gbc );

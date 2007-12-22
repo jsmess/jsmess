@@ -90,8 +90,6 @@ static UINT8 MBC3RTCMap[5];			   /* MBC3 Real-Time-Clock banks                  
 static UINT8 MBC3RTCBank;			   /* Number of RTC bank for MBC3                 */
 static UINT8 *GBC_RAMMap[8];		   /* (GBC) Addresses of internal RAM banks       */
 static UINT8 GBC_RAMBank;			   /* (GBC) Number of RAM bank currently used     */
-UINT8 *GBC_VRAMMap[2];				   /* (GBC) Addressses of video RAM banks         */
-UINT8 *gbc_vram_bank;
 static UINT8 sgb_atf_data[4050];	   /* (SGB) Attribute files                       */
 UINT8 *sgb_tile_data;
 UINT8 *gb_cart = NULL;
@@ -154,15 +152,9 @@ static void gb_init_regs(void) {
 
 	gb_io_w( 0x05, 0x00 );		/* TIMECNT */
 	gb_io_w( 0x06, 0x00 );		/* TIMEMOD */
-	gb_video_w( 0x0, 0x91 );	/* LCDCONT */
-	gb_video_w( 0x7, 0xFC );	/* BGRDPAL */
-	gb_video_w( 0x8, 0xFC );	/* SPR0PAL */
-	gb_video_w( 0x9, 0xFC );	/* SPR1PAL */
 }
 
 static void gb_init(void) {
-	gb_vram = memory_get_read_ptr( 0, ADDRESS_SPACE_PROGRAM, 0x8000 );
-
 	/* Initialize the memory banks */
 	MBC1Mode = 0;
 	MBC3RTCBank = 0;
@@ -253,7 +245,7 @@ MACHINE_RESET( gb )
 {
 	gb_init();
 
-	gb_video_init();
+	gb_video_init( GB_VIDEO_DMG );
 
 	/* Enable BIOS rom */
 	memory_set_bankptr(5, memory_region(REGION_CPU1) );
@@ -264,7 +256,7 @@ MACHINE_RESET( sgb )
 {
 	gb_init();
 
-	sgb_video_init();
+	gb_video_init( GB_VIDEO_SGB );
 
 	gb_init_regs();
 
@@ -298,7 +290,7 @@ MACHINE_RESET( gbpocket )
 {
 	gb_init();
 
-	gb_video_init();
+	gb_video_init( GB_VIDEO_MGB );
 
 	gb_init_regs();
 
@@ -306,18 +298,6 @@ MACHINE_RESET( gbpocket )
 	gb_sound_w(0x16,0x80);
 	gb_sound_w(0x15,0xF3);
 	gb_sound_w(0x14,0x77);
-
-	/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
-	{
-		int i;
-		for( i = 1; i < 0x0D; i++ ) {
-			gb_vram[ 0x1903 + i ] = i;
-			gb_vram[ 0x1923 + i ] = i + 0x0C;
-		}
-		gb_vram[ 0x1910 ] = 0x19;
-
-		cpunum_set_input_line( 0, VBL_INT, ASSERT_LINE );
-	}
 
 	/* Enable BIOS rom if we have one */
 	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
@@ -330,14 +310,7 @@ MACHINE_RESET( gbc )
 
 	gb_init();
 
-	/* Allocate memory for video ram */
-	for( ii = 0; ii < 2; ii++ ) {
-		GBC_VRAMMap[ii] = mess_ram + CGB_START_VRAM_BANKS + ii * 0x2000;
-		memset (GBC_VRAMMap[ii], 0, 0x2000);
-	}
-	gbc_io2_w( 0x0F, 0x00 );
-
-	gbc_video_init();
+	gb_video_init( GB_VIDEO_CGB );
 
 	gb_init_regs();
 
@@ -1306,27 +1279,6 @@ READ8_HANDLER ( gb_io_r )
 	}
 }
 
-WRITE8_HANDLER( gb_oam_w ) {
-	if ( gb_video_oam_locked() || offset >= 0xa0 ) { 
-                return;
-        }
-        gb_oam[offset] = data;
-}
-
-WRITE8_HANDLER( gb_vram_w ) {
-	if ( gb_video_vram_locked() ) {
-                return;
-        }
-        gb_vram[offset] = data;
-}
-
-WRITE8_HANDLER( gbc_vram_w ) {
-	if ( gb_video_vram_locked() ) {
-		return;
-	}
-	gbc_vram_bank[offset] = data;
-}
-
 DEVICE_INIT(gb_cart)
 {
 	int I;
@@ -1814,11 +1766,6 @@ WRITE8_HANDLER ( gbc_io2_w )
 		case 0x0D:	/* KEY1 - Prepare speed switch */
 			cpunum_set_reg( 0, Z80GB_SPEED, data );
 			return;
-		case 0x0F:	/* VBK - VRAM bank select */
-			gbc_vram_bank = GBC_VRAMMap[ data & 0x01 ];
-			memory_set_bankptr( 4, gbc_vram_bank );
-			data |= 0xFE;
-			break;
 		case 0x16:	/* RP - Infrared port */
 			break;
 		case 0x30:	/* SVBK - RAM bank select */
@@ -1854,7 +1801,7 @@ MACHINE_RESET( megaduck )
 	/* We may have to add some more stuff here, if not then it can be merged back into gb */
 	gb_init();
 
-	gb_video_init();
+	gb_video_init( GB_VIDEO_DMG );
 }
 
 /*

@@ -20,6 +20,8 @@ System Driver Changes:
 
 - [GAMEBOY] Fixed timer handling details and timer irq generation.  [Wilbert Pol]
 
+- [GAMEBOY] Improved handling of VRAM locking in certain STAT modes.  [Wilbert Pol]
+
 - [MEPHISTO] Fixed a keyboard mapping bug.  [Dirk Verwiebe]
 
 - [QL] Added sound. [Curt Coder]
