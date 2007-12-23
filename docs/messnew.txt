@@ -35,7 +35,7 @@ System Driver Changes:
 - [SYM1] Better LED support, memory write protect support and added speaker
   emulation. System is now marked as working.  [Dirk Best]
 
-- [TI99] Fixed fatal regressions introduced a few releases ago.  [Michael Zapf]
+- [TI99] Refactorings and code cleanups.  [Michael Zapf]
 
 - [X68000] Improved video timing.  [Barry Rodewald]
 
