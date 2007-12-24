@@ -1138,7 +1138,7 @@ HICON FormatICOInMemoryToHICON(PBYTE ptrBuffer, UINT nBufferSize)
 		/* We would break on NT if we try with a 16bpp image */
 		if (((LPBITMAPINFO)IconImage.lpBits)->bmiHeader.biBitCount != 16)
 		{
-			hIcon = CreateIconFromResource(IconImage.lpBits, IconImage.dwNumBytes, TRUE, 0x00030000);
+			hIcon = CreateIconFromResourceEx(IconImage.lpBits, IconImage.dwNumBytes, TRUE, 0x00030000,0,0,LR_DEFAULTSIZE);
 		}
 	}
 	return hIcon;
@@ -4923,6 +4923,7 @@ static void AddDriverIcon(int nItem,int default_icon_index)
 		ImageList_AddIcon(hLarge, hIcon);
 		if (nIconPos != -1)
 			icon_index[nItem] = nIconPos;
+		DestroyIcon(hIcon);
 	}
 	if (icon_index[nItem] == 0)
 		icon_index[nItem] = default_icon_index;
@@ -4980,6 +4981,7 @@ static void ReloadIcons(void)
 
 		ImageList_AddIcon(hSmall, hIcon);
 		ImageList_AddIcon(hLarge, hIcon);
+		DestroyIcon(hIcon);
 	}
 }
 
