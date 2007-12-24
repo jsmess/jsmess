@@ -1753,7 +1753,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 
 		if (IDNO == win_message_box_utf8(0, buf, MAMEUINAME " Outdated comctl32.dll Warning", MB_YESNO | MB_ICONWARNING))
 			return FALSE;
-    }
+	}
 
 	g_mame32_message = RegisterWindowMessage(TEXT("MAME32"));
 	g_bDoBroadcast = GetBroadcast();
@@ -6459,12 +6459,12 @@ static LRESULT CALLBACK PictureWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 static void RemoveCurrentGameCustomFolder(void)
 {
-    RemoveGameCustomFolder(Picker_GetSelectedItem(hwndList));
+	RemoveGameCustomFolder(Picker_GetSelectedItem(hwndList));
 }
 
 static void RemoveGameCustomFolder(int driver_index)
 {
-    int i;
+	int i;
 	TREEFOLDER **folders;
 	int num_folders;
 

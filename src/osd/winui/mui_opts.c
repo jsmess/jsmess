@@ -2615,7 +2615,7 @@ void SaveDefaultOptions(void)
 	SaveSettingsFile(global, NULL, buffer);
 }
 
-char * GetVersionString(void)
+const char * GetVersionString(void)
 {
 	return build_version;
 }
