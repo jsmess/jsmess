@@ -226,7 +226,7 @@ static int is_delim(char c)
 	an extension list
 -------------------------------------------------*/
 
-int internal_find_extension(const char *extension_list, const char *target_extension)
+static int internal_find_extension(const char *extension_list, const char *target_extension)
 {
 	/* this version allows target_extension to be delimited with a comma */
 	int pos = 0;

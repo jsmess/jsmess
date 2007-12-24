@@ -48,7 +48,7 @@ INLINE void wswan_fillbitmap( int pen, rectangle *rec ) {
 	}
 }
 
-void wswan_setup_palettes(void) {
+static void wswan_setup_palettes(void) {
 	int i,j;
 
 	if ( vdp.color_mode ) {
@@ -67,7 +67,7 @@ void wswan_setup_palettes(void) {
 	}
 }
 
-void wswan_draw_background(void) {
+static void wswan_draw_background(void) {
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
@@ -157,7 +157,7 @@ void wswan_draw_background(void) {
 	}
 }
 
-void wswan_draw_foreground_0( void ) {
+static void wswan_draw_foreground_0( void ) {
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
@@ -244,7 +244,7 @@ void wswan_draw_foreground_0( void ) {
 	}
 }
 
-void wswan_draw_foreground_2( void ) {
+static void wswan_draw_foreground_2( void ) {
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
@@ -331,7 +331,7 @@ void wswan_draw_foreground_2( void ) {
 	}
 }
 
-void wswan_draw_foreground_3( void ) {
+static void wswan_draw_foreground_3( void ) {
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
@@ -418,7 +418,7 @@ void wswan_draw_foreground_3( void ) {
 	}
 }
 
-void wswan_handle_sprites( int mask ) {
+static void wswan_handle_sprites( int mask ) {
 	int	i;
 	if ( vdp.sprite_count == 0 )
 		return;

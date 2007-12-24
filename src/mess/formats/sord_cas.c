@@ -16,14 +16,14 @@
 
 static const UINT8 SORDM5_CAS_HEADER[6] = { 'S', 'O', 'R', 'D', 'M', '5'};
 
-const struct CassetteModulation sordm5_cas_modulation =
+static const struct CassetteModulation sordm5_cas_modulation =
 {
 	CASSETTE_MODULATION_SINEWAVE,
 	1575.0 - 300, 1575.0, 1575.0 + 300,
 	1575.5 + 300, 3150.0, 3150.0 + 600
 };
 
-UINT8 cassette_image_read_uint8( cassette_image *cassette, UINT64 offset)
+static UINT8 cassette_image_read_uint8( cassette_image *cassette, UINT64 offset)
 {
 	UINT8 data;
 	cassette_image_read( cassette, &data, offset, 1);
@@ -126,7 +126,7 @@ static casserr_t sordm5_tap_load( cassette_image *cassette)
 	return CASSETTE_ERROR_SUCCESS;
 }
 
-struct CassetteFormat sordm5_cas_format =
+static struct CassetteFormat sordm5_cas_format =
 {
 	"cas",
 	sordm5_tap_identify,

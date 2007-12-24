@@ -67,7 +67,7 @@ enum
 {
 	tm990_189_palette_size = 3
 };
-unsigned char tm990_189_palette[tm990_189_palette_size*3] =
+static unsigned char tm990_189_palette[tm990_189_palette_size*3] =
 {
 	0x00,0x00,0x00,	/* black */
 	0xFF,0x00,0x00	/* red for LEDs */

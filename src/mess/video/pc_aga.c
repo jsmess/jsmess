@@ -44,7 +44,7 @@ gfx_layout europc_mda_charlayout =
 	8*16
 };
 
-gfx_layout pc200_mda_charlayout =
+static gfx_layout pc200_mda_charlayout =
 {
 	9,32,					/* 9 x 32 characters (9 x 15 is the default, but..) */
 	256,					/* 256 characters */
@@ -60,7 +60,7 @@ gfx_layout pc200_mda_charlayout =
 	8*16 					/* every char takes 8 bytes (upper half) */
 };
 
-gfx_layout pc200_cga_charlayout =
+static gfx_layout pc200_cga_charlayout =
 {
 	8,16,               /* 8 x 16 characters */
 	256,                    /* 256 characters */

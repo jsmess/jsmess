@@ -210,7 +210,7 @@ static BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts );
 #endif
 
 static void UpdateBackgroundBrush(HWND hwndTab);
-HBRUSH hBkBrush;
+static HBRUSH hBkBrush;
 
 /**************************************************************
  * Local private variables
@@ -233,8 +233,8 @@ static HICON g_hIcon = NULL;
 /* Property sheets */
 
 #define HIGHLIGHT_COLOR RGB(0,196,0)
-HBRUSH highlight_brush = NULL;
-HBRUSH background_brush = NULL;
+static HBRUSH highlight_brush = NULL;
+static HBRUSH background_brush = NULL;
 #define VECTOR_COLOR RGB( 190, 0, 0) //DARK RED
 #define FOLDER_COLOR RGB( 0, 128, 0 ) // DARK GREEN
 #define PARENT_COLOR RGB( 190, 128, 192 ) // PURPLE

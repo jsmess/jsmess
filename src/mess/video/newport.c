@@ -208,8 +208,8 @@ VIDEO_UPDATE( newport )
 	return 0;
 }
 
-UINT16 nCMAP0_PaletteIndex;
-UINT32 nCMAP0_Palette[0x10000];
+static UINT16 nCMAP0_PaletteIndex;
+static UINT32 nCMAP0_Palette[0x10000];
 
 static WRITE32_HANDLER( newport_cmap0_w )
 {

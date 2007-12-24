@@ -93,7 +93,7 @@ static struct mess_cd *get_drive(mess_image *img)
  *
  *************************************/
 
-int device_init_mess_cd(mess_image *image)
+static int device_init_mess_cd(mess_image *image)
 {
 	struct mess_cd *cd;
 
@@ -149,7 +149,7 @@ error:
 
 
 
-int device_load_mess_cd(mess_image *image)
+static int device_load_mess_cd(mess_image *image)
 {
 	return internal_load_mess_cd(image, NULL);
 }
@@ -164,7 +164,7 @@ int device_load_mess_cd(mess_image *image)
  *
  *************************************/
 
-void device_unload_mess_cd(mess_image *image)
+static void device_unload_mess_cd(mess_image *image)
 {
 	struct mess_cd *cd = get_drive(image);
 	assert(cd->cdrom_handle);

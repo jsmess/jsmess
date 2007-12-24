@@ -1523,7 +1523,7 @@ FILTER( thombas128,
 
 /************************* driver ***************************/
 
-OPTION_GUIDE_START( thom_createimage_optguide )
+static OPTION_GUIDE_START( thom_createimage_optguide )
   OPTION_INT( 'H', "heads", "Heads" )
   OPTION_INT( 'T', "tracks", "Tracks" )
   OPTION_ENUM_START( 'D', "density", "Density" )
@@ -1533,7 +1533,7 @@ OPTION_GUIDE_START( thom_createimage_optguide )
   OPTION_STRING( 'N', "name", "Floppy name" )
 OPTION_GUIDE_END
 
-OPTION_GUIDE_START( thom_writefile_optguide )
+static OPTION_GUIDE_START( thom_writefile_optguide )
   OPTION_ENUM_START( 'T', "ftype", "File type" )
     OPTION_ENUM( 0, "auto", "Automatic (by extension)" )
     OPTION_ENUM( 1, "B", "Program" )

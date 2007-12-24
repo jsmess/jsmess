@@ -602,7 +602,7 @@ static void a800_serial_command(void)
 		logerror("atari %d bytes to read\n", atari_fdc.serin_count);
 }
 
-void a800_serial_write(void)
+static void a800_serial_write(void)
 {
 	int i, drive, sector, offset;
 

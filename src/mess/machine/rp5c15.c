@@ -69,9 +69,9 @@
 
 #include "rp5c15.h"
 
-struct rp5c15 rtc;
+static struct rp5c15 rtc;
 
-emu_timer* rtc_timer;
+static emu_timer* rtc_timer;
 
 TIMER_CALLBACK(rtc_alarm_pulse)
 {
@@ -139,7 +139,7 @@ void rp5c15_init(struct rp5c15_interface* intf)
 	timer_adjust(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
 }
 
-int rp5c15_read(int offset, UINT16 mem_mask)
+static int rp5c15_read(int offset, UINT16 mem_mask)
 {
 	if((rtc.mode & 0x01) == 0x00)  // BANK 0 selected
 	{
@@ -210,7 +210,7 @@ int rp5c15_read(int offset, UINT16 mem_mask)
 	return 0;
 }
 
-void rp5c15_write(int offset, int data, UINT16 mem_mask)
+static void rp5c15_write(int offset, int data, UINT16 mem_mask)
 {
 	if(offset == 13)
 	{

@@ -38,7 +38,7 @@ const floppy_interface mfm_disk_floppy_interface =
 #define mfm_disk_header_size	0x0100
 
 /* size of a double density track in this image */
-const int TrackSizeMFMLo = 0x01900;
+static const int TrackSizeMFMLo = 0x01900;
 
 /* number of disk images that this code can handle at one time */
 #define MAX_MFM_DISK	4

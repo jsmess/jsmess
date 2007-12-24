@@ -47,7 +47,7 @@ static  READ8_HANDLER(mekd2_cas_r) { return 0xff; }
 static  READ8_HANDLER(mekd2_kbd_r) { return 0xff; }
 #endif
 
-UINT8 pia[8];
+static UINT8 pia[8];
 
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER(mekd2_pia_w) { }

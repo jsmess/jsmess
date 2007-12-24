@@ -449,7 +449,7 @@ static imgtoolerr_t fat_partition_open(imgtool_partition *partition, UINT64 firs
 
 
 
-imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_block, UINT64 block_count)
+static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_block, UINT64 block_count)
 {
 	imgtoolerr_t err;
 	UINT32 heads, tracks, sectors_per_track;

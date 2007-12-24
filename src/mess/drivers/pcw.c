@@ -105,13 +105,13 @@
 // uncomment for debug log output
 //#define VERBOSE
 
-void pcw_fdc_interrupt(int);
+static void pcw_fdc_interrupt(int);
 
 // pointer to pcw ram
 unsigned int roller_ram_addr;
 // flag to indicate if boot-program is enabled/disabled
 static int 	pcw_boot;
-int	pcw_system_status;
+static int	pcw_system_status;
 unsigned short roller_ram_offset;
 // code for CPU int type generated when FDC int is triggered
 static int fdc_interrupt_code;
@@ -215,7 +215,7 @@ static void	pcw_trigger_fdc_int(void)
 }
 
 /* fdc interrupt callback. set/clear fdc int */
-void pcw_fdc_interrupt(int state)
+static void pcw_fdc_interrupt(int state)
 {
 	pcw_system_status &= ~(1<<5);
 

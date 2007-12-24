@@ -23,14 +23,14 @@
 #include "sound/dac.h"
 
 emu_timer *ula_nmi = NULL;
-emu_timer *ula_irq = NULL;
+//emu_timer *ula_irq = NULL;
 int ula_nmi_active, ula_irq_active;
 int ula_frame_vsync = 0;
 int ula_scancode_count = 0;
 int ula_scanline_count = 0;
-int old_x = 0;
-int old_y = 0;
-int old_c = 0;
+static int old_x = 0;
+static int old_y = 0;
+static int old_c = 0;
 
 /*
  * Toggle the video output between black and white.

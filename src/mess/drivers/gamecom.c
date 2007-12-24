@@ -36,7 +36,7 @@ ADDRESS_MAP_END
 static GFXDECODE_START( gamecom_gfxdecodeinfo )
 GFXDECODE_END
 
-SM8500_CONFIG gamecom_cpu_config = {
+static SM8500_CONFIG gamecom_cpu_config = {
 	gamecom_handle_dma,
 	gamecom_update_timers
 };

@@ -516,7 +516,7 @@ static casserr_t oric_tap_load(cassette_image *cassette)
 
 
 
-struct CassetteFormat oric_tap_format =
+static struct CassetteFormat oric_tap_format =
 {
 	"tap",
 	oric_tap_identify,

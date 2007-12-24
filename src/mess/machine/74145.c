@@ -110,7 +110,7 @@ void ttl74145_reset(int which)
 
 
 /* Data Write */
-void ttl74145_write(int which, offs_t offset, UINT8 data)
+static void ttl74145_write(int which, offs_t offset, UINT8 data)
 {
 	/* Decode number */
 	UINT16 new_number = bcd_2_dec(data & 0x0f);

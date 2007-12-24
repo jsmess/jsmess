@@ -215,7 +215,7 @@ ROM_END
 
 /* System Configuration */
 
-QUICKLOAD_LOAD( vip )
+static QUICKLOAD_LOAD( vip )
 {
 	int size = image_length(image);
 

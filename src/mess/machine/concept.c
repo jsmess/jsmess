@@ -71,7 +71,7 @@ static UINT32 KeyStateSave[/*4*/3];
 
 /* Expansion slots */
 
-struct
+static struct
 {
 	read8_handler reg_read;
 	write8_handler reg_write;

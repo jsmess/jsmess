@@ -62,7 +62,7 @@ static char g_FilterText[FILTERTEXT_LEN];
 #define NUM_EXCLUSIONS  10
 
 /* Pairs of filters that exclude each other */
-DWORD filterExclusion[NUM_EXCLUSIONS] =
+static DWORD filterExclusion[NUM_EXCLUSIONS] =
 {
 	IDC_FILTER_CLONES,      IDC_FILTER_ORIGINALS,
 	IDC_FILTER_NONWORKING,  IDC_FILTER_WORKING,

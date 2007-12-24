@@ -19,7 +19,7 @@
 #include "sound/psx.h"
 #include "debugger.h"
 
-struct
+static struct
 {
 	UINT8 id[ 8 ];
 	UINT32 text;	/* SCE only */
@@ -544,7 +544,7 @@ static void (*psx_cdcmds[])(void) =
 
 /* ----------------------------------------------------------------------- */
 
-READ32_HANDLER( psx_cd_r )
+static READ32_HANDLER( psx_cd_r )
 {
 	UINT32 result = 0;
 
@@ -596,7 +596,7 @@ READ32_HANDLER( psx_cd_r )
 	return result;
 }
 
-WRITE32_HANDLER( psx_cd_w )
+static WRITE32_HANDLER( psx_cd_w )
 {
 	void (*psx_cdcmd)(void);
 

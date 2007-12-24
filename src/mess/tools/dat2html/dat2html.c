@@ -16,7 +16,7 @@
 #include "osdmess.h"
 #include "utils.h"
 
-void replace_lt_gt(char *line)
+static void replace_lt_gt(char *line)
 {
 	char buff[1024] = "", *src = line, *dst = buff;
 
@@ -38,7 +38,7 @@ void replace_lt_gt(char *line)
 	strcpy(line, buff);
 }
 
-void a_href_url(char *line)
+static void a_href_url(char *line)
 {
 	char buff[1024], c;
 	char *url_beg = strstr(line, "http://"), *url_end;

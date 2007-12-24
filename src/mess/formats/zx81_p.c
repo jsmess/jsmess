@@ -128,7 +128,7 @@ static UINT16 zx81_cassette_calculate_number_of_1(const UINT8 *bytes, UINT16 len
 
 /* ZX-81 functions */
 
-UINT8 zx81_chars[]={ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*00h-07h*/
+static UINT8 zx81_chars[]={ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*00h-07h*/
 		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*08h-0fh*/
 		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*10h-17h*/
 		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*18h-1fh*/
@@ -211,7 +211,7 @@ static casserr_t zx81_p_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &zx81_legacy_fill_wave);
 }
 
-struct CassetteFormat zx81_p_image_format =
+static struct CassetteFormat zx81_p_image_format =
 {
 	"p,81",
 	zx81_p_identify,
@@ -274,7 +274,7 @@ static casserr_t zx80_o_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &zx80_legacy_fill_wave);
 }
 
-struct CassetteFormat zx80_o_image_format =
+static struct CassetteFormat zx80_o_image_format =
 {
 	"o,80",
 	zx80_o_identify,

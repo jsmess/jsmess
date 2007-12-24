@@ -200,7 +200,7 @@ static void imgtool_floppy_close(imgtool_image *img)
 
 
 
-imgtoolerr_t imgtool_floppy_get_sector_size(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size)
+static imgtoolerr_t imgtool_floppy_get_sector_size(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size)
 {
 	floperr_t ferr;
 
@@ -213,7 +213,7 @@ imgtoolerr_t imgtool_floppy_get_sector_size(imgtool_image *image, UINT32 track, 
 
 
 
-imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len)
+static imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len)
 {
 	floperr_t ferr;
 
@@ -226,7 +226,7 @@ imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 track, UINT
 
 
 
-imgtoolerr_t imgtool_floppy_write_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len)
+static imgtoolerr_t imgtool_floppy_write_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len)
 {
 	floperr_t ferr;
 

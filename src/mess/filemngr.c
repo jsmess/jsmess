@@ -193,10 +193,10 @@ static char *update_entered_string(void)
 }
 
 
-char current_filespecification[32] = "*.*";
-const char fs_directory[] = "[DIR]";
-const char fs_device[] = "[DRIVE]";
-const char fs_file[] = "[FILE]";
+static char current_filespecification[32] = "*.*";
+static const char fs_directory[] = "[DIR]";
+static const char fs_device[] = "[DRIVE]";
+static const char fs_file[] = "[FILE]";
 /*const char fs_archive[] = "[ARCHIVE]"; */
 
 static ui_menu_item *fs_item;
@@ -213,7 +213,7 @@ enum {
 	FILESELECT_DEVICE,
 	FILESELECT_DIRECTORY,
 	FILESELECT_FILE
-} FILESELECT_ENTRY_TYPE;
+};
 
 
 static void fs_free(void)

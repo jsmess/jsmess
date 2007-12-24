@@ -216,8 +216,8 @@ typedef struct tagLVBKIMAGEW
 #define DBU_MIN_WIDTH  292
 #define DBU_MIN_HEIGHT 190
 
-int MIN_WIDTH  = DBU_MIN_WIDTH;
-int MIN_HEIGHT = DBU_MIN_HEIGHT;
+static int MIN_WIDTH  = DBU_MIN_WIDTH;
+static int MIN_HEIGHT = DBU_MIN_HEIGHT;
 
 /* Max number of bkground picture files */
 #define MAX_BGFILES 100
@@ -349,17 +349,17 @@ static LRESULT          Statusbar_MenuSelect (HWND hwnd, WPARAM wParam, LPARAM l
 static void             UpdateHistory(void);
 
 
-void RemoveCurrentGameCustomFolder(void);
-void RemoveGameCustomFolder(int driver_index);
+static void RemoveCurrentGameCustomFolder(void);
+static void RemoveGameCustomFolder(int driver_index);
 
-void BeginListViewDrag(NM_LISTVIEW *pnmv);
-void MouseMoveListViewDrag(POINTS pt);
-void ButtonUpListViewDrag(POINTS p);
+static void BeginListViewDrag(NM_LISTVIEW *pnmv);
+static void MouseMoveListViewDrag(POINTS pt);
+static void ButtonUpListViewDrag(POINTS p);
 
-void CalculateBestScreenShotRect(HWND hWnd, RECT *pRect, BOOL restrict_height);
+static void CalculateBestScreenShotRect(HWND hWnd, RECT *pRect, BOOL restrict_height);
 
 BOOL MouseHasBeenMoved(void);
-void SwitchFullScreenMode(void);
+static void SwitchFullScreenMode(void);
 
 /***************************************************************************
     External variables
@@ -795,9 +795,9 @@ static BOOL g_bDoBroadcast   = FALSE;
 static BOOL use_gui_romloading = FALSE;
 
 static BOOL g_listview_dragging = FALSE;
-HIMAGELIST himl_drag;
-int game_dragged; /* which game started the drag */
-HTREEITEM prev_drag_drop_target; /* which tree view item we're currently highlighting */
+static HIMAGELIST himl_drag;
+static int game_dragged; /* which game started the drag */
+static HTREEITEM prev_drag_drop_target; /* which tree view item we're currently highlighting */
 
 static BOOL g_in_treeview_edit = FALSE;
 
@@ -1047,7 +1047,7 @@ void GetRealColumnOrder(int order[])
  *          March '00- Seriously butchered from MSDN for mine own
  *          purposes, sayeth H0ek.
  */
-HICON FormatICOInMemoryToHICON(PBYTE ptrBuffer, UINT nBufferSize)
+static HICON FormatICOInMemoryToHICON(PBYTE ptrBuffer, UINT nBufferSize)
 {
 	ICONIMAGE           IconImage;
 	LPICONDIRENTRY      lpIDE = NULL;
@@ -1646,7 +1646,7 @@ static void RandomSelectBackground(void)
 	free(buf);
 }
 
-void SetMainTitle(void)
+static void SetMainTitle(void)
 {
 	char version[50];
 	char buffer[100];
@@ -4692,12 +4692,12 @@ static void ResetColumnDisplay(BOOL first_time)
 	Picker_SetSelectedItem(hwndList, driver_index);
 }
 
-int GamePicker_GetItemImage(HWND hwndPicker, int nItem)
+static int GamePicker_GetItemImage(HWND hwndPicker, int nItem)
 {
 	return GetIconForDriver(nItem);
 }
 
-const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nColumn,
+static const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nColumn,
 	TCHAR *pszBuffer, UINT nBufferLength)
 {
 	const TCHAR *s = NULL;
@@ -6457,12 +6457,12 @@ static LRESULT CALLBACK PictureWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	return CallWindowProc(g_lpPictureWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-void RemoveCurrentGameCustomFolder(void)
+static void RemoveCurrentGameCustomFolder(void)
 {
     RemoveGameCustomFolder(Picker_GetSelectedItem(hwndList));
 }
 
-void RemoveGameCustomFolder(int driver_index)
+static void RemoveGameCustomFolder(int driver_index)
 {
     int i;
 	TREEFOLDER **folders;
@@ -6499,7 +6499,7 @@ void RemoveGameCustomFolder(int driver_index)
 }
 
 
-void BeginListViewDrag(NM_LISTVIEW *pnmv)
+static void BeginListViewDrag(NM_LISTVIEW *pnmv)
 {
     LV_ITEM lvi;
 	POINT pt;
@@ -6534,7 +6534,7 @@ void BeginListViewDrag(NM_LISTVIEW *pnmv)
 
 }
 
-void MouseMoveListViewDrag(POINTS p)
+static void MouseMoveListViewDrag(POINTS p)
 {
    HTREEITEM htiTarget;
    TV_HITTESTINFO tvht;
@@ -6565,7 +6565,7 @@ void MouseMoveListViewDrag(POINTS p)
    }
 }
 
-void ButtonUpListViewDrag(POINTS p)
+static void ButtonUpListViewDrag(POINTS p)
 {
     POINT pt;
     HTREEITEM htiTarget;
@@ -6676,7 +6676,7 @@ void UpdateListView(void)
 							 ListView_GetTopIndex(hwndList)+ ListView_GetCountPerPage(hwndList) );
 }
 
-void CalculateBestScreenShotRect(HWND hWnd, RECT *pRect, BOOL restrict_height)
+static void CalculateBestScreenShotRect(HWND hWnd, RECT *pRect, BOOL restrict_height)
 {
 	int 	destX, destY;
 	int 	destW, destH;
@@ -6823,7 +6823,7 @@ void CalculateBestScreenShotRect(HWND hWnd, RECT *pRect, BOOL restrict_height)
   knew to remove the menu dynamically. 
 */
 
-void SwitchFullScreenMode(void)
+static void SwitchFullScreenMode(void)
 {
 	LONG lMainStyle;
 	

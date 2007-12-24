@@ -30,7 +30,7 @@ UINT8 *cgenie_fontram;
 
 
 int cgenie_tv_mode = -1;
-int cgenie_load_cas = 0;
+static int cgenie_load_cas = 0;
 static int port_ff = 0xff;
 
 #define CGENIE_DRIVE_INFO

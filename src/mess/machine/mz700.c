@@ -55,7 +55,7 @@ static void pit_clk_0(double clock);
 static void pit_clk_1(double clock);
 static void pit_irq_2(int which);
 
-struct pit8253_config pit8253 =
+static struct pit8253_config pit8253 =
 {
 	TYPE8253,
 	{

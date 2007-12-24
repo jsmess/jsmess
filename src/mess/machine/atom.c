@@ -27,7 +27,7 @@
 #include "sound/speaker.h"
 
 UINT8 atom_8255_porta;
-UINT8 atom_8255_portb;
+static UINT8 atom_8255_portb;
 UINT8 atom_8255_portc;
 
 /* printer data written */
@@ -104,7 +104,7 @@ static WRITE8_HANDLER(atom_via_out_ca2_func)
 	previous_ca2_data = data;
 }
 
-struct via6522_interface atom_6522_interface=
+static struct via6522_interface atom_6522_interface=
 {
 	atom_via_in_a_func,		/* printer status */
 	NULL,

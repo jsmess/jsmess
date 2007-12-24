@@ -11,7 +11,7 @@ static float decay_mult;
 static int envelope;
 static UINT32 sample_counter = 0;
 
-const int max_amplitude = 0x7fff;
+static const int max_amplitude = 0x7fff;
 
 void channelf_sound_w(int mode)
 {

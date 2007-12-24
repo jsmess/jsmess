@@ -42,7 +42,7 @@
 #define _NR_GB_VID_REGS		0x40
 
 static UINT8 bg_zbuf[160];
-UINT8 gb_vid_regs[_NR_GB_VID_REGS];
+static UINT8 gb_vid_regs[_NR_GB_VID_REGS];
 static UINT16 cgb_bpal[32];	/* CGB current background palette table */
 static UINT16 cgb_spal[32];	/* CGB current background palette table */
 UINT16 sgb_pal[128];	/* SGB palette remapping */
@@ -52,7 +52,7 @@ static UINT8 gb_spal1[4];	/* Sprite 1 palette		*/
 UINT8 *gb_oam = NULL;
 UINT8 *gb_vram;
 static UINT8 *gb_vram_ptr;
-int gbc_hdma_enabled;
+static int gbc_hdma_enabled;
 static UINT8	*gb_chrgen;	/* Character generator           */
 static UINT8	*gb_bgdtab;	/* Background character table    */
 static UINT8	*gb_wndtab;	/* Window character table        */
@@ -95,7 +95,7 @@ static struct gb_lcd_struct {
 	emu_timer	*lcd_timer;
 } gb_lcd;
 
-void (*update_scanline)(void);
+static void (*update_scanline)(void);
 
 /* Prototypes */
 static TIMER_CALLBACK(gb_lcd_timer_proc);
@@ -1451,7 +1451,7 @@ READ8_HANDLER( gb_video_r ) {
 }
 
 /* Ignore write when LCD is on and STAT is 02 or 03 */
-int gb_video_oam_locked( void ) {
+static int gb_video_oam_locked( void ) {
 	gb_video_up_to_date();
 	if ( ( LCDCONT & 0x80 ) && ( LCDSTAT & 0x02 ) ) {
 		return 1;
@@ -1479,9 +1479,11 @@ WRITE8_HANDLER( gb_vram_w ) {
 	gb_vram_ptr[offset] = data;
 }
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( gb_oam_r ) {
 	return gb_video_oam_locked() ? 0xFF : gb_oam[offset];
 }
+#endif
 
 WRITE8_HANDLER( gb_oam_w ) {
 	if ( gb_video_oam_locked() || offset >= 0xa0 ) {

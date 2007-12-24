@@ -25,11 +25,11 @@
  Function Prototypes
 ******************************************************************************/
 
-void aim65_update_ds1(int digit, int data);
-void aim65_update_ds2(int digit, int data);
-void aim65_update_ds3(int digit, int data);
-void aim65_update_ds4(int digit, int data);
-void aim65_update_ds5(int digit, int data);
+static void aim65_update_ds1(int digit, int data);
+static void aim65_update_ds2(int digit, int data);
+static void aim65_update_ds3(int digit, int data);
+static void aim65_update_ds4(int digit, int data);
+static void aim65_update_ds5(int digit, int data);
 
 
 
@@ -134,11 +134,11 @@ static const pia6821_interface pia =
 };
 
 
-void aim65_update_ds1(int digit, int data) { output_set_digit_value( 0 + (digit ^ 3), data); }
-void aim65_update_ds2(int digit, int data) { output_set_digit_value( 4 + (digit ^ 3), data); }
-void aim65_update_ds3(int digit, int data) { output_set_digit_value( 8 + (digit ^ 3), data); }
-void aim65_update_ds4(int digit, int data) { output_set_digit_value(12 + (digit ^ 3), data); }
-void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit ^ 3), data); }
+static void aim65_update_ds1(int digit, int data) { output_set_digit_value( 0 + (digit ^ 3), data); }
+static void aim65_update_ds2(int digit, int data) { output_set_digit_value( 4 + (digit ^ 3), data); }
+static void aim65_update_ds3(int digit, int data) { output_set_digit_value( 8 + (digit ^ 3), data); }
+static void aim65_update_ds4(int digit, int data) { output_set_digit_value(12 + (digit ^ 3), data); }
+static void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit ^ 3), data); }
 
 
 
@@ -169,7 +169,7 @@ static WRITE8_HANDLER(aim65_riot_a_w)
 }
 
 
-void aim65_riot_irq(int state)
+static void aim65_riot_irq(int state)
 {
 	cpunum_set_input_line(0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }

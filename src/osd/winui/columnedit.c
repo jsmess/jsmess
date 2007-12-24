@@ -33,7 +33,7 @@
 #include "winui.h"
 
 // Returns TRUE if successful
-int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
+static int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 {
 	LV_ITEM lvi;
 	TCHAR	buf[80];
@@ -69,7 +69,7 @@ int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 	return FALSE;
 }
 
-void DoMoveItem( HWND hWnd, BOOL bDown)
+static void DoMoveItem( HWND hWnd, BOOL bDown)
 {
 	LV_ITEM lvi;
 	TCHAR	buf[80];

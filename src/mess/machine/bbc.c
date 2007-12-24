@@ -428,7 +428,7 @@ static int bbcm_vdudriverset(void)
 }
 
 
-WRITE8_HANDLER ( page_selectbm_w )
+static WRITE8_HANDLER ( page_selectbm_w )
 {
 	pagedRAM=(data&0x80)>>7;
 	bbc_rombank=data&0x0f;
@@ -859,7 +859,7 @@ static void bbcb_IC32_initialise(void)
 
 
 /* This the BBC Masters Real Time Clock and NVRam IC */
-void MC146818_set(void)
+static void MC146818_set(void)
 {
 	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",MC146818_WR,MC146818_DS,MC146818_AS,MC146818_CE);
 
@@ -1202,9 +1202,9 @@ collector output only. It usially acts as the printer strobe line.
 file. I now need to look at the new printer code and see how I should
 connect this code up to that */
 
-int bbc_printer_porta;
-int bbc_printer_ca1;
-int bbc_printer_ca2;
+static int bbc_printer_porta;
+static int bbc_printer_ca1;
+static int bbc_printer_ca2;
 
 /* USER VIA 6522 port A is buffered as an output through IC70 so
 reading from this port will always return 0xff */
@@ -1357,7 +1357,7 @@ READ8_HANDLER (BBC_6850_r)
 
 
 
-void Serial_interrupt(int level)
+static void Serial_interrupt(int level)
 {
   MC6850_irq=level;
   bbc_setirq();
@@ -1386,7 +1386,7 @@ static int len1=0;
 static int len2=0;
 static int len3=0;
 
-emu_timer *bbc_tape_timer;
+static emu_timer *bbc_tape_timer;
 
 static TIMER_CALLBACK(bbc_tape_timer_cb)
 {
@@ -1448,7 +1448,7 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 
 }
 
-void BBC_Cassette_motor(unsigned char status)
+static void BBC_Cassette_motor(unsigned char status)
 {
 	if (status)
 	{
@@ -1530,7 +1530,7 @@ static i8271_interface bbc_i8271_interface=
 };
 
 
-READ8_HANDLER( bbc_i8271_read )
+static READ8_HANDLER( bbc_i8271_read )
 {
 int ret;
 	ret=0x0ff;
@@ -1556,7 +1556,7 @@ int ret;
 	return 0x0ff;
 }
 
-WRITE8_HANDLER( bbc_i8271_write )
+static WRITE8_HANDLER( bbc_i8271_write )
 {
 	logerror("i8271 write  %d  %d\n",offset,data);
 
@@ -1688,7 +1688,7 @@ static void bbc_wd177x_callback(wd17xx_state_t event, void *param)
 
 }
 
-WRITE8_HANDLER(bbc_wd177x_status_w)
+static WRITE8_HANDLER(bbc_wd177x_status_w)
 {
 	drive_control = data;
 
@@ -1805,7 +1805,7 @@ AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write	)
 static int opusbank;
 
 
-WRITE8_HANDLER( bbc_opus_status_w )
+static WRITE8_HANDLER( bbc_opus_status_w )
 {
 	drive_control = data;
 

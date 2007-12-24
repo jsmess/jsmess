@@ -39,27 +39,27 @@
 #define DPPL 0x30
 #define CTRL 0x3c
 
-int maria_palette[8][4];
-int maria_write_mode;
-int maria_scanline;
-unsigned int maria_dll;
-unsigned int maria_dl;
-int maria_holey;
-int maria_offset;
-int maria_vblank;
-int maria_dli;
-int maria_dmaon;				/* dma is enabled */
-int maria_dodma;				/* doing dma right now */
-int maria_wsync;
-int maria_backcolor;
+static int maria_palette[8][4];
+static int maria_write_mode;
+static int maria_scanline;
+static unsigned int maria_dll;
+static unsigned int maria_dl;
+static int maria_holey;
+static int maria_offset;
+static int maria_vblank;
+static int maria_dli;
+static int maria_dmaon;				/* dma is enabled */
+static int maria_dodma;				/* doing dma right now */
+static int maria_wsync;
+static int maria_backcolor;
 
-int maria_color_kill;
-int maria_cwidth;
-int maria_bcntl;
-int maria_kangaroo;
-int maria_rm;
+static int maria_color_kill;
+static int maria_cwidth;
+static int maria_bcntl;
+static int maria_kangaroo;
+static int maria_rm;
 
-unsigned int maria_charbase;
+static unsigned int maria_charbase;
 
 // 20030621 ericball define using logical operations
 #define inc_hpos() { hpos = (hpos + 1) & 0x1FF; }

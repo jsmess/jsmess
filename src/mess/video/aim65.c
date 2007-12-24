@@ -16,7 +16,7 @@ static int printer_dir;
 static int flag_a;
 static int flag_b;
 
-UINT16 *printerRAM;
+//UINT16 *printerRAM;
 
 static emu_timer *print_timer;
 static int printer_level;
@@ -43,7 +43,7 @@ static int printer_level;
  */
 
 
-void aim65_printer_inc(void)
+static void aim65_printer_inc(void)
 {
 	if (printer_dir)
 	{
@@ -74,7 +74,7 @@ void aim65_printer_inc(void)
 	flag_b=0;
 }
 
-void aim65_printer_cr(void) {
+static void aim65_printer_cr(void) {
 	printer_x=0;
 	printer_y++;
 	if (printer_y > 500) printer_y = 0;
@@ -142,6 +142,7 @@ VIDEO_START( aim65 )
 }
 
 
+#ifdef UNUSED_FUNCTION
 VIDEO_UPDATE( aim65 )
 {
 	/* Display printer output */
@@ -174,4 +175,5 @@ VIDEO_UPDATE( aim65 )
 
 	return 0;
 }
+#endif
 

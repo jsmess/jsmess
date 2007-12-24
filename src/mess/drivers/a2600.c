@@ -585,69 +585,69 @@ static int next_bank(void)
 }
 
 
-void modeF8_switch(UINT16 offset, UINT8 data)
+static void modeF8_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modeFA_switch(UINT16 offset, UINT8 data)
+static void modeFA_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modeF6_switch(UINT16 offset, UINT8 data)
+static void modeF6_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modeF4_switch(UINT16 offset, UINT8 data)
+static void modeF4_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void mode3F_switch(UINT16 offset, UINT8 data)
+static void mode3F_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modeUA_switch(UINT16 offset, UINT8 data)
+static void modeUA_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + (offset >> 6) * 0x1000;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modeE0_switch(UINT16 offset, UINT8 data)
+static void modeE0_switch(UINT16 offset, UINT8 data)
 {
 	int bank = 1 + (offset >> 3);
 	bank_base[bank] = CART + 0x400 * (offset & 7);
 	memory_set_bankptr(bank, bank_base[bank]);
 }
-void modeE7_switch(UINT16 offset, UINT8 data)
+static void modeE7_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modeE7_RAM_switch(UINT16 offset, UINT8 data)
+static void modeE7_RAM_switch(UINT16 offset, UINT8 data)
 {
 	memory_set_bankptr(9, extra_RAM + (4 + offset) * 256 );
 }
-void modeDC_switch(UINT16 offset, UINT8 data)
+static void modeDC_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * next_bank();
 	memory_set_bankptr(1, bank_base[1]);
 }
-void mode3E_switch(UINT16 offset, UINT8 data)
+static void mode3E_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
 	memory_set_bankptr(1, bank_base[1]);
 	mode3E_ram_enabled = 0;
 }
-void mode3E_RAM_switch(UINT16 offset, UINT8 data)
+static void mode3E_RAM_switch(UINT16 offset, UINT8 data)
 {
 	ram_base = extra_RAM + 0x200 * ( data & 0x3F );
 	memory_set_bankptr(1, ram_base );
 	mode3E_ram_enabled = 1;
 }
-void modeFV_switch(UINT16 offset, UINT8 data)
+static void modeFV_switch(UINT16 offset, UINT8 data)
 {
 	//printf("ModeFV %04x\n",offset);
 	if (!FVlocked && ( activecpu_get_pc() & 0x1F00 ) == 0x1F00 ) {
@@ -657,7 +657,7 @@ void modeFV_switch(UINT16 offset, UINT8 data)
 		memory_set_bankptr(1, bank_base[1]);
 	}
 }
-void modeJVP_switch(UINT16 offset, UINT8 data)
+static void modeJVP_switch(UINT16 offset, UINT8 data)
 {
 	switch( offset ) {
 	case 0x00:
@@ -708,7 +708,7 @@ static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(offset, data); }
 static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(offset, data); riot_ram[ 0x20 + offset ] = data; }
 
 
-OPBASE_HANDLER( modeF6_opbase )
+static OPBASE_HANDLER( modeF6_opbase )
 {
 	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 ) {
 		modeF6_switch_w( ( address & 0x1FFF ) - 0x1FF6, 0 );
@@ -716,7 +716,7 @@ OPBASE_HANDLER( modeF6_opbase )
 	return address;
 }
 
-OPBASE_HANDLER( modeSS_opbase )
+static OPBASE_HANDLER( modeSS_opbase )
 {
 	if ( address & 0x1000 ) {
 		opcode_mask = 0x7ff;
@@ -1013,7 +1013,7 @@ depending on last byte & 0x20 -> 0x00 -> switch to bank #1
 static opbase_handler FE_old_opbase_handler;
 static int FETimer;
 
-OPBASE_HANDLER(modeFE_opbase_handler)
+static OPBASE_HANDLER(modeFE_opbase_handler)
 {
 	if ( ! FETimer )
 	{
@@ -1033,7 +1033,7 @@ OPBASE_HANDLER(modeFE_opbase_handler)
 	return address;
 }
 
-void modeFE_switch(UINT16 offset, UINT8 data)
+static void modeFE_switch(UINT16 offset, UINT8 data)
 {
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
 	   should be the last byte that was on the data bus

@@ -91,7 +91,7 @@ static  READ8_HANDLER( channelf_port_5_r )
 	return port_read_with_latch(0xff,latch[3]);
 }
 
-struct {	/* SKR - 2102 RAM chip on carts 10 and 18 I/O ports */
+static struct {	/* SKR - 2102 RAM chip on carts 10 and 18 I/O ports */
 	UINT8 d; 			/* data bit:inverted logic, but reading/writing cancel out */
 	UINT8 r_w; 			/* inverted logic: 0 means read, 1 means write */
 	UINT8 a[10]; 		/* addr bits: inverted logic, but reading/writing cancel out */

@@ -96,18 +96,18 @@ Some bugs left :
 // This is the sequence for unlocking the ASIC in the CPC+/GX4000
 // These are outed to port &bc00, after syncing the lock by outing a non-zero value then a zero to &bc00
 // To lock the ASIC again, repeat the sequence without the last &ee
-unsigned char asic_unlock_seq[15] =
+static unsigned char asic_unlock_seq[15] =
 {
 	0xff, 0x77, 0xb3, 0x51, 0xa8, 0xd4, 0x62, 0x39, 0x9c, 0x46, 0x2b, 0x15, 0x8a, 0xcd, 0xee
 };
 
 int amstrad_system_type;
-int amstrad_plus_lower;  // CPC+/GX4000 cartridge bank loaded in lower ROM area
-int amstrad_plus_lower_addr;  // CPC+/GX4000 lower ROM area address / ASIC register page enable
-int amstrad_plus_lower_enabled;  // secondary lower ROM select in use?
+static int amstrad_plus_lower;  // CPC+/GX4000 cartridge bank loaded in lower ROM area
+static int amstrad_plus_lower_addr;  // CPC+/GX4000 lower ROM area address / ASIC register page enable
+static int amstrad_plus_lower_enabled;  // secondary lower ROM select in use?
 int amstrad_plus_asic_enabled;  // ASIC enabled
-int amstrad_plus_asic_regpage;  // ASIC register page enabled
-int amstrad_plus_asic_seqptr;   // current position in the ASIC unlocking sequence
+static int amstrad_plus_asic_regpage;  // ASIC register page enabled
+static int amstrad_plus_asic_seqptr;   // current position in the ASIC unlocking sequence
 int amstrad_plus_pri;  // Programmable raster interrupt, 0=disabled.
 int amstrad_plus_irq_cause;  // part of the interrupt vector for IM 2.  6 = raster IRQ, 4 = DMA channel 2, 2 = DMA channel 1, 0 = DMA channel 0
 int amstrad_plus_scroll_x;  // soft scroll - horizontal (0-15), in mode 2 pixels
@@ -118,12 +118,12 @@ int amstrad_plus_dma_0_addr;   // DMA channel address
 int amstrad_plus_dma_1_addr;
 int amstrad_plus_dma_2_addr;
 int amstrad_plus_dma_prescaler[3];  // DMA channel prescaler
-int amstrad_plus_dma_clear;  // set if DMA interrupts are to be cleared automatically
+static int amstrad_plus_dma_clear;  // set if DMA interrupts are to be cleared automatically
 
 extern int amstrad_scanline;
 extern int prev_reg;
 
-void amstrad_plus_seqcheck(int data);
+static void amstrad_plus_seqcheck(int data);
 static WRITE8_HANDLER( amstrad_plus_asic_4000_w );
 static WRITE8_HANDLER( amstrad_plus_asic_6000_w );
 static READ8_HANDLER( amstrad_plus_asic_4000_r );
@@ -458,7 +458,7 @@ void amstrad_setUpperRom(void)
 	}
 }
 
-void AmstradCPC_SetLowerRom(int Data)
+static void AmstradCPC_SetLowerRom(int Data)
 {
 	if(amstrad_plus_asic_enabled != 0)
 	{
@@ -1245,7 +1245,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 }
 
 // Handler for checking the ASIC unlocking sequence
-void amstrad_plus_seqcheck(int data)
+static void amstrad_plus_seqcheck(int data)
 {
 	static int prev_data;
 
@@ -1604,7 +1604,7 @@ void amstrad_reset_machine(void)
 	multiface_reset();
 }
 
-void kccomp_reset_machine(void)
+static void kccomp_reset_machine(void)
 {
 	/* enable lower rom (OS rom) */
 	amstrad_GateArray_write(0x089);

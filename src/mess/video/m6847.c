@@ -2048,5 +2048,7 @@ attotime m6847_scanline_time(int scanline)
  *
  *************************************/
 
+#ifdef UNUSED_FUNCTION
 void m6847_set_dirty(void) { set_dirty(); }
 int m6847_get_scanline(void) { return get_scanline(); }
+#endif

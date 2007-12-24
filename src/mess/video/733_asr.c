@@ -46,7 +46,7 @@ static const rectangle asr_scroll_clear_window =
 	asr_window_offset_y+asr_window_height-1					/* max_y */
 };
 
-struct
+static struct
 {
 	/*UINT8 OutQueue[ASROutQueueSize];
 	int OutQueueHead;

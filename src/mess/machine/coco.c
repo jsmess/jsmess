@@ -1384,13 +1384,13 @@ static WRITE8_HANDLER ( d_pia1_cb2_w )
 static void (*printer_out)(int data);
 
 /* Printer output for the CoCo, output to bitbanger port */
-void printer_out_coco(int data)
+static void printer_out_coco(int data)
 {
 	bitbanger_output(bitbanger_image(), (data & 2) >> 1);
 }
 
 /* Printer output for the Dragon, output to Paralel port */
-void printer_out_dragon(int data)
+static void printer_out_dragon(int data)
 {
 	/* If strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
@@ -2877,6 +2877,7 @@ MACHINE_START( dragon64 )
 	acia_6551_init();
 }
 
+#ifdef UNUSED_FUNCTION
 MACHINE_START( d64plus )
 {
 	machine_init_interface init;
@@ -2899,6 +2900,7 @@ MACHINE_START( d64plus )
 	dragon_plus_reg = 0;
 	plus_reg_w(0,0);
 }
+#endif
 
 MACHINE_START( tanodr64 )
 {

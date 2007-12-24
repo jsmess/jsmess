@@ -37,7 +37,7 @@ static INTERRUPT_GEN( bbcbc_interrupt )
     TMS9928A_interrupt();
 }
 
-INPUT_PORTS_START( bbcbc )
+static INPUT_PORTS_START( bbcbc )
 INPUT_PORTS_END
 
 static const TMS9928a_interface tms9129_interface =

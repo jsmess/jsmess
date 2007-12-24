@@ -70,11 +70,11 @@ Timings:
 #include "mslegacy.h"
 
 /* I/O ports */
-ADDRESS_MAP_START( dai_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( dai_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* memory w/r functions */
-ADDRESS_MAP_START( dai_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( dai_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0xbfff) AM_RAMBANK(1)
 	AM_RANGE( 0xc000, 0xdfff) AM_ROM
 	AM_RANGE( 0xe000, 0xefff) AM_ROMBANK(2)

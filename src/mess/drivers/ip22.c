@@ -75,9 +75,9 @@ INLINE void verboselog( int n_level, const char *s_fmt, ... )
 	}
 }
 
-UINT8 nRTC_Regs[0x80];
-UINT8 nRTC_UserRAM[0x200];
-UINT8 nRTC_RAM[0x800];
+static UINT8 nRTC_Regs[0x80];
+static UINT8 nRTC_UserRAM[0x200];
+static UINT8 nRTC_RAM[0x800];
 
 static UINT32 nHPC_SCSI0Descriptor, nHPC_SCSI0DMACtrl;
 
@@ -385,11 +385,11 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 	}
 }
 
-UINT32 nHPC3_enetr_nbdp;
-UINT32 nHPC3_enetr_cbp;
-UINT32 nHPC3_hd0_register;
-UINT32 nHPC3_hd0_regs[0x20];
-UINT32 nHPC3_hd1_regs[0x20];
+static UINT32 nHPC3_enetr_nbdp;
+static UINT32 nHPC3_enetr_cbp;
+//UINT32 nHPC3_hd0_register;
+//UINT32 nHPC3_hd0_regs[0x20];
+//UINT32 nHPC3_hd1_regs[0x20];
 
 static READ32_HANDLER( hpc3_hd_enet_r )
 {
@@ -507,9 +507,9 @@ static WRITE32_HANDLER( hpc3_hd0_w )
 	}
 }
 
-UINT32 nHPC3_unk0;
-UINT32 nHPC3_unk1;
-UINT32 nHPC3_IC_Unk0;
+static UINT32 nHPC3_unk0;
+static UINT32 nHPC3_unk1;
+static UINT32 nHPC3_IC_Unk0;
 
 static READ32_HANDLER( hpc3_pbus4_r )
 {
@@ -933,8 +933,8 @@ static WRITE32_HANDLER( ip22_write_ram )
 	COMBINE_DATA(&ip22_mainram[offset]);
 }
 
-UINT32 nHAL2_IAR;
-UINT32 nHAL2_IDR[4];
+static UINT32 nHAL2_IAR;
+static UINT32 nHAL2_IDR[4];
 
 #define H2_IAR_TYPE			0xf000
 #define H2_IAR_NUM			0x0f00
@@ -1097,11 +1097,11 @@ static WRITE32_HANDLER( hal2_w )
 #define PBUS_DMADESC_TXD		0x00008000
 #define PBUS_DMADESC_BC			0x00003fff
 
-UINT8 nPBUS_DMA_Active;
-UINT32 nPBUS_DMA_CurPtr;
-UINT32 nPBUS_DMA_DescPtr;
-UINT32 nPBUS_DMA_NextPtr;
-UINT32 nPBUS_DMA_WordsLeft;
+static UINT8 nPBUS_DMA_Active;
+static UINT32 nPBUS_DMA_CurPtr;
+static UINT32 nPBUS_DMA_DescPtr;
+static UINT32 nPBUS_DMA_NextPtr;
+static UINT32 nPBUS_DMA_WordsLeft;
 
 static TIMER_CALLBACK(ip22_dma)
 {
@@ -1227,7 +1227,7 @@ static ADDRESS_MAP_START( ip225015_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x20000000, 0x27ffffff ) AM_RAM AM_SHARE(1) AM_WRITE(ip22_write_ram)
 ADDRESS_MAP_END
 
-UINT32 nIntCounter;
+static UINT32 nIntCounter;
 
 // mc_update wants once every millisecond (1/1000th of a second)
 static TIMER_CALLBACK(ip22_timer)
@@ -1570,7 +1570,7 @@ static void ip22_harddisk_getinfo(const device_class *devclass, UINT32 state, un
 }
 #endif
 
-MACHINE_DRIVER_START( ip225015 )
+static MACHINE_DRIVER_START( ip225015 )
 	MDRV_CPU_ADD_TAG( "main", R5000BE, 50000000*3 )
 	MDRV_CPU_CONFIG( config )
 	MDRV_CPU_PROGRAM_MAP( ip225015_map, 0 )
@@ -1599,12 +1599,12 @@ MACHINE_DRIVER_START( ip225015 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( ip224613 )
+static MACHINE_DRIVER_START( ip224613 )
 	MDRV_IMPORT_FROM( ip225015 )
 	MDRV_CPU_REPLACE( "main", R4600BE, 133333333 )
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( ip244415 )
+static MACHINE_DRIVER_START( ip244415 )
 	MDRV_IMPORT_FROM( ip225015 )
 	MDRV_CPU_REPLACE( "main", R4600BE, 150000000 )
 MACHINE_DRIVER_END

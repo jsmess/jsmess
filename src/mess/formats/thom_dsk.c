@@ -472,7 +472,7 @@ error:
 
 
 
-void thom_floppy_fd_save ( mess_image* image )
+static void thom_floppy_fd_save ( mess_image* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	unsigned size = d->sides * d->tracks * d->sectors * d->sector_size;
@@ -552,7 +552,7 @@ error:
 
 
 
-void thom_floppy_qd_save ( mess_image* image )
+static void thom_floppy_qd_save ( mess_image* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	unsigned size = d->sides * d->tracks * d->sectors * d->sector_size;

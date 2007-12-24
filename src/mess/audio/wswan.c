@@ -48,9 +48,9 @@ struct SND {
 	UINT8	master_volume;		/* Master volume */
 };
 
-struct SND snd;
+static struct SND snd;
 
-void wswan_ch_set_freq( struct CHAN *ch, UINT16 freq ) {
+static void wswan_ch_set_freq( struct CHAN *ch, UINT16 freq ) {
 	ch->freq = freq;
 	ch->period = Machine->sample_rate / ( 3072000  / ( ( 2048 - freq ) << 5 ) );
 }

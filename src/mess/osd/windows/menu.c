@@ -505,17 +505,17 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 
 
 
-void state_load(HWND wnd, running_machine *machine)
+static void state_load(HWND wnd, running_machine *machine)
 {
 	state_dialog(wnd, WIN_FILE_DIALOG_OPEN, OFN_FILEMUSTEXIST, mame_schedule_load, machine);
 }
 
-void state_save_as(HWND wnd, running_machine *machine)
+static void state_save_as(HWND wnd, running_machine *machine)
 {
 	state_dialog(wnd, WIN_FILE_DIALOG_SAVE, OFN_OVERWRITEPROMPT, mame_schedule_save, machine);
 }
 
-void state_save(running_machine *machine)
+static void state_save(running_machine *machine)
 {
 	mame_schedule_save(machine, state_filename);
 }
@@ -1887,7 +1887,7 @@ static int invoke_command(HWND wnd, UINT command)
 //	set_menu_text
 //============================================================
 
-void set_menu_text(HMENU menu_bar, int command, const char *text)
+static void set_menu_text(HMENU menu_bar, int command, const char *text)
 {
 	TCHAR *t_text;
 	MENUITEMINFO mii;

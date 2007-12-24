@@ -235,7 +235,7 @@ static casserr_t primo_ptp_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &primo_legacy_fill_wave);
 }
 
-struct CassetteFormat primo_ptp_image_format =
+static struct CassetteFormat primo_ptp_image_format =
 {
 	"ptp",
 	primo_ptp_identify,

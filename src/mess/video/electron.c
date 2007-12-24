@@ -56,7 +56,7 @@ INLINE void electron_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-void electron_drawline( void ) {
+static void electron_drawline( void ) {
 	int i;
 	int x = 0;
 	int pal[16];

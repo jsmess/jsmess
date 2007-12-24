@@ -86,7 +86,7 @@ void SplittersExit(void)
 
 
 /* Called with hWnd = Parent Window */
-void CalcSplitter(HWND hWnd, LPHZSPLITTER lpSplitter)
+static void CalcSplitter(HWND hWnd, LPHZSPLITTER lpSplitter)
 {
 	POINT	p = {0,0};
 	RECT	leftRect, rightRect;
@@ -226,7 +226,7 @@ void AddSplitter(HWND hWnd, HWND hWndLeft, HWND hWndRight, void (*func)(HWND hWn
 	numSplitters++;
 }
 
-void OnInvertTracker(HWND hWnd, const RECT *rect)
+static void OnInvertTracker(HWND hWnd, const RECT *rect)
 {
 	HDC 	hDC = GetDC(hWnd);
 	HBRUSH	hBrush = CreateSolidBrush(RGB(0xFF, 0xFF, 0xFF));
@@ -241,7 +241,7 @@ void OnInvertTracker(HWND hWnd, const RECT *rect)
 	DeleteObject(hBrush);
 }
 
-void StartTracking(HWND hWnd, UINT hitArea)
+static void StartTracking(HWND hWnd, UINT hitArea)
 {
 	if (!bTracking && lpCurSpltr != 0 && hitArea == SPLITTER_HITITEM)
 	{
@@ -257,7 +257,7 @@ void StartTracking(HWND hWnd, UINT hitArea)
 	}
 }
 
-void StopTracking(HWND hWnd)
+static void StopTracking(HWND hWnd)
 {
 	if (bTracking)
 	{
@@ -277,7 +277,7 @@ void StopTracking(HWND hWnd)
 	}
 }
 
-UINT SplitterHitTest(HWND hWnd, POINTS p)
+static UINT SplitterHitTest(HWND hWnd, POINTS p)
 {
 	RECT  rect;
 	POINT pt;

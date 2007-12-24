@@ -36,7 +36,7 @@ static UINT32 get_leuint32(const void *ptr)
 	return LITTLE_ENDIANIZE_INT32(value);
 }
 
-int mycaslen;
+static int mycaslen;
 
 static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 UINT32 SampleRate;
@@ -310,7 +310,7 @@ static casserr_t csw_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &csw_legacy_fill_wave );
 }
 
-struct CassetteFormat csw_cassette_format = {
+static struct CassetteFormat csw_cassette_format = {
 	"csw",
 	csw_cassette_identify,
 	csw_cassette_load,

@@ -111,7 +111,7 @@ static HIMAGELIST   hTreeSmall = 0;         /* TreeView Image list of icons */
 
 /* this only has an entry for each TOP LEVEL extra folder + SubFolders*/
 LPEXFOLDERDATA		ExtraFolderData[MAX_EXTRA_FOLDERS * MAX_EXTRA_SUBFOLDERS];
-int			        numExtraFolders = 0;
+static int			        numExtraFolders = 0;
 static int          numExtraIcons = 0;
 static char         *ExtraFolderIcons[MAX_EXTRA_FOLDERS];
 
@@ -230,6 +230,7 @@ void InitTree(LPFOLDERDATA lpFolderData, LPFILTER_ITEM lpFilterList)
 	SetWindowLongPtr(GetTreeView(), GWLP_WNDPROC, (LONG_PTR)TreeWndProc);
 }
 
+#ifdef UNUSED_FUNCTION
 void DestroyTree(HWND hWnd)
 {
     if ( hTreeSmall )
@@ -238,6 +239,7 @@ void DestroyTree(HWND hWnd)
         hTreeSmall = NULL;
     }
 }
+#endif
 
 void SetCurrentFolder(LPTREEFOLDER lpFolder)
 {
@@ -2157,7 +2159,7 @@ void GetFolders(TREEFOLDER ***folders,int *num_folders)
 	*num_folders = numFolders;
 }
 
-BOOL TryRenameCustomFolderIni(LPTREEFOLDER lpFolder,const char *old_name,const char *new_name)
+static BOOL TryRenameCustomFolderIni(LPTREEFOLDER lpFolder,const char *old_name,const char *new_name)
 {
 	char filename[MAX_PATH];
 	char new_filename[MAX_PATH];

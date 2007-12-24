@@ -37,7 +37,7 @@ static void *ext_bank_80[4],*ext_bank_88[256];
 static UINT8 extmem_ctrl[2];
 
 static int use_5FD;
-void pc8801_init_5fd(void);
+static void pc8801_init_5fd(void);
 
 static void pc88sr_init_fmsound(void);
 static int enable_FM_IRQ;
@@ -776,7 +776,7 @@ static READ8_HANDLER( load_8255_chip0_C )	{ return load_8255_C(0); }
 static READ8_HANDLER( load_8255_chip1_C )	{ return load_8255_C(1); }
 
 
-const ppi8255_interface pc8801_8255_config =
+static const ppi8255_interface pc8801_8255_config =
 {
 	2,
 	{ load_8255_chip0_A, load_8255_chip1_A },
@@ -811,7 +811,7 @@ static struct nec765_interface pc8801_fdc_interface=
 	pc8801_fdc_dma_drq
 };
 
-void pc8801_init_5fd(void)
+static void pc8801_init_5fd(void)
 {
 	use_5FD = (input_port_18_r(0)&0x80)!=0x00;
 	ppi8255_init(&pc8801_8255_config);

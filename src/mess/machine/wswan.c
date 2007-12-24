@@ -23,8 +23,8 @@ TODO:
 
 enum enum_system { WSWAN=0, WSC };
 enum enum_sram { SRAM_NONE=0, SRAM_64K, SRAM_256K, SRAM_512K, SRAM_1M, SRAM_2M, EEPROM_1K, EEPROM_16K, EEPROM_8K, SRAM_UNKNOWN };
-const char* wswan_sram_str[] = { "none", "64Kbit SRAM", "256Kbit SRAM", "512Kbit SRAM", "1Mbit SRAM", "2Mbit SRAM", "1Kbit EEPROM", "16Kbit EEPROM", "8Kbit EEPROM", "Unknown" };
-const int wswan_sram_size[] = { 0, 64*1024/8, 256*1024/8, 512*1024/8, 1024*1024/8, 2*1024*1024/8,  1024/8, 16*1024/8, 8*1024/8, 0 };
+static const char* wswan_sram_str[] = { "none", "64Kbit SRAM", "256Kbit SRAM", "512Kbit SRAM", "1Mbit SRAM", "2Mbit SRAM", "1Kbit EEPROM", "16Kbit EEPROM", "8Kbit EEPROM", "Unknown" };
+static const int wswan_sram_size[] = { 0, 64*1024/8, 256*1024/8, 512*1024/8, 1024*1024/8, 2*1024*1024/8,  1024/8, 16*1024/8, 8*1024/8, 0 };
 
 struct EEPROM {
 	UINT8	mode;		/* eeprom mode */
@@ -64,8 +64,8 @@ struct VDP vdp;
 static struct EEPROM eeprom;
 static struct RTC rtc;
 static struct SoundDMA sound_dma;
-UINT8 *ws_ram;
-UINT8 *ws_bios_bank = NULL;
+static UINT8 *ws_ram;
+static UINT8 *ws_bios_bank = NULL;
 static UINT8 wswan_bios_disabled;
 UINT8 ws_portram[256];
 static UINT8 ws_portram_init[256] =
@@ -124,7 +124,7 @@ static UINT8 ws_fake_bios_code[] = {
 	0xea, 0xc0, 0xff, 0x00, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-void wswan_handle_irqs( void ) {
+static void wswan_handle_irqs( void ) {
 	if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR ) {
 		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_HBLTMR );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_VBL ) {
@@ -146,14 +146,14 @@ void wswan_handle_irqs( void ) {
 	}
 }
 
-void wswan_set_irq_line(int irq) {
+static void wswan_set_irq_line(int irq) {
 	if ( ws_portram[0xb2] & irq ) {
 		ws_portram[0xb6] |= irq;
 		wswan_handle_irqs();
 	}
 }
 
-void wswan_clear_irq_line(int irq) {
+static void wswan_clear_irq_line(int irq) {
 	ws_portram[0xb6] &= ~irq;
 	wswan_handle_irqs();
 }
@@ -1245,7 +1245,7 @@ static const char* wswan_determine_sram( UINT8 data ) {
 
 #ifdef MAME_DEBUG
 enum enum_romsize { ROM_4M=0, ROM_8M, ROM_16M, ROM_32M, ROM_64M, ROM_128M, ROM_UNKNOWN };
-const char* wswan_romsize_str[] = {
+static const char* wswan_romsize_str[] = {
 	"4Mbit", "8Mbit", "16Mbit", "32Mbit", "64Mbit", "128Mbit", "Unknown"
 };
 

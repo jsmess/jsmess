@@ -37,7 +37,7 @@ Ports:
 #include "mslegacy.h"
 
 /* memory w/r functions */
-ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x22ff) AM_NOP
 	AM_RANGE(0x2300, 0x23ff) AM_RAM
@@ -52,7 +52,7 @@ ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* port i/o functions */
-ADDRESS_MAP_START( jupiter_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( jupiter_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x00fe, 0xfffe) AM_WRITE( jupiter_port_fe_w )
 	AM_RANGE( 0xfefe, 0xfefe) AM_READ( jupiter_port_fefe_r )
 	AM_RANGE( 0xfdfe, 0xfdfe) AM_READ( jupiter_port_fdfe_r )

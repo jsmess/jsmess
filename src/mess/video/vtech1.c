@@ -37,7 +37,7 @@ Video hardware:
  Palette Initialisation
 ******************************************************************************/
 
-UINT32 vtech1_palette_mono[16];
+static UINT32 vtech1_palette_mono[16];
 
 /* note - Juergen's colors do not match the colors in the m6847 code */
 static UINT8 vtech1_palette[] =

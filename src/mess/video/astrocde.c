@@ -18,7 +18,7 @@
 #include <math.h> /* for sin() and cos() */
 
 unsigned char *astrocade_videoram;
-int magic_expand_color, magic_control, magic_expand_flipflop, collision;
+static int magic_expand_color, magic_control, magic_expand_flipflop, collision;
 
 static int ColourSplit=0;								/* Colour System vars */
 static int Colour[8] = {0,0,0,0,0,0,0,0};

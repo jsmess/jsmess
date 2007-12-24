@@ -15,10 +15,10 @@
 #include "sound/dac.h"
 #include "cpuint.h"
 
-unsigned char *advision_ram;
-int advision_rambank;
+static unsigned char *advision_ram;
+static int advision_rambank;
 int advision_framestart;
-int advision_videoenable;
+static int advision_videoenable;
 int advision_videobank;
 static int Lvalue[3];
 static int wLpointer;

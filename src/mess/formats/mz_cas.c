@@ -326,7 +326,7 @@ static casserr_t mz700_cas_load(cassette_image *cassette)
 
 
 
-struct CassetteFormat mz700_cas_format =
+static struct CassetteFormat mz700_cas_format =
 {
 	"m12",
 	mz700_cas_identify,

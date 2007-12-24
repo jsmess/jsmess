@@ -42,7 +42,7 @@ struct _nes_input
     GLOBAL VARIABLES
 ***************************************************************************/
 
-UINT8 battery_data[BATTERY_SIZE];
+static UINT8 battery_data[BATTERY_SIZE];
 
 struct nes_struct nes;
 struct fds_struct nes_fds;

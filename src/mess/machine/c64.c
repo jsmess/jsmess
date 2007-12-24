@@ -61,7 +61,7 @@ UINT8 *c64_kernal;
 UINT8 *c64_chargen;
 UINT8 *c64_roml=0;
 UINT8 *c64_romh=0;
-UINT8 *c64_io_mirror = NULL;
+static UINT8 *c64_io_mirror = NULL;
 
 static UINT8 c64_port_data;
 
@@ -362,7 +362,7 @@ void c64_vic_interrupt (int level)
  * flag restore key or rs232 received data input
  * irq to nmi connected ?
  */
-UINT8 c64_cia1_port_a_r (void)
+static UINT8 c64_cia1_port_a_r (void)
 {
 	UINT8 value = 0xff;
 
@@ -966,7 +966,7 @@ void c64_common_init_machine (void)
 	vicirq = 0;
 }
 
-OPBASE_HANDLER( c64_opbase ) {
+static OPBASE_HANDLER( c64_opbase ) {
 	if ( ( address & 0xf000 ) == 0xd000 ) {
 		if ( c64_io_enabled ) {
 			opcode_mask = 0x0fff;

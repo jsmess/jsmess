@@ -55,7 +55,7 @@ static MACHINE_RESET( sord_m5 );
 
 static unsigned char fd5_databus;
 
-ADDRESS_MAP_START( sord_fd5_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( sord_fd5_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03fff) AM_ROM	/* internal rom */
 	AM_RANGE(0x4000, 0x0ffff) AM_RAM
 ADDRESS_MAP_END
@@ -150,14 +150,14 @@ static WRITE8_HANDLER(fd5_tc_w)
 /* 0x030 fd5 reads from this port to communicate with m5 */
 /* 0x040 */
 /* 0x050 */
-ADDRESS_MAP_START( readport_sord_fd5 , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( readport_sord_fd5 , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x000, 0x000) AM_READ( nec765_status_r)
 	AM_RANGE( 0x001, 0x001) AM_READ( nec765_data_r)
 	AM_RANGE( 0x010, 0x010) AM_READ( fd5_data_r)
 	AM_RANGE( 0x030, 0x030) AM_READ( fd5_communication_r)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( writeport_sord_fd5 , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( writeport_sord_fd5 , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x001, 0x001) AM_WRITE( nec765_data_w)
 	AM_RANGE( 0x010, 0x010) AM_WRITE( fd5_data_w)	
 	AM_RANGE( 0x020, 0x020) AM_WRITE( fd5_communication_w)
@@ -337,7 +337,7 @@ static READ8_HANDLER ( sord_keyboard_r )
 	return readinputport(offset);
 }
 
-ADDRESS_MAP_START( sord_m5_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( sord_m5_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x01fff) AM_ROM	/* internal rom */
 	AM_RANGE(0x2000, 0x06fff) AM_ROMBANK(1)
 	AM_RANGE(0x7000, 0x0ffff) AM_RAM
@@ -429,7 +429,7 @@ static WRITE8_HANDLER(sord_printer_w)
 	centronics_write_data(0,data);
 }
 
-ADDRESS_MAP_START( sord_m5_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sord_m5_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x0f)					AM_READWRITE(sord_ctc_r,			sord_ctc_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_vram_r,		TMS9928A_vram_w)
@@ -440,7 +440,7 @@ ADDRESS_MAP_START( sord_m5_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x50, 0x50)					AM_READWRITE(sord_sys_r,			sord_sys_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( srdm5fd5_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( srdm5fd5_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x0f)					AM_READWRITE(sord_ctc_r,			sord_ctc_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_vram_r,		TMS9928A_vram_w)

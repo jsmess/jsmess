@@ -243,7 +243,7 @@ enum
 	mess_hd_createopts_seclen    = 'F'
 };
 
-OPTION_GUIDE_START( mess_hd_create_optionguide )
+static OPTION_GUIDE_START( mess_hd_create_optionguide )
 	OPTION_INT(mess_hd_createopts_blocksize, "blocksize", "Sectors Per Block" )
 	OPTION_INT(mess_hd_createopts_cylinders, "cylinders", "Cylinders" )
 	OPTION_INT(mess_hd_createopts_heads, "heads",	"Heads" )

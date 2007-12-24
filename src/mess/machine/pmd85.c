@@ -773,7 +773,7 @@ static OPBASE_HANDLER(mato_opbaseoverride)
 	return address;
 }
 
-void pmd85_common_driver_init (void)
+static void pmd85_common_driver_init (void)
 {
 	memory_set_opbase_handler(0, pmd85_opbaseoverride);
 

@@ -33,17 +33,17 @@ extern int amstrad_plus_dma_1_addr;
 extern int amstrad_plus_dma_2_addr; 
 extern int amstrad_plus_dma_prescaler[3];  // DMA channel prescaler
 
-int amstrad_plus_dma_repeat[3];  // marks the location of the channels' last repeat
-int amstrad_plus_dma_pause[3];  // pause count
-int amstrad_plus_dma_loopcount[3]; // counts loops taken on this channel
+static int amstrad_plus_dma_repeat[3];  // marks the location of the channels' last repeat
+static int amstrad_plus_dma_pause[3];  // pause count
+static int amstrad_plus_dma_loopcount[3]; // counts loops taken on this channel
 
 extern unsigned char *amstrad_plus_asic_ram;
 
-int amstrad_plus_split_scanline;  // ASIC split screen 
-int amstrad_plus_split_address;
-int amstrad_screen_width;  // width in bytes
+static int amstrad_plus_split_scanline;  // ASIC split screen 
+static int amstrad_plus_split_address;
+static int amstrad_screen_width;  // width in bytes
 
-void amstrad_plus_handle_dma(void);
+static void amstrad_plus_handle_dma(void);
 
 #ifdef MAME_DEBUG
 extern int amstrad_plus_lower_enabled;
@@ -72,7 +72,7 @@ static int y_screen_offset = -32;
 /* display origin - used to align hardware sprites */
 static int display_x;
 static int display_y;
-int display_update;  // flag to get location at first DE
+static int display_update;  // flag to get location at first DE
 
 /* this contains the colours in Machine->pens form.*/
 /* this is updated from the eventlist and reflects the current state
@@ -761,7 +761,7 @@ void amstrad_vh_execute_crtc_cycles(int dummy)
 
   &6422 - &643f   Sprite palette, 12-bit, xxxxGGGGRRRRBBBB, sprite pens 1-15 (0 is always transparent)
 */
-void amstrad_plus_sprite_draw(mame_bitmap* scr_bitmap)
+static void amstrad_plus_sprite_draw(mame_bitmap* scr_bitmap)
 {
 	int spr;  // sprite number
 	int xloc,yloc;
@@ -817,7 +817,7 @@ DMA commands
 4020h 	STOP 	Stop processing the sound list.
 */
 
-void amstrad_plus_dma_parse(int channel, int *addr)
+static void amstrad_plus_dma_parse(int channel, int *addr)
 {
 	unsigned short command;
 
@@ -884,7 +884,7 @@ void amstrad_plus_dma_parse(int channel, int *addr)
 	(*addr)+=2;  // point to next DMA instruction
 }
 
-void amstrad_plus_handle_dma()
+static void amstrad_plus_handle_dma()
 {
 	if(amstrad_plus_dma_status & 0x01)  // DMA channel 0
 		amstrad_plus_dma_parse(0,&amstrad_plus_dma_0_addr);

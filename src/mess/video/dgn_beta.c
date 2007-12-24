@@ -363,7 +363,7 @@ void init_video(void)
 /**************************/
 
 /* Plot a pixel on beta text screen, takes care of doubling height and width where needed */
-void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, mame_bitmap *bitmap)
+static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, mame_bitmap *bitmap)
 {
 	int PlotX;
 	int PlotY;
@@ -500,7 +500,7 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 
 /* Plot a pixel on the graphics screen, similar to character plotter above */
 /* May merge at some point in the future, if they turn out to be sufficiently similar ! */
-void plot_gfx_pixel(int x, int y, int Dot, int Colour, mame_bitmap *bitmap)
+static void plot_gfx_pixel(int x, int y, int Dot, int Colour, mame_bitmap *bitmap)
 {
 	int	DoubleX		= (~GCtrl & GCtrlHiLo) ? 1 : 0;
 	int	DoubleY		= (~m6845_get_register(INTERLACE) & 0x03) ? 1 : 0;

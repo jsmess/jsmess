@@ -38,7 +38,7 @@ typedef struct cylinder
 	int writable;
 } cylinder;
 
-cylinder apexc_cylinder;
+static cylinder apexc_cylinder;
 
 /*
 	Open cylinder image and read RAM
@@ -146,7 +146,7 @@ typedef struct tape
 	mess_image *fd;
 } tape;
 
-tape apexc_tapes[2];
+static tape apexc_tapes[2];
 
 
 

@@ -38,7 +38,7 @@ static struct
 tape;
 
 /* these are the values for wav files */
-struct
+static struct
 {
 	int state;
 	emu_timer *timer;
@@ -48,7 +48,7 @@ struct
 } wav;
 
 /* these are the values for prg files */
-struct
+static struct
 {
 	int state;
 	emu_timer *prg_timer;

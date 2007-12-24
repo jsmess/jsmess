@@ -308,7 +308,7 @@ static PALETTE_INIT( tx0 )
 }
 
 
-tx0_reset_param_t tx0_reset_param =
+static tx0_reset_param_t tx0_reset_param =
 {
 	{
 		tx0_io_cpy,

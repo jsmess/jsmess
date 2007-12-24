@@ -114,7 +114,7 @@ static casserr_t vtech1_cas_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &vtech1_legacy_fill_wave);
 }
 
-struct CassetteFormat vtech1_cas_format =
+static struct CassetteFormat vtech1_cas_format =
 {
 	"cas",
 	vtech1_cas_identify,
@@ -209,7 +209,7 @@ static casserr_t vtech2_cas_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &vtech2_legacy_fill_wave);
 }
 
-struct CassetteFormat vtech2_cas_format =
+static struct CassetteFormat vtech2_cas_format =
 {
 	"cas",
 	vtech2_cas_identify,

@@ -477,14 +477,14 @@ static casserr_t tap_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &tap_legacy_fill_wave );
 }
 
-struct CassetteFormat tzx_cassette_format = {
+static struct CassetteFormat tzx_cassette_format = {
 	"tzx",
 	tzx_cassette_identify,
 	tzx_cassette_load,
 	NULL
 };
 
-struct CassetteFormat tap_cassette_format = {
+static struct CassetteFormat tap_cassette_format = {
 	"tap",
 	tap_cassette_identify,
 	tap_cassette_load,

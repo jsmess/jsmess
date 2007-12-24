@@ -176,7 +176,7 @@ static casserr_t fmsx_cas_load(cassette_image *cassette)
 
 
 
-struct CassetteFormat fmsx_cas_format =
+static struct CassetteFormat fmsx_cas_format =
 {
 	"tap",
 	fmsx_cas_identify,

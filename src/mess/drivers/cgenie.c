@@ -243,7 +243,7 @@ static INPUT_PORTS_START( cgenie )
 	PORT_BIT(0x80, 0x00, IPT_UNKNOWN) PORT_NAME("Joy 2 [*]") PORT_CODE(JOYCODE_BUTTON1)
 INPUT_PORTS_END
 
-gfx_layout cgenie_charlayout =
+static gfx_layout cgenie_charlayout =
 {
 	8,8,		   /* 8*8 characters */
 	384,		   /* 256 fixed + 128 defineable characters */

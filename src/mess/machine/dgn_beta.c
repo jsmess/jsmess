@@ -138,7 +138,7 @@ static int DMA_NMI_LAST;
 #define INVALID_KEYROW	-1			/* no ketrow selected */
 #define NO_KEY_PRESSED	0x7F			/* retrurned by hardware if no key pressed */
 
-int SelectedKeyrow(int	Rows);
+static int SelectedKeyrow(int	Rows);
 
 int dgnbeta_font=0;
 
@@ -209,7 +209,7 @@ static int	EnableMapRegs;			/* Should we use map registers, or just map normal *
 static struct PageReg	PageRegs[MaxTasks+1][MaxPage+1];	/* 16 sets of 16 page regs, allowing for 16 seperate contexts */
 						/* Task 17 is power on default, when banking not enabled */
 
-int IsIOPage(int	Page)
+static int IsIOPage(int	Page)
 {
 	if ((Page==IOPage) || (Page==IOPage+1))
 		return 1;
@@ -479,7 +479,7 @@ than using a walking zero as the OS-9 driver does. This meant that SelectKeyrow
 never moved past the first row, by scanning for the last active row
 the beta_test rom works, and it does not break the OS-9 driver :)
 */
-int SelectedKeyrow(int	Rows)
+static int SelectedKeyrow(int	Rows)
 {
 	int	Idx;
 	int	Row;	/* Row selected */
@@ -507,7 +507,7 @@ int SelectedKeyrow(int	Rows)
 
 /* GetKeyRow, returns the value of a keyrow, checking for invalid rows */
 /* and returning no key pressed if row is invalid */
-int GetKeyRow(int RowNo)
+static int GetKeyRow(int RowNo)
 {
 	if(RowNo==INVALID_KEYROW)
 	{
@@ -1023,7 +1023,7 @@ WRITE8_HANDLER(dgnbeta_wd2797_w)
 /* Scan physical keyboard into Keyboard array */
 /* gonna try and sync this more closely with hardware as keyboard being scanned */
 /* on *EVERY* vblank ! */
-void ScanInKeyboard(void)
+static void ScanInKeyboard(void)
 {
 #if 0
 	int	Idx;

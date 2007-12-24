@@ -603,7 +603,7 @@ static struct mips3_config config =
 	32768	/* data cache size */
 };
 
-MACHINE_DRIVER_START( ip204415 )
+static MACHINE_DRIVER_START( ip204415 )
 	MDRV_CPU_ADD_TAG( "main", R4600BE, 50000000*3 )
 	MDRV_CPU_CONFIG( config )
 	MDRV_CPU_PROGRAM_MAP( ip204415_map, 0 )

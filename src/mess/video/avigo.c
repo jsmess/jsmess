@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 /* backdrop */
-struct artwork_info *avigo_backdrop;
+//struct artwork_info *avigo_backdrop;
 
 /* mem size = 0x017c0 */
 
@@ -191,8 +191,8 @@ PALETTE_INIT( avigo )
 	}
 #endif
 }
-unsigned int avigo_ad_x;
-unsigned int avigo_ad_y;
+static unsigned int avigo_ad_x;
+static unsigned int avigo_ad_y;
 
 
 

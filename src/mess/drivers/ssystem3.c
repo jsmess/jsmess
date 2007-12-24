@@ -41,7 +41,7 @@ internal expansion/cartridge port
 
  */
 
-struct via6522_interface config=
+static struct via6522_interface config=
 {
 	0,//read8_handler in_a_func;
 	0,//read8_handler in_b_func;

@@ -44,7 +44,7 @@ struct pc_fdc
 	int int_state;
 
 	struct pc_fdc_interface fdc_interface;
-} pc_fdc;
+};
 
 static struct pc_fdc *fdc;
 

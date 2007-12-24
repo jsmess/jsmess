@@ -13,7 +13,7 @@
 #include "devices/cassette.h"
 
 ULA ula;
-emu_timer *electron_tape_timer;
+static emu_timer *electron_tape_timer;
 
 static mess_image *cassette_device_image( void ) {
 	return image_from_devtype_and_index( IO_CASSETTE, 0 );
@@ -94,7 +94,7 @@ static TIMER_CALLBACK(electron_tape_timer_handler)
 	}
 }
 
-READ8_HANDLER( electron_read_keyboard ) {
+static READ8_HANDLER( electron_read_keyboard ) {
 	UINT8 data = 0;
 	int i;
 	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );

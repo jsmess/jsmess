@@ -543,7 +543,7 @@ static int apple35_get_tracks_per_disk(floppy_image *floppy)
 
 
 
-UINT32 apple35_get_track_size(floppy_image *floppy, int head, int track)
+static UINT32 apple35_get_track_size(floppy_image *floppy, int head, int track)
 {
 	if ((track < 0) || (track >= 80))
 		return 0;

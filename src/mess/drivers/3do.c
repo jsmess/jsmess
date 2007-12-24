@@ -106,8 +106,8 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #define X2_CLOCK_NTSC	49090000
 #define X601_CLOCK		16934400
 
-UINT32	*dram;
-UINT32	*vram;
+static UINT32	*dram;
+static UINT32	*vram;
 
 static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK(1) AM_BASE(&dram)					/* DRAM */
@@ -123,7 +123,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( 3do )
 INPUT_PORTS_END
 
-MACHINE_RESET( 3do )
+static MACHINE_RESET( 3do )
 {
 	memory_set_bankptr(2,memory_region(REGION_USER1));
 	

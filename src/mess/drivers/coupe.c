@@ -34,7 +34,7 @@ Changes:
 #include "sound/saa1099.h"
 #include "sound/speaker.h"
 
-ADDRESS_MAP_START( coupe_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( coupe_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x3FFF) AM_RAMBANK(1)
 	AM_RANGE( 0x4000, 0x7FFF) AM_RAMBANK(2)
 	AM_RANGE( 0x8000, 0xBFFF) AM_RAMBANK(3)
@@ -262,7 +262,7 @@ static WRITE8_HANDLER( coupe_port_w )
 	}
 }
 
-ADDRESS_MAP_START( coupe_io , ADDRESS_SPACE_IO, 8)	
+static ADDRESS_MAP_START( coupe_io , ADDRESS_SPACE_IO, 8)	
 	AM_RANGE( 0x0000, 0x0ffff) AM_READWRITE( coupe_port_r, coupe_port_w )
 ADDRESS_MAP_END
 

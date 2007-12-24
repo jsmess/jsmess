@@ -182,7 +182,7 @@ READ8_HANDLER( gb_sound_r )
 	}
 }
 
-void gb_sound_w_internal(int offset, UINT8 data ) {
+static void gb_sound_w_internal(int offset, UINT8 data ) {
 	/* Store the value */
 	snd_regs[offset] = data;
 

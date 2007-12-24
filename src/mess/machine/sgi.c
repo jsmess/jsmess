@@ -24,7 +24,7 @@ INLINE void verboselog( int n_level, const char *s_fmt, ... )
 	}
 }
 
-void *tMC_UpdateTimer;
+static void *tMC_UpdateTimer;
 static UINT32 nMC_CPUControl0;
 static UINT32 nMC_CPUControl1;
 static UINT32 nMC_Watchdog;

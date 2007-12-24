@@ -12,7 +12,7 @@
 #include "uimess.h"
 #include "input.h"
 
-int mess_pause_for_ui = 0;
+//int mess_pause_for_ui = 0;
 static int ui_active = 0;
 
 int mess_ui_active(void)

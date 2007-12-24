@@ -71,7 +71,7 @@ static WRITE8_HANDLER(apf_m1000_pia_out_a_func)
 {
 }
 
-unsigned char previous_mode;
+static unsigned char previous_mode;
 
 static WRITE8_HANDLER(apf_m1000_pia_out_b_func)
 {

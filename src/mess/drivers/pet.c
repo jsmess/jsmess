@@ -471,7 +471,7 @@ static INPUT_PORTS_START (superpet)
 	PORT_DIPSETTING(  1, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-unsigned char pet_palette[] =
+static unsigned char pet_palette[] =
 {
 	0,0,0, /* black */
 	0,0x80,0, /* green */

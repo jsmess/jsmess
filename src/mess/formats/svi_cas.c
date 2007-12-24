@@ -191,7 +191,7 @@ static casserr_t svi_cas_load(cassette_image *cassette)
 
 
 
-struct CassetteFormat svi_cas_format =
+static struct CassetteFormat svi_cas_format =
 {
 	"cas",
 	svi_cas_identify,

@@ -790,7 +790,7 @@ static void sf7000_printer_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-DEVICE_LOAD( sf7000_floppy )
+static DEVICE_LOAD( sf7000_floppy )
 {
 	if (image_has_been_created(image))
 		return INIT_FAIL;
@@ -821,7 +821,7 @@ static void sf7000_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-DEVICE_LOAD( sf7000_serial )
+static DEVICE_LOAD( sf7000_serial )
 {
 	/* filename specified */
 	if (serial_device_load(image)==INIT_PASS)

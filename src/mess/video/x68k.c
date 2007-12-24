@@ -42,25 +42,25 @@ UINT16* tvram;  // Text VRAM
 UINT16* x68k_spriteram;  // sprite/background RAM
 UINT16* x68k_spritereg;  // sprite/background registers
 
-mame_bitmap* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
-mame_bitmap* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
-mame_bitmap* x68k_gfx_1_bitmap_16; 
-mame_bitmap* x68k_gfx_2_bitmap_16; 
-mame_bitmap* x68k_gfx_3_bitmap_16; 
-mame_bitmap* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
-mame_bitmap* x68k_gfx_1_bitmap_256; 
-mame_bitmap* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
+static mame_bitmap* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
+static mame_bitmap* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
+static mame_bitmap* x68k_gfx_1_bitmap_16; 
+static mame_bitmap* x68k_gfx_2_bitmap_16; 
+static mame_bitmap* x68k_gfx_3_bitmap_16; 
+static mame_bitmap* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
+static mame_bitmap* x68k_gfx_1_bitmap_256; 
+static mame_bitmap* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
 
-tilemap* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
-tilemap* x68k_bg1_8;
-tilemap* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
-tilemap* x68k_bg1_16;
+static tilemap* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
+static tilemap* x68k_bg1_8;
+static tilemap* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
+static tilemap* x68k_bg1_16;
 
 extern unsigned int x68k_scanline;
-int sprite_shift;
+static int sprite_shift;
 
-void x68k_render_video_word(int offset);
-void x68k_crtc_refresh_mode(void);
+static void x68k_render_video_word(int offset);
+static void x68k_crtc_refresh_mode(void);
 void x68k_scanline_check(int);
 
 INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
@@ -68,7 +68,7 @@ INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-mame_bitmap* x68k_get_gfx_pri(int pri,int type)
+static mame_bitmap* x68k_get_gfx_pri(int pri,int type)
 {
 	if(type == GFX16)
 	{
@@ -106,7 +106,7 @@ mame_bitmap* x68k_get_gfx_pri(int pri,int type)
 	return NULL;  // should never reach here either.
 }
 
-void x68k_crtc_text_copy(int src, int dest)
+static void x68k_crtc_text_copy(int src, int dest)
 {
 	// copys one raster in T-VRAM to another raster
 	int src_ram = src * 256;  // 128 bytes per scanline
@@ -141,7 +141,7 @@ static TIMER_CALLBACK(x68k_crtc_operation_end)
 	sys.crtc.operation &= ~bit;
 }
 
-void x68k_crtc_refresh_mode()
+static void x68k_crtc_refresh_mode()
 {
 //	rectangle rect;
 //	double scantime;
@@ -260,7 +260,7 @@ TIMER_CALLBACK(x68k_hsync)
 	}
 }
 
-TIMER_CALLBACK(x68k_crtc_raster_end)
+static TIMER_CALLBACK(x68k_crtc_raster_end)
 {
 	sys.mfp.gpio |= 0x40;
 }
@@ -513,7 +513,7 @@ READ16_HANDLER( x68k_crtc_r )
 	return 0xffff;
 }
 
-int x68k_get_text_pixel(int offset, int bit)
+static int x68k_get_text_pixel(int offset, int bit)
 {
 	int ret = 0;
 
@@ -532,7 +532,7 @@ int x68k_get_text_pixel(int offset, int bit)
 	return ret;
 }
 
-void x68k_render_video_word(int offset)
+static void x68k_render_video_word(int offset)
 {
 	int x,y;
 	int l;
@@ -700,7 +700,7 @@ READ16_HANDLER( x68k_spriteram_r )
 {
 	return x68k_spriteram[offset];
 }
-void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
+static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 {
 	int priority;
 	rectangle rect;
@@ -801,7 +801,7 @@ void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-void x68k_draw_sprites(mame_bitmap* bitmap, int priority, rectangle cliprect)
+static void x68k_draw_sprites(mame_bitmap* bitmap, int priority, rectangle cliprect)
 {
 	/*
 	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)

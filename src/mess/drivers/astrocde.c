@@ -49,13 +49,13 @@ static WRITE8_HANDLER( astrocade_soundblock1_w )
 	astrocade_sound1_w(offset + 0x18, data);
 }
 
-ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(MRA8_ROM, astrocade_magicram_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(MRA8_RAM, astrocade_videoram_w) AM_BASE(&astrocade_videoram) AM_SIZE(&videoram_size) /* ASG */
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_WRITE(astrocade_colour_register_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_READWRITE(astrocade_intercept_r, astrocade_mode_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_WRITE(astrocade_colour_split_w)

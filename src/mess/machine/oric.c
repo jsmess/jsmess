@@ -452,7 +452,7 @@ CB2
 
 */
 
-struct via6522_interface oric_6522_interface=
+static struct via6522_interface oric_6522_interface=
 {
 	oric_via_in_a_func,
 	oric_via_in_b_func,
@@ -1433,7 +1433,7 @@ static void	telestrat_via2_irq_func(int state)
 
     oric_refresh_ints();
 }
-struct via6522_interface telestrat_via2_interface=
+static struct via6522_interface telestrat_via2_interface=
 {
 	telestrat_via2_in_a_func,
 	telestrat_via2_in_b_func,

@@ -64,7 +64,7 @@ These are yet to be implemented.
 
 */
 
-unsigned char dgnbeta_palette[] =
+static unsigned char dgnbeta_palette[] =
 {
 	/*normal brightness */
 	0x00,0x00,0x00, 	/* black */

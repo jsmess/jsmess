@@ -153,7 +153,7 @@ static casserr_t a26_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &a26_legacy_fill_wave );
 }
 
-struct CassetteFormat a26_cassette_format = {
+static struct CassetteFormat a26_cassette_format = {
 	"a26",
 	a26_cassette_identify,
 	a26_cassette_load,

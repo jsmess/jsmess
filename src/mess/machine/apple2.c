@@ -1091,7 +1091,7 @@ WRITE8_HANDLER ( apple2_c07x_w )
   apple2_c08x_r
 ***************************************************************************/
 
-READ8_HANDLER ( apple2_c08x_r )
+static READ8_HANDLER ( apple2_c08x_r )
 {
 	UINT32 val, mask;
 
@@ -1127,7 +1127,7 @@ READ8_HANDLER ( apple2_c08x_r )
   apple2_c08x_w
 ***************************************************************************/
 
-WRITE8_HANDLER ( apple2_c08x_w )
+static WRITE8_HANDLER ( apple2_c08x_w )
 {
 	apple2_c08x_r(offset);
 }

@@ -395,7 +395,7 @@ static struct SN76477interface sn76477_interface =
 
 /* Interrupt Generators */
 
-INTERRUPT_GEN( abc80_nmi_interrupt )
+static INTERRUPT_GEN( abc80_nmi_interrupt )
 {
 	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 }

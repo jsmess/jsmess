@@ -4,12 +4,14 @@
 
 #define Y_PIXELS 200
 
-int scanline;
-unsigned int base_address;
+static int scanline;
+static unsigned int base_address;
 
+#ifdef UNUSED_FUNCTION
 void gamecom_video_init( void ) {
 	scanline = 0;
 }
+#endif
 
 INTERRUPT_GEN( gamecom_scanline ) {
 	// draw line

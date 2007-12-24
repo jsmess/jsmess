@@ -222,6 +222,7 @@ static INPUT_PORTS_START( famicom )
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Change Disk Side")
 INPUT_PORTS_END
 
+#ifdef UNUSED_FUNCTION
 /* This layout is not changed at runtime */
 gfx_layout nes_vram_charlayout =
 {
@@ -233,6 +234,7 @@ gfx_layout nes_vram_charlayout =
     { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
     16*8    /* every char takes 16 consecutive bytes */
 };
+#endif
 
 static struct NESinterface nes_interface =
 {

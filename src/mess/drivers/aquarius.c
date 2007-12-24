@@ -34,7 +34,7 @@ Aquarius Memory map
 
 /* port i/o functions */
 
-ADDRESS_MAP_START( aquarius_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( aquarius_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0xfc, 0xfc) AM_WRITE( aquarius_port_fc_w)
 	AM_RANGE(0xfe, 0xfe) AM_READWRITE( aquarius_port_fe_r, aquarius_port_fe_w)
@@ -43,7 +43,7 @@ ADDRESS_MAP_END
 
 /* Memory w/r functions */
 
-ADDRESS_MAP_START( aquarius_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( aquarius_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_NOP
 	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(videoram_r, aquarius_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)

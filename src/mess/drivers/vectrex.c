@@ -16,7 +16,7 @@ Bruce Tomlin (hardware info)
 #include "devices/cartslot.h"
 #include "sound/ay8910.h"
 
-ADDRESS_MAP_START( vectrex_map , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( vectrex_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
 	AM_RANGE( 0xc800, 0xcbff) AM_RAM AM_MIRROR( 0x0400 ) AM_BASE(&vectrex_ram_base) AM_SIZE(&vectrex_ram_size)
 	AM_RANGE( 0xd000, 0xd7ff) AM_READWRITE( via_0_r, via_0_w )
@@ -183,7 +183,7 @@ ROM_END
 
 *****************************************************************/
 
-ADDRESS_MAP_START( raaspec_map , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( raaspec_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
 	AM_RANGE( 0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE( 0xa000, 0xa000) AM_WRITE( raaspec_led_w )

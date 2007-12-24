@@ -63,7 +63,7 @@ static const char * StatusString(int iStatus);
 #define SAMPLES_NOT_USED    3
 #define MAX_AUDITBOX_TEXT	0x7FFFFFFE
 
-HWND hAudit;
+static HWND hAudit;
 static int rom_index;
 static int roms_correct;
 static int roms_incorrect;

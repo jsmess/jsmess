@@ -134,7 +134,7 @@ static casserr_t lviv_lvt_load(cassette_image *cassette)
 
 
 
-struct CassetteFormat lviv_lvt_image_format =
+static struct CassetteFormat lviv_lvt_image_format =
 {
 	"lvt",
 	lviv_lvt_identify,

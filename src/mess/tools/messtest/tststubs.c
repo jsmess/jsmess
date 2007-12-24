@@ -10,6 +10,7 @@
 #include "debug/debugcpu.h"
 #endif /* MAME_DEBUG */
 
+#ifdef UNUSED_FUNCTION
 int osd_create_display(const osd_create_params *params, UINT32 *rgb_components)
 {
 	rgb_components[0] = 0xff0000;
@@ -31,11 +32,13 @@ mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
 {
 	return NULL;
 }
+#endif
 
 void osd_set_mastervolume(int attenuation)
 {
 }
 
+#ifdef UNUSED_FUNCTION
 int osd_get_mastervolume(void)
 {
 	return 0;
@@ -94,20 +97,24 @@ void osd_lightgun_read(int player, int *deltax, int *deltay)
 void osd_trak_read(int player, int *deltax, int *deltay)
 {
 }
+#endif
 
 void osd_customize_inputport_list(input_port_default_entry *defaults)
 {
 }
 
+#ifdef UNUSED_FUNCTION
 void osd_logerror(const char *text)
 {
 }
+#endif
 
 int osd_keyboard_disabled(void)
 {
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 void osd_begin_final_unloading(void)
 {
 }
@@ -115,6 +122,7 @@ void osd_begin_final_unloading(void)
 void osd_image_load_status_changed(mess_image *img, int is_final_unload)
 {
 }
+#endif
 
 #ifdef MAME_DEBUG
 void osd_wait_for_debugger(void)
@@ -123,18 +131,22 @@ void osd_wait_for_debugger(void)
 }
 #endif // MAME_DEBUG
 
+#ifdef UNUSED_FUNCTION
 int win_mess_config_init(void)
 {
 	return 0;
 }
+#endif
 
 void osd_break_into_debugger(const char *message)
 {
 }
 
+#ifdef UNUSED_FUNCTION
 void win_mess_options_init(void)
 {
 }
+#endif
 
 //============================================================
 //	osd_alloc_executable
@@ -191,6 +203,8 @@ void osd_mess_options_init(core_options *options)
 }
 
 
+#ifdef UNUSED_FUNCTION
 void osd_mess_config_init(running_machine *machine)
 {
 }
+#endif

@@ -14,7 +14,7 @@ typedef struct {
 } msx_slot_layout;
 
 #define MSX_LAYOUT_INIT(msx) \
-msx_slot_layout msx_slot_layout_##msx[] = { 
+static const msx_slot_layout msx_slot_layout_##msx[] = { 
 
 #define MSX_LAYOUT_SLOT(prim, sec, page, extend, type, size, option) \
 	{								\
@@ -220,7 +220,7 @@ const msx_slot msx_slot_list[] = {
 
 typedef struct {
 	char name[9];
-	msx_slot_layout *layout;
+	const msx_slot_layout *layout;
 } msx_driver_struct;
 
 extern const msx_driver_struct msx_driver_list[];

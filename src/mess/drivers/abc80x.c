@@ -659,7 +659,7 @@ static MACHINE_START( abc800 )
 	z80dart_init(0, &abc800_dart_intf);
 }
 
-INTERRUPT_GEN( abc802_vblank_interrupt )
+static INTERRUPT_GEN( abc802_vblank_interrupt )
 {
 	z80dart_set_ri(0, 0);
 	z80dart_set_ri(0, 1);
@@ -942,7 +942,7 @@ static void abc800_printer_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-DEVICE_LOAD( abc800_serial )
+static DEVICE_LOAD( abc800_serial )
 {
 	/* filename specified */
 	if (serial_device_load(image)==INIT_PASS)

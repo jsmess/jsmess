@@ -109,7 +109,7 @@
 #include "machine/intelfsh.h"
 
 // interrupt counter
-unsigned long pcw16_interrupt_counter;
+static unsigned long pcw16_interrupt_counter;
 // video control
 extern int pcw16_video_control;
 /* controls which bank of 2mb address space is paged into memory */
@@ -527,8 +527,8 @@ static WRITE8_HANDLER(pcw16_video_control_w)
 
 /* PCW16 KEYBOARD */
 
-unsigned char pcw16_keyboard_status;
-unsigned char pcw16_keyboard_data_shift;
+//unsigned char pcw16_keyboard_status;
+static unsigned char pcw16_keyboard_data_shift;
 
 
 

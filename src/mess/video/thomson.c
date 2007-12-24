@@ -787,7 +787,7 @@ END_UPDATE
 #define FUN(x) { x##_scandraw_8, x##_scandraw_16 }
 
 
-const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] = 
+static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] = 
 {
 	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),  
 	FUN(bitmap16), FUN(page1),  FUN(page2),   FUN(overlay),     FUN(overlay3),
@@ -799,7 +799,7 @@ const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 /* called at the start of each scanline in the active area, just after
    left border (-1<=y<199), and also after the last scanline (y=199)
 */
-TIMER_CALLBACK( thom_scanline_start )
+static TIMER_CALLBACK( thom_scanline_start )
 {
 	int y = param;
 

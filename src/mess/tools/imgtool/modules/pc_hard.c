@@ -53,7 +53,7 @@
 
 #define FAT_SECLEN	512
 
-OPTION_GUIDE_START( pc_chd_create_optionguide )
+static OPTION_GUIDE_START( pc_chd_create_optionguide )
 	OPTION_INT('T', "cylinders",	"Cylinders" )
 	OPTION_INT('H', "heads",		"Heads" )
 	OPTION_INT('S', "sectors",		"Sectors" )

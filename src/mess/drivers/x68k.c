@@ -144,15 +144,15 @@ struct x68k_system sys;
 
 extern UINT16* gvram;  // Graphic VRAM
 extern UINT16* tvram;  // Text VRAM
-UINT16* sram;   // SRAM
+static UINT16* sram;   // SRAM
 extern UINT16* x68k_spriteram;  // sprite/background RAM
 extern UINT16* x68k_spritereg;  // sprite/background registers
-UINT8 ppi_port[3];
-int current_vector[8];
-UINT8 current_irq_line;
-unsigned int x68k_scanline;
+static UINT8 ppi_port[3];
+static int current_vector[8];
+static UINT8 current_irq_line;
+static unsigned int x68k_scanline;
 
-UINT8 mfp_key;
+static UINT8 mfp_key;
 
 extern mame_bitmap* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
 extern mame_bitmap* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
@@ -168,13 +168,13 @@ extern tilemap* x68k_bg1_8;
 extern tilemap* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
 extern tilemap* x68k_bg1_16;
 
-emu_timer* kb_timer;
+static emu_timer* kb_timer;
 //emu_timer* mfp_timer[4];
 //emu_timer* mfp_irq;
 emu_timer* scanline_timer;
 emu_timer* raster_irq;
 emu_timer* vblank_irq;
-emu_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
+static emu_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
 
 // MFP is clocked at 4MHz, so at /4 prescaler the timer is triggered after 1us (4 cycles)
 // No longer necessary with the new MFP core
@@ -195,10 +195,10 @@ emu_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
 	}
 }*/
 
-void mfp_init(void);
+static void mfp_init(void);
 //static TIMER_CALLBACK(mfp_update_irq);
 
-void mfp_init()
+static void mfp_init()
 {
 	sys.mfp.tadr = sys.mfp.tbdr = sys.mfp.tcdr = sys.mfp.tddr = 0xff;
 
@@ -343,17 +343,17 @@ void mfp_set_timer(int timer, unsigned char data)
 */
 
 // 4 channel DMA controller (Hitachi HD63450)
-WRITE16_HANDLER( x68k_dmac_w )
+static WRITE16_HANDLER( x68k_dmac_w )
 {
 	hd63450_w(offset, data, mem_mask);
 }
 
-READ16_HANDLER( x68k_dmac_r )
+static READ16_HANDLER( x68k_dmac_r )
 {
 	return hd63450_r(offset, mem_mask);
 }
 
-void x68k_keyboard_ctrl_w(int data)
+static void x68k_keyboard_ctrl_w(int data)
 {
 	/* Keyboard control commands:
        00xxxxxx - TV Control
@@ -418,6 +418,7 @@ void x68k_keyboard_ctrl_w(int data)
 
 }
 
+#ifdef UNUSED_FUNCTION
 int x68k_keyboard_pop_scancode(void)
 {
 	int ret;
@@ -432,8 +433,9 @@ int x68k_keyboard_pop_scancode(void)
 	logerror("MFP: Keyboard buffer pop 0x%02x\n",ret);
 	return ret;
 }
+#endif
 
-void x68k_keyboard_push_scancode(unsigned char code)
+static void x68k_keyboard_push_scancode(unsigned char code)
 {
 	sys.keyboard.keynum++;
 	if(sys.keyboard.keynum >= 1)
@@ -501,6 +503,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 }
 
 
+#ifdef UNUSED_FUNCTION
 void mfp_recv_data(int data)
 {
 	sys.mfp.rsr |= 0x80;  // Buffer full
@@ -510,11 +513,12 @@ void mfp_recv_data(int data)
 //	mfp_trigger_irq(MFP_IRQ_RX_FULL);
 //	logerror("MFP: Receive buffer full IRQ sent\n");
 }
+#endif
 
 // mouse input
 // port B of the Z8530 SCC
 // typically read from the SCC data port on receive buffer full interrupt per byte
-int x68k_read_mouse(void)
+static int x68k_read_mouse(void)
 {
 	char val = 0;
 	char ipt = 0;
@@ -554,7 +558,7 @@ int x68k_read_mouse(void)
 	0xe98005 - Z8530 command port A
 	0xe98007 - Z8530 data port A  (RS232)
 */
-READ16_HANDLER( x68k_scc_r )
+static READ16_HANDLER( x68k_scc_r )
 {
 	offset %= 4;
 	switch(offset)
@@ -572,7 +576,7 @@ READ16_HANDLER( x68k_scc_r )
 	}
 }
 
-WRITE16_HANDLER( x68k_scc_w )
+static WRITE16_HANDLER( x68k_scc_w )
 {
 	static unsigned char prev;
 	offset %= 4;
@@ -630,7 +634,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
-READ8_HANDLER( ppi_port_a_r )
+static READ8_HANDLER( ppi_port_a_r )
 {
 	// Joystick 1
 	if(sys.joy.joy1_enable == 0)
@@ -639,7 +643,7 @@ READ8_HANDLER( ppi_port_a_r )
 		return 0xff;
 }
 
-READ8_HANDLER( ppi_port_b_r )
+static READ8_HANDLER( ppi_port_b_r )
 {
 	// Joystick 2
 	if(sys.joy.joy2_enable == 0)
@@ -648,11 +652,12 @@ READ8_HANDLER( ppi_port_b_r )
 		return 0xff;
 }
 
-READ8_HANDLER( ppi_port_c_r )
+static READ8_HANDLER( ppi_port_c_r )
 {
 	return ppi_port[2];
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( ppi_port_a_w )
 {
 	ppi_port[0] = data;
@@ -662,8 +667,9 @@ WRITE8_HANDLER( ppi_port_b_w )
 {
 	ppi_port[1] = data;
 }
+#endif
 
-WRITE8_HANDLER( ppi_port_c_w )
+static WRITE8_HANDLER( ppi_port_c_w )
 {
 	// ADPCM / Joystick control
 	ppi_port[2] = data;
@@ -678,7 +684,7 @@ WRITE8_HANDLER( ppi_port_c_w )
 
 
 // NEC uPD72065 at 0xe94000
-WRITE16_HANDLER( x68k_fdc_w )
+static WRITE16_HANDLER( x68k_fdc_w )
 {
 	unsigned int drive, x;
 	switch(offset)
@@ -721,7 +727,7 @@ WRITE16_HANDLER( x68k_fdc_w )
 	}
 }
 
-READ16_HANDLER( x68k_fdc_r )
+static READ16_HANDLER( x68k_fdc_r )
 {
 	unsigned int ret;
 	int x;
@@ -757,7 +763,7 @@ READ16_HANDLER( x68k_fdc_r )
 	}
 }
 
-void fdc_irq(int state)
+static void fdc_irq(int state)
 {
 	if((sys.ioc.irqstatus & 0x04) && state == ASSERT_LINE)
 	{
@@ -769,7 +775,7 @@ void fdc_irq(int state)
 	}
 }
 
-int x68k_fdc_read_byte(int addr)
+static int x68k_fdc_read_byte(int addr)
 {
 	int data = -1;
 
@@ -779,23 +785,23 @@ int x68k_fdc_read_byte(int addr)
 	return data;
 }
 
-void x68k_fdc_write_byte(int addr, int data)
+static void x68k_fdc_write_byte(int addr, int data)
 {
 	nec765_dack_w(0,data);
 }
 
-void fdc_drq(int state, int read_write)
+static void fdc_drq(int state, int read_write)
 {
 	sys.fdc.drq_state = state;
 }
 
-WRITE16_HANDLER( x68k_hdc_w )
+static WRITE16_HANDLER( x68k_hdc_w )
 {
 	// SASI HDC - HDDs are not a required system component, so this is something to be done later
 	logerror("SASI: write to HDC, offset %04x, data %04x\n",offset,data);
 }
 
-READ16_HANDLER( x68k_hdc_r )
+static READ16_HANDLER( x68k_hdc_r )
 {
 	logerror("SASI: [%08x] read from HDC, offset %04x\n",activecpu_get_pc(),offset);
 	switch(offset)
@@ -807,7 +813,7 @@ READ16_HANDLER( x68k_hdc_r )
 	}
 }
 
-WRITE16_HANDLER( x68k_fm_w )
+static WRITE16_HANDLER( x68k_fm_w )
 {
 	switch(offset)
 	{
@@ -822,7 +828,7 @@ WRITE16_HANDLER( x68k_fm_w )
 	}
 }
 
-READ16_HANDLER( x68k_fm_r )
+static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
 		return YM2151_status_port_0_r(0);
@@ -830,7 +836,7 @@ READ16_HANDLER( x68k_fm_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER( x68k_ct_w )
+static WRITE8_HANDLER( x68k_ct_w )
 {
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -839,7 +845,7 @@ WRITE8_HANDLER( x68k_ct_w )
 }
 
 
-WRITE16_HANDLER( x68k_ioc_w )
+static WRITE16_HANDLER( x68k_ioc_w )
 {
 	switch(offset)
 	{
@@ -871,7 +877,7 @@ WRITE16_HANDLER( x68k_ioc_w )
 	}
 }
 
-READ16_HANDLER( x68k_ioc_r )
+static READ16_HANDLER( x68k_ioc_r )
 {
 	switch(offset)
 	{
@@ -883,7 +889,7 @@ READ16_HANDLER( x68k_ioc_r )
 	}
 }
 
-WRITE16_HANDLER( x68k_sysport_w )
+static WRITE16_HANDLER( x68k_sysport_w )
 {
 	render_container* container;
 	switch(offset)
@@ -908,7 +914,7 @@ WRITE16_HANDLER( x68k_sysport_w )
 	}
 }
 
-READ16_HANDLER( x68k_sysport_r )
+static READ16_HANDLER( x68k_sysport_r )
 {
 	int ret = 0;
 	switch(offset)
@@ -991,7 +997,7 @@ READ16_HANDLER( x68k_mfp_r )
 	}
 }
 */
-WRITE16_HANDLER( x68k_mfp_w )
+static WRITE16_HANDLER( x68k_mfp_w )
 {
 	/* For the Interrupt registers, the bits are set out as such:
 	   Reg A - bit 7: GPIP7 (HSync)
@@ -1119,27 +1125,27 @@ WRITE16_HANDLER( x68k_mfp_w )
 }
 
 
-WRITE16_HANDLER( x68k_ppi_w )
+static WRITE16_HANDLER( x68k_ppi_w )
 {
 	ppi8255_w(0,offset & 0x03,data);
 }
 
-READ16_HANDLER( x68k_ppi_r )
+static READ16_HANDLER( x68k_ppi_r )
 {
 	return ppi8255_r(0,offset & 0x03);
 }
 
-READ16_HANDLER( x68k_rtc_r )
+static READ16_HANDLER( x68k_rtc_r )
 {
 	return rp5c15_r(offset,mem_mask);
 }
 
-WRITE16_HANDLER( x68k_rtc_w )
+static WRITE16_HANDLER( x68k_rtc_w )
 {
 	rp5c15_w(offset,data,mem_mask);
 }
 
-void x68k_rtc_alarm_irq(int state)
+static void x68k_rtc_alarm_irq(int state)
 {
 	if(sys.mfp.aer & 0x01)
 	{
@@ -1156,7 +1162,7 @@ void x68k_rtc_alarm_irq(int state)
 }
 
 
-WRITE16_HANDLER( x68k_sram_w )
+static WRITE16_HANDLER( x68k_sram_w )
 {
 	if(sys.sysport.sram_writeprotect == 0x31)
 	{
@@ -1164,7 +1170,7 @@ WRITE16_HANDLER( x68k_sram_w )
 	}
 }
 
-READ16_HANDLER( x68k_sram_r )
+static READ16_HANDLER( x68k_sram_r )
 {  
 	// HACKS!
 	if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
@@ -1180,7 +1186,7 @@ READ16_HANDLER( x68k_sram_r )
 	return generic_nvram16[offset];
 }
 
-WRITE16_HANDLER( x68k_vid_w )
+static WRITE16_HANDLER( x68k_vid_w )
 {
 	int val;
 	if(offset < 0x100)
@@ -1222,7 +1228,7 @@ WRITE16_HANDLER( x68k_vid_w )
 	}
 }
 
-READ16_HANDLER( x68k_vid_r )
+static READ16_HANDLER( x68k_vid_r )
 {
 	if(offset < 0x100)
 		return sys.video.gfx_pal[offset];
@@ -1245,28 +1251,28 @@ READ16_HANDLER( x68k_vid_r )
 	return 0xff;
 }
 
-READ16_HANDLER( x68k_adpcm_r )
+static READ16_HANDLER( x68k_adpcm_r )
 {
 	return 0x0000;
 }
 
-WRITE16_HANDLER( x68k_adpcm_w )
+static WRITE16_HANDLER( x68k_adpcm_w )
 {
 }
 
-READ16_HANDLER( x68k_areaset_r )
+static READ16_HANDLER( x68k_areaset_r )
 {
 	// register is write-only
 	return 0xffff;
 }
 
-WRITE16_HANDLER( x68k_areaset_w )
+static WRITE16_HANDLER( x68k_areaset_w )
 {
 	// TODO
 	logerror("SYS: Supervisor area set: 0x%02x\n",data & 0xff);
 }
 
-WRITE16_HANDLER( x68k_enh_areaset_w )
+static WRITE16_HANDLER( x68k_enh_areaset_w )
 {
 	// TODO
 	logerror("SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
@@ -1300,7 +1306,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	}
 }
 
-READ16_HANDLER( x68k_rom0_r )
+static READ16_HANDLER( x68k_rom0_r )
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists, 
 	   then access causes a bus error */
@@ -1310,7 +1316,7 @@ READ16_HANDLER( x68k_rom0_r )
 	return 0xff;
 }
 
-WRITE16_HANDLER( x68k_rom0_w )
+static WRITE16_HANDLER( x68k_rom0_w )
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists, 
 	   then access causes a bus error */
@@ -1319,7 +1325,7 @@ WRITE16_HANDLER( x68k_rom0_w )
 	cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
 }
 
-READ16_HANDLER( x68k_exp_r )
+static READ16_HANDLER( x68k_exp_r )
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if(readinputportbytag("options") & 0x02)
@@ -1335,7 +1341,7 @@ READ16_HANDLER( x68k_exp_r )
 	return 0xffff;
 }
 
-WRITE16_HANDLER( x68k_exp_w )
+static WRITE16_HANDLER( x68k_exp_w )
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if(readinputportbytag("options") & 0x02)
@@ -1350,7 +1356,7 @@ WRITE16_HANDLER( x68k_exp_w )
 	}
 }
 
-void x68k_dma_irq(int channel)
+static void x68k_dma_irq(int channel)
 {
 	current_vector[3] = hd63450_get_vector(channel);
 	current_irq_line = 3;
@@ -1358,7 +1364,7 @@ void x68k_dma_irq(int channel)
 	cpunum_set_input_line_and_vector(0,3,ASSERT_LINE,current_vector[3]);
 }
 
-void x68k_dma_end(int channel,int irq)
+static void x68k_dma_end(int channel,int irq)
 {
 	if(irq != 0)
 	{
@@ -1366,7 +1372,7 @@ void x68k_dma_end(int channel,int irq)
 	}
 }
 
-void x68k_dma_error(int channel, int irq)
+static void x68k_dma_error(int channel, int irq)
 {
 	if(irq != 0)
 	{
@@ -1376,7 +1382,7 @@ void x68k_dma_error(int channel, int irq)
 	}
 }
 
-void x68k_fm_irq(int irq)
+static void x68k_fm_irq(int irq)
 {
 	if(irq == CLEAR_LINE)
 	{
@@ -1389,7 +1395,7 @@ void x68k_fm_irq(int irq)
 	
 }
 
-READ8_HANDLER(mfp_gpio_r)
+static READ8_HANDLER(mfp_gpio_r)
 {
 	UINT8 data = sys.mfp.gpio;
 	
@@ -1401,7 +1407,7 @@ READ8_HANDLER(mfp_gpio_r)
 	return data;
 }
 
-void mfp_irq_callback(int which, int state)
+static void mfp_irq_callback(int which, int state)
 {
 	static int prev;
 	if(prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
@@ -1725,7 +1731,7 @@ static INPUT_PORTS_START( x68000 )
 
 INPUT_PORTS_END
 
-void dimdsk_set_geometry(mess_image* image)
+static void dimdsk_set_geometry(mess_image* image)
 {  
 	// DIM disk image header, most of this is guesswork
 	int tracks = 77;
@@ -1785,7 +1791,7 @@ void dimdsk_set_geometry(mess_image* image)
 	basicdsk_set_geometry(image, tracks+1, heads, sectors, sectorlen, firstsector, 0x100, FALSE);
 }
 
-DEVICE_LOAD( x68k_floppy )
+static DEVICE_LOAD( x68k_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{
@@ -1810,7 +1816,7 @@ DEVICE_LOAD( x68k_floppy )
 	return INIT_FAIL;
 }
 
-DEVICE_UNLOAD( x68k_floppy )
+static DEVICE_UNLOAD( x68k_floppy )
 {
 	if(sys.ioc.irqstatus & 0x02)
 	{
@@ -1844,7 +1850,7 @@ static void x68k_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 	}
 }
 
-MACHINE_RESET( x68000 )
+static MACHINE_RESET( x68000 )
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
 	   Just copying the inital stack pointer and program counter should
@@ -1897,7 +1903,7 @@ MACHINE_RESET( x68000 )
 	sys.mfp.gpio = 0xfb;
 }
 
-MACHINE_START( x68000 )
+static MACHINE_START( x68000 )
 {
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(REGION_USER1);
@@ -1922,7 +1928,7 @@ MACHINE_START( x68000 )
 	sys.mouse.inputtype = 0;
 }
 
-DRIVER_INIT( x68000 )
+static DRIVER_INIT( x68000 )
 {
 	unsigned char* rom = memory_region(REGION_CPU1);
 	unsigned char* user2 = memory_region(REGION_USER2);

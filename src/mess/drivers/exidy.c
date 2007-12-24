@@ -353,7 +353,7 @@ static WRITE8_HANDLER ( exidy_wd179x_w )
 }
 
 
-ADDRESS_MAP_START( exidy_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( exidy_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM		/* ram 32k machine */
 	AM_RANGE(0xbc00, 0xbcff) AM_ROM
@@ -365,7 +365,7 @@ ADDRESS_MAP_START( exidy_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM		/* programmable chars */
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( exidyd_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( exidyd_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM		/* ram 48k diskless machine */
 	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac */
@@ -651,7 +651,7 @@ static READ8_HANDLER(exidy_ff_port_r)
 }
 
 
-ADDRESS_MAP_START( exidy_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( exidy_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) ) 
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE( exidy_fc_port_r, exidy_fc_port_w )

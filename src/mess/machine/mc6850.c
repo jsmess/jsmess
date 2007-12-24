@@ -242,6 +242,7 @@ int MC6850_status_r(int offset)
 
 /* ******* other input lines ******* */
 
+#ifdef UNUSED_FUNCTION
 void MC6850_DCD(int offset, int data)
 {
 	STR=(STR&0xfb)|((data&1)<<2);
@@ -253,6 +254,7 @@ void MC6850_CTS(int offset, int data)
 	STR=(STR&0xf7)|((data&1)<<3);
 	// this also sets the Transmit Controller
 }
+#endif
 
 void MC6850_Receive_Clock(int Receive_Data)
 {
@@ -317,6 +319,7 @@ void MC6850_Reset(int clocklength)
 	dcd_count=0;
 }
 
+#ifdef UNUSED_FUNCTION
 int MC6850_Transmit_Clock(void)
 {
 	// clock out the data and return a Trasmit Data bit
@@ -325,21 +328,24 @@ int MC6850_Transmit_Clock(void)
 	   if we get to outputing data too */
 	return 0;
 }
+#endif
 
 
 /* ******* other output lines ******* */
 
+#ifdef UNUSED_FUNCTION
 int MC6850_transmit_data(int offset)
 {
 	// return the last transmitted bit
 	return 0;
 }
 
-int MC6850_RTS(int offset)
+static int MC6850_RTS(int offset)
 {
 	// is this correct ????
 	return RTS;
 }
+#endif
 
 /*
 interrupt Request is the only other output

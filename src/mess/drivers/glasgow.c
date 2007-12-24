@@ -40,7 +40,7 @@ static UINT8 key_low,
        irq_flag,
        lcd_invert,
        key_selector;
-       UINT8 board_value;
+static UINT8 board_value;
 static UINT16 beeper;
 
 
@@ -100,9 +100,9 @@ static UINT16 beeper;
 
 
 
-    BOARD_FIELD m_board[8][8];
+static     BOARD_FIELD m_board[8][8];
 
-    BOARD_FIELD start_board[8][8] =
+static     BOARD_FIELD start_board[8][8] =
 	{
 		{ { 7,44,434,"WR1"}, { 6,100,434,"WN1"}, { 5,156,434,"WB1"}, { 4,212,434,"WQ1"}, { 3,268,434,"WK"}, { 2,324,434,"WB2"}, { 1,380,434,"WN2"}, { 0,436,434,"WR2"} },
 		{ {15,44,378,"WP1"}, {14,100,378,"WP2"}, {13,156,378,"WP3"}, {12,212,378,"WP4"}, {11,268,378,"WP5"}, {10,324,378,"WP6"}, { 9,380,378,"WP7"}, { 8,436,378,"WP8"} },

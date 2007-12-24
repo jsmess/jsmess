@@ -74,12 +74,12 @@ static INTERRUPT_GEN( n64_vblank )
 	signal_rcp_interrupt(VI_INTERRUPT);
 }
 
-MACHINE_RESET( n64 )
+static MACHINE_RESET( n64 )
 {
 	n64_machine_reset();
 }
 
-MACHINE_DRIVER_START( n64 )
+static MACHINE_DRIVER_START( n64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(R4600BE, 93750000)
 	MDRV_CPU_CONFIG(config)
@@ -112,9 +112,11 @@ MACHINE_DRIVER_START( n64 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( n64 )
 {
 }
+#endif
 
 ROM_START( n64)
     ROM_REGION( 0x800000, REGION_CPU1, 0 )      /* dummy region for R4300 */

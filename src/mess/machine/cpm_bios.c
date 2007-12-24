@@ -57,7 +57,7 @@ static UINT8 zeropage0[8] =
 	BDOS >> 8
 };
 
-cpm_dph dph[NDSK] = {
+static cpm_dph dph[NDSK] = {
 	{ 0, 0, 0, 0, DIRBUF, DPB0, 0, 0 },
 	{ 0, 0, 0, 0, DIRBUF, DPB1, 0, 0 },
 	{ 0, 0, 0, 0, DIRBUF, DPB2, 0, 0 },

@@ -56,7 +56,7 @@ Nascom Memory map
 #include "mslegacy.h"
 
 /* Memory w/r functions */
-ADDRESS_MAP_START( nascom1_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( nascom1_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_READWRITE( videoram_r, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
@@ -68,7 +68,7 @@ ADDRESS_MAP_START( nascom1_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* port i/o functions */
-ADDRESS_MAP_START( nascom1_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( nascom1_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) ) 
 	AM_RANGE(0x00, 0x00) AM_READWRITE( nascom1_port_00_r, nascom1_port_00_w )
 	AM_RANGE(0x01, 0x01) AM_READWRITE( nascom1_port_01_r, nascom1_port_01_w )

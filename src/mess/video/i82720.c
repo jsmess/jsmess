@@ -333,7 +333,7 @@ INLINE UINT16 rotright16(UINT16 nbr)
    return (nbr >> 1) | (nbr << 15);
 }
 
-UINT32 gdc_get_base_addr(TYP_GDC* gdcp)
+static UINT32 gdc_get_base_addr(TYP_GDC* gdcp)
 {  
   int i;
   UINT32 ret_val = 0;
@@ -349,7 +349,7 @@ UINT32 gdc_get_base_addr(TYP_GDC* gdcp)
 }
 
 
-UINT32 gdc_partition_length(TYP_GDC* gdcp)
+static UINT32 gdc_partition_length(TYP_GDC* gdcp)
 {  
    /* Get a byte and put it into a temp */
    UINT32 pram_byte_low = gdcp->pram[2] >> 4;
@@ -358,7 +358,7 @@ UINT32 gdc_partition_length(TYP_GDC* gdcp)
 }
 
 /* Address here is from the top of the screen */
-void gdc_plot_word(UINT32 address, UINT16 writeWord)
+static void gdc_plot_word(UINT32 address, UINT16 writeWord)
 {
    TYP_GDC_REGS_DISPLAY* dispregs = &gdc.registers.display;
    UINT32 x;
@@ -389,7 +389,7 @@ INLINE UINT16 gdc_read(UINT32 address)
 }
 
 
-void gdc_write_data(UINT16 data,
+static void gdc_write_data(UINT16 data,
                     UINT16 mask,
                     UINT8 operation)
 {
@@ -421,7 +421,7 @@ void gdc_write_data(UINT16 data,
       address, base_addr); */
 }
 
-void gdc_update_ead_and_mask(void)
+static void gdc_update_ead_and_mask(void)
 {
    UINT32 maxAddr = gdc.registers.display.words_per_line *
                     gdc.registers.display.lines_per_field;
@@ -451,7 +451,7 @@ void gdc_update_ead_and_mask(void)
 }
 
 
-void gdc_auto_write_data(UINT16 data,
+static void gdc_auto_write_data(UINT16 data,
                          UINT8  operation)
 {
    gdc_write_data(data, gdc.registers.display.mask, operation);
@@ -460,7 +460,7 @@ void gdc_auto_write_data(UINT16 data,
    gdc_update_ead_and_mask();
 }
 
-UINT16 gdc_read_data(UINT16 mask)
+static UINT16 gdc_read_data(UINT16 mask)
 {
    /* Save address */
    UINT32 address = gdc.registers.display.ead;
@@ -468,7 +468,7 @@ UINT16 gdc_read_data(UINT16 mask)
    return gdc_mess.vram[address & gdc_mess.vramsize] & mask;
 }
 
-UINT16 gdc_auto_read_data(void)
+static UINT16 gdc_auto_read_data(void)
 {
    UINT16 ret_val = gdc_read_data(gdc.registers.display.mask);   
    /* Update the ead and mask */
@@ -515,7 +515,7 @@ gdc_disp_mode_to_str(int mode)
 /* Name: gdc_cmd_sync                                                      */
 /* Desc: CMD - Sync                                                        */
 /*-------------------------------------------------------------------------*/
-void gdc_cmd_sync(void)
+static void gdc_cmd_sync(void)
 {
 	UINT16 reg16;
 	UINT8 reg;
@@ -893,7 +893,7 @@ INLINE void gdc_cmd_wdat(UINT8 command)
             temp_reg &= 0xff;
             break;
          case 0x18:
-            /* FIXME: Bör bara använda en byte i detta fallet */
+            /* FIXME: Bor bara anvanda en byte i detta fallet */
             /* FIXME: Save the mask */
             gdc.registers.display.mask &= 0xff00; 
             temp_reg = ( (temp_reg  & 0xff ) << 8);
@@ -1016,7 +1016,7 @@ INLINE void gdc_cmd_gchrd(void)
 /*       The command bytes are decoded, and the succeeding parameters are  */
 /*       distributed to their proper destinations within the GDC.          */
 /*-------------------------------------------------------------------------*/
-void gdc_command_processor(UINT8 command)
+static void gdc_command_processor(UINT8 command)
 {
 	switch(command)
 	{
@@ -1181,7 +1181,7 @@ void gdc_command_processor(UINT8 command)
 /* Param: command - the command                                            */
 /* Return: Number of expected parameter bytes for the command.             */
 /*-------------------------------------------------------------------------*/
-int gdc_nbr_expected_params(UINT8 command)
+static int gdc_nbr_expected_params(UINT8 command)
 {
 	switch(command)
 	{
@@ -1367,11 +1367,13 @@ void compis_gdc_vblank_int(void)
 /* Name: compis_gdc_reset                                                  */
 /* Desc: GDC - Reset                                                       */
 /*-------------------------------------------------------------------------*/
+#ifdef UNUSED_FUNCTION
 void compis_gdc_reset(void)
 {
 	gdc_fifo_reset(&gdc);
 
 }
+#endif
 
 /*
 *  MESS Stuff

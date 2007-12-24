@@ -64,7 +64,7 @@ READ8_HANDLER( mbee_lowram_r )
 	return mbee_workram[offset];
 }
 
-offs_t mbee_opbase_handler(offs_t address)
+static offs_t mbee_opbase_handler(offs_t address)
 {
 	if (address > 0x7fff)
 	{
@@ -74,7 +74,7 @@ offs_t mbee_opbase_handler(offs_t address)
 	return address;
 }
 
-offs_t mbee56_opbase_handler(offs_t address)
+static offs_t mbee56_opbase_handler(offs_t address)
 {
 	if (address > 0xdfff)
 	{

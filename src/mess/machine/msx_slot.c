@@ -329,7 +329,7 @@ MSX_SLOT_RESET(konami_scc)
 	state->cart.scc.active = 0;
 }
 
- READ8_HANDLER (konami_scc_bank5)
+static  READ8_HANDLER (konami_scc_bank5)
 {
 	if (offset & 0x80) {
 #if 0
@@ -1971,7 +1971,7 @@ MSX_SLOT_RESET(soundcartridge)
 	state->cart.sccp.sccp_active = 0;
 }
 
- READ8_HANDLER (soundcartridge_scc)
+static  READ8_HANDLER (soundcartridge_scc)
 {
 	int reg;
 
@@ -2002,7 +2002,7 @@ MSX_SLOT_RESET(soundcartridge)
 	return 0xff;
 }
 
- READ8_HANDLER (soundcartridge_sccp)
+static  READ8_HANDLER (soundcartridge_sccp)
 {
 	int reg;
 

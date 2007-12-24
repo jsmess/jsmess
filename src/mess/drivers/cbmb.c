@@ -417,7 +417,7 @@ static INPUT_PORTS_START (cbm500)
 	/*C64_DIPS */
 INPUT_PORTS_END
 
-unsigned char cbm700_palette[] =
+static unsigned char cbm700_palette[] =
 {
 	0,0,0, /* black */
 	0,0x80,0, /* green */

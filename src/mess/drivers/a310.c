@@ -85,11 +85,11 @@ static UINT32 a310_sndstart, a310_sndend, a310_sndcur;
 
 static emu_timer *vbl_timer, *timer[4], *snd_timer;
 
-VIDEO_START( a310 )
+static VIDEO_START( a310 )
 {
 }
 
-VIDEO_UPDATE( a310 )
+static VIDEO_UPDATE( a310 )
 {
 	return 0;
 }

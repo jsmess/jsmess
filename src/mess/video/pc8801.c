@@ -25,7 +25,7 @@ static int dmac_FL;
 static UINT16 dmac_addr[3],dmac_size[3];
 static UINT8 dmac_flag,dmac_status;
 
-enum
+static enum
 {
 	noblink_underline,
 	blink_underline,
@@ -33,7 +33,7 @@ enum
 	blink_block
 } cursor_mode;
 
-enum
+static enum
 {
 	parameter0,
 	parameter1,

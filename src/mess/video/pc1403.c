@@ -39,7 +39,7 @@ static struct {
 	UINT8 reg[0x100];
 } pc1403_lcd;
 
-const struct { int x, y; } pos[]={
+static const struct { int x, y; } pos[]={
     { 152,67 }, // pc1403
     { 155,69 } // pc1403h
 };

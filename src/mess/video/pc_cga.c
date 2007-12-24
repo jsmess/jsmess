@@ -1373,7 +1373,7 @@ static WRITE8_HANDLER ( pc1512_w )
 	}
 }
 
-READ8_HANDLER ( pc1512_r )
+static READ8_HANDLER ( pc1512_r )
 {
 	UINT8 data;
 

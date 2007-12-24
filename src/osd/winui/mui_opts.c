@@ -405,7 +405,7 @@ static const options_entry filterOptions[] =
 // Screen shot Page tab control text
 // these must match the order of the options flags in options.h
 // (TAB_...)
-const char* image_tabs_long_name[MAX_TAB_TYPES] =
+static const char* image_tabs_long_name[MAX_TAB_TYPES] =
 {
 	"Snapshot ",
 	"Flyer ",
@@ -417,7 +417,7 @@ const char* image_tabs_long_name[MAX_TAB_TYPES] =
 	"History ",
 };
 
-const char* image_tabs_short_name[MAX_TAB_TYPES] =
+static const char* image_tabs_short_name[MAX_TAB_TYPES] =
 {
 	"snapshot",
 	"flyer",

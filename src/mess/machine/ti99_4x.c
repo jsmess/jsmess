@@ -336,7 +336,7 @@ typedef struct GROM_port_t
 } GROM_port_t;
 
 /* descriptor for console GROMs */
-GROM_port_t console_GROMs;
+static GROM_port_t console_GROMs;
 
 /* true if hsgpl is enabled (i.e. has_hsgpl is true and hsgpl cru bit crdena is
 set) */
@@ -927,6 +927,7 @@ MACHINE_RESET( ti99 )
 	mecmouse_y = 0;
 }
 
+#ifdef UNUSED_FUNCTION
 void machine_stop_ti99(void)
 {
 	if (has_ide)
@@ -940,6 +941,7 @@ void machine_stop_ti99(void)
 
 	tms9901_cleanup(0);
 }
+#endif
 
 
 /*

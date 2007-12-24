@@ -188,7 +188,7 @@ static void cbmb_cia_port_a_w(UINT8 data)
 	cbm_ieee_data_w(0, data);
 }
 
-const cia6526_interface cbmb_cia =
+static const cia6526_interface cbmb_cia =
 {
 	CIA6526,
 	tpi6525_0_irq2_level,

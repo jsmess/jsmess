@@ -80,7 +80,7 @@ void clear_keyboard_buffer(void)
 
 }
 
-unsigned char getKeyFromBuffer(void)
+static unsigned char getKeyFromBuffer(void)
 {
 	int i;
 	UINT8 kbcode;
@@ -95,7 +95,7 @@ unsigned char getKeyFromBuffer(void)
 	return kbcode;
 }
 
-void addToKeyboardBuffer(unsigned char kbcode)
+static void addToKeyboardBuffer(unsigned char kbcode)
 {
     if (KbRepeatTable[kbcode]==0)
     {
@@ -514,7 +514,7 @@ void exploreKeyboard(void)
     /* 0xF0-0xFF - Reserved for internal use by keyboard software */
 }
 
-void master6801_behaviour(int offset, int data)
+static void master6801_behaviour(int offset, int data)
 {
 /*
 The Master MC6801 controls all AdamNet operations, keyboard, tapes, disks...

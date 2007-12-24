@@ -13,48 +13,48 @@
 
 #define MAX_CARTRIDGES		16
 
-UINT8 smsBiosPageCount;
-UINT8 smsFMDetect;
-UINT8 smsVersion;
-int smsPaused;
+static UINT8 smsBiosPageCount;
+static UINT8 smsFMDetect;
+static UINT8 smsVersion;
+static int smsPaused;
 
-UINT8 biosPort;
+static UINT8 biosPort;
 
-UINT8 *BIOS;
+static UINT8 *BIOS;
 
-UINT8 *sms_mapper_ram;
-UINT8 sms_mapper[4];
-UINT8 *sms_banking_bios[5]; /* we are going to use 1-4, same as bank numbers */
-UINT8 *sms_banking_cart[5]; /* we are going to use 1-4, same as bank numbers */
-UINT8 *sms_banking_none[5]; /* we are going to use 1-4, same as bank numbers */
-UINT8 ggSIO[5] = { 0x7F, 0xFF, 0x00, 0xFF, 0x00 };
-UINT8 sms_store_control = 0;
+static UINT8 *sms_mapper_ram;
+static UINT8 sms_mapper[4];
+static UINT8 *sms_banking_bios[5]; /* we are going to use 1-4, same as bank numbers */
+static UINT8 *sms_banking_cart[5]; /* we are going to use 1-4, same as bank numbers */
+static UINT8 *sms_banking_none[5]; /* we are going to use 1-4, same as bank numbers */
+static UINT8 ggSIO[5] = { 0x7F, 0xFF, 0x00, 0xFF, 0x00 };
+static UINT8 sms_store_control = 0;
 
-UINT8 sms_input_port0;
-UINT8 sms_input_port1;
+static UINT8 sms_input_port0;
+static UINT8 sms_input_port1;
 
 /* Data needed for Rapid Fire Unit support */
-emu_timer	*rapid_fire_timer;
-UINT8 rapid_fire_state_1;
-UINT8 rapid_fire_state_2;
+static emu_timer	*rapid_fire_timer;
+static UINT8 rapid_fire_state_1;
+static UINT8 rapid_fire_state_2;
 
 /* Data needed for Paddle Control controller */
-UINT32 last_paddle_read_time;
-UINT8 paddle_read_state;
+static UINT32 last_paddle_read_time;
+static UINT8 paddle_read_state;
 
 /* Data needed for Sports Pad controller */
-UINT32 last_sports_pad_time_1;
-UINT32 last_sports_pad_time_2;
-UINT8 sports_pad_state_1;
-UINT8 sports_pad_state_2;
-UINT8 sports_pad_last_data_1;
-UINT8 sports_pad_last_data_2;
-UINT8 sports_pad_1_x;
-UINT8 sports_pad_1_y;
-UINT8 sports_pad_2_x;
-UINT8 sports_pad_2_y;
+static UINT32 last_sports_pad_time_1;
+static UINT32 last_sports_pad_time_2;
+static UINT8 sports_pad_state_1;
+static UINT8 sports_pad_state_2;
+static UINT8 sports_pad_last_data_1;
+static UINT8 sports_pad_last_data_2;
+static UINT8 sports_pad_1_x;
+static UINT8 sports_pad_1_y;
+static UINT8 sports_pad_2_x;
+static UINT8 sports_pad_2_y;
 
-struct {
+static struct {
 	UINT8	*ROM;			/* Pointer to ROM image data */
 	UINT32	size;			/* Size of the ROM image */
 	UINT8	features;		/* on-cartridge special hardware */
@@ -64,7 +64,7 @@ struct {
 	UINT32	ram_size;		/* size of the on-cartridge RAM */
 	UINT8	ram_page;		/* currently swapped in cartridge RAM */
 } sms_cartridge[MAX_CARTRIDGES];
-UINT8	sms_current_cartridge;
+static UINT8	sms_current_cartridge;
 
 static TIMER_CALLBACK( rapid_fire_callback ) {
 	rapid_fire_state_1 ^= 0xFF;
@@ -447,7 +447,7 @@ WRITE8_HANDLER(sms_mapper_w)
 	}
 }
 
-WRITE8_HANDLER(sms_codemasters_page0_w) {
+static WRITE8_HANDLER(sms_codemasters_page0_w) {
 	if ( sms_cartridge[sms_current_cartridge].ROM && sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER ) {
 		UINT8 rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
 		sms_banking_cart[1] = sms_cartridge[sms_current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
@@ -457,7 +457,7 @@ WRITE8_HANDLER(sms_codemasters_page0_w) {
 	}
 }
 
-WRITE8_HANDLER(sms_codemasters_page1_w) {
+static WRITE8_HANDLER(sms_codemasters_page1_w) {
 	if ( sms_cartridge[sms_current_cartridge].ROM && sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER ) {
 		/* Check if we need to switch in some RAM */
 		if ( data & 0x80 ) {

@@ -224,7 +224,7 @@ static MACHINE_RESET( comquest )
 //	memory_set_bankptr(1,mem+0x00000);
 }
 
-UINT32 amask= 0xffff;
+static UINT32 amask= 0xffff;
 
 
 static MACHINE_DRIVER_START( comquest )

@@ -942,7 +942,7 @@ static struct CassetteFormat mo5_k5 =
 
 
 
-casserr_t mo5_wav_identify ( cassette_image *cass, 
+static casserr_t mo5_wav_identify ( cassette_image *cass, 
 			     struct CassetteOptions *opts ) 
 {
 	casserr_t e = wavfile_format.identify( cass, opts );
@@ -951,7 +951,7 @@ casserr_t mo5_wav_identify ( cassette_image *cass,
 
 
 
-casserr_t mo5_wav_load ( cassette_image *cass )
+static casserr_t mo5_wav_load ( cassette_image *cass )
 {
 	casserr_t e = wavfile_format.load( cass );
 	struct CassetteInfo info;
@@ -967,7 +967,7 @@ casserr_t mo5_wav_load ( cassette_image *cass )
 
 
 
-casserr_t mo5_wav_save ( cassette_image *cass, const struct CassetteInfo *info )
+static casserr_t mo5_wav_save ( cassette_image *cass, const struct CassetteInfo *info )
 {
 	int len = info->sample_count / info->sample_frequency;
 	PRINT (( "mo5_wav_save: saving cassette, length %imn %is, %i Hz, %i bps\n", len / 60, len % 60, info->sample_frequency, info->bits_per_sample ));

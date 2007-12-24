@@ -92,7 +92,7 @@ static struct i186_state
 } i186;
 
 /* Keyboard */
-const UINT8 compis_keyb_codes[6][16] = {
+static const UINT8 compis_keyb_codes[6][16] = {
 {0x39, 0x32, 0x29, 0x20, 0x17, 0x0e, 0x05, 0x56, 0x4d, 0x44, 0x08, 0x57, 0x59, 0x4e, 0x43, 0x3a},
 {0x31, 0x28, 0x1f, 0x16, 0x0d, 0x04, 0x55, 0x4c, 0x4f, 0x58, 0x00, 0x07, 0xff, 0x42, 0x3b, 0x30},
 {0x27, 0x1e, 0x15, 0x0c, 0x03, 0x54, 0x06, 0x50, 0x01, 0xfe, 0x38, 0x2f, 0x26, 0x1d, 0x14, 0x0b},
@@ -182,17 +182,19 @@ static TYP_COMPIS compis;
 /* Name: compis_irq_set                                                    */
 /* Desc: IRQ - Issue an interrupt request                                  */
 /*-------------------------------------------------------------------------*/
+#ifdef UNUSED_FUNCTION
 void compis_irq_set(UINT8 irq)
 {
 	cpunum_set_input_line_vector(0, 0, irq);
 	cpunum_set_input_line(0, 0, HOLD_LINE);
 }
+#endif
 
 /*-------------------------------------------------------------------------*/
 /*  OSP PIC 8259                                                           */
 /*-------------------------------------------------------------------------*/
 
-void compis_osp_pic_irq(UINT8 irq)
+static void compis_osp_pic_irq(UINT8 irq)
 {
 	pic8259_set_irq_line(0, irq, 1);
 	pic8259_set_irq_line(0, irq, 0);
@@ -211,7 +213,7 @@ WRITE16_HANDLER ( compis_osp_pic_w )
 /*-------------------------------------------------------------------------*/
 /*  Keyboard                                                               */
 /*-------------------------------------------------------------------------*/
-void compis_keyb_update(void)
+static void compis_keyb_update(void)
 {
 	UINT8 key_code;
 	UINT8 key_status;
@@ -265,7 +267,7 @@ void compis_keyb_update(void)
 	}
 }
 
-void compis_keyb_init(void)
+static void compis_keyb_init(void)
 {
 	compis.keyboard.key_code = 0;
 	compis.keyboard.key_status = 0x80;
@@ -284,7 +286,7 @@ static void compis_fdc_reset(void)
 	nec765_set_reset_state(1);
 }
 
-void compis_fdc_tc(int state)
+static void compis_fdc_tc(int state)
 {
 	/* Terminal count if iSBX-218A has DMA enabled */
   	if (readinputport(7))
@@ -293,7 +295,7 @@ void compis_fdc_tc(int state)
 	}
 }
 
-void compis_fdc_int(int state)
+static void compis_fdc_int(int state)
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
   	if (!readinputport(7) && state)
@@ -523,7 +525,7 @@ WRITE16_HANDLER ( compis_rtc_w )
 /*-------------------------------------------------------------------------*/
 /*  USART 8251                                                             */
 /*-------------------------------------------------------------------------*/
-void compis_usart_rxready(int state)
+static void compis_usart_rxready(int state)
 {
 /*
 	if (state)
@@ -1516,7 +1518,7 @@ WRITE16_HANDLER( i186_internal_port_w )
 /* Name: compis                                                            */
 /* Desc: CPU - Initialize the 80186 CPU                                    */
 /*-------------------------------------------------------------------------*/
-void compis_cpu_init(void)
+static void compis_cpu_init(void)
 {
 	/* create timers here so they stick around */
 	i186.timer[0].int_timer = timer_alloc(internal_timer_int, NULL);

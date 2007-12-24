@@ -82,7 +82,7 @@ struct _imgtool_directory
     GLOBALS
 ***************************************************************************/
 
-imgtool_library *global_imgtool_library;
+static imgtool_library *global_imgtool_library;
 
 static int global_omit_untested;
 static void (*global_warn)(const char *message);

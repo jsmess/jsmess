@@ -140,7 +140,7 @@ static VIDEO_START( mpf1 )
 
 
 
-VIDEO_UPDATE( mpf1 )
+static VIDEO_UPDATE( mpf1 )
 {
 	int x;
 	static UINT8 xpositions[] = { 20, 59, 97, 135, 185, 223 };

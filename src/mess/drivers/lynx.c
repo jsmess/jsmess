@@ -202,12 +202,12 @@ static PALETTE_INIT( lynx )
 	}
 }
 
-struct CustomSound_interface lynx_sound_interface =
+static struct CustomSound_interface lynx_sound_interface =
 {
 	lynx_custom_start
 };
 
-struct CustomSound_interface lynx2_sound_interface =
+static struct CustomSound_interface lynx2_sound_interface =
 {
 	lynx2_custom_start
 };

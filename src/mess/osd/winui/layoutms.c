@@ -160,8 +160,8 @@ const ICONDATA g_iconData[] =
 
 const TCHAR g_szPlayGameString[] = TEXT("&Run %s");
 const char g_szGameCountString[] = "%d systems";
-const char g_szHistoryFileName[] = "sysinfo.dat";
-const char g_szMameInfoFileName[] = "messinfo.dat";
+static const char g_szHistoryFileName[] = "sysinfo.dat";
+static const char g_szMameInfoFileName[] = "messinfo.dat";
 
 static BOOL FilterAvailable(int driver_index)
 {

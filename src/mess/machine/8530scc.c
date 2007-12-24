@@ -15,8 +15,8 @@ static int scc_mode;
 static int scc_reg;
 static int scc_status;
 
-unsigned char scc_reg_val_a[16];
-unsigned char scc_reg_val_b[16];
+static unsigned char scc_reg_val_a[16];
+static unsigned char scc_reg_val_b[16];
 
 
 void scc_init(const struct scc8530_interface *intf)

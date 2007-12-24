@@ -44,22 +44,22 @@ typedef struct {
 	int check_value;
 } GAMECOM_TIMER;
 
-UINT8 *internal_ram;
+static UINT8 *internal_ram;
 UINT8 internal_registers[0x80];
 UINT8 gamecom_vram[16*1024];
-UINT8 *cartridge1 = NULL;
-UINT8 *cartridge2 = NULL;
-UINT8 *cartridge = NULL;
-UINT8 *dummy_bank = NULL;
+static UINT8 *cartridge1 = NULL;
+static UINT8 *cartridge2 = NULL;
+static UINT8 *cartridge = NULL;
+static UINT8 *dummy_bank = NULL;
 
 static emu_timer *gamecom_clock_timer = NULL;
-GAMECOM_DMA gamecom_dma;
-GAMECOM_TIMER gamecom_timer[2];
+static GAMECOM_DMA gamecom_dma;
+static GAMECOM_TIMER gamecom_timer[2];
 
 //int gamecom_timer_limit[8] = { 2/2, 1024/2, 2048/2, 4096/2, 8192/2, 16384/2, 32768/2, 65536/2 };
-int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
+static int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
-void gamecom_dma_init(void);
+static void gamecom_dma_init(void);
 
 static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
@@ -407,7 +407,7 @@ READ8_HANDLER( gamecom_internal_r )
 
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
    which page for source or destination is used */
-void gamecom_dma_init(void) {
+static void gamecom_dma_init(void) {
 	if ( gamecom_dma.decrement_x || gamecom_dma.decrement_y ) {
 		logerror( "TODO: Decrement-x and decrement-y are not supported yet\n" );
 	}

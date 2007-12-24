@@ -162,8 +162,8 @@ static int senila, senilb;
 static int tmp_buffer;
 
 /* inta/intb handlers */
-void (*inta_callback)(int state);
-void (*intb_callback)(int state);
+static void (*inta_callback)(int state);
+static void (*intb_callback)(int state);
 
 
 /*

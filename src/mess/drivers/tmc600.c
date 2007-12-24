@@ -396,7 +396,7 @@ ROM_END
 
 /* System Configuration */
 
-QUICKLOAD_LOAD( tmc600 )
+static QUICKLOAD_LOAD( tmc600 )
 {
 	image_fread(image, memory_region(REGION_CPU1) + 0x6300, 0x9500);
 

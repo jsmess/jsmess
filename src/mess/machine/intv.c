@@ -408,9 +408,11 @@ DEVICE_LOAD( intv_cart )
 	return intv_load_rom_file(image, 1);
 }
 
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( intv )
 {
 }
+#endif
 
 /* Set Reset and INTR/INTRM Vector */
 MACHINE_RESET( intv )

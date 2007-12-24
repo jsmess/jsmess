@@ -22,10 +22,10 @@
 
 /* pointers to memory locations */
 UINT8 *sym1_monitor;
-UINT8 *sym1_ram_1k;
-UINT8 *sym1_ram_2k;
-UINT8 *sym1_ram_3k;
-UINT8 *sym1_riot_ram;
+static UINT8 *sym1_ram_1k;
+static UINT8 *sym1_ram_2k;
+static UINT8 *sym1_ram_3k;
+static UINT8 *sym1_riot_ram;
 
 
 

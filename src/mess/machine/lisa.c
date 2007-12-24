@@ -50,8 +50,8 @@
 */
 
 /* up to 2MB of 68k RAM (normally 1MB or 512kb), generally 16kb of ROM */
-UINT8 *lisa_ram_ptr;
-UINT8 *lisa_rom_ptr;
+static UINT8 *lisa_ram_ptr;
+static UINT8 *lisa_rom_ptr;
 
 /* offsets in REGION_CPU1 */
 #define RAM_OFFSET 0x004000
@@ -64,7 +64,7 @@ UINT8 *lisa_fdc_ram;
 UINT8 *lisa_fdc_rom;
 
 /* special ROM (includes S/N) */
-UINT8 *videoROM_ptr;
+static UINT8 *videoROM_ptr;
 
 
 /*
@@ -170,7 +170,7 @@ static int PWM_floppy_motor_speed;
 /*
 	lisa model identification
 */
-enum
+static enum
 {
 	/*lisa1,*/		/* twiggy floppy drive */
 	lisa2,		/* 3.5'' Sony floppy drive */
@@ -178,7 +178,7 @@ enum
 	mac_xl		/* same as above with modified video */
 } lisa_model;
 
-struct
+static struct
 {
 	unsigned int has_fast_timers : 1;	/* I/O board VIAs are clocked at 1.25 MHz (?) instead of .5 MHz (?) (Lisa 2/10, Mac XL) */
 										/* Note that the beep routine in boot ROMs implies that

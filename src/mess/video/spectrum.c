@@ -21,7 +21,7 @@
 
 unsigned char *spectrum_characterram;
 unsigned char *spectrum_colorram;
-unsigned char *charsdirty;
+static unsigned char *charsdirty;
 static int frame_number;    /* Used for handling FLASH 1 */
 static int flash_invert;
 

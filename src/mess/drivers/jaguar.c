@@ -440,7 +440,7 @@ static struct jaguar_config dsp_config =
 	jaguar_dsp_cpu_int
 };
 
-MACHINE_DRIVER_START( jaguar )
+static MACHINE_DRIVER_START( jaguar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 13295000)

@@ -57,9 +57,9 @@ enum
  ****************************************************************************/
 #define DATAFILE_TAG '$'
 
-const char *DATAFILE_TAG_KEY = "$info";
-const char *DATAFILE_TAG_BIO = "$bio";
-const char *DATAFILE_TAG_MAME = "$mame";
+static const char *DATAFILE_TAG_KEY = "$info";
+static const char *DATAFILE_TAG_BIO = "$bio";
+static const char *DATAFILE_TAG_MAME = "$mame";
 
 const char *history_filename = NULL;
 const char *mameinfo_filename = NULL;

@@ -7,8 +7,8 @@ static FILE *errorlog;
 
 const game_driver *const drivers[1];
 int rompath_extra;
-int cheatfile;
-const char *db_filename;
+//int cheatfile;
+//const char *db_filename;
 int history_filename;
 int mameinfo_filename;
 

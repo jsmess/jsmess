@@ -85,7 +85,7 @@ Not emulated:
 #define FW	TRS80_FONT_W
 #define FH	TRS80_FONT_H
 
-READ8_HANDLER (trs80_wd179x_r)
+static READ8_HANDLER (trs80_wd179x_r)
 {
 	if (readinputport(0) & 0x80)
 	{

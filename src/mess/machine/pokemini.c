@@ -29,7 +29,7 @@ struct TIMERS {
 	emu_timer	*timer3_timer;		/* Timer 3 */
 };
 
-UINT8 pokemini_hwreg[0x100];
+static UINT8 pokemini_hwreg[0x100];
 static struct VDP vdp;
 static struct TIMERS timers;
 
@@ -677,7 +677,7 @@ DEVICE_LOAD( pokemini_cart ) {
 	return INIT_PASS;
 }
 
-void pokemini_render( void ) {
+static void pokemini_render( void ) {
 	if ( vdp.background_enabled ) {
 		int x, y;
 		for ( y = 0; y < 8; y++ ) {

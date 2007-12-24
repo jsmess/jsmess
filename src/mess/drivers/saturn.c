@@ -197,9 +197,9 @@ extern UINT32* stv_vdp1_vram;
 static UINT8 *smpc_ram;
 //static void stv_dump_ram(void);
 
-UINT32* stv_workram_l;
-UINT32* stv_workram_h;
-UINT32* stv_backupram;
+static UINT32* stv_workram_l;
+static UINT32* stv_workram_h;
+//UINT32* stv_backupram;
 extern UINT32* stv_scu;
 static UINT16* scsp_regs;
 static UINT16* sound_ram;
@@ -207,7 +207,7 @@ static UINT16* sound_ram;
 static int saturn_region;
 
 int stv_vblank,stv_hblank;
-int stv_enable_slave_sh2;
+static int stv_enable_slave_sh2;
 /*SMPC stuff*/
 static UINT8 NMI_reset;
 static void system_reset(void);
@@ -240,8 +240,8 @@ static void dma_indirect_lv1(void); /*DMA level 1 indirect transfer function*/
 static void dma_indirect_lv2(void); /*DMA level 2 indirect transfer function*/
 
 
-int minit_boost,sinit_boost;
-double minit_boost_timeslice, sinit_boost_timeslice;
+static int minit_boost,sinit_boost;
+static double minit_boost_timeslice, sinit_boost_timeslice;
 
 static int scanline;
 
@@ -428,7 +428,7 @@ static UINT8 SMEM[4];
 #define SMPC_CONTROL_MODE_PORT_1 IOSEL1 = 0
 #define SMPC_CONTROL_MODE_PORT_2 IOSEL2 = 0
 
-int DectoBCD(int num)
+static int DectoBCD(int num)
 {
 	int i, cnt = 0, tmp, res = 0;
 
@@ -999,7 +999,7 @@ DMA TODO:
 #define D1MV_0	if(DMA_STATUS & 0x100) 	    DMA_STATUS^=0x100
 #define D2MV_0	if(DMA_STATUS & 0x1000)     DMA_STATUS^=0x1000
 
-UINT32 scu_index_0,scu_index_1,scu_index_2;
+static UINT32 scu_index_0,scu_index_1,scu_index_2;
 static UINT8 scsp_to_main_irq;
 
 static UINT32 scu_add_tmp;
@@ -1013,7 +1013,7 @@ static UINT32 scu_add_tmp;
 #define WORK_RAM_H(_lv_) ((scu_##_lv_ & 0x07ffffff) >= 0x06000000) && ((scu_##_lv_ & 0x07ffffff) <= 0x060fffff)
 #define SOUND_RAM(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05afffff)
 
-READ32_HANDLER( stv_scu_r32 )
+static READ32_HANDLER( stv_scu_r32 )
 {
 	/*TODO: write only registers must return 0...*/
 	//popmessage("%02x",DMA_STATUS);
@@ -1056,7 +1056,7 @@ READ32_HANDLER( stv_scu_r32 )
    	}
 }
 
-WRITE32_HANDLER( stv_scu_w32 )
+static WRITE32_HANDLER( stv_scu_w32 )
 {
 	COMBINE_DATA(&stv_scu[offset]);
 
@@ -1831,7 +1831,7 @@ static void dma_indirect_lv2()
 
 /**************************************************************************************/
 
-WRITE32_HANDLER( stv_sh2_soundram_w )
+static WRITE32_HANDLER( stv_sh2_soundram_w )
 {
 	COMBINE_DATA(sound_ram+offset*2+1);
 	data >>= 16;
@@ -1839,7 +1839,7 @@ WRITE32_HANDLER( stv_sh2_soundram_w )
 	COMBINE_DATA(sound_ram+offset*2);
 }
 
-READ32_HANDLER( stv_sh2_soundram_r )
+static READ32_HANDLER( stv_sh2_soundram_r )
 {
 	return (sound_ram[offset*2]<<16)|sound_ram[offset*2+1];
 }
@@ -2087,22 +2087,24 @@ static void saturn_init_driver(int rgn)
  	smpc_ram[0x5f] = 0x10;
 }
 
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( saturn )
 {
 	saturn_init_driver(0);
 }
+#endif
 
-DRIVER_INIT( saturnus )
+static DRIVER_INIT( saturnus )
 {
 	saturn_init_driver(4);
 }
 
-DRIVER_INIT( saturneu )
+static DRIVER_INIT( saturneu )
 {
 	saturn_init_driver(12);
 }
 
-DRIVER_INIT( saturnjp )
+static DRIVER_INIT( saturnjp )
 {
 	saturn_init_driver(1);
 }
@@ -2110,7 +2112,7 @@ DRIVER_INIT( saturnjp )
 
 static int scsp_last_line = 0;
 
-MACHINE_START( saturn )
+static MACHINE_START( saturn )
 {
 	SCSP_set_ram_base(0, sound_ram);
 
@@ -2143,7 +2145,7 @@ MACHINE_START( saturn )
 	add_exit_callback(machine, stvcd_exit);
 }
 
-MACHINE_RESET( saturn )
+static MACHINE_RESET( saturn )
 {
 	// don't let the slave cpu and the 68k go anywhere
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
@@ -2241,8 +2243,8 @@ static GFXDECODE_START( gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16x8_layout, 0x00, 0x20 )
 GFXDECODE_END
 
-struct sh2_config sh2_conf_master = { 0 };
-struct sh2_config sh2_conf_slave  = { 1 };
+static struct sh2_config sh2_conf_master = { 0 };
+static struct sh2_config sh2_conf_slave  = { 1 };
 
 static void scsp_irq(int irq)
 {

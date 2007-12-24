@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "sound/discrete.h"
 
-const discrete_dac_r1_ladder sb2m600_dac =
+static const discrete_dac_r1_ladder sb2m600_dac =
 {
 	4,			// size of ladder
 	{180, 180, 180, 180, 0, 0, 0, 0},	// R68, R69, R70, R71

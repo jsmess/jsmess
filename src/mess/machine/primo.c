@@ -41,7 +41,7 @@ INTERRUPT_GEN( primo_vblank_interrupt )
 
 *******************************************************************************/
 
-void primo_update_memory (void)
+static void primo_update_memory (void)
 {
 	switch (primo_port_FD & 0x03)
 	{
@@ -204,7 +204,7 @@ WRITE8_HANDLER( primo_FD_w )
 
 *******************************************************************************/
 
-void primo_common_driver_init (void)
+static void primo_common_driver_init (void)
 {
 	primo_port_FD = 0x00;
 }
@@ -233,7 +233,7 @@ DRIVER_INIT( primo64 )
 
 *******************************************************************************/
 
-void primo_common_machine_init (void)
+static void primo_common_machine_init (void)
 {
 	if (readinputport(6))
 		primo_port_FD = 0x00;

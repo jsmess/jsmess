@@ -71,7 +71,7 @@ static void arcadia_update(void *param,stream_sample_t **inputs, stream_sample_t
 /* Sound handler start              */
 /************************************/
 
-void *arcadia_custom_start(int clock, const struct CustomSound_interface *config)
+static void *arcadia_custom_start(int clock, const struct CustomSound_interface *config)
 {
     arcadia_sound.channel = stream_create(0, 1, Machine->sample_rate, 0, arcadia_update);
     return (void *) ~0;

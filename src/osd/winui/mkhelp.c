@@ -25,8 +25,8 @@
 #include "osdcore.h"
 
 
-int compare( const void *arg1, const void *arg2 );
-void extract_help_ids(const char *buffer, FILE *fp);
+static int compare( const void *arg1, const void *arg2 );
+static void extract_help_ids(const char *buffer, FILE *fp);
 
 /*-------------------------------------------------
     main - primary entry point
@@ -101,13 +101,13 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-int compare( const void *arg1, const void *arg2 )
+static int compare( const void *arg1, const void *arg2 )
 {
    /* Compare all of both strings: */
    return _stricmp( * ( char** ) arg1, * ( char** ) arg2 );
 }
 
-void extract_help_ids(const char *buffer, FILE *fp)
+static void extract_help_ids(const char *buffer, FILE *fp)
 {
 	const char *ptr = buffer;
 	char **help_ids = malloc(500 * sizeof(char *));

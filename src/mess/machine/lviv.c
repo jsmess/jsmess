@@ -23,7 +23,7 @@
 
 unsigned char * lviv_video_ram;
 
-UINT8 lviv_ppi_port_outputs[2][3];
+static UINT8 lviv_ppi_port_outputs[2][3];
 
 static UINT8 startup_mem_map;
 

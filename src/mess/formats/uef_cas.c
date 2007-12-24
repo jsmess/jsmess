@@ -72,7 +72,7 @@ static const UINT8* skip_gz_header( const UINT8 *p ) {
 	return p;
 }
 
-UINT8 *gz_ptr = NULL;
+static UINT8 *gz_ptr = NULL;
 
 static float get_uef_float( const UINT8 *Float)
 {

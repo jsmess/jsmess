@@ -784,7 +784,7 @@ static  READ8_HANDLER(einstein_psg_r)
 /* keyboard int->ctc/adc->pio */
 
 
-ADDRESS_MAP_START( einstein_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( einstein_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x01fff) AM_READWRITE(MRA8_BANK1, MWA8_BANK3)
 	AM_RANGE(0x2000, 0x0ffff) AM_READWRITE(MRA8_BANK2, MWA8_BANK4)
 ADDRESS_MAP_END
@@ -1311,11 +1311,11 @@ static WRITE8_HANDLER(einstein_port_w)
 }
 
 
-ADDRESS_MAP_START( einstein2_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( einstein2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000,0x0ffff) AM_READWRITE(einstein2_port_r, einstein2_port_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( einstein_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( einstein_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000,0x0ffff) AM_READWRITE(einstein_port_r, einstein_port_w)
 ADDRESS_MAP_END
 
@@ -1348,7 +1348,7 @@ ADDRESS_MAP_END
 
 
 
-struct msm8251_interface einstein_msm8251_intf=
+static struct msm8251_interface einstein_msm8251_intf=
 {
 	NULL,
 	NULL,

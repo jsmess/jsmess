@@ -781,14 +781,18 @@ static MACHINE_DRIVER_START( c364 )
 	MDRV_CPU_PROGRAM_MAP(c364_readmem, c364_writemem)
 MACHINE_DRIVER_END
 
-DRIVER_INIT( c16 )		{ c16_driver_init(); }
+static DRIVER_INIT( c16 )		{ c16_driver_init(); }
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( c16hun )	{ c16_driver_init(); }
 DRIVER_INIT( c16c )		{ c16_driver_init(); }
 DRIVER_INIT( c16v )		{ c16_driver_init(); }
-DRIVER_INIT( plus4 )	{ c16_driver_init(); }
+#endif
+static DRIVER_INIT( plus4 )	{ c16_driver_init(); }
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( plus4c )	{ c16_driver_init(); }
 DRIVER_INIT( plus4v )	{ c16_driver_init(); }
 DRIVER_INIT( c364 )		{ c16_driver_init(); }
+#endif
 
 static void c16cart_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {

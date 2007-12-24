@@ -166,7 +166,7 @@ static void enterprise_dave_interrupt(int state)
 /* enterprise interface to dave - ok, so Dave chip is unique
 to Enterprise. But these functions make it nice and easy to see
 whats going on. */
-DAVE_INTERFACE	enterprise_dave_interface=
+static DAVE_INTERFACE	enterprise_dave_interface=
 {
 	enterprise_dave_reg_read,
 		enterprise_dave_reg_write,
@@ -284,7 +284,7 @@ static WRITE8_HANDLER (	enterprise_wd177x_write )
 
 /* I've done this because the ram is banked in 16k blocks, and
 the rom can be paged into bank 0 and bank 3. */
-ADDRESS_MAP_START( enterprise_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( enterprise_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x03fff) AM_READWRITE( MRA8_BANK1, MWA8_BANK5 )
 	AM_RANGE( 0x04000, 0x07fff) AM_READWRITE( MRA8_BANK2, MWA8_BANK6 )
 	AM_RANGE( 0x08000, 0x0bfff) AM_READWRITE( MRA8_BANK3, MWA8_BANK7 )
@@ -370,7 +370,7 @@ static  READ8_HANDLER ( exdos_card_r )
 	return EXDOS_CARD_R;
 }
 
-ADDRESS_MAP_START( enterprise_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( enterprise_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE( 0x010, 0x017) AM_READWRITE( enterprise_wd177x_read, enterprise_wd177x_write )
 	AM_RANGE( 0x018, 0x018) AM_READWRITE( exdos_card_r, exdos_card_w )

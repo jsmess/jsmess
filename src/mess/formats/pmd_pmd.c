@@ -106,7 +106,7 @@ static casserr_t pmd85_pmd_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &pmd85_legacy_fill_wave);
 }
 
-struct CassetteFormat pmd85_pmd_image_format =
+static struct CassetteFormat pmd85_pmd_image_format =
 {
 	"pmd",
 	pmd85_pmd_identify,

@@ -29,13 +29,13 @@
 
 static UINT8 *svision_reg;
 
-struct
+static struct
 {
 	emu_timer *timer1;
 	int timer_shot;
 } svision;
 
-struct
+static struct
 {
 	int state;
 	int on, clock, data;
@@ -43,7 +43,7 @@ struct
 	emu_timer *timer;
 } svision_pet;
 
-struct
+static struct
 {
 	UINT16 palette[4/*0x40?*/]; /* rgb8 */
 	int palette_on;
@@ -471,7 +471,7 @@ static MACHINE_RESET( tvlink )
 	tvlink.palette[3] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
-struct CustomSound_interface svision_sound_interface =
+static struct CustomSound_interface svision_sound_interface =
 {
 	svision_custom_start
 };

@@ -8,10 +8,10 @@
 
 static struct hd63450 dmac;
 
-TIMER_CALLBACK(dma_transfer_timer);
-void dma_transfer_abort(int channel);
-void dma_transfer_halt(int channel);
-void dma_transfer_continue(int channel);
+static TIMER_CALLBACK(dma_transfer_timer);
+static void dma_transfer_abort(int channel);
+static void dma_transfer_halt(int channel);
+static void dma_transfer_continue(int channel);
 
 void hd63450_init(struct hd63450_interface* intf)
 {
@@ -216,12 +216,12 @@ void dma_transfer_start(int channel, int dir)
 	logerror("DMA: Transfer begins: size=0x%08x\n",dmac.transfer_size[channel]);
 }
 
-TIMER_CALLBACK(dma_transfer_timer)
+static TIMER_CALLBACK(dma_transfer_timer)
 {
 	hd63450_single_transfer(param);
 }
 
-void dma_transfer_abort(int channel)
+static void dma_transfer_abort(int channel)
 {
 	logerror("DMA#%i: Transfer aborted\n",channel);
 	timer_adjust(dmac.timer[channel],attotime_zero,0,attotime_zero);
@@ -231,13 +231,13 @@ void dma_transfer_abort(int channel)
 	dmac.reg[channel].csr &= ~0x08;  // channel no longer active
 }
 
-void dma_transfer_halt(int channel)
+static void dma_transfer_halt(int channel)
 {
 	dmac.halted[channel] = 1;
 	timer_adjust(dmac.timer[channel],attotime_zero,0,attotime_zero);
 }
 
-void dma_transfer_continue(int channel)
+static void dma_transfer_continue(int channel)
 {
 	if(dmac.halted[channel] != 0)
 	{

@@ -92,7 +92,7 @@ static struct AY8910interface ay8910_interface =
 
 /* graphics output */
 
-gfx_layout intv_gromlayout =
+static gfx_layout intv_gromlayout =
 {
 	16, 16,
 	256,
@@ -104,7 +104,7 @@ gfx_layout intv_gromlayout =
 	8 * 16
 };
 
-gfx_layout intv_gramlayout =
+static gfx_layout intv_gramlayout =
 {
 	16, 16,
 	64,
@@ -116,7 +116,7 @@ gfx_layout intv_gramlayout =
 	8 * 8
 };
 
-gfx_layout intvkbd_charlayout =
+static gfx_layout intvkbd_charlayout =
 {
 	8, 8,
 	256,
