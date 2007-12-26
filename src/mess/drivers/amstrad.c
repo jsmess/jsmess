@@ -78,6 +78,7 @@ Some bugs left :
 #include "inputx.h"
 #include "mslegacy.h"
 #include "sound/ay8910.h"
+#include "formats/tzx_cas.h"
 
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
 /* for event list */
@@ -2521,6 +2522,7 @@ static void cpc6128_cassette_getinfo(const device_class *devclass, UINT32 state,
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_COUNT:							info->i = 1; break;
 		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
+		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *)cdt_cassette_formats; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}

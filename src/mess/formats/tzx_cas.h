@@ -11,5 +11,6 @@
 #include "formats/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(tzx_cassette_formats);
+CASSETTE_FORMATLIST_EXTERN(cdt_cassette_formats);
 
 #endif /* TZX_CAS_H */
