@@ -37,6 +37,8 @@ System Driver Changes:
 
 - [TI99] Refactorings and code cleanups.  [Michael Zapf]
 
+- [TZX] Added Amstrad CPC .cdt support, and fixed pause length.  [Barry Rodewald]
+
 - [X68000] Improved video timing.  [Barry Rodewald]
 
 
