@@ -22,6 +22,8 @@ System Driver Changes:
 
 - [GAMEBOY] Improved handling of VRAM locking in certain STAT modes.  [Wilbert Pol]
 
+- [GAMEBOY] Improved handling of OAM locking in certain STAT modes.  [Wilbert Pol]
+
 - [MEPHISTO] Fixed a keyboard mapping bug.  [Dirk Verwiebe]
 
 - [QL] Added sound. [Curt Coder]

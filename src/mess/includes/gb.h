@@ -49,6 +49,7 @@ READ8_HANDLER( gbc_io2_r );
 MACHINE_START( gb );
 MACHINE_RESET( gb );
 MACHINE_RESET( gbpocket );
+READ8_HANDLER( gb_oam_r );
 WRITE8_HANDLER( gb_oam_w );
 READ8_HANDLER( gb_vram_r );
 WRITE8_HANDLER( gb_vram_w );
@@ -61,7 +62,6 @@ enum {
 	GB_VIDEO_CGB
 };
 
-extern UINT8 *gb_oam;
 extern UINT8 *gb_vram;
 
 PALETTE_INIT( gb );

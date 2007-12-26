@@ -462,7 +462,7 @@ static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_WRITE( gb_oam_w ) AM_BASE(&gb_oam)	/* OAM RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE( gb_oam_r, gb_oam_w )	/* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE( gb_io_r, gb_io_w )		/* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_READWRITE( gb_sound_r, gb_sound_w )		/* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
@@ -480,7 +480,7 @@ static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_WRITE( gb_oam_w ) AM_BASE(&gb_oam)	/* OAM RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE( gb_oam_r, gb_oam_w )	/* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE( gb_io_r, sgb_io_w )		/* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_READWRITE( gb_sound_r, gb_sound_w )		/* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
@@ -500,7 +500,7 @@ static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM						/* 4k fixed RAM bank */
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK(3)					/* 4k switched RAM bank */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM						/* echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_WRITE( gb_oam_w ) AM_BASE(&gb_oam)	/* OAM RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE( gb_oam_r, gb_oam_w )	/* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE( gb_io_r, gb_io_w )		/* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_READWRITE( gb_sound_r, gb_sound_w )		/* sound controller */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
@@ -517,7 +517,7 @@ static ADDRESS_MAP_START(megaduck_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w )		/* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_NOP							/* unused? */
 	AM_RANGE(0xc000, 0xfe9f) AM_RAM							/* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_WRITE( gb_oam_w ) AM_BASE(&gb_oam)		/* OAM RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE( gb_oam_r, gb_oam_w )		/* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE( gb_io_r, gb_io_w )			/* I/O */
 	AM_RANGE(0xff10, 0xff1f) AM_READWRITE( megaduck_video_r, megaduck_video_w )	/* video controller */
 	AM_RANGE(0xff20, 0xff2f) AM_READWRITE( megaduck_sound_r1, megaduck_sound_w1)	/* sound controller pt1 */
