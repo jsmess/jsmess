@@ -29,7 +29,7 @@ static UINT16 dai_noise_volume_table[] = {   0,    0,    0,    0,
 				           500, 1000, 1500, 2000,
 					  2500, 3000, 3500, 4000};
 
-struct CustomSound_interface dai_sound_interface =
+const struct CustomSound_interface dai_sound_interface =
 {
 	dai_sh_start,
 	NULL,

@@ -179,7 +179,7 @@ static void sord_fd5_fdc_interrupt(int state)
 	}
 }
 
-static struct nec765_interface sord_fd5_nec765_interface=
+static const struct nec765_interface sord_fd5_nec765_interface=
 {
 	sord_fd5_fdc_interrupt,
 	NULL
@@ -302,7 +302,7 @@ static WRITE8_HANDLER(sord_ppi_portc_w)
 #endif
 }
 
-static ppi8255_interface sord_ppi8255_interface =
+static const ppi8255_interface sord_ppi8255_interface =
 {
 	1,
 	{sord_ppi_porta_r},
@@ -454,7 +454,7 @@ ADDRESS_MAP_END
 
 
 
-static CENTRONICS_CONFIG sordm5_cent_config[1] =
+static const CENTRONICS_CONFIG sordm5_cent_config[1] =
 {
 	{
 		PRINTER_CENTRONICS,
@@ -623,7 +623,7 @@ static INPUT_PORTS_START(sord_m5)
 INPUT_PORTS_END
 
 
-static struct z80_irq_daisy_chain sord_m5_daisy_chain[] =
+static const struct z80_irq_daisy_chain sord_m5_daisy_chain[] =
 {
 	{z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
 	{0,0,0,0,-1}

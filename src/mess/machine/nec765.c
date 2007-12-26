@@ -1745,7 +1745,7 @@ static void nec765_setup_invalid(void)
 
 static void nec765_setup_command(void)
 {
-	static const char *commands[] =
+	static const char *const commands[] =
 	{
 		NULL,						/* [00] */
 		NULL,						/* [01] */

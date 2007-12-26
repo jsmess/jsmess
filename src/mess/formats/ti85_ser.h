@@ -30,19 +30,19 @@ typedef struct {
 	UINT16 number_of_variables;
 } ti85_serial_data;
 
-extern UINT8 ti85_file_signature[];
-extern UINT8 ti86_file_signature[];
-extern UINT8 ti85_pc_ok_packet[];
-extern UINT8 ti86_pc_ok_packet[];
-extern UINT8 ti85_pc_continue_packet[];
-extern UINT8 ti86_pc_continue_packet[];
-extern UINT8 ti85_pc_screen_request_packet[];
+extern const UINT8 ti85_file_signature[];
+extern const UINT8 ti86_file_signature[];
+extern const UINT8 ti85_pc_ok_packet[];
+extern const UINT8 ti86_pc_ok_packet[];
+extern const UINT8 ti85_pc_continue_packet[];
+extern const UINT8 ti86_pc_continue_packet[];
+extern const UINT8 ti85_pc_screen_request_packet[];
 extern int ti85_serial_transfer_type;
 
-extern UINT16 ti85_calculate_checksum(UINT8*, unsigned int);
-extern UINT16 ti85_variables_count (UINT8 *, unsigned int);
-extern void ti85_variables_read (UINT8 *, unsigned int, ti85_entry *);
-extern int ti85_convert_file_data_to_serial_stream (UINT8*, UINT32, ti85_serial_data*, char*);
-extern void ti85_convert_data_to_stream (UINT8*, unsigned int, UINT8*);
-extern void ti85_convert_stream_to_data (UINT8*, unsigned int, UINT8*);
+extern UINT16 ti85_calculate_checksum(const UINT8*, unsigned int);
+extern UINT16 ti85_variables_count (const UINT8 *, unsigned int);
+extern void ti85_variables_read (const UINT8 *, unsigned int, ti85_entry *);
+extern int ti85_convert_file_data_to_serial_stream (const UINT8*, UINT32, ti85_serial_data*, char*);
+extern void ti85_convert_data_to_stream (const UINT8*, unsigned int, UINT8*);
+extern void ti85_convert_stream_to_data (const UINT8*, unsigned int, UINT8*);
 extern void ti85_free_serial_stream (ti85_serial_data*);

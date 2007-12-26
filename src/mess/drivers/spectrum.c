@@ -162,7 +162,7 @@ extern void spectrum_128_update_memory(void);
 extern void spectrum_plus3_update_memory(void);
 
 
-static struct AY8910interface spectrum_ay_interface =
+static const struct AY8910interface spectrum_ay_interface =
 {
 	NULL
 };
@@ -550,14 +550,14 @@ but with a disc drive */
 int spectrum_plus3_port_1ffd_data = -1;
 
 
-static nec765_interface spectrum_plus3_nec765_interface =
+static const nec765_interface spectrum_plus3_nec765_interface =
 {
 		NULL,
 		NULL
 };
 
 
-static int spectrum_plus3_memory_selections[]=
+static const int spectrum_plus3_memory_selections[]=
 {
 		0,1,2,3,
 		4,5,6,7,
@@ -646,7 +646,7 @@ void spectrum_plus3_update_memory(void)
 	{
 			/* Extended memory paging */
 
-			int *memory_selection;
+			const int *memory_selection;
 			int MemorySelection;
 			unsigned char *ram_data;
 
@@ -1914,7 +1914,7 @@ static INPUT_PORTS_START( spectrum )
 
 INPUT_PORTS_END
 
-static unsigned char spectrum_palette[16*3] = {
+static const unsigned char spectrum_palette[16*3] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0xbf,
 	0xbf, 0x00, 0x00, 0xbf, 0x00, 0xbf,
 	0x00, 0xbf, 0x00, 0x00, 0xbf, 0xbf,
@@ -1926,7 +1926,7 @@ static unsigned char spectrum_palette[16*3] = {
 	0xff, 0xff, 0x00, 0xff, 0xff, 0xff,
 };
 
-static unsigned short spectrum_colortable[128*2] = {
+static const unsigned short spectrum_colortable[128*2] = {
 	0,0, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7,
 	1,0, 1,1, 1,2, 1,3, 1,4, 1,5, 1,6, 1,7,
 	2,0, 2,1, 2,2, 2,3, 2,4, 2,5, 2,6, 2,7,

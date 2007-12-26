@@ -594,7 +594,7 @@ static WRITE8_HANDLER( vc1541_via1_write_portb )
 	vc1541->led = data & 8;
 }
 
-static struct via6522_interface via2 =
+static const struct via6522_interface via2 =
 {
 	0,								   /*vc1541_via0_read_porta, */
 	vc1541_via0_read_portb,

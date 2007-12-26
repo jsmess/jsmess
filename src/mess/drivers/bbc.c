@@ -713,7 +713,7 @@ static INTERRUPT_GEN( bbcb_vsync )
 }
 
 
-//static struct TMS5220interface tms5220_interface =
+//static const struct TMS5220interface tms5220_interface =
 //{
 //	680000L,
 //	50,

@@ -47,6 +47,6 @@ WRITE8_HANDLER( ti86_port_0006_w);
 VIDEO_START( ti85 );
 VIDEO_UPDATE( ti85 );
 PALETTE_INIT( ti85 );
-extern unsigned char ti85_palette[32*7][3];
-extern unsigned short ti85_colortable[32][7];
+extern const unsigned char ti85_palette[32*7][3];
+extern const unsigned short ti85_colortable[32][7];
 												

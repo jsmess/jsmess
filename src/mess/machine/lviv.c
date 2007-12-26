@@ -195,7 +195,7 @@ WRITE8_HANDLER ( lviv_io_w )
 }
 
 
-static ppi8255_interface lviv_ppi8255_interface =
+static const ppi8255_interface lviv_ppi8255_interface =
 {
 	2,
 	{lviv_ppi_0_porta_r, lviv_ppi_1_porta_r},

@@ -36,7 +36,7 @@ ADDRESS_MAP_END
 static GFXDECODE_START( gamecom_gfxdecodeinfo )
 GFXDECODE_END
 
-static SM8500_CONFIG gamecom_cpu_config = {
+static const SM8500_CONFIG gamecom_cpu_config = {
 	gamecom_handle_dma,
 	gamecom_update_timers
 };
@@ -70,7 +70,7 @@ INPUT_PORTS_END
 
 #define GAMECOM_PALETTE_LENGTH	5	
 
-static unsigned char palette[] =
+static const unsigned char palette[] =
 {
 	0xDF, 0xFF, 0x8F,	/* White */
 	0x8F, 0xCF, 0x8F,	/* Gray 3 */

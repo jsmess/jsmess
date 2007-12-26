@@ -13,10 +13,10 @@
 #include "includes/kaypro.h"
 #include "cpu/z80/z80.h"
 
-static const char *disk_ids[4] = {"KAY2","KAY2","KAY2","KAY2"};
+static const char *const disk_ids[4] = {"KAY2","KAY2","KAY2","KAY2"};
 
 static UINT8 keyrows[10] = { 0,0,0,0,0,0,0,0,0,0 };
-static char keyboard[8][10][8] = {
+static const char keyboard[8][10][8] = {
 	{ /* normal */
 		{ 27,'1','2','3','4','5','6','7'},
 		{'8','9','0','-','=','`',  8,  9},

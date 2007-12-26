@@ -305,7 +305,7 @@ $0050: <data 16384 bytes for 8000-bfff>
 $4050:
 */
  
-static const char *hardware_types[]={
+static const char *const hardware_types[]={
 	"Normal cartridge",
 	"Action Replay",
 	"KCS Power Cartridge",
@@ -330,7 +330,7 @@ typedef struct{
 	char name[0x20]; 
 } crt_header;
 	
-static const char *chip_types[]={ "ROM", "RAM", "FLASH" };
+static const char *const chip_types[]={ "ROM", "RAM", "FLASH" };
 typedef struct {
 	char id[4]; // CHIP
 	bigulong packet_length;
@@ -376,7 +376,7 @@ static int crt_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 	|IMAGE_USES_EXROM_LINE|IMAGE_USES_LABEL, //flags
 */
 
-static struct OptionTemplate c64crt_fileeopts[] =
+static const struct OptionTemplate c64crt_fileeopts[] =
 {
 	{ "ftype",	NULL, IMGOPTION_FLAG_TYPE_INTEGER,	0,		0xffff,	NULL	},	/* [0] */
 	{ "faddr",	NULL, IMGOPTION_FLAG_TYPE_INTEGER,	0,		0xffff,	NULL	},	/* [1] */
@@ -388,7 +388,7 @@ static struct OptionTemplate c64crt_fileeopts[] =
 #define C64CRT_FILEOPTION_FADDR		1
 #define C64CRT_FILEOPTION_FBANK		2
 
-static struct OptionTemplate c64crt_createopts[] =
+static const struct OptionTemplate c64crt_createopts[] =
 {
 	{ "hardwaretype",	NULL, IMGOPTION_FLAG_TYPE_INTEGER,							0,		0xffff,	NULL	},	/* [0] */
 	{ "gameline",		NULL, IMGOPTION_FLAG_TYPE_INTEGER,							0,		0x00ff,	NULL	},	/* [1] */

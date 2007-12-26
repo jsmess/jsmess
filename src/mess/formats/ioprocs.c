@@ -40,7 +40,7 @@ static UINT64 stdio_filesizeproc(void *file)
 	return (size_t) sz;
 }
 
-struct io_procs stdio_ioprocs =
+const struct io_procs stdio_ioprocs =
 {
 	stdio_closeproc,
 	stdio_seekproc,
@@ -49,7 +49,7 @@ struct io_procs stdio_ioprocs =
 	stdio_filesizeproc
 };
 
-struct io_procs stdio_ioprocs_noclose =
+const struct io_procs stdio_ioprocs_noclose =
 {
 	NULL,
 	stdio_seekproc,

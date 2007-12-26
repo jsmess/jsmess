@@ -1057,7 +1057,7 @@ static void amstrad_Set_CR(int offset, int data)
 }
 /* The cursor is not used on Amstrad. The CURSOR signal is available on the Expansion port for other hardware to use. */
 
-static struct m6845_interface amstrad6845= {
+static const struct m6845_interface amstrad6845= {
 	amstrad_Set_MA, // Memory Address register
 	amstrad_Set_RA, // Row Address register
 	amstrad_Set_HS, // Horizontal status

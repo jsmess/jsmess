@@ -721,7 +721,7 @@ WRITE8_HANDLER ( gb_io2_w )
 }
 
 #ifdef MAME_DEBUG
-static const char *sgbcmds[26] =
+static const char *const sgbcmds[26] =
 {
 	"PAL01   ",
 	"PAL23   ",
@@ -1307,7 +1307,7 @@ DEVICE_INIT(gb_cart)
 
 DEVICE_LOAD(gb_cart)
 {
-	static const char *CartTypes[] =
+	static const char *const CartTypes[] =
 	{
 		"ROM ONLY",
 		"ROM+MBC1",
@@ -1348,7 +1348,7 @@ DEVICE_LOAD(gb_cart)
 	};
 
 /*** Following are some known manufacturer codes *************************/
-	static struct
+	static const struct
 	{
 		UINT16 Code;
 		const char *Name;

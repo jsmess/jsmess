@@ -1173,7 +1173,7 @@ MACHINE_START( dgnbeta )
 
 #ifdef MAME_DEBUG
 
-static const char *os9syscalls[] =
+static const char *const os9syscalls[] =
 {
 	"F$Link",          /* Link to Module */
 	"F$Load",          /* Load Module from File */

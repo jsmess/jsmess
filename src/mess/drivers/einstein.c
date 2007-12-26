@@ -447,7 +447,7 @@ static void einstein_pio_ardy(int data)
 	centronics_write_handshake(0, handshake, CENTRONICS_STROBE);
 }
 
-static z80pio_interface einstein_pio_intf = 
+static const z80pio_interface einstein_pio_intf = 
 {
 	einstein_pio_interrupt,
 	einstein_pio_ardy,
@@ -522,7 +522,7 @@ static void einstein_fire_reti(int which)
 }
 #endif
 
-static struct z80_irq_daisy_chain einstein_daisy_chain[] =
+static const struct z80_irq_daisy_chain einstein_daisy_chain[] =
 {
 	{einstein_keyboard_int_reset, einstein_keyboard_interrupt, 0, einstein_keyboard_reti, 0},
     {z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
@@ -1348,7 +1348,7 @@ ADDRESS_MAP_END
 
 
 
-static struct msm8251_interface einstein_msm8251_intf=
+static const struct msm8251_interface einstein_msm8251_intf=
 {
 	NULL,
 	NULL,
@@ -1372,7 +1372,7 @@ static void einstein_printer_handshake_in(int number, int data, int mask)
 	}
 }
 
-static CENTRONICS_CONFIG einstein_cent_config[1]={
+static const CENTRONICS_CONFIG einstein_cent_config[1]={
 	{
 		PRINTER_CENTRONICS,
 		einstein_printer_handshake_in
@@ -1602,7 +1602,7 @@ static  READ8_HANDLER(einstein_port_b_read)
 	return einstein_keyboard_data;	
 }
 
-static struct AY8910interface einstein_ay_interface =
+static const struct AY8910interface einstein_ay_interface =
 {
 	NULL,
 	einstein_port_b_read,

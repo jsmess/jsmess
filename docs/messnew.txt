@@ -69,7 +69,9 @@ Source Changes:
 - Added a general 74145 BCD-to-decimal decoder emulation, currently used
   by the SYM-1 driver.  [Dirk Best]
 
-- Fixed M65C02 optimization  [Peter Trauner]
+- Fixed M65C02 optimization.  [Peter Trauner]
+
+- Staticization and constification.  [Atari Ace]
 
 
 

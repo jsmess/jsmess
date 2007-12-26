@@ -228,7 +228,7 @@ static casserr_t wavfile_save(cassette_image *cassette, const struct CassetteInf
 
 
 
-struct CassetteFormat wavfile_format =
+const struct CassetteFormat wavfile_format =
 {
 	"wav",
 	wavfile_identify,

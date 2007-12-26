@@ -140,7 +140,7 @@ int centronics_read_handshake(int nr)
 	return data;
 }
 
-CENTRONICS_DEVICE CENTRONICS_PRINTER_DEVICE= {
+const CENTRONICS_DEVICE CENTRONICS_PRINTER_DEVICE= {
 	NULL,
 	centronics_write_data,
 	centronics_read_handshake,

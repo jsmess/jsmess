@@ -50,7 +50,7 @@ static BOOL CALLBACK DIJoystick_EnumDeviceProc(LPDIDEVICEINSTANCE pdidi, LPVOID 
     External variables
  ***************************************************************************/
 
-struct OSDJoystick  DIJoystick = 
+const struct OSDJoystick  DIJoystick = 
 {
 	DIJoystick_init,                /* init              */
 	DIJoystick_exit,                /* exit              */

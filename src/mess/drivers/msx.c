@@ -702,7 +702,7 @@ static INPUT_PORTS_START( msx2kr )
 INPUT_PORTS_END
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	msx_psg_port_a_r,
 	msx_psg_port_b_r,

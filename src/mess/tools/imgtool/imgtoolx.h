@@ -39,7 +39,7 @@ struct WaveExtra
 
 #define WAVEMODULE(name_,humanname_,ext_,eoln_,flags_,zeropulse,onepulse,threshpulse,waveflags,blockheader,blockheadersize,\
 		initalt,nextfile,readfilechunk)	\
-	static struct WaveExtra waveextra_##name =								\
+	static const struct WaveExtra waveextra_##name =								\
 	{																		\
 		(initalt),															\
 		(nextfile),															\

@@ -32,7 +32,7 @@ static void pio_interrupt(int state);
 static int vidpg;
 static int charset;
 
-static z80pio_interface z80pio_intf =
+static const z80pio_interface z80pio_intf =
 {
 	pio_interrupt
 	NULL,
@@ -302,7 +302,7 @@ static PALETTE_INIT( super80_bw )
 	memcpy(colortable, & bw_colortable, sizeof(bw_colortable));
 }
 
-static struct z80_irq_daisy_chain super80_daisy_chain[] =
+static const struct z80_irq_daisy_chain super80_daisy_chain[] =
 {
 	{z80pio_reset, z80pio_interrupt, z80pio_reti, 0},
 	{0,0,0,-1}

@@ -191,7 +191,7 @@ static GFXDECODE_START( gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, chunky_layout, 0, 1 )
 GFXDECODE_END
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0,
 	0,

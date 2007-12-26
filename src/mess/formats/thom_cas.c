@@ -569,7 +569,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 
 
 
-static struct CassetteFormat to7_k7 = 
+static const struct CassetteFormat to7_k7 = 
 { "k7", to7_k7_identify, to7_k7_load, NULL /* no save */ };
 
 
@@ -934,7 +934,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 
 
 
-static struct CassetteFormat mo5_k5 = 
+static const struct CassetteFormat mo5_k5 = 
 { "k5,k7", mo5_k5_identify, mo5_k5_load, NULL /* no save */ };
 
 
@@ -985,11 +985,11 @@ const static struct CassetteFormat mo5_wav =
 /********************* formats ************************/
 
 
-const struct CassetteFormat *to7_cassette_formats[] = 
+const struct CassetteFormat *const to7_cassette_formats[] = 
 { &to7_wav, &to7_k7, NULL };
 
 
-const struct CassetteFormat *mo5_cassette_formats[] = 
+const struct CassetteFormat *const mo5_cassette_formats[] = 
 { &mo5_wav, &mo5_k5, NULL };
 
 

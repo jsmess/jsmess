@@ -93,7 +93,7 @@ static int vtech1_cassette_fill_wave(INT16 *buffer, int length, UINT8 *code)
 	return generic_fill_wave(buffer, length, code, V1_BITSAMPLES, V1_BYTESAMPLES, V1_LO, vtech1_fill_wave_byte);
 }
 
-static struct CassetteLegacyWaveFiller vtech1_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller vtech1_legacy_fill_wave =
 {
 	vtech1_cassette_fill_wave,	/* fill_wave */
 	1,							/* chunk_size */
@@ -114,7 +114,7 @@ static casserr_t vtech1_cas_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &vtech1_legacy_fill_wave);
 }
 
-static struct CassetteFormat vtech1_cas_format =
+static const struct CassetteFormat vtech1_cas_format =
 {
 	"cas",
 	vtech1_cas_identify,
@@ -188,7 +188,7 @@ static int vtech2_cassette_fill_wave(INT16 *buffer, int length, UINT8 *code)
 	return generic_fill_wave(buffer, length, code, VT2_BITSAMPLES, VT2_BYTESAMPLES, VT2_LO, vtech2_fill_wave_byte);
 }
 
-static struct CassetteLegacyWaveFiller vtech2_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller vtech2_legacy_fill_wave =
 {
 	vtech2_cassette_fill_wave,	/* fill_wave */
 	1,							/* chunk_size */
@@ -209,7 +209,7 @@ static casserr_t vtech2_cas_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &vtech2_legacy_fill_wave);
 }
 
-static struct CassetteFormat vtech2_cas_format =
+static const struct CassetteFormat vtech2_cas_format =
 {
 	"cas",
 	vtech2_cas_identify,

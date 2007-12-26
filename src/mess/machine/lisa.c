@@ -135,7 +135,7 @@ static  READ8_HANDLER(parallel_via_in_b);
 
 static int KBIR;	/* COPS VIA interrupt pending */
 
-static struct via6522_interface lisa_via6522_intf[2] =
+static const struct via6522_interface lisa_via6522_intf[2] =
 {
 	{	/* COPS via */
 		NULL, COPS_via_in_b,

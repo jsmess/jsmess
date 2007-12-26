@@ -38,7 +38,7 @@ static WRITE8_HANDLER ( pio_port_a_w );
 static WRITE8_HANDLER ( pio_port_b_w );
 static WRITE8_HANDLER ( pio_port_c_w );
 
-static ppi8255_interface ppi8255 = {
+static const ppi8255_interface ppi8255 = {
     1,
 	{pio_port_a_r},
 	{pio_port_b_r},
@@ -55,7 +55,7 @@ static void pit_clk_0(double clock);
 static void pit_clk_1(double clock);
 static void pit_irq_2(int which);
 
-static struct pit8253_config pit8253 =
+static const struct pit8253_config pit8253 =
 {
 	TYPE8253,
 	{

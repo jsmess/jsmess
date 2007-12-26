@@ -300,7 +300,7 @@ ROM_START( c64dx )
 	ROM_LOAD ("910429.bin", 0x20000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d))
 ROM_END
 
-static SID6581_interface c65_sound_interface =
+static const SID6581_interface c65_sound_interface =
 {
 	c64_paddle_read
 };

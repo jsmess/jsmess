@@ -1161,7 +1161,7 @@ ROM_START (c128nor)
 	ROM_REGION (0x100, REGION_GFX2, 0)
 ROM_END
 
-static SID6581_interface c128_sound_interface =
+static const SID6581_interface c128_sound_interface =
 {
 	c64_paddle_read
 };

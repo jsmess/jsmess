@@ -21,7 +21,7 @@
 
 /* ---------------------------------------------------------------------- */
 
-static void writeusage(FILE *f, int write_word_usage, struct command *c, char *argv[])
+static void writeusage(FILE *f, int write_word_usage, const struct command *c, char *argv[])
 {
 	fprintf(f, "%s %s %s %s\n",
 		(write_word_usage ? "Usage:" : "      "),
@@ -871,7 +871,7 @@ error:
 
 /* ----------------------------------------------------------------------- */
 
-static struct command cmds[] =
+static const struct command cmds[] =
 {
 	{ "create",				cmd_create,				"<format> <imagename> [--(createoption)=value]", 2, 8, 0},
 	{ "dir",				cmd_dir,				"<format> <imagename> [path]", 2, 3, 0 },
@@ -897,7 +897,7 @@ int CLIB_DECL main(int argc, char *argv[])
 {
 	int i;
 	int result;
-	struct command *c;
+	const struct command *c;
 	const char *sample_format = "coco_jvc_rsdos";
 
 #ifdef MAME_DEBUG

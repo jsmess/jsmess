@@ -34,7 +34,7 @@ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M );
 #define CONTROL_IRQ 0x10
 
 typedef struct {
-	CENTRONICS_DEVICE *device;
+	const CENTRONICS_DEVICE *device;
 	const PC_LPT_CONFIG *config;
 	int on;
 	UINT8 data;
@@ -51,7 +51,7 @@ void pc_lpt_config(int nr, const PC_LPT_CONFIG *config)
 	This->config=config;
 }
 
-void pc_lpt_set_device(int nr, CENTRONICS_DEVICE *device)
+void pc_lpt_set_device(int nr, const CENTRONICS_DEVICE *device)
 {
 	PC_LPT *This=LPT+nr;
 	This->device=device;

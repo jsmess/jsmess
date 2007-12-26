@@ -1391,14 +1391,14 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback_pal ) {
 	}
 }
 
-static struct tia_interface tia_interface =
+static const struct tia_interface tia_interface =
 {
 	a2600_read_input_port,
 	a2600_get_databus_contents,
 	a2600_tia_vsync_callback
 };
 
-static struct tia_interface tia_interface_pal =
+static const struct tia_interface tia_interface_pal =
 {
 	a2600_read_input_port,
 	a2600_get_databus_contents,

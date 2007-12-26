@@ -101,7 +101,7 @@ registers common to all modes:
 //#define VERBOSE
 
 /* mask data with these values when writing */
-static unsigned char rtc_write_masks[16*4]=
+static const unsigned char rtc_write_masks[16*4]=
 {
 	0x0f,0x07,0x0f,0x07,0x0f,0x03,0x07,0x0f,0x03,0x0f,0x03,0x0f,0x0f,0x0f, 0x0f, 0x0f,
 	0x00,0x00,0x0f,0x07,0x0f,0x03,0x07,0x0f,0x03,0x00,0x01,0x03,0x00,0x0f, 0x0f, 0x0f,
@@ -291,7 +291,7 @@ static TIMER_CALLBACK(tc8521_timer_callback)
 
 
 
-void tc8521_init(struct tc8521_interface *intf)
+void tc8521_init(const struct tc8521_interface *intf)
 {
 	memset(&rtc, 0, sizeof(struct tc8521));
 	memset(&rtc.interface, 0, sizeof(struct tc8521_interface));

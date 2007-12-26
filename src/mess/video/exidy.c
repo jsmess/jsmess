@@ -20,13 +20,13 @@ VIDEO_START( exidy )
 }
 
 /* two colours */
-static unsigned short exidy_colour_table[EXIDY_NUM_COLOURS] =
+static const unsigned short exidy_colour_table[EXIDY_NUM_COLOURS] =
 {
 	0, 1
 };
 
 /* black/white */
-static unsigned char exidy_palette[EXIDY_NUM_COLOURS * 3] =
+static const unsigned char exidy_palette[EXIDY_NUM_COLOURS * 3] =
 {
     0x000, 0x000, 0x000,
     0x0ff, 0x0ff, 0x0ff

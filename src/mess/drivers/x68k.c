@@ -1510,7 +1510,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static mfp68901_interface mfp_interface =
+static const mfp68901_interface mfp_interface =
 {
 	2000000, // 4MHz clock
 	4000000,
@@ -1524,7 +1524,7 @@ static mfp68901_interface mfp_interface =
 	NULL
 };
 
-static ppi8255_interface ppi_interface =
+static const ppi8255_interface ppi_interface =
 {
 	1,  // 1 PPI
 	{ ppi_port_a_r },
@@ -1535,7 +1535,7 @@ static ppi8255_interface ppi_interface =
 	{ ppi_port_c_w }
 };
 
-static struct hd63450_interface dmac_interface =
+static const struct hd63450_interface dmac_interface =
 {
 	0,  // CPU - 68000
 	{TIME_IN_USEC(32),TIME_IN_USEC(32),TIME_IN_USEC(4),TIME_IN_USEC(32)},  // Cycle steal mode timing (guesstimate)
@@ -1548,24 +1548,24 @@ static struct hd63450_interface dmac_interface =
 //	{ 0, 0, 0, 0 }
 };
 
-static nec765_interface fdc_interface =
+static const nec765_interface fdc_interface =
 {
 	fdc_irq,
 	fdc_drq
 };
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	x68k_fm_irq,
 	x68k_ct_w  // CT1, CT2 from YM2151 port 0x1b
 };
 
-static struct scc8530_interface scc_interface =
+static const struct scc8530_interface scc_interface =
 {
 	NULL//x68k_scc_ack
 };
 
-static struct rp5c15_interface rtc_intf = 
+static const struct rp5c15_interface rtc_intf = 
 {
 	x68k_rtc_alarm_irq
 };

@@ -74,7 +74,7 @@ static GFXDECODE_START( saa5050_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_lolayout, 0, 128 )
 GFXDECODE_END
 
-static unsigned char saa5050_palette[8 * 3] =
+static const UINT8 saa5050_palette[8 * 3] =
 {
 	0x00, 0x00, 0x00,	/* black */
 	0xff, 0x00, 0x00,	/* red */
@@ -86,7 +86,7 @@ static unsigned char saa5050_palette[8 * 3] =
 	0xff, 0xff, 0xff	/* white */
 };
 
-static	unsigned	short	saa5050_colortable[64 * 2] =	/* bgnd, fgnd */
+static const UINT16 saa5050_colortable[64 * 2] =	/* bgnd, fgnd */
 {
 	0,1, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7,
 	1,0, 1,1, 1,2, 1,3, 1,4, 1,5, 1,6, 1,7,

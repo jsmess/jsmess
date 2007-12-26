@@ -10,7 +10,7 @@
 
 struct NCR5380interface
 {
-	SCSIConfigTable *scsidevs;		/* SCSI devices */
+	const SCSIConfigTable *scsidevs;		/* SCSI devices */
 	void (*irq_callback)(int state);	/* irq callback */
 };
 
@@ -36,7 +36,7 @@ enum
 #define R5380_OUTDATA_DTACK	(R5380_OUTDATA | 0x10)
 #define R5380_CURDATA_DTACK	(R5380_CURDATA | 0x10)
 
-extern void ncr5380_init( struct NCR5380interface *interface );
+extern void ncr5380_init( const struct NCR5380interface *interface );
 extern void ncr5380_read_data(int bytes, UINT8 *pData);
 extern void ncr5380_write_data(int bytes, UINT8 *pData);
 extern void *ncr5380_get_device(int id);

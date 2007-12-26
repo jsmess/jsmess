@@ -202,13 +202,13 @@ static GFXDECODE_START( comquest_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, comquest_charlayout, 0, 2 )
 GFXDECODE_END
 
-static unsigned char comquest_palette[] =
+static const unsigned char comquest_palette[] =
 {
 	0, 0, 0,
 	255,255,255
 };
 
-static unsigned short comquest_colortable[1][2] = {
+static const unsigned short comquest_colortable[1][2] = {
 	{ 0, 1 },
 };
 
@@ -224,7 +224,7 @@ static MACHINE_RESET( comquest )
 //	memory_set_bankptr(1,mem+0x00000);
 }
 
-static UINT32 amask= 0xffff;
+static const UINT32 amask= 0xffff;
 
 
 static MACHINE_DRIVER_START( comquest )

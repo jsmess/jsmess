@@ -23,7 +23,7 @@ INLINE void z88_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 ***************************************************************************/
 
 /* two colours */
-static unsigned short z88_colour_table[Z88_NUM_COLOURS] =
+static const unsigned short z88_colour_table[Z88_NUM_COLOURS] =
 {
 	0, 1, 2
 };

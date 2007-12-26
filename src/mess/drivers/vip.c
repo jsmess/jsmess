@@ -130,7 +130,7 @@ static void vip_q_w(int level)
 	set_led_status(1, level);
 }
 
-static CDP1802_CONFIG vip_config = 
+static const CDP1802_CONFIG vip_config = 
 {
 	vip_mode_r,
 	vip_ef_r,

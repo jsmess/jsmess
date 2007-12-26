@@ -10,7 +10,7 @@
 static pc_video_update_proc pc_aga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc);
 
 
-gfx_layout europc_cga_charlayout =
+const gfx_layout europc_cga_charlayout =
 {
 	8,16,					/* 8 x 32 characters */
 	256,                    /* 256 characters */
@@ -26,7 +26,7 @@ gfx_layout europc_cga_charlayout =
 	8*16                     /* every char takes 8 bytes */
 };
 
-gfx_layout europc_mda_charlayout =
+const gfx_layout europc_mda_charlayout =
 {
 	9,32,					/* 9 x 32 characters (9 x 15 is the default, but..) */
 	256,					/* 256 characters */
@@ -44,7 +44,7 @@ gfx_layout europc_mda_charlayout =
 	8*16
 };
 
-static gfx_layout pc200_mda_charlayout =
+static const gfx_layout pc200_mda_charlayout =
 {
 	9,32,					/* 9 x 32 characters (9 x 15 is the default, but..) */
 	256,					/* 256 characters */
@@ -60,7 +60,7 @@ static gfx_layout pc200_mda_charlayout =
 	8*16 					/* every char takes 8 bytes (upper half) */
 };
 
-static gfx_layout pc200_cga_charlayout =
+static const gfx_layout pc200_cga_charlayout =
 {
 	8,16,               /* 8 x 16 characters */
 	256,                    /* 256 characters */
@@ -200,7 +200,7 @@ static void pc_aga_cursor(struct mscrtc6845_cursor *cursor)
 }
 
 
-static struct mscrtc6845_config config= { 14318180 /*?*/, pc_aga_cursor };
+static const struct mscrtc6845_config config= { 14318180 /*?*/, pc_aga_cursor };
 
 VIDEO_START( pc_aga )
 {

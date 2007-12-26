@@ -86,7 +86,7 @@ static void serial_device_in_callback(int id, unsigned long status)
 
 static void serial_protocol_none_sent_char(int id);
 
-static struct serial_protocol_interface serial_protocol_none_interface=
+static const struct serial_protocol_interface serial_protocol_none_interface=
 {
 	NULL,
 	serial_protocol_none_sent_char,
@@ -96,7 +96,7 @@ static struct serial_protocol_interface serial_protocol_none_interface=
 static void serial_protocol_xmodem_receive_char(int id, unsigned char ch);
 static void serial_protocol_xmodem_sent_char(int id);
 
-static struct serial_protocol_interface serial_protocol_xmodem_interface=
+static const struct serial_protocol_interface serial_protocol_xmodem_interface=
 {
 	serial_protocol_xmodem_receive_char,
 	serial_protocol_xmodem_sent_char
@@ -149,7 +149,7 @@ unsigned long serial_device_get_state(int id)
 }
 
 
-static const char *protocol_names[]=
+static const char *const protocol_names[]=
 {
 	"None",
 	"XModem"

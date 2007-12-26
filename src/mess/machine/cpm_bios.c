@@ -130,10 +130,10 @@ DEVICE_LOAD( cpm_floppy )
  *	cpm_init
  *	Initialize the BIOS simulation for 'n' drives of types stored in 'ids'
  *****************************************************************************/
-int cpm_init(int n, const char *ids[])
+int cpm_init(int n, const char *const ids[])
 {
 	UINT8 * RAM = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
-	dsk_fmt *f;
+	const dsk_fmt *f;
 	int i, d;
 
 
@@ -358,7 +358,7 @@ int cpm_disk_select_format(int d, const char *id)
 
 	if (VERBOSE)
 	{
-		dsk_fmt *f = &formats[fmt[d]];
+		const dsk_fmt *f = &formats[fmt[d]];
 
 		logerror("CPM '%s' is '%s'\n", id, f->name);
 		logerror("CPM #%d %dK (%d cylinders, %d sides, %d %d bytes sectors/track)\n",
@@ -379,7 +379,7 @@ int cpm_disk_select_format(int d, const char *id)
  *****************************************************************************/
 static void cpm_disk_image_seek(void)
 {
-	dsk_fmt *f = &formats[fmt[curdisk]];
+	const dsk_fmt *f = &formats[fmt[curdisk]];
 	int offs, o, r, s, h;
 
 	switch (f->order)
@@ -586,7 +586,7 @@ int cpm_disk_write_sector(void)
 
 WRITE8_HANDLER ( cpm_bios_command_w )
 {
-	dsk_fmt *f;
+	const dsk_fmt *f;
 	char buff[256];
 	UINT8 * RAM = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
 	UINT16 tmp, af, bc, de, hl;

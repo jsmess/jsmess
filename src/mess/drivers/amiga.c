@@ -179,7 +179,7 @@ INPUT_PORTS_END
   Machine drivers
 ***************************************************************************/
 
-static struct CustomSound_interface amiga_custom_interface =
+static const struct CustomSound_interface amiga_custom_interface =
 {
 	amiga_sh_start
 };

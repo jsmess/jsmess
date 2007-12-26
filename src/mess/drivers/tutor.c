@@ -547,7 +547,7 @@ static INPUT_PORTS_START(tutor)
 INPUT_PORTS_END
 
 
-static struct tms9995reset_param tutor_processor_config =
+static const struct tms9995reset_param tutor_processor_config =
 {
 #if 0
 	REGION_CPU1,/* region for processor RAM */

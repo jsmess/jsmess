@@ -349,7 +349,7 @@ static WRITE8_HANDLER ( pmd85_ppi_2_portc_w )
 
 *******************************************************************************/
 
-static struct msm8251_interface pmd85_msm8251_interface =
+static const struct msm8251_interface pmd85_msm8251_interface =
 {
 	NULL,
 	NULL,
@@ -376,7 +376,7 @@ static struct msm8251_interface pmd85_msm8251_interface =
 
 *******************************************************************************/
 
-static struct pit8253_config pmd85_pit8253_interface =
+static const struct pit8253_config pmd85_pit8253_interface =
 {
 	TYPE8253,
 	{
@@ -650,7 +650,7 @@ WRITE8_HANDLER ( mato_io_w )
 	}
 }
 
-static ppi8255_interface pmd85_ppi8255_interface =
+static const ppi8255_interface pmd85_ppi8255_interface =
 {
 	4,
 	{pmd85_ppi_0_porta_r, pmd85_ppi_1_porta_r, pmd85_ppi_2_porta_r, pmd85_ppi_3_porta_r},
@@ -661,7 +661,7 @@ static ppi8255_interface pmd85_ppi8255_interface =
 	{pmd85_ppi_0_portc_w, pmd85_ppi_1_portc_w, pmd85_ppi_2_portc_w, pmd85_ppi_3_portc_w}
 };
 
-static ppi8255_interface alfa_ppi8255_interface =
+static const ppi8255_interface alfa_ppi8255_interface =
 {
 	3,
 	{pmd85_ppi_0_porta_r, pmd85_ppi_1_porta_r, pmd85_ppi_2_porta_r},
@@ -672,7 +672,7 @@ static ppi8255_interface alfa_ppi8255_interface =
 	{pmd85_ppi_0_portc_w, pmd85_ppi_1_portc_w, pmd85_ppi_2_portc_w}
 };
 
-static ppi8255_interface mato_ppi8255_interface =
+static const ppi8255_interface mato_ppi8255_interface =
 {
 	1,
 	{pmd85_ppi_0_porta_r},

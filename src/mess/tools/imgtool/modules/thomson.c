@@ -1184,7 +1184,7 @@ static imgtoolerr_t thom_create(imgtool_image* img,
 
 /* character codes >= 128 are reserved for BASIC keywords */
 
-static const char* thombas7[2][128] = { 
+static const char *const thombas7[2][128] = { 
   { /* statements */
     "END", "FOR", "NEXT", "DATA", "DIM", "READ", "LET", "GO", "RUN", "IF",
     "RESTORE", "RETURN", "REM", "'", "STOP", "ELSE", "TRON", "TROFF", "DEFSTR",
@@ -1214,7 +1214,7 @@ static const char* thombas7[2][128] = {
 };
 
 /* MO5: some keywords ar missing; DOS and TUNE are added */
-static const char* thombas5[2][128] = {
+static const char *const thombas5[2][128] = {
   { /* statements */
     "END", "FOR", "NEXT", "DATA", "DIM", "READ", NULL, "GO", "RUN", "IF",
     "RESTORE", "RETURN", "REM", "'", "STOP", "ELSE", "TRON", "TROFF", "DEFSTR",
@@ -1248,7 +1248,7 @@ static const char* thombas5[2][128] = {
 /* DENSITY is missing on BASIC 512 & BASIC 128 for MO6 but, otherwise, they
    have the same tokens
 */
-static const char* thombas128[2][128] = {
+static const char *const thombas128[2][128] = {
   { /* statements */
     "END", "FOR", "NEXT", "DATA", "DIM", "READ", "LET", "GO", "RUN", "IF",
     "RESTORE", "RETURN", "REM", "'", "STOP", "ELSE", "TRON", "TROFF", "DEFSTR",
@@ -1401,7 +1401,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool_partition *part,
 					 const char *name, 
 					 const char *fork, 
 					 imgtool_stream *dst,
-					 const char* table[2][128])
+					 const char *const table[2][128])
 {
   imgtool_stream *org = stream_open_mem( NULL, 0 );
   imgtoolerr_t err;
@@ -1472,7 +1472,7 @@ static imgtoolerr_t thom_basic_write_file(imgtool_partition *part,
 					 const char *fork, 
 					 imgtool_stream *src, 
 					 option_resolution *opts,
-					 const char* table[2][128])
+					 const char *const table[2][128])
 {
   return IMGTOOLERR_UNIMPLEMENTED;
 }

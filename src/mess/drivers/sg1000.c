@@ -393,7 +393,7 @@ static WRITE8_HANDLER( sc3000_ppi8255_c_w )
 	keylatch = data & 0x07;
 }
 
-static ppi8255_interface sc3000_ppi8255_intf =
+static const ppi8255_interface sc3000_ppi8255_intf =
 {
 	1, 						// 1 chip
 	{ sc3000_ppi8255_a_r },	// Port A read
@@ -489,7 +489,7 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 	centronics_write_handshake(1, (data & 0x80) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 }
 
-static ppi8255_interface sf7000_ppi8255_intf =
+static const ppi8255_interface sf7000_ppi8255_intf =
 {
 	2, 											// 2 chips
 	{ sc3000_ppi8255_a_r, sf7000_ppi8255_a_r },	// Port A read
@@ -511,20 +511,20 @@ static void sf7000_fdc_index_callback(mess_image *img, int state)
 	sf7000_fdc_index = state;
 }
 
-static struct nec765_interface sf7000_nec765_interface =
+static const struct nec765_interface sf7000_nec765_interface =
 {
 	sf7000_fdc_interrupt,
 	NULL
 };
 
-static struct msm8251_interface sf7000_uart_interface =
+static const struct msm8251_interface sf7000_uart_interface =
 {
 	NULL,
 	NULL,
 	NULL
 };
 
-static CENTRONICS_CONFIG sf7000_centronics_config[1] = {
+static const CENTRONICS_CONFIG sf7000_centronics_config[1] = {
 	{
 		PRINTER_IBM,
 		NULL

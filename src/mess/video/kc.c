@@ -14,7 +14,7 @@
 
 /* KC85/4 and KC85/3 common graphics hardware */
 
-static unsigned short kc85_colour_table[KC85_PALETTE_SIZE] =
+static const unsigned short kc85_colour_table[KC85_PALETTE_SIZE] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
         16, 17, 18, 19, 20, 21, 22, 23
@@ -57,7 +57,7 @@ static unsigned short kc85_colour_table[KC85_PALETTE_SIZE] =
  */
 
 
-static unsigned char kc85_palette[KC85_PALETTE_SIZE * 3] =
+static const unsigned char kc85_palette[KC85_PALETTE_SIZE * 3] =
 {
 		/* 3 bit colour value. bit 2->green, bit 1->red, bit 0->blue */
 		 

@@ -20,7 +20,7 @@ struct pc_disk_sizes
 
 
 
-static struct pc_disk_sizes disk_sizes[] =
+static const struct pc_disk_sizes disk_sizes[] =
 {
 	{ 8*1*40*512,  8, 1},	/* 5 1/4 inch double density single sided */
 	{ 8*2*40*512,  8, 2},	/* 5 1/4 inch double density */

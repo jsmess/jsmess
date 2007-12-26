@@ -3,7 +3,7 @@
 
 	The only difference is that the US # character is a Pound character in UK.
 */
-static unsigned char US_key_translate[4][91] =
+static const unsigned char US_key_translate[4][91] =
 {
 	{	/* lower case */
 		0x92,
@@ -451,7 +451,7 @@ static unsigned char US_key_translate[4][91] =
 /*
 	key translation table for French terminals
 */
-static unsigned char French_key_translate[4][91] =
+static const unsigned char French_key_translate[4][91] =
 {
 	{	/* lower case */
 		0x92,
@@ -899,7 +899,7 @@ static unsigned char French_key_translate[4][91] =
 /*
 	key translation table for German terminals
 */
-static unsigned char German_key_translate[4][91] =
+static const unsigned char German_key_translate[4][91] =
 {
 	{	/* lower case */
 		0x92,
@@ -1347,7 +1347,7 @@ static unsigned char German_key_translate[4][91] =
 /*
 	key translation table for Swedish/Finnish terminals
 */
-static unsigned char Swedish_key_translate[4][91] =
+static const unsigned char Swedish_key_translate[4][91] =
 {
 	{	/* lower case */
 		0x92,
@@ -1795,7 +1795,7 @@ static unsigned char Swedish_key_translate[4][91] =
 /*
 	key translation table for Norwegian/Danish terminals
 */
-static unsigned char Norwegian_key_translate[4][91] =
+static const unsigned char Norwegian_key_translate[4][91] =
 {
 	{	/* lower case */
 		0x92,
@@ -2243,7 +2243,7 @@ static unsigned char Norwegian_key_translate[4][91] =
 /*
 	key translation table for Japanese katakana terminals
 */
-static unsigned char Japanese_key_translate[6][91] =
+static const unsigned char Japanese_key_translate[6][91] =
 {
 	{	/* lower case */
 		0x92,
@@ -2912,7 +2912,7 @@ static unsigned char Japanese_key_translate[6][91] =
 /*
 	key translation table for Arabic terminals
 */
-static unsigned char Arabic_key_translate[6][91] =
+static const unsigned char Arabic_key_translate[6][91] =
 {
 	{	/* lower case */
 		0x92,
@@ -3581,7 +3581,7 @@ static unsigned char Arabic_key_translate[6][91] =
 /*
 	key translation table for French word-processing terminals
 */
-static unsigned char FrenchWP_key_translate[4][91] =
+static const unsigned char FrenchWP_key_translate[4][91] =
 {
 	{	/* lower case */
 		0x92,

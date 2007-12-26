@@ -164,7 +164,7 @@ static int svi_cas_chunk_sample_calc(const UINT8 *bytes, int length)
 
 
 
-static struct CassetteLegacyWaveFiller svi_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller svi_legacy_fill_wave =
 {
 	svi_cas_fill_wave,						/* fill_wave */
 	-1,										/* chunk_size */
@@ -191,7 +191,7 @@ static casserr_t svi_cas_load(cassette_image *cassette)
 
 
 
-static struct CassetteFormat svi_cas_format =
+static const struct CassetteFormat svi_cas_format =
 {
 	"cas",
 	svi_cas_identify,

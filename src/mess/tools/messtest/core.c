@@ -229,7 +229,7 @@ parseerror:
 
 static input_code messtest_token_to_code(const char *token)
 {
-	static struct
+	static const struct
 	{
 		int				code;
 		const char *	codename;

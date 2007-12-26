@@ -492,7 +492,7 @@ ROM_END
 
 static  READ8_HANDLER(opn_dummy_input){return 0xff;}
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	opn_dummy_input,
 	opn_dummy_input,

@@ -127,13 +127,13 @@ static void ti99_2_vblank_interrupt(void)
 	the CPU can get more bus time.
 */
 
-static unsigned char ti99_2_palette[] =
+static const unsigned char ti99_2_palette[] =
 {
 	255, 255, 255,
 	0, 0, 0
 };
 
-static unsigned short ti99_2_colortable[] =
+static const unsigned short ti99_2_colortable[] =
 {
 	0, 1
 };
@@ -373,7 +373,7 @@ static INPUT_PORTS_START(ti99_2)
 INPUT_PORTS_END
 
 
-static struct tms9995reset_param ti99_2_processor_config =
+static const struct tms9995reset_param ti99_2_processor_config =
 {
 #if 0
 	REGION_CPU1,/* region for processor RAM */

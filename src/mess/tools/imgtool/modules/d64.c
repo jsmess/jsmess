@@ -78,7 +78,7 @@ typedef struct {
 	unsigned char unused2[0x2d]; // zer0
 } D71_HEADER;
 
-static D64_HEADER d64_header={ 
+static const D64_HEADER d64_header={ 
 	18,1,'A', 
 	0, // 1571 0x80
 	{ { 0 } },
@@ -117,7 +117,7 @@ typedef struct {
 	unsigned char unused1[227]; // zero
 } D81_HEADER;
 
-static D81_HEADER d81_header={ 
+static const D81_HEADER d81_header={ 
 	40,3,'D', 
 	0,
 	{ '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0',
@@ -133,7 +133,7 @@ typedef struct {
 	struct { unsigned char free, map[5]; } bam[40];
 } D81_BAM;
 
-static D81_BAM d81_bam={
+static const D81_BAM d81_bam={
 	40, 2,0x44, 0xbb,
 };
 
@@ -517,7 +517,7 @@ static int d81_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 static int d64_read_sector(imgtool_image *img, UINT8 head, UINT8 track, UINT8 sector, int offset, void *buffer, int length);
 static int d64_write_sector(imgtool_image *img, UINT8 head, UINT8 track, UINT8 sector, int offset, const void *buffer, int length);
 
-static struct OptionTemplate d64_createopts[] =
+static const struct OptionTemplate d64_createopts[] =
 {
 	{ "label",	NULL, IMGOPTION_FLAG_TYPE_STRING | IMGOPTION_FLAG_HASDEFAULT,	0,		0,		NULL	},	/* [3] */
 	{ NULL, NULL, 0, 0, 0, 0 }

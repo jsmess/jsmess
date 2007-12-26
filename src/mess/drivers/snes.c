@@ -156,7 +156,7 @@ static INPUT_PORTS_START( snes )
 #endif
 INPUT_PORTS_END
 
-static struct CustomSound_interface snes_sound_interface =
+static const struct CustomSound_interface snes_sound_interface =
 { snes_sh_start, 0, 0 };
 
 static GFXDECODE_START( gfxdecodeinfo )

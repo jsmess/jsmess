@@ -805,7 +805,7 @@ static void pc8801_fdc_dma_drq(int state, int read_)
 {
 }
 
-static struct nec765_interface pc8801_fdc_interface=
+static const struct nec765_interface pc8801_fdc_interface=
 {
 	pc8801_fdc_interrupt,
 	pc8801_fdc_dma_drq

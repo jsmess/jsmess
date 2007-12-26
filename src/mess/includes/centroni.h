@@ -51,7 +51,7 @@ void centronics_write_handshake(int nr, int data, int mask);
 UINT8 centronics_read_data(int nr);
 int centronics_read_handshake(int nr);
 
-extern CENTRONICS_DEVICE CENTRONICS_PRINTER_DEVICE;
+extern const CENTRONICS_DEVICE CENTRONICS_PRINTER_DEVICE;
 
 #ifdef __cplusplus
 }

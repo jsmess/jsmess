@@ -81,13 +81,13 @@ static GFXDECODE_START( jupiter_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_CPU1, 0x2c00, jupiter_charlayout, 0, 2 )
 GFXDECODE_END
 
-static unsigned char jupiter_palette[] =
+static const unsigned char jupiter_palette[] =
 {
 	0x00, 0x00, 0x00,	/* Black */
 	0xff, 0xff, 0xff	/* White */
 };
 
-static unsigned short jupiter_colortable[] =
+static const unsigned short jupiter_colortable[] =
 {
 	0, 1,
 	1, 0

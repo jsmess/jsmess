@@ -267,7 +267,7 @@ INLINE attotime compute_time_per_character(z80dart *dart, int which)
     z80dart_init - initialize a single DART chip
 -------------------------------------------------*/
 
-void z80dart_init(int which, z80dart_interface *intf)
+void z80dart_init(int which, const z80dart_interface *intf)
 {
 	z80dart *dart = darts + which;
 

@@ -489,7 +489,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 
 
-static struct CassetteLegacyWaveFiller oric_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller oric_legacy_fill_wave =
 {
 	oric_cassette_fill_wave,					/* fill_wave */
 	-1,											/* chunk_size */
@@ -516,7 +516,7 @@ static casserr_t oric_tap_load(cassette_image *cassette)
 
 
 
-static struct CassetteFormat oric_tap_format =
+static const struct CassetteFormat oric_tap_format =
 {
 	"tap",
 	oric_tap_identify,

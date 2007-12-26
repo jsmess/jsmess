@@ -231,7 +231,7 @@ static INPUT_PORTS_START( channelf )
 
 INPUT_PORTS_END
 
-static struct CustomSound_interface channelf_sound_interface =
+static const struct CustomSound_interface channelf_sound_interface =
 {
 	channelf_sh_custom_start
 };

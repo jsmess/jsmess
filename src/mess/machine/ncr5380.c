@@ -26,7 +26,7 @@
 
 #define VERBOSE	(0)
 
-static const char *rnames[] =
+static const char *const rnames[] =
 {
 	"Current data",
 	"Initiator cmd",
@@ -38,7 +38,7 @@ static const char *rnames[] =
 	"Reset parity"
 };
 
-static const char *wnames[] =
+static const char *const wnames[] =
 {
 	"Output data",
 	"Initiator cmd",
@@ -57,7 +57,7 @@ typedef struct
 } SCSIDev;
 
 static SCSIDev devices[8];	// SCSI IDs 0-7
-static struct NCR5380interface *intf;
+static const struct NCR5380interface *intf;
 
 static UINT8 n5380_Registers[8];
 static UINT8 last_id;
@@ -334,7 +334,7 @@ READ8_HANDLER(ncr5380_r)
 	return rv;
 }
 
-extern void ncr5380_init( struct NCR5380interface *interface )
+extern void ncr5380_init( const struct NCR5380interface *interface )
 {
 	int i;
 

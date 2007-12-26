@@ -564,7 +564,7 @@ static INPUT_PORTS_START( coco3 )
 INPUT_PORTS_END
 
 /* AY-8912 for Dragon Alpha, the AY-8912 simply an AY-8910 with only one io port. */
-static struct AY8910interface ay8912_interface =
+static const struct AY8910interface ay8912_interface =
 {
 	dgnalpha_psg_porta_read,	/* portA read */
 	NULL,    					/* portB read */

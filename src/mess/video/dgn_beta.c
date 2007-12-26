@@ -164,7 +164,7 @@ static void beta_Set_HSync(int offset, int data);
 static void beta_Set_VSync(int offset, int data);
 static void beta_Set_DE(int offset, int data);
 
-static struct m6845_interface
+static const struct m6845_interface
 beta_m6845_interface= {
 	0,		// Memory Address register
 	beta_Set_RA,	// Row Address register

@@ -68,7 +68,7 @@ static UINT64 imgtool_floppy_filesizeproc(void *file)
 	return stream_size((imgtool_stream *) file);
 }
 
-static struct io_procs imgtool_ioprocs =
+static const struct io_procs imgtool_ioprocs =
 {
 	imgtool_floppy_closeproc,
 	imgtool_floppy_seekproc,
@@ -77,7 +77,7 @@ static struct io_procs imgtool_ioprocs =
 	imgtool_floppy_filesizeproc
 };
 
-static struct io_procs imgtool_noclose_ioprocs =
+static const struct io_procs imgtool_noclose_ioprocs =
 {
 	NULL,
 	imgtool_floppy_seekproc,

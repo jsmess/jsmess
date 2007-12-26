@@ -6,7 +6,7 @@ static int abc80_blink;
 static int abc80_bank;
 static int abc80_row;
 
-static unsigned short abc80_colortable[] =
+static const unsigned short abc80_colortable[] =
 {
 	0x00, 0x01,
 	0x01, 0x00,

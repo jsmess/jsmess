@@ -143,7 +143,7 @@ static READ8_HANDLER( apple2gs_adc_read )
 	return 0x80;
 }
 
-static struct ES5503interface es5503_interface = 
+static const struct ES5503interface es5503_interface = 
 {
 	apple2gs_doc_irq,
 	apple2gs_adc_read,

@@ -930,7 +930,7 @@ const char *floppy_format_description(floppy_image *floppy)
 
 const char *floppy_error(floperr_t err)
 {
-	const char *error_messages[] =
+	static const char *const error_messages[] =
 	{
 		"The operation completed successfully",
 		"Fatal internal error",

@@ -62,7 +62,7 @@ struct OSDJoystick
 	BOOL (*Available)(void);
 };
 
-extern struct OSDJoystick DIJoystick;
+extern const struct OSDJoystick DIJoystick;
 
 extern int    DIJoystick_GetNumPhysicalJoysticks(void);
 extern TCHAR* DIJoystick_GetPhysicalJoystickName(int num_joystick);

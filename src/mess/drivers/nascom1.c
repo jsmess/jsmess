@@ -109,13 +109,13 @@ static GFXDECODE_START( nascom2_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, nascom2_charlayout, 0, 1 )
 GFXDECODE_END
 
-static	unsigned	char	nascom1_palette[] =
+static const unsigned char nascom1_palette[] =
 {
 	0x00, 0x00, 0x00,	/* Black */
 	0xff, 0xff, 0xff	/* White */
 };
 
-static	unsigned	short	nascom1_colortable[] =
+static const unsigned short nascom1_colortable[] =
 {
 	0, 1
 };

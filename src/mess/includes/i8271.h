@@ -146,7 +146,7 @@ typedef struct I8271
 #define I8271_STATUS_NON_DMA_REQUEST	0x004
 
 /* initialise emulation */
-void i8271_init(i8271_interface *);
+void i8271_init(const i8271_interface *);
 /* reset */
 void i8271_reset(void);
 

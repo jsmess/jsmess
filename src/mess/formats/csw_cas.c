@@ -292,7 +292,7 @@ int		i;
 }
 
 
-static struct CassetteLegacyWaveFiller csw_legacy_fill_wave = {
+static const struct CassetteLegacyWaveFiller csw_legacy_fill_wave = {
 	csw_cas_fill_wave,		/* fill_wave */
 	-1,						/* chunk_size */
 	0,						/* chunk_samples */
@@ -310,7 +310,7 @@ static casserr_t csw_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &csw_legacy_fill_wave );
 }
 
-static struct CassetteFormat csw_cassette_format = {
+static const struct CassetteFormat csw_cassette_format = {
 	"csw",
 	csw_cassette_identify,
 	csw_cassette_load,

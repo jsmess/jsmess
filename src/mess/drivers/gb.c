@@ -443,16 +443,16 @@ space. This mapper uses 32KB sized banks.
 #include "gb.lh"
 
 /* Initial value of the cpu registers (hacks until we get bios dumps) */
-static UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super GameBoy                    */
-static UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* GameBoy Pocket / Super GameBoy 2 */
-static UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* GameBoy Color  / Gameboy Advance */
-static UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };	/* Megaduck */
+static const UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super GameBoy                    */
+static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* GameBoy Pocket / Super GameBoy 2 */
+static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* GameBoy Color  / Gameboy Advance */
+static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };	/* Megaduck */
 
-static Z80GB_CONFIG dmg_cpu_reset = { NULL, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
-static Z80GB_CONFIG sgb_cpu_reset = { sgb_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
-static Z80GB_CONFIG mgb_cpu_reset = { mgb_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
-static Z80GB_CONFIG cgb_cpu_reset = { cgb_cpu_regs, 0, gb_timer_callback };
-static Z80GB_CONFIG megaduck_cpu_reset = { megaduck_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
+static const Z80GB_CONFIG dmg_cpu_reset = { NULL, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
+static const Z80GB_CONFIG sgb_cpu_reset = { sgb_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
+static const Z80GB_CONFIG mgb_cpu_reset = { mgb_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
+static const Z80GB_CONFIG cgb_cpu_reset = { cgb_cpu_regs, 0, gb_timer_callback };
+static const Z80GB_CONFIG megaduck_cpu_reset = { megaduck_cpu_regs, Z80GB_FEATURE_HALT_BUG, gb_timer_callback };
 
 static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
@@ -543,7 +543,7 @@ static INPUT_PORTS_START( gameboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select") 
 INPUT_PORTS_END
 
-static struct CustomSound_interface gameboy_sound_interface =
+static const struct CustomSound_interface gameboy_sound_interface =
 { gameboy_sh_start, 0, 0 };
 
 

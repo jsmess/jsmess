@@ -10,8 +10,8 @@ WRITE8_HANDLER(lh5811_w);
 
 
 /* in mess/video/ */
-extern unsigned char pc1500_palette[242][3];
-extern unsigned short pc1500_colortable[1][2];
+extern const unsigned char pc1500_palette[242][3];
+extern const unsigned short pc1500_colortable[1][2];
 
 
 void pc1500_init_colors (unsigned char *sys_palette,

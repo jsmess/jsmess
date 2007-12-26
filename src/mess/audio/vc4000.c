@@ -75,7 +75,7 @@ static void *vc4000_custom_start(int clock, const struct CustomSound_interface *
 
 
 
-struct CustomSound_interface vc4000_sound_interface =
+const struct CustomSound_interface vc4000_sound_interface =
 {
 	vc4000_custom_start
 };

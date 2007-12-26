@@ -81,7 +81,7 @@ struct FloppyFormat
 
 
 #define FLOPPY_OPTIONS_START(name)												\
-	struct FloppyFormat floppyoptions_##name[] =								\
+	const struct FloppyFormat floppyoptions_##name[] =								\
 	{																			\
 
 #define FLOPPY_OPTIONS_END														\
@@ -89,7 +89,7 @@ struct FloppyFormat
 	};
 
 #define FLOPPY_OPTIONS_EXTERN(name)												\
-	extern struct FloppyFormat floppyoptions_##name[]							\
+	extern const struct FloppyFormat floppyoptions_##name[]							\
 
 #define FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, ranges_)\
 	{ #name, extensions_, description_, identify_, construct_, ranges_ },				\

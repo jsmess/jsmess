@@ -247,15 +247,15 @@ static int videoULA_characters_per_line;
 static int videoULA_teletext_normal_select;
 static int videoULA_flash_colour_select;
 
-static int pixels_per_byte_set[8]={ 2,4,8,16,1,2,4,8 };
+static const int pixels_per_byte_set[8]={ 2,4,8,16,1,2,4,8 };
 static int pixels_per_byte;
 
-static int emulation_pixels_per_real_pixel_set[4]={ 8,4,2,1 };
+static const int emulation_pixels_per_real_pixel_set[4]={ 8,4,2,1 };
 static int emulation_pixels_per_real_pixel;
 
 static int emulation_pixels_per_byte;
 
-static int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
+static const int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
 static int emulation_cursor_size=1;
 static int cursor_state=0;
 

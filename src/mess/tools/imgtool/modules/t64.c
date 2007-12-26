@@ -115,7 +115,7 @@ static int t64_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 static int t64_image_deletefile(imgtool_image *img, const char *fname);
 static int t64_image_create(const imgtool_module *mod, imgtool_stream *f, const ResolvedOption *_options);
 
-static struct OptionTemplate t64_createopts[] =
+static const struct OptionTemplate t64_createopts[] =
 {
 	{ "entries", NULL, IMGOPTION_FLAG_TYPE_INTEGER,							0,		3,		NULL	},	/* [0] */
 	{ "label", NULL, IMGOPTION_FLAG_TYPE_STRING | IMGOPTION_FLAG_HASDEFAULT,	0,		0,		NULL	},	/* [1] */

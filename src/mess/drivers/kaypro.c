@@ -195,7 +195,7 @@ static GFXDECODE_START( gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 4 )
 GFXDECODE_END
 
-static unsigned char kaypro_palette[] =
+static const unsigned char kaypro_palette[] =
 {
       0,  0,  0,    /* black */
       0,240,  0,    /* green */
@@ -209,7 +209,7 @@ static unsigned char kaypro_palette[] =
     240,240,240,
 };
 
-static unsigned short kaypro_colortable[] =
+static const unsigned short kaypro_colortable[] =
 {
     0,  1,      /* green on black */
     0,  2,      /* dim green on black */

@@ -50,7 +50,7 @@ extern VIDEO_START( vic2 );
 extern VIDEO_UPDATE( vic2 );
 extern INTERRUPT_GEN( vic2_raster_irq );
 
-extern unsigned char vic2_palette[16 * 3];
+extern const unsigned char vic2_palette[16 * 3];
 
 /* to be inserted in GameDriver-Structure */
 

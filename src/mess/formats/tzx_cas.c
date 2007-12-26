@@ -462,7 +462,7 @@ static int tap_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	return size;
 }
 
-static struct CassetteLegacyWaveFiller tzx_legacy_fill_wave = {
+static const struct CassetteLegacyWaveFiller tzx_legacy_fill_wave = {
 	tzx_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
 	0,					/* chunk_samples */
@@ -472,7 +472,7 @@ static struct CassetteLegacyWaveFiller tzx_legacy_fill_wave = {
 	0					/* trailer_samples */
 };
 
-static struct CassetteLegacyWaveFiller tap_legacy_fill_wave = {
+static const struct CassetteLegacyWaveFiller tap_legacy_fill_wave = {
 	tap_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
 	0,					/* chunk_samples */
@@ -516,14 +516,14 @@ static casserr_t cdt_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &cdt_legacy_fill_wave );
 }
 
-static struct CassetteFormat tzx_cassette_format = {
+static const struct CassetteFormat tzx_cassette_format = {
 	"tzx",
 	tzx_cassette_identify,
 	tzx_cassette_load,
 	NULL
 };
 
-static struct CassetteFormat tap_cassette_format = {
+static const struct CassetteFormat tap_cassette_format = {
 	"tap",
 	tap_cassette_identify,
 	tap_cassette_load,

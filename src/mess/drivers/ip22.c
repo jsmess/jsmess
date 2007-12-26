@@ -1423,14 +1423,14 @@ static void scsi_irq(int state)
 	}
 }
 
-static SCSIConfigTable dev_table =
+static const SCSIConfigTable dev_table =
 {
         1,                                      /* 1 SCSI device */
         { { SCSI_ID_4, 0, SCSI_DEVICE_CDROM },  /* SCSI ID 4, using CD 0, and it's a CD-ROM */ 
 	  { SCSI_ID_2, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using HD 0, and it's a CD-ROM */ 
 };
 
-static struct WD33C93interface scsi_intf =
+static const struct WD33C93interface scsi_intf =
 {
 	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */
@@ -1538,7 +1538,7 @@ static INTERRUPT_GEN( ip22_vbl )
 	}
 }
 
-static struct mips3_config config =
+static const struct mips3_config config =
 {
 	32768,	/* code cache size */
 	32768	/* data cache size */

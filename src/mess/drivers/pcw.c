@@ -134,7 +134,7 @@ static void pcw_update_interrupt_counter(void)
 
 /* PCW uses NEC765 in NON-DMA mode. FDC Ints are connected to /INT or
 /NMI depending on choice (see system control below) */
-static nec765_interface pcw_nec765_interface =
+static const nec765_interface pcw_nec765_interface =
 {
 	pcw_fdc_interrupt,
 	NULL

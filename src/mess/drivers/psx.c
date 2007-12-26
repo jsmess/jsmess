@@ -766,7 +766,7 @@ static INPUT_PORTS_START( psx )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 L2")
 INPUT_PORTS_END
 
-static struct PSXSPUinterface psxspu_interface =
+static const struct PSXSPUinterface psxspu_interface =
 {
 	&g_p_n_psxram,
 	psx_irq_set,

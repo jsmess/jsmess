@@ -72,13 +72,13 @@ typedef struct {
 
 #define HEADER(file) ((ti85_header*)file->data)
 
-static struct OptionTemplate ti85_fileoptions[] =
+static const struct OptionTemplate ti85_fileoptions[] =
 {
 	{ "ftype", "File type", IMGOPTION_FLAG_TYPE_INTEGER | IMGOPTION_FLAG_HASDEFAULT,0,27,"12"},
 	{ NULL, 0, 0, 0, 0 }
 };
 
-static struct OptionTemplate ti85_createoptions[] =
+static const struct OptionTemplate ti85_createoptions[] =
 {
 	{ "comment", "Comment", IMGOPTION_FLAG_TYPE_STRING | IMGOPTION_FLAG_HASDEFAULT,0,0,"TI-85 file created with ImgTool"},
 	{ NULL, NULL, 0, 0, 0, 0 }

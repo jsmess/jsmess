@@ -49,7 +49,7 @@ static void SoftwareTabView_OnSelectionChanged(void);
 static void SoftwareTabView_OnMoveSize(void);
 static void SetupSoftwareTabView(void);
 
-static LPCTSTR mess_column_names[] =
+static const LPCTSTR mess_column_names[] =
 {
     TEXT("Software"),
 	TEXT("Goodname"),
@@ -1064,7 +1064,7 @@ static INT_PTR CALLBACK MyColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 {
 	INT_PTR result = 0;
 	int nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
-	LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
+	const LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
 	
 	result = InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
 		MyColumnDialogProc_shown, MyColumnDialogProc_order, ppszColumnNames,

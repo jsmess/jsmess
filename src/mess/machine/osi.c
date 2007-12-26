@@ -25,7 +25,7 @@ static READ8_HANDLER (sb2m600_acia0_statin )
 	return 0;
 }
 
-static struct acia6850_interface sb2m600_acia0 =
+static const struct acia6850_interface sb2m600_acia0 =
 {
 	sb2m600_acia0_statin,
 	sb2m600_acia0_casin,
@@ -33,7 +33,7 @@ static struct acia6850_interface sb2m600_acia0 =
 	0
 };
 
-static struct acia6850_interface sb2m600_acia1 =
+static const struct acia6850_interface sb2m600_acia1 =
 {
 	0,
 	0,

@@ -19,7 +19,7 @@ struct _basictoken_tableent
 {
 	UINT8 shift;
 	UINT8 base;
-	const char **tokens;
+	const char *const *tokens;
 	int num_tokens;
 };
 
@@ -140,7 +140,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 
 /* ----------------------------------------------------------------------- */
 
-static const char *cocobas_statements[] =
+static const char *const cocobas_statements[] =
 {
 	"FOR",		/* 0x80 */
 	"GO",		/* 0x81 */
@@ -265,7 +265,7 @@ static const char *cocobas_statements[] =
 	"ATTR"		/* 0xf8 */
 };
 
-static const char *cocobas_functions[] =
+static const char *const cocobas_functions[] =
 {
 	"SGN",		/* 0xff80 */
 	"INT",		/* 0xff81 */
@@ -314,7 +314,7 @@ static const char *cocobas_functions[] =
 	"ERLIN"		/* 0xffac */
 };
 
-static const char *dragonbas_statements[] =
+static const char *const dragonbas_statements[] =
 {
 	"FOR",		/* 0x80 */
 	"GO",		/* 0x81 */
@@ -415,7 +415,7 @@ static const char *dragonbas_statements[] =
 	"DSKO$"		/* 0xe0 */
 };
 
-static const char *dragonbas_functions[] =
+static const char *const dragonbas_functions[] =
 {
 	"SGN",		/* 0xff80 */
 	"INT",		/* 0xff81 */
@@ -458,7 +458,7 @@ static const char *dragonbas_functions[] =
 	"MKN$"		/* 0xffa6 */
 };
 
-static const char *vzbas[] =
+static const char *const vzbas[] =
 {
 	"END",		/* 0x80 */
 	"FOR",		/* 0x81 */
@@ -594,7 +594,7 @@ static const char *vzbas[] =
 /* ----------------------------------------------------------------------- *
  * CBM machines                                                            *
  * ----------------------------------------------------------------------- */
-static const char *basic_10[] = /* "BASIC 1.0" - supported by pet */
+static const char *const basic_10[] = /* "BASIC 1.0" - supported by pet */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -726,7 +726,7 @@ static const char *basic_10[] = /* "BASIC 1.0" - supported by pet */
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_20[] = /* "BASIC 2.0" - supported by vic20 & clones, c64 & clones, cbm30xx series */
+static const char *const basic_20[] = /* "BASIC 2.0" - supported by vic20 & clones, c64 & clones, cbm30xx series */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -858,7 +858,7 @@ static const char *basic_20[] = /* "BASIC 2.0" - supported by vic20 & clones, c6
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_20_super_expander_vic[] = /* "BASIC 2.0 with Super Expander" - supported by vic20 & clones */
+static const char *const basic_20_super_expander_vic[] = /* "BASIC 2.0 with Super Expander" - supported by vic20 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -990,7 +990,7 @@ static const char *basic_20_super_expander_vic[] = /* "BASIC 2.0 with Super Expa
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_20_turtle_basic_10[] = /* "BASIC 2.0 with Turtle BASIC 1.0" - supported by vic20 & clones */
+static const char *const basic_20_turtle_basic_10[] = /* "BASIC 2.0 with Turtle BASIC 1.0" - supported by vic20 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -1122,7 +1122,7 @@ static const char *basic_20_turtle_basic_10[] = /* "BASIC 2.0 with Turtle BASIC 
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_20_speech_basic_27[] = /* "BASIC 2.0 with Speech BASIC 2.7" - supported by c64 & clones */
+static const char *const basic_20_speech_basic_27[] = /* "BASIC 2.0 with Speech BASIC 2.7" - supported by c64 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -1254,7 +1254,7 @@ static const char *basic_20_speech_basic_27[] = /* "BASIC 2.0 with Speech BASIC 
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_20_at_basic[] = /* "BASIC 2.0 with @BASIC" - supported by c64 & clones */
+static const char *const basic_20_at_basic[] = /* "BASIC 2.0 with @BASIC" - supported by c64 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -1386,7 +1386,7 @@ static const char *basic_20_at_basic[] = /* "BASIC 2.0 with @BASIC" - supported 
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_20_simon_s_basic[] = /* "BASIC 2.0 with Simon's BASIC" - supported by c64 & clones */
+static const char *const basic_20_simon_s_basic[] = /* "BASIC 2.0 with Simon's BASIC" - supported by c64 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -1646,7 +1646,7 @@ static const char *basic_20_simon_s_basic[] = /* "BASIC 2.0 with Simon's BASIC" 
 	"OUT"             /* 0x647f */
 };
 
-static const char *basic_20_exp_40[] = /* "BASIC 2.0 with BASIC 4.0 Expansion" - supported by c64 & clones */
+static const char *const basic_20_exp_40[] = /* "BASIC 2.0 with BASIC 4.0 Expansion" - supported by c64 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -1778,7 +1778,7 @@ static const char *basic_20_exp_40[] = /* "BASIC 2.0 with BASIC 4.0 Expansion" -
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_35[] = /* "BASIC 3.5" - supported by c16 & clones, except c364 */
+static const char *const basic_35[] = /* "BASIC 3.5" - supported by c16 & clones, except c364 */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -1910,7 +1910,7 @@ static const char *basic_35[] = /* "BASIC 3.5" - supported by c16 & clones, exce
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_35_magic_voice[] = /* "BASIC 3.5 with Magic Voice Speech Synthesizer" - supported by c364 */
+static const char *const basic_35_magic_voice[] = /* "BASIC 3.5 with Magic Voice Speech Synthesizer" - supported by c364 */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -2053,7 +2053,7 @@ static const char *basic_35_magic_voice[] = /* "BASIC 3.5 with Magic Voice Speec
 	"SAY"             /* 0xfe0a */
 };
 
-static const char *basic_40[] = /* "BASIC 4.0" - supported by cbm40xx & cbm80xx series, cbm500, cbm600 & clones */
+static const char *const basic_40[] = /* "BASIC 4.0" - supported by cbm40xx & cbm80xx series, cbm500, cbm600 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -2185,7 +2185,7 @@ static const char *basic_40[] = /* "BASIC 4.0" - supported by cbm40xx & cbm80xx 
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
-static const char *basic_70[] = /* "BASIC 7.0" - supported by c128 & clones */
+static const char *const basic_70[] = /* "BASIC 7.0" - supported by c128 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
@@ -2367,7 +2367,7 @@ static const char *basic_70[] = /* "BASIC 7.0" - supported by c128 & clones */
 	"SLOW"            /* 0xfe26 */
 };
 
-static const char *basic_100[] = /* "BASIC 10.0" - supported by c65 & clones */
+static const char *const basic_100[] = /* "BASIC 10.0" - supported by c65 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */

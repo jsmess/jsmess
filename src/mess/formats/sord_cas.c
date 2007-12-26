@@ -126,7 +126,7 @@ static casserr_t sordm5_tap_load( cassette_image *cassette)
 	return CASSETTE_ERROR_SUCCESS;
 }
 
-static struct CassetteFormat sordm5_cas_format =
+static const struct CassetteFormat sordm5_cas_format =
 {
 	"cas",
 	sordm5_tap_identify,

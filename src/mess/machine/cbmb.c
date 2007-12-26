@@ -250,7 +250,7 @@ static void cbmb_common_driver_init (void)
 static void cbmb_display_enable_changed(int display_enabled) {
 }
 
-//static struct mscrtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };
+//static const struct mscrtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };
 const static crtc6845_interface cbm600_crtc = {
 	0,
 	1600000 /*?*/,
@@ -284,7 +284,7 @@ void cbm600hu_driver_init (void)
 	crtc6845_config( 0, &cbm600_crtc);
 }
 
-//static struct mscrtc6845_config cbm700_crtc= { 2000000 /*?*/, cbmb_vh_cursor };
+//static const struct mscrtc6845_config cbm700_crtc= { 2000000 /*?*/, cbmb_vh_cursor };
 const static crtc6845_interface cbm700_crtc = {
 	0,
 	2000000 /*?*/,

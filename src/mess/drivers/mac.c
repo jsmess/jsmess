@@ -64,7 +64,7 @@ ADDRESS_MAP_END
 
 
 
-static struct CustomSound_interface custom_interface =
+static const struct CustomSound_interface custom_interface =
 {
 	mac_sh_start
 };
@@ -382,7 +382,7 @@ static void mac2_init_machine( void )
 }
 
 
-static struct MachineDriver machine_driver_mac2 =
+static const struct MachineDriver machine_driver_mac2 =
 {
 	/* basic machine hardware */
 	{

@@ -11,7 +11,7 @@
 
 #include "formats/cassimg.h"
 
-extern struct CassetteFormat coco_cas_format;
+extern const struct CassetteFormat coco_cas_format;
 extern const struct CassetteModulation coco_cas_modulation;
 
 CASSETTE_FORMATLIST_EXTERN(coco_cassette_formats);

@@ -189,7 +189,7 @@ static int zx81_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	return p - buffer;
 }
 
-static struct CassetteLegacyWaveFiller zx81_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller zx81_legacy_fill_wave =
 {
 	zx81_cassette_fill_wave,			/* fill_wave */
 	-1,						/* chunk_size */
@@ -211,7 +211,7 @@ static casserr_t zx81_p_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &zx81_legacy_fill_wave);
 }
 
-static struct CassetteFormat zx81_p_image_format =
+static const struct CassetteFormat zx81_p_image_format =
 {
 	"p,81",
 	zx81_p_identify,
@@ -253,7 +253,7 @@ static int zx80_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	return p - buffer;
 }
 
-static struct CassetteLegacyWaveFiller zx80_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller zx80_legacy_fill_wave =
 {
 	zx80_cassette_fill_wave,			/* fill_wave */
 	-1,											/* chunk_size */
@@ -274,7 +274,7 @@ static casserr_t zx80_o_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &zx80_legacy_fill_wave);
 }
 
-static struct CassetteFormat zx80_o_image_format =
+static const struct CassetteFormat zx80_o_image_format =
 {
 	"o,80",
 	zx80_o_identify,

@@ -471,13 +471,13 @@ static INPUT_PORTS_START (superpet)
 	PORT_DIPSETTING(  1, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static unsigned char pet_palette[] =
+static const unsigned char pet_palette[] =
 {
 	0,0,0, /* black */
 	0,0x80,0, /* green */
 };
 
-static unsigned short pet_colortable[][2] = {
+static const unsigned short pet_colortable[][2] = {
 	{ 0, 1 },
 	/* reverse */
 	{ 1, 0 }

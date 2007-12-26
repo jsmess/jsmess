@@ -282,7 +282,7 @@ static void avigo_tc8521_alarm_int(int state)
 }
 
 
-static struct tc8521_interface avigo_tc8521_interface =
+static const struct tc8521_interface avigo_tc8521_interface =
 {
 	avigo_tc8521_alarm_int
 };
@@ -371,7 +371,7 @@ static void avigo_com_interrupt(int irq_num, int state)
 
 
 
-static uart8250_interface avigo_com_interface[1]=
+static const uart8250_interface avigo_com_interface[1]=
 {
 	{
 		TYPE16550,

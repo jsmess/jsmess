@@ -101,7 +101,7 @@ static void (*update_scanline)(void);
 static TIMER_CALLBACK(gb_lcd_timer_proc);
 static void gb_lcd_switch_on( void );
 
-static unsigned char palette[] =
+static const unsigned char palette[] =
 {
 /* Simple black and white palette */
 /*	0xFF,0xFF,0xFF,
@@ -122,7 +122,7 @@ static unsigned char palette[] =
 	0x41,0x41,0x41,		/* Dark       */
 };
 
-static unsigned char palette_megaduck[] = {
+static const unsigned char palette_megaduck[] = {
 	0x6B, 0xA6, 0x4A, 0x43, 0x7A, 0x63, 0x25, 0x59, 0x55, 0x12, 0x42, 0x4C
 };
 

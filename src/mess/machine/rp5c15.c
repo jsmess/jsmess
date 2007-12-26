@@ -97,7 +97,7 @@ TIMER_CALLBACK(rtc_alarm_pulse)
 	}
 }
 
-void rp5c15_init(struct rp5c15_interface* intf)
+void rp5c15_init(const struct rp5c15_interface* intf)
 {
 	mame_system_time systm;
 	mame_system_tm time;

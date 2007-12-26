@@ -299,7 +299,7 @@ static int fill_wave(INT16 *buffer, int length, UINT8 *code)
 
 
 
-static struct CassetteLegacyWaveFiller mz700_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller mz700_legacy_fill_wave =
 {
 	fill_wave,					/* fill_wave */
 	1,							/* chunk_size */
@@ -326,7 +326,7 @@ static casserr_t mz700_cas_load(cassette_image *cassette)
 
 
 
-static struct CassetteFormat mz700_cas_format =
+static const struct CassetteFormat mz700_cas_format =
 {
 	"m12",
 	mz700_cas_identify,

@@ -52,7 +52,7 @@ static void pc_fdc_hw_interrupt(int state);
 static void pc_fdc_hw_dma_drq(int,int);
 static mess_image *pc_fdc_get_image(int floppy_index);
 
-static nec765_interface pc_fdc_nec765_interface = 
+static const nec765_interface pc_fdc_nec765_interface = 
 {
 	pc_fdc_hw_interrupt,
 	pc_fdc_hw_dma_drq,

@@ -74,7 +74,7 @@ WRITE8_HANDLER(msm8251_control_w);
 
 
 /* init chip, set interface, and do main setup */
-void msm8251_init(struct msm8251_interface *);
+void msm8251_init(const struct msm8251_interface *);
 /* reset the chip */
 void msm8251_reset(void);
 

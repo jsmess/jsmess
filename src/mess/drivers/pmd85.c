@@ -627,7 +627,7 @@ ROM_START(matoh)
 	ROM_LOAD("matoh.bin", 0x10000, 0x4000, CRC(ca25880d) SHA1(38ce0b6a26d48a09fdf96863c3eaf3705aca2590))
 ROM_END
 
-static struct CassetteOptions pmd85_cassette_options = {
+static const struct CassetteOptions pmd85_cassette_options = {
 	1,		/* channels */
 	16,		/* bits per sample */
 	7200		/* sample frequency */

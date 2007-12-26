@@ -20,5 +20,5 @@ WRITE8_HANDLER(arcadia_video_w);
 extern VIDEO_START( arcadia );
 extern VIDEO_UPDATE( arcadia );
 
-extern struct CustomSound_interface arcadia_sound_interface;
+extern const struct CustomSound_interface arcadia_sound_interface;
 extern void arcadia_soundport_w (int mode, int data);

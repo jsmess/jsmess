@@ -212,7 +212,7 @@ static void mk2_irq(int chip, int level)
 	cpunum_set_input_line(0, M6502_IRQ_LINE, level);
 }
 
-static RRIOT_CONFIG riot={
+static const RRIOT_CONFIG riot={
 	1000000,
 	{ mk2_read_a, mk2_write_a },
 	{ mk2_read_b, mk2_write_b },

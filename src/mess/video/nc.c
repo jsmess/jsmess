@@ -19,7 +19,7 @@ VIDEO_START( nc )
 }
 
 /* two colours */
-static unsigned short nc_colour_table[NC_NUM_COLOURS] =
+static const unsigned short nc_colour_table[NC_NUM_COLOURS] =
 {
 	0, 1,2,3
 };

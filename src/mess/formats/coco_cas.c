@@ -259,7 +259,7 @@ static casserr_t coco_cas_load(cassette_image *cassette)
 
 
 
-struct CassetteFormat coco_cas_format =
+const struct CassetteFormat coco_cas_format =
 {
 	"cas",
 	coco_cas_identify,

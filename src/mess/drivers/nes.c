@@ -236,12 +236,12 @@ gfx_layout nes_vram_charlayout =
 };
 #endif
 
-static struct NESinterface nes_interface =
+static const struct NESinterface nes_interface =
 {
 	0
 };
 
-static struct NESinterface nespal_interface =
+static const struct NESinterface nespal_interface =
 {
 	0
 };

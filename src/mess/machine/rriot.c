@@ -59,7 +59,7 @@
 */
 
 typedef struct {
-	RRIOT_CONFIG *config;
+	const RRIOT_CONFIG *config;
 	struct {
 		UINT8 in, out, ddr;
 	} port_a, port_b;
@@ -75,7 +75,7 @@ static RRIOT rriot[MAX_RRIOTS]= { {0} };
 
 static TIMER_CALLBACK(rriot_timer_cb);
 
-void rriot_init(int nr, RRIOT_CONFIG *config)
+void rriot_init(int nr, const RRIOT_CONFIG *config)
 {
 	memset(&rriot[nr], 0, sizeof(rriot[nr]));
 	rriot[nr].config = config;

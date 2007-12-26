@@ -4,20 +4,20 @@
 #define TI85_PC_OK_PACKET_SIZE	4
 #define TI85_PC_END_PACKET_SIZE	4
 
-UINT8 ti85_pc_ok_packet[] = {0x05, 0x56, 0x00, 0x00};
-UINT8 ti86_pc_ok_packet[] = {0x06, 0x56, 0x00, 0x00};
-UINT8 ti85_pc_continue_packet[] = {0x05, 0x09, 0x00, 0x00};
-UINT8 ti86_pc_continue_packet[] = {0x06, 0x09, 0x00, 0x00};
-UINT8 ti85_pc_screen_request_packet[] = {0x05, 0x6d, 0x00, 0x00};
-static UINT8 ti85_pc_end_packet[] = {0x05, 0x92, 0x00, 0x00};
-static UINT8 ti86_pc_end_packet[] = {0x06, 0x92, 0x00, 0x00};
+const UINT8 ti85_pc_ok_packet[] = {0x05, 0x56, 0x00, 0x00};
+const UINT8 ti86_pc_ok_packet[] = {0x06, 0x56, 0x00, 0x00};
+const UINT8 ti85_pc_continue_packet[] = {0x05, 0x09, 0x00, 0x00};
+const UINT8 ti86_pc_continue_packet[] = {0x06, 0x09, 0x00, 0x00};
+const UINT8 ti85_pc_screen_request_packet[] = {0x05, 0x6d, 0x00, 0x00};
+static const UINT8 ti85_pc_end_packet[] = {0x05, 0x92, 0x00, 0x00};
+static const UINT8 ti86_pc_end_packet[] = {0x06, 0x92, 0x00, 0x00};
 
-UINT8 ti85_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x35, 0x2a, 0x2a, 0x1a, 0x0c, 0x00};
-UINT8 ti86_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x36, 0x2a, 0x2a, 0x1a, 0x0a, 0x00};
+const UINT8 ti85_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x35, 0x2a, 0x2a, 0x1a, 0x0c, 0x00};
+const UINT8 ti86_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x36, 0x2a, 0x2a, 0x1a, 0x0a, 0x00};
 
 int ti85_serial_transfer_type = TI85_SEND_VARIABLES;
 
-UINT16 ti85_calculate_checksum(UINT8* data, unsigned int size)
+UINT16 ti85_calculate_checksum(const UINT8* data, unsigned int size)
 {
 	UINT16 checksum = 0;
 	unsigned int i;
@@ -27,7 +27,7 @@ UINT16 ti85_calculate_checksum(UINT8* data, unsigned int size)
 	return checksum;
 }
 
-UINT16 ti85_variables_count (UINT8 * ti85_data, unsigned int ti85_data_size)
+UINT16 ti85_variables_count (const UINT8 * ti85_data, unsigned int ti85_data_size)
 {
 	unsigned int pos, head_size, var_size;
 	UINT16 number_of_entries = 0;
@@ -42,7 +42,7 @@ UINT16 ti85_variables_count (UINT8 * ti85_data, unsigned int ti85_data_size)
 	return number_of_entries;
 }
 
-static void ti85_backup_read (UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
+static void ti85_backup_read (const UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
 {
 	unsigned int pos = 0x42+2;
         
@@ -59,7 +59,7 @@ static void ti85_backup_read (UINT8 * ti85_data, unsigned int ti85_data_size, ti
 	ti85_entries[2].offset = pos;
 }
 
-void ti85_variables_read (UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
+void ti85_variables_read (const UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
 {
 	unsigned int pos, i=0;
 
@@ -77,7 +77,7 @@ void ti85_variables_read (UINT8 * ti85_data, unsigned int ti85_data_size, ti85_e
 }
 
 
-void ti85_convert_data_to_stream (UINT8* file_data, unsigned int size, UINT8* serial_data)
+void ti85_convert_data_to_stream (const UINT8* file_data, unsigned int size, UINT8* serial_data)
 {
 	unsigned int i, bits;
 
@@ -86,7 +86,7 @@ void ti85_convert_data_to_stream (UINT8* file_data, unsigned int size, UINT8* se
 			serial_data[i*8+bits] = (file_data[i]>>bits) & 0x01;
 }
 
-void ti85_convert_stream_to_data (UINT8* serial_data, UINT32 size, UINT8* data)
+void ti85_convert_stream_to_data (const UINT8* serial_data, UINT32 size, UINT8* data)
 {
 	UINT32 i;
 	UINT8 bits;
@@ -101,7 +101,7 @@ void ti85_convert_stream_to_data (UINT8* serial_data, UINT32 size, UINT8* data)
 	}
 }
 
-int ti85_convert_file_data_to_serial_stream (UINT8* file_data, unsigned int file_size, ti85_serial_data*  serial_data, char* calc_type)
+int ti85_convert_file_data_to_serial_stream (const UINT8* file_data, unsigned int file_size, ti85_serial_data*  serial_data, char* calc_type)
 {
 	UINT16 i;
 	UINT16 number_of_entries;

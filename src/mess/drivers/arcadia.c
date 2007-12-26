@@ -322,7 +322,7 @@ static const rgb_t arcadia_palette[] =
 	RGB_BLACK					/* black */
 };
 
-static unsigned short arcadia_colortable[2][2] = {
+static const unsigned short arcadia_colortable[2][2] = {
 	{ 0, 1 },
 	{ 1, 0 }
 };

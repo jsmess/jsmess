@@ -436,7 +436,7 @@ static const rgb_t apexc_palette[] =
 	MAKE_RGB(50, 0, 0)
 };
 
-static unsigned short apexc_colortable[] =
+static const unsigned short apexc_colortable[] =
 {
 	0, 1
 };

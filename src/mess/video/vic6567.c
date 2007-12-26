@@ -155,7 +155,7 @@
 #define FOREGROUNDCOLOR (vic2.reg[0x24]&0xf)
 #define FRAMECOLOR (vic2.reg[0x20]&0xf)
 
-unsigned char vic2_palette[] =
+const unsigned char vic2_palette[] =
 {
 /* black, white, red, cyan */
 /* purple, green, blue, yellow */

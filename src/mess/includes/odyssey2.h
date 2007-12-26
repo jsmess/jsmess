@@ -40,7 +40,7 @@ MACHINE_RESET( odyssey2 );
 /* video/odyssey2.c */
 extern int odyssey2_vh_hpos;
 
-extern UINT8 odyssey2_colors[];
+extern const UINT8 odyssey2_colors[];
 
 VIDEO_START( odyssey2 );
 VIDEO_UPDATE( odyssey2 );
@@ -54,7 +54,7 @@ WRITE8_HANDLER ( odyssey2_video_w );
 
 /* audio/odyssey2.c */
 extern sound_stream *odyssey2_sh_channel;
-extern struct CustomSound_interface odyssey2_sound_interface;
+extern const struct CustomSound_interface odyssey2_sound_interface;
 void *odyssey2_sh_start(int clock, const struct CustomSound_interface *config);
 void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length );
 

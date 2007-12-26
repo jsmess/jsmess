@@ -3,7 +3,7 @@
 
 #include "vic6567.h"
 
-extern unsigned char vic3_palette[0x100 * 3];
+extern const unsigned char vic3_palette[0x100 * 3];
 
 extern void vic4567_init (int pal, int (*dma_read) (int),
 						  int (*dma_read_color) (int), void (*irq) (int),

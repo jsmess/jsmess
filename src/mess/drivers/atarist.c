@@ -1319,7 +1319,7 @@ static WRITE8_HANDLER( ym2149_port_b_w )
 	centronics_write_data(0, data);
 }
 
-static struct AY8910interface ym2149_interface =
+static const struct AY8910interface ym2149_interface =
 {
 	0,
 	0,
@@ -1337,7 +1337,7 @@ static void acia_interrupt(int state)
 	acia_irq = state;
 }
 
-static struct acia6850_interface acia_ikbd_intf =
+static const struct acia6850_interface acia_ikbd_intf =
 {
 	Y2/64,
 	Y2/64,
@@ -1349,7 +1349,7 @@ static struct acia6850_interface acia_ikbd_intf =
 	acia_interrupt
 };
 
-static struct acia6850_interface acia_midi_intf =
+static const struct acia6850_interface acia_midi_intf =
 {
 	Y2/64,
 	Y2/64,
@@ -1420,7 +1420,7 @@ static const mfp68901_interface mfp_intf =
 	NULL
 };
 
-static CENTRONICS_CONFIG atarist_centronics_config[1] =
+static const CENTRONICS_CONFIG atarist_centronics_config[1] =
 {
 	{
 		PRINTER_IBM,
@@ -1510,7 +1510,7 @@ static MACHINE_START( atarist )
 	cpunum_set_irq_callback(0, atarist_int_ack);
 }
 
-static struct rp5c15_interface rtc_intf = 
+static const struct rp5c15_interface rtc_intf = 
 {
 	NULL
 };
@@ -1657,7 +1657,7 @@ static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 	// 0x80 = FDD_DENSE_SEL
 }
 
-static struct AY8910interface stbook_ym2149_interface =
+static const struct AY8910interface stbook_ym2149_interface =
 {
 	0,
 	0,
@@ -1667,7 +1667,7 @@ static struct AY8910interface stbook_ym2149_interface =
 
 static UINT8 krxd, ktxd;
 
-static struct acia6850_interface stbook_acia_ikbd_intf =
+static const struct acia6850_interface stbook_acia_ikbd_intf =
 {
 	U517/2/16, // 500kHz
 	U517/2/2, // 1MHZ

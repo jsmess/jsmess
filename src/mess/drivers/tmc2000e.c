@@ -138,7 +138,7 @@ static void tmc2000e_q_w(int level)
 	// floppy control (FDC-6)
 }
 
-static CDP1802_CONFIG tmc2000e_config =
+static const CDP1802_CONFIG tmc2000e_config =
 {
 	tmc2000e_mode_r,
 	tmc2000e_ef_r,

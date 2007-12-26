@@ -364,7 +364,7 @@ static void thom_floppy_format_sector ( mess_image *image, int side, int sector_
 
 
 
-static floppy_interface thom_floppy_interface = 
+static const floppy_interface thom_floppy_interface = 
 {
 	thom_floppy_seek,
 	thom_floppy_get_sectors_per_track,

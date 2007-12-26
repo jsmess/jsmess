@@ -40,7 +40,7 @@ Video hardware:
 static UINT32 vtech1_palette_mono[16];
 
 /* note - Juergen's colors do not match the colors in the m6847 code */
-static UINT8 vtech1_palette[] =
+static const UINT8 vtech1_palette[] =
 {
       0, 224,   0,    /* green */
     208, 255,   0,    /* yellow (greenish) */

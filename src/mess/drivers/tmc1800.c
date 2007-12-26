@@ -203,7 +203,7 @@ static void tmc1800_q_w(int level)
 {
 }
 
-static CDP1802_CONFIG tmc1800_config =
+static const CDP1802_CONFIG tmc1800_config =
 {
 	tmc1800_mode_r,
 	tmc1800_ef_r,
@@ -241,7 +241,7 @@ static void tmc2000_q_w(int level)
 	set_led_status(1, level);
 }
 
-static CDP1802_CONFIG tmc2000_config =
+static const CDP1802_CONFIG tmc2000_config =
 {
 	tmc1800_mode_r,
 	tmc2000_ef_r,

@@ -97,7 +97,7 @@ Some bugs left :
 // This is the sequence for unlocking the ASIC in the CPC+/GX4000
 // These are outed to port &bc00, after syncing the lock by outing a non-zero value then a zero to &bc00
 // To lock the ASIC again, repeat the sequence without the last &ee
-static unsigned char asic_unlock_seq[15] =
+static const unsigned char asic_unlock_seq[15] =
 {
 	0xff, 0x77, 0xb3, 0x51, 0xa8, 0xd4, 0x62, 0x39, 0x9c, 0x46, 0x2b, 0x15, 0x8a, 0xcd, 0xee
 };
@@ -154,7 +154,7 @@ static unsigned char previous_printer_data_byte;
 static unsigned char *Amstrad_UpperRom;
 /* There are 8 different ram configurations which work on the currently selected 64k logical block.
    The following tables show the possible ram configurations :*/
-static int RamConfigurations[8 * 4] =
+static const int RamConfigurations[8 * 4] =
 {
 	0, 1, 2, 3, 					   /* config 0 */
 	0, 1, 2, 7, 					   /* config 1 */
@@ -338,7 +338,7 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 /* -----------------------------
    - amstrad_ppi8255_interface -
    -----------------------------*/
-static ppi8255_interface amstrad_ppi8255_interface =
+static const ppi8255_interface amstrad_ppi8255_interface =
 {
 	1,                       /* number of PPIs to emulate */
 	{amstrad_ppi_porta_r},   /* port A read */
@@ -350,7 +350,7 @@ static ppi8255_interface amstrad_ppi8255_interface =
 };
 
 /* Amstrad NEC765 interface doesn't use interrupts or DMA! */
-static nec765_interface amstrad_nec765_interface =
+static const nec765_interface amstrad_nec765_interface =
 {
 	NULL,
 	NULL
@@ -1615,7 +1615,7 @@ static void kccomp_reset_machine(void)
 }
 
 /* the following timings have been measured! */
-static UINT8 amstrad_cycle_table_op[256] = {
+static const UINT8 amstrad_cycle_table_op[256] = {
 	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
 	12, 12,  8,  8,  4,  4,  8,  4, 12, 12,  8,  8,  4,  4,  8,  4,
 	 8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
@@ -1634,7 +1634,7 @@ static UINT8 amstrad_cycle_table_op[256] = {
 	 8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
 };
 
-static UINT8 amstrad_cycle_table_cb[256]=
+static const UINT8 amstrad_cycle_table_cb[256]=
 {
 	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
 	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
@@ -1655,7 +1655,7 @@ static UINT8 amstrad_cycle_table_cb[256]=
 };
 
 
-static UINT8 amstrad_cycle_table_ed[256]=
+static const UINT8 amstrad_cycle_table_ed[256]=
 {
 	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
 	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
@@ -1676,7 +1676,7 @@ static UINT8 amstrad_cycle_table_ed[256]=
 };
 
 
-static UINT8 amstrad_cycle_table_xy[256]=
+static const UINT8 amstrad_cycle_table_xy[256]=
 {
 	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
 	12, 12,  8,  8,  4,  4,  8,  4, 12, 12,  8,  8,  4,  4,  8,  4,
@@ -1696,7 +1696,7 @@ static UINT8 amstrad_cycle_table_xy[256]=
 	 8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
 };
 
-static UINT8 amstrad_cycle_table_xycb[256]=
+static const UINT8 amstrad_cycle_table_xycb[256]=
 {
 	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
 	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
@@ -1716,7 +1716,7 @@ static UINT8 amstrad_cycle_table_xycb[256]=
 	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20
 };
 
-static UINT8 amstrad_cycle_table_ex[256]=
+static const UINT8 amstrad_cycle_table_ex[256]=
 {
 	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	 4,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -1821,12 +1821,12 @@ The Gate-Array fetches two bytes for each address*/
 
 	/* Using the cool code Juergen has provided, I will override
 	the timing tables with the values for the amstrad */
-	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_op, amstrad_cycle_table_op);
-	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_cb, amstrad_cycle_table_cb);
-	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ed, amstrad_cycle_table_ed);
-	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xy, amstrad_cycle_table_xy);
-	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xycb, amstrad_cycle_table_xycb);
-	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ex, amstrad_cycle_table_ex);
+	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_op, (void*)amstrad_cycle_table_op);
+	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_cb, (void*)amstrad_cycle_table_cb);
+	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ed, (void*)amstrad_cycle_table_ed);
+	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xy, (void*)amstrad_cycle_table_xy);
+	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xycb, (void*)amstrad_cycle_table_xycb);
+	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ex, (void*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
 	cpunum_set_irq_callback(0, amstrad_cpu_acknowledge_int);
@@ -2390,7 +2390,7 @@ INPUT_PORTS_END
 /* --------------------
    - AY8910_interface -
    --------------------*/
-static struct AY8910interface ay8912_interface =
+static const struct AY8910interface ay8912_interface =
 {
 	amstrad_psg_porta_read,	/* portA read */
 	amstrad_psg_porta_read,	/* portB read */

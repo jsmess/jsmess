@@ -331,7 +331,7 @@ static DRIVER_INIT(a310)
 	memory_set_opbase_handler(0, a310_setopbase);
 }
 
-static const char *ioc_regnames[] = 
+static const char *const ioc_regnames[] = 
 {
 	"(rw) Control",					// 0
 	"(read) Keyboard receive (write) keyboard send",	// 1

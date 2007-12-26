@@ -782,7 +782,7 @@ static WRITE8_HANDLER(nc_sound_w)
 	}
 }
 
-static unsigned long baud_rate_table[]=
+static const unsigned long baud_rate_table[]=
 {
 	150,
     300,
@@ -942,12 +942,12 @@ static void nc100_rxrdy_callback(int state)
 }
 
 
-static struct tc8521_interface nc100_tc8521_interface=
+static const struct tc8521_interface nc100_tc8521_interface=
 {
 	nc100_tc8521_alarm_callback,
 };
 
-static struct msm8251_interface nc100_uart_interface=
+static const struct msm8251_interface nc100_uart_interface=
 {
 	nc100_txrdy_callback,
 	NULL,
@@ -969,7 +969,7 @@ static void nc100_printer_handshake_in(int number, int data, int mask)
 	nc_update_interrupts();
 }
 
-static CENTRONICS_CONFIG nc100_cent_config[1]={
+static const CENTRONICS_CONFIG nc100_cent_config[1]={
 	{
 		PRINTER_CENTRONICS,
 		nc100_printer_handshake_in
@@ -1276,7 +1276,7 @@ static void nc200_printer_handshake_in(int number, int data, int mask)
 	nc_update_interrupts();
 }
 
-static CENTRONICS_CONFIG nc200_cent_config[1]={
+static const CENTRONICS_CONFIG nc200_cent_config[1]={
 	{
 		PRINTER_CENTRONICS,
 		nc200_printer_handshake_in
@@ -1328,7 +1328,7 @@ static void nc200_rxrdy_callback(int state)
 	nc200_refresh_uart_interrupt();
 }
 
-static struct msm8251_interface nc200_uart_interface=
+static const struct msm8251_interface nc200_uart_interface=
 {
 	nc200_rxrdy_callback,
 	NULL,
@@ -1356,7 +1356,7 @@ static void nc200_fdc_interrupt(int state)
     nc_update_interrupts();
 }
 
-static struct nec765_interface nc200_nec765_interface=
+static const struct nec765_interface nc200_nec765_interface=
 {
     nc200_fdc_interrupt,
     NULL,

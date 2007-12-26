@@ -102,7 +102,7 @@ typedef struct {
 } RRIOT_CONFIG;
 
 /* This has to be called from a driver at startup */
-void rriot_init(int nr, RRIOT_CONFIG *riot);
+void rriot_init(int nr, const RRIOT_CONFIG *riot);
 	
 int rriot_r(int chip, int offs);
 void rriot_w(int chip, int offs, int data);

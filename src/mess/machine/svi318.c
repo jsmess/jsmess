@@ -69,7 +69,7 @@ static void svi318_uart8250_interrupt(int nr, int state)
 	cpunum_set_input_line(0, 0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-static uart8250_interface svi318_uart8250_interface[1] =
+static const uart8250_interface svi318_uart8250_interface[1] =
 {
 	{
 		TYPE8250,
@@ -224,7 +224,7 @@ static WRITE8_HANDLER ( svi318_ppi_port_c_w )
 	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x20) ? -1.0 : +1.0);
 }
 
-static ppi8255_interface svi318_ppi8255_interface =
+static const ppi8255_interface svi318_ppi8255_interface =
 {
 	1,
 	{svi318_ppi_port_a_r},

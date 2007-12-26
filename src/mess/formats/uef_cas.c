@@ -302,7 +302,7 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	return p - buffer;
 }
 
-static struct CassetteLegacyWaveFiller uef_legacy_fill_wave = {
+static const struct CassetteLegacyWaveFiller uef_legacy_fill_wave = {
 	uef_cas_fill_wave,				/* fill_wave */
 	-1,						/* chunk_size */
 	0,						/* chunk_samples */
@@ -320,7 +320,7 @@ static casserr_t uef_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &uef_legacy_fill_wave );
 }
 
-struct CassetteFormat uef_cassette_format = {
+const struct CassetteFormat uef_cassette_format = {
 	"uef",
 	uef_cassette_identify,
 	uef_cassette_load,

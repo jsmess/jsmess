@@ -149,7 +149,7 @@ static int fmsx_cas_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 }
 
 
-static struct CassetteLegacyWaveFiller fmsx_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller fmsx_legacy_fill_wave =
 {
 	fmsx_cas_fill_wave,						/* fill_wave */
 	-1,										/* chunk_size */
@@ -176,7 +176,7 @@ static casserr_t fmsx_cas_load(cassette_image *cassette)
 
 
 
-static struct CassetteFormat fmsx_cas_format =
+static const struct CassetteFormat fmsx_cas_format =
 {
 	"tap",
 	fmsx_cas_identify,

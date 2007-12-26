@@ -200,7 +200,7 @@ static INPUT_PORTS_START (compis)
   PORT_DIPSETTING( 0x00, "Disabled" )
 INPUT_PORTS_END
 
-static unsigned i86_address_mask = 0x000fffff;
+static const unsigned i86_address_mask = 0x000fffff;
 
 static const compis_gdc_interface i82720_interface =
 {

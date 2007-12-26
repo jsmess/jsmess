@@ -57,7 +57,7 @@
  black gray orange yellow dardgrey vio red lgreen
  lred lgray brown blue white green cyan lblue
 */
-unsigned char vdc8563_palette[] =
+const unsigned char vdc8563_palette[] =
 {
 #if 0
 	0x00, 0x00, 0x00, /* black */

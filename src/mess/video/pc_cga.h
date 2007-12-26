@@ -5,11 +5,11 @@
 #define CGA_PALETTE_SETS 83	/* one for colour, one for mono,
 				 * 81 for colour composite */
 
-extern unsigned char cga_palette[CGA_PALETTE_SETS * 16][3];
-extern unsigned short cga_colortable[256*2 + 16*2 + 96*4];
-extern gfx_layout CGA_charlayout;
-extern gfx_layout CGA_gfxlayout_1bpp;
-extern gfx_layout CGA_gfxlayout_2bpp;
+extern const unsigned char cga_palette[CGA_PALETTE_SETS * 16][3];
+extern const unsigned short cga_colortable[256*2 + 16*2 + 96*4];
+extern const gfx_layout CGA_charlayout;
+extern const gfx_layout CGA_gfxlayout_1bpp;
+extern const gfx_layout CGA_gfxlayout_2bpp;
 
 MACHINE_DRIVER_EXTERN( pcvideo_cga );
 

@@ -97,7 +97,7 @@ int artwork_get_inputscreen_customizations(png_info *png, artwork_cust_type cust
 	int enabled = TRUE;
 	int item_count = 0;
 
-	static const char *cust_files[] =
+	static const char *const cust_files[] =
 	{
 		"ctrlr.png",		"ctrlr.ini",
 		"keyboard.png",		"keyboard.ini"

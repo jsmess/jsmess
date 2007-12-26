@@ -7,7 +7,7 @@ UINT8 channelf_val_reg = 0;
 UINT8 channelf_row_reg = 0;
 UINT8 channelf_col_reg = 0;
 
-static UINT8 channelf_palette[] = {
+static const UINT8 channelf_palette[] = {
 	0x00, 0x00, 0x00,	/* black */
 	0xff, 0xff, 0xff,	/* white */
 	0xff, 0x00, 0x00,	/* red	 */

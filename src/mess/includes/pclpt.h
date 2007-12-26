@@ -23,7 +23,7 @@ typedef struct {
 
 void pc_lpt_config(int nr, const PC_LPT_CONFIG *config);
 
-void pc_lpt_set_device(int nr, CENTRONICS_DEVICE *device);
+void pc_lpt_set_device(int nr, const CENTRONICS_DEVICE *device);
 
 /* line definitions in centroni.h */
 /* only those lines in mask are modified */

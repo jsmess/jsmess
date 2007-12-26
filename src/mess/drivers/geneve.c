@@ -436,7 +436,7 @@ INPUT_PORTS_END
 
 
 
-static struct TMS5220interface tms5220interface =
+static const struct TMS5220interface tms5220interface =
 {
 	NULL,						/* no IRQ callback */
 #if 1

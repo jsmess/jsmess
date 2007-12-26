@@ -25,7 +25,7 @@ UINT32 mess_ram_size;
 UINT8 *mess_ram;
 UINT8 mess_ram_default_value = 0xCD;
 
-char mess_disclaimer[] =
+const char mess_disclaimer[] =
 		"MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"
 		"several computer and console systems. But hardware is useless without software\n"
 		"so a file dump of the ROM, cartridges, discs, and cassettes which run on that\n"

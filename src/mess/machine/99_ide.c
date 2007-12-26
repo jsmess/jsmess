@@ -66,7 +66,7 @@ static int input_latch, output_latch;
 
 static int ide_irq, clk_irq;
 
-static struct ide_interface ti99_ide_interface =
+static const struct ide_interface ti99_ide_interface =
 {
 	ide_interrupt_callback
 };

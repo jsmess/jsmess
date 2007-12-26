@@ -275,9 +275,9 @@ INPUT_PORTS_END
  Audio Initialisation
 ******************************************************************************/
 
-static INT16 speaker_levels[] = {-32768, 0, 32767, 0};
+static const INT16 speaker_levels[] = {-32768, 0, 32767, 0};
 
-static struct Speaker_interface speaker_interface =
+static const struct Speaker_interface speaker_interface =
 {
 	4,
 	speaker_levels

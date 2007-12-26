@@ -13,7 +13,7 @@ static void dma_transfer_abort(int channel);
 static void dma_transfer_halt(int channel);
 static void dma_transfer_continue(int channel);
 
-void hd63450_init(struct hd63450_interface* intf)
+void hd63450_init(const struct hd63450_interface* intf)
 {
 	int x;
 

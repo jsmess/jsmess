@@ -114,14 +114,14 @@ struct CassetteLegacyWaveFiller
 };
 
 /* builtin formats */
-extern struct CassetteFormat wavfile_format;
+extern const struct CassetteFormat wavfile_format;
 
 /* macros for specifying format lists */
 #define CASSETTE_FORMATLIST_EXTERN(name)	\
-	extern const struct CassetteFormat *name[]
+	extern const struct CassetteFormat *const name[]
 
 #define CASSETTE_FORMATLIST_START(name)		\
-	const struct CassetteFormat *name[] =	\
+	const struct CassetteFormat *const name[] =	\
 	{										\
 		&wavfile_format,					\
 
@@ -143,7 +143,7 @@ CASSETTE_FORMATLIST_EXTERN(cassette_default_formats);
 casserr_t cassette_open(void *file, const struct io_procs *procs,
 	const struct CassetteFormat *format, int flags, cassette_image **outcassette);
 casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const char *extension,
-	const struct CassetteFormat **formats, int flags, cassette_image **outcassette);
+	const struct CassetteFormat *const *formats, int flags, cassette_image **outcassette);
 casserr_t cassette_create(void *file, const struct io_procs *procs, const struct CassetteFormat *format,
 	const struct CassetteOptions *opts, int flags, cassette_image **outcassette);
 casserr_t cassette_save(cassette_image *cassette);

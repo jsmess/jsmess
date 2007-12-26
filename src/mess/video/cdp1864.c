@@ -22,7 +22,7 @@ typedef struct
 
 static CDP1864_VIDEO_CONFIG cdp1864;
 
-static int cdp1864_bgcolseq[] = { 2, 0, 1, 4 };
+static const int cdp1864_bgcolseq[] = { 2, 0, 1, 4 };
 
 int cdp1864_efx;
 

@@ -44,7 +44,7 @@ static unsigned char nick_colour_palette[256*3];
 /* the mapping doesn't change - EP uses 0..256 index's for
 colour specification - don't know if I require this for the
 driver or not. */
-static unsigned short nick_colour_table[256]=
+static const unsigned short nick_colour_table[256]=
 {
 	0,1,2,3,4,5,6,7,8,
 	9,10,11,12,13,14,15,16,

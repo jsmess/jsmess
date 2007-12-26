@@ -361,7 +361,7 @@ static WRITE8_HANDLER( vc20_via5_write_cb2 )
 	cbm_ieee_eoi_w(0,data);
 }
 
-static struct via6522_interface via0 =
+static const struct via6522_interface via0 =
 {
 	vc20_via0_read_porta,
 	0,								   /*via0_read_portb, */

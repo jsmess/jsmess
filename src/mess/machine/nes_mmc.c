@@ -4518,7 +4518,7 @@ int mapper_reset (int mapperNum)
 
 
 
-static mmc mmc_list[] =
+static const mmc mmc_list[] =
 {
 /*	INES   DESC						LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB */
 	{ 0, "No Mapper",				NULL, NULL, NULL, NULL, NULL, NULL, NULL },

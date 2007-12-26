@@ -17,11 +17,11 @@ pc_video_update_proc pc_mda_choosevideomode(int *width, int *height, struct mscr
 WRITE8_HANDLER ( pc_MDA_w );
 READ8_HANDLER ( pc_MDA_r );
 
-extern unsigned char mda_palette[4][3];
-extern gfx_layout pc_mda_charlayout;
-extern gfx_layout pc_mda_gfxlayout_1bpp;
+extern const unsigned char mda_palette[4][3];
+extern const gfx_layout pc_mda_charlayout;
+extern const gfx_layout pc_mda_gfxlayout_1bpp;
 GFXDECODE_EXTERN( pc_mda_gfxdecodeinfo );
-extern unsigned short mda_colortable[256*2+1*2];
+extern const unsigned short mda_colortable[256*2+1*2];
 
 PALETTE_INIT( pc_mda );
 

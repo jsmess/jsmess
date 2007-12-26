@@ -214,7 +214,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	return p - buffer;
 }
 
-static struct CassetteLegacyWaveFiller primo_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller primo_legacy_fill_wave =
 {
 	primo_cassette_fill_wave,			/* fill_wave */
 	-1,											/* chunk_size */
@@ -235,7 +235,7 @@ static casserr_t primo_ptp_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &primo_legacy_fill_wave);
 }
 
-static struct CassetteFormat primo_ptp_image_format =
+static const struct CassetteFormat primo_ptp_image_format =
 {
 	"ptp",
 	primo_ptp_identify,

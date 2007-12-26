@@ -84,13 +84,13 @@ static GFXDECODE_START( p2000m_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, p2000m_charlayout, 0, 128 )
 GFXDECODE_END
 
-static unsigned char p2000m_palette[2 * 3] =
+static const unsigned char p2000m_palette[2 * 3] =
 {
 	0x00, 0x00, 0x00,
 	0xff, 0xff, 0xff
 };
 
-static unsigned short p2000m_colortable[2 * 2] =
+static const unsigned short p2000m_colortable[2 * 2] =
 {
 	1,0, 0,1
 };

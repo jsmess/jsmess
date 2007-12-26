@@ -210,7 +210,7 @@ static void flopimg_write_track_data_info_buffer(mess_image *image, int side, co
 
 
 
-static floppy_interface mess_floppy_interface =
+static const floppy_interface mess_floppy_interface =
 {
 	flopimg_seek_callback,
 	flopimg_get_sectors_per_track,
@@ -246,7 +246,7 @@ static UINT64 image_fsize_thunk(void *file)
 
 /* ----------------------------------------------------------------------- */
 
-struct io_procs mess_ioprocs =
+const struct io_procs mess_ioprocs =
 {
 	NULL,
 	image_fseek_thunk,

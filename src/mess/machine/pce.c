@@ -77,7 +77,7 @@ static struct {
 
 /* MSM5205 ADPCM decoder definition */
 static void pce_cd_msm5205_int( int data );
-struct MSM5205interface pce_cd_msm5205_interface = {
+const struct MSM5205interface pce_cd_msm5205_interface = {
 	pce_cd_msm5205_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 1/48 prescaler, 4bit data */
 };

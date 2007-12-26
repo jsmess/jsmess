@@ -179,7 +179,7 @@ static ADDRESS_MAP_START(ti990_10_readcru, ADDRESS_SPACE_IO, 8)
 
 ADDRESS_MAP_END
 
-static ti990_10reset_param reset_params =
+static const ti990_10reset_param reset_params =
 {
 	/*idle_callback*/NULL,
 	rset_callback,

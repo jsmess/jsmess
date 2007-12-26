@@ -73,8 +73,8 @@ static UINT16 beeper;
 
   static UINT8 read_board_flag;
 
-  static  char EMP[4] = "EMP";
-  static  char NO_PIECE[4]  = "NOP";
+  static const char EMP[4] = "EMP";
+  static const char NO_PIECE[4]  = "NOP";
 
 
   typedef struct {
@@ -102,7 +102,7 @@ static UINT16 beeper;
 
 static     BOARD_FIELD m_board[8][8];
 
-static     BOARD_FIELD start_board[8][8] =
+static const BOARD_FIELD start_board[8][8] =
 	{
 		{ { 7,44,434,"WR1"}, { 6,100,434,"WN1"}, { 5,156,434,"WB1"}, { 4,212,434,"WQ1"}, { 3,268,434,"WK"}, { 2,324,434,"WB2"}, { 1,380,434,"WN2"}, { 0,436,434,"WR2"} },
 		{ {15,44,378,"WP1"}, {14,100,378,"WP2"}, {13,156,378,"WP3"}, {12,212,378,"WP4"}, {11,268,378,"WP5"}, {10,324,378,"WP6"}, { 9,380,378,"WP7"}, { 8,436,378,"WP8"} },
@@ -187,7 +187,7 @@ static     BOARD_FIELD start_board[8][8] =
   static void clear_layout(void);
   static void set_status_of_pieces(void);
 
-  static char * get_non_set_pieces(const char *cur_piece);
+  static const char * get_non_set_pieces(const char *cur_piece);
 
   static unsigned int out_of_board( float x0, float y0);
 
@@ -586,7 +586,7 @@ static VIDEO_UPDATE( glasgow )
 //  INT32 lg_x, lg_y;
 // 	UINT8 p_key;
 
-    char *piece;
+    const char *piece;
 
 	float save_x, save_y;
 
@@ -1284,7 +1284,7 @@ static void set_status_of_pieces()
 	}
 
 
-static char *get_non_set_pieces(const char *cur_piece)
+static const char *get_non_set_pieces(const char *cur_piece)
 {
 	UINT8 i=0;
 
@@ -1298,7 +1298,7 @@ static char *get_non_set_pieces(const char *cur_piece)
 	    if (!all_pieces[start_i].set && ( all_pieces[start_i].piece[0] != cur_piece[0] ||
 		                                  all_pieces[start_i].piece[1] != cur_piece[1]) )
   			{
-			return ((char *)&all_pieces[start_i].piece[0]);
+			return ((const char *)&all_pieces[start_i].piece[0]);
 			}
 
 		i=i+1;

@@ -61,7 +61,7 @@ static mame_bitmap *tmpbitmap;
 #define TMS3556_MODE_BITMAP	2
 #define TMS3556_MODE_MIXED	3
 
-/*static const char *tms3556_mode_names[] = { "DISPLAY OFF", "TEXT", "GRAPHIC", "MIXED" };*/
+/*static const char *const tms3556_mode_names[] = { "DISPLAY OFF", "TEXT", "GRAPHIC", "MIXED" };*/
 
 static PALETTE_INIT(tms3556);
 static VIDEO_UPDATE(tms3556);

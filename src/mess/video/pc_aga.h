@@ -20,8 +20,8 @@
 
 #include "driver.h"
 
-extern gfx_layout europc_cga_charlayout;
-extern gfx_layout europc_mda_charlayout;
+extern const gfx_layout europc_cga_charlayout;
+extern const gfx_layout europc_mda_charlayout;
 GFXDECODE_EXTERN( europc_gfxdecodeinfo );
 GFXDECODE_EXTERN( aga_gfxdecodeinfo );
 

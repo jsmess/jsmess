@@ -1,6 +1,6 @@
 /* Normal Character Set */
 
-static char teletext_characters[96*60]={
+static const char teletext_characters[96*60]={
   // 0x20 ' '
   0,0,0,0,0,0,
   0,0,0,0,0,0,
@@ -1062,7 +1062,7 @@ static char teletext_characters[96*60]={
 
 /* Graphics Character Set */
 
-static char teletext_graphics[96*60]={
+static const char teletext_graphics[96*60]={
   // 0x20
   0,0,0,0,0,0,
   0,0,0,0,0,0,
@@ -2123,7 +2123,7 @@ static char teletext_graphics[96*60]={
 
 /* Separated Graphics Character Set */
 
-static char teletext_separated_graphics[96*60]={
+static const char teletext_separated_graphics[96*60]={
   // Character ' ' (32)
   0,0,0,0,0,0,
   0,0,0,0,0,0,

@@ -46,10 +46,10 @@ extern void ted7360_set_dma (read8_handler dma_read,
 
 extern VIDEO_START( ted7360 );
 extern VIDEO_UPDATE( ted7360 );
-extern unsigned char ted7360_palette[16 * 8 * 3];
+extern const unsigned char ted7360_palette[16 * 8 * 3];
 
 /* to be inserted in GameDriver-Structure */
-extern struct CustomSound_interface ted7360_sound_interface;
+extern const struct CustomSound_interface ted7360_sound_interface;
 
 /* to be called when writting to port */
 extern WRITE8_HANDLER ( ted7360_port_w );

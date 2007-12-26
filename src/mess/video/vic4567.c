@@ -14,7 +14,7 @@
 #define VIC3_BITPLANE_IADDR(x) ( x&1 ? VIC3_BITPLANE_IADDR_HELPER(x)+0x10000 \
 								: VIC3_BITPLANE_IADDR_HELPER(x) )
 
-unsigned char vic3_palette[0x100*3]={0};
+const unsigned char vic3_palette[0x100*3]={0};
 
 static struct {
 	struct {

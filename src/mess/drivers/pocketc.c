@@ -498,7 +498,7 @@ static GFXDECODE_START( pc1251_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pc1251_charlayout, 0, 8 )
 GFXDECODE_END
 
-static SC61860_CONFIG config={
+static const SC61860_CONFIG config={
     pc1401_reset, pc1401_brk, NULL,
     pc1401_ina, pc1401_outa,
     pc1401_inb, pc1401_outb,
@@ -542,7 +542,7 @@ static MACHINE_DRIVER_START( pc1401 )
 MACHINE_DRIVER_END
 
 
-static SC61860_CONFIG pc1251_config =
+static const SC61860_CONFIG pc1251_config =
 {
     NULL, pc1251_brk, NULL,
     pc1251_ina, pc1251_outa,
@@ -569,7 +569,7 @@ static MACHINE_DRIVER_START( pc1251 )
 MACHINE_DRIVER_END
 
 
-static SC61860_CONFIG pc1350_config =
+static const SC61860_CONFIG pc1350_config =
 {
     NULL, pc1350_brk,NULL,
     pc1350_ina, pc1350_outa,
@@ -600,7 +600,7 @@ static MACHINE_DRIVER_START( pc1350 )
 MACHINE_DRIVER_END
 
 
-static SC61860_CONFIG pc1403_config =
+static const SC61860_CONFIG pc1403_config =
 {
     NULL, pc1403_brk, NULL,
     pc1403_ina, pc1403_outa,

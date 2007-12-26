@@ -1257,7 +1257,7 @@ static void pcw16_com_refresh_connected(int serial_port_id)
 	}
 }
 
-static uart8250_interface pcw16_com_interface[2]=
+static const uart8250_interface pcw16_com_interface[2]=
 {
 	{
 		TYPE16550,
@@ -1332,14 +1332,14 @@ static void pcw16_reset(void)
 }
 
 
-static PC_LPT_CONFIG lpt_config = 
+static const PC_LPT_CONFIG lpt_config = 
 {
 	1,
 	LPT_UNIDIRECTIONAL, // more one of these epp/ecp aware ports
 	NULL
 };
 
-static CENTRONICS_CONFIG cent_config =
+static const CENTRONICS_CONFIG cent_config =
 {
 	PRINTER_CENTRONICS,
 	pc_lpt_handshake_in

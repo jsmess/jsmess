@@ -4,7 +4,7 @@
 
 #include "includes/hp48.h"
 
-static unsigned char hp48_palette[] =
+static const UINT8 hp48_palette[] =
 {
 	49,70,64,	/* background */
 	40,35,55,	/* symbol color */
@@ -13,7 +13,7 @@ static unsigned char hp48_palette[] =
 };
 
 /* 32 contrast steps */
-unsigned short hp48_colortable[0x20][2] = {
+const UINT16 hp48_colortable[0x20][2] = {
 	{ 0, 2 },
 	{ 0, 2 },
 	{ 0, 2 },

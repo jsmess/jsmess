@@ -28,7 +28,7 @@ extern unsigned short roller_ram_offset;
 extern unsigned char pcw_vdu_video_control_register;
 
 /* two colours */
-static unsigned short pcw_colour_table[PCW_NUM_COLOURS] =
+static const unsigned short pcw_colour_table[PCW_NUM_COLOURS] =
 {
 	0, 1
 };

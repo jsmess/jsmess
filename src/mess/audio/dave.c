@@ -18,7 +18,7 @@ DAVE SOUND CHIP FOUND IN ENTERPRISE
 #define STEP 0x08000
 
 static DAVE dave;
-static DAVE_INTERFACE *dave_iface;
+static const DAVE_INTERFACE *dave_iface;
 
 //static unsigned char Dave_IntRegRead(void);
 //static void Dave_IntRegWrite(unsigned char);
@@ -652,7 +652,7 @@ int	Dave_getreg(int RegIndex)
 	return dave.Regs[RegIndex & 0x01f];
 }
 
-void	Dave_SetIFace(struct DAVE_INTERFACE *newInterface)
+void	Dave_SetIFace(const struct DAVE_INTERFACE *newInterface)
 {
 	dave_iface = newInterface;
 }

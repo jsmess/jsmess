@@ -47,7 +47,7 @@ struct SystemConfigurationParamBlock;
 
 void mess_options_init(core_options *opts);
 
-extern char mess_disclaimer[];
+extern const char mess_disclaimer[];
 
 UINT32 hash_data_extract_crc32(const char *d);
 

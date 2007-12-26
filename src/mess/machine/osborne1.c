@@ -54,7 +54,7 @@ static int osborne1_z80_irq_state(int);
 static int osborne1_z80_irq_ack(int);
 static void osborne1_z80_irq_reti(int);
 
-struct z80_irq_daisy_chain osborne1_daisy_chain[] = {
+const struct z80_irq_daisy_chain osborne1_daisy_chain[] = {
 	{ osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 },
 	{ NULL, NULL, NULL, NULL, -1 }
 };
@@ -296,7 +296,7 @@ static const pia6821_interface osborne1_video_pia_config = {
 	NULL	/* irq_b_func */
 };
 
-//static struct aica6850_interface osborne1_6850_config = {
+//static const struct aica6850_interface osborne1_6850_config = {
 //	10,	/* tx_clock */
 //	10,	/* rx_clock */
 //	NULL,	/* rx_pin */

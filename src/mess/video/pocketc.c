@@ -11,7 +11,7 @@
   203d: 0 BUSY, 1 PRINT, 3 JAPAN, 4 SMALL, 5 SHIFT, 6 DEF
   207c: 1 DEF 1 RAD 2 GRAD 5 ERROR 6 FLAG */
 
-static unsigned char pocketc_palette[] =
+static const unsigned char pocketc_palette[] =
 {
 	99,107,99,
 	94,111,103,
@@ -21,7 +21,7 @@ static unsigned char pocketc_palette[] =
 	0, 0, 0
 };
 
-unsigned short pocketc_colortable[8][2] = {
+const unsigned short pocketc_colortable[8][2] = {
 	{ 0, 4 },
 	{ 0, 4 },
 	{ 0, 4 },

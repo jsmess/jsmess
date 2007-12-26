@@ -43,7 +43,7 @@
 
 #define D64_MAX_TRACKS 35
 
-int d64_sectors_per_track[] =
+const int d64_sectors_per_track[] =
 {
 	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
 	19, 19, 19, 19, 19, 19, 19,

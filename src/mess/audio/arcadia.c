@@ -79,7 +79,7 @@ static void *arcadia_custom_start(int clock, const struct CustomSound_interface 
 
 
 
-struct CustomSound_interface arcadia_sound_interface =
+const struct CustomSound_interface arcadia_sound_interface =
 {
 	arcadia_custom_start
 };

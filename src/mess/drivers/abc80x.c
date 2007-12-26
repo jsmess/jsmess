@@ -590,7 +590,7 @@ static int dart_serial_receive(int ch)
 	return -1;
 }
 
-static z80dart_interface abc800_dart_intf =
+static const z80dart_interface abc800_dart_intf =
 {
 	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
@@ -617,7 +617,7 @@ static WRITE8_HANDLER( abc802_dart_rts_w )
 	}
 }
 
-static z80dart_interface abc802_dart_intf =
+static const z80dart_interface abc802_dart_intf =
 {
 	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
@@ -628,7 +628,7 @@ static z80dart_interface abc802_dart_intf =
 	dart_serial_receive		/* receive handler */
 };
 
-static struct z80_irq_daisy_chain abc800_daisy_chain[] =
+static const struct z80_irq_daisy_chain abc800_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
 	{ z80sio_reset, z80sio_irq_state, z80sio_irq_ack, z80sio_irq_reti, 0 },

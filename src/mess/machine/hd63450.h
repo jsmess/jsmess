@@ -45,7 +45,7 @@ struct hd63450
 	const struct hd63450_interface* intf;
 };  
 
-void hd63450_init(struct hd63450_interface* intf);
+void hd63450_init(const struct hd63450_interface* intf);
 int hd63450_read(int offset, UINT16 mem_mask);
 void hd63450_write(int offset, int data, UINT16 mem_mask);
 void hd63450_single_transfer(int x);

@@ -494,7 +494,7 @@ INPUT_PORTS_END
 /*
 	TMS0285 speech synthesizer
 */
-static struct TMS5220interface tms5220interface =
+static const struct TMS5220interface tms5220interface =
 {
 	NULL,						/* no IRQ callback */
 	spchroms_read,				/* speech ROM read handler */

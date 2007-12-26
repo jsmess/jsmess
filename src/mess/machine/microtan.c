@@ -37,7 +37,7 @@ static int via_1_irq_line = CLEAR_LINE;
 static int kbd_irq_line = CLEAR_LINE;
 
 static UINT8 keyrows[10] = { 0,0,0,0,0,0,0,0,0,0 };
-static char keyboard[8][9][8] = {
+static const char keyboard[8][9][8] = {
     { /* normal */
         { 27,'1','2','3','4','5','6','7'},
         {'8','9','0','-','=','`',127,  9},
@@ -291,7 +291,7 @@ static void via_1_irq(int state)
  * VIA read wrappers
  **************************************************************/
 #if VERBOSE
-static char *via_name[16] = {
+static const char *const via_name[16] = {
     "PB  ","PA  ","DDRB","DDRA",
     "T1CL","T1CH","T1LL","T1LH",
     "T2CL","T2CH","SR  ","ACR ",
@@ -331,7 +331,7 @@ WRITE8_HANDLER( microtan_via_1_w )
 /**************************************************************
  * VIA interface structure
  **************************************************************/
-static struct via6522_interface via6522[2] =
+static const struct via6522_interface via6522[2] =
 {
     {   /* VIA#1 at bfc0-bfcf*/
         via_0_in_a,   via_0_in_b,

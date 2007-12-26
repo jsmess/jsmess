@@ -23,7 +23,7 @@
 
 /* pio is last in chain and therefore has highest priority */
 
-static struct z80_irq_daisy_chain kc85_daisy_chain[] =
+static const struct z80_irq_daisy_chain kc85_daisy_chain[] =
 {
 	{z80pio_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
 	{z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},

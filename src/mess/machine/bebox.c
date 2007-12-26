@@ -479,7 +479,7 @@ static void bebox_ide_interrupt(int state)
 }
 
 
-static struct ide_interface bebox_ide_interface =
+static const struct ide_interface bebox_ide_interface =
 {
 	bebox_ide_interrupt
 };
@@ -937,7 +937,7 @@ static const struct pci_device_info scsi53c810_callbacks =
 	scsi53c810_pci_write
 };
 
-static SCSIConfigTable dev_table =
+static const SCSIConfigTable dev_table =
 {
 	2, /* 2 SCSI devices */
 	{
@@ -946,7 +946,7 @@ static SCSIConfigTable dev_table =
 	}
 };
 
-static struct LSI53C810interface scsi53c810_intf =
+static const struct LSI53C810interface scsi53c810_intf =
 {
 	&dev_table,		/* SCSI device table */
 	&scsi53c810_irq_callback,

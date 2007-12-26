@@ -71,7 +71,7 @@ extern DRIVER_INIT( hp48g );
 extern MACHINE_RESET( hp48 );
 
 /* in video/hp48.c */
-extern unsigned short hp48_colortable[0x20][2];
+extern const unsigned short hp48_colortable[0x20][2];
 
 extern PALETTE_INIT( hp48 );
 extern VIDEO_START( hp48 );

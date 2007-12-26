@@ -85,7 +85,7 @@ static int pmd85_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	return p - buffer;
 }
 
-static struct CassetteLegacyWaveFiller pmd85_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller pmd85_legacy_fill_wave =
 {
 	pmd85_cassette_fill_wave,			/* fill_wave */
 	-1,											/* chunk_size */
@@ -106,7 +106,7 @@ static casserr_t pmd85_pmd_load(cassette_image *cassette)
 	return cassette_legacy_construct(cassette, &pmd85_legacy_fill_wave);
 }
 
-static struct CassetteFormat pmd85_pmd_image_format =
+static const struct CassetteFormat pmd85_pmd_image_format =
 {
 	"pmd",
 	pmd85_pmd_identify,

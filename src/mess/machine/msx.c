@@ -320,7 +320,7 @@ static WRITE8_HANDLER ( msx_ppi_port_a_w );
 static WRITE8_HANDLER ( msx_ppi_port_c_w );
 static READ8_HANDLER (msx_ppi_port_b_r );
 
-static ppi8255_interface msx_ppi8255_interface =
+static const ppi8255_interface msx_ppi8255_interface =
 {
 	1,
 	{NULL}, 
@@ -331,7 +331,7 @@ static ppi8255_interface msx_ppi8255_interface =
 	{msx_ppi_port_c_w}
 };
 
-static struct tc8521_interface tc = { NULL };
+static const struct tc8521_interface tc = { NULL };
 
 static void msx_init(void)
 {

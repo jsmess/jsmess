@@ -37,7 +37,7 @@ static void msm8251_in_callback(int id, unsigned long state)
 
 
 /* init */
-void	msm8251_init(struct msm8251_interface *iface)
+void	msm8251_init(const struct msm8251_interface *iface)
 {
 	serial_helper_setup();
 

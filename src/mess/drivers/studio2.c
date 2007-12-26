@@ -201,7 +201,7 @@ static void studio2_q_w(int level)
 	beep_set_state(0, level);
 }
 
-static CDP1802_CONFIG studio2_config = 
+static const CDP1802_CONFIG studio2_config = 
 {
 	studio2_mode_r,
 	studio2_ef_r,
@@ -223,7 +223,7 @@ static UINT8 mpt02_ef_r(void)
 	return ef;
 }
 
-static CDP1802_CONFIG mpt02_config = 
+static const CDP1802_CONFIG mpt02_config = 
 {
 	studio2_mode_r,
 	mpt02_ef_r,

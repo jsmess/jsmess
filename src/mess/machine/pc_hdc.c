@@ -100,7 +100,7 @@ static UINT8 *buffer;					/* data buffer */
 static UINT8 *ptr = 0;					/* data pointer */
 static UINT8 hdc_control;
 
-static const char *hdc_command_names[] =
+static const char *const hdc_command_names[] =
 {
 	"CMD_TESTREADY",		/* 0x00 */
 	"CMD_RECALIBRATE",		/* 0x01 */

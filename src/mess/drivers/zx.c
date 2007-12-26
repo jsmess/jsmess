@@ -337,25 +337,25 @@ GFXDECODE_END
 
 /* Palette Initialization */
 
-static unsigned char zx80_palette[] =
+static const unsigned char zx80_palette[] =
 {
 	255,255,255,	/* white */
 	  0,  0,  0,	/* black */
 };
 
-static unsigned char zx81_palette[] =
+static const unsigned char zx81_palette[] =
 {
 	255,255,255,	/* white */
 	  0,  0,  0,	/* black */
 };
 
-static unsigned char ts1000_palette[] =
+static const unsigned char ts1000_palette[] =
 {
 	 64,244,244,	/* cyan */
 	  0,  0,  0,	/* black */
 };
 
-static unsigned short zx_colortable[] =
+static const unsigned short zx_colortable[] =
 {
 	0, 1,							   /* white on black */
 	1, 0							   /* black on white */
@@ -533,7 +533,7 @@ ROM_END
 
 /* System Configuration */
 
-static struct CassetteOptions zx81_cassette_options = {
+static const struct CassetteOptions zx81_cassette_options = {
 	1,		/* channels */
 	16,		/* bits per sample */
 	44100		/* sample frequency */

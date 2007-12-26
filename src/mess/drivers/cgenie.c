@@ -243,7 +243,7 @@ static INPUT_PORTS_START( cgenie )
 	PORT_BIT(0x80, 0x00, IPT_UNKNOWN) PORT_NAME("Joy 2 [*]") PORT_CODE(JOYCODE_BUTTON1)
 INPUT_PORTS_END
 
-static gfx_layout cgenie_charlayout =
+static const gfx_layout cgenie_charlayout =
 {
 	8,8,		   /* 8*8 characters */
 	384,		   /* 256 fixed + 128 defineable characters */
@@ -270,7 +270,7 @@ static GFXDECODE_START( cgenie_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, cgenie_gfxlayout, 3*16*2, 3*4 )
 GFXDECODE_END
 
-static unsigned char cgenie_palette[] = {
+static const unsigned char cgenie_palette[] = {
 	 0*4,  0*4,  0*4,  /* background   */
 
 /* this is the 'RGB monitor' version, strong and clean */
@@ -329,7 +329,7 @@ static unsigned char cgenie_palette[] = {
 
 };
 
-static unsigned short cgenie_colortable[] =
+static const unsigned short cgenie_colortable[] =
 {
 	0, 1, 0, 2, 0, 3, 0, 4, /* RGB monitor set of text colors */
 	0, 5, 0, 6, 0, 7, 0, 8,
@@ -359,7 +359,7 @@ static PALETTE_INIT( cgenie )
 }
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	cgenie_psg_port_a_r,
 	cgenie_psg_port_b_r,

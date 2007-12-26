@@ -45,7 +45,7 @@ static const gfx_layout pointerlayout =
 	8 * 8
 };
 
-static UINT8 pointermask[] =
+static const UINT8 pointermask[] =
 {
 	0x00, 0x70, 0x60, 0x50, 0x08, 0x04, 0x00, 0x00,		/* blackmask */
 	0xf0, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00	/* whitemask */
@@ -139,13 +139,13 @@ VIDEO_START( avigo )
 }
 
 /* two colours */
-static unsigned short avigo_colour_table[AVIGO_NUM_COLOURS] =
+static const unsigned short avigo_colour_table[AVIGO_NUM_COLOURS] =
 {
 	0, 1
 };
 
 /* black/white */
-static unsigned char avigo_palette[AVIGO_NUM_COLOURS * 3] =
+static const unsigned char avigo_palette[AVIGO_NUM_COLOURS * 3] =
 {
     0x0ff, 0x0ff, 0x0ff,
     0x000, 0x000, 0x000

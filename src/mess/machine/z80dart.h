@@ -37,7 +37,7 @@ struct _z80dart_interface
     INITIALIZATION/CONFIGURATION
 ***************************************************************************/
 
-void z80dart_init(int which, z80dart_interface *intf);
+void z80dart_init(int which, const z80dart_interface *intf);
 void z80dart_reset(int which);
 
 

@@ -140,7 +140,7 @@ static const rgb_t apple1_palette[] =
 	RGB_WHITE
 };
 
-static unsigned short apple1_colortable[] =
+static const unsigned short apple1_colortable[] =
 {
 	0, 1
 };

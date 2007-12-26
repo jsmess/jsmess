@@ -91,10 +91,10 @@ static PALETTE_INIT( pc_cga );
 ***************************************************************************/
 
 /* In cgapal.c; it's quite big */
-extern unsigned char cga_palette[16 * CGA_PALETTE_SETS][3];
+extern const unsigned char cga_palette[16 * CGA_PALETTE_SETS][3];
 
 
-unsigned short cga_colortable[] =
+const unsigned short cga_colortable[] =
 {
 /* Text modes */
      0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0,10, 0,11, 0,12, 0,13, 0,14, 0,15,
@@ -148,7 +148,7 @@ unsigned short cga_colortable[] =
      12,11,12,15, 13,11,12,15, 14,11,12,15, 15,11,12,15,
 };
 
-gfx_layout CGA_charlayout =
+const gfx_layout CGA_charlayout =
 {
 	8,16,					/* 8 x 16 characters */
 	256,                    /* 256 characters */

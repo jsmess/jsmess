@@ -77,7 +77,7 @@ static WRITE8_HANDLER(mac_via_out_cb2);
 static void mac_via_irq(int state);
 static offs_t mac_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-static struct via6522_interface mac_via6522_intf =
+static const struct via6522_interface mac_via6522_intf =
 {
 	mac_via_in_a, mac_via_in_b,
 	NULL, NULL,
@@ -1386,14 +1386,14 @@ DRIVER_INIT(mac512ke)
 	mac_driver_init(MODEL_MAC_512KE);
 }
 
-static SCSIConfigTable dev_table =
+static const SCSIConfigTable dev_table =
 {
 	2,                                      /* 2 SCSI devices */
 	{ { SCSI_ID_5, 1, SCSI_DEVICE_HARDDISK },  /* SCSI ID 5, using CHD 1, and it's a harddisk */
 	 { SCSI_ID_6, 0, SCSI_DEVICE_HARDDISK } } /* SCSI ID 6, using CHD 0, and it's a harddisk */
 };
 
-static struct NCR5380interface macplus_5380intf =
+static const struct NCR5380interface macplus_5380intf =
 {
 	&dev_table,	// SCSI device table
 	NULL		// IRQ (unconnected on the Mac Plus)

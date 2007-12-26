@@ -146,7 +146,7 @@ static int good_format(const struct CassetteFormat *format, const char *extensio
 
 
 casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const char *extension,
-	const struct CassetteFormat **formats, int flags, cassette_image **outcassette)
+	const struct CassetteFormat *const *formats, int flags, cassette_image **outcassette)
 {
 	casserr_t err;
 	cassette_image *cassette;
@@ -226,7 +226,7 @@ casserr_t cassette_create(void *file, const struct io_procs *procs, const struct
 {
 	casserr_t err;
 	cassette_image *cassette;
-	static struct CassetteOptions default_options = { 1, 16, 44100 };
+	static const struct CassetteOptions default_options = { 1, 16, 44100 };
 
 	/* cannot create to a read only image */
 	if (flags & CASSETTE_FLAG_READONLY)

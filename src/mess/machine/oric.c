@@ -352,7 +352,7 @@ static void oric_printer_handshake_in(int number, int data, int mask)
     via_set_input_ca1(0, acknowledge);
 }
 
-static CENTRONICS_CONFIG oric_cent_config[1]={
+static const CENTRONICS_CONFIG oric_cent_config[1]={
 	{
 		PRINTER_CENTRONICS,
 		oric_printer_handshake_in
@@ -452,7 +452,7 @@ CB2
 
 */
 
-static struct via6522_interface oric_6522_interface=
+static const struct via6522_interface oric_6522_interface=
 {
 	oric_via_in_a_func,
 	oric_via_in_b_func,
@@ -1433,7 +1433,7 @@ static void	telestrat_via2_irq_func(int state)
 
     oric_refresh_ints();
 }
-static struct via6522_interface telestrat_via2_interface=
+static const struct via6522_interface telestrat_via2_interface=
 {
 	telestrat_via2_in_a_func,
 	telestrat_via2_in_b_func,

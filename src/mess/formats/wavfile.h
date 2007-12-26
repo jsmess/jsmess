@@ -11,6 +11,6 @@
 
 #include "cassimg.h"
 
-extern struct CassetteFormat wavfile_format;
+extern const struct CassetteFormat wavfile_format;
 
 #endif /* WAVFILE_H */

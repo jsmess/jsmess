@@ -88,7 +88,7 @@ This signal also defails the character display period.
 
 /* Normal Character Set */
 
-static char teletext_saa5050_characters[96*60]={
+static const char teletext_saa5050_characters[96*60]={
   // 0x20 ' '
   0,0,0,0,0,0,
   0,0,0,0,0,0,
@@ -1150,7 +1150,7 @@ static char teletext_saa5050_characters[96*60]={
 
 /* Graphics Character Set */
 
-static char teletext_graphics[96*60]={
+static const char teletext_graphics[96*60]={
   // 0x20
   0,0,0,0,0,0,
   0,0,0,0,0,0,
@@ -2211,7 +2211,7 @@ static char teletext_graphics[96*60]={
 
 /* Separated Graphics Character Set */
 
-static char teletext_separated_graphics[96*60]={
+static const char teletext_separated_graphics[96*60]={
   // Character ' ' (32)
   0,0,0,0,0,0,
   0,0,0,0,0,0,
@@ -3369,8 +3369,8 @@ static char teletext_separated_graphics[96*60]={
 static int teletext_data;
 static int teletext_LOSE;
 
-static char *tt_lookup=teletext_saa5050_characters;
-static char *tt_graphics=teletext_graphics;
+static const char *tt_lookup=teletext_saa5050_characters;
+static const char *tt_graphics=teletext_graphics;
 static int tt_colour=7;
 static int tt_rcolour;
 static int tt_bgcolour=0;

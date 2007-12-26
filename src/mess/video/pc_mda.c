@@ -21,14 +21,14 @@
 #define MDA_LOG(n,m,a)
 #endif
 
-unsigned char mda_palette[4][3] = {
+const unsigned char mda_palette[4][3] = {
 	{ 0x00,0x00,0x00 },
 	{ 0x00,0x55,0x00 }, 
 	{ 0x00,0xaa,0x00 }, 
 	{ 0x00,0xff,0x00 }
 };
 
-gfx_layout pc_mda_charlayout =
+const gfx_layout pc_mda_charlayout =
 {
 	9,32,					/* 9 x 32 characters (9 x 15 is the default, but..) */
 	256,					/* 256 characters */
@@ -55,7 +55,7 @@ GFXDECODE_END
    (maximal 4 colors) 
    PC200 uses different attributes from IBM.
 */
-unsigned short mda_colortable[] =
+const unsigned short mda_colortable[] =
 {
 	0, 0, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10,
 	0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10,
@@ -148,7 +148,7 @@ void pc_mda_cursor(struct mscrtc6845_cursor *cursor)
 		dirtybuffer[cursor->pos*2]=1;
 }
 
-static struct mscrtc6845_config config= { 14318180 /*?*/, pc_mda_cursor };
+static const struct mscrtc6845_config config= { 14318180 /*?*/, pc_mda_cursor };
 
 
 /* This code seems to go through hoops to accomodate differing GfxElement

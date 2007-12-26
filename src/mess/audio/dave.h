@@ -102,7 +102,7 @@ extern WRITE8_HANDLER (	Dave_reg_w );
 
 extern void	Dave_SetInt(int);
 
-void	Dave_SetIFace(struct DAVE_INTERFACE *newInterface);
+void	Dave_SetIFace(const struct DAVE_INTERFACE *newInterface);
 void     Dave_Interrupt(void);
 
 #endif

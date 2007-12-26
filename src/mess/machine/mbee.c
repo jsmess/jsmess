@@ -36,7 +36,7 @@ static UINT8 mbee_busnop = 0;
 
 UINT8 *mbee_workram;
 
-static z80pio_interface pio_intf =
+static const z80pio_interface pio_intf =
 {
 	pio_interrupt,	/* callback when change interrupt status */
 	0,				/* portA ready active callback (do not support yet)*/

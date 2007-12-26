@@ -431,7 +431,7 @@ static int TEDTIME_TO_CYCLES(attotime t)
 #define MULTICOLOR2 (ted7360[0x18]&0x7f)
 #define FRAMECOLOR (ted7360[0x19]&0x7f)
 
-unsigned char ted7360_palette[] =
+const unsigned char ted7360_palette[] =
 {
 /* black, white, red, cyan */
 /* purple, green, blue, yellow */
@@ -480,7 +480,7 @@ unsigned char ted7360_palette[] =
 	0xd1, 0xff, 0xff, 0xeb, 0xff, 0xff, 0xff, 0xf8, 0xff, 0xed, 0xff, 0xbc
 };
 
-struct CustomSound_interface ted7360_sound_interface =
+const struct CustomSound_interface ted7360_sound_interface =
 {
 	ted7360_custom_start
 };
@@ -522,7 +522,7 @@ static const gfx_layout cursorlayout =
 	8 * 8
 };
 
-static UINT8 cursormask[] =
+static const UINT8 cursormask[] =
 {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 static gfx_element *cursorelement;
 

@@ -373,7 +373,7 @@ GFXDECODE_END
 
 /* Sound Interface */
 
-static struct SN76477interface sn76477_interface =
+static const struct SN76477interface sn76477_interface =
 {
 	RES_K(47),		//  4  noise_res		R26 47k
 	RES_K(330),		//  5  filter_res		R24 330k
@@ -426,7 +426,7 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 	7  R	Cassette Data
 */
 
-static struct z80_irq_daisy_chain abc80_daisy_chain[] =
+static const struct z80_irq_daisy_chain abc80_daisy_chain[] =
 {
 	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0 },
 	{ 0, 0, 0, 0, -1 }

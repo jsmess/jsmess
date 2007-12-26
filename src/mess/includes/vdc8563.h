@@ -20,7 +20,7 @@ extern void vdc8563_set_rastering(int on);
 extern VIDEO_START( vdc8563 );
 extern VIDEO_UPDATE( vdc8563 );
 
-extern unsigned char vdc8563_palette[16 * 3];
+extern const unsigned char vdc8563_palette[16 * 3];
 
 /* to be called when writting to port */
 extern WRITE8_HANDLER ( vdc8563_port_w );

@@ -391,14 +391,14 @@ static INPUT_PORTS_START( atvga )
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 INPUT_PORTS_END
 
-static unsigned i286_address_mask = 0x00ffffff;
+static const unsigned i286_address_mask = 0x00ffffff;
 
 
 #if defined(ADLIB)
 /* irq line not connected to pc on adlib cards (and compatibles) */
 static void irqhandler(int linestate) {}
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	irqhandler
 };

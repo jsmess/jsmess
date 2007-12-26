@@ -64,7 +64,7 @@ DRIVER_INIT( kim1 )
 	"..................";
 
 
-	static const char *keys[24] =
+	static const char *const keys[24] =
 	{
 		"aaaaaaaaaaaaaaaaaaaaaaaa" \
 		"aaaaaaaaaaaaaaaaaaaaaaaa" \

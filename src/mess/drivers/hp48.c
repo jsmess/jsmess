@@ -164,7 +164,7 @@ static GFXDECODE_START( hp48_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, hp48_charlayout, 0, 8 )
 GFXDECODE_END
 
-static SATURN_CONFIG config={ 
+static const SATURN_CONFIG config={ 
 	hp48_out, hp48_in, 
 	hp48_mem_reset, hp48_mem_config, hp48_mem_unconfig, hp48_mem_id,
 	hp48_crc

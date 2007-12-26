@@ -169,7 +169,7 @@ WRITE8_HANDLER( soundblaster_w )
 }
 
 #if 0
-struct CustomSound_interface soundblaster_interface = {
+const struct CustomSound_interface soundblaster_interface = {
 	soundblaster_start,
 	soundblaster_stop,
 	soundblaster_update

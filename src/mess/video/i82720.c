@@ -1380,7 +1380,7 @@ void compis_gdc_reset(void)
 */
 
 
-static unsigned char COMPIS_palette[16*3] =
+static const unsigned char COMPIS_palette[16*3] =
 {
 	0, 0, 0,
 	0, 0, 0,

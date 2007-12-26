@@ -798,7 +798,7 @@ static void typewriter_out(UINT8 data)
 			/* Black: ignore */
 			//color = color_typewriter_black;
 			{
-				static char black[5] = { '\033', '[', '3', '0', 'm' };
+				static const char black[5] = { '\033', '[', '3', '0', 'm' };
 				image_fwrite(typewriter.fd, black, sizeof(black));
 			}
 			break;
@@ -807,7 +807,7 @@ static void typewriter_out(UINT8 data)
 			/* Red: ignore */
 			//color = color_typewriter_red;
 			{
-				static char red[5] = { '\033', '[', '3', '1', 'm' };
+				static const char red[5] = { '\033', '[', '3', '1', 'm' };
 				image_fwrite(typewriter.fd, red, sizeof(red));
 			}
 			break;
@@ -825,7 +825,7 @@ static void typewriter_out(UINT8 data)
 		case 077:
 			/* Carriage Return */
 			{
-				static char line_end[2] = { '\r', '\n' };
+				static const char line_end[2] = { '\r', '\n' };
 				image_fwrite(typewriter.fd, line_end, sizeof(line_end));
 			}
 			break;

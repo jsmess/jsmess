@@ -15,7 +15,7 @@ static void d88image_get_id_callback(mess_image *img, chrn_id *, int, int);
 static void d88image_read_sector_data_into_buffer(mess_image *img, int side, int index1, char *ptr, int length);
 static void d88image_write_sector_data_from_buffer(mess_image *img, int side, int index1, const char *ptr, int length,int ddam);
 
-static floppy_interface d88image_floppy_interface=
+static const floppy_interface d88image_floppy_interface=
 {
 	d88image_seek_callback,
 	d88image_get_sectors_per_track,             /* done */

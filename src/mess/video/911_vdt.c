@@ -64,14 +64,14 @@ GFXDECODE_START( vdt911_gfxdecodeinfo )
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
 GFXDECODE_END
 
-unsigned char vdt911_palette[vdt911_palette_size*3] =
+const unsigned char vdt911_palette[vdt911_palette_size*3] =
 {
 	0x00,0x00,0x00,	/* black */
 	0xC0,0xC0,0xC0,	/* low intensity */
 	0xFF,0xFF,0xFF	/* high intensity */
 };
 
-unsigned short vdt911_colortable[vdt911_colortable_size] =
+const unsigned short vdt911_colortable[vdt911_colortable_size] =
 {
 	0, 2,	/* high intensity */
 	0, 1,	/* low intensity */
@@ -518,7 +518,7 @@ void vdt911_refresh(mame_bitmap *bitmap, int unit, int x, int y)
 		}
 }
 
-static unsigned char (*key_translate[])[91] =
+static const unsigned char (*key_translate[])[91] =
 {	/* array must use same order as vdt911_model_t!!! */
 	/* US */
 	US_key_translate,

@@ -14,7 +14,7 @@
 
 static int horizontal_pos = 0x0b;
 
-gfx_layout galaxy_charlayout =
+const gfx_layout galaxy_charlayout =
 {
 	8, 13,				/* 8x8 characters */
 	128,				/* 128 characters */
@@ -27,13 +27,13 @@ gfx_layout galaxy_charlayout =
 	8 				/* each character takes 1 consecutive byte */
 };
 
-unsigned char galaxy_palette[2*3] =
+const unsigned char galaxy_palette[2*3] =
 {
 	0xff, 0xff, 0xff,		/* White */
 	0x00, 0x00, 0x00		/* Black */
 };
 
-unsigned short galaxy_colortable[1][2] =
+const unsigned short galaxy_colortable[1][2] =
 {
 	{0, 1}
 };

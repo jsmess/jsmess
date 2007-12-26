@@ -32,7 +32,7 @@ typedef struct tagERRORCODE
 } ERRORCODE, * LPERRORCODE;
 
 /***************************************************************/
-static ERRORCODE    g_ErrorCode[] =
+static const ERRORCODE g_ErrorCode[] =
 {
 	{   DDERR_ALREADYINITIALIZED,           "DDERR_ALREADYINITIALIZED"},
 	{   DDERR_CANNOTATTACHSURFACE,          "DDERR_CANNOTATTACHSURFACE"},

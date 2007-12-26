@@ -243,7 +243,7 @@ static void exidy_printer_handshake_in(int number, int data, int mask)
 	}
 }
 
-static CENTRONICS_CONFIG exidy_cent_config[1]={
+static const CENTRONICS_CONFIG exidy_cent_config[1]={
 	{
 		PRINTER_CENTRONICS,
 		exidy_printer_handshake_in

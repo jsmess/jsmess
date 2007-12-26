@@ -62,7 +62,7 @@ static INPUT_PORTS_START( n64 )
 INPUT_PORTS_END
 
 /* ?? */
-static struct mips3_config config =
+static const struct mips3_config config =
 {
 	16384,				/* code cache size */
 	8192,				/* data cache size */

@@ -51,7 +51,7 @@ static VIDEO_UPDATE( ip204415 )
 	return 0;
 }
 
-static struct EEPROM_interface eeprom_interface_93C56 =
+static const struct EEPROM_interface eeprom_interface_93C56 =
 {
 	7,					// address bits	7
 	16,					// data bits	16
@@ -562,13 +562,13 @@ static void scsi_irq(int state)
 {
 }
 
-static SCSIConfigTable dev_table =
+static const SCSIConfigTable dev_table =
 {
         1,                                      /* 1 SCSI device */
         { { SCSI_ID_6, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 6, using CHD 0, and it's a CD-ROM */
 };
 
-static struct WD33C93interface scsi_intf =
+static const struct WD33C93interface scsi_intf =
 {
 	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */
@@ -597,7 +597,7 @@ static void ip20_chdcd_getinfo(const device_class *devclass, UINT32 state, union
 	}
 }
 
-static struct mips3_config config =
+static const struct mips3_config config =
 {
 	32768,	/* code cache size */
 	32768	/* data cache size */

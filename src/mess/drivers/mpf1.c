@@ -374,7 +374,7 @@ static void mpf1_pio_interrupt( int state )
 	logerror("pio irq state: %02x\n",state);
 }
 
-static z80pio_interface pio_intf = 
+static const z80pio_interface pio_intf = 
 {
 	mpf1_pio_interrupt,
 	NULL,
@@ -503,7 +503,7 @@ static WRITE8_HANDLER( mpf1_portc_w )
 
 
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	1, 					/* 1 chip */
 	{ mpf1_porta_r },	/* Port A read */

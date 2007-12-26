@@ -25,7 +25,7 @@
 	#define LOG_DAI_VIDEO_LINE(_mode, _unit, _resolution, _repeat, _scan)
 #endif
 
-unsigned char dai_palette[16*3] =
+const unsigned char dai_palette[16*3] =
 {
 	0x00, 0x00, 0x00,	/*  0 Black		*/
 	0x00, 0x00, 0x8b,	/*  1 Dark Blue		*/
@@ -45,7 +45,7 @@ unsigned char dai_palette[16*3] =
 	0xff, 0xff, 0xff,	/* 15 White		*/
 };
 
-unsigned short dai_colortable[1][16] =
+const unsigned short dai_colortable[1][16] =
 {
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }
 };

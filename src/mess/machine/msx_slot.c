@@ -1564,7 +1564,7 @@ MSX_SLOT_WRITE(fmpac)
 	}
 }
 
-static char PAC_HEADER[] = "PAC2 BACKUP DATA";
+static const char PAC_HEADER[] = "PAC2 BACKUP DATA";
 #define PAC_HEADER_LEN (16)
 
 MSX_SLOT_LOADSRAM(fmpac)

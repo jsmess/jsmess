@@ -188,7 +188,7 @@ static void mk1_interrupt( UINT16 addr, int level ) {
     cpunum_set_input_line( 0, 0, level ? F8_INT_INTR : F8_INT_NONE );
 }
 
-static F3853_CONFIG mk1_config = {
+static const F3853_CONFIG mk1_config = {
 	MAIN_CLOCK,
 	mk1_interrupt
 };

@@ -188,7 +188,7 @@ void uart8250_reset(int n)
 void uart8250_w(int n, offs_t idx, UINT8 data)
 {
 #ifdef VERBOSE_COM
-    static char P[8] = "NONENHNL";  /* names for parity select */
+    static const char P[8] = "NONENHNL";  /* names for parity select */
 #endif
     int tmp;
 

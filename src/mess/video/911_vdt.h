@@ -22,8 +22,8 @@ enum
 
 GFXDECODE_EXTERN( vdt911_gfxdecodeinfo );
 
-extern unsigned char vdt911_palette[];
-extern unsigned short vdt911_colortable[];
+extern const unsigned char vdt911_palette[];
+extern const unsigned short vdt911_colortable[];
 enum
 {
 	vdt911_palette_size = 3 /** 3*/,

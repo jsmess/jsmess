@@ -2243,8 +2243,8 @@ static GFXDECODE_START( gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16x8_layout, 0x00, 0x20 )
 GFXDECODE_END
 
-static struct sh2_config sh2_conf_master = { 0 };
-static struct sh2_config sh2_conf_slave  = { 1 };
+static const struct sh2_config sh2_conf_master = { 0 };
+static const struct sh2_config sh2_conf_slave  = { 1 };
 
 static void scsp_irq(int irq)
 {
@@ -2269,7 +2269,7 @@ static void scsp_irq(int irq)
 	}
 }
 
-static struct SCSPinterface scsp_interface =
+static const struct SCSPinterface scsp_interface =
 {
 	REGION_CPU3,
 	0,

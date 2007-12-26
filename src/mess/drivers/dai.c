@@ -170,7 +170,7 @@ static INPUT_PORTS_START (dai)
 		PORT_BIT(0xcb, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static struct CassetteOptions dai_cassette_options = {
+static const struct CassetteOptions dai_cassette_options = {
 	1,		/* channels */
 	16,		/* bits per sample */
 	44100		/* sample frequency */

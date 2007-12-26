@@ -209,7 +209,7 @@ static WRITE8_HANDLER ( mtx_ctc_w )
 		z80ctc_0_w(offset,data);
 }
 
-static z80ctc_interface	mtx_ctc_intf =
+static z80ctc_interface mtx_ctc_intf =
 {
 	MTX_SYSTEM_CLOCK,
 	0,
@@ -737,7 +737,7 @@ static INPUT_PORTS_START( mtx512 )
 INPUT_PORTS_END
 
 
-static struct z80_irq_daisy_chain mtx_daisy_chain[] =
+static const struct z80_irq_daisy_chain mtx_daisy_chain[] =
 {
 	{z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
 	{0,0,0,0,-1}

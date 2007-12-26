@@ -86,7 +86,7 @@ struct PickerInfo
 	int *pnColumnsShown;
 	int *pnColumnsOrder;
 	UINT_PTR nTimer;
-	LPCTSTR *ppszColumnNames;
+	const LPCTSTR *ppszColumnNames;
 };
 
 
@@ -1581,7 +1581,7 @@ int Picker_GetColumnCount(HWND hwndPicker)
 
 
 
-LPCTSTR *Picker_GetColumnNames(HWND hwndPicker)
+const LPCTSTR *Picker_GetColumnNames(HWND hwndPicker)
 {
 	struct PickerInfo *pPickerInfo;
 	pPickerInfo = GetPickerInfo(hwndPicker);

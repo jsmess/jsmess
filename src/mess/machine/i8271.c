@@ -53,7 +53,7 @@ static mess_image *current_image(void)
 	return image_from_devtype_and_index(IO_FLOPPY, i8271.drive);
 }
 
-void i8271_init(i8271_interface *iface)
+void i8271_init(const i8271_interface *iface)
 {
 	memset(&i8271, 0, sizeof(I8271));
 

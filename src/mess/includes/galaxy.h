@@ -11,9 +11,9 @@ extern READ8_HANDLER( galaxy_latch_r );
 extern WRITE8_HANDLER( galaxy_latch_w );
 
 /* video/galaxy.c */
-extern gfx_layout galaxy_charlayout;
-extern unsigned char galaxy_palette[2*3];
-extern unsigned short galaxy_colortable[1][2];
+extern const gfx_layout galaxy_charlayout;
+extern const unsigned char galaxy_palette[2*3];
+extern const unsigned short galaxy_colortable[1][2];
 extern PALETTE_INIT( galaxy );
 extern VIDEO_START( galaxy );
 extern VIDEO_UPDATE( galaxy );

@@ -32,7 +32,7 @@
 
 static BOOL SettingsFileName(DWORD nSettingsFile, char *buffer, size_t bufsize)
 {
-	extern FOLDERDATA g_folderData[];
+	extern const FOLDERDATA g_folderData[];
 	extern LPEXFOLDERDATA ExtraFolderData[];
 	char *ptr;
 	int i;

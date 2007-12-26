@@ -107,7 +107,7 @@ static int lviv_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 
 
-static struct CassetteLegacyWaveFiller lviv_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller lviv_legacy_fill_wave =
 {
 	lviv_cassette_fill_wave,					/* fill_wave */
 	-1,											/* chunk_size */
@@ -134,7 +134,7 @@ static casserr_t lviv_lvt_load(cassette_image *cassette)
 
 
 
-static struct CassetteFormat lviv_lvt_image_format =
+static const struct CassetteFormat lviv_lvt_image_format =
 {
 	"lvt",
 	lviv_lvt_identify,

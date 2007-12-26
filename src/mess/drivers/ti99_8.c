@@ -352,7 +352,7 @@ INPUT_PORTS_END
 /*
 	TMS5220 speech synthesizer
 */
-static struct TMS5220interface tms5220interface =
+static const struct TMS5220interface tms5220interface =
 {
 	NULL,						/* no IRQ callback */
 	spchroms_read,				/* speech ROM read handler */
@@ -388,7 +388,7 @@ static MACHINE_START(ti99_8_50hz)
 	TMS9928A_configure(&tms9129_interface);
 }
 
-static struct tms9995reset_param ti99_8_processor_config =
+static const struct tms9995reset_param ti99_8_processor_config =
 {
 	1,				/* enable automatic wait state generation */
 					/* (in January 83 99/8 schematics sheet 9: the delay logic

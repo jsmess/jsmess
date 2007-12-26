@@ -79,13 +79,13 @@ enum
 	AM_enint_mask = 1 << 6
 };
 
-static unsigned char asr_palette[asr733_palette_size*3] =
+static const unsigned char asr_palette[asr733_palette_size*3] =
 {
 	255, 255, 255,
 	0, 0, 0
 };
 
-static unsigned short asr_colortable[asr733_colortable_size] =
+static const unsigned short asr_colortable[asr733_colortable_size] =
 {
 	0, 1
 };
@@ -434,7 +434,7 @@ void asr733_refresh(mame_bitmap *bitmap, int unit, int x, int y)
 }
 
 
-static unsigned char key_translate[3][51] =
+static const unsigned char key_translate[3][51] =
 {
 	{	/* unshifted */
 		'1',

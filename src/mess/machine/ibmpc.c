@@ -94,7 +94,7 @@ static WRITE8_HANDLER ( pc_ppi_portc_w );
 
 /* PC-XT has a 8255 which is connected to keyboard and other
 status information */
-ppi8255_interface pc_ppi8255_interface =
+const ppi8255_interface pc_ppi8255_interface =
 {
 	1,
 	{pc_ppi_porta_r},

@@ -423,7 +423,7 @@ typedef struct
 typedef struct
 {
 	RECT        rect;       /* Client rect of window; must be initialized before first resize */
-	ResizeItem* items;      /* Array of subitems to be resized */
+	const ResizeItem* items;      /* Array of subitems to be resized */
 } Resize;
 
 static void ResizeWindow(HWND hParent, Resize *r);
@@ -500,7 +500,7 @@ static BOOL bListReady     = FALSE;
 static PDIRWATCHER s_pWatcher;
 
 /* use a joystick subsystem in the gui? */
-static struct OSDJoystick* g_pJoyGUI = NULL;
+static const struct OSDJoystick* g_pJoyGUI = NULL;
 
 /* store current keyboard state (in internal codes) here */
 static input_code keyboard_state[ 2048 ]; /* __code_max #defines the number of internal key_codes */
@@ -631,10 +631,10 @@ typedef struct
 	char		name[40];	    // functionality name (optional)
 	input_seq	is;				// the input sequence (the keys pressed)
 	UINT		func_id;        // the identifier
-	input_seq* (*getiniptr)(void);// pointer to function to get the value from .ini file
+	input_seq* (*const getiniptr)(void);// pointer to function to get the value from .ini file
 } GUISequence;
 
-static GUISequence GUISequenceControl[]=
+static const GUISequence GUISequenceControl[]=
 {
 	{"gui_key_up",                SEQ_DEF_0,    ID_UI_UP,           Get_ui_key_up },
 	{"gui_key_down",              SEQ_DEF_0,    ID_UI_DOWN,         Get_ui_key_down },
@@ -818,7 +818,7 @@ static HBITMAP          hBackground  = 0;
 static MYBITMAPINFO     bmDesc;
 
 /* List view Column text */
-LPCTSTR column_names[COLUMN_MAX] =
+const LPCTSTR column_names[COLUMN_MAX] =
 {
 #ifdef MESS
 	TEXT("System"),
@@ -1952,7 +1952,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 
 	for (i = 0; i < NUM_GUI_SEQUENCES; i++)
 	{
-		input_seq *is1;
+		const input_seq *is1;
 		input_seq *is2;
 		is1 = &(GUISequenceControl[i].is);
 		is2 = GUISequenceControl[i].getiniptr();
@@ -2711,7 +2711,7 @@ static void ResizeWindow(HWND hParent, Resize *r)
 	int cmkindex = 0, dx, dy, dx1, dtempx;
 	HWND hControl;
 	RECT parent_rect, rect;
-	ResizeItem *ri;
+	const ResizeItem *ri;
 	POINT p = {0, 0};
 
 	if (hParent == NULL)
@@ -3425,7 +3425,7 @@ static void check_for_GUI_action(void)
 
 	for (i = 0; i < NUM_GUI_SEQUENCES; i++)
 	{
-		input_seq *is = &(GUISequenceControl[i].is);
+		const input_seq *is = &(GUISequenceControl[i].is);
 
 		if (GUI_seq_pressed(is))
 		{

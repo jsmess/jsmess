@@ -264,7 +264,7 @@ static void thom_printer_getinfo ( const device_class *devclass, UINT32 state, u
 
 /* ------------ serial ------------ */
 
-static const char* thom_serial_names[3][3]=
+static const char *const thom_serial_names[3][3]=
 { 
 	{ "cc90232", "c232", "RS232 (older, CC 90-232)" },
 	{ "rf57932", "r232", "RS232 (newer, RF 57-932)" },

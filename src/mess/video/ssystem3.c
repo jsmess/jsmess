@@ -10,14 +10,14 @@
 
 UINT8 ssystem3_led[5]= {0};
 
-static unsigned char ssystem3_palette[] =
+static const unsigned char ssystem3_palette[] =
 {
 	0,12,12,
 	80,82,75,
 	0,12,12
 };
 
-static unsigned short ssystem3_colortable[1][2] = {
+static const unsigned short ssystem3_colortable[1][2] = {
 	{ 0, 1 },
 };
 

@@ -308,13 +308,13 @@ static GFXDECODE_START( trs80_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout_double_width, 0, 4 )
 GFXDECODE_END
 
-static unsigned char trs80_palette[] =
+static const unsigned char trs80_palette[] =
 {
    0x00,0x00,0x00,
    0xff,0xff,0xff
 };
 
-static unsigned short trs80_colortable[] =
+static const unsigned short trs80_colortable[] =
 {
 	0,1 	/* white on black */
 };
@@ -328,9 +328,9 @@ static PALETTE_INIT( trs80 )
 	memcpy(colortable,trs80_colortable,sizeof(trs80_colortable));
 }
 
-static INT16 speaker_levels[3] = {0.0*32767,0.46*32767,0.85*32767};
+static const INT16 speaker_levels[3] = {0.0*32767,0.46*32767,0.85*32767};
 
-static struct Speaker_interface speaker_interface =
+static const struct Speaker_interface speaker_interface =
 {
 	3,				/* optional: number of different levels */
 	speaker_levels	/* optional: level lookup table */

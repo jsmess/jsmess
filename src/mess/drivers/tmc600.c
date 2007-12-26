@@ -301,7 +301,7 @@ static void tmc600_q_w(int level)
 {
 }
 
-static CDP1802_CONFIG tmc600_cdp1802_config =
+static const CDP1802_CONFIG tmc600_cdp1802_config =
 {
 	tmc600_mode_r,
 	tmc600_ef_r,

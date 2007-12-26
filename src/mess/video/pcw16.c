@@ -6,7 +6,7 @@ int pcw16_colour_palette[16];
 int pcw16_video_control;
 
 /* 16 colours, + 1 for border */
-static unsigned short pcw16_colour_table[PCW16_NUM_COLOURS] =
+static const unsigned short pcw16_colour_table[PCW16_NUM_COLOURS] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,

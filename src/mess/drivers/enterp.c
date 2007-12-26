@@ -166,7 +166,7 @@ static void enterprise_dave_interrupt(int state)
 /* enterprise interface to dave - ok, so Dave chip is unique
 to Enterprise. But these functions make it nice and easy to see
 whats going on. */
-static DAVE_INTERFACE	enterprise_dave_interface=
+static const DAVE_INTERFACE enterprise_dave_interface =
 {
 	enterprise_dave_reg_read,
 		enterprise_dave_reg_write,
@@ -525,7 +525,7 @@ static INPUT_PORTS_START( ep128 )
 
 INPUT_PORTS_END
 
-static struct CustomSound_interface dave_custom_sound =
+static const struct CustomSound_interface dave_custom_sound =
 {
 	Dave_sh_start
 };

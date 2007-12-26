@@ -111,10 +111,10 @@ extern int vic6560_pal;
 
 extern VIDEO_START( vic6560 );
 extern VIDEO_UPDATE( vic6560 );
-extern unsigned char vic6560_palette[16 * 3];
+extern const unsigned char vic6560_palette[16 * 3];
 
 /* to be inserted in GameDriver-Structure */
-extern struct CustomSound_interface vic6560_sound_interface;
+extern const struct CustomSound_interface vic6560_sound_interface;
 
 extern INTERRUPT_GEN( vic656x_raster_interrupt );
 

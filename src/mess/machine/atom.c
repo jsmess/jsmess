@@ -104,7 +104,7 @@ static WRITE8_HANDLER(atom_via_out_ca2_func)
 	previous_ca2_data = data;
 }
 
-static struct via6522_interface atom_6522_interface=
+static const struct via6522_interface atom_6522_interface=
 {
 	atom_via_in_a_func,		/* printer status */
 	NULL,
@@ -123,7 +123,7 @@ static struct via6522_interface atom_6522_interface=
 
 
 
-static	ppi8255_interface	atom_8255_int =
+static const ppi8255_interface atom_8255_int =
 {
 	1,
 	{atom_8255_porta_r},
@@ -157,7 +157,7 @@ static void atom_8271_interrupt_callback(int state)
 	previous_i8271_int_state = state;
 }
 
-static struct i8271_interface atom_8271_interface=
+static const struct i8271_interface atom_8271_interface=
 {
 	atom_8271_interrupt_callback,
 	NULL

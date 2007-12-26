@@ -13,7 +13,7 @@
 #include "includes/lviv.h"
 #include "mslegacy.h"
 
-unsigned char lviv_palette[8*3] =
+const unsigned char lviv_palette[8*3] =
 {
 	0x00, 0x00, 0x00,
 	0x00, 0x00, 0xa4,

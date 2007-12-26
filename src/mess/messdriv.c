@@ -44,7 +44,7 @@ const game_driver * const drivers[] =
 #undef TESTDRIVER
 #define DRIVER(NAME)
 #define TESTDRIVER(NAME) &driver_##NAME,
-const game_driver *test_drivers[] =
+const game_driver *const test_drivers[] =
 {
 #include "messdriv.c"
 	0	/* end of array */

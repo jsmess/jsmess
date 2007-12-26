@@ -35,7 +35,7 @@
 #endif
 #endif
 
-static unsigned char intv_palette[] =
+static const unsigned char intv_palette[] =
 {
 	0x00, 0x00, 0x00, /* BLACK */
 	0x00, 0x2D, 0xFF, /* BLUE */
@@ -82,7 +82,7 @@ static PALETTE_INIT( intv )
 	}
 }
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	intv_right_control_r,
 	intv_left_control_r,
@@ -92,7 +92,7 @@ static struct AY8910interface ay8910_interface =
 
 /* graphics output */
 
-static gfx_layout intv_gromlayout =
+static const gfx_layout intv_gromlayout =
 {
 	16, 16,
 	256,
@@ -104,7 +104,7 @@ static gfx_layout intv_gromlayout =
 	8 * 16
 };
 
-static gfx_layout intv_gramlayout =
+static const gfx_layout intv_gramlayout =
 {
 	16, 16,
 	64,
@@ -116,7 +116,7 @@ static gfx_layout intv_gramlayout =
 	8 * 8
 };
 
-static gfx_layout intvkbd_charlayout =
+static const gfx_layout intvkbd_charlayout =
 {
 	8, 8,
 	256,

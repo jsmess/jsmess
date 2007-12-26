@@ -122,9 +122,9 @@ WRITE8_HANDLER ( memoryb3_w )
 2: 64K (banks 4 to 7) for Acorn sideways ram FE30 bank latch
 3: 128K (banks 8 to 15) for Acown sideways ram FE30 bank latch
 */
-static unsigned short bbc_SWRAMtype1[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
-static unsigned short bbc_SWRAMtype2[16]={0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0};
-static unsigned short bbc_SWRAMtype3[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
+static const unsigned short bbc_SWRAMtype1[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
+static const unsigned short bbc_SWRAMtype2[16]={0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0};
+static const unsigned short bbc_SWRAMtype3[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
 
 WRITE8_HANDLER ( memoryb4_w )
 {
@@ -282,7 +282,7 @@ The function memorybp4_128_w handles memory writes from 0xb000 to 0xbfff
 which could either be sideways ROM or sideways RAM */
 
 
-static unsigned short bbc_b_plus_sideways_ram_banks[16]={ 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
+static const unsigned short bbc_b_plus_sideways_ram_banks[16]={ 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
 
 
 WRITE8_HANDLER ( memorybp4_128_w )
@@ -489,7 +489,7 @@ WRITE8_HANDLER ( memorybm2_w )
 	}
 }
 
-static unsigned short bbc_master_sideways_ram_banks[16]=
+static const unsigned short bbc_master_sideways_ram_banks[16]=
 {
 	0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0
 };
@@ -1172,7 +1172,7 @@ static void bbc_via_system_irq(int level)
 }
 
 
-static struct via6522_interface
+static const struct via6522_interface
 bbcb_system_via= {
   bbcb_via_system_read_porta,
   bbcb_via_system_read_portb,
@@ -1261,7 +1261,7 @@ static void bbc_via_user_irq(int level)
 }
 
 
-static struct via6522_interface bbcb_user_via =
+static const struct via6522_interface bbcb_user_via =
 {
 	bbcb_via_user_read_porta,//via_user_read_porta,
 	bbcb_via_user_read_portb,//via_user_read_portb,
@@ -1309,7 +1309,7 @@ static void BBC_uPD7002_EOC(int data)
 	via_0_cb1_w(0,data);
 }
 
-static struct uPD7002_interface
+static const struct uPD7002_interface
 BBC_uPD7002= {
 	BBC_get_analogue_input,
 	BBC_uPD7002_EOC
@@ -1364,7 +1364,7 @@ static void Serial_interrupt(int level)
   //logerror("Set SIO irq  %01x\n",level);
 }
 
-static struct MC6850_interface
+static const struct MC6850_interface
 BBC_MC6850_calls= {
 	0,// Transmit data ouput
 	0,// Request to Send output
@@ -1523,7 +1523,7 @@ static void	bbc_i8271_interrupt(int state)
 }
 
 
-static i8271_interface bbc_i8271_interface=
+static const i8271_interface bbc_i8271_interface=
 {
 	bbc_i8271_interrupt,
     NULL

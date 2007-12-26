@@ -47,7 +47,7 @@ static WRITE8_HANDLER(via_out_cb2);
 static void via_irq_func(int state);
 
 
-static struct via6522_interface concept_via6522_intf =
+static const struct via6522_interface concept_via6522_intf =
 {	/* main via */
 	via_in_a, via_in_b,
 	NULL, NULL,

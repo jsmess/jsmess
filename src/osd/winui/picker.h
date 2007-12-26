@@ -51,7 +51,7 @@ struct PickerOptions
 	BOOL bOldControl;
 	BOOL bXPControl;
 	int nColumnCount;
-	LPCTSTR *ppszColumnNames;
+	const LPCTSTR *ppszColumnNames;
 };
 
 enum
@@ -93,6 +93,6 @@ void Picker_HandleDrawItem(HWND hwndPicker, LPDRAWITEMSTRUCT lpDrawItemStruct);
 // Accessors
 const struct PickerCallbacks *Picker_GetCallbacks(HWND hwndPicker);
 int Picker_GetColumnCount(HWND hwndPicker);
-LPCTSTR *Picker_GetColumnNames(HWND hwndPicker);
+const LPCTSTR *Picker_GetColumnNames(HWND hwndPicker);
 
 #endif // PICKER_H

@@ -217,7 +217,7 @@ static void kc85_fdc_dma_drq(int state, int read_)
 		kc85_disc_hw_input_gate |=(1<<7);
 }
 
-static struct nec765_interface kc_fdc_interface=
+static const struct nec765_interface kc_fdc_interface=
 {
 	kc85_fdc_interrupt,
 	kc85_fdc_dma_drq
@@ -287,21 +287,21 @@ struct kc85_module
 	void (*enable)(int state);
 };
 /*
-static struct kc85_module kc85_v24_module=
+static const struct kc85_module kc85_v24_module=
 {
 	0x0ee,
 	"M003",
 	"V24"
 };
 */
-static struct kc85_module kc85_disk_interface_device=
+static const struct kc85_module kc85_disk_interface_device=
 {
 	0x0a7,
 	"D004",
 	"Disk Interface"
 };
 
-static struct kc85_module	*modules[256>>2];
+static const struct kc85_module *modules[256>>2];
 /*
 
 	port xx80
@@ -1806,7 +1806,7 @@ static void kc85_pio_brdy_callback(int state)
 #endif
 }
 
-static z80pio_interface kc85_pio_intf =
+static const z80pio_interface kc85_pio_intf =
 {
 	kc85_pio_interrupt,		/* callback when change interrupt status */
 	kc85_pio_ardy_callback,	/* portA ready active callback */

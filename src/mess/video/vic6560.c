@@ -24,7 +24,7 @@
  * needs little more testing with working dipswitches */
 /*#define GFX */
 
-unsigned char vic6560_palette[] =
+const unsigned char vic6560_palette[] =
 {
 /* ripped from vice, a very excellent emulator */
 /* black, white, red, cyan */
@@ -37,7 +37,7 @@ unsigned char vic6560_palette[] =
 	0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0x00, 0xa0, 0xff, 0xff, 0xff, 0x00
 };
 
-struct CustomSound_interface vic6560_sound_interface =
+const struct CustomSound_interface vic6560_sound_interface =
 {
 	vic6560_custom_start
 };
@@ -122,7 +122,7 @@ static const gfx_layout pointerlayout =
 	8 * 8
 };
 
-static UINT8 pointermask[] =
+static const UINT8 pointermask[] =
 {
 	0x00, 0x70, 0x60, 0x50, 0x08, 0x04, 0x00, 0x00,		/* blackmask */
 	0xf0, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00	/* whitemask */

@@ -653,7 +653,7 @@ static const pia6821_interface to7_io =
 
 
 
-static CENTRONICS_CONFIG to7_centronics = { PRINTER_CENTRONICS, to7_io_ack };
+static const CENTRONICS_CONFIG to7_centronics = { PRINTER_CENTRONICS, to7_io_ack };
 
 
 
@@ -757,7 +757,7 @@ static const pia6821_interface to7_pia_modem =
 
 
 
-static struct acia6850_interface to7_acia_modem = 
+static const struct acia6850_interface to7_acia_modem = 
 {
 	1200, 1200, /* 1200 bauds, might be divided by 16 */
 	&to7_modem_rx, &to7_modem_tx,
@@ -1180,9 +1180,9 @@ WRITE8_HANDLER ( to7_midi_w )
 			to7_midi_intr = data >> 5;
 #if VERBOSE_MIDI
 			{
-				static int bits[8] = { 7,7,7,7,8,8,8,8 };
-				static int stop[8] = { 2,2,1,1,2,1,1,1 };
-				static char parity[8] = { 'e','o','e','o','-','-','e','o' };
+				static const int bits[8] = { 7,7,7,7,8,8,8,8 };
+				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
+				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
 				logerror( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n", 
 					  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 					  data, 
@@ -2819,7 +2819,7 @@ static const pia6821_interface to9_sys =
 };
 
 
-static CENTRONICS_CONFIG to9_centronics = { PRINTER_CENTRONICS, NULL };
+static const CENTRONICS_CONFIG to9_centronics = { PRINTER_CENTRONICS, NULL };
 
 
 

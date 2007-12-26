@@ -343,7 +343,7 @@ ROM_START( primob64 )
 	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
-static struct CassetteOptions primo_cassette_options = {
+static const struct CassetteOptions primo_cassette_options = {
 	1,		/* channels */
 	16,		/* bits per sample */
 	22050		/* sample frequency */

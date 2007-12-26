@@ -111,7 +111,7 @@ static int apf_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 
 
-static struct CassetteLegacyWaveFiller apf_legacy_fill_wave =
+static const struct CassetteLegacyWaveFiller apf_legacy_fill_wave =
 {
 	apf_cassette_fill_wave,					/* fill_wave */
 	-1,										/* chunk_size */
@@ -138,7 +138,7 @@ static casserr_t apf_apt_load(cassette_image *cassette)
 
 
 
-static struct CassetteFormat apf_apt_format =
+static const struct CassetteFormat apf_apt_format =
 {
 	"apt",
 	apf_apt_identify,

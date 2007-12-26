@@ -313,7 +313,7 @@ static void compis_fdc_dma_drq(int state, int read)
 	}
 }
 
-static nec765_interface compis_fdc_interface = 
+static const nec765_interface compis_fdc_interface = 
 {
 	compis_fdc_int,
 	compis_fdc_dma_drq
@@ -433,7 +433,7 @@ static WRITE8_HANDLER ( compis_ppi_port_c_w )
 	compis_fdc_tc((data & 0x80)?1:0);
 }
 
-static ppi8255_interface compis_ppi_interface =
+static const ppi8255_interface compis_ppi_interface =
 {
     1,
     {NULL},
@@ -458,7 +458,7 @@ WRITE16_HANDLER ( compis_ppi_w )
 /*  PIT 8253                                                               */
 /*-------------------------------------------------------------------------*/
 
-static struct pit8253_config compis_pit_config[2] =
+static const struct pit8253_config compis_pit_config[2] =
 {
 {
 	TYPE8253,
@@ -533,7 +533,7 @@ static void compis_usart_rxready(int state)
 */
 }
 
-static struct msm8251_interface compis_usart_interface=
+static const struct msm8251_interface compis_usart_interface=
 {
 	NULL,
 	NULL,
