@@ -71,7 +71,7 @@ Source Changes:
 
 - Fixed M65C02 optimization.  [Peter Trauner]
 
-- Staticization and constification.  [Atari Ace]
+- Staticization, constification and header file cleanups.  [Atari Ace]
 
 
 

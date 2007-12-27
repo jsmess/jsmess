@@ -13,24 +13,31 @@ enum {
 };
 #endif
 
-void amstrad_setup_machine(void);
+/*----------- defined in drivers/amstrad.c -----------*/
+
 void amstrad_reset_machine(void);
-void amstrad_shutdown_machine(void);
-
-SNAPSHOT_LOAD( amstrad );
-
 void amstrad_GateArray_write(int);
 void amstrad_rethinkMemory(void);
 void amstrad_setLowerRom(void);
 void amstrad_setUpperRom(void);
 
-void Amstrad_Init(void);
-void amstrad_handle_snapshot(unsigned char *);
-
 void AmstradCPC_SetUpperRom(int);
 void AmstradCPC_PALWrite(int);
 
-extern int amstrad_cassette_init(mess_image *img, mame_file *fp, int open_mode);
+
+
+/*----------- defined in machine/amstrad.c -----------*/
+
+void amstrad_setup_machine(void);
+
+SNAPSHOT_LOAD( amstrad );
+
+void amstrad_handle_snapshot(unsigned char *);
+
+DEVICE_LOAD(amstrad_plus_cartridge);
+
+/*----------- defined in video/amstrad.c -----------*/
+
 void amstrad_plus_setspritecolour(unsigned int off, int r, int g, int b);
 void amstrad_plus_setsplitline(unsigned int line, unsigned int address);
 
@@ -63,7 +70,6 @@ This gives a total of 19968 NOPs per frame. */
 
 extern VIDEO_START( amstrad );
 extern VIDEO_UPDATE( amstrad );
-void amstrad_update_scanline(void);
 void amstrad_vh_execute_crtc_cycles(int);
 void amstrad_vh_update_colour(int, int);
 void amstrad_vh_update_mode(int);
@@ -71,11 +77,6 @@ void amstrad_vh_update_mode(int);
 /* The VSYNC signal of the CRTC */
 extern int amstrad_CRTC_VS;
 extern int amstrad_CRTC_CR;
-
-/* update interrupt timer */
-void amstrad_interrupt_timer_update(void);
-/* if start of vsync sound, wait to reset interrupt counter 2 hsyncs later */
-void amstrad_interrupt_timer_trigger_reset_by_vsync(void);
 
 /*** AMSTRAD CPC SPECIFIC ***/
 
@@ -91,7 +92,5 @@ extern PALETTE_INIT( kccomp );
 
 /* initialise palette for 464plus, 6128plus */
 extern PALETTE_INIT( amstrad_plus );
-
-DEVICE_LOAD(amstrad_plus_cartridge);
 
 

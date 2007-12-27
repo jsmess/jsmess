@@ -3,6 +3,8 @@
 
 #include "cbmdrive.h"
 
+/*----------- defined in machine/cbmserb.c -----------*/
+
 void cbmfloppy_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
 
 #define IEC 1
@@ -38,6 +40,8 @@ int cbm_serial_clock_read (void);
 void cbm_serial_clock_write (int level);
 int cbm_serial_request_read (void);
 void cbm_serial_request_write (int level);
+
+extern CBM_Serial cbm_serial;
 
 /* private */
 extern CBM_Drive cbm_drive[2];

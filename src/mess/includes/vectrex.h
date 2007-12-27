@@ -9,10 +9,10 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
-/* From machine/vectrex.c */
+/*----------- defined in machine/vectrex.c -----------*/
+
 DEVICE_LOAD( vectrex_cart );
 
-/* From machine/vectrex.c */
 extern int vectrex_imager_status;
 extern UINT32 vectrex_beam_color;
 extern unsigned char vectrex_via_out[2];
@@ -34,17 +34,17 @@ DRIVER_INIT( vectrex );
 /* for spectrum 1+ */
  READ8_HANDLER( s1_via_pb_r );
 
-/* From video/vectrex.c */
+
+/*----------- defined in video/vectrex.c -----------*/
+
 VIDEO_START( vectrex );
 VIDEO_UPDATE( vectrex );
 
 VIDEO_START( raaspec );
-VIDEO_UPDATE( raaspec );
 
 WRITE8_HANDLER  ( raaspec_led_w );
 
 
-/* from video/vectrex.c */
 void vectrex_add_point_stereo (int x, int y, rgb_t color, int intensity);
 void vectrex_add_point (int x, int y, rgb_t color, int intensity);
 extern void (*vector_add_point_function) (int, int, rgb_t, int);

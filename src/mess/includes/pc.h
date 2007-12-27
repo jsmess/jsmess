@@ -1,5 +1,7 @@
 #include "driver.h"
 
+/*----------- defined in machine/pc.c -----------*/
+
 DRIVER_INIT( pccga );
 DRIVER_INIT( pcmda );
 DRIVER_INIT( europc );

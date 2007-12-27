@@ -167,6 +167,8 @@
 #define CONTROLLER_BUSY			0x80	// Set = Busy, Clear = Ready
 #define CONTROLLER_DIRECTION	0x40	// Set = Controller->Host, Clear = Host->Controller
 
+/*----------- defined in machine/corvushd.c -----------*/
+
 //
 // Prototypes
 //

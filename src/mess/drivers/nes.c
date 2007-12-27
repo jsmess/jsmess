@@ -20,8 +20,6 @@
 #include "inputx.h"
 #include "mslegacy.h"
 
-unsigned char *battery_ram;
-
 static READ8_HANDLER( psg_4015_r )
 {
 	return NESPSG_0_r(0x15);

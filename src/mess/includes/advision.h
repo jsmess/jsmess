@@ -1,4 +1,5 @@
-/* machine/advision.c */
+/*----------- defined in machine/advision.c -----------*/
+
 extern int advision_framestart;
 /*extern int advision_videoenable;*/
 extern int advision_videobank;
@@ -20,7 +21,8 @@ WRITE8_HANDLER ( advision_putD );
 
 
 
-/* video/advision.c */
+/*----------- defined in video/advision.c -----------*/
+
 extern int advision_vh_hpos;
 
 VIDEO_START( advision );

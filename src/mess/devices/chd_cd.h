@@ -13,8 +13,6 @@
 #include "image.h"
 #include "messdrv.h"
 
-const struct IODevice *mess_cd_device_specify(struct IODevice *iodev, int count);
-
 cdrom_file *mess_cd_get_cdrom_file(mess_image *image);
 chd_file *mess_cd_get_chd_file(mess_image *image);
 

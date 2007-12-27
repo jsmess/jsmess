@@ -38,6 +38,8 @@ typedef struct {
 	UINT8 *top_page;
 } MSX;
 
+/*----------- defined in machine/msx.c -----------*/
+
 /* start/stop functions */
 extern DRIVER_INIT( msx );
 extern DRIVER_INIT( msx2 );
@@ -57,7 +59,6 @@ void msx_vdp_interrupt (int);
 WRITE8_HANDLER ( msx_printer_w );
  READ8_HANDLER ( msx_printer_r );
 WRITE8_HANDLER ( msx_psg_w );
-WRITE8_HANDLER ( msx_dsk_w );
  READ8_HANDLER ( msx_psg_r );
 WRITE8_HANDLER ( msx_psg_port_a_w );
  READ8_HANDLER ( msx_psg_port_a_r );
@@ -68,9 +69,6 @@ WRITE8_HANDLER ( msx_fmpac_w );
 WRITE8_HANDLER ( msx_rtc_reg_w );
 WRITE8_HANDLER ( msx_rtc_latch_w );
 WRITE8_HANDLER ( msx_90in1_w );
-
-/* cassette functions */
-DEVICE_LOAD( msx_cassette );
 
 /* disk functions */
 DEVICE_LOAD( msx_floppy );

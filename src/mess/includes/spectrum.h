@@ -12,13 +12,14 @@ typedef enum
 }
 TIMEX_CART_TYPE;
 
+/*----------- defined in machine/spectrum.c -----------*/
+
 extern TIMEX_CART_TYPE timex_cart_type;
 extern UINT8 timex_cart_chunks;
 extern UINT8 * timex_cart_data;
 
 DEVICE_LOAD( timex_cart );
 DEVICE_UNLOAD( timex_cart );
-extern void ts2068_update_memory(void);
 
 extern MACHINE_RESET( spectrum );
 
@@ -28,9 +29,10 @@ extern QUICKLOAD_LOAD( spectrum );
 /*-----------------27/02/00 10:49-------------------
  code for WAV reading writing
 --------------------------------------------------*/
-DEVICE_LOAD( spectrum_cassette );
-DEVICE_UNLOAD( spectrum_cassette );
 
+/*----------- defined in drivers/spectrum.c -----------*/
+
+extern void ts2068_update_memory(void);
 extern int spectrum_128_port_7ffd_data;
 extern int spectrum_plus3_port_1ffd_data;
 extern int ts2068_port_ff_data;
@@ -40,6 +42,8 @@ extern unsigned char *spectrum_128_screen_location;
 
 extern void spectrum_128_update_memory(void);
 extern void spectrum_plus3_update_memory(void);
+
+/*----------- defined in video/spectrum.c -----------*/
 
 extern VIDEO_START( spectrum );
 extern VIDEO_UPDATE( spectrum );

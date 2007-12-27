@@ -5,6 +5,8 @@
 
 #include "driver.h"
 
+/*----------- defined in machine/pc_ide.c -----------*/
+
  READ8_HANDLER(at_mfm_0_r);
 WRITE8_HANDLER(at_mfm_0_w);
 

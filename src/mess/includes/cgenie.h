@@ -1,18 +1,17 @@
-extern UINT8 *cgenie_fontram;
+/*----------- defined in audio/cgenie.c -----------*/
 
-DEVICE_LOAD( cgenie_cassette );
-DEVICE_LOAD( cgenie_floppy );
-
-VIDEO_START( cgenie );
-VIDEO_UPDATE( cgenie );
-
-void cgenie_sh_sound_init(const char * gamename);
 WRITE8_HANDLER ( cgenie_sh_control_port_w );
 WRITE8_HANDLER ( cgenie_sh_data_port_w );
 READ8_HANDLER ( cgenie_sh_control_port_r );
 READ8_HANDLER ( cgenie_sh_data_port_r );
 
-/* from mess/machine/cgenie.c */
+/*----------- defined in machine/cgenie.c -----------*/
+
+extern UINT8 *cgenie_fontram;
+
+DEVICE_LOAD( cgenie_cassette );
+DEVICE_LOAD( cgenie_floppy );
+
 extern int cgenie_tv_mode;
 
 READ8_HANDLER ( cgenie_psg_port_a_r);
@@ -25,8 +24,6 @@ MACHINE_START( cgenie );
 READ8_HANDLER ( cgenie_colorram_r );
 READ8_HANDLER ( cgenie_fontram_r );
 
-void cgenie_dos_rom_w(int offset, int data);
-void cgenie_ext_rom_w(int offset, int data);
 WRITE8_HANDLER ( cgenie_colorram_w );
 WRITE8_HANDLER ( cgenie_fontram_w );
 
@@ -76,6 +73,8 @@ typedef struct {         // CRTC 6845
         UINT8    cursor_visible;
         UINT8    cursor_phase;
 } CRTC6845;
+
+/*----------- defined in video/cgenie.c -----------*/
 
 extern	int 	cgenie_font_offset[4];
 

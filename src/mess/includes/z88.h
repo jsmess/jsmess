@@ -5,6 +5,8 @@
 #define Z88_SCREEN_WIDTH        856
 #define Z88_SCREEN_HEIGHT       64
 
+/*----------- defined in video/z88.c -----------*/
+
 extern PALETTE_INIT( z88 );
 extern VIDEO_UPDATE( z88 );
 extern VIDEO_EOF( z88 );

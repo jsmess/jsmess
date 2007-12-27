@@ -14,6 +14,8 @@
 
 #include "driver.h"
 
+/*----------- defined in audio/sblaster.c -----------*/
+
  READ8_HANDLER( soundblaster_r );
 WRITE8_HANDLER( soundblaster_w );
 

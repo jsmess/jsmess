@@ -45,12 +45,12 @@ static UINT8 bg_zbuf[160];
 static UINT8 gb_vid_regs[_NR_GB_VID_REGS];
 static UINT16 cgb_bpal[32];	/* CGB current background palette table */
 static UINT16 cgb_spal[32];	/* CGB current background palette table */
-UINT16 sgb_pal[128];	/* SGB palette remapping */
 static UINT8 gb_bpal[4];	/* Background palette		*/
 static UINT8 gb_spal0[4];	/* Sprite 0 palette		*/
 static UINT8 gb_spal1[4];	/* Sprite 1 palette		*/
 static UINT8 *gb_oam;
 UINT8 *gb_vram;
+static double lcd_time;
 static UINT8 *gb_vram_ptr;
 static int gbc_hdma_enabled;
 static UINT8	*gb_chrgen;	/* Character generator           */

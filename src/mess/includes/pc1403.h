@@ -9,6 +9,8 @@
 #ifndef PC1403_H
 #define PC1403_H
 
+/*----------- defined in machine/pc1403.c -----------*/
+
 extern UINT8 pc1403_portc;
 
 int pc1403_reset(void);
@@ -25,14 +27,14 @@ NVRAM_HANDLER( pc1403 );
 READ8_HANDLER(pc1403_asic_read);
 WRITE8_HANDLER(pc1403_asic_write);
 
-/* in video/pocketc.c */
+/*----------- defined in video/pc1403.c -----------*/
+
 VIDEO_START( pc1403 );
 VIDEO_UPDATE( pc1403 );
 
 READ8_HANDLER(pc1403_lcd_read);
 WRITE8_HANDLER(pc1403_lcd_write);
 
-/* in drivers/pocketc.c */
 #define KEY_SMALL input_port_1_r(0)&0x40
 #define RAM32K (input_port_10_r(0)&0x80)==0x80
 

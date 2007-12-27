@@ -29,6 +29,8 @@ struct TIMERS {
 	emu_timer	*timer3_timer;		/* Timer 3 */
 };
 
+UINT8	*pokemini_ram;
+
 static UINT8 pokemini_hwreg[0x100];
 static struct VDP vdp;
 static struct TIMERS timers;

@@ -9,6 +9,8 @@
 #ifndef PC1350_H
 #define PC1350_H
 
+/*----------- defined in machine/pc1350.c -----------*/
+
 void pc1350_outa(int data);
 void pc1350_outb(int data);
 void pc1350_outc(int data);
@@ -20,14 +22,14 @@ int pc1350_inb(void);
 MACHINE_START( pc1350 );
 NVRAM_HANDLER( pc1350 );
 
-/* in video/pocketc.c */
+/*----------- defined in video/pc1350.c -----------*/
+
 READ8_HANDLER(pc1350_lcd_read);
 WRITE8_HANDLER(pc1350_lcd_write);
 VIDEO_UPDATE( pc1350 );
 
 int pc1350_keyboard_line_r(void);
 
-/* in drivers/pocketc.c */
 #define PC1350_KEY_OFF input_port_0_r(0)&0x80
 #define PC1350_KEY_DOWN input_port_0_r(0)&0x40
 #define PC1350_KEY_UP input_port_0_r(0)&0x20

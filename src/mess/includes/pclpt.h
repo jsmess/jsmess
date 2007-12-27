@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+/*----------- defined in machine/pclpt.c -----------*/
+
 typedef enum { 
 	LPT_UNIDIRECTIONAL
 //	, LPT_BIDIRECTIONAL

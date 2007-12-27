@@ -1,3 +1,5 @@
+/*----------- defined in video/ssystem3.c -----------*/
+
 extern UINT8 ssystem3_led[5];
 
 extern PALETTE_INIT( ssystem3 );

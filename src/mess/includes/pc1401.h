@@ -9,6 +9,8 @@
 #ifndef PC1401_H
 #define PC1401_H
 
+/*----------- defined in machine/pc1401.c -----------*/
+
 extern UINT8 pc1401_portc;
 int pc1401_reset(void);
 int pc1401_brk(void);
@@ -21,12 +23,12 @@ int pc1401_inb(void);
 DRIVER_INIT( pc1401 );
 NVRAM_HANDLER( pc1401 );
 
-/* in video/pocketc.c */
+/*----------- defined in video/pc1401.c -----------*/
+
 READ8_HANDLER(pc1401_lcd_read);
 WRITE8_HANDLER(pc1401_lcd_write);
 VIDEO_UPDATE( pc1401 );
 
-/* in drivers/pocketc.c */
 #define KEY_OFF input_port_0_r(0)&0x80
 #define KEY_CAL input_port_0_r(0)&0x40
 #define KEY_BASIC input_port_0_r(0)&0x20

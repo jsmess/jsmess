@@ -1,11 +1,13 @@
 #ifndef MEKD2_H
 #define MEKD2_H
 
-/* from mess/machine/mekd2.c */
+/*----------- defined in machine/mekd2.c -----------*/
+
 DRIVER_INIT( mekd2 );
 DEVICE_LOAD( mekd2_cart );
 
-/* from mess/video/mekd2.c */
+/*----------- defined in video/mekd2.c -----------*/
+
 PALETTE_INIT( mekd2 );
 VIDEO_START( mekd2 );
 VIDEO_UPDATE( mekd2 );

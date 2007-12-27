@@ -1,6 +1,7 @@
 #include "devices/snapquik.h"
 
-/* machine/pmd85.c */
+/*----------- defined in machine/primo.c -----------*/
+
 extern READ8_HANDLER ( primo_be_1_r );
 extern READ8_HANDLER ( primo_be_2_r );
 extern WRITE8_HANDLER ( primo_ki_1_w );
@@ -15,7 +16,8 @@ extern INTERRUPT_GEN( primo_vblank_interrupt );
 extern SNAPSHOT_LOAD( primo );
 extern QUICKLOAD_LOAD( primo );
 
-/* video/pmd85.c */
+/*----------- defined in video/primo.c -----------*/
+
 extern VIDEO_START( primo );
 extern VIDEO_UPDATE( primo );
 extern const unsigned char primo_palette[2*3];

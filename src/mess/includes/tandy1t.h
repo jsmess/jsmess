@@ -1,3 +1,5 @@
+/*----------- defined in machine/tandy1t.c -----------*/
+
 extern WRITE8_HANDLER ( pc_t1t_p37x_w );
 extern  READ8_HANDLER ( pc_t1t_p37x_r );
 

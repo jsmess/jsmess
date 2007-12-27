@@ -74,6 +74,8 @@ struct hd6402
 	struct data_form data_form;
 };
 
+/*----------- defined in machine/hd6402.c -----------*/
+
 /* reset */
 void	hd6402_reset(void);
 

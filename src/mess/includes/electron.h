@@ -45,6 +45,8 @@ typedef struct
 	UINT8 tape_byte;
 } ULA;
 
+/*----------- defined in machine/electron.c -----------*/
+
 extern ULA ula;
 
 READ8_HANDLER( electron_jim_r );
@@ -54,8 +56,11 @@ WRITE8_HANDLER( electron_1mhz_w );
 READ8_HANDLER( electron_ula_r );
 WRITE8_HANDLER( electron_ula_w );
 MACHINE_START( electron );
-void electron_video_init( void );
-INTERRUPT_GEN( electron_scanline_interrupt );
+
 void electron_interrupt_handler(int mode, int interrupt);
 
+/*----------- defined in video/electron.c -----------*/
+
+void electron_video_init( void );
+INTERRUPT_GEN( electron_scanline_interrupt );
 

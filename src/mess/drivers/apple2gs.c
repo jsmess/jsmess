@@ -101,8 +101,6 @@ static const unsigned char apple2gs_palette[] =
 	0xF, 0xF, 0xF	/* White         $F              $0FFF */
 };
 
-UINT8 apple2gs_docram[64*1024];
-
 MACHINE_DRIVER_EXTERN( apple2e );
 INPUT_PORTS_EXTERN( apple2ep );
 

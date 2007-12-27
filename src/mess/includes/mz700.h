@@ -15,27 +15,14 @@
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 
-/* from mess/machine/mz700.c */
+/*----------- defined in machine/mz700.c -----------*/
+
 DRIVER_INIT(mz700);
 MACHINE_RESET(mz700);
-
-DEVICE_LOAD( mz700_cassette );
 
  READ8_HANDLER ( mz700_mmio_r );
 WRITE8_HANDLER ( mz700_mmio_w );
 WRITE8_HANDLER ( mz700_bank_w );
-
-/* from src/mess/video/mz700.c */
-
-extern int mz700_frame_time;
-
-//extern void mz700_init_colors (unsigned char *palette, unsigned short *colortable, const unsigned char *color_prom);
-extern PALETTE_INIT(mz700);
-//extern int mz700_vh_start (void);
-//extern void mz700_vh_stop (void);
-//extern void mz700_vh_screenrefresh (mame_bitmap *bitmap, int full_refresh);
-extern VIDEO_START(mz700);
-extern VIDEO_UPDATE(mz700);
 
 /******************************************************************************
  *	Sharp MZ800
@@ -63,3 +50,16 @@ extern WRITE8_HANDLER( videoram3_w );
 extern WRITE8_HANDLER( pcgram_w );
 
 extern DRIVER_INIT( mz800 );
+
+/*----------- defined in video/mz700.c -----------*/
+
+extern int mz700_frame_time;
+
+//extern void mz700_init_colors (unsigned char *palette, unsigned short *colortable, const unsigned char *color_prom);
+extern PALETTE_INIT(mz700);
+//extern int mz700_vh_start (void);
+//extern void mz700_vh_stop (void);
+//extern void mz700_vh_screenrefresh (mame_bitmap *bitmap, int full_refresh);
+extern VIDEO_START(mz700);
+extern VIDEO_UPDATE(mz700);
+

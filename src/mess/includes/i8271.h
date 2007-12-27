@@ -6,6 +6,8 @@
 it is from cpu to fdc */
 #define I8271_FLAGS_DATA_DIRECTION 0x02
 
+/*----------- defined in machine/i8271.c -----------*/
+
 typedef enum
 {
 	I8271_STATE_EXECUTION_READ = 0,

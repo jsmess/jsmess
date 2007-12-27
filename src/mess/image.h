@@ -68,7 +68,6 @@ void image_unload(mess_image *img);
 const char *image_error(mess_image *img);
 
 /* used for driver init and machine init */
-int image_load_all(const game_driver *gamedrv, int ispreload);
 void image_unload_all(int ispreload);
 
 /* used to set the error that occured during image loading */
@@ -120,7 +119,6 @@ UINT32 image_crc(mess_image *image);
 
 int image_is_writable(mess_image *image);
 int image_has_been_created(mess_image *image);
-int image_get_open_mode(mess_image *image);
 void image_make_readonly(mess_image *image);
 
 UINT32 image_fread(mess_image *image, void *buffer, UINT32 length);

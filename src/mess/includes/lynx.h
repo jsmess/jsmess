@@ -4,18 +4,26 @@
 #include "driver.h"
 #include "sound/custom.h"
 
-extern UINT32 lynx_palette[0x10];
-
-void lynx_draw_lines(int newline);
+/*----------- defined in drivers/lynx.c -----------*/
 
 void lynx_partialhash(char *dest, const unsigned char *data,
 	unsigned long length, unsigned int functions);
+
+extern int lynx_rotate;
+
+/*----------- defined in video/lynx.c -----------*/
+
+extern UINT32 lynx_palette[0x10];
+
+void lynx_draw_lines(int newline);
 
 
 #define PAD_UP 0x80
 #define PAD_DOWN 0x40
 #define PAD_LEFT 0x20
 #define PAD_RIGHT 0x10
+
+/*----------- defined in machine/lynx.c -----------*/
 
 MACHINE_START( lynx );
 
@@ -27,7 +35,6 @@ extern UINT8 *lynx_mem_fffa;
 extern size_t lynx_mem_fe00_size;
 
 extern UINT16 lynx_granularity;
-extern int lynx_rotate;
 
 typedef struct {
 	UINT8 data[0x100];
@@ -42,13 +49,14 @@ WRITE8_HANDLER(suzy_write);
 READ8_HANDLER(suzy_read);
 void lynx_timer_count_down(int nr);
 
+/*----------- defined in audio/lynx.c -----------*/
+
 void lynx_audio_reset(void);
 void lynx_audio_write(int offset, UINT8 data);
 UINT8 lynx_audio_read(int offset);
 void lynx_audio_count_down(int nr);
 void *lynx_custom_start(int clock, const struct CustomSound_interface *config);
 void *lynx2_custom_start(int clock, const struct CustomSound_interface *config);
-void lynx_custom_update (void);
 
 #endif /* LYNX_H */
 

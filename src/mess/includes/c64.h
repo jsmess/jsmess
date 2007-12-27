@@ -208,6 +208,14 @@
 #define KEY_CURSOR_UP (input_port_13_word_r(0,0)&0x2000)
 #define KEY_CURSOR_LEFT (input_port_13_word_r(0,0)&0x1000)
 
+/*----------- defined in machine/c64.c -----------*/
+
+/* private area */
+extern UINT8 c65_keyline;
+extern UINT8 c65_6511_port;
+
+extern UINT8 c128_keyline[3];
+
 extern UINT8 *c64_colorram;
 extern UINT8 *c64_basic;
 extern UINT8 *c64_kernal;

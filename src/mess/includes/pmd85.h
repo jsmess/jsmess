@@ -1,4 +1,5 @@
-/* machine/pmd85.c */
+/*----------- defined in machine/pmd85.c -----------*/
+
  READ8_HANDLER ( pmd85_io_r );
 WRITE8_HANDLER ( pmd85_io_w );
  READ8_HANDLER ( mato_io_r );
@@ -9,10 +10,9 @@ DRIVER_INIT ( pmd853 );
 DRIVER_INIT ( alfa );
 DRIVER_INIT ( mato );
 extern MACHINE_RESET( pmd85 );
-extern int pmd85_tape_init(int);
-extern void pmd85_tape_exit(int);
 
-/* video/pmd85.c */
+/*----------- defined in video/pmd85.c -----------*/
+
 extern VIDEO_START( pmd85 );
 extern VIDEO_UPDATE( pmd85 );
 extern const unsigned char pmd85_palette[3*3];

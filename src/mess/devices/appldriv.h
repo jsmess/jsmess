@@ -21,7 +21,6 @@ void apple525_device_getinfo(const device_class *devclass, UINT32 state, union d
 
 void apple525_set_lines(UINT8 lines);
 void apple525_set_enable_lines(int enable_mask);
-void apple525_set_sel_line(int sel);
 
 UINT8 apple525_read_data(void);
 void apple525_write_data(UINT8 data);

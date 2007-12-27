@@ -85,6 +85,8 @@
 #define VC20ADDR2VIC6560ADDR(a) (((a)>0x8000)?((a)&0x1fff):((a)|0x2000))
 #define VIC6560ADDR2VC20ADDR(a) (((a)>0x2000)?((a)&0x1fff):((a)|0x8000))
 
+/*----------- defined in machine/vc20.c -----------*/
+
 extern UINT8 *vc20_memory;
 extern UINT8 *vc20_memory_9400;
 

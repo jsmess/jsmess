@@ -37,6 +37,8 @@ extern "C" {
 
 ***************************************************************************/
 
+/*----------- defined in video/crtc6845.c -----------*/
+
 /* opaque structure representing a crtc8645 chip */
 struct mscrtc6845;
 

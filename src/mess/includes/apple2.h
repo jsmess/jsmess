@@ -40,8 +40,6 @@
 
 #define VAR_DHIRES		VAR_AN3
 
-extern UINT32 a2;
-
 /* ----------------------------------------------------------------------- */
 
 #define APPLE2_SLOT_COUNT	8
@@ -64,6 +62,10 @@ struct _apple2_config
 };
 
 
+/*----------- defined in machine/apple2.c -----------*/
+
+extern UINT32 a2;
+
 extern const apple2_slotdevice apple2_slot_langcard;
 extern const apple2_slotdevice apple2_slot_mockingboard;
 extern const apple2_slotdevice apple2_slot_floppy525;
@@ -72,7 +74,6 @@ extern const apple2_slotdevice apple2_slot_iwm;
 void apple2_iwm_setdiskreg(UINT8 data);
 UINT8 apple2_iwm_getdiskreg(void);
 
-/* machine/apple2.c */
 void apple2_init_common(running_machine *machine, const apple2_config *config);
 MACHINE_START( apple2 );
 UINT8 apple2_getfloatingbusvalue(void);
@@ -83,7 +84,8 @@ void apple2_interrupt(void);
 
 void apple2_setvar(UINT32 val, UINT32 mask);
 
-/* video/apple2.c */
+/*----------- defined in video/apple2.c -----------*/
+
 void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
 VIDEO_START( apple2 );
 VIDEO_START( apple2p );
@@ -148,6 +150,8 @@ struct _apple2_memmap_config
 	UINT32 auxmem_length;
 	const apple2_memmap_entry *memmap;
 };
+
+/*----------- defined in machine/apple2.c -----------*/
 
 void apple2_setup_memory(const apple2_memmap_config *config);
 void apple2_update_memory(void);

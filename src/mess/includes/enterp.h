@@ -1,9 +1,8 @@
+/*----------- defined in machine/enterp.c -----------*/
+
 DEVICE_LOAD( enterprise_floppy );
 
-int enterprise_rom_load(int);
-int enterprise_rom_id(int);
-
-void Enterprise_Initialise(void);
+/*----------- defined in video/enterp.c -----------*/
 
 VIDEO_START( enterprise );
 VIDEO_UPDATE( enterprise );

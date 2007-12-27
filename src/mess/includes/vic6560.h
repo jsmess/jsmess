@@ -59,6 +59,8 @@ extern "C" {
  * of the 6560 (colorram) without decoding the 6560 address line a8..a13
  */
 
+/*----------- defined in video/vic6560.c -----------*/
+
 /* call to init videodriver */
 /* pal version */
 /* dma_read: videochip fetched 12 bit data from system bus */
@@ -126,7 +128,8 @@ extern  READ8_HANDLER ( vic6560_port_r );
 
 /* private area */
 
-/* from audio/pc.c */
+/*----------- defined in audio/vic6560.c -----------*/
+
 void *vic6560_custom_start(int clock, const struct CustomSound_interface *config);
 void vic6560_soundport_w (int mode, int data);
 

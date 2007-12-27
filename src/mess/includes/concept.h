@@ -11,6 +11,8 @@ enum
 	display_orientation_concept = 7
 };
 
+/*----------- defined in machine/concept.c -----------*/
+
 MACHINE_START(concept);
 VIDEO_START(concept);
 VIDEO_UPDATE(concept);

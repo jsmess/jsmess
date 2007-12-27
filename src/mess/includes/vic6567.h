@@ -10,6 +10,8 @@
  * on how to use it
  */
 
+/*----------- defined in video/vic6567.c -----------*/
+
 /* call to init videodriver */
 /* dma_read: videochip fetched 1 byte data from system bus */
 extern void vic6567_init (int vic2e, int pal, int (*dma_read) (int),

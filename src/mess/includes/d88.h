@@ -36,11 +36,10 @@ typedef struct
 } d88image;
 
 
+/*----------- defined in machine/d88.c -----------*/
+
 DEVICE_INIT(d88image_floppy);
 DEVICE_LOAD(d88image_floppy);
-
-/* check write protect */
-void d88image_get_write_protect(int id);
 
 #ifdef __cplusplus
 }

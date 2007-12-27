@@ -4,6 +4,8 @@
 #include "mame.h"
 #include "sound/custom.h"
 
+/*----------- defined in machine/gamecom.c -----------*/
+
 extern MACHINE_RESET( gamecom );
 extern DEVICE_INIT( gamecom_cart );
 extern DEVICE_LOAD( gamecom_cart );
@@ -16,8 +18,6 @@ extern READ8_HANDLER( gamecom_vram_r );
 
 extern void gamecom_handle_dma( int cycles );
 extern void gamecom_update_timers( int cycles );
-
-extern INTERRUPT_GEN( gamecom_scanline );
 
 /* SM8521 register addresses */
 #define SM8521_R0	0x00
@@ -149,8 +149,11 @@ extern INTERRUPT_GEN( gamecom_scanline );
 #define SM8521_SG1W14	0x7E
 #define SM8521_SG1W15	0x7F
 
-/* machine/gamecom.c */
 extern UINT8 internal_registers[];
 extern UINT8 gamecom_vram[];
+
+/*----------- defined in video/gamecom.c -----------*/
+
+extern INTERRUPT_GEN( gamecom_scanline );
 
 #endif

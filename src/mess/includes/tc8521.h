@@ -2,6 +2,8 @@
 
 #include "driver.h"
 
+/*----------- defined in machine/tc8521.c -----------*/
+
  READ8_HANDLER(tc8521_r);
 WRITE8_HANDLER(tc8521_w);
 

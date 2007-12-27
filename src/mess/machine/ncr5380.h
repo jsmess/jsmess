@@ -40,7 +40,6 @@ extern void ncr5380_init( const struct NCR5380interface *interface );
 extern void ncr5380_read_data(int bytes, UINT8 *pData);
 extern void ncr5380_write_data(int bytes, UINT8 *pData);
 extern void *ncr5380_get_device(int id);
-extern void ncr5380_set_device(int id, void *);
 extern READ8_HANDLER(ncr5380_r);
 extern WRITE8_HANDLER(ncr5380_w);
 

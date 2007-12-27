@@ -8,20 +8,18 @@
 
 ******************************************************************************/
 
+/*----------- defined in machine/bbc.c -----------*/
+
 DRIVER_INIT( bbc );
 DRIVER_INIT( bbcm );
 
 MACHINE_START( bbca );
 MACHINE_START( bbcb );
-MACHINE_START( bbcb1770 );
-MACHINE_START( bbcbopus );
 MACHINE_START( bbcbp );
 MACHINE_START( bbcm );
 
 MACHINE_RESET( bbca );
 MACHINE_RESET( bbcb );
-MACHINE_RESET( bbcb1770 );
-MACHINE_RESET( bbcbopus );
 MACHINE_RESET( bbcbp );
 MACHINE_RESET( bbcm );
 
@@ -64,8 +62,6 @@ WRITE8_HANDLER ( bbcm_ACCCON_write );
 DEVICE_LOAD ( bbcb_cart );
 DEVICE_LOAD( bbc_floppy );
 
-void check_disc_status(void);
-
 READ8_HANDLER  ( bbc_disc_r );
 WRITE8_HANDLER ( bbc_disc_w );
 
@@ -82,7 +78,17 @@ READ8_HANDLER  ( bbcm_wd1770_read );
 WRITE8_HANDLER ( bbcm_wd1770_write );
 
 
-/* video code */
+/* tape support */
+
+WRITE8_HANDLER ( BBC_6850_w );
+READ8_HANDLER (BBC_6850_r);
+
+WRITE8_HANDLER ( BBC_SerialULA_w );
+
+
+
+
+/*----------- defined in video/bbc.c -----------*/
 
 extern VIDEO_START( bbca );
 extern VIDEO_START( bbcb );
@@ -101,16 +107,6 @@ WRITE8_HANDLER ( videoULA_w );
 
 WRITE8_HANDLER ( BBC_6845_w );
 READ8_HANDLER ( BBC_6845_r );
-
-
-
-/* tape support */
-
-WRITE8_HANDLER ( BBC_6850_w );
-READ8_HANDLER (BBC_6850_r);
-
-WRITE8_HANDLER ( BBC_SerialULA_w );
-
 
 
 

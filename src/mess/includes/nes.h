@@ -27,13 +27,13 @@
 #define PORT_CONFIG2	12
 #define PORT_FLIPKEY	12
 
+/*----------- defined in machine/nes.c -----------*/
+
 void ppu_mirror_custom (int page, int address);
 void ppu_mirror_custom_vrom (int page, int address);
 
 WRITE8_HANDLER ( nes_IN0_w );
 WRITE8_HANDLER ( nes_IN1_w );
-
-extern int nes_vram_sprite[8];
 
 extern unsigned char *battery_ram;
 
@@ -81,7 +81,6 @@ extern struct fds_struct nes_fds;
 
 /* protos */
 
-/* machine/nes.c */
 DEVICE_LOAD(nes_cart);
 DEVICE_LOAD(nes_disk);
 DEVICE_UNLOAD(nes_disk);
@@ -96,13 +95,18 @@ int nes_ppu_vidaccess( int num, int address, int data );
 void nes_partialhash(char *dest, const unsigned char *data,
 	unsigned long length, unsigned int functions);
 
+/*----------- defined in machine/nes_mmc.c -----------*/
+
 WRITE8_HANDLER( nes_low_mapper_w );
 READ8_HANDLER ( nes_low_mapper_r );
 WRITE8_HANDLER( nes_mid_mapper_w );
 READ8_HANDLER ( nes_mid_mapper_r );
 WRITE8_HANDLER( nes_mapper_w );
 
-/* video/nes.c */
+/*----------- defined in video/nes.c -----------*/
+
+extern int nes_vram_sprite[8];
+
 PALETTE_INIT( nes );
 VIDEO_START( nes_ntsc );
 VIDEO_START( nes_pal );

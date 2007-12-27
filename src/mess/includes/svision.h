@@ -4,7 +4,11 @@
 #include "driver.h"
 #include "sound/custom.h"
 
+/*----------- defined in drivers/svision.c -----------*/
+
 void svision_irq(void);
+
+/*----------- defined in audio/svision.c -----------*/
 
 typedef struct
 {

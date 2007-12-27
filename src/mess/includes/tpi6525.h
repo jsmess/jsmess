@@ -47,6 +47,8 @@ typedef struct {
 	int irq_level[5];
 } TPI6525;
 
+/*----------- defined in machine/tpi6525.c -----------*/
+
 extern TPI6525 tpi6525[4];
 
 void tpi6525_0_reset(void);

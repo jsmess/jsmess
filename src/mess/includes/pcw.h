@@ -1,5 +1,8 @@
 #include "driver.h"
 #include "osdepend.h"
+
+/*----------- defined in video/pcw.c -----------*/
+
 #define PCW_BORDER_HEIGHT 8
 #define PCW_BORDER_WIDTH 8
 #define PCW_NUM_COLOURS 2

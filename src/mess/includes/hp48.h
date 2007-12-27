@@ -1,4 +1,3 @@
-// in drivers/hp48.c
 #define KEY_A input_port_0_r(0)&0x80
 #define KEY_B input_port_0_r(0)&0x40
 #define KEY_C input_port_0_r(0)&0x20
@@ -49,7 +48,8 @@
 #define KEY_SPC input_port_5_r(0)&1
 #define KEY_PLUS input_port_6_r(0)&0x80
 
-/* in machine/hp48.c */
+/*----------- defined in machine/hp48.c -----------*/
+
 typedef struct { 
 	int data[0x40]; 
 	UINT16 crc;
@@ -70,11 +70,13 @@ extern DRIVER_INIT( hp48s );
 extern DRIVER_INIT( hp48g );
 extern MACHINE_RESET( hp48 );
 
-/* in video/hp48.c */
+extern WRITE8_HANDLER( hp48_write );
+extern  READ8_HANDLER( hp48_read );
+
+/*----------- defined in video/hp48.c -----------*/
+
 extern const unsigned short hp48_colortable[0x20][2];
 
 extern PALETTE_INIT( hp48 );
 extern VIDEO_START( hp48 );
 extern VIDEO_UPDATE( hp48 );
-extern WRITE8_HANDLER( hp48_write );
-extern  READ8_HANDLER( hp48_read );

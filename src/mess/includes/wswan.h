@@ -75,6 +75,8 @@ struct VDP
 	UINT8 new_display_vertical;		/* New value for the display_vertical bit (to prevent mid frame changes) */
 };
 
+/*----------- defined in machine/wswan.c -----------*/
+
 extern struct VDP vdp;
 extern UINT8 ws_portram[256];
 
@@ -90,10 +92,14 @@ extern DEVICE_INIT(wswan_cart);
 extern DEVICE_LOAD(wswan_cart);
 extern INTERRUPT_GEN(wswan_scanline_interrupt);
 
-/* video/wswan.c */
+
+/*----------- defined in video/wswan.c -----------*/
+
 extern void wswan_refresh_scanline(void);
 
-/* audio/wswan.c */
+
+/*----------- defined in audio/wswan.c -----------*/
+
 extern WRITE8_HANDLER( wswan_sound_port_w );
 extern void *wswan_sh_start(int clock, const struct CustomSound_interface *config);
 

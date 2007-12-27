@@ -11,6 +11,8 @@
 
 #include "driver.h"
 
+/*----------- defined in machine/apple3.c -----------*/
+
 extern UINT32 a3;
 
 #define VAR_VM0		0x0001
@@ -26,12 +28,14 @@ MACHINE_RESET( apple3 );
 DRIVER_INIT( apple3 );
 INTERRUPT_GEN( apple3_interrupt );
 
-VIDEO_START( apple3 );
-VIDEO_UPDATE( apple3 );
-void apple3_write_charmem(void);
-
 READ8_HANDLER( apple3_00xx_r );
 WRITE8_HANDLER( apple3_00xx_w );
 
+
+/*----------- defined in video/apple3.c -----------*/
+
+VIDEO_START( apple3 );
+VIDEO_UPDATE( apple3 );
+void apple3_write_charmem(void);
 
 #endif /* APPLE3_H */

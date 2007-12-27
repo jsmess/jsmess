@@ -24,7 +24,6 @@ WRITE16_HANDLER ( compis_gdc_w );
 */
 void compis_gdc_vblank_int (void);
 #define GDC_LPF         262     /* number of lines in a single frame */
-INTERRUPT_GEN(gdc_line_interrupt);
 /*
 ** Call this function to render the screen.
 */

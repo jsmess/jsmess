@@ -18,7 +18,8 @@
 #define MAC_H_TOTAL	(704)		// (512+192)
 #define MAC_V_TOTAL	(370)		// (342+28)
 
-/* from machine/mac.c */
+/*----------- defined in machine/mac.c -----------*/
+
 MACHINE_RESET( mac );
 
 DRIVER_INIT(mac128k512k);
@@ -26,8 +27,6 @@ DRIVER_INIT(mac512ke);
 DRIVER_INIT(macplus);
 DRIVER_INIT(macse);
 DRIVER_INIT(macclassic);
-
-INTERRUPT_GEN( mac_interrupt );
 
 READ16_HANDLER ( mac_via_r );
 WRITE16_HANDLER ( mac_via_w );
@@ -42,14 +41,16 @@ WRITE16_HANDLER ( macplus_scsi_w );
 NVRAM_HANDLER( mac );
 void mac_scc_mouse_irq( int x, int y );
 
-/* from video/mac.c */
+/*----------- defined in video/mac.c -----------*/
+
 VIDEO_START( mac );
 VIDEO_UPDATE( mac );
 PALETTE_INIT( mac );
 
 void mac_set_screen_buffer( int buffer );
 
-/* from audio/mac.c */
+/*----------- defined in audio/mac.c -----------*/
+
 void *mac_sh_start(int clock, const struct CustomSound_interface *config);
 
 void mac_enable_sound( int on );

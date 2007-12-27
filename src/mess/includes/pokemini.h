@@ -1,6 +1,8 @@
 #ifndef _POKEMINI_H_
 #define _POKEMINI_H_
 
+/*----------- defined in machine/pokemini.c -----------*/
+
 extern UINT8 *pokemini_ram;
 extern MACHINE_RESET( pokemini );
 extern WRITE8_HANDLER( pokemini_hwreg_w );

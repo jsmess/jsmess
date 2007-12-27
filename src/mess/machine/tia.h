@@ -116,10 +116,6 @@ typedef struct playfield_registers {
 	int B2;	/* 8 bits  */
 } PFREG;
 
-int scanline_registers[80]; /* array to hold info on who gets displayed */
-
-
-
 typedef struct
 {
     COLREG colreg;			/* keep a record of the color registers written to */

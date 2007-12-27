@@ -92,6 +92,14 @@ static UINT8 *GBC_RAMMap[8];		   /* (GBC) Addresses of internal RAM banks       
 static UINT8 GBC_RAMBank;			   /* (GBC) Number of RAM bank currently used     */
 static UINT8 sgb_atf_data[4050];	   /* (SGB) Attribute files                       */
 UINT8 *sgb_tile_data;
+UINT16 sgb_pal[128];	/* SGB palette remapping */
+UINT16 sgb_pal_data[4096];	/* 512 palettes of 4 colours			*/
+UINT8 sgb_pal_map[20][18];	/* Palette tile map						*/
+UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute)	*/
+UINT8 sgb_window_mask;		/* Current GB screen mask				*/
+UINT8 sgb_hack;				/* Flag set if we're using a hack		*/
+UINT8 gbc_mode;				/* is the GBC in mono/colour mode?		*/
+
 static UINT8 *gb_cart = NULL;
 static UINT8 *gb_cart_ram = NULL;
 static UINT8 gb_io[0x10];

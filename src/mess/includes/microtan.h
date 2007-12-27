@@ -20,12 +20,8 @@
 #include "includes/6551.h"
 #include "devices/snapquik.h"
 
-/* from src/mess/video/microtan.c */
+/*----------- defined in machine/microtan.c -----------*/
 
-extern UINT8 microtan_chunky_graphics;
-extern UINT8 *microtan_chunky_buffer;
-
-/* from mess/machine/microtan.c */
 DRIVER_INIT( microtan );
 MACHINE_RESET( microtan );
 
@@ -46,12 +42,13 @@ WRITE8_HANDLER ( microtan_bffx_w );
 WRITE8_HANDLER ( microtan_sound_w );
 WRITE8_HANDLER ( microtan_sio_w );
 
-/* from src/mess/video/microtan.c */
-extern char microtan_frame_message[64+1];
-extern int microtan_frame_time;
+
+/*----------- defined in video/microtan.c -----------*/
+
+extern UINT8 microtan_chunky_graphics;
+extern UINT8 *microtan_chunky_buffer;
 
 extern WRITE8_HANDLER ( microtan_videoram_w );
 
-extern PALETTE_INIT( microtan );
 extern VIDEO_START( microtan );
 extern VIDEO_UPDATE( microtan );

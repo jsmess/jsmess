@@ -35,10 +35,6 @@ imgtoolerr_t imgtool_floppy_read_sector_to_stream(imgtool_image *img, int head, 
 imgtoolerr_t imgtool_floppy_write_sector_from_stream(imgtool_image *img, int head, int track, int sector, int offset, size_t length, imgtool_stream *f);
 
 
-imgtoolerr_t imgtool_floppy_createmodule(imgtool_library *library, const char *format_name,
-	const char *description, const struct FloppyFormat *format,
-	void (*getinfo)(UINT32 state, union imgtoolinfo *info));
-
 void *imgtool_floppy_extrabytes(imgtool_image *img);
 
 #endif /* IFLOPIMG_H */

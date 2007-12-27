@@ -132,6 +132,7 @@
 
 UINT8 *apple2gs_slowmem;
 UINT8 apple2gs_newvideo;
+UINT8 apple2gs_docram[64*1024];
 
 static UINT8 apple2gs_vgcint;
 static UINT8 apple2gs_langsel;

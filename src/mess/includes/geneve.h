@@ -26,6 +26,8 @@ enum
 };
 
 
+/*----------- defined in machine/geneve.c -----------*/
+
 /* prototypes for machine code */
 
 DRIVER_INIT( geneve );

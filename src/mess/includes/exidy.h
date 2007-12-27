@@ -6,8 +6,8 @@
 #define EXIDY_SCREEN_WIDTH        (64*8)
 #define EXIDY_SCREEN_HEIGHT       (30*8)
 
+/*----------- defined in video/exidy.c -----------*/
+
 VIDEO_START( exidy );
 VIDEO_UPDATE( exidy );
 PALETTE_INIT( exidy );
-
-DEVICE_LOAD( exidy_cassette );

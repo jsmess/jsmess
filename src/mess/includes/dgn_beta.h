@@ -51,6 +51,8 @@ typedef enum
 	GRAPH_640x512x2					/* Graphics 640X512X2 */
 } BETA_VID_MODES;
 	
+/*----------- defined in machine/dgn_beta.c -----------*/
+
 MACHINE_START( dgnbeta );
 
 // Page IO at FE00
@@ -76,6 +78,17 @@ void dgnbeta_ram_bE_w(offs_t offset, UINT8 data);
 void dgnbeta_ram_bF_w(offs_t offset, UINT8 data);
 void dgnbeta_ram_bG_w(offs_t offset, UINT8 data);
 
+/*  WD2797 FDC */
+READ8_HANDLER(dgnbeta_wd2797_r);
+WRITE8_HANDLER(dgnbeta_wd2797_w);
+
+extern int dgnbeta_font;
+void dgn_beta_frame_interrupt (int data);
+void dgn_beta_line_interrupt (int data);
+
+
+/*----------- defined in video/dgn_beta.c -----------*/
+
 /* mc6845 video display generator */
 void init_video(void);
 extern VIDEO_UPDATE( dgnbeta );
@@ -84,20 +97,10 @@ void vid_set_gctrl(int data);
 /* 74HC670 4x4bit colour ram */
 WRITE8_HANDLER(colour_ram_w);
 
-void dgn_beta_frame_interrupt (int data);
-void dgn_beta_line_interrupt (int data);
-
 READ8_HANDLER(dgnbeta_6845_r);
 WRITE8_HANDLER(dgnbeta_6845_w);
 
-/*  WD2797 FDC */
-READ8_HANDLER(dgnbeta_wd2797_r);
-WRITE8_HANDLER(dgnbeta_wd2797_w);
-
-extern int dgnbeta_font;
-
 
 #define iosize	(0xfEFF-0xfc00)
-extern UINT8 *ioarea;
 
 #endif

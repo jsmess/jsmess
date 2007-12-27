@@ -64,6 +64,8 @@
 #define C128_KEY_CURSOR_UP (input_port_14_word_r(0,0)&2)
 #define C128_KEY_CURSOR_LEFT (input_port_14_word_r(0,0)&1)
 
+/*----------- defined in machine/c128.c -----------*/
+
 extern UINT8 *c128_basic;
 extern UINT8 *c128_kernal;
 extern UINT8 *c128_chargen;
@@ -73,14 +75,12 @@ extern UINT8 *c128_internal_function;
 extern UINT8 *c128_external_function;
 extern UINT8 *c128_vdcram;
 
-WRITE8_HANDLER(c128_m6510_port_w);
  READ8_HANDLER(c128_m6510_port_r);
 WRITE8_HANDLER(c128_mmu8722_port_w);
  READ8_HANDLER(c128_mmu8722_port_r);
 WRITE8_HANDLER(c128_mmu8722_ff00_w);
  READ8_HANDLER(c128_mmu8722_ff00_r);
 int c128_capslock_r (void);
-WRITE8_HANDLER(c128_colorram_write);
 WRITE8_HANDLER(c128_write_0000);
 WRITE8_HANDLER(c128_write_1000);
 WRITE8_HANDLER(c128_write_4000);
@@ -98,9 +98,6 @@ extern MACHINE_RESET( c128 );
 
 extern VIDEO_START( c128 );
 extern VIDEO_UPDATE( c128 );
-
-/* private area */
-extern UINT8 c128_keyline[3];
 
 void c128_bankswitch_64 (int reset);
 

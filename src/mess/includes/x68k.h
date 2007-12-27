@@ -179,6 +179,8 @@ struct x68k_system
 	} mouse;
 };
 
+/*----------- defined in video/x68k.c -----------*/
+
 /*
 TIMER_CALLBACK(mfp_timer_a_callback);
 TIMER_CALLBACK(mfp_timer_b_callback);

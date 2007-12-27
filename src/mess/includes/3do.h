@@ -1,6 +1,8 @@
 #ifndef REAL_3DO_H
 #define REAL_3DO_H
 
+/*----------- defined in machine/3do.c -----------*/
+
 READ32_HANDLER( nvarea_r );
 WRITE32_HANDLER( nvarea_w );
 

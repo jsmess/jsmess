@@ -35,6 +35,7 @@ UINT8 *cbmb_kernal;
 static UINT8 *cbmb_chargen;
 UINT8 *cbmb_videoram;
 UINT8 *cbmb_colorram;
+UINT8 *cbmb_memory;
 
 /* tpi at 0xfde00
  in interrupt mode

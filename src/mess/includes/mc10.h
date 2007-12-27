@@ -9,6 +9,8 @@
 #ifndef MC10_H
 #define MC10_H
 
+/*----------- defined in machine/mc10.c -----------*/
+
 READ8_HANDLER ( mc10_bfff_r );
 WRITE8_HANDLER ( mc10_bfff_w );
 READ8_HANDLER ( mc10_port1_r );

@@ -23,6 +23,8 @@
 #define LMPR_RAM0	0x20	/* If bit set ram is paged into bank 0, else its rom0 */
 #define LMPR_ROM1	0x40	/* If bit set rom1 is paged into bank 3, else its ram */
 
+/*----------- defined in machine/coupe.c -----------*/
+
 extern UINT8 LMPR,HMPR,VMPR;/* Bank Select Registers (Low Page p250, Hi Page p251, Video Page p252) */
 extern UINT8 CLUT[16];		/* 16 entries in a palette (no line affects supported yet!) */
 extern UINT8 SOUND_ADDR;	/* Current Address in sound registers */
@@ -37,7 +39,8 @@ void coupe_update_memory(void);
 DEVICE_LOAD( coupe_floppy );
 MACHINE_START( coupe );
 
-void coupe_eof_callback(void);
+
+/*----------- defined in video/coupe.c -----------*/
 
 void drawMode1_line(mame_bitmap *,int);
 void drawMode2_line(mame_bitmap *,int);

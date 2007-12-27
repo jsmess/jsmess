@@ -152,8 +152,6 @@ void floppy_drive_write_track_data_info_buffer(mess_image *img, int side, const 
 void floppy_drive_format_sector(mess_image *img, int side, int sector_index, int c, int h, int r, int n, int filler);
 void floppy_drive_read_sector_data(mess_image *img, int side, int index1, void *pBuffer, int length);
 void floppy_drive_write_sector_data(mess_image *img, int side, int index1, const void *pBuffer, int length, int ddam);
-void floppy_drive_read_indexed_sector_data(mess_image *img, int side, int sector_index, void *pBuffer, int length);
-void floppy_drive_write_indexed_sector_data(mess_image *img, int side, int sector_index, const void *pBuffer, int length, int ddam);
 int	floppy_drive_get_datarate_in_us(DENSITY density);
 
 /* set motor speed to get correct index pulses

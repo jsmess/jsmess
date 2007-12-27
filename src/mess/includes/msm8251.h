@@ -63,6 +63,8 @@ struct msm8251
 /* reading and writing data register share the same address,
 and reading status and writing control share the same address */
 
+/*----------- defined in machine/msm8251.c -----------*/
+
 /* read data register */
  READ8_HANDLER(msm8251_data_r);
 /* read status register */

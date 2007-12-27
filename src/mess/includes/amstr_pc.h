@@ -1,3 +1,5 @@
+/*----------- defined in machine/amstr_pc.c -----------*/
+
 READ8_HANDLER( pc1640_port60_r );
 WRITE8_HANDLER( pc1640_port60_w );
 READ16_HANDLER( pc1640_16le_port60_r );

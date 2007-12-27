@@ -7,6 +7,8 @@
 #ifndef AT_H
 #define AT_H
 
+/*----------- defined in machine/at.c -----------*/
+
 DRIVER_INIT( atcga );
 DRIVER_INIT( at386 );
 DRIVER_INIT( at586 );

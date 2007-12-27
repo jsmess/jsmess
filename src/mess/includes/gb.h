@@ -4,14 +4,6 @@
 #include "mame.h"
 #include "sound/custom.h"
 
-void gameboy_sound_w(int offset, int data);
-
-#ifdef __MACHINE_GB_C
-#define EXTERN
-#else
-#define EXTERN extern
-#endif
-
 /* Interrupts */
 #define VBL_INT               0       /* V-Blank    */
 #define LCD_INT               1       /* LCD Status */
@@ -34,6 +26,17 @@ void gameboy_sound_w(int offset, int data);
 #define DMG_FRAMES_PER_SECOND	59.732155
 #define SGB_FRAMES_PER_SECOND	61.17
 
+/*----------- defined in audio/gb.c -----------*/
+
+/* Custom Sound Interface */
+extern READ8_HANDLER( gb_sound_r );
+extern WRITE8_HANDLER( gb_sound_w );
+extern READ8_HANDLER( gb_wave_r );
+extern WRITE8_HANDLER( gb_wave_w );
+void *gameboy_sh_start(int clock, const struct CustomSound_interface *config);
+
+/*----------- defined in machine/gb.c -----------*/
+
 WRITE8_HANDLER( gb_ram_enable );
 WRITE8_HANDLER( gb_io_w );
 READ8_HANDLER ( gb_io_r );
@@ -49,12 +52,53 @@ READ8_HANDLER( gbc_io2_r );
 MACHINE_START( gb );
 MACHINE_RESET( gb );
 MACHINE_RESET( gbpocket );
+
+/* -- Super GameBoy specific -- */
+#define SGB_BORDER_PAL_OFFSET	64	/* Border colours stored from pal 4-7	*/
+#define SGB_XOFFSET				48	/* GB screen starts at column 48		*/
+#define SGB_YOFFSET				40	/* GB screen starts at row 40			*/
+
+extern UINT16 sgb_pal_data[4096];	/* 512 palettes of 4 colours			*/
+extern UINT8 sgb_pal_map[20][18];	/* Palette tile map						*/
+extern UINT16 sgb_pal[128];			/* SGB palette remapping				*/
+extern UINT8 *sgb_tile_data;		/* 256 tiles of 32 bytes each			*/
+extern UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute)	*/
+extern UINT8 sgb_window_mask;		/* Current GB screen mask				*/
+extern UINT8 sgb_hack;				/* Flag set if we're using a hack		*/
+
+extern MACHINE_RESET( sgb );
+extern WRITE8_HANDLER ( sgb_io_w );
+
+/* -- GameBoy Color specific -- */
+#define GBC_MODE_GBC		1		/* GBC is in colour mode				*/
+#define GBC_MODE_MONO		2		/* GBC is in mono mode					*/
+
+extern UINT8 gbc_mode;				/* is the GBC in mono/colour mode?		*/
+
+MACHINE_RESET( gbc );
+
+
+/* -- Megaduck specific -- */
+extern DEVICE_LOAD(megaduck_cart);
+extern MACHINE_RESET( megaduck );
+extern  READ8_HANDLER( megaduck_video_r );
+extern WRITE8_HANDLER( megaduck_video_w );
+extern WRITE8_HANDLER( megaduck_rom_bank_select_type1 );
+extern WRITE8_HANDLER( megaduck_rom_bank_select_type2 );
+extern  READ8_HANDLER( megaduck_sound_r1 );
+extern WRITE8_HANDLER( megaduck_sound_w1 );
+extern  READ8_HANDLER( megaduck_sound_r2 );
+extern WRITE8_HANDLER( megaduck_sound_w2 );
+
+/*----------- defined in video/gb.c -----------*/
+
+WRITE8_HANDLER ( gbc_video_w );
+
 READ8_HANDLER( gb_oam_r );
 WRITE8_HANDLER( gb_oam_w );
 READ8_HANDLER( gb_vram_r );
 WRITE8_HANDLER( gb_vram_w );
 
-/* from video/gb.c */
 enum {
 	GB_VIDEO_DMG=1,
 	GB_VIDEO_MGB,
@@ -72,55 +116,7 @@ PALETTE_INIT( megaduck );
 
 READ8_HANDLER( gb_video_r );
 WRITE8_HANDLER( gb_video_w );
-VIDEO_START( gb );
-VIDEO_UPDATE( gb );
 void gb_video_init( int mode );
 void gb_video_up_to_date( void );
-
-EXTERN double lcd_time;
-/* Custom Sound Interface */
-extern READ8_HANDLER( gb_sound_r );
-extern WRITE8_HANDLER( gb_sound_w );
-extern READ8_HANDLER( gb_wave_r );
-extern WRITE8_HANDLER( gb_wave_w );
-void *gameboy_sh_start(int clock, const struct CustomSound_interface *config);
-
-/* -- Super GameBoy specific -- */
-#define SGB_BORDER_PAL_OFFSET	64	/* Border colours stored from pal 4-7	*/
-#define SGB_XOFFSET				48	/* GB screen starts at column 48		*/
-#define SGB_YOFFSET				40	/* GB screen starts at row 40			*/
-
-EXTERN UINT16 sgb_pal_data[4096];	/* 512 palettes of 4 colours			*/
-EXTERN UINT8 sgb_pal_map[20][18];	/* Palette tile map						*/
-extern UINT16 sgb_pal[128];			/* SGB palette remapping				*/
-extern UINT8 *sgb_tile_data;		/* 256 tiles of 32 bytes each			*/
-EXTERN UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute)	*/
-EXTERN UINT8 sgb_window_mask;		/* Current GB screen mask				*/
-EXTERN UINT8 sgb_hack;				/* Flag set if we're using a hack		*/
-
-extern MACHINE_RESET( sgb );
-extern WRITE8_HANDLER ( sgb_io_w );
-
-/* -- GameBoy Color specific -- */
-#define GBC_MODE_GBC		1		/* GBC is in colour mode				*/
-#define GBC_MODE_MONO		2		/* GBC is in mono mode					*/
-
-EXTERN UINT8 gbc_mode;				/* is the GBC in mono/colour mode?		*/
-
-MACHINE_RESET( gbc );
-WRITE8_HANDLER ( gbc_video_w );
-
-
-/* -- Megaduck specific -- */
-extern DEVICE_LOAD(megaduck_cart);
-extern MACHINE_RESET( megaduck );
-extern  READ8_HANDLER( megaduck_video_r );
-extern WRITE8_HANDLER( megaduck_video_w );
-extern WRITE8_HANDLER( megaduck_rom_bank_select_type1 );
-extern WRITE8_HANDLER( megaduck_rom_bank_select_type2 );
-extern  READ8_HANDLER( megaduck_sound_r1 );
-extern WRITE8_HANDLER( megaduck_sound_w1 );
-extern  READ8_HANDLER( megaduck_sound_r2 );
-extern WRITE8_HANDLER( megaduck_sound_w2 );
 
 #endif

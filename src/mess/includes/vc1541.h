@@ -18,6 +18,8 @@ typedef struct {
 	int devicenr;
 } VC1541_CONFIG;
 
+/*----------- defined in machine/vc1541.c -----------*/
+
 DEVICE_LOAD(vc1541);
 DEVICE_UNLOAD(vc1541);
 

@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+/*----------- defined in machine/pc8801.c -----------*/
+
 WRITE8_HANDLER(pc8801_write_interrupt_level);
 WRITE8_HANDLER(pc8801_write_interrupt_mask);
  READ8_HANDLER(pc88sr_inport_30);
@@ -27,8 +29,6 @@ extern MACHINE_RESET( pc88srh );
 void pc8801_update_bank(void);
 extern unsigned char *pc8801_mainRAM;
 extern int pc88sr_is_highspeed;
-int pc8801_floppy_id (int id);
-int pc8801_floppy_init (int id);
  READ8_HANDLER(pc8801fd_nec765_tc);
 void pc88sr_sound_interupt(int irq);
 WRITE8_HANDLER(pc8801_write_kanji1);
@@ -38,6 +38,8 @@ WRITE8_HANDLER(pc8801_write_kanji2);
 WRITE8_HANDLER(pc8801_calender);
  READ8_HANDLER(pc8801_read_extmem);
 WRITE8_HANDLER(pc8801_write_extmem);
+
+/*----------- defined in video/pc8801.c -----------*/
 
 void pc8801_video_init (int hireso);
 int is_pc8801_vram_select(void);
@@ -59,3 +61,4 @@ WRITE8_HANDLER(pc88sr_disp_31);
 WRITE8_HANDLER(pc88sr_disp_32);
 WRITE8_HANDLER(pc88sr_ALU);
 WRITE8_HANDLER(pc8801_palette_out);
+

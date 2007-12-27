@@ -1,5 +1,7 @@
 #include "machine/8255ppi.h"
 
+/*----------- defined in machine/ibmpc.c -----------*/
+
 extern const ppi8255_interface pc_ppi8255_interface;
 
 READ8_HANDLER( pc_rtc_r );

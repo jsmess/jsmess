@@ -13,8 +13,6 @@ The LCD is likely to be a SSD1828 LCD.
 #include "cpu/minx/minx.h"
 #include "devices/cartslot.h"
 
-UINT8	*pokemini_ram;
-
 static ADDRESS_MAP_START( pokemini_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x000FFF )  AM_ROM							/* bios */
 	AM_RANGE( 0x001000, 0x001FFF )	AM_RAM AM_BASE( &pokemini_ram)				/* VRAM/RAM */

@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+/*----------- defined in video/vdc8563.c -----------*/
+
 /* call to init videodriver */
 extern void vdc8563_init (int ram16konly);
 
@@ -27,8 +29,6 @@ extern WRITE8_HANDLER ( vdc8563_port_w );
 
 /* to be called when reading from port */
 extern  READ8_HANDLER ( vdc8563_port_r );
-
-extern void vdc8563_state (void);
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,8 @@
 /* from mame.c */
 //extern int bitmap_dirty;
 
-/* from machine/laser350.c */
+/*----------- defined in machine/vtech2.c -----------*/
+
 extern int laser_latch;
 
 DRIVER_INIT(laser);
@@ -18,7 +19,7 @@ extern  READ8_HANDLER ( laser_fdc_r );
 extern WRITE8_HANDLER ( laser_fdc_w );
 extern WRITE8_HANDLER ( laser_bank_select_w );
 
-/* from video/laser350.c */
+/*----------- defined in video/vtech2.c -----------*/
 
 extern char laser_frame_message[64+1];
 extern int laser_frame_time;

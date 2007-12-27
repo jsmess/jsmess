@@ -79,12 +79,10 @@ VIDEO_START( cdp1864 );
 VIDEO_UPDATE( cdp1864 );
 
  READ8_HANDLER( cdp1864_dispon_r );
-WRITE8_HANDLER( cdp1864_dispoff_w );
 
 void cdp1864_dma_w(UINT8 data);
 
 void cdp1864_audio_output_enable(int value);
-void cdp1864_reset(void);
 
 void cdp1864_configure(const CDP1864_interface *intf);
 
@@ -92,7 +90,5 @@ READ8_HANDLER( cdp1864_dispon_r );
 READ8_HANDLER( cdp1864_dispoff_r );
 WRITE8_HANDLER( cdp1864_step_bgcolor_w );
 WRITE8_HANDLER( cdp1864_tone_latch_w );
-
-VIDEO_UPDATE( cdp1864 );
 
 #endif

@@ -3,7 +3,13 @@
 
 #include "driver.h"
 
-/* machine/adam.c */
+/*----------- defined in drivers/adam.c -----------*/
+
+void set_memory_banks(void);
+void resetPCB(void);
+
+/*----------- defined in machine/adam.c -----------*/
+
 extern int adam_lower_memory; /* Lower 32k memory Z80 address configuration */
 extern int adam_upper_memory; /* Upper 32k memory Z80 address configuration */
 extern int adam_joy_stat[2];
@@ -14,8 +20,6 @@ int adam_cart_verify(const UINT8 *buf, size_t size);
 
 void clear_keyboard_buffer(void);
 void exploreKeyboard(void);
-void set_memory_banks(void);
-void resetPCB(void);
 
 DEVICE_LOAD( adam_floppy );
 DEVICE_UNLOAD( adam_floppy );
@@ -28,7 +32,6 @@ WRITE8_HANDLER ( adam_paddle_toggle_on );
 WRITE8_HANDLER ( adam_memory_map_controller_w );
  READ8_HANDLER ( adam_memory_map_controller_r );
  READ8_HANDLER ( adam_mem_r );
-WRITE8_HANDLER ( adam_mem_w );
  READ8_HANDLER ( adam_video_r );
 WRITE8_HANDLER ( adam_video_w );
 WRITE8_HANDLER ( common_writes_w );

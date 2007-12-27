@@ -1,3 +1,5 @@
+/*----------- defined in machine/cbmieeeb.c -----------*/
+
 void cbm_ieee_open(void);
 
 void cbm_ieee_dav_w(int device, int data);

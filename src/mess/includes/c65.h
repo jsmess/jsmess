@@ -30,6 +30,8 @@
 #define C65_KEY_F13 (input_port_13_word_r(0,0)&0x0010)
 #define C65_KEY_HELP (input_port_13_word_r(0,0)&0x0008)
 
+/*----------- defined in machine/c65.c -----------*/
+
 /*extern UINT8 *c65_memory; */
 /*extern UINT8 *c65_basic; */
 /*extern UINT8 *c65_kernal; */
@@ -39,7 +41,6 @@ extern UINT8 *c65_chargen;
 extern UINT8 *c65_interface;
 /*extern UINT8 *c65_graphics; */
 
-void c65_map(int a, int x, int y, int z);
 void c65_bankswitch (void);
 void c65_colorram_write (int offset, int value);
 
@@ -47,8 +48,5 @@ void c65_driver_init (void);
 void c65_driver_alpha1_init (void);
 void c65pal_driver_init (void);
 MACHINE_START( c65 );
-
-extern UINT8 c65_keyline;
-extern UINT8 c65_6511_port;
 
 #endif

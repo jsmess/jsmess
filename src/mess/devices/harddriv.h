@@ -13,8 +13,6 @@
 #include "image.h"
 #include "messdrv.h"
 
-const struct IODevice *mess_hd_device_specify(struct IODevice *iodev, int count);
-
 int device_init_mess_hd(mess_image *image);
 int device_load_mess_hd(mess_image *image);
 void device_unload_mess_hd(mess_image *image);

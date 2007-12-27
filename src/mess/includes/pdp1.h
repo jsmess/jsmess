@@ -7,7 +7,8 @@
 #define MEMORY_WRITE_START18(name) MEMORY_WRITE32_START(name)
 
 
-/* From drivers/pdp1.c */
+/*----------- defined in drivers/pdp1.c -----------*/
+
 /* defines for input port numbers */
 enum
 {
@@ -110,7 +111,8 @@ enum
 extern pdp1_reset_param_t pdp1_reset_param;
 
 
-/* From machine/pdp1.c */
+/*----------- defined in machine/pdp1.c -----------*/
+
 extern int *pdp1_memory;
 
 MACHINE_START( pdp1 );
@@ -149,6 +151,9 @@ void pdp1_io_sc_callback(void);
 
 INTERRUPT_GEN( pdp1_interrupt );
 
+void pdp1_get_open_mode(const struct IODevice *dev, int id,
+	unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
+
 typedef struct lightpen_t
 {
 	char active;
@@ -157,9 +162,9 @@ typedef struct lightpen_t
 	short radius;
 } lightpen_t;
 
-/* From video/pdp1.c */
+/*----------- defined in video/pdp1.c -----------*/
+
 VIDEO_START( pdp1 );
-VIDEO_EOF( pdp1 );
 VIDEO_UPDATE( pdp1 );
 
 void pdp1_plot(int x, int y);
@@ -240,5 +245,3 @@ enum
 	pen_lightpen_pressed = pen_green
 };
 
-void pdp1_get_open_mode(const struct IODevice *dev, int id,
-	unsigned int *readable, unsigned int *writeable, unsigned int *creatable);

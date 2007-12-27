@@ -23,14 +23,11 @@ extern int MMC1_extended; /* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1
 extern UINT8 MMC5_vram[0x400];
 extern int MMC5_vram_control;
 
-extern int Mapper;
-
 extern write8_handler mmc_write_low;
 extern read8_handler mmc_read_low;
 extern write8_handler mmc_write_mid;
 extern read8_handler mmc_read_mid;
 extern write8_handler mmc_write;
-extern void (*ppu_latch)(offs_t offset);
 
 int mapper_reset (int mapperNum);
 

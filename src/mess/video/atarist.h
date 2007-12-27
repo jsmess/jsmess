@@ -92,6 +92,5 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w );
 /* Video */
 
 VIDEO_START( atarist );
-VIDEO_UPDATE( atarist );
 
 #endif

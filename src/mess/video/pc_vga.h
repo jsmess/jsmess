@@ -44,7 +44,6 @@ void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);
 
 READ8_HANDLER( ega_port_03c0_r );
-READ8_HANDLER( ega_port_03d0_r );
 
 READ8_HANDLER( paradise_ega_03c0_r );
 READ16_HANDLER( paradise_ega16le_03c0_r );

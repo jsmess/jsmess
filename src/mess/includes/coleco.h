@@ -3,14 +3,16 @@
 
 #include "driver.h"
 
-/* machine/coleco.c */
+/*----------- defined in machine/coleco.c -----------*/
+
 int coleco_cart_verify(const UINT8 *buf, size_t size);
 
  READ8_HANDLER  ( coleco_paddle_r );
 WRITE8_HANDLER ( coleco_paddle_toggle_off );
 WRITE8_HANDLER ( coleco_paddle_toggle_on );
- READ8_HANDLER ( coleco_mem_r );
-WRITE8_HANDLER ( coleco_mem_w );
+
+/*----------- defined in drivers/coleco.c -----------*/
+
  READ8_HANDLER ( coleco_video_r );
 WRITE8_HANDLER ( coleco_video_w );
 

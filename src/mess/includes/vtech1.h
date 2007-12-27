@@ -1,6 +1,7 @@
 #include "devices/snapquik.h"
 
-/* from machine/vtech1.c */
+/*----------- defined in machine/vtech1.c -----------*/
+
 extern int vtech1_latch;
 
 
@@ -44,6 +45,8 @@ READ8_HANDLER ( vtech1_serial_r );
 WRITE8_HANDLER( vtech1_serial_w );
 WRITE8_HANDLER( vtech1_memory_bank_w );
 
+
+/*----------- defined in video/vtech1.c -----------*/
 
 /******************************************************************************
  Video

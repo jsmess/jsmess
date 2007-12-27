@@ -1,6 +1,8 @@
 #define READ18_HANDLER(name) READ32_HANDLER(name)
 #define WRITE18_HANDLER(name) WRITE32_HANDLER(name)
 
+/*----------- defined in machine/tx0.c -----------*/
+
 MACHINE_START( tx0 );
 void tx0_tape_get_open_mode(const struct IODevice *dev, int id,
 	unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
@@ -22,6 +24,8 @@ void tx0_sel(void);
 void tx0_io_cpy(void);
 void tx0_io_reset_callback(void);
 INTERRUPT_GEN( tx0_interrupt );
+
+/*----------- defined in video/tx0.c -----------*/
 
 VIDEO_START( tx0 );
 void tx0_plot(int x, int y);

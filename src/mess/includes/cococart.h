@@ -10,6 +10,7 @@ enum
 	CARTLINE_Q
 };
 
+#if 0
 struct cartridge_callback
 {
 	void (*setcartline)(int data);
@@ -32,5 +33,6 @@ extern const struct cartridge_slot cartridge_standard;
 extern const struct cartridge_slot cartridge_banks;
 extern const struct cartridge_slot cartridge_banks_mega;
 extern const struct cartridge_slot cartridge_Orch90;
+#endif
 
 #endif /* COCOCART_H */

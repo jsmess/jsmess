@@ -19,7 +19,6 @@ READ8_HANDLER ( pc_MDA_r );
 
 extern const unsigned char mda_palette[4][3];
 extern const gfx_layout pc_mda_charlayout;
-extern const gfx_layout pc_mda_gfxlayout_1bpp;
 GFXDECODE_EXTERN( pc_mda_gfxdecodeinfo );
 extern const unsigned short mda_colortable[256*2+1*2];
 

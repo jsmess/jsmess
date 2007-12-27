@@ -1,6 +1,8 @@
 #ifndef __VC20_TAPE_H_
 #define __VC20_TAPE_H_
 
+/*----------- defined in machine/vc20tape.c -----------*/
+
 /* put this into your gamedriver */
 void vc20tape_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
 

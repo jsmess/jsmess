@@ -1,6 +1,8 @@
 #ifndef __TED7360_H_
 #define __TED7360_H_
 
+/*----------- defined in video/ted7360.c -----------*/
+
 /*
  * if you need this chip in another mame/mess emulation than let it me know
  * I will split this from the c16 driver
@@ -62,13 +64,13 @@ extern void ted7360_frame_interrupt (void);
 extern void ted7360_raster_interrupt (void);
 
 /* private area */
-
-/* from audio/pc.c */
-void *ted7360_custom_start (int clock, const struct CustomSound_interface *config);
-void ted7360_soundport_w (int mode, int data);
-
 extern UINT8 ted7360[0x20];
 extern int ted7360_pal;
 extern int ted7360_rom;
+
+/*----------- defined in audio/ted7360.c -----------*/
+
+void *ted7360_custom_start (int clock, const struct CustomSound_interface *config);
+void ted7360_soundport_w (int mode, int data);
 
 #endif

@@ -14,6 +14,8 @@ extern "C" {
 /* must be defined until some driver init problems are solved */
 #define NEW_GAMEDRIVER
 
+/*----------- defined in machine/cbm.c -----------*/
+
 /* global header file for
  * vc20
  * c16
@@ -61,7 +63,6 @@ QUICKLOAD_LOAD( cbm_pet1 );
 QUICKLOAD_LOAD( cbm_pet );
 QUICKLOAD_LOAD( cbm_c16 );
 QUICKLOAD_LOAD( cbm_c64 );
-QUICKLOAD_LOAD( cbm_c128 );
 QUICKLOAD_LOAD( cbm_vc20 );
 QUICKLOAD_LOAD( cbmb );
 QUICKLOAD_LOAD( cbm500 );

@@ -1,4 +1,5 @@
-/* in video/pocketc.c */
+/*----------- defined in video/pocketc.c -----------*/
+
 extern PALETTE_INIT( pocketc );
 extern VIDEO_START( pocketc );
 

@@ -9,6 +9,8 @@
 #ifndef __CBMDRIVE_H_
 #define __CBMDRIVE_H_
 
+/*----------- defined in machine/cbmdrive.c -----------*/
+
 #if 0
 #define IEC 1
 #define SERIAL 2
@@ -80,20 +82,9 @@ typedef struct
 }
 CBM_Serial;
 
-extern CBM_Serial cbm_serial;
-
 void cbm_drive_open_helper (void);
 void c1551_state (CBM_Drive * c1551);
 void vc1541_state (CBM_Drive * vc1541);
 void c2031_state(CBM_Drive *drive);
-
-#if 0
-void c1551_write_data (CBM_Drive * drive, int data);
-int c1551_read_data (CBM_Drive * drive);
-void c1551_write_handshake (CBM_Drive * drive, int data);
-int c1551_read_handshake (CBM_Drive * drive);
-int c1551_read_status (CBM_Drive * drive);
-
-#endif
 
 #endif

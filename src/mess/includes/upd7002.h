@@ -14,6 +14,8 @@ struct uPD7002_interface
 		void (*EOC_func)(int data);
 };
 
+/*----------- defined in machine/upd7002.c -----------*/
+
 void uPD7002_config(const struct uPD7002_interface *intf);
 
  READ8_HANDLER ( uPD7002_EOC_r );

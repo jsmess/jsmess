@@ -1,7 +1,8 @@
 #ifndef MBEE_H
 #define MBEE_H
 
-/* from mess/machine/mbee.c */
+/*----------- defined in machine/mbee.c -----------*/
+
 MACHINE_RESET( mbee );
 MACHINE_START( mbee );
 MACHINE_START( mbee56 );
@@ -20,7 +21,8 @@ WRITE8_HANDLER ( mbee_pio_w );
 WRITE8_HANDLER ( mbee_fdc_motor_w );
 
 
-/* from mess/video/mbee.c */
+/*----------- defined in video/mbee.c -----------*/
+
 extern char mbee_frame_message[128+1];
 extern int mbee_frame_counter;
 extern UINT8 *pcgram;

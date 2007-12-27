@@ -17,9 +17,7 @@
 #define COCO_CPU_SPEED			(ATTOTIME_IN_HZ(COCO_CPU_SPEED_HZ))
 #define COCO_TIMER_CMPCARRIER	(COCO_CPU_SPEED * 0.25)
 
-/* ----------------------------------------------------------------------- *
- * from video/coco.c                                                     *
- * ----------------------------------------------------------------------- */
+/*----------- defined in video/coco.c -----------*/
 
 ATTR_CONST UINT8 coco_get_attributes(UINT8 c);
 
@@ -27,9 +25,7 @@ VIDEO_START( dragon );
 VIDEO_START( coco );
 VIDEO_START( coco2b );
 
-/* ----------------------------------------------------------------------- *
- * from video/coco3.c                                                    *
- * ----------------------------------------------------------------------- */
+/*----------- defined in video/coco3.c -----------*/
 
 VIDEO_START( coco3 );
 VIDEO_START( coco3p );
@@ -38,9 +34,7 @@ WRITE8_HANDLER ( coco3_palette_w );
 UINT32 coco3_get_video_base(UINT8 ff9d_mask, UINT8 ff9e_mask);
 void coco3_vh_blink(void);
 
-/* ----------------------------------------------------------------------- *
- * from machine/coco.c                                                     *
- * ----------------------------------------------------------------------- */
+/*----------- defined in machine/coco.c -----------*/
 
 extern UINT8 coco3_gimereg[16];
 
@@ -68,7 +62,6 @@ WRITE8_HANDLER ( coco_cartridge_w );
 READ8_HANDLER ( coco3_cartridge_r);
 WRITE8_HANDLER ( coco3_cartridge_w );
 offs_t coco3_mmu_translate(int bank, int offset);
-int coco_bitbanger_init (int id);
 WRITE8_HANDLER( coco_pia_1_w );
 void coco3_horizontal_sync_callback(int data);
 void coco3_field_sync_callback(int data);
@@ -89,15 +82,6 @@ READ8_HANDLER(wd2797_r);
 WRITE8_HANDLER(wd2797_w);
 
 void coco_set_halt_line(int halt_line);
-
-/* Returns whether a given piece of logical memory is contiguous or not */
-int coco3_mmu_ismemorycontiguous(int logicaladdr, int len);
-
-/* Reads logical memory into a buffer */
-void coco3_mmu_readlogicalmemory(UINT8 *buffer, int logicaladdr, int len);
-
-/* Translates a logical address to a physical address */
-int coco3_mmu_translatelogicaladdr(int logicaladdr);
 
 #define IO_BITBANGER IO_PRINTER
 #define IO_VHD IO_HARDDISK
@@ -120,4 +104,3 @@ struct coco3_video_vars
 extern const struct coco3_video_vars coco3_vidvars;
 
 #endif /* DRAGON_H */
-READ8_HANDLER( dragon_alpha_mapped_irq_r );

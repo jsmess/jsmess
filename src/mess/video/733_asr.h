@@ -14,8 +14,6 @@ enum
 
 GFXDECODE_EXTERN( asr733_gfxdecodeinfo );
 
-extern unsigned char asr733_palette[];
-extern unsigned short asr733_colortable[];
 enum
 {
 	asr733_palette_size = 2 /** 3*/,

@@ -8,6 +8,8 @@
 		
  ******************************************************************************/
 
+/*----------- defined in machine/compis.c -----------*/
+
 DRIVER_INIT(compis);
 MACHINE_RESET(compis);
 INTERRUPT_GEN(compis_vblank_int);

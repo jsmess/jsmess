@@ -2,6 +2,8 @@
 ** Spectravideo SVI-318 and SVI-328
 */
 
+/*----------- defined in machine/svi318.c -----------*/
+
 DRIVER_INIT( svi318 );
 MACHINE_START( svi318_pal );
 MACHINE_START( svi318_ntsc );
@@ -28,7 +30,6 @@ WRITE8_HANDLER( svi318_ppi_w );
 WRITE8_HANDLER( svi318_psg_port_b_w );
 READ8_HANDLER( svi318_psg_port_a_r );
 
-DEVICE_LOAD( svi318_cassette );
 int svi318_cassette_present(int id);
 
 READ8_HANDLER( svi318_fdc_irqdrq_r );

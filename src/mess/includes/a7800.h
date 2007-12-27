@@ -1,7 +1,8 @@
 #ifndef A7800_H
 #define A7800_H
 
-/* video/a7800.c */
+/*----------- defined in video/a7800.c -----------*/
+
 VIDEO_START( a7800 );
 VIDEO_UPDATE( a7800 );
 void a7800_interrupt(void);
@@ -9,7 +10,8 @@ void a7800_interrupt(void);
 WRITE8_HANDLER ( a7800_MARIA_w );
 
 
-/* machine/a7800.c */
+/*----------- defined in machine/a7800.c -----------*/
+
 extern int a7800_lines;
 extern int a7800_ispal;
 
@@ -24,7 +26,6 @@ DEVICE_LOAD( a7800_cart );
  READ8_HANDLER  ( a7800_TIA_r );
 WRITE8_HANDLER ( a7800_TIA_w );
  READ8_HANDLER  ( a7800_RIOT_r );
-WRITE8_HANDLER ( a7800_RIOT_w );
 WRITE8_HANDLER ( a7800_RAM0_w );
 WRITE8_HANDLER ( a7800_cart_w );
 

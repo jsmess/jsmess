@@ -124,7 +124,7 @@
 #define TYPE_PLUS4 ((input_port_9_r(0)&0xc)==4)
 #define TYPE_364 ((input_port_9_r(0)&0xc)==8)
 
-extern UINT8 *c16_memory;
+/*----------- defined in machine/c16.c -----------*/
 
 UINT8 c16_m7501_port_read(void);
 void c16_m7501_port_write(UINT8 data);
@@ -138,11 +138,6 @@ extern  READ8_HANDLER(plus4_6529_port_r);
 
 extern WRITE8_HANDLER(c16_6529_port_w);
 extern  READ8_HANDLER(c16_6529_port_r);
-
-extern WRITE8_HANDLER(c364_speech_w);
-extern  READ8_HANDLER(c364_speech_r);
-
-extern void c364_speech_init(void);
 
 #if 0
 extern WRITE8_HANDLER(c16_iec9_port_w);
@@ -166,5 +161,13 @@ extern MACHINE_RESET( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
 
 extern DEVICE_LOAD(c16_rom);
+
+
+/*----------- defined in audio/t6721.c -----------*/
+
+extern WRITE8_HANDLER(c364_speech_w);
+extern  READ8_HANDLER(c364_speech_r);
+
+extern void c364_speech_init(void);
 
 #endif

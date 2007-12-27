@@ -3,6 +3,8 @@
 extern "C" {
 #endif
 
+/*----------- defined in machine/pc_mouse.c -----------*/
+
 typedef enum { TYPE_MICROSOFT_MOUSE, TYPE_MOUSE_SYSTEMS } PC_MOUSE_PROTOCOL;
 
 void pc_mouse_handshake_in(int n, int data);

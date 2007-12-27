@@ -2,6 +2,8 @@
 
 #include "driver.h"
 
+/*----------- defined in machine/6551.c -----------*/
+
 WRITE8_HANDLER(acia_6551_w);
  READ8_HANDLER(acia_6551_r);
 

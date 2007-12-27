@@ -8,7 +8,12 @@
  */
 #define OSC_Y1 4000000
 
+/*----------- defined in machine/aim65.c -----------*/
+
 extern DRIVER_INIT( aim65 );
+
+
+/*----------- defined in video/aim65.c -----------*/
 
 VIDEO_START( aim65 );
 

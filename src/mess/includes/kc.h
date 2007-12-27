@@ -10,7 +10,7 @@
 #define KC85_SCREEN_WIDTH 320
 #define KC85_SCREEN_HEIGHT 256
 
-extern QUICKLOAD_LOAD( kc );
+/*----------- defined in video/kc.c -----------*/
 
 extern PALETTE_INIT( kc85 );
 
@@ -20,6 +20,16 @@ VIDEO_START( kc85_3 );
 VIDEO_START( kc85_4 );
 VIDEO_UPDATE( kc85_3 );
 VIDEO_UPDATE( kc85_4 );
+
+/* select video ram to display */
+void kc85_4_video_ram_select_bank(int bank);
+/* select video ram which is visible in address space */
+unsigned char *kc85_4_get_video_ram_base(int bank, int colour);
+
+/*----------- defined in machine/kc.c -----------*/
+
+extern QUICKLOAD_LOAD( kc );
+
 MACHINE_RESET( kc85_3 );
 MACHINE_RESET( kc85_4 );
 MACHINE_RESET( kc85_4d );
@@ -37,8 +47,6 @@ WRITE8_HANDLER(kc85_4_86_w);
 
  READ8_HANDLER(kc85_pio_data_r);
 
-WRITE8_HANDLER(kc85_module_w);
-
 WRITE8_HANDLER(kc85_4_pio_data_w);
 WRITE8_HANDLER(kc85_3_pio_data_w);
 
@@ -47,11 +55,6 @@ WRITE8_HANDLER(kc85_pio_control_w);
 
  READ8_HANDLER(kc85_ctc_r);
 WRITE8_HANDLER(kc85_ctc_w);
-
-/* select video ram to display */
-void kc85_4_video_ram_select_bank(int bank);
-/* select video ram which is visible in address space */
-unsigned char *kc85_4_get_video_ram_base(int bank, int colour);
 
 /* this is a fake keyboard layout. 
 The keys are converted into codes which are transmitted by the keyboard to the base-unit */
@@ -162,9 +165,6 @@ WRITE8_HANDLER(kc85_module_w);
 
 /* IO_FLOPPY device */
 
-/* for IO_ device init */
-int kc85_floppy_init(mess_image *img, mame_file *fp, int open_mode);
-
 /* used to setup machine */
 
 #define KC_DISC_INTERFACE_PORT_R \
@@ -173,8 +173,6 @@ int kc85_floppy_init(mess_image *img, mame_file *fp, int open_mode);
 #define KC_DISC_INTERFACE_PORT_W \
 	{0x0f0, 0x0f3, kc85_disc_interface_ram_w}, \
 	{0x0f4, 0x0f4, kc85_disc_interface_latch_w},
-
-extern MACHINE_DRIVER_EXTERN( cpu_kc_disc );
 
 #define KC_DISC_INTERFACE_ROM
 

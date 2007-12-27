@@ -131,6 +131,8 @@ struct serial_connection
 	void	(*in_callback)(int id, unsigned long state);
 };
 
+/*----------- defined in machine/serial.c -----------*/
+
 /* setup out and in callbacks */
 void serial_connection_init(struct serial_connection *connection);
 

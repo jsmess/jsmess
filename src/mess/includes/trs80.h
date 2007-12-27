@@ -11,17 +11,14 @@
 #define TRS80_FONT_W 6
 #define TRS80_FONT_H 12
 
+/*----------- defined in machine/trs80.c -----------*/
+
 extern UINT8 trs80_port_ff;
 
 DEVICE_LOAD( trs80_cas );
 DEVICE_UNLOAD( trs80_cas );
 DEVICE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
-
-VIDEO_START( trs80 );
-VIDEO_UPDATE( trs80 );
-
-void trs80_sh_sound_init(const char * gamename);
 
 MACHINE_START( trs80 );
 DRIVER_INIT( trs80 );
@@ -43,6 +40,11 @@ WRITE8_HANDLER( trs80_printer_w );
 WRITE8_HANDLER( trs80_motor_w );
 
 READ8_HANDLER( trs80_keyboard_r );
+
+/*----------- defined in video/trs80.c -----------*/
+
+VIDEO_START( trs80 );
+VIDEO_UPDATE( trs80 );
 
 WRITE8_HANDLER( trs80_videoram_w );
 

@@ -27,6 +27,8 @@
 
 /* Function prototypes */
 
+/*----------- defined in machine/sms.c -----------*/
+
 WRITE8_HANDLER(sms_cartram_w);
 WRITE8_HANDLER(sms_cartram2_w);
 WRITE8_HANDLER(sms_fm_detect_w);

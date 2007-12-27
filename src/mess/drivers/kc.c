@@ -326,7 +326,7 @@ static ADDRESS_MAP_START(kc85_disc_hw_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0fc, 0x0ff) AM_READWRITE(kc85_disk_hw_ctc_r, kc85_disk_hw_ctc_w)
 ADDRESS_MAP_END
 
-MACHINE_DRIVER_START( cpu_kc_disc )
+static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem, 0)
 	MDRV_CPU_IO_MAP(kc85_disc_hw_io, 0)
