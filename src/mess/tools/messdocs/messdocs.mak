@@ -49,7 +49,7 @@ $(OBJ)/build/$(MESSDOCS): $(MESSDOCS_OBJS) $(LIBUTIL) $(LIBOCORE) $(EXPAT)
 
 help: maketree $(MESSHELP)
 
-$(MESSHELP): $(OBJ)/build/$(MESSDOCS)
+$(MESSHELP): $(OBJ)/build/$(MESSDOCS) sysinfo.dat
 	$(subst /,\,$(OBJ)/build/$(MESSDOCS)) docs/wintoc.xml $(HELPOBJ)
 	$(HHC) $(subst /,\\,$(HELPOBJ))\\mess.hhp
 	@cp $(HELPOBJ)/$(MESSHELP) $@

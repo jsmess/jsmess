@@ -68,7 +68,7 @@ static void combine_path(char *buf, size_t buflen, const char *relpath)
 		if (osd_is_path_separator(buf[i]))
 			buf[i] = PATH_SEPARATOR[0];
 	}
-	
+
 	while(osd_is_path_separator(buf[--i]))
 		;
 	i++;
@@ -215,6 +215,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 	FILE *sysfile = NULL;
 	int lineno = 0;
 	int i;
+	int ul = FALSE;
 
 	struct messdocs_state *state = (struct messdocs_state *) data;
 
@@ -240,7 +241,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 		/* output TOC info */
 		fprintf(state->chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
 		fprintf(state->chm_toc, "\t\t<param name=\"Name\"  value=\"%s\">\n", name);
-		fprintf(state->chm_toc, "\t\t<param name=\"Local\" value=\"%s\">\n", filepath);	
+		fprintf(state->chm_toc, "\t\t<param name=\"Local\" value=\"%s\">\n", filepath);
 		fprintf(state->chm_toc, "\t\t</OBJECT>\n");
 
 		/* copy file */
@@ -338,20 +339,56 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 					break;
 
 				html_encode(buf, sizeof(buf) / sizeof(buf[0]));
-				if (lineno == 0)
+
+				if (!strncmp(buf, "======", 6) && lineno == 0)
 				{
-					fprintf(sysfile, "<h2>%s</h2>\n", buf);
+					char *heading = malloc(strlen(buf) + 1);
+					memset(heading, 0, strlen(buf) + 1);
+					strncpy(heading, buf + 6, strlen(buf) - 12);
+					fprintf(sysfile, "<h1>%s</h1>\n", heading);
 					fprintf(sysfile, "<p><i>(directory: %s)</i></p>\n", sysname);
 
 					if (!sysinfo_array[sys_count-1].desc)
-						sysinfo_array[sys_count-1].desc = pool_strdup(state->pool, buf);
+						sysinfo_array[sys_count-1].desc = pool_strdup(state->pool, heading);
+
+					free(heading);
 				}
-				else if (buf[strlen(buf)-1] == ':')
+				else if (buf[0] == '=')
 				{
-					fprintf(sysfile, "<h3>%s</h3>\n", buf);
+					int count;
+					char *heading = malloc(strlen(buf) + 1);
+					memset(heading, 0, strlen(buf) + 1);
+
+					if (ul)
+					{
+						fprintf(sysfile, "</ul>");
+						ul = FALSE;
+					}
+
+					for (count = 0; buf[count] == '='; count++);
+
+					strncpy(heading, buf + count, strlen(buf) - count*2);
+					fprintf(sysfile, "<h%d>%s</h%d>\n", 7-count, heading, 7-count);
+					free(heading);
+				}
+				else if (!strncmp(buf, "  * ", 4))
+				{
+					if (!ul)
+					{
+						fprintf(sysfile, "<ul>");
+					}
+
+					ul = TRUE;
+
+					fprintf(sysfile, "<li>%s</li>", buf + 4);
 				}
 				else
 				{
+					if (ul)
+					{
+						fprintf(sysfile, "</ul>");
+						ul = FALSE;
+					}
 					fprintf(sysfile, "%s\n", buf);
 				}
 				lineno++;
@@ -526,7 +563,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	{
 		len = (int) fread(buf, 1, sizeof(buf), in);
 		done = feof(in);
-		
+
 		if (XML_Parse(state.parser, buf, len, done) == XML_STATUS_ERROR)
 		{
 			process_error(&state, NULL, NULL);
