@@ -10,8 +10,6 @@
 #ifndef MSLEGACY_H
 #define MSLEGACY_H
 
-#define TIME_IN_USEC(us)		((double)(us) * (1.0 / 1000000.0))
-
 INLINE void palette_set_colors_rgb(running_machine *machine, pen_t color_base, const UINT8 *colors, int color_count)
 {
 	while (color_count--)

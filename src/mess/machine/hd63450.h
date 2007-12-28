@@ -7,8 +7,8 @@
 struct hd63450_interface
 {
 	int cpu;
-	double clock[4];
-	double burst_clock[4];
+	attotime clock[4];
+	attotime burst_clock[4];
 	void (*dma_end)(int channel,int irq);  // called when the DMA transfer ends
 	void (*dma_error)(int channel, int irq);  // called when a DMA transfer error occurs
 	int (*dma_read[4])(int addr);  // special read / write handlers for each channel

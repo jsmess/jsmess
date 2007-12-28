@@ -138,7 +138,6 @@
 #include "machine/rp5c15.h"
 #include "devices/basicdsk.h"
 #include "includes/x68k.h"
-#include "mslegacy.h"
 
 struct x68k_system sys;
 
@@ -1538,8 +1537,8 @@ static const ppi8255_interface ppi_interface =
 static const struct hd63450_interface dmac_interface =
 {
 	0,  // CPU - 68000
-	{TIME_IN_USEC(32),TIME_IN_USEC(32),TIME_IN_USEC(4),TIME_IN_USEC(32)},  // Cycle steal mode timing (guesstimate)
-	{TIME_IN_USEC(32),TIME_IN_USEC(50)/1000,TIME_IN_USEC(50)/1000,TIME_IN_USEC(50)/1000}, // Burst mode timing (guesstimate)
+	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_USEC(4),STATIC_ATTOTIME_IN_USEC(32)},  // Cycle steal mode timing (guesstimate)
+	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(50),STATIC_ATTOTIME_IN_NSEC(50),STATIC_ATTOTIME_IN_NSEC(50)}, // Burst mode timing (guesstimate)
 	x68k_dma_end,
 	x68k_dma_error,
 	{ x68k_fdc_read_byte, 0, 0, 0 },
