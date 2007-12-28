@@ -352,10 +352,7 @@ MACHINE_RESET( gbc )
 	else
 		gbc_mode = GBC_MODE_MONO;
 
-	/* Extra initialization to get the state after running the bios */
-	{
-		cpunum_set_input_line( 0, VBL_INT, ASSERT_LINE );
-	}
+	gb_timer.divcount = 0x1E9C;
 }
 
 static void gb_machine_stop(running_machine *machine)
