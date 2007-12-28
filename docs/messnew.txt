@@ -24,6 +24,8 @@ System Driver Changes:
 
 - [GAMEBOY] Improved handling of OAM locking in certain STAT modes.  [Wilbert Pol]
 
+- [GAMEBOY] Improved penalty cycle count for enabled sprites.  [Wilbert Pol]
+
 - [MEPHISTO] Fixed a keyboard mapping bug.  [Dirk Verwiebe]
 
 - [QL] Added sound. [Curt Coder]
