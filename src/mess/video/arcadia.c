@@ -535,7 +535,7 @@ VIDEO_START( arcadia )
 		arcadia_rectangle[i][5]=arcadia_rectangle[i][6]=arcadia_rectangle[i][7]=arcadia_rectangle[i][4];
 	}
 
-	arcadia_video.bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	arcadia_video.bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 }
 
 READ8_HANDLER(arcadia_video_r)

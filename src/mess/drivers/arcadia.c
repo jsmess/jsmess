@@ -306,7 +306,7 @@ static const gfx_layout arcadia_charlayout =
 	1*8
 };
 
-static GFXDECODE_START( arcadia_gfxdecodeinfo )
+static GFXDECODE_START( arcadia )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, arcadia_charlayout, 0, 128 )
 GFXDECODE_END
 
@@ -348,7 +348,7 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(128+2*XPOS, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 2*XPOS+128-1, 0, 262-1)
-	MDRV_GFXDECODE( arcadia_gfxdecodeinfo )
+	MDRV_GFXDECODE( arcadia )
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(arcadia_palette))
 	MDRV_COLORTABLE_LENGTH(sizeof (arcadia_colortable) / sizeof(arcadia_colortable[0][0]))
 	MDRV_PALETTE_INIT( arcadia )

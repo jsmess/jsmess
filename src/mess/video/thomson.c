@@ -915,7 +915,7 @@ VIDEO_UPDATE ( thom )
 	const int yup = THOM_BORDER_HEIGHT + THOM_ACTIVE_HEIGHT;
 	const int ybot = THOM_BORDER_HEIGHT + thom_bheight + 200;
 	UINT16* v = thom_vbody;
-	pen_t border = Machine->pens[ 0 ];
+	pen_t border = machine->pens[ 0 ];
 	rectangle wrect = { 0, xright - 1, 0, 0 };
 	rectangle lrect = { 0, xbleft - 1, 0, 0 };
 	rectangle rrect = { xbright, xright - 1, 0, 0 };
@@ -926,13 +926,13 @@ VIDEO_UPDATE ( thom )
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
 	{
 		if ( thom_border_l[ y ] != -1 ) 
-			border = Machine->pens[ thom_border_l[ y ] ];
+			border = machine->pens[ thom_border_l[ y ] ];
 	}
 	ypos = 0;
 	while ( y < THOM_BORDER_HEIGHT ) 
 	{
 		if ( thom_border_l[ y ] != -1 ) 
-			border = Machine->pens[ thom_border_l[ y ] ];
+			border = machine->pens[ thom_border_l[ y ] ];
 		wrect.min_y = ypos;
 		do 
 		{ 
@@ -948,7 +948,7 @@ VIDEO_UPDATE ( thom )
 	while ( y < yup ) 
 	{
 		if ( thom_border_l[ y ] != -1 ) 
-			border = Machine->pens[ thom_border_l[ y ] ];
+			border = machine->pens[ thom_border_l[ y ] ];
 		lrect.min_y = ypos;
 		do 
 		{ 
@@ -964,7 +964,7 @@ VIDEO_UPDATE ( thom )
 	while (y < ybot ) 
 	{
 		if ( thom_border_l[ y ] != -1 ) 
-			border = Machine->pens[ thom_border_l[ y ] ];
+			border = machine->pens[ thom_border_l[ y ] ];
 		wrect.min_y = ypos;
 		do 
 		{ 
@@ -978,13 +978,13 @@ VIDEO_UPDATE ( thom )
 	/* right border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT; y++ ) {
 		if ( thom_border_r[ y ] != -1 ) 
-			border = Machine->pens[ thom_border_r[ y ] ];
+			border = machine->pens[ thom_border_r[ y ] ];
 	}
 	ypos = thom_bheight /* * scale */;
 	while ( y < yup ) 
 	{
 		if ( thom_border_r[ y ] != -1 ) 
-			border = Machine->pens[ thom_border_r[ y ] ];
+			border = machine->pens[ thom_border_r[ y ] ];
 		rrect.min_y = ypos;
 		do 
 		{ 

@@ -553,8 +553,8 @@ VIDEO_UPDATE( vdc8563 )
 	} else {
 		for (i=0; i<512; i++) {
 			if (full_refresh||vdc.fontdirty[i]) {
-				decodechar(Machine->gfx[0],i,vdc.ram+(vdc.fontram_start&vdc.mask),
-						   Machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0],i,vdc.ram+(vdc.fontram_start&vdc.mask),
+						   machine->drv->gfxdecodeinfo[0].gfxlayout);
 				vdc.fontdirty[i]=0;
 			}
 		}
@@ -567,15 +567,15 @@ VIDEO_UPDATE( vdc8563 )
 		int h=CRTC6845_CHAR_LINES;
 		int height=CRTC6845_CHAR_HEIGHT;
 
-		plot_box(bitmap, 0, 0, Machine->gfx[0]->width*(w+2), height, Machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, 0, 0, machine->gfx[0]->width*(w+2), height, machine->pens[FRAMECOLOR]);
 
-		plot_box(bitmap, 0, height, Machine->gfx[0]->width, height*h, Machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, 0, height, machine->gfx[0]->width, height*h, machine->pens[FRAMECOLOR]);
 
-		plot_box(bitmap, Machine->gfx[0]->width*(w+1), height, Machine->gfx[0]->width, height*h,
-				 Machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, machine->gfx[0]->width*(w+1), height, machine->gfx[0]->width, height*h,
+				 machine->pens[FRAMECOLOR]);
 
-		plot_box(bitmap, 0, height*(h+1), Machine->gfx[0]->width*(w+2), height,
-				 Machine->pens[FRAMECOLOR]);
+		plot_box(bitmap, 0, height*(h+1), machine->gfx[0]->width*(w+2), height,
+				 machine->pens[FRAMECOLOR]);
 	}
 
 	vdc.changed=0;

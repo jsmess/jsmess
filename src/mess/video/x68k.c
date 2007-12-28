@@ -899,14 +899,12 @@ static const gfx_layout x68k_pcg_16 =
 	128*8
 };
 
-/*
-static gfx_decode x68k_gfxdecodeinfo[] =
-{
-	{ REGION_USER1, 0, &x68k_pcg_8, 0x100, 16 },  // 8x8 sprite tiles
-	{ REGION_USER1, 0, &x68k_pcg_16, 0x100, 16 },  // 16x16 sprite tiles
-	{ -1 }
-};
-*/
+#if 0
+static GFXDECODEINFO_START( x68k )
+	GFXDECODE_ENTRY( REGION_USER1, 0, x68k_pcg_8, 0x100, 16 )  // 8x8 sprite tiles
+	GFXDECODE_ENTRY( REGION_USER1, 0, x68k_pcg_16, 0x100, 16 )  // 16x16 sprite tiles
+GFXDECODEINFO_END
+#endif
 
 static TILE_GET_INFO(x68k_get_bg0_tile)
 {
@@ -954,19 +952,19 @@ VIDEO_START( x68000 )
 	x68k_gfx_0_bitmap_65536 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
 
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	Machine->gfx[gfx_index] = allocgfx(&x68k_pcg_8);
-	decodegfx(Machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
-	Machine->gfx[gfx_index]->total_colors = 32;
+	machine->gfx[gfx_index] = allocgfx(&x68k_pcg_8);
+	decodegfx(machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
+	machine->gfx[gfx_index]->total_colors = 32;
 
 	gfx_index++;
 
-	Machine->gfx[gfx_index] = allocgfx(&x68k_pcg_16);
-	decodegfx(Machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
-	Machine->gfx[gfx_index]->total_colors = 32;
+	machine->gfx[gfx_index] = allocgfx(&x68k_pcg_16);
+	decodegfx(machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
+	machine->gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
 	x68k_bg0_8 = tilemap_create(x68k_get_bg0_tile,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
@@ -1022,12 +1020,12 @@ VIDEO_UPDATE( x68000 )
 	{
 		if(sys.video.tile16_dirty[x] != 0)
 		{
-			decodechar(Machine->gfx[1], x,memory_region(REGION_USER1), &x68k_pcg_16);
+			decodechar(machine->gfx[1], x,memory_region(REGION_USER1), &x68k_pcg_16);
 			sys.video.tile16_dirty[x] = 0;
 		}
 		if(sys.video.tile8_dirty[x] != 0)
 		{
-			decodechar(Machine->gfx[0], x,memory_region(REGION_USER1), &x68k_pcg_8);
+			decodechar(machine->gfx[0], x,memory_region(REGION_USER1), &x68k_pcg_8);
 			sys.video.tile8_dirty[x] = 0;
 		}
 	}

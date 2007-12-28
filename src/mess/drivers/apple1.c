@@ -125,7 +125,7 @@ const gfx_layout apple1_charlayout =
 	8 * 8				/* 8 8-bit pixel rows per character */
 };
 
-static GFXDECODE_START( apple1_gfxdecodeinfo )
+static GFXDECODE_START( apple1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple1_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( apple1 )
 	   overscan here. */
 	MDRV_SCREEN_SIZE(40 * 7, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
-	MDRV_GFXDECODE(apple1_gfxdecodeinfo)
+	MDRV_GFXDECODE(apple1)
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(apple1_palette))
 	MDRV_COLORTABLE_LENGTH(sizeof(apple1_colortable)/sizeof(unsigned short))
 	MDRV_PALETTE_INIT(apple1)

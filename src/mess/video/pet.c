@@ -77,9 +77,9 @@ VIDEO_UPDATE( pet )
 	{
 		for (x=0;x<40;x++, i++)
 		{
-			drawgfx(bitmap,Machine->gfx[pet_font],
+			drawgfx(bitmap,machine->gfx[pet_font],
 					videoram[i], 0, 0, 0, 8*x,8*y,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		}
 	}
 	return 0;

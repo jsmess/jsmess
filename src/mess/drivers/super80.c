@@ -95,8 +95,8 @@ static VIDEO_UPDATE( super80 )
 			}
 			else
 				col = 0;
-			drawgfx(bitmap, Machine->gfx[charset], chr, col, 0, 0, x*8, y*10,
-						&Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+			drawgfx(bitmap, machine->gfx[charset], chr, col, 0, 0, x*8, y*10,
+						&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 		}
 	return 0;
 }
@@ -277,7 +277,7 @@ gfx_layout super80_dslc_charlayout =
 	8*16					/* every char takes 16 bytes */
 };
 
-static gfx_decode super80_gfxdecodeinfo[] =
+static gfx_decode super80[] =
 {
 	{ REGION_GFX1, 0x0000, &super80_elg4_charlayout, 0, 2},
 	{ REGION_GFX1, 0x1000, &super80_dslc_charlayout, 0, 2},
@@ -323,7 +323,7 @@ static MACHINE_DRIVER_START( super80 )
 
 	MDRV_MACHINE_RESET( super80 )
 
-	MDRV_GFXDECODE(super80_gfxdecodeinfo)
+	MDRV_GFXDECODE(super80)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 16*10)

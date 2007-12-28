@@ -47,9 +47,9 @@ VIDEO_START( cbm700 )
 //		if( i < 176 || i > 223 )
 		{
 			int y;
-			for( y = 0; y < Machine->gfx[0]->height; y++ ) {
-				Machine->gfx[0]->gfxdata[(i * Machine->gfx[0]->height + y) * Machine->gfx[0]->width + 8] = 0;
-				Machine->gfx[1]->gfxdata[(i * Machine->gfx[1]->height + y) * Machine->gfx[1]->width + 8] = 0;
+			for( y = 0; y < machine->gfx[0]->height; y++ ) {
+				machine->gfx[0]->gfxdata[(i * machine->gfx[0]->height + y) * machine->gfx[0]->width + 8] = 0;
+				machine->gfx[1]->gfxdata[(i * machine->gfx[1]->height + y) * machine->gfx[1]->width + 8] = 0;
 			}
 		}
 	}

@@ -186,7 +186,7 @@ static const gfx_layout chunky_layout =
     8 * 16      /* code takes 8 times 16 bits */
 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( microtan )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, chunky_layout, 0, 1 )
 GFXDECODE_END
@@ -214,7 +214,7 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 16*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*16, 16*16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(microtan)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_COLORTABLE_LENGTH(2)
 

@@ -33,7 +33,7 @@ VIDEO_START( cgenie )
 
 	video_start_generic(machine);
 
-    dlybitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+    dlybitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
     cleanbuffer = (UINT8*)auto_malloc(64 * 32 * 8);
 	memset(cleanbuffer, 0, 64 * 32 * 8);

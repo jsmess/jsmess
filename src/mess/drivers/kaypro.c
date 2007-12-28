@@ -191,7 +191,7 @@ static const gfx_layout charlayout =
 	FW * FH         /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( kaypro )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -242,7 +242,7 @@ static MACHINE_DRIVER_START( kaypro )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*KAYPRO_FONT_W, 25*KAYPRO_FONT_H)
 	MDRV_SCREEN_VISIBLE_AREA(0*KAYPRO_FONT_W, 80*KAYPRO_FONT_W-1, 0*KAYPRO_FONT_H, 25*KAYPRO_FONT_H-1)
-	MDRV_GFXDECODE( gfxdecodeinfo )
+	MDRV_GFXDECODE( kaypro )
 	MDRV_PALETTE_LENGTH(sizeof(kaypro_palette) / 3)
 	MDRV_COLORTABLE_LENGTH(sizeof(kaypro_colortable) / sizeof(kaypro_colortable[0]))
 	MDRV_PALETTE_INIT( kaypro )

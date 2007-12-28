@@ -89,13 +89,13 @@ static const gfx_layout t1t_charlayout =
     8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( t1000hx_gfxdecodeinfo )
+static GFXDECODE_START( t1000hx )
 	GFXDECODE_ENTRY( REGION_CPU1, 0xffa6e, t1t_charlayout, 0, 128 )	/* single width */
 	GFXDECODE_ENTRY( REGION_CPU1, 0xfc0a8, t1t_charlayout, 0, 128 )	/* single width */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, t1t_gfxlayout_4bpp, 256*2+16*2+2*4, 16 )	/* 160x200 4bpp gfx */
 GFXDECODE_END
 
-static GFXDECODE_START( t1000sx_gfxdecodeinfo )
+static GFXDECODE_START( t1000sx )
 	GFXDECODE_ENTRY( REGION_CPU1, 0xffa6e, t1t_charlayout, 0, 128 )	/* single width */
 	GFXDECODE_ENTRY( REGION_CPU1, 0xf40a3, t1t_charlayout, 0, 128 )	/* single width */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, t1t_gfxlayout_4bpp, 256*2+16*2+2*4, 16 )	/* 160x200 4bpp gfx */
@@ -106,7 +106,7 @@ MACHINE_DRIVER_START( pcvideo_t1000hx )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*8, 25*9)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1, 0,25*9-1)
-	MDRV_GFXDECODE(t1000hx_gfxdecodeinfo)
+	MDRV_GFXDECODE(t1000hx)
 	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / sizeof(cga_palette[0]))
 	MDRV_COLORTABLE_LENGTH(sizeof(pcjr_colortable) / sizeof(pcjr_colortable[0]))
 	MDRV_PALETTE_INIT(pcjr)
@@ -117,7 +117,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( pcvideo_t1000sx )
 	MDRV_IMPORT_FROM( pcvideo_t1000hx )
-	MDRV_GFXDECODE( t1000sx_gfxdecodeinfo )
+	MDRV_GFXDECODE( t1000sx )
 MACHINE_DRIVER_END
 
 /***************************************************************************

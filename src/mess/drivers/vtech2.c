@@ -408,7 +408,7 @@ static const gfx_layout gfxlayout_4bpp_dh =
 	2*4 					/* one byte per code */
 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( vtech2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_80, 0, 256 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_40, 0, 256 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_1bpp, 0, 256 )
@@ -478,7 +478,7 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(88*8, 24*8+32)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
-	MDRV_GFXDECODE( gfxdecodeinfo )
+	MDRV_GFXDECODE( vtech2 )
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(vt_palette))
 	MDRV_COLORTABLE_LENGTH(256*2+16)
 	MDRV_PALETTE_INIT(vtech2)

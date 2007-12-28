@@ -127,12 +127,12 @@ static const gfx_layout intvkbd_charlayout =
 	8 * 8
 };
 
-static GFXDECODE_START( intv_gfxdecodeinfo )
+static GFXDECODE_START( intv )
 	GFXDECODE_ENTRY( REGION_CPU1, 0x3000<<1, intv_gromlayout, 0, 256 )
 	GFXDECODE_ENTRY( 0, 0, intv_gramlayout, 0, 256 )    /* Dynamically decoded from RAM */
 GFXDECODE_END
 
-static GFXDECODE_START( intvkbd_gfxdecodeinfo )
+static GFXDECODE_START( intvkbd )
 	GFXDECODE_ENTRY( REGION_CPU1, 0x3000<<1, intv_gromlayout, 0, 256 )
 	GFXDECODE_ENTRY( 0, 0, intv_gramlayout, 0, 256 )    /* Dynamically decoded from RAM */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, intvkbd_charlayout, 0, 256 )
@@ -358,7 +358,7 @@ static MACHINE_DRIVER_START( intv )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 24*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
-	MDRV_GFXDECODE( intv_gfxdecodeinfo )
+	MDRV_GFXDECODE( intv )
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(2 * 2 * 16 * 16)
 	MDRV_PALETTE_INIT( intv )
@@ -386,7 +386,7 @@ static MACHINE_DRIVER_START( intvkbd )
 	MDRV_INTERLEAVE(100)
 
     /* video hardware */
-	MDRV_GFXDECODE( intvkbd_gfxdecodeinfo )
+	MDRV_GFXDECODE( intvkbd )
 	MDRV_VIDEO_START( intvkbd )
 	MDRV_VIDEO_UPDATE( intvkbd )
 MACHINE_DRIVER_END

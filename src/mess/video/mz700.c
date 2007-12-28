@@ -54,7 +54,7 @@ VIDEO_UPDATE(mz700)
 
     if( full_refresh )
 	{
-		fillbitmap(bitmap, Machine->pens[0], &Machine->screen[0].visarea);
+		fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 		memset(dirtybuffer, 1, videoram_size);
     }
 
@@ -72,8 +72,8 @@ VIDEO_UPDATE(mz700)
 			color = colorram[offs];
 			code |= (color & 0x80) << 1;
 
-            drawgfx(bitmap,Machine->gfx[0],code,color,0,0,sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            drawgfx(bitmap,machine->gfx[0],code,color,0,0,sx,sy,
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		}
 	}
 	return 0;

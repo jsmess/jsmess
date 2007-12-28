@@ -77,7 +77,7 @@ const gfx_layout jupiter_charlayout =
 	8*8 	/* each character takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( jupiter_gfxdecodeinfo )
+static GFXDECODE_START( jupiter )
 	GFXDECODE_ENTRY( REGION_CPU1, 0x2c00, jupiter_charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -189,7 +189,7 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32 * 8, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32 * 8 - 1, 0, 24 * 8 - 1)
-	MDRV_GFXDECODE( jupiter_gfxdecodeinfo )
+	MDRV_GFXDECODE( jupiter )
 	MDRV_PALETTE_LENGTH(sizeof(jupiter_palette) / 3)
 	MDRV_COLORTABLE_LENGTH(sizeof (jupiter_colortable))
 	MDRV_PALETTE_INIT( jupiter )

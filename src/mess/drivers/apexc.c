@@ -490,8 +490,8 @@ static PALETTE_INIT( apexc )
 
 static VIDEO_START( apexc )
 {
-	apexc_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	fillbitmap(apexc_bitmap, Machine->pens[0], &/*Machine->visible_area*/teletyper_window);
+	apexc_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	fillbitmap(apexc_bitmap, machine->pens[0], &/*machine->visible_area*/teletyper_window);
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
@@ -532,7 +532,7 @@ static VIDEO_UPDATE( apexc )
 
 	/*if (full_refresh)*/
 	{
-		fillbitmap(bitmap, Machine->pens[0], &/*Machine->visible_area*/panel_window);
+		fillbitmap(bitmap, machine->pens[0], &/*machine->visible_area*/panel_window);
 		apexc_draw_string(bitmap, "power", 8, 0, 0);
 		apexc_draw_string(bitmap, "running", 8, 8, 0);
 		apexc_draw_string(bitmap, "data :", 0, 24, 0);
@@ -774,7 +774,7 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( apexc )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, 0, 1 )
 GFXDECODE_END
 
@@ -818,7 +818,7 @@ static MACHINE_DRIVER_START(apexc)
 	MDRV_SCREEN_SIZE(256, 192)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(apexc)
 	MDRV_PALETTE_LENGTH(APEXC_PALETTE_SIZE)
 	MDRV_COLORTABLE_LENGTH(APEXC_COLORTABLE_SIZE)
 

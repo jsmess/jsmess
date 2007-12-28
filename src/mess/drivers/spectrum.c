@@ -1778,7 +1778,7 @@ static const gfx_layout spectrum_charlayout =
 	8				/* every char takes 1 consecutive byte */
 };
 
-static GFXDECODE_START( spectrum_gfxdecodeinfo )
+static GFXDECODE_START( spectrum )
 	GFXDECODE_ENTRY( 0, 0x0, spectrum_charlayout, 0, 0x80 )
 	GFXDECODE_ENTRY( 0, 0x0, spectrum_charlayout, 0, 0x80 )
 	GFXDECODE_ENTRY( 0, 0x0, spectrum_charlayout, 0, 0x80 )
@@ -1976,7 +1976,7 @@ static MACHINE_DRIVER_START( spectrum )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MDRV_GFXDECODE( spectrum_gfxdecodeinfo )
+	MDRV_GFXDECODE( spectrum )
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(256)
 	MDRV_PALETTE_INIT( spectrum )

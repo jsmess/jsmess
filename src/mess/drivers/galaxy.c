@@ -44,7 +44,7 @@ static ADDRESS_MAP_START (galaxy_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static GFXDECODE_START( galaxy_gfxdecodeinfo )
+static GFXDECODE_START( galaxy )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxy_charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -136,7 +136,7 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 218)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 218-1)
-	MDRV_GFXDECODE( galaxy_gfxdecodeinfo )
+	MDRV_GFXDECODE( galaxy )
 	MDRV_PALETTE_LENGTH(sizeof (galaxy_palette) / 3)
 	MDRV_COLORTABLE_LENGTH(sizeof (galaxy_colortable))
 	MDRV_PALETTE_INIT( galaxy )

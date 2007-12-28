@@ -61,9 +61,9 @@ VIDEO_UPDATE( p2000m )
 				if (code < 32) code = 32;
 			}
 
-			drawgfx (bitmap, Machine->gfx[0], code,
+			drawgfx (bitmap, machine->gfx[0], code,
 				videoram[offs + 2048] & 0x08 ? 0 : 1, 0, 0, sx, sy,
-				&Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+				&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 			if (videoram[offs] & 0x80)
 			{
 				for (loop = 0; loop < 6; loop++)

@@ -50,8 +50,8 @@ VIDEO_UPDATE( exidy )
 	int x,y;
 	int pens[2];
 
-	pens[0] = Machine->pens[0];
-	pens[1] = Machine->pens[1];
+	pens[0] = machine->pens[0];
+	pens[1] = machine->pens[1];
 
 	for (y=0; y<EXIDY_SCREEN_HEIGHT>>3; y++)
 	{

@@ -590,7 +590,7 @@ static void tms3556_draw_line(mame_bitmap *bmp, int line)
 static VIDEO_UPDATE(tms3556)
 {
 	/* already been rendered, since we're using scanline stuff */
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	return 0;
 }
 

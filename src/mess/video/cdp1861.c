@@ -154,7 +154,7 @@ VIDEO_START( cdp1861 )
 	cdp1861_dma_timer = timer_alloc(cdp1861_dma_tick, NULL);
 
 	/* allocate the temporary bitmap */
-	cdptmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	cdptmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* ensure the contents of the bitmap are saved */
 	state_save_register_bitmap("video", 0, "cdptmpbitmap", cdptmpbitmap);

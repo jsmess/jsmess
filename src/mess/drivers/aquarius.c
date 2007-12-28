@@ -66,7 +66,7 @@ static const gfx_layout aquarius_charlayout =
 	8 * 8
 };
 
-static GFXDECODE_START( aquarius_gfxdecodeinfo )
+static GFXDECODE_START( aquarius )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, aquarius_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -229,7 +229,7 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40 * 8, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 24 * 8 - 1)
-	MDRV_GFXDECODE( aquarius_gfxdecodeinfo )
+	MDRV_GFXDECODE( aquarius )
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(aquarius_palette))
 	MDRV_COLORTABLE_LENGTH(sizeof (aquarius_colortable))
 	MDRV_PALETTE_INIT( aquarius )

@@ -160,7 +160,7 @@ static const gfx_layout hp48_charlayout =
 	1*8
 };
 
-static GFXDECODE_START( hp48_gfxdecodeinfo )
+static GFXDECODE_START( hp48 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, hp48_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -188,7 +188,7 @@ static MACHINE_DRIVER_START( hp48s )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(339, 775)
 	MDRV_SCREEN_VISIBLE_AREA(0, 339-1, 0, 775-1)
-	MDRV_GFXDECODE( hp48_gfxdecodeinfo )
+	MDRV_GFXDECODE( hp48 )
 	MDRV_PALETTE_LENGTH( 248 )
 	MDRV_COLORTABLE_LENGTH( sizeof (hp48_colortable) / sizeof(hp48_colortable[0][0]) )
 	MDRV_PALETTE_INIT( hp48 )

@@ -66,7 +66,7 @@ VIDEO_START( hp48 )
 	{
 		char backdrop_name[200];
 	    /* try to load a backdrop for the machine */
-		sprintf (backdrop_name, "%s.png", Machine->gamedrv->name);
+		sprintf (backdrop_name, "%s.png", machine->gamedrv->name);
 		backdrop_load(backdrop_name, 8);
 	}
 #endif
@@ -165,14 +165,14 @@ VIDEO_UPDATE( hp48 )
 	int contrast=(hp48_hardware.data[1]|((hp48_hardware.data[2]&1)<<4));
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
-    color[0] = Machine->pens[0];
-//    color[0] = Machine->pens[1];
-	color[1] = Machine->pens[1];
+    color[0] = machine->pens[0];
+//    color[0] = machine->pens[1];
+	color[1] = machine->pens[1];
 
 
 	for (y=0,i=LCD_BASE_ADDRESS; y<64; y+=8, i+=LCD_LINE_OFFSET) {
 		for (x=0; x<131; x++) {
-			drawgfx(bitmap, Machine->gfx[0], 
+			drawgfx(bitmap, machine->gfx[0], 
 					program_read_byte(i+x),
 					contrast,0,0,
 					x*2+RIGHT,y*2+DOWN,

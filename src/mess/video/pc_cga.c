@@ -164,7 +164,7 @@ const gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( CGA_gfxdecodeinfo )
+static GFXDECODE_START( CGA )
 /* Support up to four CGA fonts */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, CGA_charlayout, 0, 256 )   /* Font 0 */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, CGA_charlayout, 0, 256 )   /* Font 1 */
@@ -177,7 +177,7 @@ MACHINE_DRIVER_START( pcvideo_cga )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*8, 25*8)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1, 0,25*8-1)
-	MDRV_GFXDECODE(CGA_gfxdecodeinfo)
+	MDRV_GFXDECODE(CGA)
 	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / (CGA_PALETTE_SETS * sizeof(cga_palette[0])))
 	MDRV_COLORTABLE_LENGTH(sizeof(cga_colortable) / sizeof(cga_colortable[0]))
 
@@ -290,7 +290,7 @@ static VIDEO_START( pc_cga )
 	 * Plantronics chipset. 
 	 * TODO: Cards which don't support Plantronics should repeat at 
 	 * BC000h */
-	buswidth = cputype_databus_width(Machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

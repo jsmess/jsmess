@@ -142,19 +142,19 @@ VIDEO_UPDATE( pc1401 )
 	bitmap_fill(bitmap, cliprect, 5);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
-    color[0] = Machine->pens[pocketc_colortable[CONTRAST][0]];
-	color[1] = Machine->pens[pocketc_colortable[CONTRAST][1]];
+    color[0] = machine->pens[pocketc_colortable[CONTRAST][0]];
+	color[1] = machine->pens[pocketc_colortable[CONTRAST][1]];
     
     if (pc1401_portc&1) {
 		for (x=RIGHT,y=DOWN,i=0; i<0x28;x+=2) {
 			for (j=0; j<5;j++,i++,x+=2)
-			drawgfx(bitmap, Machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
+			drawgfx(bitmap, machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
 				x,y,
 				0, TRANSPARENCY_NONE,0);
 		}
 		for (i=0x67; i>=0x40;x+=2) {
 			for (j=0; j<5;j++,i--,x+=2)
-			drawgfx(bitmap, Machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
+			drawgfx(bitmap, machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
 				x,y,
 				0, TRANSPARENCY_NONE,0);
 		}

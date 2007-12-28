@@ -276,7 +276,7 @@ READ8_HANDLER(sms_count_r) {
 	}
 }
 
-void check_pause_button( void ) {
+void sms_check_pause_button( void ) {
 	if ( ! IS_GAMEGEAR ) {
 		if ( ! (readinputport(2) & 0x80) ) {
 			if ( ! smsPaused ) {

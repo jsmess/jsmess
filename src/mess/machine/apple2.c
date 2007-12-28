@@ -1576,9 +1576,9 @@ MACHINE_START( apple2 )
 	memset(&a2_cfg, 0, sizeof(a2_cfg));
 
 	/* specify slots */
-	if (!strcmp(Machine->gamedrv->name, "apple2c0") ||
-		!strcmp(Machine->gamedrv->name, "apple2c3") ||
-		!strcmp(Machine->gamedrv->name, "apple2cp"))
+	if (!strcmp(machine->gamedrv->name, "apple2c0") ||
+		!strcmp(machine->gamedrv->name, "apple2c3") ||
+		!strcmp(machine->gamedrv->name, "apple2cp"))
 	{
 		a2_cfg.slots[0] = &apple2_slot_langcard;
 		a2_cfg.slots[4] = &apple2_slot_mockingboard;
@@ -1594,7 +1594,7 @@ MACHINE_START( apple2 )
 	/* there appears to be some hidden RAM that is swapped in on the Apple
 	 * IIc plus; I have not found any official documentation but the BIOS
 	 * clearly uses this area as writeable memory */
-	if (!strcmp(Machine->gamedrv->name, "apple2cp"))
+	if (!strcmp(machine->gamedrv->name, "apple2cp"))
 		apple2cp_ce00_ram = auto_malloc(0x200);
 
 	apple2_init_common(machine, &a2_cfg);

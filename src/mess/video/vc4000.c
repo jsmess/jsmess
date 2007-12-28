@@ -95,7 +95,7 @@ VIDEO_START(vc4000)
 		if ((i&0x18)==0x18) background_collision[i]|=0x10;
     }
 
-	vc4000_video.bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	vc4000_video.bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 }
 
 READ8_HANDLER(vc4000_video_r)

@@ -65,7 +65,7 @@ VIDEO_START( mekd2 )
 	{
 		char backdrop_name[200];
 	    /* try to load a backdrop for the machine */
-		sprintf(backdrop_name, "%s.png", Machine->gamedrv->name);
+		sprintf(backdrop_name, "%s.png", machine->gamedrv->name);
 		backdrop_load(backdrop_name, 2);
 	}
 #endif
@@ -80,9 +80,9 @@ VIDEO_UPDATE( mekd2 )
     for (x = 0; x < 6; x++)
     {
         int sy = 408;
-        int sx = Machine->screen[0].width - 212 + x * 30 + ((x >= 4) ? 6 : 0);
+        int sx = machine->screen[0].width - 212 + x * 30 + ((x >= 4) ? 6 : 0);
 
-        drawgfx (bitmap, Machine->gfx[0],
+        drawgfx (bitmap, machine->gfx[0],
                  videoram[2 * x + 0], videoram[2 * x + 1],
                  0, 0, sx, sy, NULL, TRANSPARENCY_PEN, 0);
     }
@@ -102,13 +102,13 @@ VIDEO_UPDATE( mekd2 )
 				{ 4,  5,  6,  7},
 				{ 0,  1,  2,  3}
             };
-            int sx = Machine->screen[0].width - 182 + x * 37;
+            int sx = machine->screen[0].width - 182 + x * 37;
             int color, code = layout[y][x];
 
             color = (readinputport (code / 7) & (0x40 >> (code % 7))) ? 0 : 1;
 
             videoram[6 * 2 + code] = color;
-            drawgfx (bitmap, Machine->gfx[1],
+            drawgfx (bitmap, machine->gfx[1],
                      layout[y][x], color,
                      0, 0, sx, sy, NULL,
                      TRANSPARENCY_NONE, 0);

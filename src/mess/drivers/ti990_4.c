@@ -245,11 +245,11 @@ static MACHINE_DRIVER_START(ti990_4)
 #endif
 
 #if VIDEO_911
-	MDRV_GFXDECODE(vdt911_gfxdecodeinfo)
+	MDRV_GFXDECODE(vdt911)
 	MDRV_PALETTE_LENGTH(vdt911_palette_size)
 	MDRV_COLORTABLE_LENGTH(vdt911_colortable_size)
 #else
-	MDRV_GFXDECODE(asr733_gfxdecodeinfo)
+	MDRV_GFXDECODE(asr733)
 	MDRV_PALETTE_LENGTH(asr733_palette_size)
 	MDRV_COLORTABLE_LENGTH(asr733_colortable_size)
 #endif

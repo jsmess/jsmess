@@ -76,7 +76,7 @@ static const gfx_layout apple2gs_dbltext_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apple2gs_gfxdecodeinfo )
+static GFXDECODE_START( apple2gs )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2gs_text_layout, 0, 2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2gs_dbltext_layout, 0, 2 )
 GFXDECODE_END
@@ -155,7 +155,7 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_SCREEN_SIZE(704, 262)	// 640+32+32 for the borders
 	MDRV_SCREEN_VISIBLE_AREA(0,703,0,230)
 	MDRV_PALETTE_LENGTH( 16+256 )
-	MDRV_GFXDECODE( apple2gs_gfxdecodeinfo )
+	MDRV_GFXDECODE( apple2gs )
 
 	MDRV_MACHINE_START( apple2gs )
 	MDRV_MACHINE_RESET( apple2gs )

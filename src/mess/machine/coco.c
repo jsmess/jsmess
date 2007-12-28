@@ -3039,7 +3039,7 @@ MACHINE_START( coco3 )
 	state_save_register_global(gime_firq);
 	state_save_register_func_postload(coco3_state_postload);
 
-	video_crosshair_set_screenmask_callback(Machine, crosshairs_get_screen);
+	video_crosshair_set_screenmask_callback(machine, crosshairs_get_screen);
 
 	/* add reset callback */
 	add_reset_callback(machine, coco3_machine_reset);

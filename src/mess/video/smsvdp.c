@@ -233,7 +233,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 
 	/* Check if we're on the last line of a frame */
 	if ( vpos == vpos_limit - 1 ) {
-		check_pause_button();
+		sms_check_pause_button();
 		return;
 	}
 
@@ -273,11 +273,11 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+		fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+		fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
@@ -313,16 +313,16 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			/* set whole line to backdrop color */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
-			fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+			fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		} else {
 			/* Draw left border */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-			fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+			fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 			/* Draw right border */
 			rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 			rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-			fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+			fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 			sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
 		}
 		return;
@@ -339,11 +339,11 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+		fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, Machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+		fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
@@ -1047,17 +1047,17 @@ VIDEO_UPDATE(sms) {
 	int x, y;
 
 	if (smsvdp.prev_bitmap_saved) {
-	for (y = 0; y < Machine->screen[0].height; y++) {
-		for (x = 0; x < Machine->screen[0].width; x++) {
+	for (y = 0; y < machine->screen[0].height; y++) {
+		for (x = 0; x < machine->screen[0].width; x++) {
 			*BITMAP_ADDR32(bitmap, y, x) = (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x)) >> 2;
 			logerror("%x %x %x\n", *BITMAP_ADDR32(tmpbitmap, y, x), *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x), (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(smsvdp.prev_bitmap, y, x)) >> 2);
 		}
 	}
 	} else {
-		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	}
 	if (!smsvdp.prev_bitmap_saved) {
-		copybitmap(smsvdp.prev_bitmap, tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(smsvdp.prev_bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	//smsvdp.prev_bitmap_saved = 1;
 	}
 	return 0;

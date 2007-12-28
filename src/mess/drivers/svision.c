@@ -381,7 +381,7 @@ static VIDEO_UPDATE( svision )
 	}
 	else
 	{
-		plot_box(bitmap, 3, 0, 162, 159, Machine->pens[PALETTE_START]);
+		plot_box(bitmap, 3, 0, 162, 159, machine->pens[PALETTE_START]);
 	}
 	return 0;
 }
@@ -412,7 +412,7 @@ static VIDEO_UPDATE( tvlink )
 	}
 	else
 	{
-		plot_box(bitmap, 3, 0, 162, 159, Machine->pens[PALETTE_START]);
+		plot_box(bitmap, 3, 0, 162, 159, machine->pens[PALETTE_START]);
 	}
 	return 0;
 }
@@ -444,7 +444,7 @@ static DRIVER_INIT( svisions )
 	svision.timer1 = timer_alloc(svision_timer, NULL);
 	svision_pet.on = TRUE;
 	svision_pet.timer = timer_alloc(svision_pet_timer, NULL);
-	timer_pulse(attotime_mul(ATTOTIME_IN_SEC(8), 256/Machine->drv->cpu[0].clock), NULL, 0, svision_pet_timer);  
+	timer_pulse(attotime_mul(ATTOTIME_IN_SEC(8), 256/machine->drv->cpu[0].clock), NULL, 0, svision_pet_timer);  
 }
 
 static MACHINE_RESET( svision )

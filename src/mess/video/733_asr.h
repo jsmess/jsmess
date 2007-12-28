@@ -12,7 +12,7 @@ enum
 	asr733_chr_region_len	= 128*asr733_single_char_len
 };
 
-GFXDECODE_EXTERN( asr733_gfxdecodeinfo );
+GFXDECODE_EXTERN( asr733 );
 
 enum
 {

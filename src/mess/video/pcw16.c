@@ -178,7 +178,7 @@ VIDEO_UPDATE( pcw16 )
 		border_colour = pcw16_colour_palette[1];
 	}
 
-	border_colour = Machine->pens[border_colour];
+	border_colour = machine->pens[border_colour];
 
 	if ((pcw16_video_control & (1<<6))==0)
 	{

@@ -265,7 +265,7 @@ static const gfx_layout cgenie_gfxlayout =
 	8*8 			/* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( cgenie_gfxdecodeinfo )
+static GFXDECODE_START( cgenie )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, cgenie_charlayout, 0, 3*16 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, cgenie_gfxlayout, 3*16*2, 3*4 )
 GFXDECODE_END
@@ -387,7 +387,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48*8, (32)*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1,0*8,32*8-1)
-	MDRV_GFXDECODE( cgenie_gfxdecodeinfo )
+	MDRV_GFXDECODE( cgenie )
 	MDRV_PALETTE_LENGTH(sizeof(cgenie_palette) / sizeof(cgenie_palette[0]) / 3)
 	MDRV_COLORTABLE_LENGTH(sizeof(cgenie_colortable) / sizeof(cgenie_colortable[0]))
 	MDRV_PALETTE_INIT( cgenie )

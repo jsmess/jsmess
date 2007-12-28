@@ -161,16 +161,16 @@ static void vic6560_video_stop(running_machine *machine)
 
 VIDEO_START( vic6560 )
 {
-	black = Machine->pens[0];
-	white = Machine->pens[1];
+	black = machine->pens[0];
+	white = machine->pens[1];
 	pointerelement = allocgfx(&pointerlayout);
 	decodegfx(pointerelement, pointermask, 0, 1);
 	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
 	/* pointerelement->colortable = pointercolortable; */
-	pointercolortable[1] = Machine->pens[1];
-	pointercolortable[2] = Machine->pens[0];
+	pointercolortable[1] = machine->pens[1];
+	pointercolortable[2] = machine->pens[0];
 	pointerelement->total_colors = 3;
-	vic6560_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	vic6560_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	add_exit_callback(machine, vic6560_video_stop);
 }
 

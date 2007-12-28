@@ -457,12 +457,12 @@ static const gfx_layout cbm700_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( cbm600_gfxdecodeinfo )
+static GFXDECODE_START( cbm600 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cbm600_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, cbm600_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( cbm700_gfxdecodeinfo )
+static GFXDECODE_START( cbm700 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cbm700_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, cbm700_charlayout, 0, 1 )
 GFXDECODE_END
@@ -618,7 +618,7 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MDRV_GFXDECODE( cbm600_gfxdecodeinfo )
+	MDRV_GFXDECODE( cbm600 )
 	MDRV_PALETTE_LENGTH(sizeof (cbm700_palette) / sizeof (cbm700_palette[0]) / 3)
 	MDRV_COLORTABLE_LENGTH(sizeof (cbmb_colortable) / sizeof(cbmb_colortable[0]))
 	MDRV_PALETTE_INIT( cbm700 )
@@ -643,7 +643,7 @@ static MACHINE_DRIVER_START( cbm700 )
 	MDRV_IMPORT_FROM( cbm600pal )
 	MDRV_SCREEN_SIZE(720, 350)
 	MDRV_SCREEN_VISIBLE_AREA(0, 720 - 1, 0, 350 - 1)
-	MDRV_GFXDECODE( cbm700_gfxdecodeinfo )
+	MDRV_GFXDECODE( cbm700 )
 
 	MDRV_VIDEO_START( cbm700 )
 MACHINE_DRIVER_END

@@ -57,8 +57,8 @@ VIDEO_UPDATE( jupiter )
 			sy = (offs / 32) * 8;
 			sx = (offs % 32) * 8;
 
-			drawgfx(bitmap, Machine->gfx[0], code & 0x7f, (code & 0x80) ? 1 : 0, 0,0, sx,sy,
-				&Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+			drawgfx(bitmap, machine->gfx[0], code & 0x7f, (code & 0x80) ? 1 : 0, 0,0, sx,sy,
+				&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 
             dirtybuffer[offs] = 0;
 		}

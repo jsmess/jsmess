@@ -106,7 +106,7 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-GFXDECODE_START( asr733_gfxdecodeinfo )
+GFXDECODE_START( asr733 )
 	GFXDECODE_ENTRY( asr733_chr_region, 0, fontlayout, 0, 1 )
 GFXDECODE_END
 

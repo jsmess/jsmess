@@ -136,7 +136,7 @@ static const gfx_layout odyssey2_spritelayout =
 	1*8
 };
 
-static GFXDECODE_START( odyssey2_gfxdecodeinfo )
+static GFXDECODE_START( odyssey2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, odyssey2_graphicslayout, 0, 2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
@@ -159,7 +159,7 @@ static MACHINE_DRIVER_START( odyssey2 )
 
 	MDRV_SCREEN_SIZE(320,300)
 	MDRV_SCREEN_VISIBLE_AREA(0,160-1,0,240-1)
-	MDRV_GFXDECODE( odyssey2_gfxdecodeinfo )
+	MDRV_GFXDECODE( odyssey2 )
 	MDRV_PALETTE_LENGTH(24)
 	MDRV_COLORTABLE_LENGTH(2)
 	MDRV_PALETTE_INIT( odyssey2 )

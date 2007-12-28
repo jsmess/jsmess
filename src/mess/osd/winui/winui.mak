@@ -66,7 +66,11 @@ $(LIBOSD): $(WINUIOBJS)
 # rules for creating helpids.c 
 #-------------------------------------------------
 
-$(WINUISRC)/helpids.c : $(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/resource.h $(WINUISRC)/resource.hm $(WINUISRC)/mameui.rc
+$(WINUIOBJ)/helpids.o : $(WINUIOBJ)/helpids.c
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+
+$(WINUIOBJ)/helpids.c : $(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/resource.h $(WINUISRC)/resource.hm $(WINUISRC)/mameui.rc
 	$(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/mameui.rc >$@
 
 # rule to build the generator

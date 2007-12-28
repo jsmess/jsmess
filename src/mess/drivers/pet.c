@@ -513,17 +513,17 @@ static const gfx_layout pet80_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( pet_gfxdecodeinfo )
+static GFXDECODE_START( pet )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pet_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, pet_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( pet80_gfxdecodeinfo )
+static GFXDECODE_START( pet80 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pet80_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, pet80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( superpet_gfxdecodeinfo )
+static GFXDECODE_START( superpet )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pet80_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, pet80_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, pet80_charlayout, 0, 1 )
@@ -805,7 +805,7 @@ static MACHINE_DRIVER_START( pet )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 200 - 1)
-	MDRV_GFXDECODE( pet_gfxdecodeinfo )
+	MDRV_GFXDECODE( pet )
 	MDRV_PALETTE_LENGTH(sizeof (pet_palette) / sizeof (pet_palette[0]) / 3)
 	MDRV_COLORTABLE_LENGTH(sizeof (pet_colortable) / sizeof(pet_colortable[0][0]))
 	MDRV_PALETTE_INIT( pet )
@@ -839,7 +839,7 @@ static MACHINE_DRIVER_START( pet80 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 250)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MDRV_GFXDECODE( pet80_gfxdecodeinfo )
+	MDRV_GFXDECODE( pet80 )
 	MDRV_VIDEO_UPDATE( crtc6845 )
 MACHINE_DRIVER_END
 
@@ -863,7 +863,7 @@ static MACHINE_DRIVER_START( superpet )
 	MDRV_SCREEN_REFRESH_RATE(50)
 
     /* video hardware */
-	MDRV_GFXDECODE( superpet_gfxdecodeinfo )
+	MDRV_GFXDECODE( superpet )
 MACHINE_DRIVER_END
 
 #define rom_cbm30 rom_pet2

@@ -258,15 +258,15 @@ VIDEO_START( vectrex )
 {
 	int width, height;
 
-	width = Machine->screen[0].width;
-	height = Machine->screen[0].height;
+	width = machine->screen[0].width;
+	height = machine->screen[0].height;
 
-	x_center=((Machine->screen[0].visarea.max_x
-		  -Machine->screen[0].visarea.min_x) / 2) << VEC_SHIFT;
-	y_center=((Machine->screen[0].visarea.max_y
-		  -Machine->screen[0].visarea.min_y) / 2) << VEC_SHIFT;
-	x_max = Machine->screen[0].visarea.max_x << VEC_SHIFT;
-	y_max = Machine->screen[0].visarea.max_y << VEC_SHIFT;
+	x_center=((machine->screen[0].visarea.max_x
+		  -machine->screen[0].visarea.min_x) / 2) << VEC_SHIFT;
+	y_center=((machine->screen[0].visarea.max_y
+		  -machine->screen[0].visarea.min_y) / 2) << VEC_SHIFT;
+	x_max = machine->screen[0].visarea.max_x << VEC_SHIFT;
+	y_max = machine->screen[0].visarea.max_y << VEC_SHIFT;
 
 	via_config(0, &vectrex_via6522_interface);
 	via_reset();
@@ -460,12 +460,12 @@ WRITE8_HANDLER( raaspec_led_w )
 
 VIDEO_START( raaspec )
 {
-	x_center=((Machine->screen[0].visarea.max_x
-		  -Machine->screen[0].visarea.min_x)/2) << VEC_SHIFT;
-	y_center=((Machine->screen[0].visarea.max_y
-		  -Machine->screen[0].visarea.min_y)/2) << VEC_SHIFT;
-	x_max = Machine->screen[0].visarea.max_x << VEC_SHIFT;
-	y_max = Machine->screen[0].visarea.max_y << VEC_SHIFT;
+	x_center=((machine->screen[0].visarea.max_x
+		  -machine->screen[0].visarea.min_x)/2) << VEC_SHIFT;
+	y_center=((machine->screen[0].visarea.max_y
+		  -machine->screen[0].visarea.min_y)/2) << VEC_SHIFT;
+	x_max = machine->screen[0].visarea.max_x << VEC_SHIFT;
+	y_max = machine->screen[0].visarea.max_y << VEC_SHIFT;
 
 	via_config(0, &spectrum1_via6522_interface);
 	via_reset();

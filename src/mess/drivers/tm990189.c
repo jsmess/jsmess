@@ -313,7 +313,7 @@ static void update_common(mame_bitmap *bitmap,
 
 static VIDEO_UPDATE( tm990_189 )
 {
-	update_common(bitmap, 580, 150, 110, 508, 387, 456, 507, 478, Machine->pens[1], Machine->pens[0]);
+	update_common(bitmap, 580, 150, 110, 508, 387, 456, 507, 478, machine->pens[1], machine->pens[0]);
 	return 0;
 }
 
@@ -321,13 +321,13 @@ static VIDEO_UPDATE( tm990_189_v )
 {
 	video_update_tms9928a(machine, screen, bitmap, cliprect);
 
-	plot_box(bitmap, LED_display_window_left, LED_display_window_top, LED_display_window_width, LED_display_window_height, Machine->pens[1]);
+	plot_box(bitmap, LED_display_window_left, LED_display_window_top, LED_display_window_width, LED_display_window_height, machine->pens[1]);
 	update_common(bitmap,
 					LED_display_window_left, LED_display_window_top,
 					LED_display_window_left, LED_display_window_top+16,
 					LED_display_window_left+80, LED_display_window_top+16,
 					LED_display_window_left+128, LED_display_window_top+16,
-					Machine->pens[6], Machine->pens[1]);
+					machine->pens[6], machine->pens[1]);
 	return 0;
 }
 
@@ -793,7 +793,7 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_SCREEN_SIZE(750, 532)
 	MDRV_SCREEN_VISIBLE_AREA(0, 750-1, 0, 532-1)
 
-	/*MDRV_GFXDECODE(tm990_189_gfxdecodeinfo)*/
+	/*MDRV_GFXDECODE(tm990_189)*/
 	MDRV_PALETTE_LENGTH(tm990_189_palette_size)
 	MDRV_COLORTABLE_LENGTH(/*tm990_189_colortable_size*/0)
 

@@ -81,7 +81,7 @@ static const gfx_layout char_layout_80_l =
 	8 * 2           /* code takes 8 times 8 bits */
 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( pc8801 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_80_l, 0, 16 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_40L_l, 0, 16 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_40R_l, 0, 16 )
@@ -529,7 +529,7 @@ static MACHINE_DRIVER_START( pc88srl )
 	/*MDRV_ASPECT_RATIO(8,5)*/
 	MDRV_SCREEN_SIZE(640, 220)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_GFXDECODE( gfxdecodeinfo )
+	MDRV_GFXDECODE( pc8801 )
 	MDRV_PALETTE_LENGTH(18)
 	MDRV_COLORTABLE_LENGTH(32)
 	MDRV_PALETTE_INIT( pc8801 )

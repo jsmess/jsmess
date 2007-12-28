@@ -550,7 +550,7 @@ static const gfx_layout apple2_dbltext_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apple2_gfxdecodeinfo )
+static GFXDECODE_START( apple2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2_text_layout, 0, 2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2_dbltext_layout, 0, 2 )
 GFXDECODE_END
@@ -577,7 +577,7 @@ static const gfx_layout apple2e_dbltext_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apple2e_gfxdecodeinfo )
+static GFXDECODE_START( apple2e )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2e_text_layout, 0, 2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2e_dbltext_layout, 0, 2 )
 GFXDECODE_END
@@ -667,20 +667,20 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2 )
 	MDRV_IMPORT_FROM( apple2_common )
-	MDRV_GFXDECODE(apple2_gfxdecodeinfo)
+	MDRV_GFXDECODE(apple2)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2p )
 	MDRV_IMPORT_FROM( apple2_common )
 	MDRV_VIDEO_START(apple2p)
-	MDRV_GFXDECODE(apple2_gfxdecodeinfo)
+	MDRV_GFXDECODE(apple2)
 MACHINE_DRIVER_END
 
 #ifdef UNUSED_FUNCTION
 static MACHINE_DRIVER_START( ace100 )
 	MDRV_IMPORT_FROM( apple2_common )
 	MDRV_VIDEO_START(apple2p)
-	MDRV_GFXDECODE(apple2_gfxdecodeinfo)
+	MDRV_GFXDECODE(apple2)
 MACHINE_DRIVER_END
 #endif
 
@@ -696,7 +696,7 @@ ROM_END
 MACHINE_DRIVER_START( apple2e )
 	MDRV_IMPORT_FROM( apple2_common )
 	MDRV_VIDEO_START(apple2e)
-	MDRV_GFXDECODE(apple2e_gfxdecodeinfo)
+	MDRV_GFXDECODE(apple2e)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2ee )

@@ -132,7 +132,7 @@ static const gfx_layout vc4000_charlayout =
 	1*8
 };
 
-static GFXDECODE_START( vc4000_gfxdecodeinfo )
+static GFXDECODE_START( vc4000 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, vc4000_charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -192,7 +192,7 @@ static MACHINE_DRIVER_START( vc4000 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(226, 312)
 	MDRV_SCREEN_VISIBLE_AREA(10, 182, 0, 269)
-	MDRV_GFXDECODE( vc4000_gfxdecodeinfo )
+	MDRV_GFXDECODE( vc4000 )
 	MDRV_PALETTE_LENGTH(sizeof(vc4000_palette) / 3)
 	MDRV_COLORTABLE_LENGTH(sizeof (vc4000_colortable) / sizeof(vc4000_colortable[0][0]))
 	MDRV_PALETTE_INIT( vc4000 )

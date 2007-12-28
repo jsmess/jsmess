@@ -303,7 +303,7 @@ static const gfx_layout trs80_charlayout_double_width =
 	8*FH		   /* every char takes FH bytes */
 };
 
-static GFXDECODE_START( trs80_gfxdecodeinfo )
+static GFXDECODE_START( trs80 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout_normal_width, 0, 4 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout_double_width, 0, 4 )
 GFXDECODE_END
@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( level1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*FW, 16*FH)
 	MDRV_SCREEN_VISIBLE_AREA(0*FW,64*FW-1,0*FH,16*FH-1)
-	MDRV_GFXDECODE( trs80_gfxdecodeinfo )
+	MDRV_GFXDECODE( trs80 )
 	MDRV_PALETTE_LENGTH(sizeof(trs80_palette)/sizeof(trs80_palette[0])/3)
 	MDRV_COLORTABLE_LENGTH(sizeof(trs80_colortable)/sizeof(trs80_colortable[0]))
 	MDRV_PALETTE_INIT( trs80 )

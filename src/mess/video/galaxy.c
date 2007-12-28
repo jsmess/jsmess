@@ -63,7 +63,7 @@ VIDEO_UPDATE( galaxy )
 		black_area.max_x = 32*8-1;
 		black_area.min_y = 0;
 		black_area.max_y = 16*13-1;
-		fillbitmap(bitmap, Machine->pens[1], &black_area);
+		fillbitmap(bitmap, machine->pens[1], &black_area);
 		fast_mode = TRUE;
 		return 0;
 	}
@@ -84,7 +84,7 @@ VIDEO_UPDATE( galaxy )
 		}
 		if (horizontal_pos == 0x0b)
 			black_area.min_x =  black_area.max_x = 0; 
-		fillbitmap(bitmap, Machine->pens[1], &black_area);
+		fillbitmap(bitmap, machine->pens[1], &black_area);
 	}	
 
 	for( offs = 0; offs < 512; offs++ )
@@ -101,7 +101,7 @@ VIDEO_UPDATE( galaxy )
 			if (code>191)
 				code-=128;
 			sy = (offs / 32) * 13;
-			drawgfx(bitmap, Machine->gfx[0], code & 0x7f, 1, 0,0, sx,sy,
+			drawgfx(bitmap, machine->gfx[0], code & 0x7f, 1, 0,0, sx,sy,
 				NULL, TRANSPARENCY_NONE, 0);
 		}
 	}

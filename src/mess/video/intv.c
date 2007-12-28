@@ -766,7 +766,7 @@ VIDEO_UPDATE( intv )
 {
 	copybitmap(bitmap,tmpbitmap,0,0,
 	           col_delay*2,row_delay*2,
-			   &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			   &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 
@@ -849,23 +849,23 @@ VIDEO_UPDATE( intvkbd )
 			for(x=0;x<40;x++)
 			{
 				offs = current_row*64+x;
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 					videoram[offs],
 					7, /* white */
 					0,0,
 					x*8,y*8,
-					&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 			}
 			if (current_row == tms9927_cursor_row)
 			{
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 					191, /* a block */
 					7,   /* white   */
 					0,0,
 					(tms9927_cursor_col-1)*8,y*8,
-					&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 			}
 			current_row = (current_row + 1) % tms9927_num_rows;
 		}
@@ -874,33 +874,33 @@ VIDEO_UPDATE( intvkbd )
 #if 0
 	// debugging
 	c = tape_motor_mode_desc[tape_motor_mode][0];
-	drawgfx(bitmap,Machine->gfx[2],
+	drawgfx(bitmap,machine->gfx[2],
 		c,
 		1,
 		0,0,
 		0*8,0*8,
-		&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+		&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 	for(y=0;y<5;y++)
 	{
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 			tape_unknown_write[y]+'0',
 			1,
 			0,0,
 			0*8,(y+2)*8,
-			&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+			&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 	}
-	drawgfx(bitmap,Machine->gfx[2],
+	drawgfx(bitmap,machine->gfx[2],
 			tape_unknown_write[5]+'0',
 			1,
 			0,0,
 			0*8,8*8,
-			&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap,Machine->gfx[2],
+			&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+	drawgfx(bitmap,machine->gfx[2],
 			tape_interrupts_enabled+'0',
 			1,
 			0,0,
 			0*8,10*8,
-			&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+			&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 #endif
 	return 0;
 }

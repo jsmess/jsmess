@@ -159,7 +159,7 @@ INPUT_PORTS_END
 static const struct CustomSound_interface snes_sound_interface =
 { snes_sh_start, 0, 0 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( snes )
 GFXDECODE_END
 
 static PALETTE_INIT( snes )
@@ -482,7 +482,7 @@ static MACHINE_DRIVER_START( snes )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(snes)
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_COLORTABLE_LENGTH(257)
 	MDRV_PALETTE_INIT( snes )

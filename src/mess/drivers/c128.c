@@ -967,7 +967,7 @@ static const gfx_layout c128graphic_charlayout =
 	8
 };
 
-static GFXDECODE_START( c128_gfxdecodeinfo )
+static GFXDECODE_START( c128 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, c128_charlayout, 0, 0x100 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, c128graphic_charlayout, 0, 0x100 )
 GFXDECODE_END
@@ -1192,7 +1192,7 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(656, 216)
 	MDRV_SCREEN_VISIBLE_AREA(0, 656 - 1, 0, 216 - 1)
-	MDRV_GFXDECODE( c128_gfxdecodeinfo )
+	MDRV_GFXDECODE( c128 )
 	MDRV_PALETTE_LENGTH((sizeof (vic2_palette) +sizeof(vdc8563_palette))/ sizeof (vic2_palette[0]) / 3 )
 	MDRV_COLORTABLE_LENGTH( 0x100*2 )
 	MDRV_PALETTE_INIT( c128 )

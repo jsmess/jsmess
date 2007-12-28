@@ -366,7 +366,7 @@ static const gfx_layout charlayout_abc80 =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( gfxdecodeinfo_abc80 )
+static GFXDECODE_START( abc80 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc80, 0, 2 )	// normal characters
 	GFXDECODE_ENTRY( REGION_GFX1, 0x500, charlayout_abc80, 0, 2 )	// graphics characters
 GFXDECODE_END
@@ -463,7 +463,7 @@ static MACHINE_DRIVER_START( abc80 )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(gfxdecodeinfo_abc80)
+	MDRV_GFXDECODE(abc80)
 	MDRV_COLORTABLE_LENGTH(2*2)
 	MDRV_PALETTE_LENGTH(2)
 

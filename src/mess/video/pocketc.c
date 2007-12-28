@@ -47,7 +47,7 @@ VIDEO_START( pocketc )
 	{
 		char backdrop_name[200];
 	    /* try to load a backdrop for the machine */
-		sprintf(backdrop_name, "%s.png", Machine->gamedrv->name);
+		sprintf(backdrop_name, "%s.png", machine->gamedrv->name);
 		backdrop_load(backdrop_name, 8);
 	}
 #endif

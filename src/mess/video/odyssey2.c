@@ -165,8 +165,8 @@ static UINT8 y_beam_pos;
 
 VIDEO_START( odyssey2 )
 {
-	o2_snd_shift[0] = Machine->sample_rate / 983;
-	o2_snd_shift[1] = Machine->sample_rate / 3933;
+	o2_snd_shift[0] = machine->sample_rate / 983;
+	o2_snd_shift[1] = machine->sample_rate / 3933;
 
 	odyssey2_vh_hpos = 0;
 	odyssey2_display = (UINT8 *) auto_malloc(8 * 8 * 256);
@@ -461,7 +461,7 @@ VIDEO_UPDATE( odyssey2 )
 
 	assert(bitmap->width<=ARRAY_LENGTH(bg[0]) && bitmap->height<=ARRAY_LENGTH(bg));
 
-	plot_box( bitmap, 0, 0, bitmap->width, bitmap->height, Machine->pens[(o2_vdc.s.color >> 3) & 0x7] );
+	plot_box( bitmap, 0, 0, bitmap->width, bitmap->height, machine->pens[(o2_vdc.s.color >> 3) & 0x7] );
 
 	if (o2_vdc.s.control & 0x08)        /* show grid */
         odyssey2_draw_grid(bitmap, bg);
@@ -491,7 +491,7 @@ VIDEO_UPDATE( odyssey2 )
 			/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
 			 * the color table, a vile gross hack.  Doesn't look like this is going
 			 * to survive the 0.118u5 transition */
-			/* Machine->gfx[0]->colortable[1]=Machine->pens[16+((o2_vdc.s.sprites[i].color>>3)&7)]; */
+			/* machine->gfx[0]->colortable[1]=machine->pens[16+((o2_vdc.s.sprites[i].color>>3)&7)]; */
 
 			y=o2_vdc.s.sprites[i].y;
 			x=o2_vdc.s.sprites[i].x;
@@ -503,7 +503,7 @@ VIDEO_UPDATE( odyssey2 )
 					if (y+4*j>=bitmap->height) 
                         break;
 					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*4, 2, 4, 1<<i);    /* 1 << i is sprite collision index */
-					drawgfxzoom(bitmap, Machine->gfx[1], o2_vdc.s.shape[i][j],0,
+					drawgfxzoom(bitmap, machine->gfx[1], o2_vdc.s.shape[i][j],0,
 						0,0,x,y+j*4,
 						0, TRANSPARENCY_PEN,0,0x20000, 0x40000);
 				}
@@ -513,7 +513,7 @@ VIDEO_UPDATE( odyssey2 )
 					if (y+j*2>=bitmap->height) 
                         break;
 					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*2, 1, 2, 1<<i);    /* 1 << i is sprite collision index */
-					drawgfxzoom(bitmap, Machine->gfx[1], o2_vdc.s.shape[i][j],0,
+					drawgfxzoom(bitmap, machine->gfx[1], o2_vdc.s.shape[i][j],0,
 						0,0,x,y+j*2,
 						0, TRANSPARENCY_PEN,0, 0x10000, 0x20000);
 				}

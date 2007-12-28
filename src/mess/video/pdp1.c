@@ -63,7 +63,7 @@ VIDEO_START( pdp1 )
 	/* set up out bitmaps */
 	pdp1_draw_panel_backdrop(panel_bitmap);
 
-	fillbitmap(typewriter_bitmap, Machine->pens[pen_typewriter_bg], &typewriter_bitmap_bounds);
+	fillbitmap(typewriter_bitmap, machine->pens[pen_typewriter_bg], &typewriter_bitmap_bounds);
 
 	/* initialize CRT */
 	video_start_crt(pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
@@ -92,9 +92,9 @@ VIDEO_UPDATE( pdp1 )
 	pdp1_draw_lightpen(bitmap);
 
 	pdp1_draw_panel(panel_bitmap);
-	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 
-	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	return 0;
 }
 

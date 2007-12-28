@@ -952,9 +952,9 @@ VIDEO_START( ted7360 )
 	decodegfx(cursorelement, cursormask, 0, 1);
 	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
 	/* cursorelement->colortable = cursorcolortable; */
-	cursorcolortable[1] = Machine->pens[1];
+	cursorcolortable[1] = machine->pens[1];
 	cursorelement->total_colors = 2;
-	ted7360_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	ted7360_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	add_exit_callback(machine, ted7360_video_stop);
 }
 

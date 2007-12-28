@@ -2410,7 +2410,7 @@ static const gfx_layout asic_sprite_layout =
 	16*16*8
 };
 
-static GFXDECODE_START( asic_sprite_gfxdecodeinfo )
+static GFXDECODE_START( asic_sprite )
 	GFXDECODE_ENTRY( REGION_USER1, 0, asic_sprite_layout, 32, 1 )
 GFXDECODE_END
 
@@ -2482,7 +2482,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cpcplus )
 	MDRV_IMPORT_FROM( amstrad )
 	MDRV_SCREEN_REFRESH_RATE( AMSTRAD_FPS )
-	MDRV_GFXDECODE( asic_sprite_gfxdecodeinfo )
+	MDRV_GFXDECODE( asic_sprite )
 	MDRV_MACHINE_START( plus )
 	MDRV_MACHINE_RESET( plus )
 	MDRV_SCREEN_SIZE(800, 312)

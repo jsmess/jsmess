@@ -192,18 +192,18 @@ VIDEO_UPDATE( spectrum )
     for (count=0;count<32*8;count++)
     {
 		if (charsdirty[count]) {
-			decodechar( Machine->gfx[0],count,spectrum_characterram,
-					Machine->drv->gfxdecodeinfo[0].gfxlayout );
+			decodechar( machine->gfx[0],count,spectrum_characterram,
+					machine->drv->gfxdecodeinfo[0].gfxlayout );
 		}
 
 		if (charsdirty[count+256]) {
-			decodechar( Machine->gfx[1],count,&spectrum_characterram[0x800],
-					Machine->drv->gfxdecodeinfo[0].gfxlayout );
+			decodechar( machine->gfx[1],count,&spectrum_characterram[0x800],
+					machine->drv->gfxdecodeinfo[0].gfxlayout );
 		}
 
 		if (charsdirty[count+512]) {
-			decodechar( Machine->gfx[2],count,&spectrum_characterram[0x1000],
-					Machine->drv->gfxdecodeinfo[0].gfxlayout );
+			decodechar( machine->gfx[2],count,&spectrum_characterram[0x1000],
+					machine->drv->gfxdecodeinfo[0].gfxlayout );
 		}
 	}
 
@@ -216,7 +216,7 @@ VIDEO_UPDATE( spectrum )
             if (charsdirty[count]) {
                     color=get_display_color(spectrum_colorram[count],
                                             flash_invert);
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 			count,
 			color,
 			0,0,
@@ -228,7 +228,7 @@ VIDEO_UPDATE( spectrum )
 	if (charsdirty[count+256]) {
                     color=get_display_color(spectrum_colorram[count+0x100],
                                             flash_invert);
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 			count,
 			color,
 			0,0,
@@ -240,7 +240,7 @@ VIDEO_UPDATE( spectrum )
 	if (charsdirty[count+512]) {
                     color=get_display_color(spectrum_colorram[count+0x200],
                                             flash_invert);
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 			count,
 			color,
 			0,0,
@@ -304,9 +304,9 @@ VIDEO_UPDATE( spectrum_128 )
                         for (b=0x80;b!=0;b>>=1)
                         {
                                 if (*scr&b)
-                                        spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,Machine->pens[ink]);
+                                        spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,machine->pens[ink]);
                                 else
-                                        spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,Machine->pens[pap]);
+                                        spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,machine->pens[pap]);
 			}
                 scr++;
                 attr++;

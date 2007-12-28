@@ -170,8 +170,8 @@ static VIDEO_UPDATE(ti99_2)
 			dirtybuffer[i] = 0;
 
 			/* Is the char code masked or not ??? */
-			drawgfx(tmpbitmap, Machine->gfx[0], videoram[i] & 0x7F, 0,
-			          0, 0, sx, sy, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+			drawgfx(tmpbitmap, machine->gfx[0], videoram[i] & 0x7F, 0,
+			          0, 0, sx, sy, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 		}
 
 		sx += 8;
@@ -182,7 +182,7 @@ static VIDEO_UPDATE(ti99_2)
 		}
 	}
 
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	return 0;
 }
 
@@ -199,7 +199,7 @@ static const gfx_layout ti99_2_charlayout =
 	8*8         /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( ti99_2 )
 	GFXDECODE_ENTRY( REGION_CPU1, 0x1c00,  ti99_2_charlayout, 0, 0 )
 GFXDECODE_END
 
@@ -408,7 +408,7 @@ static MACHINE_DRIVER_START(ti99_2)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 192)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ti99_2)
 	MDRV_PALETTE_LENGTH(TI99_2_PALETTE_SIZE)
 	MDRV_COLORTABLE_LENGTH(TI99_2_COLORTABLE_SIZE)
 	MDRV_PALETTE_INIT(ti99_2)

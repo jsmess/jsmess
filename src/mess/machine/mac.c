@@ -1076,7 +1076,7 @@ NVRAM_HANDLER( mac )
 			struct tm mac_reference;
 			UINT32 seconds;
 
-			mame_get_base_datetime(Machine, &systime);
+			mame_get_base_datetime(machine, &systime);
 
 			/* The count starts on 1st January 1904 */
 			mac_reference.tm_sec = 0;

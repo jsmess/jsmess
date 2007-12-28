@@ -146,7 +146,7 @@ static const gfx_layout key_layout =
 	18 * 24 * 2,	/* every icon takes 18 rows of 24 * 2 bits */
 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( mekd2 )
 	GFXDECODE_ENTRY( 1, 0, led_layout, 0, 16 )
 	GFXDECODE_ENTRY( 2, 0, key_layout, 16*2, 2 )
 GFXDECODE_END
@@ -166,7 +166,7 @@ static MACHINE_DRIVER_START( mekd2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(600, 768)
 	MDRV_SCREEN_VISIBLE_AREA(0, 600-1, 0, 768-1)
-	MDRV_GFXDECODE( gfxdecodeinfo )
+	MDRV_GFXDECODE( mekd2 )
 	MDRV_PALETTE_LENGTH(21 + 32768)
 	MDRV_COLORTABLE_LENGTH(256)
 	MDRV_PALETTE_INIT( mekd2 )

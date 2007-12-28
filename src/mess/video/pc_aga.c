@@ -77,7 +77,7 @@ static const gfx_layout pc200_cga_charlayout =
 };
 
 
-GFXDECODE_START( europc_gfxdecodeinfo )
+GFXDECODE_START( europc )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, europc_cga_charlayout, 0, 256 )   /* single width */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, europc_cga_charlayout, 0, 256 )   /* single width */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, europc_cga_charlayout, 0, 256 )   /* single width */
@@ -88,7 +88,7 @@ GFXDECODE_START( europc_gfxdecodeinfo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, europc_mda_charlayout, 256*2+16*2+96*4, 256 )   /* single width */
 GFXDECODE_END
 
-GFXDECODE_START( aga_gfxdecodeinfo )
+GFXDECODE_START( aga )
 /* The four CGA fonts */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, pc200_cga_charlayout, 0, 256 )   /* single width */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x3000, pc200_cga_charlayout, 0, 256 )   /* single width */
@@ -208,7 +208,7 @@ VIDEO_START( pc_aga )
 
 	pc_mda_europc_init();
 
-	buswidth = cputype_databus_width(Machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -241,7 +241,7 @@ VIDEO_START( pc200 )
 
 	video_start_pc_aga(machine);
 
-	buswidth = cputype_databus_width(Machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

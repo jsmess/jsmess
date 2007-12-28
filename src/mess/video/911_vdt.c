@@ -42,7 +42,7 @@ static const gfx_layout fontlayout_8bit =
 	10*8 			/* every char takes 10 consecutive bytes */
 };
 
-GFXDECODE_START( vdt911_gfxdecodeinfo )
+GFXDECODE_START( vdt911 )
 	/* array must use same order as vdt911_model_t!!! */
 	/* US */
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_US_chr_offset, fontlayout_7bit, 0, 4 )

@@ -161,7 +161,7 @@ VIDEO_UPDATE( aim65 )
 
             for (b = 0; b<10; b++)
             {
-                color=Machine->pens[(data & 0x1)?2:0];
+                color=machine->pens[(data & 0x1)?2:0];
                 plot_pixel(bitmap,700 - ((b * 10) + x), y,color);
                 data = data >> 1;
             }

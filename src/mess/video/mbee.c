@@ -535,8 +535,8 @@ VIDEO_UPDATE( mbee )
 			sx = (off_x + ((offs - screen_) % crt.horizontal_displayed)) * 8;
 			code = videoram[offs];
 			color = colorram[offs];
-			drawgfx( bitmap,Machine->gfx[0],code,color,0,0,sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			drawgfx( bitmap,machine->gfx[0],code,color,0,0,sx,sy,
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 			dirtybuffer[offs] = 0;
 			if( offs == cursor && (crt.cursor_top & 0x60) != 0x20 )
 			{
@@ -548,7 +548,7 @@ VIDEO_UPDATE( mbee )
 						if( y > crt.scan_lines )
 							break;
 						for( x = 0; x < 8; x++ )
-							*BITMAP_ADDR16(bitmap, sy+y, sx+x) = Machine->pens[color];
+							*BITMAP_ADDR16(bitmap, sy+y, sx+x) = machine->pens[color];
 					}
 					dirtybuffer[offs] = 1;
 				}

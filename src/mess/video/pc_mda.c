@@ -46,7 +46,7 @@ const gfx_layout pc_mda_charlayout =
 	8*8 					/* every char takes 8 bytes (upper half) */
 };
 
-GFXDECODE_START( pc_mda_gfxdecodeinfo )
+GFXDECODE_START( pc_mda )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pc_mda_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -188,7 +188,7 @@ VIDEO_START( pc_mda )
 {
 	int buswidth;
 
-	buswidth = cputype_databus_width(Machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

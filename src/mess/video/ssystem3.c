@@ -37,7 +37,7 @@ VIDEO_START( ssystem3 )
 	{
 		char backdrop_name[200];
 	    /* try to load a backdrop for the machine */
-		sprintf (backdrop_name, "%s.png", Machine->gamedrv->name);
+		sprintf (backdrop_name, "%s.png", machine->gamedrv->name);
 		backdrop_load(backdrop_name, 3);
 	}
 #endif
@@ -184,19 +184,19 @@ VIDEO_UPDATE( ssystem3 )
 							   ssystem3_led_pos[i].y);
 	}
 
-	ssystem3_draw_led(bitmap, Machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '0');
-	ssystem3_draw_led(bitmap, Machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '1');
-	ssystem3_draw_led(bitmap, Machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '2');
-	ssystem3_draw_led(bitmap, Machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
-	ssystem3_draw_led(bitmap, Machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
-	ssystem3_draw_led(bitmap, Machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '5');
-	ssystem3_draw_led(bitmap, Machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '6');
 	return 0;
 }

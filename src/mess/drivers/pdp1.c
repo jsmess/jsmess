@@ -283,7 +283,7 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( gfxdecodeinfo )
+static GFXDECODE_START( pdp1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, 0, 3 )
 GFXDECODE_END
 
@@ -412,7 +412,7 @@ static MACHINE_DRIVER_START(pdp1)
 	MDRV_SCREEN_SIZE(virtual_width, virtual_height)
 	MDRV_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pdp1)
 	MDRV_PALETTE_LENGTH(pen_crt_num_levels + (sizeof(palette) / sizeof(palette[0]) / 3))
 	MDRV_COLORTABLE_LENGTH(sizeof(pdp1_colortable) / sizeof(pdp1_colortable[0]))
 

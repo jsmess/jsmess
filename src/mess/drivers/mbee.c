@@ -188,7 +188,7 @@ const gfx_layout mbee_charlayout =
     8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( mbee_gfxdecodeinfo )
+static GFXDECODE_START( mbee )
 	GFXDECODE_ENTRY( REGION_CPU1, 0xf000, mbee_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -261,7 +261,7 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_MACHINE_RESET( mbee )
 	MDRV_MACHINE_START( mbee )
 
-	MDRV_GFXDECODE(mbee_gfxdecodeinfo)
+	MDRV_GFXDECODE(mbee)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(70*8, 310)
