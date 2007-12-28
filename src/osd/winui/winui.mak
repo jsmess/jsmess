@@ -101,6 +101,11 @@ ifdef MSVC_BUILD
 
 VCONV = $(WINOBJ)/vconv$(EXE)
 
+# append a 'v' prefix if nothing specified
+ifndef PREFIX
+PREFIX = v
+endif
+
 # replace the various compilers with vconv.exe prefixes
 CC = @$(VCONV) gcc -I.
 LD = @$(VCONV) ld /profile
@@ -121,11 +126,11 @@ LD += /LTCG
 endif
 
 ifdef PTR64
-CC += /wd4267 /wd4312 /Wp64
+CC += /wd4267
 endif
 
 # add some VC++-specific defines
-DEFS += -D_CRT_SECURE_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf -Dvsnprintf=_vsnprintf
+DEFS += -D_CRT_SECURE_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
 
 # make msvcprep into a pre-build step
 # OSPREBUILD = $(VCONV)
