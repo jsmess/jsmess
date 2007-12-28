@@ -1110,6 +1110,22 @@ static const UINT8 abs_oam_fingerprint[0x100] = {
 };
 */
 
+enum {
+	GB_LCD_STATE_LYXX_M3=1,
+	GB_LCD_STATE_LYXX_PRE_M0,
+	GB_LCD_STATE_LYXX_M0,
+	GB_LCD_STATE_LYXX_M0_PRE_INC,
+	GB_LCD_STATE_LYXX_M0_INC,
+	GB_LCD_STATE_LY00_M2,
+	GB_LCD_STATE_LYXX_M2,
+	GB_LCD_STATE_LY9X_M1,
+	GB_LCD_STATE_LY9X_M1_INC,
+	GB_LCD_STATE_LY00_M1,
+	GB_LCD_STATE_LY00_M1_1,
+	GB_LCD_STATE_LY00_M1_2,
+	GB_LCD_STATE_LY00_M0
+};
+
 static TIMER_CALLBACK( gb_video_init_vbl ) {
 	cpunum_set_input_line( 0, VBL_INT, ASSERT_LINE );
 }
@@ -1225,6 +1241,10 @@ void gb_video_init( int mode ) {
 		gbc_video_w( 0x8, 0xFC );    /* SPR0PAL */
 		gbc_video_w( 0x9, 0xFC );    /* SPR1PAL */
 		gbc_video_w( 0x0F, 0x00 );
+		CURLINE = gb_lcd.current_line = 0x90;
+		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x01;
+		gb_lcd.mode = 1;
+		timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(292,0), GB_LCD_STATE_LY9X_M1_INC, attotime_never );
 		break;
 	}
 }
@@ -1259,22 +1279,6 @@ static void gb_increment_scanline( void ) {
 		gb_lcd.window_lines_drawn = 0;
 	}
 }
-
-enum {
-	GB_LCD_STATE_LYXX_M3=1,
-	GB_LCD_STATE_LYXX_PRE_M0,
-	GB_LCD_STATE_LYXX_M0,
-	GB_LCD_STATE_LYXX_M0_PRE_INC,
-	GB_LCD_STATE_LYXX_M0_INC,
-	GB_LCD_STATE_LY00_M2,
-	GB_LCD_STATE_LYXX_M2,
-	GB_LCD_STATE_LY9X_M1,
-	GB_LCD_STATE_LY9X_M1_INC,
-	GB_LCD_STATE_LY00_M1,
-	GB_LCD_STATE_LY00_M1_1,
-	GB_LCD_STATE_LY00_M1_2,
-	GB_LCD_STATE_LY00_M0
-};
 
 static TIMER_CALLBACK(gb_lcd_timer_proc)
 {
