@@ -29,6 +29,9 @@
 
 //============================================================
 
+#define SEQWM_SETFOCUS	(WM_APP + 0)
+#define SEQWM_KILLFOCUS	(WM_APP + 1)
+
 enum
 {
 	TRIGGER_INITDIALOG	= 1,
@@ -80,6 +83,14 @@ struct _dialog_box
 	void *notify_param;
 };
 
+enum _seqselect_state
+{
+	SEQSELECT_STATE_NOT_POLLING,
+	SEQSELECT_STATE_POLLING,
+	SEQSELECT_STATE_POLLING_COMPLETE
+};
+typedef enum _seqselect_state seqselect_state;
+
 // this is the structure that gets associated with each input_seq edit box
 typedef struct _seqselect_info seqselect_info;
 struct _seqselect_info
@@ -87,10 +98,9 @@ struct _seqselect_info
 	WNDPROC oldwndproc;
 	input_seq *code;		// pointer to the input_seq
 	input_seq newcode;		// the new input_seq; committed to *code when we are done
-	UINT_PTR timer;
 	WORD pos;
 	BOOL is_analog;
-	int start_poll; 
+	seqselect_state poll_state;
 };
 
 
@@ -125,8 +135,6 @@ struct _seqselect_info
 
 #define FONT_SIZE				8
 #define FONT_FACE				L"Arial"
-
-#define TIMER_ID				0xdeadbeef
 
 #define SCROLL_DELTA_LINE		10
 #define SCROLL_DELTA_PAGE		100
@@ -1051,13 +1059,23 @@ static void seqselect_settext(HWND editwnd)
 {
 	seqselect_info *stuff;
 	astring *seqstring;
+	char buffer[128];
 
-	seqstring = astring_alloc();
-
+	// the basics
 	stuff = get_seqselect_info(editwnd);
-	input_seq_name(seqstring, &stuff->newcode);
-	win_set_window_text_utf8(editwnd, astring_c(seqstring));
+	if (stuff == NULL)
+		return;	// this should not happen - need to fix this
 
+	// retrieve the seq name
+	seqstring = astring_alloc();
+	input_seq_name(seqstring, &stuff->newcode);
+
+	// change the text - avoid calls to SetWindowText() if we can
+	win_get_window_text_utf8(editwnd, buffer, ARRAY_LENGTH(buffer));
+	if (strcmp(buffer, astring_c(seqstring)))
+		win_set_window_text_utf8(editwnd, astring_c(seqstring));
+
+	// reset the selection 
 	if (GetFocus() == editwnd)
 		SendMessage(editwnd, EM_SETSEL, 0, -1);
 
@@ -1067,24 +1085,37 @@ static void seqselect_settext(HWND editwnd)
 
 
 //============================================================
-//	seqselect_read_from_main_thread
+//	seqselect_start_read_from_main_thread
 //============================================================
 
-static void seqselect_read_from_main_thread(void *param)
+static void seqselect_start_read_from_main_thread(void *param)
 {
 	seqselect_info *stuff;
 	HWND editwnd;
 	int ret;
 	win_window_info fake_window_info;
 	win_window_info *old_window_list;
+	int pause_count;
 
 	// get the basics
 	editwnd = (HWND) param;
 	stuff = get_seqselect_info(editwnd);
 
+	// are we currently polling?  if so bail out
+	if (stuff->poll_state != SEQSELECT_STATE_NOT_POLLING)
+		return;
+
+	// change the state
+	stuff->poll_state = SEQSELECT_STATE_POLLING;
+
 	// the Win32 OSD code thinks that we are paused, we need to temporarily
 	// unpause ourselves or else we will block
-	winwindow_ui_pause_from_main_thread(FALSE);
+	pause_count = 0;
+	while(mame_is_paused(Machine) && !winwindow_ui_is_paused())
+	{
+		winwindow_ui_pause_from_main_thread(FALSE);
+		pause_count++;
+	}
 
 	// butt ugly hack so that we accept focus
 	old_window_list = win_window_list;
@@ -1092,22 +1123,45 @@ static void seqselect_read_from_main_thread(void *param)
 	fake_window_info.hwnd = GetFocus();
 	win_window_list = &fake_window_info;
 
-	// start polling if we are told to
-	if (stuff->start_poll)
-	{
-		input_seq_poll_start(stuff->is_analog ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, NULL);
-		stuff->start_poll = FALSE;
-	}
+	// start the polling
+	input_seq_poll_start(stuff->is_analog ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, NULL);
 
-	// poll
-	ret = input_seq_poll(&stuff->newcode);
-	seqselect_settext(editwnd);
+	while(stuff->poll_state == SEQSELECT_STATE_POLLING)
+	{
+		// poll
+		ret = input_seq_poll(&stuff->newcode);
+		seqselect_settext(editwnd);
+	}
 
 	// clean up after hack
 	win_window_list = old_window_list;
 
+	// we are no longer polling
+	stuff->poll_state = SEQSELECT_STATE_NOT_POLLING;
+
 	// repause the OSD code
-	winwindow_ui_pause_from_main_thread(TRUE);
+	while(pause_count--)
+		winwindow_ui_pause_from_main_thread(TRUE);
+}
+
+
+
+//============================================================
+//	seqselect_stop_read_from_main_thread
+//============================================================
+
+static void seqselect_stop_read_from_main_thread(void *param)
+{
+	HWND editwnd;
+	seqselect_info *stuff;
+
+	// get the basics
+	editwnd = (HWND) param;
+	stuff = get_seqselect_info(editwnd);
+	
+	// stop the read
+	if (stuff->poll_state == SEQSELECT_STATE_POLLING)
+		stuff->poll_state = SEQSELECT_STATE_POLLING_COMPLETE;
 }
 
 
@@ -1124,49 +1178,42 @@ static INT_PTR CALLBACK seqselect_wndproc(HWND editwnd, UINT msg, WPARAM wparam,
 
 	stuff = get_seqselect_info(editwnd);
 
-	switch(msg) {
-	case WM_KEYDOWN:
-	case WM_SYSKEYDOWN:
-	case WM_CHAR:
-	case WM_KEYUP:
-	case WM_SYSKEYUP:
-		result = 1;
-		call_baseclass = FALSE;
-		break;
-
-	case WM_TIMER:
-		if (wparam == TIMER_ID)
-		{
-			winwindow_ui_exec_on_main_thread(seqselect_read_from_main_thread, (void *) editwnd);
-			result = 0;
+	switch(msg)
+	{
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+		case WM_CHAR:
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+			result = 1;
 			call_baseclass = FALSE;
-		}
-		break;
+			break;
 
-	case WM_SETFOCUS:
-	case WM_KILLFOCUS:
-		// unselect the current seq; if appropriate
-		if (stuff->timer)
-		{
-			KillTimer(editwnd, stuff->timer);
-			stuff->timer = 0;
-		}
+		case WM_SETFOCUS:
+			PostMessage(editwnd, SEQWM_SETFOCUS, 0, 0);
+			break;
 
-		if (msg == WM_SETFOCUS)
-		{
-			// we are selecting a seq; begin a timer
-			stuff->start_poll = TRUE;
-			stuff->timer = SetTimer(editwnd, TIMER_ID, 100, (TIMERPROC) NULL);
-		}
-		break;
+		case WM_KILLFOCUS:
+			PostMessage(editwnd, SEQWM_KILLFOCUS, 0, 0);
+			break;
 
-	case WM_LBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-		SetFocus(editwnd);
-		SendMessage(editwnd, EM_SETSEL, 0, -1);
-		call_baseclass = FALSE;
-		result = 0;
-		break;
+		case SEQWM_SETFOCUS:
+			// if we receive the focus, we should start a polling loop
+			winwindow_ui_exec_on_main_thread(seqselect_start_read_from_main_thread, (void *) editwnd);
+			break;
+
+		case SEQWM_KILLFOCUS:
+			// when we abort the focus, end any current polling loop
+			winwindow_ui_exec_on_main_thread(seqselect_stop_read_from_main_thread, (void *) editwnd);
+			break;
+
+		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+			SetFocus(editwnd);
+			SendMessage(editwnd, EM_SETSEL, 0, -1);
+			call_baseclass = FALSE;
+			result = 0;
+			break;
 	}
 
 	if (call_baseclass)
@@ -1269,7 +1316,6 @@ static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 	memset(stuff, 0, sizeof(*stuff));
 	stuff->code = code;
 	stuff->pos = di->item_count;
-	stuff->timer = 0;
 	stuff->is_analog = is_analog;
 	if (dialog_add_trigger(di, di->item_count, TRIGGER_INITDIALOG, 0, seqselect_setup, di->item_count, (LPARAM) stuff, NULL, NULL))
 		return 1;
