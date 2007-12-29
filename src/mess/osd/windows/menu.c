@@ -930,7 +930,7 @@ static void paste(void)
 
 static void pause(running_machine *machine)
 {
-	mame_pause(machine, !mame_is_paused(machine));
+	mame_pause(machine, !winwindow_ui_is_paused());
 }
 
 
@@ -1633,6 +1633,19 @@ static void set_window_orientation(win_window_info *window, int orientation)
 
 
 //============================================================
+//	pause_for_command
+//============================================================
+
+static int pause_for_command(UINT command)
+{
+	// we really should be more conservative and only pause for commands
+	// that do dialog stuff
+	return (command != ID_OPTIONS_PAUSE);
+}
+
+
+
+//============================================================
 //	invoke_command
 //============================================================
 
@@ -1648,8 +1661,9 @@ static int invoke_command(HWND wnd, UINT command)
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	win_window_info *window = (win_window_info *)ptr;
 
-	// pause while invoking command
-	winwindow_ui_pause_from_window_thread(TRUE);
+	// pause while invoking certain commands
+	if (pause_for_command(command))
+		winwindow_ui_pause_from_window_thread(TRUE);
 
 	switch(command)
 	{
@@ -1876,7 +1890,8 @@ static int invoke_command(HWND wnd, UINT command)
 	}
 
 	// resume emulation
-	winwindow_ui_pause_from_window_thread(FALSE);
+	if (pause_for_command(command))
+		winwindow_ui_pause_from_window_thread(FALSE);
 
 	return handled;
 }
