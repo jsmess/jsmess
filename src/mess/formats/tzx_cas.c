@@ -212,7 +212,7 @@ static int tzx_cas_handle_block( INT16 **buffer, const UINT8 *bytes, int pause, 
 	int data_index;
 	int size = 0;
 
-	logerror( "tzx_cas_block_size: pliot_length = %d, pilot_samples = %d, sync1_samples = %d, sync2_samples = %d, bit0_samples = %d, bit1_samples = %d\n", pilot_length, pilot_samples, sync1_samples, sync2_samples, bit0_samples, bit1_samples );
+	logerror( "tzx_cas_block_size: pilot_length = %d, pilot_samples = %d, sync1_samples = %d, sync2_samples = %d, bit0_samples = %d, bit1_samples = %d\n", pilot_length, pilot_samples, sync1_samples, sync2_samples, bit0_samples, bit1_samples );
 
 	/* PILOT */
 	for( ; pilot_length > 0; pilot_length-- ) {
@@ -257,18 +257,7 @@ static int tzx_cas_handle_block( INT16 **buffer, const UINT8 *bytes, int pause, 
 		tzx_output_wave( buffer, rest_pause_samples );
 		size += rest_pause_samples;
 	}
-	else  /* default value for pause is 1000ms */
-	{
-		int start_pause_samples = millisec_to_samplecount( 1 );
-		int rest_pause_samples = millisec_to_samplecount( 1000 - 1 );
-
-		tzx_output_wave( buffer, start_pause_samples );
-		size += start_pause_samples;
-		wave_data = WAVE_LOW;
-		tzx_output_wave( buffer, rest_pause_samples );
-		size += rest_pause_samples;
-	}
-        return size;
+    return size;
 }
 
 /*
@@ -318,7 +307,7 @@ static int tzx_cas_do_work( INT16 **buffer ) {
 			break;
 		case 0x13:	/* Sequence of Pulses of Different Lengths */
 			for( data_size = 0; data_size < cur_block[1]; data_size++ ) {
-				pilot = cur_block[1 + 2*data_size] + ( cur_block[2 + 2*data_size] << 8 );
+				pilot = cur_block[2 + 2*data_size] + ( cur_block[3 + 2*data_size] << 8 );
 				size += tzx_cas_handle_block( buffer, cur_block, 0, 0, pilot, 1, 0, 0, 0, 0, 0 );
 			}
 			current_block++;

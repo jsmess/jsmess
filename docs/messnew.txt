@@ -45,6 +45,8 @@ System Driver Changes:
 
 - [TZX] Added Amstrad CPC .cdt support, and fixed pause length.  [Barry Rodewald]
 
+- [TZX] Fixed TZX block type 0x13.  [Barry Rodewald]
+
 - [X68000] Improved video timing.  [Barry Rodewald]
 
 
