@@ -15,6 +15,7 @@
 #include "driver.h"
 #include "cpu/i86/i186intf.h"
 #include "video/generic.h"
+#include "video/i82720.h"
 #include "machine/8255ppi.h"
 #include "machine/mm58274c.h"
 #include "machine/pic8259.h"
@@ -1556,8 +1557,15 @@ static int compis_irq_callback(int irqline)
 	return pic8259_acknowledge(0);
 }
 
+static const compis_gdc_interface i82720_interface =
+{
+	GDC_MODE_HRG,
+	0x8000
+};
+
 DRIVER_INIT( compis )
 {
+	compis_init( &i82720_interface );
 	cpunum_set_irq_callback(0,	compis_irq_callback);
 	pic8259_init(2, compis_pic_set_int_line);
 	memset (&compis, 0, sizeof (compis) );

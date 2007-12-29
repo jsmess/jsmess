@@ -27,6 +27,7 @@ void compis_gdc_vblank_int (void);
 /*
 ** Call this function to render the screen.
 */
+PALETTE_INIT( compis_gdc );
 VIDEO_START ( compis_gdc );
 VIDEO_UPDATE( compis_gdc );
 /*
@@ -41,13 +42,10 @@ typedef enum
 /*
 ** MachineDriver video declarations for the i82720 chip
 */
-typedef struct compis_gdc_interface
+typedef struct _compis_gdc_interface
 {
 	compis_gdc_modes mode;
 	UINT32	vramsize;
 } compis_gdc_interface;
 
-extern void mdrv_compisgdc(machine_config *machine,
-                           const compis_gdc_interface *intf);
-
-#define MDRV_COMPISGDC(intf)		mdrv_compisgdc(machine, (intf));
+void compis_init(const compis_gdc_interface *intf);

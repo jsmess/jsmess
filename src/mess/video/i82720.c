@@ -1400,7 +1400,7 @@ static const unsigned char COMPIS_palette[16*3] =
 	255, 255, 255
 };
 
-static PALETTE_INIT( compis_gdc )
+PALETTE_INIT( compis_gdc )
 {
 	palette_set_colors_rgb(machine, 0, COMPIS_palette, COMPIS_PALETTE_SIZE);
 }
@@ -1470,26 +1470,7 @@ VIDEO_START ( compis_gdc )
 	compis_gdc_start(&sIntf);
 }
 
-void mdrv_compisgdc(machine_config *machine,
-                    const compis_gdc_interface *intf)
-
+void compis_init(const compis_gdc_interface *intf)
 {
-	int scr_width = (intf->mode == GDC_MODE_UHRG) ? 1280 : 640;
-	int scr_height = (intf->mode == GDC_MODE_UHRG) ? 800 : 400;
-	screen_config *screen = &machine->screen[0];
-
 	sIntf = *intf;
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(scr_width, scr_height)
-	MDRV_SCREEN_VISIBLE_AREA(0, scr_width-1, 0, scr_height-1)
-	MDRV_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
-	MDRV_COLORTABLE_LENGTH(0)
-	MDRV_PALETTE_INIT(compis_gdc)
-
-	MDRV_VIDEO_START(compis_gdc)
-	MDRV_VIDEO_UPDATE(compis_gdc)
 }
-

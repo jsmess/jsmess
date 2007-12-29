@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_p1, I8039_p1) AM_READ(abc77_data_r)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(abc77_data_w)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(abc77_clock_r)
-	AM_RANGE(I8039_bus, I8039_bus) AM_READ(port_tag_to_handler8("DSW"))
+	AM_RANGE(I8039_bus, I8039_bus) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
 // ABC 802

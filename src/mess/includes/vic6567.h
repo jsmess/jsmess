@@ -47,7 +47,7 @@ extern void vic2_set_rastering(int onoff);
 #define VIC6569_LINES 312
 #define VIC2_LINES (vic2.pal?VIC6569_LINES:VIC6567_LINES)
 
-extern MACHINE_DRIVER_EXTERN( vh_vic2 );
+MACHINE_DRIVER_EXTERN( vh_vic2 );
 extern VIDEO_START( vic2 );
 extern VIDEO_UPDATE( vic2 );
 extern INTERRUPT_GEN( vic2_raster_irq );

@@ -317,6 +317,19 @@ static VIDEO_UPDATE( tm990_189 )
 	return 0;
 }
 
+static VIDEO_START( tm990_189_v )
+{
+	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when 
+	 * multimonitor support is added?*/
+	LED_display_window_left = machine->screen[0].visarea.min_x;
+	LED_display_window_top = machine->screen[0].visarea.max_y;
+	LED_display_window_width = machine->screen[0].visarea.max_x - machine->screen[0].visarea.min_x;
+	LED_display_window_height = 32;
+
+	machine->screen[0].visarea.max_y += 32;
+	machine->screen[0].height += 32;
+}
+
 static VIDEO_UPDATE( tm990_189_v )
 {
 	video_update_tms9928a(machine, screen, bitmap, cliprect);
@@ -832,16 +845,8 @@ static MACHINE_DRIVER_START(tm990_189_v)
 
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_VIDEO_EOF(tm990_189)
+	MDRV_VIDEO_START(tm990_189_v)
 	MDRV_VIDEO_UPDATE(tm990_189_v)
-
-	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when 
-	 * multimonitor support is added?*/
-	LED_display_window_left = machine->screen[0].defstate.visarea.min_x;
-	LED_display_window_top = machine->screen[0].defstate.visarea.max_y;
-	LED_display_window_width = machine->screen[0].defstate.visarea.max_x - machine->screen[0].defstate.visarea.min_x;
-	LED_display_window_height = 32;
-	machine->screen[0].defstate.visarea.max_y += 32;
-	machine->screen[0].defstate.height += 32;
 
 	/* sound hardware */
 	/* one two-level buzzer */

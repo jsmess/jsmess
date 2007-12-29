@@ -202,12 +202,6 @@ INPUT_PORTS_END
 
 static const unsigned i86_address_mask = 0x000fffff;
 
-static const compis_gdc_interface i82720_interface =
-{
-	GDC_MODE_HRG,
-	0x8000
-};
-
 static MACHINE_DRIVER_START( compis )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", I80186, 8000000)	/* 8 MHz */
@@ -222,7 +216,17 @@ static MACHINE_DRIVER_START( compis )
 
 	MDRV_MACHINE_RESET(compis)
 
-	MDRV_COMPISGDC( &i82720_interface )
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
+	MDRV_COLORTABLE_LENGTH(0)
+	MDRV_PALETTE_INIT(compis_gdc)
+
+	MDRV_VIDEO_START(compis_gdc)
+	MDRV_VIDEO_UPDATE(compis_gdc)
 
 MACHINE_DRIVER_END
 
