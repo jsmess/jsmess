@@ -111,12 +111,6 @@ void pc8801_video_init (int hireso)
 	text_old = auto_malloc(sizeof(unsigned short)*80*100);
 	graph_dirty = auto_malloc(80*100);
 
-	if (!wbm1 || !wbm2)
-	{
-		logerror ("pc8801: out of memory!\n");
-		return;
-	}
-
 	memset(gVRAM,0,0xc000);
 	memset(pc88sr_textRAM,0,0x1000);
 	selected_vram=0;

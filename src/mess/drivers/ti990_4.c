@@ -106,7 +106,7 @@ static WRITE8_HANDLER ( lrex_callback )
 	We emulate a single VDT911 CRT terminal.
 */
 
-static int video_start_ti990_4(void)
+static VIDEO_START( ti990_4 )
 {
 	const vdt911_init_params_t params =
 	{
@@ -115,7 +115,7 @@ static int video_start_ti990_4(void)
 		ti990_set_int3
 	};
 
-	return vdt911_init_term(0, & params);
+	vdt911_init_term(0, & params);
 }
 
 static VIDEO_UPDATE( ti990_4 )

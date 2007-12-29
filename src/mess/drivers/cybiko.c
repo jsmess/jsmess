@@ -13,7 +13,7 @@
 #include "includes/cybiko.h"
 
 #include "driver.h"
-#include "cpu/h8s2xxx/h8s2xxx.h"
+//#include "cpu/h8s2xxx/h8s2xxx.h"
 #include "video/hd66421.h"
 #include "inputx.h"
 #include "cybiko.lh"
@@ -254,7 +254,7 @@ SYSTEM_CONFIG_END
 
 MACHINE_DRIVER_START( cybikov1 )
 	// cpu
-	MDRV_CPU_ADD_TAG( "main", H8S2241, 11059200)
+	//MDRV_CPU_ADD_TAG( "main", H8S2241, 11059200)
 	MDRV_CPU_PROGRAM_MAP( cybikov1_mem, 0)
 	MDRV_CPU_IO_MAP( cybikov1_io, 0)
 	// screen
@@ -285,7 +285,7 @@ MACHINE_DRIVER_START( cybikov2 )
 	// import
 	MDRV_IMPORT_FROM( cybikov1)
 	// cpu
-	MDRV_CPU_REPLACE( "main", H8S2246, 11059200)
+	//MDRV_CPU_REPLACE( "main", H8S2246, 11059200)
 	MDRV_CPU_PROGRAM_MAP( cybikov2_mem, 0)
 	MDRV_CPU_IO_MAP( cybikov2_io, 0)
 	// machine
@@ -299,7 +299,7 @@ MACHINE_DRIVER_START( cybikoxt )
 	// import
 	MDRV_IMPORT_FROM( cybikov1)
 	// cpu
-	MDRV_CPU_REPLACE( "main", H8S2323, 18432000)
+	//MDRV_CPU_REPLACE( "main", H8S2323, 18432000)
 	MDRV_CPU_PROGRAM_MAP( cybikoxt_mem, 0)
 	MDRV_CPU_IO_MAP( cybikoxt_io, 0)
 	// sound

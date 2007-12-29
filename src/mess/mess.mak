@@ -341,8 +341,10 @@ DRVLIBS = \
 	$(MESSOBJ)/compis.a	\
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
+	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/dgn_beta.a \
+	$(MESSOBJ)/epson.a \
 	$(MESSOBJ)/ep128.a \
 	$(MESSOBJ)/exidy.a \
 	$(MESSOBJ)/fairch.a \
@@ -406,7 +408,7 @@ DRVLIBS = \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/shared.a \
-#	$(MESSOBJ)/exeltel.a \
+	$(MESSOBJ)/exeltel.a \
 
 
 
@@ -616,6 +618,7 @@ $(MESSOBJ)/dgn_beta.a:	\
 $(MESSOBJ)/trs80.a:    \
 	$(MESS_MACHINE)/trs80.o	 \
 	$(MESS_VIDEO)/trs80.o	 \
+	$(MESS_FORMATS)/trs_dsk.o	\
 	$(MESS_DRIVERS)/trs80.o
 
 $(MESSOBJ)/cgenie.a:   \
@@ -860,6 +863,7 @@ $(MESSOBJ)/vtech.a :   \
 	$(MESS_FORMATS)/vt_cas.o	\
 	$(MESS_FORMATS)/vt_dsk.o	\
 	$(MESS_DRIVERS)/crvision.o	\
+	$(MESS_DRIVERS)/super80.o	\
 
 $(MESSOBJ)/jupiter.a : \
 	$(MESS_DRIVERS)/jupiter.o	\
@@ -1072,6 +1076,7 @@ $(MESSOBJ)/telmac.a:					\
 
 $(MESSOBJ)/exeltel.a:					\
 	$(MESS_DRIVERS)/exelv.o		\
+	$(MESS_VIDEO)/tms3556.o		\
 
 $(MESSOBJ)/tx0.a:				\
 	$(MESS_VIDEO)/crt.o	\
@@ -1137,6 +1142,8 @@ $(MESSOBJ)/osborne.a:			\
 	$(MESS_DRIVERS)/osborne1.o	\
 	$(MESS_MACHINE)/osborne1.o	\
 
+$(MESSOBJ)/epson.a:			\
+	$(MESS_DRIVERS)/ex800.o	\
 
 
 #-------------------------------------------------

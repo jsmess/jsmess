@@ -34,7 +34,7 @@ void sst39vfx_init( int type, int cpu_datawidth, int cpu_endianess)
 		case SST39VF020  : flash.size = 256 * 1024; break;
 		case SST39VF400A : flash.size = 512 * 1024; break;
 	}
-	flash.data = (UINT8*)malloc( flash.size);
+	flash.data = malloc_or_die( flash.size);
 #ifdef LSB_FIRST
 	if (cpu_endianess != CPU_IS_LE) flash.swap = cpu_datawidth / 8; else flash.swap = 0;
 #else

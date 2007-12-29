@@ -73,9 +73,9 @@ void at45dbxx_init( int type)
 		case AT45DB161 : flash.pages = 4096; flash.page_size = 528; flash.devid = 0x28; break;
 	}
 	flash.size = flash.pages * flash.page_size;
-	flash.data = (UINT8*)malloc( flash.size);
-	flash.buffer1 = (UINT8*)malloc( flash.page_size);
-	flash.buffer2 = (UINT8*)malloc( flash.page_size);
+	flash.data = malloc_or_die( flash.size);
+	flash.buffer1 = malloc_or_die( flash.page_size);
+	flash.buffer2 = malloc_or_die( flash.page_size);
 	at45dbxx_state_save();
 }
 

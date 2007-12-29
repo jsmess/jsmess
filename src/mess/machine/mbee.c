@@ -212,7 +212,9 @@ DEVICE_LOAD( mbee_cart )
 {
 	int size = image_length(image);
 	UINT8 *mem = malloc(size);
-	if( mem )
+	if (!mem)
+		return INIT_FAIL;
+
 	{
 		if( image_fread(image, mem, size) == size )
 		{

@@ -26,6 +26,7 @@
 #include "machine/z80sio.h"
 #include "video/generic.h"
 #include "cpu/z80/z80daisy.h"
+#include "sound/speaker.h"
 
 static void pio_interrupt(int state);
 
@@ -34,7 +35,7 @@ static int charset;
 
 static const z80pio_interface z80pio_intf =
 {
-	pio_interrupt
+	pio_interrupt,
 	NULL,
 	NULL
 };
@@ -59,12 +60,12 @@ static void keyboard_scan(void)
 	z80pio_p_w(0, 1, state);
 }
 
-static void reset_timer_callback(int dummy)
+static TIMER_CALLBACK( reset_timer_callback )
 {
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x0000);
 }
 
-static MACHINE_RESET( super8 )
+static MACHINE_RESET( super80 )
 {
 	/* reset PIO */
 	z80pio_init(0, &z80pio_intf);
@@ -146,7 +147,7 @@ static READ8_HANDLER (super80_gpi_r)
 
 static WRITE8_HANDLER (super80_z80pio_w)
 {
-	z80pio_0_w(offset, data);
+	//z80pio_0_w(offset, data);
 	if (offset == 0)
 		/* port A write: scan keyboard */
 		keyboard_scan();
@@ -277,12 +278,10 @@ gfx_layout super80_dslc_charlayout =
 	8*16					/* every char takes 16 bytes */
 };
 
-static gfx_decode super80[] =
-{
-	{ REGION_GFX1, 0x0000, &super80_elg4_charlayout, 0, 2},
-	{ REGION_GFX1, 0x1000, &super80_dslc_charlayout, 0, 2},
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( super80 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, super80_elg4_charlayout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, super80_dslc_charlayout, 0, 2 )
+GFXDECODE_END
 
 static UINT8 bw_palette[] =
 {
@@ -304,8 +303,8 @@ static PALETTE_INIT( super80_bw )
 
 static const struct z80_irq_daisy_chain super80_daisy_chain[] =
 {
-	{z80pio_reset, z80pio_interrupt, z80pio_reti, 0},
-	{0,0,0,-1}
+	{z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0},
+	{0,0,0,0,-1}
 };
 
 

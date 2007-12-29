@@ -7,7 +7,7 @@ WRITE8_HANDLER(tms3556_vram_w);
 READ8_HANDLER(tms3556_reg_r);
 WRITE8_HANDLER(tms3556_reg_w);
 
-extern int tms3556_init(int vram_size);
+extern void tms3556_init(int vram_size);
 extern void tms3556_reset(void);
 extern void tms3556_interrupt(void);
 

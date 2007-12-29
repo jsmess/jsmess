@@ -145,8 +145,6 @@ typedef struct {
 	cpm_dpb dpb;			/* associated dpb */
 } dsk_fmt;
 
-extern const dsk_fmt formats[];
-
 /* these are in cpm_bios.c */
 DEVICE_LOAD( cpm_floppy );
 extern int cpm_init(int n, const char *const ids[]);

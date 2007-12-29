@@ -12,7 +12,7 @@
 
 #include "includes/cybiko.h"
 
-#include "cpu/h8s2xxx/h8s2xxx.h"
+//#include "cpu/h8s2xxx/h8s2xxx.h"
 #include "video/hd66421.h"
 #include "sound/speaker.h"
 #include "machine/pcf8593.h"
@@ -404,6 +404,7 @@ READ16_HANDLER( cybiko_key_r )
 	return data;
 }
 
+#if 0
 READ8_HANDLER( cybiko_io_reg_r )
 {
 	UINT8 data = 0;
@@ -520,6 +521,7 @@ WRITE8_HANDLER( cybikoxt_io_reg_w )
 		default : cybiko_io_reg_w( offset, data);
 	}
 }
+#endif
 
 // Cybiko Xtreme writes following byte pairs to 0x200003/0x200000
 // 00/01, 00/C0, 0F/32, 0D/03, 0B/03, 09/50, 07/D6, 05/00, 04/00, 20/00, 23/08, 27/01, 2F/08, 2C/02, 2B/08, 28/01

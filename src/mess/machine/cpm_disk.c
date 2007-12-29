@@ -5,7 +5,7 @@
  *
  ******************************************************************************/
 
-const dsk_fmt formats[] = {
+static const dsk_fmt formats[] = {
 	{
 		"ATHD", "IBM AT DSHD 3.5\"",
 		0,	/* unique format */

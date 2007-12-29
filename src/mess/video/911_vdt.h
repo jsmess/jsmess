@@ -55,7 +55,7 @@ typedef struct vdt911_init_params_t
 PALETTE_INIT( vdt911 );
 
 void vdt911_init(void);
-int vdt911_init_term(int unit, const vdt911_init_params_t *params);
+void vdt911_init_term(int unit, const vdt911_init_params_t *params);
 
 void vdt911_reset(void);
 

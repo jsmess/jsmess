@@ -115,6 +115,8 @@ static int get_cycles;
 /* a prototype to be called from cgenie_stop_machine */
 static void tape_put_close(running_machine *machine);
 
+/* Buffer for image reads */
+static UINT8 *image_buff;
 
 static OPBASE_HANDLER (opbaseoverride)
 {
@@ -132,13 +134,7 @@ static OPBASE_HANDLER (opbaseoverride)
 
 		if (image_exists(img))
 		{
-			buff = (UINT8*) malloc(65536);
-			if( !buff )
-			{
-				logerror("failed to allocate 64K buff\n");
-				return address;
-			}
-
+			buff = image_buff;
 			size = image_fread(img, buff, 65536);
 			s = buff;
 			if( memcmp(s, TAPE_HEADER, sizeof(TAPE_HEADER)-1) == 0 )
@@ -211,7 +207,6 @@ static OPBASE_HANDLER (opbaseoverride)
 				}
 				activecpu_set_reg(REG_PC, entry);
 			}
-			free(buff);
 		}
 		memory_set_opbase_handler(0,NULL);
 	}
@@ -318,6 +313,7 @@ MACHINE_START( cgenie )
 	in_sync = 0;
 	put_cycles = 0;
 	get_cycles = 0;
+	image_buff = auto_malloc(65536);
 
 	/*
 	 * Every fifth cycle is a wait cycle, so I reduced

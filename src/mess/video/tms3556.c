@@ -44,8 +44,6 @@ static struct
 	int dbl_h_phase[40];
 } vdp;
 
-static mame_bitmap *tmpbitmap;
-
 #define TOP_BORDER 1
 #define BOTTOM_BORDER 1
 #define LEFT_BORDER 8
@@ -198,8 +196,7 @@ WRITE8_HANDLER(tms3556_reg_w)
 
 	machine struct initialization helper
 */
-void mdrv_tms3556(machine_config *machine)
-{
+MACHINE_DRIVER_START( tms3556 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -216,7 +213,8 @@ void mdrv_tms3556(machine_config *machine)
 
 	/*MDRV_VIDEO_START(tms3556)*/
 	MDRV_VIDEO_UPDATE(tms3556)
-}
+MACHINE_DRIVER_END
+
 
 /*
 	palette_init_tms3556
@@ -242,15 +240,13 @@ static PALETTE_INIT(tms3556)
 
 	tms3556 core init (called at video init time)
 */
-int tms3556_init(int vram_size)
+void tms3556_init(int vram_size)
 {
 	memset(&vdp, 0, sizeof (vdp));
 
 	vdp.vram_size = vram_size;
 
 	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	if (!tmpbitmap)
-		return 1;
 
 	/* allocate VRAM */
 	vdp.vram = auto_malloc(0x10000);
@@ -260,8 +256,6 @@ int tms3556_init(int vram_size)
 		/* set unavailable RAM to 0xff */
 		memset(vdp.vram + vdp.vram_size, 0xff, (0x10000 - vdp.vram_size) );
 	}
-
-	return 0;
 }
 
 /*
@@ -306,7 +300,7 @@ static void tms3556_draw_line_empty(UINT16 *ln)
 
 	for (i=0; i<TOTAL_WIDTH; i++)
 #if DOUBLE_WIDTH
-		*ln++ =
+		*ln++ = vdp.bg_color;
 #endif
 			*ln++ = vdp.bg_color;
 }
@@ -333,7 +327,7 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 
 	for (xx=0; xx<LEFT_BORDER; xx++)
 #if DOUBLE_WIDTH
-		*ln++ =
+		*ln++ = vdp.bg_color;
 #endif
 			*ln++ = vdp.bg_color;
 
@@ -387,10 +381,11 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 		{	/* single width */
 			for (xx=0;xx<8;xx++)
 			{
+				UINT16 color = (pattern & 0x80) ? fg : bg;
 #if DOUBLE_WIDTH
-				*ln++ =
+				*ln++ = color;
 #endif
-					*ln++ = (pattern & 0x80) ? fg : bg;
+					*ln++ = color;
 				pattern <<= 1;
 			}
 			dbl_w_phase = 0;
@@ -402,10 +397,11 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 				pattern <<= 4;
 			for (xx=0;xx<4;xx++)
 			{
+				UINT16 color = (pattern & 0x80) ? fg : bg;
 #if DOUBLE_WIDTH
-				*ln++ = *ln++ =
+				*ln++ = color; *ln++ = color;
 #endif
-					*ln++ = *ln++ = (pattern & 0x80) ? fg : bg;
+					*ln++ = color; *ln++ = color;
 				pattern <<= 1;
 			}
 			dbl_w_phase = !dbl_w_phase;
@@ -415,7 +411,7 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 
 	for (xx=0; xx<RIGHT_BORDER; xx++)
 #if DOUBLE_WIDTH
-		*ln++ =
+		*ln++ = vdp.bg_color;
 #endif
 			*ln++ = vdp.bg_color;
 
@@ -440,7 +436,7 @@ static void tms3556_draw_line_bitmap_common(UINT16 *ln)
 
 	for (xx=0; xx<LEFT_BORDER; xx++)
 #if DOUBLE_WIDTH
-		*ln++ =
+		*ln++ = vdp.bg_color;
 #endif
 			*ln++ = vdp.bg_color;
 
@@ -451,10 +447,11 @@ static void tms3556_draw_line_bitmap_common(UINT16 *ln)
 		name_r = nametbl[vdp.name_offset+2];
 		for (xx=0;xx<8;xx++)
 		{
+			UINT16 color = Machine->pens[((name_b >> 5) & 0x4) | ((name_g >> 6) & 0x2) | ((name_r >> 7) & 0x1)];
 #if DOUBLE_WIDTH
-			*ln++ =
+			*ln++ = color;
 #endif
-				*ln++ = Machine->pens[((name_b >> 5) & 0x4) | ((name_g >> 6) & 0x2) | ((name_r >> 7) & 0x1)];
+				*ln++ = color;
 			name_b <<= 1;
 			name_g <<= 1;
 			name_r <<= 1;
@@ -464,7 +461,7 @@ static void tms3556_draw_line_bitmap_common(UINT16 *ln)
 
 	for (xx=0; xx<RIGHT_BORDER; xx++)
 #if DOUBLE_WIDTH
-		*ln++ =
+		*ln++ = vdp.bg_color;
 #endif
 			*ln++ = vdp.bg_color;
 }
@@ -546,12 +543,12 @@ static void tms3556_draw_line(mame_bitmap *bmp, int line)
 
 	/*if (vdp.controlRegs[4] & 0x??)
 	{	// interlaced mode
-		ln = (UINT16*)bmp->line[line*2+vdp.field];
+		ln = BITMAP_ADDR16(bmp, line, vdp.field);
 	}
 	else*/
 	{	/* non-interlaced mode */
-		ln = (UINT16*)bmp->line[line*2];
-		ln2 = (UINT16*)bmp->line[line*2+1];
+		ln = BITMAP_ADDR16(bmp, line, 0);
+		ln2 = BITMAP_ADDR16(bmp, line, 1);
 		double_lines = 1;
 	}
 

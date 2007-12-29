@@ -75,8 +75,9 @@ Source Changes:
 
 - Fixed M65C02 optimization.  [Peter Trauner]
 
-- Staticization, constification, header file, "Machine variable", gfxdecode,
-  Machine driver and legacy cleanups.  [Atari Ace]
+- Miscellaneous cleanups (staticization, constification, header file,
+  deprecated use of the "Machine" variable, gfxdecode naming, Machine driver,
+  memory management and removed some legacy code.  [Atari Ace]
 
 
 

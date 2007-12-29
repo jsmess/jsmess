@@ -631,10 +631,7 @@ static void pc8801_init_bank(int hireso)
       return;
     }
     if(num80!=0 || num88!=0 || numIO!=0) {
-      if((extRAM=malloc(num80*0x8000+num88*0x20000+numIO*0x100000))==NULL) {
-	logerror ("pc8801: out of memory!\n");
-	return;
-      }
+      extRAM=malloc_or_die(num80*0x8000+num88*0x20000+numIO*0x100000);
       e=extRAM;
       for(i=0;i<num80;i++) {
 	ext_bank_80[i]=e;

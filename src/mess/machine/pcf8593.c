@@ -41,7 +41,7 @@ typedef struct
 	UINT8 *data;
 	UINT32 size;
 	int pin_scl, pin_sda, inp;
-	BOOL active;
+	int active;
 	int bits;
 	UINT8 data_recv_index, data_recv[50];
 	UINT8 mode, pos;
@@ -55,7 +55,7 @@ void pcf8593_init( void)
 	_logerror( 0, "pcf8593_init\n");
 	memset( &rtc, 0, sizeof( rtc));
 	rtc.size = 16;
-	rtc.data = malloc( rtc.size);
+	rtc.data = malloc_or_die( rtc.size);
 	rtc.timer = timer_alloc( pcf8593_timer_callback , NULL);
 	timer_adjust( rtc.timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
 	pcf8593_reset();

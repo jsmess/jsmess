@@ -60,12 +60,12 @@ static void io_reset(void);
 /*
 	video initialization
 */
-static int video_start_exelv(void)
+static VIDEO_START( exelv )
 {
-	return tms3556_init(/*0x8000*/0x10000);	/* tms3556 with 32 kb of video RAM */
+	tms3556_init(/*0x8000*/0x10000);	/* tms3556 with 32 kb of video RAM */
 }
 
-static void machine_reset_exelv(void)
+static MACHINE_RESET( exelv )
 {
 	tms3556_reset();
 	io_reset();
@@ -189,9 +189,8 @@ static void io_reset(void)
 	mailbox_out = 0x00;
 }
 
-static void io_reset_timer(int dummy)
+static TIMER_CALLBACK( io_reset_timer )
 {
-	(void) dummy;
 	io_reset();
 }
 
@@ -509,9 +508,9 @@ static WRITE8_HANDLER(exelv_portb_w)
 
 static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 
-	AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7020 internal RAM */
+	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7020 internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(MRA8_NOP, MWA8_NOP)		/* reserved */
-	AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
+	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
 	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(MRA8_NOP, MWA8_NOP)		/* external I/O ports */
 	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
 	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
@@ -587,4 +586,4 @@ SYSTEM_CONFIG_END
 
 /*		YEAR	NAME	PARENT		COMPAT	MACHINE		INPUT	INIT	CONFIG		COMPANY			FULLNAME */
 /*COMP(	1984,	exl100,	0,			0,		exelv,		exelv,	NULL,	exelv,		"Exelvision",	"exl 100" , 0)*/
-COMP(	1986,	exeltel,0/*exl100*/,0,		exelv,		exelv,	NULL,	exelv,		"Exelvision",	"exeltel" , 0)
+COMP(	1986,	exeltel,0/*exl100*/,0,		exelv,		exelv,	0,	exelv,		"Exelvision",	"exeltel" , 0)

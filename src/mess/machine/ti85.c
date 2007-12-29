@@ -252,7 +252,7 @@ MACHINE_START( ti86 )
 	ti85_interrupt_speed = 0;
 	ti85_port4_bit0 = 0;
 
-	if (ti86_ram)
+	ti86_ram = auto_malloc(128*1024);
 	{
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
 
@@ -459,18 +459,10 @@ NVRAM_HANDLER( ti86 )
 {
 	if (read_or_write)
 	{
-		if (ti86_ram)
-		{
-			mame_fwrite(file, ti86_ram, sizeof(unsigned char)*128*1024);
-			free (ti86_ram);
-			ti86_ram = NULL;
-		}
+		mame_fwrite(file, ti86_ram, sizeof(unsigned char)*128*1024);
 	}
 	else
 	{
-		ti86_ram = (unsigned char *)malloc(128*1024);
-		if (ti86_ram)
-		{
 			if (file)
 			{
 				mame_fread(file, ti86_ram, sizeof(unsigned char)*128*1024);
@@ -478,7 +470,6 @@ NVRAM_HANDLER( ti86 )
 			}
 			else
 				memset(ti86_ram, 0, sizeof(unsigned char)*128*1024);
-		}
 	}
 }
 
