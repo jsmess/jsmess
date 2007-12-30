@@ -1598,12 +1598,13 @@ WRITE8_HANDLER ( gb_video_w ) {
 			   - 0x20 -> 0x60 (mode 3) - trigger
 			   - 0x20 -> 0x40 (mode 3) - trigger
 			   - 0x40 -> 0x20 (mode 2) - don't trigger
+			   - 0x40 -> 0x08 (mode 0) - don't trigger
 			   - 0x00 -> 0x40 - trigger only if LY==LYC
 			*/
 			if ( ! gb_lcd.mode_irq && ( ( gb_lcd.mode == 1 ) ||
-				( ( LCDSTAT & 0x40 ) && ! ( data & 0x60 ) ) ||
+				( ( LCDSTAT & 0x40 ) && ! ( data & 0x68 ) ) ||
 				( ! ( LCDSTAT & 0x40 ) && ( data & 0x40 ) && ( LCDSTAT & 0x04 ) ) ||
-				( ! ( LCDSTAT & 0x08 ) && ( data & 0x08 ) ) ||
+				( ! ( LCDSTAT & 0x48 ) && ( data & 0x08 ) ) ||
 				( ( LCDSTAT & 0x60 ) == 0x00 && ( data & 0x60 ) == 0x20 ) ||
 				( ( LCDSTAT & 0x60 ) == 0x20 && ( data & 0x40 ) )
 				) ) {
