@@ -132,7 +132,7 @@ static void color_batch(UINT32 *results, const UINT8 *indexes, int count)
 	for (i = 0; i < count; i++)
 	{
 		c = current_palette[indexes[i] & 0x3F];
-	
+
 		if (is_black_white)
 		{
 			/* We are on a composite monitor/TV and the monochrome phase invert
@@ -144,7 +144,7 @@ static void color_batch(UINT32 *results, const UINT8 *indexes, int count)
 			UINT32 blue  = ((c & 0x0000FF) >>  0);
 			c = (red + green + blue) / 3;
 		}
-		
+
 		results[i] = c;
 	}
 }
@@ -422,7 +422,7 @@ VIDEO_UPDATE( coco3 )
 			{
 				line = BITMAP_ADDR32(bitmap, row, 0);
 				for (i = 319; i >= 0; i--)
-					line[i * 2 + 0] = line[i * 2 + 1] = line[i];				
+					line[i * 2 + 0] = line[i * 2 + 1] = line[i];
 			}
 		}
 	}
@@ -463,7 +463,7 @@ static void coco3_set_dirty(void)
 static int coco3_new_frame(void)
 {
 	int gime_field_sync = 0;
-	
+
 	/* changing from non-legacy to legacy video? */
 	if (!video->legacy_video && (coco3_gimereg[0] & 0x80))
 		coco3_set_dirty();
@@ -671,7 +671,7 @@ static UINT32 get_composite_color(int color)
 	 * The code below is based on an algorithm specified in the following
 	 * CoCo BASIC program was used to approximate composite colors.
 	 * (Program by SockMaster):
-	 * 
+	 *
 	 * 10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
 	 * 20 SAT=92:CON=70:BRI=-50:L(0)=0:L(1)=47:L(2)=120:L(3)=255
 	 * 30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
@@ -802,12 +802,12 @@ static void internal_video_start_coco3(m6847_type type)
 	for (i = 0; i < 32; i++)
 	{
 		/* characters 0-31 are at $FA10 - $FB0F */
-		memcpy(video->fontdata[i], &rom[0xFA10 - 0x8000 + (i * 8)], 8);	
+		memcpy(video->fontdata[i], &rom[0xFA10 - 0x8000 + (i * 8)], 8);
 	}
 	for (i = 32; i < 128; i++)
 	{
 		/* characters 32-127 are at $F09D - $F39C */
-		memcpy(video->fontdata[i], &rom[0xF09D - 0x8000 + ((i - 32) * 8)], 8);	
+		memcpy(video->fontdata[i], &rom[0xF09D - 0x8000 + ((i - 32) * 8)], 8);
 	}
 
 	/* GIME field sync timer */

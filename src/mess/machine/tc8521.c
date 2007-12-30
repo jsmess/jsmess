@@ -152,7 +152,7 @@ void tc8521_save_stream(mame_file *file)
 static void tc8521_set_alarm_output(void)
 {
 	unsigned char alarm_output;
-	
+
 	alarm_output = 0;
 
 	/* what happens when all are enabled? I assume they are all or'd together */
@@ -181,7 +181,7 @@ static void tc8521_set_alarm_output(void)
 		/* alarm output enabled? */
 		alarm_output &= ~1;
 	}
-	
+
     if (rtc.interface.alarm_output_callback!=NULL)
     {
 		rtc.interface.alarm_output_callback(alarm_output);
@@ -314,7 +314,7 @@ void tc8521_init(const struct tc8521_interface *intf)
 				logerror("8521 RTC R: %04x %02x\n", offset, rtc.registers[offset]);
 #endif
         		return rtc.registers[offset];
-		
+
 			default:
 				break;
 		}

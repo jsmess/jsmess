@@ -25,7 +25,7 @@
     fdb3e 0x8..0xc
 	fd7f8
      fdb5f
-  fe172 
+  fe172
    fecc5 // 801a video setup error
     fd6c9
    copyright output
@@ -63,7 +63,7 @@
    read low 4 nibble at jim 0xa
    read low 4 nibble at jim 0xa
    return first nibble<<4|second nibble in ah
-  ff046 seldom compares ret 
+  ff046 seldom compares ret
   ffe87 0 -> ds
 
   469:
@@ -145,7 +145,7 @@ extern  READ8_HANDLER ( europc_jim2_r )
 	switch (europc_jim.state) {
 	case 0: europc_jim.state++; return 0;
 	case 1: europc_jim.state++; return 0x80;
-	case 2: 
+	case 2:
 		europc_jim.state=0;
 		switch (europc_jim.mode) {
 		case AGA_COLOR: return 0x87; // for color;

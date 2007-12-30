@@ -20,7 +20,7 @@
             A0-BF (W) = Video Chip (TMS9928A), A0=0 -> Write Register 0 , A0=1 -> Write Register 1
             A0-BF (R) = Video Chip (TMS9928A), A0=0 -> Read Register 0 , A0=1 -> Read Register 1
 
-            C0-DF (W) = Set both controllers to joystick mode 
+            C0-DF (W) = Set both controllers to joystick mode
             C0-DF (R) = Not Connected
 
             E0-FF (W) = Sound Chip (SN76489A)
@@ -35,17 +35,17 @@
 
         -Driving Controller (Expansion Module #2). It consist of a steering wheel and a gas pedal. Only one
          can be used on a real ColecoVision. The gas pedal is not analog, internally it is just a switch.
-         On a real ColecoVision, when the Driving Controller is enabled, the controller 1 do not work because 
-         have been replaced by the Driving Controller, and controller 2 have to be used to start game, gear 
+         On a real ColecoVision, when the Driving Controller is enabled, the controller 1 do not work because
+         have been replaced by the Driving Controller, and controller 2 have to be used to start game, gear
          shift, etc.
          Driving Controller is just a spinner on controller 1 socket similar to the one on Roller Controller
-         and Super Action Controllers so you can use Roller Controller or Super Action Controllers to play 
+         and Super Action Controllers so you can use Roller Controller or Super Action Controllers to play
          games requiring Driving Controller.
-         
+
         -Roller Controller. Basically a trackball with four buttons (the two fire buttons from player 1 and
          the two fire buttons from player 2). Only one Roller Controller can be used on a real ColecoVision.
 	 Roller Controller is connected to both controller sockets and both controllers are conected to the Roller
-	 Controller, it uses the spinner pins of both sockets to generate the X and Y signals (X from controller 1 
+	 Controller, it uses the spinner pins of both sockets to generate the X and Y signals (X from controller 1
 	 and the Y from controller 2)
 
         -Super Action Controllers. It is a hand controller with a keypad, four buttons (the two from
@@ -61,7 +61,7 @@
 #include "devices/cartslot.h"
 
 READ8_HANDLER(coleco_video_r)
-{  
+{
     return ((offset & 0x01) ? TMS9928A_register_r(1) : TMS9928A_vram_r(0));
 }
 
@@ -207,7 +207,7 @@ static TIMER_CALLBACK(paddle_callback)
     else
 		JoyStat[1] = 1;
 
-    if (JoyStat[0] || JoyStat[1]) 
+    if (JoyStat[0] || JoyStat[1])
 		cpunum_set_input_line(0, 0, HOLD_LINE);
 }
 

@@ -104,7 +104,7 @@ READ8_HANDLER( primo_be_2_r )
 
 	// bit 5 - SCLK
 	if (!serial_clock || !cbm_serial_clock_read ())
-		data &= ~0x20; 
+		data &= ~0x20;
 
 	// bit 4 - SDATA
 	if (!serial_data || !cbm_serial_data_read ())
@@ -136,7 +136,7 @@ WRITE8_HANDLER( primo_ki_1_w )
 
 	// bit 4 - speaker
 	speaker_level_w(0, (data&0x10)>>4);
-	
+
 	// bit 3 - display buffer
 	if (data & 0x08)
 		primo_video_memory_base |= 0x2000;
@@ -281,7 +281,7 @@ static void primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 	cpunum_set_reg(0, Z80_R, snapshot_data[25]);
 	cpunum_set_reg(0, Z80_IX, snapshot_data[26] + snapshot_data[27]*256);
 	cpunum_set_reg(0, Z80_IY, snapshot_data[28] + snapshot_data[29]*256);
-	
+
 
 	/* IO ports */
 
@@ -310,13 +310,13 @@ SNAPSHOT_LOAD( primo )
 		free(snapshot_data);
 		return INIT_FAIL;
 	}
-	
+
 	if (strncmp((char *)snapshot_data, "PS01", 4))
 	{
 		free(snapshot_data);
 		return INIT_FAIL;
 	}
-	
+
 	primo_setup_pss(snapshot_data, snapshot_size);
 
 	free(snapshot_data);
@@ -360,7 +360,7 @@ QUICKLOAD_LOAD( primo )
 		free(quickload_data);
 		return INIT_FAIL;
 	}
-	
+
 	primo_setup_pp(quickload_data, quickload_size);
 
 	free(quickload_data);

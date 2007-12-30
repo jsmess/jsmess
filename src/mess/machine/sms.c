@@ -745,7 +745,7 @@ static int detect_korean_mapper( UINT8 *rom ) {
 		if ( !memcmp( &rom[0x7ff0], signatures[i], 16 ) ) {
 			return 1;
 		}
-	} 
+	}
 	return 0;
 }
 

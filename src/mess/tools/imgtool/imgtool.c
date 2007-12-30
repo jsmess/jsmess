@@ -146,9 +146,9 @@ static void internal_error(const imgtool_module *module, const char *message)
 static char *normalize_filename(imgtool_partition *partition, const char *src)
 {
 	imgtool_charset charset;
-	
+
 	/* get charset from module */
-	charset = (imgtool_charset) (int) imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET); 
+	charset = (imgtool_charset) (int) imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET);
 
 	/* and dupe it */
 	return native_from_utf8(charset, src);
@@ -1077,7 +1077,7 @@ static imgtoolerr_t internal_open(const imgtool_module *module, const char *fnam
 	memset(image, '\0', size);
 	image->pool = pool;
 	image->module = module;
-	
+
 	/* actually call create or open */
 	if (read_or_write == OSD_FOPEN_RW_CREATE)
 		err = module->create(image, f, createopts);
@@ -1239,7 +1239,7 @@ static imgtoolerr_t cannonicalize_path(imgtool_partition *partition, UINT32 flag
 	char path_separator, alt_path_separator;
 	const char *s;
 	int in_path_separator, i, j;
-	
+
 	path_separator = partition->path_separator;
 	alt_path_separator = partition->alternate_path_separator;
 
@@ -1256,7 +1256,7 @@ static imgtoolerr_t cannonicalize_path(imgtool_partition *partition, UINT32 flag
 			err = IMGTOOLERR_FILENOTFOUND;
 		goto done;
 	}
-	
+
 	if (path_separator == '\0')
 	{
 		if (flags & PATH_MUSTBEDIR)
@@ -1445,8 +1445,8 @@ imgtoolerr_t imgtool_partition_list_file_attributes(imgtool_partition *partition
 		err = IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_FUNCTIONALITY;
 		goto done;
 	}
-	
-	path = new_fname;	
+
+	path = new_fname;
 
 	/* cannonicalize path */
 	err = cannonicalize_path(partition, PATH_LEAVENULLALONE, &path, &alloc_path);
@@ -1490,9 +1490,9 @@ imgtoolerr_t imgtool_partition_get_file_attributes(imgtool_partition *partition,
 		err = IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_FUNCTIONALITY;
 		goto done;
 	}
-	
+
 	path = new_fname;
-	
+
 	/* cannonicalize path */
 	err = cannonicalize_path(partition, PATH_LEAVENULLALONE, &path, &alloc_path);
 	if (err)
@@ -1598,9 +1598,9 @@ imgtoolerr_t imgtool_partition_get_icon_info(imgtool_partition *partition, const
 		err = IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_FUNCTIONALITY;
 		goto done;
 	}
-	
+
 	path = new_fname;
-	
+
 	/* cannonicalize path */
 	err = cannonicalize_path(partition, 0, &path, &alloc_path);
 	if (err)
@@ -2064,9 +2064,9 @@ imgtoolerr_t imgtool_partition_get_file(imgtool_partition *partition, const char
 		err = IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_FUNCTIONALITY;
 		goto done;
 	}
-	
+
 	filename = new_fname;
-	
+
 	err = imgtool_partition_read_file(partition, filename, fork, f, filter);
 	if (err)
 		goto done;
@@ -2095,14 +2095,14 @@ imgtoolerr_t imgtool_partition_put_file(imgtool_partition *partition, const char
 	imgtool_stream *f = NULL;
 	imgtool_charset charset;
 	char *alloc_newfname = NULL;
-	
+
 	if (!newfname)
 		newfname = (const char *) osd_basename((char *) source);
 
-	charset = (imgtool_charset) (int) imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET); 
+	charset = (imgtool_charset) (int) imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET);
 	if (charset != IMGTOOL_CHARSET_UTF8)
 	{
-		/* convert to native format */ 
+		/* convert to native format */
 		alloc_newfname = native_from_utf8(charset, newfname);
 		if (alloc_newfname == NULL)
 		{
@@ -2140,7 +2140,7 @@ imgtoolerr_t imgtool_partition_delete_file(imgtool_partition *partition, const c
 	imgtoolerr_t err;
 	char *alloc_path = NULL;
 	char *new_fname = NULL;
-	
+
 	if (!partition->delete_file)
 	{
 		err = IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY;
@@ -2153,9 +2153,9 @@ imgtoolerr_t imgtool_partition_delete_file(imgtool_partition *partition, const c
 		err = IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_FUNCTIONALITY;
 		goto done;
 	}
-	
+
 	fname = new_fname;
-	
+
 	/* cannonicalize path */
 	err = cannonicalize_path(partition, 0, &fname, &alloc_path);
 	if (err)
@@ -2201,9 +2201,9 @@ imgtoolerr_t imgtool_partition_list_file_forks(imgtool_partition *partition, con
 		err = IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_FUNCTIONALITY;
 		goto done;
 	}
-	
+
 	path = new_fname;
-	
+
 	/* cannonicalize path */
 	err = cannonicalize_path(partition, 0, &path, &alloc_path);
 	if (err)
@@ -2233,7 +2233,7 @@ imgtoolerr_t imgtool_partition_create_directory(imgtool_partition *partition, co
 	imgtoolerr_t err;
 	char *alloc_path = NULL;
 	char *new_path = NULL;
-	
+
 	/* implemented? */
 	if (!partition->create_dir)
 	{
@@ -2247,9 +2247,9 @@ imgtoolerr_t imgtool_partition_create_directory(imgtool_partition *partition, co
 		err = IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_FUNCTIONALITY;
 		goto done;
 	}
-	
+
 	path = new_path;
-	
+
 	/* cannonicalize path */
 	err = cannonicalize_path(partition, PATH_MUSTBEDIR, &path, &alloc_path);
 	if (err)
@@ -2279,14 +2279,14 @@ imgtoolerr_t imgtool_partition_delete_directory(imgtool_partition *partition, co
 	imgtoolerr_t err;
 	char *alloc_path = NULL;
 	char *new_path = NULL;
-	
+
 	/* implemented? */
 	if (!partition->delete_dir)
 	{
 		err = IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY;
 		goto done;
 	}
-	
+
 	new_path = normalize_filename(partition, path);
 	if (new_path == NULL)
 	{
@@ -2295,7 +2295,7 @@ imgtoolerr_t imgtool_partition_delete_directory(imgtool_partition *partition, co
 	}
 
 	path = new_path;
-	
+
 	/* cannonicalize path */
 	err = cannonicalize_path(partition, PATH_MUSTBEDIR, &path, &alloc_path);
 	if (err)
@@ -2589,7 +2589,7 @@ imgtoolerr_t imgtool_directory_open(imgtool_partition *partition, const char *pa
 
 	new_path = normalize_filename(partition, path);
 	path = new_path;
-	
+
 	err = cannonicalize_path(partition, PATH_MUSTBEDIR, &path, &alloc_path);
 	if (err)
 		goto done;
@@ -2667,19 +2667,19 @@ imgtoolerr_t imgtool_directory_get_next(imgtool_directory *directory, imgtool_di
 	if (err)
 		return markerrorsource(err);
 
-	charset = imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET); 
-	
+	charset = imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET);
+
 	if (charset)
 	{
 		char *new_fname = utf8_from_native(charset, ent->filename);
-	
+
 		if (!new_fname)
 			return IMGTOOLERR_BADFILENAME;
-	
+
 		strcpy(ent->filename, new_fname);
 		free(new_fname);
 	}
-	
+
 	/* don't trust the module! */
 	if (!partition->supports_creation_time && (ent->creation_time != 0))
 	{

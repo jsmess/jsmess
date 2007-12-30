@@ -112,7 +112,7 @@ static int usbsm_cru_r(int offset)
 		/*
 			bit
 			0	>1x00	0: USB Host controller requests interrupt.
-			1	>1x02	0: USB Device controller requests interrupt. 
+			1	>1x02	0: USB Device controller requests interrupt.
 			2	>1x04	1: USB Host controller suspended.
 			3	>1x06	1: USB Device controller suspended.
 			4	>1x08	0: Strata FEEPROM is busy.

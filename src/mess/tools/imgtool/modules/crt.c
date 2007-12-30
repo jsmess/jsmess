@@ -6,7 +6,7 @@
 #include "imgtoolx.h"
 
 #ifdef LSB_FIRST
-typedef struct { 
+typedef struct {
 	unsigned char high, low;
 } biguword;
 typedef struct {
@@ -37,7 +37,7 @@ CARTRIDGE FILE FORMAT FOR CCS64 (using fileextension .CRT)
 0019 UBYTE Game line
 001A UBYTE[6] For future use...
 0020 UBYTE[20] Name (null-terminated string)
-0040 Chip Packets 
+0040 Chip Packets
 ...
 
 Chip Packets:
@@ -100,7 +100,7 @@ $6080: <data 8192 bytes for bank 3>...
 
 $8080:
 
- 
+
 
 EXAMPLE FOR KCS POWER CARTRIDGE
 
@@ -119,7 +119,7 @@ $2060: <data 8192 bytes for a000-bfff>...
 
 $4060:
 
- 
+
 
 EXAMPLE FOR FINAL CARTRIDGE III
 
@@ -146,7 +146,7 @@ $C080: <data 16384 bytes for bank 3>...
 
 $10080:
 
- 
+
 
 EXAMPLE FOR SIMONS BASIC
 
@@ -165,7 +165,7 @@ $2060: <data 8192 bytes for a000-bfff>...
 
 $4060:
 
- 
+
 
 EXAMPLE FOR OCEAN TYPE1
 
@@ -192,7 +192,7 @@ $22160: <data 8192 bytes for a000-bfff, bank 17>...
 ...
 $40240:
 
- 
+
 
 EXAMPLE FOR FUN PLAY TYPE
 
@@ -220,7 +220,7 @@ $1E140: <data 8192 bytes for 8000-9fff, bank 15>...
 
 $20140:
 
- 
+
 
 EXAMPLE FOR SUPER GAMES TYPE
 
@@ -247,7 +247,7 @@ $C080: <data 16384 bytes for 8000-bfff, bank 0>...
 
 $10080:
 
- 
+
 
 EXAMPLE FOR ATOMIC POWER CARTRIDGE
 
@@ -274,7 +274,7 @@ $6080: <data 8192 bytes for bank 3>...
 
 $8080:
 
- 
+
 
 EXAMPLE FOR EPYX FASTLOAD TYPE
 
@@ -289,7 +289,7 @@ $0050: <data 8192 bytes for 8000-9fff>
 
 $2050:
 
- 
+
 
 EXAMPLE FOR WESTERMANN TYPE
 
@@ -304,7 +304,7 @@ $0050: <data 16384 bytes for 8000-bfff>
 
 $4050:
 */
- 
+
 static const char *const hardware_types[]={
 	"Normal cartridge",
 	"Action Replay",
@@ -327,9 +327,9 @@ typedef struct{
 	unsigned char exrom_line;
 	unsigned char game_line;
 	unsigned char reserved[6];
-	char name[0x20]; 
+	char name[0x20];
 } crt_header;
-	
+
 static const char *const chip_types[]={ "ROM", "RAM", "FLASH" };
 typedef struct {
 	char id[4]; // CHIP
@@ -495,7 +495,7 @@ static int crt_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *en
 	crt_iterator *iter=(crt_iterator*)enumeration;
 
 	ent->corrupt=0;
-	
+
 	if (!(ent->eof=(iter->pos>=iter->image->size))) {
 		sprintf(ent->fname,"%d", iter->number);
 		ent->filesize=GET_UWORD( PACKET(iter->image, iter->pos)->length );
@@ -555,7 +555,7 @@ static int crt_image_readfile(imgtool_image *img, const char *fname, imgtool_str
 	int size;
 	int pos;
 
-	if (!(pos=crt_image_findfile(image, fname)) ) 
+	if (!(pos=crt_image_findfile(image, fname)) )
 		return IMGTOOLERR_MODULENOTFOUND;
 
 	size=GET_UWORD( PACKET(image, pos)->length );
@@ -566,7 +566,7 @@ static int crt_image_readfile(imgtool_image *img, const char *fname, imgtool_str
 	return 0;
 }
 
-static int crt_image_writefile(imgtool_image *img, const char *fname, imgtool_stream *sourcef, 
+static int crt_image_writefile(imgtool_image *img, const char *fname, imgtool_stream *sourcef,
 							   const ResolvedOption *_options)
 {
 	crt_image *image=(crt_image*)img;
@@ -586,7 +586,7 @@ static int crt_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 		if (!(image->data=realloc(image->data, image->size+size+sizeof(crt_packet)-oldsize) ) )
 			return IMGTOOLERR_OUTOFMEMORY;
 		if (image->size-pos-oldsize!=0) {
-			memmove(image->data+pos+size+sizeof(crt_packet), image->data+pos+oldsize, 
+			memmove(image->data+pos+size+sizeof(crt_packet), image->data+pos+oldsize,
 					image->size-pos-oldsize);
 		}
 		image->size+=size+sizeof(crt_packet)-oldsize;
@@ -634,7 +634,7 @@ static int crt_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 	header.game_line=_options[C64CRT_CREATEOPTION_GAMELINE].i;
 	header.exrom_line=_options[C64CRT_CREATEOPTION_EXROMLINE].i;
 	if (_options[C64CRT_CREATEOPTION_LABEL].s) strcpy(header.name, _options[C64CRT_CREATEOPTION_LABEL].s);
-	return (stream_write(f, &header, sizeof(crt_header)) == sizeof(crt_header)) 
+	return (stream_write(f, &header, sizeof(crt_header)) == sizeof(crt_header))
 		? 0 : IMGTOOLERR_WRITEERROR;
 }
 

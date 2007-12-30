@@ -378,8 +378,8 @@ globtilde(pattern, patbuf, patbuf_len, pglob)
 	if (*pattern != TILDE || !(pglob->gl_flags & GLOB_TILDE))
 		return pattern;
 
-	/* 
-	 * Copy up to the end of the string or / 
+	/*
+	 * Copy up to the end of the string or /
 	 */
 	eb = &patbuf[patbuf_len - 1];
 	for (p = pattern + 1, h = (char *) patbuf;
@@ -443,7 +443,7 @@ glob0(pattern, pglob)
 	int c, err, oldpathc;
 	Char *bufnext, patbuf[_MAX_PATH+1];
 
-	qpatnext = globtilde(pattern, patbuf, sizeof(patbuf) / sizeof(Char), 
+	qpatnext = globtilde(pattern, patbuf, sizeof(patbuf) / sizeof(Char),
 	    pglob);
 	oldpathc = pglob->gl_pathc;
 	bufnext = patbuf;

@@ -299,7 +299,7 @@ READ8_HANDLER( wswan_port_r )
 {
 	UINT8 value = ws_portram[offset];
 
-	if ( offset != 2 ) 
+	if ( offset != 2 )
 	logerror( "PC=%X: port read %02X\n", activecpu_get_pc(), offset );
 	switch( offset )
 	{
@@ -572,7 +572,7 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 4-7 - Palette 0 index 3 */
 		case 0x22:	/* Bit 0-3 - Palette 1 index 0
 				   Bit 4-7 - Palette 1 index 1 */
-		case 0x23:	/* Bit 0-3 - Palette 1 index 2 
+		case 0x23:	/* Bit 0-3 - Palette 1 index 2
 				   Bit 4-7 - Palette 1 index 3 */
 		case 0x24:	/* Bit 0-3 - Palette 2 index 0
 				   Bit 4-7 - Palette 2 index 1 */
@@ -1405,7 +1405,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 		}
 	}
 
-//	vdp.current_line = (vdp.current_line + 1) % 159; 
+//	vdp.current_line = (vdp.current_line + 1) % 159;
 
 	if ( vdp.current_line == vdp.line_compare ) {
 		wswan_set_irq_line( WSWAN_IFLAG_LCMP );

@@ -99,7 +99,7 @@ static INT_PTR CALLBACK win_association_dialog_proc(HWND dialog, UINT message,
 				_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT(".%s"), t_extension);
 				free(t_extension);
 
-				control = CreateWindow(TEXT("BUTTON"), buf, style, 
+				control = CreateWindow(TEXT("BUTTON"), buf, style,
 					 xmargin, y, width, height, dialog, NULL, NULL, NULL);
 				if (!control)
 					return -1;

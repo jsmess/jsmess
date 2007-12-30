@@ -529,7 +529,7 @@ static void c128_bankswitch (int reset)
 			 * (presumably set up by CPU #1.) This always worked, but when I
 			 * changed the m8502 CPU core to use an internal memory map, it
 			 * started BRK-ing forever when trying to execute 0x0000.
-			 * 
+			 *
 			 * I am not sure whether the C128 actually executes this invalid
 			 * memory or if this is a bug in the C128 driver.  In any case, the
 			 * driver used to work with this behavior, so I am doing this hack

@@ -426,7 +426,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 			// add this option to the combo box
 			(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
 			(void)ComboBox_SetItemData(control, i, ram);
-			
+
 			free(t_ramstring);
 
 			// is this the current option?  record the index if so

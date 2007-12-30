@@ -68,13 +68,13 @@ typedef struct DAVE
 	the volume will be forced on,else it is dependant on
 	the state of the wave */
 	int level_or[8];
-	/* if one of the values is 0x00, this means the 
+	/* if one of the values is 0x00, this means the
 	volume is forced off, else it is dependant on the wave */
 	int level_and[8];
 
 	/* these are the current channel volumes in MAME form */
 	int mame_volumes[8];
-	
+
 	/* update step */
 	int UpdateStep;
 

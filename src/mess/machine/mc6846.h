@@ -19,13 +19,13 @@ struct _mc6846_interface
   write8_handler out_port_func;  /* 8-bit output */
   write8_handler out_cp1_func;   /* 1-bit output */
   write8_handler out_cp2_func;   /* 1-bit output */
-  
+
   /* CPU read from the outside through chip */
   read8_handler in_port_func; /* 8-bit input */
-  
+
   /* asynchronous timer output to outside world */
   write8_handler out_cto_func; /* 1-bit output */
-  
+
   /* timer interrupt */
   void ( * irq_func ) ( int state );
 

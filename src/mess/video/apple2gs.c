@@ -52,7 +52,7 @@ VIDEO_UPDATE( apple2gs )
 		if ((beamy < BORDER_TOP) || (beamy >= 200+BORDER_TOP))
 		{
 			// don't draw past the bottom border
-			if (beamy >= 231+BORDER_TOP) 
+			if (beamy >= 231+BORDER_TOP)
 			{
 				return 0;
 			}
@@ -118,7 +118,7 @@ VIDEO_UPDATE( apple2gs )
 					scanline[col * 4 + 3 + BORDER_LEFT] = pixel;
 				}
 			}
-		}		
+		}
 	}
 	else
 	{

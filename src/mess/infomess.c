@@ -83,7 +83,7 @@ void print_game_ramoptions(FILE* out, const game_driver* game)
 	int i, count;
 	UINT32 ram;
 	UINT32 default_ram;
-	
+
 	count = ram_option_count(game);
 	default_ram = ram_default(game);
 

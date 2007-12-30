@@ -15,29 +15,29 @@
 #include "formats/basicdsk.h"
 #include "utils.h"
 
-/* ----------------------------------------------------------------------- 
- * JVC (Jeff Vavasour CoCo) format                                         
- *                                                                         
- * Used by Jeff Vavasour's CoCo Emulators                                  
- *                                              
- *	Documentation taken from Tim Linder's web site:
- *		http://home.netcom.com/~tlindner/JVC.html 
+/* -----------------------------------------------------------------------
+ * JVC (Jeff Vavasour CoCo) format
  *
- *	A. Header length                                                       
- *		The header length is determined by the file length modulo 256:     
- *			headerSize = fileLength % 256;                                 
- *		This means that the header is variable length and the minimum size 
- *		is zero bytes, and the maximum size of 255 bytes.                  
+ * Used by Jeff Vavasour's CoCo Emulators
+ *
+ *	Documentation taken from Tim Linder's web site:
+ *		http://home.netcom.com/~tlindner/JVC.html
+ *
+ *	A. Header length
+ *		The header length is determined by the file length modulo 256:
+ *			headerSize = fileLength % 256;
+ *		This means that the header is variable length and the minimum size
+ *		is zero bytes, and the maximum size of 255 bytes.
  *
  * B. Header
  *		Here is a description of the header bytes:
- *			Byte Offset     Description            Default 
+ *			Byte Offset     Description            Default
  *			-----------		-----------------      -------
- *			          0     Sectors per track      18 
- *                    1     Side count              1 
- *                    2     Sector size code        1 
- *                    3     First sector ID         1 
- *                    4     Sector attribute flag   0 
+ *			          0     Sectors per track      18
+ *                    1     Side count              1
+ *                    2     Sector size code        1
+ *                    3     First sector ID         1
+ *                    4     Sector attribute flag   0
  *
  *  If the sector attribute flag is zero then the track count is determined
  *  by the formula:
@@ -74,10 +74,10 @@
  *		The is the same value that is stored in the wd179x ID field to
  *		determine sector size:
  *
- *			0x00		 128 bytes 
- *			0x01		 256 bytes 
- *			0x02		 512 bytes 
- *			0x03		1024 bytes 
+ *			0x00		 128 bytes
+ *			0x01		 256 bytes
+ *			0x02		 512 bytes
+ *			0x03		1024 bytes
  *
  *	Other values are undefined. Every sector in the disk image must be the
  *	same size.
@@ -90,7 +90,7 @@
  *	G. Sector Attribute Flag
  *		If this byte is non zero, then each sector contains an additional
  *		byte prepended to the sector data. If the attribute flag is zero then
- *		there are no extra bytes in front of the sector data. 
+ *		there are no extra bytes in front of the sector data.
  *
  *	H. Sector attribute byte
  *		This byte is put at the begining of every sector if the header flag
@@ -187,7 +187,7 @@ static FLOPPY_IDENTIFY(coco_jvc_identify)
 }
 
 
-    
+
 static FLOPPY_CONSTRUCT(coco_jvc_construct)
 {
 	struct basicdsk_geometry geometry;
@@ -222,9 +222,9 @@ static FLOPPY_CONSTRUCT(coco_jvc_construct)
 			header_size = 4;
 		if (header[4] != 0)
 			header_size = 5;
-    
+
 		geometry.offset = header_size;
-    
+
 		floppy_image_write(floppy, header, 0, header_size);
 	}
 	else
@@ -237,7 +237,7 @@ static FLOPPY_CONSTRUCT(coco_jvc_construct)
 }
 
 
-/* ----------------------------------------------------------------------- 
+/* -----------------------------------------------------------------------
  * OS-9 file format
  *
  * This file format is largely a hack because there are a large amount of
@@ -269,12 +269,12 @@ static FLOPPY_CONSTRUCT(coco_jvc_construct)
  * $1A     5       date of creation Y:M:D:H:M
  * $1F     32      ASCII name of disk, last letter has $80 added to it,
  *                 the full 32 bytes do not need to be used.
- * 
+ *
  * Allocation bit map, fill with zeros and set bits from low to high as
  * sectors are used. So, for a fresh disk sectors LSN0,LSN1,LSN2, and LSN3
  * will be in use so the first byte will be $FF $C0 and all others
  * in the map are $00
- * 
+ *
  * Root directory LSN2
  * Byte    size     use
  * $00      1       attributes will be $BF
@@ -459,7 +459,7 @@ static FLOPPY_CONSTRUCT(coco_os9_construct)
 
 
 
-/* ----------------------------------------------------------------------- 
+/* -----------------------------------------------------------------------
  * VDK file format
  *
  * Used by Paul Burgin's PC-Dragon emulator
@@ -576,7 +576,7 @@ static FLOPPY_CONSTRUCT(coco_vdk_construct)
 
 
 
-/* ----------------------------------------------------------------------- 
+/* -----------------------------------------------------------------------
  * DMK file format
  *
  * David M. Keil's disk image format is aptly called an 'on disk' image
@@ -644,7 +644,7 @@ static struct dmk_tag *get_dmk_tag(floppy_image *floppy)
 static floperr_t coco_dmk_get_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
 {
 	struct dmk_tag *tag = get_dmk_tag(floppy);
-	
+
 	if ((head < 0) || (head >= tag->heads) || (track < 0) || (track >= tag->tracks))
 		return FLOPPY_ERROR_SEEKERROR;
 
@@ -655,8 +655,8 @@ static floperr_t coco_dmk_get_offset(floppy_image *floppy, int head, int track, 
 	*offset += DMK_HEADER_LEN;
 	return FLOPPY_ERROR_SUCCESS;
 }
-	
-		
+
+
 
 static UINT32 coco_dmk_min_track_size(int sectors, int sector_length)
 {
@@ -665,13 +665,13 @@ static UINT32 coco_dmk_min_track_size(int sectors, int sector_length)
 	return DMK_TOC_LEN * 2 + DMK_LEAD_IN + (sectors * sector_physical_length);
 }
 
-	
-	
+
+
 static floperr_t coco_dmk_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT64 track_offset;
-	
+
 	err = coco_dmk_get_offset(floppy, head, track, &track_offset);
 	if (err)
 		return err;
@@ -679,8 +679,8 @@ static floperr_t coco_dmk_read_track(floppy_image *floppy, int head, int track, 
 	floppy_image_read(floppy, buffer, offset + track_offset, buflen);
 	return FLOPPY_ERROR_SUCCESS;
 }
-	
-	
+
+
 
 static floperr_t coco_dmk_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
@@ -690,7 +690,7 @@ static floperr_t coco_dmk_write_track(floppy_image *floppy, int head, int track,
 	err = coco_dmk_get_offset(floppy, head, track, &track_offset);
 	if (err)
 		return err;
-	
+
 	floppy_image_write(floppy, buffer, offset + track_offset, buflen);
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -704,7 +704,7 @@ static floperr_t coco_dmk_get_track_data_offset(floppy_image *floppy, int head, 
 }
 
 
-            
+
 static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track, option_resolution *params)
 {
 	int sectors;
@@ -721,7 +721,7 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 	void *track_data_v;
 	UINT32 max_track_size;
 	int *sector_map = NULL;
-            
+
 	sectors			= option_resolution_lookup_int(params, PARAM_SECTORS);
 	sector_length	= option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
 	interleave		= option_resolution_lookup_int(params, PARAM_INTERLEAVE);
@@ -740,7 +740,7 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 		err = FLOPPY_ERROR_NOSPACE;
 		goto done;
 	}
-		
+
 	err = floppy_load_track(floppy, head, track, TRUE, &track_data_v, NULL);
 	if (err)
 		goto done;
@@ -768,7 +768,7 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 		physical_sector += interleave + 1;
 		physical_sector %= sectors;
 	}
-		
+
 	/* set up track table of contents */
 	physical_sector = 0;
 	track_position = DMK_TOC_LEN * 2 + DMK_LEAD_IN;
@@ -783,11 +783,11 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 		{
 			/* this is a sector */
 			logical_sector = sector_map[physical_sector];
-		
+
 			/* write the sector */
 			memset(&track_data[track_position], 0x00, 8);
 			track_position += 8;
-		
+
 			memset(&track_data[track_position], 0xA1, 3);
 			track_position += 3;
 
@@ -800,7 +800,7 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 			crc = ccitt_crc16(0xcdb4,	&track_data[track_position], DMK_IDAM_LENGTH - 2);
 			dmk_idam_set_crc(			&track_data[track_position], crc);
 			track_position += DMK_IDAM_LENGTH;
-	
+
 			memset(&track_data[track_position], 0x4E, 22);
 			track_position += 22;
 
@@ -809,7 +809,7 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 
 			memset(&track_data[track_position], 0xA1, 3);
 			track_position += 3;
-	
+
 			/* write sector body */
 			track_data[track_position] = 0xFB;
 			memset(&track_data[track_position + 1], floppy_get_filler(floppy), sector_length);
@@ -817,22 +817,22 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 			track_data[track_position + sector_length + 1] = (UINT8) (crc >> 8);
 			track_data[track_position + sector_length + 2] = (UINT8) (crc >> 0);
 			track_position += sector_length + 3;
-		
+
 			/* write sector footer */
 			memset(&track_data[track_position], 0x4E, 24);
 			track_position += 24;
 		}
-	
+
 		/* write the TOC entry */
 		track_data[physical_sector * 2 + 0] = (UINT8) (idam_offset >> 0);
 		track_data[physical_sector * 2 + 1] = (UINT8) (idam_offset >> 8);
-		
+
 		physical_sector++;
 	}
 
 	/* write track lead in */
 	memset(&track_data[physical_sector * 2], 0x4e, DMK_LEAD_IN);
-	
+
 	/* write track footer */
 	assert(max_track_size >= (UINT32)track_position);
 	memset(&track_data[track_position], 0x4e, max_track_size - track_position);
@@ -843,13 +843,13 @@ done:
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-		
-	
+
+
 static int coco_dmk_get_heads_per_disk(floppy_image *floppy)
 {
 	return get_dmk_tag(floppy)->heads;
 }
-	
+
 
 
 static int coco_dmk_get_tracks_per_disk(floppy_image *floppy)
@@ -858,13 +858,13 @@ static int coco_dmk_get_tracks_per_disk(floppy_image *floppy)
 }
 
 
-	
+
 static UINT32 coco_dmk_get_track_size(floppy_image *floppy, int head, int track)
 {
 	return get_dmk_tag(floppy)->track_size;
 }
-	
-	
+
+
 
 static floperr_t coco_dmk_seek_sector_in_track(floppy_image *floppy, int head, int track, int sector, int sector_is_index, int dirtify, UINT8 **sector_data, UINT32 *sector_length)
 {
@@ -884,7 +884,7 @@ static floperr_t coco_dmk_seek_sector_in_track(floppy_image *floppy, int head, i
 	if (err)
 		return err;
 	track_data = (UINT8 *) track_data_v;
-		
+
 	/* search for matching IDAM */
 	for (i = 0; i < DMK_TOC_LEN; i++)
 	{
@@ -892,7 +892,7 @@ static floperr_t coco_dmk_seek_sector_in_track(floppy_image *floppy, int head, i
 		idam_offset <<= 8;
 		idam_offset |= track_data[i * 2 + 0];
 		idam_offset &= 0x3FFF;
-	
+
 		if (idam_offset == 0)
 		{
 			/* we've reached the end of the road */
@@ -948,7 +948,7 @@ static floperr_t coco_dmk_seek_sector_in_track(floppy_image *floppy, int head, i
 	}
 	if (i >= DMK_DATA_GAP)
 		return FLOPPY_ERROR_SEEKERROR;
-	
+
 	offs += i + 1;
 	sec_len = 128 << dmk_idam_sectorlength(&track_data[idam_offset]);
 
@@ -961,8 +961,8 @@ static floperr_t coco_dmk_seek_sector_in_track(floppy_image *floppy, int head, i
 		*sector_length = sec_len;
 	return FLOPPY_ERROR_SUCCESS;
 }
-	
-		
+
+
 
 static floperr_t coco_dmk_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
@@ -1014,7 +1014,7 @@ static floperr_t internal_coco_dmk_read_sector(floppy_image *floppy, int head, i
 	UINT16 crc_on_disk;
 	UINT16 calculated_crc;
 	UINT8 *sector_data;
-				
+
 	err = coco_dmk_seek_sector_in_track(floppy, head, track, sector, sector_is_index, FALSE, &sector_data, &sector_length);
 	if (err)
 		return err;
@@ -1026,7 +1026,7 @@ static floperr_t internal_coco_dmk_read_sector(floppy_image *floppy, int head, i
 	calculated_crc = ccitt_crc16(0xE295, sector_data, sector_length);
 	if (calculated_crc != crc_on_disk)
 		return FLOPPY_ERROR_INVALIDIMAGE;
-		
+
 	memcpy(buffer, sector_data, MIN(sector_length, buflen));
 
 	return FLOPPY_ERROR_SUCCESS;
@@ -1040,23 +1040,23 @@ static floperr_t internal_coco_dmk_write_sector(floppy_image *floppy, int head, 
 	UINT32 sector_length;
 	UINT8 *sector_data;
 	UINT16 crc;
-		
+
 	err = coco_dmk_seek_sector_in_track(floppy, head, track, sector, sector_is_index, TRUE, &sector_data, &sector_length);
 	if (err)
 		return err;
-		
+
 	if (buflen > sector_length)
 		return FLOPPY_ERROR_INTERNAL;
-		
+
 	memcpy(sector_data, buffer, buflen);
-		
+
 	crc = ccitt_crc16(0xE295, sector_data, sector_length);
 	sector_data[sector_length + 0] = crc >> 8;
 	sector_data[sector_length + 1] = crc >> 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-		
+
 
 static floperr_t coco_dmk_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
@@ -1085,7 +1085,7 @@ static void coco_dmk_interpret_header(floppy_image *floppy, int *heads, int *tra
 	UINT8 header[DMK_HEADER_LEN];
 
 	floppy_image_read(floppy, header, 0, DMK_HEADER_LEN);
-		
+
 	if (tracks)
 		*tracks = header[1];
 	if (heads)
@@ -1093,9 +1093,9 @@ static void coco_dmk_interpret_header(floppy_image *floppy, int *heads, int *tra
 	if (track_size)
 		*track_size = ((int) header[3]) * 0x100 + header[2];
 }
-	
-	
-	
+
+
+
 FLOPPY_CONSTRUCT(coco_dmk_construct)
 {
 	struct FloppyCallbacks *callbacks;
@@ -1124,14 +1124,14 @@ FLOPPY_CONSTRUCT(coco_dmk_construct)
 	{
 		coco_dmk_interpret_header(floppy, &heads, &tracks, &track_size);
 	}
-    
+
 	tag = floppy_create_tag(floppy, DMK_TAG, sizeof(struct dmk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	tag->heads = heads;
 	tag->track_size = track_size;
 	tag->tracks = tracks;
-    
+
 	callbacks = floppy_callbacks(floppy);
 	callbacks->read_track = coco_dmk_read_track;
 	callbacks->write_track = coco_dmk_write_track;
@@ -1150,20 +1150,20 @@ FLOPPY_CONSTRUCT(coco_dmk_construct)
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-	
-		
+
+
 FLOPPY_IDENTIFY(coco_dmk_identify)
 {
 	int heads, tracks, track_size;
 	UINT64 size, expected_size;
-		
+
 	size = floppy_image_size(floppy);
 	coco_dmk_interpret_header(floppy, &heads, &tracks, &track_size);
 	expected_size = DMK_HEADER_LEN + (heads * tracks * track_size);
 	*vote = (size == expected_size) ? 100 : 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
-            
+
 
 
 /* ----------------------------------------------------------------------- */

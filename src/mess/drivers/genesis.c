@@ -199,7 +199,7 @@ static int device_load_genesis_cart(mess_image *image)
 		if (!strncmp((char *)&ROM[0x2120], "SUPER STREET FIGHTER2", 20))
 		{
 			is_ssf2 = 1;
-		}		
+		}
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */

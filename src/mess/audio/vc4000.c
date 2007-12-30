@@ -48,7 +48,7 @@ static void vc4000_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	stream_sample_t *buffer = _buffer[0];
 
 	for (i = 0; i < length; i++, buffer++)
-	{	
+	{
 		*buffer = 0;
 		if (vc4000_sound.reg[0] && vc4000_sound.pos <= vc4000_sound.size/2)
 		{

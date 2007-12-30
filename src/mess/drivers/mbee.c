@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(mbee_ports, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) ) 
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x03) AM_READWRITE(mbee_pio_r, mbee_pio_w)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
 	AM_RANGE(0x0a, 0x0a) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)

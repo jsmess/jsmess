@@ -28,4 +28,4 @@ extern size_t jupiter_charram_size;
 /*----------- defined in drivers/jupiter.c -----------*/
 
 extern const gfx_layout jupiter_charlayout;
-												
+

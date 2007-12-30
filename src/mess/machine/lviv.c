@@ -334,7 +334,7 @@ SNAPSHOT_LOAD( lviv )
 
 	lviv_setup_snapshot (lviv_snapshot_data);
 
-	dump_registers();	
+	dump_registers();
 
 	free(lviv_snapshot_data);
 

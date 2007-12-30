@@ -143,14 +143,14 @@ int CLIB_DECL main(int ac, char **av)
 				{
 					char *eq = strchr(line, '=');
 					strcpy(system_name, eq + 1);
-								
+
 					sprintf(system_filename, "%s/%s.htm", html_directory, system_name);
 					fprintf(html, "&bull;&nbsp;&nbsp;<a href=\"%s\">%s</a>\n", system_filename, system_name);
-					
+
 					systemcount++;
 
                     			html_system = fopen(system_filename, "w");
-					
+
 					if( !html_system )
 					{
 						fprintf(stderr, "cannot create system_name file '%s'.\n", system_filename);

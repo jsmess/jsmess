@@ -274,7 +274,7 @@ static int device_load_cassette(mess_image *image)
 		/* opening an image */
 		do
 		{
-			is_writable = image_is_writable(image); 
+			is_writable = image_is_writable(image);
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			extension = image_filetype(image);
 			err = cassette_open_choices(image, &mess_ioprocs, extension, formats, cassette_flags, &tag->cassette);
@@ -307,7 +307,7 @@ error:
 static void device_unload_cassette(mess_image *image)
 {
 	struct mess_cassetteimg *tag;
-	
+
 	tag = get_cassimg(image);
 
 	/* if we are recording, write the value to the image */

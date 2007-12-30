@@ -74,7 +74,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		else
 		{
 			address = (UINT16) pick_integer_le(line_header, 0, 2);
-			line_number = (UINT16) pick_integer_le(line_header, 2, 2);			
+			line_number = (UINT16) pick_integer_le(line_header, 2, 2);
 		}
 
 		stream_printf(destf, "%u ", (unsigned) line_number);
@@ -84,7 +84,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		{
 			if (b == 0x22)
 				in_string = in_string ? FALSE : TRUE;
-				
+
 			if ((b & 0x80) && (!in_string))
 			{
 				token = NULL;

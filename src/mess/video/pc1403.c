@@ -70,32 +70,32 @@ WRITE8_HANDLER(pc1403_lcd_write)
 static const POCKETC_FIGURE	line={ /* simple line */
 	"11111",
 	"11111",
-	"11111e" 
+	"11111e"
 };
-static const POCKETC_FIGURE busy={ 
+static const POCKETC_FIGURE busy={
 	"11  1 1  11 1 1",
 	"1 1 1 1 1   1 1",
 	"11  1 1  1  1 1",
 	"1 1 1 1   1  1",
 	"11   1  11   1e"
-}, def={ 
+}, def={
 	"11  111 111",
 	"1 1 1   1",
 	"1 1 111 11",
 	"1 1 1   1",
-	"11  111 1e" 
+	"11  111 1e"
 }, shift={
 	" 11 1 1 1 111 111",
 	"1   1 1 1 1    1",
 	" 1  111 1 11   1",
 	"  1 1 1 1 1    1",
-	"11  1 1 1 1    1e" 
+	"11  1 1 1 1    1e"
 }, hyp={
 	"1 1 1 1 11",
 	"1 1 1 1 1 1",
 	"111 1 1 11",
 	"1 1  1  1",
-	"1 1  1  1e" 
+	"1 1  1  1e"
 }, de={
 	"11  111",
 	"1 1 1",
@@ -107,7 +107,7 @@ static const POCKETC_FIGURE busy={
 	"1",
 	"1 1",
 	"1 1",
-	" 11e" 
+	" 11e"
 }, rad={
 	"11   1  11",
 	"1 1 1 1 1 1",
@@ -131,34 +131,34 @@ static const POCKETC_FIGURE busy={
 	"1",
 	"111",
 	"1",
-	"111e" 
+	"111e"
 }, kana={ // katakana charset
 	"  1     1 ",
 	" 11111 111",
 	"  1  1  1 ",
 	" 1   1  1 ",
-	"1   1  1e" 
+	"1   1  1e"
 }, shoo={ // minor
 	"    1    ",
 	" 1  1  1 ",
 	"1   1   1",
 	"    1    ",
 	"   1e"
-}, sml={ 
+}, sml={
 	" 11 1 1 1",
 	"1   111 1",
 	" 1  1 1 1",
 	"  1 1 1 1",
-	"11  1 1 111e" 
+	"11  1 1 111e"
 };
 
 VIDEO_UPDATE( pc1403 )
 {
 	int x, y, i, j;
 	int color[3];
-	
+
 	bitmap_fill(bitmap, cliprect, 5);
-	
+
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = machine->pens[pocketc_colortable[CONTRAST][0]];
 	color[2] = machine->pens[pocketc_colortable[CONTRAST][1]];
@@ -202,7 +202,7 @@ VIDEO_UPDATE( pc1403 )
 				0, TRANSPARENCY_NONE,0);
 		}
 	}
-    /* if display is off, busy is always visible? it seems to behave like 
+    /* if display is off, busy is always visible? it seems to behave like
 that. */
     /* But if computer is off, busy is hidden. */
     if(!(pc1403_portc&8))
@@ -211,7 +211,7 @@ that. */
      else pocketc_draw_special(bitmap,RIGHT,DOWN-13,busy,color[2]);
     }
     else pocketc_draw_special(bitmap,RIGHT,DOWN-13,busy,color[0]);
-    
+
     pocketc_draw_special(bitmap,RIGHT+18,DOWN-13,def,
 			 pc1403_lcd.reg[0x3d]&2?color[1]:color[0]);
     pocketc_draw_special(bitmap,RIGHT+43,DOWN-13,shift,
@@ -239,7 +239,7 @@ that. */
 			 pc1403_lcd.reg[0x7c]&2?color[1]:color[0]);
     pocketc_draw_special(bitmap,RIGHT+281,DOWN-13,e,
 			 pc1403_lcd.reg[0x7c]&1?color[1]:color[0]);
-    
+
     pocketc_draw_special(bitmap, RIGHT+10,DOWN+27,line /* empty */,
 			 (pc1403_lcd.reg[0x3c]&0x40) ?color[1]:color[0]);
     pocketc_draw_special(bitmap,RIGHT+31,DOWN+27,line /*calc*/,
@@ -250,14 +250,14 @@ that. */
 			 (pc1403_lcd.reg[0x3d]&0x10) ? color[1]:color[0]);
     pocketc_draw_special(bitmap, RIGHT+94,DOWN+27,line /* empty */,
 			 (pc1403_lcd.reg[0x3c]&0x20) ? color[1]:color[0]);
-			 
-    pocketc_draw_special(bitmap,RIGHT+232,DOWN+27,line/*matrix*/, 
+
+    pocketc_draw_special(bitmap,RIGHT+232,DOWN+27,line/*matrix*/,
 			 pc1403_lcd.reg[0x3c]&0x10?color[1]:color[0]);
     pocketc_draw_special(bitmap,RIGHT+253,DOWN+27,line/*stat*/,
 			 pc1403_lcd.reg[0x3c]&8?color[1]:color[0]);
     pocketc_draw_special(bitmap,RIGHT+274,DOWN+27,line/*print*/,
 			 pc1403_lcd.reg[0x7c]&0x40?color[1]:color[0]);
-    
+
 	return 0;
 }
 

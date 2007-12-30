@@ -314,7 +314,7 @@ static void nes_read_input_device(int cfg, nes_input *vals, int pad_port,
 	vals->i0 = 0;
 	vals->i1 = 0;
 	vals->i2 = 0;
-	
+
 	switch(cfg & 0x0f)
 	{
 		case 0x01:	/* gamepad */

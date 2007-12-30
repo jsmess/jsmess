@@ -105,8 +105,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc1403_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE( pc1403_lcd_read, pc1403_lcd_write )  
-	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE( pc1403_asic_read, pc1403_asic_write )    
+	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE( pc1403_lcd_read, pc1403_lcd_write )
+	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE( pc1403_asic_read, pc1403_asic_write )
 	AM_RANGE( 0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE( 0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -698,8 +698,8 @@ SYSTEM_CONFIG_END
 */
 
 /* cpu lh5801
-   pc1500 
-   clone tandy pc2 look into drivers/pc1500.c 
+   pc1500
+   clone tandy pc2 look into drivers/pc1500.c
    pc1600
 */
 

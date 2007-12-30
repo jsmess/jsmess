@@ -92,7 +92,7 @@ static imgtoolerr_t foreach_selected_item(HWND window,
 	struct foreach_entry *first_entry = NULL;
 	struct foreach_entry *last_entry = NULL;
 	struct foreach_entry *entry;
-	
+
 	info = get_wimgtool_info(window);
 
 	if (info->image)
@@ -126,7 +126,7 @@ static imgtoolerr_t foreach_selected_item(HWND window,
 				if (err)
 					return err;
 
-				// if we have a path, prepend the path 
+				// if we have a path, prepend the path
 				if (info->current_directory && info->current_directory[0])
 				{
 					char path_separator = (char) imgtool_partition_get_info_int(info->partition, IMGTOOLINFO_INT_PATH_SEPARATOR);
@@ -669,7 +669,7 @@ static imgtoolerr_t full_refresh_image(HWND window)
 	}
 
 	win_set_window_text_utf8(window, buf);
-	
+
 	for (i = 0; i < sizeof(statusbar_text) / sizeof(statusbar_text[0]); i++)
 	{
 		TCHAR *tempstr = statusbar_text[i] ? tstring_from_utf8(statusbar_text[i]) : NULL;
@@ -899,7 +899,7 @@ static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const 
 			snprintf(local_subpath, sizeof(local_subpath) / sizeof(local_subpath[0]),
 				"%s\\%s", local_path, entry.filename);
 			subpath = imgtool_partition_path_concatenate(partition, path, entry.filename);
-			
+
 			if (entry.directory)
 				err = get_recursive_directory(partition, subpath, local_subpath);
 			else
@@ -1008,7 +1008,7 @@ imgtoolerr_t wimgtool_open_image(HWND window, const imgtool_module *module,
 		err = IMGTOOLERR_OUTOFMEMORY;
 		goto done;
 	}
-	
+
 	// try to open the image
 	err = imgtool_image_open(module, filename, read_or_write, &image);
 	if ((ERRORCODE(err) == IMGTOOLERR_READONLY) && read_or_write)
@@ -1053,7 +1053,7 @@ imgtoolerr_t wimgtool_open_image(HWND window, const imgtool_module *module,
 
 	// refresh the window
 	full_refresh_image(window);
-	
+
 done:
 	return err;
 }
@@ -1083,7 +1083,7 @@ static void menu_new(HWND window)
 		goto done;
 
 	module = find_filter_module(ofn.filter_index, TRUE);
-	
+
 	err = imgtool_image_create(module, ofn.filename, resolution, NULL);
 	if (err)
 		goto done;
@@ -1264,7 +1264,7 @@ static UINT_PTR CALLBACK extract_dialog_hook(HWND dlgwnd, UINT message,
 			ofi = (OPENFILENAME *) lparam;
 			info = (struct transfer_suggestion_info *) ofi->lCustData;
 			SetWindowLongPtr(dlgwnd, GWLP_USERDATA, (LONG_PTR) info);
-			
+
 			for (i = 0; info->suggestions[i].viability; i++)
 			{
 				SendMessage(filter_combo, CB_ADDSTRING, 0, (LPARAM) info->suggestions[i].description);
@@ -1697,7 +1697,7 @@ static imgtoolerr_t double_click(HWND window)
 	htinfo.pt.x = pt.x - r.left;
 	htinfo.pt.y = pt.y - r.top;
 	ListView_HitTest(info->listview, &htinfo);
-	
+
 	if (htinfo.flags & LVHT_ONITEM)
 	{
 		memset(&entry, 0, sizeof(entry));
@@ -1707,7 +1707,7 @@ static imgtoolerr_t double_click(HWND window)
 		ListView_GetItem(info->listview, &item);
 
 		selected_item = item.lParam;
-	
+
 		if (selected_item < 0)
 		{
 			strcpy(entry.filename, "..");

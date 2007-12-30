@@ -10,7 +10,7 @@
 #define IMGTERRS_H
 
 /* Error codes */
-typedef enum 
+typedef enum
 {
 	IMGTOOLERR_SUCCESS,
 	IMGTOOLERR_OUTOFMEMORY,

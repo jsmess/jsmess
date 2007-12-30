@@ -220,9 +220,9 @@ extern READ8_HANDLER( odyssey2_video_r )
     UINT8 data = 0;
     int bit, i;
 
-    switch (offset) 
+    switch (offset)
     {
-        case 0xa1: 
+        case 0xa1:
 
             if (horiz_scan_active())
                 data |= 1;
@@ -232,7 +232,7 @@ extern READ8_HANDLER( odyssey2_video_r )
 
             break;
 
-        case 0xa2: 
+        case 0xa2:
 
             bit = 0x01;
 
@@ -240,12 +240,12 @@ extern READ8_HANDLER( odyssey2_video_r )
             {
                 /* o2_vdc.s.collision at this point has the requested bit(s)
                  * to test the current collisions against.  TODO: Sometimes
-                 * $A2 has more than one bit set.  What are the correct semantics 
+                 * $A2 has more than one bit set.  What are the correct semantics
                  * of that when reading back?  For now having an entire byte
                  * for each graphics object that can collide is working.
                  */
 
-                if (bit & o2_vdc.s.collision) 
+                if (bit & o2_vdc.s.collision)
                     data |= (collision[i] & ~bit);
 
                 bit <<= 1;
@@ -253,7 +253,7 @@ extern READ8_HANDLER( odyssey2_video_r )
 
             break;
 
-        case 0xa4: 
+        case 0xa4:
 
             if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
                 y_beam_pos = line;
@@ -287,16 +287,16 @@ extern WRITE8_HANDLER( odyssey2_video_w )
 
     if (offset == 0xa0)
     {
-        if (    o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY 
+        if (    o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY
              && !(data & VDC_CONTROL_REG_STROBE_XY))
         {
             /* Toggling strobe bit, tuck away values */
-            x_beam_pos = get_horiz_clock_beam_pos(); 
+            x_beam_pos = get_horiz_clock_beam_pos();
             y_beam_pos = line;
 
             /* This is wrong but more games work with it, TODO: Figure
              * out correct change.  Maybe update the screen here??
-             * It seems what happens is 0x0 is written to $A0 just before 
+             * It seems what happens is 0x0 is written to $A0 just before
              * VLBANK (video update) so no screen updates happen.
              */
 
@@ -320,7 +320,7 @@ INTERRUPT_GEN( odyssey2_line )
     line_time = timer_get_time();
     line = (line + 1) % 262;
 
-    switch (line) 
+    switch (line)
     {
         case 252:
             cpunum_set_input_line(0, 0, ASSERT_LINE); /* vsync?? */
@@ -388,9 +388,9 @@ INLINE void odyssey2_draw_grid( mame_bitmap* bitmap, UINT8 bg[][320] )
     color  = o2_vdc.s.color & 7;
     color |= (o2_vdc.s.color >> 3) & 8;
 
-    for (i=0, x=0; x<9; x++, i++) 
+    for (i=0, x=0; x<9; x++, i++)
     {
-        for (j=1, y=0; y<9; y++, j<<=1) 
+        for (j=1, y=0; y<9; y++, j<<=1)
         {
             if ( ((j<=0x80)&&(o2_vdc.s.hgrid[0][i]&j))
                     ||((j>0x80)&&(o2_vdc.s.hgrid[1][i]&1)) )
@@ -404,11 +404,11 @@ INLINE void odyssey2_draw_grid( mame_bitmap* bitmap, UINT8 bg[][320] )
     if (o2_vdc.s.control & 0x80)        /* fill solid to end of next vert line */
         w=width;
 
-    for (i=0, x=0; x<10; x++, i++) 
+    for (i=0, x=0; x<10; x++, i++)
     {
         for (j=1, y=0; y<8; y++, j<<=1)
         {
-            if (o2_vdc.s.vgrid[i] & j) 
+            if (o2_vdc.s.vgrid[i] & j)
             {
                 odyssey2_draw_box(bg, x_grid_offset + x * width, y_grid_offset + y * height, w, height, COLLISION_VERTICAL_GRID);
                 plot_box(bitmap, x_grid_offset + x * width, y_grid_offset + y * height, w, height, Machine->pens[color]);
@@ -432,18 +432,18 @@ INLINE void odyssey2_draw_char(mame_bitmap *bitmap, UINT8 bg[][320], int x, int 
     // invaders aliens (!) and shoot (-)
     n = 8 - (ptr & 7) - ((y >> 1) & 7);
 
-    if (n < 3) 
+    if (n < 3)
         n += 7;
 
-    for (i=0; i<n; i++) 
+    for (i=0; i<n; i++)
     {
         if (y + i * 2 >= bitmap->height )
-            break;		
+            break;
 
         odyssey2_draw(bg, ((char*)o2_shape)[offset], x, y+i*2, 1, 2, COLLISION_CHARACTERS);
         drawgfxzoom(bitmap, Machine->gfx[0], ((char*)o2_shape)[offset],0,
                 0,0,x,y+i*2,
-                0, TRANSPARENCY_PEN,0, 0x10000, 0x20000);	
+                0, TRANSPARENCY_PEN,0, 0x10000, 0x20000);
         offset=(offset+1) & 0x1ff;
     }
 }
@@ -468,7 +468,7 @@ VIDEO_UPDATE( odyssey2 )
 
     if (o2_vdc.s.control & 0x20)        /* show foreground objects */
 	{
-		for (i=0; i<ARRAY_LENGTH(o2_vdc.s.foreground); i++) 
+		for (i=0; i<ARRAY_LENGTH(o2_vdc.s.foreground); i++)
         {
 			odyssey2_draw_char(bitmap, bg,
 				o2_vdc.s.foreground[i].x, o2_vdc.s.foreground[i].y,
@@ -500,7 +500,7 @@ VIDEO_UPDATE( odyssey2 )
 			{
 				if (o2_vdc.s.sprites[i].color & 4)
 				{
-					if (y+4*j>=bitmap->height) 
+					if (y+4*j>=bitmap->height)
                         break;
 					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*4, 2, 4, 1<<i);    /* 1 << i is sprite collision index */
 					drawgfxzoom(bitmap, machine->gfx[1], o2_vdc.s.shape[i][j],0,
@@ -510,7 +510,7 @@ VIDEO_UPDATE( odyssey2 )
 
 				else
 				{
-					if (y+j*2>=bitmap->height) 
+					if (y+j*2>=bitmap->height)
                         break;
 					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*2, 1, 2, 1<<i);    /* 1 << i is sprite collision index */
 					drawgfxzoom(bitmap, machine->gfx[1], o2_vdc.s.shape[i][j],0,
@@ -527,7 +527,7 @@ VIDEO_UPDATE( odyssey2 )
 	{
 		for (x=0; x<320; x++)
 		{
-			switch (bg[y][x]) 
+			switch (bg[y][x])
             {
                 case 0: case 1: case 2: case 4: case 8:
                 case 0x10: case 0x20: case 0x80:

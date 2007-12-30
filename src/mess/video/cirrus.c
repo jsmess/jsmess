@@ -28,7 +28,7 @@
 
 
 
-					
+
 	GC 09h:			Set 64k bank (bits 3-0 only)
 	GC 20h:			Blit Width (bits 7-0)
 	GC 21h:			Blit Width (bits 12-8)

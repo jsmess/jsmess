@@ -44,10 +44,10 @@ IMAGEMODULE(
 )
 
 /*
-	NC PCMCIA RAM Card uses a FAT-like filesystem 
+	NC PCMCIA RAM Card uses a FAT-like filesystem
 
-	Blocks are fixed at 256 bytes in size. 
-	
+	Blocks are fixed at 256 bytes in size.
+
 	Block 0 and Block 1 are reserved for a boot program.
 
 	Block 2 is reserved for root directory.
@@ -66,13 +66,13 @@ IMAGEMODULE(
 	another number (other than 0x0ffff and 0x0fffe), this is the next
 	block used by the file. If the number is 0x0ffff this means this
 	block is the last used by the file.
-	
+
 	0x0fffe indicates a reserved block.
 
 	The maximum supported PCMCIA Ram card size is 1mb, and there are
 	4096 256-byte blocks on each card. Therefore a FAT entry uses 12-bits
 	to store the block index, leaving the top 4-bits as a status??
-	
+
 	Maximum size of a file on the PCMCIA Ram card is 65536 bytes.
 */
 struct nc_card_dir_entry
@@ -218,13 +218,13 @@ static unsigned long memcard_get_free_dir_entry(struct nc_memcard *memcard)
 			{
 				return offset;
 			}
-		
+
 			offset+=32;
 		}
 
 		previous_block = current_block;
 		current_block = memcard_fat_get_next_block(memcard,current_block);
-		
+
 		if (current_block!=NC_FAT_END_OF_LIST)
 		{
 			current_block &= 0x0fff;
@@ -353,12 +353,12 @@ static unsigned long memcard_locate_dir_entry(struct nc_memcard *memcard,char *p
 					return offset;
 				}
 			}
-		
+
 			offset+=32;
 		}
 
 		current_block = memcard_fat_get_next_block(memcard,current_block);
-		
+
 		if (current_block!=NC_FAT_END_OF_LIST)
 		{
 			current_block = current_block & 0x0fff;
@@ -386,12 +386,12 @@ static int	memcard_del(struct nc_memcard *memcard,char *pNCFilename)
 		while (current_block!=0)
 		{
 			int next_block;
-		
+
 			/* get next block in list */
 			next_block = memcard_fat_get_next_block(memcard,current_block);
 			/* zero out this block */
 			memcard_fat_write(memcard,current_block,0);
-			
+
 			/* go to next block */
 			current_block = next_block;
 
@@ -488,7 +488,7 @@ static int nc_card_image_create(const imgtool_module *mod, imgtool_stream *f, co
 	int code;
 
 	struct nc_memcard memcard;
-	
+
 	/* allocate a big chunk of memory for memcard data - max size will be 1mb! */
 	if (!memcard_init(&memcard, 1024*1024))
 	{
@@ -546,7 +546,7 @@ static int nc_card_image_deletefile(imgtool_image *img, const char *fname)
 
 	if (memcard_del(&nc_card->memcard,nc_filename))
 	{
-		return IMGTOOLERR_MODULENOTFOUND;		
+		return IMGTOOLERR_MODULENOTFOUND;
 	}
 
 	return 0;
@@ -560,7 +560,7 @@ static int nc_card_image_readfile(imgtool_image *img, const char *fname, imgtool
 	struct nc_card_image *nc_card = (struct nc_card_image *)img;
 	char nc_filename[12];
 	unsigned long dir_entry_offset;
-	
+
 	setup_nc_filename(nc_filename, fname);
 
 	dir_entry_offset = memcard_locate_dir_entry(&nc_card->memcard,(char *)nc_filename);
@@ -575,7 +575,7 @@ static int nc_card_image_readfile(imgtool_image *img, const char *fname, imgtool
 
 		/* get size of file from directory entry */
 		length_remaining = ((dir_entry->size_high_byte & 0x0ff)<<8) | (dir_entry->size_low_byte & 0x0ff);
-	
+
 		/* get first block index from directory entry */
 		current_block = ((dir_entry->first_block_high & 0x0f)<<8) | dir_entry->first_block_low;
 
@@ -587,7 +587,7 @@ static int nc_card_image_readfile(imgtool_image *img, const char *fname, imgtool
 
 			/* get offset of block data in memcard data */
 			block_offset = memcard_block_to_offset(current_block);
-		
+
 			/* calc amount of data to copy from block */
 			if (length_remaining<NC_BLOCK_SIZE)
 			{
@@ -601,13 +601,13 @@ static int nc_card_image_readfile(imgtool_image *img, const char *fname, imgtool
 			/* output to file */
 			if (stream_write(destf, &nc_card->memcard.memcard_data[block_offset], copy_length)!=copy_length)
 				return IMGTOOLERR_WRITEERROR;
-		
+
 			/* update length of data remaining to write */
-			length_remaining -=copy_length;	
+			length_remaining -=copy_length;
 
 			/* get next block in list */
 			current_block = memcard_fat_get_next_block(&nc_card->memcard,current_block);
-			
+
 			if (current_block!=NC_FAT_END_OF_LIST)
 			{
 				current_block &= 0x0fff;
@@ -671,12 +671,12 @@ static int nc_card_image_writefile(imgtool_image *img, const char *fname, imgtoo
 			dir_entry->first_block_low = (current_block & 0x0ff);
 			/* setup filename */
 			strncpy((char *)dir_entry->filename,(char *)nc_filename, 12);
-			
+
 			while (length_remaining!=0)
 			{
 				/* get offset of block data */
 				block_offset = memcard_block_to_offset(current_block);
-			
+
 				/* calc amount of data to copy to block */
 				if (length_remaining<NC_BLOCK_SIZE)
 				{
@@ -691,7 +691,7 @@ static int nc_card_image_writefile(imgtool_image *img, const char *fname, imgtoo
 				if (stream_read(sourcef, &nc_card->memcard.memcard_data[block_offset], copy_length)!=copy_length)
 					return IMGTOOLERR_WRITEERROR;
 
-				length_remaining -=copy_length;	
+				length_remaining -=copy_length;
 				file_offset+=copy_length;
 
 				/* mark block as used */
@@ -699,14 +699,14 @@ static int nc_card_image_writefile(imgtool_image *img, const char *fname, imgtoo
 
 				previous_block = current_block;
 				current_block = memcard_fat_get_free_block(&nc_card->memcard);
-		
+
 				if (current_block==-1)
 					break;
-			
+
 				/* link up block chain */
 				memcard_fat_write(&nc_card->memcard,previous_block, current_block|0x02000);
 			}
-		
+
 			/* end block chain */
 			memcard_fat_write(&nc_card->memcard,current_block, NC_FAT_END_OF_LIST);
 		}
@@ -716,12 +716,12 @@ static int nc_card_image_writefile(imgtool_image *img, const char *fname, imgtoo
 	return 0;
 }
 
-/* directory fills 1 or more blocks. 
+/* directory fills 1 or more blocks.
 current_block holds index of current block we are accessing,
 offset_in_block holds offset within block referenced by current_block.
 eod is 1 if end of directory (no more blocks) or 0 if not end of directory */
 
-struct nc_card_direnum 
+struct nc_card_direnum
 {
 	imgtool_directory base;
 	/* card image */
@@ -743,7 +743,7 @@ static int nc_card_image_beginenum(imgtool_image *img, imgtool_directory **outen
 	if (memcard_is_executable(&nc_card->memcard))
 	{
 		return IMGTOOLERR_MODULENOTFOUND;
-	}	
+	}
 
 	card_enum = (struct nc_card_direnum *) malloc(sizeof(struct nc_card_direnum));
 	if (!card_enum)
@@ -792,7 +792,7 @@ static int nc_card_image_nextenum(imgtool_directory *enumeration, imgtool_dirent
 
 					/* no more directory blocks, end of directory reached */
 					card_enum->eod = 1;
-		
+
 					/* no more blocks - so quit */
 					quit = 1;
 				}
@@ -810,7 +810,7 @@ static int nc_card_image_nextenum(imgtool_directory *enumeration, imgtool_dirent
 				dir_entry = (struct nc_card_dir_entry *)&card_enum->img->memcard.memcard_data[dir_block_offset + card_enum->offset_in_block];
 
 				if (dir_entry->filename[0]!=0)
-				{	
+				{
 					/* got a used directory entry */
 
 					if (ent->fname_len<13)
@@ -828,7 +828,7 @@ static int nc_card_image_nextenum(imgtool_directory *enumeration, imgtool_dirent
 					ent->corrupt = 0;
 
 					if (ent->attr_len)
-					{	
+					{
 						switch (dir_entry->type)
 						{
 							case 0:

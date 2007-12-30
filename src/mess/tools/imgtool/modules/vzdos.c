@@ -73,11 +73,11 @@ static int vzdos_get_fname_len(const char *fname)
 {
 	int len;
 
-	for (len = 7; len > 0; len--)			
+	for (len = 7; len > 0; len--)
 		if (fname[len] != 0x20)
 			break;
-	
-	return len;	
+
+	return len;
 }
 
 /* calculate checksum-16 of buffer */
@@ -85,10 +85,10 @@ static UINT16 chksum16(UINT8 *buffer, int len)
 {
 	int i;
 	UINT16 sum = 0;
-	
+
 	for (i = 0; i < len; i++)
-		sum += buffer[i];	
-	
+		sum += buffer[i];
+
 	return sum;
 }
 
@@ -100,7 +100,7 @@ static imgtoolerr_t vzdos_get_data_start(imgtool_image *img, int track, int sect
 
 	ret = floppy_read_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, &buffer, sizeof(buffer));
 	if (ret) return ret;
-		
+
 	/* search for start of data */
 	if (memcmp(buffer + 19, "\xC3\x18\xE7\xFE", 4) == 0)
 		*start = 23;
@@ -131,7 +131,7 @@ static imgtoolerr_t vzdos_read_sector_data(imgtool_image *img, int track, int se
 		return IMGTOOLERR_CORRUPTFILE;
 
 	memcpy(data, &buffer, DATA_SIZE + 2);
-	
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -146,10 +146,10 @@ static imgtoolerr_t vzdos_write_sector_data(imgtool_image *img, int track, int s
 
 	memcpy(buffer, data, DATA_SIZE + 2);
 	place_integer_le(buffer, DATA_SIZE + 2, 2, chksum16(data, DATA_SIZE + 2));
-	
+
 	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, buffer, sizeof(buffer));
 	if (ret) return ret;
-	
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -157,10 +157,10 @@ static imgtoolerr_t vzdos_write_sector_data(imgtool_image *img, int track, int s
 static imgtoolerr_t vzdos_clear_sector(imgtool_image *img, int track, int sector)
 {
 	UINT8 data[DATA_SIZE + 2];
-	
+
 	memset(data, 0x00, sizeof(data));
-	
-	return vzdos_write_sector_data(img, track, sector, data);	
+
+	return vzdos_write_sector_data(img, track, sector, data);
 }
 
 /* return a directory entry for an index */
@@ -171,7 +171,7 @@ static imgtoolerr_t vzdos_get_dirent(imgtool_image *img, int index, vzdos_dirent
 
 	ret = vzdos_read_sector_data(img, 0, (int) index / 8, buffer);
 	if (ret) return ret;
-	
+
 	entry = ((index % 8) * sizeof(vzdos_dirent));
 
 	memcpy(ent, &buffer[entry], 10);
@@ -186,7 +186,7 @@ static imgtoolerr_t vzdos_get_dirent(imgtool_image *img, int index, vzdos_dirent
 	/* check values */
 	if (ent->start_track > 39)
 		return IMGTOOLERR_CORRUPTIMAGE;
-		
+
 	if (ent->start_sector > 15)
 		return IMGTOOLERR_CORRUPTIMAGE;
 
@@ -210,12 +210,12 @@ static imgtoolerr_t vzdos_set_dirent(imgtool_image *img, int index, vzdos_dirent
 	place_integer_le(buffer, entry + 11, 1, ent.start_sector);
 	place_integer_le(buffer, entry + 12, 2, ent.start_address);
 	place_integer_le(buffer, entry + 14, 2, ent.end_address);
-	
+
 	/* save new sector */
 	ret = vzdos_write_sector_data(img, 0, (int) index / 8, buffer);
 	if (ret) return ret;
-	
-	return IMGTOOLERR_SUCCESS;	
+
+	return IMGTOOLERR_SUCCESS;
 }
 
 /* clear a directory entry */
@@ -228,7 +228,7 @@ static imgtoolerr_t vzdos_clear_dirent(imgtool_image *img, int index)
 
 	ret = vzdos_set_dirent(img, index, entry);
 	if (ret) return ret;
-		
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -241,21 +241,21 @@ static imgtoolerr_t vzdos_searchentry(imgtool_image *image, const char *fname, i
 	/* check for invalid filenames */
 	if (strlen(fname) > 8)
 		return IMGTOOLERR_BADFILENAME;
-		
+
 	/* TODO: check for invalid characters */
-	
+
 	*entry = -1;
-		
+
 	for (i = 0; i < MAX_DIRENTS; i++) {
 
 		ret = vzdos_get_dirent(image, i, &ent);
 		if (ret) return ret;
-		
+
 		len = vzdos_get_fname_len(ent.fname) + 1;
 
 		if (strlen(fname) != len)
 			continue;
-		
+
 		memset(filename, 0x00, sizeof(filename));
 		memcpy(filename, ent.fname, len);
 
@@ -263,14 +263,14 @@ static imgtoolerr_t vzdos_searchentry(imgtool_image *image, const char *fname, i
 			*entry = i;
 			break;
 		}
-		
+
 	}
-	
+
 	if (*entry == -1)
 		return IMGTOOLERR_FILENOTFOUND;
 
 	return IMGTOOLERR_SUCCESS;
-} 
+}
 
 /* return a directory entry for a filename */
 static imgtoolerr_t vzdos_get_dirent_fname(imgtool_image *img, const char *fname, vzdos_dirent *ent)
@@ -279,10 +279,10 @@ static imgtoolerr_t vzdos_get_dirent_fname(imgtool_image *img, const char *fname
 
 	ret = vzdos_searchentry(img, fname, &index);
 	if (ret) return ret;
-	
+
 	ret = vzdos_get_dirent(img, index, ent);
-	if (ret) return ret;	
-	
+	if (ret) return ret;
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -305,7 +305,7 @@ static imgtoolerr_t vzdos_toggle_trackmap(imgtool_image *img, int track, int sec
 
 	ret = vzdos_write_sector_data(img, 0, 15, buffer);
 	if (ret) return ret;
-		
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -339,22 +339,22 @@ static imgtoolerr_t vzdos_get_trackmap(imgtool_image *img, int track, int sector
 	else
 		*used = 0;
 
-	return IMGTOOLERR_SUCCESS;	
+	return IMGTOOLERR_SUCCESS;
 }
 
 /* return the next free sector */
 static imgtoolerr_t vzdos_free_trackmap(imgtool_image *img, int *track, int *sector)
 {
 	int ret, used = 0;
-	
+
 	for (*track = 1; *track < 40; (*track)++) {
 		for (*sector = 0; *sector < 16; (*sector)++) {
 			ret = vzdos_get_trackmap(img, *track, *sector, &used);
 			if (ret) return ret;
 			if (!used) return IMGTOOLERR_SUCCESS;
-		}	
+		}
 	}
-	
+
 	return IMGTOOLERR_NOSPACE;
 }
 
@@ -368,7 +368,7 @@ static imgtoolerr_t vzdos_write_formatted_sector(imgtool_image *img, int track, 
 		0x18, 0xC3, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80,
 		0x80, 0x80, 0x80, 0x00, 0xC3, 0x18, 0xE7, 0xFE
 	};
-	
+
 	memset(sector_data, 0x00, sizeof(sector_data));
 
 	sector_header[10] = (UINT8) track;			/* current track */
@@ -406,33 +406,33 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, img
 	vz_iterator *iter = (vz_iterator *) imgtool_directory_extrabytes(enumeration);
 
 	if (iter->eof == 1 || iter->index > MAX_DIRENTS) {
-	
+
 		ent->eof = 1;
-	
+
 	} else {
-		
+
 		const char *type;
 		int ret, len;
 		vzdos_dirent dirent;
 
 		ret = vzdos_get_dirent(imgtool_directory_image(enumeration), iter->index - 1, &dirent);
-		
+
 		if (dirent.ftype == 0x00) {
 			iter->eof = 1;
 			ent->eof = 1;
 			return IMGTOOLERR_SUCCESS;
 		}
-		
+
 		/* kill trailing spaces */
-		for (len = 7; len > 0; len--) {			
+		for (len = 7; len > 0; len--) {
 			if (dirent.fname[len] != 0x20) {
 				break;
 			}
 		}
-		
+
 		memcpy(ent->filename, &dirent.fname, len + 1);
 		ent->filesize = dirent.end_address - dirent.start_address;
-		
+
 		switch (dirent.ftype) {
 			case 'T': type = "Basic";      break;
 			case 'B': type = "Binary";     break;
@@ -444,10 +444,10 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, img
 			default: type = "Unknown";
 		}
 		snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "%s", type);
-		
-		iter->index++;	
+
+		iter->index++;
 	}
-	
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -483,10 +483,10 @@ static imgtoolerr_t vzdos_diskimage_readfile(imgtool_partition *partition, const
 	int filesize, track, sector;
 	vzdos_dirent ent;
 	UINT8 buffer[DATA_SIZE + 2];
-		
+
 	ret = vzdos_get_dirent_fname(image, filename, &ent);
 	if (ret) return ret;
-	
+
 	filesize = ent.end_address - ent.start_address;
 	track = ent.start_track;
 	sector = ent.start_sector;
@@ -501,23 +501,23 @@ static imgtoolerr_t vzdos_diskimage_readfile(imgtool_partition *partition, const
 		if ((track == pick_integer_le(buffer, DATA_SIZE, 1)) && (sector == pick_integer_le(buffer, DATA_SIZE + 1, 1)))
 			return IMGTOOLERR_CORRUPTIMAGE;
 
-		/* load next track and sector values */					
+		/* load next track and sector values */
 		track  = pick_integer_le(buffer, DATA_SIZE, 1);
 		sector = pick_integer_le(buffer, DATA_SIZE + 1, 1);
-		
+
 		/* track 0 is invalid */
 		if ((track == 0) && (filesize > DATA_SIZE))
 			return IMGTOOLERR_CORRUPTIMAGE;
-		
+
 		/* write either DATA_SIZE or the remaining bytes */
 		towrite = filesize > DATA_SIZE ? DATA_SIZE : filesize;
-		
+
 		if (stream_write(destf, buffer, towrite) != towrite)
 			return IMGTOOLERR_WRITEERROR;
 
 		filesize -= DATA_SIZE;
 	}
-		
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -565,27 +565,27 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, con
 		while ((ret = vzdos_get_dirent(img, index + 1, &next_entry)) != IMGTOOLERR_FILENOTFOUND) {
 			if (ret) return ret;
 			ret = vzdos_set_dirent(img, index++, next_entry);
-			if (ret) return ret; 
+			if (ret) return ret;
 		}
 
 		ret = vzdos_clear_dirent(img, index);
 		if (ret) return ret;
-		
+
 	}
-	
+
 	/* clear sectors and trackmap entries */
 	while (filesize > 0) {
-	
+
 		filesize -= DATA_SIZE;
-	
+
 		/* clear trackmap entry */
 		ret = vzdos_clear_trackmap(img, track, sector);
 		if (ret) return ret;
 
-		/* load next track and sector values */					
+		/* load next track and sector values */
 		next_track  = pick_integer_le(buffer, DATA_SIZE, 1);
 		next_sector = pick_integer_le(buffer, DATA_SIZE + 1, 1);
-		
+
 		/* overwrite sector with default values */
 		ret = vzdos_clear_sector(img, track, sector);
 		if (ret) return ret;
@@ -597,10 +597,10 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, con
 		if (filesize > 0) {
 			ret = floppy_read_sector(imgtool_floppy(img), 0, track, sector_order[sector], 24, &buffer, DATA_SIZE + 2);
 			if (ret) return ret;
-		}		
-				
+		}
+
 	}
-	
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -630,7 +630,7 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 		/* another error occured, return it */
 		return ret;
 	}
-	
+
 	ret = stream_seek(sourcef, offset, SEEK_SET);
 	if (ret) return ret;
 
@@ -642,7 +642,7 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 
 	if (filesize > freespace)
 		return IMGTOOLERR_NOSPACE;
-	
+
 	/* get next free track and sector */
 	ret = vzdos_free_trackmap(img, &track, &sector);
 	if (ret) return ret;
@@ -666,21 +666,21 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 
 	next_track  = 0;
 	next_sector = 0;
-	
+
 	/* write data to disk */
 	while (filesize > 0) {
-	
+
 		toread = filesize > DATA_SIZE ? DATA_SIZE : filesize;
 		stream_read(sourcef, buffer, toread);
 
-		filesize -= toread;	
+		filesize -= toread;
 
 		/* mark sector as used */
 		ret = vzdos_set_trackmap(img, track, sector);
 		if (ret) return ret;
 
 		/* get track and sector for next sector */
-		if (filesize > 0) {	
+		if (filesize > 0) {
 			ret = vzdos_free_trackmap(img, &next_track, &next_sector);
 			if (ret) return ret;
 		} else {
@@ -697,9 +697,9 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 		track  = next_track;
 		sector = next_sector;
 	}
-		
+
 	return IMGTOOLERR_SUCCESS;
-	
+
 }
 
 /* create a new file or overwrite a file */
@@ -712,7 +712,7 @@ static imgtoolerr_t vzdos_diskimage_writefile(imgtool_partition *partition, cons
 	/* TODO: check for leading spaces and strip */
 	if (strlen(filename) > 8 || strlen(filename) < 1)
 		return IMGTOOLERR_BADFILENAME;
-		
+
 	/* prepare directory entry */
 	ftype = option_resolution_lookup_int(opts, 'T');
 
@@ -732,15 +732,15 @@ static imgtoolerr_t vzdos_diskimage_writefile(imgtool_partition *partition, cons
 		default:
 			break;
 	}
-	
+
 	entry.delimitor = ':';
 	memset(&entry.fname, 0x20, 8); /* pad with spaces */
-	memcpy(&entry.fname, filename, strlen(filename));		
+	memcpy(&entry.fname, filename, strlen(filename));
 
 	/* write file to disk */
 	ret = vzdos_writefile(partition, 0, sourcef, &entry);
 	if (ret) return ret;
-	
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -749,12 +749,12 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool_partition *partition
 	imgtoolerr_t ret;
 	imgtool_image *image = imgtool_partition_image(partition);
 	vzdos_dirent entry;
-	
+
 	if (fname) {
 
 		ret = vzdos_get_dirent_fname(image, fname, &entry);
 		if (ret) return ret;
-		
+
 		switch (entry.ftype) {
 			case 'B':
 				suggestions[0].viability = SUGGESTION_RECOMMENDED;
@@ -770,7 +770,7 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool_partition *partition
 				suggestions[0].description = "VZ Snapshot";
 				suggestions[1].viability = SUGGESTION_POSSIBLE;
 				suggestions[1].filter = NULL;
-				suggestions[1].description = "Raw";				
+				suggestions[1].description = "Raw";
 				suggestions[2].viability = SUGGESTION_POSSIBLE;
 				suggestions[2].filter = filter_vzbas_getinfo;
 				suggestions[2].description = "Tokenized Basic";
@@ -778,10 +778,10 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool_partition *partition
 			default:
 				suggestions[0].viability = SUGGESTION_RECOMMENDED;
 				suggestions[0].filter = NULL;
-				suggestions[0].description = "Raw";			
+				suggestions[0].description = "Raw";
 		}
-		
-	} else {	
+
+	} else {
 		suggestions[0].viability = SUGGESTION_RECOMMENDED;
 		suggestions[0].filter = NULL;
 		suggestions[0].description = "Raw";
@@ -789,7 +789,7 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool_partition *partition
 		suggestions[1].filter = filter_vzsnapshot_getinfo;
 		suggestions[1].description = "VZ Snapshot";
 	}
-		
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -804,7 +804,7 @@ static imgtoolerr_t vzdos_diskimage_create(imgtool_image *img, imgtool_stream *s
 			if (ret) return ret;
 		}
 	}
-	
+
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -818,8 +818,8 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool_partition *partition, const char
 	imgtool_image *image = imgtool_partition_image(partition);
 	vzdos_dirent entry;
 	UINT8 header[24];
-	
-	/* get directory entry from disk */	
+
+	/* get directory entry from disk */
 	ret = vzdos_get_dirent_fname(image, filename, &entry);
 	if (ret) return ret;
 
@@ -827,7 +827,7 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool_partition *partition, const char
 	header[0] = 'V';
 	header[1] = 'Z';
 	header[2] = 'F';
-	
+
 	switch (entry.ftype) {
 		case 'B':
 			header[3] = '1';
@@ -835,13 +835,13 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool_partition *partition, const char
 			break;
 		case 'T':
 			header[3] = '0';
-			header[21] = 0xF0;	
+			header[21] = 0xF0;
 			break;
 		default:
 			memset(header, 0x00, 4);
 			header[21] = 0x00;
 	}
-		
+
 	memset(header + 4, 0x00, 17);
 	memcpy(header + 4, entry.fname, vzdos_get_fname_len(entry.fname) + 1);
 	place_integer_le(header, 22, 2, entry.start_address);
@@ -865,25 +865,25 @@ static imgtoolerr_t vzsnapshot_writefile(imgtool_partition *partition, const cha
 
 	/* get header infos from file */
 	stream_read(sourcef, header, sizeof(header));
-	
-	/* prepare directory entry */	
+
+	/* prepare directory entry */
 	entry.ftype         = header[21] == 0xF1 ? 'B' : 'T';
 	entry.delimitor     = ':';
 	entry.start_address = pick_integer_le(header, 22, 2);
-	
+
 	/* filename from header or directly? */
 	fnameopt = option_resolution_lookup_int(opts, 'F');
-	
+
 	if (fnameopt == 0) {
-		memcpy(&entry.fname, &header[4], 8);			
+		memcpy(&entry.fname, &header[4], 8);
 	} else {
 		/* TODO: check for leading spaces and strip */
 		if (strlen(filename) > 8 || strlen(filename) < 1)
 		return IMGTOOLERR_BADFILENAME;
-		
+
 		memcpy(&entry.fname, filename, strlen(filename) - 3);
 	}
-	
+
 	/* write file to disk */
 	ret = vzdos_writefile(partition, 24, sourcef, &entry);
 	if (ret) return ret;
@@ -920,16 +920,16 @@ static OPTION_GUIDE_START(vzdos_writefile_optionguide)
 OPTION_GUIDE_END
 
 /*
-T	Basic Editor File		
-B	Binary File		
-D	Sequential Access Program Data File		
-F	Quickwrite Document 		
-A	Russell Harrison's Edit Ass. File		
-S	Dave Mitchell/Mark Hardwood Edit Ass. File  Start Addr A280H	
-S	Quickwrite/Diskops System File/Label    	Except Above	
-W	Edit Ass. with Diskops File	Start           Addr A813H	
-W	E & F Word Pro with Patch 3.3 File	        End Addr D000H	
-W	Russell Harrison Word Pro File              Except above two	
+T	Basic Editor File
+B	Binary File
+D	Sequential Access Program Data File
+F	Quickwrite Document
+A	Russell Harrison's Edit Ass. File
+S	Dave Mitchell/Mark Hardwood Edit Ass. File  Start Addr A280H
+S	Quickwrite/Diskops System File/Label    	Except Above
+W	Edit Ass. with Diskops File	Start           Addr A813H
+W	E & F Word Pro with Patch 3.3 File	        End Addr D000H
+W	Russell Harrison Word Pro File              Except above two
 */
 
 void vzdos_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)

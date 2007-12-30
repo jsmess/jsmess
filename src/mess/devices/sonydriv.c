@@ -494,7 +494,7 @@ static void device_unload_sonydriv_floppy(mess_image *image)
 {
 	int id;
 	device_unload_handler parent_unload;
-	
+
 	id = image_index_in_device(image);
 	save_track_data(id);
 	memset(&sony_floppy[id], 0, sizeof(sony_floppy[id]));

@@ -118,7 +118,7 @@ static const struct PickerCallbacks s_softwareListCallbacks =
 	NULL,								// pfnFindItemParent
 	SoftwarePicker_Idle,				// pfnIdle
 	SoftwarePicker_OnHeaderContextMenu,	// pfnOnHeaderContextMenu
-	NULL								// pfnOnBodyContextMenu 
+	NULL								// pfnOnBodyContextMenu
 };
 
 
@@ -128,14 +128,14 @@ static const struct TabViewCallbacks s_softwareTabViewCallbacks =
 	NULL,								// pfnGetShowTabCtrl
 	SetCurrentSoftwareTab,				// pfnSetCurrentTab
 	GetCurrentSoftwareTab,				// pfnGetCurrentTab
-	NULL,								// pfnSetShowTab 
-	NULL,								// pfnGetShowTab 
+	NULL,								// pfnSetShowTab
+	NULL,								// pfnGetShowTab
 
 	SoftwareTabView_GetTabShortName,	// pfnGetTabShortName
 	SoftwareTabView_GetTabLongName,		// pfnGetTabLongName
 
 	SoftwareTabView_OnSelectionChanged,	// pfnOnSelectionChanged
-	SoftwareTabView_OnMoveSize			// pfnOnMoveSize 
+	SoftwareTabView_OnMoveSize			// pfnOnMoveSize
 };
 
 
@@ -158,7 +158,7 @@ static const struct deviceentry s_devices[] =
 	{ IO_CARTSLOT,	"roms",		"Cartridge images" },
 	{ IO_FLOPPY,	"floppy",	"Floppy disk images" },
 	{ IO_HARDDISK,	"hard",		"Hard disk images" },
-	{ IO_CYLINDER,	NULL,		"Cylinders" },			
+	{ IO_CYLINDER,	NULL,		"Cylinders" },
 	{ IO_CASSETTE,	NULL,		"Cassette images" },
 	{ IO_PUNCHCARD,	NULL,		"Punchcard images" },
 	{ IO_PUNCHTAPE,	NULL,		"Punchtape images" },
@@ -341,7 +341,7 @@ void MyFillSoftwareList(int nGame, BOOL bForce)
 	const game_driver *drv;
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
-	
+
 	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 
@@ -702,7 +702,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
         *(s++) = '|';
     }
     *(s++) = '|';
-    
+
     t_buffer = tstring_from_utf8(szFilter);
     if( !t_buffer )
 	    return FALSE;
@@ -741,7 +741,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
     {
         //GetDirectory(filename,last_directory,sizeof(last_directory));
     }
-    
+
     return success;
 }
 
@@ -900,15 +900,15 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 	LPCTSTR t_buffer = NULL;
 	TCHAR* t_s;
 	LPCSTR s = GetSelectedSoftware(nDriverIndex, &dev->devclass, nID);
-	
+
 	t_s = tstring_from_utf8(s);
 	if( !t_s )
 		return t_buffer;
-	
+
 	_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_s);
-	free(t_s);	
+	free(t_s);
 	t_buffer = pszBuffer;
-	
+
 	return t_buffer;
 }
 
@@ -939,7 +939,7 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 		switch(nType)
 		{
 			case IO_UNKNOWN:
-				// Unknowns 
+				// Unknowns
 				nIcon = FindIconIndex(IDI_WIN_UNKNOWN);
 				break;
 
@@ -1065,11 +1065,11 @@ static INT_PTR CALLBACK MyColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 	INT_PTR result = 0;
 	int nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
 	const LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
-	
+
 	result = InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
 		MyColumnDialogProc_shown, MyColumnDialogProc_order, ppszColumnNames,
 		MyGetRealColumnOrder, MyGetColumnInfo, MySetColumnInfo);
-		
+
 	return result;
 }
 
@@ -1162,7 +1162,7 @@ BOOL MessCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 
 
 // ------------------------------------------------------------------------
-// Software Tab View 
+// Software Tab View
 // ------------------------------------------------------------------------
 
 static LPCSTR s_tabs[] =

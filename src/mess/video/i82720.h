@@ -5,9 +5,9 @@
 	Video driver for the Intel 82720 and NEC uPD7220 GDC.
 	Per Ola Ingvarsson
 	Tomas Karlsson
-	
+
  ******************************************************************************/
- 
+
 #include "driver.h"
 
 #define COMPIS_PALETTE_SIZE           16
@@ -35,7 +35,7 @@ VIDEO_UPDATE( compis_gdc );
 */
 typedef enum
 {
-	GDC_MODE_HRG,		
+	GDC_MODE_HRG,
 	GDC_MODE_UHRG
 } compis_gdc_modes;
 

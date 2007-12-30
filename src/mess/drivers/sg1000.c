@@ -154,7 +154,7 @@ static INPUT_PORTS_START( sg1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	
+
 	PORT_START_TAG("PB7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
@@ -423,16 +423,16 @@ static READ8_HANDLER( sf7000_ppi8255_a_r )
 		PA0		INT from FDC
 		PA1		BUSY from Centronics printer
 		PA2		INDEX from FDD
-		PA3		
-		PA4		
-		PA5		
-		PA6		
-		PA7		
+		PA3
+		PA4
+		PA5
+		PA6
+		PA7
 	*/
 
 	int centronics_handshake = centronics_read_handshake(1);
 	int busy = 0;
-	
+
 	if ((centronics_handshake & CENTRONICS_NOT_BUSY) == 0)
 	{
 		busy = 0x02;
@@ -476,7 +476,7 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x02) ? 0 : 1);
 	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
-	
+
 	nec765_set_tc_state(data & 0x04);
 
 	if (data & 0x08)
@@ -801,7 +801,7 @@ static DEVICE_LOAD( sf7000_floppy )
 		{
 			/* image, tracks, sides, sectors per track, sector length, first sector id, offset of track 0, track skipping */
 			basicdsk_set_geometry(image, 40, 1, 16, 256, 1, 0, FALSE);
-			
+
 			return INIT_PASS;
 		}
 	}

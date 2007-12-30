@@ -44,11 +44,11 @@ UINT16* x68k_spritereg;  // sprite/background registers
 
 static mame_bitmap* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
 static mame_bitmap* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
-static mame_bitmap* x68k_gfx_1_bitmap_16; 
-static mame_bitmap* x68k_gfx_2_bitmap_16; 
-static mame_bitmap* x68k_gfx_3_bitmap_16; 
+static mame_bitmap* x68k_gfx_1_bitmap_16;
+static mame_bitmap* x68k_gfx_2_bitmap_16;
+static mame_bitmap* x68k_gfx_3_bitmap_16;
 static mame_bitmap* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
-static mame_bitmap* x68k_gfx_1_bitmap_256; 
+static mame_bitmap* x68k_gfx_1_bitmap_256;
 static mame_bitmap* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
 
 static tilemap* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
@@ -172,7 +172,7 @@ static void x68k_crtc_refresh_mode()
 	visiblescr.max_x = sys.crtc.hend;
 	visiblescr.min_y = sys.crtc.vbegin;
 	visiblescr.max_y = sys.crtc.vend;
-	
+
 	// expand visible area to the size indicated by CRTC reg 20
 	length = sys.crtc.hend - sys.crtc.hbegin;
 	if (length < sys.crtc.width)
@@ -195,10 +195,10 @@ static void x68k_crtc_refresh_mode()
 		visiblescr.max_x = scr.max_x - 1;
 	if(visiblescr.max_y >= scr.max_y)
 		visiblescr.max_y = scr.max_y - 1;
-	
+
 	logerror("video_screen_configure(0,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
 	video_screen_configure(0,scr.max_x,scr.max_y,&visiblescr,HZ_TO_ATTOSECONDS(55.45));
-/*	
+/*
 	rect.min_x = rect.min_y = 0;
 	sys.crtc.visible_width = (sys.crtc.reg[3] - sys.crtc.reg[2]) * 8;
 	if(sys.crtc.height == 256)
@@ -241,8 +241,8 @@ TIMER_CALLBACK(x68k_hsync)
 {
 	int state = param;
 	attotime hsync_time;
-	
-	sys.crtc.hblank = state;	
+
+	sys.crtc.hblank = state;
 	if(state == 1)
 	{
 		int scan = video_screen_get_vpos(0);
@@ -356,13 +356,13 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
  *      bits 15-8 - Source Line
  *      bits 7-0 - Destination Line
  * 23 - Text Screen Mask Pattern
- * 
+ *
  * 0xe80481 - Operation Port (8-bit):
  *      bit 3 - Text Screen Line Copy Begin
  *      bit 1 - Graphic Screen High-speed Clear Begin
  *      bit 0 - Image Taking Begin (?)
  *    Operation Port bits are cleared automatically when the requested
- *    operation is completed. 
+ *    operation is completed.
  */
 WRITE16_HANDLER( x68k_crtc_w )
 {
@@ -387,7 +387,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 			{
 				attotime irq_time;
 				irq_time = video_screen_get_time_until_pos(0,(data - 1) / sys.crtc.vmultiple,2);
-	
+
 				if(attotime_to_double(irq_time) > 0)
 					timer_adjust(raster_irq,irq_time,(data - 1) / sys.crtc.vmultiple,attotime_never);
 				logerror("CRTC: Time until next raster IRQ = %f\n",attotime_to_double(irq_time));
@@ -433,7 +433,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		{
 			sys.crtc.interlace = 0;
 			if(data & 0x0400)  // real size 1024x1024
-				sys.crtc.interlace = 1;			
+				sys.crtc.interlace = 1;
 		}
 		x68k_crtc_refresh_mode();
 		break;
@@ -552,11 +552,11 @@ WRITE16_HANDLER( x68k_gvram_w )
 	int xloc,yloc,pageoffset;
 	/*
 	   G-VRAM usage is determined by colour depth and "real" screen size.
-	   
+
 	   For screen size of 1024x1024, all G-VRAM space is used, in one big page.
 	   At 1024x1024 real screen size, colour depth is always 4bpp, and ranges from
 	   0xc00000-0xdfffff.
-	   
+
 	   For screen size of 512x512, the colour depth determines the page usage.
 	   16 colours = 4 pages
 	   256 colours = 2 pages
@@ -565,7 +565,7 @@ WRITE16_HANDLER( x68k_gvram_w )
 	   Page 3 - 0xd00000-0xd7ffff    Page 4 - 0xd80000-0xdfffff
 	*/
 	COMBINE_DATA(gvram+offset);
-	
+
 	pageoffset = offset & 0x3ffff;
 	xloc = pageoffset % 512;
 	yloc = pageoffset / 512;
@@ -719,13 +719,13 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 			{
 				xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
 				yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-				copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
+				copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0);
 				xscr+=512;
-				copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
+				copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0);
 				yscr+=512;
-				copyscrollbitmap(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
+				copyscrollbitmap(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0);
 				xscr-=512;
-				copyscrollbitmap(bitmap, x68k_gfx_3_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
+				copyscrollbitmap(bitmap, x68k_gfx_3_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0);
 			}
 		}
 		else  // 512x512 "real" screen size
@@ -742,7 +742,7 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 					rect.max_y=rect.min_y + sys.crtc.visible_height-1;
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_65536, 1, &xscr, 1, &yscr,&cliprect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_65536, 1, &xscr, 1, &yscr,&cliprect, TRANSPARENCY_PEN,0);
 				}
 				break;
 			case 0x01:
@@ -755,13 +755,13 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[16] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[17] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_256, 1, &xscr, 1, &yscr, &cliprect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_256, 1, &xscr, 1, &yscr, &cliprect, TRANSPARENCY_PEN,0);
 				}
 				if(sys.video.reg[2] & 0x0001 && sys.video.reg[2] & 0x0002 && priority == sys.video.gfxlayer_pri[0])
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_256, 1, &xscr, 1, &yscr, &cliprect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_256, 1, &xscr, 1, &yscr, &cliprect, TRANSPARENCY_PEN,0);
 				}
 				break;
 			case 0x00:
@@ -774,25 +774,25 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[18] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[19] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(3,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_get_gfx_pri(3,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0);
 				}
 				if(sys.video.reg[2] & 0x0004)  // Pri2
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[16] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[17] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(2,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_get_gfx_pri(2,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0);
 				}
 				if(sys.video.reg[2] & 0x0002)  // Pri1
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[14] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[15] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(1,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_get_gfx_pri(1,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0);
 				}
 				if(sys.video.reg[2] & 0x0001)  // Pri0
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(0,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0); 
+					copyscrollbitmap(bitmap, x68k_get_gfx_pri(0,GFX16), 1, &xscr, 1, &yscr ,&cliprect, TRANSPARENCY_PEN,0);
 				}
 				break;
 			}
@@ -1082,7 +1082,7 @@ VIDEO_UPDATE( x68000 )
 #ifdef MAME_DEBUG
 			if(!input_code_pressed(KEYCODE_Q))
 #endif
-				copyscrollbitmap(bitmap, x68k_text_bitmap, 1, &xscr, 1, &yscr, &rect, TRANSPARENCY_PEN,0x100); 
+				copyscrollbitmap(bitmap, x68k_text_bitmap, 1, &xscr, 1, &yscr, &rect, TRANSPARENCY_PEN,0x100);
 		}
 	}
 

@@ -36,7 +36,7 @@ static const struct via6522_interface vectrex_via6522_interface =
 {
 	v_via_pa_r, v_via_pb_r,         /* read PA/B */
 	0, 0, 0, 0,                     /* read ca1, cb1, ca2, cb2 */
-	v_via_pa_w, v_via_pb_w,         /* write PA/B */ 
+	v_via_pa_w, v_via_pb_w,         /* write PA/B */
 	0, 0, v_via_ca2_w, v_via_cb2_w, /* write ca1, cb1, ca2, cb2 */
 	v_via_irq,                      /* IRQ */
 };
@@ -147,7 +147,7 @@ static void lightpen_show (void)
 			lightpen_down=0;
 			color=0x00ffffff;
 		}
-		
+
 		pen_x = readinputport(8)*(x_max/0xff);
 		pen_y = readinputport(7)*(y_max/0xff);
 
@@ -157,7 +157,7 @@ static void lightpen_show (void)
 		vector_add_point(pen_x-250000,pen_y+250000,color,0xff);
 	}
 	else
-		lightpen_down=0;	
+		lightpen_down=0;
 }
 
 /*********************************************************************
@@ -311,7 +311,7 @@ static WRITE8_HANDLER ( v_via_pb_w )
 				 * off when the beam reaches the pen. Exact
 				 * timing is important here.
 				 *
-				 *    lightpen 
+				 *    lightpen
 				 *       ^
 				 *  _   /|
 				 *  b  / |
@@ -418,13 +418,13 @@ static WRITE8_HANDLER ( v_via_cb2_w )
 		{
 			/* RAMP inactive */
 			/* This generates a dot (here we take the dwell time into account) */
-			
+
 			if (data)
 				vectrex_dot();
 		}
 		else
 		{
-			/* RAMP active 
+			/* RAMP active
 			 * Take MAX because RAMP is slower than BLANK
 			 */
 			time_now = MAX(attotime_to_double(timer_get_time()),start_time);

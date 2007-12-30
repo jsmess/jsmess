@@ -11,8 +11,8 @@ extern "C" {
 
 /*
  * functions for the IODevice entry IO_PRINTER
- * 
- * Currently only a simple port which only supports status 
+ *
+ * Currently only a simple port which only supports status
  * ("online/offline") and output of bytes is supported.
  */
 

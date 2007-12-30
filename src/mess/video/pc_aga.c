@@ -297,7 +297,7 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
  READ8_HANDLER( pc_aga_videoram_r )
 {
 	switch (aga.mode) {
-	case AGA_COLOR: 
+	case AGA_COLOR:
 		if (offset>=0x8000) return videoram[offset-0x8000];
 		return 0;
 	case AGA_MONO:
@@ -311,7 +311,7 @@ READ8_HANDLER( pc200_videoram_r )
 {
 	switch (aga.mode)
 	{
-		default: 
+		default:
 			if (offset>=0x8000) return videoram[offset-0x8000];
 			return 0;
 		case AGA_MONO:
@@ -363,7 +363,7 @@ WRITE8_HANDLER( pc200_cga_w )
 
 /* The bottom 3 bits of this port are:
  * Bit 2: Disable AGA
- * Bit 1: Select MDA 
+ * Bit 1: Select MDA
  * Bit 0: Select external display (monitor) rather than internal display
  *       (TV for PC200; LCD for PPC512) */
 		if ((pc200.porte & 7) != (data & 7))

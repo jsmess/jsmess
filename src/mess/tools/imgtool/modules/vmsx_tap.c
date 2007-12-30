@@ -1,16 +1,16 @@
-/* 
+/*
     vMSX tap format
 
     Virtual MSX 1.x (being replaced by the MSX driver in mess) had
     it's on format for cassette recordings. The format is similar
     to .cas files; however several recordings could be stored in
-    one file. 
+    one file.
 
     Virtual MSX was never really popular; I haven't seen any of these
     files on the internet. However for completeness sake I've added
     this converter. It's read only; the MSX driver cannot read
     these files, but can read the .cas files (like most other MSX
-    emulators). Further use and specially distribution of the .tap files 
+    emulators). Further use and specially distribution of the .tap files
     is discouraged as Virtual MSX is obsolete (along with its private
     file formats).
 
@@ -21,7 +21,7 @@
 	Original code in Virtual MSX:
 
 		ftp://ftp.komkon.org/pub/EMUL8/MSX/Emulators/VMSX1SRC.zip
-	
+
 	It's in the file TAPE.C.
 
 	RIFF format specs:
@@ -34,13 +34,13 @@
     dir - list all the files in the archive as "%title%-%type%.cas"
     getall - writes all the files to disk
     get - gets one file. If "getall" fails, due to characters in the
-          filename your FS/OS doesn't support, use: 
+          filename your FS/OS doesn't support, use:
 
 	imgtool get vmsx_tap monmsx.tap monmsx-binary.cas monmsx.cas
 
     for example.
 
-	Sean Young 
+	Sean Young
 */
 
 #include "osdepend.h"
@@ -154,7 +154,7 @@ static int vmsx_tap_read_image (TAP_IMAGE *image)
 			}
 
 		return 0;
-		}	
+		}
 
 	return IMGTOOLERR_MODULENOTFOUND;
 	}
@@ -198,7 +198,7 @@ static int vmsx_tap_image_read_data (TAP_IMAGE *image, char *chunk, unsigned cha
 
 	/* OK we've got the right data chunk. Now we can start looking for
 		the blocks */
-	pos = 0; 
+	pos = 0;
 	while ( (pos + 8) < size)
 		{
 		offset = *((UINT32*)(pmem + pos + 4));
@@ -221,9 +221,9 @@ static int vmsx_tap_image_read_data (TAP_IMAGE *image, char *chunk, unsigned cha
 			tappos += 4;
 			tapblock = LITTLE_ENDIANIZE_INT32 (tapblock);
 			if (tapblock == 0xffffffff) break;
-			memcpy (p + caspos, CasHeader, 8); 
+			memcpy (p + caspos, CasHeader, 8);
 			caspos += 8;
-			memcpy (p + caspos, pmem + pos + tappos, tapblock); 
+			memcpy (p + caspos, pmem + pos + tappos, tapblock);
 			caspos += tapblock;
 			tappos += tapblock;
 			}
@@ -231,7 +231,7 @@ static int vmsx_tap_image_read_data (TAP_IMAGE *image, char *chunk, unsigned cha
 
 		*psize = caspos;
 		*pcas = p;
-	
+
 		return 0;
 		}
 
@@ -261,14 +261,14 @@ static int vmsx_tap_image_init(const imgtool_module *mod, imgtool_stream *f, img
 		return IMGTOOLERR_OUTOFMEMORY;
 	}
 
-	if (stream_read(f, image->data, image->size)!=image->size) 
+	if (stream_read(f, image->data, image->size)!=image->size)
 	{
 		free(image);
 		*outimg=NULL;
 		return IMGTOOLERR_READERROR;
 	}
 
-	if ( (rc=vmsx_tap_read_image(image)) ) 	
+	if ( (rc=vmsx_tap_read_image(image)) )
 	{
 		if (image->entries) free(image->entries);
 		free(image);
@@ -309,17 +309,17 @@ static int vmsx_tap_image_nextenum(imgtool_directory *enumeration, imgtool_diren
 	TAP_ITERATOR *iter=(TAP_ITERATOR*)enumeration;
 	unsigned char *p;
 	int size, rc;
-	
+
 	ent->eof=iter->index>=iter->image->count;
-	if (!ent->eof) 
+	if (!ent->eof)
 		{
-		sprintf (ent->fname, "%s-%s.cas", 
+		sprintf (ent->fname, "%s-%s.cas",
 			iter->image->entries[iter->index].title,
 			iter->image->entries[iter->index].type);
 		size = 0;
 		p = NULL;
-		rc = vmsx_tap_image_read_data (iter->image, 
-			iter->image->entries[iter->index].chunk, &p, &size); 
+		rc = vmsx_tap_image_read_data (iter->image,
+			iter->image->entries[iter->index].chunk, &p, &size);
 
 		ent->corrupt=rc;
 		if (!rc) ent->filesize = size;
@@ -343,7 +343,7 @@ static TAP_ENTRY* vmsx_tap_image_findfile(TAP_IMAGE *image, const char *fname)
 
 	for (i=0; i<image->count; i++)
 		{
-		sprintf (filename, "%s-%s.cas", 
+		sprintf (filename, "%s-%s.cas",
 			image->entries[i].title, image->entries[i].type);
 		if (!strcmp(fname, filename) ) return image->entries+i;
 		}
@@ -357,7 +357,7 @@ static int vmsx_tap_image_readfile(imgtool_image *img, const char *fname, imgtoo
 	unsigned char* p;
 	int size, rc;
 
-	if ((entry=vmsx_tap_image_findfile(image, fname))==NULL ) 
+	if ((entry=vmsx_tap_image_findfile(image, fname))==NULL )
 		return IMGTOOLERR_MODULENOTFOUND;
 
 	rc = vmsx_tap_image_read_data (image, entry->chunk, &p, &size);

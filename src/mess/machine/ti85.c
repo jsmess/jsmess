@@ -620,7 +620,7 @@ SNAPSHOT_LOAD( ti8x )
 	{
 		case TI_85: expected_snapshot_size = TI85_SNAPSHOT_SIZE; break;
 		case TI_86: expected_snapshot_size = TI86_SNAPSHOT_SIZE; break;
-	}	
+	}
 
 	logerror("Snapshot loading\n");
 
@@ -674,10 +674,10 @@ DEVICE_LOAD( ti85_serial )
 			ti85_free_serial_stream (&ti85_serial_stream);
 			return INIT_FAIL;
 		}
-			                                    
+
 		ti85_serial_status = TI85_SEND_HEADER;
 	}
-	else 
+	else
 	{
 		return INIT_FAIL;
 	}

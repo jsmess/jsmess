@@ -71,7 +71,7 @@ VIDEO_UPDATE( lviv )
 	int pen;
 	UINT8 data;
 
-	for (y=0; y<256; y++)                  	
+	for (y=0; y<256; y++)
 		for (x=0; x<256; x+=4)
 		{
 			data = lviv_video_ram[y*64+x/4];

@@ -271,7 +271,7 @@ int m6845_register_r(int offset)
 					/* not sure about M6845_PERSONALITY_PREASIC */
 					retval=R12_screen_start_address_H;
 					break;
-					
+
 				default:
 					retval = 0;
 					break;
@@ -287,7 +287,7 @@ int m6845_register_r(int offset)
 					/* not sure about M6845_PERSONALITY_PREASIC */
 					retval=R13_screen_start_address_L;
 					break;
-					
+
 				default:
 					retval = 0;
 					break;

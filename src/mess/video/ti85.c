@@ -102,7 +102,7 @@ const unsigned short ti85_colortable[32][7] =
 	{ 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8 },
 	{ 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf }
 };
- 
+
 PALETTE_INIT( ti85 )
 {
 	int used = sizeof (ti85_palette) / 3;
@@ -160,12 +160,12 @@ VIDEO_UPDATE( ti85 )
 	lcdmem =  ((ti85_LCD_memory_base & 0x3F) + 0xc0) << 0x08;
 
 	memcpy (ti85_frames, ti85_frames+ti_video_memory_size, sizeof (UINT8) * (ti_number_of_frames-1) * ti_video_memory_size);
-	
-        for (y=0; y<ti_screen_y_size; y++)                  	
+
+        for (y=0; y<ti_screen_y_size; y++)
 		for (x=0; x<ti_screen_x_size; x++)
 			*(ti85_frames+(ti_number_of_frames-1)*ti_video_memory_size+y*ti_screen_x_size+x) = program_read_byte(lcdmem+y*ti_screen_x_size+x);
 
-       	for (y=0; y<ti_screen_y_size; y++)                  	
+       	for (y=0; y<ti_screen_y_size; y++)
 		for (x=0; x<ti_screen_x_size; x++)
 			for (b=0; b<8; b++)
 			{

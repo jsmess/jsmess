@@ -539,7 +539,7 @@ static TIMER_CALLBACK(change_input_line)
 	int ch = param & 1;
 	UINT8 old;
 	char linename[4];
-	
+
 	switch (line)
 	{
 	case DART_RR0_CTS:

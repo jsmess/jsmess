@@ -21,7 +21,7 @@ WRITE8_HANDLER( soundblaster_w );
 
 typedef struct {
 	int dma;
-	int irq;	
+	int irq;
 	struct { UINT8 major, minor; } version;
 } SOUNDBLASTER_CONFIG;
 

@@ -4,7 +4,7 @@
 
 	TODO:
 		- check how the drive select from DOR register, and the drive select
-		from the fdc are related !!!! 
+		from the fdc are related !!!!
 		- if all drives do not have a disk in them, and the fdc is reset, is a int generated?
 		(if yes, indicates drives are ready without discs, if no indicates no drives are ready)
 		- status register a, status register b
@@ -52,7 +52,7 @@ static void pc_fdc_hw_interrupt(int state);
 static void pc_fdc_hw_dma_drq(int,int);
 static mess_image *pc_fdc_get_image(int floppy_index);
 
-static const nec765_interface pc_fdc_nec765_interface = 
+static const nec765_interface pc_fdc_nec765_interface =
 {
 	pc_fdc_hw_interrupt,
 	pc_fdc_hw_dma_drq,
@@ -205,7 +205,7 @@ static void pc_fdc_data_rate_w(UINT8 data)
 		/* toggle reset state */
 		nec765_set_reset_state(1);
  		nec765_set_reset_state(0);
-	
+
 		/* bit is self-clearing */
 		data &= ~0x080;
 	}
@@ -281,15 +281,15 @@ static void pc_fdc_dor_w(UINT8 data)
 			when the fdc is reset.
 			In the FDC docs, it states that a INT will
 			be generated if READY input is true when the
-			fdc is reset. 
-			
+			fdc is reset.
+
 				It also states, that outputs to drive are set to 0.
 				Maybe this causes the drive motor to go on, and therefore
-				the ready line is set. 
+				the ready line is set.
 
 			This in return causes a int?? ---
-		
-		
+
+
 		what is not yet clear is if this is a result of the drives ready state
 		changing...
 		*/

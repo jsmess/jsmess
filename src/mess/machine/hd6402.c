@@ -17,7 +17,7 @@ void	hd6402_init(void)
 	uart.callback = NULL;
 	serial_connection_init(&uart.connection);
 	serial_connection_set_in_callback(&uart.connection, hd6402_in_callback);
-	uart.connection.input_state = 0;	
+	uart.connection.input_state = 0;
 	receive_register_reset(&uart.receive_reg);
 	transmit_register_reset(&uart.transmit_reg);
 }
@@ -38,7 +38,7 @@ void	hd6402_transmit_clock(void)
 		/* set it up */
 		transmit_register_setup(&uart.transmit_reg, &uart.data_form, uart.data);
 	}
-		
+
 	/* if transmit is not empty... transmit data */
 	if ((uart.transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 	{
@@ -70,7 +70,7 @@ void	hd6402_receive_clock(void)
 {
 	/* get bit received from other side and update receive register */
 	receive_register_update_bit(&uart.receive_reg, get_in_data_bit(uart.connection.input_state));
-	
+
 	if (uart.receive_reg.flags & RECEIVE_REGISTER_FULL)
 	{
 		receive_register_extract(&uart.receive_reg, &uart.data_form);
@@ -154,7 +154,7 @@ static void hd6402_update_stop_bits(void)
 	}
 
 	uart.data_form.stop_bit_count = stop_bits;
-	
+
 	logerror("hd6402: stop bits: %d\n",stop_bits);
 }
 
@@ -188,7 +188,7 @@ void	hd6402_set_input(int mask, int data)
 		if ((data & HD6402_INPUT_DRR)==0)
 		{
 			uart.state &=~HD6402_OUTPUT_DR;
-			
+
 			/* refresh outputs */
 			if (uart.callback)
 				uart.callback(HD6402_OUTPUT_PE|HD6402_OUTPUT_FE|HD6402_OUTPUT_OE|HD6402_OUTPUT_DR|HD6402_OUTPUT_TRE,  uart.state);
@@ -210,7 +210,7 @@ void	hd6402_set_input(int mask, int data)
 		uart.state |=(data & mask);
 		hd6402_update_parity();
 	}
-	
+
 	/* character length set */
 	if (mask & (HD6402_INPUT_CLS1|HD6402_INPUT_CLS2))
 	{

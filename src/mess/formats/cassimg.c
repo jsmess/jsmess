@@ -762,7 +762,7 @@ casserr_t cassette_put_modulated_data(cassette_image *cassette, int channel, dou
 			pulse_period = 1 / pulse_frequency;
 			err = cassette_put_samples(cassette, 0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, CASSETTE_WAVEFORM_8BIT);
 			if (err)
-				goto done;	
+				goto done;
 			time_index += pulse_period;
 			total_displacement += pulse_period;
 		}
@@ -873,7 +873,7 @@ casserr_t cassette_put_modulated_data_bit(cassette_image *cassette, int channel,
 	pulse_period = 1 / pulse_frequency;
 	err = cassette_put_samples(cassette, 0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, CASSETTE_WAVEFORM_8BIT);
 	if (err)
-		goto done;	
+		goto done;
 	time_index += pulse_period;
 	total_displacement += pulse_period;
 

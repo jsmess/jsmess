@@ -4,30 +4,30 @@
 #include "includes/pocketc.h"
 #include "includes/pc1350.h"
 
-static const POCKETC_FIGURE busy={ 
+static const POCKETC_FIGURE busy={
 	"11  1 1  11 1 1",
 	"1 1 1 1 1   1 1",
 	"11  1 1  1  1 1",
 	"1 1 1 1   1  1",
 	"11   1  11   1e"
-}, def={ 
+}, def={
 	"11  111 111",
 	"1 1 1   1",
 	"1 1 111 11",
 	"1 1 1   1",
-	"11  111 1e" 
+	"11  111 1e"
 }, shift={
 	" 11 1 1 1 111 111",
 	"1   1 1 1 1    1",
 	" 1  111 1 11   1",
 	"  1 1 1 1 1    1",
-	"11  1 1 1 1    1e" 
+	"11  1 1 1 1    1e"
 }, hyp={
 	"1 1 1 1 11",
 	"1 1 1 1 1 1",
 	"111 1 1 11",
 	"1 1  1  1",
-	"1 1  1  1e" 
+	"1 1  1  1e"
 }, de={
 	"11  111",
 	"1 1 1",
@@ -39,7 +39,7 @@ static const POCKETC_FIGURE busy={
 	"1",
 	"1 1",
 	"1 1",
-	" 11e" 
+	" 11e"
 }, rad={
 	"11   1  11",
 	"1 1 1 1 1 1",
@@ -63,37 +63,37 @@ static const POCKETC_FIGURE busy={
 	"1",
 	"111",
 	"1",
-	"111e" 
-}, run={ 
+	"111e"
+}, run={
 	"11  1 1 1  1",
 	"1 1 1 1 11 1",
 	"11  1 1 1 11",
 	"1 1 1 1 1  1",
-	"1 1  1  1  1e" 
-}, pro={ 
+	"1 1  1  1  1e"
+}, pro={
 	"11  11   1  ",
 	"1 1 1 1 1 1",
 	"11  11  1 1",
 	"1   1 1 1 1",
-	"1   1 1  1e" 
-}, japan={ 
+	"1   1 1  1e"
+}, japan={
 	"  1  1  11   1  1  1",
 	"  1 1 1 1 1 1 1 11 1",
 	"  1 111 11  111 1 11",
 	"1 1 1 1 1   1 1 1  1",
-	" 1  1 1 1   1 1 1  1e" 
-}, sml={ 
+	" 1  1 1 1   1 1 1  1e"
+}, sml={
 	" 11 1 1 1",
 	"1   111 1",
 	" 1  1 1 1",
 	"  1 1 1 1",
-	"11  1 1 111e" 
-}, rsv={ 
+	"11  1 1 111e"
+}, rsv={
 	"11   11 1   1",
 	"1 1 1   1   1",
 	"11   1   1 1",
 	"1 1   1  1 1",
-	"1 1 11    1e" 
+	"1 1 11    1e"
 };
 
 static struct {
@@ -135,9 +135,9 @@ VIDEO_UPDATE( pc1350 )
 {
 	int x, y, i, j, k, b;
 	int color[2];
-	
+
 	bitmap_fill(bitmap, cliprect, 5);
-	
+
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
     color[0] = machine->pens[pocketc_colortable[PC1350_CONTRAST][0]];
 	color[1] = machine->pens[pocketc_colortable[PC1350_CONTRAST][1]];

@@ -43,11 +43,11 @@ READ8_HANDLER ( coleco_paddle_r )
 			inport0 = input_port_0_r(0);
 			inport1 = input_port_1_r(0);
 			inport6 = input_port_6_r(0);
-			
-			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more 
+
+			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
 			the right behaviour */
-			
+
 			data = 0x0F;	/* No key pressed by default */
 			if (!(inport6&0x01)) /* If Driving Controller enabled -> no keypad 1*/
 			{
@@ -71,12 +71,12 @@ READ8_HANDLER ( coleco_paddle_r )
 		{
 			int data = input_port_2_r(0) & 0xCF;
 			int inport6 = input_port_6_r(0);
-			
+
 			if (inport6&0x07) /* If Extra Contollers enabled */
 			{
 			    if (JoyStat[0]==0) data|=0x30; /* Spinner Move Left*/
 			    else if (JoyStat[0]==1) data|=0x20; /* Spinner Move Right */
-			}  
+			}
 			return data | 0x80;
 		}
 	}
@@ -91,10 +91,10 @@ READ8_HANDLER ( coleco_paddle_r )
 			inport3 = input_port_3_r(0);
 			inport4 = input_port_4_r(0);
 
-			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more 
+			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
 			the right behaviour */
-			
+
 			data = 0x0F;	/* No key pressed by default */
 			if (!(inport3 & 0x01)) data &= 0x0A; /* 0 */
 			if (!(inport3 & 0x02)) data &= 0x0D; /* 1 */
@@ -116,12 +116,12 @@ READ8_HANDLER ( coleco_paddle_r )
 		{
 			int data = input_port_5_r(0) & 0xCF;
 			int inport6 = input_port_6_r(0);
-			
+
 			if (inport6&0x02) /* If Roller Controller enabled */
 			{
 			    if (JoyStat[1]==0) data|=0x30;
 			    else if (JoyStat[1]==1) data|=0x20;
-			}  
+			}
 
 			return data | 0x80;
 		}

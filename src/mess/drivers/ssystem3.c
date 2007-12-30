@@ -33,7 +33,7 @@ internal expansion/cartridge port
   port b
    bit 0: ??
 
-    hi speed serial 1 
+    hi speed serial 1
    bit 1: output data
    bit 2: output clock (hi data is taken)
 
@@ -167,5 +167,5 @@ ROM_END
 ***************************************************************************/
 
 /*	  YEAR	NAME	  PARENT	COMPAT	MACHINE   INPUT		INIT		CONFIG		COMPANY		FULLNAME */
-CONS( 1979,	ssystem3, 0, 		0,		ssystem3, ssystem3,	ssystem3,	NULL,		"NOVAG Industries Ltd.",  "Chess Champion Super System III", 0) 
+CONS( 1979,	ssystem3, 0, 		0,		ssystem3, ssystem3,	ssystem3,	NULL,		"NOVAG Industries Ltd.",  "Chess Champion Super System III", 0)
 //chess champion MK III in germany

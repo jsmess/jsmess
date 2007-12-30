@@ -11,7 +11,7 @@ typedef UINT16 littleuword;
 #define GET_UWORD(a) a
 #define SET_UWORD(a,v) a=v
 #else
-typedef struct { 
+typedef struct {
 	unsigned char low, high;
 } littleuword;
 #define GET_UWORD(a) (a.low|(a.high<<8))
@@ -78,12 +78,12 @@ typedef struct {
 	unsigned char unused2[0x2d]; // zer0
 } D71_HEADER;
 
-static const D64_HEADER d64_header={ 
-	18,1,'A', 
+static const D64_HEADER d64_header={
+	18,1,'A',
 	0, // 1571 0x80
 	{ { 0 } },
 	{ '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0',
-	  '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0' }, 
+	  '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0' },
 	{ 0xa0, 0xa0 }, { 0xa0, 0xa0 } , 0xa0, { '2', 'A' } , { '\xa0','\xa0','\xa0','\xa0' },
 };
 
@@ -117,11 +117,11 @@ typedef struct {
 	unsigned char unused1[227]; // zero
 } D81_HEADER;
 
-static const D81_HEADER d81_header={ 
-	40,3,'D', 
+static const D81_HEADER d81_header={
+	40,3,'D',
 	0,
 	{ '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0',
-	  '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0', 0xa0, 0xa0 }, 
+	  '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0', 0xa0, 0xa0 },
 	{ 0xa0, 0xa0 } , 0xa0, { '3', 'D' } , { '\xa0','\xa0' },
 };
 
@@ -352,7 +352,7 @@ static void d81_alloc_sector(struct _d64_image *image, int *track, int *sector)
 	D81_BAM *bam[2];
 	bam[0] = (D81_BAM*) (image->data + image->get_offset(image->directory.track, image->directory.sector+1)),
 	bam[1] = (D81_BAM*) (image->data + image->get_offset(image->directory.track, image->directory.sector+1));
-	
+
 	/* this contains the tracks for the search strategy for free sectors */
 	for (i=0,j=image->directory.track-1; j>0; i++,j--) tracks[i]=j;
 	for (j=image->directory.track+1;j<80;i++,j++) tracks[i]=j;
@@ -396,7 +396,7 @@ static void d81_free_sector(struct _d64_image *image, int track, int sector)
 			 +image->get_offset(image->directory.track,
 								image->directory.sector+2));
 	}
-	
+
 	bam->bam[track-1].free++;
 	bam->bam[track-1].map[i]|=mask;
 }
@@ -479,7 +479,7 @@ static int d64_filesize(d64_image *image, D64_ENTRY *entry)
 {
 	int size = 0;
 	int i=image->get_offset(entry->track, entry->sector);
-	
+
 	while (image->data[i] != 0)
 	{
 		size += 254;
@@ -848,7 +848,7 @@ static int d64_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *en
 
 	ent->corrupt=0;
 	ent->eof=0;
-	
+
 	while ((iter->track >= 1) && (iter->track <= iter->image->tracks)) //safer
 //	while (iter->track != 0)
 	{
@@ -959,7 +959,7 @@ static int d64_image_readfile(imgtool_image *img, const char *fname, imgtool_str
 	while (image->data[pos]!=0) {
 		if (stream_write(destf, image->data+pos+2, 254)!=254)
 			return IMGTOOLERR_WRITEERROR;
-		
+
 		pos = image->get_offset (image->data[pos + 0], image->data[pos + 1]);
 	}
 	if (image->data[pos+1]-1>0) {
@@ -983,11 +983,11 @@ static int d64_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 
 	if ((entry=d64_image_findfile(image, (const unsigned char *)fname))!=NULL ) {
 		/* overriding */
-		if ((freespace + GET_UWORD(entry->blocks))*254<fsize) 
+		if ((freespace + GET_UWORD(entry->blocks))*254<fsize)
 			return IMGTOOLERR_NOSPACE;
 		track=entry->track;
 		sector=entry->sector;
-		
+
 		while (track!=0) {
 			image->free_sector(image, track, sector);
 			pos = image->get_offset(track, sector);
@@ -1005,7 +1005,7 @@ static int d64_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 	memcpy(entry->name, fname, strlen(fname));
 
 	image->alloc_sector(image, &track, &sector);
-	entry->track=track; 
+	entry->track=track;
 	entry->sector=sector;
 	pos = image->get_offset(track, sector);
 
@@ -1013,9 +1013,9 @@ static int d64_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 	{
 		if (stream_read(sourcef, image->data+pos+2, 254)!=254)
 			return IMGTOOLERR_READERROR;
-		
+
 		image->alloc_sector(image, &track, &sector);
-		image->data[pos]=track; 
+		image->data[pos]=track;
 		image->data[pos+1]=sector;
 		pos = image->get_offset (track, sector);
 	}
@@ -1027,7 +1027,7 @@ static int d64_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 			return IMGTOOLERR_READERROR;
 	}
 	image->data[pos+2+fsize-i]=0;
-	
+
 	SET_UWORD(entry->blocks, b);
 	image->modified=1;
 
@@ -1099,18 +1099,18 @@ static int d64_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 				}
 				//d64_header.name=0xa0;
 				//d64_header.id=0xa0;
-				if (stream_write(f, &d64_header, sizeof(d64_header)) != sizeof(d64_header)) 
+				if (stream_write(f, &d64_header, sizeof(d64_header)) != sizeof(d64_header))
 					return  IMGTOOLERR_WRITEERROR;
 			} else {
-				if (stream_write(f, &sector, sizeof(sector)) != sizeof(sector)) 
+				if (stream_write(f, &sector, sizeof(sector)) != sizeof(sector))
 					return  IMGTOOLERR_WRITEERROR;
 			}
 		}
 	}
 	if (crc) {
 		for (t=1; t<=tracks; t++) {
-			if (stream_write(f, &d64_header, d64_sectors_per_track[t-1]) 
-				!= d64_sectors_per_track[t-1]) 
+			if (stream_write(f, &d64_header, d64_sectors_per_track[t-1])
+				!= d64_sectors_per_track[t-1])
 				return  IMGTOOLERR_WRITEERROR;
 			}
 	}
@@ -1119,15 +1119,15 @@ static int d64_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 
 static int x64_image_create(const imgtool_module *mod, imgtool_stream *f, const ResolvedOption *options_)
 {
-	struct { 
+	struct {
 		unsigned char data[0x40];
-	} x64_header={ 
+	} x64_header={
 		{ 0x43, 0x15, 0x41, 0x64,
-		  0x01, 0x02, 0x01, 0x23, 
+		  0x01, 0x02, 0x01, 0x23,
 		  0x01
 		}
 	};
-	if (stream_write(f, &x64_header, sizeof(x64_header)) != sizeof(x64_header)) 
+	if (stream_write(f, &x64_header, sizeof(x64_header)) != sizeof(x64_header))
 		return  IMGTOOLERR_WRITEERROR;
 
 	d64_image_create(mod, f, options_);
@@ -1167,7 +1167,7 @@ static int d71_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 				}
 				//d64_header.name=0xa0;
 				//d64_header.id=0xa0;
-				if (stream_write(f, &d64_header, sizeof(d64_header)) != sizeof(d64_header)) 
+				if (stream_write(f, &d64_header, sizeof(d64_header)) != sizeof(d64_header))
 					return  IMGTOOLERR_WRITEERROR;
 			} else if ((t==35+18)&&(s==0)) {
 				for (i=36;i<=70;i++) {
@@ -1186,11 +1186,11 @@ static int d71_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 						d71_header.bam2[i-36].map2[2]=0;
 					}
 				}
-				if (stream_write(f, &d71_header, sizeof(d71_header)) 
-					!= sizeof(d71_header)) 
+				if (stream_write(f, &d71_header, sizeof(d71_header))
+					!= sizeof(d71_header))
 					return  IMGTOOLERR_WRITEERROR;
 			} else {
-				if (stream_write(f, &sector, sizeof(sector)) != sizeof(sector)) 
+				if (stream_write(f, &sector, sizeof(sector)) != sizeof(sector))
 					return  IMGTOOLERR_WRITEERROR;
 			}
 		}
@@ -1210,7 +1210,7 @@ static int d81_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 				//d81_header.name=0xa0;
 				d81_header.id[0]=id[0];
 				d81_header.id[0]=id[1];
-				if (stream_write(f, &d81_header, sizeof(d81_header)) != sizeof(d81_header)) 
+				if (stream_write(f, &d81_header, sizeof(d81_header)) != sizeof(d81_header))
 					return  IMGTOOLERR_WRITEERROR;
 			} else if ((t==40)&&(s==1)){
 				d81_bam.id[0]=id[0];
@@ -1225,16 +1225,16 @@ static int d81_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 				}
 				d81_bam.bam[40-1].free=36;
 				d81_bam.bam[40-1].map[0]=0xf0;
-				if (stream_write(f, &d81_bam, sizeof(d81_bam)) != sizeof(d81_bam)) 
+				if (stream_write(f, &d81_bam, sizeof(d81_bam)) != sizeof(d81_bam))
 					return  IMGTOOLERR_WRITEERROR;
 				d81_bam.bam[40-1].free=40;
 				d81_bam.bam[40-1].map[0]=0xff;
 			} else if ((t==40)&&(s==2)){
 				d81_bam.track=0;
-				if (stream_write(f, &d81_bam, sizeof(d81_bam)) != sizeof(d81_bam)) 
+				if (stream_write(f, &d81_bam, sizeof(d81_bam)) != sizeof(d81_bam))
 					return  IMGTOOLERR_WRITEERROR;
 			} else {
-				if (stream_write(f, &sector, sizeof(sector)) != sizeof(sector)) 
+				if (stream_write(f, &sector, sizeof(sector)) != sizeof(sector))
 					return  IMGTOOLERR_WRITEERROR;
 			}
 		}

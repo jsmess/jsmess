@@ -457,7 +457,7 @@ WRITE16_HANDLER(concept_io_w)
 			{
 				int slot = ((offset >> 4) & 7) - 1;
 #if VERBOSE
-				logerror("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", 
+				logerror("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n",
 					slot, offset << 1, data);
 #endif
 				if (expansion_slots[slot].reg_write)

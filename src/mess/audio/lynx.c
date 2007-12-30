@@ -42,7 +42,7 @@ AUD_RESETDONE	EQU %01000000
 AUD_INTEGRATE	EQU %00100000
 AUD_RELOAD	EQU %00010000
 AUD_CNTEN	EQU %00001000
-AUD_LINK	EQU %00000111	
+AUD_LINK	EQU %00000111
 ; link timers (0->2->4 / 1->3->5->7->Aud0->Aud1->Aud2->Aud3->1
 AUD_64us	EQU %00000110
 AUD_32us	EQU %00000101
@@ -110,11 +110,11 @@ typedef struct {
     int ticks;
     int count;
 } LYNX_AUDIO;
-static LYNX_AUDIO lynx_audio[4]= { 
+static LYNX_AUDIO lynx_audio[4]= {
 	{ 0 },
 	{ 1 },
 	{ 2 },
-	{ 3 } 
+	{ 3 }
 };
 
 static void lynx_audio_reset_channel(LYNX_AUDIO *This)
@@ -134,7 +134,7 @@ static void lynx_audio_shift(LYNX_AUDIO *channel)
 {
     channel->shifter=((channel->shifter<<1)&0x3ff)
 	|shift_xor[channel->shifter&channel->mask];
-    
+
     if (channel->reg.n.control1&0x20) {
 	if (channel->shifter&1) {
 	    channel->reg.n.output+=channel->reg.n.volume;
@@ -189,12 +189,12 @@ UINT8 lynx_audio_read(int offset)
     stream_update(mixer_channel);
     switch (offset) {
     case 0x20: case 0x21: case 0x22: case 0x24: case 0x25:
-    case 0x28: case 0x29: case 0x2a: case 0x2c: case 0x2d: 
-    case 0x30: case 0x31: case 0x32: case 0x34: case 0x35: 
-    case 0x38: case 0x39: case 0x3a: case 0x3c: case 0x3d: 
+    case 0x28: case 0x29: case 0x2a: case 0x2c: case 0x2d:
+    case 0x30: case 0x31: case 0x32: case 0x34: case 0x35:
+    case 0x38: case 0x39: case 0x3a: case 0x3c: case 0x3d:
 	data=lynx_audio[(offset>>3)&3].reg.data[offset&7];
 	break;
-    case 0x23: case 0x2b: case 0x33: case 0x3b: 
+    case 0x23: case 0x2b: case 0x33: case 0x3b:
 	data=lynx_audio[(offset>>3)&3].shifter&0xff;
 	break;
     case 0x26:case 0x2e:case 0x36:case 0x3e:
@@ -204,10 +204,10 @@ UINT8 lynx_audio_read(int offset)
 	data=(lynx_audio[(offset>>3)&3].shifter>>4)&0xf0;
 	data|=lynx_audio[(offset>>3)&3].reg.data[offset&7]&0x0f;
 	break;
-    case 0x40: case 0x41: case 0x42: case 0x43: 
+    case 0x40: case 0x41: case 0x42: case 0x43:
 	data=lynx_audio[offset&3].attenuation;
 	break;
-    case 0x44: 
+    case 0x44:
 	data=attenuation_enable;
 	break;
     case 0x50:
@@ -229,7 +229,7 @@ void lynx_audio_write(int offset, UINT8 data)
     case 0x38: case 0x3a: case 0x3c: case 0x3e:
 	lynx_audio[(offset>>3)&3].reg.data[offset&7]=data;
 	break;
-    case 0x23: case 0x2b: case 0x33: case 0x3b: 
+    case 0x23: case 0x2b: case 0x33: case 0x3b:
 	lynx_audio[(offset>>3)&3].reg.data[offset&7]=data;
 	lynx_audio[(offset>>3)&3].shifter&=~0xff;
 	lynx_audio[(offset>>3)&3].shifter|=data;
@@ -250,7 +250,7 @@ void lynx_audio_write(int offset, UINT8 data)
     case 0x40: case 0x41: case 0x42: case 0x43: // lynx2 only, howard extension board
 	lynx_audio[offset&3].attenuation=data;
 	break;
-    case 0x44: 
+    case 0x44:
 	attenuation_enable=data; //lynx2 only, howard extension board
 	break;
     case 0x50:
@@ -297,7 +297,7 @@ static void lynx2_update (void *param,stream_sample_t **inputs, stream_sample_t 
 			lynx_audio_execute(channel);
 			v=channel->reg.n.output;
 			if (!(master_enable&(0x10<<j)))
-			{		    
+			{
 				if (attenuation_enable&(0x10<<j)) {
 					*left+=v*(channel->attenuation>>4);
 				} else {
@@ -382,7 +382,7 @@ void *lynx2_custom_start(int clock, const struct CustomSound_interface *config)
     mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, lynx2_update);
 
     usec_per_sample = 1000000 / Machine->sample_rate;
-    
+
     lynx_audio_init();
 	return (void *) ~0;
 }

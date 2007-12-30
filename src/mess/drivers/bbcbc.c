@@ -49,7 +49,7 @@ static const TMS9928a_interface tms9129_interface =
 };
 
 /* TODO */
-static const z80pio_interface pio_intf = 
+static const z80pio_interface pio_intf =
 {
 	NULL,
 	NULL,

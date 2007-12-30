@@ -344,9 +344,9 @@ WRITE8_HANDLER(apple2_c0xx_w)
 		apple2_c07x_w
 	};
 	int slot;
-	
+
 	offset &= 0xFF;
-	
+
 	if (offset < 0x80)
 	{
 		if (handlers[offset / 0x10])
@@ -486,7 +486,7 @@ static void apple2_mem_D000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
 		meminfo->read_mem		= (a2 & VAR_ROMSWITCH) ? 0x005000 : 0x001000;
 		meminfo->read_mem		|= APPLE2_MEM_ROM;
 	}
-	
+
 	if (a2 & VAR_LCWRITE)
 	{
 		if (a2 & VAR_LCRAM2)
@@ -566,7 +566,7 @@ void apple2_setvar(UINT32 val, UINT32 mask)
 
 /* -----------------------------------------------------------------------
  * Floating bus code
- * 
+ *
  *     preliminary floating bus video scanner code - look for comments
  *     with FIX:
  * ----------------------------------------------------------------------- */
@@ -576,7 +576,7 @@ UINT8 apple2_getfloatingbusvalue(void)
 	enum
 	{
 		// scanner types
-		kScannerNone = 0, kScannerApple2, kScannerApple2e, 
+		kScannerNone = 0, kScannerApple2, kScannerApple2e,
 
 		// scanner constants
 		kHBurstClock      =    53, // clock when Color Burst starts
@@ -1044,7 +1044,7 @@ READ8_HANDLER ( apple2_c06x_r )
 			result = attotime_to_double(timer_get_time()) < joystick_y2_time;
 			break;
 		default:
-			/* c060 Empty Cassette head read 
+			/* c060 Empty Cassette head read
 			 * and any other non joystick c06 port returns this according to applewin
 			 */
 			return apple2_getfloatingbusvalue();
@@ -1546,17 +1546,17 @@ void apple2_init_common(running_machine *machine, const apple2_config *config)
 				token = a2_config->slots[i]->init(i);
 			else
 				token = (void *) ~0;
-				
+
 			a2_slot_tokens[i] = token;
 		}
 	}
-	
+
 	/* --------------------------------------------- *
 	 * set up the softswitch mask/set                *
 	 * --------------------------------------------- */
 	a2_mask = ~0;
 	a2_set = 0;
-	
+
 	/* disable VAR_ROMSWITCH if the ROM is only 16k */
 	if (memory_region_length(REGION_CPU1) < 0x8000)
 		a2_mask &= ~VAR_ROMSWITCH;
@@ -1572,7 +1572,7 @@ MACHINE_START( apple2 )
 	apple2_memmap_config mem_cfg;
 	apple2_config a2_cfg;
 	void *apple2cp_ce00_ram = NULL;
-	
+
 	memset(&a2_cfg, 0, sizeof(a2_cfg));
 
 	/* specify slots */

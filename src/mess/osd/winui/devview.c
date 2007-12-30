@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------
-// Software Device View class                                              
+// Software Device View class
 // ------------------------------------------------------------------------
 
 #define WIN32_LEAN_AND_MEAN
@@ -145,7 +145,7 @@ void DevView_Refresh(HWND hwndDevView)
 static void DevView_TextChanged(HWND hwndDevView, int nChangedEntry, LPCTSTR pszFilename)
 {
 	struct DevViewInfo *pDevViewInfo;
-	
+
 	pDevViewInfo = GetDevViewInfo(hwndDevView);
 	if (!pDevViewInfo->bSurpressFilenameChanged && pDevViewInfo->pCallbacks->pfnSetSelectedSoftware)
 	{
@@ -427,7 +427,7 @@ static LRESULT CALLBACK DevView_WndProc(HWND hwndDevView, UINT nMessage, WPARAM 
 					l = GetWindowLongPtr(hwndButton, GWLP_USERDATA);
 					pEnt = (struct DevViewEntry *) l;
 					DevView_ButtonClick(hwndDevView, pEnt, hwndButton);
-					break;				
+					break;
 			}
 			break;
 	}

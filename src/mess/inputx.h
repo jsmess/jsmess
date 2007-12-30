@@ -60,7 +60,7 @@ enum
 
 #define PORT_CONFSETTING(default,name) \
 	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CONFSETTING, default), INPUT_PORT_PTR(name),
-	
+
 /* categories */
 #define PORT_CATEGORY(category) \
 	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY, category),

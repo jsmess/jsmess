@@ -82,7 +82,7 @@ xx/xx/2001	KS -	TS-2068 sound fixed.
 		     	Fixed problem with interrupt vector set to 0xffff (much
 			more 128k games works now).
 				A useful used trick on the Spectrum is to set
-				interrupt vector to 0xffff (using the table 
+				interrupt vector to 0xffff (using the table
 				which contain 0xff's) and put a byte 0x18 hex,
 				the opcode for JR, at this address. The first
 				byte of the ROM is a 0xf3 (DI), so the JR will
@@ -96,7 +96,7 @@ xx/xx/2001	KS -	TS-2068 sound fixed.
 				There are 50.08 frames per second for Spectrum
 				48k what gives 69888 cycles for each frame and
 				50.021 for Spectrum 128/+2/+2A/+3 what gives
-				70908 cycles for each frame. 
+				70908 cycles for each frame.
 			Remaped some Spectrum+ keys.
 				Presing F3 to reset was seting 0xf7 on keyboard
 				input port. Problem occured for snapshots of
@@ -772,7 +772,7 @@ static WRITE8_HANDLER ( spectrum_plus3_port_w )
 
 		/* the following is not decoded exactly, need to check
 		what is correct! */
-		
+
 		if ((offset & 2)==0)
 		{
 			switch ((offset>>14) & 0x03)
@@ -794,7 +794,7 @@ static WRITE8_HANDLER ( spectrum_plus3_port_w )
 						case 1:
 							spectrum_plus3_port_1ffd_w(offset, data);
 							break;
-							
+
 						/* +3 fdc data */
 						case 3:
 							spectrum_plus3_port_3ffd_w(offset,data);
@@ -819,7 +819,7 @@ static WRITE8_HANDLER ( spectrum_plus3_port_w )
 				/* 128K AY register */
 				case 3:
 					spectrum_128_port_fffd_w(offset, data);
-			
+
 				default:
 					break;
 			}
@@ -2011,7 +2011,7 @@ static MACHINE_DRIVER_START( spectrum_128 )
 	/* sound hardware */
 	MDRV_SOUND_ADD(AY8910, 1773400)
 	MDRV_SOUND_CONFIG(spectrum_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 

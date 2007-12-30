@@ -49,7 +49,7 @@ struct _char_info
 
 static const char_info charinfo[] =
 {
-	{ 0x0008,					"Backspace",	NULL },		/* Backspace */	
+	{ 0x0008,					"Backspace",	NULL },		/* Backspace */
 	{ 0x0009,					"Tab",			"    " },	/* Tab */
 	{ 0x000c,					"Clear",		NULL },		/* Clear */
 	{ 0x000d,					"Enter",		NULL },		/* Enter */
@@ -278,7 +278,7 @@ static const char_info charinfo[] =
 	{ 0xffeb,					NULL,			"\xE2\x86\x92" },	/* fullwidth right arrow */
 	{ 0xffec,					NULL,			"\xE2\x86\x93" },	/* fullwidth down arrow */
 	{ 0xffed,					NULL,			"\xE2\x96\xAA" },	/* fullwidth solid box */
-	{ 0xffee,					NULL,			"\xE2\x97\xA6" },	/* fullwidth open circle */	
+	{ 0xffee,					NULL,			"\xE2\x97\xA6" },	/* fullwidth open circle */
 	{ UCHAR_MAMEKEY(F1),		"F1",			NULL },		/* F1 function key */
 	{ UCHAR_MAMEKEY(F2),		"F2",			NULL },		/* F2 function key */
 	{ UCHAR_MAMEKEY(F3),		"F3",			NULL },		/* F3 function key */

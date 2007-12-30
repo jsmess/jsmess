@@ -1,23 +1,23 @@
 /*
 	video/dgn_beta.c
 
-The Dragon Beta uses a 68B45 for it's display generation, this is used in the 
+The Dragon Beta uses a 68B45 for it's display generation, this is used in the
 conventional wat with a character generator ROM in the two text modes, which are
 standard 40x25 and 80x25. In adition to the 6845 there is some TTL logic which
-provides colour and attributes. In text modes the video ram is organised as pairs 
+provides colour and attributes. In text modes the video ram is organised as pairs
 of character and attribute, in alternate bytes.
 
 The attributes decode as follows :-
 
 	7-6-5-4-3-2-1-0
 	f-u-F-F-F-B-B-B
-	
+
 	f=flash
 	u=underline
-	
+
 	FFF = foreground colour
 	BBB = bakcground colour
-		
+
 		000	black
 		001	red
 		010	green
@@ -29,19 +29,19 @@ The attributes decode as follows :-
 
 	If flash is true, foreground and background colours will be exchanged.
 
-It is interesting to note that the 6845 uses 16 bit wide access to the ram, in contrast 
-to the 8 bit accesses from the CPUs, this allows each increment of the MA lines to move 
-2 bytes at a time, and therefore feed both the character rom and the attribute decode 
+It is interesting to note that the 6845 uses 16 bit wide access to the ram, in contrast
+to the 8 bit accesses from the CPUs, this allows each increment of the MA lines to move
+2 bytes at a time, and therefore feed both the character rom and the attribute decode
 circuit simultaniously.
 
 The RAM addresses are made up of two parts, the MA0..13 from the 6845, plus two output
-lines from the 6821 PIA, I28, the lines are BP6 and PB7, with PB7 being the most 
+lines from the 6821 PIA, I28, the lines are BP6 and PB7, with PB7 being the most
 significant. This effectivly allows the 6845 access to the first 128K of memory, as there
 are 16 address lines, accessing a 16 bit wide memory.
 
 The relationship between how the cpu sees the RAM, and the way the 6845 sees it is simply
-CPU addr=2x6845 addr. So for the default video address of $1F000, the CPU sees this as 
-being at $1F000 (after DAT trasnlation). The 6845 is programmed to start it's MA lines 
+CPU addr=2x6845 addr. So for the default video address of $1F000, the CPU sees this as
+being at $1F000 (after DAT trasnlation). The 6845 is programmed to start it's MA lines
 counting at $3800, plus A14 and A15 being supplied by PB6 and PB7 from I28, gives an address
 of $F800, which is the same as $1F000 / 2.
 
@@ -60,21 +60,21 @@ Graphics modes
 		640	512	4
 		640	256	4**
 		640	512	2
-		
+
 Looking at the parts of the circuit sheet that I have seen it looks like the graphics modes
 are driven using a combination of the 6845 MA and RA lines to address more than 64K or memory
 which is needed for some of the modes above (specifically, 640x512x4, which needs 80K).
 
 2006-11-30, Text mode is almost completely implemented, in both 40 and 80 column modes.
 I have made a start on implementing the graphics modes of the beta, drawing from technical
-documents, from the project, this is still a work in progress. I have however managed to get 
+documents, from the project, this is still a work in progress. I have however managed to get
 it to display a distorted graphical image, so I know I am going in the correct direction !
 
-** 2006-12-05, this mode is not documented in any of the printed documentation, however it 
-is supported and displayed by the graphics test rom, it is basically the 640x512x4 mode with 
+** 2006-12-05, this mode is not documented in any of the printed documentation, however it
+is supported and displayed by the graphics test rom, it is basically the 640x512x4 mode with
 half the number of vertical lines, and in non-interlaced mode.
 
-It seems that the 640x512 modes operate the 6845 in interlaced mode, just how this affects 
+It seems that the 640x512 modes operate the 6845 in interlaced mode, just how this affects
 the access to the video memory is unclear to me at the moment.
 
 */
@@ -105,7 +105,7 @@ typedef enum {
 	V_TOTAL_ADJ,		// Vertical total adjust
 	V_DISPLAYED,		// Vertical displayed
 	V_SYNC_POS,		// Vertical sync pos
-	INTERLACE,		// Interlace 
+	INTERLACE,		// Interlace
 	MAX_SCAN,		// Maximum scan line
 	CURS_START,		// Cursor start pos
 	CURS_END,		// Cursor end pos
@@ -207,7 +207,7 @@ typedef enum {
 
 #define IsTextMode 	(GCtrl & GCtrlChrGfx) ? 1 : 0					// Is this text mode ?
 #define IsGfx16 	((~GCtrl & GCtrlChrGfx) && (~GCtrl & GCtrlControl)) ? 1 : 0	// is this 320x256x16bpp mode
-#define IsGfx2		((GCtrl & GCtrlHiLo) && (~GCtrl & GCtrlFS)) ? 1 : 0		// Is this a 2 colour mode 
+#define IsGfx2		((GCtrl & GCtrlHiLo) && (~GCtrl & GCtrlFS)) ? 1 : 0		// Is this a 2 colour mode
 #define SWChar		(GCtrl & GCtrlSWChar)>>1					// Swchar bit
 
 //static int beta_state;
@@ -231,7 +231,7 @@ void vid_set_gctrl(int data)
 {
 	GCtrl=data;
 #ifdef MAME_DEBUG
-	if (LogRegWrites) 
+	if (LogRegWrites)
 		debug_console_printf("I28-PB=$%2X, %2X-%s-%s-%s-%s-%s-%s PC=%4X\n",
 				     data,
 				     data & GCtrlAddrLines,
@@ -242,9 +242,9 @@ void vid_set_gctrl(int data)
 				     data & GCtrlSWChar		? "C0" : "C1",
 				     data & GCtrlWI		? "Wi" : "  ",
 				     activecpu_get_pc());
-		
 
-#endif	
+
+#endif
 }
 
 // called when the 6845 changes the character row
@@ -257,26 +257,26 @@ static void beta_Set_RA(int offset, int data)
 static void beta_Set_HSync(int offset, int data)
 {
 	int Dots; 	/* Pixels per 16 bits */
-	
+
 	beta_HSync=data;
-	
+
 	if(IsGfx16)
 		Dots=2;
 	else
 		Dots=8;
-	
+
 	if(!beta_HSync)
 	{
 		int HT=m6845_get_register(H_TOTAL);			// Get H total
 		int HS=m6845_get_register(H_SYNC_POS);		// Get Hsync pos
 		int HW=m6845_get_register(H_SYNC_WIDTH)&0xF;	// Hsync width (in chars)
-		
+
 		beta_scr_y++;
 //		beta_scr_x=0-(((HT-HS)-HW)*8);	// Number of dots after HS to wait before start of next line
 		beta_scr_x=0-((HT-(HS+HW))*Dots);
-		
+
 //debug_console_printf("HT=%d, HS=%d, HW=%d, (HS+HW)=%d, HT-(HS+HW)=%d\n",HT,HS,HW,(HS+HW),(HT-(HS+HW)));
-//debug_console_printf("Scanline=%d, row=%d\n",m6845_get_scanline_counter(),m6845_get_row_counter());		
+//debug_console_printf("Scanline=%d, row=%d\n",m6845_get_scanline_counter(),m6845_get_row_counter());
 #ifdef MAME_DEBUG
 		HSyncMin=beta_scr_x;
 #endif
@@ -296,7 +296,7 @@ static void beta_Set_VSync(int offset, int data)
 			FlashCount=0;			// Reset counter
 			FlashBit=(!FlashBit) & 0x01;	// Invert flash bit.
 		}
-		
+
 		if (DrawInterlace==INTERLACE_AT_VS)
 		{
 			DrawInterlace=INTERLACE_ON;
@@ -311,7 +311,7 @@ static void beta_Set_VSync(int offset, int data)
 		VSyncMin=beta_scr_y;
 #endif
 	}
-	
+
 	dgn_beta_frame_interrupt(data);
 }
 
@@ -319,10 +319,10 @@ static void beta_Set_DE(int offset, int data)
 {
 	beta_DE = data;
 
-#ifdef MAME_DEBUG 	
+#ifdef MAME_DEBUG
 	if(beta_DE)
 		DEPos=beta_scr_x;
-#endif	
+#endif
 }
 
 /* Video init */
@@ -331,9 +331,9 @@ void init_video(void)
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
 	m6845_set_personality(M6845_PERSONALITY_HD6845S);
-	
+
 	GCtrl=0;
-	
+
 	videoram=mess_ram;
 
 	ClkMax=65000;
@@ -342,7 +342,7 @@ void init_video(void)
 	DoubleHL=1;			/* Default to normal height */
 	DoubleY=1;
 	DrawInterlace=INTERLACE_OFF;	/* No interlace by default */
-	
+
 #ifdef MAME_DEBUG
 	/* setup debug commands */
 	if (Machine->debug_mode)
@@ -380,7 +380,7 @@ static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, m
 	}
 
 	PlotY=y*2;
-	
+
 	/* Error check, make sure we're drawing onm the actual bitmap ! */
 	if (((PlotX+1)<bitmap->width) && ((PlotY+1)<bitmap->height))
 	{
@@ -390,16 +390,16 @@ static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, m
 		/* Plot characters twice as wide in 40 col mode */
 		if(Double)
 		{
-			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+0)) = Colour;		
+			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+0)) = Colour;
 			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+1)) = Colour;
-	
-			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+0)) = Colour;		
+
+			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+0)) = Colour;
 			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+1)) = Colour;
 		}
 		else
 		{
-			*BITMAP_ADDR16(bitmap, (PlotY+0), PlotX) = Colour;	
-			*BITMAP_ADDR16(bitmap, (PlotY+1), PlotX) = Colour;	
+			*BITMAP_ADDR16(bitmap, (PlotY+0), PlotX) = Colour;
+			*BITMAP_ADDR16(bitmap, (PlotY+1), PlotX) = Colour;
 		}
 	}
 }
@@ -420,18 +420,18 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 	int UnderLine;							// Underline
 	int FlashChar;							// Flashing char
 	int ULActive;							// Underline active
-	
+
 	bit=bitmap;
-		
+
 	if (beta_DE)
-	{	
+	{
 		/* The beta text RAM contains alternate character and attribute bytes */
 		/* Top two address lines from PIA, IC28 PB6,7 */
 		crtcAddr=m6845_memory_address_r(0)-1;
 		Offset=(crtcAddr | ((GCtrl & GCtrlAddrLines)<<8))*2;
-		if (Offset<0) 
+		if (Offset<0)
 			Offset=0;
-		
+
 		/* Get the character to display */
 		char_code 	= videoram[Offset];
 
@@ -440,26 +440,26 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 		/* to indicate a double height character */
 		UnderLine=(videoram[Offset+1] & 0x40) >> 6;
 		FlashChar=(videoram[Offset+1] & 0x80) >> 7;
-		
+
 		// underline is active for character set 0, on character row 9
 		ULActive=(UnderLine && (beta_6845_RA==9) && ~SWChar);
-		
+
 		/* If Character set one, and undeline set, latch double height */
-		DoubleY=(UnderLine & SWChar & DoubleHL) | 
+		DoubleY=(UnderLine & SWChar & DoubleHL) |
 		        (SWChar & ~DoubleY & DoubleHL) |
 			(SWChar & ~DoubleY & (beta_6845_RA==9));
-	
+
 		/* Invert forground and background if flashing char and flash acive */
 		Invert=(FlashChar & FlashBit);
-		
+
 		/* Underline inverts flash */
-		if (ULActive) 
+		if (ULActive)
 			Invert=~Invert;
 
 		/* Cursor on also inverts */
 		if (CursorOn)
 			Invert=~Invert;
-		
+
 		/* Invert colours if invert is true */
 		if(!Invert)
 		{
@@ -471,7 +471,7 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 			BgColour	= (videoram[Offset+1] & 0x38) >> 3;
 			FgColour	= (videoram[Offset+1] & 0x07);
 		}
-		
+
 		/* The beta Character ROM has characters of 8x10, each aligned to a 16 byte boundry */
 		data_byte = data[(char_code*16) + beta_6845_RA];
 
@@ -480,8 +480,8 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 			if (data_byte & 0x080)
 				plot_text_pixel(x,y,Dot,FgColour,CharsPerLine,bitmap);
 			else
-				plot_text_pixel(x,y,Dot,BgColour,CharsPerLine,bitmap);		
-			
+				plot_text_pixel(x,y,Dot,BgColour,CharsPerLine,bitmap);
+
 			data_byte = data_byte<<1;
 		}
 	}
@@ -489,7 +489,7 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 	{
 		for (Dot=0; Dot<8; Dot++)
 			plot_text_pixel(x,y,Dot,Background,CharsPerLine,bitmap);
-		
+
 	}
 
 }
@@ -506,17 +506,17 @@ static void plot_gfx_pixel(int x, int y, int Dot, int Colour, mame_bitmap *bitma
 	int	DoubleY		= (~m6845_get_register(INTERLACE) & 0x03) ? 1 : 0;
 	int	PlotX;
 	int	PlotY;
-	
-	if (DoubleX) 
+
+	if (DoubleX)
 		PlotX=(x+Dot)*2;
 	else
 		PlotX=x+Dot;
-	
+
 	if(DoubleY)
 		PlotY=(y)*2;
 	else
 		PlotY=y;
-		
+
 	if(DrawInterlace==INTERLACE_ON)
 	{
 		PlotY=(y*2);//+Field;
@@ -534,17 +534,17 @@ static void plot_gfx_pixel(int x, int y, int Dot, int Colour, mame_bitmap *bitma
 			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+0)) = Colour;
 			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+1)) = Colour;
 		}
-		
+
 		/* Plot pixels twice as high if in x256 modes */
 		if (DoubleY)
 		{
-			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+0)) = Colour;		
+			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+0)) = Colour;
 			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+1)) = Colour;
 		}
-		
+
 		if (~(DoubleX | DoubleY))
 		{
-			*BITMAP_ADDR16(bitmap, PlotY, PlotX) = Colour;				
+			*BITMAP_ADDR16(bitmap, PlotY, PlotX) = Colour;
 		}
 	}
 }
@@ -565,25 +565,25 @@ static void beta_plot_gfx_line(int x,int y, mame_bitmap *bitmap)
 	int Lo;
 	int Word;
 	int Dots;	/* pixesls per byte */
-	
+
 	/* We have to do this here so that it is correct for border and drawing area ! */
 	if (IsGfx16)
 		Dots=4;
 	else if (IsGfx2)
 		Dots=16;
-	else	
+	else
 		Dots=8;
-	
+
 	if (beta_DE)
-	{	
+	{
 		/* Calculate address of graphics pixels */
 		crtcAddr=(m6845_memory_address_r(0) & 0x1FFF);
 		Addr=((crtcAddr<<3) | (beta_6845_RA & 0x07))*2;
-	
-		if(Addr<MinAddr) 
+
+		if(Addr<MinAddr)
 			MinAddr=Addr;
 
-		if(Addr>MaxAddr) 
+		if(Addr>MaxAddr)
 			MaxAddr=Addr;
 
 		if(x>MaxX) MaxX=x;
@@ -610,7 +610,7 @@ static void beta_plot_gfx_line(int x,int y, mame_bitmap *bitmap)
 			for (Dot=0;Dot<Dots;Dot++)
 			{
 				plot_gfx_pixel(x,y,Dot,Colour,bitmap);
-				
+
 				Intense	=Intense<<1;
 				Red	=Red<<1;
 				Green	=Green<<1;
@@ -637,12 +637,12 @@ static void beta_plot_gfx_line(int x,int y, mame_bitmap *bitmap)
 			{
 				Colour=ColourRAM[((Word&0x8000)>>14) | ((Word&0x80)>>7)];
 				plot_gfx_pixel(x,y,Dot,Colour,bitmap);
-		
+
 				Hi=Word&0x8000;
 				Word=((Word<<1)&0xFFFE) | (Hi>>15);
 			}
 		}
-		
+
  	}
 	else
 	{
@@ -655,9 +655,9 @@ static void beta_plot_gfx_line(int x,int y, mame_bitmap *bitmap)
 
 /* Update video screen, calls either text or graphics update routine as needed */
 VIDEO_UPDATE( dgnbeta )
-{	
+{
 	long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
-	
+
 	bit=bitmap;
 
 	c=0;
@@ -685,7 +685,7 @@ VIDEO_UPDATE( dgnbeta )
 			// check that we are on the emulated screen area.
 			if ((beta_scr_x>=0) && (beta_scr_x<699) && (beta_scr_y>=0) && (beta_scr_y<549))
 			{
-				if(IsTextMode) 
+				if(IsTextMode)
 					beta_plot_char_line(beta_scr_x, beta_scr_y, bitmap);
 				else
 					beta_plot_gfx_line(beta_scr_x, beta_scr_y, bitmap);
@@ -716,11 +716,11 @@ READ8_HANDLER(dgnbeta_6845_r)
 }
 
 WRITE8_HANDLER(dgnbeta_6845_w)
-{	
+{
 	if(offset&0x1)
 	{
 		m6845_register_w(offset,data);
-	
+
 		if(VidAddr==INTERLACE)
 		{
 			DrawInterlace=(data & 0x03) ? INTERLACE_AT_VS : INTERLACE_OFF;
@@ -732,7 +732,7 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 		VidAddr=data;				/* Record reg being written to */
 	}
 #ifdef MAME_DEBUG
-	if (LogRegWrites) 
+	if (LogRegWrites)
 		RegLog(offset,data);
 #endif
 }
@@ -762,7 +762,7 @@ static void RegLog(int offset, int data)
 {
 	char	RegName[16];
 
-	switch (VidAddr) 
+	switch (VidAddr)
 	{
 		case H_TOTAL		: sprintf(RegName,"H Total      "); break;
 		case H_DISPLAYED	: sprintf(RegName,"H Displayed  "); break;
@@ -780,8 +780,8 @@ static void RegLog(int offset, int data)
 		case START_ADDR_L	: sprintf(RegName,"Start Addr L "); break;
 		case CURS_H		: sprintf(RegName,"Cursor H     "); break;
 		case CURS_L		: sprintf(RegName,"Cursor L     "); break;
-	}	
-	
+	}
+
 	if(offset&0x1)
 		debug_console_printf("6845 write Reg %s Addr=%3d Data=%3d ($%2.2X) \n",RegName,VidAddr,data,data);
 }
@@ -789,7 +789,7 @@ static void RegLog(int offset, int data)
 static void FillScreen(int ref, int params, const char *param[])
 {
 	int	x;
-	
+
 	for(x=1;x<899;x++)
 	{
 		plot_box(bit, x, 1, 1, 698, x & 0x07);
@@ -800,13 +800,13 @@ static void FillScreen(int ref, int params, const char *param[])
 static void ScreenBox(int ref, int params, const char *param[])
 {
 	int	x,y;
-	
+
 	if(params>0)	sscanf(param[0],"%d",&BoxMinX);
 	if(params>1)	sscanf(param[1],"%d",&BoxMinY);
 	if(params>2)	sscanf(param[2],"%d",&BoxMaxX);
 	if(params>3)	sscanf(param[3],"%d",&BoxMaxY);
 	if(params>4)	sscanf(param[4],"%d",&BoxColour);
-	
+
 	for(x=BoxMinX;x<BoxMaxX;x++)
 	{
 		*BITMAP_ADDR16(bit, BoxMinY, x) = BoxColour;
@@ -844,7 +844,7 @@ static void ShowVidLimits(int ref, int params, const char *param[])
 }
 
 static void SetClkMax(int ref, int params, const char *param[])
-{	
+{
 	if(params>0)	sscanf(param[0],"%d",&ClkMax);
 }
 

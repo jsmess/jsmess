@@ -10,13 +10,13 @@
 		- Removed disk image code and replaced it with floppy drive functions.
 		  Any disc image is now useable with this code.
 		- Fixed write protect
-				  
+
 	2005-Apr-16 P.Harvey-Smith:
 		- Increased the delay in wd17xx_timed_read_sector_request and
 		  wd17xx_timed_write_sector_request, to 40us to more closely match
 		  what happens on the real hardware, this has fixed the NitrOS9 boot
 		  problems.
-  
+
 	2007-Nov-01 Wilbert Pol:
 		Needed these changes to get the MB8877 for Osborne-1 to work:
 		- Added support for multiple record read
@@ -303,7 +303,7 @@ void wd17xx_set_density(DENSITY density)
 static TIMER_CALLBACK(wd17xx_busy_callback)
 {
 	wd17xx_info *info = (wd17xx_info *) ptr;
-	wd17xx_set_irq(info);			
+	wd17xx_set_irq(info);
 	timer_reset(busy_timer, attotime_never);
 }
 
@@ -322,12 +322,12 @@ static void wd17xx_set_busy(wd17xx_info *w, attotime duration)
 static void wd17xx_restore(wd17xx_info *w)
 {
 	UINT8 step_counter;
-	
+
 	if (current_drive >= device_count(IO_FLOPPY))
 		return;
 
 	step_counter = 255;
-		
+
 #if 0
 	w->status |= STA_1_BUSY;
 #endif
@@ -357,7 +357,7 @@ static void wd17xx_restore(wd17xx_info *w)
 #if 0
 	/* simulate seek time busy signal */
 	w->busy_count = 0;	//w->busy_count * ((w->data & FDC_STEP_RATE) + 1);
-	
+
 	/* when command completes set irq */
 	wd17xx_set_irq(w);
 #endif
@@ -377,7 +377,7 @@ void wd17xx_reset(void)
 	for (i = 0; i < device_count(IO_FLOPPY); i++)
 	{
 		mess_image *img = image_from_devtype_and_index(IO_FLOPPY, i);
-		floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);    
+		floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
 		floppy_drive_set_rpm( img, 300.);
 	}
 
@@ -419,7 +419,7 @@ static void write_track(wd17xx_info * w)
 			int track   = w->buffer[i+1];
 			int side    = w->buffer[i+2];
 			int sector  = w->buffer[i+3];
-			int len     = w->buffer[i+4]; 
+			int len     = w->buffer[i+4];
 			int filler  = 0xe5; /* IBM and Thomson */
 			int density = w->density;
 			floppy_drive_format_sector(wd17xx_current_image(),side,sector,track,
@@ -559,7 +559,7 @@ static void read_track(wd17xx_info * w)
 	w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
 
 	floppy_drive_read_track_data_info_buffer( wd17xx_current_image(), hd, (char *)w->buffer, &(w->data_count) );
-	
+
 	w->data_offset = 0;
 
 	wd17xx_set_data_request();
@@ -627,7 +627,7 @@ static void wd17xx_read_id(wd17xx_info * w)
 		/* crc is stored hi-byte followed by lo-byte */
 		w->buffer[4] = crc>>8;
 		w->buffer[5] = crc & 255;
-		
+
 		w->sector = id.C;
 
 		w->status |= STA_2_BUSY;
@@ -805,7 +805,7 @@ static TIMER_CALLBACK(wd17xx_misc_timer_callback)
 	}
 
 	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer, attotime_never); 
+	timer_reset(w->timer, attotime_never);
 }
 
 
@@ -947,7 +947,7 @@ static TIMER_CALLBACK(wd17xx_read_sector_callback)
 		wd17xx_read_sector(w);
 
 	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer_rs, attotime_never); 
+	timer_reset(w->timer_rs, attotime_never);
 }
 
 
@@ -998,7 +998,7 @@ static TIMER_CALLBACK(wd17xx_write_sector_callback)
 	}
 
 	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer_ws, attotime_never); 
+	timer_reset(w->timer_ws, attotime_never);
 }
 
 
@@ -1072,7 +1072,7 @@ static void wd17xx_timed_write_sector_request(void)
 
 	//	floppy_drive_set_ready_state(wd17xx_current_image(), 1,1);
 		w->status &= ~STA_1_NOT_READY;
-		
+
 		/* TODO: What is this?  We need some more info on this */
 		if ((w->type == WD_TYPE_179X) || (w->type == WD_TYPE_1773))
 		{
@@ -1085,7 +1085,7 @@ static void wd17xx_timed_write_sector_request(void)
 				w->status |= STA_1_NOT_READY;
 		}
 	}
-	
+
 	/* eventually set data request bit */
 //	w->status |= w->status_drq;
 
@@ -1189,7 +1189,7 @@ READ8_HANDLER ( wd17xx_sector_r )
 		else
 		{
 			/* issue a timed data request */
-			wd17xx_timed_data_request();		
+			wd17xx_timed_data_request();
 		}
 	}
 	else
@@ -1205,7 +1205,7 @@ READ8_HANDLER ( wd17xx_sector_r )
 WRITE8_HANDLER ( wd17xx_command_w )
 {
 	wd17xx_info *w = &wd;
-	
+
 	floppy_drive_set_motor_state(wd17xx_current_image(), 1);
 	floppy_drive_set_ready_state(wd17xx_current_image(), 1,0);
 	/* also cleared by writing command */
@@ -1222,7 +1222,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 		w->data_count = 0;
 		w->data_offset = 0;
 		w->status &= ~(STA_2_BUSY);
-		
+
 		wd17xx_clear_data_request();
 
 		if (data & 0x0f)
@@ -1235,7 +1235,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 
 //		w->status_ipl = STA_1_IPL;
 /*		w->status_ipl = 0; */
-		
+
 		w->busy_count = 0;
 		w->command_type = TYPE_IV;
         return;
@@ -1309,7 +1309,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
             }
             else
             {
-    
+
                 /* drive write protected? */
                 if (floppy_drive_get_flag_state(wd17xx_current_image(),FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
                 {
@@ -1359,7 +1359,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 	}
 
 	w->status |= STA_1_BUSY;
-	
+
 	/* clear CRC error */
 	w->status &=~STA_1_CRC_ERR;
 
@@ -1544,9 +1544,9 @@ WRITE8_HANDLER ( wd17xx_data_w )
 		/* put byte into buffer */
 		if (VERBOSE_DATA)
 			logerror("wd17xx_info buffered data: $%02X at offset %d.\n", data, w->data_offset);
-	
+
 		w->buffer[w->data_offset++] = data;
-		
+
 		if (--w->data_count < 1)
 		{
 			if (w->command == FDC_WRITE_TRK)
@@ -1580,16 +1580,16 @@ WRITE8_HANDLER ( wd17xx_data_w )
 	UINT8 result = 0;
 
 	switch(offset % 4) {
-	case 0: 
+	case 0:
 		result = wd17xx_status_r(0);
 		break;
-	case 1: 
+	case 1:
 		result = wd17xx_track_r(0);
 		break;
-	case 2: 
+	case 2:
 		result = wd17xx_sector_r(0);
 		break;
-	case 3: 
+	case 3:
 		result = wd17xx_data_r(0);
 		break;
 	}

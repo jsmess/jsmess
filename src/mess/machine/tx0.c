@@ -509,7 +509,7 @@ void tx0_io_dis(void)
 
 	7-track tape, 6-bit data, 1-bit parity
 
-	
+
 */
 
 static void schedule_select(void)

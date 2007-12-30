@@ -29,10 +29,10 @@
 *      linux-2.6.6/include/asm-mips/sgi/hpc3.h
 *    NetBSD: http://www.netbsd.org/
 *    gxemul: http://gavare.se/gxemul/
-* 
+*
 * Gentoo LiveCD r5 boot instructions:
 *     mess -cdrom gentoor5.chd ip225015
-*     enter the command interpreter and type "sashARCS".  press enter and 
+*     enter the command interpreter and type "sashARCS".  press enter and
 *     it'll autoboot.
 *
 * IRIX boot instructions:
@@ -1344,7 +1344,7 @@ static void scsi_irq(int state)
 			{
 				UINT32 wptr, tmpword;
 				int words, sptr, twords;
-		
+
 				words = wd33c93_get_dma_count();
 				words /= 4;
 
@@ -1370,7 +1370,7 @@ static void scsi_irq(int state)
 						{
 							tmpword = dma_buffer[sptr]<<24 | dma_buffer[sptr+1]<<16 | dma_buffer[sptr+2]<<8 | dma_buffer[sptr+3];
 						}
-					
+
 						program_write_dword(wptr, tmpword);
 						wptr += 4;
 						sptr += 4;
@@ -1426,8 +1426,8 @@ static void scsi_irq(int state)
 static const SCSIConfigTable dev_table =
 {
         1,                                      /* 1 SCSI device */
-        { { SCSI_ID_4, 0, SCSI_DEVICE_CDROM },  /* SCSI ID 4, using CD 0, and it's a CD-ROM */ 
-	  { SCSI_ID_2, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using HD 0, and it's a CD-ROM */ 
+        { { SCSI_ID_4, 0, SCSI_DEVICE_CDROM },  /* SCSI ID 4, using CD 0, and it's a CD-ROM */
+	  { SCSI_ID_2, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using HD 0, and it's a CD-ROM */
 };
 
 static const struct WD33C93interface scsi_intf =

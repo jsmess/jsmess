@@ -3,7 +3,7 @@
   z88.c
 
   Functions to emulate the video hardware of the Acorn Z88
-  
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -182,7 +182,7 @@ VIDEO_UPDATE( z88 )
 				if (byte1 & Z88_SCR_HW_REV)
 				{
 				pen1 = machine->pens[0];
-				
+
 				if (byte1 & Z88_SCR_HW_GRY)
 				{
 					pen0 = machine->pens[2];
@@ -193,7 +193,7 @@ VIDEO_UPDATE( z88 )
 				}
 				}
 				else
-                {       
+                {
 				pen0 = machine->pens[0];
 				if (byte1 & Z88_SCR_HW_GRY)
 				{
@@ -273,6 +273,6 @@ VIDEO_UPDATE( z88 )
 		}
 
 		stored_ptr+=256;
-	}		
+	}
 	return 0;
 }

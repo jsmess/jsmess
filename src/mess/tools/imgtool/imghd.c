@@ -121,7 +121,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 		}
 	}
 
-	
+
 done:
 	if (cache)
 		free(cache);

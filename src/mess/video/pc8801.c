@@ -129,7 +129,7 @@ static WRITE8_HANDLER(write_gvram)
     case GRAPH_200_BW:
       x=(offset&0x3fff)%80;
       y=(offset&0x3fff)/80/2;
-      break; 
+      break;
     case GRAPH_400_BW:
       x=(offset&0x3fff)%80;
       y=(offset&0x3fff)/80/4+(offset/0x4000)*50;
@@ -289,7 +289,7 @@ int is_pc8801_vram_select(void)
     }
   }
 
-  
+
 	if (rh5) memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, rh5);
 	if (wh5) memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, wh5);
 	if (rh6) memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, rh6);
@@ -677,7 +677,7 @@ WRITE8_HANDLER(pc8801_crtc_write)
       case 0xc0:
 	blink_period=32;
 	break;
-      }	
+      }
       if((data&0x3f)==0x13) {
 	text_height=20;
 	return;

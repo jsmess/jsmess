@@ -14,7 +14,7 @@
 #define LVIV_LVT_BLOCK_PILOT_LENGTH			1298
 
 static INT16 *lviv_emit_level(INT16 *p, int count, int level)
-{	
+{
 	int i;
 
 	for (i=0; i<count; i++)
@@ -82,7 +82,7 @@ static int lviv_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	for (i=0; i<LVIV_LVT_HEADER_PILOT_LENGTH; i++)
 		p = lviv_output_bit (p, 1);
 
-	for (i=0; i<10; i++)                                 
+	for (i=0; i<10; i++)
 		p = lviv_output_byte (p, bytes[0x09]);
 
 	for (i=0; i<6; i++)
@@ -90,7 +90,7 @@ static int lviv_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 	p = lviv_emit_level (p, LVIV_LVT_PAUSE_SAMPLES, WAVEENTRY_HIGH);
 
-	for (i=0; i<LVIV_LVT_BLOCK_PILOT_LENGTH; i++)      
+	for (i=0; i<LVIV_LVT_BLOCK_PILOT_LENGTH; i++)
 		p = lviv_output_bit (p, 1);
 
 	data_size = length - ( LVIV_LVT_HEADER_PILOT_SAMPLES +
@@ -99,7 +99,7 @@ static int lviv_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			       LVIV_LVT_BLOCK_PILOT_SAMPLES );
 	data_size/=660;
 
-	for (i=0; i<data_size; i++)                      
+	for (i=0; i<data_size; i++)
 		p = lviv_output_byte (p, bytes[0x10+i]);
 
 	return p - buffer;

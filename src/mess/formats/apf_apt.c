@@ -18,7 +18,7 @@ static INT16 xor_wave_state = WAVEENTRY_HIGH^WAVEENTRY_LOW;
 /* 500 microsecond of bit 0 and 1000 microsecond of bit 1 */
 
 static INT16 *apf_emit_level(INT16 *p, int count)
-{	
+{
 	int i;
 
 	for (i=0; i<count; i++)
@@ -29,7 +29,7 @@ static INT16 *apf_emit_level(INT16 *p, int count)
 	return p;
 }
 
-/* 4 periods at 1200hz */ 
+/* 4 periods at 1200hz */
 static INT16* apf_output_bit(INT16 *p, UINT8 b)
 {
 	if (b)

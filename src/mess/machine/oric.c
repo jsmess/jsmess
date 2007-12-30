@@ -253,7 +253,7 @@ PB5
 PB6
  tape connector motor control 0
 
-PB7 
+PB7
  tape connector output high 1
 
  */
@@ -1116,7 +1116,7 @@ static void oric_common_init_machine(void)
 MACHINE_START( oric )
 {
 	oric_common_init_machine();
-	
+
 	oric_is_telestrat = 0;
 
 	oric_ram_0x0c000 = auto_malloc(16384);
@@ -1216,7 +1216,7 @@ READ8_HANDLER ( oric_IO_r )
 	{
 		if ((offset & 0x0f)!=0x0d)
 		{
-			logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpunum_get_reg(0, REG_PC)); 
+			logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpunum_get_reg(0, REG_PC));
 		}
 	}
 	/* it is repeated */
@@ -1256,7 +1256,7 @@ WRITE8_HANDLER ( oric_IO_w )
 #endif
 	if (enable_logging)
 	{
-		logerror("via 0 w: %04x %02x %04x\n",offset,data,(unsigned) cpunum_get_reg(0, REG_PC)); 
+		logerror("via 0 w: %04x %02x %04x\n",offset,data,(unsigned) cpunum_get_reg(0, REG_PC));
 	}
 
 	via_0_w(offset & 0x0f,data);

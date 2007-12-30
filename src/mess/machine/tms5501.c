@@ -56,7 +56,7 @@
 #define TMS5501_TIMER_3_INT		0x40
 #define TMS5501_TIMER_4_INT		0x80
 #define TMS5501_INT_7_INT		0x80
-			
+
 #define TMS5501_PIO_INT_7		0x80
 
 typedef struct tms5501_t
@@ -125,7 +125,7 @@ static void tms5501_field_interrupts(int which)
 	if (current_ints)
 	{
 		/* selecting interrupt with highest priority */
-		int level = find_first_bit(current_ints);	
+		int level = find_first_bit(current_ints);
 		LOG_TMS5501(which, "Interrupt level", level);
 
 		/* reseting proper bit in pending interrupts register */
@@ -349,7 +349,7 @@ UINT8 tms5501_read (int which, UINT16 offset)
 			break;
 		case 0x04:	/* Command register */
 			data = tms5501[which].command;
-			LOG_TMS5501(which, "Command register read", data);	 
+			LOG_TMS5501(which, "Command register read", data);
 			break;
 		case 0x05:	/* Serial rate register */
 			data = tms5501[which].sio_rate;
@@ -360,7 +360,7 @@ UINT8 tms5501_read (int which, UINT16 offset)
 			break;
 		case 0x08:	/* Interrupt mask register */
 			data = tms5501[which].interrupt_mask;
-			LOG_TMS5501(which, "Interrupt mask read", data);	 
+			LOG_TMS5501(which, "Interrupt mask read", data);
 			break;
 		case 0x09:	/* Timer 0 address */
 		case 0x0a:	/* Timer 1 address */

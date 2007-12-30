@@ -172,7 +172,7 @@ TESTDRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 	/* WATARA */
 	DRIVER( svision )	/* Supervision Handheld								*/
 TESTDRIVER( svisions )
-	
+
 TESTDRIVER( svisionp )
 TESTDRIVER( svisionn )
 TESTDRIVER( tvlinkp )
@@ -432,7 +432,7 @@ TESTDRIVER( tree4th )	/* Sinclair ZX-81 Tree-Forth by Tree Systems		*/
 	DRIVER( specp3sp )	/* 1987 ZX Spectrum +3 (Spain)						*/
 	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
 	DRIVER( specp3es )	/* 2000 ZX Spectrum +3e (Spain)						*/
-	
+
 TESTDRIVER( scorpion )
 TESTDRIVER( pentagon )
 
@@ -564,7 +564,7 @@ TESTDRIVER( trs80m4 )
 	DRIVER( cp400 )		/* Prologica CP400									*/
 	DRIVER( mc10 )		/* MC-10											*/
 	DRIVER( alice )		/* Matra & Hachette Ordinateur Alice				*/
-	
+
 	/* EACA */
 	DRIVER( cgenie )	/* Colour Genie EG2000								*/
 	/* system 80 trs80 compatible */

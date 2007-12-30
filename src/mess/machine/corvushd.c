@@ -1,11 +1,11 @@
-//	
+//
 //	corvus_hd
-//	
+//
 //	Implementation of a Corvus Hard Drive / Host Bus Adapter pair.  The drive
 //	being emulated is a Rev B drive, functionally speaking, rather than an Omnidrive.
-//	
+//
 //	The Corvus Flat Cable HBA is a very simplistic device due to the fact that most
-//	of the smarts are in the Hard Drive itself.  What's in the hard drive includes a 
+//	of the smarts are in the Hard Drive itself.  What's in the hard drive includes a
 //  Z80 processor, 4K of EPROM and 5KB of RAM.  Ultimately, a true emulation would include
 //  the on-boad controller; however, that is outside the current scope of this code.  Maybe
 //  if I could get a Rev. B/H drive, it could be reverse-engineered to do this.
@@ -54,7 +54,7 @@
 //	Brett Wyer
 //
 //
-//	TODO: 
+//	TODO:
 //		Implement READY line glitch after last byte of command (Disk System Tech Ref pp. 3)
 //		Implement Read-after-Write (always happens on Rev B/H drives per Mass Storage GTI pp. 12)
 //		Implement Multiple physical drive support - Up to four
@@ -405,7 +405,7 @@ void dump_buffer(UINT8 *buffer, UINT16 length) {
 
 	for(offset=0; offset < length; offset++) {
 		if(offset % 16 == 0) {					// WHY IS 0 % 16 == 0???
-			if(offset > 0 && offset % 16 == 0) 
+			if(offset > 0 && offset % 16 == 0)
 				logerror("%16.16s", ascii_dump);
 			logerror("\n%4.4x: %2.2x ", offset, *(buffer + offset));
 		} else {
@@ -471,7 +471,7 @@ static UINT8 parse_hdc_command(UINT8 data) {
 				c->recv_bytes = corvus_cmd[data][0].recv_bytes;
 				c->xmit_bytes = corvus_cmd[data][0].xmit_bytes;
 				#if VERBOSE
-				logerror("parse_hdc_command: Single byte command recoginized: 0x%2.2x, to recv: %d, to xmit: %d\n", data, 
+				logerror("parse_hdc_command: Single byte command recoginized: 0x%2.2x, to recv: %d, to xmit: %d\n", data,
 					c->recv_bytes, c->xmit_bytes);
 				#endif
 				break;
@@ -523,7 +523,7 @@ static UINT8 parse_hdc_command(UINT8 data) {
 				c->recv_bytes = corvus_prep_cmd[data].recv_bytes;
 				c->xmit_bytes = corvus_prep_cmd[data].xmit_bytes;
 				#if VERBOSE
-				logerror("parse_hdc_command: Prep command recognized: 0x%2.2x, to recv: %d, to xmit: %d\n", data, 
+				logerror("parse_hdc_command: Prep command recognized: 0x%2.2x, to recv: %d, to xmit: %d\n", data,
 					c->recv_bytes, c->xmit_bytes);
 				#endif
 				break;
@@ -647,7 +647,7 @@ static UINT8 corvus_write_logical_sector(dadr_t *dadr, UINT8 *buffer, int len) {
 	sector = (dadr->address_msn_and_drive & 0xf0 << 12) | (dadr->address_mid << 8) | dadr->address_lsb;
 
 	#if VERBOSE
-	logerror("corvus_write_logical_sector: Writing based on DADR: 0x%6.6x, logical sector: 0x%5.5x, drive: %d\n", 
+	logerror("corvus_write_logical_sector: Writing based on DADR: 0x%6.6x, logical sector: 0x%5.5x, drive: %d\n",
 		dadr->address_msn_and_drive << 16 | dadr->address_lsb << 8 | dadr->address_mid, sector, drv);
 	#endif
 
@@ -758,7 +758,7 @@ static UINT8 corvus_read_logical_sector(dadr_t *dadr, UINT8 *buffer, int len) {
 	sector = (dadr->address_msn_and_drive & 0xf0 << 12) | (dadr->address_mid << 8) | dadr->address_lsb;
 
 	#if VERBOSE
-	logerror("corvus_read_logical_sector: Reading based on DADR: 0x%6.6x, logical sector: 0x%5.5x, drive: %d\n", 
+	logerror("corvus_read_logical_sector: Reading based on DADR: 0x%6.6x, logical sector: 0x%5.5x, drive: %d\n",
 		dadr->address_msn_and_drive << 16 | dadr->address_lsb << 8 | dadr->address_mid, sector, drv);
 	#endif
 
@@ -1070,7 +1070,7 @@ static UINT8 corvus_get_drive_parameters(UINT8 drv) {
 // Corvus_Read_Boot_Block
 //
 // Old-style Boot (0x14) command boot block reader
-// 
+//
 // Pass:
 //		block:	Boot block number to read (0-7)
 //
@@ -1086,7 +1086,7 @@ static UINT8 corvus_read_boot_block(UINT8 block) {
 	#endif
 
 	return corvus_read_sector(0, 25 + block, c->buffer.read_512_response.data, 512);
-	
+
 }
 
 
@@ -1220,7 +1220,7 @@ static UINT8 corvus_format_drive(UINT8 *pattern, UINT16 len) {
 static hard_disk_file *corvus_hdc_file(int id) {
 
 	mess_image *img;
-	
+
 	img = image_from_devtype_and_index(IO_HARDDISK, id);
 	if (!image_exists(img))
 		return NULL;
@@ -1301,7 +1301,7 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 							c->buffer.single_byte_response.status = corvus_init_semaphore_table();
 							break;
 						case SEMAPHORE_STATUS_MOD:
-							c->buffer.semaphore_status_response.status = 
+							c->buffer.semaphore_status_response.status =
 								corvus_read_sector(0, 7, c->buffer.semaphore_status_response.table, 256);
 							break;
 						default:
@@ -1374,7 +1374,7 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 		//
 		// An Illegal command was detected (Truly invalid, not just unimplemented)
 		//
-		c->buffer.single_byte_response.status = 
+		c->buffer.single_byte_response.status =
 			STAT_FATAL_ERR | STAT_ILL_CMD_OP_CODE;		// Respond with an Illegal Op Code
 
 		logerror("corvus_hdc_data_w: Illegal Command, status: 0x%2.2x\n", c->buffer.single_byte_response.status);
@@ -1669,7 +1669,7 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 		c->offset = 0;			// We've reached the end of valid data
 		c->xmit_bytes = 0;		// We don't have anything more to say
 		c->recv_bytes = 0;		// No active commands
-		
+
 		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_HTC_MODE, corvus_hdc_callback);
 
 //		c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY);	// Put us in Idle, Host-to-Controller mode
@@ -1677,7 +1677,7 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 		//
 		// Not finished with this packet.  Insert an interbyte delay and then let the host continue
 		//
-		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);		
+		timer_set((ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);
 	}
 
 	return result;

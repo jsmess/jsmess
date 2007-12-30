@@ -173,31 +173,31 @@ static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
        (contains possible typing/printing errors so I've cited it litteraly)
 
     * D. Input/Output port addressing
-    *    
+    *
     *    U96 (74LS139) is an I/O port decoder.
-    *    
+    *
     *           IORQ    A7  A6   Selected I/O    Port Address
-    *            
+    *
     *            0      0   0       8255          00 - 03
-    *            
+    *
     *            0      0   1       CTC           40 - 43
-    *            
+    *
     *            0      1   0       PIO           80 - 83
-    *            
+    *
     *      Note; I/O port is not fully decoded, e.g. the 16 combinations
     *            00 - 03,  04 - 07, 08 - 0B,.....3C - 3F, all select the s
     *            8255.  The CTC & PIO are also selected by 16 different
     *            combinations.
-    
+
        Where the text states ".... , all select the s ...." it probably means
        "... ., all select the same ....".
-       
+
        So to asure that this "incompleteness" of the hardware does also exist in
        this simulator I've expanded the port assignments accordingly. I've also
        tested wether this is true for the actual hardware, and it is.
     */
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	
+
 	// The 16 I/O port combinations for the 8255 (P8255A-5, 8628LLP, (c) 1981 AMD)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(ppi8255_0_r, ppi8255_0_w) AM_MIRROR(0x3C)
 
@@ -374,7 +374,7 @@ static void mpf1_pio_interrupt( int state )
 	logerror("pio irq state: %02x\n",state);
 }
 
-static const z80pio_interface pio_intf = 
+static const z80pio_interface pio_intf =
 {
 	mpf1_pio_interrupt,
 	NULL,
@@ -445,7 +445,7 @@ static WRITE8_HANDLER( mpf1_portb_w )
 		F	0x04
 		G	0x02
 		H	0x40 (represented by P in original schematics) */
-		
+
 	/*  Original bit to leddisplay-segment assignment:
 		(and as such what is written as output to this port)
 		bit      7 6 5 4 3 2 1 0
@@ -494,7 +494,7 @@ static WRITE8_HANDLER( mpf1_portc_w )
 	// TONE led & speaker
 	led_tone = (~data & 0x80) >> 7;
 	set_led_status(0, led_tone);
-	
+
 	// speaker
 	DAC_data_w(0, 0xFF * led_tone);
 

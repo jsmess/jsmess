@@ -98,7 +98,7 @@ static int cococas_nextfile(imgtool_image *img, imgtool_dirent *ent)
 	}
 	if (err)
 		return err;
-	
+
 	/* If block is not a filename block, fail */
 	if (blk.type != COCOCAS_BLOCKTYPE_FILENAME)
 		return IMGTOOLERR_CORRUPTIMAGE;
@@ -126,7 +126,7 @@ static int cococas_nextfile(imgtool_image *img, imgtool_dirent *ent)
 
 	if (blk.type != COCOCAS_BLOCKTYPE_EOF)
 		return IMGTOOLERR_CORRUPTIMAGE;
-	
+
 	ent->filesize = filesize;
 
 	return 0;
@@ -141,7 +141,7 @@ static int cococas_readfile(imgtool_image *img, imgtool_stream *destf)
 	err = readblock(img, &blk);
 	if (err)
 		return err;
-	
+
 	/* If block is not a filename block, fail */
 	if (blk.type != COCOCAS_BLOCKTYPE_FILENAME)
 		return IMGTOOLERR_CORRUPTIMAGE;
@@ -158,7 +158,7 @@ static int cococas_readfile(imgtool_image *img, imgtool_stream *destf)
 
 	if (blk.type != COCOCAS_BLOCKTYPE_EOF)
 		return IMGTOOLERR_CORRUPTIMAGE;
-	
+
 	return 0;
 }
 

@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include <errno.h>
-	
+
 #include "osdmess.h"
 #include "utils.h"
 
@@ -127,9 +127,9 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 		basename = "tempfile";
 
 	sprintf(tempbuf, "/tmp/%s", basename);
-	unlink(tempbuf);	
+	unlink(tempbuf);
 
-	strncpy(buffer, tempbuf, buffer_len);	
+	strncpy(buffer, tempbuf, buffer_len);
 
 	return FILERR_NONE;
 }

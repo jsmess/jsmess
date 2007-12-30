@@ -5,7 +5,7 @@
 
 	Per Ola Ingvarsson
 	Tomas Karlsson
-			
+
  ******************************************************************************/
 
 /*-------------------------------------------------------------------------*/
@@ -36,10 +36,10 @@
 #define GDC_LOG_CMD_3(x,y,z) (logerror(x,y,z))
 #define GDC_LOG_CMD_4(x,y,z,a) (logerror(x,y,z,a))
 #else
-#define GDC_LOG_CMD_1(x)     
-#define GDC_LOG_CMD_2(x,y)   
+#define GDC_LOG_CMD_1(x)
+#define GDC_LOG_CMD_2(x,y)
 #define GDC_LOG_CMD_3(x,y,z)
-#define GDC_LOG_CMD_4(x,y,z,a) 
+#define GDC_LOG_CMD_4(x,y,z,a)
 #endif
 
 /* FIFO */
@@ -48,7 +48,7 @@ typedef struct
 	UINT8	data[16];	      /* The data of the fifo               */
 	UINT8	cmd_flags[16];		/* 0 for params 1 for commands        */
 	UINT8	direction;	      /* Direction flag (R=1/W=0)           */
-   UINT8 write_pos;        /* Position for next write operation  */                            
+   UINT8 write_pos;        /* Position for next write operation  */
    UINT8 read_pos;         /* Position for next read operation   */
    UINT8 count;            /* The number of entries in the fifo  */
    UINT8 nbr_cmds;         /* The number of commands in the fifo */
@@ -235,7 +235,7 @@ void gdc_fifo_add_from_outside(TYP_GDC* gdcp, UINT8 data, UINT8 cmdflag)
       gdcp->fifo.direction = GDC_FIFO_DIR_WRITE;
    }
    gdc_fifo_enqueue(gdcp, data, cmdflag);
-   
+
 }
 
 /*-------------------------------------------------------------------------*/
@@ -334,7 +334,7 @@ INLINE UINT16 rotright16(UINT16 nbr)
 }
 
 static UINT32 gdc_get_base_addr(TYP_GDC* gdcp)
-{  
+{
   int i;
   UINT32 ret_val = 0;
   int shift_amount = 0;
@@ -350,7 +350,7 @@ static UINT32 gdc_get_base_addr(TYP_GDC* gdcp)
 
 
 static UINT32 gdc_partition_length(TYP_GDC* gdcp)
-{  
+{
    /* Get a byte and put it into a temp */
    UINT32 pram_byte_low = gdcp->pram[2] >> 4;
    UINT32 pram_byte_high = gdcp->pram[3] & 0x3f;
@@ -379,7 +379,7 @@ static void gdc_plot_word(UINT32 address, UINT16 writeWord)
 
 INLINE void gdc_write(UINT32 address,
                UINT16 data)
-{   
+{
    gdc_mess.vram[address % gdc_mess.vramsize] = data;
 }
 
@@ -455,7 +455,7 @@ static void gdc_auto_write_data(UINT16 data,
                          UINT8  operation)
 {
    gdc_write_data(data, gdc.registers.display.mask, operation);
-   
+
    gdc_mess.dirty = 1;
    gdc_update_ead_and_mask();
 }
@@ -464,13 +464,13 @@ static UINT16 gdc_read_data(UINT16 mask)
 {
    /* Save address */
    UINT32 address = gdc.registers.display.ead;
-   
+
    return gdc_mess.vram[address & gdc_mess.vramsize] & mask;
 }
 
 static UINT16 gdc_auto_read_data(void)
 {
-   UINT16 ret_val = gdc_read_data(gdc.registers.display.mask);   
+   UINT16 ret_val = gdc_read_data(gdc.registers.display.mask);
    /* Update the ead and mask */
    gdc_update_ead_and_mask();
    return ret_val;
@@ -532,26 +532,26 @@ static void gdc_cmd_sync(void)
 
    if ( i == 0 )
       return;
-   
-	/* Update display mode */   
+
+	/* Update display mode */
 	reg = (gdc.registers.command.sync[0] & 0x20) ? 0x02 : 0;
 	reg += (gdc.registers.command.sync[0] & 0x02) ? 0x01 : 0;
 	gdc.registers.display.display_mode = reg;
-   
+
    GDC_LOG_CMD_2("gdc_cmd_sync: mode byte = %02X\n",
                  gdc.registers.command.sync[0]);
    GDC_LOG_CMD_2("gdc_cmd_sync: mode is %s\n", gdc_disp_mode_to_str(reg));
-   
+
 
    if ( i == 1 )
       return;
-   
+
 	/* Update words per line */
 	reg = gdc.registers.command.sync[1] & 0xfe;
    /* The register contains the number of lines - 2 */
 	gdc.registers.display.words_per_line = reg + 2;
    gdc.registers.display.display_width =  reg + 2;
-   
+
    GDC_LOG_CMD_2("gdc_cmd_sync: words_per_line set to %d\n",
                  gdc.registers.display.words_per_line);
    GDC_LOG_CMD_2("gdc_cmd_sync: display_width set to %d\n",
@@ -594,7 +594,7 @@ static void gdc_cmd_sync(void)
 
    if ( i == 6 )
       return;
-   
+
    /* Low bits of active display lines per video field */
    reg16 = gdc.registers.command.sync[6];
 
@@ -607,7 +607,7 @@ static void gdc_cmd_sync(void)
 
    gdc.registers.display.vert_back_porch =
       gdc.registers.command.sync[7] >> 2;
-   
+
    gdc_dump_disp_regs();
 }
 
@@ -665,8 +665,8 @@ INLINE void gdc_cmd_pram(UINT8 offset)
    int i,k,x;
    char tmp_str[9];
    UINT8 tmpParam[16];
-   UINT32 base_addr_before = gdc_get_base_addr(&gdc);  
-   /* Upside down */   
+   UINT32 base_addr_before = gdc_get_base_addr(&gdc);
+   /* Upside down */
    k = 0;
    while ( (param_p = gdc_fifo_dequeue_param(&gdc)) != NULL ) {
       /* This is for printing */
@@ -706,7 +706,7 @@ INLINE void gdc_cmd_cchar(void)
    UINT8 temp_reg;
    UINT8* param_p;
    TYP_GDC_REGS_DISPLAY* dispregs = &gdc.registers.display;
-   
+
    if ( ( param_p = gdc_fifo_dequeue_param(&gdc)) == NULL ) return;
    /* Cursor on or off */
    dispregs->disp_cursor = (*param_p & 0x80) != 0;
@@ -736,8 +736,8 @@ INLINE void gdc_cmd_cchar(void)
                  dispregs->cursor_blink_rate);
    GDC_LOG_CMD_2("gdc_cmd_cchar: Cursor bottom line = %d\n",
                  dispregs->cursor_bottom_line);
-   
-   
+
+
 }
 
 /*-------------------------------------------------------------------------*/
@@ -758,7 +758,7 @@ INLINE void gdc_cmd_figs(void)
    dispregs->figs_d1_param = 0xff;
    dispregs->figs_dm_param = 0xff;
 
-   
+
    if ( ( param_p = gdc_fifo_dequeue_param(&gdc)) == NULL ) return;
    /* What will be done next time? */
    dispregs->figs_operation = (*param_p & 0xf1) >> 3;
@@ -770,7 +770,7 @@ INLINE void gdc_cmd_figs(void)
       if ( ( param_p = gdc_fifo_dequeue_param(&gdc)) == NULL ) return;
       temp_reg = *param_p;
       if ( ( param_p = gdc_fifo_dequeue_param(&gdc)) != NULL ) {
-         temp_reg |= (*param_p & 0x3f) << 8;         
+         temp_reg |= (*param_p & 0x3f) << 8;
       } else {
          quit = 1;
       }
@@ -787,7 +787,7 @@ INLINE void gdc_cmd_figs(void)
          case 3:
             dispregs->figs_d1_param = temp_reg;
             break;
-         case 4:            
+         case 4:
             dispregs->figs_dm_param = temp_reg;
             break;
       }
@@ -807,7 +807,7 @@ INLINE void gdc_cmd_mask(void)
    UINT8* param_p;
    UINT16 temp_reg;
    TYP_GDC_REGS_DISPLAY* dispregs = &gdc.registers.display;
-   
+
    if ( ( param_p = gdc_fifo_dequeue_param(&gdc)) == NULL ) return;
    temp_reg = *param_p;
    if ( ( param_p = gdc_fifo_dequeue_param(&gdc)) == NULL ) return;
@@ -825,7 +825,7 @@ INLINE void gdc_cmd_inner_curs(void)
    UINT8* param_p;
    UINT32 temp_reg;
    TYP_GDC_REGS_DISPLAY* dispregs = &gdc.registers.display;
-   
+
    if ( ( param_p = gdc_fifo_dequeue_param(&gdc)) == NULL ) return;
    temp_reg = *param_p;
    dispregs->ead = temp_reg;
@@ -860,16 +860,16 @@ INLINE void gdc_cmd_wdat(UINT8 command)
    TYP_GDC_REGS_DISPLAY* dispregs = &gdc.registers.display;
 
    dispregs->cur_mod = command & 0x03;
-   
+
    /* Seems like there can be many parameters to the WDAT and that
       dc is only used for the first set */
    for ( ;; ) { /* Use up all parameters */
       UINT16 orig_mask = gdc.registers.display.mask;
       /* Low byte */
       if ( ( param_p = gdc_fifo_dequeue_param(&gdc)) == NULL ) return;
-      
+
       temp_reg = *param_p;
-      
+
       /* FIXME: Check type of transfer. There can be bytes or words */
       /* One optional high byte */
       switch(command & 0x18) {
@@ -895,13 +895,13 @@ INLINE void gdc_cmd_wdat(UINT8 command)
          case 0x18:
             /* FIXME: Bor bara anvanda en byte i detta fallet */
             /* FIXME: Save the mask */
-            gdc.registers.display.mask &= 0xff00; 
+            gdc.registers.display.mask &= 0xff00;
             temp_reg = ( (temp_reg  & 0xff ) << 8);
             break;
          default:
             return;
       }
-      
+
       GDC_LOG_CMD_4("gdc_cmd_wdat: data = %04X, dc = %02X, mod = %x",
                     temp_reg, dispregs->figs_dc_param, dispregs->cur_mod);
       GDC_LOG_CMD_3(" mask = %04X, transfer = %02X\n", dispregs->mask,
@@ -914,16 +914,16 @@ INLINE void gdc_cmd_wdat(UINT8 command)
 /*              temp_reg = 0x0000; */
 /*           } */
 /*        } */
-      
+
       for ( i=0; i < dispregs->figs_dc_param + 1; ++i ) {
-         gdc_auto_write_data(temp_reg, 
+         gdc_auto_write_data(temp_reg,
                              dispregs->cur_mod);
       }
       gdc.registers.display.mask = orig_mask;
       /* Now dc should be zero for the other parameters */
       dispregs->figs_dc_param = 0;
    }
-   
+
 }
 
 /*-------------------------------------------------------------------------*/
@@ -936,7 +936,7 @@ INLINE void gdc_cmd_rdat(UINT8 command)
    /* FIXME: Check in-parameter too */
    int i;
    for ( i=0; i < (dispregs->figs_dc_param); ++i ) {
-      UINT16 data = gdc_auto_read_data();      
+      UINT16 data = gdc_auto_read_data();
       gdc_fifo_add_from_inside(&gdc, data & 0xff, 0);
       gdc_fifo_add_from_inside(&gdc, (data >> 8) & 0xff, 0);
    }
@@ -966,12 +966,12 @@ INLINE void gdc_cmd_gchrd(void)
    int row;
    int bitnbr;
    UINT16 writeWord;
-   
+
    TYP_GDC_REGS_DISPLAY* dispregs = &gdc.registers.display;
    /* This will only work if the character is 8 by 8 and direction is
       2 and it may not even work then */
    UINT16 saved_mask = dispregs->mask;
-   UINT32 saved_ead = dispregs->ead;   
+   UINT32 saved_ead = dispregs->ead;
    for ( row = 0; row < 8;  ++row ) {
       int zy;
       for ( zy = 0; zy < dispregs->zoom_gchr; ++zy ) {
@@ -979,10 +979,10 @@ INLINE void gdc_cmd_gchrd(void)
          dispregs->ead = saved_ead -
              (dispregs->zoom_gchr*row+zy) * dispregs->words_per_line;
          GDC_LOG_CMD_2("gdc_cmd_gchrd: pram : %1x\n", gdc.pram[15-row]);
-         /* Reset pixel mask (x) */         
+         /* Reset pixel mask (x) */
          dispregs->mask = saved_mask;
          for ( bitnbr = 0; bitnbr < 8; ++bitnbr ) {
-            int zx;            
+            int zx;
             for ( zx = 0; zx < dispregs->zoom_gchr; ++zx ) {
                UINT16 bit = (gdc.pram[15-row] >> bitnbr) & 0x01;
                writeWord = bit ? 0xffff : 0x0000;
@@ -990,7 +990,7 @@ INLINE void gdc_cmd_gchrd(void)
                   ((~dispregs->mask) & gdc_mess.vram[dispregs->ead]);
                /* The mode is set by wdat */
                gdc_write_data(writeWord, 0xffff, dispregs->cur_mod);
-                              
+
                if ( dispregs->mask & 0x8000 ) {
                   dispregs->ead++;
                }
@@ -1004,8 +1004,8 @@ INLINE void gdc_cmd_gchrd(void)
    }
    // Back up 8 lines
    dispregs->ead = saved_ead -
-                   dispregs->words_per_line * 8 * dispregs->zoom_gchr; 
-   dispregs->mask = saved_mask;  
+                   dispregs->words_per_line * 8 * dispregs->zoom_gchr;
+   dispregs->mask = saved_mask;
    gdc_mess.dirty = 1;
 }
 
@@ -1051,7 +1051,7 @@ static void gdc_command_processor(UINT8 command)
          GDC_LOG_CMD_1("gdc_command: CCHAR\n");
          gdc_cmd_cchar();
 			break;
-         
+
 		/* Display control commands */
 		case CMD_START:		/* Ends idle mode and unblanks the display */
          GDC_LOG_CMD_1("gdc_command: START\n");
@@ -1061,37 +1061,37 @@ static void gdc_command_processor(UINT8 command)
 		case CMD_BCTRL_OFF:	/* Controls the blanking and unblanking of the display */
          GDC_LOG_CMD_1("gdc_command: BCTRL_OFF\n");
 			break;
-			
+
 		case CMD_BCTRL_ON:	/* Controls the blanking and unblanking of the display */
          GDC_LOG_CMD_1("gdc_command: BCTRL_ON\n");
 			break;
-         
+
 			/* Specifies zoom factors for the display and graphics characters writing */
 		case CMD_ZOOM:
          GDC_LOG_CMD_1("gdc_command: ZOOM\n");
          gdc_cmd_zoom();
 			break;
-         
-         
+
+
 		case CMD_CURS:
           /* Sets the position of the cursor in display memory */
          GDC_LOG_CMD_1("gdc_command: CURS\n");
          gdc_cmd_curs();
 			break;
 
-		case CMD_PITCH:		
+		case CMD_PITCH:
           /* Specifies the width of the X dimension of the display memory */
           GDC_LOG_CMD_1("gdc_command: PITCH\n");
           gdc_cmd_pitch();
           break;
-          
+
 		/* Drawing control commands */
 
 		case CMD_MASK:		/* Sets the MASK register contents */
          GDC_LOG_CMD_1("gdc_command: MASK\n");
          gdc_cmd_mask();
 			break;
-			
+
 		case CMD_FIGS:		/* Specifies the parameters for the drawing processor */
          GDC_LOG_CMD_1("gdc_command: FIGS\n");
          gdc_cmd_figs();
@@ -1116,9 +1116,9 @@ static void gdc_command_processor(UINT8 command)
          GDC_LOG_CMD_1("gdc_command: LPRD\n");
          gdc_cmd_lprd();
 			break;
-	
+
 		default:
-			
+
 			/* Display control commands */
 			if ((command & CMD_PRAM_BITMASK) == CMD_PRAM_BITMASK)
 			{
@@ -1132,33 +1132,33 @@ static void gdc_command_processor(UINT8 command)
 				switch(command & 0xe4)
 				{
 					/* Drawing control commands */
-	
+
 					case CMD_WDAT_BITMASK:
                   /* Writes data words or bytes into display memory */
                   GDC_LOG_CMD_1("gdc_command: WDAT\n");
                   gdc_cmd_wdat(command);
 						break;
-					
+
 					/* Memory data read commands */
-					
+
 					case CMD_RDAT_BITMASK:	/* Reads data words or bytes from display */
                   GDC_LOG_CMD_1("gdc_command: RDAT\n");
                   gdc_cmd_rdat(command);
 						break;
-	
+
 					/* Data control commands */
-			
+
 					case CMD_DMAR_BITMASK:	/* Requests a DMA read transfer */
                   GDC_LOG_CMD_1("gdc_command: DMAR\n");
 						break;
-	
+
 					case CMD_DMAW_BITMASK:	/* Requests a DMA write transfer */
                   GDC_LOG_CMD_1("gdc_command: DMAW\n");
 						break;
-	
+
 					default:
 						logerror("GDC Unknown Command %04X\n", command);
-						
+
 						break;
 				}
 			}
@@ -1205,13 +1205,13 @@ static int gdc_nbr_expected_params(UINT8 command)
 		case CMD_CCHAR:
       case CMD_CURS:
          return 3;
-		case CMD_RESET:		
-		case CMD_SYNC_OFF:	
-		case CMD_SYNC_ON:	   
+		case CMD_RESET:
+		case CMD_SYNC_OFF:
+		case CMD_SYNC_ON:
          return 8;
       case CMD_FIGS:
          return 11;
-      default:			
+      default:
          if ((command & CMD_PRAM_BITMASK) == CMD_PRAM_BITMASK) {
             return 16; /* XXX */
          } else {
@@ -1239,11 +1239,11 @@ static int gdc_nbr_expected_params(UINT8 command)
 /*-------------------------------------------------------------------------*/
 WRITE16_HANDLER ( compis_gdc_w )
 {
-   /* FIXME: Move to better place. Must be signed and larger than 8 bits */  
+   /* FIXME: Move to better place. Must be signed and larger than 8 bits */
    static INT16 last_command = -1;
    /* FIXME: Move to better place */
    static int nbr_expected_params = 17;
-   
+
 	switch (offset)
 	{
 		case 0x00:	/* Parameter into FIFO */
@@ -1266,13 +1266,13 @@ WRITE16_HANDLER ( compis_gdc_w )
 		case 0x01:	/* Command into FIFO */
 			if (LOG_PORTS)
             logerror("GDC Port %04X (CMD) Write %02X\n", offset, data);
-         
+
          if ( last_command >= 0 ) {
             /* If there is a command in the fifo we can process that one now */
-            /* Later we should add a counter for the params too */               
+            /* Later we should add a counter for the params too */
             gdc_command_processor(last_command & 0xff);
          }
-         
+
          /* Check if it is a command without parameters, if so process it now */
          if ( gdc_nbr_expected_params(data) == 0 ) {
             GDC_LOG_CMD_1("GDC: Command takes zero parameters\n");
@@ -1282,7 +1282,7 @@ WRITE16_HANDLER ( compis_gdc_w )
             /* Save the command */
             last_command = data;
             nbr_expected_params = gdc_nbr_expected_params(data);
-         }         
+         }
 			break;
 
 		default:
@@ -1300,12 +1300,12 @@ WRITE16_HANDLER ( compis_gdc_w )
 READ16_HANDLER (compis_gdc_r)
 {
 	UINT16 data;
-   
+
 	data = 0xff;
-	
+
 	switch(offset & 0x07) {
 		case 0x00:	/* Status register */
-         
+
 			GDC_LOG_CMD_3("%04X: GDC Port %04X (Status) Read",
                        activecpu_get_pc(), offset);
          /* Optimize this later, i.e. when we know what to return */
@@ -1319,7 +1319,7 @@ READ16_HANDLER (compis_gdc_r)
 			break;
 
 		case 0x01:	/* FIFO Read */
-         
+
 			GDC_LOG_CMD_3("%04X: GDC Port %04X (Fifo) Read",
                        activecpu_get_pc(),
                        offset);
@@ -1443,7 +1443,7 @@ VIDEO_UPDATE(compis_gdc)
 	/* TODO - copy only the dirty parts of the memory to the bitmap */
 	/* Or plot stuff in write-functions until scrolling occurs */
 	dirty = gdc_mess.dirty;
-	if (dirty) 
+	if (dirty)
 	{
 /*      TYP_GDC_REGS_DISPLAY* dispregs = &gdc.registers.display; */
 		UINT32 base_addr = gdc_get_base_addr(&gdc);

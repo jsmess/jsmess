@@ -313,7 +313,7 @@ static void concept_image_info(imgtool_image *img, char *string, size_t len)
 }
 
 /*
-	Open the disk catalog for enumeration 
+	Open the disk catalog for enumeration
 */
 static imgtoolerr_t concept_image_beginenum(imgtool_directory *enumeration, const char *path)
 {

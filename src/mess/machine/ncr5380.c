@@ -1,7 +1,7 @@
 /*
  * ncr5380.c
  *
- * NCR 5380 SCSI controller, as seen in many 680x0 Macs, 
+ * NCR 5380 SCSI controller, as seen in many 680x0 Macs,
  * official Apple add-on cards for the Apple II series,
  * and probably some PC cards as well.
  *
@@ -13,7 +13,7 @@
  *
  * NOTES:
  * This implementation is tied closely to the drivers found in the Mac Plus ROM and the routines in Mac
- * System 6.0.3 that it patches out the ROM traps with.  While attempts have been made to 
+ * System 6.0.3 that it patches out the ROM traps with.  While attempts have been made to
  * have the behavior work according to the manual and not the specific Apple driver code,
  * there are almost certainly areas where that is true.  In particular, IRQs are not implemented
  * as they are unused on the Mac Plus.
@@ -53,7 +53,7 @@ static const char *const wnames[] =
 typedef struct
 {
 	void *data;		// device's "this" pointer
-	pSCSIDispatch handler;	// device's handler routine	
+	pSCSIDispatch handler;	// device's handler routine
 } SCSIDev;
 
 static SCSIDev devices[8];	// SCSI IDs 0-7
@@ -178,7 +178,7 @@ WRITE8_HANDLER(ncr5380_w)
 						d_limit = devices[last_id].handler(SCSIOP_EXEC_COMMAND, devices[last_id].data, 0, &n5380_Command[0]);
 
 						d_ptr = 0;
-	
+
 						// is data available?
 						if (d_limit > 0)
 						{
@@ -187,7 +187,7 @@ WRITE8_HANDLER(ncr5380_w)
 							{
 								n5380_Data[d_limit] = 0;
 							}
-						
+
 							// read back the amount available, or 512 bytes, whichever is smaller
 							ncr5380_read_data((d_limit < 512) ? d_limit : 512, n5380_Data);
 
@@ -240,7 +240,7 @@ WRITE8_HANDLER(ncr5380_w)
 				n5380_Registers[R5380_INICOMMAND] &= ~0x20;	// clear "lost arbitration"
 			}
 
-			if (data == 0)	
+			if (data == 0)
 			{
 				// drop DMA mode
 				n5380_Registers[R5380_BUSANDSTAT] &= ~0x40;
@@ -287,7 +287,7 @@ READ8_HANDLER(ncr5380_r)
 	{
 		case R5380_CURDATA:
 			rv = n5380_Registers[reg];
-			
+
 			// if we're in the data transfer phase, readback device data instead
 			if ((n5380_Registers[R5380_BUSSTATUS] & 0x1c) == 0x04)
 			{
@@ -306,7 +306,7 @@ READ8_HANDLER(ncr5380_r)
 				 	if (d_ptr < 511)
 					{
 						d_ptr++;
-					}	
+					}
 					else
 					{
 						d_limit -= 512;
@@ -350,7 +350,7 @@ extern void ncr5380_init( const struct NCR5380interface *interface )
 		/* compilation error */
 		/* devices[interface->scsidevs->devices[i].scsiID].handler = interface->scsidevs->devices[i].handler; */
 		/* interface->scsidevs->devices[i].handler(SCSIOP_ALLOC_INSTANCE, &devices[interface->scsidevs->devices[i].scsiID].data, interface->scsidevs->devices[i].diskID, (UINT8 *)NULL); */
-	}	
+	}
 
 	state_save_register_item_array("ncr5380", 0, n5380_Registers);
 	state_save_register_item_array("ncr5380", 0, n5380_Command);

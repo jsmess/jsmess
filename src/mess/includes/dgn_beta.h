@@ -42,7 +42,7 @@
 
 /***** Video Modes *****/
 
-typedef enum 
+typedef enum
 {
 	TEXT_40x25,					/* Text mode 40x25 */
 	TEXT_80x25,					/* Text mode 80x25 */
@@ -50,7 +50,7 @@ typedef enum
 	GRAPH_320x256x16,				/* Graphics 320x256x16 */
 	GRAPH_640x512x2					/* Graphics 640X512X2 */
 } BETA_VID_MODES;
-	
+
 /*----------- defined in machine/dgn_beta.c -----------*/
 
 MACHINE_START( dgnbeta );

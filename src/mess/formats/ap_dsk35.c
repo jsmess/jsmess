@@ -8,7 +8,7 @@
 	and the Apple IIgs.
 
 	These disks have the following properties:
-		
+
 		400k:	80 tracks, 1 head
 		800k:	80 tracks, 2 heads
 
@@ -732,7 +732,7 @@ static floperr_t apple35_write_track(floppy_image *floppy, int head, int track, 
 		if ((found_sectors & (1 << sector)) == 0)
 		{
 			sony_denibblize35(sector_data, nibble_data, checksum);
-	
+
 			/* write the sector */
 			err = apple35_write_sector_td(floppy, head, track, sector, sector_data, sizeof(sector_data) / sizeof(sector_data[0]));
 			if (err)
@@ -831,7 +831,7 @@ static FLOPPY_CONSTRUCT(apple35_raw_construct)
 			sides = 1;
 			is_1440k = FALSE;
 		}
-		else if ((size == 80*2*10*512) || (size == 80*2*18*512)) 
+		else if ((size == 80*2*10*512) || (size == 80*2*18*512))
 		{
 			sides = 2;
 			is_1440k = (size == 80*2*18*512);
@@ -963,7 +963,7 @@ static FLOPPY_CONSTRUCT(apple35_diskcopy_construct)
 		header.magic = BIG_ENDIANIZE_INT16(0x100);
 
 		floppy_image_write(floppy, &header, 0, sizeof(header));
-		floppy_image_write_filler(floppy, 0, sizeof(header), data_size + tag_size); 
+		floppy_image_write_filler(floppy, 0, sizeof(header), data_size + tag_size);
 	}
 
 	/* load */
@@ -1137,7 +1137,7 @@ FLOPPY_OPTIONS_START( apple35_iigs )
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",	"Apple DiskCopy disk image",	apple35_diskcopy_identify,	apple35_diskcopy_construct,	
+	FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",	"Apple DiskCopy disk image",	apple35_diskcopy_identify,	apple35_diskcopy_construct,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])

@@ -35,7 +35,7 @@
  */
 
 /*
- * .dsk multidisks are used by fmsx-dos 1.6. These files are always double 
+ * .dsk multidisks are used by fmsx-dos 1.6. These files are always double
  * sided 3.5" disks (720kB), simply appended to one another.
  */
 
@@ -46,7 +46,7 @@
 
 
 typedef struct {
-	imgtool_image			base; 
+	imgtool_image			base;
 	char			*file_name;
 	imgtool_stream 			*file_handle;
 	int 			size, format, disks;
@@ -178,9 +178,9 @@ static int msx_dsk_image_init(const imgtool_module *mod, imgtool_stream *f, imgt
     UINT8 header;
 
 	size = stream_size (f);
-	if (size < (360*1024) ) 
+	if (size < (360*1024) )
 		return IMGTOOLERR_MODULENOTFOUND;
-	
+
 	disks = 1;
 
 	correct = 0;
@@ -188,7 +188,7 @@ static int msx_dsk_image_init(const imgtool_module *mod, imgtool_stream *f, imgt
 	if (!strcmp(mod->name, "msx_img"))
 	{
 		format = FORMAT_IMG;
-		if (1 != stream_read (f, &header, 1) ) 
+		if (1 != stream_read (f, &header, 1) )
 			return IMGTOOLERR_READERROR;
 
 		if ( (size == (720*1024+1) ) && (header == 2) )
@@ -232,7 +232,7 @@ static int msx_dsk_image_init(const imgtool_module *mod, imgtool_stream *f, imgt
 		assert(0);
 		return IMGTOOLERR_UNEXPECTED;
 	}
-	
+
 	if (!correct) return IMGTOOLERR_MODULENOTFOUND;
 
 	image = (DSK_IMAGE*)malloc (sizeof (DSK_IMAGE) );
@@ -267,7 +267,7 @@ static int msx_dsk_image_beginenum(imgtool_image *img, imgtool_directory **outen
 	iter=*(DSK_ITERATOR**)outenum = (DSK_ITERATOR*) malloc(sizeof(DSK_ITERATOR));
 	if (!iter) return IMGTOOLERR_OUTOFMEMORY;
 
-	iter->base.module = image->base.module; 
+	iter->base.module = image->base.module;
 	iter->image=image;
 	iter->index = 1;
 
@@ -314,10 +314,10 @@ static int msx_dsk_image_readfile(imgtool_image *img, const char *fname, imgtool
 	/*  check file name */
 	switch (image->format)
 		{
-		case FORMAT_IMG: 
-		case FORMAT_DDI: 
-		case FORMAT_MSX: 
-			if (strcmpi (fname, "msx.dsk") ) 
+		case FORMAT_IMG:
+		case FORMAT_DDI:
+		case FORMAT_MSX:
+			if (strcmpi (fname, "msx.dsk") )
 				return IMGTOOLERR_MODULENOTFOUND;
 			break;
 		case FORMAT_MULTI:
@@ -359,11 +359,11 @@ static int msx_dsk_image_readfile(imgtool_image *img, const char *fname, imgtool
 				}
 
 			return 0;
-		case FORMAT_IMG: 
-			offset = 1; i = (image->size / 0x1200); 
+		case FORMAT_IMG:
+			offset = 1; i = (image->size / 0x1200);
 			break;
-		case FORMAT_DDI: 
-			offset = 0x1200; i = 160; 
+		case FORMAT_DDI:
+			offset = 0x1200; i = 160;
 			break;
 		case FORMAT_MULTI:	/* multi disk */
 			i = 160; offset = 720*1024 * (disks - 1);

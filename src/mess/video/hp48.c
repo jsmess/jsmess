@@ -79,17 +79,17 @@ static void hp48_draw_special(mame_bitmap *bitmap,int x, int y, const char *figu
 	int j, xi=0;
 	for (j=0; figure[j]; j++) {
 		switch (figure[j]) {
-		case '1': 
+		case '1':
 			*BITMAP_ADDR16(bitmap, y, x+xi) = color;
 			xi++;
 			break;
-		case ' ': 
+		case ' ':
 			xi++;
 			break;
 		case '\r':
 			xi=0;
 			y++;
-			break;				
+			break;
 		};
 	}
 }
@@ -97,7 +97,7 @@ static void hp48_draw_special(mame_bitmap *bitmap,int x, int y, const char *figu
 
 #define LCD_LINES (hp48_hardware.data[0x28]|((hp48_hardware.data[0x29]&3)<<4)
 
-static const char *hp48_orange={ 
+static const char *hp48_orange={
 	"11111111111\r"
 	"111 1111111\r"
 	"11  1111111\r"
@@ -172,7 +172,7 @@ VIDEO_UPDATE( hp48 )
 
 	for (y=0,i=LCD_BASE_ADDRESS; y<64; y+=8, i+=LCD_LINE_OFFSET) {
 		for (x=0; x<131; x++) {
-			drawgfx(bitmap, machine->gfx[0], 
+			drawgfx(bitmap, machine->gfx[0],
 					program_read_byte(i+x),
 					contrast,0,0,
 					x*2+RIGHT,y*2+DOWN,

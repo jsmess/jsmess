@@ -292,7 +292,7 @@ static void customize_switches(HWND wnd, int title_string_num, UINT32 ipt_name, 
 	input_port_entry *in;
 	const char *switch_name = NULL;
 	UINT32 type;
-	
+
 	dlg = win_dialog_init(ui_getstring(title_string_num), NULL);
 	if (!dlg)
 		goto done;
@@ -397,7 +397,7 @@ static void customize_analogcontrols(HWND wnd)
 	const char *name;
 	char buf[255];
 	static const struct dialog_layout layout = { 120, 52 };
-	
+
 	dlg = win_dialog_init(ui_getstring(UI_analogcontrols), &layout);
 	if (!dlg)
 		goto done;
@@ -555,7 +555,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 
 	// compute our parameters
 	dev = params->dev;
-	guide = dev->createimage_optguide;	
+	guide = dev->createimage_optguide;
 	optspec = dev->createimage_options[format_combo_val].optspec;
 
 	// set the default extension
@@ -611,7 +611,7 @@ static void storeval_option_resolution(void *storeval_param, int val)
 	struct storeval_optres_params *params;
 	const struct IODevice *dev;
 	char buf[16];
-	
+
 	params = (struct storeval_optres_params *) storeval_param;
 	dev = params->fdparams->dev;
 
@@ -764,7 +764,7 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 
 	// add the description
 	pos += snprintf(&dest[pos], dest_len - pos, "%s (", description);
-	
+
 	// add the extensions to the description
 	pos += copy_extension_list(&dest[pos], dest_len - pos, extensions);
 
@@ -903,7 +903,7 @@ static void paste(void)
 
 	if (!OpenClipboard(NULL))
 		return;
-	
+
 	h = GetClipboardData(CF_TEXT);
 	if (h)
 	{
@@ -1347,23 +1347,23 @@ static void prepare_menus(HWND wnd)
 			img = image_from_device_and_index(dev, i);
 
 			if (!dev->not_working)
-			{	
+			{
 				new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
 				flags_for_exists = MF_STRING;
-	
+
 				if (!image_exists(img))
 					flags_for_exists |= MF_GRAYED;
-	
+
 				flags_for_writing = flags_for_exists;
 				if (!image_is_writable(img))
 					flags_for_writing |= MF_GRAYED;
-	
+
 				sub_menu = CreateMenu();
 				append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		UI_mount);
-	
+
 				if (dev->creatable)
 					append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	UI_create);
-	
+
 				append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
 
 #if HAS_WAVE
@@ -1606,7 +1606,7 @@ static void help_about_thissystem(HWND wnd)
 static mess_image *decode_deviceoption(int command, int *devoption)
 {
 	int absolute_index;
-	
+
 	command -= ID_DEVICE_0;
 	absolute_index = command / DEVOPTION_MAX;
 
@@ -1915,7 +1915,7 @@ static void set_menu_text(HMENU menu_bar, int command, const char *text)
 	mii.cbSize = sizeof(mii);
 	mii.fMask = MIIM_TYPE;
 	mii.dwTypeData = t_text;
-	SetMenuItemInfo(menu_bar, command, FALSE, &mii);	
+	SetMenuItemInfo(menu_bar, command, FALSE, &mii);
 
 	// cleanup
 	free(t_text);

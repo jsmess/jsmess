@@ -118,14 +118,14 @@ static struct {
 	/* KB port A */
 	if (pc_ppi.keyboard_disabled)
 	{
-		/*   0  0 - no floppy drives  
-		 *   1  Not used  
-		 * 2-3  The number of memory banks on the system board  
+		/*   0  0 - no floppy drives
+		 *   1  Not used
+		 * 2-3  The number of memory banks on the system board
 		 * 4-5  Display mode
 		 *	    11 = monochrome
 		 *      10 - color 80x25
-		 *      01 - color 40x25  
-		 * 6-7  The number of floppy disk drives  
+		 *      01 - color 40x25
+		 * 6-7  The number of floppy disk drives
 		 */
 		data = readinputport(1);
 	}

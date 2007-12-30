@@ -37,7 +37,7 @@
 #define THOM_SECT_INVALID  1 /* invalid header */
 
 
-typedef struct 
+typedef struct
 {
 
 	/* disk info */
@@ -81,7 +81,7 @@ static void thom_qdd_compute_map ( void )
 	{
 		{ 20,  2, 14,  8 }, { 21, 19, 13,  7 },
 		{ 22, 18, 12,  6 }, { 23, 17, 11,  5 },
-		{ 24, 16, 10,  4 }, {  1, 15,  9,  3 } 
+		{ 24, 16, 10,  4 }, {  1, 15,  9,  3 }
 	};
 	static const int q[4] = { 0, 8, 4, 12 };
 	int t, s;
@@ -97,7 +97,7 @@ static void thom_qdd_compute_map ( void )
 		thom_qdd_map[ 24*16 + s ] = q[ s%4 ] + (s/4);
 	}
 	LOG(( "thom_qdd_compute_map: QDD sector map\n" ));
-	for ( s = 0; s < 25; s++ ) 
+	for ( s = 0; s < 25; s++ )
 	{
 		for ( t = 0; t < 16; t++ )
 		{
@@ -111,19 +111,19 @@ static void thom_qdd_compute_map ( void )
 
 static UINT8* thom_floppy_sector_ptr ( thom_floppy_drive* d, int sector, int track, int side )
 {
-	if ( track >= d->tracks ) 
+	if ( track >= d->tracks )
 		track =  d->tracks - 1;
-	if ( track < 0 ) 
+	if ( track < 0 )
 		track = 0;
 
-	if ( d->data && sector >= 1 && sector <= d->sectors && side >= 0 && side < d->sides ) 
+	if ( d->data && sector >= 1 && sector <= d->sectors && side >= 0 && side < d->sides )
 	{
 		int s = track * d->sectors + sector - 1;
-		if ( d -> type == THOM_FLOPPY_QDD ) 
+		if ( d -> type == THOM_FLOPPY_QDD )
 		{
-			if ( s >= 0 && s < 400 ) 
+			if ( s >= 0 && s < 400 )
 				s = thom_qdd_map[ s ];
-			else 
+			else
 				return NULL;
 		}
 		return d->data + ( side * d->tracks * d->sectors + s ) * d->sector_size;
@@ -134,13 +134,13 @@ static UINT8* thom_floppy_sector_ptr ( thom_floppy_drive* d, int sector, int tra
 
 
 
-static UINT8* thom_floppy_sector_flag ( thom_floppy_drive* d, 
+static UINT8* thom_floppy_sector_flag ( thom_floppy_drive* d,
 					int sector, int track, int side )
 {
 	int s = track * d->sectors + sector - 1;
-	if ( d -> type == THOM_FLOPPY_QDD ) 
+	if ( d -> type == THOM_FLOPPY_QDD )
 		s = thom_qdd_map[ s ];
-	return 
+	return
 		d->sect_flag + side * d->tracks * d->sectors + s;
 }
 
@@ -152,8 +152,8 @@ static void thom_floppy_show ( thom_floppy_drive* d )
 	/* format */
 	PRINT (( "thom_floppy: drive %li, %s floppy, %s-sided, %i-byte sectors, %s, %i track(s), %i sectors, %i KB\n",
 		 (long) (d - thom_floppy_drives),
-		 (d->type == THOM_FLOPPY_5_1_4) ? "5\"1/4" : 
-		 (d->type == THOM_FLOPPY_3_1_2) ? "3\"1/2" : 
+		 (d->type == THOM_FLOPPY_5_1_4) ? "5\"1/4" :
+		 (d->type == THOM_FLOPPY_3_1_2) ? "3\"1/2" :
 		 (d->type == THOM_FLOPPY_QDD) ? "QDD" : "unknown type",
 		 (d->sides == 1) ? "one" : "two",
 		 d->sector_size,
@@ -162,7 +162,7 @@ static void thom_floppy_show ( thom_floppy_drive* d )
 		 (d->sides * d->tracks * d->sectors * d->sector_size) / 1024 ));
 	LOG (( "thom_floppy: drive %li loaded\n", d - thom_floppy_drives ));
 
-	if ( d->data ) 
+	if ( d->data )
 	{
 		UINT8* dir = d->data + 20 * 16 * d->sector_size;
 		char name[] = "01234567";
@@ -172,26 +172,26 @@ static void thom_floppy_show ( thom_floppy_drive* d )
 		memcpy( name, dir, 8 );
 		for ( i = 0; name[i]; i++ )
 		{
-			if ( name[i] < ' ' || name[i] >= 127 ) 
+			if ( name[i] < ' ' || name[i] >= 127 )
 				name[i] = '?';
 		}
 		PRINT (( "thom_floppy: floppy name \"%s\"\n", name ));
 
 		/* BASIC directory */
 		dir += d->sector_size*2;
-		for ( j = 0; j < d->sector_size * 14 / 32; j++, dir += 32 ) 
+		for ( j = 0; j < d->sector_size * 14 / 32; j++, dir += 32 )
 		{
 			char name[] = "01234567.ABC";
 			char comment[] = "01234567";
-			if ( *dir == 255 ) 
+			if ( *dir == 255 )
 				break; /* end of directory */
-			if ( *dir < ' ' || *dir > 127 ) 
+			if ( *dir < ' ' || *dir > 127 )
 				continue; /* empty entry */
 			memcpy( name, dir, 8 );
 			memcpy( name+9, dir+8, 3 );
 			for ( i = 0; name[i]; i++)
 			{
-				if ( name[i] < ' ' || name[i] >= 127 ) 
+				if ( name[i] < ' ' || name[i] >= 127 )
 					name[i] = '?';
 			}
 			memcpy( comment, dir + 16, 8 );
@@ -201,7 +201,7 @@ static void thom_floppy_show ( thom_floppy_drive* d )
 					comment[i] = '?';
 			}
 			PRINT (( "thom_floppy: file \"%s\" type=%s,%s comment=\"%s\"\n", name,
-				 (dir[11] == 0) ? "bas" : (dir[11] == 1) ? "dat" : 
+				 (dir[11] == 0) ? "bas" : (dir[11] == 1) ? "dat" :
 				 (dir[11] == 2) ? "bin" : (dir[11] == 3) ? "asm" : "???",
 				 (dir[12] == 0) ? "a" : (dir[12] == 0xff) ? "b" : "?", comment ));
 		}
@@ -221,9 +221,9 @@ static void thom_floppy_seek ( mess_image *image, int physical_track )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	thom_floppy_active( 0 );
-	if ( physical_track < 0 ) 
+	if ( physical_track < 0 )
 		physical_track = 0;
-	if ( physical_track >= 80 ) 
+	if ( physical_track >= 80 )
 		physical_track = 79;
 	LOG(( "%f thom_floppy_seek: dev=%li track=%i\n", attotime_to_double(timer_get_time()), d - thom_floppy_drives, physical_track ));
 	d->cur_track = physical_track;
@@ -234,33 +234,33 @@ static void thom_floppy_seek ( mess_image *image, int physical_track )
 static int thom_floppy_get_sectors_per_track( mess_image *image, int side )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
-	VLOG(( "thom_floppy_get_sectors_per_track: track=%i/%i dens=%s/%s\n", d->cur_track, d->tracks,  
-	       (thom_density == DEN_FM_LO) ? "FM" : "MFM", 
+	VLOG(( "thom_floppy_get_sectors_per_track: track=%i/%i dens=%s/%s\n", d->cur_track, d->tracks,
+	       (thom_density == DEN_FM_LO) ? "FM" : "MFM",
 	       (d->density == DEN_FM_LO) ? "FM" : "MFM" ));
 	return d->sectors;
 }
 
 
 
-static void thom_floppy_get_id ( mess_image* image, chrn_id* id, 
+static void thom_floppy_get_id ( mess_image* image, chrn_id* id,
 				 int id_index, int physical_side )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	int trk =  d->cur_track;
-	if ( trk >= d->tracks ) 
+	if ( trk >= d->tracks )
 		trk = d->tracks - 1;
-	VLOG(( "thom_floppy_get_id: dev=%li track=%i idx=%i phy-side=%i dens=%s/%s\n", 
+	VLOG(( "thom_floppy_get_id: dev=%li track=%i idx=%i phy-side=%i dens=%s/%s\n",
 	       d - thom_floppy_drives, trk, id_index, physical_side,
-	       (thom_density == DEN_FM_LO) ? "FM" : "MFM", 
+	       (thom_density == DEN_FM_LO) ? "FM" : "MFM",
 	       (d->density == DEN_FM_LO) ? "FM" : "MFM" ));
 	thom_floppy_active( 0 );
-	if ( thom_floppy_sector_ptr( d, id_index+1, trk, 0 ) && 
+	if ( thom_floppy_sector_ptr( d, id_index+1, trk, 0 ) &&
 #if 0
 	     /* fails with bobwinter */
-	     * thom_floppy_sector_flag( d, id_index+1, trk, 0 ) == 
-	     THOM_SECT_OK && 
+	     * thom_floppy_sector_flag( d, id_index+1, trk, 0 ) ==
+	     THOM_SECT_OK &&
 #endif
-	     thom_density == d->density ) 
+	     thom_density == d->density )
 	{
 		int index = ( id_index * thom_floppy_interlace ) % d->sectors;
 		id->C = d->cur_track;
@@ -270,7 +270,7 @@ static void thom_floppy_get_id ( mess_image* image, chrn_id* id,
 		id->data_id = 1 + index;
 		id->flags = 0;
 	}
-	else 
+	else
 	{
 		/* error */
 		id->C = 0;
@@ -279,9 +279,9 @@ static void thom_floppy_get_id ( mess_image* image, chrn_id* id,
 		id->N = 0;
 		id->data_id = 0;
 		id->flags = 0;
-		logerror( "thom_floppy_get_id: invalid operation dev=%li track=%i idx=%i phy-side=%i dens=%s/%s\n", 
-			  (long) (d - thom_floppy_drives), d->cur_track, id_index, physical_side, 
-			  (thom_density == DEN_FM_LO) ? "FM" : "MFM", 
+		logerror( "thom_floppy_get_id: invalid operation dev=%li track=%i idx=%i phy-side=%i dens=%s/%s\n",
+			  (long) (d - thom_floppy_drives), d->cur_track, id_index, physical_side,
+			  (thom_density == DEN_FM_LO) ? "FM" : "MFM",
 			  (d->density == DEN_FM_LO) ? "FM" : "MFM" );
 	}
 }
@@ -294,7 +294,7 @@ static void thom_floppy_read_sector_data_into_buffer ( mess_image* image, int si
 	UINT8* src = thom_floppy_sector_ptr( d, index1, d->cur_track, 0 );
 	thom_floppy_active( 0 );
 	LOG(( "thom_floppy_read_sector_data_into_buffer: dev=%li track=%i idx=%i side=%i len=%i\n", d - thom_floppy_drives, d->cur_track, index1, side, length ));
-	if ( length > d->sector_size ) 
+	if ( length > d->sector_size )
 	{
 		logerror( "thom_floppy_read_sector_data_into_buffer: sector size %i truncated to %i\n", length, d->sector_size );
 		length = d->sector_size;
@@ -311,7 +311,7 @@ static void thom_floppy_write_sector_data_from_buffer ( mess_image *image, int s
 	UINT8* dst = thom_floppy_sector_ptr( d, data_id, d->cur_track, 0 );
 	thom_floppy_active( 1 );
 	LOG(( "thom_floppy_write_sector_data_into_buffer: dev=%li track=%i idx=%i side=%i ddam=%i len=%i\n", d - thom_floppy_drives, d->cur_track, data_id, side, ddam, length ));
-	if ( length > d->sector_size ) 
+	if ( length > d->sector_size )
 	{
 		logerror( "thom_floppy_write_sector_data_from_buffer: sector size %i truncated to %i\n", length, d->sector_size );
 		length = d->sector_size;
@@ -332,25 +332,25 @@ static void thom_floppy_format_sector ( mess_image *image, int side, int sector_
 	UINT8* dst;
 	thom_floppy_active( 1 );
 	LOG(( "thom_floppy_format_sector: dev=%li track=%i/%i side=%i/%i idx=%i/%i c=%i h=%i r=%i n=%i filler=$%02X\n",
-	      d - thom_floppy_drives, 
+	      d - thom_floppy_drives,
 	      d->cur_track, d->tracks, side, d->sides, sector_index, d->sectors,
 	      c, h, r, n, filler ));
 
-	if ( d -> type != THOM_FLOPPY_QDD ) 
+	if ( d -> type != THOM_FLOPPY_QDD )
 	{
-		if ( sector_size != d->sector_size || ( d->cur_track >= d->tracks && d->tracks == 40 ) ) 
+		if ( sector_size != d->sector_size || ( d->cur_track >= d->tracks && d->tracks == 40 ) )
 		{
 			/* need to change image params */
-			if ( d->cur_track >= 40 ) 
+			if ( d->cur_track >= 40 )
 				d->tracks = 80;
-			d->sector_size = sector_size; 
+			d->sector_size = sector_size;
 			d->density = thom_density;
 			d->data = realloc( d->data, d->sides * d->tracks * d->sectors * d->sector_size );
 			LOG (( "thom_floppy_format_sector: image enlarged to sides=%i tracks=%i sectors=%i sector_size=%i\n",d->sides, d->tracks, d->sectors, d->sector_size  ));
 			assert( d->data );
 		}
 	}
-	
+
 	dst = thom_floppy_sector_ptr( d, r, d->cur_track, 0 );
 	if ( dst )
 	{
@@ -358,13 +358,13 @@ static void thom_floppy_format_sector ( mess_image *image, int side, int sector_
 		* thom_floppy_sector_flag( d, r, d->cur_track, 0 ) = THOM_SECT_OK;
 		d->has_changed = 1;
 	}
-	else 
+	else
 		logerror( "thom_floppy_format_sector: invalid operation\n" );
 }
 
 
 
-static const floppy_interface thom_floppy_interface = 
+static const floppy_interface thom_floppy_interface =
 {
 	thom_floppy_seek,
 	thom_floppy_get_sectors_per_track,
@@ -387,7 +387,7 @@ static int thom_floppy_fd_load ( mess_image* image )
 	int size = image_length( image );
 
 	/* O-sized => create */
-	if ( !size ) 
+	if ( !size )
 	{
 		PRINT(( "new image created in drive %i\n", image_index_in_device( image ) ));
 		d->sides = 1;
@@ -401,18 +401,18 @@ static int thom_floppy_fd_load ( mess_image* image )
 		memset( d->data, 0xff, d->sector_size * d->sectors * d->tracks * d->sides );
 		return INIT_PASS;
 	}
-  
+
 	/* load */
 	d->data = malloc( size );
 	assert( d->data );
-	if ( image_fread( image, d->data, size ) != size ) 
+	if ( image_fread( image, d->data, size ) != size )
 	{
 		logerror( "thom_floppy_fd_load: read error\n" );
 		goto error;
 	}
 
 	/* guess format: TODO two-sided images */
-	if ( size == 81920 ) 
+	if ( size == 81920 )
 	{
 		d->type = THOM_FLOPPY_5_1_4;
 		d->tracks = 40;
@@ -421,7 +421,7 @@ static int thom_floppy_fd_load ( mess_image* image )
 		d->density = DEN_FM_LO;
 		d->sector_size = 128;
 	}
-	else if ( size == 163840 ) 
+	else if ( size == 163840 )
 	{
 #if 0
 		/* this undocumented case can actually be built by the TO9 */
@@ -439,7 +439,7 @@ static int thom_floppy_fd_load ( mess_image* image )
 		d->density = DEN_MFM_LO;
 		d->sector_size = 256;
 	}
-	else if ( size == 327680 ) 
+	else if ( size == 327680 )
 	{
 		d->type = THOM_FLOPPY_3_1_2;
 		d->tracks = 80;
@@ -453,7 +453,7 @@ static int thom_floppy_fd_load ( mess_image* image )
 		logerror( "thom_floppy_fd_load: disk format not recognized\n" );
 		goto error;
 	}
-  
+
 	memset( d->sect_flag, THOM_SECT_OK, sizeof( d->sect_flag ) );
 
 	thom_floppy_show( d );
@@ -463,8 +463,8 @@ static int thom_floppy_fd_load ( mess_image* image )
 
 error:
 	PRINT(( "could not load floppy image in drive %i\n", image_index_in_device( image ) ));
-	if ( d->data ) 
-		free( d->data ); 
+	if ( d->data )
+		free( d->data );
 	d->data = NULL;
 	d->type = THOM_FLOPPY_NONE;
 	return INIT_FAIL;
@@ -476,9 +476,9 @@ static void thom_floppy_fd_save ( mess_image* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	unsigned size = d->sides * d->tracks * d->sectors * d->sector_size;
-	if ( !d->data ) 
+	if ( !d->data )
 		return;
-	if ( !d->has_changed ) 
+	if ( !d->has_changed )
 		return;
 	PRINT (( "thom_floppy_fd_save: saving floppy %li, %i KB\n", (long) (d - thom_floppy_drives), size / 1024 ));
 
@@ -503,9 +503,9 @@ static int thom_floppy_qd_load ( mess_image* image )
 {
 	thom_floppy_drive* d = thom_floppy_drives + image_index_in_device( image );
 	int size = image_length( image );
-  
+
 	/* only one format, TODO two-sided images */
-	if ( size == 51200 || size == 0 ) 
+	if ( size == 51200 || size == 0 )
 	{
 		d->type = THOM_FLOPPY_QDD;
 		d->tracks = 1;
@@ -514,7 +514,7 @@ static int thom_floppy_qd_load ( mess_image* image )
 		d->density = DEN_MFM_LO;
 		d->sector_size = 128;
 	}
-	else 
+	else
 	{
 		logerror( "thom_floppy_qd_load: disk format not recognized\n" );
 		return INIT_FAIL;
@@ -525,13 +525,13 @@ static int thom_floppy_qd_load ( mess_image* image )
 	memset( d->data, 0xff, d->sector_size * d->sectors * d->tracks * d->sides );
 	memset( d->sect_flag, THOM_SECT_OK, sizeof( d->sect_flag ) );
 
-	if  ( !size ) 
+	if  ( !size )
 	{
 		PRINT(( "new image created in drive %i\n", image_index_in_device( image ) ));
 		return INIT_PASS;
 	}
 
-	if ( image_fread( image, d->data, size ) != size ) 
+	if ( image_fread( image, d->data, size ) != size )
 	{
 		logerror( "thom_floppy_qd_load: read error\n" );
 		goto error;
@@ -543,8 +543,8 @@ static int thom_floppy_qd_load ( mess_image* image )
 
 error:
 	PRINT(( "could not load floppy image in drive %i\n", image_index_in_device( image ) ));
-	if ( d->data ) 
-		free( d->data ); 
+	if ( d->data )
+		free( d->data );
 	d->data = NULL;
 	d->type = THOM_FLOPPY_NONE;
 	return INIT_FAIL;
@@ -558,7 +558,7 @@ static void thom_floppy_qd_save ( mess_image* image )
 	unsigned size = d->sides * d->tracks * d->sectors * d->sector_size;
 	if ( !d->data )
 		return;
-	if ( !d->has_changed ) 
+	if ( !d->has_changed )
 		return;
 	PRINT (( "thom_floppy_qd_save: saving floppy %li, %i KB\n", (long) (d - thom_floppy_drives), size / 1024 ));
 	/* TODO: truncation */
@@ -580,7 +580,7 @@ static const char sap_header[] =
 	"(c) Alexandre PUKALL Avril 1998";
 
 
-static const UINT16 sap_crc[] = 
+static const UINT16 sap_crc[] =
 {
 	0x0000, 0x1081, 0x2102, 0x3183,   0x4204, 0x5285, 0x6306, 0x7387,
 	0x8408, 0x9489, 0xa50a, 0xb58b,   0xc60c, 0xd68d, 0xe70e, 0xf78f,
@@ -589,10 +589,10 @@ static const UINT16 sap_crc[] =
 
 
 static UINT16 thom_sap_crc( UINT8* data, int size )
-{  
+{
 	int i;
 	UINT16 crc = 0xffff, crc2;
-	for ( i = 0; i < size; i++ ) 
+	for ( i = 0; i < size; i++ )
 	{
 		crc2 = ( crc >> 4 ) ^ sap_crc[ ( crc ^ data[i] ) & 15 ];
 		crc = ( crc2 >> 4 ) ^ sap_crc[ ( crc2 ^ (data[i] >> 4) ) & 15 ];
@@ -612,7 +612,7 @@ static int thom_floppy_sap_load ( mess_image* image )
 	int i, format;
 
 	/* O-sized => create */
-	if ( !size ) 
+	if ( !size )
 	{
 		PRINT(( "new image created in drive %i\n", image_index_in_device( image ) ));
 		d->sides = 1;
@@ -629,7 +629,7 @@ static int thom_floppy_sap_load ( mess_image* image )
 
 	/* check header */
 	image_fread( image, buf, 66 );
-	if ( memcmp( buf+1, sap_header+1, 65 ) ) 
+	if ( memcmp( buf+1, sap_header+1, 65 ) )
 	{
 		logerror( "thom_floppy_sap_load: invalid sap header\n" );
 		return INIT_FAIL;
@@ -643,7 +643,7 @@ static int thom_floppy_sap_load ( mess_image* image )
 	d->sector_size = (format==1) ? 128 : 256;
 	d->tracks = 0;
 	d->sectors = 16;
-	for ( i = 66; i+4 < size; i += d->sector_size + 6 ) 
+	for ( i = 66; i+4 < size; i += d->sector_size + 6 )
 	{
 		int fmt, prot, track, sector;
 		image_fseek( image, i, SEEK_SET );
@@ -653,28 +653,28 @@ static int thom_floppy_sap_load ( mess_image* image )
 		track  = buf[2];
 		sector = buf[3];
 		LOG(( "thom_floppy_sap_load: drive %i found sector %i on track %i, fmt=%i, prot=%i\n", drive, sector, track, fmt, prot ));
-		if ( sector < 1 || sector > d->sectors ) 
+		if ( sector < 1 || sector > d->sectors )
 		{
 			logerror( "thom_floppy_sap_load: invalid sector %i (must be in 1..16)\n", sector );
 			goto error;
 		}
-		if ( track >= d->tracks ) 
+		if ( track >= d->tracks )
 			d->tracks = track+1;
 	}
-  
-	switch ( d->tracks ) 
+
+	switch ( d->tracks )
 	{
 	case 40: d->type = THOM_FLOPPY_5_1_4; break;
 	case 80: d->type = THOM_FLOPPY_3_1_2; break;
-	default: 
-		logerror( "thom_floppy_sap_load: invalid track number %i\n", d->tracks ); 
+	default:
+		logerror( "thom_floppy_sap_load: invalid track number %i\n", d->tracks );
 		goto error;
 	}
 
 	/* load */
 	d->data = malloc( d->tracks * d->sectors * d->sector_size );
 	assert( d->data );
-	for ( i = 0; i < d->tracks * d->sectors; i++ ) 
+	for ( i = 0; i < d->tracks * d->sectors; i++ )
 	{
 		UINT16 crc;
 		int j, fmt, prot, track, sector;
@@ -700,21 +700,21 @@ static int thom_floppy_sap_load ( mess_image* image )
 		/* check CRC */
 		crc = thom_sap_crc( buf, d->sector_size + 4 );
 		if ( ( (crc >> 8)   != buf[ d->sector_size + 4 ] ) ||
-		     ( (crc & 0xff) != buf[ d->sector_size + 5 ] ) ) 
+		     ( (crc & 0xff) != buf[ d->sector_size + 5 ] ) )
 		{
 			logerror( "thom_floppy_sap_load: CRC error for track %i, sector %i\n", track, sector );
 		}
 
-    
+
 	}
-  
+
 	thom_floppy_show( d );
- 
+
 	return INIT_PASS;
 
 error:
 	PRINT(( "could not load floppy image in drive %i\n", image_index_in_device( image ) ));
-	if ( d->data ) free( d->data ); 
+	if ( d->data ) free( d->data );
 	d->data = NULL;
 	d->type = THOM_FLOPPY_NONE;
 	return INIT_FAIL;
@@ -730,7 +730,7 @@ static void thom_floppy_sap_save ( mess_image* image )
 	UINT8 buf[262];
 	if ( !d->data )
 		return;
-	if ( !d->has_changed ) 
+	if ( !d->has_changed )
 		return;
 	PRINT (( "thom_floppy_sap_save: saving floppy %li, %i KB\n", (long) (d - thom_floppy_drives), size / 1024 ));
 
@@ -746,7 +746,7 @@ static void thom_floppy_sap_save ( mess_image* image )
 	/* write sectors */
 	for ( track = 0; track < d->tracks; track++ )
 	{
-		for ( sector = 1; sector <= d->sectors; sector++ ) 
+		for ( sector = 1; sector <= d->sectors; sector++ )
 		{
 			UINT8 *p = thom_floppy_sector_ptr( d, sector, track, 0 );
 			UINT16 crc;
@@ -765,7 +765,7 @@ static void thom_floppy_sap_save ( mess_image* image )
 			buf[ d->sector_size + 5 ] = crc & 0xff;
 
 			/* crypt data */
-			for ( i = 0; i < d->sector_size; i++ ) 
+			for ( i = 0; i < d->sector_size; i++ )
 				buf[ i + 4 ] ^= sap_magic_num;
 
 			image_fwrite( image, buf, d->sector_size + 6 );
@@ -781,7 +781,7 @@ static void thom_floppy_sap_save ( mess_image* image )
 
 static void thom_floppy_reset ( thom_floppy_drive* d )
 {
-	if ( d->data ) 
+	if ( d->data )
 		free( d->data );
 	d->data = NULL;
 	d->cur_track = 0;
@@ -812,16 +812,16 @@ int thom_floppy_load ( mess_image* image )
 	d->cur_track = 0;
 
 	/* dispatch according to extension */
-	if ( typ ) 
+	if ( typ )
 	{
-		if ( !mame_stricmp( typ, "sap" ) ) 
+		if ( !mame_stricmp( typ, "sap" ) )
 			return thom_floppy_sap_load( image );
-		else if ( !mame_stricmp( typ, "fd" ) ) 
+		else if ( !mame_stricmp( typ, "fd" ) )
 			return thom_floppy_fd_load( image );
-		else if ( !mame_stricmp( typ, "qd" ) ) 
+		else if ( !mame_stricmp( typ, "qd" ) )
 			return thom_floppy_qd_load( image );
 	}
-	
+
 	return INIT_FAIL;
 }
 
@@ -831,13 +831,13 @@ void thom_floppy_unload ( mess_image *image )
 {
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	const char* typ = image_filetype( image );
-	if ( typ ) 
+	if ( typ )
 	{
-		if ( !mame_stricmp( typ, "sap" ) )  
+		if ( !mame_stricmp( typ, "sap" ) )
 			thom_floppy_sap_save( image );
-		else if ( !mame_stricmp( typ, "fd" ) ) 
+		else if ( !mame_stricmp( typ, "fd" ) )
 			thom_floppy_fd_save( image );
-		else if ( !mame_stricmp( typ, "qd" ) ) 
+		else if ( !mame_stricmp( typ, "qd" ) )
 			thom_floppy_qd_save( image );
 	}
 	thom_floppy_reset( d );
@@ -853,7 +853,7 @@ int  thom_floppy_create ( mess_image *image, int create_format, option_resolutio
 
 	d->image = image;
 	d->cur_track = 0;
-	if ( typ && !mame_stricmp( typ, "qd" ) )  
+	if ( typ && !mame_stricmp( typ, "qd" ) )
 	{
 		d->sides = 1;
 		d->sectors = 400;
@@ -862,7 +862,7 @@ int  thom_floppy_create ( mess_image *image, int create_format, option_resolutio
 		d->density = DEN_MFM_LO;
 		d->type = THOM_FLOPPY_QDD;
 	}
-	else if ( typ && !mame_stricmp( typ, "fd" ) )  
+	else if ( typ && !mame_stricmp( typ, "fd" ) )
 	{
 		d->sides = 1;
 		d->sectors = 16;
@@ -871,7 +871,7 @@ int  thom_floppy_create ( mess_image *image, int create_format, option_resolutio
 		d->density = DEN_FM_LO;
 		d->type = THOM_FLOPPY_5_1_4;
 	}
-	else 
+	else
 	{
 		d->sides = 1;
 		d->sectors = 16;
@@ -913,7 +913,7 @@ DENSITY thom_floppy_get_density ( void )
 
 thom_floppy_type thom_floppy_get_type ( int drive )
 {
-	if ( drive < 0 || drive >= 4 ) 
+	if ( drive < 0 || drive >= 4 )
 		return THOM_FLOPPY_NONE;
 	else
 		return thom_floppy_drives[ drive ].type;
@@ -923,13 +923,13 @@ thom_floppy_type thom_floppy_get_type ( int drive )
 
 void thom_floppy_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
 {
-	switch ( state ) 
+	switch ( state )
 	{
 	case DEVINFO_INT_TYPE:
-		info->i = IO_FLOPPY; 
+		info->i = IO_FLOPPY;
 		break;
 	case DEVINFO_INT_READABLE:
-		info->i = 1; 
+		info->i = 1;
 		break;
 	case DEVINFO_INT_WRITEABLE:
 		info->i = 1;
@@ -977,7 +977,7 @@ void thom_floppy_getinfo( const device_class *devclass, UINT32 state, union devi
 		strcpy( info->s = device_temp_str(), __FILE__ );
 		break;
 	case DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy( info->s = device_temp_str(), "fd,qd,sap" ); 
+		strcpy( info->s = device_temp_str(), "fd,qd,sap" );
 		break;
 	}
 }

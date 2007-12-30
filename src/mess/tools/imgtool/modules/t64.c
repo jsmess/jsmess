@@ -12,10 +12,10 @@ typedef UINT32 littleulong;
 #define SET_UWORD(a,v) a=v
 #define SET_ULONG(a,v) a=v
 #else
-typedef struct { 
+typedef struct {
 	unsigned char low, high;
 } littleuword;
-typedef struct { 
+typedef struct {
 	unsigned char low, mid, high, highest;
 } littleulong;
 #define GET_UWORD(a) (a.low|(a.high<<8))
@@ -65,7 +65,7 @@ _______________
       16, 16    C64 file name
 
 */
- 
+
 typedef struct{
 	char dostext[0x20]; // dos text
 	littleuword version; // packed bcd
@@ -74,7 +74,7 @@ typedef struct{
 	littleuword reserved;
 	char description[24];
 } t64_header;
-	
+
 typedef struct {
 	unsigned char type;
 	unsigned char file_type;
@@ -194,7 +194,7 @@ static void t64_image_info(imgtool_image *img, char *string, const int len)
 	strncpy(name_with_null, HEADER(image)->description, 24);
 	sprintf(string,"%s\n%s\nversion:%.4x max entries:%d",
 			dostext_with_null,
-			name_with_null, 
+			name_with_null,
 			GET_UWORD(HEADER(image)->version),
 			HEADER(image)->max_entries);
 }
@@ -218,7 +218,7 @@ static int t64_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *en
 {
 	t64_iterator *iter=(t64_iterator*)enumeration;
 	ent->corrupt=0;
-	
+
 	for (;!(ent->eof=(iter->index>=GET_UWORD(HEADER(iter->image)->max_entries)));iter->index++ ){
 		if (ENTRY(iter->image, iter->index)->type==0) continue;
 		memset(ent->fname,0,17);
@@ -318,7 +318,7 @@ static int t64_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 			if (GET_ULONG(ENTRY(image,i)->offset)-pos>=size) continue;
 			size=GET_ULONG(ENTRY(image, i)->offset)-pos;
 		}
-		if ((size!=0)&&(image->size-pos-size!=0)) 
+		if ((size!=0)&&(image->size-pos-size!=0))
 			memmove(image->data+pos, image->data+pos+size, image->size-pos-size);
 		// correct offset positions in other entries
 		for (i=0;i<GET_UWORD(HEADER(image)->max_entries); i++) {
@@ -369,7 +369,7 @@ static int t64_image_deletefile(imgtool_image *img, const char *fname)
 		if (GET_ULONG(ENTRY(image,i)->offset)-pos>=size) continue;
 		size=GET_ULONG(ENTRY(image, i)->offset)-pos;
 	}
-	if ((size!=0)&&(image->size-pos-size!=0)) 
+	if ((size!=0)&&(image->size-pos-size!=0))
 		memmove(image->data+pos, image->data+pos+size, image->size-pos-size);
 	// correct offset positions in other entries
 	for (i=0;i<GET_UWORD(HEADER(image)->max_entries); i++) {
@@ -403,10 +403,10 @@ static int t64_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 	SET_UWORD(header.version, 0x0101);
 	SET_UWORD(header.max_entries, entries);
 	if (_options[T64_OPTION_LABEL].s) strcpy(header.description, _options[T64_OPTION_LABEL].s);
-	if (stream_write(f, &header, sizeof(t64_header)) != sizeof(t64_header)) 
+	if (stream_write(f, &header, sizeof(t64_header)) != sizeof(t64_header))
 		return  IMGTOOLERR_WRITEERROR;
 	for (i=0; i<entries; i++) {
-	if (stream_write(f, &entry, sizeof(t64_entry)) != sizeof(t64_entry)) 
+	if (stream_write(f, &entry, sizeof(t64_entry)) != sizeof(t64_entry))
 		return  IMGTOOLERR_WRITEERROR;
 	}
 

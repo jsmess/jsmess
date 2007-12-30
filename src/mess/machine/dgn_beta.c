@@ -3,9 +3,9 @@
   machine\dgn_beta.c (machine.c)
 
 	Moved out of dragon.c, 2005-05-05, P.Harvey-Smith.
-	
-	I decided to move this out of the main Dragon/CoCo source files, as 
-	the Beta is so radically different from the other Dragon machines that 
+
+	I decided to move this out of the main Dragon/CoCo source files, as
+	the Beta is so radically different from the other Dragon machines that
 	this made more sense (to me at least).
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
@@ -13,12 +13,12 @@
 
   References:
 	Disassembly of Dragon Beta ROM, examination of only (known) surviving board.
-	
+
   TODO:
 	Pretty much everything !
-	
+
 	Display working with 6845 taking data from rom.
-	
+
   2005-05-10
 	Memory banking seems to be working, as documented in code comments below.
 
@@ -26,33 +26,33 @@
 	CPU#2 now executes code correctly to do transfers from WD2797.
 
   2005-06-03
-  
+
 	When fed a standard OS-9 boot disk it reads in the boot file and attempts
 	to start it, not being able to find init, it fails. Hopefully I will
 	soon have an image of a Beta boot disk.
-	
+
   2005-11-29
-  
-	Major track tracing excersise on scans of bare beta board, reveal where a 
+
+	Major track tracing excersise on scans of bare beta board, reveal where a
 	whole bunch of the PIA lines go, especially the IRQs, most of them go back
 	to the IRQ line on the main CPU.
 
   2005-12-07
-  
+
 	First booted to OS9 prompt, did not execute startup scripts.
 
   2005-12-08
-	
+
 	Fixed density setting on WD2797, so density of read data is now
-	correctlty set as required by OS-9. This was the reason startup 
-	script was not being executed as Beta disks have a single denisty 
+	correctlty set as required by OS-9. This was the reason startup
+	script was not being executed as Beta disks have a single denisty
 	boot track, however the rest of the disk is double density.
 	Booted completely to OS-9, including running startup script.
-	
+
   2006-09-27
-  
+
 	Clean up of IRQ/FIRQ handling code allows correct booting again.
-	
+
 ***************************************************************************/
 
 #include <math.h>
@@ -197,7 +197,7 @@ static const struct bank_info_entry bank_info[] =
 	{ dgnbeta_ram_bG_w, 0xFF00, 0xFfff }
 };
 
-struct PageReg 
+struct PageReg
 {
 	int	value;			/* Value of the page register */
 	UINT8	*memory;		/* The memory it actually points to */
@@ -219,16 +219,16 @@ static int IsIOPage(int	Page)
 
 //
 // Memory pager, maps machine's 1Mb total address space into the 64K addressable by the 6809.
-// This is in some way similar to the system used on the CoCo 3, except the beta uses 4K 
+// This is in some way similar to the system used on the CoCo 3, except the beta uses 4K
 // pages (instead of 8K on the CoCo), and has 16 task registers instead of the 2 on the CoCo.
 //
-// Each block of 16 page registers (1 for each task), is paged in at $FE00-$FE0F, the bottom 
+// Each block of 16 page registers (1 for each task), is paged in at $FE00-$FE0F, the bottom
 // 4 bits of the PIA register at $FCC0 seem to contain which task is active.
 // bit 6 of the same port seems to enable the memory paging
 //
 // For the purpose of this driver any block that is not ram, and is not a known ROM block,
 // is mapped to the first page of the boot rom, I do not know what happens in the real
-// hardware, however this does allow the boot rom to correctly size the RAM. 
+// hardware, however this does allow the boot rom to correctly size the RAM.
 // this should probably be considdered a hack !
 //
 
@@ -247,7 +247,7 @@ static void UpdateBanks(int first, int last)
 	{
 		bank_start	= bank_info[Page].start;
 		bank_end	= bank_info[Page].end;
-		
+
 		if (!IsIOPage(Page))
 			MapPage	= PageRegs[TaskReg][Page].value;
 		else
@@ -258,7 +258,7 @@ static void UpdateBanks(int first, int last)
 		//
 		if ((MapPage*4) < ((mess_ram_size / 1024)-1))		// Block is ram
 		{
-			if (!IsIOPage(Page)) 		
+			if (!IsIOPage(Page))
 			{
 				readbank = &mess_ram[MapPage*RamPageSize];
 #ifdef MAME_DEBUG
@@ -278,13 +278,13 @@ static void UpdateBanks(int first, int last)
 			if (MapPage>0xfB)
 			{
 				if (Page!=IOPage+1)
-					readbank=&system_rom[(MapPage-0xFC)*0x1000];		
+					readbank=&system_rom[(MapPage-0xFC)*0x1000];
 				else
 					readbank=&system_rom[0x3F00];
 			}
 			else
 				readbank=system_rom;
-			
+
 			writebank=MWA8_ROM;
 		}
 
@@ -308,28 +308,28 @@ static void SetDefaultTask(void)
 {
 	int		Idx;
 
-#ifdef LOG_DEFAULT_TASK	
+#ifdef LOG_DEFAULT_TASK
 	logerror("SetDefaultTask()\n");
 	debug_console_printf("Set Default task\n");
 #endif
 
 	TaskReg=NoPagingTask;
-	
+
 	/* Reset ram pages */
 	for(Idx=0;Idx<ROMPage-1;Idx++)
 	{
 		PageRegs[TaskReg][Idx].value=NoMemPageValue;
-	}		
+	}
 
 	/* Reset RAM Page */
 	PageRegs[TaskReg][RAMPage].value=RAMPageValue;
-	
+
 	/* Reset Video mem page */
 	PageRegs[TaskReg][VideoPage].value=VideoPageValue;
 
 	/* Reset rom page */
 	PageRegs[TaskReg][ROMPage].value=ROMPageValue;
-	
+
 	/* Reset IO Page */
 	PageRegs[TaskReg][IOPage].value=IOPageValue;
 	PageRegs[TaskReg][IOPage+1].value=IOPageValue;
@@ -352,15 +352,15 @@ READ8_HANDLER( dgn_beta_page_r )
 // setup the mappings.
 
 WRITE8_HANDLER( dgn_beta_page_w )
-{	
+{
 	PageRegs[PIATaskReg][offset].value=data;
 
 #ifdef LOG_PAGE_WRITE
 	logerror("PageRegWrite : task=$%X  offset=$%X value=$%X\n",PIATaskReg,offset,data);
 #endif
 
-	if (EnableMapRegs) 
-	{		
+	if (EnableMapRegs)
+	{
 		UpdateBanks(offset,offset);
 		if (offset==15)
 			UpdateBanks(offset+1,offset+1);
@@ -459,9 +459,9 @@ void dgnbeta_ram_bG_w(offs_t offset, UINT8 data)
 	dgn_beta_bank_memory(offset,data,16);
 }
 
-/* 
-The keyrow being scanned for any key is the lest significant bit 
-of the output shift register that is zero, most of the time there should 
+/*
+The keyrow being scanned for any key is the lest significant bit
+of the output shift register that is zero, most of the time there should
 only be one row active e.g.
 
 Shifter		Row being scanned
@@ -473,8 +473,8 @@ etc.
 
 Returns row number or -1 if none selected.
 
-2006-12-03, P.Harvey-Smith, modified to scan from msb to lsb, and stop at 
-first row with zero, as the beta_test fills the shifter with zeros, rather 
+2006-12-03, P.Harvey-Smith, modified to scan from msb to lsb, and stop at
+first row with zero, as the beta_test fills the shifter with zeros, rather
 than using a walking zero as the OS-9 driver does. This meant that SelectKeyrow
 never moved past the first row, by scanning for the last active row
 the beta_test rom works, and it does not break the OS-9 driver :)
@@ -485,12 +485,12 @@ static int SelectedKeyrow(int	Rows)
 	int	Row;	/* Row selected */
 	int	Mask;	/* Mask to test row */
 	int	Found;	/* Set true when found */
-	
+
 	Row=INVALID_KEYROW;	/* Pretend no rows selected */
 	Mask=0x200;		/* Start with row 9 */
 	Found=0;		/* Start with not found */
 	Idx=9;
-	
+
 	while ((Mask>0) && !Found)
 	{
 		if((~Rows & Mask) && !Found)
@@ -501,7 +501,7 @@ static int SelectedKeyrow(int	Rows)
 		Idx=Idx-1;			/* Decrement row count */
 		Mask=Mask>>1;			/* Select next bit */
 	}
-		
+
 	return Row;
 }
 
@@ -549,15 +549,15 @@ static READ8_HANDLER(d_pia0_pb_r)
 	int RetVal;
 	int Idx;
 	int Selected;
-	
+
 #ifdef LOG_KEYBOARD
 	logerror("PB Read\n");
 #endif
 
 	KAny_next=0;
-	
+
 	Selected=SelectedKeyrow(RowShifter);
-	
+
 	/* Scan the whole keyboard, if output shifter is all low */
 	/* This actually scans in the keyboard */
 	if(RowShifter==0x00)
@@ -577,7 +577,7 @@ static READ8_HANDLER(d_pia0_pb_r)
 				case 8 : Keyboard[Idx]=input_port_8_r(0); break;
 				case 9 : Keyboard[Idx]=input_port_9_r(0); break;
 			}
-			
+
 			if(Keyboard[Idx]!=0x7F)
 			{
 				KAny_next=1;
@@ -591,13 +591,13 @@ static READ8_HANDLER(d_pia0_pb_r)
 			KAny_next=1;
 		}
 	}
-	
+
 	RetVal = (KInDat_next<<5) | (KAny_next<<2);
-	
+
 #ifdef LOG_KEYBOARD
 	logerror("FC22=$%02X KAny=%d\n",RetVal,KAny_next);
 #endif
-	
+
 	return RetVal;
 }
 
@@ -605,14 +605,14 @@ static WRITE8_HANDLER(d_pia0_pb_w)
 {
 	int	InClkState;
 	int	OutClkState;
-	
+
 #ifdef LOG_KEYBOARD
 	logerror("PB Write\n");
 #endif
-	
+
 	InClkState	= data & KInClk;
 	OutClkState	= data & KOutClk;
-	
+
 #ifdef LOG_KEYBOARD
 	logerror("InClkState=$%02X OldInClkState=$%02X Keyrow=$%02X ",InClkState,(d_pia0_pb_last & KInClk),Keyrow);
 #endif
@@ -630,7 +630,7 @@ static WRITE8_HANDLER(d_pia0_pb_w)
 #endif
 		}
 	}
-		
+
 	d_pia0_pb_last=data;
 }
 
@@ -642,7 +642,7 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 #endif
 	/* load keyrow on rising edge of CB2 */
 	if((data==1) && (d_pia0_cb2_last==0))
-	{	
+	{
 		RowNo=SelectedKeyrow(RowShifter);
 		Keyrow=GetKeyRow(RowNo);
 
@@ -655,7 +655,7 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 		debug_console_printf("rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",RowShifter,RowNo,Keyrow);
 #endif
 	}
-	
+
 	d_pia0_cb2_last=data;
 }
 
@@ -670,7 +670,7 @@ static void d_pia0_irq_b(int state)
 	cpu0_recalc_firq(state);
 }
 
-/* PIA #1 at $FC24-$FC27 I63 
+/* PIA #1 at $FC24-$FC27 I63
 	This handles :-
 		Mouse + Disk Select on side A
 		Halt on DMA CPU		PA7
@@ -706,15 +706,15 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA==CLEAR_LINE)
 			cpu_yield();
-	
+
 		d_pia1_pa_last=data & 0x80;
 	}
-	
+
 	/* Drive selects are binary encoded on PA0 & PA1 */
 	wd17xx_set_drive(~data & DSMask);
-	
+
 	/* Set density of WD2797 */
-	if (data & DDenCtrl) 
+	if (data & DDenCtrl)
 	{
 		wd17xx_set_density(DEN_FM_LO);
 #ifdef MAME_DEBUG
@@ -759,7 +759,7 @@ static WRITE8_HANDLER(d_pia1_pb_w)
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU==CLEAR_LINE)
 			cpu_yield();
-	}	
+	}
 }
 
 static void d_pia1_irq_a(int state)
@@ -772,12 +772,12 @@ static void d_pia1_irq_b(int state)
 	cpu0_recalc_irq(state);
 }
 
-/* PIA #2 at FCC0-FCC3 I28 
+/* PIA #2 at FCC0-FCC3 I28
 	This handles :-
 		DAT task select	PA0..PA3
-		
+
 		DMA CPU NMI	PA7
-		
+
 		Graphics control PB0..PB7 ???
 		VSYNC intutrupt CB2
 */
@@ -798,9 +798,9 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 
 	/* Bit 7 of $FFC0, seems to control NMI on second CPU */
 	NMI=(data & 0x80);
-	
+
 	/* only take action if NMI changed */
-	if(NMI!=DMA_NMI_LAST) 
+	if(NMI!=DMA_NMI_LAST)
 	{
 #ifdef LOG_INTS
 		logerror("cpu1 NMI : %d\n",NMI);
@@ -826,7 +826,7 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 		EnableMapRegs=0;
 	else
 		EnableMapRegs=1;
-	
+
 	/* Bits 0..3 seem to control which task register is selected */
 	OldTask=PIATaskReg;
 	PIATaskReg=data & 0x0F;
@@ -852,13 +852,13 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 	else
 	{
 		// Update ram banks only if task reg changed and mapping enabled
-		if ((PIATaskReg!=OldTask) && (EnableMapRegs))		
+		if ((PIATaskReg!=OldTask) && (EnableMapRegs))
 		{
 			TaskReg=PIATaskReg;
 			UpdateBanks(0,IOPage+1);
 		}
 	}
-#ifdef LOG_TASK	
+#ifdef LOG_TASK
 	logerror("TaskReg=$%02X PIATaskReg=$%02X\n",TaskReg,PIATaskReg);
 #endif
 }
@@ -896,7 +896,7 @@ static void cpu0_recalc_irq(int state)
 	UINT8 pia2_irq_a = pia_get_irq_a(2);
 	UINT8 pia2_irq_b = pia_get_irq_b(2);
 	UINT8 IRQ;
-	
+
 	if (pia0_irq_a || pia1_irq_a || pia1_irq_b || pia2_irq_a || pia2_irq_b)
 		IRQ = ASSERT_LINE;
 	else
@@ -912,14 +912,14 @@ static void cpu0_recalc_firq(int state)
 {
 	UINT8 pia0_irq_b = pia_get_irq_b(0);
 	UINT8 FIRQ;
-	
+
 	if (pia0_irq_b)
 		FIRQ = ASSERT_LINE;
 	else
 		FIRQ = CLEAR_LINE;
-		
+
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, FIRQ);
-	
+
 #ifdef LOG_INTS
 	logerror("cpu0 FIRQ : %d\n",FIRQ);
 #endif
@@ -943,8 +943,8 @@ static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 {
 	/* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
 	/* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
-	
-	switch(event) 
+
+	switch(event)
 	{
 		case WD17XX_IRQ_CLR:
 			pia_2_ca1_w(0,CLEAR_LINE);
@@ -959,7 +959,7 @@ static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 		case WD17XX_DRQ_SET:
 			/*wd2797_drq=ASSERT_LINE;*/
 			cpu1_recalc_firq(ASSERT_LINE);
-			break;		
+			break;
 	}
 
 #ifdef MAME_DEBUG
@@ -972,7 +972,7 @@ static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 {
 	int result = 0;
 
-	switch(offset & 0x03) 
+	switch(offset & 0x03)
 	{
 		case 0:
 			result = wd17xx_status_r(0);
@@ -993,13 +993,13 @@ static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 		default:
 			break;
 	}
-		
+
 	return result;
 }
 
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
-    switch(offset & 0x3) 
+    switch(offset & 0x3)
 	{
 		case 0:
 			/* disk head is encoded in the command byte */
@@ -1065,7 +1065,7 @@ static void ScanInKeyboard(void)
 void dgn_beta_frame_interrupt (int data)
 {
 	/* Set PIA line, so it recognises inturrupt */
-	if (!data) 
+	if (!data)
 	{
 		pia_2_cb2_w(0,ASSERT_LINE);
 	}
@@ -1077,12 +1077,12 @@ void dgn_beta_frame_interrupt (int data)
 	logerror("Vblank\n");
 #endif
 	ScanInKeyboard();
-}	
+}
 
 void dgn_beta_line_interrupt (int data)
 {
 //	/* Set PIA line, so it recognises inturrupt */
-//	if (data) 
+//	if (data)
 //	{
 //		pia_0_cb1_w(0,ASSERT_LINE);
 //	}
@@ -1101,7 +1101,7 @@ static void dgnbeta_reset(running_machine *machine)
 
 	/* Make sure CPU 1 is started out halted ! */
 	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
-	
+
 	/* Reset to task 0, and map banks disabled, so standard memory map */
 	/* with ram at $0000-$BFFF, ROM at $C000-FBFF, IO at $FC00-$FEFF */
 	/* and ROM at $FF00-$FFFF */
@@ -1127,10 +1127,10 @@ static void dgnbeta_reset(running_machine *machine)
 
 	KInDat_next=0x00;			/* Next data bit to input */
 	KAny_next=0x00;				/* Next value for KAny */
-	
+
 	DMA_NMI_LAST=0x80;			/* start with DMA NMI inactive, as pulled up */
 //	DMA_NMI=CLEAR_LINE;			/* start with DMA NMI inactive */
-	
+
 	wd17xx_reset();
 	wd17xx_set_density(DEN_MFM_LO);
 	wd17xx_set_drive(0);
@@ -1143,10 +1143,10 @@ MACHINE_START( dgnbeta )
 {
 	pia_config(0, &dgnbeta_pia_intf[0]);
 	pia_config(1, &dgnbeta_pia_intf[1]);
-	pia_config(2, &dgnbeta_pia_intf[2]); 
+	pia_config(2, &dgnbeta_pia_intf[2]);
 
 	init_video();
-	
+
 	wd17xx_init(WD_TYPE_179X,dgnbeta_fdc_callback, NULL);
 #ifdef MAME_DEBUG
 	cpuintrf_set_dasm_override(0,dgnbeta_dasm_override);
@@ -1351,7 +1351,7 @@ static void ToggleDatLog(int ref, int params, const char *param[])
 static void DumpKeys(int ref, int params, const char *param[])
 {
 	int Idx;
-	
+
 	for(Idx=0;Idx<NoKeyrows;Idx++)
 	{
 		debug_console_printf("KeyRow[%d]=%2X\n",Idx,Keyboard[Idx]);

@@ -862,7 +862,7 @@ static INT_PTR CALLBACK adjuster_sb_wndproc(HWND sbwnd, UINT msg, WPARAM wparam,
 	HWND dlgwnd, editwnd;
 	int value, id;
 	LONG_PTR l;
-	
+
 	l = GetWindowLongPtr(sbwnd, GWLP_USERDATA);
 	stuff = (struct adjuster_sb_stuff *) l;
 
@@ -1075,7 +1075,7 @@ static void seqselect_settext(HWND editwnd)
 	if (strcmp(buffer, astring_c(seqstring)))
 		win_set_window_text_utf8(editwnd, astring_c(seqstring));
 
-	// reset the selection 
+	// reset the selection
 	if (GetFocus() == editwnd)
 		SendMessage(editwnd, EM_SETSEL, 0, -1);
 
@@ -1158,7 +1158,7 @@ static void seqselect_stop_read_from_main_thread(void *param)
 	// get the basics
 	editwnd = (HWND) param;
 	stuff = get_seqselect_info(editwnd);
-	
+
 	// stop the read
 	if (stuff->poll_state == SEQSELECT_STATE_POLLING)
 		stuff->poll_state = SEQSELECT_STATE_POLLING_COMPLETE;
@@ -1349,7 +1349,7 @@ int win_dialog_add_portselect(dialog_box *dialog, input_port_entry *port, const 
 
 	port_name = input_port_name(port);
 	assert(port_name);
-	
+
 	if (port_type_is_analog(port->type))
 	{
 		seq_types[seq_count] = SEQ_TYPE_STANDARD;
@@ -1393,7 +1393,7 @@ int win_dialog_add_portselect(dialog_box *dialog, input_port_entry *port, const 
 			// no positions specified
 			dialog_new_control(di, &x, &y);
 
-			if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOPREFIX, x, y, 
+			if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOPREFIX, x, y,
 					dialog->layout->label_width, DIM_NORMAL_ROW_HEIGHT, this_port_name, DLGITEM_STATIC, NULL))
 				return 1;
 			x += dialog->layout->label_width + DIM_HORIZONTAL_SPACING;
@@ -1420,7 +1420,7 @@ int win_dialog_add_portselect(dialog_box *dialog, input_port_entry *port, const 
 			width	/= pixels_to_xdlgunits;
 			height	/= pixels_to_ydlgunits;
 
-			if (dialog_add_single_seqselect(di, x, y, width, height, 
+			if (dialog_add_single_seqselect(di, x, y, width, height,
 					port, is_analog[seq], seq_types[seq]))
 				return 1;
 		}

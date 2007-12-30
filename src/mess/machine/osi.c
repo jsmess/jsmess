@@ -21,7 +21,7 @@ static READ8_HANDLER (sb2m600_acia0_statin )
 {
 	if (sb2m600_tape_image && (sb2m600_tape_index < sb2m600_tape_size))
 		return ACIA_6850_RDRF;
-	
+
 	return 0;
 }
 

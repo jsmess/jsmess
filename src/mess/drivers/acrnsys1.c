@@ -1,6 +1,6 @@
 /******************************************************************************
  Acorn System 1 (Microcomputer Kit)
- 
+
  Skeleton driver
 
  Written by Dirk Best October 2007

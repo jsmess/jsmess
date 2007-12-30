@@ -26,7 +26,7 @@ extern PALETTE_INIT( nick );
 	  ( ( (x & (1<<4)) >>4) <<1) | \
 	  ( ( (x & (1<<7)) >>7) <<0) \
 	)<<5)
- 
+
 /* given a colour index in range 0..255 gives the Red component */
 #define NICK_GET_BLUE8(x) \
 	(( \
@@ -78,7 +78,7 @@ typedef struct NICK_STATE
 #define	NICK_2_COLOUR_MODE	0
 #define	NICK_4_COLOUR_MODE	1
 #define	NICK_16_COLOUR_MODE	2
-#define	NICK_256_COLOUR_MODE	3	
+#define	NICK_256_COLOUR_MODE	3
 
 /* Display mode types */
 #define	NICK_VSYNC_MODE	0

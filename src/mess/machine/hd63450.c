@@ -36,7 +36,7 @@ int hd63450_read(int offset, UINT16 mem_mask)
 
 	switch(reg)
 	{
-	case 0x00:  // CSR / CER 
+	case 0x00:  // CSR / CER
 		return (dmac.reg[channel].csr << 8) | dmac.reg[channel].cer;
 	case 0x02:  // DCR / OCR
 		return (dmac.reg[channel].dcr << 8) | dmac.reg[channel].ocr;
@@ -84,8 +84,8 @@ void hd63450_write(int offset, int data, UINT16 mem_mask)
 	reg = offset & 0x1f;
 	switch(reg)
 	{
-	case 0x00:  // CSR / CER 
-		if(ACCESSING_MSB) 
+	case 0x00:  // CSR / CER
+		if(ACCESSING_MSB)
 		{
 //			dmac.reg[channel].csr = (data & 0xff00) >> 8;
 //			logerror("DMA#%i: Channel status write : %02x\n",channel,dmac.reg[channel].csr);
@@ -93,24 +93,24 @@ void hd63450_write(int offset, int data, UINT16 mem_mask)
 		// CER is read-only, so no action needed there.
 		break;
 	case 0x02:  // DCR / OCR
-		if(ACCESSING_MSB) 
+		if(ACCESSING_MSB)
 		{
 			dmac.reg[channel].dcr = (data & 0xff00) >> 8;
 			logerror("DMA#%i: Device Control write : %02x\n",channel,dmac.reg[channel].dcr);
 		}
-		if(ACCESSING_LSB) 
+		if(ACCESSING_LSB)
 		{
 			dmac.reg[channel].ocr = data & 0x00ff;
 			logerror("DMA#%i: Operation Control write : %02x\n",channel,dmac.reg[channel].ocr);
 		}
 		break;
 	case 0x03:  // SCR / CCR
-		if(ACCESSING_MSB) 
+		if(ACCESSING_MSB)
 		{
 			dmac.reg[channel].scr = (data & 0xff00) >> 8;
 			logerror("DMA#%i: Sequence Control write : %02x\n",channel,dmac.reg[channel].scr);
 		}
-		if(ACCESSING_LSB) 
+		if(ACCESSING_LSB)
 		{
 			dmac.reg[channel].ccr = data & 0x00ff;
 			if((data & 0x0080))// && !dmac.intf->dma_read[channel] && !dmac.intf->dma_write[channel])
@@ -266,7 +266,7 @@ void hd63450_single_transfer(int x)
 				else
 				{
 					switch(dmac.reg[x].ocr & 0x30)  // operation size
-					{	
+					{
 					case 0x00:  // 8 bit
 						data = program_read_byte(dmac.reg[x].dar);  // read from device address
 						program_write_byte(dmac.reg[x].mar, data);  // write to memory address
@@ -304,10 +304,10 @@ void hd63450_single_transfer(int x)
 				else
 				{
 					switch(dmac.reg[x].ocr & 0x30)  // operation size
-					{	
+					{
 					case 0x00:  // 8 bit
 						data = program_read_byte(dmac.reg[x].mar);  // read from memory address
-						program_write_byte(dmac.reg[x].dar, data);  // write to device address 
+						program_write_byte(dmac.reg[x].dar, data);  // write to device address
 						datasize = 1;
 						break;
 					case 0x10:  // 16 bit

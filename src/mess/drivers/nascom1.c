@@ -69,7 +69,7 @@ ADDRESS_MAP_END
 
 /* port i/o functions */
 static ADDRESS_MAP_START( nascom1_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) ) 
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_READWRITE( nascom1_port_00_r, nascom1_port_00_w )
 	AM_RANGE(0x01, 0x01) AM_READWRITE( nascom1_port_01_r, nascom1_port_01_w )
 	AM_RANGE(0x02, 0x02) AM_READ( nascom1_port_02_r )

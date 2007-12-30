@@ -12,7 +12,7 @@
 #include "formats/basicdsk.h"
 
 static FLOPPY_IDENTIFY(vz_identify)
-{	
+{
 	UINT64 size = floppy_image_size(floppy);
 	*vote = ((size == 98560) || (size == 99200)) ? 100 : 0;
 	return FLOPPY_ERROR_SUCCESS;
@@ -29,7 +29,7 @@ static FLOPPY_CONSTRUCT(vz_construct)
 		geometry.tracks          = option_resolution_lookup_int(params, PARAM_TRACKS);
 		geometry.sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
 		geometry.first_sector_id = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
-		geometry.sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);		
+		geometry.sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
 	}
 	else
 	{
@@ -38,7 +38,7 @@ static FLOPPY_CONSTRUCT(vz_construct)
 		geometry.sectors         = 16;
 		geometry.first_sector_id = 0;
 		geometry.sector_length   = floppy_image_size(floppy)/geometry.tracks/geometry.sectors;
-	} 
+	}
 
 	return basicdsk_construct(floppy, &geometry);
 }

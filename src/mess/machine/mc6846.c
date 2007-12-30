@@ -30,11 +30,11 @@
 /******************* internal chip data structure ******************/
 
 
-static struct 
+static struct
 {
-  
+
 	const mc6846_interface* iface;
-  
+
 	/* registers */
 	UINT8    csr;      /* 0,4: combination status register */
 	UINT8    pcr;      /* 1:   peripheral control register */
@@ -90,18 +90,18 @@ static struct
 
 INLINE UINT16 mc6846_counter ( void )
 {
-	if ( mc6846.timer_started ) 
+	if ( mc6846.timer_started )
 	{
 		attotime delay = timer_timeleft( mc6846.interval );
 		return ATTOTIME_TO_CYCLES( mc6846.iface->cpunum, delay ) / FACTOR;
 	}
-	else 
+	else
 		return mc6846.preset;
 }
 
 
 
-INLINE void mc6846_update_irq( void ) 
+INLINE void mc6846_update_irq( void )
 {
 	static int old_cif;
 	int cif = 0;
@@ -110,20 +110,20 @@ INLINE void mc6846_update_irq( void )
 	     ( (mc6846.csr & 2) && (mc6846.pcr & 1) ) ||
 	     ( (mc6846.csr & 4) && (mc6846.pcr & 8) && ! (mc6846.pcr & 0x20) ) )
 		cif = 1;
-	if ( old_cif != cif ) 
-	{ 
-		LOG (( "%f: mc6846 interrupt %i (time=%i cp1=%i cp2=%i)\n", 
-		       attotime_to_double(timer_get_time()), cif, 
+	if ( old_cif != cif )
+	{
+		LOG (( "%f: mc6846 interrupt %i (time=%i cp1=%i cp2=%i)\n",
+		       attotime_to_double(timer_get_time()), cif,
 		       mc6846.csr & 1, (mc6846.csr >> 1 ) & 1, (mc6846.csr >> 2 ) & 1 ));
 		old_cif = cif;
 	}
-	if ( cif ) 
+	if ( cif )
 	{
 		mc6846.csr |= 0x80;
 		if ( mc6846.iface->irq_func )
 			mc6846.iface->irq_func( 1 );
 	}
-	else 
+	else
 	{
 		mc6846.csr &= ~0x80;
 		if ( mc6846.iface->irq_func )
@@ -137,12 +137,12 @@ INLINE void mc6846_update_cto ( void )
 {
 	int cto = CTO;
 	static int old_cto;
-	if ( cto != old_cto ) 
+	if ( cto != old_cto )
 	{
 		LOG (( "%f: mc6846 CTO set to %i\n", attotime_to_double(timer_get_time()), cto ));
 		old_cto = cto;
 	}
-	if ( mc6846.iface->out_cto_func ) 
+	if ( mc6846.iface->out_cto_func )
 		mc6846.iface->out_cto_func( 0, cto );
 }
 
@@ -153,37 +153,37 @@ INLINE void mc6846_timer_launch ( void )
 	int delay = FACTOR * (mc6846.preset+1);
 	LOG (( "%f: mc6846 timer launch called, mode=%i, preset=%i (x%i)\n", attotime_to_double(timer_get_time()), MODE, mc6846.preset, FACTOR ));
 
-	if ( ! (mc6846.tcr & 2) ) 
+	if ( ! (mc6846.tcr & 2) )
 	{
 		logerror( "mc6846 external clock CTC not implemented\n" );
 	}
-  
-	switch( MODE ) 
+
+	switch( MODE )
 	{
-    
+
 	case 0x00:
 	case 0x10: /* continuous */
 		mc6846.cto = 0;
 		break;
-    
+
 	case 0x20: /* single-shot */
 		mc6846.cto = 0;
 		timer_reset( mc6846.one_shot, ATTOTIME_IN_CYCLES( FACTOR, mc6846.iface->cpunum ) );
 		break;
-    
+
 	case 0x30:  /* cascaded single-shot */
 		break;
-    
+
 	default:
 		logerror( "mc6846 timer mode %i not implemented\n", MODE );
 		timer_reset( mc6846.interval, attotime_never );
 		mc6846.timer_started = 0;
 		return;
 	}
-  
+
 	timer_reset( mc6846.interval, ATTOTIME_IN_CYCLES( delay, mc6846.iface->cpunum ) );
 	mc6846.timer_started = 1;
-  
+
 	mc6846.csr &= ~1;
 	mc6846_update_cto();
 	mc6846_update_irq();
@@ -205,7 +205,7 @@ static TIMER_CALLBACK(mc6846_timer_expire)
 	if ( ! (mc6846.tcr & 2) )
 		logerror( "mc6846 external clock CTC not implemented\n" );
 
-	switch ( MODE ) 
+	switch ( MODE )
 	{
 	case 0x00:
 	case 0x10: /* continuous */
@@ -215,7 +215,7 @@ static TIMER_CALLBACK(mc6846_timer_expire)
 	case 0x20: /* single-shot */
 		mc6846.cto = 0;
 		break;
-    
+
 	case 0x30:  /* cascaded single-shot */
 		mc6846.cto = ( mc6846.tcr & 0x80 ) ? 1 : 0;
 		break;
@@ -253,34 +253,34 @@ static TIMER_CALLBACK(mc6846_timer_one_shot)
 
 READ8_HANDLER ( mc6846_r )
 {
-	switch ( offset ) 
+	switch ( offset )
 	{
 	case 0:
 	case 4:
 		LOG (( "$%04x %f: mc6846 CSR read $%02X intr=%i (timer=%i, cp1=%i, cp2=%i)\n",
-		       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), 
-		       mc6846.csr, (mc6846.csr >> 7) & 1, 
+		       activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+		       mc6846.csr, (mc6846.csr >> 7) & 1,
 		       mc6846.csr & 1, (mc6846.csr >> 1) & 1, (mc6846.csr >> 2) & 1 ));
 		mc6846.csr0_to_be_cleared = mc6846.csr & 1;
 		mc6846.csr1_to_be_cleared = mc6846.csr & 2;
 		mc6846.csr2_to_be_cleared = mc6846.csr & 4;
 		return mc6846.csr;
-    
-	case 1: 
+
+	case 1:
 		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846.pcr ));
 		return mc6846.pcr;
 
-	case 2: 
+	case 2:
 		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846.ddr ));
 		return mc6846.ddr;
 
 	case 3:
 		LOG (( "$%04x %f: mc6846 PORT read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), PORT ));
-		if ( ! (mc6846.pcr & 0x80) ) 
+		if ( ! (mc6846.pcr & 0x80) )
 		{
-			if ( mc6846.csr1_to_be_cleared ) 
+			if ( mc6846.csr1_to_be_cleared )
 				mc6846.csr &= ~2;
-			if ( mc6846.csr2_to_be_cleared ) 
+			if ( mc6846.csr2_to_be_cleared )
 				mc6846.csr &= ~4;
 			mc6846_update_irq();
 			mc6846.csr1_to_be_cleared = 0;
@@ -294,7 +294,7 @@ READ8_HANDLER ( mc6846_r )
 
 	case 6:
 		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846_counter() >> 8 ));
-		if ( mc6846.csr0_to_be_cleared ) 
+		if ( mc6846.csr0_to_be_cleared )
 		{
 			mc6846.csr &= ~1;
 			mc6846_update_irq();
@@ -304,7 +304,7 @@ READ8_HANDLER ( mc6846_r )
 
 	case 7:
 		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846_counter() & 0xff ));
-		if ( mc6846.csr0_to_be_cleared ) 
+		if ( mc6846.csr0_to_be_cleared )
 		{
 			mc6846.csr &= ~1;
 			mc6846_update_irq();
@@ -322,7 +322,7 @@ READ8_HANDLER ( mc6846_r )
 
 WRITE8_HANDLER ( mc6846_w )
 {
-	switch ( offset ) 
+	switch ( offset )
 	{
 	case 0:
 	case 4:
@@ -332,17 +332,17 @@ WRITE8_HANDLER ( mc6846_w )
 	case 1:
 	{
 #if VERBOSE
-		const char* cp2[8] = 
-			{ 
-			"in,neg-edge", "in,neg-edge,intr", "in,pos-edge", "in,pos-edge,intr", 
-			"out,intr-ack", "out,i/o-ack", "out,0", "out,1" 
+		const char* cp2[8] =
+			{
+			"in,neg-edge", "in,neg-edge,intr", "in,pos-edge", "in,pos-edge,intr",
+			"out,intr-ack", "out,i/o-ack", "out,0", "out,1"
 		};
 		const char* cp1[8] = {
 			"neg-edge", "neg-edge,intr", "pos-edge", "pos-edge,intr",
-			"latched,neg-edge", "latched,neg-edge,intr", 
-			"latcged,pos-edge", "latcged,pos-edge,intr" 
+			"latched,neg-edge", "latched,neg-edge,intr",
+			"latcged,pos-edge", "latcged,pos-edge,intr"
 		};
-		LOG (( "$%04x %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n", 
+		LOG (( "$%04x %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n",
 		       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
 		       (data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] ));
 #endif
@@ -357,9 +357,9 @@ WRITE8_HANDLER ( mc6846_w )
 	}
 	if ( data & 4 )
 		logerror( "$%04x mc6846 CP1 latching not implemented\n", activecpu_get_previouspc() );
-	if (data & 0x20) 
+	if (data & 0x20)
 	{
-		if (data & 0x10) 
+		if (data & 0x10)
 		{
 			mc6846.cp2_cpu = (data >> 3) & 1;
 			if ( mc6846.iface->out_cp2_func )
@@ -372,22 +372,22 @@ WRITE8_HANDLER ( mc6846_w )
 
 	case 2:
 		LOG (( "$%04x %f: mc6846 DDR write $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
-		if ( ! (mc6846.pcr & 0x80) ) 
+		if ( ! (mc6846.pcr & 0x80) )
 		{
 			mc6846.ddr = data;
-			if ( mc6846.iface->out_port_func ) 
+			if ( mc6846.iface->out_port_func )
 				mc6846.iface->out_port_func( 0, mc6846.pdr & mc6846.ddr );
 		}
 		break;
-		
+
 	case 3:
 		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,mc6846.ddr ));
-		if ( ! (mc6846.pcr & 0x80) ) 
+		if ( ! (mc6846.pcr & 0x80) )
 		{
 			mc6846.pdr = data;
-			if ( mc6846.iface->out_port_func ) 
+			if ( mc6846.iface->out_port_func )
 				mc6846.iface->out_port_func( 0, mc6846.pdr & mc6846.ddr );
-			if ( mc6846.csr1_to_be_cleared && (mc6846.csr & 2) ) 
+			if ( mc6846.csr1_to_be_cleared && (mc6846.csr & 2) )
 			{
 				mc6846.csr &= ~2;
 				LOG (( "$%04x %f: mc6846 CP1 intr reset\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()) ));
@@ -406,40 +406,40 @@ WRITE8_HANDLER ( mc6846_w )
 	case 5:
 	{
 #if VERBOSE
-		const char* mode[8] = 
-			{ 
-				"continuous", "cascaded", "continuous", "one-shot", 
+		const char* mode[8] =
+			{
+				"continuous", "cascaded", "continuous", "one-shot",
 				"freq-cmp", "freq-cmp", "pulse-cmp", "pulse-cmp"
 			};
-		LOG (( "$%04x %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n", 
+		LOG (( "$%04x %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n",
 		       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
 		       (data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
 		       (data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
 		       (data & 1) ? "enabled" : "0" ));
 #endif
 		mc6846.tcr = data;
-		if ( mc6846.tcr & 1 ) 
+		if ( mc6846.tcr & 1 )
 		{
 			/* timer preset = initialization without launch */
 			mc6846.preset = mc6846.latch;
 			mc6846.csr &= ~1;
-			if ( MODE != 0x30 ) 
+			if ( MODE != 0x30 )
 				mc6846.cto = 0;
 			mc6846_update_cto();
 			timer_reset( mc6846.interval, attotime_never );
 			timer_reset( mc6846.one_shot, attotime_never );
 			mc6846.timer_started = 0;
 		}
-		else 
+		else
 		{
 			/* timer launch */
-			if ( ! mc6846.timer_started ) 
+			if ( ! mc6846.timer_started )
 				mc6846_timer_launch();
 		}
 		mc6846_update_irq();
 	}
 	break;
-    
+
 	case 6:
 		mc6846.time_MSB = data;
 		break;
@@ -447,7 +447,7 @@ WRITE8_HANDLER ( mc6846_w )
 	case 7:
 		mc6846.latch = ( ((UINT16) mc6846.time_MSB) << 8 ) + data;
 		LOG (( "$%04x %f: mc6846 COUNT write %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mc6846.latch  ));
-		if (!(mc6846.tcr & 0x38)) 
+		if (!(mc6846.tcr & 0x38))
 		{
 			/* timer initialization */
 			mc6846.preset = mc6846.latch;
@@ -456,11 +456,11 @@ WRITE8_HANDLER ( mc6846_w )
 			mc6846.cto = 0;
 			mc6846_update_cto();
 			/* launch only if started */
-			if (!(mc6846.tcr & 1)) 
+			if (!(mc6846.tcr & 1))
 				mc6846_timer_launch();
 		}
 		break;
- 
+
 	default:
 		logerror( "$%04x mc6846 invalid write offset %i\n", activecpu_get_previouspc(), offset );
 	}
@@ -475,11 +475,11 @@ WRITE8_HANDLER ( mc6846_w )
 void mc6846_set_input_cp1 ( int data )
 {
 	data = (data != 0 );
-	if ( data == mc6846.cp1 ) 
+	if ( data == mc6846.cp1 )
 		return;
 	mc6846.cp1 = data;
 	LOG (( "%f: mc6846 input CP1 set to %i\n",  attotime_to_double(timer_get_time()), data ));
-	if (( data &&  (mc6846.pcr & 2)) || (!data && !(mc6846.pcr & 2))) 
+	if (( data &&  (mc6846.pcr & 2)) || (!data && !(mc6846.pcr & 2)))
 	{
 		mc6846.csr |= 2;
 		mc6846_update_irq();
@@ -489,17 +489,17 @@ void mc6846_set_input_cp1 ( int data )
 void mc6846_set_input_cp2 ( int data )
 {
 	data = (data != 0 );
-	if ( data == mc6846.cp2 ) 
+	if ( data == mc6846.cp2 )
 		return;
 	mc6846.cp2 = data;
 	LOG (( "%f: mc6846 input CP2 set to %i\n", attotime_to_double(timer_get_time()), data ));
-	if (mc6846.pcr & 0x20) 
+	if (mc6846.pcr & 0x20)
 	{
-		if (( data &&  (mc6846.pcr & 0x10)) || (!data && !(mc6846.pcr & 0x10))) 
+		if (( data &&  (mc6846.pcr & 0x10)) || (!data && !(mc6846.pcr & 0x10)))
 		{
 			mc6846.csr |= 4;
 			mc6846_update_irq();
-		}    
+		}
 	}
 }
 
@@ -573,7 +573,7 @@ void mc6846_config ( const mc6846_interface* iface )
 	mc6846.iface = iface;
 	mc6846.interval = timer_alloc( mc6846_timer_expire , NULL);
 	mc6846.one_shot = timer_alloc( mc6846_timer_one_shot , NULL);
-  
+
 	state_save_register_item( "mc6846", 0, mc6846.csr );
 	state_save_register_item( "mc6846", 0, mc6846.pcr );
 	state_save_register_item( "mc6846", 0, mc6846.ddr );

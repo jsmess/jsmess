@@ -21,7 +21,7 @@ UINT16 ti85_calculate_checksum(const UINT8* data, unsigned int size)
 {
 	UINT16 checksum = 0;
 	unsigned int i;
-	
+
 	for (i = 0; i<size; i++)
 		checksum += data[i];
 	return checksum;
@@ -45,7 +45,7 @@ UINT16 ti85_variables_count (const UINT8 * ti85_data, unsigned int ti85_data_siz
 static void ti85_backup_read (const UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
 {
 	unsigned int pos = 0x42+2;
-        
+
 	ti85_entries[0].head_size = 0x09;
 	ti85_entries[0].data_size = ti85_data[0x39] + ti85_data[0x3a]*256;
 	ti85_entries[0].offset = pos;
@@ -284,7 +284,7 @@ int ti85_convert_file_data_to_serial_stream (const UINT8* file_data, unsigned in
 	serial_data->end_size = TI85_PC_END_PACKET_SIZE*8;
 
 	free (ti85_entries);
-	
+
 	return 1;
 }
 

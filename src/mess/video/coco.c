@@ -5,7 +5,7 @@
 	driver by Nathan Woods
 
 	See mess/machine/coco.c for references
- 
+
 	TODO: Determine how the CoCo 2B (which used the M6847T1 was hooked up
 	to the M6847T1 chip to generate its text video modes.  My best guess is as
 	follows:
@@ -70,7 +70,7 @@ static void internal_video_start_coco(m6847_type type)
 
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = type;
-	
+
 	/* NPW 14-May-2006 - Ugly hack; using CPU timing factor seems to break some
 	 * Dragon games */
 	if (Machine->gamedrv->name[0] == 'c')

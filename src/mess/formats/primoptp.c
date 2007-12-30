@@ -26,7 +26,7 @@
 static UINT32 primo_tape_image_length;
 
 static INT16 *primo_emit_level(INT16 *p, int count, int level)
-{	
+{
 	int i;
 
 	for (i=0; i<count; i++)	*(p++) = level;
@@ -115,7 +115,7 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 
 			/* b is set on the first byte of block data */
 			b += 3;
-			
+
 			number_of_1 = primo_cassette_calculate_number_of_1(b, block_size);
 			number_of_0 = (block_size)*8-number_of_1;
 
@@ -191,7 +191,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			block_size = *(b+1) + *(b+2)*256;
 			b += 3;
 
-			for (k=0; k<block_size; k++)                      
+			for (k=0; k<block_size; k++)
 				p = primo_output_byte (p, *(b+k));
 
 			logerror ("Samples (block data): %ld\n", (long int)(p-buffer));

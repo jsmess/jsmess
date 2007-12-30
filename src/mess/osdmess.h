@@ -49,7 +49,7 @@ file_error osd_copyfile(const char *destfile, const char *srcfile);
 
 		buffer_len - length of buffer
 
-		basename - basename of file to create 
+		basename - basename of file to create
 
     Return value:
 

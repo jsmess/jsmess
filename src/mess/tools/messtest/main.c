@@ -79,7 +79,7 @@ int CLIB_DECL main(int argc, char *argv[])
 
 	/* test case for memory allocation system */
 	test_memory_pools();
-	
+
 	/* expand wildcards so '*' can be used */
 	expand_wildcards(&argc, &argv);
 
@@ -91,7 +91,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	 * have to init first */
 	cpuintrf_init(NULL);
 	sndintrf_init(NULL);
-	
+
 	/* register options */
 	messtest_options = options_create(messtest_fail);
 	options_add_entries(messtest_options, messtest_option_entries);

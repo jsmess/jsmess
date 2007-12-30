@@ -94,7 +94,7 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 		}
 
 		timer_adjust(cdp1864_dma_timer, ATTOTIME_IN_CYCLES(CDP1864_CYCLES_DMA_WAIT, 0), 0, attotime_zero);
-		
+
 		cdp1864.dmaout = 0;
 	}
 	else
@@ -108,7 +108,7 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 		}
 
 		timer_adjust(cdp1864_dma_timer, ATTOTIME_IN_CYCLES(CDP1864_CYCLES_DMA_ACTIVE, 0), 0, attotime_zero);
-		
+
 		cdp1864.dmaout = 1;
 	}
 }
@@ -129,7 +129,7 @@ void cdp1864_dma_w(UINT8 data)
 		}
 
 		*BITMAP_ADDR16(cdptmpbitmap, y, sx + x) = Machine->pens[color];
-		
+
 		data <<= 1;
 	}
 
@@ -154,7 +154,7 @@ void cdp1864_audio_output_enable(int value)
 	{
 		cdp1864.latch = CDP1864_DEFAULT_LATCH;
 	}
-	
+
 	cdp1864.audio = value;
 
 	beep_set_state(0, value);
@@ -205,7 +205,7 @@ VIDEO_START( cdp1864 )
 
 	/* ensure the contents of the bitmap are saved */
 	state_save_register_bitmap("video", 0, "cdptmpbitmap", cdptmpbitmap);
-	
+
 	state_save_register_global(cdp1864.disp);
 	state_save_register_global(cdp1864.dmaout);
 	state_save_register_global(cdp1864.dmaptr);

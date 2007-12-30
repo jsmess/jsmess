@@ -34,8 +34,8 @@
 	 120       2  [II]  Secondary Header Length
 	 122       1  [II]  MacBinary II Version Number (II: 0x81, III: 0x82)
 	 123       1  [II]  Minimum Compatible MacBinary II Version Number (0x81)
-	 124       2  [II]  CRC of previous 124 bytes  
-	
+	 124       2  [II]  CRC of previous 124 bytes
+
 	For more information, consult http://www.lazerware.com/formats/macbinary.html
 
 	TODO: I believe that the script code is some sort of identifier identifying
@@ -154,7 +154,7 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 	place_integer_be(header, 124, 2, ccitt_crc16(0, header, 124));
 
 	stream_write(destf, header, sizeof(header));
-	
+
 	if (data_fork)
 	{
 		err = imgtool_partition_read_file(partition, filename, "", destf, NULL);
@@ -163,7 +163,7 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 
 		stream_fill(destf, 0, pad128(data_fork->size));
 	}
-	
+
 	if (resource_fork)
 	{
 		err = imgtool_partition_read_file(partition, filename, "RESOURCE_FORK", destf, NULL);

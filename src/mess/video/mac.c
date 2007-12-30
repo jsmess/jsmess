@@ -1,7 +1,7 @@
 /***************************************************************************
 
 	video/mac.c
-	
+
 	Macintosh video hardware
 
 	Emulates the video hardware for compact Macintosh series (original

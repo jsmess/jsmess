@@ -98,7 +98,7 @@
 	address pointer is incremented when the read data and write data ports
 	are accessed, and when the second byte of the GPL address is written.  A
 	weird consequence of this is the fact that GPL data is always off by one
-	byte, i.e. GPL bytes 0, 1, 2... are stored in bytes 1, 2, 3... of pages 
+	byte, i.e. GPL bytes 0, 1, 2... are stored in bytes 1, 2, 3... of pages
 	>38->3f (byte 0 of page >38 corresponds to GPL address >ffff).
 
 	I think that I have once read that the geneve GROM emulator does not
@@ -464,7 +464,7 @@ static MACHINE_DRIVER_START(geneve_60hz)
 
 	MDRV_MACHINE_START( geneve )
         MDRV_MACHINE_RESET( geneve )
-        
+
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -1,5 +1,5 @@
-/* 
-   ibm at mfm hard disk 
+/*
+   ibm at mfm hard disk
    interface still used in ide devices!
 */
 

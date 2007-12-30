@@ -86,7 +86,7 @@ static TIMER_CALLBACK(cdp1861_dma_tick)
 		}
 
 		timer_adjust(cdp1861_dma_timer, ATTOTIME_IN_CYCLES(CDP1861_CYCLES_DMA_WAIT, 0), 0, attotime_zero);
-		
+
 		cdp1861.dmaout = 0;
 	}
 	else
@@ -100,7 +100,7 @@ static TIMER_CALLBACK(cdp1861_dma_tick)
 		}
 
 		timer_adjust(cdp1861_dma_timer, ATTOTIME_IN_CYCLES(CDP1861_CYCLES_DMA_ACTIVE, 0), 0, attotime_zero);
-		
+
 		cdp1861.dmaout = 1;
 	}
 }

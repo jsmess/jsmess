@@ -23,14 +23,14 @@ extern int amstrad_plus_asic_enabled;
 extern int amstrad_plus_pri;
 extern int amstrad_system_type;
 extern int amstrad_plus_irq_cause;
-extern int amstrad_plus_scroll_x;  
-extern int amstrad_plus_scroll_y;  
-extern int amstrad_plus_scroll_border;  
+extern int amstrad_plus_scroll_x;
+extern int amstrad_plus_scroll_y;
+extern int amstrad_plus_scroll_border;
 
 extern int amstrad_plus_dma_status;
 extern int amstrad_plus_dma_0_addr;   // DMA channel address
-extern int amstrad_plus_dma_1_addr; 
-extern int amstrad_plus_dma_2_addr; 
+extern int amstrad_plus_dma_1_addr;
+extern int amstrad_plus_dma_2_addr;
 extern int amstrad_plus_dma_prescaler[3];  // DMA channel prescaler
 
 static int amstrad_plus_dma_repeat[3];  // marks the location of the channels' last repeat
@@ -39,7 +39,7 @@ static int amstrad_plus_dma_loopcount[3]; // counts loops taken on this channel
 
 extern unsigned char *amstrad_plus_asic_ram;
 
-static int amstrad_plus_split_scanline;  // ASIC split screen 
+static int amstrad_plus_split_scanline;  // ASIC split screen
 static int amstrad_plus_split_address;
 static int amstrad_screen_width;  // width in bytes
 
@@ -95,13 +95,13 @@ static int amstrad_render_mode;
 static void (*draw_function)(void);
 /* current programmed mode */
 static int amstrad_current_mode;
- 
+
 static unsigned long Mode0Lookup[256];
 static unsigned long Mode1Lookup[256];
 static unsigned long Mode3Lookup[256];
 
 /* The Amstrad CPC has a fixed palette of 27 colours generated from 3 levels of Red, Green and Blue.
-The hardware allows selection of 32 colours, but these extra colours are copies of existing colours.*/ 
+The hardware allows selection of 32 colours, but these extra colours are copies of existing colours.*/
 
 static const rgb_t amstrad_palette[32] =
 {
@@ -190,9 +190,9 @@ PALETTE_INIT( amstrad_cpc )
 The palette is defined by a colour rom. The only rom dump that exists (from the KC-Club webpage)
 is 2K, which seems correct. In this rom the same 32 bytes of data is repeated throughout the rom.
 
-When a I/O write is made to "Gate Array" to select the colour, Bit 7 and 6 are used by the 
-"Gate Array" to define the function, bit 7 = 0, bit 6 = 1. In the  Amstrad CPC, bits 4..0 
-define the hardware colour number, but in the KC Compact, it seems bits 5..0 
+When a I/O write is made to "Gate Array" to select the colour, Bit 7 and 6 are used by the
+"Gate Array" to define the function, bit 7 = 0, bit 6 = 1. In the  Amstrad CPC, bits 4..0
+define the hardware colour number, but in the KC Compact, it seems bits 5..0
 define the hardware colour number allowing 64 colours to be chosen.
 
 It is possible therefore that the colour rom could be reprogrammed, so that other colour
@@ -201,16 +201,16 @@ and co
 
 colour rom byte:
 
-Bit Function 
-7 not used 
-6 not used 
+Bit Function
+7 not used
+6 not used
 5,4 Green value
 3,2 Red value
 1,0 Blue value
 
 Green value, Red value, Blue value: 0 = 0%, 01/10 = 50%, 11 = 100%.
 The 01 case is not used, it is unknown if this produces a different amount of colour.
-*/ 
+*/
 
 static unsigned char kccomp_get_colour_element(int colour_value)
 {
@@ -261,7 +261,7 @@ PALETTE_INIT( amstrad_plus )
 	int i;
 
 	palette_set_colors(machine, 0, amstrad_palette, sizeof(amstrad_palette) / 3);
-	for ( i = 0; i < 0x1000; i++ ) 
+	for ( i = 0; i < 0x1000; i++ )
 	{
 		int r, g, b;
 
@@ -336,7 +336,7 @@ void amstrad_vh_update_colour(int PenIndex, int hw_colour_index)
 void amstrad_vh_update_mode(int new_mode)
 {
 	amstrad_current_mode = new_mode;
-	
+
 }
 
 static void amstrad_draw_screen_disabled(void)
@@ -426,7 +426,7 @@ static void amstrad_plus_draw_screen_enabled_mode_1(void)
 	int x = x_screen_pos;
 	int y = y_screen_pos;
 
-  int i, cpcpen, messpen; 
+  int i, cpcpen, messpen;
   unsigned char data1;
   unsigned char data2;
 
@@ -497,7 +497,7 @@ static void amstrad_plus_draw_screen_enabled_mode_2(void)
 		messpen = 48 + (amstrad_plus_asic_ram[0x2400+cpcpen*2]);//amstrad_GateArray_render_colours[cpcpen];
 		messpen += (amstrad_plus_asic_ram[0x2401+cpcpen*2]) << 8;
 		*BITMAP_ADDR16(bitmap, y, x) = messpen;
-		x++;        
+		x++;
 		data = data<<1;
 	}
 }
@@ -622,7 +622,7 @@ static void amstrad_draw_screen_enabled_mode_1(void)
 	int x = x_screen_pos;
 	int y = y_screen_pos;
 
-  int i, cpcpen, messpen; 
+  int i, cpcpen, messpen;
   unsigned char data1 = mess_ram[addr];
   unsigned char data2 = mess_ram[addr+1];
 
@@ -676,7 +676,7 @@ static void amstrad_draw_screen_enabled_mode_2(void)
 		messpen = amstrad_GateArray_render_colours[cpcpen];
 		if ((x >= 0) && (x < bitmap->width) && (y >= 0) && (y < bitmap->height))
 			*BITMAP_ADDR16(bitmap, y, x) = messpen;
-		x++;        
+		x++;
 		data = data<<1;
 	}
 }
@@ -804,7 +804,7 @@ void amstrad_plus_setsplitline(unsigned int line, unsigned int address)
 	amstrad_plus_split_address = address;
 }
 
-/* 
+/*
 DMA commands
 
 0RDDh 	LOAD R,D 	Load 8 bit data D to PSG register R (0<=R<=15)
@@ -813,7 +813,7 @@ DMA commands
 3xxxh 	(reserved) 	Do not use
 4000h 	NOP 	No operation (64us idle)
 4001h 	LOOP 	If loop counter non zero, loop back to the first instruction after REPEAT instruction and decrement loop counter.
-4010h 	INT 	Interrupt the CPU 
+4010h 	INT 	Interrupt the CPU
 4020h 	STOP 	Stop processing the sound list.
 */
 
@@ -966,14 +966,14 @@ static void amstrad_Set_HS(int offset, int data)
 			y_screen_pos++;
 		}
 //	The GA has a counter that increments on every falling edge of the CRTC generated HSYNC signal.
- 
+
 		amstrad_CRTC_HS_Counter++;
 		amstrad_scanline++;
 
 		if (amstrad_CRTC_HS_After_VS_Counter != 0)  // counters still operate regardless of PRI state
 		{
 			amstrad_CRTC_HS_After_VS_Counter--;
-			
+
 			if (amstrad_CRTC_HS_After_VS_Counter == 0)
 			{
 				if (amstrad_CRTC_HS_Counter >= 32)
@@ -986,7 +986,7 @@ static void amstrad_Set_HS(int offset, int data)
 				amstrad_CRTC_HS_Counter = 0;
 			}
 		}
-		
+
 		if (amstrad_CRTC_HS_Counter == 52)
 		{
 			amstrad_CRTC_HS_Counter = 0;
@@ -997,10 +997,10 @@ static void amstrad_Set_HS(int offset, int data)
 		}
 		if(amstrad_plus_asic_enabled != 0)
 		{
-			// CPC+/GX4000 Programmable Raster Interrupt (disabled if &6800 in ASIC RAM is 0)		
+			// CPC+/GX4000 Programmable Raster Interrupt (disabled if &6800 in ASIC RAM is 0)
 			if(amstrad_plus_pri != 0)
 			{
-				if(m6845_get_row_counter() == ((amstrad_plus_pri >> 3) & 0x1f) && m6845_get_scanline_counter() == (amstrad_plus_pri & 0x07))  
+				if(m6845_get_row_counter() == ((amstrad_plus_pri >> 3) & 0x1f) && m6845_get_scanline_counter() == (amstrad_plus_pri & 0x07))
 				{
 //					logerror("PRI: triggered, scanline %i, VSync width = %i\n",amstrad_scanline,vid.vertical_sync_width);
 					cpunum_set_input_line(0,0,ASSERT_LINE);
@@ -1033,7 +1033,7 @@ static void amstrad_Set_HS(int offset, int data)
 	amstrad_CRTC_HS = data;
 	if(amstrad_scanline > 311) // 312 scanlines by default
 		amstrad_scanline = 0;
-} 
+}
 
 /* CRTC - Set new Vertical Sync Status*/
 static void amstrad_Set_VS(int offset, int data)
@@ -1063,7 +1063,7 @@ static const struct m6845_interface amstrad6845= {
 	amstrad_Set_HS, // Horizontal status
 	amstrad_Set_VS, // Vertical status
 	amstrad_Set_DE, // Display Enabled status
-	amstrad_Set_CR, // Cursor status 
+	amstrad_Set_CR, // Cursor status
 };
 
 /************************************************************************
@@ -1091,7 +1091,7 @@ VIDEO_UPDATE( amstrad )
 		}
 	}
 #endif
-    copybitmap(bitmap, amstrad_bitmap, 0,0,0,0,&rect, TRANSPARENCY_NONE,0); 
+    copybitmap(bitmap, amstrad_bitmap, 0,0,0,0,&rect, TRANSPARENCY_NONE,0);
 	if(amstrad_plus_asic_enabled != 0)
 		amstrad_plus_sprite_draw(bitmap);
 	amstrad_scanline = y_screen_pos - 32;
@@ -1113,9 +1113,9 @@ VIDEO_START( amstrad )
 	m6845_config(&amstrad6845);
 	m6845_reset(0);
 	m6845_get_state(0, &amstrad_vidhrdw_6845_state);
-	
+
 	draw_function = amstrad_draw_screen_disabled;
-	
+
 	amstrad_CRTC_HS_After_VS_Counter = 2;
 	x_screen_pos = x_screen_offset;
 	y_screen_pos = y_screen_offset;

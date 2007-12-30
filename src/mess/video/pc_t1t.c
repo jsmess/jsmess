@@ -135,12 +135,12 @@ static PALETTE_INIT( pcjr )
 	memcpy(colortable, pcjr_colortable, sizeof(pcjr_colortable));
 }
 
-static struct { 
+static struct {
 	UINT8 mode_control, color_select;
 	UINT8 status;
 
 	int full_refresh;
-	
+
 	// used in tandy1000hx; used in pcjr???
 	struct {
 		UINT8 index;
@@ -151,7 +151,7 @@ static struct {
 		   2 border color
 		   3 mode control 2
 		   4 reset
-		   0x10-0x1f palette registers 
+		   0x10-0x1f palette registers
 		*/
 	} reg;
 
@@ -324,7 +324,7 @@ static void pc_t1t_vga_data_w(int data)
         case 0x14: case 0x15: case 0x16: case 0x17:
         case 0x18: case 0x19: case 0x1a: case 0x1b:
         case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			palette_set_color_rgb(Machine, pcjr.reg.index-0x10, 
+			palette_set_color_rgb(Machine, pcjr.reg.index-0x10,
 								 cga_palette[data&0xf][0],
 								 cga_palette[data&0xf][1],
 								 cga_palette[data&0xf][2]);
@@ -498,7 +498,7 @@ static void t1t_plot_char(mame_bitmap *bitmap, const rectangle *r, UINT8 ch, UIN
 	gfx_element *gfx;
 
 	gfx = Machine->gfx[ch & 0x80 ? 1 : 0];
-	drawgfx(bitmap, gfx, ch & 0x7f, attr, 
+	drawgfx(bitmap, gfx, ch & 0x7f, attr,
 			0, 0, r->min_x, r->min_y, r, TRANSPARENCY_NONE, 0);
 
 	height = r->max_y - r->min_y + 1;
@@ -532,27 +532,27 @@ static void t1t_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height) {
 
-		for (sx=0, r.min_x=0, r.max_x=7; sx<columns; 
+		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;
 			 sx++, offs=(offs+2)&0x3fff, r.min_x+=8, r.max_x+=8)
 		{
 			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1])
 			{
 				UINT8 ch = pcjr.displayram[offs];
 				UINT8 attr = pcjr.displayram[offs + 1];
-				
+
 				t1t_plot_char(bitmap, &r, ch, attr);
 
 				if (cursor.on && (pcjr.pc_framecnt & 32) && (offs == cursor.pos * 2))
 				{
 					int k = height - cursor.top;
 					rectangle rect2 = r;
-					rect2.min_y += cursor.top; 
+					rect2.min_y += cursor.top;
 					if (cursor.bottom<height)
 						k=cursor.bottom-cursor.top+1;
 
 					if (k>0)
-						plot_box(bitmap, r.min_x, 
-									r.min_y+cursor.top, 
+						plot_box(bitmap, r.min_x,
+									r.min_y+cursor.top,
 									8, k, Machine->pens[7]);
 				}
 
@@ -584,14 +584,14 @@ static void t1t_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
 	{
-		for (sx=0, r.min_x=0, r.max_x=7; sx<columns; 
+		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;
 			sx++, offs=(offs+2)&0x3fff, r.min_x+=8, r.max_x+=8)
 		{
 			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1])
 			{
 				UINT8 ch = pcjr.displayram[offs + 0];
 				UINT8 attr = pcjr.displayram[offs + 1];
-					
+
 				if (attr & 0x80)	/* blinking ? */
 				{
 					if (pcjr.pc_blink)
@@ -612,8 +612,8 @@ static void t1t_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 						k = cursor.bottom - cursor.top + 1;
 
 					if (k>0)
-						plot_box(bitmap, r.min_x, 
-							r.min_y+cursor.top, 
+						plot_box(bitmap, r.min_x,
+							r.min_y+cursor.top,
 							8, k, Machine->pens[7]);
 				}
 

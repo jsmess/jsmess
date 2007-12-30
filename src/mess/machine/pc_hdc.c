@@ -120,31 +120,31 @@ static const char *const hdc_command_names[] =
 	"CMD_WRITESBUFF",		/* 0x0F */
 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x10-0x17 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x18-0x1F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x18-0x1F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x20-0x27 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x28-0x2F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x28-0x2F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x30-0x37 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x38-0x3F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x38-0x3F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x40-0x47 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x48-0x4F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x48-0x4F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x50-0x57 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x58-0x5F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x58-0x5F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x60-0x67 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x68-0x6F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x68-0x6F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x70-0x77 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x78-0x7F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x78-0x7F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x80-0x87 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x88-0x8F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x88-0x8F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x90-0x97 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x98-0x9F */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x98-0x9F */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xA0-0xA7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xA8-0xAF */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xA8-0xAF */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xB0-0xB7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xB8-0xBF */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xB8-0xBF */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xC0-0xC7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xC8-0xCF */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xC8-0xCF */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xD0-0xD7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xD8-0xDF */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xD8-0xDF */
 
 	"CMD_RAMDIAG",			/* 0xE0 */
 	NULL,					/* 0xE1 */
@@ -155,9 +155,9 @@ static const char *const hdc_command_names[] =
 	"CMD_WRITELONG",		/* 0xE6 */
 	NULL,					/* 0xE7 */
 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xE8-0xEF */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xE8-0xEF */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xF0-0xF7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL  /* 0xF8-0xFF */ 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL  /* 0xF8-0xFF */
 };
 
 
@@ -188,7 +188,7 @@ int pc_hdc_setup(void)
 static hard_disk_file *pc_hdc_file(int id)
 {
 	mess_image *img;
-	
+
 	img = image_from_devtype_and_index(IO_HARDDISK, id);
 	if (!image_exists(img))
 		return NULL;
@@ -252,7 +252,7 @@ static int get_lbasector(void)
 
 	file = pc_hdc_file(idx);
 	info = hard_disk_get_info(file);
-	
+
 	lbasector = cylinder[idx];
 	lbasector *= info->heads;
 	lbasector += head[idx];
@@ -284,7 +284,7 @@ int pc_hdc_dack_r(void)
 	UINT8 result;
 	hard_disk_info *info;
 	hard_disk_file *file;
-	
+
 	file = pc_hdc_file(idx);
 	if (!file)
 		return 0;
@@ -324,11 +324,11 @@ void pc_hdc_dack_w(int data)
 {
 	hard_disk_info *info;
 	hard_disk_file *file;
-	
+
 	file = pc_hdc_file(idx);
 	if (!file)
 		return;
-	info = hard_disk_get_info(file);	
+	info = hard_disk_get_info(file);
 
 	*(hdcdma_dst++) = data;
 
@@ -631,7 +631,7 @@ static void pc_hdc_data_w(int n, int data)
 			status[n] &= ~STA_REQUEST;
 			status[n] &= ~STA_READY;
 			status[n] |= STA_INPUT;
-			
+
 			assert(timer[n]);
 			timer_adjust(timer[n], ATTOTIME_IN_MSEC(1), n, attotime_zero);
         }

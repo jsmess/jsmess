@@ -170,7 +170,7 @@ void win_scroll_window(HWND window, WPARAM wparam, int scroll_bar, int scroll_de
 	scroll_pos = si.nPos;
 
 	// change scroll_pos in accordance with this message
-	switch(LOWORD(wparam)) 
+	switch(LOWORD(wparam))
 	{
 		case SB_BOTTOM:
 			scroll_pos = si.nMax;

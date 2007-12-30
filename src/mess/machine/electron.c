@@ -236,7 +236,7 @@ WRITE8_HANDLER( electron_ula_w ) {
 		// video_update
 		ula.current_pal[i+10] = (ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
 		ula.current_pal[i+8] = (ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
-		ula.current_pal[i+2] = (ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));  
+		ula.current_pal[i+2] = (ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
 		ula.current_pal[i] = (ula.current_pal[i] & 0x04) | (((data & 0x10) >> 3) | ((data & 0x01)));
 		break;
 	}
@@ -289,7 +289,7 @@ static void electron_reset(running_machine *machine)
 MACHINE_START( electron )
 {
 	memory_configure_bank(2, 0, 16, memory_region(REGION_USER1), 0x4000);
-	
+
 	ula.interrupt_status = 0x82;
 	ula.interrupt_control = 0x00;
 	timer_set( attotime_zero, NULL, 0, setup_beep );

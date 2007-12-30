@@ -25,16 +25,16 @@
 
    Notes:
 
-   - 2"8 QDD actually contain a single spiraling track, with 400 128-byte 
+   - 2"8 QDD actually contain a single spiraling track, with 400 128-byte
    sectors; however, the filesystem considers it has 25 virtual tracks of
-   16 sectors => we do the same in imgtool (but thomflop.c uses a 400-sector 
+   16 sectors => we do the same in imgtool (but thomflop.c uses a 400-sector
    addressing to emulate the device hardware)
 
    - tracks always have 16 sectors, this is requred by the filesystem
 
    - two-sided floppies are handled as two one-sided floppies in two
    logical floppy drives on the original Thomsons; each has its own
-   independent FAT and directory. 
+   independent FAT and directory.
    In imgtool, we handle two-sided images as two partitions.
    For now, only 3"1/2 .fd and QDD .qd files can be two-sided.
 
@@ -53,8 +53,8 @@
    Depending on the number of tracks, there can be 50, 80 or 160 blocks.
 
    Filesystem data always occupy track 20, whatever the floppy geometry.
-   
-   * sector 1: 
+
+   * sector 1:
      - bytes 0-7: floppy name
      - remaining bytes: undocumented, seem unused
 
@@ -77,7 +77,7 @@
      Note: in single density, we can reference only 127 blocks. This is not
      a problem because single density floppies can only have 50 or 80 blocks,
      never 160.
-     
+
    * sector 3-16: directory
 
      no subdirectories
@@ -162,10 +162,10 @@ typedef struct {
 } thom_dirent;
 
 
-static void thom_basic_get_info(const imgtool_class *clas, UINT32 param, 
+static void thom_basic_get_info(const imgtool_class *clas, UINT32 param,
 				union imgtoolinfo *info);
 
-static UINT8* thom_get_sector(thom_floppy* f, unsigned head, 
+static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
 			      unsigned track, unsigned sector);
 
 
@@ -183,7 +183,7 @@ static imgtoolerr_t thom_open_fd_qd(imgtool_image *img, imgtool_stream *stream)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
   int size = stream_size( stream );
-  
+
   f->stream = stream;
   f->modified = 0;
 
@@ -197,7 +197,7 @@ static imgtoolerr_t thom_open_fd_qd(imgtool_image *img, imgtool_stream *stream)
     f->heads = 1;
     break;
 
-  case 163840: 
+  case 163840:
     f->tracks = 40;
     f->sector_size = 256;
     f->sectuse_size = 255;
@@ -238,7 +238,7 @@ static imgtoolerr_t thom_open_fd_qd(imgtool_image *img, imgtool_stream *stream)
   default:
     return IMGTOOLERR_CORRUPTIMAGE;
   }
- 
+
   assert( size == f->heads * f->tracks * 16 * f->sector_size );
 
   stream_seek( stream, 0, SEEK_SET );
@@ -266,13 +266,13 @@ static void thom_close_fd_qd(imgtool_image *img)
 
 /*********************** .sap format ************************/
 
-/* SAP format, Copyright 1998 by Alexandre Pukall 
+/* SAP format, Copyright 1998 by Alexandre Pukall
 
    image is composed of:
    - byte 0:        version (0 or 1)
    - bytes 1..65:   signature
    - bytes 66..end: sectors
-  
+
    each sector is composed of
    - a 4-byte header:
      . byte 0:     format
@@ -313,7 +313,7 @@ static imgtoolerr_t thom_open_sap(imgtool_image *img, imgtool_stream *stream)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
   UINT8 buf[262];
-  
+
   f->stream = stream;
   f->modified = 0;
 
@@ -342,14 +342,14 @@ static imgtoolerr_t thom_open_sap(imgtool_image *img, imgtool_stream *stream)
     break;
   default: return IMGTOOLERR_CORRUPTIMAGE;
   }
-  
+
  stream_seek( stream, 66, SEEK_SET );
   while ( 1) {
     int i, sector, track;
     UINT16 crc;
 
     /* load sector */
-    if ( stream_read( stream, buf, 6 + f->sector_size ) < 6 + f->sector_size ) 
+    if ( stream_read( stream, buf, 6 + f->sector_size ) < 6 + f->sector_size )
       break;
 
     /* parse sector header */
@@ -389,7 +389,7 @@ static void thom_close_sap(imgtool_image *img)
       logerror( "thom_diskimage_close_sap: write error\n" );
       return;
     }
-    
+
     for ( track = 0; track < f->tracks; track++ )
       for ( sector = 1; sector <= 16; sector++ ) {
 
@@ -398,7 +398,7 @@ static void thom_close_sap(imgtool_image *img)
 	buf[1] = 0;
 	buf[2] = track;
 	buf[3] = sector;
-	memcpy( buf + 4, 
+	memcpy( buf + 4,
 		thom_get_sector( f, 0, track, sector), f->sector_size );
 
 	/* compute crc */
@@ -410,27 +410,27 @@ static void thom_close_sap(imgtool_image *img)
 	for ( i = 0; i < f->sector_size; i++ ) buf[ i + 4 ] ^= sap_magic_num;
 
 	/* save */
-	if ( stream_write( f->stream, buf, f->sector_size + 6 ) < 
+	if ( stream_write( f->stream, buf, f->sector_size + 6 ) <
 	     f->sector_size + 6 ) {
 	  logerror( "thom_diskimage_close_sap: write error\n" );
 	  return;
 	}
       }
   }
-  
+
   stream_close( f->stream );
 }
 
 
 /*********************** low-level functions *********************/
 
-static UINT8* thom_get_sector(thom_floppy* f, unsigned head, 
+static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
 			      unsigned track, unsigned sector)
 {
   assert( head < f->heads);
   assert( track < f->tracks );
   assert( sector > 0 && sector <= 16 );
-  return & f->data[ ( (head * f->tracks + track) * 16 + (sector-1) ) * 
+  return & f->data[ ( (head * f->tracks + track) * 16 + (sector-1) ) *
 		    f->sector_size ];
 }
 
@@ -553,7 +553,7 @@ static void thom_get_dirent(thom_floppy* f, unsigned head,
   }
 }
 
-static void thom_set_dirent(thom_floppy* f, unsigned head, 
+static void thom_set_dirent(thom_floppy* f, unsigned head,
 			    unsigned n, thom_dirent* d)
 {
   UINT8* base = thom_get_sector( f, head, 20, 3 ) + n * 32;
@@ -774,7 +774,7 @@ static void thom_put_file(thom_floppy* f, unsigned head,
       d->lastsectsize = size;
       break;
     }
-    
+
     /* find next free block & update fat */
     i = block;
     for ( block++; block < nbblocks && fat[ block + 1 ] != 0xff; block++ );
@@ -795,12 +795,12 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 
 /********************** module functions ***********************/
 
-static imgtoolerr_t thom_get_sector_size(imgtool_image* img, UINT32 track, 
-					 UINT32 head, UINT32 sector, 
+static imgtoolerr_t thom_get_sector_size(imgtool_image* img, UINT32 track,
+					 UINT32 head, UINT32 sector,
 					 UINT32 *sector_size)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
-  
+
   if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks ) {
     if ( sector_size ) *sector_size = 0;
     return IMGTOOLERR_SEEKERROR;
@@ -809,7 +809,7 @@ static imgtoolerr_t thom_get_sector_size(imgtool_image* img, UINT32 track,
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_get_geometry(imgtool_image* img, UINT32* tracks, 
+static imgtoolerr_t thom_get_geometry(imgtool_image* img, UINT32* tracks,
 				      UINT32* heads, UINT32* sectors)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
@@ -819,8 +819,8 @@ static imgtoolerr_t thom_get_geometry(imgtool_image* img, UINT32* tracks,
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_read_sector(imgtool_image* img, UINT32 track, 
-				     UINT32 head, UINT32 sector, void *buf, 
+static imgtoolerr_t thom_read_sector(imgtool_image* img, UINT32 track,
+				     UINT32 head, UINT32 sector, void *buf,
 				     size_t len)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
@@ -831,8 +831,8 @@ static imgtoolerr_t thom_read_sector(imgtool_image* img, UINT32 track,
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_write_sector(imgtool_image *img, UINT32 track, 
-				      UINT32 head, UINT32 sector, 
+static imgtoolerr_t thom_write_sector(imgtool_image *img, UINT32 track,
+				      UINT32 head, UINT32 sector,
 				      const void *buf, size_t len)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
@@ -861,8 +861,8 @@ static void thom_info(imgtool_image *img, char *string, size_t len)
 
 /* each side of a floppy has its own filesystem, we treat them as'partitions'
  */
-static imgtoolerr_t thom_list_partitions(imgtool_image *img, 
-					 imgtool_partition_info *partitions, 
+static imgtoolerr_t thom_list_partitions(imgtool_image *img,
+					 imgtool_partition_info *partitions,
 					 size_t len)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
@@ -879,7 +879,7 @@ static imgtoolerr_t thom_list_partitions(imgtool_image *img,
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_open_partition(imgtool_partition *part, 
+static imgtoolerr_t thom_open_partition(imgtool_partition *part,
 					UINT64 first_block, UINT64 block_count)
 {
   imgtool_image* img = imgtool_partition_image( part );
@@ -891,7 +891,7 @@ static imgtoolerr_t thom_open_partition(imgtool_partition *part,
 }
 
 
-static imgtoolerr_t thom_begin_enum(imgtool_directory *enumeration, 
+static imgtoolerr_t thom_begin_enum(imgtool_directory *enumeration,
 				    const char *path)
 {
   int* n = (int*) imgtool_directory_extrabytes( enumeration );
@@ -899,7 +899,7 @@ static imgtoolerr_t thom_begin_enum(imgtool_directory *enumeration,
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_next_enum(imgtool_directory *enumeration, 
+static imgtoolerr_t thom_next_enum(imgtool_directory *enumeration,
 				   imgtool_dirent *ent)
 {
   imgtool_partition *part = imgtool_directory_partition( enumeration);
@@ -909,10 +909,10 @@ static imgtoolerr_t thom_next_enum(imgtool_directory *enumeration,
   int* n = (int*) imgtool_directory_extrabytes( enumeration );
   thom_dirent d;
 
-  do { 
+  do {
     thom_get_dirent( f, head, *n, &d );
     (*n) ++;
-  } 
+  }
   while ( d.type == THOM_DIRENT_FREE );
   if ( d.type == THOM_DIRENT_END ) ent->eof = 1;
   else if ( d.type == THOM_DIRENT_INVALID ) {
@@ -922,7 +922,7 @@ static imgtoolerr_t thom_next_enum(imgtool_directory *enumeration,
     int size;
     snprintf( ent->filename, sizeof(ent->filename), "%s.%s", d.name, d.ext );
     snprintf( ent->attr, sizeof(ent->attr), "%c %c %s",
-	      (d.ftype == 0) ? 'B' :  (d.ftype == 1) ? 'D' : 
+	      (d.ftype == 0) ? 'B' :  (d.ftype == 1) ? 'D' :
 	      (d.ftype == 2) ? 'M' :  (d.ftype == 3) ? 'A' : '?',
 	      (d.format == 0) ? 'B' : (d.format == 0xff) ? 'A' : '?',
 	      d.comment );
@@ -947,9 +947,9 @@ static imgtoolerr_t thom_free_space(imgtool_partition *part, UINT64 *size)
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_read_file(imgtool_partition *part, 
-				   const char *filename, 
-				   const char *fork, 
+static imgtoolerr_t thom_read_file(imgtool_partition *part,
+				   const char *filename,
+				   const char *fork,
 				   imgtool_stream *destf)
 {
   int head = *( (int*) imgtool_partition_extra_bytes( part ) );
@@ -963,7 +963,7 @@ static imgtoolerr_t thom_read_file(imgtool_partition *part,
   thom_conv_filename( filename, name, ext );
   sprintf( fname, "%s.%s", name, ext );
 
-  if ( ! thom_find_dirent( f, head, fname, &d ) ) 
+  if ( ! thom_find_dirent( f, head, fname, &d ) )
     return IMGTOOLERR_FILENOTFOUND;
   size = thom_get_file_size( f, head, &d );
   if ( size < 0 ) return IMGTOOLERR_CORRUPTFILE;
@@ -971,7 +971,7 @@ static imgtoolerr_t thom_read_file(imgtool_partition *part,
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_delete_file(imgtool_partition *part, 
+static imgtoolerr_t thom_delete_file(imgtool_partition *part,
 				     const char *filename)
 {
   int head = *( (int*) imgtool_partition_extra_bytes( part ) );
@@ -983,8 +983,8 @@ static imgtoolerr_t thom_delete_file(imgtool_partition *part,
   /* convert filename */
   thom_conv_filename( filename, name, ext );
   sprintf( fname, "%s.%s", name, ext );
- 
-  if ( ! thom_find_dirent( f, head, fname, &d ) ) 
+
+  if ( ! thom_find_dirent( f, head, fname, &d ) )
     return IMGTOOLERR_FILENOTFOUND;
   /*if ( thom_get_file_size( f, head, &d ) < 0 ) return IMGTOOLERR_CORRUPTFILE;*/
   if ( stream_isreadonly( f->stream ) ) return IMGTOOLERR_WRITEERROR;
@@ -992,10 +992,10 @@ static imgtoolerr_t thom_delete_file(imgtool_partition *part,
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_write_file(imgtool_partition *part, 
-				    const char *filename, 
-				    const char *fork, 
-				    imgtool_stream *sourcef, 
+static imgtoolerr_t thom_write_file(imgtool_partition *part,
+				    const char *filename,
+				    const char *fork,
+				    imgtool_stream *sourcef,
 				    option_resolution *opts)
 {
   int head = *( (int*) imgtool_partition_extra_bytes( part ) );
@@ -1036,7 +1036,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 
   /* file type */
   switch ( option_resolution_lookup_int( opts, 'T' ) ) {
-  case 0: 
+  case 0:
     if ( ! is_new ) break;
     if ( ! mame_stricmp( ext, "BAS" ) ) d.ftype = 0;
     else if ( ! mame_stricmp( ext, "BAT" ) ) d.ftype = 0;
@@ -1056,7 +1056,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 
  /* format flag */
  switch ( option_resolution_lookup_int( opts, 'F' ) ) {
-  case 0: 
+  case 0:
     if ( ! is_new ) break;
     if ( ! mame_stricmp( ext, "DAT" ) ) d.format = 0xff;
     else if ( ! mame_stricmp( ext, "ASC" ) ) d.format = 0xff;
@@ -1066,7 +1066,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
   case 1: d.format = 0; break;
   case 2: d.format = 0xff; break;
   }
- 
+
  /* comment */
  comment = option_resolution_lookup_string( opts, 'C' );
  if ( comment && *comment )
@@ -1077,8 +1077,8 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
  return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_suggest_transfer(imgtool_partition *part, 
-					  const char *fname, 
+static imgtoolerr_t thom_suggest_transfer(imgtool_partition *part,
+					  const char *fname,
 					  imgtool_transfer_suggestion *suggestions,
 					  size_t suggestions_length)
 {
@@ -1091,7 +1091,7 @@ static imgtoolerr_t thom_suggest_transfer(imgtool_partition *part,
   if ( suggestions_length < 1 ) return IMGTOOLERR_SUCCESS;
 
   if ( fname ) {
-    if ( ! thom_find_dirent( f, head, fname, &d ) ) 
+    if ( ! thom_find_dirent( f, head, fname, &d ) )
       return IMGTOOLERR_FILENOTFOUND;
     if ( d.ftype == 0 && d.format == 0 ) is_basic = 1;
   }
@@ -1121,7 +1121,7 @@ static imgtoolerr_t thom_suggest_transfer(imgtool_partition *part,
 }
 
 static imgtoolerr_t thom_create(imgtool_image* img,
-				imgtool_stream *stream, 
+				imgtool_stream *stream,
 				option_resolution *opts)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
@@ -1162,13 +1162,13 @@ static imgtoolerr_t thom_create(imgtool_image* img,
       thom_unstringity( (char*)buf, 8 );
     }
     else memset( buf, ' ', 8 );
-    
+
     /* FAT */
     buf = thom_get_sector( f, i, 20, 2 );
     memset( buf, 0, f->sector_size );
     memset( buf + 1, 0xff, thom_nb_blocks( f ) );
     buf[ 41 ] = buf[ 42 ] = 0xfe; /* reserved for FAT */
-    
+
     /* (empty) directory */
     buf = thom_get_sector( f, i, 20, 3 );
     memset( buf, 0xff, 14 * f->sector_size );
@@ -1184,21 +1184,21 @@ static imgtoolerr_t thom_create(imgtool_image* img,
 
 /* character codes >= 128 are reserved for BASIC keywords */
 
-static const char *const thombas7[2][128] = { 
+static const char *const thombas7[2][128] = {
   { /* statements */
     "END", "FOR", "NEXT", "DATA", "DIM", "READ", "LET", "GO", "RUN", "IF",
     "RESTORE", "RETURN", "REM", "'", "STOP", "ELSE", "TRON", "TROFF", "DEFSTR",
-    "DEFINT", "DEFSNG", "DEFDBL", "ON", "WAIT", "ERROR", "RESUME", "AUTO", 
+    "DEFINT", "DEFSNG", "DEFDBL", "ON", "WAIT", "ERROR", "RESUME", "AUTO",
     "DELETE", "LOCATE", "CLS", "CONSOLE", "PSET", "MOTOR", "SKIP", "EXEC",
     "BEEP", "COLOR", "LINE", "BOX", "UNMASK", "ATTRB", "DEF", "POKE", "PRINT",
     "CONT", "LIST", "CLEAR", "WHILE", "WHEN", "NEW", "SAVE", "LOAD", "MERGE",
     "OPEN", "CLOSE", "INPEN", "PEN", "PLAY", "TAB(", "TO", "SUB", "FN",
-    "SPC(", "USING", "USR", "ERL", "ERR", "OFF", "THEN", "NOT", "STEP", 
+    "SPC(", "USING", "USR", "ERL", "ERR", "OFF", "THEN", "NOT", "STEP",
     "+", "-", "*", "/", "^", "AND", "OR", "XOR", "EQV", "IMP", "MOD", "@",
     ">", "=", "<",
     /* DOS specific */
     "DSKINI", "DSKO$", "KILL", "NAME", "FIELD", "LSET", "RSET",
-    "PUT", "GET", "VERIFY", "DEVICE", "DIR", "FILES", "WRITE", "UNLOAD", 
+    "PUT", "GET", "VERIFY", "DEVICE", "DIR", "FILES", "WRITE", "UNLOAD",
     "BACKUP", "COPY", "CIRCLE", "PAINT", "DRAW", "RENUM", "SWAP", "DENSITY",
   },
   { /* functions: 0xff prefix */
@@ -1218,18 +1218,18 @@ static const char *const thombas5[2][128] = {
   { /* statements */
     "END", "FOR", "NEXT", "DATA", "DIM", "READ", NULL, "GO", "RUN", "IF",
     "RESTORE", "RETURN", "REM", "'", "STOP", "ELSE", "TRON", "TROFF", "DEFSTR",
-    "DEFINT", "DEFSNG", NULL, "ON", "TUNE", "ERROR", "RESUME", "AUTO", 
+    "DEFINT", "DEFSNG", NULL, "ON", "TUNE", "ERROR", "RESUME", "AUTO",
     "DELETE", "LOCATE", "CLS", "CONSOLE", "PSET", "MOTOR", "SKIP", "EXEC",
     "BEEP", "COLOR", "LINE", "BOX", NULL, "ATTRB", "DEF", "POKE", "PRINT",
     "CONT", "LIST", "CLEAR", "DOS", NULL, "NEW", "SAVE", "LOAD", "MERGE",
     "OPEN", "CLOSE", "INPEN", "PEN", "PLAY", "TAB(", "TO", "SUB", "FN",
-    "SPC(", "USING", "USR", "ERL", "ERR", "OFF", "THEN", "NOT", "STEP", 
+    "SPC(", "USING", "USR", "ERL", "ERR", "OFF", "THEN", "NOT", "STEP",
     "+", "-", "*", "/", "^", "AND", "OR", "XOR", "EQV", "IMP", "MOD", "@",
     ">", "=", "<",
     /* DOS specific */
     "DSKINI", "DSKO$", "KILL", "NAME", "FIELD", "LSET", "RSET",
     "PUT", "GET", "VERIFY", "DEVICE", "DIR", "FILES", "WRITE", "UNLOAD",
-    "BACKUP","COPY", "CIRCLE", "PAINT", "DRAW", "RENUM", "SWAP", "SEARCH", 
+    "BACKUP","COPY", "CIRCLE", "PAINT", "DRAW", "RENUM", "SWAP", "SEARCH",
     "DENSITY",
   },
   { /* functions: 0xff prefix */
@@ -1240,7 +1240,7 @@ static const char *const thombas5[2][128] = {
     "SCREEN", "POS", "PTRIG",
     /* DOS specific */
     "DSKL", "CVI", "CVS", "CVD", "MKI$", "MKS$", "MKD$", "LOC", "LOF",
-    "SPACE$", "STRING$", "DSKI$", 
+    "SPACE$", "STRING$", "DSKI$",
   }
 };
 
@@ -1252,18 +1252,18 @@ static const char *const thombas128[2][128] = {
   { /* statements */
     "END", "FOR", "NEXT", "DATA", "DIM", "READ", "LET", "GO", "RUN", "IF",
     "RESTORE", "RETURN", "REM", "'", "STOP", "ELSE", "TRON", "TROFF", "DEFSTR",
-    "DEFINT", "DEFSNG", "DEFDBL", "ON", "WAIT", "ERROR", "RESUME", "AUTO", 
+    "DEFINT", "DEFSNG", "DEFDBL", "ON", "WAIT", "ERROR", "RESUME", "AUTO",
     "DELETE", "LOCATE", "CLS", "CONSOLE", "PSET", "MOTOR", "SKIP", "EXEC",
     "BEEP", "COLOR", "LINE", "BOX", "UNMASK", "ATTRB", "DEF", "POKE", "PRINT",
     "CONT", "LIST", "CLEAR", "INTERVAL", "KEY", "NEW", "SAVE", "LOAD", "MERGE",
     "OPEN", "CLOSE", "INPEN", "PEN", "PLAY", "TAB(", "TO", "SUB", "FN",
-    "SPC(", "USING", "USR", "ERL", "ERR", "OFF", "THEN", "NOT", "STEP", 
+    "SPC(", "USING", "USR", "ERL", "ERR", "OFF", "THEN", "NOT", "STEP",
     "+", "-", "*", "/", "^", "AND", "OR", "XOR", "EQV", "IMP", "MOD", "@",
-    ">", "=", "<", 
+    ">", "=", "<",
     "DSKINI", "DSKO$", "KILL", "NAME", "FIELD", "LSET", "RSET",
-    "PUT", "GET", "VERIFY", "DEVICE", "DIR", "FILES", "WRITE", "UNLOAD", 
+    "PUT", "GET", "VERIFY", "DEVICE", "DIR", "FILES", "WRITE", "UNLOAD",
     "BACKUP", "COPY", "CIRCLE", "PAINT", "RESET", "RENUM", "SWAP", "DENSITY",
-    "WINDOW", "PATTERN", "DO", "LOOP", "EXIT", "INMOUSE", "MOUSE", "CHAINE", 
+    "WINDOW", "PATTERN", "DO", "LOOP", "EXIT", "INMOUSE", "MOUSE", "CHAINE",
     "COMMON", "SEARCH", "FWD", "TURTLE",
   },
   { /* functions: 0xff prefix */
@@ -1273,15 +1273,15 @@ static const char *const thombas128[2][128] = {
     "MID$", "INSTR", "VARPTR", "RND", "INKEY$", "INPUT", "CSRLIN", "POINT",
     "SCREEN", "POS", "PTRIG",
     "DSKL", "CVI", "CVS", "CVD", "MKI$", "MKS$", "MKD$", "LOC", "LOF",
-    "SPACE$", "STRING$", "DSKI$", 
-    "FKEY$", "MIN(", "MAX(", "ATN", "CRUNCH$", "MTRIG", "EVAL", "PALETTE", 
+    "SPACE$", "STRING$", "DSKI$",
+    "FKEY$", "MIN(", "MAX(", "ATN", "CRUNCH$", "MTRIG", "EVAL", "PALETTE",
     "BANK", "HEAD", "ROT", "SHOW", "ZOOM", "TRACE",
   }
 };
 
 /* tables for simple XOR encryption sieve */
-static const UINT8 crypt1[11] = { 
-  0x80, 0x19, 0x56, 0xAA, 0x80, 0x76, 0x22, 0xF1,  0x82, 0x38, 0xAA 
+static const UINT8 crypt1[11] = {
+  0x80, 0x19, 0x56, 0xAA, 0x80, 0x76, 0x22, 0xF1,  0x82, 0x38, 0xAA
 };
 
 static const UINT8 crypt2[13] = {
@@ -1318,7 +1318,7 @@ static void thom_encrypt(imgtool_stream* out, imgtool_stream* in)
   }
 }
 
-static imgtoolerr_t thomcrypt_read_file(imgtool_partition *part, 
+static imgtoolerr_t thomcrypt_read_file(imgtool_partition *part,
 					const char *name,
 					const char *fork, imgtool_stream *dst)
 {
@@ -1351,13 +1351,13 @@ static imgtoolerr_t thomcrypt_read_file(imgtool_partition *part,
   return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thomcrypt_write_file(imgtool_partition *part, 
+static imgtoolerr_t thomcrypt_write_file(imgtool_partition *part,
 					 const char *name,
 					 const char *fork, imgtool_stream *src,
 					 option_resolution *opts)
 {
   UINT8 buf[3];
- 
+
   if ( stream_read( src, buf, 3 ) < 3 || buf[0] == 0xfe ) {
     /* too short or already encrypted file */
     stream_seek( src, 0, SEEK_SET );
@@ -1397,9 +1397,9 @@ void filter_thomcrypt_getinfo(UINT32 state, union filterinfo *info)
 }
 
 /* untokenization automatically decrypt protected files */
-static imgtoolerr_t thom_basic_read_file(imgtool_partition *part, 
-					 const char *name, 
-					 const char *fork, 
+static imgtoolerr_t thom_basic_read_file(imgtool_partition *part,
+					 const char *name,
+					 const char *fork,
 					 imgtool_stream *dst,
 					 const char *const table[2][128])
 {
@@ -1420,7 +1420,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool_partition *part,
   while ( 1 ) {
     int in_str = 0, in_fun = 0;
     int linelength, linenum;
-    
+
     /* line header: line length and line number */
     /* I am not sure this is 100% correct but it works in many cases */
     if ( stream_read( org, buf, 2 ) < 2 ) goto end;
@@ -1468,9 +1468,9 @@ static imgtoolerr_t thom_basic_read_file(imgtool_partition *part,
 }
 
 static imgtoolerr_t thom_basic_write_file(imgtool_partition *part,
-					 const char *name, 
-					 const char *fork, 
-					 imgtool_stream *src, 
+					 const char *name,
+					 const char *fork,
+					 imgtool_stream *src,
 					 option_resolution *opts,
 					 const char *const table[2][128])
 {
@@ -1513,11 +1513,11 @@ static imgtoolerr_t thom_basic_write_file(imgtool_partition *part,
       }									\
   }
 
-FILTER( thombas5,   
+FILTER( thombas5,
 	"Thomson MO5 w/ BASIC 1.0, Tokenized Files (read-only, auto-decrypt)" )
-FILTER( thombas7,   
+FILTER( thombas7,
 	"Thomson TO7 w/ BASIC 1.0, Tokenized Files (read-only, auto-decrypt)" )
-FILTER( thombas128, 
+FILTER( thombas128,
 	"Thomson w/ BASIC 128/512, Tokenized Files (read-only, auto-decrypt)" )
 
 
@@ -1549,8 +1549,8 @@ static OPTION_GUIDE_START( thom_writefile_optguide )
   OPTION_STRING( 'C', "comment", "Comment" )
 OPTION_GUIDE_END
 
-static void thom_basic_get_info(const imgtool_class *clas, 
-				UINT32 param, 
+static void thom_basic_get_info(const imgtool_class *clas,
+				UINT32 param,
 				union imgtoolinfo *info)
 {
   switch ( param ) {
@@ -1612,15 +1612,15 @@ static void thom_basic_get_info(const imgtool_class *clas,
   }
 }
 
-void thom_fd_basic_get_info(const imgtool_class *clas, 
-			    UINT32 param, 
+void thom_fd_basic_get_info(const imgtool_class *clas,
+			    UINT32 param,
 			    union imgtoolinfo *info)
 {
   switch ( param ) {
   case IMGTOOLINFO_STR_NAME:
     strcpy( info->s = imgtool_temp_str(), "thom_fd" ); break;
   case IMGTOOLINFO_STR_DESCRIPTION:
-    strcpy( info->s = imgtool_temp_str(), 
+    strcpy( info->s = imgtool_temp_str(),
 	    "Thomson .fd disk image, BASIC format" );
     break;
   case IMGTOOLINFO_STR_FILE_EXTENSIONS:
@@ -1636,8 +1636,8 @@ void thom_fd_basic_get_info(const imgtool_class *clas,
   }
 }
 
-void thom_qd_basic_get_info(const imgtool_class *clas, 
-			    UINT32 param, 
+void thom_qd_basic_get_info(const imgtool_class *clas,
+			    UINT32 param,
 			    union imgtoolinfo *info)
 {
   switch ( param ) {
@@ -1660,15 +1660,15 @@ void thom_qd_basic_get_info(const imgtool_class *clas,
   }
 }
 
-void thom_sap_basic_get_info(const imgtool_class *clas, 
-			     UINT32 param, 
+void thom_sap_basic_get_info(const imgtool_class *clas,
+			     UINT32 param,
 			     union imgtoolinfo *info)
 {
   switch ( param ) {
   case IMGTOOLINFO_STR_NAME:
     strcpy( info->s = imgtool_temp_str(), "thom_sap" ); break;
   case IMGTOOLINFO_STR_DESCRIPTION:
-    strcpy( info->s = imgtool_temp_str(), 
+    strcpy( info->s = imgtool_temp_str(),
 	    "Thomson .sap disk image, BASIC format" );
     break;
   case IMGTOOLINFO_STR_FILE_EXTENSIONS:

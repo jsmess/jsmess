@@ -142,7 +142,7 @@ SNAPSHOT_LOAD( galaxy )
 	}
 
 	image_fread(image, snapshot_data, snapshot_size);
-	
+
 	galaxy_setup_snapshot(snapshot_data, snapshot_size);
 
 	return INIT_PASS;

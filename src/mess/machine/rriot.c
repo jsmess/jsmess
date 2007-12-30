@@ -92,10 +92,10 @@ void rriot_reset(int nr)
 	rriot[nr].port_b.ddr=0;
 	if (rriot[nr].config->port_b.output)
 		rriot[nr].config->port_b.output(nr,0xff);
-	
+
 	rriot[nr].irq=0;rriot[nr].irqen=0;
-	if (rriot[nr].config->irq_callback) 
-		rriot[nr].config->irq_callback(nr, 0); 
+	if (rriot[nr].config->irq_callback)
+		rriot[nr].config->irq_callback(nr, 0);
 }
 
 int rriot_r(int chip, int offset)
@@ -217,7 +217,7 @@ void rriot_w(int chip, int offset, int data)
 		}
 		rriot[chip].irqen = (offset & 8) ? 1 : 0;
 		rriot[chip].irq =0;
-		
+
 		switch (offset&3) {
 		case 0: /* Timer 1 start */
 			LOG(("rriot(%d) TMR1  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
@@ -247,7 +247,7 @@ void rriot_w(int chip, int offset, int data)
 static int rriot_a_r(int chip)
 {
 	int data;
-	if (rriot[chip].config->port_a.input) 
+	if (rriot[chip].config->port_a.input)
 		data = rriot[chip].config->port_a.input(chip);
 	else
 		data = 0xff;
@@ -259,7 +259,7 @@ static int rriot_a_r(int chip)
 static int rriot_b_r(int chip)
 {
 	int data;
-	if (rriot[chip].config->port_b.input) 
+	if (rriot[chip].config->port_b.input)
 		data = rriot[chip].config->port_b.input(chip);
 	else
 		data = 0xff;
@@ -277,7 +277,7 @@ static void rriot_a_w(int chip, int data)
 
 static void rriot_b_w(int chip, int data)
 {
-	
+
 }
 
  READ8_HANDLER ( rriot_0_r ) { return rriot_r(0,offset); }

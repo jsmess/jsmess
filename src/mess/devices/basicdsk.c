@@ -203,7 +203,7 @@ void basicdsk_set_geometry(mess_image *img, UINT8 tracks, UINT8 heads, UINT8 sec
 	pDisk->track_divider = track_skipping ? 2 : 1;
 
 	floppy_drive_set_geometry_absolute(img, tracks * pDisk->track_divider, heads );
-	
+
 	pDisk->image_size = pDisk->tracks * pDisk->heads * pDisk->sec_per_track * pDisk->sector_length;
 
 	/* setup a new ddam map */

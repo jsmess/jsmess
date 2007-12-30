@@ -205,7 +205,7 @@ MACHINE_START( geneve )
     	tms9901_init(0, & tms9901reset_param_ti99);
 
         /* Initialize all. Actually, at this point, we don't know
-           how the switches are set. Later we use the configuration switches to 
+           how the switches are set. Later we use the configuration switches to
            determine which one to use. */
 	ti99_peb_init();
         ti99_fdc_init();
@@ -851,7 +851,7 @@ WRITE8_HANDLER ( geneve_w )
 						else
 						{
 							GPL_port.addr = ((int) data << 8) | (GPL_port.addr & 0xFF);
-	
+
 							GPL_port.waddr_LSB = TRUE;
 						}
 					}

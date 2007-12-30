@@ -199,7 +199,7 @@ static LRESULT CALLBACK hexview_wndproc(HWND hexview, UINT message, WPARAM wpara
 	struct hexview_info *info;
 
 	info = get_hexview_info(hexview);
-	
+
 	switch(message)
 	{
 		case WM_CREATE:

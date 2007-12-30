@@ -31,7 +31,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( crvision )
-	
+
 	// Player 1 Joystick
 
 	PORT_START_TAG("PA0-0")
@@ -246,12 +246,12 @@ static UINT8 read_keyboard(int pa)
 	int i;
 	UINT8 value;
 	char portname[10];
-	
+
 	for (i = 0; i < 8; i++)
 	{
 		sprintf(portname, "PA%u-%u", pa, i);
 		value = readinputportbytag(portname);
-		
+
 		if (value != 0xff)
 		{
 			if (value == 0xff - (1 << i))
@@ -353,11 +353,11 @@ static WRITE8_HANDLER( pia_portb_w )
 	*/
 
 	SN76496_0_w(0, data);
-	
+
 	sn76489_ready = 0;
 
 	// wait 32 cycles of 2 MHz to synchronize CPU and SN76489
-	timer_set(ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready); 
+	timer_set(ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready);
 }
 
 static WRITE8_HANDLER( pia_cb2_w )

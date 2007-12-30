@@ -108,7 +108,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 	}
 	offs *= geom->sector_length;
 	offs += geom->offset;
-	
+
 	if (offset)
 		*offset = offs;
 	return FLOPPY_ERROR_SUCCESS;
@@ -199,7 +199,7 @@ static floperr_t basicdsk_format_track(floppy_image *floppy, int head, int track
 	}
 
 	memset(buffer, floppy_get_filler(floppy), sector_length);
-	
+
 	for (sector = 0; sector < geometry->sectors; sector++)
 	{
 		err = basicdsk_write_sector(floppy, head, track, sector + geometry->first_sector_id, buffer, sector_length);

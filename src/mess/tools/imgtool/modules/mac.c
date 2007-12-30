@@ -5313,7 +5313,7 @@ typedef struct mac_iterator
 } mac_iterator;
 
 /*
-	Open the disk catalog for enumeration 
+	Open the disk catalog for enumeration
 */
 static imgtoolerr_t mac_image_beginenum(imgtool_directory *enumeration, const char *path)
 {

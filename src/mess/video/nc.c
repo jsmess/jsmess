@@ -86,7 +86,7 @@ VIDEO_UPDATE( nc )
 		height = NC_SCREEN_HEIGHT;
 		width = NC_SCREEN_WIDTH;
 		pens[0] = machine->pens[2];
-		pens[1] = machine->pens[3];	
+		pens[1] = machine->pens[3];
 	}
 
 
@@ -113,7 +113,7 @@ VIDEO_UPDATE( nc )
 			}
 
 			x = px;
-							
+
 			line_ptr = line_ptr+1;
 		}
 	}

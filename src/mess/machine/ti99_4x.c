@@ -732,9 +732,9 @@ static void ti99_common_init(const TMS9928a_interface *gfxparm) {
 	tms9901_init(0, & tms9901reset_param_ti99_4x);
 
 	TMS9928A_configure(gfxparm);
-            
+
         /* Initialize all. Actually, at this point, we don't know
-           how the switches are set. Later we use the configuration switches to 
+           how the switches are set. Later we use the configuration switches to
            determine which one to use. */
 	ti99_peb_init();
         ti99_fdc_init();
@@ -786,7 +786,7 @@ MACHINE_RESET( ti99 )
 
 	/* init tms9901 */
         tms9901_reset(0);
-	
+
 	if (!has_evpc) TMS9928A_reset();
         else v9938_reset();
 
@@ -1019,7 +1019,7 @@ WRITE16_HANDLER ( ti99_nop_8_w )
 
 /*
 	TI-99 cartridge port: attached to the 8-bit bus.
-	
+
 	Cartridges are usually made of ROM, through a few cartridges include some
 	RAM as well.  Bank switching is common: I know three banking schemes,
 	namely TI, MBX and Supercart.  The TI scheme writes a dummy value in
@@ -1866,7 +1866,7 @@ static int ti99_handset_poll_keyboard(int num)
 
 			return TRUE;
 		}
-				
+
 	}
 
 	current_key = 0;	/* default value if no key is down */
@@ -1895,7 +1895,7 @@ static int ti99_handset_poll_keyboard(int num)
 
 		return TRUE;
 	}
-		
+
 	return FALSE;
 }
 

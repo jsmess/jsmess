@@ -361,7 +361,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	/* only repeat keys on a 2/2+ if special REPT key is pressed */
 	if (a2_has_repeat())
 		time_until_repeat = readinputportbytag("keyb_repeat") & 0x01 ? 0 : ~0;
-			
+
 	/* check caps lock and set LED here */
 	if (pressed_specialkey(SPECIALKEY_CAPSLOCK))
 	{

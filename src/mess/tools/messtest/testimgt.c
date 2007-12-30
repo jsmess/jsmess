@@ -64,7 +64,7 @@ static void node_createimage(struct imgtooltest_state *state, xml_data_node *nod
 		return;
 	}
 	driver = attr_node->value;
-	
+
 	/* does image creation support options? */
 	module = imgtool_find_module(attr_node->value);
 	if (module && module->createimage_optguide && module->createimage_optspec)
@@ -677,7 +677,7 @@ void node_testimgtool(xml_data_node *node)
 
 	attr_node = xml_get_attribute(node, "name");
 	report_testcase_begin(attr_node ? attr_node->value : NULL);
-	
+
 	memset(&state, 0, sizeof(state));
 
 	for (child_node = node->child; child_node; child_node = child_node->next)

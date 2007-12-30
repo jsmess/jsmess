@@ -45,22 +45,22 @@
 #include "sound/speaker.h"
 
 static UINT8 avigo_key_line;
-/* 
+/*
 	bit 7:						?? high priority. When it occurs, clear this bit.
-	bit 6: pen int				
+	bit 6: pen int
 	 An interrupt when pen is pressed against screen.
 
 	bit 5: real time clock
-		
 
-	bit 4: 
-	
-	  
-	bit 3: uart int				
-	
-	  
+
+	bit 4:
+
+
+	bit 3: uart int
+
+
 	bit 2: synchronisation link interrupt???keyboard int			;; check bit 5 of port 1,
-	
+
 	bit 1: ???		(cleared in nmi, and then set again)
 
 */
@@ -189,7 +189,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		if ((current_input_port_data[3] & 0x01)!=0)
 		{
 			/* pen pressed to screen */
-			
+
 			logerror("pen pressed interrupt\n");
 			stylus_press_x = stylus_marker_x;
 			stylus_press_y = stylus_marker_y;
@@ -271,7 +271,7 @@ static void avigo_tc8521_alarm_int(int state)
 {
 //#if 0
 	avigo_irq &=~(1<<5);
-	
+
 	if (state)
 	{
 		avigo_irq |= (1<<5);
@@ -386,7 +386,7 @@ static const uart8250_interface avigo_com_interface[1]=
 static OPBASE_HANDLER( avigo_opbase_handler )
 {
 	void *opbase;
-	
+
 	opbase = avigo_banked_opbase[address / 0x4000];
 	if (opbase)
 	{
@@ -632,18 +632,18 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 			/* in the avigo rom, the y coordinate is inverted! */
 			/* therefore a low value would be near the bottom of the display,
 			and a high value at the top */
-			
+
 			/* total valid range 0x044->0x036a */
 			/* 0x0350 is also checked */
-			
+
 			/* assumption 0x044->0x0350 is screen area and
 			0x0350->0x036a is panel at bottom */
-			
+
 			/* 780 is therefore on-screen range */
 			/* 3.25 a/d units per pixel */
 			/* a/d unit * a/d range = total height */
 			/* 3.25 * 1024.00 = 315.07 */
-			
+
 			logerror("a/d select y coordinate\n");
 			logerror("y coord: %d\n",stylus_press_y);
 
@@ -672,21 +672,21 @@ static  READ8_HANDLER(avigo_ad_data_r)
 	data = 0;
 
 	/* original */
-	
+
 	/* status AND	11110111 */
 	/* status OR	01110000 -> C20F */
-	
+
 	switch (avigo_ad_control_status & 0x078)
 	{
 		/* x1110xxx */
 		/* read upper 4 bits of 10 bit A/D number */
 		case 0x070:
 		case 0x078:
-		{		
+		{
 			/* upper 4 bits of 10 bit A/D number in bits 7-4 of data */
 			/* bit 0 must be 0, bit 1 must be 0 */
 			/* bit 3 must be 1. bit 2 can have any value */
-	
+
 			logerror("a/d read upper 4 bits\n");
 			data = ((avigo_ad_value>>6) & 0x0f)<<4;
 			data |= 8;
@@ -713,7 +713,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 	/* wait for bit 0 of status to become 1 */
 	/* read data -> d */
 
-	
+
 	/* C20f AND 10111111 */
 	/* C20f OR  00001000 */
 	/* x0111xxx */
@@ -763,7 +763,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 
 	logerror("avigo ad read %02x\n",data);
 
-	return data;	
+	return data;
 }
 
 
@@ -844,18 +844,18 @@ static INPUT_PORTS_START(avigo)
     PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEMO") PORT_CODE(KEYCODE_M)
     PORT_BIT (0x0fe, 0xfe, IPT_UNUSED)
 
-	PORT_START	
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_Q) PORT_CODE(JOYCODE_BUTTON1) 
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2) 		
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_Q) PORT_CODE(JOYCODE_BUTTON1)
+    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	/* a cursor is drawn to indicate the position, so when a click is done, it will occur in the correct place */
-	PORT_START /* Mouse - X AXIS */ 
+	PORT_START /* Mouse - X AXIS */
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START /* Mouse - Y AXIS */
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-	
+
 INPUT_PORTS_END
 
 

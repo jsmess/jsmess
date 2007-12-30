@@ -329,7 +329,7 @@ UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
 			assert(0);
 			break;
 	}
-	
+
 	/* advance the file pointer */
 	s->position += result;
 

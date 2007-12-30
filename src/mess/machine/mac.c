@@ -1,6 +1,6 @@
 /****************************************************************************
 	Mac hardware
-	
+
 	The hardware for Mac 128k, 512k, 512ke, Plus (SCSI, SCC, etc).
 
 	Nate Woods
@@ -8,7 +8,7 @@
 	Raphael Nabet
 
 	Mac Model Feature Summary:
-		
+
 						CPU		FDC		Keyb	PRAM	ROMMir
 		 - Mac 128k		68k		IWM		orig	orig	???
 		 - Mac 512k		68k		IWM		orig	orig	???
@@ -434,7 +434,7 @@ static TIMER_CALLBACK(kbd_clock)
 		}
 		else
 		{
-			/* Communication is over */ 
+			/* Communication is over */
 			kbd_comm = FALSE;
 		}
 	}
@@ -489,7 +489,7 @@ static void keyboard_receive(int val)
 
 		keyboard_reply = scan_keyboard();
 		if (keyboard_reply == 0x7B)
-		{	
+		{
 			/* if NULL, wait until key pressed or timeout */
 			timer_adjust(inquiry_timeout,
 				attotime_make(0, DOUBLE_TO_ATTOSECONDS(0.25)),
@@ -903,7 +903,7 @@ static void rtc_execute_cmd(int data)
 	if (rtc_state == RTC_STATE_XPCOMMAND)
 	{
 		rtc_xpaddr = ((rtc_cmd & 7)<<5) | ((data&0x7c)>>2);
-		if ((rtc_cmd & 0x80) != 0)	
+		if ((rtc_cmd & 0x80) != 0)
 		{
 			// read command
 			if (LOG_RTC)

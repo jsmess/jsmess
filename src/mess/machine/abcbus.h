@@ -41,7 +41,7 @@
 	Type					Size		Tracks	Sides	Sectors/track	Sectors		Speed			Drives
 
 	ABC-830		Floppy		160 KB		40		1		16				640			250 Kbps		MPI 51, BASF 6106
-				Floppy		80 KB		40		1		8				320			250 Kbps		Scandia Metric FD2		
+				Floppy		80 KB		40		1		8				320			250 Kbps		Scandia Metric FD2
 	ABC-832		Floppy		640 KB		80		2		16				2560		250 Kbps		Micropolis 1015, Micropolis 1115, BASF 6118
 	ABC-834		Floppy		640 KB		80		2		16				2560		250 Kbps		Teac FD 55 F
 	ABC-838		Floppy		1 MB		77		2		25				3978 		500 Kbps		BASF 6104, BASF 6115

@@ -96,7 +96,7 @@ static int sprites_collide(int spriteNum0, int spriteNum1) {
             (s1->doubleyres ? 2 : 1);
     h2 = 8 * (s2->quady ? 4 : 1) * (s2->doubley ? 2 : 1) *
             (s2->doubleyres ? 2 : 1);
-    
+
     if ((x1 + w1 <= x2) || (y1 + h1 <= y2) ||
             (x1 >= x2 + w2) || (y1 >= y2 + h2))
         return FALSE;
@@ -609,7 +609,7 @@ static void draw_background(mame_bitmap *bitmap, int transparency)
 				}
 				offs++;
 			} // next col
-		} // next row 
+		} // next row
 	}
 }
 */

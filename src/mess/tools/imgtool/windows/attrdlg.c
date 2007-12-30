@@ -388,7 +388,7 @@ static INT_PTR CALLBACK putfileopt_dialogproc(HWND dialog, UINT message,
 	HWND ok_button, cancel_button;
 	RECT r1, r2;
 	LONG_PTR l;
-	
+
 	switch(message)
 	{
 		case WM_INITDIALOG:

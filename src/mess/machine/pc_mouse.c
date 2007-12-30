@@ -60,40 +60,40 @@ static TIMER_CALLBACK(pc_mouse_scan)
 	int mbc;
 
 	/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
-	if (pc_mouse.head==pc_mouse.tail) 
+	if (pc_mouse.head==pc_mouse.tail)
 	{
 		nx = readinputportbytag("pc_mouse_x");
-	
+
 		dx = nx - ox;
 		if (dx<=-0x800) dx = nx + 0x1000 - ox; /* Prevent jumping */
 		if (dx>=0x800) dx = nx - 0x1000 - ox;
 		ox = nx;
-	
+
 		ny = readinputportbytag("pc_mouse_y");
-	
+
 		dy = ny - oy;
 		if (dy<=-0x800) dy = ny + 0x1000 - oy;
 		if (dy>=0x800) dy = ny - 0x1000 - oy;
 		oy = ny;
-	
+
 		nb = readinputportbytag("pc_mouse_misc");
-		if ((nb & 0x80) != 0) 
+		if ((nb & 0x80) != 0)
 		{
 			pc_mouse.protocol=TYPE_MOUSE_SYSTEMS;
 		}
 		else
-		{	
+		{
 			pc_mouse.protocol=TYPE_MICROSOFT_MOUSE;
 		}
-		mbc = nb^pc_mouse.mb; 
+		mbc = nb^pc_mouse.mb;
 		pc_mouse.mb = nb;
-	
+
 		/* check if there is any delta or mouse buttons changed */
 		if ( (dx!=0) || (dy!=0) || (mbc!=0) )
 		{
 			switch (pc_mouse.protocol)
 			{
-	
+
 			default:
 			case TYPE_MICROSOFT_MOUSE:
 				{
@@ -106,7 +106,7 @@ static TIMER_CALLBACK(pc_mouse_scan)
 						m0 = 0x40 | ((nb << 4) & 0x30) | ((ddx >> 6) & 0x03) | ((ddy >> 4) & 0x0c);
 						m1 = ddx & 0x3f;
 						m2 = ddy & 0x3f;
-	
+
 						/* KT - changed to use a function */
 						pc_mouse_queue_data(m0 | 0x40);
 						pc_mouse_queue_data(m1 & 0x03f);
@@ -115,26 +115,26 @@ static TIMER_CALLBACK(pc_mouse_scan)
 						{
 						pc_mouse_queue_data( (nb & 0x04) << 3);
 						}
-	
+
 						dx -= ddx;
 						dy -= ddy;
 					} while( dx || dy );
 				}
 				break;
-	
+
 				/* mouse systems mouse
 				from "PC Mouse information" by Tomi Engdahl */
-	
+
 				/*
 				The data is sent in 5 byte packets in following format:
 						D7      D6      D5      D4      D3      D2      D1      D0
-	
+
 				1.      1       0       0       0       0       LB      CB      RB
 				2.      X7      X6      X5      X4      X3      X2      X1      X0
 				3.      Y7      Y6      Y5      Y4      Y3      Y4      Y1      Y0
 				4.      X7'     X6'     X5'     X4'     X3'     X2'     X1'     X0'
 				5.      Y7'     Y6'     Y5'     Y4'     Y3'     Y4'     Y1'     Y0'
-	
+
 				LB is left button state (0=pressed, 1=released)
 				CB is center button state (0=pressed, 1=released)
 				RB is right button state (0=pressed, 1=released)
@@ -146,19 +146,19 @@ static TIMER_CALLBACK(pc_mouse_scan)
 					  format (-128..+127), positive direction right
 				Y7'-Y0' movement in Y direction since sending of Y7-Y0 in signed byte
 					  format (-128..+127), positive direction up
-	
+
 				The last two bytes in the packet (bytes 4 and 5) contains information about movement data changes which have occured after data butes 2 and 3 have been sent. */
-	
+
 				case TYPE_MOUSE_SYSTEMS:
 				{
-	
+
 					dy =-dy;
-	
+
 					do
 					{
 						int ddx = (dx < -128) ? -128 : (dx > 127) ? 127 : dx;
 						int ddy = (dy < -128) ? -128 : (dy > 127) ? 127 : dy;
-	
+
 						/* KT - changed to use a function */
 						pc_mouse_queue_data(0x080 | ((((nb & 0x04) >> 1) + ((nb & 0x02) << 1) + (nb & 0x01)) ^ 0x07));
 						pc_mouse_queue_data(ddx);
@@ -169,12 +169,12 @@ static TIMER_CALLBACK(pc_mouse_scan)
 						dx -= ddx;
 						dy -= ddy;
 					} while( dx || dy );
-	
+
 				}
 				break;
 			}
 		}
-	} 
+	}
 
 	/* Send any data from this scan or any pending data from a previous scan */
 
@@ -219,13 +219,13 @@ void pc_mouse_handshake_in(int n, int outputs)
 			/* reset mouse */
 			pc_mouse.head = pc_mouse.tail = pc_mouse.mb = 0;
 
-			if ((readinputportbytag("pc_mouse_misc") & 0x80) == 0 ) 
+			if ((readinputportbytag("pc_mouse_misc") & 0x80) == 0 )
 			{
 				/* Identify as Microsoft 3 Button Mouse */
-				pc_mouse.queue[pc_mouse.head] = 'M';  
+				pc_mouse.queue[pc_mouse.head] = 'M';
 				pc_mouse.head = ++pc_mouse.head % 256;
-				pc_mouse.queue[pc_mouse.head] = '3';  
-				pc_mouse.head = ++pc_mouse.head % 256;  
+				pc_mouse.queue[pc_mouse.head] = '3';
+				pc_mouse.head = ++pc_mouse.head % 256;
 			}
 
 			/* start a timer to scan the mouse input */
@@ -235,7 +235,7 @@ void pc_mouse_handshake_in(int n, int outputs)
 		{
 			/* CTS just went to 0 */
 			timer_adjust(pc_mouse.timer, attotime_zero, pc_mouse.serial_port, attotime_zero);
-			pc_mouse.head = pc_mouse.tail = 0; 
+			pc_mouse.head = pc_mouse.tail = 0;
 		}
 	}
 
@@ -251,14 +251,14 @@ void pc_mouse_handshake_in(int n, int outputs)
 
 INPUT_PORTS_START( pc_mouse_mousesystems )
 	PORT_START_TAG( "pc_mouse_misc" )
-	PORT_CONFNAME( 0x80, 0x80, "Mouse Protocol" ) 
+	PORT_CONFNAME( 0x80, 0x80, "Mouse Protocol" )
 	PORT_CONFSETTING( 0x80, "Mouse Systems" )
 	PORT_CONFSETTING( 0x00, "Microsoft" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2)
 
-	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */  
+	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START_TAG( "pc_mouse_y" ) /* Mouse - Y AXIS */
@@ -269,14 +269,14 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( pc_mouse_microsoft )
 	PORT_START_TAG( "pc_mouse_misc" )
-	PORT_CONFNAME( 0x80, 0x00, "Mouse Protocol" ) 
-	PORT_CONFSETTING( 0x00, "Microsoft" )         
+	PORT_CONFNAME( 0x80, 0x00, "Mouse Protocol" )
+	PORT_CONFSETTING( 0x00, "Microsoft" )
 	PORT_CONFSETTING( 0x80, "Mouse Systems" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2)
 
-	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */  
+	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START_TAG( "pc_mouse_y" ) /* Mouse - Y AXIS */

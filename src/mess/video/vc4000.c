@@ -67,18 +67,18 @@ static struct
 	mame_bitmap *bitmap;
 } vc4000_video =
 {
-    { 
+    {
 		{ &vc4000_video.reg.d.sprites[0],1 },
-		{ &vc4000_video.reg.d.sprites[1],2 }, 
+		{ &vc4000_video.reg.d.sprites[1],2 },
 		{ &vc4000_video.reg.d.sprites[2],4 },
 		{ &vc4000_video.reg.d.sprite4,8 }
-    }    
+    }
 };
 
 VIDEO_START(vc4000)
 {
     int i;
-    
+
 	for (i=0;i<0x20; i++)
 	{
 		sprite_collision[i]=0;
@@ -111,7 +111,7 @@ READ8_HANDLER(vc4000_video_r)
 			data |= 1;
 			vc4000_video.sprites[3].finished = FALSE;
 		}
-		
+
 		if (vc4000_video.sprites[2].finished)
 		{
 			data |= 2;
@@ -151,7 +151,7 @@ READ8_HANDLER(vc4000_video_r)
 		// between 20 and 225
 		if (!activecpu_get_reg(S2650_FO))
 		{
-			if (input_port_7_r(0)&0x1) data=20; 
+			if (input_port_7_r(0)&0x1) data=20;
 			if (input_port_7_r(0)&0x2) data=225;
 		}
 		else
@@ -245,7 +245,7 @@ static const char led[20][12+1] =
 
 static void vc4000_draw_digit(mame_bitmap *bitmap, int x, int y, int d, int line)
 {
-    static const int digit_to_segment[0x10]={ 
+    static const int digit_to_segment[0x10]={
 	0x0fff, 0x007c, 0x17df, 0x15ff, 0x1c7d, 0x1df7, 0x1ff7, 0x007f, 0x1fff, 0x1dff
     };
     int i,j;
@@ -324,7 +324,7 @@ static void vc4000_sprite_update(mame_bitmap *bitmap, UINT8 *collision, SPRITE *
 		}
 
 		if (This->y>252) break;
-		
+
 		This->delay=0;
 		This->state++;
 
@@ -382,7 +382,7 @@ INLINE void vc4000_draw_grid(UINT8 *collision)
 		case 3: w=4;break;
 	}
 	switch (i&3) {
-	case 0: 
+	case 0:
 		if (k&1) w=8;break;
 	case 1:
 		if ((line%40)<=10) {
@@ -472,7 +472,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		(vc4000_video.sprites[2].finished_now) |
 		(vc4000_video.sprites[1].finished_now) |
 		(vc4000_video.sprites[0].finished_now))
-	{ 
+	{
 		cpunum_set_input_line_vector(0, 0, 3);
 		cpunum_set_input_line(0, 0, PULSE_LINE);
 	}

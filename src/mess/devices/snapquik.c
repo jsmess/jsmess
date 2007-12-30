@@ -28,7 +28,7 @@ static TIMER_CALLBACK(snapquick_processsnapshot)
 	struct snapquick_info *si = (struct snapquick_info *) ptr;
 	snapquick_loadproc loadproc;
 	const char *file_type;
-	
+
 	loadproc = (snapquick_loadproc) device_get_info_fct(&si->dev->devclass, DEVINFO_PTR_SNAPSHOT_LOAD);
 	file_type = image_filetype(si->img);
 	loadproc(si->img, file_type, si->file_size);

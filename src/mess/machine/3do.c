@@ -154,7 +154,7 @@ void madam_init( void )
 READ32_HANDLER( clio_r )
 {
 	logerror( "%08X: CLIO read offset = %08X\n", activecpu_get_pc(), offset );
-	
+
 	switch( offset )
 	{
 		case 0x0a: return 0x40; break;
@@ -162,7 +162,7 @@ READ32_HANDLER( clio_r )
 		{
 			static UINT32 irq_sequence[3] = { 0, 4, 12 };
 			static int counter = 0;
-			
+
 			return irq_sequence[(counter++)%3];
 		}
 		break;
@@ -173,17 +173,17 @@ READ32_HANDLER( clio_r )
 WRITE32_HANDLER( clio_w )
 {
 	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", activecpu_get_pc(), offset, data, mem_mask );
-	
+
 	switch( offset )
 	{
 		case 0x0A:	/* 03400028 - bits 0,1, and 6 are tested (irq sources?) */
 		break;
-		
+
 		case 0x0B:	/* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
 		break;
-		
+
 		case 0x88:	/* set timer frequency */
-			
+
 		break;
 	}
 }

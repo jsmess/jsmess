@@ -668,7 +668,7 @@ static INTERRUPT_GEN( abc802_vblank_interrupt )
 static MACHINE_START( abc802 )
 {
 	machine_start_abc800(machine);
-	
+
 	z80dart_init(0, &abc802_dart_intf);
 
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
@@ -683,7 +683,7 @@ static MACHINE_RESET( abc802 )
 static MACHINE_START( abc806 )
 {
 	machine_start_abc800(machine);
-	
+
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
 }
@@ -726,7 +726,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
 	MDRV_IMPORT_FROM(abc800m)
-	
+
 	MDRV_SCREEN_SIZE(40*6, 24*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*10-1)
 	MDRV_PALETTE_LENGTH(8)
@@ -741,7 +741,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_CPU_PROGRAM_MAP(abc802_map, 0)
 	MDRV_CPU_IO_MAP(abc802_io_map, 0)
 	MDRV_CPU_VBLANK_INT(abc802_vblank_interrupt, 1)
-	
+
 	MDRV_MACHINE_START(abc802)
 	MDRV_MACHINE_RESET(abc802)
 
@@ -756,7 +756,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(abc806_map, 0)
 	MDRV_CPU_IO_MAP(abc806_io_map, 0)
-	
+
 	MDRV_MACHINE_START(abc806)
 	MDRV_MACHINE_RESET(abc806)
 MACHINE_DRIVER_END

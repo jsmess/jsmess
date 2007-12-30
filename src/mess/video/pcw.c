@@ -70,7 +70,7 @@ VIDEO_UPDATE( pcw )
 		pen1^=1;
 		pen0^=1;
 	}
-	
+
 	pen0 = machine->pens[pen0];
 	pen1 = machine->pens[pen1];
 

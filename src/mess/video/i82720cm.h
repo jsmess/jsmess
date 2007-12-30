@@ -5,7 +5,7 @@
 
 	Per Ola Ingvarsson
 	Tomas Karlsson
-			
+
  ******************************************************************************/
 
 enum I82720_GDC_COMMANDS
@@ -17,7 +17,7 @@ enum I82720_GDC_COMMANDS
 	CMD_VSYNC_SLAVE	 = 0x6e,	/* Selects slave video synchronization mode */
 	CMD_VSYNC_MASTER = 0x6f,	/* Selects master video synchronization mode */
 	CMD_CCHAR	 = 0x4b,	/* Specifies the cursor and character row heights */
-                           
+
 	/* Display control commands */
 	CMD_START	 = 0x6b,	/* Ends idle mode and unblanks the display */
 	CMD_BCTRL_OFF	 = 0x0c,	/* Controls the blanking and unblanking of the display */
@@ -26,7 +26,7 @@ enum I82720_GDC_COMMANDS
 	CMD_CURS	 = 0x49,	/* Sets the position of the cursor in display memory */
 	CMD_PRAM_BITMASK = 0x70,	/* Defines starting addresses and lengths of the display areas and specifies the eight bytes for the graphics character */
 	CMD_PITCH	 = 0x47,	/* Specifies the width of the X dimension of the display memory */
-	
+
 	/* Drawing control commands */
 	CMD_WDAT_BITMASK = 0x20,	/* Writes data words or bytes into display memory */
 	CMD_MASK	 = 0x4a,	/* Sets the MASK register contents */
@@ -38,7 +38,7 @@ enum I82720_GDC_COMMANDS
 	CMD_RDAT_BITMASK = 0xa0,	/* Reads data words or bytes from display */
 	CMD_CURD	 = 0xe0,	/* Reads the cursor position */
 	CMD_LPRD	 = 0xc0,	/* Reads the light pen address */
-	
+
 	/* Data control commands */
 	CMD_DMAR_BITMASK = 0xa4,	/* Requests a DMA read transfer */
 	CMD_DMAW_BITMASK = 0x24		/* Requests a DMA write transfer */

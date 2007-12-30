@@ -44,7 +44,7 @@ static void dave_refresh_ints(void)
 	int int_wanted;
 
 	logerror("int latch: %02x enable: %02x input: %02x\n", (int) dave.int_latch, (int) dave.int_enable, (int) dave.int_input);
-	
+
 	int_wanted = (((dave.int_enable<<1) & dave.int_latch)!=0);
 
 	if (dave_iface->int_callback)
@@ -82,7 +82,7 @@ static void dave_refresh_selectable_int(void)
 			dave.int_input |= (dave.fifty_hz_state & 0x01)<<0;
 		}
 		break;
-		
+
 
 		default:
 			break;
@@ -117,7 +117,7 @@ static TIMER_CALLBACK(dave_1khz_callback)
 
 		dave.fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
 		dave.fifty_hz_state^=0x0ffffffff;
-	
+
 		if (dave.fifty_hz_state!=0)
 		{
 			dave.int_irq |= (1<<1);
@@ -130,7 +130,7 @@ static TIMER_CALLBACK(dave_1khz_callback)
 	{
 		/* reload counter */
 		dave.one_hz_count = DAVE_ONE_HZ_COUNTER_RELOAD;
-	
+
 		/* change state */
 		dave.int_input ^= (1<<2);
 
@@ -168,7 +168,7 @@ void	Dave_Init(void)
 	dave.fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
 	dave.one_hz_count = DAVE_ONE_HZ_COUNTER_RELOAD;
 	timer_pulse(ATTOTIME_IN_HZ(1000), NULL, 0, dave_1khz_callback);
-	
+
 	for (i=0; i<3; i++)
 	{
 		dave.Period[i] = ((STEP  * Machine->sample_rate)/125000);
@@ -178,11 +178,11 @@ void	Dave_Init(void)
 }
 
 static void dave_update_sound(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
-{		
+{
 	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,
 	2 = channel 1 left volume, 3 = channel 1 right volume,
-	4 = channel 2 left volume, 5 = channel 2 right volume 
+	4 = channel 2 left volume, 5 = channel 2 right volume
 	6 = noise channel left volume, 7 = noise channel right volume */
 	int output_volumes[8];
 	int left_volume;
@@ -295,12 +295,12 @@ static WRITE8_HANDLER(Dave_sound_w)
 		case 5:
 		{
 			int count = 0;
-			int channel_index = offset>>1; 
+			int channel_index = offset>>1;
 
 			/* Fout = 125,000 / (n+1) hz */
 
 			/* sample rate/clock */
-			
+
 
 			/* get down-count */
 			switch (offset & 0x01)
@@ -318,10 +318,10 @@ static WRITE8_HANDLER(Dave_sound_w)
 				}
 				break;
 			}
-			
+
 			count++;
 
-		
+
 			dave.Period[channel_index] = ((STEP  * Machine->sample_rate)/125000) * count;
 
 		}
@@ -356,7 +356,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 			/*	force => the value of this register is forced regardless of the wave
 					state,
 				remove => this value is force to zero so that it has no influence over
-					the final volume calculation, regardless of wave state 
+					the final volume calculation, regardless of wave state
 				use => the volume value is dependant on the wave state and is included
 					in the final volume calculation */
 
@@ -368,7 +368,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 					logerror("1khz\n");
 				}
 				break;
-				
+
 				case 1:
 				{
 					logerror("50hz\n");
@@ -396,7 +396,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 				/* force r8 value */
 				dave.level_or[0] = 0x0ffff;
 				dave.level_and[0] = 0x00;
-			
+
 				/* remove r9 value */
 				dave.level_or[2] = 0x000;
 				dave.level_and[2] = 0x00;
@@ -414,7 +414,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 				/* use r8 value */
 				dave.level_or[0] = 0x000;
 				dave.level_and[0] = 0xffff;
-			
+
 				/* use r9 value */
 				dave.level_or[2] = 0x000;
 				dave.level_and[2] = 0xffff;
@@ -434,7 +434,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 				/* force r12 value */
 				dave.level_or[1] = 0x0ffff;
 				dave.level_and[1] = 0x00;
-			
+
 				/* remove r13 value */
 				dave.level_or[3] = 0x000;
 				dave.level_and[3] = 0x00;
@@ -452,7 +452,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 				/* use r12 value */
 				dave.level_or[1] = 0x000;
 				dave.level_and[1] = 0xffff;
-			
+
 				/* use r13 value */
 				dave.level_or[3] = 0x000;
 				dave.level_and[3] = 0xffff;
@@ -568,7 +568,7 @@ READ8_HANDLER (	Dave_reg_r )
 
 		case 0x014:
 			return (dave.int_latch & 0x0aa) | (dave.int_input & 0x055);
-	
+
 
 		default:
 			break;
@@ -611,7 +611,7 @@ void	Dave_SetExternalIntState(int IntID, int State)
 
 		}
 		break;
-	
+
 		case DAVE_INT2_ID:
 		{
 			int previous_state;

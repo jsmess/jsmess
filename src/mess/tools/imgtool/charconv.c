@@ -19,23 +19,23 @@
 static char *utf8_from_latin1(const char *src)
 {
 	char *buffer, *bufptr;
-	
+
 	/* validate input */
 	if (!src)
 	{
 		return NULL;
 	}
-	
+
 	/* allocate space for result, twice the source len to be safe */
 	buffer = (char *) malloc(strlen(src) * 2 + 1);
-	
+
 	/* point to the start */
 	bufptr = buffer;
-	
+
 	do
 	{
 		unsigned char c = *src;
-		
+
 		if (c < 0x80)
 		{
 			*bufptr++ = c;
@@ -48,7 +48,7 @@ static char *utf8_from_latin1(const char *src)
 		else
 		{
 			*bufptr++ = '\xc3';
-			*bufptr++ = c - 0x40;			
+			*bufptr++ = c - 0x40;
 		}
 	} while (*src++);
 
@@ -70,17 +70,17 @@ static char *latin1_from_utf8(const char *src)
 	{
 		return NULL;
 	}
-	
+
 	/* allocate space for result */
 	buffer = (char *) malloc(strlen(src) + 1);
-	
+
 	/* point to the start */
 	bufptr = buffer;
-	
+
 	do
 	{
 		unsigned char c = *src;
-		
+
 		if (c < 0x80)
 		{
 			*bufptr++ = c;
@@ -102,7 +102,7 @@ static char *latin1_from_utf8(const char *src)
 			break;
 		}
 	} while(*src++);
-	
+
 	return buffer;
 }
 

@@ -445,7 +445,7 @@ static void a800_serial_command(void)
 			case 'S':   /* status */
 				sprintf(atari_frame_message, "DRIVE #%d STATUS", drive+1);
 				atari_frame_counter = Machine->screen[0].refresh/2;
-				
+
 				if (VERBOSE_SERIAL)
 					logerror("atari status\n");
 
@@ -629,7 +629,7 @@ static void a800_serial_write(void)
 			if (sector < 4) 	/* sector 1 .. 3 might be different length */
 			{
 				offset = (sector - 1) * drv[drive].bseclen + drv[drive].header_skip;
-				
+
 				if (VERBOSE_SERIAL)
 					logerror("atari storing 128 byte sector %d at offset 0x%08X", sector, offset );
 

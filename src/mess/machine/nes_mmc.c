@@ -2100,7 +2100,7 @@ READ8_HANDLER ( fds_r )
 				ret = 1;
 			else if (last_side != nes_fds.current_side)
 			{
-				/* If we've switched disks, report "no disk" for a few reads */			
+				/* If we've switched disks, report "no disk" for a few reads */
 				ret = 1;
 				count ++;
 				if (count == 50)
@@ -4212,7 +4212,7 @@ int mapper_reset (int mapperNum)
 
 	/* Set the vram bank-switch values to the default */
 	ppu2c0x_set_videorom_bank(0, 0, 8, 0, 64);
-	
+
 	/* Set the mapper irq callback */
 	mapper = nes_mapper_lookup(mapperNum);
 	ppu2c0x_set_scanline_callback (0, mapper ? mapper->mmc_scanline : NULL);
@@ -4220,7 +4220,7 @@ int mapper_reset (int mapperNum)
 
 	if (!nes_irq_timer)
 		nes_irq_timer = timer_alloc(nes_irq_callback, NULL);
-		
+
 	mapper_warning = 0;
 	/* 8k mask */
 	prg_mask = ((nes.prg_chunks << 1) - 1);

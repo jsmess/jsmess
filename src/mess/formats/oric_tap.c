@@ -38,7 +38,7 @@ static INT16 wave_state = WAVEENTRY_HIGH;
 static INT16 xor_wave_state = WAVEENTRY_HIGH^WAVEENTRY_LOW;
 
 static INT16 *oric_emit_level(INT16 *p, int count)
-{	
+{
 	int i;
 
 	for (i=0; i<count; i++)
@@ -49,7 +49,7 @@ static INT16 *oric_emit_level(INT16 *p, int count)
 	return p;
 }
 
-/* 4 periods at 1200hz */ 
+/* 4 periods at 1200hz */
 static INT16* oric_output_bit(INT16 *p, UINT8 b)
 {
 	p = oric_emit_level(p,1);
@@ -85,8 +85,8 @@ static int oric_get_bit_size_in_samples(UINT8 b)
 }
 
 
-/*	each byte on cassette is stored as: 
-	
+/*	each byte on cassette is stored as:
+
 	start bit		0 * 1
 	data bits		8 * x (x is 0 or 1, and depends on data-bit value)
 	parity bit		1 * x (x is 0 or 1, and depends on the parity of the data bits)
@@ -127,9 +127,9 @@ static int oric_calculate_byte_size_in_samples(UINT8 byte)
 	/* start bit */
 	count+=oric_get_bit_size_in_samples(0);
 
-	/* set initial parity */	
+	/* set initial parity */
 	parity = 1;
-	
+
 	/* data bits, written bit 0, bit 1...bit 7 */
 	data = byte;
 	for (i=0; i<8; i++)
@@ -165,10 +165,10 @@ static INT16 *oric_output_byte(INT16 *p, UINT8 byte)
 
 	/* start bit */
 	p = oric_output_bit(p, 0);
-	
-	/* set initial parity */	
+
+	/* set initial parity */
 	parity = 1;
-	
+
 	/* data bits, written bit 0, bit 1...bit 7 */
 	data = byte;
 	for (i=0; i<8; i++)
@@ -261,7 +261,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 					count += oric_seconds_to_samples(0.25);
 
 					logerror("found end of sync bytes!\n");
-				
+
 					/* oric writes approx 512 bytes */
 					/* found end of sync bytes */
 					for (i=0; i<ORIC_LEADER_LENGTH; i++)
@@ -273,7 +273,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 					{
 						//logerror("reading header!\n");
 						count+=oric_calculate_byte_size_in_samples(0x024);
-		
+
 						oric_cassette_state = ORIC_CASSETTE_READ_HEADER;
 						oric_data_count = 0;
 						oric_data_length = 9;
@@ -286,7 +286,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 			{
 				header[oric_data_count] = data;
 				count+=oric_calculate_byte_size_in_samples(data);
-		
+
 				oric_data_count++;
 
 				if (oric_data_count==oric_data_length)
@@ -315,10 +315,10 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 
 					oric_cassette_state = ORIC_CASSETTE_WRITE_DATA;
 					oric_data_count = 0;
-					
+
 					end = (((header[4] & 0x0ff)<<8) | (header[5] & 0x0ff));
 					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
-//#ifdef ORIC_WAV_DEBUG		
+//#ifdef ORIC_WAV_DEBUG
 					logerror("start (from header): %02x\n",start);
 					logerror("end (from header): %02x\n",end);
 //#endif
@@ -359,7 +359,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 
 	/* header and trailer act as pauses */
-	/* the trailer is required so that the via sees the last bit of the last 
+	/* the trailer is required so that the via sees the last bit of the last
 		byte */
     if (bytes == CODE_HEADER) {
         for (i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
@@ -453,13 +453,13 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 					{
                                             p = oric_output_bit(p,1);
                                         }
-					
+
 					oric_cassette_state = ORIC_CASSETTE_WRITE_DATA;
 					oric_data_count = 0;
-					
+
 					end = (((header[4] & 0x0ff)<<8) | (header[5] & 0x0ff));
 					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
-//#ifdef ORIC_WAV_DEBUG		
+//#ifdef ORIC_WAV_DEBUG
 					logerror("start (from header): %02x\n",start);
 					logerror("end (from header): %02x\n",end);
 //#endif

@@ -35,7 +35,7 @@ struct blink_hw
 	int sta;
 	int ack;
 	int mem[4];
-	
+
 	/* rtc acknowledge */
 	/* bit 2 = min */
 	/* bit 1 = sec */

@@ -136,11 +136,11 @@ INLINE void atarist_shifter_load(void)
 	shifter.ir[shifter.bitplane] = (RAM[1] << 8) | RAM[0];
 	shifter.bitplane++;
 	shifter.ofs += 2;
-	
+
 	if (shifter.bitplane == 4)
 	{
 		shifter.bitplane = 0;
-		
+
 		shifter.rr[0] = shifter.ir[0];
 		shifter.rr[1] = shifter.ir[1];
 		shifter.rr[2] = shifter.ir[2];
@@ -215,7 +215,7 @@ READ16_HANDLER( atarist_shifter_base_r )
 	case 0x01:
 		return (shifter.base >> 8) & 0xff;
 	}
-	
+
 	return 0;
 }
 
@@ -276,7 +276,7 @@ READ16_HANDLER( atarist_shifter_palette_r )
 {
 	return shifter.palette[offset];
 }
-		
+
 WRITE16_HANDLER( atarist_shifter_palette_w )
 {
 	shifter.palette[offset] = data;
@@ -368,7 +368,7 @@ WRITE16_HANDLER( atariste_shifter_pixelofs_w )
 
 /* Atari ST Blitter */
 
-static const int BLITTER_NOPS[16][4] = 
+static const int BLITTER_NOPS[16][4] =
 {
 	{ 1, 1, 1, 1 },
 	{ 2, 2, 3, 3 },
@@ -471,7 +471,7 @@ static TIMER_CALLBACK( atarist_blitter_tick )
 		{
 			blitter.src += blitter.src_inc_x;
 			blitter.dst += blitter.dst_inc_x;
-			
+
 			if (blitter.xcount == 1)
 			{
 				if (!(blitter.skew & ATARIST_BLITTER_SKEW_NFSR))

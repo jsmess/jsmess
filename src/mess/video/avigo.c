@@ -135,7 +135,7 @@ VIDEO_START( avigo )
 	/*stylus_pointer->colortable = stylus_color_table;*/
 	stylus_pointer->total_colors = 3;
 	stylus_color_table[1] = machine->pens[0];
-	stylus_color_table[2] = machine->pens[1]; 
+	stylus_color_table[2] = machine->pens[1];
 }
 
 /* two colours */
@@ -178,7 +178,7 @@ PALETTE_INIT( avigo )
 #ifdef AVIGO_VIDEO_DEBUG
 			logerror("backdrop %s successfully loaded\n", backdrop_name);
 #endif
-            memcpy (&sys_palette[used * 3], avigo_backdrop->orig_palette, 
+            memcpy (&sys_palette[used * 3], avigo_backdrop->orig_palette,
                     avigo_backdrop->num_pens_used * 3 * sizeof (unsigned char));
 		}
 		else
@@ -218,7 +218,7 @@ VIDEO_UPDATE( avigo )
         int by;
 
         unsigned char *line_ptr = avigo_video_memory +  (y*(AVIGO_SCREEN_WIDTH>>3));
-		
+
         x = 0;
         for (by=((AVIGO_SCREEN_WIDTH>>3)-1); by>=0; by--)
         {
@@ -236,7 +236,7 @@ VIDEO_UPDATE( avigo )
             }
 
             x = px;
-                            
+
             line_ptr = line_ptr+1;
         }
      }

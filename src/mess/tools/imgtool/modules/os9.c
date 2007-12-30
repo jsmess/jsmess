@@ -348,7 +348,7 @@ static UINT32 os9_get_free_lsns(imgtool_image *image)
 	return free_lsns;
 }
 
-	
+
 
 static imgtoolerr_t os9_corrupt_file_error(const struct os9_fileinfo *file_info)
 {
@@ -527,7 +527,7 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 		{
 			entry_index = index;
 			entry_lsn = os9_lookup_lsn(img, &dir_info, &entry_index);
-			
+
 			err = os9_read_lsn(img, entry_lsn, entry_index, entry, sizeof(entry));
 			if (err)
 				goto done;
@@ -544,7 +544,7 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 				if (!strcmp(path, filename))
 					break;
 			}
-			
+
 		}
 
 		/* at the end of the file? */
@@ -562,14 +562,14 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 			err = os9_allocate_lsn(img, &allocated_lsn);
 			if (err)
 				goto done;
-			
+
 			/* write the file */
 			memset(block, 0, sizeof(block));
 			place_integer_be(block, 0, 1, 0x1B | ((create == CREATE_DIR) ? 0x80 : 0x00));
 			err = os9_write_lsn(img, allocated_lsn, 0, block, sizeof(block));
 			if (err)
 				goto done;
-			
+
 			if( free_entry_index == 0xffffffff )
 			{
 				/* expand the directory to hold the new entry */
@@ -761,7 +761,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	place_integer_be(header,  17,  2, sectors);
 	place_string(header,   31, 32, title);
 	place_integer_be(header, 103, 2, sector_bytes / 256);
-	
+
 	/* path descriptor options */
 	place_integer_be(header, 0x3f+0x00, 1, 1); /* device class */
 	place_integer_be(header, 0x3f+0x01, 1, 1); /* drive number */
@@ -773,7 +773,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	place_integer_be(header, 0x3f+0x0b, 2, sectors); /* sectors on track zero */
 	place_integer_be(header, 0x3f+0x0d, 1, 3); /* sector interleave factor */
 	place_integer_be(header, 0x3f+0x0e, 1, 8); /* default sectors per allocation */
-	
+
 	err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id, 0, header, sector_bytes);
 	if (err)
 		goto done;
@@ -783,7 +783,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	for (i = 0; i < allocation_bitmap_lsns; i++)
 	{
 		memset(header, 0x00, sector_bytes);
-		
+
 		if (total_allocated_sectors > (8 * 256))
 		{
 			memset(header, 0xff, sector_bytes);
@@ -793,7 +793,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 		{
 			int offset;
 			UINT8 mask;
-				
+
 			while( total_allocated_sectors >= 0 )
 			{
 				offset = total_allocated_sectors / 8;
@@ -803,7 +803,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 				total_allocated_sectors--;
 			}
 		}
-		
+
 		err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + i, 0, header, sector_bytes);
 		if (err)
 			goto done;
@@ -959,7 +959,7 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool_directory *enumeration, imgto
 
 	/* fill out imgtool_dirent structure */
 	snprintf(ent->filename, sizeof(ent->filename) / sizeof(ent->filename[0]), "%s", filename);
-	snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "%c%c%c%c%c%c%c%c", 
+	snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "%c%c%c%c%c%c%c%c",
 		file_info.directory      ? 'd' : '-',
 		file_info.non_sharable   ? 's' : '-',
 		file_info.public_execute ? 'x' : '-',

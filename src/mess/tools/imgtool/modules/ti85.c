@@ -319,7 +319,7 @@ static int ti85_findfile (ti85_file * file, const char * fname)
 
 	for (i = 0; i < file->number_of_entries; i++)
 		if (!strnicmp(fname, (char *) file->data+file->entries[i].offset+0x06, file->entries[i].name_size) )
-			return i;		
+			return i;
 
 	return -1;
 }
@@ -386,7 +386,7 @@ static int ti85_file_writefile(imgtool_image *img, const char *fname, imgtool_st
 
 	if (stream_read(sourcef, file->data+offset+head_size+0x04, data_size)!=data_size)
 		return IMGTOOLERR_READERROR;
-	
+
 	file->data[file->size-2] = ti85_calculate_checksum(file->data+TI85_HEADER_SIZE, file->size-2-TI85_HEADER_SIZE)&0x00ff;
 	file->data[file->size-1] = (ti85_calculate_checksum(file->data+TI85_HEADER_SIZE, file->size-2-TI85_HEADER_SIZE)&0xff00)>>8;
 
@@ -434,9 +434,9 @@ static int ti85_file_create(const imgtool_module *mod, imgtool_stream *f, const 
 	char checksum[] = {0x00, 0x00};
 
 	strncpy(header.comment, options_[TI85_OPTION_COMMENT].s,0x2a);
-	if (stream_write(f, &header, sizeof(ti85_header)) != sizeof(ti85_header)) 
+	if (stream_write(f, &header, sizeof(ti85_header)) != sizeof(ti85_header))
 		return  IMGTOOLERR_WRITEERROR;
-	if (stream_write(f, &checksum, 2) != 2) 
+	if (stream_write(f, &checksum, 2) != 2)
 		return  IMGTOOLERR_WRITEERROR;
 
 	return 0;
@@ -545,7 +545,7 @@ static int ti85b_file_nextenum(imgtool_directory *enumeration, imgtool_dirent *e
 				break;
 		}
 
-		
+
 		ent->corrupt=0;
 		iter->index++;
 	}

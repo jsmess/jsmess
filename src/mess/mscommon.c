@@ -36,7 +36,7 @@ static struct terminal *current_terminal;
 static TILE_GET_INFO(terminal_gettileinfo)
 {
 	int ch, gfxfont, code, color;
-	
+
 	ch = current_terminal->mem[tile_index];
 	code = ch & ((1 << current_terminal->char_bits) - 1);
 	color = ch >> current_terminal->char_bits;

@@ -501,8 +501,8 @@ MACHINE_RESET( c16 )
 
 		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0xff20, 0xff3d, 0, 0, MWA8_BANK10);
 		memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM, 0xff40, 0xffff, 0, 0, MWA8_BANK11);
-		memory_set_bankptr(10, mess_ram + (0xff20 % mess_ram_size)); 
-		memory_set_bankptr(11, mess_ram + (0xff40 % mess_ram_size)); 
+		memory_set_bankptr(10, mess_ram + (0xff20 % mess_ram_size));
+		memory_set_bankptr(11, mess_ram + (0xff40 % mess_ram_size));
 
 		if (SIDCARD_HACK)
 			memory_install_write8_handler (0, ADDRESS_SPACE_PROGRAM,  0xd400, 0xd41f, 0, 0, c16_sidcart_16k);
@@ -613,7 +613,7 @@ static int c16_rom_load(mess_image *image)
 
 	size = image_length (image);
 
-	filetype = image_filetype(image);	
+	filetype = image_filetype(image);
 	if (filetype && !mame_stricmp (filetype, "prg"))
 	{
 		unsigned short in;

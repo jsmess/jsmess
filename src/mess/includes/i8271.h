@@ -51,7 +51,7 @@ typedef struct I8271
 	/* mode special register */
 	unsigned long Mode;
 
-	
+
 	/* drive outputs */
 	int drive;
 	int side;
@@ -81,7 +81,7 @@ typedef struct I8271
 
 	/* sector counter and id counter */
 	int Counter;
-	
+
 	/* ==0, to cpu, !=0 =from cpu */
 	int data_direction;
 	i8271_interface	fdc_interface;

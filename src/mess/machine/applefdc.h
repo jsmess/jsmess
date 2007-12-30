@@ -1,7 +1,7 @@
 /*********************************************************************
 
 	applefdc.h
-	
+
 	Implementation of various Apple Floppy Disk Controllers, including
 	the classic Apple controller and the IWM (Integrated Woz Machine)
 	chip

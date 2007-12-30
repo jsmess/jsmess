@@ -12,7 +12,7 @@ struct hd63450_interface
 	void (*dma_end)(int channel,int irq);  // called when the DMA transfer ends
 	void (*dma_error)(int channel, int irq);  // called when a DMA transfer error occurs
 	int (*dma_read[4])(int addr);  // special read / write handlers for each channel
-	void (*dma_write[4])(int addr,int data);  
+	void (*dma_write[4])(int addr,int data);
 };
 
 struct hd63450
@@ -43,7 +43,7 @@ struct hd63450
 	int transfer_size[4];
 	int halted[4];  // non-zero if a channel has been halted, and can be continued later.
 	const struct hd63450_interface* intf;
-};  
+};
 
 void hd63450_init(const struct hd63450_interface* intf);
 int hd63450_read(int offset, UINT16 mem_mask);

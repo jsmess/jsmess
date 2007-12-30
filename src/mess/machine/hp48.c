@@ -37,7 +37,7 @@ static int out;
 static struct {
 	int state;
 	struct {
-		int realsize, 
+		int realsize,
 			adr,/* a11..a0 ignored */
 			size;/* a19..a12 comparator select, 1 means address line must match adr */
 	} mem[5];
@@ -91,7 +91,7 @@ static void hp48_config(void)
 	}
 	if (hp48s.mem[HDW].adr!=-1)
 	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, hp48s.mem[HDW].adr&~0x3f, 
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, hp48s.mem[HDW].adr&~0x3f,
 								 hp48s.mem[HDW].adr|0x3f, 0, 0, hp48_read);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, hp48s.mem[HDW].adr&~0x3f,
 								  hp48s.mem[HDW].adr|0x3f, 0, 0, hp48_write);
@@ -187,8 +187,8 @@ int hp48_mem_id(void)
 }
 
 #define TIMER1_VALUE hp48_hardware.data[0x37]
-HP48_HARDWARE hp48_hardware={ 
-	{0} 
+HP48_HARDWARE hp48_hardware={
+	{0}
 };
 
 void hp48_crc(int adr, int data)
@@ -196,10 +196,10 @@ void hp48_crc(int adr, int data)
 	if ((hp48s.mem[HDW].adr==-1)
 		||(adr<(hp48s.mem[HDW].adr&~0x3f))
 		||(adr>(hp48s.mem[HDW].adr|0x3f)) )
-		hp48_hardware.crc=(hp48_hardware.crc >> 4) 
+		hp48_hardware.crc=(hp48_hardware.crc >> 4)
 			^ (((hp48_hardware.crc ^ data) & 0xf) * 0x1081);
-	else 
-		hp48_hardware.crc=(hp48_hardware.crc >> 4) 
+	else
+		hp48_hardware.crc=(hp48_hardware.crc >> 4)
 			^ ((hp48_hardware.crc& 0xf) * 0x1081);
 }
 
@@ -210,15 +210,15 @@ WRITE8_HANDLER( hp48_write )
 	case 0: case 1: case 2: case 3:
 	case 0xb: case 0xc:
 		hp48_hardware.data[offset]=data;
-		break;		
+		break;
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24:
 	case 0x25: case 0x26: case 0x27:
 	case 0x28: case 0x29: //wo
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34:
 		hp48_hardware.data[offset]=data;
-		break;		
+		break;
 		// uart
-	case 0xd: case 0x10: case 0x11: case 0x12: 
+	case 0xd: case 0x10: case 0x11: case 0x12:
 	case 0x13: //w0
 	case 0x14: case 0x15: //r0
 	case 0x16: case 0x17: //w0
@@ -276,7 +276,7 @@ WRITE8_HANDLER( hp48_write )
 		break;
 	case 0x18: case 0x19: //lsb of service request
 		hp48_hardware.data[offset]=data;
-		break;		
+		break;
 	case 0x1b: // base nibble offset
 		hp48_hardware.data[offset]=data;
 		break;
@@ -295,7 +295,7 @@ WRITE8_HANDLER( hp48_write )
 {
 	int data=0;
 	switch (offset) {
-		// lcd 
+		// lcd
 	case 0: case 1: case 2: case 3:
 	case 9:
 		data=1; //reset

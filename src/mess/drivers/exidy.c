@@ -9,17 +9,17 @@
 	========
 	input/output:
 		hd6402 uart data
-   
+
 	port fd:
 	========
-	input: hd6402 uart status 
+	input: hd6402 uart status
 		bit 4: parity error (RPE)
 		bit 3: framing error (RFE)
 		bit 2: over-run (RDP)
 		bit 1: data available (RDA)
 		bit 0: transmit buffer empty (TPMT)
 
-	output: 
+	output:
 		bit 4: no parity (NPB)
 		bit 3: parity type (POE)
 		bit 2: number of stop bits (NSB)
@@ -35,7 +35,7 @@
 		bit 6: baud rate (1=1200, 0=300)
 		bit 5: cassette motor 2
 		bit 4: cassette motor 1
-		bit 3..0: keyboard line select 
+		bit 3..0: keyboard line select
 
 	input:
 		bit 7..6: parallel control (not emulated)
@@ -54,14 +54,14 @@
 	interface hardware.
 
 	The cassette interface hardware converts square-wave pulses into bits which the uart receives.
-	
-	
+
+
 	Sound:
-	
+
 	external speaker connected to the parallel port
 	speaker is connected to all pins. All pins need to be toggled at the same time.
 
-	  
+
 	Kevin Thacker [MESS driver]
 
  ******************************************************************************
@@ -156,10 +156,10 @@ static int cassette_clock_state;
 static int cassette_clock_counter;
 
 /*	1. the cassette format: "frequency shift" is converted
-	into the uart data format "non-return to zero" 
-	
+	into the uart data format "non-return to zero"
+
 	2. on cassette a 1 data bit is stored as a high frequency
-	and a 0 data bit as a low frequency 
+	and a 0 data bit as a low frequency
 	- At 1200 baud, a logic 1 is 1 cycle of 1200hz and a logic 0 is 1/2 cycle of 600hz.
 	- At 300 baud, a logic 1 is 8 cycles of 2400hz and a logic 0 is 4 cycles of 1200hz.
 
@@ -189,7 +189,7 @@ static TIMER_CALLBACK(exidy_cassette_timer_callback)
 		/* previously was 0, now gone 1 */
 		/* +ve edge detected */
 		if (cassette_clock_state)
-		{			
+		{
 			int bit;
 
 			/* clock bits into cassette flip flops */
@@ -275,17 +275,17 @@ static MACHINE_RESET( exidy )
 
 	serial_connection_init(&cassette_serial_connection);
 	serial_connection_set_in_callback(&cassette_serial_connection, cassette_serial_in);
-	
+
 	exidy_fe_port_w(0,0);
 
 	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
-	
+
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 
 	/* this is temporary. Normally when a Z80 is reset, it will
 	execute address 0. The exidy starts executing from 0x0e000 */
 //	memory_set_opbase_handler(0, exidy_opbaseoverride);
-	
+
 //	cpunum_write_byte(0,0,0x0c3);
 //	cpunum_write_byte(0,1,0x000);
 //	cpunum_write_byte(0,2,0x0e0);
@@ -304,11 +304,11 @@ static MACHINE_RESET( exidyd )
 
 	serial_connection_init(&cassette_serial_connection);
 	serial_connection_set_in_callback(&cassette_serial_connection, cassette_serial_in);
-	
+
 	exidy_fe_port_w(0,0);
 
 	timer_set(attotime_zero, NULL, 0, exidy_reset_timer_callback);
-	
+
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
 
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( exidy_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xbe00, 0xbe03) AM_READWRITE(exidy_wd179x_r, exidy_wd179x_w)
 
 	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */	
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM		/* programmable chars */
 ADDRESS_MAP_END
@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( exidyd_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM		/* ram 48k diskless machine */
 	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */	
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM		/* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM		/* programmable chars */
 ADDRESS_MAP_END
@@ -493,7 +493,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 		instead of mark (-9v). Fixed in Sorcerer II.
 		2. When you select a different baud for rs232, it was "remembered" but not
 		sent to port fe. It only gets sent when motor on was requested. Motor on is
-		only meaningful in a cassette operation. 
+		only meaningful in a cassette operation.
 		3. The monitor software always resets the device to cassette whenever the
 		keyboard is scanned, motors altered, or an error occurred.
 		4. The above problems make rs232 communication impractical unless you write
@@ -638,7 +638,7 @@ static READ8_HANDLER(exidy_ff_port_r)
 	This fixes those games that use a joystick. */
 
 	UINT8 data=0x7f;
-	
+
 	/* bit 7 = printer busy
 	0 = printer is not busy */
 
@@ -652,7 +652,7 @@ static READ8_HANDLER(exidy_ff_port_r)
 
 
 static ADDRESS_MAP_START( exidy_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) ) 
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE( exidy_fc_port_r, exidy_fc_port_w )
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE( exidy_fd_port_r, exidy_fd_port_w )
@@ -851,7 +851,7 @@ ROM_START(exidy)
 //	ROM_LOAD_OPTIONAL("exsb1-1.dat", 0x0c000, 0x0800, CRC(1dd20d80) SHA1(dd34364ca1a35caa7255b18e6c953f6df664cc74))
 //	ROM_LOAD_OPTIONAL("exsb1-2.dat", 0x0c800, 0x0800, CRC(1068a3f8) SHA1(6395f2c9829d537d68b75a750acbf27145f1bbad))
 //	ROM_LOAD_OPTIONAL("exsb1-3.dat", 0x0d000, 0x0800, CRC(e6332518) SHA1(fe27fccc82f86b90453c4fae55371f3a050dd6dc))
-//	ROM_LOAD_OPTIONAL("exsb1-4.dat", 0x0d800, 0x0800, CRC(a370cb19) SHA1(75fffd897aec8c3dbe1a918f5a29485e603004cb))	
+//	ROM_LOAD_OPTIONAL("exsb1-4.dat", 0x0d800, 0x0800, CRC(a370cb19) SHA1(75fffd897aec8c3dbe1a918f5a29485e603004cb))
 ROM_END
 
 ROM_START(exidyd)

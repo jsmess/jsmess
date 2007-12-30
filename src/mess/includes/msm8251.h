@@ -42,7 +42,7 @@ struct msm8251
 	UINT8 mode_byte;
 
 	/* data being received */
-	UINT8 data;	
+	UINT8 data;
 
 	/* receive reg */
 	struct serial_receive_register receive_reg;

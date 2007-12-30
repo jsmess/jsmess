@@ -34,7 +34,7 @@ Memory map:
 		fc00-fcff 8253 programmable interval timer
 		fd00-fdff discrete devices
 		fe00-feff 8255 PIO (DCE bus)
-		ff00-ffff timer + 5501 interrupt controller 
+		ff00-ffff timer + 5501 interrupt controller
 
 Interrupts:
 -----------

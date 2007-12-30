@@ -18,14 +18,14 @@ typedef struct
 		UINT8 data[0x100];
 		struct
 		{
-			struct { UINT8 l, h; } 
+			struct { UINT8 l, h; }
 			// eng used by the blitter engine
 			// scb written by the blitter scb blocks to engine expander
 			//     used by the engine
 			//     might be used directly by software!
-			eng1, eng2,		
+			eng1, eng2,
 			h_offset, v_offset, vidbas, colbas,
-			eng3, eng4, 
+			eng3, eng4,
 			scb1, scb2, scb3, scb4, scb5, scb6,
 			eng5, eng6, eng7, eng8,
 			colloff,
@@ -44,7 +44,7 @@ typedef struct
 			UINT8 SPRSYS;
 		} s;
     } u;
-    int accumulate_overflow;    
+    int accumulate_overflow;
     UINT8 high;
     int low;
 } SUZY;
@@ -87,7 +87,7 @@ static UINT8 lynx_memory_config;
 #define GET_WORD(mem, index) ((mem)[(index)]|((mem)[(index)+1]<<8))
 
 /*
-mode from blitter command 
+mode from blitter command
 #define SHADOW         (0x07)
 #define XORSHADOW      (0x06)
 #define NONCOLLIDABLE  (0x05)
@@ -103,7 +103,7 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
     int back;
     UINT8 *screen;
     UINT8 *colbuf;
-    
+
     blitter.everon=TRUE;
     screen=blitter.mem+blitter.screen+y*80+x/2;
     colbuf=blitter.mem+blitter.colbuf+y*80+x/2;
@@ -201,7 +201,7 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 	}
 	blitter.memory_accesses+=2;
 	break;
-    case 0x04: // pen 0 transparent, 
+    case 0x04: // pen 0 transparent,
     case 0x07: // shadow: pen e doesn't collide
     case 0x05: // non collidable sprite
     case 0x15:
@@ -289,25 +289,25 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 #define INCLUDE_LYNX_LINE_FUNCTION
 static void lynx_blit_2color_line(const int y, const int xdir)
 {
-	const int bits=1; 
+	const int bits=1;
 	const int mask=0x1;
 #include "includes/lynx.h"
 }
 static void lynx_blit_4color_line(const int y, const int xdir)
 {
-	const int bits=2; 
+	const int bits=2;
 	const int mask=0x3;
 #include "includes/lynx.h"
 }
 static void lynx_blit_8color_line(const int y, const int xdir)
 {
-	const int bits=3; 
+	const int bits=3;
 	const int mask=0x7;
 #include "includes/lynx.h"
 }
 static void lynx_blit_16color_line(const int y, const int xdir)
 {
-	const int bits=4; 
+	const int bits=4;
 	const int mask=0xf;
 #include "includes/lynx.h"
 }
@@ -330,7 +330,7 @@ static void lynx_blit_16color_line(const int y, const int xdir)
  0, 4 bit repeat count-1, 3 bit color
  1, 4 bit count of values-1, 3 bit color, ....
 */
-	
+
 /*
 16 color rle:
  0, 4 bit repeat count-1, 4 bit color
@@ -339,25 +339,25 @@ static void lynx_blit_16color_line(const int y, const int xdir)
 #define INCLUDE_LYNX_LINE_RLE_FUNCTION
 static void lynx_blit_2color_rle_line(const int y, const int xdir)
 {
-	const int bits=1; 
+	const int bits=1;
 	const int mask=0x1;
 #include "includes/lynx.h"
 }
 static void lynx_blit_4color_rle_line(const int y, const int xdir)
 {
-	const int bits=2; 
+	const int bits=2;
 	const int mask=0x3;
 #include "includes/lynx.h"
 }
 static void lynx_blit_8color_rle_line(const int y, const int xdir)
 {
-	const int bits=3; 
+	const int bits=3;
 	const int mask=0x7;
 #include "includes/lynx.h"
 }
 static void lynx_blit_16color_rle_line(const int y, const int xdir)
 {
-	const int bits=4; 
+	const int bits=4;
 	const int mask=0xf;
 #include "includes/lynx.h"
 }
@@ -380,7 +380,7 @@ static void lynx_blit_lines(void)
 	ydir=1;
 	if (blitter.mem[blitter.cmd]&0x10) { ydir=-1;blitter.y--;/*?*/ }
 	switch (blitter.mem[blitter.cmd+1]&3) {
-	case 0: 
+	case 0:
 		flip =0;
 		break;
 	case 1: // blockout
@@ -515,14 +515,14 @@ static TIMER_CALLBACK(lynx_blitter_timer)
 static void lynx_blitter(void)
 {
     static const int lynx_colors[4]={2,4,8,16};
-    
+
     static void (* const blit_line[4])(const int y, const int xdir)= {
 	lynx_blit_2color_line,
 	lynx_blit_4color_line,
 	lynx_blit_8color_line,
 	lynx_blit_16color_line
     };
-    
+
     static void (* const blit_rle_line[4])(const int y, const int xdir)= {
 	lynx_blit_2color_rle_line,
 	lynx_blit_4color_rle_line,
@@ -530,7 +530,7 @@ static void lynx_blitter(void)
 	lynx_blit_16color_rle_line
     };
     int i; int o;int colors;
-    
+
     blitter.memory_accesses=0;
     blitter.mem = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
     blitter.colbuf=GET_WORD(suzy.u.data, 0xa);
@@ -545,27 +545,27 @@ static void lynx_blitter(void)
     blitter.height=0x100;
     blitter.stretch=0;
     blitter.tilt=0;
-    
+
     blitter.memory_accesses+=2;
     for (blitter.cmd=GET_WORD(suzy.u.data, 0x10); blitter.cmd; ) {
-	
+
 	blitter.memory_accesses+=1;
 	if (!(blitter.mem[blitter.cmd+1]&4)) {
-	
+
 	    blitter.colpos=GET_WORD(suzy.u.data, 0x24)+blitter.cmd;
-	
+
 	    blitter.bitmap=GET_WORD(blitter.mem,blitter.cmd+5);
 	    blitter.x=(INT16)GET_WORD(blitter.mem, blitter.cmd+7)-blitter.xoff;
 	    blitter.y=(INT16)GET_WORD(blitter.mem, blitter.cmd+9)-blitter.yoff;
 	    blitter.memory_accesses+=6;
-	    
+
 	    blitter.mode=blitter.mem[blitter.cmd]&07;
 	    if (blitter.mem[blitter.cmd+1]&0x80) {
 		blitter.line_function=blit_line[blitter.mem[blitter.cmd]>>6];
 	    } else {
 		blitter.line_function=blit_rle_line[blitter.mem[blitter.cmd]>>6];
 	    }
-	    
+
 	    if (!(blitter.mem[blitter.cmd+2]&0x20) && !( suzy.u.s.SPRSYS&0x20) ) {
 		switch (blitter.mode) {
 		case 0: case 2: case 3: case 4: case 6: case 7:
@@ -574,7 +574,7 @@ static void lynx_blitter(void)
 		    blitter.spritenr=blitter.mem[blitter.cmd+2]&0xf;
 		}
 	    }
-	    
+
 	    o=0xb;
 	    if (blitter.mem[blitter.cmd+1]&0x30) {
 		blitter.width=GET_WORD(blitter.mem, blitter.cmd+11);
@@ -582,7 +582,7 @@ static void lynx_blitter(void)
 		blitter.memory_accesses+=4;
 		o+=4;
 	    }
-	    
+
 	    if (blitter.mem[blitter.cmd+1]&0x20) {
 		blitter.stretch=GET_WORD(blitter.mem, blitter.cmd+o);
 		blitter.memory_accesses+=2;
@@ -594,7 +594,7 @@ static void lynx_blitter(void)
 		}
 	    }
 	    colors=lynx_colors[blitter.mem[blitter.cmd]>>6];
-	    
+
 	    if (!(blitter.mem[blitter.cmd+1]&8)) {
 		for (i=0; i<colors/2; i++) {
 		    blitter.color[i*2]=blitter.mem[blitter.cmd+o+i]>>4;
@@ -713,7 +713,7 @@ static void lynx_multiply(void)
 			if (input&PAD_RIGHT) data|=PAD_LEFT;
 		} else {
 			data=input;
-		}		
+		}
 		break;
 	case 0xb1: data=readinputport(1);break;
 	case 0xb2:
@@ -784,7 +784,7 @@ TIM_RESETDONE   EQU %01000000   ; reset timer done
 TIM_MAGMODE     EQU %00100000   ; nonsense in Lynx !!
 TIM_RELOAD      EQU %00010000   ; enable reload
 TIM_COUNT       EQU %00001000   ; enable counter
-TIM_LINK        EQU %00000111   
+TIM_LINK        EQU %00000111
 ; link timers (0->2->4 / 1->3->5->7->Aud0->Aud1->Aud2->Aud3->1
 TIM_64us        EQU %00000110
 TIM_32us        EQU %00000101
@@ -835,8 +835,8 @@ static void lynx_timer_signal_irq(int which)
 		lynx_timer_count_down( 2 );
 		lynx_line++;
 		break;
-    case 2: 
-		lynx_timer_count_down( 4 ); 
+    case 2:
+		lynx_timer_count_down( 4 );
 		lynx_draw_lines( -1 );
 		lynx_line=0;
 		break;
@@ -983,7 +983,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
     if (uart.buffer_loaded) {
 	uart.data_to_send=uart.buffer;
 	uart.buffer_loaded=FALSE;
-	timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);	
+	timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
     } else {
 	uart.sending=FALSE;
     }
@@ -1096,7 +1096,7 @@ WRITE8_HANDLER(mikey_write)
 		mikey.data[0x81]&=~data; // clear interrupt source
 		logerror("mikey write %.2x %.2x\n",offset,data);
 		if (!mikey.data[0x81])
-			cpunum_set_input_line(0, M65SC02_IRQ_LINE, CLEAR_LINE);	    
+			cpunum_set_input_line(0, M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	case 0x87:
@@ -1180,7 +1180,7 @@ static void lynx_reset(running_machine *machine)
 	int i;
 	lynx_memory_config_w(0, 0);
 
-	cpunum_set_input_line(0, M65SC02_IRQ_LINE, CLEAR_LINE);	    
+	cpunum_set_input_line(0, M65SC02_IRQ_LINE, CLEAR_LINE);
 
 	memset(&suzy, 0, sizeof(suzy));
 	memset(&mikey, 0, sizeof(mikey));

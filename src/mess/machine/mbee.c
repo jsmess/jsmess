@@ -11,7 +11,7 @@
 	until A15 is asserted.  The Z80 NOP instruction is 0x00, so the effect is
 	to cause reset to skip all memory up to 0x8000, where the actual handling
 	code resides.
-	
+
 ****************************************************************************/
 
 #include "driver.h"

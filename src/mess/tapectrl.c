@@ -57,7 +57,7 @@ int tapecontrol(int selected)
 		strcat(name, " ");
 		strcat(name, ui_getstring(UI_righthilight));
 		ui_draw_message_window(name);
-		
+
 		if (input_ui_pressed(IPT_UI_SELECT) || input_ui_pressed(IPT_UI_CANCEL))
 			sel = -1;
 		if (input_ui_pressed(IPT_UI_CONFIGURE))

@@ -1,10 +1,10 @@
-/* 
+/*
  * private area for the
  * commodore cbm floppy drives vc1541 c1551
  * synthetic simulation
- * 
+ *
  * contains state machines and file system accesses
- * 
+ *
  */
 #ifndef __CBMDRIVE_H_
 #define __CBMDRIVE_H_
@@ -51,7 +51,7 @@ typedef struct
 			attotime time;
 		}
 		serial;
-		struct 
+		struct
 		{
 			int device;
 			int state;

@@ -432,7 +432,7 @@ static int DectoBCD(int num)
 {
 	int i, cnt = 0, tmp, res = 0;
 
-	while (num > 0) 
+	while (num > 0)
 	{
 		tmp = num;
 		while (tmp >= 10) tmp %= 10;
@@ -507,7 +507,7 @@ static UINT8 stv_SMPC_r8 (int offset)
 	if (offset == 0x77)//PDR2 read
 		return_data=  0xff; // | EEPROM_read_bit());
 
-	if (offset == 0x33) return_data = saturn_region;	
+	if (offset == 0x33) return_data = saturn_region;
 
 //	if (LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, offset>>1, return_data);
 
@@ -532,7 +532,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 	if ((intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
 	{
 //		if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", intback_stage);
-		if (intback_stage != 3) 
+		if (intback_stage != 3)
 		{
 			intback_stage = 2;
 		}
@@ -1911,7 +1911,7 @@ static WRITE32_HANDLER(satram_w)
 
 static NVRAM_HANDLER(saturn)
 {
-	static UINT32 init[8] = 
+	static UINT32 init[8] =
 	{
 		0x420061, 0x63006b, 0x550070, 0x520061, 0x6d0020, 0x46006f, 0x72006d, 0x610074,
 	};

@@ -11,7 +11,7 @@
 
 sound_stream *odyssey2_sh_channel;
 
-const struct CustomSound_interface odyssey2_sound_interface = 
+const struct CustomSound_interface odyssey2_sound_interface =
 {
 	odyssey2_sh_start
 };

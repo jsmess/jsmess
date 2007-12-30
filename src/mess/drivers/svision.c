@@ -271,10 +271,10 @@ static INPUT_PORTS_START( svision )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("B") 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A") 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select") 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start/Pause") 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("B")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start/Pause")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( svisions )
@@ -292,10 +292,10 @@ static INPUT_PORTS_START( svisions )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("2nd B") PORT_PLAYER(2) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("2nd A") PORT_PLAYER(2) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("2nd Select") PORT_PLAYER(2) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("2nd Start/Pause") PORT_PLAYER(2) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("2nd B") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("2nd A") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("2nd Select") PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("2nd Start/Pause") PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /* most games contain their graphics in roms, and have hardware to
@@ -425,7 +425,7 @@ static INTERRUPT_GEN( svision_frame_int )
 	if (svision_channel->count)
 		svision_channel->count--;
 	if (svision_channel[1].count)
-		svision_channel[1].count--;  
+		svision_channel[1].count--;
 	if (svision_noise.count)
 		svision_noise.count--;
 }
@@ -444,7 +444,7 @@ static DRIVER_INIT( svisions )
 	svision.timer1 = timer_alloc(svision_timer, NULL);
 	svision_pet.on = TRUE;
 	svision_pet.timer = timer_alloc(svision_pet_timer, NULL);
-	timer_pulse(attotime_mul(ATTOTIME_IN_SEC(8), 256/machine->drv->cpu[0].clock), NULL, 0, svision_pet_timer);  
+	timer_pulse(attotime_mul(ATTOTIME_IN_SEC(8), 256/machine->drv->cpu[0].clock), NULL, 0, svision_pet_timer);
 }
 
 static MACHINE_RESET( svision )

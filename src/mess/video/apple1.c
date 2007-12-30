@@ -212,7 +212,7 @@ attotime apple1_vh_dsp_time_to_ready (void)
 	}
 
 	return double_to_attotime(
-		attotime_to_double(video_screen_get_time_until_pos(0, cursor_scanline, 0)) + 
+		attotime_to_double(video_screen_get_time_until_pos(0, cursor_scanline, 0)) +
 		scanline_period * cursor_hfrac);
 }
 

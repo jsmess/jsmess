@@ -50,8 +50,8 @@
 
 /*----------- defined in machine/hp48.c -----------*/
 
-typedef struct { 
-	int data[0x40]; 
+typedef struct {
+	int data[0x40];
 	UINT16 crc;
 	UINT32 timer2;
 } HP48_HARDWARE;

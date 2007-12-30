@@ -1,7 +1,7 @@
 /*********************************************************************
 
 	appldriv.c
-	
+
 	Apple 5.25" floppy drive emulation (to be interfaced with applefdc.c)
 
 *********************************************************************/
@@ -78,10 +78,10 @@ static void apple525_seek_disk(mess_image *img, struct apple525_disk *disk, sign
 	int pseudo_track;
 
 	apple525_save_current_track(img, FALSE);
-	
+
 	track = floppy_drive_get_current_track(img);
 	pseudo_track = (track * 2) + disk->tween_tracks;
-	
+
 	pseudo_track += step;
 	if (pseudo_track < 0)
 		pseudo_track = 0;

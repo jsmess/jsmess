@@ -1,5 +1,5 @@
 /***************************************************************************
-    
+
 	IBM AT Compatibles
 
 ***************************************************************************/
@@ -52,7 +52,7 @@
   adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
   soundblaster: YM3812 also accessible at 0x228/9 (address jumperable)
   soundblaster pro version 1: 2 YM3812 chips
-   at 0x388 both accessed, 
+   at 0x388 both accessed,
    at 0x220/1 left?, 0x222/3 right? (jumperable)
   soundblaster pro version 2: 1 OPL3 chip
 
@@ -318,7 +318,7 @@ static INPUT_PORTS_START( atvga )
 	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x01, 0x00, "VGA 4")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )	
+	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
     PORT_START /* IN1 */
@@ -667,7 +667,7 @@ ROM_START( at586 )
 	ROM_REGION32_LE(0x40000, REGION_USER1, 0)
     ROM_LOAD("wdbios.rom",  0x08000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
     ROM_LOAD("at586.bin",   0x20000, 0x20000, CRC(717037f5) SHA1(1d49d1b7a4a40d07d1a897b7f8c827754d76f824))
-	
+
 	ROM_REGION(0x08100, REGION_GFX1, 0)
     ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END

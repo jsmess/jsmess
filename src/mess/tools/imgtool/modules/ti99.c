@@ -974,7 +974,7 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 
 	if (img_format == if_harddisk)
 	{
-		const hard_disk_info *info; 
+		const hard_disk_info *info;
 
 		err = imghd_open(file_handle, &l1_img->harddisk_handle);
 		if (err)
@@ -1650,7 +1650,7 @@ typedef struct win_fdr
 } win_fdr;
 
 /*
-	tifile header: stand-alone file 
+	tifile header: stand-alone file
 */
 typedef struct tifile_header
 {
@@ -4187,7 +4187,7 @@ static void ti99_image_info(imgtool_image *img, char *string, size_t len)
 }
 
 /*
-	Open the disk catalog for enumeration 
+	Open the disk catalog for enumeration
 */
 static imgtoolerr_t dsk_image_beginenum(imgtool_directory *enumeration, const char *path)
 {
@@ -4308,7 +4308,7 @@ static imgtoolerr_t dsk_image_nextenum(imgtool_directory *enumeration, imgtool_d
 }
 
 /*
-	Open the disk catalog for enumeration 
+	Open the disk catalog for enumeration
 */
 static imgtoolerr_t win_image_beginenum(imgtool_directory *enumeration, const char *path)
 {

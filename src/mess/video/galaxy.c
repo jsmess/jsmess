@@ -74,18 +74,18 @@ VIDEO_UPDATE( galaxy )
 		horizontal_pos = program_read_byte(0x2ba8);
 		if (horizontal_pos > 0x0b)
 		{
-			black_area.min_x =  0; 
+			black_area.min_x =  0;
 			black_area.max_x =  8*(horizontal_pos-0x0b)-1;
 		}
 		if (horizontal_pos < 0x0b)
 		{
-			black_area.min_x = 8*(21+horizontal_pos); 
+			black_area.min_x = 8*(21+horizontal_pos);
 			black_area.max_x = 32*8-1;
 		}
 		if (horizontal_pos == 0x0b)
-			black_area.min_x =  black_area.max_x = 0; 
+			black_area.min_x =  black_area.max_x = 0;
 		fillbitmap(bitmap, machine->pens[1], &black_area);
-	}	
+	}
 
 	for( offs = 0; offs < 512; offs++ )
 	{
@@ -93,7 +93,7 @@ VIDEO_UPDATE( galaxy )
 		int code = videoram[offs];
 
 		sx = (offs % 32) * 8 + horizontal_pos*8-88;
-	
+
 		if (sx>=0 && sx<32*8)
 		{
 			if ((code>63 && code<96) || (code>127 && code<192))

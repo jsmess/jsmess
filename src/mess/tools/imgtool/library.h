@@ -150,7 +150,7 @@ enum
 	IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES,
 	IMGTOOLINFO_INT_PATH_SEPARATOR,
 	IMGTOOLINFO_INT_ALTERNATE_PATH_SEPARATOR,
-	IMGTOOLINFO_INT_PREFER_UCASE, 
+	IMGTOOLINFO_INT_PREFER_UCASE,
 	IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR,
 	IMGTOOLINFO_INT_OPEN_IS_STRICT,
 	IMGTOOLINFO_INT_SUPPORTS_CREATION_TIME,
@@ -341,7 +341,7 @@ struct _imgtool_module
 	const char *eoln;
 
 	size_t image_extra_bytes;
-	
+
 	/* flags */
 	unsigned int initial_path_separator : 1;
 	unsigned int open_is_strict : 1;

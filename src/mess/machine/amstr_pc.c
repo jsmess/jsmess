@@ -52,7 +52,7 @@ port 03de write/read
 	 fca69
 	 fd680
       fd7f9
-	 fca7b !keyboard interrupt routine for this check 
+	 fca7b !keyboard interrupt routine for this check
  */
 
 
@@ -116,10 +116,10 @@ static struct {
 /* test sequence in bios
  write 00 to 65
  write 30 to 61
- read 62 and (0x10) 
+ read 62 and (0x10)
  write 34 to 61
  read 62 and (0x0f)
- return or of the 2 62 reads 
+ return or of the 2 62 reads
 
  allows set of the original ibm pc "dipswitches"!!!!
 
@@ -127,7 +127,7 @@ static struct {
 */
 
 /* mouse x counter at 0x78 (read- writable)
-   mouse y counter at 0x7a (read- writable) 
+   mouse y counter at 0x7a (read- writable)
 
    mouse button 1,2 keys
    joystick (4 directions, 2 buttons) keys
@@ -164,12 +164,12 @@ WRITE8_HANDLER( pc1640_port60_w )
 			pc1640.port60=data;
 		}
 		break;
-	case 5: 
+	case 5:
 		// stores the configuration data for port 62 configuration dipswitch emulation
-		pc1640.port65=data; 
+		pc1640.port65=data;
 		break;
 	}
-	
+
 	logerror("pc1640 write %.2x %.2x\n",offset,data);
 }
 
@@ -181,7 +181,7 @@ WRITE8_HANDLER( pc1640_port60_w )
 	case 0:
 		if (pc1640.port61&0x80)
 			data=pc1640.port60;
-		else 
+		else
 			data = pc_keyb_read();
 		break;
 
@@ -189,7 +189,7 @@ WRITE8_HANDLER( pc1640_port60_w )
 		data = pc1640.port61;
 		break;
 
-	case 2: 
+	case 2:
 		data = pc1640.port62;
 		if (pit8253_get_output(0, 2))
 			data |= 0x20;
@@ -393,7 +393,7 @@ INPUT_PORTS_START( amstrad_keyboard )
 	PORT_START_TAG("pc_mouse_misc")
 	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 
-	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */  
+	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START_TAG( "pc_mouse_y" ) /* Mouse - Y AXIS */

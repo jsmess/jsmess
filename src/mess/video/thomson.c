@@ -70,14 +70,14 @@ static int thom_update_screen_size( void )
 	UINT8 p = readinputport( THOM_INPUT_VCONFIG );
 	int new_w, new_h, changed = 0;
 
-	switch ( p & 3 ) 
+	switch ( p & 3 )
 	{
 	case 0:  thom_bwidth = 56; thom_bheight = 47; break; /* as in original (?) */
 	case 1:  thom_bwidth = 16; thom_bheight = 16; break; /* small */
 	default: thom_bwidth =  0; thom_bheight =  0; break; /* none */
 	}
 
-	switch ( p & 0xc ) 
+	switch ( p & 0xc )
 	{
 	case 0:  thom_hires = 0; break;                 /* low */
 	case 4:  thom_hires = 1; break;                 /* high */
@@ -86,7 +86,7 @@ static int thom_update_screen_size( void )
 
 	new_w = ( 320 + thom_bwidth * 2 ) * ( thom_hires + 1 ) - 1;
 	new_h = ( 200 + thom_bheight * 2 ) /** (thom_hires + 1 )*/ - 1;
-	if ( ( Machine->screen[0].visarea.max_x != new_w ) || ( Machine->screen[0].visarea.max_y != new_h ) ) 
+	if ( ( Machine->screen[0].visarea.max_x != new_w ) || ( Machine->screen[0].visarea.max_y != new_h ) )
 	{
 		changed = 1;
 		video_screen_set_visarea( 0, 0, new_w, 0, new_h );
@@ -113,7 +113,7 @@ INLINE unsigned thom_video_elapsed ( void )
 	unsigned u;
 	attotime elapsed = timer_timeelapsed( thom_video_timer );
 	u = attotime_mul( elapsed, 1000000 ).seconds;
-	if ( u >= 19968 ) 
+	if ( u >= 19968 )
 		u = 19968;
 	return u;
 }
@@ -124,7 +124,7 @@ struct thom_vsignal thom_get_vsignal ( void )
 {
 	struct thom_vsignal v;
 	int gpl = thom_video_elapsed() - 64 * THOM_BORDER_HEIGHT - 7;
-	if ( gpl < 0 ) 
+	if ( gpl < 0 )
 		gpl += 19968;
 
 	v.inil = ( gpl & 63 ) <= 40;
@@ -151,16 +151,16 @@ static void thom_get_lightpen_pos( int*x, int* y )
 	*x = readinputport( THOM_INPUT_LIGHTPEN     );
 	*y = readinputport( THOM_INPUT_LIGHTPEN + 1 );
 
-	if ( *x < 0 ) 
+	if ( *x < 0 )
 		*x = 0;
 
-	if ( *y < 0 ) 
+	if ( *y < 0 )
 		*y = 0;
 
-	if ( *x > 2 * thom_bwidth  + 319 ) 
+	if ( *x > 2 * thom_bwidth  + 319 )
 		*x = 2 * thom_bwidth  + 319;
 
-	if ( *y > 2 * thom_bheight + 199 ) 
+	if ( *y > 2 * thom_bheight + 199 )
 		*y = 2 * thom_bheight + 199;
 }
 
@@ -177,23 +177,23 @@ struct thom_vsignal thom_get_lightpen_vsignal ( int xdec, int ydec, int xdec2 )
 	y += ydec - thom_bheight;
 
 	gpl = (x >> 3) + y * 64;
-	if ( gpl < 0 ) 
+	if ( gpl < 0 )
 		gpl += 19968;
-  
+
 	v.inil = (gpl & 63) <= 41;
 
 	v.init = (gpl <= 64 * THOM_ACTIVE_HEIGHT - 24);
 
-	v.lt3 = ( gpl & 8 ) ? 1 : 0; 
+	v.lt3 = ( gpl & 8 ) ? 1 : 0;
 
 	v.line = y;
 
 	if ( v.inil && v.init )
-		v.count = 
+		v.count =
 			( gpl >> 6 ) * 320 +  /* line */
 			( gpl & 63 ) *   8 +  /* gpl inside line */
 			( (x + xdec2) & 7 );  /* pixel inside gpl */
-	else 
+	else
 		v.count = 0;
 
 	return v;
@@ -225,7 +225,7 @@ static TIMER_CALLBACK( thom_lightpen_step )
 {
 	int step = param;
 
-	if ( thom_lightpen_cb ) 
+	if ( thom_lightpen_cb )
 		thom_lightpen_cb( step );
 
 	if ( step < thom_lightpen_nb )
@@ -239,7 +239,7 @@ static TIMER_CALLBACK( thom_lightpen_step )
 /* This code, common for all Thomson machines, emulates the TO8
    video hardware, with its 16-colors chosen among 4096, 9 video modes,
    and 4 video pages. Moreover, it emulates changing the palette several times
-   per frame to simulate more than 16 colors per frame (and the same for mode 
+   per frame to simulate more than 16 colors per frame (and the same for mode
    and page switchs) and cooper effects (distinguishing the left and right
    border color of each row).
 
@@ -265,7 +265,7 @@ static UINT16 thom_pal[16];        /* current palette */
 static UINT8  thom_pal_changed;    /* whether pal != old_pal */
 static UINT8  thom_border_index;   /* current border color index */
 
-/* the left and right border color for each row (including top and bottom 
+/* the left and right border color for each row (including top and bottom
    border rows); -1 means unchanged wrt last scanline
 */
 static  INT16 thom_border_l[THOM_TOTAL_HEIGHT+1];
@@ -289,7 +289,7 @@ static UINT8 thom_vmodepage_changed;
 /* one dirty flag for each video memory line */
 static UINT8 thom_vmem_dirty[205];
 
-/* set to 1 if undirty scanlines need to be redrawn due to other video state 
+/* set to 1 if undirty scanlines need to be redrawn due to other video state
    changes */
 static UINT8 thom_vstate_dirty;
 static UINT8 thom_vstate_last_dirty;
@@ -312,18 +312,18 @@ static void thom_border_changed( void )
 	unsigned x = l & 63;
 	unsigned color =  thom_pal[ thom_border_index ];
 
-	if ( y >= THOM_TOTAL_HEIGHT ) 
+	if ( y >= THOM_TOTAL_HEIGHT )
 	{
 		/* end of page */
 		thom_border_r[ THOM_TOTAL_HEIGHT ] = color;
 	}
-	else if ( ! x ) 
+	else if ( ! x )
 	{
 		/* start of line */
 		thom_border_l[ y ] = color;
 		thom_border_r[ y ] = color;
 	}
-	else if ( x <= 19 ) 
+	else if ( x <= 19 )
 	{
 		/* between left and right border */
 		/* NOTE: this makes the lower right part of the color picker blink
@@ -332,7 +332,7 @@ static void thom_border_changed( void )
 		thom_border_r[ y ] = color;
 		thom_border_l[ y + 1 ] = color;
 	}
-	else 
+	else
 	{
 		/* end of line */
 		thom_border_l[ y + 1 ] = color;
@@ -350,9 +350,9 @@ static void thom_gplinfo_changed( void )
 	unsigned y = l >> 6;
 	unsigned x = l & 63;
 	int modepage = ((int)thom_vmode << 8) | thom_vpage;
-	if ( y >= 200 || x>= 40 ) 
+	if ( y >= 200 || x>= 40 )
 		thom_vmodepage[ 40 ] = modepage;
-	else 
+	else
 		thom_vmodepage[ x ] = modepage;
 	thom_vmodepage_changed = 1;
 }
@@ -362,7 +362,7 @@ static void thom_gplinfo_changed( void )
 void thom_set_border_color ( unsigned index )
 {
 	assert( index < 16 );
-	if ( index != thom_border_index ) 
+	if ( index != thom_border_index )
 	{
 		LOG (( "thom_set_border_color: %i at line %i col %i\n", index, thom_video_elapsed() / 64, thom_video_elapsed() % 64  ));
 		thom_border_index = index;
@@ -376,16 +376,16 @@ void thom_set_palette ( unsigned index, UINT16 color )
 {
 	assert( index < 16 );
 
-	if ( color != 0x1000 ) 
+	if ( color != 0x1000 )
 		color &= 0xfff;
 
-	if ( thom_pal[ index ] == color ) 
+	if ( thom_pal[ index ] == color )
 		return;
 
 	LOG (( "thom_set_palette: %i to %03x at line %i col %i\n", index, color, thom_video_elapsed() / 64, thom_video_elapsed() % 64  ));
 
 	thom_pal[ index ] = color;
-	if ( index == thom_border_index ) 
+	if ( index == thom_border_index )
 		thom_border_changed();
 	thom_pal_changed = 1;
 	thom_vstate_dirty = 1;
@@ -397,7 +397,7 @@ void thom_set_video_mode ( unsigned mode )
 {
 	assert( mode < THOM_VMODE_NB );
 
-	if ( mode != thom_vmode ) 
+	if ( mode != thom_vmode )
 	{
 		LOG (( "thom_set_video_mode: %i at line %i, col %i\n", mode, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
 		thom_vmode = mode;
@@ -425,7 +425,7 @@ void thom_set_video_page ( unsigned page )
 
 
 
-typedef void ( *thom_scandraw ) ( UINT8* vram, UINT16* dst, UINT16* pal, 
+typedef void ( *thom_scandraw ) ( UINT8* vram, UINT16* dst, UINT16* pal,
 				  int org, int len );
 
 
@@ -439,7 +439,7 @@ typedef void ( *thom_scandraw ) ( UINT8* vram, UINT16* dst, UINT16* pal,
 		dst += org * res;					\
 		for ( gpl = 0; gpl < len; gpl++, dst += res, vram++ ) {	\
 			UINT8 rama = vram[ 0      ];			\
-			UINT8 ramb = vram[ 0x2000 ];				
+			UINT8 ramb = vram[ 0x2000 ];
 
 #define UPDATE_HI( name )  UPDATE( name, 16 )
 #define UPDATE_LOW( name ) UPDATE( name,  8 )
@@ -477,7 +477,7 @@ END_UPDATE
 
 /* as above, different (more logical but TO7-incompatible) color encoding */
 
-UPDATE_HI( mo5 ) 
+UPDATE_HI( mo5 )
 {
 	int i;
 	pen_t c[2];
@@ -488,7 +488,7 @@ UPDATE_HI( mo5 )
 }
 END_UPDATE
 
-UPDATE_LOW( mo5 ) 
+UPDATE_LOW( mo5 )
 {
 	int i;
 	pen_t c[2];
@@ -529,7 +529,7 @@ END_UPDATE
 
 /* 320x200, 4-colors, no constraint */
 
-UPDATE_HI( bitmap4 ) 
+UPDATE_HI( bitmap4 )
 {
 	int i;
 	pen_t c[2][2];
@@ -542,7 +542,7 @@ UPDATE_HI( bitmap4 )
 }
 END_UPDATE
 
-UPDATE_LOW( bitmap4 ) 
+UPDATE_LOW( bitmap4 )
 {
 	int i;
 	pen_t c[2][2];
@@ -559,7 +559,7 @@ END_UPDATE
 
 /* as above, but using 2-bit pixels instead of 2 planes of 1-bit pixels  */
 
-UPDATE_HI( bitmap4alt ) 
+UPDATE_HI( bitmap4alt )
 {
 	int i;
 	pen_t c[4];
@@ -574,7 +574,7 @@ UPDATE_HI( bitmap4alt )
 }
 END_UPDATE
 
-UPDATE_LOW( bitmap4alt ) 
+UPDATE_LOW( bitmap4alt )
 {
 	int i;
 	pen_t c[4];
@@ -593,7 +593,7 @@ END_UPDATE
 
 /* 160x200, 16-colors, no constraint */
 
-UPDATE_HI( bitmap16 ) 
+UPDATE_HI( bitmap16 )
 {
 	dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = Machine->pens[ pal[ rama >> 4 ] ];
 	dst[ 4] = dst[ 5] = dst[ 6] = dst[ 7] = Machine->pens[ pal[ rama & 15 ] ];
@@ -602,7 +602,7 @@ UPDATE_HI( bitmap16 )
 }
 END_UPDATE
 
-UPDATE_LOW( bitmap16 ) 
+UPDATE_LOW( bitmap16 )
 {
 	dst[0] = dst[1] = Machine->pens[ pal[ rama >> 4 ] ];
 	dst[2] = dst[3] = Machine->pens[ pal[ rama & 15 ] ];
@@ -615,7 +615,7 @@ END_UPDATE
 
 /* 640x200 (80 text column), 2-colors, no constraint */
 
-UPDATE_HI( mode80 ) 
+UPDATE_HI( mode80 )
 {
 	int i;
 	pen_t c[2];
@@ -628,7 +628,7 @@ UPDATE_HI( mode80 )
 }
 END_UPDATE
 
-UPDATE_LOW( mode80 ) 
+UPDATE_LOW( mode80 )
 {
 	/* 640-pixel mode but 320 pixels emulated => we merge pixels */
 	int i;
@@ -646,7 +646,7 @@ END_UPDATE
 
 /* as above, but TO9 flavor */
 
-UPDATE_HI( mode80_to9 ) 
+UPDATE_HI( mode80_to9 )
 {
 	int i;
 	pen_t c[2];
@@ -659,7 +659,7 @@ UPDATE_HI( mode80_to9 )
 }
 END_UPDATE
 
-UPDATE_LOW( mode80_to9 ) 
+UPDATE_LOW( mode80_to9 )
 {
 	int i;
 	pen_t c[4];
@@ -676,7 +676,7 @@ END_UPDATE
 
 /* 320x200, 2-colors, two pages (untested) */
 
-UPDATE_HI( page1 ) 
+UPDATE_HI( page1 )
 {
 	int i;
 	pen_t c[2];
@@ -688,7 +688,7 @@ UPDATE_HI( page1 )
 }
 END_UPDATE
 
-UPDATE_LOW( page1 ) 
+UPDATE_LOW( page1 )
 {
 	int i;
 	pen_t c[2];
@@ -700,7 +700,7 @@ UPDATE_LOW( page1 )
 }
 END_UPDATE
 
-UPDATE_HI( page2 ) 
+UPDATE_HI( page2 )
 {
 	int i;
 	pen_t c[2];
@@ -728,7 +728,7 @@ END_UPDATE
 
 /* 320x200, 2-colors, two overlaid pages (untested) */
 
-UPDATE_HI( overlay ) 
+UPDATE_HI( overlay )
 {
 	int i;
 	pen_t c[2][2];
@@ -740,7 +740,7 @@ UPDATE_HI( overlay )
 }
 END_UPDATE
 
-UPDATE_LOW( overlay ) 
+UPDATE_LOW( overlay )
 {
 	int i;
 	pen_t c[2][2];
@@ -756,28 +756,28 @@ END_UPDATE
 
 /* 160x200, 4-colors, four overlaid pages (untested) */
 
-UPDATE_HI( overlay3 ) 
+UPDATE_HI( overlay3 )
 {
-	static const int p[2][2][2][2] = 
-		{ { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }, 
+	static const int p[2][2][2][2] =
+		{ { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
 		  { { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } } };
 	int i;
 	for ( i = 0; i < 16; i += 4, rama >>= 1, ramb >>= 1 )
-		dst[ 15 - i ] = dst[ 14 - i ] = dst[ 13 - i ] = dst[ 12 - i ] = 
-			Machine->pens[ pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ] 
+		dst[ 15 - i ] = dst[ 14 - i ] = dst[ 13 - i ] = dst[ 12 - i ] =
+			Machine->pens[ pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ]
 					    [ rama & 1 ] [ (rama >> 4) & 1 ] ] ];
 }
 END_UPDATE
 
-UPDATE_LOW( overlay3 ) 
+UPDATE_LOW( overlay3 )
 {
-	static const int p[2][2][2][2] = 
-		{ { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }, 
+	static const int p[2][2][2][2] =
+		{ { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
 		  { { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } } };
 	int i;
 	for ( i = 0; i < 8; i += 2, rama >>= 1, ramb >>= 1 )
 		dst[ 7 - i ] = dst[ 6 - i ] =
-			Machine->pens[ pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ] 
+			Machine->pens[ pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ]
 					    [ rama & 1 ] [ (rama >> 4) & 1 ] ] ];
 }
 END_UPDATE
@@ -787,11 +787,11 @@ END_UPDATE
 #define FUN(x) { x##_scandraw_8, x##_scandraw_16 }
 
 
-static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] = 
+static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 {
-	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),  
+	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),
 	FUN(bitmap16), FUN(page1),  FUN(page2),   FUN(overlay),     FUN(overlay3),
-	FUN(to9), FUN(mode80_to9), 
+	FUN(to9), FUN(mode80_to9),
 };
 
 
@@ -804,19 +804,19 @@ static TIMER_CALLBACK( thom_scanline_start )
 	int y = param;
 
 	/* update active-area */
-	if ( y >= 0 && (thom_vstate_dirty || thom_vstate_last_dirty || thom_vmem_dirty[y]) ) 
+	if ( y >= 0 && (thom_vstate_dirty || thom_vstate_last_dirty || thom_vmem_dirty[y]) )
 	{
-		int x = 0;  
-		while ( x < 40 ) 
+		int x = 0;
+		while ( x < 40 )
 		{
 			int xx = x;
 			unsigned mode = thom_vmodepage[x] >> 8;
 			unsigned page = thom_vmodepage[x] & 0xff;
 			assert( mode < THOM_VMODE_NB );
 			assert( page < 4 );
-			do 
-			{ 
-				xx++; 
+			do
+			{
+				xx++;
 			} while ( xx < 40 && thom_vmodepage[xx] == -1 );
 			thom_scandraw_funcs[ mode ][ thom_hires ]
 				( thom_vram + y * 40 + page * 0x4000,
@@ -828,17 +828,17 @@ static TIMER_CALLBACK( thom_scanline_start )
 	}
 
 	/* prepare for next scanline */
-	if ( y == 199 ) 
+	if ( y == 199 )
 		timer_adjust( thom_scanline_timer, attotime_never, 0, attotime_zero);
-	else 
-	{ 
+	else
+	{
 
-		if ( thom_vmodepage_changed ) 
+		if ( thom_vmodepage_changed )
 		{
 			int x, m = 0;
 			for ( x = 0; x <= 40; x++ )
 			{
-				if ( thom_vmodepage[x] !=-1 ) 
+				if ( thom_vmodepage[x] !=-1 )
 				{
 					m = thom_vmodepage[x];
 					thom_vmodepage[x] = -1;
@@ -847,8 +847,8 @@ static TIMER_CALLBACK( thom_scanline_start )
 			thom_vmodepage[0] = m;
 			thom_vmodepage_changed = 0;
 		}
-    
-		if ( thom_pal_changed ) 
+
+		if ( thom_pal_changed )
 		{
 			memcpy( thom_last_pal, thom_pal, 32 );
 			thom_pal_changed = 0;
@@ -887,14 +887,14 @@ void thom_floppy_active ( int write )
 	int fold = FLOP_STATE, fnew;
 
 	/* stays up for a few frames */
-	if ( write ) 
-		thom_floppy_wcount = 25; 
-	else        
+	if ( write )
+		thom_floppy_wcount = 25;
+	else
 		thom_floppy_rcount = 25;
 
 	/* update icon */
 	fnew = FLOP_STATE;
-	if ( fold != fnew ) 
+	if ( fold != fnew )
 		output_set_value( "floppy", fnew );
 }
 
@@ -925,19 +925,19 @@ VIDEO_UPDATE ( thom )
 	/* upper border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
 	{
-		if ( thom_border_l[ y ] != -1 ) 
+		if ( thom_border_l[ y ] != -1 )
 			border = machine->pens[ thom_border_l[ y ] ];
 	}
 	ypos = 0;
-	while ( y < THOM_BORDER_HEIGHT ) 
+	while ( y < THOM_BORDER_HEIGHT )
 	{
-		if ( thom_border_l[ y ] != -1 ) 
+		if ( thom_border_l[ y ] != -1 )
 			border = machine->pens[ thom_border_l[ y ] ];
 		wrect.min_y = ypos;
-		do 
-		{ 
-			y++; 
-			ypos ++ /* += scale */; 
+		do
+		{
+			y++;
+			ypos ++ /* += scale */;
 		}
 		while ( y < THOM_BORDER_HEIGHT && thom_border_l[ y ] == -1 );
 		wrect.max_y = ypos - 1;
@@ -945,15 +945,15 @@ VIDEO_UPDATE ( thom )
 	}
 
 	/* left border */
-	while ( y < yup ) 
+	while ( y < yup )
 	{
-		if ( thom_border_l[ y ] != -1 ) 
+		if ( thom_border_l[ y ] != -1 )
 			border = machine->pens[ thom_border_l[ y ] ];
 		lrect.min_y = ypos;
-		do 
-		{ 
-			y++; 
-			ypos ++ /* += scale */; 
+		do
+		{
+			y++;
+			ypos ++ /* += scale */;
 		}
 		while ( y < yup && thom_border_l[ y ] == -1 );
 		lrect.max_y = ypos - 1;
@@ -961,14 +961,14 @@ VIDEO_UPDATE ( thom )
 	}
 
 	/* lower border */
-	while (y < ybot ) 
+	while (y < ybot )
 	{
-		if ( thom_border_l[ y ] != -1 ) 
+		if ( thom_border_l[ y ] != -1 )
 			border = machine->pens[ thom_border_l[ y ] ];
 		wrect.min_y = ypos;
-		do 
-		{ 
-			y++; 
+		do
+		{
+			y++;
 			ypos ++ /* += scale */; }
 		while ( y < ybot && thom_border_l[ y ] == -1 );
 		wrect.max_y = ypos - 1;
@@ -977,19 +977,19 @@ VIDEO_UPDATE ( thom )
 
 	/* right border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT; y++ ) {
-		if ( thom_border_r[ y ] != -1 ) 
+		if ( thom_border_r[ y ] != -1 )
 			border = machine->pens[ thom_border_r[ y ] ];
 	}
 	ypos = thom_bheight /* * scale */;
-	while ( y < yup ) 
+	while ( y < yup )
 	{
-		if ( thom_border_r[ y ] != -1 ) 
+		if ( thom_border_r[ y ] != -1 )
 			border = machine->pens[ thom_border_r[ y ] ];
 		rrect.min_y = ypos;
-		do 
-		{ 
-			y++; 
-			ypos ++ /* += scale */; 
+		do
+		{
+			y++;
+			ypos ++ /* += scale */;
 		}
 		while ( y < yup && thom_border_r[ y ] == -1 );
 		rrect.max_y = ypos - 1;
@@ -998,7 +998,7 @@ VIDEO_UPDATE ( thom )
 
 	/* active area */
 	ypos = thom_bheight /* * scale */;
-	for ( y = 0; y < 200; v += xwidth, y++ , ypos ++ /* += scale */ ) 
+	for ( y = 0; y < 200; v += xwidth, y++ , ypos ++ /* += scale */ )
 	{
 		draw_scanline16( bitmap, xbleft, ypos, xwidth, v, NULL, -1 );
 #if 0
@@ -1034,7 +1034,7 @@ static TIMER_CALLBACK( thom_set_init )
 	int init = param;
 	LOG (( "%f thom_set_init: %i, at line %i col %i\n", attotime_to_double(timer_get_time()), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
 
-	if ( thom_init_cb ) 
+	if ( thom_init_cb )
 		thom_init_cb( init );
 	if ( ! init )
 		timer_adjust( thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init, attotime_zero );
@@ -1047,24 +1047,24 @@ VIDEO_EOF ( thom )
 	int i;
 	UINT16 b = 0;
 	struct thom_vsignal l = thom_get_lightpen_vsignal( 0, -1, 0 );
-  
+
 	LOG (( "%f thom: video eof called\n", attotime_to_double(timer_get_time()) ));
 
 	/* floppy indicator count */
-	if ( thom_floppy_wcount ) 
+	if ( thom_floppy_wcount )
 		thom_floppy_wcount--;
-	if ( thom_floppy_rcount ) 
+	if ( thom_floppy_rcount )
 		thom_floppy_rcount--;
 	fnew = FLOP_STATE;
-	if ( fnew != fold ) 
+	if ( fnew != fold )
 		output_set_value( "floppy", fnew );
 
 	/* prepare state for next frame */
-	for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ ) 
+	for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
 	{
-		if ( thom_border_l[ i ] != -1 ) 
+		if ( thom_border_l[ i ] != -1 )
 			b = thom_border_l[ i ];
-		if ( thom_border_r[ i ] != -1 ) 
+		if ( thom_border_r[ i ] != -1 )
 			b = thom_border_r[ i ];
 	}
 	memset( thom_border_l, 0xff, sizeof( thom_border_l ) );
@@ -1073,7 +1073,7 @@ VIDEO_EOF ( thom )
 	thom_border_r[ 0 ] = b;
 	thom_vstate_last_dirty = thom_vstate_dirty;
 	thom_vstate_dirty = 0;
-  
+
 	/* schedule first init signal */
 	timer_adjust( thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7 ), 0, attotime_zero );
 
@@ -1104,8 +1104,8 @@ VIDEO_EOF ( thom )
 
 
 
-static const UINT16 thom_pal_init[16] = 
-{ 
+static const UINT16 thom_pal_init[16] =
+{
 	0x1000, /* 0: black */        0x000f, /* 1: red */
 	0x00f0, /* 2: geen */         0x00ff, /* 3: yellow */
 	0x0f00, /* 4: blue */         0x0f0f, /* 5: purple */
@@ -1173,7 +1173,7 @@ VIDEO_START ( thom )
 
 	thom_init_cb = NULL;
 	thom_init_timer = timer_alloc( thom_set_init , NULL);
-  
+
 	video_eof_thom(machine);
 
 	state_save_register_global( thom_bwidth );
@@ -1191,7 +1191,7 @@ PALETTE_INIT ( thom )
 
 	LOG (( "thom: palette init called\n" ));
 
-	for ( i = 0; i < 4097; i++ )  
+	for ( i = 0; i < 4097; i++ )
 	{
 		UINT8 r = 255. * pow( (i & 15) / 15., gamma );
 		UINT8 g = 255. * pow( ((i>> 4) & 15) / 15., gamma );
@@ -1212,9 +1212,9 @@ WRITE8_HANDLER ( to7_vram_w )
 {
 	assert( offset >= 0 && offset < 0x2000 );
 	/* force two topmost color bits to 1 */
-	if ( thom_mode_point ) 
+	if ( thom_mode_point )
 		data |= 0xc0;
-	if ( thom_vram[ offset + thom_mode_point ] == data ) 
+	if ( thom_vram[ offset + thom_mode_point ] == data )
 		return;
 	thom_vram[ offset + thom_mode_point ] = data;
 	/* dirty whole scanline */
@@ -1232,7 +1232,7 @@ unsigned to7_lightpen_gpl ( int decx, int decy )
 	thom_get_lightpen_pos( &x, &y );
 	x -= thom_bwidth;
 	y -= thom_bheight;
-	if ( x < 0 || y < 0 || x >= 320 || y >= 200 ) 
+	if ( x < 0 || y < 0 || x >= 320 || y >= 200 )
 		return 0;
 	x += decx;
 	y += decy;
@@ -1245,12 +1245,12 @@ unsigned to7_lightpen_gpl ( int decx, int decy )
 
 
 
-/* write to video memory through addresses 0x4000-0x5fff (TO) 
+/* write to video memory through addresses 0x4000-0x5fff (TO)
    or 0x0000-0x1fff (MO) */
 WRITE8_HANDLER ( to770_vram_w )
 {
 	assert( offset >= 0 && offset < 0x2000 );
-	if ( thom_vram[ offset + thom_mode_point ] == data ) 
+	if ( thom_vram[ offset + thom_mode_point ] == data )
 		return;
 	thom_vram[ offset + thom_mode_point ] = data;
 	/* dirty whole scanline */
@@ -1270,7 +1270,7 @@ WRITE8_HANDLER ( to8_sys_lo_w )
 {
 	UINT8* dst = thom_vram + offset + 0x6000;
 	assert( offset >= 0 && offset < 0x2000 );
-	if ( *dst == data ) 
+	if ( *dst == data )
 		return;
 	*dst = data;
 	/* dirty whole scanline */
@@ -1297,11 +1297,11 @@ WRITE8_HANDLER ( to8_data_lo_w )
 {
 	UINT8* dst = thom_vram + offset + 0x4000 * to8_data_vpage + 0x2000;
 	assert( offset >= 0 && offset < 0x2000 );
-	if ( *dst == data ) 
+	if ( *dst == data )
 		return;
 	*dst = data;
 	/* dirty whole scanline */
-	if ( to8_data_vpage >= 4 ) 
+	if ( to8_data_vpage >= 4 )
 		return;
 	thom_vmem_dirty[ offset / 40 ] = 1;
 }
@@ -1312,11 +1312,11 @@ WRITE8_HANDLER ( to8_data_hi_w )
 {
 	UINT8* dst = thom_vram + offset + 0x4000 * to8_data_vpage;
 	assert( offset >= 0 && offset < 0x2000 );
-	if ( *dst == data ) 
+	if ( *dst == data )
 		return;
 	*dst = data;
 	/* dirty whole scanline */
-	if ( to8_data_vpage >= 4 ) 
+	if ( to8_data_vpage >= 4 )
 		return;
 	thom_vmem_dirty[ offset / 40 ] = 1;
 }
@@ -1328,11 +1328,11 @@ WRITE8_HANDLER ( to8_vcart_w )
 {
 	UINT8* dst = thom_vram + offset + 0x4000 * to8_cart_vpage;
 	assert( offset>=0 && offset < 0x4000 );
-	if ( *dst == data ) 
+	if ( *dst == data )
 		return;
 	*dst = data;
 	/* dirty whole scanline */
-	if ( to8_cart_vpage >= 4  ) 
+	if ( to8_cart_vpage >= 4  )
 		return;
 	thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
 }

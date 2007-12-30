@@ -5,7 +5,7 @@
 
 	Per Ola Ingvarsson
 	Tomas Karlsson
-			
+
  ******************************************************************************/
 
 /*-------------------------------------------------------------------------*/
@@ -222,7 +222,7 @@ static void compis_keyb_update(void)
 	UINT8 icol;
 	UINT16 data;
 	UINT16 ibit;
-	
+
 	key_code = 0;
 	key_status = 0x80;
 
@@ -314,7 +314,7 @@ static void compis_fdc_dma_drq(int state, int read)
 	}
 }
 
-static const nec765_interface compis_fdc_interface = 
+static const nec765_interface compis_fdc_interface =
 {
 	compis_fdc_int,
 	compis_fdc_dma_drq
@@ -329,7 +329,7 @@ READ16_HANDLER (compis_fdc_dack_r)
   	{
 		data = nec765_dack_r(0);
 	}
-	
+
 	return data;
 }
 
@@ -429,7 +429,7 @@ static WRITE8_HANDLER ( compis_ppi_port_c_w )
 	/* FDC Reset */
 	if (data & 0x40)
 		compis_fdc_reset();
-  
+
 	/* FDC Terminal count */
 	compis_fdc_tc((data & 0x80)?1:0);
 }
@@ -852,15 +852,15 @@ static void internal_timer_update(int which,
 			internal_timer_sync(which);
 			update_int_timer = 1;
 		}
-      
+
 		t->maxB = new_maxB;
-      
+
 		if (new_maxB == 0)
 		{
          		new_maxB = 0x10000;
       		}
    	}
-		
+
 
 	/* handle control changes */
 	if (new_control != -1)
@@ -980,7 +980,7 @@ static void update_dma_control(int which, int new_control)
 	/* check for control bits we don't handle */
 	diff = new_control ^ d->control;
 	if (diff & 0x6811)
-	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n", 
+	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
 		   activecpu_get_pc(),
 		   new_control);
 
@@ -1582,10 +1582,10 @@ MACHINE_RESET( compis )
 
 	/* OSP PIT 8254 */
 	pit8253_init(2, compis_pit_config);
-		
+
 	/* PPI */
 	ppi8255_init(&compis_ppi_interface);
-	    
+
 	/* FDC */
 	nec765_init(&compis_fdc_interface, NEC765A);
 	compis_fdc_reset();

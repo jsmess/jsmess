@@ -26,7 +26,7 @@
     C000-CFFF ROM     unused or monitor ROM
 
     ********* GTIA    ********************************
-    
+
 	D000      m0pf    missile 0 playfield collisions
     D001      m1pf    missile 1 playfield collisions
     D002      m2pf    missile 2 playfield collisions

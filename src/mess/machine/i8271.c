@@ -5,7 +5,7 @@
 /* TODO:
 
 	- Scan commands
-	- Check the commands work properly using a BBC disc copier program 
+	- Check the commands work properly using a BBC disc copier program
     - check if 0 is specified as number of sectors, how many sectors
     is actually transfered
 	- deleted data functions (error if data finds deleted data?)
@@ -69,7 +69,7 @@ void i8271_init(const i8271_interface *iface)
     i8271_reset();
 }
 
-	
+
 static void i8271_seek_to_track(int track)
 {
 	mess_image *img = current_image();
@@ -94,7 +94,7 @@ static void i8271_seek_to_track(int track)
 		}
 
 		i8271.CurrentTrack[i8271.drive] = 0;
-	
+
 		/* failed to find track 0? */
 		if (StepCount==0)
 		{
@@ -116,7 +116,7 @@ static void i8271_seek_to_track(int track)
 
 		/* step towards 0 */
 		i8271.drive_control_output &= ~(1<<2);
-		
+
 		if (SignedTracks>0)
 		{
 			/* step away from 0 */
@@ -130,7 +130,7 @@ static void i8271_seek_to_track(int track)
 		i8271.CurrentTrack[i8271.drive] = track;
 	}
 }
-	
+
 
 static TIMER_CALLBACK(i8271_data_timer_callback)
 {
@@ -138,7 +138,7 @@ static TIMER_CALLBACK(i8271_data_timer_callback)
 	i8271_data_request();
 
 	/* stop it */
-	timer_reset(i8271.data_timer, attotime_never); 
+	timer_reset(i8271.data_timer, attotime_never);
 }
 
 /* setup a timed data request - data request will be triggered in a few usecs time */
@@ -160,7 +160,7 @@ static TIMER_CALLBACK(i8271_timed_command_complete_callback)
 	i8271_command_complete(1,1);
 
 	/* stop it, but don't allow it to be free'd */
-	timer_reset(i8271.command_complete_timer, attotime_never); 
+	timer_reset(i8271.command_complete_timer, attotime_never);
 }
 
 /* setup a irq to occur 128us later - in reality this would be much later, because the int would
@@ -250,7 +250,7 @@ static void i8271_get_drive(void)
 	/* &80 = drive 1 side 0 */
 
 
-	
+
 	if (i8271.CommandRegister & (1<<6))
 	{
 		i8271.drive = 0;
@@ -286,7 +286,7 @@ static void i8271_update_state(void)
 			{
 				/* setup data with byte */
 				i8271.data = i8271.pExecutionPhaseData[i8271.ExecutionPhaseCount];
-			
+
 /*				logerror("read data %02x\n", i8271.data); */
 
 				/* update counters */
@@ -353,7 +353,7 @@ static void i8271_initialise_execution_phase_read(int transfer_size)
 	/* read */
 	i8271.flags |= I8271_FLAGS_DATA_DIRECTION;
 	i8271.ExecutionPhaseCount = 0;
-	i8271.ExecutionPhaseTransferCount = transfer_size;	
+	i8271.ExecutionPhaseTransferCount = transfer_size;
 	i8271.state = I8271_STATE_EXECUTION_READ;
 }
 
@@ -392,7 +392,7 @@ static void i8271_command_complete(int result, int int_rq)
 {
 	/* not busy, and not a execution phase data request in non-dma mode */
 	i8271.StatusRegister &= ~(I8271_STATUS_COMMAND_BUSY | I8271_STATUS_NON_DMA_REQUEST);
-	
+
 	if (result)
 	{
 		i8271.StatusRegister |= I8271_STATUS_RESULT_FULL;
@@ -403,7 +403,7 @@ static void i8271_command_complete(int result, int int_rq)
 		/* trigger an int */
 		i8271_set_irq_state(1);
     }
-	
+
 	/* correct?? */
     i8271.drive_control_output &=~1;
 }
@@ -444,11 +444,11 @@ static void i8271_command_continue(void)
 			/* end command? */
 			if (i8271.Counter==0)
 			{
-				
+
 				i8271_timed_command_complete();
 				return;
 			}
-			
+
 			i8271_do_read();
 		}
 		break;
@@ -467,11 +467,11 @@ static void i8271_command_continue(void)
 			/* end command? */
 			if (i8271.Counter==0)
 			{
-				
+
 				i8271_timed_command_complete();
 				return;
 			}
-			
+
 			i8271_do_write();
 		}
 		break;
@@ -502,10 +502,10 @@ static void i8271_do_read(void)
 	{
 		/* get the sector into the buffer */
 		floppy_drive_read_sector_data(current_image(), i8271.side, i8271.data_id, i8271.pExecutionPhaseData, 1<<(i8271.ID_N+7));
-			
+
 		/* initialise for reading */
         i8271_initialise_execution_phase_read(1<<(i8271.ID_N+7));
-		
+
 		/* update state - gets first byte and triggers a data request */
 		i8271_timed_data_request();
 		return;
@@ -540,7 +540,7 @@ static void i8271_do_write(void)
 	{
 		/* initialise for reading */
         i8271_initialise_execution_phase_write(1<<(i8271.ID_N+7));
-		
+
 		/* update state - gets first byte and triggers a data request */
 		i8271_timed_data_request();
 		return;
@@ -598,14 +598,14 @@ static int i8271_find_sector(void)
 		{
 			index_count++;
 		}
-   
+
 	}
 	while (index_count!=2);
 
 	/* completion type: command/drive error */
 	/* completion code: sector not found */
 	i8271.ResultRegister |= (3<<3);
-	
+
 	return 0;
 }
 
@@ -754,12 +754,12 @@ static void i8271_command_execute(void)
 						i8271.drive_control_input |= (1<<1);
 					}
 
-					
+
 					/* need to setup this register based on drive selected */
 					data = i8271.drive_control_input;
 
 
-			
+
 
 				}
 				break;
@@ -960,7 +960,7 @@ static void i8271_command_execute(void)
 
 			/* no write fault */
 			status = 0;
-			
+
 			status |= (1<<2) | (1<<6);
 
 			/* these two do not appear to be set at all! ?? */
@@ -973,7 +973,7 @@ static void i8271_command_execute(void)
 			{
 				status |= (1<<6);
 			}
-			
+
 			/* bit 3 = 1 if write protected */
 			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
 			{
@@ -1102,7 +1102,7 @@ static void i8271_command_execute(void)
 			i8271_get_drive();
 
             i8271.drive_control_output &=~1;
-            
+
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
@@ -1191,7 +1191,7 @@ static void i8271_command_execute(void)
 #endif
 
 			i8271_get_drive();
-	
+
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
@@ -1357,14 +1357,14 @@ WRITE8_HANDLER(i8271_w)
 			if (((data ^ i8271.ResetRegister) & 0x01)!=0)
 			{
 				if ((data & 0x01)==0)
-				{	
+				{
 					i8271_reset();
 				}
 			}
-			
+
 			i8271.ResetRegister = data;
 
-		
+
 		}
 		break;
 

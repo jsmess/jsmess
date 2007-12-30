@@ -249,7 +249,7 @@ static void bebox_update_interrupts(void)
 	for (cpunum = 0; cpunum < 2; cpunum++)
 	{
 		interrupt = bebox_interrupts & bebox_cpu_imask[cpunum];
-		
+
 		if (LOG_INTERRUPTS)
 		{
 			logerror("\tbebox_update_interrupts(): CPU #%d [%08X|%08X] IRQ %s\n", cpunum,
@@ -450,7 +450,7 @@ READ64_HANDLER( bebox_800003F0_r )
 		result &= ~(0xFF << 8);
 		result |= ide_controller_0_r(0x3F6) << 8;
 	}
-	
+
 	if (((mem_mask >> 0) & 0xFF) == 0)
 	{
 		result &= ~(0xFF << 0);
@@ -466,7 +466,7 @@ WRITE64_HANDLER( bebox_800003F0_w )
 
 	if (((mem_mask >> 8) & 0xFF) == 0)
 		ide_controller_0_w(0x3F6, (data >> 8) & 0xFF);
-	
+
 	if (((mem_mask >> 0) & 0xFF) == 0)
 		ide_controller_0_w(0x3F7, (data >> 0) & 0xFF);
 }

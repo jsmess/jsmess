@@ -10,7 +10,7 @@ extern "C" {
 
 /*----------- defined in machine/pclpt.c -----------*/
 
-typedef enum { 
+typedef enum {
 	LPT_UNIDIRECTIONAL
 //	, LPT_BIDIRECTIONAL
 // epp, ecp

@@ -50,4 +50,4 @@ VIDEO_UPDATE( ti85 );
 PALETTE_INIT( ti85 );
 extern const unsigned char ti85_palette[32*7][3];
 extern const unsigned short ti85_colortable[32][7];
-												
+

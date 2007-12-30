@@ -58,7 +58,7 @@ static UINT8 zx_file_name_length = 0;
 /* common functions */
 
 static INT16 *zx81_emit_level(INT16 *p, int count, int level)
-{	
+{
 	int i;
 
 	for (i=0; i<count; i++)	*(p++) = level;
@@ -179,11 +179,11 @@ static int zx81_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	p = zx81_emit_level (p, ZX81_PILOT_LENGTH, WAVEENTRY_ZERO);
 
 	/* name */
-	for (i=0; i<zx_file_name_length; i++)                      
+	for (i=0; i<zx_file_name_length; i++)
 		p = zx81_output_byte(p, zx_file_name[i]);
 
 	/* data */
-	for (i=0; i<real_data_length; i++)                      
+	for (i=0; i<real_data_length; i++)
 		p = zx81_output_byte(p, bytes[i]);
 
 	return p - buffer;
@@ -247,7 +247,7 @@ static int zx80_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	p = zx81_emit_level (p, ZX81_PILOT_LENGTH, WAVEENTRY_ZERO);
 
 	/* data */
-	for (i=0; i<real_data_length; i++)                      
+	for (i=0; i<real_data_length; i++)
 		p = zx81_output_byte(p, bytes[i]);
 
 	return p - buffer;

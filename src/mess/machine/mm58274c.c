@@ -97,7 +97,7 @@ void mm58274c_init(int which, int mode24)
 
 	{
 		mame_system_time systime;
-		
+
 		/* get the current date/time from the core */
 		mame_get_current_datetime(Machine, &systime);
 

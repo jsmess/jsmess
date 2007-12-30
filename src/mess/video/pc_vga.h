@@ -102,7 +102,7 @@ WRITE16_HANDLER( vga_port16le_03d0_w );
   ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43))
 */
 #if 0
-        int i; 
+        int i;
         UINT8 *memory=memory_region(REGION_CPU1)+0xc0000;
         UINT8 chksum;
 

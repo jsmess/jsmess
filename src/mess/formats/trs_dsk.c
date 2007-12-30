@@ -3,10 +3,10 @@
 #include "formats/basicdsk.h"
 #include "formats/coco_dsk.h"
 
-/* ----------------------------------------------------------------------- 
- * JV1 (Jeff Vavasour 1) format                                         
- *                                                                         
- * Used by Jeff Vavasour's TRS-80 Emulators                                  
+/* -----------------------------------------------------------------------
+ * JV1 (Jeff Vavasour 1) format
+ *
+ * Used by Jeff Vavasour's TRS-80 Emulators
  *
  * Very straight basic disk; 1 head, 10 sectors, 256 sector length
  * ----------------------------------------------------------------------- */

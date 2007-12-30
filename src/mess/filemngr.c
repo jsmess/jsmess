@@ -268,7 +268,7 @@ static int fs_alloc(void)
 			exit(-1);
 		}
 	}
-	
+
 	memset(&fs_item[fs_total], 0, sizeof(fs_item[fs_total]));
 	fs_order[fs_total] = fs_total;
 	return fs_total++;
@@ -291,7 +291,7 @@ static void fs_generate_filelist(void)
 	osd_directory *dir;
 	int qsort_start, count, i, n;
 	ui_menu_item *tmp_menu_item;
-	int *tmp_types;	
+	int *tmp_types;
 
 	/* just to be safe */
 	fs_free();

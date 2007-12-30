@@ -21,7 +21,7 @@ static emu_timer *kbd_timer;
 static void kbd_sendscancode( UINT8 scancode )
 {
 	int j;
-	
+
 	/* send over to the cia A */
 	for( j = 0; j < 8; j++ )
 	{
@@ -34,18 +34,18 @@ static void kbd_sendscancode( UINT8 scancode )
 static TIMER_CALLBACK( kbd_update_callback )
 {
 	UINT8	scancode;
-	
+
 	(void)param;
-	
+
 	/* if we don't have pending data, bail */
 	if ( key_buf_pos == key_cur_pos )
 		return;
-	
+
 	/* fetch the next scan code and send it to the Amiga */
 	scancode = key_buf[key_cur_pos++];
 	key_cur_pos %= KEYBOARD_BUFFER_SIZE;
 	kbd_sendscancode( scancode );
-	
+
 	/* if we still have more data, schedule another update */
 	if ( key_buf_pos != key_cur_pos )
 	{
@@ -62,7 +62,7 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 	if ( (index == 3) && ( delta & 0x80000000 ) && ( newvalue & 0x80000000 ) )
 	{
 		const amiga_machine_interface *amiga_intf = amiga_get_interface();
-		
+
 		if ( amiga_intf != NULL && amiga_intf->nmi_callback )
 		{
 			(*amiga_intf->nmi_callback)();
@@ -71,7 +71,7 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 	else
 	{
 		int		key_buf_was_empty = ( key_buf_pos == key_cur_pos ) ? 1 : 0;
-			
+
 		for( i = 0; i < 32; i++ )
 		{
 			if ( delta & ( 1 << i ) )
@@ -79,13 +79,13 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 				int	down = ( newvalue & ( 1 << i ) ) ? 0 : 1;
 				int	scancode = ( ( (index*32)+i ) << 1 ) | down;
 				int amigacode = ~scancode;
-		
-				/* add the keycode to the buffer */		
+
+				/* add the keycode to the buffer */
 				key_buf[key_buf_pos++] = amigacode & 0xff;
 				key_buf_pos %= KEYBOARD_BUFFER_SIZE;
 			}
 		}
-		
+
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
 		if ( key_buf_was_empty && ( key_buf_pos != key_cur_pos ) )
 		{
@@ -107,7 +107,7 @@ void amigakbd_init( void )
 
 		input_port_set_changed_callback( port_tag_to_index( buf ), 0xFFFFFFFF, kbd_update, &kbd_index[i] );
 	}
-	
+
 	/* allocate a keyboard buffer */
 	key_buf = auto_malloc( KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;
@@ -254,5 +254,5 @@ INPUT_PORTS_START( amiga_keyboard )
 	PORT_BIT( 0x20000000, 0x0000, IPT_UNUSED)					// 7D
 	PORT_BIT( 0x40000000, 0x0000, IPT_UNUSED)					// 7E
 	PORT_BIT( 0x80000000, 0x0000, IPT_KEYBOARD)	PORT_CODE(KEYCODE_PGUP)		// 7F NMI button
-	
+
 INPUT_PORTS_END

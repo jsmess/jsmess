@@ -1418,7 +1418,7 @@ MACHINE_DRIVER_END
 
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
-	// basic c1.20 
+	// basic c1.20
     ROM_LOAD("basic.rom", 0xf6000, 0x8000, CRC(0c19c1a8))
 	// ???
     ROM_LOAD("bios.rom", 0x??000, 0x2000, CRC(98463f95))

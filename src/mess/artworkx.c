@@ -166,7 +166,7 @@ int artwork_get_inputscreen_customizations(png_info *png, artwork_cust_type cust
 							customizations->y = y1;
 							customizations->width = x2 - x1;
 							customizations->height = y2 - y1;
-							customizations++;				
+							customizations++;
 							customizations_length--;
 							item_count++;
 						}

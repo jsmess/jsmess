@@ -108,7 +108,7 @@ READ8_HANDLER( odyssey2_getp2 )
 
     else
         p2 = p2 | 0xF0;
-    
+
     logerror("%.6f p2 read %.2x\n", attotime_to_double(timer_get_time()), p2);
     return p2;
 }

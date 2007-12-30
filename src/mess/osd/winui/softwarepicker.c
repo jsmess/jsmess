@@ -204,10 +204,10 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 			}
 			pPickerInfo->nHashesRealized = 0;
 		}
-		
+
 
 		pPickerInfo->pDriver = pDriver;
-		
+
 		if (pDriver)
 		{
 			while(pDriver && !pPickerInfo->pHashFile)
@@ -444,7 +444,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	// copy the filename
 	strcpy(pInfo->szFilename, pszFilename);
-	
+
 	// set up device and CRC, if specified
 	pInfo->devclass = devclass;
 	if (devclass.gamedrv && device_get_info_fct(&devclass, DEVINFO_PTR_PARTIAL_HASH))
@@ -506,7 +506,7 @@ static BOOL SoftwarePicker_AddZipEntFile(HWND hwndPicker, LPCSTR pszZipPath,
 	s = (LPSTR) alloca(nLength);
 	snprintf(s, nLength, "%s\\%s", pszZipPath, pZipEnt->filename);
 
-	return SoftwarePicker_AddFileEntry(hwndPicker, s, 
+	return SoftwarePicker_AddFileEntry(hwndPicker, s,
 		nZipEntryNameLength, pZipEnt->crc, bForce);
 }
 
@@ -643,7 +643,7 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 	char* utf8_FileName;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
-	
+
 	utf8_FileName = utf8_from_tstring(pSearchInfo->fd.cFileName);
 	if( !utf8_FileName )
 		return FALSE;
@@ -662,7 +662,7 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 		rc = SoftwarePicker_AddDirectory(hwndPicker, pszFilename);
 	else
 		rc = SoftwarePicker_InternalAddFile(hwndPicker, pszFilename, FALSE);
-		
+
 		free(utf8_FileName);
 	return rc;
 }
@@ -768,7 +768,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 	unsigned int nHashFunction = 0;
 	char szBuffer[256];
 	TCHAR* t_buf;
-	
+
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	if ((nRow < 0) || (nRow >= pPickerInfo->nIndexLength))
 		return NULL;
@@ -781,7 +781,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 			t_buf = tstring_from_utf8(pFileInfo->pszSubName);
 			if( !t_buf )
 				return s;
-			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);	
+			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 			s = pszBuffer;
 			free(t_buf);
 			break;
@@ -812,7 +812,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 					t_buf = tstring_from_utf8(pszUtf8);
 					if( !t_buf )
 						return s;
-					_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);	
+					_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 					s = pszBuffer;
 					free(t_buf);
 				}
@@ -832,7 +832,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 			{
 				t_buf = tstring_from_utf8(szBuffer);
 				if( !t_buf )
-					return s;	
+					return s;
 				_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 				s = pszBuffer;
 				free(t_buf);
@@ -849,7 +849,7 @@ static LRESULT CALLBACK SoftwarePicker_WndProc(HWND hwndPicker, UINT nMessage,
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	LRESULT rc;
-	
+
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	rc = CallWindowProc(pPickerInfo->pfnOldWndProc, hwndPicker, nMessage, wParam, lParam);
 
@@ -880,7 +880,7 @@ BOOL SetupSoftwarePicker(HWND hwndPicker, const struct PickerOptions *pOptions)
 
 	if (!SetProp(hwndPicker, s_szSoftwarePickerProp, (HANDLE) pPickerInfo))
 		goto error;
-	
+
 	l = (LONG_PTR) SoftwarePicker_WndProc;
 	l = SetWindowLongPtr(hwndPicker, GWLP_WNDPROC, l);
 	pPickerInfo->pfnOldWndProc = (WNDPROC) l;

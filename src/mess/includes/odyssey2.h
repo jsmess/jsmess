@@ -7,7 +7,7 @@
 #define P1_VDC_ENABLE             (0x08)  /* active low */
 #define P1_EXT_RAM_ENABLE         (0x10)  /* active low */
 #define P1_VDC_COPY_MODE_ENABLE   (0x40)
-                                  
+
 #define P2_KEYBOARD_SELECT_MASK   (0x07)  /* select row to scan */
 
 #define VDC_CONTROL_REG_STROBE_XY (0x02)

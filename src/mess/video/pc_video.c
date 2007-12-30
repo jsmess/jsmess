@@ -86,7 +86,7 @@ VIDEO_UPDATE( pc_video )
 
 	if (video_update)
 	{
-		if ((pc_current_width != w) || (pc_current_height != h)) 
+		if ((pc_current_width != w) || (pc_current_height != h))
 		{
 			pc_current_width = w;
 			pc_current_height = h;

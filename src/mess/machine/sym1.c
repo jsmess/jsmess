@@ -78,7 +78,7 @@ static TIMER_CALLBACK( led_refresh )
 /* The speaker is connected to output 6 of the 74145 */
 static void sym1_74145_output_6_w(int state)
 {
-	speaker_level_w(0, state);	
+	speaker_level_w(0, state);
 }
 
 
@@ -197,16 +197,16 @@ static WRITE8_HANDLER( sym1_via2_a_w )
 {
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa600, 0xa67f, 0, 0,  
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa600, 0xa67f, 0, 0,
 		((readinputportbytag("WP") & 0x01) && !(data & 0x01)) ? MWA8_NOP : MWA8_BANK5);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0400, 0x07ff, 0, 0, 
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0400, 0x07ff, 0, 0,
 		((readinputportbytag("WP") & 0x02) && !(data & 0x02)) ? MWA8_NOP : MWA8_BANK2);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0800, 0x0bff, 0, 0, 
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0800, 0x0bff, 0, 0,
 		((readinputportbytag("WP") & 0x04) && !(data & 0x04)) ? MWA8_NOP : MWA8_BANK3);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0c00, 0x0fff, 0, 0, 
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,	0x0c00, 0x0fff, 0, 0,
 		((readinputportbytag("WP") & 0x08) && !(data & 0x08)) ? MWA8_NOP : MWA8_BANK4);
 }
 
@@ -287,10 +287,10 @@ DRIVER_INIT( sym1 )
 	r6532_config(0, &r6532_interface);
 	r6532_set_clock(0, OSC_Y1);
 	r6532_reset(0);
-	
+
 	/* configure 74145 */
 	ttl74145_config(0, &ttl74145_intf);
-	
+
 	/* allocate a timer to refresh the led display */
 	led_update = timer_alloc(led_refresh, NULL);
 }

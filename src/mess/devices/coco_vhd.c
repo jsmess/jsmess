@@ -196,7 +196,7 @@ READ8_HANDLER(coco_vhd_io_r)
 WRITE8_HANDLER(coco_vhd_io_w)
 {
 	int pos;
-	
+
 	switch(offset)
 	{
 		case 0xff80 - 0xff40:

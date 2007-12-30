@@ -158,7 +158,7 @@ DRIVER_INIT( pc1251 )
 
 	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1251_power_up);
 
-	// c600 b800 b000 a000 8000 tested	
+	// c600 b800 b000 a000 8000 tested
 	// 4 kb memory feedback 512 bytes too few???
 	// 11 kb ram: program stored at 8000
 #if 1

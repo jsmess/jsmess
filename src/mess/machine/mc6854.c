@@ -6,14 +6,14 @@
 
   The MC6854 chip is an Advanced Data-Link Controller (ADLC).
   It provides a high-level network interface that can transimit frames with
-  arbitrary data and address length, and is compatible with the following 
+  arbitrary data and address length, and is compatible with the following
   standards:
   - ADCCP (Advanced Data Communication Control Procedure)
   - HDLC  (High-Level Data-Link Control)
   - SDLC  (Synchronous Data-Link Control)
   It is designed to be interfaced with a M6800-family CPU.
 
-  It is used in the "Nano-network" extension of the Thomson computers to 
+  It is used in the "Nano-network" extension of the Thomson computers to
   link up to 32 computers at 500 Kbps.
   Many networks involving one PC server and several MO5 or TO7/70 computers
   were build in French schools in the 1980's to teach computer science.
@@ -46,7 +46,7 @@
 #define MAX_FRAME_LENGTH 65536
 /* arbitrary value, you may need to enlarge it if you get truncated frames */
 
-#define FIFO_SIZE 3 
+#define FIFO_SIZE 3
 /* hardcoded size of the 6854 FIFO (this is a hardware limit) */
 
 #define FLAG 0x7e
@@ -59,7 +59,7 @@
 /******************* internal chip data structure ******************/
 
 
-static struct 
+static struct
 {
 
 	/* interface */
@@ -231,35 +231,35 @@ static void mc6854_send_bits( UINT32 data, int len, int zi )
 {
 	attotime expire;
 	int i;
-	if ( zi ) 
+	if ( zi )
 	{
 		/* zero-insertion mode */
 		UINT32 d = 0;
 		int l = 0;
 		for ( i = 0; i < len; i++, data >>= 1, l++ )
 		{
-			if ( data & 1 ) 
+			if ( data & 1 )
 			{
 				d |= 1 << l;
 				mc6854->tones++;
-				if ( mc6854->tones == 5 ) 
+				if ( mc6854->tones == 5 )
 				{
 					/* insert a '0' after 5 consecutive '1" */
 					mc6854->tones = 0;
-					l++;	  
+					l++;
 				}
 			}
-			else 
+			else
 				mc6854->tones = 0;
 		}
 		data = d;
 		len = l;
 	}
-	else 
+	else
 		mc6854->tones = 0;
 
 	/* send bits */
-	if ( mc6854->iface->out_tx ) 
+	if ( mc6854->iface->out_tx )
 	{
 		for ( i = 0; i < len; i++, data >>= 1 )
 			mc6854->iface->out_tx( data & 1 );
@@ -267,7 +267,7 @@ static void mc6854_send_bits( UINT32 data, int len, int zi )
 
 	/* schedule when to ask the MC6854 for more bits */
 	expire = timer_timeleft( mc6854->ttimer );
-	if ( ! attotime_compare( expire, attotime_never ) ) 
+	if ( ! attotime_compare( expire, attotime_never ) )
 		expire = attotime_zero;
 	timer_reset( mc6854->ttimer, attotime_add(expire, attotime_mul(BIT_LENGTH, len)) );
 }
@@ -279,7 +279,7 @@ static void mc6854_tfifo_push( UINT8 data )
 {
 	int i;
 
-	if ( TRESET ) 
+	if ( TRESET )
 		return;
 
 	/* push towards the rightmost free entry */
@@ -289,13 +289,13 @@ static void mc6854_tfifo_push( UINT8 data )
 			break;
 	}
 
-	if ( i >= 0 ) 
+	if ( i >= 0 )
 		mc6854->tfifo[ i ] = data | 0x100;
-	else 
+	else
 		logerror( "%f mc6854_tfifo_push: FIFO overrun\n", attotime_to_double(timer_get_time()) );
 
 	/* start frame, if needed */
-	if ( ! mc6854->tstate ) 
+	if ( ! mc6854->tstate )
 	{
 		LOG(( "%f mc6854_tfifo_push: start frame\n", attotime_to_double(timer_get_time()) ));
 		mc6854->tstate = 2;
@@ -312,7 +312,7 @@ static void mc6854_tfifo_terminate( void )
 	int i;
 	for ( i = 0; i < FIFO_SIZE; i++ )
 	{
-		if ( mc6854->tfifo[ i ] & 0x100 ) 
+		if ( mc6854->tfifo[ i ] & 0x100 )
 		{
 			mc6854->tfifo[ i ] |= 0x200;
 			break;
@@ -327,7 +327,7 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 {
 	int i, data = mc6854->tfifo[ FIFO_SIZE - 1 ];
 
-	if ( ! mc6854->tstate ) 
+	if ( ! mc6854->tstate )
 		return;
 
 	/* shift FIFO to the right */
@@ -335,47 +335,47 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 		mc6854->tfifo[ i ] = mc6854->tfifo[ i - 1 ];
 	mc6854->tfifo[ 0 ] = 0;
 
-	if ( data & 0x100 ) 
+	if ( data & 0x100 )
 	{
 		/* got data */
 
 		int blen = 8;
 
-		switch ( mc6854->tstate ) 
+		switch ( mc6854->tstate )
 		{
 
 		case 2: /* 8-bit address field */
-			if ( ( data & 1 ) || ( ! AEX ) ) 
+			if ( ( data & 1 ) || ( ! AEX ) )
 				mc6854->tstate = 3;
 			LOG(( "%f mc6854_tfifo_cb: address field $%02X\n", attotime_to_double(timer_get_time()), data & 0xff ));
 			break;
 
 		case 3: /* 8-bit control field */
-			if ( CEX )  
-				mc6854->tstate = 4; 
-			else if ( LCF ) 
-				mc6854->tstate = 5; 
-			else 
+			if ( CEX )
+				mc6854->tstate = 4;
+			else if ( LCF )
+				mc6854->tstate = 5;
+			else
 				mc6854->tstate = 6;
 			LOG(( "%f mc6854_tfifo_cb: control field $%02X\n", attotime_to_double(timer_get_time()), data & 0xff ));
 			break;
-      
+
 		case 4: /* 8-bit extended control field (optional) */
-			if ( LCF ) 
-				mc6854->tstate = 5; 
-			else 
+			if ( LCF )
+				mc6854->tstate = 5;
+			else
 				mc6854->tstate = 6;
 			LOG(( "%f mc6854_tfifo_cb: control field $%02X\n", attotime_to_double(timer_get_time()), data & 0xff ));
 			break;
-      
+
 		case 5: /* 8-bit logical control (optional) */
-			if ( ! ( data & 0x80 ) ) 
+			if ( ! ( data & 0x80 ) )
 				mc6854->tstate = 6;
 			LOG(( "%f mc6854_tfifo_cb: logical control field $%02X\n", attotime_to_double(timer_get_time()), data & 0xff ));
 			break;
-      
+
 		case 6: /* variable-length data */
-			blen = TWL; 
+			blen = TWL;
 			LOG(( "%f mc6854_tfifo_cb: data field $%02X, %i bits\n", attotime_to_double(timer_get_time()), data & 0xff, blen ));
 			break;
 
@@ -385,12 +385,12 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 
 		if ( mc6854->flen < MAX_FRAME_LENGTH )
 			mc6854->frame[ mc6854->flen++ ] = data;
-		else 
+		else
 			logerror( "mc6854_tfifo_cb: truncated frame, max=%i\n", MAX_FRAME_LENGTH );
 
 		mc6854_send_bits( data, blen, 1 );
 	}
-	else 
+	else
 	{
 		/* data underrun => abort */
 		logerror( "%f mc6854_tfifo_cb: FIFO underrun\n", attotime_to_double(timer_get_time()) );
@@ -401,22 +401,22 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 	}
 
 	/* close frame, if needed */
-	if ( data & 0x200 ) 
+	if ( data & 0x200 )
 	{
 		int len = mc6854->flen;
 
 		LOG(( "%f mc6854_tfifo_cb: end frame\n", attotime_to_double(timer_get_time()) ));
 		mc6854_send_bits( 0xdeadbeef, 16, 1 );  /* send check-sum: TODO */
 		mc6854_send_bits( FLAG, 8, 0 );         /* send closing flag */
-    
-		if ( mc6854->tfifo[ FIFO_SIZE - 1 ] & 0x100 ) 
+
+		if ( mc6854->tfifo[ FIFO_SIZE - 1 ] & 0x100 )
 		{
 			/* re-open frame asap */
 			LOG(( "%f mc6854_tfifo_cb: start frame\n", attotime_to_double(timer_get_time()) ));
-			if ( TWOINTER ) 
+			if ( TWOINTER )
 				mc6854_send_bits( FLAG, 8, 0 );
 		}
-		else 
+		else
 			mc6854->tstate = 0;
 
 		mc6854->flen = 0;
@@ -447,70 +447,70 @@ static void mc6854_rfifo_push( UINT8 d )
 	int i, blen = 8;
 	unsigned data = d;
 
-	switch ( mc6854->rstate ) 
+	switch ( mc6854->rstate )
 	{
 
 	case 0:
 	case 1:
 	case 2: /* 8-bit address field */
-		if ( ( data & 1 ) || ( ! AEX ) ) 
+		if ( ( data & 1 ) || ( ! AEX ) )
 			mc6854->rstate = 3;
-		else 
+		else
 			mc6854->rstate = 2;
 		LOG(( "%f mc6854_rfifo_push: address field $%02X\n", attotime_to_double(timer_get_time()), data ));
 		data |= 0x400; /* address marker */
 		break;
 
 	case 3: /* 8-bit control field */
-		if ( CEX ) 
-			mc6854->rstate = 4; 
-		else if ( LCF ) 
-			mc6854->rstate = 5; 
-		else 
+		if ( CEX )
+			mc6854->rstate = 4;
+		else if ( LCF )
+			mc6854->rstate = 5;
+		else
 			mc6854->rstate = 6;
 		LOG(( "%f mc6854_rfifo_push: control field $%02X\n", attotime_to_double(timer_get_time()), data ));
 		break;
-    
+
 	case 4: /* 8-bit extended control field (optional) */
-		if ( LCF ) 
-			mc6854->rstate = 5; 
-		else 
+		if ( LCF )
+			mc6854->rstate = 5;
+		else
 			mc6854->rstate = 6;
 		LOG(( "%f mc6854_rfifo_push: control field $%02X\n", attotime_to_double(timer_get_time()), data ));
 		break;
-    
+
 	case 5: /* 8-bit logical control (optional) */
-		if ( ! ( data & 0x80 ) ) 
+		if ( ! ( data & 0x80 ) )
 			mc6854->rstate = 6;
 		LOG(( "%f mc6854_rfifo_push: logical control field $%02X\n", attotime_to_double(timer_get_time()), data ));
 		break;
-    
+
 	case 6: /* variable-length data */
-		blen = RWL; 
+		blen = RWL;
 		data >>= 8 - blen;
 		LOG(( "%f mc6854_rfifo_push: data field $%02X, %i bits\n", attotime_to_double(timer_get_time()), data, blen ));
 		break;
 	}
 
 	/* no further FIFO fill until FV is cleared! */
-	if ( mc6854->sr2 & FV ) 
+	if ( mc6854->sr2 & FV )
 	{
 		LOG(( "%f mc6854_rfifo_push: field not pushed\n", attotime_to_double(timer_get_time()) ));
 		return;
 	}
 
 	data |= 0x100; /* entry full marker */
-  
+
 	/* push towards the rightmost free entry */
 	for ( i = FIFO_SIZE - 1; i >= 0; i-- )
 	{
-		if ( ! ( mc6854->rfifo[ i ] & 0x100 ) ) 
+		if ( ! ( mc6854->rfifo[ i ] & 0x100 ) )
 			break;
 	}
 
-	if ( i >= 0 ) 
+	if ( i >= 0 )
 		mc6854->rfifo[ i ] = data | 0x100;
-	else 
+	else
 	{
 		/* FIFO full */
 		mc6854->sr2 |= OVRN;
@@ -529,7 +529,7 @@ static void mc6854_rfifo_terminate( void )
 	int i;
 	for ( i = 0; i < FIFO_SIZE; i++ )
 	{
-		if ( mc6854->rfifo[ i ] & 0x100 ) 
+		if ( mc6854->rfifo[ i ] & 0x100 )
 		{
 			mc6854->tfifo[ i ] |= 0x200;
 			break;
@@ -553,17 +553,17 @@ static UINT8 mc6854_rfifo_pop( void )
 		mc6854->rfifo[ i ] = mc6854->rfifo[ i - 1 ];
 	mc6854->rfifo[ 0 ] = 0;
 
-	if ( mc6854->rfifo[ FIFO_SIZE - 1 ] & 0x200 ) 
+	if ( mc6854->rfifo[ FIFO_SIZE - 1 ] & 0x200 )
 	{
 		/* last byte in frame */
 		mc6854->sr2 |= FV; /* TODO: check CRC & set ERR instead of FV if error*/
 	}
 
 	/* auto-refill in frame mode */
-	if ( mc6854->flen > 0 ) 
+	if ( mc6854->flen > 0 )
 	{
 		mc6854_rfifo_push( mc6854->frame[ mc6854->fpos++ ] );
-		if ( mc6854->fpos == mc6854->flen ) 
+		if ( mc6854->fpos == mc6854->flen )
 			mc6854_rfifo_terminate();
 	}
 
@@ -576,26 +576,26 @@ void mc6854_set_rx( int bit )
 {
 	int fieldlen = ( mc6854->rstate < 6 ) ? 8 : RWL;
 
-	if ( RRESET || DCD ) 
+	if ( RRESET || DCD )
 		return;
 
-	if ( bit ) 
+	if ( bit )
 	{
 		mc6854->rones++;
 		mc6854->rreg = (mc6854->rreg >> 1) | 0x80000000;
-		if ( mc6854->rones >= 8 ) 
+		if ( mc6854->rones >= 8 )
 		{
 			/* abort */
 			mc6854->rstate = 0;
-			mc6854->rsize = 0; 
-			if ( mc6854->rstate > 1 ) 
-			{ 
+			mc6854->rsize = 0;
+			if ( mc6854->rstate > 1 )
+			{
 				/* only in-frame abort */
 				mc6854->sr2 |= RABT;
 				LOG(( "%f mc6854_receive_bit: abort\n", attotime_to_double(timer_get_time()) ));
 			}
 		}
-		else 
+		else
 		{
 			mc6854->rsize++;
 			if ( mc6854->rstate && mc6854->rsize >= fieldlen + 24 )
@@ -608,13 +608,13 @@ void mc6854_set_rx( int bit )
 		mc6854->rones = 0;
 		return;
 	}
-	else if ( mc6854->rones == 6 ) 
+	else if ( mc6854->rones == 6 )
 	{
 		/* flag */
-		if ( FDSE ) 
+		if ( FDSE )
 			mc6854->sr1 |= FD;
 
-		if ( mc6854->rstate > 1 ) 
+		if ( mc6854->rstate > 1 )
 		{
 			/* end of frame */
 			mc6854->rreg >>= 1;
@@ -627,7 +627,7 @@ void mc6854_set_rx( int bit )
 		mc6854->rones = 0;
 		mc6854->rstate = 1;
 		mc6854->rsize = 0;
-	} else 
+	} else
 	{
 		mc6854->rones = 0;
 		mc6854->rreg >>= 1;
@@ -656,24 +656,24 @@ int mc6854_send_frame( UINT8* data, int len )
 	if ( mc6854->rstate > 1 || mc6854->tstate > 1 || RTS )
 		return -1; /* busy */
 
-	if ( len > MAX_FRAME_LENGTH ) 
+	if ( len > MAX_FRAME_LENGTH )
 	{
 		logerror( "mc6854_send_frame: truncated frame, size=%i, max=%i\n", len, MAX_FRAME_LENGTH );
 		len = MAX_FRAME_LENGTH;
 	}
-	else if ( len < 2 ) 
+	else if ( len < 2 )
 	{
 		logerror( "mc6854_send_frame: frame too short, size=%i, min=2\n", len );
 		len = 2;
 	}
 	memcpy( mc6854->frame, data, len );
-	if ( FDSE ) 
+	if ( FDSE )
 		mc6854->sr1 |= FD;
 	mc6854->flen = len;
 	mc6854->fpos = 0;
 	mc6854_rfifo_push( mc6854->frame[ mc6854->fpos++ ] );
 	mc6854_rfifo_push( mc6854->frame[ mc6854->fpos++ ] );
-	if ( mc6854->fpos == mc6854->flen ) 
+	if ( mc6854->fpos == mc6854->flen )
 		mc6854_rfifo_terminate();
 	return 0;
 }
@@ -686,13 +686,13 @@ int mc6854_send_frame( UINT8* data, int len )
 
 void mc6854_set_cts( int data )
 {
-	if ( ! mc6854->cts && data ) 
+	if ( ! mc6854->cts && data )
 		mc6854->sr1 |= CTS;
 	mc6854->cts = data;
 
-	if ( mc6854->cts ) 
+	if ( mc6854->cts )
 		mc6854->sr1 |= CTS;
-	else 
+	else
 		mc6854->sr1 &= ~CTS;
 }
 
@@ -700,7 +700,7 @@ void mc6854_set_cts( int data )
 
 void mc6854_set_dcd( int data )
 {
-	if ( ! mc6854->dcd && data ) 
+	if ( ! mc6854->dcd && data )
 	{
 		mc6854->sr2 |= DCD;
 		/* partial reset */
@@ -718,15 +718,15 @@ static void mc6854_update_sr2( void )
 {
 	/* update RDA */
 	mc6854->sr2 |= RDA2;
-	if ( ! (mc6854->rfifo[ FIFO_SIZE - 1 ] & 0x100) ) 
-		mc6854->sr2 &= ~RDA2; 
-	else if ( TWOBYTES && ! (mc6854->tfifo[ FIFO_SIZE - 2 ] & 0x100) ) 
+	if ( ! (mc6854->rfifo[ FIFO_SIZE - 1 ] & 0x100) )
 		mc6854->sr2 &= ~RDA2;
-  
+	else if ( TWOBYTES && ! (mc6854->tfifo[ FIFO_SIZE - 2 ] & 0x100) )
+		mc6854->sr2 &= ~RDA2;
+
 	/* update AP */
-	if ( mc6854->rfifo[ FIFO_SIZE - 1 ] & 0x400 ) 
-		mc6854->sr2 |= AP; 
-	else 
+	if ( mc6854->rfifo[ FIFO_SIZE - 1 ] & 0x400 )
+		mc6854->sr2 |= AP;
+	else
 		mc6854->sr2 &= ~AP;
 }
 
@@ -737,38 +737,38 @@ static void mc6854_update_sr1( void )
 	mc6854_update_sr2();
 
 	/* update S2RQ */
-	if ( mc6854->sr2 & 0x7f ) 
-		mc6854->sr1 |= S2RQ; 
-	else 
-		mc6854->sr1 &= ~S2RQ; 
-  
+	if ( mc6854->sr2 & 0x7f )
+		mc6854->sr1 |= S2RQ;
+	else
+		mc6854->sr1 &= ~S2RQ;
+
 	/* update TRDA (always prioritized by CTS) */
-	if ( TRESET || ( mc6854->sr1 & CTS ) ) 
+	if ( TRESET || ( mc6854->sr1 & CTS ) )
 		mc6854->sr1 &= ~TDRA;
-	else 
+	else
 	{
 		mc6854->sr1 |= TDRA;
-		if ( mc6854->tfifo[ 0 ] & 0x100 ) 
-			mc6854->sr1 &= ~TDRA; 
-		else if ( TWOBYTES && (mc6854->tfifo[ 1 ] & 0x100) ) 
+		if ( mc6854->tfifo[ 0 ] & 0x100 )
+			mc6854->sr1 &= ~TDRA;
+		else if ( TWOBYTES && (mc6854->tfifo[ 1 ] & 0x100) )
 			mc6854->sr1 &= ~TDRA;
 	}
 
 	/* update RDA */
-	if ( mc6854->sr2 & RDA2 ) 
-		mc6854->sr1 |= RDA; 
-	else 
-		mc6854->sr1 &= ~RDA; 
-  
+	if ( mc6854->sr2 & RDA2 )
+		mc6854->sr1 |= RDA;
+	else
+		mc6854->sr1 &= ~RDA;
+
 	/* update IRQ */
 	mc6854->sr1 &= ~IRQ;
-	if ( RIE && (mc6854->sr1 & (TU | TDRA) ) ) 
+	if ( RIE && (mc6854->sr1 & (TU | TDRA) ) )
 		mc6854->sr1 |= IRQ;
-	if ( TIE ) 
+	if ( TIE )
 	{
-		if ( mc6854->sr1 & (S2RQ | RDA | CTS) )  
+		if ( mc6854->sr1 & (S2RQ | RDA | CTS) )
 			mc6854->sr1 |= IRQ;
-		if ( mc6854->sr2 & (ERR | FV | DCD | OVRN | RABT | RIDLE | AP) ) 
+		if ( mc6854->sr2 & (ERR | FV | DCD | OVRN | RABT | RIDLE | AP) )
 			mc6854->sr1 |= IRQ;
 	}
 }
@@ -777,14 +777,14 @@ static void mc6854_update_sr1( void )
 
 READ8_HANDLER ( mc6854_r )
 {
-	switch ( offset ) 
+	switch ( offset )
 	{
 
 	case 0: /* status register 1 */
 		mc6854_update_sr1();
-		LOG(( "%f $%04x mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n", 
+		LOG(( "%f $%04x mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
 		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->sr1,
-		      ( mc6854->sr1 & RDA) ? 1 : 0, ( mc6854->sr1 & S2RQ) ? 1 : 0, 
+		      ( mc6854->sr1 & RDA) ? 1 : 0, ( mc6854->sr1 & S2RQ) ? 1 : 0,
 		      ( mc6854->sr1 & FD ) ? 1 : 0, ( mc6854->sr1 & CTS ) ? 1 : 0,
 		      ( mc6854->sr1 & TU ) ? 1 : 0, ( mc6854->sr1 & TDRA) ? 1 : 0,
 		      ( mc6854->sr1 & IRQ) ? 1 : 0 ));
@@ -792,11 +792,11 @@ READ8_HANDLER ( mc6854_r )
 
 	case 1: /* status register 2 */
 		mc6854_update_sr2();
-		LOG(( "%f $%04x mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n", 
+		LOG(( "%f $%04x mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n",
 		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->sr2,
-		      ( mc6854->sr2 & AP   ) ? 1 : 0, ( mc6854->sr2 & FV  ) ? 1 : 0, 
-		      ( mc6854->sr2 & RIDLE) ? 1 : 0, ( mc6854->sr2 & RABT) ? 1 : 0, 
-		      ( mc6854->sr2 & ERR  ) ? 1 : 0, ( mc6854->sr2 & DCD ) ? 1 : 0, 
+		      ( mc6854->sr2 & AP   ) ? 1 : 0, ( mc6854->sr2 & FV  ) ? 1 : 0,
+		      ( mc6854->sr2 & RIDLE) ? 1 : 0, ( mc6854->sr2 & RABT) ? 1 : 0,
+		      ( mc6854->sr2 & ERR  ) ? 1 : 0, ( mc6854->sr2 & DCD ) ? 1 : 0,
 		      ( mc6854->sr2 & OVRN ) ? 1 : 0, ( mc6854->sr2 & RDA2) ? 1 : 0 ));
 		return mc6854->sr2;
 
@@ -804,7 +804,7 @@ READ8_HANDLER ( mc6854_r )
 	case 3:
 	{
 		UINT8 data = mc6854_rfifo_pop();
-		LOG(( "%f $%04x mc6854_r: get data $%02X\n", 
+		LOG(( "%f $%04x mc6854_r: get data $%02X\n",
 		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
 		return data;
 	}
@@ -819,28 +819,28 @@ READ8_HANDLER ( mc6854_r )
 
 WRITE8_HANDLER ( mc6854_w )
 {
-	switch ( offset ) 
+	switch ( offset )
 	{
 
 	case 0: /* control register 1 */
 		mc6854->cr1 = data;
-		LOG(( "%f $%04x mc6854_w: set CR1=$%02X (ac=%i,irq=%c%c,%sreset=%c%c)\n", 
+		LOG(( "%f $%04x mc6854_w: set CR1=$%02X (ac=%i,irq=%c%c,%sreset=%c%c)\n",
 		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->cr1,
-		      AC ? 1 : 0, 
+		      AC ? 1 : 0,
 		      RIE ? 'r' : '-', TIE ? 't' : '-',
 		      DISCONTINUE ? "discontinue," : "",
 		      RRESET ? 'r' : '-', TRESET ? 't' : '-'
 			    ));
-		if ( mc6854->cr1 & 0xc ) 
-			logerror( "$%04x mc6854 DMA not handled (CR1=$%02X)\n", 
+		if ( mc6854->cr1 & 0xc )
+			logerror( "$%04x mc6854 DMA not handled (CR1=$%02X)\n",
 				  activecpu_get_previouspc(), mc6854->cr1 );
-		if ( DISCONTINUE ) 
+		if ( DISCONTINUE )
 		{
 			/* abort receive FIFO but keeps shift register & synchro */
 			mc6854->rstate = 0;
 			memset( mc6854->rfifo, 0, sizeof( mc6854->rfifo ) );
 		}
-		if ( RRESET ) 
+		if ( RRESET )
 		{
 			/* abort FIFO & synchro */
 			mc6854_rfifo_clear();
@@ -848,7 +848,7 @@ WRITE8_HANDLER ( mc6854_w )
 			mc6854->sr2 &= ~(AP | FV | RIDLE | RABT | ERR | OVRN | DCD);
 			if ( mc6854->dcd ) mc6854->sr2 |= DCD;
 		}
-		if ( TRESET ) 
+		if ( TRESET )
 		{
 			mc6854_tfifo_clear();
 			mc6854->sr1 &= ~(TU | TDRA | CTS);
@@ -857,11 +857,11 @@ WRITE8_HANDLER ( mc6854_w )
 		break;
 
 	case 1:
-		if ( AC ) 
+		if ( AC )
 		{
 			/* control register 3 */
 			mc6854->cr3 = data;
-			LOG(( "%f $%04x mc6854_w: set CR3=$%02X (lcf=%i,aex=%i,idl=%i,fdse=%i,loop=%i,tst=%i,dtr=%i)\n", 
+			LOG(( "%f $%04x mc6854_w: set CR3=$%02X (lcf=%i,aex=%i,idl=%i,fdse=%i,loop=%i,tst=%i,dtr=%i)\n",
 			      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->cr3,
 			      LCF ? (CEX ? 16 : 8) : 0,  AEX ? 1 : 0,
 			      IDL0 ? 0 : 1, FDSE ? 1 : 0, LOOP ? 1 : 0,
@@ -876,37 +876,37 @@ WRITE8_HANDLER ( mc6854_w )
 				mc6854->iface->out_dtr( DTR ? 1 : 0 );
 
 		}
-		else 
+		else
 		{
 			/* control register 2 */
 			mc6854->cr2 = data;
-			LOG(( "%f $%04x mc6854_w: set CR2=$%02X (pse=%i,bytes=%i,fmidle=%i,%s,tlast=%i,clr=%c%c,rts=%i)\n", 
+			LOG(( "%f $%04x mc6854_w: set CR2=$%02X (pse=%i,bytes=%i,fmidle=%i,%s,tlast=%i,clr=%c%c,rts=%i)\n",
 			      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->cr2,
-			      PSE ? 1 : 0,  TWOBYTES ? 2 : 1,  FMIDLE ? 1 : 0, 
+			      PSE ? 1 : 0,  TWOBYTES ? 2 : 1,  FMIDLE ? 1 : 0,
 			      FCTDRA ? "fc" : "tdra", TLAST ? 1 : 0,
 			      data & 0x20 ? 'r' : '-',  data & 0x40 ? 't' : '-',
 			      RTS ? 1 : 0 ));
 			if ( PSE )
 				logerror( "$%04x mc6854 status prioritization not handled (CR2=$%02X)\n", activecpu_get_previouspc(), mc6854->cr2 );
-			if ( TLAST ) 
+			if ( TLAST )
 				mc6854_tfifo_terminate();
-			if ( data & 0x20 ) 
+			if ( data & 0x20 )
 			{
 				/* clear receiver status */
 				mc6854->sr1 &= ~FD;
 				mc6854->sr2 &= ~(AP | FV | RIDLE | RABT | ERR | OVRN | DCD);
-				if ( mc6854->dcd ) 
+				if ( mc6854->dcd )
 					mc6854->sr2 |= DCD;
 			}
-			if ( data & 0x40 ) 
+			if ( data & 0x40 )
 			{
 				/* clear transmitter status */
 				mc6854->sr1 &= ~(TU | TDRA | CTS);
-				if ( mc6854->cts ) 
+				if ( mc6854->cts )
 					mc6854->sr1 |= CTS;
 			}
 
-			if ( mc6854->iface->out_rts ) 
+			if ( mc6854->iface->out_rts )
 				mc6854->iface->out_rts( RTS ? 1 : 0 );
 		}
 		break;
@@ -917,23 +917,23 @@ WRITE8_HANDLER ( mc6854_w )
 		break;
 
 	case 3:
-		if ( AC ) 
+		if ( AC )
 		{
 			/* control register 4 */
 			mc6854->cr4 = data;
 			LOG(( "%f $%04x mc6854_w: set CR4=$%02X (interframe=%i,tlen=%i,rlen=%i,%s%s)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->cr4,
-			      TWOINTER ? 2 : 1, 
-			      TWL, RWL, 
+			      TWOINTER ? 2 : 1,
+			      TWL, RWL,
 			      ABT ? ( ABTEX ? "abort-ext," : "abort,") : "",
 			      NRZ ? "nrz" : "nrzi" ));
-			if ( ABT ) 
-			{ 
+			if ( ABT )
+			{
 				mc6854->tstate = 0;
 				mc6854_send_bits( 0xffff, ABTEX ? 16 : 8, 0 );
 				mc6854->flen = 0;
 			}
 		}
-		else 
+		else
 		{
 			/* transmitter data: last data */
 			LOG(( "%f $%04x mc6854_w: push last-data=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
@@ -941,7 +941,7 @@ WRITE8_HANDLER ( mc6854_w )
 			mc6854_tfifo_terminate();
 		}
 		break;
- 
+
 	default:
 		logerror( "$%04x mc6854 invalid write offset %i (data=$%02X)\n", activecpu_get_previouspc(), offset, data );
 	}

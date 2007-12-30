@@ -147,7 +147,7 @@ I/O ports
 	I/O board
 	---------
 	1xxx11aa	external interfaces connector (K2)
-					
+
 	0xxx11aa	I/O board interfaces
 		000111aa	8251 (casette recorder, V24)
 		010011aa	8255 (GPIO/0, GPIO/1)

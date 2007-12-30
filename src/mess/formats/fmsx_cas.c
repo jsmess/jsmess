@@ -16,11 +16,11 @@ static int fmsx_cas_to_wav_size (const UINT8 *casdata, int caslen)
 	if (memcmp (casdata, CasHeader, sizeof (CasHeader) ) ) return -1;
 
 	pos = size = 0;
-	 
+
 	while (pos < caslen)
 	{
 		if ( (pos + 8) < caslen)
-			if (!memcmp (casdata + pos, CasHeader, 8) ) 
+			if (!memcmp (casdata + pos, CasHeader, 8) )
 			{
 				size += (CAS_EMPTY_PERIODS + CAS_HEADER_PERIODS) * CAS_PERIOD;
 				pos += 8;

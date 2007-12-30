@@ -34,7 +34,7 @@ static TILE_GET_INFO(abc80_get_tile_info)
 		abc80_bank = 0;
 		abc80_row = row;
 	}
-	
+
 	if (code == ABC80_MODE_TEXT)
 	{
 		abc80_bank = 0;
@@ -64,7 +64,7 @@ VIDEO_START( abc80 )
 	abc80_blink_timer = timer_alloc(abc80_blink_tick, NULL);
 	timer_adjust(abc80_blink_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC80_XTAL/2/6/64/312/16));
 
-	tx_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan, 
+	tx_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan,
 		TILEMAP_TYPE_PEN, 6, 10, 40, 24);
 
 	tilemap_set_scrolldx(tx_tilemap, ABC80_HDSTART, ABC80_HDSTART);

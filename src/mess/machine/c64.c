@@ -99,7 +99,7 @@ static void c64_nmi(void)
 	{
 		if (is_c128())
 		{
-			if (cpu_getactivecpu()==0) 
+			if (cpu_getactivecpu()==0)
 			{
 				/* z80 */
 				cpunum_set_input_line(0, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);

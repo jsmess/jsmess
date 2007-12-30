@@ -1,13 +1,13 @@
 /***************************************************************************
 
 	video/oric.c
-	
+
 	All graphic effects are supported including mid-line changes.
 	There may be some small bugs.
 
 	TODO:
 	- speed up this code a bit?
-	
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -41,7 +41,7 @@ struct oric_vh_state
 	unsigned char *char_data;
 	/* base of char data */
 	unsigned char *char_base;
-	
+
 	/* if (1<<3), display graphics, if 0, hide graphics */
 	int flash_state;
 	/* current count */
@@ -56,7 +56,7 @@ static TIMER_CALLBACK(oric_vh_timer_callback)
 	/* update flash count */
 	vh_state.flash_count++;
 	if (vh_state.flash_count == 30)
-	{	
+	{
 		vh_state.flash_count = 0;
 		vh_state.flash_state ^=(1<<3);
 		oric_vh_update_flash();
@@ -91,7 +91,7 @@ static void oric_vh_update_flash(void)
 			return;
 		}
 	}
-	
+
 
 	/* show */
 	vh_state.active_foreground_colour = vh_state.foreground_colour;
@@ -166,10 +166,10 @@ static void oric_vh_update_attribute(int c)
 				/* set screen memory base and standard charset location for this mode */
 				vh_state.read_addr = 0x0a000;
 				if (oric_ram)
-					vh_state.char_base = oric_ram + (unsigned long)0x09800; 
+					vh_state.char_base = oric_ram + (unsigned long)0x09800;
 				else
 					vh_state.char_base = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, 0x09800);
-				
+
 				/* changing the mode also changes the position of the standard charset
 				and alternative charset */
 				oric_refresh_charset();
@@ -182,7 +182,7 @@ static void oric_vh_update_attribute(int c)
 					vh_state.char_base = oric_ram + (unsigned long)0x0b400;
 				else
 					vh_state.char_base = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0b400);
-			
+
 				/* changing the mode also changes the position of the standard charset
 				and alternative charset */
 				oric_refresh_charset();
@@ -203,7 +203,7 @@ static void oric_vh_render_6pixels(mame_bitmap *bitmap,int x,int y, int fg, int 
 	int i;
 	int pens[2];
 	int px;
-	
+
 	/* invert? */
 	if (invert_flag)
 	{
@@ -213,7 +213,7 @@ static void oric_vh_render_6pixels(mame_bitmap *bitmap,int x,int y, int fg, int 
 
 	pens[1] = Machine->pens[fg];
 	pens[0] = Machine->pens[bg];
-	
+
 	px = x;
 	for (i=0; i<6; i++)
 	{
@@ -226,7 +226,7 @@ static void oric_vh_render_6pixels(mame_bitmap *bitmap,int x,int y, int fg, int 
 	}
 }
 
-			
+
 
 
 
@@ -254,7 +254,7 @@ VIDEO_UPDATE( oric )
 	else
 	{
 		hires_active = 0;
-	}			
+	}
 
 
 	for (y = 0; y < 224; y++)
@@ -267,7 +267,7 @@ VIDEO_UPDATE( oric )
 		oric_vh_update_attribute((1<<3));
 
 		oric_vh_update_attribute((1<<4));
-		
+
 		for (byte_offset=0; byte_offset<40; byte_offset++)
 		{
 			int c;
@@ -287,7 +287,7 @@ VIDEO_UPDATE( oric )
 					int char_line;
 
 					char_line = (y>>3);
-					read_addr = (unsigned long)read_addr_base + (unsigned long)byte_offset + (unsigned long)(char_line*40);		
+					read_addr = (unsigned long)read_addr_base + (unsigned long)byte_offset + (unsigned long)(char_line*40);
 				}
 			}
 			else
@@ -295,7 +295,7 @@ VIDEO_UPDATE( oric )
 				int char_line;
 
 				char_line = ((y-200)>>3);
-				read_addr = (unsigned long)read_addr_base + (unsigned long)byte_offset + (unsigned long)(char_line*40);		
+				read_addr = (unsigned long)read_addr_base + (unsigned long)byte_offset + (unsigned long)(char_line*40);
 			}
 
 			/* fetch data */
@@ -310,7 +310,7 @@ VIDEO_UPDATE( oric )
 				oric_vh_render_6pixels(bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, 0,(c & 0x080));
 
 				if (y<200)
-				{				
+				{
 					/* is hires active? */
 					if (vh_state.mode & (1<<2))
 					{
@@ -320,7 +320,7 @@ VIDEO_UPDATE( oric )
 					{
 						hires_active = 0;
 					}
-					
+
 					read_addr_base = vh_state.read_addr;
 				}
 			}
@@ -345,7 +345,7 @@ VIDEO_UPDATE( oric )
 
 					/* is double height set? */
 					if (vh_state.text_attributes & (1<<1))
-					{ 
+					{
 						/* if char line is even, top half of character is displayed,
 						if char line is odd, bottom half of character is displayed */
 						int double_height_flag = ((y>>3) & 0x01);
@@ -353,21 +353,21 @@ VIDEO_UPDATE( oric )
 						/* calculate line to fetch */
 						ch_line = (ch_line>>1) + (double_height_flag<<2);
 					}
-					
+
 					/* fetch pixel data for this char line */
 					char_data = vh_state.char_data[(char_index<<3) | ch_line] & 0x03f;
 
 					/* draw! */
 					oric_vh_render_6pixels(bitmap,x,y,
-						vh_state.active_foreground_colour, 
+						vh_state.active_foreground_colour,
 						vh_state.active_background_colour, char_data, (c & 0x080));
 				}
 
 			}
-			
-			x=x+6;	
+
+			x=x+6;
 		}
-		
+
 		/* after 200 lines have been drawn, force a change of the read address */
 		/* there are 200 lines of hires/text mode, then 24 lines of text mode */
 		/* the mode can't be changed in the last 24 lines. */

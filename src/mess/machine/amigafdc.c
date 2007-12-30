@@ -1,7 +1,7 @@
 /***************************************************************************
 
 	Amiga floppy disk controller emulation
-	
+
 	- The drive spins at 300 RPM = 1 Rev every 200ms
 	- At 2usec per bit, that's 12500 bytes per track, or 6250 words per track
 	- At 4usec per bit, that's 6250 bytes per track, or 3125 words per track
@@ -88,22 +88,22 @@ static DEVICE_INIT(amiga_fdc)
 	fdc_status[id].disk_changed = DISK_DETECT_DELAY;
 
 	memset( fdc_status[id].mfm, 0xaa, MAX_MFM_TRACK_LEN );
-	
+
 	fdc_sel = 0x0f;
 	fdc_dir = 0;
 	fdc_side = 1;
 	fdc_step = 1;
 	fdc_rdy = 0;
-	
+
 	return INIT_PASS;
 }
 
 static void check_extended_image( int id )
 {
 	UINT8	header[8], data[4];
-	
+
 	fdc_status[id].is_ext_image = 0;
-	
+
 	if ( image_fseek( fdc_status[id].f, 0, SEEK_SET ) )
 	{
 		logerror("FDC: image_fseek failed!\n" );
@@ -111,17 +111,17 @@ static void check_extended_image( int id )
 	}
 
 	image_fread( fdc_status[id].f, &header, sizeof( header ) );
-	
+
 	if ( memcmp( header, "UAE--ADF", sizeof( header ) ) == 0 )
 	{
 		int		i;
-		
+
 		for( i = 0; i < MAX_TRACKS; i++ )
 		{
 			image_fread( fdc_status[id].f, &data, sizeof( data ) );
-			
+
 			/* data[0,1] = SYNC - data[2,3] = LEN */
-			
+
 			fdc_status[id].extinfo[i] = data[0];
 			fdc_status[id].extinfo[i] <<= 8;
 			fdc_status[id].extinfo[i] |= data[1];
@@ -129,13 +129,13 @@ static void check_extended_image( int id )
 			fdc_status[id].extinfo[i] |= data[2];
 			fdc_status[id].extinfo[i] <<= 8;
 			fdc_status[id].extinfo[i] |= data[3];
-			
+
 			if ( i == 0 )
 				fdc_status[id].extoffs[i] = sizeof( header ) + ( MAX_TRACKS * sizeof( data ) );
 			else
 				fdc_status[id].extoffs[i] = fdc_status[id].extoffs[i-1] + ( fdc_status[id].extinfo[i-1] & 0xffff );
 		}
-		
+
 		fdc_status[id].is_ext_image = 1;
 	}
 }
@@ -153,7 +153,7 @@ static DEVICE_LOAD(amiga_fdc)
 	timer_reset( fdc_status[id].sync_timer, attotime_never );
 	timer_reset( fdc_status[id].dma_timer, attotime_never );
 	fdc_rdy = 0;
-	
+
 	check_extended_image( id );
 
 	return INIT_PASS;
@@ -162,7 +162,7 @@ static DEVICE_LOAD(amiga_fdc)
 static DEVICE_UNLOAD(amiga_fdc)
 {
 	int id = image_index_in_device(image);
-	
+
 	fdc_status[id].disk_changed = DISK_DETECT_DELAY;
 	fdc_status[id].f = NULL;
 	fdc_status[id].cached = -1;
@@ -233,22 +233,22 @@ UINT16 amiga_fdc_get_byte( void ) {
 }
 
 static TIMER_CALLBACK(fdc_sync_proc)
-{	
+{
 	int drive = param;
 	UINT16			sync = CUSTOM_REG(REG_DSRSYNC);
 	int				cur_pos;
 	int				sector;
 	int				time;
-	
+
 	/* if floppy got ejected, stop */
 	if ( fdc_status[drive].disk_changed )
 		goto bail;
-	
+
 	if ( fdc_status[drive].motor_on == 0 )
 		goto bail;
-	
+
 	cur_pos = fdc_get_curpos( drive );
-	
+
 	if ( cur_pos <= ( GAP_TRACK_BYTES + 6 ) )
 	{
 		sector = 0;
@@ -257,18 +257,18 @@ static TIMER_CALLBACK(fdc_sync_proc)
 	{
 		sector = ( cur_pos - ( GAP_TRACK_BYTES + 6 ) ) / ONE_SECTOR_BYTES;
 	}
-	
+
 	setup_fdc_buffer( drive );
-	
+
 	if ( cur_pos < 2 )
 		cur_pos = 2;
-	
+
 	if ( fdc_status[drive].mfm[cur_pos-2] == ( ( sync >> 8 ) & 0xff ) &&
 		 fdc_status[drive].mfm[cur_pos-1] == ( sync & 0xff ) )
 	{
 		amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_DSKSYN, 0);
 	}
-	
+
 	if ( sector < 10 )
 	{
 		/* start the sync timer */
@@ -278,7 +278,7 @@ static TIMER_CALLBACK(fdc_sync_proc)
 		timer_adjust( fdc_status[drive].sync_timer, ATTOTIME_IN_USEC( time ), drive, attotime_zero );
 		return;
 	}
-	
+
 bail:
 	timer_reset( fdc_status[drive].sync_timer, attotime_never );
 }
@@ -296,7 +296,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 	/* if floppy got ejected, also stop */
 	if ( fdc_status[drive].disk_changed )
 		goto bail;
-		
+
 	if ( fdc_status[drive].motor_on == 0 )
 		goto bail;
 
@@ -307,7 +307,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 		if ( fdc_status[drive].len > 0 )
 		{
 			logerror("Write to disk unsupported yet\n" );
-		
+
 			amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0);
 		}
 	}
@@ -316,11 +316,11 @@ static TIMER_CALLBACK(fdc_dma_proc)
 		offs_t offset = fdc_status[drive].ptr;
 		int cur_pos = fdc_status[drive].pos;
 		int len = fdc_status[drive].len;
-		
+
 		if ( len > MAX_WORDS_PER_DMA_CYCLE ) len = MAX_WORDS_PER_DMA_CYCLE;
-			
+
 		fdc_status[drive].len -= len;
-		
+
 		while ( len-- )
 		{
 			int dat = ( fdc_status[drive].mfm[cur_pos++] ) << 8;
@@ -335,10 +335,10 @@ static TIMER_CALLBACK(fdc_dma_proc)
 
 			offset += 2;
 		}
-		
+
 		fdc_status[drive].ptr = offset;
 		fdc_status[drive].pos = cur_pos;
-		
+
 		if ( fdc_status[drive].len <= 0 )
 		{
 			amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0);
@@ -348,7 +348,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 			int time;
 			double	len_words = fdc_status[drive].len;
 			if ( len_words > MAX_WORDS_PER_DMA_CYCLE ) len_words = MAX_WORDS_PER_DMA_CYCLE;
-				
+
 			time = len_words * 2;
 			time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 			time *= 8;
@@ -356,7 +356,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 			return;
 		}
 	}
-	
+
 bail:
 	timer_reset( fdc_status[drive].dma_timer, attotime_never );
 }
@@ -375,7 +375,7 @@ void amiga_fdc_setup_dma( void ) {
 		amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0);
 		return;
 	}
-	
+
 	if ( ( CUSTOM_REG(REG_DSKLEN) & 0x8000 ) == 0 )
 		goto bail;
 
@@ -384,13 +384,13 @@ void amiga_fdc_setup_dma( void ) {
 
 	if ( fdc_status[drive].disk_changed )
 		goto bail;
-		
+
 	setup_fdc_buffer( drive );
 
 	fdc_status[drive].len = CUSTOM_REG(REG_DSKLEN) & 0x3fff;
 	fdc_status[drive].ptr = CUSTOM_REG_LONG(REG_DSKPTH);
 	fdc_status[drive].pos = cur_pos = fdc_get_curpos( drive );
-	
+
 	/* we'll do a set amount at a time */
 	len_words = fdc_status[drive].len;
 	if ( len_words > MAX_WORDS_PER_DMA_CYCLE ) len_words = MAX_WORDS_PER_DMA_CYCLE;
@@ -419,14 +419,14 @@ void amiga_fdc_setup_dma( void ) {
 			time += 2;
 		}
 	}
-	
+
 	time += len_words * 2;
 	time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 	time *= 8;
 	timer_adjust( fdc_status[drive].dma_timer, ATTOTIME_IN_USEC( time ), drive, attotime_zero );
-	
+
 	return;
-	
+
 bail:
 	timer_reset( fdc_status[drive].dma_timer, attotime_never );
 }
@@ -453,14 +453,14 @@ static void setup_fdc_buffer( int drive )
 #if 0
 	popmessage("T:%d S:%d", fdc_status[drive].cyl, fdc_side );
 #endif
-	
+
 	if ( fdc_status[drive].is_ext_image )
 	{
 		len = fdc_status[drive].extinfo[offset] & 0xffff;
-			
+
 		if ( len > ( MAX_MFM_TRACK_LEN - 2 ) )
 			len = MAX_MFM_TRACK_LEN - 2;
-			
+
 		if ( image_fseek( fdc_status[drive].f, fdc_status[drive].extoffs[offset], SEEK_SET ) )
 		{
 			logerror("FDC: image_fseek failed!\n" );
@@ -468,7 +468,7 @@ static void setup_fdc_buffer( int drive )
 			fdc_status[drive].disk_changed = DISK_DETECT_DELAY;
 			return;
 		}
-		
+
 		/* if SYNC is 0000, then its a regular amiga dos track image */
 		if ( ( fdc_status[drive].extinfo[offset] >> 16 ) == 0x0000 )
 		{
@@ -494,7 +494,7 @@ static void setup_fdc_buffer( int drive )
 			fdc_status[drive].disk_changed = DISK_DETECT_DELAY;
 			return;
 		}
-		
+
 		image_fread( fdc_status[drive].f, temp_cyl, len );
 	}
 
@@ -508,7 +508,7 @@ static void setup_fdc_buffer( int drive )
 		UINT32 tmp;
 		UINT32 even, odd;
 		UINT32 hck = 0, dck = 0;
-		
+
 		/* Preamble and sync */
 		*(dest + 0) = 0xaa;
 		*(dest + 1) = 0xaa;
@@ -520,7 +520,7 @@ static void setup_fdc_buffer( int drive )
 		*(dest + 7) = 0x89;
 
 		/* Track and sector info */
-		
+
 		tmp = 0xff000000 | (offset<<16) | (sector<<8) | (11 - sector);
 		odd = (tmp & 0x55555555) | 0xaaaaaaaa;
 		even = ( ( tmp >> 1 ) & 0x55555555 ) | 0xaaaaaaaa;
@@ -555,11 +555,11 @@ static void setup_fdc_buffer( int drive )
 		    hck ^= (((UINT32) *(dest + x))<<24) | (((UINT32) *(dest + x + 1))<<16) |
 		    	   (((UINT32) *(dest + x + 2))<<8) | ((UINT32) *(dest + x + 3));
 
-		even = odd = hck; 
+		even = odd = hck;
 		odd >>= 1;
 		even |= 0xaaaaaaaa;
 		odd |= 0xaaaaaaaa;
-		
+
 		*(dest + 48) = (UINT8) ((odd & 0xff000000)>>24);
 		*(dest + 49) = (UINT8) ((odd & 0xff0000)>>16);
 		*(dest + 50) = (UINT8) ((odd & 0xff00)>>8);
@@ -601,7 +601,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 
 	timer_adjust(fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive, attotime_zero);
 	fdc_status[drive].rev_timer_started = 1;
-	
+
 	if ( fdc_status[drive].is_ext_image == 0 )
 	{
 		/* also start the sync timer */
@@ -637,11 +637,11 @@ static void stop_rev_timer( int drive ) {
 }
 
 static void fdc_setup_leds( int drive ) {
-	
+
 	char portname[12];
 	sprintf(portname, "drive_%d_led", drive);
 	output_set_value(portname, fdc_status[drive].motor_on == 0 ? 0 : 1);
-	
+
 	if ( drive == 0 )
 		set_led_status( 1, fdc_status[drive].motor_on ); /* update internal drive led */
 
@@ -657,7 +657,7 @@ static void fdc_stepdrive( int drive ) {
 		if ( fdc_status[drive].cyl < 79 )
 			fdc_status[drive].cyl++;
 	}
-	
+
 	/* Update disk detection if applicable */
 	if ( fdc_status[drive].f != NULL )
 	{
@@ -685,7 +685,7 @@ static void fdc_motor( int drive, int off ) {
 void amiga_fdc_control_w( UINT8 data ) {
 	int step_pulse;
 	int drive;
-	
+
 	if ( fdc_sel != ( ( data >> 3 ) & 15 ) )
 		fdc_rdy = 0;
 
@@ -719,7 +719,7 @@ int amiga_fdc_status_r( void ) {
 
 	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc_sel & ( 1 << drive ) ) ) {
-			
+
 			if ( fdc_status[drive].motor_on ) {
 				if ( fdc_rdy ) ret &= ~0x20;
 				fdc_rdy = 1;

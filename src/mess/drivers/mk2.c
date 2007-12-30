@@ -88,7 +88,7 @@ static TIMER_CALLBACK( update_leds )
 	output_set_led_value(1, mk2_led[4]&0x20?1:0);
 	output_set_led_value(2, mk2_led[4]&0x10?1:0);
 	output_set_led_value(3, mk2_led[4]&0x10?0:1);
-	
+
 	mk2_led[0]= mk2_led[1]= mk2_led[2]= mk2_led[3]= mk2_led[4]= 0;
 }
 

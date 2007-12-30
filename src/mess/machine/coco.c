@@ -48,7 +48,7 @@
 	research that for you if you want an exact number for scanlines before the
 	screen starts and the scanline that the v-interrupt triggers..etc.
 
-Dragon Alpha code added 21-Oct-2004, 
+Dragon Alpha code added 21-Oct-2004,
 			Phill Harvey-Smith (afra@aurigae.demon.co.uk)
 
 			Added AY-8912 and FDC code 30-Oct-2004.
@@ -59,21 +59,21 @@ Fixed Dragon Alpha NMI enable/disable, following circuit traces on a real machin
 Re-implemented Alpha NMI enable/disable, using direct PIA reads, rather than
 keeping track of it in a variable in the driver.
 	P.Harvey-Smith, 25-Sep-2006.
-	
-Radically re-wrote memory emulation code for CoCo 1/2 & Dragon machines, the 
-new code emulates the memory mapping of the SAM, dependent on what size of 
+
+Radically re-wrote memory emulation code for CoCo 1/2 & Dragon machines, the
+new code emulates the memory mapping of the SAM, dependent on what size of
 RAM chips it is programed to use, including proper mirroring of the RAM.
 
-Replaced the kludged emulation of the cart line, with a timer based trigger 
-this is set to toggle at 1Hz, this seems to be good enough to trigger the 
-cartline, but is so slow in real terms that it should have very little 
+Replaced the kludged emulation of the cart line, with a timer based trigger
+this is set to toggle at 1Hz, this seems to be good enough to trigger the
+cartline, but is so slow in real terms that it should have very little
 impact on the emulation speed.
 
 Re-factored the code common to all machines, and seperated the code different,
-into callbacks/functions unique to the machines, in preperation for splitting 
+into callbacks/functions unique to the machines, in preperation for splitting
 the code for individual machine types into seperate files, I have preposed, that
 the CoCo 1/2 should stay in coco.c, and that the coco3 and dragon specifc code
-should go into coco3.c and dragon.c which should (hopefully) make the code 
+should go into coco3.c and dragon.c which should (hopefully) make the code
 easier to manage.
 	P.Harvey-Smith, Dec 2006-Feb 2007
 ***************************************************************************/
@@ -616,7 +616,7 @@ static int generic_rom_load(mess_image *image, UINT8 *dest, UINT16 destlength)
 	{
 		romsize = destlength;
 	}
-	
+
 	image_fread(image, dest, romsize);
 
 	/* Now we need to repeat the mirror the ROM throughout the ROM memory */
@@ -1144,12 +1144,12 @@ static void coco_sound_update(void)
 	}
 }
 
-/* 
-	Dragon Alpha AY-3-8912	
+/*
+	Dragon Alpha AY-3-8912
 */
 
 READ8_HANDLER ( dgnalpha_psg_porta_read )
-{	
+{
 	return 0;
 }
 
@@ -1157,7 +1157,7 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 {
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
-	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */ 
+	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
 	switch (data & 0xF)
 	{
 		case(0x01) :
@@ -1255,7 +1255,7 @@ static UINT8 coco_update_keyboard(void)
 	if ((input_port_4_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
 	if ((input_port_5_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
 	if ((input_port_6_r(0) | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
-	
+
 	switch(get_input_device(joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
 	{
 		case INPUTDEVICE_RIGHT_JOYSTICK:
@@ -1298,14 +1298,14 @@ static UINT8 coco_update_keyboard(void)
 				/* While in state 7, prepare to chech next video frame for a hit */
 				dclg_time = video_screen_get_time_until_pos(0, readinputportbytag_safe("dclg_y", 0), 0);
 			}
-			
+
 			break;
 
 		default:
 			fatalerror("Invalid value returned by get_input_device");
 			break;
 	}
-	
+
 	if( attotime_compare(dclg_time, attotime_zero) )
 	{
 		/* schedule lightgun events */
@@ -1324,7 +1324,7 @@ static UINT8 coco_update_keyboard(void)
 	/* sample joystick buttons */
 	porta &= ~readinputportbytag_safe("joystick_buttons", 0);
 	port_za &= ~readinputportbytag_safe("joystick_buttons", 0);
-	
+
 	pia_set_input_a(0, porta, port_za);
 	return porta;
 }
@@ -1410,13 +1410,13 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	 */
 	UINT8 dac = pia_get_output_a(1) & 0xFC;
 	static int dclg_previous_bit;
-	
+
 	coco_sound_update();
 
 	if (get_input_device(INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
 	{
 		int dclg_this_bit = ((data & 2) >> 1);
-		
+
 		if( dclg_previous_bit == 1 )
 		{
 			if( dclg_this_bit == 0 )
@@ -1424,9 +1424,9 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 				/* Clock Diecom Light gun interface on a high to low transistion */
 				dclg_state++;
 				dclg_state &= 0x0f;
-				
+
 				/* Clear hit bit for every transistion */
-				dclg_output_h &= ~0x02;				
+				dclg_output_h &= ~0x02;
 
 				if( dclg_state > 7 )
 				{
@@ -1435,14 +1435,14 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 						dclg_output_v |= 0x01;
 					else
 						dclg_output_v &= ~0x01;
-						
+
 					/* Bit 9 of timer is only avaiable if state == 8*/
 					if (dclg_state == 8 && (((dclg_timer >> 9) & 0x01) == 1) )
 						dclg_output_v |= 0x02;
 					else
 						dclg_output_v &= ~0x02;
 				}
-				
+
 				/* During state 15, this bit is high. */
 				if( dclg_state == 15 )
 					dclg_output_h |= 0x01;
@@ -1465,7 +1465,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 		coco_hiresjoy_w(dac >= 0x80);
 
 	/* Handle printer output, serial for CoCos, Paralell for Dragons */
-	
+
 	printer_out(data);
 }
 
@@ -1493,11 +1493,11 @@ static WRITE8_HANDLER( d_pia1_pb_w )
 static WRITE8_HANDLER( dragon64_pia1_pb_w )
 {
 	int ddr;
-	
+
 	d_pia1_pb_w(0, data);
 
 	ddr = ~pia_get_port_b_z_mask(1);
-	
+
 	/* If bit 2 of the pia1 ddrb is 1 then this pin is an output so use it */
 	/* to control the paging of the 32k and 64k basic roms */
 	/* Otherwise it set as an input, with an EXTERNAL pull-up so it should */
@@ -1505,7 +1505,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 	if (ddr & 0x04)
 	{
 		dragon_page_rom(data & 0x04);
-	}	
+	}
 }
 
 /***************************************************************************
@@ -1518,7 +1518,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 	PIA2 PB0-PB7	connected to D0..7 of the AY8912.
 	CB1				DRQ from WD2797 disk controler.
 ***************************************************************************/
-  
+
 static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 {
 	int	bc_flags;		/* BCDDIR/BC1, as connected to PIA2 port a bits 0 and 1 */
@@ -1531,15 +1531,15 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 	{
 		dragon_page_rom(data & 0x04);	/* bit 2 controls boot or basic rom */
 	}
-	
+
 	/* Bits 0 and 1 for pia2 port a control the BCDIR and BC1 lines of the */
 	/* AY-8912 */
 	bc_flags = data & 0x03;	/* mask out bits */
-	
+
 	switch (bc_flags)
 	{
 		case 0x00	: 		/* Inactive, do nothing */
-			break;			
+			break;
 		case 0x01	: 		/* Write to selected port */
 			AY8910_write_port_0_w(0, pia_get_output_b(2));
 			break;
@@ -1558,12 +1558,12 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 static void dragon_page_rom(int	romswitch)
 {
 	UINT8 *bank;
-	
-	if (romswitch) 
+
+	if (romswitch)
 		bank = coco_rom;		/* This is the 32k mode basic(64)/boot rom(alpha)  */
 	else
 		bank = coco_rom + 0x8000;	/* This is the 64k mode basic(64)/basic rom(alpha) */
-	
+
 	bas_rom_bank = bank;			/* Record which rom we are using so that the irq routine */
 						/* uses the vectors from the correct rom ! (alpha) */
 
@@ -1579,7 +1579,7 @@ static void	dgnalpha_fdc_callback(wd17xx_state_t event, void *param)
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
 	/* for pia1 cb1 */
-	switch(event) 
+	switch(event)
 	{
 		case WD17XX_IRQ_CLR:
 			cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
@@ -1591,7 +1591,7 @@ static void	dgnalpha_fdc_callback(wd17xx_state_t event, void *param)
 			}
 			else
 			{
-				if (pia_get_output_ca2(2)) 
+				if (pia_get_output_ca2(2))
 					cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
@@ -1609,7 +1609,7 @@ READ8_HANDLER(wd2797_r)
 {
 	int result = 0;
 
-	switch(offset & 0x03) 
+	switch(offset & 0x03)
 	{
 		case 0:
 			result = wd17xx_data_r(0);
@@ -1626,13 +1626,13 @@ READ8_HANDLER(wd2797_r)
 		default:
 			break;
 	}
-		
+
 	return result;
 }
 
 WRITE8_HANDLER(wd2797_w)
 {
-    switch(offset & 0x3) 
+    switch(offset & 0x3)
 	{
 		case 0:
 			wd17xx_data_w(0, data);
@@ -1677,12 +1677,12 @@ static READ8_HANDLER ( d_pia1_pb_r_coco )
 	 * and serial-in (pb0). Serial-in not yet implemented. */
 	int result;
 
-	/* For the CoCo 1, the logic has been changed to only select 64K rams 	
-	   if there is more than 16K of memory, as the Color Basic 1.0 rom 	
-	   can only configure 4K or 16K ram banks (as documented in "Color 	
-	   Basic Unreveled"), doing this allows this  allows the coco driver 	
-	   to access 32K of ram, and also allows the cocoe driver to access 	
-	   the full 64K, as this uses Color Basic 1.2, which can configure 64K rams */	
+	/* For the CoCo 1, the logic has been changed to only select 64K rams
+	   if there is more than 16K of memory, as the Color Basic 1.0 rom
+	   can only configure 4K or 16K ram banks (as documented in "Color
+	   Basic Unreveled"), doing this allows this  allows the coco driver
+	   to access 32K of ram, and also allows the cocoe driver to access
+	   the full 64K, as this uses Color Basic 1.2, which can configure 64K rams */
 
 	if (mess_ram_size > 0x8000)		/* 1 bank of 64K rams */
 		result = (pia_get_output_b(0) & 0x80) >> 5;
@@ -1696,20 +1696,20 @@ static READ8_HANDLER ( d_pia1_pb_r_coco )
 
 static READ8_HANDLER ( d_pia1_pb_r_dragon32 )
 {
-	/* This handles the reading of the memory sense switch (pb2) for the Dragon 32, 
+	/* This handles the reading of the memory sense switch (pb2) for the Dragon 32,
 	 * and pb0, is the printer /busy line. */
-	 
+
 	int result;
 
-	/* Of the Dragon machines, Only the Dragon 32 needs the ram select bit 
-	   as both the 64 and Alpha, always have 64K rams, also the meaning of 
+	/* Of the Dragon machines, Only the Dragon 32 needs the ram select bit
+	   as both the 64 and Alpha, always have 64K rams, also the meaning of
 	   the bit is different with respect to the CoCo 1 */
-	   
+
 	if (mess_ram_size > 0x8000)
 		result = 0x00;		/* 1 bank of 64K, rams */
 	else
 		result = 0x04;		/* 2 banks of 16K rams */
-		
+
 	return result;
 }
 
@@ -1740,13 +1740,13 @@ READ8_HANDLER ( plus_reg_r )
 	return 0;
 }
 
-/* 
+/*
 	When writing the bits have the following meanings :
 
 	bit	value	purpose
-	0	0	First 2k of memory map determined by bits 1 & 2	
-		1	6845 display RAM mapped into first 2K of map, 
-			
+	0	0	First 2k of memory map determined by bits 1 & 2
+		1	6845 display RAM mapped into first 2K of map,
+
 	2,1	0,0	Normal bottom 32K or ram mapped (from mainboard).
 		0,1	First 32K of plus RAM mapped into $0000-$7FFF
 		1,0	Second 32K of plus RAM mapped into $0000-$7FFF
@@ -1756,20 +1756,20 @@ READ8_HANDLER ( plus_reg_r )
 WRITE8_HANDLER ( plus_reg_w )
 {
 	int map;
-	
+
 	dragon_plus_reg = data;
-	
+
 	map = (data & 0x06)>>1;
-	
+
 	switch (map)
 	{
 		case 0x00	: bottom_32k=&mess_ram[0x00000]; break;
 		case 0x01	: bottom_32k=&mess_ram[0x10000]; break;
 		case 0x02	: bottom_32k=&mess_ram[0x18000]; break;
 		case 0x03	: bottom_32k=&mess_ram[0x00000]; break;
-		default	: bottom_32k=&mess_ram[0x00000]; break; // Just to shut the compiler up !	
-	}	
-	
+		default	: bottom_32k=&mess_ram[0x00000]; break; // Just to shut the compiler up !
+	}
+
 	setup_memory_map();
 }
 
@@ -1813,9 +1813,9 @@ READ8_HANDLER(dragon_alpha_mapped_irq_r)
 
 static void setup_memory_map(void)
 {
-	/* 
-	The following table contains the RAM block mappings for the CoCo 1/2 and Dragon computers 
-	This replicates the behavior of the SAM ram size programming bits which in ther real hardware 
+	/*
+	The following table contains the RAM block mappings for the CoCo 1/2 and Dragon computers
+	This replicates the behavior of the SAM ram size programming bits which in ther real hardware
 	allowed the use of various sizes of RAM chips, as follows :-
 
 	1 or 2 banks of 4K
@@ -1825,14 +1825,14 @@ static void setup_memory_map(void)
 
 	For the 4K and 16K chip sizes, if the second bank was empty it would be mapped to nothing.
 	For the 4K and 16K chip sizes, the banks would be mirrored at chip size*2 intervals.
-	
+
 	The following table holds the data required to implement this.
 
-	Note though it is technically possible to have 2 banks of 4K rams, for a total of 8K, I 
+	Note though it is technically possible to have 2 banks of 4K rams, for a total of 8K, I
 	have never seen a machine with this configuration, so I have not implemented it.
 	*/
-	
-	struct coco_meminfo 
+
+	struct coco_meminfo
 	{
 		offs_t	start;		/* start address of bank */
 		offs_t	end;		/* End address of bank */
@@ -1876,7 +1876,7 @@ static void setup_memory_map(void)
 		last_ram_block=15;
 	else
 		last_ram_block=7;
-		
+
 	/* Map RAM blocks */
 	for(block_index=0;block_index<=last_ram_block;block_index++)
 	{
@@ -1887,7 +1887,7 @@ static void setup_memory_map(void)
 			wbank=memmap[block_index].wbank16_1;
 		else if ((memsize==1) && (mess_ram_size == 0x8000))	/* two banks of 16K rams */
 			wbank=memmap[block_index].wbank16_2;
-		else 
+		else
 			wbank=memmap[block_index].wbank64;
 
 		/* If wbank is 0 then there is no ram here so set it up to return 0, note this may change in the future */
@@ -1900,14 +1900,14 @@ static void setup_memory_map(void)
 				memory_set_bankptr(block_index+1,&bottom_32k[memmap[wbank-1].start]);
 			else
 				memory_set_bankptr(block_index+1,&mess_ram[memmap[wbank-1].start]);
-			
-			memory_install_read_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);	
+
+			memory_install_read_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
 			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
 		}
 		else
-		{	
-			memory_install_read_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);			
-			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);	
+		{
+			memory_install_read_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
+			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
 		}
 	}
 
@@ -1923,7 +1923,7 @@ static void setup_memory_map(void)
 				offset=&bas_rom_bank[0x1000*block_index];
 			else
 				offset=&coco_rom[0x4000+(0x1000*(block_index-4))];
-								
+
 			memory_set_bankptr(block_index+9,offset);
 			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_ROM);
 		}
@@ -1939,7 +1939,7 @@ static void d_sam_set_pageonemode(int val)
 	 * TODO:  Actually implement this.  Also find out what the CoCo 3 did with
 	 * this (it probably ignored it)
 	 */
-	
+
 	if (!get_sam_maptype())		// Ignored in maptype 1
 	{
 		if((mess_ram_size>0x8000) && val)
@@ -1976,7 +1976,7 @@ static void d_sam_set_memorysize(int val)
 	 * TODO:  This should affect _all_ memory accesses, not just video ram
 	 * TODO:  Verify that the CoCo 3 ignored this
 	 */
-	 
+
 	setup_memory_map();
 }
 
@@ -2726,7 +2726,7 @@ WRITE8_HANDLER(coco_pia_1_w)
 
 /***************************************************************************/
 
-/* struct to hold callbacks and initializers to pass to generic_init_machine */ 
+/* struct to hold callbacks and initializers to pass to generic_init_machine */
 typedef struct _machine_init_interface machine_init_interface;
 struct _machine_init_interface
 {
@@ -2764,7 +2764,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 
 	/* this timer is used to schedule keyboard updating */
 	update_keyboard_timer = timer_alloc(coco_update_keyboard_timerproc, NULL);
-	
+
 	/* these are the timers to delay the MUX switching */
 	mux_sel1_timer = timer_alloc(coco_update_sel1_timerproc, NULL);
 	mux_sel2_timer = timer_alloc(coco_update_sel2_timerproc, NULL);
@@ -2780,7 +2780,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
-		
+
 	pia_config(0, &init->piaintf[0]);
 	pia_config(1, &init->piaintf[1]);
 	pia_config(2, &init->piaintf[2]); /* Dragon Alpha 3rd pia */
@@ -2829,13 +2829,13 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 /* Setup for hardware common to CoCo 1/2 & Dragon machines, calls genertic_init_machine, to process */
 /* the setup common with the CoCo3, and then does the init that is not common ! */
 static void generic_coco12_dragon_init(running_machine *machine, const machine_init_interface *init)
-{	
+{
 	/* Set default RAM mapping */
 	memory_set_bankptr(1, &mess_ram[0]);
-	
+
 	/* Do generic Inits */
 	generic_init_machine(machine, init);
-	
+
 	/* Init SAM */
 	sam_init(machine, &coco_sam_intf);
 }
@@ -2845,7 +2845,7 @@ static void generic_coco12_dragon_init(running_machine *machine, const machine_i
 MACHINE_START( dragon32 )
 {
 	machine_init_interface init;
-	
+
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dragon32_pia_intf;
@@ -2854,14 +2854,14 @@ MACHINE_START( dragon32 )
 	init.cart_timer_proc	= coco_cart_timer_proc;
 	init.map_memory			= coco_mapmemory;
 	init.fdc_cart_hardware	= "dragon_fdc";
-	
+
 	generic_coco12_dragon_init(machine, &init);
 }
 
 MACHINE_START( dragon64 )
 {
 	machine_init_interface init;
-	
+
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dragon64_pia_intf;
@@ -2870,7 +2870,7 @@ MACHINE_START( dragon64 )
 	init.cart_timer_proc	= coco_cart_timer_proc;
 	init.map_memory			= coco_mapmemory;
 	init.fdc_cart_hardware	= "dragon_fdc";
-	
+
 	generic_coco12_dragon_init(machine, &init);
 
 	/* Init Serial port */
@@ -2881,7 +2881,7 @@ MACHINE_START( dragon64 )
 MACHINE_START( d64plus )
 {
 	machine_init_interface init;
-	
+
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dragon64_pia_intf;
@@ -2890,12 +2890,12 @@ MACHINE_START( d64plus )
 	init.cart_timer_proc	= coco_cart_timer_proc;
 	init.map_memory			= coco_mapmemory;
 	init.fdc_cart_hardware	= "dragon_fdc";
-	
+
 	generic_coco12_dragon_init(machine, &init);
-	
+
 	/* Init Serial port */
 	acia_6551_init();
-	
+
 	/* Init Dragon plus registers */
 	dragon_plus_reg = 0;
 	plus_reg_w(0,0);
@@ -2905,7 +2905,7 @@ MACHINE_START( d64plus )
 MACHINE_START( tanodr64 )
 {
 	machine_init_interface init;
-	
+
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dragon64_pia_intf;
@@ -2914,9 +2914,9 @@ MACHINE_START( tanodr64 )
 	init.cart_timer_proc	= coco_cart_timer_proc;
 	init.map_memory			= coco_mapmemory;
 	init.fdc_cart_hardware	= "coco_fdc";
-	
+
 	generic_coco12_dragon_init(machine, &init);
-	
+
 	/* Init Serial port */
 	acia_6551_init();
 }
@@ -2924,7 +2924,7 @@ MACHINE_START( tanodr64 )
 MACHINE_START( dgnalpha )
 {
 	machine_init_interface init;
-	
+
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dgnalpha_pia_intf;
@@ -2933,16 +2933,16 @@ MACHINE_START( dgnalpha )
 	init.cart_timer_proc	= coco_cart_timer_proc;
 	init.map_memory			= coco_mapmemory;
 	init.fdc_cart_hardware	= "dragon_fdc";
-	
+
 	generic_coco12_dragon_init(machine, &init);
-	
+
 	/* Init Serial port */
 	acia_6551_init();
-    	
+
 	/* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
 	/* by the WD2797, it is reset to 0 after the first inurrupt */
 	dgnalpha_just_reset=1;
-	
+
 	wd17xx_init(WD_TYPE_179X, dgnalpha_fdc_callback, NULL);
 }
 
@@ -2951,7 +2951,7 @@ MACHINE_START( dgnalpha )
 MACHINE_START( coco )
 {
 	machine_init_interface init;
-	
+
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= coco_pia_intf;
@@ -2960,14 +2960,14 @@ MACHINE_START( coco )
 	init.cart_timer_proc	= coco_cart_timer_proc;
 	init.map_memory			= coco_mapmemory;
 	init.fdc_cart_hardware	= "coco_fdc";
-	
+
 	generic_coco12_dragon_init(machine, &init);
 }
 
 MACHINE_START( coco2 )
 {
 	machine_init_interface init;
-	
+
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= coco2_pia_intf;
@@ -2976,7 +2976,7 @@ MACHINE_START( coco2 )
 	init.cart_timer_proc	= coco_cart_timer_proc;
 	init.map_memory			= coco_mapmemory;
 	init.fdc_cart_hardware	= "coco_fdc";
-	
+
 	generic_coco12_dragon_init(machine, &init);
 }
 
@@ -3009,7 +3009,7 @@ static UINT32 crosshairs_get_screen(int player)
 MACHINE_START( coco3 )
 {
 	machine_init_interface init;
-	
+
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= coco3_pia_intf;
@@ -3018,19 +3018,19 @@ MACHINE_START( coco3 )
 	init.cart_timer_proc	= coco3_cart_timer_proc;
 	init.map_memory			= coco3_mapmemory;
 	init.fdc_cart_hardware	= "coco3_plus_fdc";
-	
+
 	generic_init_machine(machine, &init);
-	
+
 	/* Init SAM */
 	sam_init(machine, &coco3_sam_intf);
-	
+
 	/* CoCo 3 specific function pointers */
 	update_keyboard = coco3_update_keyboard;
 
 	coco3_timer_init();
 
 	coco3_interupt_line = 0;
-	
+
 	/* set up state save variables */
 	state_save_register_global_array(coco3_mmu);
 	state_save_register_global_array(coco3_gimereg);

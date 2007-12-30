@@ -111,7 +111,7 @@ DEVICE_LOAD (msx_cart)
 	}
 	mem = image_malloc (image, size_aligned);
 	if (!mem) {
-		logerror ("cart #%d: error: failed to allocate memory for cartridge\n", 
+		logerror ("cart #%d: error: failed to allocate memory for cartridge\n",
 						id);
 		return INIT_FAIL;
 	}
@@ -119,7 +119,7 @@ DEVICE_LOAD (msx_cart)
 		memset (mem, 0xff, size_aligned);
 	}
 	if (image_fread(image, mem, size) != size) {
-		logerror ("cart #%d: %s: can't read full %d bytes\n", 
+		logerror ("cart #%d: %s: can't read full %d bytes\n",
 						id, image_filename (image), size);
 		return INIT_FAIL;
 	}
@@ -130,7 +130,7 @@ DEVICE_LOAD (msx_cart)
 		logerror("cart #%d: warning: no information in crc file\n", id);
 		type = -1;
 	}
-	else if ((1 != sscanf (extra, "%d", &type) ) || 
+	else if ((1 != sscanf (extra, "%d", &type) ) ||
 			type < 0 || type > SLOT_LAST_CARTRIDGE_TYPE) {
 		logerror("cart #%d: warning: information in crc file not valid\n", id);
 		type = -1;
@@ -162,7 +162,7 @@ DEVICE_LOAD (msx_cart)
 			logerror ("cart #%d: error: cannot allocate memory\n", id);
 			return INIT_FAIL;
 		}
-		
+
 		if (size < 0x10000) {
 			memset (mem + size, 0xff, 0x10000 - size);
 		}
@@ -177,7 +177,7 @@ DEVICE_LOAD (msx_cart)
 	/* mapper type 0 (ROM) might need moving around a bit */
 	if (!type) {
 		int i, page = 1;
-		
+
 		/* find the correct page */
 		if (mem[0] == 'A' && mem[1] == 'B') {
 			for (i=2; i<=8; i += 2) {
@@ -193,7 +193,7 @@ DEVICE_LOAD (msx_cart)
 				/* copy to the respective page */
 				memcpy (mem + (page * 0x4000), mem, 0x4000);
 				memset (mem, 0xff, 0x4000);
-			} 
+			}
 			else {
 				/* memory is repeated 4 times */
 				page = -1;
@@ -210,8 +210,8 @@ DEVICE_LOAD (msx_cart)
 
 				page = 1;
 				i = 0xc000; m = mem + 0xffff;
-				while (i--) { 
-					*m = *(m - 0x4000); m--; 
+				while (i--) {
+					*m = *(m - 0x4000); m--;
 				}
 				memset (mem, 0xff, 0x4000);
 			}
@@ -270,7 +270,7 @@ DEVICE_LOAD (msx_cart)
 DEVICE_UNLOAD (msx_cart)
 {
 	int id;
-	
+
 	id = image_index_in_device (image);
 	if (msx_slot_list[msx1.cart_state[id]->type].savesram)
 	{
@@ -323,11 +323,11 @@ static READ8_HANDLER (msx_ppi_port_b_r );
 static const ppi8255_interface msx_ppi8255_interface =
 {
 	1,
-	{NULL}, 
+	{NULL},
 	{msx_ppi_port_b_r},
 	{NULL},
 	{msx_ppi_port_a_w},
-	{NULL}, 
+	{NULL},
 	{msx_ppi_port_c_w}
 };
 
@@ -712,9 +712,9 @@ static WRITE8_HANDLER ( msx_ppi_port_c_w )
 
 	/* cassette motor on/off */
 	if ( (old_val ^ data) & 0x10)
-		cassette_change_state(cassette_device_image(), 
-						(data & 0x10) ? CASSETTE_MOTOR_DISABLED : 
-										CASSETTE_MOTOR_ENABLED, 
+		cassette_change_state(cassette_device_image(),
+						(data & 0x10) ? CASSETTE_MOTOR_DISABLED :
+										CASSETTE_MOTOR_ENABLED,
 						CASSETTE_MASK_MOTOR);
 
 	/* cassette signal write */
@@ -780,7 +780,7 @@ void msx_memory_init (void)
 	}
 
 	for (; layout->entry != MSX_LAYOUT_LAST; layout++) {
-		
+
 		switch (layout->entry) {
 		case MSX_LAYOUT_SLOT_ENTRY:
 			prim = layout->slot_primary;
@@ -899,8 +899,8 @@ void msx_memory_set_carts (void)
 	if (!msx1.layout) {
 		return;
 	}
-	
-	for (layout = msx1.layout; layout->entry != MSX_LAYOUT_LAST; 
+
+	for (layout = msx1.layout; layout->entry != MSX_LAYOUT_LAST;
 					layout++) {
 
 		if (layout->entry == MSX_LAYOUT_SLOT_ENTRY) {
@@ -942,7 +942,7 @@ void msx_memory_map_page (int page)
 
 	if (VERBOSE)
 	{
-		logerror ("mapping %s in %d/%d/%d\n", slot->name, slot_primary, 
+		logerror ("mapping %s in %d/%d/%d\n", slot->name, slot_primary,
 			slot_secondary, page);
 	}
 	slot->map (state, page);
@@ -1075,7 +1075,7 @@ READ8_HANDLER (msx_kanji_r)
 	{
 		int latch;
 		UINT8 ret;
-		
+
 		latch = msx1.kanji_latch;
 		ret = msx1.kanji_mem[latch++];
 
@@ -1091,12 +1091,12 @@ WRITE8_HANDLER (msx_kanji_w)
 {
 	if (offset)
 	{
-		msx1.kanji_latch = 
+		msx1.kanji_latch =
 				(msx1.kanji_latch & 0x007E0) | ((data & 0x3f) << 11);
 	}
 	else
 	{
-		msx1.kanji_latch = 
+		msx1.kanji_latch =
 				(msx1.kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 	}
 }

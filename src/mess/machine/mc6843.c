@@ -49,7 +49,7 @@ static struct
 
 	/* interface */
 	const mc6843_interface* iface;
-	
+
 	/* registers */
 	UINT8 CTAR;       /* current track */
 	UINT8 CMR;        /* command */
@@ -73,7 +73,7 @@ static struct
 
 	/* trigger delayed actions (bottom halves) */
 	emu_timer* timer_cont;
-	
+
 } * mc6843;
 
 
@@ -96,8 +96,8 @@ static struct
 
 
 #if VERBOSE
-static const char* mc6843_cmd[16] = 
-{ 
+static const char* mc6843_cmd[16] =
+{
 	"---", "---", "STZ", "SEK", "SSR", "SSW", "RCR", "SWD",
 	"---", "---", "FFR", "FFW", "MSR", "MSW", "---", "---",
 };
@@ -145,22 +145,22 @@ static void mc6843_status_update( void )
 	int irq = 0;
 
 	/* ISR3 */
-	if ( (mc6843->CMR & 0x40) || ! mc6843->STRB ) 
+	if ( (mc6843->CMR & 0x40) || ! mc6843->STRB )
 		mc6843->ISR &= ~8;
 	else
 		mc6843->ISR |=  8;
 
 	/* interrupts */
-	if ( mc6843->ISR & 4 ) 
+	if ( mc6843->ISR & 4 )
 		irq = 1; /* unmaskable */
-	if ( ! (mc6843->CMR & 0x80) ) 
+	if ( ! (mc6843->CMR & 0x80) )
 	{
 		/* maskable */
-		if ( mc6843->ISR & ~4 ) 
+		if ( mc6843->ISR & ~4 )
 			irq = 1;
 	}
 
-	if ( mc6843->iface->irq_func ) 
+	if ( mc6843->iface->irq_func )
 	{
 		mc6843->iface->irq_func( irq );
 		LOG(( "mc6843_status_update: irq=%i (CMR=%02X, ISR=%02X)\n", irq, mc6843->CMR, mc6843->ISR ));
@@ -204,13 +204,13 @@ static void mc6843_finish_STZ( void )
 	/* seek to track zero */
 	for ( i=0; i<83; i++ )
 	{
-		if ( floppy_drive_get_flag_state( img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) ) 
+		if ( floppy_drive_get_flag_state( img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) )
 			break;
 		floppy_drive_seek( img, -1 );
 	}
 
 	LOG(( "%f mc6843_finish_STZ: actual=%i\n", attotime_to_double(timer_get_time()), floppy_drive_get_current_track( img ) ));
-  	
+
 	/* update state */
 	mc6843->CTAR = 0;
 	mc6843->GCR = 0;
@@ -248,9 +248,9 @@ static int mc6843_address_search( chrn_id* id )
 	mess_image* img = mc6843_floppy_image();
 	int r = 0;
 
-	while ( 1 ) 
+	while ( 1 )
 	{
-		
+
 		if ( ( ! floppy_drive_get_next_id( img, mc6843->side, id ) ) || ( id->flags & ID_FLAG_CRC_ERROR_IN_ID_FIELD ) || ( id->N != 0 ) )
 		{
 			/* read address error */
@@ -274,14 +274,14 @@ static int mc6843_address_search( chrn_id* id )
 		{
 			/* found! */
 			LOG(( "%f mc6843_address_search: sector %i found on track %i\n", attotime_to_double(timer_get_time()), id->R, id->C ));
-			if ( ! (mc6843->CMR & 0x20) ) 
+			if ( ! (mc6843->CMR & 0x20) )
 			{
 				mc6843->ISR |= 0x04; /* if no DMA, set Status Sense */
 			}
 			return 1;
 		}
 
-		if ( floppy_drive_get_flag_state( img, FLOPPY_DRIVE_INDEX ) ) 
+		if ( floppy_drive_get_flag_state( img, FLOPPY_DRIVE_INDEX ) )
 		{
 			r++;
 			if ( r >= 4 )
@@ -303,8 +303,8 @@ static int mc6843_address_search( chrn_id* id )
 /* preamble specific to read commands (adds extra checks) */
 static int mc6843_address_search_read( chrn_id* id )
 {
-	if ( ! mc6843_address_search( id ) ) 
-		return 0;	
+	if ( ! mc6843_address_search( id ) )
+		return 0;
 
 	if ( id->flags & ID_FLAG_CRC_ERROR_IN_DATA_FIELD )
 	{
@@ -330,7 +330,7 @@ static int mc6843_address_search_read( chrn_id* id )
 static void mc6843_finish_RCR( void )
 {
 	chrn_id id;
-	if ( ! mc6843_address_search_read( &id ) ) 
+	if ( ! mc6843_address_search_read( &id ) )
 		return;
 	mc6843_cmd_end();
 }
@@ -344,7 +344,7 @@ static void mc6843_cont_SR( void )
 	mess_image* img = mc6843_floppy_image();
 
 	/* sector seek */
-	if ( ! mc6843_address_search_read( &id ) ) 
+	if ( ! mc6843_address_search_read( &id ) )
 		return;
 
 	/* sector read */
@@ -363,7 +363,7 @@ static void mc6843_cont_SW( void )
 	chrn_id id;
 
 	/* sector seek */
-	if ( ! mc6843_address_search( &id ) ) 
+	if ( ! mc6843_address_search( &id ) )
 		return;
 
 	/* setup sector write buffer */
@@ -409,18 +409,18 @@ READ8_HANDLER ( mc6843_r )
 	UINT8 data = 0;
 
 	switch ( offset ) {
-		
+
 	case 0: /* Data Input Register (DIR) */
 	{
 		int cmd = mc6843->CMR & 0x0f;
 
 		LOG(( "%f $%04x mc6843_r: data input cmd=%s(%i), pos=%i/%i, GCR=%i, ",
-		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), 
-		      mc6843_cmd[cmd], cmd, mc6843->data_idx, 
+		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(),
+		      mc6843_cmd[cmd], cmd, mc6843->data_idx,
 		      mc6843->data_size, mc6843->GCR ));
 
 		if ( cmd == CMD_SSR || cmd == CMD_MSR )
-		{			
+		{
 			/* sector read */
 			assert( mc6843->data_size > 0 );
 			assert( mc6843->data_idx < mc6843->data_size );
@@ -439,12 +439,12 @@ READ8_HANDLER ( mc6843_r )
 					/* schedule next sector in multiple sector read */
 					mc6843->GCR--;
 					mc6843->SAR++;
-					if ( mc6843->GCR == 0xff ) 
+					if ( mc6843->GCR == 0xff )
 					{
 						mc6843_cmd_end();
 					}
-					else if ( mc6843->SAR > 26 ) 
-						
+					else if ( mc6843->SAR > 26 )
+
 					{
 						mc6843->STRB |= 0x08; /* set Sector Address Undetected */
 						mc6843_cmd_end();
@@ -464,7 +464,7 @@ READ8_HANDLER ( mc6843_r )
 		{
 			data = mc6843->data[0];
 		}
-		else 
+		else
 		{
 			/* XXX TODO: other read modes */
 			data = mc6843->data[0];
@@ -501,13 +501,13 @@ READ8_HANDLER ( mc6843_r )
 		mess_image* img = mc6843_floppy_image();
 		int flag = floppy_drive_get_flag_state( img, FLOPPY_DRIVE_READY | FLOPPY_DRIVE_HEAD_AT_TRACK_0 | FLOPPY_DRIVE_DISK_WRITE_PROTECTED );
 		mc6843->STRA &= 0xa3;
-		if ( flag & FLOPPY_DRIVE_READY ) 
+		if ( flag & FLOPPY_DRIVE_READY )
 			mc6843->STRA |= 0x04;
-		if ( flag & FLOPPY_DRIVE_HEAD_AT_TRACK_0 ) 
+		if ( flag & FLOPPY_DRIVE_HEAD_AT_TRACK_0 )
 			mc6843->STRA |= 0x08;
-		if ( flag & FLOPPY_DRIVE_DISK_WRITE_PROTECTED ) 
+		if ( flag & FLOPPY_DRIVE_DISK_WRITE_PROTECTED )
 			mc6843->STRA |= 0x10;
-		if ( mc6843->index_pulse ) 
+		if ( mc6843->index_pulse )
 			mc6843->STRA |= 0x40;
 
 		data = mc6843->STRA;
@@ -529,7 +529,7 @@ READ8_HANDLER ( mc6843_r )
 		mc6843->STRB &= ~0xfb;
 		mc6843_status_update();
 		break;
-		
+
 	case 7: /* Logical-Track Address Register (LTAR) */
 		data = mc6843->LTAR;
 		LOG(( "%f $%04x mc6843_r: read LTAR %i (actual=%i)\n",
@@ -547,15 +547,15 @@ READ8_HANDLER ( mc6843_r )
 WRITE8_HANDLER ( mc6843_w )
 {
 	switch ( offset ) {
-		
+
 	case 0: /* Data Output Register (DOR) */
 	{
 		int cmd = mc6843->CMR & 0x0f;
 		int FWF = (mc6843->CMR >> 4) & 1;
 
 		LOG(( "%f $%04x mc6843_w: data output cmd=%s(%i), pos=%i/%i, GCR=%i, data=%02X\n",
-		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), 
-		      mc6843_cmd[cmd], cmd, mc6843->data_idx, 
+		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(),
+		      mc6843_cmd[cmd], cmd, mc6843->data_idx,
 		      mc6843->data_size, mc6843->GCR, data ));
 
 		if ( cmd == CMD_SSW || cmd == CMD_MSW || cmd == CMD_SWD )
@@ -573,7 +573,7 @@ WRITE8_HANDLER ( mc6843_w )
 
 				LOG(( "%f $%04x mc6843_w: write sector %i\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6843->data_id ));
 
-				floppy_drive_write_sector_data( 
+				floppy_drive_write_sector_data(
 					img, mc6843->side, mc6843->data_id,
 					mc6843->data, mc6843->data_size,
 					(cmd == CMD_SWD) ? ID_FLAG_DELETED_DATA : 0 );
@@ -584,12 +584,12 @@ WRITE8_HANDLER ( mc6843_w )
 				{
 					mc6843->GCR--;
 					mc6843->SAR++;
-					if ( mc6843->GCR == 0xff ) 
+					if ( mc6843->GCR == 0xff )
 					{
 						mc6843_cmd_end();
 					}
-					else if ( mc6843->SAR > 26 ) 
-						
+					else if ( mc6843->SAR > 26 )
+
 					{
 						mc6843->STRB |= 0x08; /* set Sector Address Undetected */
 						mc6843_cmd_end();
@@ -609,7 +609,7 @@ WRITE8_HANDLER ( mc6843_w )
 		{
 			/* assume we are formatting */
 			UINT8 nibble;
-			nibble = 
+			nibble =
 				(data & 0x01) |
 				((data & 0x04) >> 1 )|
 				((data & 0x10) >> 2 )|
@@ -617,7 +617,7 @@ WRITE8_HANDLER ( mc6843_w )
 
 			assert( mc6843->data_idx < sizeof(mc6843->data) );
 
-			mc6843->data[mc6843->data_idx / 2] = 
+			mc6843->data[mc6843->data_idx / 2] =
 				(mc6843->data[mc6843->data_idx / 2] << 4) | nibble;
 
 			if ( (mc6843->data_idx == 0) && (mc6843->data[0] == 0xfe ) )
@@ -748,7 +748,7 @@ WRITE8_HANDLER ( mc6843_w )
 		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6843->LTAR, data,
 		      floppy_drive_get_current_track( mc6843_floppy_image() ) ));
 		break;
-		
+
 	default:
 		logerror( "$%04x mc6843 invalid write offset %i (data=$%02X)\n", activecpu_get_previouspc(), offset, data );
 	}
@@ -766,7 +766,7 @@ void mc6843_reset ( void )
 	LOG (( "mc6843 reset\n" ));
 
 	/* setup/reset floppy drive */
-	for ( i = 0; i < device_count( IO_FLOPPY ); i++ ) 
+	for ( i = 0; i < device_count( IO_FLOPPY ); i++ )
 	{
 		mess_image * img = image_from_devtype_and_index( IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, mc6843_index_pulse_callback );
@@ -796,7 +796,7 @@ void mc6843_reset ( void )
 
 void mc6843_config ( const mc6843_interface* iface )
 {
-	assert( iface ); 
+	assert( iface );
 	mc6843 = auto_malloc( sizeof( * mc6843 ) );
 	assert( mc6843 );
 	memset( mc6843, 0, sizeof( * mc6843 ) );

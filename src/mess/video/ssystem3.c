@@ -88,12 +88,12 @@ static void ssystem3_draw_7segment(mame_bitmap *bitmap,int value, int x, int y)
 		case 'e': mask=0x10; break;
 		case 'f': mask=0x20; break;
 		case 'g': mask=0x40; break;
-		case 'h': 
+		case 'h':
 			// this is more likely wired to the separate leds
-			mask=0x80; 
+			mask=0x80;
 			break;
 		}
-		
+
 		if (mask!=0) {
 			color=Machine->pens[(value&mask)?1:0];
 			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
@@ -164,13 +164,13 @@ static void ssystem3_draw_led(mame_bitmap *bitmap,INT16 color, int x, int y, int
 			}
 			xi++;
 			break;
-		case ' ': 
+		case ' ':
 			xi++;
 			break;
 		case '\r':
 			xi=0;
 			y++;
-			break;				
+			break;
 		};
 	}
 }
@@ -180,23 +180,23 @@ VIDEO_UPDATE( ssystem3 )
 	int i;
 
 	for (i=0; i<4; i++) {
-		ssystem3_draw_7segment(bitmap, ssystem3_led[i]&0x7f, ssystem3_led_pos[i].x, 
+		ssystem3_draw_7segment(bitmap, ssystem3_led[i]&0x7f, ssystem3_led_pos[i].x,
 							   ssystem3_led_pos[i].y);
 	}
 
-	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0],
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '0');
-	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0],
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '1');
-	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0],
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '2');
-	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0],
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
-	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0],
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
-	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0],
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '5');
-	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0], 
+	ssystem3_draw_led(bitmap, machine->pens[ssystem3_led[4]&8?1:0],
 				 ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '6');
 	return 0;
 }

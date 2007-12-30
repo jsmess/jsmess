@@ -6,9 +6,9 @@
 
 	Registers are separated into two banks, switchable through
 	the LSB of the MODE register.
-	
+
 	Date and time are stored in BCD, one digit to each register
-	
+
 	Register	BANK 0					BANK 1
 	0			Timer seconds			CLKOUT
 	1			Timer seconds (10s)		RTC Adjustment
@@ -26,8 +26,8 @@
 	13			MODE register			MODE register
 	14			TEST register			TEST register
 	15			RESET register			RESET register
-	
-	
+
+
 	CLKOUT (W/O) - on the X68000, this is connected to the Timer LED
 		xxxxx000 = always high (on)
 		xxxxx001 = 16384Hz
@@ -37,28 +37,28 @@
 		xxxxx101 =     1Hz
 		xxxxx110 =  1/60Hz
 		xxxxx111 =  always low (off)
-		
+
 	Adjustment register (R/W)
 		bit 0 = if set, will reset the seconds to zero, and if the
 		        seconds were > 30, increment the minutes by 1.
 		        Always returns 0.
-		        
+
 	12/24 hour clock register (R/W) (not implemented yet)
 		bit 0 = selects 12 or 24 hour clock
 		        presumably, on reading, returns AM/PM status.
-		        
+
 	Leap year register
 		bit 0,1 = returns number of years until next leap year.
 		          Is simply year % 4.
-		          
+
 	MODE register (R/W)
 		bit 0 = if set, selects BANK 1, if reset, selects BANK 0
 		bit 2 = Alarm enable
 		bit 3 = Timer enable
-		
+
 	TEST register (not implemented yet)
 		bits 0-3 = generally all set to 0, use is unknown.
-		
+
 	RESET register (not implemented yet)
 		bit 0 = Alarm reset
 		bit 1 = Timer reset
@@ -84,7 +84,7 @@ TIMER_CALLBACK(rtc_alarm_pulse)
 	{
 		rtc.pulse16_state = 0;  // make low
 	}
-		
+
 	if(rtc.pulse_count == 8)
 	{
 		rtc.pulse1_state = 0;
@@ -101,12 +101,12 @@ void rp5c15_init(const struct rp5c15_interface* intf)
 {
 	mame_system_time systm;
 	mame_system_tm time;
-	
+
 	rtc.alarm_callback = intf->alarm_irq_callback;
-	
+
 	mame_get_base_datetime(Machine,&systm);
 	time = systm.local_time;
-	
+
 	// date/time is stored as BCD
 	rtc.systime.sec_1 = time.second % 10;
 	rtc.systime.sec_10 = time.second / 10;
@@ -134,7 +134,7 @@ void rp5c15_init(const struct rp5c15_interface* intf)
 	rtc.reset = 0x00;  // enable both 1Hz and 16Hz alarm counters by default
 	rtc.test = 0x00;
 	rtc.pulse_count = 0;
-	
+
 	rtc_timer = timer_alloc(rtc_alarm_pulse, NULL);
 	timer_adjust(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
 }
@@ -172,14 +172,14 @@ static int rp5c15_read(int offset, UINT16 mem_mask)
 			case 12:
 				return rtc.systime.year_10;
 			case 13:
-				return rtc.mode & 0x0f; 	
+				return rtc.mode & 0x0f;
 		}
 	}
 	else  // BANK 1 selected
 	{
 		switch(offset)
 		{
-			case 0:  // CLKOUT 
+			case 0:  // CLKOUT
 				return rtc.clkout & 0x07;
 			case 1:  // Adjustment (always returns 0)
 				return 0;
@@ -299,7 +299,7 @@ static void rp5c15_write(int offset, int data, UINT16 mem_mask)
 			case 10:  // 12/24 hour clock selection
 				rtc.hour24 = data;
 				break;
-			
+
 		}
 	}
 }
@@ -345,7 +345,7 @@ void rtc_add_minute()
 void rtc_add_day()
 {
 	int d,m;
-	
+
 	rtc.systime.dayofweek++;
 	if(rtc.systime.dayofweek >= 7)
 		rtc.systime.dayofweek = 0;

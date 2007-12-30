@@ -198,8 +198,8 @@ static READ32_HANDLER( joystick_r )
 	 *
 	 *   Reading this register gives you the output of the selected columns
 	 *   of the pads.
-	 *   The buttons pressed will appear as cleared bits. 
-	 *   See the description of the column addressing to map the bits 
+	 *   The buttons pressed will appear as cleared bits.
+	 *   See the description of the column addressing to map the bits
 	 *   to the buttons.
 	 */
 
@@ -223,33 +223,33 @@ static WRITE32_HANDLER( joystick_w )
 	/*
 	 *   16        12         8         4         0
 	 *   +-+-------^------+--+---------+---------+
-	 *   |r|    unused    |mu|  col 1  |  col 0  |  
+	 *   |r|    unused    |mu|  col 1  |  col 0  |
 	 *   +-+--------------+--+---------+---------+
 	 *    15                8   7...4     3...0
 	 *
-	 *   col 0:   column control of joypad 0 
+	 *   col 0:   column control of joypad 0
 	 *
-	 *      Here you select which column of the joypad to poll. 
+	 *      Here you select which column of the joypad to poll.
 	 *      The columns are:
 	 *
-	 *                Joystick       Joybut 
-	 *      col_bit|11 10  9  8     1    0  
+	 *                Joystick       Joybut
+	 *      col_bit|11 10  9  8     1    0
 	 *      -------+--+--+--+--    ---+------
 	 *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
-	 *         1   | *  7  4  1     B       
-	 *         2   | 2  5  8  0     C       
+	 *         1   | *  7  4  1     B
+	 *         2   | 2  5  8  0     C
 	 *         3   | 3  6  9  #   OPTION
 	 *
 	 *      You select a column my clearing the appropriate bit and setting
-	 *      all the other "column" bits. 
+	 *      all the other "column" bits.
 	 *
 	 *
 	 *   col1:    column control of joypad 1
 	 *
 	 *      This is pretty much the same as for joypad EXCEPT that the
 	 *      column addressing is reversed (strange!!)
-	 *            
-	 *                Joystick      Joybut 
+	 *
+	 *                Joystick      Joybut
 	 *      col_bit|15 14 13 12     3    2
 	 *      -------+--+--+--+--    ---+------
 	 *         4   | 3  6  9  #   OPTION
@@ -261,7 +261,7 @@ static WRITE32_HANDLER( joystick_w )
 	 *
 	 *      You can turn off the sound by clearing this bit.
 	 *
-	 *   read enable (r):  
+	 *   read enable (r):
 	 *
 	 *      Set this bit to read from the joysticks, clear it to write
 	 *      to them.

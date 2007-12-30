@@ -42,8 +42,8 @@ WRITE8_HANDLER( svision_sounddma_w )
 		case 4:
 			svision_dma.on = data & 0x80;
 			if (svision_dma.on)
-			{ 
-				svision_dma.pos = 0.0; 
+			{
+				svision_dma.pos = 0.0;
 			}
 			break;
 	}

@@ -1,6 +1,6 @@
 /*
 ** mtx.c : driver for Memotech MTX512
-** 
+**
 ** The memory address space of the MTX512 is divided into 8 banks,
 ** with a size of 8KB each. These banks are mapped differently based
 ** upon the memory model, selected ROM and RAM page, and the amount
@@ -225,7 +225,7 @@ static void mtx_tms9929A_interrupt (int data)
 	z80ctc_0_trg0_w (0, data ? 0 : 1);
 }
 
-static void mtx_set_bank_offsets (unsigned int bank1, unsigned int bank2, 
+static void mtx_set_bank_offsets (unsigned int bank1, unsigned int bank2,
 	                          unsigned int bank3, unsigned int bank4,
 	                          unsigned int bank5, unsigned int bank6,
 	                          unsigned int bank7, unsigned int bank8)
@@ -385,7 +385,7 @@ static unsigned char mtx_peek (int vaddress)
 
 	if (ramspace)
 		return mess_ram[paddress];
-	else 
+	else
 		return romimage[paddress];
 }
 
@@ -452,7 +452,7 @@ static void mtx_save_hack(int start, int length)
 		         mtx_rampage, start, mtx_tape_filename, mtx_tape_index);
 		if (length > bytes_saved)
 			logerror("wrote too few bytes from '%s'\n", mtx_tape_filename);
-	
+
 		mame_fclose(tape_file);
 		mtx_tape_index += length;
 	}
@@ -499,10 +499,10 @@ static void mtx_load_hack(int start, int length)
 		         mtx_tape_filename, mtx_tape_index, mtx_rampage, start);
 		if (length > bytes_loaded)
 			logerror("read too few bytes from '%s'\n", mtx_tape_filename);
-	
+
 		for (i = 0; i < length; i++)
 			mtx_poke(start + i, mtx_tape_buf[i]);
-	
+
 		mame_fclose(tape_file);
 		mtx_tape_index += length;
 	}
@@ -612,7 +612,7 @@ static ADDRESS_MAP_START( mtx_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mtx_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) ) 
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE( 0x00, 0x00) AM_READWRITE( mtx_strobe_r, mtx_bankswitch_w )
 	AM_RANGE( 0x01, 0x02) AM_READWRITE( mtx_vdp_r, mtx_vdp_w )
 	AM_RANGE( 0x03, 0x03) AM_READWRITE( mtx_psg_r, mtx_cst_w )

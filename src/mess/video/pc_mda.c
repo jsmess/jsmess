@@ -23,8 +23,8 @@
 
 const unsigned char mda_palette[4][3] = {
 	{ 0x00,0x00,0x00 },
-	{ 0x00,0x55,0x00 }, 
-	{ 0x00,0xaa,0x00 }, 
+	{ 0x00,0x55,0x00 },
+	{ 0x00,0xaa,0x00 },
 	{ 0x00,0xff,0x00 }
 };
 
@@ -52,7 +52,7 @@ GFXDECODE_END
 
 /* to be done:
    only 2 digital color lines to mda/hercules monitor
-   (maximal 4 colors) 
+   (maximal 4 colors)
    PC200 uses different attributes from IBM.
 */
 const unsigned short mda_colortable[] =
@@ -68,7 +68,7 @@ const unsigned short mda_colortable[] =
 /* nb: This---------------------------------------------^ should refer to a "dim" colour which
  * we don't do yet */
 
-/* flashing is done by dirtying the videoram buffer positions with attr bit #7 set 
+/* flashing is done by dirtying the videoram buffer positions with attr bit #7 set
  * These attributes are used for the flashing characters when they're visible. */
 	0, 0, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10,
 	0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10, 0,10,
@@ -158,7 +158,7 @@ static void pc_mda_init_video_internal(int gfx_char, int gfx_char_mask)
 	int i, y;
 
 	/* Support up to 4 fonts for PC200 */
-	for (i = 0; i < 4; i++) 
+	for (i = 0; i < 4; i++)
 	{
 		mda.gfx_char[i] = Machine->gfx[gfx_char + (i & gfx_char_mask)];
 	}
@@ -314,27 +314,27 @@ static void mda_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height) {
 
-		for (sx=0, r.min_x=0, r.max_x = char_width-1; sx<columns; 
+		for (sx=0, r.min_x=0, r.max_x = char_width-1; sx<columns;
 			 sx++, offs=(offs+2)&0x3fff, r.min_x += char_width, r.max_x += char_width) {
 			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1]) {
-				
-				attr = videoram[offs+1];	
+
+				attr = videoram[offs+1];
 				drawgfx(bitmap, mda.gfx_char[CGA_FONT], videoram[offs], attr,
 						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-				/* Underlining */ 
-				if ((attr & 7) == 1) 
-					plot_box(bitmap, r.min_x, r.min_y + 12, char_width, 
+				/* Underlining */
+				if ((attr & 7) == 1)
+					plot_box(bitmap, r.min_x, r.min_y + 12, char_width,
 						1, Machine->pens[2 + (attr & 8)]);
 
 				if (cursor.on&&(mda.pc_framecnt&32)&&(offs==cursor.pos*2)) {
 					int k=height-cursor.top;
 					rectangle rect2=r;
-					rect2.min_y+=cursor.top; 
+					rect2.min_y+=cursor.top;
 					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
 
 					if (k>0)
-						plot_box(bitmap, r.min_x, 
-								 r.min_y+cursor.top, 
+						plot_box(bitmap, r.min_x,
+								 r.min_y+cursor.top,
 								 char_width, k, Machine->pens[2/*?*/]);
 				}
 
@@ -369,11 +369,11 @@ static void mda_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height) {
 
-		for (sx=0, r.min_x=0, r.max_x = char_width-1; sx<columns; 
+		for (sx=0, r.min_x=0, r.max_x = char_width-1; sx<columns;
 			 sx++, offs=(offs+2)&0x3fff, r.min_x += char_width, r.max_x += char_width) {
 
 			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1]) {
-				
+
 				int attr = videoram[offs+1];
 				if (attr & 0x80)	/* blinking ? */
 				{
@@ -382,21 +382,21 @@ static void mda_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 				drawgfx(bitmap, mda.gfx_char[CGA_FONT], videoram[offs], attr,
 						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-				/* Underlining */ 
-				if ((attr & 7) == 1) 
-					plot_box(bitmap, r.min_x, r.min_y + 12, char_width, 
+				/* Underlining */
+				if ((attr & 7) == 1)
+					plot_box(bitmap, r.min_x, r.min_y + 12, char_width,
 						1, Machine->pens[2 + (attr & 8)]);
 
 //				if ((cursor.on)&&(offs==cursor.pos*2)) {
 				if (cursor.on&&(mda.pc_framecnt&32)&&(offs==cursor.pos*2)) {
 					int k=height-cursor.top;
 					rectangle rect2=r;
-					rect2.min_y+=cursor.top; 
+					rect2.min_y+=cursor.top;
 					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
 
 					if (k>0)
-						plot_box(bitmap, r.min_x, 
-								 r.min_y+cursor.top, 
+						plot_box(bitmap, r.min_x,
+								 r.min_y+cursor.top,
 								 char_width, k, Machine->pens[2/*?*/]);
 				}
 

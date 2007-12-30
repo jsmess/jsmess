@@ -51,7 +51,7 @@ static int validate_device(const device_class *devclass)
 	}
 
 	/* File Extensions Checks
-	 * 
+	 *
 	 * Checks the following
 	 *
 	 * 1.  Tests the integrity of the string list
@@ -134,7 +134,7 @@ static int validate_device(const device_class *devclass)
 				error = 1;
 			}
 			break;
-			
+
 		default:
 			break;
 	}

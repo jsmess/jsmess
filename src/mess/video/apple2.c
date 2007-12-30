@@ -280,7 +280,7 @@ static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 			w =		(((UINT32) vram_row[col+0] & 0x7f) <<  0)
 				|	(((UINT32) vram_row[col+1] & 0x7f) <<  7)
 				|	(((UINT32) vram_row[col+2] & 0x7f) << 14);
-	
+
 			switch(columns)
 			{
 				case 40:

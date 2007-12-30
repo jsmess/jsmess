@@ -225,7 +225,7 @@ static WRITE8_HANDLER( pet_via_port_b_w )
 }
 
 
-static const struct via6522_interface pet_via = 
+static const struct via6522_interface pet_via =
 {
 	NULL,					/* in_a_func */
 	pet_via_port_b_r,		/* in_b_func */

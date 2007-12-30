@@ -10,7 +10,7 @@
 		- Intel 80186 CPU 8MHz, integrated DMA(8237?), PIC(8259?), PIT(8253?)
                 - Intel 80130 OSP Operating system processor (PIC 8259, PIT 8254)
 		- Intel 8274 MPSC Multi-protocol serial communications controller (NEC 7201)
-		- Intel 8255 PPI Programmable peripheral interface 
+		- Intel 8255 PPI Programmable peripheral interface
 		- Intel 8253 PIT Programmable interval timer
 		- Intel 8251 USART Universal synchronous asynchronous receiver transmitter
 		- National 58174 Real-time clock (compatible with 58274)

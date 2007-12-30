@@ -1,16 +1,16 @@
 /******************************************************************************
  Epson EX-800 Dot Matrix printer
- 
+
  Written by Dirk Best, October 2007
- 
+
  --
- 
+
  Main CPU is a UPD7810H6 running at 12 MHz.
- 
+
  --
- 
+
  On startup, the ports are initialized as follows:
- 
+
  Port A lines PA0-PA7 are configured as output
  Port B lines PB0-PB7 are configured as output
  Port C lines PC2, PC4 and PC5 are configured as output
@@ -20,8 +20,8 @@
         PC3: TI input
         PC6: CO0 output
         PC7: CO1 output
-        
-The I/O lines are connected as follows:        
+
+The I/O lines are connected as follows:
 
 PA0: \
 PA1:  Carriage motor
@@ -62,8 +62,8 @@ AN4: Print head operating temperature sensor
 AN5: Scanner Unit, Color Home sensor
 AN6:
 AN7: Color Home sensor adjust
-    
-INT: Online switch    
+
+INT: Online switch
 
 
 Gate array 5a (parallel port, printer head)
@@ -200,7 +200,7 @@ static MACHINE_START(ex800)
 {
 	/* Setup beep */
 	beep_set_state(0, 0);
-	beep_set_frequency(0, 4000); /* measured at 4000 hz */	
+	beep_set_frequency(0, 4000); /* measured at 4000 hz */
 }
 
 
@@ -239,7 +239,7 @@ static WRITE8_HANDLER(ex800_porta_w)
 {
 	if (PA6) logerror("BNK0 selected.\n");
 	if (PA7) logerror("BNK1 selected.\n");
-	
+
 	logerror("PA W %x @%x\n", data, activecpu_get_pc());
 }
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER(ex800_portb_w)
 		logerror("PB3 Paper empty LED on @%x\n", activecpu_get_pc());
 	else
 		logerror("PB3 Paper empty LED off @%x\n", activecpu_get_pc());
-	
+
 //	logerror("PB W %x @%x\n", data, activecpu_get_pc());
 }
 
@@ -273,7 +273,7 @@ static WRITE8_HANDLER(ex800_portc_w)
 		beep_set_state(0, 0);
 	else
 		beep_set_state(0, 1);
-	
+
 	logerror("PC W %x @%x\n", data, activecpu_get_pc());
 }
 
@@ -366,7 +366,7 @@ static INPUT_PORTS_START( ex800 )
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FORM FEED") PORT_CODE(KEYCODE_F10)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_F11)
-	
+
 	PORT_START_TAG("SelecType")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Draft")          PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NLQ Roman")      PORT_CODE(KEYCODE_F7)
@@ -376,7 +376,7 @@ static INPUT_PORTS_START( ex800 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Proportional")   PORT_CODE(KEYCODE_F3)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(DEF_STR(Normal))  PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Condensed")      PORT_CODE(KEYCODE_F1)
-	
+
 	PORT_START_TAG("DSW_1")
 	PORT_DIPNAME(0x01, 0x00, "Condensed characters")
 	PORT_DIPSETTING(   0x00, DEF_STR(Off))
@@ -425,7 +425,7 @@ static INPUT_PORTS_START( ex800 )
 	PORT_DIPSETTING(   0x00, "9600")
 	PORT_DIPSETTING(   0x40, "4800")
 	PORT_DIPSETTING(   0x80, "1200")
-	PORT_DIPSETTING(   0xc0, "300")	
+	PORT_DIPSETTING(   0xc0, "300")
 INPUT_PORTS_END
 
 
@@ -456,14 +456,14 @@ static MACHINE_DRIVER_START(ex800)
 	MDRV_CPU_IO_MAP(ex800_io, 0)
 
 	MDRV_MACHINE_START(ex800)
-	
+
 	/* "video" hardware */
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 //	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 //	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 //	MDRV_SCREEN_SIZE(480, 640)
-//	MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 639)	
+//	MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 639)
 //	MDRV_PALETTE_LENGTH(4)
 
 //	MDRV_VIDEO_START(ex800)

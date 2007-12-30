@@ -69,7 +69,7 @@ DRIVER_INIT( pcmda )
 	pc_turbo_setup(0, 3, 0x02, 4.77/12, 1);
 }
 
-DRIVER_INIT( europc ) 
+DRIVER_INIT( europc )
 {
 	UINT8 *gfx = &memory_region(REGION_GFX1)[0x8000];
 	UINT8 *rom = &memory_region(REGION_CPU1)[0];

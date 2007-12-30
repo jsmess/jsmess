@@ -247,7 +247,7 @@ static void messtest_output_error(void *param, const char *format, va_list argpt
 	int pos, nextpos;
 
 	vsnprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), format, argptr);
-	
+
 	pos = 0;
 	while(buffer[pos] != '\0')
 	{
@@ -619,7 +619,7 @@ static void command_switch(void)
 				break;
 			view_index++;
 		}
-		
+
 		if (view_name)
 		{
 			render_target_set_view(target, view_index);
@@ -752,7 +752,7 @@ static void command_image_loadcreate(void)
 			case MESSTEST_COMMAND_IMAGE_CREATE:
 				success = (image_create(image, astring_c(filepath), format_index, NULL) == INIT_PASS);
 				break;
-			
+
 			case MESSTEST_COMMAND_IMAGE_LOAD:
 				success = (image_load(image, astring_c(filepath)) == INIT_PASS);
 				break;
@@ -1300,7 +1300,7 @@ static void node_image(xml_data_node *node, messtest_command_type_t command)
 		return;
 	}
 	new_command.u.image_args.device_type = device_type;
-	
+
 	/* 'slot' attribute */
 	attr_node = xml_get_attribute(node, "slot");
 	new_command.u.image_args.device_slot = attr_node ? atoi(attr_node->value) : 0;

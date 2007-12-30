@@ -441,7 +441,7 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 
 	I/O board
 	1xxx11aa	external interfaces connector (K2)
-					
+
 	0xxx11aa	I/O board interfaces
 		000111aa	8251 (casette recorder, V24)
 		010011aa	8255 (GPIO/0, GPIO/1)
@@ -714,11 +714,11 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 					else
 					{
 						current_level = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.038) ? 1 : 0;
-					
+
 						if (previous_level!=current_level)
-						{			
+						{
 							data = (!previous_level && current_level) ? 1 : 0;
-			
+
 							set_out_data_bit(pmd85_cassette_serial_connection.State, data);
 							serial_connection_out(&pmd85_cassette_serial_connection);
 							msm8251_receive_clock();
@@ -733,7 +733,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 				case ALFA:
 					/* not hardware data decoding */
 					return;
-			}      
+			}
 		}
 
 		/* tape writing */

@@ -52,7 +52,7 @@ static void arcadia_update(void *param,stream_sample_t **inputs, stream_sample_t
 	stream_sample_t *buffer = _buffer[0];
 
 	for (i = 0; i < length; i++, buffer++)
-	{	
+	{
 		*buffer = 0;
 		if (arcadia_sound.reg[1] && arcadia_sound.pos <= arcadia_sound.size/2)
 		{

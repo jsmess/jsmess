@@ -5,7 +5,7 @@
 
 /* ram and rom areas are not handled in this rriot compoment */
 
-/* 
+/*
 internal 64 byte ram
 internal 1024 byte rom
 inputs and output
@@ -13,8 +13,8 @@ timer
 interrupt logic
 logic to connect up to 7 6530 without additional address decoding logic
 
-1kb rom selection 
-a0..a9, 
+1kb rom selection
+a0..a9,
 rs0, cs1, cs2 mask programmed!
 
 64byte ram selection
@@ -78,14 +78,14 @@ extract the positions from the dump
 */
 
 
-/* 
+/*
 mos 6532
 chip also contains 128 bytes ram (own chip select line)
 no rom
 separate irq output
 some significant differences, so unique component
 */
- 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -103,7 +103,7 @@ typedef struct {
 
 /* This has to be called from a driver at startup */
 void rriot_init(int nr, const RRIOT_CONFIG *riot);
-	
+
 int rriot_r(int chip, int offs);
 void rriot_w(int chip, int offs, int data);
 

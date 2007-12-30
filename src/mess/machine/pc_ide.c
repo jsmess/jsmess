@@ -17,7 +17,7 @@ typedef	struct {
 	int sector_cnt;		/* sector count */
 	int error;			/* error code */
 	int status;			/* drive status */
-	
+
 	int data_cnt;                /* data count */
 	UINT8 *buffer;				/* data buffer */
 	UINT8 *ptr;					/* data pointer */

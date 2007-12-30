@@ -165,7 +165,7 @@ void exploreKeyboard(void)
     else {KbRepeatTable[0x0E]=0;}
     if (controlKey && !shiftKey && !(keyboard[1] & 0x80)) addToKeyboardBuffer(0x0F); /* controlKey + O */
     else {KbRepeatTable[0x0F]=0;}
-    
+
     if (controlKey && !shiftKey && !(keyboard[2] & 0x01)) addToKeyboardBuffer(0x10); /* controlKey + P */
     else {KbRepeatTable[0x10]=0;}
     if (controlKey && !shiftKey && !(keyboard[2] & 0x02)) addToKeyboardBuffer(0x11); /* controlKey + Q */
@@ -557,7 +557,7 @@ If you have the source listing or the Rom dump, please send us.
 			buffer=(memory_region(REGION_CPU1)[statusDCB+0x01])+(memory_region(REGION_CPU1)[statusDCB+0x02]<<8);
 			byteCount=(memory_region(REGION_CPU1)[statusDCB+0x03])+(memory_region(REGION_CPU1)[statusDCB+0x04]<<8);
 
-			if (deviceNum>=4 && deviceNum<=7) 
+			if (deviceNum>=4 && deviceNum<=7)
 			{
 				image = image_from_devtype_and_index(IO_FLOPPY, deviceNum - 4);
 				if (image_exists(image))
@@ -618,7 +618,7 @@ If you have the source listing or the Rom dump, please send us.
 				case 4: /* Read Data */
 					/*
 					AdamNet Error codes on low nibble for tape1,disk1,disk2 and on high nibble for tape2 (share DCB with tape1):
-	                
+
 						0x00  No Error (everything is OK)
 						0x01  CRC Error (block corrupt; data failed cyclic redundancy check)
 						0x02  Missing Block (attempt to access past physical end of medium)
@@ -700,7 +700,7 @@ WRITE8_HANDLER( common_writes_w )
 }
 
  READ8_HANDLER( adamnet_r )
-{  
+{
     //logerror("adam_net_data Read %2xh\n",adam_net_data);
     return adam_net_data;
 }
@@ -708,7 +708,7 @@ WRITE8_HANDLER( common_writes_w )
 WRITE8_HANDLER( adamnet_w )
 {
 	/*
-	If SmartWriter ROM is selected on lower Z80 memory 
+	If SmartWriter ROM is selected on lower Z80 memory
 	if data bit1 is 1 -> Lower 32k = EOS otherwise Lower 32k = SmartWriter
 	*/
 	UINT8 *BankBase;
@@ -735,7 +735,7 @@ WRITE8_HANDLER( adamnet_w )
 			memory_set_bankptr(2, BankBase+0x22000);
 			memory_set_bankptr(3, BankBase+0x24000);
 			memory_set_bankptr(4, BankBase+0x26000);
-	        
+
 			memory_set_bankptr(6, BankBase+0x3A000); /* Write protecting ROM */
 			memory_set_bankptr(7, BankBase+0x3A000); /* Write protecting ROM */
 			memory_set_bankptr(8, BankBase+0x3A000); /* Write protecting ROM */
@@ -754,23 +754,23 @@ WRITE8_HANDLER( adam_memory_map_controller_w )
 {
     /*
     Writes to ports 0x60 to 0x7F set memory map:
-    
+
     - D1,D0 -> Lower Memory configuration (0x0000, 0x7FFF)
        0  0    SmartWriter Rom
        0  1    Internal RAM (32k)
        1  0    RAM Expansion (32k)
        1  1    OS7 ROM (8k) + Internal RAM (24k) (for partial ColecoVision compatibility)
-    
+
     - D3,D2 -> Upper Memory configuration (0x8000, 0xFFFF)
        0  0    Internal RAM (32k)
        0  1    ROM Expansion (32k). The first expansion ROM byte must be 0x66, and the second 0x99.
        1  0    RAM Expansion (32k)
        1  1    Cartridge ROM (32k)
-    
+
     - D7,D4 -> Reserved for future expansions, must be 0.
 
     */
-    
+
     adam_lower_memory = (data & 0x03);
     adam_upper_memory = (data & 0x0C)>>2;
     set_memory_banks();
@@ -778,7 +778,7 @@ WRITE8_HANDLER( adam_memory_map_controller_w )
 }
 
  READ8_HANDLER(adam_video_r)
-{  
+{
     return ((offset&0x01) ? TMS9928A_register_r(1) : TMS9928A_vram_r(0));
 }
 
@@ -788,7 +788,7 @@ WRITE8_HANDLER(adam_video_w)
 }
 
  READ8_HANDLER( master6801_ram_r )
-{  
+{
     /*logerror("Offset %04Xh = %02Xh\n",offset ,memory_region(REGION_CPU1)[offset]);*/
     return memory_region(REGION_CPU1)[offset+0x4000];
 }
@@ -813,11 +813,11 @@ WRITE8_HANDLER( master6801_ram_w )
 			inport0 = readinputportbytag("controller1_keypad1");
 			inport1 = readinputportbytag("controller1_keypad2");
 			inport6 = readinputportbytag("controllers");
-			
-			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more 
+
+			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
 			the right behaviour */
-			
+
 			data = 0x0F;	/* No key pressed by default */
 			if (!(inport6&0x01)) /* If Driving Controller enabled -> no keypad 1 */
 			{
@@ -841,14 +841,14 @@ WRITE8_HANDLER( master6801_ram_w )
 		{
 			int data = readinputportbytag("controller1_joystick") & 0xCF;
 			int inport6 = readinputportbytag("controllers");
-			
+
 			if (inport6&0x07) /* If Extra Contollers enabled */
 			{
 			    if (adam_joy_stat[0]==0)
 					data |= 0x30; /* Spinner Move Left */
 			    else if (adam_joy_stat[0]==1)
 					data |= 0x20; /* Spinner Move Right */
-			}  
+			}
 			return data | 0x80;
 		}
 	}
@@ -863,10 +863,10 @@ WRITE8_HANDLER( master6801_ram_w )
 			inport3 = readinputportbytag("controller2_keypad1");
 			inport4 = readinputportbytag("controller2_keypad2");
 
-			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more 
+			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 			than one, a real ColecoVision think that it is a third button, so we are going to emulate
 			the right behaviour */
-			
+
 			data = 0x0F;	/* No key pressed by default */
 			if (!(inport3 & 0x01)) data &= 0x0A; /* 0 */
 			if (!(inport3 & 0x02)) data &= 0x0D; /* 1 */
@@ -888,12 +888,12 @@ WRITE8_HANDLER( master6801_ram_w )
 		{
 			int data = readinputportbytag("controller2_joystick") & 0xCF;
 			int inport6 = readinputportbytag("controllers");
-			
+
 			if (inport6&0x02) /* If Roller Controller enabled */
 			{
 			    if (adam_joy_stat[1]==0) data|=0x30;
 			    else if (adam_joy_stat[1]==1) data|=0x20;
-			}  
+			}
 
 			return data | 0x80;
 		}

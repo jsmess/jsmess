@@ -88,13 +88,13 @@ typedef struct nec765
 	unsigned int    nec765_status[4];
 	/* present cylinder number per drive */
 	unsigned int    pcn[4];
-	
+
 	/* drive being accessed. drive outputs from fdc */
 	unsigned int    drive;
 	/* side being accessed: side output from fdc */
 	unsigned int	side;
 
-	
+
 	/* step rate time in us */
 	unsigned long	srt_in_ms;
 
@@ -207,7 +207,7 @@ static void nec765_seek_complete(void)
 
 	/* if a seek is done without drive connected: */
 	/*  abnormal termination of command,
-		seek complete, 
+		seek complete,
 		not ready
 	*/
 
@@ -242,12 +242,12 @@ static void nec765_seek_complete(void)
 
 	/* if a seek is done with drive connected, but disc missing: */
 	/* seek complete */
-	
+
 	/* if a seek is done with drive connected and disc in drive: */
 	/* seek complete */
 
 	/* On Amstrad CPC:
-		If drive not connected, or drive connected but disc not in drive, not ready! 
+		If drive not connected, or drive connected but disc not in drive, not ready!
 		If drive connected and drive motor on, ready!
 	   On PC:
 	    Drive is always ready!
@@ -296,7 +296,7 @@ static void nec765_seek_complete(void)
 	else
 	{
 		/* abnormal termination, not ready */
-		fdc.nec765_status[0] = 0x040 | 0x020 | 0x08;		
+		fdc.nec765_status[0] = 0x040 | 0x020 | 0x08;
 	}
 
 	/* set drive and side */
@@ -325,7 +325,7 @@ static void nec765_timer_func(int timer_type)
 		nec765_set_data_request();
 
 		fdc.timer_type = 4;
-		
+
 		if (!(fdc.nec765_flags & NEC765_DMA_MODE))
 		{
 			/* for pcw */
@@ -346,8 +346,8 @@ static void nec765_timer_func(int timer_type)
 		case 5:		/* write data */
 		case 6:		/* read data */
 		case 9:		/* write deleted data */
-		case 10:	/* read id */			
-		case 12:	/* read deleted data */			
+		case 10:	/* read id */
+		case 12:	/* read deleted data */
 		case 13:	/* format at track */
 		case 17:	/* scan equal */
 		case 19:	/* scan low or equal */
@@ -401,7 +401,7 @@ static void nec765_setup_timed_generic(int timer_type, attotime duration)
 
 	if (!(fdc.nec765_flags & NEC765_DMA_MODE))
 	{
-		timer_adjust(fdc.timer, duration, 0, attotime_zero);		
+		timer_adjust(fdc.timer, duration, 0, attotime_zero);
 	}
 	else
 	{
@@ -414,7 +414,7 @@ static void nec765_setup_timed_generic(int timer_type, attotime duration)
 static void nec765_setup_timed_data_request(int bytes)
 {
 	/* setup timer to trigger in NEC765_DATA_RATE us */
-	nec765_setup_timed_generic(0, ATTOTIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);		
+	nec765_setup_timed_generic(0, ATTOTIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);
 }
 
 /* setup result data request */
@@ -459,7 +459,7 @@ static void nec765_seek_setup(int is_recalibrate)
 
 		/* if drive is already at track 0, or drive is not ready */
 		if (
-			floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) || 
+			floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) ||
 			(!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			)
 		{
@@ -474,7 +474,7 @@ static void nec765_seek_setup(int is_recalibrate)
 				/* yes - calculate real number of tracks to seek */
 
 				int current_track;
-	
+
 				/* get current track */
 				current_track = floppy_drive_get_current_track(img);
 
@@ -492,7 +492,7 @@ static void nec765_seek_setup(int is_recalibrate)
 			{
 				/* perform seek - if drive isn't present it will not do anything */
 				floppy_drive_seek(img, signed_tracks);
-			
+
 				nec765_setup_timed_int(signed_tracks);
 			}
 			else
@@ -627,7 +627,7 @@ static void nec765_set_dma_drq(int state)
 
 /* Drive ready */
 
-/* 
+/*
 
 A drive will report ready if:
 - drive is selected
@@ -635,7 +635,7 @@ A drive will report ready if:
 - disk is rotating at a constant speed (normally 300rpm)
 
 On more modern PCs, a ready signal is not provided by the drive.
-This signal is not used in the PC design and was eliminated to save costs 
+This signal is not used in the PC design and was eliminated to save costs
 If you look at the datasheets for the modern NEC765 variants, you will see the Ready
 signal is not mentioned.
 
@@ -770,7 +770,7 @@ static int nec765_read_skip_sector(void)
 			}
 		}
 		/* deleted data? */
-		else 
+		else
 		if (fdc.command == 0x0c)
 		{
 			/* did we just find a sector with data mark ? */
@@ -878,13 +878,13 @@ static int nec765_get_matching_sector(void)
 		{
 			index_count++;
 		}
-   
+
 	}
 	while (index_count!=2);
 
 	/* no data - specified sector ID was not found */
     fdc.nec765_status[1] |= NEC765_ST1_NO_DATA;
-  
+
 	return 0;
 }
 
@@ -993,8 +993,8 @@ static void nec765_read_data(void)
 			}
 		}
 		while (found_sector_to_read==0);
-	}	
-		
+	}
+
 	{
 		int data_size;
 
@@ -1064,7 +1064,7 @@ static void     nec765_read_a_track(void)
 
 
 	data_size = nec765_n_to_bytes(id.N);
-	
+
 	floppy_drive_read_sector_data(current_image(), fdc.side, fdc.sector_id,nec765_data_buffer,data_size);
 
 	nec765_setup_execution_phase_read(nec765_data_buffer, data_size);
@@ -1092,7 +1092,7 @@ static void nec765_write_complete(void)
 	 - terminal count input is not set
 	 - AND the the sector specified by EOT was read
 	 */
-	
+
 	/* if end of cylinder is set, and we did receive a terminal count, then clear it */
 	if ((fdc.nec765_flags & NEC765_TC)!=0)
 	{
@@ -1171,7 +1171,7 @@ static int nec765_sector_count_complete(void)
 	}
 
 
-	
+
 	/* multi-track? */
 	if (fdc.nec765_command_bytes[0] & 0x080)
 	{
@@ -1180,10 +1180,10 @@ static int nec765_sector_count_complete(void)
 		or is it ignored the first time and not the next, so that
 		if it is started on side 0, it will end at EOT on side 1,
 		but if started on side 1 it will end at end of track????
-		
+
 		PC driver requires this to end at last sector on side 1, and
 		ignore EOT parameter.
-		
+
 		To be checked!!!!
 		*/
 
@@ -1219,7 +1219,7 @@ static int nec765_sector_count_complete(void)
 		/* completed */
 		return 1;
 	}
-	
+
 	/* Multi-Track operation:
 
 	Verified on Amstrad CPC.
@@ -1229,14 +1229,14 @@ static int nec765_sector_count_complete(void)
 			2 sides
 			Sector IDs: &01, &02, &03, &04, &05, &06, &07, &08, &09
 
-		Command specified: 
+		Command specified:
 			SIDE = 0,
 			C = 0,H = 0,R = 1, N = 2, EOT = 1
 		Sectors read:
 			Sector 1 side 0
 			Sector 1 side 1
 
-		Command specified: 
+		Command specified:
 			SIDE = 0,
 			C = 0,H = 0,R = 1, N = 2, EOT = 3
 		Sectors read:
@@ -1247,7 +1247,7 @@ static int nec765_sector_count_complete(void)
 			Sector 2 side 1
 			Sector 3 side 1
 
-			
+
 		Command specified:
 			SIDE = 0,
 			C = 0, H = 0, R = 7, N = 2, EOT = 3
@@ -1278,7 +1278,7 @@ static int nec765_sector_count_complete(void)
 		/* multi-track? */
 		if (fdc.nec765_command_bytes[0] & 0x080)
 		{
-			/* if we have reached EOT (fdc.nec765_command_bytes[6]) 
+			/* if we have reached EOT (fdc.nec765_command_bytes[6])
 			on side 1, then read is complete */
 			if (fdc.side==1)
 				return 1;
@@ -1352,7 +1352,7 @@ static int nec765_read_data_stop(void)
 			}
 		}
 		/* deleted data? */
-		else 
+		else
 		if (fdc.command == 0x0c)
 		{
 			/* did we just read a sector with data? */
@@ -1481,7 +1481,7 @@ static TIMER_CALLBACK(nec765_continue_command)
 					nec765_read_complete();
 				}
 				else
-				{	
+				{
 					nec765_increment_sector();
 					nec765_read_data();
 				}
@@ -1512,7 +1512,7 @@ static int nec765_get_command_byte_count(void)
 				/* version */
 				case 0x010:
 					return 1;
-			
+
 				/* verify */
 				case 0x016:
 					return 9;
@@ -1524,7 +1524,7 @@ static int nec765_get_command_byte_count(void)
 				/* dumpreg */
 				case 0x0e:
 					return 1;
-			
+
 				/* perpendicular mode */
 				case 0x012:
 					return 1;
@@ -1532,7 +1532,7 @@ static int nec765_get_command_byte_count(void)
 				/* lock */
 				case 0x014:
 					return 1;
-			
+
 				/* seek/relative seek are together! */
 
 				default:
@@ -1825,7 +1825,7 @@ static void nec765_setup_command(void)
 			}
 
 			fdc.nec765_status[3] |= 0x08;
-	                               
+
 			/* two side and fault not set but should be? */
 			fdc.nec765_result_bytes[0] = fdc.nec765_status[3];
 			nec765_setup_result_phase(1);
@@ -1880,7 +1880,7 @@ static void nec765_setup_command(void)
 						}
 					}
 					while (index_count!=2);
-						
+
 					/* at this point, we have seen a id or two index pulses have occured! */
 					fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
 					fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
@@ -2065,13 +2065,13 @@ static void nec765_setup_command(void)
 						case 0x13:		/* configure */
 							nec765_idle();
 							break;
-							
+
 						case 0x0e:		/* dump reg */
 							fdc.nec765_result_bytes[0] = fdc.pcn[0];
 							fdc.nec765_result_bytes[1] = fdc.pcn[1];
 							fdc.nec765_result_bytes[2] = fdc.pcn[2];
 							fdc.nec765_result_bytes[3] = fdc.pcn[3];
-								
+
 							nec765_setup_result_phase(10);
 							break;
 
@@ -2103,9 +2103,9 @@ WRITE8_HANDLER(nec765_dack_w)
 {
 	/* clear data request */
 	nec765_set_dma_drq(CLEAR_LINE);
-	
+
 	/* read data */
-	return nec765_data_r(offset);	
+	return nec765_data_r(offset);
 }
 
 
@@ -2129,7 +2129,7 @@ void nec765_reset(int offset)
 		int a_drive_is_ready;
 
 		fdc.nec765_status[0] = 0x080 | 0x040;
-	
+
 		/* for the purpose of pc-xt. If any of the drives have a disk inserted,
 		do not set not-ready - need to check with pc_fdc.c whether all drives
 		are checked or only the drive selected with the drive select bits?? */
@@ -2150,7 +2150,7 @@ void nec765_reset(int offset)
 			fdc.nec765_status[0] |= 0x08;
 		}
 
-		nec765_set_int(1);	
+		nec765_set_int(1);
 	}
 }
 

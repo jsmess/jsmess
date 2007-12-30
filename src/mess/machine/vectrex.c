@@ -314,7 +314,7 @@ DRIVER_INIT( vectrex )
 	}
 
 	artwork_use_device_art(image_from_devtype_and_index(IO_CARTSLOT, 0), "mine");
-	
+
 	for (i = 0; i < vectrex_ram_size; i++)
 		vectrex_ram_base[i] = mame_rand(machine);
 }

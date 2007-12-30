@@ -45,7 +45,7 @@ struct _mess_image
 	char *dir;
 	char *hash;
 	char *basename_noext;
-	
+
 	/* flags */
 	unsigned int writeable : 1;
 	unsigned int created : 1;
@@ -841,7 +841,7 @@ void image_seterror(mess_image *image, image_error_t err, const char *message)
 
 /****************************************************************************
   Tag management functions.
-  
+
   When devices have private data structures that need to be associated with a
   device, it is recommended that image_alloctag() be called in the device
   init function.  If the allocation succeeds, then a pointer will be returned
@@ -1154,7 +1154,7 @@ UINT32 image_crc(mess_image *img)
 {
 	const char *hash_string;
 	UINT32 crc = 0;
-	
+
 	hash_string = image_hash(img);
 	if (hash_string)
 		crc = hash_data_extract_crc32(hash_string);
@@ -1355,7 +1355,7 @@ static void setup_working_directory(mess_image *image)
 	/* first set up the working directory to be the MESS directory */
 	osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
 	image->working_directory = mame_strdup(mess_directory);
-	
+
 	/* now try browsing down to "software" */
 	if (try_change_working_directory(image, "software"))
 	{

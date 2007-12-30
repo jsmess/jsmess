@@ -1332,7 +1332,7 @@ static void pcw16_reset(void)
 }
 
 
-static const PC_LPT_CONFIG lpt_config = 
+static const PC_LPT_CONFIG lpt_config =
 {
 	1,
 	LPT_UNIDIRECTIONAL, // more one of these epp/ecp aware ports

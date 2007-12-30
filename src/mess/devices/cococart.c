@@ -70,7 +70,7 @@ coco_cartridge *cococart_init(const char *carttype, const coco_cartridge_config 
 
 	/* identify the cartridge type */
 	cart_proc = find_cart(carttype);
-	assert_always(cart_proc != NULL, "Invalid cartridge hardware type");	
+	assert_always(cart_proc != NULL, "Invalid cartridge hardware type");
 
 	/* allocate the cartridge structure */
 	extra_data_size = (size_t) cococart_get_info_int(cart_proc, COCOCARTINFO_INT_DATASIZE);

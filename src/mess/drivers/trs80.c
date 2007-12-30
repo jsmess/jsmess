@@ -45,7 +45,7 @@ FE:
 - bit 4 selects internal cassette player (low) or external unit (high) on a system-80
 FD:
 - bit 7 for reading the printer status on a system-80
-- all bits for writing to a printer on a system-80 
+- all bits for writing to a printer on a system-80
 F9:
 - UART data (write) status (read) on a system-80
 F8:
@@ -541,4 +541,4 @@ COMP( 1980, sys80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"EACA Comp
 COMP( 1981, lnw80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"LNW Research","LNW-80", GAME_NOT_WORKING )
 COMP( 1980, trs80m3,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", GAME_NOT_WORKING )
 COMP( 1980, trs80m4,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", GAME_NOT_WORKING )
-								 
+

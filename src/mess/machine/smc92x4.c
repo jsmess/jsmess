@@ -313,7 +313,7 @@ int smc92x4_hd_load(mess_image *image, int disk_unit)
 			return INIT_FAIL;
 		}
 		return INIT_PASS;
-	}	
+	}
 
 	return INIT_FAIL;
 }
@@ -502,7 +502,7 @@ static void smc92x4_set_interrupt(int which, int state)
 }
 
 /*
-	Select currently selected drive 
+	Select currently selected drive
 */
 static int get_selected_drive(int which, select_mode_t *select_mode, int *disk_unit)
 {

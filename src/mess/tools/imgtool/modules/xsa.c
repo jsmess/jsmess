@@ -66,14 +66,14 @@ static int xsa_image_init(const imgtool_module *mod, imgtool_stream *f, imgtool_
 	size = stream_size (f);
 	if (size < 5) return IMGTOOLERR_MODULENOTFOUND;
 	if (4 != stream_read (f, header, 4) ) return IMGTOOLERR_READERROR;
-	
+
     if (memcmp (header, "PCK\010", 4) )
 		return IMGTOOLERR_MODULENOTFOUND;
-	
+
 	if (4 != stream_read (f, &size, 4) ) return IMGTOOLERR_READERROR;
 	size = LITTLE_ENDIANIZE_INT32 (size);
 	if (4 != stream_read (f, header, 4) ) return IMGTOOLERR_READERROR;
-	
+
 	/* get name from XSA header, can't be longer than 8.3 really */
 	/* but could be, it's zero-terminated */
 	file_name = NULL;
@@ -166,7 +166,7 @@ static int xsa_image_readfile(imgtool_image *img, const char *fname, imgtool_str
 	XSA_IMAGE *image=(XSA_IMAGE*)img;
 
 	/*  check file name */
-	if (mame_stricmp (fname, image->file_name) ) 
+	if (mame_stricmp (fname, image->file_name) )
 		return IMGTOOLERR_MODULENOTFOUND;
 
 	return xsa_extract (image->file_handle, destf);

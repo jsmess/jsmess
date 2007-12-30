@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	int pos, rc = -1;
 	imgtoolerr_t err;
 	HACCEL accel = NULL;
-	
+
 	// initialize Windows classes
 	InitCommonControls();
 	if (!wimgtool_registerclass())
@@ -61,7 +61,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
 			command_line[strlen(command_line)-1] = '\0';
 			pos++;
 		}
-		
+
 		err = wimgtool_open_image(window, NULL, command_line + pos, OSD_FOPEN_RW);
 		if (err)
 			wimgtool_report_error(window, err, command_line + pos, NULL);

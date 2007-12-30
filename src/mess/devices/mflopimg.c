@@ -122,7 +122,7 @@ static void flopimg_get_id_callback(mess_image *image, chrn_id *id, int id_index
 	mess_flopimg *flopimg;
 	int cylinder, sector, N;
 	UINT32 sector_length;
-	
+
 	flopimg = get_flopimg(image);
 	if (!flopimg || !flopimg->floppy)
 		return;
@@ -161,7 +161,7 @@ static void flopimg_read_sector_data_into_buffer(mess_image *image, int side, in
 		return;
 
 	floppy_read_indexed_sector(flopimg->floppy, side, flopimg->track, index1, 0, ptr, length);
-	
+
 	if (LOG_FLOPPY)
 		log_readwrite("sector_read", side, flopimg->track, index1, ptr, length);
 }
@@ -306,12 +306,12 @@ static int internal_floppy_device_load(mess_image *image, int create_format, opt
 	}
 
 	/* if we can get head and track counts, then set the geometry accordingly */
-	if (!flopimg_keep_geometry 
+	if (!flopimg_keep_geometry
             && floppy_callbacks(flopimg->floppy)->get_heads_per_disk
 		&& floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
 	{
 		floppy_drive_set_geometry_absolute(image,
-			floppy_get_tracks_per_disk(flopimg->floppy), 
+			floppy_get_tracks_per_disk(flopimg->floppy),
 			floppy_get_heads_per_disk(flopimg->floppy));
 	}
 	return INIT_PASS;
@@ -382,10 +382,10 @@ void floppy_install_tracktranslate_proc(mess_image *image, int (*proc)(mess_imag
 /************
  *  Another hack for ti99: Drive track count may differ from medium track count.
  *  It is possible to insert a 40 track medium in an 80 track drive; the TI
- *  controllers read the track count from sector 0 and automatically 
+ *  controllers read the track count from sector 0 and automatically
  *  apply double steps. Setting the track count of the drive to the medium
  *  track count will lead to unreachable tracks.
- *  This function is called from 99_dsk.c to switch off the lines in 
+ *  This function is called from 99_dsk.c to switch off the lines in
  *  internal_floppy_device_load which set the drive geometry to the medium
  *  geometry.
  *************/

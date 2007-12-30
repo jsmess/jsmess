@@ -5,9 +5,9 @@
   Thomson 8-bit micro-computers.
 
   A 6809E-based French family of personal computers developed in the 80's.
-  Despite their rather high price and poor design , they were quite popular 
-  in France, probably due to the government plan "Informatique pour tous" 
-  (Computer Science for Everyone) to put a network of MO5 computers in every 
+  Despite their rather high price and poor design , they were quite popular
+  in France, probably due to the government plan "Informatique pour tous"
+  (Computer Science for Everyone) to put a network of MO5 computers in every
   school during 1984-1986. And maybe their very popular light-pen.
 
   Drivers
@@ -24,7 +24,7 @@
   - to8d   Thomson TO8D            (TO8 with integrated floppy, dec 1987)
   - pro128 Olivetti Prodest PC 128 (Italian MO6, built by Thomson, 1986)
 
-  We do not consider here the few 16-bit computers built by Thomson 
+  We do not consider here the few 16-bit computers built by Thomson
   (68000-based Micromega 32, 8088-based Micromega 16 or the TO16: Thomson's own
    8088-based PC).
 
@@ -40,7 +40,7 @@
   similar technologies, but with different cost/feature trade-offs and
   different compatibility (MO6 is MO5-compatible, TO9+ is TO9-compatible and
   TO8 and TO9+ are TO7-compatible).
-  Also note that the MO5NR is actually based on MO6 design, not MO5 
+  Also note that the MO5NR is actually based on MO6 design, not MO5
   (although both MO5NR and MO6 are MO5-compatible)
 
   Also of interest are the Platini and Hinault versions of the MO5
@@ -48,7 +48,7 @@
   There were several versions of TO7/70 and MO5 with alternate keyboards.
 
   Thomson stopped producing micro-computers in jan 1990.
-  
+
 **********************************************************************/
 
 /* TODO (roughly in decreasing priority order):
@@ -119,7 +119,7 @@ static const char layout_thomson[] = "thomson";
     connect either two 8-position 2-button game pads
     or a 2-button mouse (not both at the same time!)
 
-  We emulate the SX 90-018 as it is fully compatible with the CM 90-112.  
+  We emulate the SX 90-018 as it is fully compatible with the CM 90-112.
 
   Notes:
   * all extensions are compatible with all Thomson computers.
@@ -127,15 +127,15 @@ static const char layout_thomson[] = "thomson";
   * the TO9 has its own, different mouse port
   * all extensions are based on a Motorola 6821 PIA
   * all extensions include a 6-bit sound DAC
-  * most pre-TO8 software (including TO9) do not recognise the mouse nor the 
+  * most pre-TO8 software (including TO9) do not recognise the mouse nor the
   second button of each pad
   * the mouse cannot be used at the same time as the pads: they use the same
-  6821 input ports & physical port; we use a config switch to tell MESS 
+  6821 input ports & physical port; we use a config switch to tell MESS
   whether pads or a mouse is connected
   * the mouse should not be used at the same time as the sound DAC: they use
   the same 6821 ports, either as input or output; starting from the TO8,
   there is a 'mute' signal to cut the DAC output and avoid producing an
-  audible buzz whenever the mouse is moved; unfortunately, mute is not 
+  audible buzz whenever the mouse is moved; unfortunately, mute is not
   available on the TO7(/70), TO9 and MO5.
 */
 
@@ -155,7 +155,7 @@ static INPUT_PORTS_START( thom_game_port )
      PORT_START_TAG ( "game_port_buttons" )
      PAD ( 0x40, 1, "Action A", BUTTON1, BUTTON1, LCONTROL )
      PAD ( 0x80, 2, "Action A", BUTTON1, BUTTON1, RCONTROL )
- 
+
 /* joysticks, SX 90-018 specific */
      PAD ( 0x04, 1, "Action B", BUTTON2, BUTTON2, LALT )
      PAD ( 0x08, 2, "Action B", BUTTON2, BUTTON2, RALT )
@@ -164,15 +164,15 @@ static INPUT_PORTS_START( thom_game_port )
 
 /* mouse, SX 90-018 specific */
      PORT_START_TAG ( "mouse_x" )
-     PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_X ) 
+     PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_X )
      PORT_NAME ( "Mouse X" )
      PORT_SENSITIVITY ( 150 )
      PORT_PLAYER (1)
-  
+
      PORT_START_TAG ( "mouse_y" )
      PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_Y )
      PORT_NAME ( "Mouse Y" )
-     PORT_SENSITIVITY ( 150 ) 
+     PORT_SENSITIVITY ( 150 )
      PORT_PLAYER (1)
 
      PORT_START_TAG ( "mouse_button" )
@@ -225,9 +225,9 @@ static void to7_cartridge_getinfo( const device_class *devclass,  UINT32 state, 
 	case DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy( info->s = device_temp_str(), "m7,rom" );
 		break;
-	default: 
+	default:
 		cartslot_device_getinfo( devclass, state, info );
-	}  
+	}
 }
 
 static void mo5_cartridge_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
@@ -242,9 +242,9 @@ static void mo5_cartridge_getinfo( const device_class *devclass, UINT32 state, u
 	case DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy( info->s = device_temp_str(), "m5,rom" );
 		break;
-	default: 
+	default:
 		cartslot_device_getinfo( devclass, state, info );
-	}  
+	}
 }
 
 
@@ -254,7 +254,7 @@ static void thom_printer_getinfo ( const device_class *devclass, UINT32 state, u
 {
 	switch ( state ) {
 	case DEVINFO_INT_COUNT:
-		info->i = 1; 
+		info->i = 1;
 		break;
 	default:
 		printer_device_getinfo( devclass, state, info );
@@ -265,65 +265,65 @@ static void thom_printer_getinfo ( const device_class *devclass, UINT32 state, u
 /* ------------ serial ------------ */
 
 static const char *const thom_serial_names[3][3]=
-{ 
+{
 	{ "cc90232", "c232", "RS232 (older, CC 90-232)" },
 	{ "rf57932", "r232", "RS232 (newer, RF 57-932)" },
-	{ "modem", "modm", "Modem" } 
-}; 
+	{ "modem", "modm", "Modem" }
+};
 
 static void thom_serial_getinfo ( const device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
 	case DEVINFO_INT_COUNT:
-		info->i = 3; 
+		info->i = 3;
 		break;
 	case DEVINFO_INT_TYPE:
-		info->i = IO_SERIAL; 
+		info->i = IO_SERIAL;
 		break;
 	case DEVINFO_INT_READABLE:
-		info->i = 1; 
+		info->i = 1;
 		break;
 	case DEVINFO_INT_WRITEABLE:
-		info->i = 1; 
+		info->i = 1;
 		break;
 	case DEVINFO_INT_CREATABLE:
-		info->i = 1; 
+		info->i = 1;
 		break;
-	
+
 	case DEVINFO_PTR_INIT:
 		info->init = thom_serial_init;
 		break;
 	case DEVINFO_PTR_LOAD:
-		info->load = thom_serial_load; 
+		info->load = thom_serial_load;
 		break;
 	case DEVINFO_PTR_UNLOAD:
 		info->unload = thom_serial_unload;
 		break;
-	
+
 	case DEVINFO_STR_NAME+0:
 	case DEVINFO_STR_NAME+1:
 	case DEVINFO_STR_NAME+2:
-		strcpy( info->s = device_temp_str(), 
+		strcpy( info->s = device_temp_str(),
 			thom_serial_names[ state - DEVINFO_STR_NAME ][ 0 ] );
 		break;
 	case DEVINFO_STR_SHORT_NAME+0:
 	case DEVINFO_STR_SHORT_NAME+1:
 	case DEVINFO_STR_SHORT_NAME+2:
-		strcpy( info->s = device_temp_str(), 
+		strcpy( info->s = device_temp_str(),
 			thom_serial_names[ state - DEVINFO_STR_SHORT_NAME ][ 1 ] );
 		break;
 	case DEVINFO_STR_DESCRIPTION+0:
 	case DEVINFO_STR_DESCRIPTION+1:
 	case DEVINFO_STR_DESCRIPTION+2:
-		strcpy( info->s = device_temp_str(), 
+		strcpy( info->s = device_temp_str(),
 			thom_serial_names[ state - DEVINFO_STR_DESCRIPTION ][ 2 ] );
 		break;
-	
+
 	case DEVINFO_STR_DEV_FILE:
 		strcpy( info->s = device_temp_str(), "serial" );
 		break;
 	case DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy( info->s = device_temp_str(), "txt" ); 
+		strcpy( info->s = device_temp_str(), "txt" );
 		break;
 
 	}
@@ -340,9 +340,9 @@ First computer by Thomson.
 Note that the computer comes with only a minimal BIOS and requires an
 external cartridge to be usable.
 Most software are distributed on cassette and require the BASIC 1.0 cartridge
-to be present (-cart basic.m7), as only it provides the necessary OS 
+to be present (-cart basic.m7), as only it provides the necessary OS
 capabilities (e.g., a cassette loader).
-To use disks, you will need both a BASIC 1.0 cartridge and a BASIC DOS 
+To use disks, you will need both a BASIC 1.0 cartridge and a BASIC DOS
 boot floppy.
 
 * chips:
@@ -376,8 +376,8 @@ boot floppy.
     . two 8-position 2-button game pads
     . 2-button mouse
     . based on a Motorola 6821 PIA
-  - CC 90-232 I/O extension: 
-    . CENTRONICS (printer) 
+  - CC 90-232 I/O extension:
+    . CENTRONICS (printer)
     . RS232 (unemulated)
     . based on a Motorola 6821 PIA
     . NOTE: you cannot use the CENTRONICS and RS232 at the same time
@@ -391,8 +391,8 @@ boot floppy.
   - 5"1/2 floppy drive extension
     . CD 90-640 floppy controller, based on a Western Digital 2793
     . DD 90-320 double-density double-sided 5"1/4 floppy
-      (2 drives considered as 4 simple-face drives: 0/1 for the first drive, 
-       2/3 for the second drive, 1 and 3 for upper sides, 0 and 2 for lower 
+      (2 drives considered as 4 simple-face drives: 0/1 for the first drive,
+       2/3 for the second drive, 1 and 3 for upper sides, 0 and 2 for lower
        sides)
     . floppies are 40 tracks/side, 16 sectors/track, 128 or 256 bytes/sector
       = from 80 KB one-sided single-density, to 320 KB two-sided double-density
@@ -417,7 +417,7 @@ T9000 (1980)
 -----
 
 Early TO7 prototype.
-The hardware seems to be the exactly same. Only the BIOS is different. 
+The hardware seems to be the exactly same. Only the BIOS is different.
 It has some bug that were corrected later for the TO7.
 Actually, the two computers are undistinguishable, except for the different
 startup screen, and a couple BIOS addresses.
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START ( to7, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0x0000, 0x3fff ) AM_ROMBANK   ( THOM_CART_BANK ) /* 4 * 16 KB */
                                  AM_WRITE     ( to7_cartridge_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
-                                 AM_WRITE     ( to7_vram_w ) 
+                                 AM_WRITE     ( to7_vram_w )
      AM_RANGE ( 0x6000, 0x7fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 1 * 8 KB */
      AM_RANGE ( 0x8000, 0xbfff ) AM_NOP       /* 16 KB (for extension) */
      AM_RANGE ( 0xc000, 0xdfff ) AM_NOP       /*  8 KB (for extension) */
@@ -447,13 +447,13 @@ static ADDRESS_MAP_START ( to7, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xe7e8, 0xe7eb ) AM_READWRITE ( acia_6551_r, acia_6551_w )
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_READWRITE ( pia_3_alt_r, pia_3_alt_w )
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r, 
+     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r,
 						to7_modem_mea8000_w )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
-     
+
 /* mess_ram mapping:
    0x0000 - 0x3fff: 16 KB video RAM (actually 8 K x 8 bits + 8 K x 6 bits)
    0x4000 - 0x5fff:  8 KB base RAM
@@ -501,9 +501,9 @@ ADDRESS_MAP_END
      ROM_LOAD ( "cq90-028.rom", base+0x3800, 0x7c0,			\
 		CRC(ca4dba3d)						\
 		MD5(0f58e167bf6ebcd2cbba946be2084fbe)			\
-		SHA1(949c1f777c892da62c242215d79757d61e71e62b) )			
-     
-/* external floppy / network controller: 9 banks */     
+		SHA1(949c1f777c892da62c242215d79757d61e71e62b) )
+
+/* external floppy / network controller: 9 banks */
 #define ROM_FLOPPY5( base )				\
   ROM_FLOPPY( base )					\
   ROM_LOAD ( "nano5.rom", base+0x4000, 0x7c0,	\
@@ -517,13 +517,13 @@ ADDRESS_MAP_END
 	     CRC(42a1d1a6)				\
 	     MD5(77da8cfc9e0a14ef2ed7034f5941b542) 	\
 	     SHA1(973209f4baa5e81bf7885c0602949e064bac7862) )
-     
+
 
 ROM_START ( to7 )
      ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
 		CRC(0e7826da)
-		MD5(5bf18521bf35293de942645f690b2845) 
+		MD5(5bf18521bf35293de942645f690b2845)
 		SHA1(23a2f84b03c01d385cc1923c8ece95c43756297a) )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
      ROM_FLOPPY7 ( 0x20000 )
@@ -533,7 +533,7 @@ ROM_START ( t9000 )
      ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
 		CRC(daa8cfbf)
-		MD5(b3007f26e7b621c1a4f0fd2c287f80b9) 
+		MD5(b3007f26e7b621c1a4f0fd2c287f80b9)
 		SHA1(a5735db1ad4e529804fc46603f838d3f4ccaf5cf) )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
      ROM_FLOPPY7 ( 0x20000 )
@@ -558,7 +558,7 @@ static INPUT_PORTS_START ( to7_vconfig )
      PORT_CONFSETTING ( 0x00, "Normal (56x47)" )
      PORT_CONFSETTING ( 0x01, "Small (16x16)" )
      PORT_CONFSETTING ( 0x02, DEF_STR ( None ) )
-  
+
      PORT_CONFNAME ( 0x0c, 0x08, "Resolution" )
      PORT_CONFSETTING ( 0x00, DEF_STR ( Low ) )
      PORT_CONFSETTING ( 0x04, DEF_STR ( High  ) )
@@ -738,15 +738,15 @@ SYSTEM_CONFIG_END
 
 static MACHINE_DRIVER_START ( to7 )
 
-     MDRV_MACHINE_START ( to7 )     
-     MDRV_MACHINE_RESET ( to7 )     
-  
+     MDRV_MACHINE_START ( to7 )
+     MDRV_MACHINE_RESET ( to7 )
+
 /* cpu */
      MDRV_CPU_ADD_TAG ( "main", M6809, 1000000 )
      MDRV_CPU_PROGRAM_MAP ( to7, 0 )
-  
+
 /* video */
-/* Finally, I figured it out. The video hardware overclocks the SECAM 
+/* Finally, I figured it out. The video hardware overclocks the SECAM
    framerate from 50 Hz to 1/0.019968 Hz to get 312 64us lines per frame,
    i.e., 19.968 ms per frame, not 20 ms
 */
@@ -755,7 +755,7 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_VIDEO_ATTRIBUTES ( VIDEO_TYPE_RASTER )
      MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
      MDRV_SCREEN_SIZE ( THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT )
-     MDRV_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1, 
+     MDRV_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
 				0, THOM_TOTAL_HEIGHT - 1 )
      MDRV_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
      MDRV_PALETTE_INIT ( thom )
@@ -795,20 +795,20 @@ The TO7/70 supports virtually all TO7 software and most TO7 devices and
 extensions (floppy, game, communucation, etc.).
 As the TO7, it is only usable with a cartridge, and most software require
 the BASIC 1.0 cartridge to be present.
-Though, you may also use the more advanced BASIC 128 (-cart basic128.m7): 
-it allows BASIC programs to access all the memory and the video capabilities, 
-includes its own DOS (no need for a boot disk), but may not be compatible 
+Though, you may also use the more advanced BASIC 128 (-cart basic128.m7):
+it allows BASIC programs to access all the memory and the video capabilities,
+includes its own DOS (no need for a boot disk), but may not be compatible
 with all games.
 
 It has the following modifications:
 
 * chips:
-  - custom logics for video, lightpen, address map has been replaced with an 
+  - custom logics for video, lightpen, address map has been replaced with an
     integrated Gate-Array (Motorola MC 1300 ALS)
 
 * memory:
   - 48 KB user base RAM (16 KB unswitchable + 2 switchable banks of 16 KB)
-    + 64 KB user extended RAM (EM 97-064, as 4 extra 16 KB banks) 
+    + 64 KB user extended RAM (EM 97-064, as 4 extra 16 KB banks)
     = 112 KB total user RAM emulated
   - now 8-bit x 8 K color RAM (instead of 6-bit x 8 K)
 
@@ -839,7 +839,7 @@ static ADDRESS_MAP_START ( to770, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0x0000, 0x3fff ) AM_ROMBANK   ( THOM_CART_BANK ) /* 4 * 16 KB */
                                  AM_WRITE     ( to7_cartridge_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
-                                 AM_WRITE     ( to770_vram_w ) 
+                                 AM_WRITE     ( to770_vram_w )
      AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
      AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 6 * 16 KB */
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
@@ -848,18 +848,18 @@ static ADDRESS_MAP_START ( to770, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE ( to7_floppy_r, to7_floppy_w )
      AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_READWRITE ( pia_2_alt_r, pia_2_alt_w )
-     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to770_gatearray_r, 
+     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to770_gatearray_r,
                                                 to770_gatearray_w )
      AM_RANGE ( 0xe7e8, 0xe7eb ) AM_READWRITE ( acia_6551_r, acia_6551_w )
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_READWRITE ( pia_3_alt_r, pia_3_alt_w )
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r, 
+     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r,
 						to7_modem_mea8000_w )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
-     
+
 /* mess_ram mapping:
    0x00000 - 0x03fff: 16 KB video RAM
    0x04000 - 0x07fff: 16 KB unbanked base RAM
@@ -876,7 +876,7 @@ ROM_START ( to770 )
      ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
 		CRC(89518862)
-		MD5(61402c35b75faeb4b74b815f323fff3d) 
+		MD5(61402c35b75faeb4b74b815f323fff3d)
 		SHA1(cd34474c0bcc758f6d71c90fbd40cef379d61374) )
      ROM_FLOPPY7 ( 0x20000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
@@ -886,7 +886,7 @@ ROM_START ( to770a )
      ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
 		CRC(378ea808)
-		MD5(6b63aa135107beee243967a2da0e5453) 
+		MD5(6b63aa135107beee243967a2da0e5453)
 		SHA1(f4575b537dfdb46ff2a0e7cbe8dfe4ba63161b8e) )
      ROM_FLOPPY7 ( 0x20000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
@@ -984,7 +984,7 @@ the same technology as the TO7/70.
 It has less memory and is less expandable. The MC6846 timer has disapeared.
 The BIOS has been throughly rewritten and uses a more compact call scheme.
 This, and the fact that the address map has changed, makes the MO5 completely
-TO7 software incompatible (except for pure BASIC programs). 
+TO7 software incompatible (except for pure BASIC programs).
 Moreover, the MO5 has incompatible cassette and cartridge formats.
 Unlike the TO7, the BASIC 1.0 is integrated and the MO5 can be used "as-is".
 
@@ -1001,7 +1001,7 @@ Unlike the TO7, the BASIC 1.0 is integrated and the MO5 can be used "as-is".
   - 8 KB color RAM + 8 KB point RAM, bank switched
   - 2 to 8 KB floppy ROM comes with the floppy drive / network extension
 
-* video: 
+* video:
   - as the TO7/70 but with different color encoding,
     320x200 pixels with color constraints, 16-color fixed palette
   - IN 57-001: TV overlay extension (not implemented)
@@ -1036,7 +1036,7 @@ Differences include:
 static ADDRESS_MAP_START ( mo5, ADDRESS_SPACE_PROGRAM, 8 )
 
      AM_RANGE ( 0x0000, 0x1fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
-                                 AM_WRITE     ( to770_vram_w ) 
+                                 AM_WRITE     ( to770_vram_w )
      AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
      AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
      AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
@@ -1072,11 +1072,11 @@ ROM_START ( mo5 )
      ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
 		CRC(f0ea9140)
-		MD5(ab3533a7132f90933acce80e256ae459) 
+		MD5(ab3533a7132f90933acce80e256ae459)
 		SHA1(36ce2d3df1866ec2fe368c1c28757e2f5401cf44) )
      ROM_LOAD ( "basic5.rom", 0x11000, 0x3000,
 		CRC(c2c11b9d)
-		MD5(f992a912093d3e8f165f225f74345b57) 
+		MD5(f992a912093d3e8f165f225f74345b57)
 		SHA1(512dd40fb45bc2b51a24c84b3723a32bc8e80c06) )
      ROM_FLOPPY5 ( 0x20000 )
 ROM_END
@@ -1085,11 +1085,11 @@ ROM_START ( mo5e )
      ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
 		CRC(6520213a)
-		MD5(434c42b96c31a341e13085048cdc8eae) 
+		MD5(434c42b96c31a341e13085048cdc8eae)
 		SHA1(f17a7a59baf2819ec80991b34b204795536a5e01) )
      ROM_LOAD ( "basic5e.rom", 0x11000, 0x3000,
 		CRC(934a72b2)
-		MD5(6404a7f49ec28937decd905d2a3cbb28) 
+		MD5(6404a7f49ec28937decd905d2a3cbb28)
 		SHA1(b37e2b1afbfba368c19be87b3bf61dfe6ad8b0bb) )
      ROM_FLOPPY5 ( 0x20000 )
 ROM_END
@@ -1189,8 +1189,8 @@ It has a more professional, desktop look, with a separate keyboard, and an
 optional mouse.
 It is also quite compatible with the TO7 and TO7/70 (but not the MO5).
 However, it also has many problems. The integrated BASIC 128 can only access
-128 KB of memory, which forces the 64 KB extension to be managed as a virtual 
-disk. The early versions of the software ROM has many bugs. The integrated 
+128 KB of memory, which forces the 64 KB extension to be managed as a virtual
+disk. The early versions of the software ROM has many bugs. The integrated
 floppy drive is one-sided.
 It was replaced quickly with the improved TO9+.
 
@@ -1206,7 +1206,7 @@ It was replaced quickly with the improved TO9+.
   - 112 KB base RAM
   - 64 KB extension RAM (as virtual disk)
   - 6 KB BIOS ROM + 2 KB floppy BIOS
-  - 128 KB software ROM (BASIC 1, BASIC 128, extended BIOS, 
+  - 128 KB software ROM (BASIC 1, BASIC 128, extended BIOS,
     DOS and configuration GUI, two software: "Paragraphe" and
     "Fiches et dossiers")
   - 16 KB video RAM
@@ -1251,7 +1251,7 @@ static ADDRESS_MAP_START ( to9, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0x0000, 0x3fff ) AM_ROMBANK   ( THOM_CART_BANK )/* 12 * 16 KB */
                                  AM_WRITE     ( to9_cartridge_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
-                                 AM_WRITE     ( to770_vram_w ) 
+                                 AM_WRITE     ( to770_vram_w )
      AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
      AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 10 * 16 KB */
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
@@ -1261,13 +1261,13 @@ static ADDRESS_MAP_START ( to9, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE ( to9_floppy_r, to9_floppy_w )
      AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE ( to9_vreg_r, to9_vreg_w )
      AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE ( to9_kbd_r, to9_kbd_w )
-     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to9_gatearray_r, 
+     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to9_gatearray_r,
 						to9_gatearray_w )
      AM_RANGE ( 0xe7e8, 0xe7eb ) AM_READWRITE ( acia_6551_r, acia_6551_w )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_READWRITE ( pia_3_alt_r, pia_3_alt_w )
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r, 
+     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r,
 						to7_modem_mea8000_w )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
@@ -1288,7 +1288,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 /* NOT WORKING
-   these bios seem heavily patched (probably to work with specific emulators 
+   these bios seem heavily patched (probably to work with specific emulators
    that trap some bios calls)
  */
 
@@ -1296,41 +1296,41 @@ ROM_START ( to9 )
      ROM_REGION ( 0x44800, REGION_CPU1, 0 )
      ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
 		CRC(f9278bf7)
-		MD5(507f0c482462b70b816fd23cf6791179) 
+		MD5(507f0c482462b70b816fd23cf6791179)
 		SHA1(9e99e6ae0285950f007b19161de642a4031fe46e) )
 
      /* BASIC & software */
      ROM_LOAD ( "basic9-0.rom", 0x20000, 0x4000,
 		CRC(c7bac620)
-		MD5(095d0f94ab506ab5da1e73ae550ee2bc) 
+		MD5(095d0f94ab506ab5da1e73ae550ee2bc)
 		SHA1(4b2a8b30cf437858ce978ba7b0dfa2bbd57eb38a) )
      ROM_LOAD ( "basic9-1.rom", 0x24000, 0x4000,
 		CRC(ea5f3e43)
-		MD5(ce29a894c31db083acf6bdf015a02b5e) 
+		MD5(ce29a894c31db083acf6bdf015a02b5e)
 		SHA1(5e58a29c2d117fcdb1f5e7ca31dbfffa0f9218f2) )
      ROM_LOAD ( "basic9-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
-		MD5(02279e22b8bfe29e750fb62671e3951d) 
+		MD5(02279e22b8bfe29e750fb62671e3951d)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
      ROM_LOAD ( "basic9-3.rom", 0x2c000, 0x4000,
 		CRC(6b5b19e3)
-		MD5(dac4b33a8cbebf64916b35515e0693c8) 
+		MD5(dac4b33a8cbebf64916b35515e0693c8)
 		SHA1(0e832670c185694d9abbcebcc3ad90e94eed585d) )
      ROM_LOAD ( "soft9-0a.rom", 0x30000, 0x4000,
 		CRC(8cee157e)
-		MD5(3dab712e800351b4f639790595b12101) 
+		MD5(3dab712e800351b4f639790595b12101)
 		SHA1(f32fc39b95890c00571e9f3fbcc2d8e0596fc4a1) )
      ROM_LOAD ( "soft9-1a.rom", 0x34000, 0x4000,
 		CRC(cf39ac93)
-		MD5(bcd744cdbd022cd9e2651e87792cd742) 
+		MD5(bcd744cdbd022cd9e2651e87792cd742)
 		SHA1(b97e6b7389398e5706624973c11ee7ddba323ce1) )
      ROM_LOAD ( "soft9-0b.rom", 0x38000, 0x4000,
 		CRC(033aee3f)
-		MD5(1a4d3549c78328479361e867d240f285) 
+		MD5(1a4d3549c78328479361e867d240f285)
 		SHA1(f3604e500329ec0489b05dbab05530322e9463c5) )
      ROM_LOAD ( "soft9-1b.rom", 0x3c000, 0x4000,
 		CRC(214fe527)
-		MD5(3dc2820fbe7b81a3936f731b44f23cbe) 
+		MD5(3dc2820fbe7b81a3936f731b44f23cbe)
 		SHA1(0d8e3f1ca347026e906c3d00a0371e8238c44a60) )
 
      ROM_FLOPPY7( 0x40000 )
@@ -1344,25 +1344,25 @@ ROM_END
 static INPUT_PORTS_START ( to9_keyboard )
      PORT_START_TAG ( "keyboard_0" )
      KEY ( 0, "F2 F7", F2 )           PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
-     KEY ( 1, "_ 6", 6 )              PORT_CHAR('_') PORT_CHAR('6') 
-     KEY ( 2, "Y", Y )                PORT_CHAR('Y') 
-     KEY ( 3, "H \302\250", H )       PORT_CHAR('H') 
+     KEY ( 1, "_ 6", 6 )              PORT_CHAR('_') PORT_CHAR('6')
+     KEY ( 2, "Y", Y )                PORT_CHAR('Y')
+     KEY ( 3, "H \302\250", H )       PORT_CHAR('H')
      KEY ( 4, "\xE2\x86\x91", UP )    PORT_CHAR(UCHAR_MAMEKEY(UP))
      KEY ( 5, "\xE2\x86\x92", RIGHT ) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
      KEY ( 6, "Home Clear", HOME )    PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(UCHAR_MAMEKEY(ESC))
      KEY ( 7, "N", N )                PORT_CHAR('N')
      PORT_START_TAG ( "keyboard_1" )
      KEY ( 0, "F3 F8", F3 )           PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F8))
-     KEY ( 1, "( 5", 5 )              PORT_CHAR('(') PORT_CHAR('5') 
+     KEY ( 1, "( 5", 5 )              PORT_CHAR('(') PORT_CHAR('5')
      KEY ( 2, "T", T )                PORT_CHAR('T')
      KEY ( 3, "G", G )                PORT_CHAR('G')
-     KEY ( 4, "= +", EQUALS )         PORT_CHAR('=') PORT_CHAR('+') 
+     KEY ( 4, "= +", EQUALS )         PORT_CHAR('=') PORT_CHAR('+')
      KEY ( 5, "\xE2\x86\x90", LEFT )  PORT_CHAR(UCHAR_MAMEKEY(LEFT))
      KEY ( 6, "Insert", INSERT )      PORT_CHAR(UCHAR_MAMEKEY(INSERT))
      KEY ( 7, "B \302\264", B )       PORT_CHAR('B')
      PORT_START_TAG ( "keyboard_2" )
      KEY ( 0, "F4 F9", F4 )           PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
-     KEY ( 1, "' 4", 4 )              PORT_CHAR('\'') PORT_CHAR('4') 
+     KEY ( 1, "' 4", 4 )              PORT_CHAR('\'') PORT_CHAR('4')
      KEY ( 2, "R", R )                PORT_CHAR('R')
      KEY ( 3, "F", F )                PORT_CHAR('F')
      KEY ( 4, "Accent", END )         PORT_CHAR(UCHAR_MAMEKEY(END))
@@ -1371,7 +1371,7 @@ static INPUT_PORTS_START ( to9_keyboard )
      KEY ( 7, "V", V )                PORT_CHAR('V')
      PORT_START_TAG ( "keyboard_3" )
      KEY ( 0, "F5 F10", F5 )          PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
-     KEY ( 1, "\" 3", 3 )             PORT_CHAR('"') PORT_CHAR('3') 
+     KEY ( 1, "\" 3", 3 )             PORT_CHAR('"') PORT_CHAR('3')
      KEY ( 2, "E", E )                PORT_CHAR('E')
      KEY ( 3, "D", D )                PORT_CHAR('D')
      KEY ( 4, "Keypad 7", 7_PAD )     PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
@@ -1380,7 +1380,7 @@ static INPUT_PORTS_START ( to9_keyboard )
      KEY ( 7, "C \136", C )           PORT_CHAR('C')
      PORT_START_TAG ( "keyboard_4" )
      KEY ( 0, "F1 F6", F1 )           PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-     KEY ( 1, "\303\251 2", 2 )       PORT_CHAR( 0xe9 ) PORT_CHAR('2') 
+     KEY ( 1, "\303\251 2", 2 )       PORT_CHAR( 0xe9 ) PORT_CHAR('2')
      KEY ( 2, "Z", Z )                PORT_CHAR('Z')
      KEY ( 3, "S", S )                PORT_CHAR('S')
      KEY ( 4, "Keypad 8", 8_PAD )     PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -1388,11 +1388,11 @@ static INPUT_PORTS_START ( to9_keyboard )
      KEY ( 6, "Keypad .", DEL_PAD )   PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
      KEY ( 7, "X", X )                PORT_CHAR('X')
      PORT_START_TAG ( "keyboard_5" )
-     KEY ( 0, "# @", TILDE )          PORT_CHAR('#') PORT_CHAR('@') 
-     KEY ( 1, "* 1", 1 )              PORT_CHAR('*') PORT_CHAR('1') 
+     KEY ( 0, "# @", TILDE )          PORT_CHAR('#') PORT_CHAR('@')
+     KEY ( 1, "* 1", 1 )              PORT_CHAR('*') PORT_CHAR('1')
      KEY ( 2, "A \140", A )           PORT_CHAR('A')
      KEY ( 3, "Q", Q )                PORT_CHAR('Q')
-     KEY ( 4, "[ {", QUOTE )          PORT_CHAR('[') PORT_CHAR('{') 
+     KEY ( 4, "[ {", QUOTE )          PORT_CHAR('[') PORT_CHAR('{')
      KEY ( 5, "Keypad 5", 5_PAD )     PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
      KEY ( 6, "Keypad 6", 6_PAD )     PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
      KEY ( 7, "W", W )                PORT_CHAR('W')
@@ -1404,25 +1404,25 @@ static INPUT_PORTS_START ( to9_keyboard )
      KEY ( 4, "Space", SPACE )        PORT_CHAR(' ')
      KEY ( 5, "Keypad 9", 9_PAD )     PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
      KEY ( 6, "Keypad Enter", ENTER_PAD ) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-     KEY ( 7, ", ?", COMMA )          PORT_CHAR(',') PORT_CHAR('?') 
+     KEY ( 7, ", ?", COMMA )          PORT_CHAR(',') PORT_CHAR('?')
      PORT_START_TAG ( "keyboard_7" )
      KEY ( 0, "Control", LCONTROL )   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-     KEY ( 1, "! 8", 8 )              PORT_CHAR('!') PORT_CHAR('8') 
+     KEY ( 1, "! 8", 8 )              PORT_CHAR('!') PORT_CHAR('8')
      KEY ( 2, "I", I )                PORT_CHAR('I')
      KEY ( 3, "K", K )                PORT_CHAR('K')
-     KEY ( 4, "$ &", CLOSEBRACE )     PORT_CHAR('$') PORT_CHAR('&') 
+     KEY ( 4, "$ &", CLOSEBRACE )     PORT_CHAR('$') PORT_CHAR('&')
      KEY ( 5, "\xE2\x86\x93", DOWN )  PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-     KEY ( 6, "] }", BACKSLASH )      PORT_CHAR(']') PORT_CHAR('}') 
-     KEY ( 7, "; .", STOP )           PORT_CHAR(';') PORT_CHAR('.') 
+     KEY ( 6, "] }", BACKSLASH )      PORT_CHAR(']') PORT_CHAR('}')
+     KEY ( 7, "; .", STOP )           PORT_CHAR(';') PORT_CHAR('.')
      PORT_START_TAG ( "keyboard_8" )
      KEY ( 0, "Caps-Lock", CAPSLOCK ) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
      KEY ( 1, "\303\247 9", 9 )       PORT_CHAR( 0xe7 ) PORT_CHAR('9')
      KEY ( 2, "O", O )                PORT_CHAR('O')
      KEY ( 3, "L", L )                PORT_CHAR('L')
-     KEY ( 4, "- \\", BACKSPACE )     PORT_CHAR('-') PORT_CHAR('\\') 
+     KEY ( 4, "- \\", BACKSPACE )     PORT_CHAR('-') PORT_CHAR('\\')
      KEY ( 5, "\303\271 %", COLON )   PORT_CHAR( 0xf9 ) PORT_CHAR('%')
      KEY ( 6, "Enter", ENTER )        PORT_CHAR(13)
-     KEY ( 7, ": /", SLASH )          PORT_CHAR(':') PORT_CHAR('/') 
+     KEY ( 7, ": /", SLASH )          PORT_CHAR(':') PORT_CHAR('/')
      PORT_START_TAG ( "keyboard_9" )
      KEY ( 0, "Shift", LSHIFT )  PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
      KEY ( 1, "\303\240 0", 0 )       PORT_CHAR( 0xe0 ) PORT_CHAR('0')
@@ -1431,7 +1431,7 @@ static INPUT_PORTS_START ( to9_keyboard )
      KEY ( 4, ") \302\260", MINUS )   PORT_CHAR(')') PORT_CHAR( 0xb0 )
      KEY ( 5, "\342\206\221 \302\250", OPENBRACE )  PORT_CHAR('^') PORT_CHAR( 0xa8 )
      KEY ( 6, "Keypad 3", 3_PAD )     PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-     KEY ( 7, "> <", BACKSLASH2 )     PORT_CHAR('>') PORT_CHAR('<') 
+     KEY ( 7, "> <", BACKSLASH2 )     PORT_CHAR('>') PORT_CHAR('<')
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to9_fconfig )
@@ -1523,7 +1523,7 @@ TO8 (1986)
 The TO8 was meant to replace the TO7/70 as a home-computer.
 It includes and improves on the technology from the TO9 (improved video,
 256 KB of RAM fully managed by the new BASIC 512, more integrated gate-array).
-It has a more compact Amiga-like look, no separate keyboard, no integrated 
+It has a more compact Amiga-like look, no separate keyboard, no integrated
 floppy drive (although the controller is integrated), no software in ROM,
 less extension slots. Also, the game & music extension is now integrated.
 It is quite compatible with the TO7 and TO7/70, and with the TO9 to some
@@ -1539,7 +1539,7 @@ Thomson family.
   - 2 gate-arrays (system & video, floppy controller)
 
 * memory:
-  - 256 KB base RAM 
+  - 256 KB base RAM
     + 256 KB extended RAM (EM 88-256) = 512 KB total RAM emulated
   - 16 KB BIOS ROM
   - 64 KB software ROM (BASIC 1, BASIC 512, extended BIOS)
@@ -1550,7 +1550,7 @@ Thomson family.
   border color has its 4-th index bit inverted
 
 * devices:
-  - same keyboard as T09: AZERTY 81-keys 
+  - same keyboard as T09: AZERTY 81-keys
     (but no 6850 controller, the 6804 is directly connected to the 6821 & 6846)
   - cartridge, up to 64 KB, TO7 compatible
   - two-button serial mouse (TO9-incompatible)
@@ -1583,7 +1583,7 @@ static ADDRESS_MAP_START ( to8, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0x0000, 0x3fff ) AM_RAMBANK   ( THOM_CART_BANK ) /* 8 * 16 KB */
                                  AM_WRITE     ( to8_cartridge_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
-                                 AM_WRITE     ( to770_vram_w ) 
+                                 AM_WRITE     ( to770_vram_w )
      AM_RANGE ( 0x6000, 0x7fff ) AM_RAMBANK   ( TO8_SYS_LO )
                                  AM_WRITE     ( to8_sys_lo_w )
      AM_RANGE ( 0x8000, 0x9fff ) AM_RAMBANK   ( TO8_SYS_HI )
@@ -1598,13 +1598,13 @@ static ADDRESS_MAP_START ( to8, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE ( to8_floppy_r, to8_floppy_w )
      AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE ( to8_vreg_r, to8_vreg_w )
-     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to8_gatearray_r, 
+     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to8_gatearray_r,
 						to8_gatearray_w )
      AM_RANGE ( 0xe7e8, 0xe7eb ) AM_READWRITE ( acia_6551_r, acia_6551_w )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_READWRITE ( pia_3_alt_r, pia_3_alt_w )
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r, 
+     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r,
 						to7_modem_mea8000_w )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
 
@@ -1626,29 +1626,29 @@ ROM_START ( to8 )
      /* BIOS & floppy */
      ROM_LOAD ( "to8-0.rom", 0x30000, 0x2000,
 		CRC(3c4a640a)
-		MD5(97c9b803305031daf6bffa671f7667c2) 
+		MD5(97c9b803305031daf6bffa671f7667c2)
 		SHA1(0a4952f0ca002d82ac83755e1f694d56399413b2) )
      ROM_LOAD ( "to8-1.rom", 0x32000, 0x2000,
 		CRC(cb9bae2d)
-		MD5(6ca0ebe022f9c433373eaed403aaf0ce) 
+		MD5(6ca0ebe022f9c433373eaed403aaf0ce)
 		SHA1(a4a55a6e2c74bca15951158c5164970e922fc1c1) )
 
      /* BASIC */
      ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
 		CRC(e5a00fb3)
-		MD5(6c33e3cd79bd6c675634b172594bbfec) 
+		MD5(6c33e3cd79bd6c675634b172594bbfec)
 		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
      ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
 		CRC(4b241e63)
-		MD5(360cbf42078bf8c80a283828bf6ee4e6) 
+		MD5(360cbf42078bf8c80a283828bf6ee4e6)
 		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
      ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
-		MD5(02279e22b8bfe29e750fb62671e3951d) 
+		MD5(02279e22b8bfe29e750fb62671e3951d)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
      ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
 		CRC(f552e7e3)
-		MD5(56c1e929ef4be6771cac7157d169132f) 
+		MD5(56c1e929ef4be6771cac7157d169132f)
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
      ROM_FLOPPY7( 0x34000 )
@@ -1662,7 +1662,7 @@ ROM_START ( to8d )
      /* BIOS & floppy */
      ROM_LOAD ( "to8d-0.rom", 0x30000, 0x2000,
 		CRC(30ea4950)
-		MD5(7704c1148b8761e9ce650ef1aa7ded69) 
+		MD5(7704c1148b8761e9ce650ef1aa7ded69)
 		SHA1(6705100cd337fffb26ce999302b55fb71557b128) )
      ROM_LOAD ( "to8d-1.rom", 0x32000, 0x2000,
 		CRC(926cf0ca)
@@ -1765,11 +1765,11 @@ TO9+ (1986)
 
 The TO9+ is the direct successor of the T09 as Thomson's high-end
 product: desktop look, 512 KB of RAM, integrated floppy drive and
-modem. Some software integrated in ROM on the TO9 are now supplied on 
+modem. Some software integrated in ROM on the TO9 are now supplied on
 floppies.
-Internally, the TO9+ is based more on TO8 technology than T09 
+Internally, the TO9+ is based more on TO8 technology than T09
 (same gate-arrays).
-It has enhanced communication capabilities by integrating either the 
+It has enhanced communication capabilities by integrating either the
 MODEM or the RS232 extension.
 It should be compatible with the TO9 and, to some extent, with the TO7, TO7/70
 and TO8.
@@ -1800,7 +1800,7 @@ static ADDRESS_MAP_START ( to9p, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0x0000, 0x3fff ) AM_RAMBANK   ( THOM_CART_BANK ) /* 8 * 16 KB */
                                  AM_WRITE     ( to8_cartridge_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
-                                 AM_WRITE     ( to770_vram_w ) 
+                                 AM_WRITE     ( to770_vram_w )
      AM_RANGE ( 0x6000, 0x7fff ) AM_RAMBANK   ( TO8_SYS_LO )
                                  AM_WRITE     ( to8_sys_lo_w )
      AM_RANGE ( 0x8000, 0x9fff ) AM_RAMBANK   ( TO8_SYS_HI )
@@ -1816,13 +1816,13 @@ static ADDRESS_MAP_START ( to9p, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE ( to8_floppy_r, to8_floppy_w )
      AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE ( to8_vreg_r, to8_vreg_w )
      AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE ( to9_kbd_r, to9_kbd_w )
-     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to8_gatearray_r, 
+     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to8_gatearray_r,
 						to8_gatearray_w )
      AM_RANGE ( 0xe7e8, 0xe7eb ) AM_READWRITE ( acia_6551_r, acia_6551_w )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_READWRITE ( pia_3_alt_r, pia_3_alt_w )
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r, 
+     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r,
 						to7_modem_mea8000_w )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
 
@@ -1854,7 +1854,7 @@ ROM_START ( to9p )
      /* BASIC */
      ROM_LOAD ( "basicp-0.rom", 0x20000, 0x4000,
 		CRC(e5a00fb3)
-		MD5(6c33e3cd79bd6c675634b172594bbfec) 
+		MD5(6c33e3cd79bd6c675634b172594bbfec)
 		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
      ROM_LOAD ( "basicp-1.rom", 0x24000, 0x4000,
 		CRC(4b241e63)
@@ -1937,7 +1937,7 @@ The MO6 is MO5 compatible, but not compatible with the TO family.
   an MO5-compatible one
 
 * devices:
-  - AZERTY keyboard, 69 keys, no keyboard controller (scanning is done 
+  - AZERTY keyboard, 69 keys, no keyboard controller (scanning is done
     periodically by the 6809)
   - MO5-compatible cartridge
   - two-button mouse (TO8-like)
@@ -1961,7 +1961,7 @@ Olivetti Prodest PC 128 (1986)
 
 Italian version of the MO6, built by Thomson and sold by Olivetti.
 Except from the ROM, it is very similar to the MO6.
-Do not confuse with the Olivetti Prodest PC 128 Systema (or 128s) which is 
+Do not confuse with the Olivetti Prodest PC 128 Systema (or 128s) which is
 based on the Acorn BBC Master Compact. Or with the Olivetti PC 1, which is
 a PC XT.
 
@@ -1971,7 +1971,7 @@ a PC XT.
 static ADDRESS_MAP_START ( mo6, ADDRESS_SPACE_PROGRAM, 8 )
 
      AM_RANGE ( 0x0000, 0x1fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
-                                 AM_WRITE     ( to770_vram_w ) 
+                                 AM_WRITE     ( to770_vram_w )
      AM_RANGE ( 0x2000, 0x3fff ) AM_RAMBANK   ( TO8_SYS_LO )
                                  AM_WRITE     ( to8_sys_lo_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( TO8_SYS_HI )
@@ -1986,7 +1986,7 @@ static ADDRESS_MAP_START ( mo6, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xa7cc, 0xa7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE ( to7_floppy_r, to7_floppy_w )
      AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE ( mo6_vreg_r, mo6_vreg_w )
-     AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo6_gatearray_r, 
+     AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo6_gatearray_r,
 						mo6_gatearray_w )
      AM_RANGE ( 0xa7e8, 0xa7eb ) AM_READWRITE ( acia_6551_r, acia_6551_w )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w )*/
@@ -2094,7 +2094,7 @@ static INPUT_PORTS_START ( mo6_keyboard )
      PORT_START_TAG ( "keyboard_1" )
      KEY ( 0, "Delete Backspace", DEL )  PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
      KEY ( 1, "Insert", INSERT )         PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-     KEY ( 2, "> <", BACKSLASH2 )        PORT_CHAR('>') PORT_CHAR('<') 
+     KEY ( 2, "> <", BACKSLASH2 )        PORT_CHAR('>') PORT_CHAR('<')
      KEY ( 3, "\xE2\x86\x92", RIGHT )    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
      KEY ( 4, "\xE2\x86\x93", DOWN )     PORT_CHAR(UCHAR_MAMEKEY(DOWN))
      KEY ( 5, "\xE2\x86\x90", LEFT )     PORT_CHAR(UCHAR_MAMEKEY(LEFT))
@@ -2141,8 +2141,8 @@ static INPUT_PORTS_START ( mo6_keyboard )
      KEY ( 1, "8 !", 8 )                 PORT_CHAR('8') PORT_CHAR('!')
      KEY ( 2, "9 \303\247", 9 )          PORT_CHAR('9') PORT_CHAR( 0xe7 )
      KEY ( 3, "0 \303\240", 0 )          PORT_CHAR('0') PORT_CHAR( 0xe0 )
-     KEY ( 4, "- \\", BACKSPACE )        PORT_CHAR('-') PORT_CHAR('\\') 
-     KEY ( 5, "= +", EQUALS )            PORT_CHAR('=') PORT_CHAR('+') 
+     KEY ( 4, "- \\", BACKSPACE )        PORT_CHAR('-') PORT_CHAR('\\')
+     KEY ( 5, "= +", EQUALS )            PORT_CHAR('=') PORT_CHAR('+')
      KEY ( 6, "Accent", END )            PORT_CHAR(UCHAR_MAMEKEY(END))
      KEY ( 7, "F4 F9", F4 )              PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
      PORT_START_TAG ( "keyboard_7" )
@@ -2279,7 +2279,7 @@ Here are the differences between the MO6 and MO5NR:
 * chips:
   - integrated MC 6854 network controller
 
-* memory: 
+* memory:
   - extra 2 KB ROM for the integrated network controller,
     can be masked by the ROM from the external floppy controller
 
@@ -2296,7 +2296,7 @@ Here are the differences between the MO6 and MO5NR:
 static ADDRESS_MAP_START ( mo5nr, ADDRESS_SPACE_PROGRAM, 8 )
 
      AM_RANGE ( 0x0000, 0x1fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
-                                 AM_WRITE     ( to770_vram_w ) 
+                                 AM_WRITE     ( to770_vram_w )
      AM_RANGE ( 0x2000, 0x3fff ) AM_RAMBANK   ( TO8_SYS_LO )
                                  AM_WRITE     ( to8_sys_lo_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( TO8_SYS_HI )
@@ -2312,7 +2312,7 @@ static ADDRESS_MAP_START ( mo5nr, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE ( mo5nr_net_r, mo5nr_net_w )
      AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE ( mo6_vreg_r, mo6_vreg_w )
      AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_READWRITE ( mo5nr_prn_r, mo5nr_prn_w )
-     AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo6_gatearray_r, 
+     AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo6_gatearray_r,
 						mo6_gatearray_w )
      AM_RANGE ( 0xa7e8, 0xa7eb ) AM_READWRITE ( acia_6551_r, acia_6551_w )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */

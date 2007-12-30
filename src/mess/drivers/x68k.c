@@ -88,7 +88,7 @@
 
 	RTC : Seems to work. (Tested using SX-Windows' Timer application)
 
-	DMA : FDD reading mostly works, other channels should work for effective memory copying (channel 2, often 
+	DMA : FDD reading mostly works, other channels should work for effective memory copying (channel 2, often
 	      used to copy data to video RAM or the palette in the background).
 
 	Sound : FM works, ADPCM is unimplemented as yet.
@@ -100,7 +100,7 @@
 			BG tiles and sprites work, but many games have the sprites offset by a small amount (some by a lot :))
 
 	Other issues:
-	  Bus error exceptions are a bit late at times.  Currently using a fake bus error for MIDI expansion checks.  These 
+	  Bus error exceptions are a bit late at times.  Currently using a fake bus error for MIDI expansion checks.  These
 	  are used determine if a piece of expansion hardware is present.
 	  Partial updates don't work at all well, and can be excruciatingly slow.
 	  Keyboard doesn't work well for games.
@@ -155,11 +155,11 @@ static UINT8 mfp_key;
 
 extern mame_bitmap* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
 extern mame_bitmap* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
-extern mame_bitmap* x68k_gfx_1_bitmap_16; 
-extern mame_bitmap* x68k_gfx_2_bitmap_16; 
-extern mame_bitmap* x68k_gfx_3_bitmap_16; 
+extern mame_bitmap* x68k_gfx_1_bitmap_16;
+extern mame_bitmap* x68k_gfx_2_bitmap_16;
+extern mame_bitmap* x68k_gfx_3_bitmap_16;
 extern mame_bitmap* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
-extern mame_bitmap* x68k_gfx_1_bitmap_256; 
+extern mame_bitmap* x68k_gfx_1_bitmap_256;
 extern mame_bitmap* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
 
 extern tilemap* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
@@ -357,25 +357,25 @@ static void x68k_keyboard_ctrl_w(int data)
 	/* Keyboard control commands:
        00xxxxxx - TV Control
 	              Not of much use as yet
-		
+
 	   01000xxy - y = Mouse control signal
-	   
+
 	   01001xxy - y = Keyboard enable
-	   
+
 	   010100xy - y = Sharp X1 display compatibility mode
-	   
+
 	   010101xx - xx = LED brightness (00 = bright, 11 = dark)
-	   
+
 	   010110xy - y = Display control enable
-	   
-	   010111xy - y = Display control via the Opt. 2 key enable 
-	   
+
+	   010111xy - y = Display control via the Opt. 2 key enable
+
 	   0110xxxx - xxxx = Key delay (default 500ms)
 	                     100 * (delay time) + 200ms
-	   
+
 	   0111xxxx - xxxx = Key repeat rate  (default 110ms)
 	                     (repeat rate)^2*5 + 30ms
-						 
+
 	   1xxxxxxx - xxxxxxx = keyboard LED status
 	              b6 = "full size"
 				  b5 = hiragana
@@ -428,7 +428,7 @@ int x68k_keyboard_pop_scancode(void)
 	ret = sys.keyboard.buffer[sys.keyboard.tailpos++];
 	if(sys.keyboard.tailpos > 15)
 		sys.keyboard.tailpos = 0;
-	
+
 	logerror("MFP: Keyboard buffer pop 0x%02x\n",ret);
 	return ret;
 }
@@ -459,8 +459,8 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 	int x;
 	int port = port_tag_to_index("key1");
 
-	for(x=0;x<0x80;x++)  
-	{   
+	for(x=0;x<0x80;x++)
+	{
 		// adjust delay/repeat timers
 		if(sys.keyboard.keytime[x] > 0)
 		{
@@ -521,7 +521,7 @@ static int x68k_read_mouse(void)
 {
 	char val = 0;
 	char ipt = 0;
-	
+
 	switch(sys.mouse.inputtype)
 	{
 	case 0:
@@ -937,7 +937,7 @@ static READ16_HANDLER( x68k_sysport_r )
 READ16_HANDLER( x68k_mfp_r )
 {
 	int ret;
-	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full, 
+	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
 	// MFP Timer C, and the power switch
 //	logerror("MFP: [%08x] Reading offset %i\n",activecpu_get_pc(),offset);
 	switch(offset)
@@ -988,7 +988,7 @@ READ16_HANDLER( x68k_mfp_r )
 		return sys.mfp.rsr;
 	case 22:  // TSR
 		return sys.mfp.tsr | 0x80;  // buffer is typically empty?
-	case 23: 
+	case 23:
 		return x68k_keyboard_pop_scancode();
 	default:
 //		logerror("MFP: [%08x] Offset %i read\n",activecpu_get_pc(),offset);
@@ -1170,7 +1170,7 @@ static WRITE16_HANDLER( x68k_sram_w )
 }
 
 static READ16_HANDLER( x68k_sram_r )
-{  
+{
 	// HACKS!
 	if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 		return 0x0000;
@@ -1282,7 +1282,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	int val = param;
 
 	// rather hacky, but this generally works for programs that check for MIDI hardware
-	if(mess_ram[0x09] != 0x02)  // normal vector for bus errors points to 02FF0540 
+	if(mess_ram[0x09] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
 		int addr = (mess_ram[0x09] << 24) | (mess_ram[0x08] << 16) |(mess_ram[0x0b] << 8) | mess_ram[0x0a];
 		int sp = cpunum_get_reg(0,REG_SP);
@@ -1307,7 +1307,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 
 static READ16_HANDLER( x68k_rom0_r )
 {
-	/* this location contains the address of some expansion device ROM, if no ROM exists, 
+	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
@@ -1317,7 +1317,7 @@ static READ16_HANDLER( x68k_rom0_r )
 
 static WRITE16_HANDLER( x68k_rom0_w )
 {
-	/* this location contains the address of some expansion device ROM, if no ROM exists, 
+	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
@@ -1391,13 +1391,13 @@ static void x68k_fm_irq(int irq)
 	{
 		sys.mfp.gpio &= ~0x08;
 	}
-	
+
 }
 
 static READ8_HANDLER(mfp_gpio_r)
 {
 	UINT8 data = sys.mfp.gpio;
-	
+
 	data &= ~(sys.crtc.hblank << 7);
 	data &= ~(sys.crtc.vblank << 4);
 	data |= 0x23;  // GPIP5 is unused, always 1
@@ -1564,7 +1564,7 @@ static const struct scc8530_interface scc_interface =
 	NULL//x68k_scc_ack
 };
 
-static const struct rp5c15_interface rtc_intf = 
+static const struct rp5c15_interface rtc_intf =
 {
 	x68k_rtc_alarm_irq
 };
@@ -1731,7 +1731,7 @@ static INPUT_PORTS_START( x68000 )
 INPUT_PORTS_END
 
 static void dimdsk_set_geometry(mess_image* image)
-{  
+{
 	// DIM disk image header, most of this is guesswork
 	int tracks = 77;
 	int heads = 2;
@@ -1751,7 +1751,7 @@ static void dimdsk_set_geometry(mess_image* image)
 	 * 17 = N88-BASIC (26 sector/track, 256 bytes/sector, GAP#3 = 0x33)
 	 *             or (26 sector/track, 128 bytes/sector, GAP#3 = 0x1a)
 	 */
-	image_fread(image,&format,1);  
+	image_fread(image,&format,1);
 
 	switch(format)
 	{
@@ -1778,7 +1778,7 @@ static void dimdsk_set_geometry(mess_image* image)
 		break;
 	}
 	tracks = 0;
-	for (x=0;x<86;x++)  
+	for (x=0;x<86;x++)
 	{
 		image_fread(image,&temp,2);
 		if(temp == 0x0101)
@@ -1834,17 +1834,17 @@ static void x68k_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 	case DEVINFO_INT_COUNT:
 		info->i = 4;
 		break;
-	case DEVINFO_PTR_LOAD:							
-		info->load = device_load_x68k_floppy; 
+	case DEVINFO_PTR_LOAD:
+		info->load = device_load_x68k_floppy;
 		break;
 	case DEVINFO_PTR_UNLOAD:
 		info->unload = device_unload_x68k_floppy;
 		break;
-	case DEVINFO_STR_FILE_EXTENSIONS:				
-		strcpy(info->s = device_temp_str(), "xdf,hdm,2hd,dim"); 
+	case DEVINFO_STR_FILE_EXTENSIONS:
+		strcpy(info->s = device_temp_str(), "xdf,hdm,2hd,dim");
 		break;
 	default:
-		legacybasicdsk_device_getinfo(devclass, state, info); 
+		legacybasicdsk_device_getinfo(devclass, state, info);
 		break;
 	}
 }
@@ -1863,7 +1863,7 @@ static MACHINE_RESET( x68000 )
 	memcpy(mess_ram,romdata,8);
 
 	// init keyboard
-	sys.keyboard.delay = 500;  // 3*100+200 
+	sys.keyboard.delay = 500;  // 3*100+200
 	sys.keyboard.repeat = 110;  // 4^2*5+30
 
 	// check for disks
@@ -1895,7 +1895,7 @@ static MACHINE_RESET( x68000 )
 	sys.crtc.vblank = 1;
 	irq_time = video_screen_get_time_until_pos(0,sys.crtc.reg[6],2);
 	timer_adjust(vblank_irq,irq_time,0,attotime_never);
-	
+
 	// start HBlank timer
 	timer_adjust(scanline_timer,video_screen_get_scan_period(0),1,attotime_never);
 
@@ -1965,7 +1965,7 @@ static DRIVER_INIT( x68000 )
 	cpunum_set_irq_callback(0, x68k_int_ack);
 
 	// init keyboard
-	sys.keyboard.delay = 500;  // 3*100+200 
+	sys.keyboard.delay = 500;  // 3*100+200
 	sys.keyboard.repeat = 110;  // 4^2*5+30
 	kb_timer = timer_alloc(x68k_keyboard_poll,NULL);
 	scanline_timer = timer_alloc(x68k_hsync,NULL);
@@ -2035,7 +2035,7 @@ ROM_START( x68000 )
 	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0")
 	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "ipl11",  "IPL-ROM V1.1")
-	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) ) 
+	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "ipl12",  "IPL-ROM V1.2")
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
@@ -2043,7 +2043,7 @@ ROM_START( x68000 )
 	ROM_REGION(0x8000, REGION_USER1,0)  // For Background/Sprite decoding
 	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, REGION_USER2, 0)
-	ROM_FILL(0x000,0x20000,0x00)  
+	ROM_FILL(0x000,0x20000,0x00)
 ROM_END
 
 

@@ -1,6 +1,6 @@
 /* This is an emulation of Dallas Semiconductor's Phantom Time Chip.
    DS1315.
-   
+
    by tim lindner, November 2001.
 */
 

@@ -113,7 +113,7 @@ static const struct reg_mask mscrtc6845_reg_mask[2][18] =
  * had these hardwired values: */
 static UINT8 pc1512_defaults[] =
 {
-	113, 80, 90, 10, 127, 6, 100, 112, 2 
+	113, 80, 90, 10, 127, 6, 100, 112, 2
 };
 
 /***************************************************************************
@@ -201,35 +201,35 @@ void mscrtc6845_time(struct mscrtc6845 *crtc)
 	}
 }
 
-int mscrtc6845_get_char_columns(struct mscrtc6845 *crtc) 
-{ 
+int mscrtc6845_get_char_columns(struct mscrtc6845 *crtc)
+{
 	return CRTC6845_CHAR_COLUMNS;
 }
 
-int mscrtc6845_get_char_height(struct mscrtc6845 *crtc) 
+int mscrtc6845_get_char_height(struct mscrtc6845 *crtc)
 {
 	return CRTC6845_CHAR_HEIGHT;
 }
 
-int mscrtc6845_get_char_lines(struct mscrtc6845 *crtc) 
-{ 
+int mscrtc6845_get_char_lines(struct mscrtc6845 *crtc)
+{
 	return CRTC6845_CHAR_LINES;
 }
 
-int mscrtc6845_get_start(struct mscrtc6845 *crtc) 
+int mscrtc6845_get_start(struct mscrtc6845 *crtc)
 {
 	return CRTC6845_VIDEO_START;
 }
 
 
 void mscrtc6845_set_char_columns(struct mscrtc6845 *crtc, UINT8 columns)
-{ 
+{
 	crtc->reg[1] = columns;
 }
 
 
 void mscrtc6845_set_char_lines(struct mscrtc6845 *crtc, UINT8 lines)
-{ 
+{
 	crtc->reg[6] = lines;
 }
 
@@ -308,7 +308,7 @@ int mscrtc6845_port_w(struct mscrtc6845 *crtc, int offset, UINT8 data)
 				break;
 			}
 
-			/* since the PC1512 does not support the number of lines register directly, 
+			/* since the PC1512 does not support the number of lines register directly,
 			 * this value is keyed off of register 9
 			 */
 			if ((crtc->config.personality == M6845_PERSONALITY_PC1512) && (idx == 9))

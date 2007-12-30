@@ -22,7 +22,7 @@
 	(oti 037 chip)
     ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, 0x318c5f43)
 	(tseng labs famous et4000 isa vga card (oem))
-    ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, 0xa903540d)	
+    ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, 0xa903540d)
 	(tseng labs famous et4000 isa vga card)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, 0xf01e4be0)
 
@@ -643,7 +643,7 @@ static void vga_cpu_interface(void)
 				memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, MWA64_BANK1 );
 			}
 			break;
-			
+
 		default:
 			fatalerror("VGA:  Bus width %d not supported\n", buswidth);
 			break;
@@ -677,7 +677,7 @@ static READ8_HANDLER(vga_crtc_r)
 			if (diff%columns<vga.monitor.get_sync_columns()) data|=1;
 		}
 #elif 1
-		if (vga.monitor.retrace) 
+		if (vga.monitor.retrace)
 		{
 			data |= 1;
 			if (attotime_compare(attotime_sub(timer_get_time(), vga.monitor.start_time), ATTOTIME_IN_USEC(300)) > 0)
@@ -685,8 +685,8 @@ static READ8_HANDLER(vga_crtc_r)
 				data |= 8;
 				vga.monitor.retrace=0;
 			}
-		} 
-		else 
+		}
+		else
 		{
 			if (attotime_compare(attotime_sub(timer_get_time(), vga.monitor.start_time), ATTOTIME_IN_MSEC(15)) > 0)
 				vga.monitor.retrace=1;
@@ -943,7 +943,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		{
 			vga.sequencer.data[vga.sequencer.index] = data;
 			vga_cpu_interface();
-	
+
 			if (vga.sequencer.index == 0)
 				vga.monitor.start_time = timer_get_time();
 		}
@@ -1163,7 +1163,7 @@ void pc_vga_init(const struct pc_vga_interface *vga_intf, const struct pc_svga_i
 			memory_install_write64_handler(0, vga.vga_intf.port_addressspace, vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, 0, 0, vga_port64be_03c0_w );
 			memory_install_write64_handler(0, vga.vga_intf.port_addressspace, vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, 0, 0, vga_port64be_03d0_w );
 			break;
-	}		
+	}
 
 	pc_vga_reset();
 }
@@ -1320,7 +1320,7 @@ static void vga_vh_vga(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 {
 	int pos, line, column, c, addr, curr_addr;
 	UINT16 *bitmapline;
-	
+
 	curr_addr = 0;
 	if(vga.sequencer.data[4] & 0x08)
 	{

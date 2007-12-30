@@ -105,7 +105,7 @@ static const gfx_layout odyssey2_graphicslayout =
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
 	/* x offsets */
-	{ 
+	{
 	0,
 	1,
 	2,
@@ -128,7 +128,7 @@ static const gfx_layout odyssey2_spritelayout =
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
 	/* x offsets */
-	{ 
+	{
 	7,6,5,4,3,2,1,0
 	},
 	/* y offsets */

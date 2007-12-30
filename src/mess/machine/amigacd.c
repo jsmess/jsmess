@@ -1,7 +1,7 @@
 /***************************************************************************
 
 	Amiga cdrom controller emulation
-	
+
 Notes:
 Many thanks to Toni Willem for all the help and information about the
 DMAC controller.
@@ -32,7 +32,7 @@ INLINE void dummy_log( const char *a, ... ) {}
 /***************************************************************************
 
 	DMAC
-	
+
 ***************************************************************************/
 
 /*
@@ -79,11 +79,11 @@ static void check_interrupts( void )
 	/* if interrupts are disabled, bail */
 	if ( (dmac_data.cntr & CNTR_INTEN) == 0 )
 		return;
-	
+
 	/* if no interrupts are pending, bail */
 	if ( (dmac_data.istr & ISTR_INT_P) == 0 )
 		return;
-	
+
 	/* otherwise, generate the IRQ */
 	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
 }
@@ -94,24 +94,24 @@ static TIMER_CALLBACK(dmac_dma_proc)
 	{
 		UINT16	dat16;
 		UINT8	dat8;
-		
+
 		if ( matsucd_get_next_byte( &dat8 ) < 0 )
 			break;
-		
+
 		dat16 = dat8;
-					
+
 		if ( matsucd_get_next_byte( &dat8 ) < 0 )
 			break;
-		
+
 		dat16 <<= 8;
 		dat16 |= dat8;
-		
+
 		amiga_chip_ram_w(dmac_data.acr, dat16);
-		
+
 		dmac_data.acr += 2;
 		dmac_data.wtc--;
 	}
-	
+
 	if ( dmac_data.wtc > 0 )
 	{
 		matsucd_read_next_block();
@@ -134,40 +134,40 @@ static READ16_HANDLER( amiga_dmac_r )
 		{
 			UINT8	v = dmac_data.istr;
 			LOG( "DMAC: PC=%08x - ISTR Read(%04x)\n", activecpu_get_pc(), dmac_data.istr );
-			
+
 			dmac_data.istr &= ~0x0f;
 			return v;
 		}
 		break;
-		
+
 		case 0x21:
 		{
 			LOG( "DMAC: PC=%08x - CNTR Read(%04x)\n", activecpu_get_pc(), dmac_data.cntr );
 			return dmac_data.cntr;
 		}
 		break;
-		
+
 		case 0x40:	/* wtc hi */
 		{
 			LOG( "DMAC: PC=%08x - WTC HI Read\n", activecpu_get_pc() );
 			return (dmac_data.wtc >> 16);
 		}
 		break;
-			
+
 		case 0x41:	/* wtc lo */
 		{
 			LOG( "DMAC: PC=%08x - WTC LO Read\n", activecpu_get_pc() );
 			return dmac_data.wtc;
 		}
 		break;
-		
+
 		case 0x42:	/* acr hi */
 		{
 			LOG( "DMAC: PC=%08x - ACR HI Read\n", activecpu_get_pc() );
 			return (dmac_data.acr >> 16);
 		}
 		break;
-			
+
 		case 0x43:	/* acr lo */
 		{
 			LOG( "DMAC: PC=%08x - ACR LO Read\n", activecpu_get_pc() );
@@ -182,14 +182,14 @@ static READ16_HANDLER( amiga_dmac_r )
 			return 0x00;	/* Not available without SCSI expansion */
 		}
 		break;
-		
+
 		case 0x50:
 		{
 			LOG( "DMAC: PC=%08x - CDROM RESP Read\n", activecpu_get_pc() );
 			return matsucd_response_r();
 		}
 		break;
-		
+
 		case 0x51:	/* XT IO */
 		case 0x52:
 		case 0x53:
@@ -198,7 +198,7 @@ static READ16_HANDLER( amiga_dmac_r )
 			return 0xff;
 		}
 		break;
-		
+
 		case 0x58:	/* TPI6525 */
 		case 0x59:
 		case 0x5A:
@@ -220,40 +220,40 @@ static READ16_HANDLER( amiga_dmac_r )
 			return tpi6525_0_port_r(offset - 0x58);
 		}
 		break;
-		
+
 		case 0x70:	/* DMA start strobe */
 		{
 			LOG( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() );
 			timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
 		}
 		break;
-		
+
 		case 0x71:	/* DMA stop strobe */
 		{
 			LOG( "DMAC: PC=%08x - DMA Stop Strobe\n", activecpu_get_pc() );
 			timer_reset( dmac_data.dma_timer, attotime_never );
 		}
 		break;
-		
+
 		case 0x72:	/* Clear IRQ strobe */
 		{
 			LOG( "DMAC: PC=%08x - IRQ Clear Strobe\n", activecpu_get_pc() );
 			dmac_data.istr &= ~ISTR_INT_P;
 		}
 		break;
-		
+
 		case 0x74:	/* Flush strobe */
 		{
 			LOG( "DMAC: PC=%08x - Flush Strobe\n", activecpu_get_pc() );
 			dmac_data.istr |= ISTR_FE_FLG;
 		}
 		break;
-				
+
 		default:
 			logerror( "DMAC-READ: PC=%08x, offset = %02x\n", activecpu_get_pc(), offset );
 		break;
 	}
-	
+
 	return 0;
 }
 
@@ -270,7 +270,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 			check_interrupts();
 		}
 		break;
-		
+
 		case 0x40:	/* wtc hi */
 		{
 			LOG( "DMAC: PC=%08x - WTC HI Write - data = %04x\n", activecpu_get_pc(), data );
@@ -278,7 +278,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 			dmac_data.wtc |= ((UINT32)data) << 16;
 		}
 		break;
-			
+
 		case 0x41:	/* wtc lo */
 		{
 			LOG( "DMAC: PC=%08x - WTC LO Write - data = %04x\n", activecpu_get_pc(), data );
@@ -286,7 +286,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 			dmac_data.wtc |= data;
 		}
 		break;
-		
+
 		case 0x42:	/* acr hi */
 		{
 			LOG( "DMAC: PC=%08x - ACR HI Write - data = %04x\n", activecpu_get_pc(), data );
@@ -294,7 +294,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 			dmac_data.acr |= ((UINT32)data) << 16;
 		}
 		break;
-			
+
 		case 0x43:	/* acr lo */
 		{
 			LOG( "DMAC: PC=%08x - ACR LO Write - data = %04x\n", activecpu_get_pc(), data );
@@ -302,14 +302,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 			dmac_data.acr |= data;
 		}
 		break;
-		
+
 		case 0x47:	/* dawr */
 		{
 			LOG( "DMAC: PC=%08x - DAWR Write - data = %04x\n", activecpu_get_pc(), data );
 			dmac_data.dawr = data;
 		}
 		break;
-		
+
 		case 0x48:	/* wd33c93 SCSI expansion */
 		case 0x49:
 		{
@@ -317,14 +317,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 			/* Not available without SCSI expansion */
 		}
 		break;
-		
+
 		case 0x50:
 		{
 			LOG( "DMAC: PC=%08x - CDROM CMD Write - data = %04x\n", activecpu_get_pc(), data );
 			matsucd_command_w( data );
 		}
 		break;
-		
+
 		case 0x58:	/* TPI6525 */
 		case 0x59:
 		case 0x5A:
@@ -346,35 +346,35 @@ static WRITE16_HANDLER( amiga_dmac_w )
 			tpi6525_0_port_w(offset - 0x58, data);
 		}
 		break;
-		
+
 		case 0x70:	/* DMA start strobe */
 		{
 			LOG( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() );
 			timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
 		}
 		break;
-		
+
 		case 0x71:	/* DMA stop strobe */
 		{
 			LOG( "DMAC: PC=%08x - DMA Stop Strobe\n", activecpu_get_pc() );
 			timer_reset( dmac_data.dma_timer, attotime_never );
 		}
 		break;
-		
+
 		case 0x72:	/* Clear IRQ strobe */
 		{
 			LOG( "DMAC: PC=%08x - IRQ Clear Strobe\n", activecpu_get_pc() );
 			dmac_data.istr &= ~ISTR_INT_P;
 		}
 		break;
-		
+
 		case 0x74:	/* Flush Strobe */
 		{
 			LOG( "DMAC: PC=%08x - Flush Strobe\n", activecpu_get_pc() );
 			dmac_data.istr |= ISTR_FE_FLG;
 		}
 		break;
-		
+
 		default:
 			logerror( "DMAC-WRITE: PC=%08x, offset = %02x, data = %04x\n", activecpu_get_pc(), offset, data );
 		break;
@@ -384,7 +384,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 /***************************************************************************
 
 	Autoconfig
-	
+
 ***************************************************************************/
 
 static void	dmac_install(offs_t base)
@@ -420,21 +420,21 @@ static amiga_autoconfig_device dmac_device =
 /***************************************************************************
 
 	TPI6525
-	
+
 ***************************************************************************/
 
 static int tp6525_portc_r( void )
 {
 	int	ret = 0;
-	
+
 	if ( (tpi6525[0].c.ddr & 0x04) == 0 ) /* if pin 2 is set to input */
 	{
 		ret |= matsucd_stch_r() ? 0x00 : 0x04;	/* read status change signal */
 	}
-	
+
 	if ( (tpi6525[0].c.ddr & 0x08) == 0 ) /* if pin 3 is set to input */
 		ret |= matsucd_sten_r() ? 0x08 : 0x00;	/* read enable signal */
-	
+
 	return ret;
 }
 
@@ -442,7 +442,7 @@ static void tp6525_portb_w( int data )
 {
 	if ( tpi6525[0].b.ddr & 0x01 ) /* if pin 0 is set to output */
 		matsucd_cmd_w( data & 1 ); /* write to the /CMD signal */
-	
+
 	if ( tpi6525[0].b.ddr & 0x02 ) /* if pin 1 is set to output */
 		matsucd_enable_w( data & 2 ); /* write to the /ENABLE signal */
 }
@@ -452,7 +452,7 @@ static emu_timer *tp6525_delayed_timer;
 static TIMER_CALLBACK(tp6525_delayed_irq)
 {
 	(void)param;
-	
+
 	if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 	{
 		amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
@@ -466,7 +466,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 static void tp6525_irq( int level )
 {
 	LOG( "TPI6525 Interrupt: level = %d\n", level);
-	
+
 	if ( level )
 	{
 		if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
@@ -491,7 +491,7 @@ static void cdrom_status_change( int level )
 {
 	/* invert */
 	level = level ? 0 : 1;
-	
+
 	/* PC2 on the 6525 */
 	tpi6525_0_irq2_level( level );
 }
@@ -506,31 +506,31 @@ void amigacd_init( void )
 {
 	/* initialize the dmac */
 	memset( &dmac_data, 0, sizeof( dmac_data ) );
-	
+
 	dmac_data.dma_timer = timer_alloc(dmac_dma_proc, NULL);
 	tp6525_delayed_timer = timer_alloc(tp6525_delayed_irq, NULL);
-	
+
 	/* initialize the 6525 TPI */
 	tpi6525_0_reset();
-	
+
 	tpi6525[0].a.read = NULL;
 	tpi6525[0].b.read = NULL;
 	tpi6525[0].c.read = tp6525_portc_r;
-	
+
 	tpi6525[0].a.output = NULL;
 	tpi6525[0].b.output = tp6525_portb_w;
 	tpi6525[0].c.output = NULL;
-	
+
 	tpi6525[0].interrupt.output = tp6525_irq;
 	tpi6525[0].ca.output = NULL;
 	tpi6525[0].cb.output = NULL;
-	
+
 	/* initialize the cdrom */
 	matsucd_init();
 	matsucd_set_status_enabled_callback( cdrom_status_enabled );
 	matsucd_set_status_changed_callback( cdrom_status_change );
 	matsucd_set_subcode_ready_callback( cdrom_subcode_ready );
-	
+
 	/* set up DMAC with autoconfig */
 	amiga_add_autoconfig( &dmac_device );
 }

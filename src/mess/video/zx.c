@@ -11,7 +11,7 @@
 
 	The video chip draws the scanline until a HALT instruction (0x76) is
 	reached, which indicates no further video RAM for this scanline.  Any
-	other video byte is used to generate a tile and at the same time, 
+	other video byte is used to generate a tile and at the same time,
 	appears to the CPU as a NOP (0x00) instruction.
 
 ****************************************************************************/

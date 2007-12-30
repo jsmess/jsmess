@@ -795,7 +795,7 @@ static void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
 				}
 			}
 		}
-	
+
 		if ( smsvdp.reg[0x01] & 0x02 ) {
 			spriteTileSelected += 2;
 			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
@@ -863,7 +863,7 @@ static void sms_refresh_line_mode2(int *lineBuffer, int line) {
 				penSelected = colors >> 4;
 			} else {
 				penSelected = colors & 0x0F;
-			} 
+			}
 			if ( ! penSelected ) {
 				penSelected = BACKDROP_COLOR;
 			}
@@ -881,13 +881,13 @@ static void sms_refresh_line_mode2(int *lineBuffer, int line) {
 
 static void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	int tileColumn;
-	int pixelX, pixelPlotX; 
+	int pixelX, pixelPlotX;
 	UINT8 *nameTable, *colorTable, *patternTable;
 
 	/* Draw background layer */
 	nameTable = smsvdp.VRAM + ( ( smsvdp.reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
 	colorTable = smsvdp.VRAM + ( ( smsvdp.reg[0x03] << 6 ) & ( VRAM_SIZE - 1 ) );
-	patternTable = smsvdp.VRAM + ( ( smsvdp.reg[0x04] << 11 ) & ( VRAM_SIZE - 1 ) ); 
+	patternTable = smsvdp.VRAM + ( ( smsvdp.reg[0x04] << 11 ) & ( VRAM_SIZE - 1 ) );
 	for ( tileColumn = 0; tileColumn < 32; tileColumn++ ) {
 		UINT8 pattern;
 		UINT8 colors;

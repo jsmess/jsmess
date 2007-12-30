@@ -119,7 +119,7 @@ static UINT32 mpc105_pci_read(int function, int offset, UINT32 mem_mask)
 				case 1:
 					result = 0xFF008010;
 					break;
-					
+
 				default:
 					fatalerror("Unknown CPU");
 					break;

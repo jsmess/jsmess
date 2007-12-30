@@ -120,11 +120,11 @@ static ADDRESS_MAP_START( d64_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION(REGION_CPU1, 0x3ff0)
 ADDRESS_MAP_END
 
-/* 
+/*
 	Dragon 64 with compusense Plus addon, this provided an extra 64K of memory
 	and an 80x25 column text display, provided by a motorola 6845.
-	
-	Currently only the memory is emulated.	
+
+	Currently only the memory is emulated.
 */
 
 static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -156,52 +156,52 @@ static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION(REGION_CPU1,0x3ff0)
 ADDRESS_MAP_END
 
-/* 
-	The Dragon Alpha was a prototype in development when Dragon Data went bust, 
-	it is basically an enhanced Dragon 64, with built in modem, disk system, and 
+/*
+	The Dragon Alpha was a prototype in development when Dragon Data went bust,
+	it is basically an enhanced Dragon 64, with built in modem, disk system, and
 	graphical boot rom.
 
 	It has the following extra hardware :-
 	A third 6821 PIA mapped between FF24 and FF27
 		An AY-8912, connected to the PIA.
-		
+
 	Port A of the PIA is connected as follows :-
-	
+
 		b0	BDIR of AY8912
 		b1	BC1 of AY8912
 		b2 	Rom select, High= boot rom, low=BASIC rom
 		b3..7 not used.
-		
+
 	Port B
 		b0..7 connected to D0..7 of the AY8912.
-		
+
 	CB1 DRQ of WD2797.
 
 	/irqa
 	/irqb	both connected to 6809 FIRQ.
-		
-	
+
+
 	The analog outputs of the AY-8912 are connected to the standard sound multiplexer.
 	The AY8912 output port is used as follows :-
-	
+
 		b0..b3	/DS0../DS3 for the drive interface (through an inverter first).
 		b4		/motor for the drive interface (through an inverter first).
 		b5..b7	not used as far as I can tell.
-	
+
 	A 6850 for the modem.
-	
+
 	A WD2797, used as an internal disk interface, this is however connected in a slightly strange
 	way that I am yet to completely determine.
 	19/10/2004, WD2797 is mapped between FF2C and FF2F, however the order of the registers is
-	reversed so the command Register is at the highest address instead of the lowest. The Data 
+	reversed so the command Register is at the highest address instead of the lowest. The Data
 	request pin is connected to CB1(pin 18) of PIA2, to cause an firq, the INTRQ, is connected via
 	an inverter to the 6809's NMI.
-	
+
 	All these are as yet un-emulated.
 
 	29-Oct-2004, AY-8912 is now emulated.
 	30-Oct-2004, Internal disk interface now emulated, Normal DragonDos rom replaced with a re-assembled
-				version, that talks to the alpha hardware (verified on a clone of the real machine). 
+				version, that talks to the alpha hardware (verified on a clone of the real machine).
 */
 
 
@@ -222,8 +222,8 @@ static ADDRESS_MAP_START( dgnalpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK(14)
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
-	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,			pia_0_w)	
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(acia_6551_r,		acia_6551_w)	
+	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,			pia_0_w)
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(acia_6551_r,		acia_6551_w)
 	AM_RANGE(0xff20, 0xff23) AM_READWRITE(pia_1_r,			coco_pia_1_w)
 	AM_RANGE(0xff24, 0xff27) AM_READWRITE(pia_2_r,			pia_2_w) 	/* Third PIA on Dragon Alpha */
 	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(wd2797_r,			wd2797_w)	/* Alpha onboard disk interface */
@@ -441,12 +441,12 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_joystick_buttons )
 	PORT_INCLUDE( m6847_artifacting )
-	
+
 	PORT_START /* 13 */
 	PORT_CONFNAME( 0x03, 0x00, "Real Time Clock" )
 	PORT_CONFSETTING(    0x00, "Disto" )
 	PORT_CONFSETTING(    0x01, "Cloud-9" )
-	
+
 	PORT_INCLUDE( cart_autostart )
 INPUT_PORTS_END
 
@@ -536,7 +536,7 @@ static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco3_joystick_buttons )
 	PORT_INCLUDE( m6847_artifacting )
-	
+
 	PORT_START_TAG("joystick_mode")
 	PORT_CONFNAME( 0x70, 0x00, "Joystick Type" )
 	PORT_CONFSETTING(	0x00, DEF_STR( Normal ) )
@@ -1071,7 +1071,7 @@ static void coco3_snapshot_getinfo(const device_class *devclass, UINT32 state, u
 
 /*************************************
 *
-*	Dragon only devices 
+*	Dragon only devices
 *
 **************************************/
 

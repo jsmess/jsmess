@@ -66,7 +66,7 @@ VIDEO_UPDATE( exidy )
 
 			/* prom at 0x0f800, user chars from 0x0fc00 */
 			char_addr = 0x0f800 + (ch<<3);
-		
+
 			for (cheight=0; cheight<8; cheight++)
 			{
 				int byte;

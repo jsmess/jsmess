@@ -7,7 +7,7 @@
   The MEA 8000 is a speech synthesis chip.
   The French company TMPI (Techni-musique & parole informatique) provided
   speech extensions for several 8-bit computers (Thomson, Amstrad, Oric).
-  It was quite popular in France because of its ability to spell 'u' 
+  It was quite popular in France because of its ability to spell 'u'
   (unlike the more widespread SPO 296 chip).
 
   The synthesis is based on a 4-formant model.
@@ -63,7 +63,7 @@ typedef enum
 
 
 
-typedef struct 
+typedef struct
 {
 #ifdef FLOAT_MODE
 	double fm, last_fm;         /* frequency, in Hz */
@@ -78,7 +78,7 @@ typedef struct
 
 
 
-static struct 
+static struct
 {
 
 	/* configuration parameters */
@@ -111,7 +111,7 @@ static struct
 	UINT8  noise;
 
 	emu_timer *timer;
-  
+
 } mea8000;
 
 
@@ -143,23 +143,23 @@ static struct
 
 /* frequency, in Hz */
 
-static const int fm1_table[32] = 
+static const int fm1_table[32] =
 {
-	150,  162,  174,  188,  202,  217,  233,  250, 
-	267,  286,  305,  325,  346,  368,  391,  415, 
-	440,  466,  494,  523,  554,  587,  622,  659, 
+	150,  162,  174,  188,  202,  217,  233,  250,
+	267,  286,  305,  325,  346,  368,  391,  415,
+	440,  466,  494,  523,  554,  587,  622,  659,
 	698,  740,  784,  830,  880,  932,  988, 1047
 };
 
-static const int fm2_table[32] = 
+static const int fm2_table[32] =
 {
-	440,  466,  494,  523,  554,  587,  622,  659, 
+	440,  466,  494,  523,  554,  587,  622,  659,
 	698,  740,  784,  830,  880,  932,  988, 1047,
 	1100, 1179, 1254, 1337, 1428, 1528, 1639, 1761,
 	1897, 2047, 2214, 2400, 2609, 2842, 3105, 3400
 };
 
-static const int fm3_table[8] = 
+static const int fm3_table[8] =
 {
 	1179, 1337, 1528, 1761, 2047, 2400, 2842, 3400
 };
@@ -174,7 +174,7 @@ static const int bw_table[4] = { 726, 309, 125, 50 };
 
 
 /* amplitude * 1000 */
-static const int ampl_table[16] = 
+static const int ampl_table[16] =
 {
 	0,   8,  11,  16,  22,  31,  44,   62,
 	88, 125, 177, 250, 354, 500, 707, 1000
@@ -183,11 +183,11 @@ static const int ampl_table[16] =
 
 
 /* pitch increment, in Hz / 8 ms */
-static const int pi_table[32] = 
+static const int pi_table[32] =
 {
-	0, 1,  2,  3,  4,  5,  6,  7, 
+	0, 1,  2,  3,  4,  5,  6,  7,
 	8, 9, 10, 11, 12, 13, 14, 15,
-	0 /* noise */, -15, -14, -13, -12, -11, -10, -9, 
+	0 /* noise */, -15, -14, -13, -12, -11, -10, -9,
 	-8, -7, -6, -5, -4, -3, -2, -1
 };
 
@@ -199,7 +199,7 @@ static const int pi_table[32] =
 
 static int mea8000_accept_byte( void )
 {
-	return 
+	return
 		mea8000.state == MEA8000_STOPPED ||
 		mea8000.state == MEA8000_WAIT_FIRST ||
 		(mea8000.state == MEA8000_STARTED && mea8000.bufpos < 4);
@@ -212,7 +212,7 @@ static void mea8000_update_req( void )
 	   buffer contains a complete frame and the CPU nees to wait for the next
 	   frame end to compose a new frame.
 	*/
-	if (mea8000.req_out_func) 
+	if (mea8000.req_out_func)
 		mea8000.req_out_func(0, mea8000_accept_byte());
 }
 
@@ -241,7 +241,7 @@ static int noise_table[NOISE_LEN];
 static void mea8000_init_tables( void )
 {
 	int i;
-	for (i=0; i<TABLE_LEN; i++) 
+	for (i=0; i<TABLE_LEN; i++)
 	{
 		double f = (double)i / F0;
 		cos_table[i]  = 2. * cos(2.*M_PI*f) * QUANT;
@@ -319,9 +319,9 @@ static int mea8000_compute_sample( void )
 	int in, out;
 	int ampl = mea8000_interp_i(mea8000.last_ampl, mea8000.ampl);
 
-	if (mea8000.noise) 
+	if (mea8000.noise)
 		in = mea8000_noise_gen();
-	else 
+	else
 		in = mea8000_freq_gen();
 	in = (in * ampl) / 1024;
 
@@ -329,7 +329,7 @@ static int mea8000_compute_sample( void )
 		in = mea8000_filter_step(i, in);
 	out = in;
 	return out;
-} 
+}
 
 
 
@@ -378,19 +378,19 @@ static int mea8000_compute_sample( void )
 	double in, out;
 	double ampl = mea8000_interp_f(mea8000.last_ampl, mea8000.ampl);
 
-	if (mea8000.noise) 
+	if (mea8000.noise)
 		in = mea8000_noise_gen();
-	else 
+	else
 		in = mea8000_freq_gen();
 	in *= ampl / 1000.;
 
-	for (i=0; i<4; i++) 
+	for (i=0; i<4; i++)
 	{
 		in = mea8000_filter_step(i, in);
 		out += in;
 	}
 	return out;
-} 
+}
 
 
 
@@ -407,7 +407,7 @@ static void mea8000_shift_frame( void )
 {
 	int i;
 	mea8000.last_pitch = mea8000.pitch;
-	for (i=0; i<4; i++) 
+	for (i=0; i<4; i++)
 	{
 		mea8000.f[i].last_bw = mea8000.f[i].bw;
 		mea8000.f[i].last_fm = mea8000.f[i].fm;
@@ -432,20 +432,20 @@ static void mea8000_decode_frame( void )
 	mea8000.f[2].fm = fm3_table[ mea8000.buf[1] >> 5 ];
 	mea8000.f[1].fm = fm2_table[ mea8000.buf[1] & 0x1f ];
 	mea8000.f[0].fm = fm1_table[ mea8000.buf[2] >> 3 ];
-	mea8000.ampl = ampl_table[ ((mea8000.buf[2] & 7) << 1) | 
+	mea8000.ampl = ampl_table[ ((mea8000.buf[2] & 7) << 1) |
 				   (mea8000.buf[3] >> 7) ];
 	mea8000.framelog = fd + 6 /* 64 samples / ms */ + 3;
 	mea8000.framelength = 1 <<  mea8000.framelog;
 	mea8000.bufpos = 0;
 #ifdef FLOAT_MODE
 	LOG(( "mea800_decode_frame: pitch=%i noise=%i  fm1=%gHz bw1=%gHz  fm2=%gHz bw2=%gHz  fm3=%gHz bw3=%gHz  fm4=%gHz bw4=%gHz  ampl=%g fd=%ims\n",
-	      mea8000.pitch, mea8000.noise, 
+	      mea8000.pitch, mea8000.noise,
 	      mea8000.f[0].fm, mea8000.f[0].bw, mea8000.f[1].fm, mea8000.f[1].bw,
 	      mea8000.f[2].fm, mea8000.f[2].bw, mea8000.f[3].fm, mea8000.f[3].bw,
 	      mea8000.ampl/1000., 8 << fd ));
 #else
 	LOG(( "mea800_decode_frame: pitch=%i noise=%i  fm1=%iHz bw1=%iHz  fm2=%iHz bw2=%iHz  fm3=%iHz bw3=%iHz  fm4=%iHz bw4=%iHz  ampl=%g fd=%ims\n",
-	      mea8000.pitch, mea8000.noise, 
+	      mea8000.pitch, mea8000.noise,
 	      mea8000.f[0].fm, mea8000.f[0].bw, mea8000.f[1].fm, mea8000.f[1].bw,
 	      mea8000.f[2].fm, mea8000.f[2].bw, mea8000.f[3].fm, mea8000.f[3].bw,
 	      mea8000.ampl/1000., 8 << fd ));
@@ -478,56 +478,56 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 {
 	int pos = mea8000.framepos % SUPERSAMPLING;
 
-	if (!pos) 
+	if (!pos)
 	{
 		/* sample is really computed only every 8-th time */
 		mea8000.lastsample = mea8000.sample;
 		mea8000.sample = mea8000_compute_sample();
 		DAC_signed_data_16_w(mea8000.channel, mea8000.lastsample);
 	}
-	else 
+	else
 	{
 		/* other samples are simply interpolated */
-		int sample = 
-			mea8000.lastsample + 
+		int sample =
+			mea8000.lastsample +
 			((pos*(mea8000.sample-mea8000.lastsample)) / SUPERSAMPLING);
 		DAC_signed_data_16_w(mea8000.channel, sample);
 	}
 
 	mea8000.framepos++;
-	if (mea8000.framepos == mea8000.framelength) 
+	if (mea8000.framepos == mea8000.framelength)
 	{
 		mea8000_shift_frame();
 		/* end of frame */
-		if (mea8000.bufpos == 4) 
+		if (mea8000.bufpos == 4)
 		{
 			/* we have a successor */
 			LOG(( "%f mea8000_timer_expire: new frame\n", attotime_to_double(timer_get_time()) ));
 			mea8000_decode_frame();
 			mea8000_start_frame();
 		}
-		else if (mea8000.cont)  
+		else if (mea8000.cont)
 		{
 			/* repeat mode */
 			LOG(( "%f mea8000_timer_expire: repeat frame\n", attotime_to_double(timer_get_time()) ));
 			mea8000_start_frame();
 		}
 		/* slow stop */
-		else if (mea8000.state == MEA8000_STARTED) 
+		else if (mea8000.state == MEA8000_STARTED)
 		{
 			mea8000.ampl = 0;
 			LOG(( "%f mea8000_timer_expire: fade frame\n", attotime_to_double(timer_get_time()) ));
 			mea8000_start_frame();
 			mea8000.state = MEA8000_SLOWING;
 		}
-		else if (mea8000.state == MEA8000_SLOWING) 
+		else if (mea8000.state == MEA8000_SLOWING)
 		{
 			LOG(( "%f mea8000_timer_expire: stop frame\n", attotime_to_double(timer_get_time()) ));
 			mea8000_stop_frame();
 		}
 		mea8000_update_req();
 	}
-	else 
+	else
 	{
 		/* continue frame */
 		timer_reset( mea8000.timer, SAMPLING );
@@ -542,7 +542,7 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 
 READ8_HANDLER ( mea8000_r )
 {
-	switch ( offset ) 
+	switch ( offset )
 	{
 
 	case 0: /* status register */
@@ -561,11 +561,11 @@ READ8_HANDLER ( mea8000_r )
 
 WRITE8_HANDLER ( mea8000_w )
 {
-	switch ( offset ) 
+	switch ( offset )
 	{
 
 	case 0: /* data register */
-		if (mea8000.state == MEA8000_STOPPED)  
+		if (mea8000.state == MEA8000_STOPPED)
 		{
 			/* got pitch byte before first frame */
 			mea8000.pitch = 2 * data;
@@ -573,15 +573,15 @@ WRITE8_HANDLER ( mea8000_w )
 			mea8000.state = MEA8000_WAIT_FIRST;
 			mea8000.bufpos = 0;
 		}
-		else if (mea8000.bufpos == 4) 
+		else if (mea8000.bufpos == 4)
 		{
 			/* overflow */
 			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 		}
-		else 
+		else
 		{
 			/* enqueue frame byte */
-			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), 
+			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 			      data, mea8000.bufpos ));
 			mea8000.buf[mea8000.bufpos] = data;
 			mea8000.bufpos++;
@@ -605,18 +605,18 @@ WRITE8_HANDLER ( mea8000_w )
 	{
 		int stop = (data >> 4) & 1;
 
-		if (data & 8) 
+		if (data & 8)
 			mea8000.cont = (data >> 2) & 1;
 
-		if (data & 2) 
+		if (data & 2)
 			mea8000.roe = data & 1;
 
-		if (stop) 
+		if (stop)
 			mea8000_stop_frame();
 
-		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n", 
-		      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data, 
-		      stop, mea8000.cont, mea8000.roe ));      
+		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
+		      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
+		      stop, mea8000.cont, mea8000.roe ));
 
 		mea8000_update_req();
 		break;
@@ -643,7 +643,7 @@ void mea8000_reset ( void )
 	mea8000.roe = 0;
 	mea8000.state = MEA8000_STOPPED;
 	mea8000_update_req();
-	for (i=0; i<4; i++) 
+	for (i=0; i<4; i++)
 	{
 		mea8000.f[i].last_output = 0;
 		mea8000.f[i].output = 0;
@@ -676,7 +676,7 @@ void mea8000_config ( int channel, write8_handler req_out_func )
 	state_save_register_item( "mea8000", 0, mea8000.lastsample );
 	state_save_register_item( "mea8000", 0, mea8000.sample );
 	state_save_register_item( "mea8000", 0, mea8000.phi );
-	for (i=0; i<4; i++) 
+	for (i=0; i<4; i++)
 	{
 		state_save_register_item( "mea8000", i, mea8000.f[i].fm );
 		state_save_register_item( "mea8000", i, mea8000.f[i].last_fm );

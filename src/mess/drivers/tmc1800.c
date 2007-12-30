@@ -284,7 +284,7 @@ static MACHINE_RESET( tmc2000 )
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( tmc1800 )
-	
+
 	// basic system hardware
 
 	MDRV_CPU_ADD(CDP1802, 1750000)	// 1.75 MHz
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( tmc1800 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tmc2000 )
-	
+
 	// basic system hardware
 
 	MDRV_CPU_ADD(CDP1802, CDP1864_CLK_FREQ)	// 1.75 MHz

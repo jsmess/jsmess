@@ -101,7 +101,7 @@ VIDEO_UPDATE( dai )
 					   10 - sixteen colour graphics
 				 	   11 - sixteen colour characters */
 	UINT8 unit_mode;
-     
+
 	UINT8 current_data_1, current_data_2;
 
 	UINT8 current_colour;
@@ -766,7 +766,7 @@ VIDEO_UPDATE( dai )
 				break;
 			}
 			break;
-		}		
+		}
 		current_scan_line += line_repeat_count*2+2;
 		LOG_DAI_VIDEO_LINE(display_mode, unit_mode, horizontal_resolution, line_repeat_count, current_scan_line);
 	}

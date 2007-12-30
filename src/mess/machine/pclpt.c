@@ -121,7 +121,7 @@ static int pc_LPT_r(int n, int offset)
 #if 0
 				/* set status 'out of paper', '*no* error', 'IRQ has *not* occured' */
 				LPT[n].status = 0x09c;	//0x2c;
-				
+
 #endif
 			}
 			data|=0x4; //?
@@ -138,7 +138,7 @@ static int pc_LPT_r(int n, int offset)
 }
 
 void pc_lpt_handshake_in(int nr, int data, int mask)
-{	
+{
 	PC_LPT *This=LPT+nr;
 	int neu=(data&mask)|(This->status&~mask);
 

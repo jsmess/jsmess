@@ -22,21 +22,21 @@ static const unsigned short kc85_colour_table[KC85_PALETTE_SIZE] =
 
 /*
 	foreground:
- 
+
 		"full" of each component
 
-		black, 
-		blue, 
-		red, 
-		magenta, 
-		green, 
+		black,
+		blue,
+		red,
+		magenta,
+		green,
 		cyan
 		yellow
 		white
 
 		"full of each component + half of another component"
 		black
-		violet 
+		violet
 		red/purple
 		pastel green
 		sky blue
@@ -60,7 +60,7 @@ static const unsigned short kc85_colour_table[KC85_PALETTE_SIZE] =
 static const unsigned char kc85_palette[KC85_PALETTE_SIZE * 3] =
 {
 		/* 3 bit colour value. bit 2->green, bit 1->red, bit 0->blue */
-		 
+
 		/* foreground colours */
 		0x00, 0x00, 0x00,
 		0x00, 0x00, 0xd0,
@@ -130,13 +130,13 @@ static void kc85_draw_8_pixels(mame_bitmap *bitmap,int x,int y, unsigned char co
 	/* bit 5,4,3 = foreground colour */
 		/* bit 5: background colour -> Green */
 		/* bit 4: background colour -> Red */
-		/* bit 3: background colour -> Blue */	
+		/* bit 3: background colour -> Blue */
 	/* bit 2,1,0 = background colour */
 		/* bit 2: background colour -> Green */
 		/* bit 1: background colour -> Red */
 		/* bit 0: background colour -> Blue */
-    background_pen = (colour_byte&7) + 16;	
-    foreground_pen = ((colour_byte>>3) & 0x0f);	
+    background_pen = (colour_byte&7) + 16;
+    foreground_pen = ((colour_byte>>3) & 0x0f);
 
 	if (colour_byte & kc85_blink_state)
 	{
@@ -151,7 +151,7 @@ static void kc85_draw_8_pixels(mame_bitmap *bitmap,int x,int y, unsigned char co
     for (a=0; a<8; a++)
     {
         int pen;
-		
+
 		pen = pens[(gfx_byte>>7) & 0x01];
 
 		if ((px >= 0) && (px < bitmap->width)
@@ -195,7 +195,7 @@ static void kc85_draw_8_pixels(mame_bitmap *bitmap,int x,int y, unsigned char co
 #define KC85_CYCLES_PER_LINE (KC85_CYCLES_PER_FRAME/KC85_FRAME_NUM_LINES)
 #define KC85_CYCLES_PER_PIXEL (KC85_CYCLES_PER_LINE/KC85_LINE_SIZE)
 
-/* 
+/*
 
 	- 1750000 cpu cycles per second
 	- 35000 cpu cycles per frame
@@ -205,17 +205,17 @@ static void kc85_draw_8_pixels(mame_bitmap *bitmap,int x,int y, unsigned char co
 
 /* Operation:
 
-	- Vertical and horizontal dimensions are split into states. 
+	- Vertical and horizontal dimensions are split into states.
 	- Horizontal states take a multiple of horizontal cycles, and vertical states take a multiple of lines.
 	- The horizontal states comprise left border, main display, right border and horizontal retrace timing.
 	- The vertical states comprise top border, main display, bottom border and vertical retrace timing.
 
 
 	- if frame rate is 50hz, and there are 312 lines, then the line rate is 15600hz.
-	- Each frame takes 0.02 seconds, and each line takes 0.0000064 seconds - approx 64microseconds per line 
+	- Each frame takes 0.02 seconds, and each line takes 0.0000064 seconds - approx 64microseconds per line
 
 	- the event list is based on cpu time
-		
+
 */
 
 static int horizontal_next_state_table[]=
@@ -308,15 +308,15 @@ static void kc85_common_process_cycles(struct video_update_state *video_update, 
 			/* border */
 			case 0:
 			{
-			//	video_update->render_x+=(cycles_to_do)*8;				
+			//	video_update->render_x+=(cycles_to_do)*8;
 			}
 			break;
 
 			/* pixels */
 			case 1:
-			{				
+			{
 				int i;
-	
+
 				for (i=0; i<cycles_to_do; i++)
 				{
 					unsigned char colour_byte;
@@ -360,7 +360,7 @@ static void kc85_common_process_cycles(struct video_update_state *video_update, 
 			}
 			break;
 		}
-		
+
 		video_update->horizontal.cycles_remaining_in_state -=cycles_to_do;
 
 		/* is state over? */
@@ -385,9 +385,9 @@ static int kc85_common_vh_process_line(struct video_update_state *video_update, 
 	{
 		/* do as many cycles as will fit onto the line */
 		cycles_to_do = MIN(cycles,video_update->horizontal.cycles_remaining);
-	
+
 		//logerror("process line: cycles_to_do: %d\n",cycles_to_do);
-		
+
 		/* do the cycles - draw them */
 		kc85_common_process_cycles(video_update, cycles_to_do);
 
@@ -404,7 +404,7 @@ static int kc85_common_vh_process_line(struct video_update_state *video_update, 
 		/* update x,y fetch pos */
 		video_update->x = 0;
 		video_update->y++;
-	
+
 		/* update x,y render pos */
 		video_update->render_x = 0;
 		video_update->render_y++;
@@ -432,7 +432,7 @@ static void kc85_common_vh_process_lines(struct video_update_state *video_update
 	{
 		int cycles_to_do;
 		int cycles_done;
-		
+
 		cycles_to_do = MIN(cycles, KC85_CYCLES_PER_LINE);
 		cycles_done = cycles_to_do;
 
@@ -476,7 +476,7 @@ static void kc85_common_vh_process_lines(struct video_update_state *video_update
 			break;
 		}
 
-			
+
 		//logerror("cycles done: %d\n",cycles_done);
 		video_update->vertical.cycles_remaining_in_state -=cycles_done;
 
@@ -527,7 +527,7 @@ static void kc85_common_process_frame(mame_bitmap *bitmap, void (*pixel_grab_cal
 	while (NumItems)
 	{
 		int delta_cycles;
-		
+
 		/* number of cycles until event will trigger */
 		delta_cycles = pItem->Event_Time - cycles_offset;
 
@@ -670,14 +670,14 @@ VIDEO_UPDATE( kc85_4 )
 		{
 			unsigned char colour_byte, gfx_byte;
 			int offset;
-			
+
 			offset = y | (x<<8);
 
 			colour_byte = colour_ram[offset];
 		    gfx_byte = pixel_ram[offset];
 
 			kc85_draw_8_pixels(bitmap,(x<<3),y, colour_byte, gfx_byte);
-		
+
 		}
 	}
 #endif
@@ -739,7 +739,7 @@ VIDEO_UPDATE( kc85_3 )
 {
 #if 0
 	/* colour ram takes up 0x02800 bytes */
-	   unsigned char *pixel_ram = mess_ram+0x08000;	
+	   unsigned char *pixel_ram = mess_ram+0x08000;
     unsigned char *colour_ram = pixel_ram + 0x02800;
 
     int x,y;
@@ -750,12 +750,12 @@ VIDEO_UPDATE( kc85_3 )
 		{
 			unsigned char colour_byte, gfx_byte;
 			int pixel_offset,colour_offset;
-			
+
 			if ((x & 0x020)==0)
 			{
 				pixel_offset = (x & 0x01f) | (((y>>2) & 0x03)<<5) |
 				((y & 0x03)<<7) | (((y>>4) & 0x0f)<<9);
-	
+
 				colour_offset = (x & 0x01f) | (((y>>2) & 0x03f)<<5);
 			}
 			else
@@ -765,11 +765,11 @@ VIDEO_UPDATE( kc85_3 )
 
 				pixel_offset = 0x02000+((x & 0x07) | (((y>>4) & 0x03)<<3) |
 					(((y>>2) & 0x03)<<5) | ((y & 0x03)<<7) | ((y>>6) & 0x03)<<9);
-	
+
 				colour_offset = 0x0800+((x & 0x07) | (((y>>4) & 0x03)<<3) |
 					(((y>>2) & 0x03)<<5) | ((y>>6) & 0x03)<<7);
 			}
-		
+
             colour_byte = colour_ram[colour_offset];
             gfx_byte = pixel_ram[pixel_offset];
 

@@ -51,7 +51,7 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
 {
 	/* get bit received from other side and update receive register */
 	receive_register_update_bit(&acia.receive_reg, get_in_data_bit(acia.connection.input_state));
-	
+
 	if (acia.receive_reg.flags & RECEIVE_REGISTER_FULL)
 	{
 		receive_register_extract(&acia.receive_reg, &acia.data_form);
@@ -72,7 +72,7 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
 			acia_6551_refresh_ints();
 		}
 	}
-	
+
 	/* if transmit is not empty... transmit data */
 	if ((acia.transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 	{
@@ -111,7 +111,7 @@ static void acia_6551_refresh_ints(void)
 
 	/* receive interrupts */
 
-	/* receive data register full? */ 
+	/* receive data register full? */
 	if (acia.status_register & (1<<3))
 	{
 		/* receiver interrupt enable? */
@@ -244,12 +244,12 @@ WRITE8_HANDLER(acia_6551_w)
 
 		case 1:
 		{
-			/* telstrat writes 0x07f! */		
+			/* telstrat writes 0x07f! */
 		}
 		break;
 
 
-		/* 
+		/*
 		Command Register:
 
 		b0	Data Terminal Ready
@@ -296,7 +296,7 @@ WRITE8_HANDLER(acia_6551_w)
 					acia.connection.State &=~SERIAL_STATE_RTS;
 				}
 				break;
-				
+
 				case 1:
 				case 2:
 				case 3:
@@ -351,7 +351,7 @@ WRITE8_HANDLER(acia_6551_w)
 			unsigned char previous_control_register;
 
             previous_control_register = acia.control_register;
-	
+
             if (((previous_control_register^data) & 0x07)!=0)
 			{
 				int rate;
@@ -372,14 +372,14 @@ WRITE8_HANDLER(acia_6551_w)
 
 					switch (rate)
 					{
-						
+
 						default:
 						case 1:
 						{
 							baud_rate = 50;
 						}
 						break;
-						
+
 						case 2:
 						{
 							baud_rate = 75;
@@ -397,13 +397,13 @@ WRITE8_HANDLER(acia_6551_w)
 							baud_rate = 135;
 						}
 						break;
-						
+
 						case 5:
 						{
 							baud_rate = 150;
 						}
-						break;						
-						
+						break;
+
 						case 6:
 						{
 							baud_rate = 300;
@@ -414,20 +414,20 @@ WRITE8_HANDLER(acia_6551_w)
 						{
 							baud_rate = 600;
 						}
-						break;	
-						
+						break;
+
 						case 8:
 						{
 							baud_rate = 1200;
 						}
-						break;						
-						
+						break;
+
 						case 9:
 						{
 							baud_rate = 1800;
 						}
-						break;						
-						
+						break;
+
 						case 10:
 						{
 							baud_rate = 2400;
@@ -439,25 +439,25 @@ WRITE8_HANDLER(acia_6551_w)
 							baud_rate = 3600;
 						}
 						break;
-						
+
 						case 12:
 						{
 							baud_rate = 4800;
 						}
 						break;
-			
+
 						case 13:
 						{
 							baud_rate = 7200;
 						}
 						break;
-			
+
 						case 14:
 						{
 							baud_rate = 9600;
 						}
 						break;
-			
+
 						case 15:
 						{
 							baud_rate = 19200;

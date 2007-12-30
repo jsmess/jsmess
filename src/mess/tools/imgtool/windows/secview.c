@@ -369,7 +369,7 @@ static INT_PTR CALLBACK win_sectorview_dialog_proc(HWND dialog, UINT message,
 void win_sectorview_dialog(HWND parent, imgtool_image *image)
 {
 	struct sectorview_info info;
-	
+
 	memset(&info, 0, sizeof(info));
 	info.image = image;
 

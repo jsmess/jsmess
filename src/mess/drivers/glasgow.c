@@ -233,7 +233,7 @@ static WRITE16_HANDLER ( write_lcd_flag )
   lcd_flag=data>>8;
   //beep_set_state(0,lcd_flag&1?1:0);
   if (lcd_flag == 0) key_selector=1;
- // The key function in the rom expects after writing to 
+ // The key function in the rom expects after writing to
  // the  a value from  the second key row;
   if (lcd_flag!=0) led7=255;else led7=0;
   logerror("LCD Flag 16  = %x \n  ",data);
@@ -270,8 +270,8 @@ static WRITE16_HANDLER(write_board)
  UINT8 board;
  board=data>>8;
  board_value=board;
- if (board==0xff) key_selector=0;   
- // The key function in the rom expects after writing to 
+ if (board==0xff) key_selector=0;
+ // The key function in the rom expects after writing to
  // the chess board a value from  the first key row;
   logerror("Write Board   = %x \n  ",data>>8);
 }
@@ -806,7 +806,7 @@ static INPUT_PORTS_START( new_keyboard ) //Amsterdam, Dallas 32, Roma, Roma 32
   PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H8")  PORT_CODE(KEYCODE_H )
   PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G7")  PORT_CODE(KEYCODE_7 )
   PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H8")  PORT_CODE(KEYCODE_8 )
-  
+
   PORT_START
 	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X)  PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 65535) 	PORT_PLAYER(1)
 

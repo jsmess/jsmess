@@ -1,5 +1,5 @@
 /*
-  defines centronics/parallel port printer interface  
+  defines centronics/parallel port printer interface
 
   provides a centronics printer simulation (sends output to IO_PRINTER)
 */
@@ -13,8 +13,8 @@
 extern "C" {
 #endif
 
-typedef enum { 
-	PRINTER_CENTRONICS, 
+typedef enum {
+	PRINTER_CENTRONICS,
 	PRINTER_IBM // select line not important
 } PRINTER_TYPE;
 

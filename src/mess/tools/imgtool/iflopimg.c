@@ -29,7 +29,7 @@ imgtoolerr_t imgtool_floppy_error(floperr_t err)
 
 		case FLOPPY_ERROR_UNSUPPORTED:
 			return IMGTOOLERR_UNIMPLEMENTED;
-			
+
 		default:
 			return IMGTOOLERR_UNEXPECTED;
 	}
@@ -340,7 +340,7 @@ static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool_image *
 		if (err)
 			goto done;
 	}
-	
+
 	err = FLOPPY_ERROR_SUCCESS;
 
 done:

@@ -304,7 +304,7 @@ static imgtoolerr_t prodos_load_block_525(imgtool_image *image,
 	prodos_find_block_525(image, block, &track, &head, &sector1, &sector2);
 
 	/* read first sector */
-	ferr = floppy_read_sector(imgtool_floppy(image), head, track, 
+	ferr = floppy_read_sector(imgtool_floppy(image), head, track,
 		sector1, 0, ((UINT8 *) buffer) + 0, 256);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
@@ -329,7 +329,7 @@ static imgtoolerr_t prodos_save_block_525(imgtool_image *image,
 	prodos_find_block_525(image, block, &track, &head, &sector1, &sector2);
 
 	/* read first sector */
-	ferr = floppy_write_sector(imgtool_floppy(image), head, track, 
+	ferr = floppy_write_sector(imgtool_floppy(image), head, track,
 		sector1, 0, ((const UINT8 *) buffer) + 0, 256);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
@@ -760,7 +760,7 @@ static UINT8 *next_info_block(UINT8 *buffer, size_t *position)
 	{
 		if (side)
 			return NULL;
-		
+
 		side = 0x100;
 		subpos = 8;
 	}
@@ -1111,7 +1111,7 @@ static imgtoolerr_t prodos_lookup_path(imgtool_image *image, const char *path,
 			!is_dir_storagetype(ent->storage_type))));
 
 		old_path = path;
-		path += strlen(path) + 1;	
+		path += strlen(path) + 1;
 		if (*path)
 		{
 			/* we have found part of the path; we are not finished yet */
@@ -1243,7 +1243,7 @@ static imgtoolerr_t prodos_fill_file(imgtool_image *image, UINT8 *bitmap,
 	}
 
 	for (i = 0; i < 256; i++)
-	{		
+	{
 		sub_block_allocated = FALSE;
 
 		sub_block = buffer[i + 256];
@@ -1391,7 +1391,7 @@ static imgtoolerr_t prodos_set_file_block_count(imgtool_image *image, prodos_dir
 		block <<= 8;
 		block |= buffer[0];
 		key_pointer = block;
-	
+
 		depth--;
 	}
 
@@ -1729,7 +1729,7 @@ static imgtoolerr_t prodos_diskimage_readfile(imgtool_partition *partition, cons
 
 	if (key_pointer != 0)
 	{
-		err = prodos_read_file_tree(image, &ent.filesize[fork_num], key_pointer, 
+		err = prodos_read_file_tree(image, &ent.filesize[fork_num], key_pointer,
 			nest_level, destf);
 		if (err)
 			return err;
@@ -2175,7 +2175,7 @@ static imgtoolerr_t	prodos_diskimage_getchain(imgtool_partition *partition, cons
 			if (err)
 				return err;
 			break;
-		
+
 		case 0x50:
 			/* extended ProDOS file */
 			chain[chain_pos].level = 0;

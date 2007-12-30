@@ -56,7 +56,7 @@ WRITE8_HANDLER(kc85_pio_control_w);
  READ8_HANDLER(kc85_ctc_r);
 WRITE8_HANDLER(kc85_ctc_w);
 
-/* this is a fake keyboard layout. 
+/* this is a fake keyboard layout.
 The keys are converted into codes which are transmitted by the keyboard to the base-unit */
 /* key code can be calculated as (line*8)+bit_index */
 

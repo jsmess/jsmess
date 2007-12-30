@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sms_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_bios_w) 
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_bios_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(sms_version_w)
 	AM_RANGE(0x40, 0x7F)                 AM_READWRITE(sms_count_r, SN76496_0_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)
@@ -121,11 +121,11 @@ static ADDRESS_MAP_START( gg_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x05)				 AM_READWRITE(gg_sio_r, gg_sio_w)
 	AM_RANGE(0x06, 0x06)				 AM_READWRITE(gg_psg_r, gg_psg_w)
 	AM_RANGE(0x07, 0x07) 				 AM_WRITE(sms_version_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x06) AM_WRITE(sms_bios_w) 
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0x06) AM_WRITE(sms_bios_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0x06) AM_WRITE(sms_version_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_WRITE(sms_bios_w) 
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_WRITE(sms_bios_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_WRITE(sms_version_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1e) AM_WRITE(sms_bios_w) 
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1e) AM_WRITE(sms_bios_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0x1e) AM_WRITE(sms_version_w)
 	AM_RANGE(0x40, 0x7F)                 AM_READWRITE(sms_count_r, SN76496_0_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)
@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START(sms1pal)
 	MDRV_CPU_IO_MAP(sms_io, 0)
 
 	MDRV_INTERLEAVE(1)
-        
+
 	MDRV_MACHINE_START(sms)
 	MDRV_MACHINE_RESET(sms)
 
@@ -360,10 +360,10 @@ static MACHINE_DRIVER_START(sms1pal)
 	MDRV_PALETTE_LENGTH(64+16)
 	MDRV_COLORTABLE_LENGTH(0)
 	MDRV_PALETTE_INIT(sms)
- 
+
 	MDRV_VIDEO_START(sega_315_5124)
 	MDRV_VIDEO_UPDATE(sms)
- 
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SMSIII, MASTER_CLOCK_PAL/15)

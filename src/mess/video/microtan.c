@@ -39,7 +39,7 @@ static TILE_GET_INFO(get_bg_tile_info)
 
 VIDEO_START( microtan )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 16, 32, 16);
 
 	microtan_chunky_buffer = auto_malloc(videoram_size);

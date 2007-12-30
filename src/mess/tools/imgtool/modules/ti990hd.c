@@ -35,7 +35,7 @@ that is longer than 39 characters. */
 #define MAX_SAFE_PATH_LEN 39
 
 #define MAX_DIR_LEVEL 25	/* We need to put a recursion limit to avoid endless recursion hazard */
- 
+
 
 typedef struct UINT16BE
 {
@@ -317,7 +317,7 @@ typedef union directory_entry
 #if 0
 
 /*
-	tifile header: stand-alone file 
+	tifile header: stand-alone file
 */
 typedef struct tifile_header
 {
@@ -1184,7 +1184,7 @@ static void ti990_image_info(imgtool_image *img, char *string, size_t len)
 }
 
 /*
-	Open the disk catalog for enumeration 
+	Open the disk catalog for enumeration
 */
 static imgtoolerr_t ti990_image_beginenum(imgtool_directory *enumeration, const char *path)
 {

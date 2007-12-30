@@ -30,7 +30,7 @@ xx.07.2002	Improved port and memory mapping (Raphael Nabet).
 
 Notes on emulation status and to do list:
 -----------------------------------------
-1. LIMITATION: Printer is not emulated. 
+1. LIMITATION: Printer is not emulated.
 2. LIMITATION: Timings are not implemented, due to it emulated machine runs
    twice fast as orginal.
 3. LIMITATION: .RSS files are not supported.
@@ -104,9 +104,9 @@ Keyboard:
 ---------
 	Reset - connected to CPU reset line
 
-				     Port D0 				
-	--------T-------T-------T-------T-------T-------T-------T-------¬        
-	|   7   |   6   |   5   |   4   |   3   |   2   |   1   |   0   | 
+				     Port D0
+	--------T-------T-------T-------T-------T-------T-------T-------¬
+	|   7   |   6   |   5   |   4   |   3   |   2   |   1   |   0   |
 	+-------+-------+-------+-------+-------+-------+-------+-------+---¬
 	| Shift |   ;   |       |  CLS  | Space |   R   |   G   |   6   | 0 |
 	+-------+-------+-------+-------+-------+-------+-------+-------+---+

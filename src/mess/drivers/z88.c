@@ -48,7 +48,7 @@ static void z88_interrupt_refresh(void)
 			return;
 		}
 	}
-	
+
 	logerror("clear int\n");
 	cpunum_set_input_line(0,0,CLEAR_LINE);
 }
@@ -100,7 +100,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 			blink.sta |= STA_KEY;
 
 			cpu_trigger(Z88_SNOOZE_TRIGGER);
-		
+
 			z88_interrupt_refresh();
 		}
 	}
@@ -136,7 +136,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 				/* set minutes int has occured */
 				blink.tsta |=RTC_MIN_INT;
 				refresh_ints = 1;
-				
+
 				blink.tim[1]=0;
 
 				blink.tim[2]++;
@@ -199,7 +199,7 @@ bank 0 is special. If a bit is set in the com register,
 the lower 8k is replaced with the rom. Bank 0 has been split
 into 2 8k chunks, and all other banks into 16k chunks.
 I wanted to handle all banks in the code below, and this
-explains why the extra checks are done 
+explains why the extra checks are done
 
 
 	bank 0		0x0000-0x3FFF
@@ -223,7 +223,7 @@ static void z88_refresh_memory_bank(int bank)
 		block = blink.mem[bank]-0x020;
 
 		if (block >= 128)
-		{	
+		{
 			read_addr = NULL;
 			write_addr = NULL;
 		}
@@ -304,9 +304,9 @@ static void blink_pb_w(int offset, int data, int reg_index)
 
     switch (reg_index)
 	{
-	
+
 		/* 1c000 */
-	
+
 	case 0x00:
 		{
 /**/            blink.pb[0] = addr_written;
@@ -602,7 +602,7 @@ static  READ8_HANDLER(z88_port_r)
 
 
 static ADDRESS_MAP_START( z88_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(16) ) 
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(16) )
 	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE(z88_port_r, z88_port_w)
 ADDRESS_MAP_END
 
@@ -693,7 +693,7 @@ static INPUT_PORTS_START(z88)
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MENU") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'") PORT_CODE(KEYCODE_4_PAD) 
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'") PORT_CODE(KEYCODE_4_PAD)
 	/* 7 */
 	PORT_START
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT)

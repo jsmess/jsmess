@@ -1,5 +1,5 @@
 /*
-  defines centronics/parallel port printer interface  
+  defines centronics/parallel port printer interface
 
   provides a centronics printer simulation (sends output to IO_PRINTER)
 */
@@ -16,7 +16,7 @@ typedef struct {
 	/* These bytes are used in the timer callback. When the timer callback
 	is executed, the control value is updated with the new data. The mask
 	defines the bits that are changing, and the data is the new data */
-	/* The user defined callback in CENTRONICS_CONFIG is called with the 
+	/* The user defined callback in CENTRONICS_CONFIG is called with the
 	change. This allows systems that have interrupts triggered from the centronics
 	interface to function correctly. e.g. Amstrad NC100 */
 	/* mask of data to set in timer callback */
@@ -91,9 +91,9 @@ static TIMER_CALLBACK(centronics_timer_callback)
 void centronics_write_handshake(int nr, int data, int mask)
 {
 	CENTRONICS *This=cent+nr;
-	
+
 	int neu=(data&mask)|(This->control&(~mask));
-	
+
 	if (neu & CENTRONICS_NO_RESET)
 	{
 	  /* strobe down */
@@ -126,7 +126,7 @@ int centronics_read_handshake(int nr)
 	}
 	else
 	{
-		if (This->control & CENTRONICS_SELECT) 
+		if (This->control & CENTRONICS_SELECT)
 			data|=CENTRONICS_ONLINE;
 	}
 	data |= CENTRONICS_NO_ERROR;

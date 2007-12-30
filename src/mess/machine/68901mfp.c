@@ -8,22 +8,22 @@
 	- disable GPIO3/4 interrupts when timer A/B in pulse mode
 	- spurious interrupt
 
-		If you look at the MFP datasheet it is obvious that it can generate the conditions for a spurious interrupt. 
+		If you look at the MFP datasheet it is obvious that it can generate the conditions for a spurious interrupt.
 		However the fact that they indeed happen in the ST is quite interesting.
 
-		The MFP will generate a spurious interrupt if interrupts are disabled (by changing the IERA/IERB registers) 
-		at the “precise point”. The precise point would be after the system (but not necessarily the CPU, see below) 
+		The MFP will generate a spurious interrupt if interrupts are disabled (by changing the IERA/IERB registers)
+		at the “precise point”. The precise point would be after the system (but not necessarily the CPU, see below)
 		triggered an MFP interrupt, and before the CPU drives the interrupt acknowledge cycle.
 
-		If the MFP was connected directly to the CPU, spurious interrupts probably couldn’t happen. However in the 
-		ST, GLUE seats in the middle and handles all the interrupt timing. It is possible that GLUE introduces a 
+		If the MFP was connected directly to the CPU, spurious interrupts probably couldn’t happen. However in the
+		ST, GLUE seats in the middle and handles all the interrupt timing. It is possible that GLUE introduces a
 		delay between detecting a change in the MFP interrupt request signal and actually propagating the change to
-		the CPU IPL signals (it is even possible that GLUE make some kind of latching). This would create a window 
-		long enough for the “precise point” described above. 
+		the CPU IPL signals (it is even possible that GLUE make some kind of latching). This would create a window
+		long enough for the “precise point” described above.
 
 		"yes, the spurious interrupt occurs when i mask a timer. i did not notice an occurance of the SPI when changing data and control registers.
 		if i kill interrupts with the status reg before masking the timer interrupt, then the SPI occurs as soon as the status register is set to re-enable interrupts."
-	
+
 	- divide serial clock by 16
 	- synchronous mode
 	- 1.5/2 stop bits
@@ -68,9 +68,9 @@ typedef struct
 static mfp_68901 mfp[MAX_MFP];
 
 static const int MFP68901_INT_MASK_GPIO[] =
-{ 
-	MFP68901_IR_GPIP_0, MFP68901_IR_GPIP_1, MFP68901_IR_GPIP_2, MFP68901_IR_GPIP_3, 
-	MFP68901_IR_GPIP_4, MFP68901_IR_GPIP_5, MFP68901_IR_GPIP_6, MFP68901_IR_GPIP_7 
+{
+	MFP68901_IR_GPIP_0, MFP68901_IR_GPIP_1, MFP68901_IR_GPIP_2, MFP68901_IR_GPIP_3,
+	MFP68901_IR_GPIP_4, MFP68901_IR_GPIP_5, MFP68901_IR_GPIP_6, MFP68901_IR_GPIP_7
 };
 
 static const int MFP68901_INT_MASK_TIMER[] =
@@ -752,7 +752,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		}
 		break;
 
-	case MFP68901_REGISTER_TCDCR: 
+	case MFP68901_REGISTER_TCDCR:
 		mfp_p->tcdcr = data & 0x6f;
 
 		switch (mfp_p->tcdcr & 0x07)
@@ -1173,7 +1173,7 @@ void mfp68901_config(int which, const mfp68901_interface *intf)
 	{
 		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->rx_clock), NULL, which, rx_tick);
 	}
-	
+
 	// serial transmit timer
 
 	if (mfp_p->intf->tx_clock > 0)

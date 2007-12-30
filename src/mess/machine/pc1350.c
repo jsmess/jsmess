@@ -76,7 +76,7 @@ int pc1350_ina(void)
 	if (t&0x20) {
 		if (PC1350_KEY_UP) data|=1;
 		if (PC1350_KEY_DOWN) data|=2;
-		if (PC1350_KEY_LEFT) data|=4; 
+		if (PC1350_KEY_LEFT) data|=4;
 		if (PC1350_KEY_RIGHT) data|=8;
 		if (PC1350_KEY_B) data|=0x10;
 		if (PC1350_KEY_G) data|=0x20;
@@ -115,7 +115,7 @@ int pc1350_ina(void)
 	if (PC1350_KEY_OFF&&(outa&0xc0) ) data|=0xc0;
 
 	// missing lshift
-	
+
 	return data;
 }
 

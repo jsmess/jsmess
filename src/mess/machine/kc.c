@@ -236,7 +236,7 @@ static void kc_disc_interface_init(void)
 	nec765_init(&kc_fdc_interface,NEC765A);
 
 	/* reset ctc */
-	z80ctc_reset(1); 
+	z80ctc_reset(1);
 
 	/* hold cpu at reset */
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
@@ -1719,7 +1719,7 @@ static OPBASE_HANDLER( kc85_3_opbaseoverride )
 static OPBASE_HANDLER( kc85_4_opbaseoverride )
 {
 	memory_set_opbase_handler(0,0);
-	
+
 	kc85_4_update_0x00000();
 
 	return (cpunum_get_reg(0, REG_PC) & 0x0ffff);

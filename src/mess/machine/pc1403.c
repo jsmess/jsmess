@@ -13,10 +13,10 @@ UINT8 pc1403_portc;
 static int power=1; /* simulates pressed cce when mess is started */
 
 
-/* 
+/*
    port 2:
      bits 0,1: external rom a14,a15 lines
-   port 3: 
+   port 3:
      bits 0..6 keyboard output select matrix line
 */
 static UINT8 asic[4];
@@ -145,7 +145,7 @@ int pc1403_ina(void)
 	if (KEY_UP) data|=0x10;
 	if (KEY_U) data|=0x20;
 	if (KEY_J) data|=0x40;
-	if (KEY_M) data|=0x80;	
+	if (KEY_M) data|=0x80;
     }
     if (outa&4) {
 	if (KEY_BRACE_LEFT) data|=8;

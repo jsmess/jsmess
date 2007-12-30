@@ -108,7 +108,7 @@ static MACHINE_DRIVER_START( vectrex )
 	MDRV_PALETTE_LENGTH(256 + 32768)
 	/*MDRV_ASPECT_RATIO(3, 4)*/
 
-	MDRV_VIDEO_START( vectrex )	
+	MDRV_VIDEO_START( vectrex )
 	MDRV_VIDEO_UPDATE( vectrex )
 
 	/* sound hardware */
@@ -117,7 +117,7 @@ static MACHINE_DRIVER_START( vectrex )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)	
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
 static void vectrex_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
@@ -163,11 +163,11 @@ ROM_END
   after that 2 and 3. You can leave the screen where you enter
   ads by pressing 8 several times.
 
-  Character matrix is: 
+  Character matrix is:
 
   btn| 1  2  3  4  5  6  7  8
   ---+------------------------
-  1  | 0  1  2  3  4  5  6  7  
+  1  | 0  1  2  3  4  5  6  7
   2  | 8  9  A  B  C  D  E  F
   3  | G  H  I  J  K  L  M  N
   4  | O  P  Q  R  S  T  U  V

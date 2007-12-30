@@ -378,7 +378,7 @@ static void apple3_update_memory(void)
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xC0FF, 0, 0, apple3_c0xx_r);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xC0FF, 0, 0, apple3_c0xx_w);
 	}
-	else 
+	else
 	{
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xC0FF, 0, 0, MRA8_BANK8);
 		if (via_0_a & 0x08)

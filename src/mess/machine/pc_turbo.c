@@ -26,7 +26,7 @@ static TIMER_CALLBACK(pc_turbo_callback)
 {
 	struct pc_turbo_info *ti = (struct pc_turbo_info *) ptr;
 	int val;
-	
+
 	val = readinputport(ti->port) & ti->mask;
 
 	if (val != ti->cur_val)

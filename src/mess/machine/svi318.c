@@ -365,7 +365,7 @@ WRITE8_HANDLER( svi318_fdc_density_side_w )
 	wd17xx_set_density(data & 0x01 ? DEN_FM_LO:DEN_MFM_LO);
 
 	wd17xx_set_side(data & 0x02 ? 1:0);
-            
+
 	image = image_from_devtype_and_index(IO_FLOPPY, svi318_fdc.driveselect);
 	if (image_exists(image))
 	{
@@ -387,8 +387,8 @@ static unsigned long svi318_calcoffset(UINT8 t, UINT8 h, UINT8 s,
 {
 	unsigned long o;
 
-	if ((t==0) && (h==0)) 
-		o = (s-first_sector_id)*128; 
+	if ((t==0) && (h==0))
+		o = (s-first_sector_id)*128;
 	else
 		o = ((t*heads+h)*17+s-first_sector_id)*256-2048; /* (17*256)-(18*128)=2048 */
 

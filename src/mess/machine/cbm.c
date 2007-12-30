@@ -31,7 +31,7 @@ static int general_cbm_loadsnap(mess_image *image, const char *file_type, int sn
 		image_fseek(image, 26, SEEK_SET);
 		snapshot_size -= 26;
 	}
-	else if (!mame_stricmp(file_type, "t64")) 
+	else if (!mame_stricmp(file_type, "t64"))
 	{
 		/* t64 files - for GB64 Single T64s loading to x0801 - header is always the same size */
 		if (image_fread(image, buffer, sizeof(buffer)) != sizeof(buffer))
@@ -48,7 +48,7 @@ static int general_cbm_loadsnap(mess_image *image, const char *file_type, int sn
 
 	image_fread(image, &address, 2);
 	address = LITTLE_ENDIANIZE_INT16(address);
-	if (!mame_stricmp(file_type, "t64")) 
+	if (!mame_stricmp(file_type, "t64"))
 		address = 2049;
 	snapshot_size -= 2;
 

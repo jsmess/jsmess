@@ -425,7 +425,7 @@ int imgwave_readfile(imgtool_image *img, const char *fname, imgtool_stream *dest
 		}
 	}
 	while(strcmp(ent.fname, fname));
-	
+
 	imgwave_closeenum(enumeration);
 	enumeration = NULL;
 

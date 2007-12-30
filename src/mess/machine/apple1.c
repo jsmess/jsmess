@@ -473,7 +473,7 @@ static TIMER_CALLBACK(apple1_dsp_ready_end)
 **	through repeated accesses, rather than by writing to an address.
 **	Data was read by reading an odd input address and comparing the
 **	ROM byte returned to detect signal changes.
-**	
+**
 **	The standard tape signal was a simple square wave, although this
 **	was often greatly distorted by the cassette recorder.  A single
 **	tape record consisted of a 10-second 800-Hz leader, followed by a

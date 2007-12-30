@@ -387,7 +387,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(telstrat)
 	INPUT_PORT_ORICA
 
-	PORT_START_TAG("oric_floppy_interface")	
+	PORT_START_TAG("oric_floppy_interface")
 	/* vsync cable hardware. This is a simple cable connected to the video output
 	to the monitor/television. The sync signal is connected to the cassette input
 	allowing interrupts to be generated from the vsync signal. */
@@ -453,7 +453,7 @@ static MACHINE_DRIVER_START( oric )
 
 	MDRV_MACHINE_START( oric )
 	MDRV_MACHINE_RESET( oric )
-	
+
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -472,7 +472,7 @@ static MACHINE_DRIVER_START( oric )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(AY8910, 1000000)
 	MDRV_SOUND_CONFIG(oric_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 

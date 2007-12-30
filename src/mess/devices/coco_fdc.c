@@ -11,7 +11,7 @@
  	uses the WD2797, however as this is a built in interface and not an external
  	cartrige, it is dealt with in the main coco.c file.
 
-	The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43 
+	The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
  	on the Dragon.  In addition, there is another register
 	called DSKREG that controls the interface with the wd1793.  DSKREG is
 	detailed below:  But they appear to be
@@ -41,24 +41,24 @@
 
 	---------------------------------------------------------------------------
 
-	2007-02-22, P.Harvey-Smith 
+	2007-02-22, P.Harvey-Smith
 
 	Began implementing the Dragon Delta Dos controler, this was actually the first
 	Dragon disk controler to market, beating Dragon Data's by a couple of months,
 	it is based around the WD2791 FDC, which is compatible with the WD1793/WD2797 used
 	by the standard CoCo and Dragon disk controlers except that it used an inverted
-	data bus, which is the reason the read/write handlers invert the data. This  
+	data bus, which is the reason the read/write handlers invert the data. This
 	controler like, the DragonDos WD2797 is mapped at $FF40-$FF43, in the normal
 	register order.
- 
-	The Delta cart also has a register (74LS174 hex flipflop) at $FF44 encoded as 
+
+	The Delta cart also has a register (74LS174 hex flipflop) at $FF44 encoded as
 	follows :-
 
 	Bit
 	7 not used
 	6 not used
-	5 not used 
-	4 Single (0) / Double (1) density select 
+	5 not used
+	4 Single (0) / Double (1) density select
 	3 5.25"(0) / 8"(1) Clock select
 	2 Side select
 	1 Drive select ms bit

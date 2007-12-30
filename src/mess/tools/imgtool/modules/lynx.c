@@ -191,7 +191,7 @@ static void lynx_image_info(imgtool_image *img, char *string, const int len)
 	strncpy(name_with_null, HEADER(image)->description, 24);
 	sprintf(string,"%s\n%s\nversion:%.4x max entries:%d",
 			dostext_with_null,
-			name_with_null, 
+			name_with_null,
 			GET_UWORD(HEADER(image)->version),
 			HEADER(image)->max_entries);
 }
@@ -216,7 +216,7 @@ static int lynx_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *e
 {
 	lynx_iterator *iter=(lynx_iterator*)enumeration;
 	ent->corrupt=0;
-	
+
 	ent->eof=iter->index>=iter->image->count;
 	if (!ent->eof) {
 		strcpy(ent->fname, iter->image->entries[iter->index].name);
@@ -226,7 +226,7 @@ static int lynx_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *e
 			case 'S': strcpy(ent->attr,"SEQ");break;
 			case 'R': strcpy(ent->attr,"REL");break;
 			case 'U': strcpy(ent->attr,"USR");break;
-			default: 
+			default:
 				sprintf(ent->attr,"type:%c",
 						iter->image->entries[iter->index].filetype );
 			}

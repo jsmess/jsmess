@@ -20,7 +20,7 @@ typedef enum _cococart_line
 {
 	COCOCART_LINE_CART,		/* connects to PIA1 CB1 */
 	COCOCART_LINE_NMI,		/* connects to NMI line on CPU */
-	COCOCART_LINE_HALT		/* connects to HALT line on CPU */	
+	COCOCART_LINE_HALT		/* connects to HALT line on CPU */
 } cococart_line;
 
 typedef enum _cococart_line_value
