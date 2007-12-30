@@ -26,6 +26,6 @@ void pcf8593_load( mame_file *file);
 void pcf8593_save( mame_file *file);
 
 // non-volatile ram handler
-NVRAM_HANDLER( pcf8593 );
+//NVRAM_HANDLER( pcf8593 );
 
 #endif

@@ -56,7 +56,7 @@
 	AM_RANGE( start, start + length - 1)
 
 // 512 kbyte ram + no memory mapped flash
-ADDRESS_MAP_START( cybikov1_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikov1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE_SL( 0x000000, 0x008000) AM_ROM
 //	AM_RANGE_SL( 0x200000, 0x080000) AM_RAM AM_MIRROR( 0x180000)
 	AM_RANGE_SL( 0x600000, 0x000002) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w)
@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 //	+-------------------------------------+
 
 // 256 kbyte ram + 256 kbyte memory mapped flash
-ADDRESS_MAP_START( cybikov2_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikov2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE_SL( 0x000000, 0x008000) AM_ROM
 	AM_RANGE_SL( 0x100000, 0x040000) AM_READ( MRA16_BANK2) AM_MIRROR( 0x0C0000)
 //	AM_RANGE_SL( 0x200000, 0x040000) AM_RAM AM_MIRROR( 0x1C0000)
@@ -90,7 +90,7 @@ ADDRESS_MAP_START( cybikov2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 // 2048? kbyte ram + 512 kbyte memory mapped flash
-ADDRESS_MAP_START( cybikoxt_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikoxt_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE_SL( 0x000000, 0x008000) AM_ROM
 	AM_RANGE_SL( 0x100000, 0x000002) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w)
 	AM_RANGE_SL( 0x200000, 0x000004) AM_WRITE( cybiko_unk1_w)
@@ -104,15 +104,15 @@ ADDRESS_MAP_END
 // ADDRESS MAP - IO //
 //////////////////////
 
-ADDRESS_MAP_START( cybikov1_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cybikov1_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0xFFFE40, 0xFFFFFF) AM_READWRITE( cybikov1_io_reg_r, cybikov1_io_reg_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( cybikov2_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cybikov2_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0xFFFE40, 0xFFFFFF) AM_READWRITE( cybikov2_io_reg_r, cybikov2_io_reg_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( cybikoxt_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cybikoxt_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0xFFFE40, 0xFFFFFF) AM_READWRITE( cybikoxt_io_reg_r, cybikoxt_io_reg_w)
 ADDRESS_MAP_END
 
@@ -252,7 +252,7 @@ SYSTEM_CONFIG_END
 // MACHINE DRIVER //
 ////////////////////
 
-MACHINE_DRIVER_START( cybikov1 )
+static MACHINE_DRIVER_START( cybikov1 )
 	// cpu
 	//MDRV_CPU_ADD_TAG( "main", H8S2241, 11059200)
 	MDRV_CPU_PROGRAM_MAP( cybikov1_mem, 0)
@@ -281,7 +281,7 @@ MACHINE_DRIVER_START( cybikov1 )
 //	MDRV_NVRAM_HANDLER( cybikov1)
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( cybikov2 )
+static MACHINE_DRIVER_START( cybikov2 )
 	// import
 	MDRV_IMPORT_FROM( cybikov1)
 	// cpu
@@ -295,7 +295,7 @@ MACHINE_DRIVER_START( cybikov2 )
 //	MDRV_NVRAM_HANDLER( cybikov2)
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( cybikoxt )
+static MACHINE_DRIVER_START( cybikoxt )
 	// import
 	MDRV_IMPORT_FROM( cybikov1)
 	// cpu

@@ -23,7 +23,7 @@ typedef struct
 
 static SST39VFX flash;
 
-void sst39vfx_state_save( void);
+static void sst39vfx_state_save( void);
 
 void sst39vfx_init( int type, int cpu_datawidth, int cpu_endianess)
 {
@@ -54,7 +54,7 @@ void sst39vfx_reset( void)
 	_logerror( 0, "sst39vfx_reset\n");
 }
 
-void sst39vfx_state_save( void)
+static void sst39vfx_state_save( void)
 {
 	const char *name = "sst39vfx";
 	state_save_register_item_pointer( name, 0, flash.data, flash.size);
@@ -93,7 +93,7 @@ WRITE8_HANDLER( sst39vfx_w )
 }
 */
 
-void sst39vfx_swap( void)
+static void sst39vfx_swap( void)
 {
 	int i, j;
 	UINT8 *base, temp[8];

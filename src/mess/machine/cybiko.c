@@ -20,6 +20,40 @@
 #include "machine/sst39vfx.h"
 #include "debugger.h"
 
+#ifndef _H8S2XXX_H_
+#define H8S_IO(xxxx) ((xxxx) - 0xFE40)
+
+#define H8S_IO_PFDDR  H8S_IO(0xFEBE)
+
+#define H8S_IO_PORT1  H8S_IO(0xFF50)
+#define H8S_IO_PORT3  H8S_IO(0xFF52)
+#define H8S_IO_PORT5  H8S_IO(0xFF54)
+#define H8S_IO_PORTF  H8S_IO(0xFF5E)
+
+#define H8S_IO_P1DR   H8S_IO(0xFF60)
+#define H8S_IO_P3DR   H8S_IO(0xFF62)
+#define H8S_IO_P5DR   H8S_IO(0xFF64)
+#define H8S_IO_PFDR   H8S_IO(0xFF6E)
+#define H8S_IO_SSR2   H8S_IO(0xFF8C)
+
+#define H8S_P1_TIOCB1 0x20
+
+#define H8S_P3_SCK1 0x20
+#define H8S_P3_SCK0 0x10
+#define H8S_P3_RXD1 0x08
+#define H8S_P3_TXD1 0x02
+
+#define H8S_P5_SCK2 0x04
+#define H8S_P5_RXD2 0x02
+#define H8S_P5_TXD2 0x01
+
+#define H8S_PF_PF2 0x04
+#define H8S_PF_PF1 0x02
+#define H8S_PF_PF0 0x01
+
+#define H8S_SSR_RDRF 0x40 /* receive data register full */
+#endif
+
 #define LOG_LEVEL  1
 #define _logerror(level,...)  if (LOG_LEVEL > level) logerror(__VA_ARGS__)
 
@@ -28,7 +62,7 @@
 /////////////////////////
 
 #define MACHINE_STOP(name) \
-	void machine_stop_##name( running_machine *machine)
+	static void machine_stop_##name( running_machine *machine)
 
 // machine stop
 MACHINE_STOP( cybikov1 );
@@ -36,9 +70,9 @@ MACHINE_STOP( cybikov2 );
 MACHINE_STOP( cybikoxt );
 
 // rs232
-void cybiko_rs232_init( void);
-void cybiko_rs232_exit( void);
-void cybiko_rs232_reset( void);
+static void cybiko_rs232_init( void);
+static void cybiko_rs232_exit( void);
+static void cybiko_rs232_reset( void);
 
 ////////////////////////
 // DRIVER INIT & EXIT //
@@ -292,31 +326,31 @@ typedef struct
 
 static CYBIKO_RS232 rs232;
 
-void cybiko_rs232_init( void)
+static void cybiko_rs232_init( void)
 {
 	_logerror( 0, "cybiko_rs232_init\n");
 	memset( &rs232, 0, sizeof( rs232));
 //	timer_pulse( TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
 }
 
-void cybiko_rs232_exit( void)
+static void cybiko_rs232_exit( void)
 {
 	_logerror( 0, "cybiko_rs232_exit\n");
 }
 
-void cybiko_rs232_reset( void)
+static void cybiko_rs232_reset( void)
 {
 	_logerror( 0, "cybiko_rs232_reset\n");
 }
 
-void cybiko_rs232_write_byte( UINT8 data)
+static void cybiko_rs232_write_byte( UINT8 data)
 {
 	#if 0
 	printf( "%c", data);
 	#endif
 }
 
-void cybiko_rs232_pin_sck( int data)
+static void cybiko_rs232_pin_sck( int data)
 {
 	_logerror( 3, "cybiko_rs232_pin_sck (%d)\n", data);
 	// clock high-to-low
@@ -344,19 +378,19 @@ void cybiko_rs232_pin_sck( int data)
 	rs232.pin.sck = data;
 }
 
-void cybiko_rs232_pin_txd( int data)
+static void cybiko_rs232_pin_txd( int data)
 {
 	_logerror( 3, "cybiko_rs232_pin_txd (%d)\n", data);
 	rs232.pin.txd = data;
 }
 
-int cybiko_rs232_pin_rxd( void)
+static int cybiko_rs232_pin_rxd( void)
 {
 	_logerror( 3, "cybiko_rs232_pin_rxd\n");
 	return rs232.pin.rxd;
 }
 
-int cybiko_rs232_rx_queue( void)
+static int cybiko_rs232_rx_queue( void)
 {
 	return 0;
 }
@@ -379,7 +413,7 @@ WRITE16_HANDLER( cybiko_lcd_w )
 	if ACCESSING_LSB16 hd66421_reg_dat_w( (data >> 0) & 0xFF);
 }
 
-READ8_HANDLER( cybiko_key_r_byte )
+static READ8_HANDLER( cybiko_key_r_byte )
 {
 	UINT8 data = 0xFF;
 	int i;
@@ -404,7 +438,6 @@ READ16_HANDLER( cybiko_key_r )
 	return data;
 }
 
-#if 0
 READ8_HANDLER( cybiko_io_reg_r )
 {
 	UINT8 data = 0;
@@ -521,7 +554,6 @@ WRITE8_HANDLER( cybikoxt_io_reg_w )
 		default : cybiko_io_reg_w( offset, data);
 	}
 }
-#endif
 
 // Cybiko Xtreme writes following byte pairs to 0x200003/0x200000
 // 00/01, 00/C0, 0F/32, 0D/03, 0B/03, 09/50, 07/D6, 05/00, 04/00, 20/00, 23/08, 27/01, 2F/08, 2C/02, 2B/08, 28/01

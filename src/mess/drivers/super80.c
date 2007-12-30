@@ -250,7 +250,7 @@ static INPUT_PORTS_START( super80 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-gfx_layout super80_elg4_charlayout =
+static const gfx_layout super80_elg4_charlayout =
 {
 	8,10,					/* 8 x 10 characters */
 	256,					/* 256 characters */
@@ -264,7 +264,7 @@ gfx_layout super80_elg4_charlayout =
 	8*16					/* every char takes 16 bytes */
 };
 
-gfx_layout super80_dslc_charlayout =
+static const gfx_layout super80_dslc_charlayout =
 {
 	8,10,					/* 8 x 10 characters */
 	128,					/* 128 characters */
@@ -283,13 +283,13 @@ static GFXDECODE_START( super80 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, super80_dslc_charlayout, 0, 2 )
 GFXDECODE_END
 
-static UINT8 bw_palette[] =
+static const UINT8 bw_palette[] =
 {
 	0x00,0x00,0x00,	/* black */
 	0xff,0xff,0xff	/* white */
 };
 
-static short bw_colortable[] =
+static const unsigned short bw_colortable[] =
 {
 	0, 1,
 	1, 0

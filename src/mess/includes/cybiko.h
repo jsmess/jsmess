@@ -15,6 +15,8 @@
 
 #include "driver.h"
 
+/*----------- defined in machine/cybiko.c -----------*/
+
 // driver init
 DRIVER_INIT( cybikov1 );
 DRIVER_INIT( cybikov2 );

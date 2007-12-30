@@ -60,7 +60,7 @@ typedef struct
 
 static AT45DBXX flash;
 
-void at45dbxx_state_save( void);
+static void at45dbxx_state_save( void);
 
 void at45dbxx_init( int type)
 {
@@ -115,7 +115,7 @@ void at45dbxx_reset( void)
 	flash.si_bits = 0;
 }
 
-void at45dbxx_state_save( void)
+static void at45dbxx_state_save( void)
 {
 	const char *name = "at45dbxx";
 	// data
@@ -130,7 +130,7 @@ void at45dbxx_state_save( void)
 	state_save_register_item( name, 0, flash.pin.busy);
 }
 
-UINT8 at45dbxx_read_byte( void)
+static UINT8 at45dbxx_read_byte( void)
 {
 	UINT8 data;
 	// check mode
@@ -142,14 +142,14 @@ UINT8 at45dbxx_read_byte( void)
 	return data;
 }
 
-void flash_set_io( UINT8* data, UINT32 size, UINT32 pos)
+static void flash_set_io( UINT8* data, UINT32 size, UINT32 pos)
 {
 	flash.io.data = data;
 	flash.io.size = size;
 	flash.io.pos  = pos;
 }
 
-UINT32 flash_get_page_addr( void)
+static UINT32 flash_get_page_addr( void)
 {
 	switch (flash.devid)
 	{
@@ -160,7 +160,7 @@ UINT32 flash_get_page_addr( void)
 	}
 }
 
-UINT32 flash_get_byte_addr( void)
+static UINT32 flash_get_byte_addr( void)
 {
 	switch (flash.devid)
 	{
@@ -171,7 +171,7 @@ UINT32 flash_get_byte_addr( void)
 	}
 }
 
-void at45dbxx_write_byte( UINT8 data)
+static void at45dbxx_write_byte( UINT8 data)
 {
 	// check mode
 	if (flash.mode != FLASH_MODE_SI) return;

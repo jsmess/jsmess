@@ -471,7 +471,7 @@ static const struct CassetteLegacyWaveFiller tap_legacy_fill_wave = {
 	0					/* trailer_samples */
 };
 
-static struct CassetteLegacyWaveFiller cdt_legacy_fill_wave = {
+static const struct CassetteLegacyWaveFiller cdt_legacy_fill_wave = {
 	cdt_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
 	0,					/* chunk_samples */
@@ -519,7 +519,7 @@ static const struct CassetteFormat tap_cassette_format = {
 	NULL
 };
 
-struct CassetteFormat cdt_cassette_format = {
+static const struct CassetteFormat cdt_cassette_format = {
 	"cdt",
 	cdt_cassette_identify,
 	cdt_cassette_load,

@@ -113,7 +113,7 @@ PALETTE_INIT( hd66421 )
 	}
 }
 
-void hd66421_state_save( void)
+static void hd66421_state_save( void)
 {
 	const char *name = "hd66421";
 	state_save_register_item( name, 0, lcd.idx);
