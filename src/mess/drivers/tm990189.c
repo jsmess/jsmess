@@ -322,12 +322,9 @@ static VIDEO_START( tm990_189_v )
 	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when 
 	 * multimonitor support is added?*/
 	LED_display_window_left = machine->screen[0].visarea.min_x;
-	LED_display_window_top = machine->screen[0].visarea.max_y;
+	LED_display_window_top = machine->screen[0].visarea.max_y - 32;
 	LED_display_window_width = machine->screen[0].visarea.max_x - machine->screen[0].visarea.min_x;
 	LED_display_window_height = 32;
-
-	machine->screen[0].visarea.max_y += 32;
-	machine->screen[0].height += 32;
 }
 
 static VIDEO_UPDATE( tm990_189_v )
@@ -823,6 +820,11 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)MACHINE_DRIVER_END
 
+#define LEFT_BORDER		15
+#define RIGHT_BORDER		15
+#define TOP_BORDER_60HZ		27
+#define BOTTOM_BORDER_60HZ	24
+
 static MACHINE_DRIVER_START(tm990_189_v)
 
 	/* basic machine hardware */
@@ -844,6 +846,8 @@ static MACHINE_DRIVER_START(tm990_189_v)
 	/*MDRV_INTERLEAVE(interleave)*/
 
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_SIZE(LEFT_BORDER+32*8+RIGHT_BORDER, TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ + 32)
+	MDRV_SCREEN_VISIBLE_AREA(LEFT_BORDER-12, LEFT_BORDER+32*8+12-1, TOP_BORDER_60HZ-9, TOP_BORDER_60HZ+24*8+9-1 + 32)
 	MDRV_VIDEO_EOF(tm990_189)
 	MDRV_VIDEO_START(tm990_189_v)
 	MDRV_VIDEO_UPDATE(tm990_189_v)
