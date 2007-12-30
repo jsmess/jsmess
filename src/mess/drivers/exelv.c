@@ -559,7 +559,7 @@ static MACHINE_DRIVER_START(exelv)
 
 	/* video hardware */
 	MDRV_VIDEO_START(exelv)
-	MDRV_TMS3556
+	MDRV_IMPORT_FROM(tms3556)
 
 	/* sound */
 	/*MDRV_SOUND_ADD(TMS5220, tms5220interface)*/
