@@ -1701,6 +1701,14 @@ WRITE8_HANDLER ( gbc_video_w ) {
 		break;
 	case 0x01:      /* STAT - LCD Status */
 		data = 0x80 | (data & 0x78) | (LCDSTAT & 0x07);
+		if ( LCDCONT & 0x80 ) {
+			/*
+			   - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
+			*/
+			if ( gb_lcd.mode_irq && gb_lcd.mode == 0 && ( LCDSTAT & 0x28 ) == 0x20 && ( data & 0x08 ) ) {
+				cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
+			}
+		}
 		break;
 	case 0x07:      /* BGP - GB background palette */
 		/* Some GBC games are lazy and still call this */
