@@ -1609,6 +1609,13 @@ WRITE8_HANDLER ( gb_video_w ) {
 				) ) {
 				cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
 			}
+			/*
+			   - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
+			   - 0x20 -> 0x00/0x10/0x20/0x40 (mode 0, after m2int) - trigger (stat bug)
+			*/
+			if ( gb_lcd.mode_irq && gb_lcd.mode == 0 && ( LCDSTAT & 0x20 ) == 0x20 ) {
+				cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
+			}
 		}
 		break;
 	case 0x04:						/* LY - LCD Y-coordinate */
