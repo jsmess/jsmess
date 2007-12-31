@@ -2,18 +2,21 @@
 
 TODO:
 
-- dkongjr discrete interface
 - write a shootgal palette_init
 - Pestplce colors and origin
-- Shooting Gallery: Shootgal.txt mentions speech pcb, mikesarcade.com dk conversion
-  Clarify
+- Shooting Gallery: Shootgal.txt mentions speech pcb,
+  mikesarcade.com dk conversion - Clarify
 - 8ballact: read 1507 no mapped
-- drakton - add dkongjr conversion
 - dkong3 dma (Z80 dma)
-- implement 74LS259 (8bit addressable latches), 74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
+- implement 74LS259 (8bit addressable latches),
+  74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
 
 Done:
+- dkongjr discrete interface
 - when i am retired: implement 8257 DMA controller
+- drakton - add dkongjr conversion
+- for documentation: hook up speech interface still present on radarscp (TRS02)
+  and early dkong (TKG02/TKG03) pcbs.
 - radarscp_grid_color_w() is wrong, it probably isn't supposed to change
   the grid color. There are reports of the grid being constantly blue in
   the real game, the flyer confirms this.
@@ -56,6 +59,12 @@ Done:
 
   Couriersud: 12/2007
 
+    - Cosmetic changes
+    - Fixed regression in radarscp sound
+    - Added dipswitch locations to dkong3b
+    - Added dkongjr discrete sound
+    - Proper interface Z80 - I8035 for dkongjr
+    - Changed discrete sound output factors
     - changed dkong/radarscp based games to use hardware-conformant I8035 memory maps
     - Added drakton clone drktnjr on dkongjr hardware
     - wrote M58817 sound driver and hooked it up
@@ -247,7 +256,16 @@ Changes:
 
 /*************************************
  *
- *  prototypes
+ *  Defines
+ *
+ *************************************/
+
+#define DEBUG_PROTECTION	(0)
+#define DEBUG_DISC_SOUND	(0)
+
+/*************************************
+ *
+ *  Prototypes
  *
  *************************************/
 
@@ -487,6 +505,21 @@ static READ8_HANDLER( dkong_in2_r )
 {
 	UINT8 r;
 
+#if DEBUG_DISC_SOUND
+	static UINT8 ui_snd = 0;
+	static UINT8 lst = 0;
+	if  (!lst && (readinputportbytag("TST") & 0x01))
+	{
+		ui_snd = (ui_snd + 1) % 10;
+		ui_popup("Sound %d", ui_snd);
+	}
+	lst = readinputportbytag("TST") & 0x01;
+	if (ui_snd<8)
+		dkongjr_snd_w1(ui_snd, (readinputportbytag("TST") & 0x02)>>1);
+	else
+		dkongjr_snd_w2(ui_snd-8, (readinputportbytag("TST") & 0x02)>>1);
+#endif
+
 	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(0) << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
@@ -496,11 +529,20 @@ static READ8_HANDLER( dkong_in2_r )
 
 static READ8_HANDLER( hunchbkd_mirror_r )
 {
-	return program_read_byte(0x1000+offset);
+	int data = program_read_byte(0x1000+offset);
+#if DEBUG_PROTECTION
+	if (offset >= 0xc04 && offset < 0xc14)
+		logerror("prot read %x, %x (%x)\n", offset, data, activecpu_get_pc());
+#endif
+	return data;
 }
 
 static WRITE8_HANDLER( hunchbkd_mirror_w )
 {
+#if DEBUG_PROTECTION
+	if (offset >= 0xc04 && offset < 0xc14)
+		logerror("prot write %x\n", data);
+#endif
 	program_write_byte(0x1000+offset,data);
 }
 
@@ -542,12 +584,16 @@ static WRITE8_HANDLER( hunchbkd_data_w )
 
 static READ8_HANDLER( hunchbkd_port0_r )
 {
+	dkong_state *state = Machine->driver_data;
+#if DEBUG_PROTECTION
 	logerror("port 0 : pc = %4x\n",activecpu_get_pc());
+#endif
 
 	switch (activecpu_get_pc())
 	{
 		case 0x00e9:  return 0xff;
 		case 0x0114:  return 0xfb;
+		case 0x209b:  return state->hunchloopback; /* this at least prevents reset after super bonus */
 	}
 
     return 0;
@@ -645,10 +691,65 @@ static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6bff) AM_RAM
+	AM_RANGE(0x6c00, 0x6fff) AM_RAM                                              /* DK3 bootleg only */
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x780f) AM_READWRITE(dma8257_0_r, dma8257_0_w)				/* P8257 control registers */
+	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(dkongjr_sh_tuneselect_w)
+	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
+	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
+	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)	                            /* IN2 */
+	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkongjr_snd_w1) 		                    /* Sound addrs */
+	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
+	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(dkongjr_snd_w2) 		                    /* Sound addrs */
+	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
+	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
+	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)								/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM	                                            /* bootleg DKjr only */
+	AM_RANGE(0xb000, 0xbfff) AM_ROM                                             /* pestplce only */
+	AM_RANGE(0xd000, 0xdfff) AM_ROM	                                            /* DK3 bootleg only */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x68ff) AM_RAM
+	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
+	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
+	AM_RANGE(0x6d00, 0x6fff) AM_RAM /* ???? */
+	AM_RANGE(0x7000, 0x73ff) AM_RAM /* Actual sprite ram location ... waiting for missing z80 dma */
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_WRITE(soundlatch_w)
+	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x7d00, 0x7d00) AM_READ_PORT("DSW0") AM_WRITE(soundlatch3_w)
+	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW1") AM_WRITE(dkong3_2a03_reset_w)
+	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(dkong3_coin_counter_w)
+	AM_RANGE(0x7e81, 0x7e81) AM_WRITE(dkong3_gfxbank_w)
+	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
+	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
+	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7e85, 0x7e85) AM_NOP							/* ==> DMA Chip */
+	AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM	                        /* DK3 and bootleg DKjr only */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* dma controller */
+ADDRESS_MAP_END
+
+/* Epos conversions */
+
 static ADDRESS_MAP_START( epos_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0xff) AM_READ(epos_decrypt_rom) 	/* Switch protection logic */
 ADDRESS_MAP_END
+
+/* S2650 conversions */
 
 static ADDRESS_MAP_START( hunchbkd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
@@ -705,56 +806,6 @@ static ADDRESS_MAP_START( shootgal_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(shootgal_port0_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x68ff) AM_RAM
-	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
-	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
-	AM_RANGE(0x6d00, 0x6fff) AM_RAM /* ???? */
-	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_WRITE(soundlatch_w)
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x7d00, 0x7d00) AM_READ_PORT("DSW0") AM_WRITE(soundlatch3_w)
-	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW1") AM_WRITE(dkong3_2a03_reset_w)
-	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(dkong3_coin_counter_w)
-	AM_RANGE(0x7e81, 0x7e81) AM_WRITE(dkong3_gfxbank_w)
-	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
-	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_NOP							/* ==> DMA Chip */
-	AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM	                        /* DK3 and bootleg DKjr only */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* ??? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x6c00, 0x6fff) AM_RAM                                              /* DK3 bootleg only */
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
-	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7800, 0x780f) AM_READWRITE(dma8257_0_r, dma8257_0_w)				/* P8257 control registers */
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(dkongjr_sh_tuneselect_w)
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
-	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
-	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)	                            /* IN2 */
-	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0")                               /* DSW0 */
-	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkongjr_snd_w1) 		                    /* Sound addrs */
-	AM_RANGE(0x7d80, 0x7d81) AM_WRITE(dkongjr_snd_w2) 		                    /* Sound addrs */
-	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
-	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)								/* P8257 ==> /DRQ0 /DRQ1 */
-	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM	                                            /* bootleg DKjr only */
-	AM_RANGE(0xb000, 0xbfff) AM_ROM                                             /* pestplce only */
-	AM_RANGE(0xd000, 0xdfff) AM_ROM	                                            /* DK3 bootleg only */
 ADDRESS_MAP_END
 
 
@@ -980,7 +1031,7 @@ static INPUT_PORTS_START( dkong3b )
 	PORT_INCLUDE( dkong_in2 )
 
 	PORT_START_TAG("DSW0")      /* DSW0 */
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -989,21 +1040,13 @@ static INPUT_PORTS_START( dkong3b )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dkongjr )
@@ -1011,6 +1054,12 @@ static INPUT_PORTS_START( dkongjr )
 	PORT_INCLUDE( dkong_in1_4 )
 	PORT_INCLUDE( dkong_in2 )
 	PORT_INCLUDE( dkong_dsw0 )
+
+#if DEBUG_DISC_SOUND
+	PORT_START_TAG("TST")      /* TST */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_B)
+#endif
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hunchbkd )
@@ -1100,18 +1149,12 @@ static INPUT_PORTS_START( sbdk )
 
 	PORT_INCLUDE( dkong_dsw0 )
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION( "SW1:!1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION( "SW1:!2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION( "SW1:!3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION( "SW1:!4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
 
 	PORT_START_TAG("SENSE") /* Sense */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
@@ -1128,18 +1171,10 @@ static INPUT_PORTS_START( herbiedk )
 
 	PORT_INCLUDE( dkong_dsw0 )
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION( "SW1:!1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION( "SW1:!2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION( "SW1:!3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION( "SW1:!4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW2:!2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
 
 	PORT_START_TAG("SENSE") /* Sense */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -1679,7 +1714,7 @@ ROM_START( radarscp )
 	ROM_REGION( 0x1800, REGION_CPU2, 0 )	/* sound */
 	ROM_LOAD( "trs2s3i",      0x0000, 0x0800, CRC(78034f14) SHA1(548b44ac69f39df6687da1c0f60968009b1e0767) )
 	ROM_RELOAD(               0x0800, 0x0800 )
-	ROM_FILL(                 0x1000, 0x0800, 0xFF )
+	ROM_FILL(                 0x1000, 0x0800, 0x00 )
 	/* socket 3J is empty */
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2069,10 +2104,10 @@ ROM_START( pestplce )
 	ROM_LOAD( "pest.k",       0x1000, 0x1000, CRC(2acacedf) SHA1(f91863f46aeb8986226b0b0854bac00217d6e7cf) )
 
 	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "pest.a",        0x1000, 0x1000, CRC(1958346e) SHA1(c4053dafc904b5e202e4a1acc48dd3e22db05c74) )
 	ROM_LOAD( "pest.b",        0x0000, 0x1000, CRC(e760073e) SHA1(917e74a4efa62b7404a03f094f3f4047dda8feda) )
-	ROM_LOAD( "pest.c",        0x3000, 0x1000, CRC(bf08f2a3) SHA1(c755f7463ac46054c65248d91b8e8da9cd379bf5) )
+	ROM_LOAD( "pest.a",        0x1000, 0x1000, CRC(1958346e) SHA1(c4053dafc904b5e202e4a1acc48dd3e22db05c74) )
 	ROM_LOAD( "pest.d",        0x2000, 0x1000, CRC(3a993c17) SHA1(af7048576aa3185b051518663693802ec9014a74) )
+	ROM_LOAD( "pest.c",        0x3000, 0x1000, CRC(bf08f2a3) SHA1(c755f7463ac46054c65248d91b8e8da9cd379bf5) )
 
 	/* not standard dkong layout */
 	ROM_REGION( 0x0300, REGION_PROMS, ROMREGION_INVERT )

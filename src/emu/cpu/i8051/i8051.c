@@ -68,11 +68,7 @@
 
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
 //Prototypes
@@ -407,7 +403,7 @@ static READ32_HANDLER((*hold_eram_iaddr_callback));
 #define SERIALPORT_IRQ    ((R_SCON & 0x03) && GET_ES)
 
 #if (HAS_I8052 || HAS_I8752)
-#define NO_PENDING_IRQ  !(R_TCON & 0xaa) && !(SERIALPORT_IRQ) && !GET_ET2 //!GET_TF2 && !GET_EXF2
+#define NO_PENDING_IRQ  !(R_TCON & 0xaa) && !(SERIALPORT_IRQ) && !(GET_ET2 && (GET_TF2 || GET_EXF2))
 #else
 #define NO_PENDING_IRQ  !(R_TCON & 0xaa) && !(SERIALPORT_IRQ)
 #endif

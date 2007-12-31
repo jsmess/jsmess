@@ -111,21 +111,25 @@ static WRITE16_HANDLER( z80_shared_w )
 
 static INPUT_PORTS_START( tx1 )
 PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, "Game Cost" )
-	PORT_DIPSETTING(      0x0000, "1 Coin Unit for 1 Credit" )
-	PORT_DIPSETTING(      0x0001, "2 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x0002, "3 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x0003, "4 Coin Units for 1 Credit" )
+	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0x0004, 0x0004, "Left Coin Mechanism" )
-	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
-	PORT_DIPSETTING(      0x0004, "1 Coin for 2 Coin Units" )
-
-	PORT_DIPNAME( 0x0018, 0x0000, "Right Coin Mechanism" )
-	PORT_DIPSETTING(      0x0000, "1 Coin Units 1 Credit" )
-	PORT_DIPSETTING(      0x0008, "1 Coin Units 4 Credit" )
-	PORT_DIPSETTING(      0x0010, "1 Coin Units 5 Credit" )
-	PORT_DIPSETTING(      0x0018, "1 Coin Unit 6 Credit" )
+	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00e0, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_6C ) )
 
 	PORT_DIPNAME( 0x0700, 0x0300, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0000, "A (Easiest)" )
@@ -143,15 +147,15 @@ PORT_START_TAG("DSW")
 	PORT_DIPSETTING(      0x1000, "C" )
 	PORT_DIPSETTING(      0x1800, "D (Shortest)" )
 
-	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )
-	PORT_DIPSETTING(      0x0000, "No Bonus" )
-	PORT_DIPSETTING(      0x2000, "2 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x4000, "3 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x6000, "4 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x8000, "5 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0xa000, "4 Coin Units for 2 Credit" )
-	PORT_DIPSETTING(      0xc000, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(      0xe000, "No Bonus" )
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x2000, "1" )
+	PORT_DIPSETTING(      0x4000, "2" )
+	PORT_DIPSETTING(      0x6000, "3" )
+	PORT_DIPSETTING(      0x8000, "4" )
+	PORT_DIPSETTING(      0xa000, "5" )
+	PORT_DIPSETTING(      0xc000, "6" )
+	PORT_DIPSETTING(      0xe000, "7" )
 
 PORT_START_TAG("AN_STEERING")
 	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
@@ -178,6 +182,38 @@ PORT_START_TAG("PPI_PORTD")
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( tx1a )
+	PORT_INCLUDE( tx1 )
+
+	PORT_MODIFY( "DSW" )
+	PORT_DIPNAME( 0x000c, 0x0000, "Game Cost" )
+	PORT_DIPSETTING(      0x0000, "1 Coin Unit for 1 Credit" )
+	PORT_DIPSETTING(      0x0004, "2 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x0008, "3 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x000c, "4 Coin Units for 1 Credit" )
+
+	PORT_DIPNAME( 0x0010, 0x0000, "Left Coin Mechanism" )
+	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
+	PORT_DIPSETTING(      0x0010, "1 Coin for 2 Coin Units" )
+
+	PORT_DIPNAME( 0x0060, 0x0000, "Right Coin Mechanism" )
+	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
+	PORT_DIPSETTING(      0x0020, "1 Coin for 4 Coin Units" )
+	PORT_DIPSETTING(      0x0040, "1 Coin for 5 Coin Units" )
+	PORT_DIPSETTING(      0x0060, "1 Coin for 6 Coin Units" )
+
+	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )
+	PORT_DIPSETTING(      0x0000, "No Bonus" )
+	PORT_DIPSETTING(      0x2000, "2 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x4000, "3 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x6000, "4 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x8000, "5 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0xa000, "4 Coin Units for 2 Credit" )
+	PORT_DIPSETTING(      0xc000, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(      0xe000, "No Bonus" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( buggyboy )
 PORT_START_TAG("DSW")
 	/* Dipswitch 0 is unconnected */
@@ -195,11 +231,11 @@ PORT_START_TAG("DSW")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0030, 0x0030, "Time Rank" )
-	PORT_DIPSETTING(      0x0000, "A (Short)" )
+	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )
+	PORT_DIPSETTING(      0x0000, "A (Longest)" )
 	PORT_DIPSETTING(      0x0010, "B" )
 	PORT_DIPSETTING(      0x0020, "C" )
-	PORT_DIPSETTING(      0x0030, "D (Long)" )
+	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
 
 	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )
 	PORT_DIPSETTING(      0x0000, "A (Easy)")
@@ -279,11 +315,11 @@ PORT_START_TAG("DSW")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0030, 0x0030, "Time Rank" )
-	PORT_DIPSETTING(      0x0000, "A (Short)" )
+	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )
+	PORT_DIPSETTING(      0x0000, "A (Longest)" )
 	PORT_DIPSETTING(      0x0010, "B" )
 	PORT_DIPSETTING(      0x0020, "C" )
-	PORT_DIPSETTING(      0x0030, "D (Long)" )
+	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
 
 	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )
 	PORT_DIPSETTING(      0x0000, "A (Easy)")
@@ -579,7 +615,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct AY8910interface tx1_ay8910_interface =
+static const struct AY8910interface tx1_ay8910_interface =
 {
 	/* TODO */
 	0,
@@ -590,7 +626,7 @@ static struct AY8910interface tx1_ay8910_interface =
 
 
 /* YM2149 IC19 */
-static struct AY8910interface buggyboy_ym2149_interface_1 =
+static const struct AY8910interface buggyboy_ym2149_interface_1 =
 {
 	input_port_1_r,
 	input_port_2_r,
@@ -599,7 +635,7 @@ static struct AY8910interface buggyboy_ym2149_interface_1 =
 };
 
 /* YM2149 IC24 */
-static struct AY8910interface buggyboy_ym2149_interface_2 =
+static const struct AY8910interface buggyboy_ym2149_interface_2 =
 {
 	0,
 	0,
@@ -613,7 +649,7 @@ static WRITE8_HANDLER( tx1_coin_cnt )
 	coin_counter_w(1, data & 0x40);
 }
 
-ppi8255_interface tx1_ppi8255_intf =
+const ppi8255_interface tx1_ppi8255_intf =
 {
 	1,
 	{ tx1_ppi_porta_r },         /* Accelerator and brake */
@@ -624,7 +660,7 @@ ppi8255_interface tx1_ppi8255_intf =
 	{ tx1_coin_cnt },
 };
 
-static struct CustomSound_interface tx1_custom_interface =
+static const struct CustomSound_interface tx1_custom_interface =
 {
 	tx1_sh_start,
 	NULL,
@@ -632,7 +668,7 @@ static struct CustomSound_interface tx1_custom_interface =
 };
 
 /* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
-ppi8255_interface buggyboy_ppi8255_intf =
+const ppi8255_interface buggyboy_ppi8255_intf =
 {
 	1,
 	{ input_port_1_r },
@@ -643,7 +679,7 @@ ppi8255_interface buggyboy_ppi8255_intf =
 	{ 0 },
 };
 
-static struct CustomSound_interface bb_custom_interface =
+static const struct CustomSound_interface bb_custom_interface =
 {
 	buggyboy_sh_start,
 	NULL,
@@ -1193,6 +1229,6 @@ ROM_END
  *************************************/
 
 GAME( 1983, tx1,      0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1",                                   GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1983, tx1a,     tx1,      tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1983, tx1a,     tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1985, buggyboy, buggybjr, buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (Cockpit)",        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1986, buggybjr, 0,        buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (Upright)", 0 )

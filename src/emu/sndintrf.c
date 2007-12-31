@@ -26,11 +26,7 @@
 
 #define VERBOSE			(0)
 
-#if VERBOSE
-#define VPRINTF(x) mame_printf_debug x
-#else
-#define VPRINTF(x)
-#endif
+#define VPRINTF(x) do { if (VERBOSE) mame_printf_debug x; } while (0)
 
 
 
@@ -164,7 +160,6 @@ void sid6581_get_info(void *token, UINT32 state, sndinfo *info);
 void sid8580_get_info(void *token, UINT32 state, sndinfo *info);
 void sp0256_get_info(void *token, UINT32 state, sndinfo *info);
 void s14001a_get_info(void *token, UINT32 state, sndinfo *info);
-void m58817_get_info(void *token, UINT32 state, sndinfo *info);
 
 void filter_volume_get_info(void *token, UINT32 state, sndinfo *info);
 void filter_rc_get_info(void *token, UINT32 state, sndinfo *info);
@@ -444,9 +439,6 @@ static const struct
 #endif
 #if (HAS_SP0256)
 	{ SOUND_SP0256, sp0256_get_info },
-#endif
-#if (HAS_M58817)
-	{ SOUND_M58817, m58817_get_info },
 #endif
 
 	{ SOUND_FILTER_VOLUME, filter_volume_get_info },
