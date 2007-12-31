@@ -27,7 +27,7 @@
 
 #define BEAM_DY			3
 #define BEAM_DX			3
-#define BEAM_XOFFS		20		/* table in the code indicates an offset of 20 with a beam height of 7 */
+#define BEAM_XOFFS		40		/* table in the code indicates an offset of 20 with a beam height of 7 */
 
 static UINT32 			gun_control;
 static UINT8 			gun_irq_state;
@@ -35,6 +35,8 @@ static emu_timer *		gun_timer[2];
 static INT32 			gun_x[2], gun_y[2];
 
 static UINT32 *ram_base;
+static UINT32 *zpram;
+static size_t zpram_size;
 static UINT8 cmos_protected;
 
 static emu_timer *timer[2];
@@ -63,6 +65,8 @@ static MACHINE_RESET( midzeus )
 
 	gun_timer[0] = timer_alloc(invasn_gun_callback, NULL);
 	gun_timer[1] = timer_alloc(invasn_gun_callback, NULL);
+
+	cmos_protected = TRUE;
 }
 
 
@@ -75,7 +79,7 @@ static MACHINE_RESET( midzeus )
 
 static WRITE32_HANDLER( cmos_protect_w )
 {
-	cmos_protected = 0;
+	cmos_protected = FALSE;
 }
 
 
@@ -83,12 +87,48 @@ static WRITE32_HANDLER( cmos_w )
 {
 	if (!cmos_protected)
 		COMBINE_DATA(generic_nvram32 + offset);
+	cmos_protected = TRUE;
 }
 
 
 static READ32_HANDLER( cmos_r )
 {
 	return generic_nvram32[offset];
+}
+
+
+static WRITE32_HANDLER( zpram_w )
+{
+	/* ZPRAM seems to use the same protection control as CMOS */
+//  if (!cmos_protected)
+		COMBINE_DATA(zpram + offset);
+	cmos_protected = TRUE;
+}
+
+
+static READ32_HANDLER( zpram_r )
+{
+	return zpram[offset] | 0xffffff00;
+}
+
+
+static NVRAM_HANDLER( zeus2_nvram )
+{
+	if (read_or_write)
+	{
+		mame_fwrite(file, generic_nvram, generic_nvram_size);
+		mame_fwrite(file, zpram, zpram_size);
+	}
+	else if (file)
+	{
+		mame_fread(file, generic_nvram, generic_nvram_size);
+		mame_fread(file, zpram, zpram_size);
+	}
+	else
+	{
+		memset(generic_nvram, 0xff, generic_nvram_size);
+		memset(zpram, 0xff, zpram_size);
+	}
 }
 
 
@@ -138,6 +178,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 }
 
 
+
 /*************************************
  *
  *  Lightgun handling
@@ -146,6 +187,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 
 static void update_gun_irq(void)
 {
+	/* low 2 bits of gun_control seem to enable IRQs */
 	if (gun_irq_state & gun_control & 0x03)
 		cpunum_set_input_line(0, 3, ASSERT_LINE);
 	else
@@ -158,9 +200,11 @@ static TIMER_CALLBACK( invasn_gun_callback )
 	int player = param;
 	int beamy = video_screen_get_vpos(0);
 
+	/* set the appropriate IRQ in the internal gun control and update */
 	gun_irq_state |= 0x01 << player;
 	update_gun_irq();
 
+	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
 	if (beamy <= machine->screen[0].visarea.max_y && beamy <= gun_y[player] + BEAM_DY)
 		timer_adjust(gun_timer[player], video_screen_get_time_until_pos(0, beamy, MAX(0, gun_x[player] - BEAM_DX)), player, attotime_never);
@@ -197,6 +241,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 	}
 }
 
+
 static READ32_HANDLER( invasn_gun_r )
 {
 	int beamx = video_screen_get_hpos(0);
@@ -215,6 +260,7 @@ static READ32_HANDLER( invasn_gun_r )
 }
 
 
+
 /*************************************
  *
  *  Memory maps
@@ -225,6 +271,7 @@ static READ32_HANDLER( invasn_gun_r )
 // read 8d0003, check bit 1, skip some stuff if 0
 // write junk to 9e0000
 
+static UINT32 *unknown_8a0000;
 static UINT32 *unknown_8d0000;
 static READ32_HANDLER( unknown_8d0000_r )
 {
@@ -232,8 +279,32 @@ static READ32_HANDLER( unknown_8d0000_r )
 }
 static WRITE32_HANDLER( unknown_8d0000_w )
 {
-	logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x8d0000 + offset, data);
+//  logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x8d0000 + offset, data);
 	COMBINE_DATA(&unknown_8d0000[offset]);
+}
+static WRITE32_HANDLER( unknown_9d0000_w )
+{
+//  logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x9d0000 + offset, data);
+	COMBINE_DATA(&unknown_8d0000[offset]);
+}
+
+static WRITE32_HANDLER( rombank_select_w )
+{
+	memory_set_bank(1, data);
+}
+
+static READ32_HANDLER( unknown_8a0000_r )
+{
+	logerror("%06X:unknown_8a000_r(%02X)\n", activecpu_get_pc(), offset);
+	if (offset == 0)
+		return 0x30313042;
+	return unknown_8a0000[offset];
+}
+
+static WRITE32_HANDLER( unknown_8a0000_w )
+{
+	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", activecpu_get_pc(),  offset, data);
+	COMBINE_DATA(&unknown_8a0000[offset]);
 }
 
 
@@ -245,6 +316,7 @@ static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x9d0000, 0x9d0001) AM_WRITE(unknown_9d0000_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
@@ -258,12 +330,16 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
 	AM_RANGE(0x880000, 0x8801ff) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
+	AM_RANGE(0x8a0000, 0x8a0027) AM_READWRITE(unknown_8a0000_r, unknown_8a0000_w) AM_BASE(&unknown_8a0000)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
+	AM_RANGE(0x8d0005, 0x8d0005) AM_WRITE(rombank_select_w)
+	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_BASE(&zpram) AM_SIZE(&zpram_size) AM_MIRROR(0x020000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
-	AM_RANGE(0xa00000, 0xffffff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(1) AM_REGION(REGION_USER2, 0)
 ADDRESS_MAP_END
 
 
@@ -406,7 +482,7 @@ static INPUT_PORTS_START( invasn )
 	PORT_DIPNAME( 0x0040, 0x0040, "Flip Y" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0080, 0x0000, "Test Switch" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 	PORT_DIPNAME( 0x0100, 0x0100, "Mirrored Display" )
@@ -478,58 +554,58 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( crusnexo )
 	PORT_START	    /* DS1 */
- 	PORT_DIPNAME( 0x0001, 0x0001, "Game Type" )	/* Manual states "*DIP 1, Switch 1 MUST be set */
- 	PORT_DIPSETTING(      0x0001, "Dedicated" )	/*   to OFF position for proper operation" */
- 	PORT_DIPSETTING(      0x0000, "Kit" )
- 	PORT_DIPNAME( 0x0002, 0x0002, "Seat Motion" )	/* For dedicated Sit Down models with Motion Seat */
-  	PORT_DIPSETTING(      0x0002, DEF_STR( Off ))
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Cabinet ))
- 	PORT_DIPSETTING(      0x0004, "Stand Up" )
- 	PORT_DIPSETTING(      0x0000, "Sit Down" )
- 	PORT_DIPNAME( 0x0008, 0x0008, "Wheel Invert" )
-  	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-  	PORT_DIPSETTING(      0x0008, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ))	/* Manual lists this dip as Unused */
- 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ))
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0020, 0x0020, "Link" )
- 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ))
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x00c0, 0x00c0, "Linking I.D.")
- 	PORT_DIPSETTING(      0x00c0, "Master #1" )
- 	PORT_DIPSETTING(      0x0080, "Slave #2" )
- 	PORT_DIPSETTING(      0x0040, "Slave #3" )
- 	PORT_DIPSETTING(      0x0000, "Slave #4" )
- 	PORT_DIPNAME( 0x1f00, 0x1f00, "Country Code" )
- 	PORT_DIPSETTING(      0x1f00, DEF_STR( USA ) )
- 	PORT_DIPSETTING(      0x1e00, "Germany" )
- 	PORT_DIPSETTING(      0x1d00, "France" )
- 	PORT_DIPSETTING(      0x1c00, "Canada" )
- 	PORT_DIPSETTING(      0x1b00, "Switzerland" )
- 	PORT_DIPSETTING(      0x1a00, "Italy" )
- 	PORT_DIPSETTING(      0x1900, "UK" )
- 	PORT_DIPSETTING(      0x1800, "Spain" )
- 	PORT_DIPSETTING(      0x1700, "Austrilia" )
- 	PORT_DIPSETTING(      0x1600, DEF_STR( Japan ) )
- 	PORT_DIPSETTING(      0x1500, "Taiwan" )
- 	PORT_DIPSETTING(      0x1400, "Austria" )
- 	PORT_DIPSETTING(      0x1300, "Belgium" )
- 	PORT_DIPSETTING(      0x0f00, "Sweden" )
- 	PORT_DIPSETTING(      0x0e00, "Findland" )
-	PORT_DIPSETTING(      0x0d00, "Netherlands" )
- 	PORT_DIPSETTING(      0x0c00, "Norway" )
- 	PORT_DIPSETTING(      0x0b00, "Denmark" )
- 	PORT_DIPSETTING(      0x0a00, "Hungary" )
- 	PORT_DIPSETTING(      0x0800, "General" )
- 	PORT_DIPNAME( 0x6000, 0x6000, "Coin Mode" )
- 	PORT_DIPSETTING(      0x6000, "Mode 1" ) /* USA1/GER1/FRA1/SPN1/AUSTRIA1/GEN1/CAN1/SWI1/ITL1/JPN1/TWN1/BLGN1/NTHRLND1/FNLD1/NRWY1/DNMK1/HUN1 */
- 	PORT_DIPSETTING(      0x4000, "Mode 2" ) /* USA3/GER1/FRA1/SPN1/AUSTRIA1/GEN3/CAN2/SWI2/ITL2/JPN2/TWN2/BLGN2/NTHRLND2 */
- 	PORT_DIPSETTING(      0x2000, "Mode 3" ) /* USA7/GER1/FRA1/SPN1/AUSTRIA1/GEN5/CAN3/SWI3/ITL3/JPN3/TWN3/BLGN3 */
+ 	PORT_DIPNAME( 0x001f, 0x001f, "Country Code" )
+ 	PORT_DIPSETTING(      0x001f, DEF_STR( USA ) )
+ 	PORT_DIPSETTING(      0x001e, "Germany" )
+ 	PORT_DIPSETTING(      0x001d, "France" )
+ 	PORT_DIPSETTING(      0x001c, "Canada" )
+ 	PORT_DIPSETTING(      0x001b, "Switzerland" )
+ 	PORT_DIPSETTING(      0x001a, "Italy" )
+ 	PORT_DIPSETTING(      0x0019, "UK" )
+ 	PORT_DIPSETTING(      0x0018, "Spain" )
+ 	PORT_DIPSETTING(      0x0017, "Austrilia" )
+ 	PORT_DIPSETTING(      0x0016, DEF_STR( Japan ) )
+ 	PORT_DIPSETTING(      0x0015, "Taiwan" )
+ 	PORT_DIPSETTING(      0x0014, "Austria" )
+ 	PORT_DIPSETTING(      0x0013, "Belgium" )
+ 	PORT_DIPSETTING(      0x000f, "Sweden" )
+ 	PORT_DIPSETTING(      0x000e, "Findland" )
+	PORT_DIPSETTING(      0x000d, "Netherlands" )
+ 	PORT_DIPSETTING(      0x000c, "Norway" )
+ 	PORT_DIPSETTING(      0x000b, "Denmark" )
+ 	PORT_DIPSETTING(      0x000a, "Hungary" )
+ 	PORT_DIPSETTING(      0x0008, "General" )
+ 	PORT_DIPNAME( 0x0060, 0x0060, "Coin Mode" )
+ 	PORT_DIPSETTING(      0x0060, "Mode 1" ) /* USA1/GER1/FRA1/SPN1/AUSTRIA1/GEN1/CAN1/SWI1/ITL1/JPN1/TWN1/BLGN1/NTHRLND1/FNLD1/NRWY1/DNMK1/HUN1 */
+ 	PORT_DIPSETTING(      0x0040, "Mode 2" ) /* USA3/GER1/FRA1/SPN1/AUSTRIA1/GEN3/CAN2/SWI2/ITL2/JPN2/TWN2/BLGN2/NTHRLND2 */
+ 	PORT_DIPSETTING(      0x0020, "Mode 3" ) /* USA7/GER1/FRA1/SPN1/AUSTRIA1/GEN5/CAN3/SWI3/ITL3/JPN3/TWN3/BLGN3 */
  	PORT_DIPSETTING(      0x0000, "Mode 4" ) /* USA8/GER1/FRA1/SPN1/AUSTRIA1/GEN7 */
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Switch" )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
+	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x0100, 0x0100, "Game Type" )	/* Manual states "*DIP 1, Switch 1 MUST be set */
+ 	PORT_DIPSETTING(      0x0100, "Dedicated" )	/*   to OFF position for proper operation" */
+ 	PORT_DIPSETTING(      0x0000, "Kit" )
+ 	PORT_DIPNAME( 0x0200, 0x0200, "Seat Motion" )	/* For dedicated Sit Down models with Motion Seat */
+  	PORT_DIPSETTING(      0x0200, DEF_STR( Off ))
+  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ))
+ 	PORT_DIPSETTING(      0x0400, "Stand Up" )
+ 	PORT_DIPSETTING(      0x0000, "Sit Down" )
+ 	PORT_DIPNAME( 0x0800, 0x0800, "Wheel Invert" )
+  	PORT_DIPSETTING(      0x0800, DEF_STR( Off ))
+  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x1000, 0x1000, "ROM Configuration" )	/* Manual lists this dip as Unused */
+ 	PORT_DIPSETTING(      0x1000, "32M ROM Normal" )
+  	PORT_DIPSETTING(      0x0000, "16M ROM Split Active" )
+ 	PORT_DIPNAME( 0x2000, 0x2000, "Link" )
+ 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ))
+  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0xc000, 0xc000, "Linking I.D.")
+ 	PORT_DIPSETTING(      0xc000, "Master #1" )
+ 	PORT_DIPSETTING(      0x8000, "Slave #2" )
+ 	PORT_DIPSETTING(      0x4000, "Slave #3" )
+ 	PORT_DIPSETTING(      0x0000, "Slave #4" )
 
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -546,35 +622,36 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 
 	PORT_START /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY /* Radio Switch */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* View 2 */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* View 3 */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* View 1 */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_8WAY /* Gear 1 */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_8WAY /* Gear 2 */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_8WAY /* Gear 3 */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY /* Gear 4 */
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* Not Used */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* Not Used */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* Not Used */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* Radio Switch */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* View 1 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* View 2 */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* View 3 */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) /* View 4 */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) 	/* Gear 1 */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) 	/* Gear 2 */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) 	/* Gear 3 */
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) 	/* Gear 4 */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)	/* keypad 3 */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)	/* keypad 1 */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -663,6 +740,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
+	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
@@ -681,6 +759,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* No Connection */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* No Connection */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
@@ -691,6 +770,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -708,18 +788,16 @@ static MACHINE_DRIVER_START( midzeus )
 	MDRV_CPU_PROGRAM_MAP(zeus_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(midzeus)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512/*+256*/, 278/*+256*/)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399/*+256*/, 0, 255/*+256*/)
 	MDRV_PALETTE_LENGTH(32768)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_VIDEO_START(midzeus)
 	MDRV_VIDEO_UPDATE(midzeus)
@@ -730,11 +808,27 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( midzeus2 )
-	MDRV_IMPORT_FROM(midzeus)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_ADD_TAG("main", TMS32032, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zeus2_map,0)
+	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+
+	MDRV_MACHINE_RESET(midzeus)
+	MDRV_NVRAM_HANDLER(zeus2_nvram)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+
+	MDRV_VIDEO_START(midzeus2)
+	MDRV_VIDEO_UPDATE(midzeus2)
+
+	/* sound hardware */
+	MDRV_IMPORT_FROM(dcs2_audio_2104)
 MACHINE_DRIVER_END
 
 
@@ -810,23 +904,25 @@ ROM_START( crusnexo )
 	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
 	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
 
-	ROM_REGION32_LE( 0x3000000, REGION_USER1, 0 )
+	ROM_REGION32_LE( 0x0800000, REGION_USER1, 0 )
 	ROM_LOAD32_WORD( "exotica.u10", 0x0000000, 0x200000, CRC(65450140) SHA1(cad41a2cad48426de01feb78d3f71f768e3fc872) )
 	ROM_LOAD32_WORD( "exotica.u11", 0x0000002, 0x200000, CRC(e994891f) SHA1(bb088729b665864c7f3b79b97c3c86f9c8f68770) )
 	ROM_LOAD32_WORD( "exotica.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) )
 	ROM_LOAD32_WORD( "exotica.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) )
-	ROM_LOAD32_WORD( "exotica.u14", 0x0800000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
-	ROM_LOAD32_WORD( "exotica.u15", 0x0800002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
-	ROM_LOAD32_WORD( "exotica.u16", 0x1000000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
-	ROM_LOAD32_WORD( "exotica.u17", 0x1000002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
-	ROM_LOAD32_WORD( "exotica.u18", 0x1800000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
-	ROM_LOAD32_WORD( "exotica.u19", 0x1800002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
-	ROM_LOAD32_WORD( "exotica.u20", 0x1c00002, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
-	ROM_LOAD32_WORD( "exotica.u21", 0x1c00002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
-	ROM_LOAD32_WORD( "exotica.u22", 0x2000002, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
-	ROM_LOAD32_WORD( "exotica.u23", 0x2000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
-	ROM_LOAD32_WORD( "exotica.u24", 0x2800002, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
-	ROM_LOAD32_WORD( "exotica.u25", 0x2800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+
+	ROM_REGION32_LE( 0x3000000, REGION_USER2, 0 )
+	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "exotica.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "exotica.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "exotica.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "exotica.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "exotica.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "exotica.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
+	ROM_LOAD32_WORD( "exotica.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
+	ROM_LOAD32_WORD( "exotica.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
+	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
 ROM_END
 
 
@@ -836,17 +932,19 @@ ROM_START( thegrid )
 	ROM_LOAD( "the_grid.u3", 0x400000, 0x400000, CRC(40be7585) SHA1(e481081edffa07945412a6eab17b4d3e7b42cfd3) )
 	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
 
-	ROM_REGION32_LE( 0x3000000, REGION_USER1, 0 )
+	ROM_REGION32_LE( 0x0800000, REGION_USER1, 0 )
  	ROM_LOAD32_WORD( "thegrid-11.u10", 0x0000000, 0x100000, CRC(87ea0e9e) SHA1(618de2ca87b7a3e0225d1f7e65f8fc1356de1421) )
 	ROM_LOAD32_WORD( "thegrid-11.u11", 0x0000002, 0x100000, CRC(73d84b1a) SHA1(8dcfcab5ff64f46f8486e6439a10d91ad26fd48a) )
 	ROM_LOAD32_WORD( "thegrid-11.u12", 0x0200000, 0x100000, CRC(78d16ca1) SHA1(7b893ec8af2f44d8bc293861fd8622d68d41ccbe) )
 	ROM_LOAD32_WORD( "thegrid-11.u13", 0x0200002, 0x100000, CRC(8e00b400) SHA1(96581c5da62afc19e6d69b2352b3166665cb9918) )
-	ROM_LOAD32_WORD( "the_grid.u18",   0x0400000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
-	ROM_LOAD32_WORD( "the_grid.u19",   0x0400002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
-	ROM_LOAD32_WORD( "the_grid.u20",   0x0c00002, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
-	ROM_LOAD32_WORD( "the_grid.u21",   0x0c00002, 0x400000, CRC(48c03f8e) SHA1(50790bdae9f2234ffb4914c2c5c16374e3508b47) )
-	ROM_LOAD32_WORD( "the_grid.u22",   0x1400002, 0x400000, CRC(84c3a8b6) SHA1(de0dcf9daf7ada7a6952b9e29a29571b2aa9d0b2) )
-	ROM_LOAD32_WORD( "the_grid.u23",   0x1400002, 0x400000, CRC(f48ef409) SHA1(79d74b4fe38b06a02ae0351d13d7f0a7ed0f0c87) )
+
+	ROM_REGION32_LE( 0x3000000, REGION_USER2, 0 )
+	ROM_LOAD32_WORD( "the_grid.u18",   0x0000000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
+	ROM_LOAD32_WORD( "the_grid.u19",   0x0000002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
+	ROM_LOAD32_WORD( "the_grid.u20",   0x0800000, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
+	ROM_LOAD32_WORD( "the_grid.u21",   0x0800002, 0x400000, CRC(48c03f8e) SHA1(50790bdae9f2234ffb4914c2c5c16374e3508b47) )
+	ROM_LOAD32_WORD( "the_grid.u22",   0x1000000, 0x400000, CRC(84c3a8b6) SHA1(de0dcf9daf7ada7a6952b9e29a29571b2aa9d0b2) )
+	ROM_LOAD32_WORD( "the_grid.u23",   0x1000002, 0x400000, CRC(f48ef409) SHA1(79d74b4fe38b06a02ae0351d13d7f0a7ed0f0c87) )
 ROM_END
 
 
@@ -860,7 +958,7 @@ ROM_END
 static DRIVER_INIT( mk4 )
 {
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 94, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 97, NULL);
 	midway_ioasic_set_shuffle_state(1);
 }
 
@@ -868,7 +966,7 @@ static DRIVER_INIT( mk4 )
 static DRIVER_INIT( invasn )
 {
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 97, NULL);
 	memory_install_readwrite32_handler(0, ADDRESS_SPACE_PROGRAM, 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
 }
 
@@ -876,7 +974,8 @@ static DRIVER_INIT( invasn )
 static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* unknown */, 94, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
+	memory_configure_bank(1, 0, 3, memory_region(REGION_USER2), 0x400000*4);
 }
 
 
@@ -884,7 +983,8 @@ static DRIVER_INIT( thegrid )
 {
 	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* unknown */, 94, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
+	memory_configure_bank(1, 0, 3, memory_region(REGION_USER2), 0x400000*4);
 }
 
 
@@ -897,6 +997,6 @@ static DRIVER_INIT( thegrid )
 
 GAME( 1997, mk4,      0,     midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (3.0)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, mk4a,     mk4,   midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (2.1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, invasn,   0,     midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion (Midway)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, invasn,   0,     midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion (Midway)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, crusnexo, 0,     midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 2001, thegrid,  0,     midzeus2, thegrid,  thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )

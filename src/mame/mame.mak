@@ -931,7 +931,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/midwunit.o $(MACHINE)/midwunit.o \
 	$(DRIVERS)/midxunit.o \
 	$(DRIVERS)/midyunit.o $(MACHINE)/midyunit.o $(VIDEO)/midyunit.o \
-	$(DRIVERS)/midzeus.o $(VIDEO)/midzeus.o \
+	$(DRIVERS)/midzeus.o $(VIDEO)/midzeus.o $(VIDEO)/midzeus2.o \
 	$(DRIVERS)/omegrace.o \
 	$(DRIVERS)/seattle.o \
 	$(DRIVERS)/tmaster.o \
@@ -1343,7 +1343,7 @@ $(MAMEOBJ)/taito.a: \
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/lockon.o \
 	$(DRIVERS)/tatsumi.o $(MACHINE)/tatsumi.o $(VIDEO)/tatsumi.o \
-	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(VIDEO)/tx1.o \
+	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(AUDIO)/tx1.o $(VIDEO)/tx1.o \
 
 $(MAMEOBJ)/tch.a: \
 	$(DRIVERS)/kickgoal.o $(VIDEO)/kickgoal.o \
@@ -1488,7 +1488,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
-	$(DRIVERS)/afega.o $(VIDEO)/afega.o \
 	$(DRIVERS)/ambush.o $(VIDEO)/ambush.o \
 	$(DRIVERS)/ampoker.o $(VIDEO)/ampoker.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
