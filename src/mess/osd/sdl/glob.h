@@ -37,6 +37,9 @@
  * $FreeBSD: src/sys/sys/cdefs.h,v 1.28.2.1 2000/03/18 23:30:03 jasone Exp $
  */
 
+#ifndef _SYS_CDEFS_H	/* guard against newer GLIBC too */
+#define _SYS_CDEFS_H
+
 #ifndef	_SYS_CDEFS_H_
 #define	_SYS_CDEFS_H_
 
@@ -211,6 +214,7 @@
 #endif
 
 #endif /* !_SYS_CDEFS_H_ */
+#endif /* ~_SYS_CDEFS_H */
 
 /*
  * Copyright (c) 1989, 1993
@@ -300,3 +304,4 @@ void	globfree __P((glob_t *));
 __END_DECLS
 
 #endif /* !_GLOB_H_ */
+
