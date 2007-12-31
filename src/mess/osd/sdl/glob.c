@@ -156,13 +156,13 @@ typedef char Char;
 
 static int	 compare __P((const void *, const void *));
 static void	 g_Ctoc __P((const Char *, char *));
-static int	 g_lstat __P((Char *, struct stat *, glob_t *));
+//static int	 g_lstat __P((Char *, struct stat *, glob_t *));
 static osd_directory	*g_opendir __P((Char *, glob_t *));
-static Char	*g_strchr __P((Char *, int));
+static Char	*g_strchr __P((const Char *, int));
 #ifdef notdef
 static Char	*g_strcat __P((Char *, const Char *));
 #endif
-static int	 g_stat __P((Char *, struct stat *, glob_t *));
+//static int	 g_stat __P((Char *, struct stat *, glob_t *));
 static int	 glob0 __P((const Char *, glob_t *));
 static int	 glob1 __P((Char *, glob_t *));
 static int	 glob2 __P((Char *, Char *, Char *, glob_t *));
@@ -239,7 +239,7 @@ static int globexp1(pattern, pglob)
 	if (pattern[0] == LBRACE && pattern[1] == RBRACE && pattern[2] == EOS)
 		return glob0(pattern, pglob);
 
-	while ((ptr = (const Char *) g_strchr((Char *) ptr, LBRACE)) != NULL)
+	while ((ptr = (const Char *) g_strchr(ptr, LBRACE)) != NULL)
 		if (!globexp2(ptr, pattern, pglob, &rv))
 			return rv;
 
@@ -798,7 +798,7 @@ g_opendir(str, pglob)
 
 	return osd_opendir(buf);
 }
-
+#if 0
 static int
 g_lstat(fn, sb, pglob)
 	register Char *fn;
@@ -826,15 +826,15 @@ g_stat(fn, sb, pglob)
 		return((*pglob->gl_stat)(buf, sb));
 	return(stat(buf, sb));
 }
-
+#endif
 static Char *
 g_strchr(str, ch)
-	Char *str;
+	const Char *str;
 	int ch;
 {
 	do {
 		if (*str == ch)
-			return (str);
+			return ((Char *)str);
 	} while (*str++);
 	return (NULL);
 }
