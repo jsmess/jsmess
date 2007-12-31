@@ -973,6 +973,11 @@ MACHINE_RESET( bebox )
 	ide_controller_reset(0);
 }
 
+static void bebox_exit(running_machine *machine)
+{
+	lsi53c810_exit(&scsi53c810_intf);
+}
+
 DRIVER_INIT( bebox )
 {
 	int cpu;
@@ -1024,6 +1029,7 @@ DRIVER_INIT( bebox )
 
 	/* SCSI */
 	lsi53c810_init(&scsi53c810_intf);
+	add_exit_callback(machine, bebox_exit);
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
 	 * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then

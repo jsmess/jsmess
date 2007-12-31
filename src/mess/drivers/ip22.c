@@ -1436,6 +1436,11 @@ static const struct WD33C93interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
+static void ip225015_exit(running_machine *machine)
+{
+	wd33c93_exit(&scsi_intf);
+}
+
 static DRIVER_INIT( ip225015 )
 {
 	struct kbdc8042_interface at8042 =
@@ -1451,6 +1456,7 @@ static DRIVER_INIT( ip225015 )
 
 	// SCSI init
 	wd33c93_init(&scsi_intf);
+	add_exit_callback(machine, ip225015_exit);
 
 	nIOC_ParReadCnt = 0;
 }
