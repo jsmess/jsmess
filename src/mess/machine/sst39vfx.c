@@ -12,7 +12,7 @@
 #include "sst39vfx.h"
 
 #define LOG_LEVEL  1
-#define _logerror(level,...)  if (LOG_LEVEL > level) logerror(__VA_ARGS__)
+#define _logerror(level,x)  if (LOG_LEVEL > level) logerror x
 
 typedef struct
 {
@@ -27,7 +27,7 @@ static void sst39vfx_state_save( void);
 
 void sst39vfx_init( int type, int cpu_datawidth, int cpu_endianess)
 {
-	_logerror( 0, "sst39vfx_init (%d)\n", type);
+	_logerror( 0, ("sst39vfx_init (%d)\n", type));
 	memset( &flash, 0, sizeof( flash));
 	switch (type)
 	{
@@ -45,13 +45,13 @@ void sst39vfx_init( int type, int cpu_datawidth, int cpu_endianess)
 
 void sst39vfx_exit( void)
 {
-	_logerror( 0, "sst39vfx_exit\n");
+	_logerror( 0, ("sst39vfx_exit\n"));
 	free( flash.data);
 }
 
 void sst39vfx_reset( void)
 {
-	_logerror( 0, "sst39vfx_reset\n");
+	_logerror( 0, ("sst39vfx_reset\n"));
 }
 
 static void sst39vfx_state_save( void)
@@ -78,7 +78,7 @@ UINT32 sst39vfx_get_size( void)
 /*
 READ8_HANDLER( sst39vfx_r )
 {
-	_logerror( 1, "sst39vfx_r (%08X)\n", offset);
+	_logerror( 1, ("sst39vfx_r (%08X)\n", offset));
 	if (flash.swap) offset = OFFSET_SWAP( offset, flash.swap);
 	return flash.data[offset];
 }
@@ -87,7 +87,7 @@ READ8_HANDLER( sst39vfx_r )
 /*
 WRITE8_HANDLER( sst39vfx_w )
 {
-	_logerror( 1, "sst39vfx_w (%08X/%02X)\n", offset, data);
+	_logerror( 1, ("sst39vfx_w (%08X/%02X)\n", offset, data));
 	if (flash.swap) offset = OFFSET_SWAP( offset, flash.swap);
 	flash.data[offset] = data;
 }
@@ -107,14 +107,14 @@ static void sst39vfx_swap( void)
 
 void sst39vfx_load( mame_file *file)
 {
-	_logerror( 0, "sst39vfx_load (%p)\n", file);
+	_logerror( 0, ("sst39vfx_load (%p)\n", file));
 	mame_fread( file, flash.data, flash.size);
 	if (flash.swap) sst39vfx_swap();
 }
 
 void sst39vfx_save( mame_file *file)
 {
-	_logerror( 0, "sst39vfx_save (%p)\n", file);
+	_logerror( 0, ("sst39vfx_save (%p)\n", file));
 	if (flash.swap) sst39vfx_swap();
 	mame_fwrite( file, flash.data, flash.size);
 	if (flash.swap) sst39vfx_swap();
@@ -123,7 +123,7 @@ void sst39vfx_save( mame_file *file)
 /*
 NVRAM_HANDLER( sst39vfx )
 {
-	_logerror( 0, "nvram_handler_sst39vfx (%p/%d)\n", file, read_or_write);
+	_logerror( 0, ("nvram_handler_sst39vfx (%p/%d)\n", file, read_or_write));
 	if (read_or_write)
 	{
 		sst39vfx_save( file);

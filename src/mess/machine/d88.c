@@ -7,6 +7,8 @@
 
 #define d88image_MAX_DRIVES 4
 #define VERBOSE 1
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
 static d88image     d88image_drives[d88image_MAX_DRIVES];
 
 static void d88image_seek_callback(mess_image *img,int);
@@ -145,10 +147,8 @@ static int d88image_seek(d88image * w, UINT8 t, UINT8 h, UINT8 s)
 	offset = w->sects[t*2+h][s].offset;
 
 
-#if VERBOSE
-    logerror("d88image seek track:%d head:%d sector:%d-> offset #0x%08lX\n",
-             t, h, s, offset);
-#endif
+    LOG(("d88image seek track:%d head:%d sector:%d-> offset #0x%08lX\n",
+             t, h, s, offset));
 
 	if (offset > w->image_size)
 	{

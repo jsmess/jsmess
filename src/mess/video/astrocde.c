@@ -17,6 +17,9 @@
 
 #include <math.h> /* for sin() and cos() */
 
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
 unsigned char *astrocade_videoram;
 static int magic_expand_color, magic_control, magic_expand_flipflop, collision;
 
@@ -156,9 +159,7 @@ WRITE8_HANDLER ( astrocade_colour_split_w )
 
 	BackgroundData = ((data&0xc0) >> 6) * 0x55;
 
-#ifdef MAME_DEBUG
-    logerror("Colour split set to %02d\n",ColourSplit);
-#endif
+	LOG(("Colour split set to %02d\n",ColourSplit));
 }
 
 /* This selects commercial (high res, arcade) or
@@ -181,9 +182,7 @@ WRITE8_HANDLER ( astrocade_colour_register_w )
         	RightColourCheck = (Colour[0] << 24) | (Colour[1] << 16) | (Colour[2] < 8) | Colour[3];
 	}
 
-#ifdef MAME_DEBUG
-    logerror("Colour %01x set to %02x\n",offset,data);
-#endif
+	LOG(("Colour %01x set to %02x\n",offset,data));
 }
 
 WRITE8_HANDLER ( astrocade_colour_block_w )
@@ -192,9 +191,7 @@ WRITE8_HANDLER ( astrocade_colour_block_w )
 
 	Colour[color_reg_num] = data;
 
-#ifdef MAME_DEBUG
-    logerror("Colour block write: color %x set to %x\n", color_reg_num,data);
-#endif
+	LOG(("Colour block write: color %x set to %x\n", color_reg_num,data));
 
 	if (color_reg_num == 0)
 		color_reg_num = 7;
@@ -217,9 +214,7 @@ WRITE8_HANDLER ( astrocade_videoram_w )
 
 WRITE8_HANDLER ( astrocade_magic_expand_color_w )
 {
-#ifdef MAME_DEBUG
-//	logerror("%04x: magic_expand_color = %02x\n",cpu_getpc(),data);
-#endif
+	//LOG(("%04x: magic_expand_color = %02x\n",cpu_getpc(),data));
 
 	magic_expand_color = data;
 }
@@ -227,9 +222,8 @@ WRITE8_HANDLER ( astrocade_magic_expand_color_w )
 
 WRITE8_HANDLER ( astrocade_magic_control_w )
 {
-#ifdef MAME_DEBUG
-//	logerror("%04x: magic_control = %02x\n",cpu_getpc(),data);
-#endif
+	//LOG(("%04x: magic_control = %02x\n",cpu_getpc(),data));
+
 	magic_expand_flipflop = 0;	/* initialize the expand nibble */
 	LastShifter = 0;			/* clear the shifter */
 
@@ -240,9 +234,7 @@ WRITE8_HANDLER ( astrocade_magicram_w )
 {
 	unsigned int data1,shift,bits,bibits,stib,k,old_data;
 
-#ifdef MAME_DEBUG
-//	logerror("%04x: magicram_w(%04x) = %02x, magic_register = %02x\n",cpu_getpc(),offset,data,magic_control);
-#endif
+	//LOG(("%04x: magicram_w(%04x) = %02x, magic_register = %02x\n",cpu_getpc(),offset,data,magic_control));
 
 	if (magic_control & EXPAND_MASK)	/* expand mode */
 	{

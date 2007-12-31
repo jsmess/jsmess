@@ -9,19 +9,11 @@
 
 #define VERBOSE_DBG 0       /* general debug messages */
 
-#if VERBOSE_DBG
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
-#else
-#define DBG_LOG(n,m,a)
-#endif
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
-#if VERBOSE_PIO
 #define PIO_LOG(N,M,A) \
-	if(VERBOSE_PIO>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
-#else
-#define PIO_LOG(n,m,a)
-#endif
+	if(VERBOSE_PIO>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
 /*
 ibm xt bios

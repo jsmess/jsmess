@@ -9,7 +9,8 @@
 #include "sound/speaker.h"
 #include "image.h"
 
-#define KC_DEBUG
+#define KC_DEBUG 1
+#define LOG(x) do { if (KC_DEBUG) logerror x; } while (0)
 
 static int kc85_pio_data[2];
 
@@ -322,9 +323,8 @@ static const struct kc85_module *modules[256>>2];
 {
 	int port_upper;
 	int module_index;
-#ifdef KC_DEBUG
-	logerror("kc85 module r: %04x\n",offset);
-#endif
+
+	LOG(("kc85 module r: %04x\n",offset));
 
 	port_upper = (offset>>8) & 0x0ff;
 
@@ -480,7 +480,8 @@ static void	kc_cassette_set_motor(int motor_state)
 /* The basic transmit proceedure is working, keys are received */
 /* Todo: Key-repeat, and allowing the same key to be pressed twice! */
 
-//#define KC_KEYBOARD_DEBUG
+#define KC_KEYBOARD_DEBUG 0
+#define LOG_KBD(x) do { if (KC_KEYBOARD_DEBUG) logerror x; } while (0)
 
 /*
 
@@ -856,9 +857,7 @@ static TIMER_CALLBACK(kc_keyboard_transmit_timer_callback)
 		/* get current pulse state */
 		pulse_state = (keyboard_data.transmit_buffer[pulse_byte_count]>>pulse_bit_count) & 0x01;
 
-#ifdef KC_KEYBOARD_DEBUG
-		logerror("kc keyboard sending pulse: %02x\n",pulse_state);
-#endif
+		LOG_KBD(("kc keyboard sending pulse: %02x\n",pulse_state));
 
 		/* set pulse */
 		z80pio_bstb_w(0,pulse_state & kc_brdy);
@@ -1069,9 +1068,7 @@ static TIMER_CALLBACK(kc_keyboard_update)
 
 					/* generate fake code */
 					code = (i<<3) | b;
-#ifdef KC_KEYBOARD_DEBUG
-					logerror("code: %02x\n",code);
-#endif
+					LOG_KBD(("code: %02x\n",code));
 					kc_keyboard_queue_scancode(code);
 				}
 			}
@@ -1155,9 +1152,8 @@ static void kc85_4_update_0x08000(void)
 		}
 		else
 		{
-#ifdef KC_DEBUG
-			logerror("RAM8 write enabled\n");
-#endif
+			LOG(("RAM8 write enabled\n"));
+
 			/* ram8 is enabled and write enabled */
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, MWA8_BANK9);
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, MWA8_BANK10);
@@ -1167,9 +1163,8 @@ static void kc85_4_update_0x08000(void)
     }
     else
     {
-#ifdef KC_DEBUG
-		logerror("no memory at ram8\n");
-#endif
+		LOG(("no memory at ram8\n"));
+
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, MRA8_NOP);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, MRA8_NOP);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, MWA8_NOP);
@@ -1202,9 +1197,7 @@ static void kc85_4_update_0x00000(void)
 	/* access ram? */
 	if (kc85_pio_data[0] & (1<<1))
 	{
-#ifdef KC_DEBUG
-		logerror("ram0 enabled\n");
-#endif
+		LOG(("ram0 enabled\n"));
 
 		/* yes; set address of bank */
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MRA8_BANK1);
@@ -1214,18 +1207,14 @@ static void kc85_4_update_0x00000(void)
 		if ((kc85_pio_data[0] & (1<<3))==0)
 		{
 			/* yes */
-#ifdef KC_DEBUG
-			logerror("ram0 write protected\n");
-#endif
+			LOG(("ram0 write protected\n"));
 
 			/* ram is enabled and write protected */
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
 		}
 		else
 		{
-#ifdef KC_DEBUG
-			logerror("ram0 write enabled\n");
-#endif
+			LOG(("ram0 write enabled\n"));
 
 			/* ram is enabled and write enabled; and set address of bank */
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_BANK7);
@@ -1234,9 +1223,7 @@ static void kc85_4_update_0x00000(void)
 	}
 	else
 	{
-#ifdef KC_DEBUG
-		logerror("no memory at ram0!\n");
-#endif
+		LOG(("no memory at ram0!\n"));
 
 //		memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x013000);
 		/* ram is disabled */
@@ -1267,18 +1254,15 @@ static void kc85_4_update_0x04000(void)
 		if ((kc85_86_data & (1<<1))==0)
 		{
 			/* yes */
-#ifdef KC_DEBUG
-			logerror("ram4 write protected\n");
-#endif
+			LOG(("ram4 write protected\n"));
 
 			/* ram is enabled and write protected */
 			wh = MWA8_NOP;
 		}
 		else
 		{
-#ifdef KC_DEBUG
-			logerror("ram4 write enabled\n");
-#endif
+			LOG(("ram4 write enabled\n"));
+
 			/* ram is enabled and write enabled */
 			wh = MWA8_BANK8;
 			/* set address of bank */
@@ -1287,9 +1271,8 @@ static void kc85_4_update_0x04000(void)
 	}
 	else
 	{
-#ifdef KC_DEBUG
-		logerror("no memory at ram4!\n");
-#endif
+		LOG(("no memory at ram4!\n"));
+
 		/* ram is disabled */
 		rh = MRA8_NOP;
 		wh = MWA8_NOP;
@@ -1307,18 +1290,15 @@ static void kc85_4_update_0x0c000(void)
 	if (kc85_86_data & (1<<7))
 	{
 		/* CAOS rom takes priority */
-#ifdef KC_DEBUG
-		logerror("CAOS rom 0x0c000\n");
-#endif
+		LOG(("CAOS rom 0x0c000\n"));
+
 		memory_set_bankptr(5,memory_region(REGION_CPU1) + 0x012000);
 		rh = MRA8_BANK5;
 	}
 	else if (kc85_pio_data[0] & (1<<7))
 	{
-#ifdef KC_DEBUG
 		/* BASIC takes next priority */
-        logerror("BASIC rom 0x0c000\n");
-#endif
+        	LOG(("BASIC rom 0x0c000\n"));
 
         memory_set_bankptr(5, memory_region(REGION_CPU1) + 0x010000);
 		rh = MRA8_BANK5;
@@ -1327,7 +1307,7 @@ static void kc85_4_update_0x0c000(void)
 	{
 		if (kc85_module_rom)
 		{
-			logerror("module rom at 0xc000\n");
+			LOG(("module rom at 0xc000\n"));
 
 			memory_set_bankptr(5, kc85_module_rom);
 			rh = MRA8_BANK5;
@@ -1335,9 +1315,8 @@ static void kc85_4_update_0x0c000(void)
 		else
 		{
 
-#ifdef KC_DEBUG
-			logerror("No roms 0x0c000\n");
-#endif
+			LOG(("No roms 0x0c000\n"));
+
 			rh = MRA8_NOP;
 		}
 	}
@@ -1352,18 +1331,15 @@ static void kc85_4_update_0x0e000(void)
 	if (kc85_pio_data[0] & (1<<0))
 	{
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
-#ifdef KC_DEBUG
-		logerror("CAOS rom 0x0e000\n");
-#endif
+		LOG(("CAOS rom 0x0e000\n"));
 		/* read will access the rom */
 		memory_set_bankptr(6,memory_region(REGION_CPU1) + 0x013000);
 		rh = MRA8_BANK6;
 	}
 	else
 	{
-#ifdef KC_DEBUG
-		logerror("no rom 0x0e000\n");
-#endif
+		LOG(("no rom 0x0e000\n"));
+
 		rh = MRA8_NOP;
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, rh);
@@ -1430,9 +1406,7 @@ WRITE8_HANDLER ( kc85_4_pio_data_w )
 
 WRITE8_HANDLER ( kc85_4_86_w )
 {
-#ifdef KC_DEBUG
-	logerror("0x086 W: %02x\n",data);
-#endif
+	LOG(("0x086 W: %02x\n",data));
 
 	kc85_86_data = data;
 
@@ -1448,9 +1422,8 @@ WRITE8_HANDLER ( kc85_4_86_w )
 
 WRITE8_HANDLER ( kc85_4_84_w )
 {
-#ifdef KC_DEBUG
-	logerror("0x084 W: %02x\n",data);
-#endif
+	LOG(("0x084 W: %02x\n",data));
+
 	kc85_84_data = data;
 
 	kc85_4_video_ram_select_bank(data & 0x01);
@@ -1471,18 +1444,16 @@ static void kc85_3_update_0x0c000(void)
 
 	if (kc85_pio_data[0] & (1<<7))
 	{
-#ifdef KC_DEBUG
 		/* BASIC takes next priority */
-		logerror("BASIC rom 0x0c000\n");
-#endif
+		LOG(("BASIC rom 0x0c000\n"));
+
 		memory_set_bankptr(4, memory_region(REGION_CPU1) + 0x010000);
 		rh = MRA8_BANK4;
 	}
 	else
 	{
-#ifdef KC_DEBUG
-		logerror("No roms 0x0c000\n");
-#endif
+		LOG(("No roms 0x0c000\n"));
+
 		rh = MRA8_NOP;
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, rh);
@@ -1495,18 +1466,16 @@ static void kc85_3_update_0x0e000(void)
 
 	if (kc85_pio_data[0] & (1<<0))
 	{
-#ifdef KC_DEBUG
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
-		logerror("CAOS rom 0x0e000\n");
-#endif
+		LOG(("CAOS rom 0x0e000\n"));
+
 		memory_set_bankptr(5,memory_region(REGION_CPU1) + 0x012000);
         rh = MRA8_BANK5;
 	}
 	else
 	{
-#ifdef KC_DEBUG
-		logerror("no rom 0x0e000\n");
-#endif
+		LOG(("no rom 0x0e000\n"));
+
 		rh = MRA8_NOP;
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, rh);
@@ -1523,9 +1492,8 @@ static void kc85_3_update_0x00000(void)
 	/* access ram? */
 	if (kc85_pio_data[0] & (1<<1))
 	{
-#ifdef KC_DEBUG
-		logerror("ram0 enabled\n");
-#endif
+		LOG(("ram0 enabled\n"));
+
 		/* yes */
 		rh = MRA8_BANK1;
 		/* set address of bank */
@@ -1535,18 +1503,14 @@ static void kc85_3_update_0x00000(void)
 		if ((kc85_pio_data[0] & (1<<3))==0)
 		{
 			/* yes */
-#ifdef KC_DEBUG
-			logerror("ram0 write protected\n");
-#endif
+			LOG(("ram0 write protected\n"));
 
 			/* ram is enabled and write protected */
 			wh = MWA8_NOP;
 		}
 		else
 		{
-#ifdef KC_DEBUG
-		logerror("ram0 write enabled\n");
-#endif
+			LOG(("ram0 write enabled\n"));
 
 			/* ram is enabled and write enabled */
 			wh = MWA8_BANK6;
@@ -1556,9 +1520,7 @@ static void kc85_3_update_0x00000(void)
 	}
 	else
 	{
-#ifdef KC_DEBUG
-		logerror("no memory at ram0!\n");
-#endif
+		LOG(("no memory at ram0!\n"));
 
 		/* ram is disabled */
 		rh = MRA8_NOP;
@@ -1580,9 +1542,7 @@ static void kc85_3_update_0x08000(void)
     if (kc85_pio_data[0] & (1<<2))
     {
         /* IRM enabled */
-#ifdef KC_DEBUG
-        logerror("IRM enabled\n");
-#endif
+        LOG(("IRM enabled\n"));
 		ram_page = mess_ram+0x08000;
 
 		memory_set_bankptr(3, ram_page);
@@ -1594,9 +1554,7 @@ static void kc85_3_update_0x08000(void)
     else if (kc85_pio_data[1] & (1<<5))
     {
 		/* RAM8 ACCESS */
-#ifdef KC_DEBUG
-		logerror("RAM8 enabled\n");
-#endif
+		LOG(("RAM8 enabled\n"));
 		ram_page = mess_ram + 0x04000;
 
 		memory_set_bankptr(3, ram_page);
@@ -1605,17 +1563,13 @@ static void kc85_3_update_0x08000(void)
 		/* write protect RAM8 ? */
 		if ((kc85_pio_data[1] & (1<<6))==0)
 		{
-#ifdef KC_DEBUG
-			logerror("RAM8 write protected\n");
-#endif
+			LOG(("RAM8 write protected\n"));
 			/* ram8 is enabled and write protected */
 			wh = MWA8_NOP;
 		}
 		else
 		{
-#ifdef KC_DEBUG
-			logerror("RAM8 write enabled\n");
-#endif
+			LOG(("RAM8 write enabled\n"));
 			/* ram8 is enabled and write enabled */
 			wh = MWA8_BANK8;
 			memory_set_bankptr(8,ram_page);
@@ -1623,9 +1577,7 @@ static void kc85_3_update_0x08000(void)
     }
     else
     {
-#ifdef KC_DEBUG
-		logerror("no memory at ram8!\n");
-#endif
+		LOG(("no memory at ram8!\n"));
 		rh = MRA8_NOP;
 		wh = MWA8_NOP;
     }
@@ -1755,9 +1707,7 @@ WRITE8_HANDLER ( kc85_pio_control_w )
 	unsigned char data;
 
 	data = z80ctc_0_r(offset);
-//#ifdef KC_KEYBOARD_DEBUG
-	//logerror("ctc data r:%02x\n",data);
-//#endif
+	//LOG_KBD(("ctc data r:%02x\n",data));
 	return data;
 }
 
@@ -1784,13 +1734,11 @@ static void kc85_ctc_interrupt(int state)
 static void	kc85_pio_ardy_callback(int state)
 {
 	kc_ardy = state & 0x01;
-#ifdef KC_DEBUG
+
 	if (state)
 	{
-		logerror("PIO A Ready\n");
+		LOG(("PIO A Ready\n"));
 	}
-#endif
-
 }
 
 /* callback for brdy output from PIO */
@@ -1798,12 +1746,11 @@ static void	kc85_pio_ardy_callback(int state)
 static void kc85_pio_brdy_callback(int state)
 {
 	kc_brdy = state & 0x01;
-#ifdef KC_DEBUG
+
 	if (state)
 	{
-		logerror("PIO B Ready\n");
+		LOG(("PIO B Ready\n"));
 	}
-#endif
 }
 
 static const z80pio_interface kc85_pio_intf =

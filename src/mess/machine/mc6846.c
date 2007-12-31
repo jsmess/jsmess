@@ -65,14 +65,9 @@ static struct
 
 
 
-/******************* utilitiy function and macros ********************/
+/******************* utility function and macros ********************/
 
-
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define PORT								\
 	((mc6846.pdr & mc6846.ddr) |					\
@@ -331,13 +326,12 @@ WRITE8_HANDLER ( mc6846_w )
 
 	case 1:
 	{
-#if VERBOSE
-		const char* cp2[8] =
+		static const char *const cp2[8] =
 			{
 			"in,neg-edge", "in,neg-edge,intr", "in,pos-edge", "in,pos-edge,intr",
 			"out,intr-ack", "out,i/o-ack", "out,0", "out,1"
 		};
-		const char* cp1[8] = {
+		static const char *const cp1[8] = {
 			"neg-edge", "neg-edge,intr", "pos-edge", "pos-edge,intr",
 			"latched,neg-edge", "latched,neg-edge,intr",
 			"latcged,pos-edge", "latcged,pos-edge,intr"
@@ -345,7 +339,7 @@ WRITE8_HANDLER ( mc6846_w )
 		LOG (( "$%04x %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n",
 		       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
 		       (data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] ));
-#endif
+
 	}
 	mc6846.pcr = data;
 	if ( data & 0x80 )
@@ -405,8 +399,7 @@ WRITE8_HANDLER ( mc6846_w )
 
 	case 5:
 	{
-#if VERBOSE
-		const char* mode[8] =
+		static const char *const mode[8] =
 			{
 				"continuous", "cascaded", "continuous", "one-shot",
 				"freq-cmp", "freq-cmp", "pulse-cmp", "pulse-cmp"
@@ -416,7 +409,7 @@ WRITE8_HANDLER ( mc6846_w )
 		       (data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
 		       (data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
 		       (data & 1) ? "enabled" : "0" ));
-#endif
+
 		mc6846.tcr = data;
 		if ( mc6846.tcr & 1 )
 		{

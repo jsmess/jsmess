@@ -95,22 +95,16 @@ static struct
 
 
 
-#if VERBOSE
-static const char* mc6843_cmd[16] =
+static const char *const mc6843_cmd[16] =
 {
 	"---", "---", "STZ", "SEK", "SSR", "SSW", "RCR", "SWD",
 	"---", "---", "FFR", "FFW", "MSR", "MSW", "---", "---",
 };
-#endif
 
 
 /******************* utility function and macros ********************/
 
-#if VERBOSE
-#define LOG(x)  logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 

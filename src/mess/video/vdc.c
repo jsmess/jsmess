@@ -326,9 +326,9 @@ static void vdc_advance_line(int which) {
 			int i;
 
 			vdc[which].dvssr_write = 0;
-#ifdef MAME_DEBUG
+
 			assert(((vdc[which].vdc_data[DVSSR].w<<1) + 512) <= 0x10000);
-#endif
+
 			for( i = 0; i < 256; i++ ) {
 				vdc[which].sprite_ram[i] = ( vdc[which].vram[ ( vdc[which].vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc[which].vram[ ( vdc[which].vdc_data[DVSSR].w << 1 ) + i * 2 ];
 			}

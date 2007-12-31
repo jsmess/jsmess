@@ -9,7 +9,7 @@
 #include "hd66421.h"
 
 #define LOG_LEVEL  1
-#define _logerror(level,...)  if (LOG_LEVEL > level) logerror(__VA_ARGS__)
+#define _logerror(level,x)  if (LOG_LEVEL > level) logerror x
 
 //#define BRIGHTNESS_DOES_NOT_WORK
 
@@ -66,25 +66,25 @@ static HD66421 lcd;
 
 UINT8 hd66421_reg_idx_r( void)
 {
-	_logerror( 2, "hd66421_reg_idx_r\n");
+	_logerror( 2, ("hd66421_reg_idx_r\n"));
 	return lcd.idx;
 }
 
 void hd66421_reg_idx_w( UINT8 data)
 {
-	_logerror( 2, "hd66421_reg_idx_w (%02X)\n", data);
+	_logerror( 2, ("hd66421_reg_idx_w (%02X)\n", data));
 	lcd.idx = data;
 }
 
 UINT8 hd66421_reg_dat_r( void)
 {
-	_logerror( 2, "hd66421_reg_dat_r\n");
+	_logerror( 2, ("hd66421_reg_dat_r\n"));
 	return lcd.dat[lcd.idx];
 }
 
 void hd66421_reg_dat_w( UINT8 data)
 {
-	_logerror( 2, "hd66421_reg_dat_w (%02X)\n", data);
+	_logerror( 2, ("hd66421_reg_dat_w (%02X)\n", data));
 	lcd.dat[lcd.idx] = data;
 	switch (lcd.idx)
 	{
@@ -101,7 +101,7 @@ INLINE void hd66421_plot_pixel( bitmap_t *bitmap, int x, int y, UINT32 color)
 PALETTE_INIT( hd66421 )
 {
 	int i;
-	_logerror( 0, "palette_init_hd66421\n");
+	_logerror( 0, ("palette_init_hd66421\n"));
 	// init palette
 	for (i=0;i<4;i++)
 	{
@@ -124,7 +124,7 @@ static void hd66421_state_save( void)
 
 VIDEO_START( hd66421 )
 {
-	_logerror( 0, "video_start_hd66421\n");
+	_logerror( 0, ("video_start_hd66421\n"));
 	memset( &lcd, 0, sizeof( lcd));
 	lcd.ram = auto_malloc( HD66421_RAM_SIZE);
 	hd66421_state_save();
@@ -134,7 +134,7 @@ VIDEO_UPDATE( hd66421 )
 {
 	pen_t pen[4];
 	int i;
-	_logerror( 1, "video_update_hd66421\n");
+	_logerror( 1, ("video_update_hd66421\n"));
 	// update palette
 	for (i=0;i<4;i++)
 	{

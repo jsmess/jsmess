@@ -104,10 +104,13 @@
 #include "devices/cartslot.h"
 #include "sound/beep.h"
 
-/* uncomment for verbose debugging information */
-/* #define VERBOSE */
 
-#define NC200_DEBUG
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
+#define NC200_DEBUG 1
+#define LOG_DEBUG(x) do { if (NC200_DEBUG) logerror x; } while (0)
+
 
 #include "includes/centroni.h"
 #include "devices/printer.h"
@@ -313,9 +316,7 @@ static void nc_update_interrupts(void)
 
 static TIMER_CALLBACK(nc_keyboard_timer_callback)
 {
-#ifdef VERBOSE
-		logerror("keyboard int\n");
-#endif
+		LOG(("keyboard int\n"));
 
         /* set int */
         nc_irq_status |= (1<<3);
@@ -361,9 +362,7 @@ static void nc_refresh_memory_bank_config(int bank)
 			memory_set_bankptr(bank+1, addr);
 
 			write_handler = MWA8_NOP;
-#ifdef VERBOSE
-			logerror("BANK %d: ROM %d\n",bank,mem_bank);
-#endif
+			LOG(("BANK %d: ROM %d\n",bank,mem_bank));
 		}
 		break;
 
@@ -380,9 +379,7 @@ static void nc_refresh_memory_bank_config(int bank)
 			memory_set_bankptr(bank+5, addr);
 
 			write_handler = nc_bankhandler_w[bank];
-#ifdef VERBOSE
-			logerror("BANK %d: RAM\n",bank);
-#endif
+			LOG(("BANK %d: RAM\n",bank));
 		}
 		break;
 
@@ -413,9 +410,7 @@ static void nc_refresh_memory_bank_config(int bank)
 					write_handler = MWA8_NOP;
 				}
 
-#ifdef VERBOSE
-				logerror("BANK %d: CARD-RAM\n",bank);
-#endif
+				LOG(("BANK %d: CARD-RAM\n",bank));
 			}
 			else
 			{
@@ -457,9 +452,7 @@ static void nc_common_restore_memory_from_stream(void)
 	if (!file)
 		return;
 
-#ifdef VERBOSE
-	logerror("restoring nc memory\n");
-#endif
+	LOG(("restoring nc memory\n"));
 	/* get size of memory data stored */
 	mame_fread(file, &stored_size, sizeof(unsigned long));
 
@@ -480,9 +473,7 @@ static void nc_common_store_memory_to_stream(void)
 	if (!file)
 		return;
 
-#ifdef VERBOSE
-	logerror("storing nc memory\n");
-#endif
+	LOG(("storing nc memory\n"));
 	/* write size of memory data */
 	mame_fwrite(file, &mess_ram_size, sizeof(unsigned long));
 
@@ -539,9 +530,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 			{
 				case NC_TYPE_1xx:
 				{
-#ifdef VERBOSE
-			        logerror("nmi triggered\n");
-#endif
+			        LOG(("nmi triggered\n"));
 				    cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
@@ -628,9 +617,7 @@ static  READ8_HANDLER(nc_memory_management_r)
 
 static WRITE8_HANDLER(nc_memory_management_w)
 {
-#ifdef VERBOSE
-	logerror("Memory management W: %02x %02x\n",offset,data);
-#endif
+	LOG(("Memory management W: %02x %02x\n",offset,data));
         nc_memory_config[offset] = data;
 
         nc_refresh_memory_config();
@@ -638,12 +625,8 @@ static WRITE8_HANDLER(nc_memory_management_w)
 
 static WRITE8_HANDLER(nc_irq_mask_w)
 {
-#ifdef VERBOSE
-	logerror("irq mask w: %02x\n", data);
-#endif
-#ifdef NC200_DEBUG
-	logerror("irq mask nc200 w: %02x\n",data & ((1<<4) | (1<<5) | (1<<6) | (1<<7)));
-#endif
+	LOG(("irq mask w: %02x\n", data));
+	LOG_DEBUG(("irq mask nc200 w: %02x\n",data & ((1<<4) | (1<<5) | (1<<6) | (1<<7))));
 
 	/* writing mask clears ints that are to be masked? */
 	nc_irq_mask = data;
@@ -653,9 +636,7 @@ static WRITE8_HANDLER(nc_irq_mask_w)
 
 static WRITE8_HANDLER(nc_irq_status_w)
 {
-#ifdef VERBOSE
-	logerror("irq status w: %02x\n", data);
-#endif
+	LOG(("irq status w: %02x\n", data));
     data = data^0x0ff;
 
 	if (nc_type == NC_TYPE_200)
@@ -734,9 +715,8 @@ static void nc_sound_update(int channel)
 
 static WRITE8_HANDLER(nc_sound_w)
 {
-#ifdef VERBOSE
-	logerror("sound w: %04x %02x\n", offset, data);
-#endif
+	LOG(("sound w: %04x %02x\n", offset, data));
+
 	switch (offset)
 	{
 		case 0x0:
@@ -827,9 +807,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 /* same for nc100 and nc200 */
 static WRITE8_HANDLER(nc_printer_data_w)
 {
-#ifdef VERBOSE
-	logerror("printer write %02x\n",data);
-#endif
+	LOG(("printer write %02x\n",data));
 	centronics_write_data(0,data);
 }
 
@@ -862,10 +840,7 @@ static WRITE8_HANDLER(nc100_display_memory_start_w)
 	/* bit 3-0: not used */
 	nc_display_memory_start = (data & 0x0f0)<<(12-4);
 
-#ifdef VERBOSE
-	logerror("disp memory w: %04x\n", (int) nc_display_memory_start);
-#endif
-
+	LOG(("disp memory w: %04x\n", (int) nc_display_memory_start));
 }
 
 
@@ -913,9 +888,7 @@ static void nc100_txrdy_callback(int state)
 	{
 		if (state)
 		{
-//	#ifdef VERBOSE
 			logerror("tx ready\n");
-//	#endif
 			nc_irq_latch |= (1<<1);
 		}
 	}
@@ -931,9 +904,7 @@ static void nc100_rxrdy_callback(int state)
 	{
 		if (state)
 		{
-//#ifdef VERBOSE
 			logerror("rx ready\n");
-//#endif
 			nc_irq_latch |= (1<<0);
 		}
 	}
@@ -1028,9 +999,7 @@ static WRITE8_HANDLER(nc100_poweroff_control_w)
 	/* bits 7-1: not used */
 	/* bit 0: 1 = no effect, 0 = power off */
 	nc_poweroff_control = data;
-#ifdef VERBOSE
-	logerror("nc poweroff control: %02x\n",data);
-#endif
+	LOG(("nc poweroff control: %02x\n",data));
 }
 
 
@@ -1084,9 +1053,7 @@ static  READ8_HANDLER(nc100_card_battery_status_r)
 
 static WRITE8_HANDLER(nc100_memory_card_wait_state_w)
 {
-#ifdef VERBOSE
-	logerror("nc100 memory card wait state: %02x\n",data);
-#endif
+	LOG(("nc100 memory card wait state: %02x\n",data));
 }
 
 
@@ -1255,9 +1222,7 @@ static WRITE8_HANDLER(nc200_display_memory_start_w)
 	/* bit 4-0: not used */
 	nc_display_memory_start = (data & 0x0e0)<<(12-4);
 
-#ifdef VERBOSE
-	logerror("disp memory w: %04x\n", (int) nc_display_memory_start);
-#endif
+	LOG(("disp memory w: %04x\n", (int) nc_display_memory_start));
 }
 #endif
 
@@ -1365,9 +1330,7 @@ static const struct nec765_interface nc200_nec765_interface=
 #ifdef UNUSED_FUNCTION
 static void nc200_floppy_drive_index_callback(int drive_id)
 {
-#ifdef NC200_DEBUG
-	logerror("nc200 index pulse\n");
-#endif
+	LOG_DEBUG(("nc200 index pulse\n"));
 //	nc_irq_status |= (1<<4);
 
 //	nc_update_interrupts();
@@ -1519,9 +1482,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 	}
 
 	/* bit 5 is used in disk interface */
-#ifdef NC200_DEBUG
-	logerror("bit 5: PC: %04x %02x\n",activecpu_get_pc(), data & (1<<5));
-#endif
+	LOG_DEBUG(("bit 5: PC: %04x %02x\n",activecpu_get_pc(), data & (1<<5)));
 }
 
 
@@ -1539,9 +1500,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
-#ifdef NC200_DEBUG
-	logerror("nc200 memory card wait state: PC: %04x %02x\n",activecpu_get_pc(),data);
-#endif
+	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n",activecpu_get_pc(),data));
 	floppy_drive_set_motor_state(0,1);
 	floppy_drive_set_ready_state(0,1,1);
 
@@ -1553,9 +1512,7 @@ static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 /* bit 0 seems to be the same as nc100 */
 static WRITE8_HANDLER(nc200_poweroff_control_w)
 {
-#ifdef NC200_DEBUG
-	logerror("nc200 power off: PC: %04x %02x\n", activecpu_get_pc(),data);
-#endif
+	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", activecpu_get_pc(),data));
 
 	nc200_video_set_backlight(((data^(1<<2))>>2) & 0x01);
 }

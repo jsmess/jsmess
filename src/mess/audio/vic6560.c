@@ -85,7 +85,7 @@ void vic6560_soundport_w (int offset, int data)
 			if (tone1samples == 0)
 				tone1samples = 1;
 		}
-		DBG_LOG (1, "vic6560", (errorlog, "tone1 %.2x %d\n", data, TONE1_FREQUENCY));
+		DBG_LOG (1, "vic6560", ("tone1 %.2x %d\n", data, TONE1_FREQUENCY));
 		break;
 	case 0xb:
 		vic6560[offset] = data;
@@ -96,7 +96,7 @@ void vic6560_soundport_w (int offset, int data)
 			if (tone2samples == 0)
 				tone2samples = 1;
 		}
-		DBG_LOG (1, "vic6560", (errorlog, "tone2 %.2x %d\n", data, TONE2_FREQUENCY));
+		DBG_LOG (1, "vic6560", ("tone2 %.2x %d\n", data, TONE2_FREQUENCY));
 		break;
 	case 0xc:
 		vic6560[offset] = data;
@@ -107,7 +107,7 @@ void vic6560_soundport_w (int offset, int data)
 			if (tone2samples == 0)
 				tone2samples = 1;
 		}
-		DBG_LOG (1, "vic6560", (errorlog, "tone3 %.2x %d\n", data, TONE3_FREQUENCY));
+		DBG_LOG (1, "vic6560", ("tone3 %.2x %d\n", data, TONE3_FREQUENCY));
 		break;
 	case 0xd:
 		vic6560[offset] = data;
@@ -115,7 +115,7 @@ void vic6560_soundport_w (int offset, int data)
 		{
 			noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * Machine->sample_rate
 								  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
-			DBG_LOG (1, "vic6560", (errorlog, "noise %.2x %d sample:%d\n",
+			DBG_LOG (1, "vic6560", ("noise %.2x %d sample:%d\n",
 									data, NOISE_FREQUENCY, noisesamples));
 			if ((double) noisepos / noisesamples >= 1.0)
 			{
@@ -129,7 +129,7 @@ void vic6560_soundport_w (int offset, int data)
 		break;
 	case 0xe:
 		vic6560[offset] = (old & ~0xf) | (data & 0xf);
-		DBG_LOG (3, "vic6560", (errorlog, "volume %d\n", data & 0xf));
+		DBG_LOG (3, "vic6560", ("volume %d\n", data & 0xf));
 		break;
 	}
 }

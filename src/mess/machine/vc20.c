@@ -284,7 +284,7 @@ static WRITE8_HANDLER( vc20_via1_write_porta )
 
 static WRITE8_HANDLER( vc20_via1_write_portb )
 {
-/*  if( errorlog ) fprintf(errorlog, "via1_write_portb: $%02X\n", data); */
+/*  logerror("via1_write_portb: $%02X\n", data); */
 	vc20_tape_write (data & 8 ? 1 : 0);
 	via1_portb = data;
 }

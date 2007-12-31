@@ -21,11 +21,7 @@
 #define VERBOSE 0
 #endif
 
-#if VERBOSE
-#define LOG(x)  logerror x
-#else
-#define LOG(x)  /* x */
-#endif
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 static UINT8 microtan_keypad_column;
 static UINT8 microtan_keyboard_ascii;
@@ -290,14 +286,13 @@ static void via_1_irq(int state)
 /**************************************************************
  * VIA read wrappers
  **************************************************************/
-#if VERBOSE
+
 static const char *const via_name[16] = {
     "PB  ","PA  ","DDRB","DDRA",
     "T1CL","T1CH","T1LL","T1LH",
     "T2CL","T2CH","SR  ","ACR ",
     "PCR ","IFR ","IER ","PANH"
 };
-#endif
 
  READ8_HANDLER( microtan_via_0_r )
 {
@@ -357,7 +352,7 @@ static TIMER_CALLBACK(microtan_read_cassette)
 {
 	double level = cassette_input(cassette_device_image());
 
-	LOG(("microtan_read_cassette: %+5d\n", level));
+	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
 		via_set_input_cb2(0,0);
 	else if (level > +0.07)

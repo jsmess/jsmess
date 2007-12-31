@@ -26,10 +26,12 @@
 #include "profiler.h"
 
 #ifdef MAME_DEBUG
-#define LOG(x)	logerror x
+#define VERBOSE 1
 #else
-#define LOG(x)
+#define VERBOSE 0
 #endif /* MAME_DEBUG */
+
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 #define PROFILER_C00X	PROFILER_USER2
 #define PROFILER_C01X	PROFILER_USER2

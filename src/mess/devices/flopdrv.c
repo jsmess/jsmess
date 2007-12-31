@@ -20,6 +20,7 @@
 #include "image.h"
 
 #define VERBOSE		0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 #define FLOPDRVTAG	"flopdrv"
 
 static struct floppy_drive *get_drive(mess_image *img)
@@ -344,9 +345,7 @@ void floppy_drive_seek(mess_image *img, signed int signed_tracks)
 
 	pDrive = get_drive(img);
 
-#if VERBOSE
-	logerror("seek from: %d delta: %d\n",pDrive->current_track, signed_tracks);
-#endif
+	LOG(("seek from: %d delta: %d\n",pDrive->current_track, signed_tracks));
 
 	/* update position */
 	pDrive->current_track+=signed_tracks;

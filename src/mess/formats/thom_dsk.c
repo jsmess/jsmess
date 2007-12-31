@@ -17,16 +17,8 @@
 
 #define PRINT(x) mame_printf_info x
 
-#if VERBOSE > 1
-#define LOG(x)	logerror x
-#define VLOG(x)	logerror x
-#elif VERBOSE > 0
-#define LOG(x)	logerror x
-#define VLOG(x)
-#else
-#define LOG(x)
-#define VLOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE > 0) logerror x; } while (0)
+#define VLOG(x)	do { if (VERBOSE > 1) logerror x; } while (0)
 
 
 /********************* floppy image / drive *********************/
@@ -160,7 +152,7 @@ static void thom_floppy_show ( thom_floppy_drive* d )
 		 (d->density == DEN_FM_LO) ? "FM" : "MFM",
 		 d->tracks, d->sectors,
 		 (d->sides * d->tracks * d->sectors * d->sector_size) / 1024 ));
-	LOG (( "thom_floppy: drive %li loaded\n", d - thom_floppy_drives ));
+	LOG (( "thom_floppy: drive %d loaded\n", d - thom_floppy_drives ));
 
 	if ( d->data )
 	{
@@ -225,7 +217,7 @@ static void thom_floppy_seek ( mess_image *image, int physical_track )
 		physical_track = 0;
 	if ( physical_track >= 80 )
 		physical_track = 79;
-	LOG(( "%f thom_floppy_seek: dev=%li track=%i\n", attotime_to_double(timer_get_time()), d - thom_floppy_drives, physical_track ));
+	LOG(( "%f thom_floppy_seek: dev=%d track=%i\n", attotime_to_double(timer_get_time()), d - thom_floppy_drives, physical_track ));
 	d->cur_track = physical_track;
 }
 
@@ -249,7 +241,7 @@ static void thom_floppy_get_id ( mess_image* image, chrn_id* id,
 	int trk =  d->cur_track;
 	if ( trk >= d->tracks )
 		trk = d->tracks - 1;
-	VLOG(( "thom_floppy_get_id: dev=%li track=%i idx=%i phy-side=%i dens=%s/%s\n",
+	VLOG(( "thom_floppy_get_id: dev=%d track=%i idx=%i phy-side=%i dens=%s/%s\n",
 	       d - thom_floppy_drives, trk, id_index, physical_side,
 	       (thom_density == DEN_FM_LO) ? "FM" : "MFM",
 	       (d->density == DEN_FM_LO) ? "FM" : "MFM" ));
@@ -293,7 +285,7 @@ static void thom_floppy_read_sector_data_into_buffer ( mess_image* image, int si
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	UINT8* src = thom_floppy_sector_ptr( d, index1, d->cur_track, 0 );
 	thom_floppy_active( 0 );
-	LOG(( "thom_floppy_read_sector_data_into_buffer: dev=%li track=%i idx=%i side=%i len=%i\n", d - thom_floppy_drives, d->cur_track, index1, side, length ));
+	LOG(( "thom_floppy_read_sector_data_into_buffer: dev=%d track=%i idx=%i side=%i len=%i\n", d - thom_floppy_drives, d->cur_track, index1, side, length ));
 	if ( length > d->sector_size )
 	{
 		logerror( "thom_floppy_read_sector_data_into_buffer: sector size %i truncated to %i\n", length, d->sector_size );
@@ -310,7 +302,7 @@ static void thom_floppy_write_sector_data_from_buffer ( mess_image *image, int s
 	thom_floppy_drive* d = thom_floppy_drive_of_image( image );
 	UINT8* dst = thom_floppy_sector_ptr( d, data_id, d->cur_track, 0 );
 	thom_floppy_active( 1 );
-	LOG(( "thom_floppy_write_sector_data_into_buffer: dev=%li track=%i idx=%i side=%i ddam=%i len=%i\n", d - thom_floppy_drives, d->cur_track, data_id, side, ddam, length ));
+	LOG(( "thom_floppy_write_sector_data_into_buffer: dev=%d track=%i idx=%i side=%i ddam=%i len=%i\n", d - thom_floppy_drives, d->cur_track, data_id, side, ddam, length ));
 	if ( length > d->sector_size )
 	{
 		logerror( "thom_floppy_write_sector_data_from_buffer: sector size %i truncated to %i\n", length, d->sector_size );
@@ -331,7 +323,7 @@ static void thom_floppy_format_sector ( mess_image *image, int side, int sector_
 	int sector_size = 128 << n;
 	UINT8* dst;
 	thom_floppy_active( 1 );
-	LOG(( "thom_floppy_format_sector: dev=%li track=%i/%i side=%i/%i idx=%i/%i c=%i h=%i r=%i n=%i filler=$%02X\n",
+	LOG(( "thom_floppy_format_sector: dev=%d track=%i/%i side=%i/%i idx=%i/%i c=%i h=%i r=%i n=%i filler=$%02X\n",
 	      d - thom_floppy_drives,
 	      d->cur_track, d->tracks, side, d->sides, sector_index, d->sectors,
 	      c, h, r, n, filler ));

@@ -1,6 +1,9 @@
 #include "oric_tap.h"
 #include "driver.h"
 
+#define ORIC_WAV_DEBUG 1
+#define LOG(x) do { if (ORIC_WAV_DEBUG) logerror x; } while (0)
+
 /* this code based heavily on tap2wav by Fabrice Frances */
 #define ORIC_SYNC_BYTE	0x016
 
@@ -318,10 +321,8 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 
 					end = (((header[4] & 0x0ff)<<8) | (header[5] & 0x0ff));
 					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
-//#ifdef ORIC_WAV_DEBUG
-					logerror("start (from header): %02x\n",start);
-					logerror("end (from header): %02x\n",end);
-//#endif
+					LOG(("start (from header): %02x\n",start));
+					LOG(("end (from header): %02x\n",end));
                                         oric_data_length =end - start + 1;
 				}
 			}
@@ -459,10 +460,8 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 					end = (((header[4] & 0x0ff)<<8) | (header[5] & 0x0ff));
 					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
-//#ifdef ORIC_WAV_DEBUG
-					logerror("start (from header): %02x\n",start);
-					logerror("end (from header): %02x\n",end);
-//#endif
+					LOG(("start (from header): %02x\n",start));
+					LOG(("end (from header): %02x\n",end));
                                         oric_data_length = end - start + 1;
 				}
 			}

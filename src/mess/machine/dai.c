@@ -20,13 +20,8 @@
 
 #define DEBUG_DAI_PORTS	0
 
-#if DEBUG_DAI_PORTS
-	#define LOG_DAI_PORT_R(_port, _data, _comment) logerror ("DAI port read : %04x, Data: %02x (%s)\n", _port, _data, _comment)
-	#define LOG_DAI_PORT_W(_port, _data, _comment) logerror ("DAI port write: %04x, Data: %02x (%s)\n", _port, _data, _comment)
-#else
-	#define LOG_DAI_PORT_R(_port, _data, _comment)
-	#define LOG_DAI_PORT_W(_port, _data, _comment)
-#endif
+#define LOG_DAI_PORT_R(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port read : %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
+#define LOG_DAI_PORT_W(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port write: %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
 
 /* Discrete I/O devices */
 UINT8 dai_noise_volume;

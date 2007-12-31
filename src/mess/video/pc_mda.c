@@ -14,12 +14,8 @@
 
 #define VERBOSE_MDA 0		/* MDA (Monochrome Display Adapter) */
 
-#if VERBOSE_MDA
 #define MDA_LOG(N,M,A) \
-	if(VERBOSE_MDA>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
-#else
-#define MDA_LOG(n,m,a)
-#endif
+	if(VERBOSE_MDA>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
 const unsigned char mda_palette[4][3] = {
 	{ 0x00,0x00,0x00 },
@@ -217,7 +213,7 @@ VIDEO_START( pc_mda )
  */
 static void hercules_mode_control_w(int data)
 {
-	MDA_LOG(1,"MDA_mode_control_w",(errorlog, "$%02x: colums %d, gfx %d, enable %d, blink %d\n",
+	MDA_LOG(1,"MDA_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
 	mda.mode_control = data;
 }
@@ -242,7 +238,7 @@ static int pc_mda_status_r(void)
 
 static void hercules_config_w(int data)
 {
-	MDA_LOG(1,"HGC_config_w",(errorlog, "$%02x\n", data));
+	MDA_LOG(1,"HGC_config_w",("$%02x\n", data));
     mda.configuration_switch = data;
 }
 

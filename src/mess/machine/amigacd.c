@@ -19,12 +19,7 @@ DMAC controller.
 
 #define VERBOSE_DMAC 0
 
-#if VERBOSE_DMAC
-#define LOG logerror
-#else
-INLINE void dummy_log( const char *a, ... ) {}
-#define LOG dummy_log
-#endif
+#define LOG(x) do { if (VERBOSE_DMAC) logerror x; } while (0)
 
 /* constants */
 #define CD_SECTOR_TIME		(1000/((300*1024)/2048))	/* 2X CDROM sector time in msec (300KBps) */
@@ -133,7 +128,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x20:
 		{
 			UINT8	v = dmac_data.istr;
-			LOG( "DMAC: PC=%08x - ISTR Read(%04x)\n", activecpu_get_pc(), dmac_data.istr );
+			LOG(( "DMAC: PC=%08x - ISTR Read(%04x)\n", activecpu_get_pc(), dmac_data.istr ));
 
 			dmac_data.istr &= ~0x0f;
 			return v;
@@ -142,35 +137,35 @@ static READ16_HANDLER( amiga_dmac_r )
 
 		case 0x21:
 		{
-			LOG( "DMAC: PC=%08x - CNTR Read(%04x)\n", activecpu_get_pc(), dmac_data.cntr );
+			LOG(( "DMAC: PC=%08x - CNTR Read(%04x)\n", activecpu_get_pc(), dmac_data.cntr ));
 			return dmac_data.cntr;
 		}
 		break;
 
 		case 0x40:	/* wtc hi */
 		{
-			LOG( "DMAC: PC=%08x - WTC HI Read\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - WTC HI Read\n", activecpu_get_pc() ));
 			return (dmac_data.wtc >> 16);
 		}
 		break;
 
 		case 0x41:	/* wtc lo */
 		{
-			LOG( "DMAC: PC=%08x - WTC LO Read\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - WTC LO Read\n", activecpu_get_pc() ));
 			return dmac_data.wtc;
 		}
 		break;
 
 		case 0x42:	/* acr hi */
 		{
-			LOG( "DMAC: PC=%08x - ACR HI Read\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - ACR HI Read\n", activecpu_get_pc() ));
 			return (dmac_data.acr >> 16);
 		}
 		break;
 
 		case 0x43:	/* acr lo */
 		{
-			LOG( "DMAC: PC=%08x - ACR LO Read\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - ACR LO Read\n", activecpu_get_pc() ));
 			return dmac_data.acr;
 		}
 		break;
@@ -178,14 +173,14 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x48:	/* wd33c93 SCSI expansion */
 		case 0x49:
 		{
-			LOG( "DMAC: PC=%08x - WD33C93 Read(%d)\n", activecpu_get_pc(), offset & 1 );
+			LOG(( "DMAC: PC=%08x - WD33C93 Read(%d)\n", activecpu_get_pc(), offset & 1 ));
 			return 0x00;	/* Not available without SCSI expansion */
 		}
 		break;
 
 		case 0x50:
 		{
-			LOG( "DMAC: PC=%08x - CDROM RESP Read\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - CDROM RESP Read\n", activecpu_get_pc() ));
 			return matsucd_response_r();
 		}
 		break;
@@ -194,7 +189,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x52:
 		case 0x53:
 		{
-			LOG( "DMAC: PC=%08x - XT IO Read(%d)\n", activecpu_get_pc(), (offset & 3)-1 );
+			LOG(( "DMAC: PC=%08x - XT IO Read(%d)\n", activecpu_get_pc(), (offset & 3)-1 ));
 			return 0xff;
 		}
 		break;
@@ -216,35 +211,35 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x66:
 		case 0x67:
 		{
-			LOG( "DMAC: PC=%08x - TPI6525 Read(%d)\n", activecpu_get_pc(), (offset - 0x58) );
+			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", activecpu_get_pc(), (offset - 0x58) ));
 			return tpi6525_0_port_r(offset - 0x58);
 		}
 		break;
 
 		case 0x70:	/* DMA start strobe */
 		{
-			LOG( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() ));
 			timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
 		}
 		break;
 
 		case 0x71:	/* DMA stop strobe */
 		{
-			LOG( "DMAC: PC=%08x - DMA Stop Strobe\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - DMA Stop Strobe\n", activecpu_get_pc() ));
 			timer_reset( dmac_data.dma_timer, attotime_never );
 		}
 		break;
 
 		case 0x72:	/* Clear IRQ strobe */
 		{
-			LOG( "DMAC: PC=%08x - IRQ Clear Strobe\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - IRQ Clear Strobe\n", activecpu_get_pc() ));
 			dmac_data.istr &= ~ISTR_INT_P;
 		}
 		break;
 
 		case 0x74:	/* Flush strobe */
 		{
-			LOG( "DMAC: PC=%08x - Flush Strobe\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - Flush Strobe\n", activecpu_get_pc() ));
 			dmac_data.istr |= ISTR_FE_FLG;
 		}
 		break;
@@ -265,7 +260,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 	{
 		case 0x21:	/* control write */
 		{
-			LOG( "DMAC: PC=%08x - CNTR Write(%04x)\n", activecpu_get_pc(), data );
+			LOG(( "DMAC: PC=%08x - CNTR Write(%04x)\n", activecpu_get_pc(), data ));
 			dmac_data.cntr = data;
 			check_interrupts();
 		}
@@ -273,7 +268,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x40:	/* wtc hi */
 		{
-			LOG( "DMAC: PC=%08x - WTC HI Write - data = %04x\n", activecpu_get_pc(), data );
+			LOG(( "DMAC: PC=%08x - WTC HI Write - data = %04x\n", activecpu_get_pc(), data ));
 			dmac_data.wtc &= 0x0000ffff;
 			dmac_data.wtc |= ((UINT32)data) << 16;
 		}
@@ -281,7 +276,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x41:	/* wtc lo */
 		{
-			LOG( "DMAC: PC=%08x - WTC LO Write - data = %04x\n", activecpu_get_pc(), data );
+			LOG(( "DMAC: PC=%08x - WTC LO Write - data = %04x\n", activecpu_get_pc(), data ));
 			dmac_data.wtc &= 0xffff0000;
 			dmac_data.wtc |= data;
 		}
@@ -289,7 +284,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x42:	/* acr hi */
 		{
-			LOG( "DMAC: PC=%08x - ACR HI Write - data = %04x\n", activecpu_get_pc(), data );
+			LOG(( "DMAC: PC=%08x - ACR HI Write - data = %04x\n", activecpu_get_pc(), data ));
 			dmac_data.acr &= 0x0000ffff;
 			dmac_data.acr |= ((UINT32)data) << 16;
 		}
@@ -297,7 +292,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x43:	/* acr lo */
 		{
-			LOG( "DMAC: PC=%08x - ACR LO Write - data = %04x\n", activecpu_get_pc(), data );
+			LOG(( "DMAC: PC=%08x - ACR LO Write - data = %04x\n", activecpu_get_pc(), data ));
 			dmac_data.acr &= 0xffff0000;
 			dmac_data.acr |= data;
 		}
@@ -305,7 +300,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x47:	/* dawr */
 		{
-			LOG( "DMAC: PC=%08x - DAWR Write - data = %04x\n", activecpu_get_pc(), data );
+			LOG(( "DMAC: PC=%08x - DAWR Write - data = %04x\n", activecpu_get_pc(), data ));
 			dmac_data.dawr = data;
 		}
 		break;
@@ -313,14 +308,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x48:	/* wd33c93 SCSI expansion */
 		case 0x49:
 		{
-			LOG( "DMAC: PC=%08x - WD33C93 Write(%d) - data = %04x\n", activecpu_get_pc(), offset & 1, data );
+			LOG(( "DMAC: PC=%08x - WD33C93 Write(%d) - data = %04x\n", activecpu_get_pc(), offset & 1, data ));
 			/* Not available without SCSI expansion */
 		}
 		break;
 
 		case 0x50:
 		{
-			LOG( "DMAC: PC=%08x - CDROM CMD Write - data = %04x\n", activecpu_get_pc(), data );
+			LOG(( "DMAC: PC=%08x - CDROM CMD Write - data = %04x\n", activecpu_get_pc(), data ));
 			matsucd_command_w( data );
 		}
 		break;
@@ -342,35 +337,35 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x66:
 		case 0x67:
 		{
-			LOG( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", activecpu_get_pc(), (offset - 0x58), data );
+			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", activecpu_get_pc(), (offset - 0x58), data ));
 			tpi6525_0_port_w(offset - 0x58, data);
 		}
 		break;
 
 		case 0x70:	/* DMA start strobe */
 		{
-			LOG( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() ));
 			timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
 		}
 		break;
 
 		case 0x71:	/* DMA stop strobe */
 		{
-			LOG( "DMAC: PC=%08x - DMA Stop Strobe\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - DMA Stop Strobe\n", activecpu_get_pc() ));
 			timer_reset( dmac_data.dma_timer, attotime_never );
 		}
 		break;
 
 		case 0x72:	/* Clear IRQ strobe */
 		{
-			LOG( "DMAC: PC=%08x - IRQ Clear Strobe\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - IRQ Clear Strobe\n", activecpu_get_pc() ));
 			dmac_data.istr &= ~ISTR_INT_P;
 		}
 		break;
 
 		case 0x74:	/* Flush Strobe */
 		{
-			LOG( "DMAC: PC=%08x - Flush Strobe\n", activecpu_get_pc() );
+			LOG(( "DMAC: PC=%08x - Flush Strobe\n", activecpu_get_pc() ));
 			dmac_data.istr |= ISTR_FE_FLG;
 		}
 		break;
@@ -465,7 +460,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 
 static void tp6525_irq( int level )
 {
-	LOG( "TPI6525 Interrupt: level = %d\n", level);
+	LOG(( "TPI6525 Interrupt: level = %d\n", level ));
 
 	if ( level )
 	{

@@ -23,16 +23,8 @@
 
 #define PRINT(x) mame_printf_info x
 
-#if VERBOSE > 1
-#define LOG(x)	logerror x
-#define VLOG(x)	logerror x
-#elif VERBOSE
-#define LOG(x)	logerror x
-#define VLOG(x)
-#else
-#define LOG(x)
-#define VLOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE > 0) logerror x; } while (0)
+#define VLOG(x)	do { if (VERBOSE > 1) logerror x; } while (0)
 
 
 

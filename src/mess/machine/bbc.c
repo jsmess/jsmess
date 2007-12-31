@@ -1152,14 +1152,14 @@ static  READ8_HANDLER( bbcb_via_system_read_cb2 )
 
 static WRITE8_HANDLER( bbcb_via_system_write_ca2 )
 {
-  //if( errorlog ) fprintf(errorlog, "via_system_write_ca2: $%02X\n", data);
+  //logerror("via_system_write_ca2: $%02X\n", data);
 }
 
 /* this is wired as in input port so writing to this port would be bad */
 
 static WRITE8_HANDLER( bbcb_via_system_write_cb2 )
 {
-  //if( errorlog ) fprintf(errorlog, "via_system_write_cb2: $%02X\n", data);
+  //logerror("via_system_write_cb2: $%02X\n", data);
 }
 
 

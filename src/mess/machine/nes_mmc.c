@@ -27,8 +27,10 @@
 #include "nes_mmc.h"
 #include "sound/nes_apu.h"
 
-#define LOG_MMC	1
-#define LOG_FDS	1
+#define VERBOSE 1
+
+#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_FDS(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* Global variables */
 static int prg_mask;
@@ -352,9 +354,7 @@ static WRITE8_HANDLER( mapper1_w )
 		MMC1_Size_16k = 1;
 		MMC1_Switch_Low = 1;
 		/* TODO: should we switch banks at this time also? */
-#ifdef LOG_MMC
-		logerror("=== MMC1 regs reset to default\n");
-#endif
+		LOG_MMC(("=== MMC1 regs reset to default\n"));
 		return;
 	}
 
@@ -384,25 +384,23 @@ static WRITE8_HANDLER( mapper1_w )
 				}
 
 				MMC1_SizeVrom_4k = (MMC1_reg & 0x10);
-#ifdef LOG_MMC
-				logerror("   MMC1 reg #1 val:%02x\n", MMC1_reg);
-					logerror("\t\tBank Size: ");
+				LOG_MMC(("   MMC1 reg #1 val:%02x\n", MMC1_reg));
+					LOG_MMC(("\t\tBank Size: "));
 					if (MMC1_Size_16k)
-						logerror("16k\n");
-					else logerror("32k\n");
+						LOG_MMC(("16k\n"));
+					else LOG_MMC(("32k\n"));
 
-					logerror("\t\tBank Select: ");
+					LOG_MMC(("\t\tBank Select: "));
 					if (MMC1_Switch_Low)
-						logerror("$8000\n");
-					else logerror("$C000\n");
+						LOG_MMC(("$8000\n"));
+					else LOG_MMC(("$C000\n"));
 
-					logerror("\t\tVROM Bankswitch Size Select: ");
+					LOG_MMC(("\t\tVROM Bankswitch Size Select: "));
 					if (MMC1_SizeVrom_4k)
-						logerror("4k\n");
-					else logerror("8k\n");
+						LOG_MMC(("4k\n"));
+					else LOG_MMC(("8k\n"));
 
-					logerror ("\t\tMirroring: %d\n", MMC1_reg & 0x03);
-#endif
+					LOG_MMC(("\t\tMirroring: %d\n", MMC1_reg & 0x03));
 				break;
 
 			case 1:
@@ -418,9 +416,7 @@ static WRITE8_HANDLER( mapper1_w )
 						memory_set_bankptr (2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
 						memory_set_bankptr (3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
 						memory_set_bankptr (4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
-#ifdef LOG_MMC
-						logerror("MMC1_extended 1024k bank (no reg) select: %02x\n", MMC1_extended_bank);
-#endif
+						LOG_MMC(("MMC1_extended 1024k bank (no reg) select: %02x\n", MMC1_extended_bank));
 					}
 					else
 					{
@@ -432,9 +428,7 @@ static WRITE8_HANDLER( mapper1_w )
 							memory_set_bankptr (2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
 							memory_set_bankptr (3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
 							memory_set_bankptr (4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
-#ifdef LOG_MMC
-							logerror("MMC1_extended 1024k bank (reg 1) select: %02x\n", MMC1_extended_bank);
-#endif
+							LOG_MMC(("MMC1_extended 1024k bank (reg 1) select: %02x\n", MMC1_extended_bank));
 							MMC1_extended_swap = 0;
 						}
 						else MMC1_extended_swap = 1;
@@ -448,9 +442,7 @@ static WRITE8_HANDLER( mapper1_w )
 					memory_set_bankptr (2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
 					memory_set_bankptr (3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
 					memory_set_bankptr (4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
-#ifdef LOG_MMC
-					logerror("MMC1_extended 512k bank select: %02x\n", MMC1_extended_bank & 0x01);
-#endif
+					LOG_MMC(("MMC1_extended 512k bank select: %02x\n", MMC1_extended_bank & 0x01));
 				}
 				else if (nes.chr_chunks > 0)
 				{
@@ -460,17 +452,13 @@ static WRITE8_HANDLER( mapper1_w )
 					{
 						int bank = MMC1_reg & ((nes.chr_chunks << 1) - 1);
 						ppu2c0x_set_videorom_bank(0, 0, 8, bank, 256);
-#ifdef LOG_MMC
-						logerror("MMC1 8k VROM switch: %02x\n", MMC1_reg);
-#endif
+						LOG_MMC(("MMC1 8k VROM switch: %02x\n", MMC1_reg));
 					}
 					else
 					{
 						int bank = MMC1_reg & ((nes.chr_chunks << 1) - 1);
 						ppu2c0x_set_videorom_bank(0, 0, 4, bank, 256);
-#ifdef LOG_MMC
-						logerror("MMC1 4k VROM switch (low): %02x\n", MMC1_reg);
-#endif
+						LOG_MMC(("MMC1 4k VROM switch (low): %02x\n", MMC1_reg));
 					}
 				}
 				break;
@@ -487,9 +475,7 @@ static WRITE8_HANDLER( mapper1_w )
 						memory_set_bankptr (2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
 						memory_set_bankptr (3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
 						memory_set_bankptr (4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
-#ifdef LOG_MMC
-						logerror("MMC1_extended 1024k bank (reg 2) select: %02x\n", MMC1_extended_bank);
-#endif
+						LOG_MMC(("MMC1_extended 1024k bank (reg 2) select: %02x\n", MMC1_extended_bank));
 						MMC1_extended_swap = 0;
 					}
 					else
@@ -499,9 +485,7 @@ static WRITE8_HANDLER( mapper1_w )
 				{
 					int bank = MMC1_reg & ((nes.chr_chunks << 1) - 1);
 					ppu2c0x_set_videorom_bank(0, 4, 4, bank, 256);
-#ifdef LOG_MMC
-					logerror("MMC1 4k VROM switch (high): %02x\n", MMC1_reg);
-#endif
+					LOG_MMC(("MMC1 4k VROM switch (high): %02x\n", MMC1_reg));
 				}
 				break;
 			case 3:
@@ -522,9 +506,7 @@ static WRITE8_HANDLER( mapper1_w )
 						memory_set_bankptr (3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
 						memory_set_bankptr (4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 					}
-#ifdef LOG_MMC
-					logerror("MMC1 32k bank select: %02x\n", MMC1_reg);
-#endif
+					LOG_MMC(("MMC1 32k bank select: %02x\n", MMC1_reg));
 				}
 				else
 				/* Switching one 16k bank */
@@ -545,9 +527,7 @@ static WRITE8_HANDLER( mapper1_w )
 							memory_set_bankptr (3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
 							memory_set_bankptr (4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 						}
-#ifdef LOG_MMC
-						logerror("MMC1 16k-low bank select: %02x\n", MMC1_reg);
-#endif
+						LOG_MMC(("MMC1 16k-low bank select: %02x\n", MMC1_reg));
 					}
 					else
 					{
@@ -566,18 +546,14 @@ static WRITE8_HANDLER( mapper1_w )
 							memory_set_bankptr (3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
 							memory_set_bankptr (4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 						}
-#ifdef LOG_MMC
-						logerror("MMC1 16k-high bank select: %02x\n", MMC1_reg);
-#endif
+						LOG_MMC(("MMC1 16k-high bank select: %02x\n", MMC1_reg));
 					}
 				}
 
-#ifdef LOG_MMC
-				logerror("-- page1: %06x\n", MMC1_bank1);
-				logerror("-- page2: %06x\n", MMC1_bank2);
-				logerror("-- page3: %06x\n", MMC1_bank3);
-				logerror("-- page4: %06x\n", MMC1_bank4);
-#endif
+				LOG_MMC(("-- page1: %06x\n", MMC1_bank1));
+				LOG_MMC(("-- page2: %06x\n", MMC1_bank2));
+				LOG_MMC(("-- page3: %06x\n", MMC1_bank3));
+				LOG_MMC(("-- page4: %06x\n", MMC1_bank4));
 				break;
 		}
 		MMC1_reg_count = 0;
@@ -663,9 +639,7 @@ static WRITE8_HANDLER( mapper4_w )
 				/* Reset the banks */
 				mapper4_set_prg ();
 				mapper4_set_chr ();
-#ifdef LOG_MMC
-				logerror("     MMC3 reset banks\n");
-#endif
+				LOG_MMC(("     MMC3 reset banks\n"));
 			}
 			last_bank = data & 0xc0;
 			break;
@@ -679,17 +653,13 @@ static WRITE8_HANDLER( mapper4_w )
 					data &= 0xfe;
 					MMC3_chr[cmd] = data * 64;
 					mapper4_set_chr ();
-#ifdef LOG_MMC
-					logerror("     MMC3 set vram %d: %d\n", cmd, data);
-#endif
+					LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
 					break;
 
 				case 2: case 3: case 4: case 5:
 					MMC3_chr[cmd] = data * 64;
 					mapper4_set_chr ();
-#ifdef LOG_MMC
-					logerror("     MMC3 set vram %d: %d\n", cmd, data);
-#endif
+					LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
 					break;
 
 				case 6:
@@ -718,37 +688,27 @@ static WRITE8_HANDLER( mapper4_w )
 
 		case 0x2001: /* $a001 - extra RAM enable/disable */
 			nes.mid_ram_enable = data;
-#ifdef LOG_MMC
-			logerror("     MMC3 mid_ram enable: %02x\n", 0);
-#endif
+			LOG_MMC(("     MMC3 mid_ram enable: %02x\n", 0));
 			break;
 
 		case 0x4000: /* $c000 - IRQ scanline counter */
 			IRQ_count_latch = data;
-#ifdef LOG_MMC
-//			logerror("     MMC3 set irq count latch: %02x (scanline %d)\n", data, ppu2c0x_get_current_scanline(0));
-#endif
+//			LOG_MMC(("     MMC3 set irq count latch: %02x (scanline %d)\n", data, ppu2c0x_get_current_scanline(0)));
 			break;
 
 		case 0x4001: /* $c001 - IRQ scanline latch */
 			IRQ_reload = 1;
-#ifdef LOG_MMC
-//			logerror("     MMC3 set irq reload (scanline %d)\n", ppu2c0x_get_current_scanline(0));
-#endif
+//			LOG_MMC(("     MMC3 set irq reload (scanline %d)\n", ppu2c0x_get_current_scanline(0)));
 			break;
 
 		case 0x6000: /* $e000 - Disable IRQs */
 			IRQ_enable = 0;
-#ifdef LOG_MMC
-			logerror("     MMC3 disable irqs\n");
-#endif
+			LOG_MMC(("     MMC3 disable irqs\n"));
 			break;
 
 		case 0x6001: /* $e001 - Enable IRQs */
 			IRQ_enable = 1;
-#ifdef LOG_MMC
-			logerror("     MMC3 enable irqs\n");
-#endif
+			LOG_MMC(("     MMC3 enable irqs\n"));
 			break;
 
 		default:
@@ -808,9 +768,7 @@ static WRITE8_HANDLER( mapper118_w )
 			break;
 		}
 		case 0x2000: /* $a000 */
-#ifdef LOG_MMC
-			logerror("     mapper 118 mirroring: %02x\n", data);
-#endif
+			LOG_MMC(("     mapper 118 mirroring: %02x\n", data));
 			switch (data & 0x02)
 			{
 				case 0x00: ppu2c0x_set_mirroring(0, PPU_MIRROR_LOW); break;
@@ -820,38 +778,28 @@ static WRITE8_HANDLER( mapper118_w )
 
 		case 0x2001: /* $a001 - extra RAM enable/disable */
 			nes.mid_ram_enable = data;
-#ifdef LOG_MMC
-			logerror("     MMC3 mid_ram enable: %02x\n", data);
-#endif
+			LOG_MMC(("     MMC3 mid_ram enable: %02x\n", data));
 			break;
 
 		case 0x4000: /* $c000 - IRQ scanline counter */
 			IRQ_count = data;
-#ifdef LOG_MMC
-			logerror("     MMC3 set irq count: %02x\n", data);
-#endif
+			LOG_MMC(("     MMC3 set irq count: %02x\n", data));
 			break;
 
 		case 0x4001: /* $c001 - IRQ scanline latch */
 			IRQ_count_latch = data;
-#ifdef LOG_MMC
-			logerror("     MMC3 set irq count latch: %02x\n", data);
-#endif
+			LOG_MMC(("     MMC3 set irq count latch: %02x\n", data));
 			break;
 
 		case 0x6000: /* $e000 - Disable IRQs */
 			IRQ_enable = 0;
 			IRQ_count = IRQ_count_latch; /* TODO: verify this */
-#ifdef LOG_MMC
-			logerror("     MMC3 disable irqs: %02x\n", data);
-#endif
+			LOG_MMC(("     MMC3 disable irqs: %02x\n", data));
 			break;
 
 		case 0x6001: /* $e001 - Enable IRQs */
 			IRQ_enable = 1;
-#ifdef LOG_MMC
-			logerror("     MMC3 enable irqs: %02x\n", data);
-#endif
+			LOG_MMC(("     MMC3 enable irqs: %02x\n", data));
 			break;
 
 		default:
@@ -1396,9 +1344,7 @@ static WRITE8_HANDLER( mapper7_w )
 
 static WRITE8_HANDLER( mapper8_w )
 {
-#ifdef LOG_MMC
-	logerror("* Mapper 8 switch, vrom: %02x, rom: %02x\n", data & 0x07, (data >> 3));
-#endif
+	LOG_MMC(("* Mapper 8 switch, vrom: %02x, rom: %02x\n", data & 0x07, (data >> 3)));
 	/* Switch 8k VROM bank */
 	chr8 (data & 0x07);
 
@@ -1556,9 +1502,8 @@ static WRITE8_HANDLER( mapper10_w )
 
 static WRITE8_HANDLER( mapper11_w )
 {
-#ifdef LOG_MMC
-	logerror("* Mapper 11 switch, data: %02x\n", data);
-#endif
+	LOG_MMC(("* Mapper 11 switch, data: %02x\n", data));
+
 	/* Switch 8k VROM bank */
 	chr8 (data >> 4);
 
@@ -1567,9 +1512,8 @@ static WRITE8_HANDLER( mapper11_w )
 }
 static WRITE8_HANDLER( mapper13_w )
 {
-#ifdef LOG_MMC
-	logerror("* Mapper 13 switch, data: %02x\n", data );
-#endif
+	LOG_MMC(("* Mapper 13 switch, data: %02x\n", data ));
+
 	//this is a place-holder call.
 	//mapper doesn't work because CHR-RAM is not mapped.
 	chr4_4 (data);
@@ -2120,9 +2064,7 @@ READ8_HANDLER ( fds_r )
 			break;
 	}
 
-#ifdef LOG_FDS
-	logerror ("fds_r, address: %04x, data: %02x\n", offset + 0x4030, ret);
-#endif
+	LOG_FDS(("fds_r, address: %04x, data: %02x\n", offset + 0x4030, ret));
 
 	return ret;
 }
@@ -2166,10 +2108,7 @@ WRITE8_HANDLER ( fds_w )
 			break;
 	}
 
-#ifdef LOG_FDS
-	logerror ("fds_w, address: %04x, data: %02x\n", offset + 0x4020, data);
-#endif
-
+	LOG_FDS(("fds_w, address: %04x, data: %02x\n", offset + 0x4020, data));
 }
 
 static void konami_irq ( int num, int scanline, int vblank, int blanked )
@@ -2873,9 +2812,8 @@ static WRITE8_HANDLER( mapper40_w )
 
 static WRITE8_HANDLER( mapper41_m_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper41_m_w, offset: %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper41_m_w, offset: %04x, data: %02x\n", offset, data));
+
 	if (offset & 0x20)
 		ppu2c0x_set_mirroring(0, PPU_MIRROR_HORZ);
 	else
@@ -2889,9 +2827,7 @@ static WRITE8_HANDLER( mapper41_m_w )
 
 static WRITE8_HANDLER( mapper41_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper41_w, offset: %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper41_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (mapper41_reg2)
 	{
@@ -3087,9 +3023,7 @@ static WRITE8_HANDLER( mapper65_w )
 			/* Switch 8k bank at $8000 */
 			data &= prg_mask;
 			memory_set_bankptr (1, &nes.rom[0x2000 * (data) + 0x10000]);
-#ifdef LOG_MMC
-			logerror("     Mapper 65 switch ($8000) value: %02x\n", data);
-#endif
+			LOG_MMC(("     Mapper 65 switch ($8000) value: %02x\n", data));
 			break;
 		case 0x1001:
 			if (data & 0x80)
@@ -3108,9 +3042,7 @@ static WRITE8_HANDLER( mapper65_w )
 			/* Switch 8k bank at $a000 */
 			data &= prg_mask;
 			memory_set_bankptr (2, &nes.rom[0x2000 * (data) + 0x10000]);
-#ifdef LOG_MMC
-			logerror("     Mapper 65 switch ($a000) value: %02x\n", data);
-#endif
+			LOG_MMC(("     Mapper 65 switch ($a000) value: %02x\n", data));
 			break;
 
 		case 0x3000:
@@ -3129,9 +3061,7 @@ static WRITE8_HANDLER( mapper65_w )
 			/* Switch 8k bank at $c000 */
 			data &= prg_mask;
 			memory_set_bankptr (3, &nes.rom[0x2000 * (data) + 0x10000]);
-#ifdef LOG_MMC
-			logerror("     Mapper 65 switch ($c000) value: %02x\n", data);
-#endif
+			LOG_MMC(("     Mapper 65 switch ($c000) value: %02x\n", data));
 			break;
 
 		default:
@@ -3142,9 +3072,7 @@ static WRITE8_HANDLER( mapper65_w )
 
 static WRITE8_HANDLER( mapper66_w )
 {
-#ifdef LOG_MMC
-	logerror("* Mapper 66 switch, offset %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("* Mapper 66 switch, offset %04x, data: %02x\n", offset, data));
 
 	prg32 ((data & 0x30) >> 4);
 	chr8 (data & 0x03);
@@ -3844,36 +3772,29 @@ static WRITE8_HANDLER( mapper92_w )
 
 static WRITE8_HANDLER( mapper93_m_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper93_m_w %04x:%02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper93_m_w %04x:%02x\n", offset, data));
 
 	prg16_89ab (data);
 }
 
 static WRITE8_HANDLER( mapper93_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper93_w %04x:%02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper93_w %04x:%02x\n", offset, data));
+
 	/* The high nibble appears to be the same prg bank as */
 	/* was written to the mid-area mapper */
 }
 
 static WRITE8_HANDLER( mapper94_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper94_w %04x:%02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper94_w %04x:%02x\n", offset, data));
 
 	prg16_89ab (data >> 2);
 }
 
 static WRITE8_HANDLER( mapper95_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper95_w %04x:%02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper95_w %04x:%02x\n", offset, data));
 
 	switch (offset)
 	{
@@ -3905,26 +3826,21 @@ static WRITE8_HANDLER( mapper97_w )
 }
 static WRITE8_HANDLER( mapper101_m_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper101_m_w %04x:%02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper101_m_w %04x:%02x\n", offset, data));
 
 	chr8 (data);
 }
 
 static WRITE8_HANDLER( mapper101_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper101_w %04x:%02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper101_w %04x:%02x\n", offset, data));
 
 	/* ??? */
 }
 static WRITE8_HANDLER( mapper113_l_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper113_w %04x:%02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper113_w %04x:%02x\n", offset, data));
+
 	//I think this is the right value
 	if(offset>0xFF)
 		return;
@@ -3933,9 +3849,8 @@ static WRITE8_HANDLER( mapper113_l_w )
 }
 static WRITE8_HANDLER( mapper133_l_w )
 {
-#ifdef LOG_MMC
-	logerror("mapper133_w %04x:%02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper133_w %04x:%02x\n", offset, data));
+
 	//I think this is the right value
 	if(offset!=0x20)
 		return;
@@ -3951,9 +3866,7 @@ static WRITE8_HANDLER( mapper_140_m_w )
 
 static WRITE8_HANDLER( mapper144_w )
 {
-#ifdef LOG_MMC
-	logerror("* Mapper 144 switch, data: %02x\n", data);
-#endif
+	LOG_MMC(("* Mapper 144 switch, data: %02x\n", data));
 
 	//just like mapper 11, except bit 0 taken from ROM
 	//and 0x8000 ignored?
@@ -3971,17 +3884,13 @@ static WRITE8_HANDLER( mapper144_w )
 }
 static WRITE8_HANDLER( mapper180_w )
 {
-#ifdef LOG_MMC
-	logerror("* Mapper 180 switch, data: %02x\n", data);
-#endif
+	LOG_MMC(("* Mapper 180 switch, data: %02x\n", data));
 
 	prg16_cdef(data&7);
 }
 static WRITE8_HANDLER( mapper184_m_w )
 {
-#ifdef LOG_MMC
-	logerror("* Mapper 184 switch, data: %02x\n", data);
-#endif
+	LOG_MMC(("* Mapper 184 switch, data: %02x\n", data));
 
 	if(0==offset)
 	{
@@ -3996,9 +3905,7 @@ static WRITE8_HANDLER( mapper225_w )
 	int size_16;
 	int bank;
 
-#ifdef LOG_MMC
-	logerror ("mapper225_w, offset: %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper225_w, offset: %04x, data: %02x\n", offset, data));
 
 	chr8 (offset & 0x3f);
 	hi_bank = offset & 0x40;
@@ -4029,9 +3936,7 @@ static WRITE8_HANDLER( mapper226_w )
 	int bank;
 	static int reg0, reg1;
 
-#ifdef LOG_MMC
-	logerror ("mapper226_w, offset: %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper226_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset & 0x01)
 	{
@@ -4070,9 +3975,7 @@ static WRITE8_HANDLER( mapper227_w )
 	int size_32;
 	int bank;
 
-#ifdef LOG_MMC
-	logerror ("mapper227_w, offset: %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper227_w, offset: %04x, data: %02x\n", offset, data));
 
 	hi_bank = offset & 0x04;
 	size_32 = offset & 0x01;
@@ -4110,9 +4013,7 @@ static WRITE8_HANDLER( mapper228_w )
 	int bank;
 	int chr;
 
-#ifdef LOG_MMC
-	logerror ("mapper228_w, offset: %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper228_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* Determine low 4 bits of program bank */
 	bank = (offset & 0x780) >> 7;
@@ -4160,9 +4061,7 @@ static WRITE8_HANDLER( mapper228_w )
 
 static WRITE8_HANDLER( mapper229_w )
 {
-#ifdef LOG_MMC
-	logerror ("mapper229_w, offset: %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper229_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset & 0x20)
 		ppu2c0x_set_mirroring(0, PPU_MIRROR_HORZ);
@@ -4186,9 +4085,7 @@ static WRITE8_HANDLER( mapper231_w )
 {
 	int bank;
 
-#ifdef LOG_MMC
-	logerror("mapper231_w, offset: %04x, data: %02x\n", offset, data);
-#endif
+	LOG_MMC(("mapper231_w, offset: %04x, data: %02x\n", offset, data));
 
 	bank = (data & 0x03) | ((data & 0x80) >> 5);
 	prg32 (bank);

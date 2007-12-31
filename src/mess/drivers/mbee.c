@@ -49,14 +49,6 @@
 #include "mslegacy.h"
 #include "cpu/z80/z80daisy.h"
 
-#define VERBOSE 1
-
-#if VERBOSE
-#define LOG(x)  logerror x
-#else
-#define LOG(x)  /* x */
-#endif
-
 static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_READ( mbee_lowram_r ) AM_BASE( &mbee_workram )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM

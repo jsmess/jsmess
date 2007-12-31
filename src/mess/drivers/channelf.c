@@ -19,12 +19,7 @@
 #define VERBOSE 0
 #endif
 
-
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)	/* x */
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 /* The F8 has latches on its port pins
  * These mimic's their behavior

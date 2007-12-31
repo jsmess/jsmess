@@ -59,6 +59,7 @@
 #include <assert.h>
 
 #include "driver.h"
+#include "debug/debugcon.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "includes/coco.h"
@@ -70,19 +71,20 @@
 
 static UINT8 *system_rom;
 
-/* Only log errors if debugging ! */
-#ifdef MAME_DEBUG
+#define VERBOSE 0
 
-//#define LOG_BANK_UPDATE	1
-//#define LOG_DEFAULT_TASK	1
-//#define LOG_PAGE_WRITE	1
-//#define LOG_HALT	1
-//#define LOG_TASK	1
-//#define LOG_KEYBOARD	1
-//#define LOG_VIDEO	1
-#define LOG_DISK	0
-//#define LOG_INTS	1
-#endif
+
+#define LOG_BANK_UPDATE(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_DEFAULT_TASK(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_PAGE_WRITE(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_HALT(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_TASK(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_KEYBOARD(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_VIDEO(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_DISK(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_INTS(x) do { if (VERBOSE) logerror x; } while (0)
+
+
 
 #ifdef MAME_DEBUG
 #include "debug/debugcpu.h"
@@ -240,9 +242,8 @@ static void UpdateBanks(int first, int last)
 	int		bank_start;
 	int		bank_end;
 	int		MapPage;
-#ifdef LOG_BANK_UPDATE
-//	logerror("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,activecpu_get_pc());
-#endif
+
+	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,activecpu_get_pc()));
 	for(Page=first;Page<=last;Page++)
 	{
 		bank_start	= bank_info[Page].start;
@@ -293,13 +294,11 @@ static void UpdateBanks(int first, int last)
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end,0,0,writebank);
 		memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, bank_start, bank_end,0,0,writebank);
 
-#ifdef LOG_BANK_UPDATE
-		logerror("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)readbank);
-		logerror("PageRegsSet Task=%X Page=%x\n",TaskReg,Page);
-		logerror("memory_set_bankptr(%X)\n",Page+1);
-		logerror("memory_install_write8_handler CPU=0\n");
-		logerror("memory_install_write8_handler CPU=1\n");
-#endif
+		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)readbank));
+		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",TaskReg,Page));
+		LOG_BANK_UPDATE(("memory_set_bankptr(%X)\n",Page+1));
+		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=0\n"));
+		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=1\n"));
 	}
 }
 
@@ -308,10 +307,8 @@ static void SetDefaultTask(void)
 {
 	int		Idx;
 
-#ifdef LOG_DEFAULT_TASK
-	logerror("SetDefaultTask()\n");
-	debug_console_printf("Set Default task\n");
-#endif
+	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
+	if (VERBOSE) debug_console_printf("Set Default task\n");
 
 	TaskReg=NoPagingTask;
 
@@ -355,9 +352,7 @@ WRITE8_HANDLER( dgn_beta_page_w )
 {
 	PageRegs[PIATaskReg][offset].value=data;
 
-#ifdef LOG_PAGE_WRITE
-	logerror("PageRegWrite : task=$%X  offset=$%X value=$%X\n",PIATaskReg,offset,data);
-#endif
+	LOG_PAGE_WRITE(("PageRegWrite : task=$%X  offset=$%X value=$%X\n",PIATaskReg,offset,data));
 
 	if (EnableMapRegs)
 	{
@@ -550,9 +545,7 @@ static READ8_HANDLER(d_pia0_pb_r)
 	int Idx;
 	int Selected;
 
-#ifdef LOG_KEYBOARD
-	logerror("PB Read\n");
-#endif
+	LOG_KEYBOARD(("PB Read\n"));
 
 	KAny_next=0;
 
@@ -594,9 +587,7 @@ static READ8_HANDLER(d_pia0_pb_r)
 
 	RetVal = (KInDat_next<<5) | (KAny_next<<2);
 
-#ifdef LOG_KEYBOARD
-	logerror("FC22=$%02X KAny=%d\n",RetVal,KAny_next);
-#endif
+	LOG_KEYBOARD(("FC22=$%02X KAny=%d\n",RetVal,KAny_next));
 
 	return RetVal;
 }
@@ -606,16 +597,12 @@ static WRITE8_HANDLER(d_pia0_pb_w)
 	int	InClkState;
 	int	OutClkState;
 
-#ifdef LOG_KEYBOARD
-	logerror("PB Write\n");
-#endif
+	LOG_KEYBOARD(("PB Write\n"));
 
 	InClkState	= data & KInClk;
 	OutClkState	= data & KOutClk;
 
-#ifdef LOG_KEYBOARD
-	logerror("InClkState=$%02X OldInClkState=$%02X Keyrow=$%02X ",InClkState,(d_pia0_pb_last & KInClk),Keyrow);
-#endif
+	LOG_KEYBOARD(("InClkState=$%02X OldInClkState=$%02X Keyrow=$%02X ",InClkState,(d_pia0_pb_last & KInClk),Keyrow));
 
 	/* Input clock bit has changed state */
 	if ((InClkState) != (d_pia0_pb_last & KInClk))
@@ -625,9 +612,7 @@ static WRITE8_HANDLER(d_pia0_pb_w)
 		{
 			KInDat_next=(~Keyrow & 0x40)>>6;
 			Keyrow = ((Keyrow<<1) | 0x01) & 0x7F ;
-#ifdef LOG_KEYBOARD
-			logerror("Keyrow=$%02X KInDat_next=%X\n",Keyrow,KInDat_next);
-#endif
+			LOG_KEYBOARD(("Keyrow=$%02X KInDat_next=%X\n",Keyrow,KInDat_next));
 		}
 	}
 
@@ -637,9 +622,8 @@ static WRITE8_HANDLER(d_pia0_pb_w)
 static WRITE8_HANDLER(d_pia0_cb2_w)
 {
 	int	RowNo;
-#ifdef LOG_KEYBOARD
-	logerror("\nCB2 Write\n");
-#endif
+	LOG_KEYBOARD(("\nCB2 Write\n"));
+
 	/* load keyrow on rising edge of CB2 */
 	if((data==1) && (d_pia0_cb2_last==0))
 	{
@@ -650,10 +634,8 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 		/* In the beta the shift registers are a cmos 4015, and a cmos 4013 in series */
 		RowShifter = (RowShifter<<1) | ((d_pia0_pb_last & KOutDat)>>4);
 		RowShifter &= 0x3FF;
-#ifdef LOG_KEYBOARD
-		logerror("Rowshifter=$%02X Keyrow=$%02X\n",RowShifter,Keyrow);
-		debug_console_printf("rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",RowShifter,RowNo,Keyrow);
-#endif
+		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",RowShifter,Keyrow));
+		if (VERBOSE) debug_console_printf("rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",RowShifter,RowNo,Keyrow);
 	}
 
 	d_pia0_cb2_last=data;
@@ -698,9 +680,7 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 		else
 			HALT_DMA=CLEAR_LINE;
 
-#ifdef LOG_HALT
-		logerror("DMA_CPU HALT=%d\n",HALT_DMA);
-#endif
+		LOG_HALT(("DMA_CPU HALT=%d\n",HALT_DMA));
 		cpunum_set_input_line(1, INPUT_LINE_HALT, HALT_DMA);
 
 		/* CPU un-halted let it run ! */
@@ -717,18 +697,12 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 	if (data & DDenCtrl)
 	{
 		wd17xx_set_density(DEN_FM_LO);
-#ifdef MAME_DEBUG
-		if (LOG_DISK)
-			logerror("Set density low %d\n",(data & DDenCtrl));
-#endif
+		LOG_DISK(("Set density low %d\n",(data & DDenCtrl)));
 	}
 	else
 	{
 		wd17xx_set_density(DEN_MFM_LO);
-#ifdef MAME_DEBUG
-		if (LOG_DISK)
-			logerror("Set density high %d\n",(data & DDenCtrl));
-#endif
+		LOG_DISK(("Set density high %d\n",(data & DDenCtrl)));
 	}
 }
 
@@ -749,9 +723,7 @@ static WRITE8_HANDLER(d_pia1_pb_w)
 			HALT_CPU=CLEAR_LINE;
 		else
 			HALT_CPU=ASSERT_LINE;
-#ifdef LOG_HALT
-		logerror("MAIN_CPU HALT=%d\n",HALT_CPU);
-#endif
+		LOG_HALT(("MAIN_CPU HALT=%d\n",HALT_CPU));
 		cpunum_set_input_line(0, INPUT_LINE_HALT, HALT_CPU);
 
 		d_pia1_pb_last=data & 0x02;
@@ -792,9 +764,7 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 	int OldEnableMap;
 	int NMI;
 
-#ifdef LOG_TASK
-	logerror("FCC0 write : $%02X\n",data);
-#endif
+	LOG_TASK(("FCC0 write : $%02X\n",data));
 
 	/* Bit 7 of $FFC0, seems to control NMI on second CPU */
 	NMI=(data & 0x80);
@@ -802,10 +772,7 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 	/* only take action if NMI changed */
 	if(NMI!=DMA_NMI_LAST)
 	{
-#ifdef LOG_INTS
-		logerror("cpu1 NMI : %d\n",NMI);
-//		debug_console_printf("cpu1 NMI : %d\n",NMI);
-#endif
+		LOG_INTS(("cpu1 NMI : %d\n",NMI));
 		if(!NMI)
 		{
 			cpunum_set_input_line(1,INPUT_LINE_NMI,ASSERT_LINE);
@@ -831,9 +798,7 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 	OldTask=PIATaskReg;
 	PIATaskReg=data & 0x0F;
 
-#ifdef LOG_TASK
-	logerror("OldTask=$%02X EnableMapRegs=%d OldEnableMap=%d\n",OldTask,EnableMapRegs,OldEnableMap);
-#endif
+	LOG_TASK(("OldTask=$%02X EnableMapRegs=%d OldEnableMap=%d\n",OldTask,EnableMapRegs,OldEnableMap));
 
 	// Maping was enabled or disabled, select apropreate task reg
 	// and map it in
@@ -858,9 +823,7 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 			UpdateBanks(0,IOPage+1);
 		}
 	}
-#ifdef LOG_TASK
-	logerror("TaskReg=$%02X PIATaskReg=$%02X\n",TaskReg,PIATaskReg);
-#endif
+	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n",TaskReg,PIATaskReg));
 }
 
 static READ8_HANDLER(d_pia2_pb_r)
@@ -903,9 +866,7 @@ static void cpu0_recalc_irq(int state)
 		IRQ = CLEAR_LINE;
 
 	cpunum_set_input_line(0, M6809_IRQ_LINE, IRQ);
-#ifdef LOG_INTS
-	logerror("cpu0 IRQ : %d\n",IRQ);
-#endif
+	LOG_INTS(("cpu0 IRQ : %d\n",IRQ));
 }
 
 static void cpu0_recalc_firq(int state)
@@ -920,9 +881,7 @@ static void cpu0_recalc_firq(int state)
 
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, FIRQ);
 
-#ifdef LOG_INTS
-	logerror("cpu0 FIRQ : %d\n",FIRQ);
-#endif
+	LOG_INTS(("cpu0 FIRQ : %d\n",FIRQ));
 }
 
 /* CPU 1 */
@@ -930,9 +889,7 @@ static void cpu0_recalc_firq(int state)
 static void cpu1_recalc_firq(int state)
 {
 	cpunum_set_input_line(1, M6809_FIRQ_LINE, state);
-#ifdef LOG_INTS
-	logerror("cpu1 FIRQ : %d\n",state);
-#endif
+	LOG_INTS(("cpu1 FIRQ : %d\n",state));
 }
 
 /********************************************************************************************/
@@ -962,10 +919,7 @@ static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 			break;
 	}
 
-#ifdef MAME_DEBUG
-	if (LOG_DISK)
-		logerror("dgnbeta_fdc_callback(%d)\n",event);
-#endif
+	LOG_DISK(("dgnbeta_fdc_callback(%d)\n",event));
 }
 
  READ8_HANDLER(dgnbeta_wd2797_r)
@@ -976,10 +930,7 @@ static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 	{
 		case 0:
 			result = wd17xx_status_r(0);
-#ifdef MAME_DEBUG
-			if (LOG_DISK)
-				logerror("Disk status=%2.2X\n",result);
-#endif
+			LOG_DISK(("Disk status=%2.2X\n",result));
 			break;
 		case 1:
 			result = wd17xx_track_r(0);
@@ -1029,9 +980,7 @@ static void ScanInKeyboard(void)
 	int	Idx;
 	int	Row;
 
-#ifdef LOG_KEYBOARD
-	logerror("Scanning Host keyboard\n");
-#endif
+	LOG_KEYBOARD(("Scanning Host keyboard\n"));
 
 	for(Idx=0;Idx<NoKeyrows;Idx++)
 	{
@@ -1050,13 +999,11 @@ static void ScanInKeyboard(void)
 			default : Row=0x7F; break;
 		}
 		Keyboard[Idx]=Row;
-#ifdef LOG_KEYBOARD
-		logerror("Keyboard[%d]=$%02X\n",Idx,Row);
+		LOG_KEYBOARD(("Keyboard[%d]=$%02X\n",Idx,Row));
 		if (Row!=0x7F)
 		{
-			logerror("Found Pressed Key\n");
+			LOG_KEYBOARD(("Found Pressed Key\n"));
 		}
-#endif
 	}
 #endif
 }
@@ -1073,9 +1020,7 @@ void dgn_beta_frame_interrupt (int data)
 	{
 		pia_2_cb2_w(0,CLEAR_LINE);
 	}
-#ifdef LOG_VIDEO
-	logerror("Vblank\n");
-#endif
+	LOG_VIDEO(("Vblank\n"));
 	ScanInKeyboard();
 }
 

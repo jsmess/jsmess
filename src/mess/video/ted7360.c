@@ -555,7 +555,7 @@ static void ted7360_set_interrupt (int mask)
 	{
 		if (!(ted7360[9] & 0x80))
 		{
-			DBG_LOG (1, "ted7360", (errorlog, "irq start %.2x\n", mask));
+			DBG_LOG (1, "ted7360", ("irq start %.2x\n", mask));
 			ted7360[9] |= 0x80;
 			c16_interrupt (1);
 		}
@@ -568,7 +568,7 @@ static void ted7360_clear_interrupt (int mask)
 	ted7360[9] &= ~mask;
 	if ((ted7360[9] & 0x80) && !(ted7360[9] & ted7360[0xa] & 0x5e))
 	{
-		DBG_LOG (1, "ted7360", (errorlog, "irq end %.2x\n", mask));
+		DBG_LOG (1, "ted7360", ("irq end %.2x\n", mask));
 		ted7360[9] &= ~0x80;
 		c16_interrupt (0);
 	}
@@ -583,7 +583,7 @@ static int ted7360_rastercolumn (void)
 static TIMER_CALLBACK(ted7360_timer_timeout)
 {
 	int which = param;
-	DBG_LOG (3, "ted7360 ", (errorlog, "timer %d timeout\n", which));
+	DBG_LOG (3, "ted7360 ", ("timer %d timeout\n", which));
 	switch (which)
 	{
 	case 1:
@@ -626,7 +626,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 
 	if ((offset != 8) && ((offset < 0x15) || (offset > 0x19)))
 	{
-		DBG_LOG (1, "ted7360_port_w", (errorlog, "%.2x:%.2x\n", offset, data));
+		DBG_LOG (1, "ted7360_port_w", ("%.2x:%.2x\n", offset, data));
 	}
 	switch (offset)
 	{
@@ -715,7 +715,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 				x_begin = HORICONTALPOS;
 				x_end = x_begin + 320;
 			}
-			DBG_LOG (3, "ted7360_port_w", (errorlog, "%s %s\n", data & 0x40 ? "ntsc" : "pal",
+			DBG_LOG (3, "ted7360_port_w", ("%s %s\n", data & 0x40 ? "ntsc" : "pal",
 										   data & 0x20 ? "hori freeze" : ""));
 			chargenaddr = CHARGENADDR;
 		}
@@ -743,7 +743,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 #endif
 		if ((data ^ old) & 1)
 		{
-/*    DBG_LOG(1,"set rasterline hi",(errorlog,"soll:%d\n",RASTERLINE)); */
+/*    DBG_LOG(1,"set rasterline hi",("soll:%d\n",RASTERLINE)); */
 		}
 		break;
 	case 0xb:
@@ -751,7 +751,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		{
 			ted7360_drawlines (lastline, rasterline);
 			ted7360[offset] = data;
-			/*  DBG_LOG(1,"set rasterline lo",(errorlog,"soll:%d\n",RASTERLINE)); */
+			/*  DBG_LOG(1,"set rasterline lo",("soll:%d\n",RASTERLINE)); */
 		}
 		break;
 	case 0xc:
@@ -769,7 +769,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 			ted7360[offset] = data;
 			bitmapaddr = BITMAPADDR;
 			chargenaddr = CHARGENADDR;
-			DBG_LOG (3, "ted7360_port_w", (errorlog, "bitmap %.4x %s\n",
+			DBG_LOG (3, "ted7360_port_w", ("bitmap %.4x %s\n",
 										   BITMAPADDR, INROM ? "rom" : "ram"));
 		}
 		break;
@@ -779,7 +779,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 			ted7360_drawlines (lastline, rasterline);
 			ted7360[offset] = data;
 			chargenaddr = CHARGENADDR;
-			DBG_LOG (3, "ted7360_port_w", (errorlog, "chargen %.4x %s %d\n",
+			DBG_LOG (3, "ted7360_port_w", ("chargen %.4x %s %d\n",
 										   CHARGENADDR, data & 2 ? "" : "doubleclock",
 										   data & 1));
 		}
@@ -790,7 +790,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 			ted7360_drawlines (lastline, rasterline);
 			ted7360[offset] = data;
 			videoaddr = VIDEOADDR;
-			DBG_LOG (3, "ted7360_port_w", (errorlog, "videoram %.4x\n",
+			DBG_LOG (3, "ted7360_port_w", ("videoram %.4x\n",
 										   VIDEOADDR));
 		}
 		break;
@@ -837,12 +837,12 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 0x1c:
 		ted7360[offset] = data;		   /*? */
-		DBG_LOG (1, "ted7360_port_w", (errorlog, "write to rasterline high %.2x\n",
+		DBG_LOG (1, "ted7360_port_w", ("write to rasterline high %.2x\n",
 									   data));
 		break;
 	case 0x1f:
 		ted7360[offset] = data;
-		DBG_LOG (1, "ted7360_port_w", (errorlog, "write to cursorblink %.2x\n", data));
+		DBG_LOG (1, "ted7360_port_w", ("write to cursorblink %.2x\n", data));
 		break;
 	default:
 		ted7360[offset] = data;
@@ -927,7 +927,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 0x1f:
 		val = ((rasterline & 7) << 4) | (ted7360[offset] & 0x0f);
-		DBG_LOG (1, "ted7360_port_w", (errorlog, "read from cursorblink %.2x\n", val));
+		DBG_LOG (1, "ted7360_port_w", ("read from cursorblink %.2x\n", val));
 		break;
 	default:
 		val = ted7360[offset];
@@ -936,7 +936,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	if ((offset != 8) && (offset >= 6) && (offset != 0x1c) && (offset != 0x1d) && (offset != 9)
 		&& ((offset < 0x15) || (offset > 0x19)))
 	{
-		DBG_LOG (1, "ted7360_port_r", (errorlog, "%.2x:%.2x\n", offset, val));
+		DBG_LOG (1, "ted7360_port_r", ("%.2x:%.2x\n", offset, val));
 	}
 	return val;
 }

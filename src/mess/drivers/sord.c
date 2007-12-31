@@ -36,7 +36,8 @@
 #include "formats/basicdsk.h"
 
 
-#define SORD_DEBUG
+#define SORD_DEBUG 1
+#define LOG(x) do { if (SORD_DEBUG) logerror x; } while (0)
 
 /*********************************************************************************************/
 /* FD5 disk interface */
@@ -70,9 +71,7 @@ static WRITE8_HANDLER(fd5_communication_w)
 	cpu_yield();
 
 	fd5_port_0x020_data = data;
-#ifdef SORD_DEBUG
-	logerror("fd5 0x020: %02x %04x\n",data,activecpu_get_pc());
-#endif
+	LOG(("fd5 0x020: %02x %04x\n",data,activecpu_get_pc()));
 }
 
 static  READ8_HANDLER(fd5_communication_r)
@@ -82,9 +81,7 @@ static  READ8_HANDLER(fd5_communication_r)
 	cpu_yield();
 
 	data = (obfa<<3)|(ibfa<<2)|2;
-#ifdef SORD_DEBUG
-	logerror("fd5 0x030: %02x %04x\n",data, activecpu_get_pc());
-#endif
+	LOG(("fd5 0x030: %02x %04x\n",data, activecpu_get_pc()));
 
 	return data;
 }
@@ -93,9 +90,7 @@ static  READ8_HANDLER(fd5_data_r)
 {
 	cpu_yield();
 
-#ifdef SORD_DEBUG
-	logerror("fd5 0x010 r: %02x %04x\n",fd5_databus,activecpu_get_pc());
-#endif
+	LOG(("fd5 0x010 r: %02x %04x\n",fd5_databus,activecpu_get_pc()));
 
 	ppi8255_set_portC(0, 0x50);
 	ppi8255_set_portC(0, 0x10);
@@ -106,9 +101,7 @@ static  READ8_HANDLER(fd5_data_r)
 
 static WRITE8_HANDLER(fd5_data_w)
 {
-#ifdef SORD_DEBUG
-	logerror("fd5 0x010 w: %02x %04x\n",data,activecpu_get_pc());
-#endif
+	LOG(("fd5 0x010 w: %02x %04x\n",data,activecpu_get_pc()));
 
 	fd5_databus = data;
 
@@ -129,9 +122,7 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 	else
 		state = 1;
 
-#ifdef SORD_DEBUG
-	logerror("fd5 drive state w: %02x\n",state);
-#endif
+	LOG(("fd5 drive state w: %02x\n",state));
 
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), state);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), state);
@@ -219,9 +210,7 @@ static  READ8_HANDLER(sord_ppi_portb_r)
 {
 	cpu_yield();
 
-#ifdef SORD_DEBUG
-	logerror("m5 read from pi5 port b %04x\n",activecpu_get_pc());
-#endif
+	LOG(("m5 read from pi5 port b %04x\n",activecpu_get_pc()));
 
 	return 0x0ff;
 }
@@ -230,9 +219,7 @@ static  READ8_HANDLER(sord_ppi_portc_r)
 {
 	cpu_yield();
 
-#ifdef SORD_DEBUG
-	logerror("m5 read from pi5 port c %04x\n",activecpu_get_pc());
-#endif
+	LOG(("m5 read from pi5 port c %04x\n",activecpu_get_pc()));
 
 /* from fd5 */
 /* 00 = 0000 = write */
@@ -279,9 +266,7 @@ static WRITE8_HANDLER(sord_ppi_portb_w)
 		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
 		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
 	}
-#ifdef SORD_DEBUG
-	logerror("m5 write to pi5 port b: %02x %04x\n",data,activecpu_get_pc());
-#endif
+	LOG(("m5 write to pi5 port b: %02x %04x\n",data,activecpu_get_pc()));
 }
 
 /* A,  B,  C,  D,  E,   F,  G,  H,  I,  J, K,  L,  M,   N, O, P, Q, R,   */
@@ -297,9 +282,7 @@ static WRITE8_HANDLER(sord_ppi_portc_w)
 	ibfa = (data & 0x20) ? 1 : 0;
 
 	cpu_yield();
-#ifdef SORD_DEBUG
-	logerror("m5 write to pi5 port c: %02x %04x\n",data,activecpu_get_pc());
-#endif
+	LOG(("m5 write to pi5 port c: %02x %04x\n",data,activecpu_get_pc()));
 }
 
 static const ppi8255_interface sord_ppi8255_interface =

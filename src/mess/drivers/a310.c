@@ -37,16 +37,6 @@
 #include "sound/dac.h"
 #include "image.h"
 
-#ifndef VERBOSE
-#define VERBOSE 0
-#endif
-
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)	/* x */
-#endif
-
 // interrupt register stuff
 #define A310_IRQA_PRINTER_BUSY (0x01)
 #define A310_IRQA_SERIAL_RING  (0x02)

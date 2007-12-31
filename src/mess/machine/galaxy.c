@@ -14,13 +14,8 @@
 
 #define DEBUG_GALAXY_LATCH	0
 
-#if DEBUG_GALAXY_LATCH
-	#define LOG_GALAXY_LATCH_R(_port, _data) logerror ("Galaxy latch read : %04x, Data: %02x\n", _port, _data)
-	#define LOG_GALAXY_LATCH_W(_port, _data) logerror ("Galaxy latch write: %04x, Data: %02x\n", _port, _data)
-#else
-	#define LOG_GALAXY_LATCH_R(_port, _data)
-	#define LOG_GALAXY_LATCH_W(_port, _data)
-#endif
+#define LOG_GALAXY_LATCH_R(_port, _data) do { if (DEBUG_GALAXY_LATCH) logerror ("Galaxy latch read : %04x, Data: %02x\n", _port, _data); } while (0)
+#define LOG_GALAXY_LATCH_W(_port, _data) do { if (DEBUG_GALAXY_LATCH) logerror ("Galaxy latch write: %04x, Data: %02x\n", _port, _data); } while (0)
 
 int galaxy_interrupts_enabled = TRUE;
 

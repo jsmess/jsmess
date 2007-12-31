@@ -11,7 +11,7 @@
 #include <time.h>
 
 #define LOG_LEVEL  1
-#define _logerror(level,...)  if (LOG_LEVEL > level) logerror(__VA_ARGS__)
+#define _logerror(level,x)  if (LOG_LEVEL > level) logerror x
 
 #define RTC_MODE_NONE  0
 #define RTC_MODE_SEND  1
@@ -52,7 +52,7 @@ static PCF8593 rtc;
 
 void pcf8593_init( void)
 {
-	_logerror( 0, "pcf8593_init\n");
+	_logerror( 0, ("pcf8593_init\n"));
 	memset( &rtc, 0, sizeof( rtc));
 	rtc.size = 16;
 	rtc.data = malloc_or_die( rtc.size);
@@ -63,13 +63,13 @@ void pcf8593_init( void)
 
 void pcf8593_exit( void)
 {
-	_logerror( 0, "pcf8593_exit\n");
+	_logerror( 0, ("pcf8593_exit\n"));
 	free( rtc.data);
 }
 
 void pcf8593_reset( void)
 {
-	_logerror( 0, "pcf8593_reset\n");
+	_logerror( 0, ("pcf8593_reset\n"));
 	rtc.pin_scl = 1;
 	rtc.pin_sda = 1;
 	rtc.active  = FALSE;
@@ -96,7 +96,7 @@ void pcf8593_pin_scl( int data)
 				// bit 9 = end
 				if (rtc.bits > 8)
 				{
-					_logerror( 2, "pcf8593_write_byte(%02X)\n", rtc.data_recv[rtc.data_recv_index]);
+					_logerror( 2, ("pcf8593_write_byte(%02X)\n", rtc.data_recv[rtc.data_recv_index]));
 					// enter receive mode when 1st byte = 0xA3
 					if ((rtc.data_recv[0] == 0xA3) && (rtc.data_recv_index == 0))
 					{
@@ -131,11 +131,11 @@ void pcf8593_pin_scl( int data)
 				// bit 9 = end
 				if (rtc.bits > 8)
 				{
-					_logerror( 2, "pcf8593_read_byte(%02X)\n", rtc.data[rtc.pos]);
+					_logerror( 2, ("pcf8593_read_byte(%02X)\n", rtc.data[rtc.pos]));
 					// end ?
   					if (rtc.pin_sda)
 					{
-						_logerror( 2, "pcf8593 end\n");
+						_logerror( 2, ("pcf8593 end\n"));
   						rtc.mode = RTC_MODE_RECV;
            				pcf8593_clear_buffer_rx();
 					}
@@ -157,11 +157,11 @@ void pcf8593_pin_sda_w( int data)
 	if (rtc.pin_scl)
 	{
 		// log init I2C
-		if (data) _logerror( 1, "pcf8593 init i2c\n");
+		if (data) _logerror( 1, ("pcf8593 init i2c\n"));
 		// start condition (high to low when clock is high)
 		if ((!data) && (rtc.pin_sda))
 		{
-			_logerror( 1, "pcf8593 start condition\n");
+			_logerror( 1, ("pcf8593 start condition\n"));
 			rtc.active          = TRUE;
 			rtc.bits            = 0;
 			rtc.data_recv_index = 0;
@@ -171,7 +171,7 @@ void pcf8593_pin_sda_w( int data)
 		// stop condition (low to high when clock is high)
 		if ((data) && (!rtc.pin_sda))
 		{
-			_logerror( 1, "pcf8593 stop condition\n");
+			_logerror( 1, ("pcf8593 stop condition\n"));
 			rtc.active = FALSE;
 		}
 	}
@@ -227,7 +227,7 @@ static int get_days_in_month( int year, int month)
 static TIMER_CALLBACK( pcf8593_timer_callback )
 {
 	int value;
-	_logerror( 2, "pcf8593_timer_callback (%d)\n", param);
+	_logerror( 2, ("pcf8593_timer_callback (%d)\n", param));
 	// check if counting is enabled
 	if (rtc.data[0] & 0x80) return;
 	// increment second
@@ -287,7 +287,7 @@ static TIMER_CALLBACK( pcf8593_timer_callback )
 void pcf8593_load( mame_file *file)
 {
 	mame_system_time systime;
-	_logerror( 0, "pcf8593_load (%p)\n", file);
+	_logerror( 0, ("pcf8593_load (%p)\n", file));
 	mame_fread( file, rtc.data, rtc.size);
 	mame_get_current_datetime( Machine, &systime);
 	pcf8593_set_date( systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday);
@@ -296,14 +296,14 @@ void pcf8593_load( mame_file *file)
 
 void pcf8593_save( mame_file *file)
 {
-	_logerror( 0, "pcf8593_save (%p)\n", file);
+	_logerror( 0, ("pcf8593_save (%p)\n", file));
 	mame_fwrite( file, rtc.data, rtc.size);
 }
 
 /*
 NVRAM_HANDLER( pcf8593 )
 {
-	_logerror( 0, "nvram_handler_pcf8593 (%p/%d)\n", file, read_or_write);
+	_logerror( 0, ("nvram_handler_pcf8593 (%p/%d)\n", file, read_or_write));
 	if (read_or_write)
 	{
 		pcf8593_save( file);

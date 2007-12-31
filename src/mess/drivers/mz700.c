@@ -68,17 +68,6 @@
 #include "formats/mz_cas.h"
 #include "mslegacy.h"
 
-#ifndef VERBOSE
-#define VERBOSE 1
-#endif
-
-#if VERBOSE
-#define LOG(N,M,A)	\
-	if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
-#else
-#define LOG(N,M,A)
-#endif
-
 static ADDRESS_MAP_START( mz700_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x00fff) AM_RAMBANK(1)
 	AM_RANGE( 0x01000, 0x0cfff) AM_RAM

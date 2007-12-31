@@ -29,6 +29,8 @@ Source Changes:
 - The core is based on MAME 0.122u2.  This incorporates all features of the
   update to this core.  [MAME team]
 
+- Conditional logging cleanups.  [Atari Ace]
+
 
 
 0.122

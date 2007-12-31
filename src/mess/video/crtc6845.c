@@ -47,12 +47,8 @@
 
 #define VERBOSE 0
 
-#if VERBOSE
 #define DBG_LOG(N,M,A)      \
-    if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
-#else
-#define DBG_LOG(N,M,A)
-#endif
+    if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
 /***************************************************************************
 

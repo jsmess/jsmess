@@ -102,8 +102,8 @@
 #include "image.h"
 #include "sound/beep.h"
 
-// uncomment for debug log output
-//#define VERBOSE
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 static void pcw_fdc_interrupt(int);
 
@@ -391,9 +391,7 @@ static  READ8_HANDLER(pcw_interrupt_counter_r)
 
 static WRITE8_HANDLER(pcw_bank_select_w)
 {
-#ifdef VERBOSE
-	logerror("BANK: %2x %x\n",offset, data);
-#endif
+	LOG(("BANK: %2x %x\n",offset, data));
 	pcw_banks[offset] = data;
 
 	pcw_update_mem(offset, data);
@@ -431,9 +429,7 @@ static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 
 static WRITE8_HANDLER(pcw_system_control_w)
 {
-#ifdef VERBOSE
-	logerror("SYSTEM CONTROL: %d\n",data);
-#endif
+	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
 	{

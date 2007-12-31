@@ -10,6 +10,14 @@
 #include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
 
+#ifdef MAME_DEBUG
+#define VERBOSE 1
+#else
+#define VERBOSE 0
+#endif
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
+
 /****************************************************************************
  * Scanline Interrupt System
  ****************************************************************************/
@@ -39,18 +47,14 @@ WRITE8_HANDLER ( astrocade_interrupt_enable_w )
 	lightpen_interrupts_enabled = data & 0x02;
 	lightpen_interrupt_mode = data & 0x01;
 
-#ifdef MAME_DEBUG
-    logerror("Interrupt Flag set to %02x\n",data & 0x0f);
-#endif
+    	LOG(("Interrupt Flag set to %02x\n",data & 0x0f));
 }
 
 WRITE8_HANDLER ( astrocade_interrupt_w )
 {
 	/* A write to 0F triggers an interrupt at that scanline */
 
-#ifdef MAME_DEBUG
-	logerror("Scanline interrupt set to %02x\n",data);
-#endif
+	LOG(("Scanline interrupt set to %02x\n",data));
 
     NextScanInt = data;
 }

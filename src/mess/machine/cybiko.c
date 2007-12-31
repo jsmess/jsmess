@@ -55,7 +55,7 @@
 #endif
 
 #define LOG_LEVEL  1
-#define _logerror(level,...)  if (LOG_LEVEL > level) logerror(__VA_ARGS__)
+#define _logerror(level,x)  if (LOG_LEVEL > level) logerror x
 
 /////////////////////////
 // FUNCTION PROTOTYPES //
@@ -87,19 +87,19 @@ static void init_ram_handler( offs_t start, offs_t size, offs_t mirror)
 
 DRIVER_INIT( cybikov1 )
 {
-	_logerror( 0, "init_cybikov1\n");
+	_logerror( 0, ("init_cybikov1\n"));
 	init_ram_handler( 0x200000, mess_ram_size, 0x200000);
 }
 
 DRIVER_INIT( cybikov2 )
 {
-	_logerror( 0, "init_cybikov2\n");
+	_logerror( 0, ("init_cybikov2\n"));
 	init_ram_handler( 0x200000, mess_ram_size, 0x200000);
 }
 
 DRIVER_INIT( cybikoxt )
 {
-	_logerror( 0, "init_cybikoxt\n");
+	_logerror( 0, ("init_cybikoxt\n"));
 	init_ram_handler( 0x400000, mess_ram_size, 0x200000);
 }
 
@@ -110,7 +110,7 @@ DRIVER_INIT( cybikoxt )
 /*
 NVRAM_HANDLER( cybikov1 )
 {
-	_logerror( 0, "nvram_handler_cybikov1 (%p/%d)\n", file, read_or_write);
+	_logerror( 0, ("nvram_handler_cybikov1 (%p/%d)\n", file, read_or_write));
 	nvram_handler_at45dbxx( machine, file, read_or_write);
 	nvram_handler_pcf8593( machine, file, read_or_write);
 }
@@ -119,7 +119,7 @@ NVRAM_HANDLER( cybikov1 )
 /*
 NVRAM_HANDLER( cybikov2 )
 {
-	_logerror( 0, "nvram_handler_cybikov2 (%p/%d)\n", file, read_or_write);
+	_logerror( 0, ("nvram_handler_cybikov2 (%p/%d)\n", file, read_or_write));
 	nvram_handler_at45dbxx( machine, file, read_or_write);
 	nvram_handler_sst39vfx( machine, file, read_or_write);
 	nvram_handler_pcf8593( machine, file, read_or_write);
@@ -129,7 +129,7 @@ NVRAM_HANDLER( cybikov2 )
 /*
 NVRAM_HANDLER( cybikoxt )
 {
-	_logerror( 0, "nvram_handler_cybikoxt (%p/%d)\n", file, read_or_write);
+	_logerror( 0, ("nvram_handler_cybikoxt (%p/%d)\n", file, read_or_write));
 	nvram_handler_sst39vfx( machine, file, read_or_write);
 	nvram_handler_pcf8593( machine, file, read_or_write);
 }
@@ -184,7 +184,7 @@ static int nvram_system_save( running_machine *machine, const char *name, nvram_
 
 MACHINE_START( cybikov1 )
 {
-	_logerror( 0, "machine_start_cybikov1\n");
+	_logerror( 0, ("machine_start_cybikov1\n"));
 	// real-time clock
 	pcf8593_init();
 	nvram_system_load( machine, "rtc", pcf8593_load, 0);
@@ -199,7 +199,7 @@ MACHINE_START( cybikov1 )
 
 MACHINE_START( cybikov2 )
 {
-	_logerror( 0, "machine_start_cybikov2\n");
+	_logerror( 0, ("machine_start_cybikov2\n"));
 	// real-time clock
 	pcf8593_init();
 	nvram_system_load( machine, "rtc", pcf8593_load, 0);
@@ -218,7 +218,7 @@ MACHINE_START( cybikov2 )
 
 MACHINE_START( cybikoxt )
 {
-	_logerror( 0, "machine_start_cybikoxt\n");
+	_logerror( 0, ("machine_start_cybikoxt\n"));
 	// real-time clock
 	pcf8593_init();
 	nvram_system_load( machine, "rtc", pcf8593_load, 0);
@@ -238,7 +238,7 @@ MACHINE_START( cybikoxt )
 
 MACHINE_RESET( cybikov1 )
 {
-	_logerror( 0, "machine_reset_cybikov1\n");
+	_logerror( 0, ("machine_reset_cybikov1\n"));
 	pcf8593_reset();
 	at45dbxx_reset();
 	cybiko_rs232_reset();
@@ -246,7 +246,7 @@ MACHINE_RESET( cybikov1 )
 
 MACHINE_RESET( cybikov2 )
 {
-	_logerror( 0, "machine_reset_cybikov2\n");
+	_logerror( 0, ("machine_reset_cybikov2\n"));
 	pcf8593_reset();
 	at45dbxx_reset();
 	sst39vfx_reset();
@@ -255,7 +255,7 @@ MACHINE_RESET( cybikov2 )
 
 MACHINE_RESET( cybikoxt )
 {
-	_logerror( 0, "machine_reset_cybikoxt\n");
+	_logerror( 0, ("machine_reset_cybikoxt\n"));
 	pcf8593_reset();
 	sst39vfx_reset();
 	cybiko_rs232_reset();
@@ -267,7 +267,7 @@ MACHINE_RESET( cybikoxt )
 
 MACHINE_STOP( cybikov1 )
 {
-	_logerror( 0, "machine_stop_cybikov1\n");
+	_logerror( 0, ("machine_stop_cybikov1\n"));
 	// real-time clock
 	nvram_system_save( machine, "rtc", pcf8593_save);
 	pcf8593_exit();
@@ -280,7 +280,7 @@ MACHINE_STOP( cybikov1 )
 
 MACHINE_STOP( cybikov2 )
 {
-	_logerror( 0, "machine_stop_cybikov2\n");
+	_logerror( 0, ("machine_stop_cybikov2\n"));
 	// real-time clock
 	nvram_system_save( machine, "rtc", pcf8593_save);
 	pcf8593_exit();
@@ -296,7 +296,7 @@ MACHINE_STOP( cybikov2 )
 
 MACHINE_STOP( cybikoxt )
 {
-	_logerror( 0, "machine_stop_cybikoxt\n");
+	_logerror( 0, ("machine_stop_cybikoxt\n"));
 	// real-time clock
 	nvram_system_save( machine, "rtc", pcf8593_save);
 	pcf8593_exit();
@@ -328,19 +328,19 @@ static CYBIKO_RS232 rs232;
 
 static void cybiko_rs232_init( void)
 {
-	_logerror( 0, "cybiko_rs232_init\n");
+	_logerror( 0, ("cybiko_rs232_init\n"));
 	memset( &rs232, 0, sizeof( rs232));
 //	timer_pulse( TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
 }
 
 static void cybiko_rs232_exit( void)
 {
-	_logerror( 0, "cybiko_rs232_exit\n");
+	_logerror( 0, ("cybiko_rs232_exit\n"));
 }
 
 static void cybiko_rs232_reset( void)
 {
-	_logerror( 0, "cybiko_rs232_reset\n");
+	_logerror( 0, ("cybiko_rs232_reset\n"));
 }
 
 static void cybiko_rs232_write_byte( UINT8 data)
@@ -352,7 +352,7 @@ static void cybiko_rs232_write_byte( UINT8 data)
 
 static void cybiko_rs232_pin_sck( int data)
 {
-	_logerror( 3, "cybiko_rs232_pin_sck (%d)\n", data);
+	_logerror( 3, ("cybiko_rs232_pin_sck (%d)\n", data));
 	// clock high-to-low
 	if ((rs232.pin.sck == 1) && (data == 0))
 	{
@@ -380,13 +380,13 @@ static void cybiko_rs232_pin_sck( int data)
 
 static void cybiko_rs232_pin_txd( int data)
 {
-	_logerror( 3, "cybiko_rs232_pin_txd (%d)\n", data);
+	_logerror( 3, ("cybiko_rs232_pin_txd (%d)\n", data));
 	rs232.pin.txd = data;
 }
 
 static int cybiko_rs232_pin_rxd( void)
 {
-	_logerror( 3, "cybiko_rs232_pin_rxd\n");
+	_logerror( 3, ("cybiko_rs232_pin_rxd\n"));
 	return rs232.pin.rxd;
 }
 
@@ -417,7 +417,7 @@ static READ8_HANDLER( cybiko_key_r_byte )
 {
 	UINT8 data = 0xFF;
 	int i;
-	_logerror( 2, "cybiko_key_r_byte (%08X)\n", offset);
+	_logerror( 2, ("cybiko_key_r_byte (%08X)\n", offset));
 	// A11
 	if (!(offset & (1 << 11))) data &= 0xFE;
 	// A1 .. A9
@@ -431,17 +431,17 @@ static READ8_HANDLER( cybiko_key_r_byte )
 READ16_HANDLER( cybiko_key_r )
 {
 	UINT16 data = 0;
-	_logerror( 2, "cybiko_key_r (%08X/%04X)\n", offset, mem_mask);
+	_logerror( 2, ("cybiko_key_r (%08X/%04X)\n", offset, mem_mask));
 	if ACCESSING_MSB16 data = data | (cybiko_key_r_byte( offset * 2 + 0) << 8);
 	if ACCESSING_LSB16 data = data | (cybiko_key_r_byte( offset * 2 + 1) << 0);
-	_logerror( 2, "%04X\n", data);
+	_logerror( 2, ("%04X\n", data));
 	return data;
 }
 
 READ8_HANDLER( cybiko_io_reg_r )
 {
 	UINT8 data = 0;
-	_logerror( 2, "cybiko_io_reg_r (%08X)\n", offset);
+	_logerror( 2, ("cybiko_io_reg_r (%08X)\n", offset));
 	switch (offset)
 	{
 		// keyboard
@@ -474,7 +474,7 @@ READ8_HANDLER( cybiko_io_reg_r )
 
 WRITE8_HANDLER( cybiko_io_reg_w )
 {
-	_logerror( 2, "cybiko_io_reg_w (%08X/%02X)\n", offset, data);
+	_logerror( 2, ("cybiko_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
 		// speaker
@@ -502,20 +502,20 @@ WRITE8_HANDLER( cybiko_io_reg_w )
 
 READ8_HANDLER( cybikov1_io_reg_r )
 {
-	_logerror( 2, "cybikov1_io_reg_r (%08X)\n", offset);
+	_logerror( 2, ("cybikov1_io_reg_r (%08X)\n", offset));
 	return cybiko_io_reg_r( offset);
 }
 
 READ8_HANDLER( cybikov2_io_reg_r )
 {
-	_logerror( 2, "cybikov2_io_reg_r (%08X)\n", offset);
+	_logerror( 2, ("cybikov2_io_reg_r (%08X)\n", offset));
 	return cybiko_io_reg_r( offset);
 }
 
 READ8_HANDLER( cybikoxt_io_reg_r )
 {
 	UINT8 data = 0;
-	_logerror( 2, "cybikoxt_io_reg_r (%08X)\n", offset);
+	_logerror( 2, ("cybikoxt_io_reg_r (%08X)\n", offset));
 	switch (offset)
 	{
 		// rs232
@@ -528,19 +528,19 @@ READ8_HANDLER( cybikoxt_io_reg_r )
 
 WRITE8_HANDLER( cybikov1_io_reg_w )
 {
-	_logerror( 2, "cybikov1_io_reg_w (%08X/%02X)\n", offset, data);
+	_logerror( 2, ("cybikov1_io_reg_w (%08X/%02X)\n", offset, data));
 	cybiko_io_reg_w( offset, data);
 }
 
 WRITE8_HANDLER( cybikov2_io_reg_w )
 {
-	_logerror( 2, "cybikov2_io_reg_w (%08X/%02X)\n", offset, data);
+	_logerror( 2, ("cybikov2_io_reg_w (%08X/%02X)\n", offset, data));
 	cybiko_io_reg_w( offset, data);
 }
 
 WRITE8_HANDLER( cybikoxt_io_reg_w )
 {
-	_logerror( 2, "cybikoxt_io_reg_w (%08X/%02X)\n", offset, data);
+	_logerror( 2, ("cybikoxt_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
 		// rs232

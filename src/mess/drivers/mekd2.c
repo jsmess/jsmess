@@ -31,16 +31,6 @@
 #include "devices/cartslot.h"
 #include "includes/mekd2.h"
 
-#ifndef VERBOSE
-#define VERBOSE 1
-#endif
-
-#if VERBOSE
-#define LOG(x)	logerror(x)
-#else
-#define LOG(x)	/* x */
-#endif
-
 #ifdef UNUSED_FUNCTION
 static  READ8_HANDLER(mekd2_pia_r) { return 0xff; }
 static  READ8_HANDLER(mekd2_cas_r) { return 0xff; }

@@ -32,6 +32,9 @@ setup serial interface software in driver and let the transfer begin */
 #include "driver.h"
 #include "includes/serial.h"
 
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
 /* number of serial streams supported. This is also the number
 of serial ports supported */
 #define MAX_SERIAL_DEVICES	4
@@ -287,9 +290,7 @@ void	receive_register_update_bit(struct serial_receive_register *receive, int bi
 {
 	int previous_bit;
 
-//#ifdef VERBOSE
-	//logerror("receive register receive bit: %1x\n",bit);
-//#endif
+	LOG(("receive register receive bit: %1x\n",bit));
 	previous_bit = receive->register_data & 1;
 
 	/* shift previous bit 7 out */

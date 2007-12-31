@@ -505,11 +505,9 @@ static void cbm_command (CBM_Drive * drive)
   */
 void c1551_state (CBM_Drive * c1551)
 {
-#if VERBOSE_DBG
 	static int oldstate;
 
 	oldstate = c1551->i.iec.state;
-#endif
 
 	switch (c1551->i.iec.state)
 	{
@@ -670,10 +668,9 @@ void c1551_state (CBM_Drive * c1551)
 		}
 		break;
 	}
-#if VERBOSE_DBG
+
 	if (oldstate != c1551->i.iec.state)
-		logerror ("state %d->%d %d\n", oldstate, c1551->i.iec.state, c1551->state);
-#endif
+		if (VERBOSE_DBG >= 1) logerror("state %d->%d %d\n", oldstate, c1551->i.iec.state, c1551->state);
 }
 
 static int vc1541_time_greater(CBM_Drive * vc1541, attotime threshold)
@@ -685,10 +682,7 @@ static int vc1541_time_greater(CBM_Drive * vc1541, attotime threshold)
 
 void vc1541_state (CBM_Drive * vc1541)
 {
-#if VERBOSE_DBG
 	int oldstate = vc1541->i.serial.state;
-
-#endif
 
 	switch (vc1541->i.serial.state)
 	{
@@ -1287,16 +1281,15 @@ void vc1541_state (CBM_Drive * vc1541)
 		vc1541->i.serial.state = 0;
 		break;
 	}
-#if VERBOSE_DBG
+
 	if (oldstate != vc1541->i.serial.state)
-		logerror ("%d state %d->%d %d %s %s %s\n",
+		if (VERBOSE_DBG >= 1) logerror("%d state %d->%d %d %s %s %s\n",
 				 vc1541->i.serial.device,
 				 oldstate,
 				 vc1541->i.serial.state, vc1541->state,
 				 cbm_serial.atn[0] ? "ATN" : "atn",
 				 cbm_serial.clock[0] ? "CLOCK" : "clock",
 				 cbm_serial.data[0] ? "DATA" : "data");
-#endif
 }
 
 /* difference between vic20 and pet (first series)
@@ -1304,9 +1297,7 @@ void vc1541_state (CBM_Drive * vc1541)
 
 void c2031_state(CBM_Drive *drive)
 {
-#if VERBOSE_DBG
 	int oldstate = drive->i.ieee.state;
-#endif
 	int data;
 
 	switch (drive->i.ieee.state)
@@ -1446,12 +1437,10 @@ void c2031_state(CBM_Drive *drive)
 		break;
 	}
 
-#if VERBOSE_DBG
 	if (oldstate != drive->i.ieee.state)
-		logerror("%d state %d->%d %d\n",
+		if (VERBOSE_DBG >= 1) logerror("%d state %d->%d %d\n",
 				 drive->i.ieee.device,
 				 oldstate,
 				 drive->i.ieee.state, drive->state
 				 );
-#endif
 }

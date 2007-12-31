@@ -13,11 +13,9 @@
 #include "driver.h"
 #include "rriot.h"
 
-#if 0
-#define LOG(a) logerror(a)
-#else
-#define LOG(a) ((void) 0)
-#endif
+#define VERBOSE 0
+
+#define LOG(a) do { if (VERBOSE) logerror a; } while (0)
 
 /*
   riot 6530
@@ -81,7 +79,7 @@ void rriot_init(int nr, const RRIOT_CONFIG *config)
 	rriot[nr].config = config;
 	rriot[nr].timer = timer_alloc(rriot_timer_cb, NULL);
 
-    LOG("RRIOT - successfully initialised\n");
+    LOG(("RRIOT - successfully initialised\n"));
 }
 
 void rriot_reset(int nr)

@@ -18,15 +18,11 @@
 
 
 #define LOG(LEVEL,N,M,A)  \
-if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A;
+if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A;
 
 
-//#define VERBOSE_COM 0
-#ifdef VERBOSE_COM
+#define VERBOSE_COM 0
 #define COM_LOG(n,m,a) LOG(VERBOSE_COM,n,m,a)
-#else
-#define COM_LOG(n,m,a)
-#endif
 
 typedef struct {
 	uart8250_interface interface;
@@ -187,9 +183,7 @@ void uart8250_reset(int n)
 
 void uart8250_w(int n, offs_t idx, UINT8 data)
 {
-#ifdef VERBOSE_COM
     static const char P[8] = "NONENHNL";  /* names for parity select */
-#endif
     int tmp;
 
 	switch (idx)
@@ -200,7 +194,7 @@ void uart8250_w(int n, offs_t idx, UINT8 data)
 				uart[n].dll = data;
 				tmp = uart[n].dlm * 256 + uart[n].dll;
 				COM_LOG(1,"COM_dll_w",("COM%d $%02x: [$%04x = %d baud]\n",
-					n+1, data, tmp, (tmp)?uart[n].interface.clockin/16/tmp:0));
+					n+1, data, tmp, (tmp)?(int)(uart[n].interface.clockin/16/tmp):0));
 			}
 			else
 			{
@@ -222,7 +216,7 @@ void uart8250_w(int n, offs_t idx, UINT8 data)
 				uart[n].dlm = data;
 				tmp = uart[n].dlm * 256 + uart[n].dll;
                 COM_LOG(1,"COM_dlm_w",("COM%d $%02x: [$%04x = %d baud]\n",
-					n+1, data, tmp, (tmp)?uart[n].interface.clockin/16/tmp:0));
+					n+1, data, tmp, (tmp)?(int)(uart[n].interface.clockin/16/tmp):0));
 			}
 			else
 			{

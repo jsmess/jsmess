@@ -13,15 +13,8 @@
 
 #include "includes/mekd2.h"
 
-#ifndef VERBOSE
-#define VERBOSE 1
-#endif
-
-#if VERBOSE
-#define LOG(x)	logerror(x)
-#else
-#define LOG(x)						   /* x */
-#endif
+#define VERBOSE 0
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 DRIVER_INIT( mekd2 )
 {
@@ -585,7 +578,7 @@ DEVICE_LOAD( mekd2_cart )
 	image_fread(image, &size, 2);
 	size = LITTLE_ENDIANIZE_INT16(size);
 	image_fread(image, &ident, 1);
-/*			LOG(( "mekd2_rom_load: $%04X $%04X $%02X\n", addr, size, ident)); */
+	LOG(( "mekd2_rom_load: $%04X $%04X $%02X\n", addr, size, ident));
 	while (size-- > 0)
 		image_fread(image, &RAM[addr++], 1);
 

@@ -66,16 +66,6 @@
 #include "driver.h"
 #include "includes/kim1.h"
 
-#ifndef VERBOSE
-#define VERBOSE 1
-#endif
-
-#if VERBOSE
-#define LOG(x)	if( errorlog ) fprintf x
-#else
-#define LOG(x)	/* x */
-#endif
-
 static ADDRESS_MAP_START ( kim1_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_READWRITE( m6530_003_r, m6530_003_w )

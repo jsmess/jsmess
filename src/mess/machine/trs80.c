@@ -18,11 +18,7 @@
 #define VERBOSE 0
 #endif
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
 UINT8 trs80_port_ff = 0;

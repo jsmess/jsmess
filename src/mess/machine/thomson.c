@@ -37,12 +37,13 @@
 
 #define PRINT(x) mame_printf_info x
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
-
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG_IRQ(x) do { if (VERBOSE_IRQ) logerror x; } while (0)
+#define LOG_KBD(x) do { if (VERBOSE_KBD) logerror x; } while (0)
+#define LOG_BANK(x) do { if (VERBOSE_BANK) logerror x; } while (0)
+#define LOG_VIDEO(x) do { if (VERBOSE_VIDEO) logerror x; } while (0)
+#define LOG_IO(x) do { if (VERBOSE_IO) logerror x; } while (0)
+#define LOG_MIDI(x) do { if (VERBOSE_MIDI) logerror x; } while (0)
 
 /*************************** utilities ********************************/
 
@@ -61,22 +62,17 @@ static UINT8 thom_firq;
 
 static void thom_set_irq ( int line, int state )
 {
-
-#if VERBOSE_IRQ
 	int old = thom_irq;
-#endif
 
 	if ( state )
 		thom_irq |= 1 << line;
 	else
 		thom_irq &= ~(1 << line);
 
-#if VERBOSE_IRQ
 	if ( !old && thom_irq )
-		logerror( "%f thom_set_irq: irq line up %i\n", attotime_to_double(timer_get_time()), line );
+		LOG_IRQ(( "%f thom_set_irq: irq line up %i\n", attotime_to_double(timer_get_time()), line ));
 	if ( old && !thom_irq )
-		logerror( "%f thom_set_irq: irq line down %i\n", attotime_to_double(timer_get_time()), line );
-#endif
+		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", attotime_to_double(timer_get_time()), line ));
 
 	cpunum_set_input_line( 0, M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE );
 }
@@ -85,22 +81,17 @@ static void thom_set_irq ( int line, int state )
 
 static void thom_set_firq ( int line, int state )
 {
-
-#if VERBOSE_IRQ
 	int old = thom_irq;
-#endif
 
 	if ( state )
 		thom_firq |= 1 << line;
 	else
 		thom_firq &= ~(1 << line);
 
-#if VERBOSE_IRQ
 	if ( !old && thom_firq )
-		logerror( "%f thom_set_firq: firq line up %i\n", attotime_to_double(timer_get_time()), line );
+		LOG_IRQ(( "%f thom_set_firq: firq line up %i\n", attotime_to_double(timer_get_time()), line ));
 	if ( old && !thom_firq )
-		logerror( "%f thom_set_firq: firq line down %i\n", attotime_to_double(timer_get_time()), line );
-#endif
+		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", attotime_to_double(timer_get_time()), line ));
 
 	cpunum_set_input_line( 0, M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE );
 }
@@ -328,10 +319,8 @@ static void to7_update_cart_bank ( void )
 		memory_install_read8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0003, 0, 0, to7_cartridge_r );
 	}
 
-#if VERBOSE_BANK
 	if ( bank != old_bank )
-		logerror( "to7_update_cart_bank: CART is cartridge bank %i\n", bank );
-#endif
+		LOG_BANK(( "to7_update_cart_bank: CART is cartridge bank %i\n", bank ));
 
 	memory_set_bank( THOM_CART_BANK, bank );
 	old_bank = bank;
@@ -426,10 +415,7 @@ static void to7_lightpen_cb ( int step )
 	if ( ! to7_lightpen )
 		return;
 
-#if VERBOSE_VIDEO
-	logerror( "%f to7_lightpen_cb: step=%i\n", attotime_to_double(timer_get_time()), step );
-#endif
-
+	LOG_VIDEO(( "%f to7_lightpen_cb: step=%i\n", attotime_to_double(timer_get_time()), step ));
 	pia_set_input_cb1( THOM_PIA_SYS, 1 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
 	to7_lightpen_step = step;
@@ -445,10 +431,7 @@ static void to7_set_init ( int init )
 {
 	/* INIT signal wired to system PIA 6821 */
 
-#if VERBOSE_VIDEO
-	logerror( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time()), init );
-#endif
-
+	LOG_VIDEO(( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time()), init ));
 	pia_set_input_ca1( THOM_PIA_SYS, init );
 }
 
@@ -570,10 +553,7 @@ static WRITE8_HANDLER ( to7_io_porta_out )
 	int tx  = data & 1;
 	int dtr = ( data & 2 ) ? 1 : 0;
 
-#if VERBOSE_IO
-	logerror( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), tx, dtr );
-#endif
-
+	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), tx, dtr ));
 	if ( dtr )
 		to7_io_line.State |=  SERIAL_STATE_DTR;
 	else
@@ -596,9 +576,7 @@ static READ8_HANDLER ( to7_io_porta_in )
 	else
 		cts = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 1 : 0;
 
-#if VERBOSE_IO
-	logerror( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_io_mode(), cts, dsr, rd );
-#endif
+	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_io_mode(), cts, dsr, rd ));
 
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
 }
@@ -609,9 +587,7 @@ static WRITE8_HANDLER ( to7_io_portb_out )
 {
 	/* set 8-bit data */
 
-#if VERBOSE_IO
-	logerror( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
-#endif
+	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 
 	centronics_write_data( 0, data );
 }
@@ -620,11 +596,9 @@ static WRITE8_HANDLER ( to7_io_portb_out )
 
 static WRITE8_HANDLER ( to7_io_cb2_out )
 {
-  /* send STROBE to printer */
+	/* send STROBE to printer */
 
-#if VERBOSE_IO
-	logerror( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
-#endif
+	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 
 	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 }
@@ -636,10 +610,7 @@ static void to7_io_in_callback ( int id, unsigned long state )
 	/* our peer's state has changed */
 	to7_io_line.input_state = state;
 
-#if VERBOSE_IO
-	logerror( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", attotime_to_double(timer_get_time()), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) );
-#endif
-
+	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", attotime_to_double(timer_get_time()), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) ));
 }
 
 
@@ -741,9 +712,7 @@ static UINT8 to7_modem_tx;
 
 static void to7_modem_cb( int state )
 {
-#if VERBOSE_IO
-	logerror ( "to7_modem_cb: called %i\n", state );
-#endif
+	LOG(( "to7_modem_cb: called %i\n", state ));
 }
 
 
@@ -1114,14 +1083,12 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 5:     overrun */
 		/* bit 6:     parity error (ignored) */
 		/* bit 7:     interrupt */
-#if VERBOSE_MIDI
-		logerror( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
+		LOG_MIDI(( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
 			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_midi_status,
 			  (to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
-			  (to7_midi_status & ACIA_6850_irq) ? 1 : 0 );
-#endif
+			  (to7_midi_status & ACIA_6850_irq) ? 1 : 0 ));
 		return to7_midi_status;
 
 
@@ -1134,10 +1101,8 @@ READ8_HANDLER ( to7_midi_r )
 		else
 			to7_midi_status &= ~ACIA_6850_OVRN;
 		to7_midi_overrun = 0;
-#if VERBOSE_MIDI
-		logerror( "$%04x %f to7_midi_r: read data $%02X\n",
-			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
-#endif
+		LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
+			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 		to7_midi_update_irq();
 		return data;
 	}
@@ -1164,9 +1129,7 @@ WRITE8_HANDLER ( to7_midi_w )
 		if ( (data & 3) == 3 )
 		{
 			/* reset */
-#if VERBOSE_MIDI
-			logerror( "$%04x %f to7_midi_w: reset (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
-#endif
+			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 			to7_midi_overrun = 0;
 			to7_midi_status = 2;
 			to7_midi_intr = 0;
@@ -1178,30 +1141,26 @@ WRITE8_HANDLER ( to7_midi_w )
 			/* bits 5-6: interrupt on transmit */
 			/* bit 7:    interrupt on receive */
 			to7_midi_intr = data >> 5;
-#if VERBOSE_MIDI
 			{
 				static const int bits[8] = { 7,7,7,7,8,8,8,8 };
 				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
-				logerror( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
+				LOG_MIDI(( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
 					  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 					  data,
 					  bits[ (data >> 2) & 7 ],
 					  stop[ (data >> 2) & 7 ],
 					  parity[ (data >> 2) & 7 ],
 					  to7_midi_intr >> 2,
-					  (to7_midi_intr & 3) ? 1 : 0);
+					  (to7_midi_intr & 3) ? 1 : 0));
 			}
-#endif
 		}
 		to7_midi_update_irq();
 		break;
 
 
 	case 1: /* output data */
-#if VERBOSE_MIDI
-		logerror( "$%04x %f to7_midi_w: write data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
-#endif
+		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 		if ( data == 0x55 )
 			/* cable-detect: shortcut */
 			chardev_fake_in( to7_midi_chardev, 0x55 );
@@ -1430,10 +1389,8 @@ static void to770_update_ram_bank( void )
 		return;
 	}
 
-#if VERBOSE_BANK
 	if ( bank != old_bank )
-		logerror( "to770_update_ram_bank: RAM bank change %i\n", bank );
-#endif
+		LOG_BANK(( "to770_update_ram_bank: RAM bank change %i\n", bank ));
 
 	memory_set_bank( THOM_RAM_BANK, bank );
 	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0,
@@ -1806,10 +1763,8 @@ static void mo5_update_cart_bank ( void )
 		/* 64 KB ROM from "JANE" cartridge */
 		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, MWA8_NOP );
 		bank = mo5_reg_cart & 3;
-#if VERBOSE_BANK
 		if ( bank != old_bank )
-			logerror( "mo5_update_cart_bank: CART is cartridge bank %i (A7CB style)\n", bank );
-#endif
+			LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i (A7CB style)\n", bank ));
 	}
 	else if ( rom_is_ram )
 	{
@@ -1818,10 +1773,8 @@ static void mo5_update_cart_bank ( void )
 		bank = 4 + ( mo5_reg_cart & 3 );
 		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, write_enable ?
 					       (write8_handler)(STATIC_BANK1 + THOM_CART_BANK - 1) :  MWA8_NOP );
-#if VERBOSE_BANK
 		if ( bank != old_bank )
-			logerror( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (write-enable=%i)\n", mo5_reg_cart & 3, write_enable ? 1 : 0 );
-#endif
+			LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (write-enable=%i)\n", mo5_reg_cart & 3, write_enable ? 1 : 0 ));
 	}
 	else
 	{
@@ -1832,10 +1785,8 @@ static void mo5_update_cart_bank ( void )
 			bank = thom_cart_bank % thom_cart_nb_banks;
 			memory_install_read8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xbffc, 0xbfff, 0, 0, mo5_cartridge_r );
 		}
-#if VERBOSE_BANK
 		if ( bank != old_bank )
-			logerror( "mo5_update_cart_bank: CART is internal / cartridge bank %i\n", thom_cart_bank );
-#endif
+			LOG_BANK(( "mo5_update_cart_bank: CART is internal / cartridge bank %i\n", thom_cart_bank ));
 	}
 	memory_set_bank( THOM_CART_BANK, bank );
 	old_bank = bank;
@@ -2102,9 +2053,7 @@ READ8_HANDLER  ( to9_vreg_r )
 
 WRITE8_HANDLER ( to9_vreg_w )
 {
-#if VERBOSE_VIDEO
-	logerror( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset, 0xe7da + offset, data );
-#endif
+	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset, 0xe7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -2171,26 +2120,20 @@ static void to9_update_cart_bank ( void )
 	case 0:
 		/* BASIC (64 KB) */
 		bank = 4 + to9_soft_bank;
-#if VERBOSE_BANK
 		if ( bank != old_bank )
-			logerror( "to9_update_cart_bank: CART is BASIC bank %i\n", to9_soft_bank );
-#endif
+			LOG_BANK(( "to9_update_cart_bank: CART is BASIC bank %i\n", to9_soft_bank ));
 		break;
 	case 1:
 		/* software 1 (32 KB) */
 		bank = 8 + (to9_soft_bank & 1);
-#if VERBOSE_BANK
 		if ( bank != old_bank )
-			logerror( "to9_update_cart_bank: CART is software 1 bank %i\n", to9_soft_bank );
-#endif
+			LOG_BANK(( "to9_update_cart_bank: CART is software 1 bank %i\n", to9_soft_bank ));
 		break;
 	case 2:
 		/* software 2 (32 KB) */
 		bank = 10 + (to9_soft_bank & 1);
-#if VERBOSE_BANK
 		if ( bank != old_bank )
-			logerror( "to9_update_cart_bank: CART is software 2 bank %i\n", to9_soft_bank );
-#endif
+			LOG_BANK(( "to9_update_cart_bank: CART is software 2 bank %i\n", to9_soft_bank ));
 		break;
 	case 3:
 		/* external cartridge */
@@ -2199,10 +2142,8 @@ static void to9_update_cart_bank ( void )
 			bank = thom_cart_bank % thom_cart_nb_banks;
 			memory_install_read8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0003, 0, 0, to7_cartridge_r );
 		}
-#if VERBOSE_BANK
 		if ( bank != old_bank )
-			logerror( "to9_update_cart_bank: CART is cartridge bank %i\n",  thom_cart_bank );
-#endif
+			LOG_BANK(( "to9_update_cart_bank: CART is cartridge bank %i\n",  thom_cart_bank ));
 		break;
 	}
 
@@ -2270,10 +2211,8 @@ static void to9_update_ram_bank ( void )
 		return;
 	}
 
-#if VERBOSE_BANK
 	if ( old_bank != bank )
-		logerror( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk );
-#endif
+		LOG_BANK(( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk ));
 
 	memory_set_bank( THOM_RAM_BANK, bank );
 	memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0,
@@ -2384,15 +2323,14 @@ READ8_HANDLER ( to9_kbd_r )
 		/* bit 5:     overrun */
 		/* bit 6:     parity error */
 		/* bit 7:     interrupt */
-#if VERBOSE_KBD
-		logerror( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
+
+		LOG_KBD(( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
 			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to9_kbd_status,
 			  (to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_PE) ? 1 : 0,
-			  (to9_kbd_status & ACIA_6850_irq) ? 1 : 0 );
-#endif
+			  (to9_kbd_status & ACIA_6850_irq) ? 1 : 0 ));
 		return to9_kbd_status;
 
 	case 1: /* get input data */
@@ -2402,9 +2340,7 @@ READ8_HANDLER ( to9_kbd_r )
 		else
 			to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 		to9_kbd_overrun = 0;
-#if VERBOSE_KBD
-		logerror( "$%04x %f to9_kbd_r: read data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to9_kbd_in );
-#endif
+		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to9_kbd_in ));
 		to9_kbd_update_irq();
 		return to9_kbd_in;
 
@@ -2431,9 +2367,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_overrun = 0;
 			to9_kbd_status = ACIA_6850_TDRE;
 			to9_kbd_intr = 0;
-#if VERBOSE_KBD
-			logerror( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
-#endif
+			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 		}
 		else
 		{
@@ -2445,12 +2379,11 @@ WRITE8_HANDLER ( to9_kbd_w )
 			/* bits 5-6: interrupt on transmit */
 			/* bit 7:    interrupt on receive */
 			to9_kbd_intr = data >> 5;
-#if VERBOSE_KBD
-			logerror( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
+
+			LOG_KBD(( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
 				  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
 				  data, to9_kbd_parity, to9_kbd_intr >> 2,
-				  (to9_kbd_intr & 3) ? 1 : 0 );
-#endif
+				  (to9_kbd_intr & 3) ? 1 : 0 ));
 		}
 		to9_kbd_update_irq();
 		break;
@@ -2507,9 +2440,7 @@ static void to9_kbd_send ( UINT8 data, int parity )
 	{
 		/* overrun will be set when the current valid byte is read */
 		to9_kbd_overrun = 1;
-#if VERBOSE_KBD
-		logerror( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", attotime_to_double(timer_get_time()), data, parity );
-#endif
+		LOG_KBD(( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", attotime_to_double(timer_get_time()), data, parity ));
 	}
 	else
 	{
@@ -2520,9 +2451,7 @@ static void to9_kbd_send ( UINT8 data, int parity )
 			to9_kbd_status &= ~ACIA_6850_PE; /* parity OK */
 		else
 			to9_kbd_status |= ACIA_6850_PE;  /* parity error */
-#if VERBOSE_KBD
-		logerror( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", attotime_to_double(timer_get_time()), data, parity, to9_kbd_status );
-#endif
+		LOG_KBD(( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", attotime_to_double(timer_get_time()), data, parity, to9_kbd_status ));
 	}
 	to9_kbd_update_irq();
 }
@@ -2639,17 +2568,13 @@ static int to9_kbd_get_key( void )
 			to9_kbd_key_count++;
 			if ( to9_kbd_key_count < TO9_KBD_REPEAT_DELAY || (to9_kbd_key_count - TO9_KBD_REPEAT_DELAY) % TO9_KBD_REPEAT_PERIOD )
 				return 0;
-#if VERBOSE_KBD
-			logerror( "to9_kbd_get_key: repeat key $%02X '%c'\n", asc, asc );
-#endif
+			LOG_KBD(( "to9_kbd_get_key: repeat key $%02X '%c'\n", asc, asc ));
 			return asc;
 		}
 		else {
 			to9_kbd_last_key = key;
 			to9_kbd_key_count = 0;
-#if VERBOSE_KBD
-			logerror( "to9_kbd_get_key: key down $%02X '%c'\n", asc, asc );
-#endif
+			LOG_KBD(( "to9_kbd_get_key: key down $%02X '%c'\n", asc, asc ));
 			return asc;
 		}
 	}
@@ -2768,11 +2693,9 @@ static void to9_update_centronics ( void )
 	centronics_write_data( 0, data );
 	centronics_write_handshake( 0, (b & 2) ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 
-#if VERBOSE_IO
-	logerror( "$%04x %f to9_update_centronics: data=$%02X strobe=%i\n",
+	LOG_IO(( "$%04x %f to9_update_centronics: data=$%02X strobe=%i\n",
 		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
-		  (b & 2) ? 1 : 0 );
-#endif
+		  (b & 2) ? 1 : 0 ));
 }
 
 
@@ -2781,9 +2704,7 @@ static READ8_HANDLER ( to9_sys_porta_in )
 {
 	UINT8 ktest = to9_kbd_ktest();
 
-#if VERBOSE_KBD
-	logerror( "to9_sys_porta_in: ktest=%i\n", ktest );
-#endif
+	LOG_KBD(( "to9_sys_porta_in: ktest=%i\n", ktest ));
 
 	return ktest;
 }
@@ -2802,10 +2723,8 @@ static WRITE8_HANDLER ( to9_sys_portb_out )
 	to9_update_centronics(); /* bits 0-1: printer */
 	to9_update_ram_bank();
 
-#if VERBOSE
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
-		logerror( "to9_sys_portb_out: video overlay not handled\n" );
-#endif
+		LOG(( "to9_sys_portb_out: video overlay not handled\n" ));
 }
 
 
@@ -3085,9 +3004,7 @@ static void to8_kbd_timer_func(void)
 {
 	attotime d;
 
-#if VERBOSE_KBD
-	logerror( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", attotime_to_double(timer_get_time()), to8_kbd_step, to8_kbd_ack, to8_kbd_data );
-#endif
+	LOG_KBD(( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", attotime_to_double(timer_get_time()), to8_kbd_step, to8_kbd_ack, to8_kbd_data ));
 
 	if( ! to8_kbd_step )
 	{
@@ -3105,9 +3022,7 @@ static void to8_kbd_timer_func(void)
 		else
 		{
 			/* got key! */
-#if VERBOSE_KBD
-			logerror( "to8_kbd_timer_cb: got key $%03X\n", k );
-#endif
+			LOG_KBD(( "to8_kbd_timer_cb: got key $%03X\n", k ));
 			to8_kbd_data = k;
 			to8_kbd_step = 1;
 			d = ATTOTIME_IN_USEC( 100 );
@@ -3174,9 +3089,7 @@ static void to8_kbd_set_ack ( int data )
 	if ( data )
 	{
 		double len = attotime_to_double(timer_timeelapsed( to8_kbd_signal )) * 1000. - 2.;
-#if VERBOSE_KBD
-		logerror( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", attotime_to_double(timer_get_time()), len );
-#endif
+		LOG_KBD(( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", attotime_to_double(timer_get_time()), len ));
 		if ( to8_kbd_data == 0xfff )
 		{
 			/* end signal from CPU */
@@ -3232,9 +3145,7 @@ static void to8_kbd_set_ack ( int data )
 			timer_adjust( to8_kbd_timer, ATTOTIME_IN_USEC( 400 ), 0, attotime_never );
 			timer_adjust( to8_kbd_signal, attotime_never, 0, attotime_never );
 		}
-#if VERBOSE_KBD
-		logerror( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", attotime_to_double(timer_get_time()), to8_kbd_data );
-#endif
+		LOG_KBD(( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", attotime_to_double(timer_get_time()), to8_kbd_data ));
 	}
 }
 
@@ -3285,12 +3196,11 @@ static void to8_update_floppy_bank( void )
 {
 	static int old_bank = -1;
 	int bank = (to8_reg_sys1 & 0x80) ? to7_floppy_bank : (to8_bios_bank + TO7_NB_FLOP_BANK);
-#if VERBOSE_BANK
+
 	if ( bank != old_bank )
-		logerror( "to8_update_floppy_bank: floppy ROM is %s bank %i\n",
+		LOG_BANK(( "to8_update_floppy_bank: floppy ROM is %s bank %i\n",
 			  (to8_reg_sys1 & 0x80) ? "external" : "internal",
-			  bank % TO7_NB_FLOP_BANK );
-#endif
+			  bank % TO7_NB_FLOP_BANK ));
 	memory_set_bank( THOM_FLOP_BANK, bank );
 	old_bank = bank;
 }
@@ -3304,10 +3214,8 @@ static void to8_update_ram_bank ( void )
 	if ( to8_reg_sys1 & 0x10 )
 	{
 		bank = to8_reg_ram & 31;
-#if VERBOSE_BANK
 		if ( bank != to8_data_vpage )
-			logerror( "to8_update_ram_bank: select bank %i (new style)\n", bank );
-#endif
+			LOG_BANK(( "to8_update_ram_bank: select bank %i (new style)\n", bank ));
 	}
 	else
 	{
@@ -3327,10 +3235,8 @@ static void to8_update_ram_bank ( void )
 			logerror( "to8_update_ram_bank: unknown RAM bank=$%02X\n", portb & 0xf8 );
 			return;
 		}
-#if VERBOSE_BANK
 		if ( bank != to8_data_vpage )
-			logerror( "to8_update_ram_bank: select bank %i (old style)\n", bank  );
-#endif
+			LOG_BANK(( "to8_update_ram_bank: select bank %i (old style)\n", bank  ));
 	}
 
 	/*  due to adressing distortion, the 16 KB banked memory space is
@@ -3375,10 +3281,8 @@ static void to8_update_cart_bank ( void )
 					       (to8_cart_vpage <= 4) ? to8_vcart_w :
 					       (write8_handler)(STATIC_BANK1 + THOM_CART_BANK - 1) :
 					       MWA8_NOP );
-#if VERBOSE_BANK
 		if ( bank != old_bank )
-			logerror( "to8_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 );
-#endif
+			LOG_BANK(( "to8_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 ));
 	}
 	else
 	{
@@ -3387,11 +3291,9 @@ static void to8_update_cart_bank ( void )
 		{
 			/* internal software ROM space */
 			bank = 4 + to8_soft_bank;
-#if VERBOSE_BANK
 			if ( bank != old_bank )
-				logerror( "to8_update_cart_bank: CART is internal bank %i\n",
-					  to8_soft_bank );
-#endif
+				LOG_BANK(( "to8_update_cart_bank: CART is internal bank %i\n",
+					  to8_soft_bank ));
 		}
 		else
 		{
@@ -3403,10 +3305,8 @@ static void to8_update_cart_bank ( void )
 
 			}
 
-#if VERBOSE_BANK
 			if ( bank != old_bank )
-				logerror( "to8_update_cart_bank: CART is external cartridge bank %i\n", thom_cart_bank );
-#endif
+				LOG_BANK(( "to8_update_cart_bank: CART is external cartridge bank %i\n", thom_cart_bank ));
 		}
 	}
 	memory_set_bank( THOM_CART_BANK, bank );
@@ -3548,11 +3448,9 @@ READ8_HANDLER  ( to8_gatearray_r )
 		res = 0;
 	}
 
-#if VERBOSE_VIDEO
-	logerror( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
+	LOG_VIDEO(( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
 		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
-		  offset, 0xe7e4 + offset, res, to7_lightpen );
-#endif
+		  offset, 0xe7e4 + offset, res, to7_lightpen ));
 
 	return res;
 }
@@ -3561,11 +3459,9 @@ READ8_HANDLER  ( to8_gatearray_r )
 
 WRITE8_HANDLER ( to8_gatearray_w )
 {
-#if VERBOSE_VIDEO
-	logerror( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
+	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
 		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
-		  offset, 0xe7e4 + offset, data );
-#endif
+		  offset, 0xe7e4 + offset, data ));
 
 	switch ( offset )
 	{
@@ -3644,11 +3540,9 @@ READ8_HANDLER  ( to8_vreg_r )
 
 WRITE8_HANDLER ( to8_vreg_w )
 {
-#if VERBOSE_VIDEO
-	logerror( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
+	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
 		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
-		  offset, 0xe7da + offset, data );
-#endif
+		  offset, 0xe7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -3703,9 +3597,7 @@ static READ8_HANDLER ( to8_sys_porta_in )
 {
 	int ktest = to8_kbd_ktest ();
 
-#if VERBOSE_KBD
-	logerror( "$%04x %f: to8_sys_porta_in ktest=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), ktest );
-#endif
+	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), ktest ));
 
 	return ktest;
 }
@@ -3716,10 +3608,9 @@ static WRITE8_HANDLER ( to8_sys_portb_out )
 {
 	to9_update_centronics(); /* bits 0-1: printer */
 	to8_update_ram_bank();
-#if VERBOSE
+
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
-		logerror( "to8_sys_portb_out: video overlay not handled\n" );
-#endif
+		LOG(( "to8_sys_portb_out: video overlay not handled\n" ));
 }
 
 
@@ -4084,10 +3975,8 @@ static void mo6_update_ram_bank ( void )
 	if ( to8_reg_sys1 & 0x10 )
 	{
 		bank = to8_reg_ram & 7; /* 128 KB RAM only = 8 pages */
-#if VERBOSE_BANK
 		if ( bank != to8_data_vpage )
-			logerror( "mo6_update_ram_bank: select bank %i (new style)\n", bank );
-#endif
+			LOG_BANK(( "mo6_update_ram_bank: select bank %i (new style)\n", bank ));
 	}
 	to8_data_vpage = bank;
 	memory_set_bank( TO8_DATA_LO, to8_data_vpage );
@@ -4115,20 +4004,16 @@ static void mo6_update_cart_bank ( void )
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0,
 						       (to8_reg_cart & 0x40) ? (to8_cart_vpage <= 4) ? to8_vcart_w :
 						       (write8_handler)(STATIC_BANK1 + THOM_CART_BANK - 1) : MWA8_NOP );
-#if VERBOSE_BANK
 			if ( bank != old_bank )
-				logerror( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 );
-#endif
+				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 ));
 		}
 		else if ( thom_cart_nb_banks == 4 )
 		{
 			/* "JANE"-style cartridge bank switching */
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, MWA8_NOP );
 			bank = mo5_reg_cart & 3;
-#if VERBOSE_BANK
 			if ( bank != old_bank )
-				logerror( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank );
-#endif
+				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank ));
 		}
 		else
 		{
@@ -4138,10 +4023,8 @@ static void mo6_update_cart_bank ( void )
 			bank = 8 + to8_cart_vpage;
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, write_enable ?
 						       (write8_handler)(STATIC_BANK1 + THOM_CART_BANK - 1) :  MWA8_NOP );
-#if VERBOSE_BANK
 			if ( bank != old_bank )
-				logerror( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i) (MO5 compat.)\n", to8_cart_vpage, write_enable ? 1 : 0 );
-#endif
+				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i) (MO5 compat.)\n", to8_cart_vpage, write_enable ? 1 : 0 ));
 		}
 	}
 	else
@@ -4155,10 +4038,8 @@ static void mo6_update_cart_bank ( void )
 				bank = b + 6; /* BASIC 128 */
 			else
 				bank = b + 4;                      /* BASIC 1 */
-#if VERBOSE_BANK
 			if ( bank != old_bank )
-				logerror( "mo6_update_cart_bank: CART is internal ROM bank %i\n", b );
-#endif
+				LOG_BANK(( "mo6_update_cart_bank: CART is internal ROM bank %i\n", b ));
 		}
 		else
 		{
@@ -4169,10 +4050,8 @@ static void mo6_update_cart_bank ( void )
 				bank = thom_cart_bank % thom_cart_nb_banks;
 				memory_install_read8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xbffc, 0xbfff, 0, 0, mo6_cartridge_r );
 			}
-#if VERBOSE_BANK
 			if ( bank != old_bank )
-				logerror( "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank );
-#endif
+				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank ));
 		}
 	}
 
@@ -4428,11 +4307,9 @@ READ8_HANDLER  ( mo6_gatearray_r )
 		res = 0;
 	}
 
-#if VERBOSE_VIDEO
-	logerror( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
+	LOG_VIDEO(( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
 		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
-		  offset, 0xa7e4 + offset, res, to7_lightpen );
-#endif
+		  offset, 0xa7e4 + offset, res, to7_lightpen ));
 
 	return res;
 }
@@ -4441,11 +4318,9 @@ READ8_HANDLER  ( mo6_gatearray_r )
 
 WRITE8_HANDLER ( mo6_gatearray_w )
 {
-#if VERBOSE_VIDEO
-	logerror( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
+	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
 		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
-		  offset, 0xa7e4 + offset, data );
-#endif
+		  offset, 0xa7e4 + offset, data ));
 
 	switch ( offset )
 	{
@@ -4510,11 +4385,9 @@ READ8_HANDLER ( mo6_vreg_r )
 
 WRITE8_HANDLER ( mo6_vreg_w )
 {
-#if VERBOSE_VIDEO
-	logerror( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
+	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
 		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
-		  offset, 0xa7da + offset, data );
-#endif
+		  offset, 0xa7da + offset, data ));
 
 	switch ( offset )
 	{

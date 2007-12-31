@@ -176,7 +176,7 @@ VIDEO_START( vic6560 )
 
 WRITE8_HANDLER ( vic6560_port_w )
 {
-	DBG_LOG (1, "vic6560_port_w", (errorlog, "%.4x:%.2x\n", offset, data));
+	DBG_LOG (1, "vic6560_port_w", ("%.4x:%.2x\n", offset, data));
 	switch (offset)
 	{
 	case 0xa:
@@ -280,7 +280,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 		val = vic6560[offset];
 		break;
 	}
-	DBG_LOG (3, "vic6560_port_r", (errorlog, "%.4x:%.2x\n", offset, val));
+	DBG_LOG (3, "vic6560_port_r", ("%.4x:%.2x\n", offset, val));
 	return val;
 }
 

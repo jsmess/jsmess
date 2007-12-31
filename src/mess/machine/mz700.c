@@ -17,12 +17,8 @@
 #define VERBOSE 0
 #endif
 
-#if VERBOSE
 #define LOG(N,M,A)	\
-	if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(), (const char*)M ); logerror A; }
-#else
-#define LOG(N,M,A)
-#endif
+	if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()), (const char*)M ); logerror A; }
 
 typedef UINT32 data_t;
 
@@ -531,27 +527,27 @@ static UINT8 mz800_palette_bank;
         bank2_ROM(mem);
 		if ((mz800_display_mode & 0x08) == 0)
 		{
-			LOG(1,0,("; 8000-9FFF videoram"));
+			if (VERBOSE>=1) logerror("; 8000-9FFF videoram");
             bank3_VID(mem);
 			if (mz800_display_mode & 0x04)
 			{
-				LOG(1,0,("; A000-BFFF videoram"));
+				if (VERBOSE>=1) logerror("; A000-BFFF videoram");
                 /* 640x480 mode so A000-BFFF is videoram too */
 				bank4_VID(mem);
             }
 			else
 			{
-				LOG(1,0,("; A000-BFFF RAM"));
+				if (VERBOSE>=1) logerror("; A000-BFFF RAM");
 				bank4_RAM(mem);
             }
 		}
 		else
 		{
-			LOG(1,0,("; C000-CFFF PCG RAM"));
+			if (VERBOSE>=1) logerror("; C000-CFFF PCG RAM");
             /* make C000-CFFF PCG RAM */
 			bank5_RAM(mem);
         }
-		LOG(1,0,("\n"));
+		if (VERBOSE>=1) logerror("\n");
         break;
 
     case 1: /* make 1000-1FFF and C000-CFFF RAM */
@@ -559,18 +555,18 @@ static UINT8 mz800_palette_bank;
         bank2_RAM(mem);
 		if ((mz800_display_mode & 0x08) == 0)
 		{
-			LOG(1,0,("; 8000-9FFF RAM; A000-BFFF RAM"));
+			if (VERBOSE>=1) logerror("; 8000-9FFF RAM; A000-BFFF RAM");
             /* make 8000-BFFF RAM */
             bank3_RAM(mem);
 			bank4_RAM(mem);
 		}
 		else
 		{
-			LOG(1,0,("; C000-CFFF RAM"));
+			if (VERBOSE>=1) logerror("; C000-CFFF RAM");
             /* make C000-CFFF RAM */
 			bank5_RAM(mem);
         }
-		LOG(1,0,("\n"));
+		if (VERBOSE>=1) logerror("\n");
         break;
 
     case 8: /* get MZ700 enable bit 7 ? */

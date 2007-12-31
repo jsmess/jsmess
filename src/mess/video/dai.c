@@ -19,11 +19,7 @@
 
 #define DEBUG_DAI_VIDEO	0
 
-#if DEBUG_DAI_VIDEO
-	#define LOG_DAI_VIDEO_LINE(_mode, _unit, _resolution, _repeat, _scan) logerror ("Mode: %02x, Unit: %02x, Resolution: %02x, Repeat: %d, Current line: %d\n", _mode, _unit, _resolution, _repeat, _scan)
-#else
-	#define LOG_DAI_VIDEO_LINE(_mode, _unit, _resolution, _repeat, _scan)
-#endif
+#define LOG_DAI_VIDEO_LINE(_mode, _unit, _resolution, _repeat, _scan) do { if (DEBUG_DAI_VIDEO) logerror ("Mode: %02x, Unit: %02x, Resolution: %02x, Repeat: %d, Current line: %d\n", _mode, _unit, _resolution, _repeat, _scan); } while (0)
 
 const unsigned char dai_palette[16*3] =
 {

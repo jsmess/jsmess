@@ -97,8 +97,8 @@ registers common to all modes:
 #define TC8521_ALARM_1_DAY_REGISTER 0x017
 #define TC8521_ALARM_10_DAY_REGISTER 0x018
 
-/* uncomment for verbose debugging information */
-//#define VERBOSE
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* mask data with these values when writing */
 static const unsigned char rtc_write_masks[16*4]=
@@ -310,9 +310,7 @@ void tc8521_init(const struct tc8521_interface *intf)
 			case 0x0d:
 			case 0x0e:
 			case 0x0f:
-#ifdef VERBOSE
-				logerror("8521 RTC R: %04x %02x\n", offset, rtc.registers[offset]);
-#endif
+				LOG(("8521 RTC R: %04x %02x\n", offset, rtc.registers[offset]));
         		return rtc.registers[offset];
 
 			default:
@@ -320,10 +318,8 @@ void tc8521_init(const struct tc8521_interface *intf)
 		}
 
 		/* register in selected page */
-        register_index = ((rtc.registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
-#ifdef VERBOSE
-		logerror("8521 RTC R: %04x %02x\n", offset, rtc.registers[register_index]);
-#endif
+		register_index = ((rtc.registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
+		LOG(("8521 RTC R: %04x %02x\n", offset, rtc.registers[register_index]));
 		/* data from selected page */
 		return rtc.registers[register_index];
 }
@@ -333,8 +329,7 @@ WRITE8_HANDLER(tc8521_w)
 {
 	unsigned long register_index;
 
-#ifdef VERBOSE
-        logerror("8521 RTC W: %04x %02x\n", offset, data);
+	LOG(("8521 RTC W: %04x %02x\n", offset, data));
 
 		switch (offset)
         {
@@ -342,12 +337,12 @@ WRITE8_HANDLER(tc8521_w)
                 {
                         if (data & 0x08)
                         {
-                            logerror("timer enable\n");
+                            LOG(("timer enable\n"));
                         }
 
                         if (data & 0x04)
                         {
-                            logerror("alarm enable\n");
+                            LOG(("alarm enable\n"));
                         }
 
 						logerror("page %02x selected\n", data & 0x03);
@@ -358,22 +353,22 @@ WRITE8_HANDLER(tc8521_w)
                 {
                         if (data & 0x08)
                         {
-                            logerror("test 3\n");
+                            LOG(("test 3\n"));
                         }
 
                         if (data & 0x04)
                         {
-                            logerror("test 2\n");
+                            LOG(("test 2\n"));
                         }
 
                         if (data & 0x02)
                         {
-                            logerror("test 1\n");
+                            LOG(("test 1\n"));
                         }
 
                         if (data & 0x01)
                         {
-                            logerror("test 0\n");
+                            LOG(("test 0\n"));
                         }
                 }
                 break;
@@ -382,22 +377,22 @@ WRITE8_HANDLER(tc8521_w)
                 {
                         if ((data & 0x08)==0)
                         {
-                           logerror("1hz enable\n");
+                           LOG(("1hz enable\n"));
                         }
 
                         if ((data & 0x04)==0)
                         {
-                           logerror("16hz enable\n");
+                           LOG(("16hz enable\n"));
                         }
 
                         if (data & 0x02)
                         {
-                           logerror("reset timer\n");
+                           LOG(("reset timer\n"));
                         }
 
                         if (data & 0x01)
                         {
-                           logerror("reset alarm\n");
+                           LOG(("reset alarm\n"));
                         }
                 }
                 break;
@@ -405,7 +400,7 @@ WRITE8_HANDLER(tc8521_w)
                 default:
                   break;
         }
-#endif
+
 		switch (offset)
 		{
 			/* control registers */

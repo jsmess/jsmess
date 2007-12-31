@@ -15,6 +15,7 @@
 #define ANIMATION_FRAMES	4
 
 #define VERBOSE				0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 /* from devices/mflopimg.c */
@@ -136,9 +137,7 @@ double cassette_input(mess_image *cassette)
 	sample = tag->value;
 	double_value = sample / ((double) 0x7FFFFFFF);
 
-#if VERBOSE
-	logerror("cassette_input(): time_index=%g value=%g\n", tag->position, double_value);
-#endif
+	LOG(("cassette_input(): time_index=%g value=%g\n", tag->position, double_value));
 
 	return double_value;
 }

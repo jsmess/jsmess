@@ -18,15 +18,7 @@
 
 
 #define VERBOSE 0
-
-
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
-
-#define PRINT(x) mame_printf_info x
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 /* One GPL is what is drawn in 1 us by the video system in the active window.

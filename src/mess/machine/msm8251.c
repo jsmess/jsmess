@@ -3,14 +3,9 @@
 #include "includes/msm8251.h"
 #include "includes/serial.h"
 
-/* uncomment to enable verbose comments */
-#define VERBOSE
+#define VERBOSE 1
 
-#ifdef VERBOSE
-#define LOG(x)	logerror("MSM8251: "x)
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 static struct msm8251 uart;
 static void msm8251_receive_character(UINT8 ch);
@@ -198,7 +193,7 @@ static void msm8251_update_tx_empty(void)
 
 void	msm8251_reset(void)
 {
-	LOG("MSM8251 Reset\n");
+	LOG(("MSM8251: Reset\n"));
 
 	/* what is the default setup when the 8251 has been reset??? */
 
@@ -239,11 +234,9 @@ WRITE8_HANDLER(msm8251_control_w)
 	{
 		if (uart.flags & MSM8251_EXPECTING_SYNC_BYTE)
 		{
-			LOG("Sync byte\n");
+			LOG(("MSM8251: Sync byte\n"));
 
-#ifdef VERBOSE
-			logerror("Sync byte: %02x\n", data);
-#endif
+			LOG(("Sync byte: %02x\n", data));
 			/* store sync byte written */
 			uart.sync_bytes[uart.sync_byte_offset] = data;
 			uart.sync_byte_offset++;
@@ -258,7 +251,7 @@ WRITE8_HANDLER(msm8251_control_w)
 		}
 		else
 		{
-			LOG("Mode byte\n");
+			LOG(("MSM8251: Mode byte\n"));
 
 			uart.mode_byte = data;
 
@@ -290,27 +283,26 @@ WRITE8_HANDLER(msm8251_control_w)
 						3 = x64
 				*/
 
-				LOG("Asynchronous operation\n");
+				LOG(("MSM8251: Asynchronous operation\n"));
 
-#ifdef VERBOSE
-                logerror("Character length: %d\n", (((data>>2) & 0x03)+5));
+				LOG(("Character length: %d\n", (((data>>2) & 0x03)+5)));
 
 				if (data & (1<<4))
 				{
-					logerror("enable parity checking\n");
+					LOG(("enable parity checking\n"));
 				}
 				else
 				{
-					logerror("parity check disabled\n");
+					LOG(("parity check disabled\n"));
 				}
 
 				if (data & (1<<5))
 				{
-					logerror("even parity\n");
+					LOG(("even parity\n"));
 				}
 				else
 				{
-					logerror("odd parity\n");
+					LOG(("odd parity\n"));
 				}
 
 				{
@@ -323,33 +315,32 @@ WRITE8_HANDLER(msm8251_control_w)
 						case 0:
 						{
 							/* inhibit */
-							logerror("stop bit: inhibit\n");
+							LOG(("stop bit: inhibit\n"));
 						}
 						break;
 
 						case 1:
 						{
 							/* 1 */
-							logerror("stop bit: 1 bit\n");
+							LOG(("stop bit: 1 bit\n"));
 						}
 						break;
 
 						case 2:
 						{
 							/* 1.5 */
-							logerror("stop bit: 1.5 bits\n");
+							LOG(("stop bit: 1.5 bits\n"));
 						}
 						break;
 
 						case 3:
 						{
 							/* 2 */
-							logerror("stop bit: 2 bits\n");
+							LOG(("stop bit: 2 bits\n"));
 						}
 						break;
 					}
 				}
-#endif
 
 				uart.data_form.word_length = ((data>>2) & 0x03)+5;
 				uart.data_form.parity = SERIAL_PARITY_NONE;
@@ -408,7 +399,7 @@ WRITE8_HANDLER(msm8251_control_w)
 						3 = 8 bits
 					bit 1,0 = 0
 				*/
-				LOG("Synchronous operation\n");
+				LOG(("MSM8251: Synchronous operation\n"));
 
 				/* setup for sync byte(s) */
 				uart.flags |= MSM8251_EXPECTING_SYNC_BYTE;
@@ -428,55 +419,52 @@ WRITE8_HANDLER(msm8251_control_w)
 	else
 	{
 		/* command */
-		LOG("Command byte\n");
+		LOG(("MSM8251: Command byte\n"));
 
 		uart.command = data;
-#ifdef VERBOSE
-		logerror("Command byte: %02x\n", data);
+
+		LOG(("Command byte: %02x\n", data));
 
 		if (data & (1<<7))
 		{
-			logerror("hunt mode\n");
+			LOG(("hunt mode\n"));
 		}
 
 		if (data & (1<<5))
 		{
-			logerror("/rts set to 0\n");
+			LOG(("/rts set to 0\n"));
 		}
 		else
 		{
-			logerror("/rts set to 1\n");
+			LOG(("/rts set to 1\n"));
 		}
 
 		if (data & (1<<2))
 		{
-			logerror("receive enable\n");
+			LOG(("receive enable\n"));
 		}
 		else
 		{
-			logerror("receive disable\n");
+			LOG(("receive disable\n"));
 		}
 
 		if (data & (1<<1))
 		{
-			logerror("/dtr set to 0\n");
+			LOG(("/dtr set to 0\n"));
 		}
 		else
 		{
-			logerror("/dtr set to 1\n");
+			LOG(("/dtr set to 1\n"));
 		}
 
 		if (data & (1<<0))
 		{
-			logerror("transmit enable\n");
+			LOG(("transmit enable\n"));
 		}
 		else
 		{
-			logerror("transmit disable\n");
+			LOG(("transmit disable\n"));
 		}
-
-
-#endif
 
 
 		/*	bit 7:
@@ -547,9 +535,7 @@ WRITE8_HANDLER(msm8251_control_w)
 /* read status */
  READ8_HANDLER(msm8251_status_r)
 {
-#ifdef VERBOSE
-	logerror("status: %02x\n", uart.status);
-#endif
+	LOG(("status: %02x\n", uart.status));
 
 	return uart.status;
 }

@@ -25,7 +25,8 @@ static unsigned char *avigo_video_memory;
 /* current column to read/write */
 static UINT8 avigo_screen_column = 0;
 
-//#define AVIGO_VIDEO_DEBUG
+#define AVIGO_VIDEO_DEBUG 0
+#define LOG(x) do { if (AVIGO_VIDEO_DEBUG) logerror x; } while (0)
 
 static int stylus_x;
 static int stylus_y;
@@ -70,9 +71,8 @@ void	avigo_vh_set_stylus_marker_position(int x,int y)
 
         if ((offset<0x0100) || (offset>=0x01f0))
         {
-#ifdef AVIGO_VIDEO_DEBUG
-			logerror("vid mem read: %04x\n", offset);
-#endif
+			LOG(("vid mem read: %04x\n", offset));
+
 			return 0;
 
 		}
@@ -89,23 +89,19 @@ WRITE8_HANDLER(avigo_vid_memory_w)
 		{
 			/* select column to read/write */
 			avigo_screen_column = data;
-#ifdef AVIGO_VIDEO_DEBUG
-			logerror("vid mem column write: %02x\n",data);
-#endif
+
+			LOG(("vid mem column write: %02x\n",data));
+
 			if (data>=(AVIGO_SCREEN_WIDTH>>3))
 			{
-#ifdef AVIGO_VIDEO_DEBUG
-				logerror("error: vid mem column write: %02x\n",data);
-#endif
+				LOG(("error: vid mem column write: %02x\n",data));
 			}
 			return;
         }
 
         if ((offset<0x0100) || (offset>=0x01f0))
         {
-#ifdef AVIGO_VIDEO_DEBUG
-			logerror("vid mem write: %04x %02x\n", offset, data);
-#endif
+			LOG(("vid mem write: %04x %02x\n", offset, data));
 			return;
         }
 
@@ -175,9 +171,7 @@ PALETTE_INIT( avigo )
 
 		if (avigo_backdrop)
 		{
-#ifdef AVIGO_VIDEO_DEBUG
-			logerror("backdrop %s successfully loaded\n", backdrop_name);
-#endif
+			LOG(("backdrop %s successfully loaded\n", backdrop_name));
             memcpy (&sys_palette[used * 3], avigo_backdrop->orig_palette,
                     avigo_backdrop->num_pens_used * 3 * sizeof (unsigned char));
 		}

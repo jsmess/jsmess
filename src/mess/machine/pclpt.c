@@ -15,11 +15,7 @@ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M );
 
 #define VERBOSE_LPT 1
 
-#ifdef VERBOSE_LPT
 #define LPT_LOG(n,m,a) LOG(VERBOSE_LPT,n,m,a)
-#else
-#define LPT_LOG(n,m,a)
-#endif
 
 #define STATUS_NOT_BUSY 0x80
 #define STATUS_ACKNOWLEDGE 0x40

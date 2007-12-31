@@ -1,16 +1,13 @@
 #include <string.h>
 #include "mz_cas.h"
+#include "driver.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
 #endif
 
-#if VERBOSE
 #define LOG(N,M,A)	\
-	if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(), (const char*)M ); logerror A; }
-#else
-#define LOG(N,M,A)
-#endif
+	if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()), (const char*)M ); logerror A; }
 
 #define LO  -32768
 #define HI	+32767

@@ -59,12 +59,8 @@
 
 #define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */
 
-#if VERBOSE_CGA
 #define CGA_LOG(N,M,A) \
-	if(VERBOSE_CGA>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
-#else
-#define CGA_LOG(n,m,a)
-#endif
+	if(VERBOSE_CGA>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
 /***************************************************************************
 
@@ -385,7 +381,7 @@ static void pc_cga_mode_control_w(int data)
 {
 	unsigned char mask = 0x3B;
 
-	CGA_LOG(1,"CGA_mode_control_w",(errorlog, "$%02x: columns %d, gfx %d, hires %d, blink %d\n",
+	CGA_LOG(1,"CGA_mode_control_w",("$%02x: columns %d, gfx %d, hires %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>4)&1, (data>>5)&1));
 
 	/* CGA composite: Switching between mono & colour behaves like a
@@ -406,7 +402,7 @@ static void pc_cga_mode_control_w(int data)
  */
 static void pc_cga_color_select_w(int data)
 {
-	CGA_LOG(1,"CGA_color_select_w",(errorlog, "$%02x\n", data));
+	CGA_LOG(1,"CGA_color_select_w",("$%02x\n", data));
 	if( cga.color_select == data )
 		return;
 	cga.color_select = data;
@@ -420,7 +416,7 @@ static void pc_cga_color_select_w(int data)
  */
 static void pc_cga_plantronics_w(int data)
 {
-	CGA_LOG(1,"CGA_plantronics_w",(errorlog, "$%02x\n", data));
+	CGA_LOG(1,"CGA_plantronics_w",("$%02x\n", data));
 
 	if (CGA_CHIPSET != CGA_CHIPSET_ATI) return;
 

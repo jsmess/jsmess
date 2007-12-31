@@ -35,18 +35,13 @@ static TIMER_CALLBACK(i8271_timed_command_complete_callback);
 
 static char temp_buffer[16384];
 
-// uncomment to give verbose debug information
-//#define VERBOSE
-
 static I8271 i8271;
 
-#ifdef VERBOSE
-#define FDC_LOG(x) logerror("I8271: %s\n",x)
-#define FDC_LOG_COMMAND(x) logerror("I8271: COMMAND %s\n",x)
-#else
-#define FDC_LOG(x)
-#define FDC_LOG_COMMAND(x)
-#endif
+#define VERBOSE 0
+
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define FDC_LOG(x) do { if (VERBOSE) logerror("I8271: %s\n",x); } while (0)
+#define FDC_LOG_COMMAND(x) do { if (VERBOSE) logerror("I8271: COMMAND %s\n",x); } while (0)
 
 static mess_image *current_image(void)
 {
@@ -510,9 +505,7 @@ static void i8271_do_read(void)
 		i8271_timed_data_request();
 		return;
 	}
-#ifdef VERBOSE
-	logerror("error getting sector data\n");
-#endif
+	LOG(("error getting sector data\n"));
 
 	i8271_timed_command_complete();
 }
@@ -545,9 +538,7 @@ static void i8271_do_write(void)
 		i8271_timed_data_request();
 		return;
 	}
-#ifdef VERBOSE
-	logerror("error getting sector data\n");
-#endif
+	LOG(("error getting sector data\n"));
 
 	i8271_timed_command_complete();
 }
@@ -625,9 +616,7 @@ static void i8271_command_execute(void)
 			{
 				case 0x0d:
 				{
-#ifdef VERBOSE
-					logerror("Initialization\n");
-#endif
+					LOG(("Initialization\n"));
 					i8271.StepRate = i8271.CommandParameters[1];
 					i8271.HeadSettlingTime = i8271.CommandParameters[2];
 					i8271.IndexCountBeforeHeadUnload = (i8271.CommandParameters[3]>>4) & 0x0f;
@@ -637,9 +626,7 @@ static void i8271_command_execute(void)
 
 				case 0x010:
 				{
-#ifdef VERBOSE
-					logerror("Load bad Tracks Surface 0\n");
-#endif
+					LOG(("Load bad Tracks Surface 0\n"));
 					i8271_load_bad_tracks(0);
 
 				}
@@ -647,9 +634,7 @@ static void i8271_command_execute(void)
 
 				case 0x018:
 				{
-#ifdef VERBOSE
-					logerror("Load bad Tracks Surface 1\n");
-#endif
+					LOG(("Load bad Tracks Surface 1\n"));
 					i8271_load_bad_tracks(1);
 
 				}
@@ -782,69 +767,57 @@ static void i8271_command_execute(void)
 					/* TODO: Check bits 6-7 and 5-2 are valid */
 					i8271.Mode = i8271.CommandParameters[1];
 
-#ifdef VERBOSE
 					if (i8271.Mode & 0x01)
 					{
-						logerror("Mode: Non-DMA\n");
+						LOG(("Mode: Non-DMA\n"));
 					}
 					else
 					{
-						logerror("Mode: DMA\n");
+						LOG(("Mode: DMA\n"));
 					}
 
 					if (i8271.Mode & 0x02)
 					{
-						logerror("Single actuator\n");
+						LOG(("Single actuator\n"));
 					}
 					else
 					{
-						logerror("Double actuator\n");
+						LOG(("Double actuator\n"));
 					}
-#endif
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_0_CURRENT_TRACK:
 				{
-#ifdef VERBOSE
-					logerror("Surface 0 Current Track\n");
-#endif
+					LOG(("Surface 0 Current Track\n"));
 					i8271_write_current_track(0, i8271.CommandParameters[1]);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_1_CURRENT_TRACK:
 				{
-#ifdef VERBOSE
-					logerror("Surface 1 Current Track\n");
-#endif
+					LOG(("Surface 1 Current Track\n"));
 					i8271_write_current_track(1, i8271.CommandParameters[1]);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_1:
 				{
-#ifdef VERBOSE
-					logerror("Surface 0 Bad Track 1\n");
-#endif
+					LOG(("Surface 0 Bad Track 1\n"));
 					i8271_write_bad_track(0, 1, i8271.CommandParameters[1]);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_2:
 				{
-#ifdef VERBOSE
-					logerror("Surface 0 Bad Track 2\n");
-#endif
-				i8271_write_bad_track(0, 2,i8271.CommandParameters[1]);
+					LOG(("Surface 0 Bad Track 2\n"));
+					i8271_write_bad_track(0, 2,i8271.CommandParameters[1]);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_1:
 				{
-#ifdef VERBOSE
-					logerror("Surface 1 Bad Track 1\n");
-#endif
+					LOG(("Surface 1 Bad Track 1\n"));
 
 
 					i8271_write_bad_track(1, 1, i8271.CommandParameters[1]);
@@ -853,9 +826,7 @@ static void i8271_command_execute(void)
 
 				case I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_2:
 				{
-#ifdef VERBOSE
-					logerror("Surface 1 Bad Track 2\n");
-#endif
+					LOG(("Surface 1 Bad Track 2\n"));
 
 					i8271_write_bad_track(1, 2, i8271.CommandParameters[1]);
 				}
@@ -869,34 +840,33 @@ static void i8271_command_execute(void)
 					FDC_LOG_COMMAND("Write Drive Control Output port\n");
 
 
-#ifdef VERBOSE
 					if (i8271.CommandParameters[1] & 0x01)
 					{
-						logerror("Write Enable\n");
+						LOG(("Write Enable\n"));
 					}
 					if (i8271.CommandParameters[1] & 0x02)
 					{
-						logerror("Seek/Step\n");
+						LOG(("Seek/Step\n"));
 					}
 					if (i8271.CommandParameters[1] & 0x04)
 					{
-						logerror("Direction\n");
+						LOG(("Direction\n"));
 					}
 					if (i8271.CommandParameters[1] & 0x08)
 					{
-						logerror("Load Head\n");
+						LOG(("Load Head\n"));
 					}
 					if (i8271.CommandParameters[1] & 0x010)
 					{
-						logerror("Low head current\n");
+						LOG(("Low head current\n"));
 					}
 					if (i8271.CommandParameters[1] & 0x020)
 					{
-						logerror("Write Fault Reset\n");
+						LOG(("Write Fault Reset\n"));
 					}
 
-					logerror("Select %02x\n", (i8271.CommandParameters[1] & 0x0c0)>>6);
-#endif
+					LOG(("Select %02x\n", (i8271.CommandParameters[1] & 0x0c0)>>6));
+
 					/* get drive */
 					i8271_get_drive();
 
@@ -1019,12 +989,10 @@ static void i8271_command_execute(void)
 
 			FDC_LOG_COMMAND("READ DATA MULTI RECORD");
 
-#ifdef VERBOSE
-			logerror("Sector Count: %02x\n", i8271.Counter);
-			logerror("Track: %02x\n",i8271.CommandParameters[0]);
-			logerror("Sector: %02x\n", i8271.CommandParameters[1]);
-			logerror("Sector Length: %02x bytes\n", 1<<(i8271.ID_N+7));
-#endif
+			LOG(("Sector Count: %02x\n", i8271.Counter));
+			LOG(("Track: %02x\n",i8271.CommandParameters[0]));
+			LOG(("Sector: %02x\n", i8271.CommandParameters[1]));
+			LOG(("Sector Length: %02x bytes\n", 1<<(i8271.ID_N+7)));
 
 			i8271_get_drive();
 
@@ -1054,12 +1022,11 @@ static void i8271_command_execute(void)
 			i8271.Counter = 1;
 			i8271.ID_R = i8271.CommandParameters[1];
 
-#ifdef VERBOSE
-			logerror("Sector Count: %02x\n", i8271.Counter);
-			logerror("Track: %02x\n",i8271.CommandParameters[0]);
-			logerror("Sector: %02x\n", i8271.CommandParameters[1]);
-			logerror("Sector Length: %02x bytes\n", 1<<(i8271.ID_N+7));
-#endif
+			LOG(("Sector Count: %02x\n", i8271.Counter));
+			LOG(("Track: %02x\n",i8271.CommandParameters[0]));
+			LOG(("Sector: %02x\n", i8271.CommandParameters[1]));
+			LOG(("Sector Length: %02x bytes\n", 1<<(i8271.ID_N+7)));
+
 			i8271_get_drive();
 
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
@@ -1092,12 +1059,10 @@ static void i8271_command_execute(void)
 
 			FDC_LOG_COMMAND("READ DATA MULTI RECORD");
 
-#ifdef VERBOSE
-			logerror("Sector Count: %02x\n", i8271.Counter);
-			logerror("Track: %02x\n",i8271.CommandParameters[0]);
-			logerror("Sector: %02x\n", i8271.CommandParameters[1]);
-			logerror("Sector Length: %02x bytes\n", 1<<(i8271.ID_N+7));
-#endif
+			LOG(("Sector Count: %02x\n", i8271.Counter));
+			LOG(("Track: %02x\n",i8271.CommandParameters[0]));
+			LOG(("Sector: %02x\n", i8271.CommandParameters[1]));
+			LOG(("Sector Length: %02x bytes\n", 1<<(i8271.ID_N+7)));
 
 			i8271_get_drive();
 
@@ -1140,12 +1105,10 @@ static void i8271_command_execute(void)
 			i8271.ID_R = i8271.CommandParameters[1];
 
 
-#ifdef VERBOSE
-			logerror("Sector Count: %02x\n", i8271.Counter);
-			logerror("Track: %02x\n",i8271.CommandParameters[0]);
-			logerror("Sector: %02x\n", i8271.CommandParameters[1]);
-			logerror("Sector Length: %02x bytes\n", 1<<(i8271.ID_N+7));
-#endif
+			LOG(("Sector Count: %02x\n", i8271.Counter));
+			LOG(("Track: %02x\n",i8271.CommandParameters[0]));
+			LOG(("Sector: %02x\n", i8271.CommandParameters[1]));
+			LOG(("Sector Length: %02x bytes\n", 1<<(i8271.ID_N+7)));
 			i8271_get_drive();
 
             i8271.drive_control_output &=~1;
@@ -1185,10 +1148,8 @@ static void i8271_command_execute(void)
 		{
 			FDC_LOG_COMMAND("READ ID");
 
-#ifdef VERBOSE
-			logerror("Track: %02x\n",i8271.CommandParameters[0]);
-			logerror("ID Field Count: %02x\n", i8271.CommandParameters[2]);
-#endif
+			LOG(("Track: %02x\n",i8271.CommandParameters[0]));
+			LOG(("ID Field Count: %02x\n", i8271.CommandParameters[2]));
 
 			i8271_get_drive();
 
@@ -1212,9 +1173,7 @@ static void i8271_command_execute(void)
 		break;
 
 		default:
-#ifdef VERBOSE
-			logerror("ERROR Unrecognised Command\n");
-#endif
+			LOG(("ERROR Unrecognised Command\n"));
 			break;
 	}
 }
@@ -1227,9 +1186,7 @@ WRITE8_HANDLER(i8271_w)
 	{
 		case 0:
 		{
-#ifdef VERBOSE
-			logerror("I8271 W Command Register: %02x\n", data);
-#endif
+			LOG(("I8271 W Command Register: %02x\n", data));
 
 			i8271.CommandRegister = data;
 			i8271.Command = i8271.CommandRegister & 0x03f;
@@ -1334,9 +1291,7 @@ WRITE8_HANDLER(i8271_w)
 
 		case 1:
 		{
-#ifdef VERBOSE
-			logerror("I8271 W Parameter Register: %02x\n",data);
-#endif
+			LOG(("I8271 W Parameter Register: %02x\n",data));
 			i8271.ParameterRegister = data;
 
 			if (i8271.ParameterCount!=0)
@@ -1351,9 +1306,7 @@ WRITE8_HANDLER(i8271_w)
 
 		case 2:
 		{
-#ifdef VERBOSE
-			logerror("I8271 W Reset Register: %02x\n", data);
-#endif
+			LOG(("I8271 W Reset Register: %02x\n", data));
 			if (((data ^ i8271.ResetRegister) & 0x01)!=0)
 			{
 				if ((data & 0x01)==0)
@@ -1381,9 +1334,7 @@ WRITE8_HANDLER(i8271_w)
 		{
 			/* bit 1,0 are zero other bits contain status data */
 			i8271.StatusRegister &= ~0x03;
-#ifdef VERBOSE
-			logerror("I8271 R Status Register: %02x\n",i8271.StatusRegister);
-#endif
+			LOG(("I8271 R Status Register: %02x\n",i8271.StatusRegister));
 			return i8271.StatusRegister;
 		}
 
@@ -1396,9 +1347,7 @@ WRITE8_HANDLER(i8271_w)
 				i8271_set_irq_state(0);
 
 				i8271.StatusRegister &= ~I8271_STATUS_RESULT_FULL;
-#ifdef VERBOSE
-				logerror("I8271 R Result Register %02x\n",i8271.ResultRegister);
-#endif
+				LOG(("I8271 R Result Register %02x\n",i8271.ResultRegister));
 				return i8271.ResultRegister;
 			}
 

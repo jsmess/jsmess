@@ -6,6 +6,9 @@
 #include "sound/2413intf.h"
 #include "machine/eeprom.h"
 
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
 #define CF_CODEMASTERS_MAPPER	0x01
 #define CF_KOREAN_MAPPER	0x02
 #define CF_93C46_EEPROM		0x04
@@ -375,14 +378,10 @@ WRITE8_HANDLER(sms_mapper_w)
 			if (data & 0x08) { /* it's ram */
 				sms_cartridge[sms_current_cartridge].sram_save = 1;			/* SRAM should be saved on exit. */
 				if (data & 0x04) {
-#ifdef LOG_PAGING
-					logerror("ram 1 paged.\n");
-#endif
+					LOG(("ram 1 paged.\n"));
 					SOURCE = sms_cartridge[sms_current_cartridge].cartSRAM + 0x4000;
 				} else {
-#ifdef LOG_PAGING
-					logerror("ram 0 paged.\n");
-#endif
+					LOG(("ram 0 paged.\n"));
 					SOURCE = sms_cartridge[sms_current_cartridge].cartSRAM;
 				}
 				memory_set_bankptr( 4, SOURCE );
@@ -395,17 +394,13 @@ WRITE8_HANDLER(sms_mapper_w)
 					page = (smsBiosPageCount > 0) ? sms_mapper[3] % smsBiosPageCount : 0;
 					SOURCE = sms_banking_bios[4];
 				}
-#ifdef LOG_PAGING
-				logerror("rom 2 paged in %x.\n", page);
-#endif
+				LOG(("rom 2 paged in %x.\n", page));
 				memory_set_bankptr( 4, SOURCE );
 				memory_set_bankptr( 5, SOURCE + 0x2000 );
 			}
 			break;
 		case 1: /* Select 16k ROM bank for 0400-3FFF */
-#ifdef LOG_PAGING
-			logerror("rom 0 paged in %x.\n", page);
-#endif
+			LOG(("rom 0 paged in %x.\n", page));
 			sms_banking_bios[2] = SOURCE_BIOS + 0x0400;
 			sms_banking_cart[2] = SOURCE_CART + 0x0400;
 			if ( IS_GAMEGEAR ) {
@@ -414,9 +409,7 @@ WRITE8_HANDLER(sms_mapper_w)
 			memory_set_bankptr( 2, SOURCE + 0x0400 );
 			break;
 		case 2: /* Select 16k ROM bank for 4000-7FFF */
-#ifdef LOG_PAGING
-			logerror("rom 1 paged in %x.\n", page);
-#endif
+			LOG(("rom 1 paged in %x.\n", page));
 			sms_banking_bios[3] = SOURCE_BIOS;
 			sms_banking_cart[3] = SOURCE_CART;
 			if ( IS_GAMEGEAR ) {
@@ -437,9 +430,7 @@ WRITE8_HANDLER(sms_mapper_w)
 				sms_banking_cart[4] = SOURCE_CART;
 			}
 			if ( ! ( sms_mapper[0] & 0x08 ) ) { /* is RAM disabled? */
-#ifdef LOG_PAGING
-				logerror("rom 2 paged in %x.\n", page);
-#endif
+				LOG(("rom 2 paged in %x.\n", page));
 				memory_set_bankptr( 4, SOURCE );
 				memory_set_bankptr( 5, SOURCE + 0x2000 );
 			}
@@ -500,9 +491,7 @@ WRITE8_HANDLER(sms_cartram2_w) {
 		sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + page * 0x4000;
 		memory_set_bankptr( 4, sms_banking_cart[4] );
 		memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
-#ifdef LOG_PAGING
-		logerror("rom 2 paged in %x dodgeball king.\n", page);
-#endif
+		LOG(("rom 2 paged in %x dodgeball king.\n", page));
 	}
 }
 
@@ -525,9 +514,7 @@ WRITE8_HANDLER(sms_cartram_w) {
 			sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + page * 0x4000;
 			memory_set_bankptr( 4, sms_banking_cart[4] );
 			memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
-#ifdef LOG_PAGING
-			logerror("rom 2 paged in %x codemasters.\n", page);
-#endif
+			LOG(("rom 2 paged in %x codemasters.\n", page));
 		} else if ( sms_cartridge[sms_current_cartridge].features & CF_ONCART_RAM ) {
 			sms_cartridge[sms_current_cartridge].cartRAM[offset & ( sms_cartridge[sms_current_cartridge].ram_size - 1 ) ] = data;
 		} else {

@@ -101,15 +101,11 @@ static struct
 
 
 
-/******************* utilitiy function and macros ********************/
+/******************* utility function and macros ********************/
 
 
 
-#if VERBOSE
-#define LOG(x)  logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 
 

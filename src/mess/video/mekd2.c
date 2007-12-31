@@ -13,16 +13,6 @@
 
 #include "includes/mekd2.h"
 
-#ifndef VERBOSE
-#define VERBOSE 1
-#endif
-
-#if VERBOSE
-#define LOG(x)	logerror(x)
-#else
-#define LOG(x)	/* x */
-#endif
-
 PALETTE_INIT( mekd2 )
 {
 	int i;

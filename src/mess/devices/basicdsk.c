@@ -11,6 +11,7 @@ the data will be accessed correctly */
 
 #define basicdsk_MAX_DRIVES 4
 #define VERBOSE 1
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 typedef struct
@@ -282,10 +283,8 @@ static int basicdsk_seek(basicdsk * w, UINT8 t, UINT8 h, UINT8 s)
 	}
 
 
-#if VERBOSE
-    logerror("basicdsk seek track:%d head:%d sector:%d-> offset #0x%08lX\n",
-             t, h, s, offset);
-#endif
+    LOG(("basicdsk seek track:%d head:%d sector:%d-> offset #0x%08lX\n",
+             t, h, s, offset));
 
 	if (offset > w->image_size)
 	{
@@ -321,9 +320,7 @@ static int basicdsk_seek(basicdsk * w, UINT8 t, UINT8 h, UINT8 s)
 				w->head == w->dam_list[i][1] &&
 				w->sector == w->dam_list[i][2])
 			{
-#if VERBOSE
-                                logerror("basicdsk reading formatted sector %d, track %d, head %d\n", w->sector, w->track, w->head);
-#endif
+                                LOG(("basicdsk reading formatted sector %d, track %d, head %d\n", w->sector, w->track, w->head));
 				w->data_offset = w->dam_data[i];
 				return;
 			}
@@ -398,9 +395,7 @@ int cnt;
 	w->dam_cnt = 0;
     if (w->image_file != REAL_FDD && w->mode == 0)
     {
-#if VERBOSE
-                logerror("basicdsk write_track write protected image\n");
-#endif
+                LOG(("basicdsk write_track write protected image\n"));
         w->status = STA_2_WRITE_PRO;
         return;
     }
@@ -409,9 +404,7 @@ int cnt;
 	memset(w->dam_data, 0x00, sizeof(w->dam_data));
 
 	f = w->buffer;
-#if VERBOSE
-        logerror("basicdsk write_track %s_LOW\n", (w->density) ? "MFM" : "FM" );
-#endif
+        LOG(("basicdsk write_track %s_LOW\n", (w->density) ? "MFM" : "FM" ));
     cnt = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
 
 	do
@@ -430,12 +423,11 @@ int cnt;
 			w->dam_list[w->dam_cnt][3] = *f++;	  /* copy sector length */
 			/* sector length in bytes */
 			seclen = 128 << w->dam_list[w->dam_cnt][3];
-#if VERBOSE
-                        logerror("basicdsk write_track FE @%5d T:%02X H:%02X S:%02X L:%02X\n",
+                        LOG(("basicdsk write_track FE @%5d T:%02X H:%02X S:%02X L:%02X\n",
 					(int)(f - w->buffer),
 					w->dam_list[w->dam_cnt][0],w->dam_list[w->dam_cnt][1],
-					w->dam_list[w->dam_cnt][2],w->dam_list[w->dam_cnt][3]);
-#endif
+					w->dam_list[w->dam_cnt][2],w->dam_list[w->dam_cnt][3]));
+
 			/* search start of DATA */
 			while ((--cnt > 0) && (*f != 0xf9) && (*f != 0xfa) && (*f != 0xfb))
 				f++;
@@ -447,13 +439,13 @@ int cnt;
                 /* set pointer to DATA to later write the sectors contents */
 				w->dam_data[w->dam_cnt] = (int)(f - w->buffer);
 				w->dam_cnt++;
-#if VERBOSE
-                                logerror("basicdsk write_track %02X @%5d data: %02X %02X %02X %02X ... %02X %02X %02X %02X\n",
+
+                                LOG(("basicdsk write_track %02X @%5d data: %02X %02X %02X %02X ... %02X %02X %02X %02X\n",
 						f[-1],
 						(int)(f - w->buffer),
 						f[0], f[1], f[2], f[3],
-						f[seclen-4], f[seclen-3], f[seclen-2], f[seclen-1]);
-#endif
+						f[seclen-4], f[seclen-3], f[seclen-2], f[seclen-1]));
+
 				f += seclen;
 				cnt -= seclen;
 			}
