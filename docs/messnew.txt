@@ -20,7 +20,9 @@ User Interface Changes:
 
 Imgtool Changes:
 ----------------
-(none)
+- [Windows Imgtool] Fixed a bug that could cause filenames to get mangled when
+  inserting files onto images with a directory structure.  (bug #1458) [Nate
+  Woods]
 
 
 

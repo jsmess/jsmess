@@ -1216,15 +1216,16 @@ static void menu_insert(HWND window)
 	/* figure out the image filename */
 	s1 = strrchr(ofn.filename, '\\');
 	s1 = s1 ? s1 + 1 : ofn.filename;
-	image_filename = mame_strdup(s1);
+	image_filename = (char *) alloca(strlen(s1) + 1);
+	strcpy(image_filename, s1);
 
-	if (info->current_directory)
+	/* append the current directory, if appropriate */
+	if (info->current_directory != NULL)
 	{
 		s2 = (char *) alloca(strlen(info->current_directory) + strlen(image_filename) + 1);
 		strcpy(s2, info->current_directory);
 		strcat(s2, image_filename);
-		free(image_filename);
-		image_filename = mame_strdup(image_filename);
+		image_filename = s2;
 	}
 
 	err = imgtool_partition_write_file(info->partition, image_filename, fork, stream, opts, filter);
@@ -1236,9 +1237,7 @@ static void menu_insert(HWND window)
 		goto done;
 
 done:
-	if (image_filename)
-		free(image_filename);
-	if (opts)
+	if (opts != NULL)
 		option_resolution_close(opts);
 	if (err)
 		wimgtool_report_error(window, err, image_filename, ofn.filename);
