@@ -261,7 +261,7 @@ static void messtest_output_error(void *param, const char *format, va_list argpt
 		{
 			nextpos = pos + strlen(&buffer[pos]);
 		}
-		report_message(MSG_FAILURE, &buffer[pos]);
+		report_message(MSG_FAILURE, "%s", &buffer[pos]);
 		pos = nextpos;
 	}
 }
@@ -1011,7 +1011,7 @@ void osd_update(int skip_redraw)
 	if (attotime_compare(current_time, time_limit) > 0)
 	{
 		state = STATE_ABORTED;
-		report_message(MSG_FAILURE, "Time limit of %.2f seconds exceeded", time_limit);
+		report_message(MSG_FAILURE, "Time limit of %s attoseconds exceeded", attotime_string(time_limit, 9));
 		return;
 	}
 

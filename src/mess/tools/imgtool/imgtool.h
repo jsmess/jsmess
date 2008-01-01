@@ -73,7 +73,7 @@ void imgtool_init(int omit_untested, void (*warning)(const char *message));
 void imgtool_exit(void);
 const imgtool_module *imgtool_find_module(const char *modulename);
 imgtool_module_features imgtool_get_module_features(const imgtool_module *module);
-void imgtool_warn(const char *format, ...);
+void imgtool_warn(const char *format, ...) ATTR_PRINTF(1,2);
 
 /* ----- image management ----- */
 imgtoolerr_t imgtool_identify_file(const char *filename, imgtool_module **modules, size_t count);

@@ -38,7 +38,7 @@ INLINE size_t pile_size(mess_pile *pile)
 }
 
 int pile_vprintf(mess_pile *pile, const char *fmt, va_list args);
-int pile_printf(mess_pile *pile, const char *fmt, ...);
+int pile_printf(mess_pile *pile, const char *fmt, ...)/* ATTR_PRINTF(2,3)*/;
 int pile_putc(mess_pile *pile, char c);
 int pile_puts(mess_pile *pile, const char *s);
 

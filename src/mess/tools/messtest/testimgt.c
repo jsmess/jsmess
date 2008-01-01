@@ -31,7 +31,7 @@ static void report_imgtoolerr(imgtoolerr_t err)
 {
 	const char *msg;
 	msg = imgtool_error(err);
-	report_message(MSG_FAILURE, msg);
+	report_message(MSG_FAILURE, "%s", msg);
 }
 
 

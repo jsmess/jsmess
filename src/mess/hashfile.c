@@ -64,6 +64,8 @@ struct hash_parse_state
 
 ***************************************************************************/
 
+static void parse_error(struct hash_parse_state *state, const char *fmt, ...) ATTR_PRINTF(2,3);
+
 static void parse_error(struct hash_parse_state *state, const char *fmt, ...)
 {
 	char buf[256];
@@ -82,7 +84,7 @@ static void parse_error(struct hash_parse_state *state, const char *fmt, ...)
 
 static void unknown_tag(struct hash_parse_state *state, const char *tagname)
 {
-	parse_error(state, "[%d:%d]: Unknown tag: %s\n",
+	parse_error(state, "[%lu:%lu]: Unknown tag: %s\n",
 		XML_GetCurrentLineNumber(state->parser),
 		XML_GetCurrentColumnNumber(state->parser),
 		tagname);
@@ -92,7 +94,7 @@ static void unknown_tag(struct hash_parse_state *state, const char *tagname)
 
 static void unknown_attribute(struct hash_parse_state *state, const char *attrname)
 {
-	parse_error(state, "[%d:%d]: Unknown attribute: %s\n",
+	parse_error(state, "[%lu:%lu]: Unknown attribute: %s\n",
 		XML_GetCurrentLineNumber(state->parser),
 		XML_GetCurrentColumnNumber(state->parser),
 		attrname);
@@ -103,7 +105,7 @@ static void unknown_attribute(struct hash_parse_state *state, const char *attrna
 static void unknown_attribute_value(struct hash_parse_state *state,
 	const char *attrname, const char *attrvalue)
 {
-	parse_error(state, "[%d:%d]: Unknown attribute value: %s\n",
+	parse_error(state, "[%lu:%lu]: Unknown attribute value: %s\n",
 		XML_GetCurrentLineNumber(state->parser),
 		XML_GetCurrentColumnNumber(state->parser),
 		attrvalue);
@@ -320,7 +322,7 @@ static void hashfile_parse(hash_file *hashfile,
 		state.done = mame_feof(hashfile->file);
 		if (XML_Parse(state.parser, buf, len, state.done) == XML_STATUS_ERROR)
 		{
-			parse_error(&state, "[%d:%d]: %s\n",
+			parse_error(&state, "[%lu:%lu]: %s\n",
 				XML_GetCurrentLineNumber(state.parser),
 				XML_GetCurrentColumnNumber(state.parser),
 				XML_ErrorString(XML_GetErrorCode(state.parser)));

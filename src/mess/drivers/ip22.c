@@ -62,6 +62,8 @@
 
 static UINT32 *ip22_mainram;
 
+INLINE void verboselog( int n_level, const char *s_fmt, ... ) ATTR_PRINTF(2,3);
+
 INLINE void verboselog( int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
@@ -953,11 +955,11 @@ static READ32_HANDLER( hal2_r )
 	switch( offset )
 	{
 	case 0x0010/4:
-		verboselog( 0, "HAL2 Status read: 0x0004\n", 0x0004 );
+		verboselog( 0, "HAL2 Status read: 0x0004\n" );
 		return 0x0004;
 		break;
 	case 0x0020/4:
-		verboselog( 0, "HAL2 Revision read: 0x4011\n", 0x4011 );
+		verboselog( 0, "HAL2 Revision read: 0x4011\n" );
 		return 0x4011;
 		break;
 	}

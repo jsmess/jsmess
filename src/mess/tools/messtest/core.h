@@ -71,13 +71,13 @@ offs_t parse_offset(const char *s);
 
 /* reporting */
 void error_report(const char *message);
-void error_reportf(const char *fmt, ...);
+void error_reportf(const char *fmt, ...) ATTR_PRINTF(1,2);
 void error_missingattribute(const char *attribute);
 void error_outofmemory(void);
 void error_invalidmemregion(const char *s);
 void error_baddevicetype(const char *s);
 
-void report_message(messtest_messagetype_t msgtype, const char *fmt, ...);
+void report_message(messtest_messagetype_t msgtype, const char *fmt, ...) ATTR_PRINTF(2,3);
 void report_testcase_begin(const char *testcase_name);
 void report_testcase_ran(int failure);
 

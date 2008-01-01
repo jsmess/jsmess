@@ -34,6 +34,8 @@ Source Changes:
 
 - Conditional logging cleanups.  [Atari Ace]
 
+- Greater use of ATTR_PRINTF.  [Oliver Stoeneberg]
+
 
 
 0.122
