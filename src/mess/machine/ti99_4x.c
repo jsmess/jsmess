@@ -53,7 +53,6 @@ TODO:
 #include <math.h>
 #include "driver.h"
 #include "tms9901.h"
-#include "video/tms9928a.h"
 #include "video/v9938.h"
 #include "audio/spchroms.h"
 #include "devices/cassette.h"
@@ -107,9 +106,6 @@ static void ti99_sAMSxram_init(void);
 static void ti99_4p_mapper_init(void);
 static void ti99_myarcxram_init(void);
 static void ti99_evpc_reset(void);
-
-static void ti99_common_init(const TMS9928a_interface *intf);
-
 
 /*
 	pointer to extended RAM area
@@ -713,36 +709,25 @@ MACHINE_START( ti99_4a_50hz )
 
 MACHINE_START( ti99_4ev_60hz)
 {
-	tms9901_init(0, & tms9901reset_param_ti99_4x);
-    	ti99_peb_init();
-        ti99_fdc_init();
-#if HAS_99CCFDC
-	ti99_ccfdc_init();
-#endif
-	ti99_bwg_init();
-	ti99_hfdc_init();
-        ti99_ide_init();
-        ti99_rs232_init();
-	ti99_hsgpl_init();
-	ti99_usbsm_init();
+    /* has an own VDP, so skip initing the VDP */
+    ti99_common_init(0);
 }
 
-static void ti99_common_init(const TMS9928a_interface *gfxparm) {
-
-	tms9901_init(0, & tms9901reset_param_ti99_4x);
-
-	TMS9928A_configure(gfxparm);
+void ti99_common_init(const TMS9928a_interface *gfxparm) 
+{
+    if (ti99_model==model_99_8) {
+        tms9901_init(0, &tms9901reset_param_ti99_8);
+    }
+    else {
+	tms9901_init(0,  &tms9901reset_param_ti99_4x);
+    }
+	if (gfxparm!=0) TMS9928A_configure(gfxparm);
 
         /* Initialize all. Actually, at this point, we don't know
            how the switches are set. Later we use the configuration switches to
            determine which one to use. */
 	ti99_peb_init();
-        ti99_fdc_init();
-#if HAS_99CCFDC
-	ti99_ccfdc_init();
-#endif
-	ti99_bwg_init();
-	ti99_hfdc_init();
+        ti99_floppy_controllers_init_all();
         ti99_ide_init();
         ti99_rs232_init();
 	ti99_hsgpl_init();

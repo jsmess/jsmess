@@ -34,8 +34,57 @@
 #include "devices/mflopimg.h"
 
 #define MAX_FLOPPIES 4
+#define TI99DSK_TAG	"ti99dsktag"
 
 static int use_80_track_drives;
+
+/* defines for DRQ_IRQ_status */
+enum
+{
+	fdc_IRQ = 1,
+	fdc_DRQ = 2
+};
+
+/* current state of the DRQ and IRQ lines */
+static int DRQ_IRQ_status;
+
+/* when TRUE the CPU is halted while DRQ/IRQ are true */
+static int DSKhold;
+/* disk selection bits */
+static int DSEL;
+/* currently selected disk unit */
+static int DSKnum;
+/* current side */
+static int DSKside;
+/* 1 if motor is on */
+static int DVENA;
+/* on rising edge, sets DVENA for 4.23 seconds on rising edge */
+static int motor_on;
+/* count 4.23s from rising edge of motor_on */
+void *motor_on_timer;
+
+/*
+	call this when the state of DSKhold or DRQ/IRQ or DVENA change
+
+	Emulation is faulty because the CPU is actually stopped in the midst of 
+	instruction, at the end of the memory access
+*/
+static void fdc_handle_hold(void)
+{
+	if (DSKhold && (!DRQ_IRQ_status) && DVENA)
+		cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
+	else
+		cpunum_set_input_line(0, INPUT_LINE_HALT, CLEAR_LINE);
+}
+
+/*
+	callback called at the end of DVENA pulse
+*/
+static TIMER_CALLBACK(motor_on_timer_callback)
+{
+	DVENA = 0;
+	fdc_handle_hold();
+}
 
 typedef struct ti99_geometry
 {
@@ -45,8 +94,18 @@ typedef struct ti99_geometry
 	UINT8 density;
 } ti99_geometry;
 
+static void hfdc_int_callback(int which, int state);
+static int hfdc_select_callback(int which, select_mode_t select_mode, int select_line, int gpos);
+static UINT8 hfdc_dma_read_callback(int which, offs_t offset);
+static void hfdc_dma_write_callback(int which, offs_t offset, UINT8 data);
 
-#define TI99DSK_TAG	"ti99dsktag"
+static const smc92x4_intf hfdc_intf =
+{
+	hfdc_select_callback,
+	hfdc_dma_read_callback,
+	hfdc_dma_write_callback,
+	hfdc_int_callback
+};
 
 /*
 	Convert physical sector address to sector offset in disk image
@@ -76,7 +135,6 @@ static UINT64 ti99_translate_offset(floppy_image *floppy, const struct basicdsk_
 static int ti99_tracktranslate(mess_image *image, floppy_image *floppy, int physical_track)
 {
 	struct ti99_geometry *geometry;
-
 	geometry = floppy_tag(floppy, TI99DSK_TAG);
 
 	if (use_80_track_drives && (geometry->tracksperside <= 40))
@@ -267,14 +325,6 @@ static FLOPPY_CONSTRUCT(ti99_floppy_construct)
 	int success;
 	floperr_t err;
 
-        /* Prevents internal_floppy_device_load (mflopimg) to set the drive
-           geometry to the medium geometry. TI disk controllers determine the
-           number of tracks from a field in sector 0, and if the medium has
-           40 tracks but the drive has 80, the DSR ROM automatically
-           double-steps the tracks.
-        */
-        floppy_keep_drive_geometry();
-
 	geometry1 = floppy_create_tag(floppy, TI99DSK_TAG, sizeof(*geometry1));
 
 	ti99_guess_geometry(floppy, geometry1, NULL, &success);
@@ -312,102 +362,6 @@ static void ti99_install_tracktranslate_procs(void)
 	}
 }
 
-
-/*===========================================================================*/
-/*
-	TI99/4(a) Floppy disk controller card emulation
-*/
-
-/* prototypes */
-static void fdc_callback(wd17xx_state_t event, void *param);
-static TIMER_CALLBACK(motor_on_timer_callback);
-static int fdc_cru_r(int offset);
-static void fdc_cru_w(int offset, int data);
-static READ8_HANDLER(fdc_mem_r);
-static WRITE8_HANDLER(fdc_mem_w);
-
-/* pointer to the fdc ROM data */
-static UINT8 *ti99_disk_DSR;
-
-/* when TRUE the CPU is halted while DRQ/IRQ are true */
-static int DSKhold;
-
-/* defines for DRQ_IRQ_status */
-enum
-{
-	fdc_IRQ = 1,
-	fdc_DRQ = 2
-};
-
-/* current state of the DRQ and IRQ lines */
-static int DRQ_IRQ_status;
-
-/* disk selection bits */
-static int DSEL;
-/* currently selected disk unit */
-static int DSKnum;
-/* current side */
-static int DSKside;
-
-/* 1 if motor is on */
-static int DVENA;
-/* on rising edge, sets DVENA for 4.23 seconds on rising edge */
-static int motor_on;
-/* count 4.23s from rising edge of motor_on */
-static void *motor_on_timer;
-
-static const ti99_peb_card_handlers_t fdc_handlers =
-{
-	fdc_cru_r,
-	fdc_cru_w,
-	fdc_mem_r,
-	fdc_mem_w
-};
-
-
-/*
-	Reset fdc card, set up handlers
-*/
-void ti99_fdc_init(void)
-{
-	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
-	ti99_install_tracktranslate_procs();
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
-	use_80_track_drives = FALSE;
-}
-
-/*
-	Reset fdc card, set up handlers
-*/
-void ti99_fdc_reset(void)
-{
-	ti99_disk_DSR = memory_region(region_dsr) + offset_fdc_dsr;
-	DSEL = 0;
-	DSKnum = -1;
-	DSKside = 0;
-
-	DVENA = 0;
-	motor_on = 0;
-	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
-	wd17xx_reset();		/* resets the fdc */
-	wd17xx_set_density(DEN_FM_LO);
-}
-
-
-/*
-	call this when the state of DSKhold or DRQ/IRQ or DVENA change
-
-	Emulation is faulty because the CPU is actually stopped in the midst of instruction, at
-	the end of the memory access
-*/
-static void fdc_handle_hold(void)
-{
-	if (DSKhold && (!DRQ_IRQ_status) && DVENA)
-		cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
-	else
-		cpunum_set_input_line(0, INPUT_LINE_HALT, CLEAR_LINE);
-}
-
 /*
 	callback called whenever DRQ/IRQ state change
 */
@@ -435,12 +389,68 @@ static void fdc_callback(wd17xx_state_t event, void *param)
 }
 
 /*
-	callback called at the end of DVENA pulse
+	Initializes all available controllers. This routine is only used in the 
+	init state of the emulator. During the normal operation, only the
+	reset routines are used.
 */
-static TIMER_CALLBACK(motor_on_timer_callback)
+void ti99_floppy_controllers_init_all(void)
 {
+	/* initialize the controller chip for TI FDC, CC, BwG */
+	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);
+
+	/* initialize the controller chip for HFDC */
+	smc92x4_init(0, & hfdc_intf);
+
+	ti99_install_tracktranslate_procs();
+
+	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
+	
+	/* initialize the RTC for BwG and HFDC */
+	mm58274c_init(1, 1);
+}
+
+/*===========================================================================*/
+/*
+	TI99/4(a) Floppy disk controller card emulation
+*/
+
+/* prototypes */
+static void fdc_callback(wd17xx_state_t event, void *param);
+static TIMER_CALLBACK(motor_on_timer_callback);
+static int fdc_cru_r(int offset);
+static void fdc_cru_w(int offset, int data);
+static READ8_HANDLER(fdc_mem_r);
+static WRITE8_HANDLER(fdc_mem_w);
+
+/* pointer to the fdc ROM data */
+static UINT8 *ti99_disk_DSR;
+
+static const ti99_peb_card_handlers_t fdc_handlers =
+{
+	fdc_cru_r,
+	fdc_cru_w,
+	fdc_mem_r,
+	fdc_mem_w
+};
+
+/*
+	Reset fdc card, set up handlers
+*/
+void ti99_fdc_reset(void)
+{
+	ti99_disk_DSR = memory_region(region_dsr) + offset_fdc_dsr;
+	DSEL = 0;
+	DSKnum = -1;
+	DSKside = 0;
+
 	DVENA = 0;
-	fdc_handle_hold();
+	motor_on = 0;
+
+	use_80_track_drives = FALSE;
+
+	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
+	wd17xx_reset();		/* resets the fdc */
+	wd17xx_set_density(DEN_FM_LO);
 }
 
 /*
@@ -632,18 +642,6 @@ static const ti99_peb_card_handlers_t ccfdc_handlers =
 	ccfdc_mem_w
 };
 
-
-/*
-	Reset fdc card, set up handlers
-*/
-void ti99_ccfdc_init(void)
-{
-	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
-	ti99_install_tracktranslate_procs();
-	use_80_track_drives = FALSE;
-}
-
 void ti99_ccfdc_reset(void)
 {
 	ti99_disk_DSR = memory_region(region_dsr) + offset_ccfdc_dsr;
@@ -653,6 +651,8 @@ void ti99_ccfdc_reset(void)
 
 	DVENA = 0;
 	motor_on = 0;
+
+	use_80_track_drives = FALSE;
 
 	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
 
@@ -853,15 +853,6 @@ static UINT8 *bwg_ram;
 /*
 	Reset fdc card, set up handlers
 */
-void ti99_bwg_init(void)
-{
-	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
-	mm58274c_init(1, 1);	/* initialize the RTC */
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
-	ti99_install_tracktranslate_procs();
-	use_80_track_drives = FALSE;
-}
-
 void ti99_bwg_reset(void)
 {
 	ti99_disk_DSR = memory_region(region_dsr) + offset_bwg_dsr;
@@ -876,6 +867,9 @@ void ti99_bwg_reset(void)
 
 	DVENA = 0;
 	motor_on = 0;
+        
+     	use_80_track_drives = FALSE;
+        
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 
 	wd17xx_reset();		/* initialize the floppy disk controller */
@@ -1066,7 +1060,6 @@ static  READ8_HANDLER(bwg_mem_r)
 				break;
 			}
 	}
-
 	return reply;
 }
 
@@ -1150,20 +1143,6 @@ static int cru_sel;
 static UINT8 *hfdc_ram;
 static int hfdc_irq_state;
 
-
-static int hfdc_select_callback(int which, select_mode_t select_mode, int select_line, int gpos);
-static UINT8 hfdc_dma_read_callback(int which, offs_t offset);
-static void hfdc_dma_write_callback(int which, offs_t offset, UINT8 data);
-static void hfdc_int_callback(int which, int state);
-
-static const smc92x4_intf hfdc_intf =
-{
-	hfdc_select_callback,
-	hfdc_dma_read_callback,
-	hfdc_dma_write_callback,
-	hfdc_int_callback
-};
-
 /*
 	Select the correct HFDC disk units.
 	floppy disks are selected by the 4 gpos instead of the select lines.
@@ -1246,17 +1225,6 @@ static void hfdc_int_callback(int which, int state)
 /*
 	Reset fdc card, set up handlers
 */
-void ti99_hfdc_init(void)
-{
-	/* initialize the floppy disk controller */
-	smc92x4_init(0, & hfdc_intf);
-	mm58274c_init(1, 1);	/* initialize the RTC */
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
-	ti99_install_tracktranslate_procs();
-	use_80_track_drives = TRUE;
-}
-
-
 void ti99_hfdc_reset(void)
 {
 	ti99_disk_DSR = memory_region(region_dsr) + offset_hfdc_dsr;
@@ -1273,6 +1241,8 @@ void ti99_hfdc_reset(void)
 	motor_on = 0;
 
 	ti99_peb_set_card_handlers(0x1100, & hfdc_handlers);
+
+	use_80_track_drives = TRUE;
 
 	smc92x4_reset(0);
 }

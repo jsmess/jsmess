@@ -21,9 +21,7 @@ Historical notes: TI made several last minute design changes.
 #include "driver.h"
 #include "inputx.h"
 #include "video/generic.h"
-#include "video/tms9928a.h"
 #include "video/v9938.h"
-
 #include "machine/ti99_4x.h"
 #include "machine/tms9901.h"
 #include "audio/spchroms.h"
@@ -822,6 +820,8 @@ static void ti99_4_floppy_getinfo(const device_class *devclass, UINT32 state, un
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_COUNT:							info->i = 4; break;
 
+                /* Used within mflopimg.c. */
+                case DEVINFO_INT_KEEP_DRIVE_GEOMETRY:                                  info->i = 1; break;
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_ti99; break;
 

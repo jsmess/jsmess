@@ -148,7 +148,6 @@ Keyboard interface:
 
 #include "driver.h"
 #include "inputx.h"
-#include "video/tms9928a.h"
 
 #include "machine/ti99_4x.h"
 #include "machine/tms9901.h"
@@ -366,26 +365,26 @@ static const TMS9928a_interface tms9118_interface =
 {
 	TMS99x8A,
 	0x4000,
-	0, 0,
+	15, 15,
 	tms9901_set_int2
 };
 
 static MACHINE_START(ti99_8_60hz)
 {
-	TMS9928A_configure(&tms9118_interface);
+    ti99_common_init(&tms9118_interface); 
 }
 
 static const TMS9928a_interface tms9129_interface =
 {
 	TMS9929A,
 	0x4000,
-	0, 0,
+	13, 13,
 	tms9901_set_int2
 };
 
 static MACHINE_START(ti99_8_50hz)
 {
-	TMS9928A_configure(&tms9129_interface);
+    ti99_common_init(&tms9129_interface); 
 }
 
 static const struct tms9995reset_param ti99_8_processor_config =

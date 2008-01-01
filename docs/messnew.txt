@@ -8,7 +8,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [TI99] More floppy cleanups; fixed TI99_8 regression and made the floppy
+  drive usable.  (bug #1450)  [Michael Zapf]
 
 
 

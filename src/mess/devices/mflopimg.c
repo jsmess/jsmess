@@ -60,10 +60,6 @@ static const floppy_error_map errmap[] =
 	{ FLOPPY_ERROR_INVALIDIMAGE,	IMAGE_ERROR_INVALIDIMAGE }
 };
 
-static int flopimg_keep_geometry;	/* hack for TI-99 - please fix when possible */
-
-
-
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -263,7 +259,6 @@ const struct io_procs mess_ioprocs =
 
 static int device_init_floppy(mess_image *image)
 {
-    flopimg_keep_geometry = FALSE;
     if (!image_alloctag(image, FLOPPY_TAG, sizeof(mess_flopimg)))
 		return INIT_FAIL;
 	return floppy_drive_init(image, &mess_floppy_interface);
@@ -279,6 +274,7 @@ static int internal_floppy_device_load(mess_image *image, int create_format, opt
 	const struct FloppyFormat *floppy_options;
 	int floppy_flags, i;
 	const char *extension;
+	int keep_geometry = 0;
 
 	/* look up instance data */
 	flopimg = get_flopimg(image);
@@ -304,9 +300,18 @@ static int internal_floppy_device_load(mess_image *image, int create_format, opt
 		if (err)
 			goto error;
 	}
+        
+	/* if we can get head and track counts, then set the geometry accordingly
+	   However, at least the ti99 system family requires that medium track 
+	   count and drive track count be handled separately. 
+	   It is possible to insert a 40 track medium in an 80 track drive; the 
+	   TI controllers read the track count from sector 0 and automatically 
+	   apply double steps. Setting the track count of the drive to the 
+	   medium track count will then lead to unreachable tracks.
+	*/
+	keep_geometry = (int)device_get_info_int(&image_device(image)->devclass, DEVINFO_INT_KEEP_DRIVE_GEOMETRY);
 
-	/* if we can get head and track counts, then set the geometry accordingly */
-	if (!flopimg_keep_geometry
+	if (!keep_geometry 
             && floppy_callbacks(flopimg->floppy)->get_heads_per_disk
 		&& floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
 	{
@@ -378,25 +383,6 @@ void floppy_install_tracktranslate_proc(mess_image *image, int (*proc)(mess_imag
 	flopimg->tracktranslate_proc = proc;
 }
 
-
-/************
- *  Another hack for ti99: Drive track count may differ from medium track count.
- *  It is possible to insert a 40 track medium in an 80 track drive; the TI
- *  controllers read the track count from sector 0 and automatically
- *  apply double steps. Setting the track count of the drive to the medium
- *  track count will lead to unreachable tracks.
- *  This function is called from 99_dsk.c to switch off the lines in
- *  internal_floppy_device_load which set the drive geometry to the medium
- *  geometry.
- *************/
-void floppy_keep_drive_geometry(void)
-{
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call floppy_keep_drive_geometry at init time!");
-	flopimg_keep_geometry = TRUE;
-}
-
-
-
 /*************************************
  *
  *	Device specification function
@@ -426,6 +412,10 @@ void floppy_device_getinfo(const device_class *devclass, UINT32 state, union dev
 			for (count = 0; floppy_options[count].construct; count++)
 				;
 			info->i = count;
+			break;
+
+		case DEVINFO_INT_KEEP_DRIVE_GEOMETRY:
+			info->i = 0;
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
