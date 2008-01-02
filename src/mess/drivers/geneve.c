@@ -544,6 +544,9 @@ static void geneve_floppy_getinfo(const device_class *devclass, UINT32 state, un
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_COUNT:							info->i = 4; break;
 
+		/* Used within mflopimg.c. */
+                case DEVINFO_INT_KEEP_DRIVE_GEOMETRY:                                  info->i = 1; break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_ti99; break;
 
