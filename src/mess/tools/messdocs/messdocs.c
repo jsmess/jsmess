@@ -25,7 +25,7 @@ struct messdocs_state
 };
 
 
-static void process_error(struct messdocs_state *state, const char *tag, const char *msgfmt, ...) ATTR_PRINTF(3,4)
+static void ATTR_PRINTF(3,4) process_error(struct messdocs_state *state, const char *tag, const char *msgfmt, ...)
 {
 	/*va_list va;*/
 	/*char buf[512];*/

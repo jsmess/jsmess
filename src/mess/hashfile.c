@@ -64,9 +64,7 @@ struct hash_parse_state
 
 ***************************************************************************/
 
-static void parse_error(struct hash_parse_state *state, const char *fmt, ...) ATTR_PRINTF(2,3);
-
-static void parse_error(struct hash_parse_state *state, const char *fmt, ...)
+static void ATTR_PRINTF(2,3) parse_error(struct hash_parse_state *state, const char *fmt, ...)
 {
 	char buf[256];
 	va_list va;
