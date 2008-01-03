@@ -8,6 +8,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [GAMEBOY] Small mode 0 stat bug triggering fixes.  [Wilbert Pol]
+
 - [TI99/GENEVE] More floppy cleanups; fixed TI99_8 regression and made the
   floppy drive usable.  (bug #1450)  [Michael Zapf]
 

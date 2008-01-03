@@ -1600,6 +1600,8 @@ WRITE8_HANDLER ( gb_video_w ) {
 			   - 0x40 -> 0x20 (mode 2) - don't trigger
 			   - 0x40 -> 0x08 (mode 0) - don't trigger
 			   - 0x00 -> 0x40 - trigger only if LY==LYC
+			   - 0x20 -> 0x00/0x08/0x10/0x20/0x40 (mode 2, after m2int) - don't trigger
+			   - 0x20 -> 0x00/0x08/0x10/0x20/0x40 (mode 3, after m2int) - don't trigger
 			*/
 			if ( ! gb_lcd.mode_irq && ( ( gb_lcd.mode == 1 ) ||
 				( ( LCDSTAT & 0x40 ) && ! ( data & 0x68 ) ) ||
@@ -1613,8 +1615,9 @@ WRITE8_HANDLER ( gb_video_w ) {
 			/*
 			   - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
 			   - 0x20 -> 0x00/0x10/0x20/0x40 (mode 0, after m2int) - trigger (stat bug)
+			   - 0x00 -> 0xXX (mode 0) - trigger stat bug
 			*/
-			if ( gb_lcd.mode_irq && gb_lcd.mode == 0 && ( LCDSTAT & 0x20 ) == 0x20 ) {
+			if ( gb_lcd.mode_irq && gb_lcd.mode == 0 ) {
 				cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
 			}
 		}
