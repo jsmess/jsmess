@@ -266,7 +266,7 @@ DRIVER_INIT( aim65 )
 	pia_config(0, &pia);
 
 	r6532_config(0, &r6532_interface);
-	r6532_set_clock(0, 1000000);
+	r6532_set_clock(0, AIM65_CLOCK);
 	r6532_reset(0);
 
 	via_config(0, &via0);

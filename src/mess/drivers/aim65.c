@@ -156,7 +156,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( aim65 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, OSC_Y1/4) /* 1 MHz */
+	MDRV_CPU_ADD(M6502, AIM65_CLOCK) /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(aim65_mem, 0)
 
 	MDRV_DEFAULT_LAYOUT(layout_aim65)
