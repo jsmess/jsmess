@@ -1196,6 +1196,11 @@ void gb_video_init( int mode ) {
 		gb_video_w( 0x8, 0xFC );    /* SPR0PAL */
 		gb_video_w( 0x9, 0xFC );    /* SPR1PAL */
 
+		CURLINE = gb_lcd.current_line = 0;
+		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
+		gb_lcd.mode = 1;
+		timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(60,0), GB_LCD_STATE_LY00_M0, attotime_never );
+
 		break;
 	case GB_VIDEO_SGB:
 		/* set the scanline update function */
@@ -1216,6 +1221,11 @@ void gb_video_init( int mode ) {
 		gb_video_w( 0x7, 0xFC );    /* BGRDPAL */
 		gb_video_w( 0x8, 0xFC );    /* SPR0PAL */
 		gb_video_w( 0x9, 0xFC );    /* SPR1PAL */
+
+		CURLINE = gb_lcd.current_line = 0;
+		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
+		gb_lcd.mode = 1;
+		timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(60,0), GB_LCD_STATE_LY00_M0, attotime_never );
 
 		break;
 	case GB_VIDEO_CGB:
