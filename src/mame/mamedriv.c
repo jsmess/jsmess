@@ -4208,17 +4208,18 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gatedoom )	/* MAC (c) 1990 Data East Corporation (US) */
 	DRIVER( gatedom1 )	/* MAC (c) 1990 Data East Corporation (US) */
 	DRIVER( edrandy )	/* MAD (c) 1990 Data East Corporation (World) */
+	DRIVER( edrandy2 )	/* MAD (c) 1990 Data East Corporation (World) */
 	DRIVER( edrandy1 )	/* MAD (c) 1990 Data East Corporation (World) */
-	DRIVER( edrandy0 )	/* MAD (c) 1990 Data East Corporation (World) */
 	DRIVER( edrandyj )	/* MAD (c) 1990 Data East Corporation (Japan) */
 	DRIVER( supbtime )	/* MAE (c) 1990 Data East Corporation (World) */
 	DRIVER( supbtima )	/* MAE (c) 1990 Data East Corporation (World) */
 	DRIVER( supbtimj )	/* MAE (c) 1990 Data East Corporation (Japan) */
 	DRIVER( mutantf )	/* MAF (c) 1992 Data East Corporation (World) */
-	DRIVER( mutantfa )	/* MAF (c) 1992 Data East Corporation (World) */
+	DRIVER( mutantf4 )	/* MAF (c) 1992 Data East Corporation (World) */
+	DRIVER( mutantf3 )	/* MAF (c) 1992 Data East Corporation (World) */
 	DRIVER( deathbrd )	/* MAF (c) 1992 Data East Corporation (Japan) */
 	DRIVER( cninja )	/* MAG (c) 1991 Data East Corporation (World) */
-	DRIVER( cninja0 )	/* MAG (c) 1991 Data East Corporation (World) */
+	DRIVER( cninja1 )	/* MAG (c) 1991 Data East Corporation (World) */
 	DRIVER( cninjau )	/* MAG (c) 1991 Data East Corporation (US) */
 	DRIVER( joemac )	/* MAG (c) 1991 Data East Corporation (Japan) */
 	DRIVER( stoneage )	/* bootleg */
@@ -4555,6 +4556,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( simps4pa )	/* GX072 (c) 1991 */
 	DRIVER( simpsn2p )	/* GX072 (c) 1991 */
 	DRIVER( simps2pa )	/* GX072 (c) 1991 */
+	DRIVER( simp2pa )	/* GX072 (c) 1991 (Asia) */
 	DRIVER( simps2pj )	/* GX072 (c) 1991 (Japan) */
 	DRIVER( esckids )	/* GX975 (c) 1991 (Asia) */
 	DRIVER( esckidsj )	/* GX975 (c) 1991 (Japan) */

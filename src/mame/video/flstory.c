@@ -109,6 +109,11 @@ WRITE8_HANDLER( flstory_gfxctrl_w )
 
 }
 
+READ8_HANDLER( victnine_gfxctrl_r )
+{
+	return gfxctrl;
+}
+
 WRITE8_HANDLER( victnine_gfxctrl_w )
 {
 	if (gfxctrl == data)
@@ -126,13 +131,6 @@ WRITE8_HANDLER( victnine_gfxctrl_w )
 //popmessage("%04x: gfxctrl = %02x\n",activecpu_get_pc(),data);
 
 }
-
-#ifdef UNUSED_FUNCTION
-READ8_HANDLER( flstory_scrlram_r )
-{
-	return flstory_scrlram[offset];
-}
-#endif
 
 WRITE8_HANDLER( flstory_scrlram_w )
 {

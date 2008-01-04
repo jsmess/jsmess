@@ -28,6 +28,7 @@ extern int utf8_main(int argc, char **argv);
 #ifndef MESSLIB
 #if !defined(WINUI) || defined(MESS)
 #undef main
+#undef wmain
 #endif
 #endif
 

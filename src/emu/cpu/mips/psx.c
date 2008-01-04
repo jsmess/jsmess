@@ -129,7 +129,7 @@ static const UINT32 mips_mtc0_writemask[]=
 };
 
 #if 0
-void GTELOG(const char *a,...)
+void ATTR_PRINTF(1,2) GTELOG(const char *a,...)
 {
 	va_list va;
 	char s_text[ 1024 ];
@@ -139,7 +139,7 @@ void GTELOG(const char *a,...)
 	logerror( "%08x: GTE: %08x %s\n", mipscpu.pc, INS_COFUN( mipscpu.op ), s_text );
 }
 #else
-INLINE void GTELOG(const char *a, ...) {}
+INLINE void ATTR_PRINTF(1,2) GTELOG(const char *a, ...) {}
 #endif
 
 static UINT32 getcp2dr( int n_reg );
@@ -3126,7 +3126,7 @@ static void docop2( int gteop )
 		}
 		break;
 	}
-	ui_popup_time( 1, "unknown GTE op %08x", gteop );
+	popmessage( "unknown GTE op %08x", gteop );
 	logerror( "%08x: unknown GTE op %08x\n", mipscpu.pc, gteop );
 	mips_stop();
 }
