@@ -1267,7 +1267,7 @@ static void SetupSoftwareTabView(void)
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 void MessCopyDeviceOption(core_options *opts, const game_driver *gamedrv, const device_class *devclass, int device_index, int global_index)
 {
 	const char *dev_name;
@@ -1277,7 +1277,7 @@ void MessCopyDeviceOption(core_options *opts, const game_driver *gamedrv, const 
 	opt_value = options_get_string(opts, dev_name);
 	options_set_string(mame_options(), dev_name, opt_value, OPTION_PRIORITY_CMDLINE);
 }
-
+#endif
 
 
 // ------------------------------------------------------------------------
