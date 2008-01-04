@@ -1433,13 +1433,18 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
 			}
+			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+			}
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
 			gb_increment_scanline();
 			gb_lcd.delayed_line_irq = gb_lcd.line_irq;
-			gb_lcd.line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
-			if ( ! gb_lcd.delayed_line_irq && gb_lcd.line_irq ) {
+			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			gb_lcd.line_irq = 0;
+			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
+				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 			}
 			/* Reset LY==LYC STAT bit */
@@ -1453,7 +1458,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
 			/* Check LY=LYC for line #153 */
 			if ( gb_lcd.delayed_line_irq ) {
-				if ( gb_lcd.line_irq ) {
+				if ( gb_lcd.triggering_line_irq ) {
 					cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 				}
 			}
