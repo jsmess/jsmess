@@ -7,8 +7,8 @@
 ******************************************************************************/
 
 
-/* SYM-1 main (and only) oscillator */
-#define OSC_Y1 1000000
+/* SYM-1 main (and only) oscillator Y1 */
+#define SYM1_CLOCK  XTAL_1MHz
 
 /*----------- defined in drivers/sym1.c -----------*/
 

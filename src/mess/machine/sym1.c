@@ -285,7 +285,7 @@ DRIVER_INIT( sym1 )
 	via_config(1, &via1);
 	via_config(2, &via2);
 	r6532_config(0, &r6532_interface);
-	r6532_set_clock(0, OSC_Y1);
+	r6532_set_clock(0, SYM1_CLOCK);
 	r6532_reset(0);
 
 	/* configure 74145 */

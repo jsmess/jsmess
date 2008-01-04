@@ -120,7 +120,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( sym1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, OSC_Y1)  /* 1 MHz */
+	MDRV_CPU_ADD(M6502, SYM1_CLOCK)  /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(sym1_map, 0)
 	MDRV_MACHINE_RESET(sym1)
 
