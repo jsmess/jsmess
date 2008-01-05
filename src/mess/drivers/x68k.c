@@ -546,6 +546,7 @@ static int x68k_read_mouse(void)
 		sys.mouse.bufferempty = 1;
 		val &= ~0x01;
 		scc_set_reg_b(0,val);
+		logerror("SCC: mouse buffer empty\n");
 	}
 
 	return ipt;
@@ -586,7 +587,7 @@ static WRITE16_HANDLER( x68k_scc_w )
 		scc_w(0,(UINT8)data);
 		if((scc_get_reg_b(5) & 0x02) != prev)
 		{
-			if(scc_get_reg_b(5) & 0x02)
+			if(scc_get_reg_b(5) & 0x02)  // Request to Send
 			{
 				int val = scc_get_reg_b(0);
 				sys.mouse.bufferempty = 0;
@@ -1923,7 +1924,7 @@ static MACHINE_START( x68000 )
 	timer_adjust(kb_timer,attotime_zero,0,ATTOTIME_IN_MSEC(5));  // every 5ms
 
 	// start mouse timer
-	timer_adjust(mouse_timer,attotime_zero,0,ATTOTIME_IN_MSEC(2));  // a guess for now
+	timer_adjust(mouse_timer,attotime_zero,0,ATTOTIME_IN_MSEC(1));  // a guess for now
 	sys.mouse.inputtype = 0;
 }
 
