@@ -8,11 +8,13 @@
            Christian Janoff  mepk@c64.org
 
 ***************************************************************************/
-#include <ctype.h>
+
 #include "driver.h"
+#include "includes/c128.h"
+#include "includes/c64.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
-#include "mscommon.h"
 #include "machine/6526cia.h"
 
 #define VERBOSE_DBG 1
@@ -20,10 +22,8 @@
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"
-#include "includes/vic6567.h"
-#include "includes/vdc8563.h"
-
-#include "includes/c128.h"
+#include "video/vic6567.h"
+#include "video/vdc8563.h"
 
 
 /*

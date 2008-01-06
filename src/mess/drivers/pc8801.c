@@ -5,9 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 #include "cpu/z80/z80.h"
-#include "video/generic.h"
 #include "includes/pc8801.h"
 #include "machine/nec765.h"
 #include "machine/8255ppi.h"
@@ -588,6 +586,6 @@ SYSTEM_CONFIG_START(pc88)
 SYSTEM_CONFIG_END
 
 
-/*	  YEAR	NAME	  PARENT	COMPAT	MACHINE   INPUT		INIT	CONFIG	COMPANY	FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY FULLNAME */
 COMP( 1985, pc88srl, 0,		0,		pc88srl,  pc88sr,	0,		pc88,	"Nippon Electronic Company",  "PC-8801 MKIISR (Lores display, VSYNC 15KHz)", 0 )
 COMP( 1985, pc88srh, pc88srl,	0,		pc88srh,  pc88sr,	0,		pc88,	"Nippon Electronic Company",  "PC-8801 MKIISR (Hires display, VSYNC 24KHz)", 0 )

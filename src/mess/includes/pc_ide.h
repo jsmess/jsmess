@@ -1,9 +1,15 @@
-/*
-   ibm at mfm hard disk
-   interface still used in ide devices!
-*/
+/*****************************************************************************
+ *
+ * includes/pc_ide.h
+ *
+ * ibm at mfm hard disk
+ * interface still used in ide devices!
+ *
+ ****************************************************************************/
 
-#include "driver.h"
+#ifndef PC_IDE_H_
+#define PC_IDE_H_
+
 
 /*----------- defined in machine/pc_ide.c -----------*/
 
@@ -28,3 +34,6 @@ UINT8 pc_ide_cylinder_number_h_r(void);
 UINT8 pc_ide_drive_head_r(void);
 UINT8 pc_ide_status_r(void);
 #endif
+
+
+#endif /* PC_IDE_H_ */

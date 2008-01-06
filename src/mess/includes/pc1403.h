@@ -1,13 +1,18 @@
-/*********************************************************************
+/*****************************************************************************
+ *
+ * includes/pc1403.h
+ *
+ * Pocket Computer 1403
+ *
+ ****************************************************************************/
 
-	pc1403.h
+#ifndef PC1403_H_
+#define PC1403_H_
 
-	Pocket Computer 1403
 
-*********************************************************************/
+#define KEY_SMALL input_port_1_r(0)&0x40
+#define RAM32K (input_port_10_r(0)&0x80)==0x80
 
-#ifndef PC1403_H
-#define PC1403_H
 
 /*----------- defined in machine/pc1403.c -----------*/
 
@@ -27,6 +32,7 @@ NVRAM_HANDLER( pc1403 );
 READ8_HANDLER(pc1403_asic_read);
 WRITE8_HANDLER(pc1403_asic_write);
 
+
 /*----------- defined in video/pc1403.c -----------*/
 
 VIDEO_START( pc1403 );
@@ -35,7 +41,5 @@ VIDEO_UPDATE( pc1403 );
 READ8_HANDLER(pc1403_lcd_read);
 WRITE8_HANDLER(pc1403_lcd_write);
 
-#define KEY_SMALL input_port_1_r(0)&0x40
-#define RAM32K (input_port_10_r(0)&0x80)==0x80
 
-#endif /* PC1403_H */
+#endif /* PC1403_H_ */

@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/apple2.h"
 #include "profiler.h"
 

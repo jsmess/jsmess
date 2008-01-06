@@ -1,22 +1,27 @@
-/* Harris HD6402 or AY-3-1015 */
+/*****************************************************************************
+ *
+ * machine/hd6402.h
+ *
+ * Harris HD6402 or AY-3-1015
+ *
+ * The chip has a lot of inputs and a lot of outputs and these could be wired
+ * up in any order to a I/O output.
+ *
+ * Use hd6402_set_input(mask, data) to set an input to a specified state.
+ *
+ * The outputs can also be wired in any order to a I/O port, so a callback
+ * is executed with the updated output state.
+ *
+ * Use hd6402_set_callback to setup the callback which will be executed with
+ * the new state.
+ *
+ ****************************************************************************/
 
-/* the chip has a lot of inputs and a lot of outputs and these could
-be wired up in any order to a I/O output.
+#ifndef HD6402_H_
+#define HD6402_H_
 
-  Use hd6402_set_input(mask, data)
+#include "includes/serial.h"
 
-  to set an input to a specified state.
-
-  The outputs can also be wired in any order to a I/O port, so
-  a callback is executed with the updated output state.
-  Use
-
-	hd6402_set_callback
-
-  to setup the callback which will be executed with the new state
-
- */
-#include "serial.h"
 
 /* inputs */
 
@@ -74,6 +79,7 @@ struct hd6402
 	struct data_form data_form;
 };
 
+
 /*----------- defined in machine/hd6402.c -----------*/
 
 /* reset */
@@ -101,3 +107,6 @@ void	hd6402_connect(struct serial_connection *other_connection);
 WRITE8_HANDLER(hd6402_data_w);
 /* receive read (rbr pins) */
  READ8_HANDLER(hd6402_data_r);
+
+
+#endif /* HD6402_H_ */

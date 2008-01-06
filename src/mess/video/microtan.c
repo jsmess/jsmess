@@ -12,7 +12,9 @@
  *
  ***************************************************************************/
 
+#include "driver.h"
 #include "includes/microtan.h"
+
 
 UINT8 microtan_chunky_graphics = 0;
 UINT8 *microtan_chunky_buffer = NULL;

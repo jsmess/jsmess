@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ * includes/oric.h
+ *
+ ****************************************************************************/
+
+#ifndef ORIC_H_
+#define ORIC_H_
+
+
 /*----------- defined in machine/oric.c -----------*/
 
 MACHINE_START( oric );
@@ -16,8 +26,11 @@ DEVICE_LOAD( oric_floppy );
 /* Telestrat specific */
 MACHINE_START( telestrat );
 
+
 /*----------- defined in video/oric.c -----------*/
 
 VIDEO_START( oric );
 VIDEO_UPDATE( oric );
 
+
+#endif /* ORIC_H_ */

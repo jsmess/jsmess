@@ -1,7 +1,12 @@
-#ifndef __VIC4567_H_
-#define __VIC4567_H_
+/*****************************************************************************
+ *
+ * video/vic4567.h
+ *
+ ****************************************************************************/
 
-#include "vic6567.h"
+#ifndef VIC4567_H_
+#define VIC4567_H_
+
 
 /*----------- defined in video/vic4567.c -----------*/
 
@@ -21,5 +26,4 @@ WRITE8_HANDLER( vic3_palette_w );
 extern  READ8_HANDLER ( vic3_port_r );
 
 
-#endif
-
+#endif /* VIC4567_H_ */

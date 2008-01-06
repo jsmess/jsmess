@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/gamecom.h"
 
 #define Y_PIXELS 200

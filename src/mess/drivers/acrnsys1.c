@@ -10,7 +10,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 
 /* Layout */
 #include "acrnsys1.lh"
@@ -24,7 +23,7 @@
 
 static ADDRESS_MAP_START( acrnsys1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-//	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_READWRITE(ins8154_0_r, ins8154_0_w)
+//  AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_READWRITE(ins8154_0_r, ins8154_0_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_MIRROR(0x600) AM_ROM
 ADDRESS_MAP_END

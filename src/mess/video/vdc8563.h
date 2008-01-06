@@ -1,16 +1,20 @@
-#ifndef __VDC8563_H_
-#define __VDC8563_H_
-/***************************************************************************
+/*****************************************************************************
+ *
+ * video/vdc8563.h
+ *
+ * CBM Video Device Chip 8563
+ *
+ * peter.trauner@jk.uni-linz.ac.at, 2000
+ *
+ ****************************************************************************/
 
-  CBM Video Device Chip 8563
-
-  copyright 2000 peter.trauner@jk.uni-linz.ac.at
-
-***************************************************************************/
+#ifndef VDC8563_H_
+#define VDC8563_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /*----------- defined in video/vdc8563.c -----------*/
 
@@ -30,8 +34,9 @@ extern WRITE8_HANDLER ( vdc8563_port_w );
 /* to be called when reading from port */
 extern  READ8_HANDLER ( vdc8563_port_r );
 
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* VDC8563_H_ */

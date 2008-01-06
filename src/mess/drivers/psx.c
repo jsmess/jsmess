@@ -672,7 +672,7 @@ static WRITE32_HANDLER( psx_cd_w )
 		if ((data == 0x07) && (cd_reset == 1))
 		{
 			cd_reset = 2;
-/*			psxirq_clear(0x0004); */
+/*          psxirq_clear(0x0004); */
 		}
 		else
 		{
@@ -847,7 +847,7 @@ ROM_START( psj )
 	ROMX_LOAD( "ps-21j.bin",    0x0000000, 0x080000, CRC(bc190209) SHA1(e38466a4ba8005fba7e9e3c7b9efeba7205bee3f), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 3, "2.2J", "SCPH-5000/DTL-H1200 (Version 2.2 12/04/95 J)" ) // 04121995
-/*	ROMX_LOAD( "ps-22j.bad",    0x0000000, 0x080000, BAD_DUMP CRC(8c93a399) SHA1(e340db2696274dda5fdc25e434a914db71e8b02b), ROM_BIOS(4) ) */
+/*  ROMX_LOAD( "ps-22j.bad",    0x0000000, 0x080000, BAD_DUMP CRC(8c93a399) SHA1(e340db2696274dda5fdc25e434a914db71e8b02b), ROM_BIOS(4) ) */
 	ROMX_LOAD( "ps-22j.bin",    0x0000000, 0x080000, CRC(24fc7e17) SHA1(ffa7f9a7fb19d773a0c3985a541c8e5623d2c30d), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 4, "2.2D", "DTL-H1100 (Version 2.2 03/06/96 D)" ) // 04121995
@@ -898,7 +898,7 @@ ROM_START( pse )
 	ROMX_LOAD( "ps-22e.bin",    0x0000000, 0x080000, CRC(1e26792f) SHA1(b6a11579caef3875504fcf3831b8e3922746df2c), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 3, "3.0E", "SCPH-5502/SCPH-5552 (Version 3.0 01/06/97 E)" ) // 04121995
-/*	ROMX_LOAD( "ps-30e.bad",    0x0000000, 0x080000, BAD_DUMP CRC(4d9e7c86) SHA1(f8de9325fc36fcfa4b29124d291c9251094f2e54), ROM_BIOS(4) ) */
+/*  ROMX_LOAD( "ps-30e.bad",    0x0000000, 0x080000, BAD_DUMP CRC(4d9e7c86) SHA1(f8de9325fc36fcfa4b29124d291c9251094f2e54), ROM_BIOS(4) ) */
 	ROMX_LOAD( "ps-30e.bin",    0x0000000, 0x080000, CRC(d786f0b9) SHA1(f6bc2d1f5eb6593de7d089c425ac681d6fffd3f0), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 4, "4.1E", "SCPH-7002/SCPH-7502/SCPH-9002 (Version 4.1 12/16/97 E)" ) // 04121995

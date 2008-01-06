@@ -83,15 +83,15 @@
 static ADDRESS_MAP_START( pc1401_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x2000, 0x47ff) AM_READ( MRA8_RAM )
-/*	{ 0x2000, 0x3fff, MWA8_RAM }, // done in pc1401_machine_init */
-/*	{ 0x5000, 0x57ff, ? }, */
+/*  { 0x2000, 0x3fff, MWA8_RAM }, // done in pc1401_machine_init */
+/*  { 0x5000, 0x57ff, ? }, */
 	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE( pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc1251_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-//	{ 0x2000, 0x3fff, MRA8_RAM },
+//  { 0x2000, 0x3fff, MRA8_RAM },
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM
 	AM_RANGE( 0xa000, 0xcbff) AM_ROM
 	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
@@ -518,17 +518,17 @@ static MACHINE_DRIVER_START( pc1401 )
 	MDRV_NVRAM_HANDLER( pc1401 )
 
 	/*
-	   aim: show sharp with keyboard
-	   resolution depends on the dots of the lcd
-	   (lcd dot displayed as 2x3 pixel)
-	   it seams to have 3/4 ratio in the real pc1401 */
+       aim: show sharp with keyboard
+       resolution depends on the dots of the lcd
+       (lcd dot displayed as 2x3 pixel)
+       it seams to have 3/4 ratio in the real pc1401 */
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(594, 273)
 	MDRV_SCREEN_VISIBLE_AREA(0, 594-1, 0, 273-1)
-//	MDRV_SCREEN_SIZE(640, 273)
-//	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 273-1)
+//  MDRV_SCREEN_SIZE(640, 273)
+//  MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 273-1)
 	MDRV_GFXDECODE( pc1401 )
 	MDRV_PALETTE_LENGTH(248 + 32768)
 	MDRV_COLORTABLE_LENGTH( 16 )
@@ -561,8 +561,8 @@ static MACHINE_DRIVER_START( pc1251 )
 	/* video hardware */
 	MDRV_SCREEN_SIZE(608, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 608-1, 0, 300-1)
-//	MDRV_SCREEN_SIZE(640, 334)
-//	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 334-1)
+//  MDRV_SCREEN_SIZE(640, 334)
+//  MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 334-1)
 	MDRV_GFXDECODE( pc1251 )
 
 	MDRV_VIDEO_UPDATE( pc1251 )
@@ -587,14 +587,14 @@ static MACHINE_DRIVER_START( pc1350 )
 	MDRV_NVRAM_HANDLER( pc1350 )
 
 	/*
-	   aim: show sharp with keyboard
-	   resolution depends on the dots of the lcd
-	   (lcd dot displayed as 2x2 pixel) */
+       aim: show sharp with keyboard
+       resolution depends on the dots of the lcd
+       (lcd dot displayed as 2x2 pixel) */
 	/* video hardware */
 	MDRV_SCREEN_SIZE(640, 252)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 252-1)
-//	MDRV_SCREEN_SIZE(640, 255)
-//	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 255-1)
+//  MDRV_SCREEN_SIZE(640, 255)
+//  MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 255-1)
 
 	MDRV_VIDEO_UPDATE( pc1350 )
 MACHINE_DRIVER_END
@@ -617,14 +617,14 @@ static MACHINE_DRIVER_START( pc1403 )
 	MDRV_NVRAM_HANDLER( pc1403 )
 
 	/*
-	   aim: show sharp with keyboard
-	   resolution depends on the dots of the lcd
-	   (lcd dot displayed as 2x2 pixel) */
+       aim: show sharp with keyboard
+       resolution depends on the dots of the lcd
+       (lcd dot displayed as 2x2 pixel) */
 	/* video hardware */
 	MDRV_SCREEN_SIZE(848, 320)
 	MDRV_SCREEN_VISIBLE_AREA(0, 848-1, 0, 320-1)
-//	MDRV_SCREEN_SIZE(848, 361)
-//	MDRV_SCREEN_VISIBLE_AREA(0, 848-1, 0, 361-1)
+//  MDRV_SCREEN_SIZE(848, 361)
+//  MDRV_SCREEN_VISIBLE_AREA(0, 848-1, 0, 361-1)
 
 	MDRV_VIDEO_START( pc1403 )
 	MDRV_VIDEO_UPDATE( pc1403 )
@@ -679,17 +679,17 @@ ROM_END
 #define io_pc1403h io_pc1403
 
 SYSTEM_CONFIG_START(pocketc)
-//	CONFIG_DEVICE_CASSETTE(1, "", mycas_init)
+//  CONFIG_DEVICE_CASSETTE(1, "", mycas_init)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(pc1350)
-//	CONFIG_DEVICE_CASSETTE(1, "", mycas_init)
+//  CONFIG_DEVICE_CASSETTE(1, "", mycas_init)
 	CONFIG_RAM_DEFAULT(4 * 1024)
 	CONFIG_RAM(12 * 1024)
 	CONFIG_RAM(20 * 1024)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR	COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR   COMPANY   FULLNAME */
 
 /* cpu sc43177, sc43178 (4bit!)
    pc 1211
@@ -703,7 +703,7 @@ SYSTEM_CONFIG_END
    pc1600
 */
 
-/*    YEAR  NAME		PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG		COMPANY		FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG      COMPANY     FULLNAME */
 /* cpu sc61860 */
 COMP( 1982, pc1251,		0, 		0,		pc1251,	pc1251,	pc1251,	pocketc,	"Sharp",	"Pocket Computer 1251", GAME_NOT_WORKING)
 COMP( 198?, trs80pc3,	pc1251,	0,		pc1251,	pc1251,	pc1251,	pocketc,	"Tandy",	"TRS80 PC-3", GAME_NOT_WORKING)

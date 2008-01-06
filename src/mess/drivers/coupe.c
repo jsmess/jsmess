@@ -3,21 +3,21 @@
  SAM Coupe Driver - Written By Lee Hammerton
 
 
-	Sam Coupe Memory Map - Based around the current spectrum.c (for obvious reasons!!)
+    Sam Coupe Memory Map - Based around the current spectrum.c (for obvious reasons!!)
 
-	CPU:
-		0000-7fff Banked rom/ram
-		8000-ffff Banked rom/ram
+    CPU:
+        0000-7fff Banked rom/ram
+        8000-ffff Banked rom/ram
 
 
 Interrupts:
 
 Changes:
 
- V0.2	- Added FDC support. - Based on 1771 document. Coupe had a 1772... (any difference?)
-		  	floppy supports only read sector single mode at present will add write sector
-			in next version.
-		  Fixed up palette - had red & green wrong way round.
+ V0.2   - Added FDC support. - Based on 1771 document. Coupe had a 1772... (any difference?)
+            floppy supports only read sector single mode at present will add write sector
+            in next version.
+          Fixed up palette - had red & green wrong way round.
 
 
  KT 26-Aug-2000 - Changed to use wd179x code. This is the same as the 1772.
@@ -27,7 +27,6 @@ Changes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "video/generic.h"
 #include "includes/coupe.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
@@ -369,13 +368,13 @@ static PALETTE_INIT( coupe )
 	for (a=0;a<128;a++)
 	{
 		/* decode colours for palette as follows :
-		 * bit number		7		6		5		4		3		2		1		0
-		 *						|		|		|		|		|		|		|
-		 *				 nothing   G+4	   R+4	   B+4	  ALL+1    G+2	   R+2	   B+2
-		 *
-		 * these values scaled up to 0-255 range would give modifiers of :	+4 = +(4*36), +2 = +(2*36), +1 = *(1*36)
-		 * not quite max of 255 but close enough for me!
-		 */
+         * bit number       7       6       5       4       3       2       1       0
+         *                      |       |       |       |       |       |       |
+         *               nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
+         *
+         * these values scaled up to 0-255 range would give modifiers of :  +4 = +(4*36), +2 = +(2*36), +1 = *(1*36)
+         * not quite max of 255 but close enough for me!
+         */
 		red=green=blue=0;
 		if (a&0x01)
 			blue+=2*36;
@@ -474,5 +473,5 @@ SYSTEM_CONFIG_START(coupe)
 	CONFIG_DEVICE(coupe_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE         INPUT     INIT  CONFIG  COMPANY                 		  FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT     INIT  CONFIG  COMPANY                           FULLNAME */
 COMP( 1989, coupe,	  0,		0,		coupe,			coupe,	  0,	coupe,	"Miles Gordon Technology plc",    "Sam Coupe" , 0)

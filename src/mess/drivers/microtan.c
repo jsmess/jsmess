@@ -35,8 +35,16 @@
  *
  *****************************************************************************/
 
+/* Core includes */
+#include "driver.h"
 #include "includes/microtan.h"
+
+/* Components */
+#include "sound/ay8910.h"
+
+/* Devices */
 #include "devices/cassette.h"
+
 
 static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
@@ -307,5 +315,5 @@ SYSTEM_CONFIG_START( microtan )
 	CONFIG_DEVICE(microtan_quickload_getinfo)
 SYSTEM_CONFIG_END
 
-//    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT      CONFIG    COMPANY      FULLNAME
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY      FULLNAME
 COMP( 1979, microtan, 0,		0,		microtan, microtan, microtan, microtan, "Tangerine", "Microtan 65" , 0)

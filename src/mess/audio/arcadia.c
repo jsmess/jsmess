@@ -5,9 +5,7 @@
 
 ***************************************************************************/
 
-#include <math.h>
-
-#include "mame.h"
+#include "driver.h"
 #include "streams.h"
 #include "includes/arcadia.h"
 

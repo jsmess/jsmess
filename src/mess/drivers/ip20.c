@@ -38,7 +38,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
 		logerror( "%08x: %s", activecpu_get_pc(), buf );
-//		mame_printf_info("%08x: %s", activecpu_get_pc(), buf);
+//      mame_printf_info("%08x: %s", activecpu_get_pc(), buf);
 	}
 }
 
@@ -53,13 +53,13 @@ static VIDEO_UPDATE( ip204415 )
 
 static const struct EEPROM_interface eeprom_interface_93C56 =
 {
-	7,					// address bits	7
-	16,					// data bits	16
-	"*110x",			// read			110x aaaaaaaa
-	"*101x",			// write		101x aaaaaaaa dddddddd
-	"*111x",			// erase		111x aaaaaaaa
-	"*10000xxxxxxx",	// lock			100x 00xxxx
-	"*10011xxxxxxx",	// unlock		100x 11xxxx
+	7,					// address bits 7
+	16,					// data bits    16
+	"*110x",			// read         110x aaaaaaaa
+	"*101x",			// write        101x aaaaaaaa dddddddd
+	"*111x",			// erase        111x aaaaaaaa
+	"*10000xxxxxxx",	// lock         100x 00xxxx
+	"*10011xxxxxxx",	// unlock       100x 11xxxx
 };
 
 static NVRAM_HANDLER(93C56)
@@ -154,7 +154,7 @@ static READ32_HANDLER( hpc_r )
 		return nHPC_MiscStatus;
 		break;
 	case 0x01bc:
-//		verboselog( 2, "HPC CPU Serial EEPROM Read\n" );
+//      verboselog( 2, "HPC CPU Serial EEPROM Read\n" );
 		return ( ( EEPROM_read_bit() << 4 ) );
 		break;
 	case 0x01c4:
@@ -175,26 +175,26 @@ static READ32_HANDLER( hpc_r )
 		break;
 	case 0x0d00:
 		verboselog( 2, "HPC DUART0 Channel B Control Read\n" );
-//		return 0x00000004;
+//      return 0x00000004;
 		return 0x7c; //scc_r(0);
 		break;
 	case 0x0d04:
 		verboselog( 2, "HPC DUART0 Channel B Data Read\n" );
-//		return 0;
+//      return 0;
 		return scc_r(2);
 		break;
 	case 0x0d08:
 		verboselog( 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask	 );
-//		return 0x40;
+//      return 0x40;
 		return 0x7c; //scc_r(1);
 		break;
 	case 0x0d0c:
 		verboselog( 2, "HPC DUART0 Channel A Data Read\n" );
-//		return 0;
+//      return 0;
 		return scc_r(3);
 		break;
 	case 0x0d10:
-//		verboselog( 2, "HPC DUART1 Channel B Control Read\n" );
+//      verboselog( 2, "HPC DUART1 Channel B Control Read\n" );
 		return 0x00000004;
 		break;
 	case 0x0d14:
@@ -355,7 +355,7 @@ static WRITE32_HANDLER( hpc_w )
 		nHPC_MiscStatus = data;
 		break;
 	case 0x01bc:
-//		verboselog( 2, "HPC CPU Serial EEPROM Write: %08x (%08x)\n", data, mem_mask );
+//      verboselog( 2, "HPC CPU Serial EEPROM Write: %08x (%08x)\n", data, mem_mask );
 		if( data & 0x00000001 )
 		{
 			verboselog( 2, "    CPU board LED on\n" );
@@ -399,12 +399,12 @@ static WRITE32_HANDLER( hpc_w )
 	case 0x0d10:
 		if( ( data & 0x000000ff ) >= 0x00000020 )
 		{
-//			verboselog( 2, "HPC DUART1 Channel B Control Write: %08x (%08x) %c\n", data, mem_mask, data & 0x000000ff );
+//          verboselog( 2, "HPC DUART1 Channel B Control Write: %08x (%08x) %c\n", data, mem_mask, data & 0x000000ff );
 			//mame_printf_info( "%c", data & 0x000000ff );
 		}
 		else
 		{
-//			verboselog( 2, "HPC DUART1 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
+//          verboselog( 2, "HPC DUART1 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
 		}
 		break;
 	case 0x0d14:

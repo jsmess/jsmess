@@ -8,10 +8,9 @@
 
 ******************************************************************************/
 
-
-#include "ctype.h"
 #include "driver.h"
-#include "includes/upd7002.h"
+#include "upd7002.h"
+
 
 // local copy of the uPD7002 external procedure calls
 static struct uPD7002_interface

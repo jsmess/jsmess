@@ -1,35 +1,34 @@
 /*
-	Corvus Concept driver
+    Corvus Concept driver
 
-	Relatively simple 68k-based system
+    Relatively simple 68k-based system
 
-	* 256 or 512 kbytes of DRAM
-	* 4kbytes of SRAM
-	* 8kbyte boot ROM
-	* optional MacsBugs ROM
-	* two serial ports, keyboard, bitmapped display, simple sound, omninet
-	  LAN port (seems more or less similar to AppleTalk)
-	* 4 expansion ports enable to add expansion cards, namely floppy disk
-	  and hard disk controllers (the expansion ports are partially compatible
-	  with Apple 2 expansion ports)
+    * 256 or 512 kbytes of DRAM
+    * 4kbytes of SRAM
+    * 8kbyte boot ROM
+    * optional MacsBugs ROM
+    * two serial ports, keyboard, bitmapped display, simple sound, omninet
+      LAN port (seems more or less similar to AppleTalk)
+    * 4 expansion ports enable to add expansion cards, namely floppy disk
+      and hard disk controllers (the expansion ports are partially compatible
+      with Apple 2 expansion ports)
 
-	Video: monochrome bitmapped display, 720*560 visible area (bitmaps are 768
-	  pixels wide in memory).  One interesting feature is the fact that the
-	  monitor can be rotated to give a 560*720 vertical display (you need to
-	  throw a switch and reset the machine for the display rotation to be taken
-	  into account, though).  One oddity is that the video hardware scans the
-	  display from the lower-left corner to the upper-left corner (or from the
-	  upper-right corner to the lower-left if the screen is flipped).
-	Sound: simpler buzzer connected to the via shift register
-	Keyboard: intelligent controller, connected through an ACIA.  See CCOS
-	  manual pp. 76 through 78. and User Guide p. 2-1 through 2-9.
-	Clock: mm58174 RTC
+    Video: monochrome bitmapped display, 720*560 visible area (bitmaps are 768
+      pixels wide in memory).  One interesting feature is the fact that the
+      monitor can be rotated to give a 560*720 vertical display (you need to
+      throw a switch and reset the machine for the display rotation to be taken
+      into account, though).  One oddity is that the video hardware scans the
+      display from the lower-left corner to the upper-left corner (or from the
+      upper-right corner to the lower-left if the screen is flipped).
+    Sound: simpler buzzer connected to the via shift register
+    Keyboard: intelligent controller, connected through an ACIA.  See CCOS
+      manual pp. 76 through 78. and User Guide p. 2-1 through 2-9.
+    Clock: mm58174 RTC
 
-	Raphael Nabet, Brett Wyer, 2003-2005
+    Raphael Nabet, Brett Wyer, 2003-2005
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/concept.h"
 #include "devices/mflopimg.h"
 #include "formats/basicdsk.h"
@@ -333,5 +332,5 @@ SYSTEM_CONFIG_START(concept)
 SYSTEM_CONFIG_END
 
 
-/*	  YEAR  NAME	  PARENT	COMPAT	MACHINE   INPUT	   INIT	 CONFIG   COMPANY           FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  CONFIG   COMPANY           FULLNAME */
 COMP( 1982, concept,  0,		0,		concept,  concept, 0,    concept, "Corvus Systems", "Concept" , 0)

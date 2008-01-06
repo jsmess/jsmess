@@ -44,9 +44,9 @@
 
         -Roller Controller. Basically a trackball with four buttons (the two fire buttons from player 1 and
          the two fire buttons from player 2). Only one Roller Controller can be used on a real ColecoVision.
-	 Roller Controller is connected to both controller sockets and both controllers are conected to the Roller
-	 Controller, it uses the spinner pins of both sockets to generate the X and Y signals (X from controller 1
-	 and the Y from controller 2)
+     Roller Controller is connected to both controller sockets and both controllers are conected to the Roller
+     Controller, it uses the spinner pins of both sockets to generate the X and Y signals (X from controller 1
+     and the Y from controller 2)
 
         -Super Action Controllers. It is a hand controller with a keypad, four buttons (the two from
          the player pad and two more), and a spinner. This was made primarily for two player sport games, but
@@ -287,7 +287,7 @@ SYSTEM_CONFIG_START(coleco)
 	CONFIG_DEVICE(coleco_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-//    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT	CONFIG	COMPANY   FULLNAME
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY   FULLNAME
 CONS( 1982, coleco,   0,		0,	coleco,   coleco,   0,		coleco,	"Coleco", "ColecoVision" , 0)
 CONS( 1982, colecoa,  coleco,	0,		coleco,   coleco,   0,		coleco,	"Coleco", "ColecoVision (Thick Characters)" , 0)
 CONS( 1983, colecob,  coleco,	0,		coleco,   coleco,   0,		coleco,	"Spectravideo", "SVI-603 Coleco Game Adapter" , 0)

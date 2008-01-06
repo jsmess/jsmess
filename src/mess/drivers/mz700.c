@@ -1,72 +1,79 @@
 /******************************************************************************
- *	Sharp MZ700
+ *  Sharp MZ700
  *
- *	system driver
+ *  system driver
  *
- *	Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
+ *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
  *  Reference: http://sharpmz.computingmuseum.com
  *
- *	MZ700 memory map
+ *  MZ700 memory map
  *
- *	0000-0FFF	1Z-013A ROM or RAM
- *	1000-CFFF	RAM
- *	D000-D7FF	videoram or RAM
- *	D800-DFFF	colorram or RAM
- *	E000-FFFF	memory mapped IO or RAM
+ *  0000-0FFF   1Z-013A ROM or RAM
+ *  1000-CFFF   RAM
+ *  D000-D7FF   videoram or RAM
+ *  D800-DFFF   colorram or RAM
+ *  E000-FFFF   memory mapped IO or RAM
  *
- *		xxx0	PPI8255 port A (output)
- *				bit 7	556RST (reset NE556)
- *				bit 6-4 unused
- *				bit 3-0 keyboard row demux (LS145)
+ *      xxx0    PPI8255 port A (output)
+ *              bit 7   556RST (reset NE556)
+ *              bit 6-4 unused
+ *              bit 3-0 keyboard row demux (LS145)
  *
- *		xxx1	PPI8255 port B (input)
- *				bit 7-0 keyboard matrix code
+ *      xxx1    PPI8255 port B (input)
+ *              bit 7-0 keyboard matrix code
  *
- *		xxx2	PPI8255 port C (input/output)
- *				bit 7 R -VBLANK input
- *				bit 6 R 556OUT (1.5Hz)
- *				bit 5 R RDATA from cassette
- *				bit 4 R MOTOR from cassette
- *				bit 3 W M-ON control
- *				bit 2 W INTMASK 1=enable 0=disabel clock interrupt
- *				bit 1 W WDATA to cassette
- *				bit 0 W unused
+ *      xxx2    PPI8255 port C (input/output)
+ *              bit 7 R -VBLANK input
+ *              bit 6 R 556OUT (1.5Hz)
+ *              bit 5 R RDATA from cassette
+ *              bit 4 R MOTOR from cassette
+ *              bit 3 W M-ON control
+ *              bit 2 W INTMASK 1=enable 0=disabel clock interrupt
+ *              bit 1 W WDATA to cassette
+ *              bit 0 W unused
  *
- *		xxx3	PPI8255 control
+ *      xxx3    PPI8255 control
  *
- *		xxx4	PIT8253 timer 0 (clock input 1,108800 MHz)
- *		xxx5	PIT8253 timer 1 (clock input 15,611 kHz)
- *		xxx6	PIT8253 timer 2 (clock input OUT1 1Hz (default))
- *		xxx7	PIT8253 control/status
+ *      xxx4    PIT8253 timer 0 (clock input 1,108800 MHz)
+ *      xxx5    PIT8253 timer 1 (clock input 15,611 kHz)
+ *      xxx6    PIT8253 timer 2 (clock input OUT1 1Hz (default))
+ *      xxx7    PIT8253 control/status
  *
- *		xxx8	bit 7 R -HBLANK
- *				bit 6 R unused
- *				bit 5 R unused
- *				bit 4 R joystick JB2
- *				bit 3 R joystick JB1
- *				bit 2 R joystick JA2
- *				bit 1 R joystick JA1
- *				bit 0 R NE556 OUT (32Hz IC BJ)
- *					  W gate0 of PIT8253 (sound enable)
+ *      xxx8    bit 7 R -HBLANK
+ *              bit 6 R unused
+ *              bit 5 R unused
+ *              bit 4 R joystick JB2
+ *              bit 3 R joystick JB1
+ *              bit 2 R joystick JA2
+ *              bit 1 R joystick JA1
+ *              bit 0 R NE556 OUT (32Hz IC BJ)
+ *                    W gate0 of PIT8253 (sound enable)
  *
- *	MZ800 memory map
+ *  MZ800 memory map
  *
- *	0000-0FFF	ROM or RAM
- *	1000-1FFF	PCG ROM or RAM
- *	2000-7FFF	RAM
- *	8000-9FFF	videoram or RAM
- *	A000-BFFF	videoram or RAM
- *	C000-CFFF	PCG RAM or RAM
- *	D000-DFFF	videoram or RAM
- *	E000-FFFF	memory mapped IO or RAM
+ *  0000-0FFF   ROM or RAM
+ *  1000-1FFF   PCG ROM or RAM
+ *  2000-7FFF   RAM
+ *  8000-9FFF   videoram or RAM
+ *  A000-BFFF   videoram or RAM
+ *  C000-CFFF   PCG RAM or RAM
+ *  D000-DFFF   videoram or RAM
+ *  E000-FFFF   memory mapped IO or RAM
  *
  *****************************************************************************/
 
+/* Core includes */
+#include "driver.h"
 #include "includes/mz700.h"
+
+/* Devices */
 #include "devices/cassette.h"
 #include "formats/mz_cas.h"
+
+/* TODO: Remove dependency on this */
 #include "mslegacy.h"
+
 
 static ADDRESS_MAP_START( mz700_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x00fff) AM_RAMBANK(1)
@@ -361,7 +368,7 @@ SYSTEM_CONFIG_START(mz700)
 	CONFIG_DEVICE(mz700_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT	CONFIG	COMPANY      FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY      FULLNAME */
 COMP( 1982, mz700,	  0,		0,		mz700,	  mz700,	mz700,	mz700,	"Sharp",     "MZ-700" , 0)
 COMP( 1982, mz700j,   mz700,	0,		mz700,	  mz700,	mz700,	mz700,	"Sharp",     "MZ-700 (Japan)" , 0)
 COMP( 1982, mz800,	  mz700,	0,		mz800,	  mz700,	mz800,	mz700,	"Sharp",     "MZ-800" , 0)

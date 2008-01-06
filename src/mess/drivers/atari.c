@@ -3,7 +3,7 @@
 
     MESS Driver
 
-	Juergen Buchmueller, June 1998
+    Juergen Buchmueller, June 1998
 ******************************************************************************/
 
 #include "driver.h"
@@ -13,7 +13,6 @@
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
 #include "video/gtia.h"
-#include "inputx.h"
 #include "mslegacy.h"
 
 /******************************************************************************
@@ -21,13 +20,13 @@
 
     ***************** read access *******************
     range     short   description
-	0000-9FFF RAM	  main memory
-	A000-BFFF RAM/ROM RAM or (banked) ROM cartridges
+    0000-9FFF RAM     main memory
+    A000-BFFF RAM/ROM RAM or (banked) ROM cartridges
     C000-CFFF ROM     unused or monitor ROM
 
     ********* GTIA    ********************************
 
-	D000      m0pf    missile 0 playfield collisions
+    D000      m0pf    missile 0 playfield collisions
     D001      m1pf    missile 1 playfield collisions
     D002      m2pf    missile 2 playfield collisions
     D003      m3pf    missile 3 playfield collisions
@@ -47,23 +46,23 @@
     D011      but1    button stick 1
     D012      but2    button stick 2
     D013      but3    button stick 3
-	D014	  xff	  unused
-	D015	  xff	  unused
-	D016	  xff	  unused
-	D017	  xff	  unused
-	D018	  xff	  unused
-	D019	  xff	  unused
-	D01A	  xff	  unused
-	D01B	  xff	  unused
-	D01C	  xff	  unused
-	D01D	  xff	  unused
-	D01E	  xff	  unused
+    D014      xff     unused
+    D015      xff     unused
+    D016      xff     unused
+    D017      xff     unused
+    D018      xff     unused
+    D019      xff     unused
+    D01A      xff     unused
+    D01B      xff     unused
+    D01C      xff     unused
+    D01D      xff     unused
+    D01E      xff     unused
     D01F      cons    console keys
     D020-D0FF repeated 7 times
 
     D100-D1FF xff
 
-	********* POKEY   ********************************
+    ********* POKEY   ********************************
     D200      pot0    paddle 0
     D201      pot1    paddle 1
     D202      pot2    paddle 2
@@ -75,36 +74,36 @@
     D208      potb    all paddles
     D209      kbcode  keyboard scan code
     D20A      random  random number generator
-	D20B	  xff	  unused
-	D20C	  xff	  unused
+    D20B      xff     unused
+    D20C      xff     unused
     D20D      serin   serial input
     D20E      irqst   IRQ status
     D20F      skstat  sk status
     D210-D2FF repeated 15 times
 
-	********* PIO	  ********************************
+    ********* PIO     ********************************
     D300      porta   read pio port A
     D301      portb   read pio port B
     D302      pactl   read pio port A control
     D303      pbctl   read pio port B control
     D304-D3FF repeated 63 times
 
-	********* ANTIC   ********************************
-	D400	  xff	  unused
-	D401	  xff	  unused
-	D402	  xff	  unused
-	D403	  xff	  unused
-	D404	  xff	  unused
-	D405	  xff	  unused
-	D406	  xff	  unused
-	D407	  xff	  unused
-	D408	  xff	  unused
-	D409	  xff	  unused
-	D40A	  xff	  unused
+    ********* ANTIC   ********************************
+    D400      xff     unused
+    D401      xff     unused
+    D402      xff     unused
+    D403      xff     unused
+    D404      xff     unused
+    D405      xff     unused
+    D406      xff     unused
+    D407      xff     unused
+    D408      xff     unused
+    D409      xff     unused
+    D40A      xff     unused
     D40B      vcount  vertical (scanline) counter
     D40C      penh    light pen horizontal pos
     D40D      penv    light pen vertical pos
-	D40E	  xff	  unused
+    D40E      xff     unused
     D40F      nmist   NMI status
 
     D500-D7FF xff     unused memory
@@ -114,9 +113,9 @@
 
     ***************** write access *******************
     range     short   description
-	0000-9FFF RAM	  main memory
-	A000-BFFF RAM/ROM RAM or (banked) ROM
-	C000-CFFF ROM	  unused or monitor ROM
+    0000-9FFF RAM     main memory
+    A000-BFFF RAM/ROM RAM or (banked) ROM
+    C000-CFFF ROM     unused or monitor ROM
 
     ********* GTIA    ********************************
     D000      hposp0  player 0 horz position
@@ -153,56 +152,56 @@
     D01F      wcons   write console (speaker)
     D020-D0FF repeated 7 times
 
-	D100-D1FF xff	  unused
+    D100-D1FF xff     unused
 
-	********* POKEY   ********************************
+    ********* POKEY   ********************************
     D200      audf1   frequency audio chan #1
-	D201	  audc1   control audio chan #1
-	D202	  audf2   frequency audio chan #2
-	D203	  audc2   control audio chan #2
-	D204	  audf3   frequency audio chan #3
-	D205	  audc3   control audio chan #3
-	D206	  audf4   frequency audio chan #4
-	D207	  audc4   control audio chan #4
+    D201      audc1   control audio chan #1
+    D202      audf2   frequency audio chan #2
+    D203      audc2   control audio chan #2
+    D204      audf3   frequency audio chan #3
+    D205      audc3   control audio chan #3
+    D206      audf4   frequency audio chan #4
+    D207      audc4   control audio chan #4
     D208      audctl  audio control
     D209      stimer  start timer
     D20A      skres   sk reset
     D20B      potgo   start pot AD conversion
-	D20C	  xff	  unused
+    D20C      xff     unused
     D20D      serout  serial output
     D20E      irqen   IRQ enable
     D20F      skctl   sk control
     D210-D2FF repeated 15 times
 
-	********* PIO	  ********************************
+    ********* PIO     ********************************
     D300      porta   write pio port A (output or mask)
-	D301	  portb   write pio port B (output or mask)
+    D301      portb   write pio port B (output or mask)
     D302      pactl   write pio port A control
     D303      pbctl   write pio port B control
-	D304-D3FF		  repeated
+    D304-D3FF         repeated
 
-	********* ANTIC   ********************************
+    ********* ANTIC   ********************************
     D400      dmactl  write DMA control
     D401      chactl  write character control
     D402      dlistl  write display list lo
     D403      dlisth  write display list hi
     D404      hscrol  write horz scroll
     D405      vscrol  write vert scroll
-	D406	  xff	  unused
+    D406      xff     unused
     D407      pmbash  player/missile base addr hi
-	D408	  xff	  unused
+    D408      xff     unused
     D409      chbash  character generator base addr hi
     D40A      wsync   wait for hsync
-	D40B	  xff	  unused
-	D40C	  xff	  unused
-	D40D	  xff	  unused
-	D40E	  nmien   NMI enable
+    D40B      xff     unused
+    D40C      xff     unused
+    D40D      xff     unused
+    D40E      nmien   NMI enable
     D40F      nmires  NMI reset
 
     D500-D7FF xff     unused memory
 
-	D800-DFFF ROM	  floating point ROM
-	E000-FFFF ROM	  BIOS ROM
+    D800-DFFF ROM     floating point ROM
+    E000-FFFF ROM     BIOS ROM
 ******************************************************************************/
 
 static ADDRESS_MAP_START(a400_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -493,25 +492,25 @@ static INPUT_PORTS_START( a5200 )
 	PORT_BIT(0x40, 0x40, IPT_BUTTON2) PORT_PLAYER(3)
     PORT_BIT(0x80, 0x80, IPT_BUTTON2) PORT_PLAYER(4)
 
-	/* KBCODE						   */
-	/* Key	   bits    Keypad code	   */
-	/* -------------------			   */
-	/* none    0000    $FF			   */
-	/* #	   0001    $0B			   */
-	/* 0	   0010    $00			   */
-	/* *	   0011    $0A			   */
-	/* Reset   0100    $0E			   */
-	/* 9	   0101    $09			   */
-	/* 8	   0110    $08			   */
-	/* 7	   0111    $07			   */
-	/* Pause   1000    $0D			   */
-	/* 6	   1001    $06			   */
-	/* 5	   1010    $05			   */
-	/* 4	   1011    $04			   */
-	/* Start   1100    $0C			   */
-	/* 3	   1101    $03			   */
-	/* 2	   1110    $02			   */
-	/* 1	   1111    $01			   */
+	/* KBCODE                          */
+	/* Key     bits    Keypad code     */
+	/* -------------------             */
+	/* none    0000    $FF             */
+	/* #       0001    $0B             */
+	/* 0       0010    $00             */
+	/* *       0011    $0A             */
+	/* Reset   0100    $0E             */
+	/* 9       0101    $09             */
+	/* 8       0110    $08             */
+	/* 7       0111    $07             */
+	/* Pause   1000    $0D             */
+	/* 6       1001    $06             */
+	/* 5       1010    $05             */
+	/* 4       1011    $04             */
+	/* Start   1100    $0C             */
+	/* 3       1101    $03             */
+	/* 2       1110    $02             */
+	/* 1       1111    $01             */
 
     PORT_START_TAG("keypad")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(Break)") PORT_CODE(KEYCODE_PAUSE)
@@ -955,7 +954,7 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT    COMPAT	MACHINE		INPUT    INIT	CONFIG	COMPANY   FULLNAME */
+/*     YEAR  NAME      PARENT    COMPAT MACHINE     INPUT    INIT   CONFIG  COMPANY   FULLNAME */
 COMP ( 1979, a400,	   0,		 0,		a400,		a800,	 0,		a400,	"Atari",  "Atari 400 (NTSC)" , 0)
 COMP ( 1979, a400pal,  a400,	 0,		a400pal,	a800,	 0,		a400,	"Atari",  "Atari 400 (PAL)" , 0)
 COMP ( 1979, a800,	   0,		 0,		a800,		a800,	 0,		a800,	"Atari",  "Atari 800 (NTSC)" , 0)

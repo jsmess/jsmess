@@ -4,10 +4,10 @@ DAI driver by Krzysztof Strzecha and Nathan Woods
 
 What's new:
 -----------
-21.05.2004	TMS5501 fixes. Debug code cleanups.
-06.03.2004	Stack overflow interrupt added.
+21.05.2004  TMS5501 fixes. Debug code cleanups.
+06.03.2004  Stack overflow interrupt added.
 05.09.2003      Rundom number generator added. Few video hardware bugs fixed.
-		Fixed few i8080 instructions, making much more BASIC games playable.
+        Fixed few i8080 instructions, making much more BASIC games playable.
 
 Notes on emulation status and to do list:
 -----------------------------------------
@@ -18,23 +18,23 @@ DAI technical information
 
 CPU:
 ----
-	8080 2MHz
+    8080 2MHz
 
 
 Memory map:
 -----------
-	0000-bfff RAM
-	c000-dfff ROM (non-switchable)
-	e000-efff ROM (4 switchable banks)
-	f000-f7ff ROM extension (optional)
-	f800-f8ff SRAM (stack)
-	f900-ffff I/O
-		f900-faff spare
-		fb00-fbff AMD9511 math chip (optional)
-		fc00-fcff 8253 programmable interval timer
-		fd00-fdff discrete devices
-		fe00-feff 8255 PIO (DCE bus)
-		ff00-ffff timer + 5501 interrupt controller
+    0000-bfff RAM
+    c000-dfff ROM (non-switchable)
+    e000-efff ROM (4 switchable banks)
+    f000-f7ff ROM extension (optional)
+    f800-f8ff SRAM (stack)
+    f900-ffff I/O
+        f900-faff spare
+        fb00-fbff AMD9511 math chip (optional)
+        fc00-fcff 8253 programmable interval timer
+        fd00-fdff discrete devices
+        fe00-feff 8255 PIO (DCE bus)
+        ff00-ffff timer + 5501 interrupt controller
 
 Interrupts:
 -----------
@@ -59,9 +59,7 @@ Timings:
 *******************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 #include "cpu/i8085/i8085.h"
-#include "video/generic.h"
 #include "includes/dai.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
@@ -249,5 +247,5 @@ SYSTEM_CONFIG_START(dai)
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME PARENT  COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY				   FULLNAME */
+/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT   INIT    CONFIG  COMPANY                FULLNAME */
 COMP( 1978, dai, 0,      0,	dai,	dai,	0,	dai,	"Data Applications International", "DAI Personal Computer", 0)

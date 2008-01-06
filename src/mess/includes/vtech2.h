@@ -1,5 +1,12 @@
-/* from mame.c */
-//extern int bitmap_dirty;
+/*****************************************************************************
+ *
+ * includes/vtech2.h
+ *
+ ****************************************************************************/
+
+#ifndef VTECH2_H_
+#define VTECH2_H_
+
 
 /*----------- defined in machine/vtech2.c -----------*/
 
@@ -19,6 +26,7 @@ extern  READ8_HANDLER ( laser_fdc_r );
 extern WRITE8_HANDLER ( laser_fdc_w );
 extern WRITE8_HANDLER ( laser_bank_select_w );
 
+
 /*----------- defined in video/vtech2.c -----------*/
 
 extern char laser_frame_message[64+1];
@@ -28,3 +36,6 @@ extern VIDEO_START( laser );
 extern VIDEO_UPDATE( laser );
 extern WRITE8_HANDLER ( laser_bg_mode_w );
 extern WRITE8_HANDLER ( laser_two_color_w );
+
+
+#endif /* VTECH2_H_ */

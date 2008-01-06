@@ -1,10 +1,14 @@
-/***************************************************************************
+/*****************************************************************************
+ *
+ * includes/vc1541.h
+ *
+ * Commodore VC1541 floppy disk drive
+ *
+ ****************************************************************************/
 
-       commodore vc1541 floppy disk drive
+#ifndef VC1541_H_
+#define VC1541_H_
 
-***************************************************************************/
-#include "machine/6522via.h"
-#include "driver.h"
 
 #ifdef PET_TEST_CODE
 /* test with preliminary VC1541 emulation */
@@ -17,6 +21,7 @@ typedef struct {
 	int cpunr;
 	int devicenr;
 } VC1541_CONFIG;
+
 
 /*----------- defined in machine/vc1541.c -----------*/
 
@@ -137,7 +142,7 @@ MACHINE_DRIVER_EXTERN( cpu_c1571 );
 	ROM_LOAD("1551.318008-01.bin",  0xc000, 0x4000, CRC(6d16d024))
 
 	/* bug fixes introduced bugs for 1541 mode
-	 jiffydos to have fixed 1571 and working 1541 mode */
+     jiffydos to have fixed 1571 and working 1541 mode */
 	ROM_LOAD("1570-rom.315090-01.bin",  0x8000, 0x8000, CRC(5a0c7937))
 	ROM_LOAD("1571-rom.310654-03.bin",  0x8000, 0x8000, CRC(3889b8b8))
 	ROM_LOAD("1571-rom.310654-05.bin",  0x8000, 0x8000, CRC(5755bae3))
@@ -182,3 +187,6 @@ int c1551x_0_read_data (void);
 void c1551x_0_write_handshake (int data);
 int c1551x_0_read_handshake (void);
 int c1551x_0_read_status (void);
+
+
+#endif /* VC1541_H_ */

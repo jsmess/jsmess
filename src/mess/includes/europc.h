@@ -1,18 +1,12 @@
-/*----------- defined in machine/europc.c -----------*/
+/*****************************************************************************
+ *
+ * includes/europc.h
+ *
+ ****************************************************************************/
 
-WRITE8_HANDLER( europc_pio_w );
- READ8_HANDLER( europc_pio_r );
+#ifndef EUROPC_H_
+#define EUROPC_H_
 
-extern WRITE8_HANDLER ( europc_jim_w );
-extern  READ8_HANDLER ( europc_jim_r );
-extern  READ8_HANDLER ( europc_jim2_r );
-
-extern  READ8_HANDLER( europc_rtc_r );
-extern WRITE8_HANDLER( europc_rtc_w );
-extern NVRAM_HANDLER( europc_rtc );
-
-void europc_rtc_set_time(void);
-void europc_rtc_init(void);
 
 /*
 layout of an uk europc
@@ -137,3 +131,22 @@ i am not sure if keypad enter delivers the mf2 keycode
 	PORT_START_TAG("pc_keyboard_7")	/* IN11 */\
 	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 
+
+/*----------- defined in machine/europc.c -----------*/
+
+WRITE8_HANDLER( europc_pio_w );
+ READ8_HANDLER( europc_pio_r );
+
+extern WRITE8_HANDLER ( europc_jim_w );
+extern  READ8_HANDLER ( europc_jim_r );
+extern  READ8_HANDLER ( europc_jim2_r );
+
+extern  READ8_HANDLER( europc_rtc_r );
+extern WRITE8_HANDLER( europc_rtc_w );
+extern NVRAM_HANDLER( europc_rtc );
+
+void europc_rtc_set_time(void);
+void europc_rtc_init(void);
+
+
+#endif /* EUROPC_H_ */

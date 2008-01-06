@@ -185,7 +185,6 @@ TO DO:
 
 
 #include "driver.h"
-#include "inputx.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "includes/adam.h"
@@ -725,6 +724,6 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT	COMPAT	MACHINE INPUT   INIT	CONFIG	COMPANY FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
 COMP( 1982, adam,   0,		coleco,	adam,   adam,   0,		adam,	"Coleco", "Adam" , 0)
 

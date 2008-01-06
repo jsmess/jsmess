@@ -11,11 +11,11 @@ Not nice, but it works...
 */
 
 #include <string.h>
-#include "mame.h"
-#include "uef_cas.h"
+
+#include "driver.h"
 #include "zlib.h"
-#include "osdepend.h"
-#include "math.h"
+#include "formats/uef_cas.h"
+
 
 #define UEF_WAV_FREQUENCY	4800
 #define WAVE_LOW	-32768

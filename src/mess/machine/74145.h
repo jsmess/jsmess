@@ -7,8 +7,6 @@
 #ifndef TTL74145_H_
 #define TTL74145_H_
 
-#include "driver.h"
-
 /* Interface */
 typedef struct _ttl74145_interface ttl74145_interface;
 struct _ttl74145_interface

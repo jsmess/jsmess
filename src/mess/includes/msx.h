@@ -1,7 +1,12 @@
-/*
-** msx.h : part of MSX emulation.
-**
-*/
+/*****************************************************************************
+ *
+ * includes/msx.h
+ *
+ ****************************************************************************/
+
+#ifndef MSX_H_
+#define MSX_H_
+
 
 #define MSX_MAX_CARTS	(2)
 
@@ -37,6 +42,7 @@ typedef struct {
 	UINT8 korean90in1_bank;
 	UINT8 *top_page;
 } MSX;
+
 
 /*----------- defined in machine/msx.c -----------*/
 
@@ -92,3 +98,5 @@ void msx_memory_init (void);
 void msx_memory_set_carts (void);
 void msx_memory_reset (void);
 
+
+#endif /* MSX_H_ */

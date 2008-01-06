@@ -1,6 +1,7 @@
 #include <string.h>
-#include "mame.h"
-#include "fmsx_cas.h"
+
+#include "formats/fmsx_cas.h"
+
 
 #define CAS_PERIOD        (16)
 #define CAS_HEADER_PERIODS (4000)

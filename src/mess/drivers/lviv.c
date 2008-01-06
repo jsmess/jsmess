@@ -9,24 +9,24 @@ Dr. Volodimir Mosorov for two Lviv machines.
 What's new:
 -----------
 28.02.2003      Snapshot veryfing function added.
-07.01.2003	Support for .SAV snapshots. Joystick support (there are strange
-		problems with "Doroga (1991)(-)(Ru).lvt".
-21.12.2002	Cassette support rewritten, WAVs saving and loading are working now.
-08.12.2002	Comments on emulation status updated. Changed 'lvive' to 'lvivp'.
-		ADC r instruction in 8080 core fixed (Arkanoid works now).
-		Orginal keyboard layout added.
-20.07.2002	"Reset" key fixed. 8080 core fixed (all BASIC commands works).
-		now). Unsupported .lvt files versions aren't now loaded.
-xx.07.2002	Improved port and memory mapping (Raphael Nabet).
-		Hardware description updated (Raphael Nabet).
-27.03.2002	CPU clock changed to 2.5MHz.
-		New Lviv driver added for different ROM revision.
-24.03.2002	Palette emulation.
-		Bit 7 of port 0xc1 emulated - speaker enabled/disabled.
-		Some notes about hardware added.
-		"Reset" key added.
-23.03.2002	Hardware description and notes on emulation status added.
-		Few changes in keyboard mapping.
+07.01.2003  Support for .SAV snapshots. Joystick support (there are strange
+        problems with "Doroga (1991)(-)(Ru).lvt".
+21.12.2002  Cassette support rewritten, WAVs saving and loading are working now.
+08.12.2002  Comments on emulation status updated. Changed 'lvive' to 'lvivp'.
+        ADC r instruction in 8080 core fixed (Arkanoid works now).
+        Orginal keyboard layout added.
+20.07.2002  "Reset" key fixed. 8080 core fixed (all BASIC commands works).
+        now). Unsupported .lvt files versions aren't now loaded.
+xx.07.2002  Improved port and memory mapping (Raphael Nabet).
+        Hardware description updated (Raphael Nabet).
+27.03.2002  CPU clock changed to 2.5MHz.
+        New Lviv driver added for different ROM revision.
+24.03.2002  Palette emulation.
+        Bit 7 of port 0xc1 emulated - speaker enabled/disabled.
+        Some notes about hardware added.
+        "Reset" key added.
+23.03.2002  Hardware description and notes on emulation status added.
+        Few changes in keyboard mapping.
 
 Notes on emulation status and to do list:
 -----------------------------------------
@@ -41,250 +41,248 @@ Lviv technical information
 
 CPU:
 ----
-	8080 2.5MHz (2MHz in first machines)
+    8080 2.5MHz (2MHz in first machines)
 
 Memory map:
 -----------
-	start-up map (cleared by the first I/O write operation done by the CPU):
-	0000-3fff ROM mirror #1
-	4000-7fff ROM mirror #2
-	8000-bfff ROM mirror #3
-	c000-ffff ROM
+    start-up map (cleared by the first I/O write operation done by the CPU):
+    0000-3fff ROM mirror #1
+    4000-7fff ROM mirror #2
+    8000-bfff ROM mirror #3
+    c000-ffff ROM
 
-	normal map with video RAM off:
-	0000-3fff RAM
-	4000-7fff RAM
-	8000-bfff RAM
-	c000-ffff ROM
+    normal map with video RAM off:
+    0000-3fff RAM
+    4000-7fff RAM
+    8000-bfff RAM
+    c000-ffff ROM
 
-	normal map with video RAM on:
-	0000-3fff mirrors 8000-bfff
-	4000-7fff video RAM
-	8000-bfff RAM
-	c000-ffff ROM
+    normal map with video RAM on:
+    0000-3fff mirrors 8000-bfff
+    4000-7fff video RAM
+    8000-bfff RAM
+    c000-ffff ROM
 
 Interrupts:
 -----------
-	No interrupts in Lviv.
+    No interrupts in Lviv.
 
 Ports:
 ------
-	Only A4-A5 are decoded.  A2-A3 is ignored in the console, but could be used by extension
-	devices.
+    Only A4-A5 are decoded.  A2-A3 is ignored in the console, but could be used by extension
+    devices.
 
-	C0-C3	8255 PPI
-		Port A: extension slot output, printer data
-			bits 0-4 joystick scanner output
-		Port B: palette control, extension slot input or output
-			sound on/off
-			bit 7 sound on/off
-			bits 0-6 palette select
-		Port C: memory page changing, tape input and output,
-			printer control, sound
-			bits 0-3 extension slot input
-			bits 4-7 extension slot output
-			bit 7: joystick scanner input
-			bit 6: printer control AC/busy
-			bit 5: not used
-			bit 4: tape in
-			bit 3: not used
-			bit 2: printer control SC/strobe
-			bit 1: memory paging, 0 - video ram, 1 - ram
-			bit 0: tape out, sound
+    C0-C3   8255 PPI
+        Port A: extension slot output, printer data
+            bits 0-4 joystick scanner output
+        Port B: palette control, extension slot input or output
+            sound on/off
+            bit 7 sound on/off
+            bits 0-6 palette select
+        Port C: memory page changing, tape input and output,
+            printer control, sound
+            bits 0-3 extension slot input
+            bits 4-7 extension slot output
+            bit 7: joystick scanner input
+            bit 6: printer control AC/busy
+            bit 5: not used
+            bit 4: tape in
+            bit 3: not used
+            bit 2: printer control SC/strobe
+            bit 1: memory paging, 0 - video ram, 1 - ram
+            bit 0: tape out, sound
 
-	D0-D3	8255 PPI
-		Port A:
-			keyboard scaning
-		Port B:
-			keyboard reading
-		Port C:
-			keyboard scaning/reading
+    D0-D3   8255 PPI
+        Port A:
+            keyboard scaning
+        Port B:
+            keyboard reading
+        Port C:
+            keyboard scaning/reading
 
 Keyboard:
 ---------
-	Reset - connected to CPU reset line
+    Reset - connected to CPU reset line
 
-				     Port D0
-	--------T-------T-------T-------T-------T-------T-------T-------¬
-	|   7   |   6   |   5   |   4   |   3   |   2   |   1   |   0   |
-	+-------+-------+-------+-------+-------+-------+-------+-------+---¬
-	| Shift |   ;   |       |  CLS  | Space |   R   |   G   |   6   | 0 |
-	+-------+-------+-------+-------+-------+-------+-------+-------+---+
-	|   Q   |Russian|       |  (G)  |   B   |   O   |   [   |   7   | 1 |
-	+-------+-------+-------+-------+-------+-------+-------+-------+---+
-	|   ^   |  Key  |   J   |  (B)  |   @   |   L   |   ]   |   8   | 2 |
-	+-------+-------+-------+-------+-------+-------+-------+-------+---+
-	|   X   |   P   |   N   |   5   |  Alt  |  Del  | Enter | Ready | 3 |
-	+-------+-------+-------+-------+-------+-------+-------+-------+---+ Port D1
-	|   T   |   A   |   E   |   4   |   _   |   .   |  Run  |  Tab  | 4 |
-	+-------+-------+-------+-------+-------+-------+-------+-------+---+
-	|   I   |   W   |   K   |   3   | Latin |   \   |   :   |   -   | 5 |
-	+-------+-------+-------+-------+-------+-------+-------+-------+---+
-	|   M   |   Y   |   U   |   2   |   /   |   V   |   H   |   0   | 6 |
-	+-------+-------+-------+-------+-------+-------+-------+-------+---+
-	|   S   |   F   |   C   |   1   |   ,   |   D   |   Z   |   9   | 7 |
-	L-------+-------+-------+-------+-------+-------+-------+-------+----
+                     Port D0
+    --------T-------T-------T-------T-------T-------T-------T-------??
+    |   7   |   6   |   5   |   4   |   3   |   2   |   1   |   0   |
+    +-------+-------+-------+-------+-------+-------+-------+-------+---??
+    | Shift |   ;   |       |  CLS  | Space |   R   |   G   |   6   | 0 |
+    +-------+-------+-------+-------+-------+-------+-------+-------+---+
+    |   Q   |Russian|       |  (G)  |   B   |   O   |   [   |   7   | 1 |
+    +-------+-------+-------+-------+-------+-------+-------+-------+---+
+    |   ^   |  Key  |   J   |  (B)  |   @   |   L   |   ]   |   8   | 2 |
+    +-------+-------+-------+-------+-------+-------+-------+-------+---+
+    |   X   |   P   |   N   |   5   |  Alt  |  Del  | Enter | Ready | 3 |
+    +-------+-------+-------+-------+-------+-------+-------+-------+---+ Port D1
+    |   T   |   A   |   E   |   4   |   _   |   .   |  Run  |  Tab  | 4 |
+    +-------+-------+-------+-------+-------+-------+-------+-------+---+
+    |   I   |   W   |   K   |   3   | Latin |   \   |   :   |   -   | 5 |
+    +-------+-------+-------+-------+-------+-------+-------+-------+---+
+    |   M   |   Y   |   U   |   2   |   /   |   V   |   H   |   0   | 6 |
+    +-------+-------+-------+-------+-------+-------+-------+-------+---+
+    |   S   |   F   |   C   |   1   |   ,   |   D   |   Z   |   9   | 7 |
+    L-------+-------+-------+-------+-------+-------+-------+-------+----
 
-		     Port D2
-	--------T-------T-------T-------¬
-	|   3   |   2   |   1   |   0   |
-	+-------+-------+-------+-------+-----¬
-	| Right | Home  |ScrPrn |PrnLock|  4  |
-	+-------+-------+-------+-------+-----+
-	|  Up   |  F5   |  F0   |ScrLock|  5  |
-	+-------+-------+-------+-------+-----+ Port D2
-	| Left  |  F4   |  F1   | Sound |  6  |
-	+-------+-------+-------+-------+-----+
-	| Down  |  F3   |  F2   |  (R)  |  7  |
-	L-------+-------+-------+-------+------
+             Port D2
+    --------T-------T-------T-------??
+    |   3   |   2   |   1   |   0   |
+    +-------+-------+-------+-------+-----??
+    | Right | Home  |ScrPrn |PrnLock|  4  |
+    +-------+-------+-------+-------+-----+
+    |  Up   |  F5   |  F0   |ScrLock|  5  |
+    +-------+-------+-------+-------+-----+ Port D2
+    | Left  |  F4   |  F1   | Sound |  6  |
+    +-------+-------+-------+-------+-----+
+    | Down  |  F3   |  F2   |  (R)  |  7  |
+    L-------+-------+-------+-------+------
 
-	Notes:
-		CLS	- clear screen
-		(G)	- clear screen with border and set COLOR 0,0,0
-		(B)	- clear screen with border and set COLOR 1,0,6
-		(R)	- clear screen with border and set COLOR 0,7,3
-		Sound	- sound on/off
-		ScrLock	- screen lock
-		PrnLock	- printer on/off
-		ScrPrn	- screen and printer output mode
-		Russian	- russian keyboard mode
-		Latin	- latin keyboard mode
-		Right	- cursor key
-		Up	- cursor key
-		Left	- cursor key
-		Down	- cursor key
-		Keyword	- BASIC keyword
+    Notes:
+        CLS - clear screen
+        (G) - clear screen with border and set COLOR 0,0,0
+        (B) - clear screen with border and set COLOR 1,0,6
+        (R) - clear screen with border and set COLOR 0,7,3
+        Sound   - sound on/off
+        ScrLock - screen lock
+        PrnLock - printer on/off
+        ScrPrn  - screen and printer output mode
+        Russian - russian keyboard mode
+        Latin   - latin keyboard mode
+        Right   - cursor key
+        Up  - cursor key
+        Left    - cursor key
+        Down    - cursor key
+        Keyword - BASIC keyword
 
 
 Video:
 -----
-	Screen resolution is 256x256 pixels. 4 colors at once are possible,
-	but there is a posiibility of palette change. Bits 0..6 of port 0xc1
-	are used for palette setting.
+    Screen resolution is 256x256 pixels. 4 colors at once are possible,
+    but there is a posiibility of palette change. Bits 0..6 of port 0xc1
+    are used for palette setting.
 
-	One byte of video-RAM sets 4 pixels. Colors of pixels are corrected
-	by current palette. Each bits combination (2 bits sets one pixel on
-	the display), corrected with palette register, sets REAL pixel color.
+    One byte of video-RAM sets 4 pixels. Colors of pixels are corrected
+    by current palette. Each bits combination (2 bits sets one pixel on
+    the display), corrected with palette register, sets REAL pixel color.
 
-	PBx - bit of port 0xC1 numbered x
-	R,G,B - output color components
-	== - "is equal"
-	! - inversion
+    PBx - bit of port 0xC1 numbered x
+    R,G,B - output color components
+    == - "is equal"
+    ! - inversion
 
-	00   R = PB3 == PB4; G = PB5; B = PB2 == PB6;
-	01   R = PB4; G = !PB5; B = PB6;
-	10   R = PB0 == PB4; G = PB5; B = !PB6;
-	11   R = !PB4; G = PB1 == PB5; B = PB6;
+    00   R = PB3 == PB4; G = PB5; B = PB2 == PB6;
+    01   R = PB4; G = !PB5; B = PB6;
+    10   R = PB0 == PB4; G = PB5; B = !PB6;
+    11   R = !PB4; G = PB1 == PB5; B = PB6;
 
-	Bit combinations are result of concatenation of approprate bits of
-	high and low byte halfs.
+    Bit combinations are result of concatenation of approprate bits of
+    high and low byte halfs.
 
-	Example:
-	~~~~~~~~
+    Example:
+    ~~~~~~~~
 
-	Some byte of video RAM:  1101 0001
-	Value of port 0xC1:      x000 1110
+    Some byte of video RAM:  1101 0001
+    Value of port 0xC1:      x000 1110
 
-	1101
-	0001
-	----
-	10 10 00 11
+    1101
+    0001
+    ----
+    10 10 00 11
 
-	1st pixel (10): R = 1; G = 0; B = 1;
-	2nd pixel (10): R = 1; G = 0; B = 1;
-	3rd pixel (00): R = 0; G = 0; B = 0;
-	4th pixel (11): R = 1; G = 0; B = 0;
+    1st pixel (10): R = 1; G = 0; B = 1;
+    2nd pixel (10): R = 1; G = 0; B = 1;
+    3rd pixel (00): R = 0; G = 0; B = 0;
+    4th pixel (11): R = 1; G = 0; B = 0;
 
 
 Sound:
 ------
-	Buzzer connected to port 0xc2 (bit 0).
-	Bit 7 of port 0xc1 - enable/disable speaker.
+    Buzzer connected to port 0xc2 (bit 0).
+    Bit 7 of port 0xc1 - enable/disable speaker.
 
 
 Timings:
 --------
 
-	The CPU timing is controlled by a KR580GF24 (Sovietic copy of i8224) connected to a 18MHz(?)
-	oscillator. CPU frequency must be 18MHz/9 = 2MHz.
+    The CPU timing is controlled by a KR580GF24 (Sovietic copy of i8224) connected to a 18MHz(?)
+    oscillator. CPU frequency must be 18MHz/9 = 2MHz.
 
-	Memory timing uses a 8-phase clock, derived from a 20MHz(?) video clock (called VCLK0 here:
-	in the schematics, it comes from pin 6 of V8, and it is labelled "0'" in the video clock bus).
-	This clock is divided by G7, G6 and D5 to generate the signals we call VCLK1-VCLK11.  The memory
-	clock phases Phi0-Phi7 are generated in D7, whereas PHI'14 and PHI'15 are generated in D8.
+    Memory timing uses a 8-phase clock, derived from a 20MHz(?) video clock (called VCLK0 here:
+    in the schematics, it comes from pin 6 of V8, and it is labelled "0'" in the video clock bus).
+    This clock is divided by G7, G6 and D5 to generate the signals we call VCLK1-VCLK11.  The memory
+    clock phases Phi0-Phi7 are generated in D7, whereas PHI'14 and PHI'15 are generated in D8.
 
-	When the CPU accesses RAM, wait states are inserted until the RAM transfer is complete.
+    When the CPU accesses RAM, wait states are inserted until the RAM transfer is complete.
 
-	CPU clock: 18MHz/9 = 2MHz
-	memory cycle time: 20MHz/8 = 2.5MHz
-	CPU memory access time: (min) approx. 9/20MHz = 450ns
-	                        (max) approx. 25/20MHz = 1250ns
-	pixel clock: 20MHz/4 = 5MHz
-	screen size: 256*256
-	HBL: 64 pixel clock cycles
-	VBL: 64 lines
-	horizontal frequency: 5MHZ/(256+64) = 15.625kHz
-	vertical frequency: 15.625kHz/(256+64) = 48.83Hz
+    CPU clock: 18MHz/9 = 2MHz
+    memory cycle time: 20MHz/8 = 2.5MHz
+    CPU memory access time: (min) approx. 9/20MHz = 450ns
+                            (max) approx. 25/20MHz = 1250ns
+    pixel clock: 20MHz/4 = 5MHz
+    screen size: 256*256
+    HBL: 64 pixel clock cycles
+    VBL: 64 lines
+    horizontal frequency: 5MHZ/(256+64) = 15.625kHz
+    vertical frequency: 15.625kHz/(256+64) = 48.83Hz
 
-			 |<--------VIDEO WINDOW--------->|<----------CPU WINDOW--------->|<--
-			_   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _
-	VCLK0	 |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |
-			_     ___     ___     ___     ___     ___     ___     ___     ___     ___
-	VCLK1	 |___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |
-			_         _______         _______         _______         _______
-	VCLK2	 |_______|       |_______|       |_______|       |_______|       |______|
-			_                 _______________                 _______________
-	VCLK3	 |_______________|               |_______________|               |_______
-			_                                 _______________________________
-	VCLK4	 |_______________________________|                               |_______
+             |<--------VIDEO WINDOW--------->|<----------CPU WINDOW--------->|<--
+            _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _
+    VCLK0    |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |
+            _     ___     ___     ___     ___     ___     ___     ___     ___     ___
+    VCLK1    |___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |
+            _         _______         _______         _______         _______
+    VCLK2    |_______|       |_______|       |_______|       |_______|       |______|
+            _                 _______________                 _______________
+    VCLK3    |_______________|               |_______________|               |_______
+            _                                 _______________________________
+    VCLK4    |_______________________________|                               |_______
 
-			  _                               _                               _
-	PHI0	_| |_____________________________| |_____________________________| |_____
-			      _                               _                               _
-	PHI1	_____| |_____________________________| |_____________________________| |_
-			          _                               _
-	PHI2	_________| |_____________________________| |_____________________________
-			              _                               _
-	PHI3	_____________| |_____________________________| |_________________________
-			                  _                               _
-	PHI4	_________________| |_____________________________| |_____________________
-			                      _                               _
-	PHI5	_____________________| |_____________________________| |_________________
-			                          _                               _
-	PHI6	_________________________| |_____________________________| |_____________
-			                              _                               _
-	PHI7	_____________________________| |_____________________________| |_________
-			                                                          _
-	PHI'14	_________________________________________________________| |_____________
-			                                                              _
-	PHI'15	_____________________________________________________________| |_________
-			__________             __________________________________________________
-	RAS*	          \___________/                   \_a_________/
-			______________                 __________________________________________
-	CAS*	              \_______________/               \_a_____________/
-			_________________________________________________________________________
-	WR*		                                                  \_b_________////////
-			_________________________________________________________________________
-	WRM*	\\\\\\\\\\\\\\\\\\\\\\\\\\_b__________________________________///////////
+              _                               _                               _
+    PHI0    _| |_____________________________| |_____________________________| |_____
+                  _                               _                               _
+    PHI1    _____| |_____________________________| |_____________________________| |_
+                      _                               _
+    PHI2    _________| |_____________________________| |_____________________________
+                          _                               _
+    PHI3    _____________| |_____________________________| |_________________________
+                              _                               _
+    PHI4    _________________| |_____________________________| |_____________________
+                                  _                               _
+    PHI5    _____________________| |_____________________________| |_________________
+                                      _                               _
+    PHI6    _________________________| |_____________________________| |_____________
+                                          _                               _
+    PHI7    _____________________________| |_____________________________| |_________
+                                                                      _
+    PHI'14  _________________________________________________________| |_____________
+                                                                          _
+    PHI'15  _____________________________________________________________| |_________
+            __________             __________________________________________________
+    RAS*              \___________/                   \_a_________/
+            ______________                 __________________________________________
+    CAS*                  \_______________/               \_a_____________/
+            _________________________________________________________________________
+    WR*                                                       \_b_________////////
+            _________________________________________________________________________
+    WRM*    \\\\\\\\\\\\\\\\\\\\\\\\\\_b__________________________________///////////
                         _________________________________________________________________________
         RDM*    \\\\\\\\\\\\\\\\\\\\\\\\\\_c __________________________________///////////
                         _________________________________________________________________________
-	RA		\\\\\\\\\\\\\\\\\\\\\\\\\\_a__________________________________/
+    RA      \\\\\\\\\\\\\\\\\\\\\\\\\\_a__________________________________/
 
-	DRAM
-	ADDRESS	video row /\ video column /XXX\CPU row (a)/\  CPU column (a)  /\ video row
+    DRAM
+    ADDRESS video row /\ video column /XXX\CPU row (a)/\  CPU column (a)  /\ video row
 
-	a: only if the CPU is requesting a RAM read/write
-	b: only if the CPU is requesting a RAM write
-	c: only if the CPU is requesting a RAM read
+    a: only if the CPU is requesting a RAM read/write
+    b: only if the CPU is requesting a RAM write
+    c: only if the CPU is requesting a RAM read
 
 *******************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/8255ppi.h"
-#include "video/generic.h"
 #include "includes/lviv.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"

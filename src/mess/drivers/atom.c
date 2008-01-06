@@ -4,72 +4,77 @@ Acorn Atom:
 Memory map.
 
 CPU: 65C02
-		0000-00ff Zero page
-		0100-01ff Stack
-		0200-1fff RAM (expansion)
-		0a00-0a04 FDC 8271
-		2000-21ff RAM (dos catalogue buffer)
-		2200-27ff RAM (dos seq file buffer)
-		2800-28ff RAM (float buffer)
-		2900-7fff RAM (text RAM)
-		8000-97ff VDG 6847
-		9800-9fff RAM (expansion)
-		a000-afff ROM (extension)
-		b000-b003 PPIA 8255
-		b003-b7ff NOP
-		b800-bbff VIA 6522
-		bc00-bfdf NOP
-		bfe0-bfe2 MOUSE	- extension??
-		bfe3-bfff NOP
-		c000-cfff ROM (basic)
-		d000-dfff ROM (float)
-		e000-efff ROM (dos)
-		f000-ffff ROM (kernel)
+        0000-00ff Zero page
+        0100-01ff Stack
+        0200-1fff RAM (expansion)
+        0a00-0a04 FDC 8271
+        2000-21ff RAM (dos catalogue buffer)
+        2200-27ff RAM (dos seq file buffer)
+        2800-28ff RAM (float buffer)
+        2900-7fff RAM (text RAM)
+        8000-97ff VDG 6847
+        9800-9fff RAM (expansion)
+        a000-afff ROM (extension)
+        b000-b003 PPIA 8255
+        b003-b7ff NOP
+        b800-bbff VIA 6522
+        bc00-bfdf NOP
+        bfe0-bfe2 MOUSE - extension??
+        bfe3-bfff NOP
+        c000-cfff ROM (basic)
+        d000-dfff ROM (float)
+        e000-efff ROM (dos)
+        f000-ffff ROM (kernel)
 
-Video:		MC6847
+Video:      MC6847
 
-Sound:		Buzzer
-Floppy:		FDC8271
+Sound:      Buzzer
+Floppy:     FDC8271
 
-Hardware:	PPIA 8255
+Hardware:   PPIA 8255
 
-	output	b000	0 - 3 keyboard row, 4 - 7 graphics mode
-			b002	0 cas output, 1 enable 2.4Khz, 2 buzzer, 3 colour set
+    output  b000    0 - 3 keyboard row, 4 - 7 graphics mode
+            b002    0 cas output, 1 enable 2.4Khz, 2 buzzer, 3 colour set
 
-	input	b001	0 - 5 keyboard column, 6 CTRL key, 7 SHIFT key
-			b002	4 2.4kHz input, 5 cas input, 6 REPT key, 7 60 Hz input
+    input   b001    0 - 5 keyboard column, 6 CTRL key, 7 SHIFT key
+            b002    4 2.4kHz input, 5 cas input, 6 REPT key, 7 60 Hz input
 
-			VIA 6522
+            VIA 6522
 
 
-	DOS:
+    DOS:
 
-	The original location of the 8271 memory mapped registers is 0xa00-0x0a04.
-	(This is the memory range assigned by Acorn in their design.)
+    The original location of the 8271 memory mapped registers is 0xa00-0x0a04.
+    (This is the memory range assigned by Acorn in their design.)
 
-	This is in the middle of the area for expansion RAM. Many Atom owners
-	thought this was a bad design and have modified their Atom's and dos rom
-	to use a different memory area.
+    This is in the middle of the area for expansion RAM. Many Atom owners
+    thought this was a bad design and have modified their Atom's and dos rom
+    to use a different memory area.
 
-	The atom driver in MESS uses the original memory area.
+    The atom driver in MESS uses the original memory area.
 
 
 
 ***************************************************************************/
 
+/* Core includes */
 #include "driver.h"
-#include "inputx.h"
-#include "video/generic.h"
-#include "machine/8255ppi.h"
-#include "video/m6847.h"
 #include "includes/atom.h"
-#include "includes/i8271.h"
+
+/* Components */
+#include "includes/centroni.h"
+#include "machine/i8271.h"
+#include "machine/8255ppi.h"
+#include "machine/6522via.h"
+#include "video/m6847.h"
+
+/* Devices */
 #include "devices/basicdsk.h"
 #include "devices/flopdrv.h"
 #include "devices/printer.h"
 #include "devices/cassette.h"
-#include "machine/6522via.h"
-#include "includes/centroni.h"
+#include "devices/snapquik.h"
+
 
 /* functions */
 
@@ -367,6 +372,6 @@ SYSTEM_CONFIG_START(atom)
 	CONFIG_DEVICE(atom_quickload_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT      CONFIG   COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG   COMPANY   FULLNAME */
 COMP( 1979, atom,     0,        0,		atom,     atom,     0,        atom,    "Acorn",  "Atom" , 0)
 COMP( 1979, atomeb,   atom,     0,		atomeb,   atom,     0,        atom,    "Acorn",  "Atom with Eprom Box" , 0)

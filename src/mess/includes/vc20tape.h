@@ -1,5 +1,12 @@
-#ifndef __VC20_TAPE_H_
-#define __VC20_TAPE_H_
+/*****************************************************************************
+ *
+ * includes/vc20tape.h
+ *
+ ****************************************************************************/
+
+#ifndef VC20TAPE_H_
+#define VC20TAPE_H_
+
 
 /*----------- defined in machine/vc20tape.c -----------*/
 
@@ -26,4 +33,5 @@ extern int vc20_tape_switch (void);
 /* delivers status for displaying */
 extern void vc20_tape_status (char *text, int size);
 
-#endif
+
+#endif /* VC20TAPE_H_ */

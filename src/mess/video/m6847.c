@@ -65,7 +65,6 @@
 
 #include "driver.h"
 #include "m6847.h"
-#include "inputx.h"
 
 #ifdef MAME_DEBUG
 #include "debug/debugcpu.h"

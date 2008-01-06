@@ -1,17 +1,19 @@
-/*
-  defines centronics/parallel port printer interface
+/*****************************************************************************
+ *
+ * includes/centroni.h
+ *
+ * Defines centronics/parallel port printer interface
+ * Provides a centronics printer simulation (sends output to IO_PRINTER)
+ *
+ ****************************************************************************/
 
-  provides a centronics printer simulation (sends output to IO_PRINTER)
-*/
-
-#ifndef __CENTRONICS_H_
-#define __CENTRONICS_H_
-
-#include "driver.h"
+#ifndef CENTRONICS_H_
+#define CENTRONICS_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 typedef enum {
 	PRINTER_CENTRONICS,
@@ -44,6 +46,7 @@ typedef struct {
 	void (*handshake_out)(int n, int data, int mask);
 } CENTRONICS_CONFIG;
 
+
 /*----------- defined in machine/centroni.c -----------*/
 
 void centronics_config(int nr, const CENTRONICS_CONFIG *config);
@@ -55,9 +58,9 @@ int centronics_read_handshake(int nr);
 
 extern const CENTRONICS_DEVICE CENTRONICS_PRINTER_DEVICE;
 
+
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif
+#endif /* CENTRONI_H_ */

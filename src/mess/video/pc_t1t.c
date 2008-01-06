@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 
 #include "includes/crtc6845.h"
 #include "video/pc_cga.h" // cga monitor palette

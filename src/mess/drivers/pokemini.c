@@ -8,7 +8,6 @@ The LCD is likely to be a SSD1828 LCD.
 ********************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/pokemini.h"
 #include "cpu/minx/minx.h"
 #include "devices/cartslot.h"

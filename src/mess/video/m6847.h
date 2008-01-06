@@ -9,7 +9,6 @@
 #ifndef __M6847_H__
 #define __M6847_H__
 
-#include "mame.h"
 
 /* for now, the MAME core forces us to use these */
 #define M6847_NTSC_FRAMES_PER_SECOND	60
@@ -83,5 +82,6 @@ attotime m6847_time_until(m6847_timing_type timing, UINT64 target_time);
 attotime m6847_scanline_time(int scanline);
 
 INPUT_PORTS_EXTERN( m6847_artifacting );
+
 
 #endif /* __M6847_H__ */

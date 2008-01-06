@@ -1,8 +1,12 @@
-#ifndef __ABC80_VIDEO__
-#define __ABC80_VIDEO__
+/*****************************************************************************
+ *
+ * includes/abc80.h
+ *
+ ****************************************************************************/
 
-#include "driver.h"
-#include "video/generic.h"
+#ifndef ABC80_H_
+#define ABC80_H_
+
 
 #define ABC80_XTAL		11980800.0
 
@@ -19,8 +23,12 @@
 #define ABC80_MODE_TEXT	135
 #define ABC80_MODE_GFX	151
 
+
+/*----------- defined in video/abc80.c -----------*/
+
 PALETTE_INIT( abc80 );
 VIDEO_START( abc80 );
 VIDEO_UPDATE( abc80 );
 
-#endif
+
+#endif /* ABC80_H_ */

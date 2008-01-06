@@ -6,8 +6,10 @@
 
 ****************************************************************************/
 
-#include "includes/sblaster.h"
+#include "driver.h"
+#include "sblaster.h"
 #include "sound/dac.h"
+
 
 /* operation modes
    0x10 output 8 bit direct

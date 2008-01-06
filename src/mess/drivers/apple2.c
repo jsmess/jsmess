@@ -183,8 +183,6 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 ***************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
-#include "video/generic.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"
 #include "devices/appldriv.h"
@@ -925,7 +923,7 @@ SYSTEM_CONFIG_END
 
 
 
-/*    YEAR  NAME      PARENT    COMPAT		MACHINE   INPUT     INIT CONFIG		COMPANY            FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT      MACHINE   INPUT     INIT CONFIG     COMPANY            FULLNAME */
 COMP( 1977, apple2,   0,        0,			apple2,   apple2,   0,   apple2,	"Apple Computer", "Apple ][" , 0)
 COMP( 1979, apple2p,  apple2,   0,			apple2p,  apple2p,  0,   apple2p,	"Apple Computer", "Apple ][+" , 0)
 COMP( 1980, apple2jp, apple2,   0,			apple2p,  apple2p,  0,   apple2p,	"Apple Computer", "Apple ][j+" , 0)

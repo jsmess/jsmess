@@ -11,7 +11,6 @@
 
 #include "driver.h"
 #include "includes/svi318.h"
-#include "video/generic.h"
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"
 #include "machine/uart8250.h"

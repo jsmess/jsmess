@@ -1,7 +1,14 @@
-#ifndef __CBM_SERIAL_BUS_H_
-#define __CBM_SERIAL_BUS_H_
+/*****************************************************************************
+ *
+ * includes/cbmserb.h
+ *
+ ****************************************************************************/
+
+#ifndef CBMSERB_H_
+#define CBMSERB_H_
 
 #include "cbmdrive.h"
+
 
 /*----------- defined in machine/cbmserb.c -----------*/
 
@@ -46,4 +53,5 @@ extern CBM_Serial cbm_serial;
 /* private */
 extern CBM_Drive cbm_drive[2];
 
-#endif
+
+#endif /* CBMSERB_H_ */

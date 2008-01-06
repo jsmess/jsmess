@@ -9,13 +9,11 @@
 #ifndef _8630SCC_H
 #define _8630SCC_H
 
-#include "mame.h"
 
 struct scc8530_interface
 {
 	void (*acknowledge)(void);
 };
-
 
 
 void scc_init(const struct scc8530_interface *intf);

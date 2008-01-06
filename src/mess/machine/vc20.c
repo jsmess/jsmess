@@ -17,7 +17,6 @@
 #include "driver.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
-#include "video/generic.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
@@ -28,7 +27,7 @@
 #include "includes/vc20tape.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-#include "includes/vic6560.h"
+#include "video/vic6560.h"
 
 static UINT8 keyboard[8] =
 {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};

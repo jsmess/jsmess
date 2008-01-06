@@ -11,7 +11,6 @@
 #include "driver.h"
 #include "includes/svi318.h"
 #include "cpu/z80/z80.h"
-#include "video/generic.h"
 #include "video/crtc6845.h"
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"

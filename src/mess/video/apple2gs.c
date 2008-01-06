@@ -6,9 +6,11 @@
 
 *********************************************************************/
 
-#include "mame.h"
+
+#include "driver.h"
 #include "includes/apple2.h"
 #include "includes/apple2gs.h"
+
 
 static mame_bitmap *apple2gs_legacy_gfx;
 UINT16 apple2gs_bordercolor;

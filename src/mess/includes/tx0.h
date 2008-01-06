@@ -1,5 +1,16 @@
+/*****************************************************************************
+ *
+ * includes/tx0.h
+ *
+ ****************************************************************************/
+
+#ifndef TX0_H_
+#define TX0_H_
+
+
 #define READ18_HANDLER(name) READ32_HANDLER(name)
 #define WRITE18_HANDLER(name) WRITE32_HANDLER(name)
+
 
 /*----------- defined in machine/tx0.c -----------*/
 
@@ -24,6 +35,7 @@ void tx0_sel(void);
 void tx0_io_cpy(void);
 void tx0_io_reset_callback(void);
 INTERRUPT_GEN( tx0_interrupt );
+
 
 /*----------- defined in video/tx0.c -----------*/
 
@@ -154,3 +166,6 @@ enum
 	pen_lightpen_nonpressed = pen_red,
 	pen_lightpen_pressed = pen_green
 };
+
+
+#endif /* TX0_H_ */

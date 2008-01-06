@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/advision.h"
 #include "devices/cartslot.h"
 #include "image.h"

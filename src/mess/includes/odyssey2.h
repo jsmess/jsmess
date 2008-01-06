@@ -1,5 +1,15 @@
+/*****************************************************************************
+ *
+ * includes/odyssey2.h
+ *
+ ****************************************************************************/
+
+#ifndef ODYSSEY2_H_
+#define ODYSSEY2_H_
+
 #include "sound/custom.h"
 #include "streams.h"
+
 
 #define P1_BANK_LO_BIT            (0x01)
 #define P1_BANK_HI_BIT            (0x02)
@@ -30,6 +40,7 @@
 #define COLLISION_EXTERNAL_UNUSED_IND (7)
 #define COLLISION_CHARACTERS_IND      (8)
 
+
 /*----------- defined in video/odyssey2.c -----------*/
 
 extern int odyssey2_vh_hpos;
@@ -46,11 +57,13 @@ WRITE8_HANDLER ( odyssey2_video_w );
 
 void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length );
 
+
 /*----------- defined in audio/odyssey2.c -----------*/
 
 extern sound_stream *odyssey2_sh_channel;
 extern const struct CustomSound_interface odyssey2_sound_interface;
 void *odyssey2_sh_start(int clock, const struct CustomSound_interface *config);
+
 
 /*----------- defined in machine/odyssey2.c -----------*/
 
@@ -71,3 +84,6 @@ READ8_HANDLER( odyssey2_getbus );
 WRITE8_HANDLER ( odyssey2_putbus );
 
 int odyssey2_cart_verify(const UINT8 *cartdata, size_t size);
+
+
+#endif /* ODYSSEY2_H_ */

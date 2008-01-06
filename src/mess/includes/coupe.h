@@ -1,8 +1,16 @@
-/***************************************************************************
+/*****************************************************************************
+ *
+ * includes/coupe.h
+ *
+ * SAM Coupe
+ *
+ * Driver by Lee Hammerton
+ *
+ ****************************************************************************/
 
- SAM Coupe Driver - Written By Lee Hammerton
+#ifndef COUPE_H_
+#define COUPE_H_
 
-***************************************************************************/
 
 #define DSK1_PORT	224 	/* Disk Drive 1 Port 8 ports - decode port number as (bit 0-1 address lines, bit 2 side) */
 #define DSK2_PORT	240 	/* Disk Drive 2 Port 8 ports */
@@ -22,6 +30,7 @@
 
 #define LMPR_RAM0	0x20	/* If bit set ram is paged into bank 0, else its rom0 */
 #define LMPR_ROM1	0x40	/* If bit set rom1 is paged into bank 3, else its ram */
+
 
 /*----------- defined in machine/coupe.c -----------*/
 
@@ -47,3 +56,5 @@ void drawMode2_line(mame_bitmap *,int);
 void drawMode3_line(mame_bitmap *,int);
 void drawMode4_line(mame_bitmap *,int);
 
+
+#endif /* COUPE_H_ */

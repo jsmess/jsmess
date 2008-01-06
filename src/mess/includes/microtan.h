@@ -1,24 +1,22 @@
 /******************************************************************************
- *	Microtan 65
+ *  Microtan 65
  *
- *	variables and function prototypes
+ *  variables and function prototypes
  *
- *	Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
+ *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
- *	Thanks go to Geoff Macdonald <mail@geoff.org.uk>
- *	for his site http:://www.geo255.redhotant.com
- *	and to Fabrice Frances <frances@ensica.fr>
- *	for his site http://www.ifrance.com/oric/microtan.html
+ *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
+ *  for his site http://www.geo255.redhotant.com
+ *  and to Fabrice Frances <frances@ensica.fr>
+ *  for his site http://www.ifrance.com/oric/microtan.html
  *
  ******************************************************************************/
 
-#include "driver.h"
-#include "video/generic.h"
-#include "cpu/m6502/m6502.h"
-#include "machine/6522via.h"
-#include "sound/ay8910.h"
-#include "includes/6551.h"
+#ifndef MICROTAN_H_
+#define MICROTAN_H_
+
 #include "devices/snapquik.h"
+
 
 /*----------- defined in machine/microtan.c -----------*/
 
@@ -52,3 +50,6 @@ extern WRITE8_HANDLER ( microtan_videoram_w );
 
 extern VIDEO_START( microtan );
 extern VIDEO_UPDATE( microtan );
+
+
+#endif /* MICROTAN_H_ */

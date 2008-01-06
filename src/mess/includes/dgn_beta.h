@@ -1,5 +1,12 @@
-#ifndef DGN_BETA
-#define DGN_BETA
+/*****************************************************************************
+ *
+ * includes/dgn_beta.h
+ *
+ ****************************************************************************/
+
+#ifndef DGN_BETA_H_
+#define DGN_BETA_H_
+
 
 #define DGNBETA_CPU_SPEED_HZ		2000000	/* 2MHz */
 #define DGNBETA_FRAMES_PER_SECOND	50
@@ -51,6 +58,9 @@ typedef enum
 	GRAPH_640x512x2					/* Graphics 640X512X2 */
 } BETA_VID_MODES;
 
+#define iosize	(0xfEFF-0xfc00)
+
+
 /*----------- defined in machine/dgn_beta.c -----------*/
 
 MACHINE_START( dgnbeta );
@@ -101,6 +111,4 @@ READ8_HANDLER(dgnbeta_6845_r);
 WRITE8_HANDLER(dgnbeta_6845_w);
 
 
-#define iosize	(0xfEFF-0xfc00)
-
-#endif
+#endif /* DGN_BETA_H_ */

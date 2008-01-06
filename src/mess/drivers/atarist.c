@@ -1,6 +1,4 @@
 #include "driver.h"
-#include "inputx.h"
-#include "video/generic.h"
 #include "video/atarist.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/m68000/m68000.h"
@@ -20,20 +18,20 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- fix floppy interface
-	- fix mouse
-	- MSA disk image support
-	- UK keyboard layout for the special keys
-	- accurate screen timing
-	- floppy DMA transfer timer
-	- memory shadow for boot memory check
-	- STe DMA sound and LMC1992 Microwire mixer
-	- Mega ST/STe MC68881 FPU
-	- MIDI interface
-	- Mega STe 16KB cache
-	- Mega STe LAN
+    - fix floppy interface
+    - fix mouse
+    - MSA disk image support
+    - UK keyboard layout for the special keys
+    - accurate screen timing
+    - floppy DMA transfer timer
+    - memory shadow for boot memory check
+    - STe DMA sound and LMC1992 Microwire mixer
+    - Mega ST/STe MC68881 FPU
+    - MIDI interface
+    - Mega STe 16KB cache
+    - Mega STe LAN
 
 */
 
@@ -269,18 +267,18 @@ static READ8_HANDLER( ikbd_port1_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Keyboard column input
-		1		Keyboard column input
-		2		Keyboard column input
-		3		Keyboard column input
-		4		Keyboard column input
-		5		Keyboard column input
-		6		Keyboard column input
-		7		Keyboard column input
+        0       Keyboard column input
+        1       Keyboard column input
+        2       Keyboard column input
+        3       Keyboard column input
+        4       Keyboard column input
+        5       Keyboard column input
+        6       Keyboard column input
+        7       Keyboard column input
 
-	*/
+    */
 
 	return ikbd.keylatch;
 }
@@ -289,15 +287,15 @@ static READ8_HANDLER( ikbd_port2_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		JOY 1-5
-		1		JOY 0-6
-		2		JOY 1-6
-		3		SD FROM CPU
-		4		SD TO CPU
+        0       JOY 1-5
+        1       JOY 0-6
+        2       JOY 1-6
+        3       SD FROM CPU
+        4       SD TO CPU
 
-	*/
+    */
 
 	return (ikbd.tx << 3) | (readinputportbytag_safe("IKBD_JOY1", 0xff) & 0x06);
 }
@@ -306,15 +304,15 @@ static WRITE8_HANDLER( ikbd_port2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		JOY 1-5
-		1		JOY 0-6
-		2		JOY 1-6
-		3		SD FROM CPU
-		4		SD TO CPU
+        0       JOY 1-5
+        1       JOY 0-6
+        2       JOY 1-6
+        3       SD FROM CPU
+        4       SD TO CPU
 
-	*/
+    */
 
 	ikbd.rx = (data & 0x10) >> 4;
 }
@@ -323,18 +321,18 @@ static WRITE8_HANDLER( ikbd_port3_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		CAPS LOCK LED
-		1		Keyboard row select
-		2		Keyboard row select
-		3		Keyboard row select
-		4		Keyboard row select
-		5		Keyboard row select
-		6		Keyboard row select
-		7		Keyboard row select
+        0       CAPS LOCK LED
+        1       Keyboard row select
+        2       Keyboard row select
+        3       Keyboard row select
+        4       Keyboard row select
+        5       Keyboard row select
+        6       Keyboard row select
+        7       Keyboard row select
 
-	*/
+    */
 
 	set_led_status(1, data & 0x01);
 
@@ -351,29 +349,29 @@ static READ8_HANDLER( ikbd_port4_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		JOY 0-1 or mouse XB
-		1		JOY 0-2 or mouse XA
-		2		JOY 0-3 or mouse YA
-		3		JOY 0-4 or mouse YB
-		4		JOY 1-1
-		5		JOY 1-2
-		6		JOY 1-3
-		7		JOY 1-4
+        0       JOY 0-1 or mouse XB
+        1       JOY 0-2 or mouse XA
+        2       JOY 0-3 or mouse YA
+        3       JOY 0-4 or mouse YB
+        4       JOY 1-1
+        5       JOY 1-2
+        6       JOY 1-3
+        7       JOY 1-4
 
-	*/
+    */
 
 	if (readinputportbytag("config") & 0x01)
 	{
 		/*
 
-				Right	Left		Up		Down
+                Right   Left        Up      Down
 
-			XA	1100	0110	YA	1100	0110
-			XB	0110	1100	YB	0110	1100
+            XA  1100    0110    YA  1100    0110
+            XB  0110    1100    YB  0110    1100
 
-		*/
+        */
 
 		UINT8 data = readinputportbytag_safe("IKBD_JOY0", 0xff) & 0xf0;
 		UINT8 x = readinputportbytag_safe("IKBD_MOUSEX", 0x00);
@@ -432,18 +430,18 @@ static WRITE8_HANDLER( ikbd_port4_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Keyboard row select
-		1		Keyboard row select
-		2		Keyboard row select
-		3		Keyboard row select
-		4		Keyboard row select
-		5		Keyboard row select
-		6		Keyboard row select
-		7		Keyboard row select
+        0       Keyboard row select
+        1       Keyboard row select
+        2       Keyboard row select
+        3       Keyboard row select
+        4       Keyboard row select
+        5       Keyboard row select
+        6       Keyboard row select
+        7       Keyboard row select
 
-	*/
+    */
 
 	if (~data & 0x01) ikbd.keylatch = readinputportbytag("P40");
 	if (~data & 0x02) ikbd.keylatch = readinputportbytag("P41");
@@ -509,15 +507,15 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 
 	if (dmasound.ctrl & 0x80)
 	{
-//		logerror("DMA sound left  %i\n", dmasound.fifo[7 - dmasound.samples]);
+//      logerror("DMA sound left  %i\n", dmasound.fifo[7 - dmasound.samples]);
 		dmasound.samples--;
 
-//		logerror("DMA sound right %i\n", dmasound.fifo[7 - dmasound.samples]);
+//      logerror("DMA sound right %i\n", dmasound.fifo[7 - dmasound.samples]);
 		dmasound.samples--;
 	}
 	else
 	{
-//		logerror("DMA sound mono %i\n", dmasound.fifo[7 - dmasound.samples]);
+//      logerror("DMA sound mono %i\n", dmasound.fifo[7 - dmasound.samples]);
 		dmasound.samples--;
 	}
 
@@ -773,26 +771,26 @@ static READ16_HANDLER( stbook_config_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		_POWER_SWITCH
-		1		_TOP_CLOSED
-		2		_RTC_ALARM
-		3		_SOURCE_DEAD
-		4		_SOURCE_LOW
-		5		_MODEM_WAKE
-		6		(reserved)
-		7		_EXPANSION_WAKE
-		8		(reserved)
-		9		(reserved)
-		10		(reserved)
-		11		(reserved)
-		12		(reserved)
-		13		SELF TEST
-		14		LOW SPEED FLOPPY
-		15		DMA AVAILABLE
+        0       _POWER_SWITCH
+        1       _TOP_CLOSED
+        2       _RTC_ALARM
+        3       _SOURCE_DEAD
+        4       _SOURCE_LOW
+        5       _MODEM_WAKE
+        6       (reserved)
+        7       _EXPANSION_WAKE
+        8       (reserved)
+        9       (reserved)
+        10      (reserved)
+        11      (reserved)
+        12      (reserved)
+        13      SELF TEST
+        14      LOW SPEED FLOPPY
+        15      DMA AVAILABLE
 
-	*/
+    */
 
 	return (readinputportbytag("SW400") << 8) | 0xff;
 }
@@ -801,18 +799,18 @@ static WRITE16_HANDLER( stbook_lcd_control_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Shadow Chip OFF
-		1		_SHIFTER OFF
-		2		POWEROFF
-		3		_22ON
-		4		RS-232_OFF
-		5		(reserved)
-		6		(reserved)
-		7		MTR_PWR_ON
+        0       Shadow Chip OFF
+        1       _SHIFTER OFF
+        2       POWEROFF
+        3       _22ON
+        4       RS-232_OFF
+        5       (reserved)
+        6       (reserved)
+        7       MTR_PWR_ON
 
-	*/
+    */
 }
 
 /* Memory Maps */
@@ -885,7 +883,7 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
-//	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(megast_fpu_r, megast_fpu_w)
+//  AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
@@ -990,7 +988,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
-//	AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
+//  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE(megaste_scc8530_r, megaste_scc8530_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
@@ -1006,18 +1004,18 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM
 	AM_RANGE(0xe80000, 0xebffff) AM_ROM
-//	AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
+//  AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
 	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
-/*	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
-	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
-	AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(stbook_shifter_counter_r, stbook_shifter_counter_w)
-	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(stbook_shifter_sync_r, stbook_shifter_sync_w)
-	AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(stbook_shifter_base_low_r, stbook_shifter_base_low_w)
-	AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(stbook_shifter_lineofs_r, stbook_shifter_lineofs_w)
-	AM_RANGE(0xff8240, 0xff8241) AM_READWRITE(stbook_shifter_palette_r, stbook_shifter_palette_w)
-	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(stbook_shifter_mode_r, stbook_shifter_mode_w)
-	AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)*/
+/*  AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
+    AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
+    AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(stbook_shifter_counter_r, stbook_shifter_counter_w)
+    AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(stbook_shifter_sync_r, stbook_shifter_sync_w)
+    AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(stbook_shifter_base_low_r, stbook_shifter_base_low_w)
+    AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(stbook_shifter_lineofs_r, stbook_shifter_lineofs_w)
+    AM_RANGE(0xff8240, 0xff8241) AM_READWRITE(stbook_shifter_palette_r, stbook_shifter_palette_w)
+    AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(stbook_shifter_mode_r, stbook_shifter_mode_w)
+    AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)*/
 	AM_RANGE(0xff827e, 0xff827f) AM_WRITE(stbook_lcd_control_w)
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
@@ -1044,9 +1042,9 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xff9200, 0xff9201) AM_READ(stbook_config_r)
-/*	AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(stbook_lcd_contrast_r, stbook_lcd_contrast_w)
-	AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(stbook_power_r, stbook_power_w)
-	AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(stbook_reference_r, stbook_reference_w)*/
+/*  AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(stbook_lcd_contrast_r, stbook_lcd_contrast_w)
+    AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(stbook_power_r, stbook_power_w)
+    AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(stbook_reference_r, stbook_reference_w)*/
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
@@ -1365,18 +1363,18 @@ static READ8_HANDLER( mfp_gpio_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Centronics BUSY
-		1		RS232 DCD
-		2		RS232 CTS
-		3		Blitter done
-		4		Keyboard/MIDI
-		5		FDC
-		6		RS232 RI
-		7		Monochrome monitor detect
+        0       Centronics BUSY
+        1       RS232 DCD
+        2       RS232 CTS
+        3       Blitter done
+        4       Keyboard/MIDI
+        5       FDC
+        6       RS232 RI
+        7       Monochrome monitor detect
 
-	*/
+    */
 
 	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
 
@@ -1525,18 +1523,18 @@ static READ8_HANDLER( atariste_mfp_gpio_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Centronics BUSY
-		1		RS232 DCD
-		2		RS232 CTS
-		3		Blitter done
-		4		Keyboard/MIDI
-		5		FDC
-		6		RS232 RI
-		7		Monochrome monitor detect / DMA sound active
+        0       Centronics BUSY
+        1       RS232 DCD
+        2       RS232 CTS
+        3       Blitter done
+        4       Keyboard/MIDI
+        5       FDC
+        6       RS232 RI
+        7       Monochrome monitor detect / DMA sound active
 
-	*/
+    */
 
 	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
 
@@ -1683,18 +1681,18 @@ static READ8_HANDLER( stbook_mfp_gpio_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Centronics BUSY
-		1		RS232 DCD
-		2		RS232 CTS
-		3		Blitter done
-		4		Keyboard/MIDI
-		5		FDC
-		6		RS232 RI
-		7		POWER ALARMS
+        0       Centronics BUSY
+        1       RS232 DCD
+        2       RS232 CTS
+        3       Blitter done
+        4       Keyboard/MIDI
+        5       FDC
+        6       RS232 RI
+        7       POWER ALARMS
 
-	*/
+    */
 
 	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
 
@@ -1802,9 +1800,9 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(0, "right", 0.50)
 /*
-	MDRV_SOUND_ADD(CUSTOM, 0) // DAC
-	MDRV_SOUND_ROUTE(0, "right", 0.50)
-	MDRV_SOUND_ROUTE(1, "left", 0.50)
+    MDRV_SOUND_ADD(CUSTOM, 0) // DAC
+    MDRV_SOUND_ROUTE(0, "right", 0.50)
+    MDRV_SOUND_ROUTE(1, "left", 0.50)
 */
 MACHINE_DRIVER_END
 
@@ -2190,19 +2188,19 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*     YEAR  NAME    PARENT    COMPAT	MACHINE   INPUT     INIT	CONFIG   COMPANY    FULLNAME */
+/*     YEAR  NAME    PARENT    COMPAT   MACHINE   INPUT     INIT    CONFIG   COMPANY    FULLNAME */
 COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari", "ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari", "Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
-COMP( 1989, stacy,    atarist,  0,		stacy,    stacy,    0,     stacy,	 "Atari", "Stacy", GAME_NOT_WORKING )
+COMP( 1989, stacy,    atarist,  0,      stacy,    stacy,    0,     stacy,    "Atari", "Stacy", GAME_NOT_WORKING )
 */
 COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     stbook,	 "Atari", "STBook", GAME_NOT_WORKING )
 COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
-COMP( 1991, stpad,    atariste, 0,		stpad,    stpad,    0,     stpad,	 "Atari", "STPad (prototype)", GAME_NOT_WORKING )
-COMP( 1990, tt030,    0,        0,		tt030,    tt030,    0,     tt030,	 "Atari", "TT030", GAME_NOT_WORKING )
-COMP( 1992, fx1,	  0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "FX-1 (prototype)", GAME_NOT_WORKING )
-COMP( 1992, falcon,   0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "Falcon030", GAME_NOT_WORKING )
-COMP( 1992, falcon40, falcon,	0,		falcon40, falcon,   0,     falcon,	 "Atari", "Falcon040 (prototype)", GAME_NOT_WORKING )
+COMP( 1991, stpad,    atariste, 0,      stpad,    stpad,    0,     stpad,    "Atari", "STPad (prototype)", GAME_NOT_WORKING )
+COMP( 1990, tt030,    0,        0,      tt030,    tt030,    0,     tt030,    "Atari", "TT030", GAME_NOT_WORKING )
+COMP( 1992, fx1,      0,        0,      falcon,   falcon,   0,     falcon,   "Atari", "FX-1 (prototype)", GAME_NOT_WORKING )
+COMP( 1992, falcon,   0,        0,      falcon,   falcon,   0,     falcon,   "Atari", "Falcon030", GAME_NOT_WORKING )
+COMP( 1992, falcon40, falcon,   0,      falcon40, falcon,   0,     falcon,   "Atari", "Falcon040 (prototype)", GAME_NOT_WORKING )
 */

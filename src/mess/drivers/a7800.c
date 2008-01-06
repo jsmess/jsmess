@@ -6,14 +6,13 @@
 
   Dan Boris
 
-	2002/05/13 kubecj	added more banks for bankswitching
-							added PAL machine description
-							changed clock to be precise
+    2002/05/13 kubecj   added more banks for bankswitching
+                            added PAL machine description
+                            changed clock to be precise
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
 #include "devices/cartslot.h"
@@ -265,7 +264,7 @@ static PALETTE_INIT(a7800p)
 static MACHINE_DRIVER_START( a7800_ntsc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, CLK_NTSC)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
-												 * when the TIA or RIOT are accessed) */
+                                                 * when the TIA or RIOT are accessed) */
 	MDRV_CPU_PROGRAM_MAP(a7800_mem, 0)
 	MDRV_CPU_VBLANK_INT(a7800_interrupt,262)
 
@@ -301,7 +300,7 @@ static MACHINE_DRIVER_START( a7800_pal )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("main", M6502, CLK_PAL)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
-												 * when the TIA or RIOT are accessed) */
+                                                 * when the TIA or RIOT are accessed) */
 	MDRV_CPU_VBLANK_INT(a7800_interrupt,312)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_SIZE(640,312)
@@ -382,6 +381,6 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT	MACHINE		INPUT     INIT			CONFIG		COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     INIT          CONFIG      COMPANY   FULLNAME */
 CONS( 1986, a7800,    0,        0,		a7800_ntsc,	a7800,    a7800_ntsc,	a7800_ntsc,	"Atari",  "Atari 7800 NTSC" , 0)
 CONS( 1986, a7800p,   a7800,    0,		a7800_pal,	a7800,    a7800_pal,	a7800_pal,	"Atari",  "Atari 7800 PAL" , 0)

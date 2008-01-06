@@ -92,7 +92,6 @@ Part list of Goldstar 3DO Interactive Multiplayer
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/3do.h"
 #include "devices/chd_cd.h"
 

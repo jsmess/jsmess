@@ -10,9 +10,15 @@
  ******************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/kaypro.h"
+
+#include "machine/wd17xx.h"
+#include "machine/cpm_bios.h"
 #include "devices/basicdsk.h"
+
+/* TODO: Remove dependency on this */
+#include "mslegacy.h"
+
 
 static ADDRESS_MAP_START( kaypro_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0xffff) AM_RAM
@@ -285,5 +291,5 @@ SYSTEM_CONFIG_START(kaypro)
 	CONFIG_DEVICE(kaypro_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
 COMP( 1982, kaypro,   0,		0,		kaypro,   kaypro,   kaypro,   kaypro,   "Non Linear Systems",  "Kaypro 2x" , 0)

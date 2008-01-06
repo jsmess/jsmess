@@ -1,5 +1,14 @@
-#include "mame.h"
+/*****************************************************************************
+ *
+ * includes/channelf.h
+ *
+ ****************************************************************************/
+
+#ifndef CHANNELF_H_
+#define CHANNELF_H_
+
 #include "sound/custom.h"
+
 
 /*----------- defined in video/channelf.c -----------*/
 
@@ -15,6 +24,7 @@ extern VIDEO_UPDATE( channelf );
 /*----------- defined in audio/channelf.c -----------*/
 
 void channelf_sound_w(int);
-
 void *channelf_sh_custom_start(int clock, const struct CustomSound_interface *config);
 
+
+#endif /* CHANNELF_H_ */

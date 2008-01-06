@@ -6,8 +6,10 @@
  *
  *************************************************************************/
 
+#include "driver.h"
 #include "pc_joy.h"
 #include "memconv.h"
+
 
 static attotime JOY_time;
 

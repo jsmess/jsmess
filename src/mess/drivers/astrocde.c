@@ -1,15 +1,15 @@
 
 /****************************************************************************
 
-	Bally Astrocade Driver
+    Bally Astrocade Driver
 
-	09/23/98 - Added sound, added player 2 pot					FMP
-			   Added MWA8_ROM to fix Star Fortress problem
-			   Added cartridge support
+    09/23/98 - Added sound, added player 2 pot                  FMP
+               Added MWA8_ROM to fix Star Fortress problem
+               Added cartridge support
 
-	08/02/98 - First release based on original wow.c in MAME	FMP
-			   Added palette generation based on a function
-			   Fixed collision detection
+    08/02/98 - First release based on original wow.c in MAME    FMP
+               Added palette generation based on a function
+               Fixed collision detection
                            Fixed shifter operation
                            Fixed clock speed
                            Fixed Interrupt Rate and handling
@@ -24,19 +24,18 @@
 
    Bally Astrocade style games
 
-   02.02.98 - New IO port definitions				MJC
+   02.02.98 - New IO port definitions               MJC
               Dirty Rectangle handling
               Sparkle Circuit for Gorf
               errorlog output conditional on MAME_DEBUG
 
-   03/04 98 - Extra Bases driver 				ATJ
-	      	  Wow word driver
+   03/04 98 - Extra Bases driver                ATJ
+              Wow word driver
 
  ****************************************************************************/
 
 #include "driver.h"
 #include "sound/astrocde.h"
-#include "video/generic.h"
 #include "includes/astrocde.h"
 #include "devices/cartslot.h"
 
@@ -235,6 +234,6 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT	COMPAT	  MACHINE   INPUT     INIT	CONFIG		COMPANY			FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT  CONFIG      COMPANY         FULLNAME */
 CONS( 1978, astrocde, 0,	0,	  astrocde, astrocde, 0,	astrocde,	"Bally Manufacturing", "Bally Professional Arcade", 0)
 CONS( 1977, astrocdw, astrocde, 0, astrocde, astrocde, 0,        astrocde,       "Bally Manufacturing", "Bally Computer System", 0)

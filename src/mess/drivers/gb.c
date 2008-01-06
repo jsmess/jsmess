@@ -434,13 +434,14 @@ space. This mapper uses 32KB sized banks.
 
 
 ***************************************************************************/
+
 #include "driver.h"
-#include "video/generic.h"
-#include "cpu/z80gb/z80gb.h"
 #include "includes/gb.h"
+#include "cpu/z80gb/z80gb.h"
 #include "devices/cartslot.h"
 #include "rendlay.h"
 #include "gb.lh"
+
 
 /* Initial value of the cpu registers (hacks until we get bios dumps) */
 static const UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super GameBoy                    */
@@ -567,7 +568,7 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_DEFAULT_LAYOUT(layout_gb)
-//	MDRV_SCREEN_SIZE(20*8, 18*8)
+//  MDRV_SCREEN_SIZE(20*8, 18*8)
 	MDRV_SCREEN_SIZE( 458, 154 )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 	MDRV_GFXDECODE(gb)
@@ -735,17 +736,17 @@ ROM_END
 
 ROM_START( supergb )
 	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
-/*	ROM_LOAD( "sgb_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
+/*  ROM_LOAD( "sgb_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
 ROM_END
 
 ROM_START( gbpocket )
 	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
-/*	ROM_LOAD( "gbp_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
+/*  ROM_LOAD( "gbp_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
 ROM_END
 
 ROM_START( gbcolor )
 	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
-/*	ROM_LOAD( "gbc_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
+/*  ROM_LOAD( "gbc_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
 ROM_END
 
 
@@ -753,7 +754,7 @@ ROM_START( megaduck )
 	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
 ROM_END
 
-/*    YEAR  NAME      PARENT   COMPAT	MACHINE   INPUT    INIT  CONFIG   COMPANY     FULLNAME */
+/*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  CONFIG   COMPANY     FULLNAME */
 CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    gameboy_gb, "Nintendo", "GameBoy"  , 0)
 CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    gameboy, "Nintendo", "Super GameBoy" , 0)
 CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    gameboy, "Nintendo", "GameBoy Pocket" , 0)

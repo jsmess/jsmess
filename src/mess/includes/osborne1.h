@@ -1,5 +1,12 @@
-#ifndef __OSBORNE1_H
-#define __OSBORNE1_H
+/*****************************************************************************
+ *
+ * includes/osborne1.h
+ *
+ ****************************************************************************/
+
+#ifndef OSBORNE1_H_
+#define OSBORNE1_H_
+
 
 /*----------- defined in machine/osborne1.c -----------*/
 
@@ -19,4 +26,5 @@ DEVICE_LOAD( osborne1_floppy );
 DRIVER_INIT( osborne1 );
 MACHINE_RESET( osborne1 );
 
-#endif
+
+#endif /* OSBORNE1_H_ */

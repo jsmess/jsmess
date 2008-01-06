@@ -1,3 +1,17 @@
+/*****************************************************************************
+ *
+ * includes/amstr_pc.h
+ *
+ ****************************************************************************/
+
+#ifndef AMSTR_PC_H_
+#define AMSTR_PC_H_
+
+
+#define PC200_MODE (input_port_1_r(0)&0x30)
+#define PC200_MDA 0x30
+
+
 /*----------- defined in machine/amstr_pc.c -----------*/
 
 READ8_HANDLER( pc1640_port60_r );
@@ -22,8 +36,7 @@ READ16_HANDLER( pc1640_16le_port3d0_r );
 READ16_HANDLER( pc1640_16le_port4278_r );
 READ16_HANDLER( pc1640_16le_port278_r );
 
-
-#define PC200_MODE (input_port_1_r(0)&0x30)
-#define PC200_MDA 0x30
-
 INPUT_PORTS_EXTERN( amstrad_keyboard );
+
+
+#endif /* AMSTR_PC_H_ */

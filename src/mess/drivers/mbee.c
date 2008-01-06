@@ -23,7 +23,7 @@
         F800-FFFF PCG RAM (graphics), Colour RAM (banked)
 
     Microbee 32 came in three versions:
-    	IE: features a terminal emulator mapped at $E000
+        IE: features a terminal emulator mapped at $E000
             (maybe there is a keyword to activate it?)
 
         PC: features an editor/assembler - type EDASM to run
@@ -38,14 +38,12 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "video/generic.h"
 #include "machine/wd17xx.h"
 #include "includes/mbee.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
-#include "inputx.h"
 #include "mslegacy.h"
 #include "cpu/z80/z80daisy.h"
 
@@ -375,7 +373,7 @@ SYSTEM_CONFIG_START(mbee)
 	CONFIG_DEVICE(z80bin_quickload_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT      CONFIG	COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
 COMP( 1982, mbee,     0,	0,	mbee,     mbee,     0,        mbee,		"Applied Technology",  "Microbee 32 IC" , 0)
 COMP( 1982, mbeepc,   mbee,	0,	mbee,     mbee,     0,        mbee,		"Applied Technology",  "Microbee 32 PC" , 0)
 COMP( 1985?,mbeepc85, mbee,	0,	mbee,     mbee,     0,        mbee,		"Applied Technology",  "Microbee 32 PC85" , 0)

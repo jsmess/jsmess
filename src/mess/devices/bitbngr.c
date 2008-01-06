@@ -7,12 +7,11 @@
 *********************************************************************/
 
 #include <math.h>
-#include <assert.h>
-#include <stdlib.h>
-#include "mame.h"
+
+#include "driver.h"
 #include "devices/bitbngr.h"
 #include "devices/printer.h"
-#include "mess.h"
+
 
 static TIMER_CALLBACK(bitbanger_overthreshhold);
 

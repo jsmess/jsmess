@@ -19,7 +19,6 @@
 #include "machine/pic8259.h"
 #include "machine/pc_turbo.h"
 
-#include "video/generic.h"
 #include "video/pc_vga.h"
 #include "video/pc_cga.h"
 #include "video/pc_aga.h"

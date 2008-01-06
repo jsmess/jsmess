@@ -10,10 +10,10 @@
 
 #include "driver.h"
 #include "image.h"
-#include "video/generic.h"
+#include "sound/custom.h"
 #include "includes/channelf.h"
 #include "devices/cartslot.h"
-#include "sound/custom.h"
+
 
 #ifndef VERBOSE
 #define VERBOSE 0

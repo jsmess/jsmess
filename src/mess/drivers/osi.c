@@ -1,6 +1,4 @@
 #include "driver.h"
-#include "video/generic.h"
-#include "inputx.h"
 #include "machine/mc6850.h"
 #include "sound/discrete.h"
 
@@ -284,6 +282,6 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-//    YEAR	NAME	  PARENT	COMPAT MACHINE INPUT INIT	  CONFIG   COMPANY			  FULLNAME
+//    YEAR  NAME      PARENT    COMPAT MACHINE INPUT INIT     CONFIG   COMPANY            FULLNAME
 COMP( 1978, sb2m600b, 0,        0, sb2m600, sb2m600, sb2m600, sb2m600, "Ohio Scientific", "Superboard II Model 600 (Rev. B)" , 0)
 COMP( 1979,	uk101,    sb2m600b, 0, uk101,   uk101,   sb2m600, sb2m600, "Compukit",        "UK101" , 0)

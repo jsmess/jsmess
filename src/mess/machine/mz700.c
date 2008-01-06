@@ -9,9 +9,19 @@
  *
  *****************************************************************************/
 
+/* Core includes */
+#include "driver.h"
 #include "includes/mz700.h"
-#include "devices/cassette.h"
+
+/* Components */
+#include "cpu/z80/z80.h"
+#include "machine/pit8253.h"
+#include "machine/8255ppi.h"
 #include "sound/beep.h"
+
+/* Devices */
+#include "devices/cassette.h"
+
 
 #ifndef VERBOSE
 #define VERBOSE 0

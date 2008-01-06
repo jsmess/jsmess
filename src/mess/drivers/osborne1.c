@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Osborne-1 driver file
+    Osborne-1 driver file
 
 The Osborne-1 memory is divided into 3 "banks".
 
@@ -36,7 +36,6 @@ TODO:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "inputx.h"
 #include "devices/basicdsk.h"
 #include "cpu/z80/z80daisy.h"
 #include "includes/osborne1.h"

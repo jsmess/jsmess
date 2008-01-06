@@ -1,4 +1,14 @@
+/*****************************************************************************
+ *
+ * includes/atom.h
+ *
+ ****************************************************************************/
+
+#ifndef ATOM_H_
+#define ATOM_H_
+
 #include "devices/snapquik.h"
+
 
 /*----------- defined in machine/atom.c -----------*/
 
@@ -23,8 +33,10 @@ void atom_eprom_box_init(void);
 
 MACHINE_RESET( atomeb );
 
+
 /*----------- defined in video/atom.c -----------*/
 
 VIDEO_START( atom );
 
 
+#endif /* ATOM_H_ */

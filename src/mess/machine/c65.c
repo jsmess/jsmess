@@ -5,8 +5,10 @@
      www.funet.fi
  ***************************************************************************/
 
-#include <ctype.h>
 #include "driver.h"
+#include "includes/c65.h"
+#include "includes/c64.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
@@ -15,10 +17,8 @@
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vic4567.h"
-#include "mscommon.h"
+#include "video/vic4567.h"
 
-#include "includes/c65.h"
 
 static int c65_charset_select=0;
 

@@ -4,105 +4,103 @@ Primo driver by Krzysztof Strzecha
 
 What's new:
 -----------
-2005.05.19 -	Primo B-32 and B-48 testdrivers added.
-2005.05.15 -	EPROM+RAM expansion.
-		Support for .pp files improved.
-		Some cleanups.
-2005.05.12 -	Memory fixed for A-48 model what make it fully working.
-		Fixed address of second video memory area.
+2005.05.19 -    Primo B-32 and B-48 testdrivers added.
+2005.05.15 -    EPROM+RAM expansion.
+        Support for .pp files improved.
+        Some cleanups.
+2005.05.12 -    Memory fixed for A-48 model what make it fully working.
+        Fixed address of second video memory area.
 
 To do:
-	1. Disk
-	2. V.24 / tape control
-	3. CDOS autoboot
-	4. Joystick
-	5. Printer
-	6. .PRI format
+    1. Disk
+    2. V.24 / tape control
+    3. CDOS autoboot
+    4. Joystick
+    5. Printer
+    6. .PRI format
 
 Primo variants:
-	A-32 - 16kB RAM + 16KB ROM
-	A-48 - 32kB RAM + 16KB ROM
-	A-64 - 48kB RAM + 16KB ROM
-	B-64 - 48kB RAM + 16KB ROM
+    A-32 - 16kB RAM + 16KB ROM
+    A-48 - 32kB RAM + 16KB ROM
+    A-64 - 48kB RAM + 16KB ROM
+    B-64 - 48kB RAM + 16KB ROM
 
 CPU:
-	U880D (DDR clone of Z80), 2.5Mhz
+    U880D (DDR clone of Z80), 2.5Mhz
 
 Memory map:
-	A-32
-	0000-3fff ROM
-	4000-7fff RAM
-	8000-bfff not mapped
-	c000-ffff not mapped
+    A-32
+    0000-3fff ROM
+    4000-7fff RAM
+    8000-bfff not mapped
+    c000-ffff not mapped
 
-	A-48
-	0000-3fff ROM
-	4000-7fff RAM
-	8000-bfff RAM
-	c000-ffff not mapped
+    A-48
+    0000-3fff ROM
+    4000-7fff RAM
+    8000-bfff RAM
+    c000-ffff not mapped
 
-	A-64, B-64
-	0000-3fff ROM
-	4000-7fff RAM
-	8000-bfff RAM
-	c000-ffff RAM
+    A-64, B-64
+    0000-3fff ROM
+    4000-7fff RAM
+    8000-bfff RAM
+    c000-ffff RAM
 
 I/O Ports:
-	Write:
-	00h-3fh
-		bit 7 - NMI
-				0 - disable
-				1 - enable
-		bit 6 - joystick register shift
-		bit 5 - V.24 (2) / tape control
-		bit 4 - speaker
-		bit 3 - display page
-				0 - secondary
-				1 - primary
-		bit 2 - V.24 (1) / tape control
-		bit 1 - cassette output
-		bit 0 /
-				00 - -110mV
-				01 - 0V
-				10 - 0V
-				11 - 110mV
-	40h-ffh (B models only)
-		bit 7 - not used
-		bit 6 - not used
-		bit 5 - SCLK
-		bit 4 - SDATA
-		bit 3 - not used
-		bit 2 - SRQ
-		bit 1 - ATN
-		bit 0 - not used
-	Read:
-	00h-3fh
-		bit 7 - not used
-		bit 6 - not used
-		bit 5 - VBLANK
-		bit 4 - I4
-		bit 3 - I3
-		bit 2 - cassette input
-		bit 1 - reset
-		bit 0 - keyboard input
-	40h-ffh (B models only)
-		bit 7 - not used
-		bit 6 - not used
-		bit 5 - SCLK
-		bit 4 - SDATA
-		bit 3 - SRQ
-		bit 2 - joystick 2
-		bit 1 - ATN
-		bit 0 - joystick 1
+    Write:
+    00h-3fh
+        bit 7 - NMI
+                0 - disable
+                1 - enable
+        bit 6 - joystick register shift
+        bit 5 - V.24 (2) / tape control
+        bit 4 - speaker
+        bit 3 - display page
+                0 - secondary
+                1 - primary
+        bit 2 - V.24 (1) / tape control
+        bit 1 - cassette output
+        bit 0 /
+                00 - -110mV
+                01 - 0V
+                10 - 0V
+                11 - 110mV
+    40h-ffh (B models only)
+        bit 7 - not used
+        bit 6 - not used
+        bit 5 - SCLK
+        bit 4 - SDATA
+        bit 3 - not used
+        bit 2 - SRQ
+        bit 1 - ATN
+        bit 0 - not used
+    Read:
+    00h-3fh
+        bit 7 - not used
+        bit 6 - not used
+        bit 5 - VBLANK
+        bit 4 - I4
+        bit 3 - I3
+        bit 2 - cassette input
+        bit 1 - reset
+        bit 0 - keyboard input
+    40h-ffh (B models only)
+        bit 7 - not used
+        bit 6 - not used
+        bit 5 - SCLK
+        bit 4 - SDATA
+        bit 3 - SRQ
+        bit 2 - joystick 2
+        bit 1 - ATN
+        bit 0 - joystick 1
 
 Interrupts:
-	NMI - 20ms (50HZ), can be disbled/enabled by I/O write
+    NMI - 20ms (50HZ), can be disbled/enabled by I/O write
 
 *******************************************************************************/
 #include "driver.h"
-#include "inputx.h"
 #include "cpu/z80/z80.h"
-#include "video/generic.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"

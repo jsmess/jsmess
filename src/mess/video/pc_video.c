@@ -6,10 +6,11 @@
 
 *********************************************************************/
 
-#include "video/pc_video.h"
-#include "video/generic.h"
+#include "driver.h"
 #include "state.h"
 #include "memconv.h"
+#include "includes/crtc6845.h"
+#include "video/pc_video.h"
 
 
 

@@ -1,8 +1,14 @@
-/*
+/*****************************************************************************
+ *
+ * includes/x68k.h
+ *
+ * Sharp X68000
+ *
+ ****************************************************************************/
 
-	Sharp X68000 header
+#ifndef X68K_H_
+#define X68K_H_
 
-*/
 
 #define GFX16     0
 #define GFX256    1
@@ -179,6 +185,7 @@ struct x68k_system
 	} mouse;
 };
 
+
 /*----------- defined in video/x68k.c -----------*/
 
 /*
@@ -205,3 +212,6 @@ WRITE16_HANDLER( x68k_tvram_w );
 READ16_HANDLER( x68k_tvram_r );
 VIDEO_UPDATE( x68000 );
 VIDEO_START( x68000 );
+
+
+#endif /* X68K_H_ */

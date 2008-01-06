@@ -14,7 +14,6 @@
 
 #include "driver.h"
 #include "cpu/i86/i186intf.h"
-#include "video/generic.h"
 #include "video/i82720.h"
 #include "machine/8255ppi.h"
 #include "machine/mm58274c.h"
@@ -22,7 +21,7 @@
 #include "includes/compis.h"
 #include "machine/pit8253.h"
 #include "machine/nec765.h"
-#include "includes/msm8251.h"
+#include "machine/msm8251.h"
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
 

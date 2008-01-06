@@ -10,7 +10,6 @@
 
 #include "driver.h"
 #include "video/ppu2c0x.h"
-#include "video/generic.h"
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
 

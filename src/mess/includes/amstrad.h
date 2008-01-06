@@ -1,6 +1,14 @@
-#include "driver.h"
-#include "inputx.h"
+/*****************************************************************************
+ *
+ * includes/amstrad.h
+ *
+ ****************************************************************************/
+
+#ifndef AMSTRAD_H_
+#define AMSTRAD_H_
+
 #include "devices/snapquik.h"
+
 
 //#define AMSTRAD_VIDEO_USE_EVENT_LIST
 #ifdef AMSTRAD_VIDEO_USE_EVENT_LIST
@@ -13,6 +21,7 @@ enum {
 };
 #endif
 
+
 /*----------- defined in drivers/amstrad.c -----------*/
 
 void amstrad_reset_machine(void);
@@ -23,7 +32,6 @@ void amstrad_setUpperRom(void);
 
 void AmstradCPC_SetUpperRom(int);
 void AmstradCPC_PALWrite(int);
-
 
 
 /*----------- defined in machine/amstrad.c -----------*/
@@ -94,3 +102,4 @@ extern PALETTE_INIT( kccomp );
 extern PALETTE_INIT( amstrad_plus );
 
 
+#endif /* AMSTRAD_H_ */

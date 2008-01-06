@@ -3,6 +3,8 @@
 
   provides a centronics printer simulation (sends output to IO_PRINTER)
 */
+
+#include "driver.h"
 #include "includes/centroni.h"
 #include "devices/printer.h"
 

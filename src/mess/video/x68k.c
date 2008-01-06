@@ -26,8 +26,6 @@
 */
 
 #include "driver.h"
-#include "inputx.h"
-#include "render.h"
 #include "includes/x68k.h"
 #include "machine/68901mfp.h"
 

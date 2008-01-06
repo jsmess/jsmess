@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	commodore vic20 home computer
-	PeT mess@utanet.at
+    commodore vic20 home computer
+    PeT mess@utanet.at
 
-	documentation
-	 Marko.Makela@HUT.FI (vic6560)
-	 www.funet.fi
+    documentation
+     Marko.Makela@HUT.FI (vic6560)
+     www.funet.fi
 
 ***************************************************************************/
 
@@ -161,7 +161,7 @@ when problems start with -log and look into error.log file
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"
-#include "includes/vic6560.h"
+#include "video/vic6560.h"
 #include "devices/cartslot.h"
 
 static ADDRESS_MAP_START( vc20_mem , ADDRESS_SPACE_PROGRAM, 8)
@@ -620,7 +620,7 @@ INPUT_PORTS_END
 static PALETTE_INIT( vc20 )
 {
 	palette_set_colors_rgb(machine, 0, vic6560_palette, sizeof(vic6560_palette) / 3);
-/*	memcpy(sys_colortable,colortable,sizeof(colortable)); */
+/*  memcpy(sys_colortable,colortable,sizeof(colortable)); */
 }
 
 #if 0
@@ -679,7 +679,7 @@ ROM_START (vic20i)
 	ROM_LOAD ("325329.04", 0xb000, 0x800, CRC(d37b6335) SHA1(828c965829d21c60e8c2d083caee045c639a270f))
 	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d))
 	ROM_LOAD ("901486.06", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19))
-/*	C2031_ROM (REGION_CPU2) */
+/*  C2031_ROM (REGION_CPU2) */
 ROM_END
 
 ROM_START (vc20)
@@ -835,7 +835,7 @@ SYSTEM_CONFIG_START(vc20i)
 SYSTEM_CONFIG_END
 #endif
 
-/*		YEAR	NAME		PARENT	COMPAT	MACHINE INPUT		INIT	CONFIG     COMPANY 							FULLNAME */
+/*      YEAR    NAME        PARENT  COMPAT  MACHINE INPUT       INIT    CONFIG     COMPANY                          FULLNAME */
 COMP ( 1981,	vic20,		0,		0,		vic20,	vic20,		vic20,	vc20,      "Commodore Business Machines Co.",  "VIC20 (NTSC)", GAME_IMPERFECT_SOUND)
 COMP ( 1981,	vic20i, 	vic20,	0,		vic20i, vic20i, 	vic20i, vc20,      "Commodore Business Machines Co.",  "VIC20 (NTSC), IEEE488 Interface (SYS45065)",   GAME_IMPERFECT_SOUND)
 COMP ( 1981,	vic1001,	vic20,	0,		vic20,	vic1001,	vic20,	vc20,      "Commodore Business Machines Co.",  "VIC1001 (NTSC)", GAME_IMPERFECT_SOUND)

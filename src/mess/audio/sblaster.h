@@ -12,7 +12,9 @@
   additional 16 bit adc ,dac
 */
 
-#include "driver.h"
+#ifndef SBLASTER_H_
+#define SBLASTER_H_
+
 
 /*----------- defined in audio/sblaster.c -----------*/
 
@@ -30,3 +32,6 @@ void soundblaster_reset(void);
 
 //        { SOUND_CUSTOM, &soundblaster_interface },
 //extern struct CustomSound_interface soundblaster_interface;
+
+
+#endif /* SBLASTER_H_ */

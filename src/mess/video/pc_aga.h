@@ -18,7 +18,6 @@
 
 */
 
-#include "driver.h"
 
 extern const gfx_layout europc_cga_charlayout;
 extern const gfx_layout europc_mda_charlayout;

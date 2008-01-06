@@ -7,15 +7,13 @@
 
 ***************************************************************************/
 
-#include <math.h>
-
 #include "driver.h"
-#include "mame.h"
 #include "streams.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-#include "includes/vic6560.h"
+#include "video/vic6560.h"
+
 
 /*
  * assumed model:

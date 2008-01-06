@@ -23,7 +23,7 @@
 #include "machine/wd17xx.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
-#include "includes/6551.h"
+#include "machine/6551.h"
 #include "includes/centroni.h"
 #include "devices/basicdsk.h"
 #include "devices/mfmdisk.h"

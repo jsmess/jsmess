@@ -1,12 +1,17 @@
-#ifndef __MSM8251_HEADER_INCLUDED__
-#define __MSM8251_HEADER_INCLUDED__
+/*****************************************************************************
+ *
+ * machine/msm8251.h
+ *
+ ****************************************************************************/
 
-#include "driver.h"
-#include "serial.h"
+#ifndef MSM8251_H_
+#define MSM8251_H_
+
+#include "includes/serial.h"
+
 
 #define MSM8251_EXPECTING_MODE 0x01
 #define MSM8251_EXPECTING_SYNC_BYTE 0x02
-
 
 #define MSM8251_STATUS_FRAMING_ERROR 0x020
 #define MSM8251_STATUS_OVERRUN_ERROR 0x010
@@ -52,7 +57,7 @@ struct msm8251
 	struct data_form data_form;
 
 	/* contains callback for txrdy, rxrdy and tx empty which connect
-	to host system */
+    to host system */
 	struct msm8251_interface interface;
 
 	/* the serial connection that data is transfered over */
@@ -60,10 +65,11 @@ struct msm8251
 	struct serial_connection connection;
 };
 
-/* reading and writing data register share the same address,
-and reading status and writing control share the same address */
 
 /*----------- defined in machine/msm8251.c -----------*/
+
+/* reading and writing data register share the same address,
+and reading status and writing control share the same address */
 
 /* read data register */
  READ8_HANDLER(msm8251_data_r);
@@ -93,4 +99,5 @@ void msm8251_connect_to_serial_device(mess_image *image);
 
 void msm8251_connect(struct serial_connection *other_connection);
 
-#endif
+
+#endif /* MSM8251_H_ */

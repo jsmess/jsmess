@@ -1,8 +1,12 @@
-#ifndef __C16_H_
-#define __C16_H_
+/*****************************************************************************
+ *
+ * includes/c16.h
+ *
+ ****************************************************************************/
 
-#include "driver.h"
-#include "cbmserb.h"
+#ifndef C16_H_
+#define C16_H_
+
 
 #define JOYSTICK1_PORT (input_port_7_r(0)&0x80)
 #define JOYSTICK2_PORT (input_port_7_r(0)&0x40)
@@ -124,6 +128,7 @@
 #define TYPE_PLUS4 ((input_port_9_r(0)&0xc)==4)
 #define TYPE_364 ((input_port_9_r(0)&0xc)==8)
 
+
 /*----------- defined in machine/c16.c -----------*/
 
 UINT8 c16_m7501_port_read(void);
@@ -170,4 +175,5 @@ extern  READ8_HANDLER(c364_speech_r);
 
 extern void c364_speech_init(void);
 
-#endif
+
+#endif /* C16_H_ */

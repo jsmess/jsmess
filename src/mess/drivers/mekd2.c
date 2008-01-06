@@ -1,33 +1,32 @@
 /******************************************************************************
-	Motorola Evaluation Kit 6800 D2
-	MEK6800D2
+    Motorola Evaluation Kit 6800 D2
+    MEK6800D2
 
-	system driver
+    system driver
 
-	Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
+    Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
 
-	memory map
+    memory map
 
-	range		short	description
-	0000-00ff	RAM 	256 bytes RAM
-	0100-01ff	RAM 	optional 256 bytes RAM
-	6000-63ff	PROM	optional PROM
-	or
-	6000-67ff	ROM 	optional ROM
-	8004-8007	PIA
-	8008		ACIA	cassette interface
-	8020-8023	PIA 	keyboard interface
-	a000-a07f	RAM 	128 bytes RAM (JBUG scratch)
-	c000-c3ff	PROM	optional PROM
-	or
-	c000-c7ff	ROM 	optional ROM
-	e000-e3ff	ROM 	JBUG monitor program
-	e400-ffff	-/- 	not used
+    range       short   description
+    0000-00ff   RAM     256 bytes RAM
+    0100-01ff   RAM     optional 256 bytes RAM
+    6000-63ff   PROM    optional PROM
+    or
+    6000-67ff   ROM     optional ROM
+    8004-8007   PIA
+    8008        ACIA    cassette interface
+    8020-8023   PIA     keyboard interface
+    a000-a07f   RAM     128 bytes RAM (JBUG scratch)
+    c000-c3ff   PROM    optional PROM
+    or
+    c000-c7ff   ROM     optional ROM
+    e000-e3ff   ROM     JBUG monitor program
+    e400-ffff   -/-     not used
 
 ******************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "devices/cartslot.h"
 #include "includes/mekd2.h"
 
@@ -87,13 +86,13 @@ static WRITE8_HANDLER(mekd2_kbd_w)
 
 static ADDRESS_MAP_START( mekd2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-//	AM_RANGE(0x0100, 0x01ff) AM_RAM						/* optional, set up in mekd2_init_machine */
-//	AM_RANGE(0x6000, 0x67ff) AM_ROM						/* -"- */
-//	AM_RANGE(0x8004, 0x8007) AM_READWRITE(mekd2_pia_r, mekd2_pia_w)
-//	AM_RANGE(0x8008, 0x8008) AM_READWRITE(mekd2_cas_r, mekd2_cas_w)
+//  AM_RANGE(0x0100, 0x01ff) AM_RAM                     /* optional, set up in mekd2_init_machine */
+//  AM_RANGE(0x6000, 0x67ff) AM_ROM                     /* -"- */
+//  AM_RANGE(0x8004, 0x8007) AM_READWRITE(mekd2_pia_r, mekd2_pia_w)
+//  AM_RANGE(0x8008, 0x8008) AM_READWRITE(mekd2_cas_r, mekd2_cas_w)
 	AM_RANGE(0x8020, 0x8023) AM_WRITE(mekd2_kbd_w)		/* mekd2_kbd_r */
 	AM_RANGE(0xa000, 0xa07f) AM_RAM
-//	AM_RANGE(0xc000, 0xc7ff) AM_RAM						/* optional, set up in mekd2_init_machine */
+//  AM_RANGE(0xc000, 0xc7ff) AM_RAM                     /* optional, set up in mekd2_init_machine */
 	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)	/* JBUG ROM */
 ADDRESS_MAP_END
 
@@ -209,5 +208,5 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*	  YEAR	NAME	PARENT	COMPAT	MACHINE   INPUT 	INIT	CONFIG	COMPANY		FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY     FULLNAME */
 CONS( 1977, mekd2,	0,		0,		mekd2,	  mekd2,	mekd2,	mekd2,	"Motorola",	"MEK6800D2" , 0)

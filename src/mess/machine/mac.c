@@ -41,7 +41,6 @@
 #include "state.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
-#include "video/generic.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"

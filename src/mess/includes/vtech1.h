@@ -1,8 +1,13 @@
+/*****************************************************************************
+ *
+ * includes/vtech1.h
+ *
+ ****************************************************************************/
+
+#ifndef VTECH1_H_
+#define VTECH1_H_
+
 #include "devices/snapquik.h"
-
-/*----------- defined in machine/vtech1.c -----------*/
-
-extern int vtech1_latch;
 
 
 #define VTECH1_CLK       (3579500)
@@ -12,26 +17,16 @@ extern int vtech1_latch;
 #define VZ_MCODE 0xf1
 
 
-/******************************************************************************
- Machine Initialisations
-******************************************************************************/
+/*----------- defined in machine/vtech1.c -----------*/
+
+extern int vtech1_latch;
 
 MACHINE_START( laser110 );
 MACHINE_START( laser210 );
 MACHINE_START( laser310 );
 
-
-/******************************************************************************
- Devices
-******************************************************************************/
-
 DEVICE_LOAD( vtech1_floppy );
 SNAPSHOT_LOAD( vtech1 );
-
-
-/******************************************************************************
- Read/Write Handlers
-******************************************************************************/
 
 READ8_HANDLER ( vtech1_printer_r );
 WRITE8_HANDLER( vtech1_printer_w );
@@ -48,9 +43,8 @@ WRITE8_HANDLER( vtech1_memory_bank_w );
 
 /*----------- defined in video/vtech1.c -----------*/
 
-/******************************************************************************
- Video
-******************************************************************************/
-
 VIDEO_START( vtech1_monochrome );
 VIDEO_START( vtech1 );
+
+
+#endif /* VTECH1_H_ */

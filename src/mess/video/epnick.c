@@ -1,16 +1,24 @@
-/* NICK GRAPHICS CHIP */
-/* (found in Enterprise) */
-/* this is a display list graphics chip, with bitmap,
-character and attribute graphics modes. Each entry in the
-display list defines a char line, with variable number of
-scanlines. Colour modes are 2,4, 16 and 256 colour.
-Nick has 256 colours, 3 bits for R and G, with 2 bits for Blue.
-It's a nice and flexible graphics processor..........
- */
+/*****************************************************************************
+ *
+ * video/epnick.c
+ *
+ * Nick Graphics Chip - found in Enterprise
+ * 
+ * this is a display list graphics chip, with bitmap,
+ * character and attribute graphics modes. Each entry in the
+ * display list defines a char line, with variable number of
+ * scanlines. Colour modes are 2,4, 16 and 256 colour.
+ * Nick has 256 colours, 3 bits for R and G, with 2 bits for Blue.
+ * It's a nice and flexible graphics processor..........
+ * 
+ ****************************************************************************/
 
-#include "nick.h"
+#include "driver.h"
 #include "epnick.h"
+
+/* TODO: Remove dependency on this */
 #include "mslegacy.h"
+
 
 /*************************************************************/
 /* MESS stuff */
@@ -907,19 +915,19 @@ int	Nick_reg_r(int RegIndex)
 }
 #endif
 
-void	Nick_reg_w(int RegIndex, int Data)
+WRITE8_HANDLER( Nick_reg_w )
 {
-	//mame_printf_info("Nick write %02x %02x\r\n",RegIndex, Data);
+	//mame_printf_info("Nick write %02x %02x\r\n",offset, data);
 
   /* write to a nick register */
-  Nick.Reg[RegIndex & 0x0f] = Data;
+  Nick.Reg[offset & 0x0f] = data;
 
-  if ((RegIndex == 0x03) || (RegIndex == 0x02))
+  if ((offset == 0x03) || (offset == 0x02))
   {
     /* write LPH */
 
     /* reload LPT base? */
-//    if (NICK_RELOAD_LPT(Data))
+//    if (NICK_RELOAD_LPT(data))
     {
       /* reload LPT base pointer */
       Nick.LPL = Nick.Reg[2];
@@ -929,14 +937,14 @@ void	Nick_reg_w(int RegIndex, int Data)
     }
   }
 
-  if (RegIndex == 0x01)
+  if (offset == 0x01)
   {
-	Nick.BORDER = Data;
+	Nick.BORDER = data;
   }
 
-  if (RegIndex == 0x00)
+  if (offset == 0x00)
   {
-	Nick.FIXBIAS = Data;
+	Nick.FIXBIAS = data;
   }
 }
 

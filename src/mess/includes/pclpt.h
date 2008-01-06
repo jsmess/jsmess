@@ -1,18 +1,24 @@
-#ifndef __PC_LPT_H_
-#define __PC_LPT_H_
+/*****************************************************************************
+ *
+ * includes/pclpt.h
+ *
+ ****************************************************************************/
 
-#include "driver.h"
+#ifndef PCLPT_H_
+#define PCLPT_H_
+
 #include "includes/centroni.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 /*----------- defined in machine/pclpt.c -----------*/
 
 typedef enum {
 	LPT_UNIDIRECTIONAL
-//	, LPT_BIDIRECTIONAL
+//  , LPT_BIDIRECTIONAL
 // epp, ecp
 } LPT_TYPE;
 
@@ -52,9 +58,9 @@ WRITE32_HANDLER( pc32le_parallelport0_w );
 WRITE32_HANDLER( pc32le_parallelport1_w );
 WRITE32_HANDLER( pc32le_parallelport2_w );
 
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif
-
+#endif /* PCLPT_H_ */

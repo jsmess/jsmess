@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ * includes/astrocde.h
+ *
+ ****************************************************************************/
+
+#ifndef ASTROCDE_H_
+#define ASTROCDE_H_
+
+
 /*----------- defined in machine/astrocde.c -----------*/
 
 DEVICE_LOAD(astrocade_rom);
@@ -29,3 +39,6 @@ WRITE8_HANDLER ( astrocade_colour_block_w );
 WRITE8_HANDLER ( astrocade_colour_split_w );
 
 void astrocade_copy_line(int line);
+
+
+#endif /* ASTROCDE_H_ */

@@ -9,15 +9,20 @@
 
 *******************************************************************************/
 
-#include <stdarg.h>
+/* Core includes */
 #include "driver.h"
+#include "includes/primo.h"
+
+/* Components */
 #include "cpu/z80/z80.h"
+#include "includes/cbmserb.h"
+#include "sound/speaker.h"
+
+/* Devices */
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
-#include "includes/cbmserb.h"
-#include "includes/primo.h"
-#include "sound/speaker.h"
+
 
 static UINT8 primo_port_FD = 0x00;
 static int primo_nmi = 0;

@@ -4,10 +4,12 @@
   started as some ttl's, is now available on several multi io chips
 */
 
-#include "mame.h"
+
+#include "driver.h"
+#include "memconv.h"
 #include "includes/pclpt.h"
 #include "includes/centroni.h"
-#include "memconv.h"
+
 
 #define LOG(LEVEL,N,M,A)  \
 if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A;

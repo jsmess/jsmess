@@ -1,17 +1,17 @@
 /***************************************************************************
-	commodore c16 home computer
+    commodore c16 home computer
 
-	PeT mess@utanet.at
+    PeT mess@utanet.at
 
-	documentation
-	 www.funet.fi
+    documentation
+     www.funet.fi
 
 ***************************************************************************/
 
 /*
 ------------------------------------
 c16 commodore c16/c116/c232/c264 (pal version)
-plus4	commodore plus4 (ntsc version)
+plus4   commodore plus4 (ntsc version)
 c364 commodore c364/v364 prototype (ntsc version)
 ------------------------------------
 (beta version)
@@ -162,9 +162,8 @@ when problems start with -log and look into error.log file
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"
-#include "includes/ted7360.h"
+#include "video/ted7360.h"
 #include "devices/cartslot.h"
-#include "inputx.h"
 #include "mslegacy.h"
 
 /*
@@ -175,7 +174,7 @@ when problems start with -log and look into error.log file
  *
  * ports 0xfd00 till 0xff3f are always read/writeable for the cpu
  * for the video interface chip it seams to read from
- * ram or from rom in this	area
+ * ram or from rom in this  area
  *
  * writes go always to ram
  * only 16 KByte Ram mapped to 0x4000,0x8000,0xc000
@@ -216,7 +215,7 @@ static ADDRESS_MAP_START( c16_readmem , ADDRESS_SPACE_PROGRAM, 8)
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READ( ted7360_port_r)
 	AM_RANGE(0xff20, 0xffff) AM_READ( MRA8_BANK8)
-/*	{ 0x10000, 0x3ffff, MRA8_ROM }, */
+/*  { 0x10000, 0x3ffff, MRA8_ROM }, */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c16_writemem , ADDRESS_SPACE_PROGRAM, 8)
@@ -246,7 +245,7 @@ static ADDRESS_MAP_START( c16_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE( c16_switch_to_ram)
 #if 0
 	AM_RANGE(0xff40, 0xffff) AM_WRITE( c16_write_ff40)  /*configure in c16_common_init */
-//	{0x10000, 0x3ffff, MWA8_ROM},
+//  {0x10000, 0x3ffff, MWA8_ROM},
 #endif
 ADDRESS_MAP_END
 
@@ -265,7 +264,7 @@ static ADDRESS_MAP_START( plus4_readmem , ADDRESS_SPACE_PROGRAM, 8)
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READ( ted7360_port_r)
 	AM_RANGE(0xff20, 0xffff) AM_READ( MRA8_BANK8)
-/*	{ 0x10000, 0x3ffff, MRA8_ROM }, */
+/*  { 0x10000, 0x3ffff, MRA8_ROM }, */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( plus4_writemem , ADDRESS_SPACE_PROGRAM, 8)
@@ -286,7 +285,7 @@ static ADDRESS_MAP_START( plus4_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE( c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE( c16_switch_to_ram)
 	AM_RANGE(0xff40, 0xffff) AM_WRITE( MWA8_RAM)
-//	{0x10000, 0x3ffff, MWA8_ROM},
+//  {0x10000, 0x3ffff, MWA8_ROM},
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c364_readmem , ADDRESS_SPACE_PROGRAM, 8)
@@ -305,7 +304,7 @@ static ADDRESS_MAP_START( c364_readmem , ADDRESS_SPACE_PROGRAM, 8)
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READ( ted7360_port_r)
 	AM_RANGE(0xff20, 0xffff) AM_READ( MRA8_BANK8)
-/*	{ 0x10000, 0x3ffff, MRA8_ROM }, */
+/*  { 0x10000, 0x3ffff, MRA8_ROM }, */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c364_writemem , ADDRESS_SPACE_PROGRAM, 8)
@@ -327,7 +326,7 @@ static ADDRESS_MAP_START( c364_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE( c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE( c16_switch_to_ram)
 	AM_RANGE(0xff40, 0xffff) AM_WRITE( MWA8_RAM)
-//	{0x10000, 0x3ffff, MWA8_ROM},
+//  {0x10000, 0x3ffff, MWA8_ROM},
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ports_both )
@@ -579,13 +578,13 @@ static INPUT_PORTS_START (c364)
 	PORT_BIT (0x10, 0x10, IPT_UNUSED)		   /* ntsc */
 	PORT_BIT (0xc, 0x8, IPT_UNUSED) 	   /* 364 */
 	 /* numeric block
-		hardware wired to other keys?
-		@ + - =
-		7 8 9 *
-		4 5 6 /
-		1 2 3
-		? ? ? ?
-		( 0 , . Return ???) */
+        hardware wired to other keys?
+        @ + - =
+        7 8 9 *
+        4 5 6 /
+        1 2 3
+        ? ? ? ?
+        ( 0 , . Return ???) */
 INPUT_PORTS_END
 #endif
 
@@ -615,7 +614,7 @@ static PALETTE_INIT( c16 )
 	 ROM_LOAD ("317054.01", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693))
 
 	 /* same as 109de2fc, but saved from running machine, so
-		io area different ! */
+        io area different ! */
 	 ROM_LOAD ("3plus1hi.rom", 0x1c000, 0x4000, CRC(aab61387))
 	 /* same but lo and hi in one rom */
 	 ROM_LOAD ("3plus1.rom", 0x18000, 0x8000, CRC(7d464449))
@@ -882,7 +881,7 @@ SYSTEM_CONFIG_START(plusv)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-/*		YEAR	NAME	PARENT	COMPAT	MACHINE INPUT	INIT	CONFIG   COMPANY 								FULLNAME */
+/*      YEAR    NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG   COMPANY                                FULLNAME */
 COMP ( 1984,	c16,	0,		0,		c16,	c16,	c16,	c16,     "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL)", 0)
 COMP ( 1984,	c16hun, c16,	0,		c16,	c16,	c16,	c16,     "Commodore Business Machines Co.",      "Commodore 16 Novotrade (PAL, Hungarian Character Set)", 0)
 COMP ( 1984,	c16c,	c16,	0,		c16c,	c16c,	c16,	c16c,    "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL), 1551", GAME_NOT_WORKING)

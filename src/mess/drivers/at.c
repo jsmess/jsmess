@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	IBM AT Compatibles
+    IBM AT Compatibles
 
 ***************************************************************************/
 
@@ -10,7 +10,6 @@
 #include "machine/uart8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
-#include "video/generic.h"
 #include "devices/printer.h"
 
 #include "machine/pit8253.h"
@@ -26,7 +25,7 @@
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "includes/pclpt.h"
-#include "includes/sblaster.h"
+#include "audio/sblaster.h"
 #include "includes/pc_mouse.h"
 
 #include "includes/at.h"
@@ -724,7 +723,7 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*	   YEAR		NAME		PARENT	COMPAT	MACHINE     INPUT	    INIT	    CONFIG   COMPANY	 FULLNAME */
+/*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
 COMP ( 1985,	ibmat,		0,		ibmpc,	atcga,		atcga,		atcga,	    ibmat,   "International Business Machines",  "IBM PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1988,	i8530286,	ibmat,	0,		ps2m30286,	atvga,		ps2m30286,	ibmat,   "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
 COMP ( 1987,	at,			ibmat,	0,		atcga,      atcga,		atcga,	    ibmat,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )

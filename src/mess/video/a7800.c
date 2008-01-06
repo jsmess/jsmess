@@ -21,7 +21,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "cpu/m6502/m6502.h"
 
 #include "includes/a7800.h"

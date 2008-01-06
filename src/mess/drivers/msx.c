@@ -6,7 +6,6 @@
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "machine/8255ppi.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"
@@ -1315,7 +1314,7 @@ MSX_LAYOUT_INIT (fs4500)
 	MSX_LAYOUT_SLOT (3, 1, 3, 1, ROM, 0x4000, 0x50000)
 	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 	MSX_LAYOUT_KANJI (0x54000)
-/*	MSX_LAYOUT_BUNSETSU (0x74000) */ /* Matsushita Bunsetsu Henkan ROM must be emulated */
+/*  MSX_LAYOUT_BUNSETSU (0x74000) */ /* Matsushita Bunsetsu Henkan ROM must be emulated */
 MSX_LAYOUT_END
 
 ROM_START (fs4700)
@@ -1349,7 +1348,7 @@ MSX_LAYOUT_INIT (fs4700)
 	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 	MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM2, 0x4000, 0xc000)
 	MSX_LAYOUT_KANJI (0x54000)
-/*	MSX_LAYOUT_BUNSETSU (0x74000) */ /* Matsushita Bunsetsu Henkan ROM must be emulated */
+/*  MSX_LAYOUT_BUNSETSU (0x74000) */ /* Matsushita Bunsetsu Henkan ROM must be emulated */
 MSX_LAYOUT_END
 
 ROM_START (fs5000)
@@ -1405,7 +1404,7 @@ MSX_LAYOUT_INIT (fs4600)
 	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x20000, 0x0000)   /* 128KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM2, 0x4000, 0xc000)
 	MSX_LAYOUT_KANJI (0x30000)
-/*	MSX_LAYOUT_KANJI_12 (0x50000) */ /* Matsushita 12 dots Kanji ROM must be emulated */
+/*  MSX_LAYOUT_KANJI_12 (0x50000) */ /* Matsushita 12 dots Kanji ROM must be emulated */
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
 MSX_LAYOUT_END
 
@@ -1487,7 +1486,7 @@ MSX_LAYOUT_INIT (fsa1f)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x20000)
-/*	MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
 	MSX_LAYOUT_SLOT (3, 3, 1, 2, ROM, 0x8000, 0x28000)
 	MSX_LAYOUT_KANJI (0x30000)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
@@ -1511,11 +1510,11 @@ MSX_LAYOUT_INIT (fsa1fm)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
-/*	MSX_LAYOUT_SLOT (3, 1, 1, 2, MODEM_ROM, 0x20000, 0x20000) */ /* Modem Mapper of FS-CM1/A1FM must be emulated */
-/*	MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
-/*	MSX_LAYOUT_SLOT (3, 3, 0, 4, FSA1FM_ROM, 0x100000, 0x80000) */ /* Panasonic FS-A1FM Mapper must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 1, 1, 2, MODEM_ROM, 0x20000, 0x20000) */ /* Modem Mapper of FS-CM1/A1FM must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 3, 0, 4, FSA1FM_ROM, 0x100000, 0x80000) */ /* Panasonic FS-A1FM Mapper must be emulated */
 	MSX_LAYOUT_KANJI (0x40000)
-/*	MSX_LAYOUT_KANJI_12 (0x60000) */ /* Matsushita 12 dots Kanji ROM must be emulated */
+/*  MSX_LAYOUT_KANJI_12 (0x60000) */ /* Matsushita 12 dots Kanji ROM must be emulated */
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
 MSX_LAYOUT_END
 
@@ -1846,7 +1845,7 @@ MSX_LAYOUT_INIT (hbg900p)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (0, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (0, 1, 1, 2, DISK_ROM, 0x4000, 0xc000)
-/*	MSX_LAYOUT_SLOT (0, 2, 1, 1, ROM, 0x4000, 0x20000) */ /* RS232C must be emulated */
+/*  MSX_LAYOUT_SLOT (0, 2, 1, 1, ROM, 0x4000, 0x20000) */ /* RS232C must be emulated */
 	MSX_LAYOUT_SLOT (0, 3, 1, 1, ROM, 0x4000, 0x24000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
@@ -1894,7 +1893,7 @@ MSX_LAYOUT_INIT (fsa1fx)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x20000)
-/*	MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
 	MSX_LAYOUT_SLOT (3, 3, 1, 2, ROM, 0x8000, 0x28000)
 	MSX_LAYOUT_KANJI (0x30000)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
@@ -1921,8 +1920,8 @@ MSX_LAYOUT_INIT (fsa1wx)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x20000)
-/*	MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
-/*	MSX_LAYOUT_SLOT (3, 3, 1, 4, PANASONIC08, 0x200000, 0x70000) */ /* Panasonic 08KB Mapper must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 3, 1, 4, PANASONIC08, 0x200000, 0x70000) */ /* Panasonic 08KB Mapper must be emulated */
 	MSX_LAYOUT_KANJI (0x30000)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
 MSX_LAYOUT_END
@@ -1948,8 +1947,8 @@ MSX_LAYOUT_INIT (fsa1wxa)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x20000)
-/*	MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
-/*	MSX_LAYOUT_SLOT (3, 3, 1, 4, PANASONIC08, 0x200000, 0x70000) */ /* Panasonic 08KB Mapper must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 3, 1, 4, PANASONIC08, 0x200000, 0x70000) */ /* Panasonic 08KB Mapper must be emulated */
 	MSX_LAYOUT_KANJI (0x30000)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
 MSX_LAYOUT_END
@@ -1975,8 +1974,8 @@ MSX_LAYOUT_INIT (fsa1wsx)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x20000)
-/*	MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
-/*	MSX_LAYOUT_SLOT (3, 3, 1, 4, PANASONIC08, 0x200000, 0x70000) */ /* Panasonic 08KB Mapper must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 3, 1, 4, PANASONIC08, 0x200000, 0x70000) */ /* Panasonic 08KB Mapper must be emulated */
 	MSX_LAYOUT_KANJI (0x30000)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
 MSX_LAYOUT_END
@@ -1996,7 +1995,7 @@ ROM_END
 
 MSX_LAYOUT_INIT (hbf1xdj)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-/*	MSX_LAYOUT_SLOT (0, 3, 1, 4, SONY08, 0x100000, 0x70000) */ /* Sony 08KB MSX-JE Mapper must be emulated */
+/*  MSX_LAYOUT_SLOT (0, 3, 1, 4, SONY08, 0x100000, 0x70000) */ /* Sony 08KB MSX-JE Mapper must be emulated */
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
@@ -2023,7 +2022,7 @@ ROM_END
 
 MSX_LAYOUT_INIT (hbf1xv)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-/*	MSX_LAYOUT_SLOT (0, 3, 1, 4, SONY08, 0x100000, 0x70000) */ /* Sony 08KB MSX-JE Mapper must be emulated */
+/*  MSX_LAYOUT_SLOT (0, 3, 1, 4, SONY08, 0x100000, 0x70000) */ /* Sony 08KB MSX-JE Mapper must be emulated */
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
@@ -2055,7 +2054,7 @@ MSX_LAYOUT_INIT (phc70fd)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x20000)
-/*	MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
 	MSX_LAYOUT_SLOT (3, 3, 1, 1, ROM, 0x4000, 0x28000)
 	MSX_LAYOUT_SLOT (3, 3, 2, 1, ROM, 0x4000, 0x2c000)
 	MSX_LAYOUT_KANJI (0x30000)
@@ -2082,7 +2081,7 @@ MSX_LAYOUT_INIT (phc70fd2)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x20000)
-/*	MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
+/*  MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0xc000) */ /* FDC Emulation of TC8566AF must be emulated */
 	MSX_LAYOUT_SLOT (3, 3, 1, 1, ROM, 0x4000, 0x28000)
 	MSX_LAYOUT_SLOT (3, 3, 2, 1, ROM, 0x4000, 0x2c000)
 	MSX_LAYOUT_KANJI (0x30000)
@@ -2274,7 +2273,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (vg8020)
 MSX_DRIVER_END
 
-/*	  YEAR	NAME	  PARENT	COMPAT	MACHINE  INPUT	   INIT   CONFIG  COMPANY			   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     INIT   CONFIG  COMPANY              FULLNAME */
 COMP( 1983,	msx,	  0,		0,		msx_pal, msx,	   msx,		msx,	"ASCII & Microsoft", "MSX" , 0)
 COMP( 1983, hb75d,	  msx,		0,		msx_pal, msx,      msx,		msx,	"Sony", "HB-75D (Germany)" , 0)
 COMP( 1983, hb75p,	  msx,		0,		msx_pal, msx,      msx,		msx,	"Sony", "HB-75P" , 0)

@@ -13,6 +13,7 @@
 
 ***************************************************************************/
 
+#include "driver.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
 #include "cpu/m6502/m6502.h"
@@ -20,7 +21,8 @@
 #include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "devices/appldriv.h"
-#include "includes/6551.h"
+#include "machine/6551.h"
+
 
 UINT32 a3;
 

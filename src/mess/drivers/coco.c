@@ -1,23 +1,22 @@
 /***************************************************************************
 
-	coco.c
+    coco.c
 
-	TRS-80 Radio Shack Color Computer Family
+    TRS-80 Radio Shack Color Computer Family
 
-	Mathis Rosenhauer (original driver)
-	Nate Woods (current maintainer)
-	Tim Lindner (VHD and other work)
+    Mathis Rosenhauer (original driver)
+    Nate Woods (current maintainer)
+    Tim Lindner (VHD and other work)
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 #include "machine/6821pia.h"
 #include "video/m6847.h"
 #include "machine/6883sam.h"
 #include "includes/coco.h"
 #include "devices/basicdsk.h"
-#include "includes/6551.h"
+#include "machine/6551.h"
 #include "formats/coco_dsk.h"
 #include "formats/coco_cas.h"
 #include "devices/printer.h"
@@ -121,10 +120,10 @@ static ADDRESS_MAP_START( d64_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /*
-	Dragon 64 with compusense Plus addon, this provided an extra 64K of memory
-	and an 80x25 column text display, provided by a motorola 6845.
+    Dragon 64 with compusense Plus addon, this provided an extra 64K of memory
+    and an 80x25 column text display, provided by a motorola 6845.
 
-	Currently only the memory is emulated.
+    Currently only the memory is emulated.
 */
 
 static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -157,51 +156,51 @@ static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /*
-	The Dragon Alpha was a prototype in development when Dragon Data went bust,
-	it is basically an enhanced Dragon 64, with built in modem, disk system, and
-	graphical boot rom.
+    The Dragon Alpha was a prototype in development when Dragon Data went bust,
+    it is basically an enhanced Dragon 64, with built in modem, disk system, and
+    graphical boot rom.
 
-	It has the following extra hardware :-
-	A third 6821 PIA mapped between FF24 and FF27
-		An AY-8912, connected to the PIA.
+    It has the following extra hardware :-
+    A third 6821 PIA mapped between FF24 and FF27
+        An AY-8912, connected to the PIA.
 
-	Port A of the PIA is connected as follows :-
+    Port A of the PIA is connected as follows :-
 
-		b0	BDIR of AY8912
-		b1	BC1 of AY8912
-		b2 	Rom select, High= boot rom, low=BASIC rom
-		b3..7 not used.
+        b0  BDIR of AY8912
+        b1  BC1 of AY8912
+        b2  Rom select, High= boot rom, low=BASIC rom
+        b3..7 not used.
 
-	Port B
-		b0..7 connected to D0..7 of the AY8912.
+    Port B
+        b0..7 connected to D0..7 of the AY8912.
 
-	CB1 DRQ of WD2797.
+    CB1 DRQ of WD2797.
 
-	/irqa
-	/irqb	both connected to 6809 FIRQ.
+    /irqa
+    /irqb   both connected to 6809 FIRQ.
 
 
-	The analog outputs of the AY-8912 are connected to the standard sound multiplexer.
-	The AY8912 output port is used as follows :-
+    The analog outputs of the AY-8912 are connected to the standard sound multiplexer.
+    The AY8912 output port is used as follows :-
 
-		b0..b3	/DS0../DS3 for the drive interface (through an inverter first).
-		b4		/motor for the drive interface (through an inverter first).
-		b5..b7	not used as far as I can tell.
+        b0..b3  /DS0../DS3 for the drive interface (through an inverter first).
+        b4      /motor for the drive interface (through an inverter first).
+        b5..b7  not used as far as I can tell.
 
-	A 6850 for the modem.
+    A 6850 for the modem.
 
-	A WD2797, used as an internal disk interface, this is however connected in a slightly strange
-	way that I am yet to completely determine.
-	19/10/2004, WD2797 is mapped between FF2C and FF2F, however the order of the registers is
-	reversed so the command Register is at the highest address instead of the lowest. The Data
-	request pin is connected to CB1(pin 18) of PIA2, to cause an firq, the INTRQ, is connected via
-	an inverter to the 6809's NMI.
+    A WD2797, used as an internal disk interface, this is however connected in a slightly strange
+    way that I am yet to completely determine.
+    19/10/2004, WD2797 is mapped between FF2C and FF2F, however the order of the registers is
+    reversed so the command Register is at the highest address instead of the lowest. The Data
+    request pin is connected to CB1(pin 18) of PIA2, to cause an firq, the INTRQ, is connected via
+    an inverter to the 6809's NMI.
 
-	All these are as yet un-emulated.
+    All these are as yet un-emulated.
 
-	29-Oct-2004, AY-8912 is now emulated.
-	30-Oct-2004, Internal disk interface now emulated, Normal DragonDos rom replaced with a re-assembled
-				version, that talks to the alpha hardware (verified on a clone of the real machine).
+    29-Oct-2004, AY-8912 is now emulated.
+    30-Oct-2004, Internal disk interface now emulated, Normal DragonDos rom replaced with a re-assembled
+                version, that talks to the alpha hardware (verified on a clone of the real machine).
 */
 
 
@@ -273,7 +272,7 @@ INPUT_PORTS_END
 
 /* Dragon keyboard
 
-	   PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+       PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
   PA6: Ent Clr Brk N/c N/c N/c N/c Shift
   PA5: X   Y   Z   Up  Dwn Lft Rgt Space
   PA4: P   Q   R   S   T   U   V   W
@@ -360,7 +359,7 @@ INPUT_PORTS_END
 
 /* CoCo keyboard
 
-	   PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+       PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
   PA6: Ent Clr Brk N/c N/c N/c N/c Shift
   PA5: 8   9   :   ;   ,   -   .   /
   PA4: 0   1   2   3   4   5   6   7
@@ -452,7 +451,7 @@ INPUT_PORTS_END
 
 /* CoCo 3 keyboard
 
-	   PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+       PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
   PA6: Ent Clr Brk Alt Ctr F1  F2 Shift
   PA5: 8   9   :   ;   ,   -   .   /
   PA4: 0   1   2   3   4   5   6   7
@@ -927,7 +926,7 @@ static const struct bitbanger_config coco_bitbanger_config =
 
 /*************************************
  *
- *	CoCo device getinfo functions
+ *  CoCo device getinfo functions
  *
  *************************************/
 
@@ -1071,7 +1070,7 @@ static void coco3_snapshot_getinfo(const device_class *devclass, UINT32 state, u
 
 /*************************************
 *
-*	Dragon only devices
+*   Dragon only devices
 *
 **************************************/
 
@@ -1091,7 +1090,7 @@ static void dragon_printer_getinfo(const device_class *devclass, UINT32 state, u
 
 /*************************************
  *
- *	CoCo sysconfig structures
+ *  CoCo sysconfig structures
  *
  *************************************/
 
@@ -1184,7 +1183,7 @@ SYSTEM_CONFIG_START(dgnalpha)
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
-/*     YEAR		NAME		PARENT	COMPAT	MACHINE    INPUT		INIT     CONFIG	COMPANY					FULLNAME */
+/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT        INIT     CONFIG COMPANY                 FULLNAME */
 COMP(  1980,	coco,		0,		0,		coco,		coco,		0,		coco,		"Tandy Radio Shack",	"Color Computer" , 0)
 COMP(  1981,	cocoe,		coco,	0,		coco,		coco,		0,		cocoe,		"Tandy Radio Shack",	"Color Computer (Extended BASIC 1.0)" , 0)
 COMP(  1983,	coco2,		coco,	0,		coco2,		coco,		0,		coco2,		"Tandy Radio Shack",	"Color Computer 2" , 0)

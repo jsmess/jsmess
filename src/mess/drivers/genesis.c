@@ -50,10 +50,8 @@ MESS adaptation by R. Belmont
 
 #include "driver.h"
 #include "sound/2612intf.h"
-#include "video/generic.h"
 #include "includes/genesis.h"
 #include "devices/cartslot.h"
-#include "inputx.h"
 #include "../../mame/drivers/megadriv.h"
 
 static int is_ssf2 = 0;
@@ -337,7 +335,7 @@ static DRIVER_INIT( genjpn )
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     INIT	CONFIG	 COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     INIT   CONFIG   COMPANY   FULLNAME */
 CONS( 1989, genesis,  0,		0,	megadriv,  megadri6, genusa,	genesis, "Sega",   "Genesis (USA, NTSC)", 0)
 CONS( 1990, megadriv, genesis,	0,	megadriv,  megadri6, geneur,	genesis, "Sega",   "Mega Drive (Europe, PAL)", 0)
 CONS( 1988, megadrij, genesis,	0,	megadriv,  megadri6, genjpn,	genesis, "Sega",   "Mega Drive (Japan, NTSC)", 0)

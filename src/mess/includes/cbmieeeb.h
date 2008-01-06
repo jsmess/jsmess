@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ * includes/cbmieeeb.h
+ *
+ ****************************************************************************/
+
+#ifndef CBMIEEEB_H_
+#define CBMIEEEB_H_
+
+
 /*----------- defined in machine/cbmieeeb.c -----------*/
 
 void cbm_ieee_open(void);
@@ -18,4 +28,7 @@ int cbm_ieee_eoi_r(void);
 int cbm_ieee_data_r(void);
 
 /* for debugging  */
- READ8_HANDLER(cbm_ieee_state);
+READ8_HANDLER(cbm_ieee_state);
+
+
+#endif /* CBMIEEEB_H_ */

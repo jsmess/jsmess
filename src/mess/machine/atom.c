@@ -14,17 +14,20 @@
 
 ***********************************************************************/
 
+
 #include "driver.h"
 #include "machine/8255ppi.h"
 #include "video/m6847.h"
-#include "includes/atom.h"
-#include "includes/i8271.h"
+#include "machine/i8271.h"
 #include "machine/6522via.h"
 #include "devices/basicdsk.h"
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
+#include "devices/snapquik.h"
+#include "includes/atom.h"
 #include "sound/speaker.h"
+
 
 UINT8 atom_8255_porta;
 static UINT8 atom_8255_portb;

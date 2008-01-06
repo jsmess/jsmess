@@ -3,129 +3,128 @@
 // Written by Barry Rodewald
 
 /*
-	*** Basic memory map
+    *** Basic memory map
 
-	0x000000 - 0xbfffff     RAM (Max 12MB), vector table from ROM at 0xff0000 maps to 0x000000 at reset only
-	0xc00000 - 0xdfffff     Graphic VRAM
-	0xe00000 - 0xe1ffff     Text VRAM Plane 1
-	0xe20000 - 0xe3ffff     Text VRAM Plane 2
-	0xe40000 - 0xe5ffff     Text VRAM Plane 3
-	0xe60000 - 0xe7ffff     Text VRAM Plane 4
-	0xe80000                CRTC
-	0xe82000                Video Controller
-	0xe84000                DMA Controller
-	0xe86000                Supervisor Area set
-	0xe88000                MFP
-	0xe8a000                RTC
-	0xe8c000                Printer
-	0xe8e000                System Port (?)
-	0xe90000                FM Sound source
-	0xe92000                ADPCM
-	0xe94000                FDC
-	0xe96000                HDC
-	0xe96021                SCSI (internal model)
-	0xe98000                SCC
-	0xe9a000                Serial I/O (PPI)
-	0xe9c000				I/O controller
+    0x000000 - 0xbfffff     RAM (Max 12MB), vector table from ROM at 0xff0000 maps to 0x000000 at reset only
+    0xc00000 - 0xdfffff     Graphic VRAM
+    0xe00000 - 0xe1ffff     Text VRAM Plane 1
+    0xe20000 - 0xe3ffff     Text VRAM Plane 2
+    0xe40000 - 0xe5ffff     Text VRAM Plane 3
+    0xe60000 - 0xe7ffff     Text VRAM Plane 4
+    0xe80000                CRTC
+    0xe82000                Video Controller
+    0xe84000                DMA Controller
+    0xe86000                Supervisor Area set
+    0xe88000                MFP
+    0xe8a000                RTC
+    0xe8c000                Printer
+    0xe8e000                System Port (?)
+    0xe90000                FM Sound source
+    0xe92000                ADPCM
+    0xe94000                FDC
+    0xe96000                HDC
+    0xe96021                SCSI (internal model)
+    0xe98000                SCC
+    0xe9a000                Serial I/O (PPI)
+    0xe9c000                I/O controller
 
-	[Expansions]
-	0xe9c000 / 0xe9e000     FPU (Optional, X68000 only)
-	0xea0000                SCSI
-	0xeaf900                FAX
-	0xeafa00 / 0xeafa10     MIDI (1st/2nd)
-	0xeafb00                Serial
-	0xeafc00/10/20/30       EIA232E
-	0xeafd00                EIA232E
-	0xeafe00                GPIB (?)
-	0xec0000 - 0xecffff     User I/O Expansion
+    [Expansions]
+    0xe9c000 / 0xe9e000     FPU (Optional, X68000 only)
+    0xea0000                SCSI
+    0xeaf900                FAX
+    0xeafa00 / 0xeafa10     MIDI (1st/2nd)
+    0xeafb00                Serial
+    0xeafc00/10/20/30       EIA232E
+    0xeafd00                EIA232E
+    0xeafe00                GPIB (?)
+    0xec0000 - 0xecffff     User I/O Expansion
 
-	0xeb0000 - 0xeb7fff     Sprite registers
-	0xeb8000 - 0xebffff     Sprite VRAM
-	0xed0000 - 0xed3fff     SRAM
-	0xf00000 - 0xfb0000     ROM  (CGROM.DAT)
-	0xfe0000 - 0xffffff     ROM  (IPLROM.DAT)
+    0xeb0000 - 0xeb7fff     Sprite registers
+    0xeb8000 - 0xebffff     Sprite VRAM
+    0xed0000 - 0xed3fff     SRAM
+    0xf00000 - 0xfb0000     ROM  (CGROM.DAT)
+    0xfe0000 - 0xffffff     ROM  (IPLROM.DAT)
 
 
-	*** System hardware
+    *** System hardware
 
-	CPU : X68000: 68000 at 10MHz
-	      X68000 XVI: 68000 at 16MHz
-		  X68030: 68EC030 at 25MHz
+    CPU : X68000: 68000 at 10MHz
+          X68000 XVI: 68000 at 16MHz
+          X68030: 68EC030 at 25MHz
 
     RAM : between 1MB and 4MB stock, expandable to 12MB
 
-	FDD : 2x 5.25", Compact models use 2x 3.5" drives.
+    FDD : 2x 5.25", Compact models use 2x 3.5" drives.
     FDC : NEC uPD72065  (hopefully backwards compatible enough for the existing uPD765A core :))
 
-	HDD : HD models have up to an 81MB HDD.
-	HDC : Fujitsu MB89352A (SCSI)
+    HDD : HD models have up to an 81MB HDD.
+    HDC : Fujitsu MB89352A (SCSI)
 
-	SCC : Serial controller - Zilog z85C30  (Dual channel, 1 for RS232, 1 for mouse)
-	PPI : Parallel controller  - NEC 8255   (Printer, Joystick)
+    SCC : Serial controller - Zilog z85C30  (Dual channel, 1 for RS232, 1 for mouse)
+    PPI : Parallel controller  - NEC 8255   (Printer, Joystick)
 
-	Sound : FM    - YM2151, with YM3012 DAC
-	        ADPCM - Okidata MSM6258
+    Sound : FM    - YM2151, with YM3012 DAC
+            ADPCM - Okidata MSM6258
 
-	DMA : Hitachi HD63450, DMA I/O for FDD, HDD, Expansion slots, and ADPCM
+    DMA : Hitachi HD63450, DMA I/O for FDD, HDD, Expansion slots, and ADPCM
 
-	MFP : Motorola MC68901 - monitor sync, serial port, RTC, soft power, FM synth, IRQs, keyboard
+    MFP : Motorola MC68901 - monitor sync, serial port, RTC, soft power, FM synth, IRQs, keyboard
 
-	RTC : Ricoh RP5C15
+    RTC : Ricoh RP5C15
 
-	...plus a number of custom chips for video and other stuff...
+    ...plus a number of custom chips for video and other stuff...
 
 
-	*** Current status (12/08/07)
-	FDC/FDD : Uses the uPD765A code with a small patch to handle Sense Interrupt Status being invalid if not in seek mode
-	          Extra uPD72065 commands not yet implemented, although I have yet to see them used.
+    *** Current status (12/08/07)
+    FDC/FDD : Uses the uPD765A code with a small patch to handle Sense Interrupt Status being invalid if not in seek mode
+              Extra uPD72065 commands not yet implemented, although I have yet to see them used.
 
     MFP : Largely works, as far as the X68000 goes.  Timers appear to work fine.
-	      Keyboard scancodes (via the MFP's USART) work, but there are some issues with in-game use.
+          Keyboard scancodes (via the MFP's USART) work, but there are some issues with in-game use.
 
     PPI : Joystick controls work okay.
 
-	HDC/HDD : SASI and SCSI are not implemented, not a requirement at this point.
+    HDC/HDD : SASI and SCSI are not implemented, not a requirement at this point.
 
-	RTC : Seems to work. (Tested using SX-Windows' Timer application)
+    RTC : Seems to work. (Tested using SX-Windows' Timer application)
 
-	DMA : FDD reading mostly works, other channels should work for effective memory copying (channel 2, often
-	      used to copy data to video RAM or the palette in the background).
+    DMA : FDD reading mostly works, other channels should work for effective memory copying (channel 2, often
+          used to copy data to video RAM or the palette in the background).
 
-	Sound : FM works, ADPCM is unimplemented as yet.
+    Sound : FM works, ADPCM is unimplemented as yet.
 
-	SCC : Works enough to get the mouse running
+    SCC : Works enough to get the mouse running
 
-	Video : Text mode works, but is rather slow, especially scrolling up (uses multple "raster copy" commands).
-	        16 and 256 graphic layers work, but colours on a 65,536 colour layer are wrong.
-			BG tiles and sprites work, but many games have the sprites offset by a small amount (some by a lot :))
+    Video : Text mode works, but is rather slow, especially scrolling up (uses multple "raster copy" commands).
+            16 and 256 graphic layers work, but colours on a 65,536 colour layer are wrong.
+            BG tiles and sprites work, but many games have the sprites offset by a small amount (some by a lot :))
 
-	Other issues:
-	  Bus error exceptions are a bit late at times.  Currently using a fake bus error for MIDI expansion checks.  These
-	  are used determine if a piece of expansion hardware is present.
-	  Partial updates don't work at all well, and can be excruciatingly slow.
-	  Keyboard doesn't work well for games.
-	  Supervisor area set isn't implemented.
+    Other issues:
+      Bus error exceptions are a bit late at times.  Currently using a fake bus error for MIDI expansion checks.  These
+      are used determine if a piece of expansion hardware is present.
+      Partial updates don't work at all well, and can be excruciatingly slow.
+      Keyboard doesn't work well for games.
+      Supervisor area set isn't implemented.
 
     Some minor game-specific issues (at 19/06/07):
-	  Pacmania:      Black squares on the maze (transparency?).
-	  Nemesis '94:   Menu system doesn't work except for start buttons.
-	  Flying Shark:  Appears to lock up at main menu.
-	  Salamander:    System error when using keys in-game.  No error if a joystick is used.
-	  Kyukyoku Tiger:Sprites offset by a looooong way.
-	  Dragon Buster: Text is black and unreadable (text palette should be loaded from disk, but it reads all zeroes).
-	  Baraduke:      Corrupt background, locks up on demo mode.
-	  Viewpoint:     Corrupt graphics on title screen, phantom movements on title screen, corrupt sprites, locks up.
-	  Mr. Do:        Locks up or resets after some time.  Happens on Mr Do vs. Unicorns, as well.
-	  Tetris:        Black dots over screen (text layer).
-	  Parodius Da!:  Water isn't animated (beginning of stage 1), black squares (raster effects?)
+      Pacmania:      Black squares on the maze (transparency?).
+      Nemesis '94:   Menu system doesn't work except for start buttons.
+      Flying Shark:  Appears to lock up at main menu.
+      Salamander:    System error when using keys in-game.  No error if a joystick is used.
+      Kyukyoku Tiger:Sprites offset by a looooong way.
+      Dragon Buster: Text is black and unreadable (text palette should be loaded from disk, but it reads all zeroes).
+      Baraduke:      Corrupt background, locks up on demo mode.
+      Viewpoint:     Corrupt graphics on title screen, phantom movements on title screen, corrupt sprites, locks up.
+      Mr. Do:        Locks up or resets after some time.  Happens on Mr Do vs. Unicorns, as well.
+      Tetris:        Black dots over screen (text layer).
+      Parodius Da!:  Water isn't animated (beginning of stage 1), black squares (raster effects?)
 
 
-	More detailed documentation at http://x68kdev.emuvibes.com/iomap.html - if you can stand broken english :)
+    More detailed documentation at http://x68kdev.emuvibes.com/iomap.html - if you can stand broken english :)
 
 */
 
 #include "driver.h"
-#include "inputx.h"
 #include "render.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
@@ -179,19 +178,19 @@ static emu_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
 // No longer necessary with the new MFP core
 /*static attotime prescale(int val)
 {
-	switch(val)
-	{
-		case 0:	return ATTOTIME_IN_NSEC(0);
-		case 1:	return ATTOTIME_IN_NSEC(1000);
-		case 2:	return ATTOTIME_IN_NSEC(2500);
-		case 3:	return ATTOTIME_IN_NSEC(4000);
-		case 4:	return ATTOTIME_IN_NSEC(12500);
-		case 5:	return ATTOTIME_IN_NSEC(16000);
-		case 6:	return ATTOTIME_IN_NSEC(25000);
-		case 7:	return ATTOTIME_IN_NSEC(50000);
-		default:
-			fatalerror("out of range");
-	}
+    switch(val)
+    {
+        case 0: return ATTOTIME_IN_NSEC(0);
+        case 1: return ATTOTIME_IN_NSEC(1000);
+        case 2: return ATTOTIME_IN_NSEC(2500);
+        case 3: return ATTOTIME_IN_NSEC(4000);
+        case 4: return ATTOTIME_IN_NSEC(12500);
+        case 5: return ATTOTIME_IN_NSEC(16000);
+        case 6: return ATTOTIME_IN_NSEC(25000);
+        case 7: return ATTOTIME_IN_NSEC(50000);
+        default:
+            fatalerror("out of range");
+    }
 }*/
 
 static void mfp_init(void);
@@ -204,139 +203,139 @@ static void mfp_init()
 	sys.mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
 	sys.mfp.current_irq = -1;  // No current interrupt
 
-/*	mfp_timer[0] = timer_alloc(mfp_timer_a_callback, NULL);
-	mfp_timer[1] = timer_alloc(mfp_timer_b_callback, NULL);
-	mfp_timer[2] = timer_alloc(mfp_timer_c_callback, NULL);
-	mfp_timer[3] = timer_alloc(mfp_timer_d_callback, NULL);
-	mfp_irq = timer_alloc(mfp_update_irq, NULL);
-	timer_adjust(mfp_irq, attotime_zero, 0, ATTOTIME_IN_USEC(32));
+/*  mfp_timer[0] = timer_alloc(mfp_timer_a_callback, NULL);
+    mfp_timer[1] = timer_alloc(mfp_timer_b_callback, NULL);
+    mfp_timer[2] = timer_alloc(mfp_timer_c_callback, NULL);
+    mfp_timer[3] = timer_alloc(mfp_timer_d_callback, NULL);
+    mfp_irq = timer_alloc(mfp_update_irq, NULL);
+    timer_adjust(mfp_irq, attotime_zero, 0, ATTOTIME_IN_USEC(32));
 */
 }
 /*
 TIMER_CALLBACK(mfp_update_irq)
 {
-	int x;
+    int x;
 
-	if((sys.ioc.irqstatus & 0xc0) != 0)
-		return;
+    if((sys.ioc.irqstatus & 0xc0) != 0)
+        return;
 
-	// check for pending IRQs, in priority order
-	if(sys.mfp.ipra != 0)
-	{
-		for(x=7;x>=0;x--)
-		{
-			if((sys.mfp.ipra & (1 << x)) && (sys.mfp.imra & (1 << x)))
-			{
-				current_irq_line = sys.mfp.irqline;
-				sys.mfp.current_irq = x + 8;
-				// assert IRQ line
-//				if(sys.mfp.iera & (1 << x))
-				{
-					current_vector[6] = (sys.mfp.vr & 0xf0) | (x+8);
-					cpunum_set_input_line_and_vector(0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
-//					logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | (x+8),sys.mfp.irqline);
-					return;  // one at a time only
-				}
-			}
-		}
-	}
-	if(sys.mfp.iprb != 0)
-	{
-		for(x=7;x>=0;x--)
-		{
-			if((sys.mfp.iprb & (1 << x)) && (sys.mfp.imrb & (1 << x)))
-			{
-				current_irq_line = sys.mfp.irqline;
-				sys.mfp.current_irq = x;
-				// assert IRQ line
-//				if(sys.mfp.ierb & (1 << x))
-				{
-					current_vector[6] = (sys.mfp.vr & 0xf0) | x;
-					cpunum_set_input_line_and_vector(0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
-//					logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | x,sys.mfp.irqline);
-					return;  // one at a time only
-				}
-			}
-		}
-	}
+    // check for pending IRQs, in priority order
+    if(sys.mfp.ipra != 0)
+    {
+        for(x=7;x>=0;x--)
+        {
+            if((sys.mfp.ipra & (1 << x)) && (sys.mfp.imra & (1 << x)))
+            {
+                current_irq_line = sys.mfp.irqline;
+                sys.mfp.current_irq = x + 8;
+                // assert IRQ line
+//              if(sys.mfp.iera & (1 << x))
+                {
+                    current_vector[6] = (sys.mfp.vr & 0xf0) | (x+8);
+                    cpunum_set_input_line_and_vector(0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
+//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | (x+8),sys.mfp.irqline);
+                    return;  // one at a time only
+                }
+            }
+        }
+    }
+    if(sys.mfp.iprb != 0)
+    {
+        for(x=7;x>=0;x--)
+        {
+            if((sys.mfp.iprb & (1 << x)) && (sys.mfp.imrb & (1 << x)))
+            {
+                current_irq_line = sys.mfp.irqline;
+                sys.mfp.current_irq = x;
+                // assert IRQ line
+//              if(sys.mfp.ierb & (1 << x))
+                {
+                    current_vector[6] = (sys.mfp.vr & 0xf0) | x;
+                    cpunum_set_input_line_and_vector(0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
+//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | x,sys.mfp.irqline);
+                    return;  // one at a time only
+                }
+            }
+        }
+    }
 }
 
 void mfp_trigger_irq(int irq)
 {
-	// check if interrupt is enabled
-	if(irq > 7)
-	{
-		if(!(sys.mfp.iera & (1 << (irq-8))))
-			return;  // not enabled, no action taken
-	}
-	else
-	{
-		if(!(sys.mfp.ierb & (1 << irq)))
-			return;  // not enabled, no action taken
-	}
+    // check if interrupt is enabled
+    if(irq > 7)
+    {
+        if(!(sys.mfp.iera & (1 << (irq-8))))
+            return;  // not enabled, no action taken
+    }
+    else
+    {
+        if(!(sys.mfp.ierb & (1 << irq)))
+            return;  // not enabled, no action taken
+    }
 
-	// set requested IRQ as pending
-	if(irq > 7)
-		sys.mfp.ipra |= (1 << (irq-8));
-	else
-		sys.mfp.iprb |= (1 << irq);
+    // set requested IRQ as pending
+    if(irq > 7)
+        sys.mfp.ipra |= (1 << (irq-8));
+    else
+        sys.mfp.iprb |= (1 << irq);
 
-	// check for IRQs to be called
-//	mfp_update_irq(0);
+    // check for IRQs to be called
+//  mfp_update_irq(0);
 
 }
 
 TIMER_CALLBACK(mfp_timer_a_callback)
 {
-	sys.mfp.timer[0].counter--;
-	if(sys.mfp.timer[0].counter == 0)
-	{
-		sys.mfp.timer[0].counter = sys.mfp.tadr;
-		mfp_trigger_irq(MFP_IRQ_TIMERA);
-	}
+    sys.mfp.timer[0].counter--;
+    if(sys.mfp.timer[0].counter == 0)
+    {
+        sys.mfp.timer[0].counter = sys.mfp.tadr;
+        mfp_trigger_irq(MFP_IRQ_TIMERA);
+    }
 }
 
 TIMER_CALLBACK(mfp_timer_b_callback)
 {
-	sys.mfp.timer[1].counter--;
-	if(sys.mfp.timer[1].counter == 0)
-	{
-		sys.mfp.timer[1].counter = sys.mfp.tbdr;
-			mfp_trigger_irq(MFP_IRQ_TIMERB);
-	}
+    sys.mfp.timer[1].counter--;
+    if(sys.mfp.timer[1].counter == 0)
+    {
+        sys.mfp.timer[1].counter = sys.mfp.tbdr;
+            mfp_trigger_irq(MFP_IRQ_TIMERB);
+    }
 }
 
 TIMER_CALLBACK(mfp_timer_c_callback)
 {
-	sys.mfp.timer[2].counter--;
-	if(sys.mfp.timer[2].counter == 0)
-	{
-		sys.mfp.timer[2].counter = sys.mfp.tcdr;
-			mfp_trigger_irq(MFP_IRQ_TIMERC);
-	}
+    sys.mfp.timer[2].counter--;
+    if(sys.mfp.timer[2].counter == 0)
+    {
+        sys.mfp.timer[2].counter = sys.mfp.tcdr;
+            mfp_trigger_irq(MFP_IRQ_TIMERC);
+    }
 }
 
 TIMER_CALLBACK(mfp_timer_d_callback)
 {
-	sys.mfp.timer[3].counter--;
-	if(sys.mfp.timer[3].counter == 0)
-	{
-		sys.mfp.timer[3].counter = sys.mfp.tddr;
-			mfp_trigger_irq(MFP_IRQ_TIMERD);
-	}
+    sys.mfp.timer[3].counter--;
+    if(sys.mfp.timer[3].counter == 0)
+    {
+        sys.mfp.timer[3].counter = sys.mfp.tddr;
+            mfp_trigger_irq(MFP_IRQ_TIMERD);
+    }
 }
 
 void mfp_set_timer(int timer, unsigned char data)
 {
-	if((data & 0x07) == 0x0000)
-	{  // Timer stop
-		timer_adjust(mfp_timer[timer],attotime_zero,0,attotime_zero);
-		logerror("MFP: Timer #%i stopped. \n",timer);
-		return;
-	}
+    if((data & 0x07) == 0x0000)
+    {  // Timer stop
+        timer_adjust(mfp_timer[timer],attotime_zero,0,attotime_zero);
+        logerror("MFP: Timer #%i stopped. \n",timer);
+        return;
+    }
 
-	timer_adjust(mfp_timer[timer], attotime_zero, 0, prescale(data & 0x07));
-	logerror("MFP: Timer #%i set to %2.1fus\n",timer, attotime_to_double(prescale(data & 0x07)) * 1000000);
+    timer_adjust(mfp_timer[timer], attotime_zero, 0, prescale(data & 0x07));
+    logerror("MFP: Timer #%i set to %2.1fus\n",timer, attotime_to_double(prescale(data & 0x07)) * 1000000);
 
 }
 */
@@ -356,35 +355,35 @@ static void x68k_keyboard_ctrl_w(int data)
 {
 	/* Keyboard control commands:
        00xxxxxx - TV Control
-	              Not of much use as yet
+                  Not of much use as yet
 
-	   01000xxy - y = Mouse control signal
+       01000xxy - y = Mouse control signal
 
-	   01001xxy - y = Keyboard enable
+       01001xxy - y = Keyboard enable
 
-	   010100xy - y = Sharp X1 display compatibility mode
+       010100xy - y = Sharp X1 display compatibility mode
 
-	   010101xx - xx = LED brightness (00 = bright, 11 = dark)
+       010101xx - xx = LED brightness (00 = bright, 11 = dark)
 
-	   010110xy - y = Display control enable
+       010110xy - y = Display control enable
 
-	   010111xy - y = Display control via the Opt. 2 key enable
+       010111xy - y = Display control via the Opt. 2 key enable
 
-	   0110xxxx - xxxx = Key delay (default 500ms)
-	                     100 * (delay time) + 200ms
+       0110xxxx - xxxx = Key delay (default 500ms)
+                         100 * (delay time) + 200ms
 
-	   0111xxxx - xxxx = Key repeat rate  (default 110ms)
-	                     (repeat rate)^2*5 + 30ms
+       0111xxxx - xxxx = Key repeat rate  (default 110ms)
+                         (repeat rate)^2*5 + 30ms
 
-	   1xxxxxxx - xxxxxxx = keyboard LED status
-	              b6 = "full size"
-				  b5 = hiragana
-				  b4 = insert
-				  b3 = caps
-				  b2 = code input
-				  b1 = romaji input
-				  b0 = kana
-	*/
+       1xxxxxxx - xxxxxxx = keyboard LED status
+                  b6 = "full size"
+                  b5 = hiragana
+                  b4 = insert
+                  b3 = caps
+                  b2 = code input
+                  b1 = romaji input
+                  b0 = kana
+    */
 
 	if(data & 0x80)  // LED status
 	{
@@ -442,7 +441,7 @@ static void x68k_keyboard_push_scancode(unsigned char code)
 		if(sys.keyboard.enabled != 0)
 		{
 			sys.mfp.rsr |= 0x80;  // Buffer full
-//			mfp_trigger_irq(MFP_IRQ_RX_FULL);
+//          mfp_trigger_irq(MFP_IRQ_RX_FULL);
 			logerror("MFP: Receive buffer full IRQ sent\n");
 		}
 	}
@@ -450,7 +449,7 @@ static void x68k_keyboard_push_scancode(unsigned char code)
 	if(sys.keyboard.headpos > 15)
 	{
 		sys.keyboard.headpos = 0;
-//		mfp_trigger_irq(MFP_IRQ_RX_ERROR);
+//      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
 	}
 }
 
@@ -509,8 +508,8 @@ void mfp_recv_data(int data)
 	sys.mfp.tsr |= 0x80;
 	sys.mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
 	sys.mfp.vector = current_vector[6] = (sys.mfp.vr & 0xf0) | 0x0c;
-//	mfp_trigger_irq(MFP_IRQ_RX_FULL);
-//	logerror("MFP: Receive buffer full IRQ sent\n");
+//  mfp_trigger_irq(MFP_IRQ_RX_FULL);
+//  logerror("MFP: Receive buffer full IRQ sent\n");
 }
 #endif
 
@@ -553,10 +552,10 @@ static int x68k_read_mouse(void)
 }
 
 /*
-	0xe98001 - Z8530 command port B
-	0xe98003 - Z8530 data port B  (mouse input)
-	0xe98005 - Z8530 command port A
-	0xe98007 - Z8530 data port A  (RS232)
+    0xe98001 - Z8530 command port B
+    0xe98003 - Z8530 data port B  (mouse input)
+    0xe98005 - Z8530 command port A
+    0xe98007 - Z8530 data port A  (RS232)
 */
 static READ16_HANDLER( x68k_scc_r )
 {
@@ -722,7 +721,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:
-//		logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",activecpu_get_pc(),data,offset);
+//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",activecpu_get_pc(),data,offset);
 		break;
 	}
 }
@@ -781,7 +780,7 @@ static int x68k_fdc_read_byte(int addr)
 
 	if(sys.fdc.drq_state != 0)
 		data = nec765_dack_r(0);
-//	logerror("FDC: DACK reading\n");
+//  logerror("FDC: DACK reading\n");
 	return data;
 }
 
@@ -909,7 +908,7 @@ static WRITE16_HANDLER( x68k_sysport_w )
 		sys.sysport.sram_writeprotect = data;
 		break;
 	default:
-//		logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",activecpu_get_pc(),data,offset);
+//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",activecpu_get_pc(),data,offset);
 		break;
 	}
 }
@@ -937,172 +936,172 @@ static READ16_HANDLER( x68k_sysport_r )
 /*
 READ16_HANDLER( x68k_mfp_r )
 {
-	int ret;
-	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
-	// MFP Timer C, and the power switch
-//	logerror("MFP: [%08x] Reading offset %i\n",activecpu_get_pc(),offset);
-	switch(offset)
-	{
-	case 0x00:  // GPIP - General purpose I/O register (read-only)
-		ret = 0x23;
-		if(video_screen_get_vpos(0) == sys.crtc.reg[9])
-			ret |= 0x40;
-		if(sys.crtc.vblank == 0)
-			ret |= 0x10;  // Vsync signal (low if in vertical retrace)
-//		if(sys.mfp.isrb & 0x08)
-//			ret |= 0x08;  // FM IRQ signal
-		if(video_screen_get_hpos(0) > sys.crtc.width - 32)
-			ret |= 0x80;  // Hsync signal
-//		logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",activecpu_get_pc(),offset,ret);
-		return ret;  // bit 5 is always 1
-	case 3:
-		return sys.mfp.iera;
-	case 4:
-		return sys.mfp.ierb;
-	case 5:
-		return sys.mfp.ipra;
-	case 6:
-		return sys.mfp.iprb;
-	case 7:
-		if(sys.mfp.eoi_mode == 0)  // forced low in auto EOI mode
-			return 0;
-		else
-			return sys.mfp.isra;
-	case 8:
-		if(sys.mfp.eoi_mode == 0)  // forced low in auto EOI mode
-			return 0;
-		else
-			return sys.mfp.isrb;
-	case 9:
-		return sys.mfp.imra;
-	case 10:
-		return sys.mfp.imrb;
-	case 15:  // TADR
-		return sys.mfp.timer[0].counter;  // Timer data registers return their main counter values
-	case 16:  // TBDR
-		return sys.mfp.timer[1].counter;
-	case 17:  // TCDR
-		return sys.mfp.timer[2].counter;
-	case 18:  // TDDR
-		return sys.mfp.timer[3].counter;
-	case 21:  // RSR
-		return sys.mfp.rsr;
-	case 22:  // TSR
-		return sys.mfp.tsr | 0x80;  // buffer is typically empty?
-	case 23:
-		return x68k_keyboard_pop_scancode();
-	default:
-//		logerror("MFP: [%08x] Offset %i read\n",activecpu_get_pc(),offset);
-		return 0xff;
-	}
+    int ret;
+    // Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
+    // MFP Timer C, and the power switch
+//  logerror("MFP: [%08x] Reading offset %i\n",activecpu_get_pc(),offset);
+    switch(offset)
+    {
+    case 0x00:  // GPIP - General purpose I/O register (read-only)
+        ret = 0x23;
+        if(video_screen_get_vpos(0) == sys.crtc.reg[9])
+            ret |= 0x40;
+        if(sys.crtc.vblank == 0)
+            ret |= 0x10;  // Vsync signal (low if in vertical retrace)
+//      if(sys.mfp.isrb & 0x08)
+//          ret |= 0x08;  // FM IRQ signal
+        if(video_screen_get_hpos(0) > sys.crtc.width - 32)
+            ret |= 0x80;  // Hsync signal
+//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",activecpu_get_pc(),offset,ret);
+        return ret;  // bit 5 is always 1
+    case 3:
+        return sys.mfp.iera;
+    case 4:
+        return sys.mfp.ierb;
+    case 5:
+        return sys.mfp.ipra;
+    case 6:
+        return sys.mfp.iprb;
+    case 7:
+        if(sys.mfp.eoi_mode == 0)  // forced low in auto EOI mode
+            return 0;
+        else
+            return sys.mfp.isra;
+    case 8:
+        if(sys.mfp.eoi_mode == 0)  // forced low in auto EOI mode
+            return 0;
+        else
+            return sys.mfp.isrb;
+    case 9:
+        return sys.mfp.imra;
+    case 10:
+        return sys.mfp.imrb;
+    case 15:  // TADR
+        return sys.mfp.timer[0].counter;  // Timer data registers return their main counter values
+    case 16:  // TBDR
+        return sys.mfp.timer[1].counter;
+    case 17:  // TCDR
+        return sys.mfp.timer[2].counter;
+    case 18:  // TDDR
+        return sys.mfp.timer[3].counter;
+    case 21:  // RSR
+        return sys.mfp.rsr;
+    case 22:  // TSR
+        return sys.mfp.tsr | 0x80;  // buffer is typically empty?
+    case 23:
+        return x68k_keyboard_pop_scancode();
+    default:
+//      logerror("MFP: [%08x] Offset %i read\n",activecpu_get_pc(),offset);
+        return 0xff;
+    }
 }
 */
 static WRITE16_HANDLER( x68k_mfp_w )
 {
 	/* For the Interrupt registers, the bits are set out as such:
-	   Reg A - bit 7: GPIP7 (HSync)
-	           bit 6: GPIP6 (CRTC CIRQ)
+       Reg A - bit 7: GPIP7 (HSync)
+               bit 6: GPIP6 (CRTC CIRQ)
                bit 5: Timer A
-			   bit 4: Receive buffer full
-			   bit 3: Receive error
-			   bit 2: Transmit buffer empty
-			   bit 1: Transmit error
-			   bit 0: Timer B
+               bit 4: Receive buffer full
+               bit 3: Receive error
+               bit 2: Transmit buffer empty
+               bit 1: Transmit error
+               bit 0: Timer B
        Reg B - bit 7: GPIP5 (Unused, always 1)
-	           bit 6: GPIP4 (VSync)
+               bit 6: GPIP4 (VSync)
                bit 5: Timer C
-			   bit 4: Timer D
-			   bit 3: GPIP3 (FM IRQ)
-			   bit 2: GPIP2 (Power switch)
-			   bit 1: GPIP1 (EXPON)
-			   bit 0: GPIP0 (Alarm)
-	*/
+               bit 4: Timer D
+               bit 3: GPIP3 (FM IRQ)
+               bit 2: GPIP2 (Power switch)
+               bit 1: GPIP1 (EXPON)
+               bit 0: GPIP0 (Alarm)
+    */
 	switch(offset)
 	{
-/*	case 0:  // GPDR
-		// All bits are inputs generally, so no action taken.
-		break;
-	case 1:  // AER
-		sys.mfp.aer = data;
-		break;
-	case 2:  // DDR
-		sys.mfp.ddr = data;  // usually all bits are 0 (input)
-		break;
-	case 3:  // IERA
-		sys.mfp.iera = data;
-		break;
-	case 4:  // IERB
-		sys.mfp.ierb = data;
-		break;
-	case 5:  // IPRA
-		sys.mfp.ipra = data;
-		break;
-	case 6:  // IPRB
-		sys.mfp.iprb = data;
-		break;
-	case 7:
-		sys.mfp.isra = data;
-		break;
-	case 8:
-		sys.mfp.isrb = data;
-		break;
-	case 9:
-		sys.mfp.imra = data;
-//		mfp_update_irq(0);
-//		logerror("MFP: IRQ Mask A write: %02x\n",data);
-		break;
-	case 10:
-		sys.mfp.imrb = data;
-//		mfp_update_irq(0);
-//		logerror("MFP: IRQ Mask B write: %02x\n",data);
-		break;
-	case 11:  // VR
-		sys.mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
-		sys.mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
-		if(sys.mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
-		{
-			sys.mfp.isra = 0;
-			sys.mfp.isrb = 0;
-		}
-		break;
-	case 12:  // TACR
-		sys.mfp.tacr = data;
-		mfp_set_timer(0,data & 0x0f);
-		break;
-	case 13:  // TBCR
-		sys.mfp.tbcr = data;
-		mfp_set_timer(1,data & 0x0f);
-		break;
-	case 14:  // TCDCR
-		sys.mfp.tcdcr = data;
-		mfp_set_timer(2,(data & 0x70)>>4);
-		mfp_set_timer(3,data & 0x07);
-		break;
-	case 15:  // TADR
-		sys.mfp.tadr = data;
-		sys.mfp.timer[0].counter = data;
-		break;
-	case 16:  // TBDR
-		sys.mfp.tbdr = data;
-		sys.mfp.timer[1].counter = data;
-		break;
-	case 17:  // TCDR
-		sys.mfp.tcdr = data;
-		sys.mfp.timer[2].counter = data;
-		break;
-	case 18:  // TDDR
-		sys.mfp.tddr = data;
-		sys.mfp.timer[3].counter = data;
-		break;
-	case 20:
-		sys.mfp.ucr = data;
-		break;
-	case 21:
-		if(data & 0x01)
-			sys.mfp.usart.recv_enable = 1;
-		else
-			sys.mfp.usart.recv_enable = 0;
-		break;*/
+/*  case 0:  // GPDR
+        // All bits are inputs generally, so no action taken.
+        break;
+    case 1:  // AER
+        sys.mfp.aer = data;
+        break;
+    case 2:  // DDR
+        sys.mfp.ddr = data;  // usually all bits are 0 (input)
+        break;
+    case 3:  // IERA
+        sys.mfp.iera = data;
+        break;
+    case 4:  // IERB
+        sys.mfp.ierb = data;
+        break;
+    case 5:  // IPRA
+        sys.mfp.ipra = data;
+        break;
+    case 6:  // IPRB
+        sys.mfp.iprb = data;
+        break;
+    case 7:
+        sys.mfp.isra = data;
+        break;
+    case 8:
+        sys.mfp.isrb = data;
+        break;
+    case 9:
+        sys.mfp.imra = data;
+//      mfp_update_irq(0);
+//      logerror("MFP: IRQ Mask A write: %02x\n",data);
+        break;
+    case 10:
+        sys.mfp.imrb = data;
+//      mfp_update_irq(0);
+//      logerror("MFP: IRQ Mask B write: %02x\n",data);
+        break;
+    case 11:  // VR
+        sys.mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
+        sys.mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
+        if(sys.mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
+        {
+            sys.mfp.isra = 0;
+            sys.mfp.isrb = 0;
+        }
+        break;
+    case 12:  // TACR
+        sys.mfp.tacr = data;
+        mfp_set_timer(0,data & 0x0f);
+        break;
+    case 13:  // TBCR
+        sys.mfp.tbcr = data;
+        mfp_set_timer(1,data & 0x0f);
+        break;
+    case 14:  // TCDCR
+        sys.mfp.tcdcr = data;
+        mfp_set_timer(2,(data & 0x70)>>4);
+        mfp_set_timer(3,data & 0x07);
+        break;
+    case 15:  // TADR
+        sys.mfp.tadr = data;
+        sys.mfp.timer[0].counter = data;
+        break;
+    case 16:  // TBDR
+        sys.mfp.tbdr = data;
+        sys.mfp.timer[1].counter = data;
+        break;
+    case 17:  // TCDR
+        sys.mfp.tcdr = data;
+        sys.mfp.timer[2].counter = data;
+        break;
+    case 18:  // TDDR
+        sys.mfp.tddr = data;
+        sys.mfp.timer[3].counter = data;
+        break;
+    case 20:
+        sys.mfp.ucr = data;
+        break;
+    case 21:
+        if(data & 0x01)
+            sys.mfp.usart.recv_enable = 1;
+        else
+            sys.mfp.usart.recv_enable = 0;
+        break;*/
 	case 22:
 		if(data & 0x01)
 			sys.mfp.usart.send_enable = 1;
@@ -1115,7 +1114,7 @@ static WRITE16_HANDLER( x68k_mfp_w )
 			// Keyboard control command.
 			sys.mfp.usart.send_buffer = data;
 			x68k_keyboard_ctrl_w(data);
-//			logerror("MFP: [%08x] USART Sent data %04x\n",activecpu_get_pc(),data);
+//          logerror("MFP: [%08x] USART Sent data %04x\n",activecpu_get_pc(),data);
 		}
 		break;
 	default:
@@ -1178,11 +1177,11 @@ static READ16_HANDLER( x68k_sram_r )
 	if(offset == 0x08/2)
 		return mess_ram_size >> 16;  // RAM size
 	/*if(offset == 0x46/2)
-		return 0x0024;
-	if(offset == 0x6e/2)
-		return 0xff00;
-	if(offset == 0x70/2)
-		return 0x0700;*/
+        return 0x0024;
+    if(offset == 0x6e/2)
+        return 0xff00;
+    if(offset == 0x70/2)
+        return 0x0700;*/
 	return generic_nvram16[offset];
 }
 
@@ -1309,7 +1308,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 static READ16_HANDLER( x68k_rom0_r )
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
-	   then access causes a bus error */
+       then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
 	cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
@@ -1319,7 +1318,7 @@ static READ16_HANDLER( x68k_rom0_r )
 static WRITE16_HANDLER( x68k_rom0_w )
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
-	   then access causes a bus error */
+       then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
 	cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
@@ -1336,7 +1335,7 @@ static READ16_HANDLER( x68k_exp_r )
 		if(ACCESSING_LSB)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//		cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
+//      cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
 	}
 	return 0xffff;
 }
@@ -1352,7 +1351,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		if(ACCESSING_LSB)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//		cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
+//      cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
 	}
 }
 
@@ -1420,43 +1419,43 @@ static void mfp_irq_callback(int which, int state)
 
 static INTERRUPT_GEN( x68k_vsync_irq )
 {
-//	if(sys.mfp.ierb & 0x40)
-//	{
-//		sys.mfp.isrb |= 0x40;
-//		current_vector[6] = (sys.mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
-//		current_irq_line = 6;
-//	mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
-//	mfp_trigger_irq(MFP_IRQ_GPIP4);
-//	}
-//	if(sys.crtc.height == 256)
-//		video_screen_update_partial(0,256);//sys.crtc.reg[4]/2);
-//	else
-//		video_screen_update_partial(0,512);//sys.crtc.reg[4]);
+//  if(sys.mfp.ierb & 0x40)
+//  {
+//      sys.mfp.isrb |= 0x40;
+//      current_vector[6] = (sys.mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
+//      current_irq_line = 6;
+//  mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
+//  mfp_trigger_irq(MFP_IRQ_GPIP4);
+//  }
+//  if(sys.crtc.height == 256)
+//      video_screen_update_partial(0,256);//sys.crtc.reg[4]/2);
+//  else
+//      video_screen_update_partial(0,512);//sys.crtc.reg[4]);
 }
 
 static int x68k_int_ack(int line)
 {
 	if(line == 6)  // MFP
 	{
-//		if(sys.mfp.isra & 0x10)
-//			sys.mfp.rsr &= ~0x80;
-//		if(sys.mfp.isra & 0x04)
-//			sys.mfp.tsr &= ~0x80;
+//      if(sys.mfp.isra & 0x10)
+//          sys.mfp.rsr &= ~0x80;
+//      if(sys.mfp.isra & 0x04)
+//          sys.mfp.tsr &= ~0x80;
 
-//		if(sys.mfp.current_irq < 8)
-//		{
-//			sys.mfp.iprb &= ~(1 << sys.mfp.current_irq);
+//      if(sys.mfp.current_irq < 8)
+//      {
+//          sys.mfp.iprb &= ~(1 << sys.mfp.current_irq);
 			// IRQ is in service
-//			if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
-//				sys.mfp.isrb |= (1 << sys.mfp.current_irq);
-//		}
-//		else
-//		{
-//			sys.mfp.ipra &= ~(1 << (sys.mfp.current_irq - 8));
+//          if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
+//              sys.mfp.isrb |= (1 << sys.mfp.current_irq);
+//      }
+//      else
+//      {
+//          sys.mfp.ipra &= ~(1 << (sys.mfp.current_irq - 8));
 			// IRQ is in service
-//			if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
-//				sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
-//		}
+//          if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
+//              sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
+//      }
 		sys.mfp.current_irq = -1;
 		current_vector[6] = mfp68901_get_vector(0);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],line);
@@ -1478,10 +1477,10 @@ static int x68k_int_ack(int line)
 }
 
 static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
-//	AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
+//  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
-//	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE(&gvram)
-//	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE(&tvram)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE(&gvram)
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE(&tvram)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK(2)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK(3)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
@@ -1504,7 +1503,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
-//	AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(x68k_sram_r, x68k_sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(x68k_sram_r, x68k_sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM
@@ -1544,8 +1543,8 @@ static const struct hd63450_interface dmac_interface =
 	x68k_dma_error,
 	{ x68k_fdc_read_byte, 0, 0, 0 },
 	{ x68k_fdc_write_byte, 0, 0, 0 }
-//	{ 0, 0, 0, 0 },
-//	{ 0, 0, 0, 0 }
+//  { 0, 0, 0, 0 },
+//  { 0, 0, 0, 0 }
 };
 
 static const nec765_interface fdc_interface =
@@ -1744,14 +1743,14 @@ static void dimdsk_set_geometry(mess_image* image)
 	unsigned short temp;
 
 	/* Offset + 0 : disk format type (1 byte):
-	 * 0 = 2HD / 2HDA (8 sector/track, 1024 bytes/sector, GAP#3 = 0x74)
-	 * 1 = 2HS        (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
-	 * 2 = 2HC        (15 sector/track, 512 bytes/sector, GAP#3 = 0x54)
-	 * 3 = 2HDE(68)   (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
-	 * 9 = 2HQ        (18 sector/track, 512 bytes/sector, GAP#3 = 0x54)
-	 * 17 = N88-BASIC (26 sector/track, 256 bytes/sector, GAP#3 = 0x33)
-	 *             or (26 sector/track, 128 bytes/sector, GAP#3 = 0x1a)
-	 */
+     * 0 = 2HD / 2HDA (8 sector/track, 1024 bytes/sector, GAP#3 = 0x74)
+     * 1 = 2HS        (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
+     * 2 = 2HC        (15 sector/track, 512 bytes/sector, GAP#3 = 0x54)
+     * 3 = 2HDE(68)   (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
+     * 9 = 2HQ        (18 sector/track, 512 bytes/sector, GAP#3 = 0x54)
+     * 17 = N88-BASIC (26 sector/track, 256 bytes/sector, GAP#3 = 0x33)
+     *             or (26 sector/track, 128 bytes/sector, GAP#3 = 0x1a)
+     */
 	image_fread(image,&format,1);
 
 	switch(format)
@@ -1853,8 +1852,8 @@ static void x68k_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 static MACHINE_RESET( x68000 )
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
-	   Just copying the inital stack pointer and program counter should
-	   more or less do the same job */
+       Just copying the inital stack pointer and program counter should
+       more or less do the same job */
 
 	int drive;
 	UINT8* romdata = memory_region(REGION_USER2);
@@ -1990,7 +1989,7 @@ static MACHINE_DRIVER_START( x68000 )
 
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-//	MDRV_GFXDECODE(x68k)
+//  MDRV_GFXDECODE(x68k)
 	MDRV_SCREEN_SIZE(1096, 568)  // inital setting
 	MDRV_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2006,9 +2005,9 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_SOUND_ADD(YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-//	MDRV_SOUND_ADD(OKIM6295, 0)
-//	MDRV_SOUND_CONFIG(oki_interface)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+//  MDRV_SOUND_ADD(OKIM6295, 0)
+//  MDRV_SOUND_CONFIG(oki_interface)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
 MACHINE_DRIVER_END

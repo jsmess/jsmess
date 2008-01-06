@@ -87,7 +87,12 @@
 
 ***************************************************************************/
 
+/* Core includes */
+#include "driver.h"
+#include "memconv.h"
 #include "includes/bebox.h"
+
+/* Components */
 #include "video/pc_vga.h"
 #include "video/cirrus.h"
 #include "cpu/powerpc/ppc.h"
@@ -103,8 +108,10 @@
 #include "machine/intelfsh.h"
 #include "machine/8042kbdc.h"
 #include "machine/53c810.h"
-#include "memconv.h"
+
+/* TODO: Remove dependency on this */
 #include "mslegacy.h"
+
 
 #define LOG_CPUIMASK	1
 #define LOG_UART		1

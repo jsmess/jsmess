@@ -1,47 +1,47 @@
 /******************************************************************************
 
-	Tatung Einstein
-	system driver
+    Tatung Einstein
+    system driver
 
 
-	TMS9129 VDP Graphics
-		16k ram
+    TMS9129 VDP Graphics
+        16k ram
 
-	Z80 CPU (4Mhz)
+    Z80 CPU (4Mhz)
 
-	Z80 CTC (4Mhz)
-		channel 0 is serial transmit clock
-		channel 1 is serial receive clock
-		trigger for channel 0,1 and 2 is a 2mhz clock
-		trigger for channel 3 is the terminal count of channel 2
+    Z80 CTC (4Mhz)
+        channel 0 is serial transmit clock
+        channel 1 is serial receive clock
+        trigger for channel 0,1 and 2 is a 2mhz clock
+        trigger for channel 3 is the terminal count of channel 2
 
-	Intel 8251 Serial (2Mhz clock?)
+    Intel 8251 Serial (2Mhz clock?)
 
-	WD1770 Floppy Disc controller
-		density is fixed, 4 drives and double sided supported
+    WD1770 Floppy Disc controller
+        density is fixed, 4 drives and double sided supported
 
-	AY-3-8910 PSG (2Mhz)
-		port A and port B are connected to the keyboard. Port A is keyboard
-		line select, Port B is data.
+    AY-3-8910 PSG (2Mhz)
+        port A and port B are connected to the keyboard. Port A is keyboard
+        line select, Port B is data.
 
-	printer connected to port A of PIO. /ACK from printer is connected to /ASTB.
-	D7-D0 of PIO port A is printer data lines.
-	ARDY of PIO is connected to /STROBE on printer.
+    printer connected to port A of PIO. /ACK from printer is connected to /ASTB.
+    D7-D0 of PIO port A is printer data lines.
+    ARDY of PIO is connected to /STROBE on printer.
 
-	user port is port B of PIO
-	keyboard connected to port A and port B of PSG
+    user port is port B of PIO
+    keyboard connected to port A and port B of PSG
 
-	TODO:
-	- The ADC is not emulated!
-	- printer emulation needs checking!
+    TODO:
+    - The ADC is not emulated!
+    - printer emulation needs checking!
 
-	Many thanks to Chris Coxall for the schematics of the TC-01, the dump of the
-	system rom and a dump of a Xtal boot disc.
+    Many thanks to Chris Coxall for the schematics of the TC-01, the dump of the
+    system rom and a dump of a Xtal boot disc.
 
-	Many thanks to Andrew Dunipace for his help with the 80-column card
-	and Speculator hardware (Spectrum emulator).
+    Many thanks to Andrew Dunipace for his help with the 80-column card
+    and Speculator hardware (Spectrum emulator).
 
-	Kevin Thacker [MESS driver]
+    Kevin Thacker [MESS driver]
 
 
 
@@ -60,14 +60,14 @@
 
 /* MISC */
 /* 0x20 - bit 0 is keyboard int mask; read to get state of some keys and /fire button states;
-		set to 0 to ENABLE interrupt; 1 to DISABLE interrupt; write to set mask. */
+        set to 0 to ENABLE interrupt; 1 to DISABLE interrupt; write to set mask. */
 /* 0x21 - bit 0 is adc int mask; set to 0 to ENABLE interrupt; 1 to DISABLE interrupt;
-		write to set mask; read has no effect */
+        write to set mask; read has no effect */
 /* 0x22 - alph */
 /* 0x23 - drive select and side select */
 /* 0x24 - rom */
 /* 0x25 - bit 0 is fire int mask; set to 0 to ENABLE interrupt; 1 to DISABLE interrupt;
-		write to set mask; read has no effect */
+        write to set mask; read has no effect */
 /* 0x25 - */
 /* 0x26 - */
 /* 0x27 - */
@@ -87,7 +87,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd17xx.h"
 #include "includes/centroni.h"
-#include "includes/msm8251.h"
+#include "machine/msm8251.h"
 #include "devices/dsk.h"
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
@@ -124,29 +124,29 @@ static void einstein_dump_ram(void)
 
 /**********************************************************/
 /*
-	80 column board has a UM6845,2K ram and a char rom:
+    80 column board has a UM6845,2K ram and a char rom:
 
-	0x040-0x047 used to access 2K ram. (bits 3-0 define a 256 byte row, bits 15-8 define
-				the offset in the row)
- 	0x048 = crtc register index (w),
-	0x049 = crtc data register (w)
+    0x040-0x047 used to access 2K ram. (bits 3-0 define a 256 byte row, bits 15-8 define
+                the offset in the row)
+    0x048 = crtc register index (w),
+    0x049 = crtc data register (w)
 
-	0x04c
-		bit 2 = 50/60hz mode?
-		bit 1 = 1
-		bit 0 = vsync state?
+    0x04c
+        bit 2 = 50/60hz mode?
+        bit 1 = 1
+        bit 0 = vsync state?
 
-	0: 126 (127) horizontal total
-	1: 80 horizontal displayed
-	2: 97 horizontal sync position
-	3: &38
-	4: 26 vertical total
-	5: 19 vertical adjust
-	6: 25 vertical displayed
-	7: 26 vertical sync pos
-	8: 0 no interlace
-	9: 8 (9 scanlines tall)
-	10: 32
+    0: 126 (127) horizontal total
+    1: 80 horizontal displayed
+    2: 97 horizontal sync position
+    3: &38
+    4: 26 vertical total
+    5: 19 vertical adjust
+    6: 25 vertical displayed
+    7: 26 vertical sync pos
+    8: 0 no interlace
+    9: 8 (9 scanlines tall)
+    10: 32
 
   total scanlines: ((reg 9+1) * (reg 4+1))+reg 5 = 262
   127 cycles per line
@@ -160,8 +160,8 @@ static char *einstein_80col_ram = NULL;
 static WRITE8_HANDLER(einstein_80col_ram_w)
 {
 	/* lower 3 bits of address define a 256-byte "row".
-		upper 8 bits define the offset in the row,
-		data bits define data to write */
+        upper 8 bits define the offset in the row,
+        data bits define data to write */
 	einstein_80col_ram[((offset & 0x07)<<8)|((offset>>8) & 0x0ff)] = data;
 }
 
@@ -187,45 +187,45 @@ static int Einstein_scr_y = 0;
 //// called when the 6845 changes the character row
 //static void Einstein_Set_RA(int offset, int data)
 //{
-//	Einstein_6845_RA=data;
+//  Einstein_6845_RA=data;
 //}
 //
 //
 //// called when the 6845 changes the HSync
 //static void Einstein_Set_HSync(int offset, int data)
 //{
-//	Einstein_HSync=data;
-//	if(!Einstein_HSync)
-//	{
-//		Einstein_scr_y++;
-//		Einstein_scr_x = -40;
-//	}
+//  Einstein_HSync=data;
+//  if(!Einstein_HSync)
+//  {
+//      Einstein_scr_y++;
+//      Einstein_scr_x = -40;
+//  }
 //}
 //
 //// called when the 6845 changes the VSync
 //static void Einstein_Set_VSync(int offset, int data)
 //{
-//	Einstein_VSync=data;
-//	if (!Einstein_VSync)
-//	{
-//		Einstein_scr_y = 0;
-//	}
+//  Einstein_VSync=data;
+//  if (!Einstein_VSync)
+//  {
+//      Einstein_scr_y = 0;
+//  }
 //}
 //
 //static void Einstein_Set_DE(int offset, int data)
 //{
-//	Einstein_DE = data;
+//  Einstein_DE = data;
 //}
 
 
 //static struct m6845_interface
 //einstein_m6845_interface= {
-//	0,// Memory Address register
-//	Einstein_Set_RA,// Row Address register
-//	Einstein_Set_HSync,// Horizontal status
-//	Einstein_Set_VSync,// Vertical status
-//	Einstein_Set_DE,// Display Enabled status
-//	0,// Cursor status
+//  0,// Memory Address register
+//  Einstein_Set_RA,// Row Address register
+//  Einstein_Set_HSync,// Horizontal status
+//  Einstein_Set_VSync,// Vertical status
+//  Einstein_Set_DE,// Display Enabled status
+//  0,// Cursor status
 //};
 
 static void einstein_6845_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
@@ -353,20 +353,20 @@ static void einstein_update_interrupts(void)
 {
 	/* NPW 21-Jul-2005 - Not sure how to update this for MAME 0.98u2 */
 /*
-	if (einstein_int & einstein_int_mask & EINSTEIN_KEY_INT)
-		cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
-	else
-		cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
+    if (einstein_int & einstein_int_mask & EINSTEIN_KEY_INT)
+        cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
+    else
+        cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
 
-	if (einstein_int & einstein_int_mask & EINSTEIN_ADC_INT)
-		cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
-	else
-		cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
+    if (einstein_int & einstein_int_mask & EINSTEIN_ADC_INT)
+        cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
+    else
+        cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
 
-	if (einstein_int & einstein_int_mask & EINSTEIN_FIRE_INT)
-		cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
-	else
-		cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
+    if (einstein_int & einstein_int_mask & EINSTEIN_FIRE_INT)
+        cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
+    else
+        cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
 */
 }
 
@@ -528,7 +528,7 @@ static const struct z80_irq_daisy_chain einstein_daisy_chain[] =
     {z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
 	{einstein_adc_int_reset,einstein_adc_interrupt, 0, einstein_adc_reti, 0},
 	{z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0},
-//	{einstein_fire_int_reset,einstein_fire_interrupt, einstein_fire_reti, 0},
+//  {einstein_fire_int_reset,einstein_fire_interrupt, einstein_fire_reti, 0},
     {0,0,0,0,-1}
 };
 
@@ -713,24 +713,24 @@ static  READ8_HANDLER(einstein_serial_r)
 
 /*
 
-	AY-3-8912 PSG:
+    AY-3-8912 PSG:
 
-	NOTE: BC2 is connected to +5v
+    NOTE: BC2 is connected to +5v
 
-	BDIR	BC1		FUNCTION
-	0		0		INACTIVE
-	0		1		READ FROM PSG
-	1		0		WRITE TO PSG
-	1		1		LATCH ADDRESS
+    BDIR    BC1     FUNCTION
+    0       0       INACTIVE
+    0       1       READ FROM PSG
+    1       0       WRITE TO PSG
+    1       1       LATCH ADDRESS
 
-	/PSG select, /WR connected to NOR -> BDIR
+    /PSG select, /WR connected to NOR -> BDIR
 
-	when /PSG=0 and /WR=0, BDIR is 1. (write to psg or latch address)
+    when /PSG=0 and /WR=0, BDIR is 1. (write to psg or latch address)
 
-	/PSG select, A0 connected to NOR -> BC1
-	when A0 = 0, BC1 is 1. when A0 = 1, BC1 is 0.
+    /PSG select, A0 connected to NOR -> BC1
+    when A0 = 0, BC1 is 1. when A0 = 1, BC1 is 0.
 
-	when /PSG = 1, BDIR is 0 and BC1 is 0.
+    when /PSG = 1, BDIR is 0 and BC1 is 0.
 
 
 */
@@ -1328,7 +1328,7 @@ ADDRESS_MAP_START( readport_einstein , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x020, 0x020) AM_READ( einstein_key_int_r)
 	AM_RANGE(0x028, 0x02f) AM_READ( einstein_ctc_r)
 	AM_RANGE(0x030, 0x037) AM_READ( einstein_pio_r)
-//	{0x040, 0x0ff, einstein_unmapped_r},
+//  {0x040, 0x0ff, einstein_unmapped_r},
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( writeport_einstein , ADDRESS_SPACE_IO, 8)
@@ -1341,7 +1341,7 @@ ADDRESS_MAP_START( writeport_einstein , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x024, 0x024) AM_WRITE( einstein_rom_w)
 	AM_RANGE(0x028, 0x02f) AM_WRITE( einstein_ctc_w)
 	AM_RANGE(0x030, 0x037) AM_WRITE( einstein_pio_w)
-//	{0x040, 0x0ff, einstein_unmapped_w},
+//  {0x040, 0x0ff, einstein_unmapped_w},
 ADDRESS_MAP_END
 #endif
 
@@ -1444,7 +1444,7 @@ static MACHINE_RESET( einstein )
 
 	einstein_int=0;
 	/* a reset causes the fire int, adc int, keyboard int mask
-	to be set to 1, which causes all these to be DISABLED */
+    to be set to 1, which causes all these to be DISABLED */
 	einstein_int_mask = 0;
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 
@@ -1452,7 +1452,7 @@ static MACHINE_RESET( einstein )
 
 	/* the einstein keyboard can generate a interrupt */
 	/* the int is actually clocked at the system clock 4Mhz, but this would be too fast for our
-	driver. So we update at 50Hz and hope this is good enough. */
+    driver. So we update at 50Hz and hope this is good enough. */
 	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, einstein_keyboard_timer_callback);
 
 	/* the input to channel 0 and 1 of the ctc is a 2mhz clock */
@@ -1587,7 +1587,7 @@ static WRITE8_HANDLER(einstein_port_a_write)
 {
 	einstein_keyboard_line = data;
 
-//	logerror("line: %02x\n",einstein_keyboard_line);
+//  logerror("line: %02x\n",einstein_keyboard_line);
 
 	/* re-scan the keyboard */
 	einstein_scan_keyboard();
@@ -1597,7 +1597,7 @@ static  READ8_HANDLER(einstein_port_b_read)
 {
 	einstein_scan_keyboard();
 
-//	logerror("key: %02x\n",einstein_keyboard_data);
+//  logerror("key: %02x\n",einstein_keyboard_data);
 
 	return einstein_keyboard_data;
 }
@@ -1611,17 +1611,17 @@ static const struct AY8910interface einstein_ay_interface =
 };
 
 /*
-	0: 126 (127) horizontal total
-	1: 80 horizontal displayed
-	2: 97 horizontal sync position
-	3: &38
-	4: 26 vertical total
-	5: 19 vertical adjust
-	6: 25 vertical displayed
-	7: 26 vertical sync pos
-	8: 0 no interlace
-	9: 8 (9 scanlines tall)
-	10: 32
+    0: 126 (127) horizontal total
+    1: 80 horizontal displayed
+    2: 97 horizontal sync position
+    3: &38
+    4: 26 vertical total
+    5: 19 vertical adjust
+    6: 25 vertical displayed
+    7: 26 vertical sync pos
+    8: 0 no interlace
+    9: 8 (9 scanlines tall)
+    10: 32
 
   total scanlines: ((reg 9+1) * (reg 4+1))+reg 5 = 262
   127 cycles per line
@@ -1630,82 +1630,82 @@ static const struct AY8910interface einstein_ay_interface =
 
 //static void einstein_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
 //{
-//	int w;
-//	if (Einstein_DE)
-//	{
+//  int w;
+//  if (Einstein_DE)
+//  {
 //
-//		unsigned char *data = memory_region(REGION_CPU1)+0x012000;
-//		unsigned char data_byte;
-//		int char_code;
+//      unsigned char *data = memory_region(REGION_CPU1)+0x012000;
+//      unsigned char data_byte;
+//      int char_code;
 //
-//		char_code = einstein_80col_ram[m6845_memory_address_r(0)&0x07ff];
+//      char_code = einstein_80col_ram[m6845_memory_address_r(0)&0x07ff];
 //
-//		data_byte = data[(char_code<<3) + Einstein_6845_RA];
+//      data_byte = data[(char_code<<3) + Einstein_6845_RA];
 //
-//		for (w=0; w<8;w++)
-//		{
-//			*BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
+//      for (w=0; w<8;w++)
+//      {
+//          *BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
 //
-//			data_byte = data_byte<<1;
+//          data_byte = data_byte<<1;
 //
-//		}
-//	}
-//	else
-//	{
-//		for (w=0; w<8;w++)
-//			*BITMAP_ADDR16(bitmap, y, x+w) = 0;
-//	}
+//      }
+//  }
+//  else
+//  {
+//      for (w=0; w<8;w++)
+//          *BITMAP_ADDR16(bitmap, y, x+w) = 0;
+//  }
 //
 //}
 //
 //static VIDEO_UPDATE( einstein_80col )
 //{
-//	long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
+//  long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
 //
-//	c=0;
+//  c=0;
 //
-//	// loop until the end of the Vertical Sync pulse
-//	while((Einstein_VSync)&&(c<33274))
-//	{
-//		// Clock the 6845
-//		m6845_clock();
-//		c++;
-//	}
+//  // loop until the end of the Vertical Sync pulse
+//  while((Einstein_VSync)&&(c<33274))
+//  {
+//      // Clock the 6845
+//      m6845_clock();
+//      c++;
+//  }
 //
-//	// loop until the Vertical Sync pulse goes high
-//	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
-//	while((!Einstein_VSync)&&(c<33274))
-//	{
-//		while ((Einstein_HSync)&&(c<33274))
-//		{
-//			m6845_clock();
-//			c++;
-//		}
-//		// Do all the clever split mode changes in here before the next while loop
+//  // loop until the Vertical Sync pulse goes high
+//  // or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
+//  while((!Einstein_VSync)&&(c<33274))
+//  {
+//      while ((Einstein_HSync)&&(c<33274))
+//      {
+//          m6845_clock();
+//          c++;
+//      }
+//      // Do all the clever split mode changes in here before the next while loop
 //
-//		while ((!Einstein_HSync)&&(c<33274))
-//		{
-//			// check that we are on the emulated screen area.
-//			if ((Einstein_scr_x>=0) && (Einstein_scr_x<640) && (Einstein_scr_y>=0) && (Einstein_scr_y<400))
-//			{
-//				einstein_80col_plot_char_line(Einstein_scr_x, Einstein_scr_y, bitmap);
-//			}
+//      while ((!Einstein_HSync)&&(c<33274))
+//      {
+//          // check that we are on the emulated screen area.
+//          if ((Einstein_scr_x>=0) && (Einstein_scr_x<640) && (Einstein_scr_y>=0) && (Einstein_scr_y<400))
+//          {
+//              einstein_80col_plot_char_line(Einstein_scr_x, Einstein_scr_y, bitmap);
+//          }
 //
-//			Einstein_scr_x+=8;
+//          Einstein_scr_x+=8;
 //
-//			// Clock the 6845
-//			m6845_clock();
-//			c++;
-//		}
-//	}
-//	return 0;
+//          // Clock the 6845
+//          m6845_clock();
+//          c++;
+//      }
+//  }
+//  return 0;
 //}
 
 static VIDEO_UPDATE( einstein2 )
 {
 	video_update_tms9928a(machine, screen, bitmap, cliprect);
 	video_update_crtc6845(machine, screen, bitmap, cliprect);
-//	video_update_einstein_80col(machine, screen, bitmap, cliprect);
+//  video_update_einstein_80col(machine, screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -1794,7 +1794,7 @@ SYSTEM_CONFIG_START(einstein)
 	CONFIG_DEVICE(einstein_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*     YEAR  NAME		PARENT	COMPAT	MACHINE    INPUT     INIT  CONFIG,   COMPANY   FULLNAME */
+/*     YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     INIT  CONFIG,   COMPANY   FULLNAME */
 COMP( 1984, einstein,	0,      0,		einstein,  einstein, 0,    einstein, "Tatung", "Tatung Einstein TC-01", 0)
 COMP( 1984, einstei2,	0,      0,		einstei2,  einstein, 0,    einstein, "Tatung", "Tatung Einstein TC-01 + 80 column device", 0)
 

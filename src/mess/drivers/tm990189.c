@@ -1,40 +1,40 @@
 /*
-	Experimental tm990/189 ("University Module") driver.
+    Experimental tm990/189 ("University Module") driver.
 
-	The tm990/189 is a simple board built around a tms9980 at 2.0 MHz.
-	The board features:
-	* a calculator-like alphanumeric keyboard, a 10-digit 8-segment display,
-	  a sound buzzer and 4 status LEDs
-	* a 4kb ROM socket (0x3000-0x3fff), and a 2kb ROM socket (0x0800-0x0fff)
-	* 1kb of RAM expandable to 2kb (0x0000-0x03ff and 0x0400-0x07ff)
-	* a tms9901 controlling a custom parallel I/O port (available for
-	  expansion)
-	* an optional on-board serial interface (either TTY or RS232): TI ROMs
-	  support a terminal connected to this port
-	* an optional tape interface
-	* an optional bus extension port for adding additional custom devices (TI
-	  sold a video controller expansion built around a tms9918, which was
-	  supported by University Basic)
+    The tm990/189 is a simple board built around a tms9980 at 2.0 MHz.
+    The board features:
+    * a calculator-like alphanumeric keyboard, a 10-digit 8-segment display,
+      a sound buzzer and 4 status LEDs
+    * a 4kb ROM socket (0x3000-0x3fff), and a 2kb ROM socket (0x0800-0x0fff)
+    * 1kb of RAM expandable to 2kb (0x0000-0x03ff and 0x0400-0x07ff)
+    * a tms9901 controlling a custom parallel I/O port (available for
+      expansion)
+    * an optional on-board serial interface (either TTY or RS232): TI ROMs
+      support a terminal connected to this port
+    * an optional tape interface
+    * an optional bus extension port for adding additional custom devices (TI
+      sold a video controller expansion built around a tms9918, which was
+      supported by University Basic)
 
-	One tms9901 is set up so that it handles tms9980 interrupts.  The other
-	tms9901, the tms9902, and extension cards can trigger interrupts on the
-	interrupt-handling tms9901.
+    One tms9901 is set up so that it handles tms9980 interrupts.  The other
+    tms9901, the tms9902, and extension cards can trigger interrupts on the
+    interrupt-handling tms9901.
 
-	TI sold two ROM sets for this machine: a monitor and assembler ("UNIBUG",
-	packaged as one 4kb EPROM) and a Basic interpreter ("University BASIC",
-	packaged as a 4kb and a 2kb EPROM).  Users could burn and install custom
-	ROM sets, too.
+    TI sold two ROM sets for this machine: a monitor and assembler ("UNIBUG",
+    packaged as one 4kb EPROM) and a Basic interpreter ("University BASIC",
+    packaged as a 4kb and a 2kb EPROM).  Users could burn and install custom
+    ROM sets, too.
 
-	This board was sold to universities to learn either assembly language or
-	BASIC programming.
+    This board was sold to universities to learn either assembly language or
+    BASIC programming.
 
-	A few hobbyists may have bought one of these, too.  This board can actually
-	be used as a development kit for the tms9980, but it was not supported as
-	such (there was no EPROM programmer or mass storage system for the
-	tm990/189, though you could definitively design your own and attach them to
-	the extension port).
+    A few hobbyists may have bought one of these, too.  This board can actually
+    be used as a development kit for the tms9980, but it was not supported as
+    such (there was no EPROM programmer or mass storage system for the
+    tm990/189, though you could definitively design your own and attach them to
+    the extension port).
 
-	Raphael Nabet 2003
+    Raphael Nabet 2003
 */
 
 #include "driver.h"
@@ -102,9 +102,9 @@ static const tms9901reset_param usr9901reset_param =
 	{	/* read handlers */
 		NULL
 		/*usr9901_r0,
-		usr9901_r1,
-		usr9901_r2,
-		usr9901_r3*/
+        usr9901_r1,
+        usr9901_r2,
+        usr9901_r3*/
 	},
 
 	{	/* write handlers */
@@ -112,18 +112,18 @@ static const tms9901reset_param usr9901reset_param =
 		usr9901_led_w,
 		usr9901_led_w,
 		usr9901_led_w/*,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w,
-		usr9901_w*/
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w,
+        usr9901_w*/
 	},
 
 	/* interrupt handler */
@@ -237,10 +237,10 @@ static MACHINE_RESET( tm990_189_v )
 
 
 /*
-	tm990_189 video emulation.
+    tm990_189 video emulation.
 
-	Has an integrated 10 digit 8-segment display.
-	Supports EIA and TTY terminals, and an optional 9918 controller.
+    Has an integrated 10 digit 8-segment display.
+    Supports EIA and TTY terminals, and an optional 9918 controller.
 */
 
 static PALETTE_INIT( tm990_189 )
@@ -320,7 +320,7 @@ static VIDEO_UPDATE( tm990_189 )
 static VIDEO_START( tm990_189_v )
 {
 	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when
-	 * multimonitor support is added?*/
+     * multimonitor support is added?*/
 	LED_display_window_left = machine->screen[0].visarea.min_x;
 	LED_display_window_top = machine->screen[0].visarea.max_y - 32;
 	LED_display_window_width = machine->screen[0].visarea.max_x - machine->screen[0].visarea.min_x;
@@ -342,7 +342,7 @@ static VIDEO_UPDATE( tm990_189_v )
 }
 
 /*
-	Interrupt handlers
+    Interrupt handlers
 */
 
 static void field_interrupts(void)
@@ -354,7 +354,7 @@ static void field_interrupts(void)
 }
 
 /*
-	hold and debounce load line (emulation is inaccurate)
+    hold and debounce load line (emulation is inaccurate)
 */
 
 static TIMER_CALLBACK(clear_load)
@@ -371,7 +371,7 @@ static void hold_load(void)
 }
 
 /*
-	tms9901 code
+    tms9901 code
 */
 
 static void usr9901_interrupt_callback(int intreq, int ic)
@@ -460,7 +460,7 @@ static void sys9901_tapewdata_w(int offset, int data)
 }
 
 /*
-	serial interface
+    serial interface
 */
 
 static TIMER_CALLBACK(rs232_input_callback)
@@ -475,7 +475,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 }
 
 /*
-	Initialize rs232 unit and open image
+    Initialize rs232 unit and open image
 */
 static int device_load_tm990_189_rs232(mess_image *image)
 {
@@ -494,7 +494,7 @@ static int device_load_tm990_189_rs232(mess_image *image)
 }
 
 /*
-	close a rs232 image
+    close a rs232 image
 */
 static void device_unload_tm990_189_rs232(mess_image *image)
 {
@@ -525,7 +525,7 @@ static void xmit_callback(int which, int data)
 }
 
 /*
-	External instruction decoding
+    External instruction decoding
 */
 
 static WRITE8_HANDLER(ext_instr_decode)
@@ -574,7 +574,7 @@ static void idle_callback(int state)
 }
 
 /*
-	Video Board handling
+    Video Board handling
 */
 
 static  READ8_HANDLER(video_vdp_r)
@@ -583,18 +583,18 @@ static  READ8_HANDLER(video_vdp_r)
 	static UINT8 bogus_read_save;
 
 	/* When the tms9980 reads @>2000 or @>2001, it actually does a word access:
-	it reads @>2000 first, then @>2001.  According to schematics, both access
-	are decoded to the VDP: read accesses are therefore bogus, all the more so
-	since the two reads are too close (1us) for the VDP to be able to reload
-	the read buffer: the read address pointer is probably incremented by 2, but
-	only the first byte is valid.  There is a work around for this problem: all
-	you need is reloading the address pointer before each read.  However,
-	software always uses the second byte, which is very weird, particularly
-	for the status port.  Presumably, since the read buffer has not been
-	reloaded, the second byte read from the memory read port is equal to the
-	first; however, this explanation is not very convincing for the status
-	port.  Still, I do not have any better explanation, so I will stick with
-	it. */
+    it reads @>2000 first, then @>2001.  According to schematics, both access
+    are decoded to the VDP: read accesses are therefore bogus, all the more so
+    since the two reads are too close (1us) for the VDP to be able to reload
+    the read buffer: the read address pointer is probably incremented by 2, but
+    only the first byte is valid.  There is a work around for this problem: all
+    you need is reloading the address pointer before each read.  However,
+    software always uses the second byte, which is very weird, particularly
+    for the status port.  Presumably, since the read buffer has not been
+    reloaded, the second byte read from the memory read port is equal to the
+    first; however, this explanation is not very convincing for the status
+    port.  Still, I do not have any better explanation, so I will stick with
+    it. */
 
 	if (offset & 2)
 		reply = TMS9928A_register_r(0);
@@ -650,30 +650,30 @@ static WRITE8_HANDLER(video_joy_w)
 
 
 /*
-	Memory map:
+    Memory map:
 
-	0x0000-0x03ff: 1kb RAM
-	0x0400-0x07ff: 1kb onboard expansion RAM
-	0x0800-0x0bff or 0x0800-0x0fff: 1kb or 2kb onboard expansion ROM
-	0x1000-0x2fff: reserved for offboard expansion
-		Only known card: Color Video Board
-			0x1000-0x17ff (R): Video board ROM 1
-			0x1800-0x1fff (R): Video board ROM 2
-			0x2000-0x27ff (R): tms9918 read ports (bogus)
-				(address & 2) == 0: data port (bogus)
-				(address & 2) == 1: status register (bogus)
-			0x2800-0x2fff (R): joystick read port
-				d2: joy 2 switch
-				d3: joy 2 Y (length of pulse after retrigger is proportional to axis position)
-				d4: joy 2 X (length of pulse after retrigger is proportional to axis position)
-				d2: joy 1 switch
-				d3: joy 1 Y (length of pulse after retrigger is proportional to axis position)
-				d4: joy 1 X (length of pulse after retrigger is proportional to axis position)
-			0x1801-0x1fff ((address & 1) == 1) (W): joystick write port (retrigger)
-			0x2801-0x2fff ((address & 1) == 1) (W): tms9918 write ports
-				(address & 2) == 0: data port
-				(address & 2) == 1: control register
-	0x3000-0x3fff: 4kb onboard ROM
+    0x0000-0x03ff: 1kb RAM
+    0x0400-0x07ff: 1kb onboard expansion RAM
+    0x0800-0x0bff or 0x0800-0x0fff: 1kb or 2kb onboard expansion ROM
+    0x1000-0x2fff: reserved for offboard expansion
+        Only known card: Color Video Board
+            0x1000-0x17ff (R): Video board ROM 1
+            0x1800-0x1fff (R): Video board ROM 2
+            0x2000-0x27ff (R): tms9918 read ports (bogus)
+                (address & 2) == 0: data port (bogus)
+                (address & 2) == 1: status register (bogus)
+            0x2800-0x2fff (R): joystick read port
+                d2: joy 2 switch
+                d3: joy 2 Y (length of pulse after retrigger is proportional to axis position)
+                d4: joy 2 X (length of pulse after retrigger is proportional to axis position)
+                d2: joy 1 switch
+                d3: joy 1 Y (length of pulse after retrigger is proportional to axis position)
+                d4: joy 1 X (length of pulse after retrigger is proportional to axis position)
+            0x1801-0x1fff ((address & 1) == 1) (W): joystick write port (retrigger)
+            0x2801-0x2fff ((address & 1) == 1) (W): tms9918 write ports
+                (address & 2) == 0: data port
+                (address & 2) == 1: control register
+    0x3000-0x3fff: 4kb onboard ROM
 */
 
 static ADDRESS_MAP_START(tm990_189_memmap, ADDRESS_SPACE_PROGRAM, 8)
@@ -700,57 +700,57 @@ static ADDRESS_MAP_START(tm990_189_v_memmap, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /*
-	CRU map
+    CRU map
 
-	The board features one tms9901 for keyboard and sound I/O, another tms9901
-	to drive the parallel port and a few LEDs and handle tms9980 interrupts,
-	and one optional tms9902 for serial I/O.
+    The board features one tms9901 for keyboard and sound I/O, another tms9901
+    to drive the parallel port and a few LEDs and handle tms9980 interrupts,
+    and one optional tms9902 for serial I/O.
 
-	* bits >000->1ff (R12=>000->3fe): first TMS9901: parallel port, a few LEDs,
-		interrupts
-		- CRU bits 1-5: UINT1* through UINT5* (jumper connectable to parallel
-			port or COMINT from tms9902)
-		- CRU bit 6: KBINT (interrupt request from second tms9901)
-		- CRU bits 7-15: mirrors P15-P7
-		- CRU bits 16-31: P0-P15 (parallel port)
-			(bits 16, 17, 18 and 19 control LEDs numbered 1, 2, 3 and 4, too)
-	* bits >200->3ff (R12=>400->7fe): second TMS9901: display, keyboard and
-		sound
-		- CRU bits 1-5: KB1*-KB5* (inputs from current keyboard row)
-		- CRU bit 6: RDATA (tape in)
-		- CRU bits 7-15: mirrors P15-P7
-		- CRU bits 16-19: DIGITSELA-DIGITSELD (select current display digit and
-			keyboard row)
-		- CRU bits 20-27: SEGMENTA*-SEGMENTG* and SEGMENTP* (drives digit
-			segments)
-		- CRU bit 28: DSPLYTRGR* (will generate a pulse to drive the digit
-			segments)
-		- bit 29: SHIFTLIGHT (controls shift light)
-		- bit 30: SPKRDRIVE (controls buzzer)
-		- bit 31: WDATA (tape out)
-	* bits >400->5ff (R12=>800->bfe): optional TMS9902
-	* bits >600->7ff (R12=>c00->ffe): reserved for expansion
-	* write 0 to bits >1000->17ff: IDLE: flash IDLE LED
-	* write 0 to bits >1800->1fff: RSET: not connected, but it is decoded and
-		hackers can connect any device they like to this pin
-	* write 1 to bits >0800->0fff: CKON: light FWD LED and activates
-		DECKCONTROL* signal (part of tape interface)
-	* write 1 to bits >1000->17ff: CKOF: light off FWD LED and deactivates
-		DECKCONTROL* signal (part of tape interface)
-	* write 1 to bits >1800->1fff: LREX: trigger load interrupt
+    * bits >000->1ff (R12=>000->3fe): first TMS9901: parallel port, a few LEDs,
+        interrupts
+        - CRU bits 1-5: UINT1* through UINT5* (jumper connectable to parallel
+            port or COMINT from tms9902)
+        - CRU bit 6: KBINT (interrupt request from second tms9901)
+        - CRU bits 7-15: mirrors P15-P7
+        - CRU bits 16-31: P0-P15 (parallel port)
+            (bits 16, 17, 18 and 19 control LEDs numbered 1, 2, 3 and 4, too)
+    * bits >200->3ff (R12=>400->7fe): second TMS9901: display, keyboard and
+        sound
+        - CRU bits 1-5: KB1*-KB5* (inputs from current keyboard row)
+        - CRU bit 6: RDATA (tape in)
+        - CRU bits 7-15: mirrors P15-P7
+        - CRU bits 16-19: DIGITSELA-DIGITSELD (select current display digit and
+            keyboard row)
+        - CRU bits 20-27: SEGMENTA*-SEGMENTG* and SEGMENTP* (drives digit
+            segments)
+        - CRU bit 28: DSPLYTRGR* (will generate a pulse to drive the digit
+            segments)
+        - bit 29: SHIFTLIGHT (controls shift light)
+        - bit 30: SPKRDRIVE (controls buzzer)
+        - bit 31: WDATA (tape out)
+    * bits >400->5ff (R12=>800->bfe): optional TMS9902
+    * bits >600->7ff (R12=>c00->ffe): reserved for expansion
+    * write 0 to bits >1000->17ff: IDLE: flash IDLE LED
+    * write 0 to bits >1800->1fff: RSET: not connected, but it is decoded and
+        hackers can connect any device they like to this pin
+    * write 1 to bits >0800->0fff: CKON: light FWD LED and activates
+        DECKCONTROL* signal (part of tape interface)
+    * write 1 to bits >1000->17ff: CKOF: light off FWD LED and deactivates
+        DECKCONTROL* signal (part of tape interface)
+    * write 1 to bits >1800->1fff: LREX: trigger load interrupt
 
-	Keyboard map: see input ports
+    Keyboard map: see input ports
 
-	Display segment designation:
-		   a
-		  ___
-		 |   |
-		f|   |b
-		 |___|
-		 | g |
-		e|   |c
-		 |___|  .p
-		   d
+    Display segment designation:
+           a
+          ___
+         |   |
+        f|   |b
+         |___|
+         | g |
+        e|   |c
+         |___|  .p
+           d
 */
 
 static ADDRESS_MAP_START(tm990_189_writecru, ADDRESS_SPACE_IO, 8)
@@ -1027,6 +1027,6 @@ SYSTEM_CONFIG_START(tm990_189)
 	CONFIG_DEVICE(tm990_189_serial_getinfo)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	NAME	  PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY					FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                 FULLNAME */
 COMP( 1978,	990189,	  0,		0,		tm990_189,	tm990_189,	0,		tm990_189,	"Texas Instruments",	"TM 990/189 University Board microcomputer with University Basic" , 0)
 COMP( 1980,	990189v,  990189,	0,		tm990_189_v,tm990_189,	0,		tm990_189,	"Texas Instruments",	"TM 990/189 University Board microcomputer with University Basic and Video Board Interface" , 0)

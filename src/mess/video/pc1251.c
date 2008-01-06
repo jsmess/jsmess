@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "video/generic.h"
 
 #include "includes/pocketc.h"
 #include "includes/pc1251.h"

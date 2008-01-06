@@ -1,4 +1,14 @@
+/*****************************************************************************
+ *
+ * includes/galaxy.h
+ *
+ ****************************************************************************/
+
+#ifndef GALAXY_H_
+#define GALAXY_H_
+
 #include "devices/snapquik.h"
+
 
 /*----------- defined in machine/galaxy.c -----------*/
 
@@ -11,6 +21,7 @@ extern READ8_HANDLER( galaxy_keyboard_r );
 extern READ8_HANDLER( galaxy_latch_r );
 extern WRITE8_HANDLER( galaxy_latch_w );
 
+
 /*----------- defined in video/galaxy.c -----------*/
 
 extern const gfx_layout galaxy_charlayout;
@@ -19,3 +30,6 @@ extern const unsigned short galaxy_colortable[1][2];
 extern PALETTE_INIT( galaxy );
 extern VIDEO_START( galaxy );
 extern VIDEO_UPDATE( galaxy );
+
+
+#endif /* GALAXY_H_ */

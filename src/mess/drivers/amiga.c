@@ -16,18 +16,22 @@ would commence ($C00000).
 
 ***************************************************************************/
 
+/* Core includes */
 #include "driver.h"
-#include "video/generic.h"
-#include "sound/custom.h"
 #include "includes/amiga.h"
+
+/* Components */
+#include "sound/custom.h"
 #include "machine/amigafdc.h"
 #include "machine/amigakbd.h"
 #include "machine/amigacd.h"
 #include "machine/amigacrt.h"
 #include "machine/msm6242.h"
+
+/* Devices */
 #include "devices/chd_cd.h"
 #include "devices/cartslot.h"
-#include "inputx.h"
+
 
 /***************************************************************************
   Battery Backed-Up Clock (MSM6264)

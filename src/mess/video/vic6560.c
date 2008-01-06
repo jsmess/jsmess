@@ -12,13 +12,14 @@
 #include "sound/custom.h"
 
 #define VERBOSE_DBG 0
+#include "vic6560.h"
+
 #include "includes/cbm.h"
 #include "includes/vc20.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"
 
-#include "includes/vic6560.h"
 
 /* usage of GFX system for lightpenpointer drawing,
  * needs little more testing with working dipswitches */

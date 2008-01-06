@@ -1,29 +1,27 @@
 /***************************************************************************
-	zx.c
+    zx.c
 
     Orginal driver by:
-	Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
+    Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
 
     Fixes and additions by Krzysztof Strzecha:
-	07.06.2004 Tape loading added. Some cleanups of debug code.
-		   Fixed stupid bug in timings (vblank duration).
-		   GAME_NOT_WORKING flag removed.
-    	29.05.2004 CPU clock, number of scanlines, vblank duration corrected.
-		   Some cleanups. Two non-working TESTDRIVERS added.
-    	14.05.2004 Finally fixed and readded.
+    07.06.2004 Tape loading added. Some cleanups of debug code.
+           Fixed stupid bug in timings (vblank duration).
+           GAME_NOT_WORKING flag removed.
+        29.05.2004 CPU clock, number of scanlines, vblank duration corrected.
+           Some cleanups. Two non-working TESTDRIVERS added.
+        14.05.2004 Finally fixed and readded.
 
     To do:
-	Tape saving (needs changes in video hardware emulation).
-	Some memory areas are not mirrored as they should.
-	Video hardware is not fully emulated, so it does not support pseudo
-	hi-res and hi-res modes.
-	Some memory packs are unemulated.
+    Tape saving (needs changes in video hardware emulation).
+    Some memory areas are not mirrored as they should.
+    Video hardware is not fully emulated, so it does not support pseudo
+    hi-res and hi-res modes.
+    Some memory packs are unemulated.
 
 ****************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
-#include "video/generic.h"
 #include "cpu/z80/z80.h"
 #include "includes/zx.h"
 #include "devices/cassette.h"

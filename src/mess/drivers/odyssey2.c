@@ -8,10 +8,8 @@
 
 #include "driver.h"
 #include "cpu/i8039/i8039.h"
-#include "video/generic.h"
 #include "includes/odyssey2.h"
 #include "devices/cartslot.h"
-#include "inputx.h"
 
 static ADDRESS_MAP_START( odyssey2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x03FF) AM_ROM
@@ -203,6 +201,6 @@ SYSTEM_CONFIG_START(odyssey2)
 	CONFIG_DEVICE(odyssey2_cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
-/*     YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME     FLAGS */
+/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME     FLAGS */
 COMP( 1982, odyssey2, 0,		0,		odyssey2, odyssey2, odyssey2, odyssey2, "Magnavox", "Odyssey 2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 /* philips g7000/videopac */

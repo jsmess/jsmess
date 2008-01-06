@@ -1,31 +1,31 @@
 /***************************************************************************
 TRS80 memory map
 
-0000-2fff ROM				  R   D0-D7
-3000-37ff ROM on Model III		  R   D0-D7
-		  unused on Model I
-37de      UART status			  R/W D0-D7
-37df      UART data			  R/W D0-D7
+0000-2fff ROM                 R   D0-D7
+3000-37ff ROM on Model III        R   D0-D7
+          unused on Model I
+37de      UART status             R/W D0-D7
+37df      UART data           R/W D0-D7
 37e0      interrupt latch address (lnw80 = for the realtime clock)
-37e1      select disk drive 0		  W
-37e2      cassette drive latch address	  W
-37e3      select disk drive 1		  W
+37e1      select disk drive 0         W
+37e2      cassette drive latch address    W
+37e3      select disk drive 1         W
 37e4      select which cassette unit      W   D0-D1 (D0 selects unit 1, D1 selects unit 2)
-37e5      select disk drive 2		  W
-37e7      select disk drive 3		  W
-37e0-37e3 floppy motor			  W   D0-D3
-		  or floppy head select   W   D3
+37e5      select disk drive 2         W
+37e7      select disk drive 3         W
+37e0-37e3 floppy motor            W   D0-D3
+          or floppy head select   W   D3
 37e8      send a byte to printer          W   D0-D7
 37e8      read printer status             R   D7
-37ec-37ef FDC WD179x			  R/W D0-D7
-37ec	  command			  W   D0-D7
-37ec	  status			  R   D0-D7
-37ed	  track 			  R/W D0-D7
-37ee	  sector			  R/W D0-D7
-37ef	  data				  R/W D0-D7
-3800-38ff keyboard matrix		  R   D0-D7
+37ec-37ef FDC WD179x              R/W D0-D7
+37ec      command             W   D0-D7
+37ec      status              R   D0-D7
+37ed      track               R/W D0-D7
+37ee      sector              R/W D0-D7
+37ef      data                R/W D0-D7
+3800-38ff keyboard matrix         R   D0-D7
 3900-3bff unused - kbd mirrored
-3c00-3fff video RAM 			  R/W D0-D5,D7 (or D0-D7)
+3c00-3fff video RAM               R/W D0-D5,D7 (or D0-D7)
 4000-ffff RAM
 
 Interrupts:
@@ -77,10 +77,20 @@ Not emulated:
 
 ***************************************************************************/
 
+/* Core includes */
+#include "driver.h"
 #include "includes/trs80.h"
-#include "devices/basicdsk.h"
+
+/* Components */
+#include "machine/wd17xx.h"
 #include "sound/speaker.h"
+
+/* Devices */
+#include "devices/basicdsk.h"
+
+/* TODO: Remove dependency on this */
 #include "mslegacy.h"
+
 
 #define FW	TRS80_FONT_W
 #define FH	TRS80_FONT_H
@@ -151,9 +161,9 @@ ADDRESS_MAP_END
 
 
 /**************************************************************************
-   w/o SHIFT							 with SHIFT
-   +-------------------------------+	 +-------------------------------+
-   | 0	 1	 2	 3	 4	 5	 6	 7 |	 | 0   1   2   3   4   5   6   7 |
+   w/o SHIFT                             with SHIFT
+   +-------------------------------+     +-------------------------------+
+   | 0   1   2   3   4   5   6   7 |     | 0   1   2   3   4   5   6   7 |
 +--+---+---+---+---+---+---+---+---+  +--+---+---+---+---+---+---+---+---+
 |0 | @ | A | B | C | D | E | F | G |  |0 | ` | a | b | c | d | e | f | g |
 |  +---+---+---+---+---+---+---+---+  |  +---+---+---+---+---+---+---+---+
@@ -161,7 +171,7 @@ ADDRESS_MAP_END
 |  +---+---+---+---+---+---+---+---+  |  +---+---+---+---+---+---+---+---+
 |2 | P | Q | R | S | T | U | V | W |  |2 | p | q | r | s | t | u | v | w |
 |  +---+---+---+---+---+---+---+---+  |  +---+---+---+---+---+---+---+---+
-|3 | X | Y | Z | [ | \ | ] | ^ | _ |  |3 | x | y | z | { | | | } | ~ |	 |
+|3 | X | Y | Z | [ | \ | ] | ^ | _ |  |3 | x | y | z | { | | | } | ~ |   |
 |  +---+---+---+---+---+---+---+---+  |  +---+---+---+---+---+---+---+---+
 |4 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |  |4 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
 |  +---+---+---+---+---+---+---+---+  |  +---+---+---+---+---+---+---+---+
@@ -172,7 +182,7 @@ ADDRESS_MAP_END
 |7 |SHF|ALT|PUP|PDN|INS|DEL|CTL|END|  |7 |SHF|ALT|PUP|PDN|INS|DEL|CTL|END|
 +--+---+---+---+---+---+---+---+---+  +--+---+---+---+---+---+---+---+---+
 NB: row 7 contains some originally unused bits
-	only the shift bit was there in the TRS80
+    only the shift bit was there in the TRS80
 ***************************************************************************/
 
 static INPUT_PORTS_START( trs80 )
@@ -533,7 +543,7 @@ SYSTEM_CONFIG_START(trs8012)
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME      PARENT	 COMPAT	        MACHINE   INPUT	 INIT  CONFIG	COMPANY	 FULLNAME */
+/*    YEAR  NAME      PARENT     COMPAT         MACHINE   INPUT  INIT  CONFIG   COMPANY  FULLNAME */
 COMP( 1977, trs80,    0,	 0,		level1,   trs80, trs80,    trs80,	"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
 COMP( 1978, trs80l2,  trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Radio Shack Level II Basic)" , 0)
 COMP( 1978, trs80l2a, trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (R/S L2 Basic)" , 0)

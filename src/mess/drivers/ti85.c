@@ -23,48 +23,48 @@ Needed:
 New:
 05/10/2002 TI-85 serial link works again.
 17/09/2002 TI-85 snapshots loading fixed. Few code cleanups.
-	   TI-86 SNAPSHOT LOADING DOESNT WORK.
-	   TI-85, TI-86 SERIAL LINK DOESNT WORK.
+       TI-86 SNAPSHOT LOADING DOESNT WORK.
+       TI-85, TI-86 SERIAL LINK DOESNT WORK.
 08/09/2001 TI-81, TI-85, TI-86 modified to new core.
-	   TI-81, TI-85, TI-86 reset corrected.
+       TI-81, TI-85, TI-86 reset corrected.
 21/08/2001 TI-81, TI-85, TI-86 NVRAM corrected.
 20/08/2001 TI-81 ON/OFF fixed.
-	   TI-81 ROM bank switching added (port 5).
-	   TI-81 NVRAM support added.
+       TI-81 ROM bank switching added (port 5).
+       TI-81 NVRAM support added.
 15/08/2001 TI-81 kayboard is now mapped as it should be.
 14/08/2001 TI-81 preliminary driver added.
 05/07/2001 Serial communication corrected (transmission works now after reset).
 02/07/2001 Many source cleanups.
-	   PCR added.
+       PCR added.
 01/07/2001 Possibility to request screen dump from TI (received dumps are saved
-	   as t85i file).
+       as t85i file).
 29/06/2001 Received variables can be saved now.
 19/06/2001 Possibility to receive variables from calculator (they are nor saved
-	   yet).
+       yet).
 17/06/2001 TI-86 reset fixed.
 15/06/2001 Possibility to receive memory backups from calculator.
 07/06/2001 TI-85 reset fixed.
-	   Work on receiving data from calculator started.
+       Work on receiving data from calculator started.
 04/06/2001 TI-85 is able to receive variables and memory backups.
 14/05/2001 Many source cleanups.
 11/05/2001 Release years corrected. Work on serial link started.
 26/04/2001 NVRAM support added.
 25/04/2001 Video engine totaly rewriten so grayscale works now.
 17/04/2001 TI-86 snapshots loading added.
-	   ti86grom driver added.
+       ti86grom driver added.
 16/04/2001 Sound added.
-	   Five TI-86 drivers added (all features of TI-85 drivers without
-	   snapshot loading).
+       Five TI-86 drivers added (all features of TI-85 drivers without
+       snapshot loading).
 13/04/2001 Snapshot loading (VTI 2.0 save state files).
 18/02/2001 Palette (not perfect).
-	   Contrast control (port 2) implemented.
-	   LCD ON/OFF implemented (port 3).
-	   Interrupts corrected (port 3) - ON/OFF and APD works now.
-	   Artwork added.
+       Contrast control (port 2) implemented.
+       LCD ON/OFF implemented (port 3).
+       Interrupts corrected (port 3) - ON/OFF and APD works now.
+       Artwork added.
 09/02/2001 Keypad added.
-	   200Hz timer interrupts implemented.
-	   ON key and its interrupts implemented.
-	   Calculator is now fully usable.
+       200Hz timer interrupts implemented.
+       ON key and its interrupts implemented.
+       Calculator is now fully usable.
 02/02/2001 Preliminary driver
 
 To do:
@@ -76,65 +76,64 @@ To do:
 
 TI-81 memory map
 
-	CPU: Z80 2MHz
-		0000-7fff ROM
-		8000-ffff RAM (?)
+    CPU: Z80 2MHz
+        0000-7fff ROM
+        8000-ffff RAM (?)
 
 TI-85 memory map
 
-	CPU: Z80 6MHz
-		0000-3fff ROM 0
-		4000-7fff ROM 1-7 (switched)
-		8000-ffff RAM
+    CPU: Z80 6MHz
+        0000-3fff ROM 0
+        4000-7fff ROM 1-7 (switched)
+        8000-ffff RAM
 
 TI-86 memory map
 
-	CPU: Z80 6MHz
-		0000-3fff ROM 0
-		4000-7fff ROM 0-15 or RAM 0-7 (switched)
-		7000-bfff ROM 0-15 or RAM 0-7 (switched)
-		c000-ffff RAM 0
+    CPU: Z80 6MHz
+        0000-3fff ROM 0
+        4000-7fff ROM 0-15 or RAM 0-7 (switched)
+        7000-bfff ROM 0-15 or RAM 0-7 (switched)
+        c000-ffff RAM 0
 
 Interrupts:
 
-	IRQ: 200Hz timer
-	     ON key
+    IRQ: 200Hz timer
+         ON key
 
 TI-81 ports:
-	0: Video buffer offset (write only)
-	1: Keypad
-	2: Contrast (write only)
-	3: ON status, LCD power
-	4: Video buffer width, interrupt control (write only)
-	5: ?
-	6:
-	7: ?
+    0: Video buffer offset (write only)
+    1: Keypad
+    2: Contrast (write only)
+    3: ON status, LCD power
+    4: Video buffer width, interrupt control (write only)
+    5: ?
+    6:
+    7: ?
 
 TI-85 ports:
-	0: Video buffer offset (write only)
-	1: Keypad
-	2: Contrast (write only)
-	3: ON status, LCD power
-	4: Video buffer width, interrupt control (write only)
-	5: Memory page
-	6: Power mode
-	7: Link
+    0: Video buffer offset (write only)
+    1: Keypad
+    2: Contrast (write only)
+    3: ON status, LCD power
+    4: Video buffer width, interrupt control (write only)
+    5: Memory page
+    6: Power mode
+    7: Link
 
 TI-86 ports:
-	0: Video buffer offset (write only)
-	1: Keypad
-	2: Contrast (write only)
-	3: ON status, LCD power
-	4: Power mode
-	5: Memory page
-	6: Memory page
-	7: Link
+    0: Video buffer offset (write only)
+    1: Keypad
+    2: Contrast (write only)
+    3: ON status, LCD power
+    4: Power mode
+    5: Memory page
+    6: Memory page
+    7: Link
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "video/generic.h"
 #include "includes/ti85.h"
 #include "devices/snapquik.h"
 

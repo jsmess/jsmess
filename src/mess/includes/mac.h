@@ -1,22 +1,23 @@
-/*********************************************************************
+/*****************************************************************************
+ *
+ * includes/mac.h
+ * 
+ * Macintosh driver declarations
+ *
+ ****************************************************************************/
 
-	mac.h
+#ifndef MAC_H_
+#define MAC_H_
 
-	MESS Macintosh driver declarations
-
-*********************************************************************/
-
-#ifndef MESS_MAC_H
-#define MESS_MAC_H
-
-#include "mame.h"
 #include "sound/custom.h"
+
 
 // video parameters
 #define MAC_H_VIS	(512)
 #define MAC_V_VIS	(342)
 #define MAC_H_TOTAL	(704)		// (512+192)
 #define MAC_V_TOTAL	(370)		// (342+28)
+
 
 /*----------- defined in machine/mac.c -----------*/
 
@@ -41,6 +42,7 @@ WRITE16_HANDLER ( macplus_scsi_w );
 NVRAM_HANDLER( mac );
 void mac_scc_mouse_irq( int x, int y );
 
+
 /*----------- defined in video/mac.c -----------*/
 
 VIDEO_START( mac );
@@ -48,6 +50,7 @@ VIDEO_UPDATE( mac );
 PALETTE_INIT( mac );
 
 void mac_set_screen_buffer( int buffer );
+
 
 /*----------- defined in audio/mac.c -----------*/
 
@@ -59,5 +62,5 @@ void mac_set_volume( int volume );
 
 void mac_sh_updatebuffer(void);
 
-#endif /* MESS_MAC_H */
 
+#endif /* MAC_H_ */

@@ -1,75 +1,75 @@
 /*
-	Experimental Tomy Tutor driver
+    Experimental Tomy Tutor driver
 
-	This computer is known as Tomy Tutor in US, and as Grandstand Tutor in UK.
-	It was initially released in Japan in 1982 or 1983 under the name of Pyuuta
-	(Pi-yu-u-ta, with a Kanji for the "ta").  The Japanese versions are
-	different from the English-language versions, as they have different ROMs
-	with Japanese messages and support for the katakana syllabus.  There are at
-	least 4 versions:
-	* original Pyuuta (1982 or 1983) with title screens in Japanese but no
-	  Basic
-	* Pyuuta Jr. (1983?) which is a console with a simplified keyboard
-	* Tomy/Grandstand Tutor (circa October 1983?) with title screens in English
-	  and integrated Basic
-	* Pyuuta Mk. 2 (1984?) with a better-looking keyboard and integrated Basic
+    This computer is known as Tomy Tutor in US, and as Grandstand Tutor in UK.
+    It was initially released in Japan in 1982 or 1983 under the name of Pyuuta
+    (Pi-yu-u-ta, with a Kanji for the "ta").  The Japanese versions are
+    different from the English-language versions, as they have different ROMs
+    with Japanese messages and support for the katakana syllabus.  There are at
+    least 4 versions:
+    * original Pyuuta (1982 or 1983) with title screens in Japanese but no
+      Basic
+    * Pyuuta Jr. (1983?) which is a console with a simplified keyboard
+    * Tomy/Grandstand Tutor (circa October 1983?) with title screens in English
+      and integrated Basic
+    * Pyuuta Mk. 2 (1984?) with a better-looking keyboard and integrated Basic
 
-	The Tomy Tutor features a TMS9995 CPU @10.7MHz (which includes a
-	timer/counter and 256 bytes of 16-bit RAM), 48kb of ROM (32kb on early
-	models that did not have the BASIC interpreter), a tms9918a/9929a VDP (or
-	equivalent?) with 16kb of VRAM, and a sn76489an sound generator.
-	There is a tape interface, a 56-key keyboard, an interface for two
-	joysticks, a cartridge port and an extension port.  The OS design does not
-	seem to be particularly expandable (I don't see any hook for additional
-	DSRs), but there were prototypes for a parallel port (emulated)
-	and a speech synthesizer unit (not emulated).
-
-
-	The Tutor appears to be related to Texas Instruments' TI99 series.
-
-	The general architecture is relatively close to the ti99/4(a): arguably,
-	the Tutor does not include any GROM (it uses regular CPU ROMs for GPL
-	code), and its memory map is quite different due to the fact it was
-	designed with a tms9995 in mind (vs. a tms9985 for ti99/4), but, apart from
-	that, it has a similar architecture with only 256 bytes of CPU RAM and 16kb
-	of VRAM.
-
-	While the OS is not derived directly from the TI99/4(a) OS, there are
-	disturbing similarities: the Japanese title screen is virtually identical
-	to the TI-99 title screen.  Moreover, the Tutor BASIC seems to be be
-	derived from TI Extended BASIC, as both BASIC uses similar tokens and
-	syntax, and are partially written in GPL (there is therefore a GPL
-	interpreter in Tutor ROMs, although the Tutor GPL is incompatible with TI
-	GPL, does not seem to be used by any program other than Tutor Basic, and it
-	seems unlikely that the original Pyuuta had this GPL interpreter in ROMs).
-
-	It appears that TI has sold the licence of the TI BASIC to Tomy, probably
-	after it terminated its TI99 series.  It is not impossible that the entire
-	Tutor concept is derived from a TI project under licence: this machine
-	looks like a crossbreed of the TI99/2 and the TI99/4 (or /4a, /4b, /5), and
-	it could either have been an early version of the TI99/2 project with a
-	tms9918a/99289a VDP instead of the DMA video controller, or a "TI99/3" that
-	would have closed the gap between the extremely low-end TI99/2 and the
-	relatively mid-range TI99/5.
+    The Tomy Tutor features a TMS9995 CPU @10.7MHz (which includes a
+    timer/counter and 256 bytes of 16-bit RAM), 48kb of ROM (32kb on early
+    models that did not have the BASIC interpreter), a tms9918a/9929a VDP (or
+    equivalent?) with 16kb of VRAM, and a sn76489an sound generator.
+    There is a tape interface, a 56-key keyboard, an interface for two
+    joysticks, a cartridge port and an extension port.  The OS design does not
+    seem to be particularly expandable (I don't see any hook for additional
+    DSRs), but there were prototypes for a parallel port (emulated)
+    and a speech synthesizer unit (not emulated).
 
 
-	Raphael Nabet, 2003
+    The Tutor appears to be related to Texas Instruments' TI99 series.
+
+    The general architecture is relatively close to the ti99/4(a): arguably,
+    the Tutor does not include any GROM (it uses regular CPU ROMs for GPL
+    code), and its memory map is quite different due to the fact it was
+    designed with a tms9995 in mind (vs. a tms9985 for ti99/4), but, apart from
+    that, it has a similar architecture with only 256 bytes of CPU RAM and 16kb
+    of VRAM.
+
+    While the OS is not derived directly from the TI99/4(a) OS, there are
+    disturbing similarities: the Japanese title screen is virtually identical
+    to the TI-99 title screen.  Moreover, the Tutor BASIC seems to be be
+    derived from TI Extended BASIC, as both BASIC uses similar tokens and
+    syntax, and are partially written in GPL (there is therefore a GPL
+    interpreter in Tutor ROMs, although the Tutor GPL is incompatible with TI
+    GPL, does not seem to be used by any program other than Tutor Basic, and it
+    seems unlikely that the original Pyuuta had this GPL interpreter in ROMs).
+
+    It appears that TI has sold the licence of the TI BASIC to Tomy, probably
+    after it terminated its TI99 series.  It is not impossible that the entire
+    Tutor concept is derived from a TI project under licence: this machine
+    looks like a crossbreed of the TI99/2 and the TI99/4 (or /4a, /4b, /5), and
+    it could either have been an early version of the TI99/2 project with a
+    tms9918a/99289a VDP instead of the DMA video controller, or a "TI99/3" that
+    would have closed the gap between the extremely low-end TI99/2 and the
+    relatively mid-range TI99/5.
+
+
+    Raphael Nabet, 2003
 
 
 TODO :
-	* debug the tape interface (Saved tapes sound OK, both Verify and Load
-	  recognize the tape as a Tomy tape, but the data seems to be corrupted and
-	  we end with a read error.)
-	* guess which device is located at the >e600 base
-	* find info about other Tutor variants
+    * debug the tape interface (Saved tapes sound OK, both Verify and Load
+      recognize the tape as a Tomy tape, but the data seems to be corrupted and
+      we end with a read error.)
+    * guess which device is located at the >e600 base
+    * find info about other Tutor variants
 
 
-	Interrupts:
+    Interrupts:
 
-	Interrupt levels 1 (external interrupt 1) and 2 (error interrupt) do not
-	seem to be used: triggering these seems to cause a soft reset.  XOPs are
-	not used at all: the ROM area where these vectors should be defined is used
-	by a ROM branch table.
+    Interrupt levels 1 (external interrupt 1) and 2 (error interrupt) do not
+    seem to be used: triggering these seems to cause a soft reset.  XOPs are
+    not used at all: the ROM area where these vectors should be defined is used
+    by a ROM branch table.
 */
 
 #include "driver.h"
@@ -145,17 +145,17 @@ static mess_image *printer_fp(void)
 
 
 /*
-	Keyboard:
+    Keyboard:
 
-	Keyboard ports are located at CRU logical address >ec00->ec7e (CRU physical
-	address >7600->763f).  There is one bit per key (bit >00 for keycode >00,
-	bit >01 for keycode >01, etc.), each bit is set to one when the key is
-	down.
+    Keyboard ports are located at CRU logical address >ec00->ec7e (CRU physical
+    address >7600->763f).  There is one bit per key (bit >00 for keycode >00,
+    bit >01 for keycode >01, etc.), each bit is set to one when the key is
+    down.
 
-	Joystick:
+    Joystick:
 
-	Joystick ports seem to overlap keyboard ports, i.e. some CRU bits are
-	mapped to both a keyboard key and a joystick switch.
+    Joystick ports seem to overlap keyboard ports, i.e. some CRU bits are
+    mapped to both a keyboard key and a joystick switch.
 */
 
 static READ8_HANDLER(read_keyboard)
@@ -175,17 +175,17 @@ static void device_unload_tutor_cart(mess_image *image)
 }
 
 /*
-	Cartridge mapping:
+    Cartridge mapping:
 
-	Cartridges share the >8000 address base with BASIC.  A write to @>e10c
-	disables the BASIC ROM and enable the cartridge.  A write to @>e108
-	disables the cartridge and enables the BASIC ROM.
+    Cartridges share the >8000 address base with BASIC.  A write to @>e10c
+    disables the BASIC ROM and enable the cartridge.  A write to @>e108
+    disables the cartridge and enables the BASIC ROM.
 
-	In order to be recognized by the system ROM, a cartridge should start with
-	>55, >66 or >aa.  This may may correspond to three different ROM header
-	versions (I am not sure).
+    In order to be recognized by the system ROM, a cartridge should start with
+    >55, >66 or >aa.  This may may correspond to three different ROM header
+    versions (I am not sure).
 
-	Cartridge may also define a boot ROM at base >0000 (see below).
+    Cartridge may also define a boot ROM at base >0000 (see below).
 */
 
 static  READ8_HANDLER(tutor_mapper_r)
@@ -236,22 +236,22 @@ static WRITE8_HANDLER(tutor_mapper_w)
 }
 
 /*
-	Cassette interface:
+    Cassette interface:
 
-	The cassette interface uses several ports in the >e000 range.
+    The cassette interface uses several ports in the >e000 range.
 
-	Writing to *CPU* address @>ee00 will set the tape output to 0.  Writing to
-	*CPU* address @>ee20 will set the tape output to 1.
+    Writing to *CPU* address @>ee00 will set the tape output to 0.  Writing to
+    *CPU* address @>ee20 will set the tape output to 1.
 
-	Tape input level can be read from *CRU* logical address >ed00 (CRU physical
-	address >7680).
+    Tape input level can be read from *CRU* logical address >ed00 (CRU physical
+    address >7680).
 
-	Writing to @>ee40 enables tape interrupts; writing to @>ee60 disables tape
-	interrupts.  Tape interrupts are level-4 interrupt that occur when the tape
-	input level is high(?).
+    Writing to @>ee40 enables tape interrupts; writing to @>ee60 disables tape
+    interrupts.  Tape interrupts are level-4 interrupt that occur when the tape
+    input level is high(?).
 
-	There are other output ports: @>ee80, @>eea0, @>eec0 & @>eee0.  I don't
-	know their exact meaning.
+    There are other output ports: @>ee80, @>eea0, @>eec0 & @>eee0.  I don't
+    know their exact meaning.
 */
 
 static TIMER_CALLBACK(tape_interrupt_handler)
@@ -359,46 +359,46 @@ static WRITE8_HANDLER(tutor_printer_w)
 }
 
 /*
-	Memory map summary:
+    Memory map summary:
 
-	@>0000-@>7fff: system ROM (can be paged out, see above).
-	@>8000-@>bfff: basic ROM (can be paged out, see above).
-	@>c000-@>dfff: free for future expansion? Used by 24kb cartridges?
+    @>0000-@>7fff: system ROM (can be paged out, see above).
+    @>8000-@>bfff: basic ROM (can be paged out, see above).
+    @>c000-@>dfff: free for future expansion? Used by 24kb cartridges?
 
-	@>e000(r/w): VDP data
-	@>e002(r/w): VDP register
+    @>e000(r/w): VDP data
+    @>e002(r/w): VDP register
 
-	@>e100(w): enable cart and disable system ROM at base >0000??? (the system will only link to such a ROM if @>e110 is >42???)
-	@>e108(w): disable cart and enable BASIC ROM at base >8000?
-	@>e10c(w): enable cart and disable BASIC ROM at base >8000?
-	@>e110(r): cartridges should return >42 if they have a ROM at base >0000 and they want the Tutor to boot from this ROM (with a blwp@>0000)???
+    @>e100(w): enable cart and disable system ROM at base >0000??? (the system will only link to such a ROM if @>e110 is >42???)
+    @>e108(w): disable cart and enable BASIC ROM at base >8000?
+    @>e10c(w): enable cart and disable BASIC ROM at base >8000?
+    @>e110(r): cartridges should return >42 if they have a ROM at base >0000 and they want the Tutor to boot from this ROM (with a blwp@>0000)???
 
-	@>e200(w): sound write
+    @>e200(w): sound write
 
-	@>e600(r): handshake in from whatever device???
-	@>e610(w): ???
-	@>e620(w): ???
-	@>e680(w): handshake out to this device???
+    @>e600(r): handshake in from whatever device???
+    @>e610(w): ???
+    @>e620(w): ???
+    @>e680(w): handshake out to this device???
 
-	@>e810(w): parallel port data bus
-	@>e820(r): parallel port busy input
-	@>e840(w): parallel port strobe output
+    @>e810(w): parallel port data bus
+    @>e820(r): parallel port busy input
+    @>e840(w): parallel port strobe output
 
-	@>ee00-@>eee0(w): tape interface (see above)
+    @>ee00-@>eee0(w): tape interface (see above)
 
-	@>f000-@>f0fb: tms9995 internal RAM 1
-	@>fffa-@>fffb: tms9995 internal decrementer
-	@>f000-@>f0fb: tms9995 internal RAM 2
+    @>f000-@>f0fb: tms9995 internal RAM 1
+    @>fffa-@>fffb: tms9995 internal decrementer
+    @>f000-@>f0fb: tms9995 internal RAM 2
 */
 
 /*static WRITE8_HANDLER(test_w)
 {
-	switch (offset)
-	{
-	default:
-		logerror("unmapped write %d %d\n", offset, data);
-		break;
-	}
+    switch (offset)
+    {
+    default:
+        logerror("unmapped write %d %d\n", offset, data);
+        break;
+    }
 }*/
 
 static ADDRESS_MAP_START(tutor_memmap, ADDRESS_SPACE_PROGRAM, 8)
@@ -419,13 +419,13 @@ static ADDRESS_MAP_START(tutor_memmap, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /*
-	CRU map summary:
+    CRU map summary:
 
-	>1ee0->1efe: tms9995 flag register
-	>1fda: tms9995 MID flag
+    >1ee0->1efe: tms9995 flag register
+    >1fda: tms9995 MID flag
 
-	>ec00->ec7e(r): keyboard interface
-	>ed00(r): tape input
+    >ec00->ec7e(r): keyboard interface
+    >ed00(r): tape input
 */
 
 static ADDRESS_MAP_START(tutor_readcru, ADDRESS_SPACE_IO, 8)
@@ -526,7 +526,7 @@ static INPUT_PORTS_START(tutor)
 
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
 		/* only one shift key located on the left, but we support both for
-		emulation to be friendlier */
+        emulation to be friendlier */
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MON") PORT_CODE(KEYCODE_F1)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RT") PORT_CODE(KEYCODE_ENTER)
@@ -659,5 +659,5 @@ SYSTEM_CONFIG_START(tutor)
 
 SYSTEM_CONFIG_END
 
-/*		YEAR	NAME	PARENT		COMPAT	MACHINE		INPUT	INIT	CONFIG		COMPANY		FULLNAME */
+/*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY     FULLNAME */
 COMP(	1983?,	tutor,	0,			0,		tutor,		tutor,	tutor,	tutor,		"Tomy",		"Tomy Tutor" , 0)

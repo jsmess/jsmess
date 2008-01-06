@@ -365,7 +365,7 @@ Video part
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 
-#include "includes/ted7360.h"
+#include "ted7360.h"
 
 /*#define GFX */
 

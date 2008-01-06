@@ -1,17 +1,17 @@
 /***************************************************************************
     commodore c128 home computer
 
-	PeT mess@utanet.at
+    PeT mess@utanet.at
 
     documentation:
- 	 iDOC (http://www.softwolves.pp.se/idoc)
+     iDOC (http://www.softwolves.pp.se/idoc)
            Christian Janoff  mepk@c64.org
 ***************************************************************************/
 
 /*
 ------------------------------------
-c128	commodore c128 (ntsc version)
-c128ger	commodore c128 german (pal version)
+c128    commodore c128 (ntsc version)
+c128ger commodore c128 german (pal version)
 ------------------------------------
 (preliminary version)
 
@@ -294,19 +294,23 @@ U102 23256 (read compatible 27256?) 32kB 1571 system rom
 */
 
 #include "driver.h"
-#include "mslegacy.h"
+#include "includes/c128.h"
+#include "includes/c64.h"
+
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-#include "includes/vic6567.h"
-#include "includes/vdc8563.h"
+#include "video/vic6567.h"
+#include "video/vdc8563.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"
 
-#include "includes/c128.h"
+/* TODO: Remove dependency on this */
+#include "mslegacy.h"
+
 
 /* shares ram with m8502
  * how to bankswitch ?
@@ -367,7 +371,7 @@ static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xd600, 0xd7ff) AM_READWRITE(vdc8563_port_r, vdc8563_port_w)
 	AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(cia_0_r, cia_0_w)
 	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(cia_1_r, cia_1_w)
-/*	AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(dma_port_r, dma_port_w) */
+/*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(dma_port_r, dma_port_w) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c128_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -1080,8 +1084,8 @@ ROM_START (c128dita)
 
     // in a cost reduced set this should be 1 rom
 	ROM_LOAD ("251913.01", 0x108000, 0x4000, CRC(0010ec31))
-//	ROM_LOAD ("901226.01", 0x108000, 0x2000, CRC(f833d117))
-//	ROM_LOAD( "kern128d.ita", 0x10a000, 0x2000, CRC(f1098d37 ))
+//  ROM_LOAD ("901226.01", 0x108000, 0x2000, CRC(f833d117))
+//  ROM_LOAD( "kern128d.ita", 0x10a000, 0x2000, CRC(f1098d37 ))
 	ROM_LOAD ("318079.01", 0x10c000, 0x4000, CRC(66673e8b))
 
     ROM_LOAD ("325167.01", 0x120000, 0x2000, CRC(bad36b88)) // taken from funet
@@ -1091,7 +1095,7 @@ ROM_START (c128dita)
 
 	ROM_REGION (0x10000, REGION_CPU2, 0)
     // not included in submission
-//	C1571_ROM(REGION_CPU3)
+//  C1571_ROM(REGION_CPU3)
 	ROM_REGION (0x2000, REGION_GFX1, 0)
 	ROM_REGION (0x100, REGION_GFX2, 0)
 ROM_END
@@ -1269,7 +1273,7 @@ SYSTEM_CONFIG_START(c128d)
 	CONFIG_DEVICE(c1571_device_getinfo)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	NAME		PARENT	COMPAT	MACHINE 	INPUT		INIT		CONFIG  COMPANY   FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY   FULLNAME */
 COMP (1985, c128,		0,		0,		c128,		c128,		c128,		c128,	"Commodore Business Machines Co.","Commodore 128 NTSC", 0)
 COMP (1985, c128ger,	c128,	0,		c128pal,	c128ger,	c128pal,	c128,	"Commodore Business Machines Co.","Commodore 128 German (PAL)", 0)
 COMP (1985, c128fra,	c128,	0,		c128pal,	c128fra,	c128pal,	c128,	"Commodore Business Machines Co.","Commodore 128 French (PAL)", 0)
@@ -1279,5 +1283,5 @@ COMP (1985, c128swe,	c128,	0,		c128pal,	c128swe,	c128pal,	c128,	"Commodore Busin
 /* please leave the following as testdriver */
 COMP (1985, c128nor,	c128,	0,		c128pal,	c128ita,	c128pal,	c128,	"Commodore Business Machines Co.","Commodore 128 Norwegian (PAL)", GAME_NOT_WORKING)
 COMP (1985, c128d,		c128,	0,		c128d,		c128,		c128,		c128d,	"Commodore Business Machines Co.","Commodore 128D NTSC", GAME_NOT_WORKING)
-//COMP(1985,c128dita,	c128,	0,		c128d,		c128,		c128,		c128d,	"Commodore Business Machines Co.","Commodore 128D Italian (PAL)", GAME_NOT_WORKING)
+//COMP(1985,c128dita,   c128,   0,      c128d,      c128,       c128,       c128d,  "Commodore Business Machines Co.","Commodore 128D Italian (PAL)", GAME_NOT_WORKING)
 COMP (1985, c128dita,	c128,	0,		c128pal,	c128ita,	c128pal,	c128d,	"Commodore Business Machines Co.","Commodore 128D Italian (PAL)", GAME_NOT_WORKING)

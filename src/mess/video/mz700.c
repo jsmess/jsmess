@@ -9,7 +9,9 @@
  *
  ***************************************************************************/
 
+#include "driver.h"
 #include "includes/mz700.h"
+
 
 #ifndef VERBOSE
 #define VERBOSE 1

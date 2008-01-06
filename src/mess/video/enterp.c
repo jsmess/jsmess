@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/nick.h"
 #include "video/epnick.h"
 #include "includes/enterp.h"
 

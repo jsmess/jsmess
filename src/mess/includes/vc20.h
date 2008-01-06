@@ -1,10 +1,12 @@
+/*****************************************************************************
+ *
+ * includes/vc20.h
+ *
+ ****************************************************************************/
 
-#ifndef __VC20_H_
-#define __VC20_H_
+#ifndef VC20_H_
+#define VC20_H_
 
-#include "driver.h"
-
-#include "cbmserb.h"
 
 #define TAG_JOYSTICK		"joystick"
 #define TAG_PADDLE1			"paddle1"
@@ -85,6 +87,7 @@
 #define VC20ADDR2VIC6560ADDR(a) (((a)>0x8000)?((a)&0x1fff):((a)|0x2000))
 #define VIC6560ADDR2VC20ADDR(a) (((a)>0x2000)?((a)&0x1fff):((a)|0x8000))
 
+
 /*----------- defined in machine/vc20.c -----------*/
 
 extern UINT8 *vc20_memory;
@@ -111,5 +114,5 @@ void vc20_driver_shutdown (void);
 MACHINE_RESET( vc20 );
 INTERRUPT_GEN( vc20_frame_interrupt );
 
-#endif
 
+#endif /* VC20_H_ */

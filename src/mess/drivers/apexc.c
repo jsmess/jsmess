@@ -1,14 +1,13 @@
 /*
-	drivers/apexc.c : APEXC driver
+    drivers/apexc.c : APEXC driver
 
-	By Raphael Nabet
+    By Raphael Nabet
 
-	see cpu/apexc.c for background and tech info
+    see cpu/apexc.c for background and tech info
 */
 
 #include "driver.h"
 #include "cpu/apexc/apexc.h"
-#include "video/generic.h"
 
 
 static void apexc_teletyper_init(void);
@@ -22,14 +21,14 @@ static MACHINE_START(apexc)
 
 
 /*
-	APEXC RAM loading/saving from cylinder image
+    APEXC RAM loading/saving from cylinder image
 
-	Note that, in an actual APEXC, the RAM contents are not read from the cylinder :
-	the cylinder IS the RAM.
+    Note that, in an actual APEXC, the RAM contents are not read from the cylinder :
+    the cylinder IS the RAM.
 
-	This feature is important : of course, the tape reader allows to enter programs, but you
-	still need an object code loader in memory.  (Of course, the control panel enables
-	the user to enter such a loader manually, but it would take hours...)
+    This feature is important : of course, the tape reader allows to enter programs, but you
+    still need an object code loader in memory.  (Of course, the control panel enables
+    the user to enter such a loader manually, but it would take hours...)
 */
 
 typedef struct cylinder
@@ -41,7 +40,7 @@ typedef struct cylinder
 static cylinder apexc_cylinder;
 
 /*
-	Open cylinder image and read RAM
+    Open cylinder image and read RAM
 */
 static int device_load_apexc_cylinder(mess_image *image)
 {
@@ -71,7 +70,7 @@ static int device_load_apexc_cylinder(mess_image *image)
 }
 
 /*
-	Save RAM to cylinder image and close it
+    Save RAM to cylinder image and close it
 */
 static void device_unload_apexc_cylinder(mess_image *image)
 {
@@ -97,48 +96,48 @@ static void device_unload_apexc_cylinder(mess_image *image)
 
 
 /*
-	APEXC tape support
+    APEXC tape support
 
-	APEXC does all I/O on paper tape.  There are 5 punch rows on tape.
+    APEXC does all I/O on paper tape.  There are 5 punch rows on tape.
 
-	Both a reader (read-only), and a puncher (write-only) are provided.
+    Both a reader (read-only), and a puncher (write-only) are provided.
 
-	Tape output can be fed into a teletyper, in order to have text output :
+    Tape output can be fed into a teletyper, in order to have text output :
 
-	code					Symbol
-	(binary)		Letters			Figures
-	00000							0
-	00001			T				1
-	00010			B				2
-	00011			O				3
-	00100			E				4
-	00101			H				5
-	00110			N				6
-	00111			M				7
-	01000			A				8
-	01001			L				9
-	01010			R				+
-	01011			G				-
-	01100			I				z
-	01101			P				.
-	01110			C				d
-	01111			V				=
-	10000					Space
-	10001			Z				y
-	10010			D				theta (greek letter)
-	10011					Line Space (i.e. LF)
-	10100			S				,
-	10101			Y				Sigma (greek letter)
-	10110			F				x
-	10111			X				/
-	11000					Carriage Return
-	11001			W				phi (greek letter)
-	11010			J				- (dash ?)
-	11011					Figures
-	11100			U				pi (greek letter)
-	11101			Q				)
-	11110			K				(
-	11111					Letters
+    code                    Symbol
+    (binary)        Letters         Figures
+    00000                           0
+    00001           T               1
+    00010           B               2
+    00011           O               3
+    00100           E               4
+    00101           H               5
+    00110           N               6
+    00111           M               7
+    01000           A               8
+    01001           L               9
+    01010           R               +
+    01011           G               -
+    01100           I               z
+    01101           P               .
+    01110           C               d
+    01111           V               =
+    10000                   Space
+    10001           Z               y
+    10010           D               theta (greek letter)
+    10011                   Line Space (i.e. LF)
+    10100           S               ,
+    10101           Y               Sigma (greek letter)
+    10110           F               x
+    10111           X               /
+    11000                   Carriage Return
+    11001           W               phi (greek letter)
+    11010           J               - (dash ?)
+    11011                   Figures
+    11100           U               pi (greek letter)
+    11101           Q               )
+    11110           K               (
+    11111                   Letters
 */
 
 typedef struct tape
@@ -178,7 +177,7 @@ static int device_init_apexc_tape(mess_image *image)
 
 
 /*
-	Open a tape image
+    Open a tape image
 */
 static int device_load_apexc_tape(mess_image *image)
 {
@@ -212,33 +211,33 @@ static WRITE8_HANDLER(tape_write)
 }
 
 /*
-	APEXC control panel
+    APEXC control panel
 
-	I know really little about the details, although the big picture is obvious.
+    I know really little about the details, although the big picture is obvious.
 
-	Things I know :
-	* "As well as starting and stopping the machine, [it] enables information to be inserted
-	manually and provides for the inspection of the contents of the memory via various
-	storage registers." (Booth, p. 2)
-	* "Data can be inserted manually from the control panel [into the control register]".
-	(Booth, p. 3)
-	* The contents of the R register can be edited, too.  A button allows to clear
-	a complete X (or Y ???) field.  (forgot the reference, but must be somewhere in Booth)
-	* There is no trace mode (Booth, p. 213)
+    Things I know :
+    * "As well as starting and stopping the machine, [it] enables information to be inserted
+    manually and provides for the inspection of the contents of the memory via various
+    storage registers." (Booth, p. 2)
+    * "Data can be inserted manually from the control panel [into the control register]".
+    (Booth, p. 3)
+    * The contents of the R register can be edited, too.  A button allows to clear
+    a complete X (or Y ???) field.  (forgot the reference, but must be somewhere in Booth)
+    * There is no trace mode (Booth, p. 213)
 
-	Since the control panel is necessary for the operation of the APEXC, I tried to
-	implement a commonplace control panel.  I cannot tell how close the feature set and
-	operation of this control panel is to the original APEXC control panel, but it
-	cannot be too different in the basic principles.
+    Since the control panel is necessary for the operation of the APEXC, I tried to
+    implement a commonplace control panel.  I cannot tell how close the feature set and
+    operation of this control panel is to the original APEXC control panel, but it
+    cannot be too different in the basic principles.
 */
 
 
 /* defines for input port numbers */
 /* enum
 {
-	panel_control = 0,
-	panel_edit1,
-	panel_edit2
+    panel_control = 0,
+    panel_edit1,
+    panel_edit2
 };
 */
 
@@ -319,11 +318,11 @@ INPUT_PORTS_END
 
 
 static UINT32 panel_data_reg;	/* value of a data register on the control panel which can
-								be edited - the existence of this register is a personnal
-								guess */
+                                be edited - the existence of this register is a personnal
+                                guess */
 
 /*
-	Not a real interrupt - just handle keyboard input
+    Not a real interrupt - just handle keyboard input
 */
 static void apexc_interrupt(void)
 {
@@ -362,8 +361,8 @@ static void apexc_interrupt(void)
 	while (control_transitions & (panel_CR | panel_A | panel_R | panel_ML | panel_HB))
 	{	/* read/write a register */
 		/* note that we must take into account the possibility of simulteanous keypresses
-		(which would be a goofy thing to do when reading, but a normal one when writing,
-		if the user wants to clear several registers at once) */
+        (which would be a goofy thing to do when reading, but a normal one when writing,
+        if the user wants to clear several registers at once) */
 		int reg_id = -1;
 
 		/* determinate value of reg_id */
@@ -421,11 +420,11 @@ static void apexc_interrupt(void)
 }
 
 /*
-	apexc video emulation.
+    apexc video emulation.
 
-	Since the APEXC has no video display, we display the control panel.
+    Since the APEXC has no video display, we display the control panel.
 
-	Additionnally, We display one page of teletyper output.
+    Additionnally, We display one page of teletyper output.
 */
 
 static const rgb_t apexc_palette[] =
@@ -883,6 +882,6 @@ SYSTEM_CONFIG_START(apexc)
 	CONFIG_DEVICE(apexc_punchtape_getinfo)
 SYSTEM_CONFIG_END
 
-/*		   YEAR		NAME		PARENT			COMPAT	MACHINE		INPUT	INIT	CONFIG	COMPANY		FULLNAME */
-/*COMP( c. 1951,	apexc53,	0,				0,		apexc53,	apexc,	apexc,	apexc,	"Booth",	"APEXC (as described in 1953)" , 0)*/
+/*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY     FULLNAME */
+/*COMP( c. 1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,  apexc,  "Booth",    "APEXC (as described in 1953)" , 0)*/
 COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	apexc,	"Booth",	"APEXC (as described in 1957)" , 0)

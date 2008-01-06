@@ -1,8 +1,14 @@
-#ifndef LYNX_H
-#define LYNX_H
+/*****************************************************************************
+ *
+ * includes/lynx.h
+ *
+ ****************************************************************************/
 
-#include "driver.h"
+#ifndef LYNX_H_
+#define LYNX_H_
+
 #include "sound/custom.h"
+
 
 /*----------- defined in drivers/lynx.c -----------*/
 
@@ -10,6 +16,7 @@ void lynx_partialhash(char *dest, const unsigned char *data,
 	unsigned long length, unsigned int functions);
 
 extern int lynx_rotate;
+
 
 /*----------- defined in video/lynx.c -----------*/
 
@@ -22,6 +29,7 @@ void lynx_draw_lines(int newline);
 #define PAD_DOWN 0x40
 #define PAD_LEFT 0x20
 #define PAD_RIGHT 0x10
+
 
 /*----------- defined in machine/lynx.c -----------*/
 
@@ -49,6 +57,7 @@ WRITE8_HANDLER(suzy_write);
 READ8_HANDLER(suzy_read);
 void lynx_timer_count_down(int nr);
 
+
 /*----------- defined in audio/lynx.c -----------*/
 
 void lynx_audio_reset(void);
@@ -58,8 +67,11 @@ void lynx_audio_count_down(int nr);
 void *lynx_custom_start(int clock, const struct CustomSound_interface *config);
 void *lynx2_custom_start(int clock, const struct CustomSound_interface *config);
 
-#endif /* LYNX_H */
 
+#endif /* LYNX_H_ */
+
+
+/* TODO: Move those functions to their own file */
 
 #ifdef INCLUDE_LYNX_LINE_FUNCTION
 	int j, xi, wi, i;

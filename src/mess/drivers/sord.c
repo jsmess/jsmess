@@ -1,20 +1,20 @@
 /******************************************************************************
 
-	drivers/sorc.c
+    drivers/sorc.c
 
-	Sord m5	system driver
+    Sord m5 system driver
 
-	Thankyou to Roman Stec and Jan P. Naidr for the documentation and much
-	help.
+    Thankyou to Roman Stec and Jan P. Naidr for the documentation and much
+    help.
 
-	http://falabella.lf2.cuni.cz/~naidr/sord/
+    http://falabella.lf2.cuni.cz/~naidr/sord/
 
-	PI-5 is the parallel interface using a 8255.
-	FD-5 is the disc operating system and disc interface.
-	FD-5 is connected to M5 via PI-5.
+    PI-5 is the parallel interface using a 8255.
+    FD-5 is the disc operating system and disc interface.
+    FD-5 is connected to M5 via PI-5.
 
 
-	Kevin Thacker [MESS driver]
+    Kevin Thacker [MESS driver]
 
  ******************************************************************************/
 
@@ -408,7 +408,7 @@ static WRITE8_HANDLER(sord_sys_w)
 
 static WRITE8_HANDLER(sord_printer_w)
 {
-//	logerror("centronics w: %02x\n",data);
+//  logerror("centronics w: %02x\n",data);
 	centronics_write_data(0,data);
 }
 
@@ -474,7 +474,7 @@ static MACHINE_RESET( sord_m5 )
 	/* PI-5 interface connected to Sord M5 */
 	ppi8255_init(&sord_ppi8255_interface);
 
-//	cassette_timer = timer_pulse(TIME_IN_HZ(11025), NULL, 0, cassette_timer_callback);
+//  cassette_timer = timer_pulse(TIME_IN_HZ(11025), NULL, 0, cassette_timer_callback);
 	TMS9928A_reset ();
 	z80ctc_reset(0);
 
@@ -584,7 +584,7 @@ static INPUT_PORTS_START(sord_m5)
     PORT_BIT (0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_7_PAD)
     PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_8_PAD)
     PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_9_PAD)
-/*	PORT_BIT (0x0ff, 0x000, IPT_UNUSED) */
+/*  PORT_BIT (0x0ff, 0x000, IPT_UNUSED) */
 	/* line 11 */
 	PORT_START
 	PORT_BIT (0x0ff, 0x000, IPT_UNUSED)
@@ -744,6 +744,6 @@ SYSTEM_CONFIG_START(srdm5fd5)
 	CONFIG_DEVICE(srdm5fd5_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME		PARENT	COMPAT	MACHINE			INPUT		INIT	CONFIG		COMPANY		FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE         INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP( 1983, sordm5,		0,		0,		sord_m5,		sord_m5,	0,		sordm5,		"Sord",		"Sord M5", 0)
 COMP(1983, srdm5fd5,	0,		0,		sord_m5_fd5,	sord_m5,	0,		srdm5fd5,	"Sord",		"Sord M5 + PI5 + FD5", GAME_NOT_WORKING)

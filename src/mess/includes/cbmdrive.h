@@ -1,21 +1,26 @@
-/*
- * private area for the
+/*****************************************************************************
+ *
+ * includes/cbmdrive.h
+ *
  * commodore cbm floppy drives vc1541 c1551
  * synthetic simulation
  *
  * contains state machines and file system accesses
  *
- */
-#ifndef __CBMDRIVE_H_
-#define __CBMDRIVE_H_
+ ****************************************************************************/
 
-/*----------- defined in machine/cbmdrive.c -----------*/
+#ifndef CBMDRIVE_H_
+#define CBMDRIVE_H_
+
 
 #if 0
 #define IEC 1
 #define SERIAL 2
 #define IEEE 3
 #endif
+
+
+/*----------- defined in machine/cbmdrive.c -----------*/
 
 /* data for one drive */
 typedef struct
@@ -87,4 +92,5 @@ void c1551_state (CBM_Drive * c1551);
 void vc1541_state (CBM_Drive * vc1541);
 void c2031_state(CBM_Drive *drive);
 
-#endif
+
+#endif /* CBMDRIVE_H_ */

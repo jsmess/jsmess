@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ * includes/genesis.h
+ *
+ ****************************************************************************/
+
+#ifndef GENESIS_H_
+#define GENESIS_H_
+
+
 READ16_HANDLER( genesis_68000_z80_read );
 READ16_HANDLER ( genesis_68000_io_r );
 READ16_HANDLER( genesis_68000_z80_busreq_r );
@@ -22,3 +32,6 @@ DRIVER_INIT ( genesis );
 extern UINT16 *genesis_cartridge;
 extern int genesis_is_ntsc;
 extern int genesis_region;
+
+
+#endif /* GENESIS_H_ */

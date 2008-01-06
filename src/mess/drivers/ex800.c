@@ -264,7 +264,7 @@ static WRITE8_HANDLER(ex800_portb_w)
 	else
 		logerror("PB3 Paper empty LED off @%x\n", activecpu_get_pc());
 
-//	logerror("PB W %x @%x\n", data, activecpu_get_pc());
+//  logerror("PB W %x @%x\n", data, activecpu_get_pc());
 }
 
 static WRITE8_HANDLER(ex800_portc_w)
@@ -460,14 +460,14 @@ static MACHINE_DRIVER_START(ex800)
 	/* "video" hardware */
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-//	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-//	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-//	MDRV_SCREEN_SIZE(480, 640)
-//	MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 639)
-//	MDRV_PALETTE_LENGTH(4)
+//  MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+//  MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+//  MDRV_SCREEN_SIZE(480, 640)
+//  MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 639)
+//  MDRV_PALETTE_LENGTH(4)
 
-//	MDRV_VIDEO_START(ex800)
-//	MDRV_VIDEO_UPDATE(ex800)
+//  MDRV_VIDEO_START(ex800)
+//  MDRV_VIDEO_UPDATE(ex800)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

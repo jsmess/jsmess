@@ -15,10 +15,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include "driver.h"
-#include "mscommon.h"
 
 #include "includes/crtc6845.h" // include only several register defines
-#include "includes/vdc8563.h"
+#include "vdc8563.h"
 
 #define VERBOSE 0
 #define VERBOSE_DBG	0

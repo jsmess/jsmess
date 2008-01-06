@@ -1,9 +1,8 @@
 /* This is a .D88 disc image format. */
 
 #include "driver.h"
-#include "includes/d88.h"
-#include "devices/flopdrv.h"
 #include "image.h"
+#include "includes/d88.h"
 
 #define d88image_MAX_DRIVES 4
 #define VERBOSE 1

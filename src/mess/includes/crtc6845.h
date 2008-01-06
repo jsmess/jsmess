@@ -1,27 +1,26 @@
 /***************************************************************************
 
-	Motorola 6845 CRT controller and emulation
+    Motorola 6845 CRT controller and emulation
 
-	This code emulates the functionality of the 6845 chip, and also
-	supports the functionality of chips related to the 6845
+    This code emulates the functionality of the 6845 chip, and also
+    supports the functionality of chips related to the 6845
 
-	Peter Trauner
-	Nathan Woods
+    Peter Trauner
+    Nathan Woods
 
 ***************************************************************************/
 
-#ifndef MSCRTC6845_H
-#define MSCRTC6845_H
-
-#include "mame.h"
+#ifndef MSCRTC6845_H_
+#define MSCRTC6845_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 /***************************************************************************
 
-	Constants
+    Constants
 
 ***************************************************************************/
 
@@ -33,7 +32,7 @@ extern "C" {
 
 /***************************************************************************
 
-	Type definitions
+    Type definitions
 
 ***************************************************************************/
 
@@ -59,7 +58,7 @@ struct mscrtc6845_config
 
 /***************************************************************************
 
-	Externs
+    Externs
 
 ***************************************************************************/
 
@@ -68,7 +67,7 @@ extern struct mscrtc6845 *mscrtc6845;
 
 /***************************************************************************
 
-	Prototypes
+    Prototypes
 
 ***************************************************************************/
 
@@ -89,7 +88,7 @@ void mscrtc6845_set_char_lines(struct mscrtc6845 *crtc, UINT8 lines);
 int mscrtc6845_get_personality(struct mscrtc6845 *crtc);
 
 /* cursor off, cursor on, cursor 16 frames on/off, cursor 32 frames on/off
-	start line, end line */
+    start line, end line */
 void mscrtc6845_get_cursor(struct mscrtc6845 *crtc, struct mscrtc6845_cursor *cursor);
 
 UINT8 mscrtc6845_port_r(struct mscrtc6845 *crtc, int offset);
@@ -103,10 +102,10 @@ WRITE8_HANDLER ( mscrtc6845_0_port_w );
 
 /***************************************************************************
 
-	6845 variant macros
+    6845 variant macros
 
-	These are used to support emulations of 6845 variants, but these will
-	be eventually merged into mscrtc6845.c so these are deprecated
+    These are used to support emulations of 6845 variants, but these will
+    be eventually merged into mscrtc6845.c so these are deprecated
 
 ***************************************************************************/
 
@@ -128,8 +127,9 @@ WRITE8_HANDLER ( mscrtc6845_0_port_w );
 #define CRTC6845_CURSOR_TOP	(REG(0xa)&0x1f)
 #define CRTC6845_CURSOR_BOTTOM REG(0xb)
 
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CRTC6845_H */
+#endif /* MSCRTC6845_H_ */

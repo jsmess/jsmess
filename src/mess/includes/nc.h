@@ -1,5 +1,13 @@
-#include "driver.h"
-#include "osdepend.h"
+/*****************************************************************************
+ *
+ * includes/nc.h
+ *
+ ****************************************************************************/
+
+#ifndef NC_H_
+#define NC_H_
+
+
 #define NC_NUM_COLOURS 4
 
 #define NC_SCREEN_WIDTH        480
@@ -9,6 +17,13 @@
 #define NC200_SCREEN_HEIGHT		128
 
 #define NC200_NUM_COLOURS 4
+
+enum
+{
+	NC_TYPE_1xx, /* nc100/nc150 */
+	NC_TYPE_200  /* nc200 */
+};
+
 
 /*----------- defined in video/nc.c -----------*/
 
@@ -23,6 +38,7 @@ void nc200_video_set_backlight(int state);
 
 void nc_set_card_present_state(int);
 
+
 /*----------- defined in machine/nc.c -----------*/
 
 DEVICE_INIT( nc_pcmcia_card );
@@ -31,9 +47,5 @@ DEVICE_UNLOAD( nc_pcmcia_card );
 
 DEVICE_LOAD( nc_serial );
 
-enum
-{
-        NC_TYPE_1xx, /* nc100/nc150 */
-        NC_TYPE_200  /* nc200 */
-};
 
+#endif /* NC_H_ */

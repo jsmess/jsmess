@@ -21,7 +21,7 @@
 #include "machine/8042kbdc.h"
 #include "includes/at.h"
 #include "machine/pckeybrd.h"
-#include "includes/sblaster.h"
+#include "audio/sblaster.h"
 #include "machine/i82439tx.h"
 
 static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };

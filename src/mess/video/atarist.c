@@ -10,7 +10,6 @@
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"

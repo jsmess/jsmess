@@ -98,19 +98,21 @@ Notes:
 
 ******************************************************************************/
 
-
+/* Core includes */
 #include "driver.h"
-#include "video/generic.h"
-#include "video/m6847.h"
 #include "includes/vtech1.h"
+
+/* Components */
+#include "video/m6847.h"
+#include "sound/speaker.h"
+
+/* Devices */
 #include "devices/cartslot.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
 #include "devices/z80bin.h"
 #include "formats/vt_cas.h"
-#include "sound/speaker.h"
-#include "inputx.h"
 
 
 /******************************************************************************

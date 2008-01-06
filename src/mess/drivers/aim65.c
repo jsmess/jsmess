@@ -12,7 +12,7 @@ ToDo:
 
 ******************************************************************************/
 
-
+/* Core includes */
 #include "driver.h"
 #include "includes/aim65.h"
 
@@ -23,9 +23,6 @@ ToDo:
 
 /* cartridge device */
 #include "devices/cartslot.h"
-
-/* for natural keyboard support */
-#include "inputx.h"
 
 /* for the layout */
 #include "rendlay.h"

@@ -1,12 +1,12 @@
 /***************************************************************************
-	commodore pet series computer
+    commodore pet series computer
 
     peter.trauner@jk.uni-linz.ac.at
 ***************************************************************************/
-#ifndef __PET_H_
-#define __PET_H_
 
-#include "driver.h"
+#ifndef PET_H_
+#define PET_H_
+
 
 /*----------- defined in video/pet.c -----------*/
 
@@ -21,6 +21,7 @@ void pet80_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
 					  UINT8 ra, UINT16 y, UINT8 x_count, void *param);
 
 extern int pet_font;
+
 
 /*----------- defined in machine/pet.c -----------*/
 
@@ -48,4 +49,5 @@ INTERRUPT_GEN( pet_frame_interrupt );
 
 void pet_rom_load(void);
 
-#endif
+
+#endif /* PET_H_ */

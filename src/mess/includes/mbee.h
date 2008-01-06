@@ -1,5 +1,12 @@
-#ifndef MBEE_H
-#define MBEE_H
+/*****************************************************************************
+ *
+ * includes/mbee.h
+ *
+ ****************************************************************************/
+
+#ifndef MBEE_H_
+#define MBEE_H_
+
 
 /*----------- defined in machine/mbee.c -----------*/
 
@@ -49,4 +56,5 @@ WRITE8_HANDLER ( mbee_pcg_color_w );
 VIDEO_START( mbee );
 VIDEO_UPDATE( mbee );
 
-#endif /* MBEE_H */
+
+#endif /* MBEE_H_ */

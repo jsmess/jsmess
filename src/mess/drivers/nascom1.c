@@ -1,56 +1,55 @@
 /************************************************************************
 Nascom Memory map
 
-	CPU: z80
-		0000-03ff	ROM (Nascom1 Monitor)
-		0400-07ff	ROM (Nascom2 Monitor extension)
-		0800-0bff	RAM (Screen)
-		0c00-0c7f	RAM (OS workspace)
-		0c80-0cff	RAM (extended OS workspace)
-		0d00-0f7f	RAM (Firmware workspace)
-		0f80-0fff	RAM (Stack space)
-		1000-8fff	RAM (User space)
-		9000-97ff	RAM (Programmable graphics RAM/User space)
-		9800-afff	RAM (Colour graphics RAM/User space)
-		b000-b7ff	ROM (OS extensions)
-		b800-bfff	ROM (WP/Naspen software)
-		c000-cfff	ROM (Disassembler/colour graphics software)
-		d000-dfff	ROM (Assembler/Basic extensions)
-		e000-ffff	ROM (Nascom2 Basic)
+    CPU: z80
+        0000-03ff   ROM (Nascom1 Monitor)
+        0400-07ff   ROM (Nascom2 Monitor extension)
+        0800-0bff   RAM (Screen)
+        0c00-0c7f   RAM (OS workspace)
+        0c80-0cff   RAM (extended OS workspace)
+        0d00-0f7f   RAM (Firmware workspace)
+        0f80-0fff   RAM (Stack space)
+        1000-8fff   RAM (User space)
+        9000-97ff   RAM (Programmable graphics RAM/User space)
+        9800-afff   RAM (Colour graphics RAM/User space)
+        b000-b7ff   ROM (OS extensions)
+        b800-bfff   ROM (WP/Naspen software)
+        c000-cfff   ROM (Disassembler/colour graphics software)
+        d000-dfff   ROM (Assembler/Basic extensions)
+        e000-ffff   ROM (Nascom2 Basic)
 
-	Interrupts:
+    Interrupts:
 
-	Ports:
-		OUT (00)	0:	Increment keyboard scan
-				1:	Reset keyboard scan
-				2:
-				3:	Read from cassette
-				4:
-				5:
-				6:
-				7:
-		IN  (00)	Read keyboard
-		OUT (01)	Write to cassette/serial
-		IN  (01)	Read from cassette/serial
-		OUT (02)	Unused
-		IN  (02)	?
+    Ports:
+        OUT (00)    0:  Increment keyboard scan
+                1:  Reset keyboard scan
+                2:
+                3:  Read from cassette
+                4:
+                5:
+                6:
+                7:
+        IN  (00)    Read keyboard
+        OUT (01)    Write to cassette/serial
+        IN  (01)    Read from cassette/serial
+        OUT (02)    Unused
+        IN  (02)    ?
 
-	Monitors:
-		Nasbug1		1K	Original Nascom1
-		Nasbug2     	1K
-		Nasbug3     Probably non existing
-		Nasbug4		2K
-		Nassys1		2K	Original Nascom2
-		Nassys2     Probably non existing
-		Nassys3		2K
-		Nassys4		2K
-		T4		2K
+    Monitors:
+        Nasbug1     1K  Original Nascom1
+        Nasbug2         1K
+        Nasbug3     Probably non existing
+        Nasbug4     2K
+        Nassys1     2K  Original Nascom2
+        Nassys2     Probably non existing
+        Nassys3     2K
+        Nassys4     2K
+        T4      2K
 
 ************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "video/generic.h"
 #include "includes/nascom1.h"
 #include "devices/cartslot.h"
 #include "mslegacy.h"

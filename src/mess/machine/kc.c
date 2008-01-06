@@ -1,13 +1,20 @@
+/* Core includes */
 #include "driver.h"
-#include "cpuintrf.h"
+#include "image.h"
+#include "includes/kc.h"
+
+/* Components */
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "cpu/z80/z80.h"
-#include "includes/kc.h"
-#include "devices/cassette.h"
+#include "machine/nec765.h"
 #include "sound/speaker.h"
-#include "image.h"
+
+/* Devices */
+#include "devices/cassette.h"
+#include "devices/basicdsk.h"
+
 
 #define KC_DEBUG 1
 #define LOG(x) do { if (KC_DEBUG) logerror x; } while (0)

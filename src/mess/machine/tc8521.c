@@ -1,7 +1,9 @@
 /* Toshiba TC8521 Real-Time Clock or RICOH RF5C01A*/
 
-#include "mame.h"
-#include "includes/tc8521.h"
+
+#include "driver.h"
+#include "tc8521.h"
+
 
 /* Registers:
 

@@ -2,7 +2,6 @@
 
  ******************************************************************************/
 #include "driver.h"
-#include "inputx.h"
 #include "video/m6847.h"
 #include "includes/apf.h"
 
@@ -96,7 +95,7 @@ static WRITE8_HANDLER(apf_m1000_pia_out_b_func)
 	/* multi colour graphics mode */
 	/* 158 = 1001 multi-colour graphics */
 	/* 222 = 1101 mono graphics */
-	//	if (((previous_mode^data) & 0x0f0)!=0)
+	//  if (((previous_mode^data) & 0x0f0)!=0)
 	{
 		extern UINT8 apf_m6847_attr;
 
@@ -436,31 +435,31 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( apf_m1000 )
 
 	/*
-	   There must be a bug lurking somewhere, because the lines 0-3 are not detected correctly:
-	   Using another known APF emulator, this simple Basic program can be used to read
-	   the joysticks and the keyboard:
+       There must be a bug lurking somewhere, because the lines 0-3 are not detected correctly:
+       Using another known APF emulator, this simple Basic program can be used to read
+       the joysticks and the keyboard:
 
-	   10 PRINT KEY$(n);
-	   20 GOTO 10
+       10 PRINT KEY$(n);
+       20 GOTO 10
 
-	   where n = 0, 1 or 2 - 0 = keyboard, 1,2 = joysticks #1 and #2
+       where n = 0, 1 or 2 - 0 = keyboard, 1,2 = joysticks #1 and #2
 
-	   When reading the keyboard KEY$(0) returns the character associated to the key, with the
-	   following exceptions:
+       When reading the keyboard KEY$(0) returns the character associated to the key, with the
+       following exceptions:
 
-	   Ctrl =    CHR$(1)
-	   Rept =    CHR$(2)
-	   Here Is = CHR$(4)
-	   Rubout =  CHR$(8)
+       Ctrl =    CHR$(1)
+       Rept =    CHR$(2)
+       Here Is = CHR$(4)
+       Rubout =  CHR$(8)
 
-	   When reading the joysticks, KEY$() = "N", "S", "E", "W" for the directions
-	                                        "0" - "9" for the keypad digits
-	                                        "?" for "Cl"
-	                                        "!" for "En"
+       When reading the joysticks, KEY$() = "N", "S", "E", "W" for the directions
+                                            "0" - "9" for the keypad digits
+                                            "?" for "Cl"
+                                            "!" for "En"
 
-	   Current code doesn't behaves this way...
+       Current code doesn't behaves this way...
 
-	*/
+    */
 
 	/* line 0 */
 	PORT_START_TAG("joy0")
@@ -596,8 +595,8 @@ static INPUT_PORTS_START( apf_imagination )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")           PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Here Is")         PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(HOME))
 /* It's very likely these inputs are actually disconnected: if connected they act as a duplicate of key "X" and "Z" */
-//	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Another X")       PORT_CODE(KEYCODE_8_PAD)
-//	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Another Z")       PORT_CODE(KEYCODE_9_PAD)
+//  PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Another X")       PORT_CODE(KEYCODE_8_PAD)
+//  PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Another Z")       PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT(0x40, 0x40, IPT_UNUSED)
 	PORT_BIT(0x80, 0x80, IPT_UNUSED)
 
@@ -704,6 +703,6 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE				INPUT				INIT    CONFIG		COMPANY               FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE             INPUT               INIT    CONFIG      COMPANY               FULLNAME */
 COMP(1977, apfimag,	0,		0,		apf_imagination,	apf_imagination,	0,		apfimag,	"APF Electronics Inc",  "APF Imagination Machine" ,GAME_NOT_WORKING)
 COMP(1978,	apfm1000,	0,		0,		apf_m1000,			apf_m1000,			0,		NULL,		"APF Electronics Inc",  "APF M-1000" ,GAME_NOT_WORKING)

@@ -1,12 +1,17 @@
-/******************************************************************************
+/*****************************************************************************
+ *
+ * includes/compis.h
+ *
+ * machine driver header
+ *
+ * Per Ola Ingvarsson
+ * Tomas Karlsson
+ *
+ ****************************************************************************/
 
-	compis.h
-	machine driver header
+#ifndef COMPIS_H_
+#define COMPIS_H_
 
-	Per Ola Ingvarsson
-	Tomas Karlsson
-
- ******************************************************************************/
 
 /*----------- defined in machine/compis.c -----------*/
 
@@ -46,3 +51,6 @@ WRITE16_HANDLER (compis_fdc_w);
 /* RTC 58174 */
 READ16_HANDLER (compis_rtc_r);
 WRITE16_HANDLER (compis_rtc_w);
+
+
+#endif /* COMPIS_H_ */

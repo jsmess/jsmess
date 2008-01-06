@@ -1,4 +1,12 @@
-#include "abc80.h"
+/*****************************************************************************
+ *
+ * video/abc80.c
+ *
+ ****************************************************************************/
+
+#include "driver.h"
+#include "includes/abc80.h"
+
 
 static tilemap *tx_tilemap;
 static emu_timer *abc80_blink_timer;

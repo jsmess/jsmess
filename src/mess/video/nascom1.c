@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/nascom1.h"
 
 VIDEO_UPDATE( nascom1 )

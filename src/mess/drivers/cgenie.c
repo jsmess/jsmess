@@ -1,25 +1,25 @@
 /***************************************************************************
-HAD to change the PORT_ANALOG defs in this file...	please check ;-)
+HAD to change the PORT_ANALOG defs in this file...  please check ;-)
 
 Colour Genie memory map
 
 CPU #1:
-0000-3fff ROM basic & bios		  R   D0-D7
+0000-3fff ROM basic & bios        R   D0-D7
 
 4000-bfff RAM
-c000-dfff ROM dos				  R   D0-D7
-e000-efff ROM extra 			  R   D0-D7
-f000-f3ff color ram 			  W/R D0-D3
-f400-f7ff font ram				  W/R D0-D7
-f800-f8ff keyboard matrix		  R   D0-D7
-ffe0-ffe3 floppy motor			  W   D0-D2
-		  floppy head select	  W   D3
-ffec-ffef FDC WD179x			  R/W D0-D7
-		  ffec command			  W
-		  ffec status			  R
-		  ffed track			  R/W
-		  ffee sector			  R/W
-		  ffef data 			  R/W
+c000-dfff ROM dos                 R   D0-D7
+e000-efff ROM extra               R   D0-D7
+f000-f3ff color ram               W/R D0-D3
+f400-f7ff font ram                W/R D0-D7
+f800-f8ff keyboard matrix         R   D0-D7
+ffe0-ffe3 floppy motor            W   D0-D2
+          floppy head select      W   D3
+ffec-ffef FDC WD179x              R/W D0-D7
+          ffec command            W
+          ffec status             R
+          ffed track              R/W
+          ffee sector             R/W
+          ffef data               R/W
 
 Interrupts:
 IRQ mode 1
@@ -28,7 +28,6 @@ NMI
 
 #include "driver.h"
 #include "mslegacy.h"
-#include "video/generic.h"
 #include "includes/cgenie.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
@@ -36,9 +35,9 @@ NMI
 
 static ADDRESS_MAP_START (cgenie_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-//	AM_RANGE(0x4000, 0xbfff) AM_RAM	// set up in MACHINE_START
-//	AM_RANGE(0xc000, 0xdfff) AM_ROM	// installed in cgenie_init_machine
-//	AM_RANGE(0xe000, 0xefff) AM_ROM	// installed in cgenie_init_machine
+//  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in MACHINE_START
+//  AM_RANGE(0xc000, 0xdfff) AM_ROM // installed in cgenie_init_machine
+//  AM_RANGE(0xe000, 0xefff) AM_ROM // installed in cgenie_init_machine
 	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE( cgenie_colorram_r, cgenie_colorram_w ) AM_BASE( &colorram )
 	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE( cgenie_fontram_r, cgenie_fontram_w) AM_BASE( &cgenie_fontram )
 	AM_RANGE(0xf800, 0xf8ff) AM_READ( cgenie_keyboard_r )
@@ -83,8 +82,8 @@ static INPUT_PORTS_START( cgenie )
 	PORT_BIT(0x07, 0x07, IPT_UNUSED)
 
 /**************************************************************************
-   +-------------------------------+	 +-------------------------------+
-   | 0	 1	 2	 3	 4	 5	 6	 7 |	 | 0   1   2   3   4   5   6   7 |
+   +-------------------------------+     +-------------------------------+
+   | 0   1   2   3   4   5   6   7 |     | 0   1   2   3   4   5   6   7 |
 +--+---+---+---+---+---+---+---+---+  +--+---+---+---+---+---+---+---+---+
 |0 | @ | A | B | C | D | E | F | G |  |0 | ` | a | b | c | d | e | f | g |
 |  +---+---+---+---+---+---+---+---+  |  +---+---+---+---+---+---+---+---+
@@ -202,13 +201,13 @@ static INPUT_PORTS_START( cgenie )
 	PORT_BIT( 0xff, 0x60, IPT_AD_STICK_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_MINMAX(0x00,0xcf ) PORT_PLAYER(2) PORT_REVERSE
 
 	/* Joystick Keypad */
-	/* keypads were organized a 3 x 4 matrix and it looked	   */
+	/* keypads were organized a 3 x 4 matrix and it looked     */
 	/* exactly like a our northern telephone numerical pads    */
 	/* The addressing was done with a single clear bit 0..6    */
-	/* on i/o port A,  while all other bits were set.		   */
+	/* on i/o port A,  while all other bits were set.          */
 	/* (e.g. 0xFE addresses keypad1 row 0, 0xEF keypad2 row 1) */
 
-	/*		 bit  0   1   2   3   */
+	/*       bit  0   1   2   3   */
 	/* FE/F7  0  [3] [6] [9] [#]  */
 	/* FD/EF  1  [2] [5] [8] [0]  */
 	/* FB/DF  2  [1] [4] [7] [*]  */
@@ -274,56 +273,56 @@ static const unsigned char cgenie_palette[] = {
 	 0*4,  0*4,  0*4,  /* background   */
 
 /* this is the 'RGB monitor' version, strong and clean */
-	15*4, 15*4, 15*4,  /* gray		   */
-	 0*4, 48*4, 48*4,  /* cyan		   */
-	60*4,  0*4,  0*4,  /* red		   */
-	47*4, 47*4, 47*4,  /* white 	   */
-	55*4, 55*4,  0*4,  /* yellow	   */
-	 0*4, 56*4,  0*4,  /* green 	   */
-	42*4, 32*4,  0*4,  /* orange	   */
+	15*4, 15*4, 15*4,  /* gray         */
+	 0*4, 48*4, 48*4,  /* cyan         */
+	60*4,  0*4,  0*4,  /* red          */
+	47*4, 47*4, 47*4,  /* white        */
+	55*4, 55*4,  0*4,  /* yellow       */
+	 0*4, 56*4,  0*4,  /* green        */
+	42*4, 32*4,  0*4,  /* orange       */
 	63*4, 63*4,  0*4,  /* light yellow */
-	 0*4,  0*4, 48*4,  /* blue		   */
+	 0*4,  0*4, 48*4,  /* blue         */
 	 0*4, 24*4, 63*4,  /* light blue   */
-	60*4,  0*4, 38*4,  /* pink		   */
-	38*4,  0*4, 60*4,  /* purple	   */
+	60*4,  0*4, 38*4,  /* pink         */
+	38*4,  0*4, 60*4,  /* purple       */
 	31*4, 31*4, 31*4,  /* light gray   */
 	 0*4, 63*4, 63*4,  /* light cyan   */
-	58*4,  0*4, 58*4,  /* magenta	   */
+	58*4,  0*4, 58*4,  /* magenta      */
 	63*4, 63*4, 63*4,  /* bright white */
 
 /* this is the 'TV screen' version, weak and blurred by repeating pixels */
-	15*2+80, 15*2+80, 15*2+80,	/* gray 		*/
-	 0*2+80, 48*2+80, 48*2+80,	/* cyan 		*/
-	60*2+80,  0*2+80,  0*2+80,	/* red			*/
-	47*2+80, 47*2+80, 47*2+80,	/* white		*/
-	55*2+80, 55*2+80,  0*2+80,	/* yellow		*/
-	 0*2+80, 56*2+80,  0*2+80,	/* green		*/
-	42*2+80, 32*2+80,  0*2+80,	/* orange		*/
+	15*2+80, 15*2+80, 15*2+80,	/* gray         */
+	 0*2+80, 48*2+80, 48*2+80,	/* cyan         */
+	60*2+80,  0*2+80,  0*2+80,	/* red          */
+	47*2+80, 47*2+80, 47*2+80,	/* white        */
+	55*2+80, 55*2+80,  0*2+80,	/* yellow       */
+	 0*2+80, 56*2+80,  0*2+80,	/* green        */
+	42*2+80, 32*2+80,  0*2+80,	/* orange       */
 	63*2+80, 63*2+80,  0*2+80,	/* light yellow */
-	 0*2+80,  0*2+80, 48*2+80,	/* blue 		*/
-	 0*2+80, 24*2+80, 63*2+80,	/* light blue	*/
-	60*2+80,  0*2+80, 38*2+80,	/* pink 		*/
-	38*2+80,  0*2+80, 60*2+80,	/* purple		*/
-	31*2+80, 31*2+80, 31*2+80,	/* light gray	*/
-	 0*2+80, 63*2+80, 63*2+80,	/* light cyan	*/
-	58*2+80,  0*2+80, 58*2+80,	/* magenta		*/
+	 0*2+80,  0*2+80, 48*2+80,	/* blue         */
+	 0*2+80, 24*2+80, 63*2+80,	/* light blue   */
+	60*2+80,  0*2+80, 38*2+80,	/* pink         */
+	38*2+80,  0*2+80, 60*2+80,	/* purple       */
+	31*2+80, 31*2+80, 31*2+80,	/* light gray   */
+	 0*2+80, 63*2+80, 63*2+80,	/* light cyan   */
+	58*2+80,  0*2+80, 58*2+80,	/* magenta      */
 	63*2+80, 63*2+80, 63*2+80,	/* bright white */
 
-	15*2+96, 15*2+96, 15*2+96,	/* gray 		*/
-	 0*2+96, 48*2+96, 48*2+96,	/* cyan 		*/
-	60*2+96,  0*2+96,  0*2+96,	/* red			*/
-	47*2+96, 47*2+96, 47*2+96,	/* white		*/
-	55*2+96, 55*2+96,  0*2+96,	/* yellow		*/
-	 0*2+96, 56*2+96,  0*2+96,	/* green		*/
-	42*2+96, 32*2+96,  0*2+96,	/* orange		*/
+	15*2+96, 15*2+96, 15*2+96,	/* gray         */
+	 0*2+96, 48*2+96, 48*2+96,	/* cyan         */
+	60*2+96,  0*2+96,  0*2+96,	/* red          */
+	47*2+96, 47*2+96, 47*2+96,	/* white        */
+	55*2+96, 55*2+96,  0*2+96,	/* yellow       */
+	 0*2+96, 56*2+96,  0*2+96,	/* green        */
+	42*2+96, 32*2+96,  0*2+96,	/* orange       */
 	63*2+96, 63*2+96,  0*2+96,	/* light yellow */
-	 0*2+96,  0*2+96, 48*2+96,	/* blue 		*/
-	 0*2+96, 24*2+96, 63*2+96,	/* light blue	*/
-	60*2+96,  0*2+96, 38*2+96,	/* pink 		*/
-	38*2+96,  0*2+96, 60*2+96,	/* purple		*/
-	31*2+96, 31*2+96, 31*2+96,	/* light gray	*/
-	 0*2+96, 63*2+96, 63*2+96,	/* light cyan	*/
-	58*2+96,  0*2+96, 58*2+96,	/* magenta		*/
+	 0*2+96,  0*2+96, 48*2+96,	/* blue         */
+	 0*2+96, 24*2+96, 63*2+96,	/* light blue   */
+	60*2+96,  0*2+96, 38*2+96,	/* pink         */
+	38*2+96,  0*2+96, 60*2+96,	/* purple       */
+	31*2+96, 31*2+96, 31*2+96,	/* light gray   */
+	 0*2+96, 63*2+96, 63*2+96,	/* light cyan   */
+	58*2+96,  0*2+96, 58*2+96,	/* magenta      */
 	63*2+96, 63*2+96, 63*2+96,	/* bright white */
 
 
@@ -470,5 +469,5 @@ SYSTEM_CONFIG_START(cgenie)
 	CONFIG_RAM			(32 * 1024)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	NAME	  PARENT	COMPAT	MACHINE   INPUT 	INIT	  CONFIG     COMPANY	FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG     COMPANY    FULLNAME */
 COMP( 1982, cgenie,   0,		0,		cgenie,   cgenie,	0,        cgenie,    "EACA Computers Ltd.",  "Colour Genie EG2000" , 0)

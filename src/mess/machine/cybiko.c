@@ -10,6 +10,7 @@
 
 */
 
+#include "driver.h"
 #include "includes/cybiko.h"
 
 //#include "cpu/h8s2xxx/h8s2xxx.h"
@@ -18,7 +19,7 @@
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"
 #include "machine/sst39vfx.h"
-#include "debugger.h"
+
 
 #ifndef _H8S2XXX_H_
 #define H8S_IO(xxxx) ((xxxx) - 0xFE40)

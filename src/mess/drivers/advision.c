@@ -8,20 +8,19 @@
 
 /**********************************************
 8048 Ports:
-P1 	Bit 0..1  - RAM bank select
-	Bit 3..7  - Keypad input
+P1  Bit 0..1  - RAM bank select
+    Bit 3..7  - Keypad input
 
-P2 	Bit 0..3  - A8-A11
-	Bit 4..7  - Sound control/Video write address
+P2  Bit 0..3  - A8-A11
+    Bit 4..7  - Sound control/Video write address
 
-T1	Mirror sync pulse
+T1  Mirror sync pulse
 
 ***********************************************/
 
 #include "driver.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/cop400/cop400.h"
-#include "video/generic.h"
 #include "includes/advision.h"
 #include "devices/cartslot.h"
 
@@ -115,6 +114,6 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME		PARENT	COMPAT	MACHINE   INPUT     INIT	CONFIG		COMPANY   FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT    CONFIG      COMPANY   FULLNAME */
 CONS(1982, advision,	0,		0,		advision, advision,	0,		advision,	"Entex",  "Adventurevision", 0 )
 

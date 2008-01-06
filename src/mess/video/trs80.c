@@ -5,7 +5,10 @@
   Functions to emulate the video hardware of the TRS80.
 
 ***************************************************************************/
+
+#include "driver.h"
 #include "includes/trs80.h"
+
 
 #define FW  TRS80_FONT_W
 #define FH  TRS80_FONT_H

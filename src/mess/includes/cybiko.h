@@ -1,19 +1,20 @@
-/*
+/*****************************************************************************
+ *
+ * includes/cybiko.h
+ * 
+ * Cybiko Wireless Inter-tainment System
+ * 
+ * (c) 2001-2007 Tim Schuerewegen
+ * 
+ * Cybiko Classic (V1)
+ * Cybiko Classic (V2)
+ * Cybiko Xtreme
+ *
+ ****************************************************************************/
 
-	Cybiko Wireless Inter-tainment System
+#ifndef CYBIKO_H_
+#define CYBIKO_H_
 
-	(c) 2001-2007 Tim Schuerewegen
-
-	Cybiko Classic (V1)
-	Cybiko Classic (V2)
-	Cybiko Xtreme
-
-*/
-
-#ifndef _CYBIKO_H_
-#define _CYBIKO_H_
-
-#include "driver.h"
 
 /*----------- defined in machine/cybiko.c -----------*/
 
@@ -58,4 +59,5 @@ WRITE8_HANDLER( cybikov1_io_reg_w );
 WRITE8_HANDLER( cybikov2_io_reg_w );
 WRITE8_HANDLER( cybikoxt_io_reg_w );
 
-#endif
+
+#endif /* CYBIKO_H_ */

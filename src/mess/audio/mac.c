@@ -10,6 +10,7 @@
 #include "includes/mac.h"
 #include "streams.h"
 
+
 static sound_stream *mac_stream;
 static int sample_enable = 0;
 static UINT16 *mac_snd_buf_ptr;

@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	systems\dgn_beta.c
+    systems\dgn_beta.c
 
-	Dragon Beta prototype, based on two 68B09E processors, WD2797, 6845.
+    Dragon Beta prototype, based on two 68B09E processors, WD2797, 6845.
 
 Project Beta was the second machine that Dragon Data had in development at
 the time they ceased trading, the first being Project Alpha (also know as the
@@ -39,13 +39,11 @@ documentation still exists.
 ***************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 #include "machine/6821pia.h"
-#include "video/generic.h"
 #include "includes/coco.h"
 #include "includes/dgn_beta.h"
 #include "devices/basicdsk.h"
-#include "includes/6551.h"
+#include "machine/6551.h"
 #include "formats/coco_dsk.h"
 #include "devices/mflopimg.h"
 #include "devices/coco_vhd.h"
@@ -57,8 +55,8 @@ documentation still exists.
  be controled by a 4x4bit register file in the video hardware
  The text video ram seems to be aranged of words of character, attribute
  The colour codes are stored in the attribute byte along with :
-	Underline bit 	$40
-	Flash bit	$80
+    Underline bit   $40
+    Flash bit   $80
 
 These are yet to be implemented.
 
@@ -88,51 +86,51 @@ static const unsigned char dgnbeta_palette[] =
 };
 
 /*
-	2005-05-10
+    2005-05-10
 
-	I *THINK* I know how the memory paging works, the 64K memory map is devided
-	into 16x 4K pages, what is mapped into each page is controled by the IO at
-	FE00-FE0F like so :-
+    I *THINK* I know how the memory paging works, the 64K memory map is devided
+    into 16x 4K pages, what is mapped into each page is controled by the IO at
+    FE00-FE0F like so :-
 
-	Location	Memory page 	Initialised to
-	$FE00		$0000-$0FFF		$00
-	$FE01		$1000-$1FFF		$00	(used as ram test page, when sizing memory)
-	$FE02		$2000-$2FFF		$00
-	$FE03		$3000-$3FFF		$00
-	$FE04		$4000-$4FFF		$00
-	$FE05		$5000-$5FFF		$00
-	$FE06		$6000-$6FFF		$1F	($1F000)
-	$FE07		$7000-$7FFF		$00
-	$FE08		$8000-$8FFF		$00
-	$FE09		$9000-$9FFF		$00
-	$FE0A		$A000-$AFFF		$00
-	$FE0B		$B000-$BFFF		$00
-	$FE0C		$C000-$CFFF		$00
-	$FE0D		$D000-$DFFF		$00
-	$FE0E		$E000-$EFFF		$FE
-	$FE0F		$F000-$FFFF		$FF
+    Location    Memory page     Initialised to
+    $FE00       $0000-$0FFF     $00
+    $FE01       $1000-$1FFF     $00 (used as ram test page, when sizing memory)
+    $FE02       $2000-$2FFF     $00
+    $FE03       $3000-$3FFF     $00
+    $FE04       $4000-$4FFF     $00
+    $FE05       $5000-$5FFF     $00
+    $FE06       $6000-$6FFF     $1F ($1F000)
+    $FE07       $7000-$7FFF     $00
+    $FE08       $8000-$8FFF     $00
+    $FE09       $9000-$9FFF     $00
+    $FE0A       $A000-$AFFF     $00
+    $FE0B       $B000-$BFFF     $00
+    $FE0C       $C000-$CFFF     $00
+    $FE0D       $D000-$DFFF     $00
+    $FE0E       $E000-$EFFF     $FE
+    $FE0F       $F000-$FFFF     $FF
 
-	The value stored at each location maps it's page to a 4K page within a 1M address
-	space. Acording to the Beta product descriptions released by Dragon Data, the
-	machine could have up to 768K of RAM, if this where true then pages $00-$BF could
-	potentially be RAM, and pages $C0-$FF would be ROM. The initialisation code maps in
-	the memory as described above.
+    The value stored at each location maps it's page to a 4K page within a 1M address
+    space. Acording to the Beta product descriptions released by Dragon Data, the
+    machine could have up to 768K of RAM, if this where true then pages $00-$BF could
+    potentially be RAM, and pages $C0-$FF would be ROM. The initialisation code maps in
+    the memory as described above.
 
-	At reset time the Paging would of course be disabled, as the boot rom needs to be
-	mapped in at $C000, the initalisation code would set up the mappings above and then
-	enable the paging hardware.
+    At reset time the Paging would of course be disabled, as the boot rom needs to be
+    mapped in at $C000, the initalisation code would set up the mappings above and then
+    enable the paging hardware.
 
-	It appears to be more complicated than this, whilst the above is true, there appear to
-	be 16 sets of banking registers, the active set is controled by the bottom 4 bits of
-	FCC0, bit 6 has something to do with enabling and disabling banking.
+    It appears to be more complicated than this, whilst the above is true, there appear to
+    be 16 sets of banking registers, the active set is controled by the bottom 4 bits of
+    FCC0, bit 6 has something to do with enabling and disabling banking.
 
-	2005-11-28
+    2005-11-28
 
-	The value $C0 is garanteed not to have any memory in it acording to the os9 headers,
-	quite how the MMU deals with this is still unknown to me.
+    The value $C0 is garanteed not to have any memory in it acording to the os9 headers,
+    quite how the MMU deals with this is still unknown to me.
 
-	Bit 7 of $FCC0, sets maps in the system task which has fixed values for some pages,
-	the presise nature of this is yet to be descovered.
+    Bit 7 of $FCC0, sets maps in the system task which has fixed values for some pages,
+    the presise nature of this is yet to be descovered.
 
 */
 
@@ -192,9 +190,9 @@ static INPUT_PORTS_START( dgnbeta )
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1B)
 
-/*	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8  (") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1B)
+/*  PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8  (") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1B)
 */
 
 	PORT_START /* Key row 2 */
@@ -284,9 +282,9 @@ INPUT_PORTS_END
 
 //static const char *dgnbeta_floppy_getname(const struct IODevice *dev, int id, char *buf, size_t bufsize)
 //{
-//	/* Dragon people like their floppy drives zero counted */
-//	snprintf(buf, bufsize, "Floppy #%d", id);
-//	return buf;
+//  /* Dragon people like their floppy drives zero counted */
+//  snprintf(buf, bufsize, "Floppy #%d", id);
+//  return buf;
 //}
 
 static void dgnbeta_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)

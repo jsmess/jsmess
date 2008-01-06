@@ -10,7 +10,6 @@
 
 #include "driver.h"
 #include "mslegacy.h"
-#include "video/generic.h"
 #include "includes/pmd85.h"
 
 const unsigned char pmd85_palette[3*3] =

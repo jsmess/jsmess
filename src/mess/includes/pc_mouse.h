@@ -1,11 +1,25 @@
+/*****************************************************************************
+ *
+ * includes/pc_mouse.h
+ *
+ ****************************************************************************/
+
+#ifndef PC_MOUSE_H_
+#define PC_MOUSE_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*----------- defined in machine/pc_mouse.c -----------*/
 
-typedef enum { TYPE_MICROSOFT_MOUSE, TYPE_MOUSE_SYSTEMS } PC_MOUSE_PROTOCOL;
+typedef enum
+{
+	TYPE_MICROSOFT_MOUSE,
+	TYPE_MOUSE_SYSTEMS
+} PC_MOUSE_PROTOCOL;
+
+
+/*----------- defined in machine/pc_mouse.c -----------*/
 
 void pc_mouse_handshake_in(int n, int data);
 
@@ -21,3 +35,5 @@ INPUT_PORTS_EXTERN( pc_mouse_none );
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PC_MOUSE_H_ */

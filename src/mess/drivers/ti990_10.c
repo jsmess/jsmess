@@ -1,10 +1,10 @@
 /*
-	TI990/10 driver
+    TI990/10 driver
 
-	This driver boots the DX10 build tape and build a bootable system disk.
-	I have been able to run a few programs (including most games from the
-	"fun and games" tape), but I have been unable to perform system generation
-	and install BASIC/COBOL/PASCAL.
+    This driver boots the DX10 build tape and build a bootable system disk.
+    I have been able to run a few programs (including most games from the
+    "fun and games" tape), but I have been unable to perform system generation
+    and install BASIC/COBOL/PASCAL.
 
 TODO :
 * programmer panel
@@ -16,55 +16,55 @@ TODO :
 */
 
 /*
-	CRU map:
+    CRU map:
 
-	990/10 CPU board:
-	1fa0-1fbe: map file CRU interface
-	1fc0-1fde: error interrupt register
-	1fe0-1ffe: control panel
+    990/10 CPU board:
+    1fa0-1fbe: map file CRU interface
+    1fc0-1fde: error interrupt register
+    1fe0-1ffe: control panel
 
-	optional hardware (default configuration):
-	0000-001e: 733 ASR
-	0020-003e: PROM programmer
-	0040-005e: card reader
-	0060-007e: line printer
-	0080-00be: FD800 floppy disc
-	00c0-00ee: 913 VDT, or 911 VDT
-	0100-013e: 913 VDT #2, or 911 VDT
-	0140-017e: 913 VDT #3, or 911 VDT
-	1700-177e (0b00-0b7e, 0f00-0f7e): CI402 serial controller #0 (#1, #2) (for 931/940 VDT)
-		(note that CRU base 1700 is used by the integrated serial controller in newer S300,
-		S300A, 990/10A (and 990/5?) systems)
-	1f00-1f1e: CRU expander #1 interrupt register
-	1f20-1f3e: CRU expander #2 interrupt register
-	1f40-1f5e: TILINE coupler interrupt control #1-8
-
-
-	TPCS map:
-	1ff800: disk controller #1 (system disk)
-	1ff810->1ff870: extra disk controllers #2 through #8
-	1ff880 (1ff890): tape controller #1 (#2)
-	1ff900->1ff950: communication controllers #1 through #6
-	1ff980 (1ff990, 1ff9A0): CI403/404 serial controller #1 (#2, #3) (for 931/940 VDT)
-	1ffb00, 1ffb04, etc: ECC memory controller #1, #2, etc, diagnostic
-	1ffb10, 1ffb14, etc: cache memory controller #1, #2, etc, diagnostic
+    optional hardware (default configuration):
+    0000-001e: 733 ASR
+    0020-003e: PROM programmer
+    0040-005e: card reader
+    0060-007e: line printer
+    0080-00be: FD800 floppy disc
+    00c0-00ee: 913 VDT, or 911 VDT
+    0100-013e: 913 VDT #2, or 911 VDT
+    0140-017e: 913 VDT #3, or 911 VDT
+    1700-177e (0b00-0b7e, 0f00-0f7e): CI402 serial controller #0 (#1, #2) (for 931/940 VDT)
+        (note that CRU base 1700 is used by the integrated serial controller in newer S300,
+        S300A, 990/10A (and 990/5?) systems)
+    1f00-1f1e: CRU expander #1 interrupt register
+    1f20-1f3e: CRU expander #2 interrupt register
+    1f40-1f5e: TILINE coupler interrupt control #1-8
 
 
-	interrupt map (default configuration):
-	0,1,2: CPU board
-	3: free
-	4: card reader
-	5: line clock
-	6: 733 ASR/KSR
-	7: FD800 floppy (or FD1000 floppy)
-	8: free
-	9: 913 VDT #3
-	10: 913 VDT #2
-	11: 913 VDT
-	12: free
-	13: hard disk
-	14 line printer
-	15: PROM programmer (actually not used)
+    TPCS map:
+    1ff800: disk controller #1 (system disk)
+    1ff810->1ff870: extra disk controllers #2 through #8
+    1ff880 (1ff890): tape controller #1 (#2)
+    1ff900->1ff950: communication controllers #1 through #6
+    1ff980 (1ff990, 1ff9A0): CI403/404 serial controller #1 (#2, #3) (for 931/940 VDT)
+    1ffb00, 1ffb04, etc: ECC memory controller #1, #2, etc, diagnostic
+    1ffb10, 1ffb14, etc: cache memory controller #1, #2, etc, diagnostic
+
+
+    interrupt map (default configuration):
+    0,1,2: CPU board
+    3: free
+    4: card reader
+    5: line clock
+    6: 733 ASR/KSR
+    7: FD800 floppy (or FD1000 floppy)
+    8: free
+    9: 913 VDT #3
+    10: 913 VDT #2
+    11: 913 VDT
+    12: free
+    13: hard disk
+    14 line printer
+    15: PROM programmer (actually not used)
 */
 
 #include "driver.h"
@@ -112,9 +112,9 @@ static void lrex_callback(void)
 }
 
 /*
-	TI990/10 video emulation.
+    TI990/10 video emulation.
 
-	We emulate a single VDT911 CRT terminal.
+    We emulate a single VDT911 CRT terminal.
 */
 
 
@@ -267,7 +267,7 @@ ROM_START(ti990_10)
 	ROM_LOAD16_BYTE("ti2025-7", 0x1FFC00, 0x1000, CRC(4824f89c))
 	ROM_LOAD16_BYTE("ti2025-8", 0x1FFC01, 0x1000, CRC(51fef543))
 	/* the other half of this ROM is not loaded - it makes no sense as TI990/12 machine code, as
-	it is microcode... */
+    it is microcode... */
 
 #endif
 
@@ -341,5 +341,5 @@ SYSTEM_CONFIG_START(ti990_10)
 	CONFIG_DEVICE(ti990_10_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY					FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                 FULLNAME */
 COMP( 1975,	ti990_10,	0,		0,		ti990_10,	ti990_10,	ti990_10,	ti990_10,	"Texas Instruments",	"TI Model 990/10 Minicomputer System" , 0)

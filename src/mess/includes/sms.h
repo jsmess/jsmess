@@ -1,5 +1,12 @@
-#ifndef _SMS_H_
-#define _SMS_H_
+/*****************************************************************************
+ *
+ * includes/sms.h
+ *
+ ****************************************************************************/
+
+#ifndef SMS_H_
+#define SMS_H_
+
 
 #define LOG_REG
 #define LOG_PAGING
@@ -25,10 +32,10 @@
 #define HAS_FM				( Machine->gamedrv->flags & FLAG_FM )
 #define IS_REGION_JAPAN			( Machine->gamedrv->flags & FLAG_REGION_JAPAN )
 
-/* Function prototypes */
 
 /*----------- defined in machine/sms.c -----------*/
 
+/* Function prototypes */
 WRITE8_HANDLER(sms_cartram_w);
 WRITE8_HANDLER(sms_cartram2_w);
 WRITE8_HANDLER(sms_fm_detect_w);
@@ -74,5 +81,5 @@ void sms_store_int_callback( int state );
 #define IO_BIOS_ROM					(0x08)	/* BIOS ROM disabled (1= disabled, 0= enabled) */
 #define IO_CHIP							(0x04)	/* I/O chip disabled (1= disabled, 0= enabled) */
 
-#endif /* _SMS_H_ */
 
+#endif /* SMS_H_ */

@@ -1,10 +1,10 @@
 /***************************************************************************
-	commodore b series computer
+    commodore b series computer
 
-	PeT mess@utanet.at
+    PeT mess@utanet.at
 
-	documentation
-	 vice emulator
+    documentation
+     vice emulator
      www.funet.fi
 ***************************************************************************/
 
@@ -159,15 +159,14 @@ when problems start with -log and look into error.log file
 
 #include "driver.h"
 #include "mslegacy.h"
-#include "video/generic.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-#include "includes/tpi6525.h"
-#include "includes/vic6567.h"
+#include "machine/tpi6525.h"
+#include "video/vic6567.h"
 #include "video/crtc6845.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
@@ -185,9 +184,9 @@ static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf4000, 0xf5fff) AM_READ( MRA8_ROM )
 	AM_RANGE(0xf6000, 0xf7fff) AM_READ( MRA8_ROM )
 	AM_RANGE(0xf8000, 0xfbfff) AM_READ( MRA8_ROM )
-	/*	{0xfc000, 0xfcfff, MRA8_ROM }, */
+	/*  {0xfc000, 0xfcfff, MRA8_ROM }, */
 	AM_RANGE(0xfd000, 0xfd7ff) AM_READ( MRA8_ROM )
-//	AM_RANGE(0xfd800, 0xfd8ff)
+//  AM_RANGE(0xfd800, 0xfd8ff)
 	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_READ( crtc6845_0_register_r )
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_READ( sid6581_0_port_r )
@@ -232,7 +231,7 @@ static ADDRESS_MAP_START( cbm500_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf4000, 0xf5fff) AM_READ( MRA8_ROM )
 	AM_RANGE(0xf6000, 0xf7fff) AM_READ( MRA8_ROM )
 	AM_RANGE(0xf8000, 0xfbfff) AM_READ( MRA8_ROM )
-	/*	{0xfc000, 0xfcfff, MRA8_ROM }, */
+	/*  {0xfc000, 0xfcfff, MRA8_ROM }, */
 	AM_RANGE(0xfd000, 0xfd3ff) AM_READ( MRA8_RAM ) /* videoram */
 	AM_RANGE(0xfd400, 0xfd7ff) AM_READ( MRA8_RAM ) /* colorram */
 	AM_RANGE(0xfd800, 0xfd8ff) AM_READ( vic2_port_r )
@@ -544,7 +543,7 @@ ROM_END
 	 /* 0000 1fff --> 0000
                       inverted 2000
         2000 3fff --> 4000
-		              inverted 6000 */
+                      inverted 6000 */
 
 	 /* 128 kb basic version */
     ROM_LOAD ("b128-8000.901243-02b.bin", 0xf8000, 0x2000, CRC(9d0366f9))
@@ -575,7 +574,7 @@ ROM_END
 
 	 /* 600 8x16 chars for 8x8 size
         128 ascii, 128 ascii graphics
-		inversion logic in hardware */
+        inversion logic in hardware */
     ROM_LOAD ("characters.901237-01.bin", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102))
 	 /* packing 128 national, national graphics, ascii, ascii graphics */
     ROM_LOAD ("characters-hungarian.bin", 0x0000, 0x2000, CRC(1fb5e596) SHA1(3254e069f8691b30679b19a9505b6afdfedce6ac))
@@ -737,7 +736,7 @@ SYSTEM_CONFIG_START(cbm500)
 #endif
 SYSTEM_CONFIG_END
 
-/*     YEAR		NAME	  PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG  COMPANY								FULLNAME */
+/*     YEAR     NAME      PARENT    COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY                             FULLNAME */
 COMP (1983,	cbm500,	  0,		0,		cbm500,		cbm500,		cbm500,		cbm500,	"Commodore Business Machines Co.",	"Commodore B128-40/Pet-II/P500 60Hz",		GAME_NOT_WORKING)
 COMP (1983,	cbm610,   0,		0,		cbm600, 	cbm600, 	cbm600, 	cbmb,	"Commodore Business Machines Co.",  "Commodore B128-80LP/610 60Hz",             GAME_NOT_WORKING)
 COMP (1983,	cbm620,	  cbm610,	0,		cbm600pal,	cbm600pal,	cbm600pal,	cbmb,	"Commodore Business Machines Co.",	"Commodore B256-80LP/620 50Hz",	GAME_NOT_WORKING)

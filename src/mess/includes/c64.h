@@ -1,15 +1,20 @@
-/***************************************************************************
-	commodore c64 home computer
+/*****************************************************************************
+ *
+ * includes/c64.h
+ * 
+ * Commodore C64 Home Computer
+ * 
+ * peter.trauner@jk.uni-linz.ac.at
+ * 
+ * Documentation: www.funet.fi
+ *
+ ****************************************************************************/
 
-    peter.trauner@jk.uni-linz.ac.at
-    documentation
-     www.funet.fi
-***************************************************************************/
-#ifndef __C64_H_
-#define __C64_H_
+#ifndef C64_H_
+#define C64_H_
 
-#include "driver.h"
 #include "machine/6526cia.h"
+
 
 #define C64_DIPS \
      PORT_START \
@@ -55,7 +60,7 @@
 	PORT_DIPSETTING(	0x4000, "Paddles 1, 2" )\
 	PORT_DIPSETTING(	0x6000, "Mouse Joystick Emulation/2 Button Joystick" )\
 	PORT_DIPSETTING(	0x8000, "Mouse" )\
-	/*PORT_DIPSETTING(	0xa000, "Lightpen" )*/\
+	/*PORT_DIPSETTING(  0xa000, "Lightpen" )*/\
 	/*PORT_DIPNAME ( 0x1000, 0x1000, "Lightpen Draw Pointer")*/\
 	PORT_DIPSETTING(  0, DEF_STR( Off ) )\
 	PORT_DIPSETTING(  0x1000, DEF_STR( On ) )\
@@ -208,6 +213,7 @@
 #define KEY_CURSOR_UP (input_port_13_word_r(0,0)&0x2000)
 #define KEY_CURSOR_LEFT (input_port_13_word_r(0,0)&0x1000)
 
+
 /*----------- defined in machine/c64.c -----------*/
 
 /* private area */
@@ -261,4 +267,5 @@ extern UINT8 *c64_vicaddr, *c128_vicaddr;
 extern UINT8 c64_game, c64_exrom;
 extern const cia6526_interface c64_cia0, c64_cia1;
 
-#endif
+
+#endif /* C64_H_ */

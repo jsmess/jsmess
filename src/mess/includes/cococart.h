@@ -1,7 +1,12 @@
-#ifndef COCOCART_H
-#define COCOCART_H
+/*****************************************************************************
+ *
+ * includes/cococart.h
+ *
+ ****************************************************************************/
 
-#include "driver.h"
+#ifndef COCOCART_H_
+#define COCOCART_H_
+
 
 enum
 {
@@ -35,4 +40,5 @@ extern const struct cartridge_slot cartridge_banks_mega;
 extern const struct cartridge_slot cartridge_Orch90;
 #endif
 
-#endif /* COCOCART_H */
+
+#endif /* COCOCART_H_ */

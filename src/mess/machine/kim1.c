@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "video/generic.h"
 #include "includes/kim1.h"
 #include "sound/dac.h"
 

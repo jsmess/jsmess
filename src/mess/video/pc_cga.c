@@ -48,7 +48,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "state.h"
 
 #include "includes/crtc6845.h"

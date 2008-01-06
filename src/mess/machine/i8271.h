@@ -1,10 +1,19 @@
-#include "driver.h"
+/*****************************************************************************
+ *
+ * machine/i8271.h
+ *
+ ****************************************************************************/
+
+#ifndef I8271_H_
+#define I8271_H_
+
 
 /* data request */
 #define I8271_FLAGS_DATA_REQUEST 0x01
 /* data direction. If 0x02, then it is from fdc to cpu, else
 it is from cpu to fdc */
 #define I8271_FLAGS_DATA_DIRECTION 0x02
+
 
 /*----------- defined in machine/i8271.c -----------*/
 
@@ -112,9 +121,9 @@ typedef struct I8271
 #define I8271_COMMAND_SCAN_DATA_AND_DELETED_DATA					0x004
 
 /*
-#define I8271_COMMAND_READ_OPERATION							(1<<4)
-#define I8271_COMMAND_DELETED_DATA								(1<<2)
-#define I8271_COMMAND_MULTI_RECORD								(1<<0)
+#define I8271_COMMAND_READ_OPERATION                            (1<<4)
+#define I8271_COMMAND_DELETED_DATA                              (1<<2)
+#define I8271_COMMAND_MULTI_RECORD                              (1<<0)
 */
 
 
@@ -161,3 +170,6 @@ WRITE8_HANDLER(i8271_dack_w);
 
  READ8_HANDLER(i8271_data_r);
 WRITE8_HANDLER(i8271_data_w);
+
+
+#endif /* I8271_H_ */

@@ -14,7 +14,6 @@
 #include "includes/mc10.h"
 #include "devices/cassette.h"
 #include "formats/coco_cas.h"
-#include "inputx.h"
 
 
 

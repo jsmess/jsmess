@@ -2,79 +2,77 @@
 
 Apple I
 
-CPU:		6502 @ 1.023 MHz
-			(Effective speed with RAM refresh waits is 0.960 MHz.)
+CPU:        6502 @ 1.023 MHz
+            (Effective speed with RAM refresh waits is 0.960 MHz.)
 
-RAM:		4-8 KB on main board (4 KB standard)
+RAM:        4-8 KB on main board (4 KB standard)
 
-			Additional memory could be added via the expansion
-			connector, but the user was responsible for making sure
-			the extra memory was properly interfaced.
+            Additional memory could be added via the expansion
+            connector, but the user was responsible for making sure
+            the extra memory was properly interfaced.
 
-			Some users replaced the onboard 4-kilobit RAM chips with
-			16-kilobit RAM chips, increasing on-board memory to 32 KB,
-			but this required modifying the RAM interface circuitry.
+            Some users replaced the onboard 4-kilobit RAM chips with
+            16-kilobit RAM chips, increasing on-board memory to 32 KB,
+            but this required modifying the RAM interface circuitry.
 
-ROM:		256 bytes for Monitor program
+ROM:        256 bytes for Monitor program
 
-			Optional cassette interface included 256 bytes for
-			cassette routines.
+            Optional cassette interface included 256 bytes for
+            cassette routines.
 
-Interrupts:	None.
-			(The system board had jumpers to allow interrupts, but
-			these were not connected in a standard system.)
+Interrupts: None.
+            (The system board had jumpers to allow interrupts, but
+            these were not connected in a standard system.)
 
-Video:		Dumb terminal, based on 7 1K-bit shift registers
+Video:      Dumb terminal, based on 7 1K-bit shift registers
 
-Sound:		None
+Sound:      None
 
-Hardware:	Motorola 6820 PIA for keyboard and display interface
+Hardware:   Motorola 6820 PIA for keyboard and display interface
 
 Memory map:
 
-$0000-$1FFF:	RAM address space
-	$0000-$00FF:	6502 zero page
-		$0024-$002B:	Zero page locations used by the Monitor
-	$0100-$01FF:	6502 processor stack
-	$0200-$027F:	Keyboard input buffer storage used by the Monitor
-	$0280-$0FFF:	RAM space available for a program in a 4 KB system
-	$1000-$1FFF:	Extra RAM space available for a program in an 8 KB system
-					not using cassette BASIC
+$0000-$1FFF:    RAM address space
+    $0000-$00FF:    6502 zero page
+        $0024-$002B:    Zero page locations used by the Monitor
+    $0100-$01FF:    6502 processor stack
+    $0200-$027F:    Keyboard input buffer storage used by the Monitor
+    $0280-$0FFF:    RAM space available for a program in a 4 KB system
+    $1000-$1FFF:    Extra RAM space available for a program in an 8 KB system
+                    not using cassette BASIC
 
-$2000-$BFFF:	Unused address space, available for RAM in systems larger
-				than 8 KB.
+$2000-$BFFF:    Unused address space, available for RAM in systems larger
+                than 8 KB.
 
-$C000-$CFFF:	Address space for optional cassette interface
-	$C000-$C0FF:	Cassette interface I/O range
-	$C100-$C1FF:	Cassette interface ROM
+$C000-$CFFF:    Address space for optional cassette interface
+    $C000-$C0FF:    Cassette interface I/O range
+    $C100-$C1FF:    Cassette interface ROM
 
-$D000-$DFFF:	I/O address space
-	$D010-$D013:	Motorola 6820 PIA registers.
-		$D010:  		Keyboard input port
-		$D011:  		Control register for keyboard input port, with
-						key-available flag.
-		$D012:  		Display output port (bit 7 is a status input)
-		$D013:  		Control register for display output port
-	(PIA registers also mirrored at $D014-$D017, $D018-$D01B, $D01C-$D01F,
-	$D030-$D03F, $D050-$D05F, ... , $DFD0-$DFDF, $DFF0-$DFFF.)
+$D000-$DFFF:    I/O address space
+    $D010-$D013:    Motorola 6820 PIA registers.
+        $D010:          Keyboard input port
+        $D011:          Control register for keyboard input port, with
+                        key-available flag.
+        $D012:          Display output port (bit 7 is a status input)
+        $D013:          Control register for display output port
+    (PIA registers also mirrored at $D014-$D017, $D018-$D01B, $D01C-$D01F,
+    $D030-$D03F, $D050-$D05F, ... , $DFD0-$DFDF, $DFF0-$DFFF.)
 
-$E000-$EFFF:	Extra RAM space available for a program in an 8 KB system
-				modified to use cassette BASIC
-				(The system simulated here always includes this RAM.)
+$E000-$EFFF:    Extra RAM space available for a program in an 8 KB system
+                modified to use cassette BASIC
+                (The system simulated here always includes this RAM.)
 
-$F000-$FFFF:	ROM address space
-	$FF00-$FFFF:	Apple Monitor ROM
+$F000-$FFFF:    ROM address space
+    $FF00-$FFFF:    Apple Monitor ROM
 
 **********************************************************************/
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
-#include "video/generic.h"
 #include "includes/apple1.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
-#include "inputx.h"
 
 
 /* port i/o functions */
@@ -92,16 +90,16 @@ static ADDRESS_MAP_START( apple1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc200, 0xcfff) AM_NOP
 
 	/* In $D000-$DFFF, PIA is selected by address bit 4 being high,
-	   and PIA registers are addressed with address bits 0-1.  All
-	   other address bits are ignored.  Thus $D010-$D013 is mirrored
-	   at all $Dxxx addresses with bit 4 high. */
+       and PIA registers are addressed with address bits 0-1.  All
+       other address bits are ignored.  Thus $D010-$D013 is mirrored
+       at all $Dxxx addresses with bit 4 high. */
 	AM_RANGE(0xd010, 0xd013) AM_MIRROR(0x0fec) AM_READWRITE(pia_0_r, pia_0_w)
 	/* $Dxxx addresses with bit 4 low are NOPs.
-	   (Note this uses AM_SPACE, not AM_RANGE.) */
+       (Note this uses AM_SPACE, not AM_RANGE.) */
 	AM_SPACE(0xd000, 0xf010) AM_NOP
 
 	/* We always include the remapped RAM for cassette BASIC, both for
-	   simplicity and to allow the running of BASIC programs. */
+       simplicity and to allow the running of BASIC programs. */
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 
 	AM_RANGE(0xf000, 0xfeff) AM_NOP
@@ -233,15 +231,15 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( apple1 )
 	/* basic machine hardware */
 	/* Actual CPU speed is 1.023 MHz, but RAM refresh effectively
-	   slows it to 960 kHz. */
+       slows it to 960 kHz. */
 	MDRV_CPU_ADD_TAG("main", M6502, 960000)        /* 1.023 Mhz */
 	MDRV_CPU_PROGRAM_MAP(apple1_map, 0)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
-	   Each scanline is composed of 65 character times, 40 of which
-	   are visible, and each character time is 7 dot times; a dot time
-	   is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
-	   total blanking time is about 4450 microseconds. */
+       Each scanline is composed of 65 character times, 40 of which
+       are visible, and each character time is 7 dot times; a dot time
+       is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
+       total blanking time is about 4450 microseconds. */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
 	MDRV_INTERLEAVE(1)
 
@@ -250,7 +248,7 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* It would be nice if we could implement some sort of display
-	   overscan here. */
+       overscan here. */
 	MDRV_SCREEN_SIZE(40 * 7, 24 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE(apple1)
@@ -304,8 +302,8 @@ SYSTEM_CONFIG_START(apple1)
 	CONFIG_DEVICE(apple1_snapshot_getinfo)
 	CONFIG_DEVICE(apple1_cassette_getinfo)
 	/* Note that because we always include 4K of RAM at $E000-$EFFF,
-	   the RAM amounts listed here will be 4K below the actual RAM
-	   total. */
+       the RAM amounts listed here will be 4K below the actual RAM
+       total. */
 	CONFIG_RAM			(0x1000)
 	CONFIG_RAM			(0x2000)
 	CONFIG_RAM			(0x3000)
@@ -320,5 +318,5 @@ SYSTEM_CONFIG_START(apple1)
 	CONFIG_RAM_DEFAULT	(0xC000)
 SYSTEM_CONFIG_END
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG	COMPANY				FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY             FULLNAME */
 COMP( 1976,	apple1,	0,		0,		apple1,		apple1,		apple1,	apple1,	"Apple Computer",	"Apple I" , 0)

@@ -1,5 +1,12 @@
-#ifndef KIM1_H
-#define KIM1_H
+/*****************************************************************************
+ *
+ * includes/kim1.h
+ *
+ ****************************************************************************/
+
+#ifndef KIM1_H_
+#define KIM1_H_
+
 
 /*----------- defined in machine/kim1.c -----------*/
 
@@ -16,10 +23,12 @@ READ8_HANDLER ( m6530_002_r );
 WRITE8_HANDLER ( m6530_003_w );
 WRITE8_HANDLER ( m6530_002_w );
 
+
 /*----------- defined in video/kim1.c -----------*/
 
 PALETTE_INIT( kim1 );
 VIDEO_START( kim1 );
 VIDEO_UPDATE( kim1 );
 
-#endif /* KIM1_H */
+
+#endif /* KIM1_H_ */

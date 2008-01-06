@@ -4,10 +4,10 @@ atom.c
 
 ******************************************************************************/
 
+
 #include "driver.h"
-#include "video/generic.h"
 #include "video/m6847.h"
-#include "includes/atom.h"
+
 
 static ATTR_CONST UINT8 atom_get_attributes(UINT8 c)
 {

@@ -1,4 +1,14 @@
+/*****************************************************************************
+ *
+ * includes/kc.h
+ *
+ ****************************************************************************/
+
+#ifndef KC_H_
+#define KC_H_
+
 #include "devices/snapquik.h"
+
 
 #define KC85_4_CLOCK 1750000
 #define KC85_3_CLOCK 1750000
@@ -9,6 +19,7 @@
 #define KC85_PALETTE_SIZE 24
 #define KC85_SCREEN_WIDTH 320
 #define KC85_SCREEN_HEIGHT 256
+
 
 /*----------- defined in video/kc.c -----------*/
 
@@ -25,6 +36,7 @@ VIDEO_UPDATE( kc85_4 );
 void kc85_4_video_ram_select_bank(int bank);
 /* select video ram which is visible in address space */
 unsigned char *kc85_4_get_video_ram_base(int bank, int colour);
+
 
 /*----------- defined in machine/kc.c -----------*/
 
@@ -160,8 +172,6 @@ WRITE8_HANDLER(kc85_module_w);
 
 
 /*** DISC INTERFACE **/
-#include "machine/nec765.h"
-#include "devices/basicdsk.h"
 
 /* IO_FLOPPY device */
 
@@ -198,5 +208,4 @@ WRITE8_HANDLER(kc85_disc_interface_ram_w);
  READ8_HANDLER(kc85_disc_interface_ram_r);
 
 
-
-
+#endif /* KC_H_ */

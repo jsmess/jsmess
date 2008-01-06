@@ -1,94 +1,92 @@
 /*
 
-	telmac.c
+    telmac.c
 
 
-	MESS Driver by Curt Coder
+    MESS Driver by Curt Coder
 
 
-	Telmac 1800
-	-----------
-	(c) 10/1977 Telercas Oy, Finland
+    Telmac 1800
+    -----------
+    (c) 10/1977 Telercas Oy, Finland
 
-	CPU:		CDP1802		1.76 MHz
-	RAM:		2 KB (4 KB)
-	ROM:		512 B
+    CPU:        CDP1802     1.76 MHz
+    RAM:        2 KB (4 KB)
+    ROM:        512 B
 
-	Video:		OSM-200 (1 KB videoram, 10.2 MHz xtal)
+    Video:      OSM-200 (1 KB videoram, 10.2 MHz xtal)
 
-	Designer:	Osmo Kainulainen
-	Keyboard:	OS-70 A (QWERTY, hexadecimal keypad)
-
-
-	Oscom 1000B
-	-----------
-	(c) 197? Oscom Oy, Finland
-
-	CPU:		CDP1802A	? MHz
-
-	Enhanced Telmac 1800 with built-in CRT board (OSM-200).
+    Designer:   Osmo Kainulainen
+    Keyboard:   OS-70 A (QWERTY, hexadecimal keypad)
 
 
-	Telmac 2000
-	-----------
-	(c) 1980 Telercas Oy, Finland
+    Oscom 1000B
+    -----------
+    (c) 197? Oscom Oy, Finland
 
-	CPU:		CDP1802A	1.75 MHz
-	RAM:		16 KB
-	ROM:		512 B / 2 KB (TOOL-2000)
+    CPU:        CDP1802A    ? MHz
 
-	Video:		CDP1864		1.75 MHz
-	Color RAM:	512 B
-
-	Colors:		8 fg, 4 bg
-	Resolution:	64x192
-	Sound:		frequency control, volume on/off
-	Keyboard:	ASCII, KB-16, KB-64
+    Enhanced Telmac 1800 with built-in CRT board (OSM-200).
 
 
-	Telmac 2000E
-	------------
-	(c) 1980 Telercas Oy, Finland
+    Telmac 2000
+    -----------
+    (c) 1980 Telercas Oy, Finland
 
-	CPU:		CDP1802A	1.75 MHz
-	RAM:		8 KB
-	ROM:		8 KB
+    CPU:        CDP1802A    1.75 MHz
+    RAM:        16 KB
+    ROM:        512 B / 2 KB (TOOL-2000)
 
-	Video:		CDP1864		1.75 MHz
-	Color RAM:	1 KB
+    Video:      CDP1864     1.75 MHz
+    Color RAM:  512 B
 
-	Colors:		8 fg, 4 bg
-	Resolution:	64x192
-	Sound:		frequency control, volume on/off
-	Keyboard:	ASCII (RCA VP-601/VP-611), KB-16/KB-64
-
-	SBASIC:		24.0
+    Colors:     8 fg, 4 bg
+    Resolution: 64x192
+    Sound:      frequency control, volume on/off
+    Keyboard:   ASCII, KB-16, KB-64
 
 
-	Oscom Nano
-	----------
-	(c) 1981 Oscom Oy, Finland
+    Telmac 2000E
+    ------------
+    (c) 1980 Telercas Oy, Finland
 
-	CPU:		CDP1802A	? MHz
-	ROM:		512 B / 1 KB
+    CPU:        CDP1802A    1.75 MHz
+    RAM:        8 KB
+    ROM:        8 KB
 
-	Small form factor version of Telmac 1800. Combined text and graphics output.
+    Video:      CDP1864     1.75 MHz
+    Color RAM:  1 KB
+
+    Colors:     8 fg, 4 bg
+    Resolution: 64x192
+    Sound:      frequency control, volume on/off
+    Keyboard:   ASCII (RCA VP-601/VP-611), KB-16/KB-64
+
+    SBASIC:     24.0
 
 
-	Telmac TMC-121/111/112
-	----------------------
-	(c) 198? Telercas Oy, Finland
+    Oscom Nano
+    ----------
+    (c) 1981 Oscom Oy, Finland
 
-	CPU:		CDP1802A	? MHz
+    CPU:        CDP1802A    ? MHz
+    ROM:        512 B / 1 KB
 
-	Built from Telmac 2000 series cards. Huge metal box.
+    Small form factor version of Telmac 1800. Combined text and graphics output.
+
+
+    Telmac TMC-121/111/112
+    ----------------------
+    (c) 198? Telercas Oy, Finland
+
+    CPU:        CDP1802A    ? MHz
+
+    Built from Telmac 2000 series cards. Huge metal box.
 
 */
 
 #include "driver.h"
-#include "inputx.h"
 #include "cpu/cdp1802/cdp1802.h"
-#include "video/generic.h"
 #include "video/cdp1864.h"
 #include "devices/cassette.h"
 #include "sound/beep.h"
@@ -187,11 +185,11 @@ static UINT8 tmc1800_ef_r(void)
 	UINT8 flags = 0x0f;
 
 	/*
-		EF1		?
-		EF2		keyboard
-		EF3		?
-		EF4		?
-	*/
+        EF1     ?
+        EF2     keyboard
+        EF3     ?
+        EF4     ?
+    */
 
 	// keyboard
 	if (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) flags -= EF2;
@@ -220,11 +218,11 @@ static UINT8 tmc2000_ef_r(void)
 	int flags = 0x0f;
 
 	/*
-		EF1		?
-		EF2		keyboard
-		EF3		?
-		EF4		?
-	*/
+        EF1     ?
+        EF2     keyboard
+        EF3     ?
+        EF4     ?
+    */
 
 	// keyboard
 	if (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) flags -= EF2;

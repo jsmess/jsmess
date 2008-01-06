@@ -1,23 +1,19 @@
-#ifndef __VIC6567_H_
-#define __VIC6567_H_
-
-/*
+/*****************************************************************************
+ *
+ * video/vic6567.h
+ *
  * if you need this chip in another mame/mess emulation than let it me know
  * I will split this from the c64 driver
  * peter.trauner@jk.uni-linz.ac.at
  * 1. 1. 2000
  * look at mess/drivers/c64.c and mess/machine/c64.c
  * on how to use it
- */
+ *
+ ****************************************************************************/
 
-/*----------- defined in video/vic6567.c -----------*/
+#ifndef VIC6567_H_
+#define VIC6567_H_
 
-/* call to init videodriver */
-/* dma_read: videochip fetched 1 byte data from system bus */
-extern void vic6567_init (int vic2e, int pal, int (*dma_read) (int),
-						  int (*dma_read_color) (int), void (*irq) (int));
-
-extern void vic2_set_rastering(int onoff);
 
 #define VIC6567_VRETRACERATE 60
 #define VIC6569_VRETRACERATE 50
@@ -47,14 +43,22 @@ extern void vic2_set_rastering(int onoff);
 #define VIC6569_LINES 312
 #define VIC2_LINES (vic2.pal?VIC6569_LINES:VIC6567_LINES)
 
+
+/*----------- defined in video/vic6567.c -----------*/
+
+/* call to init videodriver */
+/* dma_read: videochip fetched 1 byte data from system bus */
+extern void vic6567_init (int vic2e, int pal, int (*dma_read) (int),
+						  int (*dma_read_color) (int), void (*irq) (int));
+
+extern void vic2_set_rastering(int onoff);
+
 MACHINE_DRIVER_EXTERN( vh_vic2 );
 extern VIDEO_START( vic2 );
 extern VIDEO_UPDATE( vic2 );
 extern INTERRUPT_GEN( vic2_raster_irq );
 
 extern const unsigned char vic2_palette[16 * 3];
-
-/* to be inserted in GameDriver-Structure */
 
 /* to be called when writting to port */
 extern WRITE8_HANDLER ( vic2_port_w );
@@ -76,5 +80,5 @@ extern INTERRUPT_GEN( vic2_frame_interrupt );
 /*extern UINT8 vic2[]; */
 /*extern int vic2_pal; */
 
-#endif
 
+#endif /* VIC6567_H_ */

@@ -29,7 +29,6 @@
  *****************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 
 #include "includes/pocketc.h"
 #include "includes/pc1401.h"

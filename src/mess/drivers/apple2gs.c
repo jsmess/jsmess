@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	drivers/apple2gs.c
-	Apple IIgs
-	Driver by Nathan Woods and R. Belmont
+    drivers/apple2gs.c
+    Apple IIgs
+    Driver by Nathan Woods and R. Belmont
 
     TODO:
     - Fix spurious interrupt problem
@@ -13,8 +13,8 @@
     NOTES:
 
     Video timing and the h/vcount registers:
-    						      VCounts
-    HCounts go like this:				      0xfa (start of frame, still in vblank)
+                                  VCounts
+    HCounts go like this:                     0xfa (start of frame, still in vblank)
     0 0x40 0x41 0x58 (first visible pixel)        0x7f
                  ____________________________________     0x100 (first visible scan line)
                 |                                    |
@@ -31,7 +31,7 @@
                 |                                    |
                  ____________________________________    0x1c8 (actual start of vblank in IIgs modes)
 
-    						     0x1ff (end of frame, in vblank)
+                                 0x1ff (end of frame, in vblank)
 
     There are 64 HCounts total, and 704 pixels total, so HCounts do not map to the pixel clock.
     VCounts do map directly to scanlines however, and count 262 of them.
@@ -42,9 +42,7 @@
 
 #include "driver.h"
 #include "state.h"
-#include "inputx.h"
 #include "mslegacy.h"
-#include "video/generic.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"
 #include "devices/mflopimg.h"
@@ -274,7 +272,7 @@ SYSTEM_CONFIG_START(apple2gs)
 	CONFIG_RAM_DEFAULT			(2 * 1024 * 1024)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      CONFIG		COMPANY            FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      CONFIG      COMPANY            FULLNAME */
 COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03)", 0 )
 COMP( 1987, apple2g1, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM01)", 0 )
 COMP( 1986, apple2g0, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM00)", 0 )

@@ -9,7 +9,6 @@ Bruce Tomlin (hardware info)
 *****************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 #include "video/vector.h"
 #include "machine/6522via.h"
 #include "includes/vectrex.h"
@@ -232,6 +231,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*	  YEAR	NAME	  PARENT	COMPAT	MACHINE   INPUT 	INIT		CONFIG		COMPANY	FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY FULLNAME */
 CONS( 1982, vectrex,  0, 		0,		vectrex,  vectrex,	vectrex,	vectrex,	"General Consumer Electronics",   "Vectrex" , ROT270)
 CONS( 1984, raaspec,  vectrex,	0,		raaspec,  raaspec,	0,			NULL,		"Roy Abel & Associates",   "Spectrum I+" , ROT270)

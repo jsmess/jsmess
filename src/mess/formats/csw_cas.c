@@ -21,9 +21,11 @@ Offset	Value	Type	Description
 */
 
 #include <string.h>
-#include <zlib.h>
-#include "csw_cas.h"
-#include "mame.h"
+
+#include "driver.h"
+#include "zlib.h"
+#include "formats/csw_cas.h"
+
 
 #define CSW_WAV_FREQUENCY	44100
 

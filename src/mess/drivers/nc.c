@@ -7,20 +7,20 @@
         system driver
 
 
-		Thankyou to:
-			Cliff Lawson, Russell Marks and Tim Surtel
+        Thankyou to:
+            Cliff Lawson, Russell Marks and Tim Surtel
 
         Documentation:
 
-		NC100:
-			NC100 I/O Specification by Cliff Lawson,
-			NC100EM by Russell Marks
-		NC200:
-			Dissassembly of the NC200 ROM + e-mail
-			exchange with Russell Marks
+        NC100:
+            NC100 I/O Specification by Cliff Lawson,
+            NC100EM by Russell Marks
+        NC200:
+            Dissassembly of the NC200 ROM + e-mail
+            exchange with Russell Marks
 
 
-		NC100:
+        NC100:
 
         Hardware:
             - Z80 CPU, 6mhz
@@ -31,76 +31,77 @@
             - qwerty keyboard
             - serial/parallel connection
             - Amstrad custom ASIC chip
-			- tc8521 real time clock
-			- intel 8251 compatible uart
-			- PCMCIA Memory cards supported, up to 1mb!
+            - tc8521 real time clock
+            - intel 8251 compatible uart
+            - PCMCIA Memory cards supported, up to 1mb!
 
-		NC200:
+        NC200:
 
         Hardware:
-			- Z80 CPU
-			- Intel 8251 compatible uart
+            - Z80 CPU
+            - Intel 8251 compatible uart
             - nec765 compatible floppy disc controller
-			- mc146818 real time clock?
-			- 720k floppy disc drive (compatible with MS-DOS)
-			(disc drive can be not ready).
-			- PCMCIA Memory cards supported, up to 1mb!
+            - mc146818 real time clock?
+            - 720k floppy disc drive (compatible with MS-DOS)
+            (disc drive can be not ready).
+            - PCMCIA Memory cards supported, up to 1mb!
 
         TODO:
            - find out what the unused key bits are for
-		   (checked all unused bits on nc200! - do not seem to have any use!)
+           (checked all unused bits on nc200! - do not seem to have any use!)
            - complete serial (xmodem protocol!)
-		   - overlay would be nice!
-		   - finish NC200 disc drive emulation (closer!)
-		   - add NC150 driver - ROM needed!!!
-			- on/off control
-			- check values read from other ports that are not described!
-			- what is read from unmapped ports?
-			- what is read from uart when it is off?
-			- check if uart ints are generated when it is off?
-			- are ints cancelled if uart is turned off after int has been caused?
-			- check keyboard ints - are these regular or what??
+           - overlay would be nice!
+           - finish NC200 disc drive emulation (closer!)
+           - add NC150 driver - ROM needed!!!
+            - on/off control
+            - check values read from other ports that are not described!
+            - what is read from unmapped ports?
+            - what is read from uart when it is off?
+            - check if uart ints are generated when it is off?
+            - are ints cancelled if uart is turned off after int has been caused?
+            - check keyboard ints - are these regular or what??
 
-		PCMCIA memory cards are stored as a direct dump of the contents. There is no header
-		information. No distinction is made between RAM and ROM cards.
+        PCMCIA memory cards are stored as a direct dump of the contents. There is no header
+        information. No distinction is made between RAM and ROM cards.
 
-		Memory card sizes are a power of 2 in size (e.g. 1mb, 512k, 256k etc),
-		however the code allows any size, but it limits access to power of 2 sizes, with
-		minimum access being 16k. If a file which is less than 16k is used, no memory card
-		will be present. If a file which is greater than 1mb is used, only 1mb will be accessed.
+        Memory card sizes are a power of 2 in size (e.g. 1mb, 512k, 256k etc),
+        however the code allows any size, but it limits access to power of 2 sizes, with
+        minimum access being 16k. If a file which is less than 16k is used, no memory card
+        will be present. If a file which is greater than 1mb is used, only 1mb will be accessed.
 
-		Interrupt system of NC100:
+        Interrupt system of NC100:
 
-		The IRQ mask is used to control the interrupt sources that can interrupt.
+        The IRQ mask is used to control the interrupt sources that can interrupt.
 
-		The IRQ status can be read to determine which devices are interrupting.
-		Some devices, e.g. serial, cannot be cleared by writing to the irq status
-		register. These can only be cleared by performing an operation on the
-		device (e.g. reading a data register).
+        The IRQ status can be read to determine which devices are interrupting.
+        Some devices, e.g. serial, cannot be cleared by writing to the irq status
+        register. These can only be cleared by performing an operation on the
+        device (e.g. reading a data register).
 
-		Self Test:
+        Self Test:
 
-		- requires memory save and real time clock save to be working!
-		(i.e. for MESS nc100 driver, nc100.nv can be created)
-		- turn off nc (use NMI button)
-		- reset+FUNCTION+SYMBOL must be pressed together.
+        - requires memory save and real time clock save to be working!
+        (i.e. for MESS nc100 driver, nc100.nv can be created)
+        - turn off nc (use NMI button)
+        - reset+FUNCTION+SYMBOL must be pressed together.
 
-		Note: NC200 Self test does not test disc hardware :(
+        Note: NC200 Self test does not test disc hardware :(
 
 
 
-		Kevin Thacker [MESS driver]
+        Kevin Thacker [MESS driver]
 
  ******************************************************************************/
+
 #include "driver.h"
-#include "machine/mc146818.h"	/* for NC200 real time clock */
 #include "includes/nc.h"
-#include "includes/tc8521.h"	/* for NC100 real time clock */
-#include "includes/msm8251.h"	/* for NC100 uart */
-#include "machine/nec765.h"	/* for NC200 disk drive interface */
+#include "includes/serial.h"	/* for serial data transfers */
+#include "machine/msm8251.h"	/* for NC100 uart */
+#include "machine/mc146818.h"	/* for NC200 real time clock */
+#include "machine/tc8521.h"	/* for NC100 real time clock */
+#include "machine/nec765.h"		/* for NC200 disk drive interface */
 #include "devices/mflopimg.h"	/* for NC200 disk image */
 #include "formats/pc_dsk.h"		/* for NC200 disk image */
-#include "includes/serial.h"	/* for serial data transfers */
 #include "devices/cartslot.h"
 #include "sound/beep.h"
 
@@ -135,131 +136,131 @@ static void nc100_machine_stop(running_machine *machine);
 static void nc200_machine_stop(running_machine *machine);
 
 /*
-	Port 0x00:
-	==========
+    Port 0x00:
+    ==========
 
-	Display memory start:
+    Display memory start:
 
-	NC100:
-			bit 7           A15
-			bit 6           A14
-			bit 5           A13
-			bit 4           A12
-			bits 3-0        Not Used
-	NC200:
-			bit 7           A15
-			bit 6           A14
-			bit 5           A13
-			bits 4-0        Not Used
+    NC100:
+            bit 7           A15
+            bit 6           A14
+            bit 5           A13
+            bit 4           A12
+            bits 3-0        Not Used
+    NC200:
+            bit 7           A15
+            bit 6           A14
+            bit 5           A13
+            bits 4-0        Not Used
 
-	Port 0x010-0x013:
-	=================
+    Port 0x010-0x013:
+    =================
 
-	Memory management control:
+    Memory management control:
 
-	NC100 & NC200:
+    NC100 & NC200:
 
         10              controls 0000-3FFF
         11              controls 4000-7FFF
         12              controls 8000-BFFF
         13              controls C000-FFFF
 
-	Port 0x030:
-	===========
+    Port 0x030:
+    ===========
 
-	NC100:
-			bit 7     select card register 1=common, 0=attribute
-			bit 6     parallel interface Strobe signal
-			bit 5     Not Used
-			bit 4     uPD4711 line driver, 1=off, 0=on
-			bit 3     UART clock and reset, 1=off, 0=on
+    NC100:
+            bit 7     select card register 1=common, 0=attribute
+            bit 6     parallel interface Strobe signal
+            bit 5     Not Used
+            bit 4     uPD4711 line driver, 1=off, 0=on
+            bit 3     UART clock and reset, 1=off, 0=on
 
-			bits 2-0  set the baud rate as follows
+            bits 2-0  set the baud rate as follows
 
-					000 = 150
-					001 = 300
-					010 = 600
-					011 = 1200
-					100 = 2400
-					101 = 4800
-					110 = 9600
-					111 = 19200
-	NC200:
-			bit 7     select card register 1=common, 0=attribute
-			bit 6     parallel interface Strobe signal
+                    000 = 150
+                    001 = 300
+                    010 = 600
+                    011 = 1200
+                    100 = 2400
+                    101 = 4800
+                    110 = 9600
+                    111 = 19200
+    NC200:
+            bit 7     select card register 1=common, 0=attribute
+            bit 6     parallel interface Strobe signal
 
-			bit 5     used in disc interface; (set to 0)
+            bit 5     used in disc interface; (set to 0)
 
-			bit 4     uPD4711 line driver, 1=off, 0=on
-			bit 3     UART clock and reset, 1=off, 0=on
+            bit 4     uPD4711 line driver, 1=off, 0=on
+            bit 3     UART clock and reset, 1=off, 0=on
 
-			bits 2-0  set the baud rate as follows
+            bits 2-0  set the baud rate as follows
 
-					000 = 150
-					001 = 300
-					010 = 600
-					011 = 1200
-					100 = 2400
-					101 = 4800
-					110 = 9600
-					111 = 19200
-
-
-	Port 0x0a0:
-	===========
-
-	NC100:
-			bit 7: memory card present 0 = yes, 1 = no
-			bit 6: memory card write protected 1 = yes, 0 = no
-			bit 5: input voltage = 1, if >= to 4 volts
-			bit 4: mem card battery: 0 = battery low
-			bit 3: alkaline batteries. 0 if >=3.2 volts
-			bit 2: lithium battery 0 if >= 2.7 volts
-			bit 1: parallel interface busy (0 if busy)
-			bit 0: parallel interface ack (1 if ack)
-
-	NC200:
-
-			bit 7: memory card present 0 = yes, 1 = no
-			bit 6: memory card write protected 1 = yes, 0 = no
-			bit 5: lithium battery 0 if >= 2.7 volts
-			bit 4: input voltage = 1, if >= to 4 volts
-			bit 3: ??
-			bit 2: alkaline batteries. 0 if >=3.2 volts
-			bit 1: ??
-			bit 0: battery power: if 1: batteries are too low for disk usage, if 0: batteries ok for disc usage
+                    000 = 150
+                    001 = 300
+                    010 = 600
+                    011 = 1200
+                    100 = 2400
+                    101 = 4800
+                    110 = 9600
+                    111 = 19200
 
 
-	Port 0x060 (IRQ MASK), Port 0x090 (IRQ STATUS):
-	===============================================
+    Port 0x0a0:
+    ===========
 
-	NC100:
-			bit 7: not used
-			bit 6: not used
-			bit 5: not used
-			bit 4: not used
-			Bit 3: Key scan interrupt (10ms)
-			Bit 2: ACK from parallel interface
-			Bit 1: Tx Ready
-			Bit 0: Rx Ready
+    NC100:
+            bit 7: memory card present 0 = yes, 1 = no
+            bit 6: memory card write protected 1 = yes, 0 = no
+            bit 5: input voltage = 1, if >= to 4 volts
+            bit 4: mem card battery: 0 = battery low
+            bit 3: alkaline batteries. 0 if >=3.2 volts
+            bit 2: lithium battery 0 if >= 2.7 volts
+            bit 1: parallel interface busy (0 if busy)
+            bit 0: parallel interface ack (1 if ack)
 
-	NC200:
-			bit 7: ???
-			bit 6: RTC alarm?
-			bit 5: FDC interrupt
-			bit 4: Power off interrupt
-			Bit 3: Key scan interrupt (10ms)
-			Bit 2: serial interrupt (tx ready/rx ready combined)
-			Bit 1: not used
-			Bit 0: ACK from parallel interface
+    NC200:
 
-	Port 0x070: On/off control
+            bit 7: memory card present 0 = yes, 1 = no
+            bit 6: memory card write protected 1 = yes, 0 = no
+            bit 5: lithium battery 0 if >= 2.7 volts
+            bit 4: input voltage = 1, if >= to 4 volts
+            bit 3: ??
+            bit 2: alkaline batteries. 0 if >=3.2 volts
+            bit 1: ??
+            bit 0: battery power: if 1: batteries are too low for disk usage, if 0: batteries ok for disc usage
 
-	NC200:
-		bit 7: nc200 power on/off: 1 = on, 0=off
-		bit 2: backlight: 1=off, 0=on
-		bit 1: disk motor: 1=off, 0=disk motor???
-		bit 0: nec765 terminal count input
+
+    Port 0x060 (IRQ MASK), Port 0x090 (IRQ STATUS):
+    ===============================================
+
+    NC100:
+            bit 7: not used
+            bit 6: not used
+            bit 5: not used
+            bit 4: not used
+            Bit 3: Key scan interrupt (10ms)
+            Bit 2: ACK from parallel interface
+            Bit 1: Tx Ready
+            Bit 0: Rx Ready
+
+    NC200:
+            bit 7: ???
+            bit 6: RTC alarm?
+            bit 5: FDC interrupt
+            bit 4: Power off interrupt
+            Bit 3: Key scan interrupt (10ms)
+            Bit 2: serial interrupt (tx ready/rx ready combined)
+            Bit 1: not used
+            Bit 0: ACK from parallel interface
+
+    Port 0x070: On/off control
+
+    NC200:
+        bit 7: nc200 power on/off: 1 = on, 0=off
+        bit 2: backlight: 1=off, 0=on
+        bit 1: disk motor: 1=off, 0=disk motor???
+        bit 0: nec765 terminal count input
 */
 
 
@@ -525,7 +526,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
         if (inputport_10_state & 0x01)
         {
 			/* on NC100 on/off button causes a nmi, on
-			nc200 on/off button causes an int */
+            nc200 on/off button causes an int */
 			switch (nc_type)
 			{
 				case NC_TYPE_1xx:
@@ -642,7 +643,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
 	if (nc_type == NC_TYPE_200)
 	{
 		/* Russell Marks confirms that on the NC200, the key scan interrupt must be explicitly
-		cleared. It is not automatically cleared when reading 0x0b9 */
+        cleared. It is not automatically cleared when reading 0x0b9 */
 		if ((data & (1<<3))!=0)
 		{
 			/* set timer to occur again */
@@ -848,13 +849,13 @@ static WRITE8_HANDLER(nc100_uart_control_w)
 {
 	nc_uart_control_w(offset,data);
 
-//	/* is this correct?? */
-//	if (data & (1<<3))
-//	{
-//		/* clear latched irq's */
-//		nc_irq_latch &= ~3;
-//		nc_update_interrupts();
-//	}
+//  /* is this correct?? */
+//  if (data & (1<<3))
+//  {
+//      /* clear latched irq's */
+//      nc_irq_latch &= ~3;
+//      nc_update_interrupts();
+//  }
 }
 
 
@@ -862,8 +863,8 @@ static void	nc100_tc8521_alarm_callback(int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
-	the nmi will be triggered, but when the state changes because the int
-	is cleared this will not cause another nmi */
+    the nmi will be triggered, but when the state changes because the int
+    is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
 	if (state!=previous_alarm_state)
@@ -871,7 +872,7 @@ static void	nc100_tc8521_alarm_callback(int state)
 		if (state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
-			it would clear - to be checked */
+            it would clear - to be checked */
 			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
@@ -1271,14 +1272,14 @@ static void nc200_refresh_uart_interrupt(void)
 
 static void nc200_txrdy_callback(int state)
 {
-//	nc200_uart_interrupt_irq &=~(1<<0);
+//  nc200_uart_interrupt_irq &=~(1<<0);
 //
-//	if (state)
-//	{
-//		nc200_uart_interrupt_irq |=(1<<0);
-//	}
+//  if (state)
+//  {
+//      nc200_uart_interrupt_irq |=(1<<0);
+//  }
 //
-//	nc200_refresh_uart_interrupt();
+//  nc200_refresh_uart_interrupt();
 }
 
 static void nc200_rxrdy_callback(int state)
@@ -1331,9 +1332,9 @@ static const struct nec765_interface nc200_nec765_interface=
 static void nc200_floppy_drive_index_callback(int drive_id)
 {
 	LOG_DEBUG(("nc200 index pulse\n"));
-//	nc_irq_status |= (1<<4);
+//  nc_irq_status |= (1<<4);
 
-//	nc_update_interrupts();
+//  nc_update_interrupts();
 }
 #endif
 
@@ -1398,14 +1399,14 @@ static MACHINE_START( nc200 )
 /*
 NC200:
 
-		bit 7: memory card present 0 = yes, 1 = no
-		bit 6: memory card write protected 1=yes 0=no
-		bit 5: lithium battery 0 if >= 2.7 volts
-		bit 4: input voltage = 1, if >= to 4 volts
-		bit 3: ??
-		bit 2: alkaline batteries. 0 if >=3.2 volts
-		bit 1: ??
-		bit 0: battery power: if 1: batteries are too low for disk usage, if 0: batteries ok for disc usage
+        bit 7: memory card present 0 = yes, 1 = no
+        bit 6: memory card write protected 1=yes 0=no
+        bit 5: lithium battery 0 if >= 2.7 volts
+        bit 4: input voltage = 1, if >= to 4 volts
+        bit 3: ??
+        bit 2: alkaline batteries. 0 if >=3.2 volts
+        bit 1: ??
+        bit 0: battery power: if 1: batteries are too low for disk usage, if 0: batteries ok for disc usage
 */
 
 
@@ -1419,7 +1420,7 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
 	/* input voltage ok */
 	nc_card_battery_status |=(1<<4);
 	/* lithium batteries and alkaline batteries have enough power,
-	and there is enough power for disk usage */
+    and there is enough power for disk usage */
 	nc_card_battery_status &=~((1<<5) | (1<<2) | (1<<0));
 
 	if (nc_card_status)

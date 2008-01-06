@@ -2,11 +2,11 @@
  PeT mess@utanet.at 2000,2001
 ******************************************************************************/
 
-#include <assert.h>
-
+#include "driver.h"
 #include "includes/lynx.h"
+
 #include "cpu/m6502/m6502.h"
-#include "state.h"
+
 
 UINT16 lynx_granularity = 1;
 static int lynx_line;

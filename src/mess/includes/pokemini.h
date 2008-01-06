@@ -1,5 +1,12 @@
-#ifndef _POKEMINI_H_
-#define _POKEMINI_H_
+/*****************************************************************************
+ *
+ * includes/pokemini.h
+ *
+ ****************************************************************************/
+
+#ifndef POKEMINI_H_
+#define POKEMINI_H_
+
 
 /*----------- defined in machine/pokemini.c -----------*/
 
@@ -12,4 +19,5 @@ extern INTERRUPT_GEN( pokemini_int );
 DEVICE_INIT( pokemini_cart );
 DEVICE_LOAD( pokemini_cart );
 
-#endif /* _POKEMINI_H */
+
+#endif /* POKEMINI_H */

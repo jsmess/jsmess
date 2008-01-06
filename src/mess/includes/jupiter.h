@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ * includes/jupiter.h
+ *
+ ****************************************************************************/
+
+#ifndef JUPITER_H_
+#define JUPITER_H_
+
+
 /*----------- defined in machine/jupiter.c -----------*/
 
 OPBASE_HANDLER( jupiter_opbaseoverride );
@@ -17,6 +27,7 @@ READ8_HANDLER( jupiter_port_bffe_r);
 READ8_HANDLER( jupiter_port_7ffe_r);
 WRITE8_HANDLER( jupiter_port_fe_w);
 
+
 /*----------- defined in video/jupiter.c -----------*/
 
 VIDEO_START( jupiter );
@@ -25,7 +36,10 @@ WRITE8_HANDLER( jupiter_vh_charram_w );
 extern unsigned char *jupiter_charram;
 extern size_t jupiter_charram_size;
 
+
 /*----------- defined in drivers/jupiter.c -----------*/
 
 extern const gfx_layout jupiter_charlayout;
 
+
+#endif /* JUPITER_H_ */

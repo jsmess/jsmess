@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/pcw.h"
 
 INLINE void pcw_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)

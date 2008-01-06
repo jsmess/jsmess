@@ -1,59 +1,59 @@
 /******************************************************************************
 
-	amstrad.c
-	system driver
+    amstrad.c
+    system driver
 
-		Amstrad Hardware:
-			- 8255 connected to AY-3-8912 sound generator,
-				keyboard, cassette, printer, crtc vsync output,
-				and some PCB links
-			- 6845 (either HD6845S, UM6845R or M6845) crtc graphics display
-			  controller
-			- NEC765 floppy disc controller (CPC664,CPC6128)
-			- Z80 CPU running at 4Mhz (slowed by wait states on memory
-			  access)
-			- custom ASIC "Gate Array" controlling rom paging, ram paging,
-				current display mode and colour palette
+        Amstrad Hardware:
+            - 8255 connected to AY-3-8912 sound generator,
+                keyboard, cassette, printer, crtc vsync output,
+                and some PCB links
+            - 6845 (either HD6845S, UM6845R or M6845) crtc graphics display
+              controller
+            - NEC765 floppy disc controller (CPC664,CPC6128)
+            - Z80 CPU running at 4Mhz (slowed by wait states on memory
+              access)
+            - custom ASIC "Gate Array" controlling rom paging, ram paging,
+                current display mode and colour palette
 
-	Kevin Thacker [MESS driver]
+    Kevin Thacker [MESS driver]
 
   May-June 2004 - Yoann Courtois (aka Papagayo/ex GMC/ex PARADOX) - rewritting some code with hardware documentation from http://www.cepece.info/amstrad/
 
   June 2006  - Very preliminary CPC+ support.  CPR cart image handling, secondary ROM register, ASIC unlock detection
                Supported:
-			   12-bit palette,
-			   12-bit hardware sprites (largely works from what I've seen, some games have display issues),
-			   Programmable Raster Interrupt (seems to work),
-			   Split screen registers,
-			   Soft scroll registers (only byte-by-byre horizontally for now),
-			   Analogue controls (may well be completely wrong, I have no idea on how these should work),
-			   Vectored interrupts for Z80 interrupt mode 2 (used by Pang),
-			   DMA sound channels (may still be some issues, noticable in Navy Seals and Copter 271)
-			   04/07/06:  Added interrupt vector support for IM 2.
-			              Added soft scroll register implementation.  Vertical adjustments are a bit shaky.
-			   05/07/06:  Fixed hardware sprite offsets
-			   14/07/06:  Added basic analogue control support.
-			   04/08/06:  Fixed PRI and Split screen scanline offsets (based on code in Arnold ;))
-			              Implemented DMA sound channels
-			   06/08/06:  Fixed CRTC palette if the ASIC was re-locked after already being unlocked and used.
-			              This fixes Klax, which is now playable.
-			   08/08/06:  Fixed up vertical soft scroll, now we just need to get a finer detail on horizontal soft scroll
-			              (Only works on a byte level for now)
-						  Fixed DMA pause function when the prescaler is set to 0.
+               12-bit palette,
+               12-bit hardware sprites (largely works from what I've seen, some games have display issues),
+               Programmable Raster Interrupt (seems to work),
+               Split screen registers,
+               Soft scroll registers (only byte-by-byre horizontally for now),
+               Analogue controls (may well be completely wrong, I have no idea on how these should work),
+               Vectored interrupts for Z80 interrupt mode 2 (used by Pang),
+               DMA sound channels (may still be some issues, noticable in Navy Seals and Copter 271)
+               04/07/06:  Added interrupt vector support for IM 2.
+                          Added soft scroll register implementation.  Vertical adjustments are a bit shaky.
+               05/07/06:  Fixed hardware sprite offsets
+               14/07/06:  Added basic analogue control support.
+               04/08/06:  Fixed PRI and Split screen scanline offsets (based on code in Arnold ;))
+                          Implemented DMA sound channels
+               06/08/06:  Fixed CRTC palette if the ASIC was re-locked after already being unlocked and used.
+                          This fixes Klax, which is now playable.
+               08/08/06:  Fixed up vertical soft scroll, now we just need to get a finer detail on horizontal soft scroll
+                          (Only works on a byte level for now)
+                          Fixed DMA pause function when the prescaler is set to 0.
 
-			   Tested with the Arnold 5 Diagnostic Cartridge.  Mostly works fine, but the soft scroll test is
-			   noticably wrong.
+               Tested with the Arnold 5 Diagnostic Cartridge.  Mostly works fine, but the soft scroll test is
+               noticably wrong.
 
-			   Known issues with some games (as at 08/08/06):
-			   Robocop 2:  playable, but sprites cut out for some reason (possibly IRQ related, I think) every now and then.
-			   Navy Seals:  Playable, but has similar problems to Robocop 2.
-			   Dick Tracy:  Sprite visibility issues
-			   Switchblade:  has some slowdown when numerous enemies are on screen (normal?)
-			   Epyx World of Sports: doesn't start at all.
-			   Tennis Cup II:  controls don't seem to work.
-			   Fire and Forget II:  playable, but the top half of the screen flickers
-			   Crazy Cars II:  playable, with slight shaking of horizon
-			   No Exit:  Display is wrong, but usable, uses demo-like techniques.
+               Known issues with some games (as at 08/08/06):
+               Robocop 2:  playable, but sprites cut out for some reason (possibly IRQ related, I think) every now and then.
+               Navy Seals:  Playable, but has similar problems to Robocop 2.
+               Dick Tracy:  Sprite visibility issues
+               Switchblade:  has some slowdown when numerous enemies are on screen (normal?)
+               Epyx World of Sports: doesn't start at all.
+               Tennis Cup II:  controls don't seem to work.
+               Fire and Forget II:  playable, but the top half of the screen flickers
+               Crazy Cars II:  playable, with slight shaking of horizon
+               No Exit:  Display is wrong, but usable, uses demo-like techniques.
 
 
 Some bugs left :
@@ -62,23 +62,30 @@ Some bugs left :
     - Gate Array and CRTC aren't synchronised. (The Gate Array can change the color every microseconds?) So the multi-rasters in one line aren't supported (see yao demo p007's part)!
     - Implement full Asic for CPC+ emulation.  Soft scroll is rather dodgy.  8-bit printer port (bit 3 of CRTC reg 12) not implemented.
  ******************************************************************************/
-#include "driver.h"
 
+/* Core includes */
+#include "driver.h"
+#include "includes/amstrad.h"
+
+/* Components */
 #include "includes/centroni.h"
 #include "machine/8255ppi.h"	/* for 8255 ppi */
 #include "cpu/z80/z80.h"		/* for cycle tables */
 #include "video/m6845.h"		/* CRTC display */
-#include "includes/amstrad.h"
 #include "machine/nec765.h"	/* for floppy disc controller */
+#include "sound/ay8910.h"
+
+/* Devices */
 #include "devices/dsk.h"		/* for CPCEMU style disk images */
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/printer.h"
 #include "devices/cassette.h"
-#include "inputx.h"
-#include "mslegacy.h"
-#include "sound/ay8910.h"
 #include "formats/tzx_cas.h"
+
+/* TODO: Remove dependency on this */
+#include "mslegacy.h"
+
 
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
 /* for event list */
@@ -281,7 +288,7 @@ static READ8_HANDLER (amstrad_ppi_portb_r)
 /* Set b4-b1 50hz/60hz state and manufacturer name defined by links on PCB */
 	data |= (ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
 
-/* 	Set b0 with VSync state from the CRTC */
+/*  Set b0 with VSync state from the CRTC */
 	data |= amstrad_CRTC_VS; // m6845_vertical_sync_r(0);
 
 	return data;
@@ -408,29 +415,29 @@ void amstrad_setLowerRom(void)
 
 		if(amstrad_plus_lower_enabled == 1)
 		{  // ASIC secondary lower ROM selection (bit 5: 1 = enabled)
-//			logerror("L-ROM: Lower ROM enabled, cart bank %i\n",amstrad_plus_lower);
+//          logerror("L-ROM: Lower ROM enabled, cart bank %i\n",amstrad_plus_lower);
 			BankBase = &memory_region(REGION_CPU1)[0x4000 * amstrad_plus_lower];
 			if(BankBase != NULL)
 			{
 				switch(amstrad_plus_lower_addr)
 				{
 				case 0:
-//					logerror("L-ROM: located at &0000\n");
+//                  logerror("L-ROM: located at &0000\n");
 					memory_set_bankptr(1, BankBase);
 					memory_set_bankptr(2, BankBase+0x02000);
 					break;
 				case 1:
-//					logerror("L-ROM: located at &4000\n");
+//                  logerror("L-ROM: located at &4000\n");
 					memory_set_bankptr(3, BankBase);
 					memory_set_bankptr(4, BankBase+0x02000);
 					break;
 				case 2:
-//					logerror("L-ROM: located at &8000\n");
+//                  logerror("L-ROM: located at &8000\n");
 					memory_set_bankptr(5, BankBase);
 					memory_set_bankptr(6, BankBase+0x02000);
 					break;
 				case 3:
-//					logerror("L-ROM: located at &0000, ASIC registers enabled\n");
+//                  logerror("L-ROM: located at &0000, ASIC registers enabled\n");
 					memory_set_bankptr(1, BankBase);
 					memory_set_bankptr(2, BankBase+0x02000);
 					break;
@@ -481,86 +488,86 @@ static void AmstradCPC_SetLowerRom(int Data)
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_BANK12);
 			amstrad_plus_asic_regpage = 0;  // disable ASIC registers
 		}
-//		logerror("SYS: Secondary ROM select (lower ROM) - data = %02x - cart bank %i, addr %i\n",Data,amstrad_plus_lower,amstrad_plus_lower_addr);
+//      logerror("SYS: Secondary ROM select (lower ROM) - data = %02x - cart bank %i, addr %i\n",Data,amstrad_plus_lower,amstrad_plus_lower_addr);
 	}
 	else
 	{  // secondary ROM register not available if ASIC is locked
 		amstrad_plus_lower = 0;
 		amstrad_plus_lower_addr = 0;
 	}
-//	amstrad_setLowerRom();
+//  amstrad_setLowerRom();
 }
 
 void AmstradCPC_SetUpperRom(int Data)
 {
 	Amstrad_UpperRom = Amstrad_ROM_Table[Data & 0xFF];
-//	logerror("H-ROM: set to ROM bank %i\n",Data);
+//  logerror("H-ROM: set to ROM bank %i\n",Data);
 	amstrad_setUpperRom();
 }
 
 /* ASIC RAM */
 /*
-	ASIC RAM Layout.  Always is mapped to &4000-&7fff
+    ASIC RAM Layout.  Always is mapped to &4000-&7fff
 
-	Hardware sprites: 16 sprites, 16x16, basic zooming, 15 colour (12-bit palette)
-	Pixel data is 0 - 15 for sprite pen number, low 4 bits
-	&4000 - &400f Pixel data for first line of first sprite
-	&4010 - &401f Pixel data for second line of first sprite
-	  ...     ...
+    Hardware sprites: 16 sprites, 16x16, basic zooming, 15 colour (12-bit palette)
+    Pixel data is 0 - 15 for sprite pen number, low 4 bits
+    &4000 - &400f Pixel data for first line of first sprite
+    &4010 - &401f Pixel data for second line of first sprite
+      ...     ...
     &40f0 - &40ff Pixel data for last (16th) line of first sprite
-	  ...     ...
-	&4100 - &41ff Pixel data for second sprite
-	&4200 - &42ff Third sprite
-	  ...     ...
-	&4f00 - &4fff Pixel data for last (16th) sprite
+      ...     ...
+    &4100 - &41ff Pixel data for second sprite
+    &4200 - &42ff Third sprite
+      ...     ...
+    &4f00 - &4fff Pixel data for last (16th) sprite
 
-	&6000 - &607f Sprite properties (8 bytes each)
-	              +0 Sprite X position LSB
-				  +1 Sprite X position MSB
-				  +2 Sprite Y position LSB (scanline)
-				  +3 Sprite Y position MSB
-				  +4 Sprite zoom - bits 3,2 X magnification, bits 1,0 Y magnification
-				      Magnification: 00 = not displayed, 01 = x1, 10 = x2, 11 = x4
+    &6000 - &607f Sprite properties (8 bytes each)
+                  +0 Sprite X position LSB
+                  +1 Sprite X position MSB
+                  +2 Sprite Y position LSB (scanline)
+                  +3 Sprite Y position MSB
+                  +4 Sprite zoom - bits 3,2 X magnification, bits 1,0 Y magnification
+                      Magnification: 00 = not displayed, 01 = x1, 10 = x2, 11 = x4
 
-	Palette: LSB first, presumably GGGGBBBBxxxxRRRR
-	&6400 - &641f Pen palette (12bpp, 2 bytes each, 16 total)
-	&6420 - &6421 Border palette  (12bpp, 2 bytes)
-	&6422 - &643f Hardware sprite palette (12bpp, 2 bytes each, 15 total)
+    Palette: LSB first, presumably GGGGBBBBxxxxRRRR
+    &6400 - &641f Pen palette (12bpp, 2 bytes each, 16 total)
+    &6420 - &6421 Border palette  (12bpp, 2 bytes)
+    &6422 - &643f Hardware sprite palette (12bpp, 2 bytes each, 15 total)
 
-	Programmable Raster Interrupt:
-	&6800  Scanline for IRQ to be triggered after
-	       If 0, raster interrupts and DMA interrupts occur
-		   Otherwise, the PRI interrupt is triggered only
+    Programmable Raster Interrupt:
+    &6800  Scanline for IRQ to be triggered after
+           If 0, raster interrupts and DMA interrupts occur
+           Otherwise, the PRI interrupt is triggered only
 
-	Hardware split screen:
-	&6801  Scanline for split to occur at
-	&6802  LSB of screen address for split (like reg 12 of the 6845)
-	&6803  MSB of the above (like reg 13 of the 6845)
+    Hardware split screen:
+    &6801  Scanline for split to occur at
+    &6802  LSB of screen address for split (like reg 12 of the 6845)
+    &6803  MSB of the above (like reg 13 of the 6845)
 
-	Soft Scroll Control Register:
-	&6804  bits 3-0 - horizontal delay in mode 2 pixels (shifts display to the right)
-	       bits 6-4 - added to the 3 LSBs for the scanline address (shifts display up)
-		   bit 7    - extends the border by two bytes (16 mode 2 pixels), masking the bad data from the horizontal scroll
+    Soft Scroll Control Register:
+    &6804  bits 3-0 - horizontal delay in mode 2 pixels (shifts display to the right)
+           bits 6-4 - added to the 3 LSBs for the scanline address (shifts display up)
+           bit 7    - extends the border by two bytes (16 mode 2 pixels), masking the bad data from the horizontal scroll
 
-	Analogue paddle ports:
-	&6808 - &680f  Analogue input, read-only, 6 bit
+    Analogue paddle ports:
+    &6808 - &680f  Analogue input, read-only, 6 bit
 
-	PSG DMA channels:
-	&6c00  DMA channel 0 address LSB
-	&6c01  DMA channel 0 address MSB
-	&6c02  DMA channel 0 prescaler
-	&6c03  unused
-	&6c04-7  DMA channel 1
-	&6c08-b  DMA channel 2
-	&6c0f  Control and Status register
-	         bit 7 - raster interrupt
-			 bit 6 - DMA channel 0 interrupt
-			 bit 5 - DMA channel 1 interrupt
-			 bit 4 - DMA channel 2 interrupt
-			 bit 3 - unused (write 0)
-			 bit 2 - DMA channel 2 enable
-			 bit 1 - DMA channel 1 enable
-			 bit 0 - DMA channel 0 enable
+    PSG DMA channels:
+    &6c00  DMA channel 0 address LSB
+    &6c01  DMA channel 0 address MSB
+    &6c02  DMA channel 0 prescaler
+    &6c03  unused
+    &6c04-7  DMA channel 1
+    &6c08-b  DMA channel 2
+    &6c0f  Control and Status register
+             bit 7 - raster interrupt
+             bit 6 - DMA channel 0 interrupt
+             bit 5 - DMA channel 1 interrupt
+             bit 4 - DMA channel 2 interrupt
+             bit 3 - unused (write 0)
+             bit 2 - DMA channel 2 enable
+             bit 1 - DMA channel 1 enable
+             bit 0 - DMA channel 0 enable
 
  */
 
@@ -568,7 +575,7 @@ static WRITE8_HANDLER( amstrad_plus_asic_4000_w )
 {
 	if(amstrad_plus_asic_regpage != 0)
 	{
-//		logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
+//      logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
 		amstrad_plus_asic_ram[offset] = data;
 	}
 	else
@@ -603,7 +610,7 @@ static WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 		}
 		if(offset == 0x0800)  // Programmable raster interrupt
 		{
-//			logerror("ASIC: Wrote %02x to PRI\n",data);
+//          logerror("ASIC: Wrote %02x to PRI\n",data);
 			amstrad_plus_pri = data;
 		}
 		if(offset >= 0x0801 && offset <= 0x0803)  // Split screen registers
@@ -700,7 +707,7 @@ static WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 
 static READ8_HANDLER( amstrad_plus_asic_4000_r )
 {
-//	logerror("RAM: read from &%04x, ASIC page = %i\n",offset+0x4000,amstrad_plus_asic_regpage);
+//  logerror("RAM: read from &%04x, ASIC page = %i\n",offset+0x4000,amstrad_plus_asic_regpage);
 	if(amstrad_plus_asic_regpage != 0)
 	{
 		return amstrad_plus_asic_ram[offset];
@@ -710,7 +717,7 @@ static READ8_HANDLER( amstrad_plus_asic_4000_r )
 
 static READ8_HANDLER( amstrad_plus_asic_6000_r )
 {
-//	logerror("RAM: read from &%04x, ASIC page = %i\n",offset+0x6000,amstrad_plus_asic_regpage);
+//  logerror("RAM: read from &%04x, ASIC page = %i\n",offset+0x6000,amstrad_plus_asic_regpage);
 	if(amstrad_plus_asic_regpage != 0)
 	{
 		// Analogue ports
@@ -738,19 +745,19 @@ static READ8_HANDLER( amstrad_plus_asic_6000_r )
 		{
 			return 0x00;
 		}
-/*		if(offset == 0x0c0f)  // DMA status and control
-		{
-			int result = 0;
-			if(amstrad_plus_irq_cause == 0x00)
-				result |= 0x40;
-			if(amstrad_plus_irq_cause == 0x02)
-				result |= 0x20;
-			if(amstrad_plus_irq_cause == 0x04)
-				result |= 0x10;
-			if(amstrad_plus_irq_cause == 0x06)
-				result |= 0x80;
-			return result;
-		}
+/*      if(offset == 0x0c0f)  // DMA status and control
+        {
+            int result = 0;
+            if(amstrad_plus_irq_cause == 0x00)
+                result |= 0x40;
+            if(amstrad_plus_irq_cause == 0x02)
+                result |= 0x20;
+            if(amstrad_plus_irq_cause == 0x04)
+                result |= 0x10;
+            if(amstrad_plus_irq_cause == 0x06)
+                result |= 0x80;
+            return result;
+        }
 */
 		return amstrad_plus_asic_ram[offset+0x2000];
 	}
@@ -764,7 +771,7 @@ static READ8_HANDLER( amstrad_plus_asic_6000_r )
 void amstrad_rethinkMemory(void)
 {
 	/* the following is used for banked memory read/writes and for setting up
-	 * opcode and opcode argument reads */
+     * opcode and opcode argument reads */
 /* bank 0 - 0x0000..0x03fff */
     amstrad_setLowerRom();
 /* bank 1 - 0x04000..0x07fff */
@@ -856,7 +863,7 @@ Bit Value Function        Bit Value Function
 5   x     not used        5   x     not used
 4   1     Select border   4   0     Select pen
 3   x     | ignored       3   x     | Pen Number
-2   x     |               2   x 	  |
+2   x     |               2   x       |
 1   x     |               1   x     |
 0   x     |               0   x     |
 */
@@ -917,8 +924,8 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
   	case 0x02: {
       int Previous_GateArray_ModeAndRomConfiguration = amstrad_GateArray_ModeAndRomConfiguration;
 		/* If bit 5 is enabled on a CPC Plus/GX4000 when the ASIC is unlocked, sets the lower ROM position and cart bank
-		   b5 = 1, b4b3 = RAM position for lower ROM area and if the ASIC registers are visible at &4000,
-		   b2b1b0 = cartridge bank to read from lower ROM area (0-7 only) */
+           b5 = 1, b4b3 = RAM position for lower ROM area and if the ASIC registers are visible at &4000,
+           b2b1b0 = cartridge bank to read from lower ROM area (0-7 only) */
 		if(amstrad_system_type == SYSTEM_PLUS && amstrad_plus_asic_enabled != 0)
 		{
 			if((dataToGateArray & 0x20) != 0)
@@ -960,7 +967,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
   			}
       }  break;
 /* Ram Memory Management
-	 ---------------------
+     ---------------------
 This function is not available in the Gate-Array, but is performed by a device at the same I/O port address location.
 In the CPC464,CPC664 and KC compact, this function is performed in a memory-expansion (e.g. Dk'Tronics 64K Ram Expansion), if this expansion is not present then the function is not available.
 In the CPC6128, this function is performed by a PAL located on the main PCB, or a memory-expansion.
@@ -1060,7 +1067,7 @@ static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 		switch(r1r0) {
 		case 0x02:
 			/* CRTC Type 1 : Read Status Register
-			   CRTC Type 3 or 4 : Read from selected internal 6845 register */
+               CRTC Type 3 or 4 : Read from selected internal 6845 register */
 			switch(crtc_type) {
 			case M6845_PERSONALITY_UM6845R:
 				data = amstrad_CRTC_CR; /* Read Status Register */
@@ -1157,7 +1164,7 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
 				EventList_AddItemOffset((EVENT_LIST_CODE_CRTC_WRITE<<6), data, TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #endif
-//       	  logerror("m6845 register (%02d : %04x)\n", selected_m6845_address, (data&0x3F));
+//            logerror("m6845 register (%02d : %04x)\n", selected_m6845_address, (data&0x3F));
         m6845_register_w(0,data);
   		} break;
   		default: {
@@ -1272,7 +1279,7 @@ static void amstrad_plus_seqcheck(int data)
 }
 
 /******************************************************************************************
-	Multiface emulation
+    Multiface emulation
   ****************************************************************************************/
 
 static unsigned char *multiface_ram;
@@ -1290,7 +1297,7 @@ This address has a RET and so executes no code.
 
 It is believed that it is used to make multiface invisible to programs */
 
-/*#define MULTIFACE_0065_TOGGLE 				  0x0008*/
+/*#define MULTIFACE_0065_TOGGLE                   0x0008*/
 
 
 /* used to setup computer if a snapshot was specified */
@@ -1301,17 +1308,17 @@ static OPBASE_HANDLER( amstrad_multiface_opbaseoverride )
 		pc = activecpu_get_pc();
 
 		/* there are two places where CALL &0065 can be found
-		in the multiface rom. At this address there is a RET.
+        in the multiface rom. At this address there is a RET.
 
-		To disable the multiface from being detected, the multiface
-		stop button must be pressed, then the program that was stopped
-		must be returned to. When this is done, the multiface cannot
-		be detected and the out operations to page the multiface
-		ram/rom into the address space will not work! */
+        To disable the multiface from being detected, the multiface
+        stop button must be pressed, then the program that was stopped
+        must be returned to. When this is done, the multiface cannot
+        be detected and the out operations to page the multiface
+        ram/rom into the address space will not work! */
 
 		/* I assume that the hardware in the multiface detects
-		the PC set to 0x065 and uses this to enable/disable the multiface
-		*/
+        the PC set to 0x065 and uses this to enable/disable the multiface
+        */
 
 		/* I also use this to allow the stop button to be pressed again */
 		if (pc==0x0164)
@@ -1758,16 +1765,16 @@ static void amstrad_common_init(void)
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MRA8_BANK1);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MRA8_BANK2);
-//	if(amstrad_system_type == SYSTEM_CPC)
-//	{
+//  if(amstrad_system_type == SYSTEM_CPC)
+//  {
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MRA8_BANK3);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK4);
-//	}
-//	else
-//	{
-//		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_r);
-//		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_r);
-//	}
+//  }
+//  else
+//  {
+//      memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_r);
+//      memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_r);
+//  }
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK5);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, MRA8_BANK6);
 
@@ -1776,16 +1783,16 @@ static void amstrad_common_init(void)
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MWA8_BANK9);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_BANK10);
-//	if(amstrad_system_type == SYSTEM_CPC)
-//	{
+//  if(amstrad_system_type == SYSTEM_CPC)
+//  {
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MWA8_BANK11);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_BANK12);
-//	}
-//	else
-//	{
-//		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_w);
-//		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_w);
-//	}
+//  }
+//  else
+//  {
+//      memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_w);
+//      memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_w);
+//  }
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK13);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, MWA8_BANK14);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MWA8_BANK15);
@@ -1808,19 +1815,19 @@ static void amstrad_common_init(void)
 The CRTC generates a memory address using it's MA and RA signal outputs
 The Gate-Array fetches two bytes for each address*/
 
-//	timer_pulse(ATTOTIME_IN_USEC(AMSTRAD_US_PER_SCANLINE), NULL, 0, amstrad_vh_execute_crtc_cycles);
+//  timer_pulse(ATTOTIME_IN_USEC(AMSTRAD_US_PER_SCANLINE), NULL, 0, amstrad_vh_execute_crtc_cycles);
 	timer_pulse(ATTOTIME_IN_USEC(1), NULL, 0, amstrad_vh_execute_crtc_cycles_callback);
 
 	/* The opcode timing in the Amstrad is different to the opcode
-	timing in the core for the Z80 CPU.
+    timing in the core for the Z80 CPU.
 
-	The Amstrad hardware issues a HALT for each memory fetch.
-	This has the effect of stretching the timing for Z80 opcodes,
-	so that they are all multiple of 4 T states long. All opcode
-	timings are a multiple of 1us in length. */
+    The Amstrad hardware issues a HALT for each memory fetch.
+    This has the effect of stretching the timing for Z80 opcodes,
+    so that they are all multiple of 4 T states long. All opcode
+    timings are a multiple of 1us in length. */
 
 	/* Using the cool code Juergen has provided, I will override
-	the timing tables with the values for the amstrad */
+    the timing tables with the values for the amstrad */
 	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_op, (void*)amstrad_cycle_table_op);
 	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_cb, (void*)amstrad_cycle_table_cb);
 	cpunum_set_info_ptr(0,CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ed, (void*)amstrad_cycle_table_ed);
@@ -1892,7 +1899,7 @@ static MACHINE_RESET( plus )
 	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_plus_setsplitline(0,0);
-	//	multiface_init();
+	//  multiface_init();
 }
 
 static MACHINE_START( plus )
@@ -1915,10 +1922,10 @@ static MACHINE_RESET( kccomp )
 	kccomp_reset_machine();
 
 	/* bit 1 = /TEST. When 0, KC compact will enter data transfer
-	sequence, where another system using the expansion port signals
-	DATA2,DATA1, /STROBE and DATA7 can transfer 256 bytes of program.
-	When the program has been transfered, it will be executed. This
-	is not supported in the driver */
+    sequence, where another system using the expansion port signals
+    DATA2,DATA1, /STROBE and DATA7 can transfer 256 bytes of program.
+    When the program has been transfered, it will be executed. This
+    is not supported in the driver */
 	/* bit 3,4 are tied to +5V, bit 2 is tied to 0V */
 	ppi_port_inputs[amstrad_ppi_PortB] = (1<<4) | (1<<3) | 2;
 }
@@ -2082,7 +2089,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
    use only two buttons. The only device that reads this bit is the AMX mouse, which uses
    dedicated hardware to connect to the joystick port.
 */
-//	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1)
+//  PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")                   PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(8)
 
 /* Second joystick port need to be defined: the second joystick is daisy-chained on the back of the first one */
@@ -2092,7 +2099,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 INPUT_PORTS_END
 
 
-/* Steph 2000-10-27	I remapped the 'Machine Name' Dip Switches (easier to understand) */
+/* Steph 2000-10-27 I remapped the 'Machine Name' Dip Switches (easier to understand) */
 
 static INPUT_PORTS_START( crtc_links )
 
@@ -2155,7 +2162,7 @@ As far as I know, the KC compact used HD6845S only.
 	PORT_CONFSETTING(0x00, DEF_STR( Off) )
 	PORT_CONFSETTING(0x01, DEF_STR( On) )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Stop Button") PORT_CODE(KEYCODE_F1)
-//	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Reset Button") PORT_CODE(KEYCODE_F3)  Not implemented
+//  PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Reset Button") PORT_CODE(KEYCODE_F3)  Not implemented
 
 	PORT_START_TAG("green_display")
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
@@ -2325,17 +2332,17 @@ static INPUT_PORTS_START(plus)
 	PORT_INCLUDE( crtc_links )
 
 	/* The CPC+ and GX4000 adds support for analogue controllers.
-	   Up to two joysticks or four paddles can be used, although the ASIC supports twice that.
-	   Read at &6808-&680f in ASIC RAM
-	   I am unsure if these are even close to correct.
+       Up to two joysticks or four paddles can be used, although the ASIC supports twice that.
+       Read at &6808-&680f in ASIC RAM
+       I am unsure if these are even close to correct.
 
-	UPDATE: the analog port supports (probably with an Y-cable) up to two analog joysticks
-	with two buttons each or four paddles with one button each. The CPC+/GX4000 have also an
-	AUX port which supports a lightgun/lightpen with two buttons.
-	Since all these devices have their dedicated connector, two digital joystick, two analog joysticks
-	and one lightgun can be connected at the same moment.
+    UPDATE: the analog port supports (probably with an Y-cable) up to two analog joysticks
+    with two buttons each or four paddles with one button each. The CPC+/GX4000 have also an
+    AUX port which supports a lightgun/lightpen with two buttons.
+    Since all these devices have their dedicated connector, two digital joystick, two analog joysticks
+    and one lightgun can be connected at the same moment.
 
-	The connectors' description for both CPCs and CPC+'s can be found at http://www.hardwarebook.info/Category:Computer */
+    The connectors' description for both CPCs and CPC+'s can be found at http://www.hardwarebook.info/Category:Computer */
 
 	PORT_START_TAG("analog1")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
@@ -2423,9 +2430,9 @@ speed of 3.8Mhz */
 
 /* Info about structures below:
 
-	The Amstrad has a CPU running at 4Mhz, slowed with wait states.
-	I have measured 19968 NOP instructions per frame, which gives,
-	50.08 fps as the tv refresh rate.
+    The Amstrad has a CPU running at 4Mhz, slowed with wait states.
+    I have measured 19968 NOP instructions per frame, which gives,
+    50.08 fps as the tv refresh rate.
 
   There are 312 lines on a PAL screen, giving 64us per line.
 

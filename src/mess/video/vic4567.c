@@ -1,6 +1,9 @@
 // don't include this into the makefile
 // it is included in vic6567.c yet
 
+#include "driver.h"
+#include "vic4567.h"
+
 #define OPTIMIZE
 
 #define VIC3_BITPLANES_MASK (vic2.reg[0x32])

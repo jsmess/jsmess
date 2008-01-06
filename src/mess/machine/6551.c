@@ -1,4 +1,5 @@
-#include "includes/6551.h"
+#include "driver.h"
+#include "6551.h"
 #include "includes/serial.h"
 
 static void acia_6551_receive_char(unsigned char ch);

@@ -1,12 +1,16 @@
-/******************************************************************************
-    BBC Model B
+/*****************************************************************************
+ *
+ * includes/bbc.h
+ *
+ * BBC Model B
+ *
+ * Driver by Gordon Jefferyes <mess_bbc@gjeffery.dircon.co.uk>
+ *
+ ****************************************************************************/
 
-    MESS Driver By:
+#ifndef BBC_H_
+#define BBC_H_
 
-	Gordon Jefferyes
-	mess_bbc@gjeffery.dircon.co.uk
-
-******************************************************************************/
 
 /*----------- defined in machine/bbc.c -----------*/
 
@@ -86,8 +90,6 @@ READ8_HANDLER (BBC_6850_r);
 WRITE8_HANDLER ( BBC_SerialULA_w );
 
 
-
-
 /*----------- defined in video/bbc.c -----------*/
 
 extern VIDEO_START( bbca );
@@ -109,4 +111,4 @@ WRITE8_HANDLER ( BBC_6845_w );
 READ8_HANDLER ( BBC_6845_r );
 
 
-
+#endif /* BBC_H_ */

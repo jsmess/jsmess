@@ -5,21 +5,21 @@ PMD-85 driver by Krzysztof Strzecha
 What's new:
 -----------
 
-27.06.2004	Mato crash fixed.
-21.05.2004	V.24 / Tape switch added. V.24 is not emulated.
-25.04.2004	PMD-85.1 tape emulation with support for .pmd format files added.
-19.04.2004	Verified PMD-85.1 and PMD-85.2 monitor roms and replaced with
-		unmodified ones.
-		Memory system cleanups.
-03.04.2004	PMD-85.3 and Mato (PMD-85.2 clone) drivers.
-		Preliminary and not working tape support.
-		Reset key fixed. PMD-85.1 fixed.
-15.03.2004	Added drivers for: PMD-85.2, PMD-85.2A, PMD-85.2B and Didaktik
-		Alfa (PMD-85.1 clone). Keyboard finished. Natural keyboard added.
-		Memory system rewritten. I/O system rewritten. Support for Basic
-		ROM module added. Video emulation rewritten.
-30.11.2002	Memory mapping improved.
-06.07.2002	Preliminary driver.
+27.06.2004  Mato crash fixed.
+21.05.2004  V.24 / Tape switch added. V.24 is not emulated.
+25.04.2004  PMD-85.1 tape emulation with support for .pmd format files added.
+19.04.2004  Verified PMD-85.1 and PMD-85.2 monitor roms and replaced with
+        unmodified ones.
+        Memory system cleanups.
+03.04.2004  PMD-85.3 and Mato (PMD-85.2 clone) drivers.
+        Preliminary and not working tape support.
+        Reset key fixed. PMD-85.1 fixed.
+15.03.2004  Added drivers for: PMD-85.2, PMD-85.2A, PMD-85.2B and Didaktik
+        Alfa (PMD-85.1 clone). Keyboard finished. Natural keyboard added.
+        Memory system rewritten. I/O system rewritten. Support for Basic
+        ROM module added. Video emulation rewritten.
+30.11.2002  Memory mapping improved.
+06.07.2002  Preliminary driver.
 
 Notes on emulation status and to do list:
 -----------------------------------------
@@ -43,136 +43,134 @@ PMD-85 technical information
 Memory map:
 -----------
 
-	PMD-85.1, PMD-85.2
-	------------------
+    PMD-85.1, PMD-85.2
+    ------------------
 
-	start-up map (cleared by the first I/O write operation done by the CPU):
-	0000-0fff ROM mirror #1
-	1000-1fff not mapped
-	2000-2fff ROM mirror #2
-	3000-3fff not mapped
-	4000-7fff Video RAM mirror #1
-	8000-8fff ROM
-	9000-9fff not mapped
-	a000-afff ROM mirror #3
-	b000-bfff not mapped
-	c000-ffff Video RAM
+    start-up map (cleared by the first I/O write operation done by the CPU):
+    0000-0fff ROM mirror #1
+    1000-1fff not mapped
+    2000-2fff ROM mirror #2
+    3000-3fff not mapped
+    4000-7fff Video RAM mirror #1
+    8000-8fff ROM
+    9000-9fff not mapped
+    a000-afff ROM mirror #3
+    b000-bfff not mapped
+    c000-ffff Video RAM
 
-	normal map:
-	0000-7fff RAM
-	8000-8fff ROM
-	9000-9fff not mapped
-	a000-afff ROM mirror #1
-	b000-bfff not mapped
-	c000-ffff Video RAM
+    normal map:
+    0000-7fff RAM
+    8000-8fff ROM
+    9000-9fff not mapped
+    a000-afff ROM mirror #1
+    b000-bfff not mapped
+    c000-ffff Video RAM
 
-	Didaktik Alfa (PMD-85.1 clone)
-	------------------------------
+    Didaktik Alfa (PMD-85.1 clone)
+    ------------------------------
 
-	start-up map (cleared by the first I/O write operation done by the CPU):
-	0000-0fff ROM mirror
-	1000-33ff BASIC mirror
-	3400-3fff not mapped
-	4000-7fff Video RAM mirror
-	8000-8fff ROM
-	9000-b3ff BASIC
-	b400-bfff not mapped
-	c000-ffff Video RAM
+    start-up map (cleared by the first I/O write operation done by the CPU):
+    0000-0fff ROM mirror
+    1000-33ff BASIC mirror
+    3400-3fff not mapped
+    4000-7fff Video RAM mirror
+    8000-8fff ROM
+    9000-b3ff BASIC
+    b400-bfff not mapped
+    c000-ffff Video RAM
 
-	normal map:
-	0000-7fff RAM
-	8000-8fff ROM
-	9000-b3ff BASIC
-	b400-bfff not mapped
-	c000-ffff Video RAM
+    normal map:
+    0000-7fff RAM
+    8000-8fff ROM
+    9000-b3ff BASIC
+    b400-bfff not mapped
+    c000-ffff Video RAM
 
-	PMD-85.2A, PMD-85.2B
-	--------------------
+    PMD-85.2A, PMD-85.2B
+    --------------------
 
-	start-up map (cleared by the first I/O write operation done by the CPU):
-	0000-0fff ROM mirror #1
-	1000-1fff RAM #2 mirror
-	2000-2fff ROM mirror #2
-	3000-3fff RAM #3 mirror
-	4000-7fff Video RAM mirror #1
-	8000-8fff ROM
-	9000-9fff RAM #2
-	a000-afff ROM mirror #3
-	b000-bfff RAM #3
-	c000-ffff Video RAM
+    start-up map (cleared by the first I/O write operation done by the CPU):
+    0000-0fff ROM mirror #1
+    1000-1fff RAM #2 mirror
+    2000-2fff ROM mirror #2
+    3000-3fff RAM #3 mirror
+    4000-7fff Video RAM mirror #1
+    8000-8fff ROM
+    9000-9fff RAM #2
+    a000-afff ROM mirror #3
+    b000-bfff RAM #3
+    c000-ffff Video RAM
 
-	normal map:
-	0000-7fff RAM #1
-	8000-8fff ROM
-	9000-9fff RAM #2
-	a000-afff ROM mirror #1
-	b000-bfff RAM #3
-	c000-ffff Video RAM
+    normal map:
+    0000-7fff RAM #1
+    8000-8fff ROM
+    9000-9fff RAM #2
+    a000-afff ROM mirror #1
+    b000-bfff RAM #3
+    c000-ffff Video RAM
 
-	PMD-85.3
-	--------
+    PMD-85.3
+    --------
 
-	start-up map (cleared by the first I/O write operation done by the CPU):
-	0000-1fff ROM mirror #1 read, RAM write
-	2000-3fff ROM mirror #2 read, RAM write
-	4000-5fff ROM mirror #3 read, RAM write
-	6000-7fff ROM mirror #4 read, RAM write
-	8000-9fff ROM mirror #5 read, RAM write
-	a000-bfff ROM mirror #6 read, RAM write
-	c000-dfff ROM mirror #7 read, Video RAM #1 write
-	e000-ffff ROM, Video RAM #2 write
+    start-up map (cleared by the first I/O write operation done by the CPU):
+    0000-1fff ROM mirror #1 read, RAM write
+    2000-3fff ROM mirror #2 read, RAM write
+    4000-5fff ROM mirror #3 read, RAM write
+    6000-7fff ROM mirror #4 read, RAM write
+    8000-9fff ROM mirror #5 read, RAM write
+    a000-bfff ROM mirror #6 read, RAM write
+    c000-dfff ROM mirror #7 read, Video RAM #1 write
+    e000-ffff ROM, Video RAM #2 write
 
-	normal map:
-	0000-bfff RAM
-	c000-dfff Video RAM #1
-	e000-ffff Video RAM #2 / ROM read, Video RAM #2 write
+    normal map:
+    0000-bfff RAM
+    c000-dfff Video RAM #1
+    e000-ffff Video RAM #2 / ROM read, Video RAM #2 write
 
-	Mato
-	----
+    Mato
+    ----
 
-	start-up map (cleared by the first I/O write operation done by the CPU):
-	0000-3fff ROM mirror #1
-	4000-7fff Video RAM mirror #1
-	8000-bfff ROM
-	c000-ffff Video RAM
+    start-up map (cleared by the first I/O write operation done by the CPU):
+    0000-3fff ROM mirror #1
+    4000-7fff Video RAM mirror #1
+    8000-bfff ROM
+    c000-ffff Video RAM
 
-	normal map:
-	0000-7fff RAM
-	8000-bfff ROM
-	c000-ffff Video RAM
+    normal map:
+    0000-7fff RAM
+    8000-bfff ROM
+    c000-ffff Video RAM
 
 I/O ports
 ---------
 
-	I/O board
-	---------
-	1xxx11aa	external interfaces connector (K2)
+    I/O board
+    ---------
+    1xxx11aa    external interfaces connector (K2)
 
-	0xxx11aa	I/O board interfaces
-		000111aa	8251 (casette recorder, V24)
-		010011aa	8255 (GPIO/0, GPIO/1)
-		010111aa	8253
-		011111aa	8255 (IMS-2)
-	I/O board is not supported by Mato.
+    0xxx11aa    I/O board interfaces
+        000111aa    8251 (casette recorder, V24)
+        010011aa    8255 (GPIO/0, GPIO/1)
+        010111aa    8253
+        011111aa    8255 (IMS-2)
+    I/O board is not supported by Mato.
 
-	Motherboard
-	-----------
-	1xxx01aa	8255 (keyboard, speaker, LEDs)
-			PMD-85.3 memory banking
-			Mato cassette recorder
+    Motherboard
+    -----------
+    1xxx01aa    8255 (keyboard, speaker, LEDs)
+            PMD-85.3 memory banking
+            Mato cassette recorder
 
-	ROM Module
-	----------
-	1xxx10aa	8255 (ROM reading)
-	ROM module is not supported by Didaktik Alfa and Mato.
+    ROM Module
+    ----------
+    1xxx10aa    8255 (ROM reading)
+    ROM module is not supported by Didaktik Alfa and Mato.
 
 
 *******************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 #include "cpu/i8085/i8085.h"
-#include "video/generic.h"
 #include "devices/cassette.h"
 #include "includes/pmd85.h"
 #include "formats/pmd_pmd.h"
@@ -658,7 +656,7 @@ SYSTEM_CONFIG_START(pmd85)
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT	MACHINE  INPUT  INIT      CONFIG COMPANY  FULLNAME */
+/*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  INIT      CONFIG COMPANY  FULLNAME */
 COMP( 1985, pmd851,  0,      0,		pmd85,   pmd85, pmd851,   pmd85, "Tesla", "PMD-85.1" , 0)
 COMP( 1985, pmd852,  pmd851, 0,		pmd85,   pmd85, pmd851,   pmd85, "Tesla", "PMD-85.2" , 0)
 COMP( 1985, pmd852a, pmd851, 0,		pmd852a, pmd85, pmd852a,  pmd85, "Tesla", "PMD-85.2A" , 0)

@@ -1,11 +1,16 @@
-/******************************************************************************
-    Acorn Electron driver
+/*****************************************************************************
+ *
+ * includes/electron.h
+ *
+ * Acorn Electron
+ *
+ * Driver by Wilbert Pol
+ *
+ ****************************************************************************/
 
-    MESS Driver By:
+#ifndef ELECTRON_H_
+#define ELECTRON_H_
 
-	Wilbert Pol
-
-******************************************************************************/
 
 /* Interrupts */
 #define INT_HIGH_TONE		0x40
@@ -45,6 +50,7 @@ typedef struct
 	UINT8 tape_byte;
 } ULA;
 
+
 /*----------- defined in machine/electron.c -----------*/
 
 extern ULA ula;
@@ -59,8 +65,11 @@ MACHINE_START( electron );
 
 void electron_interrupt_handler(int mode, int interrupt);
 
+
 /*----------- defined in video/electron.c -----------*/
 
 void electron_video_init( void );
 INTERRUPT_GEN( electron_scanline_interrupt );
 
+
+#endif /* ELECTRON_H_ */

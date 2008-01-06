@@ -6,7 +6,6 @@
 
 #include "driver.h"
 
-#include "video/generic.h"
 #include "video/crtc6845.h"
 #include "mscommon.h"
 #include "includes/cbmb.h"

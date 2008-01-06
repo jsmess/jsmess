@@ -15,7 +15,7 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/pmd85.h"
 #include "machine/8255ppi.h"
-#include "includes/msm8251.h"
+#include "machine/msm8251.h"
 #include "machine/pit8253.h"
 #include "includes/serial.h"
 

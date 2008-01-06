@@ -36,14 +36,13 @@
 
 *********************************************************************/
 
-#include "sonydriv.h"
-#include "mame.h"
-#include "timer.h"
-#include "cpuintrf.h"
+#include "driver.h"
 #include "image.h"
 #include "formats/ap_dsk35.h"
+#include "devices/sonydriv.h"
 #include "devices/flopdrv.h"
 #include "devices/mflopimg.h"
+
 
 #ifdef MAME_DEBUG
 #define LOG_SONY		1

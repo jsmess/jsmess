@@ -1,9 +1,12 @@
-#ifndef __C65_H_
-#define __C65_H_
+/*****************************************************************************
+ *
+ * includes/c65.h
+ *
+ ****************************************************************************/
 
-#include "driver.h"
+#ifndef C65_H_
+#define C65_H_
 
-#include "c64.h"
 
 #define C65_KEY_TAB (input_port_10_word_r(0,0)&0x8000)
 #define C65_KEY_CTRL (input_port_10_word_r(0,0)&1)
@@ -30,6 +33,7 @@
 #define C65_KEY_F13 (input_port_13_word_r(0,0)&0x0010)
 #define C65_KEY_HELP (input_port_13_word_r(0,0)&0x0008)
 
+
 /*----------- defined in machine/c65.c -----------*/
 
 /*extern UINT8 *c65_memory; */
@@ -49,4 +53,5 @@ void c65_driver_alpha1_init (void);
 void c65pal_driver_init (void);
 MACHINE_START( c65 );
 
-#endif
+
+#endif /* C65_H_ */

@@ -1,25 +1,32 @@
 /******************************************************************************
 
     kc.c
-	system driver
+    system driver
 
-	A big thankyou to Torsten Paul for his great help with this
-	driver!
+    A big thankyou to Torsten Paul for his great help with this
+    driver!
 
 
-	Kevin Thacker [MESS driver]
+    Kevin Thacker [MESS driver]
 
  ******************************************************************************/
 
+/* Core includes */
 #include "driver.h"
-#include "cpuintrf.h"
+#include "includes/kc.h"
+
+/* Components */
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "includes/kc.h"
+#include "machine/nec765.h"
+
+/* Devices */
 #include "devices/cassette.h"
+#include "devices/basicdsk.h"
+
 
 /* pio is last in chain and therefore has highest priority */
 
@@ -38,8 +45,8 @@ static READ8_HANDLER(kc85_4_port_r)
 
 	switch (port)
 	{
-//		case 0x080:
-//			return kc85_module_r(offset);
+//      case 0x080:
+//          return kc85_module_r(offset);
 
 		case 0x085:
 		case 0x084:
@@ -76,9 +83,9 @@ static WRITE8_HANDLER(kc85_4_port_w)
 
 	switch (port)
 	{
-//		case 0x080:
-//			kc85_module_w(offset,data);
-//			return;
+//      case 0x080:
+//          kc85_module_w(offset,data);
+//          return;
 
 		case 0x085:
 		case 0x084:
@@ -221,7 +228,7 @@ static ADDRESS_MAP_START(kc85_4_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(MRA8_BANK1, MWA8_BANK7)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK2, MWA8_BANK8)
 	AM_RANGE(0x8000, 0xa7ff) AM_READWRITE(MRA8_BANK3, MWA8_BANK9)
-//	AM_RANGE(0xa800, 0xbfff) AM_RAM
+//  AM_RANGE(0xa800, 0xbfff) AM_RAM
 	AM_RANGE(0xa800, 0xbfff) AM_READWRITE(MRA8_BANK4, MWA8_BANK10)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_BANK5)
 	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_BANK6)
@@ -243,8 +250,8 @@ static READ8_HANDLER(kc85_3_port_r)
 
 	switch (port)
 	{
-//		case 0x080:
-//			return kc85_module_r(offset);
+//      case 0x080:
+//          return kc85_module_r(offset);
 
 		case 0x088:
 		case 0x089:
@@ -271,9 +278,9 @@ static WRITE8_HANDLER(kc85_3_port_w)
 
 	switch (port)
 	{
-//		case 0x080:
-//			kc85_module_w(offset,data);
-//			return;
+//      case 0x080:
+//          kc85_module_w(offset,data);
+//          return;
 
 		case 0x088:
 		case 0x089:
@@ -470,7 +477,7 @@ SYSTEM_CONFIG_START(kc85d)
 	CONFIG_DEVICE(kc85d_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*     YEAR  NAME      PARENT	COMPAT	MACHINE  INPUT     INIT  CONFIG  COMPANY   FULLNAME */
+/*     YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT     INIT  CONFIG  COMPANY   FULLNAME */
 COMP( 1987, kc85_3,   0,		0,		kc85_3,  kc85,     0,    kc85,   "VEB Mikroelektronik", "KC 85/3", GAME_NOT_WORKING)
 COMP( 1989, kc85_4,   kc85_3,  0,		kc85_4,  kc85,     0,    kc85,   "VEB Mikroelektronik", "KC 85/4", GAME_NOT_WORKING)
 COMP( 1989, kc85_4d,  kc85_3,  0,		kc85_4d, kc85,     0,    kc85d,  "VEB Mikroelektronik", "KC 85/4 + Disk Interface Module (D004)", GAME_NOT_WORKING)

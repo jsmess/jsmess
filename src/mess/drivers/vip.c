@@ -1,22 +1,21 @@
 /*
 
-	TODO:
+    TODO:
 
-	- pcb layout guru-style readme
-	- tape interface
-	- discrete sound from NE555
-	- artwork
-	- VP-550/551 Super Sound Board
-	- VP-590 Color Board
-	- VP-595 Simple Sound Board
-	- VP-601/611 ASCII Keyboard
-	- VP-700 Expanded Tiny Basic Board
+    - pcb layout guru-style readme
+    - tape interface
+    - discrete sound from NE555
+    - artwork
+    - VP-550/551 Super Sound Board
+    - VP-590 Color Board
+    - VP-595 Simple Sound Board
+    - VP-601/611 ASCII Keyboard
+    - VP-700 Expanded Tiny Basic Board
 
 */
 
 #include "driver.h"
 #include "image.h"
-#include "inputx.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
@@ -52,7 +51,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-//	AM_RANGE(0x03, 0x03) AM_READWRITE(io_r, io_w)
+//  AM_RANGE(0x03, 0x03) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
@@ -283,5 +282,5 @@ static DRIVER_INIT( vip )
 
 /* System Drivers */
 
-//    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG      COMPANY FULLNAME
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY FULLNAME
 COMP(1977,	vip,		0,		0,		vip,		vip,		vip,		vip,		"RCA",	"Cosmac VIP (VP-711)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

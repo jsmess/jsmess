@@ -1,28 +1,27 @@
 /******************************************************************************
-	Acorn Electron driver
+    Acorn Electron driver
 
-	MESS Driver By:
+    MESS Driver By:
 
-	Wilbert Pol
+    Wilbert Pol
 
 I don't have a real system to verify the behaviour of the emulation. The things
 that can be done through BASIC programs seem to behave properly (most of the time :).
 
 Incomplete:
-	- Sound (sound is too high?)
-	- Graphics (seems to be wrong for several games)
-	- 1MHz bus is not emulated
-	- Bus claiming by ULA is not implemented
+    - Sound (sound is too high?)
+    - Graphics (seems to be wrong for several games)
+    - 1MHz bus is not emulated
+    - Bus claiming by ULA is not implemented
 
 Missing:
-	- Support for ROM images
-	- Support for floppy disks
-	- Other peripherals
+    - Support for ROM images
+    - Support for floppy disks
+    - Other peripherals
 
 ******************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/electron.h"
 #include "devices/cassette.h"
 #include "formats/uef_cas.h"
@@ -228,5 +227,5 @@ SYSTEM_CONFIG_START(electron)
 	CONFIG_DEVICE(electron_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-/*	   YEAR  NAME      PARENT COMPAT	MACHINE   INPUT	    INIT  CONFIG	COMPANY	 FULLNAME */
+/*     YEAR  NAME      PARENT COMPAT    MACHINE   INPUT     INIT  CONFIG    COMPANY  FULLNAME */
 COMP ( 1983, electron, 0,     0,        electron, electron, 0,    electron, "Acorn", "Acorn Electron", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

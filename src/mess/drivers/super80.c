@@ -1,21 +1,21 @@
 /*
-	super80.c
+    super80.c
 
-	Super-80 computer sold by Dick Smith Electronics in 1981 as a kit.
+    Super-80 computer sold by Dick Smith Electronics in 1981 as a kit.
 
-	Several variants of video hardware:
-	* 32*16 monochrome display
-	* 32*16 color display
-	* 80*24 monochrome display
-	* 80*24 color display
+    Several variants of video hardware:
+    * 32*16 monochrome display
+    * 32*16 color display
+    * 80*24 monochrome display
+    * 80*24 color display
 
-	We only emulate the first variant for now.
+    We only emulate the first variant for now.
 
-	architecture:
-	* z80 @ 2MHz
-	* 16k, 32k or 48k RAM (>0000->bfff), plus 4k of optional extra RAM in
-	  >f000->ffff
-	* 12k ROM (>c000->efff range)
+    architecture:
+    * z80 @ 2MHz
+    * 16k, 32k or 48k RAM (>0000->bfff), plus 4k of optional extra RAM in
+      >f000->ffff
+    * 12k ROM (>c000->efff range)
 */
 
 #include <math.h>
@@ -24,7 +24,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "video/generic.h"
 #include "cpu/z80/z80daisy.h"
 #include "sound/speaker.h"
 
@@ -103,14 +102,14 @@ static VIDEO_UPDATE( super80 )
 }
 
 /*
-	port $F0: General Purpose output port
-	Bit 0 - cassette output
-	Bit 1 - cassette relay control; 0=relay on
-	Bit 2 - turns screen on and off;0=screen off
-	Bit 3 - Available for user projects [We will use it for sound]
-	Bit 4 - Available for user projects [We will use it for video switching]
-	Bit 5 - cassette LED; 0=LED on
-	Bit 6/7 - not decoded
+    port $F0: General Purpose output port
+    Bit 0 - cassette output
+    Bit 1 - cassette relay control; 0=relay on
+    Bit 2 - turns screen on and off;0=screen off
+    Bit 3 - Available for user projects [We will use it for sound]
+    Bit 4 - Available for user projects [We will use it for video switching]
+    Bit 5 - cassette LED; 0=LED on
+    Bit 6/7 - not decoded
 */
 static WRITE8_HANDLER (super80_gpo_w)
 {
@@ -119,10 +118,10 @@ static WRITE8_HANDLER (super80_gpo_w)
 }
 
 /*
-	port $F1: Video page output port
-	Bit 0 - not decoded
-	Bits 1 to 7 - choose video page to display
-	Bit 1 controls A9, bit 2 does A10, etc
+    port $F1: Video page output port
+    Bit 0 - not decoded
+    Bits 1 to 7 - choose video page to display
+    Bit 1 controls A9, bit 2 does A10, etc
 */
 static WRITE8_HANDLER (super80_vidpg_w)
 {
@@ -130,15 +129,15 @@ static WRITE8_HANDLER (super80_vidpg_w)
 }
 
 /*
-	port $F2: General purpose input port
-	Bit 0 - cassette input
-	Bit 1 - Available for user projects
-	Bit 2 - Available for user projects
-	Bit 3 - not decoded
-	Bit 4 - Switch A [These switches are actual DIP switches on the motherboard]
-	Bit 5 - Switch B
-	Bit 6 - Switch C
-	Bit 7 - Switch D
+    port $F2: General purpose input port
+    Bit 0 - cassette input
+    Bit 1 - Available for user projects
+    Bit 2 - Available for user projects
+    Bit 3 - not decoded
+    Bit 4 - Switch A [These switches are actual DIP switches on the motherboard]
+    Bit 5 - Switch B
+    Bit 6 - Switch C
+    Bit 7 - Switch D
 */
 static READ8_HANDLER (super80_gpi_r)
 {
@@ -361,8 +360,8 @@ ROM_END
 ***************************************************************************/
 
 SYSTEM_CONFIG_START(super80)
-	//CONFIG_DEVICE_CASSETTE			(1, NULL)
+	//CONFIG_DEVICE_CASSETTE            (1, NULL)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT      CONFIG	COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
 COMP( 1981, super80,  0,		0,		super80,  super80,  0,        super80,	"Dick Smith",  "Super-80" , 0)

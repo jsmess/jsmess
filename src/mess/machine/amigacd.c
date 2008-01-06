@@ -1,21 +1,22 @@
 /***************************************************************************
 
-	Amiga cdrom controller emulation
+	Amiga CD-ROM controller emulation
 
 Notes:
-Many thanks to Toni Willem for all the help and information about the
+Many thanks to Toni Wilen for all the help and information about the
 DMAC controller.
 
 ***************************************************************************/
 
-#include "mame.h"
+
 #include "driver.h"
 #include "amiga.h"
 #include "amigacd.h"
 #include "machine/6526cia.h"
 #include "machine/wd33c93.h"
-#include "tpi6525.h"
+#include "machine/tpi6525.h"
 #include "matsucd.h"
+
 
 #define VERBOSE_DMAC 0
 

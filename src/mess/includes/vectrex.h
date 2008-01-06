@@ -1,13 +1,12 @@
-#ifndef __VECTREX_H__
-#define __VECTREX_H__
+/*****************************************************************************
+ *
+ * includes/vectrex.h
+ *
+ ****************************************************************************/
 
-#ifndef MIN
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
+#ifndef VECTREX_H_
+#define VECTREX_H_
 
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
 
 /*----------- defined in machine/vectrex.c -----------*/
 
@@ -32,7 +31,7 @@ WRITE8_HANDLER ( vectrex_psg_port_w );
 DRIVER_INIT( vectrex );
 
 /* for spectrum 1+ */
- READ8_HANDLER( s1_via_pb_r );
+READ8_HANDLER( s1_via_pb_r );
 
 
 /*----------- defined in video/vectrex.c -----------*/
@@ -44,9 +43,9 @@ VIDEO_START( raaspec );
 
 WRITE8_HANDLER  ( raaspec_led_w );
 
-
 void vectrex_add_point_stereo (int x, int y, rgb_t color, int intensity);
 void vectrex_add_point (int x, int y, rgb_t color, int intensity);
 extern void (*vector_add_point_function) (int, int, rgb_t, int);
 
-#endif
+
+#endif /* VECTREX_H_ */

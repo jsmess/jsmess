@@ -64,7 +64,7 @@
 #include "machine/6821pia.h"
 #include "includes/coco.h"
 #include "includes/dgn_beta.h"
-#include "includes/6551.h"
+#include "machine/6551.h"
 #include "image.h"
 #include "machine/wd17xx.h"
 #include "includes/crtc6845.h"

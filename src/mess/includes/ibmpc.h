@@ -1,4 +1,14 @@
+/*****************************************************************************
+ *
+ * includes/ibmpc.h
+ *
+ ****************************************************************************/
+
+#ifndef IBMPC_H_
+#define IBMPC_H_
+
 #include "machine/8255ppi.h"
+
 
 /*----------- defined in machine/ibmpc.c -----------*/
 
@@ -14,3 +24,6 @@ void pc_rtc_init(void);
 
 READ8_HANDLER ( pc_EXP_r );
 WRITE8_HANDLER ( pc_EXP_w );
+
+
+#endif /* IBMPC_H_ */

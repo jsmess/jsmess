@@ -1,75 +1,73 @@
-#ifndef __SERIAL_TRANSMISSION_HEADER_INCLUDED__
-#define __SERIAL_TRANSMISSION_HEADER_INCLUDED__
+/*****************************************************************************
+ *
+ * includes/serial.h
+ *
+ * internal serial transmission
+ *
+ * This code is used to transmit a file stored on the host filesystem
+ * (e.g. PC harddrive) to an emulated system.
+ *
+ * The file is converted into a serial bit-stream which can be received
+ * by the emulated serial chip in the emulated system.
+ *
+ * The file can be transmitted using different protocols.
+ *
+ * A and B are two computers linked with a serial connection
+ * A and B can transmit and receive data, through the same connection
+ *
+ * These flags apply to A and B, and give the state of the input & output
+ * signals at each side.
+ *
+ ****************************************************************************/
 
-/* internal serial transmission */
-
-/*
-
-	This code is used to transmit a file stored on the host filesystem
-	(e.g. PC harddrive) to an emulated system.
-
-	The file is converted into a serial bit-stream which can be received
-	by the emulated serial chip in the emulated system.
-
-	The file can be transmitted using different protocols
-*/
-
-/*
-	A and B are two computers linked with a serial connection
-
-   A and B can transmit and receive data, through the same connection
-*/
-
-/*
-	these flags apply to A and B, and give the state of the input & output
-	signals at each side.
-*/
+#ifndef SERIAL_H_
+#define SERIAL_H_
 
 
 /*
-	CTS = Clear to Send. (INPUT)
-	Other end of connection is ready to accept data
+    CTS = Clear to Send. (INPUT)
+    Other end of connection is ready to accept data
 
 
-	NOTE:
+    NOTE:
 
-	  This output is active low on serial chips (e.g. 0 is CTS is set),
-	  but here it is active high!
+      This output is active low on serial chips (e.g. 0 is CTS is set),
+      but here it is active high!
 */
-
 #define SERIAL_STATE_CTS	0x0001
+
 /*
-	RTS = Request to Send. (OUTPUT)
-	This end is ready to send data, and requests if the other
-	end is ready to accept it
+    RTS = Request to Send. (OUTPUT)
+    This end is ready to send data, and requests if the other
+    end is ready to accept it
 
-	NOTE:
+    NOTE:
 
-	  This output is active low on serial chips (e.g. 0 is RTS is set),
-	  but here it is active high!
+      This output is active low on serial chips (e.g. 0 is RTS is set),
+      but here it is active high!
 */
 #define SERIAL_STATE_RTS	0x0002
 
 /*
-	DSR = Data Set ready. (INPUT)
-	Other end of connection has data
+    DSR = Data Set ready. (INPUT)
+    Other end of connection has data
 
 
-	NOTE:
+    NOTE:
 
-	  This output is active low on serial chips (e.g. 0 is DSR is set),
-	  but here it is active high!
+      This output is active low on serial chips (e.g. 0 is DSR is set),
+      but here it is active high!
 */
 #define SERIAL_STATE_DSR	0x0004
 
 /*
-	DTR = Data terminal Ready. (OUTPUT)
-	TX contains new data.
+    DTR = Data terminal Ready. (OUTPUT)
+    TX contains new data.
 
-  	NOTE:
+    NOTE:
 
-	  This output is active low on serial chips (e.g. 0 is DTR is set),
-	  but here it is active high!
+      This output is active low on serial chips (e.g. 0 is DTR is set),
+      but here it is active high!
 */
 #define SERIAL_STATE_DTR	0x0008
 /* RX = Recieve data. (INPUT) */
@@ -89,8 +87,8 @@ enum
 
 /* parity selections */
 /* if all the bits are added in a byte, if the result is:
-	even -> parity is even
-	odd -> parity is odd
+    even -> parity is even
+    odd -> parity is odd
 */
 enum
 {
@@ -124,10 +122,10 @@ struct serial_connection
 	unsigned long input_state;
 
 	/* this callback is executed when this side has refreshed it's state,
-	to let the other end know */
+    to let the other end know */
 	void	(*out_callback)(int id, unsigned long state);
 	/* this callback is executed when the other side has refreshed it's state,
-	to let the other end know */
+    to let the other end know */
 	void	(*in_callback)(int id, unsigned long state);
 };
 
@@ -326,4 +324,5 @@ void serial_device_set_transmit_state(mess_image *image, int state);
 #define XMODEM_CAN		24
 #define XMODEM_STX		2	/* id start of a 1k block */
 
-#endif
+
+#endif /* SERIAL_H_ */

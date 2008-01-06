@@ -1,7 +1,12 @@
-#include "driver.h"
-#include "osdepend.h"
+/*****************************************************************************
+ *
+ * includes/pcw.h
+ *
+ ****************************************************************************/
 
-/*----------- defined in video/pcw.c -----------*/
+#ifndef PCW_H_
+#define PCW_H_
+
 
 #define PCW_BORDER_HEIGHT 8
 #define PCW_BORDER_WIDTH 8
@@ -12,6 +17,12 @@
 #define PCW_SCREEN_WIDTH	(PCW_DISPLAY_WIDTH + (PCW_BORDER_WIDTH<<1))
 #define PCW_SCREEN_HEIGHT	(PCW_DISPLAY_HEIGHT  + (PCW_BORDER_HEIGHT<<1))
 
+
+/*----------- defined in video/pcw.c -----------*/
+
 extern VIDEO_START( pcw );
 extern VIDEO_UPDATE( pcw );
 extern PALETTE_INIT( pcw );
+
+
+#endif /* PCW_H_ */

@@ -16,11 +16,11 @@
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"
-#include "includes/tpi6525.h"
+#include "machine/tpi6525.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"
-#include "includes/ted7360.h"
+#include "video/ted7360.h"
 
 #include "includes/c16.h"
 

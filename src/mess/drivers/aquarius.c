@@ -1,33 +1,31 @@
 /************************************************************************
 Aquarius Memory map
 
-	CPU: z80
+    CPU: z80
 
-	Memory map
-		0000 1fff	BASIC
-		2000 2fff	expansion?
-		3000 33ff	screen ram
-		3400 37ff	colour ram
-		3800 3fff	RAM (standard)
-		4000 7fff	RAM (expansion)
-		8000 ffff	RAM (emulator only)
+    Memory map
+        0000 1fff   BASIC
+        2000 2fff   expansion?
+        3000 33ff   screen ram
+        3400 37ff   colour ram
+        3800 3fff   RAM (standard)
+        4000 7fff   RAM (expansion)
+        8000 ffff   RAM (emulator only)
 
-	Ports: Out
-		fc			Buzzer, bit 0.
-		fe			Printer.
+    Ports: Out
+        fc          Buzzer, bit 0.
+        fe          Printer.
 
-	Ports: In
-		fc			Tape in, bit 1.
-		fe			Printer.
-		ff			Keyboard, Bit set in .B selects keyboard matrix
-					line. Return bit 0 - 5 low for pressed key.
+    Ports: In
+        fc          Tape in, bit 1.
+        fe          Printer.
+        ff          Keyboard, Bit set in .B selects keyboard matrix
+                    line. Return bit 0 - 5 low for pressed key.
 
 ************************************************************************/
 
 #include "driver.h"
-#include "inputx.h"
 #include "cpu/z80/z80.h"
-#include "video/generic.h"
 #include "includes/aquarius.h"
 
 /* structures */
@@ -191,7 +189,7 @@ static INPUT_PORTS_START(aquarius)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctl")                PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-//	The reset key labelled "Rst" is not currently emulated
+//  The reset key labelled "Rst" is not currently emulated
 
 // This is a hack: it should be managed via -ramsize switch!!!
 	PORT_START_TAG("ram")	/* 8: Machine config */
@@ -251,5 +249,5 @@ ROM_START(aquarius)
 	ROM_LOAD("aq2.chr", 0x0000, 0x0800, BAD_DUMP CRC(0b3edeed) SHA1(d2509839386b852caddcaa89cd376be647ba1492))
 ROM_END
 
-/*		YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY		FULLNAME */
+/*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP(	1983,	aquarius,	0,		0,		aquarius,	aquarius,	0,		NULL,		"Mattel",	"Aquarius" , 0)

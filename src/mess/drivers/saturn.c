@@ -474,7 +474,7 @@ static void smpc_intbackhelper(void)
 
 	pad = readinputport(intback_stage); 	// will be 2 or 3, port 2 = player 1, port 3 = player 2
 
-//	if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	smpc_ram[33] = 0xf1;	// no tap, direct connect
 	smpc_ram[35] = 0x02;	// saturn pad
 	smpc_ram[37] = pad>>8;
@@ -509,7 +509,7 @@ static UINT8 stv_SMPC_r8 (int offset)
 
 	if (offset == 0x33) return_data = saturn_region;
 
-//	if (LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, offset>>1, return_data);
+//  if (LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, offset>>1, return_data);
 
 
 	return return_data;
@@ -523,15 +523,15 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 	/* get the current date/time from the core */
 	mame_get_current_datetime(Machine, &systime);
 
-//	if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
+//  if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
 
-//	if (offset == 0x7d) printf("IOSEL2 %d IOSEL1 %d\n", (data>>1)&1, data&1);
+//  if (offset == 0x7d) printf("IOSEL2 %d IOSEL1 %d\n", (data>>1)&1, data&1);
 
 	last = smpc_ram[offset];
 
 	if ((intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
 	{
-//		if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", intback_stage);
+//      if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", intback_stage);
 		if (intback_stage != 3)
 		{
 			intback_stage = 2;
@@ -542,7 +542,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 
 	if ((offset == 1) && (data & 0x40))
 	{
-//		if (LOG_SMPC) logerror("SMPC: BREAK request\n");
+//      if (LOG_SMPC) logerror("SMPC: BREAK request\n");
 		intback_stage = 0;
 	}
 
@@ -647,7 +647,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
-//				if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
+//              if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
 				smpc_ram[0x5f]=0x10;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 			  	smpc_ram[0x23] = DectoBCD(systime.local_time.year / 100);
@@ -693,7 +693,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 			//  /*This is for RTC,cartridge code and similar stuff...*/
 			//  if(!(stv_scu[40] & 0x0080)) /*System Manager(SMPC) irq*/ /* we can't check this .. breaks controls .. probably issues elsewhere? */
 				{
-//					if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
+//                  if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 					smpc_intbackhelper();
 					cpunum_set_input_line_and_vector(0, 8, HOLD_LINE , 0x47);
 				}

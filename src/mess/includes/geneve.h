@@ -1,6 +1,14 @@
-/*
-	header file for the Geneve driver
-*/
+/*****************************************************************************
+ *
+ * includes/geneve.h
+ *
+ * header file for the Geneve driver
+ *
+ ****************************************************************************/
+
+#ifndef GENEVE_H_
+#define GENEVE_H_
+
 
 /* defines */
 
@@ -43,3 +51,6 @@ READ8_HANDLER ( geneve_r );
 WRITE8_HANDLER ( geneve_w );
 
 WRITE8_HANDLER ( geneve_peb_mode_cru_w );
+
+
+#endif /* GENEVE_H_ */

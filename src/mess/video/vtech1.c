@@ -28,7 +28,6 @@ Video hardware:
 ******************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/vtech1.h"
 #include "video/m6847.h"
 

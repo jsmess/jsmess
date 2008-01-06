@@ -11,7 +11,11 @@
 
 #include "driver.h"
 #include "includes/kaypro.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/wd17xx.h"
+#include "machine/cpm_bios.h"
+
 
 static const char *const disk_ids[4] = {"KAY2","KAY2","KAY2","KAY2"};
 

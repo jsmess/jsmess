@@ -6,6 +6,8 @@
 	Not (currently) used, since an XT does not have IDE support in BIOS :(
 
 ***************************************************************************/
+
+#include "driver.h"
 #include "includes/pc_ide.h"
 
 

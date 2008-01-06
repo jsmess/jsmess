@@ -78,7 +78,6 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9900.h"
 #include "mslegacy.h"
@@ -123,8 +122,8 @@ static void ti99_2_vblank_interrupt(void)
   in a 128-entry table located in ROM.  Character code for each screen position are stored
   sequentially in RAM.  Colors are a fixed Black on White.
 
-	There is an EOL character that blanks the end of the current line, so that
-	the CPU can get more bus time.
+    There is an EOL character that blanks the end of the current line, so that
+    the CPU can get more bus time.
 */
 
 static const unsigned char ti99_2_palette[] =
@@ -445,6 +444,6 @@ SYSTEM_CONFIG_START(ti99_2)
 	/* None of these is supported (tape should be easy to emulate) */
 SYSTEM_CONFIG_END
 
-/*		YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT	INIT		CONFIG		COMPANY					FULLNAME */
+/*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */
 COMP(	1983,	ti99_224,	0,			0,		ti99_2,		ti99_2,	ti99_2_24,	ti99_2,		"Texas Instruments",	"TI-99/2 BASIC Computer (24kb ROMs)" , 0)
 COMP(	1983,	ti99_232,	ti99_224,	0,		ti99_2,		ti99_2,	ti99_2_32,	ti99_2,		"Texas Instruments",	"TI-99/2 BASIC Computer (32kb ROMs)" , 0)

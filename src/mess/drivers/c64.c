@@ -1,7 +1,7 @@
 /***************************************************************************
-	commodore c64 home computer
+    commodore c64 home computer
 
-	PeT mess@utanet.at
+    PeT mess@utanet.at
 
     documentation
      www.funet.fi
@@ -10,8 +10,8 @@
 /*
 ------------------------------------
 max     commodore max (vic10/ultimax/vickie prototype)
-c64		commodore c64 (ntsc version)
-c64pal	commodore c64 (pal version)
+c64     commodore c64 (ntsc version)
+c64pal  commodore c64 (pal version)
 c64gs   commodore c64 game system (ntsc version)
 sx64    commodore sx64 (pal version)
 ------------------------------------
@@ -191,13 +191,12 @@ when problems start with -log and look into error.log file
  */
 
 #include "driver.h"
-#include "inputx.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-#include "includes/vic6567.h"
+#include "video/vic6567.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"
@@ -221,17 +220,17 @@ static ADDRESS_MAP_START(c64_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(c64_ioarea_r, c64_ioarea_w)
 //#if 1
-//	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_BANK5, MWA8_BANK6)
+//  AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_BANK5, MWA8_BANK6)
 //#else
 ///* dram */
 ///* or character rom */
-//	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(MRA8_BANK9, vic2_port_w)
-//	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(MRA8_BANK10, sid6581_0_port_w)
-//	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_BANK11, c64_colorram_write)		   /* colorram  */
-//	AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(MRA8_BANK12, cia_0_w)
-//	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(MRA8_BANK13, cia_1_w)
-//	AM_RANGE(0xde00, 0xdeff) AM_READ(MRA8_BANK14)		   /* csline expansion port */
-//	AM_RANGE(0xdf00, 0xdfff) AM_READ(MRA8_BANK15)		   /* csline expansion port */
+//  AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(MRA8_BANK9, vic2_port_w)
+//  AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(MRA8_BANK10, sid6581_0_port_w)
+//  AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_BANK11, c64_colorram_write)         /* colorram  */
+//  AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(MRA8_BANK12, cia_0_w)
+//  AM_RANGE(0xdd00, 0xddff) AM_READWRITE(MRA8_BANK13, cia_1_w)
+//  AM_RANGE(0xde00, 0xdeff) AM_READ(MRA8_BANK14)          /* csline expansion port */
+//  AM_RANGE(0xdf00, 0xdfff) AM_READ(MRA8_BANK15)          /* csline expansion port */
 //#endif
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(MRA8_BANK7, MWA8_BANK8)	   /* ram or kernel rom or external romh */
 ADDRESS_MAP_END
@@ -690,7 +689,7 @@ ROM_END
 	 ROM_LOAD( "dos20.e0",    0x12000, 0x2000, CRC(ffaeb9bc ))
 
 	 /* speeddos plus
-		parallel interface on userport to modified vc1541 !? */
+        parallel interface on userport to modified vc1541 !? */
 	 ROM_LOAD( "speeddos.e0", 0x12000, 0x2000, CRC(8438e77b ))
 	 /* speeddos plus + */
 	 ROM_LOAD( "speeddos.e0", 0x12000, 0x2000, CRC(10aee0ae ))
@@ -848,7 +847,7 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*   YEAR  NAME		PARENT	COMPAT	MACHINE 		INPUT	INIT	CONFIG		COMPANY 						   FULLNAME */
+/*   YEAR  NAME     PARENT  COMPAT  MACHINE         INPUT   INIT    CONFIG      COMPANY                            FULLNAME */
 COMP(1982, max,		0,		0,		ultimax,		ultimax,ultimax,ultimax,	"Commodore Business Machines Co.", "Commodore Max (Ultimax/VC10)", 0)
 COMP(1982, c64,		0,		0,		c64,			c64,	c64,	c64,		"Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
 COMP(1982, cbm4064,	c64,	0,		pet64,			c64,	c64,	c64,		"Commodore Business Machines Co.", "CBM4064/PET64/Educator64 (NTSC)", 0)

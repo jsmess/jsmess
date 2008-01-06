@@ -12,7 +12,7 @@ PCB Layout
 |                                  |----------------------------|                          CA555   7805    |
 |      SPKR                                     CN1                                                        |
 |                                                                                                          |
-|						                                                                    |-----------|  |
+|                                                                                           |-----------|  |
 |                                                                                           | Output    |  |
 |   ROM.4  ROM.3  ROM.2  ROM.1  CDP1822  CDP1822  CDP1822  CDP1822                          |TV Module  |  |
 |                                                                                           |           |  |
@@ -34,15 +34,15 @@ Notes:
       TA10171V1 - RCA TA10171V1 NTSC Video Display Controller (VDC) (= RCA CDP1861)
       CDP1822 - RCA CDP1822NCE 256 x4 RAM (= Mitsubishi M58721P)
       ROM.x   - RCA CDP1831CE 512 x8 MASKROM. All ROMs are marked 'PROGRAM COPYRIGHT (C) RCA CORP. 1977'
-	  CD4001  - 4001 Quad 2-Input NOR Buffered B Series Gate (4000-series CMOS TTL logic IC)
-	  CD4042  - 4042 Quad Clocked D Latch (4000-series CMOS TTL logic IC)
+      CD4001  - 4001 Quad 2-Input NOR Buffered B Series Gate (4000-series CMOS TTL logic IC)
+      CD4042  - 4042 Quad Clocked D Latch (4000-series CMOS TTL logic IC)
       CD4515  - 4515 4-Bit Latched/4-to-16 Line Decoders (4000-series CMOS TTL logic IC)
-	  CA555   - CA555CG General Purpose Single Bipolar Timer (= NE555)
+      CA555   - CA555CG General Purpose Single Bipolar Timer (= NE555)
       7805    - Voltage regulator, input 10V-35V, output +5V
-	  SPKR    - Loudspeaker, 8 ohms, 0.3 W
-	  CN1     - ROM cartridge connector, 2x22 pins, 0.154" spacing
-	  CN2     - Player A keypad connector, 1x12 pins
-	  CN3     - Player B keypad connector, 1x12 pins
+      SPKR    - Loudspeaker, 8 ohms, 0.3 W
+      CN1     - ROM cartridge connector, 2x22 pins, 0.154" spacing
+      CN2     - Player A keypad connector, 1x12 pins
+      CN3     - Player B keypad connector, 1x12 pins
 */
 
 /*
@@ -85,16 +85,16 @@ Notes:
       CD4069  - 4069 Hex Buffer, Inverter (4000-series CMOS TTL logic IC)
       CD4515  - 4515 4-Bit Latched/4-to-16 Line Decoders (4000-series CMOS TTL logic IC)
       7805    - Voltage regulator, input 10V-35V, output +5V
-	  CN1     - ROM cartridge connector, 2x22 pins, 0.154" spacing
+      CN1     - ROM cartridge connector, 2x22 pins, 0.154" spacing
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- cdp1864 video colors
-	- discrete sound
-	- redump studio2 bios as 4 separate roms
+    - cdp1864 video colors
+    - discrete sound
+    - redump studio2 bios as 4 separate roms
 
 */
 
@@ -104,7 +104,6 @@ Notes:
 #include "video/cdp1861.h"
 #include "video/cdp1864.h"
 #include "devices/cartslot.h"
-#include "inputx.h"
 #include "sound/beep.h"
 #include "sound/discrete.h"
 
@@ -434,15 +433,15 @@ static DRIVER_INIT( mpt02 )
 
 /*
 
-	PAL clones of RCA Studio II using CDP1864C (color display):
+    PAL clones of RCA Studio II using CDP1864C (color display):
 
-	"Mustang", "9016 Telespiel Computer (Germany)"
-	"Soundic", "MPT-02 Victory Home TV Programmer (Austria)"
-	"Hanimex", "MPT-02 (France)"
-	"Sheen",   "1200 Micro Computer (Australia)"
+    "Mustang", "9016 Telespiel Computer (Germany)"
+    "Soundic", "MPT-02 Victory Home TV Programmer (Austria)"
+    "Hanimex", "MPT-02 (France)"
+    "Sheen",   "1200 Micro Computer (Australia)"
 
 */
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG      COMPANY   FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
 CONS( 1978,	m9016tc,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

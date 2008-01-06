@@ -1,8 +1,12 @@
-/***************************************************************************
+/*****************************************************************************
+ *
+ * includes/pc8801.h
+ *
+ ****************************************************************************/
 
-  $Id: pc8801.h,v 1.7 2006/02/24 13:07:04 npwoods Exp $
+#ifndef PC8801_H_
+#define PC8801_H_
 
-***************************************************************************/
 
 /*----------- defined in machine/pc8801.c -----------*/
 
@@ -39,6 +43,7 @@ WRITE8_HANDLER(pc8801_calender);
  READ8_HANDLER(pc8801_read_extmem);
 WRITE8_HANDLER(pc8801_write_extmem);
 
+
 /*----------- defined in video/pc8801.c -----------*/
 
 void pc8801_video_init (int hireso);
@@ -62,3 +67,5 @@ WRITE8_HANDLER(pc88sr_disp_32);
 WRITE8_HANDLER(pc88sr_ALU);
 WRITE8_HANDLER(pc8801_palette_out);
 
+
+#endif /* PC8801_H_ */

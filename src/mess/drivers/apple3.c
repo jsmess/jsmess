@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	drivers/apple3.c
+    drivers/apple3.c
 
-	Apple ///
+    Apple ///
 
-	Driver is not working yet; seems to get caught in an infinite loop on
-	startup.  Special thanks to Chris Smolinski (author of the Sara emulator)
-	for his input about this poorly known system.
+    Driver is not working yet; seems to get caught in an infinite loop on
+    startup.  Special thanks to Chris Smolinski (author of the Sara emulator)
+    for his input about this poorly known system.
 
 ***************************************************************************/
 
@@ -17,7 +17,6 @@
 #include "formats/ap2_dsk.h"
 #include "machine/6522via.h"
 #include "devices/appldriv.h"
-#include "inputx.h"
 
 
 static ADDRESS_MAP_START( apple3_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -173,6 +172,6 @@ SYSTEM_CONFIG_START(apple3)
 	CONFIG_DEVICE(apple3_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*     YEAR		NAME		PARENT	COMPAT	MACHINE    INPUT	INIT    CONFIG	COMPANY				FULLNAME */
+/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    CONFIG  COMPANY             FULLNAME */
 COMP( 1980,	apple3,		0,		0,		apple3,    apple3,	apple3,	apple3,	"Apple Computer",	"Apple ///", GAME_NOT_WORKING )
 

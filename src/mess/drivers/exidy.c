@@ -2,90 +2,90 @@
 
   Exidy Sorcerer system driver
 
-	The UART controls rs232 and cassette i/o. The chip is a AY-3-1014A or AY-3-1015.
+    The UART controls rs232 and cassette i/o. The chip is a AY-3-1014A or AY-3-1015.
 
 
-	port fc:
-	========
-	input/output:
-		hd6402 uart data
+    port fc:
+    ========
+    input/output:
+        hd6402 uart data
 
-	port fd:
-	========
-	input: hd6402 uart status
-		bit 4: parity error (RPE)
-		bit 3: framing error (RFE)
-		bit 2: over-run (RDP)
-		bit 1: data available (RDA)
-		bit 0: transmit buffer empty (TPMT)
+    port fd:
+    ========
+    input: hd6402 uart status
+        bit 4: parity error (RPE)
+        bit 3: framing error (RFE)
+        bit 2: over-run (RDP)
+        bit 1: data available (RDA)
+        bit 0: transmit buffer empty (TPMT)
 
-	output:
-		bit 4: no parity (NPB)
-		bit 3: parity type (POE)
-		bit 2: number of stop bits (NSB)
-		bit 1: number of bits per char bit 2 (NDB2)
-		bit 0: number of bits per char bit 1 (NDB1)
+    output:
+        bit 4: no parity (NPB)
+        bit 3: parity type (POE)
+        bit 2: number of stop bits (NSB)
+        bit 1: number of bits per char bit 2 (NDB2)
+        bit 0: number of bits per char bit 1 (NDB1)
 
-	port fe:
-	========
+    port fe:
+    ========
 
-	output:
+    output:
 
-		bit 7: rs232 enable (1=rs232, 0=cassette)
-		bit 6: baud rate (1=1200, 0=300)
-		bit 5: cassette motor 2
-		bit 4: cassette motor 1
-		bit 3..0: keyboard line select
+        bit 7: rs232 enable (1=rs232, 0=cassette)
+        bit 6: baud rate (1=1200, 0=300)
+        bit 5: cassette motor 2
+        bit 4: cassette motor 1
+        bit 3..0: keyboard line select
 
-	input:
-		bit 7..6: parallel control (not emulated)
-				7: must be 1 to read data from parallel port via PARIN
-				6: must be 1 to send data out of parallel port via PAROUT
-		bit 5: vsync
-		bit 4..0: keyboard line data
+    input:
+        bit 7..6: parallel control (not emulated)
+                7: must be 1 to read data from parallel port via PARIN
+                6: must be 1 to send data out of parallel port via PAROUT
+        bit 5: vsync
+        bit 4..0: keyboard line data
 
-	port ff:
-	========
-	  parallel port in/out
+    port ff:
+    ========
+      parallel port in/out
 
-	-------------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------
 
-	When cassette is selected, it is connected to the uart data input via the cassette
-	interface hardware.
+    When cassette is selected, it is connected to the uart data input via the cassette
+    interface hardware.
 
-	The cassette interface hardware converts square-wave pulses into bits which the uart receives.
-
-
-	Sound:
-
-	external speaker connected to the parallel port
-	speaker is connected to all pins. All pins need to be toggled at the same time.
+    The cassette interface hardware converts square-wave pulses into bits which the uart receives.
 
 
-	Kevin Thacker [MESS driver]
+    Sound:
+
+    external speaker connected to the parallel port
+    speaker is connected to all pins. All pins need to be toggled at the same time.
+
+
+    Kevin Thacker [MESS driver]
 
  ******************************************************************************
 
-	The Sorcerer comes with a non-standard Serial Port with connections for
-	rs232 and the 2 cassette players. The connections for cassette 1 are duplicated
-	on a set of phono plugs.
+    The Sorcerer comes with a non-standard Serial Port with connections for
+    rs232 and the 2 cassette players. The connections for cassette 1 are duplicated
+    on a set of phono plugs.
 
-	The CPU clock speed is 2.106mhz, which was increased to 4.0mhz on the last production runs.
+    The CPU clock speed is 2.106mhz, which was increased to 4.0mhz on the last production runs.
 
-	The Sorcerer has a bus connection for S100 equipment. This allows the connection
-	of disk drives, provided that suitable driver/boot software is loaded.
+    The Sorcerer has a bus connection for S100 equipment. This allows the connection
+    of disk drives, provided that suitable driver/boot software is loaded.
 
-	The driver "exidy" emulates a Sorcerer with 4 floppy disk drives fitted, and 32k of ram.
+    The driver "exidy" emulates a Sorcerer with 4 floppy disk drives fitted, and 32k of ram.
 
-	The driver "exidyd" emulates the most common form, a cassette-based system with 48k of ram.
+    The driver "exidyd" emulates the most common form, a cassette-based system with 48k of ram.
 
-	- Robert
+    - Robert
 
 ********************************************************************************/
 #include "driver.h"
-#include "../includes/exidy.h"
+#include "includes/exidy.h"
 #include "includes/centroni.h"
-#include "includes/hd6402.h"
+#include "machine/hd6402.h"
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
@@ -95,7 +95,6 @@
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
 #include "image.h"
-#include "inputx.h"
 #include "mslegacy.h"
 
 static int device_load_exidy_floppy(mess_image *image)
@@ -128,7 +127,7 @@ static emu_timer *serial_timer;
 static TIMER_CALLBACK(exidy_serial_timer_callback)
 {
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
-	Transmit and receive clocks are connected to the same clock */
+    Transmit and receive clocks are connected to the same clock */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
 	if (exidy_fe & 0x080)
@@ -155,20 +154,20 @@ static int cassette_clock_state;
 /* a up-counter. when this reaches a fixed value, the cassette clock state is changed */
 static int cassette_clock_counter;
 
-/*	1. the cassette format: "frequency shift" is converted
-	into the uart data format "non-return to zero"
+/*  1. the cassette format: "frequency shift" is converted
+    into the uart data format "non-return to zero"
 
-	2. on cassette a 1 data bit is stored as a high frequency
-	and a 0 data bit as a low frequency
-	- At 1200 baud, a logic 1 is 1 cycle of 1200hz and a logic 0 is 1/2 cycle of 600hz.
-	- At 300 baud, a logic 1 is 8 cycles of 2400hz and a logic 0 is 4 cycles of 1200hz.
+    2. on cassette a 1 data bit is stored as a high frequency
+    and a 0 data bit as a low frequency
+    - At 1200 baud, a logic 1 is 1 cycle of 1200hz and a logic 0 is 1/2 cycle of 600hz.
+    - At 300 baud, a logic 1 is 8 cycles of 2400hz and a logic 0 is 4 cycles of 1200hz.
 
-	Attenuation is applied to the signal and the square wave edges are rounded.
+    Attenuation is applied to the signal and the square wave edges are rounded.
 
-	A manchester encoder is used. A flip-flop synchronises input
-	data on the positive-edge of the clock pulse.
+    A manchester encoder is used. A flip-flop synchronises input
+    data on the positive-edge of the clock pulse.
 
-	Interestingly the data on cassette is stored in xmodem-checksum.
+    Interestingly the data on cassette is stored in xmodem-checksum.
 
 
 */
@@ -283,12 +282,12 @@ static MACHINE_RESET( exidy )
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 
 	/* this is temporary. Normally when a Z80 is reset, it will
-	execute address 0. The exidy starts executing from 0x0e000 */
-//	memory_set_opbase_handler(0, exidy_opbaseoverride);
+    execute address 0. The exidy starts executing from 0x0e000 */
+//  memory_set_opbase_handler(0, exidy_opbaseoverride);
 
-//	cpunum_write_byte(0,0,0x0c3);
-//	cpunum_write_byte(0,1,0x000);
-//	cpunum_write_byte(0,2,0x0e0);
+//  cpunum_write_byte(0,0,0x0c3);
+//  cpunum_write_byte(0,1,0x000);
+//  cpunum_write_byte(0,2,0x0e0);
 
 }
 
@@ -471,7 +470,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 		else
 		{
 			/* if both motors were off previously, at least one motor
-			has been switched on */
+            has been switched on */
 			if ((exidy_fe & EXIDY_CASSETTE_MOTOR_MASK)==0)
 			{
 				cassette_clock_counter = 0;
@@ -487,17 +486,17 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 	{
 		/* connect to serial device (not yet emulated) */
 		/* Notes by Robert
-		Due to bugs in the hardware and software of a real Sorcerer, the serial
-		interface misbehaves.
-		1. Sorcerer I had a hardware problem causing rs232 idle to be a space (+9v)
-		instead of mark (-9v). Fixed in Sorcerer II.
-		2. When you select a different baud for rs232, it was "remembered" but not
-		sent to port fe. It only gets sent when motor on was requested. Motor on is
-		only meaningful in a cassette operation.
-		3. The monitor software always resets the device to cassette whenever the
-		keyboard is scanned, motors altered, or an error occurred.
-		4. The above problems make rs232 communication impractical unless you write
-		your own routines or create a corrected monitor rom. */
+        Due to bugs in the hardware and software of a real Sorcerer, the serial
+        interface misbehaves.
+        1. Sorcerer I had a hardware problem causing rs232 idle to be a space (+9v)
+        instead of mark (-9v). Fixed in Sorcerer II.
+        2. When you select a different baud for rs232, it was "remembered" but not
+        sent to port fe. It only gets sent when motor on was requested. Motor on is
+        only meaningful in a cassette operation.
+        3. The monitor software always resets the device to cassette whenever the
+        keyboard is scanned, motors altered, or an error occurred.
+        4. The above problems make rs232 communication impractical unless you write
+        your own routines or create a corrected monitor rom. */
 	}
 	else
 	{
@@ -612,9 +611,9 @@ static  READ8_HANDLER(exidy_fd_port_r)
 static  READ8_HANDLER(exidy_fe_port_r)
 {
 	/* bits 6..7
-	 - hardware handshakes from user port
-	 - not emulated
-	 - tied high, allowing PARIN and PAROUT bios routines to run */
+     - hardware handshakes from user port
+     - not emulated
+     - tied high, allowing PARIN and PAROUT bios routines to run */
 
 	unsigned int data=0xc0;
 
@@ -632,15 +631,15 @@ static  READ8_HANDLER(exidy_fe_port_r)
 static READ8_HANDLER(exidy_ff_port_r)
 {
 	/* Notes added by Robert
-	The use of the parallel port as a general purpose port is not emulated.
-	Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
-	This uses bit 7. The other bits have been set high (=nothing plugged in).
-	This fixes those games that use a joystick. */
+    The use of the parallel port as a general purpose port is not emulated.
+    Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
+    This uses bit 7. The other bits have been set high (=nothing plugged in).
+    This fixes those games that use a joystick. */
 
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
-	0 = printer is not busy */
+    0 = printer is not busy */
 
 	if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0)==0 )
 		data |= 0x080;
@@ -848,10 +847,10 @@ ROM_START(exidy)
 
 	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
 
-//	ROM_LOAD_OPTIONAL("exsb1-1.dat", 0x0c000, 0x0800, CRC(1dd20d80) SHA1(dd34364ca1a35caa7255b18e6c953f6df664cc74))
-//	ROM_LOAD_OPTIONAL("exsb1-2.dat", 0x0c800, 0x0800, CRC(1068a3f8) SHA1(6395f2c9829d537d68b75a750acbf27145f1bbad))
-//	ROM_LOAD_OPTIONAL("exsb1-3.dat", 0x0d000, 0x0800, CRC(e6332518) SHA1(fe27fccc82f86b90453c4fae55371f3a050dd6dc))
-//	ROM_LOAD_OPTIONAL("exsb1-4.dat", 0x0d800, 0x0800, CRC(a370cb19) SHA1(75fffd897aec8c3dbe1a918f5a29485e603004cb))
+//  ROM_LOAD_OPTIONAL("exsb1-1.dat", 0x0c000, 0x0800, CRC(1dd20d80) SHA1(dd34364ca1a35caa7255b18e6c953f6df664cc74))
+//  ROM_LOAD_OPTIONAL("exsb1-2.dat", 0x0c800, 0x0800, CRC(1068a3f8) SHA1(6395f2c9829d537d68b75a750acbf27145f1bbad))
+//  ROM_LOAD_OPTIONAL("exsb1-3.dat", 0x0d000, 0x0800, CRC(e6332518) SHA1(fe27fccc82f86b90453c4fae55371f3a050dd6dc))
+//  ROM_LOAD_OPTIONAL("exsb1-4.dat", 0x0d800, 0x0800, CRC(a370cb19) SHA1(75fffd897aec8c3dbe1a918f5a29485e603004cb))
 ROM_END
 
 ROM_START(exidyd)
@@ -923,7 +922,7 @@ SYSTEM_CONFIG_START(exidy)
 SYSTEM_CONFIG_END
 
 
-/*	  YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY        FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY        FULLNAME */
 COMP(1979, exidy,	0,	0,	exidy,	exidy,	0,	exidy,	"Exidy Inc", "Sorcerer", GAME_NOT_WORKING )
 COMP(1979, exidyd,	exidy,	0,	exidyd,	exidy,	0,	exidy,	"Exidy Inc", "Sorcerer (diskless)", GAME_NOT_WORKING )
 

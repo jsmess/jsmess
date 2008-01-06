@@ -4,30 +4,28 @@
 #include "devices/cartslot.h"
 #include "includes/serial.h"
 #include "sound/speaker.h"
-#include "video/generic.h"
 #include "video/zx8301.h"
-#include "inputx.h"
 #include <time.h>
 
 /*
 
-	Sinclair QL
+    Sinclair QL
 
-	MESS Driver by Curt Coder
+    MESS Driver by Curt Coder
 
 
-	TODO:
+    TODO:
 
-	- microdrive simulation
-	- RTC register write
-	- serial data latching?
-	- transmit interrupt timing
-	- interface interrupt
-	- accurate screen timings
-	- ZX8301 cycle stealing
-	- emulate COMCTL properly
-	- emulate microdrive properly
-	- get modified Danish version to boot (e.g. MD_DESEL was patched to jump to 0x1cd5e)
+    - microdrive simulation
+    - RTC register write
+    - serial data latching?
+    - transmit interrupt timing
+    - interface interrupt
+    - accurate screen timings
+    - ZX8301 cycle stealing
+    - emulate COMCTL properly
+    - emulate microdrive properly
+    - get modified Danish version to boot (e.g. MD_DESEL was patched to jump to 0x1cd5e)
 
 */
 
@@ -271,18 +269,18 @@ static READ8_HANDLER( zx8302_status_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Network port
-		1		Transmit buffer full
-		2		Receive buffer full
-		3		Microdrive GAP
-		4		SER1 DTR
-		5		SER2 CTS
-		6		Latched COMCTL
-		7		Latched COMDATA
+        0       Network port
+        1       Transmit buffer full
+        2       Receive buffer full
+        3       Microdrive GAP
+        4       SER1 DTR
+        5       SER2 CTS
+        6       Latched COMCTL
+        7       Latched COMDATA
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -312,14 +310,14 @@ static WRITE8_HANDLER( zx8302_ipc_command_w )
 /*
 static int zx8302_get_selected_microdrive(void)
 {
-	int i;
+    int i;
 
-	for (i = 0; i < 8; i++)
-	{
-		if (BIT(zx8302.mdv_motor, i)) return 8 - i;
-	}
+    for (i = 0; i < 8; i++)
+    {
+        if (BIT(zx8302.mdv_motor, i)) return 8 - i;
+    }
 
-	return 0;
+    return 0;
 }
 */
 
@@ -327,18 +325,18 @@ static WRITE8_HANDLER( zx8302_mdv_control_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		MDSELDH
-		1		MDSELCKH
-		2		MDRDWL
-		3		ERASE
-		4
-		5
-		6
-		7
+        0       MDSELDH
+        1       MDSELCKH
+        2       MDRDWL
+        3       ERASE
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	zx8302.mdseld = BIT(data, 0);
 	zx8302.mdselck = BIT(data, 1);
@@ -397,28 +395,28 @@ static WRITE8_HANDLER( ipc_link_hack_w )
 {
 	/*
 
-		IPC <-> ZX8302 serial link protocol
-		***********************************
+        IPC <-> ZX8302 serial link protocol
+        ***********************************
 
-		Send bit to IPC
-		---------------
+        Send bit to IPC
+        ---------------
 
-		1. ZX initiates transmission (COMDATA = 0)
-		2. IPC acknowledges (COMCTL = 0, COMTL = 1)
-		3. ZX transmits data bit (COMDATA = 0 or 1)
-		4. IPC acknowledges (COMCTL = 0, COMTL = 1)
-		5. ZX ends bit transfer (COMDATA = 1)
+        1. ZX initiates transmission (COMDATA = 0)
+        2. IPC acknowledges (COMCTL = 0, COMTL = 1)
+        3. ZX transmits data bit (COMDATA = 0 or 1)
+        4. IPC acknowledges (COMCTL = 0, COMTL = 1)
+        5. ZX ends bit transfer (COMDATA = 1)
 
-		Receive bit from IPC
-		--------------------
+        Receive bit from IPC
+        --------------------
 
-		1. ZX initiates transmission (COMDATA = 0)
-		2. IPC acknowledges (COMCTL = 0, COMTL = 1)
-		3. IPC transmits data bit (COMDATA = 0 or 1)
-		4. IPC acknowledges (COMCTL = 0, COMTL = 1)
-		5. IPC ends bit transfer (COMDATA = 1)
+        1. ZX initiates transmission (COMDATA = 0)
+        2. IPC acknowledges (COMCTL = 0, COMTL = 1)
+        3. IPC transmits data bit (COMDATA = 0 or 1)
+        4. IPC acknowledges (COMCTL = 0, COMTL = 1)
+        5. IPC ends bit transfer (COMDATA = 1)
 
-	*/
+    */
 
 	switch (activecpu_get_pc())
 	{
@@ -445,18 +443,18 @@ static WRITE8_HANDLER( ipc_port1_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Keyboard column output (KBO0)
-		1		Keyboard column output (KBO1)
-		2		Keyboard column output (KBO2)
-		3		Keyboard column output (KBO3)
-		4		Keyboard column output (KBO4)
-		5		Keyboard column output (KBO5)
-		6		Keyboard column output (KBO6)
-		7		Keyboard column output (KBO7)
+        0       Keyboard column output (KBO0)
+        1       Keyboard column output (KBO1)
+        2       Keyboard column output (KBO2)
+        3       Keyboard column output (KBO3)
+        4       Keyboard column output (KBO4)
+        5       Keyboard column output (KBO5)
+        6       Keyboard column output (KBO6)
+        7       Keyboard column output (KBO7)
 
-	*/
+    */
 
 	ipc.keylatch = data;
 }
@@ -465,18 +463,18 @@ static WRITE8_HANDLER( ipc_port2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Serial data input (SER2 RxD, SER1 TxD)
-		1		Speaker output
-		2		Interrupt output (IPL0-2)
-		3		Interrupt output (IPL1)
-		4		Serial Clear-to-Send output (SER2 CTS)
-		5		Serial Data Terminal Ready output (SER1 DTR)
-		6		not connected
-		7		ZX8302 serial link input/output (COMDATA)
+        0       Serial data input (SER2 RxD, SER1 TxD)
+        1       Speaker output
+        2       Interrupt output (IPL0-2)
+        3       Interrupt output (IPL1)
+        4       Serial Clear-to-Send output (SER2 CTS)
+        5       Serial Data Terminal Ready output (SER1 DTR)
+        6       not connected
+        7       ZX8302 serial link input/output (COMDATA)
 
-	*/
+    */
 
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);
 
@@ -521,18 +519,18 @@ static READ8_HANDLER( ipc_port2_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Serial data input (SER2 RxD, SER1 TxD)
-		1		Speaker output
-		2		Interrupt output (IPL0-2)
-		3		Interrupt output (IPL1)
-		4		Serial Clear-to-Send output (SER2 CTS)
-		5		Serial Data Terminal Ready output (SER1 DTR)
-		6		not connected
-		7		ZX8302 serial link input/output (COMDATA)
+        0       Serial data input (SER2 RxD, SER1 TxD)
+        1       Speaker output
+        2       Interrupt output (IPL0-2)
+        3       Interrupt output (IPL1)
+        4       Serial Clear-to-Send output (SER2 CTS)
+        5       Serial Data Terminal Ready output (SER1 DTR)
+        6       not connected
+        7       ZX8302 serial link input/output (COMDATA)
 
-	*/
+    */
 
 	int irq = (ipc.ser2_rxd | ipc.ser1_txd);
 
@@ -550,18 +548,18 @@ static READ8_HANDLER( ipc_bus_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Keyboard row input (KBI0)
-		1		Keyboard row input (KBI1)
-		2		Keyboard row input (KBI2)
-		3		Keyboard row input (KBI3)
-		4		Keyboard row input (KBI4)
-		5		Keyboard row input (KBI5)
-		6		Keyboard row input (KBI6)
-		7		Keyboard row input (KBI7)
+        0       Keyboard row input (KBI0)
+        1       Keyboard row input (KBI1)
+        2       Keyboard row input (KBI2)
+        3       Keyboard row input (KBI3)
+        4       Keyboard row input (KBI4)
+        5       Keyboard row input (KBI5)
+        6       Keyboard row input (KBI6)
+        7       Keyboard row input (KBI7)
 
-	*/
+    */
 
 	if (BIT(ipc.keylatch, 0)) return readinputportbytag("ROW0") | readinputportbytag("JOY0");
 	if (BIT(ipc.keylatch, 1)) return readinputportbytag("ROW1") | readinputportbytag("JOY1");
@@ -640,7 +638,7 @@ static INPUT_PORTS_START( ql )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("\xc2\xa3 ~") PORT_CHAR(0xa3) PORT_CHAR('~') // £ ~
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("\xc2\xa3 ~") PORT_CHAR(0xa3) PORT_CHAR('~') // ? ~
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('\"')
 
@@ -719,23 +717,23 @@ static INPUT_PORTS_START( ql_es )
 	PORT_INCLUDE(ql)
 
 	PORT_MODIFY("ROW1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("] \xc3\x9c") PORT_CHAR(']') PORT_CHAR(0xfc) PORT_CHAR(0xdc) // ] Ü
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("] \xc3\x9c") PORT_CHAR(']') PORT_CHAR(0xfc) PORT_CHAR(0xdc) // ] ?
 
 	PORT_MODIFY("ROW2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('`') PORT_CHAR('^')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('!')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("[ \xc3\x87") PORT_CHAR('[') PORT_CHAR(0xe7) PORT_CHAR(0xc7) // [ Ç
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("[ \xc3\x87") PORT_CHAR('[') PORT_CHAR(0xe7) PORT_CHAR(0xc7) // [ ?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(';') PORT_CHAR(':')
 
 	PORT_MODIFY("ROW3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('\'') PORT_CHAR('"')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("\xc3\x91") PORT_CHAR(0xf1) PORT_CHAR(0xd1) // Ñ
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("\xc3\x91") PORT_CHAR(0xf1) PORT_CHAR(0xd1) // ?
 
 	PORT_MODIFY("ROW4")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1 \xc2\xa1") PORT_CHAR('1') PORT_CHAR(0xa1) // 1 ¡
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1 \xc2\xa1") PORT_CHAR('1') PORT_CHAR(0xa1) // 1 ?
 
 	PORT_MODIFY("ROW6")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2 \xc2\xbf") PORT_CHAR('2') PORT_CHAR(0xbf) // 2 ¿
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2 \xc2\xbf") PORT_CHAR('2') PORT_CHAR(0xbf) // 2 ?
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('/')
 
 	PORT_MODIFY("ROW7")
@@ -757,19 +755,19 @@ static INPUT_PORTS_START( ql_de )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\\') PORT_CHAR('^')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("\xc3\x84") PORT_CHAR(0xe4) PORT_CHAR(0xc4) // Ä
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("\xc3\x84") PORT_CHAR(0xe4) PORT_CHAR(0xc4) // ?
 
 	PORT_MODIFY("ROW3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("\xc3\x9c") PORT_CHAR(0xfc) PORT_CHAR(0xdc) // Ü
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("\xc3\x9c") PORT_CHAR(0xfc) PORT_CHAR(0xdc) // ?
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('#') PORT_CHAR('\'')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("\xc3\x96") PORT_CHAR(0xf6) PORT_CHAR(0xd6) // Ö
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("\xc3\x96") PORT_CHAR(0xf6) PORT_CHAR(0xd6) // ?
 
 	PORT_MODIFY("ROW4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3 \xc2\xa3") PORT_CHAR('3') PORT_CHAR(0xa7) // 3 £
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3 \xc2\xa3") PORT_CHAR('3') PORT_CHAR(0xa7) // 3 ?
 
 	PORT_MODIFY("ROW5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("\xc3\x9f ?") PORT_CHAR(0xdf) PORT_CHAR('?') // ß ?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("\xc3\x9f ?") PORT_CHAR(0xdf) PORT_CHAR('?') // ? ?
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 
 	PORT_MODIFY("ROW6")
@@ -789,7 +787,7 @@ static INPUT_PORTS_START( ql_it )
 	PORT_MODIFY("ROW0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('(') PORT_CHAR('5')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('\'') PORT_CHAR('4')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7 \xc3\xa8") PORT_CODE(KEYCODE_7) PORT_CHAR('è') PORT_CHAR('7') // è 7
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7 \xc3\xa8") PORT_CODE(KEYCODE_7) PORT_CHAR('?') PORT_CHAR('7') // ? 7
 
 	PORT_MODIFY("ROW1")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('<') PORT_CHAR('>')
@@ -798,12 +796,12 @@ static INPUT_PORTS_START( ql_it )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('$') PORT_CHAR('&')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR(':') PORT_CHAR('/')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("* \xc2\xa7") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('*') PORT_CHAR(0xa7) // * §
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("* \xc2\xa7") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('*') PORT_CHAR(0xa7) // * ?
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('?')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb9 %") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0xf9) PORT_CHAR('%') // ù %
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb9 %") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0xf9) PORT_CHAR('%') // ? %
 
 	PORT_MODIFY("ROW3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xac =") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0xec) PORT_CHAR('=') // ì =
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xac =") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0xec) PORT_CHAR('=') // ? =
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('+')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
@@ -812,18 +810,18 @@ static INPUT_PORTS_START( ql_it )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('#') PORT_CHAR('1')
 
 	PORT_MODIFY("ROW5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa7 9") PORT_CODE(KEYCODE_9) PORT_CHAR(0xe7) PORT_CHAR('9') // ç 9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa7 9") PORT_CODE(KEYCODE_9) PORT_CHAR(0xe7) PORT_CHAR('9') // ? 9
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(')') PORT_CHAR('\\')
 
 	PORT_MODIFY("ROW6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('^') PORT_CHAR('8')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa9 2") PORT_CODE(KEYCODE_2) PORT_CHAR(0xe9) PORT_CHAR('2') // é 2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa9 2") PORT_CODE(KEYCODE_2) PORT_CHAR(0xe9) PORT_CHAR('2') // ? 2
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('_') PORT_CHAR('6')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa0 0") PORT_CODE(KEYCODE_0) PORT_CHAR(0xe0) PORT_CHAR('0') // à 0
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa0 0") PORT_CODE(KEYCODE_0) PORT_CHAR(0xe0) PORT_CHAR('0') // ? 0
 
 	PORT_MODIFY("ROW7")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb2 !") PORT_CODE(KEYCODE_SLASH) PORT_CHAR(0xf2) PORT_CHAR('!') // ò !
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb2 !") PORT_CODE(KEYCODE_SLASH) PORT_CHAR(0xf2) PORT_CHAR('!') // ? !
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('.')
 INPUT_PORTS_END
 

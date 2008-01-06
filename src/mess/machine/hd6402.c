@@ -2,7 +2,7 @@
 /* not optimised! */
 
 #include "driver.h"
-#include "includes/hd6402.h"
+#include "hd6402.h"
 
 static struct hd6402 uart;
 

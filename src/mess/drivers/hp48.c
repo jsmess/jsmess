@@ -4,7 +4,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "cpu/saturn/saturn.h"
 
 #include "includes/hp48.h"
@@ -225,8 +224,8 @@ ROM_START(hp48s)
 	ROMX_LOAD("sxrom-f", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 7, "sxrom-j",  "sxrom-j" )
 	ROMX_LOAD("sxrom-j", 0x00000, 0x40000, CRC(1a6378ef) SHA1(5235f5379f1fd7edfe9bb6bf466b60d279163e73), ROM_BIOS(8) )
-//	ROM_SYSTEM_BIOS( 8, "rom.sx",  "bad version e dump" )
-//	ROMX_LOAD("rom.sx", 0x00000, 0x40000, CRC(5619ccaf), ROM_BIOS(9) ) //revision E bad dump
+//  ROM_SYSTEM_BIOS( 8, "rom.sx",  "bad version e dump" )
+//  ROMX_LOAD("rom.sx", 0x00000, 0x40000, CRC(5619ccaf), ROM_BIOS(9) ) //revision E bad dump
 	ROM_REGION(0x100,REGION_GFX1,0)
 ROM_END
 

@@ -19,7 +19,7 @@
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"
-#include "includes/tpi6525.h"
+#include "machine/tpi6525.h"
 
 #include "includes/c16.h"
 

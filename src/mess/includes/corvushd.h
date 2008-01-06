@@ -1,14 +1,14 @@
-/*
+/*****************************************************************************
  *
- *	corvus_hd.h
+ * includes/corvushd.h
  *
- *  Implementation of the Corvus Systems Flat Cable Hard Disk
- *	controller
+ * Implementation of the Corvus Systems Flat Cable Hard Disk controller
  *
- */
+ ****************************************************************************/
 
-#ifndef CORVUS_HD_H
-#define CORVUS_HD_H
+#ifndef CORVUSHD_H_
+#define CORVUSHD_H_
+
 
 //
 // Controller Commands
@@ -167,6 +167,7 @@
 #define CONTROLLER_BUSY			0x80	// Set = Busy, Clear = Ready
 #define CONTROLLER_DIRECTION	0x40	// Set = Controller->Host, Clear = Host->Controller
 
+
 /*----------- defined in machine/corvushd.c -----------*/
 
 //
@@ -177,4 +178,5 @@ READ8_HANDLER ( corvus_hdc_status_r );
 READ8_HANDLER ( corvus_hdc_data_r );
 WRITE8_HANDLER ( corvus_hdc_data_w );
 
-#endif
+
+#endif /* CORVUSHD_H_ */

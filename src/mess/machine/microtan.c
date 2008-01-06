@@ -12,10 +12,21 @@
  *
  *****************************************************************************/
 
-#include "includes/microtan.h"
-#include "devices/cassette.h"
+/* Core includes */
+#include "driver.h"
 #include "image.h"
+#include "includes/microtan.h"
+
+/* Components */
+#include "cpu/m6502/m6502.h"
+#include "machine/6522via.h"
+#include "machine/6551.h"
+#include "sound/ay8910.h"
+
+/* Devices */
+#include "devices/cassette.h"
 #include "devices/snapquik.h"
+
 
 #ifndef VERBOSE
 #define VERBOSE 0

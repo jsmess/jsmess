@@ -77,7 +77,7 @@
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"
 
-#include "includes/tpi6525.h"
+#include "tpi6525.h"
 
 TPI6525 tpi6525[4]={
 	{ 0 },

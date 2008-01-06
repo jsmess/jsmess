@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/mbee.h"
 
 typedef struct {		 // CRTC 6545

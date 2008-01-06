@@ -6,6 +6,7 @@
 
 */
 
+#include "driver.h"
 #include "hd66421.h"
 
 #define LOG_LEVEL  1

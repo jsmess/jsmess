@@ -1,12 +1,14 @@
-#ifndef __NICK_GRAPHICS_CHIP_HEADER_INCLUDED__
-#define __NICK_GRAPHICS_CHIP_HEADER_INCLUDED__
+/*****************************************************************************
+ *
+ * video/epnick.h
+ * 
+ * Nick Graphics Chip - found in Enterprise
+ *
+ ****************************************************************************/
 
-/* Nick Graphics Chip - found in Enterprise */
+#ifndef EPNICK_H_
+#define EPNICK_H_
 
-#include "driver.h"
-
-/* initialise palette function */
-extern PALETTE_INIT( nick );
 
 #define NICK_PALETTE_SIZE	256
 #define NICK_COLOURTABLE_SIZE	256
@@ -118,7 +120,17 @@ typedef struct NICK_STATE
 #define ADDR_CH128(x,y)		(((x & 0x01ff)<<7) | (y & 0x07f))
 #define ADDR_CH64(x,y)		(((x & 0x03ff)<<6) | (y & 0x03f))
 
-#endif
+
+/*----------- defined in video/epnick.c -----------*/
+
+/* initialise palette function */
+extern PALETTE_INIT( nick );
+
+extern int Nick_vh_start(void);
+extern void Nick_DoScreen(mame_bitmap *bm);
+
+extern int Nick_reg_r(int);
+WRITE8_HANDLER ( Nick_reg_w );
 
 
-
+#endif /* EPNICK_H_ */

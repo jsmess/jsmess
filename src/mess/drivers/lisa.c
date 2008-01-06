@@ -1,11 +1,10 @@
 /*
-	experimental LISA driver
+    experimental LISA driver
 
-	Raphael Nabet, 2000
+    Raphael Nabet, 2000
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "devices/sonydriv.h"
 /*#include "machine/6522via.h"*/
 #include "machine/lisa.h"
@@ -286,10 +285,10 @@ SYSTEM_CONFIG_START(lisa210)
 SYSTEM_CONFIG_END
 
 /*
-	Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
-	the GAME_NOT_WORKING flag...
+    Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
+    the GAME_NOT_WORKING flag...
 */
-/*	   YEAR  NAME	   PARENT	COMPAT	MACHINE   INPUT	 INIT	   CONFIG	COMPANY	 FULLNAME */
+/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  INIT      CONFIG   COMPANY  FULLNAME */
 COMP( 1984, lisa2,    0,		0,		lisa,     lisa,	 lisa2,    lisa,	"Apple Computer",  "Lisa2", GAME_NOT_WORKING )
 COMP( 1984, lisa210,  lisa2,	0,		lisa210,  lisa,	 lisa210,  lisa210,	"Apple Computer",  "Lisa2/10", GAME_NOT_WORKING )
 COMP( 1985, macxl,    lisa2,	0,		macxl,    lisa,	 mac_xl,   lisa210,	"Apple Computer",  "Macintosh XL", /*GAME_NOT_WORKING*/0 )

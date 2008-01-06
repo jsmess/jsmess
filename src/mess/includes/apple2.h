@@ -1,17 +1,14 @@
 /***************************************************************************
 
-	apple2.h
+    includes/apple2.h
 
-	Include file to handle emulation of the Apple II series.
+    Include file to handle emulation of the Apple II series.
 
 ***************************************************************************/
 
-#ifndef APPLE2_H
-#define APPLE2_H
+#ifndef APPLE2_H_
+#define APPLE2_H_
 
-#include "mame.h"
-#include "driver.h"
-#include "machine/ay3600.h"
 
 /* -----------------------------------------------------------------------
  * Softswitch values
@@ -84,6 +81,7 @@ void apple2_interrupt(void);
 
 void apple2_setvar(UINT32 val, UINT32 mask);
 
+
 /*----------- defined in video/apple2.c -----------*/
 
 void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
@@ -151,9 +149,11 @@ struct _apple2_memmap_config
 	const apple2_memmap_entry *memmap;
 };
 
+
 /*----------- defined in machine/apple2.c -----------*/
 
 void apple2_setup_memory(const apple2_memmap_config *config);
 void apple2_update_memory(void);
 
-#endif /* APPLE2_H */
+
+#endif /* APPLE2_H_ */

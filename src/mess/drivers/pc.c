@@ -1,28 +1,30 @@
 /***************************************************************************
 
-	drivers/pc.c
+    drivers/pc.c
 
-	PC-XT memory map
+    PC-XT memory map
 
-	00000-9FFFF   RAM
-	A0000-AFFFF   NOP		or videoram EGA/VGA
-	B0000-B7FFF   videoram	MDA, page #0
-	B8000-BFFFF   videoram	CGA and/or MDA page #1, T1T mapped RAM
-	C0000-C7FFF   NOP		or ROM EGA/VGA
-	C8000-C9FFF   ROM		XT HDC #1
-	CA000-CBFFF   ROM		XT HDC #2
-	D0000-EFFFF   NOP		or 'adapter RAM'
-	F0000-FDFFF   NOP		or ROM Basic + other Extensions
-	FE000-FFFFF   ROM
+    00000-9FFFF   RAM
+    A0000-AFFFF   NOP       or videoram EGA/VGA
+    B0000-B7FFF   videoram  MDA, page #0
+    B8000-BFFFF   videoram  CGA and/or MDA page #1, T1T mapped RAM
+    C0000-C7FFF   NOP       or ROM EGA/VGA
+    C8000-C9FFF   ROM       XT HDC #1
+    CA000-CBFFF   ROM       XT HDC #2
+    D0000-EFFFF   NOP       or 'adapter RAM'
+    F0000-FDFFF   NOP       or ROM Basic + other Extensions
+    FE000-FFFFF   ROM
 
 ***************************************************************************/
 
+
 #include "driver.h"
+#include "memconv.h"
+
 #include "machine/8255ppi.h"
 #include "machine/uart8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
-#include "video/generic.h"
 
 #include "machine/pit8253.h"
 #include "video/pc_vga.h"
@@ -37,7 +39,7 @@
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "includes/pclpt.h"
-#include "includes/sblaster.h"
+#include "audio/sblaster.h"
 #include "includes/pc_mouse.h"
 
 #include "includes/europc.h"
@@ -59,8 +61,6 @@
 #include "sound/sn76496.h"
 #include "sound/3812intf.h"
 
-#include "inputx.h"
-#include "memconv.h"
 
 #define ym3812_StdClock 3579545
 
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 #ifdef ADLIB
 	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_YM3812_0_r,		pc_YM3812_0_w)
 #endif
-//	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
+//  AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,   pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,			uart8250_2_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_0_r,			uart8250_0_w)
@@ -954,7 +954,7 @@ static INPUT_PORTS_START( pc1640 )
     PORT_START /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
-//	PORT_DIPSETTING(	0x00, "PC 512k" ) // machine crashes with ega bios at 0xc0000
+//  PORT_DIPSETTING(    0x00, "PC 512k" ) // machine crashes with ega bios at 0xc0000
 	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
 	PORT_DIPSETTING(	0x02, "V.g. v\xC3\xA4nta" )
 	PORT_DIPSETTING(	0x03, "Vent et cjeblik" ) // seldom c
@@ -1042,7 +1042,7 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 
 	PORT_INCLUDE( amstrad_keyboard )	/* IN4 - IN14 */
 
-//	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
+//  PORT_INCLUDE( pc_mouse_microsoft )  /* IN12 - IN14 */
 
 INPUT_PORTS_END
 
@@ -1464,9 +1464,9 @@ MACHINE_DRIVER_END
     ROM_LOAD_ODD("ibmxt.1", 0xf0000, 0x8000, CRC(2a629953))
 
 	/* pc xt mfm controller
-	   2 harddisks 17 sectors, 4 head, 613 tracks
-	   serves 2 controllers? 0x320-3, 0x324-7, dma 3, irq5
-	   movable, works at 0xee000 */
+       2 harddisks 17 sectors, 4 head, 613 tracks
+       serves 2 controllers? 0x320-3, 0x324-7, dma 3, irq5
+       movable, works at 0xee000 */
 	/* western digital 06/28/89 */
     ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4))
 
@@ -1727,7 +1727,7 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*	   YEAR		NAME		PARENT	COMPAT	MACHINE     INPUT	    INIT	    CONFIG   COMPANY	 FULLNAME */
+/*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
 COMP(  1982,	ibmpc,		0,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 10/27/82" , 0)
 COMP(  1982,	ibmpca,		ibmpc,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 08/16/82" , 0)
 COMP(  1984,	dgone,		ibmpc,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */

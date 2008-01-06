@@ -1,37 +1,36 @@
 /******************************************************************************
  *
- *	Acorn Archimedes 310
+ *  Acorn Archimedes 310
  *
- *	Skeleton: Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
- *	Enhanced: R. Belmont, June 2007
+ *  Skeleton: Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
+ *  Enhanced: R. Belmont, June 2007
  *
  *      Memory map (from http://b-em.bbcmicro.com/arculator/archdocs.txt)
  *
- *	0000000 - 1FFFFFF - logical RAM (32 meg)
- *	2000000 - 2FFFFFF - physical RAM (supervisor only - max 16MB - requires quad MEMCs)
- *	3000000 - 33FFFFF - IOC (IO controllers - supervisor only)
- *	3310000 - FDC - WD1772
- *	33A0000 - Econet - 6854
- *	33B0000 - Serial - 6551
- *	3240000 - 33FFFFF - internal expansion cards
- *	32D0000 - hard disc controller (not IDE) - HD63463
- *	3350010 - printer
- *	3350018 - latch A
- *	3350040 - latch B
- *	3270000 - external expansion cards
+ *  0000000 - 1FFFFFF - logical RAM (32 meg)
+ *  2000000 - 2FFFFFF - physical RAM (supervisor only - max 16MB - requires quad MEMCs)
+ *  3000000 - 33FFFFF - IOC (IO controllers - supervisor only)
+ *  3310000 - FDC - WD1772
+ *  33A0000 - Econet - 6854
+ *  33B0000 - Serial - 6551
+ *  3240000 - 33FFFFF - internal expansion cards
+ *  32D0000 - hard disc controller (not IDE) - HD63463
+ *  3350010 - printer
+ *  3350018 - latch A
+ *  3350040 - latch B
+ *  3270000 - external expansion cards
  *
- *	3400000 - 3FFFFFF - ROM (read - 12 meg - Arthur and RiscOS 2 512k, RiscOS 3 2MB)
- *	3400000 - 37FFFFF - Low ROM  (4 meg, I think this is expansion ROMs)
- *	3800000 - 3FFFFFF - High ROM (main OS ROM)
+ *  3400000 - 3FFFFFF - ROM (read - 12 meg - Arthur and RiscOS 2 512k, RiscOS 3 2MB)
+ *  3400000 - 37FFFFF - Low ROM  (4 meg, I think this is expansion ROMs)
+ *  3800000 - 3FFFFFF - High ROM (main OS ROM)
  *
- *	3400000 - 35FFFFF - VICD10 (write - supervisor only)
- *	3600000 - 3FFFFFF - MEMC (write - supervisor only)
+ *  3400000 - 35FFFFF - VICD10 (write - supervisor only)
+ *  3600000 - 3FFFFFF - MEMC (write - supervisor only)
  *
  *****************************************************************************/
 
 #include "driver.h"
 #include "machine/wd17xx.h"
-#include "video/generic.h"
 #include "devices/basicdsk.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
@@ -136,7 +135,7 @@ static void a310_set_timer(int tmr)
 {
 	double freq = 2000000.0 / (double)a310_timercnt[tmr];
 
-//	logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, a310_timercnt[tmr], freq);
+//  logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, a310_timercnt[tmr], freq);
 
 	timer_adjust(timer[tmr], ATTOTIME_IN_HZ(freq), tmr, attotime_never);
 }
@@ -244,7 +243,7 @@ static READ32_HANDLER(logical_r)
 		page = (offset<<2) / page_sizes[a310_pagesize];
 		poffs = (offset<<2) % page_sizes[a310_pagesize];
 
-//		printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
+//      printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
 
 		if (a310_pages[page] != -1)
 		{
@@ -274,7 +273,7 @@ static WRITE32_HANDLER(logical_w)
 		page = (offset<<2) / page_sizes[a310_pagesize];
 		poffs = (offset<<2) % page_sizes[a310_pagesize];
 
-//		printf("Writing offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
+//      printf("Writing offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
 
 		if (a310_pages[page] != -1)
 		{
@@ -423,7 +422,7 @@ static WRITE32_HANDLER(ioc_w)
 {
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
-//		logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], activecpu_get_pc());
+//      logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], activecpu_get_pc());
 
 		switch (offset&0x1f)
 		{
@@ -658,13 +657,13 @@ static WRITE32_HANDLER(memc_w)
 }
 
 /*
-	  22 2222 1111 1111 1100 0000 0000
+      22 2222 1111 1111 1100 0000 0000
           54 3210 9876 5432 1098 7654 3210
 4k  page: 11 1LLL LLLL LLLL LLAA MPPP PPPP
 8k  page: 11 1LLL LLLL LLLM LLAA MPPP PPPP
 16k page: 11 1LLL LLLL LLxM LLAA MPPP PPPP
 32k page: 11 1LLL LLLL LxxM LLAA MPPP PPPP
-	   3   8    2   9    0    f    f
+       3   8    2   9    0    f    f
 
 L - logical page
 P - physical page
@@ -733,7 +732,7 @@ static WRITE32_HANDLER(memc_page_w)
 	// now go ahead and set the mapping in the page table
 	a310_pages[log] = phys * memc;
 
-//	printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", a310_pagesize, data, log, phys, memc, perms);
+//  printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", a310_pagesize, data, log, phys, memc, perms);
 }
 
 static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -893,6 +892,6 @@ ROM_START(a310)
 	ROM_REGION(0x00800, REGION_GFX1, 0)
 ROM_END
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT	 INIT  CONFIG  COMPANY	FULLNAME */
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT     INIT  CONFIG  COMPANY  FULLNAME */
 COMP( 1988, a310, 0,      0,      a310,    a310,  a310, NULL,   "Acorn", "Archimedes 310 (Risc OS 3.11)", GAME_NOT_WORKING)
 

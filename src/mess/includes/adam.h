@@ -1,12 +1,18 @@
-#ifndef ADAM_H
-#define ADAM_H
+/*****************************************************************************
+ *
+ * includes/adam.h
+ *
+ ****************************************************************************/
 
-#include "driver.h"
+#ifndef ADAM_H_
+#define ADAM_H_
+
 
 /*----------- defined in drivers/adam.c -----------*/
 
 void set_memory_banks(void);
 void resetPCB(void);
+
 
 /*----------- defined in machine/adam.c -----------*/
 
@@ -38,4 +44,5 @@ WRITE8_HANDLER ( common_writes_w );
  READ8_HANDLER  ( master6801_ram_r );
 WRITE8_HANDLER ( master6801_ram_w );
 
-#endif /* ADAM_H */
+
+#endif /* ADAM_H_ */

@@ -6,15 +6,16 @@
 
 ***************************************************************************/
 
+
 #include "driver.h"
-#include "video/generic.h"
+#include "devices/snapquik.h"
 #include "includes/amstrad.h"
-#include "cpuintrf.h"
 
 /* CRTC emulation code */
 #include "video/m6845.h"
 
 #include "sound/ay8910.h"
+
 
 static m6845_state amstrad_vidhrdw_6845_state;
 int prev_reg;

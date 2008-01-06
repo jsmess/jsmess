@@ -18,7 +18,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "video/generic.h"
 #include "machine/wd17xx.h"
 #include "includes/mbee.h"
 #include "devices/cassette.h"

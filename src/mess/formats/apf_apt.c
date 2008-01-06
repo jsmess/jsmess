@@ -1,6 +1,8 @@
 /* .APT tape images */
-#include "mame.h"
+
+
 #include "formats/apf_apt.h"
+
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767

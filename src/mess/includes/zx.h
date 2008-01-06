@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ * includes/zx.h
+ *
+ ****************************************************************************/
+
+#ifndef ZX_H_
+#define ZX_H_
+
+
 /*----------- defined in machine/zx.c -----------*/
 
 DRIVER_INIT( zx );
@@ -26,3 +36,5 @@ extern int ula_frame_vsync;
 extern int ula_scanline_count;
 extern int ula_scancode_count;
 
+
+#endif /* ZX_H_ */

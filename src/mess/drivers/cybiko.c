@@ -1,52 +1,56 @@
 /*
 
-	Cybiko Wireless Inter-tainment System
+    Cybiko Wireless Inter-tainment System
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
-	Cybiko Classic (V1)
-	Cybiko Classic (V2)
-	Cybiko Xtreme
+    Cybiko Classic (V1)
+    Cybiko Classic (V2)
+    Cybiko Xtreme
 
 */
 
+/* Core includes */
+#include "driver.h"
 #include "includes/cybiko.h"
 
-#include "driver.h"
+/* Components */
 //#include "cpu/h8s2xxx/h8s2xxx.h"
 #include "video/hd66421.h"
-#include "inputx.h"
+
+/* Layout */
 #include "cybiko.lh"
 
-//	+------------------------------------------------------+
-//	| Cybiko Classic (CY6411)                         | V2 |
-//	+------------------------------------------------------+
-//	| - CYBIKO | CY-OS 1.1.7 | 6432241M04FA | 0028R JAPAN  |
-//	| - SST 39VF020 | 90-4C-WH | 0012175-D                 |
-//	| - ATMEL 0027 | AT90S2313-4SC                         |
-//	| - ATMEL | AT45DB041A | TC | 0027                     |
-//	| - RF2915 | RFMD0028 | 0F540BT                        |
-//	| - EliteMT | LP62S2048X-70LLT | 0026B H4A27HA         |
-//	| - MP02AB | LMX2315 | TMD                             |
-//	+------------------------------------------------------+
 
-//	+------------------------------------------------------+
-//	| Cybiko Xtreme (CY44802)                              |
-//	+------------------------------------------------------+
-//	| - CYBIKO | CYBOOT 1.5A | HD6432323G03F | 0131 JAPAN  |
-//	| - SST 39VF400A | 70-4C-EK                            |
-//	| - ATMEL 0033 | AT90S2313-4SC                         |
-//	| - SAMSUNG 129 | K4F171612D-TL60                      |
-//	| - 2E16AB | USBN9604-28M | NSC00A1                    |
-//	+------------------------------------------------------+
+//  +------------------------------------------------------+
+//  | Cybiko Classic (CY6411)                         | V2 |
+//  +------------------------------------------------------+
+//  | - CYBIKO | CY-OS 1.1.7 | 6432241M04FA | 0028R JAPAN  |
+//  | - SST 39VF020 | 90-4C-WH | 0012175-D                 |
+//  | - ATMEL 0027 | AT90S2313-4SC                         |
+//  | - ATMEL | AT45DB041A | TC | 0027                     |
+//  | - RF2915 | RFMD0028 | 0F540BT                        |
+//  | - EliteMT | LP62S2048X-70LLT | 0026B H4A27HA         |
+//  | - MP02AB | LMX2315 | TMD                             |
+//  +------------------------------------------------------+
 
-//	+------------------------------------------------------+
-//	| Cybiko MP3 Player (CY65P10)                          |
-//	+------------------------------------------------------+
-//	| - H8S/2246 | 0G1 | HD6472246FA20 | JAPAN             |
-//	| - MICRONAS | DAC3550A C2 | 0394 22 HM U | 089472.000 |
-//	| - 2E08AJ | USBN9603-28M | NSC99A1                    |
-//	+------------------------------------------------------+
+//  +------------------------------------------------------+
+//  | Cybiko Xtreme (CY44802)                              |
+//  +------------------------------------------------------+
+//  | - CYBIKO | CYBOOT 1.5A | HD6432323G03F | 0131 JAPAN  |
+//  | - SST 39VF400A | 70-4C-EK                            |
+//  | - ATMEL 0033 | AT90S2313-4SC                         |
+//  | - SAMSUNG 129 | K4F171612D-TL60                      |
+//  | - 2E16AB | USBN9604-28M | NSC00A1                    |
+//  +------------------------------------------------------+
+
+//  +------------------------------------------------------+
+//  | Cybiko MP3 Player (CY65P10)                          |
+//  +------------------------------------------------------+
+//  | - H8S/2246 | 0G1 | HD6472246FA20 | JAPAN             |
+//  | - MICRONAS | DAC3550A C2 | 0394 22 HM U | 089472.000 |
+//  | - 2E08AJ | USBN9603-28M | NSC99A1                    |
+//  +------------------------------------------------------+
 
 ///////////////////////////
 // ADDRESS MAP - PROGRAM //
@@ -58,33 +62,33 @@
 // 512 kbyte ram + no memory mapped flash
 static ADDRESS_MAP_START( cybikov1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE_SL( 0x000000, 0x008000) AM_ROM
-//	AM_RANGE_SL( 0x200000, 0x080000) AM_RAM AM_MIRROR( 0x180000)
+//  AM_RANGE_SL( 0x200000, 0x080000) AM_RAM AM_MIRROR( 0x180000)
 	AM_RANGE_SL( 0x600000, 0x000002) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w)
 	AM_RANGE_SL( 0xE00000, 0x008000) AM_READ( cybiko_key_r)
 ADDRESS_MAP_END
 
-//	+-------------------------------------+
-//	| Cybiko Classic (V2) - Memory Map    |
-//	+-------------------------------------+
-//	| 000000 - 007FFF | rom               |
-//	| 008000 - 00FFFF | 17 51 17 51 ..    |
-//	| 010000 - 0FFFFF | flash mirror      |
-//	| 100000 - 13FFFF | flash             |
-//	| 140000 - 1FFFFF | flash mirror      |
-//	| 200000 - 23FFFF | ram               |
-//	| 240000 - 3FFFFF | ram mirror        |
-//	| 400000 - 5FFFFF | FF FF FF FF ..    |
-//	| 600000 - 600001 | lcd               |
-//	| 600002 - DFFFFF | FF FF FF FF ..    |
-//	| E00000 - FFDBFF | keyboard          |
-//	| FFDC00 - FFFFFF | onchip ram & regs |
-//	+-------------------------------------+
+//  +-------------------------------------+
+//  | Cybiko Classic (V2) - Memory Map    |
+//  +-------------------------------------+
+//  | 000000 - 007FFF | rom               |
+//  | 008000 - 00FFFF | 17 51 17 51 ..    |
+//  | 010000 - 0FFFFF | flash mirror      |
+//  | 100000 - 13FFFF | flash             |
+//  | 140000 - 1FFFFF | flash mirror      |
+//  | 200000 - 23FFFF | ram               |
+//  | 240000 - 3FFFFF | ram mirror        |
+//  | 400000 - 5FFFFF | FF FF FF FF ..    |
+//  | 600000 - 600001 | lcd               |
+//  | 600002 - DFFFFF | FF FF FF FF ..    |
+//  | E00000 - FFDBFF | keyboard          |
+//  | FFDC00 - FFFFFF | onchip ram & regs |
+//  +-------------------------------------+
 
 // 256 kbyte ram + 256 kbyte memory mapped flash
 static ADDRESS_MAP_START( cybikov2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE_SL( 0x000000, 0x008000) AM_ROM
 	AM_RANGE_SL( 0x100000, 0x040000) AM_READ( MRA16_BANK2) AM_MIRROR( 0x0C0000)
-//	AM_RANGE_SL( 0x200000, 0x040000) AM_RAM AM_MIRROR( 0x1C0000)
+//  AM_RANGE_SL( 0x200000, 0x040000) AM_RAM AM_MIRROR( 0x1C0000)
 	AM_RANGE_SL( 0x600000, 0x000002) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w)
 	AM_RANGE_SL( 0xE00000, 0x1FDC00) AM_READ( cybiko_key_r)
 ADDRESS_MAP_END
@@ -94,7 +98,7 @@ static ADDRESS_MAP_START( cybikoxt_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE_SL( 0x000000, 0x008000) AM_ROM
 	AM_RANGE_SL( 0x100000, 0x000002) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w)
 	AM_RANGE_SL( 0x200000, 0x000004) AM_WRITE( cybiko_unk1_w)
-//	AM_RANGE_SL( 0x400000, 0x200000) AM_RAM
+//  AM_RANGE_SL( 0x400000, 0x200000) AM_RAM
 	AM_RANGE_SL( 0x600000, 0x080000) AM_READ( MRA16_BANK2)
 	AM_RANGE_SL( 0x7FF800, 0x000800) AM_READ( cybiko_unk2_r)
 	AM_RANGE_SL( 0xE00000, 0x1FDC00) AM_READ( cybiko_key_r)
@@ -278,7 +282,7 @@ static MACHINE_DRIVER_START( cybikov1 )
 	MDRV_MACHINE_START( cybikov1)
 	MDRV_MACHINE_RESET( cybikov1)
 	// non-volatile ram
-//	MDRV_NVRAM_HANDLER( cybikov1)
+//  MDRV_NVRAM_HANDLER( cybikov1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cybikov2 )
@@ -292,7 +296,7 @@ static MACHINE_DRIVER_START( cybikov2 )
 	MDRV_MACHINE_START( cybikov2)
 	MDRV_MACHINE_RESET( cybikov2)
 	// non-volatile ram
-//	MDRV_NVRAM_HANDLER( cybikov2)
+//  MDRV_NVRAM_HANDLER( cybikov2)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cybikoxt )
@@ -309,7 +313,7 @@ static MACHINE_DRIVER_START( cybikoxt )
 	MDRV_MACHINE_START( cybikoxt)
 	MDRV_MACHINE_RESET( cybikoxt)
 	// non-volatile ram
-//	MDRV_NVRAM_HANDLER( cybikoxt)
+//  MDRV_NVRAM_HANDLER( cybikoxt)
 MACHINE_DRIVER_END
 
 //////////////

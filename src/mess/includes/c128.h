@@ -1,17 +1,19 @@
-/***************************************************************************
-    commodore c128 home computer
+/*****************************************************************************
+ *
+ * includes/c128.h
+ * 
+ * Commodore C128 Home Computer
+ * 
+ * peter.trauner@jk.uni-linz.ac.at
+ *
+ * Documentation: iDOC (http://www.softwolves.pp.se/idoc)
+ *   Christian Janoff <mepk@c64.org>
+ * 
+ ****************************************************************************/
 
-	peter.trauner@jk.uni-linz.ac.at
-    documentation:
- 	 iDOC (http://www.softwolves.pp.se/idoc)
-           Christian Janoff  mepk@c64.org
-***************************************************************************/
-#ifndef __C128_H_
-#define __C128_H_
+#ifndef C128_H_
+#define C128_H_
 
-#include "driver.h"
-
-#include "c64.h"
 
 #define C128_MAIN_MEMORY		(input_port_8_r(0)&0x300)
 #define RAM128KB (0)
@@ -64,6 +66,7 @@
 #define C128_KEY_CURSOR_UP (input_port_14_word_r(0,0)&2)
 #define C128_KEY_CURSOR_LEFT (input_port_14_word_r(0,0)&1)
 
+
 /*----------- defined in machine/c128.c -----------*/
 
 extern UINT8 *c128_basic;
@@ -101,4 +104,5 @@ extern VIDEO_UPDATE( c128 );
 
 void c128_bankswitch_64 (int reset);
 
-#endif
+
+#endif /* C128_H_ */

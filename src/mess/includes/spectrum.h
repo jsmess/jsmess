@@ -1,68 +1,14 @@
+/*****************************************************************************
+ *
+ * includes/spectrum.h
+ *
+ ****************************************************************************/
+
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
 
 #include "devices/snapquik.h"
 
-typedef enum
-{
-	TIMEX_CART_NONE,
-	TIMEX_CART_DOCK,
-	TIMEX_CART_EXROM,
-	TIMEX_CART_HOME
-}
-TIMEX_CART_TYPE;
-
-/*----------- defined in machine/spectrum.c -----------*/
-
-extern TIMEX_CART_TYPE timex_cart_type;
-extern UINT8 timex_cart_chunks;
-extern UINT8 * timex_cart_data;
-
-DEVICE_LOAD( timex_cart );
-DEVICE_UNLOAD( timex_cart );
-
-extern MACHINE_RESET( spectrum );
-
-extern SNAPSHOT_LOAD( spectrum );
-extern QUICKLOAD_LOAD( spectrum );
-
-/*-----------------27/02/00 10:49-------------------
- code for WAV reading writing
---------------------------------------------------*/
-
-/*----------- defined in drivers/spectrum.c -----------*/
-
-extern void ts2068_update_memory(void);
-extern int spectrum_128_port_7ffd_data;
-extern int spectrum_plus3_port_1ffd_data;
-extern int ts2068_port_ff_data;
-extern int ts2068_port_f4_data;
-extern int PreviousFE;
-extern unsigned char *spectrum_128_screen_location;
-
-extern void spectrum_128_update_memory(void);
-extern void spectrum_plus3_update_memory(void);
-
-/*----------- defined in video/spectrum.c -----------*/
-
-extern VIDEO_START( spectrum );
-extern VIDEO_UPDATE( spectrum );
-extern VIDEO_EOF( spectrum );
-
-extern VIDEO_START( spectrum_128 );
-extern VIDEO_UPDATE( spectrum_128 );
-
-extern VIDEO_EOF( ts2068 );
-extern VIDEO_UPDATE( ts2068 );
-
-extern VIDEO_UPDATE( tc2048 );
-
-extern unsigned char *spectrum_characterram;
-extern unsigned char *spectrum_colorram;
-extern WRITE8_HANDLER ( spectrum_characterram_w );
-extern  READ8_HANDLER  ( spectrum_characterram_r );
-extern WRITE8_HANDLER ( spectrum_colorram_w );
-extern  READ8_HANDLER  ( spectrum_colorram_r );
 
 /* Spectrum screen size in pixels */
 #define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
@@ -99,5 +45,65 @@ extern  READ8_HANDLER  ( spectrum_colorram_r );
 #define TS2068_DISPLAY_XSIZE 512  /* Horizontal screen resolution */
 #define TS2068_RIGHT_BORDER  96   /* Number of right hand border pixels */
 #define TS2068_SCREEN_WIDTH (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER)
+
+typedef enum
+{
+	TIMEX_CART_NONE,
+	TIMEX_CART_DOCK,
+	TIMEX_CART_EXROM,
+	TIMEX_CART_HOME
+} TIMEX_CART_TYPE;
+
+
+/*----------- defined in machine/spectrum.c -----------*/
+
+extern TIMEX_CART_TYPE timex_cart_type;
+extern UINT8 timex_cart_chunks;
+extern UINT8 * timex_cart_data;
+
+DEVICE_LOAD( timex_cart );
+DEVICE_UNLOAD( timex_cart );
+
+extern MACHINE_RESET( spectrum );
+
+extern SNAPSHOT_LOAD( spectrum );
+extern QUICKLOAD_LOAD( spectrum );
+
+
+/*----------- defined in drivers/spectrum.c -----------*/
+
+extern void ts2068_update_memory(void);
+extern int spectrum_128_port_7ffd_data;
+extern int spectrum_plus3_port_1ffd_data;
+extern int ts2068_port_ff_data;
+extern int ts2068_port_f4_data;
+extern int PreviousFE;
+extern unsigned char *spectrum_128_screen_location;
+
+extern void spectrum_128_update_memory(void);
+extern void spectrum_plus3_update_memory(void);
+
+
+/*----------- defined in video/spectrum.c -----------*/
+
+extern VIDEO_START( spectrum );
+extern VIDEO_UPDATE( spectrum );
+extern VIDEO_EOF( spectrum );
+
+extern VIDEO_START( spectrum_128 );
+extern VIDEO_UPDATE( spectrum_128 );
+
+extern VIDEO_EOF( ts2068 );
+extern VIDEO_UPDATE( ts2068 );
+
+extern VIDEO_UPDATE( tc2048 );
+
+extern unsigned char *spectrum_characterram;
+extern unsigned char *spectrum_colorram;
+extern WRITE8_HANDLER ( spectrum_characterram_w );
+extern  READ8_HANDLER  ( spectrum_characterram_r );
+extern WRITE8_HANDLER ( spectrum_colorram_w );
+extern  READ8_HANDLER  ( spectrum_colorram_r );
+
 
 #endif /* SPECTRUM_H */

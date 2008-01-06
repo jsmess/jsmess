@@ -4,13 +4,10 @@
  PeT mess@utanet.at
 ***************************************************************************/
 
-#include <math.h>
-
-#include "mame.h"
-#include "timer.h"
+#include "driver.h"
 #include "streams.h"
-
 #include "includes/svision.h"
+
 
 static sound_stream *mixer_channel;
 

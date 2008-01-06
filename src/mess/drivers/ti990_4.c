@@ -1,29 +1,29 @@
 /*
-	ti990/4 driver
+    ti990/4 driver
 
-	We emulate a basic ti990/4 board, with a FD800 disk controller and an 733
-	ASR terminal.  A little floppy-based software for this computer is
-	available thanks to efforts by Dave Pitts: mostly, Forth and TX990.
-
-
-	Board setup options:
-	8kb of DRAM (onboard option, with optional parity): base 0x0000 or 0x2000
-	4 banks of 512 bytes of ROM or SRAM: base 0x0000, 0x0800, 0xF000 or 0xF800
-	power-up vector: 0x0000 (level 0) or 0xFFFC (load)
-	optional memerr interrupt (level 2)
-	optional power fail interrupt (level 1)
-	optional real-time clock interrupt (level 5 or 7)
+    We emulate a basic ti990/4 board, with a FD800 disk controller and an 733
+    ASR terminal.  A little floppy-based software for this computer is
+    available thanks to efforts by Dave Pitts: mostly, Forth and TX990.
 
 
-	Setup for the emulated system:
-	0x0000: 8kb on-board DRAM + 24kb extension RAM (total 32kb)
-	0xF800: 512 bytes SRAM
-	0xFA00: 512 bytes SRAM (or empty?)
-	0xFC00: 512 bytes self-test ROM
-	0xFE00: 512 bytes loader ROM
-	power-up vector: 0xFFFC (load)
+    Board setup options:
+    8kb of DRAM (onboard option, with optional parity): base 0x0000 or 0x2000
+    4 banks of 512 bytes of ROM or SRAM: base 0x0000, 0x0800, 0xF000 or 0xF800
+    power-up vector: 0x0000 (level 0) or 0xFFFC (load)
+    optional memerr interrupt (level 2)
+    optional power fail interrupt (level 1)
+    optional real-time clock interrupt (level 5 or 7)
 
-	Note that only interrupt levels 3-7 are supported by the board (8-15 are not wired).
+
+    Setup for the emulated system:
+    0x0000: 8kb on-board DRAM + 24kb extension RAM (total 32kb)
+    0xF800: 512 bytes SRAM
+    0xFA00: 512 bytes SRAM (or empty?)
+    0xFC00: 512 bytes self-test ROM
+    0xFE00: 512 bytes loader ROM
+    power-up vector: 0xFFFC (load)
+
+    Note that only interrupt levels 3-7 are supported by the board (8-15 are not wired).
 
 TODO:
 * finish ASR emulation
@@ -101,9 +101,9 @@ static WRITE8_HANDLER ( lrex_callback )
 #if VIDEO_911
 
 /*
-	TI990/4 video emulation.
+    TI990/4 video emulation.
 
-	We emulate a single VDT911 CRT terminal.
+    We emulate a single VDT911 CRT terminal.
 */
 
 static VIDEO_START( ti990_4 )
@@ -140,7 +140,7 @@ static VIDEO_UPDATE( ti990_4 )
 #endif
 
 /*
-	Memory map - see description above
+    Memory map - see description above
 */
 
 static ADDRESS_MAP_START(ti990_4_memmap, ADDRESS_SPACE_PROGRAM, 16)
@@ -154,25 +154,25 @@ ADDRESS_MAP_END
 
 
 /*
-	CRU map
+    CRU map
 
-	0x000-0xF7F: user devices
-	0xF80-0xF9F: CRU interrupt + expansion control
-	0xFA0-0xFAF: TILINE coupler interrupt control
-	0xFB0-0xFCF: reserved
-	0xFD0-0xFDF: memory mapping and memory protect
-	0xFE0-0xFEF: internal interrupt control
-	0xFF0-0xFFF: front panel
+    0x000-0xF7F: user devices
+    0xF80-0xF9F: CRU interrupt + expansion control
+    0xFA0-0xFAF: TILINE coupler interrupt control
+    0xFB0-0xFCF: reserved
+    0xFD0-0xFDF: memory mapping and memory protect
+    0xFE0-0xFEF: internal interrupt control
+    0xFF0-0xFFF: front panel
 
-	Default user map:
-	0x000-0x00f: 733 ASR (int 6)
-	0x010-0x01f: PROM programmer (wired to int 15, unused)
-	0x020-0x02f: 804 card reader (int 4)
-	0x030-0x03f: line printer (wired to int 14, unused)
-	0x040-0x05f: FD800 floppy controller (int 7)
-	0x060-0x07f: VDT1 (int 3 - wired to int 11, unused)
-	0x080-0x09f: VDT2, or CRU expansion (int ??? - wired to int 10, unused)
-	0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
+    Default user map:
+    0x000-0x00f: 733 ASR (int 6)
+    0x010-0x01f: PROM programmer (wired to int 15, unused)
+    0x020-0x02f: 804 card reader (int 4)
+    0x030-0x03f: line printer (wired to int 14, unused)
+    0x040-0x05f: FD800 floppy controller (int 7)
+    0x060-0x07f: VDT1 (int 3 - wired to int 11, unused)
+    0x080-0x09f: VDT2, or CRU expansion (int ??? - wired to int 10, unused)
+    0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
 */
 
 static ADDRESS_MAP_START(ti990_4_writecru, ADDRESS_SPACE_IO, 8)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START(ti990_4_writecru, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xff0, 0xfff) AM_WRITE(ti990_panel_write)
 
 	/* external instruction decoding */
-/*	AM_RANGE(0x2000, 0x2fff) AM_WRITE(idle_callback)*/
+/*  AM_RANGE(0x2000, 0x2fff) AM_WRITE(idle_callback)*/
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(rset_callback)
 	AM_RANGE(0x5000, 0x6fff) AM_WRITE(ckon_ckof_callback)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(lrex_callback)
@@ -211,7 +211,7 @@ ADDRESS_MAP_END
 
 /*static tms9900reset_param reset_params =
 {
-	idle_callback
+    idle_callback
 };*/
 
 static MACHINE_DRIVER_START(ti990_4)
@@ -282,7 +282,7 @@ ROM_START(ti990_4)
 
 #if 0
 	/* ROM set 945121-5: "733 ASR ROM loader with self test (prototyping)"
-	(cf 945401-9701 pp. 1-19) */
+    (cf 945401-9701 pp. 1-19) */
 
 	/* test ROM */
 	ROMX_LOAD("94519209.u39", 0xFC00, 0x100, CRC(0a0b0c42), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
@@ -298,7 +298,7 @@ ROM_START(ti990_4)
 
 #else
 	/* ROM set 945121-4(?): "Floppy disc loader with self test" (cf 945401-9701
-	pp. 1-19) */
+    pp. 1-19) */
 
 	ROM_LOAD16_WORD("ti9904.rom", 0xFC00, 0x400, CRC(691e7d19) SHA1(58d9bed80490fdf71c743bfd3077c70840b7df8c))
 
@@ -349,5 +349,5 @@ SYSTEM_CONFIG_START(ti990_4)
 	CONFIG_DEVICE(ti990_4_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY					FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                 FULLNAME */
 COMP( 1976,	ti990_4,	0,		0,		ti990_4,	ti990_4,	ti990_4,	ti990_4,	"Texas Instruments",	"TI Model 990/4 Microcomputer System" , 0)

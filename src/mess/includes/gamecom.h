@@ -1,15 +1,15 @@
 /*****************************************************************************
  *
+ * includes/gamecom.h
+ *
  * Tiger Game.com
  *
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
 
-#ifndef __GAMECOM_H
-#define	__GAMECOM_H
-
-#include "driver.h"
+#ifndef GAMECOM_H_
+#define GAMECOM_H_
 
 
 /* SM8521 register addresses */
@@ -170,4 +170,4 @@ extern UINT8 gamecom_vram[];
 extern INTERRUPT_GEN( gamecom_scanline );
 
 
-#endif /* __GAMECOM_H */
+#endif /* GAMECOM_H_ */

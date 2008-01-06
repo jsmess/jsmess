@@ -32,63 +32,61 @@ HP14782-1
 |-------------------------------------------------------------------------------------------|
 
 Notes:
-	All IC's shown. TMCP-300 and TMC-700 expansions have been installed.
+    All IC's shown. TMCP-300 and TMC-700 expansions have been installed.
 
-	ROM0-5	- Toshiba TMM2732DI 4Kx8 EPROM
-	ROM6	- Hitachi HN462732G 4Kx8 EPROM
-	5114	- RCA MWS5114E1 1024-Word x 4-Bit LSI Static RAM
-	MC1374	- Motorola MC1374P TV Modulator
-	CDP1802 - RCA CDP1802BE CMOS 8-Bit Microprocessor running at ? MHz
-	CDP1852	- RCA CDP1852CE Byte-Wide Input/Output Port
-	CDP1853	- RCA CDP1853CE N-Bit 1 of 8 Decoder
-	CDP1856	- RCA CDP1856CE 4-Bit Memory Buffer
-	CDP1869	- RCA CDP1869CE Video Interface System (VIS) Address and Sound Generator
-	CDP1870	- RCA CDP1870CE Video Interface System (VIS) Color Video (DOT XTAL at 5.6260MHz, CHROM XTAL at 8.867238MHz)
-	CN1		- RF connector [TMC-700]
-	CN2		- printer connector [TMC-700]
-	CN3		- EURO connector
-	CN4		- tape connector
-	CN5		- video connector
-	CN6		- power connector
-	CN7		- audio connector [TMCP-300]
-	CN8		- keyboard connector
-	SW1		- RUN/STOP switch
-	SW2		- internal speaker/external audio switch [TMCP-300]
-	P1		- color phase lock adjustment
-	C1		- dot oscillator adjustment
-	C2		- chrom oscillator adjustment
-	T1		- RF signal strength adjustment [TMC-700]
-	T2		- tape recording level adjustment (0.57 Vpp)
-	T3		- video output level adjustment (1 Vpp)
-	T4		- video synchronization pulse adjustment
-	K1		- RF signal quality adjustment [TMC-700]
-	K2		- RF channel adjustment (VHF I) [TMC-700]
-	LS1		- loudspeaker
+    ROM0-5  - Toshiba TMM2732DI 4Kx8 EPROM
+    ROM6    - Hitachi HN462732G 4Kx8 EPROM
+    5114    - RCA MWS5114E1 1024-Word x 4-Bit LSI Static RAM
+    MC1374  - Motorola MC1374P TV Modulator
+    CDP1802 - RCA CDP1802BE CMOS 8-Bit Microprocessor running at ? MHz
+    CDP1852 - RCA CDP1852CE Byte-Wide Input/Output Port
+    CDP1853 - RCA CDP1853CE N-Bit 1 of 8 Decoder
+    CDP1856 - RCA CDP1856CE 4-Bit Memory Buffer
+    CDP1869 - RCA CDP1869CE Video Interface System (VIS) Address and Sound Generator
+    CDP1870 - RCA CDP1870CE Video Interface System (VIS) Color Video (DOT XTAL at 5.6260MHz, CHROM XTAL at 8.867238MHz)
+    CN1     - RF connector [TMC-700]
+    CN2     - printer connector [TMC-700]
+    CN3     - EURO connector
+    CN4     - tape connector
+    CN5     - video connector
+    CN6     - power connector
+    CN7     - audio connector [TMCP-300]
+    CN8     - keyboard connector
+    SW1     - RUN/STOP switch
+    SW2     - internal speaker/external audio switch [TMCP-300]
+    P1      - color phase lock adjustment
+    C1      - dot oscillator adjustment
+    C2      - chrom oscillator adjustment
+    T1      - RF signal strength adjustment [TMC-700]
+    T2      - tape recording level adjustment (0.57 Vpp)
+    T3      - video output level adjustment (1 Vpp)
+    T4      - video synchronization pulse adjustment
+    K1      - RF signal quality adjustment [TMC-700]
+    K2      - RF channel adjustment (VHF I) [TMC-700]
+    LS1     - loudspeaker
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- proper emulation of the VISMAC interface (cursor blinking, color RAM), schematics are needed
-	- tape interface
-	- disk interface
-	- CPU frequency needs to be derived from the schematics
-	- memory expansions
-	- serial interface expansion card
-	- centronics printer handshaking
+    - proper emulation of the VISMAC interface (cursor blinking, color RAM), schematics are needed
+    - tape interface
+    - disk interface
+    - CPU frequency needs to be derived from the schematics
+    - memory expansions
+    - serial interface expansion card
+    - centronics printer handshaking
 
 */
 
 #include "driver.h"
-#include "inputx.h"
 #include "devices/printer.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "cpu/cdp1802/cdp1802.h"
-#include "video/generic.h"
 #include "video/cdp1869.h"
 
 /* Read/Write Handlers */
@@ -168,7 +166,7 @@ static ADDRESS_MAP_START( tmc600_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(printer_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(vismac_data_w)
-//	AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
+//  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(vismac_register_w)
 ADDRESS_MAP_END
 
@@ -284,11 +282,11 @@ static UINT8 tmc600_ef_r(void)
 	int flags = 0x0f;
 
 	/*
-		EF1		?
-		EF2		?
-		EF3		keyboard
-		EF4		?
-	*/
+        EF1     ?
+        EF2     ?
+        EF3     keyboard
+        EF4     ?
+    */
 
 	// keyboard
 
@@ -500,6 +498,6 @@ static DRIVER_INIT( tmc600 )
 
 /* System Drivers */
 
-//    YEAR  NAME 	  PARENT    COMPAT   MACHINE   INPUT     INIT	 CONFIG    COMPANY 	      FULLNAME
+//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     INIT    CONFIG    COMPANY        FULLNAME
 COMP( 1982, tmc600s1, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja I)",  GAME_NOT_WORKING )
 COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

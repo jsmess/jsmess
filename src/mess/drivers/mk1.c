@@ -204,6 +204,6 @@ static DRIVER_INIT( mk1 ) {
 ***************************************************************************/
 
 // seams to be developed by mostek (MK)
-/*     YEAR   NAME  PARENT  COMPAT	MACHINE INPUT   INIT	CONFIG	COMPANY                 FULLNAME */
+/*     YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME */
 CONS( 1979,  mk1,  0, 		0,		mk1,	mk1,	mk1,	NULL,	"Computer Electronic",  "Chess Champion MK I", 0 )
 

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/aquarius.h"
 
 static tilemap *aquarius_tilemap;

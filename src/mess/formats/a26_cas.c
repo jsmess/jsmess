@@ -4,9 +4,9 @@ Atari 2600 SuperCharger support
 
 */
 
-#include "mame.h"
-#include "driver.h"
-#include "a26_cas.h"
+
+#include "formats/a26_cas.h"
+
 
 #define A26_CAS_SIZE			8448
 #define A26_WAV_FREQUENCY		44100

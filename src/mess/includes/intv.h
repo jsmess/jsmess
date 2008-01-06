@@ -1,5 +1,12 @@
-#ifndef __INTV_H
-#define __INTV_H
+/*****************************************************************************
+ *
+ * includes/intv.h
+ *
+ ****************************************************************************/
+
+#ifndef INTV_H_
+#define INTV_H_
+
 
 /*----------- defined in video/intv.c -----------*/
 
@@ -12,6 +19,7 @@ void stic_screenrefresh(void);
 
 READ8_HANDLER ( intvkbd_tms9927_r );
 WRITE8_HANDLER ( intvkbd_tms9927_w );
+
 
 /*----------- defined in machine/intv.c -----------*/
 
@@ -49,10 +57,11 @@ WRITE8_HANDLER ( intvkbd_dualport8_lsb_w );
 READ8_HANDLER ( intvkbd_dualport8_msb_r );
 WRITE8_HANDLER ( intvkbd_dualport8_msb_w );
 
+
 /*----------- defined in audio/intv.c -----------*/
 
 READ16_HANDLER( AY8914_directread_port_0_lsb_r );
 WRITE16_HANDLER( AY8914_directwrite_port_0_lsb_w );
 
-#endif
 
+#endif /* INTV_H_ */

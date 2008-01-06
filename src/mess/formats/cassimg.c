@@ -6,14 +6,14 @@
 
 *********************************************************************/
 
-#include <string.h>
-#include <assert.h>
-#include <stdio.h>
 
-#include "cassimg.h"
+#include <string.h>
+
+#include "driver.h"
 #include "utils.h"
 #include "pool.h"
-#include "mame.h"
+#include "formats/cassimg.h"
+
 
 /* debugging parameters */
 #define LOG_PUT_SAMPLES			0

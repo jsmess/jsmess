@@ -1,12 +1,12 @@
 /***************************************************************************
-	commodore pet series computer
+    commodore pet series computer
 
-	PeT mess@utanet.at
+    PeT mess@utanet.at
 
-	documentation
-	 vice emulator
+    documentation
+     vice emulator
      www.funet.fi
-	 andre fachat (vice emulator, docu, web site, excellent keyboard pictures)
+     andre fachat (vice emulator, docu, web site, excellent keyboard pictures)
 
 ***************************************************************************/
 
@@ -119,7 +119,6 @@ when problems start with -log and look into error.log file
 #include "includes/cbm.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
-#include "video/generic.h"
 #include "includes/pet.h"
 #include "video/crtc6845.h"
 #include "includes/cbmserb.h"
@@ -132,7 +131,7 @@ static ADDRESS_MAP_START(pet_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-/*	{0xe900, 0xe91f, cbm_ieee_state }, // for debugging */
+/*  {0xe900, 0xe91f, cbm_ieee_state }, // for debugging */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -968,7 +967,7 @@ SYSTEM_CONFIG_START(pet4_32)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME		COMPAT	PARENT	MACHINE 	INPUT	 INIT	  CONFIG	COMPANY							  FULLNAME */
+/*    YEAR  NAME        COMPAT  PARENT  MACHINE     INPUT    INIT     CONFIG    COMPANY                           FULLNAME */
 COMP (1977,	pet,		0,		0,		pet,		pet,	 pet1,	  pet,		"Commodore Business Machines Co.",  "PET2001/CBM20xx Series (Basic 1)",            GAME_NO_SOUND)
 COMP (1979,	cbm30,		0,		pet,	pet,		pet,	 pet,	  pet2,		"Commodore Business Machines Co.",  "Commodore 30xx (Basic 2)",                    GAME_NO_SOUND)
 COMP (1979,	cbm30b, 	0,		pet,	pet,		petb,	 petb,	  pet2,		"Commodore Business Machines Co.",  "Commodore 30xx (Basic 2) (business keyboard)",GAME_NO_SOUND)

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "mscommon.h"
 
 #include "video/crtc6845.h"

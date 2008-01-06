@@ -1,17 +1,16 @@
 /*
 
-	dc.c - Sega Dreamcast skeleton driver
-	by R. Belmont
+    dc.c - Sega Dreamcast skeleton driver
+    by R. Belmont
 
-	SH-4 @ 200 MHz
-	ARM7TDMI @ 45 MHz
-	PowerVR 3D video
-	AICA audio
-	GD-ROM drive (modified ATAPI interface)
+    SH-4 @ 200 MHz
+    ARM7TDMI @ 45 MHz
+    PowerVR 3D video
+    AICA audio
+    GD-ROM drive (modified ATAPI interface)
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "cpu/arm7/arm7core.h"
 #include "dc.h"
 
@@ -99,7 +98,7 @@ ROM_END
 SYSTEM_CONFIG_START(dc)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME 	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY	FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
 CONS( 1999, dc, 	dcjp, 	0, 	dc, 	dc, 	0, 	dc, 	"Sega", "Dreamcast (US NTSC)", GAME_NOT_WORKING )
 CONS( 1998, dcjp, 	0, 	0, 	dc, 	dc, 	0, 	dc, 	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
 CONS( 1999, dceu, 	dcjp, 	0, 	dc, 	dc, 	0, 	dc, 	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )

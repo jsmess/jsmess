@@ -6,7 +6,10 @@
 
 ***************************************************************************/
 
+
+#include "driver.h"
 #include "includes/apple3.h"
+
 
 #define	BLACK	0
 #define DKRED	1

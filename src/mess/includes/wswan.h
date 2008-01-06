@@ -1,7 +1,14 @@
-#ifndef _WSWAN_H_
-#define _WSWAN_H_
+/*****************************************************************************
+ *
+ * includes/wswan.h
+ *
+ ****************************************************************************/
+
+#ifndef WSWAN_H_
+#define WSWAN_H_
 
 #include "sound/custom.h"
+
 
 #define WSWAN_TYPE_MONO 0
 #define WSWAN_TYPE_COLOR 1
@@ -75,6 +82,7 @@ struct VDP
 	UINT8 new_display_vertical;		/* New value for the display_vertical bit (to prevent mid frame changes) */
 };
 
+
 /*----------- defined in machine/wswan.c -----------*/
 
 extern struct VDP vdp;
@@ -103,4 +111,5 @@ extern void wswan_refresh_scanline(void);
 extern WRITE8_HANDLER( wswan_sound_port_w );
 extern void *wswan_sh_start(int clock, const struct CustomSound_interface *config);
 
-#endif /* _WSWAN_H_ */
+
+#endif /* WSWAN_H_ */

@@ -2,11 +2,11 @@
 
 Driver for a PDP1 emulator.
 
-	Digital Equipment Corporation
-	Brian Silverman (original Java Source)
-	Vadim Gerasimov (original Java Source)
-	Chris Salomon (MESS driver)
-	Raphael Nabet (MESS driver)
+    Digital Equipment Corporation
+    Brian Silverman (original Java Source)
+    Vadim Gerasimov (original Java Source)
+    Chris Salomon (MESS driver)
+    Raphael Nabet (MESS driver)
 
 Initially, this was a conversion of a JAVA emulator
 (although code has been edited extensively ever since).
@@ -174,11 +174,11 @@ static INPUT_PORTS_START( pdp1 )
    	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 18") PORT_CODE(KEYCODE_N)
 
 	/*
-		Note that I can see 2 additional keys whose purpose is unknown to me.
-		The caps look like "MAR REL" for the leftmost one and "MAR SET" for
-		rightmost one: maybe they were used to set the margin (I don't have the
-		manual for the typewriter).
-	*/
+        Note that I can see 2 additional keys whose purpose is unknown to me.
+        The caps look like "MAR REL" for the leftmost one and "MAR SET" for
+        rightmost one: maybe they were used to set the margin (I don't have the
+        manual for the typewriter).
+    */
     PORT_START		/* 6: typewriter codes 00-17 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(Space)") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 \"") PORT_CODE(KEYCODE_1)
@@ -289,12 +289,12 @@ GFXDECODE_END
 
 
 /*
-	The static palette only includes the pens for the control panel and
-	the typewriter, as the CRT palette is generated dynamically.
+    The static palette only includes the pens for the control panel and
+    the typewriter, as the CRT palette is generated dynamically.
 
-	The CRT palette defines various levels of intensity between white and
-	black.  Grey levels follow an exponential law, so that decrementing the
-	color index periodically will simulate the remanence of a cathode ray tube.
+    The CRT palette defines various levels of intensity between white and
+    black.  Grey levels follow an exponential law, so that decrementing the
+    color index periodically will simulate the remanence of a cathode ray tube.
 */
 static const UINT8 palette[] =
 {
@@ -360,28 +360,28 @@ static PALETTE_INIT( pdp1 )
 pdp1_reset_param_t pdp1_reset_param =
 {
 	{	/* external iot handlers.  NULL means that the iot is unimplemented, unless there are
-		parentheses around the iot name, in which case the iot is internal to the cpu core. */
+        parentheses around the iot name, in which case the iot is internal to the cpu core. */
 		/* I put a ? when the source is the handbook, since a) I have used the maintainance manual
-		as the primary source (as it goes more into details) b) the handbook and the maintainance
-		manual occasionnally contradict each other. */
+        as the primary source (as it goes more into details) b) the handbook and the maintainance
+        manual occasionnally contradict each other. */
 		/* dia, dba, dcc, dra are documented in MIT PDP-1 COMPUTER MODIFICATION
-		BULLETIN no. 2 (drumInstrWriteup.bin/drumInstrWriteup.txt), and are
-		similar to IOT documented in Parallel Drum Type 23 Instruction Manual. */
-	/*	(iot)		rpa			rpb			tyo			tyi			ppa			ppb			dpy */
+        BULLETIN no. 2 (drumInstrWriteup.bin/drumInstrWriteup.txt), and are
+        similar to IOT documented in Parallel Drum Type 23 Instruction Manual. */
+	/*  (iot)       rpa         rpb         tyo         tyi         ppa         ppb         dpy */
 		NULL,		iot_rpa,	iot_rpb,	iot_tyo,	iot_tyi,	iot_ppa,	iot_ppb,	iot_dpy,
-	/*				spacewar																 */
+	/*              spacewar                                                                 */
 		NULL,		iot_011,	NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	/*							lag												glf?/jsp?	gpl?/gpr?/gcf? */
+	/*                          lag                                             glf?/jsp?   gpl?/gpr?/gcf? */
 		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	/*	rrb			rcb?		rcc?		cks			mcs			mes			mel			 */
+	/*  rrb         rcb?        rcc?        cks         mcs         mes         mel          */
 		iot_rrb,	NULL,		NULL,		iot_cks,	NULL,		NULL,		NULL,		NULL,
-	/*	cad?		rac?		rbc?		pac						lpr/lfb/lsp swc/sci/sdf?/shr?	scv? */
+	/*  cad?        rac?        rbc?        pac                     lpr/lfb/lsp swc/sci/sdf?/shr?   scv? */
 		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	/*	(dsc)		(asc)		(isb)		(cac)		(lsm)		(esm)		(cbs)		 */
+	/*  (dsc)       (asc)       (isb)       (cac)       (lsm)       (esm)       (cbs)        */
 		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	/*	icv?		dia			dba			dcc			dra						mri|rlc?	mrf/inr?/ccr? */
+	/*  icv?        dia         dba         dcc         dra                     mri|rlc?    mrf/inr?/ccr? */
 		NULL,		iot_dia,	iot_dba,	iot_dcc,	iot_dra,	NULL,		NULL,		NULL,
-	/*	mcb|dur?	mwc|mtf?	mrc|sfc?...	msm|cgo?	(eem/lem)	mic			muf			 */
+	/*  mcb|dur?    mwc|mtf?    mrc|sfc?... msm|cgo?    (eem/lem)   mic         muf          */
 		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
 	},
 	pdp1_tape_read_binary,
@@ -423,7 +423,7 @@ static MACHINE_DRIVER_START(pdp1)
 MACHINE_DRIVER_END
 
 /*
-	pdp1 can address up to 65336 18 bit words when extended (4096 otherwise).
+    pdp1 can address up to 65336 18 bit words when extended (4096 otherwise).
 */
 ROM_START(pdp1)
 	ROM_REGION(pdp1_fontdata_size, REGION_GFX1, 0)
@@ -494,8 +494,8 @@ static void pdp1_cylinder_getinfo(const device_class *devclass, UINT32 state, un
 
 SYSTEM_CONFIG_START(pdp1)
 	/*CONFIG_RAM_DEFAULT(4 * 1024)
-	CONFIG_RAM(32 * 1024)
-	CONFIG_RAM(64 * 1024)*/
+    CONFIG_RAM(32 * 1024)
+    CONFIG_RAM(64 * 1024)*/
 	CONFIG_DEVICE(pdp1_punchtape_getinfo)
 	CONFIG_DEVICE(pdp1_printer_getinfo)
 	CONFIG_DEVICE(pdp1_cylinder_getinfo)
@@ -508,5 +508,5 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*	  YEAR	NAME	  PARENT	COMPAT	MACHINE   INPUT 	INIT	CONFIG	COMPANY	FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY FULLNAME */
 COMP( 1961, pdp1,	  0, 		0,		pdp1,	  pdp1, 	0,		pdp1,	"Digital Equipment Corporation",  "PDP-1" , 0)

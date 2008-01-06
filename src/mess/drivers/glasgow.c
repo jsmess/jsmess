@@ -370,7 +370,7 @@ static READ16_HANDLER(read_board_gg)
 		logerror("read_board_data = %x \n  ", data);
 
 
-//	  return 0xff00;   // Mephisto need it for working
+//    return 0xff00;   // Mephisto need it for working
 
 
       return data;
@@ -407,9 +407,9 @@ static WRITE16_HANDLER(write_beeper_gg)
 					if ( !(Line18_LED & (1<<i_18)) )
 						{
 
-//						logerror("i_18   = %d \n  ",i_18);
-//						logerror("i_AH   = %d \n  ",i_AH);
-//						logerror("LED an:   = %d \n  ",m_board[i_18][i_AH]);
+//                      logerror("i_18   = %d \n  ",i_18);
+//                      logerror("i_AH   = %d \n  ",i_AH);
+//                      logerror("LED an:   = %d \n  ",m_board[i_18][i_AH]);
 
                         LED = m_board[i_18][i_AH].field;
 
@@ -584,7 +584,7 @@ static VIDEO_START( glasgow )
 static VIDEO_UPDATE( glasgow )
 {
 //  INT32 lg_x, lg_y;
-// 	UINT8 p_key;
+//  UINT8 p_key;
 
     const char *piece;
 
@@ -594,7 +594,7 @@ static VIDEO_UPDATE( glasgow )
 
 // Get view item of cursor
 //
-//	my_cursor = my_target->curview->itemlist[3]->next;
+//  my_cursor = my_target->curview->itemlist[3]->next;
 	if (my_cursor == NULL)
 		my_cursor = get_view_item(my_target,"CURSOR_1");
 
@@ -1077,7 +1077,7 @@ BOARD_FIELD null_board  = { 0,0,0,"0"};
 		corr_y = i_y+28;
 		}
 
-// Loop über alle Spalten
+// Loop ?ber alle Spalten
 		for ( i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
 		{
 

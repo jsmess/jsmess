@@ -1,26 +1,24 @@
 /*
-	MESS Driver for TI-99/4 and TI-99/4A Home Computers.
-	Raphael Nabet, 1999-2003.
+    MESS Driver for TI-99/4 and TI-99/4A Home Computers.
+    Raphael Nabet, 1999-2003.
 
-	see machine/ti99_4x.c for some details and references
+    see machine/ti99_4x.c for some details and references
 */
 
 /*
-	TI99/4 info:
+    TI99/4 info:
 
 Similar to TI99/4a, except for the following:
-	* tms9918/9928 has no bitmap mode
-	* smaller, 40-key keyboard
-	* many small differences in the contents of system ROMs
+    * tms9918/9928 has no bitmap mode
+    * smaller, 40-key keyboard
+    * many small differences in the contents of system ROMs
 
 Historical notes: TI made several last minute design changes.
-	* TI99/4 prototypes had an extra port for an I/R joystick and keypad interface.
-	* early TI99/4 prototypes were designed for a tms9985, not a tms9900.
+    * TI99/4 prototypes had an extra port for an I/R joystick and keypad interface.
+    * early TI99/4 prototypes were designed for a tms9985, not a tms9900.
 */
 
 #include "driver.h"
-#include "inputx.h"
-#include "video/generic.h"
 #include "video/v9938.h"
 #include "machine/ti99_4x.h"
 #include "machine/tms9901.h"
@@ -38,7 +36,7 @@ Historical notes: TI made several last minute design changes.
 #include "sound/5220intf.h"
 
 /*
-	memory map
+    memory map
 */
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
@@ -78,7 +76,7 @@ static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /*
-	CRU map
+    CRU map
 */
 
 static ADDRESS_MAP_START(writecru, ADDRESS_SPACE_IO, 8)
@@ -97,7 +95,7 @@ ADDRESS_MAP_END
 
 
 /*
-	Input ports, used by machine code for TI keyboard and joystick emulation.
+    Input ports, used by machine code for TI keyboard and joystick emulation.
 */
 
 /* TI99/4a: 48-key keyboard, plus two optional joysticks (2 shift keys) */
@@ -157,13 +155,13 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_START	/* col 0 */
 		PORT_BIT(0x0088, IP_ACTIVE_LOW, IPT_UNUSED)
 		/* The original control key is located on the left, but we accept the
-		right control key as well */
+        right control key as well */
 		PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 		PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		/* TI99/4a has a second shift key which maps the same */
 		PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		/* The original function key is located on the right, but we accept the
-		left alt key as well */
+        left alt key as well */
 		PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_RALT) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_SHIFT_2)
 		PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 		PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -490,7 +488,7 @@ static INPUT_PORTS_START(ti99_4)
 INPUT_PORTS_END
 
 /*
-	TMS0285 speech synthesizer
+    TMS0285 speech synthesizer
 */
 static const struct TMS5220interface tms5220interface =
 {
@@ -677,9 +675,9 @@ MACHINE_DRIVER_END
 
 
 /*
-	ROM loading
+    ROM loading
 
-	Note that we use the same ROMset for 50Hz and 60Hz versions.
+    Note that we use the same ROMset for 50Hz and 60Hz versions.
 */
 
 ROM_START(ti99_4)
@@ -949,7 +947,7 @@ SYSTEM_CONFIG_START(ti99_4)
 	CONFIG_DEVICE(ti99_4_memcard_getinfo)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	NAME	  PARENT   COMPAT	MACHINE		 INPUT	  INIT		CONFIG	COMPANY				FULLNAME */
+/*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      CONFIG  COMPANY             FULLNAME */
 COMP( 1979, ti99_4,   0,	   0,		ti99_4_60hz,  ti99_4,  ti99_4,	ti99_4,	"Texas Instruments", "TI99/4 Home Computer (US)" , 0)
 COMP( 1980, ti99_4e,  ti99_4,  0,		ti99_4_50hz,  ti99_4,  ti99_4,	ti99_4,	"Texas Instruments", "TI99/4 Home Computer (Europe)" , 0)
 COMP( 1981, ti99_4a,  0,	   0,		ti99_4a_60hz, ti99_4a, ti99_4a,	ti99_4,	"Texas Instruments", "TI99/4A Home Computer (US)" , 0)

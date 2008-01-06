@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	Atari Jaguar
+    Atari Jaguar
 
-	Nathan Woods
-	based on MAME cojag driver by Aaron Giles
+    Nathan Woods
+    based on MAME cojag driver by Aaron Giles
 
-	TODO: Quite a bit; only a few games are playable.  Also, this driver
-	lacks the speed up hacks in the MAME cojag driver
+    TODO: Quite a bit; only a few games are playable.  Also, this driver
+    lacks the speed up hacks in the MAME cojag driver
 
 ****************************************************************************
 
@@ -54,7 +54,7 @@
 
 /*************************************
  *
- *	Global variables
+ *  Global variables
  *
  *************************************/
 
@@ -69,7 +69,7 @@ UINT8 cojag_is_r3000 = FALSE;
 
 /*************************************
  *
- *	Local variables
+ *  Local variables
  *
  *************************************/
 
@@ -90,7 +90,7 @@ static int jaguar_irq_callback(int level)
 
 /*************************************
  *
- *	Machine init
+ *  Machine init
  *
  *************************************/
 
@@ -117,7 +117,7 @@ static MACHINE_RESET( jaguar )
 #endif
 	memory_set_bankptr(15, cart_base);
 	memory_set_bankptr(16, rom_base);
-//	memory_set_bankptr(17, jaguar_gpu_ram);
+//  memory_set_bankptr(17, jaguar_gpu_ram);
 
 	/* clear any spinuntil stuff */
 	jaguar_gpu_resume();
@@ -177,8 +177,8 @@ static WRITE32_HANDLER( dspctrl_w )
  *
  *  Input ports
  *
- *	Information from "The Jaguar Underground Documentation"
- *	by Klaus and Nat!
+ *  Information from "The Jaguar Underground Documentation"
+ *  by Klaus and Nat!
  *
  *************************************/
 
@@ -190,18 +190,18 @@ static READ32_HANDLER( joystick_r )
 	int i;
 
 	/*
-	 *   16        12        8         4         0
-	 *   +---------+---------+---------^---------+
-	 *   |  pad 1  |  pad 0  |      unused       |
-	 *   +---------+---------+-------------------+
-	 *     15...12   11...8          7...0
-	 *
-	 *   Reading this register gives you the output of the selected columns
-	 *   of the pads.
-	 *   The buttons pressed will appear as cleared bits.
-	 *   See the description of the column addressing to map the bits
-	 *   to the buttons.
-	 */
+     *   16        12        8         4         0
+     *   +---------+---------+---------^---------+
+     *   |  pad 1  |  pad 0  |      unused       |
+     *   +---------+---------+-------------------+
+     *     15...12   11...8          7...0
+     *
+     *   Reading this register gives you the output of the selected columns
+     *   of the pads.
+     *   The buttons pressed will appear as cleared bits.
+     *   See the description of the column addressing to map the bits
+     *   to the buttons.
+     */
 
 	for (i = 0; i < 8; i++)
 	{
@@ -221,51 +221,51 @@ static READ32_HANDLER( joystick_r )
 static WRITE32_HANDLER( joystick_w )
 {
 	/*
-	 *   16        12         8         4         0
-	 *   +-+-------^------+--+---------+---------+
-	 *   |r|    unused    |mu|  col 1  |  col 0  |
-	 *   +-+--------------+--+---------+---------+
-	 *    15                8   7...4     3...0
-	 *
-	 *   col 0:   column control of joypad 0
-	 *
-	 *      Here you select which column of the joypad to poll.
-	 *      The columns are:
-	 *
-	 *                Joystick       Joybut
-	 *      col_bit|11 10  9  8     1    0
-	 *      -------+--+--+--+--    ---+------
-	 *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
-	 *         1   | *  7  4  1     B
-	 *         2   | 2  5  8  0     C
-	 *         3   | 3  6  9  #   OPTION
-	 *
-	 *      You select a column my clearing the appropriate bit and setting
-	 *      all the other "column" bits.
-	 *
-	 *
-	 *   col1:    column control of joypad 1
-	 *
-	 *      This is pretty much the same as for joypad EXCEPT that the
-	 *      column addressing is reversed (strange!!)
-	 *
-	 *                Joystick      Joybut
-	 *      col_bit|15 14 13 12     3    2
-	 *      -------+--+--+--+--    ---+------
-	 *         4   | 3  6  9  #   OPTION
-	 *         5   | 2  5  8  0     C
-	 *         6   | *  7  4  1     B
-	 *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
-	 *
-	 *   mute (mu):   sound control
-	 *
-	 *      You can turn off the sound by clearing this bit.
-	 *
-	 *   read enable (r):
-	 *
-	 *      Set this bit to read from the joysticks, clear it to write
-	 *      to them.
-	 */
+     *   16        12         8         4         0
+     *   +-+-------^------+--+---------+---------+
+     *   |r|    unused    |mu|  col 1  |  col 0  |
+     *   +-+--------------+--+---------+---------+
+     *    15                8   7...4     3...0
+     *
+     *   col 0:   column control of joypad 0
+     *
+     *      Here you select which column of the joypad to poll.
+     *      The columns are:
+     *
+     *                Joystick       Joybut
+     *      col_bit|11 10  9  8     1    0
+     *      -------+--+--+--+--    ---+------
+     *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
+     *         1   | *  7  4  1     B
+     *         2   | 2  5  8  0     C
+     *         3   | 3  6  9  #   OPTION
+     *
+     *      You select a column my clearing the appropriate bit and setting
+     *      all the other "column" bits.
+     *
+     *
+     *   col1:    column control of joypad 1
+     *
+     *      This is pretty much the same as for joypad EXCEPT that the
+     *      column addressing is reversed (strange!!)
+     *
+     *                Joystick      Joybut
+     *      col_bit|15 14 13 12     3    2
+     *      -------+--+--+--+--    ---+------
+     *         4   | 3  6  9  #   OPTION
+     *         5   | 2  5  8  0     C
+     *         6   | *  7  4  1     B
+     *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
+     *
+     *   mute (mu):   sound control
+     *
+     *      You can turn off the sound by clearing this bit.
+     *
+     *   read enable (r):
+     *
+     *      Set this bit to read from the joysticks, clear it to write
+     *      to them.
+     */
 	COMBINE_DATA(&joystick_data);
 }
 
@@ -273,7 +273,7 @@ static WRITE32_HANDLER( joystick_w )
 
 /*************************************
  *
- *	Main CPU memory handlers
+ *  Main CPU memory handlers
  *
  *************************************/
 
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
 	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)	// GPI02
-//	AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)	// GPI04
+//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)  // GPI04
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE(4)
@@ -340,7 +340,7 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *	Port definitions
+ *  Port definitions
  *
  *************************************/
 
@@ -424,7 +424,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *	Machine driver
+ *  Machine driver
  *
  *************************************/
 
@@ -483,7 +483,7 @@ MACHINE_DRIVER_END
 
 /*************************************
  *
- *	ROM definition(s)
+ *  ROM definition(s)
  *
  *************************************/
 
@@ -497,7 +497,7 @@ ROM_END
 
 /*************************************
  *
- *	Driver initialization
+ *  Driver initialization
  *
  *************************************/
 
@@ -543,9 +543,9 @@ SYSTEM_CONFIG_END
 
 /*************************************
  *
- *	Game driver(s)
+ *  Game driver(s)
  *
  *************************************/
 
-/*    YEAR	NAME      PARENT    COMPAT	MACHINE   INPUT     INIT      CONFIG	COMPANY		FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME */
 CONS(1993,	jaguar,   0,        0,		jaguar,   jaguar,   jaguar,   jaguar,	"Atari",	"Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)

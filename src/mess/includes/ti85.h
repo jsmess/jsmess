@@ -1,4 +1,14 @@
+/*****************************************************************************
+ *
+ * includes/ti85.h
+ *
+ ****************************************************************************/
+
+#ifndef TI85_H_
+#define TI85_H_
+
 #include "devices/snapquik.h"
+
 
 /*----------- defined in machine/ti85.c -----------*/
 
@@ -43,6 +53,7 @@ WRITE8_HANDLER( ti85_port_0007_w);
 WRITE8_HANDLER( ti86_port_0005_w);
 WRITE8_HANDLER( ti86_port_0006_w);
 
+
 /*----------- defined in video/ti85.c -----------*/
 
 VIDEO_START( ti85 );
@@ -51,3 +62,5 @@ PALETTE_INIT( ti85 );
 extern const unsigned char ti85_palette[32*7][3];
 extern const unsigned short ti85_colortable[32][7];
 
+
+#endif /* TI85_H_ */

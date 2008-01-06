@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "machine/uart8250.h"
 #include "includes/pc_mouse.h"
-#include "inputx.h"
+
 
 static struct {
 

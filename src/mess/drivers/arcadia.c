@@ -43,7 +43,7 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Start")           PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Option")          PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Select")          PORT_CODE(KEYCODE_E)
-//	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Reset")           PORT_CODE(KEYCODE_R)         Not implemented
+//  PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Reset")           PORT_CODE(KEYCODE_R)         Not implemented
 	PORT_START_TAG("controller1_col1")
 	PORT_BIT(0xf0, 0xf0, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Keypad 1")     PORT_CODE(KEYCODE_1)         PORT_PLAYER(1)
@@ -170,7 +170,7 @@ static INPUT_PORTS_START( vcg )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Start")        PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Selector A")   PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Selector B")   PORT_CODE(KEYCODE_B)
-//	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Reset")        PORT_CODE(KEYCODE_R)         Not implemented
+//  PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Reset")        PORT_CODE(KEYCODE_R)         Not implemented
 	PORT_START_TAG("controller1_col1")
 	PORT_BIT(0xf0, 0xf0, IPT_UNUSED) // some bits must be high
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Keypad 1")  PORT_CODE(KEYCODE_1)         PORT_PLAYER(1)
@@ -400,8 +400,8 @@ static int device_load_arcadia_cart(mess_image *image)
         if (size<=0x2000) memcpy (rom+0x4000, rom+0x2000, 0x1000);
 #else
 	/* this is a testpatch for the golf cartridge
-	   so it could be burned in a arcadia 2001 cartridge
-	   activate it and use debugger to save patched version */
+       so it could be burned in a arcadia 2001 cartridge
+       activate it and use debugger to save patched version */
 	// not enough yet (some pointers stored as data?)
 	struct { UINT16 address; UINT8 old; UINT8 neu; }
 	patch[]= {
@@ -475,7 +475,7 @@ static DRIVER_INIT( arcadia )
 	{
 	    UINT8 *rom=memory_region(REGION_CPU1);
 	    /* this is a simple routine to display all rom characters
-	       on the display for a snapshot */
+           on the display for a snapshot */
 	    UINT8 prog[]={ // address 0 of course
 		0x20, // eorz, 0
 		0x1b, 0x01, // bctr,a $0004
@@ -580,7 +580,7 @@ static DRIVER_INIT( arcadia )
 		0x84, 1, //addi,0 1
 		0xcc, 0x18, 0x00, //stra,0 1800
 
-//		0x1b, 0x80-20-29-26-9-8-2 // bctr,a y
+//      0x1b, 0x80-20-29-26-9-8-2 // bctr,a y
 		0x1c|3, 0, 0x32, // bcta,3 loop
 
 		// calling too many subdirectories causes cpu to reset!
@@ -598,7 +598,7 @@ static DRIVER_INIT( arcadia )
 #endif
 }
 
-/*    YEAR	NAME		PARENT		COMPAT	MACHINE   INPUT     INIT		COMPANY		FULLNAME */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT     INIT        COMPANY     FULLNAME */
 // marketed from several firms/names
 
 CONS(1982,	arcadia,	0,			0,		arcadia,  arcadia,  arcadia,	arcadia,	"Emerson",		"Arcadia 2001", GAME_IMPERFECT_SOUND )

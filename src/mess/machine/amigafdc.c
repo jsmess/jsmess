@@ -10,6 +10,13 @@
 
 ***************************************************************************/
 
+
+#include "driver.h"
+#include "amiga.h"
+#include "amigafdc.h"
+#include "machine/6526cia.h"
+
+
 #define MAX_TRACK_BYTES			12500
 #define ACTUAL_TRACK_BYTES		11968
 #define GAP_TRACK_BYTES			( MAX_TRACK_BYTES - ACTUAL_TRACK_BYTES )
@@ -19,12 +26,6 @@
 #define DISK_DETECT_DELAY		1
 #define MAX_TRACKS				160
 #define MAX_MFM_TRACK_LEN		16384
-
-#include "mame.h"
-#include "driver.h"
-#include "amiga.h"
-#include "amigafdc.h"
-#include "machine/6526cia.h"
 
 #define NUM_DRIVES 2
 

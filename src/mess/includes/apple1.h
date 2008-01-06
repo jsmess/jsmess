@@ -1,4 +1,14 @@
+/*****************************************************************************
+ *
+ * includes/apple1.h
+ *
+ ****************************************************************************/
+
+#ifndef APPLE1_H_
+#define APPLE1_H_
+
 #include "devices/snapquik.h"
+
 
 /*----------- defined in machine/apple1.c -----------*/
 
@@ -8,6 +18,7 @@ SNAPSHOT_LOAD( apple1 );
 
 READ8_HANDLER( apple1_cassette_r );
 WRITE8_HANDLER( apple1_cassette_w );
+
 
 /*----------- defined in video/apple1.c -----------*/
 
@@ -20,6 +31,10 @@ attotime apple1_vh_dsp_time_to_ready (void);
 
 extern int apple1_vh_clrscrn_pressed;
 
+
 /*----------- defined in drivers/apple1.c -----------*/
 
 extern const gfx_layout apple1_charlayout;
+
+
+#endif /* APPLE1_H_ */

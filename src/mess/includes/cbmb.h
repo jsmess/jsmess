@@ -1,12 +1,16 @@
-/***************************************************************************
-	commodore b series computer
+/*****************************************************************************
+ *
+ * includes/cbmb.h
+ * 
+ * Commodore B Series Computer
+ *
+ * peter.trauner@jk.uni-linz.ac.at
+ * 
+ ****************************************************************************/
 
-    peter.trauner@jk.uni-linz.ac.at
-***************************************************************************/
-#ifndef __CBMB_H_
-#define __CBMB_H_
+#ifndef CBMB_H_
+#define CBMB_H_
 
-#include "driver.h"
 
 #define C64_DIPS \
      PORT_START /* 13 */ \
@@ -100,6 +104,7 @@
 #define IEEE8ON	0
 #define IEEE9ON	0
 
+
 /*----------- defined in machine/cbmb.c -----------*/
 
 extern UINT8 *cbmb_basic;
@@ -120,6 +125,7 @@ MACHINE_RESET( cbmb );
 
 void cbmb_rom_load(void);
 
+
 /*----------- defined in video/cbmb.c -----------*/
 
 void cbm600_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
@@ -133,4 +139,5 @@ extern VIDEO_START( cbm700 );
 
 void cbmb_vh_set_font(int font);
 
-#endif
+
+#endif /* CBMB_H_ */

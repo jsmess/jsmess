@@ -1,7 +1,7 @@
 /***************************************************************************
 
-	commodore c65 home computer
-	PeT mess@utanet.at
+    commodore c65 home computer
+    PeT mess@utanet.at
 
     documention
      www.funet.fi
@@ -9,17 +9,22 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
+#include "includes/c65.h"
+#include "includes/c64.h"
+
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-#include "includes/vic4567.h"
+#include "video/vic4567.h"
+#include "video/vic6567.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 
-#include "includes/c65.h"
+/* TODO: Remove dependency on this */
+#include "mslegacy.h"
+
 
 static ADDRESS_MAP_START( c65_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x07fff) AM_RAMBANK(11)
@@ -33,7 +38,7 @@ static ADDRESS_MAP_START( c65_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x10000, 0x1f7ff) AM_RAM
 	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_BASE( &c64_colorram)
 
-	AM_RANGE(0x20000, 0x23fff) AM_ROM /* &c65_dos,	   maps to 0x8000    */
+	AM_RANGE(0x20000, 0x23fff) AM_ROM /* &c65_dos,     maps to 0x8000    */
 	AM_RANGE(0x24000, 0x28fff) AM_ROM /* reserved */
 	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_BASE( &c65_chargen)
 	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_BASE( &c64_basic)
@@ -41,7 +46,7 @@ static ADDRESS_MAP_START( c65_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_BASE( &c64_chargen)
 	AM_RANGE(0x2e000, 0x2ffff) AM_ROM AM_BASE( &c64_kernal)
 
-	AM_RANGE(0x30000, 0x31fff) AM_ROM /*&c65_monitor,	  monitor maps to 0x6000    */
+	AM_RANGE(0x30000, 0x31fff) AM_ROM /*&c65_monitor,     monitor maps to 0x6000    */
 	AM_RANGE(0x32000, 0x37fff) AM_ROM /*&c65_basic, */
 	AM_RANGE(0x38000, 0x3bfff) AM_ROM /*&c65_graphics, */
 	AM_RANGE(0x3c000, 0x3dfff) AM_ROM /* reserved */

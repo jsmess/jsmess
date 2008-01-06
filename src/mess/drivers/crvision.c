@@ -1,13 +1,12 @@
 /*
 
-	TODO:
+    TODO:
 
-	- proper emulation of the monstrous keyboard
+    - proper emulation of the monstrous keyboard
 
 */
 
 #include "driver.h"
-#include "inputx.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "machine/6821pia.h"
@@ -226,17 +225,17 @@ static int keylatch;
 static WRITE8_HANDLER( pia_porta_w )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PA0		Keyboard raster player 1 output
-		PA1		Keyboard raster player 1 output
-		PA2		Keyboard raster player 2 output
-		PA3		Keyboard raster player 2 output
-		PA4		?
-		PA5		?
-		PA6		?
-		PA7		?
-	*/
+        PA0     Keyboard raster player 1 output
+        PA1     Keyboard raster player 1 output
+        PA2     Keyboard raster player 2 output
+        PA3     Keyboard raster player 2 output
+        PA4     ?
+        PA5     ?
+        PA6     ?
+        PA7     ?
+    */
 
 	keylatch = ~data & 0x0f;
 }
@@ -267,15 +266,15 @@ static UINT8 read_keyboard(int pa)
 static READ8_HANDLER( pia_porta_r )
 {
 	/*
-		PA0		Keyboard raster player 1 output
-		PA1		Keyboard raster player 1 output
-		PA2		Keyboard raster player 2 output
-		PA3		Keyboard raster player 2 output
-		PA4		?
-		PA5		?
-		PA6		?
-		PA7		?
-	*/
+        PA0     Keyboard raster player 1 output
+        PA1     Keyboard raster player 1 output
+        PA2     Keyboard raster player 2 output
+        PA3     Keyboard raster player 2 output
+        PA4     ?
+        PA5     ?
+        PA6     ?
+        PA7     ?
+    */
 
 	return 0xff;
 }
@@ -283,17 +282,17 @@ static READ8_HANDLER( pia_porta_r )
 static READ8_HANDLER( pia_portb_r )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PB0		Keyboard input
-		PB1		Keyboard input
-		PB2		Keyboard input
-		PB3		Keyboard input
-		PB4		Keyboard input
-		PB5		Keyboard input
-		PB6		Keyboard input
-		PB7		Keyboard input
-	*/
+        PB0     Keyboard input
+        PB1     Keyboard input
+        PB2     Keyboard input
+        PB3     Keyboard input
+        PB4     Keyboard input
+        PB5     Keyboard input
+        PB6     Keyboard input
+        PB7     Keyboard input
+    */
 
 	if (keylatch & 0x01)
 	{
@@ -340,17 +339,17 @@ static TIMER_CALLBACK(sn76489_set_ready)
 static WRITE8_HANDLER( pia_portb_w )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PB0		SN76489 data output
-		PB1		SN76489 data output
-		PB2		SN76489 data output
-		PB3		SN76489 data output
-		PB4		SN76489 data output
-		PB5		SN76489 data output
-		PB6		SN76489 data output
-		PB7		SN76489 data output
-	*/
+        PB0     SN76489 data output
+        PB1     SN76489 data output
+        PB2     SN76489 data output
+        PB3     SN76489 data output
+        PB4     SN76489 data output
+        PB5     SN76489 data output
+        PB6     SN76489 data output
+        PB7     SN76489 data output
+    */
 
 	SN76496_0_w(0, data);
 
@@ -551,6 +550,6 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME	  PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG      COMPANY				FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME */
 COMP( 1981, crvision, 0,		0,		crvision,	crvision,	0,		crvision,	"Video Technology", "CreatiVision (NTSC)", GAME_SUPPORTS_SAVE )
 CONS( 1983, fnvision, crvision, 0,		fnvision,	crvision,	0,		fnvision,	"Video Technology", "FunVision Computer Video Games System (PAL)", GAME_SUPPORTS_SAVE )

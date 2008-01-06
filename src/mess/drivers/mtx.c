@@ -30,7 +30,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "video/generic.h"
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"
 #include "devices/cartslot.h"
@@ -221,7 +220,7 @@ static z80ctc_interface mtx_ctc_intf =
 
 static void mtx_tms9929A_interrupt (int data)
 {
-//	logerror ("tms9929A_interrupt: %d\n", data);
+//  logerror ("tms9929A_interrupt: %d\n", data);
 	z80ctc_0_trg0_w (0, data ? 0 : 1);
 }
 
@@ -232,12 +231,12 @@ static void mtx_set_bank_offsets (unsigned int bank1, unsigned int bank2,
 {
 	unsigned char * romimage;
 
-//	logerror ("CPM %d  RAM %x  ROM %x\n", mtx_relcpmh,
-//			mtx_rampage, mtx_rompage);
-//	logerror ("map: [0000] %04x [2000] %04x [4000] %04x [6000] %04x\n",
-//			bank1, bank2, bank3, bank4);
-//	logerror ("     [8000] %04x [a000] %04x [c000] %04x [e000] %04x\n",
-//			bank5, bank6, bank7, bank8);
+//  logerror ("CPM %d  RAM %x  ROM %x\n", mtx_relcpmh,
+//          mtx_rampage, mtx_rompage);
+//  logerror ("map: [0000] %04x [2000] %04x [4000] %04x [6000] %04x\n",
+//          bank1, bank2, bank3, bank4);
+//  logerror ("     [8000] %04x [a000] %04x [c000] %04x [e000] %04x\n",
+//          bank5, bank6, bank7, bank8);
 
 	romimage = memory_region (REGION_CPU1);
 
@@ -364,9 +363,9 @@ static void mtx_virt_to_phys (const char * what, int vaddress,
 
 	*paddress = pbase + offset;
 
-//	logerror ("%s (%d,%d,%d,%04x) -> (%d,%06x)\n", what,
-//			mtx_relcpmh, mtx_rompage, mtx_rampage, vaddress,
-//			*ramspace, *paddress);
+//  logerror ("%s (%d,%d,%d,%04x) -> (%d,%06x)\n", what,
+//          mtx_relcpmh, mtx_rompage, mtx_rampage, vaddress,
+//          *ramspace, *paddress);
 }
 
 static unsigned char mtx_peek (int vaddress)
@@ -417,8 +416,8 @@ static void mtx_save_hack(int start, int length)
 
 	assert(length <= 32768);
 
-//	logerror("mtx_save_hack: start=%#x  length=%#x (%d)  index=%#x (%d)\n",
-//			start, length, length, mtx_save_index, mtx_save_index);
+//  logerror("mtx_save_hack: start=%#x  length=%#x (%d)  index=%#x (%d)\n",
+//          start, length, length, mtx_save_index, mtx_save_index);
 
 	if ((start > 0xc000) && (length == 20))  /* Save the header segment */
 	{
@@ -475,7 +474,7 @@ static void mtx_load_hack(int start, int length)
 
 	assert(length <= 32768);
 
-//	logerror("mtx_load_hack: start=%#x  length=%#x (%d)\n", start, length, length);
+//  logerror("mtx_load_hack: start=%#x  length=%#x (%d)\n", start, length, length);
 
 	if ((start > 0xc000) && (length == 18))
 	{
@@ -792,5 +791,5 @@ SYSTEM_CONFIG_START(mtx512)
 	CONFIG_DEVICE(mtx_printer_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT     CONFIG,  COMPANY          FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG,  COMPANY          FULLNAME */
 COMP( 1983, mtx512,   0,		0,		mtx512,   mtx512,   0,       mtx512,  "Memotech Ltd.", "MTX 512" , 0)

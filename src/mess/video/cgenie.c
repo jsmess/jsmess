@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/cgenie.h"
 
 int cgenie_font_offset[4] = {0, 0, 0, 0};

@@ -14,7 +14,6 @@
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "includes/lynx.h"
-#include "video/generic.h"
 #include "hash.h"
 
 static int rotate=0;
@@ -274,7 +273,7 @@ ROM_START(lynx)
 	MYROM_LOAD_BIOS( 0, "lynx.bin",    0x00000, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
 	ROM_SYSTEM_BIOS( 1, "a", "alternate rom save" )
 	MYROM_LOAD_BIOS( 1, "lynxa.bin",    0x00000, 0x200, CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb))
-//	ROM_LOAD("lynx.bin", 0, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
+//  ROM_LOAD("lynx.bin", 0, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
 	ROM_REGION(0x100,REGION_GFX1, 0)
 	ROM_REGION(0x100000, REGION_USER1, 0)
 ROM_END

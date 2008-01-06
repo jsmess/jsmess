@@ -1,38 +1,37 @@
 /******************************************************************************
 
-	drivers/compis.c
-	machine driver
+    drivers/compis.c
+    machine driver
 
-	Per Ola Ingvarsson
-	Tomas Karlsson
+    Per Ola Ingvarsson
+    Tomas Karlsson
 
-	Hardware:
-		- Intel 80186 CPU 8MHz, integrated DMA(8237?), PIC(8259?), PIT(8253?)
+    Hardware:
+        - Intel 80186 CPU 8MHz, integrated DMA(8237?), PIC(8259?), PIT(8253?)
                 - Intel 80130 OSP Operating system processor (PIC 8259, PIT 8254)
-		- Intel 8274 MPSC Multi-protocol serial communications controller (NEC 7201)
-		- Intel 8255 PPI Programmable peripheral interface
-		- Intel 8253 PIT Programmable interval timer
-		- Intel 8251 USART Universal synchronous asynchronous receiver transmitter
-		- National 58174 Real-time clock (compatible with 58274)
-	Peripheral:
-		- Intel 82720 GDC Graphic display processor (NEC uPD 7220)
-		- Intel 8272 FDC Floppy disk controller (Intel iSBX-218A)
-		- Western Digital WD1002-05 Winchester controller
+        - Intel 8274 MPSC Multi-protocol serial communications controller (NEC 7201)
+        - Intel 8255 PPI Programmable peripheral interface
+        - Intel 8253 PIT Programmable interval timer
+        - Intel 8251 USART Universal synchronous asynchronous receiver transmitter
+        - National 58174 Real-time clock (compatible with 58274)
+    Peripheral:
+        - Intel 82720 GDC Graphic display processor (NEC uPD 7220)
+        - Intel 8272 FDC Floppy disk controller (Intel iSBX-218A)
+        - Western Digital WD1002-05 Winchester controller
 
-	Memory map:
+    Memory map:
 
-	00000-3FFFF	RAM	LMCS (Low Memory Chip Select)
-	40000-4FFFF	RAM	MMCS 0 (Midrange Memory Chip Select)
-	50000-5FFFF	RAM	MMCS 1 (Midrange Memory Chip Select)
-	60000-6FFFF	RAM	MMCS 2 (Midrange Memory Chip Select)
-	70000-7FFFF	RAM	MMCS 3 (Midrange Memory Chip Select)
-	80000-EFFFF	NOP
-	F0000-FFFFF	ROM	UMCS (Upper Memory Chip Select)
+    00000-3FFFF RAM LMCS (Low Memory Chip Select)
+    40000-4FFFF RAM MMCS 0 (Midrange Memory Chip Select)
+    50000-5FFFF RAM MMCS 1 (Midrange Memory Chip Select)
+    60000-6FFFF RAM MMCS 2 (Midrange Memory Chip Select)
+    70000-7FFFF RAM MMCS 3 (Midrange Memory Chip Select)
+    80000-EFFFF NOP
+    F0000-FFFFF ROM UMCS (Upper Memory Chip Select)
 
  ******************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "video/i82720.h"
 #include "includes/compis.h"
 #include "devices/mflopimg.h"
@@ -51,33 +50,33 @@ static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16)
-	AM_RANGE( 0x0000, 0x0007) AM_READWRITE( compis_ppi_r, compis_ppi_w )	/* PPI 8255			*/
-	AM_RANGE( 0x0080, 0x0087) AM_READWRITE( compis_pit_r, compis_pit_w )	/* PIT 8253			*/
-	AM_RANGE( 0x0100, 0x011b) AM_READWRITE( compis_rtc_r, compis_rtc_w ) 	/* RTC 58174			*/
-	AM_RANGE( 0x0280, 0x0283) AM_READWRITE( compis_osp_pic_r, compis_osp_pic_w ) /* PIC 8259 (80150/80130)	*/
-//  AM_RANGE( 0x0288, 0x028e) AM_READWRITE( compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)	*/
-	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard		*/
-	AM_RANGE( 0x0330, 0x033f) AM_READWRITE( compis_gdc_r, compis_gdc_w )	/* GDC 82720 PCS6:6		*/
-	AM_RANGE( 0x0340, 0x0343) AM_READWRITE( compis_fdc_r, compis_fdc_w )	/* iSBX0 (J8) FDC 8272		*/
-	AM_RANGE( 0x0350, 0x0351) AM_READ( compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK		*/
-	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( i186_internal_port_r, i186_internal_port_w)/* CPU 80186			*/
-//{ 0x0100, 0x017e, compis_null_r },	/* RTC				*/
-//{ 0x0180, 0x01ff, compis_null_r },	/* PCS3?			*/
-//{ 0x0200, 0x027f, compis_null_r },	/* Reserved			*/
-//{ 0x0280, 0x02ff, compis_null_r },	/* 80150 not used?		*/
-//{ 0x0300, 0x0300, compis_null_r },	/* Cassette  motor		*/
-//{ 0x0301, 0x030f, compis_null_r}, 	/* DMA ACK Graphics		*/
-//{ 0x0310, 0x031e, compis_null_r },	/* SCC 8274 Int Ack		*/
-//{ 0x0320, 0x0320, compis_null_r },	/* SCC 8274 Serial port		*/
-//{ 0x0321, 0x032f, compis_null_r },	/* DMA Terminate		*/
-//{ 0x0331, 0x033f, compis_null_r },	/* DMA Terminate		*/
-//{ 0x0341, 0x034f, compis_null_r },	/* J8 CS1 (16-bit)		*/
-//{ 0x0350, 0x035e, compis_null_r },	/* J8 CS1 (8-bit)		*/
-//{ 0x0360, 0x036e, compis_null_r },	/* J9 CS0 (8/16-bit)		*/
-//{ 0x0361, 0x036f, compis_null_r },	/* J9 CS1 (16-bit)		*/
-//{ 0x0370, 0x037e, compis_null_r },	/* J9 CS1 (8-bit)		*/
-//{ 0x0371, 0x037f, compis_null_r },	/* J9 CS1 (8-bit)		*/
-//{ 0xff20, 0xffff, compis_null_r },	/* CPU 80186			*/
+	AM_RANGE( 0x0000, 0x0007) AM_READWRITE( compis_ppi_r, compis_ppi_w )	/* PPI 8255         */
+	AM_RANGE( 0x0080, 0x0087) AM_READWRITE( compis_pit_r, compis_pit_w )	/* PIT 8253         */
+	AM_RANGE( 0x0100, 0x011b) AM_READWRITE( compis_rtc_r, compis_rtc_w ) 	/* RTC 58174            */
+	AM_RANGE( 0x0280, 0x0283) AM_READWRITE( compis_osp_pic_r, compis_osp_pic_w ) /* PIC 8259 (80150/80130)  */
+//  AM_RANGE( 0x0288, 0x028e) AM_READWRITE( compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
+	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard      */
+	AM_RANGE( 0x0330, 0x033f) AM_READWRITE( compis_gdc_r, compis_gdc_w )	/* GDC 82720 PCS6:6     */
+	AM_RANGE( 0x0340, 0x0343) AM_READWRITE( compis_fdc_r, compis_fdc_w )	/* iSBX0 (J8) FDC 8272      */
+	AM_RANGE( 0x0350, 0x0351) AM_READ( compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK       */
+	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( i186_internal_port_r, i186_internal_port_w)/* CPU 80186         */
+//{ 0x0100, 0x017e, compis_null_r },    /* RTC              */
+//{ 0x0180, 0x01ff, compis_null_r },    /* PCS3?            */
+//{ 0x0200, 0x027f, compis_null_r },    /* Reserved         */
+//{ 0x0280, 0x02ff, compis_null_r },    /* 80150 not used?      */
+//{ 0x0300, 0x0300, compis_null_r },    /* Cassette  motor      */
+//{ 0x0301, 0x030f, compis_null_r},     /* DMA ACK Graphics     */
+//{ 0x0310, 0x031e, compis_null_r },    /* SCC 8274 Int Ack     */
+//{ 0x0320, 0x0320, compis_null_r },    /* SCC 8274 Serial port     */
+//{ 0x0321, 0x032f, compis_null_r },    /* DMA Terminate        */
+//{ 0x0331, 0x033f, compis_null_r },    /* DMA Terminate        */
+//{ 0x0341, 0x034f, compis_null_r },    /* J8 CS1 (16-bit)      */
+//{ 0x0350, 0x035e, compis_null_r },    /* J8 CS1 (8-bit)       */
+//{ 0x0360, 0x036e, compis_null_r },    /* J9 CS0 (8/16-bit)        */
+//{ 0x0361, 0x036f, compis_null_r },    /* J9 CS1 (16-bit)      */
+//{ 0x0370, 0x037e, compis_null_r },    /* J9 CS1 (8-bit)       */
+//{ 0x0371, 0x037f, compis_null_r },    /* J9 CS1 (8-bit)       */
+//{ 0xff20, 0xffff, compis_null_r },    /* CPU 80186            */
 ADDRESS_MAP_END
 
 /* COMPIS Keyboard */
@@ -273,5 +272,5 @@ SYSTEM_CONFIG_START(compis)
 	CONFIG_DEVICE(compis_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*   YEAR	NAME		PARENT	COMPAT MACHINE	INPUT	INIT	CONFIG	COMPANY		FULLNAME */
+/*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME */
 COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	compis,	"Telenova", "Compis" , 0)

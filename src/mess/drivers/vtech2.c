@@ -1,70 +1,69 @@
 /***************************************************************************
-	vtech2.c
+    vtech2.c
 
     system driver
-	Juergen Buchmueller <pullmoll@t-online.de> MESS driver, Jan 2000
-	Davide Moretti <dave@rimini.com> ROM dump and hardware description
+    Juergen Buchmueller <pullmoll@t-online.de> MESS driver, Jan 2000
+    Davide Moretti <dave@rimini.com> ROM dump and hardware description
 
-	LASER 350 (it has only 16K of RAM)
-	FFFF|-------|
-		| Empty |
-		|	5	|
-	C000|-------|
-		|  RAM	|
-		|	3	|
-	8000|-------|-------|-------|
-		|  ROM	|Display|  I/O	|
-		|	1	|	3	|	2	|
-	4000|-------|-------|-------|
-		|  ROM	|
-		|	0	|
-	0000|-------|
-
-
-	Laser 500/700 with 64K of RAM and
-	Laser 350 with 64K RAM expansion module
-	FFFF|-------|
-		|  RAM	|
-		|	5	|
-	C000|-------|
-		|  RAM	|
-		|	4	|
-	8000|-------|-------|-------|
-		|  ROM	|Display|  I/O	|
-		|	1	|	7	|	2	|
-	4000|-------|-------|-------|
-		|  ROM	|
-		|	0	|
-	0000|-------|
+    LASER 350 (it has only 16K of RAM)
+    FFFF|-------|
+        | Empty |
+        |   5   |
+    C000|-------|
+        |  RAM  |
+        |   3   |
+    8000|-------|-------|-------|
+        |  ROM  |Display|  I/O  |
+        |   1   |   3   |   2   |
+    4000|-------|-------|-------|
+        |  ROM  |
+        |   0   |
+    0000|-------|
 
 
-	Bank REGION_CPU1	   Contents
-	0	 0x00000 - 0x03fff ROM 1st half
-	1	 0x04000 - 0x07fff ROM 2nd half
-	2			n/a 	   I/O 2KB area (mirrored 8 times?)
-	3	 0x0c000 - 0x0ffff Display RAM (16KB) present in Laser 350 only!
-	4	 0x10000 - 0x13fff RAM #4
-	5	 0x14000 - 0x17fff RAM #5
-	6	 0x18000 - 0x1bfff RAM #6
-	7	 0x1c000 - 0x1ffff RAM #7 (Display RAM with 64KB)
-	8	 0x20000 - 0x23fff RAM #8 (Laser 700 or 128KB extension)
-	9	 0x24000 - 0x27fff RAM #9
-	A	 0x28000 - 0x2bfff RAM #A
-	B	 0x2c000 - 0x2ffff RAM #B
-	C	 0x30000 - 0x33fff ROM expansion
-	D	 0x34000 - 0x34fff ROM expansion
-	E	 0x38000 - 0x38fff ROM expansion
-	F	 0x3c000 - 0x3ffff ROM expansion
+    Laser 500/700 with 64K of RAM and
+    Laser 350 with 64K RAM expansion module
+    FFFF|-------|
+        |  RAM  |
+        |   5   |
+    C000|-------|
+        |  RAM  |
+        |   4   |
+    8000|-------|-------|-------|
+        |  ROM  |Display|  I/O  |
+        |   1   |   7   |   2   |
+    4000|-------|-------|-------|
+        |  ROM  |
+        |   0   |
+    0000|-------|
+
+
+    Bank REGION_CPU1       Contents
+    0    0x00000 - 0x03fff ROM 1st half
+    1    0x04000 - 0x07fff ROM 2nd half
+    2           n/a        I/O 2KB area (mirrored 8 times?)
+    3    0x0c000 - 0x0ffff Display RAM (16KB) present in Laser 350 only!
+    4    0x10000 - 0x13fff RAM #4
+    5    0x14000 - 0x17fff RAM #5
+    6    0x18000 - 0x1bfff RAM #6
+    7    0x1c000 - 0x1ffff RAM #7 (Display RAM with 64KB)
+    8    0x20000 - 0x23fff RAM #8 (Laser 700 or 128KB extension)
+    9    0x24000 - 0x27fff RAM #9
+    A    0x28000 - 0x2bfff RAM #A
+    B    0x2c000 - 0x2ffff RAM #B
+    C    0x30000 - 0x33fff ROM expansion
+    D    0x34000 - 0x34fff ROM expansion
+    E    0x38000 - 0x38fff ROM expansion
+    F    0x3c000 - 0x3ffff ROM expansion
 
     TODO:
-		Add ROMs and drivers for the Laser100, 110,
-		210 and 310 machines and the Texet 8000.
-		They should probably go to the vtech1.c files, though.
+        Add ROMs and drivers for the Laser100, 110,
+        210 and 310 machines and the Texet 8000.
+        They should probably go to the vtech1.c files, though.
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/vtech2.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
@@ -594,7 +593,7 @@ SYSTEM_CONFIG_START(laser)
 	CONFIG_DEVICE(laser_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	 NAME      PARENT    COMPAT MACHINE   INPUT	    INIT      CONFIG    COMPANY	             FULLNAME */
+/*    YEAR   NAME      PARENT    COMPAT MACHINE   INPUT     INIT      CONFIG    COMPANY              FULLNAME */
 COMP( 1984?, laser350, 0,		 0,		laser350, laser350, laser,    laser,	"Video Technology",  "Laser 350" , 0)
 COMP( 1984?, laser500, laser350, 0,		laser500, laser500, laser,    laser,	"Video Technology",  "Laser 500" , 0)
 COMP( 1984?, laser700, laser350, 0,		laser700, laser500, laser,    laser,	"Video Technology",  "Laser 700" , 0)

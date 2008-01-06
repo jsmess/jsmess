@@ -11,7 +11,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/oric.h"
 
 static void oric_vh_update_flash(void);

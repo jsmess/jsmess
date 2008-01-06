@@ -11,7 +11,6 @@
 #include "driver.h"
 #include "timer.h"
 #include "cpu/z80/z80.h"
-#include "video/generic.h"
 #include "includes/cgenie.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"

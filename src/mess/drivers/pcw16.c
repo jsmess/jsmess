@@ -1,56 +1,56 @@
 /******************************************************************************
 
-	pcw16.c
-	system driver
+    pcw16.c
+    system driver
 
-	Kevin Thacker [MESS driver]
+    Kevin Thacker [MESS driver]
 
   Thankyou to:
 
-	- Cliff Lawson @ Amstrad plc for his documentation (Anne ASIC documentation),
-					and extensive help.
-			(web.ukonline.co.uk/cliff.lawson/)
-			(www.amstrad.com)
+    - Cliff Lawson @ Amstrad plc for his documentation (Anne ASIC documentation),
+                    and extensive help.
+            (web.ukonline.co.uk/cliff.lawson/)
+            (www.amstrad.com)
     - John Elliot for his help and tips
-			(he's written a CP/M implementation for the PCW16)
-			(www.seasip.deomon.co.uk)
-	- and others who offered their help (Richard Fairhurst, Richard Wildey)
+            (he's written a CP/M implementation for the PCW16)
+            (www.seasip.deomon.co.uk)
+    - and others who offered their help (Richard Fairhurst, Richard Wildey)
 
-	Hardware:
-		- 2mb dram max,
-		- 2mb flash-file memory max (in 2 1mb chips),
-		- 16Mhz Z80 (core combined in Anne ASIC),
-		- Anne ASIC (keyboard interface, video (colours), dram/flash/rom paging,
-		real time clock, "glue" logic for Super I/O)
-		- Winbond Super I/O chip (PC type hardware - FDC, Serial, LPT, Hard-drive)
-		- PC/AT keyboard - some keys are coloured to identify special functions, but
-		these are the same as normal PC keys
-		- PC Serial Mouse - uses Mouse System Mouse protocol
-		- PC 1.44MB Floppy drive
+    Hardware:
+        - 2mb dram max,
+        - 2mb flash-file memory max (in 2 1mb chips),
+        - 16Mhz Z80 (core combined in Anne ASIC),
+        - Anne ASIC (keyboard interface, video (colours), dram/flash/rom paging,
+        real time clock, "glue" logic for Super I/O)
+        - Winbond Super I/O chip (PC type hardware - FDC, Serial, LPT, Hard-drive)
+        - PC/AT keyboard - some keys are coloured to identify special functions, but
+        these are the same as normal PC keys
+        - PC Serial Mouse - uses Mouse System Mouse protocol
+        - PC 1.44MB Floppy drive
 
     Primary Purpose:
-		- built as a successor to the PCW8526/PCW9512 series
-		- wordprocessor system (also contains spreadsheet and other office applications)
-		- 16Mhz processor used so proportional fonts and enhanced wordprocessing features
-		  are possible, true WYSIWYG wordprocessing.
-		- flash-file can store documents.
+        - built as a successor to the PCW8526/PCW9512 series
+        - wordprocessor system (also contains spreadsheet and other office applications)
+        - 16Mhz processor used so proportional fonts and enhanced wordprocessing features
+          are possible, true WYSIWYG wordprocessing.
+        - flash-file can store documents.
 
     To Do:
-		- reduce memory usage so it is more MESSD friendly
-		- different configurations
-		- implement configuration register
-		- extract game-port hardware from pc driver - used in any PCW16 progs?
-		- extract hard-drive code from PC driver and use in this driver
-		- implement printer
-		- .. anything else that requires implementing
+        - reduce memory usage so it is more MESSD friendly
+        - different configurations
+        - implement configuration register
+        - extract game-port hardware from pc driver - used in any PCW16 progs?
+        - extract hard-drive code from PC driver and use in this driver
+        - implement printer
+        - .. anything else that requires implementing
 
-	 Info:
-	   - to use this driver you need a OS rescue disc.
-	   (HINT: This also contains the boot-rom)
-	  - the OS will be installed from the OS rescue disc into the Flash-ROM
+     Info:
+       - to use this driver you need a OS rescue disc.
+       (HINT: This also contains the boot-rom)
+      - the OS will be installed from the OS rescue disc into the Flash-ROM
 
-	Uses "MEMCARD" dir to hold flash-file data.
-	To use the power button, flick the dip switch off/on
+    Uses "MEMCARD" dir to hold flash-file data.
+    To use the power button, flick the dip switch off/on
 
  From comp.sys.amstrad.8bit FAQ:
 
@@ -85,28 +85,25 @@
    epp/ecp modes in parallel port not supported yet
    so ui disabled */
 
+/* Core includes */
 #include "driver.h"
 #include "includes/pcw16.h"
 
-// PC-Parallel Port
-#include "includes/pclpt.h"
-#include "includes/centroni.h" // centronics printer handshake simulation
-#include "devices/printer.h" // printer device
-// PC-AT keyboard
-#include "machine/pckeybrd.h"
-// change to superio later
-#include "machine/pc_fdc.h"
-// for pc disk images
-#include "devices/mflopimg.h"
-#include "formats/pc_dsk.h"
-// for pc com port
-#include "machine/uart8250.h"
-// for pc serial mouse
-#include "includes/pc_mouse.h"
-// pcw/pcw16 beeper
-#include "sound/beep.h"
-
+/* Components */
+#include "includes/centroni.h"	/* centronics printer handshake simulation */
+#include "includes/pclpt.h"		/* PC-Parallel Port */
+#include "machine/pckeybrd.h"	/* PC-AT keyboard */
+#include "machine/pc_fdc.h"		/* change to superio later */
+#include "machine/uart8250.h"	/* pc com port */
+#include "includes/pc_mouse.h"	/* pc serial mouse */
+#include "sound/beep.h"			/* pcw/pcw16 beeper */
 #include "machine/intelfsh.h"
+
+/* Devices */
+#include "formats/pc_dsk.h"		/* pc disk images */
+#include "devices/mflopimg.h"
+#include "devices/printer.h"	/* printer device */
+
 
 // interrupt counter
 static unsigned long pcw16_interrupt_counter;
@@ -434,7 +431,7 @@ static void pcw16_update_bank(int bank)
 		if (bank_id<4)
 		{
 			/* lower 4 banks are write protected. Use the rom
-			loaded */
+            loaded */
 			mem_ptr = &memory_region(REGION_CPU1)[0x010000];
 		}
 		else
@@ -474,7 +471,7 @@ static void pcw16_update_bank(int bank)
 		else
 		{
 			/* selections 0-63 are for flash-rom 0, selections
-			64-128 are for flash-rom 1 */
+            64-128 are for flash-rom 1 */
 			if ((bank_id & 0x040)==0)
 			{
 				pcw16_set_bank_handlers(bank, PCW16_MEM_FLASH_1);
@@ -504,7 +501,7 @@ static void pcw16_update_memory(void)
 
 static  READ8_HANDLER(pcw16_bankhw_r)
 {
-//	logerror("bank r: %d \n", offset);
+//  logerror("bank r: %d \n", offset);
 
 	return pcw16_banks[offset];
 }
@@ -561,7 +558,7 @@ static void pcw16_keyboard_init(void)
 	int b;
 
 	/* if sum of all bits in the byte is even, then the data
-	has even parity, otherwise it has odd parity */
+    has even parity, otherwise it has odd parity */
 	for (i=0; i<256; i++)
 	{
 		int data;
@@ -677,8 +674,8 @@ static void	pcw16_keyboard_signal_byte_received(int data)
 	pcw16_keyboard_state |=PCW16_KEYBOARD_STOP_BIT_MASK;
 
 	/* "Keyboard data has odd parity, so the parity bit in the
-	status register should only be set when the shift register
-	data itself has even parity. */
+    status register should only be set when the shift register
+    data itself has even parity. */
 
 	pcw16_keyboard_state &= ~PCW16_KEYBOARD_PARITY_MASK;
 
@@ -792,10 +789,10 @@ static TIMER_CALLBACK(pcw16_keyboard_timer_callback)
 
 		if (data!=-1)
 		{
-//			if (data==4)
-//			{
-//				pcw16_dump_cpu_ram();
-//			}
+//          if (data==4)
+//          {
+//              pcw16_dump_cpu_ram();
+//          }
 
 			pcw16_keyboard_signal_byte_received(data);
 		}
@@ -910,7 +907,7 @@ static TIMER_CALLBACK(rtc_timer_callback)
 static  READ8_HANDLER(rtc_year_invalid_r)
 {
 	/* year in lower 7 bits. RTC Invalid status is rtc_control bit 0
-	inverted */
+    inverted */
 	return (rtc_years & 0x07f) | (((rtc_control & 0x01)<<7)^0x080);
 }
 
@@ -1006,8 +1003,8 @@ static void pcw16_trigger_fdc_int(void)
 		{
 			/* I'm assuming that the nmi is edge triggered */
 			/* a interrupt from the fdc will cause a change in line state, and
-			the nmi will be triggered, but when the state changes because the int
-			is cleared this will not cause another nmi */
+            the nmi will be triggered, but when the state changes because the int
+            is cleared this will not cause another nmi */
 			/* I'll emulate it like this to be sure */
 
 			if (state!=previous_fdc_int_state)
@@ -1015,7 +1012,7 @@ static void pcw16_trigger_fdc_int(void)
 				if (state)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
-					it would clear - to be checked */
+                    it would clear - to be checked */
 					cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
@@ -1039,7 +1036,7 @@ static void pcw16_trigger_fdc_int(void)
 
 static  READ8_HANDLER(pcw16_system_status_r)
 {
-//	logerror("system status r: \n");
+//  logerror("system status r: \n");
 
 	return pcw16_system_status | (readinputport(0) & 0x04);
 }
@@ -1265,7 +1262,7 @@ static const uart8250_interface pcw16_com_interface[2]=
 		pcw16_com_interrupt,
 		NULL,
 		pc_mouse_handshake_in
-//		pcw16_com_refresh_connected
+//      pcw16_com_refresh_connected
 	},
 	{
 		TYPE16550,
@@ -1441,7 +1438,7 @@ static DRIVER_INIT( pcw16 )
 ***************************************************************************/
 
 /* the lower 64k of the flash-file memory is write protected. This contains the boot
-	rom. The boot rom is also on the OS rescue disc. Handy! */
+    rom. The boot rom is also on the OS rescue disc. Handy! */
 ROM_START(pcw16)
 	ROM_REGION((0x010000+524288), REGION_CPU1,0)
 	ROM_LOAD("pcw045.sys",0x10000, 524288, CRC(c642f498) SHA1(8a5c05de92e7b2c5acdfb038217503ad363285b5))
@@ -1482,5 +1479,5 @@ SYSTEM_CONFIG_START(pcw16)
 	CONFIG_DEVICE(pcw16_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*     YEAR  NAME     PARENT	COMPAT	MACHINE    INPUT     INIT   CONFIG,  COMPANY          FULLNAME */
+/*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT   CONFIG,  COMPANY          FULLNAME */
 COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	    pcw16,   "Amstrad plc",   "PCW16", 0)

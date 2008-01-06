@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "includes/intv.h"
-#include "video/generic.h"
 #include "video/stic.h"
 
 #define FOREGROUND_BIT 0x0010

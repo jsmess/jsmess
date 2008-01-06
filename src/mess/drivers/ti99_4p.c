@@ -1,34 +1,32 @@
 /*
-	SNUG SGCPU (a.k.a. 99/4p) system (preliminary)
+    SNUG SGCPU (a.k.a. 99/4p) system (preliminary)
 
-	This system is a reimplementation of the old ti99/4a console.  It is known
-	both as the 99/4p ("peripheral box", since the system is a card to be
-	inserted in the peripheral box, instead of a self contained console), and
-	as the SGCPU ("Second Generation CPU", which was originally the name used
-	in TI documentation to refer to either (or both) TI99/5 and TI99/8
-	projects).
+    This system is a reimplementation of the old ti99/4a console.  It is known
+    both as the 99/4p ("peripheral box", since the system is a card to be
+    inserted in the peripheral box, instead of a self contained console), and
+    as the SGCPU ("Second Generation CPU", which was originally the name used
+    in TI documentation to refer to either (or both) TI99/5 and TI99/8
+    projects).
 
-	The SGCPU was designed and built by the SNUG (System 99 Users Group),
-	namely by Michael Becker for the hardware part and Harald Glaab for the
-	software part.  It has no relationship with TI.
+    The SGCPU was designed and built by the SNUG (System 99 Users Group),
+    namely by Michael Becker for the hardware part and Harald Glaab for the
+    software part.  It has no relationship with TI.
 
-	The card is architectured around a 16-bit bus (vs. an 8-bit bus in every
-	other TI99 system).  It includes 64kb of ROM, including a GPL interpreter,
-	an internal DSR ROM which contains system-specific code, part of the TI
-	extended Basic interpreter, and up to 1Mbyte of RAM.  It still includes a
-	16-bit to 8-bit multiplexer in order to support extension cards designed
-	for TI99/4a, but it can support 16-bit cards, too.  It does not include
-	GROMs, video or sound: instead, it relies on the HSGPL and EVPC cards to
-	do the job.
+    The card is architectured around a 16-bit bus (vs. an 8-bit bus in every
+    other TI99 system).  It includes 64kb of ROM, including a GPL interpreter,
+    an internal DSR ROM which contains system-specific code, part of the TI
+    extended Basic interpreter, and up to 1Mbyte of RAM.  It still includes a
+    16-bit to 8-bit multiplexer in order to support extension cards designed
+    for TI99/4a, but it can support 16-bit cards, too.  It does not include
+    GROMs, video or sound: instead, it relies on the HSGPL and EVPC cards to
+    do the job.
 
-	TODO:
-	* Test the system? Call Debug, Call XB16.
-	* Implement MEM8 timings.
+    TODO:
+    * Test the system? Call Debug, Call XB16.
+    * Implement MEM8 timings.
 */
 
 #include "driver.h"
-#include "inputx.h"
-#include "video/generic.h"
 #include "video/v9938.h"
 
 #include "machine/ti99_4x.h"
@@ -85,10 +83,10 @@ ADDRESS_MAP_END
 
 
 /*
-	Input ports, used by machine code for TI keyboard and joystick emulation.
+    Input ports, used by machine code for TI keyboard and joystick emulation.
 
-	Since the keyboard microcontroller is not emulated, we use the TI99/4a 48-key keyboard,
-	plus two optional joysticks.
+    Since the keyboard microcontroller is not emulated, we use the TI99/4a 48-key keyboard,
+    plus two optional joysticks.
 */
 
 static INPUT_PORTS_START(ti99_4p)
@@ -107,8 +105,8 @@ static INPUT_PORTS_START(ti99_4p)
 			PORT_DIPSETTING( fdc_kind_BwG << config_fdc_bit, "SNUG's BwG" )
 			PORT_DIPSETTING( fdc_kind_hfdc << config_fdc_bit, "Myarc's HFDC" )
 		/*PORT_BIT( config_ide_mask << config_ide_bit, 1 << config_ide_bit, IPT_DIPSWITCH_NAME) PORT_NAME("Nouspickel's IDE card")
-			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
-			PORT_DIPSETTING( 1 << config_ide_bit, DEF_STR( On ) )*/
+            PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
+            PORT_DIPSETTING( 1 << config_ide_bit, DEF_STR( On ) )*/
 		PORT_BIT( config_rs232_mask << config_rs232_bit, /*1 << config_rs232_bit*/0, IPT_DIPSWITCH_NAME) PORT_NAME("TI RS232 card")
 			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 			PORT_DIPSETTING( 1 << config_rs232_bit, DEF_STR( On ) )
@@ -136,13 +134,13 @@ static INPUT_PORTS_START(ti99_4p)
 	PORT_START	/* col 0 */
 		PORT_BIT(0x0088, IP_ACTIVE_LOW, IPT_UNUSED)
 		/* The original control key is located on the left, but we accept the
-		right control key as well */
+        right control key as well */
 		PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 		PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		/* TI99/4a has a second shift key which maps the same */
 		PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		/* The original control key is located on the right, but we accept the
-		left function key as well */
+        left function key as well */
 		PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_RALT) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_SHIFT_2)
 		PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 		PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -230,15 +228,15 @@ static const struct TMS5220interface tms5220interface =
 };
 
 /*
-	we use a DAC to emulate "audio gate", even thought
-	a) there was no DAC in an actual TI99
-	b) this is a 2-level output (whereas a DAC provides a 256-level output...)
+    we use a DAC to emulate "audio gate", even thought
+    a) there was no DAC in an actual TI99
+    b) this is a 2-level output (whereas a DAC provides a 256-level output...)
 */
 
 
 
 /*
-	machine description.
+    machine description.
 */
 static MACHINE_DRIVER_START(ti99_4p_60hz)
 
@@ -449,5 +447,5 @@ SYSTEM_CONFIG_START(ti99_4p)
 	CONFIG_DEVICE(ti99_4p_memcard_getinfo)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	NAME	  PARENT   COMPAT	MACHINE		 INPUT	  INIT	   CONFIG	COMPANY		FULLNAME */
+/*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT     CONFIG   COMPANY     FULLNAME */
 COMP( 1996, ti99_4p,  0,	   0,		ti99_4p_60hz, ti99_4p, ti99_4p, ti99_4p,"snug",		"SGCPU (a.k.a. 99/4P)" , 0)

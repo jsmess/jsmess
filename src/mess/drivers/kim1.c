@@ -1,9 +1,9 @@
 /******************************************************************************
-	KIM-1
+    KIM-1
 
-	system driver
+    system driver
 
-	Juergen Buchmueller, Oct 1999
+    Juergen Buchmueller, Oct 1999
 
     KIM-1 memory map
 
@@ -204,5 +204,5 @@ SYSTEM_CONFIG_START(kim1)
 	CONFIG_DEVICE(kim1_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT    COMPAT	MACHINE   INPUT     INIT      CONFIG  COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY   FULLNAME */
 COMP( 1975, kim1,	  0, 		0,		kim1,	  kim1, 	kim1,	  kim1,	  "MOS Technologies",  "KIM-1" , 0)

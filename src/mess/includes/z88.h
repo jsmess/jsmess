@@ -1,15 +1,36 @@
-#include "driver.h"
+/*****************************************************************************
+ *
+ * includes/z88.h
+ *
+ ****************************************************************************/
+
+#ifndef Z88_H_
+#define Z88_H_
+
 
 #define Z88_NUM_COLOURS 3
 
 #define Z88_SCREEN_WIDTH        856
 #define Z88_SCREEN_HEIGHT       64
 
-/*----------- defined in video/z88.c -----------*/
+#define RTC_MIN_INT (1<<2) /* once a minute */
+#define RTC_SEC_INT (1<<1) /* once a second */
+#define RTC_TICK_INT (1<<0) /* 100 times a second */
 
-extern PALETTE_INIT( z88 );
-extern VIDEO_UPDATE( z88 );
-extern VIDEO_EOF( z88 );
+/* sta bits */
+#define STA_TIME (1<<0)
+#define STA_KEY (1<<2)
+
+/* ints bits */
+#define INT_TIME (1<<1)
+#define INT_GINT (1<<0)
+#define INT_KWAIT (1<<7)
+
+#define Z88_SCR_HW_REV  (1<<4)
+#define Z88_SCR_HW_HRS  (1<<5)
+#define Z88_SCR_HW_UND  (1<<1)
+#define Z88_SCR_HW_FLS  (1<<3)
+#define Z88_SCR_HW_GRY  (1<<2)
 
 #define Z88_AWAKE	0
 #define Z88_SNOOZE	1
@@ -54,21 +75,12 @@ struct blink_hw
 	int tim[5];
 };
 
-#define RTC_MIN_INT (1<<2) /* once a minute */
-#define RTC_SEC_INT (1<<1) /* once a second */
-#define RTC_TICK_INT (1<<0) /* 100 times a second */
 
-/* sta bits */
-#define STA_TIME (1<<0)
-#define STA_KEY (1<<2)
+/*----------- defined in video/z88.c -----------*/
 
-/* ints bits */
-#define INT_TIME (1<<1)
-#define INT_GINT (1<<0)
-#define INT_KWAIT (1<<7)
+extern PALETTE_INIT( z88 );
+extern VIDEO_UPDATE( z88 );
+extern VIDEO_EOF( z88 );
 
-#define Z88_SCR_HW_REV  (1<<4)
-#define Z88_SCR_HW_HRS  (1<<5)
-#define Z88_SCR_HW_UND  (1<<1)
-#define Z88_SCR_HW_FLS  (1<<3)
-#define Z88_SCR_HW_GRY  (1<<2)
+
+#endif /* Z88_H_ */

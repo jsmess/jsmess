@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/kc.h"
 #include "eventlst.h"
 #include "mslegacy.h"

@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/dai.h"
 #include "mslegacy.h"
 

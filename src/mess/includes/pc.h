@@ -1,4 +1,12 @@
-#include "driver.h"
+/*****************************************************************************
+ *
+ * includes/pc.h
+ *
+ ****************************************************************************/
+
+#ifndef PC_H_
+#define PC_H_
+
 
 /*----------- defined in machine/pc.c -----------*/
 
@@ -24,3 +32,5 @@ void tandy1000_frame_interrupt (void);
 void pc_aga_frame_interrupt(void);
 void pc_vga_frame_interrupt(void);
 
+
+#endif /* PC_H_ */

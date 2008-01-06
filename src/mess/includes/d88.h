@@ -1,11 +1,20 @@
+/*****************************************************************************
+ *
+ * includes/d88.h
+ *
+ * DISK IMAGE FORMAT WHICH USED TO BE PART OF WD179X - NOW SEPERATED
+ *
+ ****************************************************************************/
 
-/* DISK IMAGE FORMAT WHICH USED TO BE PART OF WD179X - NOW SEPERATED */
+#ifndef D88_H_
+#define D88_H_
 
 #include "devices/flopdrv.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 #define D88_NUM_TRACK 164
 
@@ -41,6 +50,9 @@ typedef struct
 DEVICE_INIT(d88image_floppy);
 DEVICE_LOAD(d88image_floppy);
 
+
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* D88_H_ */

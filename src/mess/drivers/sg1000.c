@@ -1,13 +1,12 @@
 #include "driver.h"
 #include "image.h"
-#include "inputx.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
 #include "includes/centroni.h"
 #include "includes/serial.h"
-#include "includes/msm8251.h"
+#include "machine/msm8251.h"
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"
 #include "sound/sn76496.h"
@@ -15,13 +14,13 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- SG-1000 pause button (NMI vector 0x66)
-	- SC-3000 reset key
-	- SC-3000 cassette
-	- SF-7000 serial comms
-	- SP-400 serial printer
+    - SG-1000 pause button (NMI vector 0x66)
+    - SC-3000 reset key
+    - SC-3000 cassette
+    - SF-7000 serial comms
+    - SP-400 serial printer
 
 */
 
@@ -29,16 +28,16 @@
 
 /*
 
-	Address	Access	Bits
-			 		7		6	5	4	3	2	1	0
-	$6000	W		-		-	-	-	-	-	-	AXIS
-	$8000	R		BUSY	-	-	-	-	-	-	PRESS
-	$A000	R/W		DATA
+    Address Access  Bits
+                    7       6   5   4   3   2   1   0
+    $6000   W       -       -   -   -   -   -   -   AXIS
+    $8000   R       BUSY    -   -   -   -   -   -   PRESS
+    $A000   R/W     DATA
 
-	AXIS: write 0 to select X axis, 1 to select Y axis.
-	BUSY: reads 1 when graphic board is busy sampling position, else 0.
-	PRESS: reads 0 when pen is touching graphic board, else 1.
-	DATA: when pen is touching graphic board, return 8-bit sample position for currently selected axis (X is in the 0-255 range, Y in the 0-191 range). Else, return 0.
+    AXIS: write 0 to select X axis, 1 to select Y axis.
+    BUSY: reads 1 when graphic board is busy sampling position, else 0.
+    PRESS: reads 0 when pen is touching graphic board, else 1.
+    DATA: when pen is touching graphic board, return 8-bit sample position for currently selected axis (X is in the 0-255 range, Y in the 0-191 range). Else, return 0.
 
 */
 
@@ -342,17 +341,17 @@ static int keylatch;
 static READ8_HANDLER( sc3000_ppi8255_a_r )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PA0		Keyboard input
-		PA1		Keyboard input
-		PA2		Keyboard input
-		PA3		Keyboard input
-		PA4		Keyboard input
-		PA5		Keyboard input
-		PA6		Keyboard input
-		PA7		Keyboard input
-	*/
+        PA0     Keyboard input
+        PA1     Keyboard input
+        PA2     Keyboard input
+        PA3     Keyboard input
+        PA4     Keyboard input
+        PA5     Keyboard input
+        PA6     Keyboard input
+        PA7     Keyboard input
+    */
 
 	return readinputport(keylatch);
 }
@@ -360,17 +359,17 @@ static READ8_HANDLER( sc3000_ppi8255_a_r )
 static READ8_HANDLER( sc3000_ppi8255_b_r )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PB0		Keyboard input
-		PB1		Keyboard input
-		PB2		Keyboard input
-		PB3		Keyboard input
-		PB4		/CONT input from cartridge terminal B-11
-		PB5		FAULT input from printer
-		PB6		BUSY input from printer
-		PB7		Cassette tape input
-	*/
+        PB0     Keyboard input
+        PB1     Keyboard input
+        PB2     Keyboard input
+        PB3     Keyboard input
+        PB4     /CONT input from cartridge terminal B-11
+        PB5     FAULT input from printer
+        PB6     BUSY input from printer
+        PB7     Cassette tape input
+    */
 
 	return readinputport(keylatch + 8) | 0x70;
 }
@@ -378,17 +377,17 @@ static READ8_HANDLER( sc3000_ppi8255_b_r )
 static WRITE8_HANDLER( sc3000_ppi8255_c_w )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PC0		Keyboard raster output
-		PC1		Keyboard raster output
-		PC2		Keyboard raster output
-		PC3		not connected
-		PC4		Cassette tape output
-		PC5		DATA to printer
-		PC6		/RESET to printer
-		PC7		/FEED to printer
-	*/
+        PC0     Keyboard raster output
+        PC1     Keyboard raster output
+        PC2     Keyboard raster output
+        PC3     not connected
+        PC4     Cassette tape output
+        PC5     DATA to printer
+        PC6     /RESET to printer
+        PC7     /FEED to printer
+    */
 
 	keylatch = data & 0x07;
 }
@@ -418,17 +417,17 @@ static int sf7000_fdc_index;
 static READ8_HANDLER( sf7000_ppi8255_a_r )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PA0		INT from FDC
-		PA1		BUSY from Centronics printer
-		PA2		INDEX from FDD
-		PA3
-		PA4
-		PA5
-		PA6
-		PA7
-	*/
+        PA0     INT from FDC
+        PA1     BUSY from Centronics printer
+        PA2     INDEX from FDD
+        PA3
+        PA4
+        PA5
+        PA6
+        PA7
+    */
 
 	int centronics_handshake = centronics_read_handshake(1);
 	int busy = 0;
@@ -444,17 +443,17 @@ static READ8_HANDLER( sf7000_ppi8255_a_r )
 static WRITE8_HANDLER( sf7000_ppi8255_b_w )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PB0		Data output to Centronics printer
-		PB1		Data output to Centronics printer
-		PB2		Data output to Centronics printer
-		PB3		Data output to Centronics printer
-		PB4		Data output to Centronics printer
-		PB5		Data output to Centronics printer
-		PB6		Data output to Centronics printer
-		PB7		Data output to Centronics printer
-	*/
+        PB0     Data output to Centronics printer
+        PB1     Data output to Centronics printer
+        PB2     Data output to Centronics printer
+        PB3     Data output to Centronics printer
+        PB4     Data output to Centronics printer
+        PB5     Data output to Centronics printer
+        PB6     Data output to Centronics printer
+        PB7     Data output to Centronics printer
+    */
 
 	centronics_write_data(1, data);
 }
@@ -462,17 +461,17 @@ static WRITE8_HANDLER( sf7000_ppi8255_b_w )
 static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 {
 	/*
-		Signal	Description
+        Signal  Description
 
-		PC0		/INUSE signal to FDD
-		PC1		/MOTOR ON signal to FDD
-		PC2		TC signal to FDC
-		PC3		RESET signal to FDC
-		PC4		not connected
-		PC5		not connected
-		PC6		/ROM SEL (switch between IPL ROM and RAM)
-		PC7		/STROBE to Centronics printer
-	*/
+        PC0     /INUSE signal to FDD
+        PC1     /MOTOR ON signal to FDD
+        PC2     TC signal to FDC
+        PC3     RESET signal to FDC
+        PC4     not connected
+        PC5     not connected
+        PC6     /ROM SEL (switch between IPL ROM and RAM)
+        PC7     /STROBE to Centronics printer
+    */
 
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x02) ? 0 : 1);
 	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
@@ -882,9 +881,9 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG      COMPANY   FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY   FULLNAME */
 CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", 0 )
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", 0 )
 COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", 0 )
 CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sg1000,		"Sega",	"SG-1000 Mark II", 0 )
-//COMP( 1983,	omv,		sg1000, 0,		omv,		omv,		0,		omv,		"Tsukuda Original",	"Othello Multivision", GAME_NOT_WORKING )
+//COMP( 1983,   omv,        sg1000, 0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision", GAME_NOT_WORKING )

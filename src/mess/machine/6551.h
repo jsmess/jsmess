@@ -1,6 +1,14 @@
-/* 6551 ACIA */
+/*****************************************************************************
+ *
+ * machine/6551.h
+ *
+ * 6551 ACIA
+ *
+ ****************************************************************************/
 
-#include "driver.h"
+#ifndef _6551_H_
+#define _6551_H_
+
 
 /*----------- defined in machine/6551.c -----------*/
 
@@ -12,3 +20,5 @@ void acia_6551_set_irq_callback(void (*callback)(int));
 
 void acia_6551_connect_to_serial_device(mess_image *image);
 
+
+#endif /* _6551_H_ */

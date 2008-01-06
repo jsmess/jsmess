@@ -1,9 +1,9 @@
 /*
-	Nintendo 64
+    Nintendo 64
 
-	Driver by Ville Linde
-	Reformatted to share hardware by R. Belmont
-	Additional work by Ryan Holtz
+    Driver by Ville Linde
+    Reformatted to share hardware by R. Belmont
+    Additional work by Ryan Holtz
 */
 
 #include "driver.h"

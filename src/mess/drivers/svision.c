@@ -8,7 +8,6 @@
 #include "driver.h"
 #include "image.h"
 #include "mslegacy.h"
-#include "video/generic.h"
 #include "cpu/m6502/m6502.h"
 
 #include "includes/svision.h"
@@ -309,7 +308,7 @@ static const unsigned char svision_palette[] =
 #if 0
     /* greens grabbed from a scan of a handheld
      * in its best adjustment for contrast
-	 */
+     */
 	86, 121, 86,
 	81, 115, 90,
 	74, 107, 101,
@@ -552,7 +551,7 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY		FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME */
 // marketed under a ton of firms and names
 CONS(1992,	svision,	0,	0,	svision,	svision,	svision,	svision,	"Watara",	"Supervision", 0)
 // svdual 2 connected via communication port

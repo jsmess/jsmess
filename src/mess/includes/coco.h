@@ -1,21 +1,22 @@
-/*********************************************************************
+/*****************************************************************************
+ *
+ * includes/coco.h
+ * 
+ * CoCo/Dragon
+ *
+ ****************************************************************************/
 
-	coco.h
+#ifndef COCO_H_
+#define COCO_H_
 
-	CoCo/Dragon code
-
-*********************************************************************/
-
-#ifndef DRAGON_H
-#define DRAGON_H
-
-#include "video/m6847.h"
 #include "devices/snapquik.h"
+
 
 #define COCO_CPU_SPEED_HZ		894886	/* 0.894886 MHz */
 #define COCO_FRAMES_PER_SECOND	(COCO_CPU_SPEED_HZ / 57.0 / 263)
 #define COCO_CPU_SPEED			(ATTOTIME_IN_HZ(COCO_CPU_SPEED_HZ))
 #define COCO_TIMER_CMPCARRIER	(COCO_CPU_SPEED * 0.25)
+
 
 /*----------- defined in video/coco.c -----------*/
 
@@ -25,6 +26,7 @@ VIDEO_START( dragon );
 VIDEO_START( coco );
 VIDEO_START( coco2b );
 
+
 /*----------- defined in video/coco3.c -----------*/
 
 VIDEO_START( coco3 );
@@ -33,6 +35,7 @@ VIDEO_UPDATE( coco3 );
 WRITE8_HANDLER ( coco3_palette_w );
 UINT32 coco3_get_video_base(UINT8 ff9d_mask, UINT8 ff9e_mask);
 void coco3_vh_blink(void);
+
 
 /*----------- defined in machine/coco.c -----------*/
 
@@ -103,4 +106,5 @@ struct coco3_video_vars
 
 extern const struct coco3_video_vars coco3_vidvars;
 
-#endif /* DRAGON_H */
+
+#endif /* COCO_H_ */

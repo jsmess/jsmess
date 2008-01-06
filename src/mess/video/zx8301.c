@@ -1,4 +1,15 @@
-#include "video/zx8301.h"
+/*****************************************************************************
+ *
+ * video/zx8301.c
+ *
+ ****************************************************************************/
+
+#include "driver.h"
+#include "zx8301.h"
+
+/* TODO: Remove dependency on this */
+#include "mslegacy.h"
+
 
 typedef struct
 {

@@ -58,7 +58,6 @@
 #include <assert.h>
 
 #include "driver.h"
-#include "video/generic.h"
 #include "mscommon.h"
 #include "utils.h"
 #include "mslegacy.h"
@@ -69,8 +68,8 @@
 /* lightpen values */
 #include "includes/c64.h"
 
-#include "includes/vic4567.h"
-#include "includes/vic6567.h"
+#include "video/vic4567.h"
+#include "vic6567.h"
 
 /*#define GFX */
 

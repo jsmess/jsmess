@@ -1,5 +1,12 @@
-#ifndef REAL_3DO_H
-#define REAL_3DO_H
+/*****************************************************************************
+ *
+ * includes/3do.h
+ *
+ ****************************************************************************/
+
+#ifndef _3DO_H_
+#define _3DO_H_
+
 
 /*----------- defined in machine/3do.c -----------*/
 
@@ -20,4 +27,5 @@ READ32_HANDLER( clio_r );
 WRITE32_HANDLER( clio_w );
 void clio_init( void );
 
-#endif /* REAL_3DO_H */
+
+#endif /* _3DO_H_ */

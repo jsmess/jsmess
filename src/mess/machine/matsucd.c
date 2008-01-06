@@ -11,7 +11,7 @@ can be expanded with support for the other drives as needed.
 
 ***************************************************************************/
 
-#include "mame.h"
+
 #include "driver.h"
 #include "devices/chd_cd.h"
 #include "sound/cdda.h"

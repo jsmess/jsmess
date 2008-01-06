@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/advision.h"
 
 static UINT8 advision_led_latch[8];

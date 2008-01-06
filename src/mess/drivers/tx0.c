@@ -1,7 +1,7 @@
 /*
-	TX-0
+    TX-0
 
-	Raphael Nabet, 2004
+    Raphael Nabet, 2004
 */
 
 #include <math.h>
@@ -18,9 +18,9 @@ static UINT32 *tx0_memory;
 
 
 /*
-	driver init function
+    driver init function
 
-	Set up the tx0_memory pointer
+    Set up the tx0_memory pointer
 */
 static DRIVER_INIT( tx0 )
 {
@@ -222,12 +222,12 @@ GFXDECODE_END
 
 
 /*
-	The static palette only includes the pens for the control panel and
-	the typewriter, as the CRT palette is generated dynamically.
+    The static palette only includes the pens for the control panel and
+    the typewriter, as the CRT palette is generated dynamically.
 
-	The CRT palette defines various levels of intensity between white and
-	black.  Grey levels follow an exponential law, so that decrementing the
-	color index periodically will simulate the remanence of a cathode ray tube.
+    The CRT palette defines various levels of intensity between white and
+    black.  Grey levels follow an exponential law, so that decrementing the
+    color index periodically will simulate the remanence of a cathode ray tube.
 */
 static const unsigned char palette[] =
 {
@@ -296,7 +296,7 @@ static PALETTE_INIT( tx0 )
 			mame_printf_debug("File %s line %d: recommended value for pen_crt_num_levels is %d\n", __FILE__, __LINE__, recommended_pen_crt_num_levels);
 	}
 	/*if ((cur_level_1 > 255.*cut_level) || (cur_level_2 > 255.*cut_level))
-		mame_printf_debug("File %s line %d: Please take higher value for pen_crt_num_levels or smaller value for decay\n", __FILE__, __LINE__);*/
+        mame_printf_debug("File %s line %d: Please take higher value for pen_crt_num_levels or smaller value for decay\n", __FILE__, __LINE__);*/
 #endif
 
 	palette_set_color_rgb(machine, 0, 0, 0, 0);
@@ -329,7 +329,7 @@ static MACHINE_DRIVER_START(tx0_64kw)
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
-	approximately 6usec) */
+    approximately 6usec) */
 	MDRV_CPU_ADD(TX0_64KW, 166667)
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_64kw_map, 0)
@@ -367,7 +367,7 @@ static MACHINE_DRIVER_START(tx0_8kw)
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
-	approximately 6usec) */
+    approximately 6usec) */
 	MDRV_CPU_ADD(TX0_8KW, 166667)
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_8kw_map, 0)
@@ -495,6 +495,6 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*	  YEAR	NAME	  PARENT	COMPAT	MACHINE   INPUT 	INIT	CONFIG	COMPANY					  FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY                   FULLNAME */
 COMP( 1956, tx0_64kw, 0, 		0,		tx0_64kw, tx0,		tx0,	tx0,	"MIT", "TX-0 original demonstrator (64 kWords of RAM)" , 0)
 COMP( 1962, tx0_8kw,  0, 		0,		tx0_8kw,  tx0,		tx0,	tx0,	"MIT", "TX-0 upgraded system (8 kWords of RAM)" , 0)

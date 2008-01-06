@@ -1,16 +1,20 @@
-#ifndef __TED7360_H_
-#define __TED7360_H_
+/*****************************************************************************
+ *
+ * video/ted7360.h
+ *
+ * If you need this chip in another mame/mess emulation than let it me know.
+ * I will split this from the c16 driver.
+ *
+ * peter.trauner@jk.uni-linz.ac.at, 16. november 1999
+ * Look at mess/drivers/c16.c and mess/machine/c16.c on how to use it
+ *
+ ****************************************************************************/
+
+#ifndef TED7360_H_
+#define TED7360_H_
+
 
 /*----------- defined in video/ted7360.c -----------*/
-
-/*
- * if you need this chip in another mame/mess emulation than let it me know
- * I will split this from the c16 driver
- * peter.trauner@jk.uni-linz.ac.at
- * 16. november 1999
- * look at mess/drivers/c16.c and mess/machine/c16.c
- * on how to use it
- */
 
 /* call to init videodriver */
 /* pal version */
@@ -68,9 +72,11 @@ extern UINT8 ted7360[0x20];
 extern int ted7360_pal;
 extern int ted7360_rom;
 
+
 /*----------- defined in audio/ted7360.c -----------*/
 
 void *ted7360_custom_start (int clock, const struct CustomSound_interface *config);
 void ted7360_soundport_w (int mode, int data);
 
-#endif
+
+#endif /* TED7360_H_ */

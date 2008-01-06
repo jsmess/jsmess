@@ -1,13 +1,14 @@
-/***************************************************************************
+/*****************************************************************************
+ *
+ * includes/nes.h
+ *
+ * Nintendo Entertainment System (Famicom)
+ *
+ ****************************************************************************/
 
-  nes.h
+#ifndef NES_H_
+#define NES_H_
 
-  Headers for the Nintendo Entertainment System (Famicom).
-
-***************************************************************************/
-
-#ifndef NES_H
-#define NES_H
 
 #define NTSC_CLOCK		N2A03_DEFAULTCLOCK	/* 1.789772 MHz */
 #define PAL_CLOCK		(26601712.0/16)		/* 1.662607 MHz */
@@ -26,6 +27,7 @@
 #define PORT_CONFIG1	11
 #define PORT_CONFIG2	12
 #define PORT_FLIPKEY	12
+
 
 /*----------- defined in machine/nes.c -----------*/
 
@@ -95,6 +97,7 @@ int nes_ppu_vidaccess( int num, int address, int data );
 void nes_partialhash(char *dest, const unsigned char *data,
 	unsigned long length, unsigned int functions);
 
+
 /*----------- defined in machine/nes_mmc.c -----------*/
 
 WRITE8_HANDLER( nes_low_mapper_w );
@@ -102,6 +105,7 @@ READ8_HANDLER ( nes_low_mapper_r );
 WRITE8_HANDLER( nes_mid_mapper_w );
 READ8_HANDLER ( nes_mid_mapper_r );
 WRITE8_HANDLER( nes_mapper_w );
+
 
 /*----------- defined in video/nes.c -----------*/
 
@@ -112,5 +116,5 @@ VIDEO_START( nes_ntsc );
 VIDEO_START( nes_pal );
 VIDEO_UPDATE( nes );
 
-#endif /* NES_H */
 
+#endif /* NES_H_ */

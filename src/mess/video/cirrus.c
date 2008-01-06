@@ -61,11 +61,12 @@
 
 ***************************************************************************/
 
-#include "cirrus.h"
+#include "driver.h"
 #include "memconv.h"
+#include "cirrus.h"
+
 
 #define LOG_PCIACCESS	0
-
 
 
 static void cirrus_update_8bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)

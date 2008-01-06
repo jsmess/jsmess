@@ -17,18 +17,19 @@ rom/ram selection
 
 ***************************************************************************/
 
-#include <stdarg.h>
+
 #include "driver.h"
+#include "image.h"
 #include "cpu/z80/z80.h"
 #include "video/m6845.h"
-#include "includes/amstrad.h"
-//#include "drivers/i8255.h"
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"
 #include "devices/dsk.h"
 #include "devices/cassette.h"
+#include "devices/snapquik.h"
+#include "includes/amstrad.h"
 #include "sound/ay8910.h"
-#include "image.h"
+
 
 void amstrad_setup_machine(void)
 {

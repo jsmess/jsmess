@@ -1,6 +1,7 @@
 /* MSM 8251/INTEL 8251 UART */
 
-#include "includes/msm8251.h"
+#include "driver.h"
+#include "msm8251.h"
 #include "includes/serial.h"
 
 #define VERBOSE 1

@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/kim1.h"
 
 PALETTE_INIT( kim1 )

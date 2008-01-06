@@ -7,10 +7,19 @@
 
 ***************************************************************************/
 
+/* Core includes */
+#include "driver.h"
 #include "includes/trs80.h"
+
+/* Components */
+#include "cpu/z80/z80.h"
+#include "machine/wd17xx.h"
+#include "sound/speaker.h"
+
+/* Devices */
 #include "devices/basicdsk.h"
 #include "devices/flopdrv.h"
-#include "sound/speaker.h"
+
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1

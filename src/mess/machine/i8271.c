@@ -11,8 +11,11 @@
 	- deleted data functions (error if data finds deleted data?)
 */
 
-#include "includes/i8271.h"
+
+#include "driver.h"
+#include "i8271.h"
 #include "devices/flopdrv.h"
+
 
 I8271_STATE_t I8271_STATE;
 

@@ -9,12 +9,13 @@ TODO:
 
 ***************************************************************************/
 
-#include "mame.h"
+
 #include "driver.h"
 #include "amiga.h"
 #include "cpu/m68000/m68k.h"
 #include "machine/6526cia.h"
 #include "machine/amigacrt.h"
+
 
 enum
 {

@@ -1,13 +1,19 @@
 /***************************************************************************
 
-	drivers/bebox.c
+    drivers/bebox.c
 
-	BeBox
+    BeBox
 
 ***************************************************************************/
 
+/* Core includes */
+#include "driver.h"
+#include "memconv.h"
 #include "includes/bebox.h"
+
+/* Components */
 #include "video/pc_vga.h"
+#include "video/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/uart8250.h"
 #include "machine/pic8259.h"
@@ -18,12 +24,12 @@
 #include "machine/pckeybrd.h"
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
+
+/* Devices */
 #include "devices/mflopimg.h"
 #include "devices/chd_cd.h"
 #include "devices/harddriv.h"
 #include "formats/pc_dsk.h"
-#include "video/cirrus.h"
-#include "memconv.h"
 
 
 static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_1_r(offset / 2); }
@@ -73,15 +79,15 @@ ADDRESS_MAP_END
 
 static const ppc_config bebox_ppc_config =
 {
-	PPC_MODEL_603,	/* 603 "Wart"					*/
-	0x10,		/* Multiplier 1.0, Bus = 66MHz, Core = 66MHz	*/
+	PPC_MODEL_603,	/* 603 "Wart"                   */
+	0x10,		/* Multiplier 1.0, Bus = 66MHz, Core = 66MHz    */
 	BUS_FREQUENCY_66MHZ
 };
 
 static const ppc_config bebox2_ppc_config =
 {
-	PPC_MODEL_603E,	/* 603E "Stretch", version 1.3			*/
-	0x19,		/* Multiplier 2.0, Bus = 66MHz, Core = 133MHz	*/
+	PPC_MODEL_603E,	/* 603E "Stretch", version 1.3          */
+	0x19,		/* Multiplier 2.0, Bus = 66MHz, Core = 133MHz   */
 	BUS_FREQUENCY_66MHZ
 };
 

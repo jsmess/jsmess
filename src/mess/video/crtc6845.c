@@ -30,14 +30,10 @@
 
 ***************************************************************************/
 
-#include <stdio.h>
-#include "mame.h"
-#include "driver.h"
-#include "video/generic.h"
-#include "state.h"
 
-#include "mscommon.h"
-#include "includes/crtc6845.h"
+#include "driver.h"
+#include "crtc6845.h"
+
 
 /***************************************************************************
 

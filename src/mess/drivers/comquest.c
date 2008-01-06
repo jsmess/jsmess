@@ -59,10 +59,10 @@ static WRITE8_HANDLER(comquest_write)
 #endif
 
 static ADDRESS_MAP_START( comquest_mem , ADDRESS_SPACE_PROGRAM, 8)
-//	{ 0x0000, 0x7fff, MRA8_BANK1 },
+//  { 0x0000, 0x7fff, MRA8_BANK1 },
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(MRA8_ROM, MWA8_RAM)
-//	{ 0x8000, 0xffff, MRA8_RAM }, // batterie buffered
+//  { 0x8000, 0xffff, MRA8_RAM }, // batterie buffered
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( comquest )
@@ -220,8 +220,8 @@ static PALETTE_INIT( comquest )
 
 static MACHINE_RESET( comquest )
 {
-//	UINT8 *mem=memory_region(REGION_USER1);
-//	memory_set_bankptr(1,mem+0x00000);
+//  UINT8 *mem=memory_region(REGION_USER1);
+//  memory_set_bankptr(1,mem+0x00000);
 }
 
 static const UINT32 amask= 0xffff;
@@ -230,31 +230,31 @@ static const UINT32 amask= 0xffff;
 static MACHINE_DRIVER_START( comquest )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6805, 4000000)		/* 4000000? */
-	/*MDRV_CPU_ADD(HD63705, 4000000)	instruction set looks like m6805/m6808 */
-	/*MDRV_CPU_ADD(M68705, 4000000)	instruction set looks like m6805/m6808 */
+	/*MDRV_CPU_ADD(HD63705, 4000000)    instruction set looks like m6805/m6808 */
+	/*MDRV_CPU_ADD(M68705, 4000000) instruction set looks like m6805/m6808 */
 
 /*
-	8 bit bus, integrated io, serial io?,
+    8 bit bus, integrated io, serial io?,
 
-	starts at address zero?
+    starts at address zero?
 
-	not saturn, although very similar hardware compared to hp48g (build into big plastic case)
-	not sc61860, 62015?
-	not cdp1802
-	not tms9900?
-	not z80
-	not 6502, mitsubishi 740
-	not i86
-	not 6809
-	not 68008?
-	not tms32010
-	not t11
-	not arm
-	not 8039
-	not tms370
-	not lh5801
-	not fujitsu mb89150
-	not epson e0c88
+    not saturn, although very similar hardware compared to hp48g (build into big plastic case)
+    not sc61860, 62015?
+    not cdp1802
+    not tms9900?
+    not z80
+    not 6502, mitsubishi 740
+    not i86
+    not 6809
+    not 68008?
+    not tms32010
+    not t11
+    not arm
+    not 8039
+    not tms370
+    not lh5801
+    not fujitsu mb89150
+    not epson e0c88
 */
 
 	MDRV_CPU_PROGRAM_MAP(comquest_mem, 0)
@@ -283,8 +283,8 @@ static MACHINE_DRIVER_START( comquest )
 MACHINE_DRIVER_END
 
 ROM_START(comquest)
-//	ROM_REGION(0x10000,REGION_CPU1,0)
-//	ROM_REGION(0x80000,REGION_USER1,0)
+//  ROM_REGION(0x10000,REGION_CPU1,0)
+//  ROM_REGION(0x80000,REGION_USER1,0)
 	ROM_REGION(0x100000,REGION_CPU1,0)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 /*
@@ -312,7 +312,7 @@ ROM_START(comquest)
 7c0 16kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 4f c7 f1 6e c7)
  */
 
-//	ROM_REGION(0x100,REGION_GFX1,0)
+//  ROM_REGION(0x100,REGION_GFX1,0)
 	ROM_REGION(0x80000,REGION_GFX1,0)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 ROM_END
@@ -327,5 +327,5 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT	CONFIG		MONITOR	COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG      MONITOR COMPANY   FULLNAME */
 CONS( 19??, comquest, 0, 		0,		comquest, comquest, 0,		comquest,	"Data Concepts",  "Comquest Plus German", 0)

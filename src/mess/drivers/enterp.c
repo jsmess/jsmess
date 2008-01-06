@@ -20,7 +20,6 @@
 #include "includes/enterp.h"
 #include "video/epnick.h"
 #include "machine/wd17xx.h"
-#include "cpuintrf.h"
 #include "devices/basicdsk.h"
 /* for CPCEMU style disk images */
 #include "devices/dsk.h"
@@ -52,8 +51,6 @@
 #define MEM_RAM_5				((unsigned int)0x0f9)
 #define MEM_RAM_6				((unsigned int)0x0fa)
 #define MEM_RAM_7				((unsigned int)0x0fb)
-
-WRITE8_HANDLER ( Nick_reg_w );
 
 
 /* The Page index for each 16k page is programmed into
@@ -384,18 +381,18 @@ ADDRESS_MAP_END
 /*
 Enterprise Keyboard Matrix
 
-		Bit
-Line	0	 1	  2    3	4	 5	  6    7
-0		n	 \	  b    c	v	 x	  z    SHFT
-1		h	 N/C  g    d	f	 s	  a    CTRL
-2		u	 q	  y    r	t	 e	  w    TAB
-3		7	 1	  6    4	5	 3	  2    N/C
-4		F4	 F8   F3   F6	F5	 F7   F2   F1
-5		8	 N/C  9    -	0	 ^	  DEL  N/C
-6		j	 N/C  k    ;	l	 :	  ]    N/C
-7		STOP DOWN RGHT UP	HOLD LEFT RETN ALT
-8		m	 ERSE ,    /	.	 SHFT SPCE INS
-9		i	 N/C  o    @	p	 [	  N/C  N/C
+        Bit
+Line    0    1    2    3    4    5    6    7
+0       n    \    b    c    v    x    z    SHFT
+1       h    N/C  g    d    f    s    a    CTRL
+2       u    q    y    r    t    e    w    TAB
+3       7    1    6    4    5    3    2    N/C
+4       F4   F8   F3   F6   F5   F7   F2   F1
+5       8    N/C  9    -    0    ^    DEL  N/C
+6       j    N/C  k    ;    l    :    ]    N/C
+7       STOP DOWN RGHT UP   HOLD LEFT RETN ALT
+8       m    ERSE ,    /    .    SHFT SPCE INS
+9       i    N/C  o    @    p    [    N/C  N/C
 
 N/C - Not connected or just dont know!
 */
@@ -625,7 +622,7 @@ SYSTEM_CONFIG_START(ep128)
 #endif
 SYSTEM_CONFIG_END
 
-/*      YEAR  NAME		PARENT	COMPAT	MACHINE INPUT   INIT  CONFIG, COMPANY                 FULLNAME */
+/*      YEAR  NAME      PARENT  COMPAT  MACHINE INPUT   INIT  CONFIG, COMPANY                 FULLNAME */
 COMP( 1984, ep128,		0,		0,		ep128,	ep128,	0,	  ep128,  "Intelligent Software", "Enterprise 128", GAME_IMPERFECT_SOUND )
 COMP( 1984, ep128a,	ep128,	0,		ep128,	ep128,	0,	  ep128,  "Intelligent Software", "Enterprise 128 (EXOS 2.1)", GAME_IMPERFECT_SOUND )
 

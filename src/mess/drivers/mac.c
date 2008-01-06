@@ -1,47 +1,47 @@
 /*
- *	Mac Plus & 512ke emulation
+ *  Mac Plus & 512ke emulation
  *
- *	Nate Woods, Raphael Nabet
- *
- *
- *		0x000000 - 0x3fffff 	RAM/ROM (switches based on overlay)
- *		0x400000 - 0x4fffff 	ROM
- *		0x580000 - 0x5fffff 	5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
- *		0x600000 - 0x6fffff 	RAM
- *		0x800000 - 0x9fffff 	Zilog 8530 SCC (Serial Control Chip) Read
- *		0xa00000 - 0xbfffff 	Zilog 8530 SCC (Serial Control Chip) Write
- *		0xc00000 - 0xdfffff 	IWM (Integrated Woz Machine; floppy)
- *		0xe80000 - 0xefffff 	Rockwell 6522 VIA
- *		0xf00000 - 0xffffef 	??? (the ROM appears to be accessing here)
- *		0xfffff0 - 0xffffff 	Auto Vector
+ *  Nate Woods, Raphael Nabet
  *
  *
- *	Interrupts:
- *		M68K:
- *			Level 1 from VIA
- *			Level 2 from SCC
- *			Level 4 : Interrupt switch (not implemented)
+ *      0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
+ *      0x400000 - 0x4fffff     ROM
+ *      0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
+ *      0x600000 - 0x6fffff     RAM
+ *      0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
+ *      0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
+ *      0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
+ *      0xe80000 - 0xefffff     Rockwell 6522 VIA
+ *      0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
+ *      0xfffff0 - 0xffffff     Auto Vector
  *
- *		VIA:
- *			CA1 from VBLANK
- *			CA2 from 1 Hz clock (RTC)
- *			CB1 from Keyboard Clock
- *			CB2 from Keyboard Data
- *			SR	from Keyboard Data Ready
  *
- *		SCC:
- *			PB_EXT	from mouse Y circuitry
- *			PA_EXT	from mouse X circuitry
+ *  Interrupts:
+ *      M68K:
+ *          Level 1 from VIA
+ *          Level 2 from SCC
+ *          Level 4 : Interrupt switch (not implemented)
+ *
+ *      VIA:
+ *          CA1 from VBLANK
+ *          CA2 from 1 Hz clock (RTC)
+ *          CB1 from Keyboard Clock
+ *          CB2 from Keyboard Data
+ *          SR  from Keyboard Data Ready
+ *
+ *      SCC:
+ *          PB_EXT  from mouse Y circuitry
+ *          PA_EXT  from mouse X circuitry
  *
  */
 
 #include "driver.h"
-#include "inputx.h"
-#include "video/generic.h"
+#include "includes/mac.h"
 #include "machine/6522via.h"
 #include "devices/sonydriv.h"
 #include "devices/harddriv.h"
-#include "includes/mac.h"
+
+/* TODO: remove depency on this */
 #include "mslegacy.h"
 
 
@@ -352,7 +352,7 @@ SYSTEM_CONFIG_END
 
 
 
-/*    YEAR      NAME      PARENT	COMPAT	MACHINE   INPUT	    INIT		CONFIG		COMPANY				FULLNAME */
+/*    YEAR      NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY             FULLNAME */
 COMP( 1984,	mac128k,  0, 		0,	mac512ke, macplus,  mac128k512k,	mac128k,	"Apple Computer",	"Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984,	mac512k,  mac128k,	0,	mac512ke, macplus,  mac128k512k,	mac512k,	"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986,	mac512ke, macplus,  0,		mac512ke, macplus,  mac512ke,		mac512k,	"Apple Computer",	"Macintosh 512ke", 0 )

@@ -202,10 +202,10 @@ I wanted to handle all banks in the code below, and this
 explains why the extra checks are done
 
 
-	bank 0		0x0000-0x3FFF
-	bank 1		0x4000-0x7FFF
-	bank 2		0x8000-0xBFFF
-	bank 3		0xC000-0xFFFF
+    bank 0      0x0000-0x3FFF
+    bank 1      0x4000-0x7FFF
+    bank 2      0x8000-0xBFFF
+    bank 3      0xC000-0xFFFF
 */
 
 static void z88_refresh_memory_bank(int bank)
@@ -452,7 +452,7 @@ static WRITE8_HANDLER(z88_port_w)
 			else
 			{
 			   /* speaker under control of continuous tone,
-			   or txd */
+               or txd */
 
 
 			}
@@ -612,7 +612,7 @@ ADDRESS_MAP_END
 -------------------------------------------------------------------------
          | D7     D6      D5      D4      D3      D2      D1      D0
 -------------------------------------------------------------------------
-A15 (#7) | RSH    SQR     ESC     INDEX   CAPS    .       /       £
+A15 (#7) | RSH    SQR     ESC     INDEX   CAPS    .       /       ??
 A14 (#6) | HELP   LSH     TAB     DIA     MENU    ,       ;       '
 A13 (#5) | [      SPACE   1       Q       A       Z       L       0
 A12 (#4) | ]      LFT     2       W       S       X       M       P
@@ -753,6 +753,6 @@ SYSTEM_CONFIG_START( z88 )
 SYSTEM_CONFIG_END
 
 
-/*	   YEAR	    NAME	PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG	COMPANY					FULLNAME */
+/*     YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                 FULLNAME */
 COMP( 1988,	z88,	0,		0,		z88,		z88,		0,		z88,	"Cambridge Computers",	"Z88",GAME_NOT_WORKING)
 

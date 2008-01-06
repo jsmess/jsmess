@@ -47,7 +47,6 @@ Todo:
 
 
 #include "driver.h"
-#include "video/generic.h"
 #include "video/m6847.h"
 #include "includes/vtech1.h"
 #include "devices/cassette.h"

@@ -1,3 +1,12 @@
+/*****************************************************************************
+ *
+ * includes/msx_slot.h
+ *
+ ****************************************************************************/
+
+#ifndef MSX_SLOT_H_
+#define MSX_SLOT_H_
+
 
 enum {
 	MSX_LAYOUT_SLOT_ENTRY,
@@ -233,3 +242,5 @@ const msx_driver_struct msx_driver_list[] = {
 		{ "", NULL }		\
 };
 
+
+#endif /* MSX_SLOT_H_ */

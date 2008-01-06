@@ -1,15 +1,29 @@
-/***************************************************************************
+/*****************************************************************************
+ *
+ * includes/pce.h
+ *
+ * NEC PC Engine/TurboGrafx16
+ *
+ ****************************************************************************/
 
-  pce.h
+#ifndef PCE_H_
+#define PCE_H_
 
-  Headers for the NEC PC Engine/TurboGrafx16.
-
-***************************************************************************/
-
-#ifndef PCE_H
-#define PCE_H
 
 #define PCE_HEADER_SIZE		512
+
+#define TG_16_JOY_SIG		0x00
+#define PCE_JOY_SIG			0x40
+#define NO_CD_SIG			0x80
+#define CD_SIG				0x00
+/* these might be used to indicate something, but they always seem to return 1 */
+#define CONST_SIG			0x30
+
+struct pce_struct
+{
+	UINT8 io_port_options; /*driver-specific options for the PCE*/
+};
+
 
 /*----------- defined in machine/pce.c -----------*/
 
@@ -25,21 +39,11 @@ WRITE8_HANDLER( pce_cd_bram_w );
 WRITE8_HANDLER( pce_cd_intf_w );
 READ8_HANDLER( pce_cd_intf_r );
 
-#define TG_16_JOY_SIG		0x00
-#define PCE_JOY_SIG			0x40
-#define NO_CD_SIG			0x80
-#define CD_SIG				0x00
-/* these might be used to indicate something, but they always seem to return 1 */
-#define CONST_SIG			0x30
-
-struct pce_struct
-{
-	UINT8 io_port_options; /*driver-specific options for the PCE*/
-};
 extern struct pce_struct pce;
 DRIVER_INIT( pce );
 DRIVER_INIT( tg16 );
 DRIVER_INIT( sgx );
 MACHINE_RESET( pce );
 
-#endif
+
+#endif /* PCE_H_ */

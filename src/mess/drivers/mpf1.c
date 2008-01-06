@@ -13,27 +13,25 @@
 *    Cassette storage emulation                  *
 *    Sound                                       *
 *    I/O board                                   *
-*	 MONI/INTR key interrupts					 *
-*	 PIO/CTC + interrupt daisy chain			 *
+*    MONI/INTR key interrupts                    *
+*    PIO/CTC + interrupt daisy chain             *
 \************************************************/
 
 /*
 
-	Artwork picture downloaded from:
+    Artwork picture downloaded from:
 
-	http://members.lycos.co.uk/leeedavison/z80/mpf1/
+    http://members.lycos.co.uk/leeedavison/z80/mpf1/
 
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "machine/8255ppi.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "mscommon.h"
-#include "inputx.h"
 #include "sound/dac.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -203,10 +201,10 @@ static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
 
 //  TODO: create drivers to emulate the following two chips
 //  The 16 I/O port combinations for the CTC (Zilog, Z0843004PSC, Z80 CTC, 8644)
-//	AM_RANGE(0x40, 0x43) AM_WRITE(ctc_enable_w) AM_MIRROR(0x7C)
+//  AM_RANGE(0x40, 0x43) AM_WRITE(ctc_enable_w) AM_MIRROR(0x7C)
 
 //  The 16 I/O port combinations for the PIO (Zilog, Z0842004PSC, Z80 PIO, 8735)
-//	AM_RANGE(0x80, 0x83) AM_READWRITE(pio_r, pio_w) AM_MIRROR(0xBF)
+//  AM_RANGE(0x80, 0x83) AM_READWRITE(pio_r, pio_w) AM_MIRROR(0xBF)
 
 ADDRESS_MAP_END
 
@@ -437,23 +435,23 @@ static WRITE8_HANDLER( mpf1_porta_w )
 static WRITE8_HANDLER( mpf1_portb_w )
 {
     //int i;
-	/*	A	0x08
-		B	0x10
-		C	0x20
-		D	0x80
-		E	0x01
-		F	0x04
-		G	0x02
-		H	0x40 (represented by P in original schematics) */
+	/*  A   0x08
+        B   0x10
+        C   0x20
+        D   0x80
+        E   0x01
+        F   0x04
+        G   0x02
+        H   0x40 (represented by P in original schematics) */
 
 	/*  Original bit to leddisplay-segment assignment:
-		(and as such what is written as output to this port)
-		bit      7 6 5 4 3 2 1 0
-		segment  d p c b a f g e
+        (and as such what is written as output to this port)
+        bit      7 6 5 4 3 2 1 0
+        segment  d p c b a f g e
 
-		The next statement converts this to the following assignment: (which is compatible with draw_led())
-		bit      7 6 5 4 3 2 1 0
-		segment  p g f e d c b a */
+        The next statement converts this to the following assignment: (which is compatible with draw_led())
+        bit      7 6 5 4 3 2 1 0
+        segment  p g f e d c b a */
 	if( data | ( activecpu_get_pc() != 0x63C ) )
 	{
 		data = ( (data & 0x08) >> 3 ) |
@@ -523,8 +521,8 @@ static MACHINE_RESET( mpf1 )
 	z80pio_reset(0);
 
 	// CTC
-/*	z80ctc_init(&ctc_intf);
-	z80ctc_reset(0);*/
+/*  z80ctc_init(&ctc_intf);
+    z80ctc_reset(0);*/
 
 	// 8255
 	ppi8255_init(&ppi8255_intf);

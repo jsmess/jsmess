@@ -61,7 +61,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/apple1.h"
 #include "mscommon.h"
 

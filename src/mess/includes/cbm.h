@@ -1,18 +1,22 @@
-#ifndef __CBM_H_
-#define __CBM_H_
+/*****************************************************************************
+ *
+ * includes/cbm.h
+ *
+ ****************************************************************************/
 
-#include <stdlib.h>
+#ifndef CBM_H_
+#define CBM_H_
 
-#include "driver.h"
-#include "devices/cartslot.h"
 #include "devices/snapquik.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 /* must be defined until some driver init problems are solved */
 #define NEW_GAMEDRIVER
+
 
 /*----------- defined in machine/cbm.c -----------*/
 
@@ -93,8 +97,9 @@ extern CBM_ROM cbm_rom[0x20];
  * 0x001a lsb 16bit address
  * 0x001c data */
 
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* CBM_H_ */

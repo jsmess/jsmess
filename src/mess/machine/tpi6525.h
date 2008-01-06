@@ -1,31 +1,34 @@
-/***************************************************************************
-    mos tri port interface 6525
-	mos triple interface adapter 6523
-
-    peter.trauner@jk.uni-linz.ac.at
-
-	used in commodore b series
-	used in commodore c1551 floppy disk drive
-***************************************************************************/
-#ifndef __TPI6525_H_
-#define __TPI6525_H_
-
-/* tia6523 is a tpi6525 without control register!? */
-
-/*
- * tia6523
+/*****************************************************************************
  *
- * only some lines of port b and c are in the pinout !
+ * machine/tpi6525.h
+ *
+ * mos tri port interface 6525
+ * mos triple interface adapter 6523
+ *
+ * peter.trauner@jk.uni-linz.ac.at
+ *
+ * used in commodore b series
+ * used in commodore c1551 floppy disk drive
+ *
+ * tia6523 is a tpi6525 without control register!?
+ *
+ * tia6523
+ *   only some lines of port b and c are in the pinout!
  *
  * connector to floppy c1551 (delivered with c1551 as c16 expansion)
- * port a for data read/write
- * port b
- * 0 status 0
- * 1 status 1
- * port c
- * 6 dav output edge data on port a available
- * 7 ack input edge ready for next datum
- */
+ *   port a for data read/write
+ *   port b
+ *   0 status 0
+ *   1 status 1
+ *   port c
+ *   6 dav output edge data on port a available
+ *   7 ack input edge ready for next datum
+ *
+ ****************************************************************************/
+
+#ifndef TPI6525_H_
+#define TPI6525_H_
+
 
 /* fill in the callback functions */
 typedef struct {
@@ -46,6 +49,7 @@ typedef struct {
 
 	int irq_level[5];
 } TPI6525;
+
 
 /*----------- defined in machine/tpi6525.c -----------*/
 
@@ -108,4 +112,5 @@ WRITE8_HANDLER ( tpi6525_1_port_c_w );
 WRITE8_HANDLER ( tpi6525_2_port_c_w );
 WRITE8_HANDLER ( tpi6525_3_port_c_w );
 
-#endif
+
+#endif /* TPI6525_H_ */

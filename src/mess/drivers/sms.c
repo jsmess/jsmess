@@ -1,11 +1,11 @@
 /******************************************************************************
  Contributors:
 
-	Marat Fayzullin (MG source)
-	Charles Mac Donald
-	Mathis Rosenhauer
-	Brad Oliver
-	Michael Luong
+    Marat Fayzullin (MG source)
+    Charles Mac Donald
+    Mathis Rosenhauer
+    Brad Oliver
+    Michael Luong
 
  To do:
 
@@ -19,20 +19,20 @@
  placeholders in 'machine/sms.c'
 
  Changes:
-	Apr 02 - Added raster palette effects for SMS & GG (ML)
-				 - Added sprite collision (ML)
-				 - Added zoomed sprites (ML)
-	May 02 - Fixed paging bug (ML)
-				 - Fixed sprite and tile priority bug (ML)
-				 - Fixed bug #66 (ML)
-				 - Fixed bug #78 (ML)
-				 - try to implement LCD persistence emulation for GG (ML)
-	Jun 10, 02 - Added bios emulation (ML)
-	Jun 12, 02 - Added PAL & NTSC systems (ML)
-	Jun 25, 02 - Added border emulation (ML)
-	Jun 27, 02 - Version bits for Game Gear (bits 6 of port 00) (ML)
-	Nov-Dec, 05 - Numerous cleanups, fixes, updates (WP)
-	Mar, 07 - More cleanups, fixes, mapper additions, etc (WP)
+    Apr 02 - Added raster palette effects for SMS & GG (ML)
+                 - Added sprite collision (ML)
+                 - Added zoomed sprites (ML)
+    May 02 - Fixed paging bug (ML)
+                 - Fixed sprite and tile priority bug (ML)
+                 - Fixed bug #66 (ML)
+                 - Fixed bug #78 (ML)
+                 - try to implement LCD persistence emulation for GG (ML)
+    Jun 10, 02 - Added bios emulation (ML)
+    Jun 12, 02 - Added PAL & NTSC systems (ML)
+    Jun 25, 02 - Added border emulation (ML)
+    Jun 27, 02 - Version bits for Game Gear (bits 6 of port 00) (ML)
+    Nov-Dec, 05 - Numerous cleanups, fixes, updates (WP)
+    Mar, 07 - More cleanups, fixes, mapper additions, etc (WP)
 
 SMS Store Unit memory map for the second CPU:
 
@@ -63,7 +63,6 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "driver.h"
 #include "sound/sn76496.h"
 #include "sound/2413intf.h"
-#include "video/generic.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
 #include "devices/cartslot.h"
@@ -170,16 +169,16 @@ static INPUT_PORTS_START( sms )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START ) /* Game Gear START */
 
 	PORT_START	/* IN3 - Light phaser X - player 1 */
-//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_CATEGORY(11) PORT_PLAYER(1)
+//  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_CATEGORY(11) PORT_PLAYER(1)
 
 	PORT_START	/* IN4 - Light phaser Y - player 1 */
-//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_CATEGORY(11) PORT_PLAYER(1)
+//  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_CATEGORY(11) PORT_PLAYER(1)
 
 	PORT_START	/* IN5 - Light phaser X - player 2 */
-//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEUDELTA(15) PORT_CATEGORY(21) PORT_PLAYER(2)
+//  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEUDELTA(15) PORT_CATEGORY(21) PORT_PLAYER(2)
 
 	PORT_START	/* IN6 - Light phaser Y - player 2 */
-//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CATEGORY(21) PORT_PLAYER(2)
+//  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CATEGORY(21) PORT_PLAYER(2)
 
 	PORT_START	/* IN7 - Rapid Fire Unit */
 	PORT_DIPNAME( 0x03, 0x00, "Rapid Fire Unit - Player 1" )
@@ -212,12 +211,12 @@ static INPUT_PORTS_START( sms )
 	PORT_START	/* IN11 - Controller selection */
 	PORT_CATEGORY_CLASS( 0x0F, 0x00, "Player 1 Controller" )
 	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 10 )
-//	PORT_CATEGORY_ITEM( 0x01, "Light Phaser", 11 )
+//  PORT_CATEGORY_ITEM( 0x01, "Light Phaser", 11 )
 	PORT_CATEGORY_ITEM( 0x02, "Sega Paddle Control", 12 )
 	PORT_CATEGORY_ITEM( 0x03, "Sega Sports Pad", 13 )
 	PORT_CATEGORY_CLASS( 0xF0, 0x00, "Player 2 Controller" )
 	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 20 )
-//	PORT_CATEGORY_ITEM( 0x10, "Light Phaser", 21 )
+//  PORT_CATEGORY_ITEM( 0x10, "Light Phaser", 21 )
 	PORT_CATEGORY_ITEM( 0x20, "Sega Paddle Control", 22 )
 	PORT_CATEGORY_ITEM( 0x30, "Sega Sports Pad", 23 )
 

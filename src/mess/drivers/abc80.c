@@ -32,55 +32,59 @@ PCB Layout
 |--------------------------------------------------------------------------------------|
 
 Notes:
-	All IC's shown.
+    All IC's shown.
 
-	ROM0-3	- Texas Instruments TMS4732 4Kx8 General Purpose Mask Programmable ROM
-	PROM0-2	- Philips Semiconductors N82S129 256x4 TTL Bipolar PROM
-	PROM3-4	- Philips Semiconductors N82S131 512x4 TTL Bipolar PROM
-	4116	- Texas Instruments TMS4116-25 16Kx1 Dynamic RAM
-	4045	- Texas Instruments TMS4045-15 1Kx4 General Purpose Static RAM with Multiplexed I/O
-	Z80A	-
-	Z80APIO	-
-	SN76477 - Texas Instruments SN76477N Complex Sound Generator
-	74S263	- Texas Instruments SN74S263N Row Output Character Generator
-	MC1488	- Texas Instruments MC1488 Quadruple Line Driver
-	MC1489	- Texas Instruments MC1489 Quadruple Line Receiver
-	CN1		- RS-232 connector
-	CN2		- ABC bus connector (DIN 41612)
-	CN3		- video connector
-	CN4		- cassette motor connector
-	CN5		- cassette connector
-	CN6		- keyboard connector
-	SW1		- reset switch
-	DIPSW1	-
-	DIPSW2	-
+    ROM0-3  - Texas Instruments TMS4732 4Kx8 General Purpose Mask Programmable ROM
+    PROM0-2 - Philips Semiconductors N82S129 256x4 TTL Bipolar PROM
+    PROM3-4 - Philips Semiconductors N82S131 512x4 TTL Bipolar PROM
+    4116    - Texas Instruments TMS4116-25 16Kx1 Dynamic RAM
+    4045    - Texas Instruments TMS4045-15 1Kx4 General Purpose Static RAM with Multiplexed I/O
+    Z80A    -
+    Z80APIO -
+    SN76477 - Texas Instruments SN76477N Complex Sound Generator
+    74S263  - Texas Instruments SN74S263N Row Output Character Generator
+    MC1488  - Texas Instruments MC1488 Quadruple Line Driver
+    MC1489  - Texas Instruments MC1489 Quadruple Line Receiver
+    CN1     - RS-232 connector
+    CN2     - ABC bus connector (DIN 41612)
+    CN3     - video connector
+    CN4     - cassette motor connector
+    CN5     - cassette connector
+    CN6     - keyboard connector
+    SW1     - reset switch
+    DIPSW1  -
+    DIPSW2  -
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- keyboard scanning is awkwardly slow
-	- cassette interface
-	- floppy
-	- printer
-	- IEC
+    - keyboard scanning is awkwardly slow
+    - cassette interface
+    - floppy
+    - printer
+    - IEC
 
 */
 
+/* Core includes */
 #include "driver.h"
-#include "inputx.h"
-#include "video/generic.h"
+#include "includes/abc80.h"
+
+/* Components */
 #include "includes/centroni.h"
-#include "devices/basicdsk.h"
-#include "devices/cassette.h"
-#include "devices/printer.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
 #include "machine/abcbus.h"
-#include "video/abc80.h"
+
+/* Devices */
+#include "devices/basicdsk.h"
+#include "devices/cassette.h"
+#include "devices/printer.h"
+
 
 static emu_timer *abc80_keyboard_timer;
 
@@ -375,22 +379,22 @@ GFXDECODE_END
 
 static const struct SN76477interface sn76477_interface =
 {
-	RES_K(47),		//  4  noise_res		R26 47k
-	RES_K(330),		//  5  filter_res		R24 330k
-	CAP_P(390),		//  6  filter_cap		C52 390p
-	RES_K(47),		//  7  decay_res		R23 47k
-	CAP_U(10),		//  8  attack_decay_cap	C50 10u/35V
-	RES_K(2.2),		// 10  attack_res		R21 2.2k
-	RES_K(33),		// 11  amplitude_res	R19 33k
-	RES_K(10),		// 12  feedback_res		R18 10k
-	0,				// 16  vco_voltage		0V or 2.5V
-	CAP_N(10) ,		// 17  vco_cap			C48 10n
-	RES_K(100),		// 18  vco_res			R20 100k
-	0,				// 19  pitch_voltage	N/C
-	RES_K(220),		// 20  slf_res			R22 220k
-	CAP_U(1),		// 21  slf_cap			C51 1u/35V
-	CAP_U(0.1),		// 23  oneshot_cap		C53 0.1u
-	RES_K(330)		// 24  oneshot_res		R25 330k
+	RES_K(47),		//  4  noise_res        R26 47k
+	RES_K(330),		//  5  filter_res       R24 330k
+	CAP_P(390),		//  6  filter_cap       C52 390p
+	RES_K(47),		//  7  decay_res        R23 47k
+	CAP_U(10),		//  8  attack_decay_cap C50 10u/35V
+	RES_K(2.2),		// 10  attack_res       R21 2.2k
+	RES_K(33),		// 11  amplitude_res    R19 33k
+	RES_K(10),		// 12  feedback_res     R18 10k
+	0,				// 16  vco_voltage      0V or 2.5V
+	CAP_N(10) ,		// 17  vco_cap          C48 10n
+	RES_K(100),		// 18  vco_res          R20 100k
+	0,				// 19  pitch_voltage    N/C
+	RES_K(220),		// 20  slf_res          R22 220k
+	CAP_U(1),		// 21  slf_cap          C51 1u/35V
+	CAP_U(0.1),		// 23  oneshot_cap      C53 0.1u
+	RES_K(330)		// 24  oneshot_res      R25 330k
 };
 
 /* Interrupt Generators */
@@ -403,27 +407,27 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 /* Machine Initialization */
 
 /*
-	PIO Channel A
+    PIO Channel A
 
-	0  R	Keyboard Data
-	1  R	Keyboard Data
-	2  R	Keyboard Data
-	3  R	Keyboard Data
-	4  R	Keyboard Data
-	5  R	Keyboard Data
-	6  R	Keyboard Data
-	7  R	Keyboard Strobe
+    0  R    Keyboard Data
+    1  R    Keyboard Data
+    2  R    Keyboard Data
+    3  R    Keyboard Data
+    4  R    Keyboard Data
+    5  R    Keyboard Data
+    6  R    Keyboard Data
+    7  R    Keyboard Strobe
 
-	PIO Channel B
+    PIO Channel B
 
-	0  R	RS-232C RxD
-	1  R	RS-232C _CTS
-	2  R	RS-232C _DCD
-	3  W	RS-232C TxD
-	4  W	RS-232C _RTS
-	5  W	Cassette Motor
-	6  W	Cassette Data
-	7  R	Cassette Data
+    0  R    RS-232C RxD
+    1  R    RS-232C _CTS
+    2  R    RS-232C _DCD
+    3  W    RS-232C TxD
+    4  W    RS-232C _RTS
+    5  W    Cassette Motor
+    6  W    Cassette Data
+    7  R    Cassette Data
 */
 
 static const struct z80_irq_daisy_chain abc80_daisy_chain[] =
@@ -564,7 +568,7 @@ SYSTEM_CONFIG_START( abc80 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
 	CONFIG_DEVICE(abc80_printer_getinfo)
-//	CONFIG_DEVICE(abc80_cassette_getinfo)
+//  CONFIG_DEVICE(abc80_cassette_getinfo)
 	CONFIG_DEVICE(abc80_floppy_getinfo)
 SYSTEM_CONFIG_END
 

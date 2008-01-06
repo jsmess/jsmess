@@ -1,9 +1,20 @@
+/*****************************************************************************
+ *
+ * includes/cgenie.h
+ *
+ ****************************************************************************/
+
+#ifndef CGENIE_H_
+#define CGENIE_H_
+
+
 /*----------- defined in audio/cgenie.c -----------*/
 
 WRITE8_HANDLER ( cgenie_sh_control_port_w );
 WRITE8_HANDLER ( cgenie_sh_data_port_w );
 READ8_HANDLER ( cgenie_sh_control_port_r );
 READ8_HANDLER ( cgenie_sh_data_port_r );
+
 
 /*----------- defined in machine/cgenie.c -----------*/
 
@@ -52,27 +63,30 @@ WRITE8_HANDLER ( cgenie_motor_w );
 int cgenie_videoram_r(int offset);
 WRITE8_HANDLER ( cgenie_videoram_w );
 
-typedef struct {         // CRTC 6845
-        UINT8    cursor_address_lo;
-        UINT8    cursor_address_hi;
-        UINT8    screen_address_lo;
-        UINT8    screen_address_hi;
-        UINT8    cursor_bottom;
-        UINT8    cursor_top;
-        UINT8    scan_lines;
-        UINT8    crt_mode;
-        UINT8    vertical_sync_pos;
-        UINT8    vertical_displayed;
-        UINT8    vertical_adjust;
-        UINT8    vertical_total;
-        UINT8    horizontal_length;
-        UINT8    horizontal_sync_pos;
-        UINT8    horizontal_displayed;
-        UINT8    horizontal_total;
-        UINT8    idx;
-        UINT8    cursor_visible;
-        UINT8    cursor_phase;
+// CRTC 6845
+typedef struct
+{         
+	UINT8    cursor_address_lo;
+	UINT8    cursor_address_hi;
+	UINT8    screen_address_lo;
+	UINT8    screen_address_hi;
+	UINT8    cursor_bottom;
+	UINT8    cursor_top;
+	UINT8    scan_lines;
+	UINT8    crt_mode;
+	UINT8    vertical_sync_pos;
+	UINT8    vertical_displayed;
+	UINT8    vertical_adjust;
+	UINT8    vertical_total;
+	UINT8    horizontal_length;
+	UINT8    horizontal_sync_pos;
+	UINT8    horizontal_displayed;
+	UINT8    horizontal_total;
+	UINT8    idx;
+	UINT8    cursor_visible;
+	UINT8    cursor_phase;
 } CRTC6845;
+
 
 /*----------- defined in video/cgenie.c -----------*/
 
@@ -92,3 +106,5 @@ extern	int 	cgenie_get_register(int indx);
 extern	void	cgenie_mode_select(int graphics);
 extern	void	cgenie_invalidate_range(int l, int h);
 
+
+#endif /* CGENIE_H_ */

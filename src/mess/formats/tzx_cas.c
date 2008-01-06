@@ -46,8 +46,9 @@ We are currently using the numbers from the TZX specification...
 
 */
 
-#include "mame.h"
-#include "tzx_cas.h"
+#include "driver.h"
+#include "formats/tzx_cas.h"
+
 
 #define TZX_WAV_FREQUENCY	44100
 #define WAVE_LOW		-0x5a9e

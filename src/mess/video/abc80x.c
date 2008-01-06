@@ -1,4 +1,13 @@
-#include "abc80x.h"
+/*****************************************************************************
+ *
+ * video/abc80x.c
+ *
+ ****************************************************************************/
+
+#include "driver.h"
+#include "includes/abc80x.h"
+#include "video/crtc6845.h"
+
 
 static tilemap *tx_tilemap;
 static tilemap *tx_tilemap_40;
