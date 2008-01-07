@@ -941,7 +941,7 @@ VIDEO_START( ti99_4ev )
 	VBL interrupt  (mmm...  actually, it happens when the beam enters the lower
 	border, so it is not a genuine VBI, but who cares ?)
 */
-void ti99_vblank_interrupt(void)
+INTERRUPT_GEN( ti99_vblank_interrupt )
 {
 	TMS9928A_interrupt();
 	if (has_handset)
@@ -951,7 +951,7 @@ void ti99_vblank_interrupt(void)
 		mecmouse_poll();
 }
 
-void ti99_4ev_hblank_interrupt(void)
+INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 {
 	static int line_count;
 	v9938_interrupt();

@@ -77,7 +77,7 @@ UINT8 apple2_getfloatingbusvalue(void);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );
 
-void apple2_interrupt(void);
+INTERRUPT_GEN( apple2_interrupt );
 
 void apple2_setvar(UINT32 val, UINT32 mask);
 

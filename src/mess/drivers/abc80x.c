@@ -1012,15 +1012,15 @@ SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
-static offs_t abc800_opbase_handler(offs_t pc)
+static OPBASE_HANDLER( abc800_opbase_handler )
 {
-	if (pc >= 0x7800 && pc < 0x8000)
+	if (address >= 0x7800 && address < 0x8000)
 	{
 		opcode_base = opcode_arg_base = memory_region(REGION_CPU1);
 		return ~0;
 	}
 
-	return pc;
+	return address;
 }
 
 static DRIVER_INIT( abc800 )

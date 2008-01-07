@@ -335,7 +335,7 @@ static void maria_draw_scanline(void)
 }
 
 
-void a7800_interrupt(void)
+INTERRUPT_GEN( a7800_interrupt )
 {
 	int frame_scanline;
 	UINT8 *ROM = memory_region(REGION_CPU1);

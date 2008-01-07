@@ -60,7 +60,7 @@ static MACHINE_RESET(ti990_4)
 }
 
 
-static void ti990_4_line_interrupt(void)
+static INTERRUPT_GEN( ti990_4_line_interrupt )
 {
 #if VIDEO_911
 	vdt911_keyboard(0);

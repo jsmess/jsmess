@@ -25,7 +25,7 @@ DRIVER_INIT( mac_xl );
 
 MACHINE_RESET( lisa );
 
-void lisa_interrupt(void);
+INTERRUPT_GEN( lisa_interrupt );
 
 READ8_HANDLER ( lisa_fdc_io_r );
 WRITE8_HANDLER ( lisa_fdc_io_w );

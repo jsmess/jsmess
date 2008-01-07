@@ -70,23 +70,23 @@ READ8_HANDLER( dgn_beta_page_r );
 WRITE8_HANDLER( dgn_beta_page_w );
 
 // Ram banking handlers.
-void dgnbeta_ram_b0_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b1_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b2_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b3_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b4_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b5_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b6_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b7_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b8_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_b9_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_bA_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_bB_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_bC_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_bD_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_bE_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_bF_w(offs_t offset, UINT8 data);
-void dgnbeta_ram_bG_w(offs_t offset, UINT8 data);
+WRITE8_HANDLER( dgnbeta_ram_b0_w );
+WRITE8_HANDLER( dgnbeta_ram_b1_w );
+WRITE8_HANDLER( dgnbeta_ram_b2_w );
+WRITE8_HANDLER( dgnbeta_ram_b3_w );
+WRITE8_HANDLER( dgnbeta_ram_b4_w );
+WRITE8_HANDLER( dgnbeta_ram_b5_w );
+WRITE8_HANDLER( dgnbeta_ram_b6_w );
+WRITE8_HANDLER( dgnbeta_ram_b7_w );
+WRITE8_HANDLER( dgnbeta_ram_b8_w );
+WRITE8_HANDLER( dgnbeta_ram_b9_w );
+WRITE8_HANDLER( dgnbeta_ram_bA_w );
+WRITE8_HANDLER( dgnbeta_ram_bB_w );
+WRITE8_HANDLER( dgnbeta_ram_bC_w );
+WRITE8_HANDLER( dgnbeta_ram_bD_w );
+WRITE8_HANDLER( dgnbeta_ram_bE_w );
+WRITE8_HANDLER( dgnbeta_ram_bF_w );
+WRITE8_HANDLER( dgnbeta_ram_bG_w );
 
 /*  WD2797 FDC */
 READ8_HANDLER(dgnbeta_wd2797_r);

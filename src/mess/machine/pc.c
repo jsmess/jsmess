@@ -267,27 +267,27 @@ static void pc_generic_frame_interrupt(void (*pc_timer)(void))
 	pc_keyboard();
 }
 
-void pc_mda_frame_interrupt (void)
+INTERRUPT_GEN( pc_mda_frame_interrupt )
 {
 	pc_generic_frame_interrupt(pc_mda_timer);
 }
 
-void pc_cga_frame_interrupt (void)
+INTERRUPT_GEN( pc_cga_frame_interrupt )
 {
 	pc_generic_frame_interrupt(NULL);
 }
 
-void tandy1000_frame_interrupt (void)
+INTERRUPT_GEN( tandy1000_frame_interrupt )
 {
 	pc_generic_frame_interrupt(pc_t1t_timer);
 }
 
-void pc_aga_frame_interrupt (void)
+INTERRUPT_GEN( pc_aga_frame_interrupt )
 {
 	pc_generic_frame_interrupt(pc_aga_timer);
 }
 
-void pc_vga_frame_interrupt (void)
+INTERRUPT_GEN( pc_vga_frame_interrupt )
 {
 	pc_generic_frame_interrupt(NULL /* vga_timer */);
 }

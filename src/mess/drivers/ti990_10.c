@@ -84,7 +84,7 @@ static MACHINE_RESET( ti990_10 )
 	ti990_hdc_init(ti990_set_int13);
 }
 
-static void ti990_10_line_interrupt(void)
+static INTERRUPT_GEN( ti990_10_line_interrupt )
 {
 	vdt911_keyboard(0);
 

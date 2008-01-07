@@ -37,7 +37,7 @@ Source Changes:
 - The core is based on MAME 0.122u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- Conditional logging cleanups.  [Atari Ace]
+- Conditional logging and core callback cleanups.  [Atari Ace]
 
 - Greater use of ATTR_PRINTF.  [Oliver Stoeneberg]
 

@@ -1705,7 +1705,8 @@ DEVICE_LOAD(gb_cart)
 	return INIT_PASS;
 }
 
-void gb_scanline_interrupt (void) {
+INTERRUPT_GEN( gb_scanline_interrupt )
+{
 }
 
 static TIMER_CALLBACK(gb_serial_timer_proc)

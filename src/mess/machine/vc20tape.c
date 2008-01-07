@@ -31,7 +31,7 @@ static struct
 
 	int data;
 	int motor;
-	void (*read_callback) (UINT32, UINT8);
+	write8_handler read_callback;
 
 	int type;						   /* 0 nothing */
 }
@@ -889,7 +889,7 @@ static TIMER_CALLBACK(vc20_prg_timer)
 	vc20_prg_state ();
 }
 
-void vc20_tape_open (void (*read_callback) (UINT32, UINT8))
+void vc20_tape_open (write8_handler read_callback)
 {
 	tape.read_callback = read_callback;
 #ifndef NEW_GAMEDRIVER

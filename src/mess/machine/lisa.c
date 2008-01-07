@@ -1199,7 +1199,7 @@ MACHINE_RESET( lisa )
 	}
 }
 
-void lisa_interrupt(void)
+INTERRUPT_GEN( lisa_interrupt )
 {
 	static int frame_count = 0;
 

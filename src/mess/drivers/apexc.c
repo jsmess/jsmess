@@ -324,7 +324,7 @@ static UINT32 panel_data_reg;	/* value of a data register on the control panel w
 /*
     Not a real interrupt - just handle keyboard input
 */
-static void apexc_interrupt(void)
+static INTERRUPT_GEN( apexc_interrupt )
 {
 	UINT32 edit_keys;
 	int control_keys;

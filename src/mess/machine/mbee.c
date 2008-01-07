@@ -63,7 +63,7 @@ READ8_HANDLER( mbee_lowram_r )
 	return mbee_workram[offset];
 }
 
-static offs_t mbee_opbase_handler(offs_t address)
+static OPBASE_HANDLER( mbee_opbase_handler )
 {
 	if (address > 0x7fff)
 	{
@@ -73,7 +73,7 @@ static offs_t mbee_opbase_handler(offs_t address)
 	return address;
 }
 
-static offs_t mbee56_opbase_handler(offs_t address)
+static OPBASE_HANDLER( mbee56_opbase_handler )
 {
 	if (address > 0xdfff)
 	{
@@ -199,7 +199,7 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 }
 
-void mbee_interrupt(void)
+INTERRUPT_GEN( mbee_interrupt )
 {
     /* once per frame, pulse the PIO B bit 7 */
     logerror("mbee interrupt\n");

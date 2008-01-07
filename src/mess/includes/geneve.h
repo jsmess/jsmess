@@ -45,7 +45,7 @@ MACHINE_START( geneve );
 MACHINE_RESET( geneve );
 
 VIDEO_START( geneve );
-void geneve_hblank_interrupt(void);
+INTERRUPT_GEN( geneve_hblank_interrupt );
 
 READ8_HANDLER ( geneve_r );
 WRITE8_HANDLER ( geneve_w );

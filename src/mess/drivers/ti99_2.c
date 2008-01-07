@@ -107,7 +107,7 @@ static MACHINE_RESET( ti99_2 )
 		memory_set_bankptr(1, TI99_2_32_ROMPAGE0);
 }
 
-static void ti99_2_vblank_interrupt(void)
+static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 {
 	/* We trigger a level-4 interrupt.  The PULSE_LINE is a mere guess. */
 	cpunum_set_input_line(0, 1, PULSE_LINE);

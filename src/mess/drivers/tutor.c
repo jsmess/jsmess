@@ -132,7 +132,7 @@ static MACHINE_RESET(tutor)
 	printer_strobe = 0;
 }
 
-static void tutor_vblank_interrupt(void)
+static INTERRUPT_GEN( tutor_vblank_interrupt )
 {
 	/* No vblank interrupt? */
 	TMS9928A_interrupt();

@@ -757,7 +757,7 @@ static void apple2_reset(running_machine *machine)
  * Apple II interrupt; used to force partial updates
  * ----------------------------------------------------------------------- */
 
-void apple2_interrupt(void)
+INTERRUPT_GEN( apple2_interrupt )
 {
 	int irq_freq = 1;
 	int scanline;

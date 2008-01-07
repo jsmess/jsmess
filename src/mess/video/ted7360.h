@@ -64,8 +64,8 @@ extern WRITE8_HANDLER ( ted7360_port_w );
 extern  READ8_HANDLER  ( ted7360_port_r );
 
 /* to be called each vertical retrace */
-extern void ted7360_frame_interrupt (void);
-extern void ted7360_raster_interrupt (void);
+INTERRUPT_GEN( ted7360_frame_interrupt );
+INTERRUPT_GEN( ted7360_raster_interrupt );
 
 /* private area */
 extern UINT8 ted7360[0x20];

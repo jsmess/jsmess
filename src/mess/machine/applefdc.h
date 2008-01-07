@@ -42,8 +42,8 @@ struct applefdc_interface
 
 
 void applefdc_init(const struct applefdc_interface *intf);
-UINT8 applefdc_r(offs_t offset);
-void applefdc_w(offs_t offset, UINT8 data);
+READ8_HANDLER( applefdc_r );
+WRITE8_HANDLER( applefdc_w );
 UINT8 applefdc_get_lines(void);
 
 

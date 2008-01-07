@@ -12,7 +12,7 @@
 
 VIDEO_START( a7800 );
 VIDEO_UPDATE( a7800 );
-void a7800_interrupt(void);
+INTERRUPT_GEN( a7800_interrupt );
  READ8_HANDLER  ( a7800_MARIA_r);
 WRITE8_HANDLER ( a7800_MARIA_w );
 

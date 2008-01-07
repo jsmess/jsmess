@@ -369,87 +369,87 @@ static void dgn_beta_bank_memory(int offset, int data, int bank)
 	PageRegs[TaskReg][bank].memory[offset]=data;
 }
 
-void dgnbeta_ram_b0_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b0_w )
 {
 	dgn_beta_bank_memory(offset,data,0);
 }
 
-void dgnbeta_ram_b1_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b1_w )
 {
 	dgn_beta_bank_memory(offset,data,1);
 }
 
-void dgnbeta_ram_b2_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b2_w )
 {
 	dgn_beta_bank_memory(offset,data,2);
 }
 
-void dgnbeta_ram_b3_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b3_w )
 {
 	dgn_beta_bank_memory(offset,data,3);
 }
 
-void dgnbeta_ram_b4_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b4_w )
 {
 	dgn_beta_bank_memory(offset,data,4);
 }
 
-void dgnbeta_ram_b5_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b5_w )
 {
 	dgn_beta_bank_memory(offset,data,5);
 }
 
-void dgnbeta_ram_b6_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b6_w )
 {
 	dgn_beta_bank_memory(offset,data,6);
 }
 
-void dgnbeta_ram_b7_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b7_w )
 {
 	dgn_beta_bank_memory(offset,data,7);
 }
 
-void dgnbeta_ram_b8_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b8_w )
 {
 	dgn_beta_bank_memory(offset,data,8);
 }
 
-void dgnbeta_ram_b9_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_b9_w )
 {
 	dgn_beta_bank_memory(offset,data,9);
 }
 
-void dgnbeta_ram_bA_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_bA_w )
 {
 	dgn_beta_bank_memory(offset,data,10);
 }
 
-void dgnbeta_ram_bB_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_bB_w )
 {
 	dgn_beta_bank_memory(offset,data,11);
 }
 
-void dgnbeta_ram_bC_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_bC_w )
 {
 	dgn_beta_bank_memory(offset,data,12);
 }
 
-void dgnbeta_ram_bD_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_bD_w )
 {
 	dgn_beta_bank_memory(offset,data,13);
 }
 
-void dgnbeta_ram_bE_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_bE_w )
 {
 	dgn_beta_bank_memory(offset,data,14);
 }
 
-void dgnbeta_ram_bF_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_bF_w )
 {
 	dgn_beta_bank_memory(offset,data,15);
 }
 
-void dgnbeta_ram_bG_w(offs_t offset, UINT8 data)
+WRITE8_HANDLER( dgnbeta_ram_bG_w )
 {
 	dgn_beta_bank_memory(offset,data,16);
 }

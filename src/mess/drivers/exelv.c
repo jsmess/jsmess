@@ -71,7 +71,7 @@ static MACHINE_RESET( exelv )
 	io_reset();
 }
 
-static void exelv_hblank_interrupt(void)
+static INTERRUPT_GEN( exelv_hblank_interrupt )
 {
 	tms3556_interrupt();
 }

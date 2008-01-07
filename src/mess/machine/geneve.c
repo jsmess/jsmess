@@ -325,7 +325,7 @@ VIDEO_START(geneve)
 /*
 	scanline interrupt
 */
-void geneve_hblank_interrupt(void)
+INTERRUPT_GEN( geneve_hblank_interrupt )
 {
 	static int line_count;
 	v9938_interrupt();

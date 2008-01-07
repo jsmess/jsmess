@@ -857,7 +857,7 @@ static UINT8 psg_b_inp = 0x00;
 	return psg_a_inp;
 }
 
-UINT8 cgenie_psg_port_b_r(offs_t port)
+ READ8_HANDLER( cgenie_psg_port_b_r )
 {
 	if( psg_a_out < 0xd0 )
 	{

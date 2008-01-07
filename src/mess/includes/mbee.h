@@ -17,7 +17,7 @@ MACHINE_START( mbee56 );
 extern UINT8 *mbee_workram;
 READ8_HANDLER( mbee_lowram_r );
 
-void mbee_interrupt(void);
+INTERRUPT_GEN( mbee_interrupt );
 
 DEVICE_LOAD( mbee_cart );
 
