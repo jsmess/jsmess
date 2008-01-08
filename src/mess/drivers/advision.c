@@ -2,7 +2,7 @@
 
     drivers/advision.c
 
-    Driver for the Entex Adventurevision
+    Driver for the Entex Adventure Vision
 
 **************************************************************************/
 
@@ -55,9 +55,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( advision_ports, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff)         AM_READWRITE(advision_MAINRAM_r, advision_MAINRAM_w)
-	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(advision_getp1, advision_putp1)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(advision_getp2, advision_putp2)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(advision_gett0)
+	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(advision_controller_r, advision_bankswitch_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(advision_av_control_w)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(advision_gett1)
 ADDRESS_MAP_END
 
@@ -167,5 +166,5 @@ SYSTEM_CONFIG_END
  *
  *************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT    CONFIG      COMPANY   FULLNAME */
-CONS( 1982, advision,	0,		0,		advision, advision,	0,		advision,	"Entex",  "Adventurevision", 0 )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY   FULLNAME */
+CONS( 1982, advision,	0,		0,		advision, advision,	advision,	advision,	"Entex",  "Adventure Vision", 0 )

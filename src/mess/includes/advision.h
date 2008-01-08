@@ -14,16 +14,19 @@ extern int advision_framestart;
 /*extern int advision_videoenable;*/
 extern int advision_videobank;
 
+DRIVER_INIT( advision );
 MACHINE_RESET( advision );
 READ8_HANDLER ( advision_MAINRAM_r);
 WRITE8_HANDLER( advision_MAINRAM_w );
-WRITE8_HANDLER( advision_putp1 );
-WRITE8_HANDLER( advision_putp2 );
-READ8_HANDLER ( advision_getp1 );
-READ8_HANDLER ( advision_getp2 );
-READ8_HANDLER ( advision_gett0 );
-READ8_HANDLER ( advision_gett1 );
 
+/* Port P1 */
+READ8_HANDLER( advision_controller_r );
+WRITE8_HANDLER( advision_bankswitch_w );
+
+/* Port P2 */
+WRITE8_HANDLER( advision_av_control_w );
+
+READ8_HANDLER ( advision_gett1 );
 READ8_HANDLER ( advision_getL );
 WRITE8_HANDLER ( advision_putG );
 WRITE8_HANDLER ( advision_putD );
