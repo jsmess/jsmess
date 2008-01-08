@@ -616,17 +616,15 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY     FULLNAME                                FLAGS */
-CONS( 1990, sms,        0,          0,      sms2ntsc,   sms,    0,      sms,        "Sega",     "Sega Master System II",                FLAG_BIOS_FULL )
-CONS( 1986, sms1,       sms,        0,      sms1ntsc,   sms,    0,      sms,        "Sega",     "Sega Master System I",                 FLAG_BIOS_FULL )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY     FULLNAME                            FLAGS */
+CONS( 1984, sg1000m3,   sms,        0,      smsfm,      sms,    0,      sg1000,     "Sega",     "SG-1000 Mark III",                 FLAG_REGION_JAPAN | FLAG_FM )
+CONS( 1986, sms1,       sms,        0,      sms1ntsc,   sms,    0,      sms,        "Sega",     "Master System I",                  FLAG_BIOS_FULL )
+CONS( 1986, sms1pal,    sms,        0,      sms1pal,    sms,    0,      sms,        "Sega",     "Master System I (PAL)" ,           FLAG_BIOS_FULL )
+CONS( 1986, smssdisp,   sms,        0,      smssdisp,   sms,    0,      smssdisp,   "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
+CONS( 1987, smsj,       sms,        0,      smsfm,      sms,    0,      sms,        "Sega",     "Master System (Japan)",            FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
+CONS( 1990, sms,        0,          0,      sms2ntsc,   sms,    0,      sms,        "Sega",     "Master System II",                 FLAG_BIOS_FULL )
+CONS( 1990, smspal,     sms,        0,      sms2pal,    sms,    0,      sms,        "Sega",     "Master System II (PAL)",           FLAG_BIOS_FULL )
+CONS( 1990, sms2kr,     sms,        0,      sms2fm,     sms,    0,      sms,        "Samsung",  "Gam*Boy II (Korea)",               FLAG_REGION_JAPAN | FLAG_BIOS_FULL | FLAG_FM )
 
-CONS( 1986, sms1pal,    sms,        0,      sms1pal,    sms,    0,      sms,        "Sega",     "Sega Master System I (PAL)" ,          FLAG_BIOS_FULL )
-CONS( 1990, smspal,     sms,        0,      sms2pal,    sms,    0,      sms,        "Sega",     "Sega Master System II (PAL)",          FLAG_BIOS_FULL )
-CONS( 1984, sg1000m3,   sms,        0,      smsfm,      sms,    0,      sg1000,     "Sega",     "Sega SG-1000 Mark III",                FLAG_REGION_JAPAN | FLAG_FM )
-CONS( 1987, smsj,       sms,        0,      smsfm,      sms,    0,      sms,        "Sega",     "Sega Master System (Japan)",           FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
-CONS( 1990, sms2kr,     sms,        0,      sms2fm,     sms,    0,      sms,        "Samsung",  "Samsung Gam*Boy II (Korea)",           FLAG_REGION_JAPAN | FLAG_BIOS_FULL | FLAG_FM )
-
-CONS( 1986, smssdisp,   sms,        0,      smssdisp,   sms,    0,      smssdisp,   "Sega",     "Sega Master System Store Display",     GAME_NOT_WORKING )
-
-CONS( 1990, gamegear,   0,          sms,    gamegear,   sms,    0,      gamegear,   "Sega",     "Sega Game Gear - European/American",   FLAG_GAMEGEAR )
-CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,   sms,    0,      gamegear,   "Sega",     "Sega Game Gear - Japanese",            FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400 )
+CONS( 1990, gamegear,   0,          sms,    gamegear,   sms,    0,      gamegear,   "Sega",     "Game Gear (Europe/America)",       FLAG_GAMEGEAR )
+CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,   sms,    0,      gamegear,   "Sega",     "Game Gear (Japan)",                FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400 )
