@@ -13,6 +13,8 @@ System Driver Changes:
 - [GBPOCKET] Fixed video startup state to match that of a real unit.  [Wilbert
   Pol]
 
+- [ORIC] Fixed tape loading.  (bug #241) [Wilbert Pol]
+
 - [TI99/GENEVE] More floppy cleanups; fixed TI99_8 regression and made the
   floppy drive usable.  (bug #1450)  [Michael Zapf]
 
