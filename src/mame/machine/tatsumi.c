@@ -352,7 +352,8 @@ READ8_HANDLER(tatsumi_hack_ym2151_r)
 	int r=YM2151_status_port_0_r(0);
 
 	if (activecpu_get_pc()==0x2aca || activecpu_get_pc()==0x29fe
-		|| activecpu_get_pc()==0xf9721)
+		|| activecpu_get_pc()==0xf9721
+		|| activecpu_get_pc()==0x1b96 || activecpu_get_pc()==0x1c65) // BigFight
 		return 0x80;
 	return r;
 }
@@ -365,9 +366,12 @@ READ8_HANDLER(tatsumi_hack_oki_r)
 
 	if (activecpu_get_pc()==0x2b70 || activecpu_get_pc()==0x2bb5
 		|| activecpu_get_pc()==0x2acc
+		|| activecpu_get_pc()==0x1c79 // BigFight
+		|| activecpu_get_pc()==0x1cbe // BigFight
 		|| activecpu_get_pc()==0xf9881)
 		return 0xf;
-	if (activecpu_get_pc()==0x2ba3 || activecpu_get_pc()==0x2a9b || activecpu_get_pc()==0x2adc)
+	if (activecpu_get_pc()==0x2ba3 || activecpu_get_pc()==0x2a9b || activecpu_get_pc()==0x2adc
+		|| activecpu_get_pc()==0x1cac) // BigFight
 		return 0;
 	return r;
 }

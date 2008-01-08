@@ -4,7 +4,7 @@
 
     x64 MIPS III recompiler.
 
-    Copyright (c) 2007, Aaron Giles
+    Copyright Aaron Giles
     Released for general use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -482,6 +482,7 @@ static void mips3drc_exit(void)
 		}
 	}
 #endif
+	drc_exit(mips3.drc);
 }
 
 
@@ -1852,7 +1853,7 @@ static void append_recover_ccr31(drc_core *drc)
 
 static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
-	emit_link link1, link2;
+	emit_link link1, link2, link3 = { 0 };
 
 	emit_mov_r32_m32(DRCTOP, REG_EAX, CPR0ADDR(COP0_Cause));								// mov  eax,[Cause]
 	emit_and_r32_m32(DRCTOP, REG_EAX, CPR0ADDR(COP0_Status));								// and  eax,[Status]
@@ -1864,12 +1865,15 @@ static void append_check_interrupts(drc_core *drc, compiler_state *compiler, con
 	if (desc == NULL)
 	{
 		emit_mov_r32_m32(DRCTOP, REG_P1, MDRC(drc->pcptr));									// mov  p1,[pc]
-		emit_jcc(DRCTOP, COND_Z, mips3.drcdata->generate_interrupt_exception);				// jz   generate_interrupt_exception
+		emit_jcc_short_link(DRCTOP, COND_NZ, &link3);										// jnz  skip
+		emit_jmp_m64(DRCTOP, MDRC(&mips3.drcdata->generate_interrupt_exception));			// jmp  generate_interrupt_exception
 	}
 	else
 		oob_request_callback(drc, COND_Z, oob_interrupt_cleanup, compiler, desc, mips3.drcdata->generate_interrupt_exception);
 	resolve_link(DRCTOP, &link1);														// skip:
 	resolve_link(DRCTOP, &link2);
+	if (desc == NULL)
+		resolve_link(DRCTOP, &link3);
 }
 
 
@@ -3033,7 +3037,7 @@ static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 			emit_mov_r32_m32(DRCTOP, REG_EDX, CPR0ADDR(COP0_Status));						// mov  edx,[Status]
 			emit_mov_m32_r32(DRCTOP, CPR0ADDR(COP0_Status), REG_EAX);						// mov  [Status],eax
 			emit_xor_r32_r32(DRCTOP, REG_EDX, REG_EAX);										// xor  edx,eax
-			emit_test_r32_imm(DRCTOP, REG_EDX, 0x8000);										// test edx,0x8000
+			emit_test_r32_imm(DRCTOP, REG_EDX, SR_IMEX5);										// test edx,0x8000
 			emit_jcc_short_link(DRCTOP, COND_Z, &link1);									// jz   skip
 			emit_lea_r64_m64(DRCTOP, REG_P1, COREADDR);										// lea  p1,[mips3.core]
 			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->mips3com_update_cycle_counting));	// call mips3com_update_cycle_counting

@@ -4,7 +4,7 @@
 
     Controls execution of the core MAME system.
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
@@ -1162,7 +1162,6 @@ void CLIB_DECL popmessage(const char *format, ...)
 	/* otherwise, generate the buffer and call the UI to display the message */
 	else
 	{
-		extern void CLIB_DECL ui_popup(const char *format, ...) ATTR_PRINTF(1,2);
 		va_list arg;
 
 		/* dump to the buffer */

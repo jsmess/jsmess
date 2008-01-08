@@ -2,7 +2,7 @@
 //
 //  input.c - Win32 implementation of MAME input routines
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
@@ -1095,8 +1095,8 @@ static void dinput_exit(running_machine *machine)
 	// release all our devices
 	while (joystick_list != NULL && joystick_list->dinput.device != NULL)
 		dinput_device_release(joystick_list);
-	while (lightgun_list != NULL && lightgun_list->dinput.device != NULL)
-		dinput_device_release(lightgun_list);
+	while (lightgun_list != NULL)
+		generic_device_free(lightgun_list);
 	while (mouse_list != NULL && mouse_list->dinput.device != NULL)
 		dinput_device_release(mouse_list);
 	while (keyboard_list != NULL && keyboard_list->dinput.device != NULL)

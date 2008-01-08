@@ -28,8 +28,8 @@ P0-125A ; KE (Namco)    1996    Kosodate Quiz My Angel                  Namco
 P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
 P0-142A                 1999    Puzzle De Bowling                       Nihon System / Moss
 P0-142A + extra parts   2000    Penguin Brothers                        Subsino
-B0-003B                 2000    Deer Hunting USA                        Sammy
-B0-003B                 2001    Turkey Hunting USA                      Sammy
+B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
+B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 -------------------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ Notes:  pzlbowl PCB with extra parts:
 
 Sammy USA Outdoor Shooting Series PCB
 
-PCB B0-003B:
+PCB B0-003A (or B0-003B):
    Deer Hunting USA (c) 2000 Sammy USA
    Turkey Hunting USA (c) 2001 Sammy USA
 
@@ -197,11 +197,11 @@ PCB B0-010A:
 EEPROM: 93LC46BX (1K Low-power 64 x 16-bit organization serial EEPROM)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Lattice ispLSI2032
-        Lattice isp1016E (2 for PCB B0-010A, used for light gun input)
+        Lattice ispLSI2032 - stamped "KW001"
+        Lattice isp1016E - stamped "GUN" (2 for PCB B0-010A, used for light gun input)
         BAT1 - CR2032 3Volt
 
-PCB Number: B0-003B
+PCB Number: B0-003A (or B0-003B)
 +-----------------------------------------------------------+
 |             VOL                          +------+         |
 |                                          |X1-010|     M1  |
@@ -2082,10 +2082,10 @@ ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 	ROM_LOAD16_BYTE( "asx907e01.u07", 0x000001, 0x100000, CRC(7c67b502) SHA1(6a0e8883a115dac4095d86897e7eca2a007a1c71) )
 
 	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD( "asx901m01.u38", 0x0000000, 0x800000, BAD_DUMP CRC(23125c93) SHA1(c8735ac43bc67c52cb78ad5bca74fa2082dda040) )
-	ROM_LOAD( "asx902m01.u39", 0x0800000, 0x800000, BAD_DUMP CRC(6e7330dd) SHA1(4a8590e9b8fe4767f7a25760bfe499792948a7ae) )
-	ROM_LOAD( "asx903m01.u40", 0x1000000, 0x800000, BAD_DUMP CRC(5f86c322) SHA1(5a72adb99eea176199f172384cb051e2b045ab94) )
-	ROM_LOAD( "asx904m01.u41", 0x1800000, 0x800000, BAD_DUMP CRC(6177f644) SHA1(120fe32518d133f03176db68f18c8175c1a81b27) )
+	ROM_LOAD( "asx901m01.u38", 0x0000000, 0x800000, CRC(eabd3f44) SHA1(5a1ac986d11a8b019e18761cf4ea0a6f49fbdbfc) )
+	ROM_LOAD( "asx902m01.u39", 0x0800000, 0x800000, CRC(c32130c8) SHA1(70d56ebed1f51657aaee02f95ac51589733e6eb7) )
+	ROM_LOAD( "asx903m01.u40", 0x1000000, 0x800000, CRC(5f86c322) SHA1(5a72adb99eea176199f172384cb051e2b045ab94) )
+	ROM_LOAD( "asx904m01.u41", 0x1800000, 0x800000, CRC(c77e0b66) SHA1(0eba30e62e4bd38c198fa6cb69fb94d002ded77a) )
 
 	ROM_REGION( 0x500000, REGION_SOUND1, 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */

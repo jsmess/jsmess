@@ -4,7 +4,7 @@
 #
 #   Core makefile for building MAME and derivatives
 #
-#   Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+#   Copyright (c) Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
 ###########################################################################
@@ -314,7 +314,6 @@ CFLAGS += -O$(OPTIMIZE)
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
 CFLAGS += -Werror $(ARCHOPTS) -fno-strict-aliasing
-#CFLAGS += $(ARCHOPTS) -fno-strict-aliasing
 endif
 
 # if symbols are on, make sure we have frame pointers

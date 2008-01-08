@@ -2553,7 +2553,7 @@ static int rsp_execute(int cycles)
 
 	if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
 	{
-		rsp_icount = 0;
+		rsp_icount = MIN(rsp_icount, 0);
 	}
 
 	while (rsp_icount > 0)
@@ -2589,7 +2589,7 @@ static int rsp_execute(int cycles)
 					case 0x0d:	/* BREAK */
 					{
 						(config->sp_set_status)(0x3);
-						rsp_icount = 1;
+						rsp_icount = MIN(rsp_icount, 1);
 
 #if LOG_INSTRUCTION_EXECUTION
 						fprintf(exec_output, "\n---------- break ----------\n\n");
@@ -2788,7 +2788,7 @@ static int rsp_execute(int cycles)
 
 		if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
 		{
-			rsp_icount = 0;
+			rsp_icount = MIN(rsp_icount, 0);
 		}
 
 	}
@@ -2961,7 +2961,7 @@ void rsp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "RSP");					break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 2005");	break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team");	break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 

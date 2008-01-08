@@ -4,7 +4,7 @@
 #
 #   MAME emulation core makefile
 #
-#   Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+#   Copyright Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
 ###########################################################################
@@ -161,6 +161,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/x76f041.o \
 	$(EMUMACHINE)/x76f100.o \
 	$(EMUMACHINE)/z80ctc.o \
+	$(EMUMACHINE)/z80dma.o \
 	$(EMUMACHINE)/z80pio.o \
 	$(EMUMACHINE)/z80sio.o \
 

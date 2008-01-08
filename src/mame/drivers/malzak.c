@@ -55,26 +55,6 @@ VIDEO_START( malzak );
 VIDEO_UPDATE( malzak );
 WRITE8_HANDLER( playfield_w );
 
-static READ8_HANDLER( malzak_s2636_1_r )
-{
-	return s2636_1_ram[offset];
-}
-
-static READ8_HANDLER( malzak_s2636_2_r )
-{
-	return s2636_2_ram[offset];
-}
-
-static WRITE8_HANDLER( malzak_s2636_1_w )
-{
-	s2636_w(s2636_1_ram,offset,data,s2636_1_dirty);
-}
-
-static WRITE8_HANDLER( malzak_s2636_2_w )
-{
-	s2636_w(s2636_2_ram,offset,data,s2636_2_dirty);
-}
-
 
 static READ8_HANDLER( saa5050_r )
 {
@@ -144,8 +124,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1200, 0x12ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1300, 0x13ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x14cb, 0x14cb) AM_READ(fake_VRLE_r)
-	AM_RANGE(0x1400, 0x14ff) AM_READ(malzak_s2636_1_r)
-	AM_RANGE(0x1500, 0x15ff) AM_READ(malzak_s2636_2_r)
+	AM_RANGE(0x1400, 0x14ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x1500, 0x15ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1600, 0x16ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1700, 0x17ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1800, 0x1fff) AM_READ(saa5050_r)  // SAA 5050 video RAM
@@ -164,8 +144,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1100, 0x11ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1200, 0x12ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1300, 0x13ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1400, 0x14ff) AM_WRITE(malzak_s2636_1_w)
-	AM_RANGE(0x1500, 0x15ff) AM_WRITE(malzak_s2636_2_w)
+	AM_RANGE(0x1400, 0x14ff) AM_WRITE(MWA8_RAM) AM_BASE(&s2636_1_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_WRITE(MWA8_RAM) AM_BASE(&s2636_2_ram)
 	AM_RANGE(0x1600, 0x16ff) AM_WRITE(playfield_w)
 	AM_RANGE(0x1600, 0x16ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1700, 0x17ff) AM_WRITE(MWA8_RAM)
@@ -187,8 +167,8 @@ static ADDRESS_MAP_START( malzak2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1300, 0x13ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x14cb, 0x14cb) AM_READ(fake_VRLE_r)
 	AM_RANGE(0x14cc, 0x14cc) AM_READ(s2636_portA_r)
-	AM_RANGE(0x1400, 0x14ff) AM_READ(malzak_s2636_1_r)
-	AM_RANGE(0x1500, 0x15ff) AM_READ(malzak_s2636_2_r)
+	AM_RANGE(0x1400, 0x14ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x1500, 0x15ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1600, 0x16ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1700, 0x17ff) AM_READ(MRA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x1800, 0x1fff) AM_READ(saa5050_r)  // SAA 5050 video RAM
@@ -207,8 +187,8 @@ static ADDRESS_MAP_START( malzak2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1100, 0x11ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1200, 0x12ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1300, 0x13ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1400, 0x14ff) AM_WRITE(malzak_s2636_1_w)
-	AM_RANGE(0x1500, 0x15ff) AM_WRITE(malzak_s2636_2_w)
+	AM_RANGE(0x1400, 0x14ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x1500, 0x15ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1600, 0x16ff) AM_WRITE(playfield_w)
 	AM_RANGE(0x1600, 0x16ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1700, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
@@ -344,17 +324,6 @@ static const gfx_layout charlayout =
 //  8*8
 };
 
-static const gfx_layout s2636_character10 =
-{
-	8,10,
-	5,
-	1,
-	{ 0 },
-	{ 0,1,2,3,4,5,6,7 },
-   	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	8*16
-};
-
 static const gfx_layout saa5050_charlayout =
 {
 	6, 10,
@@ -393,12 +362,12 @@ static const gfx_layout saa5050_lolayout =
 
 //add s2636 decodes here (i.e. from zac2650) and maybe re-arrange them
 static GFXDECODE_START( malzak )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 16 )
-  	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_character10, 0, 8 )	/* s2636 #1  */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_character10, 0, 8 )	/* s2636 #2  */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_charlayout, 0, 128)
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_hilayout, 0, 128)
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_lolayout, 0, 128)
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,         0,  16 )
+  	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_gfx_layout,   0,   8 )	/* s2636 #1  */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_gfx_layout,   0,   8 )	/* s2636 #2  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_charlayout, 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_hilayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_lolayout,   0, 128 )
 GFXDECODE_END
 
 

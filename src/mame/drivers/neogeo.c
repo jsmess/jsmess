@@ -85,6 +85,8 @@
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 
+#include "neogeo.lh"
+
 
 #define LOG_VIDEO_SYSTEM		(0)
 #define LOG_CPU_COMM			(0)
@@ -99,7 +101,7 @@
  *
  *************************************/
 
-static UINT8 display_poisition_interrupt_control;
+static UINT8 display_position_interrupt_control;
 static UINT32 display_counter;
 static UINT32 vblank_interrupt_pending;
 static UINT32 display_position_interrupt_pending;
@@ -167,9 +169,9 @@ static void adjust_display_position_interrupt_timer(void)
 }
 
 
-void neogeo_set_display_poisition_interrupt_control(UINT16 data)
+void neogeo_set_display_position_interrupt_control(UINT16 data)
 {
-	display_poisition_interrupt_control = data;
+	display_position_interrupt_control = data;
 }
 
 
@@ -187,7 +189,7 @@ void neogeo_set_display_counter_lsb(UINT16 data)
 
 	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", activecpu_get_pc(), display_counter);
 
-	if (display_poisition_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
+	if (display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_RELATIVE ");
  		adjust_display_position_interrupt_timer();
@@ -225,7 +227,7 @@ void neogeo_acknowledge_interrupt(UINT16 data)
 static TIMER_CALLBACK( display_position_interrupt_callback )
 {
 	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
-	if (display_poisition_interrupt_control & IRQ2CTRL_ENABLE)
+	if (display_position_interrupt_control & IRQ2CTRL_ENABLE)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 		display_position_interrupt_pending = 1;
@@ -233,7 +235,7 @@ static TIMER_CALLBACK( display_position_interrupt_callback )
 		update_interrupts();
 	}
 
-	if (display_poisition_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
+	if (display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_REPEAT ");
 		adjust_display_position_interrupt_timer();
@@ -243,7 +245,7 @@ static TIMER_CALLBACK( display_position_interrupt_callback )
 
 static TIMER_CALLBACK( display_position_vblank_callback )
 {
-	if (display_poisition_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
+	if (display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_VBLANK ");
 		adjust_display_position_interrupt_timer();
@@ -964,7 +966,7 @@ static MACHINE_START( neogeo )
 	irq3_pending = 1;
 
 	/* register state save */
-	state_save_register_global(display_poisition_interrupt_control);
+	state_save_register_global(display_position_interrupt_control);
 	state_save_register_global(display_counter);
 	state_save_register_global(vblank_interrupt_pending);
 	state_save_register_global(display_position_interrupt_pending);
@@ -1242,6 +1244,7 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_VIDEO_START(neogeo)
 	MDRV_VIDEO_RESET(neogeo)
 	MDRV_VIDEO_UPDATE(neogeo)
+	MDRV_DEFAULT_LAYOUT(layout_neogeo)
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1257,29 +1260,6 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 MACHINE_DRIVER_END
-
-
-/*
- *  A large number of the software produced for the
- *  system expects the visible display width to be 304 pixels
- *  and displays garbage in the left and right most 8 pixel
- *  columns.  This machine driver sets a smaller visible area
- *  to hide the garbage.
- *
- *  I don't like to do this, but I don't like the idea of the
- *  bug reports we'd get if we didn't
- */
-
-static MACHINE_DRIVER_START( neogeo_s )
-
-	MDRV_IMPORT_FROM(neogeo)
-
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_DEFAULT_POSITION((float)NEOGEO_HTOTAL / (NEOGEO_HTOTAL - 20), 0.0, 1.0, 0.0)
-
-MACHINE_DRIVER_END
-
-
 
 /*************************************
  *

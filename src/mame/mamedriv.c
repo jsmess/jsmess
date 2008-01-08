@@ -2,7 +2,7 @@
 
     mamedriv.c
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
     The list of all available drivers. Drivers have to be included here to be
@@ -688,8 +688,9 @@ const game_driver * const drivers[] =
 	DRIVER( shadowld )	/* (c) 1987 */
 	DRIVER( youkaidk )	/* (c) 1987 (Japan new version) */
 	DRIVER( yokaidko )	/* (c) 1987 (Japan old version) */
-	DRIVER( dspirit )	/* (c) 1987 new version */
-	DRIVER( dspirito )	/* (c) 1987 old version */
+	DRIVER( dspirit )	/* (c) 1987 (Japan new version) */
+	DRIVER( dspirito )	/* (c) 1987 (Japan old version) */
+	DRIVER( dspirita )	/* (c) 1987 (Atari license) */
 	DRIVER( blazer )	/* (c) 1987 (Japan) */
 	DRIVER( quester )	/* (c) 1987 (Japan) */
 	DRIVER( pacmania )	/* (c) 1987 */
@@ -1991,13 +1992,14 @@ const game_driver * const drivers[] =
 	DRIVER( commandw )	/* prototype */
 
 	/* Taito JC System */
-	DRIVER( landgear )	/* E17 (c) 199? Taito Corporation */
-	DRIVER( dendeg )	/* E35 (c) 199? Taito Corporation */
-	DRIVER( dendegx )	/* E35 (c) 199? Taito Corporation */
-	DRIVER( dendeg2 )	/* E52 (c) 199? Taito Corporation */
-	DRIVER( dendeg2x )	/* E52 (c) 199? Taito Corporation */
-	DRIVER( sidebs )	/* E23 (c) 199? Taito Corporation */
-	DRIVER( sidebs2 )	/* E38 (c) 199? Taito Corporation */
+	DRIVER( landgear )	/* E17 (c) 1995 Taito Corporation */
+	DRIVER( dendeg )	/* E35 (c) 1996 Taito Corporation */
+	DRIVER( dendegx )	/* E35 (c) 1996 Taito Corporation */
+	DRIVER( dendeg2 )	/* E52 (c) 1998 Taito Corporation */
+	DRIVER( dendeg2x )	/* E52 (c) 1998 Taito Corporation */
+	DRIVER( sidebs )	/* E23 (c) 1996 Taito Corporation */
+	DRIVER( sidebs2 )	/* E38 (c) 1997 Taito Corporation */
+	DRIVER( dangcurv )	/* E09 (c) 1995 Taito Corporation */
 
 	/* Taito "Wolf" System */
 	DRIVER( pf2012 )	/* E59 (c) 1997 Taito */
@@ -6015,7 +6017,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Midway Zeus games */
 	DRIVER( mk4 )		/* (c) 1997 Midway */
 	DRIVER( mk4a )		/* (c) 1997 Midway */
-	DRIVER( invasn )	/* (c) 1999 Midway */
+	DRIVER( invasnab )	/* (c) 1999 Midway */
+	DRIVER( invasnv4 )	/* (c) 1999 Midway */
 	DRIVER( crusnexo )	/* (c) 1999 Midway */
 	DRIVER( thegrid )	/* (c) 2001 Midway */
 
@@ -7313,10 +7316,16 @@ Other Sun games
 	DRIVER( hiryuken )	/* (c) 1985 Taito */
 
 	/* Tatsumi Games */
-	DRIVER( lockon )	/* (c) 1986 */
-	DRIVER( apache3 )	/* (c) 1988 */
-	DRIVER( roundup5 )	/* (c) 1989 */
-	DRIVER( cyclwarr )	/* (c) 1991 */
+	DRIVER( tx1 )		/* (c) 1983 Tatsumi */
+	DRIVER( tx1a )		/* (c) 1983 Tatsumi */
+	DRIVER( buggyboy )	/* (c) 1985 Tatsumi */
+	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
+	DRIVER( lockon )	/* (c) 1986 Tatsumi */
+	/* Gray Out */		/* (c) 1987 Tatsumi */
+	DRIVER( apache3 )	/* (c) 1988 Tatsumi */
+	DRIVER( roundup5 )	/* (c) 1989 Tatsumi */
+	DRIVER( cyclwarr )	/* (c) 1991 Tatsumi */
+	DRIVER( bigfight )	/* (c) 1992 Tatsumi */
 
 	/* Electronic Devices */
 	DRIVER( mugsmash )	/* (c) Electronic Devices (Italy) / 3D Games (England) */
@@ -7501,10 +7510,6 @@ Other Sun games
 	DRIVER( mosaic )	/* (c) 1990 Space */
 	DRIVER( mosaica )	/* (c) 1990 Space + Fuuki license */
 	DRIVER( gfire2 )	/* (c) 1992 Topis Corp */
-	DRIVER( tx1 )		/* (c) 1983 Tatsumi */
-	DRIVER( tx1a )		/* (c) 1983 Tatsumi */
-	DRIVER( buggyboy )	/* (c) 1985 Tatsumi */
-	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
 	DRIVER( sprcros2 )	/* (c) 1986 GM Shoji */
 	DRIVER( sprcrs2a )	/* (c) 1986 GM Shoji */
 	DRIVER( gcpinbal )	/* (c) 1994 Excellent System */

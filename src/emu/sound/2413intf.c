@@ -57,7 +57,7 @@ static void *ym2413_start(int sndindex, int clock, const void *config)
 	memset(info, 0, sizeof(*info));
 
 	/* emulator create */
-	info->chip = YM2413Init(clock, rate);
+	info->chip = YM2413Init(clock, rate, sndindex);
 	if (!info->chip)
 		return NULL;
 
@@ -181,6 +181,6 @@ void ym2413_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
 		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004, The MAME Team"; break;
+		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }

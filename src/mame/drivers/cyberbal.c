@@ -1006,21 +1006,21 @@ static const UINT16 default_eeprom[] =
 static DRIVER_INIT( cyberbal )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarigen_slapstic_init(0, 0x018000, 0);
+	atarigen_slapstic_init(0, 0x018000, 0, 0);
 }
 
 
 static DRIVER_INIT( cyberbt )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarigen_slapstic_init(0, 0x018000, 116);
+	atarigen_slapstic_init(0, 0x018000, 0, 116);
 }
 
 
 static DRIVER_INIT( cyberb2p )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarijsa_init(1, 3, 2, 0x8000);
+	atarijsa_init(machine, 2, 0x8000);
 }
 
 

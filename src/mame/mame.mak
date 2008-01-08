@@ -4,7 +4,7 @@
 #
 #   MAME target makefile
 #
-#   Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+#   Copyright Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
 ###########################################################################
@@ -1684,6 +1684,8 @@ $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 $(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
 
 $(DRIVERS)/nbmj8688.o:	$(LAYOUT)/nbmj8688.lh
+
+$(DRIVERS)/neogeo.o:	$(LAYOUT)/neogeo.lh
 
 $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
 						$(LAYOUT)/pe_schip.lh \

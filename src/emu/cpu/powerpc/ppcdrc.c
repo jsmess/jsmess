@@ -1101,7 +1101,7 @@ static void ppcdrc403_exit(void)
 #if LOG_CODE
 	//if (symfile) fclose(symfile);
 #endif
-	drc_exit(ppc.drc);
+	ppcdrc_exit();
 }
 
 static void ppcdrc403_reset(void)
@@ -1343,7 +1343,7 @@ static void ppcdrc603_exit(void)
 #if LOG_CODE
 	//if (symfile) fclose(symfile);
 #endif
-	drc_exit(ppc.drc);
+	ppcdrc_exit();
 }
 #endif
 
@@ -1534,7 +1534,7 @@ static void ppcdrc602_exit(void)
 #if LOG_CODE
 	//if (symfile) fclose(symfile);
 #endif
-	drc_exit(ppc.drc);
+	ppcdrc_exit();
 }
 
 static void ppcdrc602_reset(void)
@@ -1718,7 +1718,7 @@ static void mpc8240drc_init(int index, int clock, const void *_config, int (*irq
 
 static void mpc8240drc_exit(void)
 {
-
+	ppcdrc_exit();
 }
 #endif
 
@@ -1865,7 +1865,7 @@ static void ppc601drc_exit(void)
 #if LOG_CODE
 	//if (symfile) fclose(symfile);
 #endif
-	drc_exit(ppc.drc);
+	ppcdrc_exit();
 }
 #endif
 
@@ -1998,7 +1998,7 @@ static void ppc604drc_exit(void)
 #if LOG_CODE
 	//if (symfile) fclose(symfile);
 #endif
-	drc_exit(ppc.drc);
+	ppcdrc_exit();
 }
 #endif
 
@@ -2162,7 +2162,7 @@ static void ppc_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "PowerPC");				break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 2004");	break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team");	break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 

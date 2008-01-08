@@ -2,7 +2,7 @@
 
     CHD compression frontend
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
@@ -145,7 +145,7 @@ static char *big_int_string(UINT64 intvalue)
     progress - generic progress callback
 -------------------------------------------------*/
 
-static void progress(int forceit, const char *fmt, ...)
+static void ATTR_PRINTF(2,3) progress(int forceit, const char *fmt, ...)
 {
 	clock_t curtime = clock();
 	va_list arg;
