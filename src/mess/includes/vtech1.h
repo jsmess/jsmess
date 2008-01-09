@@ -10,8 +10,8 @@
 #include "devices/snapquik.h"
 
 
-#define VTECH1_CLK       (3579500)
-#define VZ300_XTAL1_CLK (17734470) /* verified */
+#define VTECH1_CLK        3579500
+#define VZ300_XTAL1_CLK   XTAL_17_73447MHz
 
 #define VZ_BASIC 0xf0
 #define VZ_MCODE 0xf1
