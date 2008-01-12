@@ -27,7 +27,7 @@ WRITE8_HANDLER( jupiter_vh_charram_w )
     jupiter_charram[offset] = data;
 
     /* decode character graphics again */
-	decodechar(Machine->gfx[0], chr, jupiter_charram, &jupiter_charlayout);
+	decodechar(Machine->gfx[0], chr, jupiter_charram);
 
     /* mark all visible characters with that code dirty */
     for( offs = 0; offs < videoram_size; offs++ )

@@ -547,8 +547,7 @@ VIDEO_UPDATE( vdc8563 )
 	} else {
 		for (i=0; i<512; i++) {
 			if (full_refresh||vdc.fontdirty[i]) {
-				decodechar(machine->gfx[0],i,vdc.ram+(vdc.fontram_start&vdc.mask),
-						   machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0],i,vdc.ram+(vdc.fontram_start&vdc.mask));
 				vdc.fontdirty[i]=0;
 			}
 		}

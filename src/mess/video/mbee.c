@@ -52,9 +52,6 @@ int mbee_frame_counter;
 
 UINT8 *pcgram;
 
-/* from mess/drivers/microbee.c */
-extern gfx_layout mbee_charlayout;
-
 
 WRITE8_HANDLER ( mbee_pcg_color_latch_w )
 {
@@ -108,7 +105,7 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
             logerror("mbee pcgram  [$%04X] <- $%02X\n", offset, data);
             pcgram[0x0800+offset] = data;
             /* decode character graphics again */
-            decodechar(Machine->gfx[0], chr, pcgram, &mbee_charlayout);
+            decodechar(Machine->gfx[0], chr, pcgram);
 
             /* mark all visible characters with that code dirty */
             for( i = 0; i < videoram_size; i++ )

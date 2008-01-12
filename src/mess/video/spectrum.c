@@ -192,18 +192,15 @@ VIDEO_UPDATE( spectrum )
     for (count=0;count<32*8;count++)
     {
 		if (charsdirty[count]) {
-			decodechar( machine->gfx[0],count,spectrum_characterram,
-					machine->drv->gfxdecodeinfo[0].gfxlayout );
+			decodechar( machine->gfx[0],count,spectrum_characterram);
 		}
 
 		if (charsdirty[count+256]) {
-			decodechar( machine->gfx[1],count,&spectrum_characterram[0x800],
-					machine->drv->gfxdecodeinfo[0].gfxlayout );
+			decodechar( machine->gfx[1],count,&spectrum_characterram[0x800]);
 		}
 
 		if (charsdirty[count+512]) {
-			decodechar( machine->gfx[2],count,&spectrum_characterram[0x1000],
-					machine->drv->gfxdecodeinfo[0].gfxlayout );
+			decodechar( machine->gfx[2],count,&spectrum_characterram[0x1000]);
 		}
 	}
 

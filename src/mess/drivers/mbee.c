@@ -164,7 +164,7 @@ static INPUT_PORTS_START( mbee )
     PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-const gfx_layout mbee_charlayout =
+static const gfx_layout mbee_charlayout =
 {
     8,16,                   /* 8 x 16 characters */
     256,                    /* 256 characters */

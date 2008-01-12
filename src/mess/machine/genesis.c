@@ -2238,7 +2238,7 @@ void genesis_init_frame(void)
 	{
 		if (genesis_vdp.genesis_vdp_vram_is_dirty[i])
 		{
-			decodechar(Machine->gfx[genesis_vdp.genesis_vdp_index], i,(UINT8 *)genesis_vdp.genesis_vdp_vram,  &charlayout);
+			decodechar(Machine->gfx[genesis_vdp.genesis_vdp_index], i,(UINT8 *)genesis_vdp.genesis_vdp_vram);
 			genesis_vdp.genesis_vdp_vram_is_dirty[i] = 0;
 		}
 	}

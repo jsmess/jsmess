@@ -801,7 +801,7 @@ $(MESSOBJ)/veb.a:      \
 	$(MESS_MACHINE)/kc.o	\
 
 $(MESSOBJ)/nec.a:	   \
-	$(MESS_VIDEO)/vdc.o	 \
+	$(MAME_VIDEO)/vdc.o	 \
 	$(MESS_MACHINE)/pce.o	 \
 	$(MESS_DRIVERS)/pce.o
 

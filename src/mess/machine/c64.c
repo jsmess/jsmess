@@ -1485,7 +1485,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 		c65_keyline = value;
 	}
 
-	vic2_frame_interrupt ();
+	vic2_frame_interrupt (machine, cpunum);
 
 	if (c64_tape_on) {
 		vc20_tape_config (DATASSETTE, DATASSETTE_TONE);

@@ -635,7 +635,7 @@ void trs80_fdc_callback(wd17xx_state_t event, void *param)
 			irq_status &= ~IRQ_FDC;
 			break;
 		case WD17XX_IRQ_SET:
-			trs80_fdc_interrupt();
+			trs80_fdc_interrupt(Machine, 0);
 			break;
 		case WD17XX_DRQ_CLR:
 		case WD17XX_DRQ_SET:

@@ -828,7 +828,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 
 		/* call Apple II interrupt handler */
 		if ((video_screen_get_vpos(0) % 8) == 7)
-			apple2_interrupt();
+			apple2_interrupt(machine, 0);
 	}
 
 	timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1)%262, 0), 0, attotime_never);

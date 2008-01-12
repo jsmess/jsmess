@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 
 /* graphics output */
 
-const gfx_layout jupiter_charlayout =
+static const gfx_layout jupiter_charlayout =
 {
 	8, 8,	/* 8x8 characters */
 	128,	/* 128 characters */

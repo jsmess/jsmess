@@ -395,7 +395,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	cbmb_keyline[9] = value2;
 #endif
 
-	vic2_frame_interrupt ();
+	vic2_frame_interrupt (machine, 0);
 
 	set_led_status (1 /*KB_CAPSLOCK_FLAG */ , (readinputport(12)&0x04) ? 1 : 0);
 #if 0

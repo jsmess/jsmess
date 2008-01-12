@@ -838,7 +838,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 			keyline[9] = value;
 	}
 
-	ted7360_frame_interrupt ();
+	ted7360_frame_interrupt (machine, cpunum);
 
 	vc20_tape_config (DATASSETTE, DATASSETTE_TONE);
 	vc20_tape_buttons (DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP);

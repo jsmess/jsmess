@@ -1585,12 +1585,12 @@ static INPUT_PORTS_START( scorpion )
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x08, "A 1/1  B 1/1" )
 	PORT_DIPSETTING(    0x00, "A 1/1  B 1/3" )
@@ -1604,6 +1604,11 @@ static INPUT_PORTS_START( scorpion )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ad2083 )
+	/* There are no Player 2 controls for this game:
+     * Dipswitch is read upon startup. If Cabinet = Cocktail, a 1 is stored @400F.
+     * 400F in turn is only read just before Player 2 turn. If 400F=1 then flip line
+     * is set. That is all. If there is a dedicated player 2 input,
+     * it must be multiplexed by flip line. */
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )

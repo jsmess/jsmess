@@ -1018,12 +1018,12 @@ VIDEO_UPDATE( x68000 )
 	{
 		if(sys.video.tile16_dirty[x] != 0)
 		{
-			decodechar(machine->gfx[1], x,memory_region(REGION_USER1), &x68k_pcg_16);
+			decodechar(machine->gfx[1], x,memory_region(REGION_USER1));
 			sys.video.tile16_dirty[x] = 0;
 		}
 		if(sys.video.tile8_dirty[x] != 0)
 		{
-			decodechar(machine->gfx[0], x,memory_region(REGION_USER1), &x68k_pcg_8);
+			decodechar(machine->gfx[0], x,memory_region(REGION_USER1));
 			sys.video.tile8_dirty[x] = 0;
 		}
 	}

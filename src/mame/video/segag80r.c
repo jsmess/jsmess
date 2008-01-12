@@ -66,7 +66,7 @@ INTERRUPT_GEN( segag80r_vblank_start )
 
 	/* if interrupts are enabled, clock one */
 	if (video_control & 0x04)
-		irq0_line_hold();
+		irq0_line_hold(machine, cpunum);
 }
 
 
@@ -77,7 +77,7 @@ INTERRUPT_GEN( sindbadm_vblank_start )
 	/* interrupts appear to always be enabled, but they have a manual */
 	/* acknowledge rather than an automatic ack; they are also not masked */
 	/* by bit 2 of video_control like a standard G80 */
-	irq0_line_assert();
+	irq0_line_assert(machine, cpunum);
 }
 
 
@@ -661,7 +661,7 @@ static void draw_videoram(running_machine *machine, mame_bitmap *bitmap, const r
 			/* if the tile is dirty, decode it */
 			if (dirtychar[tile])
 			{
-				decodechar(machine->gfx[0], tile, &videoram[0x800], machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0], tile, &videoram[0x800]);
 				dirtychar[tile] = 0;
 			}
 
