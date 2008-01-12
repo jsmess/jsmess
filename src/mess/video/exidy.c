@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  exidy.c
+  video/exidy.c
 
   Functions to emulate the video hardware of the Exidy Sorcerer
 
@@ -8,7 +8,6 @@
 
 #include "driver.h"
 #include "includes/exidy.h"
-#include "mslegacy.h"
 
 
 VIDEO_UPDATE( exidy )
