@@ -44,9 +44,9 @@
                Tested with the Arnold 5 Diagnostic Cartridge.  Mostly works fine, but the soft scroll test is
                noticably wrong.
 
-               Known issues with some games (as at 08/08/06):
-               Robocop 2:  playable, but sprites cut out for some reason (possibly IRQ related, I think) every now and then.
-               Navy Seals:  Playable, but has similar problems to Robocop 2.
+               Known issues with some games (as at 12/01/08):
+               Robocop 2:  playable, but sprites should be cut off outside the playing area (partial updates should be able to fix this).
+               Navy Seals:  Playable, but sound effects cut out at times (probably DMA related).
                Dick Tracy:  Sprite visibility issues
                Switchblade:  has some slowdown when numerous enemies are on screen (normal?)
                Epyx World of Sports: doesn't start at all.
@@ -95,8 +95,9 @@ Some bugs left :
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10
 
-#define SYSTEM_CPC 0
-#define SYSTEM_PLUS 1
+#define SYSTEM_CPC    0
+#define SYSTEM_PLUS   1
+#define SYSTEM_GX4000 2
 
 //int selected_m6845_address = 0;
 
@@ -278,13 +279,19 @@ static READ8_HANDLER (amstrad_ppi_portb_r)
 {
 	int data = 0;
 /* Set b7 with cassette tape input */
-	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.03) {
-		data |= (1<<7);
-  }
+	if(amstrad_system_type != SYSTEM_GX4000)
+	{
+		if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.03) {
+			data |= (1<<7);
+		}
+	}
 /* Set b6 with Parallel/Printer port ready */
-	if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0)==0 ) {
-		data |= (1<<6);
-  }
+	if(amstrad_system_type != SYSTEM_GX4000)
+	{
+		if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0)==0 ) {
+			data |= (1<<6);
+		}
+	}
 /* Set b4-b1 50hz/60hz state and manufacturer name defined by links on PCB */
 	data |= (ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
 
@@ -326,16 +333,22 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 	update_psg();
 
 /* b5 Cassette Write data */
-	if ((changed_data & 0x20) != 0) {
-		cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),
-			((data & 0x20) ? -1.0 : +1.0));
+	if(amstrad_system_type != SYSTEM_GX4000)
+	{
+		if ((changed_data & 0x20) != 0) {
+			cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),
+				((data & 0x20) ? -1.0 : +1.0));
+		}
 	}
 
 /* b4 Cassette Motor Control */
-	if ((changed_data & 0x10) != 0) {
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
-			((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
-			CASSETTE_MASK_MOTOR);
+	if(amstrad_system_type != SYSTEM_GX4000)
+	{
+		if ((changed_data & 0x10) != 0) {
+			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
+				((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
+				CASSETTE_MASK_MOTOR);
+		}
 	}
 
 /* b3-b0 Keyboard line Select keyboard line to be scanned */
@@ -926,7 +939,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		/* If bit 5 is enabled on a CPC Plus/GX4000 when the ASIC is unlocked, sets the lower ROM position and cart bank
            b5 = 1, b4b3 = RAM position for lower ROM area and if the ASIC registers are visible at &4000,
            b2b1b0 = cartridge bank to read from lower ROM area (0-7 only) */
-		if(amstrad_system_type == SYSTEM_PLUS && amstrad_plus_asic_enabled != 0)
+		if(amstrad_system_type != SYSTEM_CPC && amstrad_plus_asic_enabled != 0)
 		{
 			if((dataToGateArray & 0x20) != 0)
 			{
@@ -1118,18 +1131,21 @@ b8 b0 Function Read/Write state
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
 The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
  */
- 	if ((offset & (1<<10)) == 0)	{
-		if ((offset & (1<<10)) == 0) {
-			int b8b0 = ((offset & (1<<8)) >> (8 - 1)) | (offset & (0x01));
-			switch (b8b0) {
-  			case 0x02: {
-  					data = nec765_status_r(0);
-  			} break;
-  			case 0x03: {
-  					data = nec765_data_r(0);
-  			} break;
-  			default: {
-  			} break;
+	if(amstrad_system_type != SYSTEM_GX4000)
+	{
+ 		if ((offset & (1<<10)) == 0)	{
+			if ((offset & (1<<10)) == 0) {
+				int b8b0 = ((offset & (1<<8)) >> (8 - 1)) | (offset & (0x01));
+				switch (b8b0) {
+  				case 0x02: {
+  						data = nec765_status_r(0);
+  				} break;
+  				case 0x03: {
+  						data = nec765_data_r(0);
+  				} break;
+  				default: {
+  				} break;
+				}
 			}
 		}
 	}
@@ -1156,7 +1172,7 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
   			EventList_AddItemOffset((EVENT_LIST_CODE_CRTC_INDEX_WRITE<<6), data, TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #endif
         m6845_address_w(0,data);
-		if(amstrad_system_type == SYSTEM_PLUS)
+		if(amstrad_system_type != SYSTEM_CPC)
 			amstrad_plus_seqcheck(data);
 //          selected_m6845_address = (data & 0x1F);
       } break;
@@ -1182,20 +1198,23 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 		previous_amstrad_UpperRom_data = (data & 0xff);
 	}
 /* b12 = 0 : Printer port Write Selected*/
-	if ((offset & (1<<12)) == 0) {
-		/* on CPC, write to printer through LS chip */
-		/* the amstrad is crippled with a 7-bit port :( */
-		/* bit 7 of the data is the printer /strobe */
+	if(amstrad_system_type != SYSTEM_GX4000)
+	{
+		if ((offset & (1<<12)) == 0) {
+			/* on CPC, write to printer through LS chip */
+			/* the amstrad is crippled with a 7-bit port :( */
+			/* bit 7 of the data is the printer /strobe */
 
-		/* strobe state changed? */
-		if (((previous_printer_data_byte^data) & (1<<7)) !=0 ) {
-			/* check for only one transition */
-			if ((data & (1<<7)) == 0)  {
-				/* output data to printer */
-				printer_output(image_from_devtype_and_index(IO_PRINTER, 0), data & 0x07f);
+			/* strobe state changed? */
+			if (((previous_printer_data_byte^data) & (1<<7)) !=0 ) {
+				/* check for only one transition */
+				if ((data & (1<<7)) == 0)  {
+					/* output data to printer */
+					printer_output(image_from_devtype_and_index(IO_PRINTER, 0), data & 0x07f);
+				}
 			}
+			previous_printer_data_byte = data;
 		}
-		previous_printer_data_byte = data;
 	}
 /* if b11 = 0 : 8255 PPI Write selected - bits 9 and 8 then define the PPI function access as shown below:
 b9 b8 | PPI Function Read/Write status
@@ -1227,25 +1246,28 @@ b8 b0 Function Read/Write state
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
 The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
 */
-    if ((offset & (1<<7)) == 0) {
+	if(amstrad_system_type != SYSTEM_GX4000)
+	{
+		if ((offset & (1<<7)) == 0) {
 			unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
 
-			switch (b8b0) {
-			case 0x00:
-        /* FDC Motor Control - Bit 0 defines the state of the FDD motor:
-         * "1" the FDD motor will be active.
-         * "0" the FDD motor will be in-active.*/
-				floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x01));
-				floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), (data & 0x01));
-				floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1,1);
-				floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1,1);
-		  break;
+				switch (b8b0) {
+				case 0x00:
+			/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
+			 * "1" the FDD motor will be active.
+			 * "0" the FDD motor will be in-active.*/
+					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x01));
+					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), (data & 0x01));
+					floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1,1);
+					floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1,1);
+			  break;
 
-      case 0x03: /* Write Data register of FDC */
-				nec765_data_w(0,data);
-			break;
-			default:
-			break;
+		  case 0x03: /* Write Data register of FDC */
+					nec765_data_w(0,data);
+				break;
+				default:
+				break;
+				}
 			}
 		}
 	}
@@ -1606,7 +1628,7 @@ void amstrad_reset_machine(void)
   // Get manufacturer name and TV refresh rate from PCB link (dipswitch for mess emulation)
 	ppi_port_inputs[amstrad_ppi_PortB] = (((readinputportbytag("solder_links")&MANUFACTURER_NAME)<<1) | (readinputportbytag("solder_links")&TV_REFRESH_RATE));
 
-	if(amstrad_system_type == SYSTEM_PLUS)
+	if(amstrad_system_type != SYSTEM_CPC)
 		memset(amstrad_plus_asic_ram,0,16384);  // clear ASIC RAM
 
 	multiface_reset();
@@ -1804,12 +1826,14 @@ static void amstrad_common_init(void)
 	else
 		cpunum_set_input_line_vector(0, 0,0x00);
 
-	nec765_init(&amstrad_nec765_interface,NEC765A/*?*/);
 	ppi8255_init(&amstrad_ppi8255_interface);
 
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_SS_40);
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_SS_40);
-
+	if(amstrad_system_type != SYSTEM_GX4000)
+	{
+		nec765_init(&amstrad_nec765_interface,NEC765A/*?*/);
+		floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_SS_40);
+		floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_SS_40);
+	}
 /* Every microsecond:
 
 The CRTC generates a memory address using it's MA and RA signal outputs
@@ -1905,6 +1929,50 @@ static MACHINE_RESET( plus )
 static MACHINE_START( plus )
 {
 	amstrad_plus_asic_ram = memory_region(REGION_USER1);  // 16kB RAM for ASIC, memory-mapped registers.
+}
+
+static MACHINE_RESET( gx4000 )
+{
+	int i;
+
+	amstrad_system_type = SYSTEM_GX4000;
+
+	for (i=0; i<128; i++)  // fill ROM table
+	{
+		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x4000];
+	}
+	for(i=128;i<160;i++)
+	{
+		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[(i-128)*0x4000];
+	}
+	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0xc000];
+
+	amstrad_plus_lower = 0;  // cart bank 0
+	amstrad_plus_lower_addr = 0;  // at 0x0000, reg page disabled by default
+	amstrad_plus_lower_enabled = 1; // lower ROM enabled by default (as per usual)
+	amstrad_plus_asic_enabled = 0;  // ASIC disabled
+	amstrad_plus_asic_regpage = 0;  // ASIC register page disabled
+	amstrad_plus_asic_seqptr = 0;
+	amstrad_plus_pri = 0;  // disable PRI
+	amstrad_plus_scroll_x = 0;
+	amstrad_plus_scroll_y = 0;
+	amstrad_plus_scroll_border = 0;  // disable soft scroll
+	amstrad_plus_dma_status = 0;  // disable all DMA channels
+	amstrad_plus_dma_0_addr = 0;
+	amstrad_plus_dma_prescaler[0] = 0;
+	amstrad_plus_dma_1_addr = 0;
+	amstrad_plus_dma_prescaler[1] = 0;
+	amstrad_plus_dma_2_addr = 0;
+	amstrad_plus_dma_prescaler[2] = 0;
+	amstrad_plus_dma_clear = 1;  // by default, DMA interrupts must be cleared by writing to the DSCR (&6c0f)
+	amstrad_plus_irq_cause = 6;
+
+	amstrad_common_init();
+	amstrad_reset_machine();
+	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
+	AmstradCPC_GA_SetRamConfiguration();
+	amstrad_plus_setsplitline(0,0);
+	//  multiface_init();
 }
 
 static MACHINE_RESET( kccomp )
@@ -2092,7 +2160,8 @@ static INPUT_PORTS_START( amstrad_keyboard )
 //  PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")                   PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(8)
 
-/* Second joystick port need to be defined: the second joystick is daisy-chained on the back of the first one */
+/* Second joystick port need to be defined: the second joystick is daisy-chained on the back of the first one
+   Joystick 2 is mapped to keyboard line 6.  */
 
 /* The CPC supports at least two different brands of lightpens, probably connected to the expansion port */
 
@@ -2394,6 +2463,105 @@ static INPUT_PORTS_START(plus)
 	PORT_PLAYER(4)
 
 INPUT_PORTS_END
+
+static INPUT_PORTS_START(gx4000)
+
+	// The GX4000 is a console, so no keyboard access other than the joysticks.
+	PORT_START_TAG("keyboard_row_0")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START_TAG("keyboard_row_1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START_TAG("keyboard_row_2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START_TAG("keyboard_row_3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START_TAG("keyboard_row_4")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START_TAG("keyboard_row_5")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START_TAG("keyboard_row_6")  // Joystick 2
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	
+	PORT_START_TAG("keyboard_row_7")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START_TAG("keyboard_row_8")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START_TAG("keyboard_row_9")  // Joystick 1
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_INCLUDE(crtc_links)  // included to keep the driver happy
+
+	PORT_START_TAG("analog1")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(1)
+
+	PORT_START_TAG("analog2")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(1)
+
+	PORT_START_TAG("analog3")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(2)
+
+	PORT_START_TAG("analog4")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(2)
+
+// Not used, but are here for completeness
+	PORT_START_TAG("analog5")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(3)
+
+	PORT_START_TAG("analog6")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(3)
+
+	PORT_START_TAG("analog7")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(4)
+
+	PORT_START_TAG("analog8")
+	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
+	PORT_SENSITIVITY(100)
+	PORT_KEYDELTA(10)
+	PORT_PLAYER(4)
+
+INPUT_PORTS_END
+
 /* --------------------
    - AY8910_interface -
    --------------------*/
@@ -2469,7 +2637,7 @@ static MACHINE_DRIVER_START( amstrad )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ADD_TAG("tape", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD(AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8912_interface)
@@ -2498,6 +2666,19 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_PALETTE_INIT( amstrad_plus )
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( gx4000 )
+	MDRV_IMPORT_FROM( amstrad )
+	MDRV_SOUND_REMOVE( "tape" )
+	MDRV_SCREEN_REFRESH_RATE( AMSTRAD_FPS )
+	MDRV_GFXDECODE( asic_sprite )
+	MDRV_MACHINE_START( plus )
+	MDRV_MACHINE_RESET( gx4000 )
+	MDRV_SCREEN_SIZE(800, 312)
+	MDRV_PALETTE_LENGTH(4096+48)  // extended 12-bit palette, and standard 32 colour palette
+	MDRV_COLORTABLE_LENGTH(4096+48)
+	MDRV_PALETTE_INIT( amstrad_plus )
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -2594,6 +2775,12 @@ SYSTEM_CONFIG_START(cpcplus)
 	CONFIG_DEVICE(cpcplus_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
+SYSTEM_CONFIG_START(gx4000)
+	CONFIG_RAM_DEFAULT(64 * 1024)  // has 64k RAM
+	CONFIG_DEVICE(cpcplus_cartslot_getinfo)
+	CONFIG_DEVICE(cpcplus_snapshot_getinfo)
+SYSTEM_CONFIG_END
+
 
 /* ---------------------------------------------
    - Rom definition for the ROM loading system -
@@ -2678,5 +2865,6 @@ COMP( 1985, cpc6128,  cpc464,   0,      amstrad, cpc6128,  0,   cpc6128, "Amstra
 COMP( 1985, cpc6128f, cpc464,   0,      amstrad, cpc6128f, 0,   cpc6128, "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0)
 COMP( 1990, cpc464p,  0,        0,      cpcplus, plus,     0,   cpcplus, "Amstrad plc",         "Amstrad CPC464+", 0)
 COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus,     0,   cpcplus, "Amstrad plc",         "Amstrad CPC6128+", 0)
+COMP( 1990, gx4000,   0,        0,      gx4000,  gx4000,   0,   gx4000,  "Amstrad plc",         "Amstrad GX4000", 0)
 COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp,   0,   cpc6128, "VEB Mikroelektronik", "KC Compact", 0)
 

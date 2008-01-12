@@ -579,7 +579,7 @@ static void amstrad_draw_screen_enabled_mode_0(void)
 
 	unsigned char data = mess_ram[addr];
 
-	if(amstrad_system_type == 1)
+	if(amstrad_system_type != 0)
 	{
 		amstrad_plus_draw_screen_enabled_mode_0();
 		return;
@@ -627,7 +627,7 @@ static void amstrad_draw_screen_enabled_mode_1(void)
   unsigned char data1 = mess_ram[addr];
   unsigned char data2 = mess_ram[addr+1];
 
-	if(amstrad_system_type == 1)
+	if(amstrad_system_type != 0)
 	{
 		amstrad_plus_draw_screen_enabled_mode_1();
 		return;
@@ -665,7 +665,7 @@ static void amstrad_draw_screen_enabled_mode_2(void)
 	int i, cpcpen, messpen;
 	unsigned long data = (mess_ram[addr]<<8) | mess_ram[addr+1];
 
-	if(amstrad_system_type == 1)
+	if(amstrad_system_type != 0)
 	{
 		amstrad_plus_draw_screen_enabled_mode_2();
 		return;
@@ -699,7 +699,7 @@ static void amstrad_draw_screen_enabled_mode_3(void)
 	int cpcpen, messpen;
 	unsigned char data = mess_ram[addr];
 
-	if(amstrad_system_type == 1)
+	if(amstrad_system_type != 0)
 	{
 		amstrad_plus_draw_screen_enabled_mode_3();
 		return;
@@ -1082,7 +1082,7 @@ VIDEO_UPDATE( amstrad )
 	rect.max_y = AMSTRAD_SCREEN_HEIGHT-1;
 
 #ifdef MAME_DEBUG
-	if(input_code_pressed(KEYCODE_Z) && amstrad_system_type == 1)
+	if(input_code_pressed(KEYCODE_Z) && amstrad_system_type != 0)
 	{
 		int x;
 		for(x=0;x<32;x+=2)
