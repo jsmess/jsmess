@@ -1,15 +1,16 @@
-/*********************************************************************
+/*****************************************************************************
+ *
+ * includes/lisa.h
+ * 
+ * Lisa driver declarations
+ *
+ ****************************************************************************/
 
-	lisa.h
+#ifndef LISA_H_
+#define LISA_H_
 
-	MESS Lisa driver declarations
 
-*********************************************************************/
-
-#ifndef LISA_H
-#define LISA_H
-
-#include "osdepend.h"
+/*----------- defined in machine/lisa.c -----------*/
 
 extern UINT8 *lisa_fdc_rom;
 extern UINT8 *lisa_fdc_ram;
@@ -36,5 +37,6 @@ WRITE8_HANDLER ( lisa210_fdc_w );
 READ16_HANDLER ( lisa_r );
 WRITE16_HANDLER ( lisa_w );
 
-#endif /* LISA_H */
+
+#endif /* LISA_H_ */
 

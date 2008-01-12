@@ -5,9 +5,9 @@
 */
 
 #include "driver.h"
+#include "includes/lisa.h"
 #include "devices/sonydriv.h"
 /*#include "machine/6522via.h"*/
-#include "machine/lisa.h"
 
 
 static ADDRESS_MAP_START(lisa_map, ADDRESS_SPACE_PROGRAM, 16)
