@@ -164,10 +164,6 @@ static void kc85_draw_8_pixels(mame_bitmap *bitmap,int x,int y, unsigned char co
 }
 
 
-#ifndef MIN
-#define MIN(a,b) ((a<b) ? a : b)
-#endif /* MIN */
-
 /* height of screen in lines */
 #define KC85_SCREEN_HEIGHT 256
 /* width of display in pixels */

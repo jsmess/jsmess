@@ -61,24 +61,6 @@ VIDEO_START( intv )
 */
 }
 
-/* NPW 20-Apr-2002 - Changing this to fix compilation errors with MSVC */
-#ifdef max
-#undef max
-#endif
-#define max	my_max
-
-#ifdef min
-#undef min
-#endif
-#define min	my_min
-
-static int max(int v1, int v2) {
-    return (v1 > v2 ? v1 : v2);
-}
-
-static int min(int v1, int v2) {
-    return (v1 < v2 ? v1 : v2);
-}
 
 static int sprites_collide(int spriteNum0, int spriteNum1) {
     UINT8 x1, x2, y1, y2, w1, w2, h1, h2, x0, y0, r0y, r1y,
@@ -101,12 +83,12 @@ static int sprites_collide(int spriteNum0, int spriteNum1) {
         return FALSE;
 
     //iterate over the intersecting bits to see if any touch
-    x0 = max(x1, x2);
-    y0 = max(y1, y2);
+    x0 = MAX(x1, x2);
+    y0 = MAX(y1, y2);
     r0y = 2*(y0-y1);
     r1y = 2*(y0-y2);
-    width = min(x1+w1, x2+w2) - x0;
-    height = (min(y1+h1, y2+h2) - y0) * 2;
+    width = MIN(x1+w1, x2+w2) - x0;
+    height = (MIN(y1+h1, y2+h2) - y0) * 2;
     for (x = 0; x < width; x++) {
         for (y = 0; y < height; y++) {
             if (intv_sprite_buffers[spriteNum0][x0-x1+x][r0y+y] &&

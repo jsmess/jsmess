@@ -35,9 +35,6 @@
 #include "image.h"
 #include "utils.h"
 
-#ifndef MIN
-#define MIN(x,y) ((x)<(y)?(x):(y))
-#endif
 
 static unsigned long TapePosition = 0;
 static void spectrum_setup_sna(unsigned char *pSnapshot, unsigned long SnapshotSize);
