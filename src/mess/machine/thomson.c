@@ -7,17 +7,13 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "timer.h"
-#include "state.h"
-#include "device.h"
+#include "includes/thomson.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/mc6846.h"
 #include "machine/6850acia.h"
 #include "machine/6551.h"
 #include "sound/dac.h"
-#include "machine/thomson.h"
-#include "video/thomson.h"
 #include "audio/mea8000.h"
 #include "devices/cartslot.h"
 #include "includes/centroni.h"

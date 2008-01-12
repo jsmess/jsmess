@@ -6,15 +6,12 @@
 
 **********************************************************************/
 
-#include "math.h"
+#include <math.h>
 #include "driver.h"
-#include "timer.h"
-#include "state.h"
+#include "includes/thomson.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/mc6846.h"
-#include "machine/thomson.h"
-#include "video/thomson.h"
 
 
 #define VERBOSE 0
