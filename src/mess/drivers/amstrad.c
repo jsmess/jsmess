@@ -2865,6 +2865,6 @@ COMP( 1985, cpc6128,  cpc464,   0,      amstrad, cpc6128,  0,   cpc6128, "Amstra
 COMP( 1985, cpc6128f, cpc464,   0,      amstrad, cpc6128f, 0,   cpc6128, "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0)
 COMP( 1990, cpc464p,  0,        0,      cpcplus, plus,     0,   cpcplus, "Amstrad plc",         "Amstrad CPC464+", 0)
 COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus,     0,   cpcplus, "Amstrad plc",         "Amstrad CPC6128+", 0)
-COMP( 1990, gx4000,   0,        0,      gx4000,  gx4000,   0,   gx4000,  "Amstrad plc",         "Amstrad GX4000", 0)
+CONS( 1990, gx4000,   0,        0,      gx4000,  gx4000,   0,   gx4000,  "Amstrad plc",         "Amstrad GX4000", 0)
 COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp,   0,   cpc6128, "VEB Mikroelektronik", "KC Compact", 0)
 
