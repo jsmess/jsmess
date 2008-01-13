@@ -11,7 +11,7 @@
 #include "driver.h"
 #include "devices/cassette.h"
 #include "formats/cassimg.h"
-#include "machine/thomson.h"
+#include "includes/thomson.h"
 #include "formats/thom_cas.h"
 
 

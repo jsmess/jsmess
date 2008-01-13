@@ -11,7 +11,7 @@
 #include "state.h"
 #include "device.h"
 #include "formats/thom_dsk.h"
-#include "video/thomson.h"
+#include "includes/thomson.h"
 
 #define VERBOSE 0  /* 0, 1 or 2 */
 
