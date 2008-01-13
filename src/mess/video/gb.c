@@ -87,6 +87,7 @@ static struct gb_lcd_struct {
 	int lcd_irq_line;
 	int triggering_line_irq;
 	int line_irq;
+	int triggering_mode_irq;
 	int mode_irq;
 	int delayed_line_irq;
 	int sprite_cycles;
@@ -99,6 +100,7 @@ static void (*update_scanline)(void);
 
 /* Prototypes */
 static TIMER_CALLBACK(gb_lcd_timer_proc);
+static TIMER_CALLBACK(gbc_lcd_timer_proc);
 static void gb_lcd_switch_on( void );
 
 static const unsigned char palette[] =
@@ -1113,6 +1115,7 @@ enum {
 	GB_LCD_STATE_LYXX_M3=1,
 	GB_LCD_STATE_LYXX_PRE_M0,
 	GB_LCD_STATE_LYXX_M0,
+	GB_LCD_STATE_LYXX_M0_SCX3,
 	GB_LCD_STATE_LYXX_M0_PRE_INC,
 	GB_LCD_STATE_LYXX_M0_INC,
 	GB_LCD_STATE_LY00_M2,
@@ -1139,6 +1142,7 @@ void gb_video_init( int mode ) {
 	gb_vram = new_memory_region( Machine, REGION_GFX1, vram_size, 0 );
 	gb_oam = new_memory_region( Machine, REGION_GFX2, 0x100, 0 );
 	memset( gb_vram, 0, vram_size );
+	memset( &gb_lcd, 0, sizeof(gb_lcd) );
 
 	gb_vram_ptr = gb_vram;
 	gb_chrgen = gb_vram;
@@ -1162,11 +1166,11 @@ void gb_video_init( int mode ) {
 		gb_bpal[i] = gb_spal0[i] = gb_spal1[i] = i;
 	}
 
-	gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
-	timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0, attotime_never );
-
 	switch( mode ) {
 	case GB_VIDEO_DMG:
+		gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
+		timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0, attotime_never );
+
 		/* set the scanline update function */
 		update_scanline = gb_update_scanline;
 
@@ -1174,6 +1178,8 @@ void gb_video_init( int mode ) {
 
 		break;
 	case GB_VIDEO_MGB:
+		gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
+
 		/* set the scanline update function */
 		update_scanline = gb_update_scanline;
 		/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
@@ -1202,6 +1208,8 @@ void gb_video_init( int mode ) {
 
 		break;
 	case GB_VIDEO_SGB:
+		gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
+
 		/* set the scanline update function */
 		update_scanline = sgb_update_scanline;
 
@@ -1228,6 +1236,8 @@ void gb_video_init( int mode ) {
 
 		break;
 	case GB_VIDEO_CGB:
+		gb_lcd.lcd_timer = timer_alloc( gbc_lcd_timer_proc , NULL);
+
 		/* set the scanline update function */
 		update_scanline = cgb_update_scanline;
 
@@ -1321,6 +1331,18 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Set Mode 0 lcdstate */
 			gb_lcd.mode = 0;
 			LCDSTAT &= 0xFC;
+			/*
+				There seems to a kind of feature in the gameboy hardware when the lowest bits of the
+				SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
+				than usual.
+				The SGB probably has the same bug.
+			*/
+			if ( ( SCROLLX & 0x03 ) == 0x03 ) {
+				gb_lcd.scrollx_adjust += 4;
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_SCX3, attotime_never );
+				break;
+			}
+		case GB_LCD_STATE_LYXX_M0_SCX3:
 			/* Generate lcd interrupt if requested */
 			if ( ! gb_lcd.mode_irq && ( LCDSTAT & 0x08 ) &&
 			     ( ( ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
@@ -1381,6 +1403,8 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			if ( ( LCDSTAT & 0x20 ) && ! gb_lcd.line_irq && ! gb_lcd.line_irq ) {
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
 			}
+			/* Check for regular compensation of x-scroll register */
+			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 lasts approximately 80 clock cycles */
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
 			break;
@@ -1397,6 +1421,8 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
 			}
+			/* Check for regular compensation of x-scroll register */
+			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 last for approximately 80 clock cycles */
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
 			break;
@@ -1407,11 +1433,6 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
 			/* Check for compensations of x-scroll register */
-			if ( ( SCROLLX & 0x07 ) > 2 ) {
-				gb_lcd.scrollx_adjust = 4;
-			} else {
-				gb_lcd.scrollx_adjust = 0;
-			}
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0, attotime_never );
 			gb_lcd.start_x = 0;
@@ -1492,6 +1513,229 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Set Mode 0 lcdstat */
 			gb_lcd.mode = 0;
 			LCDSTAT = ( LCDSTAT & 0xFC );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M2, attotime_never );
+			break;
+		}
+	} else {
+		gb_increment_scanline();
+		if ( gb_lcd.current_line < 144 ) {
+			update_scanline();
+		}
+		timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0, attotime_never );
+	}
+}
+
+static TIMER_CALLBACK(gbc_lcd_timer_proc)
+{
+	static const int sprite_cycles[] = { 0, 8, 20, 32, 44, 52, 64, 76, 88, 96, 108 };
+	int mode = param;
+
+	if ( LCDCONT & 0x80 ) {
+		switch( mode ) {
+		case GB_LCD_STATE_LYXX_PRE_M0:	/* Just before switching to mode 0 */
+			gb_lcd.mode = 0;
+			if ( LCDSTAT & 0x08 ) {
+				if ( ! gb_lcd.mode_irq ) {
+					if ( ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq ) {
+						gb_lcd.mode_irq = 1;
+						cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+					}
+				} else {
+					gb_lcd.mode_irq = 0;
+				}
+			}
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0, attotime_never );
+			break;
+		case GB_LCD_STATE_LYXX_M0:		/* Switch to mode 0 */
+			/* update current scanline */
+			update_scanline();
+			/* Increment the number of window lines drawn if enabled */
+			if ( gb_lcd.layer[1].enabled ) {
+				gb_lcd.window_lines_drawn++;
+			}
+			gb_lcd.previous_line = gb_lcd.current_line;
+			/* Set Mode 0 lcdstate */
+			gb_lcd.mode = 0;
+			LCDSTAT &= 0xFC;
+			/*
+				There seems to a kind of feature in the gameboy hardware when the lowest bits of the
+				SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
+				than usual.
+				The SGB probably has the same bug.
+			*/
+			gb_lcd.triggering_mode_irq = ( LCDSTAT & 0x08 ) ? 1 : 0;
+			if ( ( SCROLLX & 0x03 ) == 0x03 ) {
+				gb_lcd.scrollx_adjust += 4;
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_SCX3, attotime_never );
+				break;
+			}
+		case GB_LCD_STATE_LYXX_M0_SCX3:
+			/* Generate lcd interrupt if requested */
+			if ( ! gb_lcd.mode_irq && gb_lcd.triggering_mode_irq &&
+			     ( ( ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+				gb_lcd.triggering_mode_irq = 0;
+			}
+			/* Check for HBLANK DMA */
+			if( gbc_hdma_enabled )
+				gbc_hdma(0x10);
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(196 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC, attotime_never );
+			break;
+		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
+			if ( CURLINE < 143 ) {
+				gb_lcd.mode = 2;
+				if ( LCDSTAT & 0x20 ) {
+					if ( ! gb_lcd.mode_irq ) {
+						if ( ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq ) {
+							gb_lcd.mode_irq = 1;
+							cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+						}
+					} else {
+						gb_lcd.mode_irq = 0;
+					}
+				}
+			}
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_INC, attotime_never );
+			break;
+		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
+			gb_increment_scanline();
+			gb_lcd.delayed_line_irq = gb_lcd.line_irq;
+			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			gb_lcd.line_irq = 0;
+			if ( ! gb_lcd.mode_irq && ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) {
+				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+			}
+			/* Check if we're going into VBlank next */
+			if ( CURLINE == 144 ) {
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1, attotime_never );
+			} else {
+				/* Internally switch to mode 2 */
+				gb_lcd.mode = 2;
+				/* Generate lcd interrupt if requested */
+				if ( ! gb_lcd.mode_irq && ( LCDSTAT & 0x20 ) &&
+					 ( ( ! gb_lcd.triggering_line_irq && ! gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
+					gb_lcd.mode_irq = 1;
+					cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+				}
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2, attotime_never );
+			}
+			break;
+		case GB_LCD_STATE_LY00_M2:		/* Switch to mode 2 on line #0 */
+			/* Set Mode 2 lcdstate */
+			gb_lcd.mode = 2;
+			LCDSTAT = ( LCDSTAT & 0xFC ) | 0x02;
+			/* Generate lcd interrupt if requested */
+			if ( ( LCDSTAT & 0x20 ) && ! gb_lcd.line_irq && ! gb_lcd.line_irq ) {
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+			}
+			/* Check for regular compensation of x-scroll register */
+			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
+			/* Mode 2 lasts approximately 80 clock cycles */
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
+			break;
+		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
+			/* Update STAT register to the correct state */
+			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
+			/* Generate lcd interrupt if requested */
+			if ( ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
+				 ( !gb_lcd.mode_irq && ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq && ( LCDSTAT & 0x20 ) ) ) {
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+			}
+			gb_lcd.line_irq = gb_lcd.triggering_line_irq;
+			/* Check if LY==LYC STAT bit should be set */
+			if ( CURLINE == CMPLINE ) {
+				LCDSTAT |= 0x04;
+			}
+			/* Check for regular compensation of x-scroll register */
+			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
+			/* Mode 2 last for approximately 80 clock cycles */
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
+			break;
+		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
+			gb_select_sprites();
+			gb_lcd.sprite_cycles = sprite_cycles[ gb_lcd.sprCount ];
+			/* Set Mode 3 lcdstate */
+			gb_lcd.mode = 3;
+			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
+			/* Check for compensations of x-scroll register */
+			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0, attotime_never );
+			gb_lcd.start_x = 0;
+			break;
+		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
+			if ( CURLINE == 144 ) {
+				/* Trigger VBlank interrupt */
+				cpunum_set_input_line( 0, VBL_INT, HOLD_LINE );
+				/* Set VBlank lcdstate */
+				gb_lcd.mode = 1;
+				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
+				/* Trigger LCD interrupt if requested */
+				if ( LCDSTAT & 0x10 ) {
+					cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+				}
+			}
+			/* Check if LY==LYC STAT bit should be set */
+			if ( CURLINE == CMPLINE ) {
+				LCDSTAT |= 0x04;
+			}
+			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+			}
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC, attotime_never );
+			break;
+		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
+			gb_increment_scanline();
+			gb_lcd.delayed_line_irq = gb_lcd.line_irq;
+			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			gb_lcd.line_irq = 0;
+			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
+				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+			}
+			if ( gb_lcd.current_line == 153 ) {
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1, attotime_never );
+			} else {
+				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1, attotime_never );
+			}
+			break;
+		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
+			/* Check LY=LYC for line #153 */
+			if ( gb_lcd.delayed_line_irq ) {
+				if ( gb_lcd.triggering_line_irq ) {
+					cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+				}
+			}
+			gb_lcd.delayed_line_irq = gb_lcd.delayed_line_irq | gb_lcd.line_irq;
+			if ( CURLINE == CMPLINE ) {
+				LCDSTAT |= 0x04;
+			}
+			gb_increment_scanline();
+			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			gb_lcd.line_irq = 0;
+			LCDSTAT &= 0xFB;
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4/*8*/,0), GB_LCD_STATE_LY00_M1_1, attotime_never );
+			break;
+		case GB_LCD_STATE_LY00_M1_1:
+			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
+				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+			}
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_2, attotime_never );
+			break;
+		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
+			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
+				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
+				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+			}
+			if ( CURLINE == CMPLINE ) {
+				LCDSTAT |= 0x04;
+			}
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(444,0), GB_LCD_STATE_LY00_M0, attotime_never );
+			break;
+		case GB_LCD_STATE_LY00_M0:		/* The STAT register seems to go to 0 for about 4 cycles */
+			/* Set Mode 0 lcdstat */
+			gb_lcd.mode = 0;
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M2, attotime_never );
 			break;
 		}
