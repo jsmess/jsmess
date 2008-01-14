@@ -5,10 +5,9 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-#include "video/crtc6845.h"
-#include "mscommon.h"
 #include "includes/cbmb.h"
+#include "video/crtc6845.h"
+
 
 static int cbmb_font=0;
 

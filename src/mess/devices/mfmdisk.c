@@ -7,9 +7,11 @@
 	- Check code is correct for detecting number of sides and track count
 	- clever write and read which correctly setup the raw mfm
 */
+
 #include "driver.h"
-#include "devices/mfmdisk.h"
-#include "devices/flopdrv.h"
+#include "mfmdisk.h"
+#include "flopdrv.h"
+
 
 static void mfm_disk_seek_callback(mess_image *image, int);
 static int mfm_disk_get_sectors_per_track(mess_image *image, int);

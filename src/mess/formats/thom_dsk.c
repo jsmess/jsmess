@@ -7,8 +7,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "timer.h"
-#include "state.h"
 #include "device.h"
 #include "formats/thom_dsk.h"
 #include "includes/thomson.h"

@@ -9,7 +9,9 @@
 #ifndef IDEDRIVE_H
 #define IDEDRIVE_H
 
-#include "driver.h"
+#include "device.h"
+#include "image.h"
+
 
 enum
 {

@@ -32,12 +32,12 @@
  ******************************************************************************/
 
 #include "driver.h"
-#include "video/i82720.h"
 #include "includes/compis.h"
+#include "video/i82720.h"
 #include "devices/mflopimg.h"
 #include "devices/printer.h"
 #include "formats/cpis_dsk.h"
-#include "cpuintrf.h"
+
 
 static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE( 0x00000, 0x3ffff) AM_RAM

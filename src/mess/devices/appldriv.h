@@ -9,7 +9,9 @@
 #ifndef APPLDRIV_H
 #define APPLDRIV_H
 
+#include "device.h"
 #include "image.h"
+
 
 enum
 {
@@ -26,5 +28,5 @@ UINT8 apple525_read_data(void);
 void apple525_write_data(UINT8 data);
 int apple525_read_status(void);
 
-#endif /* APPLDRIV_H */
 
+#endif /* APPLDRIV_H */

@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "image.h"
 #include "includes/vtech2.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"

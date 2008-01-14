@@ -10,10 +10,11 @@
 							- Cleaned code up a bit
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
-#include "devices/flopdrv.h"
-#include "devices/dsk.h"
+#include "dsk.h"
+#include "flopdrv.h"
+
+
 /* disk image and extended disk image support code */
 /* supports up to 84 tracks and 2 sides */
 

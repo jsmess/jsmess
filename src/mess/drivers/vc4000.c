@@ -10,7 +10,7 @@
 
 #include "includes/vc4000.h"
 #include "devices/cartslot.h"
-#include "image.h"
+
 
 static  READ8_HANDLER(vc4000_key_r)
 {

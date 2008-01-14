@@ -43,7 +43,6 @@
 
 
 #include "driver.h"
-#include "state.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/jaguar/jaguar.h"
 #include "includes/jaguar.h"

@@ -19,7 +19,6 @@
 #include "driver.h"
 
 #include "990_hd.h"
-#include "image.h"
 
 #include "harddisk.h"
 #include "devices/harddriv.h"

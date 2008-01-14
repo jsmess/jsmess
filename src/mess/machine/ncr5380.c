@@ -21,7 +21,6 @@
  */
 
 #include "driver.h"
-#include "state.h"
 #include "ncr5380.h"
 
 #define VERBOSE	(0)

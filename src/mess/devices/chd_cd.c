@@ -6,7 +6,9 @@
 
 *********************************************************************/
 
+#include "cdrom.h"
 #include "chd_cd.h"
+
 
 #define MAX_CDROMS	(4)	// up to this many drives
 

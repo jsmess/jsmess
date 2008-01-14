@@ -11,7 +11,7 @@
 #include "includes/apf.h"
 #include "devices/cassette.h"
 #include "devices/basicdsk.h"
-#include "image.h"
+
 
 /* 256 bytes per sector, single sided, single density, 40 track  */
 DEVICE_LOAD( apfimag_floppy )

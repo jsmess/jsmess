@@ -23,8 +23,6 @@
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
 
-#include "image.h"
-
 
 /* BBC Memory Size */
 static int bbc_RAMSize=1;

@@ -9,7 +9,6 @@
  ******************************************************************/
 
 #include "driver.h"
-#include "image.h"
 #include "sound/custom.h"
 #include "includes/channelf.h"
 #include "devices/cartslot.h"

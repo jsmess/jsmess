@@ -9,8 +9,11 @@
 #ifndef MFLOPIMG_H
 #define MFLOPIMG_H
 
-#include "devices/flopdrv.h"
+#include "device.h"
+#include "image.h"
+#include "flopdrv.h"
 #include "formats/flopimg.h"
+
 
 enum
 {

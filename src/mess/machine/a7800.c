@@ -23,7 +23,6 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tiasound.h"
-#include "cpuintrf.h"
 #include "hash.h"
 #include "image.h"
 #include "machine/6532riot.h"

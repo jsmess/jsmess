@@ -9,7 +9,6 @@
 #include <zlib.h>
 
 #include "driver.h"
-#include "image.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"

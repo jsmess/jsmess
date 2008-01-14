@@ -12,7 +12,6 @@ TODO: Define a proper color table - see machine/arcadia.c for details
 
 #include <assert.h>
 #include "driver.h"
-#include "image.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/arcadia.h"
 #include "devices/cartslot.h"

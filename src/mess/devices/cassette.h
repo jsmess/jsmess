@@ -9,8 +9,10 @@
 #ifndef CASSETTE_H
 #define CASSETTE_H
 
-#include "formats/cassimg.h"
+#include "device.h"
 #include "image.h"
+#include "formats/cassimg.h"
+
 
 enum
 {
@@ -55,5 +57,6 @@ void cassette_seek(mess_image *cassette, double time, int origin);
 
 /* device specification */
 void cassette_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+
 
 #endif /* CASSETTE_H */

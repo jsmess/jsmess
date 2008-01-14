@@ -15,7 +15,9 @@
 
 *********************************************************************/
 
+#include "harddisk.h"
 #include "harddriv.h"
+
 
 #define MAX_HARDDISKS	8
 #define USE_CHD_OPEN	0

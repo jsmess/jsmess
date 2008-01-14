@@ -16,8 +16,8 @@
 */
 
 #include "driver.h"
-#include "devices/flopdrv.h"
-#include "image.h"
+#include "flopdrv.h"
+
 
 #define VERBOSE		0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

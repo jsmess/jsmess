@@ -92,7 +92,6 @@
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
 #include "sound/ay8910.h"
-#include "image.h"
 #include "video/crtc6845.h"
 
 #define EINSTEIN_SYSTEM_CLOCK 4000000

@@ -6,7 +6,7 @@
 #include "devices/chd_cd.h"
 #include "sound/msm5205.h"
 #include "sound/cdda.h"
-#include "image.h"
+
 
 /* the largest possible cartridge image (street fighter 2 - 2.5MB) */
 #define PCE_ROM_MAXSIZE				(0x280000)

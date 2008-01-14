@@ -4,9 +4,7 @@
  */
 
 #include "driver.h"
-#include "devices/printer.h"
-#include "image.h"
-
+#include "printer.h"
 
 
 int printer_status(mess_image *img, int newstatus)

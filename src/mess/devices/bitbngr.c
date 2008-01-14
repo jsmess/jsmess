@@ -9,8 +9,8 @@
 #include <math.h>
 
 #include "driver.h"
-#include "devices/bitbngr.h"
-#include "devices/printer.h"
+#include "bitbngr.h"
+#include "printer.h"
 
 
 static TIMER_CALLBACK(bitbanger_overthreshhold);

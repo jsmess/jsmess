@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#include "mflopimg.h"
 #include "utils.h"
-#include "image.h"
-#include "devices/flopdrv.h"
+#include "mflopimg.h"
+#include "flopdrv.h"
+#include "formats/flopimg.h"
 
 
 

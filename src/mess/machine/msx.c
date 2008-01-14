@@ -24,7 +24,6 @@
 #include "devices/printer.h"
 #include "devices/cassette.h"
 #include "utils.h"
-#include "image.h"
 #include "osdepend.h"
 #include "sound/ay8910.h"
 #include "sound/2413intf.h"

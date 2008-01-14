@@ -48,12 +48,9 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "state.h"
-
+#include "pc_cga.h"
 #include "includes/crtc6845.h"
-#include "video/pc_cga.h"
 #include "video/pc_video.h"
-#include "mscommon.h"
 #include "memconv.h"
 
 #define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */

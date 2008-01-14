@@ -11,7 +11,6 @@
 #include "driver.h"
 
 #include "990_dk.h"
-#include "image.h"
 #include "formats/basicdsk.h"
 #include "devices/mflopimg.h"
 

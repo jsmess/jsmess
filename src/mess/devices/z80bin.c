@@ -8,9 +8,8 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "image.h"
-#include "devices/snapquik.h"
-#include "devices/z80bin.h"
+#include "z80bin.h"
+#include "snapquik.h"
 
 
 static QUICKLOAD_LOAD( z80bin )

@@ -53,7 +53,7 @@ Todo:
 #include "devices/printer.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
-#include "image.h"
+
 
 #define LOG_VTECH1_LATCH 0
 #define LOG_VTECH1_FDC   0

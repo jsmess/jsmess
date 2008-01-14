@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "device.h"
 #include "cococart.h"
 
 

@@ -14,7 +14,7 @@
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
 #include "audio/dave.h"
-#include "image.h"
+
 
 void Enterprise_SetupPalette(void);
 

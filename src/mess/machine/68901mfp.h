@@ -2,7 +2,6 @@
 #define MFP68901_H
 
 #include "driver.h"
-#include "timer.h"
 #include "cpu/m68000/m68000.h"
 
 #define MAX_MFP	4

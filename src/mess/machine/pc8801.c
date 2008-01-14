@@ -15,13 +15,12 @@
 
 ***************************************************************************/
 
-#include "mscommon.h"
 #include "driver.h"
-#include "timer.h"
 #include "includes/pc8801.h"
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"
 #include "sound/beep.h"
+
 
 static int ROMmode,RAMmode,maptvram;
 static int no4throm,no4throm2,port71_save;

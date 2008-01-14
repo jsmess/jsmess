@@ -8,9 +8,8 @@
 
 #include "driver.h"
 #include "includes/odyssey2.h"
-#include "image.h"
 #include "devices/cartslot.h"
-#include "osdmess.h"
+
 
 static UINT8 *ram;
 static UINT8 p1, p2;

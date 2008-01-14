@@ -5,9 +5,9 @@ the data will be accessed correctly */
 
 /* THIS DISK IMAGE CODE USED TO BE PART OF THE WD179X EMULATION, EXTRACTED INTO THIS FILE */
 #include "driver.h"
-#include "devices/basicdsk.h"
-#include "devices/flopdrv.h"
-#include "image.h"
+#include "basicdsk.h"
+#include "flopdrv.h"
+
 
 #define basicdsk_MAX_DRIVES 4
 #define VERBOSE 1

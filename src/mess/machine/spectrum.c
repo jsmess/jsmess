@@ -32,7 +32,6 @@
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
 #include "sound/ay8910.h"
-#include "image.h"
 #include "utils.h"
 
 

@@ -13,6 +13,8 @@
 
 #include <assert.h>
 #include "driver.h"
+#include "includes/pc.h"
+
 #include "machine/8255ppi.h"
 #include "machine/uart8250.h"
 #include "machine/mc146818.h"
@@ -41,10 +43,8 @@
 #include "machine/pcshare.h"
 #include "audio/pc.h"
 
-#include "includes/pc.h"
-#include "mscommon.h"
-
 #include "machine/8237dma.h"
+
 
 DRIVER_INIT( pccga )
 {

@@ -34,7 +34,7 @@
 #include "devices/basicdsk.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
-#include "image.h"
+
 
 // interrupt register stuff
 #define A310_IRQA_PRINTER_BUSY (0x01)

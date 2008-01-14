@@ -1,6 +1,5 @@
 /* Core includes */
 #include "driver.h"
-#include "image.h"
 #include "includes/kc.h"
 
 /* Components */

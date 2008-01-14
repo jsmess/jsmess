@@ -18,12 +18,13 @@
 
 #include <stdio.h>
 
-#include "mscommon.h"
+#include "driver.h"
+#include "machine/pc_hdc.h"
 #include "machine/pic8259.h"
 #include "machine/8237dma.h"
-#include "machine/pc_hdc.h"
 #include "devices/harddriv.h"
 #include "memconv.h"
+
 
 #define LOG_HDC_STATUS		0
 #define LOG_HDC_CALL		0

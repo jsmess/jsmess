@@ -2,7 +2,6 @@
 #include <stdarg.h>
 
 #include "driver.h"
-#include "image.h"
 #include "includes/cbm.h"
 #include "devices/cartslot.h"
 

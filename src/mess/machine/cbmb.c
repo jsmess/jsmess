@@ -5,6 +5,7 @@
 ***************************************************************************/
 #include <ctype.h>
 #include "driver.h"
+#include "includes/cbmb.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
@@ -18,9 +19,7 @@
 #include "includes/cbmieeeb.h"
 #include "video/vic6567.h"
 #include "video/crtc6845.h"
-#include "mscommon.h"
 
-#include "includes/cbmb.h"
 
 static TIMER_CALLBACK(cbmb_frame_interrupt);
 

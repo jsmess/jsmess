@@ -9,12 +9,12 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "pc_t1t.h"
+#include "pc_cga.h" // cga monitor palette
+#include "pc_aga.h" //europc charset
 
 #include "includes/crtc6845.h"
-#include "video/pc_cga.h" // cga monitor palette
-#include "video/pc_aga.h" //europc charset
-#include "video/pc_t1t.h"
-#include "mscommon.h"
+
 
 /***************************************************************************
 

@@ -7,10 +7,9 @@
 #ifndef CARTSLOT_H
 #define CARTSLOT_H
 
-#include <stdlib.h>
-#include "messdrv.h"
+#include "device.h"
+#include "image.h"
 
-/**************************************************************************/
 
 #define ROM_CART_LOAD(index,extensions,offset,length,flags)	\
 	{ ROMENTRY_CARTRIDGE, offset, length, flags, "#" #index "\0" extensions },
@@ -22,5 +21,6 @@
 #define ROM_NOCLEAR		0x00000008
 
 void cartslot_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+
 
 #endif /* CARTSLOT_H */

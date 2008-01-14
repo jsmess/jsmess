@@ -19,7 +19,6 @@ rom/ram selection
 
 
 #include "driver.h"
-#include "image.h"
 #include "cpu/z80/z80.h"
 #include "video/m6845.h"
 #include "machine/8255ppi.h"

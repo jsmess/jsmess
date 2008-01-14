@@ -37,7 +37,9 @@
  ***************************************************************************/
 
 #include "driver.h"
-#include "devices/coco_vhd.h"
+#include "coco_vhd.h"
+#include "includes/coco.h"
+
 
 #define VERBOSE 0
 

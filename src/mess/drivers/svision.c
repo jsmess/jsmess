@@ -6,7 +6,6 @@
 
 #include <assert.h>
 #include "driver.h"
-#include "image.h"
 #include "mslegacy.h"
 #include "cpu/m6502/m6502.h"
 

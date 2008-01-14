@@ -5,11 +5,10 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "pc_mda.h"
+#include "pc_cga.h" //for the cga palette hack
 #include "includes/crtc6845.h"
 
-#include "video/pc_mda.h"
-#include "video/pc_cga.h" //for the cga palette hack
-#include "mscommon.h"
 
 #define VERBOSE_MDA 0		/* MDA (Monochrome Display Adapter) */
 

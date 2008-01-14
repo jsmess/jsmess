@@ -9,7 +9,9 @@
 #ifndef BITBNGR_H
 #define BITBNGR_H
 
-#include "devices/printer.h"
+#include "device.h"
+#include "image.h"
+
 
 struct bitbanger_config
 {
@@ -32,5 +34,6 @@ enum
 
 void bitbanger_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
 void bitbanger_output(mess_image *img, int value);
+
 
 #endif /* BITBNGR_H */

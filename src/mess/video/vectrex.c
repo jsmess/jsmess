@@ -1,13 +1,12 @@
 #include <math.h>
 #include "driver.h"
+#include "includes/vectrex.h"
 #include "video/vector.h"
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "mscommon.h"
 
-#include "includes/vectrex.h"
 
 #define RAMP_DELAY 6.333e-6
 #define SH_DELAY RAMP_DELAY

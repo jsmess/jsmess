@@ -67,12 +67,12 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "inptport.h"
 #include "cococart.h"
+#include "coco_vhd.h"
+#include "includes/coco.h"
 #include "machine/wd17xx.h"
 #include "machine/ds1315.h"
 #include "machine/msm6242.h"
-#include "devices/coco_vhd.h"
 
 #define LOG_FDC		0
 

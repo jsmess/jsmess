@@ -9,7 +9,8 @@
 #ifndef __COCOCART_H__
 #define __COCOCART_H__
 
-#include "mamecore.h"
+#include "device.h"
+#include "image.h"
 
 
 /***************************************************************************

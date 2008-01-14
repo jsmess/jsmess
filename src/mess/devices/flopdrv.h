@@ -1,9 +1,12 @@
+/* flopdrv provides simple emulation of a disc drive */
+/* the 8271, nec765 and wd179x use this */
+
 #ifndef FLOPDRV_H
 #define FLOPDRV_H
 
-/* flopdrv provides simple emulation of a disc drive */
-/* the 8271, nec765 and wd179x use this */
+#include "device.h"
 #include "image.h"
+
 
 typedef enum
 {
@@ -160,5 +163,6 @@ int	floppy_drive_get_datarate_in_us(DENSITY density);
    track.
 */
 void floppy_drive_set_rpm(mess_image *image, float rpm);
+
 
 #endif /* FLOPDRV_H */

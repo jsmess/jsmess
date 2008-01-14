@@ -22,7 +22,7 @@
 #include "formats/svi_cas.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
-#include "image.h"
+
 
 enum {
 	SVI_INTERNAL	= 0,

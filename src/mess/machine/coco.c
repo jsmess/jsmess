@@ -93,8 +93,6 @@ easier to manage.
 #include "devices/bitbngr.h"
 #include "devices/printer.h"
 #include "devices/cassette.h"
-#include "image.h"
-#include "state.h"
 #include "machine/wd17xx.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"

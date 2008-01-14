@@ -9,9 +9,9 @@
 #ifndef SONYDRIV_H
 #define SONYDRIV_H
 
-#include "osdepend.h"
-#include "fileio.h"
+#include "device.h"
 #include "image.h"
+
 
 enum
 {
@@ -39,5 +39,6 @@ void sony_set_speed(int speed);
 UINT8 sony_read_data(void);
 void sony_write_data(UINT8 data);
 int sony_read_status(void);
+
 
 #endif /* SONYDRIV_H */

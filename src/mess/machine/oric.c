@@ -30,7 +30,7 @@
 #include "devices/printer.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
-#include "image.h"
+
 
 UINT8 *oric_ram;
 

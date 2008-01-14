@@ -37,11 +37,10 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "image.h"
+#include "sonydriv.h"
 #include "formats/ap_dsk35.h"
-#include "devices/sonydriv.h"
-#include "devices/flopdrv.h"
-#include "devices/mflopimg.h"
+#include "flopdrv.h"
+#include "mflopimg.h"
 
 
 #ifdef MAME_DEBUG

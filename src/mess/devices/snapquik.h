@@ -9,8 +9,9 @@
 #ifndef SNAPQUIK_H
 #define SNAPQUIK_H
 
-#include <stdlib.h>
-#include "messdrv.h"
+#include "device.h"
+#include "image.h"
+
 
 enum
 {
@@ -29,5 +30,5 @@ typedef int (*snapquick_loadproc)(mess_image *image, const char *file_type, int 
 void snapshot_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
 void quickload_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
 
-#endif /* SNAPQUIK_H */
 
+#endif /* SNAPQUIK_H */

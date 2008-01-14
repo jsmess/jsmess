@@ -9,10 +9,9 @@
  *********************************************************************/
 
 #include "driver.h"
-#include "machine/idectrl.h"
-#include "devices/harddriv.h"
 #include "idedrive.h"
-
+#include "harddriv.h"
+#include "machine/idectrl.h"
 
 
 static void ide_get_params(mess_image *image, int *which_bus, int *which_address,

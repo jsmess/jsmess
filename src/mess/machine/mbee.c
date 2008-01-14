@@ -23,7 +23,7 @@
 #include "devices/cassette.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
-#include "image.h"
+
 
 static UINT8 fdc_drv = 0;
 static UINT8 fdc_head = 0;

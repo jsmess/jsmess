@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "image.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

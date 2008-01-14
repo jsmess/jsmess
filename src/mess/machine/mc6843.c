@@ -31,8 +31,6 @@
 
 
 #include "driver.h"
-#include "timer.h"
-#include "state.h"
 #include "mc6843.h"
 #include "devices/flopdrv.h"
 

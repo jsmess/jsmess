@@ -10,9 +10,10 @@
 
 ***************************************************************************/
 
+#include "driver.h"
 #include "cococart.h"
-#include "sndintrf.h"
 #include "sound/dac.h"
+
 
 typedef struct _orch90_info orch90_info;
 struct _orch90_info

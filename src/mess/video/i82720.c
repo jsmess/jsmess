@@ -13,7 +13,6 @@
 /*-------------------------------------------------------------------------*/
 
 #include "driver.h"
-#include "state.h"
 #include "i82720.h"
 #include "i82720cm.h"
 #include "mslegacy.h"

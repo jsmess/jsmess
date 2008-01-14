@@ -6,6 +6,13 @@
 
 **********************************************************************/
 
+#ifndef THOMFLOP_H_
+#define THOMFLOP_H_
+
+#include "device.h"
+#include "image.h"
+
+
 extern UINT8 to7_controller_type; /* set during init */
 extern UINT8 to7_floppy_bank;
 
@@ -37,3 +44,5 @@ extern void thmfc_floppy_reset ( void );
 extern READ8_HANDLER  ( thmfc_floppy_r );
 extern WRITE8_HANDLER ( thmfc_floppy_w );
 
+
+#endif /* THOMFLOP_H_ */

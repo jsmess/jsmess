@@ -2,7 +2,6 @@
 #include "video/stic.h"
 #include "includes/intv.h"
 
-#include "cpuintrf.h"
 
 /* STIC variables */
 struct intv_sprite_type intv_sprite[8];

@@ -32,13 +32,11 @@
 
 **********************************************************************/
 
-#include "driver.h"
-#include "timer.h"
-#include "sound/dac.h"
-#include "state.h"
-#include "mea8000.h"
-
 #include <math.h>
+
+#include "driver.h"
+#include "mea8000.h"
+#include "sound/dac.h"
 
 
 #define VERBOSE 0

@@ -7,9 +7,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "timer.h"
-#include "state.h"
-#include "device.h"
 #include "includes/thomson.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
@@ -17,6 +14,7 @@
 #include "formats/thom_dsk.h"
 #include "machine/mc6854.h"
 #include "machine/mc6843.h"
+
 
 #define VERBOSE 0 /* 0, 1 or 2 */
 

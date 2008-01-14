@@ -66,7 +66,6 @@
 #include "driver.h"
 #include "devices/harddriv.h"
 #include "includes/corvushd.h"
-#include "timer.h"
 #include <ctype.h>
 
 #define VERBOSE 0

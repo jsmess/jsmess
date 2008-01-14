@@ -19,8 +19,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "timer.h"
-#include "state.h"
 #include "mc6846.h"
 
 #define VERBOSE 0

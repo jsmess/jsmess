@@ -6,9 +6,8 @@
 
 *********************************************************************/
 
+#include "driver.h"
 #include "cococart.h"
-#include "cpuintrf.h"
-#include "sndintrf.h"
 
 
 struct _coco_cartridge

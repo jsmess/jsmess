@@ -10,7 +10,6 @@
 #include "video/tms9928a.h"
 #include "includes/adam.h"
 #include "devices/cartslot.h"
-#include "image.h"
 #include "devices/basicdsk.h"
 
 int adam_lower_memory; /* Lower 32k memory Z80 address configuration */

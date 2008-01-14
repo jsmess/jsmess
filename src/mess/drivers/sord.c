@@ -50,7 +50,7 @@
 
 #include "machine/nec765.h"
 #include "devices/cassette.h"
-#include "image.h"
+
 
 static MACHINE_RESET( sord_m5 );
 

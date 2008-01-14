@@ -9,7 +9,6 @@
 
 #include <stdarg.h>
 #include "driver.h"
-#include "timer.h"
 #include "cpu/z80/z80.h"
 #include "includes/cgenie.h"
 #include "machine/wd17xx.h"
@@ -17,7 +16,7 @@
 #include "devices/cartslot.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "image.h"
+
 
 #define AYWriteReg(chip,port,value) \
 	AY8910_control_port_0_w(0,port);  \

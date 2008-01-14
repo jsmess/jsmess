@@ -58,9 +58,9 @@
 #include <assert.h>
 
 #include "driver.h"
-#include "mscommon.h"
+#include "vic6567.h"
+#include "vic4567.h"
 #include "utils.h"
-#include "mslegacy.h"
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"
@@ -68,8 +68,7 @@
 /* lightpen values */
 #include "includes/c64.h"
 
-#include "video/vic4567.h"
-#include "vic6567.h"
+#include "mslegacy.h"
 
 /*#define GFX */
 

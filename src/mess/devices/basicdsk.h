@@ -3,13 +3,15 @@
 #ifndef BASICDSK_H
 #define BASICDSK_H
 
-#include "driver.h"
-#include "devices/flopdrv.h"
+#include "device.h"
+#include "image.h"
+#include "flopdrv.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+	
 extern const floppy_interface basicdsk_floppy_interface;
 
 /* init */
@@ -62,6 +64,7 @@ void legacybasicdsk_device_getinfo(const device_class *devclass, UINT32 state, u
 	CONFIG_DEVICE_BASE(IO_FLOPPY, (count), (file_extensions), DEVICE_LOAD_RESETS_NONE,	\
 		OSD_FOPEN_READ, device_init_basicdsk_floppy, NULL, (load), device_unload_basicdsk_floppy, NULL, NULL,\
 		NULL, NULL, floppy_status, NULL, NULL, NULL, NULL, NULL, NULL)	\
+
 
 #ifdef __cplusplus
 }

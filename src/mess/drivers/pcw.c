@@ -99,7 +99,6 @@
 // pcw video hardware
 #include "includes/pcw.h"
 // pcw/pcw16 beeper
-#include "image.h"
 #include "sound/beep.h"
 
 #define VERBOSE 0
