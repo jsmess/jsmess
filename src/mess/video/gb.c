@@ -1673,7 +1673,6 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
 			gb_select_sprites();
 			gb_lcd.sprite_cycles = sprite_cycles[ gb_lcd.sprCount ];
-printf("sprite_cycles is %d\n", gb_lcd.sprite_cycles);
 			/* Set Mode 3 lcdstate */
 			gb_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
@@ -1734,7 +1733,7 @@ printf("sprite_cycles is %d\n", gb_lcd.sprite_cycles);
 			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
 			gb_lcd.line_irq = 0;
 			LCDSTAT &= 0xFB;
-			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4/*8*/,0), GB_LCD_STATE_LY00_M1_1, attotime_never );
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_1, attotime_never );
 			break;
 		case GB_LCD_STATE_LY00_M1_1:
 			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
