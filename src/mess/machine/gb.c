@@ -258,6 +258,8 @@ MACHINE_RESET( gb )
 	/* Enable BIOS rom */
 	memory_set_bankptr(5, memory_region(REGION_CPU1) );
 	memory_set_bankptr(10, ROMMap[ROMBank00] + 0x0100 );
+
+	gb_timer.divcount = 0x0004;
 }
 
 MACHINE_RESET( sgb )
@@ -292,6 +294,8 @@ MACHINE_RESET( sgb )
 	{
 		sgb_hack = 1;
 	}
+
+	gb_timer.divcount = 0xABC8;
 }
 
 MACHINE_RESET( gbpocket )
@@ -310,6 +314,8 @@ MACHINE_RESET( gbpocket )
 	/* Enable BIOS rom if we have one */
 	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
+
+	gb_timer.divcount = 0xABC8;
 }
 
 MACHINE_RESET( gbc )
