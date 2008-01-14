@@ -7,12 +7,10 @@
 
 #include "includes/vectrex.h"
 
-#define VC_BLACK 0x00000000
-#define VC_RED   0x00ff0000
-#define VC_GREEN 0x0000ff00
-#define VC_BLUE  0x000000ff
-#define VC_WHITE VC_RED|VC_GREEN|VC_BLUE
-#define VC_DARKRED 0x00800000
+#define VC_RED      MAKE_RGB(0xff, 0x00, 0x00)
+#define VC_GREEN    MAKE_RGB(0x00, 0xff, 0x00)
+#define VC_BLUE     MAKE_RGB(0x00, 0x00, 0xff)
+#define VC_DARKRED  MAKE_RGB(0x80, 0x00, 0x00)
 
 #define PORTB 0
 #define PORTA 1
@@ -21,7 +19,7 @@
   Global variables
  *********************************************************************/
 unsigned char vectrex_via_out[2];
-UINT32 vectrex_beam_color = VC_WHITE;	   /* the color of the vectrex beam */
+rgb_t vectrex_beam_color = RGB_WHITE;	   /* the color of the vectrex beam */
 int vectrex_imager_status = 0;	   /* 0 = off, 1 = right eye, 2 = left eye */
 double imager_freq;
 emu_timer *imager_timer;
@@ -34,7 +32,10 @@ size_t vectrex_ram_size;
  *********************************************************************/
 
 /* Colors for right and left eye */
-static UINT32 imager_colors[6] = {VC_WHITE,VC_WHITE,VC_WHITE,VC_WHITE,VC_WHITE,VC_WHITE};
+static rgb_t imager_colors[6] =
+{
+	RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE
+};
 
 /* Starting points of the three colors */
 /* Values taken from J. Nelson's drawings*/
@@ -118,7 +119,7 @@ void vectrex_configuration(void)
 		switch ((cport>>2) & 0x07)
 		{
 		case 0x00:
-			imager_colors[0]=imager_colors[1]=imager_colors[2]=VC_BLACK;
+			imager_colors[0]=imager_colors[1]=imager_colors[2]=RGB_BLACK;
 			break;
 		case 0x01:
 			imager_colors[0]=imager_colors[1]=imager_colors[2]=VC_DARKRED;
@@ -148,7 +149,7 @@ void vectrex_configuration(void)
 		switch ((cport>>5) & 0x07)
 		{
 		case 0x00:
-			imager_colors[3]=imager_colors[4]=imager_colors[5]=VC_BLACK;
+			imager_colors[3]=imager_colors[4]=imager_colors[5]=RGB_BLACK;
 			break;
 		case 0x01:
 			imager_colors[3]=imager_colors[4]=imager_colors[5]=VC_DARKRED;
@@ -177,8 +178,8 @@ void vectrex_configuration(void)
 	else
 	{
 		vector_add_point_function = vectrex_add_point;
-		vectrex_beam_color = VC_WHITE;
-		imager_colors[0]=imager_colors[1]=imager_colors[2]=imager_colors[3]=imager_colors[4]=imager_colors[5]=VC_WHITE;
+		vectrex_beam_color = RGB_WHITE;
+		imager_colors[0]=imager_colors[1]=imager_colors[2]=imager_colors[3]=imager_colors[4]=imager_colors[5]=RGB_WHITE;
 	}
 	vectrex_lightpen_port = (input_port_6_r (0) & 0x03);
 }
