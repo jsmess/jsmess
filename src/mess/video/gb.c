@@ -7,7 +7,7 @@
   Original code                               Carsten Sorensen   1998
   Mess modifications, bug fixes and speedups  Hans de Goede      1998
   Bug fixes, SGB and GBC code                 Anthony Kruize     2002
-  Improvements to match real hardware         Wilbert Pol        2006,2007
+  Improvements to match real hardware         Wilbert Pol        2006-2008
 
 ***************************************************************************/
 
@@ -37,6 +37,11 @@
 #define GBCBCPD		gb_vid_regs[0x29]	/* Backgound palette data                     */
 #define GBCOCPS		gb_vid_regs[0x2A]	/* Object palette spec                        */
 #define GBCOCPD		gb_vid_regs[0x2B]	/* Object palette data                        */
+
+enum {
+	UNLOCKED=0,
+	LOCKED
+};
 
 #define _NR_GB_VID_REGS		0x40
 
@@ -92,6 +97,8 @@ static struct gb_lcd_struct {
 	int delayed_line_irq;
 	int sprite_cycles;
 	int scrollx_adjust;
+	int oam_locked;
+	int vram_locked;
 	struct layer_struct	layer[2];
 	emu_timer	*lcd_timer;
 } gb_lcd;
@@ -1264,6 +1271,8 @@ void gb_video_init( int mode ) {
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x01;
 		gb_lcd.mode = 1;
 		timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(292,0), GB_LCD_STATE_LY9X_M1_INC, attotime_never );
+		gb_lcd.oam_locked = UNLOCKED;
+		gb_lcd.vram_locked = UNLOCKED;
 		break;
 	}
 }
@@ -1331,6 +1340,8 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Set Mode 0 lcdstate */
 			gb_lcd.mode = 0;
 			LCDSTAT &= 0xFC;
+			gb_lcd.oam_locked = UNLOCKED;
+			gb_lcd.vram_locked = UNLOCKED;
 			/*
 				There seems to a kind of feature in the gameboy hardware when the lowest bits of the
 				SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
@@ -1399,6 +1410,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Set Mode 2 lcdstate */
 			gb_lcd.mode = 2;
 			LCDSTAT = ( LCDSTAT & 0xFC ) | 0x02;
+			gb_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
 			if ( ( LCDSTAT & 0x20 ) && ! gb_lcd.line_irq && ! gb_lcd.line_irq ) {
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
@@ -1411,6 +1423,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
+			gb_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
 			if ( ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
 				 ( !gb_lcd.mode_irq && ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq && ( LCDSTAT & 0x20 ) ) ) {
@@ -1432,6 +1445,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Set Mode 3 lcdstate */
 			gb_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
+			gb_lcd.vram_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0, attotime_never );
@@ -1557,6 +1571,8 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Set Mode 0 lcdstate */
 			gb_lcd.mode = 0;
 			LCDSTAT &= 0xFC;
+			gb_lcd.oam_locked = UNLOCKED;
+			gb_lcd.vram_locked = UNLOCKED;
 			/*
 				There seems to a kind of feature in the gameboy hardware when the lowest bits of the
 				SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
@@ -1625,6 +1641,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Set Mode 2 lcdstate */
 			gb_lcd.mode = 2;
 			LCDSTAT = ( LCDSTAT & 0xFC ) | 0x02;
+			gb_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
 			if ( ( LCDSTAT & 0x20 ) && ! gb_lcd.line_irq && ! gb_lcd.line_irq ) {
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
@@ -1637,6 +1654,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
+			gb_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
 			if ( ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
 				 ( !gb_lcd.mode_irq && ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq && ( LCDSTAT & 0x20 ) ) ) {
@@ -1655,9 +1673,11 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
 			gb_select_sprites();
 			gb_lcd.sprite_cycles = sprite_cycles[ gb_lcd.sprCount ];
+printf("sprite_cycles is %d\n", gb_lcd.sprite_cycles);
 			/* Set Mode 3 lcdstate */
 			gb_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
+			gb_lcd.vram_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0, attotime_never );
@@ -1755,6 +1775,7 @@ static void gb_lcd_switch_on( void ) {
 	gb_lcd.line_irq = 0;
 	gb_lcd.delayed_line_irq = 0;
 	gb_lcd.mode = 0;
+	gb_lcd.oam_locked = LOCKED;	/* TODO: Investigate whether this OAM locking is correct. */
 	/* Check for LY=LYC coincidence */
 	if ( CURLINE == CMPLINE ) {
 		LCDSTAT |= 0x04;
@@ -1772,37 +1793,18 @@ void gb_video_up_to_date( void ) {
 }
 
 READ8_HANDLER( gb_video_r ) {
-//	if ( 0 && activecpu_get_pc() > 0x100 ) {
-//		logerror("LCDSTAT/LY read, cycles left is %d\n", (int)ATTOTIME_TO_CYCLES(0,timer_timeleft( gb_lcd.lcd_timer )) );
-//	}
 	gb_video_up_to_date();
 	return gb_vid_regs[offset];
 }
 
-/* Returns true when LCD is on and STAT is 02 */
-INLINE int gb_video_oam_locked( void ) {
-	if ( ( LCDCONT & 0x80 ) && ( ( LCDSTAT & 0x03 ) == 0x02 ) ) {
-		return 1;
-	}
-	return 0;
-}
-
-/* Returns true when LCD is on and STAT is 03 */
-INLINE int gb_video_vram_locked( void ) {
-	if ( ( LCDCONT & 0x80 ) && ( ( LCDSTAT & 0x03 ) == 0x03 ) ) {
-		return 1;
-	}
-	return 0;
-}
-
 READ8_HANDLER( gb_vram_r ) {
 	gb_video_up_to_date();
-	return gb_video_vram_locked() ? 0xFF : gb_vram_ptr[offset];
+	return ( gb_lcd.vram_locked == LOCKED ) ? 0xFF : gb_vram_ptr[offset];
 }
 
 WRITE8_HANDLER( gb_vram_w ) {
 	gb_video_up_to_date();
-	if ( gb_video_vram_locked() ) {
+	if ( gb_lcd.vram_locked == LOCKED ) {
 		return;
 	}
 	gb_vram_ptr[offset] = data;
@@ -1810,12 +1812,12 @@ WRITE8_HANDLER( gb_vram_w ) {
 
 READ8_HANDLER( gb_oam_r ) {
 	gb_video_up_to_date();
-	return ( gb_video_oam_locked() || gb_video_vram_locked() ) ? 0xFF : gb_oam[offset];
+	return ( gb_lcd.oam_locked == LOCKED ) ? 0xFF : gb_oam[offset];
 }
 
 WRITE8_HANDLER( gb_oam_w ) {
 	gb_video_up_to_date();
-	if ( gb_video_oam_locked() || gb_video_vram_locked() || offset >= 0xa0 ) {
+	if ( gb_lcd.oam_locked == LOCKED || offset >= 0xa0 ) {
 		return;
 	}
 	gb_oam[offset] = data;
@@ -1833,6 +1835,8 @@ WRITE8_HANDLER ( gb_video_w ) {
 		if ( ! ( data & 0x80 ) ) {
 			LCDSTAT &= ~0x03;
 			CURLINE = 0;
+			gb_lcd.oam_locked = UNLOCKED;
+			gb_lcd.vram_locked = UNLOCKED;
 		}
 		/* If LCD is being switched on */
 		if ( !( LCDCONT & 0x80 ) && ( data & 0x80 ) ) {
@@ -1955,6 +1959,8 @@ WRITE8_HANDLER ( gbc_video_w ) {
 		if ( ! ( data & 0x80 ) ) {
 			LCDSTAT &= ~0x03;
 			CURLINE = 0;
+			gb_lcd.oam_locked = UNLOCKED;
+			gb_lcd.vram_locked = UNLOCKED;
 		}
 		/* If LCD is being switched on */
 		if ( !( LCDCONT & 0x80 ) && ( data & 0x80 ) ) {
