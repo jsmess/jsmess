@@ -1799,7 +1799,7 @@ READ8_HANDLER( gbc_io2_r ) {
 	default:
 		break;
 	}
-	return gb_video_r( offset );
+	return gbc_video_r( offset );
 }
 
 /****************************************************************************

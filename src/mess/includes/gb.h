@@ -101,6 +101,7 @@ extern WRITE8_HANDLER( megaduck_sound_w2 );
 
 /*----------- defined in video/gb.c -----------*/
 
+READ8_HANDLER( gbc_video_r );
 WRITE8_HANDLER ( gbc_video_w );
 
 READ8_HANDLER( gb_oam_r );

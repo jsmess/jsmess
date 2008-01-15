@@ -10,6 +10,8 @@ System Driver Changes:
 ----------------------
 - [GAMEBOY] Small mode 0 stat bug triggering fixes.  [Wilbert Pol]
 
+- [GBCOLOR] Added locking of palette data registers.  [Wilbert Pol]
+
 - [GBPOCKET] Fixed video startup state to match that of a real unit.  [Wilbert
   Pol]
 

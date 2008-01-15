@@ -99,6 +99,7 @@ static struct gb_lcd_struct {
 	int scrollx_adjust;
 	int oam_locked;
 	int vram_locked;
+	int pal_locked;
 	struct layer_struct	layer[2];
 	emu_timer	*lcd_timer;
 } gb_lcd;
@@ -1123,6 +1124,7 @@ enum {
 	GB_LCD_STATE_LYXX_PRE_M0,
 	GB_LCD_STATE_LYXX_M0,
 	GB_LCD_STATE_LYXX_M0_SCX3,
+	GB_LCD_STATE_LYXX_M0_GBC_PAL,
 	GB_LCD_STATE_LYXX_M0_PRE_INC,
 	GB_LCD_STATE_LYXX_M0_INC,
 	GB_LCD_STATE_LY00_M2,
@@ -1273,6 +1275,7 @@ void gb_video_init( int mode ) {
 		timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(292,0), GB_LCD_STATE_LY9X_M1_INC, attotime_never );
 		gb_lcd.oam_locked = UNLOCKED;
 		gb_lcd.vram_locked = UNLOCKED;
+		gb_lcd.pal_locked = UNLOCKED;
 		break;
 	}
 }
@@ -1595,7 +1598,14 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check for HBLANK DMA */
 			if( gbc_hdma_enabled )
 				gbc_hdma(0x10);
-			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(196 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC, attotime_never );
+			if ( ( SCROLLX & 0x03 ) == 0x03 ) {
+				gb_lcd.pal_locked = UNLOCKED;
+			}
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_GBC_PAL, attotime_never );
+			break;
+		case GB_LCD_STATE_LYXX_M0_GBC_PAL:
+			gb_lcd.pal_locked = UNLOCKED;
+			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(192 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			if ( CURLINE < 143 ) {
@@ -1677,6 +1687,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
 			gb_lcd.vram_locked = LOCKED;
+			gb_lcd.pal_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0, attotime_never );
@@ -1940,6 +1951,19 @@ WRITE8_HANDLER ( gb_video_w ) {
 	gb_vid_regs[ offset ] = data;
 }
 
+READ8_HANDLER( gbc_video_r ) {
+	gb_video_up_to_date();
+	switch( offset ) {
+	case 0x29:
+	case 0x2B:
+		if ( gb_lcd.pal_locked == LOCKED ) {
+			return 0xFF;
+		}
+		break;
+	}
+	return gb_vid_regs[offset];
+}
+
 WRITE8_HANDLER ( gbc_video_w ) {
 	static const UINT16 gbc_to_gb_pal[4] = {32767, 21140, 10570, 0};
 	static UINT16 BP = 0, OP = 0;
@@ -1960,6 +1984,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			CURLINE = 0;
 			gb_lcd.oam_locked = UNLOCKED;
 			gb_lcd.vram_locked = UNLOCKED;
+			gb_lcd.pal_locked = UNLOCKED;
 		}
 		/* If LCD is being switched on */
 		if ( !( LCDCONT & 0x80 ) && ( data & 0x80 ) ) {
@@ -2046,6 +2071,9 @@ WRITE8_HANDLER ( gbc_video_w ) {
 	case 0x28:      /* BCPS - Background palette specification */
 		break;
 	case 0x29:      /* BCPD - background palette data */
+		if ( gb_lcd.pal_locked == LOCKED ) {
+			return;
+		}
 		if( GBCBCPS & 0x1 )
 		{
 			cgb_bpal[ ( GBCBCPS >> 1 ) & 0x1F ] = ( ( data & 0x7F ) << 8 ) | BP;
@@ -2061,6 +2089,9 @@ WRITE8_HANDLER ( gbc_video_w ) {
 	case 0x2A:      /* OCPS - Object palette specification */
 		break;
 	case 0x2B:      /* OCPD - Object palette data */
+		if ( gb_lcd.pal_locked == LOCKED ) {
+			return;
+		}
 		if( GBCOCPS & 0x1 )
 		{
 			cgb_spal[ ( GBCOCPS >> 1 ) & 0x1F ] = ( ( data & 0x7F ) << 8 ) | OP;
