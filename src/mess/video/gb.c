@@ -1674,6 +1674,8 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check if LY==LYC STAT bit should be set */
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
+			} else {
+				LCDSTAT &= ~0x04;
 			}
 			/* Check for regular compensation of x-scroll register */
 			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
@@ -1708,6 +1710,8 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check if LY==LYC STAT bit should be set */
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
+			} else {
+				LCDSTAT &= ~0x04;
 			}
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
@@ -1739,6 +1743,8 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.delayed_line_irq = gb_lcd.delayed_line_irq | gb_lcd.line_irq;
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
+			}  else {
+				LCDSTAT &= ~0x04;
 			}
 			gb_increment_scanline();
 			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
@@ -1760,6 +1766,8 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			}
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
+			} else {
+				LCDSTAT &= ~0x04;
 			}
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(444,0), GB_LCD_STATE_LY00_M0, attotime_never );
 			break;
