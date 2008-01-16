@@ -914,7 +914,7 @@ VIDEO_UPDATE( lisa )
 	for (y = 0; y < resy; y++)
 	{
 		for (x = 0; x < resx; x++)
-			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> ((x+y*resx) & 0xf))) ? 1 : 0;
+			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> ((x+y*resx) & 0xf))) ? 0 : 1;
 		draw_scanline8(bitmap, 0, y, resx, line_buffer, machine->pens, -1);
 	}
 	return 0;

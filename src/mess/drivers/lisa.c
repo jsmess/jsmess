@@ -31,14 +31,6 @@ static ADDRESS_MAP_START(lisa210_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)		/* handler for wrap-around */
 ADDRESS_MAP_END
 
-/* init with simple, fixed, B/W palette */
-static PALETTE_INIT( lisa )
-{
-	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
-}
-
-
 
 /* Lisa1 and Lisa 2 machine */
 static MACHINE_DRIVER_START( lisa )
@@ -60,8 +52,7 @@ static MACHINE_DRIVER_START( lisa )
 	MDRV_SCREEN_SIZE(880, 380)
 	MDRV_SCREEN_VISIBLE_AREA(0, 720-1, 0, 364-1)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_COLORTABLE_LENGTH(2)
-	MDRV_PALETTE_INIT(lisa)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(lisa)
 	MDRV_VIDEO_UPDATE(lisa)
@@ -292,4 +283,3 @@ SYSTEM_CONFIG_END
 COMP( 1984, lisa2,    0,		0,		lisa,     lisa,	 lisa2,    lisa,	"Apple Computer",  "Lisa2", GAME_NOT_WORKING )
 COMP( 1984, lisa210,  lisa2,	0,		lisa210,  lisa,	 lisa210,  lisa210,	"Apple Computer",  "Lisa2/10", GAME_NOT_WORKING )
 COMP( 1985, macxl,    lisa2,	0,		macxl,    lisa,	 mac_xl,   lisa210,	"Apple Computer",  "Macintosh XL", /*GAME_NOT_WORKING*/0 )
-
