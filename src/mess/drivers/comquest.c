@@ -40,7 +40,6 @@ icq3250a-d
  */
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/comquest.h"
 #include "devices/cartslot.h"
 
@@ -202,21 +201,6 @@ static GFXDECODE_START( comquest )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, comquest_charlayout, 0, 2 )
 GFXDECODE_END
 
-static const unsigned char comquest_palette[] =
-{
-	0, 0, 0,
-	255,255,255
-};
-
-static const unsigned short comquest_colortable[1][2] = {
-	{ 0, 1 },
-};
-
-static PALETTE_INIT( comquest )
-{
-	palette_set_colors_rgb(machine, 0, comquest_palette, sizeof(comquest_palette) / 3);
-	memcpy(colortable, comquest_colortable,sizeof(comquest_colortable));
-}
 
 static MACHINE_RESET( comquest )
 {
@@ -261,7 +245,6 @@ static MACHINE_DRIVER_START( comquest )
 	MDRV_CPU_CONFIG( amask )
 	MDRV_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( comquest )
 
@@ -271,9 +254,8 @@ static MACHINE_DRIVER_START( comquest )
 	MDRV_SCREEN_SIZE(64*4, 128)	/* 160 x 102 */
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
 	MDRV_GFXDECODE( comquest )
-	MDRV_PALETTE_LENGTH( sizeof(comquest_palette) / 3)
-	MDRV_COLORTABLE_LENGTH( sizeof(comquest_colortable) / sizeof(comquest_colortable[0][0]) )
-	MDRV_PALETTE_INIT( comquest )
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START( comquest )
 	MDRV_VIDEO_UPDATE( comquest )
