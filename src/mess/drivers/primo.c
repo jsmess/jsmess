@@ -99,15 +99,15 @@ Interrupts:
     NMI - 20ms (50HZ), can be disbled/enabled by I/O write
 
 *******************************************************************************/
+
 #include "driver.h"
+#include "includes/primo.h"
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "includes/cbmserb.h"
-#include "includes/primo.h"
 #include "formats/primoptp.h"
-#include "mslegacy.h"
 
 
 static ADDRESS_MAP_START( primoa_port, ADDRESS_SPACE_IO, 8 )
@@ -230,7 +230,6 @@ static MACHINE_DRIVER_START( primoa32 )
 	MDRV_SCREEN_REFRESH_RATE( 50 )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_CPU_VBLANK_INT( primo_vblank_interrupt, 1 )
-	MDRV_INTERLEAVE( 1 )
 
 	MDRV_MACHINE_RESET( primoa )
 
@@ -239,11 +238,9 @@ static MACHINE_DRIVER_START( primoa32 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 256, 192 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 256-1, 0, 192-1 )
-	MDRV_PALETTE_LENGTH( sizeof (primo_palette) / 3 )
-	MDRV_COLORTABLE_LENGTH( sizeof (primo_colortable) )
-	MDRV_PALETTE_INIT( primo )
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START( primo )
 	MDRV_VIDEO_UPDATE( primo )
 
 	/* sound hardware */
