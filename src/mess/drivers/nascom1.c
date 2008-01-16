@@ -49,10 +49,10 @@ Nascom Memory map
 ************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
 #include "includes/nascom1.h"
+#include "cpu/z80/z80.h"
 #include "devices/cartslot.h"
-#include "mslegacy.h"
+
 
 /* Memory w/r functions */
 static ADDRESS_MAP_START( nascom1_mem , ADDRESS_SPACE_PROGRAM, 8)
@@ -108,22 +108,6 @@ static GFXDECODE_START( nascom2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, nascom2_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const unsigned char nascom1_palette[] =
-{
-	0x00, 0x00, 0x00,	/* Black */
-	0xff, 0xff, 0xff	/* White */
-};
-
-static const unsigned short nascom1_colortable[] =
-{
-	0, 1
-};
-
-static PALETTE_INIT( nascom1 )
-{
-	palette_set_colors_rgb(machine, 0, nascom1_palette, sizeof(nascom1_palette) / 3);
-	memcpy(colortable, nascom1_colortable, sizeof (nascom1_colortable));
-}
 
 /* Keyboard input */
 
@@ -226,7 +210,6 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_CPU_VBLANK_INT(nascom_interrupt, 1)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( nascom1 )
 
@@ -236,9 +219,8 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_SCREEN_SIZE(48 * 8, 16 * 16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 16 - 1)
 	MDRV_GFXDECODE( nascom1 )
-	MDRV_PALETTE_LENGTH( sizeof (nascom1_palette) / 3 )
-	MDRV_COLORTABLE_LENGTH( sizeof (nascom1_colortable) )
-	MDRV_PALETTE_INIT( nascom1 )
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START( generic )
 	MDRV_VIDEO_UPDATE( nascom1 )
