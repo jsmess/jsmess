@@ -1087,6 +1087,8 @@ DRIVER_INIT( lisa2 )
 	lisa_features.floppy_hardware = sony_lisa2;
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 0;
+	
+	bad_parity_table = auto_malloc(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT( lisa210 )
@@ -1096,6 +1098,8 @@ DRIVER_INIT( lisa210 )
 	lisa_features.floppy_hardware = sony_lisa210;
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 0;
+	
+	bad_parity_table = auto_malloc(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT( mac_xl )
@@ -1105,6 +1109,8 @@ DRIVER_INIT( mac_xl )
 	lisa_features.floppy_hardware = sony_lisa210;
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 1;
+	
+	bad_parity_table = auto_malloc(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 static void lisa2_set_iwm_enable_lines(int enable_mask)
@@ -1147,8 +1153,7 @@ MACHINE_RESET( lisa )
 	parity_error_pending = FALSE;
 
 	bad_parity_count = 0;
-	bad_parity_table = memory_region(REGION_USER1);
-	memset(bad_parity_table, 0, memory_region_length(REGION_USER1));	/* Clear */
+	memset(bad_parity_table, 0, 0x40000);	/* Clear */
 
 	/* init video */
 

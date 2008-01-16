@@ -208,9 +208,6 @@ ROM_START( lisa2 )
 
 	ROM_REGION(0x100,REGION_GFX1,0)		/* video ROM (includes S/N) */
 	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
-
-	ROM_REGION(0x040000, REGION_USER1, 0)	/* 1 bit per byte of CPU RAM - used for parity check emulation */
-
 ROM_END
 
 ROM_START( lisa210 )
@@ -228,9 +225,6 @@ ROM_START( lisa210 )
 
 	ROM_REGION(0x100,REGION_GFX1, 0)		/* video ROM (includes S/N) */
 	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
-
-	ROM_REGION(0x040000, REGION_USER1, 0)	/* 1 bit per byte of CPU RAM - used for parity check emulation */
-
 ROM_END
 
 ROM_START( macxl )
@@ -248,10 +242,8 @@ ROM_START( macxl )
 
 	ROM_REGION(0x100,REGION_GFX1, 0)		/* video ROM (includes S/N) ; no dump known, although Lisa ROM works fine at our level of emulation */
 	ROM_LOAD( "vidstate.rom", 0x00, 0x100, NO_DUMP)
-
-	ROM_REGION(0x040000, REGION_USER1, 0)	/* 1 bit per byte of CPU RAM - used for parity check emulation */
-
 ROM_END
+
 
 static void lisa_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
