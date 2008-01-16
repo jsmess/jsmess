@@ -9,15 +9,15 @@
 
 #include <stdio.h>
 #include "driver.h"
-#include "cpu/z80/z80.h"
-#include "includes/nascom1.h"
 #include "image.h"
+#include "includes/nascom1.h"
+#include "cpu/z80/z80.h"
+
 
 static	int		nascom1_tape_size = 0;
 static	UINT8	*nascom1_tape_image = NULL;
 static	int		nascom1_tape_index = 0;
 
-static	int	nascom1_ramsize = 3;
 
 static	struct
 {
@@ -29,51 +29,51 @@ static	struct
 #define NASCOM1_KEY_INCR	0x01
 #define NASCOM1_CAS_ENABLE	0x10
 
-MACHINE_RESET( nascom1 )
+
+DRIVER_INIT( nascom1 )
 {
-	logerror("nascom1_init\r\n");
-	if (readinputport(9) != nascom1_ramsize)
+	switch (mess_ram_size)
 	{
-		nascom1_ramsize = readinputport(9);
-		switch (nascom1_ramsize)
-		{
-			case 03:
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xafff, 0, 0, MWA8_RAM);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xafff, 0, 0, MRA8_RAM);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x8fff, 0, 0, MWA8_RAM);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x8fff, 0, 0, MRA8_RAM);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x4fff, 0, 0, MWA8_RAM);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x4fff, 0, 0, MRA8_RAM);
-				break;
-			case 02:
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xafff, 0, 0, MWA8_NOP);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xafff, 0, 0, MRA8_NOP);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x8fff, 0, 0, MWA8_RAM);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x8fff, 0, 0, MRA8_RAM);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x4fff, 0, 0, MWA8_RAM);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x4fff, 0, 0, MRA8_RAM);
-				break;
-			case 01:
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xafff, 0, 0, MWA8_NOP);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xafff, 0, 0, MRA8_NOP);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x8fff, 0, 0, MWA8_NOP);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x8fff, 0, 0, MRA8_NOP);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x4fff, 0, 0, MWA8_RAM);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x4fff, 0, 0, MRA8_RAM);
-				break;
-			case 00:
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xafff, 0, 0, MWA8_NOP);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xafff, 0, 0, MRA8_NOP);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x8fff, 0, 0, MWA8_NOP);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x8fff, 0, 0, MRA8_NOP);
-				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x4fff, 0, 0, MWA8_NOP);
-				memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x4fff, 0, 0, MRA8_NOP);
-				break;
-		}
+	case 1 * 1024:
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x9000, 0xafff, 0, 0, MRA8_NOP, MWA8_NOP);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x5000, 0x8fff, 0, 0, MRA8_NOP, MWA8_NOP);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x1400, 0x4fff, 0, 0, MRA8_NOP, MWA8_NOP);
+		break;
+		
+	case 16 * 1024:
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x9000, 0xafff, 0, 0, MRA8_NOP, MWA8_NOP);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x5000, 0x8fff, 0, 0, MRA8_NOP, MWA8_NOP);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x1400, 0x4fff, 0, 0, MRA8_RAM, MWA8_RAM);
+		break;
+		
+	case 32 * 1024:
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x9000, 0xafff, 0, 0, MRA8_NOP, MWA8_NOP);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x5000, 0x8fff, 0, 0, MRA8_RAM, MWA8_RAM);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x1400, 0x4fff, 0, 0, MRA8_RAM, MWA8_RAM);
+		break;
+		
+	case 40 * 1024:
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x9000, 0xafff, 0, 0, MRA8_RAM, MWA8_RAM);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x5000, 0x8fff, 0, 0, MRA8_RAM, MWA8_RAM);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x1400, 0x4fff, 0, 0, MRA8_RAM, MWA8_RAM);
+		break;
 	}
 }
 
- READ8_HANDLER ( nascom1_port_00_r )
+
+READ8_HANDLER ( nascom1_port_00_r )
 {
 	if (nascom1_portstat.stat_count < 9)
 		return (readinputport (nascom1_portstat.stat_count) | ~0x7f);

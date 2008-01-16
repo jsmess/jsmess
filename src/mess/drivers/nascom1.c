@@ -186,12 +186,6 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x58, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_QUOTE)
-	PORT_START	/* 9: Machine config */
-	PORT_DIPNAME(0x03, 3, "RAM Size")
-	PORT_DIPSETTING(0, "1Kb")
-	PORT_DIPSETTING(1, "16Kb")
-	PORT_DIPSETTING(2, "32Kb")
-	PORT_DIPSETTING(3, "40Kb")
 INPUT_PORTS_END
 
 /* Sound output */
@@ -210,8 +204,6 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_CPU_VBLANK_INT(nascom_interrupt, 1)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_RESET( nascom1 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -261,6 +253,10 @@ ROM_START(nascom2)
 ROM_END
 
 SYSTEM_CONFIG_START(nascom)
+	CONFIG_RAM(1 * 1024)
+	CONFIG_RAM(16 * 1024)
+	CONFIG_RAM(32 * 1024)
+	CONFIG_RAM_DEFAULT(40 * 1024)
 #ifdef CART
 	CONFIG_DEVICE_CARTSLOT_REQ(1, "nas,bin", nascom1_init_cartridge, NULL, NULL)
 #endif
@@ -318,6 +314,6 @@ SYSTEM_CONFIG_START(nascom2)
 	CONFIG_DEVICE(nascom2_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                     FULLNAME        FLAGS */
-COMP( 1978, nascom1,    0,          0,      nascom1,    nascom1,    0,      nascom1,    "Nascom Microcomputers",    "Nascom 1",     0 )
-COMP( 1979, nascom2,    nascom1,    0,      nascom2,    nascom1,    0,      nascom2,    "Nascom Microcomputers",    "Nascom 2",     0 )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                     FULLNAME        FLAGS */
+COMP( 1978, nascom1,    0,          0,      nascom1,    nascom1,    nascom1,    nascom1,    "Nascom Microcomputers",    "Nascom 1",     0 )
+COMP( 1979, nascom2,    nascom1,    0,      nascom2,    nascom1,    nascom1,    nascom2,    "Nascom Microcomputers",    "Nascom 2",     0 )
