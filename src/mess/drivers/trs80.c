@@ -88,9 +88,6 @@ Not emulated:
 /* Devices */
 #include "devices/basicdsk.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 
 #define FW	TRS80_FONT_W
 #define FH	TRS80_FONT_H
@@ -318,25 +315,6 @@ static GFXDECODE_START( trs80 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout_double_width, 0, 4 )
 GFXDECODE_END
 
-static const unsigned char trs80_palette[] =
-{
-   0x00,0x00,0x00,
-   0xff,0xff,0xff
-};
-
-static const unsigned short trs80_colortable[] =
-{
-	0,1 	/* white on black */
-};
-
-
-
-/* Initialise the palette */
-static PALETTE_INIT( trs80 )
-{
-	palette_set_colors_rgb(machine, 0, trs80_palette, sizeof(trs80_palette)/3);
-	memcpy(colortable,trs80_colortable,sizeof(trs80_colortable));
-}
 
 static const INT16 speaker_levels[3] = {0.0*32767,0.46*32767,0.85*32767};
 
@@ -366,9 +344,8 @@ static MACHINE_DRIVER_START( level1 )
 	MDRV_SCREEN_SIZE(64*FW, 16*FH)
 	MDRV_SCREEN_VISIBLE_AREA(0*FW,64*FW-1,0*FH,16*FH-1)
 	MDRV_GFXDECODE( trs80 )
-	MDRV_PALETTE_LENGTH(sizeof(trs80_palette)/sizeof(trs80_palette[0])/3)
-	MDRV_COLORTABLE_LENGTH(sizeof(trs80_colortable)/sizeof(trs80_colortable[0]))
-	MDRV_PALETTE_INIT( trs80 )
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START( trs80 )
 	MDRV_VIDEO_UPDATE( trs80 )
