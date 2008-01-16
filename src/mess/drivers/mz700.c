@@ -71,9 +71,6 @@
 #include "devices/cassette.h"
 #include "formats/mz_cas.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 
 static ADDRESS_MAP_START( mz700_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x00fff) AM_RAMBANK(1)

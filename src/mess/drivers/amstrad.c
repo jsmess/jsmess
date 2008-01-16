@@ -83,9 +83,6 @@ Some bugs left :
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
 /* for event list */

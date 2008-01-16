@@ -41,7 +41,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"
 #include "devices/mflopimg.h"

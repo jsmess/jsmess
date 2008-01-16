@@ -109,9 +109,6 @@
 #include "machine/8042kbdc.h"
 #include "machine/53c810.h"
 
-/* TODO: Remove dependency on this */
-#include "mslegacy.h"
-
 
 #define LOG_CPUIMASK	1
 #define LOG_UART		1

@@ -65,7 +65,7 @@ Timings:
 #include "machine/8255ppi.h"
 #include "machine/tms5501.h"
 #include "devices/cassette.h"
-#include "mslegacy.h"
+
 
 /* I/O ports */
 static ADDRESS_MAP_START( dai_io , ADDRESS_SPACE_IO, 8)

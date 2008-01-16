@@ -41,9 +41,6 @@
 #include "devices/sonydriv.h"
 #include "devices/harddriv.h"
 
-/* TODO: remove depency on this */
-#include "mslegacy.h"
-
 
 static ADDRESS_MAP_START(mac512ke_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)

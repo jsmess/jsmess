@@ -16,7 +16,7 @@
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
 #include "sound/nes_apu.h"
-#include "mslegacy.h"
+
 
 static READ8_HANDLER( psg_4015_r )
 {

@@ -33,7 +33,7 @@ Ports:
 #include "cpu/z80/z80.h"
 #include "includes/jupiter.h"
 #include "devices/cartslot.h"
-#include "mslegacy.h"
+
 
 /* memory w/r functions */
 static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)

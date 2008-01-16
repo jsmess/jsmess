@@ -167,7 +167,7 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
 #include "devices/chd_cd.h"
-#include "mslegacy.h"
+
 
 extern UINT32* stv_vdp2_regs;
 extern UINT32* stv_vdp2_vram;
