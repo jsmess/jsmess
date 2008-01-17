@@ -175,7 +175,7 @@ VIDEO_START( odyssey2 )
 INLINE int get_horiz_clock_beam_pos( void )
 {
     int h;
-    h = attotime_mul(attotime_sub(timer_get_time(), line_time), Machine->drv->cpu[0].clock * 8).seconds;
+    h = attotime_mul(attotime_sub(timer_get_time(), line_time), cpunum_get_clock(0) * 8).seconds;
 
     return h;
 }
@@ -183,7 +183,7 @@ INLINE int get_horiz_clock_beam_pos( void )
 INLINE int get_horiz_clock( void )
 {
     int h;
-    h = attotime_mul(attotime_sub(timer_get_time(), line_time), Machine->drv->cpu[0].clock).seconds;
+    h = attotime_mul(attotime_sub(timer_get_time(), line_time), cpunum_get_clock(0)).seconds;
 
     return h;
 }
