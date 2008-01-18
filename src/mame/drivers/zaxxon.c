@@ -316,8 +316,8 @@
  *
  *************************************/
 
-#define MASTER_CLOCK		48660000
-#define SOUND_CLOCK			4000000
+#define MASTER_CLOCK		XTAL_48_66MHz
+#define SOUND_CLOCK			XTAL_4MHz
 
 #define PIXEL_CLOCK			(MASTER_CLOCK/8)
 
@@ -414,7 +414,7 @@ static READ8_HANDLER( razmataz_counter_r )
 }
 
 
-static UINT32 razmataz_dial_r(void *param)
+static CUSTOM_INPUT( razmataz_dial_r )
 {
 	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;

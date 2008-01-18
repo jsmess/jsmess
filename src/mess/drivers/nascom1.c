@@ -49,6 +49,7 @@ Nascom Memory map
 ************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "includes/nascom1.h"
 #include "cpu/z80/z80.h"
 #include "devices/cartslot.h"

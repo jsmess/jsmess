@@ -143,7 +143,7 @@ static WRITE32_HANDLER( eeprom_w )
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
-static UINT32 eeprom_bit_r(void *param)
+static CUSTOM_INPUT( eeprom_bit_r )
 {
 	return EEPROM_read_bit();
 }
@@ -373,7 +373,7 @@ static MACHINE_RESET( konamigq )
 
 static MACHINE_DRIVER_START( konamigq )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigq_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 

@@ -9,7 +9,7 @@
 #include <stddef.h>
 
 #include "device.h"
-#include "uitext.h"
+#include "mslegacy.h"
 #include "driver.h"
 #include "pool.h"
 
@@ -138,21 +138,9 @@ const char *device_briefinstancename(const device_class *devclass, int id)
  *
  *************************************/
 
-static const char *get_device_name(iodevice_t devtype)
+const char *device_uiname(iodevice_t devtype)
 {
-	const char *name;
-
-	if (Machine != NULL)
-	{
-		name = ui_getstring((UI_cartridge - IO_CARTSLOT) + devtype);
-	}
-	else
-	{
-		/* man I really hate this; may god have mercy on my soul */
-		extern const char *mess_default_text[];
-		name = mess_default_text[(UI_cartridge - IO_CARTSLOT) + devtype - UI_last_mame_entry];
-	}
-	return name;
+	return ui_getstring((UI_cartridge - IO_CARTSLOT) + devtype);
 }
 
 
@@ -170,7 +158,7 @@ static const char *default_device_name(const struct IODevice *dev, int id,
 		return buf;
 	}
 
-	name = get_device_name(dev->type);
+	name = device_uiname(dev->type);
 	if (dev->count > 1)
 	{
 		/* for the average user counting starts at #1 ;-) */

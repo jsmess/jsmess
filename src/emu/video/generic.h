@@ -95,7 +95,7 @@ extern const gfx_layout gfx_16x16x4_planar;
 /* set up all the common systems */
 void generic_video_init(running_machine *machine);
 
-/* generic video start with dirty buffers */
+/* generic video start */
 VIDEO_START( generic );
 
 /* generic video start with a temporary bitmap */
@@ -103,26 +103,6 @@ VIDEO_START( generic_bitmapped );
 
 /* generic video update to blit a temporary bitmap */
 VIDEO_UPDATE( generic_bitmapped );
-
-
-
-/* ----- core video/color/spriteram access ----- */
-
-/* video RAM read/write handlers */
-READ8_HANDLER( videoram_r );
-WRITE8_HANDLER( videoram_w );
-
-/* color RAM read/write handlers */
-READ8_HANDLER( colorram_r );
-WRITE8_HANDLER( colorram_w );
-
-/* sprite RAM read/write handlers */
-READ8_HANDLER( spriteram_r );
-WRITE8_HANDLER( spriteram_w );
-READ16_HANDLER( spriteram16_r );
-WRITE16_HANDLER( spriteram16_w );
-READ8_HANDLER( spriteram_2_r );
-WRITE8_HANDLER( spriteram_2_w );
 
 
 

@@ -63,7 +63,7 @@ static void mia_tile_callback(int layer,int bank,int *code,int *color,int *flags
 
 static void cuebrick_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
-	if (layer == 0)
+	if ((K052109_get_RMRD_line() == CLEAR_LINE) && (layer == 0))
 	{
 		*code |= ((*color & 0x01) << 8);
 		*color = layer_colorbase[layer]  + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);

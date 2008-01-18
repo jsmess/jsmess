@@ -945,7 +945,7 @@ static MACHINE_DRIVER_START( tigerh )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,6)    /* ??? */
 
-	MDRV_CPU_ADD(M68705,4000000/M68705_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(M68705,4000000)
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1649,7 +1649,7 @@ static int slapfigh_prot_pos;
 static READ8_HANDLER( slapfigh_mcu_r )
 {
 	/* pass initial checks */
-	int protvalues[] = { 0xc7, 0x55, -1 };
+	static const int protvalues[] = { 0xc7, 0x55, -1 };
 
 	if ((activecpu_get_pc()==0x1369) || // slapfigh
 		(activecpu_get_pc()==0x136d)) // slapfiga

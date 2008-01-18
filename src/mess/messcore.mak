@@ -88,10 +88,10 @@ EMUOBJS += \
 	$(MESSOBJ)/utils.o		\
 	$(MESSOBJ)/eventlst.o	\
 	$(MESSOBJ)/mscommon.o	\
+	$(MESSOBJ)/mslegacy.o	\
 	$(MESSOBJ)/tagpool.o	\
 	$(MESSOBJ)/cheatms.o	\
 	$(MESSOBJ)/opresolv.o	\
-	$(MESSOBJ)/muitext.o	\
 	$(MESSOBJ)/infomess.o	\
 	$(MESSOBJ)/climess.o	\
 

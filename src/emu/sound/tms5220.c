@@ -26,7 +26,6 @@
    * modified code so that the beast only start speaking at the start of next frame, like the data
      sheet says
 */
-#define USE_OBSOLETE_HACK 0
 
 
 #ifndef TRUE
@@ -58,9 +57,6 @@ struct tms5220
     */
 	UINT8 tms5220_speaking;	/* Speak or Speak External command in progress */
 	UINT8 speak_external;	/* Speak External command in progress */
-	#if USE_OBSOLETE_HACK
-	UINT8 speak_delay_frames;
-	#endif
 	UINT8 talk_status; 		/* tms5220 is really currently speaking */
 	UINT8 first_frame;		/* we have just started speaking, and we are to parse the first frame */
 	UINT8 last_frame;		/* we are doing the frame of sound */
@@ -112,7 +108,7 @@ struct tms5220
 	UINT8 data_register;				/* data register, used by read command */
 	UINT8 RDB_flag;					/* whether we should read data register or status register */
 
-	/* flag for variant tms0285/tms5200 emulation */
+	/* flag for variant tmc0285/tms5200 emulation */
 	/* The TMC0285 AKA TMS5200 is an early variant of the TMS5220 used in
        the early releases of the Speech Module for the TI-99/4(a) computer,
        in Zaccaria's 'Money Money', and in a few other places.
@@ -231,9 +227,6 @@ void tms5220_reset_chip(void *chip)
 	/* initialize the chip state */
 	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if tms->buffer_empty or tms->buffer_low are 0 */
 	tms->tms5220_speaking = tms->speak_external = tms->talk_status = tms->first_frame = tms->last_frame = tms->irq_pin = 0;
-#if USE_OBSOLETE_HACK
-	tms->speak_delay_frames = 0;
-#endif
 	if (tms->irq_func) tms->irq_func(0);
 	tms->buffer_empty = tms->buffer_low = 1;
 
@@ -315,7 +308,7 @@ void tms5220_set_read_and_branch(void *chip, void (*func)(void))
 
 /**********************************************************************************************
 
-     tms5220_set_variant -- sets the tms5220 core to emulate its buggy forerunner, the tms0285
+     tms5220_set_variant -- sets the tms5220 core to emulate its buggy forerunner, the tmc0285
 
 ***********************************************************************************************/
 
@@ -510,38 +503,6 @@ tryagain:
 		tms->first_frame = 1;	/* will cause the first frame to be parsed */
 		tms->buffer_empty = 0;
 	}
-
-#if 0
-	/* we are to speak, yet we fill with 0s until start of next frame */
-	if (tms->first_frame)
-	{
-		while ((size > 0) && ((tms->sample_count != 0) || (tms->interp_count != 0)))
-		{
-			tms->sample_count = (tms->sample_count + 1) % 200;
-			tms->interp_count = (tms->interp_count + 1) % 25;
-			buffer[buf_count] = 0x00;	/* should be (-1 << 8) ??? (cf note in data sheet, p 10, table 4) */
-			buf_count++;
-			size--;
-		}
-	}
-#endif
-
-#if USE_OBSOLETE_HACK
-    /* apply some delay before we actually consume data; Victory requires this */
-    if (tms->speak_delay_frames)
-    {
-    	if (size <= tms->speak_delay_frames)
-    	{
-    		tms->speak_delay_frames -= size;
-    		size = 0;
-    	}
-    	else
-    	{
-    		size -= tms->speak_delay_frames;
-    		tms->speak_delay_frames = 0;
-    	}
-    }
-#endif
 
     /* loop until the buffer is full or we've stopped speaking */
 	while ((size > 0) && tms->talk_status)
@@ -847,10 +808,6 @@ static void process_command(struct tms5220 *tms)
 
 		case 0x60 : /* speak external */
 			tms->tms5220_speaking = tms->speak_external = 1;
-#if USE_OBSOLETE_HACK
-            tms->speak_delay_frames = 10;
-#endif
-
 			tms->RDB_flag = FALSE;
 
             /* according to the datasheet, this will cause an interrupt due to a BE condition */
@@ -946,11 +903,15 @@ static int parse_frame(struct tms5220 *tms, int the_first_frame)
 
     /* if the previous frame was a stop frame, don't do anything */
 	if ((! the_first_frame) && (tms->old_energy == (energytable[15] >> 6)))
-		/*return 1;*/
-	{
-		tms->buffer_empty = 1;
 		return 1;
-	}
+//  WARNING: This code below breaks Victory's power-on test! If you change it
+//  make sure you test Victory.
+//  {
+//      if (DEBUG_5220) logerror("Buffer Empty set - Last frame stop frame\n");
+
+//      tms->buffer_empty = 1;
+//      return 1;
+//  }
 
 	if (tms->speak_external)
     	/* count the total number of bits available */
@@ -1023,7 +984,7 @@ static int parse_frame(struct tms5220 *tms, int the_first_frame)
         tms->new_k[0] = k1table[extract_bits(tms, 5)];
         tms->new_k[1] = k2table[extract_bits(tms, 5)];
         tms->new_k[2] = k3table[extract_bits(tms, 4)];
-		if (tms->variant == variant_tms0285)
+		if (tms->variant == variant_tmc0285)
 			tms->new_k[3] = k3table[extract_bits(tms, 4)];	/* ??? */
 		else
 			tms->new_k[3] = k4table[extract_bits(tms, 4)];
@@ -1043,7 +1004,7 @@ static int parse_frame(struct tms5220 *tms, int the_first_frame)
     tms->new_k[0] = k1table[extract_bits(tms, 5)];
     tms->new_k[1] = k2table[extract_bits(tms, 5)];
     tms->new_k[2] = k3table[extract_bits(tms, 4)];
-	if (tms->variant == variant_tms0285)
+	if (tms->variant == variant_tmc0285)
 		tms->new_k[3] = k3table[extract_bits(tms, 4)];	/* ??? */
 	else
 		tms->new_k[3] = k4table[extract_bits(tms, 4)];

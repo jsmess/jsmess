@@ -236,7 +236,7 @@ static WRITE8_HANDLER( input_port_4_f0_w )
 	input_port_4_f0 = data >> 4;
 }
 
-static UINT32 input_port_4_f0_r(void *param)
+static CUSTOM_INPUT( input_port_4_f0_r )
 {
 	return input_port_4_f0;
 }
@@ -325,11 +325,11 @@ ADDRESS_MAP_END
 /* seems the most logical way to do the gears */
 static UINT8 kikstart_gears[2];
 
-static int kikstart_gear_r(void *param)
+static CUSTOM_INPUT( kikstart_gear_r )
 {
 	const char *port_tag;
 
-	int player = (int)param;
+	int player = (int)(FPTR)param;
 
 	if (player == 0)
 		port_tag = "GEARP1";
@@ -1923,7 +1923,7 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(taitosj_main_mcu_map,0)
 
-	MDRV_CPU_ADD(M68705,3000000/M68705_CLOCK_DIVIDER)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_ADD(M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(taitosj_mcu_map,0)
 MACHINE_DRIVER_END
 

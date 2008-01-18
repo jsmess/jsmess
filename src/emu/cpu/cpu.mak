@@ -531,6 +531,8 @@ CPUDEFS += -DHAS_I8035=$(if $(filter I8035,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8039=$(if $(filter I8039,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8048=$(if $(filter I8048,$(CPUS)),1,0)
 CPUDEFS += -DHAS_N7751=$(if $(filter N7751,$(CPUS)),1,0)
+CPUDEFS += -DHAS_MB8884=$(if $(filter MB8884,$(CPUS)),1,0)
+CPUDEFS += -DHAS_M58715=$(if $(filter M58715,$(CPUS)),1,0)
 
 ifneq ($(filter I8035 I8039 I8048 N7751,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i8039
@@ -764,8 +766,9 @@ $(CPUOBJ)/pic16c5x/pic16c5x.o:	$(CPUSRC)/pic16c5x/pic16c5x.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_R3000=$(if $(filter R3000,$(CPUS)),1,0)
+CPUDEFS += -DHAS_R3041=$(if $(filter R3041,$(CPUS)),1,0)
 
-ifneq ($(filter R3000,$(CPUS)),)
+ifneq ($(filter R3000 R3041,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
 CPUOBJS += $(CPUOBJ)/mips/r3000.o
 DBGOBJS += $(CPUOBJ)/mips/r3kdasm.o

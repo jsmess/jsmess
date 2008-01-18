@@ -149,19 +149,19 @@ static WRITE8_HANDLER( yawdim_oki_bank_w )
  *
  *************************************/
 
-static UINT32 narc_talkback_strobe_r(void *param)
+static CUSTOM_INPUT( narc_talkback_strobe_r )
 {
 	return (williams_narc_talkback_r() >> 8) & 1;
 }
 
 
-static UINT32 narc_talkback_data_r(void *param)
+static CUSTOM_INPUT( narc_talkback_data_r )
 {
 	return williams_narc_talkback_r() & 0xff;
 }
 
 
-static UINT32 adpcm_irq_state_r(void *param)
+static CUSTOM_INPUT( adpcm_irq_state_r )
 {
 	return williams_adpcm_sound_irq_r() & 1;
 }
@@ -257,11 +257,17 @@ static INPUT_PORTS_START( narc )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(narc_talkback_strobe_r, NULL)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED ) /* memory protect interlock */
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Language ) ) /* Is this a REAL dip or toggle? or software enable? */
-	PORT_DIPSETTING(      0xc000, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( French ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( German ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( Unknown ) )
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
+/*
+    Test mode indicates "Cut for French" and "Cut for German", hinting that these
+    are jumpers or wires that can be modified on the PCB. However, there are no
+    French or German strings in the ROMs, and this "feature" was clearly never
+    actually implemented
+    PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Language ) )
+    PORT_DIPSETTING(      0xc000, DEF_STR( English ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( French ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( German ) )
+*/
 
 	PORT_START
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(narc_talkback_data_r, NULL)
@@ -1003,7 +1009,7 @@ static const tms34010_config yunit_tms_config =
 static MACHINE_DRIVER_START( zunit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, FAST_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(TMS34010, FAST_MASTER_CLOCK)
 	MDRV_CPU_CONFIG(zunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -1036,7 +1042,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( yunit_core )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, SLOW_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD_TAG("main", TMS34010, SLOW_MASTER_CLOCK)
 	MDRV_CPU_CONFIG(yunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -1071,7 +1077,7 @@ static MACHINE_DRIVER_START( yunit_cvsd_4bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_cvsd_sound)
 
 	/* video hardware */
@@ -1096,7 +1102,7 @@ static MACHINE_DRIVER_START( yunit_adpcm_6bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_adpcm_sound)
 
 	/* video hardware */
@@ -1109,7 +1115,7 @@ static MACHINE_DRIVER_START( yunit_adpcm_6bit_faster )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FASTER_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_REPLACE("main", TMS34010, FASTER_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_adpcm_sound)
 
 	/* video hardware */

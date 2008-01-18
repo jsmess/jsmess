@@ -1878,7 +1878,7 @@ static void gn845pwbb_clk_w( int offset, int data )
 	verboselog( 2, "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk, stage[ offset ].state, stage[ offset ].DO, stage[ offset ].shift, stage[ offset ].bit, stage_mask );
 }
 
-static UINT32 gn845pwbb_read( void *param )
+static CUSTOM_INPUT( gn845pwbb_read )
 {
 	return readinputportbytag( "STAGE" ) & stage_mask;
 }
@@ -2725,7 +2725,7 @@ static DRIVER_INIT( salarymc )
 
 static MACHINE_DRIVER_START( konami573 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konami573_map, 0 )
 	MDRV_CPU_VBLANK_INT( sys573_vblank, 1 )
 

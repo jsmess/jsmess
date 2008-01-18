@@ -1,5 +1,6 @@
 
 #include "driver.h"
+#include "video/generic.h"
 
 VIDEO_START( pce );
 VIDEO_UPDATE( pce );

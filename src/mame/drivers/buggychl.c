@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM) /* 6116 SRAM (36) */
 	AM_RANGE(0x8800, 0x8fff) AM_READ(MRA8_RAM) /* 6116 SRAM (35) */
 	AM_RANGE(0xa000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(videoram_r)
+	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xd400, 0xd400) AM_READ(buggychl_mcu_r)
 	AM_RANGE(0xd401, 0xd401) AM_READ(buggychl_mcu_status_r)
 	AM_RANGE(0xd600, 0xd600) AM_READ(input_port_0_r)	/* dsw */
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8fff) AM_WRITE(MWA8_RAM) /* 6116 SRAM (35) */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(buggychl_chargen_w) AM_BASE(&buggychl_character_ram)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 //  { 0xd000, 0xd000, horizon
 	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
@@ -439,7 +439,7 @@ static MACHINE_DRIVER_START( buggychl )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
-	MDRV_CPU_ADD(M68705,8000000/2/M68705_CLOCK_DIVIDER)  /* 4 MHz */
+	MDRV_CPU_ADD(M68705,8000000/2)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

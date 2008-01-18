@@ -90,8 +90,8 @@ INTERRUPT_GEN( pce_interrupt )
 		/* Check if we need to draw more just the overscan color */
 		if ( vdc[0].current_segment == STATE_VDW ) {
 			/* 0 - no sprite and background pixels drawn
-			   1 - background pixel drawn
-			   otherwise is 2 + sprite# */
+               1 - background pixel drawn
+               otherwise is 2 + sprite# */
 			UINT8 drawn[VDC_WPF];
 			/* our line buffer */
 			UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, vce.current_bitmap_line, 86 );
@@ -130,8 +130,8 @@ INTERRUPT_GEN( sgx_interrupt )
 		/* Check if we need to draw more just the overscan color */
 		if ( vdc[0].current_segment == STATE_VDW ) {
 			/* 0 - no sprite and background pixels drawn
-			   1 - background pixel drawn
-			   otherwise is 2 + sprite# */
+               1 - background pixel drawn
+               otherwise is 2 + sprite# */
 			UINT8 drawn[2][512];
 			UINT16 *line_buffer;
 			UINT16 temp_buffer[2][512];
@@ -190,11 +190,11 @@ INTERRUPT_GEN( sgx_interrupt )
 							}
 							break;
 						case 2: /* BG1 + SP1 => SP1
-								   BG0 + SP1 => BG0
-								   BG0 + BG1 => BG0
-								   BG0 + SP0 => SP0
-								   BG1 + SP0 => BG1
-								   SP0 + SP1 => SP0 */
+                                   BG0 + SP1 => BG0
+                                   BG0 + BG1 => BG0
+                                   BG0 + SP0 => SP0
+                                   BG1 + SP0 => BG1
+                                   SP0 + SP1 => SP0 */
 							if ( drawn[0][i] ) {
 								if ( drawn[0][i] > 1 ) {
 									if ( drawn[1][i] == 1 ) {
@@ -326,9 +326,9 @@ static void vdc_advance_line(int which) {
 			int i;
 
 			vdc[which].dvssr_write = 0;
-
+#ifdef MAME_DEBUG
 			assert(((vdc[which].vdc_data[DVSSR].w<<1) + 512) <= 0x10000);
-
+#endif
 			for( i = 0; i < 256; i++ ) {
 				vdc[which].sprite_ram[i] = ( vdc[which].vram[ ( vdc[which].vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc[which].vram[ ( vdc[which].vdc_data[DVSSR].w << 1 ) + i * 2 ];
 			}
@@ -475,13 +475,13 @@ static void vdc_w( int which, offs_t offset, UINT8 data )
 					break;
 
 				case LENR:
-//					logerror("LENR LSB = %02X\n", data);
+//                  logerror("LENR LSB = %02X\n", data);
 					break;
 				case SOUR:
-//					logerror("SOUR LSB = %02X\n", data);
+//                  logerror("SOUR LSB = %02X\n", data);
 					break;
 				case DESR:
-//					logerror("DESR LSB = %02X\n", data);
+//                  logerror("DESR LSB = %02X\n", data);
 					break;
 			}
 			break;
@@ -522,10 +522,10 @@ static void vdc_w( int which, offs_t offset, UINT8 data )
 					vdc_do_dma( which );
 					break;
 				case SOUR:
-//					logerror("SOUR MSB = %02X\n", data);
+//                  logerror("SOUR MSB = %02X\n", data);
 					break;
 				case DESR:
-//					logerror("DESR MSB = %02X\n", data);
+//                  logerror("DESR MSB = %02X\n", data);
 					break;
 			}
 			break;
@@ -897,8 +897,8 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 				}
 
 				/* 32 pixel wide sprites are counted as 2 sprites and the right half
-				   is only drawn if there are 2 open slots.
-				*/
+                   is only drawn if there are 2 open slots.
+                */
 				sprites_drawn++;
 				if( sprites_drawn > 16 ) {
 					vdc[which].status |= VDC_OR;

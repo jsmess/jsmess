@@ -17,11 +17,13 @@
 static UINT16 blitter_data[8];
 
 static UINT16 *screenram;
+static UINT8 vispage;
 static UINT16 *blitter_base;
 static int blitter_rows;
 
 static UINT16 gunx, guny;
 static UINT8 blank_palette;
+
 
 
 
@@ -31,10 +33,12 @@ static UINT8 blank_palette;
  *
  *************************************/
 
-INLINE void get_crosshair_xy(int player, int *x, int *y)
+INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	*x = ((readinputport(2 + player * 2) & 0xff) * Machine->screen[0].width) / 255;
-	*y = ((readinputport(3 + player * 2) & 0xff) * Machine->screen[0].height) / 255;
+	int width = machine->screen[0].visarea.max_x + 1 - machine->screen[0].visarea.min_x;
+	int height = machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y;
+	*x = ((readinputport(2 + player * 2) & 0xff) * width) / 255;
+	*y = ((readinputport(3 + player * 2) & 0xff) * height) / 255;
 }
 
 
@@ -55,14 +59,14 @@ READ16_HANDLER( lethalj_gun_r )
 		case 4:
 		case 5:
 			/* latch the crosshair position */
-			get_crosshair_xy(offset - 4, &beamx, &beamy);
+			get_crosshair_xy(Machine, offset - 4, &beamx, &beamy);
 			gunx = beamx;
 			guny = beamy;
 			blank_palette = 1;
 			break;
 
 		case 6:
-			result = gunx/2;
+			result = gunx / 2;
 			break;
 
 		case 7:
@@ -110,30 +114,24 @@ static void do_blit(void)
 {
 	int dsty = (INT16)blitter_data[1];
 	int srcx = (UINT16)blitter_data[2];
-	int srcy = (UINT16)blitter_data[3];
+	int srcy = (UINT16)(blitter_data[3] + 1);
 	int width = (UINT16)blitter_data[5];
 	int dstx = (INT16)blitter_data[6];
 	int height = (UINT16)blitter_data[7];
 	int y;
-
-	if (srcy == 0xffff)
-	{
-		return;
-	}
-
-/*  logerror("blitter data = %04X %04X %04X %04X %04X %04X %04X %04X\n",
+/*
+    logerror("blitter data = %04X %04X %04X %04X %04X %04X %04X %04X\n",
             blitter_data[0], blitter_data[1], blitter_data[2], blitter_data[3],
-            blitter_data[4], blitter_data[5], blitter_data[6], blitter_data[7]);*/
-
+            blitter_data[4], blitter_data[5], blitter_data[6], blitter_data[7]);
+*/
 	/* loop over Y coordinates */
 	for (y = 0; y <= height; y++, srcy++, dsty++)
 	{
-		UINT16 *source = blitter_base + srcy * BLITTER_SOURCE_WIDTH;
-		UINT16 *dest = screenram + dsty * BLITTER_DEST_WIDTH;
-
 		/* clip in Y */
-		if (dsty >= 0 && dsty < BLITTER_DEST_HEIGHT)
+		if (dsty >= 0 && dsty < BLITTER_DEST_HEIGHT/2)
 		{
+			UINT16 *source = blitter_base + (srcy % blitter_rows) * BLITTER_SOURCE_WIDTH;
+			UINT16 *dest = screenram + (dsty + (vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
 			int sx = srcx;
 			int dx = dstx;
 			int x;
@@ -151,7 +149,6 @@ static void do_blit(void)
 }
 
 
-
 WRITE16_HANDLER( lethalj_blitter_w )
 {
 	/* combine the data */
@@ -160,8 +157,12 @@ WRITE16_HANDLER( lethalj_blitter_w )
 	/* blit on a write to offset 7, and signal an IRQ */
 	if (offset == 7)
 	{
-		do_blit();
-		timer_set(ATTOTIME_IN_USEC(10), NULL, 0, gen_ext1_int);
+		if (blitter_data[6] == 2 && blitter_data[7] == 2)
+			vispage ^= 1;
+		else
+			do_blit();
+
+		timer_set(attotime_mul(ATTOTIME_IN_HZ(XTAL_32MHz), (blitter_data[5] + 1) * (blitter_data[7] + 1)), NULL, 0, gen_ext1_int);
 	}
 
 	/* clear the IRQ on offset 0 */
@@ -179,7 +180,7 @@ WRITE16_HANDLER( lethalj_blitter_w )
 
 void lethalj_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT16 *src = &screenram[(params->rowaddr << 9) & 0x3fe00];
+	UINT16 *src = &screenram[(vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = params->coladdr << 1;
 	int x;

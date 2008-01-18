@@ -21,7 +21,7 @@
 #include "windows/input.h"
 #include "dialog.h"
 #include "opcntrl.h"
-#include "uitext.h"
+#include "mslegacy.h"
 #include "strconv.h"
 #include "utils.h"
 #include "tapedlg.h"
@@ -31,6 +31,7 @@
 #include "devices/cassette.h"
 #include "windows/window.h"
 #include "uimess.h"
+#include "mslegacy.h"
 #include "winutf8.h"
 
 #ifdef UNDER_CE

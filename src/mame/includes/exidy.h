@@ -7,7 +7,7 @@
 #include "sound/custom.h"
 
 
-#define EXIDY_MASTER_CLOCK				(11289000)
+#define EXIDY_MASTER_CLOCK				(XTAL_11_289MHz)
 #define EXIDY_CPU_CLOCK					(EXIDY_MASTER_CLOCK / 16)
 #define EXIDY_PIXEL_CLOCK				(EXIDY_MASTER_CLOCK / 2)
 #define EXIDY_HTOTAL					(0x150)
@@ -24,53 +24,37 @@
 
 /*----------- defined in audio/exidy.c -----------*/
 
-void *exidy_sh_start(int clock, const struct CustomSound_interface *config);
-void *victory_sh_start(int clock, const struct CustomSound_interface *config);
-void *berzerk_sh_start(int clock, const struct CustomSound_interface *config);
+MACHINE_DRIVER_EXTERN( venture_audio );
 
-WRITE8_HANDLER( exidy_shriot_w );
-WRITE8_HANDLER( exidy_sfxctrl_w );
-WRITE8_HANDLER( exidy_sh8253_w );
-WRITE8_HANDLER( exidy_sh6840_w );
-WRITE8_HANDLER( exidy_sound_filter_w );
-READ8_HANDLER( exidy_shriot_r );
-READ8_HANDLER( exidy_sh8253_r );
-READ8_HANDLER( exidy_sh6840_r );
+MACHINE_DRIVER_EXTERN( mtrap_cvsd_audio );
 
-WRITE8_HANDLER( mtrap_voiceio_w );
-READ8_HANDLER( mtrap_voiceio_r );
+MACHINE_DRIVER_EXTERN( victory_audio );
+READ8_HANDLER( victory_sound_response_r );
+READ8_HANDLER( victory_sound_status_r );
+WRITE8_HANDLER( victory_sound_command_w );
 
-
-/*----------- defined in audio/targ.c -----------*/
-
-extern UINT8 targ_spec_flag;
-
-void targ_sh_start(void);
-
-WRITE8_HANDLER( targ_sh_w );
+MACHINE_DRIVER_EXTERN( berzerk_audio );
+WRITE8_HANDLER( berzerk_audio_w );
+READ8_HANDLER( berzerk_audio_r );
 
 
 /*----------- defined in video/exidy.c -----------*/
 
 extern UINT8 *exidy_videoram;
 extern UINT8 *exidy_characterram;
-
 extern UINT8 *exidy_color_latch;
+extern UINT8 *exidy_sprite1_xpos;
+extern UINT8 *exidy_sprite1_ypos;
+extern UINT8 *exidy_sprite2_xpos;
+extern UINT8 *exidy_sprite2_ypos;
+extern UINT8 *exidy_spriteno;
+extern UINT8 *exidy_sprite_enable;
 
 void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 VIDEO_START( exidy );
-VIDEO_EOF( exidy );
 VIDEO_UPDATE( exidy );
 
 INTERRUPT_GEN( exidy_vblank_interrupt );
 INTERRUPT_GEN( teetert_vblank_interrupt );
-
-WRITE8_HANDLER( exidy_color_w );
-WRITE8_HANDLER( exidy_sprite1_xpos_w );
-WRITE8_HANDLER( exidy_sprite1_ypos_w );
-WRITE8_HANDLER( exidy_sprite2_xpos_w );
-WRITE8_HANDLER( exidy_sprite2_ypos_w );
-WRITE8_HANDLER( exidy_spriteno_w );
-WRITE8_HANDLER( exidy_sprite_enable_w );
 
 READ8_HANDLER( exidy_interrupt_r );

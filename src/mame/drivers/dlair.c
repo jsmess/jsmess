@@ -279,8 +279,8 @@ static MACHINE_START( dlair )
 static MACHINE_START( dleuro )
 {
 	/* initialize the CTC and SIO peripherals */
-	ctc_intf.baseclock = machine->drv->cpu[0].clock;
-	sio_intf.baseclock = machine->drv->cpu[0].clock;
+	ctc_intf.baseclock = cpunum_get_clock(0);
+	sio_intf.baseclock = cpunum_get_clock(0);
 	z80ctc_init(0, &ctc_intf);
 	z80sio_init(0, &sio_intf);
 
@@ -397,7 +397,7 @@ static WRITE8_HANDLER( led_den2_w )
  *
  *************************************/
 
-static UINT32 laserdisc_status_r(void *param)
+static CUSTOM_INPUT( laserdisc_status_r )
 {
 	if (discinfo == NULL)
 		return 0;
@@ -417,7 +417,7 @@ static UINT32 laserdisc_status_r(void *param)
 }
 
 
-static UINT32 laserdisc_command_r(void *param)
+static CUSTOM_INPUT( laserdisc_command_r )
 {
 	if (discinfo == NULL)
 		return 0;

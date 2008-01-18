@@ -358,7 +358,7 @@ static READ32_HANDLER( input_port_2_020_r ) { return readinputport(2) << 16; }
 static READ32_HANDLER( input_port_3_020_r ) { return readinputport(3) << 16; }
 
 
-static UINT32 analog_bit_r(void *param)
+static CUSTOM_INPUT( analog_bit_r )
 {
 	int which = (FPTR)param;
 	return (analog_ports[which] >> 7) & 0x01;
@@ -632,7 +632,7 @@ static void adsp_tx_callback(int port, INT32 data)
 			/* calculate how long until we generate an interrupt */
 
 			/* period per each bit sent */
-			sample_period = attotime_mul(ATTOTIME_IN_HZ(Machine->drv->cpu[2].clock), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			sample_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(2)), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period = attotime_mul(sample_period, 16 * SOUND_CHANNELS);

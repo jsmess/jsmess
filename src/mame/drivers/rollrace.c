@@ -2,7 +2,6 @@
 
 Issues:
 -sound effects missing
--cpu speeds are guessed
 ***************************************************************************/
 
 #include "driver.h"
@@ -56,8 +55,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xd900, 0xd900) AM_WRITE(ra_fake_d800_w) /* protection ?? */
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe400, 0xe47f) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe400, 0xe47f) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xec00, 0xec0f) AM_WRITE(MWA8_NOP) /* Analog sound effects ?? ec00 sound enable ?*/
 	AM_RANGE(0xf000, 0xf0ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -236,12 +235,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rollrace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/3)			/* ?? */
+	MDRV_CPU_ADD(Z80,XTAL_24MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(Z80,12000000/3)
-	/* audio CPU */			/* ?? */
+	MDRV_CPU_ADD(Z80,XTAL_24MHz/16) /* verified on pcb */
+	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)
 
@@ -263,13 +262,13 @@ static MACHINE_DRIVER_START( rollrace )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(AY8910,12000000/8)
+	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.10)
 
-	MDRV_SOUND_ADD(AY8910,12000000/8)
+	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.10)
 
-	MDRV_SOUND_ADD(AY8910,12000000/8)
+	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.10)
 MACHINE_DRIVER_END
 

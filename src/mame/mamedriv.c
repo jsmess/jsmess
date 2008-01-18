@@ -4078,6 +4078,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( acombat )	/* bootleg */
 	DRIVER( acombato )	/* bootleg */
 	DRIVER( sstarbtl )	/* bootleg */
+	DRIVER( spfghmk2 )	/* (c) [1980] Data East Corporation */
+	DRIVER( spfgmk22 )	/* (c) [1980] Data East Corporation */
 	DRIVER( tomahawk )	/* (c) 1980 Data East, Inc. */
 	DRIVER( tomahaw1 )	/* (c) 1980 Data East, Inc. */
 	DRIVER( progolf )	/* (c) 1981 */
@@ -6262,6 +6264,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( heatbrl )	/* (c) 1992 Tad (World) */
 	DRIVER( heatbrlo )	/* (c) 1992 Tad (World) */
 	DRIVER( heatbrlu )	/* (c) 1992 Tad (US) */
+	DRIVER( hetbrlu2 )	/* (c) 1992 Tad (US) */
 	DRIVER( godzilla )	/* (c) 1993 Banpresto */
 	DRIVER( denjinmk )	/* (c) 199? Banpresto */
 	DRIVER( sdgndmrb )	/* (c) 1993 Banpresto */
@@ -6622,7 +6625,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ryouran )	/* (c) 1998 Electro Design Co. (Japan) */
 	DRIVER( teljan )	/* (c) 1999 Electro Design Co. (Japan) */
 
-	/* Seta games */
+	/* Seta games (seta.c) */
 	DRIVER( hanaawas )	/* (c) SetaKikaku */
 	DRIVER( speedatk )	/* CB-0 (c) SetaKikaku */
 	DRIVER( srmp1 )		/* UB or UC?? (c) 1987 */
@@ -6678,7 +6681,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sokonuke )	/* (c) 1995 Sammy Industries */
 	DRIVER( zombraid )	/* (c) 1995 American Sammy */
 	DRIVER( crazyfgt )	/* (c) 1998 Subsino */
+	DRIVER( inttoote )	/* (c) 1998 Coinmaster */
 
+	/* Seta games (seta2.c) */
 	DRIVER( gundamex )	/* (c) 1994 Banpresto */
 	DRIVER( grdians )	/* (c) 1995 Banpresto */
 	DRIVER( mj4simai )	/* (c) 1996 Maboroshi Ware */
@@ -7639,7 +7644,7 @@ Other Sun games
 	DRIVER( eggvntdx )	/* (c) 1997 The Game Room */
 	DRIVER( ripribit )	/* (c) 1997 LAI Games */
 	DRIVER( cfarm )		/* (c) 1999 LAI Games */
-	DRIVER( cclown )	/* (c) 1999 LAI Games */
+	DRIVER( cclownz )	/* (c) 1999 LAI Games */
 	DRIVER( rotaryf )
 	DRIVER( sbugger )	/* (c) 1981 Game-A-Tron */
 	DRIVER( sbuggera )	/* (c) 1981 Game-A-Tron */
@@ -7649,7 +7654,7 @@ Other Sun games
 	DRIVER( enigma2a )	/* (c) 1984 Zilec Electronics (bootleg?) */
 	DRIVER( ltcasino )	/* (c) 1982 Digital Controls Inc */
 	DRIVER( mv4in1 )	/* (c) 1983 Entertainment Enterprises */
-	DRIVER( ltcasin2 )	/* (c) 1984 Digital Controls Inc */
+	DRIVER( ltcasinn )	/* (c) 1984 Digital Controls Inc */
 	DRIVER( coolmini )	/* (c) 1999 SemiCom */
 	DRIVER( luplup )	/* (c) 1999 Omega System */
 	DRIVER( luplup29 )	/* (c) 1999 Omega System */
@@ -7731,6 +7736,7 @@ Other Sun games
 	DRIVER( phrcraze )	/* (c) 1986 Merit */
 	DRIVER( phrcrazs )	/* (c) 1986 Merit */
 	DRIVER( bigappg )	/* (c) 1986 Merit */
+	DRIVER( dodge )		/* (c) 1986 Merit */
 	DRIVER( couple )	/* (c) 1988 Merit */
 	DRIVER( couplep )	/* (c) 1988 Merit */
 	DRIVER( couplei )	/* (c) 1988 Merit */
@@ -7893,12 +7899,13 @@ Other Sun games
 	DRIVER( pepp0158 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0188 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0516 )	/* (c) 1987 IGT - International Gaming Technology */
-    DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
-    DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
-    DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
+	DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
+	DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
+	DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0716 )	/* (c) 1996 IGT - International Gaming Technology */
-    DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
-    DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */
+	DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
+	DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */
+	DRIVER( pexmp006 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */

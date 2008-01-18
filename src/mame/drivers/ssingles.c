@@ -2,102 +2,136 @@
  'Swinging Singles' by Ent. Ent. Ltd
  driver by Tomasz Slanina
 
+
  Crap XXX game.
  Three roms contains text "BY YACHIYO"
 
  Upper half of 7.bin = upper half of 8.bin = intentional or bad dump ?
 
  TODO:
- - colors (proms ? one of unk writes?)
+ - colors (missing prom(s) ?)
  - samples (at least two of unused roms contains samples (unkn. format , adpcm ?)
  - dips (one is tested in game (difficulty related?), another 2 are tested at start)
 
  Unknown reads/writes:
  - AY i/o ports (writes)
  - mem $c000, $c001 = protection device ? if tests fails, game crashes (problems with stack - skipped code with "pop af")
- - i/o port $8 = data read used for  $e command arg for onr of AY chips (volume? - could be a sample player (based on volume changes?)
- - i/o port $1a = 1 or 0, rarely accessed
- - i/o ports $fe,$ff (pair, unknown device , $fe = register, $ff = data ?? sample player)
-   initialized with data:
-
- 0 34
- 1 24
- 2 2c
- 3 14
- 4 f
- 5 0
- 6 e
- 7 e
- 8 0
- 9 f
- a 0
- b 0
- c 0
- d 0
- e 0
- f 0
+ - i/o port $8 = data read used for  $e command arg for one of AY chips (volume? - could be a sample player (based on volume changes?)
+ - i/o port $1a = 1 or 0, rarely accessed, related to crt  writes
 
 */
 
 #include "driver.h"
 #include "sound/ay8910.h"
+#include "video/crtc6845.h"
 
-static UINT8* ssingles_vram;
+static UINT8 *ssingles_videoram;
+static UINT8 *ssingles_colorram;
+static UINT8 prot_data;
 
-static WRITE8_HANDLER(ssingles_vram_w)
+#define NUM_PENS (4*8)
+#define VMEM_SIZE 0x100
+static pen_t pens[NUM_PENS];
+
+//fake palette
+static const UINT8 ssingles_colors[NUM_PENS*3]=
 {
-	ssingles_vram[offset]=data;
+	0x00,0x00,0x00,	0xff,0xff,0xff, 0xff,0x00,0x00,	0x80,0x00,0x00,
+	0x00,0x00,0x00,	0xf0,0xf0,0xf0,	0xff,0xff,0x00, 0x40,0x40,0x40,
+	0x00,0x00,0x00,	0xff,0xff,0xff,	0xff,0x00,0x00,	0xff,0xff,0x00,
+	0x00,0x00,0x00,	0xff,0xff,0x00,	0xd0,0x00,0x00,	0x80,0x00,0x00,
+	0x00,0x00,0x00,	0xff,0x00,0x00,	0xff,0xff,0x00,	0x80,0x80,0x00,
+	0x00,0x00,0x00,	0xff,0x00,0x00,	0x40,0x40,0x40,	0xd0,0xd0,0xd0,
+	0x00,0x00,0x00,	0x00,0x00,0xff,	0x60,0x40,0x30,	0xff,0xff,0x00,
+	0x00,0x00,0x00,	0xff,0x00,0xff,	0x80,0x00,0x80,	0x40,0x00,0x40
+};
+
+static void update_row(mame_bitmap *bitmap, const rectangle *cliprect,
+		UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
+{
+	int cx,x;
+	UINT32 tile_address;
+	UINT16 cell,palette;
+	UINT8 b0,b1;
+
+	for(cx=0;cx<x_count;++cx)
+	{
+		int address=((ma>>1)+(cx>>1))&0xff;
+
+		cell=ssingles_videoram[address]+(ssingles_colorram[address]<<8);
+
+		tile_address=((cell&0x3ff)<<4)+ra;
+		palette=(cell>>10)&0x1c;
+
+		if(cx&1)
+		{
+			b0=memory_region(REGION_GFX1)[tile_address+0x0000]; /*  9.bin */
+			b1=memory_region(REGION_GFX1)[tile_address+0x8000]; /* 11.bin */
+		}
+		else
+		{
+			b0=memory_region(REGION_GFX1)[tile_address+0x4000]; /* 10.bin */
+			b1=memory_region(REGION_GFX1)[tile_address+0xc000]; /* 12.bin */
+		}
+
+		for(x=7;x>=0;--x)
+		{
+			*BITMAP_ADDR32(bitmap, y, (cx<<3)|(x)) = pens[palette+((b1&1)|((b0&1)<<1))];
+			b0>>=1;
+			b1>>=1;
+		}
+	}
+}
+
+static const crtc6845_interface crtc6845_intf =
+{
+		0,
+		1000000, /* ? MHz */
+		8,
+		NULL,
+		update_row,
+		NULL,
+		NULL
+};
+
+static WRITE8_HANDLER(ssingles_videoram_w)
+{
+	ssingles_videoram[offset]=data;
+}
+
+static WRITE8_HANDLER(ssingles_colorram_w)
+{
+	ssingles_colorram[offset]=data;
 }
 
 static VIDEO_START(ssingles)
 {
-}
+	crtc6845_config(0, &crtc6845_intf);
 
-static VIDEO_UPDATE(ssingles)
-{
-	int x,y;
-	int addr=0;
-	for(y=0;y<32;y++)
 	{
-		for(x=0;x<18;x++)
+		int i;
+		for(i=0;i<NUM_PENS;++i)
 		{
-			int 	code=ssingles_vram[addr]+256*(ssingles_vram[addr+0x800]&3);
-			addr++;
-
-			drawgfx(bitmap,machine->gfx[0],
-					code,
-					0,
-					0,0,
-					x<<4, y<<4,
-					0,TRANSPARENCY_NONE,0);
+			pens[i]=MAKE_RGB(ssingles_colors[3*i], ssingles_colors[3*i+1], ssingles_colors[3*i+2]);
 		}
 	}
+}
+
+
+static READ8_HANDLER(c000_r)
+{
+	return prot_data;
+}
+
+static READ8_HANDLER(c001_r)
+{
+	prot_data=0xc4;
 	return 0;
 }
 
-static READ8_HANDLER(prot_r)
+static WRITE8_HANDLER(c001_w)
 {
-		int address=activecpu_get_pc();
-		switch(address)
-		{
-			case 0x638c:
-			case 0x638e: return 0;    //    not used = device reset /clear ?
-			case 0x6392: return 0x80; //1st check
-			case 0x639c: return 0xc4;	//2nd check
-			default: logerror("unk protection read @ %x\n",address);
-		}
-		return 0;
-}
-
-static WRITE8_HANDLER(prot_w)
-{
-	int address=activecpu_get_pc();
-		switch(address)
-		{
-			case 0x6390:
-			case 0x639a: break;// do nothing
-			default: logerror("unk protection write %x @ %x\n",data,address);
-		}
+	prot_data^=data^0x11;
 }
 
 static READ8_HANDLER(controls_r)
@@ -117,8 +151,11 @@ static READ8_HANDLER(controls_r)
 }
 
 static ADDRESS_MAP_START( ssingles_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ( MRA8_ROM ) AM_WRITE(ssingles_vram_w)
-	AM_RANGE(0xc000, 0xc001) AM_READWRITE( prot_r, prot_w ) //protection
+	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
+	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
+	AM_RANGE(0x0000, 0x1fff) AM_READ( MRA8_ROM )
+	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -133,8 +170,10 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x16, 0x16) AM_READ(input_port_2_r)
 	AM_RANGE(0x18, 0x18) AM_READ(input_port_3_r)
 	AM_RANGE(0x1c, 0x1c) AM_READ(controls_r)
-	AM_RANGE(0x1a, 0x1a) AM_WRITENOP
-	AM_RANGE(0xfe, 0xff) AM_WRITENOP
+	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(crtc6845_address_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(crtc6845_register_w)
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssingles )
@@ -208,40 +247,23 @@ PORT_DIPNAME( 0x80, 0x80, "UnkC" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	2,
-	{ 0, RGN_FRAC(1,2) },
-	{ RGN_FRAC(1,4),RGN_FRAC(1,4)+ 1,RGN_FRAC(1,4)+ 2,RGN_FRAC(1,4)+ 3,RGN_FRAC(1,4)+ 4,RGN_FRAC(1,4)+ 5,RGN_FRAC(1,4) + 6,RGN_FRAC(1,4) + 7,0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8},
-	8*8*2
-};
-
-static GFXDECODE_START( ssingles )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x0000, 1 )
-GFXDECODE_END
-
 static MACHINE_DRIVER_START( ssingles )
 	MDRV_CPU_ADD(Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(ssingles_map,0)
 	MDRV_CPU_IO_MAP(ssingles_io_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(288, 288)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 288-1, 0*8, 224-1)
-
-	MDRV_GFXDECODE(ssingles)
-	MDRV_PALETTE_LENGTH(16*4) //guess
+	MDRV_PALETTE_LENGTH(4) //guess
 
 	MDRV_VIDEO_START(ssingles)
-	MDRV_VIDEO_UPDATE(ssingles)
+	MDRV_VIDEO_UPDATE(crtc6845)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -267,7 +289,7 @@ ROM_START( ssingles )
 	ROM_LOAD( "11.bin", 0x8000, 0x4000, CRC(f7107b29) SHA1(a405926fd3cb4b3d2a1c705dcde25d961dba5884) )
 	ROM_LOAD( "12.bin", 0xc000, 0x4000, CRC(e5585a93) SHA1(04d55699b56d869066f2be2c6ac48042aa6c3108) )
 
-	ROM_REGION( 0x08000, REGION_USER1, 0 ) /* samples ? */
+	ROM_REGION( 0x08000, REGION_USER1, 0) /* samples ? data ?*/
 	ROM_LOAD( "5.bin", 0x00000, 0x2000, CRC(242a8dda) SHA1(e140893cc05fb8cee75904d98b02626f2565ed1b) )
 	ROM_LOAD( "6.bin", 0x02000, 0x2000, CRC(85ab8aab) SHA1(566f034e1ba23382442f27457447133a0e0f1cfc) )
 	ROM_LOAD( "7.bin", 0x04000, 0x2000, CRC(57cc112d) SHA1(fc861c58ae39503497f04d302a9f16fca19b37fb) )
@@ -277,9 +299,12 @@ ROM_END
 
 static DRIVER_INIT(ssingles)
 {
-	ssingles_vram=auto_malloc(0x2000);
-	memset(ssingles_vram,0,0x2000);
-	state_save_register_global_pointer(ssingles_vram, 0x2000);
+	ssingles_videoram=auto_malloc(VMEM_SIZE);
+	ssingles_colorram=auto_malloc(VMEM_SIZE);
+	memset(ssingles_videoram,0,VMEM_SIZE);
+	memset(ssingles_colorram,0,VMEM_SIZE);
+	state_save_register_global_pointer(ssingles_videoram, VMEM_SIZE);
+	state_save_register_global_pointer(ssingles_colorram, VMEM_SIZE);
 }
 
 GAME ( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Ent. Ent. Ltd", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )

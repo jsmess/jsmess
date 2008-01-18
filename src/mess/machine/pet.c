@@ -3,7 +3,9 @@
 
     peter.trauner@jk.uni-linz.ac.at
 ***************************************************************************/
+
 #include "driver.h"
+#include "mslegacy.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 

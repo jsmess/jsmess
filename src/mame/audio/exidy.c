@@ -5,13 +5,15 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "rescap.h"
 #include "streams.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/hc55516.h"
 #include "sound/5220intf.h"
-#include "sound/discrete.h"
-#include "exidy.h"
+#include "sound/s14001a.h"
+#include "sound/custom.h"
+#include "berzerk.h"
 
 
 
@@ -21,12 +23,12 @@
  *
  *************************************/
 
-#define CRYSTAL_OSC			(3579545)
-#define SH8253_CLOCK		(CRYSTAL_OSC/2)
-#define SH6840_CLOCK		(CRYSTAL_OSC/4)
-#define SH6532_CLOCK		(CRYSTAL_OSC/4)
-#define CVSD_CLOCK_FREQ 	(1.0 / (0.693 * (RES_K(2.4) + 2.0 * RES_K(20)) * CAP_P(2200)))
-#define BASE_VOLUME			(32767 / 6)
+#define CRYSTAL_OSC				(XTAL_3_579545MHz)
+#define SH8253_CLOCK			(CRYSTAL_OSC/2)
+#define SH6840_CLOCK			(CRYSTAL_OSC/4)
+#define SH6532_CLOCK			(CRYSTAL_OSC/4)
+#define CVSD_CLOCK_FREQ 		(1.0 / (0.693 * (RES_K(2.4) + 2.0 * RES_K(20)) * CAP_P(2200)))
+#define BASE_VOLUME				(32767 / 6)
 
 enum
 {
@@ -43,8 +45,7 @@ enum
  *
  *************************************/
 
-/* IRQ variables */
-static UINT8 pia_irq_state;
+/* IRQ variable */
 static UINT8 riot_irq_state;
 
 /* 6532 variables */
@@ -87,6 +88,7 @@ static UINT32 sh6840_LFSR_2 = 0xffffffff;/* ditto */
 static UINT32 sh6840_LFSR_3 = 0xffffffff;/* ditto */
 static UINT32 sh6840_clocks_per_sample;
 static UINT32 sh6840_clock_count;
+
 static UINT8 exidy_sfxctrl;
 
 /* 8253 variables */
@@ -113,58 +115,13 @@ static double freq_to_step;
 
 /*************************************
  *
- *  PIA interface
+ *  Interrupt generation helper
  *
  *************************************/
 
-static void exidy_irq(int state);
-
-WRITE8_HANDLER(victory_sound_response_w);
-WRITE8_HANDLER(victory_sound_irq_clear_w);
-WRITE8_HANDLER(victory_main_ack_w);
-
-/* PIA 0 */
-static const pia6821_interface pia_0_intf =
+static void update_irq_state(/* unused */ int state)
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ pia_1_portb_w, pia_1_porta_w, pia_1_cb1_w, pia_1_ca1_w,
-	/*irqs   : A/B             */ 0, 0
-};
-
-/* PIA 1 */
-static const pia6821_interface pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ pia_0_portb_w, pia_0_porta_w, pia_0_cb1_w, pia_0_ca1_w,
-	/*irqs   : A/B             */ 0, exidy_irq
-};
-
-/* Victory PIA 0 */
-static const pia6821_interface victory_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, victory_sound_response_w, victory_sound_irq_clear_w, victory_main_ack_w,
-	/*irqs   : A/B             */ 0, exidy_irq
-};
-
-
-
-/*************************************
- *
- *  Interrupt generation helpers
- *
- *************************************/
-
-INLINE void update_irq_state(void)
-{
-	cpunum_set_input_line(1, M6502_IRQ_LINE, (pia_irq_state | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-static void exidy_irq(int state)
-{
-	pia_irq_state = state;
-	update_irq_state();
+	cpunum_set_input_line(1, M6502_IRQ_LINE, (pia_get_irq_b(1) | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -390,18 +347,18 @@ static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sa
 
 static TIMER_CALLBACK( riot_interrupt );
 
-static void *common_start(void)
+static void *common_sh_start(int _has_sh8253, int _has_tms5220)
 {
 	int sample_rate = SH8253_CLOCK;
 	int i;
 
+	has_sh8253  = _has_sh8253;
+	has_tms5220 = _has_tms5220;
+
 	/* determine which sound hardware is installed */
 	has_hc55516 = FALSE;
-	has_tms5220 = FALSE;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		if (Machine->drv->sound[i].type == SOUND_TMS5220)
-			has_tms5220 = TRUE;
 		if (Machine->drv->sound[i].type == SOUND_HC55516)
 			has_hc55516 = TRUE;
 	}
@@ -409,66 +366,56 @@ static void *common_start(void)
 	/* allocate the stream */
 	exidy_stream = stream_create(0, 1, sample_rate, NULL, exidy_stream_update);
 
-	/* Init PIA */
-	pia_reset();
-
-	/* Init LFSR */
-	sh6840_LFSR_oldxor = 0;
-	sh6840_LFSR_0 = 0xffffffff;
-	sh6840_LFSR_1 = 0xffffffff;
-	sh6840_LFSR_2 = 0xffffffff;
-	sh6840_LFSR_3 = 0xffffffff;
-
-	/* Init 6532 */
+	/* 6532 */
     riot_timer = timer_alloc(riot_interrupt, NULL);
-    riot_irq_flag = 0;
-    riot_timer_irq_enable = 0;
-	riot_porta_data = 0xff;
-	riot_portb_data = 0xff;
-    riot_clock_divisor = 1;
-    riot_state = RIOT_IDLE;
 
-	/* Init 6840 */
-	memset(sh6840_timer, 0, sizeof(sh6840_timer));
+	/* 6840 */
 	sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
-	sh6840_MSB = 0;
-	sh6840_volume[0] = 0;
-	sh6840_volume[1] = 0;
-	sh6840_volume[2] = 0;
-	exidy_sfxctrl = 0;
 
-	/* Init 8253 */
-	memset(sh8253_timer, 0, sizeof(sh8253_timer));
+	/* 8253 */
 	freq_to_step = (double)(1 << 24) / (double)sample_rate;
 
 	return auto_malloc(1);
 }
 
 
-void *exidy_sh_start(int clock, const struct CustomSound_interface *config)
+
+/*************************************
+ *
+ *  Sound reset routines
+ *
+ *************************************/
+
+static void common_sh_reset(void)
 {
-	/* Init PIA */
-	pia_config(0, &pia_0_intf);
-	pia_config(1, &pia_1_intf);
-	has_sh8253 = TRUE;
-	return common_start();
-}
+	/* PIA */
+	pia_reset();
 
+	/* LFSR */
+	sh6840_LFSR_oldxor = 0;
+	sh6840_LFSR_0 = 0xffffffff;
+	sh6840_LFSR_1 = 0xffffffff;
+	sh6840_LFSR_2 = 0xffffffff;
+	sh6840_LFSR_3 = 0xffffffff;
 
-void *victory_sh_start(int clock, const struct CustomSound_interface *config)
-{
-	/* Init PIA */
-	pia_config(0, &victory_pia_0_intf);
-	pia_0_cb1_w(0, 1);
-	has_sh8253 = TRUE;
-	return common_start();
-}
+	/* 6532 */
+	riot_irq_flag = 0;
+	riot_timer_irq_enable = 0;
+	riot_porta_data = 0xff;
+	riot_portb_data = 0xff;
+	riot_clock_divisor = 1;
+	riot_state = RIOT_IDLE;
 
+	/* 6840 */
+	memset(sh6840_timer, 0, sizeof(sh6840_timer));
+	sh6840_MSB = 0;
+	sh6840_volume[0] = 0;
+	sh6840_volume[1] = 0;
+	sh6840_volume[2] = 0;
+	exidy_sfxctrl = 0;
 
-void *berzerk_sh_start(int clock, const struct CustomSound_interface *config)
-{
-	has_sh8253 = FALSE;
-	return common_start();
+	/* 8253 */
+	memset(sh8253_timer, 0, sizeof(sh8253_timer));
 }
 
 
@@ -487,7 +434,7 @@ static TIMER_CALLBACK( riot_interrupt )
 		/* generate the IRQ */
 		riot_irq_flag |= 0x80;
 		riot_irq_state = riot_timer_irq_enable;
-		update_irq_state();
+		update_irq_state(0);
 
 		/* now start counting clock cycles down */
 		riot_state = RIOT_POST_COUNT;
@@ -510,11 +457,8 @@ static TIMER_CALLBACK( riot_interrupt )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy_shriot_w )
+static WRITE8_HANDLER( exidy_shriot_w )
 {
-	/* mask to the low 7 bits */
-	offset &= 0x7f;
-
 	/* I/O is done if A2 == 0 */
 	if ((offset & 0x04) == 0)
 	{
@@ -568,10 +512,10 @@ WRITE8_HANDLER( exidy_shriot_w )
 		if (riot_state != RIOT_COUNT)
 			riot_irq_flag &= ~0x80;
 		riot_irq_state = 0;
-		update_irq_state();
+		update_irq_state(0);
 
 		/* set the enable from the offset */
-		riot_timer_irq_enable = offset & 0x08;
+		riot_timer_irq_enable = (offset & 0x08) ? 1 : 0;
 
 		/* set a new timer */
 		riot_clock_divisor = divisors[offset & 0x03];
@@ -588,11 +532,8 @@ WRITE8_HANDLER( exidy_shriot_w )
  *
  *************************************/
 
-READ8_HANDLER( exidy_shriot_r )
+static READ8_HANDLER( exidy_shriot_r )
 {
-	/* mask to the low 7 bits */
-	offset &= 0x7f;
-
 	/* I/O is done if A2 == 0 */
 	if ((offset & 0x04) == 0)
 	{
@@ -624,7 +565,7 @@ READ8_HANDLER( exidy_shriot_r )
 		int temp = riot_irq_flag;
 		riot_irq_flag = 0;
 		riot_irq_state = 0;
-		update_irq_state();
+		update_irq_state(0);
 		return temp;
 	}
 
@@ -660,13 +601,12 @@ READ8_HANDLER( exidy_shriot_r )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy_sh8253_w )
+static WRITE8_HANDLER( exidy_sh8253_w )
 {
 	int chan;
 
 	stream_update(exidy_stream);
 
-	offset &= 3;
 	switch (offset)
 	{
 		case 0:
@@ -697,9 +637,10 @@ WRITE8_HANDLER( exidy_sh8253_w )
 }
 
 
-READ8_HANDLER( exidy_sh8253_r )
+static READ8_HANDLER( exidy_sh8253_r )
 {
-    logerror("8253(R): %x\n",offset);
+	logerror("8253(R): %x\n",offset);
+
 	return 0;
 }
 
@@ -711,20 +652,19 @@ READ8_HANDLER( exidy_sh8253_r )
  *
  *************************************/
 
-READ8_HANDLER( exidy_sh6840_r )
+static READ8_HANDLER( exidy_sh6840_r )
 {
 	fatalerror("exidy_sh6840_r - unexpected read");
-    return 0;
+
+	return 0;
 }
 
 
-WRITE8_HANDLER( exidy_sh6840_w )
+static WRITE8_HANDLER( exidy_sh6840_w )
 {
 	/* force an update of the stream */
 	stream_update(exidy_stream);
 
-	/* only look at the low 3 bits */
-	offset &= 7;
 	switch (offset)
 	{
 		/* offset 0 writes to either channel 0 control or channel 2 control */
@@ -780,11 +720,10 @@ WRITE8_HANDLER( exidy_sh6840_w )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy_sfxctrl_w )
+static WRITE8_HANDLER( exidy_sfxctrl_w )
 {
 	stream_update(exidy_stream);
 
-	offset &= 3;
 	switch (offset)
 	{
 		case 0:
@@ -816,36 +755,386 @@ WRITE8_HANDLER( exidy_sound_filter_w )
 
 /*************************************
  *
+ *  Venture, etc.
+ *
+ *************************************/
+
+static const pia6821_interface venture_pia_0_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ pia_1_portb_w, pia_1_porta_w, pia_1_cb1_w, pia_1_ca1_w,
+	/*irqs   : A/B             */ 0, 0
+};
+
+
+static const pia6821_interface venture_pia_1_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ pia_0_portb_w, pia_0_porta_w, pia_0_cb1_w, pia_0_ca1_w,
+	/*irqs   : A/B             */ 0, update_irq_state
+};
+
+
+static void *venture_sh_start(int clock, const struct CustomSound_interface *config)
+{
+	pia_config(0, &venture_pia_0_intf);
+	pia_config(1, &venture_pia_1_intf);
+
+	return common_sh_start(TRUE, FALSE);
+}
+
+
+static void venture_sh_reset(void *token)
+{
+	common_sh_reset();
+}
+
+
+static const struct CustomSound_interface venture_custom_interface =
+{
+	venture_sh_start,
+	0,
+	venture_sh_reset
+};
+
+
+static ADDRESS_MAP_START( venture_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
+	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
+	AM_RANGE(0x2000, 0x27ff) AM_WRITE(exidy_sound_filter_w)
+	AM_RANGE(0x2800, 0x2807) AM_MIRROR(0x07f8) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x07fc) AM_WRITE(exidy_sfxctrl_w)
+	AM_RANGE(0x5800, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+
+MACHINE_DRIVER_START( venture_audio )
+
+	MDRV_CPU_ADD(M6502, 3579545/4)
+	MDRV_CPU_PROGRAM_MAP(venture_audio_map,0)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(venture_custom_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
  *  CVSD sound for Mouse Trap
  *
  *************************************/
 
-WRITE8_HANDLER( mtrap_voiceio_w )
+static WRITE8_HANDLER( mtrap_voiceio_w )
 {
-    if (!(offset & 0x10))
-    {
-    	hc55516_digit_clock_clear_w(0,data);
-    	hc55516_clock_set_w(0,data);
+	if (!(offset & 0x10))
+	{
+		hc55516_digit_clock_clear_w(0,data);
+		hc55516_clock_set_w(0,data);
 	}
-    if (!(offset & 0x20))
+
+	if (!(offset & 0x20))
 		riot_portb_data = data & 1;
 }
 
 
-READ8_HANDLER( mtrap_voiceio_r )
+static READ8_HANDLER( mtrap_voiceio_r )
 {
 	if (!(offset & 0x80))
 	{
-       int data = (riot_porta_data & 0x06) >> 1;
-       data |= (riot_porta_data & 0x01) << 2;
-       data |= (riot_porta_data & 0x08);
-       return data;
+		int data = (riot_porta_data & 0x06) >> 1;
+		data |= (riot_porta_data & 0x01) << 2;
+		data |= (riot_porta_data & 0x08);
+
+		return data;
 	}
-    if (!(offset & 0x40))
-    {
-    	attotime curtime = timer_get_time();
-    	int clock_pulse = curtime.attoseconds / HZ_TO_ATTOSECONDS(2 * CVSD_CLOCK_FREQ);
-    	return (clock_pulse & 1) << 7;
+
+	if (!(offset & 0x40))
+	{
+		attotime curtime = timer_get_time();
+		int clock_pulse = curtime.attoseconds / HZ_TO_ATTOSECONDS(2 * CVSD_CLOCK_FREQ);
+
+		return (clock_pulse & 1) << 7;
 	}
 	return 0;
+}
+
+
+static ADDRESS_MAP_START( cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( cvsd_iomap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0xff) AM_READWRITE(mtrap_voiceio_r, mtrap_voiceio_w)
+ADDRESS_MAP_END
+
+
+MACHINE_DRIVER_START( mtrap_cvsd_audio )
+
+	MDRV_CPU_ADD(Z80, 3579545/2)
+	MDRV_CPU_PROGRAM_MAP(cvsd_map,0)
+	MDRV_CPU_IO_MAP(cvsd_iomap,0)
+
+	/* audio hardware */
+	MDRV_SOUND_ADD(HC55516, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
+ *  Victory
+ *
+ *************************************/
+
+#define VICTORY_AUDIO_CPU_CLOCK		(XTAL_3_579545MHz / 4)
+#define VICTORY_LOG_SOUND			0
+
+
+static UINT8 victory_sound_response_ack_clk;	/* 7474 @ F4 */
+
+
+READ8_HANDLER( victory_sound_response_r )
+{
+	UINT8 ret = pia_get_output_b(1);
+
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", activecpu_get_previouspc(), ret);
+
+	pia_set_input_cb1(1, 0);
+
+	return ret;
+}
+
+
+READ8_HANDLER( victory_sound_status_r )
+{
+	UINT8 ret = (pia_get_input_ca1(1) << 7) | (pia_get_input_cb1(1) << 6);
+
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", activecpu_get_previouspc(), ret);
+
+	return ret;
+}
+
+
+static TIMER_CALLBACK( delayed_command_w )
+{
+	pia_set_input_a(1, param, 0);
+	pia_set_input_ca1(1, 0);
+}
+
+WRITE8_HANDLER( victory_sound_command_w )
+{
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", activecpu_get_previouspc(), data);
+
+	timer_call_after_resynch(NULL, data, delayed_command_w);
+}
+
+
+static WRITE8_HANDLER( victory_sound_irq_clear_w )
+{
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", activecpu_get_previouspc(), data);
+
+	if (!data) pia_set_input_ca1(1, 1);
+}
+
+
+static WRITE8_HANDLER( victory_main_ack_w )
+{
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound Main ACK W = %02X\n", activecpu_get_previouspc(), data);
+
+	if (victory_sound_response_ack_clk && !data)
+		pia_set_input_cb1(1, 1);
+
+	victory_sound_response_ack_clk = data;
+}
+
+
+static const pia6821_interface victory_pia_e5_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ 0, 0, victory_sound_irq_clear_w, victory_main_ack_w,
+	/*irqs   : A/B             */ 0, update_irq_state
+};
+
+
+static void *victory_sh_start(int clock, const struct CustomSound_interface *config)
+{
+	pia_config(1, &victory_pia_e5_intf);
+
+	state_save_register_global(victory_sound_response_ack_clk);
+
+	return common_sh_start(TRUE, TRUE);
+}
+
+
+static void victory_sh_reset(void *token)
+{
+	common_sh_reset();
+
+	/* the flip-flop @ F4 is reset */
+	victory_sound_response_ack_clk = 0;
+	pia_set_input_cb1(1, 1);
+
+	/* these two lines shouldn't be needed, but it avoids the log entry
+       as the sound CPU checks port A before the main CPU ever writes to it */
+	pia_set_input_a(1, 0, 0);
+	pia_set_input_ca1(1, 1);
+}
+
+
+static const struct CustomSound_interface victory_custom_interface =
+{
+	victory_sh_start,
+	0,
+	victory_sh_reset,
+};
+
+
+static ADDRESS_MAP_START( victory_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
+	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
+	AM_RANGE(0x4000, 0x4fff) AM_NOP
+	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x0ff8) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_WRITE(exidy_sfxctrl_w)
+	AM_RANGE(0x7000, 0xafff) AM_NOP
+	AM_RANGE(0xb000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+MACHINE_DRIVER_START( victory_audio )
+
+	MDRV_CPU_ADD(M6502, VICTORY_AUDIO_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(victory_audio_map,0)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(victory_custom_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD(TMS5220, 640000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
+ *  Berzerk
+ *
+ *  Copyright Alex Judd 1997/98
+ *  V1.1 for Mame 0.31 13March98
+ *
+ *************************************/
+
+#define BERZERK_S14001A_CLOCK	(BERZERK_MASTER_CLOCK / 2)
+
+
+static void *berzerk_sh_start(int clock, const struct CustomSound_interface *config)
+{
+	return common_sh_start(FALSE, FALSE);
+}
+
+
+static void berzerk_sh_reset(void *token)
+{
+	common_sh_reset();
+}
+
+
+static const struct S14001A_interface berzerk_s14001a_interface =
+{
+	REGION_SOUND1	/* voice data region */
+};
+
+
+static const struct CustomSound_interface berzerk_custom_interface =
+{
+	berzerk_sh_start,
+	0,
+	berzerk_sh_reset,
+};
+
+
+MACHINE_DRIVER_START( berzerk_audio )
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(S14001A, BERZERK_S14001A_CLOCK)	/* CPU clock divided by 16 divided by a programmable TTL setup */
+	MDRV_SOUND_CONFIG(berzerk_s14001a_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(berzerk_custom_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
+
+
+WRITE8_HANDLER( berzerk_audio_w )
+{
+	switch (offset)
+	{
+	/* offsets 0-3, 5 and 7 write to the 6840 */
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	case 5:
+	case 7:
+		exidy_sh6840_w(offset, data);
+		break;
+
+	/* offset 6 writes to the sfxcontrol latch */
+	case 6:
+		exidy_sfxctrl_w(data >> 6, data);
+		break;
+
+	/* offset 4 writes to the S14001A */
+	case 4:
+		if ((data & 0xc0) == 0x40) /* VSU-1000 control write */
+		{
+			/* volume and frequency control goes here */
+			/* mame_printf_debug("TODO: VSU-1000 Control write (ignored for now)\n");*/
+		  S14001A_set_volume(((data&0x38)>>3)+1);
+		  S14001A_set_rate((16-(data&0x07))*16); /* second LS161 has load triggered by its own TC(when it equals 16) long before the first ls161 will TC and fire again, so effectively it only divides by 15 and not 16. If the clock, as opposed to the E enable, had been tied to the first LS161's TC instead, it would divide by 16 as expected */
+		}
+		else if ((data & 0xc0) != 0x00)
+		{
+			/* vsu-1000 ignores these writes entirely */
+			mame_printf_debug("bogus write ignored\n");
+		}
+		else
+		{
+			/* select word input */
+			if (S14001A_bsy_0_r()) /* skip if busy... */
+			{
+				mame_printf_debug("S14001A busy, ignoring write\n");
+				break;
+			}
+
+			/* write to the register */
+			S14001A_reg_0_w(data & 0x3f);
+			S14001A_rst_0_w(1);
+			S14001A_rst_0_w(0);
+		}
+		break;
+	}
+}
+
+
+READ8_HANDLER( berzerk_audio_r )
+{
+	return ((offset == 4) && !S14001A_bsy_0_r()) ? 0x40 : 0x00;
 }

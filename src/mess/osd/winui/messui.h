@@ -4,7 +4,6 @@
 #include "driver.h"
 #include "resourcems.h"
 #include "devview.h"
-#include "uitext.h"
 #include "options.h"
 
 extern char g_szSelectedItem[MAX_PATH];

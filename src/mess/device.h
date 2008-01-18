@@ -273,6 +273,7 @@ struct IODevice
 
 
 /* device naming */
+const char *device_uiname(iodevice_t devtype);
 const char *device_typename(iodevice_t type);
 const char *device_brieftypename(iodevice_t type);
 int device_typeid(const char *name);

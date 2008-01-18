@@ -10,7 +10,7 @@
 
 #include "mess.h"
 #include "device.h"
-#include "uitext.h"
+#include "mslegacy.h"
 #include "inputx.h"
 
 
@@ -288,12 +288,11 @@ int mess_validitychecks(void)
 	const char *name;
 	input_port_entry *inputports = NULL;
 	extern int device_valididtychecks(void);
-	extern const char *mess_default_text[];
 
 	/* make sure that all of the UI_* strings are set for all devices */
 	for (devtype = 0; devtype < IO_COUNT; devtype++)
 	{
-		name = mess_default_text[UI_cartridge - IO_CARTSLOT - UI_last_mame_entry + devtype];
+		name = device_uiname(devtype);
 		if (!name || !name[0])
 		{
 			mame_printf_error("Device type %d does not have an associated UI string\n", devtype);

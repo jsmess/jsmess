@@ -3687,10 +3687,6 @@ static INTERRUPT_GEN( nmk_interrupt )
 }
 
 
-/* Parameters: YM3812 frequency, Oki frequency, Oki memory region */
-SEIBU_SOUND_SYSTEM_YM3812_HARDWARE
-
-
 static MACHINE_DRIVER_START( tharrier )
 
 	/* basic machine hardware */
@@ -4007,7 +4003,7 @@ static MACHINE_DRIVER_START( vandykeb )
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD(PIC16C57, (12000000/PIC16C5x_CLOCK_DIVIDER))	/* 3MHz */
+	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
 	MDRV_CPU_FLAGS(CPU_DISABLE)
 
 	MDRV_SCREEN_REFRESH_RATE(56)

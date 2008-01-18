@@ -173,7 +173,7 @@ static MACHINE_RESET( irem )
  *              0x06: SAUCER HIT
  */
 
-WRITE8_HANDLER( iremm10_ctrl_w )
+static WRITE8_HANDLER( iremm10_ctrl_w )
 {
 	irem_state *state = Machine->driver_data;
 
@@ -250,7 +250,7 @@ WRITE8_HANDLER( iremm10_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-WRITE8_HANDLER( iremm11_ctrl_w )
+static WRITE8_HANDLER( iremm11_ctrl_w )
 {
 	irem_state *state = Machine->driver_data;
 
@@ -283,7 +283,7 @@ WRITE8_HANDLER( iremm11_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-WRITE8_HANDLER( iremm15_ctrl_w )
+static WRITE8_HANDLER( iremm15_ctrl_w )
 {
 	irem_state *state = Machine->driver_data;
 
@@ -311,7 +311,7 @@ WRITE8_HANDLER( iremm15_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-WRITE8_HANDLER( iremm10_a500_w )
+static WRITE8_HANDLER( iremm10_a500_w )
 {
 #if DEBUG
 	if (data & 0xFC)
@@ -319,7 +319,7 @@ WRITE8_HANDLER( iremm10_a500_w )
 #endif
 }
 
-WRITE8_HANDLER( iremm11_a100_w )
+static WRITE8_HANDLER( iremm11_a100_w )
 {
 	static int last = 0x00;
 	int raising_bits = data & ~last;
@@ -353,7 +353,7 @@ WRITE8_HANDLER( iremm11_a100_w )
 
 }
 
-WRITE8_HANDLER( iremm15_a100_w )
+static WRITE8_HANDLER( iremm15_a100_w )
 {
 	static int last = 0x00;
 	//int raising_bits = data & ~last;
@@ -411,14 +411,14 @@ WRITE8_HANDLER( iremm15_a100_w )
 	last = data;
 }
 
-READ8_HANDLER( iremm10_a700_r )
+static READ8_HANDLER( iremm10_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(0));
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 	return 0x00;
 }
 
-READ8_HANDLER( iremm11_a700_r )
+static READ8_HANDLER( iremm11_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(0));
 	return 0x00;
@@ -430,7 +430,7 @@ READ8_HANDLER( iremm11_a700_r )
  *
  *************************************/
 
-TIMER_CALLBACK( skychut_callback )
+static TIMER_CALLBACK( skychut_callback )
 {
     if (param==0)
     {
@@ -447,7 +447,7 @@ TIMER_CALLBACK( skychut_callback )
 
 }
 
-INTERRUPT_GEN( iremm11_interrupt )
+static INTERRUPT_GEN( iremm11_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
@@ -458,7 +458,7 @@ INTERRUPT_GEN( iremm11_interrupt )
     }
 }
 
-INTERRUPT_GEN( iremm10_interrupt )
+static INTERRUPT_GEN( iremm10_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
@@ -466,7 +466,7 @@ INTERRUPT_GEN( iremm10_interrupt )
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN( iremm15_interrupt )
+static INTERRUPT_GEN( iremm15_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
@@ -486,7 +486,7 @@ INTERRUPT_GEN( iremm15_interrupt )
 static ADDRESS_MAP_START( iremm10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_1_r)
@@ -500,7 +500,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( iremm11_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(iremm11_a100_w) /* sound writes ???? */
@@ -514,7 +514,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( iremm15_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(MRA8_RAM, iremm15_chargen_w) AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_3_r)
@@ -543,7 +543,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
-INPUT_PORTS_START( skychut )
+static INPUT_PORTS_START( skychut )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -584,7 +584,7 @@ INPUT_PORTS_START( skychut )
 	CAB_PORTENV
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ipminvad )
+static INPUT_PORTS_START( ipminvad )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -625,7 +625,7 @@ INPUT_PORTS_START( ipminvad )
 	CAB_PORTENV
 INPUT_PORTS_END
 
-INPUT_PORTS_START( spacebeam )
+static INPUT_PORTS_START( spacebeam )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -659,7 +659,7 @@ INPUT_PORTS_START( spacebeam )
 	CAB_PORTENV
 INPUT_PORTS_END
 
-INPUT_PORTS_START( headoni )
+static INPUT_PORTS_START( headoni )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )

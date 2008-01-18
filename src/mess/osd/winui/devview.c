@@ -16,7 +16,7 @@
 #include "driver.h"
 #include "devview.h"
 #include "optionsms.h"
-#include "uitext.h"
+#include "mslegacy.h"
 #include "strconv.h"
 #include "winutf8.h"
 #include "mui_util.h"

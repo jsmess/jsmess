@@ -11,7 +11,7 @@
 #include "image.h"
 #include "ui.h"
 #include "uimenu.h"
-#include "uitext.h"
+#include "mslegacy.h"
 
 #define SEL_BITS	12
 #define SEL_MASK	((1<<SEL_BITS)-1)

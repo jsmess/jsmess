@@ -84,7 +84,7 @@ static VIDEO_UPDATE( acefruit )
 			{
 				int y;
 				int x;
-				int spriteskip[] = { 1, 2, 4 };
+				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
 				const gfx_element *gfx = machine->gfx[ 0 ];
 
@@ -139,7 +139,7 @@ static VIDEO_UPDATE( acefruit )
 	return 0;
 }
 
-static UINT32 sidewndr_payout_r(void *param)
+static CUSTOM_INPUT( sidewndr_payout_r )
 {
 	int bit_mask = (FPTR)param;
 
@@ -155,7 +155,7 @@ static UINT32 sidewndr_payout_r(void *param)
 	}
 }
 
-static UINT32 starspnr_coinage_r(void *param)
+static CUSTOM_INPUT( starspnr_coinage_r )
 {
 	int bit_mask = (FPTR)param;
 
@@ -175,7 +175,7 @@ static UINT32 starspnr_coinage_r(void *param)
 	}
 }
 
-static UINT32 starspnr_payout_r(void *param)
+static CUSTOM_INPUT( starspnr_payout_r )
 {
 	int bit_mask = (FPTR)param;
 

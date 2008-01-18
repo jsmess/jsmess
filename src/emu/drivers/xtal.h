@@ -52,11 +52,14 @@ enum
 	XTAL_4_433619MHz	= 4433619,		/* PAL subcarrier */
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_6MHz    		= 6000000,
+	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
 	XTAL_7_3728MHz   	= 7372800,
 	XTAL_8MHz    		= 8000000,
+	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
+	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
 	XTAL_12MHz   		= 12000000,
 	XTAL_12_096MHz 		= 12096000,		/* Some early 80's Atari games */
@@ -104,6 +107,7 @@ enum
 	XTAL_45MHz   		= 45000000,		/* Eolith with Hyperstone CPUs */
 	XTAL_45_158MHz  	= 45158000,		/* Sega Model 2A video board, Model 3 CPU board */
 	XTAL_48MHz   		= 48000000,
+	XTAL_48_66MHz  		= 48660000,		/* Zaxxon */
 	XTAL_49_152MHz  	= 49152000,		/* Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22  */
 	XTAL_50MHz   		= 50000000,
 	XTAL_52MHz   		= 52000000,		/* Cojag */
@@ -121,6 +125,8 @@ enum
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
 	XTAL_384kHz			= 384000,
+	XTAL_400kHz			= 400000,	/* Used on Great Swordman h/w */
+	XTAL_455kHz			= 455000,	/* Used on Gladiator h/w */
 	XTAL_640kHz			= 640000
 };
 
