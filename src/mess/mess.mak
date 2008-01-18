@@ -899,6 +899,7 @@ $(MESSOBJ)/mtx.a:	   \
 
 $(MESSOBJ)/acorn.a:    \
 	$(MESS_DRIVERS)/acrnsys1.o \
+	$(MESS_MACHINE)/ins8154.o \
 	$(MESS_MACHINE)/i8271.o	 \
 	$(MESS_MACHINE)/upd7002.o  \
 	$(MESS_VIDEO)/saa505x.o	     \
