@@ -25,31 +25,31 @@ Aquarius Memory map
 ************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
 #include "includes/aquarius.h"
-#include "mslegacy.h"
+#include "cpu/z80/z80.h"
 
-/* structures */
-
-/* port i/o functions */
-
-static ADDRESS_MAP_START( aquarius_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0xfc, 0xfc) AM_WRITE( aquarius_port_fc_w)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE( aquarius_port_fe_r, aquarius_port_fe_w)
-	AM_RANGE(0xff, 0xff) AM_READWRITE( aquarius_port_ff_r, aquarius_port_ff_w)
-ADDRESS_MAP_END
 
 /* Memory w/r functions */
 
-static ADDRESS_MAP_START( aquarius_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( aquarius_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_NOP
-	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(videoram_r, aquarius_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(MRA8_RAM, aquarius_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0xffff) AM_NOP
 ADDRESS_MAP_END
+
+
+/* port i/o functions */
+
+static ADDRESS_MAP_START( aquarius_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(aquarius_port_fc_w)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE(aquarius_port_fe_r, aquarius_port_fe_w)
+	AM_RANGE(0xff, 0xff) AM_READWRITE(aquarius_port_ff_r, aquarius_port_ff_w)
+ADDRESS_MAP_END
+
 
 /* graphics output */
 
