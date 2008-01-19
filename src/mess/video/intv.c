@@ -753,8 +753,6 @@ VIDEO_UPDATE( intv )
 
 VIDEO_START( intvkbd )
 {
-	videoram_size = 0x0800;
-	videoram = auto_malloc(videoram_size);
     video_start_generic(machine);
 	video_start_intv(machine);
 }
