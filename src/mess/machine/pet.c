@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 
@@ -313,7 +312,7 @@ WRITE8_HANDLER(cbm8096_w)
 		if (data&0x20)
 		{
 			memory_set_bankptr(1, pet_memory+0x8000);
-			wh = videoram_w;
+			wh = MWA8_RAM;
 		}
 		else
 		{
@@ -363,7 +362,7 @@ WRITE8_HANDLER(cbm8096_w)
 	else
 	{
 		memory_set_bankptr(1, pet_memory + 0x8000);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, videoram_w);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, MWA8_RAM);
 
 		memory_set_bankptr(2, pet_memory + 0x9000);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, MWA8_ROM);

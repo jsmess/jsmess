@@ -10,9 +10,6 @@
 #ifndef MSLEGACY_H
 #define MSLEGACY_H
 
-#include "driver.h"
-
-extern UINT8 *dirtybuffer;
 
 enum
 {
@@ -78,18 +75,12 @@ enum
 };
 
 
-
 /* palette */
 void palette_set_colors_rgb(running_machine *machine, pen_t color_base, const UINT8 *colors, int color_count);
 
-/* read/write handlers */
-READ8_HANDLER( videoram_r );
-WRITE8_HANDLER( videoram_w );
-WRITE8_HANDLER( colorram_w );
 
 /* uitext */
 const char * ui_getstring (int string_num);
-
 
 
 #endif /* MSLEGACY_H */

@@ -16,6 +16,9 @@
 #include "includes/crtc6845.h"
 
 
+UINT8 *dirtybuffer;
+
+
 /***************************************************************************
 
 	Static declarations
@@ -218,6 +221,7 @@ static const struct mscrtc6845_config config= { 14318180 /*?*/, pc_t1t_cursor };
 
 static VIDEO_START( pc_t1t )
 {
+	dirtybuffer = auto_malloc(videoram_size);
 	pc_video_start(&config, pc_t1t_choosevideomode, 0x8000);
 }
 

@@ -7,10 +7,8 @@
 
 *********************************************************************/
 
+#include "driver.h"
 #include "mslegacy.h"
-
-UINT8 *dirtybuffer;
-
 
 
 static const char *mess_default_text[] =
@@ -95,39 +93,6 @@ void palette_set_colors_rgb(running_machine *machine, pen_t color_base, const UI
 
 
 /***************************************************************************
-    GENERIC READ/WRITE HANDLERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    videoram_r/w - 8-bit access to videoram with
-    dirty buffer marking
--------------------------------------------------*/
-
-READ8_HANDLER( videoram_r )
-{
-	return videoram[offset];
-}
-
-WRITE8_HANDLER( videoram_w )
-{
-	dirtybuffer[offset] = 1;
-	videoram[offset] = data;
-}
-
-/*-------------------------------------------------
-    colorram_w - 8-bit access to colorram with
-    dirty buffer marking
--------------------------------------------------*/
-
-WRITE8_HANDLER( colorram_w )
-{
-	dirtybuffer[offset] = 1;
-	colorram[offset] = data;
-}
-
-
-
-/***************************************************************************
     UI TEXT
 ***************************************************************************/
 
@@ -135,4 +100,3 @@ const char * ui_getstring (int string_num)
 {
 	return mess_default_text[string_num];
 }
-

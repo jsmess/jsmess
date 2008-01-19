@@ -806,19 +806,11 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 	{
 		cgenie_font_offset[2] = (data & FF_CHR0) ? 0x00 : 0x80;
 		cgenie_font_offset[3] = (data & FF_CHR1) ? 0x00 : 0x80;
-		if( (port_ff_changed & FF_CHR) == FF_CHR )
-			cgenie_invalidate_range(0x80, 0xff);
-		else
-		if( (port_ff_changed & FF_CHR) == FF_CHR0 )
-			cgenie_invalidate_range(0x80, 0xbf);
-		else
-			cgenie_invalidate_range(0xc0, 0xff);
 	}
 
 	/* graphics mode changed ? */
 	if( port_ff_changed & FF_FGR )
 	{
-		cgenie_invalidate_range(0x00, 0xff);
 		cgenie_mode_select(data & FF_FGR);
 	}
 
@@ -1082,7 +1074,6 @@ WRITE8_HANDLER( cgenie_videoram_w )
 	if( data == videoram[offset] )
 		return; 			   /* no change */
 	videoram[offset] = data;
-	dirtybuffer[offset] = 1;
 }
 
  READ8_HANDLER( cgenie_colorram_r )
@@ -1092,21 +1083,16 @@ WRITE8_HANDLER( cgenie_videoram_w )
 
 WRITE8_HANDLER( cgenie_colorram_w )
 {
-	int a;
-
 	/* only bits 0 to 3 */
 	data &= 15;
 	/* nothing changed ? */
 	if( data == colorram[offset] )
 		return;
 
-/* set new value */
+	/* set new value */
 	colorram[offset] = data;
-/* make offset relative to video frame buffer offset */
+	/* make offset relative to video frame buffer offset */
 	offset = (offset + (cgenie_get_register(12) << 8) + cgenie_get_register(13)) & 0x3ff;
-/* mark every 1k of the frame buffer dirty */
-	for( a = offset; a < 0x4000; a += 0x400 )
-		dirtybuffer[a] = 1;
 }
 
  READ8_HANDLER( cgenie_fontram_r )
@@ -1117,7 +1103,6 @@ WRITE8_HANDLER( cgenie_colorram_w )
 WRITE8_HANDLER( cgenie_fontram_w )
 {
 	UINT8 *dp;
-	int code;
 
 	if( data == cgenie_fontram[offset] )
 		return; 			   /* no change */
@@ -1135,10 +1120,6 @@ WRITE8_HANDLER( cgenie_fontram_w )
 	dp[5] = (data & 0x04) ? 1 : 0;
 	dp[6] = (data & 0x02) ? 1 : 0;
 	dp[7] = (data & 0x01) ? 1 : 0;
-
-	/* invalidate related character */
-	code = 0x80 + offset / 8;
-	cgenie_invalidate_range(code, code);
 }
 
 /*************************************
@@ -1152,10 +1133,8 @@ INTERRUPT_GEN( cgenie_frame_interrupt )
 	if( cgenie_tv_mode != (readinputport(0) & 0x10) )
 	{
 		cgenie_tv_mode = input_port_0_r(0) & 0x10;
-		memset(dirtybuffer, 1, videoram_size);
 		/* force setting of background color */
 		port_ff ^= FF_BGD0;
 		cgenie_port_ff_w(0, port_ff ^ FF_BGD0);
 	}
 }
-

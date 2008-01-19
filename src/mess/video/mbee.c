@@ -73,7 +73,6 @@ WRITE8_HANDLER ( mbee_videoram_w )
 		logerror("mbee videoram [$%04X] <- $%02X\n", offset, data);
 		videoram[offset] = data;
 		colorram[offset] = 2;
-		dirtybuffer[offset] = 1;
 	}
 }
 
@@ -100,19 +99,11 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 		if( pcgram[0x0800+offset] != data )
         {
             int chr = 0x80 + offset / 16;
-			int i;
 
             logerror("mbee pcgram  [$%04X] <- $%02X\n", offset, data);
             pcgram[0x0800+offset] = data;
             /* decode character graphics again */
             decodechar(Machine->gfx[0], chr, pcgram);
-
-            /* mark all visible characters with that code dirty */
-            for( i = 0; i < videoram_size; i++ )
-            {
-                if( videoram[i] == chr )
-                    dirtybuffer[i] = 1;
-            }
         }
     }
 	else
@@ -121,7 +112,6 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
         {
             logerror("colorram [$%04X] <- $%02X\n", offset, data);
             colorram[offset] = data;
-            dirtybuffer[offset] = 1;
         }
 	}
 }
@@ -414,7 +404,6 @@ WRITE8_HANDLER ( m6545_data_w )
 		crt.cursor_top = data;
 		logerror("6545 cursor top              %d/$%02X\n", data & 31, data);
 		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
-        dirtybuffer[addr] = 1;
 		break;
 	case 11:
 		if( crt.cursor_bottom == data )
@@ -422,7 +411,6 @@ WRITE8_HANDLER ( m6545_data_w )
 		crt.cursor_bottom = data;
         logerror("6545 cursor bottom           %d/$%02X\n", data & 31, data);
 		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
-        dirtybuffer[addr] = 1;
 		break;
 	case 12:
 		data &= 63;
@@ -445,7 +433,6 @@ WRITE8_HANDLER ( m6545_data_w )
 			break;
 		crt.cursor_address_hi = data;
 		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
-		dirtybuffer[addr] = 1;
 		logerror("6545 cursor address hi       $%02X\n", data);
         break;
 	case 15:
@@ -453,7 +440,6 @@ WRITE8_HANDLER ( m6545_data_w )
 			break;
 		crt.cursor_address_lo = data;
 		addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
-		dirtybuffer[addr] = 1;
 		logerror("6545 cursor address lo       $%02X\n", data);
         break;
 	case 16:
@@ -492,7 +478,6 @@ VIDEO_START( mbee )
 
 	videoram = auto_malloc(0x800);
 	colorram = auto_malloc(0x800);
-	memset(dirtybuffer, 1, videoram_size);
 }
 
 VIDEO_UPDATE( mbee )
@@ -510,11 +495,6 @@ VIDEO_UPDATE( mbee )
 		}
     }
 
-    if( full_refresh )
-	{
-		memset(dirtybuffer, 1, videoram_size);
-	}
-
 	for( offs = 0x000; offs < 0x380; offs += 0x10 )
 		keyboard_matrix_r(offs);
 
@@ -524,35 +504,28 @@ VIDEO_UPDATE( mbee )
 	screen_ = crt.screen_address_hi * 256 + crt.screen_address_lo;
 	for( offs = screen_; offs < crt.horizontal_displayed * crt.vertical_displayed + screen_; offs++ )
 	{
-		if( dirtybuffer[offs] )
+		int sx, sy, code, color;
+		sy = off_y + ((offs - screen_) / crt.horizontal_displayed) * (crt.scan_lines + 1);
+		sx = (off_x + ((offs - screen_) % crt.horizontal_displayed)) * 8;
+		code = videoram[offs];
+		color = colorram[offs];
+		drawgfx( bitmap,machine->gfx[0],code,color,0,0,sx,sy,
+			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+
+		if( offs == cursor && (crt.cursor_top & 0x60) != 0x20 )
 		{
-			int sx, sy, code, color;
-			sy = off_y + ((offs - screen_) / crt.horizontal_displayed) * (crt.scan_lines + 1);
-			sx = (off_x + ((offs - screen_) % crt.horizontal_displayed)) * 8;
-			code = videoram[offs];
-			color = colorram[offs];
-			drawgfx( bitmap,machine->gfx[0],code,color,0,0,sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-			dirtybuffer[offs] = 0;
-			if( offs == cursor && (crt.cursor_top & 0x60) != 0x20 )
+			if( (crt.cursor_top & 0x60) == 0x60 || (framecnt & 16) == 0 )
 			{
-				if( (crt.cursor_top & 0x60) == 0x60 || (framecnt & 16) == 0 )
+				int x, y;
+                for( y = (crt.cursor_top & 31); y <= (crt.cursor_bottom & 31); y++ )
 				{
-					int x, y;
-                    for( y = (crt.cursor_top & 31); y <= (crt.cursor_bottom & 31); y++ )
-					{
-						if( y > crt.scan_lines )
-							break;
-						for( x = 0; x < 8; x++ )
-							*BITMAP_ADDR16(bitmap, sy+y, sx+x) = machine->pens[color];
-					}
-					dirtybuffer[offs] = 1;
+					if( y > crt.scan_lines )
+						break;
+					for( x = 0; x < 8; x++ )
+						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = machine->pens[color];
 				}
-            }
-		}
+			}
+        }
 	}
 	return 0;
 }
-
-
-

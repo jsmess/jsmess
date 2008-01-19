@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf4000, 0xf5fff) AM_WRITE( MWA8_ROM )
 	AM_RANGE(0xf6000, 0xf7fff) AM_WRITE( MWA8_ROM )
 	AM_RANGE(0xf8000, 0xfbfff) AM_WRITE( MWA8_ROM) AM_BASE( &cbmb_basic )
-	AM_RANGE(0xfd000, 0xfd7ff) AM_WRITE( videoram_w) AM_BASE( &videoram) AM_SIZE(&videoram_size ) /* VIDEORAM */
+	AM_RANGE(0xfd000, 0xfd7ff) AM_WRITE( MWA8_RAM) AM_BASE( &videoram) AM_SIZE(&videoram_size ) /* VIDEORAM */
 	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR( 0xfe ) AM_WRITE( crtc6845_0_address_w )
 	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_WRITE( crtc6845_0_register_w )
 	/* disk units */
