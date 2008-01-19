@@ -20,7 +20,7 @@ System Driver Changes:
   instead of dip switches and updated it to use the default black and white
   palette.  [Dirk Best]
 
-- [NES] Added support for mappers 42, 43, 44, 45 (partial), 46, 47, 206.
+- [NES] Added support for mappers 42, 43, 44, 45 (partial), 46, 47, 49, 206.
   [Wilbert Pol]
 
 - [ORIC] Fixed tape loading.  (bug #241) [Wilbert Pol]

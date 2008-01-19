@@ -3015,6 +3015,20 @@ static WRITE8_HANDLER( mapper47_m_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper49_m_w )
+{
+	LOG_MMC(("mapper49_m_w, offset: %04x, data: %02x\n", offset, data ));
+
+	if ( ( offset & 0x1800 ) == 0x0800 && ( offset & 0xFF ) == data ) {
+		MMC3_prg_base = ( data & 0xC0 ) >> 2;
+		MMC3_prg_mask = 0x0F;
+		MMC3_chr_base = ( data & 0xC0 ) << 1;
+		MMC3_chr_mask = 0x7F;
+		mapper4_set_prg();
+		mapper4_set_chr();
+	}
+}
+
 static WRITE8_HANDLER( mapper64_m_w )
 {
 	logerror("mapper64_m_w, offset: %04x, data: %02x\n", offset, data);
@@ -4511,6 +4525,7 @@ int mapper_reset (int mapperNum)
 			break;
 		case 44:
 		case 47:
+		case 49:
 			IRQ_enable = 0;
 			IRQ_count = IRQ_count_latch = 0;
 			IRQ_reload = 0;
@@ -4691,6 +4706,7 @@ static const mmc mmc_list[] =
 	{ 45, "X-in-1 MMC3",			NULL, NULL, mapper45_m_w, mapper4_w, NULL, NULL, mapper4_irq },
 	{ 46, "15-in-1 Color Dreams",	NULL, NULL, mapper46_m_w, mapper46_w, NULL, NULL, NULL },
 	{ 47, "2-in-1 MMC3",			NULL, NULL, mapper47_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+	{ 49, "4-in-1 MMC3",			NULL, NULL, mapper49_m_w, mapper4_w, NULL, NULL, mapper4_irq },
 	{ 64, "Tengen",					NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
 	{ 65, "Irem H3001",				NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
 	{ 66, "74161/32 Jaleco",		NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
