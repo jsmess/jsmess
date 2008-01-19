@@ -4109,6 +4109,14 @@ static WRITE8_HANDLER( mapper184_m_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper206_w )
+{
+	if ( (offset & 0x6001) == 0x2000 )
+		return;
+
+	mapper4_w( offset, data );
+}
+
 static WRITE8_HANDLER( mapper225_w )
 {
 	int hi_bank;
@@ -4391,6 +4399,7 @@ int mapper_reset (int mapperNum)
 			break;
 		case 4:
 		case 118:
+		case 206:
 			/* Can switch 8k prg banks */
 			IRQ_enable = 0;
 			IRQ_count = IRQ_count_latch = 0;
@@ -4734,6 +4743,7 @@ static const mmc mmc_list[] =
 	{ 144, "AGCI 50282",			NULL, NULL, NULL, mapper144_w, NULL, NULL, NULL }, //Death Race only
 	{ 180, "Nihon Bussan - PRG HI",	NULL, NULL, NULL, mapper180_w, NULL, NULL, NULL },
 	{ 184, "Sunsoft VROM/4K",		NULL, NULL, mapper184_m_w, NULL, NULL, NULL, NULL },
+	{ 206, "MMC3 no mirror",		NULL, NULL, NULL, mapper206_w, NULL, NULL, mapper4_irq },
 	{ 225, "72-in-1 bootleg",		NULL, NULL, NULL, mapper225_w, NULL, NULL, NULL },
 	{ 226, "76-in-1 bootleg",		NULL, NULL, NULL, mapper226_w, NULL, NULL, NULL },
 	{ 227, "1200-in-1 bootleg",		NULL, NULL, NULL, mapper227_w, NULL, NULL, NULL },
