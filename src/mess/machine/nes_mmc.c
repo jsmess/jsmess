@@ -2866,6 +2866,59 @@ static WRITE8_HANDLER( mapper42_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper43_w )
+{
+	int		bank = ( ( ( offset >> 8 ) & 0x03 ) * 0x20 ) + ( offset & 0x1F );
+
+	LOG_MMC(("mapper43_w, offset: %04x, data: %02x\n", offset, data));
+
+	ppu2c0x_set_mirroring( 0, ( offset & 0x2000 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+
+	if ( offset & 0x0800 )
+	{
+		if ( offset & 0x1000 )
+		{
+			if ( bank * 2 >= nes.prg_chunks )
+			{
+				memory_set_bankptr( 3, nes.wram );
+				memory_set_bankptr( 4, nes.wram );
+			}
+			else
+			{
+				LOG_MMC(("mapper43_w, selecting upper 16KB bank of #%02x\n", bank));
+				prg16_cdef( 2 * bank + 1 );
+			}
+		}
+		else
+		{
+			if ( bank * 2 >= nes.prg_chunks )
+			{
+				memory_set_bankptr( 1, nes.wram );
+				memory_set_bankptr( 2, nes.wram );
+			}
+			else
+			{
+				LOG_MMC(("mapper43_w, selecting lower 16KB bank of #%02x\n", bank));
+				prg16_89ab( 2 * bank );
+			}
+		}
+	}
+	else
+	{
+		if ( bank * 2 >= nes.prg_chunks ) {
+			memory_set_bankptr (1, nes.wram );
+			memory_set_bankptr (2, nes.wram );
+			memory_set_bankptr (3, nes.wram );
+			memory_set_bankptr (4, nes.wram );
+		}
+		else 
+		{
+			LOG_MMC(("mapper43_w, selecting 32KB bank #%02x\n", bank));
+			prg32( bank );
+		}
+	}
+}
+
 static WRITE8_HANDLER( mapper64_m_w )
 {
 	logerror("mapper64_m_w, offset: %04x, data: %02x\n", offset, data);
@@ -4343,6 +4396,10 @@ int mapper_reset (int mapperNum)
 			/* Switch in the last 32KB */
 			prg32( 0xFF );
 			break;
+		case 43:
+			prg32(0);
+			memset( nes.wram, 0x2000, 0xFF );
+			break;
 		case 70:
 //		case 86:
 			prg16_89ab (nes.prg_chunks-2);
@@ -4481,6 +4538,7 @@ static const mmc mmc_list[] =
 	{ 40, "SMB2j (bootleg)",		NULL, NULL, NULL, mapper40_w, NULL, NULL, mapper40_irq },
 	{ 41, "Caltron 6-in-1",			NULL, NULL, mapper41_m_w, mapper41_w, NULL, NULL, NULL },
 	{ 42, "Mario Baby",				NULL, NULL, NULL, mapper42_w, NULL, NULL, NULL },
+	{ 43, "150-in-1",				NULL, NULL, NULL, mapper43_w, NULL, NULL, NULL },
 	{ 64, "Tengen",					NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
 	{ 65, "Irem H3001",				NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
 	{ 66, "74161/32 Jaleco",		NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
