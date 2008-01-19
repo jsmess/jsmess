@@ -9,58 +9,44 @@
 #include "driver.h"
 #include "includes/jupiter.h"
 
-unsigned char *jupiter_charram;
+
+UINT8 *jupiter_charram;
 size_t jupiter_charram_size;
+
 
 VIDEO_START( jupiter )
 {
 	video_start_generic(machine);
 }
 
+
 WRITE8_HANDLER( jupiter_vh_charram_w )
 {
-	int chr = offset / 8, offs;
-
-    if( data == jupiter_charram[offset] )
+    if(data == jupiter_charram[offset])
 		return; /* no change */
 
     jupiter_charram[offset] = data;
 
     /* decode character graphics again */
-	decodechar(Machine->gfx[0], chr, jupiter_charram);
-
-    /* mark all visible characters with that code dirty */
-    for( offs = 0; offs < videoram_size; offs++ )
-	{
-		if( videoram[offs] == chr )
-			dirtybuffer[offs] = 1;
-	}
+	decodechar(Machine->gfx[0], offset / 8, jupiter_charram);
 }
+
 
 VIDEO_UPDATE( jupiter )
 {
 	int offs;
-	int full_refresh = 1;
 
-	/* do we need a full refresh? */
-    if( full_refresh )
-		memset(dirtybuffer, 1, videoram_size);
-
-    for( offs = 0; offs < videoram_size; offs++ )
+    for(offs = 0; offs < videoram_size; offs++)
 	{
-        if( dirtybuffer[offs]  )
-		{
-            int code = videoram[offs];
-			int sx, sy;
+        int code = videoram[offs];
+		int sx, sy;
 
-			sy = (offs / 32) * 8;
-			sx = (offs % 32) * 8;
+		sy = (offs / 32) * 8;
+		sx = (offs % 32) * 8;
 
-			drawgfx(bitmap, machine->gfx[0], code & 0x7f, (code & 0x80) ? 1 : 0, 0,0, sx,sy,
-				&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-
-            dirtybuffer[offs] = 0;
-		}
+		drawgfx(bitmap, machine->gfx[0], code & 0x7f, (code & 0x80) ? 1 : 0, 0,0, sx,sy,
+			&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	}
+
 	return 0;
 }
