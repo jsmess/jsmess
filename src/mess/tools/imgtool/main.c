@@ -905,7 +905,9 @@ int CLIB_DECL main(int argc, char *argv[])
 		return -1;
 #endif /* MAME_DEBUG */
 
+#ifdef WIN32
 	expand_wildcards(&argc, &argv);
+#endif /* WIN32 */
 
 	putchar('\n');
 
