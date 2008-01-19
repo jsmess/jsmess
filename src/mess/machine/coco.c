@@ -2729,6 +2729,7 @@ typedef struct _machine_init_interface machine_init_interface;
 struct _machine_init_interface
 {
 	const pia6821_interface *piaintf;			/* PIA initializer */
+	int	piaintf_count;							/* PIA count */
 	timer_callback recalc_interrupts_;			/* recalculate inturrupts callback */
 	void (*printer_out_)(int data);				/* printer output callback */
 	timer_callback cart_timer_proc;				/* cartridge timer proc */
@@ -2750,6 +2751,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	mess_image *cart_image;
 	const char *extrainfo;
 	const char *cart_hardware;
+	int i;
 
 	/* clear static variables */
 	coco_hiresjoy_ca = 1;
@@ -2779,9 +2781,9 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
 
-	pia_config(0, &init->piaintf[0]);
-	pia_config(1, &init->piaintf[1]);
-	pia_config(2, &init->piaintf[2]); /* Dragon Alpha 3rd pia */
+	/* setup PIAs */
+	for (i = 0; i < init->piaintf_count; i++)
+		pia_config(i, &init->piaintf[i]);
 	pia_reset();
 
 	/* cartridge line timers */
@@ -2847,6 +2849,7 @@ MACHINE_START( dragon32 )
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dragon32_pia_intf;
+	init.piaintf_count		= ARRAY_LENGTH(dragon32_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 	init.cart_timer_proc	= coco_cart_timer_proc;
@@ -2863,6 +2866,7 @@ MACHINE_START( dragon64 )
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dragon64_pia_intf;
+	init.piaintf_count		= ARRAY_LENGTH(dragon64_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 	init.cart_timer_proc	= coco_cart_timer_proc;
@@ -2883,6 +2887,7 @@ MACHINE_START( d64plus )
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dragon64_pia_intf;
+	init.piaintf_count		= ARRAY_LENGTH(dragon64_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 	init.cart_timer_proc	= coco_cart_timer_proc;
@@ -2907,6 +2912,7 @@ MACHINE_START( tanodr64 )
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dragon64_pia_intf;
+	init.piaintf_count		= ARRAY_LENGTH(dragon64_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 	init.cart_timer_proc	= coco_cart_timer_proc;
@@ -2926,6 +2932,7 @@ MACHINE_START( dgnalpha )
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= dgnalpha_pia_intf;
+	init.piaintf_count		= ARRAY_LENGTH(dgnalpha_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 	init.cart_timer_proc	= coco_cart_timer_proc;
@@ -2953,6 +2960,7 @@ MACHINE_START( coco )
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= coco_pia_intf;
+	init.piaintf_count		= ARRAY_LENGTH(coco_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
 	init.cart_timer_proc	= coco_cart_timer_proc;
@@ -2969,6 +2977,7 @@ MACHINE_START( coco2 )
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= coco2_pia_intf;
+	init.piaintf_count		= ARRAY_LENGTH(coco2_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
 	init.cart_timer_proc	= coco_cart_timer_proc;
@@ -3011,6 +3020,7 @@ MACHINE_START( coco3 )
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
 	init.piaintf			= coco3_pia_intf;
+	init.piaintf_count		= ARRAY_LENGTH(coco3_pia_intf);
 	init.recalc_interrupts_	= coco3_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
 	init.cart_timer_proc	= coco3_cart_timer_proc;
