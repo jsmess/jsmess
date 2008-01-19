@@ -49,7 +49,9 @@
 #include "devices/cartslot.h"
 #include "devices/snapquik.h"
 
-
+#define JAGUAR_CLOCK		XTAL_52MHz
+#define R3000_CLOCK			XTAL_40MHz
+#define M68K_CLOCK			XTAL_50MHz
 
 /*************************************
  *
@@ -442,14 +444,14 @@ static const struct jaguar_config dsp_config =
 static MACHINE_DRIVER_START( jaguar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 13295000)
+	MDRV_CPU_ADD(M68EC020, M68K_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(jaguar_map,0)
 
-	MDRV_CPU_ADD(JAGUARGPU, 52000000/2)
+	MDRV_CPU_ADD(JAGUARGPU, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(gpu_config)
 	MDRV_CPU_PROGRAM_MAP(gpu_map,0)
 
-	MDRV_CPU_ADD(JAGUARDSP, 52000000/2)
+	MDRV_CPU_ADD(JAGUARDSP, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(dsp_config)
 	MDRV_CPU_PROGRAM_MAP(dsp_map,0)
 
@@ -460,10 +462,10 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 262)	  /* guess -- TOM registers should be used to configure screen */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_PALETTE_LENGTH(65534)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 
 	MDRV_VIDEO_START(cojag)
 	MDRV_VIDEO_UPDATE(cojag)
