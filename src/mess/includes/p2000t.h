@@ -23,7 +23,6 @@ extern WRITE8_HANDLER( p2000t_port_9494_w );
 
 /*----------- defined in video/p2000m.c -----------*/
 
-extern void p2000m_vh_callback (void);
 extern VIDEO_START( p2000m );
 extern VIDEO_UPDATE( p2000m );
 
