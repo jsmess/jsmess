@@ -2919,6 +2919,26 @@ static WRITE8_HANDLER( mapper43_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper46_m_w )
+{
+	LOG_MMC(("mapper46_m_w, offset: %04x, data: %02x\n", offset, data ));
+
+	MMC1_bank1 = ( MMC1_bank1 & 0x01 ) | ( ( data & 0x0F ) << 1 );
+	MMC1_bank2 = ( MMC1_bank2 & 0x07 ) | ( ( data & 0xF0 ) >> 1 );
+	prg32(MMC1_bank1);
+	chr8(MMC1_bank2);
+}
+
+static WRITE8_HANDLER( mapper46_w )
+{
+	LOG_MMC(("mapper46_w, offset: %04x, data: %02x\n", offset, data ));
+
+	MMC1_bank1 = ( MMC1_bank1 & ~0x01 ) | ( ( data & 0x02 ) >> 1 );
+	MMC1_bank2 = ( MMC1_bank2 & ~0x07 ) | ( ( data & 0x70 ) >> 4 );
+	prg32(MMC1_bank1);
+	chr8(MMC1_bank2);
+}
+
 static WRITE8_HANDLER( mapper64_m_w )
 {
 	logerror("mapper64_m_w, offset: %04x, data: %02x\n", offset, data);
@@ -4400,6 +4420,13 @@ int mapper_reset (int mapperNum)
 			prg32(0);
 			memset( nes.wram, 0x2000, 0xFF );
 			break;
+		case 46:
+			/* Reuseing some MMC1 variables here */
+			MMC1_bank1 = 0;
+			MMC1_bank2 = 0;
+			prg32(MMC1_bank1);
+			chr8(MMC1_bank2);
+			break;
 		case 70:
 //		case 86:
 			prg16_89ab (nes.prg_chunks-2);
@@ -4539,6 +4566,9 @@ static const mmc mmc_list[] =
 	{ 41, "Caltron 6-in-1",			NULL, NULL, mapper41_m_w, mapper41_w, NULL, NULL, NULL },
 	{ 42, "Mario Baby",				NULL, NULL, NULL, mapper42_w, NULL, NULL, NULL },
 	{ 43, "150-in-1",				NULL, NULL, NULL, mapper43_w, NULL, NULL, NULL },
+// 44 - 7-in-1 MMC3
+// 45 - X-in-1 MMC3
+	{ 46, "15-in-1 Color Dreams",	NULL, NULL, mapper46_m_w, mapper46_w, NULL, NULL, NULL },
 	{ 64, "Tengen",					NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
 	{ 65, "Irem H3001",				NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
 	{ 66, "74161/32 Jaleco",		NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
