@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( coco3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff40, 0xff8f) AM_READWRITE(coco_cartridge_r,		coco_cartridge_w)
 	AM_RANGE(0xff90, 0xff9f) AM_READWRITE(coco3_gime_r,			coco3_gime_w)
 	AM_RANGE(0xffa0, 0xffaf) AM_READWRITE(coco3_mmu_r,			coco3_mmu_w)
-	AM_RANGE(0xffb0, 0xffbf) AM_READWRITE(paletteram_r,			coco3_palette_w)
+	AM_RANGE(0xffb0, 0xffbf) AM_READWRITE(MRA8_BANK10,			coco3_palette_w)
 	AM_RANGE(0xffc0, 0xffdf) AM_WRITE(sam_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION(REGION_CPU1, 0x7ff0)

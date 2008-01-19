@@ -793,8 +793,9 @@ static void internal_video_start_coco3(m6847_type type)
 		video->rgb_palette[i] = get_rgb_color(i);
 	}
 
-	/* inidentals */
+	/* incidentals */
 	paletteram = video->palette_ram;
+	memory_set_bankptr(10, paletteram);
 
 	/* font */
 	rom = memory_region(REGION_CPU1);
