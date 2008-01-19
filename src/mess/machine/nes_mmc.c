@@ -574,31 +574,33 @@ static WRITE8_HANDLER( mapper3_w )
 
 static void mapper4_set_prg (void)
 {
-	MMC3_prg0 &= prg_mask;
-	MMC3_prg1 &= prg_mask;
+	int prg0_bank = MMC3_prg_base + ( MMC3_prg0 & MMC3_prg_mask );
+	int prg1_bank = MMC3_prg_base + ( MMC3_prg1 & MMC3_prg_mask );
+	int last_bank = MMC3_prg_base + MMC3_prg_mask;
 
 	if (MMC3_cmd & 0x40)
 	{
-		memory_set_bankptr (1, &nes.rom[(nes.prg_chunks-1) * 0x4000 + 0x10000]);
-		memory_set_bankptr (3, &nes.rom[0x2000 * (MMC3_prg0) + 0x10000]);
+		memory_set_bankptr (1, &nes.rom[(last_bank-1) * 0x2000 + 0x10000]);
+		memory_set_bankptr (3, &nes.rom[0x2000 * (prg0_bank) + 0x10000]);
 	}
 	else
 	{
-		memory_set_bankptr (1, &nes.rom[0x2000 * (MMC3_prg0) + 0x10000]);
-		memory_set_bankptr (3, &nes.rom[(nes.prg_chunks-1) * 0x4000 + 0x10000]);
+		memory_set_bankptr (1, &nes.rom[0x2000 * (prg0_bank) + 0x10000]);
+		memory_set_bankptr (3, &nes.rom[(last_bank-1) * 0x2000 + 0x10000]);
 	}
-	memory_set_bankptr (2, &nes.rom[0x2000 * (MMC3_prg1) + 0x10000]);
+	memory_set_bankptr (2, &nes.rom[0x2000 * (prg1_bank) + 0x10000]);
+	memory_set_bankptr (4, &nes.rom[(last_bank) * 0x2000 + 0x10000]);
 }
 
 static void mapper4_set_chr (void)
 {
 	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 0, 2, MMC3_chr[0], 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 2, 2, MMC3_chr[1], 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 4, 1, MMC3_chr[2], 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 5, 1, MMC3_chr[3], 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 6, 1, MMC3_chr[4], 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 7, 1, MMC3_chr[5], 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 0, 2, MMC3_chr_base * 64 + ( MMC3_chr[0] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 2, 2, MMC3_chr_base * 64 + ( MMC3_chr[1] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 4, 1, MMC3_chr_base * 64 + ( MMC3_chr[2] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 5, 1, MMC3_chr_base * 64 + ( MMC3_chr[3] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 6, 1, MMC3_chr_base * 64 + ( MMC3_chr[4] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 7, 1, MMC3_chr_base * 64 + ( MMC3_chr[5] & ( MMC3_chr_mask * 64 ) ), 1);
 }
 
 static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
@@ -2921,108 +2923,30 @@ static WRITE8_HANDLER( mapper43_w )
 	}
 }
 
-static void mapper44_set_prg (void)
-{
-	int	prg0_bank = MMC3_prg_base + ( MMC3_prg0 & MMC3_prg_mask );
-	int prg1_bank = MMC3_prg_base + ( MMC3_prg1 & MMC3_prg_mask );
-	int last_bank = MMC3_prg_base + MMC3_prg_mask;
-
-	if (MMC3_cmd & 0x40)
-	{
-		memory_set_bankptr (1, &nes.rom[(last_bank-1) * 0x2000 + 0x10000]);
-		memory_set_bankptr (3, &nes.rom[0x2000 * (prg0_bank) + 0x10000]);
-	}
-	else
-	{
-		memory_set_bankptr (1, &nes.rom[0x2000 * (prg0_bank) + 0x10000]);
-		memory_set_bankptr (3, &nes.rom[(last_bank-1) * 0x2000 + 0x10000]);
-	}
-	memory_set_bankptr (2, &nes.rom[0x2000 * (prg1_bank) + 0x10000]);
-	memory_set_bankptr (4, &nes.rom[(last_bank) * 0x2000 + 0x10000]);
-}
-
-static void mapper44_set_chr (void)
-{
-	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 0, 2, MMC3_chr_base * 64 + ( MMC3_chr[0] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 2, 2, MMC3_chr_base * 64 + ( MMC3_chr[1] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 4, 1, MMC3_chr_base * 64 + ( MMC3_chr[2] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 5, 1, MMC3_chr_base * 64 + ( MMC3_chr[3] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 6, 1, MMC3_chr_base * 64 + ( MMC3_chr[4] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 7, 1, MMC3_chr_base * 64 + ( MMC3_chr[5] & ( MMC3_chr_mask * 64 ) ), 1);
-}
-
 static WRITE8_HANDLER( mapper44_w )
 {
-	static UINT8 last_bank = 0xff;
-
 //	logerror("mapper44_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	//only bits 14,13, and 0 matter for offset!
 	switch (offset & 0x6001)
 	{
-	case 0x0000: /* $8000 */
-		MMC3_cmd = data;
-
-		/* Toggle between switching $8000 and $c000 */
-		if (last_bank != (data & 0xc0))
+	case 0x2001: /* $a001 - Select 128K ROM/VROM base (0..5) or last 256K ROM/VRAM base (6) */
 		{
-			/* Reset the banks */
-			mapper44_set_prg ();
-			mapper44_set_chr ();
-			LOG_MMC(("     MMC3 reset banks\n"));
+			UINT8 page = ( data & 0x07 );
+			if ( page > 6 )
+				page = 6;
+			MMC3_prg_base = page * 16;
+			MMC3_prg_mask = ( page > 5 ) ? 0x1F : 0x0F;
+			MMC3_chr_base = page * 128;
+			MMC3_chr_mask = ( page > 5 ) ? 0xFF : 0x7F;
 		}
-		last_bank = data & 0xc0;
+		mapper4_set_prg();
+		mapper4_set_chr();
 		break;
 
-	case 0x0001: /* $8001 */
-		{
-			UINT8 cmd = MMC3_cmd & 0x07;
-			switch (cmd)
-			{
-			case 0: case 1:
-				data &= 0xfe;
-				MMC3_chr[cmd] = data * 64;
-				mapper44_set_chr ();
-				LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
-				break;
-
-			case 2: case 3: case 4: case 5:
-				MMC3_chr[cmd] = data * 64;
-				mapper44_set_chr ();
-				LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
-				break;
-
-			case 6:
-				MMC3_prg0 = data;
-				mapper44_set_prg ();
-				break;
-
-			case 7:
-				MMC3_prg1 = data;
-				mapper44_set_prg ();
-				break;
-			}
-			break;
-		}
-
-        case 0x2001: /* $a001 - Select 128K ROM/VROM base (0..5) or last 256K ROM/VRAM base (6) */
-			{
-				UINT8 page = ( data & 0x07 );
-				if ( page > 6 )
-					page = 6;
-				MMC3_prg_base = page * 16;
-				MMC3_prg_mask = ( page > 5 ) ? 0x1F : 0x0F;
-				MMC3_chr_base = page * 128;
-				MMC3_chr_mask = ( page > 5 ) ? 0xFF : 0x7F;
-			}
-			mapper44_set_prg();
-			mapper44_set_chr();
-            break;
-
-		default:
-			mapper4_w( offset, data );
-			break;
+	default:
+		mapper4_w( offset, data );
+		break;
 	}
 }
 
@@ -4407,8 +4331,12 @@ int mapper_reset (int mapperNum)
 			MMC3_prg0 = 0xfe;
 			MMC3_prg1 = 0xff;
 			MMC3_cmd = 0;
-			prg16_89ab (nes.prg_chunks-1);
-			prg16_cdef (nes.prg_chunks-1);
+			MMC3_prg_base = 0;
+			MMC3_prg_mask = ( nes.prg_chunks << 1 ) - 1;
+			MMC3_chr_base = 0;
+			MMC3_chr_mask = ( nes.chr_chunks << 3 ) - 1;
+			mapper4_set_prg();
+			mapper4_set_chr();
 			break;
 		case 5:
 			/* Can switch 8k prg banks, but they are saved as 16k in size */
@@ -4548,8 +4476,8 @@ int mapper_reset (int mapperNum)
 			MMC3_prg_mask = 0x0F;
 			MMC3_chr_base = 0;
 			MMC3_chr_mask = 0x7F;
-			mapper44_set_prg();
-			mapper44_set_chr();
+			mapper4_set_prg();
+			mapper4_set_chr();
 			break;
 		case 46:
 			/* Reuseing some MMC1 variables here */
