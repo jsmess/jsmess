@@ -80,6 +80,8 @@ int MMC5_vram_control;
 
 static int mapper41_chr, mapper41_reg2;
 
+static int mapper45_data[4], mapper45_cmd;
+
 static int mapper_warning;
 
 static emu_timer	*nes_irq_timer;
@@ -574,9 +576,9 @@ static WRITE8_HANDLER( mapper3_w )
 
 static void mapper4_set_prg (void)
 {
-	int prg0_bank = MMC3_prg_base + ( MMC3_prg0 & MMC3_prg_mask );
-	int prg1_bank = MMC3_prg_base + ( MMC3_prg1 & MMC3_prg_mask );
-	int last_bank = MMC3_prg_base + MMC3_prg_mask;
+	int prg0_bank = MMC3_prg_base | ( MMC3_prg0 & MMC3_prg_mask );
+	int prg1_bank = MMC3_prg_base | ( MMC3_prg1 & MMC3_prg_mask );
+	int last_bank = MMC3_prg_base | MMC3_prg_mask;
 
 	if (MMC3_cmd & 0x40)
 	{
@@ -595,12 +597,12 @@ static void mapper4_set_prg (void)
 static void mapper4_set_chr (void)
 {
 	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 0, 2, MMC3_chr_base * 64 + ( MMC3_chr[0] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 2, 2, MMC3_chr_base * 64 + ( MMC3_chr[1] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 4, 1, MMC3_chr_base * 64 + ( MMC3_chr[2] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 5, 1, MMC3_chr_base * 64 + ( MMC3_chr[3] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 6, 1, MMC3_chr_base * 64 + ( MMC3_chr[4] & ( MMC3_chr_mask * 64 ) ), 1);
-	ppu2c0x_set_videorom_bank(0, chr_page ^ 7, 1, MMC3_chr_base * 64 + ( MMC3_chr[5] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 0, 2, MMC3_chr_base * 64 | ( MMC3_chr[0] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 2, 2, MMC3_chr_base * 64 | ( MMC3_chr[1] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 4, 1, MMC3_chr_base * 64 | ( MMC3_chr[2] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 5, 1, MMC3_chr_base * 64 | ( MMC3_chr[3] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 6, 1, MMC3_chr_base * 64 | ( MMC3_chr[4] & ( MMC3_chr_mask * 64 ) ), 1);
+	ppu2c0x_set_videorom_bank(0, chr_page ^ 7, 1, MMC3_chr_base * 64 | ( MMC3_chr[5] & ( MMC3_chr_mask * 64 ) ), 1);
 }
 
 static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
@@ -2950,6 +2952,34 @@ static WRITE8_HANDLER( mapper44_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper45_m_w )
+{
+	LOG_MMC(("mapper45_m_w, offset: %04x, data: %02x\n", offset, data ));
+
+	if ( offset == 0 ) {
+		mapper45_data[ mapper45_cmd ] = data;
+		mapper45_cmd = ( mapper45_cmd + 1 ) & 0x03;
+
+		if ( ! mapper45_cmd ) {
+			LOG_MMC(("mapper45_m_w, command completed %02x %02x %02x %02x\n", mapper45_data[3],
+				mapper45_data[2], mapper45_data[1], mapper45_data[0] ));
+
+			MMC3_prg_base = mapper45_data[1];
+			MMC3_prg_mask = 0x3F ^ ( mapper45_data[3] & 0x3F );
+			MMC3_chr_base = ( ( mapper45_data[2] & 0xF0 ) << 4 ) + mapper45_data[0];
+			if ( mapper45_data[2] & 0x08 ) {
+				MMC3_chr_mask = ( 1 << ( ( mapper45_data[2] & 0x07 ) + 1 ) ) - 1;
+			} else {
+				MMC3_chr_mask = 0;
+			}
+			mapper4_set_prg();
+			mapper4_set_chr();
+		}
+	}
+	if ( mapper45_data[3] & 0x40 ) {
+		nes.wram[ offset ] = data;
+	}
+}
 
 static WRITE8_HANDLER( mapper46_m_w )
 {
@@ -4479,6 +4509,23 @@ int mapper_reset (int mapperNum)
 			mapper4_set_prg();
 			mapper4_set_chr();
 			break;
+		case 45:
+			IRQ_enable = 0;
+			IRQ_count = IRQ_count_latch = 0;
+			IRQ_reload = 0;
+			MMC3_prg0 = 0xfe;
+			MMC3_prg1 = 0xff;
+			MMC3_cmd = 0;
+			MMC3_prg_base = 0x30;
+			MMC3_prg_mask = 0x0F;
+			MMC3_chr_base = 0;
+			MMC3_chr_mask = 0x7F;
+			mapper45_cmd = 0;
+			mapper45_data[0] = mapper45_data[1] = mapper45_data[2] = mapper45_data[3] = 0;
+			mapper4_set_prg();
+			mapper4_set_chr();
+			memory_set_bankptr( 5, nes.wram );
+			break;
 		case 46:
 			/* Reuseing some MMC1 variables here */
 			MMC1_bank1 = 0;
@@ -4626,7 +4673,7 @@ static const mmc mmc_list[] =
 	{ 42, "Mario Baby",				NULL, NULL, NULL, mapper42_w, NULL, NULL, NULL },
 	{ 43, "150-in-1",				NULL, NULL, NULL, mapper43_w, NULL, NULL, NULL },
 	{ 44, "7-in-1 MMC3",			NULL, NULL, NULL, mapper44_w, NULL, NULL, mapper4_irq },
-// 45 - X-in-1 MMC3
+	{ 45, "X-in-1 MMC",				NULL, NULL, mapper45_m_w, mapper4_w, NULL, NULL, mapper4_irq },
 	{ 46, "15-in-1 Color Dreams",	NULL, NULL, mapper46_m_w, mapper46_w, NULL, NULL, NULL },
 	{ 64, "Tengen",					NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
 	{ 65, "Irem H3001",				NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
