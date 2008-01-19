@@ -20,10 +20,8 @@
 #define LOG(N,M,A)	\
 	if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
 
-int mz700_frame_time = 0;
 
-//void mz700_init_colors (unsigned char *palette, unsigned short *colortable, const unsigned char *color_prom)
-PALETTE_INIT(mz700)
+PALETTE_INIT( mz700 )
 {
 	int i;
 
@@ -39,42 +37,26 @@ PALETTE_INIT(mz700)
 	}
 }
 
-VIDEO_START(mz700)
-{
-	video_start_generic(machine);
-}
 
-//void mz700_vh_screenrefresh(mame_bitmap *bitmap, int full_refresh)
-VIDEO_UPDATE(mz700)
+VIDEO_UPDATE( mz700 )
 {
     int offs;
-    int full_refresh = 1;
 
-    if( full_refresh )
+    fillbitmap(bitmap, get_black_pen(machine), cliprect);
+
+	for(offs = 0; offs < 40*25; offs++)
 	{
-		fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
-		memset(dirtybuffer, 1, videoram_size);
-    }
+		int sx, sy, code, color;
 
-	for( offs = 0; offs < 40*25; offs++ )
-	{
-		if( dirtybuffer[offs] )
-		{
-			int sx, sy, code, color;
+        sy = (offs / 40) * 8;
+		sx = (offs % 40) * 8;
+		code = videoram[offs];
+		color = colorram[offs];
+		code |= (color & 0x80) << 1;
 
-            dirtybuffer[offs] = 0;
-
-            sy = (offs / 40) * 8;
-			sx = (offs % 40) * 8;
-			code = videoram[offs];
-			color = colorram[offs];
-			code |= (color & 0x80) << 1;
-
-            drawgfx(bitmap,machine->gfx[0],code,color,0,0,sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		}
+        drawgfx(bitmap, machine->gfx[0], code, color, 0, 0, sx, sy,
+			cliprect, TRANSPARENCY_NONE, 0);
 	}
+
 	return 0;
 }
-
-

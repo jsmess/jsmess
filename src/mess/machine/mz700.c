@@ -11,7 +11,6 @@
 
 /* Core includes */
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/mz700.h"
 
 /* Components */
@@ -81,20 +80,20 @@ static TIMER_CALLBACK(ne556_callback)
 
 
 
-DRIVER_INIT(mz700)
+DRIVER_INIT( mz700 )
 {
 	ppi8255_init(&ppi8255);
-
 	pit8253_init(1, &pit8253);
 
-	videoram = memory_region(REGION_CPU1)+0x12000;videoram_size=0x800;
-	colorram = memory_region(REGION_CPU1)+0x12800;
+	videoram_size = 0x5000;
+	videoram = auto_malloc(videoram_size);
+	colorram = auto_malloc(0x800);
+
 	mz700_bank_w(4, 0);
 }
 
 
-
-MACHINE_RESET(mz700)
+MACHINE_RESET( mz700 )
 {
 	ne556_timer[0] = timer_alloc(ne556_callback, NULL);
 	timer_adjust(ne556_timer[0], ATTOTIME_IN_HZ(1.5), 0, ATTOTIME_IN_HZ(1.5));
@@ -312,9 +311,9 @@ static void bank3_RAM(UINT8 *mem)
 
 static void bank3_VID(UINT8 *mem)
 {
-	memory_set_bankptr(3, &mem[0x12000]);
+	memory_set_bankptr(3, videoram);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK3);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, videoram0_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK3);
 }
 
 
@@ -328,9 +327,9 @@ static void bank4_RAM(UINT8 *mem)
 
 static void bank4_VID(UINT8 *mem)
 {
-	memory_set_bankptr(4, &mem[0x14000]);
+	memory_set_bankptr(4, videoram + 0x2000);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, MRA8_BANK4);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, videoram2_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, MWA8_BANK4);
 }
 
 
@@ -360,9 +359,9 @@ static void bank6_RAM(UINT8 *mem)
 
 static void bank6_VIO(UINT8 *mem)
 {
-	memory_set_bankptr(6, &mem[0x12000]);
+	memory_set_bankptr(6, videoram);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, MRA8_BANK6);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, videoram_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, MWA8_BANK6);
 }
 
 
@@ -383,9 +382,9 @@ static void bank7_RAM(UINT8 *mem)
 
 static void bank7_VIO(UINT8 *mem)
 {
-	memory_set_bankptr(7, &mem[0x12800]);
+	memory_set_bankptr(7, colorram);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, MRA8_BANK7);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, colorram_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, MWA8_BANK7);
 }
 
 
@@ -760,19 +759,14 @@ WRITE8_HANDLER( mz800_palette_w )
 	}
 }
 
-/* videoram wrappers */
-WRITE8_HANDLER( videoram0_w ) { videoram_w(offset + 0x0000, data); }
-WRITE8_HANDLER( videoram1_w ) { videoram_w(offset + 0x1000, data); }
-WRITE8_HANDLER( videoram2_w ) { videoram_w(offset + 0x2000, data); }
-WRITE8_HANDLER( videoram3_w ) { videoram_w(offset + 0x3000, data); }
-WRITE8_HANDLER( pcgram_w ) { videoram_w(offset + 0x4000, data); }
 
 DRIVER_INIT( mz800 )
 {
 	UINT8 *mem = memory_region(REGION_CPU1);
 
-	videoram=memory_region(REGION_CPU1)+0x12000;videoram_size=0x5000;
-	colorram=memory_region(REGION_CPU1)+0x12800;
+	videoram_size = 0x5000;
+	videoram = auto_malloc(videoram_size);
+	colorram = auto_malloc(0x800);
 
     mem[0x10001] = 0x4a;
 	mem[0x10002] = 0x00;
