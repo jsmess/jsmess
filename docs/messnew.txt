@@ -20,6 +20,8 @@ System Driver Changes:
   instead of dip switches and updated it to use the default black and white
   palette.  [Dirk Best]
 
+- [NES] Added support for mapper 42.  [Wilbert Pol]
+
 - [ORIC] Fixed tape loading.  (bug #241) [Wilbert Pol]
 
 - [TI99/GENEVE] More floppy cleanups; fixed TI99_8 regression and made the

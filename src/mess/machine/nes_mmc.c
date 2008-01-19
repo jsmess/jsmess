@@ -2837,6 +2837,35 @@ static WRITE8_HANDLER( mapper41_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper42_w )
+{
+	LOG_MMC(("mapper42_w, offset: %04x, data: %02x\n", offset, data));
+
+	if ( offset >= 0x7000 )
+	{
+		switch( offset & 0x03 )
+		{
+		case 0x00:
+			memory_set_bankptr (5, &nes.rom[( data & ( ( nes.prg_chunks << 1 ) -1 ) ) * 0x2000 + 0x10000]);
+			break;
+		case 0x01:
+			ppu2c0x_set_mirroring( 0, ( data & 0x08 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+			break;
+		case 0x02:
+			/* Check if IRQ is being enabled */
+			if ( ! IRQ_enable && ( data & 0x02 ) ) {
+				IRQ_enable = 1;
+				timer_adjust(nes_irq_timer, ATTOTIME_IN_CYCLES(24576, 0), 0, attotime_never);
+			}
+			if ( ! ( data & 0x02 ) ) {
+				IRQ_enable = 0;
+				timer_adjust(nes_irq_timer, attotime_never, 0, attotime_never);
+			}
+			break;
+		}
+	}
+}
+
 static WRITE8_HANDLER( mapper64_m_w )
 {
 	logerror("mapper64_m_w, offset: %04x, data: %02x\n", offset, data);
@@ -4310,6 +4339,10 @@ int mapper_reset (int mapperNum)
 			/* Can switch 32k prgm banks */
 			prg32(0);
 			break;
+		case 42:
+			/* Switch in the last 32KB */
+			prg32( 0xFF );
+			break;
 		case 70:
 //		case 86:
 			prg16_89ab (nes.prg_chunks-2);
@@ -4447,7 +4480,7 @@ static const mmc mmc_list[] =
 	{ 34, "Nina-1",					NULL, NULL, mapper34_m_w, mapper34_w, NULL, NULL, NULL },
 	{ 40, "SMB2j (bootleg)",		NULL, NULL, NULL, mapper40_w, NULL, NULL, mapper40_irq },
 	{ 41, "Caltron 6-in-1",			NULL, NULL, mapper41_m_w, mapper41_w, NULL, NULL, NULL },
-// 42 - "Mario Baby" pirate cart
+	{ 42, "Mario Baby",				NULL, NULL, NULL, mapper42_w, NULL, NULL, NULL },
 	{ 64, "Tengen",					NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
 	{ 65, "Irem H3001",				NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
 	{ 66, "74161/32 Jaleco",		NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
