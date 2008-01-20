@@ -916,7 +916,7 @@ void inputx_update(void)
 			/* loop through this character's component codes */
 			if (code)
 			{
-				for (i = 0; code->ipt[i] && (i < sizeof(code->ipt) / sizeof(code->ipt[0])); i++)
+				for (i = 0; i < ARRAY_LENGTH(code->ipt) && code->ipt[i]; i++)
 				{
 					value = code->ipt[i]->mask;
 					input_port_set_digital_value(code->port[i], value, value);
@@ -943,8 +943,7 @@ void inputx_handle_mess_extensions(input_port_entry *ipt)
 			buf[0] = '\0';
 			pos = 0;
 
-			for (i = 0; ipt->keyboard.chars[i] && (i < sizeof(ipt->keyboard.chars)
-				/ sizeof(ipt->keyboard.chars[0])); i++)
+			for (i = 0; i < ARRAY_LENGTH(ipt->keyboard.chars) && ipt->keyboard.chars[i]; i++)
 			{
 				ch = ipt->keyboard.chars[i];
 				pos += snprintf(&buf[pos], ARRAY_LENGTH(buf) - pos, "%-*s ", MAX(SPACE_COUNT - 1, 0), inputx_key_name(ch));
