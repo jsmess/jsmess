@@ -4680,6 +4680,42 @@ static WRITE8_HANDLER( mapper244_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper246_m_w )
+{
+	LOG_MMC(("mapper256_m_w, offset: %04x, data: %02x\n", offset, data ));
+
+	if ( offset < 0x0800 ) {
+		switch( offset & 0x0007 ) {
+		case 0x0000:
+			prg8_89( data );
+			break;
+		case 0x0001:
+			prg8_ab( data );
+			break;
+		case 0x0002:
+			prg8_cd( data );
+			break;
+		case 0x0003:
+			prg8_ef( data );
+			break;
+		case 0x0004:
+			chr2_0( data );
+			break;
+		case 0x0005:
+			chr2_2( data );
+			break;
+		case 0x0006:
+			chr2_4( data );
+			break;
+		case 0x0007:
+			chr2_6( data );
+			break;
+		}
+	} else {
+		nes.wram[offset] = data;
+	}
+}
+
 /*
 // mapper_reset
 //
@@ -5108,6 +5144,9 @@ int mapper_reset (int mapperNum)
 		case 244:
 			prg32(0);
 			break;
+		case 246:
+			prg32( 0xFF );
+			break;
 		default:
 			/* Mapper not supported */
 			err = 2;
@@ -5231,6 +5270,7 @@ static const mmc mmc_list[] =
 	{ 241, "Education 18-in-1",		NULL, mapper241_l_r, NULL, mapper241_w, NULL, NULL, NULL },
 	{ 242, "Wai Xing Zhan Shi",		NULL, NULL, NULL, mapper242_w, NULL, NULL, NULL },
 	{ 244, "Decathlon",				NULL, NULL, NULL, mapper244_w, NULL, NULL, NULL },
+	{ 246, "Fong Shen Bang",		NULL, NULL, mapper246_m_w, NULL, NULL, NULL, NULL },
 };
 
 
