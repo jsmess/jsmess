@@ -2,6 +2,7 @@
 	TODO:
 	. 5 has some issues, RAM banking needs hardware flags to determine size
 	. 13 needs banked VRAM. -see Videomation
+	. 51 only half of the games work
 	. 64 has some IRQ problems - see Skull & Crossbones
 	. 67 display issues, but vrom fixed
 	. 70 (ark2j) starts on round 0 - is this right? Yep!
@@ -3029,6 +3030,37 @@ static WRITE8_HANDLER( mapper49_m_w )
 	}
 }
 
+static void mapper51_set_banks( void ) {
+	ppu2c0x_set_mirroring( 0, ( MMC1_bank1 == 3 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+
+	if ( MMC1_bank1 & 0x01 ) {
+		prg32( MMC1_bank2 );
+	} else {
+		prg16_cdef( ( MMC1_bank2 * 2 ) + 1 );
+		prg16_89ab( MMC1_bank3 * 2 );
+	}
+}
+
+static WRITE8_HANDLER( mapper51_m_w )
+{
+	LOG_MMC(("mapper51_m_w, offset: %04x, data: %02x\n", offset, data));
+
+	MMC1_bank1 = ( ( data >> 1 ) & 0x01 ) | ( ( data >> 3 ) & 0x02 );
+	mapper51_set_banks();
+}
+
+static WRITE8_HANDLER( mapper51_w )
+{
+	LOG_MMC(("mapper51_w, offset: %04x, data: %02x\n", offset, data));
+
+	if ( offset & 0x4000 ) {
+		MMC1_bank3 = data;
+	} else {
+		MMC1_bank2 = data;
+	}
+	mapper51_set_banks();
+}
+
 static WRITE8_HANDLER( mapper64_m_w )
 {
 	logerror("mapper64_m_w, offset: %04x, data: %02x\n", offset, data);
@@ -4563,6 +4595,12 @@ int mapper_reset (int mapperNum)
 			prg32(MMC1_bank1);
 			chr8(MMC1_bank2);
 			break;
+		case 51:
+			MMC1_bank1 = 0x01;
+			MMC1_bank2 = 0x00;
+			MMC1_bank3 = 0x00;
+			mapper51_set_banks();
+			break;
 		case 70:
 //		case 86:
 			prg16_89ab (nes.prg_chunks-2);
@@ -4707,6 +4745,7 @@ static const mmc mmc_list[] =
 	{ 46, "15-in-1 Color Dreams",	NULL, NULL, mapper46_m_w, mapper46_w, NULL, NULL, NULL },
 	{ 47, "2-in-1 MMC3",			NULL, NULL, mapper47_m_w, mapper4_w, NULL, NULL, mapper4_irq },
 	{ 49, "4-in-1 MMC3",			NULL, NULL, mapper49_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+	{ 51, "11-in-1",				NULL, NULL, mapper51_m_w, mapper51_w, NULL, NULL, NULL },
 	{ 64, "Tengen",					NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
 	{ 65, "Irem H3001",				NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
 	{ 66, "74161/32 Jaleco",		NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
