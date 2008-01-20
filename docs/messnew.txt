@@ -3,7 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Amstrad GX4000 [Barry Rodewald]
-
+- Aleste 520EX [Barry Rodewald]
 
 
 System Driver Changes:

@@ -16,7 +16,6 @@
 
 #include "sound/ay8910.h"
 
-
 static m6845_state amstrad_vidhrdw_6845_state;
 int prev_reg;
 
@@ -45,6 +44,8 @@ static int amstrad_plus_split_address;
 static int amstrad_screen_width;  // width in bytes
 
 static void amstrad_plus_handle_dma(void);
+
+extern int aleste_mode;
 
 #ifdef MAME_DEBUG
 extern int amstrad_plus_lower_enabled;
@@ -279,6 +280,30 @@ PALETTE_INIT( amstrad_plus )
 	}
 }
 
+
+/* Aleste has a 6-bit RGB palette */
+PALETTE_INIT( aleste )
+{
+	int i;
+
+	palette_set_colors(machine, 0, amstrad_palette, sizeof(amstrad_palette) / 3);
+	for(i=0; i<64; i++)
+	{
+		int r,g,b;
+
+		r = (i >> 4) & 0x03;
+		g = (i >> 2) & 0x03;
+		b = i & 0x03;
+
+		r = (r << 6);
+		g = (g << 6);
+		b = (b << 6);
+
+		palette_set_color_rgb(machine, i+32, r, g, b);
+		colortable[i+32] = i+32;  // take into account the CPC and MSX palette
+	}
+}
+
 void amstrad_plus_setspritecolour(unsigned int off, int r, int g, int b)
 {
 	palette_set_color_rgb(Machine, (off/2) + 33, r, g, b);
@@ -331,6 +356,17 @@ void amstrad_vh_update_colour(int PenIndex, int hw_colour_index)
 		val = (amstrad_palette[hw_colour_index] & 0x00f000) >> 12; // green
 		amstrad_plus_asic_ram[0x2401+PenIndex*2] = val;
 	}
+}
+
+void aleste_vh_update_colour(int PenIndex, int hw_colour_index)
+{
+/*  int cpu_cycles = ((cycles_currently_ran()>>2)-1) & 63;
+
+	logerror("color is changed(%d,%d) = %d\n",PenIndex, cpu_cycles, Machine->pens[hw_colour_index]);
+  amstrad_GateArray_colours_ischanged++;
+	amstrad_GateArray_changed_colours[cpu_cycles][PenIndex] = Machine->pens[hw_colour_index];
+*/
+	amstrad_GateArray_render_colours[PenIndex] = Machine->pens[hw_colour_index+32];
 }
 
 /* Set the new screen mode (0,1,2,4) from the GateArray */
@@ -633,7 +669,16 @@ static void amstrad_draw_screen_enabled_mode_1(void)
 		return;
 	}
 
-  for (i=0;i<4;i++) {
+	if(aleste_mode & 0x04) // if in Aleste mode
+	{
+		if(~aleste_mode & 0x08)  // and VRAM is not active
+		{
+			amstrad_draw_screen_disabled();
+			return;
+		}
+	}
+
+	for (i=0;i<4;i++) {
 		cpcpen = Mode1Lookup[data1& 0xFF];
     messpen = amstrad_GateArray_render_colours[cpcpen];
   	plot_box(bitmap,x,y,2,1,messpen);
@@ -669,6 +714,15 @@ static void amstrad_draw_screen_enabled_mode_2(void)
 	{
 		amstrad_plus_draw_screen_enabled_mode_2();
 		return;
+	}
+
+	if(aleste_mode & 0x04) // if in Aleste mode
+	{
+		if(~aleste_mode & 0x08)  // and VRAM is not active
+		{
+			amstrad_draw_screen_disabled();
+			return;
+		}
 	}
 
 	for (i=0; i<16; i++)
@@ -728,16 +782,122 @@ static void amstrad_draw_screen_enabled_mode_3(void)
 	plot_box(bitmap,x+12,y,4,1,messpen);
 }
 
+/* Aleste mode 2: high resolution - 4 colours */
+static void aleste_draw_screen_enabled_mode_2(void)
+{
+	mame_bitmap *bitmap = amstrad_bitmap;
+
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
+/* calc mem addr to fetch data from	based on ma, and ra */
+	unsigned int addr = (((ma>>13) & 0x01)<<15) |
+			((ra & 0x06)<<11) |
+			((ra & 0x01) << 14) |
+			((ma & 0x07ff) << 1);
+
+	int x = x_screen_pos;
+	int y = y_screen_pos;
+	int i, cpcpen, messpen;
+	unsigned char data1; 
+	unsigned char data2; 
+
+	if(~aleste_mode & 0x08)
+	{
+		amstrad_draw_screen_disabled();
+		return;
+	}
+
+	data1 = mess_ram[addr];
+	data2 = mess_ram[addr+1];
+
+	for (i=0;i<4;i++) 
+	{
+		cpcpen = Mode1Lookup[data1& 0xFF];
+		messpen = amstrad_GateArray_render_colours[cpcpen];
+  		plot_box(bitmap,x,y,1,1,messpen);
+
+		cpcpen = Mode1Lookup[data2];
+		messpen = amstrad_GateArray_render_colours[cpcpen];
+  		plot_box(bitmap,x+4,y,1,1,messpen);
+
+		x += 1;
+		data1 = data1<<1;
+		data2 = data2<<1;
+	}
+}
+
+/* Aleste mode 3 - medium resolution, 16 colours */
+static void aleste_draw_screen_enabled_mode_3(void)
+{
+	mame_bitmap *bitmap = amstrad_bitmap;
+
+	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
+	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
+	/* calc mem addr to fetch data from	based on ma, and ra */
+	unsigned int addr = (((ma>>13) & 0x01)<<15) |
+			((ra & 0x06)<<11) |
+			((ra & 0x01) << 14) |
+			((ma & 0x07ff) << 1);
+
+	int x = x_screen_pos;
+	int y = y_screen_pos;
+	int cpcpen, messpen;
+
+	unsigned char data;
+
+	if(~aleste_mode & 0x08)
+	{
+		amstrad_draw_screen_disabled();
+		return;
+	}
+
+	data = mess_ram[addr];
+
+	cpcpen = Mode0Lookup[data];
+	messpen = amstrad_GateArray_render_colours[cpcpen];
+	plot_box(bitmap,x,y,2,1,messpen);
+
+	data = data<<1;
+
+	cpcpen = Mode0Lookup[data];
+	messpen = amstrad_GateArray_render_colours[cpcpen];
+	plot_box(bitmap,x+2,y,2,1,messpen);
+
+	data = mess_ram[addr+1];
+
+	cpcpen = Mode0Lookup[data];
+	messpen = amstrad_GateArray_render_colours[cpcpen];
+	plot_box(bitmap,x+4,y,2,1,messpen);
+
+	data = data<<1;
+
+	cpcpen = Mode0Lookup[data];
+	messpen = amstrad_GateArray_render_colours[cpcpen];
+	plot_box(bitmap,x+6,y,2,1,messpen);
+
+}
+
+
+
 /* execute crtc_execute_cycles of crtc */
 void amstrad_vh_execute_crtc_cycles(int dummy)
 {
+	int scrwidth = AMSTRAD_SCREEN_WIDTH;
 	m6845_clock(); // Clock the 6845
-	if ((x_screen_pos >= 0) && (x_screen_pos < AMSTRAD_SCREEN_WIDTH) && (y_screen_pos >= 0))
+	if(aleste_mode & 0x02)
+	{
+//		scrwidth = ALESTE_SCREEN_WIDTH;
+	}
+
+	if ((x_screen_pos >= 0) && (x_screen_pos < scrwidth) && (y_screen_pos >= 0))
 	{
 		/* render the screen */
 		(draw_function)();
 	}
-	x_screen_pos += (AMSTRAD_CHARACTERS*2); // Move to next raster
+	if(aleste_mode & 0x02)  // Aleste high res mode
+		x_screen_pos += (AMSTRAD_CHARACTERS); // Move to next raster
+	else
+		x_screen_pos += (AMSTRAD_CHARACTERS*2); // Move to next raster
 /*    }*/
 }
 
@@ -934,19 +1094,41 @@ static void amstrad_Set_DE(int offset, int data)
 			display_update = 0;
 		}
 
-		switch (amstrad_current_mode) {
-		case 0x00:
-			draw_function = amstrad_draw_screen_enabled_mode_0;
-			break;
-		case 0x01:
-			draw_function = amstrad_draw_screen_enabled_mode_1;
-			break;
-		case 0x02:
-			draw_function = amstrad_draw_screen_enabled_mode_2;
-			break;
-		case 0x03:
-			draw_function = amstrad_draw_screen_enabled_mode_3;
-			break;
+		if(aleste_mode & 0x02)
+		{
+			switch (amstrad_current_mode) 
+			{
+			case 0x00:
+				draw_function = amstrad_draw_screen_enabled_mode_2;
+				break;
+			case 0x01:
+				draw_function = amstrad_draw_screen_enabled_mode_1;
+				break;
+			case 0x02:
+				draw_function = aleste_draw_screen_enabled_mode_2;
+				break;
+			case 0x03:
+				draw_function = aleste_draw_screen_enabled_mode_3;
+				break;
+			}
+		}
+		else
+		{
+			switch (amstrad_current_mode) 
+			{
+			case 0x00:
+				draw_function = amstrad_draw_screen_enabled_mode_0;
+				break;
+			case 0x01:
+				draw_function = amstrad_draw_screen_enabled_mode_1;
+				break;
+			case 0x02:
+				draw_function = amstrad_draw_screen_enabled_mode_2;
+				break;
+			case 0x03:
+				draw_function = amstrad_draw_screen_enabled_mode_3;
+				break;
+			}
 		}
   	 }
 }
@@ -1076,27 +1258,35 @@ VIDEO_UPDATE( amstrad )
 {
 	rectangle rect;
 
-	rect.min_x = 0;
-	rect.max_x = AMSTRAD_SCREEN_WIDTH-1;
-	rect.min_y = 0;
-	rect.max_y = AMSTRAD_SCREEN_HEIGHT-1;
+//	if(aleste_mode & 0x08)
+//	{  // MSX video
+//		video_update_generic_bitmapped(machine,screen,bitmap,cliprect);
+//		return 0;
+//	}
+//	else
+	{  // CPC video
+		rect.min_x = 0;
+		rect.max_x = AMSTRAD_SCREEN_WIDTH-1;
+		rect.min_y = 0;
+		rect.max_y = AMSTRAD_SCREEN_HEIGHT-1;
 
-#ifdef MAME_DEBUG
-	if(input_code_pressed(KEYCODE_Z) && amstrad_system_type != 0)
-	{
-		int x;
-		for(x=0;x<32;x+=2)
+	#ifdef MAME_DEBUG
+		if(input_code_pressed(KEYCODE_Z) && amstrad_system_type != 0)
 		{
-			amstrad_plus_asic_ram[0x2400+x] = ((x/2)<< 4) + x/2;
-			amstrad_plus_asic_ram[0x2401+x] = x/2;
+			int x;
+			for(x=0;x<32;x+=2)
+			{
+				amstrad_plus_asic_ram[0x2400+x] = ((x/2)<< 4) + x/2;
+				amstrad_plus_asic_ram[0x2401+x] = x/2;
+			}
 		}
+	#endif
+		copybitmap(bitmap, amstrad_bitmap, 0,0,0,0,&rect, TRANSPARENCY_NONE,0);
+		if(amstrad_plus_asic_enabled != 0)
+			amstrad_plus_sprite_draw(bitmap);
+		amstrad_scanline = y_screen_pos - 32;
+		return 0;
 	}
-#endif
-    copybitmap(bitmap, amstrad_bitmap, 0,0,0,0,&rect, TRANSPARENCY_NONE,0);
-	if(amstrad_plus_asic_enabled != 0)
-		amstrad_plus_sprite_draw(bitmap);
-	amstrad_scanline = y_screen_pos - 32;
-	return 0;
 }
 
 
@@ -1124,3 +1314,4 @@ VIDEO_START( amstrad )
 	amstrad_bitmap = auto_bitmap_alloc(AMSTRAD_SCREEN_WIDTH, AMSTRAD_SCREEN_HEIGHT, BITMAP_FORMAT_INDEXED16);
 	display_update = 1;
 }
+

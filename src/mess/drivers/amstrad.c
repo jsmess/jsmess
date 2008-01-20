@@ -56,6 +56,19 @@
                No Exit:  Display is wrong, but usable, uses demo-like techniques.
 
 
+   January 2008 - added preliminary Aleste 520EX support
+               The Aleste 520EX is a Russian clone of the CPC6128, that expands on existing video mode, and can run MSX-DOS.
+			   It also adds an MC146818 RTC/NVRAM, an Intel 8253 timer, and the "Magic Sound" board, a 4-channel DMA-based
+			   sample player.  Also includes a software emulation of the MSX2 VDP, used in the ports of MSX games.
+
+			   Known issues:
+			    - The RTC doesn't always update in setup.  It expects bit 4 of register C (Update End Interrupt) to be high.
+				- Title screens appear then disappear quickly (probably because the 8253 hasn't been plugged in yet).
+				- Some video modes display wrong (still needs some work here).
+				- Vampire Killer crashes after collecting a certain key part way through stage 1.
+				- Magic Sound isn't emulated.
+
+
 Some bugs left :
 ----------------
     - CRTC all type support (0,1,2,3,4) ?
@@ -74,9 +87,13 @@ Some bugs left :
 #include "video/m6845.h"		/* CRTC display */
 #include "machine/nec765.h"	/* for floppy disc controller */
 #include "sound/ay8910.h"
+#include "machine/mc146818.h"  /* Aleste RTC */
 
 /* Devices */
 #include "devices/dsk.h"		/* for CPCEMU style disk images */
+#include "devices/basicdsk.h"   /* for 720k MSX disk images (Aleste supports these) */
+#include "includes/msx_slot.h"  
+#include "includes/msx.h"  /* MSX floppy device load */
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/printer.h"
@@ -108,6 +125,7 @@ static const unsigned char asic_unlock_seq[15] =
 };
 
 int amstrad_system_type;
+int aleste_mode;
 static int amstrad_plus_lower;  // CPC+/GX4000 cartridge bank loaded in lower ROM area
 static int amstrad_plus_lower_addr;  // CPC+/GX4000 lower ROM area address / ASIC register page enable
 static int amstrad_plus_lower_enabled;  // secondary lower ROM select in use?
@@ -152,6 +170,10 @@ static int amstrad_keyboard_line;
 
 static unsigned char previous_amstrad_UpperRom_data;
 static unsigned char previous_printer_data_byte;
+
+static int aleste_rtc_function;
+static int aleste_fdc_int;
+
 /*------------------
   - Ram Management -
   ------------------*/
@@ -216,19 +238,43 @@ static unsigned char amstrad_Psg_FunctionSelected;
 
 static void update_psg(void)
 {
-  switch (amstrad_Psg_FunctionSelected) {
-  	case 0: {/* Inactive */
-    } break;
-  	case 1: {/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
-  		ppi_port_inputs[amstrad_ppi_PortA] = AY8910_read_port_0_r(0);
-  	} break;
-  	case 2: {/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
-  		AY8910_write_port_0_w(0, ppi_port_outputs[amstrad_ppi_PortA]);
-  	} break;
-  	case 3: {/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-  		AY8910_control_port_0_w(0, ppi_port_outputs[amstrad_ppi_PortA]);
-		prev_reg = ppi_port_outputs[amstrad_ppi_PortA];
-  	} break;
+	if(aleste_mode & 0x20)  // RTC selected
+	{
+		switch(aleste_rtc_function)
+		{
+		case 0x02:  // AS
+			mc146818_port_w(0,ppi_port_outputs[amstrad_ppi_PortA]);
+			break;
+		case 0x04:  // DS write
+			mc146818_port_w(1,ppi_port_outputs[amstrad_ppi_PortA]);
+			break;
+		case 0x05:  // DS read
+			ppi_port_inputs[amstrad_ppi_PortA] = mc146818_port_r(1);
+			break;
+		}
+		return;
+	}
+  switch (amstrad_Psg_FunctionSelected) 
+  {
+  	case 0: 
+		{/* Inactive */
+		} break;
+  	case 1: 
+		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
+  			ppi_port_inputs[amstrad_ppi_PortA] = AY8910_read_port_0_r(0);
+  		} 
+		break;
+  	case 2: 
+		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
+  			AY8910_write_port_0_w(0, ppi_port_outputs[amstrad_ppi_PortA]);
+  		} 
+		break;
+  	case 3: 
+		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
+  			AY8910_control_port_0_w(0, ppi_port_outputs[amstrad_ppi_PortA]);
+			prev_reg = ppi_port_outputs[amstrad_ppi_PortA];
+  		} 
+		break;
   	default: {
     } break;
 	}
@@ -238,13 +284,13 @@ static void update_psg(void)
 static READ8_HANDLER ( amstrad_ppi_porta_r )
 {
 	update_psg();
-  return ppi_port_inputs[amstrad_ppi_PortA];
+	return ppi_port_inputs[amstrad_ppi_PortA];
 }
 
 static WRITE8_HANDLER ( amstrad_ppi_porta_w )
 {
-  	ppi_port_outputs[amstrad_ppi_PortA] = data;
-    update_psg();
+	ppi_port_outputs[amstrad_ppi_PortA] = data;
+	update_psg();
 }
 
 /* - Read PPI Port B -
@@ -295,6 +341,14 @@ static READ8_HANDLER (amstrad_ppi_portb_r)
 /*  Set b0 with VSync state from the CRTC */
 	data |= amstrad_CRTC_VS; // m6845_vertical_sync_r(0);
 
+	if(aleste_mode & 0x04)
+	{
+		if(aleste_fdc_int == 0)
+			data &= ~0x02;
+		else
+			data |= 0x02;
+	}
+
 	return data;
 }
 
@@ -325,6 +379,9 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 
 /* get b7 and b6 (PSG Function Selected */
 	amstrad_Psg_FunctionSelected = ((data & 0xC0)>>6);
+
+	/* MC146818 function */
+	aleste_rtc_function = data & 0x07;
 
 /* Perform PSG function */
 	update_psg();
@@ -366,6 +423,14 @@ static const ppi8255_interface amstrad_ppi8255_interface =
 	{amstrad_ppi_portc_w}    /* port C write */
 };
 
+static void aleste_interrupt(int state)
+{
+	if(state == CLEAR_LINE)
+		aleste_fdc_int = 0;
+	else
+		aleste_fdc_int = 1;
+}
+
 /* Amstrad NEC765 interface doesn't use interrupts or DMA! */
 static const nec765_interface amstrad_nec765_interface =
 {
@@ -373,9 +438,17 @@ static const nec765_interface amstrad_nec765_interface =
 	NULL
 };
 
+/* Aleste uses an 8272A, with the interrupt flag visible on PPI port B */
+static const nec765_interface aleste_8272_interface =
+{
+	aleste_interrupt,
+	NULL
+};
 
 /* pointers to current ram configuration selected for banks */
 static unsigned char *AmstradCPC_RamBanks[4];
+static unsigned char *Aleste_RamBanks[4];
+static int aleste_active_page[4];  // page mapped to CPU RAM (is readable?)
 
 /* pointer to RAM used for the CPC+ ASIC memory-mapped registers */
 unsigned char *amstrad_plus_asic_ram;
@@ -395,8 +468,12 @@ void amstrad_setLowerRom(void)
 	{
 		if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<2)) == 0) {
 			BankBase = &memory_region(REGION_CPU1)[0x010000];
-		} else {
-			BankBase = AmstradCPC_RamBanks[0];
+		} else 
+		{
+			if(aleste_mode & 0x04)
+				BankBase = Aleste_RamBanks[0];
+			else
+				BankBase = AmstradCPC_RamBanks[0];
 		}
 		memory_set_bankptr(1, BankBase);
 		memory_set_bankptr(2, BankBase+0x02000);
@@ -463,10 +540,16 @@ void amstrad_setUpperRom(void)
 {
 	unsigned char *BankBase;
 /* b3 : "1" Upper rom area disable or "0" Upper rom area enable */
-	if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<3)) == 0) {
+	if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<3)) == 0) 
+	{
 		BankBase = Amstrad_UpperRom;
-	} else {
-		BankBase = AmstradCPC_RamBanks[3];
+	}
+	else 
+	{
+		if(aleste_mode & 0x04)
+			BankBase = Aleste_RamBanks[3];
+		else
+			BankBase = AmstradCPC_RamBanks[3];
 	}
 
 	if (BankBase)
@@ -787,25 +870,50 @@ void amstrad_rethinkMemory(void)
 /* bank 1 - 0x04000..0x07fff */
 	if(amstrad_system_type == SYSTEM_CPC || amstrad_plus_asic_enabled == 0)
 	{
-		memory_set_bankptr(3, AmstradCPC_RamBanks[1]);
-		memory_set_bankptr(4, AmstradCPC_RamBanks[1]+0x2000);
-/* bank 2 - 0x08000..0x0bfff */
-		memory_set_bankptr(5, AmstradCPC_RamBanks[2]);
-		memory_set_bankptr(6, AmstradCPC_RamBanks[2]+0x2000);
+		if(aleste_mode & 0x04)
+		{
+			memory_set_bankptr(3, Aleste_RamBanks[1]);
+			memory_set_bankptr(4, Aleste_RamBanks[1]+0x2000);
+			/* bank 2 - 0x08000..0x0bfff */
+			memory_set_bankptr(5, Aleste_RamBanks[2]);
+			memory_set_bankptr(6, Aleste_RamBanks[2]+0x2000);
+		}
+		else
+		{
+			memory_set_bankptr(3, AmstradCPC_RamBanks[1]);
+			memory_set_bankptr(4, AmstradCPC_RamBanks[1]+0x2000);
+			/* bank 2 - 0x08000..0x0bfff */
+			memory_set_bankptr(5, AmstradCPC_RamBanks[2]);
+			memory_set_bankptr(6, AmstradCPC_RamBanks[2]+0x2000);
+		}
 	}
 	else
 		amstrad_setLowerRom();
 /* bank 3 - 0x0c000..0x0ffff */
     amstrad_setUpperRom();
 /* other banks */
-		memory_set_bankptr(9, AmstradCPC_RamBanks[0]);
-		memory_set_bankptr(10, AmstradCPC_RamBanks[0]+0x2000);
-		memory_set_bankptr(11, AmstradCPC_RamBanks[1]);
-		memory_set_bankptr(12, AmstradCPC_RamBanks[1]+0x2000);
-		memory_set_bankptr(13, AmstradCPC_RamBanks[2]);
-		memory_set_bankptr(14, AmstradCPC_RamBanks[2]+0x2000);
-		memory_set_bankptr(15, AmstradCPC_RamBanks[3]);
-		memory_set_bankptr(16, AmstradCPC_RamBanks[3]+0x2000);
+		if(aleste_mode & 0x04)
+		{
+			memory_set_bankptr(9, Aleste_RamBanks[0]);
+			memory_set_bankptr(10, Aleste_RamBanks[0]+0x2000);
+			memory_set_bankptr(11, Aleste_RamBanks[1]);
+			memory_set_bankptr(12, Aleste_RamBanks[1]+0x2000);
+			memory_set_bankptr(13, Aleste_RamBanks[2]);
+			memory_set_bankptr(14, Aleste_RamBanks[2]+0x2000);
+			memory_set_bankptr(15, Aleste_RamBanks[3]);
+			memory_set_bankptr(16, Aleste_RamBanks[3]+0x2000);
+		}
+		else
+		{
+			memory_set_bankptr(9, AmstradCPC_RamBanks[0]);
+			memory_set_bankptr(10, AmstradCPC_RamBanks[0]+0x2000);
+			memory_set_bankptr(11, AmstradCPC_RamBanks[1]);
+			memory_set_bankptr(12, AmstradCPC_RamBanks[1]+0x2000);
+			memory_set_bankptr(13, AmstradCPC_RamBanks[2]);
+			memory_set_bankptr(14, AmstradCPC_RamBanks[2]+0x2000);
+			memory_set_bankptr(15, AmstradCPC_RamBanks[3]);
+			memory_set_bankptr(16, AmstradCPC_RamBanks[3]+0x2000);
+		}
 
 /* multiface hardware enabled? */
 		if (multiface_hardware_enabled()) {
@@ -838,6 +946,7 @@ static void AmstradCPC_GA_SetRamConfiguration(void)
     for (i=0;i<4;i++) {
     	BankIndex = RamConfigurations[(ConfigurationIndex << 2) + i];
     	BankAddr = mess_ram + (BankIndex << 14);
+		Aleste_RamBanks[i] = BankAddr;
     	AmstradCPC_RamBanks[i] = BankAddr;
     }
   } else {/* Need to add the ram expansion configuration here ! */
@@ -992,6 +1101,69 @@ In the 464+ and 6128+ this function is performed by the ASIC or a memory expansi
   }
 }
 
+void aleste_msx_mapper(int offset, int data)
+{
+	int page = (offset & 0x0300) >> 8;
+	int ramptr = (data & 0x1f) * 0x4000;
+	int rampage = data & 0x1f;
+	int function = (data & 0xc0) >> 6;
+
+	// It is assumed that functions are all mapped to each port &7cff-&7fff, and b8 and b9 are only used for RAM bank location
+	switch(function)
+	{
+	case 0:  // Pen select (same as Gate Array?)
+		amstrad_GateArray_write(data);
+		break;
+	case 1:  // Colour select (6-bit palette)
+		aleste_vh_update_colour(amstrad_GateArray_PenSelected,data & 0x3f);
+		break;
+	case 2:  // Screen mode, Upper/Lower ROM select
+		amstrad_GateArray_write(data);
+		break;
+	case 3: // RAM banks
+		switch(page)
+		{
+		case 0:  /* 0x0000 - 0x3fff */
+			memory_set_bankptr(1,mess_ram+ramptr);
+			memory_set_bankptr(2,mess_ram+ramptr+0x2000);
+			memory_set_bankptr(9,mess_ram+ramptr);
+			memory_set_bankptr(10,mess_ram+ramptr+0x2000);
+			Aleste_RamBanks[0] = mess_ram+ramptr;
+			aleste_active_page[0] = data;
+			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x0000\n",ramptr,rampage);
+			break;
+		case 1:  /* 0x4000 - 0x7fff */
+			memory_set_bankptr(3,mess_ram+ramptr);
+			memory_set_bankptr(4,mess_ram+ramptr+0x2000);
+			memory_set_bankptr(11,mess_ram+ramptr);
+			memory_set_bankptr(12,mess_ram+ramptr+0x2000);
+			Aleste_RamBanks[1] = mess_ram+ramptr;
+			aleste_active_page[1] = data;
+			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x4000\n",ramptr,rampage);
+			break;
+		case 2:  /* 0x8000 - 0xbfff */
+			memory_set_bankptr(5,mess_ram+ramptr);
+			memory_set_bankptr(6,mess_ram+ramptr+0x2000);
+			memory_set_bankptr(13,mess_ram+ramptr);
+			memory_set_bankptr(14,mess_ram+ramptr+0x2000);
+			Aleste_RamBanks[2] = mess_ram+ramptr;
+			aleste_active_page[2] = data;
+			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x8000\n",ramptr,rampage);
+			break;
+		case 3:  /* 0xc000 - 0xffff */
+			memory_set_bankptr(7,mess_ram+ramptr);
+			memory_set_bankptr(8,mess_ram+ramptr+0x2000);
+			memory_set_bankptr(15,mess_ram+ramptr);
+			memory_set_bankptr(16,mess_ram+ramptr+0x2000);
+			Aleste_RamBanks[3] = mess_ram+ramptr;
+			aleste_active_page[3] = data;
+			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0xc000\n",ramptr,rampage);
+			break;
+		}
+		break;
+	}
+}
+
 /* used for loading snapshot only ! */
 void AmstradCPC_PALWrite(int data)
 {
@@ -1067,9 +1239,20 @@ static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
 	m6845_personality_t crtc_type;
+	int page;
 
 	crtc_type = readinputportbytag_safe("crtc", 0);
 	m6845_set_personality(crtc_type);
+
+	if(aleste_mode & 0x04)
+	{
+		if ((offset & (1<<15)) == 0)  // Aleste Mapper is readable?
+		{
+			page = (offset & 0x0300) >> 8;
+			data = aleste_active_page[page];
+			return data;
+		}
+	}
 
 	/* if b14 = 0 : CRTC Read selected */
 	if ((offset & (1<<14)) == 0)
@@ -1146,20 +1329,27 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			}
 		}
 	}
-  return data;
+	return data;
 }
 
 /* Offset handler for write */
 static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 {
-  if ((offset & (1<<15)) == 0) {
-/* if b15 = 0 and b14 = 1 : Gate-Array Write Selected*/
-    if ((offset & (1<<14)) != 0) {
-	   	amstrad_GateArray_write(data);
-    }
-/* if b15 = 0 : RAM Configuration Write Selected*/
-      AmstradCPC_GA_SetRamConfiguration();
-  }
+	if ((offset & (1<<15)) == 0) 
+	{
+		if(aleste_mode & 0x04) // Aleste mode
+		{
+			aleste_msx_mapper(offset,data);
+		}
+		else
+		{
+		/* if b15 = 0 and b14 = 1 : Gate-Array Write Selected*/
+		if ((offset & (1<<14)) != 0) 
+	   			amstrad_GateArray_write(data);
+		/* if b15 = 0 : RAM Configuration Write Selected*/
+		  AmstradCPC_GA_SetRamConfiguration();
+		}
+}
 /*The Gate-Array and CRTC can't be selected simultaneously, which would otherwise cause potential display corruption.*/
 /* if b14 = 0 : CRTC Write Selected*/
   if ((offset & (1<<14)) == 0) {
@@ -1266,6 +1456,36 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				break;
 				}
 			}
+		}
+	}
+
+/*	Aleste Extend Port:
+		D0 - VRAM Bank 0/1 (64K)
+		D1 - MODE 0-Norm ,1-High resolution
+		D2 - MAPMOD 0-Amstrad ,1-Yamaha mapper
+		D3 - MAP Page 0/1 (256K)
+		D4 - 580WI53
+		D5 - 0-AY8910 ,1-512WI1 */
+	if(offset == 0xfabf)
+	{
+		rectangle rect;
+		aleste_mode = data;
+		logerror("EXTEND: Port &FABF write 0x%02x\n",data);
+		if(data & 0x02)
+		{
+			// Aleste high resolution settings
+			rect.min_x = rect.min_y = 0;
+			rect.max_x = (ALESTE_SCREEN_WIDTH-32) - 1;
+			rect.max_y = (AMSTRAD_SCREEN_HEIGHT-40) - 1;
+			video_screen_configure(0,800,312,&rect,HZ_TO_ATTOSECONDS(AMSTRAD_FPS));
+		}
+		else
+		{
+			// Normal CPC video settings
+			rect.min_x = rect.min_y = 0;
+			rect.max_x = (AMSTRAD_SCREEN_WIDTH-32) - 1;
+			rect.max_y = (AMSTRAD_SCREEN_HEIGHT-40) - 1;
+			video_screen_configure(0,800,312,&rect,HZ_TO_ATTOSECONDS(AMSTRAD_FPS));
 		}
 	}
 	multiface_io_write(offset,data);
@@ -1777,6 +1997,8 @@ static TIMER_CALLBACK(amstrad_vh_execute_crtc_cycles_callback)
 
 static void amstrad_common_init(void)
 {
+	aleste_mode = 0;
+
 	amstrad_GateArray_ModeAndRomConfiguration = 0;
 	amstrad_GateArray_RamConfiguration = 0;
 	amstrad_CRTC_HS_Counter = 2;
@@ -1784,16 +2006,10 @@ static void amstrad_common_init(void)
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MRA8_BANK1);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MRA8_BANK2);
-//  if(amstrad_system_type == SYSTEM_CPC)
-//  {
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MRA8_BANK3);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK4);
-//  }
-//  else
-//  {
-//      memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_r);
-//      memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_r);
-//  }
+
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MRA8_BANK3);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK4);
+
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK5);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, MRA8_BANK6);
 
@@ -1802,18 +2018,13 @@ static void amstrad_common_init(void)
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MWA8_BANK9);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_BANK10);
-//  if(amstrad_system_type == SYSTEM_CPC)
-//  {
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MWA8_BANK11);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_BANK12);
-//  }
-//  else
-//  {
-//      memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_w);
-//      memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_w);
-//  }
+
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MWA8_BANK11);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_BANK12);
+
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK13);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, MWA8_BANK14);
+
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MWA8_BANK15);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MWA8_BANK16);
 
@@ -1995,6 +2206,31 @@ static MACHINE_RESET( kccomp )
 	ppi_port_inputs[amstrad_ppi_PortB] = (1<<4) | (1<<3) | 2;
 }
 
+static DRIVER_INIT( aleste )
+{
+	mc146818_init(MC146818_IGNORE_CENTURY);
+}
+
+static MACHINE_RESET( aleste )
+{
+	int i;
+
+	amstrad_system_type = SYSTEM_CPC;
+
+	for (i=0; i<256; i++)
+	{
+		Amstrad_ROM_Table[i] = &memory_region(REGION_CPU1)[0x014000];
+	}
+
+	Amstrad_ROM_Table[3] = &memory_region(REGION_CPU1)[0x01c000];  // MSX-DOS / BIOS
+	Amstrad_ROM_Table[7] = &memory_region(REGION_CPU1)[0x018000];  // AMSDOS
+	amstrad_common_init();
+	amstrad_reset_machine();
+
+	nec765_init(&aleste_8272_interface,NEC765A);
+	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_DS_80);
+}
 
 /* Memory is banked in 16k blocks. However, the multiface
 pages the memory in 8k blocks! The ROM can
@@ -2031,13 +2267,18 @@ static READ8_HANDLER ( amstrad_psg_porta_read )
    If keyboard matrix line 11-14 are selected, the byte is always &ff.
    After testing on a real CPC, it is found that these never change, they always return &FF. */
 
-	if (amstrad_keyboard_line > 9) {
-    return 0xFF;
-  } else {
-    int amstrad_read_keyboard_line = amstrad_keyboard_line;
-    amstrad_keyboard_line = 0xFF;
-    return (readinputport(amstrad_read_keyboard_line) & 0xFF);
-  }
+	if (amstrad_keyboard_line > 10) 
+	{
+		return 0xFF;
+	} 
+	else 
+	{
+		int amstrad_read_keyboard_line = amstrad_keyboard_line;
+		if(aleste_mode == 0x08 && amstrad_keyboard_line == 10)
+			return 0xff;
+		amstrad_keyboard_line = 0xFF;
+		return (readinputport(amstrad_read_keyboard_line) & 0xFF);
+	}
 }
 
 static INPUT_PORTS_START( amstrad_keyboard )
@@ -2559,6 +2800,28 @@ static INPUT_PORTS_START(gx4000)
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(aleste)
+	PORT_INCLUDE( amstrad_keyboard )
+
+	PORT_MODIFY( "keyboard_row_9" )
+	/* Documentation marks this input as "R/L", it's purpose is unknown - I can't even find it on the keyboard */
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R  L")       PORT_CODE(KEYCODE_PGUP)
+
+	PORT_START_TAG( "keyboard_row_10" )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F1  F6")    PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F2  F7")    PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F3  F8")    PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F4  F9")    PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F5  F10")   PORT_CODE(KEYCODE_F5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("HELP")      PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)	 PORT_NAME("INS")       PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("Funny looking Russian symbol")     PORT_CODE(KEYCODE_END)
+
+	PORT_INCLUDE( crtc_links )
+	PORT_MODIFY("multiface")  // move Multiface II stop to F6, as the Aleste has it's own F1-F5 keys.
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Stop Button") PORT_CODE(KEYCODE_F6)
+INPUT_PORTS_END
+
 /* --------------------
    - AY8910_interface -
    --------------------*/
@@ -2677,6 +2940,15 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_PALETTE_INIT( amstrad_plus )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( aleste )
+	MDRV_IMPORT_FROM( amstrad )
+	MDRV_MACHINE_RESET( aleste )
+	MDRV_PALETTE_LENGTH(32+64)
+	MDRV_COLORTABLE_LENGTH(32+64)  // standard CPC palette, and 6-bit MSX palette
+	MDRV_PALETTE_INIT( aleste )
+	MDRV_NVRAM_HANDLER( mc146818 )
+MACHINE_DRIVER_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -2686,6 +2958,15 @@ MACHINE_DRIVER_END
 /* cpc6128.rom contains OS in first 16k, BASIC in second 16k */
 /* cpcados.rom contains Amstrad DOS */
 
+/*static DEVICE_LOAD( aleste )
+{
+	if (device_load_basicdsk_floppy(image)==INIT_PASS)
+	{
+		basicdsk_set_geometry(image, 80, 2, 9, 512, 0x01, 0, FALSE);
+		return INIT_PASS;
+	}
+	return INIT_FAIL;
+}*/
 
 static void cpc6128_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -2698,6 +2979,21 @@ static void cpc6128_floppy_getinfo(const device_class *devclass, UINT32 state, u
 		default:										legacydsk_device_getinfo(devclass, state, info); break;
 	}
 }
+
+static void aleste_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case DEVINFO_PTR_LOAD:							info->load = device_load_msx_floppy; break;
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}
+}
+
 
 static void cpc6128_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -2778,6 +3074,12 @@ SYSTEM_CONFIG_START(gx4000)
 	CONFIG_DEVICE(cpcplus_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
+SYSTEM_CONFIG_START(aleste)
+	CONFIG_DEVICE(aleste_floppy_getinfo)
+	CONFIG_DEVICE(cpc6128_cassette_getinfo)
+	CONFIG_DEVICE(cpc6128_printer_getinfo)
+	CONFIG_RAM_DEFAULT(2048 * 1024)  // has 2048k RAM
+SYSTEM_CONFIG_END
 
 /* ---------------------------------------------
    - Rom definition for the ROM loading system -
@@ -2855,6 +3157,26 @@ ROM_START(gx4000)
 	ROM_REGION(0x4000, REGION_USER1,0)
 ROM_END
 
+ROM_START(al520ex)
+	ROM_REGION(0x80000, REGION_CPU1,0)
+	ROM_LOAD("al512.bin", 0x10000, 0x10000, CRC(e8c2a9a1) )
+
+	ROM_REGION(0x20, REGION_USER2,0)
+	ROM_LOAD("af.bin", 0x00, 0x20, CRC(c81fb524) )
+
+	ROM_REGION(0x100, REGION_USER3,0)  // RAM bank mappings
+	ROM_LOAD("mapper.bin", 0x00, 0x100, CRC(0daebd80) )
+
+	ROM_REGION(0x800, REGION_USER4,0)  // Colour data
+	ROM_LOAD("rfcoldat.bin", 0x00, 0x800, CRC(c6ace0e6) )
+
+	ROM_REGION(0x800, REGION_USER5,0)  // Keyboard / Video
+	ROM_LOAD("rfvdkey.bin", 0x00, 0x800, CRC(cf2aa4b0) )
+
+	ROM_REGION(0x100, REGION_USER6,0)
+	ROM_LOAD("romram.bin", 0x00, 0x100, CRC(b3ea95d7) )
+ROM_END
+
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     INIT CONFIG   COMPANY                FULLNAME */
 COMP( 1984, cpc464,   0,        0,      amstrad, cpc464,   0,   cpc6128, "Amstrad plc",         "Amstrad CPC464", 0)
 COMP( 1985, cpc664,   cpc464,   0,      amstrad, cpc664,   0,   cpc6128, "Amstrad plc",         "Amstrad CPC664", 0)
@@ -2864,4 +3186,4 @@ COMP( 1990, cpc464p,  0,        0,      cpcplus, plus,     0,   cpcplus, "Amstra
 COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus,     0,   cpcplus, "Amstrad plc",         "Amstrad CPC6128+", 0)
 CONS( 1990, gx4000,   0,        0,      gx4000,  gx4000,   0,   gx4000,  "Amstrad plc",         "Amstrad GX4000", 0)
 COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp,   0,   cpc6128, "VEB Mikroelektronik", "KC Compact", 0)
-
+COMP( 1993, al520ex,  cpc464,   0,      aleste,  aleste, aleste,aleste,  "Patisonic",           "Aleste 520EX", GAME_IMPERFECT_SOUND)

@@ -71,12 +71,14 @@ This gives a total of 19968 NOPs per frame. */
 /* REAL AMSTRAD SCREEN WIDTH and HEIGHT */
 #define AMSTRAD_SCREEN_WIDTH	(50*AMSTRAD_CHARACTERS*2)
 #define AMSTRAD_SCREEN_HEIGHT	(39*AMSTRAD_CHARACTERS)
+#define ALESTE_SCREEN_WIDTH     (82*AMSTRAD_CHARACTERS)
 
 /* number of us cycles per frame (measured) */
 #define AMSTRAD_US_PER_SCANLINE   64
 #define AMSTRAD_FPS               50.080128205128205
 
 extern VIDEO_START( amstrad );
+extern VIDEO_START( aleste );
 extern VIDEO_UPDATE( amstrad );
 void amstrad_vh_execute_crtc_cycles(int);
 void amstrad_vh_update_colour(int, int);
@@ -101,5 +103,8 @@ extern PALETTE_INIT( kccomp );
 /* initialise palette for 464plus, 6128plus */
 extern PALETTE_INIT( amstrad_plus );
 
+/**** ALESTE SPECIFIC ***/
+extern PALETTE_INIT( aleste );
+void aleste_vh_update_colour(int, int);
 
 #endif /* AMSTRAD_H_ */

@@ -211,6 +211,7 @@ TESTDRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/
 	DRIVER( gx4000 )    /* Amstrad GX4000 - 1990                            */
 	DRIVER( kccomp )	/* VEB KC compact									*/
+	DRIVER( al520ex )   /* Patisonic Aleste 520EX (1993)                    */
 TESTDRIVER( pcw8256 )	/* 198? PCW8256										*/
 TESTDRIVER( pcw8512 )	/* 198? PCW8512										*/
 TESTDRIVER( pcw9256 )	/* 198? PCW9256										*/
