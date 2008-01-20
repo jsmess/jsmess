@@ -4341,6 +4341,17 @@ static WRITE8_HANDLER( mapper193_m_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper200_w )
+{
+	LOG_MMC(("mapper200_w, offset: %04x, data: %02x\n", offset, data ));
+
+	prg16_89ab( offset & 0x07 );
+	prg16_cdef( offset & 0x07 );
+	chr8( offset & 0x07 );
+	
+	ppu2c0x_set_mirroring( 0, ( offset & 0x08 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+}
+
 static WRITE8_HANDLER( mapper206_w )
 {
 	if ( (offset & 0x6001) == 0x2000 )
@@ -4930,6 +4941,10 @@ int mapper_reset (int mapperNum)
 		case 193:
 			prg32( ( nes.prg_chunks - 1 ) >> 1 );
 			break;
+		case 200:
+			prg16_89ab( nes.prg_chunks - 1 );
+			prg16_cdef( nes.prg_chunks - 1 );
+			break;
 		case 225:
 		case 226:
 		case 227:
@@ -5046,6 +5061,7 @@ static const mmc mmc_list[] =
 	{ 184, "Sunsoft VROM/4K",		NULL, NULL, mapper184_m_w, NULL, NULL, NULL, NULL },
 	{ 188, "UNROM reversed",		NULL, NULL, NULL, mapper188_w, NULL, NULL, NULL },
 	{ 193, "Fighting Hero",			NULL, NULL, mapper193_m_w, NULL, NULL, NULL, NULL },
+	{ 200, "X-in-1",				NULL, NULL, NULL, mapper200_w, NULL, NULL, NULL },
 	{ 206, "MMC3 no mirror",		NULL, NULL, NULL, mapper206_w, NULL, NULL, mapper4_irq },
 	{ 225, "72-in-1 bootleg",		NULL, NULL, NULL, mapper225_w, NULL, NULL, NULL },
 	{ 226, "76-in-1 bootleg",		NULL, NULL, NULL, mapper226_w, NULL, NULL, NULL },
