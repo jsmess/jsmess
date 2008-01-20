@@ -4136,6 +4136,53 @@ static WRITE8_HANDLER( mapper101_w )
 
 	/* ??? */
 }
+
+static WRITE8_HANDLER( mapper112_w )
+{
+	LOG_MMC(("mapper112_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch( offset ) {
+	case 0x0000:
+		MMC1_bank1 = data;
+		break;
+	case 0x2000:
+		switch ( MMC1_bank1 ) {
+		case 0:
+			prg8_89( data );
+			break;
+		case 1:
+			prg8_ab( data );
+			break;
+		case 2:
+			data &= 0xFE;
+			chr1_0( data );
+			chr1_1( data + 1 );
+			break;
+		case 3:
+			data &= 0xFE;
+			chr1_2( data );
+			chr1_3( data + 1 );
+			break;
+		case 4:
+			chr1_4( data );
+			break;
+		case 5:
+			chr1_5( data );
+			break;
+		case 6:
+			chr1_6( data );
+			break;
+		case 7:
+			chr1_7( data );
+			break;
+		}
+		break;
+	case 0x6000:
+		ppu2c0x_set_mirroring( 0, ( data & 0x01 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+		break;
+	}
+}
+
 static WRITE8_HANDLER( mapper113_l_w )
 {
 	LOG_MMC(("mapper113_w %04x:%02x\n", offset, data));
@@ -4759,6 +4806,10 @@ int mapper_reset (int mapperNum)
 			prg16_89ab (nes.prg_chunks-1);
 			prg16_cdef (nes.prg_chunks-1);
 			break;
+		case 112:
+			prg16_89ab( nes.prg_chunks-1 );
+			prg16_cdef( nes.prg_chunks-1 );
+			break;
 		case 113:
 		case 133:
 			prg32(0);
@@ -4875,6 +4926,7 @@ static const mmc mmc_list[] =
 // 99 - vs. system
 // 100 - images hacked to work with nesticle
 	{ 101, "?? LS161",				NULL, NULL, mapper101_m_w, mapper101_w, NULL, NULL, NULL },
+	{ 112, "Asper",					NULL, NULL, NULL, mapper112_w, NULL, NULL, NULL },
 	{ 113, "Sachen/Hacker/Nina",	mapper113_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 118, "MMC3?",					NULL, NULL, NULL, mapper118_w, NULL, NULL, mapper4_irq },
 // 119 - Pinbot
