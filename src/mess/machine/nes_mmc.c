@@ -4378,6 +4378,15 @@ static WRITE8_HANDLER( mapper202_w )
 	ppu2c0x_set_mirroring( 0, ( offset & 0x01 ) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT );
 }
 
+static WRITE8_HANDLER( mapper203_w )
+{
+	LOG_MMC(("mapper203_w, offset: %04x, data: %02x\n", offset, data));
+
+	prg16_89ab( ( data >> 2 ) & 0x03 );
+	prg16_cdef( ( data >> 2 ) & 0x03 );
+	chr8( data & 0x03 );
+}
+
 static WRITE8_HANDLER( mapper206_w )
 {
 	if ( (offset & 0x6001) == 0x2000 )
@@ -4976,6 +4985,7 @@ int mapper_reset (int mapperNum)
 			chr8( 0 );
 			break;
 		case 202:
+		case 203:
 			prg16_89ab( 0 );
 			prg16_cdef( 0 );
 			chr8( 0 );
@@ -5099,6 +5109,7 @@ static const mmc mmc_list[] =
 	{ 200, "X-in-1",				NULL, NULL, NULL, mapper200_w, NULL, NULL, NULL },
 	{ 201, "X-in-1",				NULL, NULL, NULL, mapper201_w, NULL, NULL, NULL },
 	{ 202, "150-in-1",				NULL, NULL, NULL, mapper202_w, NULL, NULL, NULL },
+	{ 203, "35-in-1",				NULL, NULL, NULL, mapper203_w, NULL, NULL, NULL },
 	{ 206, "MMC3 no mirror",		NULL, NULL, NULL, mapper206_w, NULL, NULL, mapper4_irq },
 	{ 225, "72-in-1 bootleg",		NULL, NULL, NULL, mapper225_w, NULL, NULL, NULL },
 	{ 226, "76-in-1 bootleg",		NULL, NULL, NULL, mapper226_w, NULL, NULL, NULL },
