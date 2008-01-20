@@ -202,6 +202,15 @@ static void oric_psg_connection_refresh(void)
 	{
 		switch (oric_psg_control)
 		{
+			/* PSG inactive */
+			case 0:
+			break;
+			/* read register data */
+			case 1:
+			{
+				oric_via_port_a_data = AY8910_read_port_0_r(0);
+			}
+			break;
 			/* write register data */
 			case 2:
 			{

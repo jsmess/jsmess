@@ -54,7 +54,7 @@ static TIMER_CALLBACK(oric_vh_timer_callback)
 {
 	/* update flash count */
 	vh_state.flash_count++;
-	if (vh_state.flash_count == 30)
+	if (vh_state.flash_count == 16)
 	{
 		vh_state.flash_count = 0;
 		vh_state.flash_state ^=(1<<3);
