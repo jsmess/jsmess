@@ -4716,6 +4716,100 @@ static WRITE8_HANDLER( mapper246_m_w )
 	}
 }
 
+static void mapper248_set_prg( void ) {
+	if ( MMC1_bank4 & 0x80 ) {
+		prg16_89ab( MMC1_bank4 & 0x0F );
+	} else {
+		prg8_89( MMC1_bank2 & 0x1F );
+		prg8_ab( MMC1_bank3 & 0x1F );
+	}
+}
+
+static WRITE8_HANDLER( mapper248_m_w )
+{
+	LOG_MMC(("mapper248_m_w, offset: %04x, data: %02x\n", offset, data));
+
+	MMC1_bank4 = data;
+	mapper248_set_prg();
+}
+
+static WRITE8_HANDLER( mapper248_w )
+{
+	LOG_MMC(("mapper248_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch( offset & 0x7001 ) {
+	case 0x0000:
+		MMC1_bank1 = data;
+		break;
+	case 0x0001:
+		switch( MMC1_bank1 & 0x07 ) {
+		case 0:
+			chr2_0( data >> 1 );
+			break;
+		case 1:
+			chr2_2( data >> 1 );
+			break;
+		case 2:
+			chr1_4( data );
+			break;
+		case 3:
+			chr1_5( data );
+			break;
+		case 4:
+			chr1_6( data );
+			break;
+		case 5:
+			chr1_7( data );
+			break;
+		case 6:
+			MMC1_bank2 = data;
+			mapper248_set_prg();
+			break;
+		case 7:
+			MMC1_bank3 = data;
+			mapper248_set_prg();
+			break;
+		}
+		break;
+	case 0x2000:
+		ppu2c0x_set_mirroring( 0, ( data & 0x01 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+		break;
+	case 0x4000:
+		IRQ_count_latch = data;
+		break;
+	case 0x4001:
+		IRQ_count = IRQ_count_latch;
+		break;
+	case 0x6000:
+		IRQ_enable = 0;
+		break;
+	case 0x6001:
+		IRQ_enable = 1;
+		break;
+	}
+}
+
+static void mapper248_irq( int num, int scanline, int vblank, int blanked )
+{
+	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
+	{
+		int priorCount = IRQ_count;
+		if ((IRQ_count == 0) || IRQ_reload)
+		{
+			IRQ_count = IRQ_count_latch;
+			IRQ_reload = 0;
+		}
+		else
+			IRQ_count --;
+
+		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
+		{
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
+			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+		}
+	}
+}
+
 /*
 // mapper_reset
 //
@@ -5147,6 +5241,10 @@ int mapper_reset (int mapperNum)
 		case 246:
 			prg32( 0xFF );
 			break;
+		case 248:
+			MMC1_bank1 = MMC1_bank2 = MMC1_bank3 = MMC1_bank4 = 0;
+			prg32( 0xFF );
+			break;
 		default:
 			/* Mapper not supported */
 			err = 2;
@@ -5271,6 +5369,7 @@ static const mmc mmc_list[] =
 	{ 242, "Wai Xing Zhan Shi",		NULL, NULL, NULL, mapper242_w, NULL, NULL, NULL },
 	{ 244, "Decathlon",				NULL, NULL, NULL, mapper244_w, NULL, NULL, NULL },
 	{ 246, "Fong Shen Bang",		NULL, NULL, mapper246_m_w, NULL, NULL, NULL, NULL },
+	{ 248, "Bao Qing Tian",			NULL, NULL, mapper248_m_w, mapper248_w, NULL, NULL, mapper248_irq },
 };
 
 
