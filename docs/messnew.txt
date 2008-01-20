@@ -22,7 +22,7 @@ System Driver Changes:
 
 - [NES] Added support for mappers 42, 43, 44, 45 (partial), 46, 47, 49,
   51 (partial), 57, 58, 61, 62, 112, 182, 188, 193 (not working), 200, 201,
-  202, 203, 206, 240, 241 (partial), 242.
+  202, 203, 206, 240, 241 (partial), 242, 244.
   [Wilbert Pol]
 
 - [ORIC] Fixed tape loading.  (bug #241) [Wilbert Pol]

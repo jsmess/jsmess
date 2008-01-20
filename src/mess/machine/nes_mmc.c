@@ -4665,6 +4665,21 @@ static WRITE8_HANDLER( mapper242_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper244_w )
+{
+	LOG_MMC(("mapper244_w, offset: %04x, data: %02x\n", offset, data));
+
+	if ( offset < 0x0065 )
+		return;
+	if ( offset < 0x00a5 ) {
+		prg32( ( offset - 0x0065 ) & 0x03 );
+		return;
+	}
+	if ( offset < 0x00e5 ) {
+		chr8( ( offset - 0x00a5 ) & 0x07 );
+	}
+}
+
 /*
 // mapper_reset
 //
@@ -5090,6 +5105,7 @@ int mapper_reset (int mapperNum)
 		case 240:
 		case 241:
 		case 242:
+		case 244:
 			prg32(0);
 			break;
 		default:
@@ -5214,6 +5230,7 @@ static const mmc mmc_list[] =
 	{ 240, "Jing Ke Xin Zhuan",		mapper240_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 241, "Education 18-in-1",		NULL, mapper241_l_r, NULL, mapper241_w, NULL, NULL, NULL },
 	{ 242, "Wai Xing Zhan Shi",		NULL, NULL, NULL, mapper242_w, NULL, NULL, NULL },
+	{ 244, "Decathlon",				NULL, NULL, NULL, mapper244_w, NULL, NULL, NULL },
 };
 
 
