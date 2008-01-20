@@ -4645,6 +4645,26 @@ static WRITE8_HANDLER( mapper241_w )
 	prg32( data );
 }
 
+static WRITE8_HANDLER( mapper242_w )
+{
+	LOG_MMC(("mapper242_w, offset: %04x, data: %02x\n", offset, data));
+
+	prg32( ( offset >> 3 ) & 0x0F );
+
+	switch( data & 0x03 ) {
+	case 0:
+		ppu2c0x_set_mirroring( 0, PPU_MIRROR_VERT );
+		break;
+	case 1:
+		ppu2c0x_set_mirroring( 0, PPU_MIRROR_HORZ );
+		break;
+	case 2:
+	case 3:
+		/* TODO: other mirroring bits */
+		break;
+	}
+}
+
 /*
 // mapper_reset
 //
@@ -5069,6 +5089,7 @@ int mapper_reset (int mapperNum)
 			break;
 		case 240:
 		case 241:
+		case 242:
 			prg32(0);
 			break;
 		default:
@@ -5192,6 +5213,7 @@ static const mmc mmc_list[] =
 // 234 - maxi-15
 	{ 240, "Jing Ke Xin Zhuan",		mapper240_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 241, "Education 18-in-1",		NULL, mapper241_l_r, NULL, mapper241_w, NULL, NULL, NULL },
+	{ 242, "Wai Xing Zhan Shi",		NULL, NULL, NULL, mapper242_w, NULL, NULL, NULL },
 };
 
 
