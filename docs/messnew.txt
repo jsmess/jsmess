@@ -21,7 +21,7 @@ System Driver Changes:
   palette.  [Dirk Best]
 
 - [NES] Added support for mappers 42, 43, 44, 45 (partial), 46, 47, 49,
-  51 (partial), 57, 58, 61, 62, 112, 182, 188, 206.
+  51 (partial), 57, 58, 61, 62, 112, 182, 188, 193 (not working), 206.
   [Wilbert Pol]
 
 - [ORIC] Fixed tape loading.  (bug #241) [Wilbert Pol]

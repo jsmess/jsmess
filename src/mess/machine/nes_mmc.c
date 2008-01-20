@@ -10,6 +10,7 @@
 	. 82 has chr-rom banking problems. Also mapper is in the middle of sram, which is unemulated.
 	. 96 is preliminary.
 	. 118 mirroring is a guess, chr-rom banking is likely different
+	. 193 Missing PPU feature?
 	. 228 seems wrong
 	. 229 is preliminary
 
@@ -4320,6 +4321,26 @@ static WRITE8_HANDLER( mapper188_w )
 	prg16_89ab( data ^ 0x08 );
 }
 
+static WRITE8_HANDLER( mapper193_m_w )
+{
+	LOG_MMC(("mapper193_m_w, offset: %04x, data: %02x\n", offset, data ));
+
+	switch( offset & 0x03 ) {
+	case 0:
+		chr4_0( data >> 2 );
+		break;
+	case 1:
+		chr2_4( data >> 1 );
+		break;
+	case 2:
+		chr2_6( data >> 1 );
+		break;
+	case 3:
+		prg16_89ab( data );
+		break;
+	}
+}
+
 static WRITE8_HANDLER( mapper206_w )
 {
 	if ( (offset & 0x6001) == 0x2000 )
@@ -4906,6 +4927,9 @@ int mapper_reset (int mapperNum)
 			prg16_89ab( 0 );
 			prg16_cdef( ( nes.prg_chunks - 1 ) ^ 0x08 );
 			break;
+		case 193:
+			prg32( ( nes.prg_chunks - 1 ) >> 1 );
+			break;
 		case 225:
 		case 226:
 		case 227:
@@ -5021,6 +5045,7 @@ static const mmc mmc_list[] =
 	{ 182, "Super games",			NULL, NULL, NULL, mapper182_w, NULL, NULL, mapper182_irq },
 	{ 184, "Sunsoft VROM/4K",		NULL, NULL, mapper184_m_w, NULL, NULL, NULL, NULL },
 	{ 188, "UNROM reversed",		NULL, NULL, NULL, mapper188_w, NULL, NULL, NULL },
+	{ 193, "Fighting Hero",			NULL, NULL, mapper193_m_w, NULL, NULL, NULL, NULL },
 	{ 206, "MMC3 no mirror",		NULL, NULL, NULL, mapper206_w, NULL, NULL, mapper4_irq },
 	{ 225, "72-in-1 bootleg",		NULL, NULL, NULL, mapper225_w, NULL, NULL, NULL },
 	{ 226, "76-in-1 bootleg",		NULL, NULL, NULL, mapper226_w, NULL, NULL, NULL },
