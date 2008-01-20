@@ -44,7 +44,7 @@ static int prg_mask;
 static int IRQ_enable, IRQ_enable_latch;
 static UINT16 IRQ_count, IRQ_count_latch, IRQ_reload;
 static UINT8 IRQ_status;
-static UINT8 IRQ_mode_jaleco;
+static UINT8 IRQ_mode;
 
 int MMC1_extended;	/* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
 
@@ -87,6 +87,8 @@ int MMC5_vram_control;
 static int mapper41_chr, mapper41_reg2;
 
 static int mapper45_data[4], mapper45_cmd;
+
+static int mapper64_data[0x10], mapper64_cmd;
 
 static int mapper_warning;
 
@@ -1717,19 +1719,19 @@ static void jaleco_irq ( int num, int scanline, int vblank, int blanked )
 			IRQ_count -= 0x100;
 
 			logerror ("scanline: %d, irq count: %04x\n", scanline, IRQ_count);
-			if (IRQ_mode_jaleco & 0x08)
+			if (IRQ_mode & 0x08)
 			{
 				if ((IRQ_count & 0x0f) == 0x00)
 					/* rollover every 0x10 */
 					cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
 			}
-			else if (IRQ_mode_jaleco & 0x04)
+			else if (IRQ_mode & 0x04)
 			{
 				if ((IRQ_count & 0x0ff) == 0x00)
 					/* rollover every 0x100 */
 					cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
 			}
-			else if (IRQ_mode_jaleco & 0x02)
+			else if (IRQ_mode & 0x02)
 			{
 				if ((IRQ_count & 0x0fff) == 0x000)
 					/* rollover every 0x1000 */
@@ -1924,7 +1926,7 @@ static WRITE8_HANDLER( mapper18_w )
 			break;
 		case 0x7001: /* IRQ Control 1 */
 			IRQ_enable = data & 0x01;
-			IRQ_mode_jaleco = data & 0x0e;
+			IRQ_mode = data & 0x0e;
 			logerror("     Mapper 18 IRQ Control 1: %02x\n", data);
 			break;
 
@@ -3140,6 +3142,28 @@ static WRITE8_HANDLER( mapper62_w )
 	ppu2c0x_set_mirroring( 0, ( offset & 0x80 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 }
 
+static void mapper64_set_banks( void ) {
+	if ( mapper64_cmd & 0x20 ) {
+		chr1_0( mapper64_data[0] );
+		chr1_2( mapper64_data[1] );
+		chr1_1( mapper64_data[8] );
+		chr1_3( mapper64_data[9] );
+	} else {
+		chr1_0( mapper64_data[0] & 0xFE );
+		chr1_1( ( mapper64_data[0] & 0xFE ) | 1 );
+		chr1_2( mapper64_data[1] & 0xFE );
+		chr1_3( ( mapper64_data[1] & 0xFE ) | 1 );
+	}
+	chr1_4( mapper64_data[2] );
+	chr1_5( mapper64_data[3] );
+	chr1_6( mapper64_data[4] );
+	chr1_7( mapper64_data[5] );
+
+	prg8_89( mapper64_data[6] );
+	prg8_ab( mapper64_data[7] );
+	prg8_cd( mapper64_data[10] );
+}
+
 static WRITE8_HANDLER( mapper64_m_w )
 {
 	logerror("mapper64_m_w, offset: %04x, data: %02x\n", offset, data);
@@ -3147,11 +3171,6 @@ static WRITE8_HANDLER( mapper64_m_w )
 
 static WRITE8_HANDLER( mapper64_w )
 {
-	static int cmd = 0;
-	static int chr = 0;
-	static int select_high;
-	static int page;
-
 /* TODO: something in the IRQ handling hoses Skull & Crossbones */
 
 //	logerror("mapper64_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
@@ -3159,114 +3178,16 @@ static WRITE8_HANDLER( mapper64_w )
 	switch (offset & 0x7001)
 	{
 		case 0x0000:
-//			logerror("Mapper 64 0x8000 write value: %02x\n",data);
-			cmd = data & 0x0f;
-			if (data & 0x80)
-				chr = 0x1000;
-			else
-				chr = 0x0000;
-
-			if (data & 0x10)
-			{
-				ppu2c0x_set_videorom_bank(0, 1, 1, 0, 64);
-				ppu2c0x_set_videorom_bank(0, 3, 1, 0, 64);
-			}
-
-			page = chr >> 10;
-			/* Toggle switching between $8000/$A000/$C000 and $A000/$C000/$8000 */
-			if (select_high != (data & 0x40))
-			{
-				if (data & 0x40)
-				{
-					memory_set_bankptr (1, &nes.rom[(nes.prg_chunks-1) * 0x4000 + 0x10000]);
-				}
-				else
-				{
-					memory_set_bankptr (3, &nes.rom[(nes.prg_chunks-1) * 0x4000 + 0x10000]);
-				}
-			}
-
-			select_high = data & 0x40;
-//			logerror("   Mapper 64 select_high: %02x\n", select_high);
+			mapper64_cmd = data;
 			break;
-
 		case 0x0001:
-			switch (cmd)
-			{
-				case 0:
-					ppu2c0x_set_videorom_bank(0, page, 2, data, 64);
-					break;
-
-				case 1:
-					ppu2c0x_set_videorom_bank(0, page ^ 2, 2, data, 64);
-					break;
-
-				case 2:
-					ppu2c0x_set_videorom_bank(0, page ^ 4, 2, data, 64);
-					break;
-
-				case 3:
-					ppu2c0x_set_videorom_bank(0, page ^ 5, 2, data, 64);
-					break;
-
-				case 4:
-					ppu2c0x_set_videorom_bank(0, page ^ 6, 2, data, 64);
-					break;
-
-				case 5:
-					ppu2c0x_set_videorom_bank(0, page ^ 7, 2, data, 64);
-					break;
-
-				case 6:
-					/* These damn games will go to great lengths to switch to banks which are outside the valid range */
-					data &= prg_mask;
-					if (select_high)
-					{
-						memory_set_bankptr (2, &nes.rom[0x2000 * (data) + 0x10000]);
-//						logerror("     Mapper 64 switch ($A000) cmd 6 value: %02x\n", data);
-					}
-					else
-					{
-						memory_set_bankptr (1, &nes.rom[0x2000 * (data) + 0x10000]);
-//						logerror("     Mapper 64 switch ($8000) cmd 6 value: %02x\n", data);
-					}
-					break;
-				case 7:
-					data &= prg_mask;
-					if (select_high)
-					{
-						memory_set_bankptr (3, &nes.rom[0x2000 * (data) + 0x10000]);
-//						logerror("     Mapper 64 switch ($C000) cmd 7 value: %02x\n", data);
-					}
-					else
-					{
-						memory_set_bankptr (2, &nes.rom[0x2000 * (data) + 0x10000]);
-//						logerror("     Mapper 64 switch ($A000) cmd 7 value: %02x\n", data);
-					}
-					break;
-				case 8:
-					/* Switch 1k VROM at $0400 */
-					ppu2c0x_set_videorom_bank(0, 1, 1, data, 64);
-					break;
-				case 9:
-					/* Switch 1k VROM at $0C00 */
-					ppu2c0x_set_videorom_bank(0, 3, 1, data, 64);
-					break;
-				case 15:
-					data &= prg_mask;
-					if (select_high)
-					{
-						memory_set_bankptr (1, &nes.rom[0x2000 * (data) + 0x10000]);
-//						logerror("     Mapper 64 switch ($C000) cmd 15 value: %02x\n", data);
-					}
-					else
-					{
-						memory_set_bankptr (3, &nes.rom[0x2000 * (data) + 0x10000]);
-//						logerror("     Mapper 64 switch ($A000) cmd 15 value: %02x\n", data);
-					}
-					break;
+			if ( ( mapper64_cmd & 0x0F ) < 10 ) {
+				mapper64_data[ mapper64_cmd & 0x0F ] = data;
 			}
-			cmd = 16;
+			if ( ( mapper64_cmd & 0x0F ) == 0x0F ) {
+				mapper64_data[ 10 ] = data;
+			}
+			mapper64_set_banks();
 			break;
 		case 0x2000:
 			/* Not sure if the one-screen mirroring applies to this mapper */
@@ -3281,22 +3202,32 @@ static WRITE8_HANDLER( mapper64_w )
 			}
 			break;
 		case 0x4000: /* $c000 - IRQ scanline counter */
-			IRQ_count = data;
+			IRQ_count_latch = data;
+			if ( 0 ) {
+				IRQ_count = IRQ_count_latch;
+			}
 			logerror("     MMC3 copy/set irq latch: %02x\n", data);
 			break;
 
 		case 0x4001: /* $c001 - IRQ scanline latch */
-			IRQ_count_latch = data;
+			IRQ_count = IRQ_count_latch;
+			IRQ_mode = data & 0x01;
 			logerror("     MMC3 set latch: %02x\n", data);
 			break;
 
 		case 0x6000: /* $e000 - Disable IRQs */
 			IRQ_enable = 0;
+			if ( 0 ) {
+				IRQ_count = IRQ_count_latch;
+			}
 			logerror("     MMC3 disable irqs: %02x\n", data);
 			break;
 
 		case 0x6001: /* $e001 - Enable IRQs */
 			IRQ_enable = 1;
+			if ( 0 ) {
+				IRQ_count = IRQ_count_latch;
+			}
 			logerror("     MMC3 enable irqs: %02x\n", data);
 			break;
 
@@ -4659,8 +4590,10 @@ static WRITE8_HANDLER( mapper242_w )
 		ppu2c0x_set_mirroring( 0, PPU_MIRROR_HORZ );
 		break;
 	case 2:
+		ppu2c0x_set_mirroring(0, PPU_MIRROR_LOW);
+		break;
 	case 3:
-		/* TODO: other mirroring bits */
+		ppu2c0x_set_mirroring(0, PPU_MIRROR_HIGH);
 		break;
 	}
 }
