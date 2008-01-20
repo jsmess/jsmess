@@ -4234,6 +4234,74 @@ static WRITE8_HANDLER( mapper180_w )
 
 	prg16_cdef(data&7);
 }
+
+static WRITE8_HANDLER( mapper182_w )
+{
+	LOG_MMC(("mapper182_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch( offset & 0x7003 ) {
+	case 0x0001:
+		ppu2c0x_set_mirroring( 0, ( data & 0x01 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+		break;
+	case 0x2000:
+		MMC1_bank1 = data;
+		break;
+	case 0x4000:
+		switch( MMC1_bank1 ) {
+		case 0:
+			chr2_0( data >> 1 );
+			break;
+		case 1:
+			chr1_5( data );
+			break;
+		case 2:
+			chr2_2( data >> 1 );
+			break;
+		case 3:
+			chr1_7( data );
+			break;
+		case 4:
+			prg8_89( data );
+			break;
+		case 5:
+			prg8_ab( data );
+			break;
+		case 6:
+			chr1_4( data );
+			break;
+		case 7:
+			chr1_6( data );
+			break;
+		}
+		break;
+	case 0x6003:
+		IRQ_count = data;
+		IRQ_enable = 1;
+		break;
+	}
+}
+
+static void mapper182_irq( int num, int scanline, int vblank, int blanked )
+{
+	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
+	{
+		int priorCount = IRQ_count;
+		if ((IRQ_count == 0) || IRQ_reload)
+		{
+			IRQ_count = IRQ_count_latch;
+			IRQ_reload = 0;
+		}
+		else
+			IRQ_count --;
+
+		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
+		{
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
+			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+		}
+	}
+}
+
 static WRITE8_HANDLER( mapper184_m_w )
 {
 	LOG_MMC(("* Mapper 184 switch, data: %02x\n", data));
@@ -4822,6 +4890,11 @@ int mapper_reset (int mapperNum)
 		case 180:
 			prg16_89ab(0);
 			prg16_cdef(0);
+		case 182:
+			IRQ_enable = 0;
+			IRQ_count = 0;
+			prg32( ( nes.prg_chunks - 1 ) >> 1 );
+			break;
 		case 225:
 		case 226:
 		case 227:
@@ -4934,6 +5007,7 @@ static const mmc mmc_list[] =
 	{ 140, "Jaleco",                        NULL, NULL, mapper_140_m_w, NULL, NULL, NULL, NULL },
 	{ 144, "AGCI 50282",			NULL, NULL, NULL, mapper144_w, NULL, NULL, NULL }, //Death Race only
 	{ 180, "Nihon Bussan - PRG HI",	NULL, NULL, NULL, mapper180_w, NULL, NULL, NULL },
+	{ 182, "Super games",			NULL, NULL, NULL, mapper182_w, NULL, NULL, mapper182_irq },
 	{ 184, "Sunsoft VROM/4K",		NULL, NULL, mapper184_m_w, NULL, NULL, NULL, NULL },
 	{ 206, "MMC3 no mirror",		NULL, NULL, NULL, mapper206_w, NULL, NULL, mapper4_irq },
 	{ 225, "72-in-1 bootleg",		NULL, NULL, NULL, mapper225_w, NULL, NULL, NULL },
