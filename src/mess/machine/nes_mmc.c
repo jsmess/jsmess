@@ -2,6 +2,7 @@
 	TODO:
 	. 5 has some issues, RAM banking needs hardware flags to determine size
 	. 13 needs banked VRAM. -see Videomation
+	. 45 mapper is not fully working
 	. 51 only half of the games work
 	. 64 has some IRQ problems - see Skull & Crossbones
 	. 67 display issues, but vrom fixed
@@ -3061,6 +3062,28 @@ static WRITE8_HANDLER( mapper51_w )
 	mapper51_set_banks();
 }
 
+static WRITE8_HANDLER( mapper57_w )
+{
+	LOG_MMC(("mapper57_w, offset: %04x, data: %02x\n", offset, data));
+
+	if ( offset & 0x0800 ) {
+		MMC1_bank2 = data;
+	} else {
+		MMC1_bank1 = data;
+	}
+
+	if ( MMC1_bank2 & 0x80 ) {
+		prg32( 2 | ( MMC1_bank2 >> 6 ) );
+	} else {
+		prg16_89ab( ( MMC1_bank2 >> 5 ) & 0x03 );
+		prg16_cdef( ( MMC1_bank2 >> 5 ) & 0x03 );
+	}
+
+	ppu2c0x_set_mirroring( 0, ( MMC1_bank2 & 0x08 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+
+	chr8( ( MMC1_bank1 & 0x03 ) | ( MMC1_bank2 & 0x07 ) | ( ( MMC1_bank2 & 0x10 ) >> 1 ) );
+}
+
 static WRITE8_HANDLER( mapper64_m_w )
 {
 	logerror("mapper64_m_w, offset: %04x, data: %02x\n", offset, data);
@@ -4601,6 +4624,13 @@ int mapper_reset (int mapperNum)
 			MMC1_bank3 = 0x00;
 			mapper51_set_banks();
 			break;
+		case 57:
+			MMC1_bank1 = 0x00;
+			MMC1_bank2 = 0x00;
+			prg16_89ab( 0 );
+			prg16_cdef( 0 );
+			chr8(0);
+			break;
 		case 70:
 //		case 86:
 			prg16_89ab (nes.prg_chunks-2);
@@ -4746,6 +4776,7 @@ static const mmc mmc_list[] =
 	{ 47, "2-in-1 MMC3",			NULL, NULL, mapper47_m_w, mapper4_w, NULL, NULL, mapper4_irq },
 	{ 49, "4-in-1 MMC3",			NULL, NULL, mapper49_m_w, mapper4_w, NULL, NULL, mapper4_irq },
 	{ 51, "11-in-1",				NULL, NULL, mapper51_m_w, mapper51_w, NULL, NULL, NULL },
+	{ 57, "6-in-1",					NULL, NULL, NULL, mapper57_w, NULL, NULL, NULL },
 	{ 64, "Tengen",					NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
 	{ 65, "Irem H3001",				NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
 	{ 66, "74161/32 Jaleco",		NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
