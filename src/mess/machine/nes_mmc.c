@@ -3088,16 +3088,36 @@ static WRITE8_HANDLER( mapper58_w )
 {
 	LOG_MMC(("mapper58_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset & 0x40 ) {
-		prg16_89ab( offset & 0x07 );
-		prg16_cdef( offset & 0x07 );
-	} else {
-		prg32( ( offset & 0x06 ) >> 1 );
+	if ( offset & 0x4000 ) {
+		if ( offset & 0x40 ) {
+			prg16_89ab( offset & 0x07 );
+			prg16_cdef( offset & 0x07 );
+		} else {
+			prg32( ( offset & 0x06 ) >> 1 );
+		}
+
+		chr8( ( offset & 0x38 ) >> 3 );
+
+		ppu2c0x_set_mirroring( 0, ( ( data & 0x02 ) >> 1 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 	}
+}
 
-	chr8( ( offset & 0x38 ) >> 3 );
+static WRITE8_HANDLER( mapper61_w )
+{
+	LOG_MMC(("mapper61_w, offset: %04x, data: %02x\n", offset, data));
 
-	ppu2c0x_set_mirroring( 0, ( ( data & 0x02 ) >> 1 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	switch ( offset & 0x30 ) {
+	case 0x00:
+	case 0x30:
+		prg32( offset & 0x0F );
+		break;
+	case 0x10:
+	case 0x20:
+		prg16_89ab( ( ( offset & 0x0F ) << 1 ) | ( ( offset & 0x20 ) >> 4 ) );
+		prg16_cdef( ( ( offset & 0x0F ) << 1 ) | ( ( offset & 0x20 ) >> 4 ) );
+		break;
+	}
+	ppu2c0x_set_mirroring( 0, ( ( offset >> 7 ) & 0x01 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 }
 
 static WRITE8_HANDLER( mapper64_m_w )
@@ -4651,6 +4671,9 @@ int mapper_reset (int mapperNum)
 			prg32(0);
 			chr8(0);
 			break;
+		case 61:
+			prg32(0);
+			break;
 		case 70:
 //		case 86:
 			prg16_89ab (nes.prg_chunks-2);
@@ -4798,6 +4821,7 @@ static const mmc mmc_list[] =
 	{ 51, "11-in-1",				NULL, NULL, mapper51_m_w, mapper51_w, NULL, NULL, NULL },
 	{ 57, "6-in-1",					NULL, NULL, NULL, mapper57_w, NULL, NULL, NULL },
 	{ 58, "X-in-1",					NULL, NULL, NULL, mapper58_w, NULL, NULL, NULL },
+	{ 61, "20-in-1",				NULL, NULL, NULL, mapper61_w, NULL, NULL, NULL },
 	{ 64, "Tengen",					NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
 	{ 65, "Irem H3001",				NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
 	{ 66, "74161/32 Jaleco",		NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
