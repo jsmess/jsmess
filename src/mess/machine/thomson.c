@@ -16,7 +16,7 @@
 #include "sound/dac.h"
 #include "audio/mea8000.h"
 #include "devices/cartslot.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "includes/serial.h"
 #include "devices/cassette.h"
 #include "formats/thom_cas.h"

@@ -84,7 +84,7 @@
 ********************************************************************************/
 #include "driver.h"
 #include "includes/exidy.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "machine/hd6402.h"
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"

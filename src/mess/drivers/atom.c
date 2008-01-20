@@ -62,7 +62,7 @@ Hardware:   PPIA 8255
 #include "includes/atom.h"
 
 /* Components */
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "machine/i8271.h"
 #include "machine/8255ppi.h"
 #include "machine/6522via.h"

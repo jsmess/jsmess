@@ -24,7 +24,7 @@
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
 #include "machine/6551.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "devices/basicdsk.h"
 #include "devices/mfmdisk.h"
 #include "devices/printer.h"

@@ -5,7 +5,7 @@
 */
 
 #include "driver.h"
-#include "includes/centroni.h"
+#include "centroni.h"
 #include "devices/printer.h"
 
 typedef struct {

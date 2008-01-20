@@ -75,7 +75,7 @@
 /* Components */
 #include "cpu/z80/z80daisy.h"
 #include "cpu/i8039/i8039.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "includes/serial.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"

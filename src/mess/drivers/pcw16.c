@@ -90,7 +90,7 @@
 #include "includes/pcw16.h"
 
 /* Components */
-#include "includes/centroni.h"	/* centronics printer handshake simulation */
+#include "machine/centroni.h"	/* centronics printer handshake simulation */
 #include "includes/pclpt.h"		/* PC-Parallel Port */
 #include "machine/pckeybrd.h"	/* PC-AT keyboard */
 #include "machine/pc_fdc.h"		/* change to superio later */

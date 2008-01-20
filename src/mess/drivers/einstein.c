@@ -86,7 +86,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd17xx.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "machine/msm8251.h"
 #include "devices/dsk.h"
 #include "devices/basicdsk.h"

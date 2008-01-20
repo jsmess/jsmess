@@ -8,7 +8,7 @@
 #include "driver.h"
 #include "memconv.h"
 #include "includes/pclpt.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 
 
 #define LOG(LEVEL,N,M,A)  \

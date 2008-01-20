@@ -19,7 +19,7 @@
 #include "driver.h"
 #include "mslegacy.h"
 #include "includes/oric.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "devices/printer.h"
 #include "devices/mflopimg.h"
 #include "devices/cassette.h"

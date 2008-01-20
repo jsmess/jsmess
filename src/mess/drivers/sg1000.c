@@ -3,7 +3,7 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "includes/serial.h"
 #include "machine/msm8251.h"
 #include "machine/8255ppi.h"

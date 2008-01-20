@@ -6,7 +6,7 @@
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/printer.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "includes/serial.h"
 #include "machine/6850acia.h"
 #include "machine/68901mfp.h"

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * includes/centroni.h
+ * machine/centroni.h
  *
  * Defines centronics/parallel port printer interface
  * Provides a centronics printer simulation (sends output to IO_PRINTER)

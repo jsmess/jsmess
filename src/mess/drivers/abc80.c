@@ -74,7 +74,7 @@ Notes:
 #include "includes/abc80.h"
 
 /* Components */
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"

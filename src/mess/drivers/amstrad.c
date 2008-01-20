@@ -81,7 +81,7 @@ Some bugs left :
 #include "includes/amstrad.h"
 
 /* Components */
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 #include "machine/8255ppi.h"	/* for 8255 ppi */
 #include "cpu/z80/z80.h"		/* for cycle tables */
 #include "video/m6845.h"		/* CRTC display */
