@@ -13,6 +13,8 @@
 	. 193 Missing PPU feature?
 	. 228 seems wrong
 	. 229 is preliminary
+	. 230 not working yet
+	. 232 not working yet
 
 	AD&D Hillsfar (mapper 1) seems to be broken. Not sure what's up there
 
@@ -4577,6 +4579,23 @@ static WRITE8_HANDLER( mapper229_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper230_w )
+{
+	LOG_MMC(("mapper230_w, offset: %04x, data: %02x\n", offset, data));
+
+	if ( 1 ) {
+		prg16_89ab( 7 );
+	} else {
+		if ( data & 0x20 ) {
+			prg16_89ab( ( data & 0x1F ) + 8 );
+			prg16_cdef( ( data & 0x1F ) + 8 );
+		} else {
+			prg32( ( ( data & 0x1E ) >> 1 ) + 4 );
+		}
+		ppu2c0x_set_mirroring( 0, ( data & 0x40 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	}
+}
+
 static WRITE8_HANDLER( mapper231_w )
 {
 	int bank;
@@ -4586,6 +4605,31 @@ static WRITE8_HANDLER( mapper231_w )
 	bank = (data & 0x03) | ((data & 0x80) >> 5);
 	prg32 (bank);
 	chr8 ((data & 0x70) >> 4);
+}
+
+static void mapper232_set_prg( void )
+{
+	prg16_89ab( ( MMC1_bank2 & 0x03 ) | ( ( MMC1_bank1 & 0x18 ) >> 1 ) );
+	prg16_cdef( 3 | ( ( MMC1_bank1 & 0x18 ) >> 1 ) );
+}
+
+static WRITE8_HANDLER( mapper232_w )
+{
+	LOG_MMC(("mapper232_w, offset: %04x, data: %02x\n", offset, data ));
+
+	if ( offset < 0x2000 ) {
+		MMC1_bank1 = data;
+	} else {
+		MMC1_bank2 = data;
+	}
+}
+
+static WRITE8_HANDLER( mapper240_l_w )
+{
+	LOG_MMC(("mapper240_l_w, offset: %04x, data: %02x\n", offset, data));
+
+	prg32( data >> 4 );
+	chr8( data & 0x0F );
 }
 
 /*
@@ -4997,9 +5041,21 @@ int mapper_reset (int mapperNum)
 			prg16_89ab (0);
 			prg16_cdef (0);
 			break;
+		case 230:
+			prg16_89ab( 0 );
+			prg16_cdef( 7 );
+			break;
 		case 231:
 			prg16_89ab (nes.prg_chunks-2);
 			prg16_cdef (nes.prg_chunks-1);
+			break;
+		case 232:
+			MMC1_bank1 = 0x18;
+			MMC1_bank2 = 0x00;
+			mapper232_set_prg();
+			break;
+		case 240:
+			prg32(0);
 			break;
 		default:
 			/* Mapper not supported */
@@ -5116,9 +5172,11 @@ static const mmc mmc_list[] =
 	{ 227, "1200-in-1 bootleg",		NULL, NULL, NULL, mapper227_w, NULL, NULL, NULL },
 	{ 228, "Action 52",				NULL, NULL, NULL, mapper228_w, NULL, NULL, NULL },
 	{ 229, "31-in-1",				NULL, NULL, NULL, mapper229_w, NULL, NULL, NULL },
-//	{ 230, "22-in-1",				NULL, NULL, NULL, mapper230_w, NULL, NULL, NULL },
-	{ 231, "Nina-7 (AVE)",			NULL, NULL, NULL, mapper231_w, NULL, NULL, NULL }
+	{ 230, "22-in-1",				NULL, NULL, NULL, mapper230_w, NULL, NULL, NULL },
+	{ 231, "Nina-7 (AVE)",			NULL, NULL, NULL, mapper231_w, NULL, NULL, NULL },
+	{ 232, "Quattro",				NULL, NULL, mapper232_w, mapper232_w, NULL, NULL, NULL },
 // 234 - maxi-15
+	{ 240, "Jing Ke Xin Zhuan",		mapper240_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
 };
 
 
