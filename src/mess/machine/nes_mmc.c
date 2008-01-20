@@ -15,6 +15,7 @@
 	. 229 is preliminary
 	. 230 not working yet
 	. 232 not working yet
+	. 241 preliminary
 
 	AD&D Hillsfar (mapper 1) seems to be broken. Not sure what's up there
 
@@ -4632,6 +4633,18 @@ static WRITE8_HANDLER( mapper240_l_w )
 	chr8( data & 0x0F );
 }
 
+static READ8_HANDLER( mapper241_l_r )
+{
+	return 0x50;
+}
+
+static WRITE8_HANDLER( mapper241_w )
+{
+	LOG_MMC(("mapper241_w, offset: %04x, data: %02x\n", offset, data));
+
+	prg32( data );
+}
+
 /*
 // mapper_reset
 //
@@ -5055,6 +5068,7 @@ int mapper_reset (int mapperNum)
 			mapper232_set_prg();
 			break;
 		case 240:
+		case 241:
 			prg32(0);
 			break;
 		default:
@@ -5177,6 +5191,7 @@ static const mmc mmc_list[] =
 	{ 232, "Quattro",				NULL, NULL, mapper232_w, mapper232_w, NULL, NULL, NULL },
 // 234 - maxi-15
 	{ 240, "Jing Ke Xin Zhuan",		mapper240_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 241, "Education 18-in-1",		NULL, mapper241_l_r, NULL, mapper241_w, NULL, NULL, NULL },
 };
 
 
