@@ -90,6 +90,9 @@ static int mapper45_data[4], mapper45_cmd;
 
 static int mapper64_data[0x10], mapper64_cmd;
 
+static int mapper83_data[10];
+static int mapper83_low_data[4];
+
 static int mapper_warning;
 
 static emu_timer	*nes_irq_timer;
@@ -3850,6 +3853,95 @@ static WRITE8_HANDLER( mapper82_m_w )
 	}
 }
 
+static WRITE8_HANDLER( mapper83_l_w )
+{
+	mapper83_low_data[ offset & 0x03 ] = data;
+}
+
+static READ8_HANDLER( mapper83_l_r )
+{
+	return mapper83_low_data[ offset & 0x03 ];
+}
+
+static void mapper83_set_prg( void ) {
+	prg16_89ab( mapper83_data[8] & 0x3F );
+	prg16_cdef( ( mapper83_data[8] & 0x30 ) | 0x0F );
+}
+
+static void mapper83_set_chr( void ) {
+	chr1_0( mapper83_data[0] | ( ( mapper83_data[8] & 0x30 ) << 4 ) );
+	chr1_1( mapper83_data[1] | ( ( mapper83_data[8] & 0x30 ) << 4 ) );
+	chr1_2( mapper83_data[2] | ( ( mapper83_data[8] & 0x30 ) << 4 ) );
+	chr1_3( mapper83_data[3] | ( ( mapper83_data[8] & 0x30 ) << 4 ) );
+	chr1_4( mapper83_data[4] | ( ( mapper83_data[8] & 0x30 ) << 4 ) );
+	chr1_5( mapper83_data[5] | ( ( mapper83_data[8] & 0x30 ) << 4 ) );
+	chr1_6( mapper83_data[6] | ( ( mapper83_data[8] & 0x30 ) << 4 ) );
+	chr1_7( mapper83_data[7] | ( ( mapper83_data[8] & 0x30 ) << 4 ) );
+}
+
+static WRITE8_HANDLER( mapper83_w )
+{
+	LOG_MMC(("mapper83_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch( offset ) {
+	case 0x0000:
+	case 0x3000:
+	case 0x30FF:
+	case 0x31FF:
+		mapper83_data[8] = data;
+		mapper83_set_prg();
+		mapper83_set_chr();
+		break;
+	case 0x0100:
+		switch( data & 0x03 ) {
+		case 0:
+			ppu2c0x_set_mirroring( 0, PPU_MIRROR_VERT );
+			break;
+		case 1:
+			ppu2c0x_set_mirroring( 0, PPU_MIRROR_HORZ );
+			break;
+		case 2:
+			ppu2c0x_set_mirroring(0, PPU_MIRROR_LOW);
+			break;
+		case 3:
+			ppu2c0x_set_mirroring(0, PPU_MIRROR_HIGH);
+			break;
+		}
+		break;
+	case 0x0200:
+		IRQ_count = ( IRQ_count & 0xFF00 ) | data;
+		break;
+	case 0x0201:
+		IRQ_enable = 1;
+		IRQ_count = ( data << 8 ) | ( IRQ_count & 0xFF );
+		break;
+	case 0x0300:
+		prg8_89( data );
+		break;
+	case 0x0301:
+		prg8_ab( data );
+		break;
+	case 0x0302:
+		prg8_cd( data );
+		break;
+	case 0x0310:
+	case 0x0311:
+	case 0x0312:
+	case 0x0313:
+	case 0x0314:
+	case 0x0315:
+	case 0x0316:
+	case 0x0317:
+		mapper83_data[ offset - 0x0310 ] = data;
+		mapper83_set_chr();
+		break;
+	case 0x0318:
+		mapper83_data[9] = data;
+		mapper83_set_prg();
+		break;
+	}
+}
+
 static WRITE8_HANDLER( konami_vrc7_w )
 {
 //	logerror("konami_vrc7_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
@@ -5081,6 +5173,11 @@ int mapper_reset (int mapperNum)
 			prg16_89ab (0);
 			prg16_cdef (nes.prg_chunks-1);
 			break;
+		case 83:
+			mapper83_data[9] = 0x0F;
+			prg8_cd( 0x1E );
+			prg8_ef( 0x1F );
+			break;
 		case 89:
 			prg16_89ab(0);
 			prg16_cdef(nes.prg_chunks-1);
@@ -5253,7 +5350,7 @@ static const mmc mmc_list[] =
 	{ 79, "Nina-3 (AVE)",			mapper79_l_w, NULL, mapper79_w, mapper79_w, NULL, NULL, NULL },
 	{ 80, "Taito X1-005",			NULL, NULL, mapper80_m_w, NULL, NULL, NULL, NULL },
 	{ 82, "Taito C075",				NULL, NULL, mapper82_m_w, NULL, NULL, NULL, NULL },
-// 83
+	{ 83, "Cony",					mapper83_l_w, mapper83_l_r, NULL, mapper83_w, NULL, NULL, NULL },
 	{ 84, "Pasofami",				NULL, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 85, "Konami VRC 7",			NULL, NULL, NULL, konami_vrc7_w, NULL, NULL, konami_irq },
 	{ 86, "Jaleco Early Mapper 2",	NULL, NULL, NULL, mapper86_w, NULL, NULL, NULL },
