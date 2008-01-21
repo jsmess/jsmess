@@ -459,7 +459,8 @@ static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* BIOS or ROM */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)					/* 16k switched ROM bank */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
@@ -477,7 +478,8 @@ static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)					/* 16k switched ROM bank */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
@@ -495,7 +497,8 @@ static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
 	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)					/* 16k switched ROM bank */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w )		/* 8k switched VRAM bank */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (on cartridge) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM						/* 4k fixed RAM bank */
