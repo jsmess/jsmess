@@ -1,6 +1,6 @@
 /*********************************************************************
 
-	inputx.h
+	inputx.c
 
 	Secondary input related functions for MESS specific functionality
 
@@ -54,6 +54,7 @@ static const char_info charinfo[] =
 	{ 0x000c,					"Clear",		NULL },		/* Clear */
 	{ 0x000d,					"Enter",		NULL },		/* Enter */
 	{ 0x001a,					"Esc",			NULL },		/* Esc */
+	{ 0x0020,					"Space",		" " },		/* Space */
 	{ 0x0061,					NULL,			"A" },		/* a */
 	{ 0x0062,					NULL,			"B" },		/* b */
 	{ 0x0063,					NULL,			"C" },		/* c */
@@ -295,12 +296,29 @@ static const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(F14),		"F14",			NULL },		/* F14 function key */
 	{ UCHAR_MAMEKEY(F15),		"F15",			NULL },		/* F15 function key */
 	{ UCHAR_MAMEKEY(ESC),		"Esc",			"\033" },	/* esc key */
+	{ UCHAR_MAMEKEY(INSERT),	"Insert",		NULL },		/* insert key */
 	{ UCHAR_MAMEKEY(DEL),		"Delete",		"\010" },	/* delete key */
 	{ UCHAR_MAMEKEY(HOME),		"Home",			"\014" },	/* home key */
+	{ UCHAR_MAMEKEY(LEFT),		"Cursor Left",	NULL },		/* cursor left */
+	{ UCHAR_MAMEKEY(RIGHT),		"Cursor Right",	NULL },		/* cursor right */
+	{ UCHAR_MAMEKEY(UP),		"Cursor Up",	NULL },		/* cursor up */
+	{ UCHAR_MAMEKEY(DOWN),		"Cursor Down",	NULL },		/* cursor down */
+	{ UCHAR_MAMEKEY(0_PAD),		"Keypad 0",		NULL },		/* 0 on the numeric keypad */
+	{ UCHAR_MAMEKEY(1_PAD),		"Keypad 1",		NULL },		/* 1 on the numeric keypad */
+	{ UCHAR_MAMEKEY(2_PAD),		"Keypad 2",		NULL },		/* 2 on the numeric keypad */
+	{ UCHAR_MAMEKEY(3_PAD),		"Keypad 3",		NULL },		/* 3 on the numeric keypad */
+	{ UCHAR_MAMEKEY(4_PAD),		"Keypad 4",		NULL },		/* 4 on the numeric keypad */
+	{ UCHAR_MAMEKEY(5_PAD),		"Keypad 5",		NULL },		/* 5 on the numeric keypad */
+	{ UCHAR_MAMEKEY(6_PAD),		"Keypad 6",		NULL },		/* 6 on the numeric keypad */
+	{ UCHAR_MAMEKEY(7_PAD),		"Keypad 7",		NULL },		/* 7 on the numeric keypad */
+	{ UCHAR_MAMEKEY(8_PAD),		"Keypad 8",		NULL },		/* 8 on the numeric keypad */
+	{ UCHAR_MAMEKEY(9_PAD),		"Keypad 9",		NULL },		/* 9 on the numeric keypad */
+	{ UCHAR_MAMEKEY(DEL_PAD),	"Keypad .",		NULL },		/* . on the numeric keypad */
 	{ UCHAR_MAMEKEY(LSHIFT),	"Left Shift",	NULL },		/* left shift key */
 	{ UCHAR_MAMEKEY(RSHIFT),	"Right Shift",	NULL },		/* right shift key */
 	{ UCHAR_MAMEKEY(LCONTROL),	"Left Ctrl",	NULL },		/* left control key */
-	{ UCHAR_MAMEKEY(RCONTROL),	"Right Ctrl",	NULL }		/* right control key */
+	{ UCHAR_MAMEKEY(RCONTROL),	"Right Ctrl",	NULL },		/* right control key */
+	{ UCHAR_MAMEKEY(CANCEL),	"Break",		NULL }		/* Break/Pause key */
 };
 
 #define INVALID_CHAR '?'
