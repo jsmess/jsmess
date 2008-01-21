@@ -64,6 +64,7 @@ static UINT8	gb_tile_no_mod;
 static UINT8	*gbc_chrgen;	/* Character generator           */
 static UINT8	*gbc_bgdtab;	/* Background character table    */
 static UINT8	*gbc_wndtab;	/* Window character table        */
+static int		gb_do_not_check_time;
 
 struct layer_struct {
 	UINT8  enabled;
@@ -1145,6 +1146,7 @@ void gb_video_init( int mode ) {
 	int	i;
 	int vram_size = 0x2000;
 
+	gb_do_not_check_time = 0;
 	switch( mode ) {
 	case GB_VIDEO_CGB:	vram_size = 0x4000; break;
 	}
@@ -1283,6 +1285,7 @@ void gb_video_init( int mode ) {
 static void gbc_hdma(UINT16 length) {
 	UINT16 src, dst;
 
+	gb_do_not_check_time = 1;
 	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
 	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);
 	dst |= 0x8000;
@@ -1299,6 +1302,7 @@ static void gbc_hdma(UINT16 length) {
 		HDMA5 = 0xff;
 		gbc_hdma_enabled = 0;
 	}
+	gb_do_not_check_time = 0;
 }
 
 static void gb_increment_scanline( void ) {
@@ -1807,6 +1811,9 @@ static void gb_lcd_switch_on( void ) {
 
 /* Make sure the video information is up to date */
 void gb_video_up_to_date( void ) {
+	if ( gb_do_not_check_time ) {
+		return;
+	}
 	timer_set_global_time(timer_get_time());
 }
 
