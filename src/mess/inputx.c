@@ -280,6 +280,8 @@ static const char_info charinfo[] =
 	{ 0xffec,					NULL,			"\xE2\x86\x93" },	/* fullwidth down arrow */
 	{ 0xffed,					NULL,			"\xE2\x96\xAA" },	/* fullwidth solid box */
 	{ 0xffee,					NULL,			"\xE2\x97\xA6" },	/* fullwidth open circle */
+	{ UCHAR_SHIFT_1,			"Shift",		NULL },		/* Shift key */
+	{ UCHAR_SHIFT_2,			"Ctrl",			NULL },		/* Ctrl key */
 	{ UCHAR_MAMEKEY(F1),		"F1",			NULL },		/* F1 function key */
 	{ UCHAR_MAMEKEY(F2),		"F2",			NULL },		/* F2 function key */
 	{ UCHAR_MAMEKEY(F3),		"F3",			NULL },		/* F3 function key */

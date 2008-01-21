@@ -371,7 +371,7 @@ DRVLIBS = \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
 	$(MESSOBJ)/motorola.a \
-	$(MESSOBJ)/mtx.a \
+	$(MESSOBJ)/memotech.a \
 	$(MESSOBJ)/multitch.a \
 	$(MESSOBJ)/nascom1.a \
 	$(MESSOBJ)/nec.a \
@@ -894,8 +894,9 @@ $(MESSOBJ)/cpschngr.a: \
 	$(MESS_DRIVERS)/cpschngr.o \
 	$(MAME_VIDEO)/cps1.o
 
-$(MESSOBJ)/mtx.a:	   \
-	$(MESS_DRIVERS)/mtx.o
+$(MESSOBJ)/memotech.a:	   \
+	$(MESS_DRIVERS)/mtx.o \
+	$(MESS_MACHINE)/mtx.o
 
 $(MESSOBJ)/acorn.a:    \
 	$(MESS_DRIVERS)/acrnsys1.o \

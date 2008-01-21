@@ -4,6 +4,8 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Amstrad GX4000 [Barry Rodewald]
 - Aleste 520EX [Barry Rodewald]
+- Memotech MTX 500  [Dirk Best]
+- Memotech RS 128  [Dirk Best]
 
 
 System Driver Changes:
@@ -14,6 +16,9 @@ System Driver Changes:
 
 - [GBPOCKET] Fixed video startup state to match that of a real unit.  [Wilbert
   Pol]
+
+- [MTX] Rewrote keyboard emulation, added natural keyboard support and started
+  to cleanup the driver.  [Dirk Best]
 
 - [NASCOM] Improved keyboard layout, added natural keyboard support (not
   working 100%), changed RAM size configuration to use the standard method

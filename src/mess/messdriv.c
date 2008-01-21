@@ -697,7 +697,9 @@ TESTDRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
 	DRIVER( pdp1 )		/* 1961 DEC PDP1									*/
 
 	/* MEMOTECH */
-	DRIVER( mtx512 )	/* 1983 Memotech MTX512								*/
+	DRIVER( mtx512 )	/* 1983 Memotech MTX 512							*/
+	DRIVER( mtx500 )    /* 1983 Memotech MTX 500                            */
+	DRIVER( rs128 )     /* 1984 Memotech RS 128                             */
 
 	/* MATTEL */
 	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/
