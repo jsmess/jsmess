@@ -565,7 +565,7 @@ int option_resolution_contains(const char *specification, int option_char)
 
 const char *option_resolution_error_string(optreserr_t err)
 {
-	static const char *errors[] =
+	static const char *const errors[] =
 	{
 		"The operation completed successfully",		/* OPTIONRESOLUTION_ERROR_SUCCESS */
 		"Out of memory",							/* OPTIONRESOLUTION_ERROR_OUTOFMEMORY */

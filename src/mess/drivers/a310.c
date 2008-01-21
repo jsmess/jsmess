@@ -61,7 +61,7 @@
 #define A310_FIQ_PODULE        (0x40)
 #define A310_FIQ_FORCE         (0x80)
 
-static int page_sizes[4] = { 4096, 8192, 16384, 32768 };
+static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 
 static UINT32 *a310_physmem;
 static UINT32 a310_pagesize;
@@ -549,7 +549,7 @@ static WRITE32_HANDLER(vidc_w)
 {
 	UINT32 reg = data>>24;
 	UINT32 val = data & 0xffffff;
-	static const char *vrnames[] =
+	static const char *const vrnames[] =
 	{
 		"horizontal total",
 		"horizontal sync width",

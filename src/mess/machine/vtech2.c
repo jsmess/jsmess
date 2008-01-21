@@ -62,7 +62,7 @@ static  READ8_HANDLER ( mra_bank3) { return mra_bank(2,offset); }
 static  READ8_HANDLER ( mra_bank4) { return mra_bank(3,offset); }
 
 /* read banked memory (handle memory mapped i/o) */
-static read8_handler mra_bank_soft[4] =
+static const read8_handler mra_bank_soft[4] =
 {
     mra_bank1,  /* mapped in 0000-3fff */
     mra_bank2,  /* mapped in 4000-7fff */
@@ -71,7 +71,7 @@ static read8_handler mra_bank_soft[4] =
 };
 
 /* write banked memory (handle memory mapped i/o and videoram) */
-static write8_handler mwa_bank_soft[4] =
+static const write8_handler mwa_bank_soft[4] =
 {
     mwa_bank1,  /* mapped in 0000-3fff */
     mwa_bank2,  /* mapped in 4000-7fff */
@@ -80,7 +80,7 @@ static write8_handler mwa_bank_soft[4] =
 };
 
 /* read banked memory (plain ROM/RAM) */
-static read8_handler mra_bank_hard[4] =
+static const read8_handler mra_bank_hard[4] =
 {
     MRA8_BANK1,  /* mapped in 0000-3fff */
     MRA8_BANK2,  /* mapped in 4000-7fff */
@@ -89,7 +89,7 @@ static read8_handler mra_bank_hard[4] =
 };
 
 /* write banked memory (plain ROM/RAM) */
-static write8_handler mwa_bank_hard[4] =
+static const write8_handler mwa_bank_hard[4] =
 {
     MWA8_BANK1,  /* mapped in 0000-3fff */
     MWA8_BANK2,  /* mapped in 4000-7fff */
@@ -148,7 +148,7 @@ MACHINE_RESET( laser700 )
 
 WRITE8_HANDLER( laser_bank_select_w )
 {
-    static const char *bank_name[16] = {
+    static const char *const bank_name[16] = {
         "ROM lo","ROM hi","MM I/O","Video RAM lo",
         "RAM #0","RAM #1","RAM #2","RAM #3",
         "RAM #4","RAM #5","RAM #6","RAM #7/Video RAM hi",

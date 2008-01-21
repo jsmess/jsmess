@@ -374,7 +374,7 @@ static UINT8 c64_cia1_port_a_r (void)
 
 static void c64_cia1_port_a_w (UINT8 data)
 {
-	static int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
+	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
 	cbm_serial_clock_write (serial_clock = !(data & 0x10));
 	cbm_serial_data_write (serial_data = !(data & 0x20));

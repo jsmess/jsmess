@@ -247,7 +247,7 @@ void c128_bankswitch_64 (int reset)
 }
 
 static UINT8 c128_mmu[0x0b];
-static int c128_mmu_helper[4] =
+static const int c128_mmu_helper[4] =
 {0x400, 0x1000, 0x2000, 0x4000};
 static int mmu_cpu=0;
 static int mmu_page0, mmu_page1;

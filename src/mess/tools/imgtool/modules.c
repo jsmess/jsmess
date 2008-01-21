@@ -18,7 +18,7 @@
 
 /* step 2: define the modules[] array */
 #define MODULE(name)	name##_get_info,
-static void (*modules[])(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info) =
+static void (*const modules[])(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info) =
 {
 #include "modules.c"
 };
@@ -32,7 +32,7 @@ imgtoolerr_t imgtool_create_cannonical_library(int omit_untested, imgtool_librar
 	imgtool_module *module;
 
 	/* list of modules that we drop */
-	static const char *irrelevant_modules[] =
+	static const char *const irrelevant_modules[] =
 	{
 		"coco_os9_rsdos"
 	};

@@ -62,7 +62,7 @@ static int genesis_sram_len = 0;
 static int genesis_sram_active;
 static int genesis_sram_readonly;
 
-READ16_HANDLER( genesis_sram_read )
+static READ16_HANDLER( genesis_sram_read )
 {
         UINT16 retval = 0;
 
@@ -78,7 +78,7 @@ READ16_HANDLER( genesis_sram_read )
 }
 
 
-WRITE16_HANDLER( genesis_sram_write )
+static WRITE16_HANDLER( genesis_sram_write )
 {
         offset <<= 1;
 
@@ -90,7 +90,7 @@ WRITE16_HANDLER( genesis_sram_write )
 }
 
 
-WRITE16_HANDLER( genesis_sram_toggle )
+static WRITE16_HANDLER( genesis_sram_toggle )
 {
         /* unsure if this is actually supposed to toggle or just switch on?
           * Yet to encounter game that utilizes

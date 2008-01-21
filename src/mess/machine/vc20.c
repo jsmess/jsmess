@@ -608,7 +608,7 @@ MACHINE_RESET( vc20 )
 
 static int vc20_rom_id(mess_image *image)
 {
-	unsigned char magic[] =
+	static const unsigned char magic[] =
 	{0x41, 0x30, 0x20, 0xc3, 0xc2, 0xcd};	/* A0 CBM at 0xa004 (module offset 4) */
 	unsigned char buffer[sizeof (magic)];
 	const char *cp;

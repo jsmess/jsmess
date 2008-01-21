@@ -1170,8 +1170,8 @@ static void bbc_via_system_irq(int level)
 }
 
 
-static const struct via6522_interface
-bbcb_system_via= {
+static const struct via6522_interface bbcb_system_via =
+{
   bbcb_via_system_read_porta,
   bbcb_via_system_read_portb,
   bbcb_via_system_read_ca1,
@@ -1307,8 +1307,8 @@ static void BBC_uPD7002_EOC(int data)
 	via_0_cb1_w(0,data);
 }
 
-static const struct uPD7002_interface
-BBC_uPD7002= {
+static const struct uPD7002_interface BBC_uPD7002 =
+{
 	BBC_get_analogue_input,
 	BBC_uPD7002_EOC
 };
@@ -1362,8 +1362,8 @@ static void Serial_interrupt(int level)
   //logerror("Set SIO irq  %01x\n",level);
 }
 
-static const struct MC6850_interface
-BBC_MC6850_calls= {
+static const struct MC6850_interface BBC_MC6850_calls =
+{
 	0,// Transmit data ouput
 	0,// Request to Send output
 	Serial_interrupt,// Interupt Request output

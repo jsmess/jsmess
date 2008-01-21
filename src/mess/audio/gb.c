@@ -90,7 +90,7 @@ static sound_stream *channel;
 static int rate;
 
 /* Represents wave duties of 12.5%, 25%, 50% and 75% */
-static float wave_duty_table[4] = { 8, 4, 2, 1.33 };
+static const float wave_duty_table[4] = { 8, 4, 2, 1.33 };
 static INT32 env_length_table[8];
 static INT32 swp_time_table[8];
 static UINT32 period_table[MAX_FREQUENCIES];

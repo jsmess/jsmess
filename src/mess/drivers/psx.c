@@ -507,7 +507,7 @@ static void psx_cdcmd_readtoc(void)
 	/* NYI */
 }
 
-static void (*psx_cdcmds[])(void) =
+static void (*const psx_cdcmds[])(void) =
 {
 	psx_cdcmd_sync,
 	psx_cdcmd_nop,

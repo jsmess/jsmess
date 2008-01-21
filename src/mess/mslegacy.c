@@ -11,7 +11,7 @@
 #include "mslegacy.h"
 
 
-static const char *mess_default_text[] =
+static const char *const mess_default_text[] =
 {
 	"OK",
 	"Off",

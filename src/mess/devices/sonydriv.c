@@ -226,7 +226,7 @@ static int sony_rpm(floppy *f, mess_image *cur_image)
 	else
 	{	/* 800k unit : rotation speed controlled by drive */
 #if 1	/* Mac Plus */
-		static int speeds[] =
+		static const int speeds[] =
 		{
 			500,	/* 00-15:	timing value 117B (acceptable range {1135-11E9} */
 			550,	/* 16-31:	timing value ???? (acceptable range {12C6-138A} */
@@ -236,7 +236,7 @@ static int sony_rpm(floppy *f, mess_image *cur_image)
 		};
 #else	/* Lisa 2 */
 		/* 237 + 1.3*(256-reg) */
-		static int speeds[] =
+		static const int speeds[] =
 		{
 			293,	/* 00-15:	timing value ???? (acceptable range {0330-0336} */
 			322,	/* 16-31:	timing value ???? (acceptable range {02ED-02F3} */

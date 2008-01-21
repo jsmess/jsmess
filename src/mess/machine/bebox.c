@@ -267,7 +267,7 @@ static void bebox_update_interrupts(void)
 
 static void bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 {
-	static const char *interrupt_names[32] =
+	static const char *const interrupt_names[32] =
 	{
 		NULL,
 		NULL,

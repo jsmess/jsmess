@@ -487,7 +487,7 @@ DRIVER_INIT( pet1 )
 static void pet_display_enable_changed(int display_enabled) {
 }
 
-const static crtc6845_interface crtc_pet40 = {
+static const crtc6845_interface crtc_pet40 = {
 	0,
 	800000 /*?*/,
 	8 /*?*/,
@@ -497,7 +497,7 @@ const static crtc6845_interface crtc_pet40 = {
 	pet_display_enable_changed
 };
 
-const static crtc6845_interface crtc_pet80 = {
+static const crtc6845_interface crtc_pet80 = {
 	0,
 	800000 /*?*/,
 	16 /*?*/,

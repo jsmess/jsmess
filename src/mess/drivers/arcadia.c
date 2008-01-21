@@ -475,7 +475,7 @@ static DRIVER_INIT( arcadia )
 	    UINT8 *rom=memory_region(REGION_CPU1);
 	    /* this is a simple routine to display all rom characters
            on the display for a snapshot */
-	    UINT8 prog[]={ // address 0 of course
+	    static const UINT8 prog[]={ // address 0 of course
 		0x20, // eorz, 0
 		0x1b, 0x01, // bctr,a $0004
 		0x17, // retc a

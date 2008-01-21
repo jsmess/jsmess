@@ -32,7 +32,7 @@ static INPUT_PORTS_START( pokemini )
 INPUT_PORTS_END
 
 static PALETTE_INIT( pokemini ) {
-	const unsigned char pokemini_pal[4][3] = {
+	static const unsigned char pokemini_pal[4][3] = {
 		{ 0xFF, 0xFB, 0x87 },
 		{ 0xB1, 0xAE, 0x4E },
 		{ 0x84, 0x80, 0x4E },

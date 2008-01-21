@@ -26,7 +26,7 @@ static const UINT8 channelf_palette[] = {
 #define LTGREEN 6
 #define LTBLUE	7
 
-static UINT16 colormap[] = {
+static const UINT16 colormap[] = {
 	BLACK,   WHITE, WHITE, WHITE,
 	LTBLUE,  BLUE,  RED,   GREEN,
 	LTGRAY,  BLUE,  RED,   GREEN,

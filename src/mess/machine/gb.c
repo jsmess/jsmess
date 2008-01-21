@@ -1447,7 +1447,7 @@ DEVICE_LOAD(gb_cart)
 	int Checksum, I, J, filesize;
 	UINT16 reported_rom_banks;
 	UINT8	*gb_header;
-	int rambanks[8] = {0, 1, 1, 4, 16, 8, 0, 0};
+	static const int rambanks[8] = {0, 1, 1, 4, 16, 8, 0, 0};
 
 	filesize = image_length(image);
 
@@ -1633,7 +1633,7 @@ DEVICE_LOAD(gb_cart)
 	{
 		const char *P;
 		char S[50];
-		int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
+		static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
 
 
 		strncpy (S, (char *)&gb_header[0x0134], 16);
@@ -1878,7 +1878,7 @@ WRITE8_HANDLER ( megaduck_video_w )
 
 /* Map megaduck audio offset to gameboy audio offsets */
 
-static UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
 WRITE8_HANDLER( megaduck_sound_w1 )
 {

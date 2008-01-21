@@ -136,7 +136,7 @@ CASSETTE_FORMATLIST_END
 #define VT2_BITSAMPLES	18
 #define VT2_BYTESAMPLES 8*VT2_BITSAMPLES
 
-static INT16 vtech2_bit0[VT2_BITSAMPLES] =
+static const INT16 vtech2_bit0[VT2_BITSAMPLES] =
 {
 	/* short cycle, long cycles */
 	VT2_HI,VT2_HI,VT2_HI,VT2_LO,VT2_LO,VT2_LO,
@@ -144,7 +144,7 @@ static INT16 vtech2_bit0[VT2_BITSAMPLES] =
 	VT2_LO,VT2_LO,VT2_LO,VT2_LO,VT2_LO,VT2_LO
 };
 
-static INT16 vtech2_bit1[VT2_BITSAMPLES] =
+static const INT16 vtech2_bit1[VT2_BITSAMPLES] =
 {
 	/* three short cycle */
 	VT2_HI,VT2_HI,VT2_HI,VT2_LO,VT2_LO,VT2_LO,

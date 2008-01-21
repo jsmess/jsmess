@@ -1176,7 +1176,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 
-static chardev_interface to7_midi_interface =
+static const chardev_interface to7_midi_interface =
 {
 	to7_midi_byte_received_cb,
 	to7_midi_ready_to_send_cb,

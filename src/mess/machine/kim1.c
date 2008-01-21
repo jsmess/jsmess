@@ -36,7 +36,7 @@ DRIVER_INIT( kim1 )
 	UINT8 *dst;
 	int x, y, i;
 
-	static const char *seg7 =
+	static const char seg7[] =
 	"....aaaaaaaaaaaaa." \
 	"...f.aaaaaaaaaaa.b" \
 	"...ff.aaaaaaaaa.bb" \

@@ -9,7 +9,7 @@
 #include <assert.h>
 #include "imgterrs.h"
 
-static const char *msgs[] =
+static const char *const msgs[] =
 {
 	"Out of memory",
 	"Unexpected error",

@@ -103,7 +103,7 @@ static const struct reg_mask mscrtc6845_reg_mask[2][18] =
 
 /* The PC1512 has not got a full MC6845; the first 9 registers act as if they
  * had these hardwired values: */
-static UINT8 pc1512_defaults[] =
+static const UINT8 pc1512_defaults[] =
 {
 	113, 80, 90, 10, 127, 6, 100, 112, 2
 };

@@ -125,7 +125,7 @@ int pc1350_keyboard_line_r(void)
    701e .. 703b, 721e..723b, 741e ..743b, 761e ..763b, 781e .. 783b
    705e .. 707b, 725e..727b, 745e ..747b, 765e ..767b, 785e .. 787b
    783c: 0 SHIFT 1 DEF 4 RUN 5 PRO 6 JAPAN 7 SML */
-static int pc1350_addr[4]={ 0, 0x40, 0x1e, 0x5e };
+static const int pc1350_addr[4]={ 0, 0x40, 0x1e, 0x5e };
 
 #define DOWN 45
 #define RIGHT 76

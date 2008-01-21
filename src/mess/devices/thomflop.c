@@ -779,7 +779,7 @@ static WRITE8_HANDLER( to7_qdd_w )
 			/* most of these are unused now */
 			static const int bit[8] = { 6, 6, 7, 8, 7, 7, 8, 8 };
 			static const int par[8] = { 2, 1, 0, 0, 2, 1, 2, 1 };
-			static const char* parname[3] = { "none", "odd", "even" };
+			static const char *const parname[3] = { "none", "odd", "even" };
 			int bits, parity;
 			bits   = bit[ (data >> 3) & 7 ];
 			parity = par[ (data >> 3) & 7 ];
@@ -1227,7 +1227,7 @@ static void thmfc_floppy_format_byte ( UINT8 data )
 	/* accumulate bytes to form an id field */
 	if ( thmfc1->data_idx || data==0xA1 )
 	{
-		UINT8 header[] = { 0xa1, 0xa1, 0xa1, 0xfe };
+		static const UINT8 header[] = { 0xa1, 0xa1, 0xa1, 0xfe };
 		thmfc1->data[ thmfc1->data_idx ] = data;
 		thmfc1->data_idx++;
 		if ( thmfc1->data_idx > 11 )

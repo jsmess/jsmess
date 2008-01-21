@@ -104,8 +104,8 @@ static void m6845_recalc_cycles_to_vsync_end(void);
 #endif
 
 // local copy of the 6845 external procedure calls
-static struct m6845_interface
-crct6845_calls= {
+static struct m6845_interface crct6845_calls =
+{
 	0,// Memory Address register
 	0,// Row Address register
 	0,// Horizontal status

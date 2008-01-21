@@ -73,7 +73,9 @@ VIDEO_START( hp48 )
 	video_start_generic(machine);
 }
 
-static void hp48_draw_special(mame_bitmap *bitmap,int x, int y, const char *figure, int color)
+typedef const char *HP48_FIGURE;
+
+static void hp48_draw_special(mame_bitmap *bitmap,int x, int y, const HP48_FIGURE figure, int color)
 {
 	int j, xi=0;
 	for (j=0; figure[j]; j++) {
@@ -96,7 +98,8 @@ static void hp48_draw_special(mame_bitmap *bitmap,int x, int y, const char *figu
 
 #define LCD_LINES (hp48_hardware.data[0x28]|((hp48_hardware.data[0x29]&3)<<4)
 
-static const char *hp48_orange={
+
+static const HP48_FIGURE hp48_orange={
 	"11111111111\r"
 	"111 1111111\r"
 	"11  1111111\r"
@@ -104,7 +107,7 @@ static const char *hp48_orange={
 	"11  11111 1\r"
 	"111 11111 1\r"
 	"111111111 1"
-}, *hp48_blue= {
+}, hp48_blue= {
 	"11111111111\r"
 	"1111111 111\r"
 	"1111111  11\r"
@@ -112,7 +115,7 @@ static const char *hp48_orange={
 	"1 11111  11\r"
 	"1 11111 111\r"
 	"1 111111111"
-}, *hp48_alpha= {
+}, hp48_alpha= {
 	"          1\r"
 	"   11111 1\r"
 	"  1     1\r"
@@ -120,7 +123,7 @@ static const char *hp48_orange={
 	" 1      1\r"
 	" 1     11\r"
 	"  11111  1"
-}, *hp48_alarm= {
+}, hp48_alarm= {
 	"  1       1\r"
 	" 1  1   1  1\r"
 	"1  1  1  1  1\r"
@@ -128,7 +131,7 @@ static const char *hp48_orange={
 	"1  1  1  1  1\r"
 	" 1  1   1  1\r"
 	"  1       1"
-}, *hp48_busy= {
+}, hp48_busy= {
 	"11111111\r"
 	" 1    1\r"
 	"  1  1\r"
@@ -136,7 +139,7 @@ static const char *hp48_orange={
 	"  1  1\r"
 	" 1    1\r"
 	"11111111"
-}, *hp48_transmit={
+}, hp48_transmit={
 	" 11\r"
 	"1  1   1\r"
 	"    1   1\r"

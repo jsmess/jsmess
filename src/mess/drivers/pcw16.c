@@ -259,7 +259,7 @@ static  READ8_HANDLER(pcw16_flash1_bank_handler3_r)
 	return pcw16_flash1_bank_handler_r(3, offset);
 }
 
-static read8_handler pcw16_flash0_bank_handlers_r[4] =
+static const read8_handler pcw16_flash0_bank_handlers_r[4] =
 {
 	pcw16_flash0_bank_handler0_r,
 	pcw16_flash0_bank_handler1_r,
@@ -267,7 +267,7 @@ static read8_handler pcw16_flash0_bank_handlers_r[4] =
 	pcw16_flash0_bank_handler3_r,
 };
 
-static read8_handler pcw16_flash1_bank_handlers_r[4] =
+static const read8_handler pcw16_flash1_bank_handlers_r[4] =
 {
 	pcw16_flash1_bank_handler0_r,
 	pcw16_flash1_bank_handler1_r,
@@ -336,7 +336,7 @@ static WRITE8_HANDLER(pcw16_flash1_bank_handler3_w)
 	pcw16_flash1_bank_handler_w(3, offset, data);
 }
 
-static write8_handler pcw16_flash0_bank_handlers_w[4] =
+static const write8_handler pcw16_flash0_bank_handlers_w[4] =
 {
 	pcw16_flash0_bank_handler0_w,
 	pcw16_flash0_bank_handler1_w,
@@ -344,7 +344,7 @@ static write8_handler pcw16_flash0_bank_handlers_w[4] =
 	pcw16_flash0_bank_handler3_w,
 };
 
-static write8_handler pcw16_flash1_bank_handlers_w[4] =
+static const write8_handler pcw16_flash1_bank_handlers_w[4] =
 {
 	pcw16_flash1_bank_handler0_w,
 	pcw16_flash1_bank_handler1_w,
@@ -809,7 +809,7 @@ static unsigned char rtc_years;
 static unsigned char rtc_control;
 static unsigned char rtc_256ths_seconds;
 
-static int rtc_days_in_each_month[]=
+static const int rtc_days_in_each_month[]=
 {
 	31,/* jan */
 	28, /* feb */
@@ -825,7 +825,7 @@ static int rtc_days_in_each_month[]=
 	31	/* december */
 };
 
-static int rtc_days_in_february[] =
+static const int rtc_days_in_february[] =
 {
 	29, 28, 28, 28
 };

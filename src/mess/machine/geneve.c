@@ -264,7 +264,7 @@ MACHINE_RESET( geneve )
 
 	if (has_speech)
 	{
-		spchroms_interface speech_intf = { region_speech_rom };
+		static const spchroms_interface speech_intf = { region_speech_rom };
 
 		spchroms_config(& speech_intf);
 	}

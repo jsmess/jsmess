@@ -20,7 +20,7 @@ DRIVER_INIT( mekd2 )
 	UINT8 *dst;
 	int x, y, i;
 
-	static const char *seg7 =
+	static const char seg7[] =
 		"....aaaaaaaaaaaaa." \
 		"...f.aaaaaaaaaaa.b" \
 		"...ff.aaaaaaaaa.bb" \
@@ -47,7 +47,7 @@ DRIVER_INIT( mekd2 )
 		"..................";
 
 
-	static const char *keys[24] =
+	static const char *const keys[24] =
 	{
 		"........................" \
 		"........................" \

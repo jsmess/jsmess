@@ -1172,7 +1172,7 @@ static void graphics_bw_256(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT v
 
 
 
-static void (*graphics_modes[8])(UINT32 *line, const m6847_pixel *video_data) =
+static void (*const graphics_modes[8])(UINT32 *line, const m6847_pixel *video_data) =
 {
 	graphics_color_64,	graphics_bw_128,
 	graphics_color_128,	graphics_bw_128,

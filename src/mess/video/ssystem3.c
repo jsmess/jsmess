@@ -112,7 +112,7 @@ static const struct {
 	{125,123},
 };
 
-static const char* single_led=
+static const char single_led[]=
 "          c                                                                                                           1 1\r"
 "   bb   ccccc   bb                                                                                                    1 1\r"
 "   bb     c     bb                                                                                                    1 1\r"

@@ -455,7 +455,7 @@ static void kaypro_tab(void)
 
 static void kaypro_pixel(int x, int y, int set)
 {
-	static int attr_bits[4][2] = {
+	static const int attr_bits[4][2] = {
 		{	  0x002, 0x001},
 		{	  0x008, 0x004},
 		{	  0x020, 0x010},

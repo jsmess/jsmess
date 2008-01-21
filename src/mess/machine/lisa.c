@@ -349,7 +349,7 @@ INLINE void COPS_send_data_if_possible(void)
 }
 
 /* send data (queue it into the FIFO if needed) */
-static void COPS_queue_data(UINT8 *data, int len)
+static void COPS_queue_data(const UINT8 *data, int len)
 {
 #if 0
 	if (fifo_size + len <= 8)
@@ -709,7 +709,7 @@ static void reset_COPS(void)
 
 static void unplug_keyboard(void)
 {
-	UINT8 cmd[2] =
+	static const UINT8 cmd[2] =
 	{
 		0x80,	/* RESET code */
 		0xFD	/* keyboard unplugged */
@@ -737,7 +737,7 @@ static void plug_keyboard(void)
 			unknown : spanish, US dvorak, italian & swedish
 	*/
 
-	UINT8 cmd[2] =
+	static const UINT8 cmd[2] =
 	{
 		0x80,	/* RESET code */
 		0x3f	/* keyboard ID - US for now */
@@ -1177,7 +1177,7 @@ MACHINE_RESET( lisa )
 
 	/* initialize floppy */
 	{
-		struct applefdc_interface intf =
+		static struct applefdc_interface intf =
 		{
 			APPLEFDC_IWM,
 			sony_set_lines,
@@ -1223,7 +1223,7 @@ INTERRUPT_GEN( lisa_interrupt )
 					if (clock_regs.alarm == 0)
 					{
 						/* generate reset (should cause a VIA interrupt...) */
-						UINT8 cmd[2] =
+						static const UINT8 cmd[2] =
 						{
 							0x80,	/* RESET code */
 							0xFC	/* timer time-out */

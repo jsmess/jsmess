@@ -439,7 +439,7 @@ READ16_HANDLER( cybiko_key_r )
 	return data;
 }
 
-READ8_HANDLER( cybiko_io_reg_r )
+static READ8_HANDLER( cybiko_io_reg_r )
 {
 	UINT8 data = 0;
 	_logerror( 2, ("cybiko_io_reg_r (%08X)\n", offset));
@@ -473,7 +473,7 @@ READ8_HANDLER( cybiko_io_reg_r )
 	return data;
 }
 
-WRITE8_HANDLER( cybiko_io_reg_w )
+static WRITE8_HANDLER( cybiko_io_reg_w )
 {
 	_logerror( 2, ("cybiko_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)

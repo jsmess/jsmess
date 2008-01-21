@@ -1443,7 +1443,7 @@ static void ip225015_exit(running_machine *machine)
 
 static DRIVER_INIT( ip225015 )
 {
-	struct kbdc8042_interface at8042 =
+	static const struct kbdc8042_interface at8042 =
 	{
 		KBDC8042_STANDARD, NULL, NULL
 	};

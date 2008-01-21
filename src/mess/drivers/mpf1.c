@@ -141,7 +141,7 @@ static VIDEO_START( mpf1 )
 static VIDEO_UPDATE( mpf1 )
 {
 	int x;
-	static UINT8 xpositions[] = { 20, 59, 97, 135, 185, 223 };
+	static const UINT8 xpositions[] = { 20, 59, 97, 135, 185, 223 };
 
 	//fillbitmap(bitmap, get_black_pen(), NULL);
 

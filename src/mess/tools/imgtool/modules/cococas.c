@@ -11,7 +11,7 @@ static int cococas_initalt(imgtool_stream *instream, imgtool_stream **outstream,
 static int cococas_nextfile(imgtool_image *img, imgtool_dirent *ent);
 static int cococas_readfile(imgtool_image *img, imgtool_stream *destf);
 
-static UINT8 blockheader[] = { 0x55, 0x3C };
+static const UINT8 blockheader[] = { 0x55, 0x3C };
 
 WAVEMODULE(
 	cococas,

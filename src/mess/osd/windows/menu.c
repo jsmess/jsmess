@@ -644,7 +644,7 @@ static dialog_box *build_option_dialog(const struct IODevice *dev, char *filter,
 	char buf[256];
 	struct file_dialog_params *params;
 	struct storeval_optres_params *storeval_params;
-	const struct dialog_layout filedialog_layout = { 44, 220 };
+	static const struct dialog_layout filedialog_layout = { 44, 220 };
 
 	// make the filter
 	pos = 0;

@@ -264,7 +264,7 @@ static int device_load_snes_cart(mess_image *image)
 	UINT8 valid_mode20, valid_mode21;
 
 	/* Cart types */
-	static struct
+	static const struct
 	{
 		INT16 Code;
 		const char *Name;

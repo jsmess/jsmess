@@ -435,7 +435,7 @@ INPUT_PORTS_END
 ******************************************************************************/
 
 
-static UPD7810_CONFIG ex800_cpu_config =
+static const UPD7810_CONFIG ex800_cpu_config =
 {
     TYPE_7810,
     0

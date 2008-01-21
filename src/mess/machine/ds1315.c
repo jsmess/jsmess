@@ -20,7 +20,7 @@ static void ds1315_input_raw_data( void );
 static int ds1315_count;
 static int ds1315_mode;
 static int ds1315_raw_data[8*8];
-static int ds1315_pattern[] = {  1, 0, 1, 0, 0, 0, 1, 1,
+static const int ds1315_pattern[] = {  1, 0, 1, 0, 0, 0, 1, 1,
 							     0, 1, 0, 1, 1, 1, 0, 0,
 							     1, 1, 0, 0, 0, 1, 0, 1,
 							     0, 0, 1, 1, 1, 0, 1, 0,

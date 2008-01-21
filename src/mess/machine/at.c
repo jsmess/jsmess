@@ -63,7 +63,7 @@ static void at_keyboard_interrupt(int state)
 
 DRIVER_INIT( atcga )
 {
-	struct kbdc8042_interface at8042 =
+	static const struct kbdc8042_interface at8042 =
 	{
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt
 	};
@@ -74,7 +74,7 @@ DRIVER_INIT( atcga )
 
 DRIVER_INIT( at386 )
 {
-	struct kbdc8042_interface at8042 =
+	static const struct kbdc8042_interface at8042 =
 	{
 		KBDC8042_AT386, at_set_gate_a20, at_keyboard_interrupt
 	};
@@ -124,7 +124,7 @@ static const struct pc_vga_interface vga_interface =
 
 DRIVER_INIT( at_vga )
 {
-	struct kbdc8042_interface at8042 =
+	static const struct kbdc8042_interface at8042 =
 	{
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt
 	};
@@ -138,7 +138,7 @@ DRIVER_INIT( at_vga )
 
 DRIVER_INIT( ps2m30286 )
 {
-	struct kbdc8042_interface at8042 =
+	static const struct kbdc8042_interface at8042 =
 	{
 		KBDC8042_PS2, at_set_gate_a20, at_keyboard_interrupt
 	};

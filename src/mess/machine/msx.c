@@ -336,7 +336,7 @@ static void msx_init(void)
 	int i, n;
 
 	/* z80 stuff */
-	static int z80_cycle_table[] =
+	static const int z80_cycle_table[] =
 	{
 		Z80_TABLE_op, Z80_TABLE_cb, Z80_TABLE_xy,
         Z80_TABLE_ed, Z80_TABLE_xycb, Z80_TABLE_ex

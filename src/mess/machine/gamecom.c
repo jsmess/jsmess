@@ -56,8 +56,8 @@ static emu_timer *gamecom_clock_timer = NULL;
 static GAMECOM_DMA gamecom_dma;
 static GAMECOM_TIMER gamecom_timer[2];
 
-//int gamecom_timer_limit[8] = { 2/2, 1024/2, 2048/2, 4096/2, 8192/2, 16384/2, 32768/2, 65536/2 };
-static int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
+//static const int gamecom_timer_limit[8] = { 2/2, 1024/2, 2048/2, 4096/2, 8192/2, 16384/2, 32768/2, 65536/2 };
+static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
 static void gamecom_dma_init(void);
 

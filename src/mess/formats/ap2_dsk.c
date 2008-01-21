@@ -150,7 +150,7 @@ static FLOPPY_IDENTIFY(apple2_dsk_identify)
 
 static int apple2_do_translate_sector(floppy_image *floppy, int sector)
 {
-	static UINT8 skewing[] =
+	static const UINT8 skewing[] =
 	{
 		/* DOS order (*.do) */
 		0x00, 0x07, 0x0E, 0x06, 0x0D, 0x05, 0x0C, 0x04,
@@ -163,7 +163,7 @@ static int apple2_do_translate_sector(floppy_image *floppy, int sector)
 
 static int apple2_po_translate_sector(floppy_image *floppy, int sector)
 {
-	static UINT8 skewing[] =
+	static const UINT8 skewing[] =
 	{
 		/* ProDOS order (*.po) */
 		0x00, 0x08, 0x01, 0x09, 0x02, 0x0A, 0x03, 0x0B,

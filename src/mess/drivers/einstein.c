@@ -217,8 +217,7 @@ static int Einstein_scr_y = 0;
 //}
 
 
-//static struct m6845_interface
-//einstein_m6845_interface= {
+//static const struct m6845_interface einstein_m6845_interface = {
 //  0,// Memory Address register
 //  Einstein_Set_RA,// Row Address register
 //  Einstein_Set_HSync,// Horizontal status

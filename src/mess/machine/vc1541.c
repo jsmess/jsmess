@@ -175,7 +175,7 @@ typedef struct
 static CBM_Drive_Emu vc1541_static= { 0 }, *vc1541 = &vc1541_static;
 
 /* four different frequencies for the 4 different zones on the disk */
-static double vc1541_times[4]= {
+static const double vc1541_times[4]= {
 	13/16e6, 14/16e6, 15/16e6, 16/16e6
 };
 
@@ -204,14 +204,14 @@ static double vc1541_times[4]= {
  *
  * max 42 tracks, stepper resolution 84 tracks
  */
-static int bin_2_gcr[] =
+static const int bin_2_gcr[] =
 {
 	0xa, 0xb, 0x12, 0x13, 0xe, 0xf, 0x16, 0x17,
 	9, 0x19, 0x1a, 0x1b, 0xd, 0x1d, 0x1e, 0x15
 };
 
 #if 0
-static int gcr_2_bin[] = {
+static const int gcr_2_bin[] = {
 	-1, -1, -1, -1,
 	-1, -1, -1, -1,
 	-1, 8, 0, 1,

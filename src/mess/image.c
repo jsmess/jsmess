@@ -806,7 +806,7 @@ static void image_clear_error(mess_image *image)
 
 const char *image_error(mess_image *image)
 {
-	static const char *messages[] =
+	static const char *const messages[] =
 	{
 		NULL,
 		"Internal error",

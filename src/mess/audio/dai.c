@@ -19,12 +19,14 @@ static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t 
 
 static sound_stream *mixer_channel;
 
-static UINT16 dai_osc_volume_table[] = {   0,  500, 1000, 1500,
+static const UINT16 dai_osc_volume_table[] = {
+					   0,  500, 1000, 1500,
 					2000, 2500, 3000, 3500,
 					4000, 4500, 5000, 5500,
 					6000, 6500, 7000, 7500};
 
-static UINT16 dai_noise_volume_table[] = {   0,    0,    0,    0,
+static const UINT16 dai_noise_volume_table[] = {
+					     0,    0,    0,    0,
 					     0,    0,    0,    0,
 				           500, 1000, 1500, 2000,
 					  2500, 3000, 3500, 4000};

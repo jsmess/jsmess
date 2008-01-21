@@ -1298,7 +1298,7 @@ MACHINE_RESET(mac)
 
 	/* initialize floppy */
 	{
-		struct applefdc_interface intf =
+		static const struct applefdc_interface intf =
 		{
 			APPLEFDC_IWM,
 			sony_set_lines,
@@ -2346,7 +2346,7 @@ static void mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		{ 23, "ReturnDriveInfo" }
 	};
 
-	static const char *scsisels[] =
+	static const char *const scsisels[] =
 	{
 		"SCSIReset",	/* $00 */
 		"SCSIGet",		/* $01 */

@@ -1911,7 +1911,7 @@ static WRITE32_HANDLER(satram_w)
 
 static NVRAM_HANDLER(saturn)
 {
-	static UINT32 init[8] =
+	static const UINT32 init[8] =
 	{
 		0x420061, 0x63006b, 0x550070, 0x520061, 0x6d0020, 0x46006f, 0x72006d, 0x610074,
 	};

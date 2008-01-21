@@ -352,9 +352,9 @@ INLINE void vic6560_draw_pointer (mame_bitmap *bitmap,
 {
 	/* this is a a static graphical object */
 	/* should be easy to convert to gfx_element!? */
-	static UINT8 blackmask[] =
+	static const UINT8 blackmask[] =
 	{0x00, 0x70, 0x60, 0x50, 0x08, 0x04, 0x00, 0x00};
-	static UINT8 whitemask[] =
+	static const UINT8 whitemask[] =
 	{0xf0, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00};
 	int i, j, y, x;
 

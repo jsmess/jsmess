@@ -22,7 +22,7 @@
 #define MAX_HARDDISKS	8
 #define USE_CHD_OPEN	0
 
-static const char *error_strings[] =
+static const char *const error_strings[] =
 {
 	"no error",
 	"no drive interface",

@@ -395,7 +395,7 @@ static void	dmac_uninstall(offs_t base)
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, base, base + 0xFFFF, 0, 0, MWA16_UNMAP);
 }
 
-static amiga_autoconfig_device dmac_device =
+static const amiga_autoconfig_device dmac_device =
 {
 	0,				/* link into free memory list */
 	0,				/* ROM vector offset valid */

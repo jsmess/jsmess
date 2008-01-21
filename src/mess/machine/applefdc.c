@@ -278,7 +278,7 @@ static TIMER_CALLBACK(iwm_turnmotor_onoff)
 
 static void iwm_access(int offset)
 {
-	static const char *lines[] =
+	static const char *const lines[] =
 	{
 		"PH0",
 		"PH1",

@@ -52,7 +52,7 @@ typedef struct {
 
 #define D64_MAX_TRACKS 40
 
-static int d64_sectors_per_track[] =
+static const int d64_sectors_per_track[] =
 {
 	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
 	19, 19, 19, 19, 19, 19, 19,
@@ -139,7 +139,7 @@ static const D81_BAM d81_bam={
 
 #define D71_MAX_TRACKS 70
 
-int d71_sectors_per_track[] =
+static const int d71_sectors_per_track[] =
 {
 	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
 	19, 19, 19, 19, 19, 19, 19,
@@ -1201,7 +1201,7 @@ static int d71_image_create(const imgtool_module *mod, imgtool_stream *f, const 
 static int d81_image_create(const imgtool_module *mod, imgtool_stream *f, const ResolvedOption *options_)
 {
 	unsigned char sector[0x100]={0};
-	unsigned char id[2]={'1','2'};
+	static const unsigned char id[2]={'1','2'};
 	int t,s,i;
 
 	for (t=1; t<=80; t++) {

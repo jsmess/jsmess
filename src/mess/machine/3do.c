@@ -160,7 +160,7 @@ READ32_HANDLER( clio_r )
 		case 0x0a: return 0x40; break;
 		case 0x0d:
 		{
-			static UINT32 irq_sequence[3] = { 0, 4, 12 };
+			static const UINT32 irq_sequence[3] = { 0, 4, 12 };
 			static int counter = 0;
 
 			return irq_sequence[(counter++)%3];

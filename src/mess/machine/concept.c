@@ -679,7 +679,7 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 
 static  READ8_HANDLER(concept_fdc_rom_r)
 {
-	UINT8 data[8] = "CORVUS01";
+	static const UINT8 data[8] = "CORVUS01";
 	return (offset < 8) ? data[offset] : 0;
 }
 
@@ -743,6 +743,6 @@ static WRITE8_HANDLER(concept_hdc_reg_w)
  */
 static  READ8_HANDLER(concept_hdc_rom_r)
 {
-	UINT8 data[8] = { 0xa9, 0x20, 0xa9, 0x00, 0xa9, 0x03, 0xa9, 0x3c };			/* Same as Apple II */
+	static const UINT8 data[8] = { 0xa9, 0x20, 0xa9, 0x00, 0xa9, 0x03, 0xa9, 0x3c };			/* Same as Apple II */
 	return (offset < 8) ? data[offset] : 0;
 }

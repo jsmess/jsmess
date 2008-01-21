@@ -191,7 +191,7 @@ struct _wd17xx_info
 /* structure describing a double density track */
 #define TRKSIZE_DD		6144
 #if 0
-static UINT8 track_DD[][2] = {
+static const UINT8 track_DD[][2] = {
 	{16, 0x4e}, 	/* 16 * 4E (track lead in)				 */
 	{ 8, 0x00}, 	/*	8 * 00 (pre DAM)					 */
 	{ 3, 0xf5}, 	/*	3 * F5 (clear CRC)					 */
@@ -213,7 +213,7 @@ static UINT8 track_DD[][2] = {
 /* structure describing a single density track */
 #define TRKSIZE_SD		3172
 #if 0
-static UINT8 track_SD[][2] = {
+static const UINT8 track_SD[][2] = {
 	{16, 0xff}, 	/* 16 * FF (track lead in)				 */
 	{ 8, 0x00}, 	/*	8 * 00 (pre DAM)					 */
 	{ 1, 0xfc}, 	/*	1 * FC (clear CRC)					 */

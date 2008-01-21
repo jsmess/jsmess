@@ -1550,7 +1550,7 @@ static void set_listview_style(HWND window, DWORD style)
 static LRESULT wimgtool_create(HWND window, CREATESTRUCT *pcs)
 {
 	wimgtool_info *info;
-	static int status_widths[3] = { 200, 400, -1 };
+	static const int status_widths[3] = { 200, 400, -1 };
 
 	info = malloc(sizeof(*info));
 	if (!info)

@@ -61,7 +61,7 @@ static int DVENA;
 /* on rising edge, sets DVENA for 4.23 seconds on rising edge */
 static int motor_on;
 /* count 4.23s from rising edge of motor_on */
-void *motor_on_timer;
+static void *motor_on_timer;
 
 /*
 	call this when the state of DSKhold or DRQ/IRQ or DVENA change

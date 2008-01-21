@@ -103,7 +103,7 @@ MACHINE_RESET( pokemini ) {
 }
 
 WRITE8_HANDLER( pokemini_hwreg_w ) {
-	const int timer_to_cycles[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
+	static const int timer_to_cycles[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	logerror( "%0X: Write to hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
 	switch( offset ) {
 	case 0x00:	/* start-up contrast

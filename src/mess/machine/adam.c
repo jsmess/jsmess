@@ -523,7 +523,7 @@ If you have the source listing or the Rom dump, please send us.
 	int DCB_Num, deviceNum, statusDCB;
 	int i, buffer, byteCount, sectorNmbr, sectorCount, currentSector;
 	UINT8 kbcode;
-	static UINT8 interleave[8] = {0,5,2,7,4,1,6,3};
+	static const UINT8 interleave[8] = {0,5,2,7,4,1,6,3};
 	mess_image *image;
 
 	if (offset == adam_pcb)

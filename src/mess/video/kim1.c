@@ -71,7 +71,7 @@ VIDEO_UPDATE( kim1 )
 
         for (x = 0; x < 4; x++)
         {
-            static int layout[6][4] =
+            static const int layout[6][4] =
             {
                 {22, 19, 21, 23},
                 {16, 17, 20, 18},

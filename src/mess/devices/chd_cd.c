@@ -12,7 +12,7 @@
 
 #define MAX_CDROMS	(4)	// up to this many drives
 
-static const char *error_strings[] =
+static const char *const error_strings[] =
 {
 	"no error",
 	"no drive interface",
@@ -53,7 +53,7 @@ static OPTION_GUIDE_START(mess_cd_option_guide)
 	OPTION_INT('K', "hunksize",			"Hunk Bytes")
 OPTION_GUIDE_END
 
-static const char *mess_cd_option_spec =
+static const char mess_cd_option_spec[] =
 	"K512/1024/2048/[4096]";
 
 

@@ -22,7 +22,7 @@
 static UINT8 key_digit;
 
 
-READ8_HANDLER( ins8154_b1_port_a_r )
+static READ8_HANDLER( ins8154_b1_port_a_r )
 {
 	char port[11];
 	UINT8 data;
@@ -32,12 +32,12 @@ READ8_HANDLER( ins8154_b1_port_a_r )
 	return data;
 }
 
-WRITE8_HANDLER( ins8154_b1_port_a_w )
+static WRITE8_HANDLER( ins8154_b1_port_a_w )
 {
 	ttl74145_0_w(0, data & 0x07);
 }
 
-WRITE8_HANDLER( acrnsys1_led_segment_w )
+static WRITE8_HANDLER( acrnsys1_led_segment_w )
 {
 	logerror("led %d segment data: %02x\n", key_digit, data);
 	
@@ -76,13 +76,13 @@ static const ttl74145_interface ic8_7445 =
 	NULL,  /* not connected */
 };
 
-DRIVER_INIT( acrnsys1 )
+static DRIVER_INIT( acrnsys1 )
 {
 	ins8154_config(0, &ins8154_b1);
 	ttl74145_config(0, &ic8_7445);
 }
 
-MACHINE_RESET( acrnsys1 )
+static MACHINE_RESET( acrnsys1 )
 {
 	ins8154_reset(0);
 	ttl74145_reset(0);

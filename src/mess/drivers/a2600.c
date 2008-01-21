@@ -148,7 +148,7 @@ static unsigned long detect_2600controllers(void)
 
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
-	unsigned char signatures[][5] =  {
+	static const unsigned char signatures[][5] =  {
 									{ 0x55, 0xa5, 0x3c, 0x29, 0}, // star raiders
 									{ 0xf9, 0xff, 0xa5, 0x80, 1}, // sentinel
 									{ 0x81, 0x02, 0xe8, 0x86, 1}, // shooting arcade
@@ -209,7 +209,7 @@ static int detect_modeDC(void)
 {
 	int i,numfound = 0;
 	// signature is also in 'video reflex'.. maybe figure out that controller port someday...
-	unsigned char signature[3] = { 0x8d, 0xf0, 0xff };
+	static const unsigned char signature[3] = { 0x8d, 0xf0, 0xff };
 	if (cart_size == 0x10000)
 	{
 		for (i = 0; i < cart_size - sizeof signature; i++)
@@ -227,7 +227,7 @@ static int detect_modeDC(void)
 static int detect_modef6(void)
 {
 	int i,numfound = 0;
-	unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
+	static const unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
 	if (cart_size == 0x4000)
 	{
 		for (i = 0; i < cart_size - sizeof signature; i++)
@@ -249,7 +249,7 @@ static int detect_mode3E(void)
 	// Would have used STA $3e, but 'Alien' and 'Star Raiders' do that for unknown reasons
 
 	int i,numfound = 0;
-	unsigned char signature[3] = { 0x84, 0x3e, 0x9d };
+	static const unsigned char signature[3] = { 0x84, 0x3e, 0x9d };
 	if (cart_size == 0x0800 || cart_size == 0x1000)
 	{
 		for (i = 0; i < cart_size - sizeof signature; i++)
@@ -267,7 +267,7 @@ static int detect_mode3E(void)
 static int detect_modeSS(void)
 {
 	int i,numfound = 0;
-	unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
+	static const unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
 	if (cart_size == 0x0800 || cart_size == 0x1000)
 	{
 		for (i = 0; i < cart_size - sizeof signature; i++)
@@ -285,7 +285,7 @@ static int detect_modeSS(void)
 static int detect_modeFE(void)
 {
 	int i,j,numfound = 0;
-	unsigned char signatures[][5] =  {
+	static const unsigned char signatures[][5] =  {
 									{ 0x20, 0x00, 0xd0, 0xc6, 0xc5 },
 									{ 0x20, 0xc3, 0xf8, 0xa5, 0x82 },
 									{ 0xd0, 0xfb, 0x20, 0x73, 0xfe },
@@ -310,7 +310,7 @@ static int detect_modeFE(void)
 static int detect_modeE0(void)
 {
 	int i,j,numfound = 0;
-	unsigned char signatures[][3] =  {
+	static const unsigned char signatures[][3] =  {
 									{ 0x8d, 0xe0, 0x1f },
 									{ 0x8d, 0xe0, 0x5f },
 									{ 0x8d, 0xe9, 0xff },
@@ -337,7 +337,7 @@ static int detect_modeE0(void)
 static int detect_modeCV(void)
 {
 	int i,j,numfound = 0;
-	unsigned char signatures[][3] = {
+	static const unsigned char signatures[][3] = {
 									{ 0x9d, 0xff, 0xf3 },
 									{ 0x99, 0x00, 0xf4 }};
 	if (cart_size == 0x0800 || cart_size == 0x1000)
@@ -360,7 +360,7 @@ static int detect_modeCV(void)
 static int detect_modeFV(void)
 {
 	int i,j,numfound = 0;
-	unsigned char signatures[][3] = {
+	static const unsigned char signatures[][3] = {
 									{ 0x2c, 0xd0, 0xff }};
 	if (cart_size == 0x2000)
 	{
@@ -383,7 +383,7 @@ static int detect_modeFV(void)
 static int detect_modeJVP(void)
 {
 	int i,j,numfound = 0;
-	unsigned char signatures[][4] = {
+	static const unsigned char signatures[][4] = {
 									{ 0x2c, 0xc0, 0xef, 0x60 },
 									{ 0x8d, 0xa0, 0x0f, 0xf0 }};
 	if (cart_size == 0x4000 || cart_size == 0x2000)
@@ -406,7 +406,7 @@ static int detect_modeJVP(void)
 static int detect_modeE7(void)
 {
 	int i,j,numfound = 0;
-	unsigned char signatures[][3] = {
+	static const unsigned char signatures[][3] = {
 									{ 0xad, 0xe5, 0xff },
 									{ 0x8d, 0xe7, 0xff }};
 	if (cart_size == 0x2000 || cart_size == 0x4000)
@@ -429,7 +429,7 @@ static int detect_modeE7(void)
 static int detect_modeUA(void)
 {
 	int i,numfound = 0;
-	unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
+	static const unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
 	if (cart_size == 0x2000)
 	{
 		for (i = 0; i < cart_size - sizeof signature; i++)
@@ -447,8 +447,8 @@ static int detect_modeUA(void)
 static int detect_8K_mode3F(void)
 {
 	int i,numfound = 0;
-	unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
-	unsigned char signature2[4] = { 0xa9, 0x02, 0x85, 0x3f };
+	static const unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
+	static const unsigned char signature2[4] = { 0xa9, 0x02, 0x85, 0x3f };
 	// have to look for two signatures because 'not boulderdash' gives false positive otherwise
 	if (cart_size == 0x2000)
 	{
@@ -471,7 +471,7 @@ static int detect_8K_mode3F(void)
 static int detect_32K_mode3F(void)
 {
 	int i,numfound = 0;
-	unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
+	static const unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
 	if (cart_size >= 0x8000)
 	{
 		for (i = 0; i < cart_size - sizeof signature; i++)
@@ -489,7 +489,7 @@ static int detect_32K_mode3F(void)
 static int detect_super_chip(void)
 {
 	int i,j;
-	unsigned char signatures[][5] = {
+	static const unsigned char signatures[][5] = {
 									{ 0xa2, 0x7f, 0x9d, 0x00, 0xf0 }, // dig dug
 									{ 0xae, 0xf6, 0xff, 0x4c, 0x00 }}; // off the wall
 
@@ -1469,7 +1469,7 @@ static MACHINE_RESET( a2600 )
 
 	int chip = 0xFF;
 	unsigned long controltemp;
-	unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
+	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 
 	current_reset_bank_counter++;
 

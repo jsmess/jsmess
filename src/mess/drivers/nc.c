@@ -330,10 +330,10 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
 }
 
 
-static read8_handler nc_bankhandler_r[]={
+static const read8_handler nc_bankhandler_r[]={
 MRA8_BANK1, MRA8_BANK2, MRA8_BANK3, MRA8_BANK4};
 
-static write8_handler nc_bankhandler_w[]={
+static const write8_handler nc_bankhandler_w[]={
 MWA8_BANK5, MWA8_BANK6, MWA8_BANK7, MWA8_BANK8};
 
 static void nc_refresh_memory_bank_config(int bank)

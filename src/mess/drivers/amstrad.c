@@ -1101,7 +1101,7 @@ In the 464+ and 6128+ this function is performed by the ASIC or a memory expansi
   }
 }
 
-void aleste_msx_mapper(int offset, int data)
+static void aleste_msx_mapper(int offset, int data)
 {
 	int page = (offset & 0x0300) >> 8;
 	int ramptr = (data & 0x1f) * 0x4000;

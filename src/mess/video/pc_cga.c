@@ -252,7 +252,7 @@ void pc_cga_cursor(struct mscrtc6845_cursor *cursor)
 
 
 
-static struct mscrtc6845_config config= { 14318180 /*?*/, pc_cga_cursor };
+static struct mscrtc6845_config config = { 14318180 /*?*/, pc_cga_cursor };
 
 static int internal_pc_cga_video_start(int personality)
 {

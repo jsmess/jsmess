@@ -112,35 +112,35 @@ static int IRQ=0;
 
 // Bits 0,1 of control Register
 
-static int divide_by_lookup[4]={1,16,64,0};
+static const int divide_by_lookup[4]={1,16,64,0};
 static int divide_by;
 
 
 // Bits 2,3,4 of control Register
 
-static int word_length_lookup[8]={7,7,7,7,8,8,8,8};
+static const int word_length_lookup[8]={7,7,7,7,8,8,8,8};
 static int word_length;
 
 // Parity Settings
 // 2 = even
 // 1 = odd
 // 0 = no parity bit
-static int parity_lookup[8]={2,1,2,1,0,0,2,1};
+static const int parity_lookup[8]={2,1,2,1,0,0,2,1};
 static int parity;
 
-static int stop_bits_lookup[8]={2,2,1,1,2,1,1,1};
+static const int stop_bits_lookup[8]={2,2,1,1,2,1,1,1};
 static int stop_bits;
 
 // Bits 5,6 of control Register
 
-static int RTS_lookup[4]={0,0,1,0};
+static const int RTS_lookup[4]={0,0,1,0};
 static int RTS;
 
-static int break_level_lookup[4]={0,0,0,1};
+static const int break_level_lookup[4]={0,0,0,1};
 static int break_level;
 
 // transmitting Interrupt 0 = Disabled  1 = Enabled
-static int transmit_interrupt_enabled_lookup[4]={0,1,0,0};
+static const int transmit_interrupt_enabled_lookup[4]={0,1,0,0};
 static int transmit_interrupt_enabled;
 
 // Bit 7 of control Register
@@ -153,8 +153,8 @@ static int bytelength=10;
 
 
 //Local copy of the MC6850 external procedure calls
-static struct MC6850_interface
-MC6850_calls= {
+static struct MC6850_interface MC6850_calls =
+{
 	0,// Transmit data ouput
 	0,// Request to Send output
 	0,// Interupt Request output
