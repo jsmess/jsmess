@@ -4,9 +4,9 @@ TI-85 and TI-86 drivers by Krzysztof Strzecha
 Notes:
 1. After start TI-85 waits for ON key interrupt, so press ON key to start
    calculator.
-2. Only difference beetwen all TI-85 drivers is ROM version.
+2. Only difference between all TI-85 drivers is ROM version.
 3. TI-86 is TI-85 with more RAM and ROM.
-4. Only difference beetwen all TI-86 drivers is ROM version.
+4. Only difference between all TI-86 drivers is ROM version.
 5. Video engine (with grayscale support) based on the idea found in VTI source
    emulator written by Rusty Wagner.
 6. NVRAM is saved properly only when calculator is turned off before exiting MESS.
@@ -49,7 +49,7 @@ New:
 14/05/2001 Many source cleanups.
 11/05/2001 Release years corrected. Work on serial link started.
 26/04/2001 NVRAM support added.
-25/04/2001 Video engine totaly rewriten so grayscale works now.
+25/04/2001 Video engine totally rewritten so grayscale works now.
 17/04/2001 TI-86 snapshots loading added.
        ti86grom driver added.
 16/04/2001 Sound added.

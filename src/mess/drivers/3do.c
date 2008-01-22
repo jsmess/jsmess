@@ -8,7 +8,7 @@ Hardware descriptions:
 
 Processors:
 - 32bit 12.5MHZ RISC CPU (ARM60 - ARM6 core)
-- Seperate BUS for video refresh updates (VRAM is dual ported)
+- Separate BUS for video refresh updates (VRAM is dual ported)
 - Super Fast BUS Speed (50 Megabytes per second)
 - Math Co-Processor custom designed by NTG for accelerating fixed-point
   matrix operations (_not_ the ARM FPA)
@@ -35,10 +35,10 @@ Custom 16bit DSP:
 - 25MHz clock rate.
 - pipelined CISC architecture
 - 16bit register size
-- 17 seperate 16bit DMA channels to and from system memory.
+- 17 separate 16bit DMA channels to and from system memory.
 - on chip instruction SRAM and register memory.
 - 20bit internal processing.
-- special filtering capable of creeating effects such as 3D sound.
+- special filtering capable of creating effects such as 3D sound.
 
 Sound:
 - 16bit stereo sound

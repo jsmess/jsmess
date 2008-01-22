@@ -1,5 +1,5 @@
 /***************************************************************************
-Commodore Amiga - (c) 1985, Commodore Bussines Machines Co.
+Commodore Amiga - (c) 1985, Commodore Business Machines Co.
 
 Preliminary driver by:
 

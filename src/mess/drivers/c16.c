@@ -30,7 +30,7 @@ c16(pal version, ntsc version?):
  newer basic and kernal (ieee floppy support)
 
 c116(pal version, ntsc version?):
- 100% softwarecompatible to c16
+ 100% software compatible to c16
  small and flat
  gummi keys
 
@@ -129,7 +129,7 @@ several programs rely on more features
 (loading other file types, writing, ...)
 
 most games rely on starting own programs in the floppy drive
-(and therefor cpu level emulation is needed)
+(and therefore cpu level emulation is needed)
 
 Roms
 ----

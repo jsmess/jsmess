@@ -59,7 +59,7 @@ vice emulator
 Video
 -----
 NTSC:
-Screen Size (normal TV (horicontal),4/3 ratio)
+Screen Size (normal TV (horizontal),4/3 ratio)
 pixel ratio: about 7/5 !
 so no standard Vesa Resolution is good
 tweaked mode 256x256 acceptable
@@ -123,13 +123,13 @@ several programs rely on more features
 (loading other file types, writing, ...)
 
 some games rely on starting own programs in the floppy drive
-(and therefor cpu level emulation is needed)
+(and therefore CPU level emulation is needed)
 
 Roms
 ----
 .bin .rom .a0 .20 .40 .60 .prg
 files with boot-sign in it
-  recogniced as roms
+  recognized as roms
 
 .20 files loaded at 0x2000
 .40 files loaded at 0x4000

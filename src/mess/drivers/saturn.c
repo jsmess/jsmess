@@ -1,17 +1,17 @@
 /* Sega Saturn
 
-Driver by David Haywood,Angelo Salese,Olivier Galibert & Mariusz Wojcieszek
+Driver by David Haywood, Angelo Salese, Olivier Galibert & Mariusz Wojcieszek
 SCSP driver provided by R.Belmont,based on ElSemi's SCSP sound chip emulator
-CD Block driver provided by ANY,based on sthief original emulator
-Many thanks to Guru,Fabien & Runik for the help given.
+CD Block driver provided by ANY, based on sthief original emulator
+Many thanks to Guru, Fabien & Runik for the help given.
 
 MESS conversion by R. Belmont
 
 Hardware overview:
 ------------------
--two SH-2 CPUs,in a master/slave configuration.The master cpu is used to
+-two SH-2 CPUs,in a master/slave configuration. The master cpu is used to
 boot-up and to do the most of the work,the slave one does extra work that could be
-too much for a single cpu.They both shares all the existant devices;
+too much for a single cpu. They both shares all the existent devices;
 -a M68000 CPU,used to drive sound(the SCSP chip).The program is uploaded via the
 SH-2 cpus;
 -a SMPC (System Manager & Peripheral Control),used to drive all the

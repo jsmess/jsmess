@@ -1,7 +1,7 @@
 /***************************************************************************
     zx.c
 
-    Orginal driver by:
+    Original driver by:
     Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
 
     Fixes and additions by Krzysztof Strzecha:

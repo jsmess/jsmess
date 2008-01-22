@@ -5,7 +5,7 @@ Megadrive / Genesis Rewrite, Take 65498465432356345250432.3  August 06
 Thanks to:
 Charles Macdonald for much useful information (cgfm2.emuviews.com)
 
-Long Decription names mostly taken from the Good Gen database
+Long Description names mostly taken from the Good Gen database
 
 ToDo:
 
@@ -14,7 +14,7 @@ Fix HV Counter & Raster Implementation (One line errors in some games, others no
 Fix Horizontal timings (currently a kludge, currently doesn't change with resolution changes)
 Add Real DMA timings (using a timer)
 Add All VDP etc. Mirror addresses (not done yet as I prefer to catch odd cases for now)
-Investigate other Bugs (see list bloew)
+Investigate other Bugs (see list below)
 Rewrite (again) using cleaner, more readable and better optimized code with knowledge gained
 Add support for other peripherals (6 player pad, Teamplay Adapters, Lightguns, Sega Mouse etc.)
 Sort out set info, making sure all games have right manufacturers, dates etc.

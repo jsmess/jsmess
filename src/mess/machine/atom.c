@@ -6,7 +6,7 @@
 	interrupts, I/O ports)
 
 	Many thanks to Kees van Oss for:
-	1.	Tape input/output curcuit diagram. It describes in great detail how the 2.4khz
+	1.	Tape input/output circuit diagram. It describes in great detail how the 2.4khz
 		tone, 2.4khz tone enable, tape output and tape input are connected.
 	2.	The DOS rom for the Atom so I could complete the floppy disc emulation.
 	3.	Details of the eprom expansion board for the Atom.

@@ -26,15 +26,15 @@
   3 interrupt 3 input
   4 interrupt 4 input
   5 irq output
-  6 ca handshake line (read handshake answer on I3 prefered)
-  7 cb handshake line (write handshake clear on I4 prefered)
+  6 ca handshake line (read handshake answer on I3 preferred)
+  7 cb handshake line (write handshake clear on I4 preferred)
  5 port c ddr
 
  6 cr configuration register
   0 mc
     0 port c normal input output mode like port a and b
     1 port c used for handshaking and interrupt input
-  1 1 interrupt priorized
+  1 1 interrupt prioritized
   2 i3 configure edge
     1 interrupt set on positive edge
   3 i4 configure edge
@@ -55,18 +55,18 @@
    10 manual output low
    11 manual output high
  7 air active interrupt register
-   0 I0 occured
-   1 I1 occured
-   2 I2 occured
-   3 I3 occured
-   4 I4 occured
+   0 I0 occurred
+   1 I1 occurred
+   2 I2 occurred
+   3 I3 occurred
+   4 I4 occurred
    read clears interrupt
 
- non priorized interrupts
-  interrupt is set when occured
+ non prioritized interrupts
+  interrupt is set when occurred
   read clears all interrupts
 
- priorized interrupts
+ prioritized interrupts
   I4>I3>I2>I1>I0
   highest interrupt can be found in air register
   read clears highest interrupt

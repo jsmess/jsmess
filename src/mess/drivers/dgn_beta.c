@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    systems\dgn_beta.c
+    drivers/dgn_beta.c
 
     Dragon Beta prototype, based on two 68B09E processors, WD2797, 6845.
 
@@ -8,17 +8,17 @@ Project Beta was the second machine that Dragon Data had in development at
 the time they ceased trading, the first being Project Alpha (also know as the
 Dragon Professional).
 
-The machine uses dual 68B09 cpus which both sit on the same bus and access
+The machine uses dual 68B09 CPUs which both sit on the same bus and access
 the same memory and IO chips ! The first is the main processor, used to run
-user code, the second is uses as a DMA controler, to amongst other things
-disk data transfers. The first processor controled the second by having the
-halt and nmi lines from the second cpu connected to PIA output lines so
+user code, the second is uses as a DMA controller to amongst other things
+disk data transfers. The first processor controlled the second by having the
+halt and nmi lines from the second CPU connected to PIA output lines so
 that the could be changed under OS control. The first CPU just passed
-instructions for the block to be transfered in 5 low ram addresses and
+instructions for the block to be transferred in 5 low ram addresses and
 generated an NMI on the second CPU.
 
-Project Beta like the other Dragons used a WD2797 floppy disk controler
-which is memory mapped, and controled by the second CPU.
+Project Beta like the other Dragons used a WD2797 floppy disk controller
+which is memory mapped, and controlled by the second CPU.
 
 Unlike the other Dragon machines, project Beta used a 68b45 to generate video,
 and totally did away with the SAM.
@@ -26,14 +26,14 @@ and totally did away with the SAM.
 The machine has a 6551 ACIA chip, but I have not yet found where this is
 memory mapped.
 
-Project Beta, had a custom MMU bilt from a combination of LSTTL logic, and
-PAL programable logic. This MMU could address 256 blocks of 4K, giving a
+Project Beta, had a custom MMU built from a combination of LSTTL logic, and
+PAL programmable logic. This MMU could address 256 blocks of 4K, giving a
 total addressable range of 1 megabyte, of this the first 768KB could be RAM,
-however tha machine by default, came with 256K or ram, and a 16K boot rom,
+however the machine by default, came with 256K or ram, and a 16K boot ROM,
 which contained an OS-9 Level 2 bootstrap.
 
-A lot of the infomrmation required to start work on this driver has been
-infered from disassembly of the boot rom, and from what little hardware
+A lot of the information required to start work on this driver has been
+inferred from disassembly of the boot ROM, and from what little hardware
 documentation still exists.
 
 ***************************************************************************/

@@ -17,7 +17,7 @@
 
     Kevin Thacker [MESS driver]
 
-  May-June 2004 - Yoann Courtois (aka Papagayo/ex GMC/ex PARADOX) - rewritting some code with hardware documentation from http://www.cepece.info/amstrad/
+  May-June 2004 - Yoann Courtois (aka Papagayo/ex GMC/ex PARADOX) - rewriting some code with hardware documentation from http://www.cepece.info/amstrad/
 
   June 2006  - Very preliminary CPC+ support.  CPR cart image handling, secondary ROM register, ASIC unlock detection
                Supported:
