@@ -63,6 +63,9 @@ Source Changes:
 
 - Greater use of ATTR_PRINTF.  [Oliver Stoeneberg]
 
+- Changed use of AY-3-8910A sound chip to AY-3-8912A or AY-3-8913A where
+  appropriate across all drivers.  [Justin Kerk]
+
 
 
 0.122
