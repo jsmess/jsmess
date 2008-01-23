@@ -181,27 +181,10 @@ int apple2_get_bgcolor(void)
 
 static TILE_GET_INFO(apple2_lores_gettileinfo)
 {
-	/* NPW 11-Aug-2007 - breaking Apple II in the short term so that the 0.117u1 update
-	 * can be applied */
+	UINT32 ch = a2_videoram[lores_videobase + tile_index];
 	tileinfo->pen_data = lores_tiledata;
-	tileinfo->palette_base = 0;
+	tileinfo->palette_base = ch * 2;
 	tileinfo->flags = 0;
-
-	/*
-		OLD CODE:
-		---------
-
-		static pen_t pal_data[2];
-		int ch;
-
-		tileinfo->pen_data = lores_tiledata;
-		tileinfo->pal_data = pal_data;
-		tileinfo->flags = 0;
-
-		ch = a2_videoram[lores_videobase + tile_index];
-		pal_data[0] = (ch >> 0) & 0x0f;
-		pal_data[1] = (ch >> 4) & 0x0f;
-	*/
 }
 
 static void apple2_lores_draw(mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
@@ -392,8 +375,8 @@ void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_soft
 	lores_tiledata = auto_malloc(sizeof(UINT8) * 14 * 8);
 
 	/* build lores_tiledata */
-	memset(lores_tiledata + 0*14, 0, 4*14);
-	memset(lores_tiledata + 4*14, 1, 4*14);
+	memset(lores_tiledata + 0*14, 1, 4*14);
+	memset(lores_tiledata + 4*14, 0, 4*14);
 
 	/* build hires artifact map */
 	for (i = 0; i < 8; i++)

@@ -10,6 +10,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [APPLE2] Fixed lores graphics broken in 0.119.  (bug #1472) [Nate Woods]
+
 - [GAMEBOY] Small mode 0 stat bug triggering fixes.  [Wilbert Pol]
 
 - [GAMEBOY] Added partial support for MBC6.  [Wilbert Pol]
