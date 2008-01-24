@@ -20,6 +20,9 @@ System Driver Changes:
 
 - [GBPOCKET] Fixed video startup state to match that of a real unit.  [Wilbert
   Pol]
+  
+- [GENEVE] Fixed memory mapping error that would cause an emulated crash on
+  reset.  [Michael Zapf]
 
 - [MTX] Rewrote keyboard emulation, added natural keyboard support and started
   to cleanup the driver.  [Dirk Best]
@@ -35,6 +38,8 @@ System Driver Changes:
   [Wilbert Pol]
 
 - [ORIC] Fixed tape loading.  (bug #241) [Wilbert Pol]
+
+- [TI99] Fixed Mechatronic Mouse axis swapping.  (bug #966)  [Miachel Zapf]
 
 - [TI99/GENEVE] More floppy cleanups; fixed TI99_8 regression and made the
   floppy drive usable.  (bug #1450)  [Michael Zapf]
