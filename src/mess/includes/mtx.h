@@ -15,14 +15,13 @@
 
 /*----------- defined in machine/mtx.c -----------*/
 
+DRIVER_INIT( mtx512 );
 DRIVER_INIT( rs128 );
-MACHINE_START( mtx512 );
 MACHINE_RESET( rs128 );
 INTERRUPT_GEN( mtx_interrupt );
 SNAPSHOT_LOAD( mtx );
 
 WRITE8_HANDLER( mtx_bankswitch_w );
-WRITE8_HANDLER( mtx_trap_write );
 
 /* Cassette */
 READ8_HANDLER( mtx_cst_r );

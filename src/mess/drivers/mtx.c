@@ -5,29 +5,11 @@
     Memotech MTX 500, MTX 512 and RS 128
 
 
-    The memory address space of the MTX512 is divided into 8 banks,
-    with a size of 8KB each. These banks are mapped differently based
-    upon the memory model, selected ROM and RAM page, and the amount
-    of available RAM memory. There are two memory models: a ROM-based
-    model and a CPM model. The memory model, ROM, and RAM page are
-    selected at IO port 0 (i.e., with out (0),a)
-
-    0x0000 - 0x1fff  OSROM
-    0x2000 - 0x3fff  Paged: Assembler ROM, Basic ROM or RAM
-    0x4000 - 0xbfff  Paged: RAM
-    0xc000 - 0xffff  RAM
-
-    In the CPM model, all banks map to RAM memory. The available RAM
-    is (again) allocated from top to bottom. Bank 8 and bank 7, always
-    start at offset 0x0 and 0x2000, respectively. Bank 6, 5, 4, 3, 2,
-    and 1 are mapped depending on the read-only memory register and
-    the available memory.
-
-
-    TODO:  - Get rid of the tape hacks
-           - Finish RS232 support
+    TODO:  - Finish RS232 support
+           - Cartridge support
            - Floppy disk emulation
            - Hard disk emulation
+           - CBM mode
            - "Silicon" disk emulation
            - Multi Effect Video Wall emulation (maybe)
 
@@ -58,14 +40,11 @@
  *************************************/
 
 static ADDRESS_MAP_START( mtx_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(MRA8_BANK1, mtx_trap_write)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(MRA8_BANK2, MWA8_BANK10)
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(MRA8_BANK3, MWA8_BANK11)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(MRA8_BANK4, MWA8_BANK12)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(MRA8_BANK5, MWA8_BANK13)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(MRA8_BANK6, MWA8_BANK14)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(MRA8_BANK7, MWA8_BANK15)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(MRA8_BANK8, MWA8_BANK16)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(3)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(4)
+	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -249,12 +228,10 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_CPU_IO_MAP(mtx_io, 0)
 	MDRV_CPU_VBLANK_INT(mtx_interrupt, 1)
 	MDRV_CPU_CONFIG(mtx_daisy_chain)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_START( mtx512 )
 
 	/* video hardware */
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_IMPORT_FROM(tms9928a)
 
 	/* sound hardware */
@@ -278,10 +255,12 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( mtx512 )
-	ROM_REGION(0x12000, REGION_CPU1, 0)
+	ROM_REGION(0x02000, REGION_USER1, 0)
 	ROM_LOAD("osrom",    0x0000, 0x2000, CRC(9ca858cc) SHA1(3804503a58f0bcdea96bb6488833782ebd03976d))
-	ROM_LOAD("basicrom", 0x2000, 0x2000, CRC(87b4e59c) SHA1(c49782a82a7f068c1195cd967882ba9edd546eaf))
-	ROM_LOAD("assemrom", 0x4000, 0x2000, CRC(9d7538c3) SHA1(d1882c4ea61a68b1715bd634ded5603e18a99c5f))
+	ROM_REGION(0x10000, REGION_USER2, 0)
+	ROM_LOAD("basicrom", 0x0000, 0x2000, CRC(87b4e59c) SHA1(c49782a82a7f068c1195cd967882ba9edd546eaf))
+	ROM_LOAD("assemrom", 0x2000, 0x2000, CRC(9d7538c3) SHA1(d1882c4ea61a68b1715bd634ded5603e18a99c5f))
+	ROM_FILL(            0x4000, 0xc000, 0xff)
 ROM_END
 
 
@@ -374,6 +353,6 @@ SYSTEM_CONFIG_END
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG,  COMPANY          FULLNAME   FLAGS */
-COMP( 1983, mtx512,   0,		0,		mtx512,   mtx512,   0,       mtx512,  "Memotech Ltd.", "MTX 512", 0 )
-COMP( 1983, mtx500,   mtx512,   0,      mtx512,   mtx512,   0,       mtx500,  "Memotech Ltd.", "MTX 500", 0 )
+COMP( 1983, mtx512,   0,		0,		mtx512,   mtx512,   mtx512,  mtx512,  "Memotech Ltd.", "MTX 512", 0 )
+COMP( 1983, mtx500,   mtx512,   0,      mtx512,   mtx512,   mtx512,  mtx500,  "Memotech Ltd.", "MTX 500", 0 )
 COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512,   rs128,   rs128,   "Memotech Ltd.", "RS 128",  0 )

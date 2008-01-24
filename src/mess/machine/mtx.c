@@ -37,19 +37,8 @@
 
 static UINT8 key_sense;
 
-static UINT8 mtx_relcpmh;
-static UINT8 mtx_rampage;
-static UINT8 mtx_rompage;
-
-static UINT8 *mtx_null_mem = NULL;
-static UINT8 *mtx_zero_mem = NULL;
-
 static char mtx_prt_strobe = 0;
 static char mtx_prt_data = 0;
-
-static UINT8 *mtx_tape_buf = NULL;
-static int mtx_tape_index = 0;
-static char *mtx_tape_filename = NULL;
 
 
 
@@ -61,7 +50,6 @@ static char *mtx_tape_filename = NULL;
 
 static void mtx_tms9929a_interrupt(int data)
 {
-//  logerror ("tms9929a_interrupt: %d\n", data);
 	z80ctc_0_trg0_w(0, data ? 0 : 1);
 }
 
@@ -88,11 +76,6 @@ INTERRUPT_GEN( mtx_interrupt )
 
 SNAPSHOT_LOAD( mtx )
 {
-	UINT8 header[4];
-
-	/* get the header */
-	image_fread(image, &header, sizeof(header));
-
 	return INIT_FAIL;
 }
 
@@ -278,330 +261,50 @@ static const z80dart_interface mtx_dart_intf =
  *
  *************************************/
 
-static void mtx_set_bank_offsets (unsigned int bank1, unsigned int bank2,
-	                          unsigned int bank3, unsigned int bank4,
-	                          unsigned int bank5, unsigned int bank6,
-	                          unsigned int bank7, unsigned int bank8)
-{
-	UINT8 *romimage;
+/*
+    There are two memory models on the MTX, the standard one and a
+    CBM mode. In standard mode, the memory map is defined as:
 
-//  logerror ("CPM %d  RAM %x  ROM %x\n", mtx_relcpmh,
-//          mtx_rampage, mtx_rompage);
-//  logerror ("map: [0000] %04x [2000] %04x [4000] %04x [6000] %04x\n",
-//          bank1, bank2, bank3, bank4);
-//  logerror ("     [8000] %04x [a000] %04x [c000] %04x [e000] %04x\n",
-//          bank5, bank6, bank7, bank8);
+    0x0000 - 0x1fff  OSROM
+    0x2000 - 0x3fff  Paged ROM
+    0x4000 - 0x7fff  Paged RAM
+    0x8000 - 0xbfff  Paged RAM
+    0xc000 - 0xffff  RAM
 
-	romimage = memory_region(REGION_CPU1);
+    Banks are selected by output port 0. Bits 0-3 define the RAM page
+    and bits 4-6 the ROM page.
 
-	if (mtx_relcpmh)
-	{
-		memory_set_bankptr (1, mess_ram + bank1);
-		// bank 9 is handled by the mtx_trap_write function
-		memory_set_bankptr (2, mess_ram + bank2);
-		memory_set_bankptr (10, mess_ram + bank2);
-	}
-	else
-	{
-		memory_set_bankptr (1, romimage + bank1);
-		// bank is 9 handled by the mtx_trap_write function
-		memory_set_bankptr (2, romimage + bank2);
-		memory_set_bankptr (10, mtx_null_mem);
-	}
-
-	if (bank3 < mess_ram_size)
-	{
-		memory_set_bankptr (3, mess_ram + bank3);
-		memory_set_bankptr (11, mess_ram + bank3);
-	}
-	else
-	{
-		memory_set_bankptr (3, mtx_null_mem);
-		memory_set_bankptr (11, mtx_zero_mem);
-	}
-
-	if (bank4 < mess_ram_size)
-	{
-		memory_set_bankptr (4, mess_ram + bank4);
-		memory_set_bankptr (12, mess_ram + bank4);
-	}
-	else
-	{
-		memory_set_bankptr (4, mtx_null_mem);
-		memory_set_bankptr (12, mtx_zero_mem);
-	}
-
-	if (bank5 < mess_ram_size)
-	{
-		memory_set_bankptr (5, mess_ram + bank5);
-		memory_set_bankptr (13, mess_ram + bank5);
-	}
-	else
-	{
-		memory_set_bankptr (5, mtx_null_mem);
-		memory_set_bankptr (13, mtx_zero_mem);
-	}
-
-	if (bank6 < mess_ram_size)
-	{
-		memory_set_bankptr (6, mess_ram + bank6);
-		memory_set_bankptr (14, mess_ram + bank6);
-	}
-	else
-	{
-		memory_set_bankptr (6, mtx_null_mem);
-		memory_set_bankptr (14, mtx_zero_mem);
-	}
-
-	memory_set_bankptr (7, mess_ram + bank7);
-	memory_set_bankptr (15, mess_ram + bank7);
-
-	memory_set_bankptr (8, mess_ram + bank8);
-	memory_set_bankptr (16, mess_ram + bank8);
-}
+    CBM mode is selected by bit 7 of output port 0. ROM is replaced
+    by RAM in this mode.
+*/
 
 WRITE8_HANDLER( mtx_bankswitch_w )
 {
-	unsigned int bank1, bank2, bank3, bank4;
-	unsigned int bank5, bank6, bank7, bank8;
+//  UINT8 cbm_mode = data >> 7 & 0x01;
+	UINT8 rom_page = data >> 4 & 0x03;
+	UINT8 ram_page = data >> 0 & 0x0f;
 
-	mtx_relcpmh = (data & 0x80) >> 7;
-	mtx_rampage = (data & 0x0f);
-	mtx_rompage = (data & 0x70) >> 4;
+	/* set rom bank (switches between basic and assembler rom or cartridges) */
+	memory_set_bank(2, rom_page);
 
-	if (mtx_relcpmh)
+	/* set ram bank, for invalid pages a nop-handler will be installed */
+	if (ram_page >= mess_ram_size/0x8000)
 	{
-		bank1 = 0xe000 + mtx_rampage * 0xc000;
-		bank2 = 0xc000 + mtx_rampage * 0xc000;
-		bank3 = 0xa000 + mtx_rampage * 0xc000;
-		bank4 = 0x8000 + mtx_rampage * 0xc000;
-		bank5 = 0x6000 + mtx_rampage * 0xc000;
-		bank6 = 0x4000 + mtx_rampage * 0xc000;
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_NOP, MWA8_NOP);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_NOP, MWA8_NOP);
+	}
+	else if (ram_page + 1 == mess_ram_size/0x8000)
+	{
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_NOP, MWA8_NOP);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK4, MWA8_BANK4);
+		memory_set_bank(4, ram_page);
 	}
 	else
 	{
-		bank1 = 0x0;
-		bank2 = 0x2000 + mtx_rompage * 0x2000;
-		bank3 = 0xa000 + mtx_rampage * 0x8000;
-		bank4 = 0x8000 + mtx_rampage * 0x8000;
-		bank5 = 0x6000 + mtx_rampage * 0x8000;
-		bank6 = 0x4000 + mtx_rampage * 0x8000;
-	}
-
-	bank7 = 0x2000;
-	bank8 = 0x0;
-
-	mtx_set_bank_offsets (bank1, bank2, bank3, bank4,
-                              bank5, bank6, bank7, bank8);
-}
-
-static void mtx_virt_to_phys (const char * what, int vaddress,
-		int * ramspace, int * paddress)
-{
-	int offset = vaddress & 0x1fff;
-	int vbase  = vaddress & ~0x1fff;
-	int pbase = 0x20000;
-
-	*ramspace = mtx_relcpmh || vaddress >= 0x4000;
-
-	if (0xc000 <= vaddress && vaddress < 0x10000)
-		pbase = 0xe000 - vbase;
-	else if (mtx_relcpmh)
-		pbase = 0xe000 - vbase + mtx_rampage * 0xc000;
-	else if (0 <= vaddress && vaddress < 0x2000)
-		pbase = 0;
-	else if (0x2000 <= vaddress && vaddress < 0x4000)
-		pbase = 0x2000 + mtx_rompage * 0x2000;
-	else if (0x4000 <= vaddress && vaddress < 0xc000)
-		pbase = (0xe000 - vbase) + mtx_rampage * 0x8000;
-
-	*paddress = pbase + offset;
-
-//  logerror ("%s (%d,%d,%d,%04x) -> (%d,%06x)\n", what,
-//          mtx_relcpmh, mtx_rompage, mtx_rampage, vaddress,
-//          *ramspace, *paddress);
-}
-
-
-
-/*************************************
- *
- *  Tape hack
- *
- *************************************/
-
-static UINT8 mtx_peek(int vaddress)
-{
-	UINT8 * romimage;
-	int ramspace;
-	int paddress;
-
-	romimage = memory_region(REGION_CPU1);
-	mtx_virt_to_phys("peek", vaddress, &ramspace, &paddress);
-
-	if (paddress > mess_ram_size) {
-		logerror("peek into non-existing memory\n");
-		return 0;
-	}
-
-	if (ramspace)
-		return mess_ram[paddress];
-	else
-		return romimage[paddress];
-}
-
-static void mtx_poke(int vaddress, UINT8 data)
-{
-	int ramspace;
-	int paddress;
-
-	mtx_virt_to_phys ("poke", vaddress, &ramspace, &paddress);
-	if (!ramspace)
-		logerror ("poke into the ROM address space\n");
-	else if (paddress >= mess_ram_size)
-		logerror ("poke into non-existing RAM\n");
-	else
-    		mess_ram[paddress] = data;
-}
-
-/*
- * A filename is at most 14 characters long, always ending with a space.
- * The save file can be at most 65536 long.
- * Note: the empty string is saved as a single space.
- */
-static void mtx_save_hack(int start, int length)
-{
-	mame_file * tape_file;
-	file_error filerr;
-	int bytes_saved;
-	int i;
-
-	assert(length <= 32768);
-
-//  logerror("mtx_save_hack: start=%#x  length=%#x (%d)  index=%#x (%d)\n",
-//          start, length, length, mtx_save_index, mtx_save_index);
-
-	if ((start > 0xc000) && (length == 20))  /* Save the header segment */
-	{
-		for (i = 0; i < 18; i++)
-			mtx_tape_buf[i] = mtx_peek(start + i);
-		length = 18;
-
-		memcpy(mtx_tape_filename, mtx_tape_buf + 1, 15);
-		for (i = 14; i > 0 && mtx_tape_filename[i] == 0x20; i--)
-			;
-		mtx_tape_filename[i + 1] = '\0';
-		mtx_tape_index = 0;
-
-		filerr = mame_fopen(SEARCHPATH_IMAGE, mtx_tape_filename,
-                        	OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, &tape_file);
-	}
-	else  /* Save system variable, body, or variable store segment */
-	{
-		for (i = 0; i < length; i++)
-			mtx_tape_buf[i] = mtx_peek(start + i);
-
-		filerr = mame_fopen(SEARCHPATH_IMAGE, mtx_tape_filename,
-    	                    OPEN_FLAG_WRITE, &tape_file);
-	}
-
-	if (filerr == FILERR_NONE)
-	{
-		mame_fseek(tape_file, mtx_tape_index, SEEK_SET);
-		bytes_saved = mame_fwrite(tape_file, mtx_tape_buf, length);
-		logerror("saved %d bytes from %d:%04x into '%s' at %d\n", bytes_saved,
-		         mtx_rampage, start, mtx_tape_filename, mtx_tape_index);
-		if (length > bytes_saved)
-			logerror("wrote too few bytes from '%s'\n", mtx_tape_filename);
-
-		mame_fclose(tape_file);
-		mtx_tape_index += length;
-	}
-	else
-		logerror("cannot open '%s' for saving\n", mtx_tape_filename);
-}
-
-/*
- * A filename is at most 14 characters long, ending with a space.
- * At most 65536 bytes are loaded from the file.
- * Note: the empty string is loaded as a single space (ugly),
- *       not the 'next' file.
- */
-static void mtx_load_hack(int start, int length)
-{
-	mame_file * tape_file;
-	file_error filerr;
-	int bytes_loaded;
-	int i;
-
-	assert(length <= 32768);
-
-//  logerror("mtx_load_hack: start=%#x  length=%#x (%d)\n", start, length, length);
-
-	if ((start > 0xc000) && (length == 18))
-	{
-		for (i = 0; i < 15; i++)
-			mtx_tape_filename[i] = mtx_peek(start - 0xf + i);
-
-		for (i = 14; i > 0 && mtx_tape_filename[i] == 0x20; i--)
-			;
-
-		mtx_tape_filename[i+1] = '\0';
-		mtx_tape_index = 0;
-	}
-
-	filerr = mame_fopen(SEARCHPATH_IMAGE, mtx_tape_filename, OPEN_FLAG_READ,
-	                    &tape_file);
-	if (filerr == FILERR_NONE)
-	{
-		mame_fseek(tape_file, mtx_tape_index, SEEK_SET);
-		bytes_loaded = mame_fread(tape_file, mtx_tape_buf, length);
-		logerror("loaded %d bytes from '%s' at %d into %d:%04x\n", bytes_loaded,
-		         mtx_tape_filename, mtx_tape_index, mtx_rampage, start);
-		if (length > bytes_loaded)
-			logerror("read too few bytes from '%s'\n", mtx_tape_filename);
-
-		for (i = 0; i < length; i++)
-			mtx_poke(start + i, mtx_tape_buf[i]);
-
-		mame_fclose(tape_file);
-		mtx_tape_index += length;
-	}
-	else
-		logerror("cannot open '%s' for loading\n", mtx_tape_filename);
-}
-
-static void mtx_verify_hack(int start, int length)
-{
-//  logerror("mtx_verify_hack: start=0x%x, length=0x%x (%d)  not implemented\n", start, length, length);
-}
-
-WRITE8_HANDLER( mtx_trap_write )
-{
-	int pc;
-	int start;
-	int length;
-
-	if (mtx_relcpmh)
-	{
-		mtx_poke(offset, data);
-		return;
-	}
-
-	pc = activecpu_get_reg(Z80_PC);
-	if((offset == 0x0aae) && (pc == 0x0ab1))
-	{
-		start = activecpu_get_reg(Z80_HL);
-		length = activecpu_get_reg(Z80_DE);
-
-		// logerror("PC %04x\nStart %04x, Length %04x, 0xFD67 %02x, 0xFD68 %02x index 0x%04x\n", pc, start, length, mess_ram[0xfd67], mess_ram[0xfd68], mtx_tape_size);
-
-		if(mtx_peek(0xfd68) == 0)
-			mtx_save_hack(start, length);
-		else if(mtx_peek(0xfd67) == 0)
-			mtx_load_hack(start, length);
-		else
-			mtx_verify_hack(start, length);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_BANK3, MWA8_BANK3);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK4, MWA8_BANK4);
+		memory_set_bank(3, ram_page);
+		memory_set_bank(4, ram_page);
 	}
 }
 
@@ -613,40 +316,25 @@ WRITE8_HANDLER( mtx_trap_write )
  *
  *************************************/
 
-MACHINE_START( mtx512 )
+DRIVER_INIT( mtx512 )
 {
-	UINT8 * romimage;
+	/* configure memory */
+	memory_set_bankptr(1, memory_region(REGION_USER1));
+	memory_configure_bank(2, 0, 8, memory_region(REGION_USER2), 0x2000);
+	memory_configure_bank(3, 0, mess_ram_size/0x4000/2, mess_ram, 0x4000);
+	memory_configure_bank(4, 0, mess_ram_size/0x4000/2, mess_ram + mess_ram_size/2, 0x4000);
 
+	/* setup tms9928a */
 	TMS9928A_configure(&tms9928a_interface);
 
-	mtx_null_mem = (UINT8 *) auto_malloc (16384);
-	mtx_zero_mem = (UINT8 *) auto_malloc (16384);
-	memset (mtx_zero_mem, 0, 16384);
-
-	mtx_tape_buf = auto_malloc (32768);
-	mtx_tape_index = 0;
-	mtx_tape_filename = auto_malloc (16);
-	mtx_tape_filename[0] = 0;
-
+	/* setup ctc */
 	z80ctc_init(0, &mtx_ctc_intf);
-
-	// Patch the Rom (Sneaky........ Who needs to trap opcodes?)
-	romimage = memory_region(REGION_CPU1);
-	romimage[0x0aae] = 0x32;	// ld ($0aae),a
-	romimage[0x0aaf] = 0xae;
-	romimage[0x0ab0] = 0x0a;
-	romimage[0x0ab1] = 0xc9;	// ret
-
-	// Set up the starting memory configuration
-	mtx_relcpmh = 0;
-	mtx_rampage = 0;
-	mtx_rompage = 0;
-	mtx_set_bank_offsets (0, 0x2000, 0xa0000, 0x8000,
-			      0x6000, 0x4000, 0x2000, 0);
 }
 
 DRIVER_INIT( rs128 )
 {
+	driver_init_mtx512(machine);
+
 	z80dart_init(0, &mtx_dart_intf);
 
 	/* install handlers for dart interface */

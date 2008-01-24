@@ -27,6 +27,8 @@ System Driver Changes:
 - [MTX] Rewrote keyboard emulation, added natural keyboard support and started
   to cleanup the driver.  [Dirk Best]
 
+- [MTX] Rewrote memory banking and removed tape hack.  [Dirk Best]
+
 - [NASCOM] Improved keyboard layout, added natural keyboard support (not
   working 100%), changed RAM size configuration to use the standard method
   instead of dip switches and updated it to use the default black and white
