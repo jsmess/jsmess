@@ -148,7 +148,7 @@ static void update_ti86_memory (void)
 	else
 	{
 		memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x010000 + 0x004000*(ti85_memory_page_0x4000&0x0f));
-		wh = MWA8_ROM;
+		wh = MWA8_UNMAP;
 	}
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, wh);
 
@@ -161,7 +161,7 @@ static void update_ti86_memory (void)
 	else
 	{
 		memory_set_bankptr(3,memory_region(REGION_CPU1) + 0x010000 + 0x004000*(ti86_memory_page_0x8000&0x0f));
-		wh = MWA8_ROM;
+		wh = MWA8_UNMAP;
 	}
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, wh);
 }
@@ -195,8 +195,8 @@ MACHINE_START( ti81 )
 
 	timer_pulse(ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MWA8_ROM);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_UNMAP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MWA8_UNMAP);
 	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
 	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
 }
@@ -225,8 +225,8 @@ MACHINE_START( ti85 )
 
 	timer_pulse(ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MWA8_ROM);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_UNMAP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MWA8_UNMAP);
 	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
 	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
 
@@ -254,7 +254,7 @@ MACHINE_START( ti86 )
 
 	ti86_ram = auto_malloc(128*1024);
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_UNMAP);
 
 		memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
