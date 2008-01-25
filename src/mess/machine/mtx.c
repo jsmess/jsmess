@@ -76,7 +76,29 @@ INTERRUPT_GEN( mtx_interrupt )
 
 SNAPSHOT_LOAD( mtx )
 {
-	return INIT_FAIL;
+	UINT8 header[18];
+	UINT16 sys_addr;
+	
+	/* get the header */
+	image_fread(image, &header, sizeof(header));
+
+	if (header[0] == 0xff)
+	{
+		/* long header */
+		sys_addr = pick_integer_le(header, 16, 2);
+		image_fread(image, mtx_ram + (sys_addr - 0xc000), 599);
+		image_fread(image, mtx_ram, snapshot_size - 599 - 18);
+	}
+	else
+	{
+		/* short header */
+		sys_addr = pick_integer_le(header, 0, 2);
+		image_fseek(image, 4, SEEK_SET);
+		image_fread(image, mtx_ram + (sys_addr - 0xc000), 599);
+		image_fread(image, mtx_ram, snapshot_size - 599 - 4);
+	}
+	
+	return INIT_PASS;
 }
 
 

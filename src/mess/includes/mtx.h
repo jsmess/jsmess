@@ -13,6 +13,11 @@
 #define MTX_SYSTEM_CLOCK   XTAL_4MHz
 
 
+/*----------- defined in drivers/mtx.c -----------*/
+
+extern UINT8 *mtx_ram;
+
+
 /*----------- defined in machine/mtx.c -----------*/
 
 DRIVER_INIT( mtx512 );
