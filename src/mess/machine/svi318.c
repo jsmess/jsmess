@@ -513,15 +513,16 @@ WRITE8_HANDLER( svi806_ram_enable_w )
 VIDEO_UPDATE( svi328_806 )
 {
 	if ( screen == 0 )
-		video_update_tms9928a(machine, screen, bitmap, cliprect);
+		VIDEO_UPDATE_CALL(tms9928a);
 	if ( screen == 1 )
-		video_update_crtc6845(machine, screen, bitmap, cliprect);
+		VIDEO_UPDATE_CALL(crtc6845);
 	return 0;
 }
 
 MACHINE_RESET( svi328_806 )
 {
-	machine_reset_svi318(machine);
+	MACHINE_RESET_CALL(svi318);
+
 	svi318_80col_init();
 	svi.svi806_present = 1;
 	svi318_set_banks();

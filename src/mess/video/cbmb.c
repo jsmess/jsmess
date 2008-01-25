@@ -52,7 +52,7 @@ VIDEO_START( cbm700 )
 		}
 	}
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 void cbmb_vh_set_font(int font)

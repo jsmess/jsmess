@@ -672,7 +672,7 @@ static INTERRUPT_GEN( abc802_vblank_interrupt )
 
 static MACHINE_START( abc802 )
 {
-	machine_start_abc800(machine);
+	MACHINE_START_CALL(abc800);
 
 	z80dart_init(0, &abc802_dart_intf);
 
@@ -687,7 +687,7 @@ static MACHINE_RESET( abc802 )
 
 static MACHINE_START( abc806 )
 {
-	machine_start_abc800(machine);
+	MACHINE_START_CALL(abc800);
 
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);

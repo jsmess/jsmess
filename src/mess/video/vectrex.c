@@ -189,7 +189,7 @@ VIDEO_UPDATE( vectrex )
 		i = (i+1) % NVECT;
 	}
 
-	video_update_vector(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(vector);
 	vector_clear_list();
 	return 0;
 }
@@ -277,7 +277,7 @@ VIDEO_START( vectrex )
 
 	lp_t = timer_alloc(lightpen_trigger_callback, NULL);
 
-	video_start_vector(machine);
+	VIDEO_START_CALL(vector);
 }
 
 

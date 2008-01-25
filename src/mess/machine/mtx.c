@@ -355,7 +355,7 @@ DRIVER_INIT( mtx512 )
 
 DRIVER_INIT( rs128 )
 {
-	driver_init_mtx512(machine);
+	DRIVER_INIT_CALL(mtx512);
 
 	z80dart_init(0, &mtx_dart_intf);
 

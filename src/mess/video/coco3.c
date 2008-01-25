@@ -412,7 +412,7 @@ VIDEO_UPDATE( coco3 )
 	if (video->legacy_video)
 	{
 		/* legacy CoCo 1/2 graphics */
-		rc = video_update_m6847(machine, screen, bitmap, cliprect);
+		rc = VIDEO_UPDATE_CALL(m6847);
 
 		if ((rc & UPDATE_HAS_NOT_CHANGED) == 0)
 		{

@@ -1263,7 +1263,7 @@ VIDEO_UPDATE( amstrad )
 
 //	if(aleste_mode & 0x08)
 //	{  // MSX video
-//		video_update_generic_bitmapped(machine,screen,bitmap,cliprect);
+//		VIDEO_UPDATE_CALL(generic_bitmapped);
 //		return 0;
 //	}
 //	else

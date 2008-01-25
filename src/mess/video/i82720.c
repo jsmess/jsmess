@@ -1395,7 +1395,7 @@ PALETTE_INIT( compis_gdc )
 
 static compis_gdc_interface sIntf;
 
-static void compis_gdc_start (const compis_gdc_interface *intf)
+static void compis_gdc_start(const running_machine *machine, const compis_gdc_interface *intf)
 {
 	/* Only 32KB or 128KB of VRAM */
 	switch(intf->vramsize)
@@ -1421,7 +1421,8 @@ static void compis_gdc_start (const compis_gdc_interface *intf)
 	gdc_mess.tmpbmp = auto_bitmap_alloc (640, 400, BITMAP_FORMAT_INDEXED16);
 	gdc_fifo_reset(&gdc);
 	videoram_size = gdc_mess.vramsize;
-	video_start_generic_bitmapped(Machine);
+
+	VIDEO_START_CALL(generic_bitmapped);
 }
 
 VIDEO_UPDATE(compis_gdc)
@@ -1455,7 +1456,7 @@ VIDEO_UPDATE(compis_gdc)
 
 VIDEO_START ( compis_gdc )
 {
-	compis_gdc_start(&sIntf);
+	compis_gdc_start(machine, &sIntf);
 }
 
 void compis_init(const compis_gdc_interface *intf)

@@ -137,7 +137,7 @@ VIDEO_START( aim65 )
 
     printer_level = 0;
 
-    video_start_generic(machine);
+    VIDEO_START_CALL(generic);
     */
 }
 

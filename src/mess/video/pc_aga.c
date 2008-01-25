@@ -246,7 +246,7 @@ VIDEO_START( pc200 )
 {
 	int buswidth;
 
-	video_start_pc_aga(machine);
+	VIDEO_START_CALL(pc_aga);
 
 	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)

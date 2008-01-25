@@ -121,7 +121,7 @@ static PALETTE_INIT( apple2gs )
 	extern PALETTE_INIT( apple2 );
 	int i;
 
-	palette_init_apple2(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(apple2);
 
 	for (i = 0; i < 16; i++)
 	{

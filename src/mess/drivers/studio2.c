@@ -241,12 +241,12 @@ static MACHINE_START( studio2 )
 
 static MACHINE_RESET( studio2 )
 {
-	machine_reset_cdp1861(machine);
+	MACHINE_RESET_CALL(cdp1861);
 }
 
 static MACHINE_RESET( mpt02 )
 {
-	machine_reset_cdp1864(machine);
+	MACHINE_RESET_CALL(cdp1864);
 
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 }

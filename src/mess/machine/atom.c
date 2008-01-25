@@ -498,7 +498,7 @@ READ8_HANDLER(atom_eprom_box_r)
 
 MACHINE_RESET( atomeb )
 {
-	machine_reset_atom(machine);
+	MACHINE_RESET_CALL(atom);
 	atom_eprom_box_init();
 }
 

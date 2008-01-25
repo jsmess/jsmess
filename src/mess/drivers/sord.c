@@ -186,7 +186,7 @@ static MACHINE_RESET( sord_m5_fd5 )
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
 	sord_fd5_init();
-	machine_reset_sord_m5(machine);
+	MACHINE_RESET_CALL(sord_m5);
 	ppi8255_set_portC(0, 0x50);
 }
 

@@ -68,7 +68,7 @@ void tx0_plot(int x, int y)
 
 
 /*
-	video_update_tx0: effectively redraw the screen
+	VIDEO_UPDATE( tx0 ): effectively redraw the screen
 */
 VIDEO_UPDATE( tx0 )
 {

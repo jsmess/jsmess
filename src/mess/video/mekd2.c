@@ -59,7 +59,7 @@ VIDEO_START( mekd2 )
 	}
 #endif
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 VIDEO_UPDATE( mekd2 )

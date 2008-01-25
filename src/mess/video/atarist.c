@@ -759,5 +759,5 @@ VIDEO_START( atarist )
 
 	atarist_set_screen_parameters();
 
-	video_start_generic_bitmapped(machine);
+	VIDEO_START_CALL(generic_bitmapped);
 }

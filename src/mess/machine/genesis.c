@@ -1027,7 +1027,7 @@ VIDEO_START(genesis)
 {
 	genesis_vdp_start (&genesis_vdp);
 	oldscreenmode = 0xff; // driver specific
-	video_start_generic_bitmapped(machine);
+	VIDEO_START_CALL(generic_bitmapped);
 }
 
 VIDEO_UPDATE(genesis)
@@ -1075,7 +1075,7 @@ VIDEO_UPDATE(genesis)
 
 	}
 
-	video_update_generic_bitmapped(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(generic_bitmapped);
 	return 0;
 }
 

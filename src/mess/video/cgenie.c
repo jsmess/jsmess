@@ -27,7 +27,7 @@ VIDEO_START( cgenie )
 {
 	videoram_size = 0x4000;
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 
     dlybitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 }

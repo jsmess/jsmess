@@ -1515,7 +1515,7 @@ static const struct rp5c15_interface rtc_intf =
 
 static MACHINE_START( megast )
 {
-	machine_start_atarist(machine);
+	MACHINE_START_CALL(atarist);
 	rp5c15_init(&rtc_intf);
 }
 

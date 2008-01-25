@@ -47,11 +47,13 @@ static int DOWN=67, RIGHT=152;
 
 VIDEO_START( pc1403 )
 {
-	if (strcmp(machine->gamedrv->name,"pc1403h")==0) {
-		DOWN=pos[1].y;
-		RIGHT=pos[1].x;
+	if (strcmp(machine->gamedrv->name, "pc1403h") == 0)
+	{
+		DOWN = pos[1].y;
+		RIGHT = pos[1].x;
 	}
-    video_start_pocketc(machine);
+
+    VIDEO_START_CALL(pocketc);
 }
 
 

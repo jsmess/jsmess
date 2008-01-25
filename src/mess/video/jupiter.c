@@ -16,7 +16,7 @@ size_t jupiter_charram_size;
 
 VIDEO_START( jupiter )
 {
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 

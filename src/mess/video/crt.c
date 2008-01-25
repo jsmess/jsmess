@@ -124,7 +124,7 @@ void crt_plot(int x, int y)
 
 
 /*
-	video_eof_crt
+	VIDEO_EOF( crt )
 
 	keep track of time
 */

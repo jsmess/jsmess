@@ -70,7 +70,7 @@ VIDEO_START( hp48 )
 	}
 #endif
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 typedef const char *HP48_FIGURE;

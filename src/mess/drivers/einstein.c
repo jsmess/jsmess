@@ -1465,7 +1465,7 @@ static MACHINE_RESET( einstein )
 
 static MACHINE_RESET( einstein2 )
 {
-	machine_reset_einstein(machine);
+	MACHINE_RESET_CALL(einstein);
 	einstein_80col_init();
 }
 
@@ -1701,9 +1701,9 @@ static const struct AY8910interface einstein_ay_interface =
 
 static VIDEO_UPDATE( einstein2 )
 {
-	video_update_tms9928a(machine, screen, bitmap, cliprect);
-	video_update_crtc6845(machine, screen, bitmap, cliprect);
-//  video_update_einstein_80col(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(tms9928a);
+	VIDEO_UPDATE_CALL(crtc6845);
+//  VIDEO_UPDATE_CALL(einstein_80col);
 	return 0;
 }
 

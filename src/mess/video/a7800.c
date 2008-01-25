@@ -73,7 +73,7 @@ VIDEO_START( a7800 )
 {
 	int i;
 
-	video_start_generic_bitmapped(machine);
+	VIDEO_START_CALL(generic_bitmapped);
 
 	for(i=0; i<8; i++)
 	{
@@ -448,7 +448,7 @@ INTERRUPT_GEN( a7800_interrupt )
 VIDEO_UPDATE( a7800 )
 {
 	maria_scanline = 0;
-	video_update_generic_bitmapped(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(generic_bitmapped);
 	return 0;
 }
 

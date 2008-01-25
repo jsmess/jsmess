@@ -837,13 +837,13 @@ MACHINE_RESET( c128 )
 
 VIDEO_START( c128 )
 {
-	video_start_vdc8563(machine);
-	video_start_vic2(machine);
+	VIDEO_START_CALL(vdc8563);
+	VIDEO_START_CALL(vic2);
 }
 
 VIDEO_UPDATE( c128 )
 {
-	video_update_vdc8563(machine, screen, bitmap, cliprect);
-	video_update_vic2(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(vdc8563);
+	VIDEO_UPDATE_CALL(vic2);
 	return 0;
 }

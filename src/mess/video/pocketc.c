@@ -51,7 +51,7 @@ VIDEO_START( pocketc )
 	}
 #endif
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 void pocketc_draw_special(mame_bitmap *bitmap,

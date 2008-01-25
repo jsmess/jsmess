@@ -13,7 +13,7 @@ VIDEO_START( intv )
 {
 	//int i,j,k;
 
-	video_start_generic_bitmapped(machine);
+	VIDEO_START_CALL(generic_bitmapped);
 
 /*
     for (i = 0; i < 8; i++) {
@@ -753,7 +753,7 @@ VIDEO_UPDATE( intv )
 
 VIDEO_START( intvkbd )
 {
-    video_start_generic(machine);
+    VIDEO_START_CALL(generic);
 	video_start_intv(machine);
 }
 
@@ -817,7 +817,7 @@ VIDEO_UPDATE( intvkbd )
 //	char c;
 
 	/* Draw the underlying INTV screen first */
-	video_update_intv(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(intv);
 
 	/* if the intvkbd text is not blanked, overlay it */
 	if (!intvkbd_text_blanked)

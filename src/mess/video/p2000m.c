@@ -16,7 +16,7 @@ static INT8 frame_count;
 VIDEO_START( p2000m )
 {
 	frame_count = 0;
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 

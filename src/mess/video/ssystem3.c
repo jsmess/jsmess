@@ -41,7 +41,7 @@ VIDEO_START( ssystem3 )
 	}
 #endif
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 static const char led[]={

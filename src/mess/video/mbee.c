@@ -474,7 +474,7 @@ WRITE8_HANDLER ( m6545_data_w )
 
 VIDEO_START( mbee )
 {
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 
 	videoram = auto_malloc(0x800);
 	colorram = auto_malloc(0x800);
