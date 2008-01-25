@@ -99,7 +99,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 			/* column has gone low in snooze/coma */
 			blink.sta |= STA_KEY;
 
-			cpu_trigger(Machine, Z88_SNOOZE_TRIGGER);
+			cpu_trigger(machine, Z88_SNOOZE_TRIGGER);
 
 			z88_interrupt_refresh();
 		}

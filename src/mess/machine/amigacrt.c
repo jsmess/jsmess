@@ -84,7 +84,7 @@ static int amiga_ar1_irqack( int level )
 static TIMER_CALLBACK( amiga_ar1_delayed_nmi )
 {
 	(void)param;
-	cpunum_set_input_line(Machine, 0, 7, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, 7, PULSE_LINE);
 }
 
 static void amiga_ar1_nmi( void )

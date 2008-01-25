@@ -65,7 +65,7 @@ static void nes_vh_start(running_machine *machine, ppu_t ppu_type, double scanli
 		}
 	}
 
-	add_reset_callback(Machine, nes_vh_reset);
+	add_reset_callback(machine, nes_vh_reset);
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	mapper_reset(nes.mapper);

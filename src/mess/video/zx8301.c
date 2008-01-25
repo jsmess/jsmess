@@ -135,7 +135,7 @@ VIDEO_UPDATE( zx8301 )
 	}
 	else
 	{
-		fillbitmap(bitmap, get_black_pen(Machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	}
 
 	return 0;

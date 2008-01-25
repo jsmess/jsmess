@@ -458,7 +458,7 @@ static TIMER_CALLBACK(adam_paddle_callback)
 		adam_joy_stat[1] = 1;
 
 	if (adam_joy_stat[0] || adam_joy_stat[1])
-		cpunum_set_input_line (Machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line (machine, 0, 0, HOLD_LINE);
 }
 
 void set_memory_banks(void)

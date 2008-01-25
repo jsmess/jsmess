@@ -353,7 +353,7 @@ static TIMER_CALLBACK(vc1541_timer)
 		vc1541->head.ready=0;
 		vc1541->head.sync=0;
 		if (vc1541->type==TypeVC1541) {
-			cpunum_set_input_line(Machine, vc1541->cpunumber, M6502_SET_OVERFLOW, 1);
+			cpunum_set_input_line(machine, vc1541->cpunumber, M6502_SET_OVERFLOW, 1);
 			via_3_ca1_w(0,1);
 		}
 		return;
@@ -377,7 +377,7 @@ static TIMER_CALLBACK(vc1541_timer)
 		vc1541->head.sync=0;
 	}
 	if (vc1541->type==TypeVC1541) {
-		cpunum_set_input_line(Machine, vc1541->cpunumber, M6502_SET_OVERFLOW, 0);
+		cpunum_set_input_line(machine, vc1541->cpunumber, M6502_SET_OVERFLOW, 0);
 		via_3_ca1_w(0,0);
 	}
 	vc1541->clock=0;

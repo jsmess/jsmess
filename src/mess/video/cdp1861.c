@@ -170,7 +170,7 @@ VIDEO_UPDATE( cdp1861 )
 	}
 	else
 	{
-		fillbitmap(bitmap, get_black_pen(Machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	}
 
 	return 0;

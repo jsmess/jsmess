@@ -317,7 +317,7 @@ MACHINE_START( cgenie )
 	 * Every fifth cycle is a wait cycle, so I reduced
 	 * the overlocking by one fitfth
 	 */
-	cpunum_set_clockscale(Machine, 0, 0.80);
+	cpunum_set_clockscale(machine, 0, 0.80);
 
 	/* Initialize some patterns to be displayed in graphics mode */
 	for( i = 0; i < 256; i++ )

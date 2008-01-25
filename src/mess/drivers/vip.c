@@ -160,7 +160,7 @@ static MACHINE_START( vip )
 
 	for (addr = 0; addr < mess_ram_size; addr++)
 	{
-		ram[addr] = mame_rand(Machine) & 0xff;
+		ram[addr] = mame_rand(machine) & 0xff;
 	}
 
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1), 0x8000);

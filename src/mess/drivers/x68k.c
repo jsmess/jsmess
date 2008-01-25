@@ -232,7 +232,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(sys.mfp.iera & (1 << x))
                 {
                     current_vector[6] = (sys.mfp.vr & 0xf0) | (x+8);
-                    cpunum_set_input_line_and_vector(Machine, 0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
+                    cpunum_set_input_line_and_vector(machine, 0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | (x+8),sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -251,7 +251,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(sys.mfp.ierb & (1 << x))
                 {
                     current_vector[6] = (sys.mfp.vr & 0xf0) | x;
-                    cpunum_set_input_line_and_vector(Machine, 0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
+                    cpunum_set_input_line_and_vector(machine, 0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | x,sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -626,7 +626,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 				sys.mouse.irqactive = 1;
 				current_vector[5] = 0x54;
 				current_irq_line = 5;
-				cpunum_set_input_line_and_vector(Machine, 0,5,HOLD_LINE,0x54);
+				cpunum_set_input_line_and_vector(machine, 0,5,HOLD_LINE,0x54);
 			}
 		}
 	}

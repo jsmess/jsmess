@@ -189,7 +189,7 @@ VIDEO_UPDATE( vectrex )
 		i = (i+1) % NVECT;
 	}
 
-	video_update_vector(Machine, screen, bitmap, cliprect);
+	video_update_vector(machine, screen, bitmap, cliprect);
 	vector_clear_list();
 	return 0;
 }

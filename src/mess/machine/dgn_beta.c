@@ -1045,7 +1045,7 @@ static void dgnbeta_reset(running_machine *machine)
 	system_rom = memory_region(REGION_CPU1);
 
 	/* Make sure CPU 1 is started out halted ! */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* Reset to task 0, and map banks disabled, so standard memory map */
 	/* with ram at $0000-$BFFF, ROM at $C000-FBFF, IO at $FC00-$FEFF */

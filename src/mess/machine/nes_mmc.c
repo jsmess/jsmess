@@ -99,7 +99,7 @@ static emu_timer	*nes_irq_timer;
 
 static TIMER_CALLBACK(nes_irq_callback)
 {
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 	timer_adjust(nes_irq_timer, attotime_never, 0, attotime_never);
 }
 

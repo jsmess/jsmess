@@ -471,7 +471,7 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 	else
 	{
 		snprintf(state_filename, sizeof(state_filename) / sizeof(state_filename[0]),
-			"%s State.sta", Machine->gamedrv->description);
+			"%s State.sta", machine->gamedrv->description);
 		dir = NULL;
 
 		src = state_filename;

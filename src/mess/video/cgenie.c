@@ -268,7 +268,7 @@ static void cgenie_refresh_monitor(running_machine *machine, mame_bitmap * bitma
 			{
 				/* get graphics code */
 				code = videoram[i];
-				drawgfx(bitmap, Machine->gfx[1], code, 0,
+				drawgfx(bitmap, machine->gfx[1], code, 0,
 					0, 0, r.min_x, r.min_y, &r, TRANSPARENCY_NONE, 0);
 			}
 			else
@@ -278,7 +278,7 @@ static void cgenie_refresh_monitor(running_machine *machine, mame_bitmap * bitma
 				
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
-				drawgfx(bitmap, Machine->gfx[0], code, colorram[i&0x3ff],
+				drawgfx(bitmap, machine->gfx[0], code, colorram[i&0x3ff],
 					0, 0, r.min_x, r.min_y, &r, TRANSPARENCY_NONE, 0);
 			}
 
@@ -307,7 +307,7 @@ static void cgenie_refresh_monitor(running_machine *machine, mame_bitmap * bitma
 				rc.max_x = r.max_x;
 				rc.min_y = r.min_y + (crt.cursor_top & 15);
 				rc.max_y = r.min_y + (crt.cursor_bottom & 15);
-				drawgfx(bitmap, Machine->gfx[0], 0x7f, colorram[i&0x3ff],
+				drawgfx(bitmap, machine->gfx[0], 0x7f, colorram[i&0x3ff],
 					0, 0, rc.min_x, rc.min_y, &rc, TRANSPARENCY_NONE, 0);
 			}
 		}
@@ -347,9 +347,9 @@ static void cgenie_refresh_tv_set(running_machine *machine, mame_bitmap * bitmap
 			{
 				/* get graphics code */
 				code = videoram[i];
-				drawgfx(tmpbitmap, Machine->gfx[1], code, 1,
+				drawgfx(tmpbitmap, machine->gfx[1], code, 1,
 					0, 0, r.min_x, r.min_y, &r, TRANSPARENCY_NONE, 0);
-				drawgfx(dlybitmap, Machine->gfx[1], code, 2,
+				drawgfx(dlybitmap, machine->gfx[1], code, 2,
 					0, 0, r.min_x, r.min_y, &r, TRANSPARENCY_NONE, 0);
 			}
 			else
@@ -359,9 +359,9 @@ static void cgenie_refresh_tv_set(running_machine *machine, mame_bitmap * bitmap
 				
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
-				drawgfx(tmpbitmap, Machine->gfx[0], code, colorram[i&0x3ff] + 16,
+				drawgfx(tmpbitmap, machine->gfx[0], code, colorram[i&0x3ff] + 16,
 					0, 0, r.min_x, r.min_y, &r, TRANSPARENCY_NONE, 0);
-				drawgfx(dlybitmap, Machine->gfx[0], code, colorram[i&0x3ff] + 32,
+				drawgfx(dlybitmap, machine->gfx[0], code, colorram[i&0x3ff] + 32,
 					0, 0, r.min_x, r.min_y, &r, TRANSPARENCY_NONE, 0);
 			}
 
@@ -391,9 +391,9 @@ static void cgenie_refresh_tv_set(running_machine *machine, mame_bitmap * bitmap
 				rc.min_y = r.min_y + (crt.cursor_top & 15);
 				rc.max_y = r.min_y + (crt.cursor_bottom & 15);
 				
-				drawgfx(tmpbitmap, Machine->gfx[0], 0x7f, colorram[i&0x3ff] + 16,
+				drawgfx(tmpbitmap, machine->gfx[0], 0x7f, colorram[i&0x3ff] + 16,
 					0, 0, rc.min_x, rc.min_y, &rc, TRANSPARENCY_NONE, 0);
-				drawgfx(dlybitmap, Machine->gfx[0], 0x7f, colorram[i&0x3ff] + 32,
+				drawgfx(dlybitmap, machine->gfx[0], 0x7f, colorram[i&0x3ff] + 32,
 					0, 0, rc.min_x, rc.min_y, &rc, TRANSPARENCY_NONE, 0);
 			}
 		}

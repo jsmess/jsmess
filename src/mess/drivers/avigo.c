@@ -210,7 +210,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		if ((current_input_port_data[3] & 0x02)!=0)
 		{
 			/* ????? causes a NMI */
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 

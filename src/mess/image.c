@@ -181,18 +181,18 @@ static void image_exit(running_machine *machine)
 
 	indx = 0;
 
-	if (Machine->devices)
+	if (machine->devices)
 	{
-		for (i = 0; Machine->devices[i].type < IO_COUNT; i++)
+		for (i = 0; machine->devices[i].type < IO_COUNT; i++)
 		{
-			for (j = 0; j < Machine->devices[i].count; j++)
+			for (j = 0; j < machine->devices[i].count; j++)
 			{
 				/* identify the image */
 				image = &images[indx + j];
 
 				/* call the exit handler if appropriate */
-				if (Machine->devices[i].exit)
-					Machine->devices[i].exit(image);
+				if (machine->devices[i].exit)
+					machine->devices[i].exit(image);
 
 				/* free the tagpool */
 				tagpool_exit(&images[indx + j].tagpool);
@@ -208,7 +208,7 @@ static void image_exit(running_machine *machine)
 				pool_free(image->mempool);
 				image->mempool = NULL;
 			}
-			indx += Machine->devices[i].count;
+			indx += machine->devices[i].count;
 		}
 	}
 }

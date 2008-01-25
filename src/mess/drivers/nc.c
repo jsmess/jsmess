@@ -532,7 +532,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 				case NC_TYPE_1xx:
 				{
 			        LOG(("nmi triggered\n"));
-				    cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+				    cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
 

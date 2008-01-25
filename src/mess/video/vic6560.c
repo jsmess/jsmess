@@ -485,7 +485,7 @@ INTERRUPT_GEN( vic656x_raster_interrupt )
 			r.min_y = LIGHTPEN_Y_VALUE - 1 + VIC656X_MAME_YPOS;
 			r.max_y = r.min_y + 8 - 1;
 
-			if (DOCLIP (&r, &Machine->screen[0].visarea))
+			if (DOCLIP (&r, &machine->screen[0].visarea))
 			{
 #ifndef GFX
 				vic6560_draw_pointer (vic6560_bitmap, &r,

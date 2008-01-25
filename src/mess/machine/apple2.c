@@ -721,15 +721,15 @@ static void apple2_reset(running_machine *machine)
 {
 	int need_intcxrom, i;
 
-	need_intcxrom = !strcmp(Machine->gamedrv->name, "apple2c")
-		|| !strcmp(Machine->gamedrv->name, "apple2c0")
-		|| !strcmp(Machine->gamedrv->name, "apple2c3")
-		|| !strcmp(Machine->gamedrv->name, "apple2cp")
-		|| !strncmp(Machine->gamedrv->name, "apple2g", 7);
+	need_intcxrom = !strcmp(machine->gamedrv->name, "apple2c")
+		|| !strcmp(machine->gamedrv->name, "apple2c0")
+		|| !strcmp(machine->gamedrv->name, "apple2c3")
+		|| !strcmp(machine->gamedrv->name, "apple2cp")
+		|| !strncmp(machine->gamedrv->name, "apple2g", 7);
 	apple2_setvar(need_intcxrom ? VAR_INTCXROM : 0, ~0);
 
 	// ROM 0 cannot boot unless language card bank 2 is write-enabled (but read ROM) on startup
-	if (!strncmp(Machine->gamedrv->name, "apple2g", 7))
+	if (!strncmp(machine->gamedrv->name, "apple2g", 7))
 	{
 		apple2_setvar(VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
 	}
