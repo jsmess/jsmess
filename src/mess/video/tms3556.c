@@ -62,7 +62,6 @@ static struct
 /*static const char *const tms3556_mode_names[] = { "DISPLAY OFF", "TEXT", "GRAPHIC", "MIXED" };*/
 
 static PALETTE_INIT(tms3556);
-static VIDEO_UPDATE(tms3556);
 
 
 #if 0
@@ -211,17 +210,17 @@ MACHINE_DRIVER_START( tms3556 )
 	MDRV_COLORTABLE_LENGTH(0)
 	MDRV_PALETTE_INIT(tms3556)
 
-	/*MDRV_VIDEO_START(tms3556)*/
-	MDRV_VIDEO_UPDATE(tms3556)
+	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(generic_bitmapped)
 MACHINE_DRIVER_END
 
 
 /*
-	palette_init_tms3556
+	PALETTE_INIT( tms3556 )
 
 	Create our 8-color RGB palette
 */
-static PALETTE_INIT(tms3556)
+static PALETTE_INIT( tms3556 )
 {
 	int	i, red, green, blue;
 
@@ -245,8 +244,6 @@ void tms3556_init(int vram_size)
 	memset(&vdp, 0, sizeof (vdp));
 
 	vdp.vram_size = vram_size;
-
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
 	/* allocate VRAM */
 	vdp.vram = auto_malloc(0x10000);
@@ -579,17 +576,6 @@ static void tms3556_draw_line(mame_bitmap *bmp, int line)
 		memcpy (ln2, ln, TOTAL_WIDTH*(DOUBLE_WIDTH ? 2 : 1) * 2);
 }
 
-/*
-	video_update_tms3556
-
-	video update function
-*/
-static VIDEO_UPDATE(tms3556)
-{
-	/* already been rendered, since we're using scanline stuff */
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-	return 0;
-}
 
 /*
 	tms3556_interrupt_start_vblank
