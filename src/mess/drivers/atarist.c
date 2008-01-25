@@ -1739,7 +1739,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(st_map, 0)
 
-	MDRV_CPU_ADD(HD63701, 1000000) // HD6301, really clocked at 4MHz but CPU core doesn't divide it properly
+	MDRV_CPU_ADD(HD63701, XTAL_4MHz)  /* HD6301 */
 	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
@@ -1776,7 +1776,7 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(ste_map, 0)
 
-	MDRV_CPU_ADD(HD63701, 1000000) // HD6301, really clocked at 4MHz but CPU core doesn't divide it properly
+	MDRV_CPU_ADD(HD63701, XTAL_4MHz)  /* HD6301 */
 	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 

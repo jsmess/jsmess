@@ -206,7 +206,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( mc10 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6803, 894886)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD_TAG("main", M6803, XTAL_3_579545MHz)  /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mc10_mem, 0)
 	MDRV_CPU_IO_MAP(mc10_io, 0)
 	MDRV_SCREEN_REFRESH_RATE(60)
