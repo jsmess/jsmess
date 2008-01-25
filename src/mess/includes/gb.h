@@ -128,7 +128,6 @@ PALETTE_INIT( megaduck );
 READ8_HANDLER( gb_video_r );
 WRITE8_HANDLER( gb_video_w );
 void gb_video_init( int mode );
-void gb_video_up_to_date( void );
 
 
 #endif /* GB_H_ */

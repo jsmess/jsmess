@@ -64,7 +64,6 @@ static UINT8	gb_tile_no_mod;
 static UINT8	*gbc_chrgen;	/* Character generator           */
 static UINT8	*gbc_bgdtab;	/* Background character table    */
 static UINT8	*gbc_wndtab;	/* Window character table        */
-static int		gb_do_not_check_time;
 
 struct layer_struct {
 	UINT8  enabled;
@@ -1125,6 +1124,7 @@ enum {
 	GB_LCD_STATE_LYXX_PRE_M0,
 	GB_LCD_STATE_LYXX_M0,
 	GB_LCD_STATE_LYXX_M0_SCX3,
+	GB_LCD_STATE_LYXX_M0_HDMA,
 	GB_LCD_STATE_LYXX_M0_GBC_PAL,
 	GB_LCD_STATE_LYXX_M0_PRE_INC,
 	GB_LCD_STATE_LYXX_M0_INC,
@@ -1146,7 +1146,6 @@ void gb_video_init( int mode ) {
 	int	i;
 	int vram_size = 0x2000;
 
-	gb_do_not_check_time = 0;
 	switch( mode ) {
 	case GB_VIDEO_CGB:	vram_size = 0x4000; break;
 	}
@@ -1285,7 +1284,6 @@ void gb_video_init( int mode ) {
 static void gbc_hdma(UINT16 length) {
 	UINT16 src, dst;
 
-	gb_do_not_check_time = 1;
 	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
 	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);
 	dst |= 0x8000;
@@ -1302,7 +1300,6 @@ static void gbc_hdma(UINT16 length) {
 		HDMA5 = 0xff;
 		gbc_hdma_enabled = 0;
 	}
-	gb_do_not_check_time = 0;
 }
 
 static void gb_increment_scanline( void ) {
@@ -1599,9 +1596,6 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 				cpunum_set_input_line(machine, 0, LCD_INT, HOLD_LINE );
 				gb_lcd.triggering_mode_irq = 0;
 			}
-			/* Check for HBLANK DMA */
-			if( gbc_hdma_enabled )
-				gbc_hdma(0x10);
 			if ( ( SCROLLX & 0x03 ) == 0x03 ) {
 				gb_lcd.pal_locked = UNLOCKED;
 			}
@@ -1609,6 +1603,10 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			break;
 		case GB_LCD_STATE_LYXX_M0_GBC_PAL:
 			gb_lcd.pal_locked = UNLOCKED;
+		case GB_LCD_STATE_LYXX_M0_HDMA:
+			/* Check for HBLANK DMA */
+			if( gbc_hdma_enabled )
+				gbc_hdma(0x10);
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(192 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
@@ -1809,26 +1807,15 @@ static void gb_lcd_switch_on( void ) {
 	timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
 }
 
-/* Make sure the video information is up to date */
-void gb_video_up_to_date( void ) {
-	if ( gb_do_not_check_time ) {
-		return;
-	}
-	timer_set_global_time(timer_get_time());
-}
-
 READ8_HANDLER( gb_video_r ) {
-	gb_video_up_to_date();
 	return gb_vid_regs[offset];
 }
 
 READ8_HANDLER( gb_vram_r ) {
-	gb_video_up_to_date();
 	return ( gb_lcd.vram_locked == LOCKED ) ? 0xFF : gb_vram_ptr[offset];
 }
 
 WRITE8_HANDLER( gb_vram_w ) {
-	gb_video_up_to_date();
 	if ( gb_lcd.vram_locked == LOCKED ) {
 		return;
 	}
@@ -1836,12 +1823,10 @@ WRITE8_HANDLER( gb_vram_w ) {
 }
 
 READ8_HANDLER( gb_oam_r ) {
-	gb_video_up_to_date();
 	return ( gb_lcd.oam_locked == LOCKED ) ? 0xFF : gb_oam[offset];
 }
 
 WRITE8_HANDLER( gb_oam_w ) {
-	gb_video_up_to_date();
 	if ( gb_lcd.oam_locked == LOCKED || offset >= 0xa0 ) {
 		return;
 	}
@@ -1849,7 +1834,6 @@ WRITE8_HANDLER( gb_oam_w ) {
 }
 
 WRITE8_HANDLER ( gb_video_w ) {
-	gb_video_up_to_date();
 	switch (offset) {
 	case 0x00:						/* LCDC - LCD Control */
 		gb_chrgen = gb_vram + ((data & 0x10) ? 0x0000 : 0x0800);
@@ -1967,10 +1951,14 @@ WRITE8_HANDLER ( gb_video_w ) {
 }
 
 READ8_HANDLER( gbc_video_r ) {
-	gb_video_up_to_date();
 	switch( offset ) {
-	case 0x29:
-	case 0x2B:
+	case 0x11:	/* FF51 */
+	case 0x12:	/* FF52 */
+	case 0x13:	/* FF53 */
+	case 0x14:	/* FF54 */
+		return 0xFF;
+	case 0x29:	/* FF69 */
+	case 0x2B:	/* FF6B */
 		if ( gb_lcd.pal_locked == LOCKED ) {
 			return 0xFF;
 		}
@@ -1983,7 +1971,6 @@ WRITE8_HANDLER ( gbc_video_w ) {
 	static const UINT16 gbc_to_gb_pal[4] = {32767, 21140, 10570, 0};
 	static UINT16 BP = 0, OP = 0;
 
-	gb_video_up_to_date();
 	switch( offset ) {
 	case 0x00:      /* LCDC - LCD Control */
 		gb_chrgen = gb_vram + ((data & 0x10) ? 0x0000 : 0x0800);
