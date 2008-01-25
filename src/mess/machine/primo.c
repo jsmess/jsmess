@@ -51,11 +51,11 @@ static void primo_update_memory (void)
 	switch (primo_port_FD & 0x03)
 	{
 		case 0x00:	/* Original ROM */
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_UNMAP);
 			memory_set_bankptr(1, memory_region(REGION_CPU1)+0x10000);
 			break;
 		case 0x01:	/* EPROM extension 1 */
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_UNMAP);
 			memory_set_bankptr(1, memory_region(REGION_CPU1)+0x14000);
 			break;
 		case 0x02:	/* RAM */
@@ -63,7 +63,7 @@ static void primo_update_memory (void)
 			memory_set_bankptr(1, memory_region(REGION_CPU1));
 			break;
 		case 0x03:	/* EPROM extension 2 */
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_UNMAP);
 			memory_set_bankptr(1, memory_region(REGION_CPU1)+0x18000);
 			break;
 	}

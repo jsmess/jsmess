@@ -38,9 +38,9 @@ static void pmd851_update_memory (void)
 {
 	if (pmd85_startup_mem_map)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MWA8_UNMAP);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MWA8_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, MWA8_UNMAP);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, MWA8_NOP);
 
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MRA8_NOP);
@@ -78,8 +78,8 @@ static void pmd852a_update_memory (void)
 	if (pmd85_startup_mem_map)
 	{
 
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MWA8_ROM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MWA8_UNMAP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, MWA8_UNMAP);
 
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2, mess_ram + 0x9000);
@@ -144,8 +144,8 @@ static void alfa_update_memory (void)
 {
 	if (pmd85_startup_mem_map)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MWA8_ROM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x33ff, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MWA8_UNMAP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x33ff, 0, 0, MWA8_UNMAP);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3400, 0x3fff, 0, 0, MWA8_NOP);
 
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
@@ -172,7 +172,7 @@ static void mato_update_memory (void)
 {
 	if (pmd85_startup_mem_map)
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_UNMAP);
 
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x010000);
 		memory_set_bankptr(2, mess_ram + 0xc000);

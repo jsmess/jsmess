@@ -384,7 +384,7 @@ static void apple3_update_memory(void)
 	{
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xC0FF, 0, 0, MRA8_BANK8);
 		if (via_0_a & 0x08)
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xC0FF, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xC0FF, 0, 0, MWA8_UNMAP);
 		else
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xC0FF, 0, 0, MWA8_BANK8);
 		apple3_setbank(8, ~0, 0x4000);
@@ -400,7 +400,7 @@ static void apple3_update_memory(void)
 	{
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC100, 0xC4FF, 0, 0, MRA8_BANK9);
 		if (via_0_a & 0x08)
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC100, 0xC4FF, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC100, 0xC4FF, 0, 0, MWA8_UNMAP);
 		else
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC100, 0xC4FF, 0, 0, MWA8_BANK9);
 		apple3_setbank(9, ~0, 0x4100);
@@ -409,7 +409,7 @@ static void apple3_update_memory(void)
 	/* install bank 10 (C500-C7FF) */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC500, 0xC7FF, 0, 0, MRA8_BANK10);
 	if (via_0_a & 0x08)
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC500, 0xC7FF, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC500, 0xC7FF, 0, 0, MWA8_UNMAP);
 	else
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC500, 0xC7FF, 0, 0, MWA8_BANK10);
 	apple3_setbank(10, ~0, 0x4500);
@@ -424,7 +424,7 @@ static void apple3_update_memory(void)
 	{
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC800, 0xCFFF, 0, 0, MRA8_BANK11);
 		if (via_0_a & 0x08)
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC800, 0xCFFF, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC800, 0xCFFF, 0, 0, MWA8_UNMAP);
 		else
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xC800, 0xCFFF, 0, 0, MWA8_BANK11);
 		apple3_setbank(11, ~0, 0x4800);
@@ -433,7 +433,7 @@ static void apple3_update_memory(void)
 	/* install bank 6 (D000-EFFF) */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xEFFF, 0, 0, MRA8_BANK6);
 	if (via_0_a & 0x08)
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xEFFF, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xEFFF, 0, 0, MWA8_UNMAP);
 	else
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xEFFF, 0, 0, MWA8_BANK6);
 	apple3_setbank(6, ~0, 0x5000);
@@ -441,7 +441,7 @@ static void apple3_update_memory(void)
 	/* install bank 7 (F000-FFFF) */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xF000, 0xFFFF, 0, 0, MRA8_BANK7);
 	if (via_0_a & 0x09)
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xF000, 0xFFFF, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xF000, 0xFFFF, 0, 0, MWA8_UNMAP);
 	else
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xF000, 0xFFFF, 0, 0, MWA8_BANK7);
 	if (via_0_a & 0x01)

@@ -638,14 +638,14 @@ static void sg1000_map_cartridge_memory(UINT8 *ptr, int size)
 	if (size == 40 * 1024)
 	{
 		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_UNMAP);
 		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
 		memory_set_bank(1, 0);
 	}
 	else if (size == 48 * 1024)
 	{
 		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MWA8_ROM);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MWA8_UNMAP);
 		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
 		memory_set_bank(1, 0);
 	}

@@ -281,7 +281,7 @@ static void bank1_ROM(UINT8 *mem)
 {
 	memory_set_bankptr(1, &mem[0x10000]);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MRA8_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MWA8_ROM);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, MWA8_UNMAP);
 }
 
 
@@ -297,7 +297,7 @@ static void bank2_ROM(UINT8 *mem)
 {
 	memory_set_bankptr(2, &mem[0x11000]);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MRA8_BANK2);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MWA8_ROM);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MWA8_UNMAP);
 }
 
 

@@ -512,15 +512,14 @@ static void oric_enable_memory(int low, int high, int rd, int wr)
 		switch(i) {
 		case 1:
 			memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, rd ? MRA8_BANK1 : MRA8_NOP);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, wr ? MWA8_BANK5 : MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, wr ? MWA8_BANK5 : MWA8_UNMAP);
 			break;
 		case 2:
 			memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xe000, 0xf7ff, 0, 0, rd ? MRA8_BANK2 : MRA8_NOP);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xf7ff, 0, 0, wr ? MWA8_BANK6 : MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xf7ff, 0, 0, wr ? MWA8_BANK6 : MWA8_UNMAP);
 			break;
 		case 3:
 			memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, rd ? MRA8_BANK3 : MRA8_NOP);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, wr ? MWA8_BANK7 : MWA8_ROM);
 			break;
 		}
 	}

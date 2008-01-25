@@ -1216,7 +1216,7 @@ static void kc85_4_update_0x00000(void)
 			LOG(("ram0 write protected\n"));
 
 			/* ram is enabled and write protected */
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MWA8_UNMAP);
 		}
 		else
 		{
