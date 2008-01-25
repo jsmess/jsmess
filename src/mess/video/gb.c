@@ -1363,9 +1363,6 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			     ( ( ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
 				cpunum_set_input_line(machine, 0, LCD_INT, HOLD_LINE );
 			}
-			/* Check for HBLANK DMA */
-			if( gbc_hdma_enabled )
-				gbc_hdma(0x10);
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(196 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
