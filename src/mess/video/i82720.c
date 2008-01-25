@@ -1395,7 +1395,7 @@ PALETTE_INIT( compis_gdc )
 
 static compis_gdc_interface sIntf;
 
-static void compis_gdc_start(const running_machine *machine, const compis_gdc_interface *intf)
+static void compis_gdc_start(running_machine *machine, const compis_gdc_interface *intf)
 {
 	/* Only 32KB or 128KB of VRAM */
 	switch(intf->vramsize)
