@@ -166,7 +166,7 @@
 #define DK_C30		CAP_U(10)
 #define DK_C32		CAP_U(10)
 #define DK_C34		CAP_N(10)
-#define DK_C159		CAP_N(0)		/* 100nF in Schematics but sound is way off */
+#define DK_C159		CAP_N(100)
 
 
 /*
@@ -367,7 +367,7 @@ static DISCRETE_SOUND_START(dkong2b)
 #if DK_NO_FILTERS
 	DISCRETE_OUTPUT(NODE_288, 32767.0/5.0 * 10)
 #else
-	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 3)
+	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 2)
 #endif
 
 DISCRETE_SOUND_END
@@ -889,7 +889,7 @@ static SOUND_RESET( dkong )
 
 static SOUND_RESET( dkongjr )
 {
-	sound_reset_dkong(machine);
+	SOUND_RESET_CALL(dkong);
 	soundlatch_w(0,0x00);
 }
 
@@ -1117,9 +1117,9 @@ READ8_HANDLER( dkong_audio_status_r )
 WRITE8_HANDLER( dkong_audio_irq_w )
 {
 	if (data)
-		cpunum_set_input_line(1, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 WRITE8_HANDLER( dkong_snd_disc_w )
@@ -1273,7 +1273,6 @@ static const struct NESinterface nes_interface_2 = { REGION_CPU3 };
 
 static struct TMS5110interface tms5110_interface =
 {
-	TMS5110_IS_M58817,
 	REGION_SOUND1,		/* Sample Rom */
 	NULL,
 	NULL
@@ -1317,7 +1316,7 @@ MACHINE_DRIVER_START( radarsc1_audio )
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
 
-	MDRV_SOUND_ADD(TMS5110, 640000)
+	MDRV_SOUND_ADD(M58817, XTAL_640kHz)
 	MDRV_SOUND_CONFIG(tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

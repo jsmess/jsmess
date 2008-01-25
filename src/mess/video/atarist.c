@@ -170,13 +170,13 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 	if ((y == shifter.vblank_start) && (x == 0))
 	{
-		cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
 		shifter.ofs = shifter.base;
 	}
 
 	if (x == shifter.hblank_start)
 	{
-		cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);
 		shifter.ofs += (shifter.lineofs * 2); // STe
 	}
 }

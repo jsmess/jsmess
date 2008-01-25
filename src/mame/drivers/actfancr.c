@@ -84,7 +84,7 @@ static READ8_HANDLER( triothep_control_r )
 static WRITE8_HANDLER( actfancr_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( actfan_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x100000, 0x1007ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x130000, 0x130003) AM_READ(actfan_control_1_r)
 	AM_RANGE(0x140000, 0x140001) AM_READ(actfan_control_0_r)
-	AM_RANGE(0x120000, 0x1205ff) AM_READ(paletteram_r)
+	AM_RANGE(0x120000, 0x1205ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_READ(MRA8_RAM)
 ADDRESS_MAP_END
 
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( triothep_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x044000, 0x045fff) AM_READ(actfancr_pf2_data_r)
 	AM_RANGE(0x064000, 0x0647ff) AM_READ(actfancr_pf1_data_r)
 	AM_RANGE(0x120000, 0x1207ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x130000, 0x1305ff) AM_READ(paletteram_r)
+	AM_RANGE(0x130000, 0x1305ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x140000, 0x140001) AM_READ(MRA8_NOP) /* Value doesn't matter */
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(triothep_control_r)
@@ -377,7 +377,7 @@ GFXDECODE_END
 
 static void sound_irq(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate); /* IRQ */
+	cpunum_set_input_line(Machine, 1,0,linestate); /* IRQ */
 }
 
 static const struct YM3812interface ym3812_interface =
@@ -433,11 +433,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( triothep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(H6280,21477200/3) /* Should be accurate */
+	MDRV_CPU_ADD(H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(triothep_readmem,triothep_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1) /* VBL */
 
-	MDRV_CPU_ADD(M6502, 1500000)
+	MDRV_CPU_ADD(M6502, XTAL_12MHz/8) /* verified on pcb */
 	/* audio CPU */ /* Should be accurate */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
@@ -458,18 +458,18 @@ static MACHINE_DRIVER_START( triothep )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM3812, 3000000)
+	MDRV_SOUND_ADD(YM3812, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MDRV_SOUND_ADD(OKIM6295, 1024188)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, XTAL_1_056MHz) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_DRIVER_END
 

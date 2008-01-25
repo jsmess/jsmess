@@ -290,7 +290,7 @@ static WRITE8_HANDLER( mcu_p3_w )
 
 static READ8_HANDLER( nmi_ack_r )
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 
@@ -344,7 +344,7 @@ static TIMER_CALLBACK( delayed_z80_mcu_w )
 logerror("Z80 sends command %02x\n",param);
 	from_z80 = param;
 	from_mcu_pending = 0;
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(200));
 }
 
@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(paletteram_r, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(MRA8_RAM, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(AY8910_control_port_0_w)
@@ -514,7 +514,7 @@ static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(paletteram_r, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(MRA8_RAM, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(AY8910_control_port_0_w)
@@ -528,7 +528,7 @@ static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READWRITE(paletteram_r, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x00ff) AM_READWRITE(MRA8_RAM, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(AY8910_control_port_0_w)
@@ -543,7 +543,7 @@ static ADDRESS_MAP_START( sqix_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bootleg_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READWRITE(paletteram_r, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x00ff) AM_READWRITE(MRA8_RAM, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(AY8910_control_port_0_w)

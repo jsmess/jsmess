@@ -981,6 +981,7 @@ DMA commands
 static void amstrad_plus_dma_parse(int channel, int *addr)
 {
 	unsigned short command;
+	running_machine *machine = Machine;
 
 	if(*addr & 0x01)
 		(*addr)++;  // align to even address
@@ -1030,7 +1031,7 @@ static void amstrad_plus_dma_parse(int channel, int *addr)
 		{
 			amstrad_plus_irq_cause = channel * 2;
 			amstrad_plus_asic_ram[0x2c0f] |= (0x40 >> channel);
-			cpunum_set_input_line(0,0,ASSERT_LINE);
+			cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
 			logerror("DMA %i: INT\n",channel);
 		}
 		if(command & 0x20)  // Stop processing on this channel
@@ -1136,6 +1137,8 @@ static void amstrad_Set_DE(int offset, int data)
 /* CRTC - Set new Horizontal Sync Status */
 static void amstrad_Set_HS(int offset, int data)
 {
+	running_machine *machine = Machine;
+
 	if (data != 0)
 	{
 		amstrad_render_mode = amstrad_current_mode;
@@ -1163,7 +1166,7 @@ static void amstrad_Set_HS(int offset, int data)
 				{
 					if(amstrad_plus_pri == 0 || amstrad_plus_asic_enabled == 0)
 					{
-						cpunum_set_input_line(0,0, ASSERT_LINE);
+						cpunum_set_input_line(machine, 0,0, ASSERT_LINE);
 					}
 				}
 				amstrad_CRTC_HS_Counter = 0;
@@ -1175,7 +1178,7 @@ static void amstrad_Set_HS(int offset, int data)
 			amstrad_CRTC_HS_Counter = 0;
 			if(amstrad_plus_pri == 0 || amstrad_plus_asic_enabled == 0)
 			{
-				cpunum_set_input_line(0,0, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0,0, ASSERT_LINE);
 			}
 		}
 		if(amstrad_plus_asic_enabled != 0)
@@ -1186,7 +1189,7 @@ static void amstrad_Set_HS(int offset, int data)
 				if(m6845_get_row_counter() == ((amstrad_plus_pri >> 3) & 0x1f) && m6845_get_scanline_counter() == (amstrad_plus_pri & 0x07))
 				{
 //					logerror("PRI: triggered, scanline %i, VSync width = %i\n",amstrad_scanline,vid.vertical_sync_width);
-					cpunum_set_input_line(0,0,ASSERT_LINE);
+					cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
 					amstrad_plus_irq_cause = 0x06;  // raster interrupt vector
 					amstrad_CRTC_HS_Counter &= ~0x20;  // ASIC PRI resets the MSB of the raster counter
 				}

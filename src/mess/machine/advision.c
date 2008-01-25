@@ -40,7 +40,7 @@ MACHINE_RESET( advision )
 	advision_videoenable = 0;
 	wLpointer = 0;
 	rLpointer = 0;
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 }
 
@@ -61,14 +61,14 @@ READ8_HANDLER( advision_MAINRAM_r )
 	{
 		if (d & 0x01)
 		{
-			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 			/*	logerror("RELEASE RESET\n"); */
 			wLpointer = 0;
 			rLpointer = 0;
 		}
 		else
 		{
-			cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 			/*	logerror("SET RESET\n");*/
 		}
 

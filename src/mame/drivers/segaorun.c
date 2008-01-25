@@ -100,14 +100,14 @@ static const struct segaic16_memory_map_entry outrun_info[] =
 	{ 0x35/2, 0x90000, 0x10000, 0xf00000,      ~0, segaic16_road_control_0_r, segaic16_road_control_0_w, NULL,                  "road control" },
 	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, MRA16_BANK10,              MWA16_BANK10,              &segaic16_roadram_0,   "road RAM" },
 	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, MRA16_BANK11,              MWA16_BANK11,              &cpu1ram,              "CPU 1 RAM" },
-	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, MRA16_BANK12,              MWA16_ROM,                 &cpu1rom,              "CPU 1 ROM" },
+	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, MRA16_BANK12,              MWA16_UNMAP,               &cpu1rom,              "CPU 1 ROM" },
 	{ 0x31/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                 misc_io_w,                 NULL,                  "I/O space" },
 	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK13,              MWA16_BANK13,              &segaic16_spriteram_0, "object RAM" },
 	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, MRA16_BANK14,              segaic16_paletteram_w,     &paletteram16,         "color RAM" },
 	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK15,              segaic16_tileram_0_w,      &segaic16_tileram_0,   "tile RAM" },
 	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK16,              segaic16_textram_0_w,      &segaic16_textram_0,   "text RAM" },
 	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, MRA16_BANK17,              MWA16_BANK17,              &workram,              "CPU 0 RAM" },
-	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, MRA16_BANK18,              MWA16_ROM,                 NULL,                  "CPU 0 ROM" },
+	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, MRA16_BANK18,              MWA16_UNMAP,               NULL,                  "CPU 0 ROM" },
 	{ 0 }
 };
 
@@ -122,7 +122,7 @@ static const struct segaic16_memory_map_entry outrun_info[] =
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	soundlatch_w(0, param);
-	cpunum_set_input_line(2, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -134,7 +134,7 @@ static void sound_data_w(UINT8 data)
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(2, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(offset);
 }
 
@@ -172,7 +172,7 @@ static void outrun_generic_init(void)
  *
  *************************************/
 
-static void update_main_irqs(void)
+static void update_main_irqs(running_machine *machine)
 {
 	int irq = 0;
 
@@ -185,11 +185,11 @@ static void update_main_irqs(void)
 	/* assert the lines that are live, or clear everything if nothing is live */
 	if (irq != 0)
 	{
-		cpunum_set_input_line(0, irq, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 	else
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -197,7 +197,7 @@ static TIMER_CALLBACK( irq2_gen )
 {
 	/* set the IRQ2 line */
 	irq2_state = 1;
-	update_main_irqs();
+	update_main_irqs(machine);
 }
 
 
@@ -229,19 +229,19 @@ static TIMER_CALLBACK( scanline_callback )
 		case 223:
 			vblank_irq_state = 1;
 			next_scanline = scanline + 1;
-			cpunum_set_input_line(1, 4, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, 4, ASSERT_LINE);
 			break;
 
 		/* VBLANK turns off at the start of scanline 224 */
 		case 224:
 			vblank_irq_state = 0;
 			next_scanline = 65;
-			cpunum_set_input_line(1, 4, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, 4, CLEAR_LINE);
 			break;
 	}
 
 	/* update IRQs on the main CPU */
-	update_main_irqs();
+	update_main_irqs(machine);
 
 	/* come back at the next targeted scanline */
 	timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), NULL, next_scanline, scanline_callback);
@@ -257,7 +257,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 static void outrun_reset(void)
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -347,7 +347,7 @@ static WRITE8_HANDLER( video_control_w )
     */
 	segaic16_set_display_enable(data & 0x20);
 	adc_select = (data >> 2) & 7;
-	cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -481,7 +481,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
 			/* Output port:
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 0x3000/2:

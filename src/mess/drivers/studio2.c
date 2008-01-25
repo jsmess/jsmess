@@ -248,7 +248,7 @@ static MACHINE_RESET( mpt02 )
 {
 	machine_reset_cdp1864(machine);
 
-	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /* Machine Drivers */

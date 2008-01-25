@@ -772,7 +772,7 @@ INTERRUPT_GEN( apple2_interrupt )
 			irq_freq = 1;
 
 		if (irq_freq)
-			cpunum_set_input_line(0, M6502_IRQ_LINE, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, PULSE_LINE);
 	}
 
 	video_screen_update_partial(0, scanline);

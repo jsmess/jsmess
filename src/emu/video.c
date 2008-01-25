@@ -644,7 +644,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 
 					/* display some startup text */
 					sprintf(buffer, "Decoding (%d%%)", curgfx * 100 / totalgfx);
-					ui_set_startup_text(buffer, FALSE);
+					ui_set_startup_text(machine, buffer, FALSE);
 				}
 			}
 
@@ -756,7 +756,7 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	}
 
 	/* recompute the VBLANK timing */
-	cpu_compute_vblank_timing();
+	cpu_compute_vblank_timing(Machine);
 
 	/* if we are on scanline 0 already, reset the update timer immediately */
 	/* otherwise, defer until the next scanline 0 */
@@ -1035,7 +1035,7 @@ static TIMER_CALLBACK( scanline0_callback )
     operations
 -------------------------------------------------*/
 
-void video_frame_update(int debug)
+void video_frame_update(running_machine *machine, int debug)
 {
 	attotime current_time = timer_get_time();
 	int skipped_it = global.skipping_this_frame;
@@ -1056,7 +1056,7 @@ void video_frame_update(int debug)
 	}
 
 	/* draw the user interface */
-	ui_update_and_render();
+	ui_update_and_render(machine);
 
 	/* if we're throttling, synchronize before rendering */
 	if (!debug && !skipped_it && effective_throttle())
@@ -1553,7 +1553,7 @@ static void update_frameskip(void)
 	/* if we're throttling and autoframeskip is on, adjust */
 	if (effective_throttle() && effective_autoframeskip() && global.frameskip_counter == 0)
 	{
-		float speed = global.speed * 0.01;
+		double speed = global.speed * 0.01;
 
 		/* if we're too fast, attempt to increase the frameskip */
 		if (global.speed_percent >= 0.995 * speed)

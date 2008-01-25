@@ -65,7 +65,7 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
 	UINT8 val = ( ( internal_registers[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	internal_registers[SM8521_CLKT] = ( internal_registers[SM8521_CLKT] & 0xC0 ) | val;
-	cpunum_set_input_line( 0, CK_INT, HOLD_LINE );
+	cpunum_set_input_line(machine, 0, CK_INT, HOLD_LINE );
 }
 
 MACHINE_RESET( gamecom )
@@ -553,7 +553,7 @@ void gamecom_handle_dma( int cycles ) {
 		gamecom_dma.dest_current = gamecom_dma.dest_line;
 	}
 	gamecom_dma.enabled = 0;
-	cpunum_set_input_line( 0, DMA_INT, HOLD_LINE );
+	cpunum_set_input_line(Machine, 0, DMA_INT, HOLD_LINE );
 }
 
 void gamecom_update_timers( int cycles ) {
@@ -564,7 +564,7 @@ void gamecom_update_timers( int cycles ) {
 			gamecom_timer[0].counter++;
 			if ( gamecom_timer[0].counter == gamecom_timer[0].check_value ) {
 				gamecom_timer[0].counter = 0;
-				cpunum_set_input_line( 0, TIM0_INT, HOLD_LINE );
+				cpunum_set_input_line(Machine, 0, TIM0_INT, HOLD_LINE );
 			}
 		}
 	}
@@ -575,7 +575,7 @@ void gamecom_update_timers( int cycles ) {
 			gamecom_timer[1].counter++;
 			if ( gamecom_timer[1].counter == gamecom_timer[1].check_value ) {
 				gamecom_timer[1].counter = 0;
-				cpunum_set_input_line( 0, TIM1_INT, HOLD_LINE );
+				cpunum_set_input_line(Machine, 0, TIM1_INT, HOLD_LINE );
 			}
 		}
 	}

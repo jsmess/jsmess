@@ -201,7 +201,7 @@ static INTERRUPT_GEN( crvision_int )
 
 static void crvision_vdp_interrupt(int state)
 {
-	cpunum_set_input_line(0, INPUT_LINE_IRQ0, state);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9918_intf =

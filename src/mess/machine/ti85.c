@@ -114,7 +114,7 @@ static TIMER_CALLBACK(ti85_timer_callback)
 	{
 		if (ti85_ON_interrupt_mask && !ti85_ON_pressed)
 		{
-			cpunum_set_input_line(0, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 			ti85_ON_interrupt_status = 1;
 			if (!ti85_timer_interrupt_mask) ti85_timer_interrupt_mask = 1;
 		}
@@ -125,7 +125,7 @@ static TIMER_CALLBACK(ti85_timer_callback)
 		ti85_ON_pressed = 0;
 	if (ti85_timer_interrupt_mask)
 	{
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 		ti85_timer_interrupt_status = 1;
 	}
 }
@@ -529,7 +529,7 @@ static void ti8x_snapshot_setup_registers (UINT8 * data)
 
 	activecpu_set_input_line(0, 0);
 	activecpu_set_input_line(INPUT_LINE_NMI, 0);
-	cpunum_set_input_line(0, INPUT_LINE_HALT, 0);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, 0);
 }
 
 static void ti85_setup_snapshot (UINT8 * data)

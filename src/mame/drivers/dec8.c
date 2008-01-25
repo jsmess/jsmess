@@ -237,7 +237,7 @@ static WRITE8_HANDLER( gondo_i8751_w )
 	switch (offset) {
 	case 0: /* High byte */
 		i8751_value=(i8751_value&0xff) | (data<<8);
-		if (int_enable) cpunum_set_input_line (0, M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
+		if (int_enable) cpunum_set_input_line (Machine, 0, M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
 		break;
 	case 1: /* Low byte */
 		i8751_value=(i8751_value&0xff00) | data;
@@ -270,7 +270,7 @@ static WRITE8_HANDLER( shackled_i8751_w )
 	switch (offset) {
 	case 0: /* High byte */
 		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpunum_set_input_line (1, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		cpunum_set_input_line (Machine, 1, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		i8751_value=(i8751_value&0xff00) | data;
@@ -298,7 +298,7 @@ static WRITE8_HANDLER( lastmiss_i8751_w )
 	switch (offset) {
 	case 0: /* High byte */
 		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpunum_set_input_line (0, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		cpunum_set_input_line (Machine, 0, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		i8751_value=(i8751_value&0xff00) | data;
@@ -329,7 +329,7 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	switch (offset) {
 	case 0: /* High byte */
 		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpunum_set_input_line (0, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		cpunum_set_input_line (Machine, 0, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		i8751_value=(i8751_value&0xff00) | data;
@@ -426,13 +426,13 @@ static WRITE8_HANDLER( csilver_control_w )
 static WRITE8_HANDLER( dec8_sound_w )
 {
  	soundlatch_w(0,data);
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_HANDLER( oscar_sound_w )
 {
  	soundlatch_w(0,data);
-	cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static void csilver_adpcm_int(int data)
@@ -441,7 +441,7 @@ static void csilver_adpcm_int(int data)
 
 	toggle ^= 1;
 	if (toggle)
-		cpunum_set_input_line(2,M6502_IRQ_LINE,HOLD_LINE);
+		cpunum_set_input_line(Machine, 2,M6502_IRQ_LINE,HOLD_LINE);
 
 	MSM5205_data_w (0,msm5205next>>4);
 	msm5205next<<=4;
@@ -473,16 +473,16 @@ static WRITE8_HANDLER( oscar_int_w )
 	/* Deal with interrupts, coins also generate NMI to CPU 0 */
 	switch (offset) {
 		case 0: /* IRQ2 */
-			cpunum_set_input_line(1,M6809_IRQ_LINE,ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
 			return;
 		case 1: /* IRC 1 */
-			cpunum_set_input_line(0,M6809_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
 			return;
 		case 2: /* IRQ 1 */
-			cpunum_set_input_line(0,M6809_IRQ_LINE,ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
 			return;
 		case 3: /* IRC 2 */
-			cpunum_set_input_line(1,M6809_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
 			return;
 	}
 }
@@ -496,18 +496,18 @@ static WRITE8_HANDLER( shackled_int_w )
     (The last interrupt has not finished and been ack'd when the new one occurs */
 	switch (offset) {
 		case 0: /* CPU 2 - IRQ acknowledge */
-			cpunum_set_input_line(1,M6809_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
             return;
         case 1: /* CPU 1 - IRQ acknowledge */
-			cpunum_set_input_line(0,M6809_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
         	return;
         case 2: /* i8751 - FIRQ acknowledge */
             return;
         case 3: /* IRQ 1 */
-			cpunum_set_input_line(0,M6809_IRQ_LINE,ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
 			return;
         case 4: /* IRQ 2 */
-            cpunum_set_input_line(1,M6809_IRQ_LINE,ASSERT_LINE);
+            cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
             return;
 	}
 #endif
@@ -520,10 +520,10 @@ static WRITE8_HANDLER( shackled_int_w )
         case 2: /* i8751 - FIRQ acknowledge */
             return;
         case 3: /* IRQ 1 */
-			cpunum_set_input_line (0, M6809_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line (Machine, 0, M6809_IRQ_LINE, HOLD_LINE);
 			return;
         case 4: /* IRQ 2 */
-            cpunum_set_input_line (1, M6809_IRQ_LINE, HOLD_LINE);
+            cpunum_set_input_line (Machine, 1, M6809_IRQ_LINE, HOLD_LINE);
             return;
 	}
 }
@@ -541,7 +541,7 @@ static ADDRESS_MAP_START( cobra_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0fff) AM_READ(dec8_pf0_data_r)
 	AM_RANGE(0x1000, 0x17ff) AM_READ(dec8_pf1_data_r)
 	AM_RANGE(0x1800, 0x2fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x3000, 0x31ff) AM_READ(paletteram_r)
+	AM_RANGE(0x3000, 0x31ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_0_r) /* Player 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_1_r) /* Player 2 */
 	AM_RANGE(0x3802, 0x3802) AM_READ(input_port_3_r) /* Dip 1 */
@@ -636,8 +636,8 @@ static ADDRESS_MAP_START( gondo_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(paletteram_r)
-	AM_RANGE(0x2c00, 0x2fff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x2800, 0x2bff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x2c00, 0x2fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(MRA8_RAM)          /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_7_r)   /* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_8_r)   /* Dip 2 */
@@ -672,7 +672,7 @@ static ADDRESS_MAP_START( oscar_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2800, 0x2fff) AM_READ(dec8_pf0_data_r)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(MRA8_RAM) /* Sprites */
-	AM_RANGE(0x3800, 0x3bff) AM_READ(paletteram_r)
+	AM_RANGE(0x3800, 0x3bff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x3c00, 0x3c00) AM_READ(input_port_0_r)
 	AM_RANGE(0x3c01, 0x3c01) AM_READ(input_port_1_r)
 	AM_RANGE(0x3c02, 0x3c02) AM_READ(input_port_2_r) /* VBL & coins */
@@ -716,8 +716,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmiss_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_2_r)
@@ -735,8 +735,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmiss_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -754,8 +754,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmiss_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_2_r)
@@ -769,8 +769,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmiss_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -784,8 +784,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_2_r)
@@ -801,8 +801,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -819,8 +819,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_2_r)
@@ -837,8 +837,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -856,8 +856,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_1_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_0_r)
 	AM_RANGE(0x1803, 0x1803) AM_READ(input_port_2_r)
@@ -875,8 +875,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -893,8 +893,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1803, 0x1803) AM_READ(input_port_2_r)
 	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_4_r)
 	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_3_r)
@@ -907,8 +907,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
@@ -923,8 +923,8 @@ static ADDRESS_MAP_START( garyoret_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(paletteram_r)
-	AM_RANGE(0x2c00, 0x2fff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x2800, 0x2bff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x2c00, 0x2fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(MRA8_RAM)          /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_3_r)   /* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_4_r)   /* Dip 2 */
@@ -2011,12 +2011,12 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate); /* M6502_IRQ_LINE */
+	cpunum_set_input_line(Machine, 1,0,linestate); /* M6502_IRQ_LINE */
 }
 
 static void oscar_irqhandler(int linestate)
 {
-	cpunum_set_input_line(2,0,linestate); /* M6502_IRQ_LINE */
+	cpunum_set_input_line(Machine, 2,0,linestate); /* M6502_IRQ_LINE */
 }
 
 static const struct YM3526interface ym3526_interface =
@@ -2053,18 +2053,18 @@ static INTERRUPT_GEN( ghostb_interrupt )
 	if ((i8751_out & 0x2) == 0x2) latch[2]=1;
 	if ((i8751_out & 0x1) == 0x1) latch[3]=1;
 
-	if (((i8751_out & 0x8) != 0x8) && latch[0]) {latch[0]=0; cpunum_set_input_line(0,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x8001; } /* Player 1 coin */
-	if (((i8751_out & 0x4) != 0x4) && latch[1]) {latch[1]=0; cpunum_set_input_line(0,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x4001; } /* Player 2 coin */
-	if (((i8751_out & 0x2) != 0x2) && latch[2]) {latch[2]=0; cpunum_set_input_line(0,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x2001; } /* Player 3 coin */
-	if (((i8751_out & 0x1) != 0x1) && latch[3]) {latch[3]=0; cpunum_set_input_line(0,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x1001; } /* Service */
+	if (((i8751_out & 0x8) != 0x8) && latch[0]) {latch[0]=0; cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x8001; } /* Player 1 coin */
+	if (((i8751_out & 0x4) != 0x4) && latch[1]) {latch[1]=0; cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x4001; } /* Player 2 coin */
+	if (((i8751_out & 0x2) != 0x2) && latch[2]) {latch[2]=0; cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x2001; } /* Player 3 coin */
+	if (((i8751_out & 0x1) != 0x1) && latch[3]) {latch[3]=0; cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x1001; } /* Service */
 
-	if (nmi_enable) cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
+	if (nmi_enable) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
 
 static INTERRUPT_GEN( gondo_interrupt )
 {
 	if (nmi_enable)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
 
 /* Coins generate NMI's */
@@ -2075,7 +2075,7 @@ static INTERRUPT_GEN( oscar_interrupt )
 	if ((readinputport(2) & 0x7) == 0x7) latch=1;
 	if (latch && (readinputport(2) & 0x7) != 0x7) {
 		latch=0;
-    	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+    	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     }
 }
 
@@ -2123,7 +2123,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ghostb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000)
+	MDRV_CPU_ADD(HD6309, 3000000*4)
 	MDRV_CPU_PROGRAM_MAP(ghostb_readmem,ghostb_writemem)
 	MDRV_CPU_VBLANK_INT(ghostb_interrupt,1)
 
@@ -2203,7 +2203,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gondo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309,3000000) /* HD63C09EP */
+	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP */
 	MDRV_CPU_PROGRAM_MAP(gondo_readmem,gondo_writemem)
 	MDRV_CPU_VBLANK_INT(gondo_interrupt,1)
 
@@ -2243,11 +2243,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( oscar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD(HD6309, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(oscar_readmem,oscar_writemem)
 	MDRV_CPU_VBLANK_INT(oscar_interrupt,1)
 
-	MDRV_CPU_ADD(HD6309, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD(HD6309, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(oscar_sub_readmem,oscar_sub_writemem)
 
 	MDRV_CPU_ADD(M6502, XTAL_12MHz/8)
@@ -2417,7 +2417,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( garyoret )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309,3000000) /* HD63C09EP */
+	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP */
 	MDRV_CPU_PROGRAM_MAP(garyoret_readmem,garyoret_writemem)
 	MDRV_CPU_VBLANK_INT(gondo_interrupt,1)
 
@@ -3407,8 +3407,8 @@ static DRIVER_INIT( meikyuh )
 
 static DRIVER_INIT( ghostb )
 {
-	driver_init_deco222(machine);
-	driver_init_meikyuh(machine);
+	DRIVER_INIT_CALL(deco222);
+	DRIVER_INIT_CALL(meikyuh);
 }
 
 /******************************************************************************/

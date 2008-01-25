@@ -29,7 +29,7 @@ ADDRESS_MAP_END
 
 static void tms_interrupt(int dummy)
 {
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( bbcbc_interrupt )

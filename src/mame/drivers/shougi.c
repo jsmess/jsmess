@@ -91,13 +91,9 @@ PROM  : Type MB7051
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-//VIDEO_START( shougi )
-//{
-//  generic_vh_start();
-//}
-
 #include "video/resnet.h"
+
+
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -180,8 +176,7 @@ int offs;
 			*BITMAP_ADDR16(bitmap, 255-sy, 255-(sx*4 + x)) = color*4 + data;
 		}
 	}
-	/* copy the character mapped graphics */
-	//copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+
 	return 0;
 }
 
@@ -232,13 +227,13 @@ static WRITE8_HANDLER( shougi_watchdog_reset_w )
 static WRITE8_HANDLER( shougi_mcu_halt_off_w )
 {
 	/* logerror("mcu HALT OFF"); */
-	cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( shougi_mcu_halt_on_w )
 {
 	/* logerror("mcu HALT ON"); */
-	cpunum_set_input_line(2, INPUT_LINE_HALT,ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT,ASSERT_LINE);
 }
 
 
@@ -249,8 +244,8 @@ static WRITE8_HANDLER( nmi_disable_and_clear_line_w )
 	nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-	cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
@@ -263,8 +258,8 @@ static INTERRUPT_GEN( shougi_vblank_nmi )
 	if ( nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-		cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -385,7 +380,6 @@ static MACHINE_DRIVER_START( shougi )
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(shougi)
-	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(shougi)
 
 	/* sound hardware */

@@ -474,7 +474,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		(vc4000_video.sprites[0].finished_now))
 	{
 		cpunum_set_input_line_vector(0, 0, 3);
-		cpunum_set_input_line(0, 0, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
 	}
 }
 

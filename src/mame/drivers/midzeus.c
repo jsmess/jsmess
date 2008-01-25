@@ -93,7 +93,7 @@ static MACHINE_START( midzeus )
 static MACHINE_START( midzeus2 )
 {
 	timekeeper_init(0, TIMEKEEPER_MIDZEUS2, NULL);
-	machine_start_midzeus(machine);
+	MACHINE_START_CALL(midzeus);
 }
 
 
@@ -115,12 +115,12 @@ static MACHINE_RESET( midzeus )
 
 static TIMER_CALLBACK( display_irq_off )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( display_irq )
 {
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_HZ(30000000), NULL, 0, display_irq_off);
 }
 
@@ -202,7 +202,7 @@ static WRITE32_HANDLER( zpram_w )
 
 static NVRAM_HANDLER( midzeus2 )
 {
-	nvram_handler_timekeeper_0(machine, file, read_or_write);
+	NVRAM_HANDLER_CALL(timekeeper_0);
 
 	if (read_or_write)
 		mame_fwrite(file, zpram, zpram_size);
@@ -504,13 +504,13 @@ static WRITE32_HANDLER( analog_w )
  *
  *************************************/
 
-static void update_gun_irq(void)
+static void update_gun_irq(running_machine *machine)
 {
 	/* low 2 bits of gun_control seem to enable IRQs */
 	if (gun_irq_state & gun_control & 0x03)
-		cpunum_set_input_line(0, 3, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 3, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
 }
 
 
@@ -521,7 +521,7 @@ static TIMER_CALLBACK( invasn_gun_callback )
 
 	/* set the appropriate IRQ in the internal gun control and update */
 	gun_irq_state |= 0x01 << player;
-	update_gun_irq();
+	update_gun_irq(machine);
 
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
@@ -540,7 +540,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 	/* bits 0-1 enable IRQs (?) */
 	/* bits 2-3 reset IRQ states */
 	gun_irq_state &= ~((gun_control >> 2) & 3);
-	update_gun_irq();
+	update_gun_irq(Machine);
 
 	for (player = 0; player < 2; player++)
 	{

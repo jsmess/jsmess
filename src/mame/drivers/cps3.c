@@ -1206,8 +1206,8 @@ static VIDEO_UPDATE(cps3)
 
 					ypos2+=((ysizedraw2+1)/2);
 
-					if (!flipx) xpos2-= (xsize2+1)*((16*xinc)>>16);
-					else  xpos2+= (xsize2)*((16*xinc)>>16);
+					if (!flipx) xpos2-= ((xsize2+1)*16*xinc)>>16;
+					else  xpos2+= (xsize2*16*xinc)>>16;
 
 					if (flipy) ypos2-= ysize2*((16*yinc)>>16);
 
@@ -1217,8 +1217,8 @@ static VIDEO_UPDATE(cps3)
 						{
 							int current_xpos;
 
-							if (!flipx) current_xpos = (xpos+xpos2+xx* ((16*xinc)>>16)  );
-							else current_xpos = (xpos+xpos2-xx*((16*xinc)>>16));
+							if (!flipx) current_xpos = (xpos+xpos2+((xx*16*xinc)>>16)  );
+							else current_xpos = (xpos+xpos2-((xx*16*xinc)>>16));
 							//current_xpos +=  rand()&0x3ff;
 							current_xpos += gscrollx;
 							current_xpos += 1;
@@ -2018,7 +2018,7 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 				}
 
 
-				cpunum_set_input_line(0,10, ASSERT_LINE);
+				cpunum_set_input_line(Machine, 0,10, ASSERT_LINE);
 
 
 			}
@@ -2239,14 +2239,14 @@ static void cps3_process_character_dma(UINT32 address)
 				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
 				current_table_address = real_source;
 			}
-			cpunum_set_input_line(0,10, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0,10, ASSERT_LINE);
 		}
 		else if  ( (dat1&0x00e00000) ==0x00400000 )
 		{
 			/* 6bpp DMA decompression
               - this is used for the majority of sprites and backgrounds */
 			cps3_do_char_dma( real_source, real_destination, real_length );
-			cpunum_set_input_line(0,10, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0,10, ASSERT_LINE);
 
 		}
 		else if  ( (dat1&0x00e00000) ==0x00600000 )
@@ -2254,7 +2254,7 @@ static void cps3_process_character_dma(UINT32 address)
 			/* 8bpp DMA decompression
               - this is used on SFIII NG Sean's Stage ONLY */
 			cps3_do_alt_char_dma( real_source, real_destination, real_length);
-			cpunum_set_input_line(0,10, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0,10, ASSERT_LINE);
 		}
 		else
 		{
@@ -2311,12 +2311,12 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 
 static WRITE32_HANDLER( cps3_irq10_ack_w )
 {
-	cpunum_set_input_line(0,10, CLEAR_LINE); return;
+	cpunum_set_input_line(Machine, 0,10, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_irq12_ack_w )
 {
-	cpunum_set_input_line(0,12, CLEAR_LINE); return;
+	cpunum_set_input_line(Machine, 0,12, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_unk_vidregs_w )
@@ -2458,7 +2458,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN(cps3_vbl_interrupt)
 {
-	cpunum_set_input_line(0,12, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0,12, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(cps3_other_interrupt)
@@ -2466,7 +2466,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 	// this seems to need to be periodic (see the life bar portraits in sfiii2
 	// but also triggered on certain dma events (or warzard locks up in attract)
 	// what is the REAL source of IRQ10??
-	cpunum_set_input_line(0,10, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
 }
 
 
@@ -3120,9 +3120,9 @@ static DRIVER_INIT( jojo )
 //  rom[0x1fecc/4]^=0x01000000; // nocd
 
 	cps3_use_fastboot = 0;
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 
 }
@@ -3146,9 +3146,9 @@ static DRIVER_INIT (jojoba)
 //  rom[0x1fec8/4]^=0x00000070; // DEV mode
 //  rom[0x1fecc/4]^=0x01000000; // nocd
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 	cps3_use_fastboot = 0;
 }
@@ -3172,9 +3172,9 @@ static DRIVER_INIT( warzard )
 	                            // any actual NCD dumps to compare (or it expects SCSI to report there being
 	                            // no cd drive?)
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 	cps3_use_fastboot = 0; // required due to cd check, even with ASIA NO CD selected, not req. with CD emulation
 }
@@ -3200,9 +3200,9 @@ static DRIVER_INIT( sfiii )
 
 	cps3_use_fastboot = 0;
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 }
 
@@ -3224,9 +3224,9 @@ static DRIVER_INIT( sfiii2 )
 
 	cps3_use_fastboot = 0; // not required
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 }
 
 
@@ -3246,9 +3246,9 @@ static DRIVER_INIT( sfiii3 )
 //  rom[0x1fec8/4]^=0x00000001; // region
 //  rom[0x1fecc/4]^=0x01000000; // nocd
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 	cps3_use_fastboot = 0;
 }

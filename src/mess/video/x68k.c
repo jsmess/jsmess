@@ -1090,7 +1090,7 @@ VIDEO_UPDATE( x68000 )
 		sys.mfp.isra = 0;
 		sys.mfp.isrb = 0;
 //		mfp_trigger_irq(MFP_IRQ_GPIP6);
-//		cpunum_set_input_line_and_vector(0,6,ASSERT_LINE,0x43);
+//		cpunum_set_input_line_and_vector(Machine, 0,6,ASSERT_LINE,0x43);
 	}
 	if(input_code_pressed(KEYCODE_9))
 	{

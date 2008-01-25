@@ -253,7 +253,7 @@ static MACHINE_START( redbaron )
 static INTERRUPT_GEN( bzone_interrupt )
 {
 	if (readinputport(0) & 0x10)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -816,8 +816,8 @@ static WRITE8_HANDLER( analog_select_w )
 
 static DRIVER_INIT( bradley )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x400, 0x7ff, 0, 0, MRA8_RAM);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x400, 0x7ff, 0, 0, MWA8_RAM);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x400, 0x7ff, 0, 0, MRA8_BANK1, MWA8_BANK1);
+	memory_set_bankptr(1, auto_malloc(0x400));
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1808, 0x1808, 0, 0, input_port_4_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1809, 0x1809, 0, 0, input_port_5_r);

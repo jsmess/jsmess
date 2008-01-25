@@ -65,7 +65,7 @@ static void svi318_set_banks (void);
 
 static void svi318_uart8250_interrupt(int nr, int state)
 {
-	cpunum_set_input_line(0, 0, (state ? HOLD_LINE : CLEAR_LINE));
+	cpunum_set_input_line(Machine, 0, 0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 static const uart8250_interface svi318_uart8250_interface[1] =
@@ -535,7 +535,7 @@ MACHINE_RESET( svi328_806 )
 
 void svi318_vdp_interrupt(int i)
 {
-	cpunum_set_input_line(0, 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cpunum_set_input_line(Machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 DRIVER_INIT( svi318 )

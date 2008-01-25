@@ -35,7 +35,7 @@ static MACHINE_RESET( flkatck )
 static INTERRUPT_GEN( flkatck_interrupt )
 {
 	if (flkatck_irq_enabled)
-		cpunum_set_input_line(0, HD6309_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
@@ -83,7 +83,7 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 			soundlatch_w(0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cpunum_set_input_line(1,0,HOLD_LINE);
+			cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
 			watchdog_reset_w(0, data);
@@ -270,7 +270,7 @@ static const struct K007232_interface k007232_interface =
 static MACHINE_DRIVER_START( flkatck )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309,3000000) /* HD63C09EP, 24/8 MHz */
+	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem,flkatck_writemem)
 	MDRV_CPU_VBLANK_INT(flkatck_interrupt,1)
 

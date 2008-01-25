@@ -428,14 +428,14 @@ static TIMER_CALLBACK(AY3600_poll)
 			if (!reset_flag) {
 				reset_flag = 1;
 				/* using PULSE_LINE does not allow us to press and hold key */
-				cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
 			}
 			return;
 	}
 	if (reset_flag)
 	{
 		reset_flag = 0;
-		cpunum_set_input_line(0, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
 		mame_schedule_soft_reset(Machine);
 	}
 

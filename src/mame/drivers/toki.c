@@ -61,7 +61,7 @@ WRITE16_HANDLER( toki_foreground_videoram16_w );
 static WRITE16_HANDLER( tokib_soundcommand16_w )
 {
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( pip16_r )
@@ -81,7 +81,7 @@ static void toki_adpcm_int (int data)
 
 	toggle ^= 1;
 	if (toggle)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( toki_adpcm_control_w )
@@ -726,6 +726,18 @@ ROM_END
 
 static DRIVER_INIT( toki )
 {
+	UINT8 *ROM = memory_region(REGION_SOUND1);
+	UINT8 *buffer = malloc_or_die(0x20000);
+	int i;
+
+	memcpy(buffer,ROM,0x20000);
+	for( i = 0; i < 0x20000; i++ )
+	{
+		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
+	}
+
+	free(buffer);
+
 	seibu_sound_decrypt(REGION_CPU2,0x2000);
 }
 
@@ -799,6 +811,20 @@ static DRIVER_INIT(jujub)
 			UINT8 src = decrypt[i];
 			rom[i] = src^0x55;
 		}
+	}
+
+	{
+		UINT8 *ROM = memory_region(REGION_SOUND1);
+		UINT8 *buffer = malloc_or_die(0x20000);
+		int i;
+
+		memcpy(buffer,ROM,0x20000);
+		for( i = 0; i < 0x20000; i++ )
+		{
+			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
+		}
+
+		free(buffer);
 	}
 }
 

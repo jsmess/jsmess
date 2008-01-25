@@ -9,16 +9,18 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "berzerk.h"
 #include "exidy.h"
 #include "machine/74181.h"
+#include "sound/s14001a.h"
 #include "video/resnet.h"
 
 
 #define MONITOR_TYPE_PORT_TAG ("MONITOR_TYPE")
 
-#define MAIN_CPU_CLOCK  			(BERZERK_MASTER_CLOCK / 4)
-#define PIXEL_CLOCK  				(BERZERK_MASTER_CLOCK / 2)
+#define MASTER_CLOCK				(XTAL_10MHz)
+#define MAIN_CPU_CLOCK  			(MASTER_CLOCK / 4)
+#define PIXEL_CLOCK  				(MASTER_CLOCK / 2)
+#define S14001_CLOCK				(MASTER_CLOCK / 4)
 #define HTOTAL						(0x140)
 #define HBEND						(0x000)
 #define HBSTART						(0x100)
@@ -157,7 +159,7 @@ static TIMER_CALLBACK( irq_callback )
 
 	/* set the IRQ line if enabled */
 	if (irq_enabled)
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xfc);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xfc);
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -234,7 +236,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 	/* pulse the NMI line if enabled */
 	if (nmi_enabled)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 	/* set up for next interrupt */
 	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;
@@ -453,6 +455,95 @@ static VIDEO_UPDATE( berzerk )
 	}
 
 	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Audio system
+ *
+ *************************************/
+
+static const struct S14001A_interface berzerk_s14001a_interface =
+{
+	REGION_SOUND1	/* voice data region */
+};
+
+
+static const struct CustomSound_interface berzerk_custom_interface =
+{
+	exidy_sh6840_sh_start,
+	0,
+	exidy_sh6840_sh_reset
+};
+
+
+static WRITE8_HANDLER( berzerk_audio_w )
+{
+	int clock_divisor;
+
+	switch (offset)
+	{
+	/* offset 4 writes to the S14001A */
+	case 4:
+		switch (data >> 6)
+		{
+		/* write data to the S14001 */
+		case 0:
+			/* only if not busy */
+			if (!S14001A_bsy_0_r())
+			{
+				S14001A_reg_0_w(data & 0x3f);
+
+				/* clock the chip -- via a 555 timer */
+				S14001A_rst_0_w(1);
+				S14001A_rst_0_w(0);
+			}
+
+			break;
+
+		case 1:
+			/* volume */
+			S14001A_set_volume(((data & 0x38) >> 3) + 1);
+
+			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
+               giving a final clock from 19.5kHz to 34.7kHz */
+			clock_divisor = 16 - (data & 0x07);
+
+			S14001A_set_clock(S14001_CLOCK / clock_divisor / 8);
+			break;
+
+		default: break; /* 2 and 3 are not connected */
+		}
+
+		break;
+
+	/* offset 6 writes to the sfxcontrol latch */
+	case 6:
+		exidy_sfxctrl_w(data >> 6, data);
+		break;
+
+	/* everything else writes to the 6840 */
+	default:
+		exidy_sh6840_w(offset, data);
+		break;
+
+	}
+}
+
+
+static READ8_HANDLER( berzerk_audio_r )
+{
+	return ((offset == 4) && !S14001A_bsy_0_r()) ? 0x40 : 0x00;
+}
+
+
+
+static SOUND_RESET(berzerk)
+{
+	/* clears the flip-flop controlling the volume and freq on the speech chip */
+	berzerk_audio_w(4, 0x40);
 }
 
 
@@ -789,8 +880,17 @@ static MACHINE_DRIVER_START( berzerk )
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(berzerk_audio)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 
+	MDRV_SOUND_RESET(berzerk)
+
+	MDRV_SOUND_ADD(S14001A, 0)	/* placeholder - the clock is software controllable */
+	MDRV_SOUND_CONFIG(berzerk_s14001a_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(berzerk_custom_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -800,7 +900,6 @@ static MACHINE_DRIVER_START( frenzy )
 	MDRV_IMPORT_FROM(berzerk)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(frenzy_map,0)
-
 MACHINE_DRIVER_END
 
 

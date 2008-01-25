@@ -343,7 +343,7 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 static void inta_callback(int state)
 {
 	tms9901_set_single_int(0, 1, state);
-	cpunum_set_input_line(0, 1, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -1341,7 +1341,7 @@ static void poll_mouse(void)
 static void tms9901_interrupt_callback(int intreq, int ic)
 {
 	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
-	cpunum_set_input_line(0, 0, intreq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, intreq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*

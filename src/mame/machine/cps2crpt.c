@@ -673,7 +673,7 @@ static void cps2_decrypt(const UINT32 *master_key, UINT32 upper_limit)
 		{
 			char loadingMessage[256]; // for displaying with UI
 			sprintf(loadingMessage, "Decrypting %d%%", i*100/0x10000);
-			ui_set_startup_text(loadingMessage,FALSE);
+			ui_set_startup_text(Machine, loadingMessage,FALSE);
 		}
 
 
@@ -974,5 +974,5 @@ DRIVER_INIT( cps2crpt )
 		++k;
 	}
 
-	driver_init_cps2_video(machine);
+	DRIVER_INIT_CALL(cps2_video);
 }

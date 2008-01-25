@@ -92,16 +92,16 @@ UINT32 bios_ctrl_inputs;
 #define MASTER_CLOCK		53693100
 
 /* give us access to the megadriv start and update functions so that we can call them */
-extern UINT32 video_update_megadriv(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
-extern void video_start_megadriv(running_machine *machine);
-extern void video_eof_megadriv(running_machine *machine);
-extern void machine_reset_megadriv(running_machine *machine);
+VIDEO_UPDATE( megadriv );
+VIDEO_START( megadriv );
+VIDEO_EOF( megadriv );
+MACHINE_RESET( megadriv );
 
 /* in drivers/segae.c */
-extern UINT32 video_update_megatech_bios(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
-extern void video_eof_megatech_bios(running_machine *machine);
-extern void machine_reset_megatech_bios(running_machine *machine);
-extern void driver_init_megatech_bios(running_machine *machine);
+VIDEO_UPDATE( megatech_bios );
+VIDEO_EOF( megatech_bios );
+MACHINE_RESET( megatech_bios );
+DRIVER_INIT( megatech_bios );
 
 
 /* not currently used */
@@ -286,7 +286,7 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
 			memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK5);
-			memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_UNMAP);
 
 			//printf("bank ram??\n");
 			break;
@@ -353,7 +353,7 @@ static void megatech_set_genz80_as_sms_standard_map(void)
 	/* fixed rom bank area */
 	sms_rom = auto_malloc(0x400000);
 	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK5);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_ROM);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_UNMAP);
 	memory_set_bankptr( 5, sms_rom );
 
 	memcpy(sms_rom, memory_region(REGION_CPU1), 0x400000);
@@ -375,17 +375,17 @@ static void megatech_set_genz80_as_sms_standard_map(void)
 
 }
 
-static void megatech_select_game(int gameno)
+static void megatech_select_game(running_machine *machine, int gameno)
 {
 	UINT8* game_region;
 	UINT8* bios_region;
 
 	printf("game 0 selected\n");
 
-	cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	sndti_reset(SOUND_YM2612, 0);
 
 	game_region = memory_region(REGION_USER1 + (gameno*2) + 0);
@@ -409,8 +409,8 @@ static void megatech_select_game(int gameno)
 			printf("SMS cart!!, CPU not running\n");
 			current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map();
-			cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 
 
 		}
@@ -419,8 +419,8 @@ static void megatech_select_game(int gameno)
 			printf("Genesis Cart, CPU0 running\n");
 			current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80();
-			cpunum_set_input_line(0, INPUT_LINE_RESET, CLEAR_LINE);
-			cpunum_set_input_line(0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 		}
 		else
 		{
@@ -429,10 +429,10 @@ static void megatech_select_game(int gameno)
 	}
 	else
 	{
-		cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
-		cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
-	//  cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
-	//  cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	//  cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
+	//  cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
 		memset(memory_region(REGION_CPU3)+0x8000, 0x00, 0x8000);
@@ -454,7 +454,7 @@ static WRITE8_HANDLER( megatech_cart_select_w )
 	mt_cart_select_reg = data;
 
 
-	megatech_select_game(mt_cart_select_reg);
+	megatech_select_game(Machine, mt_cart_select_reg);
 
 /*
     if (mt_cart_select_reg==2)
@@ -597,14 +597,14 @@ ADDRESS_MAP_END
 static DRIVER_INIT(mtnew)
 {
 	megatech_banked_ram = auto_malloc(0x1000*8);
-	driver_init_megadriv(Machine);
-	driver_init_megatech_bios(Machine);
+	DRIVER_INIT_CALL(megadriv);
+	DRIVER_INIT_CALL(megatech_bios);
 }
 
 static VIDEO_START(mtnew)
 {
 	init_for_megadrive(); // create an sms vdp too, for comptibility mode
-	video_start_megadriv(Machine);
+	VIDEO_START_CALL(megadriv);
 }
 //attotime_never
 static VIDEO_UPDATE(mtnew)
@@ -612,26 +612,26 @@ static VIDEO_UPDATE(mtnew)
 	if (screen ==0)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
-		if (!current_game_is_sms) video_update_megadriv(machine,0,bitmap,cliprect);
-		else video_update_megatech_md_sms(machine,0,bitmap,cliprect);
+		if (!current_game_is_sms) VIDEO_UPDATE_CALL(megadriv);
+		else VIDEO_UPDATE_CALL(megatech_md_sms);
 	}
-	else if (screen ==1) video_update_megatech_bios(machine, 1, bitmap,cliprect);
+	else if (screen ==1) VIDEO_UPDATE_CALL(megatech_bios);
 	return 0;
 }
 
 static VIDEO_EOF(mtnew)
 {
-	if (!current_game_is_sms) video_eof_megadriv(Machine);
-	else video_eof_megatech_md_sms(Machine);
-	video_eof_megatech_bios(Machine);
+	if (!current_game_is_sms) VIDEO_EOF_CALL(megadriv);
+	else VIDEO_EOF_CALL(megatech_md_sms);
+	VIDEO_EOF_CALL(megatech_bios);
 }
 
 static MACHINE_RESET(mtnew)
 {
-	machine_reset_megadriv(Machine);
-	machine_reset_megatech_bios(Machine);
-	machine_reset_megatech_md_sms(Machine);
-	megatech_select_game(0);
+	MACHINE_RESET_CALL(megadriv);
+	MACHINE_RESET_CALL(megatech_bios);
+	MACHINE_RESET_CALL(megatech_md_sms);
+	megatech_select_game(machine, 0);
 }
 
 static MACHINE_DRIVER_START( megatech )

@@ -46,7 +46,7 @@ WRITE8_HANDLER( galaxy_latch_w )
 
 INTERRUPT_GEN( galaxy_interrupt )
 {
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 static int galaxy_irq_callback (int cpu)
@@ -118,8 +118,8 @@ static void galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
 			break;
 	}
 
-	cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
-	cpunum_set_input_line(0, INPUT_LINE_IRQ0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 SNAPSHOT_LOAD( galaxy )

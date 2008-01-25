@@ -952,7 +952,7 @@ static void toaplan2_scroll_reg_data_w(offs_t offset, UINT16 data, UINT32 mem_ma
 						/* HACK! When tilted, sound CPU needs to be reset. */
 						if (Machine->drv->sound[0].type == SOUND_YM3812)
 						{
-							cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+							cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 							sndti_reset(SOUND_YM3812, 0);
 						}
 					}
@@ -1517,7 +1517,7 @@ VIDEO_UPDATE( batsugun_1 )
 
 VIDEO_UPDATE( truxton2_0 )
 {
-	video_update_toaplan2_0(machine,screen,bitmap,cliprect);
+	VIDEO_UPDATE_CALL(toaplan2_0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

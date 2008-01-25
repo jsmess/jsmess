@@ -232,7 +232,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(sys.mfp.iera & (1 << x))
                 {
                     current_vector[6] = (sys.mfp.vr & 0xf0) | (x+8);
-                    cpunum_set_input_line_and_vector(0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
+                    cpunum_set_input_line_and_vector(Machine, 0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | (x+8),sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -251,7 +251,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(sys.mfp.ierb & (1 << x))
                 {
                     current_vector[6] = (sys.mfp.vr & 0xf0) | x;
-                    cpunum_set_input_line_and_vector(0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
+                    cpunum_set_input_line_and_vector(Machine, 0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | x,sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -626,7 +626,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 				sys.mouse.irqactive = 1;
 				current_vector[5] = 0x54;
 				current_irq_line = 5;
-				cpunum_set_input_line_and_vector(0,5,HOLD_LINE,0x54);
+				cpunum_set_input_line_and_vector(Machine, 0,5,HOLD_LINE,0x54);
 			}
 		}
 	}
@@ -770,7 +770,7 @@ static void fdc_irq(int state)
 		sys.ioc.irqstatus |= 0x80;
 		current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cpunum_set_input_line_and_vector(0,1,HOLD_LINE,current_vector[1]);
+		cpunum_set_input_line_and_vector(Machine, 0,1,HOLD_LINE,current_vector[1]);
 	}
 }
 
@@ -1311,7 +1311,7 @@ static READ16_HANDLER( x68k_rom0_r )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-	cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
+	cpunum_set_input_line_and_vector(Machine, 0,2,ASSERT_LINE,current_vector[2]);
 	return 0xff;
 }
 
@@ -1321,7 +1321,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-	cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
+	cpunum_set_input_line_and_vector(Machine, 0,2,ASSERT_LINE,current_vector[2]);
 }
 
 static READ16_HANDLER( x68k_exp_r )
@@ -1335,7 +1335,7 @@ static READ16_HANDLER( x68k_exp_r )
 		if(ACCESSING_LSB)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//      cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
+//      cpunum_set_input_line_and_vector(Machine, 0,2,ASSERT_LINE,current_vector[2]);
 	}
 	return 0xffff;
 }
@@ -1351,7 +1351,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		if(ACCESSING_LSB)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//      cpunum_set_input_line_and_vector(0,2,ASSERT_LINE,current_vector[2]);
+//      cpunum_set_input_line_and_vector(Machine, 0,2,ASSERT_LINE,current_vector[2]);
 	}
 }
 
@@ -1360,7 +1360,7 @@ static void x68k_dma_irq(int channel)
 	current_vector[3] = hd63450_get_vector(channel);
 	current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,current_vector[3]);
-	cpunum_set_input_line_and_vector(0,3,ASSERT_LINE,current_vector[3]);
+	cpunum_set_input_line_and_vector(Machine, 0,3,ASSERT_LINE,current_vector[3]);
 }
 
 static void x68k_dma_end(int channel,int irq)
@@ -1377,7 +1377,7 @@ static void x68k_dma_error(int channel, int irq)
 	{
 		current_vector[3] = hd63450_get_error_vector(channel);
 		current_irq_line = 3;
-		cpunum_set_input_line_and_vector(0,3,ASSERT_LINE,current_vector[3]);
+		cpunum_set_input_line_and_vector(Machine, 0,3,ASSERT_LINE,current_vector[3]);
 	}
 }
 
@@ -1413,7 +1413,7 @@ static void mfp_irq_callback(int which, int state)
 		return;
 	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 		return;
-	cpunum_set_input_line(0,6,state);
+	cpunum_set_input_line(Machine, 0, 6, state);
 	prev = state;
 }
 
@@ -1462,7 +1462,7 @@ static int x68k_int_ack(int line)
 		return current_vector[6];
 	}
 
-	cpunum_set_input_line_and_vector(0,line,CLEAR_LINE,current_vector[line]);
+	cpunum_set_input_line_and_vector(Machine, 0,line,CLEAR_LINE,current_vector[line]);
 	if(line == 1)  // IOSC
 	{
 		sys.ioc.irqstatus &= ~0xf0;
@@ -1805,7 +1805,7 @@ static DEVICE_LOAD( x68k_floppy )
 			current_vector[1] = 0x61;
 			sys.ioc.irqstatus |= 0x40;
 			current_irq_line = 1;
-			cpunum_set_input_line_and_vector(0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+			cpunum_set_input_line_and_vector(Machine, 0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 			logerror("IOC: Disk image inserted\n");
 		}
 		sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
@@ -1822,7 +1822,7 @@ static DEVICE_UNLOAD( x68k_floppy )
 		current_vector[1] = 0x61;
 		sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
-		cpunum_set_input_line_and_vector(0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		cpunum_set_input_line_and_vector(Machine, 0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
 	sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }

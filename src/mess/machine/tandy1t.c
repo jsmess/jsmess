@@ -188,8 +188,8 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 		break;
 	case 2:
 		tandy_ppi.portc = data;
-		if (data&8) cpunum_set_clockscale(0, 1);
-		else cpunum_set_clockscale(0, 4.77/8);
+		if (data&8) cpunum_set_clockscale(Machine, 0, 1);
+		else cpunum_set_clockscale(Machine, 0, 4.77/8);
 		break;
 	}
 }

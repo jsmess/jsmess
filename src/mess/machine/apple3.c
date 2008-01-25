@@ -337,7 +337,7 @@ static void apple3_update_memory(void)
 		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", via_0_b, via_1_a);
 	}
 
-	cpunum_set_clock(0, (via_0_a & 0x80) ? 1000000 : 2000000);
+	cpunum_set_clock(Machine, 0, (via_0_a & 0x80) ? 1000000 : 2000000);
 
 	/* bank 2 (0100-01FF) */
 	if (!(via_0_a & 0x04))
@@ -480,7 +480,7 @@ static WRITE8_HANDLER(apple3_via_1_out_b) { apple3_via_out(&via_1_b, data); }
 static void apple2_via_1_irq_func(int state)
 {
 	if (!via_1_irq && state)
-		cpunum_set_input_line(0, M6502_IRQ_LINE, PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, PULSE_LINE);
 	via_1_irq = state;
 }
 

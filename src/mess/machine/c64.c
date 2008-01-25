@@ -101,16 +101,16 @@ static void c64_nmi(void)
 			if (cpu_getactivecpu()==0)
 			{
 				/* z80 */
-				cpunum_set_input_line(0, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
 			}
 			else
 			{
-				cpunum_set_input_line(1, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
+				cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
 			}
 		}
 		else
 		{
-			cpunum_set_input_line(0, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, KEY_RESTORE||cia1irq);
 		}
 		nmilevel = KEY_RESTORE||cia1irq;
 	}
@@ -302,16 +302,16 @@ static void c64_irq (int level)
 		{
 			if (0&&(cpu_getactivecpu()==0))
 			{
-				cpunum_set_input_line (0, 0, level);
+				cpunum_set_input_line(Machine, 0, 0, level);
 			}
 			else
 			{
-				cpunum_set_input_line (1, M6510_IRQ_LINE, level);
+				cpunum_set_input_line(Machine, 1, M6510_IRQ_LINE, level);
 			}
 		}
 		else
 		{
-			cpunum_set_input_line (0, M6510_IRQ_LINE, level);
+			cpunum_set_input_line(Machine, 0, M6510_IRQ_LINE, level);
 		}
 		old_level = level;
 	}

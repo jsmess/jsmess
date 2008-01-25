@@ -147,11 +147,11 @@ static void pcw_interrupt_handle(void)
 		((fdc_interrupt_code==1) && ((pcw_system_status & (1<<5))!=0))
 		)
 	{
-		cpunum_set_input_line(0,0,HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, 0,HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(0,0,CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0,CLEAR_LINE);
 	}
 }
 
@@ -191,7 +191,7 @@ static void	pcw_trigger_fdc_int(void)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+					cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
 		}
@@ -480,7 +480,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* clear nmi interrupt */
-				cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 			}
 
 			/* re-issue interrupt */
@@ -502,7 +502,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* Clear NMI */
-				cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 
 			}
 

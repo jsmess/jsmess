@@ -136,8 +136,8 @@ static WRITE8_HANDLER( adpcm_w )
 
 static void lrq_callback(int state)
 {
-	//cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, state);
+	//cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, state);
 }
 
 static ADDRESS_MAP_START( sauro_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -356,7 +356,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sauro_interrupt )
 {
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( tecfri )
@@ -453,7 +453,7 @@ ROM_START( sauro )
 
 	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
 	/* SP0256 mask rom */
-	ROM_LOAD( "sp0256int.bin",   0x1000, 0x0800, BAD_DUMP CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
+	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
 ROM_END
 
 ROM_START( trckydoc )

@@ -28,9 +28,9 @@ static size_t rotaryf_videoram_size;
 static INTERRUPT_GEN( rotaryf_interrupt )
 {
 	if (video_screen_get_vblank(0))
-		cpunum_set_input_line(0, I8085_RST55_LINE,HOLD_LINE);
+		cpunum_set_input_line(machine, 0, I8085_RST55_LINE, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, I8085_RST75_LINE,HOLD_LINE);
+		cpunum_set_input_line(machine, 0, I8085_RST75_LINE, HOLD_LINE);
 
 }
 
@@ -148,7 +148,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( rotaryf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",8085A,2000000) /* 8080? */ /* 2 MHz? */
+	MDRV_CPU_ADD_TAG("main",8085A,4000000) /* 8080? */ /* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(rotaryf_map,0)
 	MDRV_CPU_IO_MAP(rotaryf_io_map,0)
 	MDRV_CPU_VBLANK_INT(rotaryf_interrupt,5)

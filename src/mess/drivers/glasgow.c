@@ -534,14 +534,14 @@ static WRITE32_HANDLER ( write_beeper32 )
 
 static TIMER_CALLBACK( update_nmi )
 {
-	// if (irq_flag==0)cpunum_set_input_line_and_vector(0,  MC68000_IRQ_7, PULSE_LINE, MC68000_INT_ACK_AUTOVECTOR);
-	cpunum_set_input_line_and_vector(0,  MC68000_IRQ_7, PULSE_LINE, MC68000_INT_ACK_AUTOVECTOR);
+	// if (irq_flag==0)cpunum_set_input_line_and_vector(Machine, 0,  MC68000_IRQ_7, PULSE_LINE, MC68000_INT_ACK_AUTOVECTOR);
+	cpunum_set_input_line_and_vector(Machine, 0,  MC68000_IRQ_7, PULSE_LINE, MC68000_INT_ACK_AUTOVECTOR);
 
 }
 
 static TIMER_CALLBACK( update_nmi32 )
 {
-	cpunum_set_input_line_and_vector(0,  MC68020_IRQ_7, PULSE_LINE, MC68020_INT_ACK_AUTOVECTOR);
+	cpunum_set_input_line_and_vector(Machine, 0,  MC68020_IRQ_7, PULSE_LINE, MC68020_INT_ACK_AUTOVECTOR);
 }
 
 static MACHINE_START( glasgow )

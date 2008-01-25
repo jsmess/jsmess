@@ -138,7 +138,7 @@ static MACHINE_DRIVER_START( paranoia )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
 
-	MDRV_CPU_ADD(8085A, 18000000/6)
+	MDRV_CPU_ADD(8085A, 18000000/3)
 	MDRV_CPU_PROGRAM_MAP(paranoia_8085_map,0)
 	MDRV_CPU_IO_MAP(paranoia_8085_io_map,0)
 
@@ -182,7 +182,7 @@ ROM_END
 
 static DRIVER_INIT(paranoia)
 {
-	driver_init_pce(machine);
+	DRIVER_INIT_CALL(pce);
 };
 
 GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia, ROT0, "Naxat Soft", "Paranoia", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

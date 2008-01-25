@@ -762,7 +762,7 @@ static READ16_HANDLER( megaste_cache_r )
 static WRITE16_HANDLER( megaste_cache_w )
 {
 	megaste_cache = data;
-	cpunum_set_clock(0, (data & 0x01) ? Y2/2 : Y2/4);
+	cpunum_set_clock(Machine, 0, (data & 0x01) ? Y2/2 : Y2/4);
 }
 
 /* ST Book */
@@ -1399,7 +1399,7 @@ static int atarist_int_ack(int line)
 
 static void mfp_interrupt(int which, int state)
 {
-	cpunum_set_input_line(0, MC68000_IRQ_6, state);
+	cpunum_set_input_line(Machine, 0, MC68000_IRQ_6, state);
 }
 
 static UINT8 mfp_rx, mfp_tx;

@@ -228,7 +228,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 		if (pending_vb_int && !DISABLE_VB_INT)
 		{
 			pending_vb_int = 0;
-			cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_4, HOLD_LINE);
 		}
 	}
 }
@@ -430,7 +430,7 @@ static INTERRUPT_GEN( vb_interrupt )
 	}
 
 	//logerror("V-Blank interrupt\n");
-	cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
 }
 
 
@@ -439,12 +439,12 @@ static void ide_interrupt(int state)
 	if (state != CLEAR_LINE)
 	{
 		//logerror("IDE interrupt asserted\n");
-		cpunum_set_input_line(0, MC68000_IRQ_1, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, MC68000_IRQ_1, HOLD_LINE);
 	}
 	else
 	{
 		//logerror("IDE interrupt cleared\n");
-		cpunum_set_input_line(0, MC68000_IRQ_1, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, MC68000_IRQ_1, CLEAR_LINE);
 	}
 }
 
@@ -460,7 +460,7 @@ static void ide_interrupt(int state)
 static ADDRESS_MAP_START( memory_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							// PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM							// WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_READWRITE(paletteram32_r, paletteram32_w)		// COLOR RAM
+	AM_RANGE(0x480000, 0x48443f) AM_READWRITE(MRA32_RAM, paletteram32_w)		// COLOR RAM
 	                             AM_BASE(&paletteram32)
 	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)				// SOUND RAM
 	AM_RANGE(0x580000, 0x58003f) AM_READWRITE(K056832_long_r, K056832_long_w)		// VIDEO REG (tilemap)
@@ -1751,7 +1751,7 @@ static DRIVER_INIT( hmcompmx )
 		0x6b, 0x09, 0x02, 0x0f, 0x05, 0x00, 0x7d, 0x1b
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, hmcompmx_user_password);
@@ -1768,7 +1768,7 @@ static DRIVER_INIT( bm4thmix )
 		0x18, 0x06, 0x1e, 0x07, 0x77, 0x1a, 0x7d, 0x77
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_user_password(0, bm4thmix_user_password);
 }
@@ -1784,7 +1784,7 @@ static DRIVER_INIT( bm5thmix )
 		0x6b, 0x1a, 0x1e, 0x06, 0x04, 0x01, 0x7d, 0x1f
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bm5thmix_user_password);
@@ -1801,7 +1801,7 @@ static DRIVER_INIT( bmclubmx )
 		0x0a, 0x1a, 0x71, 0x07, 0x1e, 0x19, 0x7d, 0x02
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bmclubmx_user_password);
@@ -1819,7 +1819,7 @@ static DRIVER_INIT( bmcompm2 )
 		0x6b, 0x0d, 0x71, 0x0f, 0x1d, 0x10, 0x7d, 0x7a
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bmcompm2_user_password);
@@ -1836,7 +1836,7 @@ static DRIVER_INIT( hmcompm2 )
 		0x09, 0x68, 0x71, 0x0b, 0x77, 0x15, 0x17, 0x1e
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, hmcompm2_user_password);
@@ -1853,7 +1853,7 @@ static DRIVER_INIT( bmdct )
 		0x0e, 0x0a, 0x05, 0x0f, 0x13, 0x74, 0x09, 0x19
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bmdct_user_password);
@@ -1870,7 +1870,7 @@ static DRIVER_INIT( bmcorerm )
 		0x05, 0x09, 0x14, 0x0d, 0x7a, 0x74, 0x7d, 0x7a
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bmcorerm_user_password);
@@ -1887,7 +1887,7 @@ static DRIVER_INIT( bm6thmix )
 		0x02, 0x06, 0x09, 0x0f, 0x7a, 0x74, 0x7d, 0x7a
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bm6thmix_user_password);
@@ -1904,7 +1904,7 @@ static DRIVER_INIT( bm7thmix )
 		0x0c, 0x06, 0x7c, 0x6e, 0x77, 0x74, 0x7d, 0x7a
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bm7thmix_user_password);
@@ -1922,7 +1922,7 @@ static DRIVER_INIT( bmfinal )
 		0x0c, 0x06, 0x71, 0x6e, 0x77, 0x79, 0x7d, 0x7a
 	};
 
-	driver_init_beatmania(machine);
+	DRIVER_INIT_CALL(beatmania);
 
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bmfinal_user_password);

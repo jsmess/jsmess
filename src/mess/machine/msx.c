@@ -278,7 +278,7 @@ DEVICE_UNLOAD (msx_cart)
 
 void msx_vdp_interrupt(int i)
 {
-	cpunum_set_input_line (0, 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cpunum_set_input_line (Machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static void msx_ch_reset_core (void)

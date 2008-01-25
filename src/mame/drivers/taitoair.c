@@ -246,7 +246,7 @@ static WRITE16_HANDLER( system_control_w )
 
 	dsp_HOLD_signal = (data & 4) ? CLEAR_LINE : ASSERT_LINE;
 
-	cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n",activecpu_get_previouspc(),data,((data & 4) ? "Clear" : "Assert"),((data & 1) ? "Clear" : "Assert"));
 }
@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( airsys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w)	/* Pause the TMS32025 */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM              		/* "gradiation ram (0)" */
 	AM_RANGE(0x184000, 0x187fff) AM_RAM            			/* "gradiation ram (1)" */
-	AM_RANGE(0x188000, 0x18bfff) AM_READWRITE(paletteram16_word_r, airsys_paletteram16_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x188000, 0x18bfff) AM_READWRITE(MRA16_RAM, airsys_paletteram16_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x800000, 0x820fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)	/* tilemaps, sprites */
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE(&taitoair_line_ram)	/* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE(&dsp_ram)	/* "dsp common ram" (TMS320C25) */
@@ -572,7 +572,7 @@ GFXDECODE_END
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface airsys_ym2610_interface =

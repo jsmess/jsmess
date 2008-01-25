@@ -139,7 +139,7 @@ static void microtan_set_irq_line(void)
     /* The 6502 IRQ line is active low and probably driven
        by open collector outputs (guess). Since MAME/MESS use
        a non-0 value for ASSERT_LINE we OR the signals here */
-    cpunum_set_input_line(0, 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
+    cpunum_set_input_line(Machine, 0, 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
 }
 
 static mess_image *cassette_device_image(void)
@@ -423,7 +423,7 @@ WRITE8_HANDLER( microtan_sound_w )
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
 static TIMER_CALLBACK(microtan_pulse_nmi)
 {
-    cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+    cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_HANDLER ( microtan_bffx_w )

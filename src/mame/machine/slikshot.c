@@ -508,7 +508,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 	/* at its endpoint; otherwise, we never get a result from the Z80 */
 	if ((data & 0x10) || cpunum_get_reg(2, Z80_PC) == 0x13a)
 	{
-		cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* on the rising edge, make the crosshair visible again */
 		if ((data & 0x10) && !(z80_ctrl & 0x10))
@@ -532,7 +532,7 @@ WRITE8_HANDLER( slikshot_z80_control_w )
 
 /*************************************
  *
- *  video_update_slikshot
+ *  VIDEO_UPDATE( slishot )
  *
  *************************************/
 
@@ -542,7 +542,7 @@ VIDEO_UPDATE( slikshot )
 	int temp, i;
 
 	/* draw the normal video first */
-	video_update_itech8_2page(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
 	xbuffer[ybuffer_next % YBUFFER_COUNT] = readinputportbytag_safe("FAKEX", 0);

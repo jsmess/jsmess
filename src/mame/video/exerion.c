@@ -162,8 +162,6 @@ VIDEO_START( exerion )
 				*dst++ = 0;
 		}
 	}
-
-	video_start_generic(machine);
 }
 
 

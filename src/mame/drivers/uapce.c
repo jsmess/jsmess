@@ -40,7 +40,7 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 
 	if ( diff & 0x40 )
 	{
-		cpunum_set_input_line(0, INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// bit 3 - enable 752 Hz (D-3) square wave output
@@ -224,7 +224,7 @@ ROM_END
 
 static DRIVER_INIT(uapce)
 {
-	driver_init_pce(machine);
+	DRIVER_INIT_CALL(pce);
 };
 
 GAME( 1989, blazlaz, 0, uapce, uapce, uapce, ROT0, "Hudson Soft", "Blazing Lazers", GAME_IMPERFECT_SOUND )

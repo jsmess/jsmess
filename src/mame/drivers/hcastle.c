@@ -37,7 +37,7 @@ static WRITE8_HANDLER( hcastle_bankswitch_w )
 
 static WRITE8_HANDLER( hcastle_soundirq_w )
 {
-	cpunum_set_input_line( 1, 0, HOLD_LINE );
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( hcastle_coin_w )
@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0414, 0x0414) AM_READ(input_port_4_r) /* Dip 2 */
 	AM_RANGE(0x0415, 0x0415) AM_READ(input_port_3_r) /* Dip 1 */
 	AM_RANGE(0x0418, 0x0418) AM_READ(hcastle_gfxbank_r)
-	AM_RANGE(0x0600, 0x06ff) AM_READ(paletteram_r)
+	AM_RANGE(0x0600, 0x06ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x0700, 0x5fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_BANK1)
 	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
@@ -243,7 +243,7 @@ GFXDECODE_END
 
 static void irqhandler(int linestate)
 {
-//  cpunum_set_input_line(1,0,linestate);
+//  cpunum_set_input_line(Machine, 1,0,linestate);
 }
 
 static void volume_callback(int v)

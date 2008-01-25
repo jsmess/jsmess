@@ -306,12 +306,12 @@ static void nc_update_interrupts(void)
 	{
 		logerror("int set %02x\n",nc_irq_status & nc_irq_mask);
 		/* set int */
-		cpunum_set_input_line(0,0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 	}
 	else
 	{
 		/* clear int */
-		cpunum_set_input_line(0,0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	}
 }
 
@@ -532,7 +532,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 				case NC_TYPE_1xx:
 				{
 			        LOG(("nmi triggered\n"));
-				    cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+				    cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
 
@@ -873,7 +873,7 @@ static void	nc100_tc8521_alarm_callback(int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 

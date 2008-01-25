@@ -348,9 +348,9 @@ static VIDEO_UPDATE( tm990_189_v )
 static void field_interrupts(void)
 {
 	if (load_state)
-		cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, 2);
+		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, 2);
 	else
-		cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, ic_state);
+		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, ic_state);
 }
 
 /*

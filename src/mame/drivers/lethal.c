@@ -172,6 +172,10 @@ maybe some priority issues / sprite placement issues..
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
 
+#define MAIN_CLOCK		XTAL_24MHz
+#define SOUND_CLOCK		XTAL_18_432MHz
+
+
 #define GUNX( a ) (( ( readinputport( a ) * 287 ) / 0xff ) + 16)
 #define GUNY( a ) (( ( readinputport( a ) * 223 ) / 0xff ) + 10)
 
@@ -247,7 +251,7 @@ static WRITE8_HANDLER( control2_w )
 
 static INTERRUPT_GEN(lethalen_interrupt)
 {
-	if (K056832_is_IRQ_enabled(0)) cpunum_set_input_line(0, HD6309_IRQ_LINE, HOLD_LINE);
+	if (K056832_is_IRQ_enabled(0)) cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( sound_cmd_w )
@@ -257,7 +261,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -267,7 +271,7 @@ static READ8_HANDLER( sound_status_r )
 
 static void sound_nmi(void)
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( le_bankswitch_w )
@@ -281,7 +285,7 @@ static READ8_HANDLER( le_4800_r )
 {
 	if (cur_control2 & 0x10)	// RAM enable
 	{
-		return paletteram_r(offset);
+		return paletteram[offset];
 	}
 	else
 	{
@@ -649,12 +653,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( lethalen )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", HD6309, 8000000)	// ???
+	MDRV_CPU_ADD_TAG("main", HD6309, MAIN_CLOCK/2)	// ???
 	MDRV_CPU_PROGRAM_MAP(le_main, 0)
 	MDRV_CPU_VBLANK_INT(lethalen_interrupt, 1)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(le_sound, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -666,7 +669,6 @@ static MACHINE_DRIVER_START( lethalen )
 	MDRV_NVRAM_HANDLER(lethalen)
 
 	MDRV_GFXDECODE(lethal)
-
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_HAS_SHADOWS)

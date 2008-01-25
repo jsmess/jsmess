@@ -314,14 +314,14 @@ static INTERRUPT_GEN( ssio_14024_clock )
 
 	/* if the low 5 bits clocked to 0, bit 6 has changed state */
 	if ((ssio_14024_count & 0x3f) == 0)
-		cpunum_set_input_line(ssio_sound_cpu, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, ssio_sound_cpu, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( ssio_irq_clear )
 {
 	/* a read here asynchronously resets the 14024 count, clearing /SINT */
 	ssio_14024_count = 0;
-	cpunum_set_input_line(ssio_sound_cpu, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, ssio_sound_cpu, 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -397,7 +397,7 @@ void ssio_reset_w(int state)
 	{
 		int i;
 
-		cpunum_set_input_line(ssio_sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, ssio_sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* latches also get reset */
 		for (i = 0; i < 4; i++)
@@ -407,7 +407,7 @@ void ssio_reset_w(int state)
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpunum_set_input_line(ssio_sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, ssio_sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 READ8_HANDLER( ssio_input_port_r )
@@ -527,7 +527,9 @@ static WRITE8_HANDLER( csdeluxe_portb_w )
 
 static void csdeluxe_irq(int state)
 {
-  	cpunum_set_input_line(csdeluxe_sound_cpu, 4, state ? ASSERT_LINE : CLEAR_LINE);
+	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
+
+  	cpunum_set_input_line(Machine, csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
@@ -574,7 +576,7 @@ READ8_HANDLER( csdeluxe_status_r )
 
 void csdeluxe_reset_w(int state)
 {
-	cpunum_set_input_line(csdeluxe_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, csdeluxe_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -647,7 +649,9 @@ static WRITE8_HANDLER( soundsgood_portb_w )
 
 static void soundsgood_irq(int state)
 {
-  	cpunum_set_input_line(soundsgood_sound_cpu, 4, state ? ASSERT_LINE : CLEAR_LINE);
+	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
+
+  	cpunum_set_input_line(Machine, soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
@@ -675,7 +679,7 @@ READ8_HANDLER( soundsgood_status_r )
 void soundsgood_reset_w(int state)
 {
 //if (state) mame_printf_debug("SG Reset\n");
-	cpunum_set_input_line(soundsgood_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, soundsgood_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -738,7 +742,9 @@ static WRITE8_HANDLER( turbocs_portb_w )
 
 static void turbocs_irq(int state)
 {
-	cpunum_set_input_line(turbocs_sound_cpu, M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
+
+	cpunum_set_input_line(Machine, turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
@@ -765,7 +771,7 @@ READ8_HANDLER( turbocs_status_r )
 
 void turbocs_reset_w(int state)
 {
-	cpunum_set_input_line(turbocs_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, turbocs_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -869,7 +875,9 @@ static WRITE8_HANDLER( squawkntalk_portb2_w )
 
 static void squawkntalk_irq(int state)
 {
-	cpunum_set_input_line(squawkntalk_sound_cpu, M6808_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
+
+	cpunum_set_input_line(Machine, squawkntalk_sound_cpu, M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
@@ -887,7 +895,7 @@ WRITE8_HANDLER( squawkntalk_data_w )
 
 void squawkntalk_reset_w(int state)
 {
-	cpunum_set_input_line(squawkntalk_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, squawkntalk_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -937,7 +945,7 @@ static const pia6821_interface squawkntalk_pia1_intf =
 
 /********* machine driver ***********/
 MACHINE_DRIVER_START(squawk_n_talk)
-	MDRV_CPU_ADD_TAG("snt", M6802, SQUAWKTALK_CLOCK/4)
+	MDRV_CPU_ADD_TAG("snt", M6802, SQUAWKTALK_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(squawkntalk_map,0)
 
 	/* only used on Discs of Tron, which is stereo */

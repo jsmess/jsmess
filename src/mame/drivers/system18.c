@@ -181,7 +181,7 @@ static void shdancbl_msm5205_callback(int data)
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct MSM5205interface shdancbl_msm5205_interface =
@@ -195,7 +195,7 @@ static UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected p
 static WRITE16_HANDLER( sound_command_irq_w ){
 	if( ACCESSING_LSB ){
 		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line( 1, 0, HOLD_LINE );
+		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
 	}
 }
 
@@ -339,7 +339,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( sound_command_nmi_w ){
 	if( ACCESSING_LSB ){
 		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -776,7 +776,7 @@ static DRIVER_INIT( shdancbl )
 	for(i = 0; i < 0xc0000; i++)
 		mem[i] ^= 0xFF;
 
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xffc000, 0xffc001, 0, 0, shdancbl_skip_r );
 
 	sys18_splittab_fg_x=&sys16_textram[0x0f80/2];
@@ -919,7 +919,7 @@ static DRIVER_INIT( mwalkbl ){
 		0x1f, 0xA0000  // ROM #4 = 256K
 	};
 
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 	sys18_splittab_fg_x=&sys16_textram[0x0f80/2];
 	sys18_splittab_bg_x=&sys16_textram[0x0fc0/2];
 
@@ -1100,7 +1100,7 @@ static DRIVER_INIT( astormbl ){
 		0x1f, 0xA0000  // ROM #4 = 256K
 	};
 
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 	sys18_splittab_fg_x=&sys16_textram[0x0f80/2];
 	sys18_splittab_bg_x=&sys16_textram[0x0fc0/2];
 	sys16_MaxShadowColors = 0; // doesn't seem to use transparent shadows

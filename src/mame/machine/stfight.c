@@ -68,7 +68,7 @@ DRIVER_INIT( empcity )
 
 DRIVER_INIT( stfight )
 {
-	driver_init_empcity(machine);
+	DRIVER_INIT_CALL(empcity);
 
 	/* patch out a tight loop during startup - is the code waiting */
 	/* for NMI to wake it up? */
@@ -101,13 +101,13 @@ static WRITE8_HANDLER( stfight_bank_w )
 static TIMER_CALLBACK( stfight_interrupt_1 )
 {
     // Do a RST08
-    cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xcf);
+    cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xcf);
 }
 
 INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
-    cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xd7);
+    cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xd7);
    	timer_set(ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
 }
 

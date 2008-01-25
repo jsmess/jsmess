@@ -766,7 +766,7 @@ VIDEO_START( atari )
 		memset(antic.video[i], 0, sizeof(VIDEO));
     }
 
-    video_start_generic_bitmapped(machine);
+    VIDEO_START_CALL(generic_bitmapped);
 }
 
 /************************************************************************
@@ -778,7 +778,7 @@ VIDEO_UPDATE( atari )
 {
 	UINT32 new_tv_artifacts;
 
-	video_update_generic_bitmapped(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(generic_bitmapped);
 
 	new_tv_artifacts = readinputportbytag_safe("artifacts", 0);
 	if( tv_artifacts != new_tv_artifacts )
@@ -1073,7 +1073,7 @@ static TIMER_CALLBACK( antic_issue_dli )
 	{
 		LOG(("           @cycle #%3d issue DLI\n", cycle()));
 		antic.r.nmist |= DLI_NMI;
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
@@ -1142,13 +1142,13 @@ static TIMER_CALLBACK( antic_line_done )
     {
 		LOG(("           @cycle #%3d release WSYNC\n", cycle()));
         /* release the CPU if it was actually waiting for HSYNC */
-        cpu_trigger(TRIGGER_HSYNC);
+        cpu_trigger(machine, TRIGGER_HSYNC);
         /* and turn off the 'wait for hsync' flag */
         antic.w.wsync = 0;
     }
 	LOG(("           @cycle #%3d release CPU\n", cycle()));
     /* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
-	cpu_trigger(TRIGGER_STEAL);
+	cpu_trigger(machine, TRIGGER_STEAL);
 
 	/* refresh the display (translate color clocks to pixels) */
     antic_linerefresh();
@@ -1531,7 +1531,7 @@ static void generic_atari_interrupt(void (*handle_keyboard)(void), int button_co
 			LOG(("           cause VBL NMI\n"));
 			/* set the VBL NMI status bit */
 			antic.r.nmist |= VBL_NMI;
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 		}
     }
 

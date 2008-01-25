@@ -45,7 +45,7 @@ static void mquake_cia_0_porta_w(UINT8 data)
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, MWA16_ROM);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, MWA16_UNMAP);
 }
 
 
@@ -338,7 +338,7 @@ static MACHINE_RESET(mquake)
 	/* set ES5503 wave memory (this is banked in 64k increments) */
 	ES5503_set_base_0(memory_region(REGION_SOUND1));
 
-	machine_reset_amiga(machine);
+	MACHINE_RESET_CALL(amiga);
 }
 
 /*************************************

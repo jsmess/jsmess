@@ -90,7 +90,7 @@ static const UINT8 led_map[16] =
 
 static void dleuro_interrupt(int state)
 {
-	cpunum_set_input_line(0, 0, state);
+	cpunum_set_input_line(Machine, 0, 0, state);
 }
 
 
@@ -189,7 +189,7 @@ static PALETTE_INIT( dleuro )
 
 static VIDEO_START( dleuro )
 {
-	video_start_dlair(machine);
+	VIDEO_START_CALL(dlair);
 
 	overlay_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	fillbitmap(overlay_bitmap, 8, NULL);

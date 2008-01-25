@@ -107,7 +107,7 @@ static void lightpen_trigger(void)
 	}
 	if (vectrex_lightpen_port & 2)
 	{
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, PULSE_LINE);
 	}
 }
 
@@ -189,7 +189,7 @@ VIDEO_UPDATE( vectrex )
 		i = (i+1) % NVECT;
 	}
 
-	video_update_vector(machine, screen, bitmap, cliprect);
+	video_update_vector(Machine, screen, bitmap, cliprect);
 	vector_clear_list();
 	return 0;
 }

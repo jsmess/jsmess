@@ -804,7 +804,7 @@ static TIMER_CALLBACK( internal_interrupt_callback )
 	cpuintrf_pop_context();
 
 	/* generate triggers so that spin loops can key off them */
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 }
 
 
@@ -1210,7 +1210,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			/* if the CPU is halting itself, stop execution right away */
 			if ((data & 0x8000) && !external_host_access)
 				tms34010_ICount = 0;
-			cpunum_set_input_line(cpunum, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
 
 			/* NMI issued? */
 			if (data & 0x0100)
@@ -1361,7 +1361,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 			/* if the CPU is halting itself, stop execution right away */
 			if ((data & 0x8000) && !external_host_access)
 				tms34010_ICount = 0;
-			cpunum_set_input_line(cpunum, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
 
 			/* NMI issued? */
 			if (data & 0x0100)

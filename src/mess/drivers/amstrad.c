@@ -771,21 +771,21 @@ static WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 			if(data & 0x40)
 			{
 				logerror("ASIC: DMA 0 IRQ acknowledge\n");
-				cpunum_set_input_line(0,0,CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
 				amstrad_plus_irq_cause = 0x06;
 				amstrad_plus_asic_ram[0x2c0f] &= ~0x40;
 			}
 			if(data & 0x20)
 			{
 				logerror("ASIC: DMA 1 IRQ acknowledge\n");
-				cpunum_set_input_line(0,0,CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
 				amstrad_plus_irq_cause = 0x06;
 				amstrad_plus_asic_ram[0x2c0f] &= ~0x20;
 			}
 			if(data & 0x10)
 			{
 				logerror("ASIC: DMA 2 IRQ acknowledge\n");
-				cpunum_set_input_line(0,0,CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
 				amstrad_plus_irq_cause = 0x06;
 				amstrad_plus_asic_ram[0x2c0f] &= ~0x10;
 			}
@@ -1068,7 +1068,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
  then the interrupt request is cleared and the 6-bit counter is reset to "0".  */
   			if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<4)) != 0) {
             amstrad_CRTC_HS_Counter = 0;
-  			    cpunum_set_input_line(0,0, CLEAR_LINE);
+  			    cpunum_set_input_line(Machine, 0,0, CLEAR_LINE);
 
   			}
 /* b3b2 != 0 then change the state of upper or lower rom area and rethink memory */
@@ -1636,7 +1636,7 @@ void	multiface_stop(void)
 		multiface_rethink_memory();
 
 		/* pulse the nmi line */
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 		/* initialise 0065 override to monitor calls to 0065 */
 		memory_set_opbase_handler(0,amstrad_multiface_opbaseoverride);
@@ -1807,7 +1807,7 @@ static int 	amstrad_cpu_acknowledge_int(int cpu)
 		amstrad_plus_asic_ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
 		return (amstrad_plus_asic_ram[0x2805] & 0xf8) + amstrad_plus_irq_cause;
 	}
-	cpunum_set_input_line(0,0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0,0, CLEAR_LINE);
 	amstrad_CRTC_HS_Counter &= 0x1F;
 	if(amstrad_plus_asic_enabled != 0)
 	{

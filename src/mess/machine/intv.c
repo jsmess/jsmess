@@ -429,12 +429,12 @@ MACHINE_RESET( intv )
 
 static TIMER_CALLBACK(intv_interrupt_complete)
 {
-	cpunum_set_input_line(0, CP1610_INT_INTRM, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CP1610_INT_INTRM, CLEAR_LINE);
 }
 
 INTERRUPT_GEN( intv_interrupt )
 {
-	cpunum_set_input_line(0, CP1610_INT_INTRM, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, CP1610_INT_INTRM, ASSERT_LINE);
 	sr1_int_pending = 1;
 	timer_set(ATTOTIME_IN_CYCLES(3791, 0), NULL, 0, intv_interrupt_complete);
 	stic_screenrefresh();

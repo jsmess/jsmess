@@ -156,7 +156,7 @@ static void int3_raise_local0_irq(UINT8 source_mask)
 	// if it's not masked, also assert it now at the CPU
 	if (int3_regs[1] & source_mask)
 	{
-		cpunum_set_input_line(0, MIPS3_IRQ0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, MIPS3_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -176,7 +176,7 @@ static void int3_raise_local1_irq(UINT8 source_mask)
 	// if it's not masked, also assert it now at the CPU
 	if (int3_regs[2] & source_mask)
 	{
-		cpunum_set_input_line(0, MIPS3_IRQ1, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, MIPS3_IRQ1, ASSERT_LINE);
 	}
 }
 
@@ -342,21 +342,21 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 		// if no local0 interrupts now, clear the input to the CPU
 		if ((int3_regs[0] & int3_regs[1]) == 0)
 		{
-			cpunum_set_input_line(0, MIPS3_IRQ0, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MIPS3_IRQ0, CLEAR_LINE);
 		}
 		else
 		{
-			cpunum_set_input_line(0, MIPS3_IRQ0, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0, MIPS3_IRQ0, ASSERT_LINE);
 		}
 
 		// if no local1 interrupts now, clear the input to the CPU
 		if ((int3_regs[2] & int3_regs[3]) == 0)
 		{
-			cpunum_set_input_line(0, MIPS3_IRQ1, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MIPS3_IRQ1, CLEAR_LINE);
 		}
 		else
 		{
-			cpunum_set_input_line(0, MIPS3_IRQ1, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0, MIPS3_IRQ1, ASSERT_LINE);
 		}
 		break;
 	case 0xb0/4:

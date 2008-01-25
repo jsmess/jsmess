@@ -204,7 +204,7 @@ static void io_iterate(void)
 			break;
 		case IOS_INIT:
 			mailbox_out = 0x08;
-			cpunum_set_input_line(0, TMS7000_IRQ1_LINE, PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, TMS7000_IRQ1_LINE, PULSE_LINE);
 			io_state = IOS_NOP;
 			break;
 		case IOS_RESET:
@@ -220,17 +220,17 @@ static void io_iterate(void)
 			break;
 		case IOS_CHARDEF1:
 			mailbox_out = 0x07;
-			cpunum_set_input_line(0, TMS7000_IRQ1_LINE, PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, TMS7000_IRQ1_LINE, PULSE_LINE);
 			io_state = IOS_CHARDEF2;
 			break;
 		case IOS_CHARDEF2:
 			mailbox_out = 0x04;
-			cpunum_set_input_line(0, TMS7000_IRQ1_LINE, PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, TMS7000_IRQ1_LINE, PULSE_LINE);
 			io_state = IOS_CHARDEF3;
 			break;
 		case IOS_CHARDEF3:
 			mailbox_out = 0xF5;
-			cpunum_set_input_line(0, TMS7000_IRQ1_LINE, PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, TMS7000_IRQ1_LINE, PULSE_LINE);
 			io_state = IOS_CHARDEF4;
 			io_counter = 0;
 			break;
@@ -369,7 +369,7 @@ static void io_iterate(void)
 					0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 				};
 				mailbox_out = fontdata[io_counter+9-2*(io_counter%10)] >> 2;
-				cpunum_set_input_line(0, TMS7000_IRQ1_LINE, PULSE_LINE);
+				cpunum_set_input_line(Machine, 0, TMS7000_IRQ1_LINE, PULSE_LINE);
 				io_counter++;
 				if (io_counter == 127*10)
 					io_state = IOS_NOP;
@@ -387,7 +387,7 @@ static void set_io_hsk(int state)
 		if (io_command_ack)
 		{
 			if (io_hsk)
-				cpunum_set_input_line(0, TMS7000_IRQ1_LINE, PULSE_LINE);
+				cpunum_set_input_line(Machine, 0, TMS7000_IRQ1_LINE, PULSE_LINE);
 			else
 			{
 				io_command_ack = 0;

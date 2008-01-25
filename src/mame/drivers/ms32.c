@@ -272,7 +272,7 @@ static READ32_HANDLER ( ms32_read_inputs3 )
 static WRITE32_HANDLER( ms32_sound_w )
 {
 	soundlatch_w(0, data & 0xff);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -285,7 +285,7 @@ static READ32_HANDLER( ms32_sound_r )
 
 static WRITE32_HANDLER( reset_sub_w )
 {
-	if(data) cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+	if(data) cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
 }
 
 
@@ -1245,21 +1245,21 @@ static int irq_callback(int irqline)
 	for(i=15; i>=0 && !(irqreq & (1<<i)); i--);
 	irqreq &= ~(1<<i);
 	if(!irqreq)
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	return i;
 }
 
 static void irq_init(void)
 {
 	irqreq = 0;
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	cpunum_set_irq_callback(0, irq_callback);
 }
 
 static void irq_raise(int level)
 {
 	irqreq |= (1<<level);
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(ms32_interrupt)
@@ -1302,7 +1302,7 @@ static INTERRUPT_GEN(ms32_interrupt)
 
 static READ8_HANDLER( latch_r )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(0)^0xff;
 }
 
@@ -2195,7 +2195,7 @@ static DRIVER_INIT (kirarast)
 //  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
 
-	driver_init_ss92047_01(machine);
+	DRIVER_INIT_CALL(ss92047_01);
 }
 
 static DRIVER_INIT (47pie2)
@@ -2203,7 +2203,7 @@ static DRIVER_INIT (47pie2)
 //  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
 
-	driver_init_ss92048_01(machine);
+	DRIVER_INIT_CALL(ss92048_01);
 }
 
 static DRIVER_INIT (f1superb)
@@ -2212,7 +2212,7 @@ static DRIVER_INIT (f1superb)
 	UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
-	driver_init_ss92046_01(machine);
+	DRIVER_INIT_CALL(ss92046_01);
 }
 
 /********** GAME DRIVERS **********/

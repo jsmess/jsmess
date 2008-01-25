@@ -657,9 +657,9 @@ static INPUT_PORTS_START( schmeisr )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -676,7 +676,7 @@ static INPUT_PORTS_START( schmeisr )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Dip switch bank 3 */
+	PORT_START	/* Dip switch bank 3 - This bank of switches are _NOT_ shown in the test mode screen */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -692,7 +692,7 @@ static INPUT_PORTS_START( schmeisr )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Freeze Screen" )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
@@ -794,7 +794,7 @@ GFXDECODE_END
 
 static void sound_irq(int state)
 {
-	cpunum_set_input_line(1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -818,7 +818,7 @@ static MACHINE_DRIVER_START( rohga )
 	MDRV_CPU_PROGRAM_MAP(rohga_readmem,rohga_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
@@ -861,7 +861,7 @@ static MACHINE_DRIVER_START( wizdfire )
 	MDRV_CPU_PROGRAM_MAP(wizdfire_readmem,wizdfire_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3)
+	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
@@ -904,7 +904,7 @@ static MACHINE_DRIVER_START( nitrobal )
 	MDRV_CPU_PROGRAM_MAP(nitrobal_readmem,nitrobal_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
@@ -947,7 +947,7 @@ static MACHINE_DRIVER_START( schmeisr )
 	MDRV_CPU_PROGRAM_MAP(schmeisr_readmem,schmeisr_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)

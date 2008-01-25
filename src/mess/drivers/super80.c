@@ -41,7 +41,7 @@ static const z80pio_interface z80pio_intf =
 
 static void pio_interrupt(int state)
 {
-	cpunum_set_input_line(0, 0, state);
+	cpunum_set_input_line(Machine, 0, 0, state);
 }
 
 static void keyboard_scan(void)

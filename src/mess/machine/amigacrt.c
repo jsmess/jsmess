@@ -84,7 +84,7 @@ static int amiga_ar1_irqack( int level )
 static TIMER_CALLBACK( amiga_ar1_delayed_nmi )
 {
 	(void)param;
-	cpunum_set_input_line(0, 7, PULSE_LINE);
+	cpunum_set_input_line(Machine, 0, 7, PULSE_LINE);
 }
 
 static void amiga_ar1_nmi( void )
@@ -280,7 +280,7 @@ static void amiga_ar23_freeze( void )
 		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);
 
 		/* trigger NMI irq */
-		cpunum_set_input_line(0, 7, PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, 7, PULSE_LINE);
 	}
 }
 

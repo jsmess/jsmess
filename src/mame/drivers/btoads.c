@@ -67,7 +67,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	main_to_sound_data = param;
 	main_to_sound_ready = 1;
-	cpu_triggerint(1);
+	cpu_triggerint(machine, 1);
 
 	/* use a timer to make long transfers faster */
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, 0);
@@ -149,7 +149,7 @@ static WRITE8_HANDLER( sound_int_state_w )
 		sndti_reset(SOUND_BSMT2000, 0);
 
 	/* also clears interrupts */
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 	sound_int_state = data;
 }
 

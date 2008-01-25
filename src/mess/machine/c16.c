@@ -375,7 +375,7 @@ void c16_interrupt (int level)
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos7501", ("irq %s\n", level ? "start" : "end"));
-		cpunum_set_input_line (0, M6510_IRQ_LINE, level);
+		cpunum_set_input_line(Machine, 0, M6510_IRQ_LINE, level);
 		old_level = level;
 	}
 }

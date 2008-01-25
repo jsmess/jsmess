@@ -599,7 +599,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 	if(cps1_scanline1 == scancount || (cps1_scanline1 < scancount && !cps1_scancalls))
 	{
 		cps1_output[0x50/2] = 0;
-		cpunum_set_input_line(0, 4, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 		cps2_set_sprite_priorities();
 		video_screen_update_partial(0, 16 - 10 + scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		cps1_scancalls++;
@@ -610,7 +610,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 	if(cps1_scanline2 == scancount || (cps1_scanline2 < scancount && !cps1_scancalls))
 	{
 		cps1_output[0x52/2] = 0;
-		cpunum_set_input_line(0, 4, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 		cps2_set_sprite_priorities();
 		video_screen_update_partial(0, 16 - 10 + scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		cps1_scancalls++;
@@ -621,7 +621,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 	{
 		cps1_output[0x50/2] = cps1_scanline1;
 		cps1_output[0x52/2] = cps1_scanline2;
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 		if(cps1_scancalls)
 		{
 			cps2_set_sprite_priorities();
@@ -692,7 +692,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
         /* Z80 Reset */
-		cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 	coin_counter_w(0, data & 0x0001);
 	if( (strncmp(Machine->gamedrv->name,"pzloop2",8)==0) ||
@@ -7189,13 +7189,13 @@ ROM_END
 static DRIVER_INIT( cps2 )
 {
 	/* Decrypt the game - see machine/cps2crpt.c */
-	driver_init_cps2crpt(machine);
+	DRIVER_INIT_CALL(cps2crpt);
 	cps2networkpresent = 0;
 }
 
 static DRIVER_INIT( ssf2tb )
 {
-	driver_init_cps2(machine);
+	DRIVER_INIT_CALL(cps2);
 	cps2networkpresent = 0;
 
 	/* we don't emulate the network board, so don't say it's present for now, otherwise the game will
@@ -7206,7 +7206,7 @@ static DRIVER_INIT( ssf2tb )
 
 static DRIVER_INIT ( puzloop2 )
 {
-	driver_init_cps2(machine);
+	DRIVER_INIT_CALL(cps2);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, pl2_port_0_word_r);
 }
 

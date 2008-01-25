@@ -47,7 +47,7 @@ static int ACCCON_IRR=0;
 
 static void bbc_setirq(void)
 {
-  cpunum_set_input_line(0, M6502_IRQ_LINE, via_system_irq|via_user_irq|MC6850_irq|ACCCON_IRR);
+	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, via_system_irq|via_user_irq|MC6850_irq|ACCCON_IRR);
 }
 
 /************************
@@ -1513,7 +1513,7 @@ static void	bbc_i8271_interrupt(int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpunum_set_input_line(0, INPUT_LINE_NMI,PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 
@@ -1678,7 +1678,7 @@ static void bbc_wd177x_callback(wd17xx_state_t event, void *param)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpunum_set_input_line(0, INPUT_LINE_NMI,PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 

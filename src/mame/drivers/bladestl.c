@@ -43,10 +43,10 @@ static INTERRUPT_GEN( bladestl_interrupt )
 {
 	if (cpu_getiloops() == 0){
 		if (K007342_is_INT_enabled())
-			cpunum_set_input_line(0, HD6309_FIRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, HD6309_FIRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops() % 2){
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 {
 	soundlatch_w(offset, data);
-	cpunum_set_input_line(1, M6809_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( bladestl_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(K007342_r)			/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_READ(K007420_r)			/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_READ(K007342_scroll_r)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x245f) AM_READ(paletteram_r)		/* Palette */
+	AM_RANGE(0x2400, 0x245f) AM_READ(MRA8_RAM)			/* Palette */
 	AM_RANGE(0x2e01, 0x2e01) AM_READ(input_port_3_r)		/* 1P controls */
 	AM_RANGE(0x2e02, 0x2e02) AM_READ(input_port_4_r)		/* 2P controls */
 	AM_RANGE(0x2e03, 0x2e03) AM_READ(input_port_1_r)		/* DISPW #2 */
@@ -431,7 +431,7 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( bladestl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000)		/* 24MHz/8 (?) */
+	MDRV_CPU_ADD(HD6309, 24000000/2)		/* 24MHz/2 (?) */
 	MDRV_CPU_PROGRAM_MAP(bladestl_readmem,bladestl_writemem)
 	MDRV_CPU_VBLANK_INT(bladestl_interrupt,2) /* (1 IRQ + 1 NMI) */
 

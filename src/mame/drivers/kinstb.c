@@ -237,7 +237,6 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_MACHINE_RESET( snes )
 
 	/* video hardware */
-	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( snes )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -266,7 +265,7 @@ static DRIVER_INIT(kinstb)
 	{
 		memory_region(REGION_USER3)[i]=BITSWAP8(memory_region(REGION_USER3)[i],5,0,6,1,7,4,3,2 );
 	}
-	driver_init_snes_hirom(machine);
+	DRIVER_INIT_CALL(snes_hirom);
 }
 
 ROM_START( kinstb )

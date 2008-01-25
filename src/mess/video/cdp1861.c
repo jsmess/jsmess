@@ -26,7 +26,7 @@ static TIMER_CALLBACK(cdp1861_int_tick)
 	{
 		if (cdp1861.disp)
 		{
-			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, HOLD_LINE);
 		}
 
 		timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_END, 0), 0, attotime_zero);
@@ -35,7 +35,7 @@ static TIMER_CALLBACK(cdp1861_int_tick)
 	{
 		if (cdp1861.disp)
 		{
-			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 		}
 
 		timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_START, 0), 0, attotime_zero);
@@ -80,7 +80,7 @@ static TIMER_CALLBACK(cdp1861_dma_tick)
 		{
 			if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
 			{
-				cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 			}
 		}
 
@@ -94,7 +94,7 @@ static TIMER_CALLBACK(cdp1861_dma_tick)
 		{
 			if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
 			{
-				cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
 			}
 		}
 
@@ -127,8 +127,8 @@ MACHINE_RESET( cdp1861 )
 	cdp1861.disp = 0;
 	cdp1861.dmaout = 0;
 
-	cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
-	cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 	cdp1861_efx = CLEAR_LINE;
 }
 
@@ -142,8 +142,8 @@ READ8_HANDLER( cdp1861_dispon_r )
 WRITE8_HANDLER( cdp1861_dispoff_w )
 {
 	cdp1861.disp = 0;
-	cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
-	cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 }
 
 VIDEO_START( cdp1861 )

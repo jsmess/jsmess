@@ -19,7 +19,7 @@ static int last_frame_flip = 0;
 
 static void ppu_nmi(int num, int *ppu_regs)
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void nes_vh_reset(running_machine *machine)

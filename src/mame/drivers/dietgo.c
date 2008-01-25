@@ -192,7 +192,7 @@ GFXDECODE_END
 
 static void sound_irq(int state)
 {
-	cpunum_set_input_line(1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
 }
 
 static const struct YM2151interface ym2151_interface =
@@ -206,7 +206,7 @@ static MACHINE_DRIVER_START( dietgo )
 	MDRV_CPU_PROGRAM_MAP(dietgo_map,0)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280, XTAL_32_22MHz/4/12)	/* Custom chip 45; XIN is 32.220MHZ/4, HSM pin is low so XIN/12 */
+	MDRV_CPU_ADD(H6280, XTAL_32_22MHz/4/3)	/* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)

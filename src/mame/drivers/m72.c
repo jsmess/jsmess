@@ -98,21 +98,21 @@ static MACHINE_START( m72 )
 static MACHINE_RESET( m72 )
 {
 	m72_irq_base = 0x20;
-	machine_reset_m72_sound(machine);
+	MACHINE_RESET_CALL(m72_sound);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 static MACHINE_RESET( xmultipl )
 {
 	m72_irq_base = 0x08;
-	machine_reset_m72_sound(machine);
+	MACHINE_RESET_CALL(m72_sound);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 static MACHINE_RESET( kengo )
 {
 	m72_irq_base = 0x18;
-	machine_reset_m72_sound(machine);
+	MACHINE_RESET_CALL(m72_sound);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
@@ -124,14 +124,14 @@ static TIMER_CALLBACK( m72_scanline_interrupt )
 	if (scanline < 256 && scanline == m72_raster_irq_position - 128)
 	{
 		video_screen_update_partial(0, scanline);
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, m72_irq_base + 2);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, m72_irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
 		video_screen_update_partial(0, scanline);
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, m72_irq_base + 0);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, m72_irq_base + 0);
 	}
 
 	/* adjust for next scanline */

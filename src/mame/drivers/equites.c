@@ -142,7 +142,7 @@ SNK/Eastern  1985 (ACT) Gekisoh          ????
 
 // Common Hardware Start
 #define EQUITES_ADD_SOUNDBOARD7 \
-	MDRV_CPU_ADD(8085A, XTAL_6_144MHz/2) /* verified on pcb */ \
+	MDRV_CPU_ADD(8085A, XTAL_6_144MHz) /* verified on pcb */ \
 	/* audio CPU */ \
 	MDRV_CPU_PROGRAM_MAP(equites_s_readmem, equites_s_writemem) \
 	MDRV_CPU_IO_MAP(0, equites_s_writeport) \
@@ -255,18 +255,18 @@ static int splndrbt_flip;
 static INTERRUPT_GEN( equites_interrupt )
 {
 	if (cpu_getiloops())
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
 // Splendor Blast Hareware
 static INTERRUPT_GEN( splndrbt_interrupt )
 {
 	if (cpu_getiloops())
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
 /******************************************************************************/

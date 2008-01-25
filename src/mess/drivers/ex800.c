@@ -170,7 +170,7 @@ static void online_switch(void *param, UINT32 oldvalue, UINT32 newvalue)
 
 	if (newvalue)
 	{
-		cpunum_set_input_line(0, UPD7810_INTF1, state);
+		cpunum_set_input_line(Machine, 0, UPD7810_INTF1, state);
 		state = (state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }

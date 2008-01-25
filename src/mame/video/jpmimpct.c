@@ -146,6 +146,4 @@ VIDEO_START( jpmimpct )
 	state_save_register_global(bt477.pixmask);
 	state_save_register_global(bt477.command);
 	state_save_register_global(bt477.color);
-
-	video_start_generic_bitmapped(machine);
 }

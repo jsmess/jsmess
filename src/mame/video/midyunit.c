@@ -100,7 +100,7 @@ VIDEO_START( midyunit_4bit )
 {
 	int i;
 
-	video_start_common(machine);
+	VIDEO_START_CALL(common);
 
 	/* init for 4-bit */
 	for (i = 0; i < 65536; i++)
@@ -113,7 +113,7 @@ VIDEO_START( midyunit_6bit )
 {
 	int i;
 
-	video_start_common(machine);
+	VIDEO_START_CALL(common);
 
 	/* init for 6-bit */
 	for (i = 0; i < 65536; i++)
@@ -124,7 +124,7 @@ VIDEO_START( midyunit_6bit )
 
 VIDEO_START( mkyawdim )
 {
-	video_start_midyunit_6bit(machine);
+	VIDEO_START_CALL(midyunit_6bit);
 	yawdim_dma = 1;
 }
 
@@ -133,7 +133,7 @@ VIDEO_START( midzunit )
 {
 	int i;
 
-	video_start_common(machine);
+	VIDEO_START_CALL(common);
 
 	/* init for 8-bit */
 	for (i = 0; i < 65536; i++)
@@ -390,7 +390,7 @@ static void dma_draw(UINT16 command)
 static TIMER_CALLBACK( dma_callback )
 {
 	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 
@@ -453,7 +453,7 @@ WRITE16_HANDLER( midyunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 

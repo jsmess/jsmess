@@ -99,7 +99,7 @@ static emu_timer	*nes_irq_timer;
 
 static TIMER_CALLBACK(nes_irq_callback)
 {
-	cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 	timer_adjust(nes_irq_timer, attotime_never, 0, attotime_never);
 }
 
@@ -632,7 +632,7 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
 			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 //			timer_adjust(nes_irq_timer, ATTOTIME_IN_CYCLES(4, 0), 0, attotime_never);
 		}
 	}
@@ -837,7 +837,7 @@ static void mapper5_irq ( int num, int scanline, int vblank, int blanked )
 	if (scanline == IRQ_count)
 	{
 		if (IRQ_enable)
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 
 		IRQ_status = 0xff;
 	}
@@ -1586,7 +1586,7 @@ static void bandai_irq ( int num, int scanline, int vblank, int blanked )
 	{
 		if (IRQ_count <= 114)
 		{
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		IRQ_count -= 114;
 	}
@@ -1726,23 +1726,23 @@ static void jaleco_irq ( int num, int scanline, int vblank, int blanked )
 			{
 				if ((IRQ_count & 0x0f) == 0x00)
 					/* rollover every 0x10 */
-					cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+					cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_mode & 0x04)
 			{
 				if ((IRQ_count & 0x0ff) == 0x00)
 					/* rollover every 0x100 */
-					cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+					cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_mode & 0x02)
 			{
 				if ((IRQ_count & 0x0fff) == 0x000)
 					/* rollover every 0x1000 */
-					cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+					cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_count == 0)
 				/* rollover at 0x10000 */
-				cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+				cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 	else
@@ -1960,7 +1960,7 @@ static void namcot_irq ( int num, int scanline, int vblank, int blanked )
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable && (IRQ_count == 0x7fff))
 	{
-		cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -2017,14 +2017,14 @@ static WRITE8_HANDLER( mapper19_w )
 static void fds_irq ( int num, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable_latch)
-		cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
 		if (IRQ_count <= 114)
 		{
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 			IRQ_enable = 0;
 			nes_fds.status0 |= 0x01;
 		}
@@ -2135,7 +2135,7 @@ static void konami_irq ( int num, int scanline, int vblank, int blanked )
 	{
 		IRQ_count = IRQ_count_latch;
 		IRQ_enable = IRQ_enable_latch;
-		cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -2802,7 +2802,7 @@ static void mapper40_irq ( int num, int scanline, int vblank, int blanked )
 	{
 		if (--IRQ_count == 0)
 		{
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -3246,7 +3246,7 @@ static void irem_irq ( int num, int scanline, int vblank, int blanked )
 	if (IRQ_enable)
 	{
 		if (--IRQ_count == 0)
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -3324,7 +3324,7 @@ static void sunsoft_irq ( int num, int scanline, int vblank, int blanked )
 	{
 		if (IRQ_count <= 114)
 		{
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		IRQ_count -= 114;
 	}
@@ -4324,7 +4324,7 @@ static void mapper182_irq( int num, int scanline, int vblank, int blanked )
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
 			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -4830,7 +4830,7 @@ static void mapper248_irq( int num, int scanline, int vblank, int blanked )
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
 			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
-			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }

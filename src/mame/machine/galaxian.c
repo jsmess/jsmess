@@ -32,7 +32,7 @@ static void galaxian_7474_9M_2_callback(void)
 static void galaxian_7474_9M_1_callback(void)
 {
 	/* Q goes to the NMI line */
-	cpunum_set_input_line(0, irq_line, TTL7474_output_r(1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, irq_line, TTL7474_output_r(1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static const struct TTL7474_interface galaxian_7474_9M_2_intf =
@@ -406,7 +406,7 @@ DRIVER_INIT( mooncrst )
 	for (i = 0;i < memory_region_length(REGION_CPU1);i++)
 		rom[i] = decode_mooncrst(rom[i],i);
 
-	driver_init_mooncrsu(machine);
+	DRIVER_INIT_CALL(mooncrsu);
 }
 
 DRIVER_INIT( mooncrgx )
@@ -493,7 +493,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT( gteikob2 )
 {
-	driver_init_pisces(machine);
+	DRIVER_INIT_CALL(pisces);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7006, 0x7006, 0, 0, gteikob2_flip_screen_x_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7007, 0x7007, 0, 0, gteikob2_flip_screen_y_w);
@@ -501,7 +501,7 @@ DRIVER_INIT( gteikob2 )
 
 DRIVER_INIT( azurian )
 {
-	driver_init_pisces(machine);
+	DRIVER_INIT_CALL(pisces);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6800, 0x6800, 0, 0, azurian_IN1_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0, azurian_IN2_r);
@@ -526,7 +526,7 @@ DRIVER_INIT( 4in1 )
 
 INTERRUPT_GEN( hunchbks_vh_interrupt )
 {
-	cpunum_set_input_line_and_vector(0,0,PULSE_LINE,0x03);
+	cpunum_set_input_line_and_vector(machine, 0,0,PULSE_LINE,0x03);
 }
 
 DRIVER_INIT( ladybugg )
@@ -558,6 +558,6 @@ INTERRUPT_GEN( gmgalax_vh_interrupt )
 		/* Ghost Muncher never clears this */
 		galaxian_stars_enable_w(0, 0);
 
-		cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }

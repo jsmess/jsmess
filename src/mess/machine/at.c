@@ -31,7 +31,7 @@ static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };
 static void at_set_gate_a20(int a20)
 {
 	/* set the CPU's A20 line */
-	cpunum_set_input_line(0, INPUT_LINE_A20, a20);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_A20, a20);
 }
 
 

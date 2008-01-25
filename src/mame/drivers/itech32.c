@@ -253,8 +253,8 @@ static UINT32 *tms1_ram, *tms2_ram;
 static UINT32 *tms1_boot;
 static UINT8 tms_spinning[2];
 
-#define START_TMS_SPINNING(n) do { cpu_spinuntil_trigger(7351 + n); tms_spinning[n] = 1; } while (0)
-#define STOP_TMS_SPINNING(n)  do { cpu_trigger(7351 + n); tms_spinning[n] = 0; } while (0)
+#define START_TMS_SPINNING(n)			do { cpu_spinuntil_trigger(7351 + n); tms_spinning[n] = 1; } while (0)
+#define STOP_TMS_SPINNING(machine, n)  	do { cpu_trigger(machine, 7351 + n); tms_spinning[n] = 0; } while (0)
 
 
 
@@ -291,9 +291,9 @@ void itech32_update_interrupts(int vint, int xint, int qint)
 
 	/* update it */
 	if (level)
-		cpunum_set_input_line(0, level, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, level, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -335,12 +335,12 @@ static MACHINE_RESET( itech32 )
 
 static MACHINE_RESET( drivedge )
 {
-	machine_reset_itech32(machine);
+	MACHINE_RESET_CALL(itech32);
 
-	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(3, INPUT_LINE_RESET, ASSERT_LINE);
-	STOP_TMS_SPINNING(0);
-	STOP_TMS_SPINNING(1);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
+	STOP_TMS_SPINNING(machine, 0);
+	STOP_TMS_SPINNING(machine, 1);
 }
 
 
@@ -536,7 +536,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	sound_data = param;
 	sound_int_state = 1;
-	cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -562,7 +562,7 @@ static WRITE32_HANDLER( sound_data32_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(1, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 	sound_int_state = 0;
 	return sound_data;
 }
@@ -633,9 +633,9 @@ static WRITE8_HANDLER( pia_portb_out )
 static void via_irq(int state)
 {
 	if (state)
-		cpunum_set_input_line(1, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(1, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -668,7 +668,7 @@ static const struct via6522_interface drivedge_via_interface =
 
 static WRITE8_HANDLER( firq_clear_w )
 {
-	cpunum_set_input_line(1, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -681,8 +681,8 @@ static WRITE8_HANDLER( firq_clear_w )
 
 static WRITE32_HANDLER( tms_reset_assert_w )
 {
-	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(3, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -691,13 +691,13 @@ static WRITE32_HANDLER( tms_reset_clear_w )
 	/* kludge to prevent crash on first boot */
 	if ((tms1_ram[0] & 0xff000000) == 0)
 	{
-		cpunum_set_input_line(2, INPUT_LINE_RESET, CLEAR_LINE);
-		STOP_TMS_SPINNING(0);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+		STOP_TMS_SPINNING(Machine, 0);
 	}
 	if ((tms2_ram[0] & 0xff000000) == 0)
 	{
-		cpunum_set_input_line(3, INPUT_LINE_RESET, CLEAR_LINE);
-		STOP_TMS_SPINNING(1);
+		cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
+		STOP_TMS_SPINNING(Machine, 1);
 	}
 }
 
@@ -706,7 +706,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
 	if (offset == 0) COMBINE_DATA(tms1_boot);
-	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(0);
+	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(Machine, 0);
 	if (!tms_spinning[0])
 		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
@@ -715,7 +715,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 static WRITE32_HANDLER( tms2_68k_ram_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(1);
+	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(Machine, 1);
 	if (!tms_spinning[1])
 		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
@@ -832,8 +832,8 @@ static NVRAM_HANDLER( itech020 )
 
 static NVRAM_HANDLER( tournament )
 {
-	nvram_handler_itech020( machine, file, read_or_write );
-	nvram_handler_timekeeper_0( machine, file, read_or_write );
+	NVRAM_HANDLER_CALL(itech020);
+	NVRAM_HANDLER_CALL(timekeeper_0);
 }
 
 
@@ -3860,7 +3860,7 @@ static DRIVER_INIT( aamat )
 	/*
         Tournament Version
     */
-	driver_init_aama(machine);
+	DRIVER_INIT_CALL(aama);
 	timekeeper_init( 0, TIMEKEEPER_M48T02, NULL );
 	memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r);
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_w);
@@ -3898,7 +3898,7 @@ static DRIVER_INIT( gtclassp )
 {
 	/* a little extra protection */
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x680000, 0x680003, 0, 0, gtclass_prot_result_r);
-	driver_init_aama(machine);
+	DRIVER_INIT_CALL(aama);
 
 	/* The protection code is:
 

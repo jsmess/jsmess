@@ -71,12 +71,12 @@ INTERRUPT_GEN( astrocade_interrupt )
     /* Scanline interrupt enabled ? */
     if ((screen_interrupts_enabled) && (screen_interrupt_mode == 0)
 	                                && (CurrentScan == NextScanInt))
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 WRITE8_HANDLER( astrocade_interrupt_vector_w )
 {
 	cpunum_set_input_line_vector(0, 0, data);
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 

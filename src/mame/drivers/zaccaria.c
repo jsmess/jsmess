@@ -99,8 +99,8 @@ static WRITE8_HANDLER( ay8910_port0a_w )
 }
 
 
-static void zaccaria_irq0a(int state) { cpunum_set_input_line(1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static void zaccaria_irq0b(int state) { cpunum_set_input_line(1,0,state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0a(int state) { cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0b(int state) { cpunum_set_input_line(Machine, 1,0,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910,port0a,acs;
 
@@ -257,7 +257,7 @@ static MACHINE_RESET( zaccaria )
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(2,0,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2,0,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound1_command_w )
@@ -663,13 +663,11 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(M6802,XTAL_3_579545MHz/4) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD(M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem1,sound_writemem1)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)3580000/4096)
 
-	MDRV_CPU_ADD(M6802,XTAL_3_579545MHz/4) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD(M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem2,sound_writemem2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

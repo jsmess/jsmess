@@ -67,7 +67,7 @@ static WRITE16_HANDLER( dec0_control_w )
 			if (ACCESSING_LSB)
 			{
 				soundlatch_w(0,data & 0xff);
-				cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+				cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 			}
 			break;
 
@@ -103,7 +103,7 @@ static WRITE16_HANDLER( slyspy_control_w )
 			if (ACCESSING_LSB)
 			{
 				soundlatch_w(0,data & 0xff);
-				cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+				cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 			}
 			break;
 		case 2:
@@ -117,7 +117,7 @@ static WRITE16_HANDLER( midres_sound_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -904,12 +904,12 @@ GFXDECODE_END
 
 static void sound_irq(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate); /* IRQ */
+	cpunum_set_input_line(Machine, 1,0,linestate); /* IRQ */
 }
 
 static void sound_irq2(int linestate)
 {
-	cpunum_set_input_line(1,1,linestate); /* IRQ2 */
+	cpunum_set_input_line(Machine, 1,1,linestate); /* IRQ2 */
 }
 
 static const struct YM3812interface ym3812_interface =
@@ -1198,7 +1198,7 @@ static MACHINE_DRIVER_START( slyspy )
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
 	MDRV_CPU_ADD(H6280, XTAL_12MHz/2/3)
-	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(slyspy_s_readmem,slyspy_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
@@ -1241,7 +1241,7 @@ static MACHINE_DRIVER_START( midres )
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
 	MDRV_CPU_ADD(H6280, XTAL_24MHz/4/3)
-	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(midres_s_readmem,midres_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)

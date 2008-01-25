@@ -329,7 +329,7 @@ static const struct dma8257_interface hb_dma =
 
 static INTERRUPT_GEN( hunchbkd_interrupt )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x03);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -359,7 +359,7 @@ static MACHINE_START( hunchbkd )
 
 	dkong_state *state = machine->driver_data;
 
-	machine_start_dkong2b(machine);
+	MACHINE_START_CALL(dkong2b);
 	dma8257_config(0, &hb_dma);
 
 	for (i=0;i<0x200;i++)
@@ -377,7 +377,7 @@ static MACHINE_START( radarscp )
 {
 	dkong_state *state = machine->driver_data;
 
-	machine_start_dkong2b(machine);
+	MACHINE_START_CALL(dkong2b);
 	state->hardware_type = HARDWARE_TRS02;
 }
 
@@ -385,13 +385,13 @@ static MACHINE_START( radarsc1 )
 {
 	dkong_state *state = machine->driver_data;
 
-	machine_start_dkong2b(machine);
+	MACHINE_START_CALL(dkong2b);
 	state->hardware_type = HARDWARE_TRS01;
 }
 
 static MACHINE_START( dkong3 )
 {
-	machine_start_dkong2b(machine);
+	MACHINE_START_CALL(dkong2b);
 	z80dma_init(1);
 	z80dma_config(0, &dk3_dma);
 }
@@ -415,7 +415,7 @@ static MACHINE_RESET( strtheat )
 	dkong_state *state = machine->driver_data;
 	UINT8 *ROM = memory_region(REGION_CPU1);
 
-	machine_reset_dkong(machine);
+	MACHINE_RESET_CALL(dkong);
 
 	/* The initial state of the counter is 0x08 */
 	memory_configure_bank(1, 0, 4, &ROM[0x10000], 0x4000);
@@ -428,7 +428,7 @@ static MACHINE_RESET( drakton )
 	dkong_state *state = machine->driver_data;
 	UINT8 *ROM = memory_region(REGION_CPU1);
 
-	machine_reset_dkong(machine);
+	MACHINE_RESET_CALL(dkong);
 
 	/* The initial state of the counter is 0x09 */
 	memory_configure_bank(1, 0, 4, &ROM[0x10000], 0x4000);
@@ -697,13 +697,13 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
-		cpunum_set_input_line(2, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 

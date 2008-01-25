@@ -71,7 +71,7 @@ static PALETTE_INIT( panicr )
 	int i;
 
 
-	palette_init_RRRR_GGGG_BBBB(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(RRRR_GGGG_BBBB);
 	color_prom += 256*3;
 
 	// txt lookup table
@@ -209,9 +209,9 @@ static VIDEO_UPDATE( panicr)
 static INTERRUPT_GEN( panicr_interrupt )
 {
 	if (cpu_getiloops())
-		cpunum_set_input_line_and_vector(cpunum, 0, HOLD_LINE, 0xc8/4);
+		cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc8/4);
 	else
-		cpunum_set_input_line_and_vector(cpunum, 0, HOLD_LINE, 0xc4/4);
+		cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc4/4);
 }
 
 static INPUT_PORTS_START( panicr )

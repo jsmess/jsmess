@@ -121,7 +121,7 @@ VIDEO_UPDATE( trs80 )
 	translate = translate_videoram[(input_port_0_r(0) & 0x40) ? 1 : 0];
 
 	if (readinputport(0) & 0x08)
-        cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
     /* check for changed color settings */
 	if (color != (readinputport(0) & 3))

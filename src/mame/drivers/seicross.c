@@ -84,7 +84,7 @@ static NVRAM_HANDLER( seicross )
 static MACHINE_RESET( friskyt )
 {
 	/* start with the protection mcu halted */
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -106,8 +106,8 @@ static WRITE8_HANDLER( friskyt_portB_w )
 	if (((portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
-		cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */
@@ -405,7 +405,7 @@ static MACHINE_DRIVER_START( nvram )
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD_TAG("mcu", NSC8105, 6000000/4)	/* ??? */
+	MDRV_CPU_ADD_TAG("mcu", NSC8105, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

@@ -173,7 +173,7 @@ VIDEO_START( rtype2 )
 
 VIDEO_START( poundfor )
 {
-	video_start_rtype2(machine);
+	VIDEO_START_CALL(rtype2);
 
 	tilemap_set_scrolldx(fg_tilemap,6,0);
 	tilemap_set_scrolldx(bg_tilemap,6,0);
@@ -352,9 +352,9 @@ WRITE16_HANDLER( m72_port02_w )
 
 		/* bit 4 resets sound CPU (active low) */
 		if (data & 0x10)
-			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bit 5 = "bank"? */
 	}

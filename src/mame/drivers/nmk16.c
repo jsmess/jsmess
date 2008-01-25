@@ -266,7 +266,7 @@ static MACHINE_RESET( NMK004 )
 
 static MACHINE_RESET( mustang_sound )
 {
-	machine_reset_seibu_sound_1(machine);
+	MACHINE_RESET_CALL(seibu_sound_1);
 }
 
 static WRITE16_HANDLER ( ssmissin_sound_w )
@@ -274,7 +274,7 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1,0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
 	}
 }
 
@@ -370,7 +370,7 @@ static WRITE16_HANDLER( afega_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(1, 0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -3672,7 +3672,7 @@ static const struct YM2203interface ym2203_nmk004_interface =
 
 static void ym2203_irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =
@@ -3682,8 +3682,8 @@ static const struct YM2203interface ym2203_interface =
 
 static INTERRUPT_GEN( nmk_interrupt )
 {
-	if (cpu_getiloops() == 0) cpunum_set_input_line(0, 4, HOLD_LINE);
-	else cpunum_set_input_line(0, 2, HOLD_LINE);
+	if (cpu_getiloops() == 0) cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	else cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 
 
@@ -3955,7 +3955,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vandyke )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_ADD(M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vandyke_readmem,vandyke_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -3979,19 +3979,19 @@ static MACHINE_DRIVER_START( vandyke )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/3) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low)
+	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/3) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
@@ -4735,7 +4735,7 @@ static DRIVER_INIT( ssmissin )
 
 static DRIVER_INIT( bjtwin )
 {
-	driver_init_nmk(machine);
+	DRIVER_INIT_CALL(nmk);
 
 	/* Patch rom to enable test mode */
 
@@ -4987,7 +4987,7 @@ GFXDECODE_END
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface afega_ym2151_intf =

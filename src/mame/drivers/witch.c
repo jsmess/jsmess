@@ -365,7 +365,7 @@ static WRITE8_HANDLER(write_a00x)
 	break;
 
 	case 0x08: //A008
-    		cpunum_set_input_line(cpu_getactivecpu(),0,CLEAR_LINE);
+    		cpunum_set_input_line(Machine, cpu_getactivecpu(),0,CLEAR_LINE);
     	break;
   }
 }
@@ -442,8 +442,8 @@ static ADDRESS_MAP_START( map_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_BASE(&gfx1_vram)
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_BASE(&gfx1_cram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(&sprite_ram)
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(paletteram_r, paletteram_xBBBBBGGGGGRRRRR_split1_w)   AM_BASE(&paletteram)
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(paletteram_2_r, paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(MRA8_RAM, paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe800, 0xefff) AM_READWRITE(MRA8_RAM, paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE(2)
@@ -757,12 +757,12 @@ static VIDEO_UPDATE(witch)
 
 static INTERRUPT_GEN( witch_main_interrupt )
 {
-	cpunum_set_input_line(0,0,ASSERT_LINE);
+	cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( witch_sub_interrupt )
 {
-	cpunum_set_input_line(1,0,ASSERT_LINE);
+	cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( witch )

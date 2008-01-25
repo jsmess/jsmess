@@ -250,10 +250,10 @@ void electron_interrupt_handler(int mode, int interrupt) {
 	}
 	if ( ula.interrupt_status & ula.interrupt_control & ~0x83 ) {
 		ula.interrupt_status |= 0x01;
-		cpunum_set_input_line( 0, 0, ASSERT_LINE );
+		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE );
 	} else {
 		ula.interrupt_status &= ~0x01;
-		cpunum_set_input_line( 0, 0, CLEAR_LINE );
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE );
 	}
 }
 

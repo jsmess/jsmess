@@ -189,13 +189,13 @@ static const pia6821_interface zwackery_pia_4_intf =
 
 static void ctc_interrupt(int state)
 {
-	cpunum_set_input_line(0, 0, state);
+	cpunum_set_input_line(Machine, 0, 0, state);
 }
 
 
 static void ipu_ctc_interrupt(int state)
 {
-	cpunum_set_input_line(3, 0, state);
+	cpunum_set_input_line(Machine, 3, 0, state);
 }
 
 
@@ -393,7 +393,7 @@ MACHINE_START( zwackery )
 	pia_config(3, &zwackery_pia_3_intf);
 	pia_config(4, &zwackery_pia_4_intf);
 
-	machine_start_mcr68(machine);
+	MACHINE_START_CALL(mcr68);
 }
 
 
@@ -482,9 +482,9 @@ static void update_mcr68_interrupts(void)
 
 	/* set the new state of the IRQ lines */
 	if (newstate)
-		cpunum_set_input_line(0, newstate, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, newstate, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -604,9 +604,9 @@ WRITE8_HANDLER( zwackery_ca2_w )
 }
 
 
-void zwackery_pia_irq(int state)
+static void zwackery_pia_irq(int state)
 {
-	v493_irq_state = state;
+	v493_irq_state = pia_get_irq_a(2) | pia_get_irq_b(2);
 	update_mcr68_interrupts();
 }
 
@@ -1003,7 +1003,7 @@ WRITE8_HANDLER( mcr_ipu_laserdisk_w )
 static TIMER_CALLBACK( ipu_watchdog_reset )
 {
 	logerror("ipu_watchdog_reset\n");
-	cpunum_set_input_line(3, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, PULSE_LINE);
 	z80ctc_reset(1);
 	z80pio_reset(0);
 	z80pio_reset(1);

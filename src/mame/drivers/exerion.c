@@ -36,7 +36,7 @@ static INTERRUPT_GEN( exerion_interrupt )
 {
 	/* Exerion triggers NMIs on coin insertion */
 	if (readinputport(4) & 1)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -473,7 +473,7 @@ static DRIVER_INIT( exerionb )
 		ram[addr] = (ram[addr] & 0xf9) | ((ram[addr] & 2) << 1) | ((ram[addr] & 4) >> 1);
 
 	/* also convert the gfx as in Exerion */
-	driver_init_exerion(machine);
+	DRIVER_INIT_CALL(exerion);
 }
 
 

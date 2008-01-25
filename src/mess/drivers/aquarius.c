@@ -207,7 +207,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( aquarius_interrupt )
 {
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 /* Machine definition */

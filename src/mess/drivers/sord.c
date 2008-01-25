@@ -161,11 +161,11 @@ static void sord_fd5_fdc_interrupt(int state)
 {
 	if (state)
 	{
-		cpunum_set_input_line(1,0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(1,0,CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0,CLEAR_LINE);
 
 	}
 }
@@ -263,8 +263,8 @@ static WRITE8_HANDLER(sord_ppi_portb_w)
 
 	if (data==0x0f0)
 	{
-		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	LOG(("m5 write to pi5 port b: %02x %04x\n",data,activecpu_get_pc()));
 }
@@ -302,7 +302,7 @@ static const ppi8255_interface sord_ppi8255_interface =
 static void sord_m5_ctc_interrupt(int state)
 {
 	//logerror("interrupting ctc %02x\r\n ",state);
-	cpunum_set_input_line(0, 0, state);
+	cpunum_set_input_line(Machine, 0, 0, state);
 }
 
 static z80ctc_interface	sord_m5_ctc_intf =
@@ -617,7 +617,7 @@ static const struct z80_irq_daisy_chain sord_m5_daisy_chain[] =
 static INTERRUPT_GEN( sord_interrupt )
 {
 	if (TMS9928A_interrupt())
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( sord_m5 )

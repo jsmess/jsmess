@@ -155,9 +155,9 @@ static void enterprise_dave_reg_read(int RegIndex)
 static void enterprise_dave_interrupt(int state)
 {
 	if (state)
-		cpunum_set_input_line(0,0,HOLD_LINE);
+		cpunum_set_input_line(Machine, 0,0,HOLD_LINE);
 	else
-		cpunum_set_input_line(0,0,CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
 }
 
 /* enterprise interface to dave - ok, so Dave chip is unique
@@ -166,8 +166,8 @@ whats going on. */
 static const DAVE_INTERFACE enterprise_dave_interface =
 {
 	enterprise_dave_reg_read,
-		enterprise_dave_reg_write,
-		enterprise_dave_interrupt,
+	enterprise_dave_reg_write,
+	enterprise_dave_interrupt,
 };
 
 

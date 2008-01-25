@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM		/* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x050000, 0x050dff) AM_READWRITE(paletteram16_word_r, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x050000, 0x050dff) AM_READWRITE(MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(twincobr_crtc_reg_sel_w)	/* 6845 CRT controller */
 	AM_RANGE(0x060002, 0x060003) AM_WRITE(twincobr_crtc_data_w)		/* 6845 CRT controller */
 	AM_RANGE(0x070000, 0x070003) AM_WRITE(twincobr_txscroll_w)	/* text layer scroll */
@@ -635,7 +635,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate);
+	cpunum_set_input_line(Machine, 1,0,linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

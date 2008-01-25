@@ -122,7 +122,7 @@ static void pc8801_update_interrupt(void)
 	}
 	if (level >= 0 && level<interrupt_level_reg)
 	{
-		cpunum_set_input_line (0, 0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 	}
 }
 
@@ -793,7 +793,7 @@ static const ppi8255_interface pc8801_8255_config =
 /* callback for /INT output from FDC */
 static void pc8801_fdc_interrupt(int state)
 {
-    cpunum_set_input_line (1, 0, state ? HOLD_LINE : CLEAR_LINE);
+    cpunum_set_input_line(Machine, 1, 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 /* callback for /DRQ output from FDC */

@@ -25,10 +25,10 @@ extern VIDEO_UPDATE( shaolins );
 
 static INTERRUPT_GEN( shaolins_interrupt )
 {
-	if (cpu_getiloops() == 0) cpunum_set_input_line(0, 0, HOLD_LINE);
+	if (cpu_getiloops() == 0) cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else if (cpu_getiloops() % 2)
 	{
-		if (shaolins_nmi_enable & 0x02) cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		if (shaolins_nmi_enable & 0x02) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -217,7 +217,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( shaolins )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1250000)        /* 1.25 MHz */
+	MDRV_CPU_ADD(M6809, XTAL_18_432MHz/12)        /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(shaolins_interrupt,16)	/* 1 IRQ + 8 NMI */
 
@@ -240,10 +240,10 @@ static MACHINE_DRIVER_START( shaolins )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76496, 1536000)
+	MDRV_SOUND_ADD(SN76496, XTAL_18_432MHz/12)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(SN76496, 3072000)
+	MDRV_SOUND_ADD(SN76496, XTAL_18_432MHz/6)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

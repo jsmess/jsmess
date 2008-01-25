@@ -37,7 +37,7 @@ static int serial_atn = 1, serial_clock = 1, serial_data = 1;
 INTERRUPT_GEN( primo_vblank_interrupt )
 {
 	if (primo_nmi)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*******************************************************************************
@@ -243,7 +243,7 @@ static void primo_common_machine_init (void)
 	if (readinputport(6))
 		primo_port_FD = 0x00;
 	primo_update_memory();
-	cpunum_set_clockscale(0, readinputport(5) ? 1.5 : 1.0);
+	cpunum_set_clockscale(Machine, 0, readinputport(5) ? 1.5 : 1.0);
 }
 
 MACHINE_RESET( primoa )

@@ -74,7 +74,7 @@ static READ8_HANDLER( spcforce_t0_r )
 
 static WRITE8_HANDLER( spcforce_soundtrigger_w )
 {
-	cpunum_set_input_line(1, 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -251,7 +251,8 @@ static PALETTE_INIT( spcforce )
 static MACHINE_DRIVER_START( spcforce )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(8085A, 4000000)        /* 4.00 MHz??? */
+	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
+	MDRV_CPU_ADD(8085A, 8000000 * 2)        /* 4.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
 
@@ -273,7 +274,6 @@ static MACHINE_DRIVER_START( spcforce )
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 	MDRV_PALETTE_INIT(spcforce)
-	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(spcforce)
 
 	/* sound hardware */

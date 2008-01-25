@@ -62,7 +62,7 @@ static WRITE16_HANDLER( m68k_shared_word_w )
 static INTERRUPT_GEN( m6809_vb_interrupt )
 {
 	if (m6809_irq_enable)
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else
 		m6809_irq_enable = 1;
 }
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( m6809_irq_disable_w )
 static INTERRUPT_GEN( m68k_vb_interrupt )
 {
 	if (m68k_irq_enable)
-		cpunum_set_input_line(3, MC68000_IRQ_1, HOLD_LINE);
+		cpunum_set_input_line(machine, 3, MC68000_IRQ_1, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( m68k_irq_enable_w )
@@ -93,7 +93,7 @@ static WRITE16_HANDLER( m68k_irq_enable_w )
 static INTERRUPT_GEN( mcu_vb_interrupt )
 {
 	if (mcu_irq_enable)
-		cpunum_set_input_line(4, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 4, 0, HOLD_LINE);
 	else
 		mcu_irq_enable = 1;
 }
@@ -447,7 +447,7 @@ static MACHINE_DRIVER_START( tceptor )
 	MDRV_CPU_PROGRAM_MAP(m68k_map,0)
 	MDRV_CPU_VBLANK_INT(m68k_vb_interrupt,1)
 
-	MDRV_CPU_ADD(HD63701, 49152000/32)	/* or compatible 6808 with extra instructions */
+	MDRV_CPU_ADD(HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 	MDRV_CPU_VBLANK_INT(mcu_vb_interrupt,1)

@@ -668,7 +668,7 @@ INLINE double CD4049(running_machine *machine, double x)
 #define RC32	((18e3 + 68e3) * 33e-6)
 #define RC4		(90e3 * 0.47e-6)
 #define dt		(1./60./(double) VTOTAL)
-#define period2 (((long long)(PIXEL_CLOCK) * ( 33L * 68L )) / (long)10000000L / 3)  // period/2 in pixel ...
+#define period2 (((INT64)(PIXEL_CLOCK) * ( 33L * 68L )) / (INT32)10000000L / 3)  // period/2 in pixel ...
 
 static void radarscp_step(running_machine *machine, int line_cnt)
 {
@@ -886,7 +886,7 @@ VIDEO_START( dkong )
 {
 	dkong_state *state = machine->driver_data;
 
-	video_start_dkong_base(machine);
+	VIDEO_START_CALL(dkong_base);
 
 	switch (state->hardware_type)
 	{

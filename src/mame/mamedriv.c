@@ -1303,6 +1303,7 @@ const game_driver * const drivers[] =
 	DRIVER( snakjack )	/* (c) 1984 */
 	DRIVER( stocker )	/* (c) 1984 */
 	DRIVER( triviag1 )	/* (c) 1984 */
+	DRIVER( trivia12 )	/* (c) 1984 */
 	DRIVER( triviag2 )	/* (c) 1984 */
 	DRIVER( triviasp )	/* (c) 1984 */
 	DRIVER( triviayp )	/* (c) 1984 */
@@ -1314,6 +1315,7 @@ const game_driver * const drivers[] =
 	DRIVER( toggle )	/* (c) 1985 */
 	DRIVER( nametune )	/* (c) 1986 */
 	DRIVER( nstocker )	/* (c) 1986 */
+	DRIVER( nstockr2 )	/* (c) 1986 */
 	DRIVER( sfootbal )	/* (c) 1986 */
 	DRIVER( spiker )	/* (c) 1986 */
 	DRIVER( stompin )	/* (c) 1986 */
@@ -4078,8 +4080,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( acombat )	/* bootleg */
 	DRIVER( acombato )	/* bootleg */
 	DRIVER( sstarbtl )	/* bootleg */
-	DRIVER( spfghmk2 )	/* (c) [1980] Data East Corporation */
-	DRIVER( spfgmk22 )	/* (c) [1980] Data East Corporation */
+	DRIVER( spfghmk2 )	/* (c) [1979] Data East Corporation */
+	DRIVER( spfgmk22 )	/* (c) [1979] Data East Corporation */
 	DRIVER( tomahawk )	/* (c) 1980 Data East, Inc. */
 	DRIVER( tomahaw1 )	/* (c) 1980 Data East, Inc. */
 	DRIVER( progolf )	/* (c) 1981 */
@@ -5871,7 +5873,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ninjak2b )	/* UPL-????? (c) 1987 */
 	DRIVER( rdaction )	/* UPL-87003?(c) 1987 + World Games license */
 	DRIVER( mnight )	/* UPL-????? (c) 1987 distributed by Kawakus */
-	DRIVER( arkarea )	/* UPL-87007 (c) [1988?] */
+	DRIVER( arkarea )	/* UPL-87007 (c) [1987] */
 	DRIVER( robokid )	/* UPL-88013 (c) 1988 */
 	DRIVER( robokidj )	/* UPL-88013 (c) 1988 */
 	DRIVER( robokdj2 )	/* UPL-88013 (c) 1988 */
@@ -6264,7 +6266,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( heatbrl )	/* (c) 1992 Tad (World) */
 	DRIVER( heatbrlo )	/* (c) 1992 Tad (World) */
 	DRIVER( heatbrlu )	/* (c) 1992 Tad (US) */
-	DRIVER( hetbrlu2 )	/* (c) 1992 Tad (US) */
 	DRIVER( godzilla )	/* (c) 1993 Banpresto */
 	DRIVER( denjinmk )	/* (c) 199? Banpresto */
 	DRIVER( sdgndmrb )	/* (c) 1993 Banpresto */
@@ -7896,8 +7897,11 @@ Other Sun games
 	DRIVER( eshb )		/* (c) 1984 Funai / Gakken */
 	DRIVER( comebaby )	/* (c) 2000 ExPotato */
 	DRIVER( peset038 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0065 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0158 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0188 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0250 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0447 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0516 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
 	DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */

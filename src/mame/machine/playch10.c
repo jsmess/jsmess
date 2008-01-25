@@ -101,12 +101,12 @@ WRITE8_HANDLER( pc10_DOGDI_w )
 
 WRITE8_HANDLER( pc10_GAMERES_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_GAMESTOP_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_PPURES_w )
@@ -292,7 +292,7 @@ DRIVER_INIT( playch10 )
 DRIVER_INIT( pc_gun )
 {
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 
 	/* set the control type */
 	pc10_gun_controller = 1;
@@ -304,7 +304,7 @@ DRIVER_INIT( pc_gun )
 DRIVER_INIT( pc_hrz )
 {
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 
 	/* setup mirroring */
 	mirroring = PPU_MIRROR_HORZ;
@@ -438,7 +438,7 @@ DRIVER_INIT( pcaboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, aboard_vrom_switch_w );
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 
 	/* set the mirroring here */
 	mirroring = PPU_MIRROR_VERT;
@@ -465,7 +465,7 @@ DRIVER_INIT( pcbboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, bboard_rom_switch_w );
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 
 	/* set the mirroring here */
 	mirroring = PPU_MIRROR_VERT;
@@ -486,7 +486,7 @@ DRIVER_INIT( pccboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, cboard_vrom_switch_w );
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 }
 
 /**********************************************************************************/
@@ -505,7 +505,7 @@ DRIVER_INIT( pcdboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 }
 
 /* D Board games with extra ram (Metroid) */
@@ -513,11 +513,11 @@ DRIVER_INIT( pcdboard )
 DRIVER_INIT( pcdboard_2 )
 {
 	/* extra ram at $6000-$7fff */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_RAM );
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_RAM );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	/* common init */
-	driver_init_pcdboard(machine);
+	DRIVER_INIT_CALL(pcdboard);
 }
 
 /**********************************************************************************/
@@ -605,11 +605,11 @@ DRIVER_INIT( pceboard )
 	ppu_latch = mapper9_latch;
 
 	/* nvram at $6000-$6fff */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_RAM );
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MWA8_RAM );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_set_bankptr(1, auto_malloc(0x1000));
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 }
 
 /**********************************************************************************/
@@ -628,7 +628,7 @@ DRIVER_INIT( pcfboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 }
 
 /* F Board games with extra ram (Baseball Stars) */
@@ -636,11 +636,11 @@ DRIVER_INIT( pcfboard )
 DRIVER_INIT( pcfboard_2 )
 {
 	/* extra ram at $6000-$6fff */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_RAM );
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MWA8_RAM );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_set_bankptr(1, auto_malloc(0x1000));
 
 	/* common init */
-	driver_init_pcfboard(machine);
+	DRIVER_INIT_CALL(pcfboard);
 }
 
 /**********************************************************************************/
@@ -659,7 +659,7 @@ static void gboard_scanline_cb( int num, int scanline, int vblank, int blanked )
 		if ( --gboard_scanline_counter == -1 )
 		{
 			gboard_scanline_counter = gboard_scanline_latch;
-			cpunum_set_input_line( 1, 0, PULSE_LINE );
+			cpunum_set_input_line(Machine, 1, 0, PULSE_LINE );
 		}
 	}
 }
@@ -805,8 +805,8 @@ DRIVER_INIT( pcgboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, gboard_rom_switch_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_RAM );
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_RAM );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	gboard_banks[0] = 0x1e;
 	gboard_banks[1] = 0x1f;
@@ -815,13 +815,13 @@ DRIVER_INIT( pcgboard )
 	gboard_4screen = 0;
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 }
 
 DRIVER_INIT( pcgboard_type2 )
 {
 	/* common init */
-	driver_init_pcgboard(machine);
+	DRIVER_INIT_CALL(pcgboard);
 
 	/* enable 4 screen mirror */
 	gboard_4screen = 1;
@@ -853,7 +853,7 @@ DRIVER_INIT( pciboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, iboard_rom_switch_w );
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 }
 
 /**********************************************************************************/
@@ -869,8 +869,8 @@ DRIVER_INIT( pchboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, gboard_rom_switch_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_RAM );
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_RAM );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	gboard_banks[0] = 0x1e;
 	gboard_banks[1] = 0x1f;
@@ -878,7 +878,7 @@ DRIVER_INIT( pchboard )
 	gboard_scanline_latch = 0;
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 }
 
 /**********************************************************************************/
@@ -894,12 +894,12 @@ DRIVER_INIT( pckboard )
 	mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_RAM );
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_RAM );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	/* Roms are banked at $8000 to $bfff */
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
-	driver_init_playch10(machine);
+	DRIVER_INIT_CALL(playch10);
 }

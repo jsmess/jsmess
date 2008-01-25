@@ -106,7 +106,7 @@ static UINT8 *mdv_image;
 static void zx8302_interrupt(UINT8 line)
 {
 	zx8302.irq |= line;
-	cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, MC68000_IRQ_2, HOLD_LINE);
 }
 
 static void zx8302_txd(int level)
@@ -366,7 +366,7 @@ static WRITE8_HANDLER( zx8302_irq_acknowledge_w )
 
 	if (!zx8302.irq)
 	{
-		cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, MC68000_IRQ_2, CLEAR_LINE);
 	}
 }
 
@@ -483,24 +483,24 @@ static WRITE8_HANDLER( ipc_port2_w )
 		switch (ipl)
 		{
 		case 0:
-			cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
-			cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
-			cpunum_set_input_line(0, MC68000_IRQ_7, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_2, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_5, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_7, HOLD_LINE);
 			break;
 		case 1: // CTRL-ALT-7
-			cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
-			cpunum_set_input_line(0, MC68000_IRQ_5, HOLD_LINE);
-			cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_2, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_5, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_7, CLEAR_LINE);
 			break;
 		case 2:
-			cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
-			cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
-			cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_2, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_5, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_7, CLEAR_LINE);
 			break;
 		case 3:
-			cpunum_set_input_line(0, MC68000_IRQ_2, CLEAR_LINE);
-			cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
-			cpunum_set_input_line(0, MC68000_IRQ_7, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_2, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_5, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_7, CLEAR_LINE);
 			break;
 		}
 
@@ -534,7 +534,7 @@ static READ8_HANDLER( ipc_port2_r )
 
 	int irq = (ipc.ser2_rxd | ipc.ser1_txd);
 
-	cpunum_set_input_line(1, INPUT_LINE_IRQ0, irq);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, irq);
 
 	return (zx8302.comdata << 7) | irq;
 }

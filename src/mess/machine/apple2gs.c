@@ -315,7 +315,7 @@ static void apple2gs_add_irq(UINT8 irq_mask)
 			logerror("apple2gs_add_irq(): adding %s\n", apple2gs_irq_name(irq_mask));
 
 		apple2gs_pending_irqs |= irq_mask;
-		cpunum_set_input_line(0, G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -329,7 +329,7 @@ static void apple2gs_remove_irq(UINT8 irq_mask)
 			logerror("apple2gs_remove_irq(): removing %s\n", apple2gs_irq_name(irq_mask));
 
 		apple2gs_pending_irqs &= ~irq_mask;
-		cpunum_set_input_line(0, G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1172,7 +1172,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 
 		case 0x36:	/* C036 - CYAREG */
 			apple2gs_cyareg = data & ~0x20;
-			cpunum_set_clock(0, (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
+			cpunum_set_clock(Machine, 0, (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
 			break;
 
 		case 0x38:	/* C038 - SCCBREG */

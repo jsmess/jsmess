@@ -34,7 +34,7 @@ static TIMER_CALLBACK(cdp1864_int_tick)
 	{
 		if (cdp1864.disp)
 		{
-			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, HOLD_LINE);
 			cdp1864.dmaptr = 0;
 		}
 
@@ -44,7 +44,7 @@ static TIMER_CALLBACK(cdp1864_int_tick)
 	{
 		if (cdp1864.disp)
 		{
-			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 		}
 
 		timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_START, 0), 0, attotime_zero);
@@ -89,7 +89,7 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 		{
 			if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
 			{
-				cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 			}
 		}
 
@@ -103,7 +103,7 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 		{
 			if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
 			{
-				cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
 			}
 		}
 
@@ -170,8 +170,8 @@ READ8_HANDLER( cdp1864_dispon_r )
 READ8_HANDLER( cdp1864_dispoff_r )
 {
 	cdp1864.disp = 0;
-	cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
-	cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 
 	return 0xff;
 }
@@ -187,8 +187,8 @@ MACHINE_RESET( cdp1864 )
 	cdp1864.dmaptr = 0;
 	cdp1864.bgcolor = 0;
 
-	cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
-	cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 	cdp1864_efx = CLEAR_LINE;
 
 	cdp1864_audio_output_enable(0);

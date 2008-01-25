@@ -70,7 +70,7 @@ static void thom_set_irq ( int line, int state )
 	if ( old && !thom_irq )
 		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", attotime_to_double(timer_get_time()), line ));
 
-	cpunum_set_input_line( 0, M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -89,7 +89,7 @@ static void thom_set_firq ( int line, int state )
 	if ( old && !thom_firq )
 		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", attotime_to_double(timer_get_time()), line ));
 
-	cpunum_set_input_line( 0, M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -98,8 +98,8 @@ static void thom_irq_reset ( void )
 {
 	thom_irq = 0;
 	thom_firq = 0;
-	cpunum_set_input_line( 0, M6809_IRQ_LINE, CLEAR_LINE );
-	cpunum_set_input_line( 0, M6809_FIRQ_LINE, CLEAR_LINE );
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, CLEAR_LINE );
+	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
 

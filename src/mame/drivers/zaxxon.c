@@ -354,14 +354,14 @@ static void service_switch(void *param, UINT32 oldval, UINT32 newval)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static INTERRUPT_GEN( vblank_int )
 {
 	if (int_enabled)
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 
@@ -369,7 +369,7 @@ static WRITE8_HANDLER( int_enable_w )
 {
 	int_enabled = data & 1;
 	if (!int_enabled)
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -1427,28 +1427,28 @@ static DRIVER_INIT( zaxxon )
 static DRIVER_INIT( zaxxonb )
 {
 	zaxxonb_decode();
-	driver_init_zaxxon(machine);
+	DRIVER_INIT_CALL(zaxxon);
 }
 
 
 static DRIVER_INIT( szaxxon )
 {
 	szaxxon_decode();
-	driver_init_zaxxon(machine);
+	DRIVER_INIT_CALL(zaxxon);
 }
 
 
 static DRIVER_INIT( futspy )
 {
 	futspy_decode();
-	driver_init_zaxxon(machine);
+	DRIVER_INIT_CALL(zaxxon);
 }
 
 
 static DRIVER_INIT( razmataz )
 {
 	nprinces_decode();
-	driver_init_zaxxon(machine);
+	DRIVER_INIT_CALL(zaxxon);
 
 	/* additional input ports are wired */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
@@ -1471,7 +1471,7 @@ static DRIVER_INIT( razmataz )
 static DRIVER_INIT( ixion )
 {
 	szaxxon_decode();
-	driver_init_zaxxon(machine);
+	DRIVER_INIT_CALL(zaxxon);
 
 	/* connect the universal sound board */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r);

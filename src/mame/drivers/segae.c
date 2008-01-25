@@ -581,13 +581,9 @@ static int sms_vdp_null_irq_callback(int status)
 static int sms_vdp_cpu0_irq_callback(int status)
 {
 	if (status==1)
-	{
-		cpunum_set_input_line(0,0,HOLD_LINE);
-	}
+		cpunum_set_input_line(Machine, 0,0,HOLD_LINE);
 	else
-	{
-		cpunum_set_input_line(0,0,CLEAR_LINE);
-	}
+		cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
 
 	return 0;
 }
@@ -595,13 +591,9 @@ static int sms_vdp_cpu0_irq_callback(int status)
 static int sms_vdp_cpu1_irq_callback(int status)
 {
 	if (status==1)
-	{
-		cpunum_set_input_line(1,0,HOLD_LINE);
-	}
+		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 	else
-	{
-		cpunum_set_input_line(1,0,CLEAR_LINE);
-	}
+		cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
 
 	return 0;
 }
@@ -610,13 +602,9 @@ static int sms_vdp_cpu1_irq_callback(int status)
 static int sms_vdp_cpu2_irq_callback(int status)
 {
 	if (status==1)
-	{
-		cpunum_set_input_line(2,0,HOLD_LINE);
-	}
+		cpunum_set_input_line(Machine, 2,0,HOLD_LINE);
 	else
-	{
-		cpunum_set_input_line(2,0,CLEAR_LINE);
-	}
+		cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
 
 	return 0;
 }
@@ -1476,7 +1464,7 @@ static void end_of_frame(struct sms_vdp *chip)
 VIDEO_EOF(sms)
 {
 	end_of_frame(vdp1);
-	//if (SMS_PAUSE_BUTTON) cpunum_set_input_line(0,INPUT_LINE_NMI,PULSE_LINE); // not on systeme!!!
+	//if (SMS_PAUSE_BUTTON) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE); // not on systeme!!!
 }
 #endif
 
@@ -2216,7 +2204,7 @@ static void init_systeme_map(void)
 	/* fixed rom bank area */
 //  sms_rom = auto_malloc(0xc000);
 //  memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK1);
-//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, MWA8_ROM);
+//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, MWA8_UNMAP);
 //  memory_set_bankptr( 1, sms_rom );
 
 	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
@@ -2353,7 +2341,7 @@ static WRITE8_HANDLER (segae_ridleofp_port_fa_w)
 
 static DRIVER_INIT( ridleofp )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, segae_ridleofp_port_f8_r);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xfa, 0xfa, 0, 0, segae_ridleofp_port_fa_w);
@@ -2362,7 +2350,7 @@ static DRIVER_INIT( ridleofp )
 
 static DRIVER_INIT( hangonjr )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, segae_hangonjr_port_f8_r);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xfa, 0xfa, 0, 0, segae_hangonjr_port_fa_w);
@@ -2370,21 +2358,21 @@ static DRIVER_INIT( hangonjr )
 
 static DRIVER_INIT( opaopa )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 8);
 }
 
 static DRIVER_INIT( fantzn2 )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 0, 0);
 }
 
 static DRIVER_INIT( astrofl )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	astrofl_decode();
 }

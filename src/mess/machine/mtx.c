@@ -189,7 +189,7 @@ READ8_HANDLER( mtx_key_hi_r )
 static void mtx_ctc_interrupt(int state)
 {
 //  logerror("mtx_ctc_interrupt: %02x\n", state);
-	cpunum_set_input_line(0, 0, state);
+	cpunum_set_input_line(Machine, 0, 0, state);
 }
 
 READ8_HANDLER( mtx_ctc_r )

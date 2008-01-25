@@ -204,7 +204,7 @@ void dma_transfer_start(int channel, int dir)
 	// Burst transfers will halt the CPU until the transfer is complete
 	if((dmac.reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
-		cpunum_set_input_line(dmac.intf->cpu,INPUT_LINE_HALT,ASSERT_LINE);
+		cpunum_set_input_line(Machine, dmac.intf->cpu,INPUT_LINE_HALT,ASSERT_LINE);
 		timer_adjust(dmac.timer[channel],attotime_zero,channel, dmac.intf->burst_clock[channel]);
 	}
 	else
@@ -367,7 +367,7 @@ void hd63450_single_transfer(int x)
 				dmac.reg[x].csr |= 0xe0;  // channel operation complete, block transfer complete
 				dmac.reg[x].csr &= ~0x08;  // channel no longer active
 				if((dmac.reg[x].dcr & 0xc0) == 0x00)  // Burst transfer
-					cpunum_set_input_line(dmac.intf->cpu,INPUT_LINE_HALT,CLEAR_LINE);
+					cpunum_set_input_line(Machine, dmac.intf->cpu,INPUT_LINE_HALT,CLEAR_LINE);
 
 				if(dmac.intf->dma_end)
 					dmac.intf->dma_end(x,dmac.reg[x].ccr & 0x08);

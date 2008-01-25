@@ -283,8 +283,8 @@ void sms_check_pause_button( void ) {
 	if ( ! IS_GAMEGEAR ) {
 		if ( ! (readinputport(2) & 0x80) ) {
 			if ( ! smsPaused ) {
-				cpunum_set_input_line( 0, INPUT_LINE_NMI, ASSERT_LINE );
-				cpunum_set_input_line( 0, INPUT_LINE_NMI, CLEAR_LINE );
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE );
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE );
 			}
 			smsPaused = 1;
 		} else {
@@ -1003,10 +1003,10 @@ WRITE8_HANDLER(sms_store_control_w) {
 }
 
 void sms_int_callback( int state ) {
-	cpunum_set_input_line( 0, 0, state );
+	cpunum_set_input_line(Machine, 0, 0, state );
 }
 
 void sms_store_int_callback( int state ) {
-	cpunum_set_input_line( sms_store_control & 0x01 ? 1 : 0, 0, state );
+	cpunum_set_input_line(Machine, sms_store_control & 0x01 ? 1 : 0, 0, state );
 }
 

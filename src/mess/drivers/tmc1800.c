@@ -258,7 +258,7 @@ static MACHINE_START( tmc1800 )
 
 static MACHINE_RESET( tmc1800 )
 {
-	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_START( tmc2000 )
@@ -273,7 +273,7 @@ static MACHINE_RESET( tmc2000 )
 {
 	machine_reset_cdp1864(machine);
 
-	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 
 	// set program counter to 0x8000
 	memory_set_bank(1, 0);

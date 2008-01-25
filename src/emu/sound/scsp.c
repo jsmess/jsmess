@@ -40,7 +40,8 @@
 
 
 #define EG_SHIFT	16
-#define FM_DELAY    4    // delay in number of slots processed before samples are written to the FM ring buffer
+#define FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
+			 // driver code indicates should be 4, but sounds distorted then
 
 // include the LFO handling code
 #include "scsplfo.c"
@@ -231,7 +232,7 @@ static void dma_scsp(struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
 #define scsp_dexe 		scsp_regs[0x16/2] & 0x1000
 #define dma_transfer_end	((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
 
-static const float SDLT[8]={-1000000.0,-36.0,-30.0,-24.0,-18.0,-12.0,-6.0,0.0};
+static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f,0.0f};
 
 static stream_sample_t *bufferl;
 static stream_sample_t *bufferr;
@@ -333,7 +334,7 @@ static TIMER_CALLBACK( timerB_cb )
 	SCSP->TimCnt[1] = 0xFFFF;
 	SCSP->udata.data[0x20/2]|=0x80;
 	SCSP->udata.data[0x1a/2]&=0xff00;
-	SCSP->udata.data[0x1a/2]|=SCSP->TimCnt[0]>>8;
+	SCSP->udata.data[0x1a/2]|=SCSP->TimCnt[1]>>8;
 
 	CheckPendingIRQ(SCSP);
 }
@@ -345,7 +346,7 @@ static TIMER_CALLBACK( timerC_cb )
 	SCSP->TimCnt[2] = 0xFFFF;
 	SCSP->udata.data[0x20/2]|=0x100;
 	SCSP->udata.data[0x1c/2]&=0xff00;
-	SCSP->udata.data[0x1c/2]|=SCSP->TimCnt[0]>>8;
+	SCSP->udata.data[0x1c/2]|=SCSP->TimCnt[2]>>8;
 
 	CheckPendingIRQ(SCSP);
 }
@@ -501,7 +502,7 @@ static void SCSP_StopSlot(struct _SLOT *slot,int keyoff)
 	slot->udata.data[0]&=~0x800;
 }
 
-#define log_base_2(n) (log((float) n)/log((float) 2))
+#define log_base_2(n) (log((double)(n))/log(2.0))
 
 static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int sndindex)
 {
@@ -540,15 +541,15 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 
 	for(i=0;i<0x400;++i)
 	{
-		//float fcent=(double) 1200.0*log_base_2((double)(((double) 1024.0+(double)i)/(double)1024.0));
+		//float fcent=(double) 1200.0*log_base_2((1024.0+(double)i)/1024.0);
 		//fcent=(double) 44100.0*pow(2.0,fcent/1200.0);
-		float fcent=44100.0*(1024.0+(double) i)/1024.0;
+		float fcent=44100.0f*(1024.0f+(float)i)/1024.0f;
 		FNS_Table[i]=(float) (1<<SHIFT) *fcent;
 	}
 
 	for(i=0;i<0x400;++i)
 	{
-		float envDB=((float)(3*(i-0x3ff)))/32.0;
+		float envDB=((float)(3*(i-0x3ff)))/32.0f;
 		float scale=(float)(1<<SHIFT);
 		EG_TABLE[i]=(INT32)(pow(10.0,envDB/20.0)*scale);
 	}
@@ -558,28 +559,28 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 		int iTL =(i>>0x0)&0xff;
 		int iPAN=(i>>0x8)&0x1f;
 		int iSDL=(i>>0xD)&0x07;
-		float TL=1.0;
-		float SegaDB=0;
-		float fSDL=1.0;
-		float PAN=1.0;
+		float TL=1.0f;
+		float SegaDB=0.0f;
+		float fSDL=1.0f;
+		float PAN=1.0f;
 		float LPAN,RPAN;
 
-		if(iTL&0x01) SegaDB-=0.4;
-		if(iTL&0x02) SegaDB-=0.8;
-		if(iTL&0x04) SegaDB-=1.5;
-		if(iTL&0x08) SegaDB-=3;
-		if(iTL&0x10) SegaDB-=6;
-		if(iTL&0x20) SegaDB-=12;
-		if(iTL&0x40) SegaDB-=24;
-		if(iTL&0x80) SegaDB-=48;
+		if(iTL&0x01) SegaDB-=0.4f;
+		if(iTL&0x02) SegaDB-=0.8f;
+		if(iTL&0x04) SegaDB-=1.5f;
+		if(iTL&0x08) SegaDB-=3.0f;
+		if(iTL&0x10) SegaDB-=6.0f;
+		if(iTL&0x20) SegaDB-=12.0f;
+		if(iTL&0x40) SegaDB-=24.0f;
+		if(iTL&0x80) SegaDB-=48.0f;
 
 		TL=pow(10.0,SegaDB/20.0);
 
 		SegaDB=0;
-		if(iPAN&0x1) SegaDB-=3;
-		if(iPAN&0x2) SegaDB-=6;
-		if(iPAN&0x4) SegaDB-=12;
-		if(iPAN&0x8) SegaDB-=24;
+		if(iPAN&0x1) SegaDB-=3.0f;
+		if(iPAN&0x2) SegaDB-=6.0f;
+		if(iPAN&0x4) SegaDB-=12.0f;
+		if(iPAN&0x8) SegaDB-=24.0f;
 
 		if((iPAN&0xf)==0xf) PAN=0.0;
 		else PAN=pow(10.0,SegaDB/20.0);
@@ -1009,7 +1010,8 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	}
 
  	for (addr_select=0;addr_select<2;addr_select++)
-  	{
+ 	{
+		INT32 rem_addr;
  		switch(LPCTL(slot))
   		{
  		case 0:	//no loop
@@ -1021,26 +1023,35 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
  			break;
  		case 1: //normal loop
  			if(*addr[addr_select]>=LEA(slot))
- 				*slot_addr[addr_select]=LSA(slot)<<SHIFT;
+			{
+				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
+				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
+			}
  			break;
  		case 2:	//reverse loop
  			if((*addr[addr_select]>=LSA(slot)) && !(slot->Backwards))
  			{
- 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+				rem_addr = *slot_addr[addr_select] - (LSA(slot)<<SHIFT);
+				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
  				slot->Backwards=1;
  			}
- 			if((*addr[addr_select]<=LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)
- 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+			else if((*addr[addr_select]<LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)
+			{
+				rem_addr = (LSA(slot)<<SHIFT) - *slot_addr[addr_select];
+				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
+			}
  			break;
  		case 3: //ping-pong
  			if(*addr[addr_select]>=LEA(slot)) //reached end, reverse till start
  			{
- 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
+				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
  				slot->Backwards=1;
  			}
- 			if((*addr[addr_select]<=LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)//reached start or negative
+			else if((*addr[addr_select]<LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)//reached start or negative
  			{
- 				*slot_addr[addr_select]=LSA(slot)<<SHIFT;
+				rem_addr = (LSA(slot)<<SHIFT) - *slot_addr[addr_select];
+				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
  				slot->Backwards=0;
  			}
  			break;
@@ -1181,7 +1192,7 @@ static void dma_scsp(struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-	cpunum_set_input_line(2,dma_transfer_end,HOLD_LINE);
+	cpunum_set_input_line(Machine, 2,dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1296,7 +1307,7 @@ WRITE16_HANDLER( SCSP_0_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				cpunum_set_input_line_and_vector(0, 9, HOLD_LINE , 0x46);
+				cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;

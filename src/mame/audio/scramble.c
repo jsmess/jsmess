@@ -170,24 +170,24 @@ static void scramble_sh_7474_callback(void)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpunum_set_input_line(1, 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void sfx_sh_7474_callback(void)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpunum_set_input_line(2, 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 {
-	cpunum_set_input_line(1, 0, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( hotshock_soundlatch_r )
 {
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 	return soundlatch_r(0);
 }
 
@@ -395,7 +395,6 @@ static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
 
 static const struct TMS5110interface ad2083_tms5110_interface =
 {
-	TMS5110_IS_5110A,
 	-1,							/* rom_region */
 	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
 };
@@ -455,7 +454,7 @@ MACHINE_DRIVER_START( ad2083_audio )
 	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MDRV_SOUND_ADD(TMS5110, AD2083_TMS5110_CLOCK)
+	MDRV_SOUND_ADD(TMS5110A, AD2083_TMS5110_CLOCK)
 	MDRV_SOUND_CONFIG(ad2083_tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

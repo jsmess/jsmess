@@ -265,12 +265,12 @@ static READ8_HANDLER( dsw1_r )
 
 static WRITE8_HANDLER( int_ack1_w )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( int_ack2_w )
 {
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 
@@ -1071,7 +1071,7 @@ static MACHINE_DRIVER_START( hopmappy )
 	MDRV_CPU_PROGRAM_MAP(hopmappy_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
-	MDRV_CPU_ADD_TAG("mcu", HD63701, 49152000/32)	/* or compatible 6808 with extra instructions */
+	MDRV_CPU_ADD_TAG("mcu", HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
 	MDRV_CPU_PROGRAM_MAP(hopmappy_mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* ??? */

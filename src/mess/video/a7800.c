@@ -352,7 +352,7 @@ INTERRUPT_GEN( a7800_interrupt )
 
 	if( maria_wsync )
 	{
-		cpu_trigger( TRIGGER_HSYNC );
+		cpu_trigger( machine, TRIGGER_HSYNC );
 		maria_wsync = 0;
 	}
 
@@ -434,7 +434,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	if( maria_dli )
 	{
 		maria_dli = 0;
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 }

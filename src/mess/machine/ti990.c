@@ -31,10 +31,10 @@ void ti990_set_int_line(int line, int state)
 	{
 		for (level = 0; ! (intlines & (1 << level)); level++)
 			;
-		cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, level);	/* interrupt it, baby */
+		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, level);	/* interrupt it, baby */
 	}
 	else
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 void ti990_set_int2(int state)
@@ -78,12 +78,12 @@ void ti990_set_int13(int state)
 
 static TIMER_CALLBACK(clear_load)
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void ti990_hold_load(void)
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
 }
 

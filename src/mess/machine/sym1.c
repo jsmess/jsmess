@@ -172,7 +172,7 @@ static const ttl74145_interface ttl74145_intf =
 
 static void sym1_irq(int level)
 {
-	cpunum_set_input_line(0, M6502_IRQ_LINE, level);
+	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, level);
 }
 
 

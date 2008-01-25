@@ -33,7 +33,7 @@ static MACHINE_RESET( system1 )
 
 static MACHINE_RESET( system1_banked )
 {
-	machine_reset_system1(machine);
+	MACHINE_RESET_CALL(system1);
 	memory_configure_bank(1, 0, 4, memory_region(REGION_CPU1) + 0x10000, 0x4000);
 }
 
@@ -111,7 +111,7 @@ static WRITE8_HANDLER( chplft_videomode_w )
 static WRITE8_HANDLER( system1_soundport_w )
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 }

@@ -128,7 +128,7 @@ unsigned char apf_ints;
 
 void apf_update_ints(void)
 {
-	cpunum_set_input_line(0, 0, apf_ints ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, apf_ints ? HOLD_LINE : CLEAR_LINE);
 }
 
 static void	apf_m1000_irq_a_func(int state)

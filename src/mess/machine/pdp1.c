@@ -924,7 +924,7 @@ void iot_tyi(int op2, int nac, int mb, int *io, int ac)
 	{
 		io_status &= ~io_st_tyi;
 		if (USE_SBS)
-			cpunum_set_input_line_and_vector(0, 0, CLEAR_LINE, 0);	/* interrupt it, baby */
+			cpunum_set_input_line_and_vector(Machine, 0, 0, CLEAR_LINE, 0);	/* interrupt it, baby */
 	}
 }
 
@@ -1274,7 +1274,7 @@ static void pdp1_keyboard(void)
 			typewriter.tb = (i << 4) + j;
 			io_status |= io_st_tyi;
 			#if USE_SBS
-				cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, 0);	/* interrupt it, baby */
+				cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, 0);	/* interrupt it, baby */
 			#endif
 			cpunum_set_reg(0, PDP1_PF1, 1);
 			pdp1_typewriter_drawchar(typewriter.tb);	/* we want to echo input */

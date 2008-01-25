@@ -73,7 +73,10 @@ static WRITE8_HANDLER( flipscreen_w );
 
 static void main_cpu_irq(int state)
 {
-	cpunum_set_input_line(0, M6809_IRQ_LINE,  state ? ASSERT_LINE : CLEAR_LINE);
+	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) |
+						 pia_get_irq_a(1) | pia_get_irq_b(1);
+
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -97,7 +100,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", safe_activ
 static WRITE8_HANDLER( audio_command_w )
 {
 	soundlatch_w(0, ~data);
-	cpunum_set_input_line(1, M6802_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, M6802_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", safe_activecpu_get_pc(), data^0xff);
 }
@@ -119,7 +122,7 @@ static WRITE8_HANDLER( audio_answer_w )
 		data = 0x00;
 
 	soundlatch2_w(0, data);
-	cpunum_set_input_line(0, M6809_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", safe_activecpu_get_pc(), data);
 }
@@ -526,7 +529,7 @@ static MACHINE_DRIVER_START( r2dtank )
 	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map,0)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(M6802,3000000/4)			/* ?? */
+	MDRV_CPU_ADD(M6802,3000000)			/* ?? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_audio_map,0)
 
 	MDRV_MACHINE_START(r2dtank)

@@ -222,25 +222,25 @@ static void lisa_field_interrupts(void)
 
 	/*if (RSIR)
 		// serial interrupt
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int0)
 		// external interrupt
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int1)
 		// external interrupt
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int2)
 		// external interrupt
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else*/ if (KBIR)
 		/* COPS VIA interrupt */
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (FDIR || VTIR)
 		/* floppy disk or VBl */
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 static void set_parity_error_pending(int value)
@@ -250,18 +250,18 @@ static void set_parity_error_pending(int value)
 	parity_error_pending = value;
 	if (parity_error_pending)
 	{
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else
 	{
-		cpunum_set_input_line(0, M68K_IRQ_7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, M68K_IRQ_7, CLEAR_LINE);
 	}
 #else
 	/* work-around... */
 	if ((! parity_error_pending) && value)
 	{
 		parity_error_pending = TRUE;
-		cpunum_set_input_line_and_vector(0, M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(Machine, 0, M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else if (parity_error_pending && (! value))
 	{
@@ -420,7 +420,7 @@ static void scan_keyboard( void )
 #if 0
 						if (keycode == NMIcode)
 						{	/* generate NMI interrupt */
-							cpunum_set_input_line(0, M68K_IRQ_7, PULSE_LINE);
+							cpunum_set_input_line(machine, 0, M68K_IRQ_7, PULSE_LINE);
 							cpunum_set_input_line_vector(0, M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif

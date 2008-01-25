@@ -107,14 +107,14 @@ VIDEO_START( midtunit )
 
 VIDEO_START( midwunit )
 {
-	video_start_midtunit(machine);
+	VIDEO_START_CALL(midtunit);
 	midtunit_gfx_rom_large = 1;
 }
 
 
 VIDEO_START( midxunit )
 {
-	video_start_midtunit(machine);
+	VIDEO_START_CALL(midtunit);
 	midtunit_gfx_rom_large = 1;
 	videobank_select = 1;
 }
@@ -311,7 +311,7 @@ WRITE16_HANDLER( midxunit_paletteram_w )
 
 READ16_HANDLER( midxunit_paletteram_r )
 {
-	return paletteram16_word_r(offset / 2, 0);
+	return paletteram16[offset / 2];
 }
 
 
@@ -594,7 +594,7 @@ DECLARE_BLITTER_SET(dma_draw_noskip_noscale,   dma_state.bpp, EXTRACTGEN,   SKIP
 static TIMER_CALLBACK( dma_callback )
 {
 	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 
@@ -684,7 +684,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 

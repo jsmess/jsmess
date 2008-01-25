@@ -57,7 +57,7 @@ static const dl1416_interface dl1416_ds5 = { DL1416T, aim65_update_ds5 };
 
 static void aim65_via_irq_func(int state)
 {
-	cpunum_set_input_line(0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 /* STEP/RUN
@@ -171,7 +171,7 @@ static WRITE8_HANDLER(aim65_riot_a_w)
 
 static void aim65_riot_irq(int state)
 {
-	cpunum_set_input_line(0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

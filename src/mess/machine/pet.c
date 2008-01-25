@@ -96,8 +96,8 @@ static void pet_irq (int level)
 	{
 		DBG_LOG (3, "mos6502", ("irq %s\n", level ? "start" : "end"));
 		if (superpet)
-			cpunum_set_input_line (1, M6809_IRQ_LINE, level);
-		cpunum_set_input_line (0, M6502_IRQ_LINE, level);
+			cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, level);
+		cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, level);
 		old_level = level;
 	}
 }
@@ -553,14 +553,14 @@ MACHINE_RESET( pet )
 		spet.rom = 0;
 		if (M6809_SELECT)
 		{
-			cpunum_set_input_line(0, INPUT_LINE_HALT, 1);
-			cpunum_set_input_line(0, INPUT_LINE_HALT, 0);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
 			pet_font = 2;
 		}
 		else
 		{
-			cpunum_set_input_line(0, INPUT_LINE_HALT, 0);
-			cpunum_set_input_line(0, INPUT_LINE_HALT, 1);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
 			pet_font = 0;
 		}
 	}
@@ -601,12 +601,12 @@ INTERRUPT_GEN( pet_frame_interrupt )
 	if (superpet)
 	{
 		if (M6809_SELECT) {
-			cpunum_set_input_line(0, INPUT_LINE_HALT,1);
-			cpunum_set_input_line(0, INPUT_LINE_HALT, 0);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT,1);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
 			pet_font|=2;
 		} else {
-			cpunum_set_input_line(0, INPUT_LINE_HALT,0);
-			cpunum_set_input_line(0, INPUT_LINE_HALT, 1);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT,0);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
 			pet_font&=~2;
 		}
 	}

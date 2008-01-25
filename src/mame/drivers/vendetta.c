@@ -204,17 +204,14 @@ static void vendetta_video_banking( int select )
 {
 	if ( select & 1 )
 	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, paletteram_r );
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w );
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r );
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_w );
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, MRA8_BANK4, paletteram_xBBBBBGGGGGRRRRR_be_w );
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r, K053247_w );
+		memory_set_bankptr(4, paletteram);
 	}
 	else
 	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, vendetta_K052109_r );
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, vendetta_K052109_w );
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K052109_r );
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K052109_w );
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, vendetta_K052109_r, vendetta_K052109_w );
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K052109_r, K052109_w );
 	}
 }
 
@@ -237,24 +234,24 @@ static WRITE8_HANDLER( vendetta_5fe0_w )
 
 static TIMER_CALLBACK( z80_nmi_callback )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE );
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE );
 }
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE );
 
 	timer_set( ATTOTIME_IN_USEC( 25 ), NULL, 0, z80_nmi_callback );
 }
 
 static WRITE8_HANDLER( z80_irq_w )
 {
-	cpunum_set_input_line_and_vector( 1, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff );
 }
 
 static READ8_HANDLER( vendetta_sound_interrupt_r )
 {
-	cpunum_set_input_line_and_vector( 1, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
@@ -574,7 +571,7 @@ static const struct K053260_interface k053260_interface =
 static INTERRUPT_GEN( vendetta_irq )
 {
 	if (irq_enabled)
-		cpunum_set_input_line(0, KONAMI_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( vendetta )

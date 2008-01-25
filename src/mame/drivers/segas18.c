@@ -99,7 +99,7 @@ static const struct segaic16_memory_map_entry rom_171_shad_info[] =
 	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, MRA16_BANK14,          MWA16_BANK14,          &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, NULL,                  NULL,                  NULL,                  "????" },
 	{ 0x25/2, 0x00000, 0x00010, 0xfffff0,      ~0, genesis_vdp_r,         genesis_vdp_w,         NULL,                  "VDP" },
-	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, MRA16_BANK17,          MWA16_ROM,             NULL,                  "ROM 0" },
+	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, MRA16_BANK17,          MWA16_UNMAP,           NULL,                  "ROM 0" },
 	{ 0 }
 };
 
@@ -112,8 +112,8 @@ static const struct segaic16_memory_map_entry rom_171_5874_info[] =
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
 	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, MRA16_BANK14,          MWA16_BANK14,          &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x00010, 0xfffff0,      ~0, genesis_vdp_r,         genesis_vdp_w,         NULL,                  "VDP" },
-	{ 0x25/2, 0x00000, 0x80000, 0xf80000, 0x80000, MRA16_BANK16,          MWA16_ROM,             NULL,                  "ROM 1" },
-	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, MRA16_BANK17,          MWA16_ROM,             NULL,                  "ROM 0" },
+	{ 0x25/2, 0x00000, 0x80000, 0xf80000, 0x80000, MRA16_BANK16,          MWA16_UNMAP,           NULL,                  "ROM 1" },
+	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, MRA16_BANK17,          MWA16_UNMAP,           NULL,                  "ROM 0" },
 	{ 0 }
 };
 
@@ -127,7 +127,7 @@ static const struct segaic16_memory_map_entry rom_171_5987_info[] =
 	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, MRA16_BANK14,          MWA16_BANK14,          &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x00010, 0xfffff0,      ~0, genesis_vdp_r,         genesis_vdp_w,         NULL,                  "VDP" },
 	{ 0x25/2, 0x00000, 0x80000, 0xf80000, 0x80000, MRA16_BANK16,          rom_5987_bank_w,       NULL,                  "ROM 1/banking" },
-	{ 0x21/2, 0x00000, 0x100000,0xf00000, 0x00000, MRA16_BANK17,          MWA16_ROM,             NULL,                  "ROM 0" },
+	{ 0x21/2, 0x00000, 0x100000,0xf00000, 0x00000, MRA16_BANK17,          MWA16_UNMAP,           NULL,                  "ROM 0" },
 	{ 0 }
 };
 
@@ -149,7 +149,7 @@ static const struct segaic16_memory_map_entry *const region_info_list[] =
 static void sound_w(UINT8 data)
 {
 	soundlatch_w(0, data & 0xff);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -555,7 +555,7 @@ static WRITE8_HANDLER( soundbank_w )
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpunum_set_input_line(2, 1, PULSE_LINE);
+	cpunum_set_input_line(Machine, 2, 1, PULSE_LINE);
 }
 
 
@@ -2212,20 +2212,20 @@ static DRIVER_INIT( generic_5987 )
 
 static DRIVER_INIT( ddcrew )
 {
-	driver_init_generic_5987(machine);
+	DRIVER_INIT_CALL(generic_5987);
 	custom_io_r = ddcrew_custom_io_r;
 }
 
 static DRIVER_INIT( lghost )
 {
-	driver_init_generic_5987(machine);
+	DRIVER_INIT_CALL(generic_5987);
 	custom_io_r = lghost_custom_io_r;
 	custom_io_w = lghost_custom_io_w;
 }
 
 static DRIVER_INIT( wwally )
 {
-	driver_init_generic_5987(machine);
+	DRIVER_INIT_CALL(generic_5987);
 	custom_io_r = wwally_custom_io_r;
 	custom_io_w = wwally_custom_io_w;
 }

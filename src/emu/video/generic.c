@@ -303,20 +303,18 @@ void generic_video_init(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    video_start_generic - general video system
+    VIDEO_START( generic ) - general video system
 -------------------------------------------------*/
 
 VIDEO_START( generic )
 {
-	assert_always(videoram_size != 0, "VIDEO_START(generic) requires non-zero videoram_size");
-
 	/* allocate the temporary bitmap */
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 }
 
 
 /*-------------------------------------------------
-    video_start_generic_bitmapped - general video
+    VIDEO_START( generic_bitmapped ) - general video
     system with a bitmap
 -------------------------------------------------*/
 
@@ -331,7 +329,7 @@ VIDEO_START( generic_bitmapped )
 
 
 /*-------------------------------------------------
-    video_update_generic_bitmapped - blast the
+    VIDEO_UPDATE( generic_bitmapped ) - blast the
     generic bitmap to the screen
 -------------------------------------------------*/
 
@@ -583,51 +581,6 @@ PALETTE_INIT( RRRR_GGGG_BBBB )
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
-}
-
-
-
-/***************************************************************************
-    GENERIC PALETTE READ HANDLERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    8-bit read handlers
--------------------------------------------------*/
-
-READ8_HANDLER( paletteram_r )
-{
-	return paletteram[offset];
-}
-
-READ8_HANDLER( paletteram_2_r )
-{
-	return paletteram_2[offset];
-}
-
-
-/*-------------------------------------------------
-    16-bit read handlers
--------------------------------------------------*/
-
-READ16_HANDLER( paletteram16_word_r )
-{
-	return paletteram16[offset];
-}
-
-READ16_HANDLER( paletteram16_2_word_r )
-{
-	return paletteram16_2[offset];
-}
-
-
-/*-------------------------------------------------
-    32-bit read handlers
--------------------------------------------------*/
-
-READ32_HANDLER( paletteram32_r )
-{
-	return paletteram32[offset];
 }
 
 

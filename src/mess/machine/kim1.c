@@ -663,7 +663,7 @@ static TIMER_CALLBACK(m6530_timer_cb)
 	logerror("m6530(%d) timer expired\n", chip);
 	m6530[chip].state |= 0x80;
 	if (m6530[chip].irqen)			   /* with IRQ? */
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 INTERRUPT_GEN( kim1_interrupt )

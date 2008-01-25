@@ -324,7 +324,7 @@ WRITE8_HANDLER( bublbobl_68705_ddrB_w );
 #if 0 // doesn't work for some reason
 static WRITE8_HANDLER(soundcpu_reset_w)
 {
-	cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 #endif
 
@@ -717,7 +717,7 @@ GFXDECODE_END
 // handler called by the 2203 emulator when the internal timers cause an IRQ
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =
@@ -784,7 +784,7 @@ static MACHINE_DRIVER_START( bublbobl )
 	/* audio CPU */	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0) // IRQs are triggered by the YM2203
 
-	MDRV_CPU_ADD_TAG("mcu", M6801, 4000000/4)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
+	MDRV_CPU_ADD_TAG("mcu", M6801, 4000000)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse, 1) // comes from the same clock that latches the INT pin on the second Z80
 
@@ -1333,7 +1333,7 @@ static DRIVER_INIT( tokiob )
 {
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
 
-	driver_init_tokio(machine);
+	DRIVER_INIT_CALL(tokio);
 }
 
 

@@ -78,7 +78,7 @@ void svision_irq(void)
 	int irq = svision.timer_shot && (BANK & 2);
 	irq = irq || (svision_dma.finished && (BANK & 4));
 
-	cpunum_set_input_line(0, M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK(svision_timer)
@@ -418,7 +418,7 @@ static VIDEO_UPDATE( tvlink )
 static INTERRUPT_GEN( svision_frame_int )
 {
 	if (BANK&1)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 	if (svision_channel->count)
 		svision_channel->count--;

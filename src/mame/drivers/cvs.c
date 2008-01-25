@@ -238,7 +238,7 @@ WRITE8_HANDLER( cvs_s2636_3_or_character_ram_w )
 static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 {
 	cpunum_set_input_line_vector(CVS_MAIN_CPU_INDEX, 0, 0x03);
-	cpunum_set_input_line(CVS_MAIN_CPU_INDEX, 0, PULSE_LINE);
+	cpunum_set_input_line(machine, CVS_MAIN_CPU_INDEX, 0, PULSE_LINE);
 
 	cvs_scroll_stars();
 }
@@ -247,7 +247,7 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 static void cvs_dac_cpu_interrupt(void)
 {
 	cpunum_set_input_line_vector(CVS_DAC_CPU_INDEX, 0, 0x03);
-	cpunum_set_input_line(CVS_DAC_CPU_INDEX, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, CVS_DAC_CPU_INDEX, 0, HOLD_LINE);
 }
 
 
@@ -430,8 +430,6 @@ static int speech_rom_read_bit(void)
 
 static const struct TMS5110interface tms5100_interface =
 {
-	//TMS5110_IS_5110A,
-	TMS5110_IS_5100,
 	-1,					 /* ROM region */
 	speech_rom_read_bit, /* M0 callback function. Called whenever chip requests a single bit of data */
 	NULL
@@ -707,7 +705,7 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(TMS5110, 640000)
+	MDRV_SOUND_ADD(TMS5100, 640000)
 	MDRV_SOUND_CONFIG(tms5100_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

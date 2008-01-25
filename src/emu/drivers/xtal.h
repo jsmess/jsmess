@@ -51,6 +51,7 @@ enum
 	XTAL_4_224MHz   	= 4224000,		/* Used to drive OKI M6295 chips, usually with /4 divider */
 	XTAL_4_433619MHz	= 4433619,		/* PAL subcarrier */
 	XTAL_4_9152MHz   	= 4915200,
+	XTAL_5MHz    		= 5000000,		/* Mutant Night */
 	XTAL_6MHz    		= 6000000,
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
 	XTAL_7_3728MHz   	= 7372800,
@@ -60,10 +61,12 @@ enum
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
 	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
+	XTAL_11_2MHz  		= 11200000,		/* New York, New York */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
 	XTAL_12MHz   		= 12000000,
 	XTAL_12_096MHz 		= 12096000,		/* Some early 80's Atari games */
 	XTAL_12_288MHz  	= 12288000,		/* Sega Model 3 digital audio board */
+	XTAL_12_5MHz   		= 12500000,		/* Red Alert audio board */
 	XTAL_13_3MHz  		= 13300000,		/* BMC bowling */
 	XTAL_13_33056MHz 	= 13330560,		/* Taito L */
 	XTAL_13_4MHz		= 13400000,		/* TNK3, Ikari Warriors h/w */
@@ -80,7 +83,7 @@ enum
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by Space Invaders games by Taito/Midway and clones */
 	XTAL_20MHz   		= 20000000,
 	XTAL_21_3MHz  		= 21300000,
-	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling */
+	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */
 	XTAL_22MHz   		= 22000000,
 	XTAL_24MHz   		= 24000000,		/* Mario, 80's Data East games, 80's Konami games */
 	XTAL_24_576MHz  	= 24576000,		/* Pole Position h/w, Model 3 CPU board */
@@ -125,9 +128,10 @@ enum
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
 	XTAL_384kHz			= 384000,
-	XTAL_400kHz			= 400000,	/* Used on Great Swordman h/w */
-	XTAL_455kHz			= 455000,	/* Used on Gladiator h/w */
-	XTAL_640kHz			= 640000
+	XTAL_400kHz			= 400000,		/* Used on Great Swordman h/w */
+	XTAL_455kHz			= 455000,		/* Used on Gladiator h/w */
+	XTAL_640kHz			= 640000,
+	XTAL_1_056MHz		= 1056000 		/* used on Trio The Punch */
 };
 
 

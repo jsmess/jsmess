@@ -43,11 +43,11 @@ static void atom_via_irq_func(int state)
 {
 	if (state)
 	{
-		cpunum_set_input_line(0,0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(0,0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	}
 
 
@@ -153,7 +153,7 @@ static void atom_8271_interrupt_callback(int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 

@@ -352,19 +352,19 @@ static void einstein_update_interrupts(void)
 	/* NPW 21-Jul-2005 - Not sure how to update this for MAME 0.98u2 */
 /*
     if (einstein_int & einstein_int_mask & EINSTEIN_KEY_INT)
-        cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
+        cpunum_set_input_line(Machine, 0, Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
+        cpunum_set_input_line(Machine, 0, Z80_INT_IEO, PULSE_LINE);
 
     if (einstein_int & einstein_int_mask & EINSTEIN_ADC_INT)
-        cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
+        cpunum_set_input_line(Machine, 0, Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
+        cpunum_set_input_line(Machine, 0, Z80_INT_IEO, PULSE_LINE);
 
     if (einstein_int & einstein_int_mask & EINSTEIN_FIRE_INT)
-        cpunum_set_input_line(0, Z80_INT_REQ, PULSE_LINE);
+        cpunum_set_input_line(Machine, 0, Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(0, Z80_INT_IEO, PULSE_LINE);
+        cpunum_set_input_line(Machine, 0, Z80_INT_IEO, PULSE_LINE);
 */
 }
 
@@ -401,13 +401,13 @@ static TIMER_CALLBACK(einstein_keyboard_timer_callback)
 static void einstein_ctc_interrupt(int state)
 {
 	logerror("ctc irq state: %02x\n",state);
-	cpunum_set_input_line(0, 1, state);
+	cpunum_set_input_line(Machine, 0, 1, state);
 }
 
 static void einstein_pio_interrupt(int state)
 {
 	logerror("pio irq state: %02x\n",state);
-	cpunum_set_input_line(0, 3, state);
+	cpunum_set_input_line(Machine, 0, 3, state);
 }
 
 static WRITE8_HANDLER(einstein_serial_transmit_clock)

@@ -601,12 +601,13 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( statriv2_interrupt )
 {
-	cpunum_set_input_line(0, I8085_RST75_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, I8085_RST75_LINE, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( statriv2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",8085A,12400000)              /* 12.4MHz / 4? */
+	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
+	MDRV_CPU_ADD_TAG("main",8085A,12400000*2)              /* 12.4MHz / 4? */
 	MDRV_CPU_PROGRAM_MAP(statriv2_readmem,statriv2_writemem)
 	MDRV_CPU_IO_MAP(statriv2_readport,statriv2_writeport)
 	MDRV_CPU_VBLANK_INT(statriv2_interrupt,1)

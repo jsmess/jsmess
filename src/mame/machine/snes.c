@@ -79,7 +79,7 @@ static void snes_latch_counters(void)
 static TIMER_CALLBACK( snes_nmi_tick )
 {
 	// pull NMI
-	cpunum_set_input_line( 0, G65816_LINE_NMI, HOLD_LINE );
+	cpunum_set_input_line(machine, 0, G65816_LINE_NMI, HOLD_LINE );
 
 	// don't happen again
 	timer_adjust(snes_nmi_timer, attotime_never, 0, attotime_never);
@@ -91,7 +91,7 @@ static void snes_hirq_tick(void)
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
 	snes_latch_counters();
 	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
-	cpunum_set_input_line( 0, G65816_LINE_IRQ, HOLD_LINE );
+	cpunum_set_input_line(Machine, 0, G65816_LINE_IRQ, HOLD_LINE );
 
 	// don't happen again
 	timer_adjust(snes_hirq_timer, attotime_never, 0, attotime_never);
@@ -121,7 +121,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
 			// IRQ latches the counters, do it now
 			snes_latch_counters();
-			cpunum_set_input_line( 0, G65816_LINE_IRQ, HOLD_LINE );
+			cpunum_set_input_line(machine, 0, G65816_LINE_IRQ, HOLD_LINE );
 		}
 	}
 	/* Horizontal IRQ timer */
@@ -224,7 +224,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		snes_ram[STAT77] &= 0x3f;		/* Clear Time Over and Range Over bits */
 		snes_ram[STAT78] ^= 0x80;		/* Toggle field flag */
 
-		cpunum_set_input_line( 0, G65816_LINE_NMI, CLEAR_LINE );
+		cpunum_set_input_line(machine, 0, G65816_LINE_NMI, CLEAR_LINE );
 	}
 
 	cpuintrf_pop_context();
@@ -1452,7 +1452,7 @@ WRITE8_HANDLER( snes_w_io )
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
              * Currently we are just increasing it no matter what */
-//          cpunum_set_clockscale( 0, (data & 0x1) ? 1.335820896 : 1.0 );
+//          cpunum_set_clockscale(Machine, 0, (data & 0x1) ? 1.335820896 : 1.0 );
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x1) != (snes_ram[MEMSEL] & 0x1) )
 				mame_printf_debug( "CPU speed: %f Mhz\n", (data & 0x1) ? 3.58 : 2.68 );

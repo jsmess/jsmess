@@ -149,7 +149,7 @@ VIDEO_START( bnj )
     /* the background area is twice as wide as the screen */
     background_bitmap = auto_bitmap_alloc(2*machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-    video_start_btime(machine);
+    VIDEO_START_CALL(btime);
 }
 
 
@@ -316,7 +316,7 @@ WRITE8_HANDLER( disco_video_control_w )
 INTERRUPT_GEN( lnc_sound_interrupt )
 {
     if (lnc_sound_interrupt_enabled)
-    	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+    	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

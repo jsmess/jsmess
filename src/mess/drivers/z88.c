@@ -44,13 +44,13 @@ static void z88_interrupt_refresh(void)
 			)
 		{
 			logerror("set int\n");
-			cpunum_set_input_line(0,0,HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 			return;
 		}
 	}
 
 	logerror("clear int\n");
-	cpunum_set_input_line(0,0,CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 static void z88_update_rtc_interrupt(void)
@@ -99,7 +99,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 			/* column has gone low in snooze/coma */
 			blink.sta |= STA_KEY;
 
-			cpu_trigger(Z88_SNOOZE_TRIGGER);
+			cpu_trigger(Machine, Z88_SNOOZE_TRIGGER);
 
 			z88_interrupt_refresh();
 		}

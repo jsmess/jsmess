@@ -710,9 +710,9 @@ static void d_recalc_irq(void)
 	UINT8 pia0_irq_b = pia_get_irq_b(0);
 
 	if (pia0_irq_a || pia0_irq_b)
-		cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, M6809_IRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static void d_recalc_firq(void)
@@ -723,15 +723,15 @@ static void d_recalc_firq(void)
 	UINT8 pia2_firq_b = pia_get_irq_b(2);
 
 	if (pia1_firq_a || pia1_firq_b || pia2_firq_a || pia2_firq_b)
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 static void coco3_recalc_irq(void)
 {
 	if ((coco3_gimereg[0] & 0x20) && gime_irq)
-		cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 	else
 		d_recalc_irq();
 }
@@ -739,7 +739,7 @@ static void coco3_recalc_irq(void)
 static void coco3_recalc_firq(void)
 {
 	if ((coco3_gimereg[0] & 0x10) && gime_firq)
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
 		d_recalc_firq();
 }
@@ -871,7 +871,7 @@ static timer_callback recalc_interrupts;
 
 void coco_set_halt_line(int halt_line)
 {
-	cpunum_set_input_line(0, INPUT_LINE_HALT, halt_line);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
 		timer_set(ATTOTIME_IN_CYCLES(1,0), NULL, 0, recalc_interrupts);
 }
@@ -1580,7 +1580,7 @@ static void	dgnalpha_fdc_callback(wd17xx_state_t event, void *param)
 	switch(event)
 	{
 		case WD17XX_IRQ_CLR:
-			cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 		case WD17XX_IRQ_SET:
 			if(dgnalpha_just_reset)
@@ -1590,7 +1590,7 @@ static void	dgnalpha_fdc_callback(wd17xx_state_t event, void *param)
 			else
 			{
 				if (pia_get_output_ca2(2))
-					cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
+					cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
 		case WD17XX_DRQ_CLR:
@@ -1801,7 +1801,7 @@ static void d_sam_set_mpurate(int val)
 	 * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
 	 * access but RAM was not.  I don't know how to simulate this.
 	 */
-    cpunum_set_clockscale(0, val ? 2 : 1);
+    cpunum_set_clockscale(Machine, 0, val ? 2 : 1);
 }
 
 READ8_HANDLER(dragon_alpha_mapped_irq_r)
@@ -2608,7 +2608,7 @@ static TIMER_CALLBACK(coco3_cart_timer_proc)
 static TIMER_CALLBACK(halt_timer_proc)
 {
 	int data = param;
-	cpunum_set_input_line(0, INPUT_LINE_HALT, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2620,7 +2620,7 @@ static TIMER_CALLBACK(halt_timer_proc)
 static TIMER_CALLBACK(nmi_timer_proc)
 {
 	int data = param;
-	cpunum_set_input_line(0, INPUT_LINE_NMI, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

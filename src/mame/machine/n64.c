@@ -34,7 +34,7 @@ void signal_rcp_interrupt(int interrupt)
 	{
 		mi_interrupt |= interrupt;
 
-		cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -44,7 +44,7 @@ void clear_rcp_interrupt(int interrupt)
 
 	//if (!mi_interrupt)
 	{
-		cpunum_set_input_line(0, INPUT_LINE_IRQ0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -125,7 +125,7 @@ static UINT32 sp_semaphore;
 static void sp_dma(int direction)
 {
 	UINT8 *src, *dst;
-	int i;
+	int i, c;
 	//int cpu = cpu_getactivecpu();
 
 	if (sp_dma_length == 0)
@@ -134,12 +134,11 @@ static void sp_dma(int direction)
 	}
 
 	sp_dma_length++;
-
 	if ((sp_dma_length & 3) != 0)
 	{
 		//fatalerror("sp_dma (%s): sp_dma_length unaligned %08X\n", cpu ? "RSP" : "R4300i", sp_dma_length);
-		sp_dma_length = sp_dma_length & ~3;
-        //sp_dma_length = (sp_dma_length + 3) & ~3;
+		//sp_dma_length = sp_dma_length & ~3;
+        sp_dma_length = (sp_dma_length + 3) & ~3;
 
 		//sp_dma_length &= ~3;
 	}
@@ -153,23 +152,16 @@ static void sp_dma(int direction)
 	}
 	if (sp_dram_addr & 0x3)
 	{
-        //sp_dram_addr = (sp_dram_addr + 3) & ~3;
-        sp_dram_addr = sp_dram_addr & ~3;
-        // sp_dram_addr &= ~0x3;
-        // fatalerror("sp_dma (%s): sp_dram_addr unaligned: %08X\n", cpu ? "RSP" : "R4300i", sp_dram_addr);
-
-        // Diddy Kong Racing does unaligned DMA?
-        //sp_dram_addr &= ~0x3;
-        //sp_dram_addr = (sp_dram_addr + 3) & ~0x3;
+        sp_dram_addr = sp_dram_addr & ~7;
 	}
 
 	if (sp_dma_count > 0)
 	{
-		fatalerror("sp_dma: dma_count = %d\n", sp_dma_count);
+		// fatalerror("sp_dma: dma_count = %d\n", sp_dma_count);
 	}
 	if (sp_dma_skip > 0)
 	{
-		fatalerror("sp_dma: dma_skip = %d\n", sp_dma_skip);
+		// fatalerror("sp_dma: dma_skip = %d\n", sp_dma_skip);
 	}
 
 	if ((sp_mem_addr & 0xfff) + (sp_dma_length) > 0x1000)
@@ -179,45 +171,39 @@ static void sp_dma(int direction)
 
 	if (direction == 0)		// RDRAM -> I/DMEM
 	{
-		src = (UINT8*)&rdram[sp_dram_addr / 4];
-		dst = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
-
-		//mame_printf_debug("sp_dma: %08X to %08X, length %08X\n", sp_dram_addr, sp_mem_addr, sp_dma_length);
-
-		for (i=0; i < sp_dma_length; i++)
-		{
-			dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(i)];
-		}
-
-		/*dst = (sp_mem_addr & 0x1000) ? (UINT8*)rsp_imem : (UINT8*)rsp_dmem;
-        for (i=0; i <= sp_dma_length; i++)
+        for (c=0; c <= sp_dma_count; c++)
         {
-            dst[BYTE4_XOR_BE(sp_mem_addr+i) & 0xfff] = src[BYTE4_XOR_BE(i)];
-        }*/
+            src = (UINT8*)&rdram[sp_dram_addr / 4];
+            dst = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
 
-        sp_mem_addr += sp_dma_length;
-        sp_dram_addr += sp_dma_length;
+            for (i=0; i < sp_dma_length; i++)
+            {
+                dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(i)];
+            }
+
+            sp_mem_addr += sp_dma_length;
+            sp_dram_addr += sp_dma_length;
+
+            sp_mem_addr += sp_dma_skip;
+        }
 	}
 	else					// I/DMEM -> RDRAM
 	{
-		src = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
-		dst = (UINT8*)&rdram[sp_dram_addr / 4];
-
-//      mame_printf_debug("sp_dma: %08X to %08X, length %08X\n", sp_mem_addr, sp_dram_addr, sp_dma_length);
-
-		for (i=0; i < sp_dma_length; i++)
-		{
-			dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(i)];
-		}
-
-		/*src = (sp_mem_addr & 0x1000) ? (UINT8*)rsp_imem : (UINT8*)rsp_dmem;
-        for (i=0; i <= sp_dma_length; i++)
+        for (c=0; c <= sp_dma_count; c++)
         {
-            dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(sp_mem_addr+i) & 0xfff];
-        }*/
+            src = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
+            dst = (UINT8*)&rdram[sp_dram_addr / 4];
 
-        sp_mem_addr += sp_dma_length;
-        sp_dram_addr += sp_dma_length;
+            for (i=0; i < sp_dma_length; i++)
+            {
+                dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(i)];
+            }
+
+            sp_mem_addr += sp_dma_length;
+            sp_dram_addr += sp_dma_length;
+
+            sp_dram_addr += sp_dma_skip;
+        }
 	}
 }
 
@@ -228,9 +214,9 @@ static void sp_set_status(UINT32 status)
 {
 	if (status & 0x1)
 	{
-		//cpu_trigger(6789);
+		//cpu_trigger(Machine, 6789);
 
-		cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
         cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_HALT);
 		//rsp_sp_status |= SP_STATUS_HALT;
 	}
@@ -282,7 +268,7 @@ READ32_HANDLER( n64_sp_reg_r )
             return 0;
 
         case 0x40000/4:     // PC
-            return cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_PC);
+            return cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_PC) & 0x00000fff;
 
         default:
             logerror("sp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
@@ -330,7 +316,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
                     //  cpu_spinuntil_trigger(6789);
 
                         // printf( "Clearing RSP_STATUS_HALT\n" );
-                        cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
+                        cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
                         cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_HALT );
                         // RSP_STATUS &= ~RSP_STATUS_HALT;
                     //}
@@ -342,7 +328,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 if (data & 0x00000002)      // set halt
                 {
                     // printf( "Setting RSP_STATUS_HALT\n" );
-                    cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+                    cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
                     cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_HALT );
                     // RSP_STATUS |= RSP_STATUS_HALT;
                 }
@@ -370,6 +356,10 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 {
                     //printf( "Setting RSP_STATUS_SSTEP\n" );
                     cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SSTEP );
+                    if( !( cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ( RSP_STATUS_BROKE | RSP_STATUS_HALT ) ) )
+                    {
+                        cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_STEPCNT, 1 );
+                    }
                     // RSP_STATUS |= RSP_STATUS_SSTEP;      // set single step
                 }
                 if (data & 0x00000080)
@@ -575,54 +565,54 @@ const rsp_config n64_rsp_config =
 
 
 // Video Interface
-static UINT32 vi_width;
-UINT32 vi_origin;
-UINT32 vi_control;
-static UINT32 vi_burst, vi_vsync, vi_hsync, vi_leap, vi_hstart, vi_vstart;
-static UINT32 vi_intr, vi_vburst, vi_xscale, vi_yscale;
+UINT32 n64_vi_width;
+UINT32 n64_vi_origin;
+UINT32 n64_vi_control;
+static UINT32 n64_vi_burst, n64_vi_vsync,  n64_vi_hsync,  n64_vi_leap,  n64_vi_hstart, n64_vi_vstart;
+static UINT32 n64_vi_intr,  n64_vi_vburst, n64_vi_xscale, n64_vi_yscale;
 
 READ32_HANDLER( n64_vi_reg_r )
 {
 	switch (offset)
 	{
 		case 0x04/4:		// VI_ORIGIN_REG
-			return vi_origin;
+            return n64_vi_origin;
 
 		case 0x08/4:		// VI_WIDTH_REG
-			return vi_width;
+            return n64_vi_width;
 
 		case 0x0c/4:
-			return vi_intr;
+            return n64_vi_intr;
 
 		case 0x10/4:		// VI_CURRENT_REG
 			return video_screen_get_vpos(0);
 
 		case 0x14/4:		// VI_BURST_REG
-			return vi_burst;
+            return n64_vi_burst;
 
 		case 0x18/4:		// VI_V_SYNC_REG
-			return vi_vsync;
+            return n64_vi_vsync;
 
 		case 0x1c/4:		// VI_H_SYNC_REG
-			return vi_hsync;
+            return n64_vi_hsync;
 
 		case 0x20/4:		// VI_LEAP_REG
-			return vi_leap;
+            return n64_vi_leap;
 
 		case 0x24/4:		// VI_H_START_REG
-			return vi_hstart;
+            return n64_vi_hstart;
 
 		case 0x28/4:		// VI_V_START_REG
-			return vi_vstart;
+            return n64_vi_vstart;
 
 		case 0x2c/4:		// VI_V_BURST_REG
-			return vi_vburst;
+            return n64_vi_vburst;
 
 		case 0x30/4:		// VI_X_SCALE_REG
-			return vi_xscale;
+            return n64_vi_xscale;
 
 		case 0x34/4:		// VI_Y_SCALE_REG
-			return vi_yscale;
+            return n64_vi_yscale;
 
 		default:
 			logerror("vi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
@@ -636,34 +626,34 @@ WRITE32_HANDLER( n64_vi_reg_w )
 	switch (offset)
 	{
 		case 0x00/4:		// VI_CONTROL_REG
-			if ((vi_control & 0x40) != (data & 0x40))
+            if ((n64_vi_control & 0x40) != (data & 0x40))
 			{
 				screen_state *state = &Machine->screen[0];
 				rectangle visarea = state->visarea;
 				visarea.max_y = (data & 0x40) ? 479 : 239;
 				video_screen_configure(0, state->width, visarea.max_y + 1, &visarea, Machine->screen[0].refresh);
 			}
-			vi_control = data;
+            n64_vi_control = data;
 			break;
 
 		case 0x04/4:		// VI_ORIGIN_REG
-			vi_origin = data & 0xffffff;
+            n64_vi_origin = data & 0xffffff;
 			break;
 
 		case 0x08/4:		// VI_WIDTH_REG
-			if (vi_width != data && data > 0)
+            if (n64_vi_width != data && data > 0)
 			{
 				screen_state *state = &Machine->screen[0];
 				rectangle visarea = state->visarea;
 				visarea.max_x = data-1;
 				video_screen_configure(0, visarea.max_x + 1, state->height, &visarea, Machine->screen[0].refresh);
 			}
-			vi_width = data;
-		        fb_width = data;
+            n64_vi_width = data;
+		    fb_width = data;
 			break;
 
 		case 0x0c/4:		// VI_INTR_REG
-			vi_intr = data;
+            n64_vi_intr = data;
 			break;
 
 		case 0x10/4:		// VI_CURRENT_REG
@@ -671,39 +661,39 @@ WRITE32_HANDLER( n64_vi_reg_w )
 			break;
 
 		case 0x14/4:		// VI_BURST_REG
-			vi_burst = data;
+            n64_vi_burst = data;
 			break;
 
 		case 0x18/4:		// VI_V_SYNC_REG
-			vi_vsync = data;
+            n64_vi_vsync = data;
 			break;
 
 		case 0x1c/4:		// VI_H_SYNC_REG
-			vi_hsync = data;
+            n64_vi_hsync = data;
 			break;
 
 		case 0x20/4:		// VI_LEAP_REG
-			vi_leap = data;
+            n64_vi_leap = data;
 			break;
 
 		case 0x24/4:		// VI_H_START_REG
-			vi_hstart = data;
+            n64_vi_hstart = data;
 			break;
 
 		case 0x28/4:		// VI_V_START_REG
-			vi_vstart = data;
+            n64_vi_vstart = data;
 			break;
 
 		case 0x2c/4:		// VI_V_BURST_REG
-			vi_vburst = data;
+            n64_vi_vburst = data;
 			break;
 
 		case 0x30/4:		// VI_X_SCALE_REG
-			vi_xscale = data;
+            n64_vi_xscale = data;
 			break;
 
 		case 0x34/4:		// VI_Y_SCALE_REG
-			vi_yscale = data;
+            n64_vi_yscale = data;
 			break;
 
         /*
@@ -974,10 +964,10 @@ WRITE32_HANDLER( n64_pi_reg_w )
 			int i;
 			UINT32 dma_length = (data + 1);
 
-			/*if (dma_length & 3)
+			if (dma_length & 3)
             {
                 dma_length = (dma_length + 3) & ~3;
-            }*/
+            }
 
 			//mame_printf_debug("PI DMA: %08X to %08X, length %08X\n", pi_cart_addr, pi_dram_addr, dma_length);
 
@@ -1570,7 +1560,7 @@ void n64_machine_reset(void)
 	audio_timer = timer_alloc(audio_timer_callback, NULL);
 	timer_adjust(audio_timer, attotime_never, 0, attotime_never);
 
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
     // bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
     boot_checksum = 0;

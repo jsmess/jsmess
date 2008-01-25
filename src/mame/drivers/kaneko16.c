@@ -103,14 +103,14 @@ MACHINE_RESET( kaneko16 )
 
 static MACHINE_RESET( berlwall )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_sprite_type = 2;	// like type 0, but using 16 instead of 8 bytes
 }
 
 static MACHINE_RESET( blazeon )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_sprite_xoffs = 0x10000 - 0x680;
 	kaneko16_sprite_yoffs = 0x000;
@@ -162,7 +162,7 @@ static MACHINE_RESET( bonkadv )
 
 static MACHINE_RESET( bakubrkr )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_priority.sprite[0] = 8;	// above all
 	kaneko16_priority.sprite[1] = 8;	// above all
@@ -174,7 +174,7 @@ static MACHINE_RESET( bakubrkr )
 
 static MACHINE_RESET( gtmr )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_sprite_type = 1;
 
@@ -186,7 +186,7 @@ static MACHINE_RESET( gtmr )
 
 static MACHINE_RESET( mgcrystl )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 /*
     Sx = Sprites with priority x, x = tiles with priority x,
     Sprites - Tiles Order:
@@ -215,7 +215,7 @@ static MACHINE_RESET( mgcrystl )
 
 static MACHINE_RESET( shogwarr )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	calc3_mcu_init();
 }
@@ -261,7 +261,7 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 	if (ACCESSING_MSB)
 	{
 		soundlatch_w(0, (data & 0xff00) >> 8 );
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1750,9 +1750,9 @@ static INTERRUPT_GEN( kaneko16_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
-		case 2:  cpunum_set_input_line(0, 3, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(0, 4, HOLD_LINE); break;
-		case 0:  cpunum_set_input_line(0, 5, HOLD_LINE); break;
+		case 2:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
+		case 1:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
+		case 0:  cpunum_set_input_line(machine, 0, 5, HOLD_LINE); break;
 	}
 }
 
@@ -2086,9 +2086,9 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
-		case 2:  cpunum_set_input_line(0, 2, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(0, 3, HOLD_LINE); break;
-//      case 0:  cpunum_set_input_line(0, 4, HOLD_LINE); break;
+		case 2:  cpunum_set_input_line(machine, 0, 2, HOLD_LINE); break;
+		case 1:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
+//      case 0:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
 	}
 }
 
@@ -3208,7 +3208,7 @@ ROM_END
 
 static DRIVER_INIT( shogwarr )
 {
-	driver_init_kaneko16(machine);
+	DRIVER_INIT_CALL(kaneko16);
 
 /*
     ROM test at 2237e:

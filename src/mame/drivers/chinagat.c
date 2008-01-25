@@ -85,8 +85,8 @@ WRITE8_HANDLER( ddragon_fgvideoram_w );
 VIDEO_START( chinagat );
 VIDEO_UPDATE( ddragon );
 
-extern int technos_video_hw;
-extern int ddragon_scrollx_hi, ddragon_scrolly_hi;
+extern UINT8 technos_video_hw;
+extern UINT16 ddragon_scrollx_hi, ddragon_scrolly_hi;
 extern UINT8 *ddragon_scrollx_lo;
 extern UINT8 *ddragon_scrolly_lo;
 extern UINT8 *ddragon_bgvideoram,*ddragon_fgvideoram;
@@ -141,13 +141,13 @@ static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 
 static WRITE8_HANDLER( chinagat_sub_IRQ_w )
 {
-	cpunum_set_input_line( 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpunum_set_input_line(Machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static WRITE8_HANDLER( chinagat_cpu_sound_cmd_w )
 {
 	soundlatch_w( offset, data );
-	cpunum_set_input_line( 2, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpunum_set_input_line(Machine, 2, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static READ8_HANDLER( saiyugb1_mcu_command_r )
@@ -457,7 +457,7 @@ static GFXDECODE_START( chinagat )
 GFXDECODE_END
 
 static void chinagat_irq_handler(int irq) {
-	cpunum_set_input_line( 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =
@@ -475,8 +475,8 @@ static const struct MSM5205interface msm5205_interface =
 
 static INTERRUPT_GEN( chinagat_interrupt )
 {
-	cpunum_set_input_line(0, 1, HOLD_LINE);	/* hold the FIRQ line */
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);	/* pulse the NMI line */
+	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	/* hold the FIRQ line */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);	/* pulse the NMI line */
 }
 
 /* This is only on the second bootleg board */
@@ -492,11 +492,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( chinagat )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309,12000000/8)		/* 1.5 MHz (12MHz oscillator ???) */
+	MDRV_CPU_ADD(HD6309,12000000/2)		/* 1.5 MHz (12MHz oscillator ???) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(chinagat_interrupt,1)
 
-	MDRV_CPU_ADD(HD6309,12000000/8)		/* 1.5 MHz (12MHz oscillator ???) */
+	MDRV_CPU_ADD(HD6309,12000000/2)		/* 1.5 MHz (12MHz oscillator ???) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_CPU_ADD(Z80, 3579545)	/* 3.579545 MHz */
@@ -512,7 +512,7 @@ static MACHINE_DRIVER_START( chinagat )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 29*8-1)
 	MDRV_GFXDECODE(chinagat)
 	MDRV_PALETTE_LENGTH(384)
 

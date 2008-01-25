@@ -24,12 +24,12 @@ VIDEO_UPDATE( battlnts );
 static INTERRUPT_GEN( battlnts_interrupt )
 {
 	if (K007342_is_INT_enabled())
-		cpunum_set_input_line(0, HD6309_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(1, 0, HOLD_LINE, 0xff);
+	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )
@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( battlnts_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(K007342_r)			/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_READ(K007420_r)			/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_READ(K007342_scroll_r)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x24ff) AM_READ(paletteram_r)		/* Palette */
+	AM_RANGE(0x2400, 0x24ff) AM_READ(MRA8_RAM)			/* Palette */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ(input_port_0_r) 	/* DIPSW #1 */
 	AM_RANGE(0x2e01, 0x2e01) AM_READ(input_port_4_r) 	/* 2P controls */
 	AM_RANGE(0x2e02, 0x2e02) AM_READ(input_port_3_r) 	/* 1P controls */
@@ -333,7 +333,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( battlnts )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000)		/* ? */
+	MDRV_CPU_ADD(HD6309, 3000000*4)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(battlnts_readmem,battlnts_writemem)
 	MDRV_CPU_VBLANK_INT(battlnts_interrupt,1)
 

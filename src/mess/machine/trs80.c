@@ -614,7 +614,7 @@ INTERRUPT_GEN( trs80_timer_interrupt )
 	if( (irq_status & IRQ_TIMER) == 0 )
 	{
 		irq_status |= IRQ_TIMER;
-		cpunum_set_input_line (0, 0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 	}
 }
 
@@ -623,7 +623,7 @@ INTERRUPT_GEN( trs80_fdc_interrupt )
 	if ((irq_status & IRQ_FDC) == 0)
 	{
 		irq_status |= IRQ_FDC;
-		cpunum_set_input_line (0, 0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 	}
 }
 

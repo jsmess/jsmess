@@ -258,7 +258,7 @@ static TIMER_CALLBACK( PS7500_Timer0_callback )
 	PS7500_IO[IRQSTA]|=0x20;
 	if(PS7500_IO[IRQMSKA]&0x20)
 	{
-		cpunum_set_input_line(0, ARM7_IRQ_LINE, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, ARM7_IRQ_LINE, PULSE_LINE);
 	}
 }
 
@@ -277,7 +277,7 @@ static TIMER_CALLBACK( PS7500_Timer1_callback )
 	PS7500_IO[IRQSTA]|=0x40;
 	if(PS7500_IO[IRQMSKA]&0x40)
 	{
-		cpunum_set_input_line(0, ARM7_IRQ_LINE, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, ARM7_IRQ_LINE, PULSE_LINE);
 	}
 }
 
@@ -295,7 +295,7 @@ static INTERRUPT_GEN( ssfindo_interrupt )
 	PS7500_IO[IRQSTA]|=0x08;
 		if(PS7500_IO[IRQMSKA]&0x08)
 		{
-			cpunum_set_input_line(0, ARM7_IRQ_LINE, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, ARM7_IRQ_LINE, PULSE_LINE);
 		}
 }
 
@@ -624,7 +624,6 @@ static MACHINE_DRIVER_START( ssfindo )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(ssfindo)
 
 MACHINE_DRIVER_END
@@ -647,7 +646,6 @@ static MACHINE_DRIVER_START( ppcar )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(ssfindo)
 MACHINE_DRIVER_END
 

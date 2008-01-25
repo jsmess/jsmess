@@ -72,7 +72,13 @@ enum _sound_type
 	SOUND_NAMCONA,
 	SOUND_TMS36XX,
 	SOUND_TMS3615,
+	SOUND_TMS5100,
 	SOUND_TMS5110,
+	SOUND_TMS5110A,
+	SOUND_CD2801,
+	SOUND_TMC0281,
+	SOUND_CD2802,
+	SOUND_M58817,
 	SOUND_TMC0285,
 	SOUND_TMS5200,
 	SOUND_TMS5220,
@@ -82,6 +88,8 @@ enum _sound_type
 	SOUND_MSM5232,
 	SOUND_UPD7759,
 	SOUND_HC55516,
+	SOUND_MC3417,
+	SOUND_MC3418,
 	SOUND_K005289,
 	SOUND_K007232,
 	SOUND_K051649,
@@ -282,6 +290,7 @@ void sndintrf_register_token(void *token);
 int sndti_exists(sound_type sndtype, int sndindex);
 int sndti_to_sndnum(sound_type type, int index);
 sound_type sndnum_to_sndti(int sndnum, int *index);
+int sndtype_count(sound_type sndtype);
 
 
 #endif	/* __SNDINTRF_H__ */

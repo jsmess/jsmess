@@ -317,7 +317,7 @@ MACHINE_START( cgenie )
 	 * Every fifth cycle is a wait cycle, so I reduced
 	 * the overlocking by one fitfth
 	 */
-	cpunum_set_clockscale(0, 0.80);
+	cpunum_set_clockscale(Machine, 0, 0.80);
 
 	/* Initialize some patterns to be displayed in graphics mode */
 	for( i = 0; i < 256; i++ )
@@ -970,7 +970,7 @@ INTERRUPT_GEN( cgenie_timer_interrupt )
 	if( (irq_status & IRQ_TIMER) == 0 )
 	{
 		irq_status |= IRQ_TIMER;
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 }
 
@@ -979,7 +979,7 @@ static INTERRUPT_GEN( cgenie_fdc_interrupt )
 	if( (irq_status & IRQ_FDC) == 0 )
 	{
 		irq_status |= IRQ_FDC;
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 }
 

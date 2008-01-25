@@ -190,9 +190,9 @@ static INTERRUPT_GEN( interrupt_A )
 {
 	switch ( cpu_getiloops() )
 	{
-		case 0:		cpunum_set_input_line(0, 3, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(0, 2, HOLD_LINE);	break;
-		case 2:		cpunum_set_input_line(0, 1, HOLD_LINE);	break;
+		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
+		case 1:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
+		case 2:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
 	}
 }
 
@@ -200,9 +200,9 @@ static INTERRUPT_GEN( interrupt_A_iganinju )
 {
 	switch ( cpu_getiloops() )
 	{
-		case 0:		cpunum_set_input_line(0, 2, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(0, 1, HOLD_LINE);	break;
-	//  case 2:     cpunum_set_input_line(0, 1, HOLD_LINE); break;
+		case 0:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
+		case 1:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+	//  case 2:     cpunum_set_input_line(machine, 0, 1, HOLD_LINE); break;
 	}
 }
 
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( readmem_A, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080006, 0x080007) AM_READ(dsw_r)
 	AM_RANGE(0x080008, 0x080009) AM_READ(soundlatch2_word_r)	/* from sound cpu */
 	AM_RANGE(0x084000, 0x084fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x088000, 0x0887ff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x088000, 0x0887ff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x08e000, 0x08ffff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x090000, 0x093fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x094000, 0x097fff) AM_READ(MRA16_RAM)
@@ -249,9 +249,9 @@ static INTERRUPT_GEN( interrupt_B )
 {
 	switch (cpu_getiloops())
 	{
-		case 0:		cpunum_set_input_line(0, 4, HOLD_LINE); break;
-		case 1:		cpunum_set_input_line(0, 1, HOLD_LINE); break;
-		default:	cpunum_set_input_line(0, 2, HOLD_LINE); break;
+		case 0:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
+		case 1:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE); break;
+		default:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE); break;
 	}
 }
 
@@ -298,7 +298,7 @@ static READ16_HANDLER( ip_select_r )
 static WRITE16_HANDLER( ip_select_w )
 {
 	COMBINE_DATA(&ip_select);
-	cpunum_set_input_line(0,2,HOLD_LINE);
+	cpunum_set_input_line(Machine, 0,2,HOLD_LINE);
 }
 
 
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( readmem_B, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(20) )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
 	AM_RANGE(0x044000, 0x044fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x048000, 0x0487ff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x048000, 0x0487ff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x04e000, 0x04ffff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x050000, 0x053fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x054000, 0x057fff) AM_READ(MRA16_RAM)
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( readmem_C, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e3fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x0f8000, 0x0f87ff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x0d8000, 0x0d8001) AM_READ(ip_select_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_READ(MRA16_RAM)
 ADDRESS_MAP_END
@@ -376,7 +376,7 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_D		1
 static INTERRUPT_GEN( interrupt_D )
 {
-	cpunum_set_input_line(0, 2, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( readmem_D, ADDRESS_SPACE_PROGRAM, 16 )
@@ -385,8 +385,7 @@ static ADDRESS_MAP_START( readmem_D, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0ca000, 0x0cbfff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x0d4000, 0x0d7fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0d8000, 0x0d87ff) AM_READ(paletteram16_word_r)
-	AM_RANGE(0x0db000, 0x0db7ff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_READ(MRA16_RAM)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(dsw_r)
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(coins_r) /* Coins + P1&P2 Buttons */
@@ -401,8 +400,7 @@ static ADDRESS_MAP_START( writemem_D, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0ca000, 0x0cbfff) AM_WRITE(MWA16_RAM) AM_BASE(&megasys1_objectram)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_WRITE(megasys1_scrollram_1_w) AM_BASE(&megasys1_scrollram[1])
 	AM_RANGE(0x0d4000, 0x0d7fff) AM_WRITE(megasys1_scrollram_2_w) AM_BASE(&megasys1_scrollram[2])
-	AM_RANGE(0x0d8000, 0x0d87ff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w)
-	AM_RANGE(0x0db000, 0x0db7ff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_WRITE(megasys1_scrollram_0_w) AM_BASE(&megasys1_scrollram[0])
 	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(OKIM6295_data_0_lsb_w)
 //  { 0x100000, 0x100001  protection
@@ -474,7 +472,7 @@ ADDRESS_MAP_END
 static void megasys1_sound_irq(int irq)
 {
 	if (irq)
-		cpunum_set_input_line(1, 4, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, 4, HOLD_LINE);
 }
 
 static READ16_HANDLER( oki_status_0_r )
@@ -810,7 +808,7 @@ MACHINE_DRIVER_END
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2969,7 +2967,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 		}
 	}
 
-	cpunum_set_input_line(0,4,HOLD_LINE);
+	cpunum_set_input_line(Machine, 0,4,HOLD_LINE);
 }
 
 

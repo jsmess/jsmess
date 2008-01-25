@@ -326,7 +326,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 		case 0x00:	/* IRQON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(0, 0, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -347,11 +347,11 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x04:	/* RESB */
-			cpunum_set_input_line(1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cpunum_set_input_line(2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
@@ -372,7 +372,7 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 
 	cpu_interrupt_enable(which,data);
 	if (!data)
-		cpunum_set_input_line(which, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, which, 0, CLEAR_LINE);
 }
 
 
@@ -1695,7 +1695,7 @@ static DRIVER_INIT( polepos2 )
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
 	memory_install_read16_handler(1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
 
-	driver_init_polepos(machine);
+	DRIVER_INIT_CALL(polepos);
 }
 
 

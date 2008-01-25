@@ -205,7 +205,7 @@ static const ppi8255_interface single_ppi_intf =
 static void system16a_generic_init(running_machine *machine)
 {
 	/* call the generic init */
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 
 	/* init the FD1094 */
 	fd1094_driver_init(NULL);
@@ -367,7 +367,7 @@ static WRITE8_HANDLER( tilemap_sound_w )
              0= Sound is disabled
              1= sound is enabled
     */
-	cpunum_set_input_line(1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 }
@@ -419,8 +419,8 @@ static WRITE8_HANDLER( n7751_control_w )
         D1 = /RESET line on 7751
         D0 = /IRQ line on 7751
     */
-	cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(2, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
@@ -497,7 +497,7 @@ static void bodyslam_i8751_sim(void)
 	UINT8 min = workram[0x202/2] & 0xff;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(0, 4, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
 
 	/* out of time? set the flag */
 	if (tick == 0 && sec == 0 && min == 0)
@@ -537,7 +537,7 @@ static void bodyslam_i8751_sim(void)
 static void quartet_i8751_sim(void)
 {
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(0, 4, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
 
 	/* X scroll values */
 	segaic16_textram_0_w(0xff8/2, workram[0x0d14/2], 0);
@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( system16a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_READWRITE(MRA16_RAM, segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
 	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_READWRITE(MRA16_RAM, segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
 	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_READWRITE(paletteram16_word_r, segaic16_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_READWRITE(MRA16_RAM, segaic16_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
 	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE(&workram)

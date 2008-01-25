@@ -102,7 +102,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	r.min_y = r.max_y = video_screen_get_vpos(0);
 	fillbitmap(bitmap, machine->pens[1], &r);
 	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(0), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == machine->screen[0].height)
 		ula_scanline_count = 0;
 }
@@ -121,7 +121,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 		ula_irq_active = 0;
 		if (++ula_scancode_count == 8)
 			ula_scancode_count = 0;
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 		if (++ula_scanline_count == machine->screen[0].height)
 			ula_scanline_count = 0;
 	}

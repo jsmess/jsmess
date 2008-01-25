@@ -126,23 +126,23 @@ static const UINT8 ws_fake_bios_code[] = {
 
 static void wswan_handle_irqs( void ) {
 	if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR ) {
-		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_HBLTMR );
+		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_HBLTMR );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_VBL ) {
-		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBL );
+		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBL );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR ) {
-		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBLTMR );
+		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBLTMR );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_LCMP ) {
-		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_LCMP );
+		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_LCMP );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_SRX ) {
-		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_SRX );
+		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_SRX );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_RTC ) {
-		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_RTC );
+		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_RTC );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_KEY ) {
-		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_KEY );
+		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_KEY );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_STX ) {
-		cpunum_set_input_line_and_vector( 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_STX );
+		cpunum_set_input_line_and_vector( Machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_STX );
 	} else {
-		cpunum_set_input_line( 0, 0, CLEAR_LINE );
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE );
 	}
 }
 

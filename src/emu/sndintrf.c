@@ -50,8 +50,8 @@ typedef struct _sndintrf_data sndintrf_data;
 struct _sndintrf_data
 {
 	sound_interface	intf;	 		/* copy of the interface data */
-	sound_type			sndtype; 		/* type index of this sound chip */
-	sound_type			aliastype;		/* aliased type index of this sound chip */
+	sound_type		sndtype; 		/* type index of this sound chip */
+	sound_type		aliastype;		/* aliased type index of this sound chip */
 	int				index; 			/* index of this sound chip */
 	int				clock; 			/* clock for this sound chip */
 	void *			token;			/* dynamically allocated token data */
@@ -107,7 +107,13 @@ void namco_63701x_get_info(void *token, UINT32 state, sndinfo *info);
 void namcona_get_info(void *token, UINT32 state, sndinfo *info);
 void tms36xx_get_info(void *token, UINT32 state, sndinfo *info);
 void tms3615_get_info(void *token, UINT32 state, sndinfo *info);
+void tms5100_get_info(void *token, UINT32 state, sndinfo *info);
 void tms5110_get_info(void *token, UINT32 state, sndinfo *info);
+void tms5110a_get_info(void *token, UINT32 state, sndinfo *info);
+void cd2801_get_info(void *token, UINT32 state, sndinfo *info);
+void tmc0281_get_info(void *token, UINT32 state, sndinfo *info);
+void cd2802_get_info(void *token, UINT32 state, sndinfo *info);
+void m58817_get_info(void *token, UINT32 state, sndinfo *info);
 void tmc0285_get_info(void *token, UINT32 state, sndinfo *info);
 void tms5200_get_info(void *token, UINT32 state, sndinfo *info);
 void tms5220_get_info(void *token, UINT32 state, sndinfo *info);
@@ -118,6 +124,8 @@ void msm5205_get_info(void *token, UINT32 state, sndinfo *info);
 void msm5232_get_info(void *token, UINT32 state, sndinfo *info);
 void upd7759_get_info(void *token, UINT32 state, sndinfo *info);
 void hc55516_get_info(void *token, UINT32 state, sndinfo *info);
+void mc3417_get_info(void *token, UINT32 state, sndinfo *info);
+void mc3418_get_info(void *token, UINT32 state, sndinfo *info);
 void k005289_get_info(void *token, UINT32 state, sndinfo *info);
 void k007232_get_info(void *token, UINT32 state, sndinfo *info);
 void k051649_get_info(void *token, UINT32 state, sndinfo *info);
@@ -177,7 +185,7 @@ static sound_interface sndintrf[SOUND_COUNT];
 static const struct
 {
 	sound_type	sndtype;
-	void	(*get_info)(void *token, UINT32 state, sndinfo *info);
+	void		(*get_info)(void *token, UINT32 state, sndinfo *info);
 } sndintrf_map[] =
 {
 	{ SOUND_DUMMY, dummy_sound_get_info },
@@ -286,11 +294,26 @@ static const struct
 #if (HAS_TMS3615)
 	{ SOUND_TMS3615, tms3615_get_info },
 #endif
+#if (HAS_TMS5100)
+	{ SOUND_TMS5100, tms5100_get_info },
+#endif
 #if (HAS_TMS5110)
 	{ SOUND_TMS5110, tms5110_get_info },
 #endif
-#if (HAS_TMC0285)
-	{ SOUND_TMC0285, tmc0285_get_info },
+#if (HAS_TMS5110A)
+	{ SOUND_TMS5110A, tms5110a_get_info },
+#endif
+#if (HAS_CD2801)
+	{ SOUND_CD2801, cd2801_get_info },
+#endif
+#if (HAS_TMC0281)
+	{ SOUND_TMC0281, tmc0281_get_info },
+#endif
+#if (HAS_CD2802)
+	{ SOUND_CD2802, cd2802_get_info },
+#endif
+#if (HAS_M58817)
+	{ SOUND_M58817, m58817_get_info },
 #endif
 #if (HAS_TMS5200)
 	{ SOUND_TMS5200, tms5200_get_info },
@@ -315,6 +338,8 @@ static const struct
 #endif
 #if (HAS_HC55516)
 	{ SOUND_HC55516, hc55516_get_info },
+	{ SOUND_MC3417, mc3417_get_info },
+	{ SOUND_MC3418, mc3418_get_info },
 #endif
 #if (HAS_K005289)
 	{ SOUND_K005289, k005289_get_info },
@@ -645,6 +670,24 @@ sound_type sndnum_to_sndti(int sndnum, int *index)
 	if (index != NULL)
 		*index = sound[sndnum].index;
 	return sound[sndnum].aliastype;
+}
+
+
+/*-------------------------------------------------
+    sndtype_count - count the number of a
+    given type
+-------------------------------------------------*/
+
+int sndtype_count(sound_type sndtype)
+{
+	int index;
+	int count = 0;
+
+	for (index = 0; index < totalsnd; index++)
+		if (sound[index].sndtype == sndtype)
+			count++;
+
+	return count;
 }
 
 
