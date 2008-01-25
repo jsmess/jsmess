@@ -305,6 +305,6 @@ MACHINE_RESET( sym1 )
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
 	   so that the CPU can find its reset vectors */
 	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
-			0xf800, 0xffff, 0, 0, MRA8_BANK1, MWA8_ROM);
+			0xf800, 0xffff, 0, 0, MRA8_BANK1, MWA8_NOP);
 	memory_set_bankptr(1, sym1_monitor + 0x800);
 }
