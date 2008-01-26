@@ -31,6 +31,7 @@ WRITE8_HANDLER ( cgenie_psg_port_a_w );
 WRITE8_HANDLER ( cgenie_psg_port_b_w );
 
 MACHINE_START( cgenie );
+MACHINE_RESET( cgenie );
 
 READ8_HANDLER ( cgenie_colorram_r );
 READ8_HANDLER ( cgenie_fontram_r );

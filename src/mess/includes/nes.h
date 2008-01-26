@@ -88,6 +88,7 @@ DEVICE_LOAD(nes_disk);
 DEVICE_UNLOAD(nes_disk);
 
 MACHINE_START( nes );
+MACHINE_RESET( nes );
 
 READ8_HANDLER( nes_IN0_r );
 READ8_HANDLER( nes_IN1_r );

@@ -470,5 +470,6 @@ VIDEO_START( raaspec )
 	z_factor = 2;
 
 	raaspec_led_w (0, 0xff);
-	video_start_vector(machine);
+
+	VIDEO_START_CALL(vector);
 }

@@ -48,6 +48,7 @@ MACHINE_START( dgnalpha );
 MACHINE_START( coco );
 MACHINE_START( coco2 );
 MACHINE_START( coco3 );
+MACHINE_RESET( coco3 );
 
 DEVICE_LOAD(coco_rom);
 DEVICE_LOAD(coco3_rom);

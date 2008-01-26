@@ -405,6 +405,7 @@ static MACHINE_DRIVER_START(pdp1)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_START( pdp1 )
+	MDRV_MACHINE_RESET( pdp1 )
 
 	/* video hardware (includes the control panel and typewriter output) */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

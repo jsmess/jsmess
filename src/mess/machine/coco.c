@@ -2987,7 +2987,7 @@ MACHINE_START( coco2 )
 	generic_coco12_dragon_init(machine, &init);
 }
 
-static void coco3_machine_reset(running_machine *machine)
+MACHINE_RESET( coco3 )
 {
 	int i;
 
@@ -3048,9 +3048,6 @@ MACHINE_START( coco3 )
 	state_save_register_func_postload(coco3_state_postload);
 
 	video_crosshair_set_screenmask_callback(machine, crosshairs_get_screen);
-
-	/* add reset callback */
-	add_reset_callback(machine, coco3_machine_reset);
 }
 
 /***************************************************************************

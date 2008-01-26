@@ -398,7 +398,7 @@ static OPBASE_HANDLER( avigo_opbase_handler )
 	return address;
 }
 
-static void avigo_machine_reset(running_machine *machine)
+static MACHINE_RESET( avigo )
 {
 	int i;
 	unsigned char *addr;
@@ -456,8 +456,6 @@ static MACHINE_START( avigo )
 	/* a timer used to check status of pen */
 	/* an interrupt is generated when the pen is pressed to the screen */
 	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, avigo_dummy_timer_callback);
-
-	add_reset_callback(machine, avigo_machine_reset);
 }
 
 
@@ -872,6 +870,7 @@ static MACHINE_DRIVER_START( avigo )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( avigo )
+	MDRV_MACHINE_RESET( avigo )
 	MDRV_NVRAM_HANDLER( avigo )
 
     /* video hardware */

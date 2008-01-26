@@ -147,7 +147,7 @@ static OPBASE_HANDLER(setOPbasefunc)
 }
 
 
-static void tx0_machine_reset(running_machine *machine)
+MACHINE_RESET( tx0 )
 {
 	/* reset device state */
 	tape_reader.rcl = tape_reader.rc = 0;
@@ -171,7 +171,6 @@ MACHINE_START( tx0 )
 	typewriter.prt_timer = timer_alloc(prt_callback, NULL);
 	dis_timer = timer_alloc(dis_callback, NULL);
 
-	add_reset_callback(machine, tx0_machine_reset);
 	add_exit_callback(machine, tx0_machine_stop);
 }
 

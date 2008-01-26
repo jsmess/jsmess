@@ -749,6 +749,7 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_CPU_PROGRAM_MAP(coco3_map, 0)
 
 	MDRV_MACHINE_START( coco3 )
+	MDRV_MACHINE_RESET( coco3 )
 
 	/* video hardware */
 	MDRV_VIDEO_START(coco3)

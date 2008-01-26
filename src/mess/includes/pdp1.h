@@ -125,6 +125,8 @@ extern pdp1_reset_param_t pdp1_reset_param;
 extern int *pdp1_memory;
 
 MACHINE_START( pdp1 );
+MACHINE_RESET( pdp1 );
+
 READ18_HANDLER ( pdp1_read_mem );
 WRITE18_HANDLER ( pdp1_write_mem );
 

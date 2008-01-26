@@ -380,6 +380,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_INTERLEAVE(4)
 
 	MDRV_MACHINE_START( cgenie )
+	MDRV_MACHINE_RESET( cgenie )
 
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

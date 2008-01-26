@@ -168,16 +168,14 @@ static MACHINE_START( vip )
 
 static MACHINE_RESET( vip )
 {
-	machine_reset_cdp1861(machine);
+	MACHINE_RESET_CALL(cdp1861);
 	memory_set_bank(1, 1);
 }
 
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( vip )
-
-	// basic machine hardware
-
+	/* basic machine hardware */
 	MDRV_CPU_ADD(CDP1802, XTAL/2)
 	MDRV_CPU_PROGRAM_MAP(vip_map, 0)
 	MDRV_CPU_IO_MAP(vip_io_map, 0)
@@ -186,8 +184,7 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_MACHINE_START(vip)
 	MDRV_MACHINE_RESET(vip)
 
-    // video hardware
-
+    /* video hardware */
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
@@ -197,8 +194,7 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_VIDEO_START(cdp1861)
 	MDRV_VIDEO_UPDATE(cdp1861)
 
-	// sound hardware
-
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

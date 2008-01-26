@@ -282,7 +282,7 @@ DEVICE_LOAD( trs80_floppy )
 
 static void trs80_fdc_callback(wd17xx_state_t event, void *param);
 
-static void trs80_machine_reset(running_machine *machine)
+MACHINE_RESET( trs80 )
 {
 	if (cas_size)
 	{
@@ -325,7 +325,6 @@ DRIVER_INIT( trs80 )
 MACHINE_START( trs80 )
 {
 	wd17xx_init(WD_TYPE_179X,trs80_fdc_callback, NULL);
-	add_reset_callback(machine, trs80_machine_reset);
 	add_exit_callback(machine, tape_put_close);
 }
 

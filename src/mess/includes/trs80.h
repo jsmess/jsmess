@@ -24,6 +24,7 @@ DEVICE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
 
 MACHINE_START( trs80 );
+MACHINE_RESET( trs80 );
 DRIVER_INIT( trs80 );
 
 WRITE8_HANDLER ( trs80_port_ff_w );

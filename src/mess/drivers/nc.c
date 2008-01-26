@@ -948,7 +948,7 @@ static const CENTRONICS_CONFIG nc100_cent_config[1]={
 	},
 };
 
-static void nc100_machine_reset(running_machine *machine)
+static MACHINE_RESET( nc100 )
 {
     /* 256k of rom */
     nc_membank_rom_mask = 0x0f;
@@ -990,7 +990,6 @@ static MACHINE_START( nc100 )
 {
     nc_type = NC_TYPE_1xx;
 
-	add_reset_callback(machine, nc100_machine_reset);
 	add_exit_callback(machine, nc100_machine_stop);
 }
 
@@ -1338,7 +1337,7 @@ static void nc200_floppy_drive_index_callback(int drive_id)
 }
 #endif
 
-static void nc200_machine_reset(running_machine *machine)
+static MACHINE_RESET( nc200 )
 {
 	/* 512k of rom */
 	nc_membank_rom_mask = 0x1f;
@@ -1392,7 +1391,6 @@ static MACHINE_START( nc200 )
 {
     nc_type = NC_TYPE_200;
 
-	add_reset_callback(machine, nc200_machine_reset);
 	add_exit_callback(machine, nc200_machine_stop);
 }
 
@@ -1667,6 +1665,7 @@ static MACHINE_DRIVER_START( nc100 )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( nc100 )
+	MDRV_MACHINE_RESET( nc100 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1695,6 +1694,7 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_CPU_IO_MAP(nc200_io, 0)
 
 	MDRV_MACHINE_START( nc200 )
+	MDRV_MACHINE_RESET( nc200 )
 
 	/* video hardware */
 	MDRV_SCREEN_SIZE(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT)

@@ -213,7 +213,7 @@ static OPBASE_HANDLER (opbaseoverride)
 
 static void cgenie_fdc_callback(wd17xx_state_t event, void *param);
 
-static void cgenie_machine_reset(running_machine *machine)
+MACHINE_RESET( cgenie )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 
@@ -332,7 +332,6 @@ MACHINE_START( cgenie )
 	/* set up FDC */
 	wd17xx_init(WD_TYPE_179X, cgenie_fdc_callback, NULL);
 
-	add_reset_callback(machine, cgenie_machine_reset);
 	add_exit_callback(machine, tape_put_close);
 }
 

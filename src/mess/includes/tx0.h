@@ -15,6 +15,8 @@
 /*----------- defined in machine/tx0.c -----------*/
 
 MACHINE_START( tx0 );
+MACHINE_RESET( tx0 );
+
 void tx0_tape_get_open_mode(const struct IODevice *dev, int id,
 	unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
 DEVICE_INIT( tx0_tape );

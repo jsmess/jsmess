@@ -168,7 +168,7 @@ int nes_ppu_vidaccess( int num, int address, int data )
 	return data;
 }
 
-static void nes_machine_reset(running_machine *machine)
+MACHINE_RESET( nes )
 {
 	/* Some carts have extra RAM and require it on at startup, e.g. Metroid */
 	nes.mid_ram_enable = 1;
@@ -184,7 +184,6 @@ static void nes_machine_reset(running_machine *machine)
 MACHINE_START( nes )
 {
 	init_nes_core();
-	add_reset_callback(machine, nes_machine_reset);
 	add_exit_callback(machine, nes_machine_stop);
 
 	if ((!image_exists(image_from_devtype_and_index(IO_CARTSLOT, 0))) && (!image_exists(image_from_devtype_and_index(IO_FLOPPY, 0))))

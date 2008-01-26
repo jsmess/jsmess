@@ -155,7 +155,7 @@ static OPBASE_HANDLER(setOPbasefunc)
 }
 
 
-static void pdp1_machine_reset(running_machine *machine)
+MACHINE_RESET( pdp1 )
 {
 	int config;
 
@@ -330,7 +330,6 @@ MACHINE_START( pdp1 )
 
 	memory_set_opbase_handler(0, setOPbasefunc);
 
-	add_reset_callback(machine, pdp1_machine_reset);
 	add_exit_callback(machine, pdp1_machine_stop);
 }
 
