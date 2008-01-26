@@ -72,7 +72,7 @@ void tx0_plot(int x, int y)
 */
 VIDEO_UPDATE( tx0 )
 {
-	video_update_crt(bitmap);
+	VIDEO_UPDATE_CALL(crt);
 
 	tx0_draw_panel(panel_bitmap);
 	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);

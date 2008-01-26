@@ -135,11 +135,11 @@ VIDEO_EOF( crt )
 
 
 /*
-	video_update_crt
+	VIDEO_UPDATE( crt )
 
 	update the bitmap
 */
-void video_update_crt(mame_bitmap *bitmap)
+VIDEO_UPDATE( crt )
 {
 	int i, p_i;
 	int y;
@@ -170,8 +170,8 @@ void video_update_crt(mame_bitmap *bitmap)
 				}
 
 				/* draw pixel on screen */
-				//plot_pixel(bitmap, x, y+crt_window_offset_y, Machine->pens[node->intensity]);
-				line[x] = Machine->pens[node->intensity];
+				//plot_pixel(bitmap, x, y+crt_window_offset_y, machine->pens[node->intensity]);
+				line[x] = machine->pens[node->intensity];
 
 				if (node->intensity != 0)
 					p_i = i;	/* current node will be next iteration's previous node */
@@ -188,4 +188,6 @@ void video_update_crt(mame_bitmap *bitmap)
 
 		decay_counter = 0;
 	}
+
+	return 0;
 }

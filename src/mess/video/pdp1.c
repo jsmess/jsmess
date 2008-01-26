@@ -88,7 +88,7 @@ void pdp1_plot(int x, int y)
 VIDEO_UPDATE( pdp1 )
 {
 	pdp1_erase_lightpen(bitmap);
-	video_update_crt(bitmap);
+	VIDEO_UPDATE_CALL(crt);
 	pdp1_draw_lightpen(bitmap);
 
 	pdp1_draw_panel(panel_bitmap);
