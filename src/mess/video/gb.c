@@ -54,9 +54,7 @@ static UINT8 gb_spal0[4];	/* Sprite 0 palette		*/
 static UINT8 gb_spal1[4];	/* Sprite 1 palette		*/
 static UINT8 *gb_oam;
 UINT8 *gb_vram;
-static double lcd_time;
 static UINT8 *gb_vram_ptr;
-static int gbc_hdma_enabled;
 static UINT8	*gb_chrgen;	/* Character generator           */
 static UINT8	*gb_bgdtab;	/* Background character table    */
 static UINT8	*gb_wndtab;	/* Window character table        */
@@ -100,6 +98,8 @@ static struct gb_lcd_struct {
 	int oam_locked;
 	int vram_locked;
 	int pal_locked;
+	int hdma_enabled;
+	int hdma_possible;
 	struct layer_struct	layer[2];
 	emu_timer	*lcd_timer;
 } gb_lcd;
@@ -1124,7 +1124,6 @@ enum {
 	GB_LCD_STATE_LYXX_PRE_M0,
 	GB_LCD_STATE_LYXX_M0,
 	GB_LCD_STATE_LYXX_M0_SCX3,
-	GB_LCD_STATE_LYXX_M0_HDMA,
 	GB_LCD_STATE_LYXX_M0_GBC_PAL,
 	GB_LCD_STATE_LYXX_M0_PRE_INC,
 	GB_LCD_STATE_LYXX_M0_INC,
@@ -1259,7 +1258,8 @@ void gb_video_init( int mode ) {
 		gbc_bgdtab = gbc_wndtab = gb_vram + 0x3C00;
 
 		/* HDMA disabled */
-		gbc_hdma_enabled = 0;
+		gb_lcd.hdma_enabled = 0;
+		gb_lcd.hdma_possible = 0;
 
 		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
 		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
@@ -1296,9 +1296,9 @@ static void gbc_hdma(UINT16 length) {
 	HDMA3 = 0x1f & (dst >> 8);
 	HDMA4 = dst & 0xF0;
 	HDMA5--;
-	if( (HDMA5 & 0x7f) == 0 ) {
+	if( (HDMA5 & 0x7f) == 0x7f ) {
 		HDMA5 = 0xff;
-		gbc_hdma_enabled = 0;
+		gb_lcd.hdma_enabled = 0;
 	}
 }
 
@@ -1600,10 +1600,13 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			break;
 		case GB_LCD_STATE_LYXX_M0_GBC_PAL:
 			gb_lcd.pal_locked = UNLOCKED;
-		case GB_LCD_STATE_LYXX_M0_HDMA:
-			/* Check for HBLANK DMA */
-			if( gbc_hdma_enabled )
+            /* Check for HBLANK DMA */
+			if( gb_lcd.hdma_enabled ) {
 				gbc_hdma(0x10);
+//				cpunum_set_reg( 0, Z80GB_DMA_CYCLES, 36 );
+			} else {
+				gb_lcd.hdma_possible = 1;
+			}
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(192 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
@@ -1631,6 +1634,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
 				cpunum_set_input_line(machine, 0, LCD_INT, HOLD_LINE );
 			}
+			gb_lcd.hdma_possible = 0;
 			/* Check if we're going into VBlank next */
 			if ( CURLINE == 144 ) {
 				timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1, attotime_never );
@@ -2047,24 +2051,31 @@ WRITE8_HANDLER ( gbc_video_w ) {
 	case 0x15:      /* HDMA5 - HBL General DMA - Mode, Length */
 		if( !(data & 0x80) )
 		{
-			if( gbc_hdma_enabled )
+			if( gb_lcd.hdma_enabled )
 			{
-				gbc_hdma_enabled = 0;
+				gb_lcd.hdma_enabled = 0;
 				data = HDMA5 & 0x80;
 			}
 			else
 			{
 				/* General DMA */
 				gbc_hdma( ((data & 0x7F) + 1) * 0x10 );
-				lcd_time -= ((KEY1 & 0x80)?110:220) + (((data & 0x7F) + 1) * 7.68);
+//				cpunum_set_reg( 0, Z80GB_DMA_CYCLES, 4 + ( ( ( data & 0x7F ) + 1 ) * 32 ) );
 				data = 0xff;
 			}
 		}
 		else
 		{
 			/* H-Blank DMA */
-			gbc_hdma_enabled = 1;
+			gb_lcd.hdma_enabled = 1;
 			data &= 0x7f;
+			gb_vid_regs[offset] = data;
+			/* Check if HDMA should be immediately performed */
+			if ( gb_lcd.hdma_possible ) {
+				gbc_hdma( 0x10 );
+//				cpunum_set_reg( 0, Z80GB_DMA_CYCLES, 36 );
+				gb_lcd.hdma_possible = 0;
+			}
 		}
 		break;
 	case 0x28:      /* BCPS - Background palette specification */
