@@ -168,8 +168,10 @@ DRIVER_INIT( galaxy )
 MACHINE_RESET( galaxy )
 {
 	/* ROM 2 enable/disable */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, readinputport(7) ? MRA8_ROM : MRA8_NOP);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, readinputport(7) ? MWA8_ROM : MWA8_NOP);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, readinputport(7) ? MRA8_BANK10 : MRA8_NOP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MWA8_NOP);
+	if (readinputport(7))
+		memory_set_bankptr(10, memory_region(REGION_CPU1) + 0x1000);
 
 	cpunum_set_irq_callback(0, galaxy_irq_callback);
 
