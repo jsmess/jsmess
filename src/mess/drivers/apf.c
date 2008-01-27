@@ -9,6 +9,7 @@
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
+#include "devices/cartslot.h"
 #include "formats/apf_apt.h"
 #include "sound/speaker.h"
 
@@ -37,7 +38,18 @@ static unsigned char pad_data;
 
 static  READ8_HANDLER(apf_m1000_pia_in_a_func)
 {
-	return pad_data;
+
+  UINT8 data=~0;
+  if (!(pad_data & 0x08))
+    data &= readinputportbytag("joy3");
+  if (!(pad_data & 0x04))
+    data &= readinputportbytag("joy2");
+  if (!(pad_data & 0x02))
+    data &= readinputportbytag("joy1");
+  if (!(pad_data & 0x01))
+    data &= readinputportbytag("joy0");
+
+	return data;
 }
 
 static  READ8_HANDLER(apf_m1000_pia_in_b_func)
@@ -74,18 +86,10 @@ static unsigned char previous_mode;
 
 static WRITE8_HANDLER(apf_m1000_pia_out_b_func)
 {
-	pad_data = 0x0ff;
+	pad_data = data;
 
 	/* bit 7..4 video control */
 	/* bit 3..0 keypad line select */
-	if (data & 0x08)
-		pad_data &= readinputportbytag("joy3");
-	if (data & 0x04)
-		pad_data &= readinputportbytag("joy2");
-	if (data & 0x02)
-		pad_data &= readinputportbytag("joy1");
-	if (data & 0x01)
-		pad_data &= readinputportbytag("joy0");
 
 	/* 1b standard, 5b, db */
 	/* 0001 */
@@ -135,7 +139,7 @@ static void	apf_m1000_irq_a_func(int state)
 {
 	if (state)
 	{
-		apf_ints|=1;
+	  	apf_ints|=1;
 	}
 	else
 	{
@@ -152,7 +156,7 @@ static void	apf_m1000_irq_b_func(int state)
 
 	if (state)
 	{
-		apf_ints|=2;
+	  	apf_ints|=2;
 	}
 	else
 	{
@@ -410,7 +414,7 @@ static ADDRESS_MAP_START(apf_m1000_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x02000, 0x03fff) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION(REGION_CPU1, 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM
-	AM_RANGE( 0x08000, 0x09fff) AM_ROM
+	AM_RANGE( 0x08000, 0x09fff) AM_ROM AM_REGION(REGION_CPU1, 0x8000)
 	AM_RANGE( 0x0a000, 0x0dfff) AM_RAM
 	AM_RANGE( 0x0e000, 0x0e7ff) AM_ROM AM_REGION(REGION_CPU1, 0x10000) AM_MIRROR(0x1800)
 ADDRESS_MAP_END
@@ -461,49 +465,53 @@ static INPUT_PORTS_START( apf_m1000 )
 
     */
 
+/*
+  ? player right is player 1
+ */
+
 	/* line 0 */
 	PORT_START_TAG("joy0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("q") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("w") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("e") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("r") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("t") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("y") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("u") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("i") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 1") PORT_CODE(KEYCODE_1) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 0") PORT_CODE(KEYCODE_0) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 4") PORT_CODE(KEYCODE_4) PORT_PLAYER(1)
+        PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 7") PORT_CODE(KEYCODE_7) PORT_PLAYER(1)
+        PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 1") PORT_CODE(KEYCODE_1_PAD) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 0") PORT_CODE(KEYCODE_0_PAD) PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 4") PORT_CODE(KEYCODE_4_PAD) PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 7") PORT_CODE(KEYCODE_7_PAD) PORT_PLAYER(2)
 
 	/* line 1 */
 	PORT_START_TAG("joy1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("o") PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("p") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("a") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("s") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("d") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("f") PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("g") PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("h") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_NAME("PAD 1/RIGHT down") PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_NAME("PAD 1/RIGHT left?") PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_NAME("PAD 1/RIGHT up") PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("PAD 1/RIGHT right?") PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_NAME("PAD 2/LEFT down") PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_NAME("PAD 2/LEFT left?") PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_NAME("PAD 2/LEFT up") PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("PAD 2/LEFT right?") PORT_PLAYER(2) PORT_8WAY
 
 	/* line 2 */
 	PORT_START_TAG("joy2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("j") PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("k") PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("l") PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("z") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("x") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("c") PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("v") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("b") PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 3") PORT_CODE(KEYCODE_3) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT clear") PORT_CODE(KEYCODE_DEL) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 6") PORT_CODE(KEYCODE_6) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 9") PORT_CODE(KEYCODE_9) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 3") PORT_CODE(KEYCODE_3_PAD) PORT_PLAYER(2)
+        PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT clear") PORT_CODE(KEYCODE_DEL_PAD) PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 6") PORT_CODE(KEYCODE_6_PAD) PORT_PLAYER(2)
+        PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 9") PORT_CODE(KEYCODE_9_PAD) PORT_PLAYER(2)
 
 	/* line 3 */
 	PORT_START_TAG("joy3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("n") PORT_CODE(KEYCODE_N)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("m") PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("2") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+        PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 2") PORT_CODE(KEYCODE_2) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT enter/fire") PORT_CODE(KEYCODE_ENTER) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 5") PORT_CODE(KEYCODE_5) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 8") PORT_CODE(KEYCODE_8) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 2") PORT_CODE(KEYCODE_2_PAD) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT enter/fire") PORT_CODE(KEYCODE_ENTER_PAD) PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 5") PORT_CODE(KEYCODE_5_PAD) PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 8") PORT_CODE(KEYCODE_8_PAD) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
@@ -657,6 +665,7 @@ ROM_END
 ROM_START(apfm1000)
 	ROM_REGION(0x10000+0x0800,REGION_CPU1,0)
 	ROM_LOAD("apf_4000.rom",0x010000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1))
+//	ROM_LOAD("apf-m1000rom.bin",0x010000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4))
 ROM_END
 
 static void apfimag_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
@@ -692,9 +701,49 @@ static void apfimag_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
+static int device_load_apfm1000_cart(mess_image *image)
+{
+	UINT8 *rom = memory_region(REGION_CPU1)+0x8000;
+	int size;
+
+	size = image_length(image);
+
+	if (image_fread(image, rom, size) != size)
+	{
+		logerror("%s load error\n", image_filename(image));
+		return 1;
+	}
+
+
+	return 0;
+}
+
+static void apfm1000_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cartslot */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_LOAD:							info->load = device_load_apfm1000_cart; break;
+		  //		case DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = lynx_partialhash; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
+
+		default:										cartslot_device_getinfo(devclass, state, info); break;
+	}
+}
+
 SYSTEM_CONFIG_START( apfimag )
 	CONFIG_DEVICE(apfimag_cassette_getinfo)
 	CONFIG_DEVICE(apfimag_floppy_getinfo)
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START(apfm1000)
+	CONFIG_DEVICE(apfm1000_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************
@@ -705,4 +754,4 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE             INPUT               INIT    CONFIG      COMPANY               FULLNAME */
 COMP(1977, apfimag,	0,		0,		apf_imagination,	apf_imagination,	0,		apfimag,	"APF Electronics Inc",  "APF Imagination Machine" ,GAME_NOT_WORKING)
-COMP(1978,	apfm1000,	0,		0,		apf_m1000,			apf_m1000,			0,		NULL,		"APF Electronics Inc",  "APF M-1000" ,GAME_NOT_WORKING)
+CONS(1978,	apfm1000,	0,		0,		apf_m1000,			apf_m1000,			0,		apfm1000,		"APF Electronics Inc",  "APF M-1000" ,GAME_NOT_WORKING)
