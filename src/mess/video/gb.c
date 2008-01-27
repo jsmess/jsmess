@@ -1368,7 +1368,8 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			if ( CURLINE < 143 ) {
 				gb_lcd.mode = 2;
-				if ( LCDSTAT & 0x20 ) {
+				gb_lcd.triggering_mode_irq = ( LCDSTAT & 0x20 ) ? 1 : 0;
+				if ( gb_lcd.triggering_mode_irq ) {
 					if ( ! gb_lcd.mode_irq ) {
 						if ( ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq ) {
 							gb_lcd.mode_irq = 1;
@@ -1386,7 +1387,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.delayed_line_irq = gb_lcd.line_irq;
 			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
 			gb_lcd.line_irq = 0;
-			if ( ! gb_lcd.mode_irq && ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) {
+			if ( ! gb_lcd.mode_irq && ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! gb_lcd.triggering_mode_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
 				cpunum_set_input_line(machine, 0, LCD_INT, HOLD_LINE );
 			}
@@ -1399,7 +1400,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				/* Internally switch to mode 2 */
 				gb_lcd.mode = 2;
 				/* Generate lcd interrupt if requested */
-				if ( ! gb_lcd.mode_irq && ( LCDSTAT & 0x20 ) &&
+				if ( ! gb_lcd.mode_irq && gb_lcd.triggering_mode_irq &&
 					 ( ( ! gb_lcd.triggering_line_irq && ! gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
 					gb_lcd.mode_irq = 1;
 					cpunum_set_input_line(machine, 0, LCD_INT, HOLD_LINE );
@@ -1427,10 +1428,11 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
 			if ( ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
-				 ( !gb_lcd.mode_irq && ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq && ( LCDSTAT & 0x20 ) ) ) {
+				 ( ! gb_lcd.mode_irq && ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq && gb_lcd.triggering_mode_irq ) ) {
 				cpunum_set_input_line(machine, 0, LCD_INT, HOLD_LINE );
 			}
 			gb_lcd.line_irq = gb_lcd.triggering_line_irq;
+			gb_lcd.triggering_mode_irq = 0;
 			/* Check if LY==LYC STAT bit should be set */
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
