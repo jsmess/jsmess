@@ -1922,8 +1922,8 @@ static void setup_memory_map(void)
 			else
 				offset=&coco_rom[0x4000+(0x1000*(block_index-4))];
 
-			memory_set_bankptr(block_index+9,offset);
-			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_ROM);
+			memory_set_bankptr(block_index + 9,offset);
+			memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_NOP);
 		}
 	}
 }
