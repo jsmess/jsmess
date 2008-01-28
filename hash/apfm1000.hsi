@@ -1,0 +1,67 @@
+<hashfile>
+	<!-- apf m1000 -->
+	<hash crc32="5d03a812" sha1="29db4ca3c8b76c413b84b6d2bfd3499a70eccd3d" name="Catena">
+		<cartnumber>MG1001</cartnumber>
+		<chip>MG1002</chip>
+	</hash>
+<!--
+	<hash crc32="" sha1="" name="">
+		<cartnumber>MG1002</cartnumber>
+		<chip></chip>
+	</hash>
+-->
+<!--
+	<hash crc32="" sha1="" name="Hangman/Tic Tac Toe/Doddle">
+		<cartnumber>MG1003</cartnumber>
+		<chip>MG1003</chip>
+	</hash>
+	<hash crc32="" sha1="" name="Bowling/Micro Match">
+		<cartnumber>MG1004</cartnumber>
+		<chip>MG1004</chip>
+	</hash>
+-->
+	<hash crc32="bc1f5b8b" sha1="3e2f1e93501cd0dd2c9b747c594b784360e5b175" name="Brickdown/Shooting Gallery">
+		<cartnumber>MG1005</cartnumber>
+		<chip>MG1005</chip>
+	</hash>
+<!--
+	<hash crc32="" sha1="" name="Baseball">
+		<cartnumber>MG1006</cartnumber>
+		<chip></chip>
+	</hash>
+	<hash crc32="" sha1="" name="Blackjack">
+		<cartnumber>MG1007</cartnumber>
+		<chip>MG1007</chip>
+	</hash>
+	<hash crc32="" sha1="" name="Backgammon">
+		<cartnumber>MG1008</cartnumber>
+		<chip></chip>
+	</hash>
+	<hash crc32="" sha1="" name="Casino I:  Roulette/Keno/Slots">
+		<cartnumber>MG1009</cartnumber>
+		<chip>MG1009</chip>
+	</hash>
+	<hash crc32="" sha1="" name="UFO/Sea Monster/Break It Down/Rebuild/Shoot">
+		<cartnumber>MG1010</cartnumber>
+		<chip>MG1010</chip>
+	</hash>
+	<hash crc32="" sha1="" name="Pinball/Dungeon Hunt/Blockout">
+		<cartnumber>MG1011</cartnumber>
+		<chip>MG1011</chip>
+	</hash>
+	<hash crc32="" sha1="" name="Boxing">
+		<cartnumber>MG1012</cartnumber>
+		<chip>MG1012</chip>
+	</hash>
+	<hash crc32="" sha1="" name="Space Destroyers">
+		<cartnumber>MG1013</cartnumber>
+		<chip></chip>
+	</hash>
+-->
+<!--
+	<hash crc32="" sha1="" name="">
+		<cartnumber></cartnumber>
+		<chip></chip>
+	</hash>
+-->
+</hashfile>
