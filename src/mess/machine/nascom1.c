@@ -73,22 +73,20 @@ READ8_HANDLER ( nascom1_port_00_r )
 	return (0xff);
 }
 
- READ8_HANDLER ( nascom1_port_01_r )
+READ8_HANDLER( nascom1_port_01_r )
 {
 	if (nascom1_portstat.stat_flags & NASCOM1_CAS_ENABLE)
 		return (nascom1_read_cassette());
 
-	return (0);
+	return 0;
 }
 
- READ8_HANDLER ( nascom1_port_02_r )
+READ8_HANDLER( nascom1_port_02_r )
 {
-	if (nascom1_portstat.stat_flags & NASCOM1_CAS_ENABLE) return (0x80);
-
-	return (0x00);
+	return nascom1_portstat.stat_flags & NASCOM1_CAS_ENABLE ? 0x80 : 0x00;
 }
 
-WRITE8_HANDLER (	nascom1_port_00_w )
+WRITE8_HANDLER( nascom1_port_00_w )
 {
 	nascom1_portstat.stat_flags &= ~NASCOM1_CAS_ENABLE;
 	nascom1_portstat.stat_flags |= (data & NASCOM1_CAS_ENABLE);
