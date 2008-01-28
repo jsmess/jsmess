@@ -2209,7 +2209,7 @@ static void coco3_mmu_update(int lowblock, int hiblock)
 		{
 			/* an offset into the CoCo 3 ROM */
 			readbank = &coco_rom[offset & ~0x80000000];
-			writebank = STATIC_ROM;
+			writebank = STATIC_UNMAP;
 		}
 		else
 		{
