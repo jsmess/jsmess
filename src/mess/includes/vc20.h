@@ -65,35 +65,20 @@
 #define DATASSETTE_RECORD	(readinputportbytag( TAG_CASSETTE )&2)
 #define DATASSETTE_STOP		(readinputportbytag( TAG_CASSETTE )&1)
 
-/* macros to access the dip switches */
-#define EXPANSION (readinputportbytag( TAG_EXPANSION )&7)
-#define EXP_3K 1
-#define EXP_8K 2
-#define EXP_16K 3
-#define EXP_32K 4
-#define EXP_CUSTOM 5
-#define RAMIN0X0400 ((EXPANSION==EXP_3K)\
-	||((EXPANSION==EXP_CUSTOM)&&(readinputportbytag( TAG_EXPANSION )&8)) )
-#define RAMIN0X2000 ((EXPANSION==EXP_8K)||(EXPANSION==EXP_16K)\
-	||(EXPANSION==EXP_32K)\
-	||((EXPANSION==EXP_CUSTOM)&&(readinputportbytag( TAG_EXPANSION )&0x10)) )
-#define RAMIN0X4000 ((EXPANSION==EXP_16K)||(EXPANSION==EXP_32K)\
-	||((EXPANSION==EXP_CUSTOM)&&(readinputportbytag( TAG_EXPANSION )&0x20)) )
-#define RAMIN0X6000 ((EXPANSION==EXP_32K)\
-	||((EXPANSION==EXP_CUSTOM)&&(readinputportbytag( TAG_EXPANSION )&0x40)) )
-#define RAMIN0XA000 ((EXPANSION==EXP_32K)\
-	||((EXPANSION==EXP_CUSTOM)&&(readinputportbytag( TAG_EXPANSION )&0x80)) )
-
 #define VC20ADDR2VIC6560ADDR(a) (((a)>0x8000)?((a)&0x1fff):((a)|0x2000))
 #define VIC6560ADDR2VC20ADDR(a) (((a)>0x2000)?((a)&0x1fff):((a)|0x8000))
 
 
 /*----------- defined in machine/vc20.c -----------*/
 
-extern UINT8 *vc20_memory;
 extern UINT8 *vc20_memory_9400;
 
 WRITE8_HANDLER ( vc20_write_9400 );
+
+WRITE8_HANDLER( vc20_0400_w );
+WRITE8_HANDLER( vc20_2000_w );
+WRITE8_HANDLER( vc20_4000_w );
+WRITE8_HANDLER( vc20_6000_w );
 
 /* split for more performance */
 /* VIC reads bits 8 till 11 */
