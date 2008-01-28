@@ -28,6 +28,7 @@ int pet_font=0;
 UINT8 *pet_memory;
 UINT8 *superpet_memory;
 UINT8 *pet_videoram;
+static UINT8 *pet80_bank1_base;
 
 /* pia at 0xe810
    port a
@@ -271,6 +272,10 @@ static  READ8_HANDLER(cbm8096_io_r)
 	return data;
 }
 
+static WRITE8_HANDLER(pet80_bank1_w) {
+	pet80_bank1_base[offset] = data;
+}
+
 /*
 65520        8096 memory control register
         bit 0    1=write protect $8000-BFFF
@@ -311,8 +316,9 @@ WRITE8_HANDLER(cbm8096_w)
 
 		if (data&0x20)
 		{
-			memory_set_bankptr(1, pet_memory+0x8000);
-			wh = MWA8_RAM;
+			pet80_bank1_base = pet_memory + 0x8000;
+			memory_set_bankptr(1, pet80_bank1_base);
+			wh = pet80_bank1_w;
 		}
 		else
 		{
@@ -330,14 +336,16 @@ WRITE8_HANDLER(cbm8096_w)
 
 		if (data&4) {
 			if (!(data&0x20)) {
-				memory_set_bankptr(1,pet_memory+0x14000);
+				pet80_bank1_base = pet_memory + 0x14000;
+				memory_set_bankptr(1,pet80_bank1_base);
 			}
 			memory_set_bankptr(2,pet_memory+0x15000);
 			memory_set_bankptr(3,pet_memory+0x16000);
 			memory_set_bankptr(4,pet_memory+0x17000);
 		} else {
 			if (!(data&0x20)) {
-				memory_set_bankptr(1,pet_memory+0x10000);
+				pet80_bank1_base = pet_memory + 0x10000;
+				memory_set_bankptr(1,pet80_bank1_base);
 			}
 			memory_set_bankptr(2,pet_memory+0x11000);
 			memory_set_bankptr(3,pet_memory+0x12000);
@@ -361,8 +369,9 @@ WRITE8_HANDLER(cbm8096_w)
 	}
 	else
 	{
-		memory_set_bankptr(1, pet_memory + 0x8000);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, MWA8_RAM);
+		pet80_bank1_base = pet_memory + 0x8000;
+		memory_set_bankptr(1, pet80_bank1_base );
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, pet80_bank1_w);
 
 		memory_set_bankptr(2, pet_memory + 0x9000);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, MWA8_UNMAP);
