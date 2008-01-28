@@ -36,10 +36,11 @@ static int via1_portb, via1_porta, via0_ca2;
 static int serial_atn = 1, serial_clock = 1, serial_data = 1;
 
 static int ieee=0; /* ieee cartridge (interface and rom)*/
-static int vc20_rom_2000;
-static int vc20_rom_4000;
-static int vc20_rom_6000;
-static int vc20_rom_a000;
+static UINT8 *vc20_rom_2000;
+static UINT8 *vc20_rom_4000;
+static UINT8 *vc20_rom_6000;
+static UINT8 *vc20_rom_a000;
+static UINT8 *vc20_rom_e000;
 
 UINT8 *vc20_memory_9400;
 
@@ -451,19 +452,19 @@ WRITE8_HANDLER( vc20_0400_w ) {
 }
 
 WRITE8_HANDLER( vc20_2000_w ) {
-	if ( ( mess_ram_size >= 16 * 1024 ) && ! vc20_rom_2000 ) {
+	if ( ( mess_ram_size >= 16 * 1024 ) && vc20_rom_2000 == NULL ) {
 		mess_ram[ 0x2000 + offset ] = data;
 	}
 }
 
 WRITE8_HANDLER( vc20_4000_w ) {
-	if ( ( mess_ram_size >= 24 * 1024 ) && ! vc20_rom_4000 ) {
+	if ( ( mess_ram_size >= 24 * 1024 ) && vc20_rom_4000 == NULL ) {
 		mess_ram[ 0x4000 + offset ] = data;
 	}
 }
 
 WRITE8_HANDLER( vc20_6000_w ) {
-	if ( ( mess_ram_size >= 32 * 1024 ) && ! vc20_rom_6000 ) {
+	if ( ( mess_ram_size >= 32 * 1024 ) && vc20_rom_6000 == NULL ) {
 		mess_ram[ 0x6000 + offset ] = data;
 	}
 }
@@ -518,6 +519,14 @@ static void vc20_common_driver_init (void)
 #endif
 	via_config (0, &via0);
 	via_config (1, &via1);
+
+	/* Set up memory banks */
+	memory_set_bankptr( 1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(REGION_CPU1) ) + 0x0400 );
+	memory_set_bankptr( 2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(REGION_CPU1) ) + 0x2000 ) );
+	memory_set_bankptr( 3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(REGION_CPU1) ) + 0x4000 ) );
+	memory_set_bankptr( 4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(REGION_CPU1) ) + 0x6000 ) );
+	memory_set_bankptr( 5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(REGION_CPU1) + 0xa000 ) );
+	memory_set_bankptr( 6, vc20_rom_e000 ? vc20_rom_e000 : ( memory_region(REGION_CPU1) + 0xe000 ) );
 }
 
 /* currently not used, but when time comes */
@@ -555,12 +564,6 @@ DRIVER_INIT( vic20i )
 
 MACHINE_RESET( vc20 )
 {
-	memory_set_bankptr( 1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(REGION_CPU1) ) + 0x0400 );
-	memory_set_bankptr( 2, ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(REGION_CPU1) ) + 0x2000 );
-	memory_set_bankptr( 3, ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(REGION_CPU1) ) + 0x4000 );
-	memory_set_bankptr( 4, ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(REGION_CPU1) ) + 0x6000 );
-	memory_set_bankptr( 5, memory_region(REGION_CPU1) + 0xa000 );
-
 	cbm_serial_reset_write (0);
 #ifdef VC1541
 	vc1541_reset ();
@@ -601,6 +604,7 @@ static int vc20_rom_id(mess_image *image)
 			|| (mame_stricmp (cp, "20") == 0)
 			|| (mame_stricmp (cp, "40") == 0)
 			|| (mame_stricmp (cp, "60") == 0)
+			|| (mame_stricmp (cp, "e0") == 0)
 			|| (mame_stricmp (cp, "bin") == 0)
 			|| (mame_stricmp (cp, "rom") == 0)
 			|| (mame_stricmp (cp, "prg") == 0))
@@ -618,10 +622,11 @@ static int vc20_rom_id(mess_image *image)
 DEVICE_INIT(vc20_rom)
 {
 	vc20_memory_init();
-	vc20_rom_2000 = 0;
-	vc20_rom_4000 = 0;
-	vc20_rom_6000 = 0;
-	vc20_rom_a000 = 0;
+	vc20_rom_2000 = NULL;
+	vc20_rom_4000 = NULL;
+	vc20_rom_6000 = NULL;
+	vc20_rom_a000 = NULL;
+	vc20_rom_e000 = NULL;
 	return INIT_PASS;
 }
 
@@ -646,6 +651,9 @@ DEVICE_LOAD(vc20_rom)
 			{
 			case 'A':
 				addr = 0xa000;
+				break;
+			case 'E':
+				addr = 0xe000;
 				break;
 			case '2':
 				addr = 0x2000;
@@ -692,24 +700,22 @@ DEVICE_LOAD(vc20_rom)
 	/* Perform banking for the cartridge */
 	switch( addr ) {
 	case 0x2000:
-		memory_set_bankptr( 2, memory_region( REGION_USER1 ) );
-		vc20_rom_2000 = 1;
+		vc20_rom_2000 = memory_region( REGION_USER1 );
 		break;
 	case 0x4000:
-		memory_set_bankptr( 3, memory_region( REGION_USER1 ) );
-		vc20_rom_4000 = 1;
+		vc20_rom_4000 = memory_region( REGION_USER1 );
 		if ( size > 0x2000 ) {
-			memory_set_bankptr( 4, memory_region( REGION_USER1 ) + 0x2000 );
-			vc20_rom_6000 = 1;
+			vc20_rom_6000 = memory_region( REGION_USER1 ) + 0x2000;
 		}
 		break;
 	case 0x6000:
-		memory_set_bankptr( 4, memory_region( REGION_USER1 ) );
-		vc20_rom_6000 = 1;
+		vc20_rom_6000 = memory_region( REGION_USER1 );
 		break;
 	case 0xa000:
-		memory_set_bankptr( 5, memory_region( REGION_USER1 ) );
-		vc20_rom_a000 = 1;
+		vc20_rom_a000 = memory_region( REGION_USER1 );
+		break;
+	case 0xe000:
+		vc20_rom_e000 = memory_region( REGION_USER1 );
 		break;
 	}
 	return 0;
