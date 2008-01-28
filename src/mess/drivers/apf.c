@@ -666,6 +666,7 @@ ROM_START(apfm1000)
 	ROM_REGION(0x10000+0x0800,REGION_CPU1,0)
 	ROM_LOAD("apf_4000.rom",0x010000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1))
 //	ROM_LOAD("apf-m1000rom.bin",0x010000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4))
+	ROM_CART_LOAD(0, "bin", 0x8000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 static void apfimag_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
@@ -701,41 +702,6 @@ static void apfimag_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static int device_load_apfm1000_cart(mess_image *image)
-{
-	UINT8 *rom = memory_region(REGION_CPU1)+0x8000;
-	int size;
-
-	size = image_length(image);
-
-	if (image_fread(image, rom, size) != size)
-	{
-		logerror("%s load error\n", image_filename(image));
-		return 1;
-	}
-
-
-	return 0;
-}
-
-static void apfm1000_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_apfm1000_cart; break;
-		  //		case DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = lynx_partialhash; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 SYSTEM_CONFIG_START( apfimag )
 	CONFIG_DEVICE(apfimag_cassette_getinfo)
@@ -743,7 +709,7 @@ SYSTEM_CONFIG_START( apfimag )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START(apfm1000)
-	CONFIG_DEVICE(apfm1000_cartslot_getinfo)
+	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************
