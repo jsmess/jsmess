@@ -182,9 +182,9 @@ static INPUT_PORTS_START (nascom1)
 	PORT_START	/* 8: count = 8 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace ClearScreen") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(8)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("New Line")              PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x58, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(UCHAR_SHIFT_2) PORT_CHAR('@')
 INPUT_PORTS_END
 
 /* Sound output */
@@ -282,9 +282,27 @@ static void nascom1_cassette_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
+static void nascom1_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "nas"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_nascom1; break;
+
+		/* --- the following bits of info are returned as doubles --- */
+		case DEVINFO_FLOAT_SNAPSHOT_DELAY:				info->d = 0.5; break;
+
+		default:										snapshot_device_getinfo(devclass, state, info); break;
+	}
+}
+
 SYSTEM_CONFIG_START(nascom1)
 	CONFIG_IMPORT_FROM(nascom)
 	CONFIG_DEVICE(nascom1_cassette_getinfo)
+	CONFIG_DEVICE(nascom1_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 static void nascom2_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
@@ -311,6 +329,7 @@ static void nascom2_cassette_getinfo(const device_class *devclass, UINT32 state,
 SYSTEM_CONFIG_START(nascom2)
 	CONFIG_IMPORT_FROM(nascom)
 	CONFIG_DEVICE(nascom2_cassette_getinfo)
+	CONFIG_DEVICE(nascom1_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                     FULLNAME        FLAGS */

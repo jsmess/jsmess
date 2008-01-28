@@ -13,6 +13,8 @@
 #include "image.h"
 #include "includes/nascom1.h"
 #include "cpu/z80/z80.h"
+#include "devices/snapquik.h"
+
 
 
 static	int		nascom1_tape_size = 0;
@@ -138,42 +140,27 @@ int	nascom1_read_cassette(void)
    Note <addr> and <byte> are in hex.
 */
 
-int	nascom1_init_cartridge(int id, mame_file *file)
+SNAPSHOT_LOAD( nascom1 )
 {
-	int		done;
-	char	fileaddr[5];
-	/* int	filebyt1, filebyt2, filebyt3, filebyt4;
-	int	filebyt5, filebyt6, filebyt7, filebyt8;
-	int	addr; */
+	UINT8 line[35];
 
-	return (1);
-
-	if (file)
+	while (image_fread(image, &line, sizeof(line)) == sizeof(line))
 	{
-		done = 0;
-		fileaddr[4] = 0;
-		while (!done)
-		{
-			mame_fread(file, (void *)fileaddr, 4);
-			logerror ("%4.4s\n", fileaddr);
-			if (fileaddr[0] == '.')
-			{
-				done = 1;
-			}
-			else
-			{
-				/* vsscanf (fileaddr, "%4X", &addr); */
-			    /* logerror ("%04X: %02X %02X %02X %02X %02X %02X %02X %02X\n",
-							  addr, filebyt1, filebyt2, filebyt3, filebyt4,
-									filebyt5, filebyt6, filebyt7, filebyt8); */
+		int addr, b0, b1, b2, b3, b4, b5, b6, b7, dummy;
 
-			}
+		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
+			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
+		{
+			program_write_byte_8(addr++, b0);
+			program_write_byte_8(addr++, b1);
+			program_write_byte_8(addr++, b2);
+			program_write_byte_8(addr++, b3);
+			program_write_byte_8(addr++, b4);
+			program_write_byte_8(addr++, b5);
+			program_write_byte_8(addr++, b6);
+			program_write_byte_8(addr++, b7);
 		}
 	}
-	else
-	{
-		return (1);
-	}
 
-	return (0);
+	return INIT_PASS;
 }

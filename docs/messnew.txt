@@ -34,6 +34,8 @@ System Driver Changes:
   instead of dip switches and updated it to use the default black and white
   palette.  [Dirk Best]
 
+- [NASCOM] Added snapshot loading support (.nas files)  [Dirk Best]
+
 - [NES] Added support for mappers 42, 43, 44, 45 (partial), 46, 47, 49,
   51 (partial), 57, 58, 61, 62, 83 (partial), 112, 182, 188, 193 (not working),
   200, 201, 202, 203, 206, 240, 241 (partial), 242, 244, 246, 248.
