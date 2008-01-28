@@ -118,19 +118,24 @@ PALETTE_INIT( ti85 )
 		ti_screen_y_size = TI81_SCREEN_Y_SIZE;
 		ti_number_of_frames = TI81_NUMBER_OF_FRAMES;
 	}
-	if (!strncmp(machine->gamedrv->name, "ti85", 4))
+	else if (!strncmp(machine->gamedrv->name, "ti85", 4))
 	{
 		ti_video_memory_size = TI85_VIDEO_MEMORY_SIZE;
 		ti_screen_x_size = TI85_SCREEN_X_SIZE;
 		ti_screen_y_size = TI85_SCREEN_Y_SIZE;
 		ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
 	}
-	if (!strncmp(machine->gamedrv->name, "ti86", 4))
+	else if (!strncmp(machine->gamedrv->name, "ti86", 4))
 	{
 		ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
 		ti_screen_x_size = TI86_SCREEN_X_SIZE;
 		ti_screen_y_size = TI86_SCREEN_Y_SIZE;
 		ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
+	}
+	else
+	{
+		/* don't allocate memory for the others drivers */
+		return;
 	}
 
 	ti85_frames = (UINT8 *) auto_malloc(ti_number_of_frames*ti_video_memory_size*sizeof (UINT8));
