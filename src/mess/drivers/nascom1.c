@@ -48,14 +48,27 @@ Nascom Memory map
 
 ************************************************************************/
 
+/* Core includes */
 #include "driver.h"
 #include "includes/nascom1.h"
+
+/* Components */
 #include "cpu/z80/z80.h"
+#include "machine/wd17xx.h"
+
+/* Devices */
+#include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 
 
-/* Memory w/r functions */
-static ADDRESS_MAP_START( nascom1_mem , ADDRESS_SPACE_PROGRAM, 8)
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( nascom1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
@@ -66,15 +79,32 @@ static ADDRESS_MAP_START( nascom1_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-/* port i/o functions */
-static ADDRESS_MAP_START( nascom1_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READWRITE( nascom1_port_00_r, nascom1_port_00_w )
-	AM_RANGE(0x01, 0x01) AM_READWRITE( nascom1_port_01_r, nascom1_port_01_w )
-	AM_RANGE(0x02, 0x02) AM_READ( nascom1_port_02_r )
+
+static ADDRESS_MAP_START( nascom1_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(4) )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
+	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
 ADDRESS_MAP_END
 
-/* graphics output */
+
+static ADDRESS_MAP_START( nascom2_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
+	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
+	AM_RANGE(0xe0, 0xe3) AM_READWRITE(wd17xx_r, wd17xx_w)
+	AM_RANGE(0xe4, 0xe4) AM_READWRITE(nascom2_fdc_select_r, nascom2_fdc_select_w)
+	AM_RANGE(0xe5, 0xe5) AM_READ(nascom2_fdc_status_r)
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  GFX layouts
+ *
+ *************************************/
 
 static const gfx_layout nascom1_charlayout =
 {
@@ -88,9 +118,11 @@ static const gfx_layout nascom1_charlayout =
 	8 * 16
 };
 
+
 static GFXDECODE_START( nascom1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, nascom1_charlayout, 0, 1 )
+	GFXDECODE_ENTRY(REGION_GFX1, 0x0000, nascom1_charlayout, 0, 1)
 GFXDECODE_END
+
 
 static const gfx_layout nascom2_charlayout =
 {
@@ -104,19 +136,25 @@ static const gfx_layout nascom2_charlayout =
 	8 * 16
 };
 
+
 static GFXDECODE_START( nascom2 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, nascom2_charlayout, 0, 1 )
+	GFXDECODE_ENTRY(REGION_GFX1, 0x0000, nascom2_charlayout, 0, 1)
 GFXDECODE_END
 
 
-/* Keyboard input */
 
-static INPUT_PORTS_START (nascom1)
-	PORT_START	/* 0: count = 0 */
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
+
+static INPUT_PORTS_START( nascom1 )
+	PORT_START_TAG("keyboard_0")
 	PORT_BIT(0x6f, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
-	PORT_START	/* 1: count = 1 */
+	PORT_START_TAG("keyboard_1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
@@ -125,7 +163,7 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 
-	PORT_START	/* 2: count = 2 */
+	PORT_START_TAG("keyboard_2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)    PORT_CHAR('J') PORT_CHAR('j')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)    PORT_CHAR('N') PORT_CHAR('n')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)    PORT_CHAR('6') PORT_CHAR('&')
@@ -134,7 +172,7 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)    PORT_CHAR('Y') PORT_CHAR('y')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 
-	PORT_START	/* 3: count = 3 */
+	PORT_START_TAG("keyboard_3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)    PORT_CHAR('K') PORT_CHAR('k')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)    PORT_CHAR('M') PORT_CHAR('m')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)    PORT_CHAR('7') PORT_CHAR('\'')
@@ -143,7 +181,7 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)    PORT_CHAR('U') PORT_CHAR('u')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
-	PORT_START	/* 4: count = 4 */
+	PORT_START_TAG("keyboard_4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('L') PORT_CHAR('l')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)     PORT_CHAR('8') PORT_CHAR('(')
@@ -152,7 +190,7 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)     PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
-	PORT_START	/* 5: count = 5 */
+	PORT_START_TAG("keyboard_5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)     PORT_CHAR('9') PORT_CHAR(')')
@@ -161,7 +199,7 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)     PORT_CHAR('O') PORT_CHAR('o')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START	/* 6: count = 6 */
+	PORT_START_TAG("keyboard_6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)     PORT_CHAR('0')
@@ -170,7 +208,7 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)     PORT_CHAR('P') PORT_CHAR('p')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START	/* 7: count = 7 */
+	PORT_START_TAG("keyboard_7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)     PORT_CHAR('G') PORT_CHAR('g')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)     PORT_CHAR('V') PORT_CHAR('v')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)     PORT_CHAR('4') PORT_CHAR('$')
@@ -179,7 +217,7 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)     PORT_CHAR('R') PORT_CHAR('r')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START	/* 8: count = 8 */
+	PORT_START_TAG("keyboard_8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace ClearScreen") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(8)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("New Line")              PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
@@ -187,20 +225,34 @@ static INPUT_PORTS_START (nascom1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(UCHAR_SHIFT_2) PORT_CHAR('@')
 INPUT_PORTS_END
 
-/* Sound output */
 
-static INTERRUPT_GEN( nascom_interrupt )
-{
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-}
+static INPUT_PORTS_START( nascom2 )
+	PORT_INCLUDE(nascom1)
 
-/* Machine definition */
+	PORT_MODIFY("keyboard_6")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                            PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('[') PORT_CHAR('\\')
+
+	PORT_MODIFY("keyboard_7")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                            PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(']') PORT_CHAR('_')
+
+	PORT_MODIFY("keyboard_8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back CS")       PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(8)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter  Escape") PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)  PORT_CHAR(27)
+INPUT_PORTS_END
+
+
+
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( nascom1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 1000000)
 	MDRV_CPU_PROGRAM_MAP(nascom1_mem, 0)
 	MDRV_CPU_IO_MAP(nascom1_io, 0)
-	MDRV_CPU_VBLANK_INT(nascom_interrupt, 1)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
@@ -209,57 +261,68 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48 * 8, 16 * 16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 16 - 1)
-	MDRV_GFXDECODE( nascom1 )
+	MDRV_GFXDECODE(nascom1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START( generic )
-	MDRV_VIDEO_UPDATE( nascom1 )
+	MDRV_VIDEO_START(generic)
+	MDRV_VIDEO_UPDATE(nascom1)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( nascom2 )
-	MDRV_IMPORT_FROM( nascom1 )
-	MDRV_CPU_REPLACE( "main", Z80, 2000000 )
+	MDRV_IMPORT_FROM(nascom1)
+	MDRV_CPU_REPLACE("main", Z80, 2000000)
+	MDRV_CPU_IO_MAP(nascom2_io, 0)
+
+	/* video hardware */
 	MDRV_SCREEN_SIZE(48 * 8, 16 * 14)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
-	MDRV_GFXDECODE( nascom2 )
-	MDRV_VIDEO_UPDATE( nascom2 )
+	MDRV_GFXDECODE(nascom2)
+	MDRV_VIDEO_UPDATE(nascom2)
 MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START(nascom1)
 	ROM_REGION(0x10000, REGION_CPU1,0)
-	ROM_SYSTEM_BIOS( 0, "T4", "NasBug T4" )
+	ROM_SYSTEM_BIOS(0, "T4", "NasBug T4")
 	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "T1", "NasBug T1" )
+	ROM_SYSTEM_BIOS(1, "T1", "NasBug T1")
 	ROMX_LOAD("nasbugt1.rom", 0x0000, 0x0400, CRC(8ea07054) SHA1(3f9a8632826003d6ea59d2418674d0fb09b83a4c), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "T2", "NasBug T2" )
+	ROM_SYSTEM_BIOS(2, "T2", "NasBug T2")
 	ROMX_LOAD("nasbugt2.rom", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b), ROM_BIOS(3))
-	ROM_REGION(0x0800, REGION_GFX1,0)
-	ROM_LOAD("nascom1.chr", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
+	ROM_REGION(0x0800, REGION_GFX1, 0)
+	ROM_LOAD("nascom1.chr",   0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
 ROM_END
+
 
 ROM_START(nascom2)
 	ROM_REGION(0x10000, REGION_CPU1,0)
-	ROM_SYSTEM_BIOS( 0, "NS3", "NasSys 3" )
+	ROM_SYSTEM_BIOS( 0, "NS3", "NasSys 3")
 	ROMX_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "NS1", "NasSys 1" )
+	ROM_SYSTEM_BIOS( 1, "NS1", "NasSys 1")
 	ROMX_LOAD("nassys1.rom", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa), ROM_BIOS(2))
-	ROM_LOAD("basic.rom", 0xe000, 0x2000, CRC(5cb5197b) SHA1(c41669c2b6d6dea808741a2738426d97bccc9b07))
-	ROM_REGION(0x1000, REGION_GFX1,0)
-	ROM_LOAD("nascom1.chr", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
-	ROM_LOAD("nasgra.chr", 0x0800, 0x0800, CRC(2bc09d32) SHA1(d384297e9b02cbcb283c020da51b3032ff62b1ae))
+	ROM_LOAD("nasdos.rom",   0xd000, 0x1000, CRC(54a36f6d) SHA1(1d063d04be5024f128bd589e6edc066e9a63fc1b))
+	ROM_LOAD("basic.rom",    0xe000, 0x2000, CRC(5cb5197b) SHA1(c41669c2b6d6dea808741a2738426d97bccc9b07))
+	ROM_REGION(0x1000, REGION_GFX1, 0)
+	ROM_LOAD("nascom1.chr",  0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
+	ROM_LOAD("nasgra.chr",   0x0800, 0x0800, CRC(2bc09d32) SHA1(d384297e9b02cbcb283c020da51b3032ff62b1ae))
 ROM_END
 
-SYSTEM_CONFIG_START(nascom)
-	CONFIG_RAM(1 * 1024)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(32 * 1024)
-	CONFIG_RAM_DEFAULT(40 * 1024)
-#ifdef CART
-	CONFIG_DEVICE_CARTSLOT_REQ(1, "nas,bin", nascom1_init_cartridge, NULL, NULL)
-#endif
-SYSTEM_CONFIG_END
+
+
+/*************************************
+ *
+ *  System configs
+ *
+ *************************************/
 
 static void nascom1_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -278,9 +341,10 @@ static void nascom1_cassette_getinfo(const device_class *devclass, UINT32 state,
 		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_nascom1_cassette; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "nas,bin"); break;
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas"); break;
 	}
 }
+
 
 static void nascom1_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -299,39 +363,49 @@ static void nascom1_snapshot_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-SYSTEM_CONFIG_START(nascom1)
-	CONFIG_IMPORT_FROM(nascom)
+
+static void nascom2_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_COUNT:							info->i = 4; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_LOAD:							info->load = device_load_nascom2_floppy; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}
+}
+
+
+SYSTEM_CONFIG_START( nascom1 )
+	CONFIG_RAM(1 * 1024)
+	CONFIG_RAM(16 * 1024)
+	CONFIG_RAM(32 * 1024)
+	CONFIG_RAM_DEFAULT(40 * 1024)
 	CONFIG_DEVICE(nascom1_cassette_getinfo)
 	CONFIG_DEVICE(nascom1_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
-static void nascom2_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_nascom1_cassette; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_nascom1_cassette; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas,nas,bin"); break;
-	}
-}
-
-SYSTEM_CONFIG_START(nascom2)
-	CONFIG_IMPORT_FROM(nascom)
-	CONFIG_DEVICE(nascom2_cassette_getinfo)
-	CONFIG_DEVICE(nascom1_snapshot_getinfo)
+SYSTEM_CONFIG_START( nascom2 )
+	CONFIG_IMPORT_FROM(nascom1)
+	CONFIG_DEVICE(nascom2_floppy_getinfo)
 SYSTEM_CONFIG_END
+
+
+
+/*************************************
+ *
+ *  Driver definitions
+ *
+ *************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                     FULLNAME        FLAGS */
 COMP( 1978, nascom1,    0,          0,      nascom1,    nascom1,    nascom1,    nascom1,    "Nascom Microcomputers",    "Nascom 1",     0 )
-COMP( 1979, nascom2,    nascom1,    0,      nascom2,    nascom1,    nascom1,    nascom2,    "Nascom Microcomputers",    "Nascom 2",     0 )
+COMP( 1979, nascom2,    nascom1,    0,      nascom2,    nascom2,    nascom1,    nascom2,    "Nascom Microcomputers",    "Nascom 2",     0 )
