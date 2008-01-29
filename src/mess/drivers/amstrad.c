@@ -3161,23 +3161,23 @@ ROM_START(gx4000)
 ROM_END
 
 ROM_START(al520ex)
-	ROM_REGION(0x80000, REGION_CPU1,0)
-	ROM_LOAD("al512.bin", 0x10000, 0x10000, CRC(e8c2a9a1) )
+	ROM_REGION(0x80000, REGION_CPU1, 0)
+	ROM_LOAD("al512.bin", 0x10000, 0x10000, CRC(e8c2a9a1) SHA1(ad5827582cb19eaaae1b76e67df62d96da6ad96b))
 
-	ROM_REGION(0x20, REGION_USER2,0)
-	ROM_LOAD("af.bin", 0x00, 0x20, CRC(c81fb524) )
+	ROM_REGION(0x20, REGION_USER2, 0)
+	ROM_LOAD("af.bin", 0x00, 0x20, CRC(c81fb524) SHA1(17738d0603915a67ec1fddc4cbf7d6b98cdeb8f6))
 
-	ROM_REGION(0x100, REGION_USER3,0)  // RAM bank mappings
-	ROM_LOAD("mapper.bin", 0x00, 0x100, CRC(0daebd80) )
+	ROM_REGION(0x100, REGION_USER3, 0)  // RAM bank mappings
+	ROM_LOAD("mapper.bin", 0x00, 0x100, CRC(0daebd80) SHA1(8633073cba752c38c5dc912ff9f6a3c89357539b))
 
-	ROM_REGION(0x800, REGION_USER4,0)  // Colour data
-	ROM_LOAD("rfcoldat.bin", 0x00, 0x800, CRC(c6ace0e6) )
+	ROM_REGION(0x800, REGION_USER4, 0)  // Colour data
+	ROM_LOAD("rfcoldat.bin", 0x00, 0x800, CRC(c6ace0e6) SHA1(2f4c51fcfaacb8deed68f6ae9388b870bc962cef))
 
-	ROM_REGION(0x800, REGION_USER5,0)  // Keyboard / Video
-	ROM_LOAD("rfvdkey.bin", 0x00, 0x800, CRC(cf2aa4b0) )
+	ROM_REGION(0x800, REGION_USER5, 0)  // Keyboard / Video
+	ROM_LOAD("rfvdkey.bin", 0x00, 0x800, CRC(cf2aa4b0) SHA1(20f37da3bc3c377b1c47ae4d9ab8d150faae19a0))
 
-	ROM_REGION(0x100, REGION_USER6,0)
-	ROM_LOAD("romram.bin", 0x00, 0x100, CRC(b3ea95d7) )
+	ROM_REGION(0x100, REGION_USER6, 0)
+	ROM_LOAD("romram.bin", 0x00, 0x100, CRC(b3ea95d7) SHA1(1252390737a7ead4ecec988c873181798fbc291b))
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     INIT CONFIG   COMPANY                FULLNAME */
