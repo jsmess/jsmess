@@ -68,12 +68,10 @@
 
 void scale2x_yuv16(texture_info *texture, const render_texinfo *texsource)
 {
-	mame_printf_error("ERROR: Scale2X not supported for YUV textures\n");
-	mame_schedule_exit(Machine);
+	fatalerror("ERROR: Scale2X not supported for YUV textures\n");
 }
 
 void scale2x_yuv16_paletted(texture_info *texture, const render_texinfo *texsource)
 {
-	mame_printf_error("ERROR: Scale2X not supported for YUV textures\n");
-	mame_schedule_exit(Machine);
+	fatalerror("ERROR: Scale2X not supported for YUV textures\n");
 }

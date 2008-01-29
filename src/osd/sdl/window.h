@@ -197,7 +197,7 @@ extern sdl_window_info *sdl_window_list;
 int sdlwindow_init(running_machine *machine);
 
 // creation/deletion of windows
-int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sdl_window_config *config);
+int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monitor_info *monitor, const sdl_window_config *config);
 
 void sdlwindow_update_cursor_state(void);
 void sdlwindow_video_window_update(sdl_window_info *window);

@@ -25,6 +25,7 @@
 #include "window.h"
 #include "video.h"
 #include "osdsdl.h"
+//#include "deprecat.h"
 
 //============================================================
 //	DEBUGGING
@@ -90,11 +91,11 @@ static void			sdl_cleanup_audio(running_machine *machine);
 void sdl_init_audio(running_machine *machine)
 {
 #if LOG_SOUND
-	sound_log = fopen("sound.log", "w");
+	sound_log = fopen(SDL_SOUND_LOG, "w");
 #endif
 
 	// skip if sound disabled
-	if (Machine->sample_rate != 0)
+	if (machine->sample_rate != 0)
 	{
 		// attempt to initialize SDL
 		if (sdl_init(machine))
@@ -484,7 +485,7 @@ static int sdl_init(running_machine *machine)
 	}
 
 	// compute the buffer sizes
-	stream_buffer_size = Machine->sample_rate * 2 * sizeof(INT16) * audio_latency / MAX_AUDIO_LATENCY;
+	stream_buffer_size = machine->sample_rate * 2 * sizeof(INT16) * audio_latency / MAX_AUDIO_LATENCY;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;

@@ -22,6 +22,7 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "ui.h"
+//#include "deprecat.h"
 
 // MAMEOS headers
 #include "window.h"
@@ -1179,7 +1180,7 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 			
 			// LCTRL-F8 to decrease prescaling effect #
 			case IPT_OSD_8:
-				if (getenv("SDLMAME_UNSUPPORTED")) {
+				if (sdl_use_unsupported()) {
 					idef->token = "DECREASE_EFFECT";
 					idef->name = "Decrease Effect";
 					input_seq_set_2(&idef->defaultseq, KEYCODE_F8, KEYCODE_LCONTROL);
@@ -1187,13 +1188,13 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 				break;
 			// add a Not lcrtl condition to frameskip decrease
 			case IPT_UI_FRAMESKIP_DEC:
-				if (getenv("SDLMAME_UNSUPPORTED"))
+				if (sdl_use_unsupported())
 					input_seq_set_3(&idef->defaultseq, KEYCODE_F8, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
 			// LCTRL-F9 to increase prescaling effect #
 			case IPT_OSD_9:
-				if (getenv("SDLMAME_UNSUPPORTED")) {
+				if (sdl_use_unsupported()) {
 					idef->token = "INCREASE_EFFECT";
 					idef->name = "Increase Effect";
 					input_seq_set_2(&idef->defaultseq, KEYCODE_F9, KEYCODE_LCONTROL);
@@ -1201,7 +1202,7 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 				break;
 			// add a Not lcrtl condition to frameskip increase
 			case IPT_UI_FRAMESKIP_INC:
-				if (getenv("SDLMAME_UNSUPPORTED"))
+				if (sdl_use_unsupported())
 					input_seq_set_3(&idef->defaultseq, KEYCODE_F9, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			

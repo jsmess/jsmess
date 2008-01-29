@@ -102,8 +102,8 @@ static sdl_monitor_info *pick_monitor(int index);
 
 static void check_osd_inputs(void);
 
-static void extract_video_config(void);
-static void load_effect_overlay(const char *filename);
+static void extract_video_config(running_machine *machine);
+static void load_effect_overlay(running_machine *machine, const char *filename);
 static float get_aspect(const char *name, int report_error);
 static void get_resolution(const char *name, sdl_window_config *config, int report_error);
 
@@ -144,7 +144,7 @@ int sdlvideo_init(running_machine *machine)
 	int index, tc;
 
 	// extract data from the options
-	extract_video_config();
+	extract_video_config(machine);
 	
 	// ensure we get called on the way out
 	add_exit_callback(machine, video_exit);
@@ -155,7 +155,7 @@ int sdlvideo_init(running_machine *machine)
 	// we need the beam width in a float, contrary to what the core does.
 	video_config.beamwidth = options_get_float(mame_options(), OPTION_BEAM);
 
-	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
+	if (machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
 	{
 		video_config.isvector = 1;
 	}
@@ -174,7 +174,7 @@ int sdlvideo_init(running_machine *machine)
 	for (index = 0; index < video_config.numscreens; index++)
 	{
 		video_config.window[index].totalColors = tc;
-		if (sdlwindow_video_window_create(index, pick_monitor(index), &video_config.window[index]))
+		if (sdlwindow_video_window_create(machine, index, pick_monitor(index), &video_config.window[index]))
 			goto error;
 	}
 
@@ -293,7 +293,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			SDL_VideoDriverName(monitor->monitor_device, sizeof(monitor->monitor_device)-1);
 			if (first_call==0) 
 			{
-				char *dimstr = getenv("SDLMAME_DESKTOPDIM");
+				char *dimstr = getenv(SDLENV_DESKTOPDIM);
 				const SDL_VideoInfo *sdl_vi;
 				
 				sdl_vi = SDL_GetVideoInfo();
@@ -307,7 +307,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 				first_call=1;
 				if ((cw==0) || (ch==0))
 				{
-					if (dimstr)
+					if (dimstr != NULL)
 					{
 						sscanf(dimstr, "%dx%d", &cw, &ch);
 					}
@@ -602,7 +602,7 @@ static void check_osd_inputs(void)
 //  extract_video_config
 //============================================================
 
-static void extract_video_config(void)
+static void extract_video_config(running_machine *machine)
 {
 	const char *stemp;
 
@@ -625,7 +625,7 @@ static void extract_video_config(void)
 #endif
 	stemp = options_get_string(mame_options(), SDLOPTION_EFFECT);
 	if (stemp != NULL && strcmp(stemp, "none") != 0)
-		load_effect_overlay(stemp);
+		load_effect_overlay(machine, stemp);
 
 	// per-window options: extract the data
 	get_resolution(SDLOPTION_RESOLUTION("0"), &video_config.window[0], TRUE);
@@ -639,16 +639,16 @@ static void extract_video_config(void)
 
 	// d3d options: extract the data
 	stemp = options_get_string(mame_options(), SDLOPTION_VIDEO);
-	if (strcmp(stemp, "opengl") == 0)
+	if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
-	else if (strcmp(stemp, "opengl16") == 0)
+	else if (strcmp(stemp, SDLOPTVAL_OPENGL16) == 0)
 	{
  		video_config.mode = VIDEO_MODE_OPENGL;
  		video_config.prefer16bpp_tex = 1;
 	}
-	else if (strcmp(stemp, "soft") == 0)
+	else if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)
 		video_config.mode = VIDEO_MODE_SOFT;
-	else if (strcmp(stemp, "none") == 0)
+	else if (strcmp(stemp, SDLOPTVAL_NONE) == 0)
 	{
 		video_config.mode = VIDEO_MODE_SOFT;
 		video_config.novideo = 1;
@@ -692,7 +692,7 @@ static void extract_video_config(void)
 			snprintf(buffer, 18, SDLOPTION_SHADER_MAME("%d"), i); buffer[17]=0;
 
 			stemp = options_get_string(mame_options(), buffer);
-			if (stemp && strcmp(stemp, "none") != 0 && strlen(stemp)>0)
+			if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
 			{
 				video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
 				strcpy(video_config.glsl_shader_mamebm[i], stemp);
@@ -709,7 +709,7 @@ static void extract_video_config(void)
 			snprintf(buffer, 20, SDLOPTION_SHADER_SCREEN("%d"), i); buffer[19]=0;
 
 			stemp = options_get_string(mame_options(), buffer);
-			if (stemp && strcmp(stemp, "none") != 0 && strlen(stemp)>0)
+			if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
 			{
 				video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
 				strcpy(video_config.glsl_shader_scrn[i], stemp);
@@ -748,7 +748,7 @@ static void extract_video_config(void)
 		video_config.glsl_vid_attributes = 0;
 	}
 
-	if (getenv("SDLMAME_UNSUPPORTED"))
+	if (sdl_use_unsupported())
 		video_config.prescale_effect = options_get_int(mame_options(), SDLOPTION_PRESCALE_EFFECT);
 	else
 		video_config.prescale_effect = 0;
@@ -764,15 +764,15 @@ static void extract_video_config(void)
 
 	// yuv settings ...
 	stemp = options_get_string(mame_options(), SDLOPTION_YUVMODE);
-	if (strcmp(stemp, "none") == 0)
+	if (strcmp(stemp, SDLOPTVAL_NONE) == 0)
 		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
-	else if (strcmp(stemp, "yv12") == 0)
+	else if (strcmp(stemp, SDLOPTVAL_YV12) == 0)
 		video_config.yuv_mode = VIDEO_YUV_MODE_YV12;
-	else if (strcmp(stemp, "yv12x2") == 0)
+	else if (strcmp(stemp, SDLOPTVAL_YV12x2) == 0)
 		video_config.yuv_mode = VIDEO_YUV_MODE_YV12X2;
-	else if (strcmp(stemp, "yuy2") == 0)
+	else if (strcmp(stemp, SDLOPTVAL_YUY2) == 0)
 		video_config.yuv_mode = VIDEO_YUV_MODE_YUY2;
-	else if (strcmp(stemp, "yuy2x2") == 0)
+	else if (strcmp(stemp, SDLOPTVAL_YUY2x2) == 0)
 		video_config.yuv_mode = VIDEO_YUV_MODE_YUY2X2;
 	else
 	{
@@ -791,7 +791,7 @@ static void extract_video_config(void)
 //  load_effect_overlay
 //============================================================
 
-static void load_effect_overlay(const char *filename)
+static void load_effect_overlay(running_machine *machine, const char *filename)
 {
 	char *tempstr = malloc_or_die(strlen(filename) + 5);
 	int scrnum;
@@ -815,7 +815,7 @@ static void load_effect_overlay(const char *filename)
 
 	// set the overlay on all screens
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (Machine->drv->screen[scrnum].tag != NULL)
+		if (machine->drv->screen[scrnum].tag != NULL)
 			render_container_set_overlay(render_container_get_screen(scrnum), effect_bitmap);
 
 	free(tempstr);
@@ -832,9 +832,9 @@ static float get_aspect(const char *name, int report_error)
 	const char *data = options_get_string(mame_options(), name);
 	int num = 0, den = 1;
 
-	if (strcmp(data, "auto") == 0)
+	if (strcmp(data, SDLOPTVAL_AUTO) == 0)
 	{
-		if (strcmp(defdata, "auto") == 0)
+		if (strcmp(defdata,SDLOPTVAL_AUTO) == 0)
 			return 0;
 		data = defdata;
 	}
@@ -854,7 +854,7 @@ static void get_resolution(const char *name, sdl_window_config *config, int repo
 	const char *data = options_get_string(mame_options(), name);
 
 	config->width = config->height = config->depth = config->refresh = 0;
-	if (strcmp(data, "auto") == 0)
+	if (strcmp(data, SDLOPTVAL_AUTO) == 0)
 	{
 		return;
 	}

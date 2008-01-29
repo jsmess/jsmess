@@ -80,7 +80,7 @@ endif	# PPC
 endif	# SYMBOLS
 
 # add an ARCH define
-DEFS += "-DSDLMAME_ARCH=$(ARCH)"
+DEFS += "-DSDLMAME_ARCH=$(ARCHOPTS)"
 
 # add SDLMAME TARGETOS definitions
 ifeq ($(TARGETOS),linux)
@@ -245,7 +245,20 @@ endif	# Win32
 ifeq ($(TARGETOS),macosx)
 OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 OSDOBJS += $(SDLOBJ)/SDLMain_tmpl.o
+
+ifndef MACOSX_USE_LIBSDL
+# Compile using framework (compile using libSDL is the exception)
 LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread 
+else
+# Compile using installed libSDL (Fink or MacPorts):
+#
+# Remove the "/SDL" component from the include path so that we can compile
+# files (header files are #include "SDL/something.h", so the extra "/SDL"
+# causes a significant problem)
+CFLAGS += `sdl-config --cflags | sed 's:/SDL::'` -DNO_SDL_GLEXT
+# Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
+LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
+endif
 
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 

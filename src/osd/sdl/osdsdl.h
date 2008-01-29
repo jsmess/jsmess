@@ -50,6 +50,7 @@
 //	Defines
 //============================================================
 
+#define SDLOPTION_INIPATH				"inipath"
 #define SDLOPTION_AUDIO_LATENCY			"audio_latency"
 #define SDLOPTION_SCREEN(x)				"screen" x
 #define SDLOPTION_ASPECT(x)				"aspect" x
@@ -77,7 +78,8 @@
 #define SDLOPTION_JOYMAP				"remapjoys"
 #define SDLOPTION_JOYMAP_FILE			"remapjoyfile"
 #define SDLOPTION_UIMODEKEY				"uimodekey"
-#define SDLOPTION_SIXAXIS			"sixaxis"
+#define SDLOPTION_SIXAXIS				"sixaxis"
+#define SDLOPTION_OSLOG					"oslog"
 
 #define SDLOPTION_SHADER_MAME(x)		"glsl_shader_mame" x
 #define SDLOPTION_SHADER_SCREEN(x)		"glsl_shader_screen" x
@@ -88,6 +90,30 @@
 #define SDLOPTION_GL_NOTEXTURERECT		"gl_notexturerect"
 #define SDLOPTION_GL_FORCEPOW2TEXTURE	"gl_forcepow2texture"
 #define SDLOPTION_GL_GLSL_VID_ATTR		"gl_glsl_vid_attr"
+
+#define SDLOPTVAL_NONE					"none"
+#define SDLOPTVAL_AUTO					"auto"
+
+#define SDLOPTVAL_OPENGL				"opengl"
+#define SDLOPTVAL_OPENGL16				"opengl16"
+#define SDLOPTVAL_SOFT					"soft"
+
+#define SDLOPTVAL_YV12					"yv12"
+#define SDLOPTVAL_YV12x2				"yv12x2"
+#define SDLOPTVAL_YUY2					"yuy2"
+#define SDLOPTVAL_YUY2x2				"yuy2x2"
+
+#define SDL_LED(x)						"led" #x
+
+#define SDLENV_IDENTIFIER				"SDL_VIDEO_X11_VISUALID"
+#define SDLENV_COLUMNS					"COLUMNS"
+#define SDLENV_DESKTOPDIM				"SDLMAME_DESKTOPDIM"
+#define SDLENV_GL_LIB					"SDLMAME_GL_LIB"
+#define SDLENV_VMWARE					"SDLMAME_VMWARE"
+
+#define sdl_use_unsupported()			(getenv("SDLMAME_UNSUPPORTED") != NULL)
+
+#define SDL_SOUND_LOG					"sound.log"
 
 //============================================================
 //	sound.c

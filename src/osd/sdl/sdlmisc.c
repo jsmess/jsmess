@@ -59,6 +59,7 @@ Version 0.2, May 2000
 #include "driver.h"
 #include "window.h"
 #include "options.h"
+#include "osdsdl.h"
 
 #ifdef HAVE_GETTIMEOFDAY
 /* Standard UNIX clock() is based on CPU time, not real time.
@@ -104,9 +105,9 @@ void fprint_colums(FILE *f, const char *text1, const char *text2)
 {
    const char *text[2];
    int i, j, cols, width[2], done = 0;
-   char *e_cols = getenv("COLUMNS");
+   char *e_cols = getenv(SDLENV_COLUMNS);
 
-   cols = e_cols? atoi(e_cols):80;
+   cols = (e_cols != NULL) ? atoi(e_cols):80;
    if ( cols < 6 ) cols = 6;  /* minimum must be 6 */
    cols--;
 

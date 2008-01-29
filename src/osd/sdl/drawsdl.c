@@ -1645,9 +1645,11 @@ static int gl_checkFramebufferStatus(void)
         case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
             mame_printf_error("GL FBO: incomplete,missing read buffer\n");
             return -1;
+#ifdef GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT 
         case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
             mame_printf_error("GL FBO: incomplete, duplicate attachment\n");
             return -1;
+#endif
         case 0:
             mame_printf_error("GL FBO: incomplete, implementation fault\n");
             return -1;

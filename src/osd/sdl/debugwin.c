@@ -19,6 +19,7 @@
 #include "debug-cb.h"
 
 #include "dview.h"
+#include "deprecat.h"
 
 typedef struct hentry {
 	struct hentry *h;

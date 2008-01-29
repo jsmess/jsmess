@@ -133,7 +133,7 @@ static void sdlwindow_init_ogl_context(void);
 static void get_min_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain);
 
 static void *complete_create_wt(void *param, int threadid);
-static void set_starting_view(int index, sdl_window_info *window, const char *view);
+static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view);
 
 //============================================================
 //  clear the worker_param structure, inline - faster than memset
@@ -690,7 +690,7 @@ void sdlwindow_update_cursor_state(void)
 //  (main thread)
 //============================================================
 
-int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sdl_window_config *config)
+int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monitor_info *monitor, const sdl_window_config *config)
 {
 	sdl_window_info *window;
 	worker_param *wp = malloc(sizeof(worker_param));
@@ -731,13 +731,13 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 
 	// set the specific view				    
 	sprintf(option, SDLOPTION_VIEW("%d"), index);
-	set_starting_view(index, window, options_get_string(mame_options(), option));
+	set_starting_view(machine, index, window, options_get_string(mame_options(), option));
 
 	// make the window title
 	if (video_config.numscreens == 1)
-		sprintf(window->title, APPNAME ": %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
+		sprintf(window->title, APPNAME ": %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
 	else
-		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", Machine->gamedrv->description, Machine->gamedrv->name, index);
+		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->gamedrv->description, machine->gamedrv->name, index);
 
 	wp->window = window;
 	if (multithreading_enabled)
@@ -985,7 +985,7 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 //  (main thread)
 //============================================================
 
-static void set_starting_view(int index, sdl_window_info *window, const char *view)
+static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view)
 {
 	int viewindex = -1;
 
@@ -993,10 +993,11 @@ static void set_starting_view(int index, sdl_window_info *window, const char *vi
 
 	// NULL is the same as auto
 	if (view == NULL)
-		view = "auto";
+		view = SDLOPTVAL_AUTO;
 
 	// auto view just selects the nth view
-	if (strcmp(view, "auto") != 0)
+
+	if (strcmp(view, SDLOPTVAL_AUTO) != 0)
 	{
 		// scan for a matching view name
 		for (viewindex = 0; ; viewindex++)
@@ -1020,7 +1021,7 @@ static void set_starting_view(int index, sdl_window_info *window, const char *vi
 		int scrcount;
 
 		// count the number of screens
-		for (scrcount = 0; Machine->drv->screen[scrcount].tag != NULL; scrcount++) ;
+		for (scrcount = 0; machine->drv->screen[scrcount].tag != NULL; scrcount++) ;
 
 		// if we have enough screens to be one per monitor, assign in order
 		if (video_config.numscreens >= scrcount)
@@ -1162,7 +1163,9 @@ static void *complete_create_wt(void *param, int threadid)
 		 *   SDL_VIDEO_GL_DRIVER
 		 */
 		const char *e;
-		e=getenv("SDLMAME_GL_LIB");
+
+		e=getenv(SDLENV_GL_LIB);
+		
 #ifdef SDLMAME_MACOSX
 		/* Vas Crabb: Default GL-lib for MACOSX */
 		if (!e)
@@ -1337,7 +1340,7 @@ static void *complete_create_wt(void *param, int threadid)
 
 		sdl->glsl_vid_attributes = video_config.glsl_vid_attributes;
 
-		if (getenv("SDLMAME_VMWARE"))
+		if (getenv(SDLENV_VMWARE) != NULL)
 		{
 			sdl->usetexturerect = 1;
 			sdl->texpoweroftwo = 1;

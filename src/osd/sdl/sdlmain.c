@@ -79,7 +79,7 @@ static const options_entry mame_sdl_options[] =
 #ifdef MESS
 	{ "inipath",                              "$HOME/.mess;.;ini",     0,     "path to ini files" },
 #else
-	{ "inipath",                              "$HOME/.mame;.;ini",     0,     "path to ini files" },
+	{ SDLOPTION_INIPATH,                     "$HOME/.mame;.;ini",     0,     "path to ini files" },
 #endif // MESS
 #endif // INI_PATH
 #endif // MACOSX
@@ -87,7 +87,7 @@ static const options_entry mame_sdl_options[] =
 
 	// debugging options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
-	{ "oslog",                                "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ SDLOPTION_OSLOG,                        "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
 
 	// performance options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
@@ -96,18 +96,18 @@ static const options_entry mame_sdl_options[] =
 
 	// video options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "VIDEO OPTIONS" },
-	{ SDLOPTION_VIDEO,                        "soft",     0,                 "video output method: soft or opengl" },
+	{ SDLOPTION_VIDEO,                   SDLOPTVAL_SOFT,  0,                 "video output method: soft or opengl" },
 	{ SDLOPTION_NUMSCREENS,                   "1",        0,                 "number of screens to create; SDLMAME only supports 1 at this time" },
 	{ SDLOPTION_WINDOW ";w",                  "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
 	{ SDLOPTION_KEEPASPECT ";ka",             "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
 	{ SDLOPTION_UNEVENSTRETCH ";ues",         "1",        OPTION_BOOLEAN,    "allow non-integer stretch factors" },
-	{ SDLOPTION_EFFECT,                       "none",     0,                 "name of a PNG file to use for visual effects, or 'none'" },
+	{ SDLOPTION_EFFECT,                  SDLOPTVAL_NONE,  0,                 "name of a PNG file to use for visual effects, or 'none'" },
 	{ SDLOPTION_CENTERH,                      "1",        OPTION_BOOLEAN,    "center horizontally within the view area" },
 	{ SDLOPTION_CENTERV,                      "1",        OPTION_BOOLEAN,    "center vertically within the view area" },
 	#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
 	{ SDLOPTION_WAITVSYNC,                    "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	#endif
-	{ SDLOPTION_YUVMODE ";ym",                "none",     0,                 "YUV mode: none, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+	{ SDLOPTION_YUVMODE ";ym",           SDLOPTVAL_NONE,  0,                 "YUV mode: none, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 
 	// OpenGL specific options
 	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
@@ -118,71 +118,71 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_GL_VBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
 	{ SDLOPTION_GL_PBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
 	{ SDLOPTION_GL_GLSL,                      "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
- 	{ SDLOPTION_GLSL_FILTER,				  "1",       0,          "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
- 	{ SDLOPTION_SHADER_MAME("0"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 0" },
- 	{ SDLOPTION_SHADER_MAME("1"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 1" },
- 	{ SDLOPTION_SHADER_MAME("2"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 2" },
- 	{ SDLOPTION_SHADER_MAME("3"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 3" },
- 	{ SDLOPTION_SHADER_MAME("4"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 4" },
- 	{ SDLOPTION_SHADER_MAME("5"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 5" },
- 	{ SDLOPTION_SHADER_MAME("6"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 6" },
- 	{ SDLOPTION_SHADER_MAME("7"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 7" },
- 	{ SDLOPTION_SHADER_MAME("8"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 8" },
- 	{ SDLOPTION_SHADER_MAME("9"),	 		 "none",      0,          "custom OpenGL GLSL shader set mame bitmap 9" },
- 	{ SDLOPTION_SHADER_SCREEN("0"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 0" },
- 	{ SDLOPTION_SHADER_SCREEN("1"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 1" },
- 	{ SDLOPTION_SHADER_SCREEN("2"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 2" },
- 	{ SDLOPTION_SHADER_SCREEN("3"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 3" },
- 	{ SDLOPTION_SHADER_SCREEN("4"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 4" },
- 	{ SDLOPTION_SHADER_SCREEN("5"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 5" },
- 	{ SDLOPTION_SHADER_SCREEN("6"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 6" },
- 	{ SDLOPTION_SHADER_SCREEN("7"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 7" },
- 	{ SDLOPTION_SHADER_SCREEN("8"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 8" },
- 	{ SDLOPTION_SHADER_SCREEN("9"),			 "none",      0,          "custom OpenGL GLSL shader screen bitmap 9" },
- 	{ SDLOPTION_GL_GLSL_VID_ATTR,			 "1",    OPTION_BOOLEAN, "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
+ 	{ SDLOPTION_GLSL_FILTER,				  "1",    0,              "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
+ 	{ SDLOPTION_SHADER_MAME("0"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 0" },
+ 	{ SDLOPTION_SHADER_MAME("1"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 1" },
+ 	{ SDLOPTION_SHADER_MAME("2"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 2" },
+ 	{ SDLOPTION_SHADER_MAME("3"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 3" },
+ 	{ SDLOPTION_SHADER_MAME("4"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 4" },
+ 	{ SDLOPTION_SHADER_MAME("5"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 5" },
+ 	{ SDLOPTION_SHADER_MAME("6"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 6" },
+ 	{ SDLOPTION_SHADER_MAME("7"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 7" },
+ 	{ SDLOPTION_SHADER_MAME("8"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 8" },
+ 	{ SDLOPTION_SHADER_MAME("9"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 9" },
+ 	{ SDLOPTION_SHADER_SCREEN("0"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 0" },
+ 	{ SDLOPTION_SHADER_SCREEN("1"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 1" },
+ 	{ SDLOPTION_SHADER_SCREEN("2"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 2" },
+ 	{ SDLOPTION_SHADER_SCREEN("3"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 3" },
+ 	{ SDLOPTION_SHADER_SCREEN("4"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 4" },
+ 	{ SDLOPTION_SHADER_SCREEN("5"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 5" },
+ 	{ SDLOPTION_SHADER_SCREEN("6"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 6" },
+ 	{ SDLOPTION_SHADER_SCREEN("7"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 7" },
+ 	{ SDLOPTION_SHADER_SCREEN("8"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 8" },
+ 	{ SDLOPTION_SHADER_SCREEN("9"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 9" },
+ 	{ SDLOPTION_GL_GLSL_VID_ATTR,			 "1",    OPTION_BOOLEAN,  "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
 
 	// per-window options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },
-	{ SDLOPTION_SCREEN(""),                   "auto",     0,                 "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("") ";screen_aspect",  "auto",     0,                 "aspect ratio for all screens; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("") ";r",          "auto",     0,                 "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW(""),                     "auto",     0,                 "preferred view for all screens" },
+	{ NULL,                                   NULL, OPTION_HEADER,    "PER-WINDOW VIDEO OPTIONS" },
+	{ SDLOPTION_SCREEN(""),                   SDLOPTVAL_AUTO,   0,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT("") ";screen_aspect",  SDLOPTVAL_AUTO,   0,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION("") ";r",          SDLOPTVAL_AUTO,   0,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW(""),                     SDLOPTVAL_AUTO,   0,    "preferred view for all screens" },
 
-	{ SDLOPTION_SCREEN("0"),                  "auto",     0,                 "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("0"),                  "auto",     0,                 "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("0") ";r0",        "auto",     0,                 "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW("0"),                    "auto",     0,                 "preferred view for the first screen" },
+	{ SDLOPTION_SCREEN("0"),                  SDLOPTVAL_AUTO,   0,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT("0"),                  SDLOPTVAL_AUTO,   0,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION("0") ";r0",        SDLOPTVAL_AUTO,   0,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW("0"),                    SDLOPTVAL_AUTO,   0,    "preferred view for the first screen" },
 
-	{ SDLOPTION_SCREEN("1"),                  "auto",     0,                 "explicit name of the second screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("1"),                  "auto",     0,                 "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("1") ";r1",        "auto",     0,                 "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW("1"),                    "auto",     0,                 "preferred view for the second screen" },
+	{ SDLOPTION_SCREEN("1"),                  SDLOPTVAL_AUTO,   0,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT("1"),                  SDLOPTVAL_AUTO,   0,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION("1") ";r1",        SDLOPTVAL_AUTO,   0,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW("1"),                    SDLOPTVAL_AUTO,   0,    "preferred view for the second screen" },
 
-	{ SDLOPTION_SCREEN("2"),                  "auto",     0,                 "explicit name of the third screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("2"),                  "auto",     0,                 "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("2") ";r2",        "auto",     0,                 "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW("2"),                    "auto",     0,                 "preferred view for the third screen" },
+	{ SDLOPTION_SCREEN("2"),                  SDLOPTVAL_AUTO,   0,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT("2"),                  SDLOPTVAL_AUTO,   0,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION("2") ";r2",        SDLOPTVAL_AUTO,   0,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW("2"),                    SDLOPTVAL_AUTO,   0,    "preferred view for the third screen" },
 
-	{ SDLOPTION_SCREEN("3"),                  "auto",     0,                 "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("3"),                  "auto",     0,                 "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("3") ";r3",        "auto",     0,                 "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW("3"),                    "auto",     0,                 "preferred view for the fourth screen" },
+	{ SDLOPTION_SCREEN("3"),                  SDLOPTVAL_AUTO,   0,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT("3"),                  SDLOPTVAL_AUTO,   0,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION("3") ";r3",        SDLOPTVAL_AUTO,   0,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW("3"),                    SDLOPTVAL_AUTO,   0,    "preferred view for the fourth screen" },
 
 	// full screen options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
-	{ SDLOPTION_SWITCHRES,                   "0",        OPTION_BOOLEAN,    "enable resolution switching" },
+	{ NULL,                                   NULL,  OPTION_HEADER,     "FULL SCREEN OPTIONS" },
+	{ SDLOPTION_SWITCHRES,                    "0",   OPTION_BOOLEAN,    "enable resolution switching" },
 	#ifdef SDLMAME_X11
 	{ SDLOPTION_USEALLHEADS,	             "0",	  OPTION_BOOLEAN,    "split full screen image across monitors" },
 	#endif
 
 	// sound options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "SOUND OPTIONS" },
-	{ SDLOPTION_AUDIO_LATENCY,                "3",        0,                 "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+	{ NULL,                                   NULL,  OPTION_HEADER,     "SOUND OPTIONS" },
+	{ SDLOPTION_AUDIO_LATENCY,                "3",   0,                 "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 	// keyboard mapping
-	{ NULL, 		                          NULL,       OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
-	{ SDLOPTION_KEYMAP,                      "0",         OPTION_BOOLEAN,    "enable keymap" },
-	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", 0,               "keymap filename" },
+	{ NULL, 		                          NULL,  OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
+	{ SDLOPTION_KEYMAP,                      "0",    OPTION_BOOLEAN,    "enable keymap" },
+	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", 0,           "keymap filename" },
 #ifdef MESS
 #ifdef SDLMAME_MACOSX	// work around for SDL 1.2.11 on Mac - 1.2.12 should not require this
 	{ SDLOPTION_UIMODEKEY,			"DELETE", 0,                  "Key to toggle MESS keyboard mode" },
@@ -192,10 +192,10 @@ static const options_entry mame_sdl_options[] =
 #endif	// MESS
 
 	// joystick mapping
-	{ NULL, 		                         NULL,        OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
-	{ SDLOPTION_JOYMAP,                      "0",         OPTION_BOOLEAN,    "enable physical to logical joystick mapping" },
-	{ SDLOPTION_JOYMAP_FILE,                "joymap.dat", 0,               "joymap filename" },
-	{ SDLOPTION_SIXAXIS,			"0",	OPTION_BOOLEAN, "Use special handling for PS3 Sixaxis controllers" },
+	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
+	{ SDLOPTION_JOYMAP,                      "0",    OPTION_BOOLEAN,    "enable physical to logical joystick mapping" },
+	{ SDLOPTION_JOYMAP_FILE,                "joymap.dat", 0,            "joymap filename" },
+	{ SDLOPTION_SIXAXIS,			        "0",	 OPTION_BOOLEAN,    "Use special handling for PS3 Sixaxis controllers" },
 	{ NULL }
 };
 
@@ -303,7 +303,7 @@ int SDL_main(int argc, char **argv)
 			char buf[130];
 			if (XMatchVisualInfo(display, DefaultScreen(display), 24, TrueColor, &vi)) {
 				snprintf(buf, sizeof(buf), "0x%lx", vi.visualid);
-				setenv("SDL_VIDEO_X11_VISUALID", buf, 0);
+				setenv(SDLENV_IDENTIFIER, buf, 0);
 			}
 		}
 		if (display)
@@ -434,8 +434,7 @@ void osd_init(running_machine *machine)
 		fflush(stdout);
 		exit(-1);
 	}
-	
-	if (getenv("SDLMAME_UNSUPPORTED"))
+	if (sdl_use_unsupported())
 		led_init();
 
 	#ifdef MESS
@@ -445,7 +444,7 @@ void osd_init(running_machine *machine)
 	sdlinput_init(machine);
 	sdl_init_audio(machine);
 
-	if (options_get_bool(mame_options(), "oslog"))
+	if (options_get_bool(mame_options(), SDLOPTION_OSLOG))
 		add_logerror_callback(machine, output_oslog);
 
 	#ifdef MESS

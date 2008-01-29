@@ -156,7 +156,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		envstr[i] = '\0';
 
 		envval = getenv(&envstr[1]);
-		if (envval)
+		if (envval != NULL)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
 			free(tmpstr);
@@ -250,18 +250,18 @@ error:
 
 file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-	UINT32 result;
+	ssize_t result;
 
 #if defined(SDLMAME_DARWIN) || defined(SDLMAME_FREEBSD)
 	result = pread(file->handle, buffer, count, offset);
-	if (!result)
+	if (result < 0)
 #elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
 	lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
 	result = read(file->handle, buffer, count); 
-	if (!result)
+	if (result < 0)
 #elif defined(SDLMAME_UNIX)
 	result = pread64(file->handle, buffer, count, offset);
-	if (!result)
+	if (result < 0)
 #else
 #error Unknown SDL SUBARCH!
 #endif
@@ -441,6 +441,7 @@ static file_error osd_rmdir(const char *dir)
 
 //============================================================
 //	osd_copyfile
+//  FIXME: this will not work with blanks in filename ...
 //============================================================
 
 file_error osd_copyfile(const char *destfile, const char *srcfile)
