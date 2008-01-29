@@ -449,7 +449,7 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc6 ) {
-	logerror( "0x%04X: writei to mbc6 ram enable area: %04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
+	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 ) {
@@ -1153,8 +1153,7 @@ WRITE8_HANDLER ( sgb_io_w )
 
 									for( I = 0; I < 2048; I++ )
 									{
-										col = program_read_byte_8 (0x8800 + (I*2));
-										col |= (UINT16)(program_read_byte_8 (0x8800 + (I*2) + 1)) << 8;
+										col = ( gb_vram[ 0x0800 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x0800 + (I*2) ];
 										sgb_pal_data[I] = col;
 									}
 								}
@@ -1198,8 +1197,7 @@ WRITE8_HANDLER ( sgb_io_w )
 										memcpy( sgb_tile_map, gb_vram + 0x1000, 2048 );
 										for( I = 0; I < 64; I++ )
 										{
-											col = program_read_byte_8 (0x8800 + (I*2));
-											col |= (UINT16)(program_read_byte_8 (0x8800 + (I*2) + 1)) << 8;
+											col = ( gb_vram[ 0x0800 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x0800 + (I*2) ];
 											sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
@@ -1208,8 +1206,7 @@ WRITE8_HANDLER ( sgb_io_w )
 										memcpy( sgb_tile_map, gb_vram + 0x0800, 2048 );
 										for( I = 0; I < 64; I++ )
 										{
-											col = program_read_byte_8 (0x9000 + (I*2));
-											col |= (UINT16)(program_read_byte_8 (0x9000 + (I*2) + 1)) << 8;
+											col = ( gb_vram[ 0x1000 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x1000 + (I*2) ];
 											sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
