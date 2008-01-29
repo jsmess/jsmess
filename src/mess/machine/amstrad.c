@@ -313,3 +313,13 @@ DEVICE_LOAD(amstrad_plus_cartridge)
 	return INIT_PASS;
 }
 
+
+/*static DEVICE_LOAD( aleste )
+{
+	if (device_load_basicdsk_floppy(image)==INIT_PASS)
+	{
+		basicdsk_set_geometry(image, 80, 2, 9, 512, 0x01, 0, FALSE);
+		return INIT_PASS;
+	}
+	return INIT_FAIL;
+}*/
