@@ -1074,7 +1074,7 @@ static void wd17xx_timed_write_sector_request(void)
 		w->status &= ~STA_1_NOT_READY;
 
 		/* TODO: What is this?  We need some more info on this */
-		if ((w->type == WD_TYPE_179X) || (w->type == WD_TYPE_1773))
+		if ((w->type == WD_TYPE_179X) || (w->type == WD_TYPE_1793) || (w->type == WD_TYPE_1773))
 		{
 			if (!floppy_drive_get_flag_state(wd17xx_current_image(), FLOPPY_DRIVE_READY))
 				w->status |= STA_1_NOT_READY;
