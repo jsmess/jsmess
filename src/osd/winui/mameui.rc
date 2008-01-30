@@ -296,7 +296,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 #ifdef MESS
-IDI_MAME32_ICON         ICON                    "res/mess.ico"
+IDI_MAMEUI_ICON         ICON                    "res/mess.ico"
 #else
 IDI_MAMEUI_ICON         ICON                    "res\\mameui.ico"
 #endif
