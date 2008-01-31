@@ -96,7 +96,7 @@ static const char_info charinfo[] =
 	{ 0x00c1,					NULL,			"A" },		/* 'A' acute */
 	{ 0x00c2,					NULL,			"A" },		/* 'A' circumflex */
 	{ 0x00c3,					NULL,			"A" },		/* 'A' tilde */
-	{ 0x00c4,					NULL,			"A" },		/* 'A' diaeresis */
+	{ 0x00c4,					NULL,			"AE" },		/* 'A' diaeresis */
 	{ 0x00c5,					NULL,			"A" },		/* 'A' ring above */
 	{ 0x00c6,					NULL,			"AE" },		/* 'AE' ligature */
 	{ 0x00c7,					NULL,			"C" },		/* 'C' cedilla */
@@ -114,20 +114,20 @@ static const char_info charinfo[] =
 	{ 0x00d3,					NULL,			"O" },		/* 'O' acute */
 	{ 0x00d4,					NULL,			"O" },		/* 'O' circumflex */
 	{ 0x00d5,					NULL,			"O" },		/* 'O' tilde */
-	{ 0x00d6,					NULL,			"O" },		/* 'O' diaeresis */
+	{ 0x00d6,					NULL,			"OE" },		/* 'O' diaeresis */
 	{ 0x00d7,					NULL,			"X" },		/* multiplication sign */
 	{ 0x00d8,					NULL,			"O" },		/* 'O' stroke */
 	{ 0x00d9,					NULL,			"U" },		/* 'U' grave */
 	{ 0x00da,					NULL,			"U" },		/* 'U' acute */
 	{ 0x00db,					NULL,			"U" },		/* 'U' circumflex */
-	{ 0x00dc,					NULL,			"U" },		/* 'U' diaeresis */
+	{ 0x00dc,					NULL,			"UE" },		/* 'U' diaeresis */
 	{ 0x00dd,					NULL,			"Y" },		/* 'Y' acute */
 	{ 0x00df,					NULL,			"SS" },		/* sharp S */
 	{ 0x00e0,					NULL,			"a" },		/* 'a' grave */
 	{ 0x00e1,					NULL,			"a" },		/* 'a' acute */
 	{ 0x00e2,					NULL,			"a" },		/* 'a' circumflex */
 	{ 0x00e3,					NULL,			"a" },		/* 'a' tilde */
-	{ 0x00e4,					NULL,			"a" },		/* 'a' diaeresis */
+	{ 0x00e4,					NULL,			"ae" },		/* 'a' diaeresis */
 	{ 0x00e5,					NULL,			"a" },		/* 'a' ring above */
 	{ 0x00e6,					NULL,			"ae" },		/* 'ae' ligature */
 	{ 0x00e7,					NULL,			"c" },		/* 'c' cedilla */
@@ -145,12 +145,12 @@ static const char_info charinfo[] =
 	{ 0x00f3,					NULL,			"o" },		/* 'o' acute */
 	{ 0x00f4,					NULL,			"o" },		/* 'o' circumflex */
 	{ 0x00f5,					NULL,			"o" },		/* 'o' tilde */
-	{ 0x00f6,					NULL,			"o" },		/* 'o' diaeresis */
+	{ 0x00f6,					NULL,			"oe" },		/* 'o' diaeresis */
 	{ 0x00f8,					NULL,			"o" },		/* 'o' stroke */
 	{ 0x00f9,					NULL,			"u" },		/* 'u' grave */
 	{ 0x00fa,					NULL,			"u" },		/* 'u' acute */
 	{ 0x00fb,					NULL,			"u" },		/* 'u' circumflex */
-	{ 0x00fc,					NULL,			"u" },		/* 'u' diaeresis */
+	{ 0x00fc,					NULL,			"ue" },		/* 'u' diaeresis */
 	{ 0x00fd,					NULL,			"y" },		/* 'y' acute */
 	{ 0x00ff,					NULL,			"y" },		/* 'y' diaeresis */
 	{ 0x2010,					NULL,			"-" },		/* hyphen */
