@@ -2234,11 +2234,11 @@ static void BuildDataMap(void)
 	datamap_set_float_format(properties_datamap, IDC_SPEEDDISP,			"%03.2f");
 
 	// trackbar ranges
-	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE,    1, 10, 1);
-	datamap_set_trackbar_range(properties_datamap, IDC_JDZ,         0.00,  1.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_JSAT,        0.00,  1.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_SPEED,       0.00,  3.00, 0.01);
-	datamap_set_trackbar_range(properties_datamap, IDC_BEAM,        0.10, 10.00, 0.10);       
+	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE,    1.00f, 10.00f, 1.00f);
+	datamap_set_trackbar_range(properties_datamap, IDC_JDZ,         0.00f,  1.00f, 0.05f);
+	datamap_set_trackbar_range(properties_datamap, IDC_JSAT,        0.00f,  1.00f, 0.05f);
+	datamap_set_trackbar_range(properties_datamap, IDC_SPEED,       0.00f,  3.00f, 0.01f);
+	datamap_set_trackbar_range(properties_datamap, IDC_BEAM,        0.10f, 10.00f, 0.10f);
 
 #ifdef MESS
 	// MESS specific stuff

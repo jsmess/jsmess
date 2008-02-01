@@ -1175,7 +1175,7 @@ VIDEO_START ( thom )
 
 PALETTE_INIT ( thom )
 {
-	float gamma = 0.6;
+	float gamma = 0.6f;
 	unsigned i;
 
 	LOG (( "thom: palette init called\n" ));

@@ -966,7 +966,7 @@ static void thmfc_floppy_index_pulse_cb ( mess_image *img, int state )
 	if ( thmfc_floppy_is_qdd() )
 	{
 		/* pulse each time the whole-disk spiraling track ends */
-		floppy_drive_set_rpm( img, 423. / 25. );
+		floppy_drive_set_rpm( img, 16.92f /* 423/25 */ );
 		thmfc1->ipl = state;
 		if ( state )
 		{
