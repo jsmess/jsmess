@@ -81,12 +81,14 @@ static struct gb_lcd_struct {
 
 	/* Things used to render current line */
 	int	current_line;		/* Current line */
+	int cmp_line;			/* Compare line */
 	int	sprCount;			/* Number of sprites on current line */
 	int	sprite[10];			/* References to sprites to draw on current line */
 	int	previous_line;		/* Previous line we've drawn in */
 	int	start_x;			/* Pixel to start drawing from (inclusive) */
 	int	end_x;				/* Pixel to end drawing (exclusive) */
 	int mode;				/* Keep track of internal STAT mode */
+	int state;				/* Current state of the video state machine */
 	int lcd_irq_line;
 	int triggering_line_irq;
 	int line_irq;
@@ -1315,10 +1317,11 @@ static void gb_increment_scanline( void ) {
 static TIMER_CALLBACK(gb_lcd_timer_proc)
 {
 	static const int sprite_cycles[] = { 0, 8, 20, 32, 44, 52, 64, 76, 88, 96, 108 };
-	int mode = param;
+
+	gb_lcd.state = param;
 
 	if ( LCDCONT & 0x80 ) {
-		switch( mode ) {
+		switch( gb_lcd.state ) {
 		case GB_LCD_STATE_LYXX_PRE_M0:	/* Just before switching to mode 0 */
 			gb_lcd.mode = 0;
 			if ( LCDSTAT & 0x08 ) {
@@ -1545,10 +1548,11 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 static TIMER_CALLBACK(gbc_lcd_timer_proc)
 {
 	static const int sprite_cycles[] = { 0, 8, 20, 32, 44, 52, 64, 76, 88, 96, 108 };
-	int mode = param;
+
+	gb_lcd.state = param;
 
 	if ( LCDCONT & 0x80 ) {
-		switch( mode ) {
+		switch( gb_lcd.state ) {
 		case GB_LCD_STATE_LYXX_PRE_M0:	/* Just before switching to mode 0 */
 			gb_lcd.mode = 0;
 			if ( LCDSTAT & 0x08 ) {
@@ -1612,6 +1616,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(192 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC, attotime_never );
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
+			gb_lcd.cmp_line = CMPLINE;
 			if ( CURLINE < 143 ) {
 				gb_lcd.mode = 2;
 				if ( LCDSTAT & 0x20 ) {
@@ -1630,7 +1635,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
 			gb_increment_scanline();
 			gb_lcd.delayed_line_irq = gb_lcd.line_irq;
-			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			gb_lcd.triggering_line_irq = ( ( gb_lcd.cmp_line == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
 			gb_lcd.line_irq = 0;
 			if ( ! gb_lcd.mode_irq && ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
@@ -1807,6 +1812,7 @@ static void gb_lcd_switch_on( void ) {
 			cpunum_set_input_line(Machine, 0, LCD_INT, HOLD_LINE );
 		}
 	}
+	gb_lcd.state = GB_LCD_STATE_LY00_M2;
 	timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3, attotime_never );
 }
 
@@ -1901,10 +1907,12 @@ WRITE8_HANDLER ( gb_video_w ) {
 	case 0x05:						/* LYC */
 		if ( CMPLINE != data ) {
 			if ( CURLINE == data ) {
-				LCDSTAT |= 0x04;
-				/* Generate lcd interrupt if requested */
-				if ( LCDSTAT & 0x40 ) {
-					cpunum_set_input_line(Machine, 0, LCD_INT, HOLD_LINE );
+				if ( gb_lcd.state != GB_LCD_STATE_LYXX_M0_INC && gb_lcd.state != GB_LCD_STATE_LY9X_M1_INC ) {
+					LCDSTAT |= 0x04;
+					/* Generate lcd interrupt if requested */
+					if ( LCDSTAT & 0x40 ) {
+						cpunum_set_input_line(Machine, 0, LCD_INT, HOLD_LINE );
+					}
 				}
 			} else {
 				LCDSTAT &= 0xFB;
@@ -2004,6 +2012,22 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			*/
 			if ( gb_lcd.mode_irq && gb_lcd.mode == 0 && ( LCDSTAT & 0x28 ) == 0x20 && ( data & 0x08 ) ) {
 				cpunum_set_input_line(Machine, 0, LCD_INT, HOLD_LINE);
+			}
+		}
+		break;
+	case 0x05:                      /* LYC */
+		if ( CMPLINE != data ) {
+			if ( ( gb_lcd.state != GB_LCD_STATE_LYXX_M0_PRE_INC && CURLINE == data ) ||
+			     ( gb_lcd.state == GB_LCD_STATE_LYXX_M0_INC && gb_lcd.triggering_line_irq ) ) {
+				LCDSTAT |= 0x04;
+				/* Generate lcd interrupt if requested */
+				if ( LCDSTAT & 0x40 ) {
+					cpunum_set_input_line(Machine, 0, LCD_INT, HOLD_LINE );
+				}
+			} else {
+				LCDSTAT &= 0xFB;
+				gb_lcd.triggering_line_irq = 0;
+				gb_lcd.cmp_line = data;
 			}
 		}
 		break;
