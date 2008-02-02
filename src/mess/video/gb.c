@@ -348,11 +348,9 @@ static void gb_update_scanline (void) {
 			gb_lcd.layer[0].enabled = ( ( LCDCONT & 0x01 ) && ( ( ! gb_lcd.layer[1].enabled ) || ( gb_lcd.layer[1].enabled && ( WNDPOSX >= 7 ) ) ) ) ? 1 : 0;
 
 			if ( gb_lcd.layer[0].enabled ) {
-				int bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
-
+				gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
 				gb_lcd.layer[0].bg_map = gb_bgdtab;
-				gb_lcd.layer[0].bg_map += ( bgline << 2 ) & 0x3E0;
-				gb_lcd.layer[0].bg_tiles = gb_chrgen + ( ( bgline & 7 ) << 1 );
+				gb_lcd.layer[0].bg_tiles = gb_chrgen;
 				gb_lcd.layer[0].xindex = SCROLLX >> 3;
 				gb_lcd.layer[0].xshift = SCROLLX & 7;
 				gb_lcd.layer[0].xstart = 0;
@@ -360,16 +358,15 @@ static void gb_update_scanline (void) {
 			}
 
 			if ( gb_lcd.layer[1].enabled ) {
-				int bgline, xpos;
+				int xpos;
 
-				bgline = gb_lcd.window_lines_drawn;
 				xpos = WNDPOSX - 7;             /* Window is offset by 7 pixels */
 				if ( xpos < 0 )
 					xpos = 0;
 
+				gb_lcd.layer[1].bgline = gb_lcd.window_lines_drawn;
 				gb_lcd.layer[1].bg_map = gb_wndtab;
-				gb_lcd.layer[1].bg_map += ( bgline << 2 ) & 0x3E0;
-				gb_lcd.layer[1].bg_tiles = gb_chrgen + ( ( bgline & 7 ) << 1);
+				gb_lcd.layer[1].bg_tiles = gb_chrgen;
 				gb_lcd.layer[1].xindex = 0;
 				gb_lcd.layer[1].xshift = 0;
 				gb_lcd.layer[1].xstart = xpos;
@@ -397,8 +394,8 @@ static void gb_update_scanline (void) {
 					l++;
 					continue;
 				}
-				map = gb_lcd.layer[l].bg_map;
-				tiles = gb_lcd.layer[l].bg_tiles;
+				map = gb_lcd.layer[l].bg_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
+				tiles = gb_lcd.layer[l].bg_tiles + ( ( gb_lcd.layer[l].bgline & 7 ) << 1 );
 				xindex = gb_lcd.start_x;
 				if ( xindex < gb_lcd.layer[l].xstart )
 					xindex = gb_lcd.layer[l].xstart;
@@ -422,6 +419,13 @@ static void gb_update_scanline (void) {
 						i--;
 					}
 					if ( gb_lcd.layer[l].xshift == 8 ) {
+						/* Take possible changes to SCROLLY into account */
+						if ( l == 0 ) {
+							gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
+							map = gb_lcd.layer[l].bg_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
+							tiles = gb_lcd.layer[l].bg_tiles + ( ( gb_lcd.layer[l].bgline & 7 ) << 1 );
+						}
+
 						gb_lcd.layer[l].xindex = ( gb_lcd.layer[l].xindex + 1 ) & 31;
 						gb_lcd.layer[l].xshift = 0;
 						tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_tile_no_mod ) * 16;
@@ -632,11 +636,9 @@ static void sgb_update_scanline (void) {
 			gb_lcd.layer[0].enabled = ((LCDCONT & 0x01) && ((!gb_lcd.layer[1].enabled) || (gb_lcd.layer[1].enabled && WNDPOSX >= 7))) ? 1 : 0;
 
 			if ( gb_lcd.layer[0].enabled ) {
-				int bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
-
+				gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
 				gb_lcd.layer[0].bg_map = gb_bgdtab;
-				gb_lcd.layer[0].bg_map += (bgline << 2) & 0x3E0;
-				gb_lcd.layer[0].bg_tiles = gb_chrgen + ( (bgline & 7) << 1);
+				gb_lcd.layer[0].bg_tiles = gb_chrgen;
 				gb_lcd.layer[0].xindex = SCROLLX >> 3;
 				gb_lcd.layer[0].xshift = SCROLLX & 7;
 				gb_lcd.layer[0].xstart = 0;
@@ -644,17 +646,16 @@ static void sgb_update_scanline (void) {
 			}
 
 			if ( gb_lcd.layer[1].enabled ) {
-				int bgline, xpos;
+				int xpos;
 
-				bgline = (gb_lcd.current_line - WNDPOSY) & 0xFF;
 				/* Window X position is offset by 7 so we'll need to adjust */
 				xpos = WNDPOSX - 7;
 				if (xpos < 0)
 					xpos = 0;
 
+				gb_lcd.layer[1].bgline = gb_lcd.window_lines_drawn;
 				gb_lcd.layer[1].bg_map = gb_wndtab;
-				gb_lcd.layer[1].bg_map += (bgline << 2) & 0x3E0;
-				gb_lcd.layer[1].bg_tiles = gb_chrgen + ( (bgline & 7) << 1);
+				gb_lcd.layer[1].bg_tiles = gb_chrgen;
 				gb_lcd.layer[1].xindex = 0;
 				gb_lcd.layer[1].xshift = 0;
 				gb_lcd.layer[1].xstart = xpos;
@@ -715,8 +716,8 @@ static void sgb_update_scanline (void) {
 					l++;
 					continue;
 				}
-				map = gb_lcd.layer[l].bg_map;
-				tiles = gb_lcd.layer[l].bg_tiles;
+				map = gb_lcd.layer[l].bg_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
+				tiles = gb_lcd.layer[l].bg_tiles + ( ( gb_lcd.layer[l].bgline & 7 ) << 1 );
 				xindex = gb_lcd.start_x;
 				if ( xindex < gb_lcd.layer[l].xstart )
 					xindex = gb_lcd.layer[l].xstart;
@@ -743,6 +744,13 @@ static void sgb_update_scanline (void) {
 						i--;
 					}
 					if ( gb_lcd.layer[l].xshift == 8 ) {
+						/* Take possible changes to SCROLLY into account */
+						if ( l == 0 ) {
+							gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
+							map = gb_lcd.layer[l].bg_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
+							tiles = gb_lcd.layer[l].bg_tiles + ( ( gb_lcd.layer[l].bgline & 7 ) << 1 );
+						}
+
 						gb_lcd.layer[l].xindex = ( gb_lcd.layer[l].xindex + 1 ) & 31;
 						gb_lcd.layer[l].xshift = 0;
 						tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_tile_no_mod ) * 16;
@@ -895,13 +903,9 @@ static void cgb_update_scanline (void) {
 			gb_lcd.layer[0].enabled = ( ( LCDCONT & 0x01 ) && ( ( ! gb_lcd.layer[1].enabled ) || ( gb_lcd.layer[1].enabled && ( WNDPOSX >= 7 ) ) ) ) ? 1 : 0;
 
 			if ( gb_lcd.layer[0].enabled ) {
-				int bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
-
-				gb_lcd.layer[0].bgline = bgline;
+				gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
 				gb_lcd.layer[0].bg_map = gb_bgdtab;
-				gb_lcd.layer[0].bg_map += ( bgline << 2 ) & 0x3E0;
 				gb_lcd.layer[0].gbc_map = gbc_bgdtab;
-				gb_lcd.layer[0].gbc_map += ( bgline << 2 ) & 0x3E0;
 				gb_lcd.layer[0].xindex = SCROLLX >> 3;
 				gb_lcd.layer[0].xshift = SCROLLX & 7;
 				gb_lcd.layer[0].xstart = 0;
@@ -909,19 +913,16 @@ static void cgb_update_scanline (void) {
 			}
 
 			if ( gb_lcd.layer[1].enabled ) {
-				int bgline, xpos;
+				int xpos;
 
-				bgline = gb_lcd.window_lines_drawn;
 				/* Window X position is offset by 7 so we'll need to adust */
 				xpos = WNDPOSX - 7;
 				if (xpos < 0)
 					xpos = 0;
 
-				gb_lcd.layer[1].bgline = bgline;
+				gb_lcd.layer[1].bgline = gb_lcd.window_lines_drawn;
 				gb_lcd.layer[1].bg_map = gb_wndtab;
-				gb_lcd.layer[1].bg_map += ( bgline << 2 ) & 0x3E0;
 				gb_lcd.layer[1].gbc_map = gbc_wndtab;
-				gb_lcd.layer[1].gbc_map += ( bgline << 2 ) & 0x3E0;
 				gb_lcd.layer[1].xindex = 0;
 				gb_lcd.layer[1].xshift = 0;
 				gb_lcd.layer[1].xstart = xpos;
@@ -949,8 +950,8 @@ static void cgb_update_scanline (void) {
 					l++;
 					continue;
 				}
-				map = gb_lcd.layer[l].bg_map;
-				gbcmap = gb_lcd.layer[l].gbc_map;
+				map = gb_lcd.layer[l].bg_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
+				gbcmap = gb_lcd.layer[l].gbc_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
 				tiles = ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x08 ) ? gbc_chrgen : gb_chrgen;
 
 				/* Check for vertical flip */
@@ -994,6 +995,13 @@ static void cgb_update_scanline (void) {
 						i--;
 					}
 					if ( gb_lcd.layer[l].xshift == 8 ) {
+						/* Take possible changes to SCROLLY into account */
+						if ( l == 0 ) {
+							gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
+							map = gb_lcd.layer[l].bg_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
+							gbcmap = gb_lcd.layer[l].gbc_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
+						}
+
 						gb_lcd.layer[l].xindex = ( gb_lcd.layer[l].xindex + 1 ) & 31;
 						gb_lcd.layer[l].xshift = 0;
 						tiles = ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x08 ) ? gbc_chrgen : gb_chrgen;
