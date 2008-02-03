@@ -11,6 +11,7 @@
 
 /* Core includes */
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/mz700.h"
 
 /* Components */

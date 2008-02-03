@@ -36,6 +36,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 

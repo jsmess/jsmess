@@ -16,6 +16,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "video/m6847.h"
 #include "machine/i8271.h"
@@ -49,8 +50,6 @@ static void atom_via_irq_func(int state)
 	{
 		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	}
-
-
 }
 
 static mess_image *cassette_device_image(void)

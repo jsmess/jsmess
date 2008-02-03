@@ -4,16 +4,42 @@
 static int layer_colorbase[2];
 extern int bladestl_spritebank;
 
+
 PALETTE_INIT( bladestl )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	/* build the lookup table for sprites. Palette is dynamic. */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = 0x20 + (*(color_prom++) & 0x0f);
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x30);
+
+	/* characters use pens 0x00-0x1f, no look-up table */
+	for (i = 0; i < 0x20; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	/* sprites use pens 0x20-0x2f */
+	for (i = 0x20; i < 0x120; i++)
+	{
+		UINT8 ctabentry = (color_prom[i - 0x20] & 0x0f) | 0x20;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0x00; i < 0x60; i += 2)
+	{
+		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
+	}
+}
+
+
 
 /***************************************************************************
 
@@ -64,6 +90,8 @@ VIDEO_START( bladestl )
 
 VIDEO_UPDATE( bladestl )
 {
+	set_pens(machine);
+
 	K007342_tilemap_update();
 
 	K007342_tilemap_draw( bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);

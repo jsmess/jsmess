@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
 
@@ -166,7 +167,7 @@ VIDEO_UPDATE( cdp1861 )
 {
 	if (cdp1861.disp)
 	{
-		copybitmap(bitmap, cdptmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, cdptmpbitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
 	{

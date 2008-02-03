@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "includes/crtc6845.h"
 #include "video/pc_video.h"
@@ -107,7 +108,7 @@ VIDEO_UPDATE( pc_video )
 
 		if (tmpbitmap)
 		{
-			copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+			copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
 			if (!pc_anythingdirty)
 				rc = UPDATE_HAS_NOT_CHANGED;
 			pc_anythingdirty = 0;

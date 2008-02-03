@@ -101,6 +101,7 @@
  *****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "sh2.h"
 
 /* speed up delay loops, bail out of tight loops */
@@ -140,7 +141,7 @@ typedef struct
 
 	UINT16 	frc;
 	UINT16 	ocra, ocrb, icr;
-	UINT32 	frc_base;
+	UINT64 	frc_base;
 
 	int		frt_input;
 	int 	internal_irq_level;
@@ -2341,7 +2342,7 @@ static int sh2_execute(int cycles)
 		else
 			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh2.pc & AM)));
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(sh2.pc);
 
 		sh2.delay = 0;
 		sh2.pc += 2;
@@ -2395,7 +2396,7 @@ static void sh2_set_context(void *src)
 static void sh2_timer_resync(void)
 {
 	int divider = div_tab[(sh2.m[5] >> 8) & 3];
-	UINT32 cur_time = cpunum_gettotalcycles(sh2.cpu_number);
+	UINT64 cur_time = cpunum_gettotalcycles(sh2.cpu_number);
 
 	if(divider)
 		sh2.frc += (cur_time - sh2.frc_base) >> divider;
@@ -2920,12 +2921,12 @@ static void set_irq_line(int irqline, int state)
 	}
 }
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t sh2_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 static void sh2_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
@@ -3128,9 +3129,9 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = sh2_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh2_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh2_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh2_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

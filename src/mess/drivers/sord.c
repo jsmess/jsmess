@@ -19,6 +19,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"
 #include "cpu/z80/z80.h"
@@ -166,7 +167,6 @@ static void sord_fd5_fdc_interrupt(int state)
 	else
 	{
 		cpunum_set_input_line(Machine, 1, 0,CLEAR_LINE);
-
 	}
 }
 

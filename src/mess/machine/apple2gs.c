@@ -106,6 +106,7 @@
 
 #include <assert.h>
 #include "driver.h"
+#include "deprecat.h"
 
 #include "includes/apple2gs.h"
 #include "includes/apple2.h"

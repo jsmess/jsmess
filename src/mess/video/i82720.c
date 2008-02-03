@@ -1448,7 +1448,7 @@ VIDEO_UPDATE(compis_gdc)
 		}
 		copybitmap(bitmap,
 					gdc_mess.tmpbmp, 0, 0, 0, 0,
-					NULL, TRANSPARENCY_NONE, 0);
+					NULL);
 		gdc_mess.dirty = 0;
 	}
 	return dirty ? 0 : UPDATE_HAS_NOT_CHANGED;

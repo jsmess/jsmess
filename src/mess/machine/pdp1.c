@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include "driver.h"
+#include "deprecat.h"
 
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"

@@ -18,6 +18,7 @@
 #include "video/generic.h"
 #include "render.h"
 #include "messopts.h"
+#include "deprecat.h"
 
 #ifdef MAME_DEBUG
 #include "debug/debugcpu.h"

@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/oric.h"
 #include "machine/wd17xx.h"
 #include "machine/6522via.h"
@@ -748,7 +749,6 @@ static WRITE8_HANDLER(oric_jasmin_w)
 	{
 		/* microdisc floppy disc interface */
 		case 0x04:
-			logerror("cycles: %d\n",cycles_currently_ran());
 			wd17xx_command_w(0,data);
 			break;
 		case 0x05:

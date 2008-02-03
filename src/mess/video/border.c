@@ -15,6 +15,7 @@ Changes:
 #include "driver.h"
 #include "border.h"
 #include "eventlst.h"
+#include "deprecat.h"
 
 /* Last border colour output in the previous frame */
 static int CurrBorderColor = 0;

@@ -118,6 +118,7 @@ e000-e001   YM2203
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/upd7759.h"
@@ -284,7 +285,7 @@ static ADDRESS_MAP_START( combasc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0414, 0x0414) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combasc_sh_irqtrigger_w)
 	AM_RANGE(0x041c, 0x041c) AM_WRITE(watchdog_reset_w)			/* watchdog reset? */
-	AM_RANGE(0x0600, 0x06ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0600, 0x06ff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0x0800, 0x1fff) AM_WRITE(MWA8_RAM)					/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(combasc_video_w)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(MWA8_ROM)					/* banked ROM area */
@@ -303,7 +304,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( combascb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x04ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combascb_bankselect_w)
-	AM_RANGE(0x0600, 0x06ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0600, 0x06ff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0x0800, 0x1fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(combasc_video_w)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(MWA8_BANK1) /* banked ROM/RAM area */
@@ -679,8 +680,7 @@ static MACHINE_DRIVER_START( combasc )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(combasc)
-	MDRV_PALETTE_LENGTH(128)
-	MDRV_COLORTABLE_LENGTH(8*16*16)
+	MDRV_PALETTE_LENGTH(8*16*16)
 
 	MDRV_PALETTE_INIT(combasc)
 	MDRV_VIDEO_START(combasc)
@@ -722,8 +722,7 @@ static MACHINE_DRIVER_START( combascb )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(combascb)
-	MDRV_PALETTE_LENGTH(128)
-	MDRV_COLORTABLE_LENGTH(8*16*16)
+	MDRV_PALETTE_LENGTH(8*16*16)
 
 	MDRV_PALETTE_INIT(combascb)
 	MDRV_VIDEO_START(combascb)

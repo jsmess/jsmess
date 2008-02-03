@@ -52,6 +52,7 @@ TODO:
 
 #include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "tms9901.h"
 #include "video/v9938.h"
 #include "audio/spchroms.h"

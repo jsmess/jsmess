@@ -11,6 +11,7 @@
 
 #include <stdarg.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "cpu/i8085/i8085.h"

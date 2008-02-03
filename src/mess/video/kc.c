@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "includes/kc.h"
 #include "eventlst.h"
+#include "deprecat.h"
 #include "mslegacy.h"
 
 /* KC85/4 and KC85/3 common graphics hardware */

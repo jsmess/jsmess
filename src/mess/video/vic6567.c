@@ -58,6 +58,7 @@
 #include <assert.h>
 
 #include "driver.h"
+#include "deprecat.h"
 #include "vic6567.h"
 #include "vic4567.h"
 #include "utils.h"
@@ -1331,7 +1332,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 VIDEO_UPDATE( vic2 )
 {
 	if (vic2.on)
-		copybitmap(bitmap, vic2.bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, vic2.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

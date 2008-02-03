@@ -55,6 +55,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "sound/nes_apu.h"
 #include "cpu/m6502/m6502.h"
@@ -265,7 +266,6 @@ static MACHINE_DRIVER_START( cham24 )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(cham24)
 	MDRV_PALETTE_LENGTH(8*4*16)
-	MDRV_COLORTABLE_LENGTH(4*8)
 
 	MDRV_PALETTE_INIT(cham24)
 	MDRV_VIDEO_START(cham24)

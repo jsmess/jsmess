@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/pc8801.h"
 
 /* NPW 23-Oct-2001 - Adding this so that it compiles */
@@ -590,10 +591,10 @@ VIDEO_UPDATE( pc8801 )
     }
   }
 
-  copybitmap(wbm1,wbm2,0,0,0,0,
-	     &machine->screen[0].visarea,TRANSPARENCY_PEN,palette_transparent_pen);
-  copybitmap(bitmap,wbm1,0,0,0,0,
-	     &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap_trans(wbm1,wbm2,0,0,0,0,
+		&machine->screen[0].visarea,palette_transparent_pen);
+	copybitmap(bitmap,wbm1,0,0,0,0,
+		&machine->screen[0].visarea);
 	return 0;
 }
 

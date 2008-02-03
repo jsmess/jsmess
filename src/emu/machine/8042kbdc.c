@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    ibmat.c
+    8042kbdc.c
 
     Code specific to fun IBM AT stuff
 
@@ -175,6 +175,7 @@
 
 #include "driver.h"
 #include "memconv.h"
+#include "deprecat.h"
 
 #include "machine/pckeybrd.h"
 #include "machine/8042kbdc.h"

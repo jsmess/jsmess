@@ -12,6 +12,7 @@
 #include "machine/6821pia.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
+#include "deprecat.h"
 
 /* Memory Map */
 

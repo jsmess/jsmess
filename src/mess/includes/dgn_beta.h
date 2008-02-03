@@ -100,7 +100,7 @@ void dgn_beta_line_interrupt (int data);
 /*----------- defined in video/dgn_beta.c -----------*/
 
 /* mc6845 video display generator */
-void init_video(void);
+void init_video(running_machine *machine);
 extern VIDEO_UPDATE( dgnbeta );
 void vid_set_gctrl(int data);
 

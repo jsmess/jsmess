@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

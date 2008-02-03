@@ -71,124 +71,97 @@
 static PALETTE_INIT( yamato )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
-
 
 	/* chars - 12 bits RGB */
-	for (i = 0;i < 64;i++)
+	for (i = 0; i < 0x40; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
-
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x00] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
 		/* green component */
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
+		bit0 = (color_prom[i + 0x00] >> 4) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 5) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 6) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
 		/* blue component */
-		bit0 = (color_prom[64] >> 0) & 0x01;
-		bit1 = (color_prom[64] >> 1) & 0x01;
-		bit2 = (color_prom[64] >> 2) & 0x01;
-		bit3 = (color_prom[64] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x40] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x40] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x40] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x40] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
-	color_prom += 64;
 
 	/* big sprite - 8 bits RGB */
-	for (i = 0;i < 32;i++)
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (color_prom[i + 0x80] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x80] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (color_prom[i + 0x80] >> 3) & 0x01;
+		bit1 = (color_prom[i + 0x80] >> 4) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (color_prom[i + 0x80] >> 6) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+64,MAKE_RGB(r,g,b));
-		color_prom++;
-	}
-
-
-	/* character and sprite lookup table */
-	/* they use colors 0-63 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-	{
-		/* pen 0 always uses color 0 (background in River Patrol and Silver Land) */
-		if (i % 4 == 0) COLOR(0,i) = 0;
-		else COLOR(0,i) = i;
-	}
-
-	/* big sprite lookup table */
-	/* it uses colors 64-95 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-	{
-		if (i % 4 == 0) COLOR(2,i) = 0;
-		else COLOR(2,i) = i + 64;
+		palette_set_color(machine, i + 0x40, MAKE_RGB(r, g, b));
 	}
 
 	/* fake colors for bg gradient */
-	for (i = 0;i < 256;i++)
-	{
-		palette_set_color(machine,i+16*4+8*4,MAKE_RGB(0,0,i));
-	}
+	for (i = 0; i < 0x100; i++)
+		palette_set_color(machine, i + 0x60, MAKE_RGB(0, 0, i));
 }
 
 static PALETTE_INIT( toprollr )
 {
 	int i;
 
-	for (i = 0;i < 32*5;i++)
+	for (i = 0; i < 32*5; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0,bit1,bit2;
+		int r,g,b;
 
 		/* red component */
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
 		bit2 = (color_prom[0] >> 2) & 0x01;
-
-
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* green component */
 		bit0 = (color_prom[0] >> 3) & 0x01;
 		bit1 = (color_prom[0] >> 4) & 0x01;
 		bit2 = (color_prom[0] >> 5) & 0x01;
-
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* blue component */
 		bit0 = 0;
 		bit1 = (color_prom[0] >> 6) & 0x01;
 		bit2 = (color_prom[0] >> 7) & 0x01;
-
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 
@@ -244,7 +217,7 @@ static ADDRESS_MAP_START( yamato_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8800, 0x88ff) AM_WRITE(cclimber_bigsprite_videoram_w) AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
+	AM_RANGE(0x8800, 0x88ff) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
 	AM_RANGE(0x8900, 0x8bff) AM_WRITE(MWA8_RAM)  /* not used, but initialized */
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 //AM_RANGE(0x9400, 0x97ff) AM_WRITE(MWA8_RAM) /* mirror address, used by Crazy Climber to draw windows */
@@ -307,10 +280,10 @@ static WRITE8_HANDLER(rombank_w)
 	}
 }
 
-static ADDRESS_MAP_START( trmem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( toprollr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_BANK1)
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_WRITE(cclimber_bigsprite_videoram_w) AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
 	AM_RANGE(0x8c00, 0x8fff) AM_RAM AM_BASE(&toprollr_videoram3)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM AM_BASE(&toprollr_videoram4)
@@ -330,7 +303,7 @@ static ADDRESS_MAP_START( trmem_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( trport_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( toprollr_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x08, 0x08) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(AY8910_write_port_0_w)
@@ -490,7 +463,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_layout trcharlayout =
+static const gfx_layout toprollr_charlayout =
 {
 	8,8,
 	RGN_FRAC(1,2),
@@ -501,7 +474,7 @@ static const gfx_layout trcharlayout =
 	8*8
 };
 
-static const gfx_layout trspritelayout =
+static const gfx_layout toprollr_spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,2),    /* 128 sprites (64 in Crazy Climber) */
@@ -523,11 +496,11 @@ static GFXDECODE_START( yamato )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, spritelayout,    0, 16 ) /* sprite set #2 */
 GFXDECODE_END
 
-static GFXDECODE_START( tr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, trcharlayout,      0, 40 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, trcharlayout,      0, 40 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, trspritelayout,    0, 40 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, trcharlayout,   	 0, 40 )
+static GFXDECODE_START( toprollr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, toprollr_charlayout,      0, 40 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, toprollr_charlayout,      0, 40 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, toprollr_spritelayout,    0, 40 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, toprollr_charlayout,   	0, 40 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( yamato )
@@ -553,7 +526,6 @@ static MACHINE_DRIVER_START( yamato )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(yamato)
 	MDRV_PALETTE_LENGTH(96+256)
-	MDRV_COLORTABLE_LENGTH(16*4+8*4)
 
 	MDRV_PALETTE_INIT(yamato)
 	MDRV_VIDEO_START(generic)
@@ -573,8 +545,8 @@ static MACHINE_DRIVER_START( toprollr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3072000)
-	MDRV_CPU_PROGRAM_MAP(trmem_map,0)
-	MDRV_CPU_IO_MAP(trport_map,0)
+	MDRV_CPU_PROGRAM_MAP(toprollr_map,0)
+	MDRV_CPU_IO_MAP(toprollr_io_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -586,7 +558,7 @@ static MACHINE_DRIVER_START( toprollr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(tr)
+	MDRV_GFXDECODE(toprollr)
 	MDRV_PALETTE_LENGTH(32*5)
 	MDRV_PALETTE_INIT(toprollr)
 

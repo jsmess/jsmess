@@ -8,6 +8,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/electron.h"
 #include "sound/beep.h"
 #include "devices/cassette.h"

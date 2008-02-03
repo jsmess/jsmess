@@ -9,8 +9,9 @@
   Code by Wilbert Pol
 */
 
-#include "sm8500.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "sm8500.h"
 
 #define FLAG_C	0x80
 #define FLAG_Z	0x40
@@ -215,7 +216,7 @@ static int sm8500_execute( int cycles )
 		UINT32	d1,d2;
 		UINT32	res;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(regs.PC);
 		oldpc = regs.PC;
 		mycycles = 0;
 		sm8500_process_interrupts();
@@ -496,7 +497,7 @@ void sm8500_get_info( UINT32 state, cpuinfo *info )
 	case CPUINFO_PTR_EXIT:					info->exit = sm8500_exit; break;
 	case CPUINFO_PTR_EXECUTE:				info->execute = sm8500_execute; break;
 	case CPUINFO_PTR_BURN:					info->burn = sm8500_burn; break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:			info->disassemble = sm8500_dasm; break;
 #endif
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sm8500_icount; break;

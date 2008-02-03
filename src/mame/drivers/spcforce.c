@@ -32,6 +32,7 @@ a000-a3ff   R/W X/Y scroll position of each character (can be scrolled up
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/sn76496.h"
@@ -365,6 +366,6 @@ ROM_START( meteor )
 ROM_END
 
 
-GAME( 1980, spcforce, 0,        spcforce, spcforce, 0, ROT270, "Venture Line", "Space Force", GAME_IMPERFECT_COLORS )
+GAME( 1980, spcforce, 0,        spcforce, spcforce, 0, ROT270, "Venture Line", "Space Force (set 1)", GAME_IMPERFECT_COLORS )
 GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, 0, ROT270, "Elcon (bootleg?)", "Space Force (set 2)", GAME_IMPERFECT_COLORS )
 GAME( 1981, meteor,   spcforce, spcforce, spcforc2, 0, ROT270, "Venture Line", "Meteoroids", GAME_IMPERFECT_COLORS )

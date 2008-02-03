@@ -45,6 +45,7 @@
 #include "devices/cassette.h"
 #include "sound/speaker.h"
 #include "mslegacy.h"
+#include "deprecat.h"
 
 static int load_state;
 static int ic_state;

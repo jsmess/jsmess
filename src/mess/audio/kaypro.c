@@ -9,6 +9,7 @@
 #include "includes/kaypro.h"
 #include "sound/custom.h"
 #include "streams.h"
+#include "deprecat.h"
 
 #ifdef UNUSED_FUNCTION
 static	sound_stream  *channel;

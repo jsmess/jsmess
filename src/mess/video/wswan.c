@@ -9,6 +9,7 @@
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/wswan.h"
 
 static int pal[16][16];

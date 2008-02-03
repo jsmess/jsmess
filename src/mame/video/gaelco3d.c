@@ -7,6 +7,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "eminline.h"
 #include "gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
@@ -489,7 +490,7 @@ VIDEO_UPDATE( gaelco3d )
 	else
 	{
 		if (video_changed)
-			copybitmap(bitmap, screenbits, 0,1, 0,0, cliprect, TRANSPARENCY_NONE, 0);
+			copybitmap(bitmap, screenbits, 0,1, 0,0, cliprect);
 		ret = video_changed;
 		video_changed = FALSE;
 	}

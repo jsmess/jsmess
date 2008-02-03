@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/intv.h"
 #include "video/stic.h"
 
@@ -747,7 +748,7 @@ VIDEO_UPDATE( intv )
 {
 	copybitmap(bitmap,tmpbitmap,0,0,
 	           col_delay*2,row_delay*2,
-			   &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			   cliprect);
 	return 0;
 }
 

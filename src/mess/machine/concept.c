@@ -5,6 +5,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/concept.h"
 #include "machine/6522via.h"
 #include "machine/mm58274c.h"	/* mm58274 seems to be compatible with mm58174 */

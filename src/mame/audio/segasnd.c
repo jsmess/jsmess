@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    segag80.c
+    segasnd.c
 
     Sound boards for early Sega G-80 based games.
 
@@ -11,11 +11,11 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "segag80v.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/sp0250.h"
 #include "segasnd.h"
-#include <math.h>
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

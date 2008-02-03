@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <wctype.h>
 #include "inputx.h"
+#include "deprecat.h"
 #include "inptport.h"
 #include "mame.h"
 

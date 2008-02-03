@@ -11,8 +11,8 @@ Custom :    X1-010              Sound: 8 Bit PCM
             DX-101              Sprites
             DX-102 x3
 
-OSC:    50.0000MHz
-        32.5304MHz
+OSC:    50.00000MHz
+        32.53047MHz
 
 *   The Toshiba TMP68301 is a 68HC000 + serial I/O, parallel I/O,
     3 timers, address decoder, wait generator, interrupt controller,
@@ -108,7 +108,7 @@ PO-113A   BP949KA
 Notes:
       *: unknown QFP208 (has large heatsink on it). Should be similar to other known
          graphics chips used on Seta hardware of this era.
-      68301 clock: 16.000MHz
+      68301 clock: 16.000MHz (?? From what OSC + divider??)
       VSync: 60Hz
 
 ***************************************************************************/
@@ -159,21 +159,137 @@ Notes:
                             Penguin Brothers (Japan)
 
 (c)2000 Subsino
-Board:  P0-142A
-CPU:    TMP68301 (68000 core)
 
-OSC:    50.0000MHz
-        32.5304MHz
-        28.0000MHz
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP)
+        NEC DX-102 (52 Pin PQFP x3)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
+   OSC: 50MHz, 32.53047MHz & 28MHz
+ Other: 8 Position Dipswitch x 2
+        Lattice ispLSI2032
 
-Chips.: DX-101
-        DX-102 x3
-Sound:  X1-010
+PCB Number: P0-142A
++-----------------------------------------------------------+
+|                VOL                       +------+         |
+|                                          |Seta  |     M1  |
+|   +---+ +---+                            |X1-010|         |
+|   |   | |   |   M   M                    |      |  +---+  |
++-+ | U | | U |   1   1                    +------+  |   |  |
+  | | 0 | | 0 |                    74HC00            |   |  |
++-+ | 7 | | 6 |   M   M                              | U |  |
+|   |   | |   |   1   1                              | 1 |  |
+|   +---+ +---+                                      | 8 |  |
+|                                          Lattice   |   |  |
+|   D D  +---+                            ispLSI2032 |   |  |
+|   S S  |DX |                  +-------+            +---+  |
+|   W W  |102|                  |Toshiba|     CN2           |
+|   1 2  +---+      BAT1*       |  TMP  |                   |
+|                               | 68301 |  U50*             |
+|                               +-------+                   |
+|                                                           |
+|                  50MHz        +----------+     28MHz      |
+|     +---+                     |          |                |
+|     |DX |     SW1             |   NEC    |    M   M       |
+|     |102|                     |  DX-101  |    2   2       |
+|     +---+         M  M        |          |                |
+|                   1  1        |          |                |
+|                               +----------+                |
+|                                                           |
+|                             +---+      +---++---++---+    |
+|                             |   |      |   ||   ||   |    |
+|     +---+                   |   |      |   ||   ||   |    |
++-+   |DX |                   | U |      | U || U || U |    |
+  |   |102|     32.53047MHz   | 4 |      | 4 || 3 || 3 |    |
++-+   +---+                   | 0 |      | 1 || 8 || 9 |    |
+|                             |   |      |   ||   ||   |    |
+|                             |   |      |   ||   ||   |    |
+|                             +---+      +---++---++---+    |
++-----------------------------------------------------------+
 
-Notes:  pzlbowl PCB with extra parts:
+Notes:  pzlbowl PCB with these extra parts:
         28MHz OSC
         2x 62256 SRAM
         74HC00
+
+U50*  Unpopulated 93LC46BX EEPROM
+BAT1* Unpopulated CR2032 3Volt battery
+
+Ram M1 are NEC D43001GU-70LL
+Ram M2 are LGS GM76C8128ALLFW70
+
+***************************************************************************/
+
+/***************************************************************************
+
+                            Puzzle De Bowling (Japan)
+
+(c)1999 Nihon System / Moss
+
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP)
+        NEC DX-102 (52 Pin PQFP x3)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
+   OSC: 50MHz & 32.53047MHz
+ Other: 8 Position Dipswitch x 2
+        Lattice ispLSI2032 - stamped "KUDEC"
+
+PCB Number: P0-142A
++-----------------------------------------------------------+
+|                VOL                       +------+         |
+|                                          |Seta  |     M1  |
+|   +---+ +---+                            |X1-010|         |
+|   |   | |   |  U4*  M                    |      |  +---+  |
++-+ | U | | U |       1                    +------+  | K |  |
+  | | 0 | | 0 |                     U30*             | U |  |
++-+ | 7 | | 6 |  U5*  M                              | S |  |
+|   |   | |   |       1                              |   |  |
+|   +---+ +---+                                      | U |  |
+|                                          Lattice   | 1 |  |
+|   D D  +---+                            ispLSI2032 | 8 |  |
+|   S S  |DX |                  +-------+            +---+  |
+|   W W  |102|                  |Toshiba|     CN2           |
+|   1 2  +---+      BAT1*       |  TMP  |                   |
+|                               | 68301 |  U50*             |
+|                               +-------+                   |
+|                                                           |
+|                  50MHz        +----------+     XM2*       |
+|     +---+                     |          |                |
+|     |DX |     SW1             |   NEC    |    M   M       |
+|     |102|                     |  DX-101  |    2   2       |
+|     +---+         M  M        |          |                |
+|                   1  1        |          |                |
+|                               +----------+                |
+|                                                           |
+|                             +---+      +---++---++---+    |
+|                             | K |      | K || K || K |    |
+|     +---+                   | U |      | U || U || U |    |
++-+   |DX |                   | C |      | C || C || C |    |
+  |   |102|     32.53047MHz   |   |      |   ||   ||   |    |
++-+   +---+                   | U |      | U || U || U |    |
+|                             | 4 |      | 4 || 3 || 3 |    |
+|                             | 0 |      | 1 || 8 || 9 |    |
+|                             +---+      +---++---++---+    |
++-----------------------------------------------------------+
+
+* Unpopulated:
+  U4 & U5 RAM HM62256 equivalent
+  U50 93LC46BX EEPROM
+  U30 74HC00
+  BAT1 CR2032 3Volt battery
+  XM2 OSC
+
+Ram M1 are NEC D43001GU-70LL
+Ram M2 are LGS GM76C8128ALLFW70
+
+KUP-U06-I03 U06 Program rom ST27C4001 (even)
+KUP-U07-I03 U07 Program rom ST27C4001 (odd)
+
+KUS-U18-I00 U18 Mask rom (Samples 23C32000 32Mbit)
+
+KUC-U38-I00 U38 Mask rom (Graphics 23C32000 32Mbit)
+KUC-U39-I00 U39 Mask rom (Graphics 23C32000 32Mbit)
+KUC-U40-I00 U40 Mask rom (Graphics 23C32000 32Mbit)
+KUC-U41-I00 U41 Mask rom (Graphics 23C32000 32Mbit)
 
 ***************************************************************************/
 
@@ -291,6 +407,7 @@ U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pi
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/tmp68301.h"
 #include "machine/eeprom.h"
 #include "sound/x1_010.h"
@@ -1042,8 +1159,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( myangel )
 	PORT_START_TAG("IN0")	// $700300.w
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:2" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:3" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" ) /* Listed as "Unused" */
 	PORT_DIPNAME( 0x0008, 0x0008, "Increase Lives While Playing" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Yes ) )
@@ -1128,8 +1245,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( myangel2 )
 	PORT_START_TAG("IN0") //$600300.w
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:2" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:3" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" ) /* Listed as "Unused" */
 	PORT_DIPNAME( 0x0008, 0x0008, "Increase Lives While Playing" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Yes ) )
@@ -1695,7 +1812,7 @@ static const struct x1_010_interface x1_010_sound_intf =
 static MACHINE_DRIVER_START( mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,32530400 / 2)			/* !! TMP68301 !! */
+	MDRV_CPU_ADD_TAG("main",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
 	MDRV_CPU_PROGRAM_MAP(mj4simai_readmem,mj4simai_writemem)
 	MDRV_CPU_VBLANK_INT(seta2_interrupt,1)
 
@@ -1730,7 +1847,6 @@ static MACHINE_DRIVER_START( gundamex )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_REPLACE("main",M68000,16000000)
 	MDRV_CPU_PROGRAM_MAP(gundamex_readmem,gundamex_writemem)
 
 	MDRV_NVRAM_HANDLER(93C46_gundamex)

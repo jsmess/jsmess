@@ -13,6 +13,7 @@
 
  ******************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/z88.h"
 #include "sound/speaker.h"
 

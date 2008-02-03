@@ -35,6 +35,7 @@ To do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 #include "sound/3812intf.h"
@@ -3007,7 +3008,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, lhb,      0,        lhb,      lhb,      lhb,      ROT0, "IGS",        "Long Hu Bang",                    0 )
+GAME( 1995, lhb,      0,        lhb,      lhb,      lhb,      ROT0, "IGS",        "Long Hu Bang (set 1)",            0 )
 // the screenshot in the zip shows a 1995 copyright, but only 199 is displayed in MAME?  todo: verify protection patch is correct for this set
 GAME( 1995, lhba,     lhb,      lhb,      lhb,      lhb,      ROT0, "IGS",        "Long Hu Bang (set 2)",            0 )
 GAME( 199?, dbc,      0,        lhb,      lhb,      0,        ROT0, "IGS",        "Da Ban Cheng",                    GAME_NOT_WORKING ) // needs decrypting / prot patches

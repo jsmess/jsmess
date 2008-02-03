@@ -8,6 +8,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
 
@@ -1284,7 +1285,7 @@ VIDEO_UPDATE( amstrad )
 			}
 		}
 	#endif
-		copybitmap(bitmap, amstrad_bitmap, 0,0,0,0,&rect, TRANSPARENCY_NONE,0);
+		copybitmap(bitmap, amstrad_bitmap, 0,0,0,0,&rect);
 		if(amstrad_plus_asic_enabled != 0)
 			amstrad_plus_sprite_draw(bitmap);
 		amstrad_scanline = y_screen_pos - 32;

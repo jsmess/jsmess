@@ -15,6 +15,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"

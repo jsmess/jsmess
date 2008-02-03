@@ -14,6 +14,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
 #include "cpu/m6502/m6502.h"

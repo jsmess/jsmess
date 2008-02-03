@@ -43,6 +43,7 @@ Known Non-Issues (confirmed on Real Genesis)
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
@@ -2608,7 +2609,7 @@ VIDEO_START(megadriv)
 VIDEO_UPDATE(megadriv)
 {
 	/* Copy our screen buffer here */
-	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect);
 
 //  int xxx;
 	/* reference */

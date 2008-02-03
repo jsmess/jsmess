@@ -135,6 +135,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 #include "machine/atarigen.h"
 #include "cpu/mips/r3000.h"
@@ -837,7 +838,7 @@ VIDEO_UPDATE( cojag )
 	}
 
 	/* render the object list */
-	copybitmap(bitmap, screen_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, screen_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

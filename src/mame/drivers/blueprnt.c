@@ -51,6 +51,7 @@ write:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
@@ -311,8 +312,7 @@ static MACHINE_DRIVER_START( blueprnt )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(blueprnt)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(128*4+8)
+	MDRV_PALETTE_LENGTH(128*4+8)
 
 	MDRV_PALETTE_INIT(blueprnt)
 	MDRV_VIDEO_START(blueprnt)

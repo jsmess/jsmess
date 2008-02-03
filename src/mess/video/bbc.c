@@ -9,10 +9,10 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/bbc.h"
 #include "video/m6845.h"
 #include "saa505x.h"
-//#include "video/bbctext.h"
 
 
 static void BBC_draw_hi_res(void);

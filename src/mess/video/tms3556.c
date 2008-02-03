@@ -12,6 +12,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "tms3556.h"
 
 static struct

@@ -4,6 +4,7 @@
 #include "machine/pit8253.h"
 #include "video/pc_aga.h"
 #include "audio/pc.h"
+#include "deprecat.h"
 
 /*
 

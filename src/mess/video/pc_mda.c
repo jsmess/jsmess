@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "pc_mda.h"
 #include "pc_cga.h" //for the cga palette hack
 #include "includes/crtc6845.h"

@@ -340,8 +340,8 @@ const game_driver * const drivers[] =
 	DRIVER( ckongalc )	/* bootleg */
 	DRIVER( bigkong )	/* bootleg */
 	DRIVER( monkeyd )	/* bootleg */
+	DRIVER( rpatrol )	/* Orca, from a suspicious set */
 	DRIVER( rpatrolb )	/* bootleg */
-	DRIVER( rpatrolo )	/* Orca, from a suspicious set */
 	DRIVER( silvland )	/* Falcon */
 	DRIVER( yamato )	/* (c) 1983 Sega */
 	DRIVER( yamato2 )	/* (c) 1983 Sega */
@@ -6955,6 +6955,7 @@ Other Sun games
 	DRIVER( hyprduel )	/* (c) 1993 Technosoft (World) */
 	DRIVER( hyprdelj )	/* (c) 1993 Technosoft (Japan) */
 	DRIVER( magerror )	/* (c) 199? Technosoft (Japan) */
+	DRIVER( puzzlet )	/* (c) 2000 Yunizu Corporation (Japan) */
 
 	/* Venture Line games */
 	DRIVER( spcforce )	/* (c) 1980 Venture Line */
@@ -7332,9 +7333,11 @@ Other Sun games
 	/* Tatsumi Games */
 	DRIVER( tx1 )		/* (c) 1983 Tatsumi */
 	DRIVER( tx1a )		/* (c) 1983 Tatsumi */
+	/* TX-1 V8 */		/* (c) 1984 Tatsumi */
 	DRIVER( buggyboy )	/* (c) 1985 Tatsumi */
 	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
 	DRIVER( lockon )	/* (c) 1986 Tatsumi */
+	DRIVER( lockonc )	/* (c) 1986 Tatsumi */
 	/* Gray Out */		/* (c) 1987 Tatsumi */
 	DRIVER( apache3 )	/* (c) 1988 Tatsumi */
 	DRIVER( roundup5 )	/* (c) 1989 Tatsumi */
@@ -7346,6 +7349,7 @@ Other Sun games
 	DRIVER( stlforce )	/* (c) 1994 Electronic Devices (Italy) / Ecogames S.L. (Spain) */
 	DRIVER( fantland )	/* (c) 198? Electronic Devices Italy */
 	DRIVER( fantlnda )	/* (c) 198? Electronic Devices Italy */
+	DRIVER( wheelrun )	/* (c) 1988? International Games */
 	DRIVER( galaxygn )	/* (c) 1989 Electronic Devices Italy */
 	DRIVER( borntofi )	/* (c) International Games? */
 	DRIVER( diverboy )	/* (c) 1992 Electronic Devices */
@@ -7683,6 +7687,7 @@ Other Sun games
 	DRIVER( promutrv )	/* (c) 1985 Enerdyne Technologies Inc */
 	DRIVER( promutra )	/* (c) 1985 Enerdyne Technologies Inc */
 	DRIVER( promutrb )	/* (c) 1985 Enerdyne Technologies Inc */
+	DRIVER( promutrc )	/* (c) 1985 Enerdyne Technologies Inc */
 	DRIVER( strvmstr )	/* (c) 1986 Enerdyne Technologies Inc */
 	DRIVER( dorachan )	/* (c) 1980 Craul Denshi */
 	DRIVER( ladyfrog )	/* (c) 1990 Mondial Games */
@@ -7918,5 +7923,6 @@ Other Sun games
 	DRIVER( drw80pkr )
 	DRIVER( blazlaz )
 	DRIVER( paranoia )
+	DRIVER( galgbios )  /* (c) 1998 Creative Electonics */
 
 #endif	/* DRIVER_RECURSIVE */

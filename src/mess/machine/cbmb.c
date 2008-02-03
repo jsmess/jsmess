@@ -9,6 +9,7 @@
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
+#include "deprecat.h"
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"

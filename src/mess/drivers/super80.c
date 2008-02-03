@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "mslegacy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"

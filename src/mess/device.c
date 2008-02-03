@@ -9,6 +9,7 @@
 #include <stddef.h>
 
 #include "device.h"
+#include "deprecat.h"
 #include "mslegacy.h"
 #include "driver.h"
 #include "pool.h"

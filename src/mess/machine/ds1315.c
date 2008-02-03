@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "ds1315.h"
+#include "deprecat.h"
 
 
 enum

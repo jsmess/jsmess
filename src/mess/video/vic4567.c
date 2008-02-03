@@ -3,6 +3,7 @@
 
 #include "driver.h"
 #include "vic4567.h"
+#include "deprecat.h"
 
 #define OPTIMIZE
 

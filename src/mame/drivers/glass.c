@@ -9,6 +9,7 @@ The DS5002FP has up to 128KB undumped gameplay code making the game unplayable :
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
@@ -337,6 +338,6 @@ static DRIVER_INIT( glass )
 	glass_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0200000, 0x0200000, 0x0200000, 0x0300000);
 }
 
-GAME( 1993, glass, 0, glass,glass, glass, ROT0, "Gaelco", "Glass (Ver 1.1)", GAME_UNEMULATED_PROTECTION )
-GAME( 1993, glass10 , glass, glass,glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0)", GAME_UNEMULATED_PROTECTION )
-GAME( 1993, glass10a, glass, glass,glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0 set 2)", GAME_UNEMULATED_PROTECTION )
+GAME( 1993, glass,    0,     glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.1)",        GAME_UNEMULATED_PROTECTION )
+GAME( 1993, glass10,  glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0, set 1)", GAME_UNEMULATED_PROTECTION )
+GAME( 1993, glass10a, glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0, set 2)", GAME_UNEMULATED_PROTECTION )

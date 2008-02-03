@@ -61,6 +61,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/apple1.h"
 #include "mscommon.h"
 

@@ -48,6 +48,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "pc_cga.h"
 #include "includes/crtc6845.h"
 #include "video/pc_video.h"

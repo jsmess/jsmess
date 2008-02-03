@@ -14,6 +14,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/spectrum.h"
 #include "eventlst.h"
 #include "video/border.h"

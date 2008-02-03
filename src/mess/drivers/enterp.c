@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/dave.h"
 #include "includes/enterp.h"
 #include "video/epnick.h"

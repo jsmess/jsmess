@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/pcw16.h"
 
 int pcw16_colour_palette[16];

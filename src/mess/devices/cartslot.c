@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include "driver.h"
 #include "cartslot.h"
+#include "deprecat.h"
 
 
 static int is_cart_roment(const rom_entry *roment)

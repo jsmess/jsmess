@@ -9,9 +9,9 @@
 
 ***************************************************************************/
 
-#include "cpuintrf.h"
-#include "x86drc.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "x86drc.h"
 
 #define LOG_DISPATCHES				0
 #define BREAK_ON_MODIFIED_CODE		0
@@ -391,7 +391,7 @@ void drc_append_verify_code(drc_core *drc, void *code, UINT8 length)
 
 void drc_append_call_debugger(drc_core *drc)
 {
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	if (Machine->debug_mode)
 	{
 		emit_link link;
@@ -615,7 +615,7 @@ void drc_dasm(FILE *f, const void *begin, const void *end)
 
 	while(begin_ptr < end_ptr)
 	{
-#if defined(MAME_DEBUG) && HAS_I386
+#if defined(ENABLE_DEBUGGER) && HAS_I386
 		length = i386_dasm_one(buffer, pc, (UINT8 *) begin_ptr, 32) & DASMFLAG_LENGTHMASK;
 #else
 		sprintf(buffer, "%02X", *begin_ptr);

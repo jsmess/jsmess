@@ -1,5 +1,6 @@
 /* Core includes */
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/kc.h"
 
 /* Components */

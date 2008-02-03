@@ -9,6 +9,7 @@
 
 /* Core includes */
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/mtx.h"
 
 /* Components */

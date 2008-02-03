@@ -11,6 +11,7 @@
 #include "driver.h"
 #include "includes/wswan.h"
 #include "streams.h"
+#include "deprecat.h"
 
 static sound_stream *channel;
 

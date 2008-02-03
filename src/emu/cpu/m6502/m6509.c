@@ -38,6 +38,7 @@ addresses take place.
 */
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "m6509.h"
 
 #include "ops02.h"
@@ -200,7 +201,7 @@ static int m6509_execute(int cycles)
 		UINT8 op;
 		PPC = PCD;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PCD);
 
 		/* if an irq is pending, take it now */
 		if( m6509.pending_irq )
@@ -368,7 +369,7 @@ void m6509_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = m6509_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m6509_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6502_dasm;			break;
 #endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502_ICount;			break;

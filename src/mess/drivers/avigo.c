@@ -39,6 +39,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/avigo.h"
 #include "machine/intelfsh.h"
 #include "machine/tc8521.h"
@@ -512,7 +513,7 @@ static  READ8_HANDLER(avigo_irq_r)
 
 static WRITE8_HANDLER(avigo_irq_w)
 {
-        avigo_irq &= ~data;
+	avigo_irq &= ~data;
 
 	avigo_refresh_ints();
 }

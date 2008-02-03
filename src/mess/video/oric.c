@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/oric.h"
 
 static void oric_vh_update_flash(void);

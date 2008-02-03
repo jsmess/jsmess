@@ -5,9 +5,9 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "tia.h"
 #include "sound/tiaintf.h"
-#include <math.h>
 
 #define HMOVE_INACTIVE		-200
 #define PLAYER_GFX_SLOTS	4
@@ -26,8 +26,8 @@ struct player_gfx {
 static struct player_gfx p0gfx;
 static struct player_gfx p1gfx;
 
-static UINT32 frame_cycles;
-static UINT32 paddle_cycles;
+static UINT64 frame_cycles;
+static UINT64 paddle_cycles;
 
 static int horzP0;
 static int horzP1;
@@ -284,8 +284,7 @@ VIDEO_START( tia )
 VIDEO_UPDATE( tia )
 {
 	screen_height = machine->screen[0].height;
-	copybitmap(bitmap, helper[2], 0, 0, 0, 0,
-		cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, helper[2], 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -1649,7 +1648,7 @@ static WRITE8_HANDLER( GRP1_w )
 
 static READ8_HANDLER( INPT_r )
 {
-	UINT32 elapsed = activecpu_gettotalcycles() - paddle_cycles;
+	UINT64 elapsed = activecpu_gettotalcycles() - paddle_cycles;
 	int input = TIA_INPUT_PORT_ALWAYS_ON;
 
 	if ( tia_read_input_port )

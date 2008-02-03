@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/advision.h"
 #include "devices/cartslot.h"
 #include "sound/dac.h"

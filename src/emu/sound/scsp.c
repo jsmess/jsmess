@@ -25,10 +25,10 @@
     * January 5, 2007   (kingshriek+RB) Working, good-sounding FM, removed obsolete non-USEDSP code.
 */
 
-#include <math.h>
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "deprecat.h"
 #include "scsp.h"
 #include "scspdsp.h"
 
@@ -1070,7 +1070,10 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		sample=(sample*EG_TABLE[EG_Update(slot)>>(SHIFT-10)])>>SHIFT;
 
 	if(!STWINH(slot))
-		*RBUFDST=sample;
+ 	{
+ 		unsigned short Enc=((TL(slot))<<0x0)|(0x7<<0xd);
+ 		*RBUFDST=(sample*SCSP->LPANTABLE[Enc])>>(SHIFT+1);
+ 	}
 
 	return sample;
 }

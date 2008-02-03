@@ -42,6 +42,7 @@
 \*********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/mips3.h"
 #include "machine/sgi.h"
 #include "machine/pckeybrd.h"

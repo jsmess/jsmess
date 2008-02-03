@@ -21,6 +21,7 @@
 #include "windows/input.h"
 #include "dialog.h"
 #include "opcntrl.h"
+#include "deprecat.h"
 #include "mslegacy.h"
 #include "strconv.h"
 #include "utils.h"

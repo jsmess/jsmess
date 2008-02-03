@@ -70,7 +70,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.122u7.  This incorporates all features of the
+- The core is based on MAME 0.122u8.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Miscellaneous cleanups (staticization, constification, conditional logging,

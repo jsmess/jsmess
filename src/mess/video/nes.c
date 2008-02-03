@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"

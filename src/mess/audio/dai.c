@@ -13,6 +13,7 @@
 #include "machine/pit8253.h"
 #include "includes/dai.h"
 #include "streams.h"
+#include "deprecat.h"
 
 static void *dai_sh_start(int clock, const struct CustomSound_interface *config);
 static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);

@@ -65,6 +65,7 @@
 
 #include "driver.h"
 #include "m6847.h"
+#include "deprecat.h"
 
 #ifdef MAME_DEBUG
 #include "debug/debugcpu.h"
@@ -1872,7 +1873,7 @@ void m6847_init(const m6847_config *cfg)
 	if (cfg->cpu0_timing_factor > 0)
 	{
 		cpu0_clock_period = period * cfg->cpu0_timing_factor * GROSS_FACTOR;
-		cpunum_set_clock_period(Machine, 0, cpu0_clock_period);
+		cpunum_set_clock(Machine, 0, ATTOSECONDS_PER_SECOND / cpu0_clock_period);
 	}
 
 	/* calculate timing */

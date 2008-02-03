@@ -9,6 +9,7 @@
 #include "cassette.h"
 #include "formats/cassimg.h"
 #include "ui.h"
+#include "deprecat.h"
 
 
 #define CASSETTE_TAG		"cassette"

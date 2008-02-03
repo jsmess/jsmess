@@ -13,6 +13,7 @@ DAVE SOUND CHIP FOUND IN ENTERPRISE
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/dave.h"
 
 #define STEP 0x08000

@@ -399,8 +399,8 @@ static void cgenie_refresh_tv_set(running_machine *machine, mame_bitmap * bitmap
 		}
 	}
 
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
-	copybitmap(bitmap, dlybitmap, 0, 0, 1, 0, cliprect, TRANSPARENCY_COLOR, 0);
+	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, dlybitmap, 0, 0, 1, 0, cliprect, 0);
 }
 
 /***************************************************************************

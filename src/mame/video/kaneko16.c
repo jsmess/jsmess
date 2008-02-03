@@ -391,11 +391,11 @@ else
 }
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void kaneko16_draw_sprites_custom(mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void kaneko16_draw_sprites_custom(running_machine *machine, mame_bitmap *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int priority)
 {
-	const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *pal = &machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
@@ -594,7 +594,8 @@ void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const 
 
 		UINT32 primask = kaneko16_priority.sprite[curr_pri];
 
-		kaneko16_draw_sprites_custom(	bitmap,machine->gfx[0],
+		kaneko16_draw_sprites_custom(	machine,
+										bitmap,machine->gfx[0],
 										s->code,
 										s->color,
 										s->flipx, s->flipy,
@@ -904,7 +905,7 @@ static void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitma
 	{
 		/* keep sprites on screen */
 		kaneko16_draw_sprites(machine,sprites_bitmap,cliprect);
-		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
+		copybitmap_trans(bitmap,sprites_bitmap,0,0,0,0,cliprect,0);
 	}
 	else
 	{
@@ -927,11 +928,7 @@ static void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *
 		sx		=	(select & 0x1f) * 256;
 		sy		=	0;
 
-		copybitmap(
-			bitmap, kaneko16_bg15_bitmap,
-			flip, flip,
-			-sx, -sy,
-			cliprect, TRANSPARENCY_NONE,0 );
+		copybitmap(bitmap, kaneko16_bg15_bitmap, flip, flip, -sx, -sy, cliprect);
 
 //      flag = 0;
 	}

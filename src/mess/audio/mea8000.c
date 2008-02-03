@@ -37,6 +37,7 @@
 #include "driver.h"
 #include "mea8000.h"
 #include "sound/dac.h"
+#include "deprecat.h"
 
 
 #define VERBOSE 0

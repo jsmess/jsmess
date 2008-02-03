@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/m68000/m68000.h"
 #include "devices/cartslot.h"

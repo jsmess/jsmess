@@ -7,6 +7,7 @@
 #ifndef SMS_H_
 #define SMS_H_
 
+#include "deprecat.h"
 
 #define LOG_REG
 #define LOG_PAGING

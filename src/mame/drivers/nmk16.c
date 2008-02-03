@@ -145,6 +145,7 @@ Afega Games
 ********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
@@ -232,6 +233,7 @@ VIDEO_UPDATE( tharrier );
 VIDEO_UPDATE( hachamf );
 VIDEO_UPDATE( tdragon );
 VIDEO_EOF( nmk );
+VIDEO_EOF( strahl );
 
 /* Variables defined in video: */
 
@@ -4207,7 +4209,7 @@ static MACHINE_DRIVER_START( strahl )
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(strahl)
-	MDRV_VIDEO_EOF(nmk)
+	MDRV_VIDEO_EOF(strahl)
 	MDRV_VIDEO_UPDATE(strahl)
 
 	/* sound hardware */

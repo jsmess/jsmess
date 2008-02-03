@@ -93,6 +93,7 @@
   - emulation of other hardware...?
  ******************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 // nec765 interface
 #include "machine/nec765.h"
 #include "devices/dsk.h"

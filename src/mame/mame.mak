@@ -755,21 +755,21 @@ $(MAMEOBJ)/igs.a: \
 	$(MACHINE)/pgmy2ks.o \
 
 $(MAMEOBJ)/irem.a: \
+	$(DRIVERS)/m52.o $(VIDEO)/m52.o \
+	$(DRIVERS)/m57.o $(VIDEO)/m57.o \
+	$(DRIVERS)/m58.o $(VIDEO)/m58.o \
 	$(DRIVERS)/m62.o $(VIDEO)/m62.o \
 	$(DRIVERS)/m72.o $(AUDIO)/m72.o $(VIDEO)/m72.o \
 	$(DRIVERS)/m90.o $(VIDEO)/m90.o \
 	$(DRIVERS)/m92.o $(VIDEO)/m92.o \
 	$(DRIVERS)/m107.o $(VIDEO)/m107.o \
-	$(DRIVERS)/mpatrol.o $(VIDEO)/mpatrol.o \
 	$(DRIVERS)/olibochu.o \
 	$(DRIVERS)/redalert.o $(AUDIO)/redalert.o $(VIDEO)/redalert.o \
 	$(DRIVERS)/shisen.o $(VIDEO)/shisen.o \
 	$(DRIVERS)/skychut.o $(VIDEO)/skychut.o \
 	$(DRIVERS)/travrusa.o $(VIDEO)/travrusa.o \
-	$(DRIVERS)/troangel.o $(VIDEO)/troangel.o \
 	$(DRIVERS)/vigilant.o $(VIDEO)/vigilant.o \
 	$(DRIVERS)/wilytowr.o \
-	$(DRIVERS)/yard.o $(VIDEO)/yard.o \
 	$(MACHINE)/irem_cpu.o \
 	$(AUDIO)/fghtbskt.o \
 	$(AUDIO)/irem.o \
@@ -1289,7 +1289,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/ashnojoe.o $(VIDEO)/ashnojoe.o \
 	$(DRIVERS)/asuka.o $(MACHINE)/bonzeadv.o $(VIDEO)/asuka.o \
 	$(DRIVERS)/bigevglf.o $(MACHINE)/bigevglf.o $(VIDEO)/bigevglf.o \
-	$(DRIVERS)/bking2.o $(VIDEO)/bking2.o \
+	$(DRIVERS)/bking.o $(VIDEO)/bking.o \
 	$(DRIVERS)/bublbobl.o $(MACHINE)/bublbobl.o $(VIDEO)/bublbobl.o \
 	$(DRIVERS)/buggychl.o $(MACHINE)/buggychl.o $(VIDEO)/buggychl.o \
 	$(DRIVERS)/chaknpop.o $(MACHINE)/chaknpop.o $(VIDEO)/chaknpop.o \
@@ -1357,9 +1357,9 @@ $(MAMEOBJ)/taito.a: \
 	$(VIDEO)/taitoic.o \
 
 $(MAMEOBJ)/tatsumi.a: \
-	$(DRIVERS)/lockon.o \
-	$(DRIVERS)/tatsumi.o $(MACHINE)/tatsumi.o $(VIDEO)/tatsumi.o \
 	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(AUDIO)/tx1.o $(VIDEO)/tx1.o \
+	$(DRIVERS)/lockon.o $(VIDEO)/lockon.o \
+	$(DRIVERS)/tatsumi.o $(MACHINE)/tatsumi.o $(VIDEO)/tatsumi.o \
 
 $(MAMEOBJ)/tch.a: \
 	$(DRIVERS)/kickgoal.o $(VIDEO)/kickgoal.o \
@@ -1503,7 +1503,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
 	$(DRIVERS)/ambush.o $(VIDEO)/ambush.o \
-	$(DRIVERS)/ampoker.o $(VIDEO)/ampoker.o \
+	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
 	$(DRIVERS)/attckufo.o $(AUDIO)/attckufo.o $(VIDEO)/attckufo.o \
@@ -1540,6 +1540,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
+	$(DRIVERS)/galgames.o \
 	$(DRIVERS)/gamecstl.o \
 	$(DRIVERS)/gdrawpkr.o $(VIDEO)/gdrawpkr.o \
 	$(DRIVERS)/gtipoker.o \
@@ -1641,7 +1642,7 @@ $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 
-$(DRIVERS)/ampoker.o:	$(LAYOUT)/ampoker.lh \
+$(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 						$(LAYOUT)/sigmapkr.lh \
 
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/tenpindx.lh

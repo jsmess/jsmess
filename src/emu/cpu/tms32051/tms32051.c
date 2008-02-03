@@ -4,9 +4,10 @@
    Written by Ville Linde
 */
 
+#include "debugger.h"
+#include "deprecat.h"
 #include "cpuintrf.h"
 #include "tms32051.h"
-#include "debugger.h"
 
 static void delay_slot(UINT16 startpc);
 static void save_interrupt_context(void);
@@ -360,7 +361,7 @@ static int tms_execute(int num_cycles)
 		}
 
 		ppc = tms.pc;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(tms.pc);
 
 		tms.op = ROPCODE();
 		tms32051_opcode_table[tms.op >> 8]();
@@ -627,9 +628,9 @@ static void tms_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = tms_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = tms_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32051_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_READ:							info->read = tms_debug_read;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms_icount;				break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_internal_pgm; break;

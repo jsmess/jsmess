@@ -1001,7 +1001,7 @@ static int recompile_delay_slot(drc_core *drc, UINT32 pc)
 	UINT32 result;
 	UINT32 physpc;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	if (Machine->debug_mode)
 	{
 		/* emit debugging */
@@ -3571,7 +3571,7 @@ static UINT32 recompile_set_cop0_reg(drc_core *drc, UINT8 reg)
 			emit_mov_m32_r32(DRCTOP, CPR0ADDR(COP0_Status), REG_EAX);						// mov  [COP0_Status],eax
 			emit_xor_r32_r32(DRCTOP, REG_EBX, REG_EAX);										// xor  ebx,eax
 /*
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
             _test_r32_imm(REG_EAX, 0xe0);                                                   // test eax,0xe0
             _jcc_short_link(COND_Z, &link1);                                                // jz   skip
             _sub_r32_imm(REG_ESP, 4);                                                       // sub  esp,4
@@ -3594,7 +3594,7 @@ static UINT32 recompile_set_cop0_reg(drc_core *drc, UINT8 reg)
 			emit_mov_m32_r32(DRCTOP, ICOUNTADDR, REG_EBP);									// mov  [icount],ebp
 			emit_sub_r32_imm(DRCTOP, REG_ESP, 8);											// sub  esp,8
 			emit_push_r32(DRCTOP, REG_EAX);													// push eax
-			emit_call(DRCTOP, (x86code *)activecpu_gettotalcycles64);						// call activecpu_gettotalcycles64
+			emit_call(DRCTOP, (x86code *)activecpu_gettotalcycles);							// call activecpu_gettotalcycles
 			emit_pop_r32(DRCTOP, REG_EBX);													// pop  ebx
 			emit_add_r32_imm(DRCTOP, REG_ESP, 8);											// add  esp,8
 			emit_sub_r32_r32(DRCTOP, REG_EAX, REG_EBX);										// sub  eax,ebx
@@ -3647,7 +3647,7 @@ static UINT32 recompile_get_cop0_reg(drc_core *drc, UINT8 reg)
 			resolve_link(DRCTOP, &link1);												// notneg:
 			emit_mov_m32_r32(DRCTOP, ICOUNTADDR, REG_EBP);									// mov  [icount],ebp
 			emit_sub_r32_imm(DRCTOP, REG_ESP, 12);											// sub  esp,12
-			emit_call(DRCTOP, (x86code *)activecpu_gettotalcycles64);						// call activecpu_gettotalcycles64
+			emit_call(DRCTOP, (x86code *)activecpu_gettotalcycles);							// call activecpu_gettotalcycles
 			emit_add_r32_imm(DRCTOP, REG_ESP, 12);											// add  esp,12
 			emit_sub_r32_m32(DRCTOP, REG_EAX, MABS(LO(&mips3.core->count_zero_time)));		// sub  eax,[mips3.core->count_zero_time+0]
 			emit_sbb_r32_m32(DRCTOP, REG_EDX, MABS(HI(&mips3.core->count_zero_time)));		// sbb  edx,[mips3.core->count_zero_time+4]

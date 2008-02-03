@@ -59,6 +59,7 @@
 #include "video/tms9928a.h"
 #include "includes/coleco.h"
 #include "devices/cartslot.h"
+#include "deprecat.h"
 
 READ8_HANDLER(coleco_video_r)
 {

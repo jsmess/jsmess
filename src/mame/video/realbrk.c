@@ -20,6 +20,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "realbrk.h"
 
 //UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs;
@@ -323,7 +324,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 									(rot & 1 ? scaley : scalex) << 12, (rot & 1 ? scalex : scaley) << 12);
 
 					// peek at the unrotated sprite
-					// copybitmap( bitmap,tmpbitmap0, 0,0, 50+(x * xdim/0x10000),50+(y * ydim/0x10000), cliprect, TRANSPARENCY_PEN, 0 );
+					// copybitmap_trans( bitmap,tmpbitmap0, 0,0, 50+(x * xdim/0x10000),50+(y * ydim/0x10000), cliprect, 0 );
 				}
 
 				switch( rot )
@@ -341,7 +342,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 							currx = (sx - (y+1) * ydim) / 0x10000;
 							curry = (sy + x * xdim) / 0x10000;
 
-							copybitmap( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, TRANSPARENCY_PEN, 0 );
+							copybitmap_trans( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
 					case 0x20: // rot 180
@@ -357,7 +358,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 							currx = (sx - (x+1) * xdim) / 0x10000;
 							curry = (sy - (y+1) * ydim) / 0x10000;
 
-							copybitmap( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, TRANSPARENCY_PEN, 0 );
+							copybitmap_trans( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
 					case 0x30: // rot 270
@@ -373,7 +374,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 							currx = (sx + y * ydim) / 0x10000;
 							curry = (sy - (x+1) * xdim) / 0x10000;
 
-							copybitmap( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, TRANSPARENCY_PEN, 0 );
+							copybitmap_trans( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
 					default:

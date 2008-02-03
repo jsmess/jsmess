@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "cococart.h"
+#include "deprecat.h"
 
 
 struct _coco_cartridge

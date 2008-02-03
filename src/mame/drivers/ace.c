@@ -38,6 +38,7 @@ A1                   2101            2101
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 static UINT8 *ace_scoreram;
@@ -330,7 +331,6 @@ static MACHINE_DRIVER_START( ace )
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
 	MDRV_GFXDECODE(ace)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_COLORTABLE_LENGTH(2*2)
 
 	MDRV_PALETTE_INIT(ace)
 	MDRV_VIDEO_UPDATE(ace)

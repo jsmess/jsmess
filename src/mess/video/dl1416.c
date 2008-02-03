@@ -30,6 +30,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "dl1416.h"
 
 

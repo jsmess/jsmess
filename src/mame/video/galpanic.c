@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "kan_pand.h"
 
 UINT16 *galpanic_bgvideoram,*galpanic_fgvideoram;
@@ -104,7 +105,7 @@ static void draw_fgbitmap(running_machine *machine, mame_bitmap *bitmap, const r
 VIDEO_UPDATE( galpanic )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(machine, bitmap, cliprect);
 
@@ -116,7 +117,7 @@ VIDEO_UPDATE( galpanic )
 VIDEO_UPDATE( comad )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(machine,bitmap,cliprect);
 
@@ -130,7 +131,7 @@ VIDEO_UPDATE( comad )
 //  {
 //      /* keep sprites on the bitmap without clearing them */
 //      comad_draw_sprites(machine,sprites_bitmap,0);
-//      copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
+//      copybitmap_trans(bitmap,sprites_bitmap,0,0,0,0,cliprect,0);
 //  }
 	return 0;
 }

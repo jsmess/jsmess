@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    dsp56kops.c
+    dsp56ops.c
     Core implementation for the portable Motorola/Freescale DSP56k emulator.
     Written by Andrew Gardner
 
@@ -117,7 +117,7 @@ static void execute_one(void)
 {
 	unsigned size = 666 ;
 
-	CALL_MAME_DEBUG;
+	CALL_DEBUGGER(PC);
 	OP = ROPCODE(PC<<1);
 
 	if (BITS(OP,0x8000))											// First, the parallel data move instructions

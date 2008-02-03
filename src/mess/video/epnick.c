@@ -17,6 +17,7 @@
 #include "epnick.h"
 
 /* TODO: Remove dependency on this */
+#include "deprecat.h"
 #include "mslegacy.h"
 
 

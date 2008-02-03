@@ -11,6 +11,7 @@
 
 #include "dialog.h"
 #include "mame.h"
+#include "deprecat.h"
 #include "mslegacy.h"
 #include "inputx.h"
 #include "utils.h"

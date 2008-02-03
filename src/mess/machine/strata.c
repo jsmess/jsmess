@@ -13,6 +13,7 @@
 
 #include "driver.h"
 #include "strata.h"
+#include "deprecat.h"
 
 #define MAX_STRATA	1
 

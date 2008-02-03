@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #include "driver.h"
-#include "driver.h"
+#include "deprecat.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 

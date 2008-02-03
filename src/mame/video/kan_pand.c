@@ -45,6 +45,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "kan_pand.h"
 
 static UINT8* pandora_spriteram;
@@ -66,7 +67,7 @@ void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectang
 		return;
 	}
 
-	copybitmap(bitmap,pandora_sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
+	copybitmap_trans(bitmap,pandora_sprites_bitmap,0,0,0,0,cliprect,0);
 }
 
 

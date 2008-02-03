@@ -127,6 +127,7 @@ TODO:  - The UPD7810 core is missing analog port emulation
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/beep.h"
 

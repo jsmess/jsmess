@@ -7,19 +7,17 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 
-static int gfxbank;
+static UINT8 gfxbank;
+static UINT8 palette_bank;
 
 static tilemap *bg_tilemap;
+
 
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
-
-  Pac Man has a 16 bytes palette PROM and a 128 bytes color lookup table PROM.
-
-  Pengo has a 32 bytes palette PROM and a 256 bytes color lookup table PROM
-  (actually that's 512 bytes, but the high address bit is grounded).
 
   The palette PROM is connected to the RGB output this way:
 
@@ -33,47 +31,58 @@ static tilemap *bg_tilemap;
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
+
 PALETTE_INIT( champbas )
 {
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances_rg[0], rweights, 0, 0,
+			3, &resistances_rg[0], gweights, 0, 0,
+			2, &resistances_b[0],  bweights, 0, 0);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 32);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 32;
 
-	/* TODO: there are 32 colors in the palette, but we are suing only 16 */
-	/* the only difference between the two banks is color #14, grey instead of green */
-
-	/* character lookup table */
-	/* sprites use the same color lookup table as characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f);
+	/* character lookup table - sprites use the same color lookup table as characters */
+	for (i = 0; i < 0x200; i++)
+	{
+		UINT8 ctabentry = ((i & 0x100) >> 4) | (color_prom[i & 0xff] & 0x0f);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( champbas_videoram_w )
@@ -97,6 +106,15 @@ WRITE8_HANDLER( champbas_gfxbank_w )
 	}
 }
 
+WRITE8_HANDLER( champbas_palette_bank_w )
+{
+	if (palette_bank != (data & 0x01))
+	{
+		palette_bank = data & 0x01;
+		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	}
+}
+
 WRITE8_HANDLER( champbas_flipscreen_w )
 {
 	if (flip_screen != data)
@@ -109,15 +127,14 @@ WRITE8_HANDLER( champbas_flipscreen_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
-	int color = (colorram[tile_index] & 0x1f) + 32;
+	int color = (palette_bank << 6) | 0x20 | (colorram[tile_index] & 0x1f);
 
 	SET_TILE_INFO(gfxbank, code, color, 0);
 }
 
 VIDEO_START( champbas )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -127,7 +144,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	for (offs = spriteram_size - 2; offs >= 0; offs -= 2)
 	{
 		int code = spriteram[offs] >> 2;
-		int color = spriteram[offs + 1];
+		int color = (palette_bank << 6) | (spriteram[offs + 1] & 0x3f);
 		int flipx = spriteram[offs] & 0x01;
 		int flipy = spriteram[offs] & 0x02;
 		int sx = ((256 + 16 - spriteram_2[offs + 1]) & 0xff) - 16;
@@ -139,7 +156,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			flipx, flipy,
 			sx, sy,
 			cliprect,
-			TRANSPARENCY_COLOR, 0);
+			TRANSPARENCY_PENS,
+			colortable_get_transpen_mask(machine->colortable, machine->gfx[2 + gfxbank], color, 0));
 	}
 }
 

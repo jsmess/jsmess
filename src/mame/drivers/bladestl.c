@@ -26,6 +26,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
 #include "video/konamiic.h"
@@ -34,9 +35,9 @@ Notes:
 
 /* from video */
 int bladestl_spritebank;
+PALETTE_INIT( bladestl );
 VIDEO_START( bladestl );
 VIDEO_UPDATE( bladestl );
-PALETTE_INIT( bladestl );
 WRITE8_HANDLER( bladestl_vreg_w );
 
 static INTERRUPT_GEN( bladestl_interrupt )
@@ -124,7 +125,7 @@ static ADDRESS_MAP_START( bladestl_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(K007342_w)				/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_WRITE(K007420_w)				/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_WRITE(K007342_scroll_w)		/* Scroll RAM */
-	AM_RANGE(0x2400, 0x245f) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* palette */
+	AM_RANGE(0x2400, 0x245f) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)/* palette */
 	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)			/* Video Registers */
 	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(bladestl_sh_irqtrigger_w)/* cause interrupt on audio CPU */
 	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
@@ -449,10 +450,9 @@ static MACHINE_DRIVER_START( bladestl )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(bladestl)
-	MDRV_PALETTE_LENGTH(48)
-	MDRV_COLORTABLE_LENGTH(48 + 16*16)
-
 	MDRV_PALETTE_INIT(bladestl)
+	MDRV_PALETTE_LENGTH(32 + 16*16)
+
 	MDRV_VIDEO_START(bladestl)
 	MDRV_VIDEO_UPDATE(bladestl)
 

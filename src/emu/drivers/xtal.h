@@ -67,6 +67,7 @@ enum
 	XTAL_12_096MHz 		= 12096000,		/* Some early 80's Atari games */
 	XTAL_12_288MHz  	= 12288000,		/* Sega Model 3 digital audio board */
 	XTAL_12_5MHz   		= 12500000,		/* Red Alert audio board */
+	XTAL_12_9792MHz		= 12979200,		/* Exidy 440 */
 	XTAL_13_3MHz  		= 13300000,		/* BMC bowling */
 	XTAL_13_33056MHz 	= 13330560,		/* Taito L */
 	XTAL_13_4MHz		= 13400000,		/* TNK3, Ikari Warriors h/w */
@@ -82,6 +83,7 @@ enum
 	XTAL_18_432MHz  	= 18432000,
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by Space Invaders games by Taito/Midway and clones */
 	XTAL_20MHz   		= 20000000,
+	XTAL_21MHz  		= 21000000,		/* Lock-On pixel clock */
 	XTAL_21_3MHz  		= 21300000,
 	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */
 	XTAL_22MHz   		= 22000000,
@@ -122,6 +124,7 @@ enum
 	XTAL_64MHz   		= 64000000,		/* BattleToads */
 	XTAL_66_6667MHz   	= 66666700,		/* later Midway games */
 	XTAL_67_7376MHz  	= 67737600,		/* PSX-based h/w, Sony ZN1-2-based */
+	XTAL_73_728MHz  	= 73728000,		/* Ms. Pac-Man/Galaga 20th Anniversary */
 	XTAL_100MHz  		= 100000000,	/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	XTAL_101_4912MHz  	= 101491200,	/* PSX-based Namco System 10 */
 

@@ -16,6 +16,7 @@
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
 #include "image.h"
+#include "deprecat.h"
 
 #define VERBOSE_SERIAL	0
 #define VERBOSE_CHKSUM	0

@@ -8,6 +8,7 @@
 ***************************************************************************************/
 #include "driver.h"
 #include "includes/odyssey2.h"
+#include "deprecat.h"
 
 sound_stream *odyssey2_sh_channel;
 

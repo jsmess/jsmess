@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "mame.h"
+#include "deprecat.h"
 #include "options.h"
 #include "driver.h"
 #include "pool.h"

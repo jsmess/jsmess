@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include "mame.h"
+#include "deprecat.h"
 #include "mslegacy.h"
 #include "uimenu.h"
 #include "uimess.h"

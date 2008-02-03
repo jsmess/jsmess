@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "pc_t1t.h"
 #include "pc_cga.h" // cga monitor palette
 #include "pc_aga.h" //europc charset

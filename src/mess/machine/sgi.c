@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "sgi.h"
+#include "deprecat.h"
 
 #define VERBOSE_LEVEL ( 1 )
 

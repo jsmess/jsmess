@@ -38,6 +38,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "sound/nes_apu.h"
 #include "cpu/m6502/m6502.h"
@@ -276,7 +277,6 @@ static MACHINE_DRIVER_START( multigam )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(multigam)
 	MDRV_PALETTE_LENGTH(8*4*16)
-	MDRV_COLORTABLE_LENGTH(4*8)
 
 	MDRV_PALETTE_INIT(multigam)
 	MDRV_VIDEO_START(multigam)
@@ -332,5 +332,5 @@ ROM_START( multigmb )
 ROM_END
 
 
-GAME( 1992, multigam, 0, multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 1)", 0 )
+GAME( 1992, multigam, 0,        multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 1)", 0 )
 GAME( 1992, multigmb, multigam, multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 2)", 0 )

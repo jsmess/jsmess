@@ -34,6 +34,7 @@
 #include "devices/basicdsk.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
+#include "deprecat.h"
 
 
 // interrupt register stuff

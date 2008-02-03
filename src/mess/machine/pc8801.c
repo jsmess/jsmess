@@ -16,6 +16,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/pc8801.h"
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"

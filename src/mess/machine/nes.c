@@ -7,6 +7,7 @@
 #include "zlib.h"
 #include "image.h"
 #include "hash.h"
+#include "deprecat.h"
 
 
 

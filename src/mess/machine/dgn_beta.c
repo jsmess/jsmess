@@ -59,6 +59,7 @@
 #include <assert.h>
 
 #include "driver.h"
+#include "deprecat.h"
 #include "debug/debugcon.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -1094,7 +1095,7 @@ MACHINE_START( dgnbeta )
 	pia_config(1, &dgnbeta_pia_intf[1]);
 	pia_config(2, &dgnbeta_pia_intf[2]);
 
-	init_video();
+	init_video(machine);
 
 	wd17xx_init(WD_TYPE_179X,dgnbeta_fdc_callback, NULL);
 #ifdef MAME_DEBUG

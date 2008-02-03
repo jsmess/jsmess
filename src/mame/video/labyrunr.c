@@ -8,25 +8,56 @@ static rectangle clip0, clip1;
 
 PALETTE_INIT( labyrunr )
 {
-	int i,pal;
+	int pal;
 
-	for (pal = 0;pal < 8;pal++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x80);
+
+	for (pal = 0; pal < 8; pal++)
 	{
-		if (pal & 1)	/* chars, no lookup table */
+		/* chars, no lookup table */
+		if (pal & 1)
 		{
-			for (i = 0;i < 256;i++)
-				*(colortable++) = 16 * pal + (i & 0x0f);
+			int i;
+
+			for (i = 0; i < 0x100; i++)
+				colortable_entry_set_value(machine->colortable, (pal << 8) | i, (pal << 4) | (i & 0x0f));
 		}
-		else	/* sprites */
+		/* sprites */
+		else
 		{
-			for (i = 0;i < 256;i++)
+			int i;
+
+			for (i = 0; i < 0x100; i++)
+			{
+				UINT8 ctabentry;
+
 				if (color_prom[i] == 0)
-					*(colortable++) = 0;
+					ctabentry = 0;
 				else
-					*(colortable++) = 16 * pal + color_prom[i];
+					ctabentry = (pal << 4) | (color_prom[i] & 0x0f);
+
+				colortable_entry_set_value(machine->colortable, (pal << 8) | i, ctabentry);
+			}
 		}
 	}
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0x00; i < 0x100; i += 2)
+	{
+		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
+	}
+}
+
 
 
 /***************************************************************************
@@ -142,6 +173,8 @@ VIDEO_UPDATE( labyrunr )
 {
 	rectangle finalclip0, finalclip1;
 
+	set_pens(machine);
+
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
@@ -168,7 +201,7 @@ VIDEO_UPDATE( labyrunr )
 		}
 
 		tilemap_draw(bitmap,&finalclip0,layer0,TILEMAP_DRAW_OPAQUE,0);
-		K007121_sprites_draw(machine,0,bitmap,cliprect,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
+		K007121_sprites_draw(0,bitmap,machine->gfx,machine->colortable,cliprect,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		tilemap_draw(bitmap,&finalclip1,layer1,TILEMAP_DRAW_OPAQUE,0);
 	}
@@ -236,7 +269,7 @@ VIDEO_UPDATE( labyrunr )
 		tilemap_draw(bitmap,&finalclip1,layer1,0,1);
 		if(use_clip3[1]) tilemap_draw(bitmap,&finalclip3,layer1,0,1);
 
-		K007121_sprites_draw(machine,0,bitmap,cliprect,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
+		K007121_sprites_draw(0,bitmap,machine->gfx,machine->colortable,cliprect,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
 	}
 	return 0;
 }

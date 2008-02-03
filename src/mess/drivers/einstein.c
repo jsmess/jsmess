@@ -79,6 +79,7 @@
 /* 7e = 0, read from fe, 7e = 1, read from fe */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"

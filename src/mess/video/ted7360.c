@@ -355,6 +355,7 @@ Video part
 #include <math.h>
 #include <stdio.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "utils.h"
 #include "sound/custom.h"
 
@@ -1226,6 +1227,6 @@ INTERRUPT_GEN( ted7360_raster_interrupt )
 
 VIDEO_UPDATE( ted7360 )
 {
-	copybitmap(bitmap, ted7360_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, ted7360_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

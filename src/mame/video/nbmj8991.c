@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "nb1413m3.h"
 
 
@@ -334,12 +335,11 @@ VIDEO_UPDATE( nbmj8991_type1 )
 			scrolly =  (( nbmj8991_scrolly) + 0x0f1) & 0x1ff;
 		}
 
-		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
-	{
 		fillbitmap(bitmap, machine->pens[0x00], 0);
-	}
+
 	return 0;
 }
 
@@ -375,11 +375,10 @@ VIDEO_UPDATE( nbmj8991_type2 )
 			scrolly =  (( nbmj8991_scrolly) + 0x0f1) & 0x1ff;
 		}
 
-		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
-	{
 		fillbitmap(bitmap, machine->pens[0x00], 0);
-	}
+
 	return 0;
 }

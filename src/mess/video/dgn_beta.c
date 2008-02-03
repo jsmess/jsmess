@@ -321,7 +321,7 @@ static void beta_Set_DE(int offset, int data)
 }
 
 /* Video init */
-void init_video(void)
+void init_video(running_machine *machine)
 {
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
@@ -340,7 +340,7 @@ void init_video(void)
 
 #ifdef MAME_DEBUG
 	/* setup debug commands */
-	if (Machine->debug_mode)
+	if (machine->debug_mode)
 	{
 		debug_console_register_command("beta_vid_log", CMDFLAG_NONE, 0, 0, 0,ToggleRegLog);
 		debug_console_register_command("beta_vid_fill", CMDFLAG_NONE, 0, 0, 0,FillScreen);

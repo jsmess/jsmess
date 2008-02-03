@@ -13,6 +13,7 @@
 
 #include <assert.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/pc.h"
 
 #include "machine/8255ppi.h"

@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "tms9901.h"
 #include "mm58274c.h"
 #include "video/v9938.h"

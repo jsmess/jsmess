@@ -11,6 +11,7 @@
 
 #include "driver.h"
 #include "memory.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
 #include "cpm_bios.h"

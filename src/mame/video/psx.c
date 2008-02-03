@@ -17,8 +17,8 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/psx.h"
 
 #define STOP_ON_ERROR ( 0 )
@@ -511,7 +511,7 @@ static int DebugMeshDisplay( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	if( m_b_debugmesh )
 	{
-		copybitmap( bitmap, debugmesh, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0 );
+		copybitmap( bitmap, debugmesh, 0, 0, 0, 0, cliprect );
 	}
 	m_b_debugclear = 1;
 	return m_b_debugmesh;

@@ -40,6 +40,7 @@ TODO:
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 #include "cpu/f8/f8.h"
 #include "cpu/f8/f3853.h"

@@ -22,6 +22,7 @@
 
 #include "driver.h"
 #include "mslegacy.h"
+#include "deprecat.h"
 
 #include "733_asr.h"
 
@@ -430,7 +431,7 @@ WRITE8_HANDLER(asr733_0_cru_w)
 */
 void asr733_refresh(mame_bitmap *bitmap, int unit, int x, int y)
 {
-	copybitmap(bitmap, asr[unit].bitmap, 0, 0, x, y, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, asr[unit].bitmap, 0, 0, x, y, &Machine->screen[0].visarea);
 }
 
 

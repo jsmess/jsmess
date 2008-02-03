@@ -212,6 +212,7 @@
 *********************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "eminline.h"
 #include "e132xs.h"
 #include "osd_cpu.h"
@@ -602,7 +603,7 @@ static void hyperstone_set_trap_entry(int which)
 
 static UINT32 compute_tr(void)
 {
-	UINT64 cycles_since_base = activecpu_gettotalcycles64() - hyperstone.tr_base_cycles;
+	UINT64 cycles_since_base = activecpu_gettotalcycles() - hyperstone.tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
 	return hyperstone.tr_base_value + (clocks_since_base / hyperstone.tr_clocks_per_tick);
 }
@@ -618,12 +619,12 @@ static void update_timer_prescale(void)
 	hyperstone.clock_cycles_6 = 6 << hyperstone.clock_scale;
 	hyperstone.tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
 	hyperstone.tr_base_value = prevtr;
-	hyperstone.tr_base_cycles = activecpu_gettotalcycles64();
+	hyperstone.tr_base_cycles = activecpu_gettotalcycles();
 }
 
 static void adjust_timer_interrupt(void)
 {
-	UINT64 cycles_since_base = activecpu_gettotalcycles64() - hyperstone.tr_base_cycles;
+	UINT64 cycles_since_base = activecpu_gettotalcycles() - hyperstone.tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
 	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << hyperstone.clock_scale);
 	int cpunum = cpu_getactivecpu();
@@ -798,7 +799,7 @@ INLINE void set_global_register(UINT8 code, UINT32 val)
 */
 			case TR_REGISTER:
 				hyperstone.tr_base_value = val;
-				hyperstone.tr_base_cycles = activecpu_gettotalcycles64();
+				hyperstone.tr_base_cycles = activecpu_gettotalcycles();
 				adjust_timer_interrupt();
 				break;
 
@@ -1746,12 +1747,12 @@ static void hyperstone_set_context(void *regs)
 		hyperstone = *(hyperstone_regs *)regs;
 }
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t hyperstone_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return dasm_hyperstone( buffer, pc, oprom, GET_H, GET_FP );
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 /* Opcodes */
 
@@ -4734,7 +4735,7 @@ static int hyperstone_execute(int cycles)
 		UINT16 opcode;
 
 		PPC = PC;	/* copy PC to previous PC */
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PC);
 
 		opcode = READ_OP(PC);
 		PC += 2;
@@ -5056,9 +5057,9 @@ static void hyperstone_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = hyperstone_exit;			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = hyperstone_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hyperstone_dasm;	break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hyperstone_ICount;		break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map = 0;	break;

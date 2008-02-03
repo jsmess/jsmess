@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "driver.h"
+#include "deprecat.h"
 
 #include "includes/crtc6845.h" // include only several register defines
 #include "vdc8563.h"

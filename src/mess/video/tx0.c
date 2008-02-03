@@ -5,6 +5,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
@@ -75,9 +76,9 @@ VIDEO_UPDATE( tx0 )
 	VIDEO_UPDATE_CALL(crt);
 
 	tx0_draw_panel(panel_bitmap);
-	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
-	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
 	return 0;
 }
 

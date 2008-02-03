@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "utils.h"
 #include "image.h"
 #include "ui.h"

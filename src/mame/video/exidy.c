@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 UINT8 *exidy_videoram;
@@ -376,7 +377,7 @@ VIDEO_UPDATE( exidy )
 
 	/* update the background and draw it */
 	draw_background();
-	copybitmap(bitmap, background_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, background_bitmap, 0, 0, 0, 0, cliprect);
 
 	/* draw the sprites */
 	draw_sprites(machine, bitmap, NULL);

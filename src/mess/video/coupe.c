@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
+#include "deprecat.h"
 #include "includes/coupe.h"
 
 unsigned char *sam_screen;

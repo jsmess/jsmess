@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    machine/pc.c
+    machine/pcshare.c
 
     Functions to emulate general aspects of the machine
     (RAM, ROM, interrupts, I/O ports)
@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "machine/8255ppi.h"
 

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "driver.h"
+#include "deprecat.h"
 
 #include "includes/vc4000.h"
 #include "cpu/s2650/s2650.h"
@@ -480,6 +481,6 @@ INTERRUPT_GEN( vc4000_video_line )
 
 VIDEO_UPDATE( vc4000 )
 {
-	copybitmap(bitmap, vc4000_video.bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, vc4000_video.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    debugcmd.h
+    debugcmd.c
 
     Debugger command interface engine.
 
@@ -18,7 +18,7 @@
 #include "debughlp.h"
 #include "debugvw.h"
 #include "render.h"
-#include <stdarg.h>
+#include "deprecat.h"
 #include <ctype.h>
 
 

@@ -63,6 +63,7 @@ Notes:
 *********************************************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/h83002/h83002.h"
 
 /***************************************************************************
@@ -119,7 +120,7 @@ static VIDEO_UPDATE( lastfght )
 #endif
 #endif
 
-	copybitmap(bitmap,lastfght_bitmap[lastfght_dest^1],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,lastfght_bitmap[lastfght_dest^1],0,0,0,0,cliprect);
 
 	return 0;
 }
@@ -460,7 +461,7 @@ static INTERRUPT_GEN( unknown_interrupt )
 }
 
 static MACHINE_DRIVER_START( lastfght )
-	MDRV_CPU_ADD(H83002, 32000000/2)
+	MDRV_CPU_ADD(H83044, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP( lastfght_map, 0 )
 	MDRV_CPU_VBLANK_INT(unknown_interrupt,2)
 

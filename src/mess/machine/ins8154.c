@@ -11,6 +11,7 @@
  ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "ins8154.h"
 
 #define MAX_INS8154   2

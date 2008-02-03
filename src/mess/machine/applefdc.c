@@ -36,6 +36,7 @@
 *********************************************************************/
 
 #include "applefdc.h"
+#include "deprecat.h"
 
 /* logging */
 #define LOG_IWM			0

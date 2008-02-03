@@ -37,6 +37,7 @@ PAL frame timing
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/smsvdp.h"
 #include "includes/sms.h"
 
@@ -1053,10 +1054,10 @@ VIDEO_UPDATE(sms) {
 		}
 	}
 	} else {
-		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
 	}
 	if (!smsvdp.prev_bitmap_saved) {
-		copybitmap(smsvdp.prev_bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(smsvdp.prev_bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
 	//smsvdp.prev_bitmap_saved = 1;
 	}
 	return 0;

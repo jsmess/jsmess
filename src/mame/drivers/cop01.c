@@ -50,6 +50,7 @@ Mighty Guy board layout:
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
 
@@ -433,8 +434,7 @@ static MACHINE_DRIVER_START( cop01 )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(cop01)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(16+8*16+16*16)
+	MDRV_PALETTE_LENGTH(16+8*16+16*16)
 
 	MDRV_PALETTE_INIT(cop01)
 	MDRV_VIDEO_START(cop01)
@@ -475,8 +475,7 @@ static MACHINE_DRIVER_START( mightguy )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(cop01)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(16+8*16+16*16)
+	MDRV_PALETTE_LENGTH(16+8*16+16*16)
 
 	MDRV_PALETTE_INIT(cop01)
 	MDRV_VIDEO_START(cop01)

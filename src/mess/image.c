@@ -14,6 +14,7 @@
 
 #include "image.h"
 #include "mess.h"
+#include "deprecat.h"
 #include "unzip.h"
 #include "devices/flopdrv.h"
 #include "utils.h"

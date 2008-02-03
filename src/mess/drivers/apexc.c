@@ -8,6 +8,8 @@
 
 #include "driver.h"
 #include "cpu/apexc/apexc.h"
+#include "deprecat.h"
+
 
 
 static void apexc_teletyper_init(void);
@@ -537,7 +539,7 @@ static VIDEO_UPDATE( apexc )
 		apexc_draw_string(bitmap, "data :", 0, 24, 0);
 	}
 
-	copybitmap(bitmap, apexc_bitmap, 0, 0, 0, 0, &teletyper_window, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, apexc_bitmap, 0, 0, 0, 0, &teletyper_window);
 
 
 	apexc_draw_led(bitmap, 0, 0, 1);

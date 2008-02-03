@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "driver.h"
 #include "image.h"
+#include "deprecat.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"

@@ -82,6 +82,7 @@ easier to manage.
 #include <assert.h>
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "includes/coco.h"

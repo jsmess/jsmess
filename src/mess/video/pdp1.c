@@ -18,6 +18,7 @@
 #include <math.h>
 
 #include "driver.h"
+#include "deprecat.h"
 
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
@@ -92,9 +93,9 @@ VIDEO_UPDATE( pdp1 )
 	pdp1_draw_lightpen(bitmap);
 
 	pdp1_draw_panel(panel_bitmap);
-	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
-	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
 	return 0;
 }
 

@@ -7,6 +7,7 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "includes/arcadia.h"
 
 

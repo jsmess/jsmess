@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/beep.h"
 #include "video/cdp1864.h"
@@ -219,7 +220,7 @@ VIDEO_UPDATE( cdp1864 )
 	if (cdp1864.disp)
 	{
 		fillbitmap(bitmap, machine->pens[cdp1864_bgcolseq[cdp1864.bgcolor]], cliprect);
-		copybitmap(bitmap, cdptmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, cdp1864.bgcolor);
+		copybitmap_trans(bitmap, cdptmpbitmap, 0, 0, 0, 0, cliprect, cdp1864.bgcolor);
 	}
 	else
 	{

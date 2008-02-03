@@ -8,6 +8,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "utils.h"
 #include "sound/custom.h"
 
@@ -502,6 +503,6 @@ INTERRUPT_GEN( vic656x_raster_interrupt )
 
 VIDEO_UPDATE( vic6560 )
 {
-	copybitmap(bitmap, vic6560_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, vic6560_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

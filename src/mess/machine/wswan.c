@@ -16,6 +16,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/wswan.h"
 #include "image.h"
 

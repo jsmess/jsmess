@@ -7,6 +7,7 @@
 */
 
 #include "pcf8593.h"
+#include "deprecat.h"
 
 #include <time.h>
 

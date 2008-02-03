@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "mame.h"
+#include "deprecat.h"
 #include "configms.h"
 #include "config.h"
 #include "xmlfile.h"

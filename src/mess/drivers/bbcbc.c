@@ -13,6 +13,7 @@
 #include "video/tms9928a.h"
 #include "machine/z80pio.h"
 #include "devices/cartslot.h"
+#include "deprecat.h"
 
 static ADDRESS_MAP_START( bbcbc_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM

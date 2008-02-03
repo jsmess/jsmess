@@ -24,6 +24,7 @@
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/snes.h"
 #include "devices/cartslot.h"
 

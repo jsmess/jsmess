@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT8 *popeye_background_pos;
 UINT8 *popeye_palettebank;
@@ -303,9 +304,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 	set_background_palette(machine, (*popeye_palettebank & 0x08) >> 3);
 
 	if (popeye_background_pos[1] == 0)	/* no background */
-	{
 		fillbitmap(bitmap,machine->pens[0],cliprect);
-	}
 	else
 	{
 		/* copy the background graphics */
@@ -322,7 +321,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 			scrolly = -scrolly;
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap2,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap2,1,&scrollx,1,&scrolly,cliprect);
 	}
 }
 

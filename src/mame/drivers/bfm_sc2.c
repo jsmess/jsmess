@@ -137,6 +137,7 @@ Adder hardware:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 
 #include "video/bfm_adr2.h"
@@ -145,8 +146,6 @@ Adder hardware:
 #include "sound/upd7759.h"
 
 /* fruit machines only */
-//#include "video/bfm_dm01.h"
-//#include "video/awpvid.h"
 #include "machine/steppers.h" // stepper motor
 
 #include "machine/bfm_bd1.h"  // vfd
@@ -172,6 +171,12 @@ Adder hardware:
 #define LOG_SERIAL(x) do { if (VERBOSE) logerror x; } while (0)
 #define UART_LOG(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
+#ifndef AWP_VIDEO //Defined for fruit machines with mechanical reels
+#define draw_reel(x)
+#else
+#define draw_reel(x) awp_draw_reel x
+#endif
 
 #define MASTER_CLOCK		(XTAL_8MHz)
 
@@ -524,23 +529,6 @@ static INTERRUPT_GEN( timer_irq )
 
 ///////////////////////////////////////////////////////////////////////////
 
-#ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( reel12_w )
-{
-	reel12_latch = data;
-
-	if ( Stepper_update(0, data   ) ) reel_changed |= 0x01;
-	if ( Stepper_update(1, data>>4) ) reel_changed |= 0x02;
-
-	if ( Stepper_optic_state(0) ) optic_pattern |=  0x01;
-	else                          optic_pattern &= ~0x01;
-	if ( Stepper_optic_state(1) ) optic_pattern |=  0x02;
-	else                          optic_pattern &= ~0x02;
-}
-#endif
-
-///////////////////////////////////////////////////////////////////////////
-
 static WRITE8_HANDLER( reel12_vid_w )  // in a video cabinet this is used to drive a hopper
 {
 	reel12_latch = data;
@@ -587,6 +575,9 @@ static WRITE8_HANDLER( reel34_w )
 	else                          optic_pattern &= ~0x04;
 	if ( Stepper_optic_state(3) ) optic_pattern |=  0x08;
 	else                          optic_pattern &= ~0x08;
+
+	draw_reel((2));
+	draw_reel((3));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -602,6 +593,9 @@ static WRITE8_HANDLER( reel56_w )
 	else                          optic_pattern &= ~0x10;
 	if ( Stepper_optic_state(5) ) optic_pattern |=  0x20;
 	else                          optic_pattern &= ~0x20;
+
+	draw_reel((4));
+	draw_reel((5));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -610,76 +604,22 @@ static WRITE8_HANDLER( reel56_w )
 
 static WRITE8_HANDLER( mmtr_w )
 {
+	int i;
 	int  changed = mmtr_latch ^ data;
 	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
 
 	mmtr_latch = data;
 
-	if ( changed & 0x01 )
-	{
-		if ( Mechmtr_update(0, cycles, data & 0x01 ) )
-		{
-			sc2gui_update_mmtr |= 0x01;
-		}
-	}
-
-	if ( changed & 0x02 )
-	{
-		if ( Mechmtr_update(1, cycles, data & 0x02 ) )
-		{
-			sc2gui_update_mmtr |= 0x02;
-		}
-	}
-
-	if ( changed & 0x04 )
-	{
-		if ( Mechmtr_update(2, cycles, data & 0x04 ) )
-		{
-			sc2gui_update_mmtr |= 0x04;
-		}
-	}
-
-	if ( changed & 0x08 )
-	{
-		if ( Mechmtr_update(3, cycles, data & 0x08 ) )
-		{
-			sc2gui_update_mmtr |= 0x08;
-		}
-	}
-
-
-	if ( changed & 0x10 )
-	{
-		if ( Mechmtr_update(4, cycles, data & 0x10 ) )
-		{
-			sc2gui_update_mmtr |= 0x10;
-		}
-	}
-
-	if ( changed & 0x20 )
-	{
-		if ( Mechmtr_update(5, cycles, data & 0x20 ) )
-		{
-			sc2gui_update_mmtr |= 0x20;
-		}
-	}
-
-	if ( changed & 0x40 )
-	{
-		if ( Mechmtr_update(6, cycles, data & 0x40 ) )
-		{
-			sc2gui_update_mmtr |= 0x40;
-		}
-	}
-
-	if ( changed & 0x80 )
-	{
-		if ( Mechmtr_update(7, cycles, data & 0x80 ) )
-		{
-			sc2gui_update_mmtr |= 0x80;
-		}
-	}
-
+	for (i = 0; i<8; i++)
+ 	{
+		if ( changed & (1 << i) )
+ 		{
+			if ( Mechmtr_update(i, cycles, data & (1 << i) ) )
+			{
+				sc2gui_update_mmtr |= (1 << i);
+			}
+ 		}
+ 	}
 	if ( data & 0x1F ) cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
@@ -949,15 +889,6 @@ static WRITE8_HANDLER( coininhib_w )
 		i++;
 	}
 }
-
-///////////////////////////////////////////////////////////////////////////
-
-#ifdef UNUSED_FUNCTION
-static READ8_HANDLER( direct_input_r )
-{
-	return 0;
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -3065,7 +2996,6 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_VIDEO_UPDATE(addersc2)
 
 	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(16)
 	MDRV_PALETTE_INIT(adder2)
 	MDRV_GFXDECODE(adder2)
 

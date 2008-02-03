@@ -27,6 +27,7 @@
 // MAME headers
 #include "osdepend.h"
 #include "driver.h"
+#include "deprecat.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -352,7 +353,7 @@ void winwindow_process_events(int ingame)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we're running, disable some parts of the debugger
-#if defined(MAME_DEBUG)
+#ifdef ENABLE_DEBUGGER
 	if (ingame)
 		debugwin_update_during_game();
 #endif
@@ -494,7 +495,7 @@ void winwindow_toggle_full_screen(void)
 
 	assert(GetCurrentThreadId() == main_threadid);
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	// if we are in debug mode, never go full screen
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		return;

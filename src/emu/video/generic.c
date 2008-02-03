@@ -10,6 +10,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "generic.h"
 
 
@@ -335,7 +336,7 @@ VIDEO_START( generic_bitmapped )
 
 VIDEO_UPDATE( generic_bitmapped )
 {
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

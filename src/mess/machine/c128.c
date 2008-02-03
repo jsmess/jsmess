@@ -12,6 +12,7 @@
 #include "driver.h"
 #include "includes/c128.h"
 #include "includes/c64.h"
+#include "deprecat.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"

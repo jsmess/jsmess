@@ -8,14 +8,12 @@
 
 
 #include "driver.h"
+#include "tutankhm.h"
 
 
 #define NUM_PENS	(0x10)
 
 
-UINT8 *tutankhm_videoram;
-size_t tutankhm_videoram_size;
-UINT8 *tutankhm_paletteram;
 UINT8 *tutankhm_scroll;
 
 static UINT8 junofrst_blitterdata[4];
@@ -23,6 +21,12 @@ static UINT8 tutankhm_flip_screen_x;
 static UINT8 tutankhm_flip_screen_y;
 
 
+
+/*************************************
+ *
+ *  Write handlers
+ *
+ *************************************/
 
 WRITE8_HANDLER( tutankhm_flip_screen_x_w )
 {
@@ -36,55 +40,69 @@ WRITE8_HANDLER( tutankhm_flip_screen_y_w )
 }
 
 
+
+/*************************************
+ *
+ *  Palette management
+ *
+ *************************************/
+
 static void get_pens(pen_t *pens)
 {
 	offs_t i;
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		UINT8 data = tutankhm_paletteram[i];
+		UINT8 data = paletteram[i];
 
 		pens[i] = MAKE_RGB(pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
 
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+VIDEO_START( tutankhm )
+{
+	state_save_register_global_array(junofrst_blitterdata);
+	state_save_register_global(tutankhm_flip_screen_x);
+	state_save_register_global(tutankhm_flip_screen_y);
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
 VIDEO_UPDATE( tutankhm )
 {
+	int xorx = tutankhm_flip_screen_x ? 255 : 0;
+	int xory = tutankhm_flip_screen_y ? 255 : 0;
 	pen_t pens[NUM_PENS];
-	offs_t offs;
+	int x, y;
 
 	get_pens(pens);
 
-	for (offs = 0; offs < tutankhm_videoram_size; offs++)
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		int i;
+		UINT32 *dst = BITMAP_ADDR32(bitmap, y, 0);
 
-		UINT8 data = tutankhm_videoram[offs];
-
-		UINT8 y = offs >> 7;
-		UINT8 x = offs << 1;
-
-		for (i = 0; i < 2; i++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			UINT8 sy = y;
-			UINT8 sx = x;
-
-			pen_t pen = pens[data & 0x0f];
-
-			/* adjust for scrolling */
-			if (x < 192)
-			{
-				sy = sy - *tutankhm_scroll;
-			}
-
-			if (tutankhm_flip_screen_y)	sy = 255 - sy;
-			if (tutankhm_flip_screen_x)	sx = 255 - sx;
-
-			*BITMAP_ADDR32(bitmap, sy, sx) = pen;
-
-			x = x + 1;
-			data = data >> 4;
+			UINT8 effx = x ^ xorx;
+			UINT8 yscroll = (effx < 192) ? *tutankhm_scroll : 0;
+			UINT8 effy = (y ^ xory) + yscroll;
+			UINT8 vrambyte = videoram[effy * 128 + effx / 2];
+			UINT8 shifted = vrambyte >> (4 * (effx % 2));
+			dst[x] = pens[shifted & 0x0f];
 		}
 	}
 
@@ -150,9 +168,9 @@ WRITE8_HANDLER( junofrst_blitter_w )
 						data = 0;
 
 					if (dest & 1)
-						tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0x0f) | (data << 4);
+						videoram[dest >> 1] = (videoram[dest >> 1] & 0x0f) | (data << 4);
 					else
-						tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0xf0) | data;
+						videoram[dest >> 1] = (videoram[dest >> 1] & 0xf0) | data;
 				}
 
 				dest = dest + 1;

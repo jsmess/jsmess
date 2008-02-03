@@ -4,6 +4,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "namcoic.h"
 
 #define TX_TILE_OFFSET_CENTER	(32 * 2)
@@ -512,10 +513,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			if (is_mask_spr[color])
 			{
 				if (!need_mask)
-				{
 					// backup previous bitmap
-					copybitmap(temp_bitmap, bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
-				}
+					copybitmap(temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
 				need_mask = 1;
 			}

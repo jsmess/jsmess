@@ -1,5 +1,6 @@
 #include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/vectrex.h"
 #include "video/vector.h"
 #include "machine/6522via.h"
@@ -98,7 +99,7 @@ void vectrex_add_point (int x, int y, rgb_t color, int intensity)
 /*********************************************************************
   Lightpen
  *********************************************************************/
-static void lightpen_trigger(void)
+static void lightpen_trigger(running_machine *machine)
 {
 	if (vectrex_lightpen_port & 1)
 	{
@@ -107,13 +108,13 @@ static void lightpen_trigger(void)
 	}
 	if (vectrex_lightpen_port & 2)
 	{
-		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, PULSE_LINE);
 	}
 }
 
 static TIMER_CALLBACK(lightpen_trigger_callback)
 {
-	lightpen_trigger();
+	lightpen_trigger(machine);
 }
 
 static int lightpen_check (void)
@@ -430,7 +431,7 @@ static WRITE8_HANDLER ( v_via_cb2_w )
 			start_time = time_now;
 		}
 		if (data & lightpen_check())
-			lightpen_trigger();
+			lightpen_trigger(Machine);
 
 		blank = data;
 	}

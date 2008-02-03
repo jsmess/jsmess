@@ -87,6 +87,7 @@
 
 /* Core includes */
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/pcw16.h"
 
 /* Components */

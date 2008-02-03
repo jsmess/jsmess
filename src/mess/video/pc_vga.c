@@ -29,6 +29,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "pc_vga.h"
 #include "pc_video.h"
 

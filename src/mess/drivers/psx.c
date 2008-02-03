@@ -89,9 +89,6 @@ static OPBASE_HANDLER( psx_setopbase )
 
 		memory_set_opbase_handler( 0, NULL );
 
-		DEBUGGER_BREAK;
-		CALL_MAME_DEBUG;
-
 		return ~0;
 	}
 	return address;

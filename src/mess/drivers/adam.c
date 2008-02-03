@@ -192,6 +192,7 @@ TO DO:
 #include "devices/cartslot.h"
 #include "devices/mflopimg.h"
 #include "formats/adam_dsk.h"
+#include "deprecat.h"
 
 static ADDRESS_MAP_START( adam_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x01fff) AM_READWRITE( MRA8_BANK1, MWA8_BANK6 )
@@ -432,9 +433,9 @@ static void adam_vdp_interrupt (int state)
 
     /* only if it goes up */
 	if (state && !last_state)
-	    {
-	        cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-	    }
+    {
+        cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+    }
 	last_state = state;
 }
 

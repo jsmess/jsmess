@@ -7,6 +7,7 @@ Driver by Manuel Abadia <manu@teleline.es>
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/vlm5030.h"
@@ -135,7 +136,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_cpu0, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)								/* video registers (005885 #1) */
 	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)								/* video registers (005885 #2) */
-	AM_RANGE(0x1800, 0x187f) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* seems wrong, MSB is used as well */
+	AM_RANGE(0x1800, 0x187f) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(ddrible_fg_videoram_w) AM_BASE(&ddrible_fg_videoram)/* Video RAM 1 */
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(MWA8_RAM) AM_BASE(&ddrible_spriteram_1)				/* Object RAM 1 */
 	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_RAM) AM_BASE(&ddrible_sharedram)				/* shared RAM with CPU #1 */
@@ -362,8 +363,7 @@ static MACHINE_DRIVER_START( ddribble )
 /*  MDRV_SCREEN_SIZE(64*8, 32*8)
     MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
 	MDRV_GFXDECODE(ddrible)
-	MDRV_PALETTE_LENGTH(64)
-	MDRV_COLORTABLE_LENGTH(64 + 256)
+	MDRV_PALETTE_LENGTH(64 + 256)
 
 	MDRV_PALETTE_INIT(ddrible)
 	MDRV_VIDEO_START(ddrible)

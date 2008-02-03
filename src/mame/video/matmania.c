@@ -13,6 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 
@@ -180,9 +181,9 @@ VIDEO_UPDATE( matmania )
 
 		scrolly = -*matmania_scroll;
 		if (matmania_pageselect[0]&0x01) // maniach sets 0x20 sometimes, which must have a different meaning
-			copyscrollbitmap(bitmap,tmpbitmap2,0,0,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			copyscrollbitmap(bitmap,tmpbitmap2,0,0,1,&scrolly,cliprect);
 		else
-			copyscrollbitmap(bitmap,tmpbitmap,0,0,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			copyscrollbitmap(bitmap,tmpbitmap,0,0,1,&scrolly,cliprect);
 	}
 
 
@@ -196,7 +197,7 @@ VIDEO_UPDATE( matmania )
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04,spriteram[offs] & 0x02,
 					239 - spriteram[offs+3],(240 - spriteram[offs+2]) & 0xff,
-					&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 
@@ -215,7 +216,7 @@ VIDEO_UPDATE( matmania )
 				(matmania_colorram2[offs] & 0x30) >> 4,
 				0,0,
 				8*sx,8*sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -268,9 +269,9 @@ VIDEO_UPDATE( maniach )
 		scrolly = -*matmania_scroll;
 
 		if (matmania_pageselect[0]&0x01) // this sets 0x20 sometimes, which must have a different meaning
-			copyscrollbitmap(bitmap,tmpbitmap2,0,0,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			copyscrollbitmap(bitmap,tmpbitmap2,0,0,1,&scrolly,cliprect);
 		else
-			copyscrollbitmap(bitmap,tmpbitmap,0,0,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			copyscrollbitmap(bitmap,tmpbitmap,0,0,1,&scrolly,cliprect);
 	}
 
 
@@ -284,7 +285,7 @@ VIDEO_UPDATE( maniach )
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04,spriteram[offs] & 0x02,
 					239 - spriteram[offs+3],(240 - spriteram[offs+2]) & 0xff,
-					&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 
@@ -303,7 +304,7 @@ VIDEO_UPDATE( maniach )
 				(matmania_colorram2[offs] & 0x30) >> 4,
 				0,0,
 				8*sx,8*sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }

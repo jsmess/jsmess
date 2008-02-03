@@ -12,6 +12,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
 #include "machine/8255ppi.h"

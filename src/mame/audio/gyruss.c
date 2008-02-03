@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/flt_rc.h"
 
@@ -28,20 +29,7 @@ static const int gyruss_timer[10] =
 
 READ8_HANDLER( gyruss_portA_r )
 {
-	/* need to protect from totalcycles overflow */
-	static int last_totalcycles = 0;
-
-	/* number of Z80 clock cycles to count */
-	static int clock;
-
-	int current_totalcycles;
-
-	current_totalcycles = activecpu_gettotalcycles();
-	clock = (clock + (current_totalcycles-last_totalcycles)) % 10240;
-
-	last_totalcycles = current_totalcycles;
-
-	return gyruss_timer[clock/1024];
+	return gyruss_timer[(activecpu_gettotalcycles()/1024) % 10];
 }
 
 

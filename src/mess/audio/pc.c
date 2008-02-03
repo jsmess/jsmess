@@ -15,6 +15,7 @@
 #include "machine/pcshare.h"
 #include "machine/pit8253.h"
 #include "audio/pc.h"
+#include "deprecat.h"
 
 #define SND_LOG(n,m,a)
 #define BASECLOCK	1193180
