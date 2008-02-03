@@ -698,6 +698,7 @@ READ16_HANDLER( x68k_spriteram_r )
 {
 	return x68k_spriteram[offset];
 }
+
 static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 {
 	int priority;
@@ -717,13 +718,13 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 			{
 				xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
 				yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-				copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect);
+				copyscrollbitmap_trans(bitmap, x68k_gfx_0_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
 				xscr+=512;
-				copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect);
+				copyscrollbitmap_trans(bitmap, x68k_gfx_1_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
 				yscr+=512;
-				copyscrollbitmap(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect);
+				copyscrollbitmap_trans(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
 				xscr-=512;
-				copyscrollbitmap(bitmap, x68k_gfx_3_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect);
+				copyscrollbitmap_trans(bitmap, x68k_gfx_3_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
 			}
 		}
 		else  // 512x512 "real" screen size
@@ -740,7 +741,7 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 					rect.max_y=rect.min_y + sys.crtc.visible_height-1;
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_65536, 1, &xscr, 1, &yscr,&cliprect);
+					copyscrollbitmap_trans(bitmap, x68k_gfx_0_bitmap_65536, 1, &xscr, 1, &yscr,&cliprect,0);
 				}
 				break;
 			case 0x01:
@@ -753,13 +754,13 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[16] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[17] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_1_bitmap_256, 1, &xscr, 1, &yscr, &cliprect);
+					copyscrollbitmap_trans(bitmap, x68k_gfx_1_bitmap_256, 1, &xscr, 1, &yscr, &cliprect,0);
 				}
 				if(sys.video.reg[2] & 0x0001 && sys.video.reg[2] & 0x0002 && priority == sys.video.gfxlayer_pri[0])
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_gfx_0_bitmap_256, 1, &xscr, 1, &yscr, &cliprect);
+					copyscrollbitmap_trans(bitmap, x68k_gfx_0_bitmap_256, 1, &xscr, 1, &yscr, &cliprect,0);
 				}
 				break;
 			case 0x00:
@@ -772,25 +773,25 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[18] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[19] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(3,GFX16), 1, &xscr, 1, &yscr ,&cliprect);
+					copyscrollbitmap_trans(bitmap, x68k_get_gfx_pri(3,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
 				}
 				if(sys.video.reg[2] & 0x0004)  // Pri2
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[16] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[17] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(2,GFX16), 1, &xscr, 1, &yscr ,&cliprect);
+					copyscrollbitmap_trans(bitmap, x68k_get_gfx_pri(2,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
 				}
 				if(sys.video.reg[2] & 0x0002)  // Pri1
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[14] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[15] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(1,GFX16), 1, &xscr, 1, &yscr ,&cliprect);
+					copyscrollbitmap_trans(bitmap, x68k_get_gfx_pri(1,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
 				}
 				if(sys.video.reg[2] & 0x0001)  // Pri0
 				{
 					xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
 					yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap(bitmap, x68k_get_gfx_pri(0,GFX16), 1, &xscr, 1, &yscr ,&cliprect);
+					copyscrollbitmap_trans(bitmap, x68k_get_gfx_pri(0,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
 				}
 				break;
 			}
