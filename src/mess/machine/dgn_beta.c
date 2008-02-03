@@ -308,7 +308,9 @@ static void SetDefaultTask(void)
 	int		Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
+#ifdef MAME_DEBUG
 	if (VERBOSE) debug_console_printf("Set Default task\n");
+#endif
 
 	TaskReg=NoPagingTask;
 
@@ -635,7 +637,9 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 		RowShifter = (RowShifter<<1) | ((d_pia0_pb_last & KOutDat)>>4);
 		RowShifter &= 0x3FF;
 		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",RowShifter,Keyrow));
+#ifdef MAME_DEBUG
 		if (VERBOSE) debug_console_printf("rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",RowShifter,RowNo,Keyrow);
+#endif
 	}
 
 	d_pia0_cb2_last=data;
