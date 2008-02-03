@@ -12,50 +12,46 @@
 #ifndef __SDL_VIDEO__
 #define __SDL_VIDEO__
 
-#include "osdcomm.h"
-#include "osd_cpu.h"
-#include "mamecore.h"
-
 //============================================================
 //  CONSTANTS
 //============================================================
 
-#define MAX_VIDEO_WINDOWS   	(4)
+#define MAX_VIDEO_WINDOWS			(4)
 
-#define VIDEO_MODE_SOFT		0
-#define VIDEO_MODE_OPENGL	1
+#define VIDEO_MODE_SOFT				(0)
+#define VIDEO_MODE_OPENGL			(1)
 
-#define SDL_MULTIMON	(0)
+#define SDL_MULTIMON				(0)
 
-#define VIDEO_YUV_MODE_NONE	0
-#define VIDEO_YUV_MODE_YV12	1
-#define VIDEO_YUV_MODE_YV12X2	2
-#define VIDEO_YUV_MODE_YUY2	3
-#define VIDEO_YUV_MODE_YUY2X2	4
-#define VIDEO_YUV_MODE_MAX	VIDEO_YUV_MODE_YUY2X2
-#define VIDEO_YUV_MODE_MIN	VIDEO_YUV_MODE_NONE
+#define VIDEO_YUV_MODE_NONE			(0)
+#define VIDEO_YUV_MODE_YV12			(1)
+#define VIDEO_YUV_MODE_YV12X2		(2)
+#define VIDEO_YUV_MODE_YUY2			(3)
+#define VIDEO_YUV_MODE_YUY2X2		(4)
+#define VIDEO_YUV_MODE_MAX			VIDEO_YUV_MODE_YUY2X2
+#define VIDEO_YUV_MODE_MIN			VIDEO_YUV_MODE_NONE
 
 
 // texture formats
 // This used to be an enum, but these are now defines so we can use them as
 // preprocessor conditionals
-#define SDL_TEXFORMAT_ARGB32			 0	// non-16-bit textures or specials
-#define SDL_TEXFORMAT_RGB32			 1
-#define SDL_TEXFORMAT_RGB32_PALETTED		 2
-#define SDL_TEXFORMAT_YUY16			 3
-#define SDL_TEXFORMAT_YUY16_PALETTED		 4
-#define SDL_TEXFORMAT_PALETTE16			 5
-#define SDL_TEXFORMAT_RGB15			 6
-#define SDL_TEXFORMAT_RGB15_PALETTED		 7
-#define SDL_TEXFORMAT_PALETTE16			 5
-#define SDL_TEXFORMAT_RGB15			 6
-#define SDL_TEXFORMAT_RGB15_PALETTED		 7
-#define SDL_TEXFORMAT_PALETTE16A		 8
+#define SDL_TEXFORMAT_ARGB32			(0)	// non-16-bit textures or specials
+#define SDL_TEXFORMAT_RGB32				(1)
+#define SDL_TEXFORMAT_RGB32_PALETTED	(2)
+#define SDL_TEXFORMAT_YUY16				(3)
+#define SDL_TEXFORMAT_YUY16_PALETTED	(4)
+#define SDL_TEXFORMAT_PALETTE16			(5)
+#define SDL_TEXFORMAT_RGB15				(6)
+#define SDL_TEXFORMAT_RGB15_PALETTED	(7)
+#define SDL_TEXFORMAT_PALETTE16			(5)
+#define SDL_TEXFORMAT_RGB15				(6)
+#define SDL_TEXFORMAT_RGB15_PALETTED	(7)
+#define SDL_TEXFORMAT_PALETTE16A		(8)
 // special texture formats for 16bpp texture destination support, do not use
 // to address the tex properties / tex functions arrays!
-#define SDL_TEXFORMAT_PALETTE16_ARGB1555	 16
-#define SDL_TEXFORMAT_RGB15_ARGB1555		 17
-#define SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555	 18
+#define SDL_TEXFORMAT_PALETTE16_ARGB1555	(16)
+#define SDL_TEXFORMAT_RGB15_ARGB1555		(17)
+#define SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555	(18)
 
 #define GLSL_SHADER_MAX 10
 
@@ -118,6 +114,7 @@ struct _sdl_video_config
 
 	int					fullstretch;
 
+#if USE_OPENGL	
 	// OpenGL options
 	int					filter;			// enable filtering, disabled if glsl_filter>0
 	int					prescale_effect;
@@ -133,6 +130,7 @@ struct _sdl_video_config
 	int					vbo;
 	int					allowtexturerect;	// allow GL_ARB_texture_rectangle, default: no
 	int					forcepow2texture;	// force power of two textures, default: no
+#endif
 
 	int					perftest;		// print out real video fps
 
@@ -147,22 +145,17 @@ struct _sdl_video_config
 	int					yuv_mode;
 };
 
-
-
 //============================================================
 //  GLOBAL VARIABLES
 //============================================================
 
-
 extern sdl_video_config video_config;
-
 
 //============================================================
 //  PROTOTYPES
 //============================================================
 
 int sdlvideo_init(running_machine *machine);
-void sdlvideo_loadgl(void);
 
 void sdlvideo_monitor_refresh(sdl_monitor_info *monitor);
 float sdlvideo_monitor_get_aspect(sdl_monitor_info *monitor);

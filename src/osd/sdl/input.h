@@ -19,10 +19,10 @@
 
 void sdlinput_init(running_machine *machine);
 void sdlinput_poll(void);
-#ifdef SDLMAME_WIN32
-void sdlinput_process_events_buf(void);
-#endif
+int  sdlinput_should_hide_mouse(void);
 
-int sdlinput_should_hide_mouse(void);
+#ifdef SDLMAME_WIN32
+void  sdlinput_process_events_buf(void);
+#endif
 
 #endif /* __INPUT_H */

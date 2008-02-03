@@ -1,6 +1,5 @@
 #ifndef __SDL_EFFECT__
 #define __SDL_EFFECT__
-#include "window.h"
 
 void scale2x_argb32(texture_info *texture, const render_texinfo *texsource);
 void scale2x_rgb32(texture_info *texture, const render_texinfo *texsource);

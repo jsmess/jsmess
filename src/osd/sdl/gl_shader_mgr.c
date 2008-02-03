@@ -1,4 +1,7 @@
 
+#include "osdcomm.h"
+#include "mamecore.h"
+
 #include "gl_shader_mgr.h"
 
 #define GLSL_VERTEX_SHADER_INT_NUMBER 1 // general

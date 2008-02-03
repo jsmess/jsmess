@@ -12,8 +12,6 @@
 
 #include "mamecore.h"
 
-
-
 //============================================================
 //  FUNCTION PROTOTYPES
 //============================================================
@@ -34,5 +32,5 @@ char *utf8_from_wstring(const WCHAR *s) ATTR_MALLOC;
 
 
 
-#endif // __WIN_STRCONV__
+#endif // __SDL_STRCONV__
 

@@ -39,12 +39,12 @@
 
 USE_DISPATCH_GL = 1
 
-# uncomment and chang the next line to compile and link to specific
+# uncomment and change the next line to compile and link to specific
 # SDL library. This is currently ony supported for unix!
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
-# SDL_INSTALL_ROOT = /usr/local/sdl13
+SDL_INSTALL_ROOT = /usr/local/sdl13
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -279,7 +279,7 @@ TOOLS += \
 	testkeys$(EXE)
 
 # drawSDL depends on the core software renderer, so make sure it exists
-$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c $(SRC)/osd/sdl/yuv_blit.c
+$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c
 
 # due to quirks of using /bin/sh, we need to explicitly specify the current path
 CURPATH = ./

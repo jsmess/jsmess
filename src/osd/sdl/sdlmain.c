@@ -109,6 +109,7 @@ static const options_entry mame_sdl_options[] =
 	#endif
 	{ SDLOPTION_YUVMODE ";ym",           SDLOPTVAL_NONE,  0,                 "YUV mode: none, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 
+#if USE_OPENGL
 	// OpenGL specific options
 	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
 	{ SDLOPTION_FILTER ";glfilter;flt",       "1",    OPTION_BOOLEAN, "enable bilinear filtering on screen output" },
@@ -140,7 +141,8 @@ static const options_entry mame_sdl_options[] =
  	{ SDLOPTION_SHADER_SCREEN("8"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 8" },
  	{ SDLOPTION_SHADER_SCREEN("9"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 9" },
  	{ SDLOPTION_GL_GLSL_VID_ATTR,			 "1",    OPTION_BOOLEAN,  "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
-
+#endif
+ 	
 	// per-window options
 	{ NULL,                                   NULL, OPTION_HEADER,    "PER-WINDOW VIDEO OPTIONS" },
 	{ SDLOPTION_SCREEN(""),                   SDLOPTVAL_AUTO,   0,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
@@ -435,14 +437,14 @@ void osd_init(running_machine *machine)
 		exit(-1);
 	}
 	if (sdl_use_unsupported())
-		led_init();
+		sdlled_init();
 
 	#ifdef MESS
 	sdl_mess_options_parse();
 	#endif
 
 	sdlinput_init(machine);
-	sdl_init_audio(machine);
+	sdlaudio_init(machine);
 
 	if (options_get_bool(mame_options(), SDLOPTION_OSLOG))
 		add_logerror_callback(machine, output_oslog);

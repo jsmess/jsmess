@@ -29,8 +29,13 @@
 #include <unistd.h>
 
 // MAME headers
+
+#include "osdcomm.h"
 #include "osdepend.h"
-#include "driver.h"
+//#include "driver.h"
+
+// OSD headers
+
 #include "window.h"
 #include "video.h"
 #include "input.h"
@@ -134,6 +139,39 @@ static void get_min_bounds(sdl_window_info *window, int *window_width, int *wind
 
 static void *complete_create_wt(void *param, int threadid);
 static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view);
+
+
+//============================================================
+// Load the OGL function addresses
+//============================================================
+
+#if USE_OPENGL
+static void sdlwindow_loadgl(void)
+{
+#ifdef USE_DISPATCH_GL
+
+	int err = 0;
+
+	/* the following is tricky ... #func will be expanded to glBegin
+	 * while func will be expanded to disp_p->glBegin
+	 */
+
+	#define OSD_GL(ret,func,params) \
+	if (!(func = SDL_GL_GetProcAddress( #func ) )) \
+		{ err++; mame_printf_error("GL function %s not found!\n", #func ); }
+
+	#define OSD_GL_UNUSED(ret,func,params)
+
+	#define GET_GLFUNC 1
+	#include "osd_opengl.h"
+	#undef GET_GLFUNC
+	
+	if (err)
+		fatalerror("Error loading GL library functions, giving up\n");
+
+#endif		
+}
+#endif
 
 //============================================================
 //  clear the worker_param structure, inline - faster than memset
@@ -310,11 +348,6 @@ static void sdlwindow_exit(running_machine *machine)
 //  (main thread)
 //============================================================
 
-void compute_blit_surface_size(sdl_window_info *window, int window_width, int window_height);
-#if USE_OPENGL
-void drawsdl_destroy_all_textures(sdl_window_info *window);
-#endif
-
 static void yuv_overlay_init(sdl_window_info *window)
 {
 	int minimum_width, minimum_height;
@@ -371,9 +404,8 @@ static void *sdlwindow_resize_wt(void *param, int threadid)
 
 	ASSERT_WINDOW_THREAD();
 	
-#if USE_OPENGL
-	drawsdl_destroy_all_textures(window);
-#endif
+	draw.window_destroy_all_textures(window);
+
 #if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
 	SDL_FreeSurface(window->sdlsurf);
 #endif
@@ -391,7 +423,7 @@ static void *sdlwindow_resize_wt(void *param, int threadid)
 	if (window->opengl)
 		sdlwindow_init_ogl_context();
 #endif
-	compute_blit_surface_size(window, wp->resize_new_width, wp->resize_new_height);
+	drawsdl_blit_surface_size(window, wp->resize_new_width, wp->resize_new_height);
 	free(wp);
 	return NULL;
 }
@@ -535,19 +567,17 @@ static void sdlwindow_modify_yuv(int dir)
 	}
 }
 
-#if USE_OPENGL
 static void *destroy_all_textures_wt(void *param, int threadid)
 {
 	worker_param *wp = (worker_param *) param;
 
 	sdl_window_info *window = wp->window;
 
-	drawsdl_destroy_all_textures(window);
+	draw.window_destroy_all_textures(window);
 
 	free(wp);
 	return NULL;
 }
-#endif
 
 void sdlwindow_modify_prescale(int dir)
 {
@@ -577,9 +607,7 @@ void sdlwindow_modify_prescale(int dir)
 		}
 		else
 		{
-#if USE_OPENGL
 			execute_async_wait(destroy_all_textures_wt, &wp);
-#endif
 			video_config.prescale = new_prescale;
 		}
 		ui_popup_time(1, "Prescale %d", video_config.prescale);
@@ -588,34 +616,37 @@ void sdlwindow_modify_prescale(int dir)
 
 void sdlwindow_modify_effect(int dir)
 {
-#if USE_OPENGL
-	worker_param wp;
-	sdl_window_info *window = sdl_window_list;
-#endif
-	int new_prescale_effect = video_config.prescale_effect;
-	const char *effect_names[] = { "none", "scale2x" };
 
 	if (video_config.mode == VIDEO_MODE_SOFT) 
 	{
 		sdlwindow_modify_yuv(dir);
 		return;
-	}	
-
-	if (dir > 0 && video_config.prescale_effect < 1)
-		new_prescale_effect = video_config.prescale_effect + 1;
-	if (dir < 0 && video_config.prescale_effect > 0)
-		new_prescale_effect = video_config.prescale_effect - 1;
-	
-	if (new_prescale_effect != video_config.prescale_effect)
-	{
-#if USE_OPENGL
-		clear_worker_param(&wp);
-		wp.window = window;
-		execute_async_wait(destroy_all_textures_wt, &wp);
-#endif
-		video_config.prescale_effect = new_prescale_effect;
-		ui_popup_time(1, "Effect: %s", effect_names[video_config.prescale_effect]);
 	}
+#if USE_OPENGL
+	else
+	{
+		int new_prescale_effect = video_config.prescale_effect;
+		const char *effect_names[] = { "none", "scale2x" };
+
+		if (dir > 0 && video_config.prescale_effect < 1)
+			new_prescale_effect = video_config.prescale_effect + 1;
+		if (dir < 0 && video_config.prescale_effect > 0)
+			new_prescale_effect = video_config.prescale_effect - 1;
+		
+		if (new_prescale_effect != video_config.prescale_effect)
+		{
+			worker_param wp;
+			sdl_window_info *window = sdl_window_list;
+
+			clear_worker_param(&wp);
+			wp.window = window;
+			execute_async_wait(destroy_all_textures_wt, &wp);
+
+			video_config.prescale_effect = new_prescale_effect;
+			ui_popup_time(1, "Effect: %s", effect_names[video_config.prescale_effect]);
+		}
+	}
+#endif
 }
 
 void sdlwindow_toggle_draw(void)
@@ -927,7 +958,7 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 			if (!window->fullscreen)
 			{
 				sdl_info *sdl = window->dxdata;
-				compute_blit_surface_size(window, window->sdlsurf->w, window->sdlsurf->h);
+				drawsdl_blit_surface_size(window, window->sdlsurf->w, window->sdlsurf->h);
 				sdlwindow_resize(sdl->blitwidth, sdl->blitheight);
 			}
 			else if (video_config.switchres)
@@ -1125,7 +1156,7 @@ static void *complete_create_wt(void *param, int threadid)
 		window->extra_flags = SDL_RESIZABLE;
 
 		/* Create the window directly with the correct aspect
-		   instead of letting compute_blit_surface_size() resize it
+		   instead of letting drawsdl_blit_surface_size() resize it
 		   this stops the window from "flashing" from the wrong aspect
 		   size to the right one at startup. */
 		tempwidth = (window->maxwidth != 0) ? window->maxwidth : 640;
@@ -1208,7 +1239,7 @@ static void *complete_create_wt(void *param, int threadid)
 		/* load any GL function addresses
 		 * this must be done here because we need a context
 		 */ 
-		sdlvideo_loadgl();
+		sdlwindow_loadgl();
 
 		extstr = (char *)glGetString(GL_EXTENSIONS);
 		vendor = (char *)glGetString(GL_VENDOR);

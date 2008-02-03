@@ -40,7 +40,7 @@ Version 0.2, May 2000
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 #include <sys/mman.h>
 #endif
-#include "misc.h"
+#include "sdlmisc.h"
 #ifdef SDLMAME_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -55,11 +55,6 @@ Version 0.2, May 2000
 #define INCL_DOS
 #include <os2.h>
 #endif
-
-#include "driver.h"
-#include "window.h"
-#include "options.h"
-#include "osdsdl.h"
 
 #ifdef HAVE_GETTIMEOFDAY
 /* Standard UNIX clock() is based on CPU time, not real time.
@@ -95,75 +90,6 @@ uclock_t uclock(void)
 }
 
 #endif
-
-void print_colums(const char *text1, const char *text2)
-{
-   fprint_colums(stdout, text1, text2);
-}
-
-void fprint_colums(FILE *f, const char *text1, const char *text2)
-{
-   const char *text[2];
-   int i, j, cols, width[2], done = 0;
-   char *e_cols = getenv(SDLENV_COLUMNS);
-
-   cols = (e_cols != NULL) ? atoi(e_cols):80;
-   if ( cols < 6 ) cols = 6;  /* minimum must be 6 */
-   cols--;
-
-   /* initialize our arrays */
-   text[0] = text1;
-   text[1] = text2;
-   width[0] = cols * 0.4;
-   width[1] = cols - width[0];
-
-   while(!done)
-   {
-      done = 1;
-      for(i = 0; i < 2; i++)
-      {
-         int to_print = width[i]-1; /* always leave one space open */
-
-         /* we don't want to print more then we have */
-         j = strlen(text[i]);
-         if (to_print > j)
-           to_print = j;
-
-         /* if they have preffered breaks, try to give them to them */
-         for(j=0; j<to_print; j++)
-            if(text[i][j] == '\n')
-            {
-               to_print = j;
-               break;
-            }
-
-         /* if we don't have enough space, break at the first ' ' or '\n' */
-         if(to_print < strlen(text[i]))
-         {
-           while(to_print && (text[i][to_print] != ' ') &&
-              (text[i][to_print] != '\n'))
-              to_print--;
-
-           /* if it didn't work, just print the columnwidth */
-           if(!to_print)
-              to_print = width[i]-1;
-         }
-         fprintf(f, "%-*.*s", width[i], to_print, text[i]);
-
-         /* adjust ptr */
-         text[i] += to_print;
-
-         /* skip ' ' and '\n' */
-         while((text[i][0] == ' ') || (text[i][0] == '\n'))
-            text[i]++;
-
-         /* do we still have text to print */
-         if(text[i][0])
-            done = 0;
-      }
-      fprintf(f, "\n");
-   }
-}
 
 void *osd_alloc_executable(size_t size)
 {

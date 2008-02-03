@@ -1,4 +1,3 @@
-#include "window.h"
 #include "texsrc.h"
 
 // texcopy function prototype

@@ -1,3 +1,6 @@
+#include "osdcomm.h"
+#include "mamecore.h"
+#include "window.h"
 #include "effect.h"
 
 // 16 and 32 bpp versions of the core scale2x functions

@@ -179,6 +179,7 @@ struct _sdl_draw_callbacks
 	int (*window_init)(sdl_window_info *window);
 	const render_primitive_list *(*window_get_primitives)(sdl_window_info *window);
 	int (*window_draw)(sdl_window_info *window, UINT32 dc, int update);
+	void (*window_destroy_all_textures)(sdl_window_info *window);
 	void (*window_destroy)(sdl_window_info *window);
 };
 
@@ -220,6 +221,8 @@ void sdlwindow_resize(INT32 width, INT32 height);
 int drawsdl_init(sdl_draw_callbacks *callbacks);
 int drawogl_init(sdl_draw_callbacks *callbacks);
 void drawsdl_yuv_init(sdl_window_info *window);
+
+void drawsdl_blit_surface_size(sdl_window_info *window, int window_width, int window_height);
 
 //============================================================
 //  multitasking

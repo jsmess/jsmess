@@ -22,7 +22,7 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "ui.h"
-//#include "deprecat.h"
+#include "deprecat.h"
 
 // MAMEOS headers
 #include "window.h"
@@ -48,6 +48,12 @@ enum
 	POVDIR_UP,
 	POVDIR_DOWN
 };
+
+// introduced in 1.3
+
+#ifndef SDLK_INDEX
+#define SDLK_INDEX(x)		(x)
+#endif
 
 #define MAX_KEYS			256
 #define MAX_AXES			8
@@ -818,7 +824,7 @@ void sdlinput_init(running_machine *machine)
 		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 		
 		// add the item to the device
-		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[key_trans_table[keynum].sdl_key-SDLK_FIRST], itemid, generic_button_get_state);
+		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[SDLK_INDEX(key_trans_table[keynum].sdl_key)-SDLK_FIRST], itemid, generic_button_get_state);
 	}
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
@@ -958,11 +964,11 @@ void sdlinput_poll(void)
 			#endif
 
 			devinfo = keyboard_list;
-			devinfo->keyboard.state[event.key.keysym.sym-SDLK_FIRST] = 0x80;
+			devinfo->keyboard.state[SDLK_INDEX(event.key.keysym.sym)-SDLK_FIRST] = 0x80;
 			break;
 		case SDL_KEYUP:
 			devinfo = keyboard_list;
-			devinfo->keyboard.state[event.key.keysym.sym-SDLK_FIRST] = 0;
+			devinfo->keyboard.state[SDLK_INDEX(event.key.keysym.sym)-SDLK_FIRST] = 0;
 			break;
 		case SDL_JOYAXISMOTION:
 			devinfo = generic_device_find_index(joystick_list, event.jaxis.which);

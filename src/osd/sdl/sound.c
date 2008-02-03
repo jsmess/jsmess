@@ -25,7 +25,7 @@
 #include "window.h"
 #include "video.h"
 #include "osdsdl.h"
-//#include "deprecat.h"
+#include "deprecat.h"
 
 //============================================================
 //	DEBUGGING
@@ -57,10 +57,10 @@ static int				initialized_audio = 0;
 static int				buf_locked;
 
 static INT8				*stream_buffer;
-static volatile INT32	  		stream_playpos;
+static volatile INT32	stream_playpos;
 
-static UINT32				stream_buffer_size;
-static UINT32				stream_buffer_in;
+static UINT32			stream_buffer_size;
+static UINT32			stream_buffer_in;
 
 // buffer over/underflow counts
 static int				buffer_underflows;
@@ -83,12 +83,14 @@ static void			sdl_kill(running_machine *machine);
 static int			sdl_create_buffers(void);
 static void			sdl_destroy_buffers(void);
 static void			sdl_cleanup_audio(running_machine *machine);
+static void			sdl_callback(void *userdata, Uint8 *stream, int len);
+
 
 
 //============================================================
 //	osd_start_audio_stream
 //============================================================
-void sdl_init_audio(running_machine *machine)
+void sdlaudio_init(running_machine *machine)
 {
 #if LOG_SOUND
 	sound_log = fopen(SDL_SOUND_LOG, "w");
@@ -370,7 +372,7 @@ void osd_set_mastervolume(int _attenuation)
 //============================================================
 //	sdl_callback
 //============================================================
-void sdl_callback(void *userdata, Uint8 *stream, int len)
+static void sdl_callback(void *userdata, Uint8 *stream, int len)
 {
 	int len1, len2, sb_in;
 

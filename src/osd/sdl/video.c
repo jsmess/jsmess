@@ -40,15 +40,10 @@
 #include <unistd.h>
 
 // MAME headers
-#include "osdepend.h"
-#include "driver.h"
-#include "profiler.h"
-#include "video/vector.h"
-#include "render.h"
 #include "rendutil.h"
-#include "options.h"
-#include "ui.h"
+#include "profiler.h"
 #include "debugwin.h"
+#include "ui.h"
 
 // MAMEOS headers
 #include "video.h"
@@ -107,33 +102,6 @@ static void load_effect_overlay(running_machine *machine, const char *filename);
 static float get_aspect(const char *name, int report_error);
 static void get_resolution(const char *name, sdl_window_config *config, int report_error);
 
-void sdlvideo_loadgl(void)
-{
-#ifndef NO_OPENGL
-#ifdef USE_DISPATCH_GL
-
-	int err = 0;
-
-	/* the following is tricky ... #func will be expanded to glBegin
-	 * while func will be expanded to disp_p->glBegin
-	 */
-
-	#define OSD_GL(ret,func,params) \
-	if (!(func = SDL_GL_GetProcAddress( #func ) )) \
-		{ err++; mame_printf_error("GL function %s not found!\n", #func ); }
-
-	#define OSD_GL_UNUSED(ret,func,params)
-
-	#define GET_GLFUNC 1
-	#include "osd_opengl.h"
-	#undef GET_GLFUNC
-	
-	if (err)
-		fatalerror("Error loading GL library functions, giving up\n");
-
-#endif		
-#endif
-}
 
 //============================================================
 //  sdlvideo_init
@@ -192,29 +160,10 @@ error:
 
 static void video_exit(running_machine *machine)
 {
-	int i;
-
 	// free the overlay effect
 	if (effect_bitmap != NULL)
 		bitmap_free(effect_bitmap);
 	effect_bitmap = NULL;
-
-	for(i=0; i<video_config.glsl_shader_mamebm_num; i++)
-	{
-		if ( NULL!=video_config.glsl_shader_mamebm[i])
-		{
-			free(video_config.glsl_shader_mamebm[i]);
-			video_config.glsl_shader_mamebm[i] = NULL;
-		}
-	}
-	for(i=0; i<video_config.glsl_shader_scrn_num; i++)
-	{
-		if ( NULL!=video_config.glsl_shader_scrn[i])
-		{
-			free(video_config.glsl_shader_scrn[i]);
-			video_config.glsl_shader_scrn[i] = NULL;
-		}
-	}
 
 	// free all of our monitor information
 	while (sdl_monitor_list != NULL)
@@ -223,6 +172,30 @@ static void video_exit(running_machine *machine)
 		sdl_monitor_list = temp->next;
 		free(temp);
 	}
+
+#if USE_OPENGL
+	{
+		int i;
+
+		for(i=0; i<video_config.glsl_shader_mamebm_num; i++)
+		{
+			if ( NULL!=video_config.glsl_shader_mamebm[i])
+			{
+				free(video_config.glsl_shader_mamebm[i]);
+				video_config.glsl_shader_mamebm[i] = NULL;
+			}
+		}
+		for(i=0; i<video_config.glsl_shader_scrn_num; i++)
+		{
+			if ( NULL!=video_config.glsl_shader_scrn[i])
+			{
+				free(video_config.glsl_shader_scrn[i]);
+				video_config.glsl_shader_scrn[i] = NULL;
+			}
+		}
+	}
+#endif
+	
 }
 
 
@@ -254,6 +227,8 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
     #elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
 		#if defined(SDLMAME_X11)
+		//FIXME: The code below fails for SDL1.3
+		#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
 		// X11 version
 		int screen;
 		SDL_SysWMinfo info;
@@ -285,6 +260,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			}
 		}
  		else
+		#endif
  		#endif
 		{
 			static int first_call=0;
@@ -574,12 +550,14 @@ static void check_osd_inputs(void)
 		ui_popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 	
+#if USE_OPENGL
 	if (input_ui_pressed(IPT_OSD_5))
 	{
 		video_config.filter = !video_config.filter;
 		ui_popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
 	}
-		
+#endif
+
 	if (input_ui_pressed(IPT_OSD_6))
 		sdlwindow_modify_prescale(-1);
 
@@ -635,18 +613,10 @@ static void extract_video_config(running_machine *machine)
 
 	// default to working video please
 	video_config.novideo = 0;
-	video_config.prefer16bpp_tex = 0;
 
 	// d3d options: extract the data
 	stemp = options_get_string(mame_options(), SDLOPTION_VIDEO);
-	if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
-		video_config.mode = VIDEO_MODE_OPENGL;
-	else if (strcmp(stemp, SDLOPTVAL_OPENGL16) == 0)
-	{
- 		video_config.mode = VIDEO_MODE_OPENGL;
- 		video_config.prefer16bpp_tex = 1;
-	}
-	else if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)
+	if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)
 		video_config.mode = VIDEO_MODE_SOFT;
 	else if (strcmp(stemp, SDLOPTVAL_NONE) == 0)
 	{
@@ -656,6 +626,15 @@ static void extract_video_config(running_machine *machine)
 		if (options_get_int(mame_options(), OPTION_SECONDS_TO_RUN) == 0)
 			mame_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
+#if USE_OPENGL
+	else if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
+		video_config.mode = VIDEO_MODE_OPENGL;
+	else if (strcmp(stemp, SDLOPTVAL_OPENGL16) == 0)
+	{
+ 		video_config.mode = VIDEO_MODE_OPENGL;
+ 		video_config.prefer16bpp_tex = 1;
+	}
+#endif
 	else
 	{
 		mame_printf_warning("Invalid video value %s; reverting to software\n", stemp);
@@ -663,16 +642,19 @@ static void extract_video_config(running_machine *machine)
 	}
 	
 	video_config.switchres     = options_get_bool(mame_options(), SDLOPTION_SWITCHRES);
-	video_config.filter        = options_get_bool(mame_options(), SDLOPTION_FILTER);
 	video_config.centerh       = options_get_bool(mame_options(), SDLOPTION_CENTERH);
 	video_config.centerv       = options_get_bool(mame_options(), SDLOPTION_CENTERV);
+
+#if USE_OPENGL
 	video_config.prescale      = options_get_int(mame_options(), SDLOPTION_PRESCALE);
 	if (video_config.prescale < 1 || video_config.prescale > 3)
 	{
 		mame_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;
 	}
-
+	// default to working video please
+	video_config.prefer16bpp_tex = 0;
+	video_config.filter        = options_get_bool(mame_options(), SDLOPTION_FILTER);
 	video_config.forcepow2texture = options_get_bool(mame_options(), SDLOPTION_GL_FORCEPOW2TEXTURE)==1;
 	video_config.allowtexturerect = options_get_bool(mame_options(), SDLOPTION_GL_NOTEXTURERECT)==0;
 	video_config.vbo         = options_get_bool(mame_options(), SDLOPTION_GL_VBO);
@@ -752,7 +734,7 @@ static void extract_video_config(running_machine *machine)
 		video_config.prescale_effect = options_get_int(mame_options(), SDLOPTION_PRESCALE_EFFECT);
 	else
 		video_config.prescale_effect = 0;
-
+#endif
 	// misc options: sanity check values
 
 	// global options: sanity check values

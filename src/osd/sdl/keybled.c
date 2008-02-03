@@ -8,7 +8,7 @@
 static void led_change_notify(const char *outname, INT32 value, void *param);
 #endif
 
-void led_init(void)
+void sdlled_init(void)
 {
 	#if defined(SDLMAME_X11)
 	SDL_SysWMinfo info;

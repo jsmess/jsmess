@@ -17,22 +17,17 @@
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.
 */
-#ifndef __MISC_H
-#define __MISC_H
-#include <stdio.h>
+
+#ifndef __SDLMISC_H
+#define __SDLMISC_H
 
 /* clock stuff */
 typedef long uclock_t;
 uclock_t uclock(void);
 #define UCLOCKS_PER_SEC 1000000
 
-/* print colum stuff */
-void print_colums(const char *text1, const char *text2);
-void fprint_colums(FILE *f, const char *text1, const char *text2);
-
 #if !(defined __USE_BSD || defined __USE_ISOC99 || defined __USE_UNIX98)
 int snprintf(char *s, size_t maxlen, const char *fmt, ...);
 #endif
 
-
-#endif /* ifndef __MISC_H */
+#endif /* ifndef __SDLMISC_H */

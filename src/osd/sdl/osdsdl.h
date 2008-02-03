@@ -3,6 +3,21 @@
 
 /* Notes
 
+	- fixed compile against SDL13
+	- stricter checks for USE_OPENGL, e.g. for options
+	- move sdlvideo_loadgl to window.c, rename it sdlwindow_loadgl and make it static
+	- moved yuv_blit.c into drawsdl.c
+	- renamed compute_blit_surface_size to drawsdl_blit_surface_size
+	- renamed drawsdl_destroy_all_textures to drawogl_destroy_all_textures and
+	  moved it to _sdl_draw_callbacks
+	- removed print_colums
+	- rename misc.h to sdlmisc.h
+	- moved some includes from .h to .c
+	- rename led_init to sdlled_init for consistency
+	- rename sdl_init_audio to sdlaudio_init for consistency
+	- fixed some indentation issues
+	- removed ticker.h & dirty.h
+	
 	- changed all [f]printf to mame_printf_verbose|error|warning
 	- removed obsolete frameskipping code
 	- removed obsolete throttle code
@@ -106,7 +121,6 @@
 #define SDL_LED(x)						"led" #x
 
 #define SDLENV_IDENTIFIER				"SDL_VIDEO_X11_VISUALID"
-#define SDLENV_COLUMNS					"COLUMNS"
 #define SDLENV_DESKTOPDIM				"SDLMAME_DESKTOPDIM"
 #define SDLENV_GL_LIB					"SDLMAME_GL_LIB"
 #define SDLENV_VMWARE					"SDLMAME_VMWARE"
@@ -119,14 +133,13 @@
 //	sound.c
 //============================================================
 
-void sdl_init_audio(running_machine *machine);
-void sdl_callback(void *userdata, Uint8 *stream, int len);
+void sdlaudio_init(running_machine *machine);
 
 //============================================================
 // keybled.c
 //============================================================
 
-void led_init(void);
+void sdlled_init(void);
 
 
 #endif
