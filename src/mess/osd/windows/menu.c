@@ -81,12 +81,15 @@ enum
 	DEVOPTION_MAX
 };
 
-#ifdef MAME_DEBUG
-#define HAS_PROFILER	1
+#ifdef ENABLE_DEBUGGER
 #define HAS_DEBUGGER	1
 #else
-#define HAS_PROFILER	0
 #define HAS_DEBUGGER	0
+#endif
+#ifdef MAME_PROFILER
+#define HAS_PROFILER	1
+#else
+#define HAS_PROFILER	0
 #endif
 
 #ifdef UNDER_CE

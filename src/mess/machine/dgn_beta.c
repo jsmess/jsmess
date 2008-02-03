@@ -87,18 +87,18 @@ static UINT8 *system_rom;
 
 
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t dgnbeta_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 static void ToggleDatLog(int ref, int params, const char *param[]);
 static void DumpKeys(int ref, int params, const char *param[]);
 
 static int LogDatWrites;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 static READ8_HANDLER(d_pia0_pa_r);
 static WRITE8_HANDLER(d_pia0_pa_w);
@@ -263,7 +263,7 @@ static void UpdateBanks(int first, int last)
 			if (!IsIOPage(Page))
 			{
 				readbank = &mess_ram[MapPage*RamPageSize];
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 				if(LogDatWrites)
 					debug_console_printf("Mapping page %X, pageno=%X, mess_ram[%X]\n",Page,MapPage,(MapPage*RamPageSize));
 #endif
@@ -309,7 +309,7 @@ static void SetDefaultTask(void)
 	int		Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	if (VERBOSE) debug_console_printf("Set Default task\n");
 #endif
 
@@ -638,7 +638,7 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 		RowShifter = (RowShifter<<1) | ((d_pia0_pb_last & KOutDat)>>4);
 		RowShifter &= 0x3FF;
 		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",RowShifter,Keyrow));
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		if (VERBOSE) debug_console_printf("rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",RowShifter,RowNo,Keyrow);
 #endif
 	}
@@ -1098,13 +1098,13 @@ MACHINE_START( dgnbeta )
 	init_video(machine);
 
 	wd17xx_init(WD_TYPE_179X,dgnbeta_fdc_callback, NULL);
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	cpuintrf_set_dasm_override(0,dgnbeta_dasm_override);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 	add_reset_callback(machine, dgnbeta_reset);
 	dgnbeta_reset(machine);
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	/* setup debug commands */
 	if (machine->debug_mode)
 	{
@@ -1112,7 +1112,7 @@ MACHINE_START( dgnbeta )
 		debug_console_register_command("beta_key_dump", CMDFLAG_NONE, 0, 0, 0,DumpKeys);
 	}
 	LogDatWrites=0;
-#endif	/* MAME_DEBUG */
+#endif	/* ENABLE_DEBUGGER */
 }
 
 
@@ -1121,7 +1121,7 @@ MACHINE_START( dgnbeta )
   OS9 Syscalls for disassembly
 ****************************************************************************/
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 
 static const char *const os9syscalls[] =
 {
@@ -1290,7 +1290,7 @@ static offs_t dgnbeta_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom,
 	return result;
 }
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static void ToggleDatLog(int ref, int params, const char *param[])
 {
 	LogDatWrites=!LogDatWrites;
@@ -1309,4 +1309,4 @@ static void DumpKeys(int ref, int params, const char *param[])
 }
 #endif
 
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */

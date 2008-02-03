@@ -20,9 +20,9 @@
 #include "messopts.h"
 #include "deprecat.h"
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 typedef enum
 {
@@ -903,7 +903,7 @@ static void command_verify_image(void)
 
 static void command_trace(void)
 {
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	int cpunum;
 	FILE *file;
 	char filename[256];

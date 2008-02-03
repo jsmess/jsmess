@@ -6,9 +6,9 @@
 #include <windows.h>
 #endif
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 #ifdef UNUSED_FUNCTION
 int osd_create_display(const osd_create_params *params, UINT32 *rgb_components)
@@ -124,12 +124,12 @@ void osd_image_load_status_changed(mess_image *img, int is_final_unload)
 }
 #endif
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 void osd_wait_for_debugger(void)
 {
 	debug_cpu_go(~0);
 }
-#endif // MAME_DEBUG
+#endif // ENABLE_DEBUGGER
 
 #ifdef UNUSED_FUNCTION
 int win_mess_config_init(void)
