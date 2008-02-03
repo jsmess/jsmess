@@ -501,7 +501,7 @@ static void *sdlwindow_toggle_full_screen_wt(void *param, int threadid)
 
 	ASSERT_WINDOW_THREAD();
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	// if we are in debug mode, never go full screen
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		return NULL;
@@ -693,7 +693,7 @@ void sdlwindow_update_cursor_state(void)
 {
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	#ifdef MAME_DEBUG
+	#ifdef ENABLE_DEBUGGER
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 	#endif
 	{

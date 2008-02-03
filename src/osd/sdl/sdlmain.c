@@ -388,6 +388,7 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(PTR64);
 	MACRO_VERBOSE(MAME_DEBUG);
 	MACRO_VERBOSE(NDEBUG);
+	MACRO_VERBOSE(ENABLE_DEBUGGER);
 	MACRO_VERBOSE(VODOO_DRC);
 	mame_printf_verbose("\n");
 	mame_printf_verbose("SDL/OpenGL defines: ");

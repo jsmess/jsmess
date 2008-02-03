@@ -214,11 +214,11 @@ LIBS += -lX11 -lXinerama
 endif
 
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
-ifdef DEBUG
+ifdef DEBUGGER
 OSDOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 CFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
-endif # DEBUG
+endif # DEBUGGER
 
 # make sure we can find X headers
 CFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
@@ -234,7 +234,7 @@ OSDCOREOBJS += $(SDLOBJ)/main.o
 SDLMAIN = $(SDLOBJ)/main.o
 
 # at least compile some stubs to link it
-ifdef DEBUG
+ifdef DEBUGGER
 OSDOBJS += $(SDLOBJ)/debugwin.o
 endif
 
@@ -263,10 +263,10 @@ endif
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
-ifdef DEBUG
+ifdef DEBUGGER
 OSDOBJS += $(SDLOBJ)/debugosx.o
 LIBS += -framework Carbon
-endif	# DEBUG
+endif	# DEBUGGER
 endif	# Mac OS X
 
 # OS2: add the necessary libraries

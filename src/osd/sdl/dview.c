@@ -1,6 +1,10 @@
-
-#include "dview.h"
 #include <gconf/gconf-client.h>
+#include "driver.h"
+#include "debug/debugvw.h"
+#include "debug/debugcon.h"
+#include "debug/debugcpu.h"
+#include "deprecat.h"
+#include "dview.h"
 
 G_DEFINE_TYPE(DView, dview, GTK_TYPE_CONTAINER);
 

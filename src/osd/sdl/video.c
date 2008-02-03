@@ -378,7 +378,7 @@ void osd_update(int skip_redraw)
 	sdlinput_poll();
 	check_osd_inputs();
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	debugwin_update_during_game();
 #endif
 }
@@ -596,7 +596,7 @@ static void extract_video_config(running_machine *machine)
 	#endif
 
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	// if we are in debug mode, never go full screen
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		video_config.windowed = TRUE;
