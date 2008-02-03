@@ -26,6 +26,7 @@
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "deprecat.h"
 
 // MAMEOS headers
 #include "debugwin.h"
