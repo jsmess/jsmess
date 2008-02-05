@@ -339,7 +339,7 @@ static void gb_update_scanline (void) {
 		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
-		if ( gb_lcd.start_x == 0 ) {
+		if ( gb_lcd.start_x < 0 ) {
 			/* Window is enabled if the hardware says so AND the current scanline is
 			 * within the window AND the window X coordinate is <=166 */
 			gb_lcd.layer[1].enabled = ( ( LCDCONT & 0x20 ) && ( gb_lcd.current_line >= WNDPOSY ) && ( WNDPOSX <= 166 ) ) ? 1 : 0;
@@ -374,6 +374,7 @@ static void gb_update_scanline (void) {
 				gb_lcd.layer[1].xend = 160;
 				gb_lcd.layer[0].xend = xpos;
 			}
+			gb_lcd.start_x = 0;
 		}
 
 		if ( cycles_to_go < 160 ) {
@@ -626,8 +627,7 @@ static void sgb_update_scanline (void) {
 		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
-		if ( gb_lcd.start_x == 0 ) {
-
+		if ( gb_lcd.start_x < 0 ) {
 			/* Window is enabled if the hardware says so AND the current scanline is
 			 * within the window AND the window X coordinate is <=166 */
 			gb_lcd.layer[1].enabled = ((LCDCONT & 0x20) && gb_lcd.current_line >= WNDPOSY && WNDPOSX <= 166) ? 1 : 0;
@@ -663,6 +663,7 @@ static void sgb_update_scanline (void) {
 				gb_lcd.layer[1].xend = 160;
 				gb_lcd.layer[0].xend = xpos;
 			}
+			gb_lcd.start_x = 0;
 		}
 
 		if ( cycles_to_go == 0 ) {
@@ -893,8 +894,7 @@ static void cgb_update_scanline (void) {
 		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
-		if ( gb_lcd.start_x == 0 ) {
-
+		if ( gb_lcd.start_x < 0 ) {
 			/* Window is enabled if the hardware says so AND the current scanline is
 			 * within the window AND the window X coordinate is <=166 */
 			gb_lcd.layer[1].enabled = ( ( LCDCONT & 0x20 ) && ( gb_lcd.current_line >= WNDPOSY ) && ( WNDPOSX <= 166 ) ) ? 1 : 0;
@@ -930,6 +930,7 @@ static void cgb_update_scanline (void) {
 				gb_lcd.layer[1].xend = 160;
 				gb_lcd.layer[0].xend = xpos;
 			}
+			gb_lcd.start_x = 0;
 		}
 
 		if ( cycles_to_go < 160 ) {
@@ -1464,7 +1465,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0, attotime_never );
-			gb_lcd.start_x = 0;
+			gb_lcd.start_x = -1;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
 			if ( CURLINE == 144 ) {
@@ -1712,7 +1713,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
 			timer_adjust( gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0, attotime_never );
-			gb_lcd.start_x = 0;
+			gb_lcd.start_x = -1;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
 			if ( CURLINE == 144 ) {
