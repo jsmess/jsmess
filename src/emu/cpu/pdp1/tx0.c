@@ -10,7 +10,6 @@
 
 #include "cpuintrf.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "tx0.h"
 
 #define LOG 0
