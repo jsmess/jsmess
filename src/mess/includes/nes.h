@@ -68,6 +68,7 @@ struct fds_struct
 {
 	UINT8 *data;
 	UINT8 sides;
+	UINT8 *ram;
 
 	/* Variables which can change */
 	UINT8 motor_on;

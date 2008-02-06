@@ -92,14 +92,16 @@ static void init_nes_core (void)
 	{
 		case 20:
 			nes.slow_banking = 0;
+			nes_fds.data = auto_malloc( 0x8000 );
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4030, 0x403f, 0, 0, fds_r);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, MRA8_RAM);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, MRA8_BANK2);
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MRA8_BANK1);
-			memory_set_bankptr(1, &nes.rom[0xe000]);
 
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4020, 0x402f, 0, 0, fds_w);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, MWA8_RAM);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, MWA8_BANK2);
+
+			memory_set_bankptr(1, &nes.rom[0xe000]);
+			memory_set_bankptr(2, nes_fds.data );
 			break;
 		case 40:
 			nes.slow_banking = 1;
@@ -542,6 +544,7 @@ DEVICE_LOAD(nes_cart)
 	if (nes.battery)
 		image_battery_load(image, battery_data, BATTERY_SIZE);
 
+printf("Mapper: %d\n", nes.mapper );
 	return INIT_PASS;
 
 bad:
