@@ -450,6 +450,7 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 				set_display_settings();
 			}
 			if ( ( regNum == 1 ) && ( smsvdp.reg[0x01] & 0x20 ) && ( smsvdp.status & STATUS_VINT ) ) {
+				smsvdp.irq_state = 1;
 				smsvdp.int_callback( ASSERT_LINE );
 			}
 			smsvdp.addrmode = 0;
