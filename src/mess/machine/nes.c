@@ -544,7 +544,6 @@ DEVICE_LOAD(nes_cart)
 	if (nes.battery)
 		image_battery_load(image, battery_data, BATTERY_SIZE);
 
-printf("Mapper: %d\n", nes.mapper );
 	return INIT_PASS;
 
 bad:
