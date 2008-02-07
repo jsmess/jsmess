@@ -378,7 +378,8 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 static void genesis_machine_stop(running_machine *machine)
 {
 	/* Write out the battery file if necessary */
-        image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_len);
+	if ((genesis_sram != NULL) && (genesis_sram_len > 0))
+		image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_len);
 }
 
 
