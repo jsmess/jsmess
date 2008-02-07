@@ -290,7 +290,7 @@ INLINE void gb_update_sprites (void)
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if (colour && !bg_zbuf[xindex])
+					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
 					data >>= 1;
 				}
@@ -299,25 +299,25 @@ INLINE void gb_update_sprites (void)
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if (colour)
+					if (colour && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
 					data >>= 1;
 				}
 				break;
 			case 0x80:				   /* priority is set (behind bgnd & wnd, don't flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
+				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if (colour && !bg_zbuf[xindex])
+					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
 					data <<= 1;
 				}
 				break;
 			case 0x00:				   /* priority is not set (overlaps bgnd & wnd, don't flip x) */
-				for (bit = 0; bit < 8; bit++, xindex++)
+				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if (colour)
+					if (colour && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
 					data <<= 1;
 				}
@@ -378,7 +378,7 @@ static void gb_update_scanline (void) {
 		}
 
 		if ( cycles_to_go < 160 ) {
-			gb_lcd.end_x = 160 - cycles_to_go;
+			gb_lcd.end_x = MIN(160 - cycles_to_go,160);
 			/* Draw empty pixels when the background is disabled */
 			if ( ! ( LCDCONT & 0x01 ) ) {
 				rectangle r;
@@ -517,7 +517,7 @@ INLINE void sgb_update_sprites (void)
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex <= SGB_XOFFSET + 160) && colour && !bg_zbuf[xindex - SGB_XOFFSET])
+					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !bg_zbuf[xindex - SGB_XOFFSET])
 						gb_plot_pixel(bitmap, xindex, yindex, sgb_pal[pal + spal[colour]]);
 					data >>= 1;
 				}
@@ -526,7 +526,7 @@ INLINE void sgb_update_sprites (void)
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex <= SGB_XOFFSET + 160) && colour)
+					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
 						gb_plot_pixel(bitmap, xindex, yindex, sgb_pal[pal + spal[colour]]);
 					data >>= 1;
 				}
@@ -535,7 +535,7 @@ INLINE void sgb_update_sprites (void)
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex <= SGB_XOFFSET + 160) && colour && !bg_zbuf[xindex - SGB_XOFFSET])
+					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !bg_zbuf[xindex - SGB_XOFFSET])
 						gb_plot_pixel(bitmap, xindex, yindex, sgb_pal[pal + spal[colour]]);
 					data <<= 1;
 				}
@@ -544,7 +544,7 @@ INLINE void sgb_update_sprites (void)
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex <= SGB_XOFFSET + 160) && colour)
+					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
 						gb_plot_pixel(bitmap, xindex, yindex, sgb_pal[pal + spal[colour]]);
 					data <<= 1;
 				}
@@ -699,7 +699,7 @@ static void sgb_update_scanline (void) {
 			}
 		}
 		if ( cycles_to_go < 160 ) {
-			gb_lcd.end_x = 160 - cycles_to_go;
+			gb_lcd.end_x = MIN(160 - cycles_to_go,160);
 
 			/* if background or screen disabled clear line */
 			if ( ! ( LCDCONT & 0x01 ) ) {
@@ -842,7 +842,7 @@ INLINE void cgb_update_sprites (void) {
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if (colour && !bg_zbuf[xindex])
+					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[cgb_spal[pal + colour]]);
 					data >>= 1;
 				}
@@ -853,7 +853,7 @@ INLINE void cgb_update_sprites (void) {
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if((bg_zbuf[xindex] & 0x80) && (bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
-					if (colour)
+					if (colour && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[cgb_spal[pal + colour]]);
 					data >>= 1;
 				}
@@ -862,7 +862,7 @@ INLINE void cgb_update_sprites (void) {
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if (colour && !bg_zbuf[xindex])
+					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[cgb_spal[pal + colour]]);
 					data <<= 1;
 				}
@@ -873,7 +873,7 @@ INLINE void cgb_update_sprites (void) {
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if((bg_zbuf[xindex] & 0x80) && (bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
-					if (colour)
+					if (colour && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[cgb_spal[pal + colour]]);
 					data <<= 1;
 				}
@@ -934,7 +934,7 @@ static void cgb_update_scanline (void) {
 		}
 
 		if ( cycles_to_go < 160 ) {
-			gb_lcd.end_x = 160 - cycles_to_go;
+			gb_lcd.end_x = MIN(160 - cycles_to_go,160);
 			/* Draw empty line when the background is disabled */
 			if ( ! ( LCDCONT & 0x01 ) ) {
 				rectangle r = Machine->screen[0].visarea;
