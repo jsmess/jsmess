@@ -188,15 +188,6 @@ MACHINE_START( nes )
 {
 	init_nes_core();
 	add_exit_callback(machine, nes_machine_stop);
-
-	if ((!image_exists(image_from_devtype_and_index(IO_CARTSLOT, 0))) && (!image_exists(image_from_devtype_and_index(IO_FLOPPY, 0))))
-	{
-		/* NPW 05-Mar-2006 - Hack to keep the Famicom from crashing */
-		static const UINT8 infinite_loop[] = { 0x4C, 0xF9, 0xFF, 0xF9, 0xFF }; /* JMP $FFF9, DC.W $FFF9 */
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xFFF9, 0xFFFD, 0, 0, MRA8_BANK11);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xFFF9, 0xFFFD, 0, 0, MWA8_BANK11);
-		memory_set_bankptr(11, (void *) infinite_loop);
-	}
 }
 
 static void nes_machine_stop(running_machine *machine)
@@ -562,24 +553,8 @@ void nes_partialhash(char *dest, const unsigned char *data,
 }
 
 
-
-DEVICE_LOAD(nes_disk)
+DEVICE_INIT(nes_disk)
 {
-	unsigned char magic[4];
-
-	/* See if it has a fucking redundant header on it */
-	image_fread(image, magic, 4);
-	if ((magic[0] == 'F') &&
-		(magic[1] == 'D') &&
-		(magic[2] == 'S'))
-	{
-		/* Skip past the fucking redundant header */
-		image_fseek (image, 0x10, SEEK_SET);
-	}
-	else
-		/* otherwise, point to the start of the image */
-		image_fseek (image, 0, SEEK_SET);
-
 	/* clear some of the cart variables we don't use */
 	nes.trainer = 0;
 	nes.battery = 0;
@@ -591,6 +566,27 @@ DEVICE_LOAD(nes_disk)
 
 	nes_fds.sides = 0;
 	nes_fds.data = NULL;
+
+	return INIT_PASS;
+}
+
+
+DEVICE_LOAD(nes_disk)
+{
+	unsigned char magic[4];
+
+	/* See if it has a  redundant header on it */
+	image_fread(image, magic, 4);
+	if ((magic[0] == 'F') &&
+		(magic[1] == 'D') &&
+		(magic[2] == 'S'))
+	{
+		/* Skip past the redundant header */
+		image_fseek (image, 0x10, SEEK_SET);
+	}
+	else
+		/* otherwise, point to the start of the image */
+		image_fseek (image, 0, SEEK_SET);
 
 	/* read in all the sides */
 	while (!image_feof (image))
