@@ -630,7 +630,7 @@ static void sms_refresh_line_mode4(int *lineBuffer, int line) {
 				pixelPlotX = spriteX + (pixelX << 1);
 
 				/* check to prevent going outside of active display area */
-				if ( pixelPlotX > 256 ) {
+				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
 					continue;
 				}
 
@@ -661,7 +661,7 @@ static void sms_refresh_line_mode4(int *lineBuffer, int line) {
 				pixelPlotX = spriteX + pixelX;
 
 				/* check to prevent going outside of active display area */
-				if ( pixelPlotX > 256 ) {
+				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
 					continue;
 				}
 

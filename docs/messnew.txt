@@ -47,6 +47,8 @@ System Driver Changes:
 
 - [SMS] Fixed buttons for player 2.  (bug #1377)  [Enik Land]
 
+- [SMS] Fixed some video mode 4 boundary checks. (bug #1454)  [Enik Land]
+
 - [TI99] Fixed Mechatronic Mouse axis swapping.  (bug #966)  [Miachel Zapf]
 
 - [TI99/GENEVE] More floppy cleanups; fixed TI99_8 regression and made the
