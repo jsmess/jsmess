@@ -9,8 +9,6 @@
 #include "sound/cdda.h"
 
 
-/* the largest possible cartridge image (street fighter 2 - 2.5MB) */
-#define PCE_ROM_MAXSIZE				(0x280000)
 #define PCE_BRAM_SIZE				0x800
 #define PCE_ADPCM_RAM_SIZE			0x10000
 #define PCE_CD_COMMAND_BUFFER_SIZE	0x100
@@ -124,7 +122,6 @@ DEVICE_LOAD(pce_cart)
 	logerror("*** DEVICE_LOAD(pce_cart) : %s\n", image_filename(image));
 
 	/* open file to get size */
-	new_memory_region(Machine, REGION_USER1,PCE_ROM_MAXSIZE,0);
 	ROM = memory_region(REGION_USER1);
 
 	size = image_length( image );

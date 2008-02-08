@@ -19,6 +19,9 @@
 /* these might be used to indicate something, but they always seem to return 1 */
 #define CONST_SIG			0x30
 
+/* the largest possible cartridge image (street fighter 2 - 2.5MB) */
+#define PCE_ROM_MAXSIZE		0x280000
+
 struct pce_struct
 {
 	UINT8 io_port_options; /*driver-specific options for the PCE*/

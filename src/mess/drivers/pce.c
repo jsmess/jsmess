@@ -267,9 +267,13 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-#define rom_pce NULL
-#define rom_tg16 NULL
-#define rom_sgx NULL
+ROM_START( pce )
+	ROM_REGION( PCE_ROM_MAXSIZE, REGION_USER1, 0 )		/* Cartridge ROM area */
+	ROM_FILL( 0, PCE_ROM_MAXSIZE, 0xFF )
+ROM_END
+
+#define rom_tg16 rom_pce
+#define rom_sgx rom_pce
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    INIT   CONFIG  COMPANY  FULLNAME */
 CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   pce,	"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND )
