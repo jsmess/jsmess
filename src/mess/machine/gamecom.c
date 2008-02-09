@@ -72,14 +72,13 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 MACHINE_RESET( gamecom )
 {
 	memory_set_bankptr( 1, memory_region(REGION_USER1) );
-        memory_set_bankptr( 2, memory_region(REGION_USER1) );
-        memory_set_bankptr( 3, memory_region(REGION_USER1) );
-        memory_set_bankptr( 4, memory_region(REGION_USER1) );
+	memory_set_bankptr( 2, memory_region(REGION_USER1) );
+	memory_set_bankptr( 3, memory_region(REGION_USER1) );
+	memory_set_bankptr( 4, memory_region(REGION_USER1) );
 
 	/* should possibly go in a DRIVER_INIT piece? */
-	if ( gamecom_clock_timer == NULL ) {
-		gamecom_clock_timer = timer_alloc( gamecom_clock_timer_callback , NULL);
-	}
+	gamecom_clock_timer = timer_alloc( gamecom_clock_timer_callback , NULL);
+
 	/* intialize the empty dummy bank */
 	if ( dummy_bank == NULL ) {
 		dummy_bank = auto_malloc( 8 * 1024 );
