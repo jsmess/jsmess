@@ -719,7 +719,7 @@ static void populate_control(datamap *map, HWND control, core_options *opts, dat
 						entry->use_trackbar_options = TRUE;
 						entry->trackbar_min = minval_float;
 						entry->trackbar_max = maxval_float;
-						entry->trackbar_increments = 0.05f;
+						entry->trackbar_increments = (float)0.05;
 						break;
 				}
 			}

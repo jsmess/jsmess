@@ -24,6 +24,7 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <windowsx.h>
 
 // MAME/MAMEUI headers
 #include "driver.h"
@@ -176,7 +177,7 @@ void FreeScreenShot(void)
 	m_hDIB = NULL;
 
 	if (m_hPal != NULL)
-		DeleteObject(m_hPal);
+		DeletePalette(m_hPal);
 	m_hPal = NULL;
 
 	if (m_hDDB != NULL)
@@ -265,6 +266,9 @@ BOOL LoadDIB(const char *filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 	const char *zip_name;
 	astring *fname;
 	void *buffer = NULL;
+	if (pPal != NULL ) {
+		DeletePalette(pPal);
+	}
 
 	switch (pic_type)
 	{

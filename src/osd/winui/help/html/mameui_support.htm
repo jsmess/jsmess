@@ -35,7 +35,7 @@ a:link
 <div class="Section1">
 	<h1 style="mso-margin-bottom-alt: auto"><span style="COLOR: black">MameUI 
 	Troubleshooting [&amp; Tips]<o:p></o:p></span></h1>
-	<p style="MARGIN-TOP: 0in">MameUI has been in development since 1997.<span style="mso-spacerun: yes">&nbsp;
+	<p style="MARGIN-TOP: 0in">MameUI [previously Mame32] has been in development since 1997.<span style="mso-spacerun: yes">&nbsp;
 	</span>It is mature, complex, and robust.&nbsp; However, since the Mame 
 	project itself is a documentation effort, and development is continuous, 
 	there will be times when changes to the core program effect MameUI.&nbsp; 
@@ -80,7 +80,7 @@ a:link
 	</span></span></span>Utilization of an external ROMs management utility like
 	<b style="mso-bidi-font-weight: normal"><a href="http://www.clrmame.com/">
 	<span style="COLOR: black">Clrmame</span></a></b> is recommended for repair 
-	and identification of damaged sets.</p>
+	and identification of damaged or incomplete sets.</p>
 	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
 	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
 	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -304,7 +304,10 @@ a:link
 	confirmed by turning on FPS display with [<b>F11</b>], and frame skip to 
 	auto with [<b>F8</b>].&nbsp; If the FPS dips anywhere or frame skipping 
 	rises anywhere during the game play, the game is maxing out the CPU and 
-	sound breakup could occur.<span style="mso-spacerun: yes">&nbsp; </span>If 
+	sound breakup could occur.<span style="mso-spacerun: yes">&nbsp; It is also 
+	possible to determine if the host CPU can run the game at 100% by 
+	unthrottling the emulation with the [F10] key, if the CPU can do it, it will 
+	run the game faster than 100%.&nbsp; </span>If 
 	upgrading machine components, provide MameUI with as much hardware as 
 	possible; a faster CPU makes the most difference, followed by video card, 
 	and RAM.</p>
@@ -322,11 +325,38 @@ a:link
 	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
 	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
 	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>As Mame has continued development, infrastructure and 
+	accuracy has improved.<span style="mso-spacerun: yes">&nbsp; </span>As such, 
+	the optimization point of the games has shifted so that older games may be 
+	slower unthrottled overall than when run on earlier versions.<span style="mso-spacerun: yes">&nbsp;
+	</span>For example, in version .36 Donkey Kong may have run unthrottled at 
+	1900 FPS, but in .77 it runs 1500 FPS.<span style="mso-spacerun: yes">&nbsp;
+	Thus older machines [P3 and prior] will continue to have trouble playing the 
+	same games as earlier versions of Mame.&nbsp; M</span>odern machines should have no problem running these 
+	early 80's games at their intended ~60 FPS rate.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Periodically, speed-up hacks in the core code will be 
+	removed to provide more accurate emulation of the games.<span style="mso-spacerun: yes">&nbsp;
+	</span>This can result in a drop in FPS for that particular family of games, 
+	but can be offset by upgrading the machine MameUI is used on.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>On certain system setups (older), DirectDraw may be a 
+	faster option than the D3D settings.<span style="mso-spacerun: yes">&nbsp;
+	</span>Choose Ddraw as the video mode in Default Options • Display. </p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	</span></span></span>With the advent of MameUI .120 some historically 
-	hardware punishing games become playable on high end overclocked [3.6Ghz+] 
+	host CPU punishing games become playable on high end overclocked [3.6Ghz+] 
 	Intel Core2Duo and Quad Cores.&nbsp; These processors combined with 64bit 
 	operating systems and native 64bit MameUI provide almost 100% playability in 
-	namcos21.c / namcos22.c / seattle.c and midvunit.c games.</p>
+	namcos21.c / namcos22.c / seattle.c and midvunit.c games.&nbsp; MameUI64 + 
+	Vista64 + C2D chips is the best current combination for MameUI gaming on the 
+	Windows platform.</p>
 	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
 	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
 	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -339,24 +369,6 @@ a:link
 	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
 	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
 	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	</span></span></span>As Mame has continued development, infrastructure and 
-	accuracy has improved.<span style="mso-spacerun: yes">&nbsp; </span>As such, 
-	the optimization point of the games has shifted so that older games may be 
-	slower unthrottled overall than when run on earlier versions.<span style="mso-spacerun: yes">&nbsp;
-	</span>For example, in version .36 Donkey Kong may have run unthrottled at 
-	1900 FPS, but in .77 it runs 1500 FPS.<span style="mso-spacerun: yes">&nbsp;
-	</span>Regardless, modern machines should have no problem running these 
-	earlier games at their intended 60 FPS rate.</p>
-	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
-	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
-	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	</span></span></span>Periodically, speed-up hacks in the core code will be 
-	removed to provide more accurate emulation of the games.<span style="mso-spacerun: yes">&nbsp;
-	</span>This can result in a drop in FPS for that particular family of games, 
-	but can be offset by upgrading the machine Mame is used on.</p>
-	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
-	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
-	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	</span></span></span>AMD’s Cool ‘n Quiet technology on certain setups has 
 	been known to cause slowdowns and lags while working in the MameUI GUI as 
 	well as causing some in-game sound and graphic stuttering.<span style="mso-spacerun: yes">&nbsp;
@@ -364,14 +376,8 @@ a:link
 	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
 	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
 	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	</span></span></span>On certain system setups (older), DirectDraw may be a 
-	faster option than the D3D settings.<span style="mso-spacerun: yes">&nbsp;
-	</span>Choose Ddraw as the video mode in Default Options • Display. </p>
-	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
-	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
-	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	</span></span></span>If seeing a severe slowdown in games that previously 
-	didn't, toggle the Use less CPU time if possible menu item in Options • 
+	didn't, toggle the 'Sleep when possible' menu item in Options • 
 	Default Options • Miscellaneous.&nbsp; This happens to laptop users 
 	particularly.</p>
 	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
@@ -422,7 +428,7 @@ a:link
 	</span></span></span>There are some older video card/video driver 
 	combinations that <b>can</b> do hardware stretching, but are slower than 
 	running with hardware stretch <b>off</b>. If games are too sluggish with the 
-	hw stretch on, toggle it off if possible.&nbsp; Some PCI graphic cards have 
+	hw stretch on, toggle it off if possible.&nbsp; Some old PCI graphic cards have 
 	been seen to have this problem.</p>
 	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
 	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
@@ -465,7 +471,7 @@ a:link
 	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
 	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	</span></span></span>Lightguns and mice are treated like mappable joysticks 
-	in current versions of Mame.<span style="mso-spacerun: yes">&nbsp; </span>If 
+	in current versions of MameUI.<span style="mso-spacerun: yes">&nbsp; </span>If 
 	multiple mice are in use it is necessary to enter the in-game [<b style="mso-bidi-font-weight: normal">TAB</b>] 
 	menu and map their axes in the ‘Input General’ section.</p>
 	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>

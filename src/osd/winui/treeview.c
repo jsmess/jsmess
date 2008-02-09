@@ -1771,18 +1771,18 @@ static void TreeCtrlOnPaint(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		DeleteDC(maskDC);
 		DeleteDC(imageDC);
 		DeleteDC(tempDC);
-		DeleteObject(bmpImage);
-		DeleteObject(maskBitmap);
+		DeleteBitmap(bmpImage);
+		DeleteBitmap(maskBitmap);
 
 		if (GetBackgroundPalette() == NULL)
 		{
-			DeleteObject(hPAL);
-			hPAL = 0;
+			DeletePalette(hPAL);
+			hPAL = NULL;
 		}
 	}
 
 	SelectObject(memDC, hOldBitmap);
-	DeleteObject(bitmap);
+	DeleteBitmap(bitmap);
 	DeleteDC(memDC);
 	EndPaint(hWnd, &ps);
 	ReleaseDC(hWnd, hDC);

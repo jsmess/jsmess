@@ -238,7 +238,7 @@ static void OnInvertTracker(HWND hWnd, const RECT *rect)
 	if (hOldBrush != 0)
 		SelectObject(hDC, hOldBrush);
 	ReleaseDC(hWnd, hDC);
-	DeleteObject(hBrush);
+	DeleteBrush(hBrush);
 }
 
 static void StartTracking(HWND hWnd, UINT hitArea)

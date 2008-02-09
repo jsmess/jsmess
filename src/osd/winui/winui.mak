@@ -46,9 +46,9 @@
 #-------------------------------------------------
 
 ifdef PTR64
-EMULATOR = $(FULLNAME)UI64$(EXE)
+EMULATOR = $(FULLNAME)ui64$(EXE)
 else
-EMULATOR = $(FULLNAME)UI32$(EXE)
+EMULATOR = $(FULLNAME)ui32$(EXE)
 endif
 
 
@@ -129,6 +129,11 @@ ifdef PTR64
 CC += /wd4267
 endif
 
+# explicitly set the entry point for UNICODE builds
+ifdef UNICODE
+LD += /ENTRY:wmainCRTStartup
+endif
+
 # add some VC++-specific defines
 DEFS += -D_CRT_SECURE_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
 
@@ -140,23 +145,11 @@ BUILD += $(VCONV)
 
 $(VCONV): $(WINOBJ)/vconv.o
 	@echo Linking $@...
-ifdef PTR64
-	@link.exe /nologo $^ version.lib bufferoverflowu.lib /out:$@
-else
 	@link.exe /nologo $^ version.lib /out:$@
-endif
 
 $(WINOBJ)/vconv.o: $(WINSRC)/vconv.c
 	@echo Compiling $<...
 	@cl.exe /nologo /O1 -D_CRT_SECURE_NO_DEPRECATE -c $< /Fo$@
-
-PDBFILES = $(EMULATOR:.exe=.pdb) $(TOOLS:.exe=.pdb)
-
-clean-pdb:
-	@echo Deleting $(PDBFILES)...
-	$(RM) $(PDBFILES)
-
-clean: clean-pdb
 
 endif
 
@@ -312,6 +305,10 @@ OSDOBJS += \
 	$(WINOBJ)/debugwin.o
 endif
 
+$(WINOBJ)/winmain.o : $(WINSRC)/winmain.c
+	@echo Compiling $<...
+	$(CC) $(CDEFS) -Dmain=utf8_main $(CFLAGS) -c $< -o $@
+
 # add our UI resources
 RESFILE += $(UIOBJ)/mameui.res
 
@@ -328,7 +325,7 @@ LIBOSD := $(UIOBJ)/mui_main.o $(LIBOSD)
 # Don't build for an MSVC_BUILD
 #-------------------------------------------------
 
-ledutil$(EXE): $(WINOBJ)/ledutil.o $(WINOBJ)/main.o $(LIBOCORE)
+ledutil$(EXE): $(WINOBJ)/ledutil.o $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
