@@ -10,6 +10,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [APFM1000] Cartridge support, pads fixed and hooked up [PeT]
+
 - [APPLE2] Fixed lores graphics broken in 0.119.  (bug #1472) [Nate Woods]
 
 - [GAMEBOY] Small mode 0 stat bug triggering fixes.  [Wilbert Pol]
@@ -54,13 +56,11 @@ System Driver Changes:
 - [TI99/GENEVE] More floppy cleanups; fixed TI99_8 regression and made the
   floppy drive usable.  (bug #1450)  [Michael Zapf]
 
-- [APFM1000] cartridge support, pads fixed and hooked up [PeT]
-
 
 
 User Interface Changes:
 -----------------------
-(none)
+- [Windows] Fixed bug in state saving and loading.  (bug #1494) [Nate Woods]
 
 
 
