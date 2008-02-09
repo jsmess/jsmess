@@ -100,10 +100,9 @@ Part list of Goldstar 3DO Interactive Multiplayer
    is fully supported. */
 #define CPU_ARM6	CPU_ARM7
 
-#define X1_CLOCK		50000000
 #define X2_CLOCK_PAL	59000000
 #define X2_CLOCK_NTSC	49090000
-#define X601_CLOCK		16934400
+#define X601_CLOCK		XTAL_16_9344MHz
 
 static UINT32	*dram;
 static UINT32	*vram;
@@ -139,7 +138,7 @@ static MACHINE_RESET( 3do )
 
 static MACHINE_DRIVER_START( 3do )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD_TAG( "main", ARM6, X1_CLOCK/4 )
+	MDRV_CPU_ADD_TAG( "main", ARM6, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem, 0 )
 
 	MDRV_MACHINE_RESET( 3do )
@@ -156,7 +155,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( 3do_pal )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM6, X1_CLOCK/4 )
+	MDRV_CPU_ADD_TAG("main", ARM6, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem, 0 )
 
 	MDRV_MACHINE_RESET( 3do )
