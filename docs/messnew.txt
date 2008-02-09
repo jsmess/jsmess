@@ -1,4 +1,36 @@
-﻿0.123
+﻿0.123.1
+
+New System Drivers Supported (in no particular order):
+------------------------------------------------------
+(none)
+
+
+
+System Driver Changes:
+----------------------
+(none)
+
+
+
+User Interface Changes:
+-----------------------
+(none)
+
+
+
+Imgtool Changes:
+----------------
+(none)
+
+
+
+Source Changes:
+----------------
+(none)
+
+
+
+0.123
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
