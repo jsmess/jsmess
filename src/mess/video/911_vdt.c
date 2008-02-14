@@ -16,6 +16,8 @@ TODO:
 #include "911_key.h"
 #include "sound/beep.h"
 #include "deprecat.h"
+#include "mslegacy.h"
+
 
 
 #define MAX_VDT 1
@@ -130,10 +132,10 @@ static TIMER_CALLBACK(beep_callback);
 */
 PALETTE_INIT( vdt911 )
 {
-	/*memcpy(palette, & vdt911_palette, sizeof(vdt911_palette));*/
+	// memcpy(palette, & vdt911_palette, sizeof(vdt911_palette));
 	palette_set_colors_rgb(machine, 0, vdt911_palette, vdt911_palette_size);
 
-	memcpy(colortable, & vdt911_colortable, sizeof(vdt911_colortable));
+	memcpy(colortable,  &vdt911_colortable, sizeof(vdt911_colortable));
 }
 
 /*
