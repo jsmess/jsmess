@@ -98,6 +98,7 @@ easier to manage.
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "devices/cococart.h"
+#include "mslegacy.h"
 
 /*common vars/calls */
 static UINT8 *coco_rom;

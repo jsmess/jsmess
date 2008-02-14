@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "video/atarist.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/m68000/m68000.h"

@@ -16,6 +16,7 @@
 
 #include "driver.h"
 #include "tms5501.h"
+#include "mslegacy.h"
 
 #define DEBUG_TMS5501	0
 

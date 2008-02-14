@@ -15,6 +15,7 @@
 #include "driver.h"
 #include "i8271.h"
 #include "devices/flopdrv.h"
+#include "mslegacy.h"
 
 
 I8271_STATE_t I8271_STATE;

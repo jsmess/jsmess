@@ -167,7 +167,7 @@ when problems start with -log and look into error.log file
 #include "includes/cbm.h"
 #include "machine/tpi6525.h"
 #include "video/vic6567.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "includes/vc20tape.h"

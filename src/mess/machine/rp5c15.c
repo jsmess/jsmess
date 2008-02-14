@@ -69,6 +69,7 @@
 
 #include "rp5c15.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 static struct rp5c15 rtc;
 

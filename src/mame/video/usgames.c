@@ -1,14 +1,16 @@
 #include "driver.h"
+#include "video/mc6845.h"
 #include "deprecat.h"
 
-UINT8 *usg_videoram,*usg_charram;
+UINT8 *usgames_videoram,*usgames_charram;
 
 
-static tilemap *usg_tilemap;
+static mc6845_t *mc6845;
+static tilemap *usgames_tilemap;
 
 
 
-PALETTE_INIT(usg)
+PALETTE_INIT(usgames)
 {
 	int j;
 
@@ -35,41 +37,53 @@ PALETTE_INIT(usg)
 
 
 
-static TILE_GET_INFO( get_usg_tile_info )
+static TILE_GET_INFO( get_usgames_tile_info )
 {
 	int tileno, colour;
 
-	tileno = usg_videoram[tile_index*2];
-	colour = usg_videoram[tile_index*2+1];
+	tileno = usgames_videoram[tile_index*2];
+	colour = usgames_videoram[tile_index*2+1];
 
 	SET_TILE_INFO(0,tileno,colour,0);
 }
 
-VIDEO_START(usg)
+VIDEO_START(usgames)
 {
-	usg_tilemap = tilemap_create(get_usg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	mc6845 = mc6845_config(NULL);
+	usgames_tilemap = tilemap_create(get_usgames_tile_info,tilemap_scan_rows, 8, 8,64,32);
 }
 
 
-WRITE8_HANDLER( usg_videoram_w )
+WRITE8_HANDLER( usgames_videoram_w )
 {
-	usg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(usg_tilemap,offset/2);
+	usgames_videoram[offset] = data;
+	tilemap_mark_tile_dirty(usgames_tilemap,offset/2);
 }
 
-WRITE8_HANDLER( usg_charram_w )
+WRITE8_HANDLER( usgames_charram_w )
 {
-	usg_charram[offset] = data;
+	usgames_charram[offset] = data;
 
-	decodechar(Machine->gfx[0], offset/8, usg_charram);
+	decodechar(Machine->gfx[0], offset/8, usgames_charram);
 
-	tilemap_mark_all_tiles_dirty(usg_tilemap);
+	tilemap_mark_all_tiles_dirty(usgames_tilemap);
 }
 
 
-
-VIDEO_UPDATE(usg)
+WRITE8_HANDLER( usgames_mc6845_address_w )
 {
-	tilemap_draw(bitmap,cliprect,usg_tilemap,0,0);
+	mc6845_address_w(mc6845, data);
+}
+
+
+WRITE8_HANDLER( usgames_mc6845_register_w )
+{
+	mc6845_register_w(mc6845, data);
+}
+
+
+VIDEO_UPDATE(usgames)
+{
+	tilemap_draw(bitmap,cliprect,usgames_tilemap,0,0);
 	return 0;
 }

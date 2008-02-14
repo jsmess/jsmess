@@ -9,6 +9,7 @@
 #include "amiga.h"
 #include "amigakbd.h"
 #include "machine/6526cia.h"
+#include "mslegacy.h"
 
 
 #define KEYBOARD_BUFFER_SIZE	256

@@ -6,6 +6,7 @@
 
 #include <math.h>
 #include "driver.h"
+#include "mslegacy.h"
 
 #include "tms9901.h"
 

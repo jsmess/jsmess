@@ -16,6 +16,7 @@ DMAC controller.
 #include "machine/wd33c93.h"
 #include "machine/tpi6525.h"
 #include "matsucd.h"
+#include "mslegacy.h"
 
 
 #define VERBOSE_DMAC 0

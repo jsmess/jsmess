@@ -331,7 +331,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 				xexex_objdma(0);
 
 				// schedule DMA end interrupt
-				timer_adjust(dmadelay_timer, XE_DMADELAY, 0, attotime_zero);
+				timer_adjust_oneshot(dmadelay_timer, XE_DMADELAY, 0);
 			}
 
 			// IRQ 4 is the V-blank interrupt. It controls color, sound and
@@ -438,7 +438,7 @@ static INPUT_PORTS_START( xexex )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START

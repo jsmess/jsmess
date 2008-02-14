@@ -25,6 +25,12 @@ static UINT8* robokid_bg1_videoram;
 static UINT8* robokid_bg2_videoram;
 
 
+/*************************************
+ *
+ *  Callbacks for the TileMap code
+ *
+ *************************************/
+
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int const lo = ninjakd2_fg_videoram[(tile_index << 1)];
@@ -113,6 +119,12 @@ static TILE_GET_INFO( robokid_get_bg2_tile_info )
 
 
 
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
 static void videoram_alloc(const running_machine* const machine, int const size)
 {
 	if (size)
@@ -135,8 +147,8 @@ VIDEO_START( ninjakd2 )
 {
 	videoram_alloc(machine, 0);
 
-	fg_tilemap = tilemap_create(         get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
-	bg_tilemap = tilemap_create(ninjakd2_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 32, 32);
+	fg_tilemap = tilemap_create(         get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	bg_tilemap = tilemap_create(ninjakd2_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
@@ -147,8 +159,8 @@ VIDEO_START( mnight )
 {
 	videoram_alloc(machine, 0);
 
-	fg_tilemap = tilemap_create(       get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
-	bg_tilemap = tilemap_create(mnight_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 32, 32);
+	fg_tilemap = tilemap_create(       get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	bg_tilemap = tilemap_create(mnight_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
@@ -161,10 +173,10 @@ VIDEO_START( robokid )
 
 	videoram_alloc(machine, 0x0800);
 
-	fg_tilemap  = tilemap_create(        get_fg_tile_info,  tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
-	bg0_tilemap = tilemap_create(robokid_get_bg0_tile_info, robokid_bg_scan,   TILEMAP_TYPE_PEN, 16, 16, 32, 32);
-	bg1_tilemap = tilemap_create(robokid_get_bg1_tile_info, robokid_bg_scan,   TILEMAP_TYPE_PEN, 16, 16, 32, 32);
-	bg2_tilemap = tilemap_create(robokid_get_bg2_tile_info, robokid_bg_scan,   TILEMAP_TYPE_PEN, 16, 16, 32, 32);
+	fg_tilemap  = tilemap_create(        get_fg_tile_info,  tilemap_scan_rows,   8,  8, 32, 32);
+	bg0_tilemap = tilemap_create(robokid_get_bg0_tile_info, robokid_bg_scan,    16, 16, 32, 32);
+	bg1_tilemap = tilemap_create(robokid_get_bg1_tile_info, robokid_bg_scan,    16, 16, 32, 32);
+	bg2_tilemap = tilemap_create(robokid_get_bg2_tile_info, robokid_bg_scan,    16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap,  15);
 	tilemap_set_transparent_pen(bg1_tilemap, 15);
@@ -179,10 +191,10 @@ VIDEO_START( omegaf )
 
 	videoram_alloc(machine, 0x2000);
 
-	fg_tilemap  = tilemap_create(        get_fg_tile_info,  tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8,  32, 32);
-	bg0_tilemap = tilemap_create(robokid_get_bg0_tile_info, omegaf_bg_scan,    TILEMAP_TYPE_PEN, 16, 16, 128, 32);
-	bg1_tilemap = tilemap_create(robokid_get_bg1_tile_info, omegaf_bg_scan,    TILEMAP_TYPE_PEN, 16, 16, 128, 32);
-	bg2_tilemap = tilemap_create(robokid_get_bg2_tile_info, omegaf_bg_scan,    TILEMAP_TYPE_PEN, 16, 16, 128, 32);
+	fg_tilemap  = tilemap_create(        get_fg_tile_info,  tilemap_scan_rows,   8,  8,  32, 32);
+	bg0_tilemap = tilemap_create(robokid_get_bg0_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
+	bg1_tilemap = tilemap_create(robokid_get_bg1_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
+	bg2_tilemap = tilemap_create(robokid_get_bg2_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap,  15);
 	tilemap_set_transparent_pen(bg0_tilemap, 15);
@@ -193,6 +205,12 @@ VIDEO_START( omegaf )
 }
 
 
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 WRITE8_HANDLER( ninjakd2_bgvideoram_w )
 {
@@ -309,6 +327,13 @@ WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
 	next_sprite_overdraw_enabled = data & 1;
 }
 
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
 
 static void draw_sprites(running_machine* const machine, mame_bitmap* const bitmap, const rectangle* const cliprect)
 {

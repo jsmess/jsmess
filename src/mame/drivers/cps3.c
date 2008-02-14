@@ -2437,7 +2437,7 @@ static INPUT_PORTS_START( cps3 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x00020000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00fc0000, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2522,7 +2522,7 @@ static MACHINE_RESET( cps3 )
 	{
 		fastboot_timer = timer_alloc(fastboot_timer_callback, NULL);
 	//  printf("reset\n");
-		timer_adjust(fastboot_timer, attotime_zero, 0, attotime_zero);
+		timer_adjust_oneshot(fastboot_timer, attotime_zero, 0);
 	}
 }
 

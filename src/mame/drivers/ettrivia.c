@@ -194,8 +194,8 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 static VIDEO_START( ettrivia )
 {
-	bg_tilemap = tilemap_create( get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
-	fg_tilemap = tilemap_create( get_tile_info_fg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
+	bg_tilemap = tilemap_create( get_tile_info_bg,tilemap_scan_rows,8,8,64,32 );
+	fg_tilemap = tilemap_create( get_tile_info_fg,tilemap_scan_rows,8,8,64,32 );
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
@@ -244,7 +244,6 @@ static MACHINE_DRIVER_START( ettrivia )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(ettrivia)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(32*4+32*4)
 
 	MDRV_PALETTE_INIT(naughtyb)
 	MDRV_VIDEO_START(ettrivia)

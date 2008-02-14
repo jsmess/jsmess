@@ -6,6 +6,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 
 #include "includes/aim65.h"
 #include "machine/6522via.h"

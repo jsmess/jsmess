@@ -3,6 +3,7 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/beep.h"
 #include "video/cdp1864.h"
+#include "mslegacy.h"
 
 static mame_bitmap *cdptmpbitmap;
 

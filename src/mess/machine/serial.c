@@ -30,6 +30,7 @@ setup serial interface software in driver and let the transfer begin */
 */
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "includes/serial.h"
 
 #define VERBOSE 0

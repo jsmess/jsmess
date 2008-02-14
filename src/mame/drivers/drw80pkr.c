@@ -29,7 +29,6 @@
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "cpu/i8039/i8039.h"
-#include "video/crtc6845.h"
 
 static tilemap *bg_tilemap;
 
@@ -108,7 +107,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( drw80pkr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 40, 25);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 }
 
 static VIDEO_UPDATE( drw80pkr )

@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "z80dart.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

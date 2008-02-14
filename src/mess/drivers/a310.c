@@ -35,6 +35,7 @@
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 
 // interrupt register stuff

@@ -10,6 +10,7 @@
 */
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "at29040.h"
 
 #define MAX_AT29C040A 4

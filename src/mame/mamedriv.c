@@ -141,6 +141,7 @@ const game_driver * const drivers[] =
 	DRIVER( galaxiaj )	/* (c) Namco */
 	DRIVER( galmidw )	/* (c) Midway */
 	DRIVER( galmidwo )	/* (c) Midway */
+	DRIVER( galtaito )	/* (c) Taito */
 	DRIVER( superg )	/* hack */
 	DRIVER( galapx )	/* hack */
 	DRIVER( moonaln )	/* [Nichibutsu] (Karateco license) or hack */
@@ -2045,6 +2046,7 @@ const game_driver * const drivers[] =
 	DRIVER( hellfir1 )	/* B90 / TP-??? (c) 1989 Toaplan + Taito license */
 	DRIVER( hellfir2 )	/* B90 / TP-??? (c) 1989 Toaplan + Taito license */
 	DRIVER( zerowing )	/* TP-015 (c) 1989 Toaplan */
+	DRIVER( zerowng2 )	/* TP-015 (c) 1989 Toaplan */
 	DRIVER( demonwld )	/* TP-016 (c) 1990 Toaplan (+ Taito license when set to Japan) */
 	DRIVER( demonwl1 )	/* TP-016 (c) 1989 Toaplan + Taito license */
 	DRIVER( demonwl2 )	/* TP-016 (c) 1989 Toaplan */
@@ -4473,7 +4475,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jailbrek )	/* GX507 (c) 1986 */
 	DRIVER( manhatan )	/* GX507 (c) 1986 (Japan) */
    	DRIVER( jailbrkb )	/* bootleg */
-    DRIVER( scotrsht )	/* GX545 (c) 1985 */
+	DRIVER( scotrsht )	/* GX545 (c) 1985 */
 	DRIVER( finalizr )	/* GX523 (c) 1985 */
 	DRIVER( finalizb )	/* bootleg */
 	DRIVER( ironhors )	/* GX560 (c) 1986 */
@@ -4485,6 +4487,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( topgunbl )	/* bootleg */
 	DRIVER( ddribble )	/* GX690 (c) 1986 */
 	DRIVER( contra )	/* GX633 (c) 1987 */
+	DRIVER( contra1 )	/* GX633 (c) 1987 */
 	DRIVER( contrab )	/* bootleg */
 	DRIVER( contraj )	/* GX633 (c) 1987 (Japan) */
 	DRIVER( contrajb )	/* bootleg */
@@ -6063,10 +6066,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gauntd24 )	/* (c) 1999 Midway Games */
 	DRIVER( cartfury )	/* (c) 2000 Midway Games */
 
-	/* Midway Touchmaster games */
+	/* Midway Touchmaster / Galaxy Games */
 	DRIVER( tm )		/* (c) 1996 Midway Games */
 	DRIVER( tm3k )		/* (c) 1996 Midway Games */
 	DRIVER( tm4k )		/* (c) 1996 Midway Games */
+	DRIVER( galgbios )  /* (c) 1998 Creative Electonics & Software (CES) */
 
 	/* Cinematronics raster games */
 	DRIVER( embargo )
@@ -6368,6 +6372,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kirarast )	/* (c) 1996 */
 	DRIVER( tp2m32 )	/* (c) 1997 */
 	DRIVER( bnstars )	/* (c) 1997 */
+	DRIVER( wpksocv2 )  /* (c) 1997 */
 
 	DRIVER( f1superb )	/* (c) 1994 */
 
@@ -6590,6 +6595,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( blazeon )	/* (c) 1992 Atlus */
 	DRIVER( sandscrp )	/* (c) 1992 Face */
 	DRIVER( sandscra )	/* (c) 1992 Face */
+	DRIVER( sandscrb )	/* (c) 1992 Face */
 	DRIVER( explbrkr )	/* (c) 1992 Kaneko */
 	DRIVER( bakubrkr )	/* (c) 1992 Kaneko */
 	DRIVER( shogwarr )	/* (c) 1992 Kaneko */
@@ -7781,24 +7787,32 @@ Other Sun games
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolycdae )	/* (c) 1985 TAB-Austria */
+	DRIVER( jolyc3x3 )	/* (c) 1985 TAB-Austria */
+	DRIVER( jolyc980 )	/* (c) 2000 Spale-Soft */
 	DRIVER( jolycdcr )	/* (c) 1993 Soft Design */
 	DRIVER( jolycdit )	/* 199? bootleg */
-	DRIVER( jolycdat )	/* (c) 1986 Fun World */
-	DRIVER( jolycdab )	/* (c) 1990 Inter Games */
-	DRIVER( bigdeal )	/* (c) 1986 Fun World */
-	DRIVER( bigdealb )	/* (c) 1986 Fun World */
+	DRIVER( jolycdab )	/* (c) 1986 Inter Games */
+	DRIVER( bigdeal )	/* (c) 1986 Funworld */
+	DRIVER( bigdealb )	/* (c) 1986 Funworld */
+	DRIVER( jolycdat )	/* (c) 1986 Funworld */
 	DRIVER( cuoreuno )	/* (c) 1996 C.M.C. */
-	DRIVER( elephfam )	/* (c) 1996 C.M.C. */
+	DRIVER( elephfam )	/* (c) 1997 C.M.C. */
 	DRIVER( elephfmb )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10 )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10b )	/* (c) 1996 C.M.C. */
 	DRIVER( tortufam )	/* (c) 1997 C.M.C. */
 	DRIVER( royalcrd )	/* (c) 1991 TAB-Austria */
 	DRIVER( royalcdb )	/* (c) 1991 TAB-Austria */
-	DRIVER( royalcdc )	/* (c) 199? Evona Electronic */
+	DRIVER( royalcdc )	/* (c) 1991 Evona Electronic */
+	DRIVER( lluck3x3 )	/* (c) 1991 TAB-Austria */
+	DRIVER( lluck4x1 )	/* (c) 1991 TAB-Austria */
 	DRIVER( magiccrd )	/* (c) 1996 Impera */
+	DRIVER( magiccda )	/* (c) 1996 Impera */
+	DRIVER( magiccdb )	/* (c) 1996 Impera */
+	DRIVER( vegasslw )	/* (c) 1993 Funworld */
+	DRIVER( vegasfst )	/* (c) 1993 Soft Design */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
-	DRIVER( monglfir )	/* 199? bootleg */
+	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
 	DRIVER( snookr10 )	/* (c) 1998 Sandiy */
 	DRIVER( saloon )	/* 199? unknown */
@@ -7925,6 +7939,7 @@ Other Sun games
 	DRIVER( drw80pkr )
 	DRIVER( blazlaz )
 	DRIVER( paranoia )
-	DRIVER( galgbios )  /* (c) 1998 Creative Electonics */
+	DRIVER( vcombat )   /* (c) 1993 VR8 Inc. */
+	DRIVER( shadfgtr )  /* (c) 1989 Sega? */
 
 #endif	/* DRIVER_RECURSIVE */

@@ -34,6 +34,7 @@
 */
 
 #include "68901mfp.h"
+#include "mslegacy.h"
 
 typedef struct
 {

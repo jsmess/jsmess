@@ -10,6 +10,7 @@
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"
@@ -19,7 +20,7 @@
 #include "includes/vc20tape.h"
 #include "includes/cbmieeeb.h"
 #include "video/vic6567.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 
 
 static TIMER_CALLBACK(cbmb_frame_interrupt);
@@ -252,7 +253,7 @@ static void cbmb_display_enable_changed(int display_enabled) {
 }
 
 //static const struct mscrtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };
-static const crtc6845_interface cbm600_crtc = {
+static const mc6845_interface cbm600_crtc = {
 	0,
 	1600000 /*?*/,
 	8 /*?*/,
@@ -286,7 +287,7 @@ void cbm600hu_driver_init (void)
 }
 
 //static const struct mscrtc6845_config cbm700_crtc= { 2000000 /*?*/, cbmb_vh_cursor };
-static const crtc6845_interface cbm700_crtc = {
+static const mc6845_interface cbm700_crtc = {
 	0,
 	2000000 /*?*/,
 	9 /*?*/,

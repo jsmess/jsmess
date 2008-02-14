@@ -303,13 +303,13 @@ static WRITE32_HANDLER( timers_w )
 
 	model2_timerorig[offset] = model2_timervals[offset];
 	period = attotime_mul(ATTOTIME_IN_HZ(25000000), model2_timerorig[offset]);
-	timer_adjust(model2_timers[offset], period, 0, attotime_zero);
+	timer_adjust_oneshot(model2_timers[offset], period, 0);
 	model2_timerrun[offset] = 1;
 }
 
 static void model2_timer_exp(int tnum, int bit)
 {
-	timer_adjust(model2_timers[tnum], attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
 
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
@@ -348,10 +348,10 @@ static MACHINE_RESET(model2_common)
 	model2_timers[2] = timer_alloc(model2_timer_2_cb, NULL);
 	model2_timers[3] = timer_alloc(model2_timer_3_cb, NULL);
 
-	timer_adjust(model2_timers[0], attotime_never, 0, attotime_never);
-	timer_adjust(model2_timers[1], attotime_never, 0, attotime_never);
-	timer_adjust(model2_timers[2], attotime_never, 0, attotime_never);
-	timer_adjust(model2_timers[3], attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(model2_timers[0], attotime_never, 0);
+	timer_adjust_oneshot(model2_timers[1], attotime_never, 0);
+	timer_adjust_oneshot(model2_timers[2], attotime_never, 0);
+	timer_adjust_oneshot(model2_timers[3], attotime_never, 0);
 }
 
 static MACHINE_RESET(model2o)
@@ -1425,7 +1425,7 @@ static INPUT_PORTS_START( model2 )
 	PORT_START
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2 )
@@ -1443,7 +1443,7 @@ static INPUT_PORTS_START( desert )
 	PORT_START
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) // VR 1 (Blue)
@@ -1474,7 +1474,7 @@ static INPUT_PORTS_START( daytona )
 	PORT_START
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) // VR 1 (Red)
@@ -1507,7 +1507,7 @@ static INPUT_PORTS_START( bel )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)

@@ -66,6 +66,7 @@
 #include "driver.h"
 #include "m6847.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 #ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"

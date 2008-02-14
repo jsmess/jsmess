@@ -212,23 +212,23 @@ static TIMER_CALLBACK( scanline_callback )
 	{
     	if (out&0x2000)
     		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
-		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, param+1, 0), param+1, attotime_zero);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, param+1, 0), param+1);
 		interrupt_line_active = 1;
 	}
 	else
 	{
 		if (interrupt_line_active)
 	    	cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
-		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, attotime_zero);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline);
 		interrupt_line_active = 0;
 	}
 }
 
 static VIDEO_START( pkscramble )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8,32,32);
-	md_tilemap = tilemap_create(get_md_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8,32,32);
+	md_tilemap = tilemap_create(get_md_tile_info, tilemap_scan_rows, 8, 8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(md_tilemap,15);
 	tilemap_set_transparent_pen(fg_tilemap,15);
@@ -275,7 +275,7 @@ static MACHINE_RESET( pkscramble)
 	out = 0;
 	interrupt_line_active=0;
 	scanline_timer = timer_alloc(scanline_callback, NULL);
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, attotime_zero);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline);
 
 	state_save_register_global(out);
 	state_save_register_global(interrupt_line_active);

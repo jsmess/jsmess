@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 #include "sound/ay8910.h"
 
 #define MAIN_CLOCK 10595000
@@ -29,6 +29,8 @@ static UINT8 madalien_edge2_pos;
 static UINT8 madalien_headlight_pos;
 static UINT8 madalien_shift_count;
 static UINT8 madalien_shift_data;
+
+static mc6845_t *mc6845;
 
 static tilemap* tilemap_fg;
 
@@ -82,6 +84,22 @@ static PALETTE_INIT( madalien )
 			colortable[0x10 + i] ^= 6;
 		}
 	}
+}
+
+
+static WRITE8_HANDLER( madalien_mc6845_address_w )
+{
+	mc6845_address_w(mc6845, data);
+}
+
+static READ8_HANDLER( madalien_mc6845_register_r )
+{
+	return mc6845_register_r(mc6845);
+}
+
+static WRITE8_HANDLER( madalien_mc6845_register_w )
+{
+	mc6845_register_w(mc6845, data);
 }
 
 
@@ -161,7 +179,7 @@ static VIDEO_START( madalien )
 {
 	rectangle rect = { 0, 127, 0, 127 };
 
-	static const crtc6845_interface crtc6845_intf =
+	static const mc6845_interface mc6845_intf =
 	{
 		0,                /* screen we are acting on */
 		PIXEL_CLOCK / 8,  /* the clock of the chip  */
@@ -172,30 +190,30 @@ static VIDEO_START( madalien )
 		NULL              /* call back for display state changes */
 	};
 
-	crtc6845_config(0, &crtc6845_intf);
+	mc6845 = mc6845_config(&mc6845_intf);
 
 	tilemap_fg = tilemap_create(get_tile_info_FG,
-		tilemap_scan_cols_flip_x, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+		tilemap_scan_cols_flip_x, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(tilemap_fg, 0);
 
 	tilemap_edge1[0] = tilemap_create(get_tile_info_BG,
-		scan_mode0, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+		scan_mode0, 16, 16, 16, 8);
 	tilemap_edge1[1] = tilemap_create(get_tile_info_BG,
-		scan_mode1, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+		scan_mode1, 16, 16, 16, 8);
 	tilemap_edge1[2] = tilemap_create(get_tile_info_BG,
-		scan_mode2, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+		scan_mode2, 16, 16, 32, 8);
 	tilemap_edge1[3] = tilemap_create(get_tile_info_BG,
-		scan_mode3, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+		scan_mode3, 16, 16, 32, 8);
 
 	tilemap_edge2[0] = tilemap_create(get_tile_info_BG,
-		scan_mode0, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+		scan_mode0, 16, 16, 16, 8);
 	tilemap_edge2[1] = tilemap_create(get_tile_info_BG,
-		scan_mode1, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+		scan_mode1, 16, 16, 16, 8);
 	tilemap_edge2[2] = tilemap_create(get_tile_info_BG,
-		scan_mode2, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+		scan_mode2, 16, 16, 32, 8);
 	tilemap_edge2[3] = tilemap_create(get_tile_info_BG,
-		scan_mode3, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+		scan_mode3, 16, 16, 32, 8);
 
 	update_edges(0);
 
@@ -497,8 +515,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x7fff) AM_RAM AM_BASE(&madalien_charram)
 
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(madalien_mc6845_address_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(madalien_mc6845_register_r, madalien_mc6845_register_w)
 	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITE(madalien_screen_control_w)
 	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
 	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READWRITE(soundlatch2_r, madalien_sound_command_w)

@@ -118,7 +118,7 @@ static TIMER_CALLBACK( cursor_callback )
 	if (lockon_main_inten)
 		cpunum_set_input_line_and_vector(machine, MAIN_CPU, 0, HOLD_LINE, 0xff);
 
-	timer_adjust(cursor_timer, video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), 0, attotime_zero);
+	timer_adjust_oneshot(cursor_timer, video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
 
 /*************************************
@@ -428,7 +428,7 @@ static void ground_draw(void)
 		/* End of list marker */
 		if (lockon_ground_ram[offs + 2] & 0x8000)
 		{
-			timer_adjust(bufend_timer, attotime_mul(ATTOTIME_IN_HZ(FRAMEBUFFER_CLOCK), FRAMEBUFFER_MAX_X * y), 0, attotime_zero);
+			timer_adjust_oneshot(bufend_timer, attotime_mul(ATTOTIME_IN_HZ(FRAMEBUFFER_CLOCK), FRAMEBUFFER_MAX_X * y), 0);
 		}
 	}
 }
@@ -935,7 +935,7 @@ static void hud_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_START( lockon )
 {
-	lockon_tilemap = tilemap_create(get_lockon_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	lockon_tilemap = tilemap_create(get_lockon_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_transparent_pen(lockon_tilemap, 0);
 
 	/* Allocate the two frame buffers for rotation */
@@ -950,7 +950,7 @@ VIDEO_START( lockon )
 
 	/* Timer for the CRTC cursor pulse */
 	cursor_timer = timer_alloc(cursor_callback, NULL);
-	timer_adjust(cursor_timer, video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), 0, attotime_zero);
+	timer_adjust_oneshot(cursor_timer, video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
 
 VIDEO_UPDATE( lockon )

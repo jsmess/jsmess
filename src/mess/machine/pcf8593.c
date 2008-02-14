@@ -8,6 +8,7 @@
 
 #include "pcf8593.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 #include <time.h>
 

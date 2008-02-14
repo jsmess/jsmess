@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "includes/thomson.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"

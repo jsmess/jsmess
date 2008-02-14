@@ -80,6 +80,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -93,7 +94,7 @@
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
 #include "sound/ay8910.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 
 #define EINSTEIN_SYSTEM_CLOCK 4000000
 
@@ -253,7 +254,7 @@ static void einstein_6845_display_enable_changed(int display_enabled) {
 	}
 }
 
-static const crtc6845_interface einstein_crtc6845_interface = {
+static const mc6845_interface einstein_crtc6845_interface = {
 	0,
 	EINSTEIN_SYSTEM_CLOCK /*?*/,
 	8 /*?*/,

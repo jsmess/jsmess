@@ -155,7 +155,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( m52 )
 {
-	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 128 - 1, -1);
@@ -332,7 +332,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	fillbitmap(bitmap, machine->remapped_colortable[machine->gfx[image]->color_base + 3], &rect);
+	fillbitmap(bitmap, machine->pens[machine->gfx[image]->color_base + 3], &rect);
 }
 
 

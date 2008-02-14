@@ -127,6 +127,7 @@
 #include "driver.h"
 #include "render.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
 #include "machine/8255ppi.h"

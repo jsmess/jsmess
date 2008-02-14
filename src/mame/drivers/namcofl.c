@@ -182,7 +182,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0, attotime_zero);
+		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0);
 	}
 }
 
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( namcofl )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_TOGGLE PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -329,7 +329,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	video_screen_update_partial(0, video_screen_get_vpos(0));
 	cpunum_set_input_line(machine, 0, I960_IRQ1, ASSERT_LINE);
-	timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, attotime_zero);
+	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(0), 0);
 }
 
 

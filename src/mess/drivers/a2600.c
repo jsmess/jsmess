@@ -13,6 +13,7 @@
 #include "formats/a26_cas.h"
 #include "video/tia.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 #define CART memory_region(REGION_USER1)
 

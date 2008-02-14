@@ -314,13 +314,14 @@
 #define MASTER_CLOCK	10000000	/* 10MHz */
 
 #include "driver.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 
 
 /*************************
 *     Video Hardware     *
 *************************/
 
+static mc6845_t *mc6845;
 static tilemap *bg_tilemap;
 
 static WRITE8_HANDLER( magicfly_videoram_w )
@@ -333,6 +334,21 @@ static WRITE8_HANDLER( magicfly_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
+}
+
+static WRITE8_HANDLER( magicfly_mc6845_address_w )
+{
+	mc6845_address_w(mc6845, data);
+}
+
+static READ8_HANDLER( magicfly_mc6845_register_r )
+{
+	return mc6845_register_r(mc6845);
+}
+
+static WRITE8_HANDLER( magicfly_mc6845_register_w )
+{
+	mc6845_register_w(mc6845, data);
 }
 
 static TILE_GET_INFO( get_magicfly_tile_info )
@@ -363,8 +379,8 @@ static TILE_GET_INFO( get_magicfly_tile_info )
 
 static VIDEO_START(magicfly)
 {
-	bg_tilemap = tilemap_create(get_magicfly_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 29);
+	mc6845 = mc6845_config(NULL);
+	bg_tilemap = tilemap_create(get_magicfly_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
 static TILE_GET_INFO( get_7mezzo_tile_info )
@@ -396,7 +412,7 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
 static VIDEO_START( 7mezzo )
 {
 	bg_tilemap = tilemap_create(get_7mezzo_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 29);
+		8, 8, 32, 29);
 }
 
 static VIDEO_UPDATE( magicfly )
@@ -454,8 +470,8 @@ static WRITE8_HANDLER( mux_w )
 
 static ADDRESS_MAP_START( magicfly_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    /* MK48Z02B NVRAM */
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(crtc6845_address_w)                                   /* MC6845P register addressing */
-	AM_RANGE(0x0801, 0x0801) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)         /* MC6845P register values */
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(magicfly_mc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_READWRITE(magicfly_mc6845_register_r, magicfly_mc6845_register_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(magicfly_videoram_w) AM_BASE(&videoram)        /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_WRITE(magicfly_colorram_w) AM_BASE(&colorram)        /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)  /* multiplexed input port */

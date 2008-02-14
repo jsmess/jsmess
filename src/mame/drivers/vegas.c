@@ -965,7 +965,7 @@ static TIMER_CALLBACK( nile_timer_callback )
 		if (regs[1] & 2)
 			logerror("Unexpected value: timer %d is prescaled\n", which);
 		if (scale != 0)
-			timer_adjust(timer[which], attotime_mul(TIMER_PERIOD, scale), which, attotime_never);
+			timer_adjust_oneshot(timer[which], attotime_mul(TIMER_PERIOD, scale), which);
 	}
 
 	/* trigger the interrupt */
@@ -1178,7 +1178,7 @@ static WRITE32_HANDLER( nile_w )
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (scale != 0)
-					timer_adjust(timer[which], attotime_mul(TIMER_PERIOD, scale), which, attotime_never);
+					timer_adjust_oneshot(timer[which], attotime_mul(TIMER_PERIOD, scale), which);
 				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ(attotime_mul(TIMER_PERIOD, nile_regs[offset + 1] + 1).attoseconds));
 			}
 
@@ -1188,7 +1188,7 @@ static WRITE32_HANDLER( nile_w )
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
 				nile_regs[offset + 1] = attotime_to_double(timer_timeleft(timer[which])) * SYSTEM_CLOCK;
-				timer_adjust(timer[which], attotime_never, which, attotime_never);
+				timer_adjust_oneshot(timer[which], attotime_never, which);
 			}
 			break;
 
@@ -1204,7 +1204,7 @@ static WRITE32_HANDLER( nile_w )
 			{
 				if (nile_regs[offset - 1] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				timer_adjust(timer[which], attotime_mul(TIMER_PERIOD, nile_regs[offset]), which, attotime_never);
+				timer_adjust_oneshot(timer[which], attotime_mul(TIMER_PERIOD, nile_regs[offset]), which);
 			}
 			break;
 
@@ -1781,7 +1781,7 @@ static INPUT_PORTS_START( vegas_common )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2) /* Test switch */
+	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )

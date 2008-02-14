@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "includes/cbmb.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 
 
 static int cbmb_font=0;

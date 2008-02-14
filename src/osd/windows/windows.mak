@@ -286,25 +286,6 @@ $(LEDUTIL): $(LEDUTILOBJS) $(LIBOCORE)
 
 
 #-------------------------------------------------
-# rule for making the verinfo tool
-#-------------------------------------------------
-
-VERINFO = $(WINOBJ)/verinfo$(EXE)
-
-ifneq ($(CROSS_BUILD),1)
-BUILD += $(VERINFO)
-
-VERINFOOBJS = \
-	$(WINOBJ)/verinfo.o
-
-$(VERINFO): $(VERINFOOBJS) $(LIBOCORE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-endif
-
-
-
-#-------------------------------------------------
 # generic rule for the resource compiler
 #-------------------------------------------------
 
@@ -320,6 +301,6 @@ $(WINOBJ)/%.res: $(WINSRC)/%.rc | $(OSPREBUILD)
 
 $(RESFILE): $(WINSRC)/mame.rc $(WINOBJ)/mamevers.rc
 
-$(WINOBJ)/mamevers.rc: $(VERINFO) $(SRC)/version.c
+$(WINOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
-	@$(VERINFO) $(SRC)/version.c > $@
+	@$(OBJ)/build/verinfo$(EXE) $(SRC)/version.c > $@

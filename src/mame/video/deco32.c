@@ -490,7 +490,7 @@ INLINE void dragngun_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			int source_base = (code % gfx->total_elements) * gfx->height;
 
 			if (sprite_screen_width && sprite_screen_height)
@@ -949,10 +949,10 @@ static TILE_GET_INFO( get_ll_pf4_tile_info )
 
 VIDEO_START( captaven )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_ca_pf3_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
+	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(get_ca_pf3_tile_info, tilemap_scan_rows,16,16,32,32);
 	deco32_raster_display_list=auto_malloc(10 * 256);
 	memset(deco32_raster_display_list, 0, 10 * 256);
 
@@ -968,10 +968,10 @@ VIDEO_START( captaven )
 
 VIDEO_START( fghthist )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_pf3_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf4_tilemap = tilemap_create(get_pf4_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
+	pf4_tilemap = tilemap_create(get_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
@@ -988,11 +988,11 @@ VIDEO_START( fghthist )
 
 VIDEO_START( dragngun )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_ll_pf3_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf4_tilemap = tilemap_create(get_ll_pf4_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,32);
-	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(get_ll_pf3_tile_info, deco16_scan_rows,16,16,64,32);
+	pf4_tilemap = tilemap_create(get_ll_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
+	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
 	dirty_palette = auto_malloc(4096);
 	deco32_raster_display_list = auto_malloc(10 * 256);
 
@@ -1011,11 +1011,11 @@ VIDEO_START( dragngun )
 
 VIDEO_START( lockload )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_ll_pf3_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	pf4_tilemap = tilemap_create(get_ll_pf4_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
-	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(get_ll_pf3_tile_info, deco16_scan_rows,16,16,32,32);
+	pf4_tilemap = tilemap_create(get_ll_pf4_tile_info, deco16_scan_rows,     16,16,32,32);
+	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
 	dirty_palette = auto_malloc(4096);
 	deco32_raster_display_list = auto_malloc(10 * 256);
 	memset(deco32_raster_display_list, 0, 10 * 256);
@@ -1035,10 +1035,10 @@ VIDEO_START( lockload )
 
 VIDEO_START( nslasher )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_pf3_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf4_tilemap = tilemap_create(get_pf4_tile_info, deco16_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
+	pf4_tilemap = tilemap_create(get_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
@@ -1414,9 +1414,9 @@ VIDEO_UPDATE( fghthist )
 */
 static void mixDualAlphaSprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
 {
-	const pen_t *pal0 = &machine->remapped_colortable[gfx0->color_base];
-	const pen_t *pal1 = &machine->remapped_colortable[gfx1->color_base];
-	const pen_t *pal2 = &machine->remapped_colortable[(deco32_pri&1) ? machine->gfx[1]->color_base : machine->gfx[2]->color_base];
+	const pen_t *pal0 = &machine->pens[gfx0->color_base];
+	const pen_t *pal1 = &machine->pens[gfx1->color_base];
+	const pen_t *pal2 = &machine->pens[(deco32_pri&1) ? machine->gfx[1]->color_base : machine->gfx[2]->color_base];
 	int x,y;
 
 	/* Mix sprites into main bitmap, based on priority & alpha */

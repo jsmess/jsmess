@@ -24,6 +24,7 @@
 #include "machine/8237dma.h"
 #include "devices/harddriv.h"
 #include "memconv.h"
+#include "mslegacy.h"
 
 
 #define LOG_HDC_STATUS		0

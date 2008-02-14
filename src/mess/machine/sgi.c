@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "sgi.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 #define VERBOSE_LEVEL ( 1 )
 

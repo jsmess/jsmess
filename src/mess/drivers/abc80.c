@@ -79,6 +79,7 @@ Notes:
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
 #include "machine/abcbus.h"
+#include "mslegacy.h"
 
 /* Devices */
 #include "devices/basicdsk.h"

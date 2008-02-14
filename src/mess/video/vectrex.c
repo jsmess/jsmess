@@ -1,6 +1,7 @@
 #include <math.h>
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "includes/vectrex.h"
 #include "video/vector.h"
 #include "machine/6522via.h"

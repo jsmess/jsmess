@@ -13,6 +13,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "includes/gb.h"
 #include "cpu/z80gb/z80gb.h"
 #include "profiler.h"

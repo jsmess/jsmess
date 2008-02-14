@@ -793,7 +793,7 @@ static void internal_post_key(unicode_char ch)
 	/* need to start up the timer? */
 	if (keybuf->begin_pos == keybuf->end_pos)
 	{
-		timer_adjust(inputx_timer, choose_delay(ch), 0, attotime_zero);
+		timer_adjust_oneshot(inputx_timer, choose_delay(ch), 0);
 		keybuf->status_keydown = 0;
 	}
 
@@ -909,7 +909,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 	if (keybuf->begin_pos != keybuf->end_pos)
 	{
 		delay = choose_delay(keybuf->buffer[keybuf->begin_pos]);
-		timer_adjust(inputx_timer, delay, 0, attotime_zero);
+		timer_adjust_oneshot(inputx_timer, delay, 0);
 	}
 }
 

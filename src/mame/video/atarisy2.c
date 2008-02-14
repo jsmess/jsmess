@@ -124,13 +124,13 @@ VIDEO_START( atarisy2 )
 	atarigen_playfield = &vram[0x2000];
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 128,64);
+	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,48);
+	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 
 	/* reset the statics */
@@ -196,7 +196,7 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 	if (!(newscroll & 0x10))
 		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(0));
 	else
-		timer_adjust(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll >> 6, attotime_zero);
+		timer_adjust_oneshot(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll >> 6);
 
 	/* update the playfield banking */
 	if (playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)

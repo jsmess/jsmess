@@ -6,6 +6,7 @@
 
 #include "machine/hd63450.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 static struct hd63450 dmac;
 

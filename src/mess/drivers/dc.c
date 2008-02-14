@@ -16,6 +16,8 @@
 
 static UINT64 *dc_sound_ram;
 
+UINT32 dma_offset;	/* silly MAME global variable */
+
 static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM						// BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION(REGION_CPU1, 0x200000)	// flash

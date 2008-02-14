@@ -178,7 +178,7 @@ static TIMER_CALLBACK( response_timer )
 
 	/* if there's more to come, set another timer */
 	if (laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, attotime_zero);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
 	else
 		serial_timer_active = FALSE;
 }
@@ -192,7 +192,7 @@ static void vsync_callback(void)
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, attotime_zero);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
 		serial_timer_active = TRUE;
 	}
 }
@@ -206,7 +206,7 @@ static void serial_w(UINT16 data)
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, attotime_zero);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
 		serial_timer_active = TRUE;
 	}
 }
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( alg )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("P1JOY")		/* referenced by JOY0DAT */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )

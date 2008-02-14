@@ -64,6 +64,7 @@
 //
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "devices/harddriv.h"
 #include "includes/corvushd.h"
 #include <ctype.h>

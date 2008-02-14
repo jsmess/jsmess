@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "machine/nec765.h"
 
 typedef enum

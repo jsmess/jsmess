@@ -1,6 +1,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"

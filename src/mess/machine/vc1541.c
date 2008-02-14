@@ -102,6 +102,7 @@ FF00-FFFF       Jump table, vectors
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"

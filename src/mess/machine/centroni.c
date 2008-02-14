@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "centroni.h"
+#include "mslegacy.h"
 #include "devices/printer.h"
 
 typedef struct {

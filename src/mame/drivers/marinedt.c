@@ -354,7 +354,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 //freezes the game before the reset
 //doesn't seem to be done as a dip, but what about mixing with diops like this?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_TOGGLE PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -450,7 +450,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( marinedt )
 {
-	tx_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
+	tx_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 	tilemap_set_scrolldx(tx_tilemap, 0, 4*8);

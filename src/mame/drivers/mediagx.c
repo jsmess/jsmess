@@ -169,7 +169,7 @@ static VIDEO_START(mediagx)
 	}
 }
 
-static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	UINT8 *dp;
@@ -183,15 +183,11 @@ static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_
 		{
 			UINT8 pen = dp[index++];
 			if (pen)
-			{
-				p[i] = Machine->remapped_colortable[gfx->color_base + (att & 0xf)];
-			}
+				p[i] = machine->pens[gfx->color_base + (att & 0xf)];
 			else
 			{
 				if (((att >> 4) & 7) > 0)
-				{
-					p[i] = Machine->remapped_colortable[gfx->color_base + ((att >> 4) & 0x7)];
-				}
+					p[i] = machine->pens[gfx->color_base + ((att >> 4) & 0x7)];
 			}
 		}
 	}
@@ -304,8 +300,8 @@ static void draw_cga(running_machine *machine, mame_bitmap *bitmap, const rectan
 			int att1 = (cga[index] >> 24) & 0xff;
 			int ch1 = (cga[index] >> 16) & 0xff;
 
-			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
+			draw_char(machine, bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
+			draw_char(machine, bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
 			index++;
 		}
 	}
@@ -643,7 +639,7 @@ static void cx5510_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 static TIMER_CALLBACK( sound_timer_callback )
 {
 	ad1847_sample_counter = 0;
-	timer_adjust(sound_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
+	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
 
 	dmadac_transfer(0, 1, 0, 1, dacl_ptr, dacl);
 	dmadac_transfer(1, 1, 0, 1, dacr_ptr, dacr);
@@ -782,7 +778,7 @@ GFXDECODE_END
 
 static INPUT_PORTS_START(mediagx)
 	PORT_START
-	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x001, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
 	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
@@ -860,7 +856,7 @@ static MACHINE_RESET(mediagx)
 	dacr = auto_malloc(65536 * sizeof(INT16));
 
 	sound_timer = timer_alloc(sound_timer_callback, NULL);
-	timer_adjust(sound_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
+	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
 
 	dmadac_enable(0, 2, 1);
 	ide_controller_reset(0);

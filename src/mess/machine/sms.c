@@ -2,6 +2,7 @@
 #include "driver.h"
 #include "image.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"

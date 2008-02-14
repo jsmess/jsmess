@@ -13,6 +13,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"

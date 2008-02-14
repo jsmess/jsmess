@@ -7,6 +7,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "includes/thomson.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"

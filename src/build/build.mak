@@ -25,11 +25,13 @@ OBJDIRS += \
 
 FILE2STR = $(BUILDOUT)/file2str$(EXE)
 PNG2BDC = $(BUILDOUT)/png2bdc$(EXE)
+VERINFO = $(BUILDOUT)/verinfo$(EXE)
 
 ifneq ($(CROSS_BUILD),1)
 BUILD += \
 	$(FILE2STR) \
 	$(PNG2BDC) \
+	$(VERINFO) \
 
 
 
@@ -42,7 +44,7 @@ FILE2STROBJS = \
 
 $(FILE2STR): $(FILE2STROBJS) $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ -o $@
 
 
 
@@ -53,9 +55,21 @@ $(FILE2STR): $(FILE2STROBJS) $(LIBOCORE)
 PNG2BDCOBJS = \
 	$(BUILDOBJ)/png2bdc.o \
 
-$(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+$(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBUTIL) $(LIBOCORE) $(ZLIB) -o $@
+
+
+
+#-------------------------------------------------
+# verinfo
+#-------------------------------------------------
+
+VERINFOOBJS = \
+	$(BUILDOBJ)/verinfo.o
+
+$(VERINFO): $(VERINFOOBJS) $(LIBOCORE)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ -o $@
 
 endif
-

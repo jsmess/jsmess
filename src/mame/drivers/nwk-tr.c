@@ -248,21 +248,21 @@ int K001604_vh_start(running_machine *machine, int chip)
 	{
 		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
 		int roz_width = K001604_layer_size ? 64 : 128;
-		K001604_layer_8x8[chip][0] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_0, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
-		K001604_layer_8x8[chip][1] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_1, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][0] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_0, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][1] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_1, 8, 8, 64, 64);
 
-		K001604_layer_roz[chip][0] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_TYPE_PEN, roz_tile_size, roz_tile_size, roz_width, 64);
-		K001604_layer_roz[chip][1] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_1, TILEMAP_TYPE_PEN, roz_tile_size, roz_tile_size, 64, 64);
+		K001604_layer_roz[chip][0] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, roz_tile_size, roz_tile_size, roz_width, 64);
+		K001604_layer_roz[chip][1] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_1, roz_tile_size, roz_tile_size, 64, 64);
 	}
 	else
 	{
 		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
 		int roz_width = K001604_layer_size ? 64 : 128;
-		K001604_layer_8x8[chip][0] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_0, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
-		K001604_layer_8x8[chip][1] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_1, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][0] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_0, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][1] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_1, 8, 8, 64, 64);
 
-		K001604_layer_roz[chip][0] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_TYPE_PEN, roz_tile_size, roz_tile_size, roz_width, 64);
-		K001604_layer_roz[chip][1] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_1, TILEMAP_TYPE_PEN, roz_tile_size, roz_tile_size, 64, 64);
+		K001604_layer_roz[chip][0] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, roz_tile_size, roz_tile_size, roz_width, 64);
+		K001604_layer_roz[chip][1] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_1, roz_tile_size, roz_tile_size, 64, 64);
 	}
 
 	tilemap_set_transparent_pen(K001604_layer_8x8[chip][0], 0);
@@ -545,7 +545,7 @@ static VIDEO_START( nwktr )
 
 static VIDEO_UPDATE( nwktr )
 {
-	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	voodoo_update(0, bitmap, cliprect);
 
@@ -838,7 +838,7 @@ static INPUT_PORTS_START( nwktr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START

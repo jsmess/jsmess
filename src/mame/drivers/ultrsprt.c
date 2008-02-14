@@ -36,11 +36,11 @@ static VIDEO_UPDATE( ultrsprt )
 				if (p1 == 0)
 				{
 					UINT8 p2 = ram[BYTE4_XOR_BE(fb_index + i)];
-					bmp[i] = machine->remapped_colortable[0x000 + p2];
+					bmp[i] = machine->pens[0x000 + p2];
 				}
 				else
 				{
-					bmp[i] = machine->remapped_colortable[0x100 + p1];
+					bmp[i] = machine->pens[0x100 + p1];
 				}
 			}
 		}
@@ -223,7 +223,7 @@ static INPUT_PORTS_START( ultrsprt )
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2) /* Test Button */
+	PORT_SERVICE_NO_TOGGLE( 0x1, IP_ACTIVE_LOW )
 
 INPUT_PORTS_END
 

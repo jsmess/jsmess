@@ -30,6 +30,7 @@
 #include "osdepend.h"
 #include "deprecat.h"
 #include "driver.h"
+#include "mslegacy.h"
 #include "includes/nes.h"
 #include "nes_mmc.h"
 #include "sound/nes_apu.h"

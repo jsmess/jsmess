@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "memconv.h"
+#include "mslegacy.h"
 #include "includes/ibmpc.h"
 
 #include "machine/pcshare.h"

@@ -12,6 +12,7 @@
  **********************************************************************/
 #include "driver.h"
 #include "rriot.h"
+#include "mslegacy.h"
 
 #define VERBOSE 0
 

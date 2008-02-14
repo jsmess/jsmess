@@ -332,11 +332,11 @@ static void draw_blend_gfx(mame_bitmap *bitmap, const rectangle *cliprect, const
 				UINT8 alpha = alpha_table[global_pen];
 				if (alpha)
 				{
-					p[i] = alpha_blend16(p[i], Machine->remapped_colortable[gfx->color_base + global_pen]);
+					p[i] = alpha_blend16(p[i], Machine->pens[gfx->color_base + global_pen]);
 				}
 				else
 				{
-					p[i] = Machine->remapped_colortable[gfx->color_base + global_pen];
+					p[i] = Machine->pens[gfx->color_base + global_pen];
 				}
 			}
 			dp_i += xd;
@@ -482,10 +482,10 @@ VIDEO_START( spi )
 	int i;
 	int region_length;
 
-	text_layer	= tilemap_create( get_text_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8,64,32 );
-	back_layer	= tilemap_create( get_back_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
-	mid_layer	= tilemap_create( get_mid_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
-	fore_layer	= tilemap_create( get_fore_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
+	text_layer	= tilemap_create( get_text_tile_info, tilemap_scan_rows,  8,8,64,32 );
+	back_layer	= tilemap_create( get_back_tile_info, tilemap_scan_cols,  16,16,32,32 );
+	mid_layer	= tilemap_create( get_mid_tile_info, tilemap_scan_cols,  16,16,32,32 );
+	fore_layer	= tilemap_create( get_fore_tile_info, tilemap_scan_cols,  16,16,32,32 );
 
 	tilemap_set_transparent_pen(text_layer, 31);
 	tilemap_set_transparent_pen(mid_layer, 63);
@@ -598,11 +598,11 @@ static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const
 				UINT8 alpha = alpha_table[pen];
 				if (alpha)
 				{
-					*d = alpha_blend16(*d, machine->remapped_colortable[pen]);
+					*d = alpha_blend16(*d, machine->pens[pen]);
 				}
 				else
 				{
-					*d = machine->remapped_colortable[pen];
+					*d = machine->pens[pen];
 				}
 			}
 			++d;

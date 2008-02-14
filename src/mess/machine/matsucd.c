@@ -16,6 +16,7 @@ can be expanded with support for the other drives as needed.
 #include "devices/chd_cd.h"
 #include "sound/cdda.h"
 #include "machine/matsucd.h"
+#include "mslegacy.h"
 
 
 #define MATSU_STATUS_READY		( 1 << 0 )	/* driver ready */

@@ -637,7 +637,7 @@ static void adjust_timer_interrupt(void)
 	{
 		UINT64 clocks_until_int = hyperstone.tr_clocks_per_tick - (clocks_since_base % hyperstone.tr_clocks_per_tick);
 		UINT64 cycles_until_int = (clocks_until_int << hyperstone.clock_scale) + cycles_until_next_clock;
-		timer_adjust(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int + 1, cpunum), cpunum * 2 + 1, attotime_never);
+		timer_adjust_oneshot(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int + 1, cpunum), cpunum * 2 + 1);
 	}
 
 	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
@@ -648,19 +648,19 @@ static void adjust_timer_interrupt(void)
 		if (delta > 0x80000000)
 		{
 			if (!hyperstone.timer_int_pending)
-				timer_adjust(hyperstone.timer, attotime_zero, cpunum * 2 + 0, attotime_never);
+				timer_adjust_oneshot(hyperstone.timer, attotime_zero, cpunum * 2 + 0);
 		}
 		else
 		{
 			UINT64 clocks_until_int = mulu_32x32(delta, hyperstone.tr_clocks_per_tick);
 			UINT64 cycles_until_int = (clocks_until_int << hyperstone.clock_scale) + cycles_until_next_clock;
-			timer_adjust(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int, cpunum), cpunum * 2 + 0, attotime_never);
+			timer_adjust_oneshot(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int, cpunum), cpunum * 2 + 0);
 		}
 	}
 
 	/* otherwise, disable the timer */
 	else
-		timer_adjust(hyperstone.timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(hyperstone.timer, attotime_never, 0);
 }
 
 static TIMER_CALLBACK( e132xs_timer_callback )
@@ -1598,32 +1598,44 @@ static void e116_init(int index, int clock, const void *config, int (*irqcallbac
 
 	hyperstone_init(index, clock, config, irqcallback, scale_mask);
 }
+#endif
 
+#if (HAS_E116T)
 static void e116t_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_E116XT)
 static void e116xt_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 3);
 }
+#endif
 
+#if (HAS_E116XS)
 static void e116xs_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 7);
 }
+#endif
 
+#if (HAS_E116XSR)
 static void e116xsr_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 7);
 }
+#endif
 
+#if (HAS_GMS30C2116)
 static void gms30c2116_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_GMS30C2216)
 static void gms30c2216_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 0);
@@ -1647,42 +1659,58 @@ static void e132_init(int index, int clock, const void *config, int (*irqcallbac
 
 	hyperstone_init(index, clock, config, irqcallback, scale_mask);
 }
+#endif
 
+#if (HAS_E132N)
 static void e132n_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_E132T)
 static void e132t_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_E132XN)
 static void e132xn_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 3);
 }
+#endif
 
+#if (HAS_E132XT)
 static void e132xt_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 3);
 }
+#endif
 
+#if (HAS_E132XS)
 static void e132xs_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 7);
 }
+#endif
 
+#if (HAS_E132XSR)
 static void e132xsr_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 7);
 }
+#endif
 
+#if (HAS_GMS30C2132)
 static void gms30c2132_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_GMS30C2232)
 static void gms30c2232_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 0);

@@ -74,6 +74,7 @@ TODO :
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "cpu/tms9900/tms9900.h"
 #include "video/tms9928a.h"
 #include "devices/cartslot.h"

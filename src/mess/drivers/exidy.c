@@ -94,6 +94,7 @@
 #include "devices/printer.h"
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
+#include "mslegacy.h"
 
 
 static int device_load_exidy_floppy(mess_image *image)

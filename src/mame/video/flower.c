@@ -10,11 +10,21 @@ PALETTE_INIT( flower )
 {
 	int i;
 
-	for (i=0; i<256; i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		palette_set_color_rgb(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
-		colortable[i] = i;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
+
+	for (i = 0; i < 0x100; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
@@ -138,10 +148,10 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START(flower)
 {
-	flower_bg0_tilemap        = tilemap_create(get_bg0_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,16,16);
-	flower_bg1_tilemap        = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,16);
-	flower_text_tilemap       = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
-	flower_text_right_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN, 8, 8, 2,32);
+	flower_bg0_tilemap        = tilemap_create(get_bg0_tile_info, tilemap_scan_rows,     16,16,16,16);
+	flower_bg1_tilemap        = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,16,16,16,16);
+	flower_text_tilemap       = tilemap_create(get_text_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	flower_text_right_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_cols, 8, 8, 2,32);
 
 	tilemap_set_transparent_pen(flower_bg1_tilemap,15);
 	tilemap_set_transparent_pen(flower_text_tilemap,3);

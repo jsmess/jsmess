@@ -38,6 +38,7 @@ PAL frame timing
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "video/smsvdp.h"
 #include "includes/sms.h"
 

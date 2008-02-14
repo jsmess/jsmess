@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
 

@@ -798,7 +798,7 @@ static DRIVER_INIT( namcos11 )
 	emu_timer *timer;
 
 	timer = timer_alloc( mcu_timer , NULL);
-	timer_adjust( timer, ATTOTIME_IN_HZ( 600 ), 0, ATTOTIME_IN_HZ( 600 ) );
+	timer_adjust_periodic( timer, ATTOTIME_IN_HZ( 600 ), 0, ATTOTIME_IN_HZ( 600 ) );
 
 	psx_driver_init();
 	namcoc7x_on_driver_init();
@@ -912,7 +912,7 @@ static INPUT_PORTS_START( namcos11 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Test Switch" ) PORT_CODE( KEYCODE_F2 )
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x02, 0x00, "DIP1 (Test)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )

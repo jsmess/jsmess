@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 
@@ -17,7 +18,7 @@
 #include "includes/pet.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 
 /* keyboard lines */
 static int pet_basic1=0; /* basic version 1 for quickloader */
@@ -497,7 +498,7 @@ DRIVER_INIT( pet1 )
 static void pet_display_enable_changed(int display_enabled) {
 }
 
-static const crtc6845_interface crtc_pet40 = {
+static const mc6845_interface crtc_pet40 = {
 	0,
 	800000 /*?*/,
 	8 /*?*/,
@@ -507,7 +508,7 @@ static const crtc6845_interface crtc_pet40 = {
 	pet_display_enable_changed
 };
 
-static const crtc6845_interface crtc_pet80 = {
+static const mc6845_interface crtc_pet80 = {
 	0,
 	800000 /*?*/,
 	16 /*?*/,

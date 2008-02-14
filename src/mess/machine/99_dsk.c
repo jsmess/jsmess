@@ -25,6 +25,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "machine/wd17xx.h"
 #include "smc92x4.h"
 #include "ti99_4x.h"

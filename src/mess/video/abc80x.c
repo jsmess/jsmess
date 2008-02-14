@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "includes/abc80x.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 
 
 static tilemap *tx_tilemap;
@@ -37,7 +37,7 @@ PALETTE_INIT( abc800c )
 	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
 }
 
-static const crtc6845_interface crtc6845_intf =
+static const mc6845_interface crtc6845_intf =
 {
 	0,						/* screen we are acting on */
 	ABC800_X01/6,			/* the clock (pin 21) of the chip */
@@ -61,7 +61,7 @@ static TILE_GET_INFO(abc800_get_tile_info)
 VIDEO_START( abc800m )
 {
 	tx_tilemap = tilemap_create(abc800_get_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 6, 10, 80, 24);
+		6, 10, 80, 24);
 }
 
 static TILE_GET_INFO(abc800c_get_tile_info)
@@ -75,7 +75,7 @@ static TILE_GET_INFO(abc800c_get_tile_info)
 VIDEO_START( abc800c )
 {
 	tx_tilemap = tilemap_create(abc800c_get_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 6, 10, 40, 24);
+		6, 10, 40, 24);
 }
 
 VIDEO_UPDATE( abc800 )
@@ -109,10 +109,10 @@ static TILE_GET_INFO(abc802_get_tile_info_80)
 VIDEO_START( abc802 )
 {
 	tx_tilemap_40 = tilemap_create(abc802_get_tile_info_40, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 12, 10, 40, 24);
+		12, 10, 40, 24);
 
 	tx_tilemap = tilemap_create(abc802_get_tile_info_80, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 6, 10, 80, 24);
+		6, 10, 80, 24);
 
 	abc802_columns = 80;
 }

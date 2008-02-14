@@ -10,9 +10,10 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "includes/svi318.h"
 #include "cpu/z80/z80.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"
 #include "machine/uart8250.h"
@@ -443,7 +444,7 @@ static void svi806_crtc6845_update_row(mame_bitmap *bitmap, const rectangle *cli
 	}
 }
 
-static const crtc6845_interface svi806_crtc6845_interface = {
+static const mc6845_interface svi806_crtc6845_interface = {
 	1,
 	3579545 /*?*/,
 	8 /*?*/,

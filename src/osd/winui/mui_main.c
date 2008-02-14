@@ -10,8 +10,9 @@
   that you have read the license and understand and accept it fully.
 
  ***************************************************************************/
-
+#ifndef WINUI
 #define WINUI
+#endif
 
 // import the main() from MAME, but rename it so we can call it indirectly
 #undef main

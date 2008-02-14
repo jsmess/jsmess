@@ -5,6 +5,7 @@
 #include "video/pc_aga.h"
 #include "audio/pc.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 /*
 

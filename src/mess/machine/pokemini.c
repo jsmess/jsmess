@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "mslegacy.h"
 #include "includes/pokemini.h"
 #include "cpu/minx/minx.h"
 

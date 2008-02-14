@@ -8,6 +8,9 @@
 ***********************************************************************************/
 
 #include "driver.h"
+#include "video/mc6845.h"
+
+static mc6845_t *mc6845;
 static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( gdrawpkr_videoram_w )
@@ -41,10 +44,25 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
+WRITE8_HANDLER( gdrawpkr_mc6845_address_w )
+{
+	mc6845_address_w(mc6845, data);
+}
+
+READ8_HANDLER( gdrawpkr_mc6845_register_r )
+{
+	return mc6845_register_r(mc6845);
+}
+
+WRITE8_HANDLER( gdrawpkr_mc6845_register_w )
+{
+	mc6845_register_w(mc6845, data);
+}
+
 VIDEO_START( gdrawpkr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 31);
+	mc6845 = mc6845_config(NULL);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
 }
 
 VIDEO_UPDATE( gdrawpkr )

@@ -236,15 +236,17 @@
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "video/crtc6845.h"
 #include "machine/6821pia.h"
 
 /* from video */
-extern WRITE8_HANDLER( gdrawpkr_videoram_w );
-extern WRITE8_HANDLER( gdrawpkr_colorram_w );
-extern PALETTE_INIT( gdrawpkr );
-extern VIDEO_START( gdrawpkr );
-extern VIDEO_UPDATE( gdrawpkr );
+WRITE8_HANDLER( gdrawpkr_videoram_w );
+WRITE8_HANDLER( gdrawpkr_colorram_w );
+WRITE8_HANDLER( gdrawpkr_mc6845_address_w );
+READ8_HANDLER( gdrawpkr_mc6845_register_r );
+WRITE8_HANDLER( gdrawpkr_mc6845_register_w );
+PALETTE_INIT( gdrawpkr );
+VIDEO_START( gdrawpkr );
+VIDEO_UPDATE( gdrawpkr );
 
 
 /*************************
@@ -255,8 +257,8 @@ static ADDRESS_MAP_START( gdrawpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0840, 0x0840) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x0841, 0x0841) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0880, 0x0880) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x0881, 0x0881) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x0880, 0x0880) AM_WRITE(gdrawpkr_mc6845_address_w)
+	AM_RANGE(0x0881, 0x0881) AM_READWRITE(gdrawpkr_mc6845_register_r, gdrawpkr_mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(gdrawpkr_videoram_w) AM_BASE(&videoram)
@@ -268,8 +270,8 @@ static ADDRESS_MAP_START( elgrande_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0840, 0x0840) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x0841, 0x0841) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0880, 0x0880) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x0881, 0x0881) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x0880, 0x0880) AM_WRITE(gdrawpkr_mc6845_address_w)
+	AM_RANGE(0x0881, 0x0881) AM_READWRITE(gdrawpkr_mc6845_register_r, gdrawpkr_mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(gdrawpkr_videoram_w) AM_BASE(&videoram)
@@ -578,8 +580,7 @@ static MACHINE_DRIVER_START( gdrawpkr )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 
 	MDRV_GFXDECODE(gdrawpkr)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(1024)
+	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(gdrawpkr)
 	MDRV_VIDEO_START(gdrawpkr)
@@ -619,8 +620,11 @@ ROM_START( gdrawpkr )
 	ROM_LOAD( "cg-2b.u69",	 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )
 	ROM_LOAD( "cg-2a.u68",	 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 
-	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "82s129n.u28", 0x0000, 0x0100, CRC(6db5a344) SHA1(5f1a81ac02a2a74252decd3bb95a5436cc943930) )
+	ROM_RELOAD(			     0x0100, 0x0100 )
+	ROM_RELOAD(			     0x0200, 0x0100 )
+	ROM_RELOAD(			     0x0300, 0x0100 )
 ROM_END
 
 ROM_START( elgrande )
@@ -639,8 +643,11 @@ ROM_START( elgrande )
 	ROM_LOAD( "d1.u69",	0x0800, 0x0800, CRC(ed3c83b7) SHA1(93e2134de3d9f79a6cff0391c1a32fccd3840c3f) )
 	ROM_LOAD( "d1.u68",	0x1000, 0x0800, BAD_DUMP CRC(3ab70570) SHA1(5ff84015a78d15a5207499f84ce637e49bca136f) ) /* bad bits */
 
-	ROM_REGION( 0x200, REGION_PROMS, 0 )
+	ROM_REGION( 0x0500, REGION_PROMS, 0 )
 	ROM_LOAD( "d1.u28", 0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+	ROM_RELOAD(			0x0100, 0x0200 )
+	ROM_RELOAD(			0x0200, 0x0200 )
+	ROM_RELOAD(			0x0300, 0x0200 )
 ROM_END
 
 
@@ -654,7 +661,7 @@ static DRIVER_INIT( gdrawpkr )
 	int x;
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
-	for (x=0x0000;x<0x0100;x++)
+	for (x=0x0000;x<0x0400;x++)
 	{
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x04;	/* blue background */
@@ -672,7 +679,7 @@ static DRIVER_INIT( elgrande )
 	UINT8 *ROM = memory_region( REGION_GFX2 );
 
 	/* Palette transformed by PLDs? */
-	for (x=0x0000;x<0x0100;x++)
+	for (x=0x0000;x<0x0400;x++)
 	{
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x00; /* black background */

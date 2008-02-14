@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "machine/uart8250.h"
 #include "includes/pc_mouse.h"
+#include "mslegacy.h"
 
 
 static struct {

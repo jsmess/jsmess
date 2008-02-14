@@ -67,7 +67,7 @@ UIOBJ = $(OBJ)/osd/$(OSD)
 
 OBJDIRS += $(UIOBJ)
 
-
+DEFS += -DWINUI
 
 #-------------------------------------------------
 # configure the resource compiler
@@ -351,13 +351,13 @@ $(UIOBJ)/mkhelp$(EXE): $(UIOBJ)/mkhelp.o $(LIBOCORE)
 # rule for making the verinfo tool
 #-------------------------------------------------
 
-VERINFO = $(UIOBJ)/verinfo$(EXE)
+#VERINFO = $(UIOBJ)/verinfo$(EXE)
 
-$(VERINFO): $(UIOBJ)/verinfo.o $(LIBOCORE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+#$(VERINFO): $(UIOBJ)/verinfo.o $(LIBOCORE)
+#	@echo Linking $@...
+#	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
-BUILD += $(VERINFO)
+#BUILD += $(VERINFO)
 
 
 
@@ -365,9 +365,10 @@ BUILD += $(VERINFO)
 # Specific rele to compile verinfo util.
 #-------------------------------------------------
 
-$(UIOBJ)/verinfo.o : $(WINSRC)/verinfo.c
-	@echo Compiling $<...
-	$(CC) -DWINUI $(CDEFS) $(CFLAGS) -c $< -o $@
+#$(BUILDOBJ)/verinfo.o : $(BUILDSRC)/verinfo.c
+#	@echo Compiling $<...
+#	@echo $(CC) -DWINUI $(CDEFS) $(CFLAGS) -c $< -o $@
+#	$(CC) -DWINUI $(CDEFS) $(CFLAGS) -c $< -o $@
 
 
 
@@ -375,7 +376,7 @@ $(UIOBJ)/verinfo.o : $(WINSRC)/verinfo.c
 # generic rule for the resource compiler for UI
 #-------------------------------------------------
 
-$(UIOBJ)/mameui.res: $(UISRC)/mameui.rc $(UIOBJ)/mamevers.rc
+$(RESFILE): $(UISRC)/mameui.rc $(UIOBJ)/mamevers.rc
 	@echo Compiling mameui resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) -o $@ -i $<
 
@@ -385,11 +386,9 @@ $(UIOBJ)/mameui.res: $(UISRC)/mameui.rc $(UIOBJ)/mamevers.rc
 # rules for resource file
 #-------------------------------------------------
 
-#$(UIOBJ)/mameui.res: $(UISRC)/mameui.rc $(UIOBJ)/mamevers.rc
-
-$(UIOBJ)/mamevers.rc: $(VERINFO) $(SRC)/version.c
+$(UIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
-	@$(VERINFO) $(SRC)/version.c > $@
+	@$(OBJ)/build/verinfo$(EXE) $(SRC)/version.c > $@
 
 
 

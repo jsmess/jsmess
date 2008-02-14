@@ -120,7 +120,7 @@ when problems start with -log and look into error.log file
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "includes/pet.h"
-#include "video/crtc6845.h"
+#include "video/mc6845.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
 /*#include "includes/vc1541.h" */

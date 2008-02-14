@@ -37,6 +37,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 

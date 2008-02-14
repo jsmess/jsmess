@@ -15,6 +15,7 @@
 #include "amiga.h"
 #include "amigafdc.h"
 #include "machine/6526cia.h"
+#include "mslegacy.h"
 
 
 #define MAX_TRACK_BYTES			12500

@@ -20,6 +20,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "mm58274c.h"
 
 

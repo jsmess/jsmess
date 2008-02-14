@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "6551.h"
 #include "includes/serial.h"
+#include "mslegacy.h"
 
 static void acia_6551_receive_char(unsigned char ch);
 static void acia_6551_refresh_ints(void);

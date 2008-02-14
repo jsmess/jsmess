@@ -133,9 +133,9 @@ VIDEO_START( kaneko16_1xVIEW2 )
 	VIDEO_START_CALL(kaneko16_sprites);
 
 	kaneko16_tmap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
+										 16,16, 0x20,0x20	);
 	kaneko16_tmap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
+										 16,16, 0x20,0x20	);
 
 	kaneko16_tmap_2 = 0;
 
@@ -179,9 +179,9 @@ VIDEO_START( kaneko16_2xVIEW2 )
 	VIDEO_START_CALL(kaneko16_1xVIEW2);
 
 	kaneko16_tmap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
+										 16,16, 0x20,0x20	);
 	kaneko16_tmap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
+										 16,16, 0x20,0x20	);
 
 	{
 		int dx, xdim = machine->screen[0].width;
@@ -395,7 +395,7 @@ static void kaneko16_draw_sprites_custom(running_machine *machine, mame_bitmap *
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int priority)
 {
-	const pen_t *pal = &machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;

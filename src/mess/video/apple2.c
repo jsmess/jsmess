@@ -347,21 +347,18 @@ void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_soft
 	text_tilemap = tilemap_create(
 		apple2_text_gettileinfo,
 		apple2_text_getmemoryoffset,
-		TILEMAP_TYPE_PEN,
 		7*2, 8,
 		40, 24);
 
 	dbltext_tilemap = tilemap_create(
 		apple2_dbltext_gettileinfo,
 		apple2_dbltext_getmemoryoffset,
-		TILEMAP_TYPE_PEN,
 		7, 8,
 		80, 24);
 
 	lores_tilemap = tilemap_create(
 		apple2_lores_gettileinfo,
 		apple2_text_getmemoryoffset,
-		TILEMAP_TYPE_PEN,
 		14, 8,
 		40, 24);
 

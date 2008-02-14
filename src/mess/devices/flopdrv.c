@@ -16,6 +16,7 @@
 */
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "flopdrv.h"
 
 

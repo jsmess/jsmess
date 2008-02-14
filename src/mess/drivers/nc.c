@@ -95,6 +95,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "includes/nc.h"
 #include "includes/serial.h"	/* for serial data transfers */
 #include "machine/msm8251.h"	/* for NC100 uart */

@@ -37,6 +37,7 @@
 
 #include "applefdc.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 /* logging */
 #define LOG_IWM			0

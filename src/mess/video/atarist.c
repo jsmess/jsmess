@@ -15,6 +15,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
 #include "video/atarist.h"
+#include "mslegacy.h"
 
 static struct SHIFTER
 {

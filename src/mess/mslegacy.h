@@ -10,6 +10,7 @@
 #ifndef MSLEGACY_H
 #define MSLEGACY_H
 
+#include "driver.h"
 
 enum
 {
@@ -81,6 +82,24 @@ void palette_set_colors_rgb(running_machine *machine, pen_t color_base, const UI
 
 /* uitext */
 const char * ui_getstring (int string_num);
+
+
+/* timer */
+void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime period);
+
+
+/* mc6845 */
+struct _mc6845_t;
+struct _mc6845_interface;
+
+extern struct _mc6845_t *mslegacy_mc6845;
+
+WRITE8_HANDLER(crtc6845_0_address_w);
+READ8_HANDLER(crtc6845_0_register_r);
+WRITE8_HANDLER(crtc6845_0_register_w);
+VIDEO_UPDATE(crtc6845);
+void crtc6845_config(int index, const struct _mc6845_interface *intf);
+
 
 
 #endif /* MSLEGACY_H */

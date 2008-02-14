@@ -16,6 +16,7 @@ be written to RAM if RAM was switched in.
 
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"

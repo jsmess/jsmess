@@ -11,6 +11,7 @@
 #include "ctype.h"
 #include "driver.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"

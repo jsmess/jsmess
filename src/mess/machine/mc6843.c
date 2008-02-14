@@ -33,6 +33,7 @@
 #include "driver.h"
 #include "mc6843.h"
 #include "devices/flopdrv.h"
+#include "mslegacy.h"
 
 
 /******************* parameters ******************/
