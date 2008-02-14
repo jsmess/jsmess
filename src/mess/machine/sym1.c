@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/sym1.h"
 
 /* M6502 CPU */
@@ -37,37 +36,37 @@ static emu_timer *led_update;
 
 static void sym1_74145_output_0_w(int state)
 {
-	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 0, attotime_never);
+	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 0);
 }
 
 
 static void sym1_74145_output_1_w(int state)
 {
-	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 1, attotime_never);
+	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 1);
 }
 
 
 static void sym1_74145_output_2_w(int state)
 {
-	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 2, attotime_never);
+	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 2);
 }
 
 
 static void sym1_74145_output_3_w(int state)
 {
-	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 3, attotime_never);
+	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 3);
 }
 
 
 static void sym1_74145_output_4_w(int state)
 {
-	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 4, attotime_never);
+	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 4);
 }
 
 
 static void sym1_74145_output_5_w(int state)
 {
-	if (state) timer_adjust(led_update, LED_REFRESH_DELAY, 5, attotime_never);
+	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 5);
 }
 
 

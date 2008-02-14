@@ -74,7 +74,6 @@ TODO :
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/tms9900/tms9900.h"
 #include "video/tms9928a.h"
 #include "devices/cartslot.h"
@@ -291,10 +290,10 @@ static WRITE8_HANDLER(tutor_cassette_w)
 			{
 				tape_interrupt_enable = ! data;
 				if (tape_interrupt_enable)
-					timer_adjust(tape_interrupt_timer, /*ATTOTIME_IN_HZ(44100)*/attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+					timer_adjust_periodic(tape_interrupt_timer, /*ATTOTIME_IN_HZ(44100)*/attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 				else
 				{
-					timer_adjust(tape_interrupt_timer, attotime_never, 0, attotime_zero);
+					timer_adjust_oneshot(tape_interrupt_timer, attotime_never, 0);
 					cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
 				}
 			}

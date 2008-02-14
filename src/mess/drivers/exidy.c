@@ -94,7 +94,6 @@
 #include "devices/printer.h"
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
-#include "mslegacy.h"
 
 
 static int device_load_exidy_floppy(mess_image *image)
@@ -465,7 +464,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 			/* both are now off */
 
 			/* stop timer */
-			timer_adjust(cassette_timer, attotime_zero, 0, attotime_zero);
+			timer_adjust_oneshot(cassette_timer, attotime_zero, 0);
 		}
 		else
 		{
@@ -477,7 +476,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 				cassette_clock_state = 0;
 				/* start timer */
 				/* the correct baud rate should be being used here (see bit 6 below) */
-				timer_adjust(cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(4800));
+				timer_adjust_periodic(cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(4800));
 			}
 		}
 	}
@@ -514,7 +513,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 			baud_rate = 1200;
 		}
 
-		timer_adjust(serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
+		timer_adjust_periodic(serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
 	}
 
 	exidy_fe = data;

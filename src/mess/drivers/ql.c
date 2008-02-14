@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/m68000/m68000.h"
 #include "devices/cartslot.h"
@@ -212,8 +211,8 @@ static WRITE8_HANDLER( zx8302_control_w )
 
 	zx8302.tcr = data;
 
-	timer_adjust(zx8302_txd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud));
-	timer_adjust(zx8302_ipc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baudx4));
+	timer_adjust_periodic(zx8302_txd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud));
+	timer_adjust_periodic(zx8302_ipc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baudx4));
 }
 
 static UINT8 zx8302_get_microdrive_status(void)
@@ -878,8 +877,8 @@ static MACHINE_START( ql )
 	zx8302_rtc_timer = timer_alloc(zx8302_rtc_tick, NULL);
 	zx8302_gap_timer = timer_alloc(zx8302_gap_tick, NULL);
 
-	timer_adjust(zx8302_rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(X2/32768));
-	timer_adjust(zx8302_gap_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(31));
+	timer_adjust_periodic(zx8302_rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(X2/32768));
+	timer_adjust_periodic(zx8302_gap_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(31));
 
 	zx8302.ctr = time(NULL) + 283996800;
 

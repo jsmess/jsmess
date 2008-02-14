@@ -38,9 +38,9 @@ PAL frame timing
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "video/smsvdp.h"
 #include "includes/sms.h"
+
 
 #define IS_SMS1_VDP			( smsvdp.features & MODEL_315_5124 )
 #define IS_SMS2_VDP			( smsvdp.features & MODEL_315_5246 )
@@ -211,7 +211,7 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 	set_display_settings();
 
 	smsvdp.smsvdp_display_timer = timer_alloc( smsvdp_display_callback , NULL);
-	timer_adjust( smsvdp.smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ) );
+	timer_adjust_periodic(smsvdp.smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ));
 	return 0;
 }
 

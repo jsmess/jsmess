@@ -127,7 +127,6 @@
 #include "driver.h"
 #include "render.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
 #include "machine/8255ppi.h"
@@ -139,6 +138,7 @@
 #include "machine/rp5c15.h"
 #include "devices/basicdsk.h"
 #include "includes/x68k.h"
+
 
 struct x68k_system sys;
 
@@ -210,7 +210,7 @@ static void mfp_init()
     mfp_timer[2] = timer_alloc(mfp_timer_c_callback, NULL);
     mfp_timer[3] = timer_alloc(mfp_timer_d_callback, NULL);
     mfp_irq = timer_alloc(mfp_update_irq, NULL);
-    timer_adjust(mfp_irq, attotime_zero, 0, ATTOTIME_IN_USEC(32));
+    timer_adjust_periodic(mfp_irq, attotime_zero, 0, ATTOTIME_IN_USEC(32));
 */
 }
 /*
@@ -331,12 +331,12 @@ void mfp_set_timer(int timer, unsigned char data)
 {
     if((data & 0x07) == 0x0000)
     {  // Timer stop
-        timer_adjust(mfp_timer[timer],attotime_zero,0,attotime_zero);
+        timer_adjust_oneshot(mfp_timer[timer], attotime_zero, 0);
         logerror("MFP: Timer #%i stopped. \n",timer);
         return;
     }
 
-    timer_adjust(mfp_timer[timer], attotime_zero, 0, prescale(data & 0x07));
+    timer_adjust_periodic(mfp_timer[timer], attotime_zero, 0, prescale(data & 0x07));
     logerror("MFP: Timer #%i set to %2.1fus\n",timer, attotime_to_double(prescale(data & 0x07)) * 1000000);
 
 }
@@ -1896,10 +1896,10 @@ static MACHINE_RESET( x68000 )
 	// start VBlank timer
 	sys.crtc.vblank = 1;
 	irq_time = video_screen_get_time_until_pos(0,sys.crtc.reg[6],2);
-	timer_adjust(vblank_irq,irq_time,0,attotime_never);
+	timer_adjust_oneshot(vblank_irq, irq_time, 0);
 
 	// start HBlank timer
-	timer_adjust(scanline_timer,video_screen_get_scan_period(0),1,attotime_never);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_scan_period(0), 1);
 
 	sys.mfp.gpio = 0xfb;
 }
@@ -1922,10 +1922,10 @@ static MACHINE_START( x68000 )
 	memory_set_bankptr(4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	timer_adjust(kb_timer,attotime_zero,0,ATTOTIME_IN_MSEC(5));  // every 5ms
+	timer_adjust_periodic(kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
 
 	// start mouse timer
-	timer_adjust(mouse_timer,attotime_zero,0,ATTOTIME_IN_MSEC(1));  // a guess for now
+	timer_adjust_periodic(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
 	sys.mouse.inputtype = 0;
 }
 

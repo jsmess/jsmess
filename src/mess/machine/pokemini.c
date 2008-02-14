@@ -1,7 +1,7 @@
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/pokemini.h"
 #include "cpu/minx/minx.h"
+
 
 struct VDP {
 	UINT8	colors_inverted;
@@ -126,7 +126,7 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			*/
 		if ( data & 0x01 ) {	/* enable timer */
 			if ( ! timers.seconds_running ) {
-				timer_adjust( timers.seconds_timer, ATTOTIME_IN_SEC(1), 0, attotime_zero );
+				timer_adjust_oneshot(timers.seconds_timer, ATTOTIME_IN_SEC(1), 0);
 				timers.seconds_running = 1;
 			}
 		} else {		/* pause timer */
@@ -172,7 +172,7 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 4-7 R/W Unused
 			*/
 		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x18] & 0x07 ) ) {
-			timer_adjust( timers.timer1_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+			timer_adjust_periodic(timers.timer1_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ));
 		}
 		if ( ( data & 0x08 ) && timers.timers_enabled ) {
 			timer_enable( timers.timer1_timer, 1 );
@@ -217,7 +217,7 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 4-7     Unused
 			*/
 		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x1A] & 0x07 ) ) {
-			timer_adjust( timers.timer2_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+			timer_adjust_periodic(timers.timer2_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ));
 		}
 		if ( ( data & 0x08 ) && timers.timers_enabled ) {
 			timer_enable( timers.timer2_timer, 1 );
@@ -238,7 +238,7 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 4-7     Unused
 			*/
 		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x1C] & 0x07 ) ) {
-			timer_adjust( timers.timer3_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+			timer_adjust_periodic(timers.timer3_timer, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, ATTOTIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ));
 		}
 		if ( ( data & 0x08 ) && timers.timers_enabled ) {
 			timer_enable( timers.timer3_timer, 1 );
@@ -415,7 +415,7 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			*/
 		if ( data & 0x01 ) {	/* enable timer */
 			if ( ! timers.hz256_running ) {
-				timer_adjust( timers.hz256_timer, ATTOTIME_IN_HZ(256), 0, attotime_zero );
+				timer_adjust_oneshot(timers.hz256_timer, ATTOTIME_IN_HZ(256), 0);
 				timers.hz256_running = 1;
 			}
 		} else {		/* pause timer */

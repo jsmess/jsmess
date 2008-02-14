@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/kim1.h"
 #include "sound/dac.h"
@@ -598,7 +597,7 @@ DRIVER_INIT( kim1 )
 
 static void set_chip_clock(int chip, int data)
 {
-	timer_adjust(m6530[chip].timer, attotime_zero, chip, ATTOTIME_IN_HZ((data + 1) * m6530[chip].clock / 256 / 256));
+	timer_adjust_periodic(m6530[chip].timer, attotime_zero, chip, ATTOTIME_IN_HZ((data + 1) * m6530[chip].clock / 256 / 256));
 }
 
 MACHINE_RESET( kim1 )

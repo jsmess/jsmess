@@ -7,7 +7,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/thomson.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
@@ -1042,7 +1041,7 @@ static void thmfc_floppy_cmd_complete(void)
 	thmfc1->stat0 |= THMFC1_STAT0_FINISHED;
 	thmfc1->data_idx = 0;
 	thmfc1->data_size = 0;
-	timer_adjust( thmfc_floppy_cmd, attotime_never, 0, attotime_never );
+	timer_adjust_oneshot(thmfc_floppy_cmd, attotime_never, 0);
 }
 
 
@@ -1342,7 +1341,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 		/* abort previous command, if any */
 		thmfc1->op = THMFC1_OP_RESET;
-		timer_adjust( thmfc_floppy_cmd, attotime_never, 0, attotime_never );
+		timer_adjust_oneshot(thmfc_floppy_cmd, attotime_never, 0);
 
 		switch ( data & 3 )
 		{
@@ -1361,7 +1360,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_finish = thmfc1->sector_size + 3;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_WRITE_SECT;
-				timer_adjust( thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 10 ), 0, attotime_never );
+				timer_adjust_oneshot(thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 10 ), 0);
 			}
 			break;
 
@@ -1377,7 +1376,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_idx = 1;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_READ_ADDR;
-				timer_adjust( thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 1 ), 0, attotime_never );
+				timer_adjust_oneshot(thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 1 ), 0);
 			}
 			break;
 
@@ -1393,7 +1392,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_idx = 1;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_READ_SECT;
-				timer_adjust( thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 10 ), 0, attotime_never );
+				timer_adjust_oneshot(thmfc_floppy_cmd, ATTOTIME_IN_MSEC( 10 ), 0);
 			}
 			break;
 		}
@@ -1550,7 +1549,7 @@ void thmfc_floppy_reset( void )
 	thmfc1->data_raw_size = 0;
 	thmfc1->data_crc = 0;
 	thmfc1->wsync = 0;
-	timer_adjust( thmfc_floppy_cmd, attotime_never, 0, attotime_never );
+	timer_adjust_oneshot(thmfc_floppy_cmd, attotime_never, 0);
 }
 
 

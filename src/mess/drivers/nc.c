@@ -95,7 +95,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/nc.h"
 #include "includes/serial.h"	/* for serial data transfers */
 #include "machine/msm8251.h"	/* for NC100 uart */
@@ -593,7 +592,7 @@ static void nc_common_init_machine(void)
 
 	/* keyboard timer */
 	nc_keyboard_timer = timer_alloc(nc_keyboard_timer_callback, NULL);
-	timer_adjust(nc_keyboard_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
+	timer_adjust_oneshot(nc_keyboard_timer, ATTOTIME_IN_MSEC(10), 0);
 
 	/* dummy timer */
 	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, dummy_timer_callback);
@@ -798,7 +797,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 		}
 	}
 
-	timer_adjust(nc_serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate_table[(data & 0x07)]));
+	timer_adjust_periodic(nc_serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate_table[(data & 0x07)]));
 
 	nc_uart_control = data;
 }

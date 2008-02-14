@@ -233,7 +233,7 @@ static void vc20_wav_state (void)
 		if (tape.motor && tape.play)
 		{
 			wav.state = 3;
-			timer_adjust(wav.timer, 0, 0, 1.0 / wav.sample->smpfreq);
+			timer_adjust_periodic(wav.timer, 0, 0, 1.0 / wav.sample->smpfreq);
 			break;
 		}
 		if (tape.motor && tape.record)

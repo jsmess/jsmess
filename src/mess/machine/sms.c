@@ -2,7 +2,6 @@
 #include "driver.h"
 #include "image.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"
@@ -945,7 +944,7 @@ MACHINE_RESET(sms)
 	rapid_fire_state_1 = 0;
 	rapid_fire_state_2 = 0;
 	rapid_fire_timer = timer_alloc( rapid_fire_callback , NULL);
-	timer_adjust( rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10) );
+	timer_adjust_periodic(rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
 
 	last_paddle_read_time = 0;
 	paddle_read_state = 0;

@@ -356,7 +356,6 @@ Video part
 #include <stdio.h>
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "utils.h"
 #include "sound/custom.h"
 
@@ -590,17 +589,17 @@ static TIMER_CALLBACK(ted7360_timer_timeout)
 	{
 	case 1:
 	    // prooved by digisound of several intros like eoroidpro
-		timer_adjust(timer1, TEDTIME_IN_CYCLES (TIMER1), 1, attotime_zero);
+		timer_adjust_oneshot(timer1, TEDTIME_IN_CYCLES (TIMER1), 1);
 		timer1_active = 1;
 		ted7360_set_interrupt (8);
 		break;
 	case 2:
-		timer_adjust(timer2, TEDTIME_IN_CYCLES (0x10000), 2, attotime_zero);
+		timer_adjust_oneshot(timer2, TEDTIME_IN_CYCLES (0x10000), 2);
 		timer2_active = 1;
 		ted7360_set_interrupt (0x10);
 		break;
 	case 3:
-		timer_adjust(timer3, TEDTIME_IN_CYCLES (0x10000), 3, attotime_zero);
+		timer_adjust_oneshot(timer3, TEDTIME_IN_CYCLES (0x10000), 3);
 		timer3_active = 1;
 		ted7360_set_interrupt (0x40);
 		break;
@@ -653,7 +652,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 1:						   /* start timer 1 */
 		ted7360[offset] = data;
-		timer_adjust(timer1, TEDTIME_IN_CYCLES (TIMER1), 1, attotime_zero);
+		timer_adjust_oneshot(timer1, TEDTIME_IN_CYCLES (TIMER1), 1);
 		timer1_active = 1;
 		break;
 	case 2:						   /* stop timer 2 */
@@ -667,7 +666,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 3:						   /* start timer 2 */
 		ted7360[offset] = data;
-		timer_adjust(timer2, TEDTIME_IN_CYCLES (TIMER2), 2, attotime_zero);
+		timer_adjust_oneshot(timer2, TEDTIME_IN_CYCLES (TIMER2), 2);
 		timer2_active = 1;
 		break;
 	case 4:						   /* stop timer 3 */
@@ -681,7 +680,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 5:						   /* start timer 3 */
 		ted7360[offset] = data;
-		timer_adjust(timer3, TEDTIME_IN_CYCLES (TIMER3), 3, attotime_zero);
+		timer_adjust_oneshot(timer3, TEDTIME_IN_CYCLES (TIMER3), 3);
 		timer3_active = 1;
 		break;
 	case 6:

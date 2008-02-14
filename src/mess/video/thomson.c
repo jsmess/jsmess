@@ -9,7 +9,6 @@
 #include <math.h>
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/thomson.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -220,7 +219,7 @@ static TIMER_CALLBACK( thom_lightpen_step )
 		thom_lightpen_cb( step );
 
 	if ( step < thom_lightpen_nb )
-		timer_adjust( thom_lightpen_timer, ATTOTIME_IN_USEC( 64 ), step + 1, attotime_zero );
+		timer_adjust_oneshot(thom_lightpen_timer, ATTOTIME_IN_USEC( 64 ), step + 1);
 }
 
 
@@ -820,7 +819,7 @@ static TIMER_CALLBACK( thom_scanline_start )
 
 	/* prepare for next scanline */
 	if ( y == 199 )
-		timer_adjust( thom_scanline_timer, attotime_never, 0, attotime_zero);
+		timer_adjust_oneshot(thom_scanline_timer, attotime_never, 0);
 	else
 	{
 
@@ -845,7 +844,7 @@ static TIMER_CALLBACK( thom_scanline_start )
 			thom_pal_changed = 0;
 		}
 
-		timer_adjust( thom_scanline_timer, ATTOTIME_IN_USEC(64), y + 1, attotime_zero);
+		timer_adjust_oneshot(thom_scanline_timer, ATTOTIME_IN_USEC(64), y + 1);
 	}
 }
 
@@ -1028,7 +1027,7 @@ static TIMER_CALLBACK( thom_set_init )
 	if ( thom_init_cb )
 		thom_init_cb( init );
 	if ( ! init )
-		timer_adjust( thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init, attotime_zero );
+		timer_adjust_oneshot(thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init);
 }
 
 /* call this at the very begining of each new frame */
@@ -1066,20 +1065,18 @@ VIDEO_EOF ( thom )
 	thom_vstate_dirty = 0;
 
 	/* schedule first init signal */
-	timer_adjust( thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7 ), 0, attotime_zero );
+	timer_adjust_oneshot(thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7 ), 0);
 
 	/* schedule first lightpen signal */
 	l.line &= ~1; /* hack (avoid lock in MO6 palette selection) */
-	timer_adjust( thom_lightpen_timer,
-			   ATTOTIME_IN_USEC( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ),
-			   0, attotime_zero );
+	timer_adjust_oneshot(thom_lightpen_timer,
+			   ATTOTIME_IN_USEC( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ), 0);
 
 	/* schedule first active-area scanline call-back */
-	timer_adjust( thom_scanline_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7),
-			   -1, attotime_zero );
+	timer_adjust_oneshot(thom_scanline_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7), -1);
 
 	/* reset video frame time */
-	timer_adjust( thom_video_timer, attotime_zero, 0, attotime_never );
+	timer_adjust_oneshot(thom_video_timer, attotime_zero, 0);
 
 	/* update screen size according to user options */
 	if ( thom_update_screen_size() )

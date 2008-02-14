@@ -33,7 +33,6 @@
 #include "driver.h"
 #include "mc6843.h"
 #include "devices/flopdrv.h"
-#include "mslegacy.h"
 
 
 /******************* parameters ******************/
@@ -376,7 +375,7 @@ static TIMER_CALLBACK( mc6843_cont )
 
 	LOG(( "%f mc6843_cont: timer called for cmd=%s(%i)\n", attotime_to_double(timer_get_time()), mc6843_cmd[cmd], cmd ));
 
-	timer_adjust( mc6843->timer_cont, attotime_never, 0, attotime_never );
+	timer_adjust_oneshot(mc6843->timer_cont, attotime_never, 0);
 
 	switch ( cmd )
 	{
@@ -444,7 +443,7 @@ READ8_HANDLER ( mc6843_r )
 					}
 					else
 					{
-						timer_adjust( mc6843->timer_cont, DELAY_ADDR, 0, attotime_never );
+						timer_adjust_oneshot(mc6843->timer_cont, DELAY_ADDR, 0);
 					}
 				}
 				else
@@ -589,7 +588,7 @@ WRITE8_HANDLER ( mc6843_w )
 					}
 					else
 					{
-						timer_adjust( mc6843->timer_cont, DELAY_ADDR, 0, attotime_never );
+						timer_adjust_oneshot(mc6843->timer_cont, DELAY_ADDR, 0);
 					}
 				}
 				else
@@ -690,12 +689,12 @@ WRITE8_HANDLER ( mc6843_w )
 			mc6843->STRA |=  0x80; /* set Busy */
 			mc6843->STRA &= ~0x22; /* clear Track Not Equal & Delete Data Mark Detected */
 			mc6843->STRB &= ~0x04; /* clear Data Mark Undetected */
-			timer_adjust( mc6843->timer_cont, DELAY_ADDR, 0, attotime_never );
+			timer_adjust_oneshot(mc6843->timer_cont, DELAY_ADDR, 0);
 			break;
 		case CMD_STZ:
 		case CMD_SEK:
 			mc6843->STRA |= 0x80; /* set Busy */
-			timer_adjust( mc6843->timer_cont, DELAY_SEEK, 0, attotime_never );
+			timer_adjust_oneshot(mc6843->timer_cont, DELAY_SEEK, 0);
 			break;
 		case CMD_FFW:
 		case CMD_FFR:
@@ -778,7 +777,7 @@ void mc6843_reset ( void )
 
 	mc6843->data_size = 0;
 	mc6843->data_idx = 0;
-	timer_adjust( mc6843->timer_cont, attotime_never, 0, attotime_never );
+	timer_adjust_oneshot(mc6843->timer_cont, attotime_never, 0);
 }
 
 

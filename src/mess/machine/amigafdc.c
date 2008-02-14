@@ -15,7 +15,6 @@
 #include "amiga.h"
 #include "amigafdc.h"
 #include "machine/6526cia.h"
-#include "mslegacy.h"
 
 
 #define MAX_TRACK_BYTES			12500
@@ -277,7 +276,7 @@ static TIMER_CALLBACK(fdc_sync_proc)
 		time = ONE_SECTOR_BYTES;
 		time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 		time *= 8;
-		timer_adjust( fdc_status[drive].sync_timer, ATTOTIME_IN_USEC( time ), drive, attotime_zero );
+		timer_adjust_oneshot(fdc_status[drive].sync_timer, ATTOTIME_IN_USEC( time ), drive);
 		return;
 	}
 
@@ -354,7 +353,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 			time = len_words * 2;
 			time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 			time *= 8;
-			timer_adjust( fdc_status[drive].dma_timer, ATTOTIME_IN_USEC( time ), drive, attotime_zero );
+			timer_adjust_oneshot(fdc_status[drive].dma_timer, ATTOTIME_IN_USEC( time ), drive);
 			return;
 		}
 	}
@@ -425,7 +424,7 @@ void amiga_fdc_setup_dma( void ) {
 	time += len_words * 2;
 	time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 	time *= 8;
-	timer_adjust( fdc_status[drive].dma_timer, ATTOTIME_IN_USEC( time ), drive, attotime_zero );
+	timer_adjust_oneshot(fdc_status[drive].dma_timer, ATTOTIME_IN_USEC( time ), drive);
 
 	return;
 
@@ -601,7 +600,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 	/* Issue a index pulse when a disk revolution completes */
 	cia_issue_index(1);
 
-	timer_adjust(fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive, attotime_zero);
+	timer_adjust_oneshot(fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive);
 	fdc_status[drive].rev_timer_started = 1;
 
 	if ( fdc_status[drive].is_ext_image == 0 )
@@ -610,7 +609,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 		time = GAP_TRACK_BYTES + 6;
 		time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 		time *= 8;
-		timer_adjust( fdc_status[drive].sync_timer, ATTOTIME_IN_USEC( time ), drive, attotime_zero );
+		timer_adjust_oneshot(fdc_status[drive].sync_timer, ATTOTIME_IN_USEC( time ), drive);
 	}
 }
 
@@ -622,7 +621,7 @@ static void start_rev_timer( int drive ) {
 		return;
 	}
 
-	timer_adjust(fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive, attotime_zero);
+	timer_adjust_oneshot(fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive);
 	fdc_status[drive].rev_timer_started = 1;
 }
 

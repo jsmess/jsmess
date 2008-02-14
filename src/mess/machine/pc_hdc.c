@@ -24,7 +24,6 @@
 #include "machine/8237dma.h"
 #include "devices/harddriv.h"
 #include "memconv.h"
-#include "mslegacy.h"
 
 
 #define LOG_HDC_STATUS		0
@@ -635,7 +634,7 @@ static void pc_hdc_data_w(int n, int data)
 			status[n] |= STA_INPUT;
 
 			assert(timer[n]);
-			timer_adjust(timer[n], ATTOTIME_IN_MSEC(1), n, attotime_zero);
+			timer_adjust_oneshot(timer[n], ATTOTIME_IN_MSEC(1), n);
         }
 	}
 }

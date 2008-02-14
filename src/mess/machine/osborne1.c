@@ -16,7 +16,6 @@ be written to RAM if RAM was switched in.
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
@@ -358,7 +357,7 @@ static TIMER_CALLBACK(osborne1_video_callback) {
 		beep_set_state( 0, 0 );
 	}
 
-	timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, y + 1, 0 ), 0, attotime_never );
+	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos( 0, y + 1, 0 ), 0);
 }
 
 /*
@@ -435,7 +434,7 @@ MACHINE_RESET( osborne1 ) {
 	memset( mess_ram + 0x10000, 0xFF, 0x1000 );
 
 	osborne1.video_timer = timer_alloc( osborne1_video_callback , NULL);
-	timer_adjust( osborne1.video_timer, video_screen_get_time_until_pos( 0, 1, 0 ), 0, attotime_never );
+	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos( 0, 1, 0 ), 0);
 	pia_1_ca1_w( 0, 0 );
 
 	timer_set( attotime_zero, NULL, 0, setup_beep );

@@ -16,7 +16,6 @@
 */
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "flopdrv.h"
 
 
@@ -76,12 +75,12 @@ static void floppy_drive_index_func(mess_image *img)
 	if (pDrive->index)
 	{
 		pDrive->index = 0;
-		timer_adjust(pDrive->index_timer, double_to_attotime(ms*19/20/1000.0), 0, attotime_zero);
+		timer_adjust_oneshot(pDrive->index_timer, double_to_attotime(ms*19/20/1000.0), 0);
 	}
 	else
 	{
 		pDrive->index = 1;
-		timer_adjust(pDrive->index_timer, double_to_attotime(ms/20/1000.0), 0, attotime_zero);
+		timer_adjust_oneshot(pDrive->index_timer, double_to_attotime(ms/20/1000.0), 0);
 	}
 
 	if (pDrive->index_pulse_callback)
@@ -224,7 +223,7 @@ void floppy_drive_set_motor_state(mess_image *img, int state)
 			else
 			{
 				/* on->off */
-				timer_adjust(pDrive->index_timer, attotime_zero, 0, attotime_zero);
+				timer_adjust_oneshot(pDrive->index_timer, attotime_zero, 0);
 			}
 		}
 	}

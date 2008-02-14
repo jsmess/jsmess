@@ -37,7 +37,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 
@@ -314,7 +313,7 @@ static TIMER_CALLBACK(wd17xx_busy_callback)
 static void wd17xx_set_busy(wd17xx_info *w, attotime duration)
 {
 	w->status |= STA_1_BUSY;
-	timer_adjust(busy_timer, duration, 0, attotime_zero);
+	timer_adjust_oneshot(busy_timer, duration, 0);
 }
 
 
@@ -832,7 +831,7 @@ static void wd17xx_complete_command(wd17xx_info *w, int delay)
 	usecs *= delay;
 
 	/* set new timer */
-	timer_adjust(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_COMMAND, attotime_zero);
+	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_COMMAND);
 }
 
 
@@ -1014,7 +1013,7 @@ static void wd17xx_timed_data_request(void)
 	usecs = floppy_drive_get_datarate_in_us(w->density);
 
 	/* set new timer */
-	timer_adjust(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_DATA, attotime_zero);
+	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_DATA);
 }
 
 

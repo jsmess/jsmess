@@ -6,7 +6,6 @@
 
 #include <math.h>
 #include "driver.h"
-#include "mslegacy.h"
 
 #include "tms9901.h"
 
@@ -329,7 +328,7 @@ static void tms9901_timer_reload(int which)
 {
 	if (tms9901[which].clockinvl)
 	{	/* reset clock interval */
-		timer_adjust(tms9901[which].timer, double_to_attotime((double) tms9901[which].clockinvl / (tms9901[which].clock_rate / 64.)), which, double_to_attotime((double) tms9901[which].clockinvl / (tms9901[which].clock_rate / 64.)));
+		timer_adjust_periodic(tms9901[which].timer, double_to_attotime((double) tms9901[which].clockinvl / (tms9901[which].clock_rate / 64.)), which, double_to_attotime((double) tms9901[which].clockinvl / (tms9901[which].clock_rate / 64.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */

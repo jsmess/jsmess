@@ -9,7 +9,6 @@
 #include "driver.h"
 #include "machine/uart8250.h"
 #include "includes/pc_mouse.h"
-#include "mslegacy.h"
 
 
 static struct {
@@ -230,12 +229,12 @@ void pc_mouse_handshake_in(int n, int outputs)
 			}
 
 			/* start a timer to scan the mouse input */
-			timer_adjust(pc_mouse.timer, attotime_zero, pc_mouse.serial_port, ATTOTIME_IN_HZ(240));
+			timer_adjust_periodic(pc_mouse.timer, attotime_zero, pc_mouse.serial_port, ATTOTIME_IN_HZ(240));
 		}
 		else
 		{
 			/* CTS just went to 0 */
-			timer_adjust(pc_mouse.timer, attotime_zero, pc_mouse.serial_port, attotime_zero);
+			timer_adjust_oneshot(pc_mouse.timer, attotime_zero, pc_mouse.serial_port);
 			pc_mouse.head = pc_mouse.tail = 0;
 		}
 	}

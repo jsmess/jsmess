@@ -25,7 +25,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "machine/wd17xx.h"
 #include "smc92x4.h"
 #include "ti99_4x.h"
@@ -35,8 +34,10 @@
 #include "formats/basicdsk.h"
 #include "devices/mflopimg.h"
 
+
 #define MAX_FLOPPIES 4
 #define TI99DSK_TAG	"ti99dsktag"
+
 
 static int use_80_track_drives;
 
@@ -507,7 +508,7 @@ static void fdc_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			timer_adjust(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0, attotime_zero);
+			timer_adjust_oneshot(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
 		}
 		motor_on = data;
 		break;
@@ -711,7 +712,7 @@ static void ccfdc_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			timer_adjust(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0, attotime_zero);
+			timer_adjust_oneshot(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
 		}
 		motor_on = data;
 		break;
@@ -925,7 +926,7 @@ static void bwg_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			timer_adjust(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0, attotime_zero);
+			timer_adjust_oneshot(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
 		}
 		motor_on = data;
 		break;
@@ -1317,7 +1318,7 @@ static void hfdc_cru_w(int offset, int data)
 		{
 			DVENA = 1;
 			fdc_handle_hold();
-			timer_adjust(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0, attotime_zero);
+			timer_adjust_oneshot(motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
 		}
 		motor_on = data;
 		break;

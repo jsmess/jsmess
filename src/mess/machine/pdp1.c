@@ -13,7 +13,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
@@ -407,7 +406,7 @@ DEVICE_LOAD( pdp1_tape )
 			if (tape_reader.motor_on && tape_reader.rcl)
 			{
 				/* delay is approximately 1/400s */
-				timer_adjust(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0, attotime_zero);
+				timer_adjust_oneshot(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
 			}
 			else
 			{
@@ -489,7 +488,7 @@ static void begin_tape_read(int binary, int nac)
 	if (tape_reader.motor_on && tape_reader.rcl)
 	{
 		/* delay is approximately 1/400s */
-		timer_adjust(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0, attotime_zero);
+		timer_adjust_oneshot(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
 	}
 	else
 	{
@@ -542,7 +541,7 @@ static TIMER_CALLBACK(reader_callback)
 
 	if (tape_reader.motor_on && tape_reader.rcl)
 		/* delay is approximately 1/400s */
-		timer_adjust(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0, attotime_zero);
+		timer_adjust_oneshot(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
 	else
 		timer_enable(tape_reader.timer, 0);
 }
@@ -680,7 +679,7 @@ void iot_ppa(int op2, int nac, int mb, int *io, int ac)
 			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
 	}
 
-	timer_adjust(tape_puncher.timer, ATTOTIME_IN_USEC(15800), nac, attotime_zero);
+	timer_adjust_oneshot(tape_puncher.timer, ATTOTIME_IN_USEC(15800), nac);
 }
 
 /*
@@ -707,7 +706,7 @@ void iot_ppb(int op2, int nac, int mb, int *io, int ac)
 		if (timer_enable(tape_puncher.timer, 0))
 			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
 	}
-	timer_adjust(tape_puncher.timer, ATTOTIME_IN_USEC(15800), nac, attotime_zero);
+	timer_adjust_oneshot(tape_puncher.timer, ATTOTIME_IN_USEC(15800), nac);
 }
 
 
@@ -896,7 +895,7 @@ void iot_tyo(int op2, int nac, int mb, int *io, int ac)
 			logerror("Error: overlapped TYO instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
 	}
 
-	timer_adjust(typewriter.tyo_timer, ATTOTIME_IN_MSEC(delay), nac, attotime_zero);
+	timer_adjust_oneshot(typewriter.tyo_timer, ATTOTIME_IN_MSEC(delay), nac);
 }
 
 /*
@@ -1008,7 +1007,7 @@ void iot_dpy(int op2, int nac, int mb, int *io, int ac)
 			if (timer_enable(dpy_timer, 0))
 				logerror("Error: overlapped DPY instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
 		}
-		timer_adjust(dpy_timer, ATTOTIME_IN_USEC(50), 0, attotime_zero);
+		timer_adjust_oneshot(dpy_timer, ATTOTIME_IN_USEC(50), 0);
 	}
 }
 
@@ -1027,7 +1026,7 @@ static void parallel_drum_set_il(int il)
 	il_phase = attotime_sub(attotime_mul(PARALLEL_DRUM_WORD_TIME, il), timer_timeelapsed(parallel_drum.rotation_timer));
 	if (attotime_compare(il_phase, attotime_zero) < 0)
 		il_phase = attotime_add(il_phase, PARALLEL_DRUM_ROTATION_TIME);
-	timer_adjust(parallel_drum.il_timer, il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
+	timer_adjust_periodic(parallel_drum.il_timer, il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1043,7 +1042,7 @@ static TIMER_CALLBACK(il_timer_callback)
 static void parallel_drum_init(void)
 {
 	parallel_drum.rotation_timer = timer_alloc(NULL, NULL);
-	timer_adjust(parallel_drum.rotation_timer, PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
+	timer_adjust_periodic(parallel_drum.rotation_timer, PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
 	parallel_drum.il_timer = timer_alloc(il_timer_callback, NULL);
 	parallel_drum_set_il(0);

@@ -6,10 +6,10 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 
 #include "includes/aim65.h"
 #include "machine/6522via.h"
+
 
 static int printer_x;
 static int printer_y;
@@ -96,7 +96,7 @@ WRITE8_HANDLER( aim65_printer_on )
 	if (!data)
 	{
 		aim65_printer_cr();
-		timer_adjust(print_timer, attotime_zero, 0, ATTOTIME_IN_USEC(10));
+		timer_adjust_periodic(print_timer, attotime_zero, 0, ATTOTIME_IN_USEC(10));
 		via_0_cb1_w(0, 0);
 		printer_level = 1;
 	}

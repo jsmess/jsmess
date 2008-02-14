@@ -12,7 +12,6 @@
 #include <stdarg.h>
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "devices/cassette.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/pmd85.h"
@@ -787,7 +786,7 @@ static void pmd85_common_driver_init (void)
 	msm8251_init(&pmd85_msm8251_interface);
 
 	pmd85_cassette_timer = timer_alloc(pmd85_cassette_timer_callback, NULL);
-	timer_adjust(pmd85_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
+	timer_adjust_periodic(pmd85_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
 
 	serial_connection_init(&pmd85_cassette_serial_connection);
 	serial_connection_set_in_callback(&pmd85_cassette_serial_connection, pmd85_cassette_write);

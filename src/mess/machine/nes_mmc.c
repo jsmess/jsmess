@@ -30,7 +30,6 @@
 #include "osdepend.h"
 #include "deprecat.h"
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/nes.h"
 #include "nes_mmc.h"
 #include "sound/nes_apu.h"
@@ -102,7 +101,7 @@ static emu_timer	*nes_irq_timer;
 static TIMER_CALLBACK(nes_irq_callback)
 {
 	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);
-	timer_adjust(nes_irq_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
 }
 
 WRITE8_HANDLER( nes_low_mapper_w )
@@ -635,7 +634,7 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 		{
 			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
 			cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, HOLD_LINE);
-//			timer_adjust(nes_irq_timer, ATTOTIME_IN_CYCLES(4, 0), 0, attotime_never);
+//			timer_adjust_oneshot(nes_irq_timer, ATTOTIME_IN_CYCLES(4, 0), 0);
 		}
 	}
 }
@@ -2874,11 +2873,11 @@ static WRITE8_HANDLER( mapper42_w )
 			/* Check if IRQ is being enabled */
 			if ( ! IRQ_enable && ( data & 0x02 ) ) {
 				IRQ_enable = 1;
-				timer_adjust(nes_irq_timer, ATTOTIME_IN_CYCLES(24576, 0), 0, attotime_never);
+				timer_adjust_oneshot(nes_irq_timer, ATTOTIME_IN_CYCLES(24576, 0), 0);
 			}
 			if ( ! ( data & 0x02 ) ) {
 				IRQ_enable = 0;
-				timer_adjust(nes_irq_timer, attotime_never, 0, attotime_never);
+				timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
 			}
 			break;
 		}

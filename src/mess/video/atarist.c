@@ -15,7 +15,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
 #include "video/atarist.h"
-#include "mslegacy.h"
+
 
 static struct SHIFTER
 {
@@ -721,8 +721,8 @@ VIDEO_START( atarist )
 	atarist_shifter_timer = timer_alloc(atarist_shifter_tick, NULL);
 	atarist_glue_timer = timer_alloc(atarist_glue_tick, NULL);
 
-	timer_adjust(atarist_shifter_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
-	timer_adjust(atarist_glue_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
+	timer_adjust_periodic(atarist_shifter_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
+	timer_adjust_periodic(atarist_glue_timer, video_screen_get_time_until_pos(0,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
 
 	memset(&shifter, 0, sizeof(shifter));
 

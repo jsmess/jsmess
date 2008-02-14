@@ -16,7 +16,6 @@ DMAC controller.
 #include "machine/wd33c93.h"
 #include "machine/tpi6525.h"
 #include "matsucd.h"
-#include "mslegacy.h"
 
 
 #define VERBOSE_DMAC 0
@@ -112,7 +111,7 @@ static TIMER_CALLBACK(dmac_dma_proc)
 	if ( dmac_data.wtc > 0 )
 	{
 		matsucd_read_next_block();
-		timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
+		timer_adjust_oneshot(dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0);
 	}
 	else
 	{
@@ -221,7 +220,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x70:	/* DMA start strobe */
 		{
 			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() ));
-			timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
+			timer_adjust_oneshot(dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0);
 		}
 		break;
 
@@ -347,7 +346,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x70:	/* DMA start strobe */
 		{
 			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", activecpu_get_pc() ));
-			timer_adjust( dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0, attotime_zero );
+			timer_adjust_oneshot(dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0);
 		}
 		break;
 
@@ -456,7 +455,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 	}
 	else
 	{
-		timer_adjust( tp6525_delayed_timer, ATTOTIME_IN_MSEC(1), 0, attotime_zero );
+		timer_adjust_oneshot(tp6525_delayed_timer, ATTOTIME_IN_MSEC(1), 0);
 	}
 }
 
@@ -473,7 +472,7 @@ static void tp6525_irq( int level )
 		else
 		{
 			/* we *have to* deliver the irq, so if we can't, delay it and try again later */
-			timer_adjust( tp6525_delayed_timer, ATTOTIME_IN_MSEC(1), 0, attotime_zero );
+			timer_adjust_oneshot(tp6525_delayed_timer, ATTOTIME_IN_MSEC(1), 0);
 		}
 	}
 }

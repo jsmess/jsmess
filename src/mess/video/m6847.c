@@ -66,12 +66,12 @@
 #include "driver.h"
 #include "m6847.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 
 #ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #endif
+
 
 #define LOG_FS			0
 #define LOG_HS			0
@@ -1633,12 +1633,10 @@ static TIMER_CALLBACK(hs_rise)
 	if (LOG_HS)
 		logerror("hs_rise(): time=%s\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION));
 
-	timer_adjust(m6847->hs_rise_timer,
-		attotime_make(0, m6847->scanline_period),
-		0, attotime_never);
-	timer_adjust(m6847->hs_fall_timer,
-		attotime_make(0, m6847->horizontal_sync_period),
-		0, attotime_never);
+	timer_adjust_oneshot(m6847->hs_rise_timer,
+		attotime_make(0, m6847->scanline_period), 0);
+	timer_adjust_oneshot(m6847->hs_fall_timer,
+		attotime_make(0, m6847->horizontal_sync_period), 0);
 
 	set_horizontal_sync();
 	prepare_scanline(0);
@@ -1658,12 +1656,11 @@ static TIMER_CALLBACK(fs_rise)
 		logerror("fs_rise(): time=%s scanline=%d\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION), get_scanline());
 
 	/* adjust field sync falling edge timer */
-	timer_adjust(m6847->fs_fall_timer,
-		attotime_make(0, m6847->field_sync_period),
-		0, attotime_never);
+	timer_adjust_oneshot(m6847->fs_fall_timer,
+		attotime_make(0, m6847->field_sync_period), 0);
 
 	/* adjust horizontal sync rising timer */
-	timer_adjust(m6847->hs_rise_timer, attotime_zero, 0, attotime_never);
+	timer_adjust_oneshot(m6847->hs_rise_timer, attotime_zero, 0);
 
 	/* this is a hook for the CoCo 3 code to extend this stuff */
 	if (m6847->new_frame_callback)
@@ -1892,7 +1889,7 @@ void m6847_init(const m6847_config *cfg)
 	/* setup timing */
 	frame_period = period *
 		(UINT32) (v->clocks_per_scanline * total_scanlines * GROSS_FACTOR);
-	timer_adjust(m6847->fs_rise_timer, attotime_zero, 0, attotime_make(0, frame_period));
+	timer_adjust_periodic(m6847->fs_rise_timer, attotime_zero, 0, attotime_make(0, frame_period));
 
 	/* setup save states */
 	state_save_register_func_postload(set_field_sync);

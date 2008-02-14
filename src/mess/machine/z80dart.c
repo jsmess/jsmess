@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "z80dart.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -309,7 +308,7 @@ static void reset_channel(z80dart *dart, int ch)
 	interrupt_check(dart);
 
 	/* start the receive timer running */
-	timer_adjust(chan->receive_timer, tpc, ((dart - darts) << 1) | ch, tpc);
+	timer_adjust_periodic(chan->receive_timer, tpc, ((dart - darts) << 1) | ch, tpc);
 }
 
 

@@ -14,7 +14,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/i86/i186intf.h"
 #include "video/i82720.h"
 #include "machine/8255ppi.h"
@@ -26,6 +25,7 @@
 #include "machine/msm8251.h"
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
+
 
 /*-------------------------------------------------------------------------*/
 /* Defines, constants, and global variables                                */
@@ -778,11 +778,11 @@ static TIMER_CALLBACK(internal_timer_int)
 	if (t->control & 0x0001)
 	{
 		int count = t->maxA ? t->maxA : 0x10000;
-		timer_adjust(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), count), which, attotime_zero);
+		timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), count), which);
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		timer_adjust(t->int_timer, attotime_never, which, attotime_zero);
+		timer_adjust_oneshot(t->int_timer, attotime_never, which);
 }
 
 
@@ -893,7 +893,7 @@ static void internal_timer_update(int which,
 				internal_timer_sync(which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				timer_adjust(t->time_timer, attotime_never, which, attotime_zero);
+				timer_adjust_oneshot(t->time_timer, attotime_never, which);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -902,7 +902,7 @@ static void internal_timer_update(int which,
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				timer_adjust(t->time_timer, attotime_never, which, attotime_zero);
+				timer_adjust_oneshot(t->time_timer, attotime_never, which);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -927,12 +927,12 @@ static void internal_timer_update(int which,
 	        	int diff = t->maxA - t->count;
 	         	if (diff <= 0)
 	         		diff += 0x10000;
-	         	timer_adjust(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which, attotime_zero);
+	         	timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which);
 	         	if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 	      	}
 	      	else
 	      	{
-	        	timer_adjust(t->int_timer, attotime_never, which, attotime_zero);
+	        	timer_adjust_oneshot(t->int_timer, attotime_never, which);
 		}
 	}
 }
@@ -1014,8 +1014,8 @@ static void update_dma_control(int which, int new_control)
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 			d->finished = 0;
-/*			timer_adjust(d->finish_timer,
-         ATTOTIME_IN_HZ(dac[dacnum].frequency) * (double)count, which, 0);*/
+/*			timer_adjust_oneshot(d->finish_timer,
+         ATTOTIME_IN_HZ(dac[dacnum].frequency) * (double)count, which);*/
 		}
 	}
 

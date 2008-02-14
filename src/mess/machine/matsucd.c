@@ -16,7 +16,6 @@ can be expanded with support for the other drives as needed.
 #include "devices/chd_cd.h"
 #include "sound/cdda.h"
 #include "machine/matsucd.h"
-#include "mslegacy.h"
 
 
 #define MATSU_STATUS_READY		( 1 << 0 )	/* driver ready */
@@ -151,7 +150,7 @@ static void matsucd_cdda_play( UINT32 lba, UINT32 num_blocks )
 	if (cddanum != -1)
 	{
 		cdda_start_audio(cddanum, lba, num_blocks);
-		timer_adjust( cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
+		timer_adjust_oneshot(cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0);
 	}
 }
 
@@ -168,7 +167,7 @@ static void matsucd_cdda_pause( int pause )
 		}
 		else
 		{
-			timer_adjust( cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
+			timer_adjust_oneshot(cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0);
 		}
 	}
 }
@@ -298,7 +297,7 @@ static TIMER_CALLBACK(matsu_subcode_proc)
 
 			newstatus |= MATSU_STATUS_PLAYING;
 
-			timer_adjust( cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
+			timer_adjust_oneshot(cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0);
 		}
 		else
 		{

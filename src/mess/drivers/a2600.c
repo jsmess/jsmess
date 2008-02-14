@@ -13,7 +13,7 @@
 #include "formats/a26_cas.h"
 #include "video/tia.h"
 #include "deprecat.h"
-#include "mslegacy.h"
+
 
 #define CART memory_region(REGION_USER1)
 
@@ -1743,7 +1743,7 @@ static MACHINE_RESET( a2600 )
 			}
 		}
 		dpc.oscillator = timer_alloc( modeDPC_timer_callback , NULL);
-		timer_adjust( dpc.oscillator, ATTOTIME_IN_HZ(42000), 0, ATTOTIME_IN_HZ(42000) );
+		timer_adjust_periodic(dpc.oscillator, ATTOTIME_IN_HZ(42000), 0, ATTOTIME_IN_HZ(42000));
 		break;
 
 	case mode32in1:

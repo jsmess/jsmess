@@ -37,7 +37,7 @@
 
 #include "applefdc.h"
 #include "deprecat.h"
-#include "mslegacy.h"
+
 
 /* logging */
 #define LOG_IWM			0
@@ -310,15 +310,13 @@ static void iwm_access(int offset)
 	{
 		case 0x08:
 			/* Turn off motor */
-			timer_adjust(motor_timer,
-				(iwm_mode & IWM_MODE_MOTOROFFDELAY) ? attotime_zero : ATTOTIME_IN_SEC(1),
-				0,
-				attotime_zero);
+			timer_adjust_oneshot(motor_timer,
+				(iwm_mode & IWM_MODE_MOTOROFFDELAY) ? attotime_zero : ATTOTIME_IN_SEC(1), 0);
 			break;
 
 		case 0x09:
 			/* Turn on motor */
-			timer_adjust(motor_timer, attotime_zero, 1, attotime_zero);
+			timer_adjust_oneshot(motor_timer, attotime_zero, 1);
 			break;
 
 		case 0x0A:

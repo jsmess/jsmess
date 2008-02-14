@@ -11,7 +11,6 @@
 #include "ctype.h"
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
@@ -1453,7 +1452,7 @@ static void BBC_Cassette_motor(unsigned char status)
 	if (status)
 	{
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED ,CASSETTE_MASK_MOTOR);
-		timer_adjust(bbc_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+		timer_adjust_periodic(bbc_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 	} else {
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		timer_reset(bbc_tape_timer, attotime_never);

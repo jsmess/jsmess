@@ -15,7 +15,6 @@
 #include "driver.h"
 #include "i8271.h"
 #include "devices/flopdrv.h"
-#include "mslegacy.h"
 
 
 I8271_STATE_t I8271_STATE;
@@ -150,7 +149,7 @@ static void i8271_timed_data_request(void)
 
 	/* set timers */
 	timer_reset(i8271.command_complete_timer, attotime_never);
-	timer_adjust(i8271.data_timer, ATTOTIME_IN_USEC(usecs), 0, attotime_zero);
+	timer_adjust_oneshot(i8271.data_timer, ATTOTIME_IN_USEC(usecs), 0);
 }
 
 
@@ -174,7 +173,7 @@ static void i8271_timed_command_complete(void)
 
 	/* set timers */
 	timer_reset(i8271.data_timer, attotime_never);
-	timer_adjust(i8271.command_complete_timer, ATTOTIME_IN_USEC(usecs), 0, attotime_zero);
+	timer_adjust_oneshot(i8271.command_complete_timer, ATTOTIME_IN_USEC(usecs), 0);
 }
 
 void i8271_reset()

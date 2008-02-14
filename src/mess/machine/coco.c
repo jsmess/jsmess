@@ -98,7 +98,7 @@ easier to manage.
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "devices/cococart.h"
-#include "mslegacy.h"
+
 
 /*common vars/calls */
 static UINT8 *coco_rom;
@@ -1188,7 +1188,7 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 
 static WRITE8_HANDLER ( d_pia0_ca2_w )
 {
-	timer_adjust(mux_sel1_timer, ATTOTIME_IN_USEC(16), data, attotime_never);
+	timer_adjust_oneshot(mux_sel1_timer, ATTOTIME_IN_USEC(16), data);
 }
 
 static TIMER_CALLBACK(coco_update_sel1_timerproc)
@@ -1200,7 +1200,7 @@ static TIMER_CALLBACK(coco_update_sel1_timerproc)
 
 static WRITE8_HANDLER ( d_pia0_cb2_w )
 {
-	timer_adjust(mux_sel2_timer, ATTOTIME_IN_USEC(16), data, attotime_never);
+	timer_adjust_oneshot(mux_sel2_timer, ATTOTIME_IN_USEC(16), data);
 }
 
 static TIMER_CALLBACK(coco_update_sel2_timerproc)
@@ -2035,7 +2035,7 @@ static void coco3_timer_reset(void)
 			logerror("coco3_reset_timer(): target_time=%g\n", attotime_to_double(target_time));
 
 		/* and adjust the timer */
-		timer_adjust(coco3_gime_timer, target_time, 0, attotime_zero);
+		timer_adjust_oneshot(coco3_gime_timer, target_time, 0);
 	}
 	else
 	{
@@ -2572,7 +2572,7 @@ static void coco_cart_timer_w(running_machine *machine, int data)
 
 	/* special code for Q state */
 	if ((data == 0x02) || (data == 0x03) || (data == 0x04))
-		timer_adjust(cart_timer, ATTOTIME_IN_USEC(0), data + 1, attotime_zero);
+		timer_adjust_oneshot(cart_timer, ATTOTIME_IN_USEC(0), data + 1);
 }
 
 
@@ -2637,15 +2637,15 @@ static void coco_setcartline(coco_cartridge *cartridge, cococart_line line, coco
 	switch(line)
 	{
 		case COCOCART_LINE_CART:
-			timer_adjust(cart_timer, ATTOTIME_IN_USEC(0), (int) value, attotime_zero);
+			timer_adjust_oneshot(cart_timer, ATTOTIME_IN_USEC(0), (int) value);
 			break;
 
 		case COCOCART_LINE_NMI:
-			timer_adjust(nmi_timer, ATTOTIME_IN_USEC(0), (int) value, attotime_zero);
+			timer_adjust_oneshot(nmi_timer, ATTOTIME_IN_USEC(0), (int) value);
 			break;
 
 		case COCOCART_LINE_HALT:
-			timer_adjust(halt_timer, ATTOTIME_IN_CYCLES(7,0), (int) value, attotime_zero);
+			timer_adjust_oneshot(halt_timer, ATTOTIME_IN_CYCLES(7,0), (int) value);
 			break;
 	}
 }
@@ -2706,7 +2706,7 @@ static void twiddle_cart_line_if_q(void)
 {
 	/* if the cartridge CART line is set to Q, trigger another round of pulses */
 	if ((coco_cart != NULL) && (cococart_get_line(coco_cart, COCOCART_LINE_CART) == COCOCART_LINE_VALUE_Q))
-		timer_adjust(cart_timer, ATTOTIME_IN_USEC(0), 0x02, attotime_zero);
+		timer_adjust_oneshot(cart_timer, ATTOTIME_IN_USEC(0), 0x02);
 }
 
 

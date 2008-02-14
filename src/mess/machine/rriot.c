@@ -10,9 +10,10 @@
  * used in chess champion mk2
  * rockwell aim65 ?
  **********************************************************************/
+
 #include "driver.h"
 #include "rriot.h"
-#include "mslegacy.h"
+
 
 #define VERBOSE 0
 
@@ -220,23 +221,23 @@ void rriot_w(int chip, int offset, int data)
 		switch (offset&3) {
 		case 0: /* Timer 1 start */
 			LOG(("rriot(%d) TMR1  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) ), chip, attotime_zero);
+			timer_adjust_oneshot(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) ), chip);
 			rriot[chip].state=Delay1;
 			break;
 		case 1: /* Timer 8 start */
 			LOG(("rriot(%d) TMR8  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 8 ), chip, attotime_zero);
+			timer_adjust_oneshot(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 8 ), chip);
 			rriot[chip].state=Delay8;
 			break;
 		case 2: /* Timer 64 start */
 			LOG(("rriot(%d) TMR64 write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
 //			LOG(("rriot(%d) TMR64 write: time is $%f\n", chip, (double)(64.0 * (data + 1) / rriot[chip].clock)));
-			timer_adjust(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 64 ), chip, attotime_zero);
+			timer_adjust_oneshot(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 64 ), chip);
 			rriot[chip].state=Delay64;
 			break;
 		case 3: /* Timer 1024 start */
 			LOG(("rriot(%d) TMR1K write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 1024 ), chip, attotime_zero);
+			timer_adjust_oneshot(rriot[chip].timer, attotime_mul(ATTOTIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 1024 ), chip);
 			rriot[chip].state=Delay1024;
 			break;
 		}

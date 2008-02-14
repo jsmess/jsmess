@@ -5,8 +5,6 @@
 #include "driver.h"
 #include "includes/lynx.h"
 #include "deprecat.h"
-#include "mslegacy.h"
-
 #include "cpu/m6502/m6502.h"
 
 
@@ -948,9 +946,9 @@ static void lynx_timer_write(int which, int offset, UINT8 data)
 			{
 				attotime t = attotime_mul(ATTOTIME_IN_HZ( lynx_time_factor( lynx_timer[which].cntrl1 & 7 ) ), lynx_timer[which].bakup + 1 );
 				if ( lynx_timer[which].cntrl1 & 0x10 )
-					timer_adjust( lynx_timer[which].timer, attotime_zero, which, t);
+					timer_adjust_periodic(lynx_timer[which].timer, attotime_zero, which, t);
 				else
-					timer_adjust( lynx_timer[which].timer, t, which, attotime_zero);
+					timer_adjust_oneshot(lynx_timer[which].timer, t, which);
 				lynx_timer[which].timer_active = 1;
 			}
 		}

@@ -69,7 +69,7 @@
 
 #include "rp5c15.h"
 #include "deprecat.h"
-#include "mslegacy.h"
+
 
 static struct rp5c15 rtc;
 
@@ -138,7 +138,7 @@ void rp5c15_init(const struct rp5c15_interface* intf)
 	rtc.pulse_count = 0;
 
 	rtc_timer = timer_alloc(rtc_alarm_pulse, NULL);
-	timer_adjust(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
+	timer_adjust_periodic(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
 }
 
 static int rp5c15_read(int offset, UINT16 mem_mask)

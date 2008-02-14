@@ -16,7 +16,7 @@
 
 #include "driver.h"
 #include "tms5501.h"
-#include "mslegacy.h"
+
 
 #define DEBUG_TMS5501	0
 
@@ -212,7 +212,7 @@ static void tms5501_timer_reload(int which, int timer)
 {
 	if (tms5501[which].timer_counter[timer])
 	{	/* reset clock interval */
-		timer_adjust(tms5501[which].timer[timer], double_to_attotime((double) tms5501[which].timer_counter[0] / (tms5501[which].clock_rate / 128.)), which, double_to_attotime((double) tms5501[which].timer_counter[timer] / (tms5501[which].clock_rate / 128.)));
+		timer_adjust_periodic(tms5501[which].timer[timer], double_to_attotime((double) tms5501[which].timer_counter[0] / (tms5501[which].clock_rate / 128.)), which, double_to_attotime((double) tms5501[which].timer_counter[timer] / (tms5501[which].clock_rate / 128.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */

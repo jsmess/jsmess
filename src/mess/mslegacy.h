@@ -84,10 +84,6 @@ void palette_set_colors_rgb(running_machine *machine, pen_t color_base, const UI
 const char * ui_getstring (int string_num);
 
 
-/* timer */
-void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime period);
-
-
 /* mc6845 */
 struct _mc6845_t;
 struct _mc6845_interface;

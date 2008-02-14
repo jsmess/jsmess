@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "video/atarist.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/m68000/m68000.h"
@@ -598,7 +597,7 @@ static WRITE16_HANDLER( atariste_sound_dma_control_w )
 		if (!dmasound.active)
 		{
 			atariste_dmasound_set_state(1);
-			timer_adjust(dmasound_timer, attotime_zero, 0, ATTOTIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]));
+			timer_adjust_periodic(dmasound_timer, attotime_zero, 0, ATTOTIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]));
 		}
 	}
 	else
@@ -713,7 +712,7 @@ static WRITE16_HANDLER( atariste_microwire_data_w )
 	if (!timer_enabled(microwire_timer))
 	{
 		mwire.data = data;
-		timer_adjust(microwire_timer, attotime_zero, 0, ATTOTIME_IN_USEC(2));
+		timer_adjust_periodic(microwire_timer, attotime_zero, 0, ATTOTIME_IN_USEC(2));
 	}
 }
 

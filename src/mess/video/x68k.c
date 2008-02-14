@@ -26,9 +26,9 @@
 */
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/x68k.h"
 #include "machine/68901mfp.h"
+
 
 extern struct x68k_system sys;
 
@@ -232,7 +232,7 @@ static void x68k_crtc_refresh_mode()
 	if(sys.crtc.reg[4] != 0)
 	{
 //		scantime = ATTOTIME_IN_HZ(55.45) / sys.crtc.reg[4];
-//		timer_adjust(scanline_timer,attotime_zero,0,scantime);
+//		timer_adjust_periodic(scanline_timer, attotime_zero, 0, scantime);
 	}*/
 }
 
@@ -248,12 +248,12 @@ TIMER_CALLBACK(x68k_hsync)
 		if(scan > sys.crtc.vend)
 			scan = 0;
 		hsync_time = video_screen_get_time_until_pos(0,scan+1,sys.crtc.hsync_end);
-		timer_adjust(scanline_timer,hsync_time,0,attotime_never);
+		timer_adjust_oneshot(scanline_timer, hsync_time, 0);
 	}
 	if(state == 0)
 	{
 		hsync_time = video_screen_get_time_until_pos(0,video_screen_get_vpos(0),sys.crtc.hend);
-		timer_adjust(scanline_timer,hsync_time,1,attotime_never);
+		timer_adjust_oneshot(scanline_timer, hsync_time, 1);
 //		if(!(sys.mfp.gpio & 0x40))  // if GPIP6 is active, clear it
 //			sys.mfp.gpio |= 0x40;
 	}
@@ -272,7 +272,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 
 	if(scan > sys.crtc.vtotal)
 	{
-		timer_adjust(raster_irq,attotime_zero,0,attotime_never);  // disable timer
+		timer_adjust_oneshot(raster_irq, attotime_zero, 0);  // disable timer
 		return;
 	}
 	sys.mfp.gpio &= ~0x40;  // GPIP6
@@ -284,7 +284,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	irq_time = video_screen_get_time_until_pos(0,scan,2);
 	// end of HBlank period clears GPIP6 also?
 	end_time = video_screen_get_time_until_pos(0,scan,sys.crtc.hbegin);
-	timer_adjust(raster_irq,irq_time,scan,attotime_never);
+	timer_adjust_oneshot(raster_irq, irq_time, scan);
 	timer_set(end_time,NULL,0,x68k_crtc_raster_end);
 	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(0));
 }
@@ -302,7 +302,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		if(vblank_line > sys.crtc.vtotal)
 			vblank_line = sys.crtc.vtotal;
 		irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
-		timer_adjust(vblank_irq,irq_time,0,attotime_never);
+		timer_adjust_oneshot(vblank_irq, irq_time, 0);
 		logerror("CRTC: VBlank on\n");
 	}
 	if(val == 0)  // VBlank off
@@ -310,7 +310,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		sys.crtc.vblank = 0;
 		vblank_line = sys.crtc.vbegin;
 		irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
-		timer_adjust(vblank_irq,irq_time,1,attotime_never);
+		timer_adjust_oneshot(vblank_irq, irq_time, 1);
 		logerror("CRTC: VBlank off\n");
 	}
 }
@@ -388,13 +388,13 @@ WRITE16_HANDLER( x68k_crtc_w )
 				irq_time = video_screen_get_time_until_pos(0,(data - 1) / sys.crtc.vmultiple,2);
 
 				if(attotime_to_double(irq_time) > 0)
-					timer_adjust(raster_irq,irq_time,(data - 1) / sys.crtc.vmultiple,attotime_never);
+					timer_adjust_oneshot(raster_irq, irq_time, (data - 1) / sys.crtc.vmultiple);
 				logerror("CRTC: Time until next raster IRQ = %f\n",attotime_to_double(irq_time));
 			}
 		}
 		else
 		{
-			timer_adjust(raster_irq,attotime_zero,0,attotime_never);  // disable timer
+			timer_adjust_oneshot(raster_irq, attotime_zero, 0);  // disable timer
 		}
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
@@ -977,7 +977,7 @@ VIDEO_START( x68000 )
 	tilemap_set_transparent_pen(x68k_bg0_16,0);
 	tilemap_set_transparent_pen(x68k_bg1_16,0);
 
-//	timer_adjust(scanline_timer,attotime_zero,0,ATTOTIME_IN_HZ(55.45)/568);
+//	timer_adjust_periodic(scanline_timer, attotime_zero, 0, ATTOTIME_IN_HZ(55.45)/568);
 }
 
 VIDEO_UPDATE( x68000 )

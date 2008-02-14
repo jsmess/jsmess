@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "sgi.h"
 #include "deprecat.h"
-#include "mslegacy.h"
+
 
 #define VERBOSE_LEVEL ( 1 )
 
@@ -576,7 +576,7 @@ void mc_init()
 	nMC_DMAMode = 0;
 	nMC_DMAZoomByteCnt = 0;
 	tMC_UpdateTimer = timer_alloc( mc_update_callback , NULL);
-	timer_adjust( tMC_UpdateTimer, ATTOTIME_IN_HZ(10000), 0, ATTOTIME_IN_HZ(10000) );
+	timer_adjust_periodic(tMC_UpdateTimer, ATTOTIME_IN_HZ(10000), 0, ATTOTIME_IN_HZ(10000));
 
 	// if Indigo2, ID appropriately
 	if (!strcmp(Machine->gamedrv->name, "ip244415"))

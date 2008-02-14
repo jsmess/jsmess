@@ -1,7 +1,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/gamecom.h"
 #include "cpu/sm8500/sm8500.h"
 #include "image.h"
@@ -328,10 +327,10 @@ WRITE8_HANDLER( gamecom_internal_w )
 			/* timer run */
 			if ( data & 0x40 ) {
 				/* timer resolution 1 minute */
-				timer_adjust( gamecom_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(60) );
+				timer_adjust_periodic(gamecom_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(60));
 			} else {
 				/* TImer resolution 1 second */
-				timer_adjust( gamecom_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1) );
+				timer_adjust_periodic(gamecom_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
 			}
 		} else {
 			/* disable timer reset */

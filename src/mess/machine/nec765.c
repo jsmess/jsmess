@@ -21,8 +21,8 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "machine/nec765.h"
+
 
 typedef enum
 {
@@ -402,7 +402,7 @@ static void nec765_setup_timed_generic(int timer_type, attotime duration)
 
 	if (!(fdc.nec765_flags & NEC765_DMA_MODE))
 	{
-		timer_adjust(fdc.timer, duration, 0, attotime_zero);
+		timer_adjust_oneshot(fdc.timer, duration, 0);
 	}
 	else
 	{
@@ -429,7 +429,7 @@ static void nec765_setup_timed_result_data_request(void)
 static void nec765_setup_timed_int(int signed_tracks)
 {
 	/* setup timer to signal after seek time is complete */
-	timer_adjust(fdc.seek_timer, attotime_zero, 0, double_to_attotime(fdc.srt_in_ms*abs(signed_tracks)*0.001));
+	timer_adjust_periodic(fdc.seek_timer, attotime_zero, 0, double_to_attotime(fdc.srt_in_ms*abs(signed_tracks)*0.001));
 }
 
 static void nec765_seek_setup(int is_recalibrate)
@@ -732,7 +732,7 @@ void nec765_set_tc_state(int state)
 			}
 
 #ifdef NO_END_OF_CYLINDER
-			timer_adjust(fdc.command_timer, attotime_zero, 0, attotime_zero);
+			timer_adjust_oneshot(fdc.command_timer, attotime_zero, 0);
 #else
 			nec765_update_state();
 #endif
@@ -1605,7 +1605,7 @@ void nec765_update_state(void)
 
 		if ((fdc.nec765_transfer_bytes_remaining==0) || (fdc.nec765_flags & NEC765_TC))
 		{
-			timer_adjust(fdc.command_timer, attotime_zero, 0, attotime_zero);
+			timer_adjust_oneshot(fdc.command_timer, attotime_zero, 0);
 		}
 		else
 		{
@@ -1673,7 +1673,7 @@ void nec765_update_state(void)
 
 		if ((fdc.nec765_transfer_bytes_remaining == 0) || (fdc.nec765_flags & NEC765_TC))
 		{
-			timer_adjust(fdc.command_timer, attotime_zero, 0, attotime_zero);
+			timer_adjust_oneshot(fdc.command_timer, attotime_zero, 0);
 		}
 		else
 		{

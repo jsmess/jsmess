@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/electron.h"
 #include "sound/beep.h"
 #include "devices/cassette.h"
@@ -30,7 +29,7 @@ static void electron_tape_start( void ) {
 	ula.high_tone_set = 0;
 	ula.bit_count = 0;
 	ula.tape_running = 1;
-	timer_adjust( electron_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(4800) );
+	timer_adjust_periodic(electron_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(4800));
 }
 
 static void electron_tape_stop( void ) {

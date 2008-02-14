@@ -38,14 +38,15 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
+#include "mslegacy.h"
 #include "cpu/tms9900/tms9900.h"
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "video/tms9928a.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
-#include "mslegacy.h"
-#include "deprecat.h"
+
 
 static int load_state;
 static int ic_state;
@@ -489,7 +490,7 @@ static int device_load_tm990_189_rs232(mess_image *image)
 
 	tms9902_set_dsr(id, 1);
 	rs232_input_timer = timer_alloc(rs232_input_callback, NULL);
-	timer_adjust(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
+	timer_adjust_periodic(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
 	return INIT_PASS;
 }

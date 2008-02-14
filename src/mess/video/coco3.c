@@ -32,7 +32,6 @@
 #include "machine/6883sam.h"
 #include "video/m6847.h"
 #include "includes/coco.h"
-#include "mslegacy.h"
 
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
@@ -511,10 +510,8 @@ static int coco3_new_frame(void)
 	}
 
 	/* set up GIME field sync */
-	timer_adjust(video->gime_fs_timer,
-		m6847_scanline_time(gime_field_sync),
-		0,
-		attotime_never);
+	timer_adjust_oneshot(video->gime_fs_timer,
+		m6847_scanline_time(gime_field_sync), 0);
 
 	return video->legacy_video;
 }

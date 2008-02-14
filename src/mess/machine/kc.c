@@ -1,7 +1,6 @@
 /* Core includes */
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/kc.h"
 
 /* Components */
@@ -434,7 +433,7 @@ static void	kc_cassette_set_motor(int motor_state)
 		if (motor_state)
 		{
 			/* start timer */
-			timer_adjust(kc_cassette_timer, attotime_zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
+			timer_adjust_periodic(kc_cassette_timer, attotime_zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
 		}
 		else
 		{

@@ -1,7 +1,6 @@
 #include <math.h>
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/vectrex.h"
 #include "video/vector.h"
 #include "machine/6522via.h"
@@ -275,7 +274,7 @@ VIDEO_START( vectrex )
 	imager_freq = 1;
 
 	imager_timer = timer_alloc(vectrex_imager_right_eye, NULL);
-	timer_adjust(imager_timer, ATTOTIME_IN_HZ(imager_freq), 2, ATTOTIME_IN_HZ(imager_freq));
+	timer_adjust_periodic(imager_timer, ATTOTIME_IN_HZ(imager_freq), 2, ATTOTIME_IN_HZ(imager_freq));
 
 	lp_t = timer_alloc(lightpen_trigger_callback, NULL);
 
@@ -334,7 +333,7 @@ static WRITE8_HANDLER ( v_via_pb_w )
 						+(double)(pen_y-y_int)*(pen_y-y_int);
 					d2=b2-ab*ab/a2;
 					if (d2<2e10 && analog_sig[ASIG_Z]*blank>0)
-						timer_adjust(lp_t, double_to_attotime(ab/a2/(VECTREX_CLOCK*INT_PER_CLOCK)),0,attotime_zero);
+						timer_adjust_oneshot(lp_t, double_to_attotime(ab/a2/(VECTREX_CLOCK*INT_PER_CLOCK)), 0);
 				}
 			}
 		}
@@ -357,7 +356,7 @@ static WRITE8_HANDLER ( v_via_pb_w )
 			vectrex_solid_line(attotime_to_double(timer_get_time())-start_time+RAMP_DELAY, blank);
 			/* Cancel running timer, line already finished */
 			if (lightpen_down)
-				timer_adjust(lp_t,attotime_never,0,attotime_zero);
+				timer_adjust_oneshot(lp_t, attotime_never, 0);
 		}
 	}
 

@@ -6,9 +6,9 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "image.h"
-#include "mslegacy.h"
 
 #include "includes/vectrex.h"
+
 
 #define VC_RED      MAKE_RGB(0xff, 0x00, 0x00)
 #define VC_GREEN    MAKE_RGB(0x00, 0xff, 0x00)
@@ -290,7 +290,7 @@ WRITE8_HANDLER ( vectrex_psg_port_w )
 
 			if (imager_freq > 1)
 			{
-				timer_adjust (imager_timer,
+				timer_adjust_periodic(imager_timer,
 					double_to_attotime(MIN(1.0/imager_freq, attotime_to_double(timer_timeleft(imager_timer)))),
 					2,
 					ATTOTIME_IN_HZ(imager_freq));

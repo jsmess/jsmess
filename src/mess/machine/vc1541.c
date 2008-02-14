@@ -102,7 +102,6 @@ FF00-FFFF       Jump table, vectors
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
@@ -572,7 +571,7 @@ static WRITE8_HANDLER( vc1541_via1_write_portb )
 				if (attotime_to_double(timer_timeelapsed(vc1541->timer)) > 1.0e29)
 					timer_reset(vc1541->timer, attotime_never);
 				else
-					timer_adjust(vc1541->timer, attotime_zero, 0, double_to_attotime(tme));
+					timer_adjust_periodic(vc1541->timer, attotime_zero, 0, double_to_attotime(tme));
 			}
 			else
 			{
@@ -866,7 +865,7 @@ static WRITE8_HANDLER ( c1551_port_w )
 					if (attotime_to_double(timer_timeelapsed(vc1541->timer)) > 1.0e29)
 						timer_reset(vc1541->timer, attotime_never);
 					else
-						timer_adjust(vc1541->timer, attotime_zero, 0, double_to_attotime(tme));
+						timer_adjust_periodic(vc1541->timer, attotime_zero, 0, double_to_attotime(tme));
 				}
 				else
 				{
@@ -947,7 +946,7 @@ int c1551_config (int id, int mode, C1551_CONFIG *config)
 	/* time should be small enough to allow quitting of the irq
 	   line before the next interrupt is triggered */
 	vc1541->drive.c1551.timer = timer_alloc(c1551_timer, NULL);
-	timer_adjust(vc1541->drive.c1551.timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
+	timer_adjust_periodic(vc1541->drive.c1551.timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
 	return 0;
 }
 

@@ -8,7 +8,6 @@
 
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
-#include "mslegacy.h"
 #include "video/crt.h"
 
 
@@ -232,7 +231,7 @@ DEVICE_LOAD( tx0_tape )
 			if (tape_reader.motor_on && tape_reader.rcl)
 			{
 				/* delay is approximately 1/400s */
-				timer_adjust(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0, attotime_zero);
+				timer_adjust_oneshot(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
 			}
 			else
 			{
@@ -306,7 +305,7 @@ static void begin_tape_read(int binary)
 	if (tape_reader.motor_on && tape_reader.rcl)
 	{
 		/* delay is approximately 1/400s */
-		timer_adjust(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0, attotime_zero);
+		timer_adjust_oneshot(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
 	}
 	else
 	{
@@ -357,7 +356,7 @@ static TIMER_CALLBACK(reader_callback)
 
 	if (tape_reader.motor_on && tape_reader.rcl)
 		/* delay is approximately 1/400s */
-		timer_adjust(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0, attotime_zero);
+		timer_adjust_oneshot(tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
 	else
 		timer_enable(tape_reader.timer, 0);
 }
@@ -398,7 +397,7 @@ void tx0_io_p6h(void)
 	/* shuffle and punch 6-bit word */
 	tape_write(((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5));
 
-	timer_adjust(tape_puncher.timer, ATTOTIME_IN_USEC(15800), 0, attotime_zero);
+	timer_adjust_oneshot(tape_puncher.timer, ATTOTIME_IN_USEC(15800), 0);
 }
 
 /*
@@ -413,7 +412,7 @@ void tx0_io_p7h(void)
 	/* shuffle and punch 6-bit word */
 	tape_write(((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5) | 0100);
 
-	timer_adjust(tape_puncher.timer, ATTOTIME_IN_USEC(15800), 0, attotime_zero);
+	timer_adjust_oneshot(tape_puncher.timer, ATTOTIME_IN_USEC(15800), 0);
 }
 
 
@@ -472,7 +471,7 @@ void tx0_io_prt(void)
 	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
 	typewriter_out(ch);
 
-	timer_adjust(typewriter.prt_timer, ATTOTIME_IN_MSEC(100), 0, attotime_zero);
+	timer_adjust_oneshot(typewriter.prt_timer, ATTOTIME_IN_MSEC(100), 0);
 }
 
 
@@ -498,7 +497,7 @@ void tx0_io_dis(void)
 	y = ac & 0777;
 	tx0_plot(x, y);
 
-	timer_adjust(dis_timer, ATTOTIME_IN_USEC(50), 0, attotime_zero);
+	timer_adjust_oneshot(dis_timer, ATTOTIME_IN_USEC(50), 0);
 }
 
 
@@ -531,7 +530,7 @@ static void schedule_select(void)
 		delay = ATTOTIME_IN_USEC(4600);
 		break;
 	}
-	timer_adjust(magtape.timer, delay, 0, attotime_zero);
+	timer_adjust_oneshot(magtape.timer, delay, 0);
 }
 
 static void schedule_unselect(void)
@@ -553,7 +552,7 @@ static void schedule_unselect(void)
 		delay = ATTOTIME_IN_USEC(5750);
 		break;
 	}
-	timer_adjust(magtape.timer, delay, 0, attotime_zero);
+	timer_adjust_oneshot(magtape.timer, delay, 0);
 }
 
 DEVICE_INIT( tx0_magtape )
@@ -783,7 +782,7 @@ static void magtape_callback(int dummy)
 					break;
 				}
 				if (magtape.state != MTS_UNSELECTING)
-					timer_adjust(magtape.timer, ATTOTIME_IN_USEC(66), 0, attotime_zero);
+					timer_adjust_oneshot(magtape.timer, ATTOTIME_IN_USEC(66), 0);
 			}
 			break;
 
@@ -942,14 +941,14 @@ static void magtape_callback(int dummy)
 					break;
 				}
 				if (magtape.state != MTS_UNSELECTING)
-					timer_adjust(magtape.timer, ATTOTIME_IN_USEC(66), 0, attotime_zero);
+					timer_adjust_oneshot(magtape.timer, ATTOTIME_IN_USEC(66), 0);
 			}
 			break;
 
 		case 2:	/* rewind */
 			magtape.state = MTS_UNSELECTING;
 			/* we rewind at 10*read speed (I don't know the real value) */
-			timer_adjust(magtape.timer, attotime_mul(ATTOTIME_IN_NSEC(6600), image_ftell(magtape.img)), 0, attotime_zero);
+			timer_adjust_oneshot(magtape.timer, attotime_mul(ATTOTIME_IN_NSEC(6600), image_ftell(magtape.img)), 0);
 			//schedule_unselect();
 			image_fseek(magtape.img, 0, SEEK_END);
 			magtape.irg_pos = MTIRGP_END;
@@ -1037,7 +1036,7 @@ static void magtape_callback(int dummy)
 					image_unload(magtape.img);
 				}
 				else
-					timer_adjust(magtape.timer, ATTOTIME_IN_USEC(66), 0, attotime_zero);
+					timer_adjust_oneshot(magtape.timer, ATTOTIME_IN_USEC(66), 0);
 			}
 			break;
 		}
@@ -1053,7 +1052,7 @@ void tx0_sel(void)
 	{
 		if (0)
 			magtape_callback(0);
-		timer_adjust(magtape.timer, attotime_zero, 0, attotime_zero);
+		timer_adjust_oneshot(magtape.timer, attotime_zero, 0);
 	}
 }
 

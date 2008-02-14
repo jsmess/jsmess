@@ -39,7 +39,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
 #include "cpu/m68000/m68000.h"
@@ -47,6 +46,7 @@
 #include "devices/sonydriv.h"
 #include "machine/ncr5380.h"
 #include "includes/mac.h"
+
 
 #ifdef MAME_DEBUG
 #define LOG_VIA			0
@@ -491,9 +491,8 @@ static void keyboard_receive(int val)
 		if (keyboard_reply == 0x7B)
 		{
 			/* if NULL, wait until key pressed or timeout */
-			timer_adjust(inquiry_timeout,
-				attotime_make(0, DOUBLE_TO_ATTOSECONDS(0.25)),
-				0, attotime_zero);
+			timer_adjust_oneshot(inquiry_timeout,
+				attotime_make(0, DOUBLE_TO_ATTOSECONDS(0.25)), 0);
 		}
 		break;
 
@@ -1330,7 +1329,7 @@ MACHINE_RESET(mac)
 		timer_set(attotime_zero, NULL, 0, set_memory_overlay_callback);
 
 	mac_scanline_timer = timer_alloc(mac_scanline_tick, NULL);
-	timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
+	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 }
 
 
@@ -1474,7 +1473,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 	if (!(scanline % 10))
 		mouse_callback();
 
-	timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0, attotime_never);
+	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0);
 
 	cpuintrf_pop_context();
 }

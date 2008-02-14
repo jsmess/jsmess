@@ -30,8 +30,8 @@ setup serial interface software in driver and let the transfer begin */
 */
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/serial.h"
+
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -209,7 +209,7 @@ void serial_device_set_transmit_state(mess_image *image, int state)
 		if (state)
 		{
 			/* start timer */
-			timer_adjust(serial_devices[id].timer, attotime_zero, id, ATTOTIME_IN_HZ(serial_devices[id].BaudRate));
+			timer_adjust_periodic(serial_devices[id].timer, attotime_zero, id, ATTOTIME_IN_HZ(serial_devices[id].BaudRate));
 		}
 		else
 		{

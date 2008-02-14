@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "6551.h"
 #include "includes/serial.h"
-#include "mslegacy.h"
+
 
 static void acia_6551_receive_char(unsigned char ch);
 static void acia_6551_refresh_ints(void);
@@ -467,7 +467,7 @@ WRITE8_HANDLER(acia_6551_w)
 						break;
 					}
 
-					timer_adjust(acia.timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
+					timer_adjust_periodic(acia.timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
 				}
 			}
 

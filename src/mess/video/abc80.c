@@ -5,7 +5,6 @@
  ****************************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/abc80.h"
 
 
@@ -71,7 +70,7 @@ static TIMER_CALLBACK(abc80_blink_tick)
 VIDEO_START( abc80 )
 {
 	abc80_blink_timer = timer_alloc(abc80_blink_tick, NULL);
-	timer_adjust(abc80_blink_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC80_XTAL/2/6/64/312/16));
+	timer_adjust_periodic(abc80_blink_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC80_XTAL/2/6/64/312/16));
 
 	tx_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan,
 		6, 10, 40, 24);

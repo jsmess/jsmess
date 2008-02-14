@@ -8,7 +8,6 @@
 
 #include "pcf8593.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 
 #include <time.h>
 
@@ -59,7 +58,7 @@ void pcf8593_init( void)
 	rtc.size = 16;
 	rtc.data = malloc_or_die( rtc.size);
 	rtc.timer = timer_alloc( pcf8593_timer_callback , NULL);
-	timer_adjust( rtc.timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+	timer_adjust_periodic(rtc.timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
 	pcf8593_reset();
 }
 

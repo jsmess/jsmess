@@ -38,7 +38,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/lisa.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
@@ -646,7 +645,7 @@ static TIMER_CALLBACK(read_COPS_command)
 
 		case 0x7:	/* send mouse command */
 			if (immediate & 0x8)
-				timer_adjust(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC((immediate & 0x7)*4)); /* enable mouse */
+				timer_adjust_periodic(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC((immediate & 0x7)*4)); /* enable mouse */
 			else
 				timer_reset(mouse_timer, attotime_never);
 			break;

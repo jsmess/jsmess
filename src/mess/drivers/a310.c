@@ -35,7 +35,6 @@
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 
 
 // interrupt register stuff
@@ -130,7 +129,7 @@ static TIMER_CALLBACK( a310_vblank )
 	a310_request_irq_a(A310_IRQA_VBL);
 
 	// set up for next vbl
-	timer_adjust(vbl_timer, video_screen_get_time_until_pos(0, a310_vidregs[0xb4], 0), 0, attotime_never);
+	timer_adjust_oneshot(vbl_timer, video_screen_get_time_until_pos(0, a310_vidregs[0xb4], 0), 0);
 }
 
 static void a310_set_timer(int tmr)
@@ -139,7 +138,7 @@ static void a310_set_timer(int tmr)
 
 //  logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, a310_timercnt[tmr], freq);
 
-	timer_adjust(timer[tmr], ATTOTIME_IN_HZ(freq), tmr, attotime_never);
+	timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
 }
 
 // param
@@ -208,19 +207,19 @@ static MACHINE_START( a310 )
 	wd17xx_init(WD_TYPE_1772, a310_wd177x_callback, NULL);
 
 	vbl_timer = timer_alloc(a310_vblank, NULL);
-	timer_adjust(vbl_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(vbl_timer, attotime_never, 0);
 
 	timer[0] = timer_alloc(a310_timer, NULL);
 	timer[1] = timer_alloc(a310_timer, NULL);
 	timer[2] = timer_alloc(a310_timer, NULL);
 	timer[3] = timer_alloc(a310_timer, NULL);
-	timer_adjust(timer[0], attotime_never, 0, attotime_never);
-	timer_adjust(timer[1], attotime_never, 0, attotime_never);
-	timer_adjust(timer[2], attotime_never, 0, attotime_never);
-	timer_adjust(timer[3], attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(timer[0], attotime_never, 0);
+	timer_adjust_oneshot(timer[1], attotime_never, 0);
+	timer_adjust_oneshot(timer[2], attotime_never, 0);
+	timer_adjust_oneshot(timer[3], attotime_never, 0);
 
 	snd_timer = timer_alloc(a310_audio_tick, NULL);
-	timer_adjust(snd_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(snd_timer, attotime_never, 0);
 
 	// reset the DAC to centerline
 	DAC_signed_data_w(0, 0x80);
@@ -591,7 +590,7 @@ static WRITE32_HANDLER(vidc_w)
 			video_screen_configure(0, a310_vidregs[0x80], a310_vidregs[0xa0], &visarea, Machine->screen[0].refresh);
 
 			// slightly hacky: fire off a VBL right now.  the BIOS doesn't wait long enough otherwise.
-			timer_adjust(vbl_timer, attotime_zero, 0, attotime_never);
+			timer_adjust_oneshot(vbl_timer, attotime_zero, 0);
 		}
 
 		a310_vidregs[reg] = val>>12;
@@ -638,11 +637,11 @@ static WRITE32_HANDLER(memc_w)
 
 					a310_sndcur = a310_sndstart;
 
-					timer_adjust(snd_timer, ATTOTIME_IN_HZ(sndhz), 0, ATTOTIME_IN_HZ(sndhz));
+					timer_adjust_periodic(snd_timer, ATTOTIME_IN_HZ(sndhz), 0, ATTOTIME_IN_HZ(sndhz));
 				}
 				else
 				{
-					timer_adjust(snd_timer, attotime_never, 0, attotime_never);
+					timer_adjust_oneshot(snd_timer, attotime_never, 0);
 					DAC_signed_data_w(0, 0x80);
 				}
 				break;

@@ -6,7 +6,6 @@
 
 #include "driver.h"
 #include "centroni.h"
-#include "mslegacy.h"
 #include "devices/printer.h"
 
 typedef struct {
@@ -75,19 +74,19 @@ static TIMER_CALLBACK(centronics_timer_callback)
 	{
 		This->new_control_mask = CENTRONICS_ACKNOWLEDGE;
 		This->new_control_data = 0;
-		timer_adjust(This->timer, ATTOTIME_IN_USEC(2), nr, attotime_zero);
+		timer_adjust_oneshot(This->timer, ATTOTIME_IN_USEC(2), nr);
 	}
 	/* phase 3: end */
 	else if ( This->control & CENTRONICS_NOT_BUSY )
 	{
-		timer_adjust(This->timer, attotime_never, nr, attotime_zero);
+		timer_adjust_oneshot(This->timer, attotime_never, nr);
 	}
 	/* phase 1: schedule not busy & ack */
 	else
 	{
 		This->new_control_mask = CENTRONICS_NOT_BUSY | CENTRONICS_ACKNOWLEDGE;
 		This->new_control_data = CENTRONICS_NOT_BUSY | CENTRONICS_ACKNOWLEDGE;
-		timer_adjust(This->timer, ATTOTIME_IN_USEC(15), nr, attotime_zero);
+		timer_adjust_oneshot(This->timer, ATTOTIME_IN_USEC(15), nr);
 	}
 }
 
@@ -105,7 +104,7 @@ void centronics_write_handshake(int nr, int data, int mask)
 			/* schedule busy */
 			This->new_control_mask = CENTRONICS_NOT_BUSY;
 			This->new_control_data = 0;
-			timer_adjust(This->timer, ATTOTIME_IN_USEC(5), nr, attotime_zero);
+			timer_adjust_oneshot(This->timer, ATTOTIME_IN_USEC(5), nr);
 
 			/* output */
 			printer_output(image_from_devtype_and_index(IO_PRINTER, nr), This->data);

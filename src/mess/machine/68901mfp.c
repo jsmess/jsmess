@@ -34,7 +34,7 @@
 */
 
 #include "68901mfp.h"
-#include "mslegacy.h"
+
 
 typedef struct
 {
@@ -657,7 +657,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			{
 			int divisor = PRESCALER[mfp_p->tacr & 0x07];
 			logerror("MFP68901 #%u Timer A Delay Mode : %u Prescale\n", which, divisor);
-			timer_adjust(mfp_p->timer[MFP68901_TIMER_A], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_A], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
 			}
 			break;
 
@@ -676,7 +676,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			{
 			int divisor = PRESCALER[mfp_p->tacr & 0x07];
 			logerror("MFP68901 #%u Timer A Pulse Width Mode : %u Prescale\n", which, divisor);
-			timer_adjust(mfp_p->timer[MFP68901_TIMER_A], attotime_never, which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_A], attotime_never, which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
 			timer_enable(mfp_p->timer[MFP68901_TIMER_A], 0);
 			}
 			break;
@@ -715,7 +715,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			{
 			int divisor = PRESCALER[mfp_p->tbcr & 0x07];
 			logerror("MFP68901 #%u Timer B Delay Mode : %u Prescale\n", which, divisor);
-			timer_adjust(mfp_p->timer[MFP68901_TIMER_B], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_B], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
 			}
 			break;
 
@@ -734,7 +734,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			{
 			int divisor = PRESCALER[mfp_p->tbcr & 0x07];
 			logerror("MFP68901 #%u Timer B Pulse Width Mode : %u Prescale\n", which, DIVISOR);
-			timer_adjust(mfp_p->timer[MFP68901_TIMER_B], attotime_never, which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_B], attotime_never, which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
 			timer_enable(mfp_p->timer[MFP68901_TIMER_B], 0);
 			}
 			break;
@@ -773,7 +773,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			{
 			int divisor = PRESCALER[mfp_p->tcdcr & 0x07];
 			logerror("MFP68901 #%u Timer D Delay Mode : %u Prescale\n", which, divisor);
-			timer_adjust(mfp_p->timer[MFP68901_TIMER_D], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_D], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
 			}
 			break;
 		}
@@ -795,7 +795,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			{
 			int divisor = PRESCALER[(mfp_p->tcdcr >> 4) & 0x07];
 			logerror("MFP68901 #%u Timer C Delay Mode : %u Prescale\n", which, divisor);
-			timer_adjust(mfp_p->timer[MFP68901_TIMER_C], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_C], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
 			}
 			break;
 		}

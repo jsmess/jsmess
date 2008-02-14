@@ -37,7 +37,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "includes/gb.h"
 #include "cpu/z80gb/z80gb.h"
 #include "image.h"
@@ -720,7 +719,7 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
 			SIOCount = 8;
-			timer_adjust( gb_serial_timer, ATTOTIME_IN_CYCLES( 512, 0 ), 0, ATTOTIME_IN_CYCLES( 512, 0 ) );
+			timer_adjust_periodic(gb_serial_timer, ATTOTIME_IN_CYCLES( 512, 0 ), 0, ATTOTIME_IN_CYCLES( 512, 0 ));
 			timer_enable( gb_serial_timer, 1 );
 			break;
 		}

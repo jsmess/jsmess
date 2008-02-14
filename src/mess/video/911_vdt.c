@@ -15,7 +15,6 @@ TODO:
 #include "911_chr.h"
 #include "911_key.h"
 #include "sound/beep.h"
-#include "mslegacy.h"
 #include "deprecat.h"
 
 
@@ -443,7 +442,7 @@ void vdt911_cru_w(int offset, int data, int unit)
 			/* beep enable strobe - not tested */
 			beep_set_state(unit, 1);
 
-			timer_adjust(vdt[unit].beep_timer, ATTOTIME_IN_USEC(300), unit, attotime_zero);
+			timer_adjust_oneshot(vdt[unit].beep_timer, ATTOTIME_IN_USEC(300), unit);
 			break;
 
 		case 0xf:

@@ -20,7 +20,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "mm58274c.h"
 
 
@@ -249,7 +248,7 @@ void mm58274c_w(int which, int offset, int data)
 			/* interrupt run */
 			attotime period = interrupt_period_table(rtc[which].int_ctl & int_ctl_dly);
 
-			timer_adjust(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : attotime_zero);
+			timer_adjust_periodic(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : attotime_zero);
 		}
 		if (data & ctl_clkstop)
 			/* stopping the clock clears the tenth counter */
@@ -322,7 +321,7 @@ void mm58274c_w(int which, int offset, int data)
 				/* interrupt run */
 				attotime period = interrupt_period_table(rtc[which].int_ctl & int_ctl_dly);
 
-				timer_adjust(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : attotime_zero);
+				timer_adjust_periodic(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : attotime_zero);
 			}
 		}
 		else

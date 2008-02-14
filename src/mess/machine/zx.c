@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/zx.h"
 #include "devices/cassette.h"
-#include "mslegacy.h"
+
 
 #define	DEBUG_ZX81_PORTS	1
 #define DEBUG_ZX81_VSYNC	1
@@ -79,7 +79,7 @@ WRITE8_HANDLER ( zx_io_w )
 	}
 	else if ((offset & 1) == 0)
 	{
-		timer_adjust(ula_nmi, attotime_zero, 0, ATTOTIME_IN_CYCLES(207, 0));
+		timer_adjust_periodic(ula_nmi, attotime_zero, 0, ATTOTIME_IN_CYCLES(207, 0));
 
 		LOG_ZX81_IOW("ULA NMIs on");
 
