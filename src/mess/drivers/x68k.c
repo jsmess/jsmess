@@ -1220,6 +1220,12 @@ static WRITE16_HANDLER( x68k_vid_w )
 		sys.video.gfx_pri = (data & 0x0300) >> 8;
 		sys.video.text_pri = (data & 0x0c00) >> 10;
 		sys.video.sprite_pri = (data & 0x3000) >> 12;
+		if(sys.video.gfx_pri == 3)
+			sys.video.gfx_pri--;
+		if(sys.video.text_pri == 3)
+			sys.video.text_pri--;
+		if(sys.video.sprite_pri == 3)
+			sys.video.sprite_pri--;
 		break;
 	case 0x300:
 		sys.video.reg[2] = data;
