@@ -22,14 +22,14 @@ static INPUT_PORTS_START( gamepock )
 	PORT_START
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_SELECT )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_SELECT )
+	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
@@ -56,6 +56,15 @@ static MACHINE_DRIVER_START( gamepock )
 
 MACHINE_DRIVER_END
 
+static DEVICE_INIT(gamepock_cart) {
+	memory_set_bankptr( 1, memory_region( REGION_CPU1 ) + 0x4000 );
+	return INIT_PASS;
+}
+
+static TIMER_CALLBACK(gamepock_cart_enable) {
+	memory_set_bankptr( 1, memory_region( REGION_USER1 ) );
+}
+
 static DEVICE_LOAD(gamepock_cart) {
 	UINT8 *cart = memory_region( REGION_USER1 );
 	int size = image_length( image );
@@ -65,7 +74,10 @@ static DEVICE_LOAD(gamepock_cart) {
 		return INIT_FAIL;
 	}
 
-	memory_set_bankptr( 1, cart );
+	/* I do not yet how the cartridge gets enabled.
+	  For now we will wait 1 second before enabling the cartridge */
+	timer_set( ATTOTIME_IN_SEC(1), NULL, 0, gamepock_cart_enable );
+
 	return INIT_PASS;
 }
 
@@ -73,6 +85,7 @@ static void gamepock_cartslot_getinfo(const device_class *devclass, UINT32 state
 	switch( state ) {
 	case DEVINFO_INT_COUNT:										info->i = 1; break;
 	case DEVINFO_INT_MUST_BE_LOADED:							info->i = 0; break;
+	case DEVINFO_PTR_INIT:										info->init = device_init_gamepock_cart; break;
 	case DEVINFO_PTR_LOAD:										info->load = device_load_gamepock_cart; break;
 	case DEVINFO_STR_FILE_EXTENSIONS:							strcpy( info->s = device_temp_str(), "bin" ); break;
 	default:													cartslot_device_getinfo(devclass, state, info); break;
@@ -84,7 +97,7 @@ SYSTEM_CONFIG_START(gamepock)
 SYSTEM_CONFIG_END
 
 ROM_START( gamepock )
-	ROM_REGION( 0x1000, REGION_CPU1, 0 )
+	ROM_REGION( 0xC000, REGION_CPU1, ROMREGION_ERASEFF )
 	ROM_LOAD( "egpcboot.bin", 0x0000, 0x1000, CRC(ee1ea65d) SHA1(9c7731b5ead721d2cc7f7e2655c5fed9e56db8b0) )
 	ROM_REGION( 0x8000, REGION_USER1, ROMREGION_ERASEFF )
 ROM_END
