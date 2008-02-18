@@ -14,11 +14,9 @@ static UINT8 gamepock_port_b;
 static HD44102CH hd44102ch[3];
 
 static void hd44102ch_w( int which, int c_d, UINT8 data ) {
-	//logerror("HD44102CH #%d write %s %02X ", which, ( c_d ) ? "data" : "command",  data );
 	if ( c_d ) {
 		UINT8	y;
 		/* Data */
-		//logerror("write to %02X", hd44102ch[which].address );
 		hd44102ch[which].ram[ hd44102ch[which].address ] = data;
 
 		/* Increment/decrement Y counter */
@@ -34,37 +32,30 @@ static void hd44102ch_w( int which, int c_d, UINT8 data ) {
 		/* Command */
 		switch ( data ) {
 		case 0x38:		/* Display off */
-			//logerror("display off");
 			hd44102ch[which].enabled = 0;
 			break;
 		case 0x39:		/* Display on */
-			//logerror("display on");
 			hd44102ch[which].enabled = 1;
 			break;
 		case 0x3A:		/* Y decrement mode */
-			//logerror("y decrement mode");
 			hd44102ch[which].y_inc = 0xFF;
 			break;
 		case 0x3B:		/* Y increment mode */
-			//logerror("y increment mode");
 			hd44102ch[which].y_inc = 0x01;
 			break;
 		case 0x3E:		/* Display start page #0 */
 		case 0x7E:		/* Display start page #1 */
 		case 0xBE:		/* Display start page #2 */
 		case 0xFE:		/* Display start page #3 */
-			//logerror("set start page %d", data >> 6 );
 			hd44102ch[which].start_page = data & 0xC0;
 			break;
 		default:
 			if ( ( data & 0x3F ) < 50 ) {
-				//logerror("set X/Y address %02X", data );
 				hd44102ch[which].address = data;
 			}
 			break;
 		}
 	}
-	//logerror("\n");
 }
 
 static void hd44102ch_init( int which ) {
@@ -73,34 +64,34 @@ static void hd44102ch_init( int which ) {
 }
 
 static void gamepock_lcd_update(void) {
-	if ( gamepock_port_a & 0x02 ) {
-		/* Check whether HD44102CH #1 is enabled */
-		if ( gamepock_port_a & 0x08 ) {
-			hd44102ch_w( 0, gamepock_port_a & 0x04, gamepock_port_b );
-		}
+	/* Check whether HD44102CH #1 is enabled */
+	if ( gamepock_port_a & 0x08 ) {
+		hd44102ch_w( 0, gamepock_port_a & 0x04, gamepock_port_b );
+	}
 
-		/* Check whether HD44102CH #2 is enabled */
-		if ( gamepock_port_a & 0x10 ) {
-			hd44102ch_w( 1, gamepock_port_a & 0x04, gamepock_port_b );
-		}
+	/* Check whether HD44102CH #2 is enabled */
+	if ( gamepock_port_a & 0x10 ) {
+		hd44102ch_w( 1, gamepock_port_a & 0x04, gamepock_port_b );
+	}
 
-		/* Check whether HD44102CH #3 is enabled */
-		if ( gamepock_port_a & 0x20 ) {
-			hd44102ch_w( 2, gamepock_port_a & 0x04, gamepock_port_b );
-		}
+	/* Check whether HD44102CH #3 is enabled */
+	if ( gamepock_port_a & 0x20 ) {
+		hd44102ch_w( 2, gamepock_port_a & 0x04, gamepock_port_b );
 	}
 }
 
 WRITE8_HANDLER( gamepock_port_a_w ) {
+	UINT8	old_port_a = gamepock_port_a;
+
 	gamepock_port_a = data;
 
-	gamepock_lcd_update();
+	if ( ! ( old_port_a & 0x02 ) && ( gamepock_port_a & 0x02 ) ) {
+		gamepock_lcd_update();
+	}
 }
 
 WRITE8_HANDLER( gamepock_port_b_w ) {
 	gamepock_port_b = data;
-
-	gamepock_lcd_update();
 }
 
 READ8_HANDLER( gamepock_port_b_r ) {
