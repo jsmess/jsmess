@@ -57,12 +57,8 @@ static MACHINE_DRIVER_START( gamepock )
 MACHINE_DRIVER_END
 
 static DEVICE_INIT(gamepock_cart) {
-	memory_set_bankptr( 1, memory_region( REGION_CPU1 ) + 0x4000 );
-	return INIT_PASS;
-}
-
-static TIMER_CALLBACK(gamepock_cart_enable) {
 	memory_set_bankptr( 1, memory_region( REGION_USER1 ) );
+	return INIT_PASS;
 }
 
 static DEVICE_LOAD(gamepock_cart) {
@@ -74,9 +70,7 @@ static DEVICE_LOAD(gamepock_cart) {
 		return INIT_FAIL;
 	}
 
-	/* I do not yet how the cartridge gets enabled.
-	  For now we will wait 1 second before enabling the cartridge */
-	timer_set( ATTOTIME_IN_SEC(1), NULL, 0, gamepock_cart_enable );
+	memory_set_bankptr( 1, memory_region( REGION_USER1 ) );
 
 	return INIT_PASS;
 }
@@ -97,7 +91,7 @@ SYSTEM_CONFIG_START(gamepock)
 SYSTEM_CONFIG_END
 
 ROM_START( gamepock )
-	ROM_REGION( 0xC000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, REGION_CPU1, ROMREGION_ERASEFF )
 	ROM_LOAD( "egpcboot.bin", 0x0000, 0x1000, CRC(ee1ea65d) SHA1(9c7731b5ead721d2cc7f7e2655c5fed9e56db8b0) )
 	ROM_REGION( 0x8000, REGION_USER1, ROMREGION_ERASEFF )
 ROM_END
