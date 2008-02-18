@@ -30,10 +30,10 @@
 
 */
 
-#define X1 15000000.0
-#define X2    32768.0
-#define X3  4436000.0
-#define X4 11000000.0
+#define X1 XTAL_15MHz
+#define X2 XTAL_32_768kHz
+#define X3 XTAL_4_436MHz
+#define X4 XTAL_11MHz
 
 /* Peripheral Chip (ZX8302) */
 
@@ -574,6 +574,13 @@ static READ8_HANDLER( ipc_bus_r )
 	return 0;
 }
 
+static READ8_HANDLER( ipc_ea_r )
+{
+	// connected to ground via a 10K resistor, but needs to be 1 because the logic is reversed in i8039.c
+
+	return 1;
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -608,6 +615,7 @@ static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(ipc_t1_r)
 	AM_RANGE(I8039_bus, I8039_bus) AM_READ(ipc_bus_r)
+	AM_RANGE(I8039_ea, I8039_ea) AM_READ(ipc_ea_r)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -902,7 +910,7 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
 	MDRV_CPU_VBLANK_INT(zx8302_int, 1)
 
-	MDRV_CPU_ADD(I8048, X4) // i8749
+	MDRV_CPU_ADD(I8749, X4)
 	MDRV_CPU_PROGRAM_MAP(ipc_map, 0)
 	MDRV_CPU_IO_MAP(ipc_io_map, 0)
 

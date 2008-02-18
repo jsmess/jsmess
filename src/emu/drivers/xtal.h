@@ -50,6 +50,7 @@ enum
 	XTAL_4MHz    		= 4000000,
 	XTAL_4_224MHz   	= 4224000,		/* Used to drive OKI M6295 chips, usually with /4 divider */
 	XTAL_4_433619MHz	= 4433619,		/* PAL subcarrier */
+	XTAL_4_436MHz		= 4436000,
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
 	XTAL_6MHz    		= 6000000,
@@ -76,6 +77,7 @@ enum
 	XTAL_14_31818MHz  	= 14318180,
 	XTAL_14_705882MHz  	= 14705882,		/* Aleck64 */
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
+	XTAL_15MHz			= 15000000,		/* Sinclair QL */
 	XTAL_15_468MHz  	= 15468000,		/* Bank Panic h/w, Sega G80 */
 	XTAL_16MHz   		= 16000000,
 	XTAL_16_9344MHz  	= 16934400,		/* Usually used to drive 90's Yamaha OPL/FM chips */
