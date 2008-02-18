@@ -37,7 +37,7 @@ INPUT_PORTS_END
 static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, NULL };
 
 static MACHINE_DRIVER_START( gamepock )
-	MDRV_CPU_ADD_TAG("main", UPD78C06, 6000000)	/* uPD78C06AG */
+	MDRV_CPU_ADD_TAG("main", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
 	MDRV_CPU_PROGRAM_MAP( gamepock_mem, 0 )
 	MDRV_CPU_IO_MAP( gamepock_io, 0 )
 	MDRV_CPU_CONFIG( gamepock_cpu_config )
