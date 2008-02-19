@@ -1,20 +1,18 @@
 <hashfile>
 	<!-- apf m1000 -->
+	<hash crc32="" sha1="" name="Catena">
+		<cartnumber>MG1001</cartnumber>
+		<chip></chip>
+	</hash>
 	<hash crc32="5d03a812" sha1="29db4ca3c8b76c413b84b6d2bfd3499a70eccd3d" name="Catena">
 		<cartnumber>MG1001</cartnumber>
 		<chip>MG1002</chip>
 	</hash>
-<!--
-	<hash crc32="" sha1="" name="">
-		<cartnumber>MG1002</cartnumber>
-		<chip></chip>
-	</hash>
--->
-<!--
-	<hash crc32="" sha1="" name="Hangman/Tic Tac Toe/Doddle">
+	<hash crc32="e58a5d5b" sha1="01ceda20d936e4a41f1bd0802dc0e69c" name="Hangman/Tic Tac Toe/Doddle">
 		<cartnumber>MG1003</cartnumber>
 		<chip>MG1003</chip>
 	</hash>
+<!--
 	<hash crc32="" sha1="" name="Bowling/Micro Match">
 		<cartnumber>MG1004</cartnumber>
 		<chip>MG1004</chip>
@@ -24,35 +22,35 @@
 		<cartnumber>MG1005</cartnumber>
 		<chip>MG1005</chip>
 	</hash>
-<!--
-	<hash crc32="" sha1="" name="Baseball">
+	<hash crc32="1fb354b7" sha1="1465d677c735e55b4e57a0b6c13c3237" name="Baseball">
 		<cartnumber>MG1006</cartnumber>
 		<chip></chip>
 	</hash>
-	<hash crc32="" sha1="" name="Blackjack">
+	<hash crc32="38faa709" sha1="99013ab95f9f6c31e25485c8f435e80d" name="Blackjack">
 		<cartnumber>MG1007</cartnumber>
 		<chip>MG1007</chip>
 	</hash>
-	<hash crc32="" sha1="" name="Backgammon">
+	<hash crc32="811c6269" sha1="73ae2d72259a017722aea17492afd7a5" name="Backgammon">
 		<cartnumber>MG1008</cartnumber>
 		<chip></chip>
 	</hash>
-	<hash crc32="" sha1="" name="Casino I:  Roulette/Keno/Slots">
+	<hash crc32="21d5f63f" sha1="5903502975d5ddff0a11100c06e1bd95" name="Casino I:  Roulette/Keno/Slots">
 		<cartnumber>MG1009</cartnumber>
 		<chip>MG1009</chip>
 	</hash>
-	<hash crc32="" sha1="" name="UFO/Sea Monster/Break It Down/Rebuild/Shoot">
+	<hash crc32="0504d667" sha1="c21b4e67299ef92a8e43071c171a8620" name="UFO/Sea Monster/Break It Down/Rebuild/Shoot">
 		<cartnumber>MG1010</cartnumber>
 		<chip>MG1010</chip>
 	</hash>
-	<hash crc32="" sha1="" name="Pinball/Dungeon Hunt/Blockout">
+	<hash crc32="3f4b8c83" sha1="75910e921d0db2d8a6609addca7b558d" name="Pinball/Dungeon Hunt/Blockout">
 		<cartnumber>MG1011</cartnumber>
 		<chip>MG1011</chip>
 	</hash>
-	<hash crc32="" sha1="" name="Boxing">
+	<hash crc32="7121f8b1" sha1="085f4494891149adc75a69089091e52a" name="Boxing">
 		<cartnumber>MG1012</cartnumber>
 		<chip>MG1012</chip>
 	</hash>
+<!--
 	<hash crc32="" sha1="" name="Space Destroyers">
 		<cartnumber>MG1013</cartnumber>
 		<chip></chip>
