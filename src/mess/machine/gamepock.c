@@ -1,4 +1,6 @@
 #include "driver.h"
+#include "sound/speaker.h"
+#include "cpu/upd7810/upd7810.h"
 #include "includes/gamepock.h"
 
 typedef struct {
@@ -183,4 +185,13 @@ VIDEO_UPDATE( gamepock ) {
 
 	return 0;
 }
+
+/* This is called whenever the T0 pin switches state */
+int gamepock_io_callback( int ioline, int state ) {
+	if ( ioline == UPD7810_TO ) {
+		speaker_level_w(0, state & 1 );
+	}
+	return 0;
+}
+
 
