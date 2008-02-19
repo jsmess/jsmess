@@ -22,7 +22,7 @@
 #include "sound/beep.h"
 #include "video/cdp1861.h"
 
-#define XTAL 3521280
+#define XTAL XTAL_3_52128MHz
 
 extern int cdp1861_efx;
 

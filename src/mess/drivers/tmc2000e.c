@@ -168,7 +168,7 @@ static MACHINE_DRIVER_START( tmc2000e )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, CDP1864_CLK_FREQ)	// 1.75 MHz
+	MDRV_CPU_ADD(CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000e_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000e_io_map, 0)
 	MDRV_CPU_CONFIG(tmc2000e_config)

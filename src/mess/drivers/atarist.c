@@ -38,13 +38,13 @@
 
 // Atari ST
 
-#define Y1		2457600.0
+#define Y1		XTAL_2_4576MHz
 
 // STBook
 
-#define U517	16000000.0
-#define Y200	2457600.0
-#define Y700	10000000.0
+#define U517	XTAL_16MHz
+#define Y200	XTAL_2_4576MHz
+#define Y700	XTAL_10MHz
 
 /* Floppy Disk Controller */
 

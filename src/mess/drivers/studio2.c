@@ -92,6 +92,7 @@ Notes:
 
     TODO:
 
+	- figure out real cpu clock from schematics
     - cdp1864 video colors
     - discrete sound
     - redump studio2 bios as 4 separate roms
@@ -257,7 +258,7 @@ static MACHINE_DRIVER_START( studio2 )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD_TAG("main", CDP1802, 3579545/2)
+	MDRV_CPU_ADD_TAG("main", CDP1802, 3579545/2) // the real clock is derived from an oscillator circuit
 	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
 	MDRV_CPU_IO_MAP(studio2_io_map, 0)
 	MDRV_CPU_CONFIG(studio2_config)
