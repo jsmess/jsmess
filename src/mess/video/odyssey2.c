@@ -341,7 +341,7 @@ INLINE void odyssey2_draw_box(UINT8 bg[][320], int x, int y, int width, int heig
     }
 }
 
-INLINE void odyssey2_draw(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id)
+INLINE void odyssey2_draw(mame_bitmap *bitmap, UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id, UINT32 col)
 {
     int m,x1,y1;
     for (m=0x80; m>0; m>>=1, x+=scale_x)
@@ -351,14 +351,17 @@ INLINE void odyssey2_draw(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x
 			for (y1=0; y1<scale_y; y1++)
 			{
 				for (x1 = 0; x1 < scale_x; x1++)
+				{
 					bg[y+y1][x+x1] |= collision_id;
+					*BITMAP_ADDR16(bitmap, y+y1, x+x1) = col;
+				}
 			}
 		}
     }
 }
 
 // different bit ordering, maybe I should change rom
-INLINE void odyssey2_draw_sprite(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id)
+INLINE void odyssey2_draw_sprite(mame_bitmap *bitmap, UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id, UINT32 col)
 {
     int m,x1,y1;
 
@@ -369,7 +372,10 @@ INLINE void odyssey2_draw_sprite(UINT8 bg[][320], UINT8 code, int x, int y, int 
 			for (y1=0; y1<scale_y; y1++)
 			{
 				for (x1 = 0; x1 < scale_x; x1++)
+				{
 					bg[y+y1][x+x1] |= collision_id;
+					*BITMAP_ADDR16(bitmap, y+y1, x+x1) = col;
+				}
 			}
 		}
     }
@@ -421,12 +427,9 @@ INLINE void odyssey2_draw_char(mame_bitmap *bitmap, UINT8 bg[][320], int x, int 
 {
     int n, i;
     int offset = ptr | ((color & 1) << 8);
+	UINT32 col = Machine->pens[16 + ( ( color & 0xe ) >> 1 )];
 
     offset=(offset + (y >> 1)) & 0x1ff;
-	/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
-	 * the color table, a vile gross hack.  Doesn't look like this is going
-	 * to survive the 0.118u5 transition */
-	/* Machine->gfx[0]->colortable[1]=Machine->pens[16 + ((color & 0xe) >> 1)]; */
 
     // don't ask me about the technical background, but also this height thingy is needed
     // invaders aliens (!) and shoot (-)
@@ -440,10 +443,7 @@ INLINE void odyssey2_draw_char(mame_bitmap *bitmap, UINT8 bg[][320], int x, int 
         if (y + i * 2 >= bitmap->height )
             break;
 
-        odyssey2_draw(bg, ((char*)o2_shape)[offset], x, y+i*2, 1, 2, COLLISION_CHARACTERS);
-        drawgfxzoom(bitmap, Machine->gfx[0], ((char*)o2_shape)[offset],0,
-                0,0,x,y+i*2,
-                0, TRANSPARENCY_PEN,0, 0x10000, 0x20000);
+		odyssey2_draw(bitmap, bg, ((char*)o2_shape)[offset], x, y+i*2, 1, 2, COLLISION_CHARACTERS, col);
         offset=(offset+1) & 0x1ff;
     }
 }
@@ -488,10 +488,7 @@ VIDEO_UPDATE( odyssey2 )
 
 		for (i=0; i<ARRAY_LENGTH(o2_vdc.s.sprites); i++)
 		{
-			/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
-			 * the color table, a vile gross hack.  Doesn't look like this is going
-			 * to survive the 0.118u5 transition */
-			/* machine->gfx[0]->colortable[1]=machine->pens[16+((o2_vdc.s.sprites[i].color>>3)&7)]; */
+			UINT32 col = machine->pens[16+((o2_vdc.s.sprites[i].color>>3)&7)];
 
 			y=o2_vdc.s.sprites[i].y;
 			x=o2_vdc.s.sprites[i].x;
@@ -502,20 +499,14 @@ VIDEO_UPDATE( odyssey2 )
 				{
 					if (y+4*j>=bitmap->height)
                         break;
-					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*4, 2, 4, 1<<i);    /* 1 << i is sprite collision index */
-					drawgfxzoom(bitmap, machine->gfx[1], o2_vdc.s.shape[i][j],0,
-						0,0,x,y+j*4,
-						0, TRANSPARENCY_PEN,0,0x20000, 0x40000);
+					odyssey2_draw_sprite(bitmap, bg, o2_vdc.s.shape[i][j], x, y+j*4, 2, 4, 1<<i, col);    /* 1 << i is sprite collision index */
 				}
 
 				else
 				{
 					if (y+j*2>=bitmap->height)
                         break;
-					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*2, 1, 2, 1<<i);    /* 1 << i is sprite collision index */
-					drawgfxzoom(bitmap, machine->gfx[1], o2_vdc.s.shape[i][j],0,
-						0,0,x,y+j*2,
-						0, TRANSPARENCY_PEN,0, 0x10000, 0x20000);
+					odyssey2_draw_sprite(bitmap, bg, o2_vdc.s.shape[i][j], x, y+j*2, 1, 2, 1<<i, col);    /* 1 << i is sprite collision index */
 				}
 			}
 		}
