@@ -141,7 +141,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( odyssey2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8048, 1790000)         /* 1.79 MHz */
+	MDRV_CPU_ADD(I8048, ( ( XTAL_7_15909MHz * 4 ) / 3 ) )
 	MDRV_CPU_PROGRAM_MAP(odyssey2_mem, 0)
 	MDRV_CPU_IO_MAP(odyssey2_io, 0)
 	MDRV_CPU_VBLANK_INT(odyssey2_line, 262)
