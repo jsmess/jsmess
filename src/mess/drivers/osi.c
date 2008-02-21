@@ -1,20 +1,152 @@
+/*
+
+	TODO:
+
+	- fix UK101 keyboard
+	- fix UK101 video to 64x16
+	- accurate video timing
+	- proper mirroring
+	- floppy disk support
+	- cegmon/wemon bioses
+
+*/
+
 #include "driver.h"
-#include "machine/mc6850.h"
+#include "image.h"
+#include "machine/6850acia.h"
 #include "sound/discrete.h"
 
-WRITE8_HANDLER( sb2m600_videoram_w );
-VIDEO_START( sb2m600 );
-VIDEO_START( uk101 );
-VIDEO_UPDATE( sb2m600 );
-DISCRETE_SOUND_EXTERN( sb2m600_discrete_interface );
-READ8_HANDLER( osi_keyboard_r );
-WRITE8_HANDLER ( sb2m600b_keyboard_w );
-WRITE8_HANDLER ( uk101_keyboard_w );
-int device_load_sb2m600_cassette(mess_image *image);
-void device_unload_sb2m600_cassette(mess_image *image);
-READ8_HANDLER( osi470_floppy_status_r );
-WRITE8_HANDLER( osi470_floppy_control_w );
-DRIVER_INIT( sb2m600 );
+/* Video */
+
+static tilemap *bg_tilemap;
+
+static WRITE8_HANDLER( sb2m600_videoram_w )
+{
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
+}
+
+static TILE_GET_INFO(get_bg_tile_info)
+{
+	UINT8 code = videoram[tile_index];
+
+	SET_TILE_INFO(0, code, 0, 0);
+}
+
+static VIDEO_START( sb2m600 )
+{
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+}
+
+static VIDEO_START( uk101 )
+{
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 16, 64, 16);
+}
+
+static VIDEO_UPDATE( sb2m600 )
+{
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+
+	return 0;
+}
+
+/* Sound */
+
+static const discrete_dac_r1_ladder sb2m600_dac =
+{
+	4,			// size of ladder
+	{180, 180, 180, 180, 0, 0, 0, 0},	// R68, R69, R70, R71
+	5,			// 5V
+	RES_K(1),	// R67
+	0,			// no rGnd
+	0			// no cFilter
+};
+
+static DISCRETE_SOUND_START(sb2m600_discrete_interface)
+	DISCRETE_INPUT_DATA(NODE_01)
+	DISCRETE_DAC_R1(NODE_02, 1, NODE_01, DEFAULT_TTL_V_LOGIC_1, &sb2m600_dac)
+	DISCRETE_CRFILTER(NODE_03, 1, NODE_02, 1.0/(1.0/RES_K(1)+1.0/180+1.0/180+1.0/180+1.0/180), CAP_U(0.1))
+	DISCRETE_OUTPUT(NODE_03, 100)
+	DISCRETE_GAIN(NODE_04, NODE_03, 32767.0/5)
+	DISCRETE_OUTPUT(NODE_04, 100)
+DISCRETE_SOUND_END
+
+/* Keyboard */
+
+static UINT8 key_row_latch;
+
+static READ8_HANDLER( osi_keyboard_r )
+{
+	UINT8 key_column_data = 0xff;
+
+	if (!(key_row_latch & 0x01)) key_column_data &= readinputportbytag("ROW0");
+	if (!(key_row_latch & 0x02)) key_column_data &= readinputportbytag("ROW1");
+	if (!(key_row_latch & 0x04)) key_column_data &= readinputportbytag("ROW2");
+	if (!(key_row_latch & 0x08)) key_column_data &= readinputportbytag("ROW3");
+	if (!(key_row_latch & 0x10)) key_column_data &= readinputportbytag("ROW4");
+	if (!(key_row_latch & 0x20)) key_column_data &= readinputportbytag("ROW5");
+	if (!(key_row_latch & 0x40)) key_column_data &= readinputportbytag("ROW6");
+	if (!(key_row_latch & 0x80)) key_column_data &= readinputportbytag("ROW7");
+
+	return key_column_data;
+}
+
+static WRITE8_HANDLER ( sb2m600b_keyboard_w )
+{
+	key_row_latch = data;
+	discrete_sound_w(NODE_01, (data >> 2) & 0x0f);
+}
+
+static WRITE8_HANDLER ( uk101_keyboard_w )
+{
+	key_row_latch = data;
+}
+
+/* Disk Drive */
+
+static READ8_HANDLER( osi470_floppy_status_r )
+{
+	/*
+		C000 FLOPIN			FLOPPY DISK STATUS PORT
+
+		BIT	FUNCTION
+		0	DRIVE 0 READY (0 IF READY)
+		1	TRACK 0 (0 IF AT TRACK 0)
+		2	FAULT (0 IF FAULT)
+		3
+		4	DRIVE 1 READY (0 IF READY)
+		5	WRITE PROTECT (0 IF WRITE PROTECT)
+		6	DRIVE SELECT (1 = A OR C, 0 = B OR D)
+		7	INDEX (0 IF AT INDEX HOLE)
+	*/
+
+	return 0x00;
+}
+
+static WRITE8_HANDLER( osi470_floppy_control_w )
+{
+	/*
+		C002 FLOPOT			FLOPPY DISK CONTROL PORT
+
+		BIT	FUNCTION
+		0	WRITE ENABLE (0 ALLOWS WRITING)
+		1	ERASE ENABLE (0 ALLOWS ERASING)
+			ERASE ENABLE IS ON 200us AFTER WRITE IS ON
+			ERASE ENABLE IS OFF 530us AFTER WRITE IS OFF
+		2	STEP BIT : INDICATES DIRECTION OF STEP (WAIT 10us FIRST)
+			0 INDICATES STEP TOWARD 76
+			1 INDICATES STEP TOWARD 0
+		3	STEP (TRANSITION FROM 1 TO 0)
+			MUST HOLD AT LEAST 10us, MIN 8us BETWEEN
+		4	FAULT RESET (0 RESETS)
+		5	SIDE SELECT (1 = A OR B, 0 = C OR D)
+		6	LOW CURRENT (0 FOR TRKS 43-76, 1 FOR TRKS 0-42)
+		7	HEAD LOAD (0 TO LOAD : MUST WAIT 40ms AFTER)
+
+		C010 ACIA			DISK CONTROLLER ACIA STATUS PORT
+		C011 ACIAIO			DISK CONTROLLER ACIA I/O PORT
+	*/
+}
 
 /* Memory Maps */
 
@@ -24,20 +156,22 @@ static ADDRESS_MAP_START( sb2m600_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(osi470_floppy_status_r)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(osi470_floppy_control_w)
-	AM_RANGE(0xc010, 0xc011) AM_READWRITE(acia6850_1_r, acia6850_1_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc010, 0xc010) AM_READWRITE(acia6850_1_stat_r, acia6850_1_ctrl_w)
+	AM_RANGE(0xc011, 0xc011) AM_READWRITE(acia6850_1_data_r, acia6850_1_data_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(osi_keyboard_r, sb2m600b_keyboard_w)
-	AM_RANGE(0xf000, 0xf001) AM_READWRITE(acia6850_0_r, acia6850_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
+	AM_RANGE(0xf001, 0xf001) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( uk101_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(osi_keyboard_r, uk101_keyboard_w)
-	AM_RANGE(0xf000, 0xf001) AM_READWRITE(acia6850_0_r, acia6850_0_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xdf00, 0xdf00) AM_MIRROR(0x03ff) AM_READWRITE(osi_keyboard_r, uk101_keyboard_w)
+	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
+	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -173,15 +307,70 @@ static GFXDECODE_START( uk101 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, uk101_charlayout, 0, 1 )
 GFXDECODE_END
 
+/* Machine Start */
+
+static UINT8 rx, tx;
+
+static const struct acia6850_interface sb2m600_acia_intf =
+{
+	500000, //
+	500000, //
+	&rx,
+	&tx,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static const struct acia6850_interface osi470_acia_intf =
+{
+	500000, //
+	500000, //
+	&rx,
+	&tx,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static const struct acia6850_interface uk101_acia_intf =
+{
+	500000, //
+	500000, //
+	&rx,
+	&tx,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static MACHINE_START( sb2m600 )
+{
+	// TODO: save states
+	acia6850_config(0, &sb2m600_acia_intf);
+	acia6850_config(1, &osi470_acia_intf);
+}
+
+static MACHINE_START( uk101 )
+{
+	// TODO: save states
+	acia6850_config(0, &uk101_acia_intf);
+}
+
 /* Machine Drivers */
 
 #define X1 3932160
 
 static MACHINE_DRIVER_START( sb2m600 )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M6502, X1/4) // .98304 MHz
+	MDRV_CPU_ADD(M6502, X1/4) // .98304 MHz
 	MDRV_CPU_PROGRAM_MAP(sb2m600_mem, 0)
 	MDRV_SCREEN_REFRESH_RATE(X1/256/256) // 60 Hz
+
+	MDRV_MACHINE_START(sb2m600)
 
     // video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -190,7 +379,6 @@ static MACHINE_DRIVER_START( sb2m600 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 	MDRV_GFXDECODE(sb2m600)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_COLORTABLE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(sb2m600)
@@ -203,22 +391,23 @@ static MACHINE_DRIVER_START( sb2m600 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
-#define XL1 8000000
+#define UK101_X1 XTAL_8MHz
 
 static MACHINE_DRIVER_START( uk101 )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6502, XL1/8) // 1 MHz
+	MDRV_CPU_ADD(M6502, UK101_X1/8) // 1 MHz
 	MDRV_CPU_PROGRAM_MAP(uk101_mem, 0)
 	MDRV_SCREEN_REFRESH_RATE(50)
+
+	MDRV_MACHINE_START(uk101)
 
     // video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*16-1)
+	MDRV_SCREEN_SIZE(64*8, 16*16)
+	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 	MDRV_GFXDECODE(uk101)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_COLORTABLE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(uk101)
@@ -253,9 +442,34 @@ ROM_END
 
 /* System Configuration */
 
+static UINT8 *sb2m600_tape_image;
+static int sb2m600_tape_size;
+static int sb2m600_tape_index;
+
+static DEVICE_LOAD( sb2m600_cassette )
+{
+	sb2m600_tape_image = (UINT8 *)image_malloc(image, sb2m600_tape_size);
+	sb2m600_tape_size = image_length(image);
+
+	if (!sb2m600_tape_image || (image_fread(image, sb2m600_tape_image, sb2m600_tape_size) != sb2m600_tape_size))
+	{
+		return INIT_FAIL;
+	}
+
+	sb2m600_tape_index = 0;
+
+	return INIT_PASS;
+}
+
+static DEVICE_UNLOAD( sb2m600_cassette )
+{
+	sb2m600_tape_image = NULL;
+	sb2m600_tape_size = 0;
+	sb2m600_tape_index = 0;
+}
+
 static void sb2m600_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* cassette */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -283,5 +497,5 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT MACHINE INPUT INIT     CONFIG   COMPANY            FULLNAME
-COMP( 1978, sb2m600b, 0,        0, sb2m600, sb2m600, sb2m600, sb2m600, "Ohio Scientific", "Superboard II Model 600 (Rev. B)" , 0)
-COMP( 1979,	uk101,    sb2m600b, 0, uk101,   uk101,   sb2m600, sb2m600, "Compukit",        "UK101" , 0)
+COMP( 1978, sb2m600b, 0,        0, sb2m600, sb2m600, 0, 	sb2m600, "Ohio Scientific", "Superboard II Model 600 (Rev. B)" , 0)
+COMP( 1979,	uk101,    sb2m600b, 0, uk101,   uk101,   0, 	sb2m600, "Compukit",        "UK101" , GAME_NOT_WORKING)

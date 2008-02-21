@@ -789,10 +789,7 @@ $(MESSOBJ)/p2000.a:    \
 	$(MESS_DRIVERS)/p2000t.o	 \
 	$(MESS_MACHINE)/p2000t.o	 \
 	$(MESS_MACHINE)/mc6850.o	 \
-	$(MESS_VIDEO)/osi.o	 \
-	$(MESS_AUDIO)/osi.o	 \
 	$(MESS_DRIVERS)/osi.o	\
-	$(MESS_MACHINE)/osi.o	 \
 
 $(MESSOBJ)/amstrad.a:  \
 	$(MESS_DRIVERS)/amstrad.o  \
