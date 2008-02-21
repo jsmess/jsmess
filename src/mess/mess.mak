@@ -664,7 +664,6 @@ $(MESSOBJ)/sinclair.a: \
 	$(MESS_FORMATS)/zx81_p.o		\
 	$(MESS_DRIVERS)/ql.o		\
 	$(MESS_VIDEO)/zx8301.o		\
-	$(MESS_MACHINE)/zx8302.o		\
 	$(MESS_FORMATS)/tzx_cas.o		\
 
 $(MESSOBJ)/apple.a:   \
