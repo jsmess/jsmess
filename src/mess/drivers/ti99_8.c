@@ -397,7 +397,6 @@ static const struct tms9995reset_param ti99_8_processor_config =
 };
 
 static MACHINE_DRIVER_START(ti99_8_60hz)
-
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD(TMS9995, 10738635)
@@ -405,17 +404,14 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_CPU_PROGRAM_MAP(ti99_8_memmap, 0)
 	MDRV_CPU_IO_MAP(ti99_8_readcru, ti99_8_writecru)
 	MDRV_CPU_VBLANK_INT(ti99_vblank_interrupt, 1)
-	/*MDRV_CPU_PERIODIC_INT(func, rate)*/
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	/*MDRV_INTERLEAVE(interleave)*/
 
 	MDRV_MACHINE_START( ti99_8_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -428,8 +424,8 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START(ti99_8_50hz)
 
+static MACHINE_DRIVER_START(ti99_8_50hz)
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD(TMS9995, 10738635)
@@ -437,17 +433,14 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_CPU_PROGRAM_MAP(ti99_8_memmap, 0)
 	MDRV_CPU_IO_MAP(ti99_8_readcru, ti99_8_writecru)
 	MDRV_CPU_VBLANK_INT(ti99_vblank_interrupt, 1)
-	/*MDRV_CPU_PERIODIC_INT(func, rate)*/
-
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	/*MDRV_INTERLEAVE(interleave)*/
 
 	MDRV_MACHINE_START( ti99_8_50hz )
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

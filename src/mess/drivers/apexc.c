@@ -807,14 +807,12 @@ static MACHINE_DRIVER_START(apexc)
 	MDRV_CPU_VBLANK_INT(apexc_interrupt, 1)
 	/*MDRV_CPU_PERIODIC_INT(func, rate)*/
 
-	/* video hardware does not exist, but we display a control panel and the typewriter output */
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	/*MDRV_INTERLEAVE(interleave)*/
-
 	MDRV_MACHINE_START( apexc )
 
+	/* video hardware does not exist, but we display a control panel and the typewriter output */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 192)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)

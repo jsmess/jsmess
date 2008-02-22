@@ -200,18 +200,19 @@ static MACHINE_DRIVER_START( mephisto )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(mephisto_mem, 0)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
 	MDRV_MACHINE_START( mephisto )
 	MDRV_MACHINE_RESET( mephisto )
-    /* video hardware */
-	 MDRV_DEFAULT_LAYOUT(layout_mephisto)
+
+	/* video hardware */
+	MDRV_DEFAULT_LAYOUT(layout_mephisto)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( rebel5 )

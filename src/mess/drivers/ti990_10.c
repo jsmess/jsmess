@@ -192,27 +192,21 @@ static const ti990_10reset_param reset_params =
 
 
 static MACHINE_DRIVER_START(ti990_10)
-
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	MDRV_CPU_ADD(TI990_10, 4000000)
 	MDRV_CPU_CONFIG(reset_params)
 	MDRV_CPU_PROGRAM_MAP(ti990_10_memmap, 0)
 	MDRV_CPU_IO_MAP(ti990_10_readcru, ti990_10_writecru)
-	/*MDRV_CPU_VBLANK_INT(NULL, 0)*/
 	MDRV_CPU_PERIODIC_INT(ti990_10_line_interrupt, 120/*or 100 in Europe*/)
 
-	/* video hardware - we emulate a single 911 vdt display */
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	/*MDRV_INTERLEAVE(interleave)*/
-
 	MDRV_MACHINE_RESET( ti990_10 )
-	/*MDRV_NVRAM_HANDLER( NULL )*/
 
+	/* video hardware - we emulate a single 911 vdt display */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	/*MDRV_ASPECT_RATIO(num, den)*/
 	MDRV_SCREEN_SIZE(560, 280)
 	MDRV_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 
@@ -229,7 +223,6 @@ static MACHINE_DRIVER_START(ti990_10)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
 MACHINE_DRIVER_END
 
 

@@ -390,7 +390,7 @@ static const struct MachineDriver machine_driver_mac2 =
 			0,0,
 		}
 	},
-	60, DEFAULT_REAL_60HZ_VBLANK_DURATION,		/* frames per second, vblank duration */
+	60, ATTOSECONDS_IN_USEC(2500) /* not accurate */,		/* frames per second, vblank duration */
 	1,
 	mac2_init_machine,
 	0,

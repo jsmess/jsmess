@@ -326,27 +326,22 @@ static const tx0_reset_param_t tx0_reset_param =
 
 
 static MACHINE_DRIVER_START(tx0_64kw)
-
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
     approximately 6usec) */
 	MDRV_CPU_ADD_TAG("main", TX0_64KW, 166667)
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_64kw_map, 0)
-	/*MDRV_CPU_PORTS(readport, writeport)*/
 	/* dummy interrupt: handles input */
 	MDRV_CPU_VBLANK_INT(tx0_interrupt, 1)
-	/*MDRV_CPU_PERIODIC_INT(func, rate)*/
-
-	MDRV_SCREEN_REFRESH_RATE(refresh_rate)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	/*MDRV_INTERLEAVE(interleave)*/
 
 	MDRV_MACHINE_START( tx0 )
 	MDRV_MACHINE_RESET( tx0 )
 
 	/* video hardware (includes the control panel and typewriter output) */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_REFRESH_RATE(refresh_rate)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(virtual_width, virtual_height)
 	MDRV_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
