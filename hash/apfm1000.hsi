@@ -12,12 +12,10 @@
 		<cartnumber>MG1003</cartnumber>
 		<chip>MG1003</chip>
 	</hash>
-<!--
-	<hash crc32="" sha1="" name="Bowling/Micro Match">
+	<hash crc32="cca5836b" sha1="4ff1c4ffa46c543bbf48a519a4285b5d2c697ae3" name="Bowling/Micro Match">
 		<cartnumber>MG1004</cartnumber>
 		<chip>MG1004</chip>
 	</hash>
--->
 	<hash crc32="bc1f5b8b" sha1="3e2f1e93501cd0dd2c9b747c594b784360e5b175" name="Brickdown/Shooting Gallery">
 		<cartnumber>MG1005</cartnumber>
 		<chip>MG1005</chip>
