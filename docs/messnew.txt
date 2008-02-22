@@ -10,6 +10,7 @@ System Driver Changes:
 ----------------------
 - [QL] System boots up again. (bug #1495) [Curt Coder]
 
+- [APFM1000] added special APF video mode [PeT]
 
 
 User Interface Changes:

@@ -1,5 +1,17 @@
 /******************************************************************************
 
+driver by ?
+
+PeT mess@utanet.at around February 2008:
+ added apfm1000 cartridge loading
+ fixed apfm1000 pads
+ added apf video mode
+
+todo for apf m1000:
+ add exact cpu/video timing. memory controller+6847 memory operations hold cpu
+  (backgammon relies on exact video timing)
+ support special cartridges (basic, space destroyer)
+
  ******************************************************************************/
 #include "driver.h"
 #include "video/m6847.h"
@@ -100,16 +112,16 @@ static WRITE8_HANDLER(apf_m1000_pia_out_b_func)
 	/* multi colour graphics mode */
 	/* 158 = 1001 multi-colour graphics */
 	/* 222 = 1101 mono graphics */
-	//  if (((previous_mode^data) & 0x0f0)!=0)
+	if (((previous_mode^data) & 0x0f0)!=0)
 	{
-		extern UINT8 apf_m6847_attr;
+	  //	  logerror("apf vidmode %02x\n", data);
 
 		/* not sure if this is correct - need to check */
 		apf_m6847_attr = 0x00;
-		if (data & 0x80)	apf_m6847_attr |= M6847_AG;
-		if (data & 0x40)	apf_m6847_attr |= M6847_GM2;
-		if (data & 0x20)	apf_m6847_attr |= M6847_GM1;
-		if (data & 0x10)	apf_m6847_attr |= M6847_GM0;
+       		if (data & 0x80)	apf_m6847_attr |= M6847_AG;
+		if (data & 0x40)	apf_m6847_attr |= M6847_GM0;
+		//		if (data & 0x20)	apf_m6847_attr |= M6847_GM1; //?
+		//		if (data & 0x10)	apf_m6847_attr |= M6847_GM2; //M6847_GM0; //?
 		previous_mode = data;
 	}
 }
@@ -514,6 +526,7 @@ static INPUT_PORTS_START( apf_m1000 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 5") PORT_CODE(KEYCODE_5_PAD) PORT_PLAYER(2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 8") PORT_CODE(KEYCODE_8_PAD) PORT_PLAYER(2)
 
+	PORT_INCLUDE( m6847_artifacting )
 INPUT_PORTS_END
 
 
@@ -620,6 +633,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( apf_imagination )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6800, 3750000)        /* 7.8336 Mhz */
+	//	     MDRV_CPU_ADD_TAG("main", M6800, (3750000/2) )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
 	MDRV_CPU_PROGRAM_MAP(apf_imagination_map, 0)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_INTERLEAVE(0)
