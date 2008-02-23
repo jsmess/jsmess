@@ -128,7 +128,7 @@ static MACHINE_DRIVER_START( dc )
 	MDRV_CPU_PROGRAM_MAP(dc_map,0)
 	MDRV_CPU_IO_MAP(dc_port,0)
 
-	MDRV_CPU_ADD_TAG("sound", ARM7, 45000000)
+	MDRV_CPU_ADD_TAG("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
 
 	MDRV_MACHINE_RESET( dc_console )
