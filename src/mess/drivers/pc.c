@@ -1368,6 +1368,7 @@ static MACHINE_DRIVER_START( xtvga )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -1398,6 +1399,7 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000hx )
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 

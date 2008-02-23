@@ -521,7 +521,7 @@ static MACHINE_DRIVER_START( pc1401 )
        (lcd dot displayed as 2x3 pixel)
        it seams to have 3/4 ratio in the real pc1401 */
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE(20)	/* very early and slow lcd */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -558,6 +558,7 @@ static MACHINE_DRIVER_START( pc1251 )
 	MDRV_NVRAM_HANDLER( pc1251 )
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(608, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 608-1, 0, 300-1)
 //  MDRV_SCREEN_SIZE(640, 334)
@@ -590,6 +591,7 @@ static MACHINE_DRIVER_START( pc1350 )
        resolution depends on the dots of the lcd
        (lcd dot displayed as 2x2 pixel) */
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(640, 252)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 252-1)
 //  MDRV_SCREEN_SIZE(640, 255)
@@ -620,6 +622,7 @@ static MACHINE_DRIVER_START( pc1403 )
        resolution depends on the dots of the lcd
        (lcd dot displayed as 2x2 pixel) */
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(848, 320)
 	MDRV_SCREEN_VISIBLE_AREA(0, 848-1, 0, 320-1)
 //  MDRV_SCREEN_SIZE(848, 361)

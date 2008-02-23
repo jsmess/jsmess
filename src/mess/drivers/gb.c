@@ -558,7 +558,7 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_CPU_CONFIG(dmg_cpu_reset)
 	MDRV_CPU_VBLANK_INT(gb_scanline_interrupt, 1)	/* 1 dummy int each frame */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
