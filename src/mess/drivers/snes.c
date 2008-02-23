@@ -158,24 +158,6 @@ INPUT_PORTS_END
 static const struct CustomSound_interface snes_sound_interface =
 { snes_sh_start, 0, 0 };
 
-static GFXDECODE_START( snes )
-GFXDECODE_END
-
-static PALETTE_INIT( snes )
-{
-	int i, r, g, b;
-
-	for( i = 0; i < 32768; i++ )
-	{
-		r = (i & 0x1F) << 3;
-		g = ((i >> 5) & 0x1F) << 3;
-		b = ((i >> 10) & 0x1F) << 3;
-		palette_set_color_rgb(machine,  i, r, g, b );
-	}
-}
-
-
-
 /* Loads the battery backed RAM into the appropriate memory area */
 static void snes_load_sram(void)
 {
@@ -476,10 +458,7 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_VIDEO_UPDATE( snes )
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(snes)
-	MDRV_PALETTE_LENGTH(32768)
-	MDRV_PALETTE_INIT( snes )
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 
 	MDRV_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 
