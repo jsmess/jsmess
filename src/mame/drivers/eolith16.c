@@ -114,10 +114,10 @@ static VIDEO_UPDATE( eolith16 )
 		for (x=0;x < 320/2;x++)
 		{
 			color = vram[count + (0x10000/2) * (vbuffer ^ 1)] & 0xff;
-			*BITMAP_ADDR16(bitmap, y, x*2 + 0) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*2 + 0) = color;
 
 			color = (vram[count + (0x10000/2) * (vbuffer ^ 1)] & 0xff00) >> 8;
-			*BITMAP_ADDR16(bitmap, y, x*2 + 1) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*2 + 1) = color;
 
 			count++;
 		}
@@ -167,16 +167,16 @@ static MACHINE_DRIVER_START( eolith16 )
 	MDRV_CPU_PROGRAM_MAP(eolith16_map,0)
 	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(eolith16_eeprom)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
+
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(eolith16)

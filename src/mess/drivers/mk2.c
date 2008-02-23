@@ -114,6 +114,7 @@ static MACHINE_DRIVER_START( mk2 )
 
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_mk2)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 

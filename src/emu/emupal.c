@@ -110,19 +110,14 @@ void palette_init(running_machine *machine)
 	switch (palette->format)
 	{
 		case BITMAP_FORMAT_INDEXED16:
-			/* indexed modes are fine for everything */
-			break;
-
 		case BITMAP_FORMAT_RGB15:
 		case BITMAP_FORMAT_RGB32:
-			/* RGB modes can't use color tables */
-			assert(machine->drv->color_table_len == 0);
+			/* indexed and RGB modes are fine for everything */
 			break;
 
 		case BITMAP_FORMAT_INVALID:
 			/* invalid format means no palette - or at least it should */
-			assert(machine->drv->total_colors == 0);
-			assert(machine->drv->color_table_len == 0);
+			assert(machine->config->total_colors == 0);
 			return;
 
 		default:
@@ -131,7 +126,7 @@ void palette_init(running_machine *machine)
 	}
 
 	/* allocate all the data structures */
-	if (machine->drv->total_colors > 0)
+	if (machine->config->total_colors > 0)
 	{
 		int numcolors;
 
@@ -158,45 +153,16 @@ void palette_init(running_machine *machine)
 
 void palette_config(running_machine *machine)
 {
-	int total_colors = (machine->palette == NULL) ? 0 : palette_get_num_colors(machine->palette) * palette_get_num_groups(machine->palette);
-	pen_t *remapped_colortable = NULL;
-	UINT16 *colortable = NULL;
 	int i;
 
-	/* allocate memory for the colortables, if needed */
-	if (machine->drv->color_table_len > 0)
-	{
-		/* first for the raw colortable */
-		colortable = auto_malloc(machine->drv->color_table_len * sizeof(colortable[0]));
-		for (i = 0; i < machine->drv->color_table_len; i++)
-			colortable[i] = i % total_colors;
-
-		/* then for the remapped colortable */
-		remapped_colortable = auto_malloc(machine->drv->color_table_len * sizeof(remapped_colortable[0]));
-	}
-
 	/* now let the driver modify the initial palette and colortable */
-	if (machine->drv->init_palette)
-		(*machine->drv->init_palette)(machine, colortable, memory_region(REGION_PROMS));
-
-	/* now compute the remapped_colortable */
-	for (i = 0; i < machine->drv->color_table_len; i++)
-	{
-		pen_t color = colortable[i];
-
-		/* check for invalid colors set by machine->drv->init_palette */
-		assert(color < total_colors);
-		remapped_colortable[i] = machine->pens[color];
-	}
-
-	/* now we can set the final colortables */
-	machine->game_colortable = colortable;
-	machine->remapped_colortable = (remapped_colortable != NULL) ? remapped_colortable : machine->pens;
+	if (machine->config->init_palette)
+		(*machine->config->init_palette)(machine, memory_region(REGION_PROMS));
 
 	/* set the color table base for each graphics element */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
 		if (machine->gfx[i] != NULL)
-			machine->gfx[i]->color_base = machine->drv->gfxdecodeinfo[i].color_codes_start;
+			machine->gfx[i]->color_base = machine->config->gfxdecodeinfo[i].color_codes_start;
 }
 
 
@@ -369,13 +335,17 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 	colortable_t *ctable;
 	UINT32 index;
 
+	assert(machine != NULL);
+	assert(machine->config != NULL);
+	assert(palettesize > 0);
+
 	/* allocate the colortable */
 	ctable = auto_malloc(sizeof(*ctable));
 	memset(ctable, 0, sizeof(*ctable));
 
 	/* fill in the basics */
 	ctable->machine = machine;
-	ctable->entries = machine->drv->total_colors;
+	ctable->entries = machine->config->total_colors;
 	ctable->palentries = palettesize;
 
 	/* allocate the raw colortable */
@@ -402,6 +372,7 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 void colortable_entry_set_value(colortable_t *ctable, UINT32 entry, UINT16 value)
 {
 	/* ensure values are within range */
+	assert(ctable != NULL);
 	assert(entry < ctable->entries);
 	assert(value < ctable->palentries);
 
@@ -421,6 +392,7 @@ void colortable_entry_set_value(colortable_t *ctable, UINT32 entry, UINT16 value
 
 UINT16 colortable_entry_get_value(colortable_t *ctable, UINT32 entry)
 {
+	assert(ctable != NULL);
 	assert(entry < ctable->entries);
 	return ctable->raw[entry];
 }
@@ -434,6 +406,7 @@ UINT16 colortable_entry_get_value(colortable_t *ctable, UINT32 entry)
 void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t color)
 {
 	/* ensure values are within range */
+	assert(ctable != NULL);
 	assert(entry < ctable->palentries);
 
 	/* alpha doesn't matter */
@@ -461,6 +434,7 @@ void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t colo
 
 rgb_t colortable_palette_get_color(colortable_t *ctable, UINT32 entry)
 {
+	assert(ctable != NULL);
 	assert(entry < ctable->palentries);
 	return ctable->palette[entry];
 }
@@ -479,6 +453,7 @@ UINT32 colortable_get_transpen_mask(colortable_t *ctable, const gfx_element *gfx
 	UINT32 count, bit;
 
 	/* make sure we are in range */
+	assert(ctable != NULL);
 	assert(entry < ctable->entries);
 	assert(gfx->color_depth <= 32);
 
@@ -506,11 +481,26 @@ void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap *tmap, co
 {
 	int color;
 
+	assert(ctable != NULL);
+	assert(gfx != NULL);
+	assert(tmap != NULL);
 	assert(gfx->total_colors <= TILEMAP_NUM_GROUPS);
 
 	/* iterate over all colors in the tilemap */
 	for (color = 0; color < gfx->total_colors; color++)
 		tilemap_set_transmask(tmap, color, colortable_get_transpen_mask(ctable, gfx, color, transcolor), 0);
+}
+
+
+/*-------------------------------------------------
+    colortable_palette_get_size -
+    return the number of entries in a colortable
+-------------------------------------------------*/
+
+UINT32 colortable_palette_get_size(colortable_t *ctable)
+{
+	assert(ctable != NULL);
+	return ctable->palentries;
 }
 
 
@@ -611,14 +601,14 @@ static void allocate_palette(running_machine *machine, palette_private *palette)
 
 	/* determine the number of groups we need */
 	numgroups = 1;
-	if (machine->drv->video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config->video_attributes & VIDEO_HAS_SHADOWS)
 		palette->shadow_group = numgroups++;
-	if (machine->drv->video_attributes & VIDEO_HAS_HIGHLIGHTS)
+	if (machine->config->video_attributes & VIDEO_HAS_HIGHLIGHTS)
 		palette->hilight_group = numgroups++;
-	assert_always(machine->drv->total_colors * numgroups <= 65536, "Error: palette has more than 65536 colors.");
+	assert_always(machine->config->total_colors * numgroups <= 65536, "Error: palette has more than 65536 colors.");
 
 	/* allocate a palette object containing all the colors and groups */
-	machine->palette = palette_alloc(machine->drv->total_colors, numgroups);
+	machine->palette = palette_alloc(machine->config->total_colors, numgroups);
 	assert_always(machine->palette != NULL, "Failed to allocate system palette");
 
 	/* configure the groups */
@@ -628,7 +618,7 @@ static void allocate_palette(running_machine *machine, palette_private *palette)
 		palette_group_set_contrast(machine->palette, palette->hilight_group, (float)PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
 
 	/* set the initial colors to a standard rainbow */
-	for (index = 0; index < machine->drv->total_colors; index++)
+	for (index = 0; index < machine->config->total_colors; index++)
 		palette_entry_set_color(machine->palette, index, MAKE_RGB(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
 
 	/* switch off the color mode */
@@ -708,7 +698,7 @@ static void allocate_color_tables(running_machine *machine, palette_private *pal
 static void allocate_shadow_tables(running_machine *machine, palette_private *palette)
 {
 	/* if we have shadows, allocate shadow tables */
-	if (machine->drv->video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config->video_attributes & VIDEO_HAS_SHADOWS)
 	{
 		pen_t *table = auto_malloc(65536 * sizeof(*table));
 		int i;
@@ -718,7 +708,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 		{
 			palette->shadow_table[0].base = palette->shadow_table[2].base = table;
 			for (i = 0; i < 65536; i++)
-				table[i] = (i < machine->drv->total_colors) ? (i + machine->drv->total_colors) : i;
+				table[i] = (i < machine->config->total_colors) ? (i + machine->config->total_colors) : i;
 		}
 
 		/* RGB mode gets two 32k tables in slots 0 and 2 */
@@ -731,7 +721,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 	}
 
 	/* if we have hilights, allocate shadow tables */
-	if (machine->drv->video_attributes & VIDEO_HAS_HIGHLIGHTS)
+	if (machine->config->video_attributes & VIDEO_HAS_HIGHLIGHTS)
 	{
 		pen_t *table = auto_malloc(65536 * sizeof(*table));
 		int i;
@@ -741,7 +731,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 		{
 			palette->shadow_table[1].base = palette->shadow_table[3].base = table;
 			for (i = 0; i < 65536; i++)
-				table[i] = (i < machine->drv->total_colors) ? (i + 2 * machine->drv->total_colors) : i;
+				table[i] = (i < machine->config->total_colors) ? (i + 2 * machine->config->total_colors) : i;
 		}
 
 		/* RGB mode gets two 32k tables in slots 1 and 3 */

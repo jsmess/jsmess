@@ -496,7 +496,7 @@ static VIDEO_UPDATE(bnstars)
 
 	if (screen==0)
 	{
-		fillbitmap(bitmap,machine->pens[0],cliprect);	/* bg color */
+		fillbitmap(bitmap,0,cliprect);	/* bg color */
 
 
 		tilemap_set_scrollx(ms32_bg_tilemap[0], 0, ms32_bg0_scroll[0x00/4] + ms32_bg0_scroll[0x08/4] + 0x10 );
@@ -514,7 +514,7 @@ static VIDEO_UPDATE(bnstars)
 	}
 	else
 	{
-		fillbitmap(bitmap,machine->pens[0x8000+0],cliprect);	/* bg color */
+		fillbitmap(bitmap,0x8000+0,cliprect);	/* bg color */
 
 
 		tilemap_set_scrollx(ms32_bg_tilemap[1], 0, ms32_bg1_scroll[0x00/4] + ms32_bg1_scroll[0x08/4] + 0x10 );
@@ -1348,23 +1348,22 @@ static MACHINE_DRIVER_START( bnstars )
 
 	MDRV_MACHINE_RESET(ms32)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_GFXDECODE(bnstars)
 	MDRV_PALETTE_LENGTH(0x8000*2)
 
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("left", 0x000)
+	MDRV_SCREEN_ADD("left", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(40*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 
-	MDRV_SCREEN_ADD("right", 0x000)
+	MDRV_SCREEN_ADD("right", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(40*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 

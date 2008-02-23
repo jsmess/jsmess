@@ -150,17 +150,6 @@ static GFXDECODE_START( starcrus )
 GFXDECODE_END
 
 
-static const UINT16 colortable_source[] =
-{
-	0x00, 0x01, /* White on Black */
-};
-static PALETTE_INIT( starcrus )
-{
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* Black */
-    palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* White */
-	memcpy(colortable,colortable_source,sizeof(colortable_source));
-}
-
 static const char *const starcrus_sample_names[] =
 {
     "*starcrus",
@@ -186,19 +175,18 @@ static MACHINE_DRIVER_START( starcrus )
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(57)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+
 	MDRV_GFXDECODE(starcrus)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
-	MDRV_PALETTE_INIT(starcrus)
+	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(starcrus)
 	MDRV_VIDEO_UPDATE(starcrus)
 

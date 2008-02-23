@@ -354,7 +354,6 @@ static const unsigned short cgenie_colortable[] =
 static PALETTE_INIT( cgenie )
 {
 	palette_set_colors_rgb(machine, 0, cgenie_palette, sizeof(cgenie_palette) / 3);
-	memcpy(colortable, cgenie_colortable, sizeof(cgenie_colortable));
 }
 
 
@@ -381,7 +380,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_MACHINE_RESET( cgenie )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -389,7 +388,6 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1,0*8,32*8-1)
 	MDRV_GFXDECODE( cgenie )
 	MDRV_PALETTE_LENGTH(sizeof(cgenie_palette) / sizeof(cgenie_palette[0]) / 3)
-	MDRV_COLORTABLE_LENGTH(sizeof(cgenie_colortable) / sizeof(cgenie_colortable[0]))
 	MDRV_PALETTE_INIT( cgenie )
 
 	MDRV_VIDEO_START( cgenie )
@@ -430,13 +428,13 @@ static void cgenie_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_cgenie_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_cgenie_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
@@ -448,17 +446,17 @@ static void cgenie_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_READABLE:						info->i = 0;	/* INVALID */ break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0;	/* INVALID */ break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0;	/* INVALID */ break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 0;	/* INVALID */ break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0;	/* INVALID */ break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0;	/* INVALID */ break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_cgenie_cassette; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_cgenie_cassette; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas"); break;
 	}
 }
 

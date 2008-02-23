@@ -917,14 +917,17 @@ void CreateCPUFolders(int parent_index)
 	for (jj = 0; jj < nGames; jj++)
 	{
 		int n;
-		machine_config drv;
-		expand_machine_driver(drivers[jj]->drv,&drv);
-		for (n = 0; n < MAX_CPU; n++)
-			if (drv.cpu[n].type != CPU_DUMMY)
+		machine_config *config;
+		// expand_machine_driver(drivers[jj]->drv,&drv);
+		config = machine_config_alloc(drivers[jj]->drv);
+		for (n = 0; n < MAX_CPU; n++) {
+			if (config->cpu[n].type != CPU_DUMMY)
 			{
 				// cpu type #'s are one-based
-				AddGame(map[drv.cpu[n].type],jj);
+				AddGame(map[config->cpu[n].type],jj);
 			}
+		}
+		machine_config_free(config);
 	}
 }
 
@@ -969,18 +972,22 @@ void CreateSoundFolders(int parent_index)
 	for (jj = 0; jj < nGames; jj++)
 	{
 		int n;
-		machine_config drv;
-		expand_machine_driver(drivers[jj]->drv,&drv);
+		machine_config *config;
+
+		// expand_machine_driver(drivers[jj]->drv,&drv);
+		config = machine_config_alloc(drivers[jj]->drv);
 		// Additional range and null checking.
-		for (n = 0; n < MAX_SOUND ; n++)
-			if (drv.sound[n].type > SOUND_DUMMY &&
-				drv.sound[n].type < MAX_SOUND)
+		for (n = 0; n < MAX_SOUND ; n++) {
+			if (config->sound[n].type > SOUND_DUMMY &&
+				config->sound[n].type < MAX_SOUND)
 			{
-				if (map[drv.sound[n].type] != NULL) {
+				if (map[config->sound[n].type] != NULL) {
 					// sound type #'s are one-based, though that doesn't affect us here
-					AddGame(map[drv.sound[n].type],jj);
+					AddGame(map[config->sound[n].type],jj);
 				}
 			}
+		}
+		machine_config_free(config);
 	}
 
 }

@@ -211,8 +211,6 @@ INLINE int in_vblank( void )
 PALETTE_INIT( odyssey2 )
 {
 	palette_set_colors_rgb(machine, 0, odyssey2_colors, sizeof(odyssey2_colors) / 3);
-	colortable[0] = 0;
-	colortable[1] = 1;
 }
 
 extern READ8_HANDLER( odyssey2_video_r )

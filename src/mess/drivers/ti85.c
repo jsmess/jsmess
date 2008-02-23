@@ -332,6 +332,7 @@ static MACHINE_DRIVER_START( ti81 )
 	MDRV_CPU_ADD_TAG("main", Z80, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(ti81_mem, 0)
 	MDRV_CPU_IO_MAP(ti81_io, 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
@@ -339,12 +340,10 @@ static MACHINE_DRIVER_START( ti81 )
 	MDRV_MACHINE_START( ti81 )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(96, 64)
 	MDRV_SCREEN_VISIBLE_AREA(0, 96-1, 0, 64-1)
 	MDRV_PALETTE_LENGTH(32*7 + 32768)
-	MDRV_COLORTABLE_LENGTH(32*7 + 32768)
 	MDRV_PALETTE_INIT( ti85 )
 
 	MDRV_VIDEO_START( ti85 )
@@ -469,10 +468,10 @@ static void ti85_snapshot_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sav"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sav"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_ti8x; break;
+		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_ti8x; break;
 
 		default:										snapshot_device_getinfo(devclass, state, info); break;
 	}
@@ -484,19 +483,19 @@ static void ti85_serial_getinfo(const device_class *devclass, UINT32 state, unio
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_ti85_serial; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_ti85_serial; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_ti85_serial; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_ti85_serial; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_ti85_serial; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_ti85_serial; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "85p,85s,85i,85n,85c,85l,85k,85m,85v,85d,85e,85r,85g,85b"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "85p,85s,85i,85n,85c,85l,85k,85m,85v,85d,85e,85r,85g,85b"); break;
 	}
 }
 
@@ -511,10 +510,10 @@ static void ti86_snapshot_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sav"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sav"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_ti8x; break;
+		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_ti8x; break;
 
 		default:										snapshot_device_getinfo(devclass, state, info); break;
 	}
@@ -526,19 +525,19 @@ static void ti86_serial_getinfo(const device_class *devclass, UINT32 state, unio
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_ti85_serial; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_ti85_serial; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_ti85_serial; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_ti85_serial; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_ti85_serial; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_ti85_serial; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "86p,86s,86i,86n,86c,86l,86k,86m,86v,86d,86e,86r,86g"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "86p,86s,86i,86n,86c,86l,86k,86m,86v,86d,86e,86r,86g"); break;
 	}
 }
 

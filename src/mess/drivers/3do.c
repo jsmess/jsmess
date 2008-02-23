@@ -146,7 +146,7 @@ static MACHINE_DRIVER_START( 3do )
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
 	MDRV_SCREEN_SIZE( 640, 525 )
 	MDRV_SCREEN_VISIBLE_AREA( 0,639,0,479 )
@@ -163,7 +163,6 @@ static MACHINE_DRIVER_START( 3do_pal )
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
 	MDRV_SCREEN_SIZE( 640, 625 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
@@ -197,7 +196,7 @@ ROM_END
 static void chdcd_3do_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
 	/* CHD CD-ROM */
 	switch( state ) {
-	case DEVINFO_INT_COUNT:		info->i = 1; break;
+	case MESS_DEVINFO_INT_COUNT:		info->i = 1; break;
 	default:			cdrom_device_getinfo( devclass, state, info ); break;
 	}
 }

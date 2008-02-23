@@ -37,7 +37,6 @@ static const rgb_t nc_palette[NC_NUM_COLOURS] =
 PALETTE_INIT( nc )
 {
 	palette_set_colors(machine, 0, nc_palette, ARRAY_LENGTH(nc_palette));
-	memcpy(colortable, nc_colour_table, sizeof (nc_colour_table));
 }
 
 extern int nc_display_memory_start;

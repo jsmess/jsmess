@@ -932,15 +932,8 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( c128 )
 {
-	int i;
-
 	palette_set_colors_rgb(machine, 0, vic2_palette, sizeof(vic2_palette) / 3);
 	palette_set_colors_rgb(machine, sizeof(vic2_palette) / 3, vdc8563_palette, sizeof(vdc8563_palette) / 3);
-
-	for (i=0; i<0x100; i++) {
-		colortable[i*2]=0x10+((i&0xf0)>>4);
-		colortable[i*2+1]=0x10+(i&0xf);
-	}
 }
 
 static const gfx_layout c128_charlayout =
@@ -1190,7 +1183,7 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_MACHINE_RESET( c128 )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1198,7 +1191,6 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 656 - 1, 0, 216 - 1)
 	MDRV_GFXDECODE( c128 )
 	MDRV_PALETTE_LENGTH((sizeof (vic2_palette) +sizeof(vdc8563_palette))/ sizeof (vic2_palette[0]) / 3 )
-	MDRV_COLORTABLE_LENGTH( 0x100*2 )
 	MDRV_PALETTE_INIT( c128 )
 
 	MDRV_VIDEO_START( c128 )
@@ -1236,7 +1228,7 @@ static void c128_cbmcartslot_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crt,80"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crt,80"); break;
 
 		default:										cbmcartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -1247,13 +1239,13 @@ static void c64_quickload_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "p00,prg"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "p00,prg"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_cbm_c64; break;
+		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_cbm_c64; break;
 
 		/* --- the following bits of info are returned as doubles --- */
-		case DEVINFO_FLOAT_QUICKLOAD_DELAY:				info->d = CBM_QUICKLOAD_DELAY; break;
+		case MESS_DEVINFO_FLOAT_QUICKLOAD_DELAY:				info->d = CBM_QUICKLOAD_DELAY; break;
 
 		default:										quickload_device_getinfo(devclass, state, info); break;
 	}

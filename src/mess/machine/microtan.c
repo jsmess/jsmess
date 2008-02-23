@@ -768,7 +768,6 @@ static void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size)
         for (i = 0; i < 32*16; i++)
         {
             microtan_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
-            dirtybuffer[i] = 1;
         }
         base += 64;
         microtan_set_cpu_regs(snapshot_buff, base);
@@ -838,7 +837,6 @@ static void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size)
         for (i = 0; i < 32*16; i++)
         {
             microtan_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
-            dirtybuffer[i] = 1;
         }
         base += 64;
 

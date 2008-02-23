@@ -289,11 +289,6 @@ ADDRESS_MAP_END
 
 
 
-static const unsigned short bbc_colour_table[8]=
-{
-	0,1,2,3,4,5,6,7
-};
-
 static const rgb_t bbc_palette[8]=
 {
 	MAKE_RGB(0x0ff,0x0ff,0x0ff),
@@ -309,7 +304,6 @@ static const rgb_t bbc_palette[8]=
 static PALETTE_INIT( bbc )
 {
 	palette_set_colors(machine, 0, bbc_palette, ARRAY_LENGTH(bbc_palette));
-	memcpy(colortable,bbc_colour_table,sizeof(bbc_colour_table));
 }
 
 static INPUT_PORTS_START(bbca)
@@ -726,6 +720,7 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_CPU_PROGRAM_MAP( bbca_mem, 0 )
 	MDRV_CPU_VBLANK_INT(bbcb_vsync, 1)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
 	MDRV_INTERLEAVE(1)
@@ -734,12 +729,10 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_MACHINE_RESET( bbca )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(800,300)
 	MDRV_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
 	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(16)
 	MDRV_PALETTE_INIT(bbc)
 
 	MDRV_VIDEO_START(bbca)
@@ -798,12 +791,10 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_MACHINE_RESET( bbcm )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(800,300)
 	MDRV_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
 	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(16)
 	MDRV_PALETTE_INIT(bbc)
 
 	MDRV_VIDEO_START(bbcm)
@@ -823,13 +814,13 @@ static void bbc_cartslot_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_bbcb_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_bbcb_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -841,13 +832,13 @@ static void bbc_floppy_getinfo(const device_class *devclass, UINT32 state, union
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_bbc_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_bbc_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ssd,bbc,img"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ssd,bbc,img"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
@@ -855,10 +846,10 @@ static void bbc_floppy_getinfo(const device_class *devclass, UINT32 state, union
 
 static void bbc_cassette_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-	case DEVINFO_PTR_CASSETTE_FORMATS:
+	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
 		info->p = (void *)bbc_cassette_formats;
 		break;
 	default:
@@ -873,7 +864,7 @@ static void bbc_printer_getinfo(const device_class *devclass, UINT32 state, unio
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}

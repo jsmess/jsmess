@@ -17,14 +17,9 @@ static const unsigned char ssystem3_palette[] =
 	0,12,12
 };
 
-static const unsigned short ssystem3_colortable[1][2] = {
-	{ 0, 1 },
-};
-
 PALETTE_INIT( ssystem3 )
 {
 	palette_set_colors_rgb(machine, 0, ssystem3_palette, sizeof(ssystem3_palette) / 3);
-	memcpy(colortable,ssystem3_colortable,sizeof(ssystem3_colortable));
 }
 
 VIDEO_START( ssystem3 )

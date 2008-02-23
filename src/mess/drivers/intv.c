@@ -56,29 +56,9 @@ static const unsigned char intv_palette[] =
 
 static PALETTE_INIT( intv )
 {
-	int i,j;
-
 	/* Two copies of the palette */
 	palette_set_colors_rgb(machine, 0, intv_palette, sizeof(intv_palette) / 3);
 	palette_set_colors_rgb(machine, sizeof(intv_palette) / 3, intv_palette, sizeof(intv_palette) / 3);
-
-    /* Two copies of the color table */
-    for(i=0;i<16;i++)
-    {
-    	for(j=0;j<16;j++)
-    	{
-    		*colortable++ = i;
-    		*colortable++ = j;
-		}
-	}
-    for(i=0;i<16;i++)
-    {
-    	for(j=0;j<16;j++)
-    	{
-    		*colortable++ = i+16;
-    		*colortable++ = j+16;
-		}
-	}
 }
 
 static const struct AY8910interface ay8910_interface =
@@ -351,7 +331,7 @@ static MACHINE_DRIVER_START( intv )
 	MDRV_MACHINE_RESET( intv )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.92)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -359,7 +339,6 @@ static MACHINE_DRIVER_START( intv )
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
 	MDRV_GFXDECODE( intv )
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(2 * 2 * 16 * 16)
 	MDRV_PALETTE_INIT( intv )
 
 	MDRV_VIDEO_START( intv )
@@ -426,15 +405,15 @@ static void intv_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_intv_cart; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_intv_cart; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_intv_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_intv_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "int,rom"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "int,rom"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -450,13 +429,13 @@ static void intvkbd_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_intvkbd_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_intvkbd_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "int,rom,bin"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "int,rom,bin"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -469,15 +448,15 @@ static void intvkbd_cassette_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_READABLE:						info->i = 0;	/* INVALID */ break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0;	/* INVALID */ break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0;	/* INVALID */ break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 0;	/* INVALID */ break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0;	/* INVALID */ break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0;	/* INVALID */ break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
 	}
 }
 #endif

@@ -2709,16 +2709,18 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 	{
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
+
 		astring *basename;
 		astring *srcname;
-		machine_config drv;
-
-		/* expand the machine driver to look at the info */
-		expand_machine_driver(driver->drv, &drv);
+		machine_config *config = machine_config_alloc(driver->drv);
 
 		/* parse "vector.ini" for vector games */
-		if (drv.video_attributes & VIDEO_TYPE_VECTOR)
+		if (isDriverVector(config))
+		{
 			ui_parse_ini_file(opts, "vector");
+		}
+
+		machine_config_free(config);
 
 		if (opt_type == OPTIONS_VECTOR)
 		{
@@ -2797,10 +2799,6 @@ void save_options(OPTIONS_TYPE opt_type, core_options *opts, int game_num)
 	} else if (driver != NULL)
 	{
 		astring *basename, *srcname;
-		machine_config drv;
-
-		/* expand the machine driver to look at the info */
-		expand_machine_driver(driver->drv, &drv);
 
 		switch (opt_type)
 		{

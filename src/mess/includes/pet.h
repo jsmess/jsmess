@@ -7,6 +7,8 @@
 #ifndef PET_H_
 #define PET_H_
 
+#include "video/mc6845.h"
+
 
 /*----------- defined in video/pet.c -----------*/
 
@@ -15,9 +17,9 @@ extern void pet_vh_init (void);
 extern void pet80_vh_init (void);
 extern void superpet_vh_init (void);
 extern VIDEO_UPDATE( pet );
-void pet40_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+void pet40_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
 					  UINT8 ra, UINT16 y, UINT8 x_count, void *param);
-void pet80_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+void pet80_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
 					  UINT8 ra, UINT16 y, UINT8 x_count, void *param);
 
 extern int pet_font;

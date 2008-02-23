@@ -242,7 +242,7 @@ static HBRUSH background_brush = NULL;
 
 BOOL PropSheetFilter_Vector(const machine_config *drv, const game_driver *gamedrv)
 {
-	return (drv->video_attributes & VIDEO_TYPE_VECTOR) != 0;
+	return isDriverVector(drv);
 }
 
 /* Help IDs - moved to auto-generated helpids.c */
@@ -351,10 +351,6 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 	int maxPropSheets;
 	int possiblePropSheets;
 	int i;
-	machine_config drv;
-
-	if (gamedrv)
-	    expand_machine_driver(gamedrv->drv, &drv);
 
 	i = ( isGame ) ? 0 : 2;
 
@@ -377,7 +373,14 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 	{
 		if ((gamedrv != NULL) || g_propSheets[i].bOnDefaultPage)
 		{
-			if (!gamedrv || !g_propSheets[i].pfnFilterProc || g_propSheets[i].pfnFilterProc(&drv, gamedrv))
+			machine_config *config = NULL;
+
+			/* Allocate machine config */
+			if (gamedrv != NULL)
+			{
+				config = machine_config_alloc(gamedrv->drv);
+			}
+			if (!gamedrv || !g_propSheets[i].pfnFilterProc || g_propSheets[i].pfnFilterProc(config, gamedrv))
 			{
 				pspages[maxPropSheets].dwSize      = sizeof(PROPSHEETPAGE);
 				pspages[maxPropSheets].dwFlags     = 0;
@@ -387,6 +390,11 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 				pspages[maxPropSheets].lParam      = 0;
 				pspages[maxPropSheets].pfnDlgProc  = g_propSheets[i].pfnDlgProc;
 				maxPropSheets++;
+			}
+			if (config != NULL)
+			{
+				/* Free the structure */
+				machine_config_free(config);
 			}
 		}
 	}
@@ -566,33 +574,36 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 /* Build CPU info string */
 static char *GameInfoCPU(UINT nIndex)
 {
-	int i;
+	int chipnum;
 	static char buf[1024] = "";
-	machine_config drv;
-	expand_machine_driver(drivers[nIndex]->drv,&drv);
+	machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
 
 	ZeroMemory(buf, sizeof(buf));
 
 	cpuintrf_init(NULL);
 
-	i = 0;
-	while (i < MAX_CPU && drv.cpu[i].type)
+	for (chipnum = 0; chipnum < ARRAY_LENGTH(config->cpu); chipnum++)
 	{
-		if (drv.cpu[i].clock >= 1000000)
-			sprintf(&buf[strlen(buf)], "%s %d.%06d MHz",
-					cputype_name(drv.cpu[i].type),
-					drv.cpu[i].clock / 1000000,
-					drv.cpu[i].clock % 1000000);
-		else
-			sprintf(&buf[strlen(buf)], "%s %d.%03d kHz",
-					cputype_name(drv.cpu[i].type),
-					drv.cpu[i].clock / 1000,
-					drv.cpu[i].clock % 1000);
+		if (config->cpu[chipnum].type != CPU_DUMMY)
+		{
+			if (config->cpu[chipnum].clock >= 1000000)
+			{
+				sprintf(&buf[strlen(buf)], "%s %d.%06d MHz",
+					cputype_name(config->cpu[chipnum].type),
+					config->cpu[chipnum].clock / 1000000,
+					config->cpu[chipnum].clock % 1000000);
+			} else {
+				sprintf(&buf[strlen(buf)], "%s %d.%03d kHz",
+					cputype_name(config->cpu[chipnum].type),
+					config->cpu[chipnum].clock / 1000,
+					config->cpu[chipnum].clock % 1000);
+			}
 
-		strcat(buf, "\n");
-
-		i++;
+			strcat(buf, "\n");
+		}
     }
+	/* Free the structure */
+	machine_config_free(config);
 
 	return buf;
 }
@@ -600,51 +611,60 @@ static char *GameInfoCPU(UINT nIndex)
 /* Build Sound system info string */
 static char *GameInfoSound(UINT nIndex)
 {
-	int i;
+	int chipnum;
 	static char buf[1024];
-	machine_config drv;
-	expand_machine_driver(drivers[nIndex]->drv,&drv);
+	machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
 
 	buf[0] = 0;
 
-	i = 0;
-	while (i < MAX_SOUND && drv.sound[i].type)
+		/* iterate over sound chips */
+	for (chipnum = 0; chipnum < ARRAY_LENGTH(config->sound); chipnum++)
 	{
-		int clock,sound_type,count;
-
-		sound_type = drv.sound[i].type;
-		clock = drv.sound[i].clock;
-
-		count = 1;
-		i++;
-
-		while (i < MAX_SOUND
-				&& drv.sound[i].type == sound_type
-				&& drv.sound[i].clock == clock)
+		if (config->sound[chipnum].type != SOUND_DUMMY)
 		{
-			count++;
-			i++;
-		}
+			int clock,sound_type,count;
 
-		if (count > 1)
-			sprintf(&buf[strlen(buf)],"%dx",count);
+			sound_type = config->sound[chipnum].type;
+			clock = config->sound[chipnum].clock;
 
-		sprintf(&buf[strlen(buf)],"%s",sndtype_name(sound_type));
+			count = 1;
+			chipnum++;
 
-		if (clock)
-		{
-			if (clock >= 1000000)
-				sprintf(&buf[strlen(buf)]," %d.%06d MHz",
+			/* Matching chips at the same clock are aggregated */
+			while (chipnum < ARRAY_LENGTH(config->sound)
+				&& config->sound[chipnum].type == sound_type
+				&& config->sound[chipnum].clock == clock)
+			{
+				count++;
+				chipnum++;
+			}
+
+			if (count > 1)
+			{
+				sprintf(&buf[strlen(buf)],"%dx",count);
+			}
+
+			sprintf(&buf[strlen(buf)],"%s",sndtype_name(sound_type));
+
+			if (clock)
+			{
+				if (clock >= 1000000)
+				{
+					sprintf(&buf[strlen(buf)]," %d.%06d MHz",
 						clock / 1000000,
 						clock % 1000000);
-			else
+				} else {
 				sprintf(&buf[strlen(buf)]," %d.%03d kHz",
 						clock / 1000,
 						clock % 1000);
+				}
+			}
 		}
 
 		strcat(buf,"\n");
 	}
+	/* Free the structure */
+	machine_config_free(config);
 
 	return buf;
 }
@@ -653,24 +673,33 @@ static char *GameInfoSound(UINT nIndex)
 static char *GameInfoScreen(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config drv;
-	expand_machine_driver(drivers[nIndex]->drv,&drv);
+	machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
 
-	if (drv.video_attributes & VIDEO_TYPE_VECTOR)
-		strcpy(buf, "Vector Game");
+	if (isDriverVector(config))
+	{
+		strcpy(buf, "Vector Game"); 
+	}
 	else
 	{
+		const device_config *screen = video_screen_first(config);
+		const screen_config *scrconfig = screen->inline_config;
+
 		if (drivers[nIndex]->flags & ORIENTATION_SWAP_XY)
+		{
 			sprintf(buf,"%d x %d (V) %f Hz",
-			drv.screen[0].defstate.visarea.max_y - drv.screen[0].defstate.visarea.min_y + 1,
-					drv.screen[0].defstate.visarea.max_x - drv.screen[0].defstate.visarea.min_x + 1,
-					ATTOSECONDS_TO_HZ(drv.screen[0].defstate.refresh));
-		else
+			scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1,
+					scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1,
+					ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+		} else {
 			sprintf(buf,"%d x %d (H) %f Hz",
-					drv.screen[0].defstate.visarea.max_x - drv.screen[0].defstate.visarea.min_x + 1,
-					drv.screen[0].defstate.visarea.max_y - drv.screen[0].defstate.visarea.min_y + 1,
-					ATTOSECONDS_TO_HZ(drv.screen[0].defstate.refresh));
+					scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1,
+					scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1,
+					ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+		}
 	}
+	/* Free the structure */
+	machine_config_free(config);
+
 	return buf;
 }
 
@@ -678,11 +707,11 @@ static char *GameInfoScreen(UINT nIndex)
 static char *GameInfoColors(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config drv;
-	expand_machine_driver(drivers[nIndex]->drv,&drv);
+	machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
 
 	ZeroMemory(buf, sizeof(buf));
-	sprintf(buf, "%d colors ", drv.total_colors);
+	sprintf(buf, "%d colors ", config->total_colors);
+	machine_config_free(config);
 
 	return buf;
 }
@@ -2320,17 +2349,13 @@ static void SetStereoEnabled(HWND hWnd, int nIndex)
 {
 	BOOL enabled = FALSE;
 	HWND hCtrl;
-	machine_config drv;
-	int speakernum, num_speakers;
-
-	num_speakers = 0;
+	int num_speakers = 0;
 
 	if ( nIndex > -1)
 	{
-		expand_machine_driver(drivers[nIndex]->drv,&drv);
-		for (speakernum = 0; speakernum < MAX_SPEAKER; speakernum++)
-			if (drv.speaker[speakernum].tag != NULL)
-				num_speakers++;
+		machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
+		num_speakers = numberOfSpeakers(config);
+		machine_config_free(config);
 	}
 
 	hCtrl = GetDlgItem(hWnd, IDC_STEREO);
@@ -2348,10 +2373,12 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 	int i;
 	BOOL enabled;
 	HWND hCtrl;
-	machine_config drv;
+	machine_config *config = NULL;
 
 	if (nIndex > -1)
-		expand_machine_driver(drivers[nIndex]->drv,&drv);
+	{
+		config = machine_config_alloc(drivers[nIndex]->drv);
+	}
 
 	hCtrl = GetDlgItem(hWnd, IDC_USE_FM_YM3812);
 	if (hCtrl)
@@ -2361,13 +2388,13 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 		{
 			if (nIndex <= -1
 #if HAS_YM3812
-			||  drv.sound[i].type == SOUND_YM3812
+			||  config->sound[i].type == SOUND_YM3812
 #endif
 #if HAS_YM3526
-			||  drv.sound[i].type == SOUND_YM3526
+			||  config->sound[i].type == SOUND_YM3526
 #endif
 #if HAS_YM2413
-			||  drv.sound[i].type == SOUND_YM2413
+			||  config->sound[i].type == SOUND_YM2413
 #endif
 			)
 				enabled = TRUE;
@@ -2375,29 +2402,34 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
     
 		EnableWindow(hCtrl, enabled);
 	}
+	if (nIndex > -1)
+	{
+		machine_config_free(config);
+	}
 }
 
 static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 {
+	machine_config *config = NULL;
 #if (HAS_SAMPLES == 1) || (HAS_VLM5030 == 1)
 	int i;
 	BOOL enabled = FALSE;
 	HWND hCtrl;
-	machine_config drv;
 
 	hCtrl = GetDlgItem(hWnd, IDC_SAMPLES);
 
-	if ( nIndex > -1 )
-		expand_machine_driver(drivers[nIndex]->drv,&drv);
+	if ( nIndex > -1 ) {
+		config = machine_config_alloc(drivers[nIndex]->drv);
+	}
 	
 	if (hCtrl)
 	{
 		for (i = 0; i < MAX_SOUND; i++)
 		{
 			if (nIndex <= -1
-			||  drv.sound[i].type == SOUND_SAMPLES
+			||  config->sound[i].type == SOUND_SAMPLES
 #if HAS_VLM5030
-			||  drv.sound[i].type == SOUND_VLM5030
+			||  config->sound[i].type == SOUND_VLM5030
 #endif
 			)
 				enabled = TRUE;
@@ -2406,6 +2438,10 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 		EnableWindow(hCtrl, enabled);
 	}
 #endif
+	if (config != NULL)
+	{
+		machine_config_free(config);
+	}
 }
 
 /* Moved here cause it's called in a few places */

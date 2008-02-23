@@ -419,16 +419,10 @@ static const unsigned char oric_palette[8*3] =
 	0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
 };
 
-static const unsigned short oric_colortable[8] =
-{
-	 0,1,2,3,4,5,6,7
-};
-
 /* Initialise the palette */
 static PALETTE_INIT( oric )
 {
 	palette_set_colors_rgb(machine, 0, oric_palette, sizeof(oric_palette) / 3);
-	memcpy(colortable, oric_colortable,sizeof(oric_colortable));
 }
 
 
@@ -452,14 +446,13 @@ static MACHINE_DRIVER_START( oric )
 	MDRV_MACHINE_RESET( oric )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*6, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(8)
 	MDRV_PALETTE_INIT( oric )
 
 	MDRV_VIDEO_START( oric )
@@ -534,11 +527,11 @@ static void oric_common_cassette_getinfo(const device_class *devclass, UINT32 st
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:				info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:				info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) oric_cassette_formats; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) oric_cassette_formats; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
@@ -550,7 +543,7 @@ static void oric_common_printer_getinfo(const device_class *devclass, UINT32 sta
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}
@@ -567,19 +560,19 @@ static void oric1_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_oric_floppy; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_oric_floppy; break;
-		case DEVINFO_PTR_STATUS:						/* info->status = floppy_status; */ break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_oric_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_oric_floppy; break;
+		case MESS_DEVINFO_PTR_STATUS:						/* info->status = floppy_status; */ break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 	}
 }
 
@@ -594,10 +587,10 @@ static void prav8_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_apple2; break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_apple2; break;
 
 		default:										floppy_device_getinfo(devclass, state, info); break;
 	}

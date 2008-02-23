@@ -44,7 +44,7 @@ static struct mess_cassetteimg *get_cassimg(mess_image *image)
 static cassette_state get_default_state(const struct IODevice *dev)
 {
 	assert(dev->type == IO_CASSETTE);
-	return (cassette_state) (int) device_get_info_int(&dev->devclass, DEVINFO_INT_CASSETTE_DEFAULT_STATE);
+	return (cassette_state) (int) mess_device_get_info_int(&dev->devclass, MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE);
 }
 
 
@@ -260,12 +260,12 @@ static int device_load_cassette(mess_image *image)
 
 	/* figure out the cassette format */
 	dev = device_find(Machine->devices, IO_CASSETTE);
-	formats = device_get_info_ptr(&dev->devclass, DEVINFO_PTR_CASSETTE_FORMATS);
+	formats = mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_CASSETTE_FORMATS);
 
 	if (image_has_been_created(image))
 	{
 		/* creating an image */
-		create_opts = (const struct CassetteOptions *) device_get_info_ptr(&dev->devclass, DEVINFO_PTR_CASSETTE_OPTIONS);
+		create_opts = (const struct CassetteOptions *) mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_CASSETTE_OPTIONS);
 		err = cassette_create(image, &mess_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &tag->cassette);
 		if (err)
 			goto error;
@@ -381,23 +381,23 @@ void cassette_device_getinfo(const device_class *devclass, UINT32 state, union d
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:						info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_READABLE:					info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:					info->i = 1; break;
-		case DEVINFO_INT_CREATABLE:					info->i = 1; break;
-		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_PLAY; break;
+		case MESS_DEVINFO_INT_TYPE:						info->i = IO_CASSETTE; break;
+		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_PLAY; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:						info->init = device_init_cassette; break;
-		case DEVINFO_PTR_LOAD:						info->load = device_load_cassette; break;
-		case DEVINFO_PTR_UNLOAD:					info->unload = device_unload_cassette; break;
-		case DEVINFO_PTR_DISPLAY:					info->display = device_display_cassette; break;
-		case DEVINFO_PTR_CASSETTE_FORMATS:			info->p = (void *) cassette_default_formats; break;
+		case MESS_DEVINFO_PTR_INIT:						info->init = device_init_cassette; break;
+		case MESS_DEVINFO_PTR_LOAD:						info->load = device_load_cassette; break;
+		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_cassette; break;
+		case MESS_DEVINFO_PTR_DISPLAY:					info->display = device_display_cassette; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:			info->p = (void *) cassette_default_formats; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
-		case DEVINFO_STR_FILE_EXTENSIONS:
-			formats = device_get_info_ptr(devclass, DEVINFO_PTR_CASSETTE_FORMATS);
+		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
+			formats = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_CASSETTE_FORMATS);
 
 			/* set up a temporary string */
 			s = device_temp_str();

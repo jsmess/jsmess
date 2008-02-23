@@ -166,15 +166,9 @@ static const unsigned char vc4000_palette[] =
 	0, 0, 0 // black
 };
 
-static const unsigned short vc4000_colortable[1][2] =
-{
-	{ 0, 1 },
-};
-
 static PALETTE_INIT( vc4000 )
 {
 	palette_set_colors_rgb(machine, 0, vc4000_palette, sizeof(vc4000_palette) / 3);
-	memcpy(colortable, vc4000_colortable,sizeof(vc4000_colortable));
 }
 
 static MACHINE_DRIVER_START( vc4000 )
@@ -186,7 +180,7 @@ static MACHINE_DRIVER_START( vc4000 )
 	MDRV_INTERLEAVE(1)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -194,7 +188,6 @@ static MACHINE_DRIVER_START( vc4000 )
 	MDRV_SCREEN_VISIBLE_AREA(10, 182, 0, 269)
 	MDRV_GFXDECODE( vc4000 )
 	MDRV_PALETTE_LENGTH(sizeof(vc4000_palette) / 3)
-	MDRV_COLORTABLE_LENGTH(sizeof (vc4000_colortable) / sizeof(vc4000_colortable[0][0]))
 	MDRV_PALETTE_INIT( vc4000 )
 
 	MDRV_VIDEO_START( vc4000 )

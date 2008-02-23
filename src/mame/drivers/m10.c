@@ -723,7 +723,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const char *m10_sample_names[] =
+static const char *const m10_sample_names[] =
 {
 	"*ipminvad",
 	"1.wav",		/* shot/missle */
@@ -740,7 +740,7 @@ static const char *m10_sample_names[] =
 };
 
 
-static struct Samplesinterface m10_samples_interface =
+static const struct Samplesinterface m10_samples_interface =
 {
 	6,	/* 6 channels */
 	m10_sample_names
@@ -764,11 +764,11 @@ static MACHINE_DRIVER_START( m10 )
 
 	MDRV_CPU_VBLANK_INT(m10_interrupt,1)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART)
 
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_GFXDECODE(m10)
 	MDRV_PALETTE_LENGTH(2*8)
 
@@ -811,11 +811,11 @@ static MACHINE_DRIVER_START( m15 )
 
 	MDRV_CPU_VBLANK_INT(m15_interrupt,1)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART)
 
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(2*8)
 
 	MDRV_PALETTE_INIT(m10)

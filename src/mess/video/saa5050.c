@@ -102,7 +102,6 @@ static const UINT16 saa5050_colortable[64 * 2] =	/* bgnd, fgnd */
 static PALETTE_INIT( saa5050 )
 {
 	palette_set_colors_rgb(machine, 0, saa5050_palette, sizeof(saa5050_palette) / 3);
-	memcpy(colortable, saa5050_colortable, sizeof (saa5050_colortable));
 }
 
 static VIDEO_START( saa5050 )
@@ -240,17 +239,16 @@ static VIDEO_UPDATE( saa5050 )
 }
 
 MACHINE_DRIVER_START( vh_saa5050 )
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(SAA5050_VBLANK))
 	MDRV_INTERLEAVE(1)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40 * 6, 24 * 10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 6 - 1, 0, 24 * 10 - 1)
 	MDRV_GFXDECODE( saa5050 )
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(128)
 	MDRV_PALETTE_INIT(saa5050)
 
 	MDRV_VIDEO_START(saa5050)

@@ -516,7 +516,7 @@ static void draw_background(mame_bitmap *bitmap, int transparency)
 							decodechar(Machine->gfx[1],
 								   code,
 								   intv_gram,
-								   Machine->drv->gfxdecodeinfo[1].gfxlayout);
+								   Machine->config->gfxdecodeinfo[1].gfxlayout);
 							intv_gramdirtybytes[code] = 0;
 						}
 						// Draw GRAM char
@@ -571,7 +571,7 @@ static void draw_background(mame_bitmap *bitmap, int transparency)
 						decodechar(Machine->gfx[1],
 							   code,
 							   intv_gram,
-							   Machine->drv->gfxdecodeinfo[1].gfxlayout);
+							   Machine->config->gfxdecodeinfo[1].gfxlayout);
 						intv_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
@@ -619,7 +619,7 @@ static void draw_sprites(mame_bitmap *bitmap, int behind_foreground)
 						decodechar(Machine->gfx[1],
 						   code,
 						   intv_gram,
-						   Machine->drv->gfxdecodeinfo[1].gfxlayout);
+						   Machine->config->gfxdecodeinfo[1].gfxlayout);
 						intv_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
@@ -638,11 +638,11 @@ static void draw_sprites(mame_bitmap *bitmap, int behind_foreground)
 						decodechar(Machine->gfx[1],
 						   code,
 						   intv_gram,
-						   Machine->drv->gfxdecodeinfo[1].gfxlayout);
+						   Machine->config->gfxdecodeinfo[1].gfxlayout);
 						decodechar(Machine->gfx[1],
 						   code+1,
 						   intv_gram,
-						   Machine->drv->gfxdecodeinfo[1].gfxlayout);
+						   Machine->config->gfxdecodeinfo[1].gfxlayout);
 						intv_gramdirtybytes[code] = 0;
 						intv_gramdirtybytes[code+1] = 0;
 					}

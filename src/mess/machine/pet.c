@@ -495,7 +495,8 @@ DRIVER_INIT( pet1 )
 }
 
 //static const struct mscrtc6845_config crtc_pet = { 800000 /*?*/};
-static void pet_display_enable_changed(int display_enabled) {
+static void pet_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+{
 }
 
 static const mc6845_interface crtc_pet40 = {

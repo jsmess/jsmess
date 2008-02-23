@@ -368,12 +368,12 @@ static MACHINE_DRIVER_START( sb2m600 )
 	// basic machine hardware
 	MDRV_CPU_ADD(M6502, X1/4) // .98304 MHz
 	MDRV_CPU_PROGRAM_MAP(sb2m600_mem, 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(X1/256/256) // 60 Hz
 
 	MDRV_MACHINE_START(sb2m600)
 
     // video hardware
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
@@ -402,7 +402,6 @@ static MACHINE_DRIVER_START( uk101 )
 	MDRV_MACHINE_START(uk101)
 
     // video hardware
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 16*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
@@ -473,18 +472,18 @@ static void sb2m600_cassette_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_sb2m600_cassette; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_sb2m600_cassette; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sb2m600_cassette; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_sb2m600_cassette; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bas"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bas"); break;
 	}
 }
 

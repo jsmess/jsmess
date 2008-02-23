@@ -244,7 +244,6 @@ PALETTE_INIT( kccomp )
 
 	for (i=0; i<32; i++)
 	{
-		colortable[i] = i;
 		palette_set_color_rgb(machine, i,
 			kccomp_get_colour_element((color_prom[i]>>2) & 0x03),
 			kccomp_get_colour_element((color_prom[i]>>4) & 0x03),
@@ -277,7 +276,6 @@ PALETTE_INIT( amstrad_plus )
 		b = ( b << 4 ) | ( b );
 
 		palette_set_color_rgb(machine, i+48, g, r, b);
-		colortable[i+48] = i+48;  // take into account the original palette, and sprite palette
 	}
 }
 
@@ -301,7 +299,6 @@ PALETTE_INIT( aleste )
 		b = (b << 6);
 
 		palette_set_color_rgb(machine, i+32, r, g, b);
-		colortable[i+32] = i+32;  // take into account the CPC and MSX palette
 	}
 }
 

@@ -20,14 +20,9 @@ const unsigned char pmd85_palette[3*3] =
 	0xff, 0xff, 0xff
 };
 
-const unsigned short pmd85_colortable[1][3] ={
-	{ 0, 1, 2 }
-};
-
 PALETTE_INIT( pmd85 )
 {
 	palette_set_colors_rgb(machine, 0, pmd85_palette, sizeof(pmd85_palette) / 3);
-	memcpy(colortable, pmd85_colortable, sizeof (pmd85_colortable));
 }
 
 VIDEO_START( pmd85 )

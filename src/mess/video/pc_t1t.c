@@ -105,13 +105,11 @@ static GFXDECODE_START( t1000sx )
 GFXDECODE_END
 
 MACHINE_DRIVER_START( pcvideo_t1000hx )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*8, 25*9)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1, 0,25*9-1)
 	MDRV_GFXDECODE(t1000hx)
 	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / sizeof(cga_palette[0]))
-	MDRV_COLORTABLE_LENGTH(sizeof(pcjr_colortable) / sizeof(pcjr_colortable[0]))
 	MDRV_PALETTE_INIT(pcjr)
 
 	MDRV_VIDEO_START(pc_t1t)
@@ -135,7 +133,6 @@ static PALETTE_INIT( pcjr )
 	int i;
 	for(i = 0; i < (sizeof(cga_palette) / 3); i++)
 		palette_set_color_rgb(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
-	memcpy(colortable, pcjr_colortable, sizeof(pcjr_colortable));
 }
 
 static struct {
@@ -510,7 +507,7 @@ static void t1t_plot_char(mame_bitmap *bitmap, const rectangle *r, UINT8 ch, UIN
 
 	if (height > 8)
 	{
-		bgcolor = Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (attr % gfx->total_colors)];
+		bgcolor = gfx->color_base + gfx->color_granularity * (attr % gfx->total_colors);
 		plot_box(bitmap, r->min_x, r->min_y + 8, width, height - 8, bgcolor);
 	}
 }

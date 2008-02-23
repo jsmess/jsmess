@@ -142,16 +142,16 @@ static VIDEO_UPDATE( vega )
 		for (x=0;x < 320/4;x++)
 		{
 			color = vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff;
-			*BITMAP_ADDR16(bitmap, y, x*4 + 3) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*4 + 3) = color;
 
 			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff00) >> 8;
-			*BITMAP_ADDR16(bitmap, y, x*4 + 2) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*4 + 2) = color;
 
 			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff0000) >> 16;
-			*BITMAP_ADDR16(bitmap, y, x*4 + 1) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*4 + 1) = color;
 
 			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff000000) >> 24;
-			*BITMAP_ADDR16(bitmap, y, x*4 + 0) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*4 + 0) = color;
 
 			count++;
 		}
@@ -167,16 +167,16 @@ static MACHINE_DRIVER_START( vega )
 
 	/* sound cpu */
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(at28c16_0)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(vega)

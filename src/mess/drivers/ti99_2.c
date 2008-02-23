@@ -132,18 +132,11 @@ static const unsigned char ti99_2_palette[] =
 	0, 0, 0
 };
 
-static const unsigned short ti99_2_colortable[] =
-{
-	0, 1
-};
-
 #define TI99_2_PALETTE_SIZE sizeof(ti99_2_palette)/3
-#define TI99_2_COLORTABLE_SIZE sizeof(ti99_2_colortable)/2
 
 static PALETTE_INIT(ti99_2)
 {
 	palette_set_colors_rgb(machine, 0, ti99_2_palette, TI99_2_PALETTE_SIZE);
-	memcpy(colortable, & ti99_2_colortable, sizeof(ti99_2_colortable));
 }
 
 
@@ -380,7 +373,7 @@ static MACHINE_DRIVER_START(ti99_2)
 
 	/* video hardware */
 	/*MDRV_TMS9928A( &tms9918_interface )*/
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -388,7 +381,6 @@ static MACHINE_DRIVER_START(ti99_2)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MDRV_GFXDECODE(ti99_2)
 	MDRV_PALETTE_LENGTH(TI99_2_PALETTE_SIZE)
-	MDRV_COLORTABLE_LENGTH(TI99_2_COLORTABLE_SIZE)
 	MDRV_PALETTE_INIT(ti99_2)
 
 	MDRV_VIDEO_UPDATE(ti99_2)

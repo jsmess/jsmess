@@ -86,16 +86,9 @@ static const unsigned char jupiter_palette[] =
 	0xff, 0xff, 0xff	/* White */
 };
 
-static const unsigned short jupiter_colortable[] =
-{
-	0, 1,
-	1, 0
-};
-
 static PALETTE_INIT( jupiter )
 {
 	palette_set_colors_rgb(machine, 0, jupiter_palette, sizeof(jupiter_palette) / 3);
-	memcpy (colortable, jupiter_colortable, sizeof (jupiter_colortable));
 }
 
 /* keyboard input */
@@ -182,7 +175,7 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_MACHINE_START( jupiter )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -190,7 +183,6 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_SCREEN_VISIBLE_AREA(0, 32 * 8 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE( jupiter )
 	MDRV_PALETTE_LENGTH(sizeof(jupiter_palette) / 3)
-	MDRV_COLORTABLE_LENGTH(sizeof (jupiter_colortable))
 	MDRV_PALETTE_INIT( jupiter )
 
 	MDRV_VIDEO_START( jupiter )
@@ -214,13 +206,13 @@ static void jupiter_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_jupiter_ace; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_jupiter_ace; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ace"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ace"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -232,19 +224,19 @@ static void jupiter_cassette_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_jupiter_tap; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_jupiter_tap; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_jupiter_tap; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_jupiter_tap; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
 	}
 }
 

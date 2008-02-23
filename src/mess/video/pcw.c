@@ -44,7 +44,6 @@ static const rgb_t pcw_palette[PCW_NUM_COLOURS] =
 PALETTE_INIT( pcw )
 {
 	palette_set_colors(machine, 0, pcw_palette, ARRAY_LENGTH(pcw_palette));
-	memcpy(colortable, pcw_colour_table, sizeof (pcw_colour_table));
 }
 
 /***************************************************************************

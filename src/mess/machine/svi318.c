@@ -429,15 +429,17 @@ DEVICE_LOAD( svi318_floppy )
 	return INIT_PASS;
 }
 
-static void svi806_crtc6845_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+static void svi806_crtc6845_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
 									   UINT8 ra, UINT16 y, UINT8 x_count, void *param ) {
 	int i;
 
-	for( i = 0; i < x_count; i++ ) {
+	for( i = 0; i < x_count; i++ )
+	{
 		int j;
 		UINT8	data = svi.svi806_gfx[ svi.svi806_ram[ ( ma + i ) & 0x7FF ] * 16 + ra ];
 
-		for( j=0; j < 8; j++ ) {
+		for( j=0; j < 8; j++ )
+		{
 			*BITMAP_ADDR16(bitmap, y, i * 8 + j ) = TMS9928A_PALETTE_SIZE + ( ( data & 0x80 ) ? 1 : 0 );
 			data = data << 1;
 		}

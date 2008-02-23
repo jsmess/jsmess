@@ -1,16 +1,26 @@
-/* Super Kaneko Nova System */
-/* Original Driver by Sylvain Glaize */
-/* taken to pieces and attempted reconstruction by David Haywood */
+/*
+   Super Kaneko Nova System
+    Original Driver by Sylvain Glaize
+    taken to pieces and attempted reconstruction by David Haywood
 
-/* Credits (in no particular order):
+Mainboard + Cart combo
+  Regions are not cross compatible and have thier own BIOS
+   Regions by color coded cart:
+
+    White      = Japan
+    Light Blue = USA
+    Dark Blue  = Europe
+    Green      = Asia
+    Red        = Korean
+
+  Credits (in no particular order):
    Olivier Galibert for all the assistance and information he's provided
    R.Belmont for working on the SH2 timers so sound worked
    Nicola Salmoria for hooking up the Roz and improving the dirty tile handling
    Paul Priest for a lot of things
    Stephh for spotting what was wrong with Puzz Loop's inputs
-*/
 
-/*
+
 ToDo:
    Priorities
    Transparency effects (each pen has a transparent flag, there are seperate r,g,b alpha values to be used for these pens)
@@ -183,7 +193,7 @@ NEP-16
 extern void skns_sprite_kludge(int x, int y);
 
 UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
-UINT32 *skns_palette_ram, *skns_v3t_ram, *skns_main_ram, *skns_cache_ram;
+UINT32 *skns_palette_ram;
 UINT32 *skns_pal_regs, *skns_v3_regs, *skns_spc_regs;
 
 UINT32 skns_v3t_dirty[0x4000]; // allocate this elsewhere?
@@ -198,6 +208,8 @@ WRITE32_HANDLER ( skns_palette_ram_w );
 VIDEO_START(skns);
 VIDEO_EOF(skns);
 VIDEO_UPDATE(skns);
+
+static UINT32 *skns_v3t_ram, *skns_main_ram, *skns_cache_ram;
 
 /* hit.c */
 
@@ -941,16 +953,18 @@ static MACHINE_DRIVER_START(skns)
 	MDRV_CPU_PROGRAM_MAP(skns_readmem,skns_writemem)
 	MDRV_CPU_VBLANK_INT(skns_interrupt,2)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(skns)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16,64*16)
 	MDRV_SCREEN_VISIBLE_AREA(0,319,0,239)
+
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_GFXDECODE(skns_bg)
 

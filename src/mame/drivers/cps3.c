@@ -910,13 +910,13 @@ static VIDEO_START(cps3)
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[0] = allocgfx(&cps3_tiles8x8_layout);
-	machine->gfx[0]->total_colors = machine->drv->total_colors / 16;
+	machine->gfx[0]->total_colors = machine->config->total_colors / 16;
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[1] = allocgfx(&cps3_tiles16x16_layout);
-	machine->gfx[1]->total_colors = machine->drv->total_colors / 64;
+	machine->gfx[1]->total_colors = machine->config->total_colors / 64;
 	machine->gfx[1]->color_granularity=64;
 
 	//decode_charram();
@@ -2729,12 +2729,10 @@ static MACHINE_DRIVER_START( cps3 )
 	MDRV_CPU_VBLANK_INT(cps3_vbl_interrupt,1)
 	MDRV_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 224*2)
 	MDRV_SCREEN_VISIBLE_AREA(0, (384*1)-1, 0, 223/*511*/)

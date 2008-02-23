@@ -294,6 +294,7 @@ static MACHINE_DRIVER_START( nes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", N2A03, NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(nes_map, 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.098)
 	// This isn't used so much to calulate the vblank duration (the PPU code tracks that manually) but to determine
 	// the number of cycles in each scanline for the PPU scanline timer. Since the PPU has 20 vblank scanlines + 2
@@ -304,7 +305,6 @@ static MACHINE_DRIVER_START( nes )
 	MDRV_MACHINE_START( nes )
 	MDRV_MACHINE_RESET( nes )
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
@@ -313,7 +313,6 @@ static MACHINE_DRIVER_START( nes )
 	MDRV_VIDEO_UPDATE(nes)
 
 	MDRV_PALETTE_LENGTH(4*16*8)
-	MDRV_COLORTABLE_LENGTH(4*8)
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -327,9 +326,11 @@ static MACHINE_DRIVER_START( nespal )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("main", N2A03, PAL_CLOCK)
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(53.355)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
-
 	MDRV_VIDEO_START(nes_pal)
 
     /* sound hardware */
@@ -344,15 +345,15 @@ static void nes_cartslot_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_nes_cart; break;
-		case DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = nes_partialhash; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_nes_cart; break;
+		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = nes_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "nes"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "nes"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -368,14 +369,14 @@ static void famicom_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_nes_cart; break;
-		case DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = nes_partialhash; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_nes_cart; break;
+		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = nes_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "nes"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "nes"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -387,19 +388,19 @@ static void famicom_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_nes_disk; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_nes_disk; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_nes_disk; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_nes_disk; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_nes_disk; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_nes_disk; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk,fds"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk,fds"); break;
 	}
 }
 

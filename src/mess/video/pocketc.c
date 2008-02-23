@@ -34,7 +34,6 @@ const unsigned short pocketc_colortable[8][2] = {
 PALETTE_INIT( pocketc )
 {
 	palette_set_colors_rgb(machine, 0, pocketc_palette, sizeof(pocketc_palette) / 3);
-	memcpy(colortable,pocketc_colortable,sizeof(pocketc_colortable));
 }
 
 VIDEO_START( pocketc )

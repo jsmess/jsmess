@@ -110,7 +110,6 @@ PALETTE_INIT( hd66421 )
 		#ifndef BRIGHTNESS_DOES_NOT_WORK
 		palette_set_brightness( machine, i, 1.0 * i / (4 - 1));
 		#endif
-		colortable[i] = i;
 	}
 }
 

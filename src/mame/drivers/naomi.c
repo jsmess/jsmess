@@ -493,6 +493,7 @@ Idol Janshi Suchie-Pai 3   841-0002C  21979        14         315-6213   317-504
 Sega Marine Fishing        840-0027C  22221        10         315-6213   not populated  ROM 3&4 not populated. Requires special I/O board and fishing controller
 *Slash Out                 840-0041C  23341        17         315-6213   317-0286-COM
 *Spawn                     841-0005C  22977B       10         315-6213   317-5051-COM
+Toy Fighter                840-0011C  22035        10         315-6212   317-0257-COM
 Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-0258-COM
 *Zombie Revenge            840-0003C  21707        19         315-6213   317-0249-COM
 
@@ -507,9 +508,11 @@ Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-025
 #include "machine/x76f100.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
+#include "sound/aica.h"
 #include "dc.h"
+#include "deprecat.h"
 
-#define CPU_CLOCK 200000000
+#define CPU_CLOCK (200000000)
                                  /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
@@ -541,15 +544,6 @@ static READ64_HANDLER( naomi_unknown1_r )
 }
 
 static WRITE64_HANDLER( naomi_unknown1_w )
-{
-}
-
-static READ32_HANDLER( dc_aica_arm_r )
-{
-	return 0;
-}
-
-static WRITE32_HANDLER( dc_aica_arm_w )
 {
 }
 
@@ -721,17 +715,58 @@ static READ32_HANDLER( test1 )
 	return -1;
 }
 
+static void aica_irq(int irq)
+{
+	cpunum_set_input_line(Machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE( &dc_sound_ram )                /* shared with SH-4 */
-	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE( dc_aica_arm_r, dc_aica_arm_w )   /* shared with SH-4 */
+	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
 	AM_RANGE(0x00808000, 0x008080ff) AM_READ( test1 )                               // for bug (?) in sound bios
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( naomi )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_START_TAG("IN3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_START_TAG("IN4")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_START_TAG("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
+
+static const struct AICAinterface aica_interface =
+{
+	REGION_CPU1,		// dummy, is fixed up in the reset handler
+	0,
+	aica_irq
+};
+
+static MACHINE_RESET( naomi )
+{
+	MACHINE_RESET_CALL(dc);
+	AICA_set_ram_base(0, dc_sound_ram, 8*1024*1024);
+}
 
 static MACHINE_DRIVER_START( naomi )
 	/* basic machine hardware */
@@ -744,22 +779,29 @@ static MACHINE_DRIVER_START( naomi )
 	MDRV_CPU_ADD_TAG("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
 
-	MDRV_MACHINE_RESET( dc )
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_MACHINE_START( dc )
+	MDRV_MACHINE_RESET( naomi )
 
 	MDRV_NVRAM_HANDLER(naomi_eeproms)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+
 	MDRV_PALETTE_LENGTH(0x1000)
 
 	MDRV_VIDEO_START(dc)
 	MDRV_VIDEO_UPDATE(dc)
+
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SOUND_ADD(AICA, 0)
+	MDRV_SOUND_CONFIG(aica_interface)
+	MDRV_SOUND_ROUTE(0, "left", 2.0)
+	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -1372,6 +1414,28 @@ ROM_START( suchie3 )
 	ROM_LOAD("mpr-21993.ic14",0x7000000, 0x0400000, CRC(fb28cf0a) SHA1(d51b1d4514a93074d1f77bd1bc5995739604cf56) )
 ROM_END
 
+
+/* toy fighter - 1999 sega */
+
+ROM_START( toyfight )
+	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x8000000, REGION_USER1, 0)
+	ROM_LOAD("epr-22035.ic22",   0x0000000, 0x0400000, CRC(dbc76493) SHA1(a9772bdb62610a39adf2b9f397781bcddda3e635) )
+
+	ROM_LOAD("mpr-22025.ic1", 0x0800000, 0x0800000, CRC(30237202) SHA1(e229a7671b3a34b26a461716bd7b437da100e1c8) )
+	ROM_LOAD("mpr-22026.ic2", 0x1000000, 0x0800000, CRC(f28e71ff) SHA1(019425fcf234beca2b586de5235cf9f171563533) )
+	ROM_LOAD("mpr-22027.ic3", 0x1800000, 0x0800000, CRC(1a84632d) SHA1(f3880f21399c6713c48c710c06d0344a0a28f026) )
+	ROM_LOAD("mpr-22028.ic4", 0x2000000, 0x0800000, CRC(2b34ccba) SHA1(76c39ea19c3be1d9a9ce9e67035be7543b71ff26) )
+	ROM_LOAD("mpr-22029.ic5", 0x2800000, 0x0800000, CRC(8162953a) SHA1(15c9e10080a5f2e70c31b9b89a256050a1aed4e9) )
+	ROM_LOAD("mpr-22030.ic6", 0x3000000, 0x0800000, CRC(5bf5fed6) SHA1(6c8eedb177aa49aee9a8b090f2e5f96644416c6c) )
+	ROM_LOAD("mpr-22031.ic7", 0x3800000, 0x0800000, CRC(ee7c40cc) SHA1(b9d92ef5bae0e932ec8769a30ebd841a263d3e2a) )
+	ROM_LOAD("mpr-22032.ic8", 0x4000000, 0x0800000, CRC(3c48c9ba) SHA1(00be199b23040f8e81db2ec489ba98cbf615652c) )
+	ROM_LOAD("mpr-22033.ic9", 0x4800000, 0x0800000, CRC(5fe5586e) SHA1(3ff41ae1f81469597684faadd88e62b5e0634352) )
+	ROM_LOAD("mpr-22034.ic10",0x5000000, 0x0800000, CRC(3aa5ce5e) SHA1(f00a906235e4522d6fc2ac771324114346875314) )
+ROM_END
+
 /*
 
 SYSTEMID: NAOMI
@@ -1826,6 +1890,7 @@ IC15    32M     0DF9    FC01    MPR21928
 
 */
 
+/* according to elsemi this set might be a bad dump, (or protected while the clone isn't?) */
 ROM_START( vs2_2k )
 	ROM_REGION( 0x200000, REGION_CPU1, 0)
 	NAOMI_BIOS
@@ -2220,6 +2285,7 @@ GAME( 1999, suchie3,  naomi,    naomi,    naomi,    0, ROT0, "Jaleco",          
 GAME( 1999, vs2_2k,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS) (set 1)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, vs2_2ka,  vs2_2k,   naomi,    naomi,    0, ROT0, "Sega",            "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS) (set 2)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, smarinef, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Sega Marine Fishing", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, toyfight, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Toy Fighter", GAME_NO_SOUND|GAME_NOT_WORKING )
 // Incomplete Dumps (just IC22)
 GAME( 2000, cspike,   naomi,    naomi,    naomi,    0, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, capsnk,   naomi,    naomi,    naomi,    0, ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )

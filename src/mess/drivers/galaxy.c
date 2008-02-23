@@ -123,6 +123,7 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
 	MDRV_CPU_IO_MAP(galaxy_readport, galaxy_writeport)
 	MDRV_CPU_VBLANK_INT(galaxy_interrupt, 1)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
@@ -130,13 +131,11 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_MACHINE_RESET( galaxy )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 218)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 218-1)
 	MDRV_GFXDECODE( galaxy )
 	MDRV_PALETTE_LENGTH(sizeof (galaxy_palette) / 3)
-	MDRV_COLORTABLE_LENGTH(sizeof (galaxy_colortable))
 	MDRV_PALETTE_INIT( galaxy )
 
 	MDRV_VIDEO_START( galaxy )
@@ -157,10 +156,10 @@ static void galaxy_snapshot_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "gal"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "gal"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_galaxy; break;
+		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_galaxy; break;
 
 		default:										snapshot_device_getinfo(devclass, state, info); break;
 	}

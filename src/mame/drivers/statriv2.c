@@ -139,13 +139,10 @@ static PALETTE_INIT(statriv2)
 {
 	int i;
 
-	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine,i,pal1bit(i >> 2),pal1bit(i >> 0),pal1bit(i >> 1));
-
 	for (i = 0; i < 64; i++)
 	{
-		colortable[2*i+0] = i % 8;
-		colortable[2*i+1] = i / 8;
+		palette_set_color_rgb(machine,2*i+0,pal1bit(i >> 2),pal1bit(i >> 0),pal1bit(i >> 1));
+		palette_set_color_rgb(machine,2*i+1,pal1bit(i >> 5),pal1bit(i >> 4),pal1bit(i >> 3));
 	}
 }
 
@@ -612,19 +609,18 @@ static MACHINE_DRIVER_START( statriv2 )
 	MDRV_CPU_IO_MAP(statriv2_readport,statriv2_writeport)
 	MDRV_CPU_VBLANK_INT(statriv2_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(statriv2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 38*8-1, 0, 32*8-1)
+
 	MDRV_GFXDECODE(statriv2)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(2*64)
+	MDRV_PALETTE_LENGTH(2*64)
 
 	MDRV_PALETTE_INIT(statriv2)
 	MDRV_VIDEO_START(statriv2)
@@ -644,6 +640,7 @@ static MACHINE_DRIVER_START( statriv4 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(statriv4_readport,statriv4_writeport)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -662,6 +659,7 @@ static MACHINE_DRIVER_START( sextriv )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(trivquiz_readport,trivquiz_writeport)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -675,6 +673,7 @@ static MACHINE_DRIVER_START( supertr2 )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -688,6 +687,7 @@ static MACHINE_DRIVER_START( supertr3 )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -697,6 +697,7 @@ static MACHINE_DRIVER_START( quaquiz2 )
 
 	MDRV_NVRAM_HANDLER(quaquiz2)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 38*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -707,6 +708,7 @@ static MACHINE_DRIVER_START( hangman )
 	MDRV_CPU_REPLACE("main",8085A,12400000/4)
 	MDRV_CPU_IO_MAP(hangman_readport,supertr2_writeport)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 35*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 

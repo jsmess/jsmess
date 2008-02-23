@@ -550,10 +550,6 @@ WRITE8_HANDLER( trs80_port_ff_w )
 		}
 	}
 
-	/* font width change ? (32<->64 characters per line) */
-	if( changes & 0x08 )
-		memset(dirtybuffer, 1, 64 * 16);
-
 	trs80_port_ff = data;
 }
 

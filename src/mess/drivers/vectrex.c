@@ -97,10 +97,10 @@ static MACHINE_DRIVER_START( vectrex )
 	MDRV_CPU_ADD_TAG("main", M6809, 1500000)        /* 1.5 Mhz */
 	MDRV_CPU_PROGRAM_MAP(vectrex_map, 0)
 
+	MDRV_SCREEN_ADD("main", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_VECTOR)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
@@ -125,13 +125,13 @@ static void vectrex_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_vectrex_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_vectrex_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,gam,vec"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,gam,vec"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}

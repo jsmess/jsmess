@@ -429,7 +429,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, int scrn
 
 static VIDEO_UPDATE( common )
 {
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	draw_sprites(machine, bitmap, screen);
 	return 0;
 }
@@ -586,13 +586,12 @@ static MACHINE_DRIVER_START( common )
 	MDRV_CPU_PROGRAM_MAP(common_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold, 1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(93C46_vamphalf)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(31, 350, 16, 255)

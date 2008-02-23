@@ -22,6 +22,7 @@
 
 // MAME/MAMEUI headers
 #include "tabview.h"
+#include "driver.h"
 #include "mui_util.h"
 #include "strconv.h"
 

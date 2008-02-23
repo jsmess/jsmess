@@ -24,7 +24,7 @@ static tilemap *fg_tilemap;
 static rgb_t palette[64];
 
 #define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs)
+#define COLOR(gfxn,offs) (Machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs)
 
 
 
@@ -39,7 +39,7 @@ PALETTE_INIT( rockola )
 {
 	int i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -193,7 +193,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( rockola )
 {
-	mc6845 = mc6845_config(NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -214,7 +214,7 @@ PALETTE_INIT( satansat )
 {
 	int i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -315,7 +315,7 @@ static TILE_GET_INFO( satansat_get_fg_tile_info )
 
 VIDEO_START( satansat )
 {
-	mc6845 = mc6845_config(NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 
 	bg_tilemap = tilemap_create(satansat_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	fg_tilemap = tilemap_create(satansat_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);

@@ -245,14 +245,12 @@ static const unsigned short a7800_colortable[] =
 static PALETTE_INIT(a7800)
 {
 	palette_set_colors(machine, 0, a7800_palette, ARRAY_LENGTH(a7800_palette));
-    memcpy(colortable,a7800_colortable,sizeof(a7800_colortable));
 }
 
 
 static PALETTE_INIT(a7800p)
 {
 	palette_set_colors(machine, 0, a7800p_palette, ARRAY_LENGTH(a7800p_palette));
-    memcpy(colortable,a7800_colortable,sizeof(a7800_colortable));
 }
 
 
@@ -273,14 +271,13 @@ static MACHINE_DRIVER_START( a7800_ntsc )
 	MDRV_MACHINE_RESET( a7800 )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640,262)
 	MDRV_SCREEN_VISIBLE_AREA(0,319,25,45+204)
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(a7800_palette))
-	MDRV_COLORTABLE_LENGTH(sizeof(a7800_colortable) / sizeof(a7800_colortable[0]))
 	MDRV_PALETTE_INIT(a7800)
 
 	MDRV_VIDEO_START(a7800)
@@ -303,6 +300,8 @@ static MACHINE_DRIVER_START( a7800_pal )
 	MDRV_CPU_REPLACE("main", M6502, CLK_PAL)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
                                                  * when the TIA or RIOT are accessed) */
 	MDRV_CPU_VBLANK_INT(a7800_interrupt,312)
+
+	MDRV_SCREEN_MODIFY( "main" )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_SIZE(640,312)
 	MDRV_SCREEN_VISIBLE_AREA(0,319,50,50+225)
@@ -342,16 +341,16 @@ static void a7800_ntsc_cartslot_getinfo(const device_class *devclass, UINT32 sta
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_a7800_cart; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_a7800_cart; break;
-		case DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = a7800_partialhash; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_a7800_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_a7800_cart; break;
+		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = a7800_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "a78"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "a78"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -367,7 +366,7 @@ static void a7800_pal_cartslot_getinfo(const device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
 		default:										a7800_ntsc_cartslot_getinfo( devclass, state, info); break;
 	}
 }

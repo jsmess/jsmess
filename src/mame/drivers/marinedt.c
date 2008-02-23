@@ -410,7 +410,7 @@ static PALETTE_INIT( marinedt )
 {
 	int i,r,b,g;
 
-	for (i = 0;i < machine->drv->total_colors; i++)
+	for (i = 0;i < machine->config->total_colors; i++)
 	{
 		int bit0,bit1,bit2;
 
@@ -479,10 +479,10 @@ static VIDEO_UPDATE( marinedt )
 {
 	int sx, sy;
 
-	fillbitmap(tile, machine->pens[0], NULL);
+	fillbitmap(tile, 0, NULL);
 	tilemap_draw(tile, cliprect, tx_tilemap, 0, 0);
 
-	fillbitmap(obj1, machine->pens[0], NULL);
+	fillbitmap(obj1, 0, NULL);
 	drawgfx(obj1, machine->gfx[1],
 			OBJ_CODE(marinedt_obj1_a),
 			OBJ_COLOR(marinedt_obj1_a),
@@ -490,7 +490,7 @@ static VIDEO_UPDATE( marinedt )
 			0, 0,
 			NULL, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(obj2, machine->pens[0], NULL);
+	fillbitmap(obj2, 0, NULL);
 	drawgfx(obj2, machine->gfx[2],
 			OBJ_CODE(marinedt_obj2_a),
 			OBJ_COLOR(marinedt_obj2_a),
@@ -498,15 +498,15 @@ static VIDEO_UPDATE( marinedt )
 			0, 0,
 			NULL, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(bitmap, machine->pens[0], NULL);
+	fillbitmap(bitmap, 0, NULL);
 
 	if (marinedt_pd & 0x02)
-		copybitmap_trans(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, machine->pens[0]);
+		copybitmap_trans(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, 0);
 
 	if (marinedt_pd & 0x01)
-		copybitmap_trans(bitmap, obj1, 0, 0, OBJ_X(marinedt_obj1_x), OBJ_Y(marinedt_obj1_y), cliprect, machine->pens[0]);
+		copybitmap_trans(bitmap, obj1, 0, 0, OBJ_X(marinedt_obj1_x), OBJ_Y(marinedt_obj1_y), cliprect, 0);
 
-	copybitmap_trans(bitmap, tile, 0, 0, 0, 0, cliprect, machine->pens[0]);
+	copybitmap_trans(bitmap, tile, 0, 0, 0, 0, cliprect, 0);
 
 	coll = cx = cyr = cyq = 0;
 	if (marinedt_pd & 0x01)
@@ -521,10 +521,10 @@ static VIDEO_UPDATE( marinedt )
 				 || y < cliprect->min_y || y > cliprect->max_y)
 					continue;
 
-				if (*BITMAP_ADDR16(obj1, sy, sx) == machine->pens[0])
+				if (*BITMAP_ADDR16(obj1, sy, sx) == 0)
 					continue;
 
-				if (*BITMAP_ADDR16(tile, y, x) != machine->pens[0])
+				if (*BITMAP_ADDR16(tile, y, x) != 0)
 				{
 					coll = 0x08;
 
@@ -558,10 +558,10 @@ static VIDEO_UPDATE( marinedt )
 				 || yy < 0 || yy >= 32)
 					continue;
 
-				if (*BITMAP_ADDR16(obj1, sy, sx) == machine->pens[0])
+				if (*BITMAP_ADDR16(obj1, sy, sx) == 0)
 					continue;
 
-				if (*BITMAP_ADDR16(obj2, yy, xx) != machine->pens[0])
+				if (*BITMAP_ADDR16(obj2, yy, xx) != 0)
 				{
 					collh = 0x80;
 
@@ -589,14 +589,14 @@ static MACHINE_DRIVER_START( marinedt )
 	MDRV_CPU_IO_MAP(marinedt_readport,marinedt_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(4*8+32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
+
 	MDRV_GFXDECODE(marinedt)
 	MDRV_PALETTE_LENGTH(64)
 

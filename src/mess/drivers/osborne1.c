@@ -148,9 +148,8 @@ static MACHINE_DRIVER_START( osborne1 )
 
 	MDRV_MACHINE_RESET( osborne1 )
 
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_ADD( "main",0 )
 	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
@@ -184,9 +183,9 @@ ROM_END
 
 static void osborne1_floppy_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
-	case DEVINFO_INT_COUNT:				info->i = 2; break;
-	case DEVINFO_PTR_LOAD:				info->load = device_load_osborne1_floppy; break;
-	case DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "img" ); break;
+	case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+	case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_osborne1_floppy; break;
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "img" ); break;
 	default:							legacybasicdsk_device_getinfo( devclass, state, info ); break;
 	}
 }

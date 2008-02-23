@@ -584,6 +584,7 @@ static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_START( dragon32 )
@@ -591,7 +592,6 @@ static MACHINE_DRIVER_START( dragon32 )
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
 	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
@@ -604,14 +604,14 @@ static MACHINE_DRIVER_START( dragon64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_START( dragon64 )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
 	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
@@ -624,14 +624,14 @@ static MACHINE_DRIVER_START( d64plus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(d64_plus_map, 0)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_START( dragon64 )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
 	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
@@ -644,14 +644,14 @@ static MACHINE_DRIVER_START( dgnalpha )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(dgnalpha_map, 0)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_START( dgnalpha )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
 	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
@@ -667,14 +667,14 @@ static MACHINE_DRIVER_START( tanodr64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
-	MDRV_SCREEN_REFRESH_RATE(COCO_FRAMES_PER_SECOND)			/* Tano Dragon 64 is NTSC */
 
 	MDRV_MACHINE_START( tanodr64 )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
 	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(COCO_FRAMES_PER_SECOND)			/* Tano Dragon 64 is NTSC */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
@@ -687,14 +687,14 @@ static MACHINE_DRIVER_START( coco )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_START( coco )
 
 	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_VIDEO_START(coco)
 	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
@@ -707,17 +707,17 @@ static MACHINE_DRIVER_START( coco2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_START( coco2 )
 
 	/* video hardware */
-	MDRV_VIDEO_START(coco)
-	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MDRV_VIDEO_START(coco)
+	MDRV_VIDEO_UPDATE(m6847)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -727,17 +727,17 @@ static MACHINE_DRIVER_START( coco2b )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809E, COCO_CPU_SPEED_HZ)        /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_START( coco2 )
 
 	/* video hardware */
-	MDRV_VIDEO_START(coco2b)
-	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MDRV_VIDEO_START(coco2b)
+	MDRV_VIDEO_UPDATE(m6847)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -754,16 +754,15 @@ static MACHINE_DRIVER_START( coco3 )
 	/* video hardware */
 	MDRV_VIDEO_START(coco3)
 	MDRV_VIDEO_UPDATE(coco3)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_DEFAULT_LAYOUT(layout_coco3)
 
-	MDRV_SCREEN_ADD("composite", 0)
+	MDRV_SCREEN_ADD("composite", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_SCREEN_SIZE(640, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 
-	MDRV_SCREEN_ADD("rgb", 0)
+	MDRV_SCREEN_ADD("rgb", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_SCREEN_SIZE(640, 25+192+26)
@@ -775,15 +774,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
 	MDRV_IMPORT_FROM( coco3 )
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
 	/* video hardware */
 	MDRV_VIDEO_START(coco3p)
 	MDRV_VIDEO_UPDATE(coco3)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 1, 239)
+	MDRV_SCREEN_MODIFY("composite")
+	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MDRV_SCREEN_MODIFY("rgb")
+	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3h )
@@ -937,10 +935,10 @@ static void coco_bitbanger_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_BITBANGER_CONFIG:				info->p = (void *) &coco_bitbanger_config; break;
+		case MESS_DEVINFO_PTR_BITBANGER_CONFIG:				info->p = (void *) &coco_bitbanger_config; break;
 
 		default:										bitbanger_device_getinfo(devclass, state, info); break;
 	}
@@ -954,13 +952,13 @@ static void coco_cassette_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) coco_cassette_formats; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) coco_cassette_formats; break;
 
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
@@ -974,24 +972,24 @@ static void coco_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_coco; break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_coco; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "floppydisk0"); break;
-		case DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "floppydisk1"); break;
-		case DEVINFO_STR_NAME+2:						strcpy(info->s = device_temp_str(), "floppydisk2"); break;
-		case DEVINFO_STR_NAME+3:						strcpy(info->s = device_temp_str(), "floppydisk3"); break;
-		case DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "flop0"); break;
-		case DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "flop1"); break;
-		case DEVINFO_STR_SHORT_NAME+2:					strcpy(info->s = device_temp_str(), "flop2"); break;
-		case DEVINFO_STR_SHORT_NAME+3:					strcpy(info->s = device_temp_str(), "flop3"); break;
-		case DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Floppy #0"); break;
-		case DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Floppy #1"); break;
-		case DEVINFO_STR_DESCRIPTION+2:					strcpy(info->s = device_temp_str(), "Floppy #2"); break;
-		case DEVINFO_STR_DESCRIPTION+3:					strcpy(info->s = device_temp_str(), "Floppy #3"); break;
+		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "floppydisk0"); break;
+		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "floppydisk1"); break;
+		case MESS_DEVINFO_STR_NAME+2:						strcpy(info->s = device_temp_str(), "floppydisk2"); break;
+		case MESS_DEVINFO_STR_NAME+3:						strcpy(info->s = device_temp_str(), "floppydisk3"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "flop0"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "flop1"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+2:					strcpy(info->s = device_temp_str(), "flop2"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+3:					strcpy(info->s = device_temp_str(), "flop3"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Floppy #0"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Floppy #1"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+2:					strcpy(info->s = device_temp_str(), "Floppy #2"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+3:					strcpy(info->s = device_temp_str(), "Floppy #3"); break;
 
 		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
@@ -1004,14 +1002,14 @@ static void coco_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_coco_rom; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_coco_rom; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_coco_rom; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_coco_rom; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ccc,rom"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ccc,rom"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -1024,14 +1022,14 @@ static void coco3_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_coco3_rom; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_coco3_rom; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_coco3_rom; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_coco3_rom; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ccc,rom"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ccc,rom"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -1044,10 +1042,10 @@ static void coco_snapshot_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pak"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pak"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_coco_pak; break;
+		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_coco_pak; break;
 
 		default:										snapshot_device_getinfo(devclass, state, info); break;
 	}
@@ -1060,10 +1058,10 @@ static void coco3_snapshot_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pak"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pak"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_coco3_pak; break;
+		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_coco3_pak; break;
 
 		default:										snapshot_device_getinfo(devclass, state, info); break;
 	}
@@ -1081,7 +1079,7 @@ static void dragon_printer_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}

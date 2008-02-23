@@ -35,14 +35,14 @@ static VIDEO_UPDATE(laserbas)
 		for(x=0;x<128;x++)
 		{
 			if (vram2[y*128+x]&0xf)
-				*BITMAP_ADDR16(bitmap, y, x*2) = machine->pens[vram2[y*128+x]&0xf]+16;
+				*BITMAP_ADDR16(bitmap, y, x*2) = (vram2[y*128+x]&0xf)+16;
 			else
-				*BITMAP_ADDR16(bitmap, y, x*2) = machine->pens[vram1[y*128+x]&0xf]+16;
+				*BITMAP_ADDR16(bitmap, y, x*2) = (vram1[y*128+x]&0xf)+16;
 
 			if (vram2[y*128+x]>>4)
-				*BITMAP_ADDR16(bitmap, y, x*2+1) = machine->pens[vram2[y*128+x]>>4]+16;
+				*BITMAP_ADDR16(bitmap, y, x*2+1) = (vram2[y*128+x]>>4)+16;
 			else
-				*BITMAP_ADDR16(bitmap, y, x*2+1) = machine->pens[vram1[y*128+x]>>4]+16;
+				*BITMAP_ADDR16(bitmap, y, x*2+1) = (vram1[y*128+x]>>4)+16;
 		}
 	return 0;
 }
@@ -133,12 +133,13 @@ static MACHINE_DRIVER_START( laserbas )
 	MDRV_CPU_IO_MAP(laserbas_io,0)
 	MDRV_CPU_VBLANK_INT(laserbas_interrupt,2)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_VIDEO_START(laserbas)
 	MDRV_VIDEO_UPDATE(laserbas)

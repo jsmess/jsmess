@@ -15,6 +15,11 @@
     (1) as per the document at
     http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
 
+    The various speed rated devices are identified by a letter,
+    for example M68A45, M68B45, etc.
+
+    The chip is originally designed by Hitachi, not by Motorola.
+
 **********************************************************************/
 
 #include "driver.h"
@@ -26,6 +31,7 @@
 
 struct _mc6845_t
 {
+	running_machine *machine;
 	const mc6845_interface *intf;
 
 	/* internal registers */
@@ -64,45 +70,6 @@ static void mc6845_state_save_postload(void *param);
 static void configure_screen(mc6845_t *mc6845, int postload);
 static void update_timer(mc6845_t *mc6845);
 static TIMER_CALLBACK( display_enable_changed_timer_cb );
-
-
-mc6845_t *mc6845_config(const mc6845_interface *intf)
-{
-	mc6845_t *mc6845;
-
-	/* allocate the object that holds the state */
-	mc6845 = auto_malloc(sizeof(*mc6845));
-	memset(mc6845, 0, sizeof(*mc6845));
-
-	mc6845->intf = intf;
-
-	/* create the timer if the user is interested in getting display enable
-       notifications */
-	if (intf && intf->display_enable_changed)
-		mc6845->display_enable_changed_timer = timer_alloc(display_enable_changed_timer_cb, mc6845);
-
-	/* register for state saving */
-	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
-
-	state_save_register_item("mc6845", 0, mc6845->address_latch);
-	state_save_register_item("mc6845", 0, mc6845->horiz_total);
-	state_save_register_item("mc6845", 0, mc6845->horiz_disp);
-	state_save_register_item("mc6845", 0, mc6845->horiz_sync_pos);
-	state_save_register_item("mc6845", 0, mc6845->sync_width);
-	state_save_register_item("mc6845", 0, mc6845->vert_total);
-	state_save_register_item("mc6845", 0, mc6845->vert_total_adj);
-	state_save_register_item("mc6845", 0, mc6845->vert_disp);
-	state_save_register_item("mc6845", 0, mc6845->vert_sync_pos);
-	state_save_register_item("mc6845", 0, mc6845->intl_skew);
-	state_save_register_item("mc6845", 0, mc6845->max_ras_addr);
-	state_save_register_item("mc6845", 0, mc6845->cursor_start_ras);
-	state_save_register_item("mc6845", 0, mc6845->cursor_end_ras);
-	state_save_register_item("mc6845", 0, mc6845->start_addr);
-	state_save_register_item("mc6845", 0, mc6845->cursor);
-	state_save_register_item("mc6845", 0, mc6845->light_pen);
-
-	return mc6845;
-}
 
 
 static void mc6845_state_save_postload(void *param)
@@ -157,7 +124,7 @@ UINT8 mc6845_register_r(mc6845_t *mc6845)
 void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 {
 	int call_configure_screen = FALSE;
-	if (LOG)  logerror("CRT #0 PC %04x: CRTC6845 reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->address_latch, data);
+	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->address_latch, data);
 
 	switch (mc6845->address_latch)
 	{
@@ -263,7 +230,7 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 				visarea.max_x = max_x;
 				visarea.max_y = max_y;
 
-				if (LOG) logerror("CRTC6845 config screen: HTOTAL: %x  VTOTAL: %x  MAX_X: %x  MAX_Y: %x  FPS: %f\n",
+				if (LOG) logerror("M6845 config screen: HTOTAL: %x  VTOTAL: %x  MAX_X: %x  MAX_Y: %x  FPS: %f\n",
 								  horiz_total, vert_total, max_x, max_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 				video_screen_configure(mc6845->intf->scrnum, horiz_total, vert_total, &visarea, refresh);
@@ -350,7 +317,7 @@ static TIMER_CALLBACK( display_enable_changed_timer_cb )
 	mc6845_t *mc6845 = ptr;
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->display_enable_changed(is_display_enabled(mc6845));
+	mc6845->intf->display_enable_changed(mc6845->machine, mc6845, is_display_enabled(mc6845));
 
 	update_timer(mc6845);
 }
@@ -416,7 +383,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 		void *param = 0;
 
 		if (mc6845->intf->begin_update)
-			param = mc6845->intf->begin_update(bitmap, cliprect);
+			param = mc6845->intf->begin_update(mc6845->machine, mc6845, bitmap, cliprect);
 
 		/* read the start address at the beginning of the frame */
 		if (cliprect->min_y == 0)
@@ -428,7 +395,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 			UINT8 ra = y % (mc6845->max_ras_addr + 1);
 
 			/* call the external system to draw it */
-			mc6845->intf->update_row(bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, param);
+			mc6845->intf->update_row(mc6845->machine, mc6845, bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, param);
 
 			/* update MA if the last raster address */
 			if (ra == mc6845->max_ras_addr)
@@ -437,6 +404,87 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 
 		/* call the tear down function if any */
 		if (mc6845->intf->end_update)
-			mc6845->intf->end_update(bitmap, cliprect, param);
+			mc6845->intf->end_update(mc6845->machine, mc6845, bitmap, cliprect, param);
+	}
+}
+
+
+/* device interface */
+static void *mc6845_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+{
+	mc6845_t *mc6845;
+	char unique_tag[30];
+
+	/* validate arguments */
+	assert(machine != NULL);
+	assert(tag != NULL);
+	assert(strlen(tag) < 20);
+
+	/* allocate the object that holds the state */
+	mc6845 = auto_malloc(sizeof(*mc6845));
+	memset(mc6845, 0, sizeof(*mc6845));
+
+	mc6845->machine = machine;
+	mc6845->intf = static_config;
+
+	/* create the timer if the user is interested in getting display enable
+       notifications */
+	if (mc6845->intf && mc6845->intf->display_enable_changed)
+		mc6845->display_enable_changed_timer = timer_alloc(display_enable_changed_timer_cb, mc6845);
+
+	/* register for state saving */
+	state_save_combine_module_and_tag(unique_tag, "mc6845", tag);
+
+	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
+
+	state_save_register_item(unique_tag, 0, mc6845->address_latch);
+	state_save_register_item(unique_tag, 0, mc6845->horiz_total);
+	state_save_register_item(unique_tag, 0, mc6845->horiz_disp);
+	state_save_register_item(unique_tag, 0, mc6845->horiz_sync_pos);
+	state_save_register_item(unique_tag, 0, mc6845->sync_width);
+	state_save_register_item(unique_tag, 0, mc6845->vert_total);
+	state_save_register_item(unique_tag, 0, mc6845->vert_total_adj);
+	state_save_register_item(unique_tag, 0, mc6845->vert_disp);
+	state_save_register_item(unique_tag, 0, mc6845->vert_sync_pos);
+	state_save_register_item(unique_tag, 0, mc6845->intl_skew);
+	state_save_register_item(unique_tag, 0, mc6845->max_ras_addr);
+	state_save_register_item(unique_tag, 0, mc6845->cursor_start_ras);
+	state_save_register_item(unique_tag, 0, mc6845->cursor_end_ras);
+	state_save_register_item(unique_tag, 0, mc6845->start_addr);
+	state_save_register_item(unique_tag, 0, mc6845->cursor);
+	state_save_register_item(unique_tag, 0, mc6845->light_pen);
+
+	return mc6845;
+}
+
+
+static void mc6845_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+void mc6845_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = mc6845_set_info;		break;
+		case DEVINFO_FCT_START:							info->start = mc6845_start;				break;
+		case DEVINFO_FCT_STOP:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							/* Nothing */							break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "MC6845";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";				break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }

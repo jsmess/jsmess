@@ -153,7 +153,7 @@ static VIDEO_UPDATE(dblewing)
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,machine->pens[0x0],cliprect); /* not Confirmed */
+	fillbitmap(bitmap,0,cliprect); /* not Confirmed */
 	fillbitmap(priority_bitmap,0,NULL);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
@@ -549,14 +549,14 @@ static MACHINE_DRIVER_START( dblewing )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(58)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_GFXDECODE(dblewing)
 

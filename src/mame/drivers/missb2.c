@@ -47,7 +47,7 @@ static VIDEO_UPDATE( missb2 )
 	/* the background character columns is stored in the area dd00-dd3f */
 
 	/* This clears & redraws the entire screen each pass */
-	fillbitmap(bitmap,machine->pens[255],&machine->screen[0].visarea);
+	fillbitmap(bitmap,255,&machine->screen[0].visarea);
 
 	if (!bublbobl_video_enable) return 0;
 
@@ -380,15 +380,17 @@ static MACHINE_DRIVER_START( missb2 )
 //  MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
 	MDRV_CPU_VBLANK_INT(missb2_interrupt, 1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(missb2)
 	MDRV_PALETTE_LENGTH(512)
 

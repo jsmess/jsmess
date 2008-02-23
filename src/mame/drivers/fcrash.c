@@ -172,7 +172,7 @@ static VIDEO_UPDATE( fcrash )
 	tilemap_set_enable(cps1_bg_tilemap[2],1);
 
 	/* Blank screen */
-	fillbitmap(bitmap,machine->pens[4095],cliprect);
+	fillbitmap(bitmap,4095,cliprect);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	l0 = (layercontrol >> 0x06) & 03;
@@ -330,14 +330,14 @@ static MACHINE_DRIVER_START( fcrash )
 //  /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+
 	MDRV_GFXDECODE(cps1)
 	MDRV_PALETTE_LENGTH(4096)
 

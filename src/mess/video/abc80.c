@@ -14,18 +14,10 @@ static int abc80_blink;
 static int abc80_bank;
 static int abc80_row;
 
-static const unsigned short abc80_colortable[] =
-{
-	0x00, 0x01,
-	0x01, 0x00,
-};
-
 PALETTE_INIT( abc80 )
 {
 	palette_set_color(machine, 0, RGB_BLACK);
 	palette_set_color(machine, 1, RGB_WHITE);
-
-	memcpy(colortable, abc80_colortable, sizeof(abc80_colortable));
 }
 
 static TILE_GET_INFO(abc80_get_tile_info)

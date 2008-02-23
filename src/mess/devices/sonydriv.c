@@ -497,7 +497,7 @@ static void device_unload_sonydriv_floppy(mess_image *image)
 	save_track_data(id);
 	memset(&sony_floppy[id], 0, sizeof(sony_floppy[id]));
 
-	parent_unload = (device_unload_handler) device_get_info_fct(&parent_devclass, DEVINFO_PTR_UNLOAD);
+	parent_unload = (device_unload_handler) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
 	parent_unload(image);
 }
 
@@ -508,15 +508,15 @@ void sonydriv_device_getinfo(const device_class *devclass, UINT32 state, union d
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:				info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_DEV_TAG:			strcpy(info->s = device_temp_str(), "sonydriv"); break;
+		case MESS_DEVINFO_STR_DEV_TAG:			strcpy(info->s = device_temp_str(), "sonydriv"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_UNLOAD:			info->unload = device_unload_sonydriv_floppy; break;
-		case DEVINFO_PTR_FLOPPY_OPTIONS:
-			if (device_get_info_int(devclass, DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES) & SONY_FLOPPY_SUPPORT2IMG)
+		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = device_unload_sonydriv_floppy; break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:
+			if (mess_device_get_info_int(devclass, MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES) & SONY_FLOPPY_SUPPORT2IMG)
 				info->p = (void *) floppyoptions_apple35_iigs;
 			else
 				info->p = (void *) floppyoptions_apple35_mac;

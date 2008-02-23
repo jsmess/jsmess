@@ -249,7 +249,8 @@ static void cbmb_common_driver_init (void)
 	cbm_ieee_open();
 }
 
-static void cbmb_display_enable_changed(int display_enabled) {
+static void cbmb_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+{
 }
 
 //static const struct mscrtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };

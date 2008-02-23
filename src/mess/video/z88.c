@@ -40,7 +40,6 @@ static const rgb_t z88_palette[Z88_NUM_COLOURS] =
 PALETTE_INIT( z88 )
 {
 	palette_set_colors(machine, 0, z88_palette, ARRAY_LENGTH(z88_palette));
-	memcpy(colortable, z88_colour_table, sizeof (z88_colour_table));
 }
 
 extern struct blink_hw blink;

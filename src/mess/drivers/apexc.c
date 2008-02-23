@@ -485,8 +485,6 @@ static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 static PALETTE_INIT( apexc )
 {
 	palette_set_colors(machine, 0, apexc_palette, APEXC_PALETTE_SIZE);
-
-	memcpy(colortable, & apexc_colortable, sizeof(apexc_colortable));
 }
 
 static VIDEO_START( apexc )
@@ -810,7 +808,7 @@ static MACHINE_DRIVER_START(apexc)
 	MDRV_MACHINE_START( apexc )
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -819,7 +817,6 @@ static MACHINE_DRIVER_START(apexc)
 
 	MDRV_GFXDECODE(apexc)
 	MDRV_PALETTE_LENGTH(APEXC_PALETTE_SIZE)
-	MDRV_COLORTABLE_LENGTH(APEXC_COLORTABLE_SIZE)
 
 	MDRV_PALETTE_INIT(apexc)
 	MDRV_VIDEO_START(apexc)
@@ -842,19 +839,19 @@ static void apexc_cylinder_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_CYLINDER; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CYLINDER; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_apexc_cylinder; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_apexc_cylinder; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_apexc_cylinder; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_apexc_cylinder; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "apc"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "apc"); break;
 	}
 }
 
@@ -864,16 +861,16 @@ static void apexc_punchtape_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_apexc_tape; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_apexc_tape; break;
-		case DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = apexc_get_open_mode; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_apexc_tape; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_apexc_tape; break;
+		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = apexc_get_open_mode; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
 	}
 }
 

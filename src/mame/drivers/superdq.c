@@ -120,7 +120,7 @@ static PALETTE_INIT( superdq )
 			2,	&resistances[1], bweights, 220, 0);
 
 	/* initialize the palette with these colors */
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -343,10 +343,12 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_MACHINE_START(superdq)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_SELF_RENDER)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)
+
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 

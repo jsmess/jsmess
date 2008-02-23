@@ -90,20 +90,20 @@ extern UINT8* mermaid_videoram2;
 extern UINT8* mermaid_bg_scrollram;
 extern UINT8* mermaid_fg_scrollram;
 
-extern WRITE8_HANDLER( mermaid_videoram2_w );
-extern WRITE8_HANDLER( mermaid_videoram_w );
-extern WRITE8_HANDLER( mermaid_colorram_w );
-extern WRITE8_HANDLER( mermaid_flip_screen_x_w );
-extern WRITE8_HANDLER( mermaid_flip_screen_y_w );
-extern WRITE8_HANDLER( mermaid_bg_scroll_w );
-extern WRITE8_HANDLER( mermaid_fg_scroll_w );
-extern WRITE8_HANDLER( rougien_gfxbankswitch1_w );
-extern WRITE8_HANDLER( rougien_gfxbankswitch2_w );
-extern READ8_HANDLER( mermaid_collision_r );
+WRITE8_HANDLER( mermaid_videoram2_w );
+WRITE8_HANDLER( mermaid_videoram_w );
+WRITE8_HANDLER( mermaid_colorram_w );
+WRITE8_HANDLER( mermaid_flip_screen_x_w );
+WRITE8_HANDLER( mermaid_flip_screen_y_w );
+WRITE8_HANDLER( mermaid_bg_scroll_w );
+WRITE8_HANDLER( mermaid_fg_scroll_w );
+WRITE8_HANDLER( rougien_gfxbankswitch1_w );
+WRITE8_HANDLER( rougien_gfxbankswitch2_w );
+READ8_HANDLER( mermaid_collision_r );
 
-extern PALETTE_INIT( mermaid );
-extern VIDEO_START( mermaid );
-extern VIDEO_UPDATE( mermaid );
+PALETTE_INIT( mermaid );
+VIDEO_START( mermaid );
+VIDEO_UPDATE( mermaid );
 
 /* Read/Write Handlers */
 
@@ -257,17 +257,17 @@ static MACHINE_DRIVER_START( mermaid )
 	MDRV_CPU_PROGRAM_MAP(mermaid_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	// video hardware
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(mermaid)
-	MDRV_PALETTE_LENGTH(4*16+1)
-	MDRV_COLORTABLE_LENGTH(4*16+2*2)
+	MDRV_PALETTE_LENGTH(4*16+2*2)
 
 	MDRV_PALETTE_INIT(mermaid)
 	MDRV_VIDEO_START(mermaid)
@@ -388,6 +388,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid, 0, mermaid, mermaid, 0, ROT0, "[Sanritsu] Rock-Ola", "Mermaid", GAME_NOT_WORKING )
+GAME( 1982, mermaid, 0,       mermaid, mermaid, 0, ROT0, "[Sanritsu] Rock-Ola", "Mermaid", GAME_NOT_WORKING )
 GAME( 1982, yachtmn, mermaid, mermaid, mermaid, 0, ROT0, "[Sanritsu] Esco", "Yachtsman", GAME_NOT_WORKING )
-GAME( 1982, rougien, 0, mermaid, mermaid, 0, ROT0, "Sanritsu",            "Rougien", 0 )
+GAME( 1982, rougien, 0,       mermaid, mermaid, 0, ROT0, "Sanritsu", "Rougien", 0 )

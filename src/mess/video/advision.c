@@ -43,8 +43,6 @@ PALETTE_INIT( advision )
 	{
 		/* 8 shades of RED */
 		palette_set_color_rgb(machine, i, i * 0x22, 0x00, 0x00);
-		colortable[i*2+0] = 0;
-		colortable[i*2+0] = i;
 	}
 
 	palette_set_color_rgb(machine, 8, 0x55, 0x55, 0x55);	/* DK GREY - for MAME text only */

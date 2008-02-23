@@ -341,7 +341,19 @@ static WRITE8_HANDLER( vid_o1_callback )
 
 static WRITE8_HANDLER( vid_o2_callback )
 {
+	int clock  = ptm6840_get_ext_clock(1, 1)/(ptm6840_get_count(1,1)?ptm6840_get_count(1,1):1)
+	*ptm6840_get_ext_clock(1, 0)/(ptm6840_get_count(1,0)?ptm6840_get_count(1,0):1)
+	*ptm6840_get_ext_clock(1, 2)/(ptm6840_get_count(1,2)?ptm6840_get_count(1,2):1);
+
 	ptm6840_set_c3(   1, data); // copy output value to c3
+
+	if (clock)
+	{
+		acia6850_set_rx_clock(0, clock);
+		acia6850_set_tx_clock(0, clock);
+		acia6850_set_rx_clock(1, clock);
+		acia6850_set_tx_clock(1, clock);
+	}
 }
 
 static WRITE8_HANDLER( vid_o3_callback )
@@ -442,7 +454,7 @@ static VIDEO_UPDATE( mpu4_vid )
 
 	int x,y,count = 0;
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	for (i=0; i < 0x1000; i++)
 	{
@@ -987,10 +999,10 @@ static VIDEO_START( mpu4_vid )
 	machine->gfx[mpu4_gfx_index+3] = allocgfx(&mpu4_vid_char_16x16_layout);
 
 	/* set the color information */
-	machine->gfx[mpu4_gfx_index+0]->total_colors = machine->drv->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+1]->total_colors = machine->drv->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+2]->total_colors = machine->drv->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+3]->total_colors = machine->drv->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+0]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+1]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+2]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+3]->total_colors = machine->config->total_colors / 16;
 
 	scn2675_IR_pointer = 0;
 }
@@ -1450,7 +1462,9 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 //Deal 'Em was designed as an enhanced gamecard, to fit into an existing MPU4 cabinet
-//It's an unoffical addon, and does all its work through the existing 6809 CPU
+//It's an unoffical addon, and does all its work through the existing 6809 CPU.
+//Although given unofficial status, Barcrest's patent on the MPU4 Video hardware (GB1596363) describes
+//the Deal 'Em board design, rather than the one they ultimately used.
 
 static const gfx_layout dealemcharlayout =
 {
@@ -1534,7 +1548,7 @@ static PALETTE_INIT( dealem )
 
 static VIDEO_START(dealem)
 {
-	mc6845 = mc6845_config(NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 }
 
 static VIDEO_UPDATE(dealem)
@@ -1607,11 +1621,12 @@ static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_INTERLEAVE(16)
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
 	MDRV_SCREEN_REFRESH_RATE(50)
+
 	MDRV_MACHINE_START(mpu4_vid)
 	MDRV_MACHINE_RESET(mpu4_vid)
 	MDRV_VIDEO_START (mpu4_vid)
@@ -1649,9 +1664,7 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 100)	// generate 50 hz signal
 
-	MDRV_SCREEN_REFRESH_RATE(56)//Measured accurately from the flip-flop
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
@@ -1659,19 +1672,21 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 	MDRV_SCREEN_REFRESH_RATE(50)
+
 	MDRV_VIDEO_START( dealem)
 	MDRV_GFXDECODE(dealem)
 	MDRV_VIDEO_UPDATE(dealem)
 
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32)
 	MDRV_PALETTE_INIT(dealem)
 
+	MDRV_DEVICE_ADD("crtc", MC6845)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT (crmaze)
@@ -1955,8 +1970,8 @@ GAME( 1987, dealem,	 0,		  dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em
 GAME( 199?, bctvidbs,0,       mpu4mod2, mpu4,     0,	 ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
 
 GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The Crystal Maze - Now Featuring Ocean Zone (AMLD Version SWP)",	GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
+GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD Version)",									GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The New Crystal Maze - Now Featuring Ocean Zone! (AMLD Version)",	GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Turnover",															GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1990, timemchn,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Time Machine v2.0",												GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?

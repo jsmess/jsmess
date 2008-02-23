@@ -84,7 +84,6 @@ PALETTE_INIT( pc_mda )
 	int i;
 	for(i = 0; i < (sizeof(cga_palette) / 3); i++)
 		palette_set_color_rgb(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
-    memcpy(colortable, mda_colortable, sizeof(mda_colortable));
 }
 
 static struct
@@ -110,24 +109,13 @@ static struct
  ***************************************************************************/
 static void pc_mda_blink_textcolors(int on)
 {
-	int i, offs, size;
+	int offs, size;
 
 	if (mda.pc_blink == on) return;
 
     mda.pc_blink = on;
 	offs = (mscrtc6845_get_start(mscrtc6845)*2)% videoram_size;
 	size = mscrtc6845_get_char_lines(mscrtc6845)*mscrtc6845_get_char_columns(mscrtc6845);
-
-	if (dirtybuffer)
-	{
-		for (i = 0; i < size; i++)
-		{
-			if (videoram[offs+1] & 0x80)
-				dirtybuffer[offs+1] = 1;
-			if ((offs += 2) == videoram_size)
-				offs = 0;
-		}
-	}
 }
 
 extern void pc_mda_timer(void)
@@ -139,8 +127,6 @@ extern void pc_mda_timer(void)
 
 void pc_mda_cursor(struct mscrtc6845_cursor *cursor)
 {
-	if (dirtybuffer)
-		dirtybuffer[cursor->pos*2]=1;
 }
 
 static const struct mscrtc6845_config config= { 14318180 /*?*/, pc_mda_cursor };
@@ -183,7 +169,7 @@ VIDEO_START( pc_mda )
 {
 	int buswidth;
 
-	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -307,34 +293,29 @@ static void mda_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 	mscrtc6845_time(crtc);
 	mscrtc6845_get_cursor(crtc, &cursor);
 
-	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height) {
-
+	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
+	{
 		for (sx=0, r.min_x=0, r.max_x = char_width-1; sx<columns;
-			 sx++, offs=(offs+2)&0x3fff, r.min_x += char_width, r.max_x += char_width) {
-			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1]) {
+			 sx++, offs=(offs+2)&0x3fff, r.min_x += char_width, r.max_x += char_width)
+		{
+			attr = videoram[offs+1];
+			drawgfx(bitmap, mda.gfx_char[CGA_FONT], videoram[offs], attr,
+					0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
+			/* Underlining */
+			if ((attr & 7) == 1)
+				plot_box(bitmap, r.min_x, r.min_y + 12, char_width,
+					1, Machine->pens[2 + (attr & 8)]);
 
-				attr = videoram[offs+1];
-				drawgfx(bitmap, mda.gfx_char[CGA_FONT], videoram[offs], attr,
-						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-				/* Underlining */
-				if ((attr & 7) == 1)
-					plot_box(bitmap, r.min_x, r.min_y + 12, char_width,
-						1, Machine->pens[2 + (attr & 8)]);
+			if (cursor.on&&(mda.pc_framecnt&32)&&(offs==cursor.pos*2)) {
+				int k=height-cursor.top;
+				rectangle rect2=r;
+				rect2.min_y+=cursor.top;
+				if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
 
-				if (cursor.on&&(mda.pc_framecnt&32)&&(offs==cursor.pos*2)) {
-					int k=height-cursor.top;
-					rectangle rect2=r;
-					rect2.min_y+=cursor.top;
-					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
-
-					if (k>0)
-						plot_box(bitmap, r.min_x,
-								 r.min_y+cursor.top,
-								 char_width, k, Machine->pens[2/*?*/]);
-				}
-
-				if (dirtybuffer)
-					dirtybuffer[offs] = dirtybuffer[offs+1] = 0;
+				if (k>0)
+					plot_box(bitmap, r.min_x,
+							 r.min_y+cursor.top,
+							 char_width, k, Machine->pens[2/*?*/]);
 			}
 		}
 	}
@@ -362,41 +343,35 @@ static void mda_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 	mscrtc6845_time(crtc);
 	mscrtc6845_get_cursor(crtc, &cursor);
 
-	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height) {
-
+	for (sy=0, r.min_y=0, r.max_y=height-1; sy<lines; sy++, r.min_y+=height,r.max_y+=height)
+	{
 		for (sx=0, r.min_x=0, r.max_x = char_width-1; sx<columns;
-			 sx++, offs=(offs+2)&0x3fff, r.min_x += char_width, r.max_x += char_width) {
+			 sx++, offs=(offs+2)&0x3fff, r.min_x += char_width, r.max_x += char_width)
+		{
+			int attr = videoram[offs+1];
+			if (attr & 0x80)	/* blinking ? */
+			{
+				if (mda.pc_blink) attr = 0;
+			}
 
-			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1]) {
-
-				int attr = videoram[offs+1];
-				if (attr & 0x80)	/* blinking ? */
-				{
-					if (mda.pc_blink) attr = 0;
-				}
-
-				drawgfx(bitmap, mda.gfx_char[CGA_FONT], videoram[offs], attr,
-						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-				/* Underlining */
-				if ((attr & 7) == 1)
-					plot_box(bitmap, r.min_x, r.min_y + 12, char_width,
-						1, Machine->pens[2 + (attr & 8)]);
+			drawgfx(bitmap, mda.gfx_char[CGA_FONT], videoram[offs], attr,
+					0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
+			/* Underlining */
+			if ((attr & 7) == 1)
+				plot_box(bitmap, r.min_x, r.min_y + 12, char_width,
+					1, Machine->pens[2 + (attr & 8)]);
 
 //				if ((cursor.on)&&(offs==cursor.pos*2)) {
-				if (cursor.on&&(mda.pc_framecnt&32)&&(offs==cursor.pos*2)) {
-					int k=height-cursor.top;
-					rectangle rect2=r;
-					rect2.min_y+=cursor.top;
-					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
+			if (cursor.on&&(mda.pc_framecnt&32)&&(offs==cursor.pos*2)) {
+				int k=height-cursor.top;
+				rectangle rect2=r;
+				rect2.min_y+=cursor.top;
+				if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
 
-					if (k>0)
-						plot_box(bitmap, r.min_x,
-								 r.min_y+cursor.top,
-								 char_width, k, Machine->pens[2/*?*/]);
-				}
-
-				if (dirtybuffer)
-					dirtybuffer[offs] = dirtybuffer[offs+1] = 0;
+				if (k>0)
+					plot_box(bitmap, r.min_x,
+							 r.min_y+cursor.top,
+							 char_width, k, Machine->pens[2/*?*/]);
 			}
 		}
 	}

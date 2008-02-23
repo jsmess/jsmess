@@ -91,15 +91,9 @@ static const unsigned char p2000m_palette[2 * 3] =
 	0xff, 0xff, 0xff
 };
 
-static const unsigned short p2000m_colortable[2 * 2] =
-{
-	1,0, 0,1
-};
-
 static PALETTE_INIT( p2000m )
 {
 	palette_set_colors_rgb(machine, 0, p2000m_palette, sizeof(p2000m_palette) / 3);
-	memcpy(colortable, p2000m_colortable, sizeof (p2000m_colortable));
 }
 
 /* Keyboard input */
@@ -232,7 +226,7 @@ static MACHINE_DRIVER_START( p2000m )
 	MDRV_INTERLEAVE(1)
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -240,7 +234,6 @@ static MACHINE_DRIVER_START( p2000m )
 	MDRV_SCREEN_VISIBLE_AREA(0, 80 * 6 - 1, 0, 24 * 10 - 1)
 	MDRV_GFXDECODE( p2000m )
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_COLORTABLE_LENGTH(4)
 	MDRV_PALETTE_INIT(p2000m)
 
 	MDRV_VIDEO_START(p2000m)

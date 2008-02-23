@@ -25,8 +25,8 @@ TODO:
 #include "sound/sn76477.h"
 #include "sound/tms3615.h"
 
-extern WRITE8_HANDLER( laserbat_csound1_w );
-extern WRITE8_HANDLER( laserbat_csound2_w );
+WRITE8_HANDLER( laserbat_csound1_w );
+WRITE8_HANDLER( laserbat_csound2_w );
 
 static tilemap *bg_tilemap;
 static int laserbat_video_page = 0;
@@ -35,8 +35,6 @@ static s2636_t *s2636_0, *s2636_1, *s2636_2;
 static UINT8 *s2636_0_ram;
 static UINT8 *s2636_1_ram;
 static UINT8 *s2636_2_ram;
-
-static mame_bitmap *collision_bitmap;
 
 /* information for the single 32x32 sprite displayed */
 static struct sprite_info
@@ -509,8 +507,6 @@ static VIDEO_START( laserbat )
 	videoram = (UINT8 *)auto_malloc(0x400);
 	colorram = (UINT8 *)auto_malloc(0x400);
 
-	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-
 	/* configure the S2636 chips */
 	s2636_0 = s2636_config(s2636_0_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
 	s2636_1 = s2636_config(s2636_1_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
@@ -543,13 +539,13 @@ static VIDEO_UPDATE( laserbat )
 			int pixel2 = *BITMAP_ADDR8(s2636_2_bitmap, y, x);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel0))
-				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel0)];
+				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel0);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel1))
-				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel1)];
+				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel1);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel2))
-				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel2)];
+				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel2);
 		}
 	}
 
@@ -699,11 +695,10 @@ static MACHINE_DRIVER_START( laserbat )
 	MDRV_CPU_IO_MAP(laserbat_io_map,0)
 	MDRV_CPU_VBLANK_INT(laserbat_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
@@ -738,21 +733,19 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_CPU_PROGRAM_MAP(catnmous_sound_map,0)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle, (double)3580000/4096)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_START(catnmous)
 	MDRV_MACHINE_RESET(catnmous)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 
 	MDRV_GFXDECODE(laserbat)
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_COLORTABLE_LENGTH(4096)
 
 	MDRV_VIDEO_START(laserbat)
 	MDRV_VIDEO_UPDATE(laserbat)

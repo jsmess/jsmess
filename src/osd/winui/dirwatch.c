@@ -21,6 +21,7 @@
 
 // MAME/MAMEUI headers
 #include "dirwatch.h"
+#include "driver.h"
 #include "mui_util.h"
 #include "strconv.h"
 

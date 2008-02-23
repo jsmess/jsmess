@@ -578,7 +578,8 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 6) 'progear'
 
-  - BUTTON3 doesn't physically exist on the machine and has no effect ingame.
+  - BUTTON3 acts like a rapid fire (keep button pressed).
+    It has to be enabled in the game settings as it is OFF by default.
 
 ***************************************************************************/
 
@@ -1244,17 +1245,20 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_CPU_PROGRAM_MAP(qsound_readmem,qsound_writemem)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 
-	MDRV_SCREEN_REFRESH_RATE(59.633333)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 //  MDRV_INTERLEAVE(262)  /* 262 scanlines, for raster effects */
 
 	MDRV_NVRAM_HANDLER(cps2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(59.633333)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+
 	MDRV_GFXDECODE(cps2)
 	MDRV_PALETTE_LENGTH(4096)
 

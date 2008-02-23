@@ -32,15 +32,9 @@ const unsigned char galaxy_palette[2*3] =
 	0x00, 0x00, 0x00		/* Black */
 };
 
-const unsigned short galaxy_colortable[1][2] =
-{
-	{0, 1}
-};
-
 PALETTE_INIT( galaxy )
 {
 	palette_set_colors_rgb(machine, 0, galaxy_palette, sizeof(galaxy_palette) / 3);
-	memcpy(colortable, galaxy_colortable, sizeof (galaxy_colortable));
 }
 
 VIDEO_START( galaxy )

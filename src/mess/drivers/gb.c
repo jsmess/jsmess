@@ -558,6 +558,7 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_CPU_CONFIG(dmg_cpu_reset)
 	MDRV_CPU_VBLANK_INT(gb_scanline_interrupt, 1)	/* 1 dummy int each frame */
 
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
@@ -568,7 +569,6 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_DEFAULT_LAYOUT(layout_gb)
 //  MDRV_SCREEN_SIZE(20*8, 18*8)
@@ -576,7 +576,6 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 	MDRV_GFXDECODE(gb)
 	MDRV_PALETTE_LENGTH(4)
-	MDRV_COLORTABLE_LENGTH(4)
 	MDRV_PALETTE_INIT(gb)
 
 	/* sound hardware */
@@ -598,10 +597,11 @@ static MACHINE_DRIVER_START( supergb )
 	MDRV_MACHINE_RESET( sgb )
 
 	MDRV_DEFAULT_LAYOUT(layout_horizont)	/* runs on a TV, not an LCD */
+
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(32*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MDRV_PALETTE_LENGTH(32768)
-	MDRV_COLORTABLE_LENGTH(8*16)	/* 8 palettes of 16 colours */
 	MDRV_PALETTE_INIT(sgb)
 MACHINE_DRIVER_END
 
@@ -622,7 +622,6 @@ static MACHINE_DRIVER_START( gbcolor )
 	MDRV_MACHINE_RESET(gbc)
 
 	MDRV_PALETTE_LENGTH(32768)
-	MDRV_COLORTABLE_LENGTH(16*4)	/* 16 palettes of 4 colours */
 	MDRV_PALETTE_INIT(gbc)
 MACHINE_DRIVER_END
 
@@ -632,15 +631,15 @@ static void gameboy_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_gb_cart; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_gb_cart; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_gb_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_gb_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "gb,gmb,cgb,gbc,sgb"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "gb,gmb,cgb,gbc,sgb"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -651,7 +650,7 @@ static void gameboy_cartslot_getinfo_gb(const device_class *devclass, UINT32 sta
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
 
 		default:										gameboy_cartslot_getinfo(devclass, state, info); break;
 	}
@@ -677,6 +676,7 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_CPU_VBLANK_INT(gb_scanline_interrupt, 1)	/* 1 int each scanline ! */
 	MDRV_CPU_CONFIG(megaduck_cpu_reset)
 
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
@@ -686,14 +686,12 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(20*8, 18*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 	MDRV_DEFAULT_LAYOUT(layout_gb)
 	MDRV_GFXDECODE(gb)
 	MDRV_PALETTE_LENGTH(4)
-	MDRV_COLORTABLE_LENGTH(4)
 	MDRV_PALETTE_INIT(megaduck)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -709,14 +707,14 @@ static void megaduck_cartslot_getinfo(const device_class *devclass, UINT32 state
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_megaduck_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_megaduck_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}

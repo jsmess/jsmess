@@ -92,7 +92,7 @@ static void mess_enumerate_devices(core_options *opts, const game_driver *gamedr
 		devclass.get_info = handlers[i];
 
 		/* how many of this device exist? */
-		count = (int) device_get_info_int(&devclass, DEVINFO_INT_COUNT);
+		count = (int) mess_device_get_info_int(&devclass, MESS_DEVINFO_INT_COUNT);
 
 		/* loop on each device instance */
 		for (j = 0; j < count; j++)
@@ -215,14 +215,14 @@ static void extract_device_options_for_device(core_options *opts, const game_dri
 	assert_always(options_get_bool(opts, OPTION_ADDED_DEVICE_OPTIONS), "extract_device_options_for_device() called without device options");
 
 	/* identify the correct image */
-	dev_tag = device_get_info_string(devclass, DEVINFO_STR_DEV_TAG);
+	dev_tag = mess_device_get_info_string(devclass, MESS_DEVINFO_STR_DEV_TAG);
 	if (dev_tag != NULL)
 	{
 		image = image_from_devtag_and_index(dev_tag, device_index);
 	}
 	else
 	{
-		dev_type = (iodevice_t) (int) device_get_info_int(devclass, DEVINFO_INT_TYPE);
+		dev_type = (iodevice_t) (int) mess_device_get_info_int(devclass, MESS_DEVINFO_INT_TYPE);
 		image = image_from_devtype_and_index(dev_type, device_index);
 	}
 

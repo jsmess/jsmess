@@ -46,7 +46,6 @@ static const rgb_t electron_palette[8]=
 static PALETTE_INIT( electron )
 {
 	palette_set_colors(machine, 0, electron_palette, ARRAY_LENGTH(electron_palette));
-	memcpy(colortable,electron_colour_table,sizeof(electron_colour_table));
 }
 
 static ADDRESS_MAP_START(electron_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -189,16 +188,15 @@ static MACHINE_DRIVER_START( electron )
 	MDRV_CPU_ADD_TAG( "main", M6502, 2000000 )
 	MDRV_CPU_PROGRAM_MAP( electron_mem, 0 )
 	MDRV_CPU_VBLANK_INT( electron_scanline_interrupt, 312 ) /* scanline interrupt */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 50.08 )
 
 	MDRV_MACHINE_START( electron )
 
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 640, 312 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-1 )
 	MDRV_PALETTE_LENGTH( 16 )
-	MDRV_COLORTABLE_LENGTH( 16 )
 	MDRV_PALETTE_INIT(electron)
 
 	MDRV_VIDEO_START( generic_bitmapped )
@@ -211,10 +209,10 @@ MACHINE_DRIVER_END
 
 static void electron_cassette_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-	case DEVINFO_PTR_CASSETTE_FORMATS:
+	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
 		info->p = (void *)uef_cassette_formats;
 		break;
 	default:

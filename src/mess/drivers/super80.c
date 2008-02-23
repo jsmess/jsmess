@@ -289,16 +289,9 @@ static const UINT8 bw_palette[] =
 	0xff,0xff,0xff	/* white */
 };
 
-static const unsigned short bw_colortable[] =
-{
-	0, 1,
-	1, 0
-};
-
 static PALETTE_INIT( super80_bw )
 {
 	palette_set_colors_rgb(machine, 0, bw_palette, sizeof(bw_palette) / 3);
-	memcpy(colortable, & bw_colortable, sizeof(bw_colortable));
 }
 
 static const struct z80_irq_daisy_chain super80_daisy_chain[] =
@@ -321,14 +314,13 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_MACHINE_RESET( super80 )
 
 	MDRV_GFXDECODE(super80)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 //	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 16*10)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0, 16*10-1)
 	MDRV_PALETTE_LENGTH(sizeof(bw_palette)/sizeof(bw_palette[0])/3)
-	MDRV_COLORTABLE_LENGTH(sizeof(bw_colortable)/sizeof(bw_colortable[0]))
 	MDRV_PALETTE_INIT(super80_bw)
 
 	MDRV_VIDEO_START(super80)

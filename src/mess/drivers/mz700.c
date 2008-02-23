@@ -256,7 +256,7 @@ static MACHINE_DRIVER_START(mz700)
 	MDRV_MACHINE_RESET( mz700 )
 
 	/* video hardware - include overscan */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -265,7 +265,6 @@ static MACHINE_DRIVER_START(mz700)
 
 	MDRV_GFXDECODE(mz700)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(2*256)
 
 	MDRV_PALETTE_INIT(mz700)
 	MDRV_VIDEO_UPDATE(mz700)
@@ -286,7 +285,6 @@ static MACHINE_DRIVER_START(mz800)
 	MDRV_MACHINE_RESET( mz700 )
 
 	/* video hardware - include overscan */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -295,7 +293,6 @@ static MACHINE_DRIVER_START(mz800)
 
 	MDRV_GFXDECODE(mz700)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(2*256)
 
 	MDRV_PALETTE_INIT(mz700)
 	MDRV_VIDEO_UPDATE(mz700)
@@ -338,10 +335,10 @@ static void mz700_cassette_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) mz700_cassette_formats; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) mz700_cassette_formats; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}

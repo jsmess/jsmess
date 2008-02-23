@@ -1946,9 +1946,8 @@ static MACHINE_DRIVER_START( a2600 )
 	MDRV_MACHINE_RESET(a2600)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
 	MDRV_PALETTE_LENGTH( TIA_PALETTE_LENGTH )
 	MDRV_PALETTE_INIT(tia_NTSC)
@@ -1973,9 +1972,8 @@ static MACHINE_DRIVER_START( a2600p )
 	MDRV_MACHINE_RESET(a2600)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
 	MDRV_PALETTE_LENGTH( TIA_PALETTE_LENGTH )
 	MDRV_PALETTE_INIT(tia_PAL)
@@ -2007,15 +2005,15 @@ static void a2600_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_a2600_cart; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_a2600_cart; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_a2600_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_a2600_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,a26"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,a26"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -2023,19 +2021,19 @@ static void a2600_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 
 static void a2600_cassette_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-	case DEVINFO_INT_WRITEABLE:
+	case MESS_DEVINFO_INT_WRITEABLE:
 		info->i = 0;
 		break;
-	case DEVINFO_INT_CREATABLE:
+	case MESS_DEVINFO_INT_CREATABLE:
 		info->i = 0;
 		break;
-	case DEVINFO_INT_CASSETTE_DEFAULT_STATE:
+	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:
 		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED;
 		break;
-	case DEVINFO_PTR_CASSETTE_FORMATS:
+	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
 		info->p = (void *)a26_cassette_formats;
 		break;
 	default:

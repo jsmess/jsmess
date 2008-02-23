@@ -2899,6 +2899,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
 	MDRV_CPU_IO_MAP(amstrad_io, 0)
 
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(AMSTRAD_FPS)
 	MDRV_INTERLEAVE(1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(19968))
@@ -2906,13 +2907,11 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_MACHINE_RESET( amstrad )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(800, 312)
 	/* Amstrad Monitor Visible AREA : 768x272 */
 	MDRV_SCREEN_VISIBLE_AREA(0, ((AMSTRAD_SCREEN_WIDTH-32) - 1), 0, ((AMSTRAD_SCREEN_HEIGHT-40) - 1))
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32)
 	MDRV_PALETTE_INIT(amstrad_cpc)
 
 	MDRV_VIDEO_START(amstrad)
@@ -2946,7 +2945,6 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_MACHINE_RESET(plus)
 	MDRV_SCREEN_SIZE(800, 312)
 	MDRV_PALETTE_LENGTH(4096+48)  // extended 12-bit palette, and standard 32 colour palette
-	MDRV_COLORTABLE_LENGTH(4096+48)
 	MDRV_PALETTE_INIT(amstrad_plus)
 MACHINE_DRIVER_END
 
@@ -2960,7 +2958,6 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_MACHINE_RESET(gx4000)
 	MDRV_SCREEN_SIZE(800, 312)
 	MDRV_PALETTE_LENGTH(4096+48)  // extended 12-bit palette, and standard 32 colour palette
-	MDRV_COLORTABLE_LENGTH(4096+48)
 	MDRV_PALETTE_INIT(amstrad_plus)
 MACHINE_DRIVER_END
 
@@ -2971,7 +2968,6 @@ static MACHINE_DRIVER_START( aleste )
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_PALETTE_LENGTH(32+64)
-	MDRV_COLORTABLE_LENGTH(32+64)  // standard CPC palette, and 6-bit MSX palette
 	MDRV_PALETTE_INIT(aleste)
 	MDRV_NVRAM_HANDLER(mc146818)
 MACHINE_DRIVER_END
@@ -3090,7 +3086,7 @@ static void cpc6128_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		default:										legacydsk_device_getinfo(devclass, state, info); break;
 	}
@@ -3103,9 +3099,9 @@ static void cpc6128_cassette_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
-		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *)cdt_cassette_formats; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *)cdt_cassette_formats; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
@@ -3118,7 +3114,7 @@ static void cpc6128_printer_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}
@@ -3131,14 +3127,14 @@ static void cpcplus_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_amstrad_plus_cartridge; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_amstrad_plus_cartridge; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cpr,bin"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cpr,bin"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -3151,10 +3147,10 @@ static void cpcplus_snapshot_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sna"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sna"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_amstrad; break;
+		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_amstrad; break;
 
 		default:										snapshot_device_getinfo(devclass, state, info); break;
 	}
@@ -3167,9 +3163,9 @@ static void aleste_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_msx_floppy; break;
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_msx_floppy; break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}

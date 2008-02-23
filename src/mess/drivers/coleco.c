@@ -244,6 +244,7 @@ static MACHINE_DRIVER_START( coleco )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -278,7 +279,7 @@ static void coleco_cartslot_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_VERIFY:						info->imgverify = coleco_cart_verify; break;
+		case MESS_DEVINFO_PTR_VERIFY:						info->imgverify = coleco_cart_verify; break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}

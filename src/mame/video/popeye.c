@@ -58,13 +58,12 @@ static tilemap *fg_tilemap;
   The bootleg is the same, but the outputs are not inverted.
 
 ***************************************************************************/
-static void convert_color_prom(running_machine *machine,UINT16 *colortable,const UINT8 *color_prom)
+static void convert_color_prom(running_machine *machine,const UINT8 *color_prom)
 {
-	int i,pal_index;
+	int i;
 
 
 	/* palette entries 0-15 are directly used by the background and changed at runtime */
-	pal_index = 16;
 	color_prom += 32;
 
 	/* characters */
@@ -72,7 +71,6 @@ static void convert_color_prom(running_machine *machine,UINT16 *colortable,const
 	{
 		int prom_offs = i | ((i & 8) << 1);	/* address bits 3 and 4 are tied together */
 		int bit0,bit1,bit2,r,g,b;
-
 
 		/* red component */
 		bit0 = ((color_prom[prom_offs] ^ invertmask) >> 0) & 0x01;
@@ -90,7 +88,7 @@ static void convert_color_prom(running_machine *machine,UINT16 *colortable,const
 		bit2 = ((color_prom[prom_offs] ^ invertmask) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,pal_index++,MAKE_RGB(r,g,b));
+		palette_set_color(machine,16 + (2 * i) + 1,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 32;
@@ -117,23 +115,9 @@ static void convert_color_prom(running_machine *machine,UINT16 *colortable,const
 		bit2 = ((color_prom[256] ^ invertmask) >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,pal_index++,MAKE_RGB(r,g,b));
+		palette_set_color(machine,48+i,MAKE_RGB(r,g,b));
 
 		color_prom++;
-	}
-
-
-	/* palette entries 0-15 are directly used by the background */
-
-	for (i = 0;i < 16;i++)	/* characters */
-	{
-		*(colortable++) = 0;	/* since chars are transparent, the PROM only */
-								/* stores the non transparent color */
-		*(colortable++) = i + 16;
-	}
-	for (i = 0;i < 256;i++)	/* sprites */
-	{
-		*(colortable++) = i + 16+16;
 	}
 }
 
@@ -141,14 +125,14 @@ PALETTE_INIT( popeye )
 {
 	invertmask = 0xff;
 
-	convert_color_prom(machine,colortable,color_prom);
+	convert_color_prom(machine,color_prom);
 }
 
 PALETTE_INIT( popeyebl )
 {
 	invertmask = 0x00;
 
-	convert_color_prom(machine,colortable,color_prom);
+	convert_color_prom(machine,color_prom);
 }
 
 static void set_background_palette(running_machine *machine,int bank)
@@ -215,7 +199,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		if (flip_screen)
 			sy = 512-8 - sy;
 
-		colour = Machine->pens[data & 0x0f];
+		colour = data & 0x0f;
 		for (y = 0; y < 8; y++)
 		{
 			for (x = 0; x < 8; x++)
@@ -232,7 +216,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		if (flip_screen)
 			sy = 512-4 - sy;
 
-		colour = Machine->pens[data & 0x0f];
+		colour = data & 0x0f;
 		for (y = 0; y < 4; y++)
 		{
 			for (x = 0; x < 8; x++)

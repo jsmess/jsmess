@@ -176,12 +176,12 @@ static UINT16 tmaster_color;
 static UINT16 tmaster_addr;
 static int (*compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
 
-int tmaster_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
+static int tmaster_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
 {
 	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
 }
 
-int galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
+static int galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
 {
 	return reg_low | (reg_mid << 16);
 }
@@ -683,16 +683,17 @@ static MACHINE_DRIVER_START( tm3k )
 	MDRV_CPU_PROGRAM_MAP(tmaster_map,0)
 	MDRV_CPU_VBLANK_INT(tm3k_interrupt,2+5+20) // ??
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(tmaster)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
+
 	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(tmaster)
@@ -756,14 +757,13 @@ static MACHINE_DRIVER_START( galgames )
 	MDRV_MACHINE_RESET( galgames )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(400, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
+
 	MDRV_PALETTE_LENGTH(0x800)	// only 0x100 used
 
 	MDRV_VIDEO_START(galgames)

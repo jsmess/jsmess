@@ -281,7 +281,7 @@ static int internal_floppy_device_load(mess_image *image, int create_format, opt
 
 	/* figure out the floppy options */
 	dev = image_device(image);
-	floppy_options = device_get_info_ptr(&dev->devclass, DEVINFO_PTR_FLOPPY_OPTIONS);
+	floppy_options = mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
 
 	if (image_has_been_created(image))
 	{
@@ -309,7 +309,7 @@ static int internal_floppy_device_load(mess_image *image, int create_format, opt
 	   apply double steps. Setting the track count of the drive to the 
 	   medium track count will then lead to unreachable tracks.
 	*/
-	keep_geometry = (int)device_get_info_int(&image_device(image)->devclass, DEVINFO_INT_KEEP_DRIVE_GEOMETRY);
+	keep_geometry = (int)mess_device_get_info_int(&image_device(image)->devclass, MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY);
 
 	if (!keep_geometry 
             && floppy_callbacks(flopimg->floppy)->get_heads_per_disk
@@ -398,30 +398,30 @@ void floppy_device_getinfo(const device_class *devclass, UINT32 state, union dev
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:				info->i = IO_FLOPPY; break;
-		case DEVINFO_INT_READABLE:			info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:			info->i = 1; break;
-		case DEVINFO_INT_CREATABLE:
-			floppy_options = device_get_info_ptr(devclass, DEVINFO_PTR_FLOPPY_OPTIONS);
+		case MESS_DEVINFO_INT_TYPE:				info->i = IO_FLOPPY; break;
+		case MESS_DEVINFO_INT_READABLE:			info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:			info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:
+			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
 			info->i = floppy_options->param_guidelines ? 1 : 0;
 			break;
 
-		case DEVINFO_INT_CREATE_OPTCOUNT:
+		case MESS_DEVINFO_INT_CREATE_OPTCOUNT:
 			/* count total floppy options */
-			floppy_options = device_get_info_ptr(devclass, DEVINFO_PTR_FLOPPY_OPTIONS);
+			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
 			for (count = 0; floppy_options[count].construct; count++)
 				;
 			info->i = count;
 			break;
 
-		case DEVINFO_INT_KEEP_DRIVE_GEOMETRY:
+		case MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY:
 			info->i = 0;
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 			/* retrieve the floppy options */
-			floppy_options = device_get_info_ptr(devclass, DEVINFO_PTR_FLOPPY_OPTIONS);
+			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
 
 			/* set up a temporary string */
 			s = device_temp_str();
@@ -434,29 +434,29 @@ void floppy_device_getinfo(const device_class *devclass, UINT32 state, union dev
 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:				info->init = device_init_floppy; break;
-		case DEVINFO_PTR_LOAD:				info->load = device_load_floppy; break;
-		case DEVINFO_PTR_CREATE:			info->create = device_create_floppy; break;
-		case DEVINFO_PTR_UNLOAD:			info->unload = device_unload_floppy; break;
-		case DEVINFO_PTR_CREATE_OPTGUIDE:	info->p = (void *) floppy_option_guide; break;
+		case MESS_DEVINFO_PTR_INIT:				info->init = device_init_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_floppy; break;
+		case MESS_DEVINFO_PTR_CREATE:			info->create = device_create_floppy; break;
+		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = device_unload_floppy; break;
+		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:	info->p = (void *) floppy_option_guide; break;
 
 		default:
-			floppy_options = device_get_info_ptr(devclass, DEVINFO_PTR_FLOPPY_OPTIONS);
-			if ((state >= DEVINFO_STR_CREATE_OPTNAME) && (state < DEVINFO_STR_CREATE_OPTNAME + DEVINFO_CREATE_OPTMAX))
+			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
+			if ((state >= MESS_DEVINFO_STR_CREATE_OPTNAME) && (state < MESS_DEVINFO_STR_CREATE_OPTNAME + MESS_DEVINFO_CREATE_OPTMAX))
 			{
-				info->s = (void *) floppy_options[state - DEVINFO_STR_CREATE_OPTNAME].name;
+				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTNAME].name;
 			}
-			else if ((state >= DEVINFO_STR_CREATE_OPTDESC) && (state < DEVINFO_STR_CREATE_OPTDESC + DEVINFO_CREATE_OPTMAX))
+			else if ((state >= MESS_DEVINFO_STR_CREATE_OPTDESC) && (state < MESS_DEVINFO_STR_CREATE_OPTDESC + MESS_DEVINFO_CREATE_OPTMAX))
 			{
-				info->s = (void *) floppy_options[state - DEVINFO_STR_CREATE_OPTDESC].description;
+				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTDESC].description;
 			}
-			else if ((state >= DEVINFO_STR_CREATE_OPTEXTS) && (state < DEVINFO_STR_CREATE_OPTEXTS + DEVINFO_CREATE_OPTMAX))
+			else if ((state >= MESS_DEVINFO_STR_CREATE_OPTEXTS) && (state < MESS_DEVINFO_STR_CREATE_OPTEXTS + MESS_DEVINFO_CREATE_OPTMAX))
 			{
-				info->s = (void *) floppy_options[state - DEVINFO_STR_CREATE_OPTEXTS].extensions;
+				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTEXTS].extensions;
 			}
-			else if ((state >= DEVINFO_PTR_CREATE_OPTSPEC) && (state < DEVINFO_PTR_CREATE_OPTSPEC + DEVINFO_CREATE_OPTMAX))
+			else if ((state >= MESS_DEVINFO_PTR_CREATE_OPTSPEC) && (state < MESS_DEVINFO_PTR_CREATE_OPTSPEC + MESS_DEVINFO_CREATE_OPTMAX))
 			{
-				info->p = (void *) floppy_options[state - DEVINFO_PTR_CREATE_OPTSPEC].param_guidelines;
+				info->p = (void *) floppy_options[state - MESS_DEVINFO_PTR_CREATE_OPTSPEC].param_guidelines;
 			}
 			break;
 	}

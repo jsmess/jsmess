@@ -59,7 +59,6 @@ INLINE void pcw16_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 PALETTE_INIT( pcw16 )
 {
 	palette_set_colors(machine, 0, pcw16_palette, ARRAY_LENGTH(pcw16_palette));
-	memcpy(colortable, pcw16_colour_table, sizeof (pcw16_colour_table));
 }
 
 VIDEO_START( pcw16 )

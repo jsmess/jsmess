@@ -40,17 +40,11 @@ const unsigned char dai_palette[16*3] =
 	0xff, 0xff, 0xff,	/* 15 White		*/
 };
 
-const unsigned short dai_colortable[1][16] =
-{
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }
-};
-
 static unsigned short dai_4_colours_palette[4];
 
 PALETTE_INIT( dai )
 {
 	palette_set_colors_rgb(machine, 0, dai_palette, sizeof(dai_palette) / 3);
-	memcpy(colortable, dai_colortable, sizeof (dai_colortable));
 }
 
 

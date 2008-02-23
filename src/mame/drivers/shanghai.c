@@ -663,7 +663,7 @@ static PALETTE_INIT( shanghai )
 	int i;
 
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -704,7 +704,7 @@ static VIDEO_UPDATE( shanghai )
 		for (x = 0;x < 384;x++)
 		{
 			b &= (HD63484_RAM_SIZE-1);
-			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[HD63484_ram[b]];
+			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b];
 			b++;
 		}
 	}
@@ -724,7 +724,7 @@ static VIDEO_UPDATE( shanghai )
 			{
 				b &= (HD63484_RAM_SIZE-1);
 				if (x <= w && x + sx >= 0 && x+sx < 384)
-					*BITMAP_ADDR16(bitmap, y, x+sx) = machine->pens[HD63484_ram[b]];
+					*BITMAP_ADDR16(bitmap, y, x+sx) = HD63484_ram[b];
 
 				b++;
 			}
@@ -988,13 +988,13 @@ static MACHINE_DRIVER_START( shanghai )
 	MDRV_CPU_IO_MAP(shanghai_portmap,0)
 	MDRV_CPU_VBLANK_INT(shanghai_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(30)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(shanghai)
@@ -1021,13 +1021,13 @@ static MACHINE_DRIVER_START( shangha2 )
 	MDRV_CPU_IO_MAP(shangha2_portmap,0)
 	MDRV_CPU_VBLANK_INT(shanghai_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(30)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(shanghai)
@@ -1054,16 +1054,17 @@ static MACHINE_DRIVER_START( kothello )
 
 	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
 
-	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_INTERLEAVE(200)
 
 	MDRV_MACHINE_RESET(seibu_sound_1)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(shanghai)

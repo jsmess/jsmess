@@ -882,17 +882,18 @@ static MACHINE_DRIVER_START( zwackery )
 	MDRV_CPU_PROGRAM_MAP(zwackery_map,0)
 	MDRV_CPU_VBLANK_INT(mcr68_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_30HZ_VBLANK_DURATION)
 //  MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_MACHINE_START(zwackery)
 	MDRV_MACHINE_RESET(zwackery)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(30)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
+
 	MDRV_GFXDECODE(zwackery)
 	MDRV_PALETTE_LENGTH(4096)
 
@@ -911,17 +912,18 @@ static MACHINE_DRIVER_START( mcr68 )
 	MDRV_CPU_PROGRAM_MAP(mcr68_map,0)
 	MDRV_CPU_VBLANK_INT(mcr68_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_30HZ_VBLANK_DURATION)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_MACHINE_START(mcr68)
 	MDRV_MACHINE_RESET(mcr68)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(30)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
+
 	MDRV_GFXDECODE(mcr68)
 	MDRV_PALETTE_LENGTH(64)
 
@@ -1027,6 +1029,25 @@ ROM_START( zwackery )
 	ROM_REGION( 0x8000, REGION_GFX3, ROMREGION_DISPOSE )	/* bg color maps */
 	ROM_LOAD16_BYTE( "tilef.bin",  0x0000, 0x4000, CRC(a0dfcd7e) SHA1(0fc6723eddef2a96de9bf1f48006dd067c148540) )
 	ROM_LOAD16_BYTE( "tilee.bin",  0x0001, 0x4000, CRC(ab504dc8) SHA1(4ebdcd42624e94c29ccdb8247bfff2d8e936ddd7) )
+
+	ROM_REGION( 0x000D, REGION_PLDS, ROMREGION_DISPOSE )
+    /* According to the manual these pal's are located on the "Venus CPU" board */
+	ROM_LOAD( "pal.d5",    0x0000, 0x00001, NO_DUMP ) /* marked H-T in manual */
+	ROM_LOAD( "pal.d2",    0x0001, 0x00001, NO_DUMP ) /* marked V-T in manual */
+	ROM_LOAD( "pal.d4",    0x0002, 0x00001, NO_DUMP ) /* marked MISC V&H PAL in manual */
+	ROM_LOAD( "pal.d3",    0x0003, 0x00001, NO_DUMP ) /* marked MISC CUSTOM PAL in manual */
+	ROM_LOAD( "pal.e6",    0x0004, 0x00001, NO_DUMP ) /* marked CPU WTS PAL in manual*/
+	ROM_LOAD( "pal.f8",    0x0005, 0x00001, NO_DUMP ) /* marked CPU IOC PAL in manual*/
+	ROM_LOAD( "pal.a5",    0x0006, 0x00001, NO_DUMP ) /* marked CPU RMD PAL in manual*/
+    /* According to the manual these pal's are located on the "Venus VIDEO" board */
+	ROM_LOAD( "pal.1f",    0x0007, 0x00001, NO_DUMP ) /* marked PAL FGBDCD in manual*/
+	ROM_LOAD( "pal.1d",    0x0008, 0x00001, NO_DUMP ) /* marked PAL HCT in manual*/
+    /* According to the manual these pal's are located on the "Venus BACKGROUND" board */
+	ROM_LOAD( "pal.1c",    0x0009, 0x00001, NO_DUMP ) /* marked BGBPE PAL in manual*/
+	ROM_LOAD( "pal.5c",    0x000a, 0x00001, NO_DUMP ) /* marked HCT PAL in manual*/
+	ROM_LOAD( "pal.5j",    0x000b, 0x00001, NO_DUMP ) /* marked BGBDCD PAL in manual*/
+    /* According to the manual this pal is located on the "Artificial Artist" board */
+	ROM_LOAD( "pal20.u15", 0x000c, 0x00001, NO_DUMP ) /* marked CSD002R0 in manual, pal type not specified */
 ROM_END
 
 
@@ -1052,6 +1073,16 @@ ROM_START( xenophob )
 	ROM_LOAD( "xeno_fg.8j",   0x10000, 0x10000, CRC(20e682f5) SHA1(1009f7ec56998df8a1d5ecd724d0523c435c9ee0) )
 	ROM_LOAD( "xeno_fg.9j",   0x20000, 0x10000, CRC(82fb3e09) SHA1(f06e9df20044244a6c174f4876e615ccc18e1cba) )
 	ROM_LOAD( "xeno_fg.10j",  0x30000, 0x10000, CRC(6a7a3516) SHA1(1def9c134220eac9ba5e46d38282ff18f51b6398) )
+
+	ROM_REGION( 0x0006, REGION_PLDS, ROMREGION_DISPOSE )
+    /* According to the manual these pal's are located on the Video Game board */
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
+    /* According to the manual this pal is located on the "Sounds Good" board */
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
 
@@ -1079,6 +1110,16 @@ ROM_START( spyhunt2 )
 	ROM_LOAD( "fg1.8j",   0x20000, 0x20000, CRC(692afb67) SHA1(5669298a646deb2f82e438ae52de03f81a9e11a7) )
 	ROM_LOAD( "fg2.9j",   0x40000, 0x20000, CRC(f1aba383) SHA1(56d1f7e9eb430671076415dd87fe77a38fadad84) )
 	ROM_LOAD( "fg3.10j",  0x60000, 0x20000, CRC(d3475ff8) SHA1(aa7a283a190a6c43e365fcd9242c5d0b920dbf32) )
+
+	ROM_REGION( 0x0006, REGION_PLDS, ROMREGION_DISPOSE )
+    /* According to the manual these pal's are located on the Video Game board */
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
+    /* According to the manual this pal is located on the "Sounds Good" board */
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
 
@@ -1106,6 +1147,16 @@ ROM_START( spyhnt2a )
 	ROM_LOAD( "fg1.8j",   0x20000, 0x20000, CRC(692afb67) SHA1(5669298a646deb2f82e438ae52de03f81a9e11a7) )
 	ROM_LOAD( "fg2.9j",   0x40000, 0x20000, CRC(f1aba383) SHA1(56d1f7e9eb430671076415dd87fe77a38fadad84) )
 	ROM_LOAD( "fg3.10j",  0x60000, 0x20000, CRC(d3475ff8) SHA1(aa7a283a190a6c43e365fcd9242c5d0b920dbf32) )
+
+	ROM_REGION( 0x0006, REGION_PLDS, ROMREGION_DISPOSE )
+    /* According to the manual these pal's are located on the Video Game board */
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
+    /* According to the manual this pal is located on the "Sounds Good" board */
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
 
@@ -1131,6 +1182,16 @@ ROM_START( blasted )
 	ROM_LOAD( "fg1",  0x20000, 0x20000, CRC(4fbdba58) SHA1(5dfaca5447e96d904028a14ef01ab6bd972011e6) )
 	ROM_LOAD( "fg2",  0x40000, 0x20000, CRC(8891f6f8) SHA1(af07aa290eff3b9632b238d8b5a37280961f63f7) )
 	ROM_LOAD( "fg3",  0x60000, 0x20000, CRC(18e4a130) SHA1(2412b45ca58b36515c80b0888a5d35303a5ce5a2) )
+
+	ROM_REGION( 0x0006, REGION_PLDS, ROMREGION_DISPOSE )
+    /* According to the manual these pal's are located on the Video Game board */
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
+    /* According to the manual this pal is located on the "Sounds Good" board */
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
 
@@ -1327,7 +1388,7 @@ static DRIVER_INIT( zwackery )
 
 static DRIVER_INIT( xenophob )
 {
-	mcr68_common_init(MCR_SOUNDS_GOOD, 0, 0);
+	mcr68_common_init(MCR_SOUNDS_GOOD, 0, -4);
 
 	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));

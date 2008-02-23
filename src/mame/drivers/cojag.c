@@ -1008,9 +1008,9 @@ static MACHINE_DRIVER_START( cojagr3k )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 
@@ -1387,7 +1387,7 @@ ROM_END
 static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UINT16 spin_pc)
 {
 	/* copy over the ROM */
-	cojag_is_r3000 = (machine->drv->cpu[0].type == CPU_R3041BE);
+	cojag_is_r3000 = (machine->config->cpu[0].type == CPU_R3041BE);
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)

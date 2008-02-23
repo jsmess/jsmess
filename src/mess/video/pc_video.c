@@ -124,8 +124,6 @@ WRITE8_HANDLER ( pc_video_videoram_w )
 	if (videoram && videoram[offset] != data)
 	{
 		videoram[offset] = data;
-		if (dirtybuffer)
-			dirtybuffer[offset] = 1;
 		pc_anythingdirty = 1;
 	}
 }
@@ -137,17 +135,6 @@ WRITE32_HANDLER( pc_video_videoram32_w )
 {
 	COMBINE_DATA(((UINT32 *) videoram) + offset);
 	pc_anythingdirty = 1;
-	if (dirtybuffer)
-	{
-		if ((mem_mask & 0x000000FF) == 0)
-			dirtybuffer[offset * 4 + 0] = 1;
-		if ((mem_mask & 0x0000FF00) == 0)
-			dirtybuffer[offset * 4 + 1] = 1;
-		if ((mem_mask & 0x00FF0000) == 0)
-			dirtybuffer[offset * 4 + 2] = 1;
-		if ((mem_mask & 0xFF000000) == 0)
-			dirtybuffer[offset * 4 + 3] = 1;
-	}
 }
 
 

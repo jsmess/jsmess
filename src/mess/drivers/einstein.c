@@ -228,7 +228,7 @@ static int Einstein_scr_y = 0;
 //  0,// Cursor status
 //};
 
-static void einstein_6845_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+static void einstein_6845_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
 									 UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
 	/* TODO: Verify implementation */
 	unsigned char *data = memory_region(REGION_CPU1) + 0x012000;
@@ -236,18 +236,21 @@ static void einstein_6845_update_row(mame_bitmap *bitmap, const rectangle *clipr
 	int char_code;
 	int i, x;
 
-	for ( i = 0, x = 0; i < x_count; i++, x+=8 ) {
+	for ( i = 0, x = 0; i < x_count; i++, x+=8 )
+	{
 		int w;
 		char_code = einstein_80col_ram[(ma + i)&0x07ff];
 		data_byte = data[(char_code<<3) + ra];
-		for (w=0; w<8;w++) {
+		for (w=0; w<8;w++)
+		{
 			*BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
 			data_byte = data_byte<<1;
 		}
 	}
 }
 
-static void einstein_6845_display_enable_changed(int display_enabled) {
+static void einstein_6845_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+{
 	/* TODO: Implement me properly */
 	if ( display_enabled ) {
 		Einstein_scr_y = ( Einstein_scr_y + 1 ) % 240 /*?*/;
@@ -1722,6 +1725,7 @@ static MACHINE_DRIVER_START( einstein )
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -1770,7 +1774,7 @@ static void einstein_printer_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}
@@ -1782,7 +1786,7 @@ static void einstein_floppy_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		default:										legacydsk_device_getinfo(devclass, state, info); break;
 	}

@@ -777,13 +777,13 @@ static MACHINE_DRIVER_START( psxntsc )
 	MDRV_CPU_PROGRAM_MAP( psx_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(0)
 
 	MDRV_MACHINE_RESET( psx )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 1024, 512 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
@@ -813,7 +813,6 @@ static MACHINE_DRIVER_START( psxpal )
 	MDRV_MACHINE_RESET( psx )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 1024, 512 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 511 )
@@ -924,10 +923,10 @@ static void psx_quickload_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "exe,psx"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "exe,psx"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_psx_exe_load; break;
+		case MESS_DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_psx_exe_load; break;
 
 		default:										quickload_device_getinfo(devclass, state, info); break;
 	}

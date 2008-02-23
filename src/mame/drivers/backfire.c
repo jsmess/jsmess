@@ -182,7 +182,7 @@ static VIDEO_UPDATE(backfire)
 	{
 
 		fillbitmap(priority_bitmap,0,NULL);
-		fillbitmap(bitmap,machine->pens[0x100],cliprect);
+		fillbitmap(bitmap,0x100,cliprect);
 
 		if (backfire_left_priority[0] == 0)
 		{
@@ -204,7 +204,7 @@ static VIDEO_UPDATE(backfire)
 	else if (screen==1)
 	{
 		fillbitmap(priority_bitmap,0,NULL);
-		fillbitmap(bitmap,machine->pens[0x500],cliprect);
+		fillbitmap(bitmap,0x500,cliprect);
 
 		if (backfire_right_priority[0] == 0)
 		{
@@ -491,27 +491,24 @@ static MACHINE_DRIVER_START( backfire )
 	MDRV_CPU_PROGRAM_MAP(backfire_map,0)
 	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_PALETTE_LENGTH(2048)
 	MDRV_GFXDECODE(backfire)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("left", 0x000)
+	MDRV_SCREEN_ADD("left", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_SCREEN_ADD("right", 0x000)
+	MDRV_SCREEN_ADD("right", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 

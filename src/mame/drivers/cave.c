@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( dfeveron_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(MWA16_RAM						)	// Sprites?
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x600000, 0x607fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
-	AM_RANGE(0x708000, 0x708fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x708000, 0x708fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0x710c00, 0x710fff) AM_WRITE(MWA16_RAM						)	// ?
 	AM_RANGE(0x800000, 0x80007f) AM_WRITE(MWA16_RAM) AM_BASE(&cave_videoregs	)	// Video Regs
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_0		)	// Layer 0 Control
@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( ddonpach_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_0			)	// Layer 0 Control
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_1			)	// Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_2			)	// Layer 2 Control
-	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(cave_eeprom_msb_w					)	// EEPROM
 ADDRESS_MAP_END
 
@@ -627,7 +627,7 @@ static ADDRESS_MAP_START( donpachi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x700005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_0			)	// Layer 0 Control
 	AM_RANGE(0x800000, 0x800005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_2			)	// Layer 2 Control
 	AM_RANGE(0x900000, 0x90007f) AM_WRITE(MWA16_RAM) AM_BASE(&cave_videoregs		)	// Video Regs
-	AM_RANGE(0xa08000, 0xa08fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xa08000, 0xa08fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(OKIM6295_data_0_lsb_w				)	// M6295
 	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(OKIM6295_data_1_lsb_w				)	//
 	AM_RANGE(0xb00020, 0xb0002f) AM_WRITE(NMK112_okibank_lsb_w				)	//
@@ -670,7 +670,7 @@ static ADDRESS_MAP_START( esprade_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_0		)	// Layer 0 Control
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_1		)	// Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_2		)	// Layer 2 Control
-	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(cave_eeprom_msb_w				)	// EEPROM
 ADDRESS_MAP_END
 
@@ -717,7 +717,7 @@ static ADDRESS_MAP_START( gaia_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_0		)	// Layer 0 Control
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_1		)	// Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_2		)	// Layer 2 Control
-	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(gaia_coin_lsb_w				)	// Coin counter only
 	AM_RANGE(0xd00014, 0xd00015) AM_WRITE(watchdog_reset16_w			)	// Watchdog?
 ADDRESS_MAP_END
@@ -758,7 +758,7 @@ static ADDRESS_MAP_START( guwange_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_0		)	// Layer 0 Control
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_1		)	// Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_2		)	// Layer 2 Control
-	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(cave_eeprom_lsb_w				)	// EEPROM
 //  AM_RANGE(0xd00012, 0xd00013) AM_WRITE(MWA16_NOP             )   // ?
 //  AM_RANGE(0xd00014, 0xd00015) AM_WRITE(MWA16_NOP             )   // ? $800068 in dfeveron ? probably Watchdog
@@ -790,7 +790,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotdogst_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM						)	// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(MWA16_RAM						)	// RAM
-	AM_RANGE(0x408000, 0x408fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x408000, 0x408fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0x880000, 0x887fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x900000, 0x907fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
 	AM_RANGE(0x980000, 0x987fff) AM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2	)	// Layer 2
@@ -897,7 +897,7 @@ static ADDRESS_MAP_START( korokoro_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140005) AM_WRITE( MWA16_RAM				) AM_BASE( &cave_vctrl_0	)	// Layer 0 Control
 	AM_RANGE(0x180000, 0x187fff) AM_WRITE( MWA16_RAM				) AM_BASE( &spriteram16		) AM_SIZE(&spriteram_size	)	// Sprites
 	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE( MWA16_RAM				) AM_BASE( &cave_videoregs	)	// Video Regs
-	AM_RANGE(0x200000, 0x207fff) AM_WRITE( paletteram16_xGGGGGRRRRRBBBBB_word_w	) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x200000, 0x207fff) AM_WRITE( MWA16_RAM	) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0x240000, 0x240003) AM_WRITE( cave_sound_w				)	// YMZ280
 	AM_RANGE(0x280008, 0x280009) AM_WRITE( korokoro_leds_w			)
 	AM_RANGE(0x28000a, 0x28000b) AM_WRITE( korokoro_eeprom_msb_w	)	// EEPROM
@@ -940,7 +940,7 @@ static ADDRESS_MAP_START( mazinger_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_1			)	// Layer 1 Control
 	AM_RANGE(0x700000, 0x700005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_0			)	// Layer 0 Control
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(cave_eeprom_msb_w					)	// EEPROM
-	AM_RANGE(0xc08000, 0xc0ffff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xc08000, 0xc0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xd00000, 0xd7ffff) AM_WRITE(MWA16_ROM							)	// ROM
 ADDRESS_MAP_END
 
@@ -977,7 +977,7 @@ static ADDRESS_MAP_START( metmqstr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM						)	// ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_WRITE(MWA16_ROM						)	// ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_WRITE(MWA16_ROM						)	// ROM
-	AM_RANGE(0x408000, 0x408fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x408000, 0x408fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0x880000, 0x887fff) AM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2	)	// Layer 2
 	AM_RANGE(0x888000, 0x88ffff) AM_WRITE(MWA16_RAM						)	//
 	AM_RANGE(0x900000, 0x907fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
@@ -1066,7 +1066,7 @@ static ADDRESS_MAP_START( pwrinst2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(pwrinst2_vctrl_1_w) AM_BASE(&cave_vctrl_1			)	// Layer 1 Control
 	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(pwrinst2_vctrl_3_w) AM_BASE(&cave_vctrl_3			)	// Layer 3 Control
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_cmd_w						)	// To Sound CPU
-	AM_RANGE(0xf00000, 0xf04fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xf00000, 0xf04fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 ADDRESS_MAP_END
 
 
@@ -1126,7 +1126,7 @@ static ADDRESS_MAP_START( sailormn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(MWA16_RAM							)	// (agallet)
 	AM_RANGE(0x200000, 0x3fffff) AM_WRITE(MWA16_ROM							)	// ROM
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(MWA16_RAM							)	// (agallet)
-	AM_RANGE(0x408000, 0x40bfff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x408000, 0x40bfff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0x40c000, 0x40ffff) AM_WRITE(MWA16_RAM							)	// (agallet)
 	AM_RANGE(0x410000, 0x410001) AM_WRITE(MWA16_RAM							)	// (agallet)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
@@ -1172,7 +1172,7 @@ static ADDRESS_MAP_START( uopoko_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x600000, 0x60007f) AM_WRITE(MWA16_RAM) AM_BASE(&cave_videoregs	)	// Video Regs
 	AM_RANGE(0x700000, 0x700005) AM_WRITE(MWA16_RAM) AM_BASE(&cave_vctrl_0		)	// Layer 0 Control
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(cave_eeprom_msb_w				)	// EEPROM
 ADDRESS_MAP_END
 
@@ -2020,20 +2020,19 @@ static MACHINE_DRIVER_START( dfeveron )
 	MDRV_CPU_PROGRAM_MAP(dfeveron_readmem,dfeveron_writemem)
 	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+
 	MDRV_GFXDECODE(dfeveron)
-	MDRV_PALETTE_LENGTH(0x800)
-	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
 	MDRV_PALETTE_INIT(dfeveron)
 	MDRV_VIDEO_START(cave_2_layers)
@@ -2060,20 +2059,19 @@ static MACHINE_DRIVER_START( ddonpach )
 	MDRV_CPU_PROGRAM_MAP(ddonpach_readmem,ddonpach_writemem)
 	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+
 	MDRV_GFXDECODE(ddonpach)
-	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_COLORTABLE_LENGTH(0x8000 + 0x40*16)	// $400 extra entries for layers 1&2
+	MDRV_PALETTE_LENGTH(0x8000 + 0x40*16)	// $400 extra entries for layers 1&2
 
 	MDRV_PALETTE_INIT(ddonpach)
 	MDRV_VIDEO_START(cave_3_layers)
@@ -2100,20 +2098,19 @@ static MACHINE_DRIVER_START( donpachi )
 	MDRV_CPU_PROGRAM_MAP(donpachi_readmem,donpachi_writemem)
 	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+
 	MDRV_GFXDECODE(donpachi)
-	MDRV_PALETTE_LENGTH(0x800)
-	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
 	MDRV_PALETTE_INIT(dfeveron)
 	MDRV_VIDEO_START(cave_3_layers)
@@ -2145,17 +2142,17 @@ static MACHINE_DRIVER_START( esprade )
 	MDRV_CPU_PROGRAM_MAP(esprade_readmem,esprade_writemem)
 	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+
 	MDRV_GFXDECODE(esprade)
 	MDRV_PALETTE_LENGTH(0x8000)
 
@@ -2183,16 +2180,16 @@ static MACHINE_DRIVER_START( gaia )
 	MDRV_CPU_PROGRAM_MAP(gaia_readmem,gaia_writemem)
 	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+
 	MDRV_GFXDECODE(esprade)
 	MDRV_PALETTE_LENGTH(0x8000)
 
@@ -2220,17 +2217,17 @@ static MACHINE_DRIVER_START( guwange )
 	MDRV_CPU_PROGRAM_MAP(guwange_readmem,guwange_writemem)
 	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+
 	MDRV_GFXDECODE(esprade)
 	MDRV_PALETTE_LENGTH(0x8000)
 
@@ -2262,20 +2259,19 @@ static MACHINE_DRIVER_START( hotdogst )
 	MDRV_CPU_PROGRAM_MAP(hotdogst_sound_readmem,hotdogst_sound_writemem)
 	MDRV_CPU_IO_MAP(hotdogst_sound_readport,hotdogst_sound_writeport)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
+
 	MDRV_GFXDECODE(hotdogst)
-	MDRV_PALETTE_LENGTH(0x800)
-	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
 	MDRV_PALETTE_INIT(dfeveron)
 	MDRV_VIDEO_START(cave_3_layers)
@@ -2313,20 +2309,19 @@ static MACHINE_DRIVER_START( korokoro )
 	MDRV_CPU_PROGRAM_MAP(korokoro_readmem,korokoro_writemem)
 	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(korokoro)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
+
 	MDRV_GFXDECODE(korokoro)
-	MDRV_PALETTE_LENGTH(0x4000)
-	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
 	MDRV_PALETTE_INIT(korokoro)
 	MDRV_VIDEO_START(cave_1_layer)
@@ -2358,21 +2353,21 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_CPU_PROGRAM_MAP(mazinger_sound_readmem,mazinger_sound_writemem)
 	MDRV_CPU_IO_MAP(mazinger_sound_readport,mazinger_sound_writeport)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-	MDRV_WATCHDOG_VBLANK_INIT(DEFAULT_60HZ_3S_VBLANK_WATCHDOG)
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
+
 	MDRV_GFXDECODE(mazinger)
-	MDRV_PALETTE_LENGTH(0x4000)
-	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
 	MDRV_PALETTE_INIT(mazinger)
 	MDRV_VIDEO_START(cave_2_layers)
@@ -2415,21 +2410,21 @@ static MACHINE_DRIVER_START( metmqstr )
 	MDRV_CPU_PROGRAM_MAP(metmqstr_sound_readmem,metmqstr_sound_writemem)
 	MDRV_CPU_IO_MAP(metmqstr_sound_readport,metmqstr_sound_writeport)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-	MDRV_WATCHDOG_VBLANK_INIT(DEFAULT_60HZ_3S_VBLANK_WATCHDOG)
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_MACHINE_RESET(cave)	/* start with the watchdog armed */
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x200, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
+
 	MDRV_GFXDECODE(donpachi)
-	MDRV_PALETTE_LENGTH(0x800)
-	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
 	MDRV_PALETTE_INIT(dfeveron)
 	MDRV_VIDEO_START(cave_3_layers)
@@ -2473,20 +2468,19 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_CPU_PROGRAM_MAP(pwrinst2_sound_readmem,pwrinst2_sound_writemem)
 	MDRV_CPU_IO_MAP(pwrinst2_sound_readport,pwrinst2_sound_writeport)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x200, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
+
 	MDRV_GFXDECODE(pwrinst2)
-	MDRV_PALETTE_LENGTH(0x5000/2)
-	MDRV_COLORTABLE_LENGTH(0x8000+0x2800)
+	MDRV_PALETTE_LENGTH(0x8000+0x2800)
 
 	MDRV_PALETTE_INIT(pwrinst2)
 	MDRV_VIDEO_START(cave_4_layers)
@@ -2534,21 +2528,21 @@ static MACHINE_DRIVER_START( sailormn )
 	MDRV_CPU_PROGRAM_MAP(sailormn_sound_readmem,sailormn_sound_writemem)
 	MDRV_CPU_IO_MAP(sailormn_sound_readport,sailormn_sound_writeport)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 //  MDRV_INTERLEAVE(10)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320+1, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
+
 	MDRV_GFXDECODE(sailormn)
-	MDRV_PALETTE_LENGTH(0x2000)
-	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
 	MDRV_PALETTE_INIT(sailormn)	// 4 bit sprites, 6 bit tiles
 	MDRV_VIDEO_START(sailormn_3_layers)	/* Layer 2 has 1 banked ROM */
@@ -2584,16 +2578,16 @@ static MACHINE_DRIVER_START( uopoko )
 	MDRV_CPU_PROGRAM_MAP(uopoko_readmem,uopoko_writemem)
 	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(cave)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+
 	MDRV_GFXDECODE(uopoko)
 	MDRV_PALETTE_LENGTH(0x8000)
 

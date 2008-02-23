@@ -11,49 +11,9 @@ static const UINT8 hp48_palette[] =
 	37,42,64	/* lcd dark */
 };
 
-/* 32 contrast steps */
-const UINT16 hp48_colortable[0x20][2] = {
-	{ 0, 2 },
-	{ 0, 2 },
-	{ 0, 2 },
-	{ 0, 2 },
-	{ 0, 2 },
-	{ 0, 2 },
-	{ 0, 2 },
-	{ 0, 2 },
-
-	{ 0, 2 },
-	{ 0, 2 },
-	{ 0, 2 },
-	{ 0, 3 },
-	{ 0, 3 },
-	{ 0, 3 },
-	{ 0, 3 },
-	{ 0, 3 },
-
-	{ 0, 3 },
-	{ 0, 3 },
-	{ 0, 3 },
-	{ 0, 3 },
-	{ 0, 3 },
-	{ 0, 3 },
-	{ 2, 3 },
-	{ 2, 3 },
-
-	{ 2, 3 },
-	{ 2, 3 },
-	{ 2, 3 },
-	{ 2, 3 },
-	{ 2, 3 },
-	{ 2, 3 },
-	{ 2, 3 },
-	{ 2, 3 }
-};
-
 PALETTE_INIT( hp48 )
 {
 	palette_set_colors_rgb(machine, 0, hp48_palette, sizeof(hp48_palette) / 3);
-	memcpy(colortable,hp48_colortable,sizeof(hp48_colortable));
 }
 
 VIDEO_START( hp48 )

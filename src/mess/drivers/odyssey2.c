@@ -150,7 +150,7 @@ static MACHINE_DRIVER_START( odyssey2 )
 	MDRV_MACHINE_RESET( odyssey2 )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -159,7 +159,6 @@ static MACHINE_DRIVER_START( odyssey2 )
 	MDRV_SCREEN_VISIBLE_AREA(0,160-1,0,240-1)
 	MDRV_GFXDECODE( odyssey2 )
 	MDRV_PALETTE_LENGTH(24)
-	MDRV_COLORTABLE_LENGTH(2)
 	MDRV_PALETTE_INIT( odyssey2 )
 
 	MDRV_VIDEO_START( odyssey2 )
@@ -187,11 +186,11 @@ static void odyssey2_cartslot_device_getinfo(const device_class *devclass, UINT3
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_VERIFY:						info->imgverify = odyssey2_cart_verify; break;
+		case MESS_DEVINFO_PTR_VERIFY:						info->imgverify = odyssey2_cart_verify; break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}

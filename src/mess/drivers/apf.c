@@ -635,6 +635,7 @@ static MACHINE_DRIVER_START( apf_imagination )
 	MDRV_CPU_ADD_TAG("main", M6800, 3750000)        /* 7.8336 Mhz */
 	//	     MDRV_CPU_ADD_TAG("main", M6800, (3750000/2) )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
 	MDRV_CPU_PROGRAM_MAP(apf_imagination_map, 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_INTERLEAVE(0)
 
@@ -643,7 +644,6 @@ static MACHINE_DRIVER_START( apf_imagination )
 	/* video hardware */
 	MDRV_VIDEO_START(apf)
 	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
@@ -690,10 +690,10 @@ static void apfimag_cassette_getinfo(const device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) apf_cassette_formats; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) apf_cassette_formats; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
@@ -705,13 +705,13 @@ static void apfimag_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_apfimag_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_apfimag_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "apd"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "apd"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}

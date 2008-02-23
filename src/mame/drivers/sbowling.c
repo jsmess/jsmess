@@ -38,7 +38,6 @@ PROMs : NEC B406 (1kx4) x2
 ***********************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
@@ -67,7 +66,7 @@ static void plot_pixel_sbw(int x, int y, int col)
 		y = 255-y;
 		x = 247-x;
 	}
-	*BITMAP_ADDR16(tmpbitmap, y, x) = Machine->pens[col];
+	*BITMAP_ADDR16(tmpbitmap, y, x) = col;
 }
 
 static WRITE8_HANDLER( sbw_videoram_w )
@@ -94,7 +93,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 
 static VIDEO_UPDATE(sbowling)
 {
-	fillbitmap(bitmap,machine->pens[0x18],cliprect);
+	fillbitmap(bitmap,0x18,cliprect);
 	tilemap_draw(bitmap,cliprect,sb_tilemap,0,0);
 	copybitmap_trans(bitmap,tmpbitmap,0,0,0,0,cliprect, color_prom_address);
 	return 0;
@@ -301,7 +300,7 @@ static PALETTE_INIT( sbowling )
 		3,	resistances_rg, outputs_g,	0,	100,
 		2,	resistances_b,  outputs_b,	0,	100);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -332,14 +331,15 @@ static MACHINE_DRIVER_START( sbowling )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT(sbw_interrupt, 2)
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_GFXDECODE(sbowling)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)		/* vert size taken from mw8080bw */
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
+
 	MDRV_PALETTE_LENGTH(0x400)
 	MDRV_PALETTE_INIT(sbowling)
 	MDRV_VIDEO_START(sbowling)

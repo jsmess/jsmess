@@ -24,6 +24,7 @@
 
 // MAME/MAMEUI headers
 #include "directinput.h"
+#include "driver.h"
 #include "mui_util.h" // For ErrorMsg
 
 /***************************************************************************

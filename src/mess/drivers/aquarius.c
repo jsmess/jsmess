@@ -112,7 +112,6 @@ static const unsigned short aquarius_colortable[] =
 static PALETTE_INIT( aquarius )
 {
 	palette_set_colors(machine, 0, aquarius_palette, ARRAY_LENGTH(aquarius_palette));
-	memcpy(colortable, aquarius_colortable, sizeof (aquarius_colortable));
 }
 
 /* Keyboard input */
@@ -222,7 +221,7 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_MACHINE_RESET( aquarius )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -230,7 +229,6 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE( aquarius )
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(aquarius_palette))
-	MDRV_COLORTABLE_LENGTH(sizeof (aquarius_colortable))
 	MDRV_PALETTE_INIT( aquarius )
 
 	MDRV_VIDEO_START( aquarius )

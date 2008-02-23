@@ -525,6 +525,7 @@ static MACHINE_DRIVER_START( pmd85 )
 	MDRV_CPU_ADD_TAG("main", 8080, 2000000)		/* 2.048MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(pmd85_mem, 0)
 	MDRV_CPU_IO_MAP(pmd85_readport, pmd85_writeport)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
@@ -532,12 +533,10 @@ static MACHINE_DRIVER_START( pmd85 )
 	MDRV_MACHINE_RESET( pmd85 )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(288, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 288-1, 0, 256-1)
 	MDRV_PALETTE_LENGTH(sizeof (pmd85_palette) / 3)
-	MDRV_COLORTABLE_LENGTH(sizeof (pmd85_colortable))
 	MDRV_PALETTE_INIT( pmd85 )
 
 	MDRV_VIDEO_START( pmd85 )
@@ -637,14 +636,14 @@ static void pmd85_cassette_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) pmd85_pmd_format; break;
-		case DEVINFO_PTR_CASSETTE_OPTIONS:				info->p = (void *) &pmd85_cassette_options; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) pmd85_pmd_format; break;
+		case MESS_DEVINFO_PTR_CASSETTE_OPTIONS:				info->p = (void *) &pmd85_cassette_options; break;
 
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}

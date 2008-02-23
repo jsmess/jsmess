@@ -379,7 +379,7 @@ static TILE_GET_INFO( get_magicfly_tile_info )
 
 static VIDEO_START(magicfly)
 {
-	mc6845 = mc6845_config(NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_magicfly_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
@@ -411,8 +411,8 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
 
 static VIDEO_START( 7mezzo )
 {
-	bg_tilemap = tilemap_create(get_7mezzo_tile_info, tilemap_scan_rows,
-		8, 8, 32, 29);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
+	bg_tilemap = tilemap_create(get_7mezzo_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
 static VIDEO_UPDATE( magicfly )
@@ -423,19 +423,24 @@ static VIDEO_UPDATE( magicfly )
 
 static PALETTE_INIT( magicfly )
 {
-    /* 1st gfx bank */
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 4, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 6, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 10, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 11, MAKE_RGB(0x00, 0xff, 0x00));
-	palette_set_color(machine, 12, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 14, MAKE_RGB(0x00, 0x00, 0x00));
+	int i;
 
-	/* 2nd gfx bank */
-	palette_set_color(machine, 22, MAKE_RGB(0xe0, 0xe0, 0xe0));
-	palette_set_color(machine, 23, MAKE_RGB(0xff, 0xff, 0xff));
+	for (i = 0; i < 0x100; i += 0x20)
+	{
+		/* 1st gfx bank */
+		palette_set_color(machine, i + 0, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine, i + 2, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine, i + 4, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine, i + 6, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine, i + 10, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine, i + 11, MAKE_RGB(0x00, 0xff, 0x00));
+		palette_set_color(machine, i + 12, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine, i + 14, MAKE_RGB(0x00, 0x00, 0x00));
+
+		/* 2nd gfx bank */
+		palette_set_color(machine, i + 22, MAKE_RGB(0xe0, 0xe0, 0xe0));
+		palette_set_color(machine, i + 23, MAKE_RGB(0xff, 0xff, 0xff));
+	}
 }
 
 
@@ -657,25 +662,24 @@ static MACHINE_DRIVER_START( magicfly )
 	MDRV_CPU_PROGRAM_MAP(magicfly_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06. */
 
 	MDRV_GFXDECODE(magicfly)
-	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(magicfly)
-	MDRV_COLORTABLE_LENGTH(256)
 
 	MDRV_VIDEO_START(magicfly)
 	MDRV_VIDEO_UPDATE(magicfly)
 
+	MDRV_DEVICE_ADD("crtc", MC6845)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( 7mezzo )

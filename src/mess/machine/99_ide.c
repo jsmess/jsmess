@@ -374,13 +374,13 @@ void ti99_ide_harddisk_getinfo(const device_class *devclass, UINT32 state, union
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:						info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_PTR_IDEDRIVE_INTERFACE: info->p = (void *) &ti99_ide_interface; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_DEV_TAG:					strcpy(info->s = device_temp_str(), "99_ide"); break;
+		case MESS_DEVINFO_STR_DEV_TAG:					strcpy(info->s = device_temp_str(), "99_ide"); break;
 
 		default: ide_harddisk_device_getinfo(devclass, state, info); break;
 	}

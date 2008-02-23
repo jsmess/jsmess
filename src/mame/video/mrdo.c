@@ -49,8 +49,6 @@ static int flipscreen;
 PALETTE_INIT( mrdo )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	const int R1 = 150;
 	const int R2 = 120;
@@ -61,7 +59,7 @@ PALETTE_INIT( mrdo )
 	int weight[16];
 	const float potadjust = 0.2f;	/* diode voltage drop */
 
-	for (i = 15;i >= 0;i--)
+	for (i = 0x0f; i >= 0; i--)
 	{
 		float par = 0;
 
@@ -76,42 +74,57 @@ PALETTE_INIT( mrdo )
 		}
 		else pot[i] = 0;
 
-		weight[i] = 255 * pot[i] / pot[15];
+		weight[i] = 0xff * pot[i] / pot[0x0f];
 	}
 
-	for (i = 0;i < 256;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	for (i = 0; i < 0x100; i++)
 	{
 		int a1,a2;
-		int bits0,bits2,r,g,b;
+		int bits0, bits2;
+		int r, g, b;
 
 		a1 = ((i >> 3) & 0x1c) + (i & 0x03) + 32;
 		a2 = ((i >> 0) & 0x1c) + (i & 0x03);
 
+		/* red component */
 		bits0 = (color_prom[a1] >> 0) & 0x03;
 		bits2 = (color_prom[a2] >> 0) & 0x03;
 		r = weight[bits0 + (bits2 << 2)];
+
+		/* green component */
 		bits0 = (color_prom[a1] >> 2) & 0x03;
 		bits2 = (color_prom[a2] >> 2) & 0x03;
 		g = weight[bits0 + (bits2 << 2)];
+
+		/* blue component */
 		bits0 = (color_prom[a1] >> 4) & 0x03;
 		bits2 = (color_prom[a2] >> 4) & 0x03;
 		b = weight[bits0 + (bits2 << 2)];
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 64;
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x40;
+
+	/* characters */
+	for (i = 0; i < 0x100; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
+	for (i = 0x100; i < 0x140; i++)
 	{
-		int bits;
+		UINT8 ctabentry = color_prom[(i - 0x100) & 0x1f];
 
-		if (i < 32)
-			bits = color_prom[i] & 0x0f;		/* low 4 bits are for sprite color n */
+		if ((i - 0x100) & 0x20)
+			ctabentry = ctabentry >> 4;		/* high 4 bits are for sprite color n + 8 */
 		else
-			bits = color_prom[i & 0x1f] >> 4;	/* high 4 bits are for sprite color n + 8 */
+			ctabentry = ctabentry & 0x0f;	/* low 4 bits are for sprite color n */
 
-		COLOR(2,i) = bits + ((bits & 0x0c) << 3);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 

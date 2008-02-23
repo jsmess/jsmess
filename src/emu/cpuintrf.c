@@ -94,6 +94,7 @@ void tms9989_get_info(UINT32 state, cpuinfo *info);
 void tms9995_get_info(UINT32 state, cpuinfo *info);
 void tms99105a_get_info(UINT32 state, cpuinfo *info);
 void tms99110a_get_info(UINT32 state, cpuinfo *info);
+void tms99000_get_info(UINT32 state, cpuinfo *info);
 void z8000_get_info(UINT32 state, cpuinfo *info);
 void tms32010_get_info(UINT32 state, cpuinfo *info);
 void tms32025_get_info(UINT32 state, cpuinfo *info);
@@ -494,6 +495,9 @@ static const struct
 #endif
 #if (HAS_TMS99110A)
 	{ CPU_TMS99110A, tms99110a_get_info },
+#endif
+#if (HAS_TMS99000)
+	{ CPU_TMS99000, tms99000_get_info },
 #endif
 #if (HAS_Z8000)
 	{ CPU_Z8000, z8000_get_info },
@@ -1016,7 +1020,7 @@ void cpuintrf_init(running_machine *machine)
 		/* loop over all defined CPUs */
 		for (totalcpu = 0; totalcpu < CPU_COUNT; totalcpu++)
 		{
-			cpu_type cputype = machine->drv->cpu[totalcpu].type;
+			cpu_type cputype = machine->config->cpu[totalcpu].type;
 			char familyname[256];
 			int j;
 

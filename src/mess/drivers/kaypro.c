@@ -228,7 +228,6 @@ static const unsigned short kaypro_colortable[] =
 static PALETTE_INIT( kaypro )
 {
 	palette_set_colors_rgb(machine, 0, kaypro_palette, sizeof(kaypro_palette) / 3);
-    memcpy(colortable, kaypro_colortable, sizeof(kaypro_colortable));
 }
 
 static MACHINE_DRIVER_START( kaypro )
@@ -242,7 +241,7 @@ static MACHINE_DRIVER_START( kaypro )
 	MDRV_MACHINE_RESET( kaypro )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -250,7 +249,6 @@ static MACHINE_DRIVER_START( kaypro )
 	MDRV_SCREEN_VISIBLE_AREA(0*KAYPRO_FONT_W, 80*KAYPRO_FONT_W-1, 0*KAYPRO_FONT_H, 25*KAYPRO_FONT_H-1)
 	MDRV_GFXDECODE( kaypro )
 	MDRV_PALETTE_LENGTH(sizeof(kaypro_palette) / 3)
-	MDRV_COLORTABLE_LENGTH(sizeof(kaypro_colortable) / sizeof(kaypro_colortable[0]))
 	MDRV_PALETTE_INIT( kaypro )
 
 	MDRV_VIDEO_START( kaypro )
@@ -275,13 +273,13 @@ static void kaypro_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_cpm_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_cpm_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}

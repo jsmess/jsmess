@@ -181,7 +181,7 @@ static MACHINE_DRIVER_START( hp48s )
 
 	/* video hardware (well, actually there was no video ;) */
 	/* scanned with 300 dpi, scaled x 55%, y 55% for perfect display 2x2 pixels */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(64)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -189,7 +189,6 @@ static MACHINE_DRIVER_START( hp48s )
 	MDRV_SCREEN_VISIBLE_AREA(0, 339-1, 0, 775-1)
 	MDRV_GFXDECODE( hp48 )
 	MDRV_PALETTE_LENGTH( 248 )
-	MDRV_COLORTABLE_LENGTH( sizeof (hp48_colortable) / sizeof(hp48_colortable[0][0]) )
 	MDRV_PALETTE_INIT( hp48 )
 
 	MDRV_VIDEO_START( hp48 )

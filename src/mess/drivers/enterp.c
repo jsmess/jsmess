@@ -540,7 +540,7 @@ static MACHINE_DRIVER_START( ep128 )
 	MDRV_MACHINE_START( enterprise )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -548,7 +548,6 @@ static MACHINE_DRIVER_START( ep128 )
 	MDRV_SCREEN_VISIBLE_AREA(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1)
 	/* MDRV_GFXDECODE( enterprise ) */
 	MDRV_PALETTE_LENGTH(NICK_PALETTE_SIZE)
-	MDRV_COLORTABLE_LENGTH(NICK_COLOURTABLE_SIZE)
 	MDRV_PALETTE_INIT( nick )
 
 	MDRV_VIDEO_START( enterprise )
@@ -589,7 +588,7 @@ static void ep128_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		default:										legacydsk_device_getinfo(devclass, state, info); break;
 	}
@@ -602,13 +601,13 @@ static void ep128_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = enterprise_floppy_init; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = enterprise_floppy_init; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}

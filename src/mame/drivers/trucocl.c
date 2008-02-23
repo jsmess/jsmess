@@ -36,11 +36,11 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "sound/dac.h"
 
 /* from video */
-extern WRITE8_HANDLER( trucocl_videoram_w );
-extern WRITE8_HANDLER( trucocl_colorram_w );
-extern PALETTE_INIT( trucocl );
-extern VIDEO_START( trucocl );
-extern VIDEO_UPDATE( trucocl );
+WRITE8_HANDLER( trucocl_videoram_w );
+WRITE8_HANDLER( trucocl_colorram_w );
+PALETTE_INIT( trucocl );
+VIDEO_START( trucocl );
+VIDEO_UPDATE( trucocl );
 
 
 static WRITE8_HANDLER( irq_enable_w)
@@ -147,17 +147,16 @@ static MACHINE_DRIVER_START( trucocl )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(trucocl_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+
 	MDRV_GFXDECODE(trucocl)
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(trucocl)
 	MDRV_VIDEO_START(trucocl)

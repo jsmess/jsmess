@@ -1557,7 +1557,7 @@ static void ip22_chdcd_getinfo(const device_class *devclass, UINT32 state, union
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default: cdrom_device_getinfo(devclass, state, info); break;
 	}
@@ -1570,7 +1570,7 @@ static void ip22_harddisk_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		default: harddisk_device_getinfo(devclass, state, info); break;
 	}
@@ -1587,7 +1587,7 @@ static MACHINE_DRIVER_START( ip225015 )
 	MDRV_NVRAM_HANDLER( ip22 )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)

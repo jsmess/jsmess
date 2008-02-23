@@ -24,7 +24,7 @@ PALETTE_INIT( ambush )
 {
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors; i++)
+	for (i = 0;i < machine->config->total_colors; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -95,7 +95,7 @@ VIDEO_UPDATE( ambush )
 	int offs;
 
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 
 	/* Draw the background priority characters */

@@ -244,7 +244,7 @@ static WRITE8_HANDLER( zvideoram_w )
 		for (i = 0; i < 8; i++)
 		{
 			if (x >= 0 && y < tmpbitmap->width)
-				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)?Machine->pens[col]:Machine->pens[0];
+				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)? col : 0;
 			x++;
 			data >>= 1;
 		}
@@ -310,7 +310,7 @@ static WRITE8_HANDLER(spaceg_colorram_w)
 		for (i = 0; i < 8; i++)
 		{
 			if (x >= 0 && x < tmpbitmap->width)
-				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)?Machine->pens[col]:Machine->pens[0];
+				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)? col : 0;
 			x++;
 			data >>= 1;
 		}
@@ -416,14 +416,14 @@ static MACHINE_DRIVER_START( spaceg )
 	MDRV_CPU_PROGRAM_MAP(readwritemem,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)	/* 60 Hz NMIs (verified) */
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1-3*8)
+
 	MDRV_PALETTE_LENGTH(16+128-16)
 	MDRV_PALETTE_INIT( spaceg )
 	MDRV_VIDEO_START(generic_bitmapped)

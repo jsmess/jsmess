@@ -73,12 +73,14 @@ static void *tms5220_start(int sndindex, int clock, const void *config)
 }
 
 
+#if (HAS_TMC0285) && (HAS_TMS5200)
 static void *tms5200_start(int sndindex, int clock, const void *config)
 {
 	struct tms5220_info *info = tms5220_start(sndindex, clock, config);
 	tms5220_set_variant(info->chip, variant_tmc0285);
 	return info;
 }
+#endif /* (HAS_TMC0285) && (HAS_TMS5200) */
 
 
 
@@ -269,6 +271,7 @@ void tms5220_get_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
+#if (HAS_TMC0285)
 void tmc0285_get_info(void *token, UINT32 state, sndinfo *info)
 {
 	switch (state)
@@ -278,7 +281,9 @@ void tmc0285_get_info(void *token, UINT32 state, sndinfo *info)
 		default: 										tms5220_get_info(token, state, info);	break;
 	}
 }
+#endif
 
+#if (HAS_TMS5200)
 void tms5200_get_info(void *token, UINT32 state, sndinfo *info)
 {
 	switch (state)
@@ -288,4 +293,4 @@ void tms5200_get_info(void *token, UINT32 state, sndinfo *info)
 		default: 										tms5220_get_info(token, state, info);	break;
 	}
 }
-
+#endif

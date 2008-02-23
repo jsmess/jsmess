@@ -84,22 +84,22 @@ VIDEO_UPDATE( pet )
 }
 
 
-void pet40_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+void pet40_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
 					  UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
-		drawgfx( bitmap, Machine->gfx[pet_font], videoram[(ma+i)&0x3ff], 0, 0, 0, 8 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+		drawgfx( bitmap, machine->gfx[pet_font], videoram[(ma+i)&0x3ff], 0, 0, 0, 8 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 	}
 }
 
-void pet80_update_row(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
+void pet80_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
 					  UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
-		drawgfx( bitmap, Machine->gfx[pet_font], videoram[((ma+i)<<1)&0x7ff], 0, 0, 0, 16 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
-		drawgfx( bitmap, Machine->gfx[pet_font], videoram[(((ma+i)<<1)+1)&0x7ff], 0, 0, 0, 16 * i + 8, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+		drawgfx( bitmap, machine->gfx[pet_font], videoram[((ma+i)<<1)&0x7ff], 0, 0, 0, 16 * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
+		drawgfx( bitmap, machine->gfx[pet_font], videoram[(((ma+i)<<1)+1)&0x7ff], 0, 0, 0, 16 * i + 8, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 	}
 }
 

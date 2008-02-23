@@ -44,8 +44,8 @@ static MACHINE_DRIVER_START( gamepock )
 
 	MDRV_MACHINE_RESET( gamepock )
 
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 75, 64 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 74, 0, 63 )
@@ -81,11 +81,11 @@ static DEVICE_LOAD(gamepock_cart) {
 
 static void gamepock_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
 	switch( state ) {
-	case DEVINFO_INT_COUNT:										info->i = 1; break;
-	case DEVINFO_INT_MUST_BE_LOADED:							info->i = 0; break;
-	case DEVINFO_PTR_INIT:										info->init = device_init_gamepock_cart; break;
-	case DEVINFO_PTR_LOAD:										info->load = device_load_gamepock_cart; break;
-	case DEVINFO_STR_FILE_EXTENSIONS:							strcpy( info->s = device_temp_str(), "bin" ); break;
+	case MESS_DEVINFO_INT_COUNT:										info->i = 1; break;
+	case MESS_DEVINFO_INT_MUST_BE_LOADED:							info->i = 0; break;
+	case MESS_DEVINFO_PTR_INIT:										info->init = device_init_gamepock_cart; break;
+	case MESS_DEVINFO_PTR_LOAD:										info->load = device_load_gamepock_cart; break;
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:							strcpy( info->s = device_temp_str(), "bin" ); break;
 	default:													cartslot_device_getinfo(devclass, state, info); break;
 	}
 }

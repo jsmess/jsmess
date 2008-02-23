@@ -1159,7 +1159,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_MACHINE_RESET(pc_mda)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1167,7 +1167,6 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_SCREEN_VISIBLE_AREA(0,80*9-1, 0,25*14-1)
 	MDRV_GFXDECODE(pc_mda)
 	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / sizeof(cga_palette[0]))
-	MDRV_COLORTABLE_LENGTH(sizeof(mda_colortable) / sizeof(mda_colortable[0]))
 	MDRV_PALETTE_INIT(pc_mda)
 
 	MDRV_VIDEO_START(pc_mda)
@@ -1229,7 +1228,6 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_MACHINE_RESET(pc_aga)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1237,7 +1235,6 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_SCREEN_VISIBLE_AREA(0,80*9-1, 0,25*14-1)
 	MDRV_GFXDECODE(europc)
 	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / sizeof(cga_palette[0]))
-	MDRV_COLORTABLE_LENGTH((sizeof(cga_colortable)+sizeof(mda_colortable) )/sizeof(cga_colortable[0]))
 	MDRV_PALETTE_INIT(pc_aga)
 
 	MDRV_VIDEO_START(pc_aga)
@@ -1295,7 +1292,6 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_MACHINE_RESET(pc_aga)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1303,7 +1299,6 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1, 0,25*14-1)
 	MDRV_GFXDECODE(aga)
 	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / sizeof(cga_palette[0]))
-	MDRV_COLORTABLE_LENGTH((sizeof(cga_colortable)+sizeof(mda_colortable) )/sizeof(cga_colortable[0]))
 	MDRV_PALETTE_INIT(pc_aga)
 
 	MDRV_VIDEO_START(pc200)	/* PC200 needs its own video init */
@@ -1681,10 +1676,10 @@ static void ibmpc_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc; break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc; break;
 
 		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
@@ -1696,7 +1691,7 @@ static void ibmpc_printer_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 3; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 3; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}
@@ -1708,7 +1703,7 @@ static void ibmpc_harddisk_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		default:										harddisk_device_getinfo(devclass, state, info); break;
 	}

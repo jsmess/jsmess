@@ -327,6 +327,7 @@ static MACHINE_DRIVER_START( svi318 )
 
 	/* Video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -365,13 +366,12 @@ static MACHINE_DRIVER_START( svi328_806 )
 	/* Video hardware */
 	MDRV_DEFAULT_LAYOUT( layout_sv328806 )
 
-	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_ADD("svi806", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)	/* 2 additional entries for monochrome svi806 output */
 
-	MDRV_SCREEN_ADD("svi806", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -471,7 +471,7 @@ static void svi318_printer_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:
+		case MESS_DEVINFO_INT_COUNT:
 			info->i = 1;
 			break;
 
@@ -487,12 +487,12 @@ static void svi318_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:
+		case MESS_DEVINFO_INT_COUNT:
 			info->i = 1;
 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_FORMATS:
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
 			info->p = (void *) svi_cassette_formats;
 			break;
 
@@ -508,23 +508,23 @@ static void svi318_cartslot_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:
+		case MESS_DEVINFO_INT_COUNT:
 			info->i = 1;
 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:
+		case MESS_DEVINFO_PTR_INIT:
 			info->init = device_init_svi318_cart;
 			break;
-		case DEVINFO_PTR_LOAD:
+		case MESS_DEVINFO_PTR_LOAD:
 			info->load = device_load_svi318_cart;
 			break;
-		case DEVINFO_PTR_UNLOAD:
+		case MESS_DEVINFO_PTR_UNLOAD:
 			info->unload = device_unload_svi318_cart;
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 			strcpy(info->s = device_temp_str(), "rom");
 			break;
 
@@ -540,17 +540,17 @@ static void svi318_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:
+		case MESS_DEVINFO_INT_COUNT:
 			info->i = 2;
 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:
+		case MESS_DEVINFO_PTR_LOAD:
 			info->load = device_load_svi318_floppy;
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 			strcpy(info->s = device_temp_str(), "dsk");
 			break;
 

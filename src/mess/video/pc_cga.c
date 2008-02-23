@@ -166,13 +166,11 @@ static GFXDECODE_START( CGA )
 GFXDECODE_END
 
 MACHINE_DRIVER_START( pcvideo_cga )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*8, 25*8)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1, 0,25*8-1)
 	MDRV_GFXDECODE(CGA)
 	MDRV_PALETTE_LENGTH(sizeof(cga_palette) / (CGA_PALETTE_SETS * sizeof(cga_palette[0])))
-	MDRV_COLORTABLE_LENGTH(sizeof(cga_colortable) / sizeof(cga_colortable[0]))
 
 	MDRV_PALETTE_INIT(pc_cga)
 	MDRV_VIDEO_START(pc_cga)
@@ -240,15 +238,12 @@ static int cga_blinkthisframe(void);
 /* Initialise the cga palette */
 static PALETTE_INIT( pc_cga )
 {
-	memcpy(colortable, cga_colortable, sizeof(cga_colortable));
 }
 
 
 
 void pc_cga_cursor(struct mscrtc6845_cursor *cursor)
 {
-	if (dirtybuffer && (videoram_size > cursor->pos*2))
-		dirtybuffer[cursor->pos*2]=1;
 }
 
 
@@ -283,7 +278,7 @@ static VIDEO_START( pc_cga )
 	 * Plantronics chipset.
 	 * TODO: Cards which don't support Plantronics should repeat at
 	 * BC000h */
-	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -365,7 +360,6 @@ static void pc_cga_check_palette(void)
 					     cga_palette[i + p][1],
 					     cga_palette[i + p][2]);
 		cga.palette = p;
-		if (dirtybuffer) memset(dirtybuffer, 1, videoram_size);
 	}
 }
 
@@ -384,11 +378,6 @@ static void pc_cga_mode_control_w(int data)
 	/* CGA composite: Switching between mono & colour behaves like a
 	 * mode change */
 	if(CGA_MONITOR == CGA_MONITOR_COMPOSITE) mask = 0x3F;
-
-	if ((cga.mode_control ^ data) & mask)    /* text/gfx/width change */
-	{
-		if (dirtybuffer) memset(dirtybuffer, 1, videoram_size);
-	}
 	cga.mode_control = data;
 }
 
@@ -403,7 +392,6 @@ static void pc_cga_color_select_w(int data)
 	if( cga.color_select == data )
 		return;
 	cga.color_select = data;
-	if (dirtybuffer) memset(dirtybuffer, 1, videoram_size);
 }
 
 
@@ -420,7 +408,6 @@ static void pc_cga_plantronics_w(int data)
 	data &= 0x70;	/* Only bits 6-4 are used */
 	if (cga.plantronics == data) return;
 	cga.plantronics = data;
-	if (dirtybuffer) memset(dirtybuffer, 1, videoram_size);
 }
 
 
@@ -481,10 +468,7 @@ WRITE8_HANDLER( pc_cga8_w )
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
 	case 1: case 3: case 5: case 7:
-		if (mscrtc6845_port_w(mscrtc6845, offset, data))
-		{
-			if (dirtybuffer) memset(dirtybuffer, 1, videoram_size);
-		}
+		mscrtc6845_port_w(mscrtc6845, offset, data);
 		break;
 	case 8:
 		pc_cga_mode_control_w(data);
@@ -533,36 +517,30 @@ static void cga_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;
 			 sx++, offs=(offs+2)&0x3fff, r.min_x+=8, r.max_x+=8)
 		{
-			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1])
-			{
-				drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], videoram[offs+1],
-						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-				if (height > 16)
-				{
-					r.min_y+=16;
-					drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], videoram[offs+1],
+			drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], videoram[offs+1],
 					0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-					r.min_y-=16;
-				}
+			if (height > 16)
+			{
+				r.min_y+=16;
+				drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], videoram[offs+1],
+				0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
+				r.min_y-=16;
+			}
 
-				if (cursor.on && cga_blinkthisframe() && (offs==cursor.pos*2))
+			if (cursor.on && cga_blinkthisframe() && (offs==cursor.pos*2))
+			{
+				int k=height-cursor.top;
+				if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
+
+				if (k>0)
 				{
-					int k=height-cursor.top;
-					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
-
-					if (k>0)
-					{
-						plot_box(bitmap, r.min_x,
-								 r.min_y+cursor.top,
-								 8, k, Machine->pens[7]);
-					}
+					plot_box(bitmap, r.min_x,
+							 r.min_y+cursor.top,
+							 8, k, Machine->pens[7]);
 				}
-
 			}
 		}
 	}
-	if (dirtybuffer)
-		memset(dirtybuffer, 0, videoram_size);
 }
 
 
@@ -597,25 +575,19 @@ static void cga_text_inten_alt(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;
 			 sx++, offs=(offs+2)&0x3fff, r.min_x+=8, r.max_x+=8)
 		{
-			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1])
+			drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], (videoram[offs+1] & 15),
+					0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
+			if (cursor.on && cga_blinkthisframe() && (offs==cursor.pos*2))
 			{
-				drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], (videoram[offs+1] & 15),
-						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-				if (cursor.on && cga_blinkthisframe() && (offs==cursor.pos*2))
+				int k=height-cursor.top;
+				if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
+
+				if (k>0)
 				{
-					int k=height-cursor.top;
-					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
-
-					if (k>0)
-					{
-						plot_box(bitmap, r.min_x,
-								 r.min_y+cursor.top,
-								 8, k, Machine->pens[7]);
-					}
+					plot_box(bitmap, r.min_x,
+							 r.min_y+cursor.top,
+							 8, k, Machine->pens[7]);
 				}
-
-				if (dirtybuffer)
-					dirtybuffer[offs] = dirtybuffer[offs+1] = 0;
 			}
 		}
 	}
@@ -649,47 +621,40 @@ static void cga_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;
 			 sx++, offs=(offs+2)&0x3fff, r.min_x+=8, r.max_x+=8)
 		{
-			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1])
+			int attr = videoram[offs+1];
+
+			if (attr & 0x80)	/* blinking ? */
 			{
+				if (cga.pc_blink)
+					attr = (attr & 0x70) | ((attr & 0x70) >> 4);
+				else
+					attr = attr & 0x7f;
+			}
 
-				int attr = videoram[offs+1];
+			drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], attr,
+					0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
+			if (height>16)
+			{
+				r.min_y+=16;
+				drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], videoram[offs+1],
+					0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
+				r.min_y-=16;
+			}
 
-				if (attr & 0x80)	/* blinking ? */
+			if (cursor.on && cga_blinkthisframe() && (offs==cursor.pos*2))
+			{
+				int k=height-cursor.top;
+				if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
+
+				if (k > 0)
 				{
-					if (cga.pc_blink)
-						attr = (attr & 0x70) | ((attr & 0x70) >> 4);
-					else
-						attr = attr & 0x7f;
+					plot_box(bitmap, r.min_x,
+							 r.min_y+cursor.top,
+							 8, k, Machine->pens[7]);
 				}
-
-				drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], attr,
-						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-				if (height>16)
-				{
-					r.min_y+=16;
-					drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], videoram[offs+1],
-						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
- 					r.min_y-=16;
-				}
-
-				if (cursor.on && cga_blinkthisframe() && (offs==cursor.pos*2))
-				{
-					int k=height-cursor.top;
-					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
-
-					if (k > 0)
-					{
-						plot_box(bitmap, r.min_x,
-								 r.min_y+cursor.top,
-								 8, k, Machine->pens[7]);
-					}
-				}
-
 			}
 		}
 	}
-	if (dirtybuffer)
-		memset(dirtybuffer, 0, videoram_size);
 }
 
 
@@ -727,34 +692,27 @@ static void cga_text_blink_alt(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 		for (sx=0, r.min_x=0, r.max_x=7; sx<columns;
 			 sx++, offs=(offs+2)&0x3fff, r.min_x+=8, r.max_x+=8)
 		{
-			if (!dirtybuffer || dirtybuffer[offs] || dirtybuffer[offs+1])
+			int attr = videoram[offs+1];
+
+			if ((attr & 0x80) && cga.pc_blink)	/* blinking ? */
+				attr = (attr & 0x70) >> 4;
+			else
+				attr = attr & 0x0F;
+
+			drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], attr,
+					0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
+
+			if (cga_blinkthisframe() && (offs==cursor.pos*2))
 			{
+				int k=height-cursor.top;
+				if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
 
-				int attr = videoram[offs+1];
-
-				if ((attr & 0x80) && cga.pc_blink)	/* blinking ? */
-					attr = (attr & 0x70) >> 4;
-				else
-					attr = attr & 0x0F;
-
-				drawgfx(bitmap, Machine->gfx[CGA_FONT], videoram[offs], attr,
-						0,0,r.min_x,r.min_y,&r,TRANSPARENCY_NONE,0);
-
-				if (cga_blinkthisframe() && (offs==cursor.pos*2))
+				if (k > 0)
 				{
-					int k=height-cursor.top;
-					if (cursor.bottom<height) k=cursor.bottom-cursor.top+1;
-
-					if (k > 0)
-					{
-						plot_box(bitmap, r.min_x,
-								 r.min_y+cursor.top,
-								 8, k, Machine->pens[7]);
-					}
+					plot_box(bitmap, r.min_x,
+							 r.min_y+cursor.top,
+							 8, k, Machine->pens[7]);
 				}
-
-				if (dirtybuffer)
-					dirtybuffer[offs]=dirtybuffer[offs+1]=0;
 			}
 		}
 	}
@@ -858,24 +816,14 @@ static void cga_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc, int scale
 			{
 				for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
 				{
-					if (!dirtybuffer || dirtybuffer[i])
-					{
-						cga_plot_unit_4bpp(bitmap, sx*scale, sy*height+sh, i, scale/2);
-						if (dirtybuffer)
-							dirtybuffer[i]=0;
-					}
+					cga_plot_unit_4bpp(bitmap, sx*scale, sy*height+sh, i, scale/2);
 				}
 			}
 			else
 			{
 				for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
 				{
-					if (!dirtybuffer || dirtybuffer[i])
-					{
-						cga_plot_unit_4bpp(bitmap, sx*scale, sy*height+sh, i, scale/2);
-						if (dirtybuffer)
-							dirtybuffer[i]=0;
-					}
+					cga_plot_unit_4bpp(bitmap, sx*scale, sy*height+sh, i, scale/2);
 				}
 			}
 		}
@@ -957,24 +905,14 @@ static void cga_pgfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 			{
 				for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
 				{
-					if (!dirtybuffer || dirtybuffer[i])
-					{
-						pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
-						if (dirtybuffer)
-							dirtybuffer[i]=0;
-					}
+					pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
 				}
 			}
 			else
 			{
 				for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
 				{
-					if (!dirtybuffer || dirtybuffer[i])
-					{
-						pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
-						if (dirtybuffer)
-							dirtybuffer[i]=0;
-					}
+					pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
 				}
 			}
 		}
@@ -1074,24 +1012,14 @@ static void cga_pgfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 			if (!(sh&1)) { // char line 0 used as a12 line in graphic mode
 				for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
 				{
-					if (!dirtybuffer || dirtybuffer[i])
-					{
-						pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
-						if (dirtybuffer)
-							dirtybuffer[i]=0;
-					}
+					pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
 				}
 			}
 			else
 			{
 				for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
 				{
-					if (!dirtybuffer || dirtybuffer[i])
-					{
-						pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
-						if (dirtybuffer)
-							dirtybuffer[i]=0;
-					}
+					pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
 				}
 			}
 		}
@@ -1155,28 +1083,20 @@ static void pc1512_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 			{
 				for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
 				{
-					if (!dirtybuffer || dirtybuffer[i])
-					{
-						pc1512_plot_unit(bitmap, sx*8, sy*height+sh, i);
-					}
+					pc1512_plot_unit(bitmap, sx*8, sy*height+sh, i);
 				}
 			}
 			else
 			{
 				for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
 				{
-					if (!dirtybuffer || dirtybuffer[i])
-					{
-						pc1512_plot_unit(bitmap, sx*8, sy*height+sh, i);
-					}
+					pc1512_plot_unit(bitmap, sx*8, sy*height+sh, i);
 				}
 			}
 		}
 		if (sy*height >= bitmap->height)
 			break;
 	}
-	if (dirtybuffer)
-		memset(dirtybuffer, 0, videoram_size);
 }
 
 
@@ -1187,22 +1107,13 @@ static void pc1512_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 static void pc_cga_blink_textcolors(int on)
 {
-	int i, offs, size;
+	int offs, size;
 
 	if (cga.pc_blink == on) return;
 
     cga.pc_blink = on;
 	offs = (mscrtc6845_get_start(mscrtc6845)*2) & 0x3fff;
 	size = mscrtc6845_get_char_lines(mscrtc6845)*mscrtc6845_get_char_columns(mscrtc6845);
-
-	if (dirtybuffer)
-	{
-		for (i = 0; i < size; i++)
-		{
-			if (videoram[offs+1] & 0x80) dirtybuffer[offs+1] = 1;
-			offs=(offs+2)&0x3fff;
-	    }
-	}
 }
 
 
@@ -1397,9 +1308,6 @@ static WRITE8_HANDLER ( pc1512_videoram_w )
 		videoram[offset+videoram_offset[2]] = data; /* red */
 	if (pc1512.write & 8)
 		videoram[offset+videoram_offset[3]] = data; /* intensity (text, 4color) */
-
-	if (dirtybuffer)
-		dirtybuffer[offset] = 1;
 }
 
 

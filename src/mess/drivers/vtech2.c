@@ -434,17 +434,7 @@ static const rgb_t vt_palette[] =
 /* Initialise the palette */
 static PALETTE_INIT( vtech2 )
 {
-	int i;
-
 	palette_set_colors(machine, 0, vt_palette, ARRAY_LENGTH(vt_palette));
-
-	for (i = 0; i < 256; i++)
-	{
-		colortable[2*i] = i%16;
-		colortable[2*i+1] = i/16;
-	}
-	for (i = 0; i < 16; i++)
-		colortable[2*256+i] = i;
 }
 
 static INTERRUPT_GEN( vtech2_interrupt )
@@ -458,6 +448,7 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_CPU_PROGRAM_MAP(vtech2_mem, 0)
 	MDRV_CPU_IO_MAP(vtech2_io, 0)
 	MDRV_CPU_VBLANK_INT(vtech2_interrupt, 1)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
@@ -465,13 +456,11 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_MACHINE_RESET( laser350 )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(88*8, 24*8+32)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
 	MDRV_GFXDECODE( vtech2 )
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(vt_palette))
-	MDRV_COLORTABLE_LENGTH(256*2+16)
 	MDRV_PALETTE_INIT(vtech2)
 
 	MDRV_VIDEO_START(laser)
@@ -539,10 +528,10 @@ static void laser_cassette_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) vtech2_cassette_formats; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) vtech2_cassette_formats; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
@@ -554,14 +543,14 @@ static void laser_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_laser_cart; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_laser_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_laser_cart; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_laser_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -573,17 +562,17 @@ static void laser_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_laser_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_laser_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 	}
 }
 

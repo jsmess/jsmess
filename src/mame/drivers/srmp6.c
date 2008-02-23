@@ -127,7 +127,7 @@ static VIDEO_START(srmp6)
 {
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[0] = allocgfx(&tiles8x8_layout);
-	machine->gfx[0]->total_colors = machine->drv->total_colors / 256;
+	machine->gfx[0]->total_colors = machine->config->total_colors / 256;
 	machine->gfx[0]->color_granularity=256;
 
 	tileram = auto_malloc(0x100000*16);
@@ -711,13 +711,14 @@ static MACHINE_DRIVER_START( srmp6 )
 	MDRV_CPU_PROGRAM_MAP(srmp6,0)
 	MDRV_CPU_VBLANK_INT(srmp6_interrupt,2)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
+
 	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(srmp6)

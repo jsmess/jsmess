@@ -97,7 +97,6 @@ static const unsigned char kc85_palette[KC85_PALETTE_SIZE * 3] =
 PALETTE_INIT( kc85 )
 {
 	palette_set_colors_rgb(machine, 0, kc85_palette, sizeof(kc85_palette) / 3);
-	memcpy(colortable, kc85_colour_table, sizeof (kc85_colour_table));
 }
 
 static int kc85_blink_state;

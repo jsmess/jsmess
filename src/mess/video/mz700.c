@@ -29,12 +29,6 @@ PALETTE_INIT( mz700 )
 	{
 		palette_set_color_rgb(machine, i, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00);
 	}
-
-	for (i = 0; i < 256; i++)
-	{
-		colortable[i*2+0] = i & 7;
-        colortable[i*2+1] = (i >> 4) & 7;
-	}
 }
 
 

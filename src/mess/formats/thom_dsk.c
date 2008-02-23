@@ -915,58 +915,58 @@ void thom_floppy_getinfo( const device_class *devclass, UINT32 state, union devi
 {
 	switch ( state )
 	{
-	case DEVINFO_INT_TYPE:
+	case MESS_DEVINFO_INT_TYPE:
 		info->i = IO_FLOPPY;
 		break;
-	case DEVINFO_INT_READABLE:
+	case MESS_DEVINFO_INT_READABLE:
 		info->i = 1;
 		break;
-	case DEVINFO_INT_WRITEABLE:
+	case MESS_DEVINFO_INT_WRITEABLE:
 		info->i = 1;
 		break;
-	case DEVINFO_INT_CREATABLE:
+	case MESS_DEVINFO_INT_CREATABLE:
 		info->i = 1;
 		break;
-	case DEVINFO_PTR_INIT:
+	case MESS_DEVINFO_PTR_INIT:
 		info->init = thom_floppy_init;
 		break;
-	case DEVINFO_PTR_LOAD:
+	case MESS_DEVINFO_PTR_LOAD:
 		info->load = thom_floppy_load;
 		break;
-	case DEVINFO_PTR_UNLOAD:
+	case MESS_DEVINFO_PTR_UNLOAD:
 		info->unload = thom_floppy_unload;
 		break;
-	case DEVINFO_PTR_CREATE:
+	case MESS_DEVINFO_PTR_CREATE:
 		info->create = thom_floppy_create;
 		break;
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 4;
 		break;
-	case DEVINFO_STR_NAME+0:
-	case DEVINFO_STR_NAME+1:
-	case DEVINFO_STR_NAME+2:
-	case DEVINFO_STR_NAME+3:
+	case MESS_DEVINFO_STR_NAME+0:
+	case MESS_DEVINFO_STR_NAME+1:
+	case MESS_DEVINFO_STR_NAME+2:
+	case MESS_DEVINFO_STR_NAME+3:
 		strcpy( info->s = device_temp_str(), "floppydisk0" );
-		info->s[ strlen( info->s ) - 1 ] += state - DEVINFO_STR_NAME;
+		info->s[ strlen( info->s ) - 1 ] += state - MESS_DEVINFO_STR_NAME;
 		break;
-	case DEVINFO_STR_SHORT_NAME+0:
-	case DEVINFO_STR_SHORT_NAME+1:
-	case DEVINFO_STR_SHORT_NAME+2:
-	case DEVINFO_STR_SHORT_NAME+3:
+	case MESS_DEVINFO_STR_SHORT_NAME+0:
+	case MESS_DEVINFO_STR_SHORT_NAME+1:
+	case MESS_DEVINFO_STR_SHORT_NAME+2:
+	case MESS_DEVINFO_STR_SHORT_NAME+3:
 		strcpy( info->s = device_temp_str(), "flop0");
-		info->s[ strlen( info->s ) - 1 ] += state - DEVINFO_STR_SHORT_NAME;
+		info->s[ strlen( info->s ) - 1 ] += state - MESS_DEVINFO_STR_SHORT_NAME;
 		break;
-	case DEVINFO_STR_DESCRIPTION+0:
-	case DEVINFO_STR_DESCRIPTION+1:
-	case DEVINFO_STR_DESCRIPTION+2:
-	case DEVINFO_STR_DESCRIPTION+3:
+	case MESS_DEVINFO_STR_DESCRIPTION+0:
+	case MESS_DEVINFO_STR_DESCRIPTION+1:
+	case MESS_DEVINFO_STR_DESCRIPTION+2:
+	case MESS_DEVINFO_STR_DESCRIPTION+3:
 		strcpy( info->s = device_temp_str(), "Floppy #0" );
-		info->s[ strlen( info->s ) - 1 ] += state - DEVINFO_STR_DESCRIPTION;
+		info->s[ strlen( info->s ) - 1 ] += state - MESS_DEVINFO_STR_DESCRIPTION;
 		break;
-	case DEVINFO_STR_DEV_FILE:
+	case MESS_DEVINFO_STR_DEV_FILE:
 		strcpy( info->s = device_temp_str(), __FILE__ );
 		break;
-	case DEVINFO_STR_FILE_EXTENSIONS:
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy( info->s = device_temp_str(), "fd,qd,sap" );
 		break;
 	}

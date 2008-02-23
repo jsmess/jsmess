@@ -37,7 +37,7 @@ static int bitbanger_init(mess_image *img)
 	const struct IODevice *dev;
 
 	dev = image_device(img);
-	config = (const struct bitbanger_config *) device_get_info_ptr(&dev->devclass, DEVINFO_PTR_BITBANGER_CONFIG);
+	config = (const struct bitbanger_config *) mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_BITBANGER_CONFIG);
 
 	bi = (struct bitbanger_info *) auto_malloc(sizeof(struct bitbanger_info));
 	bi->pulses = (double *) auto_malloc(config->maximum_pulses * sizeof(double));
@@ -162,16 +162,16 @@ void bitbanger_device_getinfo(const device_class *devclass, UINT32 state, union 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:						info->i = IO_BITBANGER; break;
-		case DEVINFO_INT_READABLE:					info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:					info->i = 1; break;
-		case DEVINFO_INT_CREATABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:						info->i = IO_BITBANGER; break;
+		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:						info->init = bitbanger_init; break;
+		case MESS_DEVINFO_PTR_INIT:						info->init = bitbanger_init; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
-		case DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "prn"); break;
+		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "prn"); break;
 	}
 }

@@ -215,7 +215,7 @@ static PALETTE_INIT( esh )
 	int i;
 
 	/* Oddly enough, the top 4 bits of each byte is 0 */
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		int r,g,b;
 		int bit0,bit1,bit2;
@@ -292,11 +292,11 @@ static MACHINE_DRIVER_START( esh )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 /*  video */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 

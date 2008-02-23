@@ -612,10 +612,6 @@ PALETTE_INIT( pc8801 )
 			(i & 2) ? 0xff : 0x00,
 			(i & 4) ? 0xff : 0x00,
 			(i & 1) ? 0xff : 0x00);
-		colortable[i*2+0] = 0;
-		colortable[i*2+1] = i+8;
-		colortable[(i+8)*2+0] = i+8;
-		colortable[(i+8)*2+1] = 0;
 	}
 
 	/* for background and scanline */

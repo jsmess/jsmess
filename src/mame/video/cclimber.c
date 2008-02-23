@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
+#include "includes/cclimber.h"
 
 
 UINT8 *cclimber_bsvideoram;
@@ -49,7 +50,7 @@ PALETTE_INIT( cclimber )
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
 
-	for (i = 0;i < machine->drv->total_colors; i++)
+	for (i = 0;i < machine->config->total_colors; i++)
 	{
 		UINT8 data;
 		int bit0, bit1, bit2;

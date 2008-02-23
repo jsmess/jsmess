@@ -220,13 +220,7 @@ static const UINT8 palette[] =
 
 static PALETTE_INIT( mbee )
 {
-	int i;
 	palette_set_colors_rgb(machine, 0, palette, sizeof(palette) / 3);
-	for( i = 0; i < 256; i++ )
-	{
-		colortable[2*i+0] = i / 32;
-		colortable[2*i+1] = i & 31;
-	}
 }
 
 static const struct z80_irq_daisy_chain mbee_daisy_chain[] =
@@ -250,14 +244,13 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_MACHINE_START( mbee )
 
 	MDRV_GFXDECODE(mbee)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(70*8, 310)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 70*8-1, 0, 19*16-1)
 	MDRV_PALETTE_LENGTH(sizeof(palette)/sizeof(palette[0])/3)
-	MDRV_COLORTABLE_LENGTH(256 * 2)
 	MDRV_PALETTE_INIT(mbee)
 
 	MDRV_VIDEO_START(mbee)
@@ -322,7 +315,7 @@ static void mbee_cassette_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
@@ -334,13 +327,13 @@ static void mbee_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_mbee_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_mbee_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -352,13 +345,13 @@ static void mbee_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_basicdsk_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_basicdsk_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}

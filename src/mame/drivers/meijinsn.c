@@ -230,7 +230,7 @@ static PALETTE_INIT( meijinsn )
 			3,	resistances_rg,	weights_g,	0,	1000+1000,
 			2,	resistances_b,	weights_b,	0,	1000+1000);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -312,16 +312,16 @@ static MACHINE_DRIVER_START( meijinsn )
 	MDRV_CPU_IO_MAP(meijinsn_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 160)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(meijinsn)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(12, 243, 2*8, 30*8-1)
+
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(meijinsn)
 

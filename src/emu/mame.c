@@ -265,7 +265,7 @@ extern int mame_validitychecks(const game_driver *driver);
 static int parse_ini_file(core_options *options, const char *name);
 
 static running_machine *create_machine(const game_driver *driver);
-static void reset_machine(running_machine *machine);
+static void prepare_machine(running_machine *machine);
 static void destroy_machine(running_machine *machine);
 static void init_machine(running_machine *machine);
 static TIMER_CALLBACK( soft_reset );
@@ -330,7 +330,7 @@ int mame_execute(core_options *options)
 
 		/* create the machine structure and driver */
 		machine = create_machine(driver);
-		reset_machine(machine);
+		prepare_machine(machine);
 		mame = machine->mame_data;
 
 		/* start in the "pre-init phase" */
@@ -1280,7 +1280,7 @@ int mame_find_cpu_index(running_machine *machine, const char *tag)
 	int cpunum;
 
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		if (machine->drv->cpu[cpunum].tag && strcmp(machine->drv->cpu[cpunum].tag, tag) == 0)
+		if (machine->config->cpu[cpunum].tag && strcmp(machine->config->cpu[cpunum].tag, tag) == 0)
 			return cpunum;
 
 	return -1;
@@ -1329,15 +1329,22 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 	{
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
+		const device_config *device;
+		machine_config *config;
 		astring *sourcename;
-		machine_config drv;
-
-		/* expand the machine driver to look at the info */
-		expand_machine_driver(driver->drv, &drv);
 
 		/* parse "vector.ini" for vector games */
-		if (drv.video_attributes & VIDEO_TYPE_VECTOR)
-			parse_ini_file(options, "vector");
+		config = machine_config_alloc(driver->drv);
+		for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
+		{
+			const screen_config *scrconfig = device->inline_config;
+			if (scrconfig->type == SCREEN_TYPE_VECTOR)
+			{
+				parse_ini_file(options, "vector");
+				break;
+			}
+		}
+		machine_config_free(config);
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
 		sourcename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
@@ -1411,16 +1418,13 @@ static running_machine *create_machine(const game_driver *driver)
 
 	/* initialize the driver-related variables in the machine */
 	machine->gamedrv = driver;
-	machine->drv = malloc(sizeof(*machine->drv));
-	if (machine->drv == NULL)
-		goto error;
-	machine->basename = mame_strdup(machine->gamedrv->name);
-	expand_machine_driver(machine->gamedrv->drv, (machine_config *)machine->drv);
+	machine->basename = mame_strdup(driver->name);
+	machine->config = machine_config_alloc(driver->drv);
 
 	/* allocate the driver data */
-	if (machine->drv->driver_data_size != 0)
+	if (machine->config->driver_data_size != 0)
 	{
-		machine->driver_data = malloc(machine->drv->driver_data_size);
+		machine->driver_data = malloc(machine->config->driver_data_size);
 		if (machine->driver_data == NULL)
 			goto error;
 	}
@@ -1429,8 +1433,8 @@ static running_machine *create_machine(const game_driver *driver)
 error:
 	if (machine->driver_data != NULL)
 		free(machine->driver_data);
-	if (machine->drv != NULL)
-		free((machine_config *)machine->drv);
+	if (machine->config != NULL)
+		machine_config_free((machine_config *)machine->config);
 	if (machine->mame_data != NULL)
 		free(machine->mame_data);
 	if (machine != NULL)
@@ -1440,25 +1444,27 @@ error:
 
 
 /*-------------------------------------------------
-    reset_machine - reset the state of the
+    prepare_machine - reset the state of the
     machine object
 -------------------------------------------------*/
 
-static void reset_machine(running_machine *machine)
+static void prepare_machine(running_machine *machine)
 {
-	int scrnum;
+	const device_config *device;
 
 	/* reset most portions of the machine */
 
 	/* video-related information */
 	memset(machine->gfx, 0, sizeof(machine->gfx));
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		machine->screen[scrnum] = machine->drv->screen[scrnum].defstate;
+	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
+	{
+		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
+		const screen_config *scrconfig = device->inline_config;
+		machine->screen[scrnum] = scrconfig->defstate;
+	}
 
 	/* palette-related information */
 	machine->pens = NULL;
-	machine->game_colortable = NULL;
-	machine->remapped_colortable = NULL;
 	machine->shadow_table = NULL;
 
 	/* audio-related information */
@@ -1483,8 +1489,8 @@ static void reset_machine(running_machine *machine)
 	machine->streams_data = NULL;
 
 	/* reset the driver data */
-	if (machine->drv->driver_data_size != 0)
-		memset(machine->driver_data, 0, machine->drv->driver_data_size);
+	if (machine->config->driver_data_size != 0)
+		memset(machine->driver_data, 0, machine->config->driver_data_size);
 }
 
 
@@ -1498,8 +1504,8 @@ static void destroy_machine(running_machine *machine)
 	assert(machine == Machine);
 	if (machine->driver_data != NULL)
 		free(machine->driver_data);
-	if (machine->drv != NULL)
-		free((machine_config *)machine->drv);
+	if (machine->config != NULL)
+		machine_config_free((machine_config *)machine->config);
 	if (machine->mame_data != NULL)
 		free(machine->mame_data);
 	if (machine->basename != NULL)
@@ -1584,10 +1590,13 @@ static void init_machine(running_machine *machine)
 	video_init(machine);
 	sound_init(machine);
 
+	/* start up the devices */
+	device_list_start(machine);
+
 	/* call the driver's _START callbacks */
-	if (machine->drv->machine_start != NULL) (*machine->drv->machine_start)(machine);
-	if (machine->drv->sound_start != NULL) (*machine->drv->sound_start)(machine);
-	if (machine->drv->video_start != NULL) (*machine->drv->video_start)(machine);
+	if (machine->config->machine_start != NULL) (*machine->config->machine_start)(machine);
+	if (machine->config->sound_start != NULL) (*machine->config->sound_start)(machine);
+	if (machine->config->video_start != NULL) (*machine->config->video_start)(machine);
 
 	/* free memory regions allocated with REGIONFLAG_DISPOSE (typically gfx roms) */
 	for (num = 0; num < MAX_MEMORY_REGIONS; num++)
@@ -1630,12 +1639,12 @@ static TIMER_CALLBACK( soft_reset )
 	cpuint_reset();
 
 	/* run the driver's reset callbacks */
-	if (machine->drv->machine_reset != NULL)
-		(*machine->drv->machine_reset)(machine);
-	if (machine->drv->sound_reset != NULL)
-		(*machine->drv->sound_reset)(machine);
-	if (machine->drv->video_reset != NULL)
-		(*machine->drv->video_reset)(machine);
+	if (machine->config->machine_reset != NULL)
+		(*machine->config->machine_reset)(machine);
+	if (machine->config->sound_reset != NULL)
+		(*machine->config->sound_reset)(machine);
+	if (machine->config->video_reset != NULL)
+		(*machine->config->video_reset)(machine);
 
 	/* call all registered reset callbacks */
 	for (cb = machine->mame_data->reset_callback_list; cb; cb = cb->next)

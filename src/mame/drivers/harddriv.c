@@ -977,10 +977,10 @@ static MACHINE_DRIVER_START( driver_nomsp )
 	MDRV_NVRAM_HANDLER(atarigen)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(4000000*4, 160*4, 0, 127*4, 417, 0, 384)
 
@@ -3425,10 +3425,10 @@ static void init_ds3(running_machine *machine)
 	memory_install_write16_handler(hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x823800, 0x823fff, 0, 0, hd68k_ds3_control_w);
 
 	/* if we have a sound DSP, boot it */
-	if (hdcpu_sound != -1 && machine->drv->cpu[hdcpu_sound].type == CPU_ADSP2105)
+	if (hdcpu_sound != -1 && machine->config->cpu[hdcpu_sound].type == CPU_ADSP2105)
 		adsp2105_load_boot_data((UINT8 *)(memory_region(REGION_CPU1 + hdcpu_sound) + 0x10000),
 								(UINT32 *)(memory_region(REGION_CPU1 + hdcpu_sound)));
-	if (hdcpu_sounddsp != -1 && machine->drv->cpu[hdcpu_sounddsp].type == CPU_ADSP2105)
+	if (hdcpu_sounddsp != -1 && machine->config->cpu[hdcpu_sounddsp].type == CPU_ADSP2105)
 		adsp2105_load_boot_data((UINT8 *)(memory_region(REGION_CPU1 + hdcpu_sounddsp) + 0x10000),
 								(UINT32 *)(memory_region(REGION_CPU1 + hdcpu_sounddsp)));
 

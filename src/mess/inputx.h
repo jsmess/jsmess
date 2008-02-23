@@ -54,23 +54,6 @@ enum
 #define PORT_CHAR(ch)	\
 	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CHAR, ch),
 
-/* config definition */
-#define PORT_CONFNAME(mask,default,name) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_CONFNAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(name),
-
-#define PORT_CONFSETTING(default,name) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CONFSETTING, default), INPUT_PORT_PTR(name),
-
-/* categories */
-#define PORT_CATEGORY(category) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY, category),
-
-#define PORT_CATEGORY_CLASS(mask,default,name) 						\
-	INPUT_PORT_UINT32(INPUT_TOKEN_CATEGORY_NAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(name),
-
-#define PORT_CATEGORY_ITEM(default,name,category) 					\
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY_SETTING, default), INPUT_PORT_PTR(name), INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY, category),
-
 
 
 /***************************************************************************

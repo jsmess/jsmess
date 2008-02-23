@@ -76,7 +76,7 @@ static int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, mess
 		/* if the region is inverted, do that now */
 		if (type >= REGION_CPU1 && type < REGION_CPU1 + MAX_CPU)
 		{
-			int cputype = Machine->drv->cpu[type - REGION_CPU1].type;
+			int cputype = Machine->config->cpu[type - REGION_CPU1].type;
 			if (cputype != 0)
 			{
 				datawidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;
@@ -197,23 +197,23 @@ void cartslot_device_getinfo(const device_class *devclass, UINT32 state, union d
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:						info->i = count; break;
-		case DEVINFO_INT_TYPE:						info->i = IO_CARTSLOT; break;
-		case DEVINFO_INT_READABLE:					info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:					info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:					info->i = 0; break;
-		case DEVINFO_INT_RESET_ON_LOAD:				info->i = 1; break;
-		case DEVINFO_INT_LOAD_AT_INIT:				info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:			info->i = must_be_loaded; break;
+		case MESS_DEVINFO_INT_COUNT:						info->i = count; break;
+		case MESS_DEVINFO_INT_TYPE:						info->i = IO_CARTSLOT; break;
+		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_RESET_ON_LOAD:				info->i = 1; break;
+		case MESS_DEVINFO_INT_LOAD_AT_INIT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:			info->i = must_be_loaded; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:						info->init = (count > 0) ? device_init_cartslot_specified : NULL; break;
-		case DEVINFO_PTR_LOAD:						info->load = (count > 0) ? device_load_cartslot_specified : NULL; break;
-		case DEVINFO_PTR_UNLOAD:					info->unload = (count > 0) ? device_unload_cartslot_specified : NULL; break;
+		case MESS_DEVINFO_PTR_INIT:						info->init = (count > 0) ? device_init_cartslot_specified : NULL; break;
+		case MESS_DEVINFO_PTR_LOAD:						info->load = (count > 0) ? device_load_cartslot_specified : NULL; break;
+		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = (count > 0) ? device_unload_cartslot_specified : NULL; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
-		case DEVINFO_STR_FILE_EXTENSIONS:
+		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 			info->s = device_temp_str();
 			strcpy(info->s, file_extensions);
 			break;

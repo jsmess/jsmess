@@ -303,13 +303,11 @@ static MACHINE_DRIVER_START(sms1ntsc)
 	MDRV_MACHINE_RESET(sms)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_53_693175MHz/10, SMS_X_PIXELS, LBORDER_START + LBORDER_X_PIXELS - 2, LBORDER_START + LBORDER_X_PIXELS + 256 + 10, NTSC_Y_PIXELS, TBORDER_START + NTSC_224_TBORDER_Y_PIXELS, TBORDER_START + NTSC_224_TBORDER_Y_PIXELS + 224)
 
 	MDRV_PALETTE_LENGTH(64+16)
-	MDRV_COLORTABLE_LENGTH(0)
 	MDRV_PALETTE_INIT(sms)
 
 	MDRV_VIDEO_START(sega_315_5124)
@@ -350,13 +348,11 @@ static MACHINE_DRIVER_START(sms1pal)
 	MDRV_MACHINE_RESET(sms)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_PAL/10, SMS_X_PIXELS, LBORDER_START + LBORDER_X_PIXELS - 2, LBORDER_START + LBORDER_X_PIXELS + 256 + 10, PAL_Y_PIXELS, TBORDER_START + PAL_240_TBORDER_Y_PIXELS, TBORDER_START + PAL_240_TBORDER_Y_PIXELS + 240)
 
 	MDRV_PALETTE_LENGTH(64+16)
-	MDRV_COLORTABLE_LENGTH(0)
 	MDRV_PALETTE_INIT(sms)
 
 	MDRV_VIDEO_START(sega_315_5124)
@@ -399,12 +395,10 @@ static MACHINE_DRIVER_START(gamegear)
 	MDRV_MACHINE_RESET(sms)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_53_693175MHz/10, SMS_X_PIXELS, LBORDER_START + LBORDER_X_PIXELS + 6*8, LBORDER_START + LBORDER_X_PIXELS + 26*8, NTSC_Y_PIXELS, TBORDER_START + NTSC_192_TBORDER_Y_PIXELS + 3*8, TBORDER_START + NTSC_192_TBORDER_Y_PIXELS + 21*8 )
 	MDRV_PALETTE_LENGTH(4096)
-	MDRV_COLORTABLE_LENGTH(0)
 	MDRV_PALETTE_INIT(gamegear)
 
 	MDRV_VIDEO_START(sega_315_5378)
@@ -511,15 +505,15 @@ static void sms_cartslot_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:				info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:		info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 0; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:				info->init = device_init_sms_cart; break;
-		case DEVINFO_PTR_LOAD:				info->load = device_load_sms_cart; break;
+		case MESS_DEVINFO_PTR_INIT:				info->init = device_init_sms_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_sms_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "sms"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "sms"); break;
 
 		default:					cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -532,7 +526,7 @@ SYSTEM_CONFIG_END
 static void sg1000_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
 	/* cartslot */
 	switch(state) {
-		case DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
 		default:					sms_cartslot_getinfo(devclass, state, info); break;
 	}
 }
@@ -543,8 +537,8 @@ SYSTEM_CONFIG_END
 
 static void smssdisp_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
 	switch(state) {
-		case DEVINFO_INT_COUNT:				info->i = 5; break;
-		case DEVINFO_INT_MUST_BE_LOADED:	info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:				info->i = 5; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:	info->i = 1; break;
 		default:					sms_cartslot_getinfo(devclass, state, info); break;
 	}
 }
@@ -558,9 +552,9 @@ static void gamegear_cartslot_getinfo(const device_class *devclass, UINT32 state
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_INT_COUNT:				info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
-		case DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "gg"); break;
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "gg"); break;
 
 		default:					sms_cartslot_getinfo(devclass, state, info); break;
 	}

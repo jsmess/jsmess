@@ -3992,6 +3992,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hmgeo )
 	DRIVER( gwing2 )
 	DRIVER( suchie3 )
+	DRIVER( toyfight )
 	DRIVER( pjustic )
 	DRIVER( pstone )
 	DRIVER( pstone2 )
@@ -5406,6 +5407,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( chopperb )	/* A7003 'KK' (c) 1988 */
 	DRIVER( legofair )	/* A7003 'KK' (c) 1988 */
 	DRIVER( fsoccer )	/* A6006 'FS' (c) 1988 */
+	DRIVER( fsoccerj )	/* A6006 'FS' (c) 1988 */
+
 	DRIVER( fsoccerb )	/*            (c) 1988 */
 	DRIVER( tdfever )	/* A6006 'TD' (c) 1987 */
 	DRIVER( tdfeverj )	/* A6006 'TD' (c) 1987 */
@@ -7022,9 +7025,10 @@ Other Sun games
 	DRIVER( silkroad )	/* (c) 1999 */
 
 	/* Afega games */
-	DRIVER( twinactn )	/* (c) 1996 - bootleg of mustang in nmk16.c */
+	DRIVER( twinactn )	/* (c) 1996 - bootleg of US AFF Mustang */
 	DRIVER( stagger1 )	/* (c) 1998 */
 	DRIVER( redhawk )	/* (c) 1997 */
+	DRIVER( redhawke )	/* (c) 1997 Excellent Co., Ltd license */
 	DRIVER( redhawkb )	/* (c) 1997 */
 	DRIVER( grdnstrm )	/* (c) 1998 */
 	DRIVER( bubl2000 )	/* (c) 1998 Tuning */
@@ -7150,6 +7154,7 @@ Other Sun games
 	DRIVER( goldstar )	/* (c) 198? IGS */
 	DRIVER( goldstbl )	/* (c) 198? IGS */
 	DRIVER( moonlght )	/* bootleg */
+ 	DRIVER( cpoker )	/* (c) 198? IGS */
 	DRIVER( csk227it )	/* (c) 198? IGS */
 	DRIVER( csk234it )	/* (c) 198? IGS */
 	DRIVER( stellecu )	/* (c) 1998 */

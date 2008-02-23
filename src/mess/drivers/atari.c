@@ -665,7 +665,6 @@ static const unsigned short atari_colortable[] =
 static PALETTE_INIT( atari )
 {
 	palette_set_colors_rgb(machine, 0, atari_palette, sizeof(atari_palette) / 3);
-	memcpy(colortable,atari_colortable,sizeof(atari_colortable));
 }
 
 
@@ -704,14 +703,13 @@ static const struct POKEYinterface pokey_interface =
 static MACHINE_DRIVER_START( atari_common_nodac )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6510, FREQ_17_EXACT)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
 	MDRV_PALETTE_LENGTH(sizeof(atari_palette) / sizeof(atari_palette[0]) / 3)
-	MDRV_COLORTABLE_LENGTH(sizeof(atari_colortable) / sizeof(atari_colortable[0]))
 	MDRV_PALETTE_INIT(atari)
 
 	MDRV_VIDEO_START(atari)
@@ -805,6 +803,8 @@ static MACHINE_DRIVER_START( a5200 )
 	MDRV_CPU_VBLANK_INT(a5200_interrupt, TOTAL_LINES_60HZ)
 
 	MDRV_MACHINE_START( a5200 )
+
+	MDRV_SCREEN_MODIFY( "main" )
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 MACHINE_DRIVER_END
@@ -856,17 +856,17 @@ static void atari_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_a800_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_a800_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "atr,dsk,xfd"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "atr,dsk,xfd"); break;
 	}
 }
 
@@ -880,14 +880,14 @@ static void a400_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_a800_cart; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_a800_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_a800_cart; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_a800_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -905,14 +905,14 @@ static void a800_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_a800_cart; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_a800_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_a800_cart; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_a800_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -930,14 +930,14 @@ static void a5200_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_a5200_cart; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_a5200_cart; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_a5200_cart; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_a5200_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin,a52"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin,a52"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}

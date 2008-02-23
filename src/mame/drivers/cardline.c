@@ -35,7 +35,7 @@ static int cardline_video;
 static VIDEO_UPDATE( cardline )
 {
 	int x,y;
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	for(y=0;y<32;y++)
 	{
 		for(x=0;x<64;x++)
@@ -169,7 +169,7 @@ static PALETTE_INIT(cardline)
 {
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		data=color_prom[i];
 
@@ -199,14 +199,14 @@ static MACHINE_DRIVER_START( cardline )
 	MDRV_CPU_DATA_MAP(mem_data,0)
 	MDRV_CPU_IO_MAP(mem_io,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 35*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+
 	MDRV_GFXDECODE(cardline)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_PALETTE_INIT(cardline)

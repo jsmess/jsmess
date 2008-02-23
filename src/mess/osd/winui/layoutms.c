@@ -15,6 +15,7 @@
 #include <stdlib.h> /* For malloc and free */
 #include <string.h>
 
+#include "driver.h"
 #include "bitmask.h"
 #include "TreeView.h"
 #include "mui_util.h"

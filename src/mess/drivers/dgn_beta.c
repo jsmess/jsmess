@@ -293,24 +293,24 @@ static void dgnbeta_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:			info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_coco; break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_coco; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME+0:		strcpy(info->s = device_temp_str(), "floppydisk0"); break;
-		case DEVINFO_STR_NAME+1:		strcpy(info->s = device_temp_str(), "floppydisk1"); break;
-		case DEVINFO_STR_NAME+2:		strcpy(info->s = device_temp_str(), "floppydisk2"); break;
-		case DEVINFO_STR_NAME+3:		strcpy(info->s = device_temp_str(), "floppydisk3"); break;
-		case DEVINFO_STR_SHORT_NAME+0:		strcpy(info->s = device_temp_str(), "flop0"); break;
-		case DEVINFO_STR_SHORT_NAME+1:		strcpy(info->s = device_temp_str(), "flop1"); break;
-		case DEVINFO_STR_SHORT_NAME+2:		strcpy(info->s = device_temp_str(), "flop2"); break;
-		case DEVINFO_STR_SHORT_NAME+3:		strcpy(info->s = device_temp_str(), "flop3"); break;
-		case DEVINFO_STR_DESCRIPTION+0:	strcpy(info->s = device_temp_str(), "Floppy #0"); break;
-		case DEVINFO_STR_DESCRIPTION+1:	strcpy(info->s = device_temp_str(), "Floppy #1"); break;
-		case DEVINFO_STR_DESCRIPTION+2:	strcpy(info->s = device_temp_str(), "Floppy #2"); break;
-		case DEVINFO_STR_DESCRIPTION+3:	strcpy(info->s = device_temp_str(), "Floppy #3"); break;
+		case MESS_DEVINFO_STR_NAME+0:		strcpy(info->s = device_temp_str(), "floppydisk0"); break;
+		case MESS_DEVINFO_STR_NAME+1:		strcpy(info->s = device_temp_str(), "floppydisk1"); break;
+		case MESS_DEVINFO_STR_NAME+2:		strcpy(info->s = device_temp_str(), "floppydisk2"); break;
+		case MESS_DEVINFO_STR_NAME+3:		strcpy(info->s = device_temp_str(), "floppydisk3"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+0:		strcpy(info->s = device_temp_str(), "flop0"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+1:		strcpy(info->s = device_temp_str(), "flop1"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+2:		strcpy(info->s = device_temp_str(), "flop2"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+3:		strcpy(info->s = device_temp_str(), "flop3"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+0:	strcpy(info->s = device_temp_str(), "Floppy #0"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+1:	strcpy(info->s = device_temp_str(), "Floppy #1"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+2:	strcpy(info->s = device_temp_str(), "Floppy #2"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+3:	strcpy(info->s = device_temp_str(), "Floppy #3"); break;
 
 		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
@@ -330,6 +330,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 	MDRV_CPU_ADD_TAG("dma", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map,0)
 
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(DGNBETA_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
 
@@ -341,7 +342,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 	MDRV_SCREEN_VISIBLE_AREA(0, 699, 0, 549)
 	MDRV_PALETTE_LENGTH(sizeof (dgnbeta_palette) / sizeof (dgnbeta_palette[0]) / 3)
 	MDRV_PALETTE_INIT( dgnbeta )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_AFTER_VBLANK)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_VIDEO_UPDATE( dgnbeta )

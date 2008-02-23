@@ -185,14 +185,13 @@ static MACHINE_DRIVER_START( dai )
 	MDRV_MACHINE_START( dai )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(1056, 542)
 	MDRV_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
 	MDRV_PALETTE_LENGTH(sizeof (dai_palette) / 3)
-	MDRV_COLORTABLE_LENGTH(sizeof (dai_colortable))
 	MDRV_PALETTE_INIT( dai )
 
 	MDRV_VIDEO_START( dai )
@@ -229,13 +228,13 @@ static void dai_cassette_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_OPTIONS:				info->p = (void *) &dai_cassette_options; break;
+		case MESS_DEVINFO_PTR_CASSETTE_OPTIONS:				info->p = (void *) &dai_cassette_options; break;
 
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}

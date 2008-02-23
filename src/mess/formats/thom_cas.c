@@ -990,21 +990,22 @@ void to7_cassette_getinfo( const device_class *devclass, UINT32 state, union dev
 {
 	switch ( state )
 	{
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-	case DEVINFO_PTR_CASSETTE_FORMATS:
+	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
 		info->p = (void *) to7_cassette_formats;
 		break;
-	case DEVINFO_INT_CASSETTE_DEFAULT_STATE:
+	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:
 		info->i =
 			CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED;
 		break;
-	case DEVINFO_STR_DEV_FILE:
+	case MESS_DEVINFO_STR_DEV_FILE:
 		strcpy( info->s = device_temp_str(), __FILE__ );
 		break;
 	default:
 		cassette_device_getinfo( devclass, state, info );
+		break;
 	}
 }
 
@@ -1013,17 +1014,17 @@ void mo5_cassette_getinfo( const device_class *devclass, UINT32 state, union dev
 {
 	switch ( state )
 	{
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-	case DEVINFO_PTR_CASSETTE_FORMATS:
+	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
 		info->p = (void *) mo5_cassette_formats;
 		break;
-	case DEVINFO_INT_CASSETTE_DEFAULT_STATE:
+	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:
 		info->i =
 			CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED;
 		break;
-	case DEVINFO_STR_DEV_FILE:
+	case MESS_DEVINFO_STR_DEV_FILE:
 		strcpy( info->s = device_temp_str(), __FILE__ );
 		break;
 	default:

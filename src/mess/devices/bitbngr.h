@@ -29,7 +29,7 @@ struct bitbanger_config
 
 enum
 {
-	DEVINFO_PTR_BITBANGER_CONFIG = DEVINFO_PTR_DEV_SPECIFIC
+	MESS_DEVINFO_PTR_BITBANGER_CONFIG = MESS_DEVINFO_PTR_DEV_SPECIFIC
 };
 
 void bitbanger_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);

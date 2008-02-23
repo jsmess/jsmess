@@ -178,7 +178,7 @@ iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 	devclass = &pPickerInfo->ppIndex[nIndex]->devclass;
 	if (!devclass->gamedrv)
 		return -1;
-	return (iodevice_t) (int) device_get_info_int(devclass, DEVINFO_INT_TYPE);
+	return (iodevice_t) (int) mess_device_get_info_int(devclass, MESS_DEVINFO_INT_TYPE);
 }
 
 
@@ -237,8 +237,8 @@ static void ComputeFileHash(struct SoftwarePickerInfo *pPickerInfo,
 	iodevice_t type;
 	device_partialhash_handler partialhash;
 
-	type = (iodevice_t) (int) device_get_info_int(&pFileInfo->devclass, DEVINFO_INT_TYPE);
-	partialhash = (device_partialhash_handler) device_get_info_fct(&pFileInfo->devclass, DEVINFO_PTR_PARTIAL_HASH);
+	type = (iodevice_t) (int) mess_device_get_info_int(&pFileInfo->devclass, MESS_DEVINFO_INT_TYPE);
+	partialhash = (device_partialhash_handler) mess_device_get_info_fct(&pFileInfo->devclass, MESS_DEVINFO_PTR_PARTIAL_HASH);
 
 	nFunctions = hashfile_functions_used(pPickerInfo->pHashFile, type);
 
@@ -363,7 +363,7 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 	// have already been calculated
 	if ((pPickerInfo->pHashFile != NULL) && (pFileInfo->devclass.get_info != NULL))
 	{
-		type = (iodevice_t) (int) device_get_info_int(&pFileInfo->devclass, DEVINFO_INT_TYPE);
+		type = (iodevice_t) (int) mess_device_get_info_int(&pFileInfo->devclass, MESS_DEVINFO_INT_TYPE);
 		if (type < IO_COUNT)
 	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->pHashFile, type);
 		nCalculatedHashes = hash_data_used_functions(pFileInfo->szHash);
@@ -447,7 +447,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	// set up device and CRC, if specified
 	pInfo->devclass = devclass;
-	if (devclass.gamedrv && device_get_info_fct(&devclass, DEVINFO_PTR_PARTIAL_HASH))
+	if (devclass.gamedrv && mess_device_get_info_fct(&devclass, MESS_DEVINFO_PTR_PARTIAL_HASH))
 		nCrc = 0;
 	if (nCrc != 0)
 		snprintf(pInfo->szHash, sizeof(pInfo->szHash) / sizeof(pInfo->szHash[0]), "c:%08x#", nCrc);
@@ -728,7 +728,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 		pFileInfo = pPickerInfo->ppIndex[pPickerInfo->nCurrentPosition];
 		if (!pFileInfo->bHashRealized)
 		{
-			type = (iodevice_t) (int) device_get_info_int(&pFileInfo->devclass, DEVINFO_INT_TYPE);
+			type = (iodevice_t) (int) mess_device_get_info_int(&pFileInfo->devclass, MESS_DEVINFO_INT_TYPE);
 			if (hashfile_functions_used(pPickerInfo->pHashFile, type))
 			{
 				// only calculate the hash if it is appropriate for this device

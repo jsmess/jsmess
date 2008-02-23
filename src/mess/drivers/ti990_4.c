@@ -225,7 +225,7 @@ static MACHINE_DRIVER_START(ti990_4)
 	MDRV_MACHINE_RESET( ti990_4 )
 
 	/* video hardware - we emulate a single 911 vdt display */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -241,11 +241,9 @@ static MACHINE_DRIVER_START(ti990_4)
 #if VIDEO_911
 	MDRV_GFXDECODE(vdt911)
 	MDRV_PALETTE_LENGTH(vdt911_palette_size)
-	MDRV_COLORTABLE_LENGTH(vdt911_colortable_size)
 #else
 	MDRV_GFXDECODE(asr733)
 	MDRV_PALETTE_LENGTH(asr733_palette_size)
-	MDRV_COLORTABLE_LENGTH(asr733_colortable_size)
 #endif
 
 #if VIDEO_911
@@ -329,10 +327,10 @@ static void ti990_4_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_fd800; break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_fd800; break;
 
 		default:										floppy_device_getinfo(devclass, state, info); break;
 	}

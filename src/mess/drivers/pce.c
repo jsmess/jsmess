@@ -149,16 +149,14 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_MACHINE_RESET( pce )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
 	/* MDRV_GFXDECODE( pce ) */
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_PALETTE_INIT( vce )
-	MDRV_COLORTABLE_LENGTH(1024)
 
 	MDRV_VIDEO_START( pce )
 	MDRV_VIDEO_UPDATE( pce )
@@ -190,15 +188,13 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_MACHINE_RESET( pce )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_PALETTE_INIT( vce )
-	MDRV_COLORTABLE_LENGTH(1024)
 
 	MDRV_VIDEO_START( pce )
 	MDRV_VIDEO_UPDATE( pce )
@@ -235,15 +231,15 @@ static void pce_cartslot_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_pce_cart; break;
-		case DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = pce_partialhash; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pce_cart; break;
+		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = pce_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pce"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pce"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
@@ -251,7 +247,7 @@ static void pce_cartslot_getinfo(const device_class *devclass, UINT32 state, uni
 
 static void pce_chdcd_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
 	switch( state ) {
-	case DEVINFO_INT_COUNT:			info->i = 1; break;
+	case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
 	default:						cdrom_device_getinfo(devclass, state, info);
 	}
 }

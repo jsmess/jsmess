@@ -114,12 +114,6 @@ static const UINT8 pc1512_defaults[] =
 
 ***************************************************************************/
 
-static void mscrtc6845_state_postload(void)
-{
-	if (dirtybuffer && videoram_size)
-		memset(dirtybuffer, 1, videoram_size);
-}
-
 struct mscrtc6845 *mscrtc6845_init(const struct mscrtc6845_config *config)
 {
 	struct mscrtc6845 *crtc;
@@ -142,7 +136,6 @@ struct mscrtc6845 *mscrtc6845_init(const struct mscrtc6845_config *config)
 
 	state_save_register_item_array("mscrtc6845", 0, crtc->reg);
 	state_save_register_item("mscrtc6845", 0, crtc->idx);
-	state_save_register_func_postload(mscrtc6845_state_postload);
 	return crtc;
 }
 

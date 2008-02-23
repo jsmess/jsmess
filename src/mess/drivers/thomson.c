@@ -213,13 +213,13 @@ INPUT_PORTS_END
 static void to7_cartridge_getinfo( const device_class *devclass,  UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-	case DEVINFO_PTR_LOAD:
+	case MESS_DEVINFO_PTR_LOAD:
 		info->load = to7_cartridge_load;
 		break;
-	case DEVINFO_STR_FILE_EXTENSIONS:
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy( info->s = device_temp_str(), "m7,rom" );
 		break;
 	default:
@@ -230,13 +230,13 @@ static void to7_cartridge_getinfo( const device_class *devclass,  UINT32 state, 
 static void mo5_cartridge_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-	case DEVINFO_PTR_LOAD:
+	case MESS_DEVINFO_PTR_LOAD:
 		info->load = mo5_cartridge_load;
 		break;
-	case DEVINFO_STR_FILE_EXTENSIONS:
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy( info->s = device_temp_str(), "m5,rom" );
 		break;
 	default:
@@ -250,7 +250,7 @@ static void mo5_cartridge_getinfo( const device_class *devclass, UINT32 state, u
 static void thom_printer_getinfo ( const device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
 	default:
@@ -271,55 +271,55 @@ static const char *const thom_serial_names[3][3]=
 static void thom_serial_getinfo ( const device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 3;
 		break;
-	case DEVINFO_INT_TYPE:
+	case MESS_DEVINFO_INT_TYPE:
 		info->i = IO_SERIAL;
 		break;
-	case DEVINFO_INT_READABLE:
+	case MESS_DEVINFO_INT_READABLE:
 		info->i = 1;
 		break;
-	case DEVINFO_INT_WRITEABLE:
+	case MESS_DEVINFO_INT_WRITEABLE:
 		info->i = 1;
 		break;
-	case DEVINFO_INT_CREATABLE:
+	case MESS_DEVINFO_INT_CREATABLE:
 		info->i = 1;
 		break;
 
-	case DEVINFO_PTR_INIT:
+	case MESS_DEVINFO_PTR_INIT:
 		info->init = thom_serial_init;
 		break;
-	case DEVINFO_PTR_LOAD:
+	case MESS_DEVINFO_PTR_LOAD:
 		info->load = thom_serial_load;
 		break;
-	case DEVINFO_PTR_UNLOAD:
+	case MESS_DEVINFO_PTR_UNLOAD:
 		info->unload = thom_serial_unload;
 		break;
 
-	case DEVINFO_STR_NAME+0:
-	case DEVINFO_STR_NAME+1:
-	case DEVINFO_STR_NAME+2:
+	case MESS_DEVINFO_STR_NAME+0:
+	case MESS_DEVINFO_STR_NAME+1:
+	case MESS_DEVINFO_STR_NAME+2:
 		strcpy( info->s = device_temp_str(),
-			thom_serial_names[ state - DEVINFO_STR_NAME ][ 0 ] );
+			thom_serial_names[ state - MESS_DEVINFO_STR_NAME ][ 0 ] );
 		break;
-	case DEVINFO_STR_SHORT_NAME+0:
-	case DEVINFO_STR_SHORT_NAME+1:
-	case DEVINFO_STR_SHORT_NAME+2:
+	case MESS_DEVINFO_STR_SHORT_NAME+0:
+	case MESS_DEVINFO_STR_SHORT_NAME+1:
+	case MESS_DEVINFO_STR_SHORT_NAME+2:
 		strcpy( info->s = device_temp_str(),
-			thom_serial_names[ state - DEVINFO_STR_SHORT_NAME ][ 1 ] );
+			thom_serial_names[ state - MESS_DEVINFO_STR_SHORT_NAME ][ 1 ] );
 		break;
-	case DEVINFO_STR_DESCRIPTION+0:
-	case DEVINFO_STR_DESCRIPTION+1:
-	case DEVINFO_STR_DESCRIPTION+2:
+	case MESS_DEVINFO_STR_DESCRIPTION+0:
+	case MESS_DEVINFO_STR_DESCRIPTION+1:
+	case MESS_DEVINFO_STR_DESCRIPTION+2:
 		strcpy( info->s = device_temp_str(),
-			thom_serial_names[ state - DEVINFO_STR_DESCRIPTION ][ 2 ] );
+			thom_serial_names[ state - MESS_DEVINFO_STR_DESCRIPTION ][ 2 ] );
 		break;
 
-	case DEVINFO_STR_DEV_FILE:
+	case MESS_DEVINFO_STR_DEV_FILE:
 		strcpy( info->s = device_temp_str(), "serial" );
 		break;
-	case DEVINFO_STR_FILE_EXTENSIONS:
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy( info->s = device_temp_str(), "txt" );
 		break;
 
@@ -747,9 +747,9 @@ static MACHINE_DRIVER_START ( to7 )
    framerate from 50 Hz to 1/0.019968 Hz to get 312 64us lines per frame,
    i.e., 19.968 ms per frame, not 20 ms
 */
+     MDRV_SCREEN_ADD("main", RASTER)
      MDRV_SCREEN_REFRESH_RATE ( /*50*/ 1./0.019968 )
      MDRV_INTERLEAVE ( 0 )
-     MDRV_VIDEO_ATTRIBUTES ( VIDEO_TYPE_RASTER )
      MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
      MDRV_SCREEN_SIZE ( THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT )
      MDRV_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,

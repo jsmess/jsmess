@@ -160,9 +160,7 @@ static INPUT_PORTS_START( formatz )
 	PORT_DIPSETTING(    0x08, "40000" )
 	PORT_DIPSETTING(    0x04, "70000" )
 	PORT_DIPSETTING(    0x00, "100000" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:5")	/* Listed as "Unused" in the manual */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:5" )		/* Listed as "Unused" */
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -172,7 +170,7 @@ static INPUT_PORTS_START( formatz )
 	/* The last dip switch is directly connected to the video hardware and
        flips the screen. The program instead sees the coin input, which must
        stay low for exactly 2 frames to be consistently recognized. */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_DIPLOCATION("SW1:8") /* "Screen Inversion" */
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:1,2,3")
@@ -185,19 +183,13 @@ static INPUT_PORTS_START( formatz )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x00, "0(Easy)" )
-	PORT_DIPSETTING(    0x08, "1(Medium)" )
-	PORT_DIPSETTING(    0x10, "2(Hard)" )
-	PORT_DIPSETTING(    0x18, "3(Hardest)" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:6")	/* Listed as "Unused" in the manual */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:7")	/* Listed as "Unused" in the manual */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:8")	/* Listed as "Unused" in the manual */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Hard ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:6" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:7" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )		/* Listed as "Unused" */
 INPUT_PORTS_END
 
 
@@ -263,16 +255,16 @@ static MACHINE_DRIVER_START( formatz )
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(aeroboto)
-
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(aeroboto)
+
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

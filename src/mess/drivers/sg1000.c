@@ -563,6 +563,7 @@ static MACHINE_DRIVER_START( sg1000 )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -583,6 +584,7 @@ static MACHINE_DRIVER_START( sc3000 )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -604,6 +606,7 @@ static MACHINE_DRIVER_START( sf7000 )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -690,10 +693,10 @@ static void sg1000_cartslot_getinfo( const device_class *devclass, UINT32 state,
 {
 	switch( state )
 	{
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_sg1000_cart; break;
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg"); break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sg1000_cart; break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}
@@ -750,10 +753,10 @@ static void sc3000_cartslot_getinfo( const device_class *devclass, UINT32 state,
 {
 	switch( state )
 	{
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_sc3000_cart; break;
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,sc"); break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sc3000_cart; break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,sc"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}
@@ -763,7 +766,7 @@ static void sc3000_cassette_getinfo(const device_class *devclass, UINT32 state, 
 {
 	switch(state)
 	{
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
@@ -773,7 +776,7 @@ static void sc3000_printer_getinfo(const device_class *devclass, UINT32 state, u
 {
 	switch(state)
 	{
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}
@@ -783,7 +786,7 @@ static void sf7000_printer_getinfo(const device_class *devclass, UINT32 state, u
 {
 	switch(state)
 	{
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}
@@ -812,9 +815,9 @@ static void sf7000_floppy_getinfo(const device_class *devclass, UINT32 state, un
 {
 	switch(state)
 	{
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_floppy; break;
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sf7"); break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_floppy; break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sf7"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
@@ -848,16 +851,16 @@ static void sf7000_serial_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = serial_device_init; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_serial; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = serial_device_init; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_serial; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
 	}
 }
 

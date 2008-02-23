@@ -6,22 +6,46 @@
 
 ***************************************************************************/
 
-#include "sound/discrete.h"
+#include "video/mc6845.h"
 
+
+#define MAIN_CLOCK_OSC			20000000	/* 20 MHz */
+#define SLITHER_CLOCK_OSC		21300000	/* 21.3 MHz */
+#define SOUND_CLOCK_OSC			7372800		/* 7.3728 MHz */
+#define COIN_CLOCK_OSC			4000000		/* 4 MHz */
 #define QIX_CHARACTER_CLOCK		(20000000/2/16)
 
 
-/*----------- defined in machine/qix.c -----------*/
+typedef struct _qix_state qix_state;
+struct _qix_state
+{
+	/* machine state */
+	UINT8 *_68705_port_out;
+	UINT8 *_68705_ddr;
+	UINT8  _68705_port_in[3];
+	UINT8  coinctrl;
 
-extern UINT8 *qix_68705_port_out;
-extern UINT8 *qix_68705_ddr;
+	/* video state */
+	mc6845_t *mc6845;
+	UINT8 *videoram;
+	UINT8 *videoram_address;
+	UINT8 *videoram_mask;
+	UINT8 *paletteram;
+	UINT8  flip_screen;
+	UINT8  palette_bank;
+	UINT8  leds;
+	UINT8 *scanline_latch;
+};
+
+
+/*----------- defined in machine/qix.c -----------*/
 
 MACHINE_START( qix );
 MACHINE_START( qixmcu );
 MACHINE_START( slither );
 MACHINE_RESET( qix );
 
-WRITE8_HANDLER( zoo_bankswitch_w );
+WRITE8_HANDLER( zookeep_bankswitch_w );
 
 READ8_HANDLER( qix_data_firq_r );
 READ8_HANDLER( qix_data_firq_ack_r );
@@ -44,29 +68,21 @@ WRITE8_HANDLER( qix_pia_0_w );
 
 INTERRUPT_GEN( qix_vblank_start );
 
+
 /*----------- defined in video/qix.c -----------*/
 
-extern UINT8 *qix_videoaddress;
-extern UINT8 qix_cocktail_flip;
+MACHINE_DRIVER_EXTERN( qix_video );
+MACHINE_DRIVER_EXTERN( zookeep_video );
+MACHINE_DRIVER_EXTERN( slither_video );
 
-VIDEO_START( qix );
-VIDEO_UPDATE( qix );
-
-WRITE8_HANDLER( qix_mc6845_address_w );
-READ8_HANDLER( qix_mc6845_register_r );
-WRITE8_HANDLER( qix_mc6845_register_w );
-READ8_HANDLER( qix_scanline_r );
-READ8_HANDLER( qix_videoram_r );
-WRITE8_HANDLER( qix_videoram_w );
-READ8_HANDLER( qix_addresslatch_r );
-WRITE8_HANDLER( qix_addresslatch_w );
-WRITE8_HANDLER( slither_vram_mask_w );
-WRITE8_HANDLER( qix_paletteram_w );
+WRITE8_HANDLER( qix_flip_screen_w );
 WRITE8_HANDLER( qix_palettebank_w );
+
 
 /*----------- defined in audio/qix.c -----------*/
 
-DISCRETE_SOUND_EXTERN( qix );
+MACHINE_DRIVER_EXTERN( qix_audio );
+MACHINE_DRIVER_EXTERN( slither_audio );
 
 WRITE8_HANDLER( qix_dac_w );
 WRITE8_HANDLER( qix_vol_w );

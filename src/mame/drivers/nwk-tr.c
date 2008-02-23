@@ -279,16 +279,8 @@ int K001604_vh_start(running_machine *machine, int chip)
 	machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(&K001604_char_layout_layer_16x16);
 	decodegfx(machine->gfx[K001604_gfx_index[chip][1]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][1]]->total_elements);
 
-	if (machine->drv->color_table_len)
-	{
-		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->drv->color_table_len / 16;
-		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->drv->color_table_len / 16;
-	}
-	else
-	{
-		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->drv->total_colors / 16;
-		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->drv->total_colors / 16;
-	}
+	machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->config->total_colors / 16;
 
 	return 0;
 }
@@ -918,17 +910,18 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_RESET(nwktr)
 	MDRV_NVRAM_HANDLER( timekeeper_0 )
 
  	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+
 	MDRV_PALETTE_LENGTH(65536)
 
 	MDRV_VIDEO_START(nwktr)

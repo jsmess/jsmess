@@ -153,7 +153,6 @@ PALETTE_INIT( avigo )
 /*	char *backdrop_name;
     int used = 2; */
 	palette_set_colors_rgb(machine, 0, avigo_palette, sizeof(avigo_palette) / 3);
-    memcpy(colortable, avigo_colour_table, sizeof (avigo_colour_table));
 
 	/* load backdrop */
 #if 0
@@ -166,7 +165,7 @@ PALETTE_INIT( avigo )
 
 		logerror("%s\n",backdrop_name);
 
-        artwork_load(&avigo_backdrop, backdrop_name, used,machine->drv->total_colors-used);
+        artwork_load(&avigo_backdrop, backdrop_name, used,machine->config->total_colors-used);
 
 		if (avigo_backdrop)
 		{

@@ -48,12 +48,6 @@ static const unsigned char FLOP_MASK   = 0x40;
 
 enum { FAKE_BLK,FAKE_YLW,FAKE_BLU,FAKE_RED,FAKE_WHT };
 
-static unsigned short fake_colortable[] =
-{
-	FAKE_BLK,FAKE_YLW,FAKE_BLU,FAKE_RED,
-	FAKE_BLK,FAKE_WHT,FAKE_BLK,FAKE_RED   /* not used by the game, here only for the dip switch menu */
-};
-
 PALETTE_INIT( astrocade )
 {
 	/* This routine builds a palette using a transformation from */
@@ -120,8 +114,6 @@ PALETTE_INIT( astrocade )
 	}
 
 	/* Set the fake colortable for the dip switch menus, etc. */
-
-	colortable = fake_colortable;
 }
 
 WRITE8_HANDLER ( astrocade_vertical_blank_w )

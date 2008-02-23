@@ -84,7 +84,6 @@ static PALETTE_INIT( gamecom )
 	for ( index = 0; index < GAMECOM_PALETTE_LENGTH; index++ )
 	{
 		palette_set_color_rgb(machine,  4-index, palette[index*3+0], palette[index*3+1], palette[index*3+2] );
-		colortable[index] = index;
 	}
 }
 
@@ -95,6 +94,7 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_CPU_CONFIG( gamecom_cpu_config )
 	MDRV_CPU_VBLANK_INT( gamecom_scanline, 200 )
 
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 59.732155 )
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
@@ -105,13 +105,11 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
-	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 200, 200 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
 	MDRV_GFXDECODE( gamecom )
 	MDRV_PALETTE_LENGTH( GAMECOM_PALETTE_LENGTH )
-	MDRV_COLORTABLE_LENGTH( GAMECOM_PALETTE_LENGTH )
 	MDRV_PALETTE_INIT( gamecom )
 
 	/* sound hardware */
@@ -124,16 +122,16 @@ MACHINE_DRIVER_END
 
 static void gamecom_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-	case DEVINFO_PTR_INIT:
+	case MESS_DEVINFO_PTR_INIT:
 		info->init = device_init_gamecom_cart;
 		break;
-	case DEVINFO_PTR_LOAD:
+	case MESS_DEVINFO_PTR_LOAD:
 		info->load = device_load_gamecom_cart;
 		break;
-	case DEVINFO_STR_FILE_EXTENSIONS:
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy(info->s = device_temp_str(), "bin,tgc");
 		break;
 	default:

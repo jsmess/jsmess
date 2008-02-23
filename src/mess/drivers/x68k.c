@@ -1839,16 +1839,16 @@ static void x68k_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 {
 	switch(state)
 	{
-	case DEVINFO_INT_COUNT:
+	case MESS_DEVINFO_INT_COUNT:
 		info->i = 4;
 		break;
-	case DEVINFO_PTR_LOAD:
+	case MESS_DEVINFO_PTR_LOAD:
 		info->load = device_load_x68k_floppy;
 		break;
-	case DEVINFO_PTR_UNLOAD:
+	case MESS_DEVINFO_PTR_UNLOAD:
 		info->unload = device_unload_x68k_floppy;
 		break;
-	case DEVINFO_STR_FILE_EXTENSIONS:
+	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
 		strcpy(info->s = device_temp_str(), "xdf,hdm,2hd,dim");
 		break;
 	default:
@@ -1994,7 +1994,7 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_MACHINE_RESET( x68000 )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55.45)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 //  MDRV_GFXDECODE(x68k)
@@ -2002,7 +2002,6 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(65536)
-	MDRV_COLORTABLE_LENGTH(65536 + 512)
 	MDRV_PALETTE_INIT( x68000 )
 
 	MDRV_VIDEO_START( x68000 )

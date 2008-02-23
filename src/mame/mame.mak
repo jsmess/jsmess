@@ -304,7 +304,7 @@ SOUNDS += BEEP
 #SOUNDS += SID6581
 #SOUNDS += SID8580
 SOUNDS += SP0256
-
+SOUNDS += AICA
 
 
 #-------------------------------------------------
@@ -490,7 +490,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/gauntlet.o $(VIDEO)/gauntlet.o \
 	$(DRIVERS)/harddriv.o $(MACHINE)/harddriv.o $(AUDIO)/harddriv.o $(VIDEO)/harddriv.o \
 	$(DRIVERS)/irobot.o $(MACHINE)/irobot.o $(VIDEO)/irobot.o \
-	$(DRIVERS)/jedi.o $(VIDEO)/jedi.o \
+	$(DRIVERS)/jedi.o $(AUDIO)/jedi.o $(VIDEO)/jedi.o \
 	$(DRIVERS)/klax.o $(VIDEO)/klax.o \
 	$(DRIVERS)/liberatr.o $(VIDEO)/liberatr.o \
 	$(DRIVERS)/mediagx.o \
@@ -633,7 +633,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/kingobox.o $(VIDEO)/kingobox.o \
 	$(DRIVERS)/lemmings.o $(VIDEO)/lemmings.o \
 	$(DRIVERS)/liberate.o $(VIDEO)/liberate.o \
-	$(DRIVERS)/madalien.o \
+	$(DRIVERS)/madalien.o $(VIDEO)/madalien.o \
 	$(DRIVERS)/madmotor.o $(VIDEO)/madmotor.o \
 	$(DRIVERS)/metlclsh.o $(VIDEO)/metlclsh.o \
 	$(DRIVERS)/pcktgal.o $(VIDEO)/pcktgal.o \
@@ -723,7 +723,7 @@ $(MAMEOBJ)/gaelco.a: \
 
 $(MAMEOBJ)/gameplan.a: \
 	$(DRIVERS)/enigma2.o \
-	$(DRIVERS)/gameplan.o \
+	$(DRIVERS)/gameplan.o $(VIDEO)/gameplan.o \
 	$(DRIVERS)/toratora.o \
 
 $(MAMEOBJ)/gametron.a: \

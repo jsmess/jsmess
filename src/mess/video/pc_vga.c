@@ -154,12 +154,11 @@ static const unsigned short vga_colortable[] =
 };
 
 MACHINE_DRIVER_START( pcvideo_vga )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(720, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0,720-1, 0,480-1)
 	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_COLORTABLE_LENGTH(0x100*2 /*sizeof(vga_colortable) / sizeof(vga_colortable[0])*/)
 	MDRV_PALETTE_INIT(vga)
 
 	MDRV_VIDEO_START(vga)
@@ -168,12 +167,11 @@ MACHINE_DRIVER_START( pcvideo_vga )
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( pcvideo_pc1640 )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(720, 350)
 	MDRV_SCREEN_VISIBLE_AREA(0,720-1, 0,350-1)
 	MDRV_PALETTE_LENGTH(sizeof(ega_palette) / 3)
-	MDRV_COLORTABLE_LENGTH(0x100*2 /*sizeof(vga_colortable) / sizeof(vga_colortable[0])*/)
 	MDRV_PALETTE_INIT(ega)
 
 	MDRV_VIDEO_START(ega)
@@ -186,7 +184,6 @@ MACHINE_DRIVER_END
 static PALETTE_INIT( ega )
 {
 	palette_set_colors_rgb(machine, 0, ega_palette, sizeof(ega_palette) / 3);
-	memcpy(colortable, vga_colortable,0x200);
 }
 
 static PALETTE_INIT( vga )
@@ -194,8 +191,6 @@ static PALETTE_INIT( vga )
 	int i;
 	for (i = 0; i < 0x100; i++)
 		palette_set_color_rgb(machine, i, 0, 0, 0);
-
-	memcpy(colortable, vga_colortable,0x200);
 }
 
 static UINT8 color_bitplane_to_packed[4/*plane*/][8/*pixel*/][256];
@@ -603,7 +598,7 @@ static void vga_cpu_interface(void)
 		}
 	}
 
-	buswidth = cputype_databus_width(Machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(Machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -1138,7 +1133,7 @@ void pc_vga_init(const struct pc_vga_interface *vga_intf, const struct pc_svga_i
 	memset(vga.crtc.data, '\0', vga.svga_intf.crtc_regcount);
 	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
-	buswidth = cputype_databus_width(Machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(Machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

@@ -64,7 +64,7 @@ INTERRUPT_GEN( astrocade_interrupt )
 {
     CurrentScan++;
 
-    if (CurrentScan == machine->drv->cpu[0].vblank_interrupts_per_frame)
+    if (CurrentScan == machine->config->cpu[0].vblank_interrupts_per_frame)
 		CurrentScan = 0;
 
     if (CurrentScan < 204) astrocade_copy_line(CurrentScan);

@@ -114,8 +114,6 @@ PALETTE_INIT( pc_aga )
 	int i;
 	for(i = 0; i < (sizeof(cga_palette) / 3); i++)
 		palette_set_color_rgb(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
-	memcpy(colortable,cga_colortable,sizeof(cga_colortable));
-	memcpy((char*)colortable+sizeof(cga_colortable), mda_colortable, sizeof(mda_colortable));
 }
 
 static struct {
@@ -215,7 +213,7 @@ VIDEO_START( pc_aga )
 
 	pc_mda_europc_init();
 
-	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -248,7 +246,7 @@ VIDEO_START( pc200 )
 
 	VIDEO_START_CALL(pc_aga);
 
-	buswidth = cputype_databus_width(machine->drv->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

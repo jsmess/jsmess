@@ -123,7 +123,7 @@ static VIDEO_UPDATE(fortecar)
 {
 	int x,y,count;
 	count = 0;
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	for (y=0;y<32;y++)
 	{
 		for(x=0;x<64;x++)
@@ -149,14 +149,14 @@ static MACHINE_DRIVER_START( fortecar )
 
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+
 	MDRV_GFXDECODE(fortecar)
 	MDRV_PALETTE_LENGTH(0x100)
 

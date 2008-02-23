@@ -4750,17 +4750,18 @@ static const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nCo
 			break;
 
 		case COLUMN_TYPE:
-        {
-            machine_config drv;
-            expand_machine_driver(drivers[nItem]->drv,&drv);
+			{
+				machine_config *config = machine_config_alloc(drivers[nItem]->drv);
+				/* Vector/Raster */
+				if (isDriverVector(config))
+					s = TEXT("Vector");
+				else
+					s = TEXT("Raster");
 
-			/* Vector/Raster */
-			if (drv.video_attributes & VIDEO_TYPE_VECTOR)
-				s = TEXT("Vector");
-			else
-				s = TEXT("Raster");
+				machine_config_free(config);
+			}
 			break;
-        }
+
 		case COLUMN_TRACKBALL:
 			/* Trackball */
 			if (DriverUsesTrackball(nItem))
@@ -5199,19 +5200,21 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 		break;
 
 	case COLUMN_PLAYTIME:
-	   value = GetPlayTime(index1) - GetPlayTime(index2);
-	   break;
+		value = GetPlayTime(index1) - GetPlayTime(index2);
+		break;
 
 	case COLUMN_TYPE:
-    {
-        machine_config drv1,drv2;
-        expand_machine_driver(drivers[index1]->drv,&drv1);
-        expand_machine_driver(drivers[index2]->drv,&drv2);
+		{
+			machine_config *config1 = machine_config_alloc(drivers[index1]->drv);
+			machine_config *config2 = machine_config_alloc(drivers[index2]->drv);
 
-		value = (drv1.video_attributes & VIDEO_TYPE_VECTOR) -
-				(drv2.video_attributes & VIDEO_TYPE_VECTOR);
+			value = isDriverVector(config1) - isDriverVector(config2);
+
+			machine_config_free(config1);
+			machine_config_free(config2);
+		}
 		break;
-    }
+
 	case COLUMN_TRACKBALL:
 		value = DriverUsesTrackball(index1) - DriverUsesTrackball(index2);
 		break;
@@ -5414,7 +5417,7 @@ static BOOL SelectLanguageFile(HWND hWnd, TCHAR* filename)
 	of.lStructSize       = sizeof(of);
 	of.hwndOwner         = hWnd;
 	of.hInstance         = NULL;
-	of.lpstrFilter       = TEXT(MAMENAME " Language files (*.lng)\0*.lng\0");
+	of.lpstrFilter       = TEXT(MAMENAME) TEXT(" Language files (*.lng)\0*.lng\0");
 	of.lpstrCustomFilter = NULL;
 	of.nMaxCustFilter    = 0;
 	of.nFilterIndex      = 1;

@@ -300,7 +300,6 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	seen_first_update = FALSE;
 	videoram = NULL;
 	videoram_size = 0;
-	dirtybuffer = NULL;
 
 	/* set up options */
 	opts = mame_options_init(win_mess_opts);

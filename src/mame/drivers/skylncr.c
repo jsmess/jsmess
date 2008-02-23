@@ -84,7 +84,7 @@ static VIDEO_START( skylncr )
 
 static VIDEO_UPDATE( skylncr )
 {
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	tilemap_draw(bitmap,cliprect, tmap2, 0, 0);
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;
@@ -431,14 +431,14 @@ static MACHINE_DRIVER_START( skylncr )
 	MDRV_CPU_IO_MAP(io_map_skylncr,0)
 	MDRV_CPU_VBLANK_INT(skylncr_vblank_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+
 	MDRV_GFXDECODE(skylncr)
 	MDRV_PALETTE_LENGTH(0x200)
 

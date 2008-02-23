@@ -330,7 +330,6 @@ static void mwa_bank(int bank, int offs, int data)
         if( laser_bank[bank] == laser_video_bank && mem[offs] != data )
 		{
 			logerror("bank #%d write to videoram [$%05X] $%02X\n", bank+1, offs, data);
-            dirtybuffer[offs&0x3fff] = 1;
 		}
         mem[offs] = data;
         break;

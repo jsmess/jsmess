@@ -67,7 +67,7 @@ void    EventList_AddItemOffset(int ID, int Data, int Time)
 {
 
         if (!CyclesPerFrame)
-                CyclesPerFrame = (int)(cpunum_get_clock(0) / Machine->screen[0].refresh);	//totalcycles();	//_(int)(cpunum_get_clock(0) / Machine->drv->frames_per_second);
+                CyclesPerFrame = (int)(cpunum_get_clock(0) / Machine->screen[0].refresh);	//totalcycles();	//_(int)(cpunum_get_clock(0) / Machine->config->frames_per_second);
 
         if (NumEvents < TotalEvents)
         {

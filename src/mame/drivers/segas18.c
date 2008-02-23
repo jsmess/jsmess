@@ -204,7 +204,7 @@ static MACHINE_RESET( system18 )
 	fd1094_machine_init();
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
-	if (machine->drv->cpu[2].type == CPU_I8751)
+	if (machine->config->cpu[2].type == CPU_I8751)
 		timer_call_after_resynch(NULL, 0, boost_interleave);
 }
 
@@ -1265,16 +1265,16 @@ static MACHINE_DRIVER_START( system18 )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-
 	MDRV_MACHINE_RESET(system18)
 	MDRV_NVRAM_HANDLER(system18)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(342,262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+
 	MDRV_GFXDECODE(segas18)
 	MDRV_PALETTE_LENGTH(2048*3+2048)
 

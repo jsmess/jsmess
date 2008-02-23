@@ -41,7 +41,7 @@ int c1551_config(int id, int mode, C1551_CONFIG*config);
 
 enum
 {
-	DEVINFO_PTR_VC1541_CONFIG = DEVINFO_PTR_DEV_SPECIFIC
+	DEVINFO_PTR_VC1541_CONFIG = MESS_DEVINFO_PTR_DEV_SPECIFIC
 };
 
 void vc1541_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);

@@ -119,7 +119,6 @@ void genesis_vdp_start (genvdp *current_vdp)
 	decodegfx(Machine->gfx[gfx_index] , (UINT8 *)&current_vdp->genesis_vdp_vram, 0, 1);
 
 	/* set the color information */
-	Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
 	Machine->gfx[gfx_index]->total_colors = 0x4;
 	current_vdp -> genesis_vdp_index = gfx_index;
 

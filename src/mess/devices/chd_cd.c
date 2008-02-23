@@ -216,25 +216,25 @@ void cdrom_device_getinfo(const device_class *devclass, UINT32 state, union devi
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:						info->i = IO_CDROM; break;
-		case DEVINFO_INT_READABLE:					info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:					info->i = 0; break;
-		case DEVINFO_INT_CREATABLE:					info->i = 0; break;
-		case DEVINFO_INT_CREATE_OPTCOUNT:			info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:						info->i = IO_CDROM; break;
+		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATE_OPTCOUNT:			info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:						info->init = device_init_mess_cd; break;
-		case DEVINFO_PTR_LOAD:						info->load = device_load_mess_cd; break;
-		case DEVINFO_PTR_UNLOAD:					info->unload = device_unload_mess_cd; break;
-		case DEVINFO_PTR_CREATE_OPTGUIDE:			info->p = (void *) mess_cd_option_guide; break;
-		case DEVINFO_PTR_CREATE_OPTSPEC+0:			info->p = (void *) mess_cd_option_spec;
+		case MESS_DEVINFO_PTR_INIT:						info->init = device_init_mess_cd; break;
+		case MESS_DEVINFO_PTR_LOAD:						info->load = device_load_mess_cd; break;
+		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_mess_cd; break;
+		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:			info->p = (void *) mess_cd_option_guide; break;
+		case MESS_DEVINFO_PTR_CREATE_OPTSPEC+0:			info->p = (void *) mess_cd_option_spec;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
-		case DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "chd"); break;
-		case DEVINFO_STR_CREATE_OPTNAME+0:			strcpy(info->s = device_temp_str(), "chdcd"); break;
-		case DEVINFO_STR_CREATE_OPTDESC+0:			strcpy(info->s = device_temp_str(), "MAME/MESS CHD CD-ROM drive"); break;
-		case DEVINFO_STR_CREATE_OPTEXTS+0:			strcpy(info->s = device_temp_str(), "chd"); break;
+		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "chd"); break;
+		case MESS_DEVINFO_STR_CREATE_OPTNAME+0:			strcpy(info->s = device_temp_str(), "chdcd"); break;
+		case MESS_DEVINFO_STR_CREATE_OPTDESC+0:			strcpy(info->s = device_temp_str(), "MAME/MESS CHD CD-ROM drive"); break;
+		case MESS_DEVINFO_STR_CREATE_OPTEXTS+0:			strcpy(info->s = device_temp_str(), "chd"); break;
 	}
 }
 

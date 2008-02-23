@@ -398,7 +398,6 @@ static PALETTE_INIT( coupe )
 		palette_set_color_rgb(machine, a, red, green, blue);
 		coupe_colortable[a]=a;
 	}
-	memcpy(colortable,coupe_colortable,sizeof(coupe_colortable));
 }
 
 
@@ -409,6 +408,7 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_CPU_PROGRAM_MAP(coupe_mem, 0)
 	MDRV_CPU_IO_MAP(coupe_io, 0)
 	MDRV_CPU_VBLANK_INT(coupe_line_interrupt, 192 + 10)	/* 192 scanlines + 10 lines of vblank (approx).. */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
@@ -416,13 +416,11 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_MACHINE_START( coupe )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 24*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 24*8-1)
 	MDRV_GFXDECODE( coupe_gfxdecodeinfo )
 	MDRV_PALETTE_LENGTH(128)
-	MDRV_COLORTABLE_LENGTH(128)
 	MDRV_PALETTE_INIT(coupe)
 
 	MDRV_VIDEO_START( generic_bitmapped )
@@ -454,13 +452,13 @@ static void coupe_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_coupe_floppy; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_coupe_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}

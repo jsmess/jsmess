@@ -352,8 +352,6 @@ static PALETTE_INIT( pdp1 )
 
 	/* load static palette */
 	palette_set_colors_rgb(machine, pen_crt_num_levels, palette, sizeof(palette) / sizeof(palette[0]) / 3);
-
-	memcpy(colortable, pdp1_colortable, sizeof(pdp1_colortable));
 }
 
 
@@ -405,7 +403,7 @@ static MACHINE_DRIVER_START(pdp1)
 	MDRV_MACHINE_RESET( pdp1 )
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(refresh_rate)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -414,7 +412,6 @@ static MACHINE_DRIVER_START(pdp1)
 
 	MDRV_GFXDECODE(pdp1)
 	MDRV_PALETTE_LENGTH(pen_crt_num_levels + (sizeof(palette) / sizeof(palette[0]) / 3))
-	MDRV_COLORTABLE_LENGTH(sizeof(pdp1_colortable) / sizeof(pdp1_colortable[0]))
 
 	MDRV_PALETTE_INIT(pdp1)
 	MDRV_VIDEO_START(pdp1)
@@ -436,17 +433,17 @@ static void pdp1_punchtape_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
-		case DEVINFO_INT_COUNT:							info->i = 2; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_INIT:							info->init = device_init_pdp1_tape; break;
-		case DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_tape; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_tape; break;
-		case DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = pdp1_get_open_mode; break;
+		case MESS_DEVINFO_PTR_INIT:							info->init = device_init_pdp1_tape; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_tape; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_tape; break;
+		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = pdp1_get_open_mode; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap,rim"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap,rim"); break;
 	}
 }
 
@@ -456,18 +453,18 @@ static void pdp1_printer_getinfo(const device_class *devclass, UINT32 state, uni
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_PRINTER; break;
-		case DEVINFO_INT_READABLE:						info->i = 0; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PRINTER; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_typewriter; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_typewriter; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_typewriter; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_typewriter; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "typ"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "typ"); break;
 	}
 }
 
@@ -477,18 +474,18 @@ static void pdp1_cylinder_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TYPE:							info->i = IO_CYLINDER; break;
-		case DEVINFO_INT_READABLE:						info->i = 1; break;
-		case DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CYLINDER; break;
+		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_drum; break;
-		case DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_drum; break;
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pdp1_drum; break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = device_unload_pdp1_drum; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "drm"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "drm"); break;
 	}
 }
 

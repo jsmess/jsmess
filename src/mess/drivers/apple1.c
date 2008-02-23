@@ -138,15 +138,9 @@ static const rgb_t apple1_palette[] =
 	RGB_WHITE
 };
 
-static const unsigned short apple1_colortable[] =
-{
-	0, 1
-};
-
 static PALETTE_INIT( apple1 )
 {
 	palette_set_colors(machine, 0, apple1_palette, ARRAY_LENGTH(apple1_palette));
-	memcpy(colortable, apple1_colortable, sizeof (apple1_colortable));
 }
 
 /* keyboard input */
@@ -234,6 +228,7 @@ static MACHINE_DRIVER_START( apple1 )
        slows it to 960 kHz. */
 	MDRV_CPU_ADD_TAG("main", M6502, 960000)        /* 1.023 Mhz */
 	MDRV_CPU_PROGRAM_MAP(apple1_map, 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
        Each scanline is composed of 65 character times, 40 of which
@@ -245,7 +240,6 @@ static MACHINE_DRIVER_START( apple1 )
 
 	MDRV_MACHINE_RESET( apple1 )
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* It would be nice if we could implement some sort of display
        overscan here. */
@@ -253,7 +247,6 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
 	MDRV_GFXDECODE(apple1)
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(apple1_palette))
-	MDRV_COLORTABLE_LENGTH(sizeof(apple1_colortable)/sizeof(unsigned short))
 	MDRV_PALETTE_INIT(apple1)
 
 	MDRV_VIDEO_START(apple1)
@@ -276,10 +269,10 @@ static void apple1_snapshot_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "snp"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "snp"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_apple1; break;
+		case MESS_DEVINFO_PTR_SNAPSHOT_LOAD:					info->f = (genf *) snapshot_load_apple1; break;
 
 		default:										snapshot_device_getinfo(devclass, state, info); break;
 	}
@@ -291,8 +284,8 @@ static void apple1_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}

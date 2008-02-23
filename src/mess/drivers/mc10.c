@@ -209,6 +209,7 @@ static MACHINE_DRIVER_START( mc10 )
 	MDRV_CPU_ADD_TAG("main", M6803, XTAL_3_579545MHz)  /* 0,894886 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mc10_mem, 0)
 	MDRV_CPU_IO_MAP(mc10_io, 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_MACHINE_START(mc10)
@@ -216,7 +217,6 @@ static MACHINE_DRIVER_START( mc10 )
 	/* video hardware */
 	MDRV_VIDEO_START(mc10)
 	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
@@ -258,13 +258,13 @@ static void mc10_cassette_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) coco_cassette_formats; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) coco_cassette_formats; break;
 
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
