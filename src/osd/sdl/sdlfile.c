@@ -461,18 +461,18 @@ file_error osd_copyfile(const char *destfile, const char *srcfile)
 osd_directory_entry *osd_stat(const char *path)
 {
 	osd_directory_entry *result = NULL;
-        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	struct stat st;
 	#else
 	struct stat64 st;
 	#endif
-
-        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
+	
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	stat(path, &st);
 	#else
 	stat64(path, &st);
 	#endif
-
+	
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
 	result = (osd_directory_entry *) malloc(sizeof(*result) + strlen(path) + 1);
@@ -480,7 +480,7 @@ osd_directory_entry *osd_stat(const char *path)
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
 	result->size = (UINT64)st.st_size;
-
+	
 	return result;
 }
 

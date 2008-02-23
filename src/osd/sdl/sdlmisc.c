@@ -33,14 +33,11 @@ Version 0.2, May 2000
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <time.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 #include <sys/mman.h>
 #endif
-#include "sdlmisc.h"
 #ifdef SDLMAME_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -54,41 +51,6 @@ Version 0.2, May 2000
 #ifdef SDLMAME_OS2
 #define INCL_DOS
 #include <os2.h>
-#endif
-
-#ifdef HAVE_GETTIMEOFDAY
-/* Standard UNIX clock() is based on CPU time, not real time.
-   Here is a real-time drop in replacement for UNIX systems that have the
-   gettimeofday() routine.  This results in much more accurate timing.
-*/
-uclock_t uclock(void)
-{
-  static uclock_t init_sec = 0;
-  struct timeval tv;
-
-  gettimeofday(&tv, 0);
-  if (init_sec == 0) init_sec = tv.tv_sec;
-
-  return (tv.tv_sec - init_sec) * 1000000 + tv.tv_usec;
-}
-#else
-
-/* some platforms don't define CLOCKS_PER_SEC, according to posix it should
-   always be 1000000, so asume that's the case if it is not defined,
-   except for openstep which doesn't define it and has it at 64 */
-#ifndef CLOCKS_PER_SEC
-#ifdef openstep
-#define CLOCKS_PER_SEC 64     /* this is correct for OS4.2 intel */
-#else
-#define CLOCKS_PER_SEC 1000000
-#endif
-#endif
-
-uclock_t uclock(void)
-{
-   return (clock() * (1000000 / CLOCKS_PER_SEC));
-}
-
 #endif
 
 void *osd_alloc_executable(size_t size)
@@ -137,7 +99,7 @@ void osd_break_into_debugger(const char *message)
 		DebugBreak();
 	}
 #elif defined(SDLMAME_UNIX)
-	#ifdef MAME_DEBUG
+	#ifdef ENABLE_DEBUGGER
 	printf("MAME exception: %s\n", message);
 	printf("Attempting to fall into debugger\n");
 	kill(getpid(), SIGTRAP); 

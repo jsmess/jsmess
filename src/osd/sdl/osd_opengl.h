@@ -17,14 +17,14 @@
 	 */
 	#include <SDL/SDL_version.h>
 	
-#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1210)
+#if (SDL_VERSION_ATLEAST(1,2,10))
+	#include <SDL/SDL_opengl.h>
+#else
 	/*
 	 * SDL 1.2.9 does not provide everything we need
 	 * We therefore distribute it ourselves
 	 */
 	#include "SDL1211_opengl.h"
-#else
-	#include <SDL/SDL_opengl.h>
 #endif	
 	#ifdef USE_DISPATCH_GL
 	

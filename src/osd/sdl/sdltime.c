@@ -59,10 +59,6 @@ static osd_ticks_t mach_cycle_counter(void);
 //  GLOBAL VARIABLES
 //============================================================
 
-// global cycle_counter function and divider
-osd_ticks_t		(*cycle_counter)(void) = init_cycle_counter;
-osd_ticks_t		(*ticks_counter)(void) = init_cycle_counter;
-osd_ticks_t		ticks_per_second;
 
 
 //============================================================
@@ -71,6 +67,11 @@ osd_ticks_t		ticks_per_second;
 
 static osd_ticks_t suspend_adjustment;
 static osd_ticks_t suspend_time;
+
+// global cycle_counter function and divider
+static osd_ticks_t		(*cycle_counter)(void) = init_cycle_counter;
+static osd_ticks_t		(*ticks_counter)(void) = init_cycle_counter;
+static osd_ticks_t		ticks_per_second;
 
 
 //============================================================

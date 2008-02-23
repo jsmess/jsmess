@@ -123,7 +123,7 @@ int sdlvideo_init(running_machine *machine)
 	// we need the beam width in a float, contrary to what the core does.
 	video_config.beamwidth = options_get_float(mame_options(), OPTION_BEAM);
 
-	if (machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
+	if (machine->config->video_attributes & SCREEN_TYPE_VECTOR)
 	{
 		video_config.isvector = 1;
 	}
@@ -136,7 +136,7 @@ int sdlvideo_init(running_machine *machine)
 	if (sdlwindow_init(machine))
 		goto error;
 
-	tc = machine->drv->total_colors;
+	tc = machine->config->total_colors;
 
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)
@@ -173,29 +173,6 @@ static void video_exit(running_machine *machine)
 		free(temp);
 	}
 
-#if USE_OPENGL
-	{
-		int i;
-
-		for(i=0; i<video_config.glsl_shader_mamebm_num; i++)
-		{
-			if ( NULL!=video_config.glsl_shader_mamebm[i])
-			{
-				free(video_config.glsl_shader_mamebm[i]);
-				video_config.glsl_shader_mamebm[i] = NULL;
-			}
-		}
-		for(i=0; i<video_config.glsl_shader_scrn_num; i++)
-		{
-			if ( NULL!=video_config.glsl_shader_scrn[i])
-			{
-				free(video_config.glsl_shader_scrn[i]);
-				video_config.glsl_shader_scrn[i] = NULL;
-			}
-		}
-	}
-#endif
-	
 }
 
 
@@ -228,7 +205,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	{
 		#if defined(SDLMAME_X11)
 		//FIXME: The code below fails for SDL1.3
-		#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
+		#if (!SDL_VERSION_ATLEAST(1,3,0))
 		// X11 version
 		int screen;
 		SDL_SysWMinfo info;
@@ -273,9 +250,12 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 				const SDL_VideoInfo *sdl_vi;
 				
 				sdl_vi = SDL_GetVideoInfo();
-				#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
+				#if (SDL_VERSION_ATLEAST(1,2,10))
 				//FIXME: File a bug for SDL 1.3
-				#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
+				#if (SDL_VERSION_ATLEAST(1,3,0))
+				cw = 0;
+				ch = 0;
+				#else
 				cw = sdl_vi->current_w;
 				ch = sdl_vi->current_h;
 				#endif
@@ -534,9 +514,11 @@ finishit:
 
 static void check_osd_inputs(void)
 {
+	sdl_window_info *window = sdl_window_list;
+
 	// check for toggling fullscreen mode
 	if (input_ui_pressed(IPT_OSD_1))
-		sdlwindow_toggle_full_screen();
+		sdlwindow_toggle_full_screen(window);
 	
 	if (input_ui_pressed(IPT_OSD_2))
 	{
@@ -559,19 +541,19 @@ static void check_osd_inputs(void)
 #endif
 
 	if (input_ui_pressed(IPT_OSD_6))
-		sdlwindow_modify_prescale(-1);
+		sdlwindow_modify_prescale(window, -1);
 
 	if (input_ui_pressed(IPT_OSD_7))
-		sdlwindow_modify_prescale(1);
+		sdlwindow_modify_prescale(window, 1);
 
 	if (input_ui_pressed(IPT_OSD_8))
-		sdlwindow_modify_effect(-1);
+		sdlwindow_modify_effect(window, -1);
 
 	if (input_ui_pressed(IPT_OSD_9))
-		sdlwindow_modify_effect(1);
+		sdlwindow_modify_effect(window, 1);
 
 	if (input_ui_pressed(IPT_OSD_10))
-		sdlwindow_toggle_draw();
+		sdlwindow_toggle_draw(window);
 }
 
 
@@ -777,6 +759,7 @@ static void load_effect_overlay(running_machine *machine, const char *filename)
 {
 	char *tempstr = malloc_or_die(strlen(filename) + 5);
 	int scrnum;
+	int numscreens;
 	char *dest;
 
 	// append a .PNG extension
@@ -796,9 +779,9 @@ static void load_effect_overlay(running_machine *machine, const char *filename)
 	}
 
 	// set the overlay on all screens
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (machine->drv->screen[scrnum].tag != NULL)
-			render_container_set_overlay(render_container_get_screen(scrnum), effect_bitmap);
+	numscreens = video_screen_count(machine->config);
+	for (scrnum = 0; scrnum < numscreens; scrnum++)
+		render_container_set_overlay(render_container_get_screen(scrnum), effect_bitmap);
 
 	free(tempstr);
 }

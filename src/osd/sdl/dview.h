@@ -45,7 +45,7 @@ struct _DView
 };
 
 
-GtkWidget *dview_new(gchar *widget_name, gchar *string1, gchar *string2, gint int1, gint int2);
+GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar *string2, gint int1, gint int2);
 void dview_set_debug_view(DView *dv, debug_view *dw);
 void dview_this_one_is_stupidly_autoscrolling(DView *dv);
 

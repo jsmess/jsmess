@@ -311,12 +311,12 @@ static kt_table sdl_key_trans_table[] =
 	KTT_ENTRY2(  LWIN, 			LSUPER ),
 	KTT_ENTRY2(  RWIN, 			RSUPER ),
 	KTT_ENTRY2(  MENU,	 		MENU ),
-#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
-	KTT_ENTRY0(  TILDE, 		BACKQUOTE,  	0xc0,	'`',	"TILDE" ),
-	KTT_ENTRY0(  BACKSLASH2,	HASH,     0xdc,   '\\', "BACKSLASH2" ),
-#else
+#if (SDL_VERSION_ATLEAST(1,3,0))
 	KTT_ENTRY0(  TILDE, 		GRAVE,  	0xc0,	'`',	"TILDE" ),
 	KTT_ENTRY0(  BACKSLASH2,	NONUSBACKSLASH,     0xdc,   '\\', "BACKSLASH2" ),
+#else
+	KTT_ENTRY0(  TILDE, 		BACKQUOTE,  	0xc0,	'`',	"TILDE" ),
+	KTT_ENTRY0(  BACKSLASH2,	HASH,     0xdc,   '\\', "BACKSLASH2" ),
 #endif
 	{ -1 }
 };
@@ -345,7 +345,7 @@ static key_lookup_table sdl_lookup_table[] =
 	KE8(s,			t,			u,				v,			w,			x,			y,			z			)
 	{ SDLK_DELETE, "SDLK_DELETE" }, 
 	//FIXME:Proper check for version
-#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
+#if (!SDL_VERSION_ATLEAST(1,3,0))
 	KE8(WORLD_0,	WORLD_1,	WORLD_2,	WORLD_3,	WORLD_4,	WORLD_5,	WORLD_6,	WORLD_7		)
 	KE8(WORLD_8,	WORLD_9,	WORLD_10,	WORLD_11,	WORLD_12,	WORLD_13,	WORLD_14,	WORLD_15	)
 	KE8(WORLD_16,	WORLD_17,	WORLD_18,	WORLD_19,	WORLD_20,	WORLD_21,	WORLD_22,	WORLD_23	)
@@ -1053,7 +1053,7 @@ void sdlinput_poll(void)
 			devinfo->mouse.lY = event.motion.yrel * INPUT_RELATIVE_PER_PIXEL; 
 			break;
 		case SDL_VIDEORESIZE:
-			sdlwindow_resize(event.resize.w, event.resize.h);
+			sdlwindow_resize(sdl_window_list, event.resize.w, event.resize.h);
 			break;
 		}
 	}

@@ -1,10 +1,6 @@
-#include <gconf/gconf-client.h>
-#include "driver.h"
-#include "debug/debugvw.h"
-#include "debug/debugcon.h"
-#include "debug/debugcpu.h"
-#include "deprecat.h"
+
 #include "dview.h"
+#include <gconf/gconf-client.h>
 
 G_DEFINE_TYPE(DView, dview, GTK_TYPE_CONTAINER);
 
@@ -13,10 +9,10 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	debug_view_char *viewdata;
 	DView *dv = DVIEW(wdv);
 	DViewClass *dvc = DVIEW_GET_CLASS(dv);
-	UINT32 trow = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_ROWS);
-	UINT32 tcol = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_COLS);
-	UINT32 prow = debug_view_get_property_UINT32(dv->dw, DVP_TOP_ROW);
-	UINT32 pcol = debug_view_get_property_UINT32(dv->dw, DVP_LEFT_COL);
+	//UINT32 trow = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_ROWS);
+	//UINT32 tcol = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_COLS);
+	//UINT32 prow = debug_view_get_property_UINT32(dv->dw, DVP_TOP_ROW);
+	//UINT32 pcol = debug_view_get_property_UINT32(dv->dw, DVP_LEFT_COL);
 	UINT32 vrow = debug_view_get_property_UINT32(dv->dw, DVP_VISIBLE_ROWS);
 	UINT32 vcol = debug_view_get_property_UINT32(dv->dw, DVP_VISIBLE_COLS);
 	UINT32 i, j, xx, yy;
@@ -396,11 +392,11 @@ static void dview_view_update(debug_view *dw)
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 }
 
-GtkWidget *dview_new(gchar *widget_name, gchar *string1, gchar *string2, gint int1, gint int2)
+GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar *string2, gint int1, gint int2)
 {
 	GtkWidget *wdv = g_object_new(DVIEW_TYPE, NULL);
 	DView *dv = DVIEW(wdv);
-	dv->name = widget_name;
+	dv->name = (gchar *) widget_name;
 	dv->this_one_is_stupidly_autoscrolling = 0;
 	return wdv;
 }

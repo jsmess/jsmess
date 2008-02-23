@@ -14,6 +14,8 @@
 
 #ifndef SDLMAME_WIN32
 
+#ifndef SDLMAME_OS2
+
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
 ***************************************************************************/
@@ -197,6 +199,7 @@ void osd_thread_wait_free(osd_thread *thread);
 -----------------------------------------------------------------------------*/
 int osd_num_processors(void);
 
+#endif  /* SDLMAME_OS2 */
 
 #endif	/* SDLMAME_WIN32 */
 

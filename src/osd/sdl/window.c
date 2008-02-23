@@ -18,7 +18,7 @@
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 #include <sys/time.h>
 #endif
-#if defined(SDLMAME_MACOSX)
+#if defined(SDLMAME_MACOSX) || defined(SDLMAME_OS2)
 #include <sys/time.h>
 #endif
 
@@ -132,46 +132,15 @@ static void *draw_video_contents_wt(void *param, int threadid);
 static void *sdlwindow_video_window_destroy_wt(void *param, int threadid);
 static void *sdlwindow_resize_wt(void *param, int threadid);
 static void *sdlwindow_toggle_full_screen_wt(void *param, int threadid);
-#if USE_OPENGL
-static void sdlwindow_init_ogl_context(void);
-#endif
+static void sdlwindow_clear_surface(sdl_window_info *window, int times);
+static void sdlwindow_update_cursor_state(void);
+static void sdlwindow_sync(void);
+
+
 static void get_min_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain);
 
 static void *complete_create_wt(void *param, int threadid);
 static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view);
-
-
-//============================================================
-// Load the OGL function addresses
-//============================================================
-
-#if USE_OPENGL
-static void sdlwindow_loadgl(void)
-{
-#ifdef USE_DISPATCH_GL
-
-	int err = 0;
-
-	/* the following is tricky ... #func will be expanded to glBegin
-	 * while func will be expanded to disp_p->glBegin
-	 */
-
-	#define OSD_GL(ret,func,params) \
-	if (!(func = SDL_GL_GetProcAddress( #func ) )) \
-		{ err++; mame_printf_error("GL function %s not found!\n", #func ); }
-
-	#define OSD_GL_UNUSED(ret,func,params)
-
-	#define GET_GLFUNC 1
-	#include "osd_opengl.h"
-	#undef GET_GLFUNC
-	
-	if (err)
-		fatalerror("Error loading GL library functions, giving up\n");
-
-#endif		
-}
-#endif
 
 //============================================================
 //  clear the worker_param structure, inline - faster than memset
@@ -254,7 +223,11 @@ int sdlwindow_init(running_machine *machine)
 	if (multithreading_enabled)
 	{
 		// create a thread to run the windows from
+#ifndef SDLMAME_OS2
 		work_queue = osd_work_queue_alloc(0);
+#else
+		work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_IO);
+#endif
 		if (work_queue == NULL)
 			return 1;
 		osd_work_item_queue(work_queue, &sdlwindow_thread_id, NULL, WORK_ITEM_FLAG_AUTO_RELEASE);
@@ -267,11 +240,13 @@ int sdlwindow_init(running_machine *machine)
 	}
 
 	// initialize the drawers
+#if USE_OPENGL
 	if (video_config.mode == VIDEO_MODE_OPENGL)
 	{
 		if (drawogl_init(&draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
+#endif
 	if (video_config.mode == VIDEO_MODE_SOFT)
 	{
 		if (drawsdl_init(&draw))
@@ -290,7 +265,7 @@ int sdlwindow_init(running_machine *machine)
 //  (main thread)
 //============================================================
 
-void _sdlwindow_sync(const char *s, int line)
+static void sdlwindow_sync(void)
 {
 	if (multithreading_enabled)
 	{
@@ -344,8 +319,104 @@ static void sdlwindow_exit(running_machine *machine)
 }
 
 //============================================================
-//  sdlwindow_resize
-//  (main thread)
+//  sdlwindow_blit_surface_size
+//============================================================
+
+INLINE int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
+{
+	float aspect0 = (float)width0 / (float)height0;
+	float aspect1 = (float)width1 / (float)height1;
+	return (fabs(desired_aspect - aspect0) < fabs(desired_aspect - aspect1)) ? 0 : 1;
+}
+
+void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int window_height)
+{
+	sdl_info *sdl = window->dxdata;
+	INT32 newwidth, newheight;
+	int xscale, yscale;
+	float desired_aspect = 1.0f;
+	INT32 target_width = window_width;
+	INT32 target_height = window_height;
+
+	// start with the minimum size
+	render_target_get_minimum_size(window->target, &newwidth, &newheight);
+
+	// compute the appropriate visible area if we're trying to keepaspect
+	if (video_config.keepaspect)
+	{
+		// make sure the monitor is up-to-date
+		sdlvideo_monitor_refresh(window->monitor);
+		render_target_compute_visible_area(window->target, target_width, target_height, sdlvideo_monitor_get_aspect(window->monitor), render_target_get_orientation(window->target), &target_width, &target_height);
+		desired_aspect = (float)target_width / (float)target_height;
+	}
+
+//	logerror("Render target wants %d x %d, minimum is %d x %d\n", target_width, target_height, newwidth, newheight);
+
+        // don't allow below 1:1 size - this prevents the OutRunners "death spiral"
+        // that would occur if you kept rotating it with fullstretch on in SDLMAME u10 test 2.
+        if ((target_width >= newwidth) && (target_height >= newheight))
+	{
+                newwidth = target_width;
+                newheight = target_height;
+	}
+
+        // non-integer scaling - often gives more pleasing results in full screen 
+        if (!video_config.fullstretch)
+	{
+		// compute maximum integral scaling to fit the window
+		xscale = (target_width + 2) / newwidth;
+		yscale = (target_height + 2) / newheight;
+
+		// try a little harder to keep the aspect ratio if desired
+		if (video_config.keepaspect)
+		{
+			// if we could stretch more in the X direction, and that makes a better fit, bump the xscale
+			while (newwidth * (xscale + 1) <= window_width &&
+				better_mode(newwidth * xscale, newheight * yscale, newwidth * (xscale + 1), newheight * yscale, desired_aspect))
+				xscale++;
+
+			// if we could stretch more in the Y direction, and that makes a better fit, bump the yscale
+			while (newheight * (yscale + 1) <= window_height &&
+				better_mode(newwidth * xscale, newheight * yscale, newwidth * xscale, newheight * (yscale + 1), desired_aspect))
+				yscale++;
+
+			// now that we've maxed out, see if backing off the maximally stretched one makes a better fit
+			if (window_width - newwidth * xscale < window_height - newheight * yscale)
+			{
+				while (better_mode(newwidth * xscale, newheight * yscale, newwidth * (xscale - 1), newheight * yscale, desired_aspect) && (xscale >= 0))
+					xscale--;
+			}
+			else
+			{
+				while (better_mode(newwidth * xscale, newheight * yscale, newwidth * xscale, newheight * (yscale - 1), desired_aspect) && (yscale >= 0))
+					yscale--;
+			}
+		}
+
+		// ensure at least a scale factor of 1
+		if (xscale <= 0) xscale = 1;
+		if (yscale <= 0) yscale = 1;
+
+		// apply the final scale
+		newwidth *= xscale;
+		newheight *= yscale;
+	}
+
+	if ((render_target_get_layer_config(window->target) & LAYER_CONFIG_ZOOM_TO_SCREEN)
+		&& video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
+		newwidth = window_width;
+
+	if (((sdl->blitwidth != newwidth) || (sdl->blitheight != newheight)) && !(video_config.mode == VIDEO_MODE_OPENGL) && (window->sdlsurf))
+	{
+		sdlwindow_clear_surface(window, 3);
+	}
+
+	sdl->blitwidth = newwidth;
+	sdl->blitheight = newheight;
+}
+
+//============================================================
+//  yuv_overlay_init
 //============================================================
 
 static void yuv_overlay_init(sdl_window_info *window)
@@ -397,6 +468,11 @@ static void yuv_overlay_init(sdl_window_info *window)
 	}
 }
 
+//============================================================
+//  sdlwindow_resize
+//  (main thread)
+//============================================================
+
 static void *sdlwindow_resize_wt(void *param, int threadid)
 {
 	sdl_window_info *window = sdl_window_list;
@@ -406,7 +482,7 @@ static void *sdlwindow_resize_wt(void *param, int threadid)
 	
 	draw.window_destroy_all_textures(window);
 
-#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
+#if (!SDL_VERSION_ATLEAST(1,3,0))
 	SDL_FreeSurface(window->sdlsurf);
 #endif
 	//printf("SetVideoMode %d %d\n", wp->resize_new_width, wp->resize_new_height);
@@ -420,17 +496,16 @@ static void *sdlwindow_resize_wt(void *param, int threadid)
 		yuv_overlay_init(window);
 	}
 #if USE_OPENGL
-	if (window->opengl)
-		sdlwindow_init_ogl_context();
+	if (video_config.mode == VIDEO_MODE_OPENGL)
+		drawogl_init_ogl_context();
 #endif
-	drawsdl_blit_surface_size(window, wp->resize_new_width, wp->resize_new_height);
+	sdlwindow_blit_surface_size(window, wp->resize_new_width, wp->resize_new_height);
 	free(wp);
 	return NULL;
 }
 
-void sdlwindow_resize(INT32 width, INT32 height)
+void sdlwindow_resize(sdl_window_info *window, INT32 width, INT32 height)
 {
-	sdl_window_info *window = sdl_window_list;
 	worker_param wp;
 
 	ASSERT_MAIN_THREAD();
@@ -452,8 +527,9 @@ void sdlwindow_resize(INT32 width, INT32 height)
 
 static void *sdlwindow_clear_surface_wt(void *param, int threadid)
 {
-	sdl_window_info *window = sdl_window_list;
 	worker_param *wp = (worker_param *) param;
+	//sdl_window_info *window = sdl_window_list;
+	sdl_window_info *window = wp->window;
 	int i;
 
 	ASSERT_WINDOW_THREAD();
@@ -472,7 +548,7 @@ static void *sdlwindow_clear_surface_wt(void *param, int threadid)
 	return NULL;
 }
 
-void sdlwindow_clear_surface(sdl_window_info *window, int times)
+static void sdlwindow_clear_surface(sdl_window_info *window, int times)
 {
 	worker_param *wp = malloc(sizeof(worker_param));
 
@@ -526,10 +602,9 @@ static void *sdlwindow_toggle_full_screen_wt(void *param, int threadid)
 	return NULL;
 }
 
-void sdlwindow_toggle_full_screen(void)
+void sdlwindow_toggle_full_screen(sdl_window_info *window)
 {
 	worker_param wp;
-	sdl_window_info *window = sdl_window_list;
 
 	ASSERT_MAIN_THREAD();
 
@@ -579,9 +654,8 @@ static void *destroy_all_textures_wt(void *param, int threadid)
 	return NULL;
 }
 
-void sdlwindow_modify_prescale(int dir)
+void sdlwindow_modify_prescale(sdl_window_info *window, int dir)
 {
-	sdl_window_info *window = sdl_window_list;
 	worker_param wp;
 	int new_prescale = video_config.prescale;
 
@@ -614,7 +688,7 @@ void sdlwindow_modify_prescale(int dir)
 	}
 }
 
-void sdlwindow_modify_effect(int dir)
+void sdlwindow_modify_effect(sdl_window_info *window, int dir)
 {
 
 	if (video_config.mode == VIDEO_MODE_SOFT) 
@@ -649,9 +723,9 @@ void sdlwindow_modify_effect(int dir)
 #endif
 }
 
-void sdlwindow_toggle_draw(void)
+void sdlwindow_toggle_draw(sdl_window_info *window)
 {
-	sdl_window_info *window = sdl_window_list;
+#if USE_OPENGL
 	worker_param wp;
 
 	// If we are not fullscreen (windowed) remember our windowed size
@@ -682,6 +756,7 @@ void sdlwindow_toggle_draw(void)
 	}
 
 	execute_async_wait(&complete_create_wt, &wp);
+#endif
 }
 
 //============================================================
@@ -689,7 +764,7 @@ void sdlwindow_toggle_draw(void)
 //  (main or window thread)
 //============================================================
 
-void sdlwindow_update_cursor_state(void)
+static void sdlwindow_update_cursor_state(void)
 {
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
@@ -808,7 +883,7 @@ static void *sdlwindow_video_window_destroy_wt(void *param, int threadid)
 
 	if (window->sdlsurf)
 	{
-#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
+#if (!SDL_VERSION_ATLEAST(1,3,0))
 		// Will be done by SDL on next call to SetVideoMode
 		SDL_FreeSurface(window->sdlsurf);
 #endif
@@ -958,13 +1033,13 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 			if (!window->fullscreen)
 			{
 				sdl_info *sdl = window->dxdata;
-				drawsdl_blit_surface_size(window, window->sdlsurf->w, window->sdlsurf->h);
-				sdlwindow_resize(sdl->blitwidth, sdl->blitheight);
+				sdlwindow_blit_surface_size(window, window->sdlsurf->w, window->sdlsurf->h);
+				sdlwindow_resize(window, sdl->blitwidth, sdl->blitheight);
 			}
 			else if (video_config.switchres)
 			{
 				pick_best_mode(window, &tempwidth, &tempheight);
-				sdlwindow_resize(tempwidth, tempheight);
+				sdlwindow_resize(window, tempwidth, tempheight);
 			}
 
 			if (video_config.yuv_mode != VIDEO_YUV_MODE_NONE)
@@ -1052,8 +1127,8 @@ static void set_starting_view(running_machine *machine, int index, sdl_window_in
 		int scrcount;
 
 		// count the number of screens
-		for (scrcount = 0; machine->drv->screen[scrcount].tag != NULL; scrcount++) ;
-
+		scrcount = video_screen_count(machine->config);
+		
 		// if we have enough screens to be one per monitor, assign in order
 		if (video_config.numscreens >= scrcount)
 		{
@@ -1095,20 +1170,6 @@ static void set_starting_view(running_machine *machine, int index, sdl_window_in
 }
 
 
-
-#if USE_OPENGL
-static void sdlwindow_init_ogl_context(void)
-{
-	// do some one-time OpenGL setup
-	glShadeModel(GL_SMOOTH);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-}
-#endif
-
 //============================================================
 //  complete_create
 //  (window thread)
@@ -1120,17 +1181,13 @@ static void *complete_create_wt(void *param, int threadid)
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window;
 	int tempwidth, tempheight;
-	sdl_info *sdl;
+	//sdl_info *sdl;
 	static int result[2] = {0,1};
 
 	ASSERT_WINDOW_THREAD();
 	free(wp);
 
-	// initialize the drawing backend
-	if ((*draw.window_init)(window))
-		return (void *) &result[1];
-
-	sdl = window->dxdata;
+	//sdl = window->dxdata;
 
 	if (window->fullscreen)
 	{
@@ -1156,7 +1213,7 @@ static void *complete_create_wt(void *param, int threadid)
 		window->extra_flags = SDL_RESIZABLE;
 
 		/* Create the window directly with the correct aspect
-		   instead of letting drawsdl_blit_surface_size() resize it
+		   instead of letting sdlwindow_blit_surface_size() resize it
 		   this stops the window from "flashing" from the wrong aspect
 		   size to the right one at startup. */
 		tempwidth = (window->maxwidth != 0) ? window->maxwidth : 640;
@@ -1165,14 +1222,15 @@ static void *complete_create_wt(void *param, int threadid)
 		get_min_bounds(window, &tempwidth, &tempheight, video_config.keepaspect );
 	}
 
-	if (window->opengl)
+#ifndef NO_OPENGL
+	if (video_config.mode  == VIDEO_MODE_OPENGL)
 	{
 		window->extra_flags |= SDL_OPENGL;
 
  		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		
-		#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
-		#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
+		#if (SDL_VERSION_ATLEAST(1,2,10))
+ 		#if (!SDL_VERSION_ATLEAST(1,3,0))
 		if (options_get_bool(mame_options(), SDLOPTION_WAITVSYNC))
 		{
 			SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
@@ -1185,9 +1243,8 @@ static void *complete_create_wt(void *param, int threadid)
 		#endif
 	}
 
-#ifndef NO_OPENGL
 #ifdef USE_DISPATCH_GL
-	if (window->opengl && !dll_loaded)
+	if ((video_config.mode  == VIDEO_MODE_OPENGL) && !dll_loaded)
 	{
 		/*
 		 *  directfb and and x11 use this env var
@@ -1223,174 +1280,18 @@ static void *complete_create_wt(void *param, int threadid)
 	if (!window->sdlsurf)
 		return (void *) &result[1];
 		
-	if ( window->opengl && !(window->sdlsurf->flags & SDL_OPENGL) )
+	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(window->sdlsurf->flags & SDL_OPENGL) )
 	{
 		fprintf(stderr, "OpenGL not supported on this driver!\n");
 		return (void *) &result[1];
 	}
 
-#if USE_OPENGL
-	if (window->opengl)
-	{
-		char *extstr;
-		char *vendor;
-		int has_and_allow_texturerect = 0;
-		
-		/* load any GL function addresses
-		 * this must be done here because we need a context
-		 */ 
-		sdlwindow_loadgl();
+	// initialize the drawing backend
+	if ((*draw.window_init)(window))
+		return (void *) &result[1];
 
-		extstr = (char *)glGetString(GL_EXTENSIONS);
-		vendor = (char *)glGetString(GL_VENDOR);
-
-		// print out the driver info for debugging
-		if (!shown_video_info)
-		{
-			mame_printf_verbose("OpenGL: %s\nOpenGL: %s\nOpenGL: %s\n", vendor, (char *)glGetString(GL_RENDERER), (char *)glGetString(GL_VERSION));
-		}
-
-		sdl->usetexturerect = 0;
-		sdl->texpoweroftwo = 1;
-		sdl->usevbo = 0;
-		sdl->usepbo = 0;
-		sdl->usefbo = 0;
-		sdl->useglsl = 0;
-
-		if ( video_config.allowtexturerect &&
-		     ( strstr(extstr, "GL_ARB_texture_rectangle") ||  strstr(extstr, "GL_EXT_texture_rectangle") )
-		   )
-		{
-			has_and_allow_texturerect = 1;
-                        if (!shown_video_info)
-                        {
-                                mame_printf_verbose("OpenGL: texture rectangle supported\n");
-                        }
-		}
-
-		// does this card support non-power-of-two sized textures?  (they're faster, so use them if possible)
-		if ( !video_config.forcepow2texture && strstr(extstr, "GL_ARB_texture_non_power_of_two"))
-		{
-			if (!shown_video_info)
-			{
-				mame_printf_verbose("OpenGL: non-power-of-2 textures supported (new method)\n");
-			}
-                        sdl->texpoweroftwo = 0;
-		}
-		else
-		{
-			// second chance: GL_ARB_texture_rectangle or GL_EXT_texture_rectangle (old version)
-			if (has_and_allow_texturerect)
-			{
-				if (!shown_video_info)
-				{
-					mame_printf_verbose("OpenGL: non-power-of-2 textures supported (old method)\n");
-				}
-				sdl->usetexturerect = 1;
-			}
-			else
-			{
-				if (!shown_video_info)
-				{
-					mame_printf_verbose("OpenGL: forcing power-of-2 textures (creation, not copy)\n");
-				}
-			}
-		}
-
-		if (strstr(extstr, "GL_ARB_vertex_buffer_object"))
-		{
-                        sdl->usevbo = video_config.vbo;
-			if (!shown_video_info)
-			{
-				if(sdl->usevbo)
-					mame_printf_verbose("OpenGL: vertex buffer supported\n");
-				else
-					mame_printf_verbose("OpenGL: vertex buffer supported, but disabled\n");
-			}
-		}
-
-		if (strstr(extstr, "GL_ARB_pixel_buffer_object"))
-		{
-			if( sdl->usevbo )
-			{
-				sdl->usepbo = video_config.pbo;
-				if (!shown_video_info)
-				{
-					if(sdl->usepbo)
-						mame_printf_verbose("OpenGL: pixel buffers supported\n");
-					else
-						mame_printf_verbose("OpenGL: pixel buffers supported, but disabled\n");
-				}
-			} else {
-				if (!shown_video_info)
-				{
-					mame_printf_verbose("OpenGL: pixel buffers supported, but disabled due to disabled vbo\n");
-				}
-			}
-		}
-		else
-		{
-			if (!shown_video_info)
-			{
-				mame_printf_verbose("OpenGL: pixel buffers not supported\n");
-			}
-		}
-		
-		if (strstr(extstr, "GL_EXT_framebuffer_object"))
-		{
-                        sdl->usefbo = 1;
-			if (!shown_video_info)
-			{
-				if(sdl->usefbo)
-					mame_printf_verbose("OpenGL: framebuffer object supported\n");
-				else
-					mame_printf_verbose("OpenGL: framebuffer object not supported\n");
-			}
-		}
-
-		if (strstr(extstr, "GL_ARB_shader_objects") &&
-		    strstr(extstr, "GL_ARB_shading_language_100") &&
-		    strstr(extstr, "GL_ARB_vertex_shader") &&
-		    strstr(extstr, "GL_ARB_fragment_shader") 
-		   )
-		{
-			sdl->useglsl = video_config.glsl;
-			if (!shown_video_info)
-			{
-				if(sdl->useglsl)
-					mame_printf_verbose("OpenGL: GLSL supported\n");
-				else
-					mame_printf_verbose("OpenGL: GLSL supported, but disabled\n");
-			}
-		} else {
-			if (!shown_video_info)
-			{
-				mame_printf_verbose("OpenGL: GLSL not supported\n");
-			}
-		}
-
-		sdl->glsl_vid_attributes = video_config.glsl_vid_attributes;
-
-		if (getenv(SDLENV_VMWARE) != NULL)
-		{
-			sdl->usetexturerect = 1;
-			sdl->texpoweroftwo = 1;
-		}
-		glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&sdl->texture_max_width);
-		glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&sdl->texture_max_height);
-		if (!shown_video_info)
-		{
-			mame_printf_verbose("OpenGL: max texture size %d x %d\n", sdl->texture_max_width, sdl->texture_max_height);
-		}
-
-		shown_video_info = 1;
-
-		sdlwindow_init_ogl_context();
-	}
-#endif
 	if (video_config.yuv_mode != VIDEO_YUV_MODE_NONE)
 	{
-		drawsdl_yuv_init(window);
 		yuv_overlay_init(window);
 	}
 

@@ -14,17 +14,12 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "driver.h"
-#include "debug/debugvw.h"
-#include "debug/debugcon.h"
-#include "debug/debugcpu.h"
-#include "deprecat.h"
-
 #include "debug-intf.h"
 #include "debug-sup.h"
 #include "debug-cb.h"
 
 #include "dview.h"
+#include "deprecat.h"
 
 typedef struct hentry {
 	struct hentry *h;

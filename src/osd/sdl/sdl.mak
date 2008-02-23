@@ -44,7 +44,7 @@ USE_DISPATCH_GL = 1
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
-SDL_INSTALL_ROOT = /usr/local/sdl13
+# SDL_INSTALL_ROOT = /usr/local/sdl13
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -160,8 +160,12 @@ OSDCOREOBJS = \
 OSDOBJS =  $(SDLOBJ)/sdlmain.o \
 	$(SDLOBJ)/input.o \
 	$(SDLOBJ)/sound.o  $(SDLOBJ)/video.o \
-	$(SDLOBJ)/drawsdl.o $(SDLOBJ)/window.o $(SDLOBJ)/keybled.o \
-	$(SDLOBJ)/scale2x.o
+	$(SDLOBJ)/drawsdl.o $(SDLOBJ)/window.o $(SDLOBJ)/keybled.o 
+
+
+ifndef NO_OPENGL
+OSDOBJS += $(SDLOBJ)/drawogl.o $(SDLOBJ)/scale2x.o
+endif
 
 # add the debugger includes
 CFLAGS += -Isrc/debug
@@ -218,6 +222,7 @@ ifdef DEBUGGER
 OSDOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 CFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
+CFLAGS += -DGTK_DISABLE_DEPRECATED
 endif # DEBUGGER
 
 # make sure we can find X headers
@@ -234,7 +239,7 @@ OSDCOREOBJS += $(SDLOBJ)/main.o
 SDLMAIN = $(SDLOBJ)/main.o
 
 # at least compile some stubs to link it
-ifdef DEBUGGER
+ifdef DEBUG
 OSDOBJS += $(SDLOBJ)/debugwin.o
 endif
 

@@ -16,11 +16,6 @@
 
 #include "SDL/SDL.h"
 
-#ifdef SDLMAME_OS2
-#define INCL_DOS
-#include <os2.h>
-#endif
-
 #ifdef SDLMAME_MACOSX
 #include <mach/mach.h>
 #endif
@@ -41,6 +36,11 @@
 #include <pthread.h>
 #include <errno.h>
 #include <sys/time.h>
+#else
+#include <stdlib.h>
+#define pthread_t       int
+#define pthread_self    _gettid
+#endif
 
 struct _osd_lock {
  	volatile pthread_t	holder;
@@ -52,6 +52,7 @@ struct _osd_lock {
 #endif
 };
  
+#ifndef SDLMAME_OS2
 struct _osd_event {
 	pthread_mutex_t 	mutex;
 	pthread_cond_t 		cond;
@@ -63,6 +64,7 @@ struct _osd_event {
 	INT8				padding[48];	// A bit more padding
 #endif
 };
+#endif
 
 struct _osd_thread {
 	pthread_t			thread;
@@ -232,6 +234,7 @@ void osd_lock_free(osd_lock *lock)
 //  osd_num_processors
 //============================================================
 
+#ifndef SDLMAME_OS2
 int osd_num_processors(void)
 {
 	int processors = 1;
@@ -443,65 +446,7 @@ void osd_thread_wait_free(osd_thread *thread)
 	free(thread);
 }
 
-
-#else   // SDLMAME_OS2
-
-
-struct _osd_lock
-{
-     HMTX   hmtx;
-};
-
-//============================================================
-//  osd_lock_alloc
-//============================================================
-
-osd_lock *osd_lock_alloc(void)
-{
-     osd_lock *lock = malloc(sizeof(*lock));
-     if (lock == NULL)
-          return NULL;
-     DosCreateMutexSem( NULL, &lock->hmtx, 0, FALSE );
-     return lock;
-}
-
-//============================================================
-//  osd_lock_acquire
-//============================================================
-
-void osd_lock_acquire(osd_lock *lock)
-{
-    DosRequestMutexSem( lock->hmtx, -1 );
-}
-
-//============================================================
-//  osd_lock_try
-//============================================================
-
-int osd_lock_try(osd_lock *lock)
-{
-    return ( DosRequestMutexSem( lock->hmtx, 0 ) == 0 );
-}
-
-//============================================================
-//  osd_lock_release
-//============================================================
-
-void osd_lock_release(osd_lock *lock)
-{
-    DosReleaseMutexSem( lock->hmtx );
-}
-
-//============================================================
-//  osd_lock_free
-//============================================================
-
-void osd_lock_free(osd_lock *lock)
-{
-    DosCloseMutexSem( lock->hmtx );
-    free( lock );
-}
-#endif
+#endif  /* SDLMAME_OS2 */
 #else	// SDLMAME_WIN32
 #include "../windows/winsync.c"
 #endif

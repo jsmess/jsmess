@@ -3,11 +3,26 @@
 
 /* Notes
 
-	- fixed compile against SDL13
+	- fixes from judge for warnings / may reappear (glade)
+	- more warnings fixed / may reappear (glade)
+	- moved osdefs.h into sdlprefix.h
+	- removed osdefs.h
+	- finally removed sdlmisc.h
+
+	- create drawogl.c and moved ogl relevant stuff there
+	- draw.window_init() now called after window creation
+	- removed window.opengl flag
+	- added sdl_window_info as parameter to all functions in window.h
+	- rename SDL_VERSIONNUM to SDL_VERSION_ATLEAST
+	- removed all uclock stuff in sdlmisc.[ch]
+	- minor cleanups
+
+	- fixed compile issues against SDL13
+	- fixed input issues with SDL13
 	- stricter checks for USE_OPENGL, e.g. for options
-	- move sdlvideo_loadgl to window.c, rename it sdlwindow_loadgl and make it static
+	- move sdlvideo_loadgl to window.c, rename it to sdlwindow_loadgl and make it static
 	- moved yuv_blit.c into drawsdl.c
-	- renamed compute_blit_surface_size to drawsdl_blit_surface_size
+	- renamed compute_blit_surface_size to sdlwindow_blit_surface_size
 	- renamed drawsdl_destroy_all_textures to drawogl_destroy_all_textures and
 	  moved it to _sdl_draw_callbacks
 	- removed print_colums

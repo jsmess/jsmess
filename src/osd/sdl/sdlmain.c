@@ -104,7 +104,7 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_EFFECT,                  SDLOPTVAL_NONE,  0,                 "name of a PNG file to use for visual effects, or 'none'" },
 	{ SDLOPTION_CENTERH,                      "1",        OPTION_BOOLEAN,    "center horizontally within the view area" },
 	{ SDLOPTION_CENTERV,                      "1",        OPTION_BOOLEAN,    "center vertically within the view area" },
-	#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
+	#if (SDL_VERSION_ATLEAST(1,2,10))
 	{ SDLOPTION_WAITVSYNC,                    "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	#endif
 	{ SDLOPTION_YUVMODE ";ym",           SDLOPTVAL_NONE,  0,                 "YUV mode: none, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
