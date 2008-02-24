@@ -124,11 +124,7 @@ static MACHINE_DRIVER_START( sym1 )
 	MDRV_CPU_PROGRAM_MAP(sym1_map, 0)
 	MDRV_MACHINE_RESET(sym1)
 
-	/* "video" hardware */
 	MDRV_DEFAULT_LAYOUT(layout_sym1)
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
