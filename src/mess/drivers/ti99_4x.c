@@ -682,7 +682,7 @@ ROM_START(ti99_4)
 	ROM_LOAD_OPTIONAL("rs232.bin", offset_rs232_dsr, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
 
 	/* HSGPL memory space */
-	ROM_REGION(region_hsgpl_len, region_hsgpl, 0)
+	ROM_REGION(region_hsgpl_len, region_hsgpl, ROMREGION_ERASEFF)
 
 	/*TMS5220 ROM space*/
 	ROM_REGION(0x8000, region_speech_rom, 0)
@@ -709,7 +709,7 @@ ROM_START(ti99_4a)
 	ROM_LOAD_OPTIONAL("rs232.bin", offset_rs232_dsr, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
 
 	/* HSGPL memory space */
-	ROM_REGION(region_hsgpl_len, region_hsgpl, 0)
+	ROM_REGION(region_hsgpl_len, region_hsgpl, ROMREGION_ERASEFF)
 
 	/*TMS5220 ROM space*/
 	ROM_REGION(0x8000, region_speech_rom, 0)
@@ -737,7 +737,7 @@ ROM_START(ti99_4ev)
 	ROM_LOAD("evpcdsr.bin", offset_evpc_dsr, 0x10000, CRC(a062b75d) SHA1(6e8060f86e3bb9c36f244d88825e3fe237bfe9a9)) /* evpc DSR ROM */
 
 	/* HSGPL memory space */
-	ROM_REGION(region_hsgpl_len, region_hsgpl, 0)
+	ROM_REGION(region_hsgpl_len, region_hsgpl, ROMREGION_ERASEFF)
 
 	/*TMS5220 ROM space*/
 	ROM_REGION(0x8000, region_speech_rom, 0)
