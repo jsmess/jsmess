@@ -297,9 +297,9 @@ ROM_START(ti990_4)
 
 #if VIDEO_911
 	/* VDT911 character definitions */
-	ROM_REGION(vdt911_chr_region_len, vdt911_chr_region, 0)
+	ROM_REGION(vdt911_chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
 #else
-	ROM_REGION(asr733_chr_region_len, asr733_chr_region, 0)
+	ROM_REGION(asr733_chr_region_len, asr733_chr_region, ROMREGION_ERASEFF)
 #endif
 
 ROM_END
