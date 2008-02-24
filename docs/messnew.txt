@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- Philips Videopac G7000/C52 [Wilbert Pol]
 
 
 

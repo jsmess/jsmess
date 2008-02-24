@@ -455,7 +455,7 @@ INLINE void odyssey2_draw_char(mame_bitmap *bitmap, UINT8 bg[][320], int x, int 
 VIDEO_UPDATE( odyssey2 )
 {
 	int i, j, x, y;
-	UINT8 bg[300][320]= { { 0 } };
+	UINT8 bg[313][320]= { { 0 } };
 
 	assert(bitmap->width<=ARRAY_LENGTH(bg[0]) && bitmap->height<=ARRAY_LENGTH(bg));
 
