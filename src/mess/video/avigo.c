@@ -27,10 +27,6 @@ static UINT8 avigo_screen_column = 0;
 static int stylus_x;
 static int stylus_y;
 
-
-/* colour table filled in from avigo colour table*/
-static UINT32 stylus_color_table[3] = {0,0,0};
-
 static const gfx_layout pointerlayout =
 {
 	8, 8,
@@ -116,16 +112,15 @@ WRITE8_HANDLER(avigo_vid_memory_w)
 
 VIDEO_START( avigo )
 {
-    /* current selected column to read/write */
-    avigo_screen_column = 0;
+	/* current selected column to read/write */
+	avigo_screen_column = 0;
 
-    /* allocate video memory */
-    avigo_video_memory = auto_malloc(((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT));
+	/* allocate video memory */
+	avigo_video_memory = auto_malloc(((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT));
 	machine->gfx[0] = stylus_pointer = allocgfx(&pointerlayout);
+
 	decodegfx(stylus_pointer, pointermask, 0, 1);
 	stylus_pointer->total_colors = 3;
-	stylus_color_table[1] = machine->pens[0];
-	stylus_color_table[2] = machine->pens[1];
 }
 
 /* Initialise the palette */
@@ -135,8 +130,8 @@ PALETTE_INIT( avigo )
 	palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
 }
 
-static unsigned int avigo_ad_x;
-static unsigned int avigo_ad_y;
+//static unsigned int avigo_ad_x;
+//static unsigned int avigo_ad_y;
 
 /***************************************************************************
   Draw the game screen in the given mame_bitmap.
