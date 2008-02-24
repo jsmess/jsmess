@@ -169,6 +169,10 @@ TESTDRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 	/* MAGNAVOX */
 	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
 
+	/* PHILLIPS */
+	DRIVER( videopac )	/* Phillips Videopac G7000/C52                                 */
+	DRIVER( g7400 )		/* Phillips Videopac Plus G7400                                */ 
+
 	/* WATARA */
 	DRIVER( svision )	/* Supervision Handheld								*/
 TESTDRIVER( svisions )
