@@ -257,7 +257,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START (kaypro)
-    ROM_REGION(0x10000,REGION_CPU1,0) /* 64K for the Z80 */
+    ROM_REGION(0x10000,REGION_CPU1,ROMREGION_ERASEFF) /* 64K for the Z80 */
     /* totally empty :) */
 
     ROM_REGION(0x04000,REGION_GFX1,0)  /* 4 * 4K font ram */
