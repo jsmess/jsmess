@@ -418,7 +418,7 @@ ROM_START (cgenie)
 	ROM_LOAD ("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
 
 	/* Empty memory region for the character generator */
-	ROM_REGION(0x0800,REGION_GFX2,0)
+	ROM_REGION(0x0800,REGION_GFX2,ROMREGION_ERASEFF)
 
 ROM_END
 
