@@ -423,7 +423,7 @@ MACHINE_DRIVER_END
     pdp1 can address up to 65336 18 bit words when extended (4096 otherwise).
 */
 ROM_START(pdp1)
-	ROM_REGION(pdp1_fontdata_size, REGION_GFX1, 0)
+	ROM_REGION(pdp1_fontdata_size, REGION_GFX1, ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 
