@@ -240,10 +240,10 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_CPU_CONFIG(mtx_daisy_chain)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_IMPORT_FROM(tms9928a)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
