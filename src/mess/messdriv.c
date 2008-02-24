@@ -169,10 +169,6 @@ TESTDRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 	/* MAGNAVOX */
 	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
 
-	/* PHILLIPS */
-	DRIVER( videopac )	/* Phillips Videopac G7000/C52                                 */
-	DRIVER( g7400 )		/* Phillips Videopac Plus G7400                                */ 
-
 	/* WATARA */
 	DRIVER( svision )	/* Supervision Handheld								*/
 TESTDRIVER( svisions )
@@ -187,6 +183,9 @@ TESTDRIVER( tvlinkp )
 	/* BANDAI */
 	DRIVER( wswan )		/* Bandai WonderSwan Handheld						*/
 	DRIVER( wscolor )	/* Bandai WonderSwan Color Handheld					*/
+
+	/* EPOCH */
+TESTDRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
 
 
 /****************COMPUTERS***************************************************/
@@ -606,7 +605,8 @@ TESTDRIVER( trs80m4 )
 	/* PHILIPS */
 	DRIVER( p2000t )	/* 1980 P2000T										*/
 	DRIVER( p2000m )	/* 1980 P2000M										*/
-	/* philips g7000 odyssey2 compatible */
+	DRIVER( videopac )	/* 1979 Videopac G7000/C52							*/
+TESTDRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 
 	/* COMPUKIT */
 	DRIVER( uk101 )		/* 1979 UK101										*/
