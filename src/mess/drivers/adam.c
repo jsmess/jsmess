@@ -637,6 +637,8 @@ static MACHINE_DRIVER_START( adam )
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_REFRESH_RATE(50)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
