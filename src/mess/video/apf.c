@@ -16,6 +16,7 @@ static ATTR_CONST UINT8 apf_get_attributes(UINT8 c)
 	/* this seems to be the same so far, as it gives the same result as vapf */
   UINT8 result = apf_m6847_attr;
   if (apf_m6847_attr&M6847_AG) {
+    //    if ( !(result&M6847_GM0)&&(c&0x20)) result|=M6847_CSS; // not working since m6847 doesn't deliver character
     result |= M6847_GM2|M6847_GM1;
   } else {
 	if (c & 0x40)	result |= M6847_INV;
