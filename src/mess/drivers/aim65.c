@@ -24,8 +24,7 @@ ToDo:
 /* cartridge device */
 #include "devices/cartslot.h"
 
-/* for the layout */
-#include "rendlay.h"
+/* Layout */
 #include "aim65.lh"
 
 
@@ -158,12 +157,7 @@ static MACHINE_DRIVER_START( aim65 )
 
 	MDRV_DEFAULT_LAYOUT(layout_aim65)
 
-	/* dummy values */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
-	MDRV_VIDEO_START( aim65 )
+	MDRV_VIDEO_START(aim65)
 MACHINE_DRIVER_END
 
 
