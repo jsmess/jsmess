@@ -193,9 +193,9 @@ ROM_START(kim1)
 	ROM_REGION(0x10000,REGION_CPU1,0)
 		ROM_LOAD("6530-003.bin",    0x1800, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
 		ROM_LOAD("6530-002.bin",    0x1c00, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
-	ROM_REGION(128 * 24 * 3,REGION_GFX1,0)
+	ROM_REGION(128 * 24 * 3,REGION_GFX1,ROMREGION_ERASEFF)
 		/* space filled with 7segement graphics by kim1_init_driver */
-	ROM_REGION( 24 * 18 * 3 * 2,REGION_GFX2,0)
+	ROM_REGION( 24 * 18 * 3 * 2,REGION_GFX2,ROMREGION_ERASEFF)
 		/* space filled with key icons by kim1_init_driver */
 ROM_END
 
