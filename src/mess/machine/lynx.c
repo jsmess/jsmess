@@ -805,10 +805,9 @@ typedef struct {
 	UINT8	bakup;
 	UINT8	cntrl1;
 	UINT8	cntrl2;
-    int		counter;
-    void	*timer;
+	int		counter;
+	void	*timer;
 	int		timer_active;
-    double	settime;
 } LYNX_TIMER;
 
 #define NR_LYNX_TIMERS	8
@@ -821,7 +820,6 @@ static void lynx_timer_init(int which)
 {
 	memset( &lynx_timer[which], 0, sizeof(LYNX_TIMER) );
 	lynx_timer[which].timer = timer_alloc( lynx_timer_shot , NULL);
-	lynx_timer[which].settime = 0.0;
 }
 
 static void lynx_timer_signal_irq(int which)
@@ -938,6 +936,19 @@ static void lynx_timer_write(int which, int offset, UINT8 data)
 		break;
 	case 1:
 		lynx_timer[which].cntrl1 = data;
+		if ( data & 0x40 )
+			lynx_timer[which].cntrl2 &= ~8;
+		break;
+	case 2:
+//		lynx_timer[which].counter = data;
+		break;
+	case 3:
+		lynx_timer[which].cntrl2 = ( lynx_timer[which].cntrl2 & 8 ) | ( data & ~8 );
+		break;
+	}
+
+	/* Update timers */
+	if ( offset < 3 ) {
 		timer_reset( lynx_timer[which].timer, attotime_never);
 		lynx_timer[which].timer_active = 0;
 		if ( ( lynx_timer[which].cntrl1 & 0x08 ) )
@@ -952,15 +963,6 @@ static void lynx_timer_write(int which, int offset, UINT8 data)
 				lynx_timer[which].timer_active = 1;
 			}
 		}
-		if ( data & 0x40 )
-			lynx_timer[which].cntrl2 &= ~8;
-		break;
-	case 2:
-//		lynx_timer[which].counter = data;
-		break;
-	case 3:
-		lynx_timer[which].cntrl2 = ( lynx_timer[which].cntrl2 & 8 ) | ( data & ~8 );
-		break;
 	}
 }
 
