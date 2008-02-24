@@ -276,6 +276,7 @@ static MACHINE_DRIVER_START( nascom2 )
 	MDRV_CPU_IO_MAP(nascom2_io, 0)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(48 * 8, 16 * 14)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
 	MDRV_GFXDECODE(nascom2)
