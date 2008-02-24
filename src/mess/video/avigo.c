@@ -14,9 +14,6 @@
   Start the video hardware emulation.
 ***************************************************************************/
 
-/* backdrop */
-//struct artwork_info *avigo_backdrop;
-
 /* mem size = 0x017c0 */
 
 static unsigned char *avigo_video_memory;
@@ -59,7 +56,7 @@ void	avigo_vh_set_stylus_marker_position(int x,int y)
 	stylus_y = y;
 }
 
- READ8_HANDLER(avigo_vid_memory_r)
+READ8_HANDLER(avigo_vid_memory_r)
 {
         unsigned char *ptr;
 
@@ -126,67 +123,20 @@ VIDEO_START( avigo )
     avigo_video_memory = auto_malloc(((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT));
 	machine->gfx[0] = stylus_pointer = allocgfx(&pointerlayout);
 	decodegfx(stylus_pointer, pointermask, 0, 1);
-	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
-	/*stylus_pointer->colortable = stylus_color_table;*/
 	stylus_pointer->total_colors = 3;
 	stylus_color_table[1] = machine->pens[0];
 	stylus_color_table[2] = machine->pens[1];
 }
 
-/* two colours */
-static const unsigned short avigo_colour_table[AVIGO_NUM_COLOURS] =
-{
-	0, 1
-};
-
-/* black/white */
-static const unsigned char avigo_palette[AVIGO_NUM_COLOURS * 3] =
-{
-    0x0ff, 0x0ff, 0x0ff,
-    0x000, 0x000, 0x000
-};
-
-
 /* Initialise the palette */
 PALETTE_INIT( avigo )
 {
-/*	char *backdrop_name;
-    int used = 2; */
-	palette_set_colors_rgb(machine, 0, avigo_palette, sizeof(avigo_palette) / 3);
-
-	/* load backdrop */
-#if 0
-	backdrop_name = malloc(strlen(machine->gamedrv->name)+4+1);
-
-    if (backdrop_name!=NULL)
-	{
-		strcpy(backdrop_name, machine->gamedrv->name);
-		strcat(backdrop_name, ".png");
-
-		logerror("%s\n",backdrop_name);
-
-        artwork_load(&avigo_backdrop, backdrop_name, used,machine->config->total_colors-used);
-
-		if (avigo_backdrop)
-		{
-			LOG(("backdrop %s successfully loaded\n", backdrop_name));
-            memcpy (&sys_palette[used * 3], avigo_backdrop->orig_palette,
-                    avigo_backdrop->num_pens_used * 3 * sizeof (unsigned char));
-		}
-		else
-		{
-			logerror("no backdrop loaded\n");
-		}
-
-        free(backdrop_name);
-		backdrop_name = NULL;
-	}
-#endif
+	palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
 }
+
 static unsigned int avigo_ad_x;
 static unsigned int avigo_ad_y;
-
-
 
 /***************************************************************************
   Draw the game screen in the given mame_bitmap.
@@ -195,43 +145,37 @@ static unsigned int avigo_ad_y;
 ***************************************************************************/
 VIDEO_UPDATE( avigo )
 {
-    int y;
-    int b;
-    int x;
-    int pens[2];
+	int y;
+	int b;
+	int x;
 	rectangle r;
 
 	/* draw avigo display */
-    pens[0] = machine->pens[0];
-    pens[1] = machine->pens[1];
+	for (y=0; y<AVIGO_SCREEN_HEIGHT; y++)
+	{
+		int by;
+		unsigned char *line_ptr = avigo_video_memory +  (y*(AVIGO_SCREEN_WIDTH>>3));
 
-    for (y=0; y<AVIGO_SCREEN_HEIGHT; y++)
-    {
-        int by;
-
-        unsigned char *line_ptr = avigo_video_memory +  (y*(AVIGO_SCREEN_WIDTH>>3));
-
-        x = 0;
-        for (by=((AVIGO_SCREEN_WIDTH>>3)-1); by>=0; by--)
-        {
+		x = 0;
+		for (by=((AVIGO_SCREEN_WIDTH>>3)-1); by>=0; by--)
+		{
 			int px;
-            unsigned char byte;
+			unsigned char byte;
 
-            byte = line_ptr[0];
+			byte = line_ptr[0];
 
 			px = x;
-            for (b=7; b>=0; b--)
-            {
-				*BITMAP_ADDR16(bitmap, y, px) = pens[(byte>>7) & 0x01];
-                px++;
+			for (b=7; b>=0; b--)
+			{
+				*BITMAP_ADDR16(bitmap, y, px) = ((byte>>7) & 0x01);
+				px++;
 				byte = byte<<1;
-            }
+			}
 
-            x = px;
-
-            line_ptr = line_ptr+1;
-        }
-     }
+			x = px;
+			line_ptr = line_ptr+1;
+		}
+	}
 
 	r.min_x = 0;
 	r.max_x = AVIGO_SCREEN_WIDTH;
@@ -239,29 +183,29 @@ VIDEO_UPDATE( avigo )
 	r.max_y = AVIGO_SCREEN_HEIGHT;
 
 	/* draw stylus marker */
-	drawgfx (bitmap, stylus_pointer, 0, 0, 0, 0,
-			 stylus_x, stylus_y, &r, TRANSPARENCY_PEN, 0);
-
+	drawgfx (bitmap, stylus_pointer, 0, 0, 0, 0, stylus_x, stylus_y, &r, TRANSPARENCY_PEN, 0);
+#if 0
 	{
 
-		char	avigo_text[256];
-		sprintf(avigo_text,"X: %03x Y: %03x",avigo_ad_x, avigo_ad_y);
-		// FIXME
-		//ui_draw_text(avigo_text, 0, 200);
+	char	avigo_text[256];
+	sprintf(avigo_text,"X: %03x Y: %03x",avigo_ad_x, avigo_ad_y);
+	// FIXME
+	//ui_draw_text(avigo_text, 0, 200);
 	}
 	{
-		int xb,yb,zb,ab,bb;
-		char	avigo_text[256];
-		xb =cpunum_read_byte(0,0x0c1cf) & 0x0ff;
-		yb = cpunum_read_byte(0,0x0c1d0) & 0x0ff;
-		zb =cpunum_read_byte(0,0x0c1d1) & 0x0ff;
-		ab = cpunum_read_byte(0,0x0c1d2) & 0x0ff;
-		bb =cpunum_read_byte(0,0x0c1d3) & 0x0ff;
+	int xb,yb,zb,ab,bb;
+	char	avigo_text[256];
+	xb =cpunum_read_byte(0,0x0c1cf) & 0x0ff;
+	yb = cpunum_read_byte(0,0x0c1d0) & 0x0ff;
+	zb =cpunum_read_byte(0,0x0c1d1) & 0x0ff;
+	ab = cpunum_read_byte(0,0x0c1d2) & 0x0ff;
+	bb =cpunum_read_byte(0,0x0c1d3) & 0x0ff;
 
-		sprintf(avigo_text,"Xb: %02x Yb: %02x zb: %02x ab:%02x bb:%02x",xb, yb,zb,ab,bb);
-		// FIXME
-		//ui_draw_text(avigo_text, 0, 216+16);
+	sprintf(avigo_text,"Xb: %02x Yb: %02x zb: %02x ab:%02x bb:%02x",xb, yb,zb,ab,bb);
+	// FIXME
+	//ui_draw_text(avigo_text, 0, 216+16);
 	}
+#endif
 	return 0;
 }
 
