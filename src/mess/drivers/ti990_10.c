@@ -265,7 +265,7 @@ ROM_START(ti990_10)
 
 
 	/* VDT911 character definitions */
-	ROM_REGION(vdt911_chr_region_len, vdt911_chr_region, 0)
+	ROM_REGION(vdt911_chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
 
 ROM_END
 
