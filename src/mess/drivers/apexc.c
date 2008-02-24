@@ -826,10 +826,10 @@ MACHINE_DRIVER_END
 
 ROM_START(apexc)
 	/*CPU memory space*/
-	ROM_REGION32_BE(0x10000, REGION_CPU1, 0)
+	ROM_REGION32_BE(0x10000, REGION_CPU1, ROMREGION_ERASEFF)
 		/* Note this computer has no ROM... */
 
-	ROM_REGION(apexcfontdata_size, REGION_GFX1, 0)
+	ROM_REGION(apexcfontdata_size, REGION_GFX1, ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 
