@@ -96,7 +96,7 @@ static void adjust_begin_and_end_row(const rectangle *cliprect, int *beginrow, i
 -------------------------------------------------*/
 
 INLINE void apple2_plot_text_character(mame_bitmap *bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2)
+	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2, int flip)
 {
 	int x, y, i;
 	int fg = fgcolor;
@@ -125,7 +125,11 @@ INLINE void apple2_plot_text_character(mame_bitmap *bitmap, int xpos, int ypos, 
 	{
 		for (x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << x)) ? bg : fg;
+			if (flip)
+				color = (chardata[y] & (1 << (6 - x))) ? bg : fg;
+			else
+				color = (chardata[y] & (1 << x)) ? bg : fg;
+
 			for (i = 0; i < xscale; i++)
 			{
 				*BITMAP_ADDR16(bitmap, ypos + y, xpos + (x * xscale) + i) = color;
@@ -141,7 +145,7 @@ INLINE void apple2_plot_text_character(mame_bitmap *bitmap, int xpos, int ypos, 
 	column or 80 column)
 -------------------------------------------------*/
 
-static void apple2_text_draw(mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_text_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
 	int row, col;
 	UINT32 start_address = (page ? 0x0800 : 0x0400);
@@ -149,6 +153,7 @@ static void apple2_text_draw(mame_bitmap *bitmap, const rectangle *cliprect, int
 	const UINT8 *textgfx_data = memory_region(REGION_GFX1);
 	UINT32 textgfx_datalen = memory_region_length(REGION_GFX1);
 	UINT32 my_a2 = effective_a2();
+	int flip = !strcmp(machine->gamedrv->name, "apple2") || !strcmp(machine->gamedrv->name, "apple2p");
 
 	/* perform adjustments */
 	adjust_begin_and_end_row(cliprect, &beginrow, &endrow);
@@ -163,14 +168,14 @@ static void apple2_text_draw(mame_bitmap *bitmap, const rectangle *cliprect, int
 			if (my_a2 & VAR_80COL)
 			{
 				apple2_plot_text_character(bitmap, col * 14 + 0, row, 1, a2_videoram[address + 0x10000],
-					textgfx_data, textgfx_datalen, my_a2);
+					textgfx_data, textgfx_datalen, my_a2, flip);
 				apple2_plot_text_character(bitmap, col * 14 + 7, row, 1, a2_videoram[address + 0x00000],
-					textgfx_data, textgfx_datalen, my_a2);
+					textgfx_data, textgfx_datalen, my_a2, flip);
 			}
 			else
 			{
 				apple2_plot_text_character(bitmap, col * 14, row, 2, a2_videoram[address],
-					textgfx_data, textgfx_datalen, my_a2);
+					textgfx_data, textgfx_datalen, my_a2, flip);
 			}
 		}
 	}
@@ -181,7 +186,7 @@ static void apple2_text_draw(mame_bitmap *bitmap, const rectangle *cliprect, int
     apple2_lores_draw - renders lo-res text
 -------------------------------------------------*/
 
-static void apple2_lores_draw(mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_lores_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
 	int row, col, y, x;
 	UINT8 code;
@@ -351,7 +356,7 @@ static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 	}
 }
 
-static void apple2_hires_draw(mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_hires_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
 	struct drawtask_params dtparams;
 
@@ -498,29 +503,29 @@ VIDEO_UPDATE( apple2 )
 	if (effective_a2() & VAR_TEXT)
 	{
 		/* text screen */
-		apple2_text_draw(bitmap, cliprect, page, 0, 191);
+		apple2_text_draw(machine, bitmap, cliprect, page, 0, 191);
 	}
 	else if ((effective_a2() & VAR_HIRES) && (effective_a2() & VAR_MIXED))
 	{
 		/* hi-res on top; text at bottom */
-		apple2_hires_draw(bitmap, cliprect, page, 0, 159);
-		apple2_text_draw(bitmap, cliprect, page, 160, 191);
+		apple2_hires_draw(machine, bitmap, cliprect, page, 0, 159);
+		apple2_text_draw(machine, bitmap, cliprect, page, 160, 191);
 	}
 	else if (effective_a2() & VAR_HIRES)
 	{
 		/* hi-res screen */
-		apple2_hires_draw(bitmap, cliprect, page, 0, 191);
+		apple2_hires_draw(machine, bitmap, cliprect, page, 0, 191);
 	}
 	else if (effective_a2() & VAR_MIXED)
 	{
 		/* lo-res on top; text at bottom */
-		apple2_lores_draw(bitmap, cliprect, page, 0, 159);
-		apple2_text_draw(bitmap, cliprect, page, 160, 191);
+		apple2_lores_draw(machine, bitmap, cliprect, page, 0, 159);
+		apple2_text_draw(machine, bitmap, cliprect, page, 160, 191);
 	}
 	else
 	{
 		/* lo-res screen */
-		apple2_lores_draw(bitmap, cliprect, page, 0, 191);
+		apple2_lores_draw(machine, bitmap, cliprect, page, 0, 191);
 	}
 	return 0;
 }
