@@ -23,31 +23,12 @@
 
 
 /******************************************************************************
- Function Prototypes
-******************************************************************************/
-
-static void aim65_update_ds1(int digit, int data);
-static void aim65_update_ds2(int digit, int data);
-static void aim65_update_ds3(int digit, int data);
-static void aim65_update_ds4(int digit, int data);
-static void aim65_update_ds5(int digit, int data);
-
-
-
-/******************************************************************************
  Global variables
 ******************************************************************************/
 
 
 static UINT8 pia_a, pia_b;
 static UINT8 riot_port_a;
-
-/* Display driver interfaces */
-static const dl1416_interface dl1416_ds1 = { DL1416T, aim65_update_ds1 };
-static const dl1416_interface dl1416_ds2 = { DL1416T, aim65_update_ds2 };
-static const dl1416_interface dl1416_ds3 = { DL1416T, aim65_update_ds3 };
-static const dl1416_interface dl1416_ds4 = { DL1416T, aim65_update_ds4 };
-static const dl1416_interface dl1416_ds5 = { DL1416T, aim65_update_ds5 };
 
 
 
@@ -90,17 +71,21 @@ static void aim65_via_irq_func(int state)
  * PB7: CU (Cursor)
  */
 
+static void dl1416_update(dl1416_t *chip, int index)
+{
+	dl1416_set_input_ce(chip, pia_a & (0x04 << index));
+	dl1416_set_input_w(chip, pia_a & 0x80);
+	dl1416_set_input_cu(chip, pia_b & 0x80);
+	dl1416_write(chip, pia_a & 0x03, pia_b & 0x7f);
+}
+
 static void aim65_pia(void)
 {
-	int which;
-
-	for (which = 0; which < 5; which++)
-	{
-		dl1416_set_input_ce(which, pia_a & (0x04 << which));
-		dl1416_set_input_w(which, pia_a & 0x80);
-		dl1416_set_input_cu(which, pia_b & 0x80);
-		dl1416_write(which, pia_a & 0x03, pia_b & 0x7f);
-	}
+	dl1416_update(devtag_get_token(Machine, DL1416, "ds1"), 0);
+	dl1416_update(devtag_get_token(Machine, DL1416, "ds2"), 1);
+	dl1416_update(devtag_get_token(Machine, DL1416, "ds3"), 2);
+	dl1416_update(devtag_get_token(Machine, DL1416, "ds4"), 3);
+	dl1416_update(devtag_get_token(Machine, DL1416, "ds5"), 4);
 }
 
 
@@ -135,11 +120,11 @@ static const pia6821_interface pia =
 };
 
 
-static void aim65_update_ds1(int digit, int data) { output_set_digit_value( 0 + (digit ^ 3), data); }
-static void aim65_update_ds2(int digit, int data) { output_set_digit_value( 4 + (digit ^ 3), data); }
-static void aim65_update_ds3(int digit, int data) { output_set_digit_value( 8 + (digit ^ 3), data); }
-static void aim65_update_ds4(int digit, int data) { output_set_digit_value(12 + (digit ^ 3), data); }
-static void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit ^ 3), data); }
+void aim65_update_ds1(int digit, int data) { output_set_digit_value( 0 + (digit ^ 3), data); }
+void aim65_update_ds2(int digit, int data) { output_set_digit_value( 4 + (digit ^ 3), data); }
+void aim65_update_ds3(int digit, int data) { output_set_digit_value( 8 + (digit ^ 3), data); }
+void aim65_update_ds4(int digit, int data) { output_set_digit_value(12 + (digit ^ 3), data); }
+void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit ^ 3), data); }
 
 
 
@@ -247,21 +232,8 @@ DRIVER_INIT( aim65 )
 	memory_set_bankptr(1, mess_ram);
 
 	if (mess_ram_size < 4 * 1024)
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
 			mess_ram_size, 0x0fff, 0, 0, MRA8_NOP, MWA8_NOP);
-
-	/* Init display driver */
-	dl1416_config(0, &dl1416_ds1);
-	dl1416_config(1, &dl1416_ds2);
-	dl1416_config(2, &dl1416_ds3);
-	dl1416_config(3, &dl1416_ds4);
-	dl1416_config(4, &dl1416_ds5);
-
-	dl1416_reset(0);
-	dl1416_reset(1);
-	dl1416_reset(2);
-	dl1416_reset(3);
-	dl1416_reset(4);
 
 	pia_config(0, &pia);
 

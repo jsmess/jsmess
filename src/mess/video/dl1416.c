@@ -20,6 +20,7 @@
  *
  * Changes:
  *   - 2007-07-30: Initial version.  [Dirk Best]
+ *   - 2008-02-25: Converted to the new device interface.  [Dirk Best]
  *
  ****************************************************************************/
 
@@ -28,19 +29,14 @@
  Includes
 *****************************************************************************/
 
-
 #include "driver.h"
-#include "deprecat.h"
 #include "dl1416.h"
 
 
 
 /*****************************************************************************
- Macros
+ Constants
 *****************************************************************************/
-
-
-#define MAX_DL1416 (5)
 
 #define SEG_UNDEF  (-1)
 #define SEG_BLANK  (0)
@@ -52,10 +48,7 @@
  Type definitions
 *****************************************************************************/
 
-/* DL1416 chip state */
-typedef struct _dl1416_state dl1416_state;
-
-struct _dl1416_state
+struct _dl1416_t
 {
 	const dl1416_interface *intf;
 
@@ -123,7 +116,85 @@ static const int dl1416t_segments[128] = {
 };
 
 
-static dl1416_state dl1416[MAX_DL1416];
+
+/*****************************************************************************
+ Device interface
+*****************************************************************************/
+
+static void *dl1416_start(running_machine *machine, const char *tag,
+	const void *static_config, const void *inline_config)
+{
+	dl1416_t *dl1416;
+	char unique_tag[30];
+
+	/* validate arguments */
+	assert(tag != NULL);
+	assert(strlen(tag) < 20);
+
+	/* allocate the object that holds the state */
+	dl1416 = auto_malloc(sizeof(*dl1416));
+	memset(dl1416, 0, sizeof(*dl1416));
+
+	dl1416->intf = static_config;
+
+	/* register for state saving */
+	state_save_combine_module_and_tag(unique_tag, "dl1416", tag);
+
+	state_save_register_item(unique_tag, 0, dl1416->chip_enable);
+	state_save_register_item(unique_tag, 0, dl1416->cursor_enable);
+	state_save_register_item(unique_tag, 0, dl1416->write_enable);
+	state_save_register_item_array(unique_tag, 0, dl1416->cursor_ram);
+
+	return dl1416;
+}
+
+
+static void dl1416_reset(running_machine *machine, void *token)
+{
+	int i;
+	dl1416_t *chip = token;
+
+	/* Disable all lines */
+	chip->chip_enable = FALSE;
+	chip->write_enable = FALSE;
+	chip->cursor_enable = FALSE;
+
+	/* Randomize cursor memory */
+	for (i = 0; i < 4; i++)
+		chip->cursor_ram[i] = mame_rand(machine);
+}
+
+
+static void dl1416_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+void dl1416_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = dl1416_set_info;		break;
+		case DEVINFO_FCT_START:							info->start = dl1416_start;				break;
+		case DEVINFO_FCT_STOP:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							info->reset = dl1416_reset;				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "DL1416";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "DL1416";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";		break;
+	}
+}
 
 
 
@@ -131,89 +202,51 @@ static dl1416_state dl1416[MAX_DL1416];
  Implementation
 *****************************************************************************/
 
-/* Config */
-void dl1416_config(int which, const dl1416_interface *intf)
-{
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call dl1416_config at init time!");
-	assert_always(which < MAX_DL1416, "'which' exceeds maximum number of configured DL1416s!");
-
-	dl1416[which].intf = intf;
-
-	state_save_register_item("dl1416", which, dl1416[which].chip_enable);
-	state_save_register_item("dl1416", which, dl1416[which].cursor_enable);
-	state_save_register_item("dl1416", which, dl1416[which].write_enable);
-	state_save_register_item_array("dl1416", which, dl1416[which].cursor_ram);
-}
-
-
-/* Reset */
-void dl1416_reset(int which)
-{
-	int i;
-
-	assert_always(which < MAX_DL1416, "'which' exceeds maximum number of configured DL1416s!");
-
-	/* Disable all lines */
-	dl1416[which].chip_enable = FALSE;
-	dl1416[which].write_enable = FALSE;
-	dl1416[which].cursor_enable = FALSE;
-
-	/* Randomize cursor memory */
-	for (i = 0; i < 4; i++)
-		dl1416[which].cursor_ram[i] = mame_rand(Machine);
-}
-
-
 /* Write enable, active low */
-void dl1416_set_input_w(int which, int data)
+void dl1416_set_input_w(dl1416_t *chip, int data)
 {
-	assert_always(which < MAX_DL1416, "'which' exceeds maximum number of configured DL1416s!");
-	dl1416[which].write_enable = !data;
+	chip->write_enable = !data;
 }
 
 
 /* Chip enable, active low */
-void dl1416_set_input_ce(int which, int data)
+void dl1416_set_input_ce(dl1416_t *chip, int data)
 {
-	assert_always(which < MAX_DL1416, "'which' exceeds maximum number of configured DL1416s!");
-	dl1416[which].chip_enable = !data;
+	chip->chip_enable = !data;
 }
 
 
 /* Cursor enable, active low */
-void dl1416_set_input_cu(int which, int data)
+void dl1416_set_input_cu(dl1416_t *chip, int data)
 {
-	assert_always(which < MAX_DL1416, "'which' exceeds maximum number of configured DL1416s!");
-	dl1416[which].cursor_enable = !data;
+	chip->cursor_enable = !data;
 }
 
 
 /* Data */
-void dl1416_write(int which, offs_t offset, UINT8 data)
+void dl1416_write(dl1416_t *chip, offs_t offset, UINT8 data)
 {
 	int i, digit;
-
-	assert_always(which < MAX_DL1416, "'which' exceeds maximum number of configured DL1416s!");
 
 	offset &= 0x03; /* A0-A1 */
 	data &= 0x7f;   /* D0-D6 */
 
 	/* Only try to update the data if we are enabled and write is enabled */
-	if (dl1416[which].chip_enable && dl1416[which].write_enable)
+	if (chip->chip_enable && chip->write_enable)
 	{
-		if (dl1416[which].cursor_enable)
+		if (chip->cursor_enable)
 		{
-			switch (dl1416[which].intf->type)
+			switch (chip->intf->type)
 			{
 
 			case DL1416B:
 
 				/* The cursor will be set if D0 is high and the original */
 				/* character restored otherwise */
-				digit = data & 1 ? SEG_CURSOR : dl1416[which].cursor_ram[offset];
+				digit = data & 1 ? SEG_CURSOR : chip->cursor_ram[offset];
 
 				/* Call update function */
-				dl1416[which].intf->digit_changed(offset, digit);
+				chip->intf->digit_changed(offset, digit);
 
 				break;
 
@@ -222,14 +255,14 @@ void dl1416_write(int which, offs_t offset, UINT8 data)
 				for (i = 0; i < 4; i++)
 				{
 					/* Save old digit */
-					int previous_digit = dl1416[which].cursor_ram[i];
+					int previous_digit = chip->cursor_ram[i];
 
 					/* Either set the cursor or restore the original character */
-					digit = data & i ? SEG_CURSOR : dl1416[which].cursor_ram[i];
+					digit = data & i ? SEG_CURSOR : chip->cursor_ram[i];
 
 					/* Call update function if we changed something */
 					if (previous_digit != digit)
-						dl1416[which].intf->digit_changed(i, digit);
+						chip->intf->digit_changed(i, digit);
 				}
 				break;
 
@@ -240,8 +273,8 @@ void dl1416_write(int which, offs_t offset, UINT8 data)
 			/* On the DL1416T, a digit can only be changed if there is no */
 			/* previously stored cursor, or overriden by an undefined */
 			/* character (blank) */
-			if ((dl1416[which].intf->type != DL1416T) || (
-				(dl1416[which].cursor_ram[offset] != SEG_CURSOR) ||
+			if ((chip->intf->type != DL1416T) || (
+				(chip->cursor_ram[offset] != SEG_CURSOR) ||
 				(dl1416t_segments[data] == SEG_UNDEF)))
 			{
 				/* Load data */
@@ -252,19 +285,11 @@ void dl1416_write(int which, offs_t offset, UINT8 data)
 					digit = SEG_BLANK;
 
 				/* Save value */
-				dl1416[which].cursor_ram[offset] = digit;
+				chip->cursor_ram[offset] = digit;
 
 				/* Call update function */
-				dl1416[which].intf->digit_changed(offset, digit);
+				chip->intf->digit_changed(offset, digit);
 			}
 		}
 	}
 }
-
-
-/* Standard handlers */
-WRITE8_HANDLER( dl1416_0_w ) { dl1416_write(0, offset, data); }
-WRITE8_HANDLER( dl1416_1_w ) { dl1416_write(1, offset, data); }
-WRITE8_HANDLER( dl1416_2_w ) { dl1416_write(2, offset, data); }
-WRITE8_HANDLER( dl1416_3_w ) { dl1416_write(3, offset, data); }
-WRITE8_HANDLER( dl1416_4_w ) { dl1416_write(4, offset, data); }

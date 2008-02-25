@@ -21,7 +21,13 @@
 
 /*----------- defined in machine/aim65.c -----------*/
 
-extern DRIVER_INIT( aim65 );
+void aim65_update_ds1(int digit, int data);
+void aim65_update_ds2(int digit, int data);
+void aim65_update_ds3(int digit, int data);
+void aim65_update_ds4(int digit, int data);
+void aim65_update_ds5(int digit, int data);
+
+DRIVER_INIT( aim65 );
 
 
 /*----------- defined in video/aim65.c -----------*/
