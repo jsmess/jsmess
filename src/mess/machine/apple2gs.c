@@ -1240,7 +1240,6 @@ static WRITE8_HANDLER( apple2gs_main0400_w )
 	if (!(apple2gs_shadow & 0x01))
 	{
 		apple2gs_slowmem[offset] = data;
-		apple2_video_touch(offset);
 	}
 }
 
@@ -1252,7 +1251,6 @@ static WRITE8_HANDLER( apple2gs_aux0400_w )
 	if (!(apple2gs_shadow & 0x01))
 	{
 		apple2gs_slowmem[offset] = data;
-		apple2_video_touch(offset);
 	}
 }
 
@@ -1264,7 +1262,6 @@ static WRITE8_HANDLER( apple2gs_main2000_w )
 	if (!(apple2gs_shadow & 0x02))
 	{
 		apple2gs_slowmem[offset] = data;
-		apple2_video_touch(offset);
 	}
 }
 
@@ -1276,7 +1273,6 @@ static WRITE8_HANDLER( apple2gs_aux2000_w )
 	if (!(apple2gs_shadow & 0x12) || !(apple2gs_shadow & 0x08))
 	{
 		apple2gs_slowmem[offset] = data;
-		apple2_video_touch(offset);
 	}
 }
 
@@ -1632,7 +1628,6 @@ static WRITE8_HANDLER( apple2gs_E1Cxxx_w) { apple2gs_xxCxxx_w(offset | 0xE1C000,
 static WRITE8_HANDLER( apple2gs_Exxxxx_w )
 {
 	apple2gs_slowmem[offset] = data;
-	apple2_video_touch(offset);
 }
 
 static WRITE8_HANDLER( apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(offset + 0x00400, data); }

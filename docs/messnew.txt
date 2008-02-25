@@ -8,9 +8,12 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [APFM1000] Added special APF video mode [PeT]
+
+- [APPLE2] Removed usage of tilemaps.  [Nate Woods]
+
 - [QL] System boots up again. (bug #1495) [Curt Coder]
 
-- [APFM1000] added special APF video mode [PeT]
 
 
 User Interface Changes:

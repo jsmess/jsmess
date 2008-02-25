@@ -89,7 +89,6 @@ VIDEO_START( apple2 );
 VIDEO_START( apple2p );
 VIDEO_START( apple2e );
 VIDEO_UPDATE( apple2 );
-void apple2_video_touch(offs_t offset);
 void apple2_set_fgcolor(int color);
 void apple2_set_bgcolor(int color);
 int apple2_get_fgcolor(void);
