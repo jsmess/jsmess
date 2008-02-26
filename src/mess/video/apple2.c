@@ -96,7 +96,7 @@ static void adjust_begin_and_end_row(const rectangle *cliprect, int *beginrow, i
 -------------------------------------------------*/
 
 INLINE void apple2_plot_text_character(mame_bitmap *bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2, int flip)
+	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2)
 {
 	int x, y, i;
 	int fg = fgcolor;
@@ -125,10 +125,7 @@ INLINE void apple2_plot_text_character(mame_bitmap *bitmap, int xpos, int ypos, 
 	{
 		for (x = 0; x < 7; x++)
 		{
-			if (flip)
-				color = (chardata[y] & (1 << (6 - x))) ? bg : fg;
-			else
-				color = (chardata[y] & (1 << x)) ? bg : fg;
+			color = (chardata[y] & (1 << x)) ? bg : fg;
 
 			for (i = 0; i < xscale; i++)
 			{
@@ -153,7 +150,6 @@ static void apple2_text_draw(running_machine *machine, mame_bitmap *bitmap, cons
 	const UINT8 *textgfx_data = memory_region(REGION_GFX1);
 	UINT32 textgfx_datalen = memory_region_length(REGION_GFX1);
 	UINT32 my_a2 = effective_a2();
-	int flip = !strcmp(machine->gamedrv->name, "apple2") || !strcmp(machine->gamedrv->name, "apple2p");
 
 	/* perform adjustments */
 	adjust_begin_and_end_row(cliprect, &beginrow, &endrow);
@@ -168,14 +164,14 @@ static void apple2_text_draw(running_machine *machine, mame_bitmap *bitmap, cons
 			if (my_a2 & VAR_80COL)
 			{
 				apple2_plot_text_character(bitmap, col * 14 + 0, row, 1, a2_videoram[address + 0x10000],
-					textgfx_data, textgfx_datalen, my_a2, flip);
+					textgfx_data, textgfx_datalen, my_a2);
 				apple2_plot_text_character(bitmap, col * 14 + 7, row, 1, a2_videoram[address + 0x00000],
-					textgfx_data, textgfx_datalen, my_a2, flip);
+					textgfx_data, textgfx_datalen, my_a2);
 			}
 			else
 			{
 				apple2_plot_text_character(bitmap, col * 14, row, 2, a2_videoram[address],
-					textgfx_data, textgfx_datalen, my_a2, flip);
+					textgfx_data, textgfx_datalen, my_a2);
 			}
 		}
 	}
@@ -382,7 +378,7 @@ static void apple2_hires_draw(running_machine *machine, mame_bitmap *bitmap, con
 	VIDEO CORE
 ***************************************************************************/
 
-void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo)
+void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo)
 {
 	int i, j;
 	UINT16 c;
@@ -439,6 +435,18 @@ void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_soft
 		}
 	}
 
+	/* do we need to flip the gfx? */
+	if (!strcmp(machine->gamedrv->name, "apple2")
+		|| !strcmp(machine->gamedrv->name, "apple2p")
+		|| !strcmp(machine->gamedrv->name, "apple2jp"))
+	{
+		for (i = 0; i < memory_region_length(REGION_GFX1); i++)
+		{
+			apple2_font[i] = BITSWAP8(apple2_font[i], 7, 0, 1, 2, 3, 4, 5, 6);
+		}
+	}
+
+
 	/* build double hires artifact map */
 	for (i = 0; i < 16; i++)
 	{
@@ -453,7 +461,7 @@ void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_soft
 
 VIDEO_START( apple2 )
 {
-	apple2_video_start(mess_ram, mess_ram_size, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
+	apple2_video_start(machine, mess_ram, mess_ram_size, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
 
 	/* hack to fix the colors on apple2/apple2p */
 	fgcolor = 0;
@@ -463,7 +471,7 @@ VIDEO_START( apple2 )
 
 VIDEO_START( apple2p )
 {
-	apple2_video_start(mess_ram, mess_ram_size, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
+	apple2_video_start(machine, mess_ram, mess_ram_size, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
 
 	/* hack to fix the colors on apple2/apple2p */
 	fgcolor = 0;
@@ -473,7 +481,7 @@ VIDEO_START( apple2p )
 
 VIDEO_START( apple2e )
 {
-	apple2_video_start(mess_ram, mess_ram_size, 0, 8);
+	apple2_video_start(machine, mess_ram, mess_ram_size, 0, 8);
 }
 
 

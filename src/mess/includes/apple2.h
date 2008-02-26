@@ -84,7 +84,7 @@ void apple2_setvar(UINT32 val, UINT32 mask);
 
 /*----------- defined in video/apple2.c -----------*/
 
-void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
+void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
 VIDEO_START( apple2 );
 VIDEO_START( apple2p );
 VIDEO_START( apple2e );
