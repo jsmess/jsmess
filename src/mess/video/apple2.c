@@ -438,6 +438,7 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 	/* do we need to flip the gfx? */
 	if (!strcmp(machine->gamedrv->name, "apple2")
 		|| !strcmp(machine->gamedrv->name, "apple2p")
+		|| !strcmp(machine->gamedrv->name, "ace100")
 		|| !strcmp(machine->gamedrv->name, "apple2jp"))
 	{
 		for (i = 0; i < memory_region_length(REGION_GFX1); i++)
