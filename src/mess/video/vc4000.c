@@ -21,27 +21,28 @@ static UINT8 sprite_collision[0x20];
 static UINT8 background_collision[0x20];
 
 typedef struct {
-    UINT8 bitmap[10],x1,x2,y1,y2, res1, res2;
+	UINT8 bitmap[10],x1,x2,y1,y2, res1, res2;
 } SPRITE_HELPER;
 
 typedef struct {
-    const SPRITE_HELPER *data;
-    int mask;
-    int state;
-    int delay;
-    int size;
-    int y;
-    int finished;
-    int finished_now;
+	const SPRITE_HELPER *data;
+	int mask;
+	int state;
+	int delay;
+	int size;
+	int y;
+	UINT8 scolor;
+	int finished;
+	int finished_now;
 } SPRITE;
 
 static struct
 {
-    SPRITE sprites[4];
-    int line;
-    UINT8 sprite_collision;
-    UINT8 background_collision;
-    union
+	SPRITE sprites[4];
+	int line;
+	UINT8 sprite_collision;
+	UINT8 background_collision;
+	union
 	{
 		UINT8 data[0x100];
 		struct
@@ -63,22 +64,22 @@ static struct
 			UINT8 background_collision;
 			UINT8 sprite_collision;
 		} d;
-    } reg;
+	} reg;
 
 	mame_bitmap *bitmap;
 } vc4000_video =
 {
-    {
+	{
 		{ &vc4000_video.reg.d.sprites[0],1 },
 		{ &vc4000_video.reg.d.sprites[1],2 },
 		{ &vc4000_video.reg.d.sprites[2],4 },
 		{ &vc4000_video.reg.d.sprite4,8 }
-    }
+	}
 };
 
 VIDEO_START(vc4000)
 {
-    int i;
+	int i;
 
 	for (i=0;i<0x20; i++)
 	{
@@ -94,7 +95,7 @@ VIDEO_START(vc4000)
 		if ((i&0x12)==0x12) background_collision[i]|=0x40;
 		if ((i&0x14)==0x14) background_collision[i]|=0x20;
 		if ((i&0x18)==0x18) background_collision[i]|=0x10;
-    }
+	}
 
 	vc4000_video.bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 }
@@ -135,15 +136,15 @@ READ8_HANDLER(vc4000_video_r)
 		vc4000_video.sprite_collision = 0;
 		vc4000_video.reg.d.sprite_collision &= 0xbf;
 		break;
-
+ 
 #ifndef ANALOG_HACK
 	case 0xcc:
-		if (!activecpu_get_reg(S2650_FO)) data=input_port_7_r(0)<<3;
-		else data=input_port_8_r(0)<<3;
+		if (!activecpu_get_reg(S2650_FO)) data=input_port_7_r(0);
+		else data=input_port_8_r(0);
 		break;
 	case 0xcd:
-		if (!activecpu_get_reg(S2650_FO)) data=input_port_9_r(0)<<3;
-		else data=input_port_10_r(0)<<3;
+		if (!activecpu_get_reg(S2650_FO)) data=input_port_9_r(0);
+		else data=input_port_10_r(0);
 		break;
 #else
 
@@ -186,118 +187,138 @@ READ8_HANDLER(vc4000_video_r)
 
 WRITE8_HANDLER(vc4000_video_w)
 {
-    switch (offset) {
+	switch (offset) {
 
-    case 0xc0:						// Sprite size
-	vc4000_video.sprites[0].size=1<<(data&3);
-	vc4000_video.sprites[1].size=1<<((data>>2)&3);
-	vc4000_video.sprites[2].size=1<<((data>>4)&3);
-	vc4000_video.sprites[3].size=1<<((data>>6)&3);
-	break;
+	case 0xc0:						// Sprite size
+		vc4000_video.sprites[0].size=1<<(data&3);
+		vc4000_video.sprites[1].size=1<<((data>>2)&3);
+		vc4000_video.sprites[2].size=1<<((data>>4)&3);
+		vc4000_video.sprites[3].size=1<<((data>>6)&3);
+		break;
 
-    case 0xc7:						// Soundregister
-	vc4000_video.reg.data[offset]=data;
-	vc4000_soundport_w(0, data);
-	break;
+	case 0xc1:						// Sprite 1+2 color
+		vc4000_video.sprites[0].scolor=((~data>>3)&7);
+		vc4000_video.sprites[1].scolor=(~data&7);
+		break;
+		
+	case 0xc2:						// Sprite 2+3 color
+		vc4000_video.sprites[2].scolor=((~data>>3)&7);
+		vc4000_video.sprites[3].scolor=(~data&7);
+		break;
+		
+	case 0xc7:						// Soundregister
+		vc4000_video.reg.data[offset]=data;
+		vc4000_soundport_w(0, data);
+		break;
 
-    case 0xca:			// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
-	vc4000_video.reg.data[offset]=data;
-	vc4000_video.background_collision=data;
-	break;
+	case 0xca:			// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
+		vc4000_video.reg.data[offset]=data;
+		vc4000_video.background_collision=data;
+		break;
 
-    case 0xcb:					// VRST-Flag (bit 6) and intersprite collision (bit5-0)
-	vc4000_video.reg.data[offset]=data;
-	vc4000_video.sprite_collision=data;
-	break;
-    default:
-	vc4000_video.reg.data[offset]=data;
+	case 0xcb:					// VRST-Flag (bit 6) and intersprite collision (bit5-0)
+		vc4000_video.reg.data[offset]=data;
+		vc4000_video.sprite_collision=data;
+		break;
+	default:
+		vc4000_video.reg.data[offset]=data;
     }
 }
 
 
 READ8_HANDLER(vc4000_vsync_r)
 {
-    return vc4000_video.line >= 269 ? 0x80 : 0;
+	return vc4000_video.line >= 269 ? 0x80 : 0;
 }
 
 static const char led[20][12+1] =
 {
-    "aaaabbbbcccc",
-    "aaaabbbbcccc",
-    "aaaabbbbcccc",
-    "aaaabbbbcccc",
-    "llll    dddd",
-    "llll    dddd",
-    "llll    dddd",
-    "llll    dddd",
-    "kkkkmmmmeeee",
-    "kkkkmmmmeeee",
-    "kkkkmmmmeeee",
-    "kkkkmmmmeeee",
-    "jjjj    ffff",
-    "jjjj    ffff",
-    "jjjj    ffff",
-    "jjjj    ffff",
-    "iiiihhhhgggg",
-    "iiiihhhhgggg",
-    "iiiihhhhgggg",
-    "iiiihhhhgggg"
+	"aaaabbbbcccc",
+	"aaaabbbbcccc",
+	"aaaabbbbcccc",
+	"aaaabbbbcccc",
+	"llll    dddd",
+	"llll    dddd",
+	"llll    dddd",
+	"llll    dddd",
+	"kkkkmmmmeeee",
+	"kkkkmmmmeeee",
+	"kkkkmmmmeeee",
+	"kkkkmmmmeeee",
+	"jjjj    ffff",
+	"jjjj    ffff",
+	"jjjj    ffff",
+	"jjjj    ffff",
+	"iiiihhhhgggg",
+	"iiiihhhhgggg",
+	"iiiihhhhgggg",
+	"iiiihhhhgggg"
 };
 
 static void vc4000_draw_digit(mame_bitmap *bitmap, int x, int y, int d, int line)
 {
-    static const int digit_to_segment[0x10]={
+	static const int digit_to_segment[0x10]={
 	0x0fff, 0x007c, 0x17df, 0x15ff, 0x1c7d, 0x1df7, 0x1ff7, 0x007f, 0x1fff, 0x1dff
-    };
-    int i,j;
-    i=line;
-    for (j=0; j<sizeof(led[0]); j++) {
+	};
+	int i,j;
+	i=line;
+	for (j=0; j<sizeof(led[0]); j++) {
 	if (digit_to_segment[d]&(1<<(led[i][j]-'a')) ) {
 	    *BITMAP_ADDR16(bitmap, y+i, x+j) = Machine->pens[((vc4000_video.reg.d.background>>4)&7)^7];
 	}
-    }
+	}
 }
 
 INLINE void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int scale)
 {
-    int j,m;
-    for (j=0,m=0x80; j<8; j++, m>>=1) {
+	int i,j,m;
+
+	for (j=0,m=0x80; j<8; j++, m>>=1) {
 	if (data&m) {
-	    int i;
-	    for (i=0; i<scale; i++, collision++) *collision|=color;
+		for (i=0; i<scale; i++, collision++) *collision|=color;
 	} else
-	    collision+=scale;
-    }
+		collision+=scale;
+	}
 }
 
 
 static void vc4000_sprite_update(mame_bitmap *bitmap, UINT8 *collision, SPRITE *This)
 {
 
-    if (vc4000_video.line==0)
-    {
+	int i,j,m;
+
+	if (vc4000_video.line==0)
+	{
 	  This->y=This->data->y1;
 	  This->state=0;
 	  This->delay=0;
 	  This->finished=FALSE;
-    }
-   This->finished_now=FALSE;
+	}
+	This->finished_now=FALSE;
 
-    if (vc4000_video.line>269) return;
+	if (vc4000_video.line>269) return;
 
-    switch (This->state) {
+	switch (This->state) {
 	case 0:
-		if (vc4000_video.line != This->y) break;
+		if (vc4000_video.line != This->y + 2) break;
 		This->state++;
 	case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:case 9:case 10:
 
 		if (vc4000_video.line<bitmap->height && This->data->x1<bitmap->width)
 		{
-		  vc4000_collision_plot(collision+This->data->x1, This->data->bitmap[This->state-1],
+			vc4000_collision_plot(collision+This->data->x1, This->data->bitmap[This->state-1],
 					This->mask,This->size);
-		  drawgfxzoom(bitmap, Machine->gfx[0], This->data->bitmap[This->state-1],0,
-			      0,0,This->data->x1,vc4000_video.line,
-			      0, TRANSPARENCY_PEN,0, This->size<<16, This->size<<16);
+			for (j=0,m=0x80; j<8; j++, m>>=1)
+			{
+				if (This->data->bitmap[This->state-1]&m)
+				{
+					for (i=0; i<This->size; i++)
+					{
+ 						*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x1 + i + j*This->size) =
+							Machine->pens[This->scolor];
+					} 
+				}
+			}
 		}
 		This->delay++;
 		if (This->delay>=This->size)
@@ -341,11 +362,19 @@ static void vc4000_sprite_update(mame_bitmap *bitmap, UINT8 *collision, SPRITE *
 //		if (vc4000_video.line<bitmap->height && This->data->x2<bitmap->width)
 		if (vc4000_video.line < 269)
 		{
-		  vc4000_collision_plot(collision+This->data->x2,This->data->bitmap[This->state-13],
+			vc4000_collision_plot(collision+This->data->x2,This->data->bitmap[This->state-13],
 					This->mask,This->size);
-		  drawgfxzoom(bitmap, Machine->gfx[0], This->data->bitmap[This->state-13],0,
-			      0,0,This->data->x2,vc4000_video.line,
-			      0, TRANSPARENCY_PEN,0, This->size<<16, This->size<<16);
+			for (j=0,m=0x80; j<8; j++, m>>=1)
+			{
+				if (This->data->bitmap[This->state-13]&m)
+				{
+					for (i=0; i<This->size; i++)
+					{
+ 						*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x2 + i + j*This->size) =
+							Machine->pens[This->scolor];
+					} 
+				}
+			}
 		This->delay++;
 		if (This->delay<This->size) break;
 		This->delay=0;
@@ -357,7 +386,7 @@ static void vc4000_sprite_update(mame_bitmap *bitmap, UINT8 *collision, SPRITE *
 		break;
 		}
 		break;
-    }
+	}
 }
 
 INLINE void vc4000_draw_grid(UINT8 *collision)
@@ -427,23 +456,16 @@ INTERRUPT_GEN( vc4000_video_line )
 		vc4000_video.background_collision=0;
 		vc4000_video.sprite_collision=0;
 		vc4000_video.reg.d.sprite_collision=0;
-		logerror("begin of frame\n");
+//		logerror("begin of frame\n");
 	}
 
 	if (vc4000_video.line <= 270)
 	{
 		vc4000_draw_grid(collision);
 
-		/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
-		 * the color table, a vile gross hack.  Doesn't look like this is going
-		 * to survive the 0.118u5 transition */
-		/* machine->gfx[0]->colortable[1]=machine->pens[8|((vc4000_video.reg.d.sprite_colors[0]>>3)&7)]; */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[0]);
-		/* machine->gfx[0]->colortable[1]=machine->pens[8|(vc4000_video.reg.d.sprite_colors[0]&7)]; */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[1]);
-		/* machine->gfx[0]->colortable[1]=machine->pens[8|((vc4000_video.reg.d.sprite_colors[1]>>3)&7)]; */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[2]);
-		/* machine->gfx[0]->colortable[1]=machine->pens[8|(vc4000_video.reg.d.sprite_colors[1]&7)]; */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[3]);
 
 		for (i=0; i<256; i++)
@@ -474,8 +496,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		(vc4000_video.sprites[1].finished_now) |
 		(vc4000_video.sprites[0].finished_now))
 	{
-		cpunum_set_input_line_vector(0, 0, 3);
-		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
+		cpunum_set_input_line_and_vector(machine,0, 0, PULSE_LINE, 3);
 	}
 }
 
