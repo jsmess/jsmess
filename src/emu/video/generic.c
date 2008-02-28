@@ -60,7 +60,7 @@ UINT8 *paletteram_2;	/* use when palette RAM is split in two parts */
 UINT16 *paletteram16_2;
 
 mame_bitmap *tmpbitmap;
-int flip_screen_x, flip_screen_y;
+static int flip_screen_x, flip_screen_y;
 
 
 
@@ -295,6 +295,8 @@ void generic_video_init(running_machine *machine)
 	spriteram_3_size = 0;
 	tmpbitmap = NULL;
 	flip_screen_x = flip_screen_y = 0;
+	state_save_register_item("video", 0, flip_screen_x);
+	state_save_register_item("video", 0, flip_screen_y);
 }
 
 
@@ -302,17 +304,6 @@ void generic_video_init(running_machine *machine)
 /***************************************************************************
     GENERIC VIDEO START/UPDATE
 ***************************************************************************/
-
-/*-------------------------------------------------
-    VIDEO_START( generic ) - general video system
--------------------------------------------------*/
-
-VIDEO_START( generic )
-{
-	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-}
-
 
 /*-------------------------------------------------
     VIDEO_START( generic_bitmapped ) - general video
@@ -497,6 +488,22 @@ void flip_screen_set(int on)
 
 
 /*-------------------------------------------------
+    flip_screen_set_no_update - set global flip
+       do not call update_flip.
+-------------------------------------------------*/
+
+void flip_screen_set_no_update(int on)
+{
+	/* flip_screen_y is not updated on purpose
+     * this function is for drivers which
+     * where writing to flip_screen_x to
+     * bypass update_flip
+     */
+	flip_screen_x = on;
+}
+
+
+/*-------------------------------------------------
     flip_screen_x_set - set global horizontal flip
 -------------------------------------------------*/
 
@@ -523,6 +530,36 @@ void flip_screen_y_set(int on)
 		flip_screen_y = on;
 		updateflip();
 	}
+}
+
+
+/*-------------------------------------------------
+    flip_screen_get - get global flip
+-------------------------------------------------*/
+
+int flip_screen_get(void)
+{
+	return flip_screen_x;
+}
+
+
+/*-------------------------------------------------
+    flip_screen_x_get - get global x flip
+-------------------------------------------------*/
+
+int flip_screen_x_get(void)
+{
+	return flip_screen_x;
+}
+
+
+/*-------------------------------------------------
+    flip_screen_get - get global y flip
+-------------------------------------------------*/
+
+int flip_screen_y_get(void)
+{
+	return flip_screen_y;
 }
 
 

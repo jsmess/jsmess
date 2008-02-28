@@ -54,7 +54,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			inc = 1;
 		}
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			y=240-y;
 			x=304-x;
@@ -83,7 +83,7 @@ VIDEO_UPDATE( funkyjet )
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,machine->pens[768],cliprect);
+	fillbitmap(bitmap,768,cliprect);
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	draw_sprites(machine,bitmap,cliprect);

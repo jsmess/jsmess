@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "includes/jupiter.h"
+#include "mslegacy.h"
 
 
 UINT8 *jupiter_charram;

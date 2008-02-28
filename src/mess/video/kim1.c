@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "includes/kim1.h"
+#include "mslegacy.h"
 
 PALETTE_INIT( kim1 )
 {

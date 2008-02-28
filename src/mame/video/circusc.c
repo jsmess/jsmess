@@ -185,7 +185,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipx = sr[offs + 1] & 0x40;
 		int flipy = sr[offs + 1] & 0x80;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -212,7 +212,7 @@ VIDEO_UPDATE( circusc )
 	for (i = 10;i < 32;i++)
 		tilemap_set_scrolly(bg_tilemap,i,*circusc_scroll);
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
 	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);

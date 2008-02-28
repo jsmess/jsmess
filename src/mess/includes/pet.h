@@ -13,14 +13,12 @@
 /*----------- defined in video/pet.c -----------*/
 
 /* call to init videodriver */
-extern void pet_vh_init (void);
-extern void pet80_vh_init (void);
-extern void superpet_vh_init (void);
-extern VIDEO_UPDATE( pet );
-void pet40_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-					  UINT8 ra, UINT16 y, UINT8 x_count, void *param);
-void pet80_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-					  UINT8 ra, UINT16 y, UINT8 x_count, void *param);
+void pet_vh_init (void);
+void pet80_vh_init (void);
+void superpet_vh_init (void);
+VIDEO_UPDATE( pet );
+MC6845_UPDATE_ROW( pet40_update_row );
+MC6845_UPDATE_ROW( pet80_update_row );
 
 extern int pet_font;
 

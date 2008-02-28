@@ -598,7 +598,7 @@ void deco16_2_video_init_half_width(void) /* 2 times playfield generator chips *
 void deco_allocate_sprite_bitmap(void)
 {
 	/* Allow sprite bitmap to be used by Deco32 games as well */
-	sprite_priority_bitmap = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
+	sprite_priority_bitmap = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
 }
 
 /*****************************************************************************************/

@@ -367,7 +367,7 @@ static void draw_sprites(running_machine* const machine, mame_bitmap* const bitm
 			int const big = (sprptr[2] & 0x04) >> 2;
 			int x,y;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 240 - 16*big - sx;
 				sy = 240 - 16*big - sy;
@@ -464,7 +464,7 @@ static void erase_sprites(running_machine* const machine, mame_bitmap* const bit
 
 VIDEO_UPDATE( ninjakd2 )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -477,7 +477,7 @@ VIDEO_UPDATE( ninjakd2 )
 
 VIDEO_UPDATE( robokid )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
 
@@ -494,7 +494,7 @@ VIDEO_UPDATE( robokid )
 
 VIDEO_UPDATE( omegaf )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
 

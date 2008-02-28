@@ -2712,7 +2712,7 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 
 		astring *basename;
 		astring *srcname;
-		machine_config *config = machine_config_alloc(driver->drv);
+		machine_config *config = machine_config_alloc(driver->machine_config);
 
 		/* parse "vector.ini" for vector games */
 		if (isDriverVector(config))

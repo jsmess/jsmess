@@ -94,7 +94,7 @@ static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rect
 {
 	int offs;
 
-	flip_screen = 1;
+	flip_screen_set_no_update(1);
 
 	for (offs = (0x1400/4)-4;offs >= 0;offs -= 4) // 0x1400 for charlien
 	{
@@ -144,7 +144,7 @@ static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rect
 			inc = 1;
 		}
 
-		if (flip_screen)
+		if (flip_screen_x_get())
 		{
 			y=240-y;
 			x=304-x;

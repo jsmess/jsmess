@@ -1020,7 +1020,7 @@ OBJDIRS += $(CPUOBJ)/m68000
 CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kmame.o $(CPUOBJ)/m68000/m68kops.o
 DBGOBJS += $(CPUOBJ)/m68000/m68kdasm.o
 endif
-M68KMAKE = $(CPUOBJ)/m68000/m68kmake$(EXE)
+M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
 
 # when we compile source files we need to include generated files from the OBJ directory
 $(CPUOBJ)/m68000/%.o: $(CPUSRC)/m68000/%.c
@@ -1039,6 +1039,9 @@ $(CPUOBJ)/m68000/m68kops.c: $(M68KMAKE) $(CPUSRC)/m68000/m68k_in.c
 
 # rule to build the generator
 ifneq ($(CROSS_BUILD),1)
+
+BUILD += $(M68KMAKE)
+
 $(M68KMAKE): $(CPUOBJ)/m68000/m68kmake.o $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
@@ -1222,8 +1225,9 @@ $(CPUOBJ)/v810/v810.o:	$(CPUSRC)/v810/v810.c \
 
 CPUDEFS += -DHAS_UPD7810=$(if $(filter UPD7810,$(CPUS)),1,0)
 CPUDEFS += -DHAS_UPD7807=$(if $(filter UPD7807,$(CPUS)),1,0)
+CPUDEFS += -DHAS_UPD7801=$(if $(filter UPD7801,$(CPUS)),1,0)
 
-ifneq ($(filter UPD7810 UPD7807,$(CPUS)),)
+ifneq ($(filter UPD7810 UPD7807 UPD7801,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/upd7810
 CPUOBJS += $(CPUOBJ)/upd7810/upd7810.o
 DBGOBJS += $(CPUOBJ)/upd7810/7810dasm.o

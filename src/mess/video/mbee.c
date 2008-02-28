@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "includes/mbee.h"
 #include "deprecat.h"
+#include "mslegacy.h"
 
 typedef struct {		 // CRTC 6545
 	UINT8 horizontal_total;

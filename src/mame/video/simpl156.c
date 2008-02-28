@@ -40,7 +40,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 {
 	int offs;
 
-	flip_screen = 1;
+	//FIXME: flip_screen_x should not be written!
+	flip_screen_set_no_update(1);
 
 	for (offs = (0x1400/4)-4;offs >= 0;offs -= 4) // 0x1400 for charlien
 	{
@@ -86,7 +87,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			inc = 1;
 		}
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			y=240-y;
 			x=304-x;
@@ -117,7 +118,7 @@ VIDEO_UPDATE( simpl156 )
 
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,machine->pens[256],cliprect);
+	fillbitmap(bitmap,256,cliprect);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);

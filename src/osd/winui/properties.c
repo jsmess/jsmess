@@ -378,7 +378,7 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 			/* Allocate machine config */
 			if (gamedrv != NULL)
 			{
-				config = machine_config_alloc(gamedrv->drv);
+				config = machine_config_alloc(gamedrv->machine_config);
 			}
 			if (!gamedrv || !g_propSheets[i].pfnFilterProc || g_propSheets[i].pfnFilterProc(config, gamedrv))
 			{
@@ -576,7 +576,7 @@ static char *GameInfoCPU(UINT nIndex)
 {
 	int chipnum;
 	static char buf[1024] = "";
-	machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
+	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
 
 	ZeroMemory(buf, sizeof(buf));
 
@@ -613,7 +613,7 @@ static char *GameInfoSound(UINT nIndex)
 {
 	int chipnum;
 	static char buf[1024];
-	machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
+	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
 
 	buf[0] = 0;
 
@@ -673,7 +673,7 @@ static char *GameInfoSound(UINT nIndex)
 static char *GameInfoScreen(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
+	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
 
 	if (isDriverVector(config))
 	{
@@ -707,7 +707,7 @@ static char *GameInfoScreen(UINT nIndex)
 static char *GameInfoColors(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
+	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
 
 	ZeroMemory(buf, sizeof(buf));
 	sprintf(buf, "%d colors ", config->total_colors);
@@ -2353,7 +2353,7 @@ static void SetStereoEnabled(HWND hWnd, int nIndex)
 
 	if ( nIndex > -1)
 	{
-		machine_config *config = machine_config_alloc(drivers[nIndex]->drv);
+		machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
 		num_speakers = numberOfSpeakers(config);
 		machine_config_free(config);
 	}
@@ -2377,7 +2377,7 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 
 	if (nIndex > -1)
 	{
-		config = machine_config_alloc(drivers[nIndex]->drv);
+		config = machine_config_alloc(drivers[nIndex]->machine_config);
 	}
 
 	hCtrl = GetDlgItem(hWnd, IDC_USE_FM_YM3812);
@@ -2419,7 +2419,7 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 	hCtrl = GetDlgItem(hWnd, IDC_SAMPLES);
 
 	if ( nIndex > -1 ) {
-		config = machine_config_alloc(drivers[nIndex]->drv);
+		config = machine_config_alloc(drivers[nIndex]->machine_config);
 	}
 	
 	if (hCtrl)

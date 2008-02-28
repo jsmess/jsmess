@@ -459,7 +459,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 			gfxdata		=	base_gfx + (8*8*4/8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx = !flipx;		x = max_x - x - width;
 				flipy = !flipy;		y = max_y - y - height;
@@ -635,7 +635,7 @@ VIDEO_UPDATE( hyprduel )
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[((hyprduel_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000],cliprect);
+	fillbitmap(bitmap,((hyprduel_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000,cliprect);
 
 	/*  Screen Control Register:
 

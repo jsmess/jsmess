@@ -388,7 +388,7 @@ $(RESFILE): $(UISRC)/mameui.rc $(UIOBJ)/mamevers.rc
 
 $(UIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
-	@$(OBJ)/build/verinfo$(EXE) $(SRC)/version.c > $@
+	@$(OBJ)/build/verinfo$(EXE) -b winui $(SRC)/version.c > $@
 
 
 

@@ -51,9 +51,6 @@ enum
 #define UCHAR_SHIFT_BEGIN	(UCHAR_SHIFT_1)
 #define UCHAR_SHIFT_END		(UCHAR_SHIFT_2)
 
-#define PORT_CHAR(ch)	\
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CHAR, ch),
-
 
 
 /***************************************************************************

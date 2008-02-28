@@ -160,7 +160,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		my=0x200 - my;
 		my-=0x200;
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			mx=240-mx;
 			my=240-my;
 		}
@@ -174,7 +174,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				fx=tile&0x4000;
 				tile&=0x3fff;
 
-				if (flip_screen) {
+				if (flip_screen_get()) {
 					if (fx) fx=0; else fx=1;
 					if (fy) fy=0; else fy=1;
 				}
@@ -187,7 +187,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 					cliprect,TRANSPARENCY_PEN,0);
 			}
 
-			if (flip_screen) {
+			if (flip_screen_get()) {
 				my-=16;
 				if (my < -0x100) my+=0x200;
 			}
@@ -202,7 +202,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( pow )
 {
-	fillbitmap(bitmap,machine->pens[2047],cliprect);
+	fillbitmap(bitmap,2047,cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites(machine, bitmap,cliprect,1,0x000);
@@ -237,7 +237,7 @@ static void draw_sprites2(running_machine *machine, mame_bitmap *bitmap, const r
 		my=0x200 - my;
 		my-=0x200;
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			mx=240-mx;
 			my=240-my;
 		}
@@ -254,7 +254,7 @@ static void draw_sprites2(running_machine *machine, mame_bitmap *bitmap, const r
 					fx=tile&0x8000;
 				}
 
-				if (flip_screen) {
+				if (flip_screen_get()) {
 					if (fx) fx=0; else fx=1;
 					if (fy) fy=0; else fy=1;
 				}
@@ -269,7 +269,7 @@ static void draw_sprites2(running_machine *machine, mame_bitmap *bitmap, const r
 					mx,my,
 					cliprect,TRANSPARENCY_PEN,0);
 			}
-			if (flip_screen) {
+			if (flip_screen_get()) {
 				my-=16;
 				if (my < -0x100) my+=0x200;
 			}
@@ -284,7 +284,7 @@ static void draw_sprites2(running_machine *machine, mame_bitmap *bitmap, const r
 
 VIDEO_UPDATE( searchar )
 {
-	fillbitmap(bitmap,machine->pens[2047],cliprect);
+	fillbitmap(bitmap,2047,cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites2(machine, bitmap,cliprect,8,0x2000,0x000);

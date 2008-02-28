@@ -503,8 +503,6 @@ static MACHINE_DRIVER_START( omegrace )
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
 
-	MDRV_PALETTE_LENGTH(32768)
-
 	MDRV_VIDEO_START(dvg)
 	MDRV_VIDEO_UPDATE(vector)
 
@@ -542,7 +540,7 @@ ROM_START( omegrace )
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, REGION_USER1, 0 )
-	ROM_LOAD( "01-34602.bin",	0x0000, 0x0100, BAD_DUMP CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+	ROM_LOAD( "dvgprom.bin",	0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
 ROM_START( deltrace )
@@ -559,9 +557,29 @@ ROM_START( deltrace )
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, REGION_USER1, 0 )
-	ROM_LOAD( "01-34602.bin",	0x0000, 0x0100, BAD_DUMP CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+	ROM_LOAD( "dvgprom.bin",	0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
+
+/*************************************
+ *
+ *  Game specific initalization
+ *
+ *************************************/
+
+static DRIVER_INIT( omegrace )
+{
+	int i;
+	UINT8 *prom = memory_region(REGION_USER1);
+
+	/* Omega Race has two pairs of the state PROM output
+     * lines swapped before going into the decoder.
+     * Since all other avg/dvg games connect the PROM
+     * in a consistent way to the decoder, we swap the bits
+     * here. */
+	for (i=0; i<memory_region_length(REGION_USER1); i++)
+		prom[i] = BITSWAP8(prom[i],7,6,5,4,1,0,3,2);
+}
 
 
 /*************************************
@@ -570,5 +588,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL(1981, omegrace, 0,        omegrace, omegrace, 0, ROT0, "Midway",         "Omega Race", GAME_NO_COCKTAIL, layout_hoffe457 )
-GAMEL(1981, deltrace, omegrace, omegrace, omegrace, 0, ROT0, "Allied Leisure", "Delta Race", GAME_NO_COCKTAIL, layout_hoffe457 )
+GAMEL(1981, omegrace, 0,        omegrace, omegrace, omegrace, ROT0, "Midway",         "Omega Race", GAME_NO_COCKTAIL, layout_hoffe457 )
+GAMEL(1981, deltrace, omegrace, omegrace, omegrace, omegrace, ROT0, "Allied Leisure", "Delta Race", GAME_NO_COCKTAIL, layout_hoffe457 )

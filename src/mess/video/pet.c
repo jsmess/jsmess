@@ -84,8 +84,8 @@ VIDEO_UPDATE( pet )
 }
 
 
-void pet40_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-					  UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+MC6845_UPDATE_ROW( pet40_update_row )
+{
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
@@ -93,8 +93,8 @@ void pet40_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *b
 	}
 }
 
-void pet80_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-					  UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+MC6845_UPDATE_ROW( pet80_update_row )
+{
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {

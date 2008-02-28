@@ -323,7 +323,7 @@ static void delayed_sound_2(int data)
 
 	if (n8080_hardware == 1)
 	{
-		flip_screen = data & 0x20;
+		flip_screen_set_no_update(data & 0x20);
 	}
 	if (n8080_hardware == 3)
 	{

@@ -130,10 +130,8 @@ void cbmb_rom_load(void);
 
 /*----------- defined in video/cbmb.c -----------*/
 
-void cbm600_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-					   UINT8 ra, UINT16 y, UINT8 x_count, void *param);
-void cbm700_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-					   UINT8 ra, UINT16 y, UINT8 x_count, void *param);
+MC6845_UPDATE_ROW( cbm600_update_row );
+MC6845_UPDATE_ROW( cbm700_update_row );
 
 void cbm600_vh_init(void);
 void cbm700_vh_init(void);

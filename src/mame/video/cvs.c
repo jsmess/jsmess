@@ -295,16 +295,16 @@ VIDEO_UPDATE( cvs )
             	int bx=255-7-cvs_bullet_ram[offs]-ct;
 
             	/* Bullet/Object Collision */
-				if ((*BITMAP_ADDR8(s2636_0_bitmap, offs, bx) != 0) ||
-					(*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) ||
-					(*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0))
+				if ((*BITMAP_ADDR16(s2636_0_bitmap, offs, bx) != 0) ||
+					(*BITMAP_ADDR16(s2636_1_bitmap, offs, bx) != 0) ||
+					(*BITMAP_ADDR16(s2636_2_bitmap, offs, bx) != 0))
 					cvs_collision_register |= 0x08;
 
             	/* Bullet/Background Collision */
 				if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(scrolled_collision_background, offs, bx)))
                    	cvs_collision_register |= 0x80;
 
-				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[BULLET_STAR_PEN];
+				*BITMAP_ADDR16(bitmap, offs, bx) = BULLET_STAR_PEN;
             }
         }
     }
@@ -320,15 +320,15 @@ VIDEO_UPDATE( cvs )
 
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pixel0 = *BITMAP_ADDR8(s2636_0_bitmap, y, x);
-				int pixel1 = *BITMAP_ADDR8(s2636_1_bitmap, y, x);
-				int pixel2 = *BITMAP_ADDR8(s2636_2_bitmap, y, x);
+				int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
+				int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
+				int pixel2 = *BITMAP_ADDR16(s2636_2_bitmap, y, x);
 
 				int pixel = pixel0 | pixel1 | pixel2;
 
 				if (S2636_IS_PIXEL_DRAWN(pixel))
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel)];
+					*BITMAP_ADDR16(bitmap, y, x) = SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. S2636 collision detection */
 					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) cvs_collision_register |= 0x01;
@@ -362,14 +362,14 @@ VIDEO_UPDATE( cvs )
 			{
 				if ((y & 1) ^ ((x >> 4) & 1))
 				{
-					if (flip_screen_x)
+					if (flip_screen_x_get())
 						x = ~x;
 
-					if (flip_screen_y)
+					if (flip_screen_y_get())
 						y = ~y;
 
 					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0)
-						*BITMAP_ADDR16(bitmap, y, x) = machine->pens[BULLET_STAR_PEN];
+						*BITMAP_ADDR16(bitmap, y, x) = BULLET_STAR_PEN;
 				}
 			}
 		}

@@ -299,7 +299,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 		/* Handle flip_screen. Apply a global offset of 32 pixels along x too */
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{	sx = screen_w - sx - dimx*16 - 32;	flipx = !flipx;
 			sy = screen_h - sy - dimy*16;		flipy = !flipy;
 			code += dimx*dimy-1;			inc = -1;	}
@@ -367,7 +367,7 @@ if (input_code_pressed(KEYCODE_Z))
 #endif
 
 	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, tilemap_0, 0, 0);
-	else					fillbitmap(bitmap,machine->pens[0],cliprect);
+	else					fillbitmap(bitmap,0,cliprect);
 	if (layers_ctrl&8)		draw_sprites(machine,bitmap,cliprect);
 	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, tilemap_1, 0, 0);
 	return 0;

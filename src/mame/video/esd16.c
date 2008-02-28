@@ -215,7 +215,7 @@ static void esd16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 		sy	 =	0x100 - ((sy & 0xff)  - (sy & 0x100));
 		sy	-=	dimy*16;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{	flipx = !flipx;		sx = max_x - sx -    1 * 16 + 2;	// small offset
 			flipy = !flipy;		sy = max_y - sy - dimy * 16;	}
 
@@ -274,7 +274,7 @@ static void hedpanic_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 		sy = 0x1ff-sy;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{	flipx = !flipx;		sx = max_x - sx -    1 * 16 + 2;	// small offset
 			flipy = !flipy;		sy = max_y - sy - dimy * 16;	}
 
@@ -325,7 +325,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,esdtilemap_0,0,0);
-	else					fillbitmap(bitmap,machine->pens[0],cliprect);
+	else					fillbitmap(bitmap,0,cliprect);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,esdtilemap_1,0,1);
 
@@ -353,7 +353,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,esdtilemap_0,0,0);
-	else					fillbitmap(bitmap,machine->pens[0],cliprect);
+	else					fillbitmap(bitmap,0,cliprect);
 
 	if (layers_ctrl & 2)
 	{

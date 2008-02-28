@@ -278,8 +278,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		xdim	=		((zoom & 0x00ff) >> 0) << (16-6+4);
 		ydim	=		((zoom & 0xff00) >> 8) << (16-6+4);
 
-		if (flip_screen_x)	{	flipx = !flipx;		sx = (max_x << 16) - sx - xnum * xdim;	}
-		if (flip_screen_y)	{	flipy = !flipy;		sy = (max_y << 16) - sy - ynum * ydim;	}
+		if (flip_screen_x_get())	{	flipx = !flipx;		sx = (max_x << 16) - sx - xnum * xdim;	}
+		if (flip_screen_y_get())	{	flipy = !flipy;		sy = (max_y << 16) - sy - ynum * ydim;	}
 
 		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
 		else		{ xstart = 0;       xend = xnum;  xinc = +1; }
@@ -313,8 +313,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 				// buffer the tile and rotate it into bitmap
 				if( rot )
 				{
-					fillbitmap( tmpbitmap0, machine->pens[0], &spritetile_clip );
-					fillbitmap( tmpbitmap1, machine->pens[0], &spritetile_clip );
+					fillbitmap( tmpbitmap0, 0, &spritetile_clip );
+					fillbitmap( tmpbitmap1, 0, &spritetile_clip );
 					drawgfxzoom(	tmpbitmap0,machine->gfx[gfx],
 									code++,
 									color,
@@ -440,8 +440,8 @@ static void dai2kaku_draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect
 		xdim	=		((zoom & 0x00ff) >> 0) << (16-6+4);
 		ydim	=		((zoom & 0xff00) >> 8) << (16-6+4);
 
-		if (flip_screen_x)	{	flipx = !flipx;		sx = (max_x << 16) - sx - xnum * xdim;	}
-		if (flip_screen_y)	{	flipy = !flipy;		sy = (max_y << 16) - sy - ynum * ydim;	}
+		if (flip_screen_x_get())	{	flipx = !flipx;		sx = (max_x << 16) - sx - xnum * xdim;	}
+		if (flip_screen_y_get())	{	flipy = !flipy;		sy = (max_y << 16) - sy - ynum * ydim;	}
 
 		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
 		else		{ xstart = 0;       xend = xnum;  xinc = +1; }
@@ -536,7 +536,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 		return 0;
 	}
 	else
-		fillbitmap(bitmap,machine->pens[realbrk_vregs[0xc/2] & 0x7fff],cliprect);
+		fillbitmap(bitmap,realbrk_vregs[0xc/2] & 0x7fff,cliprect);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
@@ -604,7 +604,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 		return 0;
 	}
 	else
-		fillbitmap(bitmap,machine->pens[realbrk_vregs[0xc/2] & 0x7fff],cliprect);
+		fillbitmap(bitmap,realbrk_vregs[0xc/2] & 0x7fff,cliprect);
 
 
 

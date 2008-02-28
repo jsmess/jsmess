@@ -86,7 +86,7 @@ const game_driver driver_##NAME = 	\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
-	construct_##MACHINE,					\
+	machine_config_##MACHINE,				\
 	ipt_##INPUT,							\
 	driver_init_##INIT,						\
 	rom_##NAME,								\
@@ -106,7 +106,7 @@ const game_driver driver_##NAME = 	\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
-	construct_##MACHINE,					\
+	machine_config_##MACHINE,				\
 	ipt_##INPUT,							\
 	driver_init_##INIT,						\
 	rom_##NAME,								\

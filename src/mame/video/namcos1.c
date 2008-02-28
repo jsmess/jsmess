@@ -138,10 +138,10 @@ VIDEO_START( namcos1 )
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0;i < 0x2000;i++)
-		machine->shadow_table[machine->pens[i]] = machine->pens[i];
+		machine->shadow_table[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x0800;i < 0x1000;i++)
-		machine->shadow_table[machine->pens[i]] = machine->pens[i + 0x0800];
+		machine->shadow_table[i] = i + 0x0800;
 
 	spriteram = &namcos1_spriteram[0x800];
 
@@ -309,7 +309,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		sx += sprite_xoffs;
 		sy -= sprite_yoffs;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
@@ -345,8 +345,8 @@ VIDEO_UPDATE( namcos1 )
 
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	flip_screen = spriteram[0x07f6] & 1;
-	tilemap_set_flip(ALL_TILEMAPS,flip_screen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	flip_screen_set_no_update(spriteram[0x07f6] & 1);
+	tilemap_set_flip(ALL_TILEMAPS,flip_screen_get() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 
 	/* background color */
@@ -378,7 +378,7 @@ VIDEO_UPDATE( namcos1 )
 		scrollx = ( namcos1_playfield_control[j+1] + (namcos1_playfield_control[j+0]<<8) ) - disp_x[i];
 		scrolly = ( namcos1_playfield_control[j+3] + (namcos1_playfield_control[j+2]<<8) ) + 8;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			scrollx = -scrollx;
 			scrolly = -scrolly;

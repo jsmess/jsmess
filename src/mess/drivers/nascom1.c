@@ -51,6 +51,7 @@ Nascom Memory map
 /* Core includes */
 #include "driver.h"
 #include "includes/nascom1.h"
+#include "mslegacy.h"
 
 /* Components */
 #include "cpu/z80/z80.h"

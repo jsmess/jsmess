@@ -8,6 +8,7 @@
 #include "deprecat.h"
 #include "includes/cbmb.h"
 #include "video/mc6845.h"
+#include "mslegacy.h"
 
 
 static int cbmb_font=0;
@@ -61,8 +62,8 @@ void cbmb_vh_set_font(int font)
 	cbmb_font=font;
 }
 
-void cbm600_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-					   UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+MC6845_UPDATE_ROW( cbm600_update_row )
+{
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
@@ -74,8 +75,8 @@ void cbm600_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *
 	}
 }
 
-void cbm700_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-					   UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+MC6845_UPDATE_ROW( cbm700_update_row )
+{
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {

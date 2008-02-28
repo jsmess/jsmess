@@ -4,12 +4,12 @@
     taken to pieces and attempted reconstruction by David Haywood
 
 Mainboard + Cart combo
-  Regions are not cross compatible and have thier own BIOS
+  Regions are not cross compatible and have their own BIOS
    Regions by color coded cart:
 
     White      = Japan
-    Light Blue = USA
-    Dark Blue  = Europe
+    Light Blue = Europe
+    Dark Blue  = USA
     Green      = Asia
     Red        = Korean
 

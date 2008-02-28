@@ -33,6 +33,7 @@
 #include "machine/z80sio.h"
 #include "mscommon.h"
 #include "sound/dac.h"
+#include "mslegacy.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

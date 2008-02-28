@@ -918,8 +918,7 @@ void CreateCPUFolders(int parent_index)
 	{
 		int n;
 		machine_config *config;
-		// expand_machine_driver(drivers[jj]->drv,&drv);
-		config = machine_config_alloc(drivers[jj]->drv);
+		config = machine_config_alloc(drivers[jj]->machine_config);
 		for (n = 0; n < MAX_CPU; n++) {
 			if (config->cpu[n].type != CPU_DUMMY)
 			{
@@ -974,8 +973,7 @@ void CreateSoundFolders(int parent_index)
 		int n;
 		machine_config *config;
 
-		// expand_machine_driver(drivers[jj]->drv,&drv);
-		config = machine_config_alloc(drivers[jj]->drv);
+		config = machine_config_alloc(drivers[jj]->machine_config);
 		// Additional range and null checking.
 		for (n = 0; n < MAX_SOUND ; n++) {
 			if (config->sound[n].type > SOUND_DUMMY &&

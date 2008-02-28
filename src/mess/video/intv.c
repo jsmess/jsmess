@@ -2,6 +2,7 @@
 #include "deprecat.h"
 #include "includes/intv.h"
 #include "video/stic.h"
+#include "mslegacy.h"
 
 #define FOREGROUND_BIT 0x0010
 

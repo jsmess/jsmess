@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "includes/cgenie.h"
+#include "mslegacy.h"
 
 int cgenie_font_offset[4] = {0, 0, 0, 0};
 

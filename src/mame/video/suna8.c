@@ -318,7 +318,7 @@ static void draw_normal_sprites(running_machine *machine, mame_bitmap *bitmap,co
 				if (flipx)	tile_flipx = !tile_flipx;
 				if (flipy)	tile_flipy = !tile_flipy;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{	sx = max_x - sx;	tile_flipx = !tile_flipx;
 					sy = max_y - sy;	tile_flipy = !tile_flipy;	}
 
@@ -383,7 +383,7 @@ static void draw_text_sprites(running_machine *machine, mame_bitmap *bitmap,cons
 				int sx		=	 x + tx * 8;
 				int sy		=	(y + real_ty * 8) & 0xff;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{	sx = max_x - sx;	flipx = !flipx;
 					sy = max_y - sy;	flipy = !flipy;	}
 
@@ -410,7 +410,7 @@ static void draw_text_sprites(running_machine *machine, mame_bitmap *bitmap,cons
 VIDEO_UPDATE( suna8 )
 {
 	/* see hardhead, hardhea2 test mode (press button 2 for both players) */
-	fillbitmap(bitmap,machine->pens[0xff],cliprect);
+	fillbitmap(bitmap,0xff,cliprect);
 
 #ifdef MAME_DEBUG
 #if TILEMAPS

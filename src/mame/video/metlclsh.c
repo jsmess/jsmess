@@ -194,7 +194,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		if (sx < -7) sx += 256;
 		sy	=	240 - spriteram[offs+2];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;	flipx = !flipx;
 			sy = 240 - sy;	flipy = !flipy;		if (sizey)	sy+=16;
@@ -237,13 +237,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_UPDATE( metlclsh )
 {
-	fillbitmap(bitmap,machine->pens[0x10],cliprect);
+	fillbitmap(bitmap,0x10,cliprect);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,1,0);	// low priority tiles of foreground
 	if (metlclsh_scrollx[0] & 0x08)					// background (if enabled)
 	{
 		/* The background seems to be always flipped along x */
-		tilemap_set_flip(bg_tilemap, (flip_screen ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
+		tilemap_set_flip(bg_tilemap, (flip_screen_get() ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
 		tilemap_set_scrollx(bg_tilemap, 0,metlclsh_scrollx[1] + ((metlclsh_scrollx[0]&0x02)<<7) );
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}

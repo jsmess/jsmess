@@ -228,8 +228,8 @@ static int Einstein_scr_y = 0;
 //  0,// Cursor status
 //};
 
-static void einstein_6845_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-									 UINT8 ra, UINT16 y, UINT8 x_count, void *param) {
+static MC6845_UPDATE_ROW( einstein_6845_update_row )
+{
 	/* TODO: Verify implementation */
 	unsigned char *data = memory_region(REGION_CPU1) + 0x012000;
 	unsigned char data_byte;

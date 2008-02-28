@@ -2495,8 +2495,9 @@ V-V                           TP-027
 	DRIVER( ddtodr1 )	/* 13/01/1994 (c) 1993 (Euro) */
 	DRIVER( ddtodu )	/* 25/01/1994 (c) 1993 (US) */
 	DRIVER( ddtodur1 )	/* 13/01/1994 (c) 1993 (US) */
-	DRIVER( ddtodj )	/* 25/01/1994 (c) 1993 (Japan) */
-	DRIVER( ddtodjr1 )	/* 13/01/1994 (c) 1993 (Japan) */
+	DRIVER( ddtodj )	/* 12/04/1994 (c) 1993 (Japan) */
+	DRIVER( ddtodjr1 )	/* 25/01/1994 (c) 1993 (Japan) */
+	DRIVER( ddtodjr2 )	/* 13/01/1994 (c) 1993 (Japan) */
 	DRIVER( ddtoda )	/* 13/01/1994 (c) 1993 (Asia) */
 	DRIVER( ddtodh )	/* 25/01/1994 (c) 1993 (Hispanic) */
 	DRIVER( ssf2t )		/* 23/02/1994 (c) 1994 (World) */
@@ -3980,8 +3981,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Sega Naomi-based (Dreamcast) systems */
 	DRIVER( naomi )
 	DRIVER( csmash )
+	DRIVER( csmasho )
 	DRIVER( vs2_2k )
-	DRIVER( vs2_2ka )
 	DRIVER( smarinef )
 	DRIVER( cspike )
 	DRIVER( capsnk )
@@ -5555,6 +5556,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( neobombe )	/* 0093 (c) 1997 Hudson */
 	DRIVER( gowcaizr )	/* 0094 (c) 1995 Technos */
 	DRIVER( rbff1 )		/* 0095 (c) 1995 SNK */
+	DRIVER( rbff1a )	/* 0095 (c) 1995 SNK */
 	DRIVER( aof3 )		/* 0096 (c) 1996 SNK */
 	DRIVER( aof3k )		/* Censored Korean release of aof3 */
 	DRIVER( sonicwi3 )	/* 0097 (c) 1995 Video System Co. */
@@ -5668,6 +5670,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pnyaa )		/* 0267 (c) 2003 Aiky / Taito */
 	DRIVER( ms5pcb )	/* 0268 (c) 2003 Playmore */
 	DRIVER( mslug5 )	/* 0268 (c) 2003 Playmore */
+	DRIVER( mslug5h )	/* 0268 (c) 2003 Playmore */
 	DRIVER( ms5plus )	/* bootleg */
 	DRIVER( svcpcb )	/* 0269 (c) 2003 Playmore / Capcom - JAMMA PCB */
 	DRIVER( svcpcba )	/* 0269 (c) 2003 Playmore / Capcom - JAMMA PCB */
@@ -7790,12 +7793,17 @@ Other Sun games
 	DRIVER( dreamwld )	/* (c) 2000 SemiCom */
 	DRIVER( cybertnk )	/* (c) 1990 Coreland */
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
+
+	/* Funworld */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolycdae )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyc3x3 )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyc980 )	/* (c) 2000 Spale-Soft */
-	DRIVER( jolycdcr )	/* (c) 1993 Soft Design */
+	DRIVER( jolycdev )	/* (c) 1998 TAB/Evona */
+	DRIVER( jolyccra )	/* (c) 1985 TAB-Austria */
+	DRIVER( jolyccrb )	/* (c) 1993 Soft Design */
 	DRIVER( jolycdit )	/* 199? bootleg */
+	DRIVER( sjcd2kx3 )	/* (c) 1985 M.P.*/
 	DRIVER( jolycdab )	/* (c) 1986 Inter Games */
 	DRIVER( bigdeal )	/* (c) 1986 Funworld */
 	DRIVER( bigdealb )	/* (c) 1986 Funworld */
@@ -7816,11 +7824,15 @@ Other Sun games
 	DRIVER( magiccdb )	/* (c) 1996 Impera */
 	DRIVER( vegasslw )	/* (c) 1993 Funworld */
 	DRIVER( vegasfst )	/* (c) 1993 Soft Design */
+	DRIVER( vegasfte )	/* (c) 1993 Soft Design */
+	DRIVER( jolyjokr )	/* (c) 198? Impera */
+	DRIVER( jolyjkra )	/* (c) 198? Impera */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
 	DRIVER( snookr10 )	/* (c) 1998 Sandiy */
 	DRIVER( saloon )	/* 199? unknown */
+
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
@@ -7889,8 +7901,45 @@ Other Sun games
 	DRIVER( jokerpkr )	/* Bootleg in Coinmaster hardware */
 	DRIVER( pottnpkr )	/* Bootleg */
 	DRIVER( pottnpkb )	/* Bootleg */
-	DRIVER( gdrawpkr )	/* (c) 1981 Cal Omega / Casino Electronics Inc. */
+
+	/* Cal Omega */
+	DRIVER( comg076 )	/* (c) 1981 Cal Omega Inc. */
+	DRIVER( comg079 )	/* (c) 1981 Cal Omega Inc. */
+	DRIVER( comg094 )	/* (c) 1981 Cal Omega Inc. */
+	DRIVER( comg107 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg125 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg127 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg128 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg134 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg145 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg157 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg159 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg164 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg168 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg172 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg175 )	/* (c) 1984 Cal Omega / Casino Electronics Inc. */
+	DRIVER( comg176 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg181 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg183 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg185 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg186 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg204 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg208 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg227 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg236 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg239 )	/* (c) 1985 Cal Omega / Casino Electronics Inc. */
+	DRIVER( comg246 )	/* (c) 1985 Cal Omega Inc. */
+	DRIVER( comg272a )	/* (c) 1985 Cal Omega Inc. */
+	DRIVER( comg272b )	/* (c) 1985 Cal Omega Inc. */
+	DRIVER( comg903d )	/* (c) 198? Cal Omega Inc. */
+	DRIVER( comg905d )	/* (c) 198? Cal Omega Inc. */
 	DRIVER( elgrande )	/* (c) 1982 Tuni Electro Service / E.T. Marketing */
+	DRIVER( jjpoker )	/* (c) 1983 Enter-Tech */
+	DRIVER( jjpokerb )	/* (c) 1983 Enter-Tech */
+	DRIVER( ssipkr24 )	/* (c) 1988 SSI */
+	DRIVER( ssipkr30 )	/* (c) 1988 SSI */
+	DRIVER( ssipkr40 )	/* (c) 1990 SSI */
+
 	DRIVER( altair )	/* (c) 1981 Cidelsa */
 	DRIVER( destryer )	/* (c) 1981 Cidelsa */
 	DRIVER( destryea )	/* (c) 1981 Cidelsa */

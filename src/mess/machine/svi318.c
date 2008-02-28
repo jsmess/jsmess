@@ -429,8 +429,8 @@ DEVICE_LOAD( svi318_floppy )
 	return INIT_PASS;
 }
 
-static void svi806_crtc6845_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 ma,
-									   UINT8 ra, UINT16 y, UINT8 x_count, void *param ) {
+static MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
+{
 	int i;
 
 	for( i = 0; i < x_count; i++ )
