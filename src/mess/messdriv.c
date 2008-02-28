@@ -185,7 +185,7 @@ TESTDRIVER( tvlinkp )
 	DRIVER( wscolor )	/* Bandai WonderSwan Color Handheld					*/
 
 	/* EPOCH */
-//	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
+	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
 
 
 /****************COMPUTERS***************************************************/

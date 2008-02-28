@@ -130,6 +130,7 @@ CPUS += PSXCPU
 #CPUS += ASAP
 #CPUS += UPD7810
 #CPUS += UPD7807
+CPUS += UPD7801
 CPUS += ARM
 CPUS += ARM7
 CPUS += JAGUAR
@@ -358,6 +359,7 @@ DRVLIBS = \
 	$(MESSOBJ)/dgn_beta.a \
 	$(MESSOBJ)/epson.a \
 	$(MESSOBJ)/ep128.a \
+	$(MESSOBJ)/epoch.a \
 	$(MESSOBJ)/exidy.a \
 	$(MESSOBJ)/fairch.a \
 	$(MESSOBJ)/galaxy.a \
@@ -1156,6 +1158,9 @@ $(MESSOBJ)/osborne.a:			\
 $(MESSOBJ)/epson.a:			\
 	$(MESS_DRIVERS)/ex800.o	\
 
+$(MESSOBJ)/epoch.a:				\
+	$(MESS_DRIVERS)/gamepock.o	\
+	$(MESS_MACHINE)/gamepock.o	\
 
 #-------------------------------------------------
 # layout dependencies

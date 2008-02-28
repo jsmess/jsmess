@@ -3,6 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Philips Videopac G7000/C52 [Wilbert Pol]
+- Epoch Game Pocket Computer [Wilbert Pol]
 
 
 
