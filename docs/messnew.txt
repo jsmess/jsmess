@@ -21,7 +21,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- [Windows UI] Fixed a bug in the per-driver software view.  (bug #1512) [Nate
+  Woods]
 
 
 

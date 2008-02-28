@@ -356,7 +356,7 @@ static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 		if (s != NULL)
 		{
 			*s = '\0';
-			new_pos = s - &t_dir_list[pos] + 1;
+			new_pos = s - t_dir_list + 1;
 		}
 		else
 		{
