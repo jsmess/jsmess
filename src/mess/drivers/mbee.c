@@ -182,7 +182,7 @@ static GFXDECODE_START( mbee )
 	GFXDECODE_ENTRY( REGION_CPU1, 0xf000, mbee_charlayout, 0, 256 )
 GFXDECODE_END
 
-static const UINT8 palette[] =
+static const UINT8 mbee_palette[] =
 {
     0x00,0x00,0x00, /* black    */
     0xf0,0x00,0x00, /* red      */
@@ -220,7 +220,23 @@ static const UINT8 palette[] =
 
 static PALETTE_INIT( mbee )
 {
-	palette_set_colors_rgb(machine, 0, palette, sizeof(palette) / 3);
+	int i;
+	UINT8 r, b, g; 
+	machine->colortable = colortable_alloc(machine, 32);
+
+	for (i = 0; i < 32; i++)
+	{
+		r = mbee_palette[i*3];
+		g = mbee_palette[i*3+1];
+		b = mbee_palette[i*3+2];
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r, g, b));
+	}
+
+	for( i = 0; i < 256; i++ )
+	{
+		colortable_entry_set_value(machine->colortable, i*2, i>>5);
+		colortable_entry_set_value(machine->colortable, i*2+1, i&31);
+	}
 }
 
 static const struct z80_irq_daisy_chain mbee_daisy_chain[] =
@@ -250,7 +266,7 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(70*8, 310)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 70*8-1, 0, 19*16-1)
-	MDRV_PALETTE_LENGTH(sizeof(palette)/sizeof(palette[0])/3)
+	MDRV_PALETTE_LENGTH(256*2)
 	MDRV_PALETTE_INIT(mbee)
 
 	MDRV_VIDEO_START(mbee)

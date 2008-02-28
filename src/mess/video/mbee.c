@@ -523,7 +523,7 @@ VIDEO_UPDATE( mbee )
 					if( y > crt.scan_lines )
 						break;
 					for( x = 0; x < 8; x++ )
-						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = machine->pens[color];
+						*BITMAP_ADDR16(bitmap, sy+y, sx+x) = machine->pens[5]; //[color];
 				}
 			}
         }
