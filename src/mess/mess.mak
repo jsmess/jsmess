@@ -1173,6 +1173,7 @@ $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
+$(MESS_DRIVERS)/gamepock.o:	$(MESS_LAYOUT)/gamepock.lh
 $(MESS_DRIVERS)/gb.o:		$(MESS_LAYOUT)/gb.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
