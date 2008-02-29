@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( intv )
 	MDRV_PALETTE_INIT( intv )
 
 	MDRV_VIDEO_START( intv )
-	MDRV_VIDEO_UPDATE( intv )
+	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

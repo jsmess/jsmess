@@ -15,7 +15,7 @@ extern VIDEO_UPDATE( intv );
 extern VIDEO_START( intvkbd );
 extern VIDEO_UPDATE( intvkbd );
 
-void stic_screenrefresh(void);
+void stic_screenrefresh(running_machine *machine);
 
 READ8_HANDLER ( intvkbd_tms9927_r );
 WRITE8_HANDLER ( intvkbd_tms9927_w );
