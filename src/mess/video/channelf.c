@@ -43,7 +43,6 @@ VIDEO_START( channelf )
 {
 	videoram_size = 0x2000;
 	videoram = auto_malloc(videoram_size);
-	VIDEO_START_CALL(generic);
 }
 
 static int recalc_palette_offset(int reg1, int reg2)
@@ -72,5 +71,3 @@ VIDEO_UPDATE( channelf )
 	}
 	return 0;
 }
-
-
