@@ -33,7 +33,7 @@
 #include "machine/z80sio.h"
 #include "mscommon.h"
 #include "sound/dac.h"
-#include "mslegacy.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -134,7 +134,6 @@ static VIDEO_START( mpf1 )
 {
     videoram_size = 6 * 2 + 24;
     videoram = auto_malloc (videoram_size);
-	VIDEO_START_CALL(generic);
 }
 
 
