@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "includes/cgenie.h"
-#include "mslegacy.h"
+
 
 int cgenie_font_offset[4] = {0, 0, 0, 0};
 
@@ -28,7 +28,7 @@ VIDEO_START( cgenie )
 {
 	videoram_size = 0x4000;
 
-	VIDEO_START_CALL(generic);
+	VIDEO_START_CALL(generic_bitmapped);
 
     dlybitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 }
