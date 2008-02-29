@@ -107,7 +107,6 @@ static PALETTE_INIT( saa5050 )
 static VIDEO_START( saa5050 )
 {
 	frame_count = 0;
-	VIDEO_START_CALL(generic);
 }
 
 #ifdef UNUSED_FUNCTION
