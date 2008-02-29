@@ -807,7 +807,6 @@ static MACHINE_DRIVER_START( pet )
 	MDRV_PALETTE_LENGTH(sizeof (pet_palette) / sizeof (pet_palette[0]) / 3)
 	MDRV_PALETTE_INIT( pet )
 
-	MDRV_VIDEO_START( generic )
 	MDRV_VIDEO_UPDATE( pet )
 MACHINE_DRIVER_END
 
