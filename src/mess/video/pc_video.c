@@ -11,7 +11,6 @@
 #include "memconv.h"
 #include "includes/crtc6845.h"
 #include "video/pc_video.h"
-#include "mslegacy.h"
 
 
 
@@ -63,7 +62,7 @@ struct mscrtc6845 *pc_video_start(const struct mscrtc6845_config *config,
 
 	if (videoram_size)
 	{
-		video_start_generic(Machine);
+		video_start_generic_bitmapped(Machine);
 	}
 
 	state_save_register_func_postload(pc_video_postload);
