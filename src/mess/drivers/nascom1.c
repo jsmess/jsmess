@@ -51,7 +51,6 @@ Nascom Memory map
 /* Core includes */
 #include "driver.h"
 #include "includes/nascom1.h"
-#include "mslegacy.h"
 
 /* Components */
 #include "cpu/z80/z80.h"
@@ -266,7 +265,6 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(nascom1)
 MACHINE_DRIVER_END
 
