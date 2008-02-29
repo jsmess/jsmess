@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "mslegacy.h"
-
 #include "includes/pocketc.h"
 
 /* PC126x
@@ -36,22 +35,13 @@ PALETTE_INIT( pocketc )
 	palette_set_colors_rgb(machine, 0, pocketc_palette, sizeof(pocketc_palette) / 3);
 }
 
+
 VIDEO_START( pocketc )
 {
     videoram_size = 6 * 2 + 24;
     videoram = (UINT8*)auto_malloc (videoram_size);
-
-#if 0
-	{
-		char backdrop_name[200];
-	    /* try to load a backdrop for the machine */
-		sprintf(backdrop_name, "%s.png", machine->gamedrv->name);
-		backdrop_load(backdrop_name, 8);
-	}
-#endif
-
-	VIDEO_START_CALL(generic);
 }
+
 
 void pocketc_draw_special(mame_bitmap *bitmap,
 						  int x, int y, const POCKETC_FIGURE fig, int color)
@@ -68,4 +58,3 @@ void pocketc_draw_special(mame_bitmap *bitmap,
 		}
 	}
 }
-
