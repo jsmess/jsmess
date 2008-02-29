@@ -74,7 +74,6 @@ WRITE8_HANDLER ( mbee_videoram_w )
 	{
 		logerror("mbee videoram [$%04X] <- $%02X\n", offset, data);
 		videoram[offset] = data;
-		colorram[offset] = 2;
 	}
 }
 
