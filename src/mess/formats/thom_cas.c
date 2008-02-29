@@ -765,12 +765,12 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 			cassette_image_read( cass, block, pos, 6 );
 			if ( ! memcmp( block, "DCMOTO", 6 ) )
 			{
-				LOG (( "mo5_k5_load: DCMOTO signature found at off=$%x\n", pos ));
+				LOG (( "mo5_k5_load: DCMOTO signature found at off=$%x\n", (int)pos ));
 				pos += 6;
 			}
 			else if ( ! memcmp( block, "DCMO", 4 ) )
 			{
-				LOG (( "mo5_k5_load: DCMO* signature found at off=$%x\n", pos ));
+				LOG (( "mo5_k5_load: DCMO* signature found at off=$%x\n", (int)pos ));
 				pos += 5;
 			}
 		}
@@ -857,7 +857,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 	{
 		invalid++;
 		K5_FILL_0( 1200 );
-		LOG (( "mo5_k5_load: trailing trash off=$%x size=%i hbitstart=%i\n", (int) pos, (int) size-pos, hbitsize ));
+		LOG (( "mo5_k5_load: trailing trash off=$%x size=%i hbitstart=%i\n", (int) pos, (int) (size-pos), hbitsize ));
 		for ( ; pos < size; pos++ )
 		{
 			cassette_image_read( cass, &in, pos, 1 );
@@ -867,13 +867,13 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 				cassette_image_read( cass, block, pos, 6 );
 				if ( ! memcmp( block, "DCMOTO", 6 ) )
 				{
-					LOG (( "mo5_k5_load: DCMOTO signature found at off=$%x\n", pos ));
+					LOG (( "mo5_k5_load: DCMOTO signature found at off=$%x\n", (int)pos ));
 					pos += 6;
 					cassette_image_read( cass, &in, pos, 1 );
 				}
 				else if ( ! memcmp( block, "DCMO", 4 ) )
 				{
-					LOG (( "mo5_k5_load: DCMO* signature found at off=$%x\n", pos ));
+					LOG (( "mo5_k5_load: DCMO* signature found at off=$%x\n", (int)pos ));
 					pos += 5;
 					cassette_image_read( cass, &in, pos, 1 );
 				}

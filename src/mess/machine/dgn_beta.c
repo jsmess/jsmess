@@ -295,7 +295,7 @@ static void UpdateBanks(int first, int last)
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, bank_start, bank_end,0,0,writebank);
 		memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, bank_start, bank_end,0,0,writebank);
 
-		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)readbank));
+		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(FPTR)readbank));
 		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",TaskReg,Page));
 		LOG_BANK_UPDATE(("memory_set_bankptr(%X)\n",Page+1));
 		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=0\n"));

@@ -890,7 +890,7 @@ static void command_verify_image(running_machine *machine)
 		{
 			state = STATE_ABORTED;
 			report_message(MSG_FAILURE, "Failed verification step (%s; 0x%x-0x%x)",
-				filename, offset_start, offset_end);
+				filename, (int)offset_start, (int)offset_end);
 			break;
 		}
 	}
