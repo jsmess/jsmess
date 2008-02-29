@@ -820,6 +820,14 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
 	DRIVER( pro128 )	/* 1986 Oliveti Prodest PC 128						*/
 
+	/* Dick Smith */
+	DRIVER( super80 )
+	DRIVER( super80d )
+	DRIVER( super80e )
+	DRIVER( super80m )
+	DRIVER( super80v )
+
+
 /****************Games*******************************************************/
 	/* Computer Electronic */
 	DRIVER( mk1 )		/* Chess Champion MK I								*/

@@ -402,6 +402,7 @@ DRVLIBS = \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/ssystem3.a \
+	$(MESSOBJ)/super80.a \
 	$(MESSOBJ)/svi.a \
 	$(MESSOBJ)/svision.a \
 	$(MESSOBJ)/synertec.a \
@@ -874,6 +875,8 @@ $(MESSOBJ)/vtech.a :   \
 	$(MESS_FORMATS)/vt_cas.o	\
 	$(MESS_FORMATS)/vt_dsk.o	\
 	$(MESS_DRIVERS)/crvision.o	\
+
+$(MESSOBJ)/super80.a :   \
 	$(MESS_DRIVERS)/super80.o	\
 
 $(MESSOBJ)/jupiter.a : \
