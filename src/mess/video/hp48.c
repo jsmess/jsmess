@@ -11,27 +11,19 @@ static const UINT8 hp48_palette[] =
 	37,42,64	/* lcd dark */
 };
 
+
 PALETTE_INIT( hp48 )
 {
 	palette_set_colors_rgb(machine, 0, hp48_palette, sizeof(hp48_palette) / 3);
 }
 
+
 VIDEO_START( hp48 )
 {
     videoram_size = 6 * 2 + 24;
     videoram = (UINT8*) auto_malloc (videoram_size);
-
-#if 0
-	{
-		char backdrop_name[200];
-	    /* try to load a backdrop for the machine */
-		sprintf (backdrop_name, "%s.png", machine->gamedrv->name);
-		backdrop_load(backdrop_name, 8);
-	}
-#endif
-
-	VIDEO_START_CALL(generic);
 }
+
 
 typedef const char *HP48_FIGURE;
 
