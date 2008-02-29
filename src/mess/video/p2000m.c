@@ -7,7 +7,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "includes/p2000t.h"
 
 
@@ -17,7 +16,6 @@ static INT8 frame_count;
 VIDEO_START( p2000m )
 {
 	frame_count = 0;
-	VIDEO_START_CALL(generic);
 }
 
 
