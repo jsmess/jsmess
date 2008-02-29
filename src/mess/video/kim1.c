@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "includes/kim1.h"
-#include "mslegacy.h"
+
 
 PALETTE_INIT( kim1 )
 {
@@ -31,13 +31,13 @@ PALETTE_INIT( kim1 )
 	palette_set_color_rgb(machine, 20, 255, 255, 255);
 }
 
+
 VIDEO_START( kim1 )
 {
     videoram_size = 6 * 2 + 24;
     videoram = auto_malloc (videoram_size);
-
-	VIDEO_START_CALL(generic);
 }
+
 
 VIDEO_UPDATE( kim1 )
 {
