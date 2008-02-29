@@ -59,6 +59,32 @@ WRITE8_HANDLER( odyssey2_bus_w )
 		odyssey2_video_w(offset, data);
 }
 
+READ8_HANDLER( g7400_bus_r )
+{
+	if ((p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0) {
+		return odyssey2_video_r(offset); /* seems to have higher priority than ram??? */
+	}
+	else if (!(p1 & P1_EXT_RAM_ENABLE)) {
+		return ram[offset];
+	} else {
+//		return ef9341_r( offset & 0x02, offset & 0x01 );
+	}
+
+	return 0;
+}
+
+WRITE8_HANDLER( g7400_bus_w )
+{
+	if ((p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00) {
+		ram[offset] = data;
+	}
+	else if (!(p1 & P1_VDC_ENABLE)) {
+		odyssey2_video_w(offset, data);
+	} else {
+//		ef9341_w( offset & 0x02, offset & 0x01, data );
+	}
+}
+
 /***** 8048 Ports ************************/
 
 READ8_HANDLER( odyssey2_getp1 )

@@ -22,24 +22,11 @@
 
 #define VDC_CONTROL_REG_STROBE_XY (0x02)
 
-#define COLLISION_SPRITE_0        (0x01)
-#define COLLISION_SPRITE_1        (0x02)
-#define COLLISION_SPRITE_2        (0x04)
-#define COLLISION_SPRITE_3        (0x08)
-#define COLLISION_VERTICAL_GRID   (0x10)
-#define COLLISION_HORIZ_GRID_DOTS (0x20)
-#define COLLISION_EXTERNAL_UNUSED (0x40)
-#define COLLISION_CHARACTERS      (0x80)
-
-#define COLLISION_SPRITE_0_IND        (1)
-#define COLLISION_SPRITE_1_IND        (2)
-#define COLLISION_SPRITE_2_IND        (3)
-#define COLLISION_SPRITE_3_IND        (4)
-#define COLLISION_VERTICAL_GRID_IND   (5)
-#define COLLISION_HORIZ_GRID_DOTS_IND (6)
-#define COLLISION_EXTERNAL_UNUSED_IND (7)
-#define COLLISION_CHARACTERS_IND      (8)
-
+#define I824X_START_ACTIVE_SCAN			6
+#define I824X_END_ACTIVE_SCAN			(6 + 160)
+#define I824X_START_Y					1
+#define I824X_SCREEN_HEIGHT				243
+#define I824X_LINE_CLOCKS				228
 
 /*----------- defined in video/odyssey2.c -----------*/
 
@@ -51,7 +38,6 @@ VIDEO_START( odyssey2 );
 VIDEO_UPDATE( odyssey2 );
 PALETTE_INIT( odyssey2 );
 READ8_HANDLER ( odyssey2_t1_r );
-INTERRUPT_GEN( odyssey2_line );
 READ8_HANDLER ( odyssey2_video_r );
 WRITE8_HANDLER ( odyssey2_video_w );
 
@@ -82,6 +68,11 @@ WRITE8_HANDLER ( odyssey2_putp2 );
 
 READ8_HANDLER( odyssey2_getbus );
 WRITE8_HANDLER ( odyssey2_putbus );
+
+READ8_HANDLER ( g7400_bus_r );
+WRITE8_HANDLER ( g7400_bus_w );
+void ef9341_w( int command, int b, UINT8 data );
+UINT8 ef9341_r( int command, int b );
 
 int odyssey2_cart_verify(const UINT8 *cartdata, size_t size);
 
