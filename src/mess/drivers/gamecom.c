@@ -113,11 +113,13 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_PALETTE_INIT( gamecom )
 
 	/* sound hardware */
+#if 0	
 	MDRV_SPEAKER_STANDARD_STEREO( "left", "right" )
 	/* MDRV_SOUND_ADD( CUSTOM, 0 ) */
 	/* MDRV_SOUND_CONFIG */
 	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
 	MDRV_SOUND_ROUTE( 1, "right", 0.50 )
+#endif
 MACHINE_DRIVER_END
 
 static void gamecom_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {

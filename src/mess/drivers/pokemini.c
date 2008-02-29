@@ -69,9 +69,11 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_CPU_VBLANK_INT( pokemini_int, 1 )
 
 	/* sound hardware */
+#if 0	
 	MDRV_SPEAKER_STANDARD_STEREO( "left", "right" )
 	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
 	MDRV_SOUND_ROUTE( 0, "right", 0.50 )
+#endif
 MACHINE_DRIVER_END
 
 static void pokemini_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
