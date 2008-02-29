@@ -10,7 +10,7 @@
 
 #include "driver.h"
 #include "mslegacy.h"
-#include "includes/mekd2.h"
+
 
 PALETTE_INIT( mekd2 )
 {
@@ -32,22 +32,13 @@ PALETTE_INIT( mekd2 )
 	palette_set_color_rgb(machine, 20, 255, 255, 255);
 }
 
+
 VIDEO_START( mekd2 )
 {
     videoram_size = 6 * 2 + 24;
     videoram = (UINT8*)auto_malloc (videoram_size);
-
-#if 0
-	{
-		char backdrop_name[200];
-	    /* try to load a backdrop for the machine */
-		sprintf(backdrop_name, "%s.png", machine->gamedrv->name);
-		backdrop_load(backdrop_name, 2);
-	}
-#endif
-
-	VIDEO_START_CALL(generic);
 }
+
 
 VIDEO_UPDATE( mekd2 )
 {
@@ -93,5 +84,3 @@ VIDEO_UPDATE( mekd2 )
 
 	return 0;
 }
-
-
