@@ -8,7 +8,6 @@
 #include "deprecat.h"
 #include "includes/cbmb.h"
 #include "video/mc6845.h"
-#include "mslegacy.h"
 
 
 static int cbmb_font=0;
@@ -53,8 +52,6 @@ VIDEO_START( cbm700 )
 			}
 		}
 	}
-
-	VIDEO_START_CALL(generic);
 }
 
 void cbmb_vh_set_font(int font)

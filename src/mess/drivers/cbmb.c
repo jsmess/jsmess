@@ -620,7 +620,6 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_PALETTE_LENGTH(sizeof (cbm700_palette) / sizeof (cbm700_palette[0]) / 3)
 	MDRV_PALETTE_INIT( cbm700 )
 
-	MDRV_VIDEO_START( generic )
 	MDRV_VIDEO_UPDATE( crtc6845 )
 
 	/* sound hardware */
