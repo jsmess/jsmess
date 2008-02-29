@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "includes/mbee.h"
 #include "deprecat.h"
-#include "mslegacy.h"
+
 
 typedef struct {		 // CRTC 6545
 	UINT8 horizontal_total;
@@ -476,8 +476,6 @@ WRITE8_HANDLER ( m6545_data_w )
 
 VIDEO_START( mbee )
 {
-	VIDEO_START_CALL(generic);
-
 	videoram = auto_malloc(0x800);
 	colorram = auto_malloc(0x800);
 }
