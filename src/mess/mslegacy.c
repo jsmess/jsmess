@@ -146,21 +146,3 @@ VIDEO_UPDATE(crtc6845)
 	mc6845_update(mslegacy_mc6845, bitmap, cliprect);
 	return 0;
 }
-
-
-
-/***************************************************************************
-    GENERIC VIDEO
-***************************************************************************/
-
-/*-------------------------------------------------
-    VIDEO_START( generic ) - general video system
--------------------------------------------------*/
-
-VIDEO_START( generic )
-{
-	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-}
-
-

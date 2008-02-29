@@ -96,8 +96,5 @@ WRITE8_HANDLER(crtc6845_0_register_w);
 VIDEO_UPDATE(crtc6845);
 void crtc6845_config(int index, const struct _mc6845_interface *intf);
 
-/* generic video */
-VIDEO_START(generic);
-
 
 #endif /* MSLEGACY_H */
