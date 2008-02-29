@@ -17,28 +17,20 @@ static const unsigned char ssystem3_palette[] =
 	0,12,12
 };
 
+
 PALETTE_INIT( ssystem3 )
 {
 	palette_set_colors_rgb(machine, 0, ssystem3_palette, sizeof(ssystem3_palette) / 3);
 }
+
 
 VIDEO_START( ssystem3 )
 {
 	// artwork seams to need this
     videoram_size = 6 * 2 + 24;
     videoram = (UINT8*) auto_malloc (videoram_size);
-
-#if 0
-	{
-		char backdrop_name[200];
-	    /* try to load a backdrop for the machine */
-		sprintf (backdrop_name, "%s.png", machine->gamedrv->name);
-		backdrop_load(backdrop_name, 3);
-	}
-#endif
-
-	VIDEO_START_CALL(generic);
 }
+
 
 static const char led[]={
 	"    aaaaaaaaaaaa\r"
