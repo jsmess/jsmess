@@ -185,7 +185,6 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_PALETTE_LENGTH(sizeof(jupiter_palette) / 3)
 	MDRV_PALETTE_INIT( jupiter )
 
-	MDRV_VIDEO_START( jupiter )
 	MDRV_VIDEO_UPDATE( jupiter )
 
 	/* sound hardware */

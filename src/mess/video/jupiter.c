@@ -9,17 +9,10 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "includes/jupiter.h"
-#include "mslegacy.h"
 
 
 UINT8 *jupiter_charram;
 size_t jupiter_charram_size;
-
-
-VIDEO_START( jupiter )
-{
-	VIDEO_START_CALL(generic);
-}
 
 
 WRITE8_HANDLER( jupiter_vh_charram_w )
