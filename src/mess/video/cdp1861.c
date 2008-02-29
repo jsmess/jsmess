@@ -3,7 +3,7 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
 
-static mame_bitmap *cdptmpbitmap;
+static bitmap_t *cdptmpbitmap;
 
 static emu_timer *cdp1861_int_timer;
 static emu_timer *cdp1861_efx_timer;

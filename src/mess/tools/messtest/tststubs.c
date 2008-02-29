@@ -28,7 +28,7 @@ int osd_skip_this_frame(void)
 	return 0;
 }
 
-mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
+bitmap_t *osd_override_snapshot(bitmap_t *bitmap, rectangle *bounds)
 {
 	return NULL;
 }

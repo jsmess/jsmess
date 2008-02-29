@@ -65,7 +65,7 @@ static struct
 
 	void (*int_callback)(int state);
 
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 } asr[MAX_ASR];
 
 enum
@@ -427,7 +427,7 @@ WRITE8_HANDLER(asr733_0_cru_w)
 /*
 	Video refresh
 */
-void asr733_refresh(mame_bitmap *bitmap, int unit, int x, int y)
+void asr733_refresh(bitmap_t *bitmap, int unit, int x, int y)
 {
 	copybitmap(bitmap, asr[unit].bitmap, 0, 0, x, y, &Machine->screen[0].visarea);
 }

@@ -505,7 +505,7 @@ static int y_begin, y_end;
 
 static UINT16 c16_bitmap[2], bitmapmulti[4], mono[2], monoinversed[2], multi[4], ecmcolor[2], colors[5];
 
-static mame_bitmap *ted7360_bitmap;
+static bitmap_t *ted7360_bitmap;
 static int rasterline = 0, lastline = 0;
 static double rastertime;
 static void ted7360_drawlines (int first, int last);

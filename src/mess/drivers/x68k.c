@@ -154,14 +154,14 @@ static unsigned int x68k_scanline;
 
 static UINT8 mfp_key;
 
-extern mame_bitmap* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
-extern mame_bitmap* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
-extern mame_bitmap* x68k_gfx_1_bitmap_16;
-extern mame_bitmap* x68k_gfx_2_bitmap_16;
-extern mame_bitmap* x68k_gfx_3_bitmap_16;
-extern mame_bitmap* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
-extern mame_bitmap* x68k_gfx_1_bitmap_256;
-extern mame_bitmap* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
+extern bitmap_t* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
+extern bitmap_t* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
+extern bitmap_t* x68k_gfx_1_bitmap_16;
+extern bitmap_t* x68k_gfx_2_bitmap_16;
+extern bitmap_t* x68k_gfx_3_bitmap_16;
+extern bitmap_t* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
+extern bitmap_t* x68k_gfx_1_bitmap_256;
+extern bitmap_t* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
 
 extern tilemap* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
 extern tilemap* x68k_bg1_8;

@@ -14,7 +14,7 @@
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
 
-mame_bitmap *nes_zapper_hack;
+bitmap_t *nes_zapper_hack;
 int nes_vram_sprite[8]; /* Used only by mmc5 for now */
 static int last_frame_flip = 0;
 
@@ -89,7 +89,7 @@ PALETTE_INIT( nes )
 	ppu2c0x_init_palette(machine, 0);
 }
 
-static void draw_sight(mame_bitmap *bitmap, int playerNum, int x_center, int y_center)
+static void draw_sight(bitmap_t *bitmap, int playerNum, int x_center, int y_center)
 {
 	int x,y;
 	UINT16 color;

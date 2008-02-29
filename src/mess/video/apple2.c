@@ -95,7 +95,7 @@ static void adjust_begin_and_end_row(const rectangle *cliprect, int *beginrow, i
 	textual character
 -------------------------------------------------*/
 
-INLINE void apple2_plot_text_character(mame_bitmap *bitmap, int xpos, int ypos, int xscale, UINT32 code,
+INLINE void apple2_plot_text_character(bitmap_t *bitmap, int xpos, int ypos, int xscale, UINT32 code,
 	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2)
 {
 	int x, y, i;
@@ -142,7 +142,7 @@ INLINE void apple2_plot_text_character(mame_bitmap *bitmap, int xpos, int ypos, 
 	column or 80 column)
 -------------------------------------------------*/
 
-static void apple2_text_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_text_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
 	int row, col;
 	UINT32 start_address = (page ? 0x0800 : 0x0400);
@@ -182,7 +182,7 @@ static void apple2_text_draw(running_machine *machine, mame_bitmap *bitmap, cons
     apple2_lores_draw - renders lo-res text
 -------------------------------------------------*/
 
-static void apple2_lores_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_lores_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
 	int row, col, y, x;
 	UINT8 code;
@@ -265,7 +265,7 @@ int apple2_get_bgcolor(void)
 
 struct drawtask_params
 {
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 	const UINT8 *vram;
 	int beginrow;
 	int rowcount;
@@ -274,7 +274,7 @@ struct drawtask_params
 
 static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 {
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 	const UINT8 *vram;
 	int beginrow;
 	int endrow;
@@ -352,7 +352,7 @@ static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 	}
 }
 
-static void apple2_hires_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_hires_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
 	struct drawtask_params dtparams;
 

@@ -492,7 +492,7 @@ WRITE8_HANDLER ( pc_T1T_w )
   Plot single text character
 ***************************************************************************/
 
-static void t1t_plot_char(mame_bitmap *bitmap, const rectangle *r, UINT8 ch, UINT8 attr)
+static void t1t_plot_char(bitmap_t *bitmap, const rectangle *r, UINT8 ch, UINT8 attr)
 {
 	int width;
 	int height;
@@ -519,7 +519,7 @@ static void t1t_plot_char(mame_bitmap *bitmap, const rectangle *r, UINT8 ch, UIN
   Draw text mode with 40x25 characters (default) with high intensity bg.
 ***************************************************************************/
 
-static void t1t_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void t1t_text_inten(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -571,7 +571,7 @@ static void t1t_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   Draw text mode with 40x25 characters (default) and blinking colors.
 ***************************************************************************/
 
-static void t1t_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void t1t_text_blink(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -635,7 +635,7 @@ static void t1t_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   Even scanlines are from T1T_base + 0x0000, odd from T1T_base + 0x2000
 ***************************************************************************/
 
-static void t1t_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void t1t_gfx_2bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	static const UINT16 palette[] =
 	{
@@ -653,7 +653,7 @@ static void t1t_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   The cell size is 1x1 (1 scanline is the real default)
   Even scanlines are from T1T_base + 0x0000, odd from T1T_base + 0x2000
 ***************************************************************************/
-static void t1t_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void t1t_gfx_1bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int i, sx, sy, sh;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -695,7 +695,7 @@ static void t1t_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   CGA_base + 0x2000
 ***************************************************************************/
 
-static void t1t_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void t1t_gfx_4bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	pc_render_gfx_4bpp(bitmap, crtc, pcjr.displayram, NULL, 4);
 }

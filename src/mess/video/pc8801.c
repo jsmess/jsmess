@@ -76,7 +76,7 @@ static int disp_plane[3];
 
 static char *graph_dirty=NULL;
 static unsigned short *attr_tmp=NULL,*attr_old=NULL,*text_old=NULL;
-static mame_bitmap *wbm1,*wbm2;
+static bitmap_t *wbm1,*wbm2;
 
 #define TRAM(x,y) (pc88sr_is_highspeed ? \
 	pc88sr_textRAM[(dmac_addr[2]+(x)+(y)*120)&0xfff] : \

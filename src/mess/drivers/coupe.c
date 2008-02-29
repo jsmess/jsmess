@@ -42,7 +42,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( coupe_line_interrupt )
 {
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 	int interrupted=0;	/* This is used to allow me to clear the STAT flag (easiest way I can do it!) */
 
 	HPEN = CURLINE;

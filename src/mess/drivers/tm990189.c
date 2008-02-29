@@ -263,7 +263,7 @@ INLINE void draw_digit(void)
 	segment_state[digitsel] |= ~segment;
 }
 
-static void update_common(mame_bitmap *bitmap,
+static void update_common(bitmap_t *bitmap,
 							int display_x, int display_y,
 							int LED14_x, int LED14_y,
 							int LED56_x, int LED56_y,

@@ -66,7 +66,7 @@ VIDEO_START( pcw16 )
 }
 
 /* 640, 1 bit per pixel */
-static void pcw16_vh_decode_mode0(mame_bitmap *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode0(bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int local_byte;
@@ -89,7 +89,7 @@ static void pcw16_vh_decode_mode0(mame_bitmap *bitmap, int x, int y, unsigned ch
 }
 
 /* 320, 2 bits per pixel */
-static void pcw16_vh_decode_mode1(mame_bitmap *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode1(bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int px;
@@ -120,7 +120,7 @@ static void pcw16_vh_decode_mode1(mame_bitmap *bitmap, int x, int y, unsigned ch
 }
 
 /* 160, 4 bits per pixel */
-static void pcw16_vh_decode_mode2(mame_bitmap *bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode2(bitmap_t *bitmap, int x, int y, unsigned char byte)
 {
 	int px;
 	int b;
@@ -152,7 +152,7 @@ static void pcw16_vh_decode_mode2(mame_bitmap *bitmap, int x, int y, unsigned ch
 }
 
 /***************************************************************************
-  Draw the game screen in the given mame_bitmap.
+  Draw the game screen in the given bitmap_t.
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/

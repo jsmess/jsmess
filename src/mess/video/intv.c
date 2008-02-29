@@ -204,7 +204,7 @@ static void render_sprites(void)
     }
 }
 
-static void render_line(running_machine *machine, mame_bitmap *bitmap,
+static void render_line(running_machine *machine, bitmap_t *bitmap,
 	UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor)
 {
     UINT32 color = (nextByte & 0x80 ? machine->pens[fgcolor]
@@ -264,7 +264,7 @@ static void render_line(running_machine *machine, mame_bitmap *bitmap,
     intv_plot_pixel(bitmap, x+15, y+1, color);
 }
 
-static void render_colored_squares(running_machine *machine, mame_bitmap *bitmap,
+static void render_colored_squares(running_machine *machine, bitmap_t *bitmap,
 	UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3)
 {
     plot_box(bitmap, x, y, 8, 8, machine->pens[color0]);
@@ -273,7 +273,7 @@ static void render_colored_squares(running_machine *machine, mame_bitmap *bitmap
     plot_box(bitmap, x+8, y+8, 8, 8, machine->pens[color3]);
 }
 
-static void render_color_stack_mode(running_machine *machine, mame_bitmap *bitmap)
+static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
 {
     UINT8 h, csPtr = 0, nexty = 0;
     UINT16 nextCard, nextx = 0;
@@ -332,7 +332,7 @@ static void render_color_stack_mode(running_machine *machine, mame_bitmap *bitma
     }
 }
 
-static void render_fg_bg_mode(running_machine *machine, mame_bitmap *bitmap)
+static void render_fg_bg_mode(running_machine *machine, bitmap_t *bitmap)
 {
     UINT8 i, j, isGrom, fgcolor, bgcolor, nexty = 0;
     UINT16 nextCard, memoryLocation, nextx = 0;
@@ -368,7 +368,7 @@ static void render_fg_bg_mode(running_machine *machine, mame_bitmap *bitmap)
     }
 }
 
-static void copy_sprites_to_background(running_machine *machine, mame_bitmap *bitmap)
+static void copy_sprites_to_background(running_machine *machine, bitmap_t *bitmap)
 {
     UINT8 width, currentPixel;
     UINT8 borderCollision, foregroundCollision;
@@ -437,7 +437,7 @@ static void copy_sprites_to_background(running_machine *machine, mame_bitmap *bi
     }
 }
 
-static void render_background(running_machine *machine, mame_bitmap *bitmap)
+static void render_background(running_machine *machine, bitmap_t *bitmap)
 {
 	if (intv_color_stack_mode)
         render_color_stack_mode(machine, bitmap);
@@ -446,7 +446,7 @@ static void render_background(running_machine *machine, mame_bitmap *bitmap)
 }
 
 /*
-static void draw_background(mame_bitmap *bitmap, int transparency)
+static void draw_background(bitmap_t *bitmap, int transparency)
 {
 	// First, draw the background
 	int offs = 0;
@@ -598,7 +598,7 @@ static void draw_background(mame_bitmap *bitmap, int transparency)
 
 /* TBD: need to handle sprites behind foreground? */
 /*
-static void draw_sprites(mame_bitmap *bitmap, int behind_foreground)
+static void draw_sprites(bitmap_t *bitmap, int behind_foreground)
 {
 	int i;
 	int code;
@@ -699,7 +699,7 @@ static void draw_sprites(mame_bitmap *bitmap, int behind_foreground)
 }
 */
 
-static void draw_borders(running_machine *machine, mame_bitmap *bm)
+static void draw_borders(running_machine *machine, bitmap_t *bm)
 {
 	if (intv_left_edge_inhibit)
 	{

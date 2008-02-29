@@ -15,7 +15,7 @@
 UINT16 primo_video_memory_base;
 
 
-static void primo_draw_scanline(mame_bitmap *bitmap, int primo_scanline)
+static void primo_draw_scanline(bitmap_t *bitmap, int primo_scanline)
 {
 	int x, i;
 	UINT8 data;

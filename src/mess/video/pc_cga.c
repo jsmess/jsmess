@@ -497,7 +497,7 @@ WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w, offse
   The character cell size is 16x8
 ***************************************************************************/
 
-static void cga_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_text_inten(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
 	int	offs = mscrtc6845_get_start(crtc) * 2;
@@ -551,7 +551,7 @@ static void cga_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   The character cell size is 16x8
 ***************************************************************************/
 
-static void cga_text_inten_alt(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_text_inten_alt(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
 	int	offs = mscrtc6845_get_start(crtc) * 2;
@@ -600,7 +600,7 @@ static void cga_text_inten_alt(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   Draw text mode with 40x25 characters (default) and blinking colors.
   The character cell size is 16x8
 ***************************************************************************/
-static void cga_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_text_blink(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -665,7 +665,7 @@ static void cga_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   The character cell size is 16x8
 ***************************************************************************/
 
-static void cga_text_blink_alt(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_text_blink_alt(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -727,7 +727,7 @@ static void cga_text_blink_alt(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   cga fetches 2 byte per mscrtc6845 access (not modeled here)!
 ***************************************************************************/
 
-static void cga_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_gfx_2bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	const UINT16 *palette;
 	int colorset = cga.color_select & 0x3F;
@@ -769,7 +769,7 @@ static void cga_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 ***************************************************************************/
 
-static void cga_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_gfx_1bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	const UINT16 *palette;
 
@@ -785,7 +785,7 @@ static void cga_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 
 
-INLINE void cga_plot_unit_4bpp(mame_bitmap *bitmap,
+INLINE void cga_plot_unit_4bpp(bitmap_t *bitmap,
 				 int x, int y, int offs, int scale)
 {
 	int color;
@@ -798,7 +798,7 @@ INLINE void cga_plot_unit_4bpp(mame_bitmap *bitmap,
 }
 
 
-static void cga_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc, int scale)
+static void cga_gfx_4bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc, int scale)
 {
 	int i, sx, sy, sh;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -837,7 +837,7 @@ static void cga_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc, int scale
  * The different scaling factors mean that the '160x200' versions of screens
  * are the same size as the normal colour ones.
  */
-static void cga_gfx_4bpph(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_gfx_4bpph(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	pc_cga_check_palette();
 	cga_gfx_4bpp(bitmap, crtc, 8);
@@ -845,7 +845,7 @@ static void cga_gfx_4bpph(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 
 /* The lo-res graphics mode on a colour composite monitor */
-static void cga_gfx_4bppl(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_gfx_4bppl(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	pc_cga_check_palette();
 	cga_gfx_4bpp(bitmap, crtc, 4);
@@ -854,7 +854,7 @@ static void cga_gfx_4bppl(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 
 
-INLINE void pgfx_plot_unit_4bpp(mame_bitmap *bitmap,
+INLINE void pgfx_plot_unit_4bpp(bitmap_t *bitmap,
 							 int x, int y, int offs)
 {
 	int color, values[2];
@@ -889,7 +889,7 @@ INLINE void pgfx_plot_unit_4bpp(mame_bitmap *bitmap,
   Second plane at CGA_base + 0x4000 / 0x6000
 ***************************************************************************/
 
-static void cga_pgfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_pgfx_4bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int i, sx, sy, sh;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -922,7 +922,7 @@ static void cga_pgfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 
 
 
-INLINE void pgfx_plot_unit_2bpp(mame_bitmap *bitmap,
+INLINE void pgfx_plot_unit_2bpp(bitmap_t *bitmap,
 					 int x, int y, const UINT16 *palette, int offs)
 {
 	int i;
@@ -969,7 +969,7 @@ INLINE void pgfx_plot_unit_2bpp(mame_bitmap *bitmap,
   cga fetches 2 byte per mscrtc6845 access (not modeled here)!
 ***************************************************************************/
 
-static void cga_pgfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void cga_pgfx_2bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int i, sx, sy, sh;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -1033,7 +1033,7 @@ static void cga_pgfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 // mapping of the 4 planes into videoram
 // (text data should be readable at videoram+0)
 static const int videoram_offset[4]= { 0xc000, 0x8000, 0x4000, 0 };
-INLINE void pc1512_plot_unit(mame_bitmap *bitmap,
+INLINE void pc1512_plot_unit(bitmap_t *bitmap,
 							 int x, int y, int offs)
 {
 	int color, values[4];
@@ -1065,7 +1065,7 @@ INLINE void pc1512_plot_unit(mame_bitmap *bitmap,
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 ***************************************************************************/
 
-static void pc1512_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void pc1512_gfx_4bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int i, sx, sy, sh;
 	int	offs = mscrtc6845_get_start(crtc)*2;

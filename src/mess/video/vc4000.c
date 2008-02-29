@@ -66,7 +66,7 @@ static struct
 		} d;
 	} reg;
 
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 } vc4000_video =
 {
 	{
@@ -255,7 +255,7 @@ static const char led[20][12+1] =
 	"iiiihhhhgggg"
 };
 
-static void vc4000_draw_digit(mame_bitmap *bitmap, int x, int y, int d, int line)
+static void vc4000_draw_digit(bitmap_t *bitmap, int x, int y, int d, int line)
 {
 	static const int digit_to_segment[0x10]={
 	0x0fff, 0x007c, 0x17df, 0x15ff, 0x1c7d, 0x1df7, 0x1ff7, 0x007f, 0x1fff, 0x1dff
@@ -282,7 +282,7 @@ INLINE void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int
 }
 
 
-static void vc4000_sprite_update(mame_bitmap *bitmap, UINT8 *collision, SPRITE *This)
+static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *This)
 {
 
 	int i,j,m;

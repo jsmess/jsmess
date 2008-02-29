@@ -516,7 +516,7 @@ static struct {
 	    UINT8 ram3[3][16];
 	} d;
     } reg;
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 } arcadia_video={ 0 };
 
 VIDEO_START( arcadia )
@@ -641,7 +641,7 @@ WRITE8_HANDLER(arcadia_video_w)
     }
 }
 
-INLINE void arcadia_draw_char(mame_bitmap *bitmap, UINT8 *ch, int color,
+INLINE void arcadia_draw_char(bitmap_t *bitmap, UINT8 *ch, int color,
 			      int y, int x)
 {
 	/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
@@ -693,7 +693,7 @@ INLINE void arcadia_draw_char(mame_bitmap *bitmap, UINT8 *ch, int color,
     }
 }
 
-INLINE void arcadia_vh_draw_line(mame_bitmap *bitmap,
+INLINE void arcadia_vh_draw_line(bitmap_t *bitmap,
 				 int y, UINT8 chars1[16])
 {
     int x, ch, j, h;
@@ -741,7 +741,7 @@ static int arcadia_sprite_collision(int n1, int n2)
     return FALSE;
 }
 
-static void arcadia_draw_sprites(mame_bitmap *bitmap)
+static void arcadia_draw_sprites(bitmap_t *bitmap)
 {
     int i, k, x, y;
     UINT8 b;

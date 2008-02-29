@@ -1216,7 +1216,7 @@ static void text_mode(int scanline, UINT32 *RESTRICT line, const m6847_pixel *RE
 
 
 
-static void render_scanline(mame_bitmap *bitmap, int scanline)
+static void render_scanline(bitmap_t *bitmap, int scanline)
 {
 	UINT32 border_color;
 	UINT32 *line;

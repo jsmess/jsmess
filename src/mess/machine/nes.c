@@ -204,7 +204,7 @@ static int zapper_hit_pixel(const nes_input *input)
 	UINT16 pix = 0;
 	rgb_t col;
 	UINT8 r, g, b;
-	extern mame_bitmap *nes_zapper_hack;
+	extern bitmap_t *nes_zapper_hack;
 
 	if (nes_zapper_hack)
 		pix = *BITMAP_ADDR16(nes_zapper_hack, input->i2, input->i1);

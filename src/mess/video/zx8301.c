@@ -47,7 +47,7 @@ WRITE8_HANDLER( zx8301_control_w )
 	zx8301.base = BIT(data, 7);
 }
 
-static void zx8301_draw_screen(mame_bitmap *bitmap)
+static void zx8301_draw_screen(bitmap_t *bitmap)
 {
 	UINT32 addr = zx8301.base << 15;
 	int y, word, pixel;

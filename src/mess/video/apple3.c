@@ -86,7 +86,7 @@ VIDEO_START( apple3 )
 
 
 
-static void apple3_video_text40(mame_bitmap *bitmap)
+static void apple3_video_text40(bitmap_t *bitmap)
 {
 	int x, y, col, row;
 	offs_t offset;
@@ -141,7 +141,7 @@ static void apple3_video_text40(mame_bitmap *bitmap)
 
 
 
-static void apple3_video_text80(mame_bitmap *bitmap)
+static void apple3_video_text80(bitmap_t *bitmap)
 {
 	int x, y, col, row;
 	offs_t offset;
@@ -193,7 +193,7 @@ static void apple3_video_text80(mame_bitmap *bitmap)
 
 
 
-static void apple3_video_graphics_hgr(mame_bitmap *bitmap)
+static void apple3_video_graphics_hgr(bitmap_t *bitmap)
 {
 	/* hi-res mode: 280x192x2 */
 	int y, i, x;
@@ -235,7 +235,7 @@ static UINT8 swap_bits(UINT8 b)
 
 
 
-static void apple3_video_graphics_chgr(mame_bitmap *bitmap)
+static void apple3_video_graphics_chgr(bitmap_t *bitmap)
 {
 	/* color hi-res mode: 280x192x16 */
 	int y, i, x;
@@ -280,7 +280,7 @@ static void apple3_video_graphics_chgr(mame_bitmap *bitmap)
 
 
 
-static void apple3_video_graphics_shgr(mame_bitmap *bitmap)
+static void apple3_video_graphics_shgr(bitmap_t *bitmap)
 {
 	/* super hi-res mode: 560x192x2 */
 	int y, i, x;
@@ -321,7 +321,7 @@ static void apple3_video_graphics_shgr(mame_bitmap *bitmap)
 
 
 
-static void apple3_video_graphics_chires(mame_bitmap *bitmap)
+static void apple3_video_graphics_chires(bitmap_t *bitmap)
 {
 	UINT16 *pen;
 	PAIR pix;

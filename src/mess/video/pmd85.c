@@ -29,7 +29,7 @@ VIDEO_START( pmd85 )
 {
 }
 
-static void pmd85_draw_scanline(mame_bitmap *bitmap, int pmd85_scanline)
+static void pmd85_draw_scanline(bitmap_t *bitmap, int pmd85_scanline)
 {
 	int x, i;
 	int pen0, pen1;

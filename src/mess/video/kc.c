@@ -114,7 +114,7 @@ void	kc85_video_set_blink_state(int data)
 
 
 /* draw 8 pixels */
-static void kc85_draw_8_pixels(mame_bitmap *bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
+static void kc85_draw_8_pixels(bitmap_t *bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
 {
 	int a;
 	int background_pen;
@@ -270,7 +270,7 @@ struct grab_info
 struct video_update_state
 {
 	/* bitmap to render to */
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 	/* grab colour and pixel information for 8-pixels referenced by x,y coordinate */
 	void (*pixel_grab_callback)(struct grab_info *,int x,int y, unsigned char *colour_ptr, unsigned char *pixel_ptr);
 	/* current coords */
@@ -490,7 +490,7 @@ static void kc85_common_vh_process_lines(struct video_update_state *video_update
 
 /* the kc85 screen is 320 pixels wide and 256 pixels tall */
 /* if we assume a 50hz display, there are 312 lines for the complete frame, leaving 56 lines not visible */
-static void kc85_common_process_frame(mame_bitmap *bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
+static void kc85_common_process_frame(bitmap_t *bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
 {
 	int cycles_remaining_in_frame = KC85_CYCLES_PER_FRAME;
 
@@ -647,7 +647,7 @@ static void kc85_4_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
 
 
 /***************************************************************************
-  Draw the game screen in the given mame_bitmap.
+  Draw the game screen in the given bitmap_t.
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
@@ -726,7 +726,7 @@ static void kc85_3_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
 }
 
 /***************************************************************************
-  Draw the game screen in the given mame_bitmap.
+  Draw the game screen in the given bitmap_t.
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/

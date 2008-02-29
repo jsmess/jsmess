@@ -145,7 +145,7 @@ WRITE32_HANDLER( pc_video_videoram32_w )
  *
  *************************************/
 
-void pc_render_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc,
+void pc_render_gfx_1bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc,
 	const UINT8 *vram, const UINT16 *palette, int interlace)
 {
 	int sx, sy, sh;
@@ -185,7 +185,7 @@ void pc_render_gfx_1bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc,
 
 
 
-void pc_render_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc,
+void pc_render_gfx_2bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc,
 	const UINT8 *vram, const UINT16 *palette, int interlace)
 {
 	int sx, sy, sh;
@@ -226,7 +226,7 @@ void pc_render_gfx_2bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc,
 
 
 
-void pc_render_gfx_4bpp(mame_bitmap *bitmap, struct mscrtc6845 *crtc,
+void pc_render_gfx_4bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc,
 	const UINT8 *vram, const UINT16 *palette, int interlace)
 {
 	int sx, sy, sh;

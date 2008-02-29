@@ -14,7 +14,7 @@ int cgenie_font_offset[4] = {0, 0, 0, 0};
 
 static CRTC6845 crt;
 static int graphics = 0;
-static mame_bitmap *dlybitmap = NULL;
+static bitmap_t *dlybitmap = NULL;
 static int off_x = 0;
 static int off_y = 0;
 
@@ -237,7 +237,7 @@ void cgenie_mode_select(int mode)
 }
 
 
-static void cgenie_refresh_monitor(running_machine *machine, mame_bitmap * bitmap, const rectangle *cliprect)
+static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, const rectangle *cliprect)
 {
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
@@ -315,7 +315,7 @@ static void cgenie_refresh_monitor(running_machine *machine, mame_bitmap * bitma
 	}
 }
 
-static void cgenie_refresh_tv_set(running_machine *machine, mame_bitmap * bitmap, const rectangle *cliprect)
+static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, const rectangle *cliprect)
 {
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
@@ -405,7 +405,7 @@ static void cgenie_refresh_tv_set(running_machine *machine, mame_bitmap * bitmap
 }
 
 /***************************************************************************
-  Draw the game screen in the given mame_bitmap.
+  Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 VIDEO_UPDATE( cgenie )
 {

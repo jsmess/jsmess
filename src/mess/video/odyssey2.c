@@ -339,7 +339,7 @@ INLINE void odyssey2_draw_box(UINT8 bg[][320], int x, int y, int width, int heig
     }
 }
 
-INLINE void odyssey2_draw(mame_bitmap *bitmap, UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id, UINT32 col)
+INLINE void odyssey2_draw(bitmap_t *bitmap, UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id, UINT32 col)
 {
     int m,x1,y1;
     for (m=0x80; m>0; m>>=1, x+=scale_x)
@@ -359,7 +359,7 @@ INLINE void odyssey2_draw(mame_bitmap *bitmap, UINT8 bg[][320], UINT8 code, int 
 }
 
 // different bit ordering, maybe I should change rom
-INLINE void odyssey2_draw_sprite(mame_bitmap *bitmap, UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id, UINT32 col)
+INLINE void odyssey2_draw_sprite(bitmap_t *bitmap, UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id, UINT32 col)
 {
     int m,x1,y1;
 
@@ -379,7 +379,7 @@ INLINE void odyssey2_draw_sprite(mame_bitmap *bitmap, UINT8 bg[][320], UINT8 cod
     }
 }
 
-INLINE void odyssey2_draw_grid( mame_bitmap* bitmap, UINT8 bg[][320] )
+INLINE void odyssey2_draw_grid( bitmap_t* bitmap, UINT8 bg[][320] )
 {
     int width  = 16;
     int height = 24;
@@ -421,7 +421,7 @@ INLINE void odyssey2_draw_grid( mame_bitmap* bitmap, UINT8 bg[][320] )
     }
 }
 
-INLINE void odyssey2_draw_char(mame_bitmap *bitmap, UINT8 bg[][320], int x, int y, int ptr, int color)
+INLINE void odyssey2_draw_char(bitmap_t *bitmap, UINT8 bg[][320], int x, int y, int ptr, int color)
 {
     int n, i;
     int offset = ptr | ((color & 1) << 8);

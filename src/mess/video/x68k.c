@@ -41,14 +41,14 @@ UINT16* tvram;  // Text VRAM
 UINT16* x68k_spriteram;  // sprite/background RAM
 UINT16* x68k_spritereg;  // sprite/background registers
 
-static mame_bitmap* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
-static mame_bitmap* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
-static mame_bitmap* x68k_gfx_1_bitmap_16;
-static mame_bitmap* x68k_gfx_2_bitmap_16;
-static mame_bitmap* x68k_gfx_3_bitmap_16;
-static mame_bitmap* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
-static mame_bitmap* x68k_gfx_1_bitmap_256;
-static mame_bitmap* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
+static bitmap_t* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
+static bitmap_t* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
+static bitmap_t* x68k_gfx_1_bitmap_16;
+static bitmap_t* x68k_gfx_2_bitmap_16;
+static bitmap_t* x68k_gfx_3_bitmap_16;
+static bitmap_t* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
+static bitmap_t* x68k_gfx_1_bitmap_256;
+static bitmap_t* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
 
 static tilemap* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
 static tilemap* x68k_bg1_8;
@@ -67,7 +67,7 @@ INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-static mame_bitmap* x68k_get_gfx_pri(int pri,int type)
+static bitmap_t* x68k_get_gfx_pri(int pri,int type)
 {
 	if(type == GFX16)
 	{
@@ -700,7 +700,7 @@ READ16_HANDLER( x68k_spriteram_r )
 	return x68k_spriteram[offset];
 }
 
-static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
+static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 {
 	int priority;
 	rectangle rect;
@@ -801,7 +801,7 @@ static void x68k_draw_gfx(mame_bitmap* bitmap,rectangle cliprect)
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-static void x68k_draw_sprites(mame_bitmap* bitmap, int priority, rectangle cliprect)
+static void x68k_draw_sprites(bitmap_t* bitmap, int priority, rectangle cliprect)
 {
 	/*
 	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)

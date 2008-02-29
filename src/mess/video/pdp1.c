@@ -25,8 +25,8 @@
 #include "video/crt.h"
 
 
-static mame_bitmap *panel_bitmap;
-static mame_bitmap *typewriter_bitmap;
+static bitmap_t *panel_bitmap;
+static bitmap_t *typewriter_bitmap;
 
 static const rectangle typewriter_bitmap_bounds =
 {
@@ -40,12 +40,12 @@ static const rectangle panel_bitmap_bounds =
 	0,	panel_window_height-1,	/* min_y, max_y */
 };
 
-static void pdp1_draw_panel_backdrop(mame_bitmap *bitmap);
-static void pdp1_draw_panel(mame_bitmap *bitmap);
+static void pdp1_draw_panel_backdrop(bitmap_t *bitmap);
+static void pdp1_draw_panel(bitmap_t *bitmap);
 
 static lightpen_t lightpen_state, previous_lightpen_state;
-static void pdp1_erase_lightpen(mame_bitmap *bitmap);
-static void pdp1_draw_lightpen(mame_bitmap *bitmap);
+static void pdp1_erase_lightpen(bitmap_t *bitmap);
+static void pdp1_draw_lightpen(bitmap_t *bitmap);
 
 INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
@@ -150,7 +150,7 @@ enum
 };
 
 /* draw a small 8*8 LED (or is this a lamp? ) */
-static void pdp1_draw_led(mame_bitmap *bitmap, int x, int y, int state)
+static void pdp1_draw_led(bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
@@ -160,7 +160,7 @@ static void pdp1_draw_led(mame_bitmap *bitmap, int x, int y, int state)
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
-static void pdp1_draw_multipleled(mame_bitmap *bitmap, int x, int y, int value, int nb_bits)
+static void pdp1_draw_multipleled(bitmap_t *bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -174,7 +174,7 @@ static void pdp1_draw_multipleled(mame_bitmap *bitmap, int x, int y, int value, 
 
 
 /* draw a small 8*8 switch */
-static void pdp1_draw_switch(mame_bitmap *bitmap, int x, int y, int state)
+static void pdp1_draw_switch(bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 	int i;
@@ -215,7 +215,7 @@ static void pdp1_draw_switch(mame_bitmap *bitmap, int x, int y, int state)
 
 
 /* draw nb_bits switches which represent nb_bits bits in value */
-static void pdp1_draw_multipleswitch(mame_bitmap *bitmap, int x, int y, int value, int nb_bits)
+static void pdp1_draw_multipleswitch(bitmap_t *bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -229,14 +229,14 @@ static void pdp1_draw_multipleswitch(mame_bitmap *bitmap, int x, int y, int valu
 
 
 /* write a single char on screen */
-static void pdp1_draw_char(mame_bitmap *bitmap, char character, int x, int y, int color)
+static void pdp1_draw_char(bitmap_t *bitmap, char character, int x, int y, int color)
 {
 	drawgfx(bitmap, Machine->gfx[0], character-32, color, 0, 0,
 				x+1, y, &Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 }
 
 /* write a string on screen */
-static void pdp1_draw_string(mame_bitmap *bitmap, const char *buf, int x, int y, int color)
+static void pdp1_draw_string(bitmap_t *bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
@@ -251,7 +251,7 @@ static void pdp1_draw_string(mame_bitmap *bitmap, const char *buf, int x, int y,
 /*
 	draw the operator control panel (fixed backdrop)
 */
-static void pdp1_draw_panel_backdrop(mame_bitmap *bitmap)
+static void pdp1_draw_panel_backdrop(bitmap_t *bitmap)
 {
 	/* fill with black */
 	fillbitmap(panel_bitmap, Machine->pens[pen_panel_bg], &panel_bitmap_bounds);
@@ -302,7 +302,7 @@ static void pdp1_draw_panel_backdrop(mame_bitmap *bitmap)
 /*
 	draw the operator control panel (dynamic elements)
 */
-static void pdp1_draw_panel(mame_bitmap *bitmap)
+static void pdp1_draw_panel(bitmap_t *bitmap)
 {
 	/* column 1: registers, test word, test address */
 	pdp1_draw_multipleled(bitmap, x_panel_col1_offset+2*8, y_panel_pc_offset+8, cpunum_get_reg(0, PDP1_PC), 16);
@@ -504,7 +504,7 @@ void pdp1_update_lightpen_state(const lightpen_t *new_state)
 }
 
 #if 1
-static void pdp1_draw_circle(mame_bitmap *bitmap, int x, int y, int radius, int color_)
+static void pdp1_draw_circle(bitmap_t *bitmap, int x, int y, int radius, int color_)
 {
 	int interval;
 	int a;
@@ -539,7 +539,7 @@ static void pdp1_draw_circle(mame_bitmap *bitmap, int x, int y, int radius, int 
 	}
 }
 #else
-static void pdp1_draw_circle(mame_bitmap *bitmap, int x, int y, int radius, int color)
+static void pdp1_draw_circle(bitmap_t *bitmap, int x, int y, int radius, int color)
 {
 	float fx, fy;
 	float interval;
@@ -571,7 +571,7 @@ static void pdp1_draw_circle(mame_bitmap *bitmap, int x, int y, int radius, int 
 }
 #endif
 
-static void pdp1_erase_lightpen(mame_bitmap *bitmap)
+static void pdp1_erase_lightpen(bitmap_t *bitmap)
 {
 	if (previous_lightpen_state.active)
 	{
@@ -587,7 +587,7 @@ static void pdp1_erase_lightpen(mame_bitmap *bitmap)
 	}
 }
 
-static void pdp1_draw_lightpen(mame_bitmap *bitmap)
+static void pdp1_draw_lightpen(bitmap_t *bitmap)
 {
 	if (lightpen_state.active)
 	{

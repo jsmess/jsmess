@@ -306,7 +306,7 @@ static void graphics_none(UINT32 *line, int width)
 
 
 
-static void coco3_render_scanline(mame_bitmap *bitmap, int scanline)
+static void coco3_render_scanline(bitmap_t *bitmap, int scanline)
 {
 	const coco3_scanline_record *scanline_record;
 	UINT32 *line;

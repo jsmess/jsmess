@@ -51,10 +51,10 @@ MACHINE_START( coupe );
 
 /*----------- defined in video/coupe.c -----------*/
 
-void drawMode1_line(mame_bitmap *,int);
-void drawMode2_line(mame_bitmap *,int);
-void drawMode3_line(mame_bitmap *,int);
-void drawMode4_line(mame_bitmap *,int);
+void drawMode1_line(bitmap_t *,int);
+void drawMode2_line(bitmap_t *,int);
+void drawMode3_line(bitmap_t *,int);
+void drawMode4_line(bitmap_t *,int);
 
 
 #endif /* COUPE_H_ */

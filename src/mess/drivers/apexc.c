@@ -445,7 +445,7 @@ static const unsigned short apexc_colortable[] =
 #define APEXC_PALETTE_SIZE ARRAY_LENGTH(apexc_palette)
 #define APEXC_COLORTABLE_SIZE sizeof(apexc_colortable)/2
 
-static mame_bitmap *apexc_bitmap;
+static bitmap_t *apexc_bitmap;
 
 enum
 {
@@ -494,7 +494,7 @@ static VIDEO_START( apexc )
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
-static void apexc_draw_led(mame_bitmap *bitmap, int x, int y, int state)
+static void apexc_draw_led(bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
@@ -504,14 +504,14 @@ static void apexc_draw_led(mame_bitmap *bitmap, int x, int y, int state)
 }
 
 /* write a single char on screen */
-static void apexc_draw_char(mame_bitmap *bitmap, char character, int x, int y, int color)
+static void apexc_draw_char(bitmap_t *bitmap, char character, int x, int y, int color)
 {
 	drawgfx(bitmap, Machine->gfx[0], character-32, color, 0, 0,
 				x+1, y, &Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 }
 
 /* write a string on screen */
-static void apexc_draw_string(mame_bitmap *bitmap, const char *buf, int x, int y, int color)
+static void apexc_draw_string(bitmap_t *bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{

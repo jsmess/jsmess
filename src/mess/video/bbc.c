@@ -50,7 +50,7 @@ static UINT16 *BBC_display_left;
 static UINT16 *BBC_display_right;
 
 // this is a more global variable to store the bitmap variable passed in in the bbc_vh_screenrefresh function
-static mame_bitmap *BBC_bitmap;
+static bitmap_t *BBC_bitmap;
 
 // this is the X and Y screen location in emulation pixels of the next pixels to be drawn
 static int y_screen_pos;

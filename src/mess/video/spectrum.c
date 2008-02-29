@@ -342,7 +342,7 @@ VIDEO_UPDATE( spectrum_128 )
  *******************************************************************/
 
 /* Draw a scanline in TS2068/TC2048 hires mode (code modified from COUPE.C) */
-static void ts2068_hires_scanline(mame_bitmap *bitmap, int y, int borderlines)
+static void ts2068_hires_scanline(bitmap_t *bitmap, int y, int borderlines)
 {
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
@@ -387,7 +387,7 @@ static void ts2068_hires_scanline(mame_bitmap *bitmap, int y, int borderlines)
 }
 
 /* Draw a scanline in TS2068/TC2048 64-column mode */
-static void ts2068_64col_scanline(mame_bitmap *bitmap, int y, int borderlines, unsigned short inkcolor)
+static void ts2068_64col_scanline(bitmap_t *bitmap, int y, int borderlines, unsigned short inkcolor)
 {
 	int x,b,scrx,scry;
         unsigned char *scr1, *scr2;
@@ -421,7 +421,7 @@ static void ts2068_64col_scanline(mame_bitmap *bitmap, int y, int borderlines, u
 }
 
 /* Draw a scanline in TS2068/TC2048 lores (normal Spectrum) mode */
-static void ts2068_lores_scanline(mame_bitmap *bitmap, int y, int borderlines, int screen)
+static void ts2068_lores_scanline(bitmap_t *bitmap, int y, int borderlines, int screen)
 {
 	int x,b,scrx,scry;
 	unsigned short ink,pap;

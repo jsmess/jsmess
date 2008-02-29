@@ -1199,7 +1199,7 @@ static VIDEO_RESET( vga )
 	pc_vga_reset();
 }
 
-static void vga_vh_text(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void vga_vh_text(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	UINT8 ch, attr;
 	UINT8 bits;
@@ -1266,7 +1266,7 @@ static void vga_vh_text(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 	}
 }
 
-static void vga_vh_ega(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void vga_vh_ega(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int pos, line, column, c, addr, i;
 	int height = CRTC6845_CHAR_HEIGHT;
@@ -1311,7 +1311,7 @@ static void vga_vh_ega(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
 	}
 }
 
-static void vga_vh_vga(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void vga_vh_vga(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int pos, line, column, c, addr, curr_addr;
 	UINT16 *bitmapline;

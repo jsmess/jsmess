@@ -5,7 +5,7 @@
 #include "video/cdp1864.h"
 
 
-static mame_bitmap *cdptmpbitmap;
+static bitmap_t *cdptmpbitmap;
 
 static emu_timer *cdp1864_int_timer;
 static emu_timer *cdp1864_efx_timer;

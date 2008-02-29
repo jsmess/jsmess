@@ -276,7 +276,7 @@ WRITE8_HANDLER ( pc_MDA_w )
   The character cell size is 9x15. Column 9 is column 8 repeated for
   character codes 176 to 223.
 ***************************************************************************/
-static void mda_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void mda_text_inten(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -327,7 +327,7 @@ static void mda_text_inten(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   The character cell size is 9x15. Column 9 is column 8 repeated for
   character codes 176 to 223.
 ***************************************************************************/
-static void mda_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void mda_text_blink(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	int sx, sy;
 	int	offs = mscrtc6845_get_start(crtc)*2;
@@ -384,7 +384,7 @@ static void mda_text_blink(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
   bit 7 being the leftmost.
 ***************************************************************************/
 
-static void hercules_gfx(mame_bitmap *bitmap, struct mscrtc6845 *crtc)
+static void hercules_gfx(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
 	const UINT8 *vram = videoram;
 	static const UINT16 palette[2] = {0, 10};

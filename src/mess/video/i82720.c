@@ -115,7 +115,7 @@ typedef struct
 	UINT16	vramsize;		/* Size in words   */
 	UINT8	mode;			/* Resolution mode */
 	UINT8   dirty;
-	mame_bitmap *tmpbmp;
+	bitmap_t *tmpbmp;
 } TYP_GDC_MESS;
 
 static TYP_GDC_MESS gdc_mess;

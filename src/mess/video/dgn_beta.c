@@ -141,7 +141,7 @@ static void ShowVidLimits(int ref, int params, const char *param[]);
 static void SetClkMax(int ref, int params, const char *param[]);
 #endif /* ENABLE_DEBUGGER */
 
-static mame_bitmap	*bit;
+static bitmap_t	*bit;
 static int MinAddr	= 0xFFFF;
 static int MaxAddr	= 0x0000;
 static int MinX	= 0xFFFF;
@@ -358,7 +358,7 @@ void init_video(running_machine *machine)
 /**************************/
 
 /* Plot a pixel on beta text screen, takes care of doubling height and width where needed */
-static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, mame_bitmap *bitmap)
+static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, bitmap_t *bitmap)
 {
 	int PlotX;
 	int PlotY;
@@ -399,7 +399,7 @@ static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, m
 	}
 }
 
-static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
+static void beta_plot_char_line(int x,int y, bitmap_t *bitmap)
 {
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
 	unsigned char *data 	= memory_region(REGION_GFX1);		// ptr to char rom
@@ -495,7 +495,7 @@ static void beta_plot_char_line(int x,int y, mame_bitmap *bitmap)
 
 /* Plot a pixel on the graphics screen, similar to character plotter above */
 /* May merge at some point in the future, if they turn out to be sufficiently similar ! */
-static void plot_gfx_pixel(int x, int y, int Dot, int Colour, mame_bitmap *bitmap)
+static void plot_gfx_pixel(int x, int y, int Dot, int Colour, bitmap_t *bitmap)
 {
 	int	DoubleX		= (~GCtrl & GCtrlHiLo) ? 1 : 0;
 	int	DoubleY		= (~m6845_get_register(INTERLACE) & 0x03) ? 1 : 0;
@@ -546,7 +546,7 @@ static void plot_gfx_pixel(int x, int y, int Dot, int Colour, mame_bitmap *bitma
 
 /* Get and plot a graphics bixel block */
 
-static void beta_plot_gfx_line(int x,int y, mame_bitmap *bitmap)
+static void beta_plot_gfx_line(int x,int y, bitmap_t *bitmap)
 {
 	int crtcAddr;
 	int Addr;

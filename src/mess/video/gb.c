@@ -244,7 +244,7 @@ static void gb_select_sprites( void ) {
 
 INLINE void gb_update_sprites (void)
 {
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 	UINT8 height, tilemask, line, *oam, *vram;
 	int i, yindex;
 
@@ -330,7 +330,7 @@ INLINE void gb_update_sprites (void)
 }
 
 static void gb_update_scanline (void) {
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 
 	profiler_mark(PROFILER_VIDEO);
 
@@ -463,7 +463,7 @@ static void gb_update_scanline (void) {
 
 INLINE void sgb_update_sprites (void)
 {
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 	UINT8 height, tilemask, line, *oam, *vram, pal;
 	INT16 i, yindex;
 
@@ -561,7 +561,7 @@ static void sgb_refresh_border(void) {
 	UINT16 yidx, xidx, xindex;
 	UINT8 *map, *tiles, *tiles2;
 	UINT8 pal, i;
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 
 	map = sgb_tile_map - 64;
 
@@ -619,7 +619,7 @@ static void sgb_refresh_border(void) {
 }
 
 static void sgb_update_scanline (void) {
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 
 	profiler_mark(PROFILER_VIDEO);
 
@@ -791,7 +791,7 @@ static void sgb_update_scanline (void) {
 /* --- Gameboy Color Specific --- */
 
 INLINE void cgb_update_sprites (void) {
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 	UINT8 height, tilemask, line, *oam;
 	int i, xindex, yindex;
 
@@ -886,7 +886,7 @@ INLINE void cgb_update_sprites (void) {
 }
 
 static void cgb_update_scanline (void) {
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 
 	profiler_mark(PROFILER_VIDEO);
 

@@ -898,7 +898,7 @@ WRITE8_HANDLER( Nick_reg_w )
   }
 }
 
-void    Nick_DoScreen(mame_bitmap *bm)
+void    Nick_DoScreen(bitmap_t *bm)
 {
   int line = 0;
 

@@ -12,8 +12,8 @@
 #include "video/crt.h"
 
 
-static mame_bitmap *panel_bitmap;
-static mame_bitmap *typewriter_bitmap;
+static bitmap_t *panel_bitmap;
+static bitmap_t *typewriter_bitmap;
 
 INLINE void tx0_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
@@ -32,8 +32,8 @@ static const rectangle typewriter_bitmap_bounds =
 	0,	typewriter_window_height-1,	/* min_y, max_y */
 };
 
-static void tx0_draw_panel_backdrop(mame_bitmap *bitmap);
-static void tx0_draw_panel(mame_bitmap *bitmap);
+static void tx0_draw_panel_backdrop(bitmap_t *bitmap);
+static void tx0_draw_panel(bitmap_t *bitmap);
 
 
 
@@ -123,7 +123,7 @@ enum
 };
 
 /* draw a small 8*8 LED (or is this a lamp? ) */
-static void tx0_draw_led(mame_bitmap *bitmap, int x, int y, int state)
+static void tx0_draw_led(bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
@@ -133,7 +133,7 @@ static void tx0_draw_led(mame_bitmap *bitmap, int x, int y, int state)
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
-static void tx0_draw_multipleled(mame_bitmap *bitmap, int x, int y, int value, int nb_bits)
+static void tx0_draw_multipleled(bitmap_t *bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -147,7 +147,7 @@ static void tx0_draw_multipleled(mame_bitmap *bitmap, int x, int y, int value, i
 
 
 /* draw a small 8*8 switch */
-static void tx0_draw_switch(mame_bitmap *bitmap, int x, int y, int state)
+static void tx0_draw_switch(bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 	int i;
@@ -188,7 +188,7 @@ static void tx0_draw_switch(mame_bitmap *bitmap, int x, int y, int state)
 
 
 /* draw nb_bits switches which represent nb_bits bits in value */
-static void tx0_draw_multipleswitch(mame_bitmap *bitmap, int x, int y, int value, int nb_bits)
+static void tx0_draw_multipleswitch(bitmap_t *bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -202,14 +202,14 @@ static void tx0_draw_multipleswitch(mame_bitmap *bitmap, int x, int y, int value
 
 
 /* write a single char on screen */
-static void tx0_draw_char(mame_bitmap *bitmap, char character, int x, int y, int color)
+static void tx0_draw_char(bitmap_t *bitmap, char character, int x, int y, int color)
 {
 	drawgfx(bitmap, Machine->gfx[0], character-32, color, 0, 0,
 				x+1, y, &Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 }
 
 /* write a string on screen */
-static void tx0_draw_string(mame_bitmap *bitmap, const char *buf, int x, int y, int color)
+static void tx0_draw_string(bitmap_t *bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
@@ -222,7 +222,7 @@ static void tx0_draw_string(mame_bitmap *bitmap, const char *buf, int x, int y, 
 
 
 /* draw a vertical line */
-static void tx0_draw_vline(mame_bitmap *bitmap, int x, int y, int height, int color)
+static void tx0_draw_vline(bitmap_t *bitmap, int x, int y, int height, int color)
 {
 	while (height--)
 		tx0_plot_pixel(bitmap, x, y++, color);
@@ -230,7 +230,7 @@ static void tx0_draw_vline(mame_bitmap *bitmap, int x, int y, int height, int co
 
 #ifdef UNUSED_FUNCTION
 /* draw a horizontal line */
-static void tx0_draw_hline(mame_bitmap *bitmap, int x, int y, int width, int color)
+static void tx0_draw_hline(bitmap_t *bitmap, int x, int y, int width, int color)
 {
 	while (width--)
 		tx0_plot_pixel(bitmap, x++, y, color);
@@ -240,7 +240,7 @@ static void tx0_draw_hline(mame_bitmap *bitmap, int x, int y, int width, int col
 /*
 	draw the operator control panel (fixed backdrop)
 */
-static void tx0_draw_panel_backdrop(mame_bitmap *bitmap)
+static void tx0_draw_panel_backdrop(bitmap_t *bitmap)
 {
 	int i;
 	char buf[3];
@@ -287,7 +287,7 @@ static void tx0_draw_panel_backdrop(mame_bitmap *bitmap)
 /*
 	draw the operator control panel (dynamic elements)
 */
-static void tx0_draw_panel(mame_bitmap *bitmap)
+static void tx0_draw_panel(bitmap_t *bitmap)
 {
 	int cm_sel, lr_sel;
 	int i;

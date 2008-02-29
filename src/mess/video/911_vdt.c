@@ -467,7 +467,7 @@ WRITE8_HANDLER(vdt911_0_cru_w)
 /*
 	Video refresh
 */
-void vdt911_refresh(mame_bitmap *bitmap, int unit, int x, int y)
+void vdt911_refresh(bitmap_t *bitmap, int unit, int x, int y)
 {
 	const gfx_element *gfx = Machine->gfx[vdt[unit].model];
 	int height = (vdt[unit].screen_size == char_960) ? 12 : /*25*/24;

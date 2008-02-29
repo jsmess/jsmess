@@ -531,7 +531,7 @@ static void tms3556_draw_line_mixed(UINT16 *ln)
 
 	draw a line.  If non-interlaced mode, duplicate the line.
 */
-static void tms3556_draw_line(mame_bitmap *bmp, int line)
+static void tms3556_draw_line(bitmap_t *bmp, int line)
 {
 	int double_lines;
 	UINT16 *ln, *ln2 = NULL;

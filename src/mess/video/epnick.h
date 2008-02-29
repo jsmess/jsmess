@@ -127,7 +127,7 @@ typedef struct NICK_STATE
 extern PALETTE_INIT( nick );
 
 extern int Nick_vh_start(void);
-extern void Nick_DoScreen(mame_bitmap *bm);
+extern void Nick_DoScreen(bitmap_t *bm);
 
 extern int Nick_reg_r(int);
 WRITE8_HANDLER ( Nick_reg_w );

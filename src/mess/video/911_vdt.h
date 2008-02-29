@@ -65,7 +65,7 @@ void vdt911_cru_w(int offset, int data, int unit);
  READ8_HANDLER(vdt911_0_cru_r);
 WRITE8_HANDLER(vdt911_0_cru_w);
 
-void vdt911_refresh(mame_bitmap *bitmap, int unit, int x, int y);
+void vdt911_refresh(bitmap_t *bitmap, int unit, int x, int y);
 
 void vdt911_keyboard(int unit);
 

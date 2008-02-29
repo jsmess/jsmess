@@ -12,7 +12,7 @@
 #include "includes/apple2gs.h"
 
 
-static mame_bitmap *apple2gs_legacy_gfx;
+static bitmap_t *apple2gs_legacy_gfx;
 UINT16 apple2gs_bordercolor;
 
 VIDEO_START( apple2gs )

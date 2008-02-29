@@ -96,7 +96,7 @@ static struct _smsvdp {
 	UINT8		*VRAM;						/* Pointer to VRAM */
 	UINT8		*CRAM;						/* Pointer to CRAM */
 	const UINT8	*sms_frame_timing;
-	mame_bitmap	*prev_bitmap;
+	bitmap_t	*prev_bitmap;
 	int			prev_bitmap_saved;
 	UINT8		*collision_buffer;
 
@@ -111,7 +111,7 @@ static struct _smsvdp {
 } smsvdp;
 
 static TIMER_CALLBACK(smsvdp_display_callback);
-static void sms_refresh_line(mame_bitmap *bitmap, int offsetx, int offsety, int line);
+static void sms_refresh_line(bitmap_t *bitmap, int offsetx, int offsety, int line);
 static void sms_update_palette(void);
 
 static void set_display_settings( void ) {
@@ -914,7 +914,7 @@ static void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	sms_refresh_tms9918_sprites( lineBuffer, line );
 }
 
-static void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, int line ) {
+static void sms_refresh_line( bitmap_t *bitmap, int pixelOffsetX, int pixelPlotY, int line ) {
 	int x;
 	int *blitLineBuffer = smsvdp.line_buffer;
 

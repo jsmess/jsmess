@@ -27,7 +27,7 @@ VIDEO_START( hp48 )
 
 typedef const char *HP48_FIGURE;
 
-static void hp48_draw_special(mame_bitmap *bitmap,int x, int y, const HP48_FIGURE figure, int color)
+static void hp48_draw_special(bitmap_t *bitmap,int x, int y, const HP48_FIGURE figure, int color)
 {
 	int j, xi=0;
 	for (j=0; figure[j]; j++) {

@@ -87,7 +87,7 @@ int amstrad_CRTC_HS_Counter;
 /* 2 HSYNCS after the VSYNC Counter */
 static int amstrad_CRTC_HS_After_VS_Counter;
 
-static mame_bitmap	*amstrad_bitmap;
+static bitmap_t	*amstrad_bitmap;
 
 static int amstrad_scanline;
 static int border_counter;  // counts length of the soft scroll border extend
@@ -391,7 +391,7 @@ static void amstrad_draw_screen_disabled(void)
 /* mode 0 - low resolution - 16 colours */
 static void amstrad_plus_draw_screen_enabled_mode_0(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -449,7 +449,7 @@ static void amstrad_plus_draw_screen_enabled_mode_0(void)
 /* mode 1 - medium resolution - 4 colours */
 static void amstrad_plus_draw_screen_enabled_mode_1(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -500,7 +500,7 @@ static void amstrad_plus_draw_screen_enabled_mode_1(void)
 /* mode 2: high resolution - 2 colours */
 static void amstrad_plus_draw_screen_enabled_mode_2(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -540,7 +540,7 @@ static void amstrad_plus_draw_screen_enabled_mode_2(void)
 /* undocumented mode. low resolution - 4 colours */
 static void amstrad_plus_draw_screen_enabled_mode_3(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -598,7 +598,7 @@ static void amstrad_plus_draw_screen_enabled_mode_3(void)
 /* mode 0 - low resolution - 16 colours */
 static void amstrad_draw_screen_enabled_mode_0(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -645,7 +645,7 @@ static void amstrad_draw_screen_enabled_mode_0(void)
 /* mode 1 - medium resolution - 4 colours */
 static void amstrad_draw_screen_enabled_mode_1(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -694,7 +694,7 @@ static void amstrad_draw_screen_enabled_mode_1(void)
 /* mode 2: high resolution - 2 colours */
 static void amstrad_draw_screen_enabled_mode_2(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -737,7 +737,7 @@ static void amstrad_draw_screen_enabled_mode_2(void)
 /* undocumented mode. low resolution - 4 colours */
 static void amstrad_draw_screen_enabled_mode_3(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -783,7 +783,7 @@ static void amstrad_draw_screen_enabled_mode_3(void)
 /* Aleste mode 2: high resolution - 4 colours */
 static void aleste_draw_screen_enabled_mode_2(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -827,7 +827,7 @@ static void aleste_draw_screen_enabled_mode_2(void)
 /* Aleste mode 3 - medium resolution, 16 colours */
 static void aleste_draw_screen_enabled_mode_3(void)
 {
-	mame_bitmap *bitmap = amstrad_bitmap;
+	bitmap_t *bitmap = amstrad_bitmap;
 
 	int ma = amstrad_CRTC_MA; // m6845_memory_address_r(0);
 	int ra = amstrad_CRTC_RA; // m6845_row_address_r(0);
@@ -920,7 +920,7 @@ void amstrad_vh_execute_crtc_cycles(int dummy)
 
   &6422 - &643f   Sprite palette, 12-bit, xxxxGGGGRRRRBBBB, sprite pens 1-15 (0 is always transparent)
 */
-static void amstrad_plus_sprite_draw(mame_bitmap* scr_bitmap)
+static void amstrad_plus_sprite_draw(bitmap_t* scr_bitmap)
 {
 	int spr;  // sprite number
 	int xloc,yloc;

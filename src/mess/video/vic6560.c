@@ -91,7 +91,7 @@ UINT8 vic6560[16];
 
 int vic6560_pal;
 
-static mame_bitmap *vic6560_bitmap;
+static bitmap_t *vic6560_bitmap;
 static int rasterline = 0, lastline = 0;
 static void vic6560_drawlines (int start, int last);
 
@@ -348,7 +348,7 @@ static void vic6560_draw_character_multi (int ybegin, int yend,
 
 
 #ifndef GFX
-INLINE void vic6560_draw_pointer (mame_bitmap *bitmap,
+INLINE void vic6560_draw_pointer (bitmap_t *bitmap,
 								  rectangle *visible, int xoff, int yoff)
 {
 	/* this is a a static graphical object */

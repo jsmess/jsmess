@@ -46,7 +46,7 @@ void zx_ula_bkgnd(int color)
 	{
 		int y, new_x, new_y;
 		rectangle r;
-		mame_bitmap *bitmap = tmpbitmap;
+		bitmap_t *bitmap = tmpbitmap;
 
 		new_y = video_screen_get_vpos(0);
 		new_x = video_screen_get_hpos(0);
@@ -98,7 +98,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	 * scanlines at the top and bottom of the display.
 	 */
 	rectangle r = machine->screen[0].visarea;
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 
 	r.min_y = r.max_y = video_screen_get_vpos(0);
 	fillbitmap(bitmap, machine->pens[1], &r);
@@ -130,7 +130,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 
 int zx_ula_r(int offs, int region)
 {
-	mame_bitmap *bitmap = tmpbitmap;
+	bitmap_t *bitmap = tmpbitmap;
 	int x, y, chr, data, ireg, rreg, cycles, offs0 = offs, halted = 0;
 	UINT8 *chrgen, *rom = memory_region(REGION_CPU1);
 	UINT16 *scanline;

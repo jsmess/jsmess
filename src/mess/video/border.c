@@ -35,7 +35,7 @@ void set_last_border_color (int NewColor)
         CurrBorderColor = NewColor;
 }
 
-void draw_border(mame_bitmap *bitmap,
+void draw_border(bitmap_t *bitmap,
 	int full_refresh,               /* Full refresh flag */
 	int TopBorderLines,             /* Border lines before actual screen */
 	int ScreenLines,                /* Screen height in pixels */

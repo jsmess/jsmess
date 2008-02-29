@@ -402,7 +402,7 @@ static void vdc8563_time(void)
 	}
 }
 
-static void vdc8563_monotext_screenrefresh (mame_bitmap *bitmap, int full_refresh)
+static void vdc8563_monotext_screenrefresh (bitmap_t *bitmap, int full_refresh)
 {
 	int x, y, i;
 	rectangle rect;
@@ -442,7 +442,7 @@ static void vdc8563_monotext_screenrefresh (mame_bitmap *bitmap, int full_refres
 	}
 }
 
-static void vdc8563_text_screenrefresh (mame_bitmap *bitmap, int full_refresh)
+static void vdc8563_text_screenrefresh (bitmap_t *bitmap, int full_refresh)
 {
 	int x, y, i, j;
 	rectangle rect;
@@ -502,7 +502,7 @@ static void vdc8563_text_screenrefresh (mame_bitmap *bitmap, int full_refresh)
 	}
 }
 
-static void vdc8563_graphic_screenrefresh (mame_bitmap *bitmap, int full_refresh)
+static void vdc8563_graphic_screenrefresh (bitmap_t *bitmap, int full_refresh)
 {
 	int x, y, i, j, k;
 	rectangle rect;
