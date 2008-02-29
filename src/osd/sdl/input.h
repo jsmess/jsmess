@@ -18,7 +18,7 @@
 //============================================================
 
 void sdlinput_init(running_machine *machine);
-void sdlinput_poll(void);
+void sdlinput_poll(running_machine *machine);
 int  sdlinput_should_hide_mouse(void);
 
 #ifdef SDLMAME_WIN32

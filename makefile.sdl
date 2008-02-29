@@ -1,13 +1,11 @@
 ###########################################################################
 #
-#   makefile.sdl
+#   makefile
 #
-#   Core makefile for building SDLMAME and derivatives
+#   Core makefile for building MAME and derivatives
 #
-#   Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+#   Copyright (c) Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
-#
-#   SDLMAME/MESS by Olivier Galibert and R. Belmont
 #
 ###########################################################################
 
@@ -45,7 +43,9 @@ ifndef OSD
 OSD = sdl
 endif
 
-
+ifndef CROSS_BUILD_OSD
+CROSS_BUILD_OSD = $(OSD)
+endif
 
 #-------------------------------------------------
 # specify OS target, which further differentiates
@@ -98,7 +98,7 @@ endif
 # uncomment next line to enable the debugger
 # DEBUGGER = 1
 
-# uncomment next line to include the debugger
+# uncomment next line to build a debug version
 # DEBUG = 1
 
 # uncomment next line to include the internal profiler
@@ -110,9 +110,9 @@ X86_MIPS3_DRC = 1
 # uncomment next line to use DRC PowerPC engine
 X86_PPC_DRC = 1
 
-# uncomment next line to use DRC Voodoo rasterizers
-# X86_VOODOO_DRC = 1
-
+# uncomment next line to build using unix-style libsdl on Mac OS X
+# (vs. the native framework port).  Normal users should not enable this.
+# MACOSX_USE_LIBSDL = 1
 
 
 #-------------------------------------------------
@@ -192,11 +192,14 @@ ifeq ($(TARGETOS),os2)
 EXE = .exe
 endif
 
+ifndef BUILD_EXE
+BUILD_EXE = $(EXE)
+endif
+
 # compiler, linker and utilities
 AR = @ar
 CC = @gcc
 LD = @gcc
-HHC = @-hhc
 MD = -mkdir$(EXE)
 RM = @rm -f
 
@@ -206,7 +209,7 @@ RM = @rm -f
 # form the name of the executable
 #-------------------------------------------------
 
-# debug builds just get the 'd' suffix and nothing more
+# debugger builds just get the 'd' suffix and nothing more
 ifdef DEBUGGER
 DEBUGSUFFIX = d
 endif
@@ -283,11 +286,6 @@ ifdef PROFILER
 DEFS += -DMAME_PROFILER
 endif
 
-# define VOODOO_DRC if we are building the DRC Voodoo engine
-ifdef X86_VOODOO_DRC
-DEFS += -DVOODOO_DRC
-endif
-
 
 
 #-------------------------------------------------
@@ -332,8 +330,10 @@ CFLAGS += -O$(OPTIMIZE)
 # if we are optimizing, include optimization options
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
-#CFLAGS += -Werror $(ARCHOPTS) -fno-strict-aliasing
 CFLAGS += $(ARCHOPTS) -fno-strict-aliasing
+ifneq ($(TARGETOS),os2)
+CFLAGS += -Werror
+endif
 endif
 
 # if symbols are on, make sure we have frame pointers
@@ -367,10 +367,11 @@ CFLAGS += \
 
 # LDFLAGS are used generally; LDFLAGSEMULATOR are additional
 # flags only used when linking the core emulator
+LDFLAGS =
 ifneq ($(TARGETOS),macosx)
+ifneq ($(TARGETOS),os2)
 LDFLAGS = -Wl,--warn-common
-else
-LDFLAGS=
+endif
 endif
 LDFLAGSEMULATOR =
 
@@ -419,7 +420,6 @@ LIBCPU = $(OBJ)/libcpu.a
 LIBSOUND = $(OBJ)/libsound.a
 LIBUTIL = $(OBJ)/libutil.a
 LIBOCORE = $(OBJ)/libocore.a
-LIBOCORE_NOMAIN = $(OBJ)/libocore_nomain.a
 LIBOSD = $(OBJ)/libosd.a
 
 VERSIONOBJ = $(OBJ)/version.o
@@ -462,6 +462,14 @@ endif
 all: maketree buildtools emulator tools
 
 
+#-------------------------------------------------
+# defines needed by multiple make files
+#-------------------------------------------------
+
+BUILDSRC = $(SRC)/build
+BUILDOBJ = $(OBJ)/build
+BUILDOUT = $(BUILDOBJ)
+
 
 #-------------------------------------------------
 # include the various .mak files
@@ -475,6 +483,7 @@ include $(SRC)/$(TARGET)/$(SUBTARGET).mak
 include $(SRC)/emu/emu.mak
 include $(SRC)/lib/lib.mak
 include $(SRC)/build/build.mak
+-include $(SRC)/osd/$(CROSS_BUILD_OSD)/build.mak
 include $(SRC)/tools/tools.mak
 
 # combine the various definitions to one
@@ -491,8 +500,6 @@ emulator: maketree $(BUILD) $(EMULATOR)
 buildtools: maketree $(BUILD)
 
 tools: maketree $(TOOLS)
-
-help: maketree $(HELP)
 
 maketree: $(sort $(OBJDIRS))
 
@@ -532,8 +539,6 @@ $(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) 
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
 
 endif
-
-
 
 #-------------------------------------------------
 # generic rules

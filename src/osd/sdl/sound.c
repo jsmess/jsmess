@@ -25,7 +25,6 @@
 #include "window.h"
 #include "video.h"
 #include "osdsdl.h"
-#include "deprecat.h"
 
 //============================================================
 //	DEBUGGING
@@ -278,17 +277,17 @@ static void copy_sample_data(INT16 *data, int bytes_to_copy)
 //	osd_update_audio_stream
 //============================================================
 
-void osd_update_audio_stream(INT16 *buffer, int samples_this_frame)
+void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int samples_this_frame)
 {
 	// if nothing to do, don't do it
-	if (Machine->sample_rate != 0 && stream_buffer)
+	if (machine->sample_rate != 0 && stream_buffer)
 	{
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
 		int play_position, write_position, orig_write, stream_in;
 
 		play_position = stream_playpos;
 
-		write_position = stream_playpos + ((Machine->sample_rate / 50) * sizeof(INT16) * 2);
+		write_position = stream_playpos + ((machine->sample_rate / 50) * sizeof(INT16) * 2);
 		orig_write = write_position;
 
 		if (!stream_in_initialized)

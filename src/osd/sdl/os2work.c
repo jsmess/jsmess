@@ -178,7 +178,7 @@ INLINE void scalable_lock_init(scalable_lock *lock)
 
 
 INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
-
+{
     INT32 myslot = (atomic_increment32(&lock->nextindex) - 1) & (WORK_MAX_THREADS - 1);
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -511,8 +511,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 //  osd_Twork_item_queue_multiple
 //============================================================
 
-osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, INT32 numitems, void 
-parambase, INT32 paramstep, UINT32 flags)
+osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, INT32 numitems, void *parambase, INT32 paramstep, UINT32 flags)
 {
     osd_work_item *itemlist = NULL;
     osd_work_item **item_tailptr = &itemlist;
@@ -750,7 +749,7 @@ static void worker_thread_entry(void *param)
 //  worker_thread_process
 //============================================================
 
-static int execute_work_item(osd_work_item *item)
+static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread)
 {
 	int threadid = thread - queue->thread;
 

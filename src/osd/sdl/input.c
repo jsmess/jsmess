@@ -22,7 +22,6 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "ui.h"
-#include "deprecat.h"
 
 // MAMEOS headers
 #include "window.h"
@@ -904,7 +903,7 @@ void sdlinput_process_events_buf(void)
 }
 #endif
 
-void sdlinput_poll(void)
+void sdlinput_poll(running_machine *machine)
 {
 	device_info *devinfo;
 	SDL_Event event;
@@ -939,7 +938,7 @@ void sdlinput_poll(void)
 		}
 		switch(event.type) {
 		case SDL_QUIT:
-			mame_schedule_exit(Machine);
+			mame_schedule_exit(machine);
 			break;
 		case SDL_KEYDOWN:
 			#ifdef MESS

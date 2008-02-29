@@ -341,7 +341,7 @@ sdl_monitor_info *sdlvideo_monitor_from_handle(UINT32 hmonitor)
 //  osd_update
 //============================================================
 
-void osd_update(int skip_redraw)
+void osd_update(running_machine *machine, int skip_redraw)
 {
 	sdl_window_info *window;
 
@@ -355,7 +355,7 @@ void osd_update(int skip_redraw)
 	}
 
 	// poll the joystick values here
-	sdlinput_poll();
+	sdlinput_poll(machine);
 	check_osd_inputs();
 
 #ifdef ENABLE_DEBUGGER
