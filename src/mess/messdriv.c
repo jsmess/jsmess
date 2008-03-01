@@ -827,6 +827,12 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( super80m )
 	DRIVER( super80v )
 
+	/* Galeb */
+	DRIVER( galeb )
+
+	/* Orao */
+	DRIVER( orao )
+	DRIVER( orao103 )
 
 /****************Games*******************************************************/
 	/* Computer Electronic */

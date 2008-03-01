@@ -3,6 +3,8 @@
   galaxy.c
 
   Functions to emulate the video hardware of the Galaksija.
+  
+  01/03/2008 - Update by Miodrag Milanovic to make Galaksija video work with new SVN code
 
 ***************************************************************************/
 
@@ -94,7 +96,7 @@ VIDEO_UPDATE( galaxy )
 			if (code>191)
 				code-=128;
 			sy = (offs / 32) * 13;
-			drawgfx(bitmap, machine->gfx[0], code & 0x7f, 1, 0,0, sx,sy,
+			drawgfx(bitmap, machine->gfx[0], code & 0x7f, 0, 0,0, sx,sy,
 				NULL, TRANSPARENCY_NONE, 0);
 		}
 	}

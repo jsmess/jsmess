@@ -390,6 +390,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pdp1.a \
+	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pmd85.a \
 	$(MESSOBJ)/primo.a \
 	$(MESSOBJ)/rca.a \
@@ -1165,6 +1166,14 @@ $(MESSOBJ)/epoch.a:				\
 	$(MESS_DRIVERS)/gamepock.o	\
 	$(MESS_MACHINE)/gamepock.o	\
 
+$(MESSOBJ)/pel.a:      \
+	$(MESS_DRIVERS)/galeb.o \
+	$(MESS_MACHINE)/galeb.o \
+	$(MESS_VIDEO)/galeb.o \
+	$(MESS_DRIVERS)/orao.o \
+	$(MESS_MACHINE)/orao.o \
+	$(MESS_VIDEO)/orao.o \
+ 
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------

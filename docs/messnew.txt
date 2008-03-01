@@ -2,8 +2,10 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-- Philips Videopac G7000/C52 [Wilbert Pol]
 - Epoch Game Pocket Computer [Wilbert Pol]
+- Galeb [Miodrag Milanovic]
+- Orao [Miodrag Milanovic]
+- Philips Videopac G7000/C52 [Wilbert Pol]
 
 
 
@@ -12,6 +14,8 @@ System Driver Changes:
 - [APFM1000] Added special APF video mode [PeT]
 
 - [APPLE2] Removed usage of tilemaps.  [Nate Woods]
+
+- [GALAXY] Fixed regressions.  [Miodrag Milanovic]
 
 - [QL] System boots up again. (bug #1495) [Curt Coder]
 
