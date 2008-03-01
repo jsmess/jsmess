@@ -11,6 +11,28 @@
 
 
 static int cbmb_font=0;
+static mc6845_t *mc6845;
+
+VIDEO_START( cbmb_crtc ) {
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
+}
+
+VIDEO_UPDATE( cbmb_crtc ) {
+	mc6845_update(mc6845, bitmap, cliprect);
+	return 0;
+}
+
+READ8_HANDLER( cbmb_mc6845_register_r ) {
+	return mc6845_register_r( mc6845 );
+}
+
+WRITE8_HANDLER( cbmb_mc6845_register_w ) {
+	mc6845_register_w( mc6845, data );
+}
+
+WRITE8_HANDLER( cbmb_mc6845_address_w ) {
+	mc6845_address_w( mc6845, data );
+}
 
 void cbm600_vh_init(void)
 {
@@ -39,6 +61,8 @@ void cbm700_vh_init(void)
 VIDEO_START( cbm700 )
 {
 	int i;
+
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 
     /* remove pixel column 9 for character codes 0 - 175 and 224 - 255 */
 	for( i = 0; i < 256; i++)
@@ -83,5 +107,9 @@ MC6845_UPDATE_ROW( cbm700_update_row )
 			drawgfx( bitmap, machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
 //		}
 	}
+}
+
+void cbmb_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+{
 }
 

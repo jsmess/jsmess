@@ -130,12 +130,18 @@ void cbmb_rom_load(void);
 
 /*----------- defined in video/cbmb.c -----------*/
 
+READ8_HANDLER( cbmb_mc6845_register_r );
+WRITE8_HANDLER( cbmb_mc6845_register_w );
+WRITE8_HANDLER( cbmb_mc6845_address_w );
+VIDEO_START( cbmb_crtc );
+VIDEO_UPDATE( cbmb_crtc );
 MC6845_UPDATE_ROW( cbm600_update_row );
 MC6845_UPDATE_ROW( cbm700_update_row );
+void cbmb_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled);
 
 void cbm600_vh_init(void);
 void cbm700_vh_init(void);
-extern VIDEO_START( cbm700 );
+VIDEO_START( cbm700 );
 
 void cbmb_vh_set_font(int font);
 

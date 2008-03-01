@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	/*  {0xfc000, 0xfcfff, MRA8_ROM }, */
 	AM_RANGE(0xfd000, 0xfd7ff) AM_READ( MRA8_ROM )
 //  AM_RANGE(0xfd800, 0xfd8ff)
-	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_READ( crtc6845_0_register_r )
+	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_READ( cbmb_mc6845_register_r )
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_READ( sid6581_0_port_r )
 	/* db00 coprocessor */
@@ -209,8 +209,8 @@ static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf6000, 0xf7fff) AM_WRITE( MWA8_ROM )
 	AM_RANGE(0xf8000, 0xfbfff) AM_WRITE( MWA8_ROM) AM_BASE( &cbmb_basic )
 	AM_RANGE(0xfd000, 0xfd7ff) AM_WRITE( MWA8_RAM) AM_BASE( &videoram) AM_SIZE(&videoram_size ) /* VIDEORAM */
-	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR( 0xfe ) AM_WRITE( crtc6845_0_address_w )
-	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_WRITE( crtc6845_0_register_w )
+	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR( 0xfe ) AM_WRITE( cbmb_mc6845_address_w )
+	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_WRITE( cbmb_mc6845_register_w )
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_WRITE( sid6581_0_port_w)
 	/* db00 coprocessor */
@@ -600,6 +600,30 @@ ROM_END
 
 #endif
 
+static const mc6845_interface cbm600_crtc = {
+	0,
+	XTAL_18MHz / 8 /*?*/,	/*  I do not know if this is correct, please verify */
+	8 /*?*/,
+	NULL,
+	cbm600_update_row,
+	NULL,
+	cbmb_display_enable_changed,
+	NULL,
+	NULL
+};
+
+static const mc6845_interface cbm700_crtc = {
+	0,
+	XTAL_18MHz / 8 /*?*/,	/* I do not know if this is correct, please verify */
+	9 /*?*/,
+	NULL,
+	cbm700_update_row,
+	NULL,
+	cbmb_display_enable_changed,
+	NULL,
+	NULL
+};
+
 
 static MACHINE_DRIVER_START( cbm600 )
 	/* basic machine hardware */
@@ -620,7 +644,11 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_PALETTE_LENGTH(sizeof (cbm700_palette) / sizeof (cbm700_palette[0]) / 3)
 	MDRV_PALETTE_INIT( cbm700 )
 
-	MDRV_VIDEO_UPDATE( crtc6845 )
+	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_CONFIG( cbm600_crtc )
+
+	MDRV_VIDEO_START( cbmb_crtc )
+	MDRV_VIDEO_UPDATE( cbmb_crtc )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -642,6 +670,9 @@ static MACHINE_DRIVER_START( cbm700 )
 	MDRV_SCREEN_SIZE(720, 350)
 	MDRV_SCREEN_VISIBLE_AREA(0, 720 - 1, 0, 350 - 1)
 	MDRV_GFXDECODE( cbm700 )
+
+	MDRV_DEVICE_MODIFY("crtc", MC6845)
+	MDRV_DEVICE_CONFIG( cbm700_crtc )
 
 	MDRV_VIDEO_START( cbm700 )
 MACHINE_DRIVER_END

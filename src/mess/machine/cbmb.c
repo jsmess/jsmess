@@ -20,7 +20,6 @@
 #include "includes/vc20tape.h"
 #include "includes/cbmieeeb.h"
 #include "video/vic6567.h"
-#include "video/mc6845.h"
 
 
 static TIMER_CALLBACK(cbmb_frame_interrupt);
@@ -249,27 +248,11 @@ static void cbmb_common_driver_init (void)
 	cbm_ieee_open();
 }
 
-static void cbmb_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
-{
-}
-
-//static const struct mscrtc6845_config cbm600_crtc= { 1600000 /*?*/, cbmb_vh_cursor };
-static const mc6845_interface cbm600_crtc = {
-	0,
-	1600000 /*?*/,
-	8 /*?*/,
-	NULL,
-	cbm600_update_row,
-	NULL,
-	cbmb_display_enable_changed
-};
-
 void cbm600_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm_ntsc = 1;
 	cbm600_vh_init();
-	crtc6845_config( 0, &cbm600_crtc);
 }
 
 void cbm600pal_driver_init (void)
@@ -277,26 +260,13 @@ void cbm600pal_driver_init (void)
 	cbmb_common_driver_init ();
 	cbm_ntsc = 0;
 	cbm600_vh_init();
-	crtc6845_config( 0, &cbm600_crtc);
 }
 
 void cbm600hu_driver_init (void)
 {
 	cbmb_common_driver_init ();
 	cbm_ntsc = 0;
-	crtc6845_config( 0, &cbm600_crtc);
 }
-
-//static const struct mscrtc6845_config cbm700_crtc= { 2000000 /*?*/, cbmb_vh_cursor };
-static const mc6845_interface cbm700_crtc = {
-	0,
-	2000000 /*?*/,
-	9 /*?*/,
-	NULL,
-	cbm700_update_row,
-	NULL,
-	cbmb_display_enable_changed
-};
 
 void cbm700_driver_init (void)
 {
@@ -304,7 +274,6 @@ void cbm700_driver_init (void)
 	cbm700 = 1;
 	cbm_ntsc = 0;
 	cbm700_vh_init();
-	crtc6845_config( 0, &cbm700_crtc);
 }
 
 void cbm500_driver_init (void)
