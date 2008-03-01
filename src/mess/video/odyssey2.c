@@ -359,7 +359,7 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 			/* Regular foreground objects */
 			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.foreground ); i++ ) {
 				int	y = o2_vdc.s.foreground[i].y;
-				int	height = 8;
+				int	height = 7;
 
 				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 ) {
 					UINT16	color = machine->pens[ 16 + ( ( o2_vdc.s.foreground[i].color & 0x0E ) >> 1 ) ];
@@ -390,7 +390,7 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 			/* Quad objects */
 			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.quad ); i++ ) {
 				int y = o2_vdc.s.quad[i].single[0].y;
-				int height = 8;
+				int height = 7;
 
 				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 ) {
 					int	x = o2_vdc.s.quad[i].single[0].x;
