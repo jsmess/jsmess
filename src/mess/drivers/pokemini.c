@@ -58,7 +58,7 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
 	/* This still needs to be improved to actually match the hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 96, 64 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )

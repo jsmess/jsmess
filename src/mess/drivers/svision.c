@@ -481,7 +481,7 @@ static MACHINE_DRIVER_START( svision )
 	 MDRV_CPU_ADD_TAG("main", M65C02, 4000000)        /* ? stz used! speed? */
 	MDRV_CPU_PROGRAM_MAP(svision_mem, 0)
 	MDRV_CPU_VBLANK_INT(svision_frame_int, 1)
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE(61)
 
 	MDRV_MACHINE_RESET( svision )
