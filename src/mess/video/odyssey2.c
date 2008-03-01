@@ -359,11 +359,11 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 			/* Regular foreground objects */
 			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.foreground ); i++ ) {
 				int	y = o2_vdc.s.foreground[i].y;
-				int	height = 7;
+				int	height = 8;
 
 				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 ) {
 					UINT16	color = machine->pens[ 16 + ( ( o2_vdc.s.foreground[i].color & 0x0E ) >> 1 ) ];
-					int		offset = ( o2_vdc.s.foreground[i].ptr | ( ( o2_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( ( vpos - start_vpos ) >> 1 );
+					int		offset = ( o2_vdc.s.foreground[i].ptr | ( ( o2_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - start_vpos - y ) >> 1 );
 					UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
 					int		x = o2_vdc.s.foreground[i].x;
 					UINT8	m;
@@ -390,7 +390,7 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 			/* Quad objects */
 			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.quad ); i++ ) {
 				int y = o2_vdc.s.quad[i].single[0].y;
-				int height = 7;
+				int height = 8;
 
 				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 ) {
 					int	x = o2_vdc.s.quad[i].single[0].x;
@@ -398,7 +398,7 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 
 					for ( j = 0; j < ARRAY_LENGTH( o2_vdc.s.quad[0].single ); j++, x += 8 ) {
 						UINT16 color = machine->pens[ 16 + ( ( o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 ) ];
-						int	offset = ( o2_vdc.s.quad[i].single[j].ptr | ( ( o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( ( vpos - start_vpos ) >> 1 );
+						int	offset = ( o2_vdc.s.quad[i].single[j].ptr | ( ( o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - start_vpos - y ) >> 1 );
 						UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
 						UINT8	m;
 
