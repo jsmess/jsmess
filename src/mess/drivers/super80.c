@@ -30,8 +30,16 @@ static UINT8 mc6845[20];				/* registers */
 static UINT8 mc6845_reg;				/* register index */
 static UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
-#define SUPER80V_SCREEN_WIDTH        (560)
-#define SUPER80V_SCREEN_HEIGHT       (300)
+#define MASTER_CLOCK			(12e6)		/* 12mhz */
+#define HTOTAL				(384)
+#define HBEND				(0)
+#define HBSTART				(256)
+#define VTOTAL				(240)
+#define VBEND				(0)
+#define VBSTART				(160)
+
+#define SUPER80V_SCREEN_WIDTH		(560)
+#define SUPER80V_SCREEN_HEIGHT		(300)
 
 /**************************** PALETTES for super80m and super80v ******************************************/
 
@@ -196,14 +204,6 @@ static void mc6845_screen_configure(void)
 	visarea.min_y = 0;
 	visarea.max_y = SUPER80V_SCREEN_HEIGHT-1;
 
-	/* dynamic screen sizing - we must override some user settings */
-	if (dyn)
-	{
-		mc6845[4] = mc6845[6];				// no band at top or bottom
-		mc6845[7] = mc6845[6];				// screen starts at the top line
-		mc6845[5] = 0;					// exactly at the top
-	}
-
 	/* calculate the effect of sync and vertical adjustments */
 	if ( mc6845[2] ) off_x = mc6845[0] - mc6845[2] - 23; else off_x = -24;
 
@@ -212,6 +212,12 @@ static void mc6845_screen_configure(void)
 	if( off_y < 0 ) off_y = 0;
 
 	if( off_y > 128 ) off_y = 128;
+
+	if (dyn)
+	{
+		off_x = 0;
+		off_y = 0;
+	}
 
 	width = mc6845[1]*7-1;							// width in pixels
 	height = mc6845[6]*(mc6845[9]+1)-1;					// height in pixels
@@ -233,36 +239,7 @@ static void mc6845_screen_configure(void)
 			video_screen_configure(0, SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT, &visarea, state->refresh);	// in case dipswitch was just turned to NO
 }
 
-static VIDEO_EOF( super80 )
-{
-	UINT8 go_fast = 0;
-	if ((super80_mhz == 2) || (!(readinputport(9) & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
-		go_fast++;
-
-	/* code to slow down computer to 1mhz by halting cpu on every second frame */
-	if (!go_fast)
-	{
-		if (!int_sw)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
-
-		int_sw++;
-		if (int_sw > 1)
-		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
-			int_sw = 0;
-		}
-	}
-	else
-	{
-		if (int_sw < 8)								// @2mhz, reset just once
-		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
-			int_sw = 8;							// ...not every time
-		}
-	}
-}
-
-static VIDEO_EOF( super80v )
+static VIDEO_EOF( super80m )
 {
 	/* if we chose another palette or colour mode, enable it */
 	UINT8 chosen_palette = (readinputport(9) & 0x60)>>5;				// read colour dipswitches
@@ -275,12 +252,6 @@ static VIDEO_EOF( super80v )
 		else
 			palette_set_colors_rgb(machine, super80_rgb_palette);		// rgb and b&w
 	}
-}
-
-static VIDEO_EOF( super80m )
-{
-	VIDEO_EOF_CALL( super80v );
-	VIDEO_EOF_CALL( super80 );	
 }
 
 static VIDEO_UPDATE( super80 )
@@ -811,6 +782,36 @@ GFXDECODE_END
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
+static TIMER_CALLBACK( super80_halfspeed )
+{
+	UINT8 go_fast = 0;
+	if ((super80_mhz == 2) || (!(readinputport(9) & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
+		go_fast++;
+
+	/* code to slow down computer to 1mhz by halting cpu on every second frame */
+	if (!go_fast)
+	{
+		if (!int_sw)
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
+
+		int_sw++;
+		if (int_sw > 1)
+		{
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
+			int_sw = 0;
+		}
+	}
+	else
+	{
+		if (int_sw < 8)								// @2mhz, reset just once
+		{
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			int_sw = 8;							// ...not every time
+		}
+	}
+}
+
+
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( super80_reset )
 {
@@ -826,7 +827,7 @@ MACHINE_RESET( super80 )
 
 static MACHINE_DRIVER_START( super80 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 12000000/6)		/* 2 Mhz */
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/6)		/* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(super80_map, 0)
 	MDRV_CPU_IO_MAP(super80_io, 0)
 	MDRV_CPU_CONFIG(super80_daisy_chain)
@@ -836,14 +837,11 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_GFXDECODE(super80)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(48.8)
-//	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(200))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 16*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*10-1)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_EOF(super80)
 	MDRV_VIDEO_UPDATE(super80)
 
 	/* sound hardware */
@@ -872,25 +870,45 @@ static MACHINE_DRIVER_START( super80m )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80v )
-	MDRV_IMPORT_FROM(super80m)
-	MDRV_CPU_MODIFY("main")
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/6)		/* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(super80v_map, 0)
 	MDRV_CPU_IO_MAP(super80v_io, 0)
+	MDRV_CPU_CONFIG(super80_daisy_chain)
 
-//	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_MACHINE_RESET( super80 )
+
 	MDRV_GFXDECODE(super80v)
-//	MDRV_SCREEN_SIZE(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT)
-//	MDRV_SCREEN_VISIBLE_AREA(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1)
-	MDRV_VIDEO_EOF(super80v)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT)
+	MDRV_SCREEN_VISIBLE_AREA(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1)
+	MDRV_PALETTE_LENGTH(256*2)
+	MDRV_PALETTE_INIT(super80m)
+
+	MDRV_VIDEO_EOF(super80m)
 	MDRV_VIDEO_UPDATE(super80v)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
-
-static DRIVER_INIT( super80 )
+static void driver_init_common( void )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xc000);
 	timer_pulse(ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
+}
+
+static DRIVER_INIT( super80 )
+{
+	timer_pulse(ATTOTIME_IN_HZ(100),NULL,0,super80_halfspeed);	/* timer for 1mhz slowdown */
+	driver_init_common();
 }
 
 static DRIVER_INIT( super80d )
@@ -906,7 +924,7 @@ static DRIVER_INIT( super80v )
 	pcgram = memory_region(REGION_CPU1)+0xf000;
 	videoram = memory_region(REGION_CPU1)+0x18000;
 	colorram = memory_region(REGION_CPU1)+0x1C000;
-	DRIVER_INIT_CALL( super80 );
+	driver_init_common();
 }
 
 
