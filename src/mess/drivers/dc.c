@@ -4,23 +4,34 @@
     by R. Belmont
 
     SH-4 @ 200 MHz
-    ARM7TDMI @ 45 MHz
+    ARM7DI @ 2.8223 MHz (no T or M extensions)
     PowerVR 3D video
     AICA audio
     GD-ROM drive (modified ATAPI interface)
+
+            NTSC/N  NTSC/I   PAL/N   PAL/I   VGA
+	    (x/240) (x/480) (x/240)  (x/480) (640x480)
+    VTOTAL   262     524      312     624    524
+    HTOTAL   857     857      863     863    857
+
+    PCLKs = 26917135 (NTSC 480 @ 59.94), 26944080 (VGA 480 @ 60.0), 13458568 (NTSC 240 @ 59.94),
+            25925600 (PAL 480 @ 50.00), 13462800 (PAL 240 @ 50.00)
 */
 
 #include "driver.h"
+#include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
-#include "dc.h"
 #include "sound/aica.h"
+#include "dc.h"
 #include "deprecat.h"
+
+#define CPU_CLOCK (200000000)
 
 #define DC_VIDEO_TYPE	(3<<8)		// composite
 
 static UINT32 *dc_sound_ram;
 
-UINT32 dma_offset;	/* silly MAME global variable */
+UINT32 dma_offset;
 
 static UINT64 portA = 0x3, PDTRA, latched_PDTRA = 0, w;
 static int state = 0;
@@ -69,7 +80,7 @@ static WRITE64_HANDLER( dc_arm_w )
 }
 
 static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM						// BIOS
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION(REGION_CPU1, 0x200000)	// flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
@@ -122,11 +133,20 @@ static const struct AICAinterface aica_interface =
 	aica_irq
 };
 
+static INTERRUPT_GEN( dc_dispatch_vblank )
+{
+	dc_vblank();
+}
+
+static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
+
 static MACHINE_DRIVER_START( dc )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH4, 200000000)
+	MDRV_CPU_ADD_TAG("main", SH4, CPU_CLOCK)
+	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(dc_map,0)
 	MDRV_CPU_IO_MAP(dc_port,0)
+	MDRV_CPU_VBLANK_INT(dc_dispatch_vblank,1)
 
 	MDRV_CPU_ADD_TAG("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
@@ -135,13 +155,9 @@ static MACHINE_DRIVER_START( dc )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(16*8, 16*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 16*8-1, 0, 16*8-1)
-	MDRV_PALETTE_LENGTH(0x1000)
-
+	MDRV_SCREEN_RAW_PARAMS((524*857*59.94), 857, 0xa4, 640+0xa4, 524, 0x12, 480+0x12)
+	
 	MDRV_VIDEO_START(dc)
 	MDRV_VIDEO_UPDATE(dc)
 
