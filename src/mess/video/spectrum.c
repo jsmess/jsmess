@@ -216,7 +216,7 @@ VIDEO_UPDATE( spectrum )
                                             flash_invert);
 		drawgfx(bitmap,machine->gfx[0],
 			count,
-			color,
+			color+8, // use 2nd part of palette
 			0,0,
                             (sx*8)+SPEC_LEFT_BORDER,(sy*8)+SPEC_TOP_BORDER,
 			0,TRANSPARENCY_NONE,0);
@@ -228,7 +228,7 @@ VIDEO_UPDATE( spectrum )
                                             flash_invert);
 		drawgfx(bitmap,machine->gfx[1],
 			count,
-			color,
+			color+8, // use 2nd part of palette
 			0,0,
                             (sx*8)+SPEC_LEFT_BORDER,((sy+8)*8)+SPEC_TOP_BORDER,
 			0,TRANSPARENCY_NONE,0);
@@ -240,7 +240,7 @@ VIDEO_UPDATE( spectrum )
                                             flash_invert);
 		drawgfx(bitmap,machine->gfx[2],
 			count,
-			color,
+			color+8, // use 2nd part of palette
 			0,0,
                             (sx*8)+SPEC_LEFT_BORDER,((sy+16)*8)+SPEC_TOP_BORDER,
 			0,TRANSPARENCY_NONE,0);
