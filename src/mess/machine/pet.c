@@ -18,7 +18,6 @@
 #include "includes/pet.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-#include "video/mc6845.h"
 
 /* keyboard lines */
 static int pet_basic1=0; /* basic version 1 for quickloader */
@@ -256,8 +255,8 @@ static WRITE8_HANDLER(cbm8096_io_w)
 	else if (offset<0x40) ;
 	else if (offset<0x50) via_0_w(offset&0xf,data);
 	else if (offset<0x80) ;
-	else if (offset == 0x80) crtc6845_0_address_w(offset&1, data);
-	else if (offset == 0x81) crtc6845_0_register_w(offset&1,data);
+	else if (offset == 0x80) pet_mc6845_address_w(offset, data);
+	else if (offset == 0x81) pet_mc6845_register_w(offset, data);
 }
 
 static  READ8_HANDLER(cbm8096_io_r)
@@ -270,7 +269,7 @@ static  READ8_HANDLER(cbm8096_io_r)
 	else if (offset<0x40) ;
 	else if (offset<0x50) data=via_0_r(offset&0xf);
 	else if (offset<0x80) ;
-	else if (offset == 0x81) data=crtc6845_0_register_r(offset&1);
+	else if (offset == 0x81) data=pet_mc6845_register_r(offset);
 	return data;
 }
 
@@ -494,37 +493,11 @@ DRIVER_INIT( pet1 )
 	pet_vh_init();
 }
 
-//static const struct mscrtc6845_config crtc_pet = { 800000 /*?*/};
-static void pet_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
-{
-}
-
-static const mc6845_interface crtc_pet40 = {
-	0,
-	800000 /*?*/,
-	8 /*?*/,
-	NULL,
-	pet40_update_row,
-	NULL,
-	pet_display_enable_changed
-};
-
-static const mc6845_interface crtc_pet80 = {
-	0,
-	800000 /*?*/,
-	16 /*?*/,
-	NULL,
-	pet80_update_row,
-	NULL,
-	pet_display_enable_changed
-};
-
 DRIVER_INIT( pet40 )
 {
 	pet_common_driver_init ();
 	pia_config(0, &pet_pia0);
 	pet_vh_init();
-	crtc6845_config( 0, &crtc_pet40);
 }
 
 DRIVER_INIT( cbm80 )
@@ -537,7 +510,6 @@ DRIVER_INIT( cbm80 )
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
 	pet80_vh_init();
-	crtc6845_config( 0, &crtc_pet80);
 }
 
 DRIVER_INIT( superpet )
@@ -552,7 +524,6 @@ DRIVER_INIT( superpet )
 	memory_set_bank(1, 0);
 
 	superpet_vh_init();
-	crtc6845_config( 0, &crtc_pet80);
 }
 
 MACHINE_RESET( pet )

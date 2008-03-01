@@ -103,3 +103,7 @@ MC6845_UPDATE_ROW( pet80_update_row )
 	}
 }
 
+void pet_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+{
+}
+

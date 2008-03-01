@@ -125,8 +125,10 @@ when problems start with -log and look into error.log file
 #include "includes/cbmieeeb.h"
 /*#include "includes/vc1541.h" */
 
+static mc6845_t	*mc6845;
+
 static ADDRESS_MAP_START(pet_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size )
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size )
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
@@ -136,13 +138,13 @@ static ADDRESS_MAP_START(pet_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pet40_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size )
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size )
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe880) AM_WRITE( crtc6845_0_address_w )
-	AM_RANGE(0xe881, 0xe881) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
+	AM_RANGE(0xe880, 0xe880) AM_WRITE( pet_mc6845_address_w )
+	AM_RANGE(0xe881, 0xe881) AM_READWRITE(pet_mc6845_register_r, pet_mc6845_register_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -158,8 +160,8 @@ static ADDRESS_MAP_START( pet80_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe880) AM_WRITE( crtc6845_0_address_w )
-	AM_RANGE(0xe881, 0xe881) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
+	AM_RANGE(0xe880, 0xe880) AM_WRITE( pet_mc6845_address_w )
+	AM_RANGE(0xe881, 0xe881) AM_READWRITE(pet_mc6845_register_r, pet_mc6845_register_w)
 #endif
 	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_BANK8)
 	AM_RANGE(0xf000, 0xffef) AM_WRITE(MWA8_BANK8)
@@ -189,8 +191,8 @@ static ADDRESS_MAP_START( superpet_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe880) AM_WRITE(crtc6845_0_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
+	AM_RANGE(0xe880, 0xe880) AM_WRITE(pet_mc6845_address_w)
+	AM_RANGE(0xe881, 0xe881) AM_READWRITE(pet_mc6845_register_r, pet_mc6845_register_w)
 	/* 0xefe0, 0xefe3, mos 6702 */
 	/* 0xeff0, 0xeff3, acia6551 */
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
@@ -205,8 +207,8 @@ static ADDRESS_MAP_START( superpet_m6809_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xe820, 0xe823) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xe840, 0xe84f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xe880, 0xe880) AM_WRITE(crtc6845_0_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
+	AM_RANGE(0xe880, 0xe880) AM_WRITE(pet_mc6845_address_w)
+	AM_RANGE(0xe881, 0xe881) AM_READWRITE(pet_mc6845_register_r, pet_mc6845_register_w)
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -476,12 +478,6 @@ static const unsigned char pet_palette[] =
 	0,0x80,0, /* green */
 };
 
-static const unsigned short pet_colortable[][2] = {
-	{ 0, 1 },
-	/* reverse */
-	{ 1, 0 }
-};
-
 static const gfx_layout pet_charlayout =
 {
 	8,8,
@@ -529,9 +525,54 @@ static GFXDECODE_START( superpet )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x3000, pet80_charlayout, 0, 1 )
 GFXDECODE_END
 
+static const mc6845_interface crtc_pet40 = {
+	0,
+	XTAL_17_73447MHz/3,			/* This is a wild guess and mostly likely incorrect */
+	8,
+	NULL,
+	pet40_update_row,
+	NULL,
+	pet_display_enable_changed,
+	NULL,
+	NULL
+};
+
+static const mc6845_interface crtc_pet80 = {
+	0,
+	XTAL_12MHz / 2,			/* This is a wild guess and mostly likely incorrect */
+	16,
+	NULL,
+	pet80_update_row,
+	NULL,
+	pet_display_enable_changed,
+	NULL,
+	NULL
+};
+
 static PALETTE_INIT( pet )
 {
 	palette_set_colors_rgb(machine, 0, pet_palette, sizeof(pet_palette) / 3);
+}
+
+static VIDEO_START( pet_crtc ) {
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
+}
+
+static VIDEO_UPDATE( pet_crtc ) {
+	mc6845_update(mc6845, bitmap, cliprect);
+	return 0;
+}
+
+READ8_HANDLER( pet_mc6845_register_r ) {
+	return mc6845_register_r( mc6845 );
+}
+
+WRITE8_HANDLER( pet_mc6845_register_w ) {
+	mc6845_register_w( mc6845, data );
+}
+
+WRITE8_HANDLER( pet_mc6845_address_w ) {
+	mc6845_address_w( mc6845, data );
 }
 
 /* basic 1 */
@@ -815,7 +856,12 @@ static MACHINE_DRIVER_START( pet40 )
 	MDRV_IMPORT_FROM( pet )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( pet40_mem, 0 )
-	MDRV_VIDEO_UPDATE( crtc6845 )
+
+	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_CONFIG( crtc_pet40 )
+
+	MDRV_VIDEO_START( pet_crtc )
+	MDRV_VIDEO_UPDATE( pet_crtc )
 MACHINE_DRIVER_END
 
 
@@ -837,8 +883,13 @@ static MACHINE_DRIVER_START( pet80 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 250)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
+
+	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_CONFIG( crtc_pet80 )
+
 	MDRV_GFXDECODE( pet80 )
-	MDRV_VIDEO_UPDATE( crtc6845 )
+	MDRV_VIDEO_START( pet_crtc )
+	MDRV_VIDEO_UPDATE( pet_crtc )
 MACHINE_DRIVER_END
 
 
@@ -861,8 +912,6 @@ static MACHINE_DRIVER_START( superpet )
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(50)
-
-    /* video hardware */
 	MDRV_GFXDECODE( superpet )
 MACHINE_DRIVER_END
 

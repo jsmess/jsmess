@@ -9,6 +9,9 @@
 
 #include "video/mc6845.h"
 
+READ8_HANDLER( pet_mc6845_register_r );
+WRITE8_HANDLER( pet_mc6845_register_w );
+WRITE8_HANDLER( pet_mc6845_address_w );
 
 /*----------- defined in video/pet.c -----------*/
 
@@ -19,6 +22,7 @@ void superpet_vh_init (void);
 VIDEO_UPDATE( pet );
 MC6845_UPDATE_ROW( pet40_update_row );
 MC6845_UPDATE_ROW( pet80_update_row );
+void pet_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled);
 
 extern int pet_font;
 
