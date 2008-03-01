@@ -13,6 +13,26 @@
 
 static UINT8 *ram;
 static UINT8 p1, p2;
+static size_t	cart_size;
+
+static void odyssey2_switch_banks(void) {
+	switch ( cart_size ) {
+	case 12288:
+		/* 12KB cart support (for instance, KTAA as released) */
+		memory_set_bankptr( 1, memory_region(REGION_USER1) + (p1 & 0x03) * 0xC00 );
+		memory_set_bankptr( 2, memory_region(REGION_USER1) + (p1 & 0x03) * 0xC00 + 0x800 );
+		break;
+	case 16384:
+		/* 16KB cart support (for instance, full sized version KTAA) */
+		memory_set_bankptr( 1, memory_region(REGION_USER1) + (p1 & 0x03) * 0x1000 + 0x400 );
+		memory_set_bankptr( 2, memory_region(REGION_USER1) + (p1 & 0x03) * 0x1000 + 0xC00 );
+		break;
+	default:
+		memory_set_bankptr(1, memory_region(REGION_USER1) + (p1 & 0x03) * 0x800);
+		memory_set_bankptr(2, memory_region(REGION_USER1) + (p1 & 0x03) * 0x800 );
+		break;
+	}
+}
 
 DRIVER_INIT( odyssey2 )
 {
@@ -30,10 +50,9 @@ DRIVER_INIT( odyssey2 )
 MACHINE_RESET( odyssey2 )
 {
     /* jump to "last" bank, will work for all sizes due to being mirrored */
-    memory_set_bankptr(1, memory_region(REGION_USER1) + 0x800*3);
-
     p1 = 0xFF;
     p2 = 0xFF;
+	odyssey2_switch_banks();
     return;
 }
 
@@ -99,8 +118,7 @@ WRITE8_HANDLER( odyssey2_putp1 )
 {
     p1 = data;
 
-    /* ROM is mirrored so this will be OK for all sizes 2k/4k/8k */
-    memory_set_bankptr(1, memory_region(REGION_USER1) + (0x800 * (p1 & 0x03)));
+	odyssey2_switch_banks();
 
     logerror("%.6f p1 written %.2x\n", attotime_to_double(timer_get_time()), data);
 }
@@ -167,9 +185,12 @@ WRITE8_HANDLER( odyssey2_putbus )
 
 int odyssey2_cart_verify(const UINT8 *cartdata, size_t size)
 {
+	cart_size = size;
     if (   (size == 2048)
         || (size == 4096)
-        || (size == 8192))
+        || (size == 8192)
+		|| (size == 12288)
+		|| (size == 16384))
     {
 		return IMAGE_VERIFY_PASS;
     }
