@@ -10,6 +10,7 @@
 */
 
 #include "driver.h"
+#include "video/mc6845.h"
 #include "includes/svi318.h"
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"
@@ -352,6 +353,18 @@ static MACHINE_DRIVER_START( svi318n )
 	MDRV_MACHINE_RESET( svi318 )
 MACHINE_DRIVER_END
 
+static const mc6845_interface svi806_crtc6845_interface = {
+	1,
+	3579545 /*?*/,
+	8 /*?*/,
+	NULL,
+	svi806_crtc6845_update_row,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( svi328_806 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD_TAG( "main", Z80, 3579545 )	/* 3.579545 Mhz */
@@ -379,6 +392,10 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_SCREEN_SIZE(640, 400)
 	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
+	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_CONFIG( svi806_crtc6845_interface )
+
+	MDRV_VIDEO_START( svi328_806 )
 	MDRV_VIDEO_UPDATE( svi328_806 )
 
 	/* Sound hardware */

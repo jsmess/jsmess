@@ -11,9 +11,9 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "mslegacy.h"
+#include "video/mc6845.h"
 #include "includes/svi318.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"
 #include "machine/uart8250.h"
@@ -60,6 +60,7 @@ typedef struct {
 static SVI_318 svi;
 static UINT8 *pcart;
 static UINT32 pcart_rom_size;
+static mc6845_t	*mc6845;
 
 static void svi318_set_banks (void);
 
@@ -429,7 +430,7 @@ DEVICE_LOAD( svi318_floppy )
 	return INIT_PASS;
 }
 
-static MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
+MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 {
 	int i;
 
@@ -446,32 +447,13 @@ static MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 	}
 }
 
-static const mc6845_interface svi806_crtc6845_interface = {
-	1,
-	3579545 /*?*/,
-	8 /*?*/,
-	NULL,
-	svi806_crtc6845_update_row,
-	NULL,
-	NULL
-};
-
 static void svi806_set_crtc_register(UINT8 reg, UINT8 data) {
-	crtc6845_0_address_w(0, reg);
-	crtc6845_0_register_w(0, data);
+	mc6845_address_w(mc6845, reg);
+	mc6845_register_w(mc6845, data);
 }
 
-/* 80 column card init */
-static void svi318_80col_init(void)
-{
-	/* 2K RAM, but allocating 4KB to make banking easier */
-	/* The upper 2KB will be set to FFs and will never be written to */
-	svi.svi806_ram = new_memory_region( Machine, REGION_GFX2, 0x1000, 0 );
-	memset( svi.svi806_ram, 0x00, 0x800 );
-	memset( svi.svi806_ram + 0x800, 0xFF, 0x800 );
-	svi.svi806_gfx = memory_region(REGION_GFX1);
-	/* initialise 6845 */
-	crtc6845_config( 0, &svi806_crtc6845_interface);
+static TIMER_CALLBACK(svi318_80col_init_registers) {
+	cpuintrf_push_context( 0 );
 	/* set some default values for the 6845 controller */
 	svi806_set_crtc_register(  0, 109 );
 	svi806_set_crtc_register(  1,  80 );
@@ -489,21 +471,35 @@ static void svi318_80col_init(void)
 	svi806_set_crtc_register( 13,   0 );
 	svi806_set_crtc_register( 14,   0 );
 	svi806_set_crtc_register( 15,   0 );
+	cpuintrf_pop_context();
+}
+
+/* 80 column card init */
+static void svi318_80col_init(void)
+{
+	/* 2K RAM, but allocating 4KB to make banking easier */
+	/* The upper 2KB will be set to FFs and will never be written to */
+	svi.svi806_ram = new_memory_region( Machine, REGION_GFX2, 0x1000, 0 );
+	memset( svi.svi806_ram, 0x00, 0x800 );
+	memset( svi.svi806_ram + 0x800, 0xFF, 0x800 );
+	svi.svi806_gfx = memory_region(REGION_GFX1);
+
+	timer_set( attotime_zero, NULL, 0, svi318_80col_init_registers );
 }
 
 READ8_HANDLER( svi806_r )
 {
-	return crtc6845_0_register_r( offset );
+	return mc6845_register_r( mc6845 );
 }
 
 WRITE8_HANDLER( svi806_w )
 {
 	switch( offset ) {
 	case 0:
-		crtc6845_0_address_w( offset, data );
+		mc6845_address_w( mc6845, data );
 		break;
 	case 1:
-		crtc6845_0_register_w( offset, data );
+		mc6845_register_w( mc6845, data );
 		break;
 	}
 }
@@ -514,12 +510,18 @@ WRITE8_HANDLER( svi806_ram_enable_w )
 	svi318_set_banks();
 }
 
+VIDEO_START( svi328_806 ) {
+	VIDEO_START_CALL(tms9928a);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
+}
+
 VIDEO_UPDATE( svi328_806 )
 {
 	if ( screen == 0 )
 		VIDEO_UPDATE_CALL(tms9928a);
-	if ( screen == 1 )
-		VIDEO_UPDATE_CALL(crtc6845);
+	if ( screen == 1 ) {
+		mc6845_update(mc6845, bitmap, cliprect);
+	}
 	return 0;
 }
 
