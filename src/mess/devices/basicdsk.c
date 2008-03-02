@@ -588,7 +588,6 @@ void legacybasicdsk_device_getinfo(const device_class *devclass, UINT32 state, u
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_INIT:						info->init = device_init_basicdsk_floppy; break;
 		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = device_unload_basicdsk_floppy; break;
-		case MESS_DEVINFO_PTR_STATUS:					/* info->status = floppy_status; */ break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
