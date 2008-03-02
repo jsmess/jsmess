@@ -263,21 +263,9 @@ int apple2_get_bgcolor(void)
 	HIGH RESOLUTION GRAPHICS
 ***************************************************************************/
 
-struct drawtask_params
+static void apple2_hires_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
-	bitmap_t *bitmap;
 	const UINT8 *vram;
-	int beginrow;
-	int rowcount;
-	int columns;
-};
-
-static void apple2_hires_draw_task(struct drawtask_params *dtparams)
-{
-	bitmap_t *bitmap;
-	const UINT8 *vram;
-	int beginrow;
-	int endrow;
 	int row, col, b;
 	int offset;
 	int columns;
@@ -287,32 +275,40 @@ static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 	UINT32 w;
 	UINT16 *artifact_map_ptr;
 
-	bitmap		= dtparams->bitmap;
-	vram		= dtparams->vram;
-	beginrow	= dtparams->beginrow;
-	endrow		= dtparams->beginrow + dtparams->rowcount;
-	columns		= dtparams->columns;
+	/* sanity checks */
+	if (beginrow < cliprect->min_y)
+		beginrow = cliprect->min_y;
+	if (endrow > cliprect->max_y)
+		endrow = cliprect->max_y;
+	if (endrow < beginrow)
+		return;
+
+	vram		= a2_videoram + (page ? 0x4000 : 0x2000);
+	columns		= ((effective_a2() & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
 
 	vram_row[0] = 0;
 	vram_row[columns + 1] = 0;
 
-	assert((columns == 40) || (columns == 80));
-
-	for (row = beginrow; row < endrow; row++)
+	for (row = beginrow; row <= endrow; row++)
 	{
 		for (col = 0; col < 40; col++)
 		{
-			offset = compute_video_address(col, row / 8);
+			offset = compute_video_address(col, row / 8) | ((row & 7) << 10);
 
-			switch(columns) {
-			case 40:
-				vram_row[1+col] = vram[offset];
-				break;
+			switch(columns)
+			{
+				case 40:
+					vram_row[1+col] = vram[offset];
+					break;
 
-			case 80:
-				vram_row[1+(col*2)+0] = vram[offset + 0x10000];
-				vram_row[1+(col*2)+1] = vram[offset + 0x00000];
-				break;
+				case 80:
+					vram_row[1+(col*2)+0] = vram[offset + 0x10000];
+					vram_row[1+(col*2)+1] = vram[offset + 0x00000];
+					break;
+
+				default:
+					fatalerror("Invalid column count");
+					break;
 			}
 		}
 
@@ -350,26 +346,6 @@ static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 			}
 		}
 	}
-}
-
-static void apple2_hires_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
-{
-	struct drawtask_params dtparams;
-
-	if (beginrow < cliprect->min_y)
-		beginrow = cliprect->min_y;
-	if (endrow > cliprect->max_y)
-		endrow = cliprect->max_y;
-	if (endrow < beginrow)
-		return;
-
-	dtparams.vram = a2_videoram + (page ? 0x4000 : 0x2000);
-	dtparams.bitmap = bitmap;
-	dtparams.beginrow = beginrow;
-	dtparams.rowcount = (endrow + 1) - beginrow;
-	dtparams.columns = ((effective_a2() & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
-
-	apple2_hires_draw_task(&dtparams);
 }
 
 
