@@ -1444,9 +1444,9 @@ static void *apple2_fdc_init(int slot, applefdc_t fdc_type)
 	for (dev = Machine->devices; dev->type < IO_COUNT; dev++)
 	{
 		if (!strcmp(dev->tag, "sonydriv"))
-			apple2_fdc_has_35 = !dev->not_working;
+			apple2_fdc_has_35 = 1;
 		else if (!strcmp(dev->tag, "apple525driv"))
-			apple2_fdc_has_525 = !dev->not_working;
+			apple2_fdc_has_525 = 1;
 	}
 
 	applefdc_init(&intf);

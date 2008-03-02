@@ -1351,52 +1351,43 @@ static void prepare_menus(HWND wnd)
 		{
 			img = image_from_device_and_index(dev, i);
 
-			if (!dev->not_working)
-			{
-				new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
-				flags_for_exists = MF_STRING;
+			new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
+			flags_for_exists = MF_STRING;
 
-				if (!image_exists(img))
-					flags_for_exists |= MF_GRAYED;
+			if (!image_exists(img))
+				flags_for_exists |= MF_GRAYED;
 
-				flags_for_writing = flags_for_exists;
-				if (!image_is_writable(img))
-					flags_for_writing |= MF_GRAYED;
+			flags_for_writing = flags_for_exists;
+			if (!image_is_writable(img))
+				flags_for_writing |= MF_GRAYED;
 
-				sub_menu = CreateMenu();
-				append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		UI_mount);
+			sub_menu = CreateMenu();
+			append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		UI_mount);
 
-				if (dev->creatable)
-					append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	UI_create);
+			if (dev->creatable)
+				append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	UI_create);
 
-				append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
+			append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
 
 #if HAS_WAVE
-				if ((dev->type == IO_CASSETTE) && !strcmp(dev->file_extensions, "wav"))
-				{
-					cassette_state state;
-					state = image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED;
-					append_menu_uistring(sub_menu, MF_SEPARATOR, 0, -1);
-					append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	UI_pauseorstop);
-					append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			UI_play);
-					append_menu_uistring(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		UI_record);
-#if USE_TAPEDLG
-					append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_DIALOG,		UI_tapecontrol);
-#else
-					append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		UI_rewind);
-					append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	UI_fastforward);
-#endif
-				}
-#endif /* HAS_WAVE */
-				s = image_exists(img) ? image_filename(img) : ui_getstring(UI_emptyslot);
-				flags = MF_POPUP;
-			}
-			else
+			if ((dev->type == IO_CASSETTE) && !strcmp(dev->file_extensions, "wav"))
 			{
-				sub_menu = NULL;
-				s = "Not working";
-				flags = MF_DISABLED | MF_GRAYED;
+				cassette_state state;
+				state = image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED;
+				append_menu_uistring(sub_menu, MF_SEPARATOR, 0, -1);
+				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	UI_pauseorstop);
+				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			UI_play);
+				append_menu_uistring(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		UI_record);
+#if USE_TAPEDLG
+				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_DIALOG,		UI_tapecontrol);
+#else
+				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		UI_rewind);
+				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	UI_fastforward);
+#endif
 			}
+#endif /* HAS_WAVE */
+			s = image_exists(img) ? image_filename(img) : ui_getstring(UI_emptyslot);
+			flags = MF_POPUP;
 
 			snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%s: %s", image_typename_id(img), s);
 			append_menu_utf8(device_menu, flags, (UINT_PTR) sub_menu, buf);

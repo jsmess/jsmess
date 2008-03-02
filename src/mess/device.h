@@ -36,7 +36,6 @@ enum
 	MESS_DEVINFO_INT_MUST_BE_LOADED,
 	MESS_DEVINFO_INT_RESET_ON_LOAD,
 	MESS_DEVINFO_INT_LOAD_AT_INIT,
-	MESS_DEVINFO_INT_NOT_WORKING,
 	MESS_DEVINFO_INT_CREATE_OPTCOUNT,
 
 	MESS_DEVINFO_INT_DEV_SPECIFIC = 0x08000,					/* R/W: Device-specific values start here */
@@ -248,7 +247,6 @@ struct IODevice
 	unsigned int reset_on_load : 1;
 	unsigned int must_be_loaded : 1;
 	unsigned int load_at_init : 1;
-	unsigned int not_working : 1;
 
 	/* image handling callbacks */
 	device_init_handler init;

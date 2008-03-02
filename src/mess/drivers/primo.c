@@ -408,17 +408,16 @@ static void primo_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void primo_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_NOT_WORKING:					info->i = 1; break;
-
 		default:										cbmfloppy_device_getinfo(devclass, state, info); break;
 	}
 }
+#endif /* UNUSED_FUNCTION */
 
 SYSTEM_CONFIG_START( primoa )
 	CONFIG_DEVICE(primo_cassette_getinfo)
@@ -429,7 +428,7 @@ SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( primob )
 	CONFIG_IMPORT_FROM( primoa )
-	CONFIG_DEVICE(primo_floppy_getinfo)
+	//CONFIG_DEVICE(primo_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT     CONFIG COMPANY  FULLNAME */

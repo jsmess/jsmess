@@ -266,7 +266,6 @@ const struct IODevice *devices_allocate(const game_driver *gamedrv)
 			devices[i].reset_on_load		= mess_device_get_info_int(&devices[i].devclass, MESS_DEVINFO_INT_RESET_ON_LOAD) ? 1 : 0;
 			devices[i].must_be_loaded		= mess_device_get_info_int(&devices[i].devclass, MESS_DEVINFO_INT_MUST_BE_LOADED) ? 1 : 0;
 			devices[i].load_at_init			= mess_device_get_info_int(&devices[i].devclass, MESS_DEVINFO_INT_LOAD_AT_INIT) ? 1 : 0;
-			devices[i].not_working			= mess_device_get_info_int(&devices[i].devclass, MESS_DEVINFO_INT_NOT_WORKING) ? 1 : 0;
 
 			devices[i].init					= (device_init_handler) mess_device_get_info_fct(&devices[i].devclass, MESS_DEVINFO_PTR_INIT);
 			devices[i].exit					= (device_exit_handler) mess_device_get_info_fct(&devices[i].devclass, MESS_DEVINFO_PTR_EXIT);

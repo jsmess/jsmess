@@ -241,7 +241,6 @@ static void apple2gs_floppy525_getinfo(const device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_NOT_WORKING:					/* info->i = 1; */ break;
 		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:	info->i = 15; break;
 		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:	info->i = 16; break;
 
