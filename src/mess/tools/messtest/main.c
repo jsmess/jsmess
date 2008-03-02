@@ -80,8 +80,10 @@ int CLIB_DECL main(int argc, char *argv[])
 	/* test case for memory allocation system */
 	test_memory_pools();
 
+#ifdef WIN32
 	/* expand wildcards so '*' can be used */
 	expand_wildcards(&argc, &argv);
+#endif
 
 	test_count = 0;
 	failure_count = 0;
