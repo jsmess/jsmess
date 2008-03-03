@@ -277,7 +277,7 @@ VIDEO_UPDATE( laser )
 					sx = BORDER_H/2 + x * 8;
                     code = videoram[0x3800+offs];
 					drawgfx(bitmap,machine->gfx[0],code,color,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                        &machine->screen[0].visarea,TRANSPARENCY_PEN,0);
                 }
             }
         }
@@ -295,7 +295,7 @@ VIDEO_UPDATE( laser )
                     code = videoram[0x3800+offs];
                     color = videoram[0x3801+offs];
 					drawgfx(bitmap,machine->gfx[1],code,color,0,0,sx,sy,
-                        &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                        &machine->screen[0].visarea,TRANSPARENCY_PEN,0);
                 }
             }
         }
