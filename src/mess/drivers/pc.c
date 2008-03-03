@@ -1154,7 +1154,10 @@ static const struct YM3812interface ym3812_interface =
 
 static MACHINE_DRIVER_START( pcmda )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc8, pc8, V20, 4772720, pc_mda_frame_interrupt)	/* 4,77 Mhz */
+	MDRV_CPU_ADD_TAG("main", V20, 4772720)
+	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
+	MDRV_CPU_IO_MAP(pc8_io, 0)
+	MDRV_CPU_VBLANK_INT(pc_mda_frame_interrupt, 4)
 
 	MDRV_MACHINE_RESET(pc_mda)
 
