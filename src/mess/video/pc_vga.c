@@ -1137,9 +1137,6 @@ void pc_vga_init(const struct pc_vga_interface *vga_intf, const struct pc_svga_i
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc7fff, 0, 0, MRA8_ROM );
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc7fff, 0, 0, MWA8_ROM );
-
 			memory_install_read8_handler(0, vga.vga_intf.port_addressspace, vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, 0, 0, vga_port_03b0_r );
 			memory_install_read8_handler(0, vga.vga_intf.port_addressspace, vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, 0, 0, vga_port_03c0_r );
 			memory_install_read8_handler(0, vga.vga_intf.port_addressspace, vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, 0, 0, vga_port_03d0_r );
