@@ -323,7 +323,7 @@ static INTERRUPT_GEN( intv_interrupt2 )
 
 static MACHINE_DRIVER_START( intv )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", CP1610, 3579545/4)        /* Colorburst/4 */
+	MDRV_CPU_ADD_TAG("main", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MDRV_CPU_PROGRAM_MAP(intv_mem, 0)
 	MDRV_CPU_VBLANK_INT(intv_interrupt,1)
 	MDRV_INTERLEAVE(1)
@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( intv )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, 3579545/2)
+	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/2)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
@@ -357,16 +357,15 @@ static MACHINE_DRIVER_START( intvkbd )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(intvkbd_mem, 0)
 
-	MDRV_CPU_ADD(M6502, 3579545/2)	/* Colorburst/2 */
+	MDRV_CPU_ADD(M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(intv2_mem, 0)
-	MDRV_CPU_VBLANK_INT(intv_interrupt2,1)
+	MDRV_CPU_VBLANK_INT(intv_interrupt2, 1)
 
 	MDRV_INTERLEAVE(100)
 
     /* video hardware */
-	MDRV_GFXDECODE( intvkbd )
-	MDRV_VIDEO_START( intvkbd )
-	MDRV_VIDEO_UPDATE( intvkbd )
+	MDRV_GFXDECODE(intvkbd)
+	MDRV_VIDEO_UPDATE(intvkbd)
 MACHINE_DRIVER_END
 
 ROM_START(intv)

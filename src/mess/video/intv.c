@@ -747,13 +747,6 @@ void stic_screenrefresh(running_machine *machine)
 }
 
 
-VIDEO_START( intvkbd )
-{
-    VIDEO_START_CALL(generic_bitmapped);
-	VIDEO_START_CALL(intv);
-}
-
-
 /* very rudimentary support for the tms9927 character generator IC */
 
 static UINT8 tms9927_cursor_col;
