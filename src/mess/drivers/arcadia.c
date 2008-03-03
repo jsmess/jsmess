@@ -432,7 +432,7 @@ static int device_load_arcadia_cart(mess_image *image)
 	return INIT_PASS;
 }
 
-static void arcadia_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void arcadia_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

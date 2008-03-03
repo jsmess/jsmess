@@ -625,7 +625,7 @@ static MACHINE_DRIVER_START( gbcolor )
 	MDRV_PALETTE_INIT(gbc)
 MACHINE_DRIVER_END
 
-static void gameboy_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void gameboy_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -645,7 +645,7 @@ static void gameboy_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void gameboy_cartslot_getinfo_gb(const device_class *devclass, UINT32 state, union devinfo *info)
+static void gameboy_cartslot_getinfo_gb(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -701,7 +701,7 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END
 
-static void megaduck_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void megaduck_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

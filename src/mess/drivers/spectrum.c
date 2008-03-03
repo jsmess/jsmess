@@ -2279,7 +2279,7 @@ ROM_START(pentagon)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-static void spectrum_common_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void spectrum_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -2292,7 +2292,7 @@ static void spectrum_common_cassette_getinfo(const device_class *devclass, UINT3
 	}
 }
 
-static void spectrum_common_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void spectrum_common_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)
@@ -2307,7 +2307,7 @@ static void spectrum_common_snapshot_getinfo(const device_class *devclass, UINT3
 	}
 }
 
-static void spectrum_common_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void spectrum_common_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)
@@ -2333,7 +2333,7 @@ SYSTEM_CONFIG_START(spectrum)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
-static void specpls3_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void specpls3_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -2350,7 +2350,7 @@ SYSTEM_CONFIG_START(specpls3)
 	CONFIG_DEVICE(specpls3_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-static void ts2068_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ts2068_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

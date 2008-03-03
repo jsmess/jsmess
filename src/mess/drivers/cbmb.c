@@ -705,7 +705,7 @@ static DRIVER_INIT( cbm600hu )	{ cbm600hu_driver_init(); }
 static DRIVER_INIT( cbm600pal )	{ cbm600pal_driver_init(); }
 static DRIVER_INIT( cbm700 )	{ cbm700_driver_init(); }
 
-static void cbmb_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void cbmb_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -716,7 +716,7 @@ static void cbmb_cbmcartslot_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void cbmb_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void cbmb_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -742,7 +742,7 @@ SYSTEM_CONFIG_START(cbmb)
 #endif
 SYSTEM_CONFIG_END
 
-static void cbm500_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void cbm500_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

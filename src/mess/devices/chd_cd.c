@@ -211,7 +211,7 @@ chd_file *mess_cd_get_chd_file(mess_image *image)
  *
  *************************************/
 
-void cdrom_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void cdrom_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

@@ -372,7 +372,7 @@ static void device_display_cassette(mess_image *image)
 
 
 
-void cassette_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void cassette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	char *s;
 	int i;

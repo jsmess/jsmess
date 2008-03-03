@@ -1224,7 +1224,7 @@ static MACHINE_DRIVER_START( c128pal )
 	MDRV_SOUND_CONFIG(c128_sound_interface)
 MACHINE_DRIVER_END
 
-static void c128_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void c128_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -1235,7 +1235,7 @@ static void c128_cbmcartslot_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void c64_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void c64_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

@@ -1678,7 +1678,7 @@ ROM_START( dgone )
 	ROM_LOAD("cga.chr", 0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
 
-static void ibmpc_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ibmpc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -1693,7 +1693,7 @@ static void ibmpc_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	}
 }
 
-static void ibmpc_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ibmpc_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -1705,7 +1705,7 @@ static void ibmpc_printer_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void ibmpc_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ibmpc_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
 	switch(state)

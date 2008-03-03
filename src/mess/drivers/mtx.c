@@ -286,7 +286,7 @@ ROM_END
  *
  *************************************/
 
-static void mtx_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mtx_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -298,7 +298,7 @@ static void mtx_printer_getinfo(const device_class *devclass, UINT32 state, unio
 }
 
 
-static void mtx_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mtx_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

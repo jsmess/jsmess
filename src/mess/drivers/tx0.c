@@ -383,7 +383,7 @@ ROM_START(tx0_8kw)
 		/* space filled with our font */
 ROM_END
 
-static void tx0_punchtape_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tx0_punchtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* punchtape */
 	switch(state)
@@ -403,7 +403,7 @@ static void tx0_punchtape_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void tx0_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tx0_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -424,7 +424,7 @@ static void tx0_printer_getinfo(const device_class *devclass, UINT32 state, unio
 	}
 }
 
-static void tx0_magtape_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tx0_magtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* magtape */
 	switch(state)

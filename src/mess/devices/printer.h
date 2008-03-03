@@ -22,7 +22,7 @@ extern "C" {
 int printer_status(mess_image *img, int newstatus);
 void printer_output(mess_image *img, int data);
 
-void printer_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+void printer_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 #ifdef __cplusplus

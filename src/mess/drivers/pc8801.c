@@ -558,7 +558,7 @@ static MACHINE_DRIVER_START( pc88srh )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 MACHINE_DRIVER_END
 
-static void pc88_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pc88_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

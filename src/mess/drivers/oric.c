@@ -521,7 +521,7 @@ ROM_START(prav8dda)
     ROM_LOAD_OPTIONAL ("8ddoshi.rom",0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b))
 ROM_END
 
-static void oric_common_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void oric_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -537,7 +537,7 @@ static void oric_common_cassette_getinfo(const device_class *devclass, UINT32 st
 	}
 }
 
-static void oric_common_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void oric_common_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -554,7 +554,7 @@ SYSTEM_CONFIG_START(oric_common)
 	CONFIG_DEVICE(oric_common_printer_getinfo)
 SYSTEM_CONFIG_END
 
-static void oric1_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void oric1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -580,7 +580,7 @@ SYSTEM_CONFIG_START(oric1)
 	CONFIG_DEVICE(oric1_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-static void prav8_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void prav8_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

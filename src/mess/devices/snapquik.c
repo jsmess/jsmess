@@ -84,7 +84,7 @@ static void device_unload_snapquick(mess_image *image)
 
 /* ----------------------------------------------------------------------- */
 
-static void snapquick_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void snapquick_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -105,7 +105,7 @@ static void snapquick_device_getinfo(const device_class *devclass, UINT32 state,
 
 
 
-void snapshot_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void snapshot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -121,7 +121,7 @@ void snapshot_device_getinfo(const device_class *devclass, UINT32 state, union d
 
 
 
-void quickload_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void quickload_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

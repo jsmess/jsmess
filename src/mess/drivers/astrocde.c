@@ -206,7 +206,7 @@ ROM_START( astrocdw )
     ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf))
 ROM_END
 
-static void astrocde_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void astrocde_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

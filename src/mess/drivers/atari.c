@@ -860,7 +860,7 @@ ROM_START(a5200a)
 	ROM_LOAD("5200a.rom", 0xf800, 0x0800, CRC(c2ba2613) SHA1(1d2a3f00109d75d2d79fecb565775eb95b7d04d5))
 ROM_END
 
-static void atari_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void atari_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -884,7 +884,7 @@ SYSTEM_CONFIG_START(atari)
 	CONFIG_DEVICE(atari_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-static void a400_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void a400_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -909,7 +909,7 @@ SYSTEM_CONFIG_START(a400)
 	CONFIG_DEVICE(a400_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-static void a800_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void a800_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -934,7 +934,7 @@ SYSTEM_CONFIG_START(a800)
 	CONFIG_DEVICE(a800_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-static void a5200_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void a5200_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

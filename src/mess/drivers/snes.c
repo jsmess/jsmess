@@ -478,7 +478,7 @@ static MACHINE_DRIVER_START( snespal )
 	MDRV_SCREEN_RAW_PARAMS(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL)
 MACHINE_DRIVER_END
 
-static void snes_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void snes_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

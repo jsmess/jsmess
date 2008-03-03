@@ -42,7 +42,7 @@ const options_entry mess_core_options[] =
 	option, by device and index
 -------------------------------------------------*/
 
-const char *mess_get_device_option(const device_class *devclass, int device_index)
+const char *mess_get_device_option(const mess_device_class *devclass, int device_index)
 {
 	const char *result = NULL;
 	const char *dev_name;
@@ -66,13 +66,13 @@ const char *mess_get_device_option(const device_class *devclass, int device_inde
 -------------------------------------------------*/
 
 static void mess_enumerate_devices(core_options *opts, const game_driver *gamedrv,
-	void (*proc)(core_options *opts, const game_driver *gamedrv, const device_class *devclass, int device_index, int global_index))
+	void (*proc)(core_options *opts, const game_driver *gamedrv, const mess_device_class *devclass, int device_index, int global_index))
 {
 	struct SystemConfigurationParamBlock cfg;
 	device_getinfo_handler handlers[64];
 	int count_overrides[ARRAY_LENGTH(handlers)];
 	int i, j, count, index = 0;
-	device_class devclass;
+	mess_device_class devclass;
 
 	/* retrieve getinfo handlers */
 	memset(&cfg, 0, sizeof(cfg));
@@ -110,7 +110,7 @@ static void mess_enumerate_devices(core_options *opts, const game_driver *gamedr
 -------------------------------------------------*/
 
 static void add_device_options_for_device(core_options *opts, const game_driver *gamedrv,
-	const device_class *devclass, int device_index, int global_index)
+	const mess_device_class *devclass, int device_index, int global_index)
 {
 	options_entry this_entry[2];
 	const char *dev_name;
@@ -204,7 +204,7 @@ void mess_options_init(core_options *opts)
 -------------------------------------------------*/
 
 static void extract_device_options_for_device(core_options *opts, const game_driver *gamedrv,
-	const device_class *devclass, int device_index, int global_index)
+	const mess_device_class *devclass, int device_index, int global_index)
 {
 	mess_image *image;
 	iodevice_t dev_type;

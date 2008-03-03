@@ -369,7 +369,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 
 
-void ti99_ide_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void ti99_ide_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

@@ -26,7 +26,7 @@ struct apple525_disk
 	UINT8 track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
 };
 
-static const device_class parent_devclass = { floppy_device_getinfo, NULL };
+static const mess_device_class parent_devclass = { floppy_device_getinfo, NULL };
 static int apple525_enable_mask = 1;
 
 
@@ -316,7 +316,7 @@ static void device_unload_apple525_floppy(mess_image *image)
 
 
 
-void apple525_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void apple525_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

@@ -329,7 +329,7 @@ ROM_START(mz800)
 		ROM_LOAD("mz700fon.int",0x00000, 0x1000, CRC(42b9e8fb) SHA1(5128ad179a702f8e0bd9910a58bad8fbe4c20167))
 ROM_END
 
-static void mz700_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mz700_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

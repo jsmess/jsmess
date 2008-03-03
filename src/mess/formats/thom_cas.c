@@ -986,7 +986,7 @@ const struct CassetteFormat *const mo5_cassette_formats[] =
 
 /********************* devices ************************/
 
-void to7_cassette_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+void to7_cassette_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state )
 	{
@@ -1010,7 +1010,7 @@ void to7_cassette_getinfo( const device_class *devclass, UINT32 state, union dev
 }
 
 
-void mo5_cassette_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+void mo5_cassette_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state )
 	{

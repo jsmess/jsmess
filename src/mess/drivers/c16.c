@@ -796,7 +796,7 @@ DRIVER_INIT( plus4v )	{ c16_driver_init(); }
 DRIVER_INIT( c364 )		{ c16_driver_init(); }
 #endif
 
-static void c16cart_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void c16cart_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -813,7 +813,7 @@ static void c16cart_device_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void c16_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void c16_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

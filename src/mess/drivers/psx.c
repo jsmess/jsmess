@@ -918,7 +918,7 @@ ROM_START( psa )
 	ROMX_LOAD( "ps-41a.bin",    0x0000000, 0x080000, CRC(502224b6) SHA1(14df4f6c1e367ce097c11deae21566b4fe5647a9), ROM_BIOS(2) )
 ROM_END
 
-static void psx_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void psx_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)

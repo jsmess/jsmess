@@ -489,7 +489,7 @@ ROM_END
 
 #define rom_ti99_8e rom_ti99_8
 
-static void ti99_8_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_8_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -501,7 +501,7 @@ static void ti99_8_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void ti99_8_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_8_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -522,7 +522,7 @@ static void ti99_8_cartslot_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void ti99_8_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_8_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -537,7 +537,7 @@ static void ti99_8_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void ti99_8_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_8_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
 	switch(state)
@@ -560,7 +560,7 @@ static void ti99_8_harddisk_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void ti99_8_parallel_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_8_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* parallel */
 	switch(state)
@@ -581,7 +581,7 @@ static void ti99_8_parallel_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void ti99_8_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_8_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)
@@ -603,7 +603,7 @@ static void ti99_8_serial_getinfo(const device_class *devclass, UINT32 state, un
 }
 
 #if 0
-static void ti99_8_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_8_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)
@@ -626,7 +626,7 @@ static void ti99_8_quickload_getinfo(const device_class *devclass, UINT32 state,
 }
 #endif
 
-static void ti99_8_memcard_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_8_memcard_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* memcard */
 	switch(state)

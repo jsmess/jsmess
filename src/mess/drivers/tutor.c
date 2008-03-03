@@ -598,7 +598,7 @@ ROM_START(tutor)
 	ROM_LOAD("tutor2.bin", 0x8000, 0x4000, CRC(05f228f5) SHA1(46a14a45f6f9e2c30663a2b87ce60c42768a78d0))      /* BASIC ROM */
 ROM_END
 
-static void tutor_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tutor_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -617,7 +617,7 @@ static void tutor_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void tutor_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tutor_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -629,7 +629,7 @@ static void tutor_cassette_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void tutor_parallel_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tutor_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* parallel */
 	switch(state)

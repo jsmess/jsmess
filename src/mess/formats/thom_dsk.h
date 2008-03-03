@@ -36,7 +36,7 @@ extern DENSITY thom_floppy_get_density( void );
 
 extern thom_floppy_type thom_floppy_get_type( int drive );
 
-extern void thom_floppy_getinfo( const device_class *devclass,
+extern void thom_floppy_getinfo( const mess_device_class *devclass,
 				 UINT32 state, union devinfo *info );
 
 #endif

@@ -747,7 +747,7 @@ int amiga_fdc_status_r( void ) {
 
 
 
-void amiga_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void amiga_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

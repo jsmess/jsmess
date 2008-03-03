@@ -152,7 +152,7 @@ ROM_END
 ******************************************************************************/
 
 
-static void sym1_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sym1_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

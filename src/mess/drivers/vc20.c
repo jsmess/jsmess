@@ -781,7 +781,7 @@ static MACHINE_DRIVER_START( vc20v )
 #endif
 MACHINE_DRIVER_END
 
-static void cbmvc20_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void cbmvc20_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -799,7 +799,7 @@ static void cbmvc20_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void vc20_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vc20_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

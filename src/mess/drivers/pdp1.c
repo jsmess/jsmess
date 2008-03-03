@@ -427,7 +427,7 @@ ROM_START(pdp1)
 		/* space filled with our font */
 ROM_END
 
-static void pdp1_punchtape_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pdp1_punchtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* punchtape */
 	switch(state)
@@ -447,7 +447,7 @@ static void pdp1_punchtape_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void pdp1_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pdp1_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -468,7 +468,7 @@ static void pdp1_printer_getinfo(const device_class *devclass, UINT32 state, uni
 	}
 }
 
-static void pdp1_cylinder_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pdp1_cylinder_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cylinder */
 	switch(state)

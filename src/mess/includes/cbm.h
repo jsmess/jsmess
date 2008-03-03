@@ -27,7 +27,7 @@ extern "C" {
  * c128
  * c65*/
 
-void cbmcartslot_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 /**************************************************************************
  * Logging

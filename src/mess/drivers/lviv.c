@@ -449,7 +449,7 @@ static MACHINE_DRIVER_START( lviv )
 MACHINE_DRIVER_END
 
 
-static void lviv_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void lviv_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -467,7 +467,7 @@ static void lviv_cassette_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void lviv_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void lviv_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)

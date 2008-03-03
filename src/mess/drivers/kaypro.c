@@ -267,7 +267,7 @@ ROM_START (kaypro)
     ROM_LOAD ("cpm62k.sys",   0x0000, 0x1600, CRC(d10cd036) SHA1(68c04701711fcb5ac1586eb8f060f3f0e02ba3dd))
 ROM_END
 
-static void kaypro_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void kaypro_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

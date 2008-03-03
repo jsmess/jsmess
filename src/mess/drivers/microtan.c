@@ -260,7 +260,7 @@ ROM_START( microtan )
     // initialized in init_microtan
 ROM_END
 
-static void microtan_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void microtan_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -272,7 +272,7 @@ static void microtan_cassette_getinfo(const device_class *devclass, UINT32 state
 	}
 }
 
-static void microtan_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void microtan_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)
@@ -290,7 +290,7 @@ static void microtan_snapshot_getinfo(const device_class *devclass, UINT32 state
 	}
 }
 
-static void microtan_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void microtan_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)

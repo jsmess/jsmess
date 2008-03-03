@@ -210,7 +210,7 @@ INPUT_PORTS_END
 
 /* ------------ cartridge ------------ */
 
-static void to7_cartridge_getinfo( const device_class *devclass,  UINT32 state, union devinfo *info )
+static void to7_cartridge_getinfo( const mess_device_class *devclass,  UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
 	case MESS_DEVINFO_INT_COUNT:
@@ -227,7 +227,7 @@ static void to7_cartridge_getinfo( const device_class *devclass,  UINT32 state, 
 	}
 }
 
-static void mo5_cartridge_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+static void mo5_cartridge_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
 	case MESS_DEVINFO_INT_COUNT:
@@ -247,7 +247,7 @@ static void mo5_cartridge_getinfo( const device_class *devclass, UINT32 state, u
 
 /* ------------ printer ------------ */
 
-static void thom_printer_getinfo ( const device_class *devclass, UINT32 state, union devinfo *info )
+static void thom_printer_getinfo ( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
 	case MESS_DEVINFO_INT_COUNT:
@@ -268,7 +268,7 @@ static const char *const thom_serial_names[3][3]=
 	{ "modem", "modm", "Modem" }
 };
 
-static void thom_serial_getinfo ( const device_class *devclass, UINT32 state, union devinfo *info )
+static void thom_serial_getinfo ( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state ) {
 	case MESS_DEVINFO_INT_COUNT:

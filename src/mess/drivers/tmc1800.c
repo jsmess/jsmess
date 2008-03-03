@@ -356,7 +356,7 @@ ROM_END
 
 /* System Configuration */
 
-static void tmc1800_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tmc1800_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -374,7 +374,7 @@ SYSTEM_CONFIG_START( tmc1800 )
 	CONFIG_DEVICE(tmc1800_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-static void tmc2000_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tmc2000_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

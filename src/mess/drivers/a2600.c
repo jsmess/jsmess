@@ -1999,7 +1999,7 @@ ROM_END
 
 #define rom_a2600p rom_a2600
 
-static void a2600_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void a2600_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -2019,7 +2019,7 @@ static void a2600_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void a2600_cassette_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
+static void a2600_cassette_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
 	case MESS_DEVINFO_INT_COUNT:
 		info->i = 1;

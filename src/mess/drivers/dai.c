@@ -222,7 +222,7 @@ ROM_START(dai)
 ROM_END
 
 
-static void dai_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void dai_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

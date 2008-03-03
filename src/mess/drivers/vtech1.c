@@ -394,7 +394,7 @@ ROM_END
  System Config
 ******************************************************************************/
 
-static void vtech1_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vtech1_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -406,7 +406,7 @@ static void vtech1_printer_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void vtech1_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vtech1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -421,7 +421,7 @@ static void vtech1_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void vtech1_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vtech1_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)
@@ -439,7 +439,7 @@ static void vtech1_snapshot_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void vtech1_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

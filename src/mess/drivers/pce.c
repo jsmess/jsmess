@@ -225,7 +225,7 @@ static void pce_partialhash(char *dest, const unsigned char *data,
 	}
 }
 
-static void pce_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pce_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -245,7 +245,7 @@ static void pce_cartslot_getinfo(const device_class *devclass, UINT32 state, uni
 	}
 }
 
-static void pce_chdcd_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
+static void pce_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
 	switch( state ) {
 	case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
 	default:						cdrom_device_getinfo(devclass, state, info);

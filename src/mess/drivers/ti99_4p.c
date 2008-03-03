@@ -303,7 +303,7 @@ ROM_START(ti99_4p)
 ROM_END
 
 #ifdef UNUSED_FUNCTION
-static void ti99_4p_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_4p_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -316,7 +316,7 @@ static void ti99_4p_cassette_getinfo(const device_class *devclass, UINT32 state,
 }
 #endif
 
-static void ti99_4p_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_4p_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -331,7 +331,7 @@ static void ti99_4p_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void ti99_4p_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_4p_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
 	switch(state)
@@ -353,7 +353,7 @@ static void ti99_4p_harddisk_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void ti99_4p_parallel_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_4p_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* parallel */
 	switch(state)
@@ -371,7 +371,7 @@ static void ti99_4p_parallel_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void ti99_4p_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_4p_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)
@@ -390,7 +390,7 @@ static void ti99_4p_serial_getinfo(const device_class *devclass, UINT32 state, u
 }
 
 #if 0
-static void ti99_4p_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_4p_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)
@@ -410,7 +410,7 @@ static void ti99_4p_quickload_getinfo(const device_class *devclass, UINT32 state
 }
 #endif
 
-static void ti99_4p_memcard_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti99_4p_memcard_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* memcard */
 	switch(state)

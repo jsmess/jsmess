@@ -263,7 +263,7 @@ ROM_START(apple1)
 	ROM_LOAD("apple1.vid", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
 ROM_END
 
-static void apple1_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apple1_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)
@@ -278,7 +278,7 @@ static void apple1_snapshot_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void apple1_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apple1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

@@ -179,7 +179,7 @@ ROM_START(mekd2)
 		/* space filled with key icons by mekd2_init_driver */
 ROM_END
 
-static void mekd2_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mekd2_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

@@ -452,7 +452,7 @@ ROM_START(trs80m4)
 	ROM_LOAD("trs80m1.chr", 0x0800, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
-static void trs80_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void trs80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -473,7 +473,7 @@ static void trs80_cassette_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void trs80_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void trs80_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)
@@ -497,7 +497,7 @@ SYSTEM_CONFIG_START(trs80)
 SYSTEM_CONFIG_END
 
 
-static void trs8012_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

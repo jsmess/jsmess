@@ -235,7 +235,7 @@ WRITE8_HANDLER(coco_vhd_io_w)
 
 
 
-void coco_vhd_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void coco_vhd_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

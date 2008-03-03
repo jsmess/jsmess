@@ -1095,7 +1095,7 @@ void vc20_tape_status (char *text, int size)
 
 
 
-void vc20tape_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void vc20tape_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

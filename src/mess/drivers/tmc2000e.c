@@ -203,7 +203,7 @@ ROM_END
 
 /* System Configuration */
 
-static void tmc2000e_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tmc2000e_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -215,7 +215,7 @@ static void tmc2000e_cassette_getinfo(const device_class *devclass, UINT32 state
 	}
 }
 
-static void tmc2000e_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tmc2000e_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -233,7 +233,7 @@ static void tmc2000e_floppy_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void tmc2000e_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tmc2000e_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)

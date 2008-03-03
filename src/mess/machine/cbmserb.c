@@ -402,7 +402,7 @@ void cbm_drive_1_status (char *text, int size)
 	cbm_drive_status (cbm_drive + 1, text, size);
 }
 
-void cbmfloppy_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void cbmfloppy_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

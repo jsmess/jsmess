@@ -1068,7 +1068,7 @@ MACHINE_DRIVER_START( cpu_c1571 )
 MACHINE_DRIVER_END
 
 
-void vc1541_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -1092,14 +1092,14 @@ void vc1541_device_getinfo(const device_class *devclass, UINT32 state, union dev
 
 
 
-void c2031_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void c2031_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	vc1541_device_getinfo(devclass, state, info);
 }
 
 
 
-void c1551_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void c1551_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -1112,7 +1112,7 @@ void c1551_device_getinfo(const device_class *devclass, UINT32 state, union devi
 
 
 
-void c1571_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void c1571_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	vc1541_device_getinfo(devclass, state, info);
 }

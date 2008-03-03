@@ -533,7 +533,7 @@ static int dsk_get_sectors_per_track(mess_image *img, int side)
 
 
 
-void legacydsk_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void legacydsk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

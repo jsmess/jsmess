@@ -193,7 +193,7 @@ ROM_START(3do_pal)
     ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, NO_DUMP, ROM_BIOS(3) )
 ROM_END
 
-static void chdcd_3do_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
+static void chdcd_3do_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
 	/* CHD CD-ROM */
 	switch( state ) {
 	case MESS_DEVINFO_INT_COUNT:		info->i = 1; break;

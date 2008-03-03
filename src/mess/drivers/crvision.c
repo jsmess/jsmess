@@ -511,7 +511,7 @@ static DEVICE_LOAD( crvision_cart )
 	return INIT_PASS;
 }
 
-static void crvision_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void crvision_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -530,7 +530,7 @@ static void crvision_cartslot_getinfo(const device_class *devclass, UINT32 state
 	}
 }
 
-static void crvision_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void crvision_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

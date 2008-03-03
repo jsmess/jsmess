@@ -344,7 +344,7 @@ static const struct CassetteOptions primo_cassette_options = {
 	22050		/* sample frequency */
 };
 
-static void primo_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void primo_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -363,7 +363,7 @@ static void primo_cassette_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void primo_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void primo_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)
@@ -378,7 +378,7 @@ static void primo_snapshot_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void primo_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void primo_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)
@@ -393,7 +393,7 @@ static void primo_quickload_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void primo_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -409,7 +409,7 @@ static void primo_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 }
 
 #ifdef UNUSED_FUNCTION
-static void primo_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void primo_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)

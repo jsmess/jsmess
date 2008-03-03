@@ -2007,7 +2007,7 @@ static DEVICE_LOAD( atarist_floppy )
 	return INIT_FAIL;
 }
 
-static void atarist_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void atarist_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -2025,7 +2025,7 @@ static void atarist_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void atarist_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void atarist_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -2056,7 +2056,7 @@ static DEVICE_LOAD( atarist_serial )
 	return INIT_FAIL;
 }
 
-static void atarist_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void atarist_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)
@@ -2075,7 +2075,7 @@ static void atarist_serial_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void megaste_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void megaste_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)
@@ -2112,7 +2112,7 @@ static DEVICE_LOAD( atarist_cart )
 	return INIT_FAIL;
 }
 
-static void atarist_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+static void atarist_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch( state )
 	{

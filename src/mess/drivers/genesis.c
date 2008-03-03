@@ -318,7 +318,7 @@ ROM_START(megadrij)
 	ROM_REGION( 0x10000, REGION_CPU2, ROMREGION_ERASEFF)
 ROM_END
 
-static void genesis_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void genesis_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

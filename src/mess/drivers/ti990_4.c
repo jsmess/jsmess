@@ -321,7 +321,7 @@ static INPUT_PORTS_START(ti990_4)
 #endif
 INPUT_PORTS_END
 
-static void ti990_4_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti990_4_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

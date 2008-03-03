@@ -284,7 +284,7 @@ static INPUT_PORTS_START(ti990_10)
 	VDT911_KEY_PORTS
 INPUT_PORTS_END
 
-static void ti990_10_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti990_10_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
 	switch(state)
@@ -306,7 +306,7 @@ static void ti990_10_harddisk_getinfo(const device_class *devclass, UINT32 state
 	}
 }
 
-static void ti990_10_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti990_10_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

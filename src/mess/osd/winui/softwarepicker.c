@@ -33,7 +33,7 @@
 
 struct FileInfo
 {
-	device_class devclass;
+	mess_device_class devclass;
 
 	// hash information
 	char szHash[HASH_BUF_SIZE];
@@ -135,13 +135,13 @@ LPCSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex)
 
 
 
-device_class SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
+mess_device_class SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	if ((nIndex < 0) || (nIndex >= pPickerInfo->nIndexLength))
 	{
-		device_class dummy;
+		mess_device_class dummy;
 		memset(&dummy, 0, sizeof(dummy));
 		return dummy;
 	}
@@ -169,7 +169,7 @@ int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCSTR pszFilename)
 iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
-	const device_class *devclass;
+	const mess_device_class *devclass;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	if ((nIndex < 0) || (nIndex >= pPickerInfo->nIndexLength))
@@ -395,7 +395,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	int nIndex, nSize, devindex;
 	LPCSTR pszExtension = NULL, s;
 	const struct IODevice *devices = NULL;
-	device_class devclass = {0,};
+	mess_device_class devclass = {0,};
 
 	// first check to see if it is already here
 	if (SoftwarePicker_LookupIndex(hwndPicker, pszFilename) >= 0)

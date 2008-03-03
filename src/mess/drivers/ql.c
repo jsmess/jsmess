@@ -1080,7 +1080,7 @@ static DEVICE_LOAD( ql_microdrive )
 	return INIT_FAIL;
 }
 
-static void ql_microdrive_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ql_microdrive_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -1119,7 +1119,7 @@ static DEVICE_LOAD( ql_serial )
 	return INIT_FAIL;
 }
 
-static void ql_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ql_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)
@@ -1154,7 +1154,7 @@ static DEVICE_LOAD( ql_cart )
 	return INIT_FAIL;
 }
 
-static void ql_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+static void ql_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch( state )
 	{

@@ -924,7 +924,7 @@ MACHINE_DRIVER_END
 #define rom_cbm80 rom_pet80
 #define rom_cbm80pal rom_pet80pal
 
-static void pet_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pet_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -935,7 +935,7 @@ static void pet_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void pet_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pet_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -952,7 +952,7 @@ static void pet_quickload_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void pet1_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pet1_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -989,7 +989,7 @@ SYSTEM_CONFIG_START(pet2)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END
 
-static void pet4_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pet4_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

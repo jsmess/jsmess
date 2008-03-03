@@ -684,7 +684,7 @@ ROM_START(apfm1000)
 	ROM_CART_LOAD(0, "bin", 0x8000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
-static void apfimag_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apfimag_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -699,7 +699,7 @@ static void apfimag_cassette_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void apfimag_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apfimag_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

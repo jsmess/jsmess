@@ -907,7 +907,7 @@ ROM_END
 
 /* System Configuration */
 
-static void abc800_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void abc800_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -919,7 +919,7 @@ static void abc800_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void abc800_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void abc800_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -937,7 +937,7 @@ static void abc800_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void abc800_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void abc800_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -968,7 +968,7 @@ static DEVICE_LOAD( abc800_serial )
 	return INIT_FAIL;
 }
 
-static void abc800_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void abc800_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)

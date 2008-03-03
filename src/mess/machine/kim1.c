@@ -908,7 +908,7 @@ WRITE8_HANDLER ( m6530_002_w )
 	m6530_w(1, offset, data);
 }
 
-void kim1_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void kim1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

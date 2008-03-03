@@ -484,7 +484,7 @@ ROM_START( sv328n80 )
 	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
-static void svi318_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void svi318_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -500,7 +500,7 @@ static void svi318_printer_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void svi318_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void svi318_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -521,7 +521,7 @@ static void svi318_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void svi318_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void svi318_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -553,7 +553,7 @@ static void svi318_cartslot_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void svi318_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void svi318_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

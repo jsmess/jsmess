@@ -422,7 +422,7 @@ ROM_START (cgenie)
 
 ROM_END
 
-static void cgenie_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void cgenie_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -440,7 +440,7 @@ static void cgenie_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void cgenie_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void cgenie_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

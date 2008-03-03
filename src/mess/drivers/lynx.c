@@ -390,7 +390,7 @@ static QUICKLOAD_LOAD( lynx )
 	return 0;
 }
 
-static void lynx_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void lynx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -409,7 +409,7 @@ static void lynx_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void lynx_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void lynx_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)

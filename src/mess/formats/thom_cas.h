@@ -24,7 +24,7 @@ extern void to7_set_cassette ( int i );
 
 CASSETTE_FORMATLIST_EXTERN( to7_cassette_formats );
 
-extern void to7_cassette_getinfo( const device_class *devclass,
+extern void to7_cassette_getinfo( const mess_device_class *devclass,
 				  UINT32 state, union devinfo *info );
 
 
@@ -40,7 +40,7 @@ extern void mo5_set_cassette ( int i );
 
 CASSETTE_FORMATLIST_EXTERN( mo5_cassette_formats );
 
-extern void mo5_cassette_getinfo( const device_class *devclass,
+extern void mo5_cassette_getinfo( const mess_device_class *devclass,
 				  UINT32 state, union devinfo *info );
 
 #endif

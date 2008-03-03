@@ -20,7 +20,7 @@ enum
 	DEVINFO_PTR_IDEDRIVE_INTERFACE = MESS_DEVINFO_PTR_DEV_SPECIFIC
 };
 
-void ide_harddisk_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+void ide_harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 #endif /* IDEDRIVE_H */

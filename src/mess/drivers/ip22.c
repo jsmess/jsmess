@@ -1551,7 +1551,7 @@ static const struct mips3_config config =
 	32768	/* data cache size */
 };
 
-static void ip22_chdcd_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ip22_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* CHD CD-ROM */
 	switch(state)
@@ -1564,7 +1564,7 @@ static void ip22_chdcd_getinfo(const device_class *devclass, UINT32 state, union
 }
 
 #ifdef UNUSED_FUNCTION
-static void ip22_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ip22_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
 	switch(state)

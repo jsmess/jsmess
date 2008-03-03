@@ -225,7 +225,7 @@ static QUICKLOAD_LOAD( vip )
 	return INIT_PASS;
 }
 
-static void vip_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vip_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)
@@ -240,7 +240,7 @@ static void vip_quickload_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void vip_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vip_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

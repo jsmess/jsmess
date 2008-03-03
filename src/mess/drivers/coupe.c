@@ -446,7 +446,7 @@ ROM_START(coupe)
 	ROM_LOAD("sam_rom1.rom", 0x4000, 0x4000, CRC(F031AED4) SHA1(a7f06facc6f0a3713215f4befc307914836706a4))
 ROM_END
 
-static void coupe_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

@@ -44,10 +44,10 @@ enum
 	DEVINFO_PTR_VC1541_CONFIG = MESS_DEVINFO_PTR_DEV_SPECIFIC
 };
 
-void vc1541_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
-void c2031_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
-void c1551_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
-void c1571_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+void c2031_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+void c1551_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+void c1571_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 MACHINE_DRIVER_EXTERN( cpu_vc1540 );
 MACHINE_DRIVER_EXTERN( cpu_vc1541 );

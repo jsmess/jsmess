@@ -1030,7 +1030,7 @@ ROM_PCW(pcw9256)
 ROM_PCW(pcw9512)
 ROM_PCW(pcw10)
 
-static void generic_pcw_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void generic_pcw_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

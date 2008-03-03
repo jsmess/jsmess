@@ -463,7 +463,7 @@ ROM_START (ti83p)
 	ROMX_LOAD( "ti83pv112.bin", 0x10000, 0x80000, CRC(ddca5026) SHA1(6615df5554076b6b81bd128bf847d2ff046e556b), ROM_BIOS(3) )
 ROM_END
 
-static void ti85_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti85_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)
@@ -478,7 +478,7 @@ static void ti85_snapshot_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void ti85_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)
@@ -505,7 +505,7 @@ SYSTEM_CONFIG_START(ti85)
 	CONFIG_DEVICE(ti85_snapshot_getinfo)
 SYSTEM_CONFIG_END
 
-static void ti86_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti86_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* snapshot */
 	switch(state)
@@ -520,7 +520,7 @@ static void ti86_snapshot_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void ti86_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ti86_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)

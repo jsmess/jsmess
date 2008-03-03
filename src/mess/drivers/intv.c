@@ -399,7 +399,7 @@ ROM_START(intvkbd)
 	ROM_LOAD( "4c52.u34",  0x0000, 0x0800, CRC(cbeb2e96) SHA1(f0e17adcd278fb376c9f90833c7fbbb60193dbe3))
 ROM_END
 
-static void intv_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void intv_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -423,7 +423,7 @@ SYSTEM_CONFIG_START(intv)
 	CONFIG_DEVICE(intv_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-static void intvkbd_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void intvkbd_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -442,7 +442,7 @@ static void intvkbd_cartslot_getinfo(const device_class *devclass, UINT32 state,
 }
 
 #ifdef UNUSED_FUNCTION
-static void intvkbd_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void intvkbd_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

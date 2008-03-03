@@ -630,7 +630,7 @@ static const struct CassetteOptions pmd85_cassette_options = {
 	7200		/* sample frequency */
 };
 
-static void pmd85_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void pmd85_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

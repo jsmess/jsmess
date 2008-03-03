@@ -1835,7 +1835,7 @@ static DEVICE_UNLOAD( x68k_floppy )
 	sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }
 
-static void x68k_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void x68k_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

@@ -17,7 +17,7 @@ BOOL CreateMessIcons(void);
 BOOL MessApproveImageList(HWND hParent, int nDriver);
 
 #ifdef UNUSED_FUNCTION
-void MessCopyDeviceOption(core_options *opts, const game_driver *gamedrv, const device_class *devclass, int device_index, int global_index);
+void MessCopyDeviceOption(core_options *opts, const game_driver *gamedrv, const mess_device_class *devclass, int device_index, int global_index);
 #endif
 
 #endif // __MESSUI_H__

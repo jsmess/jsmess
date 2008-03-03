@@ -160,7 +160,7 @@ static void device_unload_cartslot_specified(mess_image *image)
 
 
 
-void cartslot_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void cartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	const rom_entry *romrgn, *roment;
 	int position, count = 0, must_be_loaded = 0;

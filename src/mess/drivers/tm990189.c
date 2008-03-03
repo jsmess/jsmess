@@ -975,7 +975,7 @@ static INPUT_PORTS_START(tm990_189)
 
 INPUT_PORTS_END
 
-static void tm990_189_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tm990_189_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -987,7 +987,7 @@ static void tm990_189_cassette_getinfo(const device_class *devclass, UINT32 stat
 	}
 }
 
-static void tm990_189_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void tm990_189_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)

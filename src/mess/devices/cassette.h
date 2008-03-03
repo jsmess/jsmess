@@ -56,7 +56,7 @@ double cassette_get_length(mess_image *cassette);
 void cassette_seek(mess_image *cassette, double time, int origin);
 
 /* device specification */
-void cassette_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+void cassette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 #endif /* CASSETTE_H */

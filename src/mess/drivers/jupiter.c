@@ -199,7 +199,7 @@ ROM_START (jupiter)
 	ROM_LOAD ("jupiter.hi", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3))
 ROM_END
 
-static void jupiter_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void jupiter_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -217,7 +217,7 @@ static void jupiter_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void jupiter_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void jupiter_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

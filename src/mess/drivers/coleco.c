@@ -273,7 +273,7 @@ ROM_START (colecob)
 	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-static void coleco_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coleco_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

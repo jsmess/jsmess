@@ -686,7 +686,7 @@ ROM_START (adam)
 	//ROM_LOAD ("master68.rom", 0x0100, 0x0E4, CRC(619a47b8)) /* Replacement 6801 Master ROM */
 ROM_END
 
-static void adam_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void adam_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -698,7 +698,7 @@ static void adam_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void adam_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void adam_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

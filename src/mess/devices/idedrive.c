@@ -20,8 +20,8 @@ static void ide_get_params(mess_image *image, int *which_bus, int *which_address
 	device_load_handler *parent_load,
 	device_unload_handler *parent_unload)
 {
-	const device_class *devclass = &image_device(image)->devclass;
-	device_class parent_devclass;
+	const mess_device_class *devclass = &image_device(image)->devclass;
+	mess_device_class parent_devclass;
 
 	*which_bus = image_index_in_device(image);
 	*which_address = (int) mess_device_get_info_int(devclass, DEVINFO_INT_IDEDRIVE_ADDRESS);
@@ -121,7 +121,7 @@ static void ide_hd_unload(mess_image *image)
 	ide_hd_validity_check - check this device's validity
 -------------------------------------------------*/
 
-static int ide_hd_validity_check(const device_class *devclass)
+static int ide_hd_validity_check(const mess_device_class *devclass)
 {
 	int error = 0;
 	int which_address;
@@ -159,7 +159,7 @@ static int ide_hd_validity_check(const device_class *devclass)
 	ide_harddisk_device_getinfo - Get info proc
 -------------------------------------------------*/
 
-void ide_harddisk_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void ide_harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

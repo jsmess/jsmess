@@ -51,7 +51,7 @@
 #define LOG_SONY_EXTRA	0
 #endif
 
-static const device_class parent_devclass = { floppy_device_getinfo, NULL };
+static const mess_device_class parent_devclass = { floppy_device_getinfo, NULL };
 
 /*
 	These lines are normally connected to the PHI0-PHI3 lines of the IWM
@@ -503,7 +503,7 @@ static void device_unload_sonydriv_floppy(mess_image *image)
 
 
 
-void sonydriv_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void sonydriv_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

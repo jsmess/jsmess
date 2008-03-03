@@ -325,7 +325,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void mbee_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mbee_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -337,7 +337,7 @@ static void mbee_cassette_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void mbee_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mbee_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -355,7 +355,7 @@ static void mbee_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void mbee_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

@@ -929,7 +929,7 @@ static const struct bitbanger_config coco_bitbanger_config =
  *
  *************************************/
 
-static void coco_bitbanger_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coco_bitbanger_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* bitbanger port */
 	switch(state)
@@ -946,7 +946,7 @@ static void coco_bitbanger_getinfo(const device_class *devclass, UINT32 state, u
 
 
 
-static void coco_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coco_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -966,7 +966,7 @@ static void coco_cassette_getinfo(const device_class *devclass, UINT32 state, un
 
 
 
-static void coco_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coco_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -997,7 +997,7 @@ static void coco_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 
 
 
-static void coco_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coco_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -1017,7 +1017,7 @@ static void coco_cartslot_getinfo(const device_class *devclass, UINT32 state, un
 
 
 
-static void coco3_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coco3_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -1037,7 +1037,7 @@ static void coco3_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 
 
 
-static void coco_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coco_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -1053,7 +1053,7 @@ static void coco_snapshot_getinfo(const device_class *devclass, UINT32 state, un
 
 
 
-static void coco3_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void coco3_snapshot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -1073,7 +1073,7 @@ static void coco3_snapshot_getinfo(const device_class *devclass, UINT32 state, u
 *
 **************************************/
 
-static void dragon_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void dragon_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer port */
 	switch(state)

@@ -691,7 +691,7 @@ static FLOPPY_OPTIONS_START( sordm5 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static void sordm5_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sordm5_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -703,7 +703,7 @@ static void sordm5_printer_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void sordm5_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sordm5_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -725,7 +725,7 @@ SYSTEM_CONFIG_START(sordm5)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
-static void srdm5fd5_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void srdm5fd5_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

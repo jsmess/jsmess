@@ -591,7 +591,7 @@ static INPUT_PORTS_START( ip204415 )
 	PORT_BIT ( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static void ip20_chdcd_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ip20_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* CHD CD-ROM */
 	switch(state)

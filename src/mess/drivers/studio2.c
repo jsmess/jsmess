@@ -361,7 +361,7 @@ static DEVICE_LOAD( studio2_cart )
 	return INIT_PASS;
 }
 
-static void studio2_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+static void studio2_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch( state )
 	{

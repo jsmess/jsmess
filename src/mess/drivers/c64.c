@@ -779,7 +779,7 @@ MACHINE_DRIVER_END
 #define rom_max rom_ultimax
 #define rom_cbm4064 rom_pet64
 
-static void c64_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void c64_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -790,7 +790,7 @@ static void c64_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void c64_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void c64_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -820,7 +820,7 @@ SYSTEM_CONFIG_START(sx64)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 SYSTEM_CONFIG_END
 
-static void ultimax_cbmcartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void ultimax_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

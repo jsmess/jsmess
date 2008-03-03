@@ -2382,7 +2382,7 @@ ROM_START(hisaturn)
 ROM_END
 
 
-static void saturn_chdcd_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void saturn_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* CHD CD-ROM */
 	switch(state)

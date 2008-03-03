@@ -22,7 +22,7 @@ hard_disk_file *mess_hd_get_hard_disk_file(mess_image *image);
 hard_disk_file *mess_hd_get_hard_disk_file_by_number(int drivenum);
 chd_file *mess_hd_get_chd_file(mess_image *image);
 
-void harddisk_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+void harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 #endif /* MESS_HD_H */

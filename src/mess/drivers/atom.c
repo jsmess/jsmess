@@ -308,7 +308,7 @@ ROM_START (atomeb)
 	ROM_LOAD ("atomicw.rom",0x018000,0x1000, CRC(a3fd737d) SHA1(d418d9322c69c49106ed2c268ad0864c0f2c4c1b))
 ROM_END
 
-static void atom_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void atom_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -320,7 +320,7 @@ static void atom_cassette_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void atom_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void atom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -338,7 +338,7 @@ static void atom_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 	}
 }
 
-static void atom_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void atom_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -350,7 +350,7 @@ static void atom_printer_getinfo(const device_class *devclass, UINT32 state, uni
 	}
 }
 
-static void atom_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void atom_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)

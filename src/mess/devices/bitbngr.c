@@ -157,7 +157,7 @@ void bitbanger_output(mess_image *img, int value)
 
 
 
-void bitbanger_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void bitbanger_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

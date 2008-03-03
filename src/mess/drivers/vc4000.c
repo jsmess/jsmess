@@ -274,7 +274,7 @@ static DEVICE_LOAD( vc4000_cart )
 	return INIT_PASS;
 }
 
-static void vc4000_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vc4000_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -330,7 +330,7 @@ QUICKLOAD_LOAD(vc4000)
 	return INIT_PASS;
 }
 
-static void vc4000_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void vc4000_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)

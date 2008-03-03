@@ -767,7 +767,7 @@ ROM_START(apple2cp)
 ROM_END
 
 
-static void apple2_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

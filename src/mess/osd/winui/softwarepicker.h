@@ -5,7 +5,7 @@
 //============================================================
 
 LPCSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex);
-device_class SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex);
+mess_device_class SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex);
 int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCSTR pszFilename);
 iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex);
 BOOL SoftwarePicker_AddFile(HWND hwndPicker, LPCSTR pszFilename);

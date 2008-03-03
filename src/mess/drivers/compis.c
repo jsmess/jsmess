@@ -240,7 +240,7 @@ ROM_START (compis)
      ROM_LOAD ("compis.rom", 0xf0000, 0x10000, CRC(89877688) SHA1(7daa1762f24e05472eafc025879da90fe61d0225))
 ROM_END
 
-static void compis_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void compis_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -252,7 +252,7 @@ static void compis_printer_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void compis_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void compis_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

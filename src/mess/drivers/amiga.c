@@ -509,7 +509,7 @@ SYSTEM_CONFIG_START(a1000)
 	CONFIG_DEVICE(amiga_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-static void cdtv_cd_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void cdtv_cd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* CHD CD-ROM */
 	switch(state)

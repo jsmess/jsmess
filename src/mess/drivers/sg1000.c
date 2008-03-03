@@ -689,7 +689,7 @@ static DEVICE_LOAD( sg1000_cart )
 	return INIT_PASS;
 }
 
-static void sg1000_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+static void sg1000_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch( state )
 	{
@@ -749,7 +749,7 @@ static DEVICE_LOAD( sc3000_cart )
 	return INIT_PASS;
 }
 
-static void sc3000_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+static void sc3000_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch( state )
 	{
@@ -762,7 +762,7 @@ static void sc3000_cartslot_getinfo( const device_class *devclass, UINT32 state,
 	}
 }
 
-static void sc3000_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sc3000_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -772,7 +772,7 @@ static void sc3000_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void sc3000_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sc3000_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -782,7 +782,7 @@ static void sc3000_printer_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void sf7000_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sf7000_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -811,7 +811,7 @@ static DEVICE_LOAD( sf7000_floppy )
 	return INIT_FAIL;
 }
 
-static void sf7000_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sf7000_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
@@ -845,7 +845,7 @@ static DEVICE_LOAD( sf7000_serial )
 	return INIT_FAIL;
 }
 
-static void sf7000_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)

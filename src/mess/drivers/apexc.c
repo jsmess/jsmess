@@ -833,7 +833,7 @@ ROM_START(apexc)
 		/* space filled with our font */
 ROM_END
 
-static void apexc_cylinder_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apexc_cylinder_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cylinder */
 	switch(state)
@@ -855,7 +855,7 @@ static void apexc_cylinder_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void apexc_punchtape_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apexc_punchtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* punchtape */
 	switch(state)

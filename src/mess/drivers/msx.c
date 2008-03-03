@@ -2134,7 +2134,7 @@ MSX_LAYOUT_INIT (vg8020)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
-static void msx_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void msx_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -2152,7 +2152,7 @@ static void msx_floppy_getinfo(const device_class *devclass, UINT32 state, union
 	}
 }
 
-static void msx_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void msx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -2171,7 +2171,7 @@ static void msx_cartslot_getinfo(const device_class *devclass, UINT32 state, uni
 	}
 }
 
-static void msx_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void msx_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -2186,7 +2186,7 @@ static void msx_cassette_getinfo(const device_class *devclass, UINT32 state, uni
 	}
 }
 
-static void msx_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void msx_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)

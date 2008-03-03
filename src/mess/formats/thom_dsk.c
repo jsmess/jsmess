@@ -911,7 +911,7 @@ thom_floppy_type thom_floppy_get_type ( int drive )
 
 
 
-void thom_floppy_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+void thom_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
 {
 	switch ( state )
 	{

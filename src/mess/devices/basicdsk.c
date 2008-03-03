@@ -575,7 +575,7 @@ static void basicdsk_read_sector_data_into_buffer(mess_image *img, int side, int
 
 
 
-void legacybasicdsk_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+void legacybasicdsk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

@@ -261,7 +261,7 @@ ROM_START (g7400)
 	ROM_CART_LOAD(0, "bin", 0x0000, 0x4000, ROM_MIRROR)
 ROM_END
 
-static void odyssey2_cartslot_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void odyssey2_cartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

@@ -89,7 +89,7 @@ int device_typeid(const char *name)
 
 
 
-static const char *internal_device_instancename(const device_class *devclass, int id,
+static const char *internal_device_instancename(const mess_device_class *devclass, int id,
 	UINT32 base, const char *(*get_dev_typename)(iodevice_t))
 {
 	iodevice_t type;
@@ -119,14 +119,14 @@ static const char *internal_device_instancename(const device_class *devclass, in
 
 
 
-const char *device_instancename(const device_class *devclass, int id)
+const char *device_instancename(const mess_device_class *devclass, int id)
 {
 	return internal_device_instancename(devclass, id, MESS_DEVINFO_STR_NAME, device_typename);
 }
 
 
 
-const char *device_briefinstancename(const device_class *devclass, int id)
+const char *device_briefinstancename(const mess_device_class *devclass, int id)
 {
 	return internal_device_instancename(devclass, id, MESS_DEVINFO_STR_SHORT_NAME, device_brieftypename);
 }

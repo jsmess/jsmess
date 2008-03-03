@@ -76,7 +76,7 @@ static MACHINE_DRIVER_START( pokemini )
 #endif
 MACHINE_DRIVER_END
 
-static void pokemini_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
+static void pokemini_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
 	case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
 	case MESS_DEVINFO_INT_MUST_BE_LOADED:	info->i = 0; break;

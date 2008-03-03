@@ -425,7 +425,7 @@ done:
 
 
 // this is a wrapper call to wrap the idiosycracies of SetSelectedSoftware()
-static void InternalSetSelectedSoftware(int nGame, const device_class *devclass, int device_inst, const char *pszSoftware)
+static void InternalSetSelectedSoftware(int nGame, const mess_device_class *devclass, int device_inst, const char *pszSoftware)
 {
 	if (!pszSoftware)
 		pszSoftware = "";
@@ -440,7 +440,7 @@ static void InternalSetSelectedSoftware(int nGame, const device_class *devclass,
 
 
 // Places the specified image in the specified slot; nID = -1 means don't matter
-static void MessSpecifyImage(int nGame, const device_class *devclass, int nID, LPCSTR pszFilename)
+static void MessSpecifyImage(int nGame, const mess_device_class *devclass, int nID, LPCSTR pszFilename)
 {
 	const struct IODevice *devices;
 	const struct IODevice *dev;
@@ -498,7 +498,7 @@ static void MessSpecifyImage(int nGame, const device_class *devclass, int nID, L
 
 
 
-static void MessRemoveImage(int nGame, device_class devclass, LPCSTR pszFilename)
+static void MessRemoveImage(int nGame, mess_device_class devclass, LPCSTR pszFilename)
 {
 	int i, nPos;
 	const struct IODevice *devices;
@@ -967,7 +967,7 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem)
 {
 	int nGame;
-	device_class devclass;
+	mess_device_class devclass;
 	LPCSTR pszFullName;
 	HWND hwndList;
 
@@ -990,7 +990,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 	LPCSTR pszName;
 	LPSTR s;
 	int nGame;
-	device_class devclass;
+	mess_device_class devclass;
 	HWND hwndList;
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
@@ -1268,7 +1268,7 @@ static void SetupSoftwareTabView(void)
 
 
 #ifdef UNUSED_FUNCTION
-void MessCopyDeviceOption(core_options *opts, const game_driver *gamedrv, const device_class *devclass, int device_index, int global_index)
+void MessCopyDeviceOption(core_options *opts, const game_driver *gamedrv, const mess_device_class *devclass, int device_index, int global_index)
 {
 	const char *dev_name;
 	const char *opt_value;

@@ -299,7 +299,7 @@ static FLOPPY_OPTIONS_START(concept)
 #endif
 FLOPPY_OPTIONS_END
 
-static void concept_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void concept_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -314,7 +314,7 @@ static void concept_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
-static void concept_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void concept_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* Hard Drive */
 	switch(state)

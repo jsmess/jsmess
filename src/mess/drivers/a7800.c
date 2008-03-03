@@ -335,7 +335,7 @@ ROM_START (a7800p)
     ROM_LOAD ("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END
 
-static void a7800_ntsc_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void a7800_ntsc_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -360,7 +360,7 @@ SYSTEM_CONFIG_START(a7800_ntsc)
 	CONFIG_DEVICE(a7800_ntsc_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-static void a7800_pal_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void a7800_pal_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

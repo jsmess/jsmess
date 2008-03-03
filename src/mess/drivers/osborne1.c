@@ -181,7 +181,7 @@ ROM_START( osborne1 )
 	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
-static void osborne1_floppy_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
+static void osborne1_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
 	case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
 	case MESS_DEVINFO_PTR_LOAD:				info->load = device_load_osborne1_floppy; break;

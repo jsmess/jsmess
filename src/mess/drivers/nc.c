@@ -1722,7 +1722,7 @@ ROM_START(nc200)
         ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
 
-static void nc_common_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void nc_common_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -1734,7 +1734,7 @@ static void nc_common_printer_getinfo(const device_class *devclass, UINT32 state
 	}
 }
 
-static void nc_common_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void nc_common_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -1754,7 +1754,7 @@ static void nc_common_cartslot_getinfo(const device_class *devclass, UINT32 stat
 	}
 }
 
-static void nc_common_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void nc_common_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)
@@ -1787,7 +1787,7 @@ SYSTEM_CONFIG_START(nc100)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-static void nc200_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void nc200_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

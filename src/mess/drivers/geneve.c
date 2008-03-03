@@ -524,7 +524,7 @@ ROM_START(genmod)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 
-static void geneve_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void geneve_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -542,7 +542,7 @@ static void geneve_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void geneve_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void geneve_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
 	switch(state)
@@ -565,7 +565,7 @@ static void geneve_harddisk_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void geneve_parallel_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void geneve_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* parallel */
 	switch(state)
@@ -586,7 +586,7 @@ static void geneve_parallel_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-static void geneve_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void geneve_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
 	switch(state)
@@ -607,7 +607,7 @@ static void geneve_serial_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void geneve_memcard_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void geneve_memcard_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* memcard */
 	switch(state)

@@ -281,7 +281,7 @@ ROM_START( macclasc )
 	ROM_LOAD16_WORD( "classic.rom",  0x00000, 0x40000, CRC(b14ddcde) SHA1(f710e73e8e0f99d9d0e9e79e71f67a6c3648bf06) )
 ROM_END
 
-static void mac128512_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mac128512_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -293,7 +293,7 @@ static void mac128512_floppy_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void mac_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mac_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -305,7 +305,7 @@ static void mac_floppy_getinfo(const device_class *devclass, UINT32 state, union
 	}
 }
 
-static void mac_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void mac_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
 	switch(state)

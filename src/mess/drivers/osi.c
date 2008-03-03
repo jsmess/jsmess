@@ -468,7 +468,7 @@ static DEVICE_UNLOAD( sb2m600_cassette )
 	sb2m600_tape_index = 0;
 }
 
-static void sb2m600_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void sb2m600_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{

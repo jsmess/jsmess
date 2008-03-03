@@ -166,7 +166,7 @@ static DEVICE_LOAD(n64_cart)
 	return INIT_PASS;
 }
 
-static void n64_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void n64_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

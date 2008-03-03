@@ -140,7 +140,7 @@ void SetHashDirs(const char *paths)
 	options_set_string(MameUIGlobal(), OPTION_HASHPATH, paths, OPTION_PRIORITY_CMDLINE);
 }
 
-void SetSelectedSoftware(int driver_index, const device_class *devclass, int device_inst, const char *software)
+void SetSelectedSoftware(int driver_index, const mess_device_class *devclass, int device_inst, const char *software)
 {
 	const char *opt_name = device_instancename(devclass, device_inst);
 	core_options *o;
@@ -158,7 +158,7 @@ void SetSelectedSoftware(int driver_index, const device_class *devclass, int dev
 	options_free(o);
 }
 
-const char *GetSelectedSoftware(int driver_index, const device_class *devclass, int device_inst)
+const char *GetSelectedSoftware(int driver_index, const mess_device_class *devclass, int device_inst)
 {
 	const char *opt_name = device_instancename(devclass, device_inst);
 	const char *software;

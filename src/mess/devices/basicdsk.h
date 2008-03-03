@@ -53,7 +53,7 @@ void basicdsk_set_calcoffset(mess_image *img, unsigned long (*calcoffset)(UINT8 
 have a deleted data mark, if ddam==0, the sector will have a data mark */
 void basicdsk_set_ddam(mess_image *img, UINT8 physical_track, UINT8 physical_side, UINT8 sector_id,UINT8 ddam);
 
-void legacybasicdsk_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info);
+void legacybasicdsk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 #define CONFIG_DEVICE_FLOPPY_BASICDSK(count, file_extensions, load)		\
 	CONFIG_DEVICE_BASE(IO_FLOPPY, (count), (file_extensions), DEVICE_LOAD_RESETS_NONE,	\

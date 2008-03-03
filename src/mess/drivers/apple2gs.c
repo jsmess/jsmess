@@ -213,7 +213,7 @@ ROM_END
  * Floppy disk devices
  * ----------------------------------------------------------------------- */
 
-static void apple2gs_floppy35_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apple2gs_floppy35_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* 3.5" floppy */
 	switch(state)
@@ -235,7 +235,7 @@ static void apple2gs_floppy35_getinfo(const device_class *devclass, UINT32 state
 
 
 
-static void apple2gs_floppy525_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void apple2gs_floppy525_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* 5.25" floppy */
 	switch(state)

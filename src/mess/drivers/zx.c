@@ -528,7 +528,7 @@ static const struct CassetteOptions zx81_cassette_options = {
 	44100		/* sample frequency */
 };
 
-static void zx80_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void zx80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -553,7 +553,7 @@ SYSTEM_CONFIG_START(zx80)
 	CONFIG_RAM(16 * 1024)
 SYSTEM_CONFIG_END
 
-static void zx81_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void zx81_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)

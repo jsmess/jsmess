@@ -515,7 +515,7 @@ ROM_END
 
 /* System Configuration */
 
-static void abc80_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void abc80_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -528,7 +528,7 @@ static void abc80_printer_getinfo(const device_class *devclass, UINT32 state, un
 }
 
 #if 0
-static void abc80_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void abc80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	// cassette
 	switch(state)
@@ -544,7 +544,7 @@ static void abc80_cassette_getinfo(const device_class *devclass, UINT32 state, u
 }
 #endif
 
-static void abc80_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void abc80_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

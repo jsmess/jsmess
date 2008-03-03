@@ -168,7 +168,7 @@ static MACHINE_DRIVER_START( wscolor )
 	MDRV_PALETTE_INIT( wscolor )
 MACHINE_DRIVER_END
 
-static void wswan_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void wswan_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)

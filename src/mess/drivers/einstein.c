@@ -1768,7 +1768,7 @@ ROM_START(einstei2)
 	ROM_LOAD("charrom.rom",0x012000, 0x0800, NO_DUMP)
 ROM_END
 
-static void einstein_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void einstein_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
 	switch(state)
@@ -1780,7 +1780,7 @@ static void einstein_printer_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void einstein_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void einstein_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

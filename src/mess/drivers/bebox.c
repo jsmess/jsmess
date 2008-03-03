@@ -146,7 +146,7 @@ ROM_START(bebox2)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
-static void bebox_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void bebox_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -161,7 +161,7 @@ static void bebox_floppy_getinfo(const device_class *devclass, UINT32 state, uni
 	}
 }
 
-static void bebox_cdrom_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void bebox_cdrom_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cdrom */
 	switch(state)
@@ -173,7 +173,7 @@ static void bebox_cdrom_getinfo(const device_class *devclass, UINT32 state, unio
 	}
 }
 
-static void bebox_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void bebox_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
 	switch(state)

@@ -518,7 +518,7 @@ static QUICKLOAD_LOAD( jaguar )
 	return INIT_PASS;
 }
 
-static void jaguar_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void jaguar_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)

@@ -420,7 +420,7 @@ ROM_START(kc85_3)
 	ROM_LOAD("caos__e0.853", 0x12000, 0x2000, CRC(52bc2199) SHA1(207d3e1c4ebf82ac7553ed0a0850b627b9796d4b))
 ROM_END
 
-static void kc85_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void kc85_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
@@ -432,7 +432,7 @@ static void kc85_cassette_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
-static void kc85_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void kc85_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)
@@ -453,7 +453,7 @@ SYSTEM_CONFIG_START(kc85)
 	CONFIG_DEVICE(kc85_quickload_getinfo)
 SYSTEM_CONFIG_END
 
-static void kc85d_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void kc85d_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)

@@ -1047,7 +1047,7 @@ static QUICKLOAD_LOAD( super80 )
 	return INIT_PASS;
 }
 
-static void super80_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void super80_quickload_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* quickload */
 	switch(state)
@@ -1081,7 +1081,7 @@ static DEVICE_LOAD( super80_cart )
 	return INIT_PASS;
 }
 
-static void super80_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void super80_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
@@ -1099,7 +1099,7 @@ static void super80_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
-static void super80_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+static void super80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
 	switch(state)
