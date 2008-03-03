@@ -96,7 +96,7 @@ typedef void (*device_getdispositions_handler)(const struct IODevice *dev, int i
 typedef void (*device_display_handler)(mess_image *image);
 typedef const char *(*device_getname_handler)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
 
-struct _device_class;
+struct _mess_device_class;
 
 union devinfo
 {
@@ -119,12 +119,12 @@ union devinfo
 	device_display_handler display;
 	device_getname_handler name;
 
-	int (*validity_check)(const struct _device_class *devclass);
+	int (*validity_check)(const struct _mess_device_class *devclass);
 };
 
-typedef void (*device_getinfo_handler)(const struct _device_class *devclass, UINT32 state, union devinfo *info);
+typedef void (*device_getinfo_handler)(const struct _mess_device_class *devclass, UINT32 state, union devinfo *info);
 
-typedef struct _device_class
+typedef struct _mess_device_class
 {
 	device_getinfo_handler get_info;
 	const game_driver *gamedrv;
