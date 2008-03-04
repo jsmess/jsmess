@@ -127,9 +127,6 @@ static const UINT8 o2_shape[0x40][8]={
     { 0x00,0x00,0x00,0x10,0x38,0xFF,0x7E,0x00 }
 };
 
-static UINT8 *odyssey2_display;
-int odyssey2_vh_hpos;
-
 static union {
     UINT8 reg[0x100];
     struct {
@@ -529,10 +526,6 @@ VIDEO_START( odyssey2 )
 {
 	o2_snd_shift[0] = machine->sample_rate / 983;
 	o2_snd_shift[1] = machine->sample_rate / 3933;
-
-	odyssey2_vh_hpos = 0;
-	odyssey2_display = (UINT8 *) auto_malloc(8 * 8 * 256);
-	memset(odyssey2_display, 0, 8 * 8 * 256);
 
 	start_vpos = I824X_START_Y;
 	start_vblank = I824X_START_Y + I824X_SCREEN_HEIGHT;
