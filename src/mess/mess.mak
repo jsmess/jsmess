@@ -990,7 +990,6 @@ $(MESSOBJ)/pmd85.a:   \
 $(MESSOBJ)/magnavox.a: \
 	$(MESS_MACHINE)/odyssey2.o \
 	$(MESS_VIDEO)/odyssey2.o \
-	$(MESS_AUDIO)/odyssey2.o \
 	$(MESS_DRIVERS)/odyssey2.o
 
 $(MESSOBJ)/teamconc.a: \

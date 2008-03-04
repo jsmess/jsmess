@@ -43,13 +43,7 @@ WRITE8_HANDLER ( odyssey2_video_w );
 
 void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length );
 
-
-/*----------- defined in audio/odyssey2.c -----------*/
-
-extern sound_stream *odyssey2_sh_channel;
 extern const struct CustomSound_interface odyssey2_sound_interface;
-void *odyssey2_sh_start(int clock, const struct CustomSound_interface *config);
-
 
 /*----------- defined in machine/odyssey2.c -----------*/
 

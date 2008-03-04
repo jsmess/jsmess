@@ -169,6 +169,8 @@ static bitmap_t		*tmp_bitmap;
 static int			start_vpos;
 static int			start_vblank;
 
+static sound_stream *odyssey2_sh_channel;
+
 
 PALETTE_INIT( odyssey2 )
 {
@@ -553,6 +555,17 @@ VIDEO_UPDATE( odyssey2 )
 
 	return 0;
 }
+
+static void *odyssey2_sh_start(int clock, const struct CustomSound_interface *config)
+{
+	odyssey2_sh_channel = stream_create(0, 1, Machine->sample_rate, 0, odyssey2_sh_update );
+	return (void *) ~0;
+}
+
+const struct CustomSound_interface odyssey2_sound_interface =
+{
+	odyssey2_sh_start
+};
 
 void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length )
 {
