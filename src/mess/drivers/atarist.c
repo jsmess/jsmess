@@ -16,6 +16,7 @@
 #include "machine/wd17xx.h"
 #include "sound/ay8910.h"
 #include "audio/lmc1992.h"
+#include "includes/atarist.h"
 
 /*
 
@@ -45,6 +46,22 @@
 #define U517	XTAL_16MHz
 #define Y200	XTAL_2_4576MHz
 #define Y700	XTAL_10MHz
+
+/* Multi Function Peripheral */
+
+static READ16_HANDLER( atarist_mfp_r )
+{
+	atarist_state *state = Machine->driver_data;
+
+	return mc68901_register_r(state->mfp, offset);
+}
+
+static WRITE16_HANDLER( atarist_mfp_w )
+{
+	atarist_state *state = Machine->driver_data;
+
+	if (ACCESSING_LSB) mc68901_register_w(state->mfp, offset, data & 0xff);
+}
 
 /* Floppy Disk Controller */
 
@@ -470,10 +487,12 @@ static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
 
 static emu_timer *dmasound_timer;
 
-static void atariste_dmasound_set_state(int state)
+static void atariste_dmasound_set_state(int level)
 {
-	dmasound.active = state;
-	mfp68901_tai_w(0, state);
+	atarist_state *state = Machine->driver_data;
+
+	dmasound.active = level;
+	mc68901_tai_w(state->mfp, level);
 
 	if (state == 0)
 	{
@@ -846,7 +865,7 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
-	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(atarist_mfp_r, atarist_mfp_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
@@ -883,7 +902,7 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(atarist_blitter_count_y_r, atarist_blitter_count_y_w)
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(atarist_mfp_r, atarist_mfp_w)
 //  AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
@@ -891,6 +910,7 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
@@ -940,7 +960,7 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff9216, 0xff9217) AM_READ_PORT("PADDLE1Y")
 	AM_RANGE(0xff9220, 0xff9221) AM_READ_PORT("GUNX")
 	AM_RANGE(0xff9222, 0xff9223) AM_READ_PORT("GUNY")
-	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(atarist_mfp_r, atarist_mfp_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
@@ -988,7 +1008,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(atarist_mfp_r, atarist_mfp_w)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE(megaste_scc8530_r, megaste_scc8530_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
@@ -1046,7 +1066,7 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(stbook_lcd_contrast_r, stbook_lcd_contrast_w)
     AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(stbook_power_r, stbook_power_w)
     AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(stbook_reference_r, stbook_reference_w)*/
-	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(atarist_mfp_r, atarist_mfp_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
@@ -1377,9 +1397,11 @@ static READ8_HANDLER( mfp_gpio_r )
 
     */
 
+	atarist_state *state = Machine->driver_data;
+
 	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
 
-	mfp68901_tai_w(0, data & 0x01);
+	mc68901_tai_w(state->mfp, data & 0x01);
 
 	data |= (acia_irq << 4);
 	data |= (fdc.irq << 5);
@@ -1390,27 +1412,29 @@ static READ8_HANDLER( mfp_gpio_r )
 
 static int atarist_int_ack(int line)
 {
+	atarist_state *state = Machine->driver_data;
+
 	if (line == MC68000_IRQ_6)
 	{
-		return mfp68901_get_vector(0);
+		return mc68901_get_vector(state->mfp);
 	}
 
 	return MC68000_INT_ACK_AUTOVECTOR;
 }
 
-static void mfp_interrupt(int which, int state)
+static void mfp_interrupt(mc68901_t *chip, int state)
 {
 	cpunum_set_input_line(Machine, 0, MC68000_IRQ_6, state);
 }
 
 static UINT8 mfp_rx, mfp_tx;
 
-static const mfp68901_interface mfp_intf =
+static const mc68901_interface mfp_intf =
 {
 	Y2/8,
 	Y1,
-	MFP68901_TDO_LOOPBACK,
-	MFP68901_TDO_LOOPBACK,
+	MC68901_TDO_LOOPBACK,
+	MC68901_TDO_LOOPBACK,
 	&mfp_rx,
 	&mfp_tx,
 	NULL,
@@ -1497,6 +1521,8 @@ static void atarist_state_save(void)
 
 static MACHINE_START( atarist )
 {
+	atarist_state *state = machine->driver_data;
+
 	atarist_configure_memory();
 	atarist_state_save();
 
@@ -1504,7 +1530,7 @@ static MACHINE_START( atarist )
 	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
-	mfp68901_config(0, &mfp_intf);
+	state->mfp = devtag_get_token(machine, MC68901, "mfp");
 
 	cpunum_set_irq_callback(0, atarist_int_ack);
 }
@@ -1546,12 +1572,12 @@ static READ8_HANDLER( atariste_mfp_gpio_r )
 	return data;
 }
 
-static const mfp68901_interface atariste_mfp_intf =
+static const mc68901_interface atariste_mfp_intf =
 {
 	Y2/8,
 	Y1,
-	MFP68901_TDO_LOOPBACK,
-	MFP68901_TDO_LOOPBACK,
+	MC68901_TDO_LOOPBACK,
+	MC68901_TDO_LOOPBACK,
 	&mfp_rx,
 	&mfp_tx,
 	NULL,
@@ -1585,6 +1611,8 @@ static void atariste_state_save(void)
 
 static MACHINE_START( atariste )
 {
+	atarist_state *state = machine->driver_data;
+
 	atarist_configure_memory();
 	atariste_state_save();
 
@@ -1592,7 +1620,7 @@ static MACHINE_START( atariste )
 	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
-	mfp68901_config(0, &atariste_mfp_intf);
+	state->mfp = devtag_get_token(machine, MC68901, "mfp");
 
 	cpunum_set_irq_callback(0, atarist_int_ack);
 
@@ -1703,12 +1731,12 @@ static READ8_HANDLER( stbook_mfp_gpio_r )
 	return data;
 }
 
-static const mfp68901_interface stbook_mfp_intf =
+static const mc68901_interface stbook_mfp_intf =
 {
 	Y2/8,
 	Y1,
-	MFP68901_TDO_LOOPBACK,
-	MFP68901_TDO_LOOPBACK,
+	MC68901_TDO_LOOPBACK,
+	MC68901_TDO_LOOPBACK,
 	&mfp_rx,
 	&mfp_tx,
 	NULL,
@@ -1719,6 +1747,8 @@ static const mfp68901_interface stbook_mfp_intf =
 
 static MACHINE_START( stbook )
 {
+	atarist_state *state = machine->driver_data;
+
 	stbook_configure_memory();
 	atariste_state_save();
 
@@ -1729,13 +1759,15 @@ static MACHINE_START( stbook )
 	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
 	acia6850_config(0, &stbook_acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
-	mfp68901_config(0, &stbook_mfp_intf);
+	state->mfp = devtag_get_token(machine, MC68901, "mfp");
 	rp5c15_init(&rtc_intf);
 
 	cpunum_set_irq_callback(0, atarist_int_ack);
 }
 
 static MACHINE_DRIVER_START( atarist )
+	MDRV_DRIVER_DATA(atarist_state)
+
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(st_map, 0)
@@ -1745,6 +1777,11 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
 	MDRV_MACHINE_START(atarist)
+
+	// device hardware
+
+	MDRV_DEVICE_ADD("mfp", MC68901)
+	MDRV_DEVICE_CONFIG(mfp_intf)
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1772,6 +1809,8 @@ static MACHINE_DRIVER_START( megast )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atariste )
+	MDRV_DRIVER_DATA(atarist_state)
+
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(ste_map, 0)
@@ -1781,6 +1820,11 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
 	MDRV_MACHINE_START(atariste)
+
+	// device hardware
+
+	MDRV_DEVICE_ADD("mfp", MC68901)
+	MDRV_DEVICE_CONFIG(atariste_mfp_intf)
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1815,6 +1859,8 @@ static MACHINE_DRIVER_START( megaste )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( stbook )
+	MDRV_DRIVER_DATA(atarist_state)
+
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M68000, U517/2)
 	MDRV_CPU_PROGRAM_MAP(stbook_map, 0)
@@ -1822,6 +1868,11 @@ static MACHINE_DRIVER_START( stbook )
 	//MDRV_CPU_ADD(COP888, Y700)
 
 	MDRV_MACHINE_START(stbook)
+
+	// device hardware
+
+	MDRV_DEVICE_ADD("mfp", MC68901)
+	MDRV_DEVICE_CONFIG(stbook_mfp_intf)
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", LCD)

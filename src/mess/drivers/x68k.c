@@ -139,6 +139,7 @@
 #include "devices/basicdsk.h"
 #include "includes/x68k.h"
 
+mc68901_t *x68k_mfp;
 
 struct x68k_system sys;
 
@@ -935,6 +936,11 @@ static READ16_HANDLER( x68k_sysport_r )
 	}
 }
 
+static READ16_HANDLER( x68k_mfp_r )
+{
+	return mc68901_register_r(x68k_mfp, offset);
+}
+
 /*
 READ16_HANDLER( x68k_mfp_r )
 {
@@ -998,6 +1004,7 @@ READ16_HANDLER( x68k_mfp_r )
     }
 }
 */
+
 static WRITE16_HANDLER( x68k_mfp_w )
 {
 	/* For the Interrupt registers, the bits are set out as such:
@@ -1120,7 +1127,7 @@ static WRITE16_HANDLER( x68k_mfp_w )
 		}
 		break;
 	default:
-		mfp68901_0_register_lsb_w(offset,data,mem_mask);
+		if (ACCESSING_LSB) mc68901_register_w(x68k_mfp, offset, data & 0xff);
 		return;
 	}
 }
@@ -1409,12 +1416,13 @@ static READ8_HANDLER(mfp_gpio_r)
 	data &= ~(sys.crtc.hblank << 7);
 	data &= ~(sys.crtc.vblank << 4);
 	data |= 0x23;  // GPIP5 is unused, always 1
-	mfp68901_tai_w(0,sys.crtc.vblank);
+
+//	mc68901_tai_w(mfp, sys.crtc.vblank);
 
 	return data;
 }
 
-static void mfp_irq_callback(int which, int state)
+static void mfp_irq_callback(mc68901_t *chip, int state)
 {
 	static int prev;
 	if(prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
@@ -1465,7 +1473,7 @@ static int x68k_int_ack(int line)
 //              sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
 //      }
 		sys.mfp.current_irq = -1;
-		current_vector[6] = mfp68901_get_vector(0);
+		current_vector[6] = mc68901_get_vector(x68k_mfp);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],line);
 		return current_vector[6];
 	}
@@ -1495,7 +1503,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(mfp68901_0_register_lsb_r, x68k_mfp_w)
+	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE(x68k_rtc_r, x68k_rtc_w)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
@@ -1517,11 +1525,11 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static const mfp68901_interface mfp_interface =
+static const mc68901_interface mfp_interface =
 {
 	2000000, // 4MHz clock
 	4000000,
-	MFP68901_TDO_LOOPBACK,
+	MC68901_TDO_LOOPBACK,
 	0,
 	&mfp_key,  // Rx
 	NULL,      // Tx
@@ -1933,6 +1941,8 @@ static MACHINE_START( x68000 )
 	// start mouse timer
 	timer_adjust_periodic(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
 	sys.mouse.inputtype = 0;
+
+	x68k_mfp = devtag_get_token(machine, MC68901, "mfp");
 }
 
 static DRIVER_INIT( x68000 )
@@ -1969,7 +1979,6 @@ static DRIVER_INIT( x68000 )
 
 	memset(&sys,0,sizeof(sys));
 
-	mfp68901_config(0,&mfp_interface);
 	cpunum_set_irq_callback(0, x68k_int_ack);
 
 	// init keyboard
@@ -1992,6 +2001,10 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_MACHINE_START( x68000 )
 	MDRV_MACHINE_RESET( x68000 )
+
+	/* device hardware */
+	MDRV_DEVICE_ADD("mfp", MC68901)
+	MDRV_DEVICE_CONFIG(mfp_interface)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

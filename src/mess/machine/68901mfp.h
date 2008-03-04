@@ -1,12 +1,29 @@
-#ifndef MFP68901_H
-#define MFP68901_H
+/**********************************************************************
+
+    Motorola MC68901 Multi Function Peripheral emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+#ifndef __MC68901__
+#define __MC68901__
 
 #include "driver.h"
-#include "cpu/m68000/m68000.h"
 
-#define MAX_MFP	4
+typedef struct _mc68901_t mc68901_t;
+typedef struct _mc68901_interface mc68901_interface;
 
-typedef struct
+#define MC68901_TAO_LOOPBACK	-1
+#define MC68901_TBO_LOOPBACK	-2
+#define MC68901_TCO_LOOPBACK	-3
+#define MC68901_TDO_LOOPBACK	-4
+
+#define MC68901 DEVICE_GET_INFO_NAME( mc68901 )
+
+/* interface */
+struct _mc68901_interface
 {
 	int	chip_clock;
 	int	timer_clock;
@@ -15,219 +32,28 @@ typedef struct
 
 	UINT8 *rx_pin, *tx_pin;
 
-	void (*to_w)(int which, int timer, int value);
+	void (*to_w)(mc68901_t *chip, int timer, int value);
 
-	void (*irq_callback)(int which, int state);
+	void (*irq_callback)(mc68901_t *chip, int state);
 
 	read8_handler gpio_r;
 	write8_handler gpio_w;
-} mfp68901_interface;
-
-enum
-{
-	MFP68901_REGISTER_GPIP = 0,
-	MFP68901_REGISTER_AER,
-	MFP68901_REGISTER_DDR,
-	MFP68901_REGISTER_IERA,
-	MFP68901_REGISTER_IERB,
-	MFP68901_REGISTER_IPRA,
-	MFP68901_REGISTER_IPRB,
-	MFP68901_REGISTER_ISRA,
-	MFP68901_REGISTER_ISRB,
-	MFP68901_REGISTER_IMRA,
-	MFP68901_REGISTER_IMRB,
-	MFP68901_REGISTER_VR,
-	MFP68901_REGISTER_TACR,
-	MFP68901_REGISTER_TBCR,
-	MFP68901_REGISTER_TCDCR,
-	MFP68901_REGISTER_TADR,
-	MFP68901_REGISTER_TBDR,
-	MFP68901_REGISTER_TCDR,
-	MFP68901_REGISTER_TDDR,
-	MFP68901_REGISTER_SCR,
-	MFP68901_REGISTER_UCR,
-	MFP68901_REGISTER_RSR,
-	MFP68901_REGISTER_TSR,
-	MFP68901_REGISTER_UDR
 };
 
-enum
-{
-	MFP68901_INT_GPI0 = 0,
-	MFP68901_INT_GPI1,
-	MFP68901_INT_GPI2,
-	MFP68901_INT_GPI3,
-	MFP68901_INT_TIMER_D,
-	MFP68901_INT_TIMER_C,
-	MFP68901_INT_GPI4,
-	MFP68901_INT_GPI5,
-	MFP68901_INT_TIMER_B,
-	MFP68901_INT_XMIT_ERROR,
-	MFP68901_INT_XMIT_BUFFER_EMPTY,
-	MFP68901_INT_RCV_ERROR,
-	MFP68901_INT_RCV_BUFFER_FULL,
-	MFP68901_INT_TIMER_A,
-	MFP68901_INT_GPI6,
-	MFP68901_INT_GPI7
-};
+/* device interface */
+DEVICE_GET_INFO( mc68901 );
 
-enum
-{
-	MFP68901_GPIP_0 = 0,
-	MFP68901_GPIP_1,
-	MFP68901_GPIP_2,
-	MFP68901_GPIP_3,
-	MFP68901_GPIP_4,
-	MFP68901_GPIP_5,
-	MFP68901_GPIP_6,
-	MFP68901_GPIP_7
-};
+/* read from MFP register */
+UINT8 mc68901_register_r(mc68901_t *chip, int reg);
+/* write to MFP register */
+void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data);
 
-enum
-{
-	MFP68901_TIMER_A = 0,
-	MFP68901_TIMER_B,
-	MFP68901_TIMER_C,
-	MFP68901_TIMER_D,
-	MFP68901_MAX_TIMERS
-};
+/* write to MFP Timer A input */
+void mc68901_tai_w(mc68901_t *chip, int value);
+/* write to MFP Timer B input */
+void mc68901_tbi_w(mc68901_t *chip, int value);
 
-enum
-{
-	MFP68901_SERIAL_START = 0,
-	MFP68901_SERIAL_DATA,
-	MFP68901_SERIAL_PARITY,
-	MFP68901_SERIAL_STOP
-};
-
-enum
-{
-	MFP68901_XMIT_OFF = 0,
-	MFP68901_XMIT_STARTING,
-	MFP68901_XMIT_ON,
-	MFP68901_XMIT_BREAK,
-	MFP68901_XMIT_STOPPING
-};
-
-#define MFP68901_TAO_LOOPBACK			-1
-#define MFP68901_TBO_LOOPBACK			-2
-#define MFP68901_TCO_LOOPBACK			-3
-#define MFP68901_TDO_LOOPBACK			-4
-
-#define MFP68901_AER_GPIP_0				0x01
-#define MFP68901_AER_GPIP_1				0x02
-#define MFP68901_AER_GPIP_2				0x04
-#define MFP68901_AER_GPIP_3				0x08
-#define MFP68901_AER_GPIP_4				0x10
-#define MFP68901_AER_GPIP_5				0x20
-#define MFP68901_AER_GPIP_6				0x40
-#define MFP68901_AER_GPIP_7				0x80
-
-#define MFP68901_VR_S					0x08
-
-#define MFP68901_IR_GPIP_0				0x0001
-#define MFP68901_IR_GPIP_1				0x0002
-#define MFP68901_IR_GPIP_2				0x0004
-#define MFP68901_IR_GPIP_3				0x0008
-#define MFP68901_IR_TIMER_D				0x0010
-#define MFP68901_IR_TIMER_C				0x0020
-#define MFP68901_IR_GPIP_4				0x0040
-#define MFP68901_IR_GPIP_5				0x0080
-#define MFP68901_IR_TIMER_B				0x0100
-#define MFP68901_IR_XMIT_ERROR			0x0200
-#define MFP68901_IR_XMIT_BUFFER_EMPTY	0x0400
-#define MFP68901_IR_RCV_ERROR			0x0800
-#define MFP68901_IR_RCV_BUFFER_FULL		0x1000
-#define MFP68901_IR_TIMER_A				0x2000
-#define MFP68901_IR_GPIP_6				0x4000
-#define MFP68901_IR_GPIP_7				0x8000
-
-#define MFP68901_TCR_TIMER_STOPPED		0x00
-#define MFP68901_TCR_TIMER_DELAY_4		0x01
-#define MFP68901_TCR_TIMER_DELAY_10		0x02
-#define MFP68901_TCR_TIMER_DELAY_16		0x03
-#define MFP68901_TCR_TIMER_DELAY_50		0x04
-#define MFP68901_TCR_TIMER_DELAY_64		0x05
-#define MFP68901_TCR_TIMER_DELAY_100	0x06
-#define MFP68901_TCR_TIMER_DELAY_200	0x07
-#define MFP68901_TCR_TIMER_EVENT		0x08
-#define MFP68901_TCR_TIMER_PULSE_4		0x09
-#define MFP68901_TCR_TIMER_PULSE_10		0x0a
-#define MFP68901_TCR_TIMER_PULSE_16		0x0b
-#define MFP68901_TCR_TIMER_PULSE_50		0x0c
-#define MFP68901_TCR_TIMER_PULSE_64		0x0d
-#define MFP68901_TCR_TIMER_PULSE_100	0x0e
-#define MFP68901_TCR_TIMER_PULSE_200	0x0f
-#define MFP68901_TCR_TIMER_RESET		0x10
-
-#define MFP68901_UCR_PARITY_ENABLED		0x04
-#define MFP68901_UCR_PARITY_EVEN		0x02
-#define MFP68901_UCR_PARITY_ODD			0x00
-#define MFP68901_UCR_WORD_LENGTH_8		0x00
-#define MFP68901_UCR_WORD_LENGTH_7		0x20
-#define MFP68901_UCR_WORD_LENGTH_6		0x40
-#define MFP68901_UCR_WORD_LENGTH_5		0x60
-#define MFP68901_UCR_START_STOP_0_0		0x00
-#define MFP68901_UCR_START_STOP_1_1		0x08
-#define MFP68901_UCR_START_STOP_1_15	0x10
-#define MFP68901_UCR_START_STOP_1_2		0x18
-#define MFP68901_UCR_CLOCK_DIVIDE_16	0x80
-#define MFP68901_UCR_CLOCK_DIVIDE_1		0x00
-
-#define MFP68901_RSR_RCV_ENABLE			0x01
-#define MFP68901_RSR_SYNC_STRIP_ENABLE	0x02
-#define MFP68901_RSR_MATCH				0x04
-#define MFP68901_RSR_CHAR_IN_PROGRESS	0x04
-#define MFP68901_RSR_FOUND_SEARCH		0x08
-#define MFP68901_RSR_BREAK				0x08
-#define MFP68901_RSR_FRAME_ERROR		0x10
-#define MFP68901_RSR_PARITY_ERROR		0x20
-#define MFP68901_RSR_OVERRUN_ERROR		0x40
-#define MFP68901_RSR_BUFFER_FULL		0x80
-
-#define MFP68901_TSR_XMIT_ENABLE		0x01
-#define MFP68901_TSR_OUTPUT_HI_Z		0x00
-#define MFP68901_TSR_OUTPUT_LOW			0x02
-#define MFP68901_TSR_OUTPUT_HIGH		0x04
-#define MFP68901_TSR_OUTPUT_LOOP		0x06
-#define MFP68901_TSR_OUTPUT_MASK		0x06
-#define MFP68901_TSR_BREAK				0x08
-#define MFP68901_TSR_END_OF_XMIT		0x10
-#define MFP68901_TSR_AUTO_TURNAROUND	0x20
-#define MFP68901_TSR_UNDERRUN_ERROR		0x40
-#define MFP68901_TSR_BUFFER_EMPTY		0x80
-
-/* External Interface */
-
-void mfp68901_tai_w(int which, int value);
-void mfp68901_tbi_w(int which, int value);
-
-int mfp68901_get_vector(int which);
-
-void mfp68901_reset(int which);
-
-void mfp68901_config(int which, const mfp68901_interface *intf);
-
-/* Read/Write Handlers */
-
-READ16_HANDLER( mfp68901_0_register_msb_r );
-READ16_HANDLER( mfp68901_1_register_msb_r );
-READ16_HANDLER( mfp68901_2_register_msb_r );
-READ16_HANDLER( mfp68901_3_register_msb_r );
-
-READ16_HANDLER( mfp68901_0_register_lsb_r );
-READ16_HANDLER( mfp68901_1_register_lsb_r );
-READ16_HANDLER( mfp68901_2_register_lsb_r );
-READ16_HANDLER( mfp68901_3_register_lsb_r );
-
-WRITE16_HANDLER( mfp68901_0_register_msb_w );
-WRITE16_HANDLER( mfp68901_1_register_msb_w );
-WRITE16_HANDLER( mfp68901_2_register_msb_w );
-WRITE16_HANDLER( mfp68901_3_register_msb_w );
-
-WRITE16_HANDLER( mfp68901_0_register_lsb_w );
-WRITE16_HANDLER( mfp68901_1_register_lsb_w );
-WRITE16_HANDLER( mfp68901_2_register_lsb_w );
-WRITE16_HANDLER( mfp68901_3_register_lsb_w );
+/* get MFP interrupt vector */
+int mc68901_get_vector(mc68901_t *chip);
 
 #endif

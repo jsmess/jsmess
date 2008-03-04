@@ -15,7 +15,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
 #include "video/atarist.h"
-
+#include "includes/atarist.h"
 
 static struct SHIFTER
 {
@@ -161,7 +161,8 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 	if (de != shifter.de)
 	{
-		mfp68901_tbi_w(0, de);
+		atarist_state *state = machine->driver_data;
+		mc68901_tbi_w(state->mfp, de);
 		shifter.de = de;
 	}
 

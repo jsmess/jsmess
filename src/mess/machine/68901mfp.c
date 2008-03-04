@@ -34,11 +34,183 @@
 */
 
 #include "68901mfp.h"
+#include "cpu/m68000/m68000.h"
 
-
-typedef struct
+enum
 {
-	const mfp68901_interface *intf;
+	MC68901_REGISTER_GPIP = 0,
+	MC68901_REGISTER_AER,
+	MC68901_REGISTER_DDR,
+	MC68901_REGISTER_IERA,
+	MC68901_REGISTER_IERB,
+	MC68901_REGISTER_IPRA,
+	MC68901_REGISTER_IPRB,
+	MC68901_REGISTER_ISRA,
+	MC68901_REGISTER_ISRB,
+	MC68901_REGISTER_IMRA,
+	MC68901_REGISTER_IMRB,
+	MC68901_REGISTER_VR,
+	MC68901_REGISTER_TACR,
+	MC68901_REGISTER_TBCR,
+	MC68901_REGISTER_TCDCR,
+	MC68901_REGISTER_TADR,
+	MC68901_REGISTER_TBDR,
+	MC68901_REGISTER_TCDR,
+	MC68901_REGISTER_TDDR,
+	MC68901_REGISTER_SCR,
+	MC68901_REGISTER_UCR,
+	MC68901_REGISTER_RSR,
+	MC68901_REGISTER_TSR,
+	MC68901_REGISTER_UDR
+};
+
+enum
+{
+	MC68901_INT_GPI0 = 0,
+	MC68901_INT_GPI1,
+	MC68901_INT_GPI2,
+	MC68901_INT_GPI3,
+	MC68901_INT_TIMER_D,
+	MC68901_INT_TIMER_C,
+	MC68901_INT_GPI4,
+	MC68901_INT_GPI5,
+	MC68901_INT_TIMER_B,
+	MC68901_INT_XMIT_ERROR,
+	MC68901_INT_XMIT_BUFFER_EMPTY,
+	MC68901_INT_RCV_ERROR,
+	MC68901_INT_RCV_BUFFER_FULL,
+	MC68901_INT_TIMER_A,
+	MC68901_INT_GPI6,
+	MC68901_INT_GPI7
+};
+
+enum
+{
+	MC68901_GPIP_0 = 0,
+	MC68901_GPIP_1,
+	MC68901_GPIP_2,
+	MC68901_GPIP_3,
+	MC68901_GPIP_4,
+	MC68901_GPIP_5,
+	MC68901_GPIP_6,
+	MC68901_GPIP_7
+};
+
+enum
+{
+	MC68901_TIMER_A = 0,
+	MC68901_TIMER_B,
+	MC68901_TIMER_C,
+	MC68901_TIMER_D,
+	MC68901_MAX_TIMERS
+};
+
+enum
+{
+	MC68901_SERIAL_START = 0,
+	MC68901_SERIAL_DATA,
+	MC68901_SERIAL_PARITY,
+	MC68901_SERIAL_STOP
+};
+
+enum
+{
+	MC68901_XMIT_OFF = 0,
+	MC68901_XMIT_STARTING,
+	MC68901_XMIT_ON,
+	MC68901_XMIT_BREAK,
+	MC68901_XMIT_STOPPING
+};
+
+#define MC68901_AER_GPIP_0				0x01
+#define MC68901_AER_GPIP_1				0x02
+#define MC68901_AER_GPIP_2				0x04
+#define MC68901_AER_GPIP_3				0x08
+#define MC68901_AER_GPIP_4				0x10
+#define MC68901_AER_GPIP_5				0x20
+#define MC68901_AER_GPIP_6				0x40
+#define MC68901_AER_GPIP_7				0x80
+
+#define MC68901_VR_S					0x08
+
+#define MC68901_IR_GPIP_0				0x0001
+#define MC68901_IR_GPIP_1				0x0002
+#define MC68901_IR_GPIP_2				0x0004
+#define MC68901_IR_GPIP_3				0x0008
+#define MC68901_IR_TIMER_D				0x0010
+#define MC68901_IR_TIMER_C				0x0020
+#define MC68901_IR_GPIP_4				0x0040
+#define MC68901_IR_GPIP_5				0x0080
+#define MC68901_IR_TIMER_B				0x0100
+#define MC68901_IR_XMIT_ERROR			0x0200
+#define MC68901_IR_XMIT_BUFFER_EMPTY	0x0400
+#define MC68901_IR_RCV_ERROR			0x0800
+#define MC68901_IR_RCV_BUFFER_FULL		0x1000
+#define MC68901_IR_TIMER_A				0x2000
+#define MC68901_IR_GPIP_6				0x4000
+#define MC68901_IR_GPIP_7				0x8000
+
+#define MC68901_TCR_TIMER_STOPPED		0x00
+#define MC68901_TCR_TIMER_DELAY_4		0x01
+#define MC68901_TCR_TIMER_DELAY_10		0x02
+#define MC68901_TCR_TIMER_DELAY_16		0x03
+#define MC68901_TCR_TIMER_DELAY_50		0x04
+#define MC68901_TCR_TIMER_DELAY_64		0x05
+#define MC68901_TCR_TIMER_DELAY_100		0x06
+#define MC68901_TCR_TIMER_DELAY_200		0x07
+#define MC68901_TCR_TIMER_EVENT			0x08
+#define MC68901_TCR_TIMER_PULSE_4		0x09
+#define MC68901_TCR_TIMER_PULSE_10		0x0a
+#define MC68901_TCR_TIMER_PULSE_16		0x0b
+#define MC68901_TCR_TIMER_PULSE_50		0x0c
+#define MC68901_TCR_TIMER_PULSE_64		0x0d
+#define MC68901_TCR_TIMER_PULSE_100		0x0e
+#define MC68901_TCR_TIMER_PULSE_200		0x0f
+#define MC68901_TCR_TIMER_RESET			0x10
+
+#define MC68901_UCR_PARITY_ENABLED		0x04
+#define MC68901_UCR_PARITY_EVEN			0x02
+#define MC68901_UCR_PARITY_ODD			0x00
+#define MC68901_UCR_WORD_LENGTH_8		0x00
+#define MC68901_UCR_WORD_LENGTH_7		0x20
+#define MC68901_UCR_WORD_LENGTH_6		0x40
+#define MC68901_UCR_WORD_LENGTH_5		0x60
+#define MC68901_UCR_START_STOP_0_0		0x00
+#define MC68901_UCR_START_STOP_1_1		0x08
+#define MC68901_UCR_START_STOP_1_15		0x10
+#define MC68901_UCR_START_STOP_1_2		0x18
+#define MC68901_UCR_CLOCK_DIVIDE_16		0x80
+#define MC68901_UCR_CLOCK_DIVIDE_1		0x00
+
+#define MC68901_RSR_RCV_ENABLE			0x01
+#define MC68901_RSR_SYNC_STRIP_ENABLE	0x02
+#define MC68901_RSR_MATCH				0x04
+#define MC68901_RSR_CHAR_IN_PROGRESS	0x04
+#define MC68901_RSR_FOUND_SEARCH		0x08
+#define MC68901_RSR_BREAK				0x08
+#define MC68901_RSR_FRAME_ERROR			0x10
+#define MC68901_RSR_PARITY_ERROR		0x20
+#define MC68901_RSR_OVERRUN_ERROR		0x40
+#define MC68901_RSR_BUFFER_FULL			0x80
+
+#define MC68901_TSR_XMIT_ENABLE			0x01
+#define MC68901_TSR_OUTPUT_HI_Z			0x00
+#define MC68901_TSR_OUTPUT_LOW			0x02
+#define MC68901_TSR_OUTPUT_HIGH			0x04
+#define MC68901_TSR_OUTPUT_LOOP			0x06
+#define MC68901_TSR_OUTPUT_MASK			0x06
+#define MC68901_TSR_BREAK				0x08
+#define MC68901_TSR_END_OF_XMIT			0x10
+#define MC68901_TSR_AUTO_TURNAROUND		0x20
+#define MC68901_TSR_UNDERRUN_ERROR		0x40
+#define MC68901_TSR_BUFFER_EMPTY		0x80
+
+#define LOG		(0)
+
+struct _mc68901_t
+{
+	int device_type;
+	const mc68901_interface *intf;
 
 	UINT8 gpip;
 	UINT8 aer;
@@ -49,11 +221,11 @@ typedef struct
 	int irqlevel;
 
 	UINT8 tacr, tbcr, tcdcr;
-	UINT8 tdr[MFP68901_MAX_TIMERS];
-	UINT8 tmc[MFP68901_MAX_TIMERS];
-	int to[MFP68901_MAX_TIMERS];
-	int ti[MFP68901_MAX_TIMERS];
-	emu_timer *timer[MFP68901_MAX_TIMERS];
+	UINT8 tdr[MC68901_MAX_TIMERS];
+	UINT8 tmc[MC68901_MAX_TIMERS];
+	int to[MC68901_MAX_TIMERS];
+	int ti[MC68901_MAX_TIMERS];
+	emu_timer *timer[MC68901_MAX_TIMERS];
 
 	UINT8 ucr;
 	UINT8 udr;
@@ -66,60 +238,54 @@ typedef struct
 	int rxtx_word, rxtx_start, rxtx_stop;
 } mfp_68901;
 
-static mfp_68901 mfp[MAX_MFP];
-
-static const int MFP68901_INT_MASK_GPIO[] =
+static const int MC68901_INT_MASK_GPIO[] =
 {
-	MFP68901_IR_GPIP_0, MFP68901_IR_GPIP_1, MFP68901_IR_GPIP_2, MFP68901_IR_GPIP_3,
-	MFP68901_IR_GPIP_4, MFP68901_IR_GPIP_5, MFP68901_IR_GPIP_6, MFP68901_IR_GPIP_7
+	MC68901_IR_GPIP_0, MC68901_IR_GPIP_1, MC68901_IR_GPIP_2, MC68901_IR_GPIP_3,
+	MC68901_IR_GPIP_4, MC68901_IR_GPIP_5, MC68901_IR_GPIP_6, MC68901_IR_GPIP_7
 };
 
-static const int MFP68901_INT_MASK_TIMER[] =
+static const int MC68901_INT_MASK_TIMER[] =
 {
-	MFP68901_IR_TIMER_A, MFP68901_IR_TIMER_B, MFP68901_IR_TIMER_C, MFP68901_IR_TIMER_D
+	MC68901_IR_TIMER_A, MC68901_IR_TIMER_B, MC68901_IR_TIMER_C, MC68901_IR_TIMER_D
 };
 
-static const int MFP68901_LOOPBACK_TIMER[] =
+static const int MC68901_LOOPBACK_TIMER[] =
 {
-	MFP68901_TAO_LOOPBACK, MFP68901_TBO_LOOPBACK, MFP68901_TCO_LOOPBACK, MFP68901_TDO_LOOPBACK
+	MC68901_TAO_LOOPBACK, MC68901_TBO_LOOPBACK, MC68901_TCO_LOOPBACK, MC68901_TDO_LOOPBACK
 };
 
-static const int MFP68901_GPIO_TIMER[] =
+static const int MC68901_GPIO_TIMER[] =
 {
-	MFP68901_GPIP_4, MFP68901_GPIP_3
+	MC68901_GPIP_4, MC68901_GPIP_3
 };
 
 static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
-INLINE void mfp68901_check_interrupts(int which)
+static void mc68901_check_interrupts(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
+	int irqlevel = (chip->ipr & chip->imr) ? HOLD_LINE : CLEAR_LINE;
 
-	int irqlevel = (mfp_p->ipr & mfp_p->imr) ? HOLD_LINE : CLEAR_LINE;
-
-	if (irqlevel != mfp_p->irqlevel)
+	if (irqlevel != chip->irqlevel)
 	{
-		mfp_p->intf->irq_callback(which, irqlevel);
+		chip->intf->irq_callback(chip, irqlevel);
 	}
 }
 
-INLINE void mfp68901_interrupt(int which, UINT16 mask)
+static void mc68901_interrupt(mc68901_t *chip, UINT16 mask)
 {
-	mfp_68901 *mfp_p = &mfp[which];
+	chip->ipr |= mask;
 
-	mfp_p->ipr |= mask;
-
-	mfp68901_check_interrupts(which);
+	mc68901_check_interrupts(chip);
 }
 
-static TIMER_CALLBACK( mfp68901_gpio_poll_tick )
+static TIMER_CALLBACK( mc68901_gpio_poll_tick )
 {
-	mfp_68901 *mfp_p = &mfp[param];
+	mc68901_t *chip = ptr;
 
-	UINT8 gpio = mfp_p->intf->gpio_r(0);
+	UINT8 gpio = chip->intf->gpio_r(0);
 
-	UINT8 gpold = (mfp_p->gpip & ~mfp_p->ddr) ^ mfp_p->aer;
-	UINT8 gpnew = (gpio & ~mfp_p->ddr) ^ mfp_p->aer;
+	UINT8 gpold = (chip->gpip & ~chip->ddr) ^ chip->aer;
+	UINT8 gpnew = (gpio & ~chip->ddr) ^ chip->aer;
 
 	int bit;
 
@@ -127,71 +293,63 @@ static TIMER_CALLBACK( mfp68901_gpio_poll_tick )
 	{
 		if ((BIT(gpold, bit) == 1) && (BIT(gpnew, bit) == 0)) // if transition from 1 to 0 is detected...
 		{
-			logerror("MFP68901 #%u Edge Transition Detected on GPIO%u\n", param, bit);
+			logerror("MC68901 Edge Transition Detected on GPIO%u\n", bit);
 
-			if (mfp_p->ier & MFP68901_INT_MASK_GPIO[bit]) // AND interrupt enabled bit is set...
+			if (chip->ier & MC68901_INT_MASK_GPIO[bit]) // AND interrupt enabled bit is set...
 			{
-				logerror("MFP68901 #%u Interrupt Pending for GPIO%u\n", param, bit);
+				logerror("MC68901 Interrupt Pending for GPIO%u\n", bit);
 
-				mfp68901_interrupt(param, MFP68901_INT_MASK_GPIO[bit]); // set interrupt pending bit
+				mc68901_interrupt(chip, MC68901_INT_MASK_GPIO[bit]); // set interrupt pending bit
 			}
 		}
 	}
 
-	mfp_p->gpip = (gpio & ~mfp_p->ddr) | (mfp_p->gpip & mfp_p->ddr);
+	chip->gpip = (gpio & ~chip->ddr) | (chip->gpip & chip->ddr);
 }
 
 /* USART */
 
-INLINE void mfp68901_rx_buffer_full(int which)
+static void mc68901_rx_buffer_full(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	if (mfp_p->ier & MFP68901_IR_RCV_BUFFER_FULL)
+	if (chip->ier & MC68901_IR_RCV_BUFFER_FULL)
 	{
-		mfp68901_interrupt(which, MFP68901_IR_RCV_BUFFER_FULL);
+		mc68901_interrupt(chip, MC68901_IR_RCV_BUFFER_FULL);
 	}
 }
 
-INLINE void mfp68901_rx_error(int which)
+static void mc68901_rx_error(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	if (mfp_p->ier & MFP68901_IR_RCV_ERROR)
+	if (chip->ier & MC68901_IR_RCV_ERROR)
 	{
-		mfp68901_interrupt(which, MFP68901_IR_RCV_ERROR);
+		mc68901_interrupt(chip, MC68901_IR_RCV_ERROR);
 	}
 	else
 	{
-		mfp68901_rx_buffer_full(which);
+		mc68901_rx_buffer_full(chip);
 	}
 }
 
-INLINE void mfp68901_tx_buffer_empty(int which)
+static void mc68901_tx_buffer_empty(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	if (mfp_p->ier & MFP68901_IR_XMIT_BUFFER_EMPTY)
+	if (chip->ier & MC68901_IR_XMIT_BUFFER_EMPTY)
 	{
-		mfp68901_interrupt(which, MFP68901_IR_XMIT_BUFFER_EMPTY);
+		mc68901_interrupt(chip, MC68901_IR_XMIT_BUFFER_EMPTY);
 	}
 }
 
-INLINE void mfp68901_tx_error(int which)
+static void mc68901_tx_error(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	if (mfp_p->ier & MFP68901_IR_XMIT_ERROR)
+	if (chip->ier & MC68901_IR_XMIT_ERROR)
 	{
-		mfp68901_interrupt(which, MFP68901_IR_XMIT_ERROR);
+		mc68901_interrupt(chip, MC68901_IR_XMIT_ERROR);
 	}
 	else
 	{
-		mfp68901_tx_buffer_empty(which);
+		mc68901_tx_buffer_empty(chip);
 	}
 }
 
-INLINE int mfp68901_parity(UINT8 b)
+static int mc68901_parity(UINT8 b)
 {
 	b ^= b >> 4;
 	b ^= b >> 2;
@@ -199,98 +357,96 @@ INLINE int mfp68901_parity(UINT8 b)
 	return b & 1;
 }
 
-INLINE void mfp68901_serial_rx(int which)
+static void mc68901_serial_rx(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	if (mfp_p->rsr & MFP68901_RSR_RCV_ENABLE)
+	if (chip->rsr & MC68901_RSR_RCV_ENABLE)
 	{
-		switch (mfp_p->rx_state)
+		switch (chip->rx_state)
 		{
-		case MFP68901_SERIAL_START:
-			if (mfp_p->intf->rx_pin == 0)
+		case MC68901_SERIAL_START:
+			if (chip->intf->rx_pin == 0)
 			{
-				mfp_p->rsr |= MFP68901_RSR_CHAR_IN_PROGRESS;
-				mfp_p->rx_bits = 0;
-				mfp_p->rx_buffer = 0;
-				mfp_p->rx_state = MFP68901_SERIAL_DATA;
-				mfp_p->next_rsr = MFP68901_RSR_BREAK;
+				chip->rsr |= MC68901_RSR_CHAR_IN_PROGRESS;
+				chip->rx_bits = 0;
+				chip->rx_buffer = 0;
+				chip->rx_state = MC68901_SERIAL_DATA;
+				chip->next_rsr = MC68901_RSR_BREAK;
 			}
 			break;
 
-		case MFP68901_SERIAL_DATA:
-			if ((mfp_p->next_rsr & MFP68901_RSR_BREAK) && (*mfp_p->intf->rx_pin == 1) && mfp_p->rsr_read)
+		case MC68901_SERIAL_DATA:
+			if ((chip->next_rsr & MC68901_RSR_BREAK) && (*chip->intf->rx_pin == 1) && chip->rsr_read)
 			{
-				mfp_p->next_rsr &= ~MFP68901_RSR_BREAK;
+				chip->next_rsr &= ~MC68901_RSR_BREAK;
 			}
 
-			mfp_p->rx_buffer >>= 1;
-			mfp_p->rx_buffer |= (*mfp_p->intf->rx_pin << 7);
-			mfp_p->rx_bits++;
+			chip->rx_buffer >>= 1;
+			chip->rx_buffer |= (*chip->intf->rx_pin << 7);
+			chip->rx_bits++;
 
-			if (mfp_p->rx_bits == mfp_p->rxtx_word)
+			if (chip->rx_bits == chip->rxtx_word)
 			{
-				if (mfp_p->rxtx_word < 8)
+				if (chip->rxtx_word < 8)
 				{
-					mfp_p->rx_buffer >>= (8 - mfp_p->rxtx_word);
+					chip->rx_buffer >>= (8 - chip->rxtx_word);
 				}
 
-				mfp_p->rsr &= ~MFP68901_RSR_CHAR_IN_PROGRESS;
+				chip->rsr &= ~MC68901_RSR_CHAR_IN_PROGRESS;
 
-				if (mfp_p->ucr & MFP68901_UCR_PARITY_ENABLED)
+				if (chip->ucr & MC68901_UCR_PARITY_ENABLED)
 				{
-					mfp_p->rx_state = MFP68901_SERIAL_PARITY;
+					chip->rx_state = MC68901_SERIAL_PARITY;
 				}
 				else
 				{
-					mfp_p->rx_state = MFP68901_SERIAL_STOP;
+					chip->rx_state = MC68901_SERIAL_STOP;
 				}
 			}
 			break;
 
-		case MFP68901_SERIAL_PARITY:
-			mfp_p->rx_parity = *mfp_p->intf->rx_pin;
+		case MC68901_SERIAL_PARITY:
+			chip->rx_parity = *chip->intf->rx_pin;
 
-			if (mfp_p->rx_parity != (mfp68901_parity(mfp_p->rx_buffer) ^ ((mfp_p->ucr & MFP68901_UCR_PARITY_EVEN) >> 1)))
+			if (chip->rx_parity != (mc68901_parity(chip->rx_buffer) ^ ((chip->ucr & MC68901_UCR_PARITY_EVEN) >> 1)))
 			{
-				mfp_p->next_rsr |= MFP68901_RSR_PARITY_ERROR;
+				chip->next_rsr |= MC68901_RSR_PARITY_ERROR;
 			}
 
-			mfp_p->rx_state = MFP68901_SERIAL_STOP;
+			chip->rx_state = MC68901_SERIAL_STOP;
 			break;
 
-		case MFP68901_SERIAL_STOP:
-			if (*mfp_p->intf->rx_pin == 1)
+		case MC68901_SERIAL_STOP:
+			if (*chip->intf->rx_pin == 1)
 			{
-				if (!((mfp_p->rsr & MFP68901_RSR_SYNC_STRIP_ENABLE) && (mfp_p->rx_buffer == mfp_p->scr)))
+				if (!((chip->rsr & MC68901_RSR_SYNC_STRIP_ENABLE) && (chip->rx_buffer == chip->scr)))
 				{
-					if (!(mfp_p->rsr & MFP68901_RSR_OVERRUN_ERROR))
+					if (!(chip->rsr & MC68901_RSR_OVERRUN_ERROR))
 					{
-						if (mfp_p->rsr & MFP68901_RSR_BUFFER_FULL)
+						if (chip->rsr & MC68901_RSR_BUFFER_FULL)
 						{
 							// incoming word received but last word in receive buffer has not been read
-							mfp_p->next_rsr |= MFP68901_RSR_OVERRUN_ERROR;
+							chip->next_rsr |= MC68901_RSR_OVERRUN_ERROR;
 						}
 						else
 						{
 							// incoming word received and receive buffer is empty
-							mfp_p->rsr |= MFP68901_RSR_BUFFER_FULL;
-							mfp_p->udr = mfp_p->rx_buffer;
-							mfp68901_rx_buffer_full(which);
+							chip->rsr |= MC68901_RSR_BUFFER_FULL;
+							chip->udr = chip->rx_buffer;
+							mc68901_rx_buffer_full(chip);
 						}
 					}
 				}
 			}
 			else
 			{
-				if (mfp_p->rx_buffer)
+				if (chip->rx_buffer)
 				{
 					// non-zero data word not followed by a stop bit
-					mfp_p->next_rsr |= MFP68901_RSR_FRAME_ERROR;
+					chip->next_rsr |= MC68901_RSR_FRAME_ERROR;
 				}
 			}
 
-			mfp_p->rx_state = MFP68901_SERIAL_START;
+			chip->rx_state = MC68901_SERIAL_START;
 			break;
 		}
 	}
@@ -298,245 +454,239 @@ INLINE void mfp68901_serial_rx(int which)
 
 static TIMER_CALLBACK( rx_tick )
 {
-	mfp68901_serial_rx(param);
+	mc68901_serial_rx(ptr);
 }
 
-INLINE void mfp68901_transmit_disabled(int which)
+static void mc68901_transmit_disabled(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	switch (mfp_p->tsr & MFP68901_TSR_OUTPUT_MASK)
+	switch (chip->tsr & MC68901_TSR_OUTPUT_MASK)
 	{
-	case MFP68901_TSR_OUTPUT_HI_Z:
+	case MC68901_TSR_OUTPUT_HI_Z:
 		// indeterminate
-	case MFP68901_TSR_OUTPUT_LOW:
-		*mfp_p->intf->tx_pin = 0;
+	case MC68901_TSR_OUTPUT_LOW:
+		*chip->intf->tx_pin = 0;
 		break;
 
-	case MFP68901_TSR_OUTPUT_HIGH:
-	case MFP68901_TSR_OUTPUT_LOOP:
-		*mfp_p->intf->tx_pin = 1;
+	case MC68901_TSR_OUTPUT_HIGH:
+	case MC68901_TSR_OUTPUT_LOOP:
+		*chip->intf->tx_pin = 1;
 		break;
 	}
 }
 
-INLINE void mfp68901_transmit(int which)
+static void mc68901_transmit(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	switch (mfp_p->tx_state)
+	switch (chip->tx_state)
 	{
-	case MFP68901_SERIAL_START:
-		if (mfp_p->tsr & MFP68901_TSR_UNDERRUN_ERROR)
+	case MC68901_SERIAL_START:
+		if (chip->tsr & MC68901_TSR_UNDERRUN_ERROR)
 		{
-			if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+			if (chip->tsr & MC68901_TSR_XMIT_ENABLE)
 			{
-				*mfp_p->intf->tx_pin = 1;
+				*chip->intf->tx_pin = 1;
 			}
 			else
 			{
-				mfp68901_transmit_disabled(which);
+				mc68901_transmit_disabled(chip);
 			}
 		}
 		else
 		{
-			if (mfp_p->tsr & MFP68901_TSR_BUFFER_EMPTY)
+			if (chip->tsr & MC68901_TSR_BUFFER_EMPTY)
 			{
-				mfp_p->tsr |= MFP68901_TSR_UNDERRUN_ERROR;
+				chip->tsr |= MC68901_TSR_UNDERRUN_ERROR;
 
-				if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+				if (chip->tsr & MC68901_TSR_XMIT_ENABLE)
 				{
-					*mfp_p->intf->tx_pin = 1;
+					*chip->intf->tx_pin = 1;
 				}
 				else
 				{
-					mfp68901_transmit_disabled(which);
+					mc68901_transmit_disabled(chip);
 				}
 			}
 			else
 			{
-				*mfp_p->intf->tx_pin = 0;
-				mfp_p->tx_buffer = mfp_p->udr;
-				mfp_p->tx_bits = 0;
-				mfp_p->tx_state = MFP68901_SERIAL_DATA;
-				mfp_p->tsr |= MFP68901_TSR_BUFFER_EMPTY;
-				mfp68901_tx_buffer_empty(which);
-				mfp_p->tx_parity = mfp68901_parity(mfp_p->tx_buffer);
+				*chip->intf->tx_pin = 0;
+				chip->tx_buffer = chip->udr;
+				chip->tx_bits = 0;
+				chip->tx_state = MC68901_SERIAL_DATA;
+				chip->tsr |= MC68901_TSR_BUFFER_EMPTY;
+				mc68901_tx_buffer_empty(chip);
+				chip->tx_parity = mc68901_parity(chip->tx_buffer);
 			}
 		}
 		break;
 
-	case MFP68901_SERIAL_DATA:
-		*mfp_p->intf->tx_pin = mfp_p->tx_buffer & 0x01;
-		mfp_p->tx_buffer >>= 1;
-		mfp_p->tx_bits++;
+	case MC68901_SERIAL_DATA:
+		*chip->intf->tx_pin = chip->tx_buffer & 0x01;
+		chip->tx_buffer >>= 1;
+		chip->tx_bits++;
 
-		if (mfp_p->tx_bits == mfp_p->rxtx_word)
+		if (chip->tx_bits == chip->rxtx_word)
 		{
-			if (mfp_p->ucr & MFP68901_UCR_PARITY_ENABLED)
+			if (chip->ucr & MC68901_UCR_PARITY_ENABLED)
 			{
-				mfp_p->tx_state = MFP68901_SERIAL_PARITY;
+				chip->tx_state = MC68901_SERIAL_PARITY;
 			}
 			else
 			{
-				mfp_p->tx_state = MFP68901_SERIAL_STOP;
+				chip->tx_state = MC68901_SERIAL_STOP;
 			}
 		}
 		break;
 
-	case MFP68901_SERIAL_PARITY:
-		if (mfp_p->rxtx_word < 8)
+	case MC68901_SERIAL_PARITY:
+		if (chip->rxtx_word < 8)
 		{
 			// highest bit in buffer is user-specified parity bit
 
-			*mfp_p->intf->tx_pin = mfp_p->tx_buffer & 0x01;
+			*chip->intf->tx_pin = chip->tx_buffer & 0x01;
 		}
 		else
 		{
 			// use previously calculated parity
 
-			*mfp_p->intf->tx_pin = mfp_p->tx_parity ^ ((mfp_p->ucr & MFP68901_UCR_PARITY_EVEN) >> 1);
+			*chip->intf->tx_pin = chip->tx_parity ^ ((chip->ucr & MC68901_UCR_PARITY_EVEN) >> 1);
 		}
 
-		mfp_p->tx_state = MFP68901_SERIAL_STOP;
+		chip->tx_state = MC68901_SERIAL_STOP;
 		break;
 
-	case MFP68901_SERIAL_STOP:
-		*mfp_p->intf->tx_pin = 1;
+	case MC68901_SERIAL_STOP:
+		*chip->intf->tx_pin = 1;
 
-		if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+		if (chip->tsr & MC68901_TSR_XMIT_ENABLE)
 		{
-			mfp_p->tx_state = MFP68901_SERIAL_START;
+			chip->tx_state = MC68901_SERIAL_START;
 		}
 		else
 		{
-			if (mfp_p->tsr & MFP68901_TSR_AUTO_TURNAROUND)
+			if (chip->tsr & MC68901_TSR_AUTO_TURNAROUND)
 			{
-				mfp_p->tsr |= MFP68901_TSR_XMIT_ENABLE;
-				mfp_p->tx_state = MFP68901_SERIAL_START;
+				chip->tsr |= MC68901_TSR_XMIT_ENABLE;
+				chip->tx_state = MC68901_SERIAL_START;
 			}
 			else
 			{
-				mfp_p->xmit_state = MFP68901_XMIT_OFF;
-				mfp_p->tsr |= MFP68901_TSR_END_OF_XMIT;
-				mfp68901_tx_error(which);
+				chip->xmit_state = MC68901_XMIT_OFF;
+				chip->tsr |= MC68901_TSR_END_OF_XMIT;
+				mc68901_tx_error(chip);
 			}
 		}
 		break;
 	}
 }
 
-INLINE void mfp68901_serial_tx(int which)
+static void mc68901_serial_tx(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	switch (mfp_p->xmit_state)
+	switch (chip->xmit_state)
 	{
-	case MFP68901_XMIT_OFF:
-		mfp68901_transmit_disabled(which);
+	case MC68901_XMIT_OFF:
+		mc68901_transmit_disabled(chip);
 		break;
 
-	case MFP68901_XMIT_STARTING:
-		if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+	case MC68901_XMIT_STARTING:
+		if (chip->tsr & MC68901_TSR_XMIT_ENABLE)
 		{
-			*mfp_p->intf->tx_pin = 1;
-			mfp_p->xmit_state = MFP68901_XMIT_ON;
+			*chip->intf->tx_pin = 1;
+			chip->xmit_state = MC68901_XMIT_ON;
 		}
 		else
 		{
-			mfp_p->xmit_state = MFP68901_XMIT_OFF;
-			mfp_p->tsr |= MFP68901_TSR_END_OF_XMIT;
+			chip->xmit_state = MC68901_XMIT_OFF;
+			chip->tsr |= MC68901_TSR_END_OF_XMIT;
 		}
 		break;
 
-	case MFP68901_XMIT_BREAK:
-		if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+	case MC68901_XMIT_BREAK:
+		if (chip->tsr & MC68901_TSR_XMIT_ENABLE)
 		{
-			if (mfp_p->tsr & MFP68901_TSR_BREAK)
+			if (chip->tsr & MC68901_TSR_BREAK)
 			{
-				*mfp_p->intf->tx_pin = 1;
+				*chip->intf->tx_pin = 1;
 			}
 			else
 			{
-				mfp_p->xmit_state = MFP68901_XMIT_ON;
+				chip->xmit_state = MC68901_XMIT_ON;
 			}
 		}
 		else
 		{
-			mfp_p->xmit_state = MFP68901_XMIT_OFF;
-			mfp_p->tsr |= MFP68901_TSR_END_OF_XMIT;
+			chip->xmit_state = MC68901_XMIT_OFF;
+			chip->tsr |= MC68901_TSR_END_OF_XMIT;
 		}
 		break;
 
-	case MFP68901_XMIT_ON:
-		mfp68901_transmit(which);
+	case MC68901_XMIT_ON:
+		mc68901_transmit(chip);
 		break;
 	}
 }
 
 static TIMER_CALLBACK( tx_tick )
 {
-	mfp68901_serial_tx(param);
+	mc68901_serial_tx(ptr);
 }
 
-static UINT8 mfp68901_register_r(int which, int reg)
+UINT8 mc68901_register_r(mc68901_t *chip, int reg)
 {
-	mfp_68901 *mfp_p = &mfp[which];
+	assert(chip != NULL);
 
 	switch (reg)
 	{
-	case MFP68901_REGISTER_GPIP:  return mfp_p->gpip;
-	case MFP68901_REGISTER_AER:   return mfp_p->aer;
-	case MFP68901_REGISTER_DDR:   return mfp_p->ddr;
+	case MC68901_REGISTER_GPIP:  return chip->gpip;
+	case MC68901_REGISTER_AER:   return chip->aer;
+	case MC68901_REGISTER_DDR:   return chip->ddr;
 
-	case MFP68901_REGISTER_IERA:  return mfp_p->ier >> 8;
-	case MFP68901_REGISTER_IERB:  return mfp_p->ier & 0xff;
-	case MFP68901_REGISTER_IPRA:  return mfp_p->ipr >> 8;
-	case MFP68901_REGISTER_IPRB:  return mfp_p->ipr & 0xff;
-	case MFP68901_REGISTER_ISRA:  return mfp_p->isr >> 8;
-	case MFP68901_REGISTER_ISRB:  return mfp_p->isr & 0xff;
-	case MFP68901_REGISTER_IMRA:  return mfp_p->imr >> 8;
-	case MFP68901_REGISTER_IMRB:  return mfp_p->imr & 0xff;
-	case MFP68901_REGISTER_VR:    return mfp_p->vr;
+	case MC68901_REGISTER_IERA:  return chip->ier >> 8;
+	case MC68901_REGISTER_IERB:  return chip->ier & 0xff;
+	case MC68901_REGISTER_IPRA:  return chip->ipr >> 8;
+	case MC68901_REGISTER_IPRB:  return chip->ipr & 0xff;
+	case MC68901_REGISTER_ISRA:  return chip->isr >> 8;
+	case MC68901_REGISTER_ISRB:  return chip->isr & 0xff;
+	case MC68901_REGISTER_IMRA:  return chip->imr >> 8;
+	case MC68901_REGISTER_IMRB:  return chip->imr & 0xff;
+	case MC68901_REGISTER_VR:    return chip->vr;
 
-	case MFP68901_REGISTER_TACR:  return mfp_p->tacr;
-	case MFP68901_REGISTER_TBCR:  return mfp_p->tbcr;
-	case MFP68901_REGISTER_TCDCR: return mfp_p->tcdcr;
-	case MFP68901_REGISTER_TADR:  return mfp_p->tmc[MFP68901_TIMER_A];
-	case MFP68901_REGISTER_TBDR:  return mfp_p->tmc[MFP68901_TIMER_B];
-	case MFP68901_REGISTER_TCDR:  return mfp_p->tmc[MFP68901_TIMER_C];
-	case MFP68901_REGISTER_TDDR:  return mfp_p->tmc[MFP68901_TIMER_D];
+	case MC68901_REGISTER_TACR:  return chip->tacr;
+	case MC68901_REGISTER_TBCR:  return chip->tbcr;
+	case MC68901_REGISTER_TCDCR: return chip->tcdcr;
+	case MC68901_REGISTER_TADR:  return chip->tmc[MC68901_TIMER_A];
+	case MC68901_REGISTER_TBDR:  return chip->tmc[MC68901_TIMER_B];
+	case MC68901_REGISTER_TCDR:  return chip->tmc[MC68901_TIMER_C];
+	case MC68901_REGISTER_TDDR:  return chip->tmc[MC68901_TIMER_D];
 
-	case MFP68901_REGISTER_SCR:   return mfp_p->scr;
-	case MFP68901_REGISTER_UCR:   return mfp_p->ucr;
-	case MFP68901_REGISTER_RSR:
-		mfp_p->rsr_read = 1;
-		return mfp_p->rsr;
+	case MC68901_REGISTER_SCR:   return chip->scr;
+	case MC68901_REGISTER_UCR:   return chip->ucr;
+	case MC68901_REGISTER_RSR:
+		chip->rsr_read = 1;
+		return chip->rsr;
 
-	case MFP68901_REGISTER_TSR:
+	case MC68901_REGISTER_TSR:
 		{
 			// clear UE bit (in reality, this won't be cleared until one full clock cycle of the transmitter has passed since the bit was set)
 
-			UINT8 tsr = mfp_p->tsr;
-			mfp_p->tsr &= 0xbf;
+			UINT8 tsr = chip->tsr;
+			chip->tsr &= 0xbf;
 
 			return tsr;
 		}
 
-	case MFP68901_REGISTER_UDR:
+	case MC68901_REGISTER_UDR:
 		// load RSR with latched value
 
-		mfp_p->rsr = (mfp_p->next_rsr & 0x7c) | (mfp_p->rsr & 0x03);
-		mfp_p->next_rsr = 0;
+		chip->rsr = (chip->next_rsr & 0x7c) | (chip->rsr & 0x03);
+		chip->next_rsr = 0;
 
 		// signal receiver error interrupt
 
-		if (mfp_p->rsr & 0x78)
+		if (chip->rsr & 0x78)
 		{
-			mfp68901_rx_error(which);
+			mc68901_rx_error(chip);
 		}
 
-		return mfp_p->udr;
+		return chip->udr;
 
 	default:					  return 0;
 	}
@@ -544,708 +694,732 @@ static UINT8 mfp68901_register_r(int which, int reg)
 
 #define DIVISOR PRESCALER[data & 0x07]
 
-static void mfp68901_register_w(int which, int reg, UINT8 data)
+void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 {
-	mfp_68901 *mfp_p = &mfp[which];
+	assert(chip != NULL);
 
 	switch (reg)
 	{
-	case MFP68901_REGISTER_GPIP:
-		logerror("MFP68901 #%u General Purpose I/O : %x\n", which, data);
-		mfp_p->gpip = data & mfp_p->ddr;
+	case MC68901_REGISTER_GPIP:
+		logerror("MC68901 General Purpose I/O : %x\n", data);
+		chip->gpip = data & chip->ddr;
 
-		if (mfp_p->intf->gpio_w)
+		if (chip->intf->gpio_w)
 		{
-			mfp_p->intf->gpio_w(0, mfp_p->gpip);
+			chip->intf->gpio_w(0, chip->gpip);
 		}
 		break;
 
-	case MFP68901_REGISTER_AER:
-		logerror("MFP68901 #%u Active Edge Register : %x\n", which, data);
-		mfp_p->aer = data;
+	case MC68901_REGISTER_AER:
+		logerror("MC68901 Active Edge Register : %x\n", data);
+		chip->aer = data;
 		break;
 
-	case MFP68901_REGISTER_DDR:
-		logerror("MFP68901 #%u Data Direction Register : %x\n", which, data);
-		mfp_p->ddr = data;
+	case MC68901_REGISTER_DDR:
+		logerror("MC68901 Data Direction Register : %x\n", data);
+		chip->ddr = data;
 		break;
 
-	case MFP68901_REGISTER_IERA:
-		logerror("MFP68901 #%u Interrupt Enable Register A : %x\n", which, data);
-		mfp_p->ier = (data << 8) | (mfp_p->ier & 0xff);
-		mfp_p->ipr &= mfp_p->ier;
-		mfp68901_check_interrupts(which);
+	case MC68901_REGISTER_IERA:
+		logerror("MC68901 Interrupt Enable Register A : %x\n", data);
+		chip->ier = (data << 8) | (chip->ier & 0xff);
+		chip->ipr &= chip->ier;
+		mc68901_check_interrupts(chip);
 		break;
 
-	case MFP68901_REGISTER_IERB:
-		logerror("MFP68901 #%u Interrupt Enable Register B : %x\n", which, data);
-		mfp_p->ier = (mfp_p->ier & 0xff00) | data;
-		mfp_p->ipr &= mfp_p->ier;
-		mfp68901_check_interrupts(which);
+	case MC68901_REGISTER_IERB:
+		logerror("MC68901 Interrupt Enable Register B : %x\n", data);
+		chip->ier = (chip->ier & 0xff00) | data;
+		chip->ipr &= chip->ier;
+		mc68901_check_interrupts(chip);
 		break;
 
-	case MFP68901_REGISTER_IPRA:
-		logerror("MFP68901 #%u Interrupt Pending Register A : %x\n", which, data);
-		mfp_p->ipr &= (data << 8) | (mfp_p->ipr & 0xff);
-		mfp68901_check_interrupts(which);
+	case MC68901_REGISTER_IPRA:
+		logerror("MC68901 Interrupt Pending Register A : %x\n", data);
+		chip->ipr &= (data << 8) | (chip->ipr & 0xff);
+		mc68901_check_interrupts(chip);
 		break;
 
-	case MFP68901_REGISTER_IPRB:
-		logerror("MFP68901 #%u Interrupt Pending Register B : %x\n", which, data);
-		mfp_p->ipr &= (mfp_p->ipr & 0xff00) | data;
-		mfp68901_check_interrupts(which);
+	case MC68901_REGISTER_IPRB:
+		logerror("MC68901 Interrupt Pending Register B : %x\n", data);
+		chip->ipr &= (chip->ipr & 0xff00) | data;
+		mc68901_check_interrupts(chip);
 		break;
 
-	case MFP68901_REGISTER_ISRA:
-		logerror("MFP68901 #%u Interrupt In-Service Register A : %x\n", which, data);
-		mfp_p->isr &= (data << 8) | (mfp_p->isr & 0xff);
+	case MC68901_REGISTER_ISRA:
+		logerror("MC68901 Interrupt In-Service Register A : %x\n", data);
+		chip->isr &= (data << 8) | (chip->isr & 0xff);
 		break;
 
-	case MFP68901_REGISTER_ISRB:
-		logerror("MFP68901 #%u Interrupt In-Service Register B : %x\n", which, data);
-		mfp_p->isr &= (mfp_p->isr & 0xff00) | data;
+	case MC68901_REGISTER_ISRB:
+		logerror("MC68901 Interrupt In-Service Register B : %x\n", data);
+		chip->isr &= (chip->isr & 0xff00) | data;
 		break;
 
-	case MFP68901_REGISTER_IMRA:
-		logerror("MFP68901 #%u Interrupt Mask Register A : %x\n", which, data);
-		mfp_p->imr = (data << 8) | (mfp_p->imr & 0xff);
-		mfp_p->isr &= mfp_p->imr;
-		mfp68901_check_interrupts(which);
+	case MC68901_REGISTER_IMRA:
+		logerror("MC68901 Interrupt Mask Register A : %x\n", data);
+		chip->imr = (data << 8) | (chip->imr & 0xff);
+		chip->isr &= chip->imr;
+		mc68901_check_interrupts(chip);
 		break;
 
-	case MFP68901_REGISTER_IMRB:
-		logerror("MFP68901 #%u Interrupt Mask Register B : %x\n", which, data);
-		mfp_p->imr = (mfp_p->imr & 0xff00) | data;
-		mfp_p->isr &= mfp_p->imr;
-		mfp68901_check_interrupts(which);
+	case MC68901_REGISTER_IMRB:
+		logerror("MC68901 Interrupt Mask Register B : %x\n", data);
+		chip->imr = (chip->imr & 0xff00) | data;
+		chip->isr &= chip->imr;
+		mc68901_check_interrupts(chip);
 		break;
 
-	case MFP68901_REGISTER_VR:
-		logerror("MFP68901 #%u Interrupt Vector : %x\n", which, data & 0xf0);
+	case MC68901_REGISTER_VR:
+		logerror("MC68901 Interrupt Vector : %x\n", data & 0xf0);
 
-		mfp_p->vr = data & 0xf8;
+		chip->vr = data & 0xf8;
 
-		if (mfp_p->vr & MFP68901_VR_S)
+		if (chip->vr & MC68901_VR_S)
 		{
-			logerror("MFP68901 #%u Software End-Of-Interrupt Mode\n", which);
+			logerror("MC68901 Software End-Of-Interrupt Mode\n");
 		}
 		else
 		{
-			logerror("MFP68901 #%u Automatic End-Of-Interrupt Mode\n", which);
+			logerror("MC68901 Automatic End-Of-Interrupt Mode\n");
 
-			mfp_p->isr = 0;
+			chip->isr = 0;
 		}
 		break;
 
-	case MFP68901_REGISTER_TACR:
-		mfp_p->tacr = data & 0x1f;
+	case MC68901_REGISTER_TACR:
+		chip->tacr = data & 0x1f;
 
-		switch (mfp_p->tacr & 0x0f)
+		switch (chip->tacr & 0x0f)
 		{
-		case MFP68901_TCR_TIMER_STOPPED:
-			logerror("MFP68901 #%u Timer A Stopped\n", which);
-			timer_enable(mfp_p->timer[MFP68901_TIMER_A], 0);
+		case MC68901_TCR_TIMER_STOPPED:
+			logerror("MC68901 Timer A Stopped\n");
+			timer_enable(chip->timer[MC68901_TIMER_A], 0);
 			break;
 
-		case MFP68901_TCR_TIMER_DELAY_4:
-		case MFP68901_TCR_TIMER_DELAY_10:
-		case MFP68901_TCR_TIMER_DELAY_16:
-		case MFP68901_TCR_TIMER_DELAY_50:
-		case MFP68901_TCR_TIMER_DELAY_64:
-		case MFP68901_TCR_TIMER_DELAY_100:
-		case MFP68901_TCR_TIMER_DELAY_200:
+		case MC68901_TCR_TIMER_DELAY_4:
+		case MC68901_TCR_TIMER_DELAY_10:
+		case MC68901_TCR_TIMER_DELAY_16:
+		case MC68901_TCR_TIMER_DELAY_50:
+		case MC68901_TCR_TIMER_DELAY_64:
+		case MC68901_TCR_TIMER_DELAY_100:
+		case MC68901_TCR_TIMER_DELAY_200:
 			{
-			int divisor = PRESCALER[mfp_p->tacr & 0x07];
-			logerror("MFP68901 #%u Timer A Delay Mode : %u Prescale\n", which, divisor);
-			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_A], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			int divisor = PRESCALER[chip->tacr & 0x07];
+			logerror("MC68901 Timer A Delay Mode : %u Prescale\n", divisor);
+			timer_adjust_periodic(chip->timer[MC68901_TIMER_A], ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor), 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
 			}
 			break;
 
-		case MFP68901_TCR_TIMER_EVENT:
-			logerror("MFP68901 #%u Timer A Event Count Mode\n", which);
-			timer_enable(mfp_p->timer[MFP68901_TIMER_A], 0);
+		case MC68901_TCR_TIMER_EVENT:
+			logerror("MC68901 Timer A Event Count Mode\n");
+			timer_enable(chip->timer[MC68901_TIMER_A], 0);
 			break;
 
-		case MFP68901_TCR_TIMER_PULSE_4:
-		case MFP68901_TCR_TIMER_PULSE_10:
-		case MFP68901_TCR_TIMER_PULSE_16:
-		case MFP68901_TCR_TIMER_PULSE_50:
-		case MFP68901_TCR_TIMER_PULSE_64:
-		case MFP68901_TCR_TIMER_PULSE_100:
-		case MFP68901_TCR_TIMER_PULSE_200:
+		case MC68901_TCR_TIMER_PULSE_4:
+		case MC68901_TCR_TIMER_PULSE_10:
+		case MC68901_TCR_TIMER_PULSE_16:
+		case MC68901_TCR_TIMER_PULSE_50:
+		case MC68901_TCR_TIMER_PULSE_64:
+		case MC68901_TCR_TIMER_PULSE_100:
+		case MC68901_TCR_TIMER_PULSE_200:
 			{
-			int divisor = PRESCALER[mfp_p->tacr & 0x07];
-			logerror("MFP68901 #%u Timer A Pulse Width Mode : %u Prescale\n", which, divisor);
-			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_A], attotime_never, which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
-			timer_enable(mfp_p->timer[MFP68901_TIMER_A], 0);
-			}
-			break;
-		}
-
-		if (mfp_p->tacr & MFP68901_TCR_TIMER_RESET)
-		{
-			logerror("MFP68901 #%u Timer A Reset\n", which);
-
-			mfp_p->to[MFP68901_TIMER_A] = 0;
-
-			if (mfp_p->intf->to_w)
-			{
-				mfp_p->intf->to_w(which, MFP68901_TIMER_A, mfp_p->to[MFP68901_TIMER_A]);
-			}
-		}
-		break;
-
-	case MFP68901_REGISTER_TBCR:
-		mfp_p->tbcr = data & 0x1f;
-
-		switch (mfp_p->tbcr & 0x0f)
-		{
-		case MFP68901_TCR_TIMER_STOPPED:
-			logerror("MFP68901 #%u Timer B Stopped\n", which);
-			timer_enable(mfp_p->timer[MFP68901_TIMER_B], 0);
-			break;
-
-		case MFP68901_TCR_TIMER_DELAY_4:
-		case MFP68901_TCR_TIMER_DELAY_10:
-		case MFP68901_TCR_TIMER_DELAY_16:
-		case MFP68901_TCR_TIMER_DELAY_50:
-		case MFP68901_TCR_TIMER_DELAY_64:
-		case MFP68901_TCR_TIMER_DELAY_100:
-		case MFP68901_TCR_TIMER_DELAY_200:
-			{
-			int divisor = PRESCALER[mfp_p->tbcr & 0x07];
-			logerror("MFP68901 #%u Timer B Delay Mode : %u Prescale\n", which, divisor);
-			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_B], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
-			}
-			break;
-
-		case MFP68901_TCR_TIMER_EVENT:
-			logerror("MFP68901 #%u Timer B Event Count Mode\n", which);
-			timer_enable(mfp_p->timer[MFP68901_TIMER_B], 0);
-			break;
-
-		case MFP68901_TCR_TIMER_PULSE_4:
-		case MFP68901_TCR_TIMER_PULSE_10:
-		case MFP68901_TCR_TIMER_PULSE_16:
-		case MFP68901_TCR_TIMER_PULSE_50:
-		case MFP68901_TCR_TIMER_PULSE_64:
-		case MFP68901_TCR_TIMER_PULSE_100:
-		case MFP68901_TCR_TIMER_PULSE_200:
-			{
-			int divisor = PRESCALER[mfp_p->tbcr & 0x07];
-			logerror("MFP68901 #%u Timer B Pulse Width Mode : %u Prescale\n", which, DIVISOR);
-			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_B], attotime_never, which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
-			timer_enable(mfp_p->timer[MFP68901_TIMER_B], 0);
+			int divisor = PRESCALER[chip->tacr & 0x07];
+			logerror("MC68901 Timer A Pulse Width Mode : %u Prescale\n", divisor);
+			timer_adjust_periodic(chip->timer[MC68901_TIMER_A], attotime_never, 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
+			timer_enable(chip->timer[MC68901_TIMER_A], 0);
 			}
 			break;
 		}
 
-		if (mfp_p->tacr & MFP68901_TCR_TIMER_RESET)
+		if (chip->tacr & MC68901_TCR_TIMER_RESET)
 		{
-			logerror("MFP68901 #%u Timer B Reset\n", which);
+			logerror("MC68901 Timer A Reset\n");
 
-			mfp_p->to[MFP68901_TIMER_B] = 0;
+			chip->to[MC68901_TIMER_A] = 0;
 
-			if (mfp_p->intf->to_w)
+			if (chip->intf->to_w)
 			{
-				mfp_p->intf->to_w(which, MFP68901_TIMER_B, mfp_p->to[MFP68901_TIMER_B]);
+				chip->intf->to_w(chip, MC68901_TIMER_A, chip->to[MC68901_TIMER_A]);
 			}
 		}
 		break;
 
-	case MFP68901_REGISTER_TCDCR:
-		mfp_p->tcdcr = data & 0x6f;
+	case MC68901_REGISTER_TBCR:
+		chip->tbcr = data & 0x1f;
 
-		switch (mfp_p->tcdcr & 0x07)
+		switch (chip->tbcr & 0x0f)
 		{
-		case MFP68901_TCR_TIMER_STOPPED:
-			logerror("MFP68901 #%u Timer D Stopped\n", which);
-			timer_enable(mfp_p->timer[MFP68901_TIMER_D], 0);
+		case MC68901_TCR_TIMER_STOPPED:
+			logerror("MC68901 Timer B Stopped\n");
+			timer_enable(chip->timer[MC68901_TIMER_B], 0);
 			break;
 
-		case MFP68901_TCR_TIMER_DELAY_4:
-		case MFP68901_TCR_TIMER_DELAY_10:
-		case MFP68901_TCR_TIMER_DELAY_16:
-		case MFP68901_TCR_TIMER_DELAY_50:
-		case MFP68901_TCR_TIMER_DELAY_64:
-		case MFP68901_TCR_TIMER_DELAY_100:
-		case MFP68901_TCR_TIMER_DELAY_200:
+		case MC68901_TCR_TIMER_DELAY_4:
+		case MC68901_TCR_TIMER_DELAY_10:
+		case MC68901_TCR_TIMER_DELAY_16:
+		case MC68901_TCR_TIMER_DELAY_50:
+		case MC68901_TCR_TIMER_DELAY_64:
+		case MC68901_TCR_TIMER_DELAY_100:
+		case MC68901_TCR_TIMER_DELAY_200:
 			{
-			int divisor = PRESCALER[mfp_p->tcdcr & 0x07];
-			logerror("MFP68901 #%u Timer D Delay Mode : %u Prescale\n", which, divisor);
-			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_D], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			int divisor = PRESCALER[chip->tbcr & 0x07];
+			logerror("MC68901 Timer B Delay Mode : %u Prescale\n", divisor);
+			timer_adjust_periodic(chip->timer[MC68901_TIMER_B], ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor), 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
+			}
+			break;
+
+		case MC68901_TCR_TIMER_EVENT:
+			logerror("MC68901 Timer B Event Count Mode\n");
+			timer_enable(chip->timer[MC68901_TIMER_B], 0);
+			break;
+
+		case MC68901_TCR_TIMER_PULSE_4:
+		case MC68901_TCR_TIMER_PULSE_10:
+		case MC68901_TCR_TIMER_PULSE_16:
+		case MC68901_TCR_TIMER_PULSE_50:
+		case MC68901_TCR_TIMER_PULSE_64:
+		case MC68901_TCR_TIMER_PULSE_100:
+		case MC68901_TCR_TIMER_PULSE_200:
+			{
+			int divisor = PRESCALER[chip->tbcr & 0x07];
+			logerror("MC68901 Timer B Pulse Width Mode : %u Prescale\n", DIVISOR);
+			timer_adjust_periodic(chip->timer[MC68901_TIMER_B], attotime_never, 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
+			timer_enable(chip->timer[MC68901_TIMER_B], 0);
 			}
 			break;
 		}
 
-		switch ((mfp_p->tcdcr >> 4) & 0x07)
+		if (chip->tacr & MC68901_TCR_TIMER_RESET)
 		{
-		case MFP68901_TCR_TIMER_STOPPED:
-			logerror("MFP68901 #%u Timer C Stopped\n", which);
-			timer_enable(mfp_p->timer[MFP68901_TIMER_C], 0);
+			logerror("MC68901 Timer B Reset\n");
+
+			chip->to[MC68901_TIMER_B] = 0;
+
+			if (chip->intf->to_w)
+			{
+				chip->intf->to_w(chip, MC68901_TIMER_B, chip->to[MC68901_TIMER_B]);
+			}
+		}
+		break;
+
+	case MC68901_REGISTER_TCDCR:
+		chip->tcdcr = data & 0x6f;
+
+		switch (chip->tcdcr & 0x07)
+		{
+		case MC68901_TCR_TIMER_STOPPED:
+			logerror("MC68901 Timer D Stopped\n");
+			timer_enable(chip->timer[MC68901_TIMER_D], 0);
 			break;
 
-		case MFP68901_TCR_TIMER_DELAY_4:
-		case MFP68901_TCR_TIMER_DELAY_10:
-		case MFP68901_TCR_TIMER_DELAY_16:
-		case MFP68901_TCR_TIMER_DELAY_50:
-		case MFP68901_TCR_TIMER_DELAY_64:
-		case MFP68901_TCR_TIMER_DELAY_100:
-		case MFP68901_TCR_TIMER_DELAY_200:
+		case MC68901_TCR_TIMER_DELAY_4:
+		case MC68901_TCR_TIMER_DELAY_10:
+		case MC68901_TCR_TIMER_DELAY_16:
+		case MC68901_TCR_TIMER_DELAY_50:
+		case MC68901_TCR_TIMER_DELAY_64:
+		case MC68901_TCR_TIMER_DELAY_100:
+		case MC68901_TCR_TIMER_DELAY_200:
 			{
-			int divisor = PRESCALER[(mfp_p->tcdcr >> 4) & 0x07];
-			logerror("MFP68901 #%u Timer C Delay Mode : %u Prescale\n", which, divisor);
-			timer_adjust_periodic(mfp_p->timer[MFP68901_TIMER_C], ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor), which, ATTOTIME_IN_HZ(mfp_p->intf->timer_clock / divisor));
+			int divisor = PRESCALER[chip->tcdcr & 0x07];
+			logerror("MC68901 Timer D Delay Mode : %u Prescale\n", divisor);
+			timer_adjust_periodic(chip->timer[MC68901_TIMER_D], ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor), 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
+			}
+			break;
+		}
+
+		switch ((chip->tcdcr >> 4) & 0x07)
+		{
+		case MC68901_TCR_TIMER_STOPPED:
+			logerror("MC68901 Timer C Stopped\n");
+			timer_enable(chip->timer[MC68901_TIMER_C], 0);
+			break;
+
+		case MC68901_TCR_TIMER_DELAY_4:
+		case MC68901_TCR_TIMER_DELAY_10:
+		case MC68901_TCR_TIMER_DELAY_16:
+		case MC68901_TCR_TIMER_DELAY_50:
+		case MC68901_TCR_TIMER_DELAY_64:
+		case MC68901_TCR_TIMER_DELAY_100:
+		case MC68901_TCR_TIMER_DELAY_200:
+			{
+			int divisor = PRESCALER[(chip->tcdcr >> 4) & 0x07];
+			logerror("MC68901 Timer C Delay Mode : %u Prescale\n", divisor);
+			timer_adjust_periodic(chip->timer[MC68901_TIMER_C], ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor), 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
 			}
 			break;
 		}
 		break;
 
-	case MFP68901_REGISTER_TADR:
-		logerror("MFP68901 #%u Timer A Data Register : %x\n", which, data);
+	case MC68901_REGISTER_TADR:
+		logerror("MC68901 Timer A Data Register : %x\n", data);
 
-		mfp_p->tdr[MFP68901_TIMER_A] = data;
+		chip->tdr[MC68901_TIMER_A] = data;
 
-		if (!timer_enabled(mfp_p->timer[MFP68901_TIMER_A]))
+		if (!timer_enabled(chip->timer[MC68901_TIMER_A]))
 		{
-			mfp_p->tmc[MFP68901_TIMER_A] = data;
+			chip->tmc[MC68901_TIMER_A] = data;
 		}
 		break;
 
-	case MFP68901_REGISTER_TBDR:
-		logerror("MFP68901 #%u Timer B Data Register : %x\n", which, data);
+	case MC68901_REGISTER_TBDR:
+		logerror("MC68901 Timer B Data Register : %x\n", data);
 
-		mfp_p->tdr[MFP68901_TIMER_B] = data;
+		chip->tdr[MC68901_TIMER_B] = data;
 
-		if (!timer_enabled(mfp_p->timer[MFP68901_TIMER_B]))
+		if (!timer_enabled(chip->timer[MC68901_TIMER_B]))
 		{
-			mfp_p->tmc[MFP68901_TIMER_B] = data;
+			chip->tmc[MC68901_TIMER_B] = data;
 		}
 		break;
 
-	case MFP68901_REGISTER_TCDR:
-		logerror("MFP68901 #%u Timer C Data Register : %x\n", which, data);
+	case MC68901_REGISTER_TCDR:
+		logerror("MC68901 Timer C Data Register : %x\n", data);
 
-		mfp_p->tdr[MFP68901_TIMER_C] = data;
+		chip->tdr[MC68901_TIMER_C] = data;
 
-		if (!timer_enabled(mfp_p->timer[MFP68901_TIMER_C]))
+		if (!timer_enabled(chip->timer[MC68901_TIMER_C]))
 		{
-			mfp_p->tmc[MFP68901_TIMER_C] = data;
+			chip->tmc[MC68901_TIMER_C] = data;
 		}
 		break;
 
-	case MFP68901_REGISTER_TDDR:
-		logerror("MFP68901 #%u Timer D Data Register : %x\n", which, data);
+	case MC68901_REGISTER_TDDR:
+		logerror("MC68901 Timer D Data Register : %x\n", data);
 
-		mfp_p->tdr[MFP68901_TIMER_D] = data;
+		chip->tdr[MC68901_TIMER_D] = data;
 
-		if (!timer_enabled(mfp_p->timer[MFP68901_TIMER_D]))
+		if (!timer_enabled(chip->timer[MC68901_TIMER_D]))
 		{
-			mfp_p->tmc[MFP68901_TIMER_D] = data;
+			chip->tmc[MC68901_TIMER_D] = data;
 		}
 		break;
 
-	case MFP68901_REGISTER_SCR:
-		logerror("MFP68901 #%u Sync Character : %x\n", which, data);
+	case MC68901_REGISTER_SCR:
+		logerror("MC68901 Sync Character : %x\n", data);
 
-		mfp_p->scr = data;
+		chip->scr = data;
 		break;
 
-	case MFP68901_REGISTER_UCR:
-		if (data & MFP68901_UCR_PARITY_ENABLED)
+	case MC68901_REGISTER_UCR:
+		if (data & MC68901_UCR_PARITY_ENABLED)
 		{
-			if (data & MFP68901_UCR_PARITY_EVEN)
-				logerror("MFP68901 #%u Parity : Even\n", which);
+			if (data & MC68901_UCR_PARITY_EVEN)
+				logerror("MC68901 Parity : Even\n");
 			else
-				logerror("MFP68901 #%u Parity : Odd\n", which);
+				logerror("MC68901 Parity : Odd\n");
 		}
 		else
 		{
-			logerror("MFP68901 #%u Parity : Disabled\n", which);
+			logerror("MC68901 Parity : Disabled\n");
 		}
 
 		switch (data & 0x60)
 		{
-		case MFP68901_UCR_WORD_LENGTH_8:
-			mfp_p->rxtx_word = 8;
-			logerror("MFP68901 #%u Word Length : 8 bits\n", which);
+		case MC68901_UCR_WORD_LENGTH_8:
+			chip->rxtx_word = 8;
+			logerror("MC68901 Word Length : 8 bits\n");
 			break;
-		case MFP68901_UCR_WORD_LENGTH_7:
-			mfp_p->rxtx_word = 7;
-			logerror("MFP68901 #%u Word Length : 7 bits\n", which);
+		case MC68901_UCR_WORD_LENGTH_7:
+			chip->rxtx_word = 7;
+			logerror("MC68901 Word Length : 7 bits\n");
 			break;
-		case MFP68901_UCR_WORD_LENGTH_6:
-			mfp_p->rxtx_word = 6;
-			logerror("MFP68901 #%u Word Length : 6 bits\n", which);
+		case MC68901_UCR_WORD_LENGTH_6:
+			chip->rxtx_word = 6;
+			logerror("MC68901 Word Length : 6 bits\n");
 			break;
-		case MFP68901_UCR_WORD_LENGTH_5:
-			mfp_p->rxtx_word = 5;
-			logerror("MFP68901 #%u Word Length : 5 bits\n", which);
+		case MC68901_UCR_WORD_LENGTH_5:
+			chip->rxtx_word = 5;
+			logerror("MC68901 Word Length : 5 bits\n");
 			break;
 		}
 
 		switch (data & 0x18)
 		{
-		case MFP68901_UCR_START_STOP_0_0:
-			mfp_p->rxtx_start = 0;
-			mfp_p->rxtx_stop = 0;
-			logerror("MFP68901 #%u Start Bits : 0, Stop Bits : 0, Format : synchronous\n", which);
+		case MC68901_UCR_START_STOP_0_0:
+			chip->rxtx_start = 0;
+			chip->rxtx_stop = 0;
+			logerror("MC68901 Start Bits : 0, Stop Bits : 0, Format : synchronous\n");
 			break;
-		case MFP68901_UCR_START_STOP_1_1:
-			mfp_p->rxtx_start = 1;
-			mfp_p->rxtx_stop = 1;
-			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 1, Format : asynchronous\n", which);
+		case MC68901_UCR_START_STOP_1_1:
+			chip->rxtx_start = 1;
+			chip->rxtx_stop = 1;
+			logerror("MC68901 Start Bits : 1, Stop Bits : 1, Format : asynchronous\n");
 			break;
-		case MFP68901_UCR_START_STOP_1_15:
-			mfp_p->rxtx_start = 1;
-			mfp_p->rxtx_stop = 1;
-			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 1½, Format : asynchronous\n", which);
+		case MC68901_UCR_START_STOP_1_15:
+			chip->rxtx_start = 1;
+			chip->rxtx_stop = 1;
+			logerror("MC68901 Start Bits : 1, Stop Bits : 1½, Format : asynchronous\n");
 			break;
-		case MFP68901_UCR_START_STOP_1_2:
-			mfp_p->rxtx_start = 1;
-			mfp_p->rxtx_stop = 2;
-			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 2, Format : asynchronous\n", which);
+		case MC68901_UCR_START_STOP_1_2:
+			chip->rxtx_start = 1;
+			chip->rxtx_stop = 2;
+			logerror("MC68901 Start Bits : 1, Stop Bits : 2, Format : asynchronous\n");
 			break;
 		}
 
-		if (data & MFP68901_UCR_CLOCK_DIVIDE_16)
-			logerror("MFP68901 #%u Rx/Tx Clock Divisor : 16\n", which);
+		if (data & MC68901_UCR_CLOCK_DIVIDE_16)
+			logerror("MC68901 Rx/Tx Clock Divisor : 16\n");
 		else
-			logerror("MFP68901 #%u Rx/Tx Clock Divisor : 1\n", which);
+			logerror("MC68901 Rx/Tx Clock Divisor : 1\n");
 
-		mfp_p->ucr = data;
+		chip->ucr = data;
 		break;
 
-	case MFP68901_REGISTER_RSR:
-		if ((data & MFP68901_RSR_RCV_ENABLE) == 0)
+	case MC68901_REGISTER_RSR:
+		if ((data & MC68901_RSR_RCV_ENABLE) == 0)
 		{
-			logerror("MFP68901 #%u Receiver Disabled\n", which);
-			mfp_p->rsr = 0;
+			logerror("MC68901 Receiver Disabled\n");
+			chip->rsr = 0;
 		}
 		else
 		{
-			logerror("MFP68901 #%u Receiver Enabled\n", which);
+			logerror("MC68901 Receiver Enabled\n");
 
-			if (data & MFP68901_RSR_SYNC_STRIP_ENABLE)
-				logerror("MFP68901 #%u Sync Strip Enabled\n", which);
+			if (data & MC68901_RSR_SYNC_STRIP_ENABLE)
+				logerror("MC68901 Sync Strip Enabled\n");
 			else
-				logerror("MFP68901 #%u Sync Strip Disabled\n", which);
+				logerror("MC68901 Sync Strip Disabled\n");
 
-			if (data & MFP68901_RSR_FOUND_SEARCH)
-				logerror("MFP68901 #%u Receiver Search Mode Enabled\n", which);
+			if (data & MC68901_RSR_FOUND_SEARCH)
+				logerror("MC68901 Receiver Search Mode Enabled\n");
 
-			mfp_p->rsr = data & 0x0b;
+			chip->rsr = data & 0x0b;
 		}
 		break;
 
-	case MFP68901_REGISTER_TSR:
-		if ((data & MFP68901_TSR_XMIT_ENABLE) == 0)
+	case MC68901_REGISTER_TSR:
+		if ((data & MC68901_TSR_XMIT_ENABLE) == 0)
 		{
-			logerror("MFP68901 #%u Transmitter Disabled\n", which);
+			logerror("MC68901 Transmitter Disabled\n");
 
-			mfp_p->tsr = data & 0x27;
+			chip->tsr = data & 0x27;
 		}
 		else
 		{
-			logerror("MFP68901 #%u Transmitter Enabled\n", which);
+			logerror("MC68901 Transmitter Enabled\n");
 
 			switch (data & 0x06)
 			{
-			case MFP68901_TSR_OUTPUT_HI_Z:
-				logerror("MFP68901 #%u Transmitter Disabled Output State : Hi-Z\n", which);
+			case MC68901_TSR_OUTPUT_HI_Z:
+				logerror("MC68901 Transmitter Disabled Output State : Hi-Z\n");
 				break;
-			case MFP68901_TSR_OUTPUT_LOW:
-				logerror("MFP68901 #%u Transmitter Disabled Output State : 0\n", which);
+			case MC68901_TSR_OUTPUT_LOW:
+				logerror("MC68901 Transmitter Disabled Output State : 0\n");
 				break;
-			case MFP68901_TSR_OUTPUT_HIGH:
-				logerror("MFP68901 #%u Transmitter Disabled Output State : 1\n", which);
+			case MC68901_TSR_OUTPUT_HIGH:
+				logerror("MC68901 Transmitter Disabled Output State : 1\n");
 				break;
-			case MFP68901_TSR_OUTPUT_LOOP:
-				logerror("MFP68901 #%u Transmitter Disabled Output State : Loop\n", which);
+			case MC68901_TSR_OUTPUT_LOOP:
+				logerror("MC68901 Transmitter Disabled Output State : Loop\n");
 				break;
 			}
 
-			if (data & MFP68901_TSR_BREAK)
-				logerror("MFP68901 #%u Transmitter Break Enabled\n", which);
+			if (data & MC68901_TSR_BREAK)
+				logerror("MC68901 Transmitter Break Enabled\n");
 			else
-				logerror("MFP68901 #%u Transmitter Break Disabled\n", which);
+				logerror("MC68901 Transmitter Break Disabled\n");
 
-			if (data & MFP68901_TSR_AUTO_TURNAROUND)
-				logerror("MFP68901 #%u Transmitter Auto Turnaround Enabled\n", which);
+			if (data & MC68901_TSR_AUTO_TURNAROUND)
+				logerror("MC68901 Transmitter Auto Turnaround Enabled\n");
 			else
-				logerror("MFP68901 #%u Transmitter Auto Turnaround Disabled\n", which);
+				logerror("MC68901 Transmitter Auto Turnaround Disabled\n");
 
-			mfp_p->tsr = data & 0x2f;
-			mfp_p->tsr |= MFP68901_TSR_BUFFER_EMPTY;  // x68000 expects the buffer to be empty, so this will do for now
+			chip->tsr = data & 0x2f;
+			chip->tsr |= MC68901_TSR_BUFFER_EMPTY;  // x68000 expects the buffer to be empty, so this will do for now
 		}
 		break;
 
-	case MFP68901_REGISTER_UDR:
-		logerror("MFP68901 UDR %x\n", data);
-		mfp_p->udr = data;
-		//mfp_p->tsr &= ~MFP68901_TSR_BUFFER_EMPTY;
+	case MC68901_REGISTER_UDR:
+		logerror("MC68901 UDR %x\n", data);
+		chip->udr = data;
+		//chip->tsr &= ~MC68901_TSR_BUFFER_EMPTY;
 		break;
 	}
 }
 
-INLINE void mfp68901_timer_count(int which, int index)
+static void mc68901_timer_count(mc68901_t *chip, int index)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	if (mfp_p->tmc[index] == 0x01)
+	if (chip->tmc[index] == 0x01)
 	{
-		mfp_p->to[index] = mfp_p->to[index] ? 0 : 1;
+		chip->to[index] = chip->to[index] ? 0 : 1;
 
-		if (mfp_p->to[index])
+		if (chip->to[index])
 		{
-			if (mfp_p->intf->rx_clock == MFP68901_LOOPBACK_TIMER[index])
+			if (chip->intf->rx_clock == MC68901_LOOPBACK_TIMER[index])
 			{
-				mfp68901_serial_rx(which);
+				mc68901_serial_rx(chip);
 			}
 
-			if (mfp_p->intf->tx_clock == MFP68901_LOOPBACK_TIMER[index])
+			if (chip->intf->tx_clock == MC68901_LOOPBACK_TIMER[index])
 			{
-				mfp68901_serial_tx(which);
+				mc68901_serial_tx(chip);
 			}
 		}
 
-		if (mfp_p->intf->to_w)
+		if (chip->intf->to_w)
 		{
-			mfp_p->intf->to_w(which, index, mfp_p->to[index]);
+			chip->intf->to_w(chip, index, chip->to[index]);
 		}
 
-		if (mfp_p->ier & MFP68901_INT_MASK_TIMER[index])
+		if (chip->ier & MC68901_INT_MASK_TIMER[index])
 		{
-			mfp68901_interrupt(which, MFP68901_INT_MASK_TIMER[index]);
+			mc68901_interrupt(chip, MC68901_INT_MASK_TIMER[index]);
 		}
 
-		mfp_p->tmc[index] = mfp_p->tdr[index];
+		chip->tmc[index] = chip->tdr[index];
 	}
 	else
 	{
-		mfp_p->tmc[index]--;
+		chip->tmc[index]--;
 	}
 }
 
-INLINE void mfp68901_ti_w(int which, int index, int value)
+static void mc68901_ti_w(mc68901_t *chip, int index, int value)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
-	int bit = MFP68901_GPIO_TIMER[index];
-	int aer = BIT(mfp_p->aer, bit);
-	int cr = index ? mfp_p->tbcr : mfp_p->tacr;
+	int bit = MC68901_GPIO_TIMER[index];
+	int aer = BIT(chip->aer, bit);
+	int cr = index ? chip->tbcr : chip->tacr;
 
 	switch (cr & 0x0f)
 	{
-	case MFP68901_TCR_TIMER_EVENT:
-		if (((mfp_p->ti[index] ^ aer) == 1) && ((value ^ aer) == 0))
+	case MC68901_TCR_TIMER_EVENT:
+		if (((chip->ti[index] ^ aer) == 1) && ((value ^ aer) == 0))
 		{
-			mfp68901_timer_count(which, index);
+			mc68901_timer_count(chip, index);
 		}
 
-		mfp_p->ti[index] = value;
+		chip->ti[index] = value;
 		break;
 
-	case MFP68901_TCR_TIMER_PULSE_4:
-	case MFP68901_TCR_TIMER_PULSE_10:
-	case MFP68901_TCR_TIMER_PULSE_16:
-	case MFP68901_TCR_TIMER_PULSE_50:
-	case MFP68901_TCR_TIMER_PULSE_64:
-	case MFP68901_TCR_TIMER_PULSE_100:
-	case MFP68901_TCR_TIMER_PULSE_200:
-		timer_enable(mfp_p->timer[index], (value == aer));
+	case MC68901_TCR_TIMER_PULSE_4:
+	case MC68901_TCR_TIMER_PULSE_10:
+	case MC68901_TCR_TIMER_PULSE_16:
+	case MC68901_TCR_TIMER_PULSE_50:
+	case MC68901_TCR_TIMER_PULSE_64:
+	case MC68901_TCR_TIMER_PULSE_100:
+	case MC68901_TCR_TIMER_PULSE_200:
+		timer_enable(chip->timer[index], (value == aer));
 
-		if (((mfp_p->ti[index] ^ aer) == 0) && ((value ^ aer) == 1))
+		if (((chip->ti[index] ^ aer) == 0) && ((value ^ aer) == 1))
 		{
-			if (mfp_p->ier & MFP68901_INT_MASK_GPIO[bit])
+			if (chip->ier & MC68901_INT_MASK_GPIO[bit])
 			{
-				mfp68901_interrupt(which, MFP68901_INT_MASK_GPIO[bit]);
+				mc68901_interrupt(chip, MC68901_INT_MASK_GPIO[bit]);
 			}
 		}
 
-		mfp_p->ti[index] = value;
+		chip->ti[index] = value;
 		break;
 	}
 }
 
 static TIMER_CALLBACK( timer_a )
 {
-	mfp68901_timer_count(param, MFP68901_TIMER_A);
+	mc68901_timer_count(ptr, MC68901_TIMER_A);
 }
 
 static TIMER_CALLBACK( timer_b )
 {
-	mfp68901_timer_count(param, MFP68901_TIMER_B);
+	mc68901_timer_count(ptr, MC68901_TIMER_B);
 }
 
 static TIMER_CALLBACK( timer_c )
 {
-	mfp68901_timer_count(param, MFP68901_TIMER_C);
+	mc68901_timer_count(ptr, MC68901_TIMER_C);
 }
 
 static TIMER_CALLBACK( timer_d )
 {
-	mfp68901_timer_count(param, MFP68901_TIMER_D);
+	mc68901_timer_count(ptr, MC68901_TIMER_D);
 }
 
 /* External Interface */
 
-void mfp68901_tai_w(int which, int value)
+void mc68901_tai_w(mc68901_t *chip, int value)
 {
-	mfp68901_ti_w(which, MFP68901_TIMER_A, value);
+	assert(chip != NULL);
+
+	mc68901_ti_w(chip, MC68901_TIMER_A, value);
 }
 
-void mfp68901_tbi_w(int which, int value)
+void mc68901_tbi_w(mc68901_t *chip, int value)
 {
-	mfp68901_ti_w(which, MFP68901_TIMER_B, value);
+	assert(chip != NULL);
+
+	mc68901_ti_w(chip, MC68901_TIMER_B, value);
 }
 
-int mfp68901_get_vector(int which)
+int mc68901_get_vector(mc68901_t *chip)
 {
-	mfp_68901 *mfp_p = &mfp[which];
-
 	int ch;
+
+	assert(chip != NULL);
 
 	for (ch = 15; ch >= 0; ch--)
 	{
-		if (BIT(mfp_p->imr, ch) && BIT(mfp_p->ipr, ch))
+		if (BIT(chip->imr, ch) && BIT(chip->ipr, ch))
 		{
-			if (mfp_p->vr & MFP68901_VR_S)
+			if (chip->vr & MC68901_VR_S)
 			{
-				mfp_p->isr |= (1 << ch);
+				chip->isr |= (1 << ch);
 			}
 
-			mfp_p->ipr &= ~(1 << ch);
-			mfp68901_check_interrupts(which);
+			chip->ipr &= ~(1 << ch);
+			mc68901_check_interrupts(chip);
 
-			return (mfp_p->vr & 0xf0) | ch;
+			return (chip->vr & 0xf0) | ch;
 		}
 	}
 
 	return MC68000_INT_ACK_SPURIOUS;
 }
 
-void mfp68901_reset(int which)
-{
-	mfp68901_register_w(which, MFP68901_REGISTER_GPIP, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_AER, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_DDR, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_IERA, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_IERB, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_IPRA, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_IPRB, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_ISRA, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_ISRB, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_IMRA, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_IMRB, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_VR, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_TACR, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_TBCR, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_TCDCR, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_SCR, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_UCR, 0);
-	mfp68901_register_w(which, MFP68901_REGISTER_RSR, 0);
-}
+/* Device Interface */
 
-void mfp68901_config(int which, const mfp68901_interface *intf)
+static DEVICE_START( mc68901 )
 {
-	mfp_68901 *mfp_p = &mfp[which];
+	mc68901_t *mc68901;
+	char unique_tag[30];
 
-	assert(which < MAX_MFP);
+	assert(machine != NULL);
+	assert(tag != NULL);
+	assert(strlen(tag) < 20);
+
+	// allocate the object that holds the state
+
+	mc68901 = auto_malloc(sizeof(*mc68901));
+	memset(mc68901, 0, sizeof(*mc68901));
+
+	//mc68901->device_type = device_type;
+	mc68901->intf = static_config;
 
 	// initial settings
 
-	memset(mfp_p, 0, sizeof(mfp));
-
-	mfp_p->tsr = MFP68901_TSR_BUFFER_EMPTY;
-
-	mfp_p->intf = intf;
+	mc68901->tsr = MC68901_TSR_BUFFER_EMPTY;
 
 	// counter timers
 
-	mfp_p->timer[MFP68901_TIMER_A] = timer_alloc(timer_a, NULL);
-	mfp_p->timer[MFP68901_TIMER_B] = timer_alloc(timer_b, NULL);
-	mfp_p->timer[MFP68901_TIMER_C] = timer_alloc(timer_c, NULL);
-	mfp_p->timer[MFP68901_TIMER_D] = timer_alloc(timer_d, NULL);
+	mc68901->timer[MC68901_TIMER_A] = timer_alloc(timer_a, mc68901);
+	mc68901->timer[MC68901_TIMER_B] = timer_alloc(timer_b, mc68901);
+	mc68901->timer[MC68901_TIMER_C] = timer_alloc(timer_c, mc68901);
+	mc68901->timer[MC68901_TIMER_D] = timer_alloc(timer_d, mc68901);
 
 	// serial receive timer
 
-	if (mfp_p->intf->rx_clock > 0)
+	if (mc68901->intf->rx_clock > 0)
 	{
-		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->rx_clock), NULL, which, rx_tick);
+		timer_pulse(ATTOTIME_IN_HZ(mc68901->intf->rx_clock), mc68901, 0, rx_tick);
 	}
 
 	// serial transmit timer
 
-	if (mfp_p->intf->tx_clock > 0)
+	if (mc68901->intf->tx_clock > 0)
 	{
-		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->tx_clock), NULL, which, tx_tick);
+		timer_pulse(ATTOTIME_IN_HZ(mc68901->intf->tx_clock), mc68901, 0, tx_tick);
 	}
 
 	// general purpose I/O poll timer
 
-	if (mfp_p->intf->gpio_r)
+	if (mc68901->intf->gpio_r)
 	{
-		timer_pulse(ATTOTIME_IN_HZ(mfp_p->intf->chip_clock / 4), NULL, which, mfp68901_gpio_poll_tick);
+		timer_pulse(ATTOTIME_IN_HZ(mc68901->intf->chip_clock / 4), mc68901, 0, mc68901_gpio_poll_tick);
 	}
 
-	// save state support
+	// register save state support
 
-	state_save_register_item("mfp68901", which, mfp_p->gpip);
-	state_save_register_item("mfp68901", which, mfp_p->aer);
-	state_save_register_item("mfp68901", which, mfp_p->ddr);
-	state_save_register_item("mfp68901", which, mfp_p->ier);
-	state_save_register_item("mfp68901", which, mfp_p->ipr);
-	state_save_register_item("mfp68901", which, mfp_p->isr);
-	state_save_register_item("mfp68901", which, mfp_p->imr);
-	state_save_register_item("mfp68901", which, mfp_p->vr);
-	state_save_register_item("mfp68901", which, mfp_p->tacr);
-	state_save_register_item("mfp68901", which, mfp_p->tbcr);
-	state_save_register_item("mfp68901", which, mfp_p->tcdcr);
-	state_save_register_item_array("mfp68901", which, mfp_p->tdr);
-	state_save_register_item_array("mfp68901", which, mfp_p->tmc);
-	state_save_register_item_array("mfp68901", which, mfp_p->to);
-	state_save_register_item_array("mfp68901", which, mfp_p->ti);
-	state_save_register_item("mfp68901", which, mfp_p->scr);
-	state_save_register_item("mfp68901", which, mfp_p->ucr);
-	state_save_register_item("mfp68901", which, mfp_p->rsr);
-	state_save_register_item("mfp68901", which, mfp_p->tsr);
-	state_save_register_item("mfp68901", which, mfp_p->udr);
-	state_save_register_item("mfp68901", which, mfp_p->rx_bits);
-	state_save_register_item("mfp68901", which, mfp_p->tx_bits);
-	state_save_register_item("mfp68901", which, mfp_p->rx_parity);
-	state_save_register_item("mfp68901", which, mfp_p->tx_parity);
-	state_save_register_item("mfp68901", which, mfp_p->rx_state);
-	state_save_register_item("mfp68901", which, mfp_p->tx_state);
-	state_save_register_item("mfp68901", which, mfp_p->rx_buffer);
-	state_save_register_item("mfp68901", which, mfp_p->tx_buffer);
-	state_save_register_item("mfp68901", which, mfp_p->xmit_state);
-	state_save_register_item("mfp68901", which, mfp_p->rxtx_word);
-	state_save_register_item("mfp68901", which, mfp_p->rxtx_start);
-	state_save_register_item("mfp68901", which, mfp_p->rxtx_stop);
-	state_save_register_item("mfp68901", which, mfp_p->rsr_read);
-	state_save_register_item("mfp68901", which, mfp_p->next_rsr);
-	state_save_register_item("mfp68901", which, mfp_p->irqlevel);
+	state_save_combine_module_and_tag(unique_tag, "MC68901", tag);
+
+	state_save_register_item(unique_tag, 0, mc68901->gpip);
+	state_save_register_item(unique_tag, 0, mc68901->aer);
+	state_save_register_item(unique_tag, 0, mc68901->ddr);
+	state_save_register_item(unique_tag, 0, mc68901->ier);
+	state_save_register_item(unique_tag, 0, mc68901->ipr);
+	state_save_register_item(unique_tag, 0, mc68901->isr);
+	state_save_register_item(unique_tag, 0, mc68901->imr);
+	state_save_register_item(unique_tag, 0, mc68901->vr);
+	state_save_register_item(unique_tag, 0, mc68901->tacr);
+	state_save_register_item(unique_tag, 0, mc68901->tbcr);
+	state_save_register_item(unique_tag, 0, mc68901->tcdcr);
+	state_save_register_item_array(unique_tag, 0, mc68901->tdr);
+	state_save_register_item_array(unique_tag, 0, mc68901->tmc);
+	state_save_register_item_array(unique_tag, 0, mc68901->to);
+	state_save_register_item_array(unique_tag, 0, mc68901->ti);
+	state_save_register_item(unique_tag, 0, mc68901->scr);
+	state_save_register_item(unique_tag, 0, mc68901->ucr);
+	state_save_register_item(unique_tag, 0, mc68901->rsr);
+	state_save_register_item(unique_tag, 0, mc68901->tsr);
+	state_save_register_item(unique_tag, 0, mc68901->udr);
+	state_save_register_item(unique_tag, 0, mc68901->rx_bits);
+	state_save_register_item(unique_tag, 0, mc68901->tx_bits);
+	state_save_register_item(unique_tag, 0, mc68901->rx_parity);
+	state_save_register_item(unique_tag, 0, mc68901->tx_parity);
+	state_save_register_item(unique_tag, 0, mc68901->rx_state);
+	state_save_register_item(unique_tag, 0, mc68901->tx_state);
+	state_save_register_item(unique_tag, 0, mc68901->rx_buffer);
+	state_save_register_item(unique_tag, 0, mc68901->tx_buffer);
+	state_save_register_item(unique_tag, 0, mc68901->xmit_state);
+	state_save_register_item(unique_tag, 0, mc68901->rxtx_word);
+	state_save_register_item(unique_tag, 0, mc68901->rxtx_start);
+	state_save_register_item(unique_tag, 0, mc68901->rxtx_stop);
+	state_save_register_item(unique_tag, 0, mc68901->rsr_read);
+	state_save_register_item(unique_tag, 0, mc68901->next_rsr);
+	state_save_register_item(unique_tag, 0, mc68901->irqlevel);
+
+	return mc68901;
 }
 
-/* Read/Write Handlers */
+static DEVICE_RESET( mc68901 )
+{
+	mc68901_t *mc68901 = token;
 
-READ16_HANDLER( mfp68901_0_register_msb_r ) { return mfp68901_register_r(0, offset) << 8; }
-READ16_HANDLER( mfp68901_1_register_msb_r ) { return mfp68901_register_r(1, offset) << 8; }
-READ16_HANDLER( mfp68901_2_register_msb_r ) { return mfp68901_register_r(2, offset) << 8; }
-READ16_HANDLER( mfp68901_3_register_msb_r ) { return mfp68901_register_r(3, offset) << 8; }
+	mc68901_register_w(mc68901, MC68901_REGISTER_GPIP, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_AER, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_DDR, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_IERA, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_IERB, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_IPRA, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_IPRB, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_ISRA, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_ISRB, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_IMRA, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_IMRB, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_VR, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_TACR, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_TBCR, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_TCDCR, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_SCR, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_UCR, 0);
+	mc68901_register_w(mc68901, MC68901_REGISTER_RSR, 0);
+}
 
-READ16_HANDLER( mfp68901_0_register_lsb_r ) { return mfp68901_register_r(0, offset); }
-READ16_HANDLER( mfp68901_1_register_lsb_r ) { return mfp68901_register_r(1, offset); }
-READ16_HANDLER( mfp68901_2_register_lsb_r ) { return mfp68901_register_r(2, offset); }
-READ16_HANDLER( mfp68901_3_register_lsb_r ) { return mfp68901_register_r(3, offset); }
+static DEVICE_SET_INFO( mc68901 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
 
-WRITE16_HANDLER( mfp68901_0_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset, (data >> 8) & 0xff); }
-WRITE16_HANDLER( mfp68901_1_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset, (data >> 8) & 0xff); }
-WRITE16_HANDLER( mfp68901_2_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset, (data >> 8) & 0xff); }
-WRITE16_HANDLER( mfp68901_3_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset, (data >> 8) & 0xff); }
+DEVICE_GET_INFO( mc68901 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
-WRITE16_HANDLER( mfp68901_0_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset, data & 0xff); }
-WRITE16_HANDLER( mfp68901_1_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset, data & 0xff); }
-WRITE16_HANDLER( mfp68901_2_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset, data & 0xff); }
-WRITE16_HANDLER( mfp68901_3_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset, data & 0xff); }
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mc68901); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc68901);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc68901);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Motorola 68901";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "MC68901 MFP";					break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team"; 		break;
+	}
+}

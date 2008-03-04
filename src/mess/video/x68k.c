@@ -28,9 +28,11 @@
 #include "driver.h"
 #include "includes/x68k.h"
 #include "machine/68901mfp.h"
-
+#include "deprecat.h"
 
 extern struct x68k_system sys;
+
+extern mc68901_t *x68k_mfp;
 
 extern emu_timer* scanline_timer;
 extern emu_timer* raster_irq;
@@ -313,6 +315,8 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		timer_adjust_oneshot(vblank_irq, irq_time, 1);
 		logerror("CRTC: VBlank off\n");
 	}
+
+	mc68901_tai_w(x68k_mfp, sys.crtc.vblank);
 }
 
 
