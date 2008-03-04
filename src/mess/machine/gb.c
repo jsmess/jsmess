@@ -56,6 +56,7 @@ enum {
 	MBC_MBC6,		/*    ?? ROM,  32KB SRAM                         */
 	MBC_MBC7,		/*    ?? ROM,    ?? RAM                          */
 	MBC_WISDOM,		/*    ?? ROM,    ?? RAM - Wisdom tree controller */
+	MBC_MBC1_KOR,	/*   1MB ROM,    ?? RAM - Korean MBC1 variant    */
 	MBC_MEGADUCK,	/* MEGADUCK style banking                        */
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
@@ -105,7 +106,6 @@ UINT8 gbc_mode;				/* is the GBC in mono/colour mode?		*/
 static UINT8 *gb_cart = NULL;
 static UINT8 *gb_cart_ram = NULL;
 static UINT8 gb_io[0x10];
-//UINT8 gb_ie;
 static UINT8 *gb_dummy_rom_bank = NULL;
 static UINT8 *gb_dummy_ram_bank = NULL;
 /* TAMA5 related global variables */
@@ -151,6 +151,9 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w );
 static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w );
 static WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w );
 static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w );
+static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor );
+static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor );
+static WRITE8_HANDLER( gb_mem_mode_select_mbc1_kor );
 static void gb_timer_increment( void );
 
 #ifdef MAME_DEBUG
@@ -165,6 +168,11 @@ static void gb_init_regs(void) {
 
 	gb_io_w( 0x05, 0x00 );		/* TIMECNT */
 	gb_io_w( 0x06, 0x00 );		/* TIMEMOD */
+}
+
+static void gb_rom16_0000( UINT8 *addr ) {
+	memory_set_bankptr( 5, addr );
+	memory_set_bankptr( 10, addr + 0x0100 );
 }
 
 static void gb_rom16_4000( UINT8 *addr ) {
@@ -243,6 +251,13 @@ static void gb_init(void) {
 		case MBC_WISDOM:
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, gb_rom_bank_select_wisdom );
 			break;
+		case MBC_MBC1_KOR:
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_enable ); /* We don't emulate RAM enable yet */
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc1_kor );
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc1_kor );
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, gb_mem_mode_select_mbc1_kor );
+			break;
+
 		case MBC_MEGADUCK:
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0001, 0x0001, 0, 0, megaduck_rom_bank_select_type1 );
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xB000, 0xB000, 0, 0, megaduck_rom_bank_select_type2 );
@@ -692,6 +707,45 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w ) {
 	case 0x38:	mmm01_bank_mask = 0x03;	break;
 	default:	mmm01_bank_mask = 0xFF; break;
 	}
+}
+
+/* Korean MBC1 variant mapping */
+
+static void gb_set_mbc1_kor_banks( void ) {
+	if ( ROMBank & 0x30 ) {
+		gb_rom16_0000( ROMMap[ ROMBank & 0x30 ] );
+	}
+	gb_rom16_4000( ROMMap[ ROMBank ] );
+	memory_set_bankptr( 2, RAMMap[ MBC1Mode ? ( ROMBank >> 5 ) : 0 ] );
+}
+
+static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
+{
+	data &= 0x0F; /* Only uses lower 5 bits */
+	/* Selecting bank 0 == selecting bank 1 */
+	if( data == 0 )
+		data = 1;
+
+	ROMBank = ( ROMBank & 0x01F0 ) | data;
+	/* Switch banks */
+	gb_set_mbc1_kor_banks();
+}
+
+static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor )
+{
+	data &= 0x3; /* Only uses the lower 2 bits */
+
+	/* Select the upper bits of the ROMMask */
+	ROMBank = ( ROMBank & 0x0F ) | ( data << 4 );
+
+	/* Switch banks */
+	gb_set_mbc1_kor_banks();
+}
+
+static WRITE8_HANDLER( gb_mem_mode_select_mbc1_kor )
+{
+	MBC1Mode = data & 0x1;
+	gb_set_mbc1_kor_banks();
 }
 
 WRITE8_HANDLER ( gb_io_w )
@@ -1584,6 +1638,12 @@ DEVICE_LOAD(gb_cart)
 		}
 	}
 
+	/* Check if we're dealing with a Korean variant of the MBC1 mapper */
+	if ( MBCType == MBC_MBC1 ) {
+		if ( gb_header[0x13F] == 0x42 && gb_header[0x140] == 0x32 && gb_header[0x141] == 0x43 && gb_header[0x142] == 0x4B ) {
+			MBCType = MBC_MBC1_KOR;
+		}
+	}
 	if ( MBCType == MBC_UNKNOWN ) {
 		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type" );
 		return INIT_FAIL;
