@@ -17,6 +17,8 @@ System Driver Changes:
 
 - [GALAXY] Fixed regressions.  [Miodrag Milanovic]
 
+- [GAMEBOY] Added support for Korean MBC1 mapper variant.  [Wilbert Pol]
+
 - [QL] System boots up again. (bug #1495) [Curt Coder]
 
 - [VC4000] Cleaned up, added quickload and fixed colors.  (bug #1404) [Manfred
