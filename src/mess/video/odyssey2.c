@@ -594,6 +594,9 @@ void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t *
 				{
 					signal |= *buffer << 23;
 				}
+				o2_vdc.s.shift3 = signal & 0xFF;
+				o2_vdc.s.shift2 = ( signal >> 8 ) & 0xFF;
+				o2_vdc.s.shift1 = ( signal >> 16 ) & 0xFF;
 			}
 
 			/* Throw an interrupt if enabled */
