@@ -1169,6 +1169,7 @@ $(MESSOBJ)/pel.a:      \
 	$(MESS_DRIVERS)/galeb.o \
 	$(MESS_MACHINE)/galeb.o \
 	$(MESS_VIDEO)/galeb.o \
+	$(MESS_FORMATS)/orao_cas.o		\
 	$(MESS_DRIVERS)/orao.o \
 	$(MESS_MACHINE)/orao.o \
 	$(MESS_VIDEO)/orao.o \

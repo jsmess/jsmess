@@ -10,12 +10,14 @@
 
 /*----------- defined in machine/orao.c -----------*/
 
+extern UINT8 *orao_memory;
+
 extern DRIVER_INIT( orao );
 extern MACHINE_RESET( orao );
 
 extern DRIVER_INIT( orao103 );
 
-extern READ8_HANDLER( orao_keyboard_r );
+extern READ8_HANDLER( orao_io_r );
 extern WRITE8_HANDLER( orao_io_w );
 
 

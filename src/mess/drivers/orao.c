@@ -14,15 +14,16 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "includes/orao.h"
-
+#include "devices/cassette.h"
+#include "formats/orao_cas.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(orao_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x5fff ) AM_RAM
+static ADDRESS_MAP_START(orao_mem, ADDRESS_SPACE_PROGRAM, 8)			
+    AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_BASE(&orao_memory)
     AM_RANGE( 0x6000, 0x7fff ) AM_RAM  // video ram
-    AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE( orao_keyboard_r, orao_io_w )
-    AM_RANGE( 0xa000, 0xafff ) AM_ROM  // extension
-    AM_RANGE( 0xb000, 0xbfff ) AM_ROM  // DOS
+    AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE( orao_io_r, orao_io_w )
+    AM_RANGE( 0xa000, 0xafff ) AM_RAM  // extension
+    AM_RANGE( 0xb000, 0xbfff ) AM_RAM  // DOS
     AM_RANGE( 0xc000, 0xdfff ) AM_ROM
     AM_RANGE( 0xe000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
@@ -167,6 +168,8 @@ static MACHINE_DRIVER_START( orao )
 		MDRV_SPEAKER_STANDARD_MONO("mono")
 		MDRV_SOUND_ADD(DAC, 0)
 		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 8.00)	        
+		MDRV_SOUND_ADD(WAVE, 0)
+		MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)		
 MACHINE_DRIVER_END
  
 /* ROM definition */
@@ -182,9 +185,26 @@ ROM_START( orao103 )
     ROM_LOAD( "crt13.rom", 0xe000, 0x2000, CRC(e7076014) SHA1(0e213287b0b520440af6a2a6297788a9356818c2) )    
 ROM_END
 
+static void orao_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
+		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)orao_cassette_formats; break;
+
+		default:					cassette_device_getinfo(devclass, state, info); break;
+	}
+}
+
+SYSTEM_CONFIG_START(orao)
+	CONFIG_DEVICE(orao_cassette_getinfo)
+SYSTEM_CONFIG_END
 /* Driver */
  
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE 	INPUT   INIT 	 CONFIG 		COMPANY 		 FULLNAME   	FLAGS */
-COMP( 1984, orao,     0,      0, 		orao, 	orao, 	orao, 	 NULL,  "PEL Varazdin", "Orao 102",		 0)
-COMP( 1985, orao103,  orao,   0, 		orao, 	orao, 	orao103, NULL,  "PEL Varazdin", "Orao 103",		 0)
+COMP( 1984, orao,     0,      0, 		orao, 	orao, 	orao, 	 orao,  "PEL Varazdin", "Orao 102",		 0)
+COMP( 1985, orao103,  orao,   0, 		orao, 	orao, 	orao103, orao,  "PEL Varazdin", "Orao 103",		 0)
 
