@@ -312,6 +312,7 @@ READ8_HANDLER(apple2_c0xx_r)
 	};
 	UINT8 result = 0x00;
 	int slot;
+	running_machine *machine = Machine;
 
 	offset &= 0xFF;
 
@@ -324,7 +325,7 @@ READ8_HANDLER(apple2_c0xx_r)
 	{
 		slot = (offset - 0x80) / 0x10;
 		if (a2_config->slots[slot] && a2_config->slots[slot]->read)
-			result = a2_config->slots[slot]->read(a2_slot_tokens[slot], offset % 0x10);
+			result = a2_config->slots[slot]->read(machine, a2_slot_tokens[slot], offset % 0x10);
 	}
 	return result;
 }
@@ -345,6 +346,7 @@ WRITE8_HANDLER(apple2_c0xx_w)
 		apple2_c07x_w
 	};
 	int slot;
+	running_machine *machine = Machine;
 
 	offset &= 0xFF;
 
@@ -357,7 +359,7 @@ WRITE8_HANDLER(apple2_c0xx_w)
 	{
 		slot = (offset - 0x80) / 0x10;
 		if (a2_config->slots[slot] && a2_config->slots[slot]->write)
-			a2_config->slots[slot]->write(a2_slot_tokens[slot], offset % 0x10, data);
+			a2_config->slots[slot]->write(machine, a2_slot_tokens[slot], offset % 0x10, data);
 	}
 }
 
@@ -743,7 +745,7 @@ static void apple2_reset(running_machine *machine)
 		if (a2_config->slots[i])
 		{
 			if (a2_config->slots[i]->reset)
-				a2_config->slots[i]->reset(a2_slot_tokens[i]);
+				a2_config->slots[i]->reset(machine, a2_slot_tokens[i]);
 		}
 	}
 
@@ -1135,7 +1137,7 @@ static WRITE8_HANDLER ( apple2_c08x_w )
  * Language Card
  * ----------------------------------------------------------------------- */
 
-static UINT8 apple2_langcard_read(void *token, offs_t offset)
+static UINT8 apple2_langcard_read(running_machine *machine, void *token, offs_t offset)
 {
 	return apple2_c08x_r(offset);
 
@@ -1143,7 +1145,7 @@ static UINT8 apple2_langcard_read(void *token, offs_t offset)
 
 
 
-static void apple2_langcard_write(void *token, offs_t offset, UINT8 data)
+static void apple2_langcard_write(running_machine *machine, void *token, offs_t offset, UINT8 data)
 {
 	apple2_c08x_w(offset, data);
 }
@@ -1166,7 +1168,7 @@ const apple2_slotdevice apple2_slot_langcard =
  * Mockingboard
  * ----------------------------------------------------------------------- */
 
-static void apple2_mockingboard_reset(void *token)
+static void apple2_mockingboard_reset(running_machine *machine, void *token)
 {
 	/* TODO: fix this */
 	/* What follows is pure filth. It abuses the core like an angry pimp on a bad hair day. */
@@ -1181,7 +1183,7 @@ static void apple2_mockingboard_reset(void *token)
 
 
 
-static UINT8 apple2_mockingboard_read(void *token, offs_t offset)
+static UINT8 apple2_mockingboard_read(running_machine *machine, void *token, offs_t offset)
 {
 	static int flip1 = 0, flip2 = 0;
 
@@ -1205,7 +1207,7 @@ static UINT8 apple2_mockingboard_read(void *token, offs_t offset)
 
 
 
-static void apple2_mockingboard_write(void *token, offs_t offset, UINT8 data)
+static void apple2_mockingboard_write(running_machine *machine, void *token, offs_t offset, UINT8 data)
 {
 	static int latch0, latch1;
 
@@ -1423,7 +1425,7 @@ UINT8 apple2_iwm_getdiskreg(void)
 
 
 
-static void *apple2_fdc_init(int slot, applefdc_t fdc_type)
+static void *apple2_fdc_init(running_machine *machine, int slot, applefdc_t fdc_type)
 {
 	const struct IODevice *dev;
 	struct applefdc_interface intf;
@@ -1455,28 +1457,28 @@ static void *apple2_fdc_init(int slot, applefdc_t fdc_type)
 
 
 
-static void *apple2_fdc_apple2_init(int slot)
+static void *apple2_fdc_apple2_init(running_machine *machine, int slot)
 {
-	return apple2_fdc_init(slot, APPLEFDC_APPLE2);
+	return apple2_fdc_init(machine, slot, APPLEFDC_APPLE2);
 }
 
 
 
-static void *apple2_fdc_iwm_init(int slot)
+static void *apple2_fdc_iwm_init(running_machine *machine, int slot)
 {
-	return apple2_fdc_init(slot, APPLEFDC_IWM);
+	return apple2_fdc_init(machine, slot, APPLEFDC_IWM);
 }
 
 
 
-static UINT8 apple2_fdc_read(void *token, offs_t offset)
+static UINT8 apple2_fdc_read(running_machine *machine, void *token, offs_t offset)
 {
 	return applefdc_r(offset);
 }
 
 
 
-static void apple2_fdc_write(void *token, offs_t offset, UINT8 data)
+static void apple2_fdc_write(running_machine *machine, void *token, offs_t offset, UINT8 data)
 {
 	applefdc_w(offset, data);
 }
@@ -1540,7 +1542,7 @@ void apple2_init_common(running_machine *machine, const apple2_config *config)
 		if (a2_config->slots[i])
 		{
 			if (a2_config->slots[i]->init)
-				token = a2_config->slots[i]->init(i);
+				token = a2_config->slots[i]->init(machine, i);
 			else
 				token = (void *) ~0;
 

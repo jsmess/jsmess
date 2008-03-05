@@ -46,10 +46,10 @@ struct _apple2_slotdevice
 {
 	const char *name;
 	const char *description;
-	void *(*init)(int slot);
-	void (*reset)(void *token);
-	UINT8 (*read)(void *token, offs_t offset);
-	void (*write)(void *token, offs_t offset, UINT8 data);
+	void *(*init)(running_machine *machine, int slot);
+	void (*reset)(running_machine *machine, void *token);
+	UINT8 (*read)(running_machine *machine, void *token, offs_t offset);
+	void (*write)(running_machine *machine, void *token, offs_t offset, UINT8 data);
 };
 
 typedef struct _apple2_config apple2_config;
