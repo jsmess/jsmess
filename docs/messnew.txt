@@ -44,6 +44,9 @@ Source Changes:
 - The core is based on MAME 0.123u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
+- Updated the Motorola MC68901 Multi Function Peripheral to use the new
+  device system. [Curt Coder]
+
 
 
 0.123
