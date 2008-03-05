@@ -1266,6 +1266,7 @@ int mc68901_get_vector(mc68901_t *chip)
 			}
 
 			chip->ipr &= ~(1 << ch);
+			chip->irqlevel = CLEAR_LINE;
 			mc68901_check_interrupts(chip);
 
 			return (chip->vr & 0xf0) | ch;
