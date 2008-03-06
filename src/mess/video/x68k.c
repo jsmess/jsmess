@@ -272,11 +272,6 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	attotime irq_time;
 	attotime end_time;
 
-	if(scan > sys.crtc.vtotal)
-	{
-		timer_adjust_oneshot(raster_irq, attotime_zero, 0);  // disable timer
-		return;
-	}
 	sys.mfp.gpio &= ~0x40;  // GPIP6
 	if((readinputportbytag("options") & 0x01))
 	{
@@ -384,21 +379,18 @@ WRITE16_HANDLER( x68k_crtc_w )
 		x68k_crtc_refresh_mode();
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
-		if((data / sys.crtc.vmultiple) < sys.crtc.vtotal)
+		if(data != 0)
 		{
-	//		if(data <= sys.crtc.video_height)
-			{
-				attotime irq_time;
-				irq_time = video_screen_get_time_until_pos(0,(data - 1) / sys.crtc.vmultiple,2);
+			attotime irq_time;
+			irq_time = video_screen_get_time_until_pos(0,(data - 1) / sys.crtc.vmultiple,2);
 
-				if(attotime_to_double(irq_time) > 0)
-					timer_adjust_oneshot(raster_irq, irq_time, (data - 1) / sys.crtc.vmultiple);
-				logerror("CRTC: Time until next raster IRQ = %f\n",attotime_to_double(irq_time));
-			}
+			if(attotime_to_double(irq_time) > 0)
+				timer_adjust_oneshot(raster_irq, irq_time, (data - 1) / sys.crtc.vmultiple);
+			logerror("CRTC: Time until next raster IRQ = %f\n",attotime_to_double(irq_time));
 		}
 		else
 		{
-			timer_adjust_oneshot(raster_irq, attotime_zero, 0);  // disable timer
+			timer_adjust_oneshot(raster_irq, attotime_never, 0);  // disable timer
 		}
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
