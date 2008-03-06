@@ -558,7 +558,7 @@ VIDEO_UPDATE( odyssey2 )
 
 static void *odyssey2_sh_start(int clock, const struct CustomSound_interface *config)
 {
-	odyssey2_sh_channel = stream_create(0, 1, Machine->sample_rate, 0, odyssey2_sh_update );
+	odyssey2_sh_channel = stream_create(0, 1, clock/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
 	return (void *) ~0;
 }
 
@@ -584,7 +584,7 @@ void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t *
 		{
 			*buffer = 0;
 			*buffer = signal & 0x1;
-			period = (o2_vdc.s.sound & 0x20) ? 11 : 44;
+			period = (o2_vdc.s.sound & 0x20) ? 1 : 4;
 			if( ++count >= period )
 			{
 				count = 0;
