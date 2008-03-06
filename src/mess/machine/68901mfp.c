@@ -263,11 +263,13 @@ static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
 static void mc68901_check_interrupts(mc68901_t *chip)
 {
-	int irqlevel = (chip->ipr & chip->imr) ? HOLD_LINE : CLEAR_LINE;
-
-	if (irqlevel != chip->irqlevel)
+	if (chip->ipr & chip->imr)
 	{
-		chip->intf->irq_callback(chip, irqlevel);
+		chip->intf->irq_callback(chip, ASSERT_LINE);
+	}
+	else
+	{
+		chip->intf->irq_callback(chip, CLEAR_LINE);
 	}
 }
 
@@ -293,11 +295,11 @@ static TIMER_CALLBACK( mc68901_gpio_poll_tick )
 	{
 		if ((BIT(gpold, bit) == 1) && (BIT(gpnew, bit) == 0)) // if transition from 1 to 0 is detected...
 		{
-			logerror("MC68901 Edge Transition Detected on GPIO%u\n", bit);
+			if (LOG) logerror("MC68901 Edge Transition Detected on GPIO%u\n", bit);
 
 			if (chip->ier & MC68901_INT_MASK_GPIO[bit]) // AND interrupt enabled bit is set...
 			{
-				logerror("MC68901 Interrupt Pending for GPIO%u\n", bit);
+				if (LOG) logerror("MC68901 Interrupt Pending for GPIO%u\n", bit);
 
 				mc68901_interrupt(chip, MC68901_INT_MASK_GPIO[bit]); // set interrupt pending bit
 			}
@@ -701,7 +703,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 	switch (reg)
 	{
 	case MC68901_REGISTER_GPIP:
-		logerror("MC68901 General Purpose I/O : %x\n", data);
+		if (LOG) logerror("MC68901 General Purpose I/O : %x\n", data);
 		chip->gpip = data & chip->ddr;
 
 		if (chip->intf->gpio_w)
@@ -711,77 +713,77 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		break;
 
 	case MC68901_REGISTER_AER:
-		logerror("MC68901 Active Edge Register : %x\n", data);
+		if (LOG) logerror("MC68901 Active Edge Register : %x\n", data);
 		chip->aer = data;
 		break;
 
 	case MC68901_REGISTER_DDR:
-		logerror("MC68901 Data Direction Register : %x\n", data);
+		if (LOG) logerror("MC68901 Data Direction Register : %x\n", data);
 		chip->ddr = data;
 		break;
 
 	case MC68901_REGISTER_IERA:
-		logerror("MC68901 Interrupt Enable Register A : %x\n", data);
+		if (LOG) logerror("MC68901 Interrupt Enable Register A : %x\n", data);
 		chip->ier = (data << 8) | (chip->ier & 0xff);
 		chip->ipr &= chip->ier;
 		mc68901_check_interrupts(chip);
 		break;
 
 	case MC68901_REGISTER_IERB:
-		logerror("MC68901 Interrupt Enable Register B : %x\n", data);
+		if (LOG) logerror("MC68901 Interrupt Enable Register B : %x\n", data);
 		chip->ier = (chip->ier & 0xff00) | data;
 		chip->ipr &= chip->ier;
 		mc68901_check_interrupts(chip);
 		break;
 
 	case MC68901_REGISTER_IPRA:
-		logerror("MC68901 Interrupt Pending Register A : %x\n", data);
+		if (LOG) logerror("MC68901 Interrupt Pending Register A : %x\n", data);
 		chip->ipr &= (data << 8) | (chip->ipr & 0xff);
 		mc68901_check_interrupts(chip);
 		break;
 
 	case MC68901_REGISTER_IPRB:
-		logerror("MC68901 Interrupt Pending Register B : %x\n", data);
+		if (LOG) logerror("MC68901 Interrupt Pending Register B : %x\n", data);
 		chip->ipr &= (chip->ipr & 0xff00) | data;
 		mc68901_check_interrupts(chip);
 		break;
 
 	case MC68901_REGISTER_ISRA:
-		logerror("MC68901 Interrupt In-Service Register A : %x\n", data);
+		if (LOG) logerror("MC68901 Interrupt In-Service Register A : %x\n", data);
 		chip->isr &= (data << 8) | (chip->isr & 0xff);
 		break;
 
 	case MC68901_REGISTER_ISRB:
-		logerror("MC68901 Interrupt In-Service Register B : %x\n", data);
+		if (LOG) logerror("MC68901 Interrupt In-Service Register B : %x\n", data);
 		chip->isr &= (chip->isr & 0xff00) | data;
 		break;
 
 	case MC68901_REGISTER_IMRA:
-		logerror("MC68901 Interrupt Mask Register A : %x\n", data);
+		if (LOG) logerror("MC68901 Interrupt Mask Register A : %x\n", data);
 		chip->imr = (data << 8) | (chip->imr & 0xff);
 		chip->isr &= chip->imr;
 		mc68901_check_interrupts(chip);
 		break;
 
 	case MC68901_REGISTER_IMRB:
-		logerror("MC68901 Interrupt Mask Register B : %x\n", data);
+		if (LOG) logerror("MC68901 Interrupt Mask Register B : %x\n", data);
 		chip->imr = (chip->imr & 0xff00) | data;
 		chip->isr &= chip->imr;
 		mc68901_check_interrupts(chip);
 		break;
 
 	case MC68901_REGISTER_VR:
-		logerror("MC68901 Interrupt Vector : %x\n", data & 0xf0);
+		if (LOG) logerror("MC68901 Interrupt Vector : %x\n", data & 0xf0);
 
 		chip->vr = data & 0xf8;
 
 		if (chip->vr & MC68901_VR_S)
 		{
-			logerror("MC68901 Software End-Of-Interrupt Mode\n");
+			if (LOG) logerror("MC68901 Software End-Of-Interrupt Mode\n");
 		}
 		else
 		{
-			logerror("MC68901 Automatic End-Of-Interrupt Mode\n");
+			if (LOG) logerror("MC68901 Automatic End-Of-Interrupt Mode\n");
 
 			chip->isr = 0;
 		}
@@ -793,7 +795,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		switch (chip->tacr & 0x0f)
 		{
 		case MC68901_TCR_TIMER_STOPPED:
-			logerror("MC68901 Timer A Stopped\n");
+			if (LOG) logerror("MC68901 Timer A Stopped\n");
 			timer_enable(chip->timer[MC68901_TIMER_A], 0);
 			break;
 
@@ -806,13 +808,13 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		case MC68901_TCR_TIMER_DELAY_200:
 			{
 			int divisor = PRESCALER[chip->tacr & 0x07];
-			logerror("MC68901 Timer A Delay Mode : %u Prescale\n", divisor);
+			if (LOG) logerror("MC68901 Timer A Delay Mode : %u Prescale\n", divisor);
 			timer_adjust_periodic(chip->timer[MC68901_TIMER_A], ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor), 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
 			}
 			break;
 
 		case MC68901_TCR_TIMER_EVENT:
-			logerror("MC68901 Timer A Event Count Mode\n");
+			if (LOG) logerror("MC68901 Timer A Event Count Mode\n");
 			timer_enable(chip->timer[MC68901_TIMER_A], 0);
 			break;
 
@@ -825,7 +827,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		case MC68901_TCR_TIMER_PULSE_200:
 			{
 			int divisor = PRESCALER[chip->tacr & 0x07];
-			logerror("MC68901 Timer A Pulse Width Mode : %u Prescale\n", divisor);
+			if (LOG) logerror("MC68901 Timer A Pulse Width Mode : %u Prescale\n", divisor);
 			timer_adjust_periodic(chip->timer[MC68901_TIMER_A], attotime_never, 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
 			timer_enable(chip->timer[MC68901_TIMER_A], 0);
 			}
@@ -834,7 +836,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 
 		if (chip->tacr & MC68901_TCR_TIMER_RESET)
 		{
-			logerror("MC68901 Timer A Reset\n");
+			if (LOG) logerror("MC68901 Timer A Reset\n");
 
 			chip->to[MC68901_TIMER_A] = 0;
 
@@ -851,7 +853,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		switch (chip->tbcr & 0x0f)
 		{
 		case MC68901_TCR_TIMER_STOPPED:
-			logerror("MC68901 Timer B Stopped\n");
+			if (LOG) logerror("MC68901 Timer B Stopped\n");
 			timer_enable(chip->timer[MC68901_TIMER_B], 0);
 			break;
 
@@ -864,13 +866,13 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		case MC68901_TCR_TIMER_DELAY_200:
 			{
 			int divisor = PRESCALER[chip->tbcr & 0x07];
-			logerror("MC68901 Timer B Delay Mode : %u Prescale\n", divisor);
+			if (LOG) logerror("MC68901 Timer B Delay Mode : %u Prescale\n", divisor);
 			timer_adjust_periodic(chip->timer[MC68901_TIMER_B], ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor), 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
 			}
 			break;
 
 		case MC68901_TCR_TIMER_EVENT:
-			logerror("MC68901 Timer B Event Count Mode\n");
+			if (LOG) logerror("MC68901 Timer B Event Count Mode\n");
 			timer_enable(chip->timer[MC68901_TIMER_B], 0);
 			break;
 
@@ -883,7 +885,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		case MC68901_TCR_TIMER_PULSE_200:
 			{
 			int divisor = PRESCALER[chip->tbcr & 0x07];
-			logerror("MC68901 Timer B Pulse Width Mode : %u Prescale\n", DIVISOR);
+			if (LOG) logerror("MC68901 Timer B Pulse Width Mode : %u Prescale\n", DIVISOR);
 			timer_adjust_periodic(chip->timer[MC68901_TIMER_B], attotime_never, 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
 			timer_enable(chip->timer[MC68901_TIMER_B], 0);
 			}
@@ -892,7 +894,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 
 		if (chip->tacr & MC68901_TCR_TIMER_RESET)
 		{
-			logerror("MC68901 Timer B Reset\n");
+			if (LOG) logerror("MC68901 Timer B Reset\n");
 
 			chip->to[MC68901_TIMER_B] = 0;
 
@@ -909,7 +911,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		switch (chip->tcdcr & 0x07)
 		{
 		case MC68901_TCR_TIMER_STOPPED:
-			logerror("MC68901 Timer D Stopped\n");
+			if (LOG) logerror("MC68901 Timer D Stopped\n");
 			timer_enable(chip->timer[MC68901_TIMER_D], 0);
 			break;
 
@@ -922,7 +924,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		case MC68901_TCR_TIMER_DELAY_200:
 			{
 			int divisor = PRESCALER[chip->tcdcr & 0x07];
-			logerror("MC68901 Timer D Delay Mode : %u Prescale\n", divisor);
+			if (LOG) logerror("MC68901 Timer D Delay Mode : %u Prescale\n", divisor);
 			timer_adjust_periodic(chip->timer[MC68901_TIMER_D], ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor), 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
 			}
 			break;
@@ -931,7 +933,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		switch ((chip->tcdcr >> 4) & 0x07)
 		{
 		case MC68901_TCR_TIMER_STOPPED:
-			logerror("MC68901 Timer C Stopped\n");
+			if (LOG) logerror("MC68901 Timer C Stopped\n");
 			timer_enable(chip->timer[MC68901_TIMER_C], 0);
 			break;
 
@@ -944,7 +946,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		case MC68901_TCR_TIMER_DELAY_200:
 			{
 			int divisor = PRESCALER[(chip->tcdcr >> 4) & 0x07];
-			logerror("MC68901 Timer C Delay Mode : %u Prescale\n", divisor);
+			if (LOG) logerror("MC68901 Timer C Delay Mode : %u Prescale\n", divisor);
 			timer_adjust_periodic(chip->timer[MC68901_TIMER_C], ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor), 0, ATTOTIME_IN_HZ(chip->intf->timer_clock / divisor));
 			}
 			break;
@@ -952,7 +954,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		break;
 
 	case MC68901_REGISTER_TADR:
-		logerror("MC68901 Timer A Data Register : %x\n", data);
+		if (LOG) logerror("MC68901 Timer A Data Register : %x\n", data);
 
 		chip->tdr[MC68901_TIMER_A] = data;
 
@@ -963,7 +965,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		break;
 
 	case MC68901_REGISTER_TBDR:
-		logerror("MC68901 Timer B Data Register : %x\n", data);
+		if (LOG) logerror("MC68901 Timer B Data Register : %x\n", data);
 
 		chip->tdr[MC68901_TIMER_B] = data;
 
@@ -974,7 +976,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		break;
 
 	case MC68901_REGISTER_TCDR:
-		logerror("MC68901 Timer C Data Register : %x\n", data);
+		if (LOG) logerror("MC68901 Timer C Data Register : %x\n", data);
 
 		chip->tdr[MC68901_TIMER_C] = data;
 
@@ -985,7 +987,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		break;
 
 	case MC68901_REGISTER_TDDR:
-		logerror("MC68901 Timer D Data Register : %x\n", data);
+		if (LOG) logerror("MC68901 Timer D Data Register : %x\n", data);
 
 		chip->tdr[MC68901_TIMER_D] = data;
 
@@ -996,7 +998,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		break;
 
 	case MC68901_REGISTER_SCR:
-		logerror("MC68901 Sync Character : %x\n", data);
+		if (LOG) logerror("MC68901 Sync Character : %x\n", data);
 
 		chip->scr = data;
 		break;
@@ -1005,32 +1007,36 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		if (data & MC68901_UCR_PARITY_ENABLED)
 		{
 			if (data & MC68901_UCR_PARITY_EVEN)
-				logerror("MC68901 Parity : Even\n");
+			{
+				if (LOG) logerror("MC68901 Parity : Even\n");
+			}
 			else
-				logerror("MC68901 Parity : Odd\n");
+			{
+				if (LOG) logerror("MC68901 Parity : Odd\n");
+			}
 		}
 		else
 		{
-			logerror("MC68901 Parity : Disabled\n");
+			if (LOG) logerror("MC68901 Parity : Disabled\n");
 		}
 
 		switch (data & 0x60)
 		{
 		case MC68901_UCR_WORD_LENGTH_8:
 			chip->rxtx_word = 8;
-			logerror("MC68901 Word Length : 8 bits\n");
+			if (LOG) logerror("MC68901 Word Length : 8 bits\n");
 			break;
 		case MC68901_UCR_WORD_LENGTH_7:
 			chip->rxtx_word = 7;
-			logerror("MC68901 Word Length : 7 bits\n");
+			if (LOG) logerror("MC68901 Word Length : 7 bits\n");
 			break;
 		case MC68901_UCR_WORD_LENGTH_6:
 			chip->rxtx_word = 6;
-			logerror("MC68901 Word Length : 6 bits\n");
+			if (LOG) logerror("MC68901 Word Length : 6 bits\n");
 			break;
 		case MC68901_UCR_WORD_LENGTH_5:
 			chip->rxtx_word = 5;
-			logerror("MC68901 Word Length : 5 bits\n");
+			if (LOG) logerror("MC68901 Word Length : 5 bits\n");
 			break;
 		}
 
@@ -1039,29 +1045,33 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		case MC68901_UCR_START_STOP_0_0:
 			chip->rxtx_start = 0;
 			chip->rxtx_stop = 0;
-			logerror("MC68901 Start Bits : 0, Stop Bits : 0, Format : synchronous\n");
+			if (LOG) logerror("MC68901 Start Bits : 0, Stop Bits : 0, Format : synchronous\n");
 			break;
 		case MC68901_UCR_START_STOP_1_1:
 			chip->rxtx_start = 1;
 			chip->rxtx_stop = 1;
-			logerror("MC68901 Start Bits : 1, Stop Bits : 1, Format : asynchronous\n");
+			if (LOG) logerror("MC68901 Start Bits : 1, Stop Bits : 1, Format : asynchronous\n");
 			break;
 		case MC68901_UCR_START_STOP_1_15:
 			chip->rxtx_start = 1;
 			chip->rxtx_stop = 1;
-			logerror("MC68901 Start Bits : 1, Stop Bits : 1½, Format : asynchronous\n");
+			if (LOG) logerror("MC68901 Start Bits : 1, Stop Bits : 1½, Format : asynchronous\n");
 			break;
 		case MC68901_UCR_START_STOP_1_2:
 			chip->rxtx_start = 1;
 			chip->rxtx_stop = 2;
-			logerror("MC68901 Start Bits : 1, Stop Bits : 2, Format : asynchronous\n");
+			if (LOG) logerror("MC68901 Start Bits : 1, Stop Bits : 2, Format : asynchronous\n");
 			break;
 		}
 
 		if (data & MC68901_UCR_CLOCK_DIVIDE_16)
-			logerror("MC68901 Rx/Tx Clock Divisor : 16\n");
+		{
+			if (LOG) logerror("MC68901 Rx/Tx Clock Divisor : 16\n");
+		}
 		else
-			logerror("MC68901 Rx/Tx Clock Divisor : 1\n");
+		{
+			if (LOG) logerror("MC68901 Rx/Tx Clock Divisor : 1\n");
+		}
 
 		chip->ucr = data;
 		break;
@@ -1069,20 +1079,24 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 	case MC68901_REGISTER_RSR:
 		if ((data & MC68901_RSR_RCV_ENABLE) == 0)
 		{
-			logerror("MC68901 Receiver Disabled\n");
+			if (LOG) logerror("MC68901 Receiver Disabled\n");
 			chip->rsr = 0;
 		}
 		else
 		{
-			logerror("MC68901 Receiver Enabled\n");
+			if (LOG) logerror("MC68901 Receiver Enabled\n");
 
 			if (data & MC68901_RSR_SYNC_STRIP_ENABLE)
-				logerror("MC68901 Sync Strip Enabled\n");
+			{
+				if (LOG) logerror("MC68901 Sync Strip Enabled\n");
+			}
 			else
-				logerror("MC68901 Sync Strip Disabled\n");
+			{
+				if (LOG) logerror("MC68901 Sync Strip Disabled\n");
+			}
 
 			if (data & MC68901_RSR_FOUND_SEARCH)
-				logerror("MC68901 Receiver Search Mode Enabled\n");
+				if (LOG) logerror("MC68901 Receiver Search Mode Enabled\n");
 
 			chip->rsr = data & 0x0b;
 		}
@@ -1091,39 +1105,47 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 	case MC68901_REGISTER_TSR:
 		if ((data & MC68901_TSR_XMIT_ENABLE) == 0)
 		{
-			logerror("MC68901 Transmitter Disabled\n");
+			if (LOG) logerror("MC68901 Transmitter Disabled\n");
 
 			chip->tsr = data & 0x27;
 		}
 		else
 		{
-			logerror("MC68901 Transmitter Enabled\n");
+			if (LOG) logerror("MC68901 Transmitter Enabled\n");
 
 			switch (data & 0x06)
 			{
 			case MC68901_TSR_OUTPUT_HI_Z:
-				logerror("MC68901 Transmitter Disabled Output State : Hi-Z\n");
+				if (LOG) logerror("MC68901 Transmitter Disabled Output State : Hi-Z\n");
 				break;
 			case MC68901_TSR_OUTPUT_LOW:
-				logerror("MC68901 Transmitter Disabled Output State : 0\n");
+				if (LOG) logerror("MC68901 Transmitter Disabled Output State : 0\n");
 				break;
 			case MC68901_TSR_OUTPUT_HIGH:
-				logerror("MC68901 Transmitter Disabled Output State : 1\n");
+				if (LOG) logerror("MC68901 Transmitter Disabled Output State : 1\n");
 				break;
 			case MC68901_TSR_OUTPUT_LOOP:
-				logerror("MC68901 Transmitter Disabled Output State : Loop\n");
+				if (LOG) logerror("MC68901 Transmitter Disabled Output State : Loop\n");
 				break;
 			}
 
 			if (data & MC68901_TSR_BREAK)
-				logerror("MC68901 Transmitter Break Enabled\n");
+			{
+				if (LOG) logerror("MC68901 Transmitter Break Enabled\n");
+			}
 			else
-				logerror("MC68901 Transmitter Break Disabled\n");
+			{
+				if (LOG) logerror("MC68901 Transmitter Break Disabled\n");
+			}
 
 			if (data & MC68901_TSR_AUTO_TURNAROUND)
-				logerror("MC68901 Transmitter Auto Turnaround Enabled\n");
+			{
+				if (LOG) logerror("MC68901 Transmitter Auto Turnaround Enabled\n");
+			}
 			else
-				logerror("MC68901 Transmitter Auto Turnaround Disabled\n");
+			{
+				if (LOG) logerror("MC68901 Transmitter Auto Turnaround Disabled\n");
+			}
 
 			chip->tsr = data & 0x2f;
 			chip->tsr |= MC68901_TSR_BUFFER_EMPTY;  // x68000 expects the buffer to be empty, so this will do for now
@@ -1131,7 +1153,7 @@ void mc68901_register_w(mc68901_t *chip, int reg, UINT8 data)
 		break;
 
 	case MC68901_REGISTER_UDR:
-		logerror("MC68901 UDR %x\n", data);
+		if (LOG) logerror("MC68901 UDR %x\n", data);
 		chip->udr = data;
 		//chip->tsr &= ~MC68901_TSR_BUFFER_EMPTY;
 		break;
@@ -1266,7 +1288,7 @@ int mc68901_get_vector(mc68901_t *chip)
 			}
 
 			chip->ipr &= ~(1 << ch);
-			chip->irqlevel = CLEAR_LINE;
+
 			mc68901_check_interrupts(chip);
 
 			return (chip->vr & 0xf0) | ch;
@@ -1365,7 +1387,6 @@ static DEVICE_START( mc68901 )
 	state_save_register_item(unique_tag, 0, mc68901->rxtx_stop);
 	state_save_register_item(unique_tag, 0, mc68901->rsr_read);
 	state_save_register_item(unique_tag, 0, mc68901->next_rsr);
-	state_save_register_item(unique_tag, 0, mc68901->irqlevel);
 
 	return mc68901;
 }
