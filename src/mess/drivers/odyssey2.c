@@ -10,6 +10,7 @@
 #include "cpu/i8039/i8039.h"
 #include "includes/odyssey2.h"
 #include "devices/cartslot.h"
+#include "sound/sp0256.h"
 
 static ADDRESS_MAP_START( odyssey2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x03FF) AM_ROM
@@ -147,6 +148,12 @@ static GFXDECODE_START( odyssey2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
 
+static const struct sp0256_interface the_voice_sp0256 = {
+	NULL,
+	0,
+	REGION_SOUND1
+};
+
 static MACHINE_DRIVER_START( odyssey2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
@@ -170,9 +177,13 @@ static MACHINE_DRIVER_START( odyssey2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD(CUSTOM, XTAL_7_15909MHz/2)
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+//	MDRV_SOUND_ADD(SP0256, 3120000)
+//	MDRV_SOUND_CONFIG(the_voice_sp0256)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( videopac )
@@ -198,7 +209,7 @@ static MACHINE_DRIVER_START( videopac )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD(CUSTOM, XTAL_17_73447MHz/5)
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -226,7 +237,7 @@ static MACHINE_DRIVER_START( g7400 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD(CUSTOM, 3547000)
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -238,6 +249,10 @@ ROM_START (odyssey2)
 
     ROM_REGION(0x4000, REGION_USER1, 0)
 	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
+
+//	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
+//	/* SP0256 mask rom */
+//	ROM_LOAD( "0256-019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
 ROM_END
 
 ROM_START (videopac)
