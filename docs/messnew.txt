@@ -2,11 +2,11 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Dick Smith Super-80 [Robbbert]
 - Epoch Game Pocket Computer [Wilbert Pol]
 - Galeb [Miodrag Milanovic]
 - Orao [Miodrag Milanovic]
 - Philips Videopac G7000/C52 [Wilbert Pol]
-- Dick Smith Super-80 [Robbbert]
 
 
 
@@ -20,12 +20,12 @@ System Driver Changes:
 
 - [GAMEBOY] Added support for Korean MBC1 mapper variant.  [Wilbert Pol]
 
+- [MBEE] Fixed colours and sound. [Robbbert]
+
 - [QL] System boots up again. (bug #1495) [Curt Coder]
 
 - [VC4000] Cleaned up, added quickload and fixed colors.  (bug #1404) [Manfred
   Schneider]
-
-- [MBEE] Fix colours and sound [Robbbert]
 
 
 
