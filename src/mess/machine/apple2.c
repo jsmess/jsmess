@@ -1428,7 +1428,7 @@ UINT8 apple2_iwm_getdiskreg(void)
 static void *apple2_fdc_init(running_machine *machine, int slot, applefdc_t fdc_type)
 {
 	const struct IODevice *dev;
-	struct applefdc_interface intf;
+	applefdc_interface intf;
 
 	apple2_fdc_has_35 = FALSE;
 	apple2_fdc_has_525 = FALSE;

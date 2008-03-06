@@ -29,7 +29,8 @@ typedef enum
 } applefdc_t;
 
 
-struct applefdc_interface
+typedef struct _applefdc_interface applefdc_interface;
+struct _applefdc_interface
 {
 	applefdc_t type;
 	void (*set_lines)(UINT8 lines);
@@ -41,7 +42,7 @@ struct applefdc_interface
 };
 
 
-void applefdc_init(const struct applefdc_interface *intf);
+void applefdc_init(const applefdc_interface *intf);
 READ8_HANDLER( applefdc_r );
 WRITE8_HANDLER( applefdc_w );
 UINT8 applefdc_get_lines(void);

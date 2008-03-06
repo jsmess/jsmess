@@ -1178,7 +1178,7 @@ MACHINE_RESET( lisa )
 
 	/* initialize floppy */
 	{
-		static struct applefdc_interface intf =
+		static applefdc_interface intf =
 		{
 			APPLEFDC_IWM,
 			sony_set_lines,

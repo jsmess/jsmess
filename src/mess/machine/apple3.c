@@ -688,7 +688,7 @@ static void apple3_set_enable_lines(int enable_mask)
 
 
 
-static const struct applefdc_interface apple3_fdc_interface =
+static const applefdc_interface apple3_fdc_interface =
 {
 	APPLEFDC_APPLE2,
 	apple525_set_lines,

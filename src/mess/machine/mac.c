@@ -1299,7 +1299,7 @@ MACHINE_RESET(mac)
 
 	/* initialize floppy */
 	{
-		static const struct applefdc_interface intf =
+		static const applefdc_interface intf =
 		{
 			APPLEFDC_IWM,
 			sony_set_lines,

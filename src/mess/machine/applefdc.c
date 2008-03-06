@@ -86,7 +86,7 @@ enum
 
 static int iwm_mode;		/* 0-31 */
 static emu_timer *motor_timer;
-static struct applefdc_interface iwm_intf;
+static applefdc_interface iwm_intf;
 
 static TIMER_CALLBACK(iwm_turnmotor_onoff);
 
@@ -99,7 +99,7 @@ static TIMER_CALLBACK(iwm_turnmotor_onoff);
 
 ***************************************************************************/
 
-void applefdc_init(const struct applefdc_interface *intf)
+void applefdc_init(const applefdc_interface *intf)
 {
 	applefdc_lines = 0;
 	iwm_mode = 0x1f;	/* default value needed by Lisa 2 - no, I don't know if it is true */
