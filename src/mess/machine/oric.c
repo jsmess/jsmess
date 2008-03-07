@@ -209,7 +209,7 @@ static void oric_psg_connection_refresh(void)
 			/* read register data */
 			case 1:
 			{
-				oric_via_port_a_data = AY8910_read_port_0_r(0);
+				//oric_via_port_a_data = AY8910_read_port_0_r(0);
 			}
 			break;
 			/* write register data */
