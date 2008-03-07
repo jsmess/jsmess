@@ -48,7 +48,8 @@
 #include "cpu/z80/z80daisy.h"
 
 static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_READ( mbee_lowram_r ) AM_BASE( &mbee_workram )
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
+	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
@@ -58,7 +59,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xdfff) AM_RAM
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
+	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_videoram_r, mbee_videoram_w) AM_BASE(&pcgram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbee_pcg_color_r, mbee_pcg_color_w)
@@ -252,7 +254,7 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_CPU_ADD_TAG("main", Z80, 3375000)         /* 3.37500 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mbee_mem, 0)
 	MDRV_CPU_IO_MAP(mbee_ports, 0)
-	/* MDRV_CPU_CONFIG(mbee_daisy_chain) */
+	MDRV_CPU_CONFIG(mbee_daisy_chain)
 	MDRV_CPU_VBLANK_INT(mbee_interrupt,1)
 	MDRV_INTERLEAVE(1)
 
@@ -285,9 +287,19 @@ static MACHINE_DRIVER_START( mbee56 )
 	MDRV_IMPORT_FROM( mbee )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP(mbee56_mem, 0)
-	MDRV_MACHINE_START( mbee56 )
 MACHINE_DRIVER_END
 
+static DRIVER_INIT( mbee )
+{
+	UINT8 *RAM = memory_region(REGION_CPU1);
+	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0x8000);
+}
+
+static DRIVER_INIT( mbee56 )
+{
+	UINT8 *RAM = memory_region(REGION_CPU1);
+	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xe000);
+}
 
 ROM_START( mbee )
     ROM_REGION(0x10000,REGION_CPU1,0)
@@ -383,8 +395,8 @@ SYSTEM_CONFIG_START(mbee)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
-COMP( 1982, mbee,     0,	0,	mbee,     mbee,     0,        mbee,		"Applied Technology",  "Microbee 32 IC" , 0)
-COMP( 1982, mbeepc,   mbee,	0,	mbee,     mbee,     0,        mbee,		"Applied Technology",  "Microbee 32 PC" , 0)
-COMP( 1985?,mbeepc85, mbee,	0,	mbee,     mbee,     0,        mbee,		"Applied Technology",  "Microbee 32 PC85" , 0)
-COMP( 1983, mbee56,   mbee,	0,	mbee56,   mbee,     0,        mbee,		"Applied Technology",  "Microbee 56" , 0)
+COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,     mbee,		"Applied Technology",  "Microbee 32 IC" , 0)
+COMP( 1982, mbeepc,   mbee,	0,	mbee,     mbee,     mbee,     mbee,		"Applied Technology",  "Microbee 32 PC" , 0)
+COMP( 1985?,mbeepc85, mbee,	0,	mbee,     mbee,     mbee,     mbee,		"Applied Technology",  "Microbee 32 PC85" , 0)
+COMP( 1983, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56,   mbee,		"Applied Technology",  "Microbee 56" , 0)
 

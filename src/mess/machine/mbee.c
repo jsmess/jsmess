@@ -32,7 +32,6 @@ static UINT8 fdc_den = 0;
 static UINT8 fdc_status = 0;
 static void pio_interrupt(int state);
 static void mbee_fdc_callback(wd17xx_state_t event, void *param);
-static UINT8 mbee_busnop = 0;
 
 UINT8 *mbee_workram;
 
@@ -49,61 +48,28 @@ static void pio_interrupt(int state)
 }
 
 /*
-  NOTE: the original hardware has a "busnop" circuit which is enabled on reset/poweron.
-  It causes all reads to return 0x00 until A15 is asserted (e.g. a read at or above 0x8000).
-  The following stuff emulates that functionality.
+  On reset or power on, a circuit forces rom 8000-8FFF to appear at 0000-0FFF, while ram is disabled.
+  It gets set back to normal on the first attempt to write to memory. (/WR line goes active).
+  The previous code caused the debugger to show $FF always in RAM, soft reset to hang, and many games to not work.
 */
 
-READ8_HANDLER( mbee_lowram_r )
+
+/* after the first 4 bytes have been read from ROM, switch the ram back in */
+static TIMER_CALLBACK( mbee_reset )
 {
-	if (mbee_busnop)
-	{
-		return 0;
-	}
-
-	return mbee_workram[offset];
-}
-
-static OPBASE_HANDLER( mbee_opbase_handler )
-{
-	if (address > 0x7fff)
-	{
-		mbee_busnop = 0;
-	}
-
-	return address;
-}
-
-static OPBASE_HANDLER( mbee56_opbase_handler )
-{
-	if (address > 0xdfff)
-	{
-		mbee_busnop = 0;
-	}
-
-	return address;
+	memory_set_bank(1, 0);
 }
 
 MACHINE_RESET( mbee )
 {
-	mbee_busnop = 1;
-}
-
-static void mbee_machine_start(opbase_handler handler)
-{
 	z80pio_init(0, &pio_intf);
-	wd17xx_init(WD_TYPE_179X,mbee_fdc_callback, NULL);
-	memory_set_opbase_handler(0, handler);
+	timer_set(ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
+	memory_set_bank(1, 1);
 }
 
 MACHINE_START( mbee )
 {
-	mbee_machine_start(mbee_opbase_handler);
-}
-
-MACHINE_START( mbee56 )
-{
-	mbee_machine_start(mbee56_opbase_handler);
+	wd17xx_init(WD_TYPE_179X,mbee_fdc_callback, NULL);
 }
 
 static mess_image *cassette_device_image(void)
