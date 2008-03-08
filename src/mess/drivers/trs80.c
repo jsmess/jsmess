@@ -73,7 +73,6 @@ Not emulated:
  LNW80 Colour board
  LNW80 Hires graphics
  LNW80 24x80 screen
- LNW80 Character generator hasn't been decoded, that's why the screen is corrupt
 
 ***************************************************************************/
 
@@ -285,7 +284,7 @@ static INPUT_PORTS_START( trs80 )
 
 INPUT_PORTS_END
 
-static const gfx_layout trs80_charlayout_normal_width =
+static const gfx_layout trs80_charlayout =
 {
 	FW,FH,			/* 6 x 12 characters */
 	256,			/* 256 characters */
@@ -299,25 +298,8 @@ static const gfx_layout trs80_charlayout_normal_width =
 	8*FH		   /* every char takes FH bytes */
 };
 
-static const gfx_layout lnw80_charlayout_normal_width =
-{
-	8, 8,			/* 6 x 12 characters */
-	256,			/* 256 characters */
-	1,				/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 5, 6, 1, 0, 2, 3, 4, 7 },
-	/* y offsets */
-	{  0*8, 0x200*8, 0x100*8, 0x300*8, 1*8, 0x201*8, 0x101*8, 0x301*8 },
-	2*8		   /* every char takes FH bytes */
-};
-
 static GFXDECODE_START( trs80 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout_normal_width, 0, 1 )
-GFXDECODE_END
-
-static GFXDECODE_START( lnw80 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, lnw80_charlayout_normal_width, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -368,11 +350,6 @@ static MACHINE_DRIVER_START( model1 )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( mem_model1, 0 )
 	MDRV_CPU_IO_MAP( io_model1, 0 )
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( lnw80 )
-	MDRV_IMPORT_FROM( model1 )
-	MDRV_GFXDECODE( lnw80 )
 MACHINE_DRIVER_END
 
 
@@ -441,7 +418,8 @@ ROM_START(lnw80)
 	ROM_LOAD("lnw_c1.bin", 0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
 
 	ROM_REGION(0x01000, REGION_GFX1,0)
-	ROM_LOAD("lnw_chr.bin",0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
+	ROM_LOAD("lnw_chr.bin",0x0800, 0x0400, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
+	ROM_IGNORE( 0x400 )		/* leave out unused ff's */
 ROM_END
 
 ROM_START(trs80m3)
@@ -535,7 +513,7 @@ COMP( 1977, trs80,    0,	 0,		level1,   trs80, trs80,    trs80,	"Tandy Radio Sha
 COMP( 1978, trs80l2,  trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Radio Shack Level II Basic)" , 0)
 COMP( 1978, trs80l2a, trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (R/S L2 Basic)" , 0)
 COMP( 1980, sys80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
-COMP( 1981, lnw80,    trs80,	 0,		lnw80,    trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
+COMP( 1981, lnw80,    trs80,	 0,		model1,   trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
 COMP( 1980, trs80m3,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", GAME_NOT_WORKING )
 COMP( 1980, trs80m4,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", GAME_NOT_WORKING )
 

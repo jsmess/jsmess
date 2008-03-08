@@ -16,16 +16,10 @@
 ***************************************************************************/
 static int width_store = 10;  // bodgy value to force an initial resize
 
-
-/***************************************************************************
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function,
-  it will be called by the main emulation engine.
-***************************************************************************/
 VIDEO_UPDATE( trs80 )
 {
-	int width = 64 - (trs80_port_ff & 8) * 4;
-	int skip = 3 - width / 32;
+	int width = 64 - ((trs80_port_ff & 8) << 2);
+	int skip = 3 - (width >> 5);
 	int i=0,x,y,chr;
 	int adj=readinputport(0)&0x40;
 
@@ -34,11 +28,12 @@ VIDEO_UPDATE( trs80 )
 		width_store = width;
 		video_screen_set_visarea(0, 0, width*FW-1, 0, 16*FH-1);
 	}
+
 	for (y = 0; y < 16; y++)
 	{
 		for (x = 0; x < 64; x+=skip)
 		{
-			i = y * 64 + x;
+			i = (y << 6) + x;
 			chr=videoram[i];
 			if ((adj) && (chr < 32)) chr+=64;			// 7-bit video handler
 			drawgfx( bitmap,machine->gfx[0],chr,0,0,0,x/skip*FW,y*FH,
