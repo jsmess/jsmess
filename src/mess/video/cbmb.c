@@ -88,11 +88,11 @@ MC6845_UPDATE_ROW( cbm600_update_row )
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
-//		if ( ma + i == cursor_ma ) {
-//			plot_box( bitmap, machine->gfx[cbmb_font]->width * i, y, machine->gfx[cbmb_font]->width, 1, machine->pens[1] );
-//		} else {
+		if ( i == cursor_x ) {
+			plot_box( bitmap, machine->gfx[cbmb_font]->width * i, y, machine->gfx[cbmb_font]->width, 1, machine->pens[1] );
+		} else {
 			drawgfx( bitmap, machine->gfx[cbmb_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
-//		}
+		}
 	}
 }
 
@@ -101,11 +101,11 @@ MC6845_UPDATE_ROW( cbm700_update_row )
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
-//		if ( ma + i == cursor_ma ) {
-//			plot_box( bitmap, machine->gfx[cbmb_font]->width * i, y, machine->gfx[cbmb_font]->width, 1, machine->pens[1] );
-//		} else {
+		if ( i == cursor_x ) {
+			plot_box( bitmap, machine->gfx[cbmb_font]->width * i, y, machine->gfx[cbmb_font]->width, 1, machine->pens[1] );
+		} else {
 			drawgfx( bitmap, machine->gfx[cbmb_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, machine->gfx[cbmb_font]->width * i, y-ra, cliprect, TRANSPARENCY_NONE, 0 );
-//		}
+		}
 	}
 }
 
