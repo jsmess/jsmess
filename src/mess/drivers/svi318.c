@@ -355,7 +355,7 @@ MACHINE_DRIVER_END
 
 static const mc6845_interface svi806_crtc6845_interface = {
 	1,
-	3579545 /*?*/,
+	XTAL_12MHz / 4,
 	8 /*?*/,
 	NULL,
 	svi806_crtc6845_update_row,

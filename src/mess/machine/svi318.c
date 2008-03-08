@@ -439,6 +439,10 @@ MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 		int j;
 		UINT8	data = svi.svi806_gfx[ svi.svi806_ram[ ( ma + i ) & 0x7FF ] * 16 + ra ];
 
+		if ( i == cursor_x ) {
+			data = 0xFF;
+		}
+
 		for( j=0; j < 8; j++ )
 		{
 			*BITMAP_ADDR16(bitmap, y, i * 8 + j ) = TMS9928A_PALETTE_SIZE + ( ( data & 0x80 ) ? 1 : 0 );
