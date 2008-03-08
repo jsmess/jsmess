@@ -185,7 +185,7 @@ READ8_HANDLER( odyssey2_getbus )
 {
     UINT8 data = 0xff;
 
-    if ((p2 & P2_KEYBOARD_SELECT_MASK) != 0)
+    if ((p2 & P2_KEYBOARD_SELECT_MASK) == 1)
 		data &= readinputport(6);       /* read joystick 1 */
 
     if ((p2 & P2_KEYBOARD_SELECT_MASK) == 0)
