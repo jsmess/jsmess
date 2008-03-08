@@ -9,8 +9,10 @@
 #include "driver.h"
 #include "includes/odyssey2.h"
 #include "devices/cartslot.h"
+#include "sound/sp0256.h"
 
 
+static int the_voice_lrq_state;
 static UINT8 *ram;
 static UINT8 p1, p2;
 static size_t	cart_size;
@@ -32,6 +34,14 @@ static void odyssey2_switch_banks(void) {
 		memory_set_bankptr(2, memory_region(REGION_USER1) + (p1 & 0x03) * 0x800 );
 		break;
 	}
+}
+
+void the_voice_lrq_callback(int state) {
+	the_voice_lrq_state = state;
+}
+
+READ8_HANDLER( odyssey2_t0_r ) {
+	return ( the_voice_lrq_state == ASSERT_LINE ) ? 0 : 1;
 }
 
 DRIVER_INIT( odyssey2 )
@@ -71,8 +81,17 @@ READ8_HANDLER( odyssey2_bus_r )
 
 WRITE8_HANDLER( odyssey2_bus_w )
 {
-    if ((p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
+    if ((p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00) {
 		ram[offset] = data;
+		if ( offset & 0x80 ) {
+			if ( data & 0x20 ) {
+				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, p1 );
+				sp0256_ALD_w( 0, offset & 0x7F );
+			} else {
+				/* TODO: Reset sp0256 in this case */
+			}
+		}
+	}
 
     else if (!(p1 & P1_VDC_ENABLE))
 		odyssey2_video_w(offset, data);

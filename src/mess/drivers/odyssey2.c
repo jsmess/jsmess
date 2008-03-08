@@ -23,6 +23,7 @@ static ADDRESS_MAP_START( odyssey2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( I8039_p1,	 I8039_p1)	AM_READWRITE( odyssey2_getp1, odyssey2_putp1 )
 	AM_RANGE( I8039_p2,	 I8039_p2)	AM_READWRITE( odyssey2_getp2, odyssey2_putp2 )
 	AM_RANGE( I8039_bus, I8039_bus)	AM_READWRITE( odyssey2_getbus, odyssey2_putbus )
+	AM_RANGE( I8039_t0,  I8039_t0)  AM_READ( odyssey2_t0_r )
 	AM_RANGE( I8039_t1,  I8039_t1)	AM_READ( odyssey2_t1_r )
 ADDRESS_MAP_END
 
@@ -31,6 +32,7 @@ static ADDRESS_MAP_START( g7400_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( I8039_p1,  I8039_p1)  AM_READWRITE( odyssey2_getp1, odyssey2_putp1 )
 	AM_RANGE( I8039_p2,  I8039_p2)  AM_READWRITE( odyssey2_getp2, odyssey2_putp2 )
 	AM_RANGE( I8039_bus, I8039_bus) AM_READWRITE( odyssey2_getbus, odyssey2_putbus )
+	AM_RANGE( I8039_t0,  I8039_t0)  AM_READ( odyssey2_t0_r )
 	AM_RANGE( I8039_t1,  I8039_t1)  AM_READ( odyssey2_t1_r )
 ADDRESS_MAP_END
 
@@ -149,7 +151,7 @@ static GFXDECODE_START( odyssey2 )
 GFXDECODE_END
 
 static const struct sp0256_interface the_voice_sp0256 = {
-	NULL,
+	the_voice_lrq_callback,
 	0,
 	REGION_SOUND1
 };
@@ -181,9 +183,9 @@ static MACHINE_DRIVER_START( odyssey2 )
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-//	MDRV_SOUND_ADD(SP0256, 3120000)
-//	MDRV_SOUND_CONFIG(the_voice_sp0256)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ADD(SP0256, 3120000)
+	MDRV_SOUND_CONFIG(the_voice_sp0256)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( videopac )
@@ -212,6 +214,10 @@ static MACHINE_DRIVER_START( videopac )
 	MDRV_SOUND_ADD(CUSTOM, XTAL_17_73447MHz/5)
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(SP0256, 3120000)
+	MDRV_SOUND_CONFIG(the_voice_sp0256)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( g7400 )
@@ -250,9 +256,13 @@ ROM_START (odyssey2)
     ROM_REGION(0x4000, REGION_USER1, 0)
 	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
 
-//	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
-//	/* SP0256 mask rom */
-//	ROM_LOAD( "0256-019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
+	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
+	/* SP0256B-019 mask rom */
+	ROM_LOAD( "0256b019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
+	/* External ROM from The Voice */
+	ROM_LOAD( "sp128_03.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
+	/* Additional rom from S.I.D. the Spellbinder */
+	ROM_LOAD( "sp128_04.bin",   0x8000, 0x4000, CRC(6780c7d3) SHA1(2e44233f25d07e35500ef79c9c542e974c94390a) )
 ROM_END
 
 ROM_START (videopac)
@@ -265,6 +275,14 @@ ROM_START (videopac)
 
 	ROM_REGION(0x4000, REGION_USER1, 0)
 	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
+
+	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
+	/* SP0256B-019 mask rom */
+	ROM_LOAD( "0256b019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
+	/* External ROM from The Voice */
+	ROM_LOAD( "sp128_03.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
+	/* Additional rom from S.I.D. the Spellbinder */
+	ROM_LOAD( "sp128_04.bin",   0x8000, 0x4000, CRC(6780c7d3) SHA1(2e44233f25d07e35500ef79c9c542e974c94390a) )
 ROM_END
 
 ROM_START (g7400)
