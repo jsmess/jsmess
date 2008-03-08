@@ -55,12 +55,13 @@
 
     TODO:
 
+	- change to use devread/write in 0.123u5
+	- pass mc6854 around in machine->driver_data
     - keyboard ROM dump is needed!
     - keyboard NE556 discrete beeper
     - ABC806 memory banking
     - proper port mirroring
     - COM port DIP switch
-    - use MAME CRTC6845 implementation
     - HR graphics board
     - floppy controller board
     - Facit DTC (recased ABC-800?)
@@ -89,10 +90,28 @@
 #include "devices/cassette.h"
 #include "devices/printer.h"
 
+mc6845_t *abc800_mc6845;
 
 static emu_timer *abc800_ctc_timer;
 
 /* Read/Write Handlers */
+
+// CRTC
+
+static READ8_HANDLER( crtc_register_r )
+{
+	return mc6845_register_r(abc800_mc6845);
+}
+
+static WRITE8_HANDLER( crtc_register_w )
+{
+	mc6845_register_w(abc800_mc6845, data);
+}
+
+static WRITE8_HANDLER( crtc_address_w )
+{
+	mc6845_address_w(abc800_mc6845, data);
+}
 
 // HR
 
@@ -264,7 +283,7 @@ static WRITE8_HANDLER( abc77_data_w )
 static ADDRESS_MAP_START( abc800_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc800_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -277,9 +296,9 @@ static ADDRESS_MAP_START( abc800_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
 	AM_RANGE(0x30, 0x32) AM_WRITE(ram_ctrl_w)
-//	AM_RANGE(0x31, 0x31) AM_READ(crtc6845_0_register_r)
-//	AM_RANGE(0x38, 0x38) AM_WRITE(crtc6845_0_address_w)
-//	AM_RANGE(0x39, 0x39) AM_WRITE(crtc6845_0_register_w)
+	AM_RANGE(0x31, 0x31) AM_READ(crtc_register_r)
+	AM_RANGE(0x38, 0x38) AM_WRITE(crtc_address_w)
+	AM_RANGE(0x39, 0x39) AM_WRITE(crtc_register_w)
 	AM_RANGE(0x40, 0x43) AM_READWRITE(sio2_r, sio2_w)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
@@ -303,7 +322,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x77ff) AM_RAMBANK(1)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc800_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -315,10 +334,10 @@ static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
-//	AM_RANGE(0x31, 0x31) AM_READ(crtc6845_0_register_r)
+	AM_RANGE(0x31, 0x31) AM_READ(crtc_register_r)
 	AM_RANGE(0x32, 0x35) AM_READWRITE(sio2_r, sio2_w)
-//	AM_RANGE(0x38, 0x38) AM_WRITE(crtc6845_0_address_w)
-//	AM_RANGE(0x39, 0x39) AM_WRITE(crtc6845_0_register_w)
+	AM_RANGE(0x38, 0x38) AM_WRITE(crtc_address_w)
+	AM_RANGE(0x39, 0x39) AM_WRITE(crtc_register_w)
 	AM_RANGE(0x60, 0x63) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
@@ -328,7 +347,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc806_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x77ff) AM_RAMBANK(1)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc800_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -340,12 +359,12 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
-//	AM_RANGE(0x31, 0x31) AM_READ(crtc6845_0_register_r)
+	AM_RANGE(0x31, 0x31) AM_READ(crtc_register_r)
 	AM_RANGE(0x34, 0x34) AM_READWRITE(bankswitch_r, bankswitch_w)
 	AM_RANGE(0x35, 0x35) AM_READWRITE(attribute_r, attribute_w)
 	AM_RANGE(0x37, 0x37) AM_READWRITE(sync_r, fgctlprom_w)
-//	AM_RANGE(0x38, 0x38) AM_WRITE(crtc6845_0_address_w)
-//	AM_RANGE(0x39, 0x39) AM_WRITE(crtc6845_0_register_w)
+	AM_RANGE(0x38, 0x38) AM_WRITE(crtc_address_w)
+	AM_RANGE(0x39, 0x39) AM_WRITE(crtc_register_w)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(sio2_r, sio2_w)
 	AM_RANGE(0x60, 0x63) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
@@ -504,52 +523,6 @@ static INPUT_PORTS_START( abc806 )
 	PORT_INCLUDE(abc77)
 INPUT_PORTS_END
 
-/* Graphics Layouts */
-
-static const gfx_layout charlayout_abc800m =
-{
-	6, 10,
-	128,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	16*8
-};
-
-static const gfx_layout charlayout_abc802_40 =
-{
-	12, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	16*8
-};
-
-static const gfx_layout charlayout_abc802_80 =
-{
-	6, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	16*8
-};
-
-/* Graphics Decode Info */
-
-static GFXDECODE_START( abc800m )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc800m, 0, 2 )
-GFXDECODE_END
-
-static GFXDECODE_START( abc802 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc802_40, 0, 8 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc802_80, 0, 8 )
-GFXDECODE_END
-
 /* Machine Initialization */
 
 static WRITE8_HANDLER( abc800_ctc_z2_w )
@@ -619,7 +592,7 @@ static WRITE8_HANDLER( abc802_dart_rts_w )
 {
 	if (offset == 1)
 	{
-		abc802_set_columns(data ? 40 : 80);
+//		abc802_set_columns(data ? 40 : 80);
 	}
 }
 
@@ -663,6 +636,8 @@ static MACHINE_START( abc800 )
 	z80ctc_init(0, &abc800_ctc_intf);
 	z80sio_init(0, &abc800_sio_intf);
 	z80dart_init(0, &abc800_dart_intf);
+
+	abc800_mc6845 = devtag_get_token(machine, MC6845, "crtc");
 }
 
 static INTERRUPT_GEN( abc802_vblank_interrupt )
@@ -703,7 +678,7 @@ static MACHINE_RESET( abc806 )
 
 static MACHINE_DRIVER_START( abc800m )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, ABC800_X01/2/2)	// 3 MHz
+	MDRV_CPU_ADD(Z80, ABC800_X01/2/2)	// 3 MHz
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc800_map, 0)
 	MDRV_CPU_IO_MAP(abc800_io_map, 0)
@@ -714,58 +689,58 @@ static MACHINE_DRIVER_START( abc800m )
 
 	MDRV_MACHINE_START(abc800)
 
-	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*6, 24*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 80*6-1, 0, 24*10-1)
-	MDRV_GFXDECODE(abc800m)
-	MDRV_PALETTE_LENGTH(2)
-
-	MDRV_PALETTE_INIT(abc800m)
-	MDRV_VIDEO_START(abc800m)
-	MDRV_VIDEO_UPDATE(abc800)
+	MDRV_IMPORT_FROM(abc800m_video)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
-	MDRV_IMPORT_FROM(abc800m)
+	// basic machine hardware
+	MDRV_CPU_ADD(Z80, ABC800_X01/2/2)	// 3 MHz
+	MDRV_CPU_CONFIG(abc800_daisy_chain)
+	MDRV_CPU_PROGRAM_MAP(abc800_map, 0)
+	MDRV_CPU_IO_MAP(abc800_io_map, 0)
 
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_SIZE(40*6, 24*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*10-1)
-	MDRV_PALETTE_LENGTH(8)
+	MDRV_CPU_ADD(I8035, 4608000) // 4.608 MHz, keyboard cpu
+	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
+	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
-	MDRV_PALETTE_INIT(abc800c)
-	MDRV_VIDEO_START(abc800c)
+	MDRV_MACHINE_START(abc800)
+
+	MDRV_IMPORT_FROM(abc800c_video)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
-	MDRV_IMPORT_FROM(abc800m)
-
-	MDRV_CPU_MODIFY("main")
+	// basic machine hardware
+	MDRV_CPU_ADD(Z80, ABC800_X01/2/2)	// 3 MHz
+	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc802_map, 0)
 	MDRV_CPU_IO_MAP(abc802_io_map, 0)
 	MDRV_CPU_VBLANK_INT(abc802_vblank_interrupt, 1)
 
+	MDRV_CPU_ADD(I8035, 4608000) // 4.608 MHz, keyboard cpu
+	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
+	MDRV_CPU_IO_MAP(abc77_io_map, 0)
+
 	MDRV_MACHINE_START(abc802)
 	MDRV_MACHINE_RESET(abc802)
 
-	MDRV_GFXDECODE(abc802)
-	MDRV_PALETTE_INIT(abc800m)
-	MDRV_VIDEO_START(abc802)
-	MDRV_VIDEO_UPDATE(abc802)
+	MDRV_IMPORT_FROM(abc802_video)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
-	MDRV_IMPORT_FROM(abc800m)
-	MDRV_CPU_MODIFY("main")
+	// basic machine hardware
+	MDRV_CPU_ADD(Z80, ABC800_X01/2/2)	// 3 MHz
+	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc806_map, 0)
 	MDRV_CPU_IO_MAP(abc806_io_map, 0)
 
+	MDRV_CPU_ADD(I8035, 4608000) // 4.608 MHz, keyboard cpu
+	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
+	MDRV_CPU_IO_MAP(abc77_io_map, 0)
+
 	MDRV_MACHINE_START(abc806)
 	MDRV_MACHINE_RESET(abc806)
+
+	MDRV_IMPORT_FROM(abc806_video)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -802,7 +777,7 @@ ROM_START( abc800c )
 
 	ROM_ABC77
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, REGION_GFX1, 0 )
 	ROM_LOAD( "vuc-se.7c",  0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 )
@@ -848,7 +823,7 @@ ROM_START( abc800m )
 
 	ROM_ABC77
 
-	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, REGION_GFX1, 0 )
 	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 ROM_END
 
@@ -866,7 +841,7 @@ ROM_START( abc802 )
 
 	ROM_ABC77
 
-	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, REGION_GFX1, 0 )
 	ROM_LOAD( "abct2-11.3g",  0x0000, 0x2000, CRC(e21601ee) SHA1(2e838ebd7692e5cb9ba4e80fe2aa47ea2584133a) )
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )
@@ -893,7 +868,7 @@ ROM_START( abc806 )
 
 	ROM_ABC77
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, REGION_GFX1, 0 )
 	ROM_LOAD( "abct6-11.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) ) // 6490243-01
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )

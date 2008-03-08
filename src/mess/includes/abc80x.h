@@ -4,25 +4,16 @@
  *
  ****************************************************************************/
 
-#ifndef ABC80X_H_
-#define ABC80X_H_
-
+#ifndef __ABC80X__
+#define __ABC80X__
 
 #define ABC800_X01 12000000.0
 
-
 /*----------- defined in video/abc80x.c -----------*/
 
-WRITE8_HANDLER( abc800_videoram_w );
-PALETTE_INIT( abc800m );
-PALETTE_INIT( abc800c );
-VIDEO_START( abc800m );
-VIDEO_START( abc800c );
-VIDEO_UPDATE( abc800 );
-VIDEO_START( abc802 );
-VIDEO_UPDATE( abc802 );
+MACHINE_DRIVER_EXTERN(abc800m_video);
+MACHINE_DRIVER_EXTERN(abc800c_video);
+MACHINE_DRIVER_EXTERN(abc802_video);
+MACHINE_DRIVER_EXTERN(abc806_video);
 
-void abc802_set_columns(int columns);
-
-
-#endif /* ABC80X_H_ */
+#endif /* __ABC80X__ */

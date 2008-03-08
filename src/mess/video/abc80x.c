@@ -8,24 +8,15 @@
 #include "includes/abc80x.h"
 #include "video/mc6845.h"
 
+extern mc6845_t *abc800_mc6845;
 
-static tilemap *tx_tilemap;
-static tilemap *tx_tilemap_40;
-static int abc802_columns;
-
-WRITE8_HANDLER( abc800_videoram_w )
-{
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap, offset);
-}
-
-PALETTE_INIT( abc800m )
+static PALETTE_INIT( abc800m )
 {
 	palette_set_color_rgb(machine,  0, 0x00, 0x00, 0x00); // black
 	palette_set_color_rgb(machine,  1, 0xff, 0xff, 0x00); // yellow (really white, but blue signal is disconnected from monitor)
 }
 
-PALETTE_INIT( abc800c )
+static PALETTE_INIT( abc800c )
 {
 	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
 	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff); // blue
@@ -37,103 +28,86 @@ PALETTE_INIT( abc800c )
 	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
 }
 
-static const mc6845_interface crtc6845_intf =
+static MC6845_UPDATE_ROW( abc800m_crtc6845_update_row )
 {
-	0,						/* screen we are acting on */
-	ABC800_X01/6,			/* the clock (pin 21) of the chip */
-	8,						/* number of pixels per video memory address */
-	0,						/* before pixel update callback */
-	0,						/* row update callback */
-	0,						/* after pixel update callback */
-	0						/* call back for display state changes */
+	int col;
+
+	for (col = 0; col < x_count; col++)
+	{
+		int bit;
+
+		UINT8 *charrom = memory_region(REGION_GFX1);
+		UINT16 address = (videoram[(ma + col) & 0x7ff] * 16) + ra;
+		UINT8 data = charrom[address & 0x7ff];
+
+		if (col == cursor_x)
+		{
+			data = ~data; // TODO this might be wrong
+		}
+
+		data <<= 2;
+
+		for (bit = 0; bit < 6; bit++)
+		{
+			*BITMAP_ADDR16(bitmap, y, (col * 6) + bit) = (data & 0x80) ? 1 : 0;
+			data <<= 1;
+		}
+	}
+}
+
+static VIDEO_START( abc800 )
+{
+}
+
+static VIDEO_UPDATE( abc800 )
+{
+	mc6845_update(abc800_mc6845, bitmap, cliprect);
+
+	return 0;
+}
+
+static const mc6845_interface abc800m_crtc6845_interface = {
+	0,
+	ABC800_X01/6,
+	6,
+	NULL,
+	abc800m_crtc6845_update_row,
+	NULL,
+	NULL,
+	NULL,
+	NULL
 };
 
-static TILE_GET_INFO(abc800_get_tile_info)
-{
-	int attr = videoram[tile_index];
-	int bank = 0;	// TODO: bank 1 is graphics mode, add a [40][25] array to support it, also to videoram_w
-	int code = attr & 0x7f;
-	int color = (attr & 0x80) ? 1 : 0;
+MACHINE_DRIVER_START( abc800m_video )
+	// device interface
+	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_CONFIG( abc800m_crtc6845_interface )
 
-	SET_TILE_INFO(bank, code, color, 0);
-}
+	// video hardware
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-VIDEO_START( abc800m )
-{
-	tx_tilemap = tilemap_create(abc800_get_tile_info, tilemap_scan_rows,
-		6, 10, 80, 24);
-}
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MDRV_SCREEN_SIZE(640, 400)
+	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-static TILE_GET_INFO(abc800c_get_tile_info)
-{
-	int code = videoram[tile_index];
-	int color = 1;						// WRONG!
+	MDRV_PALETTE_LENGTH(2)
 
-	SET_TILE_INFO(0, code, color, 0);
-}
+	MDRV_PALETTE_INIT(abc800m)
+	MDRV_VIDEO_START(abc800)
+	MDRV_VIDEO_UPDATE(abc800)
+MACHINE_DRIVER_END
 
-VIDEO_START( abc800c )
-{
-	tx_tilemap = tilemap_create(abc800c_get_tile_info, tilemap_scan_rows,
-		6, 10, 40, 24);
-}
+MACHINE_DRIVER_START( abc800c_video )
+	MDRV_IMPORT_FROM(abc800m_video)
+	MDRV_PALETTE_INIT(abc800c)
+MACHINE_DRIVER_END
 
-VIDEO_UPDATE( abc800 )
-{
-	tilemap_mark_all_tiles_dirty(tx_tilemap);
-	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
+MACHINE_DRIVER_START( abc802_video )
+	MDRV_IMPORT_FROM(abc800m_video)
+MACHINE_DRIVER_END
 
-	return 0;
-}
-
-static TILE_GET_INFO(abc802_get_tile_info_40)
-{
-	int attr = videoram[tile_index * 2];
-	int bank = 0;
-	int code = attr & 0x7f;
-	int color = (attr & 0x80) ? 1 : 0;
-
-	SET_TILE_INFO(bank, code, color, 0);
-}
-
-static TILE_GET_INFO(abc802_get_tile_info_80)
-{
-	int attr = videoram[tile_index];
-	int bank = 1;
-	int code = attr & 0x7f;
-	int color = (attr & 0x80) ? 1 : 0;
-
-	SET_TILE_INFO(bank, code, color, 0);
-}
-
-VIDEO_START( abc802 )
-{
-	tx_tilemap_40 = tilemap_create(abc802_get_tile_info_40, tilemap_scan_rows,
-		12, 10, 40, 24);
-
-	tx_tilemap = tilemap_create(abc802_get_tile_info_80, tilemap_scan_rows,
-		6, 10, 80, 24);
-
-	abc802_columns = 80;
-}
-
-VIDEO_UPDATE( abc802 )
-{
-	if (abc802_columns == 40)
-	{
-		tilemap_mark_all_tiles_dirty(tx_tilemap_40);
-		tilemap_draw(bitmap, cliprect, tx_tilemap_40, 0, 0);
-	}
-	else
-	{
-		tilemap_mark_all_tiles_dirty(tx_tilemap);
-		tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
-	}
-
-	return 0;
-}
-
-void abc802_set_columns(int columns)
-{
-	abc802_columns = columns;
-}
+MACHINE_DRIVER_START( abc806_video )
+	MDRV_IMPORT_FROM(abc800m_video)
+MACHINE_DRIVER_END

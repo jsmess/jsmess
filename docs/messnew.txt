@@ -12,6 +12,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [ABC80x] Updated to use the new MAME MC6845 code. [Curt Coder]
+
 - [APFM1000] Added special APF video mode [PeT]
 
 - [APPLE2] Removed usage of tilemaps.  [Nate Woods]
