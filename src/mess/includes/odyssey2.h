@@ -63,6 +63,9 @@ WRITE8_HANDLER ( odyssey2_putp2 );
 READ8_HANDLER( odyssey2_getbus );
 WRITE8_HANDLER ( odyssey2_putbus );
 
+READ8_HANDLER( odyssey2_t0_r );
+void the_voice_lrq_callback( int state );
+
 READ8_HANDLER ( g7400_bus_r );
 WRITE8_HANDLER ( g7400_bus_w );
 void ef9341_w( int command, int b, UINT8 data );
