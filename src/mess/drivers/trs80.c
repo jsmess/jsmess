@@ -112,6 +112,7 @@ static ADDRESS_MAP_START( mem_level1, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_level1, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_port_xx_r)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
 ADDRESS_MAP_END
@@ -134,6 +135,7 @@ static ADDRESS_MAP_START( mem_model1, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_model1, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_port_xx_r)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
 ADDRESS_MAP_END
@@ -146,6 +148,7 @@ static ADDRESS_MAP_START( mem_model3, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_model3, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80_irq_status_r, trs80_irq_mask_w)
 	AM_RANGE(0xe4, 0xe4)	AM_WRITE(trs80_motor_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(trs80_wd179x_r, wd17xx_command_w)
@@ -296,23 +299,25 @@ static const gfx_layout trs80_charlayout_normal_width =
 	8*FH		   /* every char takes FH bytes */
 };
 
-static const gfx_layout trs80_charlayout_double_width =
+static const gfx_layout lnw80_charlayout_normal_width =
 {
-	FW*2,FH,	   /* FW*2 x FH*3 characters */
-	256,		   /* 256 characters */
-	1,			   /* 1 bits per pixel */
-	{ 0 },		   /* no bitplanes; 1 bit per pixel */
-	/* x offsets double width: use each bit twice */
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 },
+	8, 8,			/* 6 x 12 characters */
+	256,			/* 256 characters */
+	1,				/* 1 bits per pixel */
+	{ 0 },			/* no bitplanes; 1 bit per pixel */
+	/* x offsets */
+	{ 5, 6, 1, 0, 2, 3, 4, 7 },
 	/* y offsets */
-	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8,
-	   6*8, 7*8, 8*8, 9*8,10*8,11*8 },
-	8*FH		   /* every char takes FH bytes */
+	{  0*8, 0x200*8, 0x100*8, 0x300*8, 1*8, 0x201*8, 0x101*8, 0x301*8 },
+	2*8		   /* every char takes FH bytes */
 };
 
 static GFXDECODE_START( trs80 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout_normal_width, 0, 4 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout_double_width, 0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, trs80_charlayout_normal_width, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( lnw80 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lnw80_charlayout_normal_width, 0, 1 )
 GFXDECODE_END
 
 
@@ -348,7 +353,6 @@ static MACHINE_DRIVER_START( level1 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START( trs80 )
 	MDRV_VIDEO_UPDATE( trs80 )
 
 	/* sound hardware */
@@ -364,6 +368,11 @@ static MACHINE_DRIVER_START( model1 )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( mem_model1, 0 )
 	MDRV_CPU_IO_MAP( io_model1, 0 )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( lnw80 )
+	MDRV_IMPORT_FROM( model1 )
+	MDRV_GFXDECODE( lnw80 )
 MACHINE_DRIVER_END
 
 
@@ -432,7 +441,7 @@ ROM_START(lnw80)
 	ROM_LOAD("lnw_c1.bin", 0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
 
 	ROM_REGION(0x01000, REGION_GFX1,0)
-	ROM_LOAD("lnw_chr.bin",0x0800, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
+	ROM_LOAD("lnw_chr.bin",0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
 ROM_END
 
 ROM_START(trs80m3)
@@ -526,7 +535,7 @@ COMP( 1977, trs80,    0,	 0,		level1,   trs80, trs80,    trs80,	"Tandy Radio Sha
 COMP( 1978, trs80l2,  trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Radio Shack Level II Basic)" , 0)
 COMP( 1978, trs80l2a, trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (R/S L2 Basic)" , 0)
 COMP( 1980, sys80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
-COMP( 1981, lnw80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"LNW Research","LNW-80", GAME_NOT_WORKING )
+COMP( 1981, lnw80,    trs80,	 0,		lnw80,    trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
 COMP( 1980, trs80m3,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", GAME_NOT_WORKING )
 COMP( 1980, trs80m4,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", GAME_NOT_WORKING )
 

@@ -26,6 +26,7 @@ QUICKLOAD_LOAD( trs80_cmd );
 MACHINE_START( trs80 );
 MACHINE_RESET( trs80 );
 DRIVER_INIT( trs80 );
+DRIVER_INIT( lnw80 );
 
 WRITE8_HANDLER ( trs80_port_ff_w );
 READ8_HANDLER ( trs80_port_ff_r );
