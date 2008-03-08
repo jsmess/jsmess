@@ -1216,26 +1216,32 @@ static WRITE16_HANDLER( x68k_vid_w )
 	switch(offset)
 	{
 	case 0x200:
-		sys.video.reg[0] = data;
+		COMBINE_DATA(sys.video.reg);
 		break;
 	case 0x280:  // priority levels
-		sys.video.reg[1] = data;
-		sys.video.gfxlayer_pri[0] = data & 0x0003;
-		sys.video.gfxlayer_pri[1] = (data & 0x000c) >> 2;
-		sys.video.gfxlayer_pri[2] = (data & 0x0030) >> 4;
-		sys.video.gfxlayer_pri[3] = (data & 0x00c0) >> 6;
-		sys.video.gfx_pri = (data & 0x0300) >> 8;
-		sys.video.text_pri = (data & 0x0c00) >> 10;
-		sys.video.sprite_pri = (data & 0x3000) >> 12;
-		if(sys.video.gfx_pri == 3)
-			sys.video.gfx_pri--;
-		if(sys.video.text_pri == 3)
-			sys.video.text_pri--;
-		if(sys.video.sprite_pri == 3)
-			sys.video.sprite_pri--;
+		COMBINE_DATA(sys.video.reg+1);
+		if(ACCESSING_LSB)
+		{
+			sys.video.gfxlayer_pri[0] = data & 0x0003;
+			sys.video.gfxlayer_pri[1] = (data & 0x000c) >> 2;
+			sys.video.gfxlayer_pri[2] = (data & 0x0030) >> 4;
+			sys.video.gfxlayer_pri[3] = (data & 0x00c0) >> 6;
+		}
+		if(ACCESSING_MSB)
+		{
+			sys.video.gfx_pri = (data & 0x0300) >> 8;
+			sys.video.text_pri = (data & 0x0c00) >> 10;
+			sys.video.sprite_pri = (data & 0x3000) >> 12;
+			if(sys.video.gfx_pri == 3)
+				sys.video.gfx_pri--;
+			if(sys.video.text_pri == 3)
+				sys.video.text_pri--;
+			if(sys.video.sprite_pri == 3)
+				sys.video.sprite_pri--;
+		}
 		break;
 	case 0x300:
-		sys.video.reg[2] = data;
+		COMBINE_DATA(sys.video.reg+2);
 		break;
 	default:
 		logerror("VC: Invalid video controller write (offset = 0x%04x, data = %04x)\n",offset,data);

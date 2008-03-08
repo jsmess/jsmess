@@ -69,11 +69,11 @@ INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-static bitmap_t* x68k_get_gfx_pri(int pri,int type)
+static bitmap_t* x68k_get_gfx_page(int pri,int type)
 {
 	if(type == GFX16)
 	{
-		switch(sys.video.gfxlayer_pri[pri])
+		switch(pri)
 		{
 		case 0:
 			return x68k_gfx_0_bitmap_16;
@@ -89,7 +89,7 @@ static bitmap_t* x68k_get_gfx_pri(int pri,int type)
 	}
 	if(type == GFX256)
 	{
-		switch(sys.video.gfxlayer_pri[pri])
+		switch(pri)
 		{
 		case 0:
 		case 1:
@@ -701,6 +701,7 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 	int priority;
 	rectangle rect;
 	int xscr,yscr;
+	int gpage;
 
 	for(priority=3;priority>=0;priority--)
 	{
@@ -747,18 +748,16 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 				rect.min_y=sys.crtc.vshift;
 				rect.max_x=rect.min_x + sys.crtc.visible_width-1;
 				rect.max_y=rect.min_y + sys.crtc.visible_height-1;
-				if(sys.video.reg[2] & 0x0004 && sys.video.reg[2] & 0x0008 && priority == sys.video.gfxlayer_pri[2])
-				{
-					xscr = sys.crtc.hbegin-(sys.crtc.reg[16] & 0x1ff);
-					yscr = sys.crtc.vbegin-(sys.crtc.reg[17] & 0x1ff);
-					copyscrollbitmap_trans(bitmap, x68k_gfx_1_bitmap_256, 1, &xscr, 1, &yscr, &cliprect,0);
-				}
-				if(sys.video.reg[2] & 0x0001 && sys.video.reg[2] & 0x0002 && priority == sys.video.gfxlayer_pri[0])
-				{
-					xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
-					yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap_trans(bitmap, x68k_gfx_0_bitmap_256, 1, &xscr, 1, &yscr, &cliprect,0);
-				}
+				gpage = sys.video.gfxlayer_pri[priority];
+				if(sys.video.reg[2] & (1 << priority))
+ 				{
+					if(gpage == 0 || gpage == 2)  // so that we aren't drawing the same pages twice
+					{
+						xscr = sys.crtc.hbegin-(sys.crtc.reg[12 + (gpage*2)] & 0x1ff);
+						yscr = sys.crtc.vbegin-(sys.crtc.reg[13 + (gpage*2)] & 0x1ff);
+						copyscrollbitmap_trans(bitmap, x68k_get_gfx_page(gpage,GFX256), 1, &xscr, 1, &yscr, &cliprect,0);
+					}
+ 				}				
 				break;
 			case 0x00:
 				// 16 colour gfx screen
@@ -766,30 +765,13 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 				rect.min_y=sys.crtc.vshift;
 				rect.max_x=rect.min_x + sys.crtc.visible_width-1;
 				rect.max_y=rect.min_y + sys.crtc.visible_height-1;
-				if(sys.video.reg[2] & 0x0008)  // Pri3
-				{
-					xscr = sys.crtc.hbegin-(sys.crtc.reg[18] & 0x1ff);
-					yscr = sys.crtc.vbegin-(sys.crtc.reg[19] & 0x1ff);
-					copyscrollbitmap_trans(bitmap, x68k_get_gfx_pri(3,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
-				}
-				if(sys.video.reg[2] & 0x0004)  // Pri2
-				{
-					xscr = sys.crtc.hbegin-(sys.crtc.reg[16] & 0x1ff);
-					yscr = sys.crtc.vbegin-(sys.crtc.reg[17] & 0x1ff);
-					copyscrollbitmap_trans(bitmap, x68k_get_gfx_pri(2,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
-				}
-				if(sys.video.reg[2] & 0x0002)  // Pri1
-				{
-					xscr = sys.crtc.hbegin-(sys.crtc.reg[14] & 0x1ff);
-					yscr = sys.crtc.vbegin-(sys.crtc.reg[15] & 0x1ff);
-					copyscrollbitmap_trans(bitmap, x68k_get_gfx_pri(1,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
-				}
-				if(sys.video.reg[2] & 0x0001)  // Pri0
-				{
-					xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
-					yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
-					copyscrollbitmap_trans(bitmap, x68k_get_gfx_pri(0,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
-				}
+				gpage = sys.video.gfxlayer_pri[priority];
+				if(sys.video.reg[2] & (1 << priority))
+ 				{
+					xscr = sys.crtc.hbegin-(sys.crtc.reg[12+(gpage*2)] & 0x1ff);
+					yscr = sys.crtc.vbegin-(sys.crtc.reg[13+(gpage*2)] & 0x1ff);
+					copyscrollbitmap_trans(bitmap, x68k_get_gfx_page(gpage,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
+ 				}
 				break;
 			}
 		}
@@ -1104,6 +1086,8 @@ VIDEO_UPDATE( x68000 )
 #endif
 
 #ifdef MAME_DEBUG
+//	popmessage("Layer priorities [%04x] - Txt: %i  Spr: %i  Gfx: %i  Layer Pri0-3: %i %i %i %i",sys.video.reg[1],sys.video.text_pri,sys.video.sprite_pri,
+//		sys.video.gfx_pri,sys.video.gfxlayer_pri[0],sys.video.gfxlayer_pri[1],sys.video.gfxlayer_pri[2],sys.video.gfxlayer_pri[3]);
 //	popmessage("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i",sys.crtc.reg[0],sys.crtc.reg[1],sys.crtc.reg[2],sys.crtc.reg[3],
 //		sys.crtc.reg[4],sys.crtc.reg[5],sys.crtc.reg[6],sys.crtc.reg[7],sys.crtc.reg[8],sys.crtc.reg[9]);
 //	popmessage("Visible resolution = %ix%i (%s) Screen size = %ix%i",sys.crtc.visible_width,sys.crtc.visible_height,sys.crtc.interlace ? "Interlaced" : "Non-interlaced",sys.crtc.video_width,sys.crtc.video_height);
@@ -1120,8 +1104,6 @@ VIDEO_UPDATE( x68000 )
 //	popmessage("Layer enable - 0x%02x",sys.video.reg[2] & 0xff);
 //	popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //		sys.crtc.reg[12],sys.crtc.reg[13],sys.crtc.reg[14],sys.crtc.reg[15],sys.crtc.reg[16],sys.crtc.reg[17],sys.crtc.reg[18],sys.crtc.reg[19]);
-//	popmessage("Layer priorities - Txt: %i  Spr: %i  Gfx: %i  Pages 0-3: %i %i %i %i",sys.video.text_pri,sys.video.sprite_pri,
-//		sys.video.gfx_pri,sys.video.gfx0_pri,sys.video.gfx1_pri,sys.video.gfx2_pri,sys.video.gfx3_pri);
 //	popmessage("Video Controller registers - %04x - %04x - %04x",sys.video.reg[0],sys.video.reg[1],sys.video.reg[2]);
 //	popmessage("IOC IRQ status - %02x",sys.ioc.irqstatus);
 //	popmessage("RAM: mouse data - %02x %02x %02x %02x",mess_ram[0x931],mess_ram[0x930],mess_ram[0x933],mess_ram[0x932]);
