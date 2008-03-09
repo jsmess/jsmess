@@ -7,7 +7,6 @@
 #include <assert.h>
 #include "driver.h"
 #include "deprecat.h"
-#include "mslegacy.h"
 #include "cpu/i8039/i8039.h"
 #include "includes/odyssey2.h"
 
@@ -175,7 +174,11 @@ static sound_stream *odyssey2_sh_channel;
 
 PALETTE_INIT( odyssey2 )
 {
-	palette_set_colors_rgb(machine, 0, odyssey2_colors, sizeof(odyssey2_colors) / 3);
+	int i;
+
+	for ( i = 0; i < 24; i++ ) {
+		palette_set_color_rgb( machine, i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
+	}
 }
 
 READ8_HANDLER( odyssey2_video_r )
