@@ -313,7 +313,7 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 
 		/* Display grid if enabled */
 		if ( o2_vdc.s.control & 0x08 ) {
-			UINT16	color = machine->pens[ ( o2_vdc.s.color & 7 ) | ( ( ( ( o2_vdc.s.color >> 3 ) & 0x08 ) & ( lum << 3 ) ) ^ 0x08 ) ];
+			UINT16	color = machine->pens[ ( o2_vdc.s.color & 7 ) | ( ( o2_vdc.s.color >> 3 ) & 0x08 ) | ( ( lum << 3 ) ^ 0x08 ) ];
 			int		x_grid_offset = 8;
 			int 	y_grid_offset = 24;
 			int		width = 16;
