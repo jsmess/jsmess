@@ -128,7 +128,7 @@ CPUS += TMS9995
 #CPUS += ADSP2181
 CPUS += PSXCPU
 #CPUS += ASAP
-#CPUS += UPD7810
+CPUS += UPD7810
 #CPUS += UPD7807
 CPUS += UPD7801
 CPUS += ARM
@@ -425,6 +425,7 @@ DRVLIBS = \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/shared.a \
 	$(MESSOBJ)/exeltel.a \
+	$(MESSOBJ)/gmaster.a \
 
 
 
@@ -496,7 +497,7 @@ $(MESSOBJ)/coleco.a:   \
 	$(MESS_MACHINE)/adam.o		\
 	$(MESS_DRIVERS)/adam.o		\
 	$(MESS_FORMATS)/adam_dsk.o	\
-	
+
 $(MESSOBJ)/arcadia.a:  \
 	$(MESS_DRIVERS)/arcadia.o	\
 	$(MESS_AUDIO)/arcadia.o	\
@@ -1173,6 +1174,10 @@ $(MESSOBJ)/pel.a:      \
 	$(MESS_DRIVERS)/orao.o \
 	$(MESS_MACHINE)/orao.o \
 	$(MESS_VIDEO)/orao.o \
+
+$(MESSOBJ)/gmaster.a:			\
+	$(MESS_DRIVERS)/gmaster.o	\
+	$(MESS_AUDIO)/gmaster.o
  
 #-------------------------------------------------
 # layout dependencies
@@ -1231,5 +1236,5 @@ endif
 #-------------------------------------------------
 # MESS special OSD rules
 #-------------------------------------------------
-	
+
 include $(SRC)/mess/osd/$(OSD)/$(OSD).mak

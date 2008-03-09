@@ -169,13 +169,16 @@ TESTDRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 	/* MAGNAVOX */
 	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
 
+	/* Hartung, Watara, ...*/
+	DRIVER( gmaster )	/* Hartung Gamemaster */
+
 	/* WATARA */
 	DRIVER( svision )	/* Supervision Handheld								*/
 TESTDRIVER( svisions )
 
 TESTDRIVER( svisionp )
 TESTDRIVER( svisionn )
-TESTDRIVER( tvlinkp )
+	DRIVER( tvlinkp )
 
 	/* INTERTON */
 	DRIVER( vc4000 )	/* Interton vc4000									*/

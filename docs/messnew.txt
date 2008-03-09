@@ -7,8 +7,7 @@ New System Drivers Supported (in no particular order):
 - Galeb [Miodrag Milanovic]
 - Orao [Miodrag Milanovic]
 - Philips Videopac G7000/C52 [Wilbert Pol]
-
-
+- Hartung/Watara/Virella/Videojet/... Game Master [PeT]
 
 System Driver Changes:
 ----------------------
@@ -33,6 +32,7 @@ System Driver Changes:
 - [VC4000] Cleaned up, added quickload and fixed colors.  (bug #1404) [Manfred
   Schneider]
 
+- [SVISION] Watara TV-Link PAL activated [PeT]
 
 
 User Interface Changes:
