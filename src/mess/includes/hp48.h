@@ -77,13 +77,14 @@ void hp48_crc(int adr, int data);
 int hp48_in(void);
 void hp48_out(int v);
 
-extern DRIVER_INIT( hp48s );
-extern DRIVER_INIT( hp48g );
-extern MACHINE_RESET( hp48 );
+DRIVER_INIT( hp48s );
+DRIVER_INIT( hp48g );
+MACHINE_RESET( hp48 );
 
-extern WRITE8_HANDLER( hp48_write );
-extern  READ8_HANDLER( hp48_read );
+WRITE8_HANDLER( hp48_write );
+READ8_HANDLER( hp48_read );
 
+WRITE8_HANDLER( hp48_mem_w );
 
 /*----------- defined in video/hp48.c -----------*/
 

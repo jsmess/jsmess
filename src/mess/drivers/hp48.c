@@ -13,7 +13,7 @@
  0xc0000- 0xcffff ram also mapped at 0xd0000-0xdffff */
 
 static ADDRESS_MAP_START(hp48_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x00000, 0xfffff) AM_ROM // configured at runtime, complexe mmu
+	AM_RANGE( 0x00000, 0xfffff) AM_ROM AM_WRITE( hp48_mem_w ) // configured at runtime, complexe mmu
 ADDRESS_MAP_END
 
 
