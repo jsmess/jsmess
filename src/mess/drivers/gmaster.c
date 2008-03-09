@@ -238,7 +238,8 @@ MACHINE_DRIVER_END
 ROM_START(gmaster)
 	ROM_REGION(0x10000,REGION_CPU1, 0)
      ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
-     ROM_CART_LOAD(0, "bin", 0x8000, 0x7eff, 0)
+//     ROM_CART_LOAD(0, "bin", 0x8000, 0x7f00, 0)
+     ROM_CART_LOAD(0, "bin", 0x8000, 0x8000, 0)
 ROM_END
 
 static DRIVER_INIT( gmaster )
