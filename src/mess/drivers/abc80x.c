@@ -276,6 +276,11 @@ static WRITE8_HANDLER( abc77_data_w )
 //  abc77_hys = data & 0x80;
 }
 
+static READ8_HANDLER( abc77_ea_r )
+{
+	return readinputportbytag("DSW") & 0x01;
+}
+
 /* Memory Maps */
 
 // ABC 800
@@ -315,6 +320,7 @@ static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(abc77_data_w)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(abc77_clock_r)
 	AM_RANGE(I8039_bus, I8039_bus) AM_READ_PORT("DSW")
+	AM_RANGE(I8039_ea, I8039_ea) AM_READ(abc77_ea_r)
 ADDRESS_MAP_END
 
 // ABC 802
@@ -1008,7 +1014,7 @@ static DRIVER_INIT( abc800 )
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
-COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800C", GAME_NOT_WORKING )
-COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800M", GAME_NOT_WORKING )
+COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C", GAME_NOT_WORKING )
+COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M", GAME_NOT_WORKING )
 COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc800, abc802, "Luxor Datorer AB", "ABC 802",  GAME_NOT_WORKING )
 COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc800, abc806, "Luxor Datorer AB", "ABC 806",  GAME_NOT_WORKING )

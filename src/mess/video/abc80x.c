@@ -37,12 +37,12 @@ static MC6845_UPDATE_ROW( abc800m_crtc6845_update_row )
 		int bit;
 
 		UINT8 *charrom = memory_region(REGION_GFX1);
-		UINT16 address = (videoram[(ma + col) & 0x7ff] * 16) + ra;
+		UINT16 address = (videoram[(ma + col) & 0x7ff] << 4) | (ra & 0x0f);
 		UINT8 data = charrom[address & 0x7ff];
 
 		if (col == cursor_x)
 		{
-			data = ~data; // TODO this might be wrong
+			data = 0xff;
 		}
 
 		data <<= 2;
