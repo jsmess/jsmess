@@ -40,6 +40,7 @@ PALETTE_INIT( odyssey2 );
 READ8_HANDLER ( odyssey2_t1_r );
 READ8_HANDLER ( odyssey2_video_r );
 WRITE8_HANDLER ( odyssey2_video_w );
+WRITE8_HANDLER ( odyssey2_lum_w );
 
 void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length );
 

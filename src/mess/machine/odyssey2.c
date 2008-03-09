@@ -139,6 +139,8 @@ WRITE8_HANDLER( odyssey2_putp1 )
 
 	odyssey2_switch_banks();
 
+	odyssey2_lum_w ( 0, p1 >> 7 );
+
     logerror("%.6f p1 written %.2x\n", attotime_to_double(timer_get_time()), data);
 }
 

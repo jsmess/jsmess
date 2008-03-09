@@ -168,6 +168,7 @@ static emu_timer	*i824x_hblank_timer;
 static bitmap_t		*tmp_bitmap;
 static int			start_vpos;
 static int			start_vblank;
+static UINT8		lum;		/* Output of P1 bit 7 influences the intensity of the background and grid colours */
 
 static sound_stream *odyssey2_sh_channel;
 
@@ -266,6 +267,10 @@ WRITE8_HANDLER( odyssey2_video_w )
     o2_vdc.reg[offset] = data;
 }
 
+WRITE8_HANDLER ( odyssey2_lum_w ) {
+	lum = data;
+}
+
 READ8_HANDLER( odyssey2_t1_r )
 {
 	if ( video_screen_get_vpos( 0 ) > start_vpos && video_screen_get_vpos( 0 ) < start_vblank ) {
@@ -298,14 +303,14 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 		rect.min_y = rect.max_y = vpos;
 		rect.min_x = I824X_START_ACTIVE_SCAN;
 		rect.max_x = I824X_END_ACTIVE_SCAN - 1;
-		fillbitmap( tmp_bitmap, machine->pens[(o2_vdc.s.color >> 3) & 0x7], &rect );
+		fillbitmap( tmp_bitmap, machine->pens[ ( (o2_vdc.s.color >> 3) & 0x7 ) | ( ( lum << 3 ) ^ 0x08 ) ], &rect );
 
 		/* Clear collision map */
 		memset( collision_map, 0, sizeof( collision_map ) );
 
 		/* Display grid if enabled */
 		if ( o2_vdc.s.control & 0x08 ) {
-			UINT16	color = machine->pens[ ( o2_vdc.s.color & 7 ) | ( ( o2_vdc.s.color >> 3 ) & 0x08 ) ];
+			UINT16	color = machine->pens[ ( o2_vdc.s.color & 7 ) | ( ( ( ( o2_vdc.s.color >> 3 ) & 0x08 ) & ( lum << 3 ) ) ^ 0x08 ) ];
 			int		x_grid_offset = 8;
 			int 	y_grid_offset = 24;
 			int		width = 16;
